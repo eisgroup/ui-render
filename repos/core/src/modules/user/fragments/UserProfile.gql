@@ -1,0 +1,12 @@
+fragment UserProfile on User {
+    id
+    avatar
+    age
+    name
+    surname
+    sex
+    role
+    type
+    lastOnline
+    created
+}

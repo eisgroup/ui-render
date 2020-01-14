@@ -1,0 +1,14 @@
+@import "_mixins";
+
+.color__swatch {
+  display: inline-flex;
+  .circle(@size-icon);
+
+  &.small {
+    .square(@size-icon-small);
+  }
+
+  &.large {
+    .square(@size-icon-large);
+  }
+}

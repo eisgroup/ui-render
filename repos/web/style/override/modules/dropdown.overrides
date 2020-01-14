@@ -1,0 +1,190 @@
+/*******************************
+        User Overrides
+*******************************/
+
+// @IMPORTANT: Color overrides only!
+// For styles affecting layout, edit inside `input.less`
+.ui.selection.dropdown {
+  &.active,
+  @{select-interaction} {
+    i.icon.dropdown {
+      color: @color-primary;
+
+      .inverted & {
+        color: @color-primary-light;
+      }
+    }
+  }
+
+  &:focus {
+    .inverted & {
+      border-color: @color-primary-light !important;
+    }
+  }
+
+  &.active {
+    .inverted & {
+      border-color: @color-primary-light !important;
+    }
+
+    .menu {
+      .inverted & {
+        border-color: @color-primary-light !important;
+      }
+    }
+  }
+
+  &.error {
+    border-color: @color-error !important;
+
+    .inverted & {
+      border-color: @color-error-light !important;
+    }
+
+    .menu {
+      .item:hover {
+        .inverted & {
+          background: darken(fade(@color-link-inverse, 50%), 75%);
+        }
+      }
+    }
+  }
+
+  // Placeholder
+  .text {
+    color: @color-text !important;
+
+    &.default {
+      color: @color-text-grey !important;
+    }
+  }
+
+  // Buttons for Multiple Search Selection
+  > .label {
+    &:extend(.no-wrap all);
+    &:extend(.outline all);
+    font-weight: normal;
+    color: @color-text;
+    background-color: @color-bg;
+  }
+
+  .inverted & {
+    color: @color-text-inverse;
+    background: transparent;
+
+    input[type="text"] {
+      color: @color-text-grey;
+    }
+
+    // Placeholder
+    .text {
+      color: @color-text-inverse !important;
+
+      &.default {
+        color: @color-text-grey !important;
+      }
+    }
+
+    .selected.item {
+      background: darken(fade(@color-link-inverse, 50%), 75%);
+    }
+
+    .menu {
+      background: @color-grey-dark-50;
+
+      .message {
+        color: @color-text-inverse !important;
+      }
+
+      > .item {
+        border-top-color: fade(@color-link-inverse, 50%);
+      }
+    }
+
+    // Buttons for Multiple Search Selection
+    .label {
+      color: @color-text-inverse;
+      background: transparent;
+      box-shadow: none;
+      border: 1px solid @color-text-grey;
+    }
+  }
+
+  &.text.blue {
+    .inverted & {
+      // Placeholder
+      .text {
+        color: @color-blue-light !important;
+
+        &.default {
+          color: @color-blue-light !important;
+        }
+      }
+    }
+  }
+
+  &.text.emerald {
+    .inverted & {
+      // Placeholder
+      .text {
+        color: @color-emerald-light !important;
+
+        &.default {
+          color: @color-emerald-light !important;
+        }
+      }
+    }
+  }
+
+  &.text.green {
+    .inverted & {
+      // Placeholder
+      .text {
+        color: @color-green-light !important;
+
+        &.default {
+          color: @color-green-light !important;
+        }
+      }
+    }
+  }
+
+  &.text.gold {
+    .inverted & {
+      // Placeholder
+      .text {
+        color: @color-gold-light !important;
+
+        &.default {
+          color: @color-gold-light !important;
+        }
+      }
+    }
+  }
+
+  &.text.orange {
+    .inverted & {
+      // Placeholder
+      .text {
+        color: @color-orange-light !important;
+
+        &.default {
+          color: @color-orange-light !important;
+        }
+      }
+    }
+  }
+
+  &.text.red {
+    .inverted & {
+      // Placeholder
+      .text {
+        color: @color-red-light !important;
+
+        &.default {
+          color: @color-red-light !important;
+        }
+      }
+    }
+  }
+}

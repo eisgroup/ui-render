@@ -1,0 +1,54 @@
+@import "_mixins";
+
+.review {
+  &:extend(.padding-v all);
+  &:extend(.max-width-600 all);
+
+  + .review {
+    &:extend(.border-gradient-top-grey-light);
+  }
+}
+
+.review__user {
+  &:extend(.padding-top all);
+}
+
+.review__text {
+  &:extend(.padding-v);
+  &:extend(.padding-h-smaller);
+  &:extend(.p all);
+  text-align: left;
+}
+
+.review__meta {
+  &:extend(.padding-left);
+}
+
+.review__name {
+  &:extend(.bold);
+  &:extend(.padding-bottom-smallest);
+}
+
+.review__time {
+  &:extend(.padding-left);
+  &:extend(.padding-right-smaller);
+  &:extend(.padding-bottom-smallest);
+  &:extend(.text.small);
+  &:extend(.fade);
+}
+
+.stars {
+  color: @color-primary;
+
+  .inverted & {
+    color: @color-primary-light;
+  }
+
+  .icon {
+    &:extend(i.icon all);
+  }
+
+  > span > span + span {
+    &:extend(.margin-left-smallest);
+  }
+}

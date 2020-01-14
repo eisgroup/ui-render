@@ -1,0 +1,101 @@
+@import "_mixins";
+@import "_layout";
+
+/* Input Inside Stylised Form */
+.app__form {
+  .input--wrapper {
+    &:extend(.margin-top all);
+
+    &.float {
+      &:extend(.margin-top-large all);
+    }
+  }
+
+  > .input--wrapper.float:first-child,
+  > .flex--row:first-child > .input--wrapper.float {
+    &:extend(.margin-top-smaller all);
+  }
+
+  .flex--row {
+    > .input--wrapper + .input--wrapper {
+      &:extend(.margin-left-large all);
+    }
+  }
+
+  div.input {
+    input, textarea {
+      width: 100%;
+    }
+  }
+}
+
+/* Group of Inputs */
+.app__form__group {
+  @color-border: fade(@input-color-inverse, 50%);
+  @color-border-active: fade(@color-primary-light, 50%);
+  @color-border-error: fade(@color-error-light, 50%);
+  &:extend(.margin-h-large all);
+  &:extend(.no-outline all);
+
+  .app__form__group__content {
+    &:extend(.padding all);
+    &:extend(.radius-large all);
+    border: @border-size-thick @border-style @color-border;
+  }
+
+  &.active, &.done, &:hover {
+    .app__form__group__content {
+      border-color: @color-border-active;
+    }
+  }
+
+  &.error {
+    .app__form__group__content {
+      border-color: @color-border-error;
+    }
+  }
+
+  &:not(.active):not(.done):not(.error):not(.custom):not(:hover) {
+    &:extend(.fade--quarter all);
+  }
+}
+
+.app__form__group__title {
+  &:extend(.h3 all);
+  &:extend(.no-margin-bottom all);
+  &:extend(.normal all);
+  text-align: center;
+}
+
+.form-in-steps {
+  .app__progress--bar {
+    background-color: rgba(255, 255, 255, 0.65);
+    height: size(7);
+  }
+
+  .app__progress--bar__wrapper {
+    border-radius: 0;
+    border: 0;
+  }
+}
+
+.fields-in-group {
+  .input__pay-rate input {
+    padding-right: @padding-smaller;
+    text-align: right;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 0 !important;
+  }
+
+  .input__pay-currency {
+    margin-left: 0 !important;
+
+    .ui.selection.dropdown {
+      padding-left: @padding-smaller;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: 0;
+    }
+  }
+}

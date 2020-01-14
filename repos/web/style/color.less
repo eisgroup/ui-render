@@ -1,0 +1,60 @@
+@import "_mixins";
+
+.inverted {
+  .inverse-colors();
+
+  ::selection {
+    background: @color-bg;
+  }
+
+  :not(.button) {
+    &.primary {
+      color: @color-primary-light !important;
+    }
+    &.secondary {
+      color: @color-secondary-light !important;
+    }
+
+    &.tertiary {
+      color: @color-tertiary-light !important;
+    }
+
+    &.red, &.text.error {
+      color: @color-red-light !important;
+    }
+    &.orange {
+      color: @color-orange-light !important;
+    }
+    &.gold {
+      color: @color-gold-light !important;
+    }
+    &.yellow {
+      color: @color-yellow-light !important;
+    }
+    &.green {
+      color: @color-green-light !important;
+    }
+    &.emerald {
+      color: @color-emerald-light !important;
+    }
+    &.cyan {
+      color: @color-cyan-light !important;
+    }
+    &.blue {
+      color: @color-blue-light !important;
+    }
+    &.violet {
+      color: @color-violet-light !important;
+    }
+    &.purple {
+      color: @color-purple-light !important;
+    }
+    &.pink {
+      color: @color-pink-light !important;
+    }
+  }
+}
+
+.transparent {
+  background-color: transparent !important;
+}

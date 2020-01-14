@@ -1,0 +1,217 @@
+@import "_mixins";
+@import "effect";
+
+.button {
+  @paddingCircle: 0.35;
+  @paddingTop: 0.4;
+  @paddingBottom: @paddingTop * 1.2;
+  @paddingH: @paddingTop * 2.2;
+  @radius: @radius-base;
+  @small: @size-smallest;
+  @base: @size-large;
+  @large: @size-larger;
+  @background: transparent;
+  @backgroundHover: @color-shadow-darkest;
+  @font-family: @font-family-secondary;
+
+  .buttonColors();
+  .font(@size: @base; @lineHeight: 1; @weight: @font-weight-bold);
+  &:extend(.align-center all);
+  &:extend(.interaction all);
+  &:extend(.pointer all);
+  display: inline-flex; // align content in the middle
+  position: relative; // for Spinner
+  text-transform: uppercase;
+  //color: @color-white;
+  font-family: @font-family;
+  background-color: @background;
+  border: @border;
+  transition: @speed-transition;
+  -webkit-backface-visibility: hidden; // smooth the edges for Chrome when using `transform`
+
+  // Interaction
+  &:not(:disabled) {
+    &:hover, &:focus, &:active {
+      &.transparent {
+        color: @color-primary-light !important;
+
+        .inverted & {
+          color: @color-white !important;
+          border-color: @color-white !important;
+        }
+      }
+
+      background-color: @color-shadow-lightest;
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .sizeScale(@base);
+
+  i.icon {
+    font-size: @size-icon; // crisp display fix
+  }
+
+  &.small {
+    .sizeScale(@small);
+  }
+
+  &.large {
+    .sizeScale(@large);
+
+    i.icon {
+      margin-right: @margin-small;
+      font-size: @size-icon-larger; // crisp display fix
+    }
+  }
+
+  &.circle {
+    //@sizeScale: 1.2; // make icon larger
+    //@padding: @paddingTop * unit(@size-base / @size-icon * @size-base / @size-icon); // and padding smaller
+    @sizeScale: 1;
+    @padding: @paddingCircle;
+    &:extend(.round all);
+
+    .scalePadding(@size: @base * @sizeScale; @top: @padding; @left: @padding;);
+    //font-size: @base * @sizeScale;
+    letter-spacing: 0 !important;
+    transform: none;
+
+    &.small {
+      //  font-size: @small * @sizeScale;
+      .scalePadding(@size: @small * @sizeScale; @top: @padding; @left: @padding;);
+    }
+
+    &.large {
+      //  font-size: @large * @sizeScale;
+      .scalePadding(@size: @large * @sizeScale; @top: @padding; @left: @padding;);
+    }
+
+    @{select-interaction} {
+      &:extend(.round all);
+    }
+  }
+
+  &.round {
+    border-radius: @radius-round !important;
+  }
+
+  &.transparent {
+    border-color: transparent !important;
+
+    .inverted & {
+      color: @color-white;
+    }
+  }
+
+  &.loading {
+    .app__loading {
+      margin: -1px;
+    }
+
+    .app__spinner {
+      &:extend(.app__spinner.base all);
+    }
+
+    &.large .app__spinner {
+      &:extend(.app__spinner.large all);
+    }
+
+    &.small .app__spinner {
+      &:extend(.app__spinner.small all);
+    }
+  }
+
+  &.bg-white {
+    &:extend(.bg-white all);
+  }
+
+  &.bg-grey {
+    &:extend(.bg-grey all);
+  }
+
+  &.bg-grey-light {
+    &:extend(.bg-grey-light all);
+  }
+
+  &.alert {
+    .specialColor(@color-alert);
+  }
+
+  &.instagram {
+    .specialColor(@color-pink);
+  }
+
+  &.facebook {
+    .specialColor(@color-blue);
+  }
+
+  &.vk {
+    .specialColor(@color-teal-light);
+  }
+
+  .sizeScale(@size) {
+    @ratio: @size / @size-base;
+    .scalePadding(@size: @size; @top: @paddingTop; @left: @paddingH; @bottom: @paddingBottom;);
+    font-size: @size;
+    border-radius: size(round(@ratio * px(@radius)));
+  }
+}
+
+// -----------------------------------------------------------------------------
+// MIXINS
+// -----------------------------------------------------------------------------
+
+.specialColor(@color) {
+  color: @color-white;
+  border-color: @color-white;
+  background-color: @color !important;
+
+  @{select-interaction} {
+    color: @color-white !important;
+    .outline(@color-white);
+  }
+}
+
+.buttonColors(@colors: @all-colors; @i: length(@colors);) when (@i > 0) {
+  @color: extract(@colors, @i); // color
+  .buttonColor(@color;);
+  .buttonColors(@colors; (@i - 1);); // iterate
+}
+
+.buttonColor(@color: primary) {
+  @colorVar: ~'color-@{color}';
+  @colorVal: @@colorVar;
+  @colorVarLight: ~'color-@{color}-light';
+  @colorValLight: @@colorVarLight;
+
+  &.@{color}, .@{color} & {
+    border-color: @colorVal;
+
+    &:not(:disabled) {
+      @{select-interaction} {
+        //color: @colorVal;
+        box-shadow: inset 0 0 0 @border-size @colorVal;
+      }
+    }
+
+    .inverted & {
+      color: @colorValLight;
+      border-color: @colorValLight;
+
+      &:not(:disabled) {
+        @{select-interaction} {
+          //color: @colorValLight;
+          box-shadow: inset 0 0 0 @border-size @colorValLight;
+        }
+      }
+    }
+  }
+}
+
+/* Delete Button */
+// <Button circle className='app__slider__remove small' onClick={}><Icon name='delete'/></Button>

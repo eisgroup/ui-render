@@ -1,0 +1,48 @@
+@import "_mixins";
+
+.app__collapse__content {
+  overflow: hidden;
+  transition: @speed-transition * 2;
+}
+
+
+.app__expand {
+  .app__expand,
+  + .app__expand {
+    border-top: @border-base;
+  }
+
+  .app__expand {
+    //background: @color-shadow-light;
+  }
+
+  &:nth-child(2n) {
+    .striped & {
+      background: @color-shadow-lightest;
+    }
+
+    .inverted .striped & {
+      background: @color-highlight-darkest;
+    }
+  }
+
+  &:last-child {
+    .striped & {
+      border-bottom: @border-base;
+    }
+  }
+
+  .striped & {
+    border-top: @border-base;
+  }
+
+  .inverted .striped & {
+    border-color: fade(@color-border, 13%);
+  }
+
+  &.expanded, &:hover, &:focus, &:active {
+    .inverted & {
+      background: @color-shadow;
+    }
+  }
+}

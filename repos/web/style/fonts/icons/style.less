@@ -1,0 +1,616 @@
+@import "variables";
+
+@font-face {
+  font-family: '@{icomoon-font-family}';
+  src: url('@{icomoon-font-path}/@{icomoon-font-family}.eot?681moa');
+  src: url('@{icomoon-font-path}/@{icomoon-font-family}.eot?681moa#iefix') format('embedded-opentype'),
+  url('@{icomoon-font-path}/@{icomoon-font-family}.ttf?681moa') format('truetype'),
+  url('@{icomoon-font-path}/@{icomoon-font-family}.woff?681moa') format('woff'),
+  url('@{icomoon-font-path}/@{icomoon-font-family}.svg?681moa#@{icomoon-font-family}') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+i.icon {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: '@{icomoon-font-family}' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  &.RUB {
+    &:before {
+      content: @RUB;
+    }
+  }
+
+  &.facebook {
+    &:before {
+      content: @facebook;
+    }
+  }
+
+  &.USD {
+    &:before {
+      content: @USD;
+    }
+  }
+
+  &.dollar {
+    &:before {
+      content: @dollar;
+    }
+  }
+
+  &.instagram {
+    &:before {
+      content: @instagram;
+    }
+  }
+
+  &.vk {
+    &:before {
+      content: @vk;
+    }
+  }
+
+  &.telegram {
+    &:before {
+      content: @telegram;
+    }
+  }
+
+  &.chevron-up-circle {
+    &:before {
+      content: @chevron-up-circle;
+    }
+  }
+
+  &.chevron-down-circle {
+    &:before {
+      content: @chevron-down-circle;
+    }
+  }
+
+  &.chevron-left-circle {
+    &:before {
+      content: @chevron-left-circle;
+    }
+  }
+
+  &.chevron-right-circle {
+    &:before {
+      content: @chevron-right-circle;
+    }
+  }
+
+  &.shutter {
+    &:before {
+      content: @shutter;
+    }
+  }
+
+  &.globe {
+    &:before {
+      content: @globe;
+    }
+  }
+
+  &.theme {
+    &:before {
+      content: @theme;
+    }
+  }
+
+  &.book {
+    &:before {
+      content: @book;
+    }
+  }
+
+  &.books {
+    &:before {
+      content: @books;
+    }
+  }
+
+  &.bank {
+    &:before {
+      content: @bank;
+    }
+  }
+
+  &.receipt {
+    &:before {
+      content: @receipt;
+    }
+  }
+
+  &.profile {
+    &:before {
+      content: @profile;
+    }
+  }
+
+  &.calendar-user {
+    &:before {
+      content: @calendar-user;
+    }
+  }
+
+  &.tag {
+    &:before {
+      content: @tag;
+    }
+  }
+
+  &.tags {
+    &:before {
+      content: @tags;
+    }
+  }
+
+  &.camera {
+    &:before {
+      content: @camera;
+    }
+  }
+
+  &.read {
+    &:before {
+      content: @read;
+    }
+  }
+
+  &.sent {
+    &:before {
+      content: @sent;
+    }
+  }
+
+  &.radar {
+    &:before {
+      content: @radar;
+    }
+  }
+
+  &.compass {
+    &:before {
+      content: @compass;
+    }
+  }
+
+  &.send {
+    &:before {
+      content: @send;
+    }
+  }
+
+  &.aim {
+    &:before {
+      content: @aim;
+    }
+  }
+
+  &.diamond-star {
+    &:before {
+      content: @diamond-star;
+    }
+  }
+
+  &.plus-circle {
+    &:before {
+      content: @plus-circle;
+    }
+  }
+
+  &.minus-circle {
+    &:before {
+      content: @minus-circle;
+    }
+  }
+
+  &.filter {
+    &:before {
+      content: @filter;
+    }
+  }
+
+  &.eye {
+    &:before {
+      content: @eye;
+    }
+  }
+
+  &.flag {
+    &:before {
+      content: @flag;
+    }
+  }
+
+  &.pushpin {
+    &:before {
+      content: @pushpin;
+    }
+  }
+
+  &.pin {
+    &:before {
+      content: @pin;
+    }
+  }
+
+  &.location {
+    &:before {
+      content: @location;
+    }
+  }
+
+  &.map {
+    &:before {
+      content: @map;
+    }
+  }
+
+  &.star-full {
+    &:before {
+      content: @star-full;
+    }
+  }
+
+  &.star {
+    &:before {
+      content: @star;
+    }
+  }
+
+  &.star-half {
+    &:before {
+      content: @star-half;
+    }
+  }
+
+  &.star-empty {
+    &:before {
+      content: @star-empty;
+    }
+  }
+
+  &.cube {
+    &:before {
+      content: @cube;
+    }
+  }
+
+  &.test {
+    &:before {
+      content: @test;
+    }
+  }
+
+  &.home {
+    &:before {
+      content: @home;
+    }
+  }
+
+  &.heart {
+    &:before {
+      content: @heart;
+    }
+  }
+
+  &.edit {
+    &:before {
+      content: @edit;
+    }
+  }
+
+  &.cog {
+    &:before {
+      content: @cog;
+    }
+  }
+
+  &.at-sign {
+    &:before {
+      content: @at-sign;
+    }
+  }
+
+  &.mail {
+    &:before {
+      content: @mail;
+    }
+  }
+
+  &.bubble-dots {
+    &:before {
+      content: @bubble-dots;
+    }
+  }
+
+  &.bubble-question {
+    &:before {
+      content: @bubble-question;
+    }
+  }
+
+  &.bubble-alert {
+    &:before {
+      content: @bubble-alert;
+    }
+  }
+
+  &.bubble {
+    &:before {
+      content: @bubble;
+    }
+  }
+
+  &.login {
+    &:before {
+      content: @login;
+    }
+  }
+
+  &.logout {
+    &:before {
+      content: @logout;
+    }
+  }
+
+  &.options {
+    &:before {
+      content: @options;
+    }
+  }
+
+  &.picture {
+    &:before {
+      content: @picture;
+    }
+  }
+
+  &.user {
+    &:before {
+      content: @user;
+    }
+  }
+
+  &.users {
+    &:before {
+      content: @users;
+    }
+  }
+
+  &.calendar {
+    &:before {
+      content: @calendar;
+    }
+  }
+
+  &.support {
+    &:before {
+      content: @support;
+    }
+  }
+
+  &.search {
+    &:before {
+      content: @search;
+    }
+  }
+
+  &.zoom-in {
+    &:before {
+      content: @zoom-in;
+    }
+  }
+
+  &.zoom-out {
+    &:before {
+      content: @zoom-out;
+    }
+  }
+
+  &.delete {
+    &:before {
+      content: @delete;
+    }
+  }
+
+  &.close {
+    &:before {
+      content: @close;
+    }
+  }
+
+  &.plus {
+    &:before {
+      content: @plus;
+    }
+  }
+
+  &.minus {
+    &:before {
+      content: @minus;
+    }
+  }
+
+  &.check {
+    &:before {
+      content: @check;
+    }
+  }
+
+  &.checkmark {
+    &:before {
+      content: @checkmark;
+    }
+  }
+
+  &.chevron-left {
+    &:before {
+      content: @chevron-left;
+    }
+  }
+
+  &.chevron-right {
+    &:before {
+      content: @chevron-right;
+    }
+  }
+
+  &.chevron-up {
+    &:before {
+      content: @chevron-up;
+    }
+  }
+
+  &.chevron-down {
+    &:before {
+      content: @chevron-down;
+    }
+  }
+
+  &.dropdown {
+    &:before {
+      content: @dropdown;
+    }
+  }
+
+  &.question-circle {
+    &:before {
+      content: @question-circle;
+    }
+  }
+
+  &.check-circle {
+    &:before {
+      content: @check-circle;
+    }
+  }
+
+  &.cross-circle {
+    &:before {
+      content: @cross-circle;
+    }
+  }
+
+  &.square {
+    &:before {
+      content: @square;
+    }
+  }
+
+  &.check-square {
+    &:before {
+      content: @check-square;
+    }
+  }
+
+  &.more {
+    &:before {
+      content: @more;
+    }
+  }
+
+  &.visa {
+    &:before {
+      content: @visa;
+    }
+  }
+
+  &.whatsapp {
+    &:before {
+      content: @whatsapp;
+    }
+  }
+
+  &.hair {
+    &:before {
+      content: @hair;
+    }
+  }
+
+  &.twitter {
+    &:before {
+      content: @twitter;
+    }
+  }
+
+  &.measurement {
+    &:before {
+      content: @measurement;
+    }
+  }
+
+  &.clock {
+    &:before {
+      content: @clock;
+    }
+  }
+
+  &.bell {
+    &:before {
+      content: @bell;
+    }
+  }
+
+  &.caret-down {
+    &:before {
+      content: @caret-down;
+    }
+  }
+
+  &.desc {
+    &:before {
+      content: @desc;
+    }
+  }
+
+  &.caret-up {
+    &:before {
+      content: @caret-up;
+    }
+  }
+
+  &.asc {
+    &:before {
+      content: @asc;
+    }
+  }
+
+  &.sort {
+    &:before {
+      content: @sort;
+    }
+  }
+
+  &.discover {
+    &:before {
+      content: @discover;
+    }
+  }
+
+  &.mastercard {
+    &:before {
+      content: @mastercard;
+    }
+  }
+
+  &.amex {
+    &:before {
+      content: @amex;
+    }
+  }
+}

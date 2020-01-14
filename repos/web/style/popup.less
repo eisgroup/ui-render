@@ -1,0 +1,34 @@
+@import "_mixins";
+@import "modal";
+
+.app__popup {
+  &:extend(.app__modal all);
+
+  &.active {
+    z-index: 9999999; // navbar z-index is 1000
+  }
+}
+
+.app__popup__box {
+  &:extend(.app__modal__box all);
+
+  &--alert {
+    text-align: center;
+  }
+}
+
+.app__popup__box__content {
+  &:extend(.app__modal__box__content all);
+}
+
+.app__popup__box__header__title {
+  &:extend(.app__modal__box__header__title all);
+}
+
+.app__popup__box__body {
+  &:extend(.app__modal__box__body all);
+}
+
+.app__popup__box__footer {
+  &:extend(.app__modal__box__footer all);
+}

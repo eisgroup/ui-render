@@ -1,0 +1,108 @@
+@import "_mixins";
+@import "_layout";
+
+.base-font {
+  .font(@lineHeight: 1)
+}
+
+.text, .p, p, li {
+  .colors();
+
+  &.row {
+    &:extend(.flex--row all);
+    &:extend(.flex--row.middle);
+  }
+
+  &.smallest {
+    font-size: @size-smallest;
+  }
+
+  &.smaller {
+    font-size: @size-smaller;
+  }
+
+  &.small {
+    font-size: @size-small;
+  }
+
+  &.base {
+    font-size: @size-base;
+  }
+
+  &.large {
+    font-size: @size-large;
+  }
+
+  &.larger {
+    font-size: @size-larger;
+  }
+
+  &.largest {
+    font-size: @size-largest;
+  }
+
+  &.normal {
+    font-weight: @font-weight;
+  }
+
+  &.bold {
+    font-weight: @font-weight-bold;
+  }
+
+  &.truncate {
+    .text-truncate();
+  }
+
+  &.left {
+    text-align: left;
+  }
+
+  &.center {
+    text-align: center;
+  }
+
+  &.right {
+    text-align: right;
+  }
+
+  &.wrap {
+    white-space: normal;
+  }
+
+  > .text,
+  > i.icon {
+    margin-right: @size-base-space;
+  }
+
+  i.icon {
+    vertical-align: text-bottom; // good for icon with normal text, for titles, use `baseline`
+  }
+}
+
+.break-word {
+  word-break: break-word;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.strike {
+  text-decoration: line-through;
+}
+
+.text-shadow {
+  .text-shadow();
+}
+
+.text-shadow-soft {
+  .text-shadow(@blur: size(3););
+}
+
+.text-highlight {
+  .text-highlight();
+}
+
+.uppercase {
+  text-transform: uppercase;
+}

@@ -1,0 +1,26 @@
+{
+  "renderer": "Expand",
+  "title": "Admin Expenses",
+  "items": [
+    {
+      "renderer": "Col",
+      "items": [
+        {
+          "renderer": "Title",
+          "children": "Fully Insured"
+        },
+        {
+          "renderer": "Input",
+          "label": "Number of claims per employee",
+          "name": "adminExpenses.perEmployeeClaims",
+          "type": "number",
+          "min": 1
+        },
+        {
+          "renderer": "Table",
+          "name": "adminCosts"
+        }
+      ]
+    }
+  ]
+}

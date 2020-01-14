@@ -1,0 +1,101 @@
+@import "_mixins";
+@import "_layout";
+
+.app__upload {
+  &:extend(.flex--fill);
+  &:extend(.full-width);
+  &:extend(.align-center);
+
+  .app__view--close__icon {
+    .square(size(20));
+  }
+
+  h2 {
+    width: 100%;
+    margin: 0;
+    padding: @padding-base;
+    background: @color-shadow;
+  }
+}
+
+.app__upload__dropzone {
+  &:extend(.flex--fill);
+  &:extend(.align-center);
+  min-height: 7rem;
+  padding: @padding-base;
+  border: 1px dashed @color-link;
+
+  &:hover, &:focus, &:active, &.active {
+    border-style: solid;
+    border-color: @color-link;
+    background: @color-shadow;
+    cursor: pointer;
+    outline: none;
+
+    .inverted & {
+      border-color: @color-link-inverse;
+    }
+  }
+
+  .app__modal__box__content & {
+    border-bottom-left-radius: @radius-large;
+    border-bottom-right-radius: @radius-large;
+  }
+}
+
+.app__upload__file__add,
+.app__upload__file__remove {
+  &:extend(.position-absolute all);
+  &:extend(.bg-white all);
+  &:extend(.round all);
+  bottom: -@margin-smaller;
+  right: -@margin-smaller;
+
+  @{select-interaction} {
+    border-radius: @radius-round !important;
+  }
+}
+
+.app__upload__file__add {
+  &:extend(.text.primary all);
+}
+
+.app__upload__file__number {
+  &:extend(.position-top-left all);
+  &:extend(.padding-small all);
+  &:extend(.text-shadow-soft all);
+  color: @color-white;
+}
+
+.app__upload--grid {
+  &:extend(.flex--row all);
+  &:extend(.flex--row.spread all);
+  &:extend(.flex--row.wrap all);
+  &:extend(.no-padding all);
+  color: @color-text-grey;
+}
+
+.app__upload--grid__item {
+  @paddingBetweenFiles: @padding-base;
+  @size: calc(100% / 3 - @paddingBetweenFiles);
+  .square(@size);
+
+  &.preview {
+    .app__upload__dropzone {
+      border: none;
+    }
+  }
+
+  .app__upload__dropzone {
+    &:extend(.no-padding all);
+    &:extend(.radius-large all);
+    &:extend(.bg-grey-light all);
+
+    .app__upload__file {
+      &:extend(.full-width all);
+      &:extend(.full-height all);
+      &:extend(.radius-large all);
+      &:extend(.bg-image all);
+    }
+  }
+}

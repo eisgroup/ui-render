@@ -1,0 +1,46 @@
+@import "_mixins";
+@import "_layout";
+
+.app__placeholder {
+  &:extend(.fill);
+  .background-image('placeholder.jpg'; auto 100%) !important;
+
+  .sun {
+    width: 12.7vh;
+    height: 13.3vh;
+    bottom: 62.5vh;
+    right: 10.7vh;
+    background: fade(@color-white, 80%);
+    transform: rotate(-33deg);
+  }
+
+  .app__form {
+    .fade(0.8);
+    margin-top: 27vh;
+    margin-left: 3vh;
+
+    .float-label + .float-label {
+      margin-top: @margin-small;
+    }
+
+    input {
+      border-color: @color-yellow-dark !important;
+    }
+
+    label {
+      color: @color-yellow-dark !important;
+    }
+  }
+
+  &.inverted {
+    h1 {
+      margin: @margin-base;
+      color: @color-orange-light;
+      .text-shadow(@opacity: 1; @blur: 7px);
+    }
+
+    > h1 {
+      margin-top: 33vh;
+    }
+  }
+}

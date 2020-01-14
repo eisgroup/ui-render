@@ -1,0 +1,10 @@
+/*******************************
+         Site Overrides
+*******************************/
+input {
+  &:focus {
+    .inverted & {
+      border-color: @color-primary-light !important;
+    }
+  }
+}

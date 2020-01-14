@@ -1,0 +1,132 @@
+@import "_mixins";
+
+.tooltip {
+  @line-height: size(7); // distance between tooltip and origin reference point
+  &:extend(.bg-blur all);
+  &:extend(.bg-neutral all);
+  &:extend(.border all);
+  &:extend(.radius all);
+  &:extend(.padding-small all);
+  &:extend(.transition all);
+  position: absolute;
+  display: none; // `visibility: hidden` is not enough because it will trigger hover
+  opacity: 0;
+  z-index: -1;
+
+  /* Vertical line */
+
+  &:after {
+    .object();
+    position: absolute;
+    border-width: 0;
+    border-color: inherit;
+    border-style: @border-style;
+  }
+
+  &.show,
+  *:hover > &,
+  *:active > &,
+  *:focus > & {
+    &:extend(.fade-in all);
+    animation-delay: @speed-base;
+    visibility: visible; // must be defined to show in certain layout
+    display: flex;
+    z-index: 9; // to overlay other elements
+  }
+
+  &.show {
+    animation-delay: 0s;
+  }
+
+  &.center.middle {
+    &:extend(.position-center all);
+  }
+
+  &.top {
+    bottom: calc(100% + @line-height);
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* Vertical Line */
+    &:after {
+      top: calc(100% + @border-size);
+      left: 50%;
+      width: 0;
+      height: @line-height;
+      border-left-width: @border-size;
+    }
+  }
+
+  &.top.right {
+    left: auto;
+    right: 0;
+    transform: none;
+
+    &:after {
+      left: auto;
+      right: @radius-base * 3;
+    }
+  }
+
+  &.top.left {
+    left: 0;
+    right: auto;
+    transform: none;
+
+    &:after {
+      left: @radius-base * 3;
+      right: auto;
+    }
+  }
+
+  &.bottom {
+    top: calc(100% + @line-height);
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* Vertical Line */
+
+    &:after {
+      bottom: calc(100% + @border-size);
+      left: 50%;
+      width: 0;
+      height: @line-height;
+      border-left-width: @border-size;
+    }
+  }
+
+  &.left {
+    left: -@line-height;
+    top: 50%;
+    transform: translate(-100%, -50%);
+  }
+
+  &.right {
+    right: -@line-height;
+    top: 50%;
+    transform: translate(100%, -50%);
+
+    /* Vertical Line */
+
+    &:after {
+      top: 50%;
+      right: calc(100% + @border-size);
+      height: 0;
+      width: @line-height;
+      border-top-width: @border-size;
+    }
+  }
+
+  .button & {
+    &:extend(.text.base);
+    &:extend(.text.normal);
+    &:extend(.no-wrap);
+    color: @color-text;
+    text-transform: none;
+
+    .inverted & {
+      &:extend(.text-shadow);
+      color: @color-text-inverse;
+    }
+  }
+}

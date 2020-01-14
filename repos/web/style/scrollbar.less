@@ -1,0 +1,41 @@
+@import "_mixins";
+
+/*
+ * As of Nov, 2018, there is no way to detect OS on Safari and Chrome with CSS.
+ * Ideally, we only want to style scrollbar on Windows, and leave it as default on Safari,
+ * because the desired effect is overlay scrollbar with content background showing through.
+ * However, as soon as the scrollbar is styled, transparent track background shows the content of parent container,
+ * and not the overflowing content itself, like the desired default behavior in Mac OS.
+*/
+::-webkit-scrollbar {
+  width: 3px !important;
+  height: 3px !important;
+}
+
+/* this targets the default scrollbar (compulsory) */
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+/* the new scrollbar will have a flat appearance with the set background color */
+::-webkit-scrollbar-thumb {
+  background: @color-neutral !important;
+  border-radius: @radius-large !important;
+  border: 1px solid @color-neutral !important;
+}
+
+/* this will style the thumb, ignoring the track */
+::-webkit-scrollbar-button {
+}
+
+/* optionally, style the top + bottom buttons (left and right for horizontal bars) */
+::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* if both the vertical + horizontal bars appear, the right bottom corner needs to be styled */
+.no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

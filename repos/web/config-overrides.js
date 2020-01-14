@@ -34,7 +34,7 @@ if (process.env.NODE_ENV === 'test') {
       // todo: check if `lodash` plugin increases hot-reload time on large projects
       'lodash',  // cherry pick imports to reduce final js bundle size, and increases build speed
       'transform-export-extensions',
-      'import-graphql', // for importing .graphql and .gql files
+      // 'import-graphql', // for importing .graphql and .gql files
       // 'semantic-ui-react' imports are already pruned correctly by CRA 2
     )
   )

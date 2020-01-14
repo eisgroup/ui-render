@@ -1,0 +1,7 @@
+#import "../../fragments/Look.gql"
+fragment UserLook on User {
+    look {
+        ...Look
+    }
+    photos
+}

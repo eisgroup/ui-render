@@ -1,0 +1,142 @@
+@import "_mixins";
+
+@avatar-border: @border @color-text-inverse;
+
+.app__profile {
+  &:extend(.no-outline all);
+
+  .app__progress__stats {
+    background-color: @color-shadow-dark;
+  }
+}
+
+.app__avatar {
+  @status-size: size(12);
+  &:extend(.flex--col.center all);
+  &:extend(.no-outline all);
+  &:extend(.transition all);
+
+  &.online {
+    .app__avatar__inner:after {
+      @offset: (@size-avatar * 0.15 - @status-size / 2);
+      top: @offset;
+      right: @offset;
+      .circle(@status-size);
+      position: absolute;
+      content: ' ';
+      border: @avatar-border;
+    }
+
+    &.large .app__avatar__inner:after {
+      @offset: (@size-avatar-large * 0.15 - @status-size / 2);
+      top: @offset;
+      right: @offset;
+    }
+  }
+
+  &.online .app__avatar__inner:after {
+    background-color: @color-green;
+  }
+
+  &.interact {
+    @{select-interaction} {
+      .app__avatar__inner:after, .app__avatar__image {
+        border-color: @color-primary-light;
+      }
+
+      .app__avatar__image {
+        &:extend(.flash-text all);
+      }
+    }
+
+    // Show Camera Icon on interaction with shadow background behind
+    .app__profile & {
+      @{select-interaction} {
+        .app__avatar__image {
+          &:after {
+            &:extend(.position-center all);
+            .circle(@size-avatar);
+            content: ' ';
+            background-color: @color-shadow-dark;
+          }
+
+          > .placeholder {
+            opacity: 0;
+          }
+        }
+
+        &:after {
+          &:extend(.position-center all);
+          &:extend(.fade-in all);
+          .icon(@camera);
+          margin-left: size(1); // offset icon alignment
+          font-size: size(round(px(@size-avatar) * 0.4));
+        }
+      }
+    }
+  }
+}
+
+.app__avatar__inner {
+  &:before {
+    @scale: 0.7;
+
+    .app__avatar.fetching & {
+      &:extend(.position-center all);
+      .icon(@picture);
+      color: @color-neutral;
+      font-size: @size-avatar * @scale;
+    }
+
+    .app__avatar.small & {
+      font-size: @size-avatar-small * @scale;
+    }
+
+    .app__avatar.large & {
+      font-size: @size-avatar-large * @scale;
+    }
+
+    .app__avatar.larger & {
+      font-size: @size-avatar-larger * @scale;
+    }
+  }
+}
+
+.app__avatar__image {
+  .circle(@size-avatar);
+  &:extend(.text.bold all);
+  &:extend(.overflow-hidden all);
+  &:extend(.bg-image all);
+  font-size: size(round(px(@size-avatar) * 0.8));
+  text-transform: uppercase;
+  border: @avatar-border;
+
+  .placeholder {
+    &:extend(.transition all);
+
+    i.icon {
+      &:extend(.flex--col);
+      &:extend(.no-margin all);
+      font-size: 75%;
+    }
+  }
+
+  .app__profile & {
+    border-color: @color-primary-light;
+  }
+
+  .app__avatar.small & {
+    .square(@size-avatar-small);
+    font-size: size(round(px(@size-avatar-small) * 0.8));
+  }
+
+  .app__avatar.large & {
+    .square(@size-avatar-large);
+    font-size: size(round(px(@size-avatar-large) * 0.8));
+  }
+
+  .app__avatar.larger & {
+    .square(@size-avatar-larger);
+    font-size: size(round(px(@size-avatar-larger) * 0.8));
+  }
+}

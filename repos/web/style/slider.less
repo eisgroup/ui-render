@@ -1,0 +1,146 @@
+@slider-color: @color-primary-light;
+@slider-color-handle: @color-primary-light;
+@slider-color-handle-border: @slider-color-handle;
+@slider-color-handle-hover: @color-tertiary-light;
+@slider-color-rail: @color-shadow-light;
+@slider-color-disabled: @color-text;
+@slider-track-size: @border-size-thick;
+@slider-handle-size: @slider-track-size * 6; // must be bigger than @slider-track-size
+@slider-track-padding: (@slider-handle-size - @slider-track-size) / 2;
+
+// Inverted Colors
+@slider-color-inverted: @color-secondary-light;
+@slider-color-handle-inverted: @color-primary-light;
+@slider-color-handle-border-inverted: @color-border-lighter;
+@slider-color-rail-inverted: @color-highlight-lighter;
+
+.app__slider {
+  /* Layout and Sizes */
+
+  &:not(.vertical) {
+    height: @slider-handle-size;
+
+    .rc-slider-rail,
+    .rc-slider-track,
+    .rc-slider-step {
+      height: @slider-track-size;
+    }
+
+    .rc-slider-handle {
+      .circle(@slider-handle-size);
+      margin-top: -@slider-track-padding; // offset track padding
+      //margin-left: -(@slider-handle-size / 2); // <- this cause bug - Slider fires onChange twice
+    }
+  }
+
+  .rc-slider-track {
+    background-color: @slider-color;
+
+    .inverted & {
+      background-color: @slider-color-inverted;
+    }
+  }
+
+  .rc-slider-handle {
+    background-color: @slider-color-handle;
+    border-color: @slider-color-handle-border;
+
+    .inverted & {
+      background-color: @slider-color-handle-inverted;
+      border-color: @slider-color-handle-border-inverted;
+    }
+
+    &:hover, &:focus, &:active {
+      background-color: @slider-color-handle-hover;
+      border-color: @slider-color-handle-border;
+    }
+  }
+
+  .rc-slider-rail {
+    background-color: @slider-color-rail;
+
+    .inverted & {
+      background-color: @slider-color-rail-inverted;
+    }
+  }
+
+  .rc-slider-dot {
+    border-color: @slider-color-rail;
+    background-color: @slider-color-rail;
+
+    .inverted & {
+      border-color: @slider-color-rail-inverted;
+      background-color: @slider-color-rail-inverted;
+    }
+  }
+
+  .rc-slider-dot:first-child,
+  .rc-slider-dot:last-child {
+    .inverted & {
+      background-color: @color-grey-light;
+    }
+  }
+
+  .tooltip {
+    &:extend(.padding-smaller all);
+    &:extend(.padding-bottom-smallest all);
+    &:extend(.text.smaller all);
+
+    &.top {
+      &:after {
+        top: 100%;
+      }
+    }
+
+    &.right {
+      &:after {
+        right: 100%;
+      }
+    }
+  }
+}
+
+.rc-slider-handle {
+  &:hover, &:focus, &:active {
+    .tooltip {
+      background-color: @slider-color-handle-hover;
+      border-color: @slider-color-handle-hover;
+    }
+  }
+}
+
+.app__slider--wrap {
+  &:extend(.padding-v all);
+  &:extend(.padding-h-smaller all);
+  align-self: stretch;
+  align-items: center;
+
+  .rc-slider-disabled {
+    background-color: initial;
+
+    .rc-slider-track {
+      background-color: @slider-color-disabled;
+    }
+
+    .rc-slider-handle {
+      border-color: @slider-color-disabled;
+    }
+  }
+}
+
+.app__slider__label {
+  &:extend(.uppercase all);
+  .text-truncate(@maxWidth: 45%);
+}
+
+.app__slider__remove {
+  &:extend(.margin-left-smaller all);
+  &:extend(.appear-on-hover all);
+  background-color: @color-white !important;
+}
+
+.app__slider__values {
+  position: absolute;
+  bottom: calc(100% + @margin-smaller);
+  right: 0;
+}

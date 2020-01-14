@@ -1,0 +1,112 @@
+@import "_mixins";
+
+@carousel-size-control-icon: @size-icon-largest;
+
+.carousel {
+  &:extend(.radius-largest all);
+  overflow: hidden;
+}
+
+.carousel__image {
+  &:extend(.bg-image all);
+  &:extend(.radius-large all);
+}
+
+.carousel__image__count,
+.carousel__image__date {
+  &:extend(.padding all);
+  &:extend(.text-shadow-soft all);
+  color: @color-white;
+}
+
+.carousel__image__date {
+  &:extend(.position-top-right all);
+}
+
+.carousel__image__count {
+  &:extend(.position-top-left all);
+}
+
+.carousel__control {
+  &:extend(.position-absolute all);
+  width: 50%;
+  height: 100%;
+
+  &.icon {
+    &:extend(.text-shadow-soft all);
+    &:extend(.no-outline all);
+    color: @color-white;
+    font-size: @carousel-size-control-icon;
+    opacity: 0.65;
+
+    &:before {
+      &:extend(.position-middle all);
+      &:extend(.padding-smaller all);
+    }
+
+    @{select-interaction} {
+      opacity: 1;
+    }
+  }
+
+  &.prev {
+    left: 0;
+    &:before {
+      left: 0;
+    }
+    @{select-interaction} {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+  }
+
+  &.next {
+    right: 0;
+    &:before {
+      right: 0;
+    }
+    @{select-interaction} {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+  }
+}
+
+.carousel__items {
+  margin-top: @margin-smallest;
+
+  @media screen and (min-width: @screen-desktop) {
+    margin-top: @margin-small;
+  }
+}
+
+.carousel__item {
+  @clickColor: @color-secondary;
+  @clickContrastColor: @color-white;
+  &:extend(.bg-image all);
+  &:extend(.radius-large all);
+  .square(size(40));
+  border: @border transparent;
+
+  &.active {
+    border-color: @clickColor;
+    box-shadow: inset 0 0 0 1px @clickContrastColor;;
+  }
+
+  & + .carousel__item {
+    margin-left: @margin-smallest;
+  }
+
+  &:focus {
+    .outline(@color: @clickContrastColor);
+  }
+
+
+  @media screen and (min-width: @screen-desktop) {
+    .square(size(70));
+
+    & + .carousel__item {
+      margin-left: @margin-small;
+    }
+  }
+}

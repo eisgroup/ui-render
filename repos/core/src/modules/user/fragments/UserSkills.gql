@@ -1,0 +1,12 @@
+#import "../../fragments/Pay.gql"
+fragment UserSkills on User {
+    lang
+    workExp
+    workTagsExc
+    modeling {
+        isActive
+        pay {
+            ...Pay
+        }
+    }
+}

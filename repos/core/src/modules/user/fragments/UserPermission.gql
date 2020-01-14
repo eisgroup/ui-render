@@ -1,0 +1,7 @@
+#import "./UserProfile.gql"
+fragment UserPermission on UserPermission {
+    user {
+        ...UserProfile
+    }
+    permissions
+}

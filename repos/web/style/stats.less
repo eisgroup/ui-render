@@ -1,0 +1,80 @@
+@import "_mixins";
+
+
+// =============================================================================
+// Split Bars
+// =============================================================================
+.app__bar-stats {
+  .app__bar-stats__item {
+    @border: @border-size @border-style transparent;
+    box-sizing: border-box;
+
+    > .text {
+      font-size: @size-icon-largest;
+      line-height: 1;
+    }
+
+    .app__progress--bar__wrapper {
+      &:extend(.overflow-hidden all);
+      border: none;
+      border-radius: 0;
+    }
+
+    &:first-child {
+      border-right: @border;
+      .app__progress--bar__wrapper {
+        border-top-left-radius: @radius-base;
+        border-bottom-left-radius: @radius-base;
+      }
+    }
+
+    &:last-child {
+      border-left: @border;
+      .app__progress--bar__wrapper {
+        border-top-right-radius: @radius-base;
+        border-bottom-right-radius: @radius-base;
+      }
+    }
+  }
+
+  .app__progress__bar {
+    .text {
+      text-align: center;
+    }
+  }
+}
+
+// =============================================================================
+// Top Ranked List
+// =============================================================================
+.app__top-stats__table {
+  th {
+    text-align: left;
+  }
+}
+
+.app__top-stats__title {
+  &:extend(.padding-bottom-small all);
+  &:extend(.no-padding-h all);
+}
+
+.app__top-stats__item {
+  text-align: right;
+
+  > * {
+    &:extend(.padding-smallest all);
+
+    &:first-child {
+      &:extend(.padding-right-smaller all);
+    }
+  }
+
+  .app__progress--bar__wrapper {
+    border-color: transparent;
+  }
+}
+
+.app__top-stats__label {
+  &:extend(.no-wrap all);
+  color: @color-text-grey;
+}

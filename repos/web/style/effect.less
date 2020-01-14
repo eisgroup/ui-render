@@ -1,0 +1,190 @@
+@import "_mixins";
+
+.appear-on-hover {
+  &:extend(.disappear all);
+  z-index: 1;
+
+  @{select-interaction},
+  *:hover > & {
+    &:extend(.appear all);
+  }
+}
+
+.bold {
+  .bold();
+}
+
+.interaction {
+  &:hover, &:focus {
+    &:extend(.outline all);
+    transition: 200ms;
+  }
+}
+
+.border {
+  border: @border-base;
+}
+
+.border-dark {
+  border: @border-base-dark;
+}
+
+.border-light {
+  border: @border-base-light;
+}
+
+.border-h {
+  border-left: @border-base;
+  border-right: @border-base;
+}
+
+.border-v {
+  border-top: @border-base;
+  border-bottom: @border-base;
+}
+
+.border-top {
+  border-top: @border-base !important;
+}
+
+.border-right {
+  border-right: @border-base !important;
+}
+
+.border-bottom {
+  border-bottom: @border-base !important;
+}
+
+.border-left {
+  border-left: @border-base !important;
+}
+
+.box-highlight {
+  .box-highlight();
+}
+
+.box-shadow {
+  .box-shadow();
+}
+
+.box-shadow-right {
+  .box-shadow(@opacity: 0.1; @x: size(1); @y: 0; @blur: size(3));
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+.circular {
+  &:extend(.round all);
+  &:extend(.padding-small all);
+  &:extend(.align-center all);
+  display: inline-flex;
+  box-sizing: content-box;
+  min-width: @size-base;
+  line-height: 1;
+
+  &.small {
+    &:extend(.padding-smaller all);
+    &:extend(.text.smaller all);
+    &:extend(.bold all);
+    min-width: @size-smaller;
+  }
+
+  .colors(@colors: red; @property: background-color;);
+}
+
+.radius {
+  border-radius: @radius-base;
+}
+
+.radius-small {
+  border-radius: @radius-small;
+}
+
+.radius-large {
+  border-radius: @radius-large;
+}
+
+.radius-larger {
+  border-radius: @radius-larger;
+}
+
+.radius-largest {
+  border-radius: @radius-largest;
+}
+
+.radius-top {
+  border-top-left-radius: @radius-base;
+  border-top-right-radius: @radius-base;
+}
+
+.radius-top-large {
+  border-top-left-radius: @radius-large;
+  border-top-right-radius: @radius-large;
+}
+
+.radius-bottom {
+  border-bottom-left-radius: @radius-base;
+  border-bottom-right-radius: @radius-base;
+}
+
+.round {
+  border-radius: @radius-round;
+
+  @{select-interaction} {
+    border-radius: @radius-round !important;
+  }
+}
+
+.outline {
+  .outline();
+}
+
+.no-outline {
+  .no-outline();
+}
+
+.transition {
+  transition: @speed-transition;
+}
+
+.underline {
+  &:after {
+    .object();
+    width: 100%;
+    height: @border-size;
+    background: @color-secondary;
+  }
+}
+
+.clearfix {
+  &:before, &:after {
+    content: " ";
+    display: table;
+  }
+
+  &:after {
+    clear: both;
+  }
+}
+
+.card {
+  &:extend(.padding);
+  &:extend(.margin);
+  &:extend(.radius-large);
+  &:extend(.bg-base all);
+  &:extend(.box-shadow all);
+  &:extend(.min-width-290 all);
+  &:extend(.max-width-290 all);
+  &:extend(.full-width all);
+
+  &.large {
+    &:extend(.max-width-360 all);
+  }
+
+  .card__text {
+    &:extend(.padding-left);
+    max-width: calc(100% - @size-avatar-large);
+  }
+}

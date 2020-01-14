@@ -1,0 +1,17 @@
+/*******************************
+         Site Overrides
+*******************************/
+.ui.table {
+  margin: 0;
+  &.inverted {
+    background: @color-bg-inverse;
+
+    thead th {
+      background: @color-shadow;
+    }
+
+    tbody tr.expanded {
+      background: @color-bg-black !important;
+    }
+  }
+}

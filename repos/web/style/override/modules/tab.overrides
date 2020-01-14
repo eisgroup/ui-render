@@ -1,0 +1,11 @@
+/*******************************
+        User Overrides
+*******************************/
+.ui.compact.menu.inverted .item:last-child {
+    border-radius: 0;
+}
+.ui.inverted.tab {
+    background: @color-bg-black;
+    border: none;
+}
+

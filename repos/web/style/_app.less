@@ -1,0 +1,220 @@
+@import "_mixins";
+@import "_layout";
+
+// =============================================================================
+// GENERAL BASE STYLING FOR THE APP
+// =============================================================================
+
+* { // do not add other selectors here, like `:not(.app)` because it will override form inputs
+  /* Disable mobile touch feedback box highlighting */
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -moz-tap-highlight-color: rgba(0, 0, 0, 0);
+
+  /* Applying transition by default causes flickering on scroll on Safari */
+  //transition: @speed-transition; // animating by default creates a nice UI feel
+  /* Stop scroll flickering of content with `transform` on iOS Safari */
+  -webkit-backface-visibility: hidden;
+  //-webkit-transform: translate3d(0, 0, 0);
+
+  &:focus:not(a):not(.a) { // do not add other selectors here, like `[tabIndex="-1"]` because it will override form inputs
+    .outline();
+  }
+}
+
+*[tabIndex="-1"] {
+  .no-outline();
+}
+
+
+html {
+  &:extend(.flex--col);
+  font-size: @size-scale; // !important - reset browser default size
+  height: 100%;
+  box-sizing: border-box;
+}
+
+body {
+  &:extend(.flex--fill);
+  &:extend(.base-font);
+  min-height: 100%;
+  position: relative;
+  overflow-x: hidden;
+  color: @color-text;
+  background-color: @color-bg;
+
+  /* Make text lighter on dark background */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  .bold();
+  margin: @margin-base 0;
+  padding: 0;
+  line-height: 1; // for simplicity of styling and crisp display with whole pixels
+  &:first-child {
+    margin-top: 0;
+  }
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+h1, .h1 {
+  font-size: (@size-h1 / @size-base * 100%);  // define in percentage to work nicely on mobile
+
+  small {
+    color: inherit;
+    font-size: 80%;
+  }
+
+  /* Resize on mobile */
+  @media screen and (max-width: @screen-tablet - @screen-unit) {
+    font-size: 0.8 * (@size-h1 / @size-base * 100%);
+  }
+
+  /* Resize on mobile */
+  @media screen and (max-width: @screen-mobile-small) {
+    font-size: 0.7 * (@size-h1 / @size-base * 100%);
+  }
+}
+
+h2, .h2 {
+  font-size: (@size-h2 / @size-base * 100%);  // define in percentage to work nicely on mobile
+
+  /* Resize on mobile */
+  @media screen and (max-width: @screen-tablet - @screen-unit) {
+    font-size: 0.85 * (@size-h2 / @size-base * 100%);
+  }
+
+  /* Resize on mobile */
+  @media screen and (max-width: @screen-mobile-small) {
+    font-size: 0.75 * (@size-h2 / @size-base * 100%);
+  }
+}
+
+h3, .h3 {
+  font-size: (@size-h3 / @size-base * 100%);  // define in percentage to work nicely on mobile
+
+  small {
+    color: inherit;
+    font-size: 80%;
+    opacity: 0.8;
+  }
+
+  /* Resize on mobile */
+  @media screen and (max-width: @screen-tablet - @screen-unit) {
+    font-size: 0.9 * (@size-h3 / @size-base * 100%);
+  }
+}
+
+h4, .h4 {
+  font-size: (@size-h4 / @size-base * 100%);  // define in percentage to work nicely on mobile
+}
+
+h5, .h5 {
+  font-size: (@size-h5 / @size-base * 100%);  // define in percentage to work nicely on mobile
+}
+
+h6, .h6 {
+  font-size: (@size-h6 / @size-base * 100%);  // define in percentage to work nicely on mobile
+  margin: calc(2rem - 0.14285714em ) 0 1rem;
+}
+
+p, .p {
+  margin: 0;
+  line-height: @line-height-base;
+  max-width: size(600);
+  white-space: pre-line; // for displaying new lines, like textarea
+
+  + p, + .p {
+    margin-top: @margin-base;
+  }
+
+  &.narrow {
+    max-width: size(400);
+  }
+
+  &.small {
+    font-size: @size-small;
+    line-height: @line-height-small;
+  }
+}
+
+a, .a {
+  .padding-h(@padding-smallest); // default padding for `:focus` state
+  .click-color();
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+@{select-icon} {
+  font-size: (@size-icon / @size-base * 100%); // scale size with text
+  line-height: 1; // fix line height inherited from frameworks
+  &.smallest {
+    font-size: @size-icon-smallest;
+  }
+  &.smaller {
+    font-size: @size-icon-smaller;
+  }
+  &.small {
+    font-size: @size-icon-small;
+  }
+  &.base {
+    font-size: @size-icon;
+  }
+  &.large {
+    font-size: @size-icon-large;
+  }
+  &.larger {
+    font-size: @size-icon-larger;
+  }
+  &.largest {
+    font-size: @size-icon-largest;
+  }
+}
+
+ul, ol {
+  li {
+    max-width: size(600);
+  }
+  li + li {
+    margin-top: @margin-base;
+  }
+}
+
+b {
+  .bold();
+}
+
+#root {
+  &:extend(.flex--fill);
+  &:extend(.max-size); // to enable ScrollView
+}
+
+i.icon {
+  font-size: (@size-icon / @size-base * 100%);
+}
+
+.app {
+  &:extend(.fill);
+  overflow: hidden;
+
+  &.inverted {
+    background: @color-bg-inverse;
+  }
+
+  .app__content {
+    &:extend(.flex--fill);
+    &:extend(.max-size); // to enable ScrollView
+  }
+}
+
+.app__page {
+  &:extend(.max-size); // comment this out to allow scrolling like normal web page
+  //.bg-neutral;  // do not set background color for nice Modal round corners
+}

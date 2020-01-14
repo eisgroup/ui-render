@@ -1,0 +1,8 @@
+#import "../../fragments/Place.gql"
+fragment UserContacts on User {
+    email
+    phones
+    place {
+        ...Place
+    }
+}

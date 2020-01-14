@@ -1,0 +1,47 @@
+@import "_mixins";
+
+.tabs {
+  &:extend(.max-width all); // for ScrollView to work
+  &:extend(.max-height all); // for ScrollView to work
+}
+
+.tabs__content {
+  &:extend(.padding-top all);
+}
+
+.tabs__item {
+  @activeBorderColor: @color-secondary;
+  &:extend(.padding-h);
+  &:extend(.padding-top-small);
+  line-height: @line-height-base;
+
+  &.active {
+    border-color: transparent;
+
+    &:after {
+      .tabs:not(.buttoned) & {
+        &:extend(.margin-top-smaller);
+        .object();
+        width: 100%;
+        height: @border-size;
+        background: @activeBorderColor;
+      }
+    }
+
+    .tabs.buttoned & {
+      &:extend(.border);
+      &:extend(.margin-h-small);
+      &:extend(.padding-v-small);
+      &:extend(.round);
+      border-color: @activeBorderColor;
+    }
+  }
+}
+
+.tabs-content-grey {
+  &,
+  .input--wrapper.float .ui.selection.dropdown + .input__label,
+  .input--wrapper.float .input label {
+    &:extend(.bg-grey-light all);
+  }
+}

@@ -1,0 +1,8 @@
+fragment UserAction on UserAction {
+    events {
+        skipped
+    }
+    models {
+        skipped
+    }
+}
