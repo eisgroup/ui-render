@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { logRender } from '../../common/utils'
 import ScrollView from '../../components/ScrollView'
+import Render from '../../components/views/Render'
 import { reduxForm } from '../../modules/form'
 import data from './data/_data'
 import meta from './data/_meta'
@@ -18,9 +19,10 @@ export default class OpenL extends Component {
   }
 
   render () {
+    const {data, meta} = this.props
     return (
       <ScrollView fill className='fade-in'>
-        {'OpenL Tablets'}
+        <Render {...meta}/>
       </ScrollView>
     )
   }

@@ -17,6 +17,22 @@ export function isList (data) {
 }
 
 /**
+ * Check if Given Arrays are Equal in Values by reference
+ *
+ * @param {Array|*} a
+ * @param {Array|*} b
+ * @returns {Boolean} true - if all elements of a are equal to all elements of b using reference exact equality match
+ */
+export function isEqualList (a, b) {
+  if (a === b) return true
+  if (a && b && a.length !== b.length) return false
+  for (const i in a) {
+    if (a[i] !== b[i]) return false
+  }
+  return true
+}
+
+/**
  * Check if the data passed is an array and has values.
  *
  * @param {*} data - The variable to check

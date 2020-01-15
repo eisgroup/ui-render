@@ -2,6 +2,7 @@ import { change, formValues, getFormValues, reducer, reduxForm, registerField, s
 import * as asyncValidate from './asyncValidators'
 import { ACTION_TYPE, NAME } from './constants'
 import * as normalize from './normalizers'
+import './renders' // to trigger all definitions
 import saga from './sagas'
 import * as validate from './validationRules'
 

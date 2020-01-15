@@ -4,6 +4,7 @@ import {
   hasCommonListValue,
   hasListValue,
   intersection,
+  isEqualList,
   isInCollectionAny,
   isInList,
   isInListAny,
@@ -42,6 +43,20 @@ it(`intersection() does not mutate original list, and keeps first list's order`,
   const list2 = [5, 3]
   expect(intersection(list, list2)).toEqual([3, 5])
   expect(list).toEqual(listClone)
+})
+
+it(`${isEqualList.name}() returns true when elements inside the list are the same`, () => {
+  let a = []
+  let b = a
+  expect(isEqualList(a, b)).toBe(true)
+  b.push(1)
+  expect(isEqualList(a, b)).toBe(true)
+  b = [...a]
+  expect(isEqualList(a, b)).toBe(true)
+  a = [null]
+  expect(isEqualList(a, b)).toBe(false)
+  b = [null]
+  expect(isEqualList(a, b)).toBe(true)
 })
 
 it(`${isInCollectionAny.name}() returns true when include match found for any element`, () => {

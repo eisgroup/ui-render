@@ -1,103 +1,163 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React from 'react'
-// import { Column, Table } from 'react-virtualized' // adds 132 KB to final bundle.js
-// import Table, { Column } from 'react-virtualized/dist/commonjs/Table' // adds 80 KB to final bundle.js
-// import 'react-virtualized/styles.css'
-import { by, hasListValue } from '../common/utils'
+import React, { Component } from 'react'
+import { by, hasListValue, isEqual, isEqualList } from '../common/utils'
+import Placeholder from './Placeholder'
 import { renderSort } from './renders'
 import Row from './Row'
 import Table from './Table'
 import Text from './Text'
-import Column from './View'
-
-/**
- * Table with Dynamic Columns - Component
- *
- * @Note: check <Table> component for props documentation
- */
-export default function TableView
-  ({
-    headers, // in default layout, headers are the columns
-    items,  // in default layout, items are the rows
-    sorts,
-    onSort,
-    ...props
-  }) {
-  // Create new list to avoid mutating original data
-  const rows = [...items] // eslint-disable-line
-
-  // Multiple Column Sorting according to the order they are given
-  if (hasListValue(sorts)) {
-    let args = []
-    sorts.forEach(({id, sort, sortKey}) => {
-      if (!sort) return
-      const sortPath = sortKey ? [id, sortKey].join('.') : id
-      args.push((sort < 0 ? '-' : '') + sortPath)
-    })
-    rows.sort(by(...args))
-  }
-  return (
-    <Table
-      // width={800}
-      // height={400}
-      // headerHeight={40}
-      // rowHeight={60}
-      rowCount={rows.length}
-      rowGetter={({index}) => rows[index]}
-      rowClassName={rowClassName}
-      {...props}
-    >
-      {headers.map(({id, header, render, className, color, style}, i) => (
-        <Column
-          key={id || i}
-          // width={200}
-          dataKey={id}
-          headerRenderer={() => renderHeader({id, header, sorts, onSort})}
-          cellRenderer={({cellData}) => render ? render(cellData) : cellData}
-          className={classNames(className, color)}
-          style={style}
-        />
-      ))}
-    </Table>
-  )
-}
+import View from './View'
+// import { Column, Table } from 'react-virtualized' // adds 132 KB to final bundle.js
+// import Table, { Column } from 'react-virtualized/dist/commonjs/Table' // adds 80 KB to final bundle.js
+// import 'react-virtualized/styles.css'
 
 const sortStates = [-1, 0, 1, undefined]
 const sortObj = {
-  id: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired, // id of the header, used for grouping columns/rows
   sort: PropTypes.oneOf(sortStates),
-  sortKey: PropTypes.string,
-}
-TableView.propTypes = {
-  headers: PropTypes.arrayOf(
-    PropTypes.shape({
-      ...sortObj,
-      render: PropTypes.func, // cell render function for items belonging to the header
-      header: PropTypes.string, // header title, falls back to `id` if not given
-      className: PropTypes.string, // css class name
-      color: PropTypes.string, // css class name
-      style: PropTypes.object, // css inline styles
-    })
-  ).isRequired,
-  items: PropTypes.arrayOf(
-    PropTypes.object.isRequired, // nested object by key matching `id` in `headers` prop
-  ).isRequired,
-  sorts: PropTypes.arrayOf(
-    PropTypes.shape({
-      ...sortObj,
-    })
-  ),
-  onSort: PropTypes.func // receives column `id` as argument
+  sortKey: PropTypes.string, // path to item's value used for sorting objects
 }
 
-function renderHeader ({id, header, sorts, onSort}) {
-  return (
-    <Row className='middle' onClick={onSort && onSort.bind(this, id)}>
-      <Text>{header || id}</Text>
-      {sorts && renderSort((sorts.find(item => item.id === id) || {}).sort)}
-    </Row>
-  )
+/**
+ * Table with Dynamic Headers - Component
+ * @Note: check <Table> component for props documentation
+ */
+export default class TableView extends Component {
+  static propTypes = {
+    items: PropTypes.arrayOf( // in default layout, items are rows
+      PropTypes.object.isRequired, // nested object by key matching `id` in `headers` prop
+    ).isRequired,
+    // Header will be derived from items, if not defined
+    headers: PropTypes.arrayOf( // in default layout, headers are columns
+      PropTypes.shape({
+        ...sortObj,
+        renderCell: PropTypes.func, // cell render function for items under the header, receives cell data as argument
+        title: PropTypes.string, // header title, falls back to `id` if not given, and `children` not defined
+        children: PropTypes.any, // custom header content to render, overrides `title`
+        className: PropTypes.string, // css class name
+        classNameCell: PropTypes.string, // css class name for items under the header
+        style: PropTypes.object, // css inline styles
+        styleCell: PropTypes.object, // css inline styles for items under the header
+      })
+    ),
+    sorts: PropTypes.arrayOf(PropTypes.shape({...sortObj})),
+    onSort: PropTypes.func, // receives header `id` as argument
+    // ...other Table props
+  }
+
+  // LOGIC ---------------------------------------------------------------------
+
+  // Compute header based on items if not defined
+  get headers () {
+    if (this.props.headers) return this.props.headers
+    if (this._headers) return this._headers
+    const [item] = this.props.items
+    if (!item) return
+    return (this._headers = Object.keys(item).map(id => ({id})))
+  }
+
+  set headers (val) {
+    return (this._headers = val)
+  }
+
+  get itemsSorted () {
+    if (this._itemsSorted) return this._itemsSorted
+    const {items, sorts} = this.props
+    this._itemsSorted = items
+
+    // Multiple Header Sorting according to the order they are given
+    if (hasListValue(sorts)) {
+      // Create new list to avoid mutating original data
+      this._itemsSorted = [...items]
+      const sortKeys = []
+      sorts.forEach(({id, sort, sortKey}) => {
+        if (sort) sortKeys.push((sort < 0 ? '-' : '') + (sortKey ? `${id}.${sortKey}` : id))
+      })
+      this._itemsSorted.sort(by(...sortKeys))
+    }
+
+    return this._itemsSorted
+  }
+
+  set itemsSorted (val) {
+    return (this._itemsSorted = val)
+  }
+
+  UNSAFE_componentWillReceiveProps (next) {
+    const {items, sorts} = this.props
+
+    // Reset sorting if items changed
+    if (sorts && (!isEqual(next.sorts, sorts) || !isEqualList(next.items, items))) {
+      console.warn('not equal!!!')
+      console.warn('isEqual sorts', isEqual(next.sorts, sorts))
+      console.warn('isEqual items', isEqualList(next.items, items))
+      this.itemsSorted = null
+    }
+
+    // Reset Header definitions if not defined and item structure changed
+    if (
+      !next.headers &&
+      next.items.length &&
+      !isEqual(Object.keys(next.items[0] || {}), Object.keys(items[0] || {}))
+    ) this.headers = null
+  }
+
+  // RENDERS -------------------------------------------------------------------
+
+  renderHeader = ({id, title, children, className, style}) => {
+    const {sorts, onSort} = this.props
+    return (
+      <Table.HeaderCell key={id}>
+        <Row className={classNames('middle', className)} style={style} onClick={onSort && onSort.bind(this, id)}>
+          {children || <Text>{title || id}</Text>}
+          {sorts && renderSort((sorts.find(item => item.id === id) || {}).sort, {className: 'margin-left-small'})}
+        </Row>
+      </Table.HeaderCell>
+    )
+  }
+
+  renderItem = (item, i) => {
+    return (
+      <Table.Row key={i}>
+        {this.headers.map(this.renderItemData.bind(this, item))}
+      </Table.Row>
+    )
+  }
+
+  // Render Row Cells (in default layout)
+  renderItemData = (item, {id, renderCell, classNameCell, styleCell}) => {
+    const value = item[id]
+    return (
+      <Table.Cell key={id}>
+        <View className={classNameCell} style={styleCell}>
+          {renderCell
+            ? renderCell(value)
+            : <Text className='p'>{value}</Text>
+          }
+        </View>
+      </Table.Cell>
+    )
+  }
+
+  render () {
+    const headers = this.headers
+    if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
+    const {sorts, onSort, items: _, headers: __, ...props} = this.props
+    const items = this.itemsSorted
+    return (
+      <Table {...props}>
+        <Table.Header className='font-normal'>
+          <Table.Row>
+            {headers.map(this.renderHeader)}
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {items.map(this.renderItem)}
+        </Table.Body>
+      </Table>
+    )
+  }
 }
 
 function rowClassName ({index}) {

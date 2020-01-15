@@ -37,6 +37,10 @@ const field = {
   step: Number, // slider increment
   pushable: Number, // minimum slider increments between two handles
 
+  // Table view props
+  inverted: Boolean, // whether to style table in dark mode
+  striped: Boolean, // whether to alternate background shade of items (rows in default layout)
+
   // Upload and other input props
   kind: 'Type of file or input, for example, "images"',
   count: Number, // number of files/inputs

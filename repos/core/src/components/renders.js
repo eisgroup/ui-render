@@ -143,29 +143,14 @@ export function renderFloatShort (value, digits = 3, props) {
 }
 
 /**
- * Render Input Fields from Given List of Filters
- * @example:
- *    <View>
- *      {filters.map(renderFilters)}
- *    </View>
- *
- * @param {String} type - of input (ex. 'text', 'email', 'dropdown', etc.)
- * @param {*} field - input field props
- * @param {Number} i - index position of the field in given list
- * @returns {Array<Object>} list - of React Components
- */
-export function renderFilters ({type, ...field}, i) {
-  return ACTIVE.renderField({view: type, done: false, ...field}, i)
-}
-
-/**
  * Render Sort Icon
  *
  * @param {Number|Undefined} order - sorting order, one of renderSort.icon keys
+ * @param {String} [className] - css class to add
  */
-export function renderSort (order) {
+export function renderSort (order, {className} = {}) {
   return (
-    <Icon className={classNames('app__sort__icon no-margin', {active: !order})} name={renderSort.icon[order || 0]}/>
+    <Icon className={classNames('app__sort__icon', className, {active: !order})} name={renderSort.icon[order || 0]}/>
   )
 }
 
