@@ -74,7 +74,7 @@ export function languageDropdownOptions (languageObj) {
  * @example:
  *    const FIELD = {
  *      [FIELD_COLOR]: {
- *        view: FIELD_RENDER.DROPDOWN,
+ *        view: FIELD.TYPE.DROPDOWN,
  *        renderLabel: colorDropdownChoice,
  *      }
  *    }

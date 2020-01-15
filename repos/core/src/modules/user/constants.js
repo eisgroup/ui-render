@@ -1,7 +1,8 @@
 import { optionsFrom } from '../../common/variables'
-import { FIELD_RENDER, FIELD_EMAIL, required, stickyPlaceholder, FIELD_PHONE, FIELD_ADDRESS } from '../form/constants'
+import { required, stickyPlaceholder } from '../form/constants'
 import { timeInThePast } from '../form/validationRules'
 import { SEX, USER } from './definitions'
+import { FIELD } from '../../components/views/constants'
 
 /**
  * CONSTANT VARIABLES ==========================================================
@@ -13,72 +14,58 @@ export const SELF = `${NAME}_SELF`
 export const USER_LOGIN = `${NAME}_LOGIN`
 export const USER_SETTINGS = `${NAME}_SETTINGS`
 
-/* Form Input Definitions */
-export const FIELD_FIRST_NAME = 'First Name'
-export const FIELD_LAST_NAME = 'Last Name'
-export const FIELD_FULL_NAME = 'Full Name'
-export const FIELD_BIRTHDAY = 'Date of Birth'
-export const FIELD_BIRTH_SEX = 'Birthday & Sex'
-export const FIELD_ROLE = 'Role'
-export const FIELD_SEX = 'Gender'
-export const FIELDS_FOR_USER_CONTACTS = [
-  {id: FIELD_EMAIL, required},
-  {id: FIELD_PHONE, required},
-  {id: FIELD_ADDRESS},
-]
-export const FIELDS_FOR_USER_PROFILE = [
-  {id: FIELD_FULL_NAME},
-  {id: FIELD_BIRTH_SEX},
-]
-export const FIELDS_FOR_USER_ONBOARDING= [ // base profile info required from all Users
-  {id: FIELD_EMAIL, required},
-  {id: FIELD_PHONE, required},
-  {id: FIELD_ROLE, required},
-  {id: FIELD_SEX, required},
-  {id: FIELD_FIRST_NAME, required},
-  {id: FIELD_LAST_NAME, required},
-  {id: FIELD_BIRTHDAY, required},
-]
-export const USER_FIELD = {
-  [FIELD_FIRST_NAME]: {
+// Field IDs
+FIELD.ID = {
+  FIRST_NAME: `${NAME}_FIRST_NAME`,
+  LAST_NAME: `${NAME}_LAST_NAME`,
+  FULL_NAME: `${NAME}_FULL_NAME`,
+  BIRTHDAY: `${NAME}_BIRTHDAY`,
+  BIRTH_n_SEX: `${NAME}_BIRTH_&_SEX`,
+  ROLE: `${NAME}_ROLE`,
+  SEX: `${NAME}_SEX`,
+}
+
+// Field Definitions
+FIELD.DEF = {
+  [FIELD.ID.FIRST_NAME]: {
     name: 'name',
-    label: FIELD_FIRST_NAME,
+    label: 'First Name',
     hint: 'My first name is',
   },
-  [FIELD_LAST_NAME]: {
+  [FIELD.ID.LAST_NAME]: {
     name: 'surname',
-    label: FIELD_LAST_NAME,
+    label: 'Last Name',
     hint: 'My family name is',
   },
-  [FIELD_BIRTHDAY]: {
+  [FIELD.ID.BIRTHDAY]: {
     name: 'birthday',
-    label: FIELD_BIRTHDAY,
+    label: 'Date of Birth',
     hint: 'I was born on',
     placeholder: 'dd.mm.yyyy',
     stickyPlaceholder,
     validate: [timeInThePast],
-    view: FIELD_RENDER.DATE,
+    view: FIELD.TYPE.DATE,
   },
-  [FIELD_ROLE]: {
+  [FIELD.ID.ROLE]: {
     name: 'role',
-    label: FIELD_ROLE,
+    label: 'User Role',
     hint: 'Register me as',
     options: optionsFrom([USER.ROLE.CLIENT, USER.ROLE.MODEL]),
-    view: FIELD_RENDER.DROPDOWN,
+    view: FIELD.TYPE.DROPDOWN,
   },
-  [FIELD_SEX]: {
+  [FIELD.ID.SEX]: {
     name: 'sex',
-    label: FIELD_SEX,
+    label: 'Gender',
     hint: 'I am',
     options: optionsFrom([SEX.FEMALE, SEX.MALE]),
-    view: FIELD_RENDER.DROPDOWN,
+    view: FIELD.TYPE.DROPDOWN,
   },
-  [FIELD_FULL_NAME]: {
-    items: [{id: FIELD_FIRST_NAME, required}, {id: FIELD_LAST_NAME, required}],
-    view: FIELD_RENDER.GROUP,
+  [FIELD.ID.FULL_NAME]: {
+    items: [{id: FIELD.ID.FIRST_NAME, required}, {id: FIELD.ID.LAST_NAME, required}],
+    view: FIELD.TYPE.GROUP,
   },
-  [FIELD_BIRTH_SEX]: {
-    items: [{id: FIELD_BIRTHDAY, required}, {id: FIELD_SEX, required}],
-    view: FIELD_RENDER.GROUP,
+  [FIELD.ID.BIRTH_n_SEX]: {
+    items: [{id: FIELD.ID.BIRTHDAY, required}, {id: FIELD.ID.SEX, required}],
+    view: FIELD.TYPE.GROUP,
   },
 }

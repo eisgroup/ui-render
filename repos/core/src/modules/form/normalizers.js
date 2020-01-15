@@ -122,3 +122,12 @@ export function phone (value) {
     .replace(/([^\d]+)?-([^\d]+)?/g, '-')
     .replace(/\s\s+/g, ' ')
 }
+
+export const NORMALIZE = {
+  DATE: date.name,
+  HOUR_MINUTE: hourMinute.name,
+  INTEGER: integer.name,
+  NUMBER: number.name,
+  PHONE: phone.name,
+  UPPERCASE: uppercase.name,
+}

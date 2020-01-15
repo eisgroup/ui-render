@@ -2,7 +2,8 @@ import PropTypes from 'prop-types'
 import { reduxForm } from 'redux-form' // produces smallest js bundle size
 import { GET, stateAction } from '../../common/actions'
 import { debounce, get, hasListValue, isEmpty, isEqual, objChanges } from '../../common/utils'
-import { createInput, FIELD } from '../fields'
+import { FIELD } from '../../components/views/constants'
+import { createInput } from '../fields'
 import { FORM_ASYNC_VALIDATE } from './constants'
 import { renderField } from './renders'
 import { fieldValues, registeredFieldValues } from './selectors'
@@ -169,7 +170,7 @@ export function withForm ({form, ...options}) {
 export function asyncValidateForm (values, dispatch, props, blurredField) {
   return new Promise((resolve) => {
     const existingAsyncErrors = props.asyncErrors || {}
-    const asyncValidators = get(FIELD, `${blurredField}.validateAsync`, [])
+    const asyncValidators = get(FIELD.DEF, `${blurredField}.validateAsync`, [])
     if (!hasListValue(asyncValidators)) return resolve(existingAsyncErrors)
 
     // Add blurred field to async validator descriptors

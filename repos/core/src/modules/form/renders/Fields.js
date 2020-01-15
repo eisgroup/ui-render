@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { Field } from 'redux-form'
 import { cleanList, findObjByKeys, isEmpty, isEqual } from '../../../common/utils'
-import { DEFINITION, TAG_TYPE_BY } from '../../../common/variables/definitions'
+import { DEFINITION, TYPE_BY } from '../../../common/variables/definitions'
 import Dropdown from '../../../components/Dropdown'
 import View from '../../../components/View'
 import { InputField } from '../fields'
@@ -100,7 +100,7 @@ export default class Fields extends Component {
         <Dropdown
           search selection
           value=''
-          placeholder={addPlaceholder || `+ Add ${TAG_TYPE_BY[kind].name}`}
+          placeholder={addPlaceholder || `+ Add ${TYPE_BY[kind].name}`}
           onSelect={this.handleAddField}
           options={fieldOptions}
         />}

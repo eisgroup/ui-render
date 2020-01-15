@@ -16,7 +16,7 @@ export const ROUTES = createNestedRoutes(ROUTE, {  // used for Routes definition
   [ROUTE.REPORT]: '/:id?',
 })
 export const ROUTES_FOR_NAV = [ // shown in Navigation
-  {path: ROUTE.HOME, name: 'Home', icon: 'test'},
+  {path: ROUTE.HOME, name: 'Home', icon: 'home'},
 ]
 if (_SHOULD_SHOW_TEST_) ROUTES_FOR_NAV.push(...[
   {path: ROUTE.TESTER, name: 'Tester', icon: 'test'},

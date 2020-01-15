@@ -1,4 +1,5 @@
 import { ROUTE } from '../common/variables'
+import OpenL from './eis/openl'
 import Home from './home'
 import Tester from './tester'
 import Theme from './theme'
@@ -11,7 +12,7 @@ import Theme from './theme'
  */
 
 export default {
-  [ROUTE.HOME]: Home,
+  [ROUTE.HOME]: OpenL,
   [ROUTE.REPORT]: Home,
   [ROUTE.TESTER]: Tester,
   [ROUTE.THEME]: Theme,

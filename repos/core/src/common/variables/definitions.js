@@ -46,7 +46,7 @@ export const TYPE = {
     [LANGUAGE.ENGLISH.code]: 'Phone'
   },
 }
-export const TAG_TYPE_BY = {
+export const TYPE_BY = {
   [TYPE.LANGUAGE.key]: TYPE.LANGUAGE,
   [TYPE.PHONE.key]: TYPE.PHONE,
 }
@@ -70,6 +70,50 @@ export const DEFINITION_BY_CODE = {
 export const ENUM = {
   LANGUAGE: enumFrom(LANGUAGE),
   LANGUAGE_LEVEL: enumFrom(LANGUAGE_LEVEL),
+}
+
+/**
+ * Define Getters and Setters for Definition Object to avoid duplicate definitions by mistake
+ * @example:
+ *    const FIELD = getSetDefinitions('TYPE', 'ID')
+ *    FIELD.TYPE = {
+ *      EXPAND: 'Expand',
+ *      COLLAPSE: 'Expand', // throws error because of duplicate value 'Expand'
+ *    }
+ *    ....
+ *    FIELD.TYPE = {
+ *      EXPAND: 'Expand' // throws error the second time because of duplicate key 'EXPAND'
+ *    }
+ *
+ * @param {String} props - list of definition keys
+ * @returns {Object} DEFINITION - with getters and setters defined for given `props`
+ */
+export function getSetDefinition (...props) {
+  const DEFINITION = {}
+  props.forEach(prop => {
+    const _key = `_${prop}`
+    Object.defineProperty(DEFINITION, prop, {
+      get () {
+        return this[_key]
+      },
+      set (def) {
+        if (!this[_key]) this[_key] = {}
+        const data = this[_key]
+        for (const key in def) {
+          if (data[key] != null)
+            throw new Error(`Duplicate ${prop}[${key}] definition ${JSON.stringify(def, null, 2)}`)
+          const value = def[key]
+          for (const i in data) {
+            if (data[i] === value)
+              throw new Error(`Duplicate ${prop}[${key}] definition value "${value}" ${JSON.stringify(def, null, 2)}`)
+          }
+          data[key] = value
+        }
+        return data
+      },
+    })
+  })
+  return DEFINITION
 }
 
 /**

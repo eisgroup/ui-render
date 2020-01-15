@@ -5,7 +5,6 @@ import Collapse from '../../../components/Collapse'
 import Label from '../../../components/Label'
 import Row from '../../../components/Row'
 import { withGroupInputChange } from '../../../components/utils'
-import { FIELD_RENDER } from '../constants'
 import { DateField, DatesField, DropdownField, InputField, ToggleField } from '../fields'
 import Fields from './Fields'
 import FieldsWithLevel from './FieldsWithLevel'
@@ -57,41 +56,41 @@ export function renderField (fieldDefinition, i) {
   let Field
   const {view, ...props} = fieldDefinition
   switch (view) {
-    case FIELD_RENDER.COLLAPSE:
+    case FIELD.TYPE.COLLAPSE:
       Field = Collapse
       break
-    case FIELD_RENDER.DROPDOWN:
+    case FIELD.TYPE.DROPDOWN:
       if (props.selection == null) props.selection = true
       Field = DropdownField
       break
-    case FIELD_RENDER.DATE:
+    case FIELD.TYPE.DATE:
       Field = DateField
       break
-    case FIELD_RENDER.DATES:
+    case FIELD.TYPE.DATES:
       Field = DatesField
       break
-    case FIELD_RENDER.SLIDER:
+    case FIELD.TYPE.SLIDER:
       Field = SliderLabeled
       break
-    case FIELD_RENDER.TOGGLE:
+    case FIELD.TYPE.TOGGLE:
       Field = ToggleField
       break
-    case FIELD_RENDER.MULTIPLE:
+    case FIELD.TYPE.MULTIPLE:
       Field = Fields
       break
-    case FIELD_RENDER.MULTIPLE_LEVEL:
+    case FIELD.TYPE.MULTIPLE_LEVEL:
       Field = FieldsWithLevel
       break
-    case FIELD_RENDER.GROUP:
+    case FIELD.TYPE.GROUP:
       Field = FieldsInGroup
       break
-    case FIELD_RENDER.PLACE:
+    case FIELD.TYPE.PLACE:
       Field = PlaceField
       break
-    case FIELD_RENDER.UPLOAD_GRID:
+    case FIELD.TYPE.UPLOAD_GRID:
       Field = UploadGridField
       break
-    case FIELD_RENDER.INPUT:
+    case FIELD.TYPE.INPUT:
     default:
       Field = InputField
   }
