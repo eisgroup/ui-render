@@ -55,8 +55,8 @@ export class FieldsInGroup extends Component {
  */
 export function renderField (fieldDefinition, i) {
   let Field
-  const {renderer, ...props} = fieldDefinition
-  switch (renderer) {
+  const {view, ...props} = fieldDefinition
+  switch (view) {
     case FIELD_RENDER.COLLAPSE:
       Field = Collapse
       break

@@ -1,6 +1,6 @@
 const field = {
   // Meta data
-  renderer: 'FieldsInGroup', // * name of React Component used to render this field
+  view: 'FieldsInGroup', // * name of React Component used to render this field
   items: [], // recursively nested fields
   hint: 'Displayed as title text above input',
   readOnly: Boolean, // makes all nested fields disabled, with `readOnly` css class applied

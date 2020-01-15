@@ -59,7 +59,7 @@ export default class FieldsWithLevel extends Component {
         ),
       // Tooltip layout
       tooltipProps: {
-        renderer: (value) => <Fragment>{level[value]} {unit}</Fragment>
+        render: (value) => <Fragment>{level[value]} {unit}</Fragment>
       },
       ...props
     })

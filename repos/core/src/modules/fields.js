@@ -51,7 +51,7 @@ export const FIELD = { // to be transformed by selector to currently active lang
     label: 'Address',
     hint: 'My address is',
     placeholder: 'Enter address',
-    renderer: FIELD_RENDER.PLACE
+    view: FIELD_RENDER.PLACE
   },
   [FIELD_PHONE]: {
     name: 'phones',
@@ -61,7 +61,7 @@ export const FIELD = { // to be transformed by selector to currently active lang
     hint: 'My phone number is',
     placeholder: '+7 (555) 555-55-55',
     type: 'tel',
-    renderer: FIELD_RENDER.MULTIPLE,
+    view: FIELD_RENDER.MULTIPLE,
     normalize: phone,
     validate: [phoneNumber]
   },
@@ -74,7 +74,7 @@ export const FIELD = { // to be transformed by selector to currently active lang
     max: SLIDER_MIN_MAX[FIELD_LANGUAGE][1],
     unit: 'Level',
     hint: 'I speak',
-    renderer: FIELD_RENDER.MULTIPLE_LEVEL,
+    view: FIELD_RENDER.MULTIPLE_LEVEL,
   },
 }
 

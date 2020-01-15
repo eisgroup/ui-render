@@ -74,7 +74,7 @@ export function languageDropdownOptions (languageObj) {
  * @example:
  *    const FIELD = {
  *      [FIELD_COLOR]: {
- *        renderer: FIELD_RENDER.DROPDOWN,
+ *        view: FIELD_RENDER.DROPDOWN,
  *        renderLabel: colorDropdownChoice,
  *      }
  *    }
@@ -155,7 +155,7 @@ export function renderFloatShort (value, digits = 3, props) {
  * @returns {Array<Object>} list - of React Components
  */
 export function renderFilters ({type, ...field}, i) {
-  return ACTIVE.renderField({renderer: type, done: false, ...field}, i)
+  return ACTIVE.renderField({view: type, done: false, ...field}, i)
 }
 
 /**

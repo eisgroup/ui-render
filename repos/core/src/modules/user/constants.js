@@ -57,28 +57,28 @@ export const USER_FIELD = {
     placeholder: 'dd.mm.yyyy',
     stickyPlaceholder,
     validate: [timeInThePast],
-    renderer: FIELD_RENDER.DATE,
+    view: FIELD_RENDER.DATE,
   },
   [FIELD_ROLE]: {
     name: 'role',
     label: FIELD_ROLE,
     hint: 'Register me as',
     options: optionsFrom([USER.ROLE.CLIENT, USER.ROLE.MODEL]),
-    renderer: FIELD_RENDER.DROPDOWN,
+    view: FIELD_RENDER.DROPDOWN,
   },
   [FIELD_SEX]: {
     name: 'sex',
     label: FIELD_SEX,
     hint: 'I am',
     options: optionsFrom([SEX.FEMALE, SEX.MALE]),
-    renderer: FIELD_RENDER.DROPDOWN,
+    view: FIELD_RENDER.DROPDOWN,
   },
   [FIELD_FULL_NAME]: {
     items: [{id: FIELD_FIRST_NAME, required}, {id: FIELD_LAST_NAME, required}],
-    renderer: FIELD_RENDER.GROUP,
+    view: FIELD_RENDER.GROUP,
   },
   [FIELD_BIRTH_SEX]: {
     items: [{id: FIELD_BIRTHDAY, required}, {id: FIELD_SEX, required}],
-    renderer: FIELD_RENDER.GROUP,
+    view: FIELD_RENDER.GROUP,
   },
 }

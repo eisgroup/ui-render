@@ -48,13 +48,13 @@ export default function TableView
       rowClassName={rowClassName}
       {...props}
     >
-      {headers.map(({id, header, renderer, className, color, style}, i) => (
+      {headers.map(({id, header, render, className, color, style}, i) => (
         <Column
           key={id || i}
           // width={200}
           dataKey={id}
           headerRenderer={() => renderHeader({id, header, sorts, onSort})}
-          cellRenderer={({cellData}) => renderer ? renderer(cellData) : cellData}
+          cellRenderer={({cellData}) => render ? render(cellData) : cellData}
           className={classNames(className, color)}
           style={style}
         />
@@ -73,8 +73,8 @@ TableView.propTypes = {
   headers: PropTypes.arrayOf(
     PropTypes.shape({
       ...sortObj,
-      renderer: PropTypes.func,
-      header: PropTypes.string, // falls back to `id` if not given
+      render: PropTypes.func, // cell render function for items belonging to the header
+      header: PropTypes.string, // header title, falls back to `id` if not given
       className: PropTypes.string, // css class name
       color: PropTypes.string, // css class name
       style: PropTypes.object, // css inline styles

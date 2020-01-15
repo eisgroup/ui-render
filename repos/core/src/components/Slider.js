@@ -21,7 +21,7 @@ import Tooltip from './Tooltip'
  * @param {Object} [rangeOptions] - explicit list of min, max and all possible steps in between
  * @param {Object} [rangeLabels] - sliderRangeMarks() options when given along with `range`
  * @param {Number|Null} [step] - slider movement interval, if `null`, will use sliderRangeMarks() as interval
- * @param {Object<renderer>} [tooltipProps] - whether to render tooltip, and its options (passed as <Tooltip> props)
+ * @param {Object} [tooltipProps] - whether to render tooltip, and its options (passed as <Tooltip> props)
  * @param {String} [unit] - unit to display in tooltip
  * @param {Function} [render] - function to render extra content, receives `value` as first argument
  * @param {Object} [props] - other props to pass
@@ -42,10 +42,10 @@ export default function Slider
   const classNameFinal = classNames('app__slider', className)
   const SliderComponent = (typeof props.value === 'object') ? Range : RCSlider
   if (tooltipProps) props.handle = ({value, index, dragging, ...handleProps}) => {
-    const {renderer, ...tipProps} = tooltipProps
+    const {render, ...tipProps} = tooltipProps
     return <Handle key={index} value={value} {...handleProps}>
       <Tooltip show top={!props.vertical} right={props.vertical} {...tipProps}>
-        {renderer ? renderer(value) : `${value}${unit || ''}`}
+        {render ? render(value) : `${value}${unit || ''}`}
       </Tooltip>
     </Handle>
   }
