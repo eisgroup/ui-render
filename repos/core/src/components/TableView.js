@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 // import { Column, Table } from 'react-virtualized' // adds 132 KB to final bundle.js
 // import Table, { Column } from 'react-virtualized/dist/commonjs/Table' // adds 80 KB to final bundle.js
-import 'react-virtualized/styles.css'
+// import 'react-virtualized/styles.css'
 import { by, hasListValue } from '../common/utils'
 import { renderSort } from './renders'
 import Row from './Row'

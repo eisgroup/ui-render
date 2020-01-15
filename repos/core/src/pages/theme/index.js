@@ -26,12 +26,12 @@ export default class Theme extends Component {
     const { activeIndex, items } = this.state
     const Content = items[activeIndex].content
     return (
-      <ScrollView className='app__page fade-in-left padding padding-bottom-largest'>
+      <ScrollView className='app__page fade-in-right padding padding-bottom-largest'>
         <Helmet title={`${APP_NAME} Theme Demo`}/>
         <Row className='center wrap margin'>
-          {items.map(({ name }, i) => (
+          {items.map(({name}, i) => (
             <Button key={name || i} className={activeIndex === i ? 'primary' : 'transparent'}
-                    onClick={() => this.setState({ activeIndex: i })}>{name}</Button>
+                    onClick={() => this.setState({activeIndex: i})}>{name}</Button>
           ))}
         </Row>
         <Content/>

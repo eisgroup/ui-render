@@ -1,5 +1,7 @@
+import classNames from 'classnames'
 import React, { Component } from 'react'
 import Button from '../../components/Button'
+import Icon from '../../components/Icon'
 import Row from '../../components/Row'
 import View from '../../components/View'
 
@@ -7,37 +9,48 @@ import View from '../../components/View'
  * Button States
  */
 export default class Buttons extends Component {
+  renderButtonGroups = ({className, children, ...props}) => (<View className='margin'>
+    {/* Default */}
+    <Row className='wrap middle margin-v-smaller spread'>
+      <Button className={classNames('large', className)} {...props}>{children || 'Large'}</Button>
+      <Button className={classNames(className)} {...props}>{children || className || 'Default'}</Button>
+      <Button className={classNames('small', className)} {...props}>{children || 'Small'}</Button>
+    </Row>
+
+    {/* Disabled */}
+    <Row className='wrap middle margin-v-smaller spread'>
+      <Button disabled className={classNames('large', className)} {...props}>{children || 'Large'}</Button>
+      <Button disabled className={classNames(className)} {...props}>{children || className || 'Default'}</Button>
+      <Button disabled className={classNames('small', className)} {...props}>{children || 'Small'}</Button>
+    </Row>
+
+    {/* Loading */}
+    <Row className='wrap middle margin-v-smaller spread'>
+      <Button loading className={classNames('large', className)} {...props}>{children || 'Large'}</Button>
+      <Button loading className={classNames(className)} {...props}>{children || className || 'Default'}</Button>
+      <Button loading className={classNames('small', className)} {...props}>{children || 'Small'}</Button>
+    </Row>
+  </View>)
+
   render () {
     return (
-      <View className='full-width'>
-        {/* Standard */}
-        <Row className='wrap middle margin-v-smaller spread'>
-          <Button className='primary'>Primary</Button>
-          <Button className='primary large'>Large</Button>
-          <Button className='primary small'>Small</Button>
-        </Row>
-
-        {/* Disabled */}
-        <Row className='wrap middle margin-v-smaller spread'>
-          <Button disabled className='primary'>Primary</Button>
-          <Button disabled className='primary large'>Large</Button>
-          <Button disabled className='primary small'>Small</Button>
-        </Row>
-
-        {/* Loading */}
-        <Row className='wrap middle margin-v-smaller spread'>
-          <Button loading className='primary'>Primary</Button>
-          <Button loading className='primary large'>Large</Button>
-          <Button loading className='primary small'>Small</Button>
-        </Row>
-
-        {/* Transparent */}
-        <Row className='wrap middle margin-v-smaller spread'>
-          <Button className='transparent'>Transparent</Button>
-          <Button className='transparent large'>Large</Button>
-          <Button className='transparent small'>Small</Button>
-        </Row>
-      </View>
+      <Row className='full-width center wrap'>
+        <View className='margin'>
+          {this.renderButtonGroups({className: 'primary'})}
+          {this.renderButtonGroups({className: 'primary', circle: true})}
+          {this.renderButtonGroups({className: 'primary', circle: true, children: <Icon name='heart'/>})}
+        </View>
+        <View className='margin'>
+          {this.renderButtonGroups({className: 'secondary'})}
+          {this.renderButtonGroups({className: 'secondary', circle: true})}
+          {this.renderButtonGroups({className: 'secondary', circle: true, children: <Icon name='heart'/>})}
+        </View>
+        <View className='margin'>
+          {this.renderButtonGroups({name: 'Default'})}
+          {this.renderButtonGroups({name: 'Default', circle: true})}
+          {this.renderButtonGroups({name: 'Default', circle: true, children: <Icon name='heart'/>})}
+        </View>
+      </Row>
     )
   }
 }
