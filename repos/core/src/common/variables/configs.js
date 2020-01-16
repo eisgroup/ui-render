@@ -29,7 +29,7 @@ export const SIZE_SCALE = 62.5  // match percentage of font-size defined in <htm
 export const TIME_DURATION_INSTANT = 200  // Milliseconds - max delay that seems instant to human
 export const TOOLTIP_DELAY = 777  // Milliseconds
 export const FORM_SYNC_THROTTLE = THREE_SECONDS  // Milliseconds - debounce input changes duration
-export const ANIMATION_DURATION = 500  // Milliseconds
+export const ANIMATION_DURATION = 500  // Milliseconds - match with CSS @speed-base in /repos/web/style/_variables.less
 export const THEME = {
   LIGHT: 'LIGHT',
   DARK: 'DARK',

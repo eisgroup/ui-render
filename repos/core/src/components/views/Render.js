@@ -21,7 +21,7 @@ export default function Render ({view, items = [], ...props}, i) {
   if (props.key == null) props.key = i
   switch (view) {
     case FIELD.TYPE.EXPAND:
-      return <Expand {...props}>{items.map(Render)}</Expand>
+      return <Expand {...props}>{() => items.map(Render)}</Expand>
     case FIELD.TYPE.COL:
       return <View {...props}>{items.map(Render)}</View>
     case FIELD.TYPE.ROW:
