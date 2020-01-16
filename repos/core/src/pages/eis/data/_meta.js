@@ -5,6 +5,7 @@ export default {
   'items': [
     {
       'view': 'Col',
+      'className': 'padding',
       'items': [
         {
           'view': 'Title',
@@ -12,6 +13,7 @@ export default {
         },
         {
           'view': 'Input',
+          'className': 'margin-bottom',
           'label': 'Number of claims per employee',
           'name': 'adminExpenses.perEmployeeClaims',
           'type': 'number',
