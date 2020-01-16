@@ -1,4 +1,4 @@
-import View from './_View'
+import View from './_Template'
 import { NAME } from './constants'
 import * as query from './queries'
 import reducer from './reducers'

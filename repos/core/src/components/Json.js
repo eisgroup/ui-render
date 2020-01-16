@@ -28,5 +28,5 @@ export default function Json
 }
 
 Json.propTypes = {
-  data: PropTypes.any.isRequired, // string or component to always show
+  data: PropTypes.any.isRequired, // JSON data to show
 }
