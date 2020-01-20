@@ -21,6 +21,13 @@
   }
 }
 
+.no-interaction {
+  &:hover, &:focus {
+    &:extend(.no-outline all);
+    transition: none;
+  }
+}
+
 .border {
   border: @border-base;
 }

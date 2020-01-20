@@ -7,7 +7,7 @@ import Slider from '../../../components/Slider'
 import Text from '../../../components/Text'
 import Tooltip from '../../../components/Tooltip'
 import View from '../../../components/View'
-import { SliderField } from '../fields'
+import { SliderField } from '../inputs'
 
 /**
  * FORM FIELD RENDERERS ========================================================

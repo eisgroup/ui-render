@@ -6,6 +6,7 @@ import Row from '../../components/Row'
 import View from '../../components/View'
 import { reduxForm } from '../../modules/form'
 import PlaceField from '../../modules/form/renders/PlaceField'
+import { isRequired } from '../../modules/form/validationRules'
 
 /**
  * Form Inputs
@@ -30,9 +31,8 @@ export default class Dropdowns extends Component {
 
           {/* Redux Form Inputs */}
           <form className='app__form full-width max-width-290 padding-h-small'>
-            <PlaceField name='address' placeholder='Enter address'/>
-            <Place placeholder='Enter address'
-                   onChange={val => warn('onSelect', val)}
+            <PlaceField name='place' placeholder='Enter address' required validate={isRequired}/>
+            <Place placeholder='Enter address' onChange={val => warn('onSelect', val)}
               // value={{id: 'ChIJGaSPc1pKtUYRHzFSa1B9NHw', address: 'Red Square, Moskva, Russia, 109012'}}
             />
           </form>

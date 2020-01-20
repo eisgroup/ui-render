@@ -50,6 +50,10 @@
     }
   }
 
+  &.readonly {
+    opacity: initial !important; //override .disabled styling
+  }
+
   // Placeholder
   .text {
     color: @color-text !important;

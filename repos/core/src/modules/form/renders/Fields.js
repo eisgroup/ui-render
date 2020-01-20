@@ -6,7 +6,7 @@ import { cleanList, findObjByKeys, isEmpty, isEqual } from '../../../common/util
 import { DEFINITION, TYPE_BY } from '../../../common/variables/definitions'
 import Dropdown from '../../../components/Dropdown'
 import View from '../../../components/View'
-import { InputField } from '../fields'
+import { InputField } from '../inputs'
 
 /**
  * List of Predefined Form Fields with dropdown search input to add and remove them (ex. Languages)

@@ -37,17 +37,17 @@ export default class Buttons extends Component {
       <Row className='full-width center wrap'>
         <View className='margin'>
           {this.renderButtonGroups({className: 'primary'})}
-          {this.renderButtonGroups({className: 'primary', circle: true})}
+          {this.renderButtonGroups({className: 'primary round'})}
           {this.renderButtonGroups({className: 'primary', circle: true, children: <Icon name='heart'/>})}
         </View>
         <View className='margin'>
           {this.renderButtonGroups({className: 'secondary'})}
-          {this.renderButtonGroups({className: 'secondary', circle: true})}
+          {this.renderButtonGroups({className: 'secondary round'})}
           {this.renderButtonGroups({className: 'secondary', circle: true, children: <Icon name='heart'/>})}
         </View>
         <View className='margin'>
           {this.renderButtonGroups({name: 'Default'})}
-          {this.renderButtonGroups({name: 'Default', circle: true})}
+          {this.renderButtonGroups({name: 'Default', className: 'round'})}
           {this.renderButtonGroups({name: 'Default', circle: true, children: <Icon name='heart'/>})}
         </View>
       </Row>

@@ -15,7 +15,7 @@ import Text from '../components/Text'
 import View from '../components/View'
 import { POPUP } from '../modules/exports'
 import { reduxForm } from '../modules/form'
-import { SliderField } from '../modules/form/fields'
+import { SliderField } from '../modules/form/inputs'
 import { testPayload } from '../modules/popup/data'
 import { history } from '../modules/router'
 

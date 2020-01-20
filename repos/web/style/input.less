@@ -22,9 +22,20 @@
 @input-label-size-offset: @input-label-size + @input-padding-v-value + (@input-label-size-default-ratio - @input-label-size-ratio) * @input-label-line-height * @input-font-size;
 
 .input-disabled {
-  cursor: not-allowed;
-  opacity: 0.75;
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.9;
   border-style: dotted !important;
+}
+
+.input-tag {
+  &:extend(.margin-h-smallest all);
+  &:extend(.margin-v-smaller all);
+  &:extend(.button all);
+  &:extend(.button.small all);
+  background-color: @color-bg-white !important;
+  border: @border-size dashed @color-text;
+  border-style: dashed;
 }
 
 // -----------------------------------------------------------------------------
@@ -86,7 +97,7 @@ input, select, textarea {
   @{select-interaction} {
     opacity: 1;
     outline: 0;
-    box-shadow: none;
+    box-shadow: none; // overrides Semantic UI dropdown, but not default focus styling
     background-color: @input-background-color-interaction;
     border-color: @color-primary;
 
@@ -95,12 +106,22 @@ input, select, textarea {
     }
   }
 
+  &.readonly,
+  &[readonly],
   &.disabled,
+  &:disabled {
+    @{select-interaction} {
+      box-shadow: none;
+      border-color: initial;
+    }
+  }
+
+  &.disabled:not(.readonly),
   &:disabled {
     &:extend(.input-disabled all);
 
     + label {
-      cursor: not-allowed;
+      cursor: default;
     }
   }
 
@@ -328,12 +349,11 @@ input, select, textarea {
     &:extend(.input__field-help all);
   }
 
-  &.error + .field-help,
-  &.error + .input__label + .field-help {
-    &:extend(.fade-in-down all);
-
-    .error {
-      display: flex;
+  &.info.active,
+  &.error {
+    + .field-help,
+    + .input__label + .field-help {
+      &:extend(.fade-in-down all);
     }
   }
 
@@ -365,6 +385,9 @@ input, select, textarea {
   }
 
   &.done {
+    &.readonly input,
+    &.readonly select,
+    &.readonly textarea,
     .ui.selection.dropdown:not(.active):not(:hover),
     input:not(:focus):not(:hover),
     select:not(:focus):not(:hover),
@@ -377,6 +400,23 @@ input, select, textarea {
   &.resize {
     textarea {
       resize: none;
+    }
+  }
+
+  &.readonly {
+    .ui.selection.dropdown {
+      .label {
+        &:extend(.input-tag all);
+        box-shadow: none;
+
+        .icon.delete {
+          display: none;
+        }
+      }
+
+      > .icon.dropdown {
+        display: none;
+      }
     }
   }
 
@@ -396,24 +436,25 @@ input, select, textarea {
     &:extend(.input__field-help all);
   }
 
-  .input.error {
-    input {
-      border-color: @color-error !important;
-
-      .inverted & {
-        border-color: @color-error-light !important;
-      }
-
-      &:focus {
-        .outline(@color: @color-error; @color-inverse: @color-error-light);
+  .input {
+    &.info.active,
+    &.error {
+      & ~ .field-help {
+        &:extend(.fade-in-down all);
       }
     }
 
-    & ~ .field-help {
-      &:extend(.fade-in-down all);
+    &.error {
+      input {
+        border-color: @color-error !important;
 
-      .error {
-        display: flex;
+        .inverted & {
+          border-color: @color-error-light !important;
+        }
+
+        &:focus {
+          .outline(@color: @color-error; @color-inverse: @color-error-light);
+        }
       }
     }
   }
@@ -474,7 +515,7 @@ div.select {
       i.icon {
         padding: @icon-padding;
       }
-      &:not(.left) {
+      &:not(.lefty) {
         .input__unit,
         input, select, textarea {
           padding-right: @padding
@@ -485,7 +526,7 @@ div.select {
           margin-right: @offset - @icon-padding;
         }
       }
-      &.left {
+      &.lefty {
         .input__unit,
         input, select, textarea {
           padding-left: @padding;
@@ -554,10 +595,9 @@ div.select {
   padding: @padding-smaller @input-padding-h-value;
   opacity: 0;
 
-  // hide error by default, and show when .error class is added to input
   .error {
     &:extend(.text.error all);
-    display: none;
+    //display: none; // hide error by default, and show when .error class is added to input (in static html)
   }
 }
 

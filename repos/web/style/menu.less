@@ -192,6 +192,12 @@
     }
   }
 
+  //.app__menu__item:not(.active):not(:hover):not(:focus):not(:active),
+  //.app__menu__item--empty {
+  //  &:extend(.bg-texture all);
+  //  background-color: @menu-color-bg;
+  //}
+
   /* Make Sidebar Overlay on Mobile */
   @media screen and (max-width: @screen-tablet - @screen-unit) {
     &:extend(.bg-grey all);
@@ -223,6 +229,7 @@
 
         @{select-interaction} {
           .text {
+            //.text.bold;
             display: flex;
           }
         }

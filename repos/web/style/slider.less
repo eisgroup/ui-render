@@ -49,10 +49,19 @@
       background-color: @slider-color-handle-inverted;
       border-color: @slider-color-handle-border-inverted;
     }
+  }
 
-    &:hover, &:focus, &:active {
-      background-color: @slider-color-handle-hover;
-      border-color: @slider-color-handle-border;
+  &:not(.readonly):not(.disabled) {
+    .rc-slider-handle {
+      &:hover, &:focus, &:active {
+        background-color: @slider-color-handle-hover;
+        border-color: @slider-color-handle-border;
+
+        .tooltip {
+          background-color: @slider-color-handle-hover;
+          border-color: @slider-color-handle-hover;
+        }
+      }
     }
   }
 
@@ -100,15 +109,6 @@
   }
 }
 
-.rc-slider-handle {
-  &:hover, &:focus, &:active {
-    .tooltip {
-      background-color: @slider-color-handle-hover;
-      border-color: @slider-color-handle-hover;
-    }
-  }
-}
-
 .app__slider--wrap {
   &:extend(.padding-v all);
   &:extend(.padding-h-smaller all);
@@ -123,6 +123,7 @@
     }
 
     .rc-slider-handle {
+      cursor: default;
       border-color: @slider-color-disabled;
     }
   }

@@ -8,9 +8,9 @@ import Select from '../../components/Select'
 import Tooltip from '../../components/Tooltip'
 import View from '../../components/View'
 import { reduxForm } from '../../modules/form'
-import { InputField, ToggleField } from '../../modules/form/fields'
-import { number } from '../../modules/form/normalizers'
-import { url } from '../../modules/form/validationRules'
+import { DropdownField, InputField, ToggleField } from '../../modules/form/inputs'
+import { hourMinute, number } from '../../modules/form/normalizers'
+import { isRequired, url } from '../../modules/form/validationRules'
 
 /**
  * Form Inputs
@@ -26,31 +26,49 @@ export default class Forms extends Component {
           {/* Redux Form Inputs */}
           <Row className='center wrap margin'>
             <form className='app__form max-width-290 padding-h-small'>
-              <InputField float name='card' label='Card Number' placeholder='xxxx xxxx xxxx xxxx' icon='visa'
-                          done={false}/>
+              <InputField float name='card' label='Card Number' placeholder='xxxx xxxx xxxx xxxx' icon='visa'/>
               <Row className='justify'>
-                <InputField float name='date' label='Expiry Date' placeholder='mm/yy' stickyPlaceholder done={false}/>
-                <InputField float name='cvv' placeholder='xxx' stickyPlaceholder done={false} style={{ width: '45%' }}/>
+                <InputField float name='date' label='Expiry Date' placeholder='mm/yy' stickyPlaceholder/>
+                <InputField float name='cvv' placeholder='xxx' stickyPlaceholder style={{width: '45%'}}/>
               </Row>
-              <InputField float name='amount' type='number' unit='USD' icon='dollar' left done={false}
-                          normalize={number({ min: 0, max: 999999 })}/>
-              <InputField float name='target' label='Number with Icon' type='number' icon='dollar' left
-                          normalize={number({ min: 0 })}/>
+              <Row className='justify bottom'>
+                <InputField name='amount' type='number' unit='USD' icon='dollar' label='Amount' lefty/>
+                <InputField float name='amount' type='number' unit='USD' icon='dollar'
+                            normalize={number({min: 0, max: 999999})}/>
+              </Row>
               <Row className='justify'>
-                <InputField float name='begin' placeholder='hh:mm' icon='clock' stickyPlaceholder>
+                <InputField float name='begin' icon='clock' placeholder='hh:mm' stickyPlaceholder
+                            normalize={hourMinute}>
                   <Tooltip top>Begin Time</Tooltip>
                 </InputField>
-                <InputField float name='finish' placeholder='hh:mm' icon='clock' stickyPlaceholder>
+                <InputField float name='finish' icon='clock' placeholder='hh:mm' stickyPlaceholder
+                            normalize={hourMinute}>
                   <Tooltip top>Finish Time</Tooltip>
                 </InputField>
               </Row>
             </form>
             <form className='app__form max-width-290 padding-h-small'>
               <InputField float name='url' type='url' placeholder='https://example.com' icon='chain' validate={url}/>
-              <InputField float name='amount' type='number' unit='USD' done={false}/>
-              <InputField float name='amount' type='number' unit='USD' icon='dollar' done={false}/>
-              <InputField name='amount' type='number' unit='USD' icon='dollar' label='Amount' left done={false}/>
-              <InputField name='amount' value='9' type='number' unit='USD' icon='dollar' label='Amount'/>
+              <Row className='justify'>
+                <InputField float name='required' required validate={isRequired}/>
+                <DropdownField float name='dropdown-required' options={['One', 'Two', 'Three']} validate={isRequired}/>
+              </Row>
+              <Row className='justify'>
+                <InputField name='done' value={9} type='number' unit='USD' label='Done'/>
+                <InputField name='false' placeholder='done=false' label='Done' done={false}/>
+              </Row>
+              <Row className='justify'>
+                <InputField float name='disabled' icon='USD' lefty disabled value={7}/>
+                <InputField float name='disabled-empty' disabled/>
+              </Row>
+              <Row className='justify'>
+                <InputField float name='info' info='Info Message'/>
+                <DropdownField float name='dropdown' info='Info' options={['One', 'Two', 'Three']}/>
+              </Row>
+              <Row className='justify'>
+                <InputField float name='readonly' icon='edit' lefty/>
+                <InputField float name='readonly' readonly/>
+              </Row>
             </form>
           </Row>
         </Row>
@@ -62,8 +80,8 @@ export default class Forms extends Component {
           <Input type='date' icon='calendar'/>
           <Select
             options={[
-              { text: 'English', value: 'en', content: <img src={PATH_IMAGES + 'flags/en.svg'} alt='en'/> },
-              { text: 'Русский', value: 'ru', content: <img src={PATH_IMAGES + 'flags/ru.svg'} alt='ru'/> },
+              {text: 'English', value: 'en', content: <img src={PATH_IMAGES + 'flags/en.svg'} alt='en'/>},
+              {text: 'Русский', value: 'ru', content: <img src={PATH_IMAGES + 'flags/ru.svg'} alt='ru'/>},
             ]}
           />
           <InputNative type='textarea' rows={3} placeholder='Text area...'/>
@@ -71,7 +89,7 @@ export default class Forms extends Component {
 
         {/* Raw Inputs */}
         <Row className='top center wrap margin'>
-          <Input label='Label' placeholder='Enter text' icon='dollar' left/>
+          <Input label='Label' placeholder='Enter text' icon='dollar' lefty/>
           <Input type='textarea' label='Text Area' icon='edit'/>
         </Row>
 
