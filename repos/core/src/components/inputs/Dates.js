@@ -24,7 +24,7 @@ export default class Dates extends Component {
     })),
     onChange: PropTypes.func, // callback when input changes, only fires if input is valid
     validate: PropTypes.arrayOf(PropTypes.func), // list of validation functions to run on each time range
-    readOnly: PropTypes.bool, // render as view only
+    readonly: PropTypes.bool, // render as view only
   }
 
   state = {
@@ -36,11 +36,11 @@ export default class Dates extends Component {
 
   get inputProps () {
     const {
-      required, disabled, info, float,
+      info, float, required, disabled, readonly,
       onBlur, onFocus, onDrop, onDragStart,
     } = this.props
     return {
-      required, disabled, info, float,
+      info, float, required, disabled, readonly,
       onBlur, onFocus, onDrop, onDragStart,
     }
   }
@@ -148,14 +148,13 @@ export default class Dates extends Component {
   }
 
   renderDate = ({date, from, to, id}, i, items) => {
-    const {readOnly} = this.props
+    const {readonly} = this.props
     const dateProps = this.inputProps
-    if (readOnly) dateProps.disabled = true
     const {required, ...timeProps} = dateProps
     const {disabled} = dateProps
     const key = id || i
     const error = this.state.errors[key] || {}
-    if (this.state.dates.length > 1 && !readOnly) {
+    if (this.state.dates.length > 1 && !readonly) {
       dateProps.icon = 'delete'
       dateProps.onClickIcon = () => this.handleDeleteDate(key)
     }
@@ -169,14 +168,14 @@ export default class Dates extends Component {
                  error={!disabled && (error.date || (items.length - 1 === i && this.props.error))}
           />
           <Input id={`from-${key}`} label='From' placeholder='hh:mm' stickyPlaceholder {...timeProps}
-                 className={'app__fields--date__item__time' + ((readOnly && !from) ? ' invisible' : '')}
+                 className={'app__fields--date__item__time' + ((readonly && !from) ? ' invisible' : '')}
                  onChange={(from) => this.handleChangeDate({from}, key)}
                  value={from}
                  error={!disabled && error.from}
           ><Tooltip top>Start Time</Tooltip>
           </Input>
           <Input id={`to-${key}`} label='To' placeholder='hh:mm' stickyPlaceholder {...timeProps}
-                 className={'app__fields--date__item__time' + ((readOnly && !to) ? ' invisible' : '')}
+                 className={'app__fields--date__item__time' + ((readonly && !to) ? ' invisible' : '')}
                  onChange={(to) => this.handleChangeDate({to}, key)}
                  value={to}
                  error={!disabled && error.to}
@@ -188,12 +187,12 @@ export default class Dates extends Component {
   }
 
   render () {
-    const {placeholder = 'Add Dates', readOnly, className, style} = this.props
+    const {placeholder = 'Add Dates', readonly, disabled, className, style} = this.props
     const {dates} = this.state
     return (
       <View className={classNames('app__input--dates middle', className)} style={style}>
         {dates.map(this.renderDate)}
-        {!readOnly &&
+        {!readonly && !disabled &&
         <View className='left'>
           <Button className='small round transparent margin-v' onClick={this.handleAddDate}>
             <Icon name='plus-circle' className='margin-right-smaller'/>

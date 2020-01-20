@@ -11,7 +11,7 @@ import Square from './Square'
 export default function SquareImage ({ name, path, className, ...props }) {
   const backgroundImage = `url('${imageSrc({ name, path })}')`
   return (
-    <Square className={classNames('bg-image--cover', className)} {...props} style={{ backgroundImage }}/>
+    <Square middle center className={classNames('bg-image--cover', className)} {...props} style={{ backgroundImage }}/>
   )
 }
 

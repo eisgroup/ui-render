@@ -37,9 +37,10 @@ export default function Slider
     tooltipProps,
     unit,
     render,
+    readonly,
     ...props
   }) {
-  const classNameFinal = classNames('app__slider', className)
+  const classNameFinal = classNames('app__slider', className, {readonly})
   const SliderComponent = (typeof props.value === 'object') ? Range : RCSlider
   if (tooltipProps) props.handle = ({value, index, dragging, ...handleProps}) => {
     const {render, ...tipProps} = tooltipProps

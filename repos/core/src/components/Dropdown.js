@@ -30,6 +30,7 @@ import View from './View'
  * @param {String|Object} [error] - message to display
  * @param {String|Object} [info] - explanation message to display under input
  * @param {Boolean} [float] - whether display as float-label input
+ * @param {Boolean} [readonly] - whether to disable input and add `readonly` css class
  * @param {String} [className] - css class to add
  * @param {Object} [style] - css styles to add
  * @param {Boolean} [fill] - whether to fill available width
@@ -56,8 +57,10 @@ export default function Dropdown
     lazyLoad = true,
     optionsLabel,
     initialValues, // not used, removing from DOM
+    readonly,
     ...props
   }) {
+  if (readonly) props.disabled = true // Semantic Dropdown does not accept `readOnly` prop
   if (onChange || onSelect) props.onChange = (event, data) => {
     tempValue = data.value // store value temporarily for onSelect event
     onChange && onChange(data.value, event)
@@ -98,12 +101,16 @@ export default function Dropdown
 
   return (
     <View className={classNames('input--wrapper', {
-      float,
-      done,
-      labeled: label,
-      'fill-width': !props.compact && fill
+      float, done, labeled: label, readonly, 'fill-width': !props.compact && fill,
     }, className)} style={style}>
-      <DropDown options={options} placeholder={placeholder} error={!!error} lazyLoad={lazyLoad} {...props} />
+      <DropDown
+        className={classNames({info, readonly})}
+        options={options}
+        placeholder={placeholder}
+        error={!!error}
+        lazyLoad={lazyLoad}
+        {...props}
+      />
       {label && <Text className='input__label'>{label + (props.required ? '*' : '')}</Text>}
       {(error || info) &&
       <View id={props.id} className='field-help'>

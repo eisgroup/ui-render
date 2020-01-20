@@ -20,6 +20,7 @@ import View from './View'
  * @param {String|Object} [labelFalse] - text to show for unchecked state
  * @param {*} [valueTrue] - value to assign to true case
  * @param {*} [valueFalse] - value to assign to false case
+ * @param {Boolean} [readonly] - input attribute
  * @param {Boolean} [danger] - if true, then unchecked will have red background
  * @param {String} [className] - css class to apply
  * @param {Object} [props] - other props to pass
@@ -38,12 +39,14 @@ export default function Checkbox
     labelTrue,
     labelFalse,
     id,
+    readonly,
     danger,
     className,
     float: _, // not used
     initialValues: __, // not used
     ...props
   }) {
+  if (readonly) props.readOnly = readonly // React wants `readonly` to be `readOnly`
   labelTrue = labelTrue || 'ON'
   labelFalse = labelFalse || 'OFF'
   if (!id) id = 'checkbox-' + label.replace(/ +?/g, '-')

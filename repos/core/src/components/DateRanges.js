@@ -35,7 +35,7 @@ export default function DateRanges
         </Text>}
         {children}
       </Text>
-      {!isString && hasDetails && <Dates value={times} readOnly {...props}/>}
+      {!isString && hasDetails && <Dates value={times} readonly {...props}/>}
     </>
   )
 }

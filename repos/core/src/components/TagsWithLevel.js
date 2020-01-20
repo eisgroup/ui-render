@@ -12,7 +12,7 @@ import Text from './Text'
  * Tags with Level - Component.
  * (Clickable tags that expand Slider of given tag's level)
  * @example:
- *    <TagsWithLevel {...FIELD[FIELD_LANGUAGE]} items={items}/>
+ *    <TagsWithLevel {...FIELD.DEF[FIELD.ID.LANGUAGE]} items={items}/>
  */
 export default function TagsWithLevel
   ({
@@ -34,7 +34,7 @@ export default function TagsWithLevel
     <>
       {slider && <SliderLabeled {...{
         ...slider,
-        readOnly: true,
+        readonly: true,
         min,
         max,
         unit,
@@ -58,8 +58,7 @@ export default function TagsWithLevel
           const label = (definitionByCode[code] || {}).name
           return (
             <Button
-              key={code}
-              className='app__tag small margin-h-smallest margin-v-smaller'
+              key={code} className='app__tag'
               onClick={() => setDisplay((slider && slider.name === code) ? null : {name: code, label, value})}
             >
               {label}

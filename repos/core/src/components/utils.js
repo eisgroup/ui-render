@@ -127,15 +127,16 @@ export function withGroupInputChange (constructor) {
   Object.defineProperty(constructor.prototype, 'fields', {
     get () {
       // Hook to `onChange` call from each field in the group
-      const {items, name: prefix, required, disabled} = this.props
+      const {items, name: prefix, required, disabled, readonly} = this.props
       return items.map(({name, onChange, ...field}) => ({
         name: prefix ? (prefix + '.' + name) : name,
         onChange: (val, ...args) => {
           onChange && onChange(val, ...args)
           this.handleChangeInput(name, val)
         },
-        required,
-        disabled,
+        ...required && {required},
+        ...disabled && {disabled},
+        ...readonly && {readonly},
         ...field,
       }))
     }

@@ -32,6 +32,17 @@ let hasLoadedScript
  * Address Input Field powered by Google Places Autocomplete
  * -----------------------------------------------------------------------------
  */
+// @withGql({
+//   query: {
+//     query, variables: {
+//       apiKey: {
+//         api: API_PLACES,
+//         provider: API_PROVIDER_GOOGLE,
+//         platform: API_PLATFORM_WEB,
+//       }
+//     }
+//   }
+// })
 @connect(null, mapDispatchToProps)
 export default class Place extends Component {
   static propTypes = {
@@ -79,7 +90,7 @@ export default class Place extends Component {
 
   get inputProps () {
     let {
-      value, label, hint, placeholder, required, disabled,
+      value, label, hint, placeholder, required, disabled, readonly,
       multiple, done, error, info, float,
       onBlur, onFocus, onDrop, onDragStart,
       className, style, fill
@@ -87,7 +98,7 @@ export default class Place extends Component {
     error = error || this.state.error
     if (value) value = value.id
     return {
-      value, label, hint, placeholder, required, disabled,
+      value, label, hint, placeholder, required, disabled, readonly,
       multiple, done, error, info, float,
       onBlur, onFocus, onDrop, onDragStart,
       className, style, fill
