@@ -7,6 +7,7 @@ import { SELF } from './constants'
  * =============================================================================
  */
 
-export function setUser (payload) {
-  return ACTIVE.store.dispatch(stateAction(SELF, SET, payload))
+// Set User Data in State, and optionally sync with Backend by setting meta = {sync: true}
+export function setUser (payload, meta) {
+  return ACTIVE.store.dispatch(stateAction(SELF, SET, payload, meta))
 }

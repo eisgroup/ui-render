@@ -30,39 +30,13 @@ export const USER = {
       code: 999,
       [LANGUAGE.ENGLISH.code]: 'Admin'
     },
-    AGENCY: {
-      code: 2,
-      [LANGUAGE.ENGLISH.code]: 'Agency'
-    },
-    CLIENT: {
-      code: 3,
-      [LANGUAGE.ENGLISH.code]: 'Client'
-    },
-    MODEL: {
-      code: 1,
-      [LANGUAGE.ENGLISH.code]: 'Model'
-    },
     STAFF: {
       code: 99,
       [LANGUAGE.ENGLISH.code]: 'Staff'
     },
   },
 
-  ACTION: {
-    SKIP: {
-      code: 'skip',
-      [LANGUAGE.ENGLISH.code]: 'Skip'
-    },
-    // todo: Phase 2
-    // SAVE: {
-    //   code: 'save',
-    //   [LANGUAGE.ENGLISH.code]: 'Save'
-    // },
-    // UNSAVE: {
-    //   code: 'unsave',
-    //   [LANGUAGE.ENGLISH.code]: 'Unsave'
-    // },
-  },
+  ACTION: {},
 }
 
 export const SEX = { // code needs to be incrementing value for slider
@@ -109,5 +83,4 @@ DEFINITION_BY_CODE.USER_TYPE = definitionByCode(USER.TYPE)
 DEFINITION_BY_CODE.SEX = definitionByCode(SEX)
 ENUM.USER_ROLE = enumFrom(USER.ROLE)
 ENUM.USER_TYPE = enumFrom(USER.TYPE)
-ENUM.USER_ACTION = enumFrom(USER.ACTION)
 ENUM.SEX = enumFrom(SEX)

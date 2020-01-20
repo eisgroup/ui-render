@@ -1,6 +1,0 @@
-#import "../fragments/UserAction.gql"
-mutation userAction($action: UserActionInput!) {
-    userAction(action: $action) {
-        ...UserAction
-    }
-}

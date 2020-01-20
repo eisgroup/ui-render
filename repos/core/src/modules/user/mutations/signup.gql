@@ -1,8 +1,0 @@
-mutation signup($email: Email!, $password: Password!, $referrer: KeyValInput) {
-    signup(email: $email, password: $password, referrer: $referrer) {
-        id
-        email
-        created
-        updated
-    }
-}

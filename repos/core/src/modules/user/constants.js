@@ -25,6 +25,19 @@ FIELD.ID = {
   SEX: `${NAME}_SEX`,
 }
 
+// Lists
+FIELD.FOR = {
+  USER_CONTACTS: [
+    {id: FIELD.ID.EMAIL, required},
+    {id: FIELD.ID.PHONE, required},
+    {id: FIELD.ID.ADDRESS},
+  ],
+  USER_PROFILE: [
+    {id: FIELD.ID.FULL_NAME},
+    {id: FIELD.ID.BIRTH_n_SEX},
+  ],
+}
+
 // Field Definitions
 FIELD.DEF = {
   [FIELD.ID.FIRST_NAME]: {
@@ -50,7 +63,7 @@ FIELD.DEF = {
     name: 'role',
     label: 'User Role',
     hint: 'Register me as',
-    options: optionsFrom([USER.ROLE.CLIENT, USER.ROLE.MODEL]),
+    options: optionsFrom([USER.ROLE.ADMIN, USER.ROLE.STAFF]),
     view: FIELD.TYPE.DROPDOWN,
   },
   [FIELD.ID.SEX]: {

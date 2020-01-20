@@ -54,20 +54,6 @@ export default class select {
     ]
   }
 
-  static isClient = function () {
-    return [
-      this.role,
-      (role) => role === USER.ROLE.CLIENT.code
-    ]
-  }
-
-  static isModel = function () {
-    return [
-      this.role,
-      (role) => role === USER.ROLE.MODEL.code
-    ]
-  }
-
   static isCompany = function () {
     return [
       this.type,

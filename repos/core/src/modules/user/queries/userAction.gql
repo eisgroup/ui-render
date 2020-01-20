@@ -1,6 +1,0 @@
-#import "../fragments/UserAction.gql"
-query userAction {
-    userAction {
-        ...UserAction
-    }
-}

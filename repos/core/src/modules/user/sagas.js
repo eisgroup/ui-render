@@ -1,4 +1,4 @@
-import { stateAction, stateActionType } from '../../common/actions'
+import { SET, stateAction, stateActionType } from '../../common/actions'
 import { apiAction } from '../../common/api/actions'
 import { subscribeToApiResults } from '../../common/api/utils'
 import { CREATE, LOGIN, RESET, SUBMIT, SUCCESS } from '../../common/constants'
@@ -9,7 +9,8 @@ import { FORM_ACTION_TYPE } from '../exports'
 import history from '../router/history'
 import * as routerSelect from '../router/selectors'
 import { SELF, USER_LOGIN } from './constants'
-import { user as query } from './queries'
+// import { user as mutation } from './mutations'
+// import { user as query } from './queries'
 
 /**
  * ASYNC TASKS =================================================================
@@ -33,6 +34,7 @@ function * watch () {
   yield all([
     // List task subscriptions here
     takeLatest(stateActionType(LOGIN), loginOpen),
+    takeLatest(stateActionType(SELF, SET), userUpdate),
     takeLatest(FORM_ACTION_TYPE[SUBMIT][SUCCESS], loginSuccessFlow)
   ])
 }
@@ -86,16 +88,20 @@ function * loginSuccessFlow ({meta: {form} = {}}) {
  */
 export function * infoGqlFlow () {
   /* API Request and Wait for Response */
-  yield put(apiAction(API_GQL_URL, CREATE, {body: {query}}, {
-    query,
-    headers: {'Content-Type': 'application/json'}
-  }))
+  yield put(apiAction(API_GQL_URL, CREATE, {body: {query}}, {query, headers: {'Content-Type': 'application/json'}}))
   const {payload = {}, meta: {result} = {}} = yield call(subscribeToApiResults, API_GQL_URL, CREATE, {query})
   if (result !== SUCCESS) return
 
   /* Update State */
   const {user} = payload.data || {}
   if (user) yield put(stateAction(SELF, RESET, sanitizeGqlResponse(user)))
+}
+
+// Sync User Data with Backend
+function * userUpdate ({payload, meta}) {
+  const {sync} = meta || {}
+  if (!sync) return
+  yield call(userMutate, {payload, meta})
 }
 
 /**
@@ -106,4 +112,13 @@ export function * infoGqlFlow () {
 function * loginOpen () {
   if (ROUTE.LOGIN === (yield selectState(routerSelect.activeRoute))) return
   history.push({pathname: ROUTE.LOGIN, state: {isModal: true, canCloseModal: false}})
+}
+
+function * userMutate ({payload}) {
+  const variables = {user: payload}
+  const query = mutation
+  yield put(apiAction(API_GQL_URL, CREATE, {body: {query, variables}}, {
+    query, variables,
+    headers: {'Content-Type': 'application/json'}
+  }))
 }
