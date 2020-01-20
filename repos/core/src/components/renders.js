@@ -95,11 +95,12 @@ export function colorDropdownChoice (obj) {
  * Render Currency Amount in consistent manner
  *
  * @param {Number|String} amount - float number or string
+ * @param {Number} [decimals] - the number of decimal digits to keep
  * @param {*} [props] - other pros to pass
  * @returns {Object} - React component
  */
-export function renderCurrency (amount, props) {
-  return renderFloat(amount, amount < 100 ? 2 : 0, props)
+export function renderCurrency (amount, decimals, props) {
+  return renderFloat(amount, decimals != null ? decimals : (amount < 100 ? 2 : 0), props)
 }
 
 /**

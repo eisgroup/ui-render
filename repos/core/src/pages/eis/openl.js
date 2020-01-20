@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { logRender } from '../../common/utils'
-import Json from '../../components/Json'
 import ScrollView from '../../components/ScrollView'
-import Render from '../../components/views/Render'
+import Render, { metaToProps } from '../../components/views/Render'
 import { reduxForm } from '../../modules/form'
 import data from './data/_data'
 import meta from './data/_meta'
@@ -16,7 +15,7 @@ import meta from './data/_meta'
 export default class OpenL extends Component {
   static defaultProps = {
     data,
-    meta,
+    meta: metaToProps(meta),
   }
 
   render () {
@@ -24,12 +23,12 @@ export default class OpenL extends Component {
     return (
       <>
         <ScrollView fill className='fade-in'>
-          <Render {...meta}/>
+          <Render data={data} {...meta}/>
         </ScrollView>
 
-        <ScrollView className='padding bg-neutral inverted'>
-          <Json data={meta} inverted/>
-        </ScrollView>
+        {/*<ScrollView className='padding bg-neutral inverted'>*/}
+        {/*  <Json data={meta} inverted/>*/}
+        {/*</ScrollView>*/}
       </>
     )
   }

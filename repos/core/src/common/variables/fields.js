@@ -5,18 +5,23 @@ import { getSetDefinition } from './definitions'
  * CONSTANT VARIABLES ==========================================================
  * =============================================================================
  */
-export const FIELD = getSetDefinition('TYPE', 'ID', 'DEF', 'MIN_MAX', 'FOR')
+export const FIELD = getSetDefinition('TYPE', 'RENDER', 'ID', 'DEF', 'MIN_MAX', 'FOR')
 
 // Field Type Definitions
 FIELD.TYPE = {
-  // Renderers
   EXPAND: 'Expand',
   COL: 'Col',
   ROW: 'Row',
   TABLE: 'Table',
   TITLE: 'Title',
-
   // ...to be populated by modules
+}
+
+// Value Renderer Definitions
+FIELD.RENDER = {
+  CURRENCY: 'Currency',
+  PERCENT: 'Percent',
+  TITLE_WITH_FILTER: 'TitleWithFilter',
 }
 
 // Field IDs for uniquely identifying field definitions

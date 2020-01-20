@@ -32,7 +32,7 @@ export default class TableView extends Component {
     headers: PropTypes.arrayOf( // in default layout, headers are columns
       PropTypes.shape({
         ...sortObj,
-        renderCell: PropTypes.func, // cell render function for items under the header, receives cell data as argument
+        renderCell: PropTypes.func, // cell render function(value, cellProps) for items under the header
         title: PropTypes.string, // header title, falls back to `id` if not given, and `children` not defined
         children: PropTypes.any, // custom header content to render, overrides `title`
         className: PropTypes.string, // css class name
@@ -126,13 +126,13 @@ export default class TableView extends Component {
   }
 
   // Render Row Cells (in default layout)
-  renderItemData = (item, {id, renderCell, classNameCell, styleCell}) => {
+  renderItemData = (item, {id, renderCell, classNameCell: className, styleCell: style}) => {
     const value = item[id]
     return (
       <Table.Cell key={id}>
-        <View className={classNameCell} style={styleCell}>
+        <View className={className} style={style}>
           {renderCell
-            ? renderCell(value)
+            ? renderCell(value, {id, className, style})
             : <Text className='p'>{value}</Text>
           }
         </View>
