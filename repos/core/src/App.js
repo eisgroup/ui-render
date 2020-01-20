@@ -9,9 +9,10 @@ import Row from './components/Row'
 import { UIContext } from './components/utils'
 import View from './components/View'
 import Sidebar, { Header } from './containers/Navigation'
-import { View as Popup } from './modules/popup'
+import Popup from './modules/popup/views/Popup'
 import { select, SETTING } from './modules/settings'
-import { View as CookiePolicy, withTracker } from './modules/tracking'
+import { withTracker } from './modules/tracking'
+import AcceptCookie from './modules/tracking/views/AcceptCookie'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
@@ -112,7 +113,7 @@ export default class App extends Component {
     return (
       <UIContext.Provider value={this.state}>
         <View className={`app fade-in lang--${lang} ${currency}` + (inverted ? ' inverted text-shadow' : '')}>
-          <CookiePolicy/>
+          <AcceptCookie/>
 
           {/* Header */}
           <Header isMobile={isMobile} {...props} />

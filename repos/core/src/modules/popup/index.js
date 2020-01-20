@@ -1,4 +1,3 @@
-import View from './_View'
 import { NAME } from './constants'
 import reducer from './reducers'
 import saga from './sagas'
@@ -13,12 +12,10 @@ import select from './selectors'
 export {
   NAME,
   select,
-  View
 }
 export default {
   NAME,
   reducer,
   saga,
   select,
-  View
 }

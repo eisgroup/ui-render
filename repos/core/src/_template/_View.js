@@ -30,13 +30,13 @@ const mapDispatchToProps = (dispatch) => ({
  */
 @connect(mapStateToProps, mapDispatchToProps)
 @logRender
-export default class NameView extends Component {
+export default class Name extends Component {
   render () {
     const {actions, ui} = this.props
     return (
       <View className='app__name'>
         <Row>
-          <Button onClick={actions.set}><Icon name='search' />{ui.isLoading}</Button>
+          <Button onClick={actions.set}><Icon name='search'/>{ui.isLoading}</Button>
           <Text>{NAME}</Text>
         </Row>
       </View>

@@ -1,17 +1,17 @@
 import React, { Component } from 'react'
-import { ROUTE } from '../../common/variables'
-import Button from '../../components/Button'
-import Row from '../../components/Row'
-import Text from '../../components/Text'
-import View from '../../components/View'
-import { Link } from '../router'
-import { tracking } from './utils'
+import { ROUTE } from '../../../common/variables'
+import Button from '../../../components/Button'
+import Row from '../../../components/Row'
+import Text from '../../../components/Text'
+import View from '../../../components/View'
+import { Link } from '../../router'
+import { tracking } from '../utils'
 
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
  * -----------------------------------------------------------------------------
  */
-export default class AcceptCookieView extends Component {
+export default class AcceptCookie extends Component {
   state = {
     isOpen: tracking.showCookiePolicy
   }

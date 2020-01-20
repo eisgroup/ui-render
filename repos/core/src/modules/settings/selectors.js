@@ -1,7 +1,8 @@
 import { LANGUAGE } from '../../common/constants'
 import selector from '../../common/selector'
-import { findObjByKeys } from '../../common/utils'
+import { findObjByKeys, isInList } from '../../common/utils'
 import { ACTIVE, CURRENCY, DEFAULT, ROUTES_FOR_NAV } from '../../common/variables'
+import userSelect from '../user/selectors'
 import { NAME } from './constants'
 
 /**
@@ -51,7 +52,8 @@ export default class select {
 
   static routesForNav = function () {
     return [
-      () => ROUTES_FOR_NAV
+      userSelect.role,
+      (userRole) => ROUTES_FOR_NAV.filter(r => !r.userRoles || isInList(r.userRoles, userRole))
     ]
   }
 }

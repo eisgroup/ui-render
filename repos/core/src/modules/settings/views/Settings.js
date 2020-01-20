@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
-import { stateAction } from '../../common/actions'
-import { SET } from '../../common/constants'
-import { connect } from '../../common/redux'
-import { logRender } from '../../common/utils'
-import { DEFAULT } from '../../common/variables'
-import Select from '../../components/Select'
-import View from '../../components/View'
-import { NAME, SETTING } from './constants'
-import select from './selectors'
+import { stateAction } from '../../../common/actions'
+import { SET } from '../../../common/constants'
+import { connect } from '../../../common/redux'
+import { logRender } from '../../../common/utils'
+import { DEFAULT } from '../../../common/variables'
+import Select from '../../../components/Select'
+import View from '../../../components/View'
+import { NAME, SETTING } from '../constants'
+import select from '../selectors'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------

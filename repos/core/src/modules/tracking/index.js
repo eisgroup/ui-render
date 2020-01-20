@@ -1,4 +1,3 @@
-import View from './_View'
 import { NAME } from './constants'
 import { withTracker } from './utils'
 
@@ -17,10 +16,8 @@ import { withTracker } from './utils'
 
 export {
   NAME,
-  View,
   withTracker
 }
 export default {
   NAME,
-  View
 }

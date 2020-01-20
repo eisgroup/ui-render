@@ -1,4 +1,3 @@
-import View from './_View'
 import { NAME, SETTING, UI } from './constants'
 import reducer from './reducers'
 import saga from './sagas'
@@ -15,7 +14,6 @@ export {
   UI,
   SETTING,
   select,
-  View
 }
 export default {
   NAME,
@@ -23,5 +21,4 @@ export default {
   reducer,
   saga,
   select,
-  View
 }

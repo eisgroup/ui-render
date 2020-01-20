@@ -1,4 +1,3 @@
-import View from './_Template'
 import { NAME } from './constants'
 import * as query from './queries'
 import reducer from './reducers'
@@ -15,7 +14,6 @@ export {
   NAME,
   select,
   query,
-  View
 }
 export default {
   NAME,
@@ -23,5 +21,4 @@ export default {
   query,
   saga,
   select,
-  View
 }
