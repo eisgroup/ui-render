@@ -1,12 +1,16 @@
 import PropTypes from 'prop-types'
+import React from 'react'
 import { reduxForm } from 'redux-form' // produces smallest js bundle size
 import { GET, stateAction } from '../../common/actions'
 import { debounce, get, hasListValue, isEmpty, isEqual, objChanges } from '../../common/utils'
-import { FIELD } from '../../components/views/constants'
-import { createInput } from '../fields'
+import { FIELD } from '../../common/variables'
+import Text from '../../components/Text'
+import Tooltip from '../../components/Tooltip'
+import View from '../../components/View'
+import { fieldsFrom } from '../fields'
 import { FORM_ASYNC_VALIDATE } from './constants'
 import { renderField } from './renders'
-import { fieldValues, registeredFieldValues } from './selectors'
+import { fieldValues, registeredFieldErrors, registeredFieldValues } from './selectors'
 
 // import { apolloForm as apolloReduxForm } from '@fundflow/apollo-redux-form'
 // import { schema } from '../../../server/modules/schemas'  // Note: this will expose GraphQL schema to frontend bundle
@@ -100,10 +104,29 @@ export function withForm ({form, ...options}) {
       }
     })
 
+    // Define instance getter
+    Object.defineProperty(constructor.prototype, 'validationErrorsTooltip', {
+      get () {
+        const errors = registeredFieldErrors(this.props.form)
+        return errors && <Tooltip top>
+          <View className='padding-h-smaller'>
+            <Text className='margin-v-small bold'>Please complete:</Text>
+            {(() => {
+              const messages = []
+              for (const k in errors) {
+                messages.push(<Text key={k} className='margin-bottom-smaller'>{`- ${k}: ${errors[k]}`}</Text>)
+              }
+              return messages
+            })()}
+          </View>
+        </Tooltip>
+      }
+    })
+
     // Define instance method
     constructor.prototype.renderInput = function (FIELDS, {onChange} = {}) {
       const {initialValues} = this.props
-      return createInput(FIELDS, {initialValues})
+      return fieldsFrom(FIELDS, {initialValues})
         .map(field => ({
           ...field,
           onChange: (...args) => {
@@ -170,7 +193,7 @@ export function withForm ({form, ...options}) {
 export function asyncValidateForm (values, dispatch, props, blurredField) {
   return new Promise((resolve) => {
     const existingAsyncErrors = props.asyncErrors || {}
-    const asyncValidators = get(FIELD.DEF, `${blurredField}.validateAsync`, [])
+    const asyncValidators = get(FIELD, `${blurredField}.validateAsync`, [])
     if (!hasListValue(asyncValidators)) return resolve(existingAsyncErrors)
 
     // Add blurred field to async validator descriptors

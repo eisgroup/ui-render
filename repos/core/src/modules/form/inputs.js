@@ -8,6 +8,7 @@ import Input from '../../components/Input'
 import DateInput from '../../components/inputs/DateInput'
 import Dates from '../../components/inputs/Dates'
 import Slider from '../../components/Slider'
+import { isRequired } from './validationRules'
 
 /**
  * FORM FIELDS =================================================================
@@ -17,6 +18,7 @@ import Slider from '../../components/Slider'
 
 export class DateField extends Component {
   input = ({input, meta: {touched, error} = {}}) => {
+    if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, normalize, error: errorMessage, validate: _, ...props} = this.props
     return (
       <DateInput
@@ -43,6 +45,7 @@ export class DateField extends Component {
 
 export class DatesField extends Component {
   input = ({input, meta: {touched, error} = {}}) => {
+    if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, normalize, error: errorMessage, ...props} = this.props
     return (
       <Dates
@@ -68,6 +71,7 @@ export class DatesField extends Component {
 
 export class DropdownField extends Component {
   input = ({input, meta: {touched, error} = {}}) => {
+    if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, normalize, error: errorMessage, validate: _, ...props} = this.props
     return (
       <DropDown
@@ -107,6 +111,7 @@ export class InputField extends Component {
 
   // do not use ...props from input, because it is shared by <Field> instances
   input = ({input, meta: {touched, error} = {}}) => {
+    if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, normalize, error: errorMessage, validate: _, ...props} = this.props
     return (
       <Input
@@ -126,7 +131,7 @@ export class InputField extends Component {
 
   // Rerender Field for all prop changes
   render () {
-    const {error: _, info: __, left: ___, float: ____, stickyPlaceholder: _____, ...props} = this.props
+    const {error: _, info: __, lefty: ___, float: ____, stickyPlaceholder: _____, ...props} = this.props
     return <Field {...props} component={this.input}/>
   }
 }
@@ -136,6 +141,7 @@ export class InputField extends Component {
  */
 export class SliderField extends Component {
   input = ({input}) => {
+    if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, defaultValue, denormalize, normalize, ...props} = this.props
     this.val = input.value
     this.value = isList(input.value) ? input.value : (isNumber(input.value) ? input.value : defaultValue)
@@ -184,6 +190,7 @@ export class ToggleField extends Component {
     // @Note: see <Checkbox> component for docs
   }
   input = ({input}) => {
+    if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, label, name, ...props} = this.props
     return (
       <Checkbox

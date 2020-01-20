@@ -74,7 +74,7 @@ export default class Fields extends Component {
     const {name, kind, minFields, fields: __, ...props} = this.props
     const {code} = obj
     const id = name ? `${name}.${code}` : `${kind}.${code}`
-    if (!minFields || minFields < this.state.fields.length) {
+    if (!props.readonly && (!minFields || minFields < this.state.fields.length)) {
       props.icon = 'delete'
       props.onClickIcon = () => this.handleDeleteField(code)
     }
@@ -82,7 +82,7 @@ export default class Fields extends Component {
   }
 
   render () {
-    const {name, kind, options, renderField, addPlaceholder, className, style} = this.props
+    const {name, kind, options, renderField, addPlaceholder, readonly, className, style} = this.props
     const {fields} = this.state
     const renderItem = renderField ? ((obj, i) => renderField(obj, i, this.handleDeleteField)) : this.renderField
     const fieldOptions = options
@@ -96,7 +96,7 @@ export default class Fields extends Component {
         */}
         {name && !fields.length && <Field name={name} component={this.placeholderInput}/>}
         {fields.map(renderItem)}
-        {!!fieldOptions.length &&
+        {!readonly && !!fieldOptions.length &&
         <Dropdown
           search selection
           value=''

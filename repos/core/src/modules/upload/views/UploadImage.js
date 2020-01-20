@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { connect } from '../common/redux'
-import { isEqual, toList } from '../common/utils'
-import upload from '../modules/upload'
-import Upload from '../modules/upload/_View'
-import Image from './Image'
+import { connect } from '../../../common/redux'
+import { isEqual, toList } from '../../../common/utils'
+import Image from '../../../components/Image'
+import upload from '../index'
+import Upload from './Upload'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------

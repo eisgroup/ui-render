@@ -1,11 +1,9 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { ACTIVE } from '../../../common/variables'
-import Collapse from '../../../components/Collapse'
+import { ACTIVE, FIELD } from '../../../common/variables'
 import Label from '../../../components/Label'
 import Row from '../../../components/Row'
 import { withGroupInputChange } from '../../../components/utils'
-import { FIELD } from '../../../components/views/constants'
 import { DateField, DatesField, DropdownField, InputField, ToggleField } from '../inputs'
 import Fields from './Fields'
 import FieldsWithLevel from './FieldsWithLevel'
@@ -57,8 +55,8 @@ export function renderField (fieldDefinition, i) {
   let Field
   const {view, ...props} = fieldDefinition
   switch (view) {
-    case FIELD.TYPE.COLLAPSE:
-      Field = Collapse
+    case FIELD.TYPE.INPUT:
+      Field = InputField
       break
     case FIELD.TYPE.DROPDOWN:
       if (props.selection == null) props.selection = true
@@ -91,7 +89,6 @@ export function renderField (fieldDefinition, i) {
     case FIELD.TYPE.UPLOAD_GRID:
       Field = UploadGridField
       break
-    case FIELD.TYPE.INPUT:
     default:
       Field = InputField
   }

@@ -25,20 +25,20 @@ import { SliderField } from '../inputs'
  * @param {Object} [tooltipProps] - unused, removing from tooltip layout
  * @param {String} [unit] - slider value unit
  * @param {Function} [render] - function to render value, receives `value` as first argument
- * @param {Boolean} [readOnly] - whether to render slider for viewing only
+ * @param {Boolean} [readonly] - whether to render slider for viewing only
  * @param {*} [props] - other input props, like `min`, `max`,...
  * @returns {Object} - React Component
  */
-export function SliderLabeled ({name, id = name, label = id, onRemove, tooltip, tooltipProps, unit, render, readOnly, ...props}) {
-  const Slide = readOnly ? Slider : SliderField
-  if (readOnly) props.disabled = true
+export function SliderLabeled ({name, id = name, label = id, onRemove, tooltip, tooltipProps, unit, render, readonly, ...props}) {
+  const Slide = (readonly && props.value != null) ? Slider : SliderField
+  if (readonly) props.disabled = true
   return (
     <View key={id} className='app__slider--wrap'>
       <Row className='app__slider__label--wrap bottom fill-width padding-bottom-smaller'>
         <Text className='app__slider__label'>
           {label}
         </Text>
-        {onRemove &&
+        {onRemove && !readonly &&
         <Button circle className='app__slider__remove small' onClick={() => onRemove(id)}><Icon
           name='delete'/></Button>
         }
@@ -66,6 +66,7 @@ export function SliderLabeled ({name, id = name, label = id, onRemove, tooltip, 
               )
           )}
         </Text>}
+        readonly={readonly}
         {...props}
       />
     </View>

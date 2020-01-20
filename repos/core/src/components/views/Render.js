@@ -1,12 +1,11 @@
 import classNames from 'classnames'
 import React from 'react'
-import { ACTIVE } from '../../common/variables'
+import { ACTIVE, FIELD } from '../../common/variables'
 import Expand from '../Expand'
 import Row from '../Row'
 import TableView from '../TableView'
 import Text from '../Text'
 import View from '../View'
-import { FIELD } from './constants'
 
 /**
  * Recursive Field Renderer

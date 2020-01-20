@@ -2,9 +2,11 @@ import React, { Component } from 'react'
 import { Field } from 'redux-form'
 import { isFunction } from '../../../common/utils'
 import Place from '../../../components/inputs/Place'
+import { isRequired } from '../validationRules'
 
 export default class PlaceField extends Component {
   input = ({input, meta: {touched, error} = {}}) => {
+    if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, error: errorMessage, ...props} = this.props
     return (
       <Place

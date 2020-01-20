@@ -2,7 +2,7 @@ import { optionsFrom } from '../../common/variables'
 import { required, stickyPlaceholder } from '../form/constants'
 import { timeInThePast } from '../form/validationRules'
 import { SEX, USER } from './definitions'
-import { FIELD } from '../../components/views/constants'
+import { FIELD } from '../../common/variables/fields'
 
 /**
  * CONSTANT VARIABLES ==========================================================

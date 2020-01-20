@@ -1,16 +1,16 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component, Fragment } from 'react'
-import { OPEN, stateAction } from '../common/actions'
-import { connect } from '../common/redux'
-import { by, get, isEqual } from '../common/utils'
-import { ROUTE_HOME } from '../common/variables'
-import { POPUP, POPUP_ALERT, POPUP_CONFIRM } from '../modules/exports'
-import Icon from './Icon'
-import Row from './Row'
-import Text from './Text'
+import { OPEN, stateAction } from '../../../common/actions'
+import { connect } from '../../../common/redux'
+import { by, get, isEqual } from '../../../common/utils'
+import { ROUTE_HOME } from '../../../common/variables'
+import Icon from '../../../components/Icon'
+import Row from '../../../components/Row'
+import Text from '../../../components/Text'
+import View from '../../../components/View'
+import { POPUP, POPUP_ALERT, POPUP_CONFIRM } from '../../exports'
 import UploadImage from './UploadImage'
-import View from './View'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
@@ -18,7 +18,7 @@ import View from './View'
  */
 const mapDispatchToProps = (dispatch) => ({
   actions: {
-    alert: ({ file, aspectRatios }) => dispatch(stateAction(POPUP, OPEN, {
+    alert: ({file, aspectRatios}) => dispatch(stateAction(POPUP, OPEN, {
       activePopup: POPUP_ALERT,
       [POPUP_ALERT]: {
         items: [{

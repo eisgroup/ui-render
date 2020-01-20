@@ -1,6 +1,6 @@
 import { get } from '../common/utils'
 import { OPTIONS, TYPE } from '../common/variables/definitions'
-import { FIELD } from '../components/views/constants'
+import { FIELD } from '../common/variables/fields'
 import { phone } from './form/normalizers'
 import { email, isRequired, phoneNumber } from './form/validationRules'
 

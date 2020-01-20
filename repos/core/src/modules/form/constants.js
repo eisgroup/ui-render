@@ -1,6 +1,5 @@
-import { CHANGE, ERROR, FINISH, LANGUAGE_LEVEL, START, SUBMIT, SUCCESS } from '../../common/constants'
-import { DEFINITION_BY_CODE, OPTIONS, TYPE } from '../../common/variables'
-import { FIELD } from '../../components/views/constants'
+import { CHANGE, ERROR, FINISH, START, SUBMIT, SUCCESS } from '../../common/constants'
+import { FIELD } from '../../common/variables/fields'
 
 /**
  * CONSTANT VARIABLES ==========================================================
@@ -36,62 +35,25 @@ FIELD.TYPE = {
   UPLOAD_GRID: 'UploadGrid',  // multiple uploads in grid layout
 }
 
-// Common Field Ids
-FIELD.ID = {
-  NAME: 'name',
-  EMAIL: 'email',
-  ABOUT: 'about',
-  ADDRESS: 'address',
-  LANGUAGE: 'lang',
-  PHONE: 'phone',
-  ID_HIDDEN: 'idHidden', // default input `name` is `id`
-}
-
-// Min/Max Values for Slider Ranges
-FIELD.MIN_MAX = {
-  [FIELD.ID.LANGUAGE]: [LANGUAGE_LEVEL.BASIC.code, LANGUAGE_LEVEL.NATIVE.code],
-}
-
-// Common Field Definitions
-FIELD.DEF = {
-  [FIELD.ID.ID_HIDDEN]: {
-    name: 'id',
-    type: 'hidden',
-  },
-  [FIELD.ID.NAME]: {
-    name: 'name',
-    label: 'Name',
-  },
-  [FIELD.ID.ABOUT]: {
-    name: 'about',
-    label: 'Description',
-    hint: 'About me',
-    placeholder: 'Enter brief description',
-    type: 'textarea',
-  },
-  [FIELD.ID.ADDRESS]: {
-    name: 'place',
-    label: 'Address',
-    hint: 'My address is',
-    placeholder: 'Enter address',
-    view: FIELD.TYPE.PLACE
-  },
-  [FIELD.ID.LANGUAGE]: {
-    name: 'lang',
-    kind: TYPE.LANGUAGE.key,
-    level: DEFINITION_BY_CODE.LANGUAGE_LEVEL,
-    options: OPTIONS.LANGUAGE,
-    min: FIELD.MIN_MAX[FIELD.ID.LANGUAGE][0],
-    max: FIELD.MIN_MAX[FIELD.ID.LANGUAGE][1],
-    unit: 'Level',
-    hint: 'I speak',
-    view: FIELD.TYPE.MULTIPLE_LEVEL,
-  },
-}
-
 // Field props
 export const stickyPlaceholder = true
-export const left = true
+export const lefty = true
+export const disabled = true
+export const readonly = true
 export const multiple = true
 export const required = true
 export const search = true
+
+/**
+ * Populate List of Field Definition with Slider Field required props
+ *
+ * @param {Array<Object>} fields - list of fields to create, requires FIELD.ID, used for extending base definition
+ * @param {Object} [options] - extra props to add (i.e. {namePrefix})
+ * @returns {Array<Object>} list - of slider field definitions
+ */
+export function toSlider(fields, options) {
+  return fields.map(field => {
+    const [min, max] = FIELD.MIN_MAX[field.id]
+    return {...options, ...field, min, max, defaultValue: [min, max], view: FIELD.TYPE.SLIDER}
+  })
+}
