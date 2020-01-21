@@ -35,9 +35,10 @@ export default {
                   'Adjusted Fixed': {
                     view: 'Row',
                     items: [
-                      {view: 'Text', children: 'Adjusted Fixed'},
+                      {view: 'Text', fill: true, children: 'Adjusted Fixed'},
                       {
                         view: 'Col',
+                        fill: true,
                         className: 'bg-grey padding',
                         items: [
                           {view: 'Input', label: 'UW Exception Dollar Amount', type: 'number'},
@@ -48,9 +49,10 @@ export default {
                   'Adjusted Variable': {
                     view: 'Row',
                     items: [
-                      {view: 'Text', children: 'Adjusted Variable'},
+                      {view: 'Text', fill: true, children: 'Adjusted Variable'},
                       {
                         view: 'Col',
+                        fill: true,
                         className: 'bg-grey padding',
                         items: [
                           {view: 'Input', label: 'Risk Adjustment Percent', type: 'number'},

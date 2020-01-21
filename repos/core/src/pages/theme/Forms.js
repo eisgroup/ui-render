@@ -54,7 +54,7 @@ export default class Forms extends Component {
                 <DropdownField float name='dropdown-required' options={['One', 'Two', 'Three']} validate={isRequired}/>
               </Row>
               <Row className='justify'>
-                <InputField name='done' value={9} type='number' unit='USD' label='Done'/>
+                <InputField name='done' value={9} type='number' unit='%' label='Done'/>
                 <InputField name='false' placeholder='done=false' label='Done' done={false}/>
               </Row>
               <Row className='justify'>

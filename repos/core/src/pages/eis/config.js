@@ -18,6 +18,7 @@ const field = {
   onChange: Function, // callback for input value changes
   float: Boolean, // whether label should float above input when in focus
   disabled: Boolean, // disabled input
+  readonly: Boolean, // read-only input
   normalize: [Function], // redux-form input value normalizer function/s
   validate: [Function], // redux-form input value validation function/s
   value: undefined, // controlled input value
@@ -38,8 +39,24 @@ const field = {
   pushable: Number, // minimum slider increments between two handles
 
   // Table view props
+  // @see: <TableView /> for all props
   inverted: Boolean, // whether to style table in dark mode
   striped: Boolean, // whether to alternate background shade of items (rows in default layout)
+  headers: [
+    {
+      id: String,
+      renderCell: String, // name of render Function to use
+    },
+    {
+      id: String,
+      renderCell: { // dynamic rendering based on cell value
+        values: {
+          'value to match': {/* definition of nested fields to render */}
+        },
+        default: String,
+      }
+    }
+  ],
 
   // Upload and other input props
   kind: 'Type of file or input, for example, "images"',
