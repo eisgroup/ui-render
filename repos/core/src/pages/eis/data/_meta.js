@@ -27,7 +27,40 @@ export default {
             {
               id: 'adminCategory',
               classNameCell: 'uppercase',
-              renderCell: 'TitleWithFilter',
+              // - String renderCell -> maps to FIELD.RENDER function
+              // - Object renderCell -> maps to FIELD.TYPE recursive Render by matching values
+              //                     -> can optionally specify `default` FIELD.RENDER function
+              renderCell: {
+                values: {
+                  'Adjusted Fixed': {
+                    view: 'Row',
+                    items: [
+                      {view: 'Text', children: 'Adjusted Fixed'},
+                      {
+                        view: 'Col',
+                        className: 'bg-grey padding',
+                        items: [
+                          {view: 'Input', label: 'UW Exception Dollar Amount', type: 'number'},
+                        ]
+                      },
+                    ]
+                  },
+                  'Adjusted Variable': {
+                    view: 'Row',
+                    items: [
+                      {view: 'Text', children: 'Adjusted Variable'},
+                      {
+                        view: 'Col',
+                        className: 'bg-grey padding',
+                        items: [
+                          {view: 'Input', label: 'Risk Adjustment Percent', type: 'number'},
+                        ]
+                      },
+                    ]
+                  },
+                },
+                // default: 'Currency',
+              },
               title: 'Description'
             },
             {
@@ -58,7 +91,8 @@ export default {
               renderCell: 'Currency',
               title: 'Per Employee'
             },
-          ]
+          ],
+          rows: []
         }
       ]
     }

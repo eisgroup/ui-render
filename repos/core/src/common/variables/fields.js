@@ -13,6 +13,7 @@ FIELD.TYPE = {
   COL: 'Col',
   ROW: 'Row',
   TABLE: 'Table',
+  TEXT: 'Text',
   TITLE: 'Title',
   // ...to be populated by modules
 }
@@ -21,7 +22,7 @@ FIELD.TYPE = {
 FIELD.RENDER = {
   CURRENCY: 'Currency',
   PERCENT: 'Percent',
-  TITLE_WITH_FILTER: 'TitleWithFilter',
+  TITLE_n_INPUT: 'Title+Input',
 }
 
 // Field IDs for uniquely identifying field definitions

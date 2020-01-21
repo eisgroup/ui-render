@@ -20,6 +20,7 @@ export default class OpenL extends Component {
 
   render () {
     const {data, meta} = this.props
+    console.warn('meta', meta)
     return (
       <>
         <ScrollView fill className='fade-in'>

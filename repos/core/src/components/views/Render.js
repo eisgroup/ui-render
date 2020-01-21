@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { get, toPercent } from '../../common/utils'
+import { get, isObject, toPercent } from '../../common/utils'
 import { ACTIVE, FIELD } from '../../common/variables'
 import Expand from '../Expand'
 import { renderCurrency } from '../renders'
@@ -33,6 +33,8 @@ export default function Render ({data, view, items = [], ...props}, i) {
       return <Row {...props}>{items.map(Render)}</Row>
     case FIELD.TYPE.TABLE:
       return <TableView items={data} {...props}/>
+    case FIELD.TYPE.TEXT:
+      return <Text {...props}/>
     case FIELD.TYPE.TITLE:
       return <Text {...props} className={classNames('h3', props.className)}/>
     default:
@@ -49,10 +51,12 @@ export default function Render ({data, view, items = [], ...props}, i) {
 export function RenderFunc (Name) {
   switch (Name) {
     case FIELD.RENDER.CURRENCY:
-      return (val) => <Row><Text className='margin-right-smaller'>$</Text> {renderCurrency(val, 2)}</Row>
+      return (val, {id, ...props} = {}) => (
+        <Row {...props}><Text className='margin-right-smaller'>$</Text> {renderCurrency(val, 2)}</Row>
+      )
     case FIELD.RENDER.PERCENT:
-      return toPercent
-    case FIELD.RENDER.TITLE_WITH_FILTER:
+      return (val, {decimals} = {}) => toPercent(val, decimals)
+    case FIELD.RENDER.TITLE_n_INPUT:
       return (val, {id, ...props} = {}) => <Row {...props}><Text>{val}</Text></Row>
     default:
       return (val) => val
@@ -67,9 +71,20 @@ export function RenderFunc (Name) {
  */
 export function metaToProps (meta) {
   for (const key in meta) {
+
+    // Map Value Renderer Names/Objects to Actual Render Functions
     if (key.indexOf('render') === 0) {
-      meta[key] = RenderFunc(meta[key])
-    } else if (typeof meta[key] === 'object') {
+      const render = meta[key]
+      if (typeof render === 'string') meta[key] = RenderFunc(meta[key])
+      if (isObject(render)) meta[key] = (val, ...args) => {
+        const props = get(render, `values[${val}]`)
+        if (props) return Render(props)
+        return RenderFunc(render.default).apply(this, [val, ...args])
+      }
+    }
+
+    // Recursively process the rest of definitions
+    else if (typeof meta[key] === 'object') {
       meta[key] = metaToProps(meta[key])
     }
   }
