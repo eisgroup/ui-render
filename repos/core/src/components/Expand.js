@@ -20,6 +20,7 @@ export default class Expand extends Component {
       PropTypes.func,  // function to render content when expanded, receives `id` if given
       PropTypes.any,  // pre-rendered content (not recommended for performance reasons)
     ]),
+    renderTitle: PropTypes.func, // function to render title
     expanded: PropTypes.bool, // whether should render as expanded
     active: PropTypes.bool, // whether to add `active` css class
     justify: PropTypes.bool, // whether should render expand icon spread out from `title`
@@ -82,18 +83,20 @@ export default class Expand extends Component {
   }
 
   renderTitle = () => {
-    const {title, justify = false, children, iconOpened, iconClosed} = this.props
+    const {title, renderTitle, justify = false, children, iconOpened, iconClosed} = this.props
+    if (title == null && !renderTitle) return null
     const {expanded} = this.state
     const hasContent = children != null
+    const Title = renderTitle ? renderTitle(title) : title
     return (
       <Text
         className={classNames('row fill-width middle padding-small', {justify})}
         onClick={hasContent && this.handleToggleExpand}
       >
-        {justify && title}
+        {justify && Title}
         {hasContent && iconOpened && iconClosed &&
         <Icon name={(expanded ? iconOpened : iconClosed) + ' spin-90-deg' + (expanded ? '' : '-')}/>}
-        {!justify && title}
+        {!justify && Title}
       </Text>
     )
   }
@@ -111,6 +114,7 @@ export default class Expand extends Component {
       justify: __,
       iconClosed: ___,
       iconOpened: ____,
+      renderTitle: _____,
       ...props
     } = this.props
     const {expanded, changing} = this.state
@@ -118,7 +122,7 @@ export default class Expand extends Component {
     const content = hasContent && (expanded || changing) && this.content
     return (
       <View className={classNames('app__expand', className, {expanded, active})} {...props}>
-        {title != null && this.renderTitle()}
+        {this.renderTitle()}
         {hasContent &&
         <AnimateHeight expanded={expanded} duration={duration} className='expand__content'>{content}</AnimateHeight>
         }

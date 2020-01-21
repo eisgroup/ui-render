@@ -13,6 +13,7 @@ FIELD.TYPE = {
   COL: 'Col',
   ROW: 'Row',
   TABLE: 'Table',
+  TABS: 'Tabs',
   TEXT: 'Text',
   TITLE: 'Title',
   // ...to be populated by modules

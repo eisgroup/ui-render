@@ -6,6 +6,7 @@ import Expand from '../Expand'
 import { renderCurrency } from '../renders'
 import Row from '../Row'
 import TableView from '../TableView'
+import Tabs from '../Tabs'
 import Text from '../Text'
 import View from '../View'
 
@@ -33,6 +34,10 @@ export default function Render ({data, view, items = [], ...props}, i) {
       return <Row {...props}>{items.map(Render)}</Row>
     case FIELD.TYPE.TABLE:
       return <TableView items={data} {...props}/>
+    case FIELD.TYPE.TABS:
+      const tabs = items.map(({tab}) => isObject(tab) ? Render(this, tab) : tab)
+      const panels = items.map(({content, data}) => isObject(content) ? Render.bind(this, {...content, data}) : content)
+      return <Tabs items={tabs} panels={panels}/>
     case FIELD.TYPE.TEXT:
       return <Text {...props}/>
     case FIELD.TYPE.TITLE:
@@ -77,6 +82,7 @@ export function metaToProps (meta) {
       const render = meta[key]
       if (typeof render === 'string') meta[key] = RenderFunc(meta[key])
       if (isObject(render)) meta[key] = (val, ...args) => {
+        if (render.view) return Render(render)
         const props = get(render, `values[${val}]`)
         if (props) return Render(props)
         return RenderFunc(render.default).apply(this, [val, ...args])
