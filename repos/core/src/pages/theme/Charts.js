@@ -18,8 +18,8 @@ export default class Charts extends Component {
 
         {/* Pie Chart */}
         <Row className='fill--width center wrap'>
-          <PieChart className='min-width-290' unit='View' items={pieItems}/>
-          <PieChart className='min-width-290' unit='View' items={pieItems} hasRef/>
+          <PieChart unit='View' items={pieItems}/>
+          <PieChart unit='View' items={pieItems} hasRef/>
         </Row>
       </View>
     )

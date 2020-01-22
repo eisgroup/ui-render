@@ -134,7 +134,15 @@ export default {
                   {
                     view: 'Row',
                     items: [
-                      // {view: 'PieChart'}
+                      {
+                        view: 'PieChart',
+                        name: 'planCalculations[0].subGroupEnrollmentBreakdown[0].enrollmentBreakdown',
+                        hasRef: true,
+                        mapItems: {
+                          label: 'tier',
+                          value: 'numberOfLives',
+                        }
+                      }
                     ]
                   },
                   {view: 'Title', children: 'Area Factors'},

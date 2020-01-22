@@ -39,7 +39,7 @@ const field = {
   pushable: Number, // minimum slider increments between two handles
 
   // Table view props
-  // @see: <TableView /> for all props
+  // @see: <TableView /> docs for other props
   inverted: Boolean, // whether to style table in dark mode
   striped: Boolean, // whether to alternate background shade of items (rows in default layout)
   headers: [
@@ -57,6 +57,10 @@ const field = {
       }
     }
   ],
+
+  // Pie Chart
+  // @see: <PieChart/> docs for other props
+  mapItems: Object, // data mapper key/value pairs (ex. {label: 'pieLabelKeyFromData', value: 'pieValueKeyFromData'}
 
   // Upload and other input props
   kind: 'Type of file or input, for example, "images"',

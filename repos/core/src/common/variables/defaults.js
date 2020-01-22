@@ -1,5 +1,5 @@
 import { LANGUAGE, ONE_HOUR } from '../constants'
-import { GREEN, TEAL, VIOLET } from '../styles'
+import { PINK, TEAL, VIOLET } from '../styles'
 import { THEME } from './configs'
 import { CURRENCY } from './definitions'
 
@@ -10,7 +10,7 @@ import { CURRENCY } from './definitions'
 export const DEFAULT = {
   LANGUAGE: LANGUAGE.ENGLISH.code,
   CURRENCY: CURRENCY.USD.code,
-  GRADIENT_COLORS: [GREEN, TEAL, VIOLET],
+  GRADIENT_COLORS: [PINK, TEAL, VIOLET],
   GRADIENT_HUE_COUNT: 3,
   PAY_INTERVAL: ONE_HOUR,
   THEME: THEME.LIGHT,

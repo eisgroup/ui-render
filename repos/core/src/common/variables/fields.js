@@ -11,6 +11,7 @@ export const FIELD = getSetDefinition('TYPE', 'RENDER', 'ID', 'DEF', 'MIN_MAX', 
 FIELD.TYPE = {
   EXPAND: 'Expand',
   COL: 'Col',
+  PIE_CHART: 'PieChart',
   ROW: 'Row',
   TABLE: 'Table',
   TABS: 'Tabs',

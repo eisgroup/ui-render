@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component, Fragment } from 'react'
 import { Pie, PieChart as Piechart, ResponsiveContainer, Tooltip } from 'recharts'
-import { TEXT_INVERSE } from '../../common/styles'
+import { TEXT_LIGHT } from '../../common/styles'
 import {
   by,
   gradientColors,
@@ -48,6 +48,10 @@ export default class PieChart extends Component {
     hasRef: PropTypes.bool, // whether to render Reference table to the side of Pie Chart, default is false
   }
 
+  static defaultProps = {
+    height: 290,
+  }
+
   renderTotal = () => {
     return (
       <>
@@ -72,7 +76,7 @@ export default class PieChart extends Component {
 
   render () {
     const {
-      items, height = 290, unit: u, classNameWrap, className, children,
+      items, height, unit: u, classNameWrap, className, children,
       gradient = true, colors: colours, hasRef,
       ...props
     } = this.props
@@ -82,7 +86,7 @@ export default class PieChart extends Component {
     this.data = dataNormalized(items, colors, gradient)
     return (
       <Container {...hasRef && {className: classNames('app__pie-chart--ref middle wrap', classNameWrap)}}>
-        <View className={classNames('app__pie-chart fill--width center', className, {gradient})} {...props}>
+        <View className={classNames('app__pie-chart min-width-290 center', className, {gradient})} {...props}>
           <ResponsiveContainer height={height}>
             <Piechart>
               {gradient && <defs>{this.data.map(renderGradient)}</defs>}
@@ -134,7 +138,7 @@ function renderLabel ({cx, cy, midAngle, innerRadius, outerRadius, startAngle, e
   const fontScale = Math.min(percent + 5, fontSize)  // make font size smaller if percent is low
 
   /* Inner Label Coordinates */
-  const percentColor = fill === 'none' ? color : TEXT_INVERSE
+  const percentColor = fill === 'none' ? color : TEXT_LIGHT
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5
   const x = cx + radius * Math.cos(-midAngle * RADIAN)
   const y = cy + radius * Math.sin(-midAngle * RADIAN)

@@ -2,6 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { get, isObject, toPercent } from '../../common/utils'
 import { ACTIVE, FIELD } from '../../common/variables'
+import PieChart from '../charts/PieChart'
 import Expand from '../Expand'
 import { renderCurrency } from '../renders'
 import Row from '../Row'
@@ -30,6 +31,18 @@ export default function Render ({data, view, items = [], ...props}, i) {
       return <Expand {...props}>{() => items.map(Render)}</Expand>
     case FIELD.TYPE.COL:
       return <View {...props}>{items.map(Render)}</View>
+    case FIELD.TYPE.PIE_CHART:
+      const {mapItems, ...prop} = props
+      if (mapItems) {
+        data = data.map(item => {
+          const result = {}
+          for (const key in mapItems) {
+            result[key] = item[mapItems[key]]
+          }
+          return result
+        })
+      }
+      return <PieChart items={data} {...prop}/>
     case FIELD.TYPE.ROW:
       return <Row {...props}>{items.map(Render)}</Row>
     case FIELD.TYPE.TABLE:
