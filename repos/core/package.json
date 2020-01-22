@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "backoff": "^2.5.0",
+    "chroma-js": "^2.1.0",
     "circular-json-es6": "^2.0.2",
     "classnames": "^2.2.6",
     "connected-react-router": "5.0.0",
