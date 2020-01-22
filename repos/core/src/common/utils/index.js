@@ -6,6 +6,7 @@
 
 export * from './array'
 export * from './codec'
+export * from './color'
 // export * from './crypto'
 // export * from './file'
 export * from './function'

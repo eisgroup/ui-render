@@ -6,6 +6,7 @@ import Button from '../../components/Button'
 import Row from '../../components/Row'
 import ScrollView from '../../components/ScrollView'
 import Buttons from './Buttons'
+import Charts from './Charts'
 import Dropdowns from './Dropdowns'
 import Forms from './Forms'
 import Layouts from './Layouts'
@@ -13,9 +14,10 @@ import Layouts from './Layouts'
 @logRender
 export default class Theme extends Component {
   state = {
-    activeIndex: 2,
+    activeIndex: 1,
     items: [
       {name: 'Buttons', content: Buttons},
+      {name: 'Charts', content: Charts},
       {name: 'Dropdowns', content: Dropdowns},
       {name: 'Inputs', content: Forms},
       {name: 'Layouts', content: Layouts},

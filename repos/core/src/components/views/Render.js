@@ -35,9 +35,12 @@ export default function Render ({data, view, items = [], ...props}, i) {
     case FIELD.TYPE.TABLE:
       return <TableView items={data} {...props}/>
     case FIELD.TYPE.TABS:
-      const tabs = items.map(({tab}) => isObject(tab) ? Render(this, tab) : tab)
-      const panels = items.map(({content, data}) => isObject(content) ? Render.bind(this, {...content, data}) : content)
-      return <Tabs items={tabs} panels={panels}/>
+      const tabs = items.map(({tab}, i) => isObject(tab) ? Render(tab, i) : tab)
+      const panels = items.map(({content, data}, i) => isObject(content)
+        ? Render.bind(this, {...content, data}, i)
+        : content
+      )
+      return <Tabs items={tabs} panels={panels} {...props}/>
     case FIELD.TYPE.TEXT:
       return <Text {...props}/>
     case FIELD.TYPE.TITLE:

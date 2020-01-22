@@ -440,8 +440,18 @@ export function toHex (string) {
  * @param {String} string - to convert
  * @returns {String} - with alpha numeric characters only
  */
-export function toAplhanum (string) {
+export function toAlphaNum (string) {
   return string.replace(/[^a-zA-Z0-9]/g, '')
+}
+
+/**
+ * Convert String to Alpha Numeric Characters with dashes and underscores
+ *
+ * @param {String} string - to convert
+ * @returns {String} - with alpha numeric characters, dash and underscore only
+ */
+export function toAlphaNumId (string) {
+  return string.replace(/[^a-zA-Z0-9_-]/g, '')
 }
 
 /**
