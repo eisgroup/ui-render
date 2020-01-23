@@ -45,7 +45,8 @@ export default class PieChart extends Component {
     colors: PropTypes.array,
     children: PropTypes.any, // content to render inside the pie, will override default Label
     gradient: PropTypes.bool, // default is true
-    hasRef: PropTypes.bool, // whether to render Reference table to the side of Pie Chart, default is false
+    legends: PropTypes.bool, // whether to render Legends to the side of Pie Chart, default is false
+    pointers: PropTypes.bool, // whether to render reference pointers to each pie, default is true if `legends` is false
   }
 
   static defaultProps = {
@@ -77,15 +78,15 @@ export default class PieChart extends Component {
   render () {
     const {
       items, height, unit: u, classNameWrap, className, children,
-      gradient = true, colors: colours, hasRef,
+      gradient = true, colors: colours, legends, pointers,
       ...props
     } = this.props
     unit = u
-    const Container = hasRef ? Row : Fragment
+    const Container = legends ? Row : Fragment
     const colors = gradientColors(items.length, colours)
     this.data = dataNormalized(items, colors, gradient)
     return (
-      <Container {...hasRef && {className: classNames('app__pie-chart--ref middle wrap', classNameWrap)}}>
+      <Container {...legends && {className: classNames('app__pie-chart--ref middle wrap', classNameWrap)}}>
         <View className={classNames('app__pie-chart min-width-290 center', className, {gradient})} {...props}>
           <ResponsiveContainer height={height}>
             <Piechart>
@@ -96,7 +97,7 @@ export default class PieChart extends Component {
                 innerRadius='40%'
                 outerRadius='60%'
                 labelLine={false}
-                label={renderLabel}
+                label={(pointers || (!legends && pointers !== false)) ? renderPercentPointer : renderPercent}
                 strokeWidth={0}
                 children={this.data.map(renderCell)}
               />
@@ -110,7 +111,7 @@ export default class PieChart extends Component {
             }
           </View>
         </View>
-        {hasRef && this.renderReference()}
+        {legends && this.renderReference()}
       </Container>
     )
   }
@@ -127,7 +128,35 @@ function dataNormalized (items, colors, gradient) {
   })
 }
 
-function renderLabel ({cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, name, percent, fill, color}) {
+/**
+ * Get Coordinates of Center Point within each Pie in a Donut
+ */
+function donutPieCenterCoords ({cx, cy, midAngle, innerRadius, outerRadius}) {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+  const x = cx + radius * Math.cos(-midAngle * RADIAN)
+  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+  return {x, y}
+}
+
+function renderPercent ({cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, name, percent, fill, color}) {
+  percent = percent * 100
+  if (percent < 1) return null
+  const fontScale = Math.min(percent + 5, fontSize)  // make font size smaller if percent is low
+
+  /* Inner Label */
+  const percentColor = fill === 'none' ? color : TEXT_LIGHT
+  const {x, y} = donutPieCenterCoords({cx, cy, midAngle, innerRadius, outerRadius})
+
+  return (
+    <g>
+      <text x={x} y={y} fill={percentColor} textAnchor='middle' dominantBaseline='central' fontSize={fontScale - 2}>
+        {Math.round(percent) + '%'}
+      </text>
+    </g>
+  )
+}
+
+function renderPercentPointer ({cx, cy, midAngle, innerRadius, outerRadius, name, percent, fill, color}) {
   percent = percent * 100
   name = truncate(name, 9, 2)
   if (percent < 1) return null
@@ -137,13 +166,11 @@ function renderLabel ({cx, cy, midAngle, innerRadius, outerRadius, startAngle, e
   const radiusEffect = outerRadius / 13
   const fontScale = Math.min(percent + 5, fontSize)  // make font size smaller if percent is low
 
-  /* Inner Label Coordinates */
+  /* Inner Label */
   const percentColor = fill === 'none' ? color : TEXT_LIGHT
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5
-  const x = cx + radius * Math.cos(-midAngle * RADIAN)
-  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+  const {x, y} = donutPieCenterCoords({cx, cy, midAngle, innerRadius, outerRadius})
 
-  /* Out Label Coordinates */
+  /* Out Label */
   const labelColor = chroma(color).alpha(0.7).css()
   const labelSize = Math.max(fontScale - Math.max(0, name.length - 5) * angleEffect, 6)  // scale to characters and angle
   const lineScale = Math.min(percent + 2, radiusEffect)  // scale line length proportionally to percent and chart size

@@ -137,7 +137,7 @@ export default {
                       {
                         view: 'PieChart',
                         name: 'planCalculations[0].subGroupEnrollmentBreakdown[0].enrollmentBreakdown',
-                        hasRef: true,
+                        legends: true,
                         mapItems: {
                           label: 'tier',
                           value: 'numberOfLives',
