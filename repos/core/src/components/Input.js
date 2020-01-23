@@ -75,7 +75,8 @@ export default function Input
       style={style}
     >
       {!float && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
-      <Row className={classNames('input', {active, icon, lefty, disabled, error, info})}>
+      <Row className={classNames('input', {active, icon, lefty, disabled, error, info})}
+           style={{...unit && {zIndex: 0}}} /* z-index is sometimes required to show unit, which has z-index -1 */>
         {icon && lefty && <Icon name={icon} onClick={onClickIcon}/>}
         {unit && hasValue &&
         <Text className='input__unit truncate'>

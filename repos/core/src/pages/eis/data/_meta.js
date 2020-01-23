@@ -97,7 +97,6 @@ export default {
                   title: 'Per Employee'
                 },
               ],
-              rows: []
             }
           ]
         }
@@ -124,6 +123,7 @@ export default {
       items: [
         {
           view: 'Tabs',
+          defaultIndex: 2,
           items: [
             {
               tab: 'Demographic',
@@ -162,6 +162,51 @@ export default {
                     ]
                   },
                   {view: 'Title', children: 'PPO'},
+                ]
+              }
+            },
+            {
+              tab: 'Redistribution Calculator',
+              content: {
+                view: 'Col',
+                items: [
+                  {view: 'Title', children: 'Calculate Rate'},
+                  {
+                    view: 'Table',
+                    name: 'planCalculations[0].tierRates',
+                    headers: [
+                      {
+                        id: 'tier',
+                        className: 'uppercase',
+                      },
+                      {
+                        id: 'adjManualRate',
+                        renderCell: 'Currency',
+                      },
+                      {
+                        id: 'adjFormulaRate',
+                        renderCell: 'Currency',
+                      },
+                      {
+                        id: 'manualRate',
+                        renderCell: {
+                          view: 'Input',
+                          type: 'number',
+                          icon: 'USD',
+                          unit: 'USD',
+                          lefty: true,
+                        },
+                      },
+                      {
+                        id: 'formulaRate',
+                        renderCell: 'Currency',
+                      },
+                      {
+                        id: 'proposedRate',
+                        renderCell: 'Currency',
+                      },
+                    ],
+                  },
                 ]
               }
             }

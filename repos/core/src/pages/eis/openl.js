@@ -14,6 +14,7 @@ import meta from './data/_meta'
 @logRender
 export default class OpenL extends Component {
   static defaultProps = {
+    initialValues: data,
     data,
     meta: metaToProps(meta),
   }
