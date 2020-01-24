@@ -173,7 +173,7 @@ export default {
                   {view: 'Title', children: 'Calculate Rate'},
                   {
                     view: 'Table',
-                    name: 'planCalculations[0].tierRates',
+                    name: 'planCalculations.0.tierRates',
                     headers: [
                       {
                         id: 'tier',
@@ -191,6 +191,7 @@ export default {
                         id: 'manualRate',
                         renderCell: {
                           view: 'Input',
+                          name: 'planCalculations.0.tierRates.{index}.manualRate',
                           type: 'number',
                           icon: 'USD',
                           unit: 'USD',

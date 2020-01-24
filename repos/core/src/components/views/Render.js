@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { get, isObject, toPercent } from '../../common/utils'
+import { get, interpolateString, isObject, toPercent } from '../../common/utils'
 import { ACTIVE, FIELD } from '../../common/variables'
 import PieChart from '../charts/PieChart'
 import Expand from '../Expand'
@@ -72,13 +72,13 @@ export default function Render ({data, view, items = [], ...props}, i) {
 export function RenderFunc (Name) {
   switch (Name) {
     case FIELD.RENDER.CURRENCY:
-      return (val, {id, ...props} = {}) => (
+      return (val, index, {id, ...props} = {}) => (
         <Row {...props}><Text className='margin-right-smaller'>$</Text> {renderCurrency(val, 2)}</Row>
       )
     case FIELD.RENDER.PERCENT:
-      return (val, {decimals} = {}) => toPercent(val, decimals)
+      return (val, index, {decimals} = {}) => toPercent(val, decimals)
     case FIELD.RENDER.TITLE_n_INPUT:
-      return (val, {id, ...props} = {}) => <Row {...props}><Text>{val}</Text></Row>
+      return (val, index, {id, ...props} = {}) => <Row {...props}><Text>{val}</Text></Row>
     default:
       return (val) => val
   }
@@ -97,11 +97,23 @@ export function metaToProps (meta) {
     if (key.indexOf('render') === 0) {
       const render = meta[key]
       if (typeof render === 'string') meta[key] = RenderFunc(meta[key])
-      if (isObject(render)) meta[key] = (val, ...args) => {
-        if (render.view) return Render(render)
-        const props = get(render, `values[${val}]`)
-        if (props) return Render(props)
-        return RenderFunc(render.default).apply(this, [val, ...args])
+      if (isObject(render)) meta[key] = (val, index, props) => {
+
+        // Render is a field definition
+        if (render.view) return Render({
+          ...render,
+          ...render.name && {name: interpolateString(render.name, {index})},
+          ...props
+        })
+
+        // Render has conditional match by values
+        const valueProps = get(render, `values[${val}]`)
+        if (valueProps) return typeof valueProps === 'string'
+          ? RenderFunc(valueProps).apply(this, [val, index, props])
+          : Render({...valueProps, ...props})
+
+        // Render did not match any values
+        return RenderFunc(render.default).apply(this, [val, index, props])
       }
     }
 
