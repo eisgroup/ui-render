@@ -194,7 +194,7 @@ export default {
                           name: 'planCalculations.0.tierRates.{index}.manualRate',
                           type: 'number',
                           icon: 'USD',
-                          unit: 'USD',
+                          unit: '/ person',
                           lefty: true,
                         },
                       },

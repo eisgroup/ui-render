@@ -107,13 +107,10 @@ export function metaToProps (meta) {
         })
 
         // Render has conditional match by values
-        const valueProps = get(render, `values[${val}]`)
-        if (valueProps) return typeof valueProps === 'string'
-          ? RenderFunc(valueProps).apply(this, [val, index, props])
-          : Render({...valueProps, ...props})
-
-        // Render did not match any values
-        return RenderFunc(render.default).apply(this, [val, index, props])
+        const valueProps = get(render, `values[${val}]`, render.default)
+        return (isObject(valueProps))
+          ? Render({...valueProps, ...props})
+          : RenderFunc(valueProps).apply(this, [val, index, props])
       }
     }
 
