@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { by, hasListValue, isEqual, isEqualList } from '../common/utils'
+import { by, hasListValue, isEqual, isEqualList, isFunction } from '../common/utils'
 import Placeholder from './Placeholder'
 import { renderSort } from './renders'
 import Row from './Row'
@@ -127,13 +127,17 @@ export default class TableView extends Component {
 
   // Render Row Cells (in default layout)
   renderItemData = (item, index, {id, renderCell, classNameCell: className, styleCell: style}) => {
-    const value = item[id]
+    // Conditional rendering logic based on given cell data
+    const cell = item[id]
+    const {render: r, data} = cell || {}
+    const render = isFunction(cell) ? cell : (r || renderCell)
+    const value = data != null ? data : cell
     return (
       <Table.Cell key={id}>
         <View className={className} style={style}>
-          {renderCell
-            ? renderCell(value, index, {className, style})
-            : <Text className='p'>{value}</Text>
+          {render
+            ? render(value, index, {className, style})
+            : (typeof cell === 'object' ? cell : <Text className='p'>{cell}</Text>)
           }
         </View>
       </Table.Cell>

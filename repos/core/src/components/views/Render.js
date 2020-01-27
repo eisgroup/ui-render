@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { get, interpolateString, isObject, toPercent } from '../../common/utils'
+import { get, interpolateString, isNumeric, isObject, toPercent } from '../../common/utils'
 import { ACTIVE, FIELD } from '../../common/variables'
 import PieChart from '../charts/PieChart'
 import Expand from '../Expand'
@@ -21,16 +21,19 @@ import View from '../View'
  * @param {Number} [i] - index of field in the list
  * @returns {*} Node - React component/s
  */
-export default function Render ({data, view, items = [], ...props}, i) {
+export default function Render ({data: info, view, items = [], ...props}, i) {
   if (props.key == null) props.key = i
   // Pass down data to child renderers, if defined
+  let data = info
   if (props.name) data = get(data, props.name)
   if (data) items = items.map((item) => ({...item, data}))
   switch (view) {
     case FIELD.TYPE.EXPAND:
       return <Expand {...props}>{() => items.map(Render)}</Expand>
+
     case FIELD.TYPE.COL:
       return <View {...props}>{items.map(Render)}</View>
+
     case FIELD.TYPE.PIE_CHART:
       const {mapItems, ...prop} = props
       if (mapItems) {
@@ -43,10 +46,29 @@ export default function Render ({data, view, items = [], ...props}, i) {
         })
       }
       return <PieChart items={data} {...prop}/>
+
     case FIELD.TYPE.ROW:
       return <Row {...props}>{items.map(Render)}</Row>
+
     case FIELD.TYPE.TABLE:
-      return <TableView items={data} {...props}/>
+      const {extraItems, ...more} = props
+      if (extraItems) data = data.concat(extraItems.map(item => {
+        for (const key in item) {
+          const definition = item[key]
+          if (isObject(definition)) {
+            if ((definition.name && Object.keys(definition).length === 1)) {
+              item[key] = get(info, definition.name)
+            } else if (definition.name && definition.render) {
+              item[key].data = get(info, definition.name)
+            } else if (definition.view) {
+              item[key] = (_, index, props) => Render({...props, ...definition})
+            }
+          }
+        }
+        return item
+      }))
+      return <TableView items={data} {...more}/>
+
     case FIELD.TYPE.TABS:
       const tabs = items.map(({tab}, i) => isObject(tab) ? Render(tab, i) : tab)
       const panels = items.map(({content, data}, i) => isObject(content)
@@ -54,10 +76,13 @@ export default function Render ({data, view, items = [], ...props}, i) {
         : content
       )
       return <Tabs items={tabs} panels={panels} {...props}/>
+
     case FIELD.TYPE.TEXT:
       return <Text {...props}/>
+
     case FIELD.TYPE.TITLE:
       return <Text {...props} className={classNames('h3', props.className)}/>
+
     default:
       return ACTIVE.renderField({view, items, ...props})
   }
@@ -72,8 +97,9 @@ export default function Render ({data, view, items = [], ...props}, i) {
 export function RenderFunc (Name) {
   switch (Name) {
     case FIELD.RENDER.CURRENCY:
-      return (val, index, {id, ...props} = {}) => (
-        <Row {...props}><Text className='margin-right-smaller'>$</Text> {renderCurrency(val, 2)}</Row>
+      return (val, index, {id, ...props} = {}) => (isNumeric(val)
+          ? <Row {...props}><Text className='margin-right-smaller'>$</Text> {renderCurrency(val, 2)}</Row>
+          : null
       )
     case FIELD.RENDER.PERCENT:
       return (val, index, {decimals} = {}) => toPercent(val, decimals)

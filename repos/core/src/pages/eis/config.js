@@ -57,6 +57,29 @@ const field = {
       }
     }
   ],
+  extraItems: [ // list of item definitions (rows in default layout)
+    {
+      'cellId': String, // custom cell value
+    },
+    {
+      'cellId1': { // using value mapping by `name`, will be converted to {'cellId': 'cellValue'}
+        name: 'path.to.cell.value'
+      }
+    },
+    {
+      'cellId3': { // using render function
+        render: 'Currency',
+        name: 'path.to.cell.value',
+        // data: 'value' will be added to object based on given `name` path
+      },
+    },
+    {
+      'cellId4': { // using recursive field Render
+        view: 'Input',
+        name: 'path.to.cell.value',
+      },
+    },
+  ],
 
   // Pie Chart
   // @see: <PieChart/> docs for other props

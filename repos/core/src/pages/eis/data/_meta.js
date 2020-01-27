@@ -207,6 +207,24 @@ export default {
                         renderCell: 'Currency',
                       },
                     ],
+                    extraItems: [
+                      {
+                        tier: 'Composite Rate',
+                        adjManualRate: {name: 'planCalculations[0].adjManualCompositeRate'}, // null
+                        adjFormulaRate: {name: 'planCalculations[0].adjFormulaCompositeRate'}, // undefined
+                        manualRate: {
+                          name: 'planCalculations[0].manualCompositeRate',
+                          render: 'Currency',
+                        },
+                        formulaRate: {
+                          view: 'Input',
+                          name: 'planCalculations[0].formulaCompositeRate',
+                          type: 'number',
+                          unit: 'USD',
+                        },
+                        proposedRate: {name: 'planCalculations[0].proposedCompositeRate'},
+                      }
+                    ],
                   },
                 ]
               }

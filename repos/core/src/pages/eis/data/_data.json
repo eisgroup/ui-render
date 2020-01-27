@@ -149,14 +149,13 @@
           "proposedRate": 218.22
         }
       ],
-      "manualCompositeRate": 135.47,
+      "manualCompositeRate": 245,
       "experienceRate": 0.0,
       "formulaCompositeRate": 135.47,
       "currentCompositeRate": null,
       "renewalCompositeRate": null,
-      "adjManualCompositeRate": 135.47,
-      "adjFormulaCompositeRate": 135.47,
-      "proposedCompositeRate": 135.47,
+      "adjManualCompositeRate": null,
+      "proposedCompositeRate": 536.98,
       "currentAnnualPremium": null,
       "renewalAnnualPremium": null,
       "finalAnnualPremium": 9753.6,
