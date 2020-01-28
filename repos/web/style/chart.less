@@ -155,3 +155,22 @@
   &:extend(.padding-h all);
   &:extend(.radius all);
 }
+
+
+.app__stats-change {
+  i.icon.caret-up {
+    color: @color-green;
+
+    .inverted & {
+      color: @color-green-light;
+    }
+  }
+
+  i.icon.caret-down {
+    color: @color-red;
+
+    .inverted & {
+      color: @color-red-light;
+    }
+  }
+}
