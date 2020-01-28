@@ -35,7 +35,7 @@ export default class OpenL extends Component {
     console.warn('meta', meta)
     return (
       <>
-        <ScrollView fill className='fade-in'>
+        <ScrollView fill className='fade-in bg-texture'>
           <Render data={data} {...meta}/>
         </ScrollView>
 

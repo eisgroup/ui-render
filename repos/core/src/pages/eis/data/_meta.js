@@ -1,5 +1,6 @@
 export default {
   view: 'Col',
+  className: 'bg-grey-lighter',
   items: [
     {
       view: 'Expand',
@@ -123,7 +124,7 @@ export default {
       items: [
         {
           view: 'Tabs',
-          defaultIndex: 1,
+          // defaultIndex: 1,
           items: [
             {
               tab: 'Demographic',
@@ -134,17 +135,49 @@ export default {
                   {view: 'Title', children: 'Summary'},
                   {
                     view: 'Row',
+                    className: 'wrap',
                     items: [
                       {
-                        view: 'PieChart',
-                        name: 'planCalculations[0].subGroupEnrollmentBreakdown[0].enrollmentBreakdown',
-                        legends: true,
-                        mapItems: {
-                          label: 'tier',
-                          value: 'numberOfLives',
-                        }
-                      }
-                    ]
+                        view: 'Row',
+                        className: 'fill bg-white border radius margin-right center',
+                        items: [
+                          {
+                            view: 'Label',
+                            className: 'position-top-left padding-large bold',
+                            children: 'By Age'
+                          },
+                          {
+                            view: 'PieChart',
+                            name: 'planCalculations[0].manualClaimDetail.ageBreakdown',
+                            legends: true,
+                            mapItems: {
+                              label: 'ageBand',
+                              value: 'numberOfLives',
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        view: 'Row',
+                        className: 'fill bg-white border radius margin-right center',
+                        items: [
+                          {
+                            view: 'Label',
+                            className: 'position-top-left padding-large bold',
+                            children: 'By Enrollment'
+                          },
+                          {
+                            view: 'PieChart',
+                            name: 'planCalculations[0].subGroupEnrollmentBreakdown[0].enrollmentBreakdown',
+                            legends: true,
+                            mapItems: {
+                              label: 'tier',
+                              value: 'numberOfLives',
+                            }
+                          }
+                        ]
+                      },
+                    ],
                   },
                   {view: 'Title', children: 'Area Factors'},
                 ]
@@ -162,7 +195,7 @@ export default {
                     items: [
                       {
                         view: 'Col',
-                        className: 'middle padding bg-green-light border radius',
+                        className: 'middle padding bg-gradient-violet-teal-light border radius',
                         items: [
                           {
                             view: 'Col',
@@ -170,7 +203,7 @@ export default {
                             items: [
                               {
                                 view: 'Text',
-                                className: 'h3 red margin-bottom-small',
+                                className: 'h3 pink margin-bottom-small',
                                 items: [
                                   {
                                     view: 'Counter',
@@ -192,7 +225,7 @@ export default {
                             items: [
                               {
                                 view: 'Text',
-                                className: 'h3 green margin-bottom-small',
+                                className: 'h3 violet margin-bottom-small',
                                 items: [
                                   {
                                     view: 'Counter',
@@ -213,7 +246,7 @@ export default {
                       {
                         view: 'Col',
                         fill: true,
-                        className: 'margin-left-smaller',
+                        className: 'bg-white margin-left-smaller',
                         items: [
                           {
                             view: 'Row',
@@ -270,7 +303,7 @@ export default {
                   {view: 'Title', children: 'Factors', className: 'margin-top-largest'},
                   {
                     view: 'Col',
-                    className: 'padding border radius no-padding-top',
+                    className: 'padding border radius no-padding-top bg-white',
                     items: [
                       {
                         view: 'Row',

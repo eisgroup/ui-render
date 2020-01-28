@@ -13,6 +13,7 @@ FIELD.TYPE = {
   EXPAND: 'Expand',
   COL: 'Col',
   COUNTER: 'Counter',
+  LABEL: 'Label',
   PIE_CHART: 'PieChart',
   ROW: 'Row',
   TABLE: 'Table',

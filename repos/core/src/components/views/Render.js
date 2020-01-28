@@ -6,6 +6,7 @@ import Button from '../Button'
 import PieChart from '../charts/PieChart'
 import Counter from '../Counter'
 import Expand from '../Expand'
+import Label from '../Label'
 import { renderCurrency } from '../renders'
 import Row from '../Row'
 import TableView from '../TableView'
@@ -42,6 +43,10 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
 
     case FIELD.TYPE.COL:
       return <View {...props}>{items.map(Render)}</View>
+
+    case FIELD.TYPE.LABEL:
+      if (items.length) props.children = items.map(Render)
+      return <Label {...props}/>
 
     case FIELD.TYPE.PIE_CHART:
       const {mapItems, ...prop} = props
