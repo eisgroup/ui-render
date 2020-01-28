@@ -9,6 +9,7 @@ export const FIELD = getSetDefinition('TYPE', 'RENDER', 'ID', 'DEF', 'MIN_MAX', 
 
 // Field Type Definitions
 FIELD.TYPE = {
+  BUTTON: 'Button',
   EXPAND: 'Expand',
   COL: 'Col',
   PIE_CHART: 'PieChart',

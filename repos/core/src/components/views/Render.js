@@ -2,6 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { get, interpolateString, isNumeric, isObject, toPercent } from '../../common/utils'
 import { ACTIVE, FIELD } from '../../common/variables'
+import Button from '../Button'
 import PieChart from '../charts/PieChart'
 import Expand from '../Expand'
 import { renderCurrency } from '../renders'
@@ -28,6 +29,10 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
   if (props.name) data = get(data, props.name)
   if (data) items = items.map((item) => ({...item, data}))
   switch (view) {
+    case FIELD.TYPE.BUTTON:
+      if (items.length) props.children = items.map(Render)
+      return <Button {...props}/>
+
     case FIELD.TYPE.EXPAND:
       return <Expand {...props}>{() => items.map(Render)}</Expand>
 

@@ -123,12 +123,13 @@ export default {
       items: [
         {
           view: 'Tabs',
-          defaultIndex: 2,
+          defaultIndex: 1,
           items: [
             {
               tab: 'Demographic',
               content: {
                 view: 'Col',
+                className: 'padding',
                 items: [
                   {view: 'Title', children: 'Summary'},
                   {
@@ -153,12 +154,86 @@ export default {
               tab: 'Factors',
               content: {
                 view: 'Col',
+                className: 'padding',
                 items: [
                   {view: 'Title', children: 'Factors'},
                   {
-                    view: 'Row',
+                    view: 'Col',
+                    className: 'padding border radius no-padding-top',
                     items: [
-                      // {view: 'Table'}
+                      {
+                        view: 'Row',
+                        className: 'wrap app__form',
+                        items: [
+                          {
+                            view: 'Input',
+                            name: 'planCalculations[0].manualClaimDetail.initialLoad',
+                            label: 'Initial Load',
+                          },
+                          {
+                            view: 'Input',
+                            name: 'planCalculations[0].manualClaimDetail.occupationFactor',
+                            label: 'Occupation',
+                          },
+                          {
+                            view: 'Input',
+                            name: 'planCalculations[0].manualClaimDetail.occupation',
+                            label: 'Occupation Code',
+                            readonly: true,
+                          },
+                          {
+                            view: 'Input',
+                            name: 'planCalculations[0].manualClaimDetail.waitGroupSize',
+                            label: 'Wait Grp Size',
+                          },
+                          {
+                            view: 'Input',
+                            name: 'planCalculations[0].manualClaimDetail.planUtilization',
+                            label: 'Plan Util',
+                          },
+                          {
+                            view: 'Input',
+                            name: 'planCalculations[0].manualClaimDetail.groupSize',
+                            label: 'Group Size',
+                          },
+                          {
+                            view: 'Input',
+                            name: 'planCalculations[0].manualClaimDetail.yearLoad',
+                            label: 'Cal Year Load',
+                          },
+                          {
+                            view: 'Input',
+                            name: 'planCalculations[0].manualClaimDetail.voluntaryLoad',
+                            label: 'Vol Load',
+                          },
+                          {
+                            view: 'Input',
+                            name: 'planCalculations[0].manualClaimDetail.waitingLoad',
+                            label: 'Wait Load',
+                          },
+                          {
+                            view: 'Input',
+                            name: 'planCalculations[0].manualClaimDetail.rolloverLoad',
+                            label: 'Rollover Load',
+                          },
+                        ],
+                      },
+                      {
+                        view: 'Row',
+                        className: 'margin-top',
+                        items: [
+                          {
+                            view: 'Button',
+                            className: 'a transparent',
+                            children: 'Apply'
+                          },
+                          {
+                            view: 'Button',
+                            className: 'a transparent',
+                            children: 'Reset'
+                          },
+                        ]
+                      },
                     ]
                   },
                   {view: 'Title', children: 'PPO'},
@@ -169,6 +244,7 @@ export default {
               tab: 'Redistribution Calculator',
               content: {
                 view: 'Col',
+                className: 'padding',
                 items: [
                   {view: 'Title', children: 'Calculate Rate'},
                   {
@@ -221,6 +297,7 @@ export default {
                           name: 'planCalculations[0].formulaCompositeRate',
                           type: 'number',
                           unit: 'USD',
+                          placeholder: 'placeholder'
                         },
                         proposedRate: {name: 'planCalculations[0].proposedCompositeRate'},
                       }
