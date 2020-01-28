@@ -12,6 +12,7 @@ FIELD.TYPE = {
   BUTTON: 'Button',
   EXPAND: 'Expand',
   COL: 'Col',
+  COUNTER: 'Counter',
   PIE_CHART: 'PieChart',
   ROW: 'Row',
   TABLE: 'Table',

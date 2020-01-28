@@ -4,6 +4,7 @@ import { get, interpolateString, isNumeric, isObject, toPercent } from '../../co
 import { ACTIVE, FIELD } from '../../common/variables'
 import Button from '../Button'
 import PieChart from '../charts/PieChart'
+import Counter from '../Counter'
 import Expand from '../Expand'
 import { renderCurrency } from '../renders'
 import Row from '../Row'
@@ -35,6 +36,9 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
 
     case FIELD.TYPE.EXPAND:
       return <Expand {...props}>{() => items.map(Render)}</Expand>
+
+    case FIELD.TYPE.COUNTER:
+      return <Counter {...props}/>
 
     case FIELD.TYPE.COL:
       return <View {...props}>{items.map(Render)}</View>
@@ -83,9 +87,11 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
       return <Tabs items={tabs} panels={panels} {...props}/>
 
     case FIELD.TYPE.TEXT:
+      if (items.length) props.children = items.map(Render)
       return <Text {...props}/>
 
     case FIELD.TYPE.TITLE:
+      if (items.length) props.children = items.map(Render)
       return <Text {...props} className={classNames('h3', props.className)}/>
 
     default:
@@ -119,35 +125,39 @@ export function RenderFunc (Name) {
  * Map meta.json declarations to props ready for rendering
  *
  * @param {Object} meta - json
+ * @param {Object} data - json
  * @returns {Object} props
  */
-export function metaToProps (meta) {
+export function metaToProps (meta, data) {
   for (const key in meta) {
+    const definition = meta[key]
 
     // Map Value Renderer Names/Objects to Actual Render Functions
     if (key.indexOf('render') === 0) {
-      const render = meta[key]
-      if (typeof render === 'string') meta[key] = RenderFunc(meta[key])
-      if (isObject(render)) meta[key] = (val, index, props) => {
+      if (typeof definition === 'string') meta[key] = RenderFunc(meta[key])
+      if (isObject(definition)) meta[key] = (val, index, props) => {
 
         // Render is a field definition
-        if (render.view) return Render({
-          ...render,
-          ...render.name && {name: interpolateString(render.name, {index})},
+        if (definition.view) return Render({
+          ...definition,
+          ...definition.name && {name: interpolateString(definition.name, {index})},
           ...props
         })
 
         // Render has conditional match by values
-        const valueProps = get(render, `values[${val}]`, render.default)
+        const valueProps = get(definition, `values[${val}]`, definition.default)
         return (isObject(valueProps))
           ? Render({...valueProps, ...props})
           : RenderFunc(valueProps).apply(this, [val, index, props])
       }
-    }
-
-    // Recursively process the rest of definitions
-    else if (typeof meta[key] === 'object') {
-      meta[key] = metaToProps(meta[key])
+    } else if (typeof definition === 'object') {
+      if ((definition.name && Object.keys(definition).length === 1)) {
+        // Transform {name} - single key objects with name to their values
+        meta[key] = get(data, definition.name)
+      } else {
+        // Recursively process the rest of definitions
+        meta[key] = metaToProps(meta[key], data)
+      }
     }
   }
   return meta

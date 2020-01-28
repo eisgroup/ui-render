@@ -156,7 +156,118 @@ export default {
                 view: 'Col',
                 className: 'padding',
                 items: [
-                  {view: 'Title', children: 'Factors'},
+                  {view: 'Title', children: 'PPO'},
+                  {
+                    view: 'Row',
+                    items: [
+                      {
+                        view: 'Col',
+                        className: 'middle padding bg-green-light border radius',
+                        items: [
+                          {
+                            view: 'Col',
+                            className: 'center padding',
+                            items: [
+                              {
+                                view: 'Text',
+                                className: 'h3 red margin-bottom-small',
+                                items: [
+                                  {
+                                    view: 'Counter',
+                                    end: {name: 'planCalculations[0].manualClaimDetail.networkDetails[1].ppoPenetration'},
+                                    render: 'Percent'
+                                  },
+                                ]
+                              },
+                              {
+                                view: 'Text',
+                                className: 'bold',
+                                children: 'PPO Penetration'
+                              }
+                            ]
+                          },
+                          {
+                            view: 'Col',
+                            className: 'center padding',
+                            items: [
+                              {
+                                view: 'Text',
+                                className: 'h3 green margin-bottom-small',
+                                items: [
+                                  {
+                                    view: 'Counter',
+                                    end: {name: 'planCalculations[0].manualClaimDetail.networkDetails[1].netUtilization'},
+                                    render: 'Percent'
+                                  },
+                                ]
+                              },
+                              {
+                                view: 'Text',
+                                className: 'bold',
+                                children: 'Net Utilization'
+                              }
+                            ]
+                          },
+                        ],
+                      },
+                      {
+                        view: 'Col',
+                        fill: true,
+                        className: 'margin-left-smaller',
+                        items: [
+                          {
+                            view: 'Row',
+                            className: 'app__form wrap padding no-padding-top border',
+                            items: [
+                              {
+                                view: 'Input',
+                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].area',
+                                label: 'Area',
+                              },
+                              {
+                                view: 'Input',
+                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].trend',
+                                label: 'trend',
+                              },
+                              {
+                                view: 'Input',
+                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumEEandSP',
+                                label: 'maximum (EE and SP)',
+                              },
+                              {
+                                view: 'Input',
+                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumCH',
+                                label: 'maximum (CH)',
+                              },
+                            ],
+                          },
+                          {
+                            view: 'Col',
+                            className: 'padding no-padding-top border',
+                            items: [
+                              {view: 'Text', className: 'padding-top', children: 'COPAY'},
+                              {
+                                view: 'Row', className: 'wrap app__form',
+                                items: [
+                                  {
+                                    view: 'Input',
+                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].rateCalcEmp',
+                                    label: 'Areas',
+                                  },
+                                  {
+                                    view: 'Input',
+                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].rateCalcWOEmp',
+                                    label: 'trends',
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ]
+                  },
+                  {view: 'Title', children: 'Factors', className: 'margin-top-largest'},
                   {
                     view: 'Col',
                     className: 'padding border radius no-padding-top',
@@ -233,84 +344,6 @@ export default {
                             children: 'Reset'
                           },
                         ]
-                      },
-                    ]
-                  },
-                  {view: 'Title', children: 'PPO'},
-                  {
-                    view: 'Row',
-                    items: [
-                      {
-                        view: 'Col',
-                        className: 'padding bg-green-light border radius',
-                        items: [
-                          // {view:'StatsChange'}
-                        ],
-                      },
-                      {
-                        view: 'Col',
-                        fill: true,
-                        className: 'margin-left-smaller',
-                        items: [
-                          {
-                            view: 'Row',
-                            className: 'app__form wrap padding no-padding-top border',
-                            items: [
-                              {
-                                view: 'Input',
-                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].area',
-                                label: 'Area',
-                              },
-                              {
-                                view: 'Input',
-                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].trend',
-                                label: 'trend',
-                              },
-                              {
-                                view: 'Input',
-                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumEEandSP',
-                                label: 'maximum (EE and SP)',
-                              },
-                              {
-                                view: 'Input',
-                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumCH',
-                                label: 'maximum (CH)',
-                              },
-                            ],
-                          },
-                          {
-                            view: 'Col',
-                            className: 'padding no-padding-top border',
-                            items: [
-                              {view: 'Text', className: 'padding-top', children: 'COPAY'},
-                              {
-                                view: 'Row', className: 'wrap app__form',
-                                items: [
-                                  {
-                                    view: 'Input',
-                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].area',
-                                    label: 'Area',
-                                  },
-                                  {
-                                    view: 'Input',
-                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].trend',
-                                    label: 'trend',
-                                  },
-                                  {
-                                    view: 'Input',
-                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumEEandSP',
-                                    label: 'maximum (EE and SP)',
-                                  },
-                                  {
-                                    view: 'Input',
-                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumCH',
-                                    label: 'maximum (CH)',
-                                  },
-                                ],
-                              },
-                            ],
-                          },
-                        ],
                       },
                     ]
                   },

@@ -27,7 +27,7 @@ const mapStateToProps = (state) => ({
 export default class OpenL extends Component {
   static defaultProps = {
     data,
-    meta: metaToProps(meta),
+    meta: metaToProps(meta, data),
   }
 
   render () {
