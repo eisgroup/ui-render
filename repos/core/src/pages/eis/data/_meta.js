@@ -6,7 +6,7 @@ export default {
       view: 'Expand',
       title: 'Admin Expenses',
       className: 'border-gradient-h-right',
-      expanded: false,
+      // expanded: true,
       items: [
         {
           view: 'Col',
@@ -45,7 +45,7 @@ export default {
                             fill: true,
                             className: 'bg-grey padding',
                             items: [
-                              {view: 'Input', label: 'UW Exception Dollar Amount', type: 'number'},
+                              {view: 'Input', name: 'required1', label: 'UW Exception Dollar Amount', type: 'number'},
                             ]
                           },
                         ]
@@ -59,7 +59,7 @@ export default {
                             fill: true,
                             className: 'bg-grey padding',
                             items: [
-                              {view: 'Input', label: 'Risk Adjustment Percent', type: 'number'},
+                              {view: 'Input', name: 'required2', label: 'Risk Adjustment Percent', type: 'number'},
                             ]
                           },
                         ]
@@ -120,7 +120,7 @@ export default {
         ]
       },
       className: 'border-gradient-h-right',
-      expanded: true,
+      // expanded: true,
       items: [
         {
           view: 'Tabs',
@@ -179,7 +179,34 @@ export default {
                       },
                     ],
                   },
-                  {view: 'Title', children: 'Area Factors'},
+                  {view: 'Title', children: 'Enrolled by State', className: 'margin-top-largest'},
+                  {
+                    view: 'Table',
+                    name: 'planCalculations[0].manualClaimDetail.enrollmentByState',
+                    headers: [
+                      {
+                        id: 'state',
+                        renderCell: {
+                          view: 'Expand',
+                          name: '{value}',
+                          items: [
+                            {
+                              view: 'Table',
+                              name: 'planCalculations[0].manualClaimDetail.enrollmentByMSA'
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        id: 'numberOfLives',
+                        label: 'Number of Lives'
+                      },
+                      {
+                        id: 'enrolledPct',
+                        label: 'Enrolled Percent'
+                      },
+                    ]
+                  }
                 ]
               }
             },

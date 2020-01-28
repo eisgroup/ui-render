@@ -28,14 +28,15 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
   if (props.key == null) props.key = i
   // Pass down data to child renderers, if defined
   let data = info
-  if (props.name) data = get(data, props.name)
-  if (data) items = items.map((item) => ({...item, data}))
+  if (props.name) data = get(info, props.name)
+  if (info) items = items.map((item) => ({...item, data: info}))
   switch (view) {
     case FIELD.TYPE.BUTTON:
       if (items.length) props.children = items.map(Render)
       return <Button {...props}/>
 
     case FIELD.TYPE.EXPAND:
+      if (props.name != null && props.title == null) props.title = props.name
       return <Expand {...props}>{() => items.map(Render)}</Expand>
 
     case FIELD.TYPE.COUNTER:
@@ -140,20 +141,21 @@ export function metaToProps (meta, data) {
     // Map Value Renderer Names/Objects to Actual Render Functions
     if (key.indexOf('render') === 0) {
       if (typeof definition === 'string') meta[key] = RenderFunc(meta[key])
-      if (isObject(definition)) meta[key] = (val, index, props) => {
+      if (isObject(definition)) meta[key] = (value, index, props) => {
 
         // Render is a field definition
         if (definition.view) return Render({
           ...definition,
-          ...definition.name && {name: interpolateString(definition.name, {index})},
-          ...props
+          ...definition.name && {name: interpolateString(definition.name, {index, value})},
+          ...props,
+          data,
         })
 
         // Render has conditional match by values
-        const valueProps = get(definition, `values[${val}]`, definition.default)
+        const valueProps = get(definition, `values[${value}]`, definition.default)
         return (isObject(valueProps))
-          ? Render({...valueProps, ...props})
-          : RenderFunc(valueProps).apply(this, [val, index, props])
+          ? Render({...valueProps, ...props, data})
+          : RenderFunc(valueProps).apply(this, [value, index, {...props, data}])
       }
     } else if (typeof definition === 'object') {
       if ((definition.name && Object.keys(definition).length === 1)) {
