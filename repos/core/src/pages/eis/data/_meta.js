@@ -237,6 +237,83 @@ export default {
                     ]
                   },
                   {view: 'Title', children: 'PPO'},
+                  {
+                    view: 'Row',
+                    items: [
+                      {
+                        view: 'Col',
+                        className: 'padding bg-green-light border radius',
+                        items: [
+                          // {view:'StatsChange'}
+                        ],
+                      },
+                      {
+                        view: 'Col',
+                        fill: true,
+                        className: 'margin-left-smaller',
+                        items: [
+                          {
+                            view: 'Row',
+                            className: 'app__form wrap padding no-padding-top border',
+                            items: [
+                              {
+                                view: 'Input',
+                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].area',
+                                label: 'Area',
+                              },
+                              {
+                                view: 'Input',
+                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].trend',
+                                label: 'trend',
+                              },
+                              {
+                                view: 'Input',
+                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumEEandSP',
+                                label: 'maximum (EE and SP)',
+                              },
+                              {
+                                view: 'Input',
+                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumCH',
+                                label: 'maximum (CH)',
+                              },
+                            ],
+                          },
+                          {
+                            view: 'Col',
+                            className: 'padding no-padding-top border',
+                            items: [
+                              {view: 'Text', className: 'padding-top', children: 'COPAY'},
+                              {
+                                view: 'Row', className: 'wrap app__form',
+                                items: [
+                                  {
+                                    view: 'Input',
+                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].area',
+                                    label: 'Area',
+                                  },
+                                  {
+                                    view: 'Input',
+                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].trend',
+                                    label: 'trend',
+                                  },
+                                  {
+                                    view: 'Input',
+                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumEEandSP',
+                                    label: 'maximum (EE and SP)',
+                                  },
+                                  {
+                                    view: 'Input',
+                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumCH',
+                                    label: 'maximum (CH)',
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ]
+                  },
                 ]
               }
             },

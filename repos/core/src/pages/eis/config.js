@@ -1,3 +1,11 @@
+/**
+ * @Summary of strategies used:
+ *    1. Recursive Field definitions
+ *    2. Mapping functions by name
+ *    3. Custom rendering by matching values
+ *    4. Data mapping by keys
+ *    5. Dynamic definitions using string interpolation
+ */
 const field = {
   // Meta data
   view: 'FieldsInGroup', // * name of React Component used to render this field
