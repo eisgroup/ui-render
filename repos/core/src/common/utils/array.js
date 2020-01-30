@@ -7,32 +7,6 @@ import thenby from 'thenby'
  */
 
 /**
- * Check if the data passed is an array.
- *
- * @param {*} data - The variable to check
- * @return {boolean}
- */
-export function isList (data) {
-  return (!!data && data.constructor === Array)
-}
-
-/**
- * Check if Given Arrays are Equal in Values by reference
- *
- * @param {Array|*} a
- * @param {Array|*} b
- * @returns {Boolean} true - if all elements of a are equal to all elements of b using reference exact equality match
- */
-export function isEqualList (a, b) {
-  if (a === b) return true
-  if (a && b && a.length !== b.length) return false
-  for (const i in a) {
-    if (a[i] !== b[i]) return false
-  }
-  return true
-}
-
-/**
  * Check if the data passed is an array and has values.
  *
  * @param {*} data - The variable to check
@@ -64,6 +38,32 @@ export function hasCommonListValue (...args) {
     // If value does not exist in at least one list, skip to next value
     return !args.some(list => !isInList(list, value))
   })
+}
+
+/**
+ * Check if Given Arrays are Equal in Values by Element References
+ *
+ * @param {Array|*} a
+ * @param {Array|*} b
+ * @returns {Boolean} true - if all elements of `a` are equal to all elements of `b` using exact equality match
+ */
+export function isEqualList (a, b) {
+  if (a === b) return true
+  if (a && b && a.length !== b.length) return false
+  for (const i in a) {
+    if (a[i] !== b[i]) return false
+  }
+  return true
+}
+
+/**
+ * Check if the data passed is an array.
+ *
+ * @param {*} data - The variable to check
+ * @return {boolean}
+ */
+export function isList (data) {
+  return (!!data && data.constructor === Array)
 }
 
 /**
@@ -142,6 +142,18 @@ export function cleanList (array) {
 }
 
 /**
+ * Converts Any Value to Array (or keep it as is if already Array)
+ *
+ * @param {*} value - the value to convert
+ * @param {*} [clean] - if truthy, remove falsey values: false, null, 0, "", undefined, and NaN
+ * @return {Array}
+ */
+export function toList (value, clean) { // eslint-disable-line no-shadow
+  if (!isList(value)) value = [value]
+  return clean ? value.filter(v => v) : value
+}
+
+/**
  * Compute the Average Number from Array Elements
  *
  * @param {Array} array - list of numbers to calculate average of
@@ -191,26 +203,6 @@ export function toListValuesTotal (array = [], key = 'value', fallback = 0) {
     sum += obj[key] || fallback
   }
   return sum
-}
-
-/**
- * Converts a value to an array.
- *
- * @uses lodash
- * @see https://lodash.com/docs/#compact
- *
- * @param {*} value - the value to convert
- * @param {*} [clean] - if truthy, remove falsey values: false, null, 0, "", undefined, and NaN
- * @return {Array}
- */
-export function toList (value, clean) { // eslint-disable-line no-shadow
-  let list = value
-
-  if (!isList(value)) {
-    list = [value]
-  }
-
-  return clean ? list.filter(v => v) : list
 }
 
 /**

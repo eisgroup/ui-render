@@ -13,6 +13,7 @@ import {
   prependToList,
   removeFromList,
   shuffle,
+  toList,
   toListAvg,
   toListTotal,
   toListValuesTotal,
@@ -37,7 +38,7 @@ const NON_ARRAY_VALUES = [
   undefined
 ]
 
-it(`intersection() does not mutate original list, and keeps first list's order`, () => {
+test(`intersection() does not mutate original list, and keeps first list's order`, () => {
   const list = [1, 2, 3, 4, 5]
   const listClone = cloneDeep(list)
   const list2 = [5, 3]
@@ -45,7 +46,7 @@ it(`intersection() does not mutate original list, and keeps first list's order`,
   expect(list).toEqual(listClone)
 })
 
-it(`${isEqualList.name}() returns true when elements inside the list are the same`, () => {
+test(`${isEqualList.name}() returns true when elements inside two lists are the same`, () => {
   let a = []
   let b = a
   expect(isEqualList(a, b)).toBe(true)
@@ -59,7 +60,7 @@ it(`${isEqualList.name}() returns true when elements inside the list are the sam
   expect(isEqualList(a, b)).toBe(true)
 })
 
-it(`${isInCollectionAny.name}() returns true when include match found for any element`, () => {
+test(`${isInCollectionAny.name}() returns true when include match found for any element`, () => {
   expect(isInCollectionAny([{name: 'god', age: 'eternal'}], {name: 'dog'}, {name: 'god'})).toBe(true)
   expect(isInCollectionAny([{name: 'god', age: 'eternal'}], {name: 'dog'}, {name: 'goddess'})).toBe(false)
   expect(isInCollectionAny({entity: {name: 'god', age: 'eternal'}}, {name: 'dog'}, {name: 'god'})).toBe(true)
@@ -67,11 +68,11 @@ it(`${isInCollectionAny.name}() returns true when include match found for any el
   expect(isInCollectionAny({name: 'god', age: 'eternal'}, [undefined])).toBe(false)
 })
 
-it(`${toListAvg.name}() computes correct average number of values provided`, () => {
+test(`${toListAvg.name}() computes correct average number of values provided`, () => {
   expect(toListAvg([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])).toEqual(5.5)
 })
 
-it(`${toListTotal.name}() computes correct total number of values provided`, () => {
+test(`${toListTotal.name}() computes correct total number of values provided`, () => {
   expect(toListTotal([1, 2, 3, 0])).toEqual(6)
   expect(toListTotal(undefined)).toEqual(0)
   expect(toListTotal([])).toEqual(0)
@@ -80,7 +81,7 @@ it(`${toListTotal.name}() computes correct total number of values provided`, () 
   // expect(toListTotal(NaN)).toEqual(0)
 })
 
-it(`${toListValuesTotal.name}() computes correct total number of values provided`, () => {
+test(`${toListValuesTotal.name}() computes correct total number of values provided`, () => {
   expect(toListValuesTotal([{value: 1}, {value: 2}, {value: 0}])).toEqual(3)
   expect(toListValuesTotal([{count: 1}, {count: 2}, {count: 0}], 'count')).toEqual(3)
   expect(toListValuesTotal(undefined)).toEqual(0)
@@ -90,7 +91,7 @@ it(`${toListValuesTotal.name}() computes correct total number of values provided
   // expect(toListTotal(NaN)).toEqual(0)
 })
 
-it(`${colorScaleDistinct.name}() computes color orders correctly`, () => {
+test(`${colorScaleDistinct.name}() computes color orders correctly`, () => {
   let colors = [0, 1, 2, 3, 4, 5]
   let hues
 
@@ -116,7 +117,7 @@ it(`${colorScaleDistinct.name}() computes color orders correctly`, () => {
   expect(colorScaleDistinct(colors, hues)).toEqual([0, 3, 6, 1, 4, 7, 2, 5])
 })
 
-it(`${shuffle.name}() randomizes list value orders`, () => {
+test(`${shuffle.name}() randomizes list value orders`, () => {
   const list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
   const listClone = cloneDeep(list)
   const result = shuffle(list)
@@ -213,21 +214,21 @@ describe(`${isInListAny.name}()`, () => {
   // })
 })
 
-describe(`${prependToList.name}()`, () => {
-  it('Adds value to the beginning of array', () => {
-    expect(prependToList([7], 1)).toEqual([1, 7])
-  })
-  it('Trims the list down when limit provided', () => {
-    expect(prependToList([7, 7, 7, 7, 7], 1, 2)).toEqual([1, 7])
-  })
-})
-
 describe(`${mergeLists.name}()`, () => {
   it('merges multiple lists in one unique list', () => {
     expect(mergeLists([1, 2, 3, 'id'], [1, 3, 4, 'id'])).toEqual([1, 2, 3, 'id', 4])
   })
   it(`'does not remove falsey values, like: 0, '', NaN, undefined, null'`, () => {
     expect(mergeLists([0, '', NaN, undefined, null])).toEqual([0, '', NaN, undefined, null])
+  })
+})
+
+describe(`${prependToList.name}()`, () => {
+  it('Adds value to the beginning of array', () => {
+    expect(prependToList([7], 1)).toEqual([1, 7])
+  })
+  it('Trims the list down when limit provided', () => {
+    expect(prependToList([7, 7, 7, 7, 7], 1, 2)).toEqual([1, 7])
   })
 })
 
@@ -243,6 +244,32 @@ describe(`${removeFromList.name}()`, () => {
     const listClone = cloneDeep(list)
     expect(removeFromList(list, [1, 'id'])).toEqual([7])
     expect(list).toEqual(listClone)
+  })
+})
+
+describe(`${toList.name}()`, () => {
+  it('returns the same value if given array', () => {
+    const list = [{name: 'list'}]
+    expect(toList(list)).toBe(list)
+  })
+
+  describe('returns list of given value for non array values', () => {
+    NON_ARRAY_VALUES.forEach((value) => {
+      it(`[${typeof value}] ${value}`, () => {
+        expect(toList(value)).toEqual([value])
+      })
+    })
+  })
+
+  describe('removes nil values without mutation when passing `clean` argument ', () => {
+    const original = cloneDeep(NON_ARRAY_VALUES)
+    const result = toList(NON_ARRAY_VALUES, 'clean')
+    result.forEach(value => {
+      it(`[${typeof value}] ${value}`, () => {
+        expect(value).toBeTruthy()
+      })
+    })
+    expect(NON_ARRAY_VALUES).toEqual(original)
   })
 })
 
