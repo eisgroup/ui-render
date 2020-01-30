@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { formatDuration } from '../common/utils'
+import { formatDuration, isFunction } from '../common/utils'
 import Icon from './Icon'
 import { imageSrc } from './Image'
 import Loading from './Loading'
@@ -28,27 +28,38 @@ export default class Carousel extends Component {
         path: PropTypes.string,
       }),
     ])).isRequired,
-    activeIndex: PropTypes.number,
+    activeIndex: PropTypes.number,  // opened tab index (controlled)
+    defaultIndex: PropTypes.number, // opened tab index initially (uncontrolled)
     hideImage: PropTypes.bool, // whether to hide background image for active item
     hideItems: PropTypes.bool, // whether to hide list of items below
     hideCount: PropTypes.bool, // whether to hide item count at the top left
     hideControls: PropTypes.bool, // whether to hide prev and next arrows
+    onChange: PropTypes.func, // callback when active item index changes, receives activeItem ID if given, or index
     square: PropTypes.bool, // whether to render as square
     className: PropTypes.string,
     itemClass: PropTypes.string, // css class names to add to active item
-    childrenRender: PropTypes.any, // function to render content inside Carousel, receives active item props as argument
-    children: PropTypes.any, // extra content to render inside Carousel
+    children: PropTypes.any, // extra content to render inside Carousel, receives active item props as argument
   }
 
   state = {
-    activeIndex: 0,
+    activeIndex: Math.max(this.props.activeIndex || this.props.defaultIndex || 0, 0),
     transition: false,
   }
 
-  handleClickItem = (index) => {
-    this.setState({ transition: true })
+  UNSAFE_componentWillReceiveProps (next) {
+    const {activeIndex, items} = next
+    if (activeIndex != null && activeIndex !== this.props.activeIndex) this.handleClickItem(activeIndex)
+
+    // Handle use case when parent changes layout and carousel has less panels than previously set active index
+    if (this.state.activeIndex >= items.length) this.setState({activeIndex: 0})
+  }
+
+  handleClickItem = (activeIndex) => {
+    this.setState({transition: true})
     this.setTimeout(() => {
-      this.setState({ activeIndex: index, transition: false })
+      this.setState({activeIndex, transition: false})
+      const {onChange, items} = this.props
+      onChange && onChange((items[activeIndex] || {}).id || activeIndex)
     }, 50)
   }
 
@@ -59,25 +70,16 @@ export default class Carousel extends Component {
   }
 
   handleClickNext = () => {
-    let { activeIndex } = this.state
+    let {activeIndex} = this.state
     activeIndex = (activeIndex === this.props.items.length - 1) ? 0 : activeIndex + 1
     this.handleClickItem(activeIndex)
-  }
-
-  componentDidMount () {
-    const { activeIndex } = this.props
-    if (activeIndex) this.handleClickItem(activeIndex)
-  }
-
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    if (nextProps.activeIndex !== this.props.activeIndex) this.handleClickItem(nextProps.activeIndex)
   }
 
   render () {
     const {
       items,
       hideImage, hideItems, hideCount, hideControls,
-      itemClass, childrenRender, children, className, style, fill, square,
+      itemClass, children, className, style, fill, square,
       loading = false,
     } = this.props
     const {activeIndex, transition} = this.state
@@ -98,7 +100,7 @@ export default class Carousel extends Component {
             <Icon className='carousel__control prev' name='chevron-left' onClick={this.handleClickPrev}/>
             <Icon className='carousel__control next' name='chevron-right' onClick={this.handleClickNext}/>
           </>}
-          {childrenRender ? childrenRender(activeItem, activeIndex) : children}
+          {isFunction(children) ? children(activeItem, activeIndex) : children}
         </Canvas>
         {!hideItems && items.length > 1 &&
         <ScrollView row center className='carousel__items'>
