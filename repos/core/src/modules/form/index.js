@@ -1,4 +1,4 @@
-import { change, formValues, getFormValues, reducer, reduxForm, registerField, submit } from 'redux-form' // produces smallest js bundle size
+import { change, formValues, getFormValues, reducer, reduxForm, registerField, reset, submit } from 'redux-form' // produces smallest js bundle size
 import * as asyncValidate from './asyncValidators'
 import { ACTION_TYPE, NAME } from './constants'
 import * as normalize from './normalizers'
@@ -20,6 +20,7 @@ export {
   getFormValues,
   formValues,
   normalize,
+  reset,
   submit,
   validate
 }

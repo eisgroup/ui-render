@@ -401,7 +401,8 @@ export default {
                           {
                             view: 'Button',
                             className: 'a transparent',
-                            children: 'Reset'
+                            children: 'Reset',
+                            onClick: 'reset',
                           },
                         ]
                       },

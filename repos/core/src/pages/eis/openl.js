@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from '../../common/redux'
 import { logRender } from '../../common/utils'
+import { FIELD } from '../../common/variables'
 import ScrollView from '../../components/ScrollView'
 import Render, { metaToProps } from '../../components/views/Render'
+import { reset } from '../../modules/form'
 import { withForm } from '../../modules/form/utils'
 import router from '../../modules/router'
 import data from './data/_data'
@@ -28,6 +30,15 @@ export default class OpenL extends Component {
   static defaultProps = {
     data,
     meta: metaToProps(meta, data),
+  }
+
+  componentDidMount () {
+    FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm
+  }
+
+  resetForm = () => {
+    const {dispatch, form} = this.props
+    dispatch(reset(form))
   }
 
   render () {

@@ -5,7 +5,7 @@ import { getSetDefinition } from './definitions'
  * CONSTANT VARIABLES ==========================================================
  * =============================================================================
  */
-export const FIELD = getSetDefinition('TYPE', 'RENDER', 'ID', 'DEF', 'MIN_MAX', 'FOR')
+export const FIELD = getSetDefinition('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', 'MIN_MAX', 'FOR')
 
 // Field Type Definitions
 FIELD.TYPE = {
@@ -29,6 +29,14 @@ FIELD.RENDER = {
   PERCENT: 'Percent',
   TITLE_n_INPUT: 'Title+Input',
 }
+
+// Action Type Definitions
+FIELD.ACTION = {
+  RESET: 'reset',
+}
+
+// Action Methods by Action Type Definitions
+FIELD.FUNC = {}
 
 // Field IDs for uniquely identifying field definitions
 FIELD.ID = {

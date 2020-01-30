@@ -166,6 +166,12 @@ export function metaToProps (meta, data) {
         meta[key] = metaToProps(meta[key], data)
       }
     }
+
+    // Map `onClick` functions by name
+    if (typeof definition.onClick === 'string') {
+      const funcName = definition.onClick
+      definition.onClick = (...args) => FIELD.FUNC[funcName](...args)
+    }
   }
   return meta
 }
