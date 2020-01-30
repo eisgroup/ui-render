@@ -1,26 +1,26 @@
 {
-  "policyID": "MP0000002577",
+  "policyID": "MP0000001232",
   "adminCosts": [
     {
       "adminCategory": "Claims Processing",
-      "annualAmt": 2390.1480049255147,
-      "premiumPct": 0.2450529734794352,
-      "perClaimAmt": 113.81657166311975,
-      "perEmployeeAmt": 33.196500068409925
+      "annualAmt": 9828.212948695867,
+      "premiumPct": 0.285,
+      "perClaimAmt": 75.89353628336578,
+      "perEmployeeAmt": 22.135614749315017
     },
     {
       "adminCategory": "Risk Margin",
-      "annualAmt": 243.83993091253956,
+      "annualAmt": 862.1239428680587,
       "premiumPct": 0.025,
-      "perClaimAmt": 11.611425281549502,
-      "perEmployeeAmt": 3.386665707118605
+      "perClaimAmt": 6.657327744154894,
+      "perEmployeeAmt": 1.9417205920451774
     },
     {
       "adminCategory": "Premium Tax",
-      "annualAmt": 195.07194473003165,
+      "annualAmt": 689.6991542944469,
       "premiumPct": 0.02,
-      "perClaimAmt": 9.289140225239603,
-      "perEmployeeAmt": 2.709332565694884
+      "perClaimAmt": 5.325862195323914,
+      "perEmployeeAmt": 1.5533764736361415
     },
     {
       "adminCategory": "Commission",
@@ -45,38 +45,38 @@
     },
     {
       "adminCategory": "Administration Total",
-      "annualAmt": 2829.0598805680875,
-      "premiumPct": 0.2900529734794352,
-      "perClaimAmt": 134.7171371699089,
-      "perEmployeeAmt": 39.292498341223435
+      "annualAmt": 11380.036045858378,
+      "premiumPct": 0.33,
+      "perClaimAmt": 87.87672622284462,
+      "perEmployeeAmt": 25.630711814996346
     },
     {
       "adminCategory": "Manual Claims",
-      "annualAmt": 6924.537355933495,
-      "premiumPct": 0.7099470265205646,
-      "perClaimAmt": 329.73987409207115,
-      "perEmployeeAmt": 96.17412994352077
+      "annualAmt": 23104.921668863968,
+      "premiumPct": 0.6699999999999999,
+      "perClaimAmt": 178.4163835433511,
+      "perEmployeeAmt": 52.03811186681074
     },
     {
       "adminCategory": "Manual Premium",
-      "annualAmt": 9753.597236501582,
-      "premiumPct": 0.9999999999999998,
-      "perClaimAmt": 464.45701126198014,
-      "perEmployeeAmt": 135.4666282847442
+      "annualAmt": 34484.957714722346,
+      "premiumPct": 1.0,
+      "perClaimAmt": 266.29310976619576,
+      "perEmployeeAmt": 77.66882368180708
     },
     {
       "adminCategory": "Adjusted Fixed",
-      "annualAmt": 2390.1480049255147,
-      "premiumPct": 0.2450529734794352,
-      "perClaimAmt": 113.81657166311975,
-      "perEmployeeAmt": 33.196500068409925
+      "annualAmt": 9828.212948695867,
+      "premiumPct": 0.285,
+      "perClaimAmt": 75.89353628336578,
+      "perEmployeeAmt": 22.135614749315017
     },
     {
       "adminCategory": "Adjusted Variable",
-      "annualAmt": 438.91187564257234,
+      "annualAmt": 1551.823097162509,
       "premiumPct": 0.045,
-      "perClaimAmt": 20.90056550678916,
-      "perEmployeeAmt": 6.095998272813504
+      "perClaimAmt": 11.983189939478834,
+      "perEmployeeAmt": 3.495097065681326
     },
     {
       "adminCategory": "Underwriting Override",
@@ -87,126 +87,121 @@
     },
     {
       "adminCategory": "Adjusted Administration Total",
-      "annualAmt": 2829.059880568087,
-      "premiumPct": 0.2900529734794353,
-      "perClaimAmt": 134.7171371699089,
-      "perEmployeeAmt": 39.29249834122343
+      "annualAmt": 11380.036045858376,
+      "premiumPct": 0.33000000000000007,
+      "perClaimAmt": 87.8767262228446,
+      "perEmployeeAmt": 25.630711814996346
     },
     {
       "adminCategory": "Projected Claims Total",
-      "annualAmt": 6924.537355933495,
-      "premiumPct": 0.7099470265205646,
-      "perClaimAmt": 329.73987409207115,
-      "perEmployeeAmt": 96.17412994352077
+      "annualAmt": 23104.921668863968,
+      "premiumPct": 0.6699999999999999,
+      "perClaimAmt": 178.4163835433511,
+      "perEmployeeAmt": 52.03811186681074
     },
     {
       "adminCategory": "Grand Total",
-      "annualAmt": 9753.597236501582,
+      "annualAmt": 34484.957714722346,
       "premiumPct": 1.0,
-      "perClaimAmt": 464.45701126198014,
-      "perEmployeeAmt": 135.4666282847442
+      "perClaimAmt": 266.29310976619576,
+      "perEmployeeAmt": 77.66882368180708
     }
   ],
-  "asoAdminCost": null,
+  "asoAdminCost": {
+    "fullyInsuredPremiumNetComAmt": 34484.957714722346,
+    "fullyInsuredPremiumNetComPct": 1.0,
+    "admExpencesAmt": 11380.036045858376,
+    "admExpencesPct": 0.33000000000000007,
+    "claimsAmt": 23104.92166886397,
+    "claimsPct": 0.6699999999999999,
+    "riskAndTaxesAmt": 1551.8230971625055,
+    "riskAndTaxesPct": 0.045,
+    "lostInterestAmt": 152.4924830145022,
+    "lostInterestPct": 0.0066,
+    "asoPreCommision": 9980.705431710374,
+    "asoPreCommisionPEPM": 22.479066287635977,
+    "exeptionPct": 0.0,
+    "asoNetCommisions": 22.479066287635977,
+    "asoCommissionPEPMOverride": 0.0,
+    "asoFinalPEPM": 22.479066287635977,
+    "asoFinal": 9980.705431710374,
+    "asoEquivalency": 33085.62710057435,
+    "asoFactor": 0.9594220000000001
+  },
   "planCalculations": [
     {
-      "planName": "ALACARTE",
+      "planName": "ASO",
       "tierRates": [
         {
           "area": null,
-          "tier": "Employee only",
-          "manualRate": 55.55,
-          "adjManualRate": 58.31,
-          "formulaRate": 60.45,
-          "adjFormulaRate": 67.88,
-          "proposedRate": 55.96
-        },
-        {
-          "area": null,
-          "tier": "Employee + Spouse",
-          "manualRate": 112.11,
-          "adjManualRate": 119.78,
-          "formulaRate": 120.44,
-          "adjFormulaRate": 119.78,
-          "proposedRate": 119.78
-        },
-        {
-          "area": null,
-          "tier": "Employee + Child(ren)",
-          "manualRate": 136.81,
-          "adjManualRate": 133.12,
-          "formulaRate": 137.64,
-          "adjFormulaRate": 136.81,
-          "proposedRate": 136.81
-        },
-        {
-          "area": null,
           "tier": "Employee + Family",
-          "manualRate": 218.22,
-          "adjManualRate": 218.22,
-          "formulaRate": 218.22,
-          "adjFormulaRate": 218.22,
-          "proposedRate": 218.22
+          "manualRate": 73.86,
+          "adjManualRate": 73.86,
+          "formulaRate": 87.2,
+          "adjFormulaRate": 83.67,
+          "proposedRate": 83.67
+        },
+        {
+          "area": null,
+          "tier": "Employee only",
+          "manualRate": 25.89,
+          "adjManualRate": 25.89,
+          "formulaRate": 30.57,
+          "adjFormulaRate": 29.33,
+          "proposedRate": 29.33
         }
       ],
-      "manualCompositeRate": 245,
-      "experienceRate": 0.0,
-      "formulaCompositeRate": 135.47,
+      "manualCompositeRate": 56.19,
+      "experienceRate": 89.55,
+      "formulaCompositeRate": 66.34,
       "currentCompositeRate": null,
       "renewalCompositeRate": null,
-      "adjManualCompositeRate": null,
-      "proposedCompositeRate": 536.98,
+      "adjManualCompositeRate": 56.19,
+      "adjFormulaCompositeRate": 63.65,
+      "proposedCompositeRate": 63.65,
       "currentAnnualPremium": null,
       "renewalAnnualPremium": null,
-      "finalAnnualPremium": 9753.6,
-      "proposedAnnualPremium": 9753.6,
+      "finalAnnualPremium": 14511.59,
+      "proposedAnnualPremium": 14511.59,
       "pctRenewalFromCurrent": null,
       "pctFinalFromCurrent": null,
       "pctFinalFromRenewal": null,
       "pctProposedFromCurrent": null,
       "pctProposedFromRenewal": null,
-      "experienceAdjFactor": 1.0,
+      "experienceAdjFactor": 1.1806,
       "subGroupEnrollmentBreakdown": [
         {
-          "planName": "ALACARTE",
+          "planName": "ASO",
           "subGroup": "DEFAULT",
           "enrollmentBreakdown": [
             {
-              "tier": "Employee only",
-              "numberOfLives": 2
-            },
-            {
-              "tier": "Employee + Spouse",
-              "numberOfLives": 1
-            },
-            {
-              "tier": "Employee + Child(ren)",
-              "numberOfLives": 1
-            },
-            {
               "tier": "Employee + Family",
-              "numberOfLives": 2
+              "numberOfLives": 12
+            },
+            {
+              "tier": "Employee only",
+              "numberOfLives": 7
             }
           ]
         }
       ],
       "manualClaimDetail": {
-        "planName": "ALACARTE",
+        "planName": "ASO",
         "area": null,
         "areaFactors": null,
-        "totalEnrolled": 6.0,
-        "tierSize": 6.0,
+        "totalEnrolled": 19.0,
+        "tierSize": 19.0,
         "requiredParticipationPct": 1.0,
-        "minNumberOfParticipants": 25,
-        "currentParticipationPct": 0.24,
+        "minNumberOfParticipants": 80,
+        "currentParticipationPct": 0.4625,
         "occupation": "11 - Manufacturing - General",
         "occupationFactor": 0.9526,
         "initialLoad": 1.06,
-        "groupSize": 1.02,
+        "groupSize": 1.01,
         "yearLoad": 1.0,
         "voluntaryLoad": 1.0,
         "waitingLoad": 1.02,
-        "waitGroupSize": 1.05,
+        "waitGroupSize": 1.0,
         "rolloverLoad": 1.0,
         "steerage": 0.0,
         "planUtilization": 1.0,
@@ -220,11 +215,11 @@
                 "base": 8.054116031747252,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9989666666666667,
+                "ageFactor": 0.9884421052631581,
                 "copay": 1.0,
-                "claimsRate": 9.24212158821597,
-                "rateCalc": 4.476487716713187,
-                "rateCalcWO": 4.476487716713187
+                "claimsRate": 5.172814366391775,
+                "rateCalc": 3.6287292780238305,
+                "rateCalcWO": 3.6287292780238305
               },
               {
                 "tierElement": "Employee",
@@ -232,11 +227,11 @@
                 "base": 12.731744802909159,
                 "deductibleCredit": 0.95,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9811166666666665,
+                "ageFactor": 0.9926368421052633,
                 "copay": 1.0,
-                "claimsRate": 13.202122808533746,
-                "rateCalc": 6.394542640760515,
-                "rateCalcWO": 6.949876647950488
+                "claimsRate": 7.190142137439043,
+                "rateCalc": 5.043884709413489,
+                "rateCalcWO": 5.760547537975133
               },
               {
                 "tierElement": "Employee",
@@ -244,11 +239,11 @@
                 "base": 3.997567767244638,
                 "deductibleCredit": 0.24,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9149833333333333,
+                "ageFactor": 0.9207105263157895,
                 "copay": 1.0,
-                "claimsRate": 3.920607553460473,
-                "rateCalc": 1.8989743196514874,
-                "rateCalcWO": 2.0350614904211675
+                "claimsRate": 2.145975557630996,
+                "rateCalc": 1.5054018536781437,
+                "rateCalcWO": 1.6776617111959542
               },
               {
                 "tierElement": "Employee",
@@ -256,11 +251,11 @@
                 "base": 1.8500173715614334,
                 "deductibleCredit": 0.11,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.8213499999999999,
+                "ageFactor": 0.8996473684210526,
                 "copay": 1.0,
-                "claimsRate": 1.6296287624392953,
-                "rateCalc": 0.7893223507428658,
-                "rateCalcWO": 0.8454201331153909
+                "claimsRate": 0.9713380411971684,
+                "rateCalc": 0.6813936358998136,
+                "rateCalcWO": 0.7586362138911109
               },
               {
                 "tierElement": "Employee",
@@ -268,11 +263,11 @@
                 "base": 3.6870575253079094,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9938000000000001,
+                "ageFactor": 0.9935,
                 "copay": 1.0,
-                "claimsRate": 4.2090269321324705,
-                "rateCalc": 2.038672309292032,
-                "rateCalcWO": 2.038672309292032
+                "claimsRate": 2.3801567501672016,
+                "rateCalc": 1.669679960242292,
+                "rateCalcWO": 1.669679960242292
               }
             ],
             "spouseDetails": [
@@ -282,11 +277,11 @@
                 "base": 8.054116031747252,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9989666666666667,
+                "ageFactor": 0.9884421052631581,
                 "copay": 1.0,
-                "claimsRate": 9.24212158821597,
-                "rateCalc": 4.476487716713187,
-                "rateCalcWO": 4.476487716713187
+                "claimsRate": 5.172814366391775,
+                "rateCalc": 3.6287292780238305,
+                "rateCalcWO": 3.6287292780238305
               },
               {
                 "tierElement": "Spouse",
@@ -294,11 +289,11 @@
                 "base": 12.73174480290916,
                 "deductibleCredit": 0.95,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9811166666666665,
+                "ageFactor": 0.9926368421052633,
                 "copay": 1.0,
-                "claimsRate": 13.202122808533748,
-                "rateCalc": 6.394542640760516,
-                "rateCalcWO": 6.9498766479504885
+                "claimsRate": 7.190142137439045,
+                "rateCalc": 5.04388470941349,
+                "rateCalcWO": 5.760547537975134
               },
               {
                 "tierElement": "Spouse",
@@ -306,11 +301,11 @@
                 "base": 4.003497703608233,
                 "deductibleCredit": 0.24,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9149833333333333,
+                "ageFactor": 0.9207105263157895,
                 "copay": 1.0,
-                "claimsRate": 3.9267578372506895,
-                "rateCalc": 1.9019532536092822,
-                "rateCalcWO": 2.0380802722997595
+                "claimsRate": 2.149476299239327,
+                "rateCalc": 1.507857623916388,
+                "rateCalcWO": 1.680150331218495
               },
               {
                 "tierElement": "Spouse",
@@ -318,11 +313,11 @@
                 "base": 1.8500173715614334,
                 "deductibleCredit": 0.11,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.8213499999999999,
+                "ageFactor": 0.8996473684210526,
                 "copay": 1.0,
-                "claimsRate": 1.6296287624392953,
-                "rateCalc": 0.7893223507428658,
-                "rateCalcWO": 0.8454201331153909
+                "claimsRate": 0.9713380411971684,
+                "rateCalc": 0.6813936358998136,
+                "rateCalcWO": 0.7586362138911109
               },
               {
                 "tierElement": "Spouse",
@@ -330,11 +325,11 @@
                 "base": 3.687057525307909,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9938000000000001,
+                "ageFactor": 0.9935,
                 "copay": 1.0,
-                "claimsRate": 4.20902693213247,
-                "rateCalc": 2.0386723092920316,
-                "rateCalcWO": 2.0386723092920316
+                "claimsRate": 2.3801567501672016,
+                "rateCalc": 1.669679960242292,
+                "rateCalcWO": 1.669679960242292
               }
             ],
             "childDetails": [
@@ -344,11 +339,11 @@
                 "base": 10.875859699482367,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9989666666666667,
+                "ageFactor": 0.9884421052631581,
                 "copay": 1.0,
-                "claimsRate": 12.49299008281108,
-                "rateCalc": 6.051069131359345,
-                "rateCalcWO": 6.051069131359345
+                "claimsRate": 7.066776739737725,
+                "rateCalc": 4.957343882926014,
+                "rateCalcWO": 4.957343882926014
               },
               {
                 "tierElement": "Child",
@@ -356,11 +351,11 @@
                 "base": 9.222308566667516,
                 "deductibleCredit": 0.84,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9811166666666665,
+                "ageFactor": 0.9926368421052633,
                 "copay": 1.0,
-                "claimsRate": 9.591139058490569,
-                "rateCalc": 4.645536825588214,
-                "rateCalcWO": 5.131072690307751
+                "claimsRate": 5.099786266643475,
+                "rateCalc": 3.5775000660503977,
+                "rateCalcWO": 4.203635962828882
               },
               {
                 "tierElement": "Child",
@@ -368,11 +363,11 @@
                 "base": 0.5138170133498772,
                 "deductibleCredit": 0.03,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9149833333333333,
+                "ageFactor": 0.9207105263157895,
                 "copay": 1.0,
-                "claimsRate": 0.5516184663964638,
-                "rateCalc": 0.2671803509147075,
-                "rateCalcWO": 0.28587554037651586
+                "claimsRate": 0.3004020296927826,
+                "rateCalc": 0.21073202382948703,
+                "rateCalcWO": 0.23420379615549466
               },
               {
                 "tierElement": "Child",
@@ -380,11 +375,11 @@
                 "base": 0.11212226494311718,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.8213499999999999,
+                "ageFactor": 0.8996473684210526,
                 "copay": 1.0,
-                "claimsRate": 0.1270936351929688,
-                "rateCalc": 0.06155871153428249,
-                "rateCalcWO": 0.0623821559933953
+                "claimsRate": 0.07189170398735245,
+                "rateCalc": 0.050432030347127746,
+                "rateCalcWO": 0.05110663796830943
               },
               {
                 "tierElement": "Child",
@@ -392,25 +387,25 @@
                 "base": 3.024501834249418,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9938000000000001,
+                "ageFactor": 0.9935,
                 "copay": 1.0,
-                "claimsRate": 3.474214679554965,
-                "rateCalc": 1.6827607373270381,
-                "rateCalcWO": 1.6827607373270381
+                "claimsRate": 1.9652220424087607,
+                "rateCalc": 1.3786032627497458,
+                "rateCalcWO": 1.3786032627497458
               }
             ],
-            "trend": 1.088026709221028,
-            "area": 0.9570996491411689,
+            "trend": 1.0840430576024724,
+            "area": 0.5762,
             "maximumEEandSP": 1.0,
             "maximumCH": 1.0,
-            "netUtilization": 0.48435715479234404,
-            "ppoPenetration": 0.48435715479234404,
-            "rateCalcEmp": 15.597999337160088,
-            "rateCalcWOEmp": 16.345518297492266,
-            "rateCalcSp": 15.600978271117883,
-            "rateCalcWOSp": 16.348537079370857,
-            "rateCalcCh": 12.708105756723585,
-            "rateCalcWOCh": 13.213160255364045
+            "netUtilization": 0.3715,
+            "ppoPenetration": 0.7015,
+            "rateCalcEmp": 12.529089437257568,
+            "rateCalcWOEmp": 13.495254701328319,
+            "rateCalcSp": 12.531545207495814,
+            "rateCalcWOSp": 13.497743321350862,
+            "rateCalcCh": 10.174611265902774,
+            "rateCalcWOCh": 10.824893542628445
           },
           {
             "network": "Non-Participating",
@@ -421,11 +416,11 @@
                 "base": 8.054116031747252,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9989666666666667,
+                "ageFactor": 0.9884421052631581,
                 "copay": 1.0,
-                "claimsRate": 14.761742607758178,
-                "rateCalc": 7.611786958487511,
-                "rateCalcWO": 7.611786958487511
+                "claimsRate": 7.550046654174737,
+                "rateCalc": 0.2959618288436498,
+                "rateCalcWO": 0.2959618288436498
               },
               {
                 "tierElement": "Employee",
@@ -433,11 +428,11 @@
                 "base": 12.731744802909159,
                 "deductibleCredit": 0.95,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9811166666666665,
+                "ageFactor": 0.9926368421052633,
                 "copay": 1.0,
-                "claimsRate": 21.65837837758087,
-                "rateCalc": 11.167987849199777,
-                "rateCalcWO": 11.817519399072179
+                "claimsRate": 10.914144580296474,
+                "rateCalc": 0.42783446754762194,
+                "rateCalcWO": 0.4698344940762229
               },
               {
                 "tierElement": "Employee",
@@ -445,11 +440,11 @@
                 "base": 3.997567767244638,
                 "deductibleCredit": 0.24,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9149833333333333,
+                "ageFactor": 0.9207105263157895,
                 "copay": 1.0,
-                "claimsRate": 6.3967666183558585,
-                "rateCalc": 3.2984469392183713,
-                "rateCalcWO": 3.4604036675167524
+                "claimsRate": 3.230528071015545,
+                "rateCalc": 0.12663670038380942,
+                "rateCalcWO": 0.13683132308424045
               },
               {
                 "tierElement": "Employee",
@@ -457,11 +452,11 @@
                 "base": 1.8500173715614334,
                 "deductibleCredit": 0.11,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.8213499999999999,
+                "ageFactor": 0.8996473684210526,
                 "copay": 1.0,
-                "claimsRate": 2.6582928770678405,
-                "rateCalc": 1.370729702526507,
-                "rateCalcWO": 1.4375462083062427
+                "claimsRate": 1.4617711285289452,
+                "rateCalc": 0.05730142823833467,
+                "rateCalcWO": 0.06187492758140137
               },
               {
                 "tierElement": "Employee",
@@ -469,11 +464,11 @@
                 "base": 3.6870575253079094,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9938000000000001,
+                "ageFactor": 0.9935,
                 "copay": 1.0,
-                "claimsRate": 6.7227607436460035,
-                "rateCalc": 3.4665434775039627,
-                "rateCalcWO": 3.4665434775039627
+                "claimsRate": 3.4739878981093657,
+                "rateCalc": 0.1361803256058872,
+                "rateCalcWO": 0.1361803256058872
               }
             ],
             "spouseDetails": [
@@ -483,11 +478,11 @@
                 "base": 8.054116031747252,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9989666666666667,
+                "ageFactor": 0.9884421052631581,
                 "copay": 1.0,
-                "claimsRate": 14.761742607758178,
-                "rateCalc": 7.611786958487511,
-                "rateCalcWO": 7.611786958487511
+                "claimsRate": 7.550046654174737,
+                "rateCalc": 0.2959618288436498,
+                "rateCalcWO": 0.2959618288436498
               },
               {
                 "tierElement": "Spouse",
@@ -495,11 +490,11 @@
                 "base": 12.73174480290916,
                 "deductibleCredit": 0.95,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9811166666666665,
+                "ageFactor": 0.9926368421052633,
                 "copay": 1.0,
-                "claimsRate": 21.65837837758087,
-                "rateCalc": 11.167987849199777,
-                "rateCalcWO": 11.817519399072179
+                "claimsRate": 10.914144580296476,
+                "rateCalc": 0.427834467547622,
+                "rateCalcWO": 0.46983449407622296
               },
               {
                 "tierElement": "Spouse",
@@ -507,11 +502,11 @@
                 "base": 4.003497703608233,
                 "deductibleCredit": 0.24,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9149833333333333,
+                "ageFactor": 0.9207105263157895,
                 "copay": 1.0,
-                "claimsRate": 6.406590002024774,
-                "rateCalc": 3.303512296722977,
-                "rateCalcWO": 3.4655367821343104
+                "claimsRate": 3.2356376227208665,
+                "rateCalc": 0.12683699481065802,
+                "rateCalcWO": 0.13703429676365736
               },
               {
                 "tierElement": "Spouse",
@@ -519,11 +514,11 @@
                 "base": 1.8500173715614334,
                 "deductibleCredit": 0.11,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.8213499999999999,
+                "ageFactor": 0.8996473684210526,
                 "copay": 1.0,
-                "claimsRate": 2.6582928770678405,
-                "rateCalc": 1.370729702526507,
-                "rateCalcWO": 1.4375462083062427
+                "claimsRate": 1.4617711285289452,
+                "rateCalc": 0.05730142823833467,
+                "rateCalcWO": 0.06187492758140137
               },
               {
                 "tierElement": "Spouse",
@@ -531,11 +526,11 @@
                 "base": 3.687057525307909,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9938000000000001,
+                "ageFactor": 0.9935,
                 "copay": 1.0,
-                "claimsRate": 6.722760743646003,
-                "rateCalc": 3.4665434775039623,
-                "rateCalcWO": 3.4665434775039623
+                "claimsRate": 3.4739878981093653,
+                "rateCalc": 0.13618032560588716,
+                "rateCalcWO": 0.13618032560588716
               }
             ],
             "childDetails": [
@@ -545,11 +540,11 @@
                 "base": 10.875859699482367,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9989666666666667,
+                "ageFactor": 0.9884421052631581,
                 "copay": 1.0,
-                "claimsRate": 19.95410926414045,
-                "rateCalc": 10.289193674545828,
-                "rateCalcWO": 10.289193674545828
+                "claimsRate": 10.314403398332916,
+                "rateCalc": 0.4043246132146504,
+                "rateCalcWO": 0.4043246132146504
               },
               {
                 "tierElement": "Child",
@@ -557,11 +552,11 @@
                 "base": 9.222308566667516,
                 "deductibleCredit": 0.84,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9811166666666665,
+                "ageFactor": 0.9926368421052633,
                 "copay": 1.0,
-                "claimsRate": 15.83436670273892,
-                "rateCalc": 8.164877898661668,
-                "rateCalcWO": 8.724838457908891
+                "claimsRate": 7.817297144083556,
+                "rateCalc": 0.3064380480480755,
+                "rateCalcWO": 0.3428516408998428
               },
               {
                 "tierElement": "Child",
@@ -569,11 +564,11 @@
                 "base": 0.5138170133498772,
                 "deductibleCredit": 0.03,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.9149833333333333,
+                "ageFactor": 0.9207105263157895,
                 "copay": 1.0,
-                "claimsRate": 0.8994572486971785,
-                "rateCalc": 0.46379869486086334,
-                "rateCalcWO": 0.4861006770697131
+                "claimsRate": 0.4518069965401045,
+                "rateCalc": 0.017710834264372102,
+                "rateCalcWO": 0.01910183387118204
               },
               {
                 "tierElement": "Child",
@@ -581,11 +576,11 @@
                 "base": 0.11212226494311718,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 0.9868,
-                "ageFactor": 0.8213499999999999,
+                "ageFactor": 0.8996473684210526,
                 "copay": 1.0,
-                "claimsRate": 0.2029970620809669,
-                "rateCalc": 0.10467398266022496,
-                "rateCalcWO": 0.10607416159325596
+                "claimsRate": 0.10493044611829815,
+                "rateCalc": 0.0041132734878372886,
+                "rateCalcWO": 0.004168294981594334
               },
               {
                 "tierElement": "Child",
@@ -593,173 +588,1476 @@
                 "base": 3.024501834249418,
                 "deductibleCredit": 0.0,
                 "deductibleUtil": 1.0,
-                "ageFactor": 0.9938000000000001,
+                "ageFactor": 0.9935,
                 "copay": 1.0,
-                "claimsRate": 5.5491006447130315,
-                "rateCalc": 2.8613540447834658,
-                "rateCalcWO": 2.8613540447834658
+                "claimsRate": 2.868364695705949,
+                "rateCalc": 0.11243989607167323,
+                "rateCalcWO": 0.11243989607167323
               }
             ],
-            "trend": 1.088026709221028,
-            "area": 1.4987283966134346,
+            "trend": 1.0840430576024724,
+            "area": 0.841,
             "maximumEEandSP": 1.0,
             "maximumCH": 1.0,
-            "netUtilization": 0.365642845207656,
-            "ppoPenetration": 0.515642845207656,
-            "rateCalcEmp": 26.91549492693613,
-            "rateCalcWOEmp": 27.793799710886645,
-            "rateCalcSp": 26.920560284440736,
-            "rateCalcWOSp": 27.798932825504203,
-            "rateCalcCh": 21.883898295512047,
-            "rateCalcWOCh": 22.467561015901154
+            "netUtilization": 0.03920000000000001,
+            "ppoPenetration": 0.03920000000000001,
+            "rateCalcEmp": 1.043914750619303,
+            "rateCalcWOEmp": 1.1006828991914017,
+            "rateCalcSp": 1.0441150450461516,
+            "rateCalcWOSp": 1.1008858728708186,
+            "rateCalcCh": 0.8450266650866086,
+            "rateCalcWOCh": 0.8828862790389429
           },
-          null
+          {
+            "network": "EPO",
+            "employeeDetails": [
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Preventive",
+                "base": 5.658740745921481,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9884421052631581,
+                "copay": 1.0,
+                "claimsRate": 3.634367236678485,
+                "rateCalc": 0.9423914244707311,
+                "rateCalcWO": 0.9423914244707311
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Other Class II",
+                "base": 9.059909707999648,
+                "deductibleCredit": 0.95,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9926368421052633,
+                "copay": 1.3121,
+                "claimsRate": 6.367795361542694,
+                "rateCalc": 1.6511693372480203,
+                "rateCalcWO": 1.9881149282112793
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Major Restorative",
+                "base": 2.3471787769226142,
+                "deductibleCredit": 0.24,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9207105263157895,
+                "copay": 1.787,
+                "claimsRate": 2.0937696332321623,
+                "rateCalc": 0.5429144658970996,
+                "rateCalcWO": 0.6506600192933751
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Prosthodontics",
+                "base": 0.9748809027677494,
+                "deductibleCredit": 0.11,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.8996473684210526,
+                "copay": 1.787,
+                "claimsRate": 0.8336709408531342,
+                "rateCalc": 0.21617087496321769,
+                "rateCalcWO": 0.2640637099387135
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Radiographs",
+                "base": 2.527511006216659,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9935,
+                "copay": 1.0,
+                "claimsRate": 1.6316188020598037,
+                "rateCalc": 0.42307875537410705,
+                "rateCalcWO": 0.42307875537410705
+              }
+            ],
+            "spouseDetails": [
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Preventive",
+                "base": 5.658740745921481,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9884421052631581,
+                "copay": 1.0,
+                "claimsRate": 3.634367236678485,
+                "rateCalc": 0.9423914244707311,
+                "rateCalcWO": 0.9423914244707311
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Other Class II",
+                "base": 9.059909707999648,
+                "deductibleCredit": 0.95,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9926368421052633,
+                "copay": 1.3121,
+                "claimsRate": 6.367795361542694,
+                "rateCalc": 1.6511693372480203,
+                "rateCalcWO": 1.9881149282112793
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Major Restorative",
+                "base": 2.3506605492380643,
+                "deductibleCredit": 0.24,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9207105263157895,
+                "copay": 1.787,
+                "claimsRate": 2.097442751769099,
+                "rateCalc": 0.5438669055337273,
+                "rateCalcWO": 0.6516251993061717
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Prosthodontics",
+                "base": 0.9748809027677494,
+                "deductibleCredit": 0.11,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.8996473684210526,
+                "copay": 1.787,
+                "claimsRate": 0.8336709408531342,
+                "rateCalc": 0.21617087496321769,
+                "rateCalcWO": 0.2640637099387135
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Radiographs",
+                "base": 2.527511006216659,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9935,
+                "copay": 1.0,
+                "claimsRate": 1.6316188020598037,
+                "rateCalc": 0.42307875537410705,
+                "rateCalcWO": 0.42307875537410705
+              }
+            ],
+            "childDetails": [
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Preventive",
+                "base": 7.772855325564067,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9884421052631581,
+                "copay": 1.0,
+                "claimsRate": 5.050546323124872,
+                "rateCalc": 1.3096066615862794,
+                "rateCalcWO": 1.3096066615862794
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Other Class II",
+                "base": 6.1778090933278484,
+                "deductibleCredit": 0.84,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9926368421052633,
+                "copay": 1.3121,
+                "claimsRate": 4.1300746856269805,
+                "rateCalc": 1.070928365983076,
+                "rateCalcWO": 1.3657201285880167
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Major Restorative",
+                "base": 0.3016885414272428,
+                "deductibleCredit": 0.03,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9207105263157895,
+                "copay": 1.787,
+                "claimsRate": 0.2937601409289961,
+                "rateCalc": 0.07617200454288868,
+                "rateCalcWO": 0.09083300018600513
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Prosthodontics",
+                "base": 0.05708516494244263,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.8996473684210526,
+                "copay": 1.787,
+                "claimsRate": 0.06540858107691162,
+                "rateCalc": 0.016960445073243183,
+                "rateCalcWO": 0.0171873176664402
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Radiographs",
+                "base": 2.0607337659857734,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9935,
+                "copay": 1.0,
+                "claimsRate": 1.3389971778464094,
+                "rateCalc": 0.3472019682155739,
+                "rateCalcWO": 0.3472019682155739
+              }
+            ],
+            "trend": 1.0840430576024724,
+            "area": 0.5762,
+            "maximumEEandSP": 1.0,
+            "maximumCH": 1.0,
+            "netUtilization": 0.2593,
+            "ppoPenetration": 0.2593,
+            "rateCalcEmp": 3.775724857953176,
+            "rateCalcWOEmp": 4.268308837288206,
+            "rateCalcSp": 3.7766772975898038,
+            "rateCalcWOSp": 4.269274017301003,
+            "rateCalcCh": 2.8208694454010614,
+            "rateCalcWOCh": 3.130549076242315
+          }
         ],
-        "assumedParticipationPct": 0.25,
+        "assumedParticipationPct": 0.47,
         "claims": [
           {
-            "tier": "Employee only",
-            "rate": 42.51349426409622
-          },
-          {
-            "tier": "Employee + Spouse",
-            "rate": 85.03503281965484
-          },
-          {
-            "tier": "Employee + Child(ren)",
-            "rate": 97.13080946217104
-          },
-          {
             "tier": "Employee + Family",
-            "rate": 154.92597442555314
+            "rate": 49.48733643781679
+          },
+          {
+            "tier": "Employee only",
+            "rate": 17.348729045830048
           }
         ],
         "adjClaims": [
           {
-            "tier": "Employee only",
-            "rate": 42.51349426409622
-          },
-          {
-            "tier": "Employee + Spouse",
-            "rate": 85.03503281965484
-          },
-          {
-            "tier": "Employee + Child(ren)",
-            "rate": 97.13080946217104
-          },
-          {
             "tier": "Employee + Family",
-            "rate": 154.92597442555314
+            "rate": 49.48733643781679
+          },
+          {
+            "tier": "Employee only",
+            "rate": 17.348729045830048
           }
         ],
-        "claimsAnnual": 6924.537355933495,
-        "adjClaimsAnnual": 6924.537355933495,
-        "ppoPenetration": 0.48435715479234404,
-        "ppoAreaFactor": 0.9570996491411689,
-        "indemnityAreaFactor": 1.4987283966134346,
-        "epoPenetration": null,
-        "epoAreaFactor": null,
+        "claimsAnnual": 8583.469686895342,
+        "adjClaimsAnnual": 8583.469686895342,
+        "ppoPenetration": 0.7015,
+        "ppoAreaFactor": 0.5762,
+        "indemnityAreaFactor": 0.841,
+        "epoPenetration": 0.2593,
+        "epoAreaFactor": 0.5762,
         "experienceAdjFactor": null,
         "ageBreakdown": [
           {
             "ageBand": "0 - 24",
-            "numberOfLives": 0.0
+            "numberOfLives": 1.0
           },
           {
             "ageBand": "25 - 34",
-            "numberOfLives": 2.0
+            "numberOfLives": 4.0
           },
           {
             "ageBand": "35 - 44",
-            "numberOfLives": 1.0
+            "numberOfLives": 5.0
           },
           {
             "ageBand": "45 - 54",
-            "numberOfLives": 2.0
+            "numberOfLives": 5.0
           },
           {
             "ageBand": "55 - 64",
-            "numberOfLives": 1.0
+            "numberOfLives": 3.0
           },
           {
             "ageBand": "65+",
-            "numberOfLives": 0.0
+            "numberOfLives": 1.0
           }
         ],
         "subGroupEnrollmentBreakdown": {
-          "planName": "ALACARTE",
+          "planName": "ASO",
           "subGroup": "DEFAULT",
           "enrollmentBreakdown": [
             {
-              "tier": "Employee only",
-              "numberOfLives": 2
+              "tier": "Employee + Family",
+              "numberOfLives": 12
             },
             {
-              "tier": "Employee + Spouse",
-              "numberOfLives": 1
-            },
+              "tier": "Employee only",
+              "numberOfLives": 7
+            }
+          ]
+        },
+        "enrollmentBreakdown": [
+          {
+            "tier": "Employee + Family",
+            "numberOfLives": 12
+          },
+          {
+            "tier": "Employee only",
+            "numberOfLives": 7
+          }
+        ],
+        "enrollmentBreakdownReport": [
+          {
+            "tier": "Employee + Family",
+            "numberOfLives": 12
+          },
+          {
+            "tier": "Employee only",
+            "numberOfLives": 7
+          }
+        ],
+        "enrollmentByState": [
+          {
+            "state": "NV",
+            "numberOfLives": 19.0,
+            "enrolledPct": 1.0
+          }
+        ],
+        "enrollmentByMSA": [
+          {
+            "state": "NV",
+            "msa": "Space Coast",
+            "numberOfLives": 19.0,
+            "enrolledPct": 1.0,
+            "ppoPenetration": 0.5860272395989157,
+            "ppoAreaFactor": 0.5762102325676609,
+            "indemnityAreaFactor": 0.8410340931266652
+          }
+        ]
+      }
+    },
+    {
+      "planName": "ASOALC",
+      "tierRates": [
+        {
+          "area": "1",
+          "tier": "Employee + Child(ren)",
+          "manualRate": 66.14,
+          "adjManualRate": 66.14,
+          "formulaRate": 78.09,
+          "adjFormulaRate": 74.92,
+          "proposedRate": 74.92
+        },
+        {
+          "area": "1",
+          "tier": "Employee + Family",
+          "manualRate": 106.33,
+          "adjManualRate": 106.33,
+          "formulaRate": 125.54,
+          "adjFormulaRate": 120.44,
+          "proposedRate": 120.44
+        },
+        {
+          "area": "1",
+          "tier": "Employee only",
+          "manualRate": 29.2,
+          "adjManualRate": 29.2,
+          "formulaRate": 34.47,
+          "adjFormulaRate": 33.07,
+          "proposedRate": 33.07
+        },
+        {
+          "area": "1",
+          "tier": "Employee + Spouse",
+          "manualRate": 58.4,
+          "adjManualRate": 58.4,
+          "formulaRate": 68.95,
+          "adjFormulaRate": 66.15,
+          "proposedRate": 66.15
+        },
+        {
+          "area": "2",
+          "tier": "Employee + Child(ren)",
+          "manualRate": 73.71,
+          "adjManualRate": 73.71,
+          "formulaRate": 87.02,
+          "adjFormulaRate": 83.49,
+          "proposedRate": 83.49
+        },
+        {
+          "area": "2",
+          "tier": "Employee + Family",
+          "manualRate": 118.36,
+          "adjManualRate": 118.36,
+          "formulaRate": 139.74,
+          "adjFormulaRate": 134.07,
+          "proposedRate": 134.07
+        },
+        {
+          "area": "2",
+          "tier": "Employee only",
+          "manualRate": 32.55,
+          "adjManualRate": 32.55,
+          "formulaRate": 38.43,
+          "adjFormulaRate": 36.87,
+          "proposedRate": 36.87
+        },
+        {
+          "area": "2",
+          "tier": "Employee + Spouse",
+          "manualRate": 65.11,
+          "adjManualRate": 65.11,
+          "formulaRate": 76.88,
+          "adjFormulaRate": 73.76,
+          "proposedRate": 73.76
+        },
+        {
+          "area": "3",
+          "tier": "Employee + Child(ren)",
+          "manualRate": 82.06,
+          "adjManualRate": 82.06,
+          "formulaRate": 96.88,
+          "adjFormulaRate": 92.95,
+          "proposedRate": 92.95
+        },
+        {
+          "area": "3",
+          "tier": "Employee + Family",
+          "manualRate": 131.64,
+          "adjManualRate": 131.64,
+          "formulaRate": 155.42,
+          "adjFormulaRate": 149.11,
+          "proposedRate": 149.11
+        },
+        {
+          "area": "3",
+          "tier": "Employee only",
+          "manualRate": 36.26,
+          "adjManualRate": 36.26,
+          "formulaRate": 42.81,
+          "adjFormulaRate": 41.07,
+          "proposedRate": 41.07
+        },
+        {
+          "area": "3",
+          "tier": "Employee + Spouse",
+          "manualRate": 72.53,
+          "adjManualRate": 72.53,
+          "formulaRate": 85.63,
+          "adjFormulaRate": 82.16,
+          "proposedRate": 82.16
+        },
+        {
+          "area": "4",
+          "tier": "Employee + Child(ren)",
+          "manualRate": 91.33,
+          "adjManualRate": 91.33,
+          "formulaRate": 107.83,
+          "adjFormulaRate": 103.45,
+          "proposedRate": 103.45
+        },
+        {
+          "area": "4",
+          "tier": "Employee + Family",
+          "manualRate": 146.38,
+          "adjManualRate": 146.38,
+          "formulaRate": 172.82,
+          "adjFormulaRate": 165.81,
+          "proposedRate": 165.81
+        },
+        {
+          "area": "4",
+          "tier": "Employee only",
+          "manualRate": 40.37,
+          "adjManualRate": 40.37,
+          "formulaRate": 47.67,
+          "adjFormulaRate": 45.73,
+          "proposedRate": 45.73
+        },
+        {
+          "area": "4",
+          "tier": "Employee + Spouse",
+          "manualRate": 80.75,
+          "adjManualRate": 80.75,
+          "formulaRate": 95.34,
+          "adjFormulaRate": 91.47,
+          "proposedRate": 91.47
+        },
+        {
+          "area": "5",
+          "tier": "Employee + Child(ren)",
+          "manualRate": 99.47,
+          "adjManualRate": 99.47,
+          "formulaRate": 117.44,
+          "adjFormulaRate": 112.67,
+          "proposedRate": 112.67
+        },
+        {
+          "area": "5",
+          "tier": "Employee + Family",
+          "manualRate": 159.32,
+          "adjManualRate": 159.32,
+          "formulaRate": 188.1,
+          "adjFormulaRate": 180.47,
+          "proposedRate": 180.47
+        },
+        {
+          "area": "5",
+          "tier": "Employee only",
+          "manualRate": 43.98,
+          "adjManualRate": 43.98,
+          "formulaRate": 51.93,
+          "adjFormulaRate": 49.82,
+          "proposedRate": 49.82
+        },
+        {
+          "area": "5",
+          "tier": "Employee + Spouse",
+          "manualRate": 87.98,
+          "adjManualRate": 87.98,
+          "formulaRate": 103.87,
+          "adjFormulaRate": 99.66,
+          "proposedRate": 99.66
+        },
+        {
+          "area": "6",
+          "tier": "Employee + Child(ren)",
+          "manualRate": 114.08,
+          "adjManualRate": 114.08,
+          "formulaRate": 134.69,
+          "adjFormulaRate": 129.22,
+          "proposedRate": 129.22
+        },
+        {
+          "area": "6",
+          "tier": "Employee + Family",
+          "manualRate": 182.56,
+          "adjManualRate": 182.56,
+          "formulaRate": 215.54,
+          "adjFormulaRate": 206.8,
+          "proposedRate": 206.8
+        },
+        {
+          "area": "6",
+          "tier": "Employee only",
+          "manualRate": 50.47,
+          "adjManualRate": 50.47,
+          "formulaRate": 59.59,
+          "adjFormulaRate": 57.17,
+          "proposedRate": 57.17
+        },
+        {
+          "area": "6",
+          "tier": "Employee + Spouse",
+          "manualRate": 100.95,
+          "adjManualRate": 100.95,
+          "formulaRate": 119.18,
+          "adjFormulaRate": 114.35,
+          "proposedRate": 114.35
+        },
+        {
+          "area": "7",
+          "tier": "Employee + Child(ren)",
+          "manualRate": 124.16,
+          "adjManualRate": 124.16,
+          "formulaRate": 146.59,
+          "adjFormulaRate": 140.64,
+          "proposedRate": 140.64
+        },
+        {
+          "area": "7",
+          "tier": "Employee + Family",
+          "manualRate": 198.6,
+          "adjManualRate": 198.6,
+          "formulaRate": 234.47,
+          "adjFormulaRate": 224.96,
+          "proposedRate": 224.96
+        },
+        {
+          "area": "7",
+          "tier": "Employee only",
+          "manualRate": 54.94,
+          "adjManualRate": 54.94,
+          "formulaRate": 64.87,
+          "adjFormulaRate": 62.24,
+          "proposedRate": 62.24
+        },
+        {
+          "area": "7",
+          "tier": "Employee + Spouse",
+          "manualRate": 109.9,
+          "adjManualRate": 109.9,
+          "formulaRate": 129.75,
+          "adjFormulaRate": 124.48,
+          "proposedRate": 124.48
+        },
+        {
+          "area": "8",
+          "tier": "Employee + Child(ren)",
+          "manualRate": 138.91,
+          "adjManualRate": 138.91,
+          "formulaRate": 164.0,
+          "adjFormulaRate": 157.34,
+          "proposedRate": 157.34
+        },
+        {
+          "area": "8",
+          "tier": "Employee + Family",
+          "manualRate": 222.04,
+          "adjManualRate": 222.04,
+          "formulaRate": 262.15,
+          "adjFormulaRate": 251.52,
+          "proposedRate": 251.52
+        },
+        {
+          "area": "8",
+          "tier": "Employee only",
+          "manualRate": 61.48,
+          "adjManualRate": 61.48,
+          "formulaRate": 72.59,
+          "adjFormulaRate": 69.65,
+          "proposedRate": 69.65
+        },
+        {
+          "area": "8",
+          "tier": "Employee + Spouse",
+          "manualRate": 122.98,
+          "adjManualRate": 122.98,
+          "formulaRate": 145.2,
+          "adjFormulaRate": 139.3,
+          "proposedRate": 139.3
+        }
+      ],
+      "manualCompositeRate": 14.45,
+      "experienceRate": 89.55,
+      "formulaCompositeRate": 17.06,
+      "currentCompositeRate": null,
+      "renewalCompositeRate": null,
+      "adjManualCompositeRate": 14.45,
+      "adjFormulaCompositeRate": 16.37,
+      "proposedCompositeRate": 16.37,
+      "currentAnnualPremium": null,
+      "renewalAnnualPremium": null,
+      "finalAnnualPremium": 18574.050000000003,
+      "proposedAnnualPremium": 18574.050000000003,
+      "pctRenewalFromCurrent": null,
+      "pctFinalFromCurrent": null,
+      "pctFinalFromRenewal": null,
+      "pctProposedFromCurrent": null,
+      "pctProposedFromRenewal": null,
+      "experienceAdjFactor": 1.1806,
+      "subGroupEnrollmentBreakdown": [
+        {
+          "planName": "ASOALC",
+          "subGroup": "1",
+          "enrollmentBreakdown": [
             {
               "tier": "Employee + Child(ren)",
               "numberOfLives": 1
             },
             {
               "tier": "Employee + Family",
-              "numberOfLives": 2
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee only",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee + Spouse",
+              "numberOfLives": 1
+            }
+          ]
+        },
+        {
+          "planName": "ASOALC",
+          "subGroup": "2",
+          "enrollmentBreakdown": [
+            {
+              "tier": "Employee + Child(ren)",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee + Family",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee only",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee + Spouse",
+              "numberOfLives": 1
+            }
+          ]
+        },
+        {
+          "planName": "ASOALC",
+          "subGroup": "3",
+          "enrollmentBreakdown": [
+            {
+              "tier": "Employee + Child(ren)",
+              "numberOfLives": 0
+            },
+            {
+              "tier": "Employee + Family",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee only",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee + Spouse",
+              "numberOfLives": 1
+            }
+          ]
+        },
+        {
+          "planName": "ASOALC",
+          "subGroup": "4",
+          "enrollmentBreakdown": [
+            {
+              "tier": "Employee + Child(ren)",
+              "numberOfLives": 0
+            },
+            {
+              "tier": "Employee + Family",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee only",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee + Spouse",
+              "numberOfLives": 1
+            }
+          ]
+        },
+        {
+          "planName": "ASOALC",
+          "subGroup": "5",
+          "enrollmentBreakdown": [
+            {
+              "tier": "Employee + Child(ren)",
+              "numberOfLives": 0
+            },
+            {
+              "tier": "Employee + Family",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee only",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee + Spouse",
+              "numberOfLives": 0
+            }
+          ]
+        },
+        {
+          "planName": "ASOALC",
+          "subGroup": "6",
+          "enrollmentBreakdown": [
+            {
+              "tier": "Employee + Child(ren)",
+              "numberOfLives": 0
+            },
+            {
+              "tier": "Employee + Family",
+              "numberOfLives": 0
+            },
+            {
+              "tier": "Employee only",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee + Spouse",
+              "numberOfLives": 0
+            }
+          ]
+        },
+        {
+          "planName": "ASOALC",
+          "subGroup": "7",
+          "enrollmentBreakdown": [
+            {
+              "tier": "Employee + Child(ren)",
+              "numberOfLives": 0
+            },
+            {
+              "tier": "Employee + Family",
+              "numberOfLives": 0
+            },
+            {
+              "tier": "Employee only",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee + Spouse",
+              "numberOfLives": 0
+            }
+          ]
+        },
+        {
+          "planName": "ASOALC",
+          "subGroup": "8",
+          "enrollmentBreakdown": [
+            {
+              "tier": "Employee + Child(ren)",
+              "numberOfLives": 0
+            },
+            {
+              "tier": "Employee + Family",
+              "numberOfLives": 0
+            },
+            {
+              "tier": "Employee only",
+              "numberOfLives": 0
+            },
+            {
+              "tier": "Employee + Spouse",
+              "numberOfLives": 0
+            }
+          ]
+        }
+      ],
+      "manualClaimDetail": {
+        "planName": "ASOALC",
+        "area": "1",
+        "areaFactors": [
+          {
+            "area": "1",
+            "state": null,
+            "msaCode": null,
+            "indemnityFactor": 0.7103348344377108,
+            "msaValue": null,
+            "areaFactorBlend": 0.6128048976511851,
+            "PPOFactor": 0.504837017230074,
+            "PPOPenetrationFactor": 0.47460327370767486
+          },
+          {
+            "area": "2",
+            "state": null,
+            "msaCode": null,
+            "indemnityFactor": 0.8166819835663641,
+            "msaValue": null,
+            "areaFactorBlend": 0.6799856796690142,
+            "PPOFactor": 0.5693288485232094,
+            "PPOPenetrationFactor": 0.5526362294680476
+          },
+          {
+            "area": "3",
+            "state": null,
+            "msaCode": null,
+            "indemnityFactor": 0.884436497348229,
+            "msaValue": null,
+            "areaFactorBlend": 0.7522323030802415,
+            "PPOFactor": 0.6122415974952795,
+            "PPOPenetrationFactor": 0.4856968089387771
+          },
+          {
+            "area": "4",
+            "state": null,
+            "msaCode": null,
+            "indemnityFactor": 0.9819311495325234,
+            "msaValue": null,
+            "areaFactorBlend": 0.833532670459398,
+            "PPOFactor": 0.681417970182259,
+            "PPOPenetrationFactor": 0.49381687483382825
+          },
+          {
+            "area": "5",
+            "state": null,
+            "msaCode": null,
+            "indemnityFactor": 1.0680973863422685,
+            "msaValue": null,
+            "areaFactorBlend": 0.9049409875602095,
+            "PPOFactor": 0.7423455038533849,
+            "PPOPenetrationFactor": 0.5008609544647121
+          },
+          {
+            "area": "6",
+            "state": null,
+            "msaCode": null,
+            "indemnityFactor": 1.2231980261018947,
+            "msaValue": null,
+            "areaFactorBlend": 1.0330631816646512,
+            "PPOFactor": 0.8483473907557437,
+            "PPOPenetrationFactor": 0.5072282837713908
+          },
+          {
+            "area": "7",
+            "state": null,
+            "msaCode": null,
+            "indemnityFactor": 1.291524441463556,
+            "msaValue": null,
+            "areaFactorBlend": 1.119841121905324,
+            "PPOFactor": 0.8955805742588256,
+            "PPOPenetrationFactor": 0.43360519957102933
+          },
+          {
+            "area": "8",
+            "state": null,
+            "msaCode": null,
+            "indemnityFactor": 1.474484466881904,
+            "msaValue": null,
+            "areaFactorBlend": 1.2489064203247608,
+            "PPOFactor": 0.9731329300405005,
+            "PPOPenetrationFactor": 0.4499398724861234
+          }
+        ],
+        "totalEnrolled": 18.0,
+        "tierSize": 18.0,
+        "requiredParticipationPct": 1.0,
+        "minNumberOfParticipants": 80,
+        "currentParticipationPct": 0.4625,
+        "occupation": "11 - Manufacturing - General",
+        "occupationFactor": 0.9526,
+        "initialLoad": 1.06,
+        "groupSize": 1.01,
+        "yearLoad": 1.0,
+        "voluntaryLoad": 1.0,
+        "waitingLoad": 1.02,
+        "waitGroupSize": 1.0,
+        "rolloverLoad": 1.0,
+        "steerage": 0.0,
+        "planUtilization": 1.0,
+        "networkDetails": [
+          {
+            "network": "PPO",
+            "employeeDetails": [
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Preventive",
+                "base": 8.054116031747252,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9911823529411765,
+                "copay": 1.0,
+                "claimsRate": 4.54472025398572,
+                "rateCalc": 2.1569391106271985,
+                "rateCalcWO": 2.1569391106271985
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Other Class II",
+                "base": 12.731744802909159,
+                "deductibleCredit": 0.95,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9991588235294119,
+                "copay": 1.0,
+                "claimsRate": 6.227179903053332,
+                "rateCalc": 2.9554399679557526,
+                "rateCalcWO": 3.437074098822135
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Major Restorative",
+                "base": 3.997567767244638,
+                "deductibleCredit": 0.24,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9585941176470588,
+                "copay": 1.0,
+                "claimsRate": 1.9299632332276146,
+                "rateCalc": 0.9159668686252748,
+                "rateCalcWO": 1.0353734792045055
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Prosthodontics",
+                "base": 1.8500173715614334,
+                "deductibleCredit": 0.11,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9621882352941176,
+                "copay": 1.0,
+                "claimsRate": 0.8975039474853852,
+                "rateCalc": 0.4259583116421249,
+                "rateCalcWO": 0.4809526156901048
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Radiographs",
+                "base": 3.6870575253079094,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9962235294117647,
+                "copay": 1.0,
+                "claimsRate": 2.0910885356326747,
+                "rateCalc": 0.9924374646238553,
+                "rateCalcWO": 0.9924374646238553
+              }
+            ],
+            "spouseDetails": [
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Preventive",
+                "base": 8.054116031747252,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9911823529411765,
+                "copay": 1.0,
+                "claimsRate": 4.54472025398572,
+                "rateCalc": 2.1569391106271985,
+                "rateCalcWO": 2.1569391106271985
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Other Class II",
+                "base": 12.73174480290916,
+                "deductibleCredit": 0.95,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9991588235294119,
+                "copay": 1.0,
+                "claimsRate": 6.227179903053333,
+                "rateCalc": 2.955439967955753,
+                "rateCalcWO": 3.4370740988221353
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Major Restorative",
+                "base": 4.003497703608233,
+                "deductibleCredit": 0.24,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9585941176470588,
+                "copay": 1.0,
+                "claimsRate": 1.9331566062043044,
+                "rateCalc": 0.9174824538941813,
+                "rateCalcWO": 1.0369093378069647
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Prosthodontics",
+                "base": 1.8500173715614334,
+                "deductibleCredit": 0.11,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9621882352941176,
+                "copay": 1.0,
+                "claimsRate": 0.8975039474853852,
+                "rateCalc": 0.4259583116421249,
+                "rateCalcWO": 0.4809526156901048
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Radiographs",
+                "base": 3.687057525307909,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9962235294117647,
+                "copay": 1.0,
+                "claimsRate": 2.0910885356326743,
+                "rateCalc": 0.9924374646238551,
+                "rateCalcWO": 0.9924374646238551
+              }
+            ],
+            "childDetails": [
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Preventive",
+                "base": 10.875859699482367,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9911823529411765,
+                "copay": 1.0,
+                "claimsRate": 6.1915489252343985,
+                "rateCalc": 2.9385293892374813,
+                "rateCalcWO": 2.9385293892374813
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Other Class II",
+                "base": 9.222308566667516,
+                "deductibleCredit": 0.84,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9991588235294119,
+                "copay": 1.0,
+                "claimsRate": 4.367423419499052,
+                "rateCalc": 2.0727934525618177,
+                "rateCalcWO": 2.49175931913308
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Major Restorative",
+                "base": 0.5138170133498772,
+                "deductibleCredit": 0.03,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9585941176470588,
+                "copay": 1.0,
+                "claimsRate": 0.25959874404170025,
+                "rateCalc": 0.12320641377259169,
+                "rateCalcWO": 0.138827314450434
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Prosthodontics",
+                "base": 0.11212226494311718,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9621882352941176,
+                "copay": 1.0,
+                "claimsRate": 0.06298783999403405,
+                "rateCalc": 0.029894235064943774,
+                "rateCalcWO": 0.030294117414819386
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Radiographs",
+                "base": 3.024501834249418,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9962235294117647,
+                "copay": 1.0,
+                "claimsRate": 1.7218272025068255,
+                "rateCalc": 0.817184827068667,
+                "rateCalcWO": 0.817184827068667
+              }
+            ],
+            "trend": 1.0840430576024724,
+            "area": 0.504837017230074,
+            "maximumEEandSP": 1.0,
+            "maximumCH": 1.0,
+            "netUtilization": 0.47460327370767486,
+            "ppoPenetration": 0.47460327370767486,
+            "rateCalcEmp": 7.446741723474206,
+            "rateCalcWOEmp": 8.102776768967798,
+            "rateCalcSp": 7.448257308743113,
+            "rateCalcWOSp": 8.104312627570259,
+            "rateCalcCh": 5.9816083177055015,
+            "rateCalcWOCh": 6.416594967304482
+          },
+          {
+            "network": "Non-Participating",
+            "employeeDetails": [
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Preventive",
+                "base": 8.054116031747252,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9911823529411765,
+                "copay": 1.0,
+                "claimsRate": 6.522577503193659,
+                "rateCalc": 3.4269408671659165,
+                "rateCalcWO": 3.4269408671659165
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Other Class II",
+                "base": 12.731744802909159,
+                "deductibleCredit": 0.95,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9991588235294119,
+                "copay": 1.0,
+                "claimsRate": 9.337285207367467,
+                "rateCalc": 4.905779080408621,
+                "rateCalcWO": 5.4608169672930735
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Major Restorative",
+                "base": 3.997567767244638,
+                "deductibleCredit": 0.24,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9585941176470588,
+                "copay": 1.0,
+                "claimsRate": 2.866841652789075,
+                "rateCalc": 1.5062292191738589,
+                "rateCalcWO": 1.6449994676177673
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Prosthodontics",
+                "base": 1.8500173715614334,
+                "deductibleCredit": 0.11,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9621882352941176,
+                "copay": 1.0,
+                "claimsRate": 1.3327035498722402,
+                "rateCalc": 0.7001980822210354,
+                "rateCalcWO": 0.7641366257202774
+              },
+              {
+                "tierElement": "Employee",
+                "benefitCategory": "Radiographs",
+                "base": 3.6870575253079094,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9962235294117647,
+                "copay": 1.0,
+                "claimsRate": 3.0011279633201187,
+                "rateCalc": 1.5767828071127437,
+                "rateCalcWO": 1.5767828071127437
+              }
+            ],
+            "spouseDetails": [
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Preventive",
+                "base": 8.054116031747252,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9911823529411765,
+                "copay": 1.0,
+                "claimsRate": 6.522577503193659,
+                "rateCalc": 3.4269408671659165,
+                "rateCalcWO": 3.4269408671659165
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Other Class II",
+                "base": 12.73174480290916,
+                "deductibleCredit": 0.95,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9991588235294119,
+                "copay": 1.0,
+                "claimsRate": 9.337285207367469,
+                "rateCalc": 4.905779080408623,
+                "rateCalcWO": 5.460816967293074
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Major Restorative",
+                "base": 4.003497703608233,
+                "deductibleCredit": 0.24,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9585941176470588,
+                "copay": 1.0,
+                "claimsRate": 2.8714247781682,
+                "rateCalc": 1.508637178244238,
+                "rateCalcWO": 1.6474396369229753
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Prosthodontics",
+                "base": 1.8500173715614334,
+                "deductibleCredit": 0.11,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9621882352941176,
+                "copay": 1.0,
+                "claimsRate": 1.3327035498722402,
+                "rateCalc": 0.7001980822210354,
+                "rateCalcWO": 0.7641366257202774
+              },
+              {
+                "tierElement": "Spouse",
+                "benefitCategory": "Radiographs",
+                "base": 3.687057525307909,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9962235294117647,
+                "copay": 1.0,
+                "claimsRate": 3.0011279633201187,
+                "rateCalc": 1.5767828071127437,
+                "rateCalcWO": 1.5767828071127437
+              }
+            ],
+            "childDetails": [
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Preventive",
+                "base": 10.875859699482367,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9911823529411765,
+                "copay": 1.0,
+                "claimsRate": 8.88610419843537,
+                "rateCalc": 4.66873005535043,
+                "rateCalcWO": 4.66873005535043
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Other Class II",
+                "base": 9.222308566667516,
+                "deductibleCredit": 0.84,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9991588235294119,
+                "copay": 1.0,
+                "claimsRate": 6.622141721372648,
+                "rateCalc": 3.479251581453012,
+                "rateCalcWO": 3.9589025947958514
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Major Restorative",
+                "base": 0.5138170133498772,
+                "deductibleCredit": 0.03,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9585941176470588,
+                "copay": 1.0,
+                "claimsRate": 0.38521941867421544,
+                "rateCalc": 0.20239302147566537,
+                "rateCalcWO": 0.22056858027426907
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Prosthodontics",
+                "base": 0.11212226494311718,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 0.9868,
+                "ageFactor": 0.9621882352941176,
+                "copay": 1.0,
+                "claimsRate": 0.09040007858779404,
+                "rateCalc": 0.04749590534659591,
+                "rateCalcWO": 0.04813123768402504
+              },
+              {
+                "tierElement": "Child",
+                "benefitCategory": "Radiographs",
+                "base": 3.024501834249418,
+                "deductibleCredit": 0.0,
+                "deductibleUtil": 1.0,
+                "ageFactor": 0.9962235294117647,
+                "copay": 1.0,
+                "claimsRate": 2.4711645047037876,
+                "rateCalc": 1.298341740901165,
+                "rateCalcWO": 1.298341740901165
+              }
+            ],
+            "trend": 1.0840430576024724,
+            "area": 0.7103348344377108,
+            "maximumEEandSP": 1.0,
+            "maximumCH": 1.0,
+            "netUtilization": 0.5253967262923251,
+            "ppoPenetration": 0.5253967262923251,
+            "rateCalcEmp": 12.115930056082176,
+            "rateCalcWOEmp": 12.873676734909779,
+            "rateCalcSp": 12.118338015152556,
+            "rateCalcWOSp": 12.876116904214989,
+            "rateCalcCh": 9.696212304526867,
+            "rateCalcWOCh": 10.194674209005742
+          },
+          null
+        ],
+        "assumedParticipationPct": 0.47,
+        "claims": [
+          {
+            "tier": "Employee + Child(ren)",
+            "rate": 44.31638275999907
+          },
+          {
+            "tier": "Employee + Family",
+            "rate": 71.24061632180812
+          },
+          {
+            "tier": "Employee only",
+            "rate": 19.562671779556382
+          },
+          {
+            "tier": "Employee + Spouse",
+            "rate": 39.12926710345205
+          }
+        ],
+        "adjClaims": [
+          {
+            "tier": "Employee + Child(ren)",
+            "rate": 44.31638275999907
+          },
+          {
+            "tier": "Employee + Family",
+            "rate": 71.24061632180812
+          },
+          {
+            "tier": "Employee only",
+            "rate": 19.562671779556382
+          },
+          {
+            "tier": "Employee + Spouse",
+            "rate": 39.12926710345205
+          }
+        ],
+        "claimsAnnual": 2090.9872555777874,
+        "adjClaimsAnnual": 2090.9872555777874,
+        "ppoPenetration": 0.47460327370767486,
+        "ppoAreaFactor": 0.504837017230074,
+        "indemnityAreaFactor": 0.7103348344377108,
+        "epoPenetration": null,
+        "epoAreaFactor": null,
+        "experienceAdjFactor": null,
+        "ageBreakdown": [
+          {
+            "ageBand": "0 - 24",
+            "numberOfLives": 1.0
+          },
+          {
+            "ageBand": "25 - 34",
+            "numberOfLives": 3.0
+          },
+          {
+            "ageBand": "35 - 44",
+            "numberOfLives": 4.0
+          },
+          {
+            "ageBand": "45 - 54",
+            "numberOfLives": 5.0
+          },
+          {
+            "ageBand": "55 - 64",
+            "numberOfLives": 3.0
+          },
+          {
+            "ageBand": "65+",
+            "numberOfLives": 1.0
+          }
+        ],
+        "subGroupEnrollmentBreakdown": {
+          "planName": "ASOALC",
+          "subGroup": "1",
+          "enrollmentBreakdown": [
+            {
+              "tier": "Employee + Child(ren)",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee + Family",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee only",
+              "numberOfLives": 1
+            },
+            {
+              "tier": "Employee + Spouse",
+              "numberOfLives": 1
             }
           ]
         },
         "enrollmentBreakdown": [
           {
-            "tier": "Employee only",
-            "numberOfLives": 2
-          },
-          {
-            "tier": "Employee + Spouse",
-            "numberOfLives": 1
-          },
-          {
             "tier": "Employee + Child(ren)",
             "numberOfLives": 1
           },
           {
             "tier": "Employee + Family",
-            "numberOfLives": 2
+            "numberOfLives": 1
+          },
+          {
+            "tier": "Employee only",
+            "numberOfLives": 1
+          },
+          {
+            "tier": "Employee + Spouse",
+            "numberOfLives": 1
           }
         ],
         "enrollmentBreakdownReport": [
           {
-            "tier": "Employee only",
-            "numberOfLives": 2
-          },
-          {
-            "tier": "Employee + Spouse",
-            "numberOfLives": 1
-          },
-          {
             "tier": "Employee + Child(ren)",
-            "numberOfLives": 1
+            "numberOfLives": 2
           },
           {
             "tier": "Employee + Family",
-            "numberOfLives": 2
+            "numberOfLives": 5
+          },
+          {
+            "tier": "Employee only",
+            "numberOfLives": 7
+          },
+          {
+            "tier": "Employee + Spouse",
+            "numberOfLives": 4
           }
         ],
         "enrollmentByState": [
           {
-            "state": "NY",
-            "numberOfLives": 6.0,
+            "state": "NV",
+            "numberOfLives": 18.0,
             "enrolledPct": 1.0
           }
         ],
         "enrollmentByMSA": [
           {
-            "state": "NY",
-            "msa": "New York/White Plains",
-            "numberOfLives": 6.0,
+            "state": "NV",
+            "msa": "Space Coast",
+            "numberOfLives": 18.0,
             "enrolledPct": 1.0,
-            "ppoPenetration": 0.48435715479234404,
-            "ppoAreaFactor": 0.9570996491411689,
-            "indemnityAreaFactor": 1.4987283966134346
+            "ppoPenetration": 0.5860272395989157,
+            "ppoAreaFactor": 0.5762102325676609,
+            "indemnityAreaFactor": 0.8410340931266652
           }
         ]
       }

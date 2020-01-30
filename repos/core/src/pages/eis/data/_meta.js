@@ -115,7 +115,7 @@ export default {
           {
             view: 'Dropdown',
             name: 'planCalculations.0.planName',
-            options: ['ALACARTE', 'GOLD'],
+            options: ['ALACARTE', 'ASO', 'GOLD'],
           }
         ]
       },
@@ -234,7 +234,7 @@ export default {
                                 items: [
                                   {
                                     view: 'Counter',
-                                    end: {name: 'planCalculations[0].manualClaimDetail.networkDetails[1].ppoPenetration'},
+                                    end: {name: 'planCalculations[0].manualClaimDetail.networkDetails[0].ppoPenetration'},
                                     render: 'Percent'
                                   },
                                 ]
@@ -256,7 +256,7 @@ export default {
                                 items: [
                                   {
                                     view: 'Counter',
-                                    end: {name: 'planCalculations[0].manualClaimDetail.networkDetails[1].netUtilization'},
+                                    end: {name: 'planCalculations[0].manualClaimDetail.networkDetails[0].netUtilization'},
                                     render: 'Percent'
                                   },
                                 ]
