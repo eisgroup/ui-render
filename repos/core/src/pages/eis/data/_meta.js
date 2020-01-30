@@ -396,7 +396,8 @@ export default {
                           {
                             view: 'Button',
                             className: 'a transparent',
-                            children: 'Apply'
+                            children: 'Apply',
+                            type: 'submit,'
                           },
                           {
                             view: 'Button',
