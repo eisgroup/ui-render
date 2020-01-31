@@ -88,7 +88,7 @@ export default class Fields extends Component {
     const fieldOptions = options
       .filter(({value}) => value && !fields.find(({code}) => code === value)) // filter out empty string '' and 0
     return (
-      <View className={classNames('app__fields min-width-290', className)} style={style}>
+      <View className={classNames('app__fields', className)} style={style}>
         {/*
         Only register placeholder parent field when there are no fields left (to reset on backend)
         because if registered when there are existing fields, withForm's  this.changedValues grabs all values within it,

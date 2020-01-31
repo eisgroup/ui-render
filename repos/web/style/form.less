@@ -1,10 +1,6 @@
 @import "_mixins";
 @import "_layout";
 
-label {
-  &:extend(.uppercase all);
-}
-
 /* Input Inside Stylised Form */
 .app__form {
   .input--wrapper {
@@ -102,4 +98,24 @@ label {
       border-left: 0;
     }
   }
+}
+
+.fields--date__item__date {
+  input {
+    padding-right: @padding-smallest !important;
+  }
+}
+
+.fields--date__item__date,
+.fields--date__item__time {
+  + .fields--date__item__time {
+    // must use padding to prevent width overflow
+    padding-left: @margin-smallest !important;
+    margin-left: 0 !important;
+  }
+}
+
+.fields--date__item__time {
+  min-width: size(84);
+  max-width: size(84);
 }
