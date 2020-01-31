@@ -16,6 +16,7 @@ import { withTimer } from '../../../components/utils'
 import View from '../../../components/View'
 import { POPUP, POPUP_ALERT } from '../../exports'
 import { history } from '../../router'
+import { openModal } from '../../router/history'
 import { NAME as UPLOAD } from '../constants'
 import select from '../selectors'
 
@@ -84,10 +85,7 @@ export default class Upload extends Component {
   onDragLeave = () => this.setState({ active: false })
 
   openInModal = (uri) => {
-    history.push({
-      pathname: uri || this.uri,
-      state: { isModal: true, className: 'fill--three-quarter' }
-    })
+    openModal(uri || this.uri, {className: 'fill--three-quarter'})
   }
 
   handleCloseModal = () => {

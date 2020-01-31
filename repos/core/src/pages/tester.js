@@ -18,6 +18,7 @@ import { reduxForm } from '../modules/form'
 import { SliderField } from '../modules/form/inputs'
 import { testPayload } from '../modules/popup/data'
 import { history } from '../modules/router'
+import { openModal } from '../modules/router/history'
 
 const query = `mutation {
   login (email: "example@gmail.com", password: "TEST!@#$%") {
@@ -39,8 +40,8 @@ const mapDispatchToProps = (dispatch) => ({
       headers: {'Content-Type': 'application/json'}
     })),
     login: () => history.push({pathname: ROUTE.LOGIN, state: {isModal: true}}),
-    contact: () => history.push({ pathname: ROUTE.CONTACT, state: { isModal: true } }),
-    openInModal: () => history.push({ pathname: ROUTE.THEME, state: { isModal: true } }),
+    contact: () => openModal(ROUTE.CONTACT),
+    openInModal: () => openModal(ROUTE.THEME),
     popupAlert: () => dispatch(stateAction(POPUP, ALERT, testPayload)),
   }
 })

@@ -24,33 +24,34 @@ import View from './View'
  */
 export default function Avatar
   ({
-     name = '',
-     status = '',
-     hideName = true,
-     src = '',
-     secure,
-     small,
-     large,
-     larger,
-     className,
-     onClick,
-     style,
-     children,
-   }) {
+    name = '',
+    status = '',
+    hideName = true,
+    src = '',
+    secure,
+    small,
+    large,
+    larger,
+    className,
+    onClick,
+    style,
+    children,
+  }) {
   const hasImage = src && !secure
   return (
-    <View className={classNames('app__avatar', status, className, {
-      small,
-      large,
-      larger,
-      interact: onClick,
-      fetching: hasImage,
-    })}
-          onClick={onClick}
-          style={style}>
+    <View
+      className={classNames('app__avatar', status, className, {
+        small,
+        large,
+        larger,
+        interact: onClick,
+        fetching: hasImage,
+      })}
+      onClick={onClick}
+      style={style}>
       <View className='app__avatar__inner'>
         <View className='app__avatar__image align-center'
-              style={hasImage ? { backgroundImage: `url('${encodeURI(src)}')` } : undefined}
+              style={hasImage ? {backgroundImage: `url('${encodeURI(src)}')`} : undefined}
         >
           {hasImage
             ? <Text className='sr-only'>{name}</Text> // for screen readers
