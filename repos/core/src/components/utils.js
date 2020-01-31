@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useContext } from 'react'
 import { warn } from '../common/utils'
 import { SIZE_SCALE, SOUND } from '../common/variables'
 
@@ -56,6 +56,16 @@ export function toRem (pixels) {
 }
 
 /**
+ * React Component Context Decorator
+ */
+export function withContext (Component) {
+  return function ContextWrapper (props) {
+    const context = useContext(UIContext)
+    return <Component {...context} {...props}/>
+  }
+}
+
+/**
  * React Component Timer Decorator to clearTimeout() and clearInterval() automatically on componentWillUnmount()
  * @example:
  *    @withTimer
@@ -66,32 +76,32 @@ export function toRem (pixels) {
  *      }
  *    }
  *
- * @param {Object} constructor - class
+ * @param {Object} Class - to be decorated
  */
-export function withTimer (constructor) {
-  const componentWillUnmount = constructor.prototype.componentWillUnmount
+export function withTimer (Class) {
+  const componentWillUnmount = Class.prototype.componentWillUnmount
 
-  constructor.prototype.setTimeout = function () {
+  Class.prototype.setTimeout = function () {
     if (!this.timers) this.timers = []
     this.timers.push(setTimeout(...arguments))
   }
 
-  constructor.prototype.setInterval = function () {
+  Class.prototype.setInterval = function () {
     if (!this.intervals) this.intervals = []
     this.intervals.push(setInterval(...arguments))
   }
 
-  constructor.prototype.clearTimer = function () {
+  Class.prototype.clearTimer = function () {
     if (this.timers) this.timers.forEach(clearTimeout)
     if (this.intervals) this.intervals.forEach(clearInterval)
   }
 
-  constructor.prototype.componentWillUnmount = function () {
+  Class.prototype.componentWillUnmount = function () {
     this.clearTimer()
     if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
   }
 
-  return constructor
+  return Class
 }
 
 /**

@@ -27,6 +27,7 @@ export const QUERY_CACHE_TIME = Number(ENV.QUERY_CACHE_TIME) || TWO_SECONDS
 /* UI */
 export const SIZE_SCALE = 62.5  // match percentage of font-size defined in <html> root element
 export const TIME_DURATION_INSTANT = 200  // Milliseconds - max delay that seems instant to human
+export const TYPING_DELAY = 300  // Milliseconds - 300 is deal for debouncing input changes while typing
 export const TOOLTIP_DELAY = 777  // Milliseconds
 export const FORM_SYNC_THROTTLE = THREE_SECONDS  // Milliseconds - debounce input changes duration
 export const ANIMATION_DURATION = 500  // Milliseconds - match with CSS @speed-base in /repos/web/style/_variables.less

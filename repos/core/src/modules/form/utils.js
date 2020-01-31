@@ -3,7 +3,7 @@ import React from 'react'
 import { reduxForm } from 'redux-form' // produces smallest js bundle size
 import { GET, stateAction } from '../../common/actions'
 import { debounce, get, hasListValue, isEmpty, isEqual, objChanges } from '../../common/utils'
-import { FIELD } from '../../common/variables'
+import { FIELD, TYPING_DELAY } from '../../common/variables'
 import Text from '../../components/Text'
 import Tooltip from '../../components/Tooltip'
 import View from '../../components/View'
@@ -56,25 +56,25 @@ import { fieldValues, registeredFieldErrors, registeredFieldValues } from './sel
  * @returns {Function} decorator - HOC wrapper function for given React component
  */
 export function withForm ({form, ...options}) {
-  return function Decorator (constructor) {
-    const componentDidUpdate = constructor.prototype.componentDidUpdate
-    const componentWillUnmount = constructor.prototype.componentWillUnmount
-    const handleChangeInput = constructor.prototype.handleChangeInput
+  return function Decorator (Class) {
+    const componentDidUpdate = Class.prototype.componentDidUpdate
+    const componentWillUnmount = Class.prototype.componentWillUnmount
+    const handleChangeInput = Class.prototype.handleChangeInput
 
-    constructor.propTypes = {
+    Class.propTypes = {
       initialValues: PropTypes.object, // form initial values
       onChangeState: PropTypes.func, // onChangeState(this: Class)
-      ...constructor.propTypes
+      ...Class.propTypes
     }
 
-    constructor.prototype.state = {
+    Class.prototype.state = {
       hasInputChanges: false,
       canSave: false, // only used internally to compare changes for re-rendering
-      ...constructor.prototype.state
+      ...Class.prototype.state
     }
 
     // Define instance getter
-    Object.defineProperty(constructor.prototype, 'canSave', {
+    Object.defineProperty(Class.prototype, 'canSave', {
       get () {
         const {valid, loading} = this.props
         const {hasInputChanges} = this.state
@@ -83,21 +83,21 @@ export function withForm ({form, ...options}) {
     })
 
     // Define instance getter
-    Object.defineProperty(constructor.prototype, 'formValues', {
+    Object.defineProperty(Class.prototype, 'formValues', {
       get () {
         return fieldValues(this.props.form)
       }
     })
 
     // Define instance getter
-    Object.defineProperty(constructor.prototype, 'registeredValues', {
+    Object.defineProperty(Class.prototype, 'registeredValues', {
       get () {
         return registeredFieldValues(this.props.form)
       }
     })
 
     // Define instance getter
-    Object.defineProperty(constructor.prototype, 'changedValues', {
+    Object.defineProperty(Class.prototype, 'changedValues', {
       get () {
         // Have to select all form values, because registered values may not include all input values
         return objChanges(this.props.initialValues, this.formValues)
@@ -105,7 +105,7 @@ export function withForm ({form, ...options}) {
     })
 
     // Define instance getter
-    Object.defineProperty(constructor.prototype, 'validationErrorsTooltip', {
+    Object.defineProperty(Class.prototype, 'validationErrorsTooltip', {
       get () {
         const errors = registeredFieldErrors(this.props.form)
         return errors && <Tooltip top>
@@ -124,7 +124,7 @@ export function withForm ({form, ...options}) {
     })
 
     // Define instance method
-    constructor.prototype.renderInput = function (FIELDS, {onChange} = {}) {
+    Class.prototype.renderInput = function (FIELDS, {onChange} = {}) {
       const {initialValues} = this.props
       return fieldsFrom(FIELDS, {initialValues})
         .map(field => ({
@@ -139,16 +139,16 @@ export function withForm ({form, ...options}) {
     }
 
     // Define instance method
-    constructor.prototype.handleChangeInput = debounce(function () {
+    Class.prototype.handleChangeInput = debounce(function () {
       // To handle use case when all fields in a group are removed, and no registered values are sent to backend,
       // use placeholder parent field that reserves as registered null value field for the entire group.
       // See <Fields> component for example.
       this.syncInputChanges()
       if (handleChangeInput) handleChangeInput.apply(this, arguments)
-    }, 300)
+    }, TYPING_DELAY)
 
     // Define instance method
-    constructor.prototype.syncInputChanges = function () {
+    Class.prototype.syncInputChanges = function () {
       const {initialValues, valid, loading} = this.props
       const registeredValues = this.registeredValues
       const hasInputChanges = (registeredValues && isEmpty(initialValues)) || !!this.changedValues
@@ -159,19 +159,19 @@ export function withForm ({form, ...options}) {
       }
     }
 
-    constructor.prototype.componentDidUpdate = function (old) {
+    Class.prototype.componentDidUpdate = function (old) {
       if (!isEqual(old.initialValues, this.props.initialValues)) {
         this.syncInputChanges()
       }
       if (componentDidUpdate) componentDidUpdate.apply(this, arguments)
     }
 
-    constructor.prototype.componentWillUnmount = function () {
+    Class.prototype.componentWillUnmount = function () {
       if (this.props.onChangeState) this.props.onChangeState({})
       if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
     }
 
-    return reduxForm({form, enableReinitialize: true, ...options})(constructor)
+    return reduxForm({form, enableReinitialize: true, ...options})(Class)
   }
 }
 
