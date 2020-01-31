@@ -186,14 +186,22 @@ export default {
                     headers: [
                       {
                         id: 'state',
+                        // Custom render function for Table Rows in default layout
+                        renderItem: {
+                          view: 'Table',
+                          name: 'planCalculations[0].manualClaimDetail.enrollmentByMSA',
+                          filterItems: [
+                            //  ╭ key path to value in this child-table's item to use for filtering
+                            {'state': 'state'}
+                            //           ╰ key path to value from parent-table's item to match against
+                          ]
+                        },
+                        // Custom render function for Table Cells (columns in default layout)
                         renderCell: {
-                          view: 'Expand',
+                          view: 'Expand', // todo: write special renderFunc that triggers expanding of renderItem
                           name: '{value}',
                           items: [
-                            {
-                              view: 'Table',
-                              name: 'planCalculations[0].manualClaimDetail.enrollmentByMSA'
-                            }
+                            {}
                           ]
                         }
                       },
