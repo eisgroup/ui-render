@@ -30,8 +30,12 @@ export default class Tabs extends Component {
     vertical: PropTypes.bool, // render tabs as vertical layout
     centerTabs: PropTypes.bool, // align tabs to center
     buttoned: PropTypes.bool, // style tabs as buttons
-    className: PropTypes.string,
     children: PropTypes.any, // extra content to render inside Tabs
+    className: PropTypes.string,
+    classNameTabs: PropTypes.string,
+    classNamePanels: PropTypes.string,
+    styleTabs: PropTypes.object,
+    stylePanels: PropTypes.object,
   }
 
   state = {
@@ -57,7 +61,8 @@ export default class Tabs extends Component {
 
   render () {
     const {
-      vertical, buttoned, className, items, panels, children, tabsClassName, centerTabs,
+      vertical, buttoned, items, panels, children, centerTabs,
+      className, classNameTabs, classNamePanels, styleTabs, stylePanels,
       activeIndex: _, defaultIndex: __, onChange: ___,
       ...props
     } = this.props
@@ -70,9 +75,9 @@ export default class Tabs extends Component {
         {...props}
       >
         <ScrollView row={!vertical} center={centerTabs}
-                    className={classNames('tabs__items no-scrollbar', tabsClassName)}>
+                    className={classNames('tabs__items no-scrollbar', classNameTabs)} style={styleTabs}>
           {items.map((tab, i) => (
-            <View key={i} className={classNames('tabs__item', {active: activeIndex === i})}
+            <View key={i} className={classNames('tabs__item', {active: activeIndex === i && items.length > 1})}
                   onClick={activeIndex !== i && (() => this.handleClickTab(i))}>
               {typeof tab === 'object'
                 ? (tab.icon ? <Text><Icon name={tab.icon}/>{tab.text}</Text> : tab)
@@ -81,7 +86,8 @@ export default class Tabs extends Component {
             </View>
           ))}
         </ScrollView>
-        <ScrollView fill className={classNames('tabs__content', {'fade-in': !transition})}>
+        <ScrollView fill className={classNames('tabs__content', {'fade-in': !transition}, classNamePanels)}
+                    style={stylePanels}>
           {typeof content === 'object' ? content : (isFunction(content) ? content() : <Text>{content}</Text>)}
         </ScrollView>
         {children}
