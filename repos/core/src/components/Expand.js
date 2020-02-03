@@ -26,8 +26,8 @@ export default class Expand extends Component {
     justify: PropTypes.bool, // whether should render expand icon spread out from `title`
     iconOpened: PropTypes.string, // name of icon for expanded state
     iconClosed: PropTypes.string, // name of icon for collapsed state
-    onClick: PropTypes.func, // callback on click or Enter press (if `onKeyPress` not given)
-    id: PropTypes.string, // argument to pass to 'onClick' callback, uses `title` if not given
+    onClick: PropTypes.func, // callback({expanded, key, value}) on click or Enter press (if `onKeyPress` not given)
+    id: PropTypes.string, // argument to pass to 'onClick' callback as `key`
     duration: PropTypes.number, // milliseconds for the animation
     className: PropTypes.string,
   }
@@ -65,21 +65,21 @@ export default class Expand extends Component {
     // Expanding should be fast
     if (expand) {
       this.setState({expanded: false, changing: true}, () => {
-        this.handleClick()
+        this.handleClick(true)
         this.setState({expanded: true, changing: false})
       })
     } else {
       // Collapsing has to wait for Animation
       this.setState({expanded: false, changing: true}, () => {
-        this.handleClick()
+        this.handleClick(false)
         this.setTimeout(() => this.setState({changing: false}), this.props.duration)
       })
     }
   }
 
-  handleClick = () => {
+  handleClick = (expanded) => {
     const {onClick, id, title} = this.props
-    onClick && onClick(id || String(title))
+    onClick && onClick({expanded, key: id, value: String(title)})
   }
 
   renderTitle = () => {

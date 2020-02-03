@@ -189,7 +189,7 @@ export default {
                       name: 'planCalculations[0].manualClaimDetail.enrollmentByMSA',
                       filterItems: [
                         //  ╭ key path to value in this child-table's item to use for filtering
-                        {'state': 'state'}
+                        {'state': 'state'},
                         //           ╰ key path to value from parent-table's item to match against
                       ],
                     },
@@ -198,10 +198,11 @@ export default {
                         id: 'state',
                         // Custom render function for Table Cells (columns in default layout)
                         renderCell: {
-                          view: 'Expand', // todo: write special renderFunc that triggers expanding of renderItem
+                          view: 'Expand',
                           name: '{value}',
-                          // toggle extra table row expansion in default layout
-                          onClick: 'tableItemExpand', // function is injected by TableView instance on render
+                          id: 'state',
+                          // toggle extra table item expansion (row in default layout)
+                          onClick: 'handleItemExpand', // function is injected by TableView instance on render
                           // items: [{}], // can also make it expand any content inside clicked cell
                         },
                       },

@@ -152,7 +152,7 @@ export function metaToProps (meta, data) {
     // Map Value Renderer Names/Objects to Actual Render Functions
     if (key.indexOf('render') === 0) {
       if (typeof definition === 'string') meta[key] = RenderFunc(meta[key])
-      if (isObject(definition)) meta[key] = (value, index, props) => {
+      if (isObject(definition)) meta[key] = (value, index, props, self) => {
 
         // Render is a field definition
         if (definition.view) return Render({
@@ -160,6 +160,7 @@ export function metaToProps (meta, data) {
           ...definition.name && {name: interpolateString(definition.name, {index, value})},
           // for row data from parent table (in default layout)
           ...definition.filterItems && {parentItem: value},
+          ...typeof definition.onClick === 'string' && {onClick: self[definition.onClick]},
           ...props,
           data,
         })

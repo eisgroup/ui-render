@@ -44,7 +44,15 @@ export default class TableView extends Component {
     sorts: PropTypes.arrayOf(PropTypes.shape({...sortObj})),
     onSort: PropTypes.func, // receives header `id` as argument
     renderItem: PropTypes.func, // callback to render extra table rows in default layout
+    itemsExpanded: PropTypes.bool,
     // ...other Table props
+  }
+
+  state = {
+    items: {
+      expanded: this.props.itemsExpanded,
+      expandedByIndex: {},
+    },
   }
 
   // LOGIC ---------------------------------------------------------------------
@@ -104,6 +112,21 @@ export default class TableView extends Component {
     ) this.headers = null
   }
 
+  // HANDLERS ------------------------------------------------------------------
+  handleItemExpand = ({key, value, expanded}) => {
+    const {items} = this.props
+    value = String(value).toLowerCase()
+    this.setState({
+      items: {
+        ...this.state.items,
+        expandedByIndex: {
+          ...this.state.items.expandedByIndex,
+          [items.findIndex(i => String(i[key]).toLowerCase() === value)]: expanded
+        }
+      }
+    })
+  }
+
   // RENDERS -------------------------------------------------------------------
 
   renderHeader = ({id, title, children, className, style}) => {
@@ -120,12 +143,13 @@ export default class TableView extends Component {
 
   renderItem = (item, i) => {
     const {renderItem} = this.props
+    const {items: {expanded, expandedByIndex}} = this.state
     return (
       <Fragment key={i}>
         <Table.Row>
           {this.headers.map(this.renderItemData.bind(this, item, i))}
         </Table.Row>
-        {renderItem &&
+        {renderItem && (expanded || expandedByIndex[i]) &&
         <Table.Row>
           <Table.Cell colSpan={this.headers.length}>
             {renderItem(item, i)}
@@ -147,7 +171,7 @@ export default class TableView extends Component {
       <Table.Cell key={id}>
         <View className={className} style={style}>
           {render
-            ? render(value, index, {className, style})
+            ? render(value, index, {className, style}, this)
             : (typeof cell === 'object' ? cell : <Text className='p'>{cell}</Text>)
           }
         </View>
@@ -158,7 +182,7 @@ export default class TableView extends Component {
   render () {
     const headers = this.headers
     if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
-    const {sorts, onSort, items: _, headers: __, ...props} = this.props
+    const {sorts, onSort, items: _, headers: __, renderItem: ___, ...props} = this.props
     const items = this.itemsSorted
     return (
       <Table {...props}>
