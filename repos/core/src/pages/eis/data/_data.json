@@ -902,7 +902,12 @@
         "enrollmentByState": [
           {
             "state": "NV",
-            "numberOfLives": 19.0,
+            "numberOfLives": 18.0,
+            "enrolledPct": 1.0
+          },
+          {
+            "state": "WS",
+            "numberOfLives": 15.0,
             "enrolledPct": 1.0
           }
         ],
@@ -910,11 +915,29 @@
           {
             "state": "NV",
             "msa": "Space Coast",
-            "numberOfLives": 19.0,
-            "enrolledPct": 1.0,
+            "numberOfLives": 5.0,
+            "enrolledPct": 0.3,
             "ppoPenetration": 0.5860272395989157,
             "ppoAreaFactor": 0.5762102325676609,
             "indemnityAreaFactor": 0.8410340931266652
+          },
+          {
+            "state": "NV",
+            "msa": "Space Coast 2",
+            "numberOfLives": 13.0,
+            "enrolledPct": 0.7,
+            "ppoPenetration": 0.6760272395989157,
+            "ppoAreaFactor": 0.5462102325676609,
+            "indemnityAreaFactor": 0.7810340931266652
+          },
+          {
+            "state": "WS",
+            "msa": "Washington",
+            "numberOfLives": 15.0,
+            "enrolledPct": 1.0,
+            "ppoPenetration": 0.5260272395989157,
+            "ppoAreaFactor": 0.7762102325676609,
+            "indemnityAreaFactor": 0.6410340931266652
           }
         ]
       }
@@ -2045,12 +2068,7 @@
         "enrollmentByState": [
           {
             "state": "NV",
-            "numberOfLives": 18.0,
-            "enrolledPct": 1.0
-          },
-          {
-            "state": "WS",
-            "numberOfLives": 18.0,
+            "numberOfLives": 19.0,
             "enrolledPct": 1.0
           }
         ],
@@ -2058,25 +2076,7 @@
           {
             "state": "NV",
             "msa": "Space Coast",
-            "numberOfLives": 18.0,
-            "enrolledPct": 1.0,
-            "ppoPenetration": 0.5860272395989157,
-            "ppoAreaFactor": 0.5762102325676609,
-            "indemnityAreaFactor": 0.8410340931266652
-          },
-          {
-            "state": "NV",
-            "msa": "Space Coast 2",
-            "numberOfLives": 18.0,
-            "enrolledPct": 1.0,
-            "ppoPenetration": 0.5860272395989157,
-            "ppoAreaFactor": 0.5762102325676609,
-            "indemnityAreaFactor": 0.8410340931266652
-          },
-          {
-            "state": "WS",
-            "msa": "Washington",
-            "numberOfLives": 18.0,
+            "numberOfLives": 19.0,
             "enrolledPct": 1.0,
             "ppoPenetration": 0.5860272395989157,
             "ppoAreaFactor": 0.5762102325676609,

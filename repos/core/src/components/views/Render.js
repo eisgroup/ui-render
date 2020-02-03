@@ -66,7 +66,18 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
       return <Row {...props}>{items.map(Render)}</Row>
 
     case FIELD.TYPE.TABLE:
-      const {extraItems, ...more} = props
+      const {extraItems, filterItems, parentItem, ...more} = props
+      if (filterItems && parentItem) {
+        data = data.filter(item => {
+          return !filterItems.find(filter => {
+            for (const key in filter) {
+              // If mismatch in value found, filter out given item
+              if (get(item, key) !== get(parentItem, filter[key])) return true
+            }
+            return false
+          })
+        })
+      }
       if (extraItems) data = data.concat(extraItems.map(item => {
         for (const key in item) {
           const definition = item[key]
@@ -147,6 +158,8 @@ export function metaToProps (meta, data) {
         if (definition.view) return Render({
           ...definition,
           ...definition.name && {name: interpolateString(definition.name, {index, value})},
+          // for row data from parent table (in default layout)
+          ...definition.filterItems && {parentItem: value},
           ...props,
           data,
         })
@@ -167,10 +180,9 @@ export function metaToProps (meta, data) {
       }
     }
 
-    // Map `onClick` functions by name
+    // Map `onClick` functions by name (if exists)
     if (typeof definition.onClick === 'string') {
-      const funcName = definition.onClick
-      definition.onClick = (...args) => FIELD.FUNC[funcName](...args)
+      definition.onClick = FIELD.FUNC[definition.onClick] || definition.onClick
     }
   }
   return meta

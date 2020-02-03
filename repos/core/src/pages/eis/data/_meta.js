@@ -120,7 +120,7 @@ export default {
         ]
       },
       className: 'border-gradient-h-right',
-      // expanded: true,
+      expanded: true,
       items: [
         {
           view: 'Tabs',
@@ -183,27 +183,27 @@ export default {
                   {
                     view: 'Table',
                     name: 'planCalculations[0].manualClaimDetail.enrollmentByState',
+                    // Extra render function for Table Items (rows in default layout)
+                    renderItem: {
+                      view: 'Table',
+                      name: 'planCalculations[0].manualClaimDetail.enrollmentByMSA',
+                      filterItems: [
+                        //  ╭ key path to value in this child-table's item to use for filtering
+                        {'state': 'state'}
+                        //           ╰ key path to value from parent-table's item to match against
+                      ],
+                    },
                     headers: [
                       {
                         id: 'state',
-                        // Custom render function for Table Rows in default layout
-                        renderItem: {
-                          view: 'Table',
-                          name: 'planCalculations[0].manualClaimDetail.enrollmentByMSA',
-                          filterItems: [
-                            //  ╭ key path to value in this child-table's item to use for filtering
-                            {'state': 'state'}
-                            //           ╰ key path to value from parent-table's item to match against
-                          ]
-                        },
                         // Custom render function for Table Cells (columns in default layout)
                         renderCell: {
                           view: 'Expand', // todo: write special renderFunc that triggers expanding of renderItem
                           name: '{value}',
-                          items: [
-                            {}
-                          ]
-                        }
+                          // toggle extra table row expansion in default layout
+                          onClick: 'tableItemExpand', // function is injected by TableView instance on render
+                          // items: [{}], // can also make it expand any content inside clicked cell
+                        },
                       },
                       {
                         id: 'numberOfLives',

@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { by, hasListValue, isEqual, isEqualList, isFunction } from '../common/utils'
 import Placeholder from './Placeholder'
 import { renderSort } from './renders'
@@ -43,6 +43,7 @@ export default class TableView extends Component {
     ),
     sorts: PropTypes.arrayOf(PropTypes.shape({...sortObj})),
     onSort: PropTypes.func, // receives header `id` as argument
+    renderItem: PropTypes.func, // callback to render extra table rows in default layout
     // ...other Table props
   }
 
@@ -118,10 +119,20 @@ export default class TableView extends Component {
   }
 
   renderItem = (item, i) => {
+    const {renderItem} = this.props
     return (
-      <Table.Row key={i}>
-        {this.headers.map(this.renderItemData.bind(this, item, i))}
-      </Table.Row>
+      <Fragment key={i}>
+        <Table.Row>
+          {this.headers.map(this.renderItemData.bind(this, item, i))}
+        </Table.Row>
+        {renderItem &&
+        <Table.Row>
+          <Table.Cell colSpan={this.headers.length}>
+            {renderItem(item, i)}
+          </Table.Cell>
+        </Table.Row>
+        }
+      </Fragment>
     )
   }
 
