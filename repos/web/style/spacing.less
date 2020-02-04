@@ -1,16 +1,19 @@
 @import "_mixins";
 
 .space {
+  .object(inline-flex);
   // block used for spacing
   .square(@padding-base);
 }
 
 .space-small {
+  &:extend(.space all);
   .square(@padding-small);
 }
 
 .space-large {
-  .square(@padding-large);
+  &:extend(.space all);
+  .square(@padding-largest);
 }
 
 .padding {
@@ -143,6 +146,10 @@
 
 .padding-h-larger {
   .padding-h(@padding-larger);
+}
+
+.padding-h-largest {
+  .padding-h(@padding-largest);
 }
 
 .padding-v-large {
