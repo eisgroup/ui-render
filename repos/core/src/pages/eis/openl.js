@@ -27,18 +27,15 @@ const mapStateToProps = (state) => ({
 @withForm({form: 'TEST', enableReinitialize: true})
 @logRender
 export default class OpenL extends Component {
-  static defaultProps = {
-    data,
-    meta: metaToProps(meta, data),
-  }
-
-  componentDidMount () {
-    FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm
-  }
-
   resetForm = () => {
     const {dispatch, form} = this.props
     dispatch(reset(form))
+  }
+
+  state = {
+    reset: (FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm), // must be declared before using `metaToProps`
+    data,
+    meta: metaToProps(meta, data),
   }
 
   /**
@@ -51,7 +48,7 @@ export default class OpenL extends Component {
   handleSubmit = this.props.handleSubmit(this.submit)
 
   render () {
-    const {data, meta} = this.props
+    const {data, meta} = this.state
     console.warn('meta', meta)
     return (
       <>

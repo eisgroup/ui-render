@@ -144,6 +144,12 @@ export function metaToProps (meta, data) {
     const definition = meta[key]
     if (!definition) continue
 
+    // Map `onClick` functions by name (if exists)
+    // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
+    if (typeof definition.onClick === 'string') {
+      definition.onClick = FIELD.FUNC[definition.onClick] || definition.onClick
+    }
+
     // Map Value Renderer Names/Objects to Actual Render Functions
     if (key.indexOf('render') === 0) {
       if (typeof definition === 'string') meta[key] = RenderFunc(meta[key])
@@ -155,7 +161,8 @@ export function metaToProps (meta, data) {
           ...definition.name && {name: interpolateString(definition.name, {index, value})},
           // Filter for row data from parent table (in default layout)
           ...definition.filterItems && {parentItem: value},
-          ...typeof definition.onClick === 'string' && {onClick: self[definition.onClick]},
+          ...typeof definition.onClick === 'string' && self && !FIELD.FUNC[definition.onClick] &&
+          {onClick: self[definition.onClick]},
           // Recursively map definitions within Render function
           ...definition.items && {items: metaToProps(definition.items, data)},
           ...props,
@@ -179,11 +186,6 @@ export function metaToProps (meta, data) {
         // Recursively process the rest of definitions
         meta[key] = metaToProps(meta[key], data)
       }
-    }
-
-    // Map `onClick` functions by name (if exists)
-    if (typeof definition.onClick === 'string') {
-      definition.onClick = FIELD.FUNC[definition.onClick] || definition.onClick
     }
   }
   return meta
