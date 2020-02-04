@@ -114,8 +114,9 @@ export default {
           },
           {
             view: 'Dropdown',
-            name: 'planCalculations.0.planName',
-            options: ['ALACARTE', 'ASO', 'GOLD'],
+            name: 'plan',
+            options: {name: 'planCalculations'},
+            mapOptions: 'planName',
           }
         ]
       },
@@ -151,6 +152,7 @@ export default {
                             name: 'planCalculations[0].manualClaimDetail.ageBreakdown',
                             legends: true,
                             mapItems: {
+                              //         ╭ key path to value within items found for given `name` attribute above
                               label: 'ageBand',
                               value: 'numberOfLives',
                             }

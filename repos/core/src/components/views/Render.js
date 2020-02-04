@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { get, interpolateString, isNumeric, isObject, toPercent } from '../../common/utils'
+import { get, interpolateString, isList, isNumeric, isObject, toPercent } from '../../common/utils'
 import { ACTIVE, FIELD } from '../../common/variables'
 import Button from '../Button'
 import PieChart from '../charts/PieChart'
@@ -51,15 +51,7 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
 
     case FIELD.TYPE.PIE_CHART:
       const {mapItems, ...prop} = props
-      if (mapItems) {
-        data = data.map(item => {
-          const result = {}
-          for (const key in mapItems) {
-            result[key] = item[mapItems[key]]
-          }
-          return result
-        })
-      }
+      if (mapItems) data = mapProps(data, mapItems)
       return <PieChart items={data} {...prop}/>
 
     case FIELD.TYPE.ROW:
@@ -112,7 +104,9 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
       return <Text {...props} className={classNames('h3', props.className)}/>
 
     default:
-      return ACTIVE.renderField({view, items, ...props})
+      const {mapOptions, ...rest} = props
+      if (mapOptions) rest.options = mapProps(props.options || [], mapOptions)
+      return ACTIVE.renderField({view, items, ...rest})
   }
 }
 
@@ -148,6 +142,7 @@ export function RenderFunc (Name) {
 export function metaToProps (meta, data) {
   for (const key in meta) {
     const definition = meta[key]
+    if (!definition) continue
 
     // Map Value Renderer Names/Objects to Actual Render Functions
     if (key.indexOf('render') === 0) {
@@ -158,9 +153,11 @@ export function metaToProps (meta, data) {
         if (definition.view) return Render({
           ...definition,
           ...definition.name && {name: interpolateString(definition.name, {index, value})},
-          // for row data from parent table (in default layout)
+          // Filter for row data from parent table (in default layout)
           ...definition.filterItems && {parentItem: value},
           ...typeof definition.onClick === 'string' && {onClick: self[definition.onClick]},
+          // Recursively map definitions within Render function
+          ...definition.items && {items: metaToProps(definition.items, data)},
           ...props,
           data,
         })
@@ -171,7 +168,10 @@ export function metaToProps (meta, data) {
           ? Render({...valueProps, ...props, data})
           : RenderFunc(valueProps).apply(this, [value, index, {...props, data}])
       }
-    } else if (typeof definition === 'object') {
+    }
+
+    // Process Object definitions
+    else if (isObject(definition) || isList(definition)) {
       if ((definition.name && Object.keys(definition).length === 1)) {
         // Transform {name} - single key objects with name to their values
         meta[key] = get(data, definition.name)
@@ -187,4 +187,22 @@ export function metaToProps (meta, data) {
     }
   }
   return meta
+}
+
+/**
+ * Map Data by given Mapper definition
+ *
+ * @param {Array} data - to map
+ * @param {Object|String} mapper - object of key / value pairs (value being key path from `data`), or key path string
+ * @returns {Array} list - mapped from given data
+ */
+function mapProps (data, mapper) {
+  const mapData = typeof mapper === 'string' ? (item) => get(item, mapper) : (item) => {
+    const result = {}
+    for (const key in mapper) {
+      result[key] = get(item, mapper[key])
+    }
+    return result
+  }
+  return data.map(mapData)
 }
