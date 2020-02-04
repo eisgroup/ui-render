@@ -1,10 +1,11 @@
 /**
  * @Summary of strategies used:
- *    1. Recursive Field definitions
- *    2. Mapping functions by name
- *    3. Custom rendering by matching values
- *    4. Data mapping by keys
- *    5. Dynamic definitions using string interpolation
+ *    1. Recursive Field definitions (i.e. objects with `view` attribute can have nested `items`)
+ *    2. Function definitions by name (i.e. attribute keys starting with the word `render`, `normalize`, `validate`)
+ *    3. Custom rendering by matching values (i.e. `renderCell` in Table)
+ *    4. Data mapping by keys (i.e. `mapItems`, `mapOptions`)
+ *    5. Dynamic definitions using string interpolation (i.e. `name: "{value}"` in Table)
+ *    6. Value transform for objects with a single attribute `name` as key path
  */
 const field = {
   // Meta data
