@@ -150,18 +150,29 @@ export function isPhoneNumber (string) {
 
 /**
  * Interpolate a Template String with given Variables
+ * @example:
+ *    interpolateString('key.{id}.name', {id: 'user'})
+ *    >>> 'key.user.name'
+ *
+ *    interpolateString('key.{$id}.name', {$id: 'user'}, {formatKey: '$key'})
+ *    >>> 'key.user.name'
  *
  * @param {String} string - template with '{placeholders}' to interpolate
  * @param {Object} variables - object containing keys matching the names of placeholders to interpolate
- * @param {String} [formatKey] - placeholder key format to match in given 'variables' (e.g. format = '{key}')
+ * @param {String} [formatKey] - placeholder key format to match in given 'variables' (e.g. format = '$key')
  * @param {String} [name] - function name to use in case error is thrown
+ * @param {Boolean} [suppressError] - whether to ignore error when replacement string not found, and leave as is
  * @return {String} output - with interpolated variables
  */
-export function interpolateString (string, variables = {}, { formatKey, name } = {}) {
-  return string.replace(/{(\w+)}/g, (_, key) => {
+export function interpolateString (string, variables = {}, {formatKey, name, suppressError} = {}) {
+  return string.replace(/{(\w+)}/g, (_, match) => {
+    let key = match
     if (formatKey) key = formatKey.replace('key', key)
     if (variables[key] === undefined) {
-      throw new Error(`${name || interpolateString.name + '()'} expects variable '${key}', got '${variables[key]}'`)
+      if (!suppressError) {
+        throw new Error(`${name || interpolateString.name + '()'} expects variable '${key}', got '${variables[key]}'`)
+      }
+      return `{${match}}`
     }
     return variables[key]
   })

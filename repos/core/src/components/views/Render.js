@@ -137,18 +137,17 @@ export function RenderFunc (Name) {
  *
  * @param {Object} meta - json
  * @param {Object} data - json
+ * @param {Class} instance - of React Component class that is rendering the data, for mapping dynamic states
  * @returns {Object} props
  */
-export function metaToProps (meta, data) {
+export function metaToProps (meta, data, instance) {
   for (const key in meta) {
     const definition = meta[key]
     if (!definition) continue
 
     // Map `onClick` functions by name (if exists)
     // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
-    if (typeof definition.onClick === 'string') {
-      definition.onClick = FIELD.FUNC[definition.onClick] || definition.onClick
-    }
+    if (typeof definition.onClick === 'string') definition.onClick = FIELD.FUNC[definition.onClick] || definition.onClick
 
     // Map Value Renderer Names/Objects to Actual Render Functions
     if (key.indexOf('render') === 0) {
