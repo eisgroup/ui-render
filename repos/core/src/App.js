@@ -43,7 +43,7 @@ export default class App extends Component {
     const {
       onModalClose = get(this, 'props.history.goBack') || (() => log('modal close')),
       canCloseModal = true,
-      className
+      classNameModal
     } = get(this, 'props.location.state', {})
     // Modal.setAppElement('#root')  // hide content behind modal from screen readers
     return (
@@ -51,7 +51,7 @@ export default class App extends Component {
         isOpen
         canClose={canCloseModal}
         onClose={onModalClose}
-        className={className}
+        className={classNameModal}
       >{this.props.children}</Modal>
     )
   }
@@ -77,7 +77,7 @@ export default class App extends Component {
     // @example:
     //  @option 1:
     //    import { Link } from 'react-router';
-    //    <Link to={{ pathname: '/login', state: { isModal: true, modalContentClass: 'some-class' } }}>
+    //    <Link to={{ pathname: '/login', state: { isModal: true, classNameModal: 'bg-transparent' } }}>
     //
     //  @option 2:
     //    import history from './history';
