@@ -114,9 +114,13 @@ export default {
           },
           {
             view: 'Dropdown',
-            name: 'plan',
-            options: {name: 'planCalculations'},
-            mapOptions: 'planName',
+            name: 'plan', // `plan` must be unique key path identifier that does not exist in *_data.json
+            value: {name: '{state.active.plan,0}'},
+            options: {name: 'planCalculations'}, // `planCalculations` is key path pointing to array in *_data.json
+            mapOptions: {
+              text: 'planName', // `planName` is key path pointing to value for each item in `options` above
+              value: '{index}', // using index of item, instead of its value as ID
+            },
           }
         ]
       },
@@ -149,7 +153,7 @@ export default {
                           },
                           {
                             view: 'PieChart',
-                            name: 'planCalculations[0].manualClaimDetail.ageBreakdown',
+                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.ageBreakdown',
                             legends: true,
                             mapItems: {
                               //         ╭ key path to value within items found for given `name` attribute above
@@ -170,7 +174,7 @@ export default {
                           },
                           {
                             view: 'PieChart',
-                            name: 'planCalculations[0].subGroupEnrollmentBreakdown[0].enrollmentBreakdown',
+                            name: 'planCalculations.{state.active.plan,0}.subGroupEnrollmentBreakdown[0].enrollmentBreakdown',
                             legends: true,
                             mapItems: {
                               label: 'tier',
@@ -184,11 +188,11 @@ export default {
                   {view: 'Title', children: 'Enrolled by State', className: 'margin-top-largest'},
                   {
                     view: 'Table',
-                    name: 'planCalculations[0].manualClaimDetail.enrollmentByState',
+                    name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.enrollmentByState',
                     // Extra render function for Table Items (rows in default layout)
                     renderItem: {
                       view: 'Table',
-                      name: 'planCalculations[0].manualClaimDetail.enrollmentByMSA',
+                      name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.enrollmentByMSA',
                       filterItems: [
                         //  ╭ key path to value in this child-table's item to use for filtering
                         {'state': 'state'},
@@ -245,7 +249,7 @@ export default {
                                 items: [
                                   {
                                     view: 'Counter',
-                                    end: {name: 'planCalculations[0].manualClaimDetail.networkDetails[0].ppoPenetration'},
+                                    end: {name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].ppoPenetration'},
                                     render: 'Percent'
                                   },
                                 ]
@@ -267,7 +271,7 @@ export default {
                                 items: [
                                   {
                                     view: 'Counter',
-                                    end: {name: 'planCalculations[0].manualClaimDetail.networkDetails[0].netUtilization'},
+                                    end: {name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].netUtilization'},
                                     render: 'Percent'
                                   },
                                 ]
@@ -292,22 +296,22 @@ export default {
                             items: [
                               {
                                 view: 'Input',
-                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].area',
+                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].area',
                                 label: 'Area',
                               },
                               {
                                 view: 'Input',
-                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].trend',
+                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].trend',
                                 label: 'trend',
                               },
                               {
                                 view: 'Input',
-                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumEEandSP',
+                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].maximumEEandSP',
                                 label: 'maximum (EE and SP)',
                               },
                               {
                                 view: 'Input',
-                                name: 'planCalculations[0].manualClaimDetail.networkDetails[0].maximumCH',
+                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].maximumCH',
                                 label: 'maximum (CH)',
                               },
                             ],
@@ -322,12 +326,12 @@ export default {
                                 items: [
                                   {
                                     view: 'Input',
-                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].rateCalcEmp',
+                                    name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].rateCalcEmp',
                                     label: 'Areas',
                                   },
                                   {
                                     view: 'Input',
-                                    name: 'planCalculations[0].manualClaimDetail.networkDetails[0].rateCalcWOEmp',
+                                    name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].rateCalcWOEmp',
                                     label: 'trends',
                                   },
                                 ],
@@ -349,53 +353,53 @@ export default {
                         items: [
                           {
                             view: 'Input',
-                            name: 'planCalculations[0].manualClaimDetail.initialLoad',
+                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.initialLoad',
                             label: 'Initial Load',
                           },
                           {
                             view: 'Input',
-                            name: 'planCalculations[0].manualClaimDetail.occupationFactor',
+                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.occupationFactor',
                             label: 'Occupation',
                           },
                           {
                             view: 'Input',
-                            name: 'planCalculations[0].manualClaimDetail.occupation',
+                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.occupation',
                             label: 'Occupation Code',
                             readonly: true,
                           },
                           {
                             view: 'Input',
-                            name: 'planCalculations[0].manualClaimDetail.waitGroupSize',
+                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.waitGroupSize',
                             label: 'Wait Grp Size',
                           },
                           {
                             view: 'Input',
-                            name: 'planCalculations[0].manualClaimDetail.planUtilization',
+                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.planUtilization',
                             label: 'Plan Util',
                           },
                           {
                             view: 'Input',
-                            name: 'planCalculations[0].manualClaimDetail.groupSize',
+                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.groupSize',
                             label: 'Group Size',
                           },
                           {
                             view: 'Input',
-                            name: 'planCalculations[0].manualClaimDetail.yearLoad',
+                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.yearLoad',
                             label: 'Cal Year Load',
                           },
                           {
                             view: 'Input',
-                            name: 'planCalculations[0].manualClaimDetail.voluntaryLoad',
+                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.voluntaryLoad',
                             label: 'Vol Load',
                           },
                           {
                             view: 'Input',
-                            name: 'planCalculations[0].manualClaimDetail.waitingLoad',
+                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.waitingLoad',
                             label: 'Wait Load',
                           },
                           {
                             view: 'Input',
-                            name: 'planCalculations[0].manualClaimDetail.rolloverLoad',
+                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.rolloverLoad',
                             label: 'Rollover Load',
                           },
                         ],
@@ -469,20 +473,20 @@ export default {
                     extraItems: [
                       {
                         tier: 'Composite Rate',
-                        adjManualRate: {name: 'planCalculations[0].adjManualCompositeRate'}, // null
-                        adjFormulaRate: {name: 'planCalculations[0].adjFormulaCompositeRate'}, // undefined
+                        adjManualRate: {name: 'planCalculations.{state.active.plan,0}.adjManualCompositeRate'}, // null
+                        adjFormulaRate: {name: 'planCalculations.{state.active.plan,0}.adjFormulaCompositeRate'}, // undefined
                         manualRate: {
-                          name: 'planCalculations[0].manualCompositeRate',
+                          name: 'planCalculations.{state.active.plan,0}.manualCompositeRate',
                           render: 'Currency',
                         },
                         formulaRate: {
                           view: 'Input',
-                          name: 'planCalculations[0].formulaCompositeRate',
+                          name: 'planCalculations.{state.active.plan,0}.formulaCompositeRate',
                           type: 'number',
                           unit: 'USD',
                           placeholder: 'placeholder'
                         },
-                        proposedRate: {name: 'planCalculations[0].proposedCompositeRate'},
+                        proposedRate: {name: 'planCalculations.{state.active.plan,0}.proposedCompositeRate'},
                       }
                     ],
                   },

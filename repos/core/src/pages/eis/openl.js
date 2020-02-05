@@ -35,7 +35,9 @@ export default class OpenL extends Component {
   state = {
     reset: (FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm), // must be declared before using `metaToProps`
     data,
-    meta: metaToProps(meta, data),
+    active: {
+      plan: 1,
+    },
   }
 
   /**
@@ -48,13 +50,14 @@ export default class OpenL extends Component {
   handleSubmit = this.props.handleSubmit(this.submit)
 
   render () {
-    const {data, meta} = this.state
-    console.warn('meta', meta)
+    const {data} = this.state
+    const props = metaToProps(meta, data, this)
+    console.warn('props', props)
     return (
       <>
         <ScrollView fill className='fade-in bg-texture'>
           <form onSubmit={this.handleSubmit}>
-            <Render data={data} {...meta}/>
+            <Render data={data} {...props}/>
           </form>
         </ScrollView>
 

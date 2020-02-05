@@ -76,7 +76,7 @@ export class DropdownField extends Component {
     return (
       <DropDown
         {...input}
-        value={input.value || (props.multiple ? [] : '')}
+        value={input.value === '' ? (props.multiple ? [] : '') : input.value}
         onBlur={() => input.onBlur()} // prevent value change, but need onBlur to set touched for validation
         onChange={value => {
           input.onChange(value)

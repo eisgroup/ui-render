@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { get, interpolateString, isList, isNumeric, isObject, toPercent } from '../../common/utils'
+import { get, interpolateString, isList, isNumeric, isObject, isString, toPercent } from '../../common/utils'
 import { ACTIVE, FIELD } from '../../common/variables'
 import Button from '../Button'
 import PieChart from '../charts/PieChart'
@@ -137,7 +137,7 @@ export function RenderFunc (Name) {
  *
  * @param {Object} meta - json
  * @param {Object} data - json
- * @param {Class} instance - of React Component class that is rendering the data, for mapping dynamic states
+ * @param {Object} instance - of React Component class that is rendering the data, for mapping dynamic states
  * @returns {Object} props
  */
 export function metaToProps (meta, data, instance) {
@@ -148,6 +148,7 @@ export function metaToProps (meta, data, instance) {
     // Map `onClick` functions by name (if exists)
     // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
     if (typeof definition.onClick === 'string') definition.onClick = FIELD.FUNC[definition.onClick] || definition.onClick
+    if (definition.name) definition.name = interpolateString(definition.name, instance, {suppressError: true})
 
     // Map Value Renderer Names/Objects to Actual Render Functions
     if (key.indexOf('render') === 0) {
@@ -163,7 +164,7 @@ export function metaToProps (meta, data, instance) {
           ...typeof definition.onClick === 'string' && self && !FIELD.FUNC[definition.onClick] &&
           {onClick: self[definition.onClick]},
           // Recursively map definitions within Render function
-          ...definition.items && {items: metaToProps(definition.items, data)},
+          ...definition.items && {items: metaToProps(definition.items, data, instance)},
           ...props,
           data,
         })
@@ -178,12 +179,12 @@ export function metaToProps (meta, data, instance) {
 
     // Process Object definitions
     else if (isObject(definition) || isList(definition)) {
-      if ((definition.name && Object.keys(definition).length === 1)) {
+      if ((definition.name != null && Object.keys(definition).length === 1)) {
         // Transform {name} - single key objects with name to their values
-        meta[key] = get(data, definition.name)
+        meta[key] = isString(definition.name) ? get(data, definition.name, definition.name) : definition.name
       } else {
         // Recursively process the rest of definitions
-        meta[key] = metaToProps(meta[key], data)
+        meta[key] = metaToProps(meta[key], data, instance)
       }
     }
   }
@@ -198,10 +199,11 @@ export function metaToProps (meta, data, instance) {
  * @returns {Array} list - mapped from given data
  */
 function mapProps (data, mapper) {
-  const mapData = typeof mapper === 'string' ? (item) => get(item, mapper) : (item) => {
+  const mapData = typeof mapper === 'string' ? (item) => get(item, mapper) : (item, index) => {
     const result = {}
     for (const key in mapper) {
-      result[key] = get(item, mapper[key])
+      // `index` must be converted to string to match fallback value defined in config (which can only be string)
+      result[key] = mapper[key] === '{index}' ? String(index) : get(item, mapper[key])
     }
     return result
   }

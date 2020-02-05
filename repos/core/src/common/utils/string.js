@@ -149,6 +149,15 @@ export function isPhoneNumber (string) {
 }
 
 /**
+ * Check if given value is a String
+ * @param {*} value - to check
+ * @returns {Boolean} true - if it's a string
+ */
+export function isString (value) {
+  return typeof value === 'string'
+}
+
+/**
  * Interpolate a Template String with given Variables
  * @example:
  *    interpolateString('key.{id}.name', {id: 'user'})
