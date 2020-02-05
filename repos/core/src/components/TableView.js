@@ -66,10 +66,6 @@ export default class TableView extends Component {
     return (this._headers = Object.keys(item).map(id => ({id})))
   }
 
-  set headers (val) {
-    return (this._headers = val)
-  }
-
   get itemsSorted () {
     if (this._itemsSorted) return this._itemsSorted
     const {items, sorts} = this.props
@@ -89,19 +85,18 @@ export default class TableView extends Component {
     return this._itemsSorted
   }
 
-  set itemsSorted (val) {
-    return (this._itemsSorted = val)
-  }
-
   UNSAFE_componentWillReceiveProps (next) {
     const {items, sorts} = this.props
 
-    // Reset sorting if items changed
-    if (sorts && (!isEqual(next.sorts, sorts) || !isEqualList(next.items, items))) {
+    // Reset if items or sorting if items changed
+    if (
+      !isEqualList(next.items, items) ||
+      (sorts && !isEqual(next.sorts, sorts))
+    ) {
       console.warn('not equal!!!')
       console.warn('isEqual sorts', isEqual(next.sorts, sorts))
       console.warn('isEqual items', isEqualList(next.items, items))
-      this.itemsSorted = null
+      this._itemsSorted = null
     }
 
     // Reset Header definitions if not defined and item structure changed
@@ -109,7 +104,7 @@ export default class TableView extends Component {
       !next.headers &&
       next.items.length &&
       !isEqual(Object.keys(next.items[0] || {}), Object.keys(items[0] || {}))
-    ) this.headers = null
+    ) this._headers = null
   }
 
   // HANDLERS ------------------------------------------------------------------
