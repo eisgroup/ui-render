@@ -111,25 +111,40 @@ describe(`${getParamByKey.name}() works`, () => {
   })
 })
 
-describe(`${interpolateString.name} works as expected, and throws error if missing variables`, () => {
+describe(`${interpolateString.name}()`, () => {
   const template = 'Hidden {SECRET} {SER_VICE}'
 
-  it(`${interpolateString.name}() replaces template placeholders for given variables`, () => {
-    let template = 'Hidden {SECRET} {SER_VICE}'
+  it(`replaces template placeholders with given variables`, () => {
     expect(interpolateString(template, {SECRET: 'Pure', SER_VICE: 'Heart'})).toEqual('Hidden Pure Heart')
-    expect(interpolateString(template, {'{SECRET}': 'Pure', '{SER_VICE}': 'Heart'}, {formatKey: '{key}'}))
-      .toEqual('Hidden Pure Heart')
-    template = 'Hidden {{SECRET} {SER_VICE}}'
+  })
+
+  it(`replaces template variables without affecting '{' and '}' characters`, () => {
+    let template = 'Hidden {{SECRET} {SER_VICE}}'
     expect(interpolateString(template, {SECRET: 'Pure', SER_VICE: 'Heart'})).toEqual('Hidden {Pure Heart}')
     template = 'Hidden {SECRET} {SER_VICE} {}'
     expect(interpolateString(template, {SECRET: 'Pure', SER_VICE: 'Heart'})).toEqual('Hidden Pure Heart {}')
   })
 
-  it(`${interpolateString.name}() throws error for missing variables`, () => {
+  it(`replaces template variables using special key format`, () => {
+    expect(interpolateString(template, {'{SECRET}': 'Pure', '{SER_VICE}': 'Heart'}, {formatKey: '{key}'}))
+      .toEqual('Hidden Pure Heart')
+  })
+
+  it(`replaces variables with key path`, () => {
+    const template = 'Hidden {state.user.id}'
+    expect(interpolateString(template, {state: {user: {id: 'Within'}}})).toEqual('Hidden Within')
+  })
+
+  it(`replaces variables with fallback value when not found`, () => {
+    const template = 'Hidden {state.user.id,0}'
+    expect(interpolateString(template, {})).toEqual('Hidden 0')
+  })
+
+  it(`throws error for missing variables`, () => {
     expect(() => interpolateString(template, {SECRET: 'Pure', SERVICE: 'Heart'})).toThrow(/'SER_VICE'/)
   })
 
-  it(`${interpolateString.name}() leaves string as is for missing variables when error is suppressed`, () => {
+  it(`leaves string as is for missing variables when error is suppressed`, () => {
     const template = 'Hidden {$SECRET} {SER_VICE}'
     expect(interpolateString(template, {}, {suppressError: true})).toEqual(template)
   })
