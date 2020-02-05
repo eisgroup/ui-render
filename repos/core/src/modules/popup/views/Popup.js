@@ -77,7 +77,7 @@ export default class Popup extends Component {
             }
             {hasConfirm &&
             <View>
-              {confirm.items.map(({id, title, content, confirmLabel, confirmClass = 'basic primary', action}, index) => (
+              {confirm.items.map(({id, title, content, cancelLabel, confirmLabel, confirmClass = 'basic primary', action}, index) => (
                 <Fragment key={id || index}>
                   <View>
                     <View className='app__popup__box__header'>
@@ -86,11 +86,12 @@ export default class Popup extends Component {
                     <Text className='app__popup__box__body p'>{content}</Text>
                   </View>
                   <Row className='app__popup__box__footer center'>
-                    <Button onClick={closeConfirm} className='basic grey margin-smaller'>Cancel</Button>
+                    <Button onClick={closeConfirm}
+                            className='basic grey margin-smaller'>{cancelLabel || 'No'}</Button>
                     <Button onClick={() => {
                       closeConfirm()
                       action(id)
-                    }} className={'margin-smaller ' + confirmClass}>{confirmLabel || 'Confirm'}</Button>
+                    }} className={'margin-smaller ' + confirmClass}>{confirmLabel || 'Yes'}</Button>
                   </Row>
                 </Fragment>
               ))}
