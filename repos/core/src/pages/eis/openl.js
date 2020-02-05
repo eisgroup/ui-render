@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from '../../common/redux'
-import { logRender, warn } from '../../common/utils'
+import { cloneDeep, logRender, set, warn } from '../../common/utils'
 import { FIELD } from '../../common/variables'
 import ScrollView from '../../components/ScrollView'
 import Render, { metaToProps } from '../../components/views/Render'
@@ -32,11 +32,16 @@ export default class OpenL extends Component {
     dispatch(reset(form))
   }
 
+  setStates = (keyPath, value) => {
+    this.setState(set(this.state, keyPath, value))
+  }
+
   state = {
     reset: (FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm), // must be declared before using `metaToProps`
+    setState: (FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates), // must be declared before using `metaToProps`
     data,
     active: {
-      plan: 1,
+      // plan: 1,
     },
   }
 
@@ -51,7 +56,7 @@ export default class OpenL extends Component {
 
   render () {
     const {data} = this.state
-    const props = metaToProps(meta, data, this)
+    const props = metaToProps(cloneDeep(meta), data, this)
     console.warn('props', props)
     return (
       <>

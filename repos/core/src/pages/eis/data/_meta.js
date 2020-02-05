@@ -116,6 +116,7 @@ export default {
             view: 'Dropdown',
             name: 'plan', // `plan` must be unique key path identifier that does not exist in *_data.json
             value: {name: '{state.active.plan,0}'},
+            onChange: 'setState,active.plan',
             options: {name: 'planCalculations'}, // `planCalculations` is key path pointing to array in *_data.json
             mapOptions: {
               text: 'planName', // `planName` is key path pointing to value for each item in `options` above

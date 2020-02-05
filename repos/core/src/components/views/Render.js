@@ -133,12 +133,12 @@ export function RenderFunc (Name) {
 }
 
 /**
- * Map meta.json declarations to props ready for rendering
+ * Map meta.json declarations to props ready for rendering (by mutation)
  *
  * @param {Object} meta - json
  * @param {Object} data - json
  * @param {Object} instance - of React Component class that is rendering the data, for mapping dynamic states
- * @returns {Object} props
+ * @returns {Object} props - mutated meta
  */
 export function metaToProps (meta, data, instance) {
   for (const key in meta) {
@@ -147,8 +147,10 @@ export function metaToProps (meta, data, instance) {
 
     // Map `onClick` functions by name (if exists)
     // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
-    if (typeof definition.onClick === 'string') definition.onClick = FIELD.FUNC[definition.onClick] || definition.onClick
-    if (definition.name) definition.name = interpolateString(definition.name, instance, {suppressError: true})
+    if (isObject(definition)) {
+      metaToFunctions(definition)
+      if (definition.name) definition.name = interpolateString(definition.name, instance, {suppressError: true})
+    }
 
     // Map Value Renderer Names/Objects to Actual Render Functions
     if (key.indexOf('render') === 0) {
@@ -161,7 +163,7 @@ export function metaToProps (meta, data, instance) {
           ...definition.name && {name: interpolateString(definition.name, {index, value})},
           // Filter for row data from parent table (in default layout)
           ...definition.filterItems && {parentItem: value},
-          ...typeof definition.onClick === 'string' && self && !FIELD.FUNC[definition.onClick] &&
+          ...isString(definition.onClick) && self && !getFunctionFromConfig(definition.onClick, null) &&
           {onClick: self[definition.onClick]},
           // Recursively map definitions within Render function
           ...definition.items && {items: metaToProps(definition.items, data, instance)},
@@ -208,4 +210,33 @@ function mapProps (data, mapper) {
     return result
   }
   return data.map(mapData)
+}
+
+/**
+ * Get Function from Definition String
+ * @example:
+ *    getFunctionFromConfig('reset,0')
+ *    >>> function reset().bind(this, '0')
+ *
+ * @param {String} string - name of function to get, with optional arguments, separated by comma
+ * @param {*} [fallback] - value to use when function not found, defaults to given `string`
+ * @returns {any}
+ */
+function getFunctionFromConfig (string, fallback = string) {
+  const [name, ...args] = string.split(',')
+  const func = FIELD.FUNC[name]
+  return ((args.length && func) ? func.bind(this, ...args) : func) || fallback
+}
+
+/**
+ * Transform Definition Functions if they exists
+ *
+ * @param {Object} definition - containing function names
+ * @param {Array} [funcNames] - list of definitions keys to check for function transform
+ * @returns {Object} definition - with names replaced by functions (by mutation)
+ */
+function metaToFunctions (definition, funcNames = ['onClick', 'onChange']) {
+  funcNames.forEach(name => {
+    if (isString(definition[name])) definition[name] = getFunctionFromConfig(definition[name])
+  })
 }
