@@ -1,10 +1,10 @@
 /**
  * @Summary of strategies used:
  *    1. Recursive Field definitions (i.e. objects with `view` attribute can have nested `items`)
- *        - Field can by any vew rendering component or input
+ *        - Field can by any view rendering component or input
  *
  *    2. Function definitions by name (i.e. attributes starting with the word `render`, etc.)
- *        - Optional arguments can be defined, separated by comma (i.e. `"setState,plan"` -> use "plan" as argument)
+ *        - Arguments can be defined, separated by comma (i.e. `"setState,plan"` -> use "plan" as argument)
  *
  *    3. Custom rendering by matching values (i.e. `renderCell: { values: {...} }` in Table)
  *        - Default function can be defined when no value matches (i.e. `renderCell: { default: "Currency" }`)
@@ -12,11 +12,11 @@
  *    4. Data mapping by key paths (i.e. `mapItems`, `mapOptions`)
  *        - String can be used as a mapper (i.e. `mapOptions: "planName"` -> use "planName" attribute as options value)
  *
- *    5. Dynamic definitions with string interpolation (i.e. `name: "{value}"` in Table is replaced with actual value)
- *        - Optional fallback value can be defined after a comma (i.e. `"{value,0}"` -> use "0" as fallback value)
+ *    5. Dynamic definitions with curly brace transform (i.e. `name: "{key}"` -> is replaced with `name: "value"`)
+ *        - Fallback value can be defined after a comma (i.e. `name: "{key,0}"` -> falls back to `name: "0"`)
  *
  *    6. Value transform for objects with a single attribute `name` (i.e. `title: {name: "{key}"}` becomes `title: "value"`)
- *        - `name` attribute value will be first transformed using string interpolation for dynamic variables
+ *        - Transform of `name` attribute value for dynamic variables will happen first
  *
  *    7. State dependent config and update (i.e. `setState` action with dynamic `{state.value...}` config)
  *        - Dynamic states are transformed on render
@@ -25,7 +25,6 @@ const field = {
   // Meta data
   view: 'Col', // * name of React Component used to render this field
   items: [], // recursively nested fields
-  readOnly: Boolean, // makes all nested fields disabled, with `readOnly` css class applied
   style: Object, // css style to apply
   className: 'CSS class name to apply',
   onClick: Function, // example: `{onClick: 'setState,active.plan'}` - `setState` function with `active.plan` argument
@@ -41,7 +40,7 @@ const field = {
   onChange: Function, // callback for input value changes
   float: Boolean, // whether label should float above input when in focus
   disabled: Boolean, // disabled input
-  readonly: Boolean, // read-only input
+  readonly: Boolean, // read-only input, makes all nested fields disabled, with `readonly` css class applied
   normalize: [Function], // redux-form input value normalizer function/s
   validate: [Function], // redux-form input value validation function/s
   value: undefined, // controlled input value
@@ -55,6 +54,7 @@ const field = {
   multiple: Boolean,
   search: Boolean, // whether dropdown options are searchable
   options: [{text: 'Label for Human', value: 'internal value'}],
+  mapOptions: Object, // data mapper key/value pairs or string (ex. {value: "{index}", text: "planName"})
 
   // Slider input props
   min: Number, // minimum value
