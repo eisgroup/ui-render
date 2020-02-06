@@ -3,6 +3,7 @@
 
 /* Input Inside Stylised Form */
 .app__form {
+  .checkbox--wrapper,
   .input--wrapper {
     &:extend(.margin-top all);
 
@@ -11,9 +12,15 @@
     }
   }
 
+  > .checkbox--wrapper.float:first-child,
   > .input--wrapper.float:first-child,
+  > .flex--row:first-child > .checkbox--wrapper.float,
   > .flex--row:first-child > .input--wrapper.float {
     &:extend(.margin-top-smaller all);
+  }
+
+  > .flex--row:first-child > .input--wrapper.float + .checkbox--wrapper {
+    &:extend(.margin-top-large all);
   }
 
   .flex--row {
@@ -70,12 +77,12 @@
 .form-in-steps {
   .app__progress--bar {
     background-color: rgba(255, 255, 255, 0.65);
-    height: size(7);
   }
 
   .app__progress--bar__wrapper {
     border-radius: 0;
     border: 0;
+    height: size(7);
   }
 }
 

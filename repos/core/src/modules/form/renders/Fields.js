@@ -88,7 +88,10 @@ export default class Fields extends Component {
     const fieldOptions = options
       .filter(({value}) => value && !fields.find(({code}) => code === value)) // filter out empty string '' and 0
     return (
-      <View className={classNames('app__fields', className)} style={style}>
+      // `min-width` is required to prevent sliders from collapsing when placeholder Dropdown has short text.
+      // This only happen in FormInSteps or modals, where container is centered and has undetermined minimum width.
+      // `min-width-290` causes overflow in certain layout, so use a lesser value
+      <View className={classNames('app__fields min-width-260', className)} style={style}>
         {/*
         Only register placeholder parent field when there are no fields left (to reset on backend)
         because if registered when there are existing fields, withForm's  this.changedValues grabs all values within it,

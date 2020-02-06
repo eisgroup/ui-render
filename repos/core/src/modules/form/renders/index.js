@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { ACTIVE, FIELD } from '../../../common/variables'
@@ -30,11 +31,11 @@ export class FieldsInGroup extends Component {
 
   // RENDERS -------------------------------------------------------------------
   render () {
-    const {hint} = this.props
+    const {hint, className, style} = this.props
     return (
       <>
         {hint && <Label>{hint}</Label>}
-        <Row className='fields-in-group top justify'>
+        <Row className={classNames('fields-in-group top justify', className)} style={style}>
           {this.fields.map(renderField)}
         </Row>
       </>
