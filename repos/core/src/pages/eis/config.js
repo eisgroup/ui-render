@@ -1,29 +1,43 @@
 /**
  * @Summary of strategies used:
  *    1. Recursive Field definitions (i.e. objects with `view` attribute can have nested `items`)
- *    2. Function definitions by name (i.e. attribute keys starting with the word `render`, `normalize`, `validate`)
- *    3. Custom rendering by matching values (i.e. `renderCell` in Table)
- *    4. Data mapping by keys (i.e. `mapItems`, `mapOptions`)
- *    5. Dynamic definitions using string interpolation (i.e. `name: "{value}"` in Table)
- *    6. Value transform for objects with a single attribute `name` as key path
+ *        - Field can by any vew rendering component or input
+ *
+ *    2. Function definitions by name (i.e. attributes starting with the word `render`, etc.)
+ *        - Optional arguments can be defined, separated by comma (i.e. `"setState,plan"` -> use "plan" as argument)
+ *
+ *    3. Custom rendering by matching values (i.e. `renderCell: { values: {...} }` in Table)
+ *        - Default function can be defined when no value matches (i.e. `renderCell: { default: "Currency" }`)
+ *
+ *    4. Data mapping by key paths (i.e. `mapItems`, `mapOptions`)
+ *        - String can be used as a mapper (i.e. `mapOptions: "planName"` -> use "planName" attribute as options value)
+ *
+ *    5. Dynamic definitions with string interpolation (i.e. `name: "{value}"` in Table is replaced with actual value)
+ *        - Optional fallback value can be defined after a comma (i.e. `"{value,0}"` -> use "0" as fallback value)
+ *
+ *    6. Value transform for objects with a single attribute `name` (i.e. `title: {name: "{key}"}` becomes `title: "value"`)
+ *        - `name` attribute value will be first transformed using string interpolation for dynamic variables
+ *
+ *    7. State dependent config and update (i.e. `setState` action with dynamic `{state.value...}` config)
+ *        - Dynamic states are transformed on render
  */
 const field = {
   // Meta data
-  view: 'FieldsInGroup', // * name of React Component used to render this field
+  view: 'Col', // * name of React Component used to render this field
   items: [], // recursively nested fields
-  hint: 'Displayed as title text above input',
   readOnly: Boolean, // makes all nested fields disabled, with `readOnly` css class applied
   style: Object, // css style to apply
   className: 'CSS class name to apply',
+  onClick: Function, // example: `{onClick: 'setState,active.plan'}` - `setState` function with `active.plan` argument
 
   // Generic input props
-  name: 'adminCosts.adminCategory', // * path to field value within *-data.json
+  name: 'adminCosts.adminCategory', // * path to field value within *_data.json
   label: 'Input label',
   placeholder: 'To appear inside empty input when focused',
   type: 'number', // 'text', 'textarea', 'email', etc.
   unit: 'Input value unit label (e.x. "USD" for currency input)',
-  icon: 'dollar', // icon css class name -> displays Icon inside input
-  iconLeft: Boolean, // By default, icon is displayed to the right
+  icon: 'dollar', // icon css class name -> displays Icon inside Input
+  lefty: Boolean, // whether to show icon on the left, default is on the right
   onChange: Function, // callback for input value changes
   float: Boolean, // whether label should float above input when in focus
   disabled: Boolean, // disabled input
@@ -32,6 +46,7 @@ const field = {
   validate: [Function], // redux-form input value validation function/s
   value: undefined, // controlled input value
   defaultValue: undefined, // to be used on init if `value` not set
+  hint: 'Displayed as title text above input',
   info: 'Content to render when input is in focus',
   error: 'Content to render when input is invalid',
 
@@ -67,27 +82,27 @@ const field = {
     }
   ],
   extraItems: [ // list of item definitions (rows in default layout)
-    {
-      'cellId': String, // custom cell value
-    },
-    {
-      'cellId1': { // using value mapping by `name`, will be converted to {'cellId': 'cellValue'}
+    { // cell definitions by ID (column in default layout)
+      'cellId1': String, // custom cell value
+      'cellId2': { // using value mapping by `name`, will be converted to {'cellId': 'cellValue'}
         name: 'path.to.cell.value'
-      }
-    },
-    {
+      },
       'cellId3': { // using render function
         render: 'Currency',
         name: 'path.to.cell.value',
         // data: 'value' will be added to object based on given `name` path
       },
-    },
-    {
       'cellId4': { // using recursive field Render
         view: 'Input',
         name: 'path.to.cell.value',
       },
     },
+  ],
+  renderItem: Object, // nested field definition to render after each Table item (row in default layout)
+  filterItems: [ // used for nested tables within tables
+    //  ╭ key path to value in this child-table's item to use for filtering
+    {'state': 'state'},
+    //           ╰ key path to value from parent-table's item to match against
   ],
 
   // Pie Chart
