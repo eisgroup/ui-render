@@ -81,7 +81,8 @@ h1, .h1 {
 }
 
 h2, .h2 {
-  font-size: (@size-h2 / @size-base * 100%);  // define in percentage to work nicely on mobile
+  font-size: (@size-h2 / @size-base * 100%); // define in percentage to work nicely on mobile
+  text-transform: capitalize;
 
   /* Resize on mobile */
   @media screen and (max-width: @screen-tablet - @screen-unit) {

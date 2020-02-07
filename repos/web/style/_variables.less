@@ -73,14 +73,14 @@
 @color-brown:         rgb(88, 72, 53);
 @color-red-darker:    rgb(138, 42, 43);
 @color-red-dark:      rgb(189, 5, 18);
-@color-red:           rgb(220, 30, 45);
+@color-red:           rgb(155, 5, 25);
 @color-red-light:     rgb(247, 111, 170);
 @color-red-lighter:   rgb(255, 155, 155);
 @color-pink-light:    rgb(255, 125, 205);
 @color-pink:          rgb(235, 77, 164);
 @color-pink-dark:     rgb(193, 35, 193);
 @color-orange-dark:   rgb(215, 90, 30);
-@color-orange:        rgb(229, 114, 37);
+@color-orange:        rgb(210, 113, 49);
 @color-orange-light:  rgb(254, 130, 114);
 @color-gold:          rgb(239, 165, 44);
 @color-gold-light:    rgb(243, 200, 88);
@@ -93,7 +93,7 @@
 @color-lime-yellow:   rgb(206, 220, 0);
 @color-lime:          rgb(120, 190, 32);
 @color-green-light:   rgb(36, 210, 187);
-@color-green:         rgb(55, 145, 70);
+@color-green:         rgb(76, 147, 90);
 @color-green-dark:    rgb(29, 114, 61);
 @color-emerald:       rgb(27, 158, 129);
 @color-emerald-light: rgb(87, 203, 158);
@@ -102,8 +102,10 @@
 @color-cyan-lighter:  rgb(100, 217, 245);
 @color-cyan-light:    rgb(55, 169, 224);
 @color-cyan:          rgb(0, 144, 218);
-@color-blue-light:    rgb(57, 95, 223);
-@color-blue:          rgb(55, 85, 175);
+@color-blue-lightest: rgb(239, 244, 255);
+@color-blue-light:    rgb(57, 116, 187);
+@color-blue:          rgb(44, 101, 167);
+@color-blue-dark:     rgb(55, 87, 152);
 @color-navy:          rgb(32, 50, 110);
 @color-purple:        rgb(55, 21, 130);
 @color-purple-light:  rgb(217, 127, 245);
@@ -124,10 +126,10 @@
   error;
 
 // Semantic Colors
-@color-primary:           @color-teal; // Primary theme color
-@color-primary-light:     @color-teal-light; // Primary theme color
-@color-secondary:         @color-black; // Secondary theme color
-@color-secondary-light:   @color-white; // Secondary theme color
+@color-primary:           @color-blue; // Primary theme color
+@color-primary-light:     @color-blue-light; // Primary theme color
+@color-secondary:         @color-teal; // Secondary theme color
+@color-secondary-light:   @color-teal-light; // Secondary theme color
 @color-tertiary:          @color-pink; // Tertiary theme color
 @color-tertiary-light:    @color-pink-light; // Tertiary theme color
 @color-text:              @color-off-black; // Foreground color for default text
@@ -219,31 +221,31 @@
 
 // Sizes
 @size-scale:            62.5%; // set this to html element so `1rem = 10px` for easier `rem` interpretation
-@size-base:             1.8rem; // default text size, used to scale all other sizes, like button, etc.
+@size-base:             1.6rem; // default text size, used to scale all other sizes, like button, etc.
 @size-base-px:          px(@size-base);
 @size-base-space:       size(round(@size-base-px * 1/4)); // character spacing
-@size-smallest:         size(round(12/18 * @size-base-px));  // round to whole pixel, then convert to rem
-@size-smaller:          size(round(14/18 * @size-base-px));
-@size-small:            size(round(16/18 * @size-base-px));
-@size-large:            size(round(20/18 * @size-base-px));
-@size-larger:           size(round(24/18 * @size-base-px));
-@size-largest:          size(round(32/18 * @size-base-px));
-@size-h6:               size(round(20/18 * @size-base-px));  // actual header sizes will be converted to %
-@size-h5:               size(round(22/18 * @size-base-px));
-@size-h4:               size(round(24/18 * @size-base-px));
-@size-h3:               size(round(28/18 * @size-base-px));
-@size-h2:               size(round(36/18 * @size-base-px));
-@size-h1:               size(round(48/18 * @size-base-px));
+@size-smallest:         size(round(11/16 * @size-base-px));  // round to whole pixel, then convert to rem
+@size-smaller:          size(round(12/16 * @size-base-px));
+@size-small:            size(round(14/16 * @size-base-px));
+@size-large:            size(round(20/16 * @size-base-px));
+@size-larger:           size(round(24/16 * @size-base-px));
+@size-largest:          size(round(32/16 * @size-base-px));
+@size-h6:               size(round(18/16 * @size-base-px));  // actual header sizes will be converted to %
+@size-h5:               size(round(20/16 * @size-base-px));
+@size-h4:               size(round(24/16 * @size-base-px));
+@size-h3:               size(round(24/16 * @size-base-px));
+@size-h2:               size(round(28/16 * @size-base-px));
+@size-h1:               size(round(36/16 * @size-base-px));
 
 // Icons
-@size-icon:             2rem; // Custom icon fonts http://icomoon.io/app/#/select
+@size-icon:             1.6rem; // Custom icon fonts http://icomoon.io/app/#/select
 @size-icon-px:          px(@size-icon);
-@size-icon-smallest:    size(round(12/20 * @size-icon-px));
-@size-icon-smaller:     size(round(14/20 * @size-icon-px));
-@size-icon-small:       size(round(16/20 * @size-icon-px));
-@size-icon-large:       size(round(24/20 * @size-icon-px));
-@size-icon-larger:      size(round(32/20 * @size-icon-px));
-@size-icon-largest:     size(round(40/20 * @size-icon-px));
+@size-icon-smallest:    size(round(12/16 * @size-icon-px));
+@size-icon-smaller:     size(round(14/16 * @size-icon-px));
+@size-icon-small:       size(round(16/16 * @size-icon-px));
+@size-icon-large:       size(round(24/16 * @size-icon-px));
+@size-icon-larger:      size(round(32/16 * @size-icon-px));
+@size-icon-largest:     size(round(40/16 * @size-icon-px));
 
 // Line Heights
 @line-height-scale:     1.37; // 1.37 works for Open Sans (use unitless number to scale dynamically)
@@ -263,13 +265,13 @@
 // -----------------------------------------------------------------------------
 
 // Margin
-@margin-base:           1.5rem;
-@margin-smallest:       (@margin-base * 0.2 /1.5);
-@margin-smaller:        (@margin-base * 0.5 /1.5);
-@margin-small:          (@margin-base * 1   /1.5);
-@margin-large:          (@margin-base * 2   /1.5);
-@margin-larger:         (@margin-base + 2.5 /1.5);
-@margin-largest:        (@margin-base * 3   /1.5);
+@margin-base:           1.6rem;
+@margin-smallest:       (@margin-base * 4  /16);
+@margin-smaller:        (@margin-base * 8  /16);
+@margin-small:          (@margin-base * 12 /16);
+@margin-large:          (@margin-base * 20 /16);
+@margin-larger:         (@margin-base + 24 /16);
+@margin-largest:        (@margin-base * 28 /16);
 
 // Padding
 @padding-base:          @margin-base;
