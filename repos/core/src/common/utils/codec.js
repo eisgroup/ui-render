@@ -1,4 +1,4 @@
-import CircularJSON from 'circular-json-es6'
+import CircularJSON from 'circular-json' // do not change to `flatted` package in existing app, it breaks existing data
 
 /**
  * DATA FORMAT FUNCTIONS =======================================================

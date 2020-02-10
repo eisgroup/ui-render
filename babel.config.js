@@ -17,9 +17,9 @@ module.exports = (api) => {
   babel-node --root-mode upward --ignore node_modules
   */
   // Tested with Node 10.15.3
-  // Currently .babelrc is only used for backend Node.js with babel 6, because frontend has its own config.
-  // This babel.config.js is loaded by global JEST test automatically, but not with babel 6
-  // because it only searches for .babelrc files upwards (with --ignore option).
+  // '.babelrc' is only used for backend Node.js, because frontend has its own config-overrides.js.
+  // 'babel.config.js' is loaded by global JEST test automatically, but not with babel 6,
+  // because it only searches for .babelrc files upwards (with --ignore option to exclude node_modules in upward directory).
   // This file can also be loaded by parsing `--config-file` option (only available with for @babel/node 7), like so:
   // $ babel-node --config-file ../../babel.config.js # inside nodemon.json
   return {
