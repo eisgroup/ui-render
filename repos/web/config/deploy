@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#------------------------------------------------------------------------------
+# Sync build with remote repository and re-deploy
+#------------------------------------------------------------------------------
+UPSTREAM=${1:-'@{u}'}
+LOCAL=$(git rev-parse @)
+REMOTE=$(git rev-parse "$UPSTREAM")
+BASE=$(git merge-base @ "$UPSTREAM")
+
+# Git pull force updates
+sudo git fetch
+if [ $LOCAL = $REMOTE ]; then
+    echo "Up-to-date"
+
+elif [ $LOCAL = $BASE ]; then
+    echo "Need to pull"
+    sudo git pull
+
+elif [ $REMOTE = $BASE ]; then
+    echo "Need to push"
+    sudo git reset --hard HEAD^1
+
+else
+    echo "Diverged"
+    sudo git reset --hard HEAD^1
+    sudo git pull
+fi
