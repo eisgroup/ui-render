@@ -1,7 +1,5 @@
-import { ONE_HOUR } from '../../common/constants'
 import selector from '../../common/selector'
 import { NAME } from './constants'
-import { USER } from './definitions'
 
 /**
  * STATE SELECTORS =============================================================
@@ -16,64 +14,15 @@ export default class select {
     (val) => val || {}
   ]
 
-  static id = function () {
-    return [
-      this.self,
-      (user) => user.id
-    ]
-  }
+  static id = () => [
+    (state) => state[NAME].data.self.id,
+    (val) => val
+  ]
 
-  static location = function () {
-    return [
-      this.self,
-      (user) => user.location
-    ]
-  }
-
-  static role = function () {
-    return [
-      this.self,
-      (user) => user.role || USER.ROLE.MODEL.code
-    ]
-  }
-
-  static type = function () {
-    return [
-      this.self,
-      (user) => user.type || USER.TYPE.FREELANCER.code
-    ]
-  }
-
-  static payInterval = function () {
-    return [
-      this.self,
-      (user) => {
-        const {modeling: {pay: {interval} = {}} = {}} = user
-        return interval || ONE_HOUR
-      }
-    ]
-  }
-
-  static isCompany = function () {
-    return [
-      this.type,
-      (type) => type === USER.TYPE.COMPANY.code
-    ]
-  }
-
-  static isFreelancer = function () {
-    return [
-      this.type,
-      (type) => type === USER.TYPE.FREELANCER.code
-    ]
-  }
-
-  static isPerHourPay = function () {
-    return [
-      this.payInterval,
-      (interval) => interval === ONE_HOUR
-    ]
-  }
+  static role = () => [
+    (state) => state[NAME].data.self.role,
+    (val) => val
+  ]
 
   static ui = () => [
     state => state[NAME].ui,
