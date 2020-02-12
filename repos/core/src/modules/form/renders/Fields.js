@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { Field } from 'redux-form'
-import { cleanList, findObjByKeys, isEmpty, isEqual } from '../../../common/utils'
+import { cleanList, findObjByKeys, isEqual } from '../../../common/utils'
 import { DEFINITION, TYPE_BY } from '../../../common/variables/definitions'
 import Dropdown from '../../../components/Dropdown'
 import View from '../../../components/View'
@@ -27,31 +27,30 @@ export default class Fields extends Component {
     // ...other props to pass to <Field/> component
   }
 
-  state = {
-    fields: [], // example: [PHONE.MOBILE]
+  static defaultProps = {
+    initialValues: {}
   }
 
-  UNSAFE_componentWillMount () {
-    const {initialValues} = this.props
-    if (!isEmpty(initialValues)) this.syncState()
+  state = {
+    fields: this.fields(), // example: [PHONE.MOBILE]
+  }
+
+  fields (props = this.props) {
+    return cleanList(Object.keys(props.initialValues).map(code => findObjByKeys(DEFINITION[props.kind], {code})))
   }
 
   UNSAFE_componentWillReceiveProps (next) {
-    if (next.initialValues && !isEqual(next.initialValues, this.props.initialValues)) this.syncState(next)
+    if (!isEqual(next.initialValues, this.props.initialValues))
+      this.setState({fields: this.fields(next)})
   }
 
-  syncState = (props = this.props) => {
-    const fields = Object.keys(props.initialValues).map(code => findObjByKeys(DEFINITION[this.props.kind], {code}))
-    this.setState({fields: cleanList(fields)})
-  }
-
-  handleDeleteField = (code) => {
-    const fields = this.state.fields.filter(field => field.code !== code)
+  handleDeleteField = (name) => {
+    const fields = this.state.fields.filter(field => field.code !== name)
     this.setState({fields}, () => {
       // When no fields are left, dispatch action to set parent wrapper field as null to reset on backend,
       // because redux-form persists the deleted field value in state.
       if (!fields.length && this.onChange) this.onChange(null)
-      if (this.props.onChange) this.props.onChange(fields)
+      if (this.props.onChange) this.props.onChange(fields, {deleted: {name}})
     })
   }
 
