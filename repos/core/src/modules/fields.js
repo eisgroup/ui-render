@@ -1,4 +1,4 @@
-import { get } from '../common/utils'
+import { get, hasListValue } from '../common/utils'
 import { OPTIONS, TYPE } from '../common/variables/definitions'
 import { FIELD } from '../common/variables/fields'
 import { phone } from './form/normalizers'
@@ -45,18 +45,88 @@ FIELD.DEF = {
  * @returns {Array<Object>} list - of field definitions ready for rendering
  */
 export function fieldsFrom (fields, {initialValues: initValues = {}} = {}) {
-  return fields.map(({id, ...field}) => ({...FIELD.DEF[id], ...field})) // collect definitions
-    .map(({name = '', namePrefix = '', options, items, float = true, required, ...field}) => {
+  // Collect definitions
+  return fields.map(({id, ...field}) => ({...FIELD.DEF[id], ...field}))
+    // Process prefixes
+    .map(({name = '', namePrefix = '', options, items, float = true, required, disabled, readonly, ...field}) => {
       name = namePrefix + name
       const initialValues = get(initValues, name)
       return {
         float,
         ...field,
-        ...name && {name},
         ...initialValues && {initialValues},
-        ...required && {required, validate: [isRequired, ...(field.validate || [])]},
-        ...options && {options: options.items || options}, // options need to fallback in case already lang already set
-        ...items && {items: fieldsFrom(items, {initialValues})}, // nested fields in group
+        ...name && {name},
+        ...disabled != null && {disabled},
+        ...readonly != null && {readonly},
+        ...required != null && {required}, // required may be false for nested field inside required group
+        ...required && {validate: [isRequired, ...(field.validate || [])]},
+        ...options && {options: options.items || options}, // options need to fallback in case lang already set
+        ...items && { // nested fields in group
+          items: fieldsFrom(items.map(i => ({
+            ...required && {required},
+            ...disabled && {disabled},
+            ...readonly && {readonly},
+            ...i,
+          })), {initialValues})
+        },
       }
     })
+}
+
+/**
+ * Get Object of Required Fields mapping by key path to type, based on definition from FIELD.FOR.LIST
+ * @example:
+ *    requiredFieldsFrom(FIELD.FOR.USER)
+ *    >>> {'name': String, 'phones.work': Number}
+ *
+ * @param {Array|Object} fields - FIELD.FOR.LIST
+ * @returns {Object} required fields - key/value pairs of key path -> value type
+ */
+export function requiredFieldsFrom (fields) {
+  let result = {}
+
+  fieldsFrom(fields).forEach(field => {
+      const {name} = field
+
+      if (hasListValue(field.items)) {
+        result = {...result, ...requiredFieldsFrom(field.items)}
+      } else if (name && field.required) {
+
+        if (field.type === 'number') {
+          return result[name] = Number
+
+        } else if (field.defaultValue != null) {
+          return result[name] = field.defaultValue.constructor
+
+        } else if (field.view === FIELD.TYPE.MULTIPLE) {
+          if (hasListValue(field.options)) {
+            // Field might be marked required for all, but only one is actually required
+            // field.options.forEach(option => {
+            //   const nestedName = get(option, 'value', '')
+            //   result[`${name}.${nestedName}`] = nestedName.constructor
+            // })
+            // Returning top level object is good enough logic for use with isRequired()
+            // since the object must be non-empty to pass validation
+            return result[name] = Object
+          }
+
+        } else if (hasListValue(field.options)) {
+          return result[name] = get(field.options[0], 'value', '').constructor
+
+        } else if (field.view === FIELD.TYPE.TOGGLE) {
+          return result[name] = Boolean
+
+        } else if (field.view === FIELD.TYPE.UPLOAD_GRID) {
+          return result[name] = Array
+
+        } else if (field.view === FIELD.TYPE.UPLOAD) {
+          return result[name] = Object
+        }
+
+        return result[name] = String
+      }
+    }
+  )
+
+  return result
 }
