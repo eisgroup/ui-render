@@ -84,10 +84,9 @@ export default class Carousel extends Component {
     } = this.props
     const {activeIndex, transition} = this.state
     if (!items.length) return null
-    const activeItem = items[activeIndex]
+    const activeItem = items[activeIndex] || {}
     const backgroundImage = !hideImage ? `url('${imageSrc(activeItem)}')` : ''
-    const {time} = items[activeIndex]
-    const dateAgo = time ? formatDuration(Date.now() - time, {shorten: true, largest: 1}) : ''
+    const dateAgo = activeItem.time ? formatDuration(Date.now() - activeItem.time, {shorten: true, largest: 1}) : ''
     const Canvas = square ? Square.Row : Row
     return (
       <View fill={fill} className={classNames('carousel fade-in', className, {loading})} style={style}>
@@ -103,12 +102,12 @@ export default class Carousel extends Component {
           {isFunction(children) ? children(activeItem, activeIndex) : children}
         </Canvas>
         {!hideItems && items.length > 1 &&
-        <ScrollView row center className='carousel__items'>
-          {items.map(({name, path}, index) => {
-            const style = {backgroundImage: `url('${imageSrc({name, path})}')`}
+        <ScrollView row center className='carousel__items min-height'>
+          {items.map((item, index) => {
+            const style = {backgroundImage: `url('${imageSrc(item)}')`}
             const active = index === activeIndex
             return <View
-              key={name || index}
+              key={item.id || item.src || item.name || index}
               className={classNames('carousel__item', {active})} style={style}
               onClick={!active && (() => this.handleClickItem(index))}
             />
