@@ -12,9 +12,40 @@ import View from '../../components/View'
  */
 export default class Layouts extends Component {
   render () {
-    const squareClass = 'bg-home align-center'
+    const squareClass = 'bg-home align-center fill'
     return (
       <View fill className='full-width'>
+
+        {/* asSquare */}
+        <Row className='center wrap' style={{minHeight: 200, color: 'white'}}>
+          <Square.View right className={squareClass}>Square.View right</Square.View>
+          <Square.View className={squareClass}>Square.View</Square.View>
+          <Square.Row left className={squareClass}>Square.Row left</Square.Row>
+        </Row>
+
+        {/* asSquare with dimensions */}
+        <Row className='center wrap' style={{minHeight: 200, color: 'white'}}>
+          <Row fill className='border'>
+            <Square.View left className={squareClass}>Square.View Left</Square.View>
+          </Row>
+          <Square.View>
+            <Row fill style={{color: 'white'}}>
+              <View fill className='border'>
+                <Square.Row top className={squareClass} width={1} height={2}>Row 1:2 Top</Square.Row>
+              </View>
+              <View fill className='border'>
+                <Square.Row className={squareClass} width={1} height={1}>Row 1:1</Square.Row>
+              </View>
+              <View fill className='border'>
+                <Square.Row bottom className={squareClass} width={3} height={2}>Row 3:2 Bottom</Square.Row>
+              </View>
+            </Row>
+          </Square.View>
+          <View fill className='border'>
+            <Square.Row right className={squareClass}>Square.Row Right</Square.Row>
+          </View>
+        </Row>
+
         {/* Square */}
         <Row className='center wrap' style={{minHeight: 200, color: 'white'}}>
           <Row fill className='border'>
@@ -37,14 +68,6 @@ export default class Layouts extends Component {
             <Square right classNameInner={squareClass}>right</Square>
           </View>
         </Row>
-
-        {/* asSquare */}
-        <Row className='center wrap' style={{minHeight: 200, color: 'white'}}>
-          <Square.View right className={squareClass}>Right View</Square.View>
-          <Square.View className={squareClass}>Middle Center View</Square.View>
-          <Square.View left className={squareClass}>Left View</Square.View>
-        </Row>
-
 
         {/* Headers */}
         <h1>H1 Header with <Icon name='search'/>
