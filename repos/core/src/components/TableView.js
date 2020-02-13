@@ -93,9 +93,6 @@ export default class TableView extends Component {
       !isEqualList(next.items, items) ||
       (sorts && !isEqual(next.sorts, sorts))
     ) {
-      console.warn('not equal!!!')
-      console.warn('isEqual sorts', isEqual(next.sorts, sorts))
-      console.warn('isEqual items', isEqualList(next.items, items))
       this._itemsSorted = null
     }
 

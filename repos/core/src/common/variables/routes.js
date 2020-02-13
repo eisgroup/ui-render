@@ -9,6 +9,7 @@ export const ROUTE_BASE = `${ROUTE_HOME}${ROUTE_SLASH}`
 export const ROUTE = {
   HOME: ROUTE_HOME,
   REPORT: `${ROUTE_BASE}report`,
+  PRIVACY: `${ROUTE_BASE}privacy`,
   TESTER: `${ROUTE_BASE}tester`, // for development only
   THEME: `${ROUTE_BASE}theme`, // for development only
 }

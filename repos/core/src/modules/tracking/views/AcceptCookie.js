@@ -29,7 +29,7 @@ export default class AcceptCookie extends Component {
         <Row className="wrap align-center padding">
           <Text className="p padding-small" style={{maxWidth: '100%'}}>
             Our site uses cookies. By continuing to use our site you are agreeing to our
-            <Link to={ROUTE.PRIVACY}>Privacy Policy</Link>
+            <Link to={ROUTE.PRIVACY} className='margin-left-smallest'>Privacy Policy</Link>
           </Text>
           <Button
             className="small secondary basic"
