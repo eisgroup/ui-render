@@ -12,3 +12,12 @@
     .square(@size-icon-large);
   }
 }
+
+.app__placeholder {
+  &:before {
+    .object();
+    &:extend(.position-fill all);
+    &:extend(.bg-texture all);
+    &:extend(.bg-fade-to-top all);
+  }
+}
