@@ -11,7 +11,7 @@
   "scripts": {
     "start": "yarn cors && yarn gql && yarn css && react-app-rewired start & yarn style",
     "build": "yarn css --minify && react-app-rewired build && yarn clean",
-    "build-dist": "cp -rf build/* ../../dist/web && yarn delete build && cp -rf ./config/* ../../dist/web",
+    "build-dist": "yarn delete ../../dist/web/* && cp -rf build/* ../../dist/web && yarn delete build && cp -rf ./config/* ../../dist/web",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "css": "yarn gulp theme.config css",
