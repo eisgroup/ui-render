@@ -66,7 +66,7 @@ export default class Popup extends Component {
                     <View className='app__popup__box__header'>
                       <Text className='app__popup__box__header__title'>{title}</Text>
                     </View>
-                    <Text className='app__popup__box__body p'>{content}</Text>
+                    <Text className='app__popup__box__body p center'>{content}</Text>
                   </View>
                   <View className='app__popup__box__footer center'>
                     <Button onClick={closeAlert} className='primary'>{closeLabel || 'Ok'}</Button>
@@ -83,7 +83,7 @@ export default class Popup extends Component {
                     <View className='app__popup__box__header'>
                       <Text className='app__popup__box__header__title'>{title || 'Confirm Action'}</Text>
                     </View>
-                    <Text className='app__popup__box__body p'>{content}</Text>
+                    <Text className='app__popup__box__body p center'>{content}</Text>
                   </View>
                   <Row className='app__popup__box__footer center'>
                     <Button onClick={closeConfirm}
