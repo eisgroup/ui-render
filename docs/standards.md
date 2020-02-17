@@ -2,7 +2,7 @@
 
 ## CSS Standard
 
-Please refer to `repos/web/style/_variables.less` for reference.
+Please refer to [_variables.less](../repos/web/style/_variables.less) for reference.
 
 ## Javascript Standard
 
@@ -63,7 +63,7 @@ Use the widely accepted naming convention used in React for different data types
 
 When naming functions/variables/constants, think about how they will read within the context of use. 
 
-For example, a comparison function `by` that can be found inside `src/common/utils/array.js`, in and by itself is quite a vague name, however, it all makes sense within the context when used:
+For example, a comparison function `by` that can be found inside [array.js](../repos/core/src/common/utils/array.js), in and by itself is quite a vague name, however, it all makes sense within the context when used:
 
 ```javascript
 // Notice how this reads like normal English

@@ -23,9 +23,9 @@ This app is built using **unidirectional** data flow with **modular** architectu
 
 The app is divided into **common** and **app-specific modules**. Common modules are used by many app-specific modules to delegate common tasks, like API fetching, form inputs, etc.
 
-Examples of common modules include: `src/common/api`, `src/common/redux` and `src/common/utils`.
+Examples of common modules include: [api](../repos/core/src/common/api), [redux](../repos/core/src/common/redux) and [utils](../repos/core/src/common/utils).
 
-Examples of app-specific modules include: `src/web/modules/tracking` and `src/web/modules/form`.
+Examples of app-specific modules include: [tracking](../repos/core/src/modules/tracking) and [user](../repos/core/src/modules/user).
 
 Every interaction that happens within the app is dispatched as an **action** ([redux-action](https://redux.js.org/basics/actions)), and action orchestration (interaction flow) is managed with reactive action-subscription pattern (chaining of events) using ES6 generator functions ([redux-saga](https://github.com/redux-saga/redux-saga)). This allows us to declaratively compose complex asynchronous flows into easy to understand work flows.
 
@@ -37,12 +37,12 @@ Like playing with LEGO, we always break down features into the smallest possible
 
 Like the modular approach to data architecture, CSS styling is done in similar fashion. There is a very strong emphasis on re-use by separating CSS styles into individual components that can be composed together to create complex views.
 
-All CSS files for the web build are inside the `src/web/style` folder, with the root file `src/web/style/_all.less`. Please check all the comments inside `src/web/style/_variables.less` for conventions we use.
+All CSS files for the web build are inside the [style](../repos/web/style) folder, with the root file [_all.less](../repos/web/style/_all.less). Please check all the comments inside [_variables.less](../repos/web/style/_variables.less) for conventions we use.
 
 You should see clear separation of concerns when it comes to styling generic vs app-specific components.
 
-For example, common components like modals (`src/web/style/modal.less`) and layouts (`src/web/style/_layout.less`), which are almost identical in many projects, do not have any app specific styling. 
-These common styling are re-used and composed together to create app-specific styling for the menu (`src/web/style/menu.less`) with the use of LESS [:extend()](http://lesscss.org/features/#extend-feature-use-cases-for-extend) keyword.
+For example, common components like [modal](../repos/web/style/modal.less) and [layouts](../repos/web/style/_layout.less), which are almost identical in many projects, do not have any app specific styling. 
+These common styling are re-used and composed together to create app-specific styling for the [menu](../repos/web/style/menu.less) with the use of LESS [:extend()](http://lesscss.org/features/#extend-feature-use-cases-for-extend) keyword.
 
 These way we can easily copy-paste tested and proven to be cross-browser compatible components like modals without wasting weeks of development time.
 
@@ -97,7 +97,7 @@ A typical module file structure:
     ├ selectors.js  # app state queries (similar to database query)
     ├ utils.js  # helper functions
 ```
-There is a boilerplate template you can use when creating new modules at `src/web/modules/_template`.
+There is a boilerplate [_template](../repos/core/src/_template) you can use when creating new modules.
 
 For example, the `api` module is solely responsible for performing network requests to the backend REST API. This module handles all HTTP fetch requests, as well as timeout and error handling. It’s also responsible for storing and requesting new authentication token when expired, as well as the login and the logout flow of the application. What the `api` module does not do is defining the different endpoints of the backend API, it just knows how to fetch them when URLs are provided, because these data are project specific.
 
@@ -115,9 +115,9 @@ This allows us to focus 80% of the time on actual development, and only 10-20% o
 
 Modules connect to each other through:
 
-1. Containers - Views composed from other modules (`src/containers`)
-2. Pages - Routes composed of Container Views to create a complete UI screen (`src/pages`)
-3. Root - top level file connecting all Pages together (`src/web/main.js`)
+1. [Containers](../repos/core/src/containers) - Views composed from other modules
+2. [Pages] - Routes composed of Container Views to create a complete UI Page/Screen
+3. Root - top level file connecting all Pages/Screens together (example: `repos/web/src/main.js`)
 4. Action orchestration (managed by redux-saga in `sagas.js` files).
 
 ## What is the difference between "modules" and "Containers"?
@@ -128,8 +128,8 @@ The commonality:
 
 The difference:
 
-* a Module is a collection of self-containing functions for performing a specific task (ex. a Router `src/web/modules/router` module for handling all navigation logic)
-* a Container composes related tasks (modules) together to deliver a re-usable feature-set (ex. NavLinks `src/containers/NavLinks.js` renders a list of links using Router module and AlertCounter component, which can be used as Header and/or Sidebar links).
+* a Module is a collection of self-containing functions for performing a specific task (ex. [router](../repos/core/src/modules/router) module for handling all navigation logic)
+* a Container composes related tasks (modules) together to deliver a re-usable feature-set (ex. [NavLinks](../repos/core/src/containers/NavLinks.js) renders a list of links using Router module and AlertCounter component, which can be used as Header and/or Sidebar links).
 
 This very subtle but important distinction allows us to easily extend and keep adding new feature-sets into the app without the fear of breaking existing features, thus reducing the need for regression testing.
 
@@ -173,7 +173,7 @@ stateActionType(TO_DO, UPDATE);  // create action constant
 
 The benefits of action constant composition:
 
-1. Keep it DRY - common actions, such as CRUD, are defined in one place: `src/common/constants.js`
+1. Keep it DRY - common actions, such as CRUD, are defined in one place: `repos/core/src/common/constants.js`
 2. Keep it consistent - new developers will not accidentally create their own convention of defining actions, thus creating duplicates and confusion (ex. `UPDATE_TO_DO` OR `TO_DO_UPDATE`?)
 3. Save time and improve readability by avoiding excessive constant definitions
 4. Reduce clutter from excessive constant imports
@@ -181,7 +181,7 @@ The benefits of action constant composition:
 
 ## Examples
 
-Please refer to `src/pages/theme` folder for examples of how to implement different components, containers and modules. This is equivalent to [Storybook](https://github.com/storybooks/storybook) concept.
+Please refer to [theme](../repos/core/src/pages/theme) folder for examples of how to implement different components, containers and modules. This is equivalent to [Storybook](https://github.com/storybooks/storybook) concept.
 As we add new components to the app, they will all be listed in this `Theme` route when viewed in development mode.
 
 
@@ -189,7 +189,7 @@ As we add new components to the app, they will all be listed in this `Theme` rou
 
 All Redux actions must be dispatched as [Flux Standard Actions](https://github.com/redux-utilities/flux-standard-action) using one of the provided action creator. Depending on installed modules, you may have more than one type of action creators, but typically, at least two types of action creators are provided:
 
-1. **Redux State** action creator (`src/common/actions.js`):
+1. **Redux State** action creator (`repos/core/src/common/actions.js`):
     
     ```javascript
     function stateAction (TYPE, ACTION, RESULT, payload = {}, meta = {}) {
@@ -247,4 +247,4 @@ Example on how to show popup alert whenever an API fetch error occurs:
     }
     ```
 
-[More merged request examples](https://bitbucket.org/lowlatencymedia/client/pull-requests/?state=MERGED).
+[More merged request examples](https://mnsgitlab01.exigengroup.com/openl-report/client/merge_requests).
