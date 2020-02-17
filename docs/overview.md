@@ -116,7 +116,7 @@ This allows us to focus 80% of the time on actual development, and only 10-20% o
 Modules connect to each other through:
 
 1. [Containers](../repos/core/src/containers) - Views composed from other modules
-2. [Pages] - Routes composed of Container Views to create a complete UI Page/Screen
+2. [Pages](../repos/core/src/pages) - Routes composed of Container Views to create a complete UI Page/Screen
 3. Root - top level file connecting all Pages/Screens together (example: `repos/web/src/main.js`)
 4. Action orchestration (managed by redux-saga in `sagas.js` files).
 
