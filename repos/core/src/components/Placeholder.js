@@ -11,7 +11,7 @@ import View from './View'
 export default function Placeholder ({className, ...props}) {
   return <View
     fill
-    className={classNames('app__placeholder full-screen middle center fade-in-up padding-largest', className)}
+    className={classNames('bg-texture-faded full-screen middle center fade-in-up padding-largest', className)}
     {...props}
   />
 }

@@ -36,6 +36,11 @@
   background-color: @color-bg-white !important;
   border: @border-size dashed @color-text;
   border-style: dashed;
+
+  &.disabled,
+  &.no-pointer {
+    border-style: dotted;
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -835,7 +840,7 @@ input.checkbox.toggle {
   + label { // slide container
     //.text-shadow();
     .font-size(@size-small);
-    text-transform: uppercase;
+    &:extend(.uppercase);
     border-radius: @checkbox-size !important;
     //border-color: transparent !important;
     white-space: nowrap;
@@ -894,6 +899,7 @@ input.checkbox.toggle {
 
   &:checked { // true state
     + label { // slide container
+      &:extend(.text.bold);
       &:extend(.text-shadow all);
       text-align: right;
       color: @color-white;

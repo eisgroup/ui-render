@@ -13,7 +13,7 @@ export default function DateRanges
   ({
     start,
     end,
-    times,
+    times = [],
     className,
     style,
     children,
@@ -29,7 +29,7 @@ export default function DateRanges
         {hasDetails &&
         <Text
           key={isString}
-          className={'a' + (isString ? ' margin-left-smaller' : '')}
+          className={'a no-wrap' + (isString ? ' margin-left-smaller' : '')}
           onClick={() => toggleDisplay(!isString)}>
           {(isString ? '- show hours' : 'Show less')}
         </Text>}

@@ -32,9 +32,13 @@
       &:extend(.border);
       &:extend(.margin-h-small);
       &:extend(.padding-v-small);
-      &:extend(.round);
       border-color: @activeBorderColor;
+      border-style: dashed;
     }
+  }
+
+  .tabs.buttoned & {
+    &:extend(.round);
   }
 }
 

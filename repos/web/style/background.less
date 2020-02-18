@@ -46,6 +46,15 @@
   .background-image(@name: 'diamonds-dimmed.png'; @size: 120px 108px;);
 }
 
+.bg-texture-faded {
+  &:before {
+    .object();
+    &:extend(.position-fill all);
+    &:extend(.bg-texture all);
+    &:extend(.bg-fade-to-top all);
+  }
+}
+
 // To be used as inner content of container with background image
 .bg-blur {
   backdrop-filter: blur(7px);
