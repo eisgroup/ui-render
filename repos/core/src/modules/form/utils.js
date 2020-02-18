@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { reduxForm } from 'redux-form' // produces smallest js bundle size
 import { GET, stateAction } from '../../common/actions'
-import { debounce, get, hasListValue, isEmpty, isEqual, objChanges } from '../../common/utils'
+import { debounce, get, hasListValue, isEmpty, isEqual, objChanges, toJSON } from '../../common/utils'
 import { FIELD, TYPING_DELAY } from '../../common/variables'
 import Text from '../../components/Text'
 import Tooltip from '../../components/Tooltip'
@@ -114,7 +114,7 @@ export function withForm ({form, ...options}) {
             {(() => {
               const messages = []
               for (const k in errors) {
-                messages.push(<Text key={k} className='margin-bottom-smaller'>{`- ${k}: ${errors[k]}`}</Text>)
+                messages.push(<Text key={k} className='margin-bottom-smaller'>{`- ${k}: ${toJSON(errors[k])}`}</Text>)
               }
               return messages
             })()}
@@ -149,6 +149,7 @@ export function withForm ({form, ...options}) {
 
     // Define instance method
     Class.prototype.syncInputChanges = function () {
+      // todo: Phase 2 - put back deleted flag from FieldsWithLevel
       const {initialValues, valid, loading} = this.props
       const registeredValues = this.registeredValues
       const hasInputChanges = (registeredValues && isEmpty(initialValues)) || !!this.changedValues
