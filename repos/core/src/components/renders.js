@@ -1,5 +1,6 @@
 import classNames from 'classnames'
-import React, { Fragment } from 'react'
+import React from 'react'
+import { LANGUAGE } from '../common/constants'
 import { debounce, shortNumber } from '../common/utils'
 import { ACTIVE, PATH_IMAGES } from '../common/variables'
 import ColorSwatch from './ColorSwatch'
@@ -20,7 +21,7 @@ import Text from './Text'
 export function colorDropdownOptions (colorObj) {
   const options = {
     get items () {
-      return this[ACTIVE.LANG.code]
+      return this[ACTIVE.LANG.code] || this[LANGUAGE.ENGLISH.code] || []
     }
   }
   for (const key in colorObj) {
@@ -30,9 +31,9 @@ export function colorDropdownOptions (colorObj) {
       options[lang] = (options[lang] || []).concat({
         text,
         value: code.constructor === Array ? code.join(',') : code,  // Dropdown `value` cannot be array
-        content: <Row className='input--dropdown__option bottom'>
+        content: <Row className='input--dropdown__option middle'>
           <ColorSwatch code={code} className='input--dropdown__option__color'/>
-          <Text>{text}</Text>
+          <Text className='margin-top-smallest'>{text}</Text>
         </Row>
       })
     }
@@ -49,7 +50,7 @@ export function colorDropdownOptions (colorObj) {
 export function languageDropdownOptions (languageObj) {
   const options = {
     get items () {
-      return this[ACTIVE.LANG.code]
+      return this[ACTIVE.LANG.code] || this[LANGUAGE.ENGLISH.code] || []
     }
   }
   for (const key in languageObj) {
@@ -198,36 +199,4 @@ export function toTextHeightFunc (e) {
     + parseInt(computed.getPropertyValue('border-bottom-width'), 10)
 
   e.target.style.height = `${Math.min(height, Math.round(window.innerHeight / 5))}px`
-}
-
-/**
- * Short Summary of Model Stats, like Sizes and Colors
- * @returns {Object} - React component
- */
-export function renderModelStats ({ height, chest, waist, hip, cup, eyeColor, hairColor }) {
-  return (
-    <Fragment>
-      {/* Sizes */}
-      <Text className='margin-v-smaller no-wrap'>
-        <Icon name='measurement'/>
-        {Math.round(height / 10)}
-        <Text className='fade margin-h-smaller'>/</Text>
-        {Math.round(chest / 10)}
-        <Text className='fade margin-h-smaller'>-</Text>
-        {Math.round(waist / 10)}
-        <Text className='fade margin-h-smaller'>-</Text>
-        {Math.round(hip / 10)}
-      </Text>
-
-      {/* Colors */}
-      <Row className='margin-v-smaller wrap'>
-        <Row className='margin-right-small middle'>
-          <Icon name='eye'/><ColorSwatch small className='margin-h-smaller' code={eyeColor}/>
-        </Row>
-        <Row className='middle'><Icon name='hair'/>
-          <ColorSwatch small className='margin-h-smaller' code={hairColor}/>
-        </Row>
-      </Row>
-    </Fragment>
-  )
 }

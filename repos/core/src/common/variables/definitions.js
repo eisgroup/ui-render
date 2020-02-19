@@ -154,7 +154,7 @@ export function definitionByCode (DEFINITION) {
 export function optionsFrom (DEFINITION) {
   const options = {
     get items () {
-      return this[ACTIVE.LANG.code]
+      return this[ACTIVE.LANG.code] || this[LANGUAGE.ENGLISH.code] || []
     }
   }
   for (const key in DEFINITION) {
@@ -199,7 +199,11 @@ export function localise (DEFINITION) {
     const definition = DEFINITION[NAME]
     const {code, key, name} = definition
     if (name == null && (code != null || key != null)) {
-      Object.defineProperty(DEFINITION[NAME], 'name', {get () { return this[ACTIVE.LANG.code] }})
+      Object.defineProperty(DEFINITION[NAME], 'name', {
+        get () {
+          return this[ACTIVE.LANG.code] || this[LANGUAGE.ENGLISH.code] || String(code != null ? code : key)
+        }
+      })
     } else {
       if (definition.constructor === Object) localise(definition) // recursively process nested definitions
     }
