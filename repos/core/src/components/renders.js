@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 import { LANGUAGE } from '../common/constants'
-import { debounce, shortNumber } from '../common/utils'
+import { debounce, shortNumber, toUpperCase } from '../common/utils'
 import { ACTIVE, PATH_IMAGES } from '../common/variables'
 import ColorSwatch from './ColorSwatch'
 import Icon from './Icon'
@@ -9,13 +9,15 @@ import Image from './Image'
 import Row from './Row'
 import Text from './Text'
 
-// =============================================================================
-// RENDER HELPERS
-// =============================================================================
+/**
+ * RENDER HELPERS ==============================================================
+ * =============================================================================
+ */
+
 /**
  * Create Color Swatch Options from RGB Definition for use with Dropdowns
  *
- * @param {Object} colorObj - definition from variables.js
+ * @param {Object|Array<Object>} colorObj - definition from variables.js
  * @returns {Object<lang[{text, value, content}]>} options - grouped by language code, for use with dropdowns
  */
 export function colorDropdownOptions (colorObj) {
@@ -44,10 +46,11 @@ export function colorDropdownOptions (colorObj) {
 /**
  * Create Language Options from Language Definition for use with Dropdowns
  *
- * @param {Object} languageObj - definition from variables.js
+ * @param {Object|Array<Object>} languageObj - definition from variables.js
+ * @param {Boolean} [selection] - whether to render as selected language flag and code, default is searchable text
  * @returns {Object<lang[{text, value, content}]>} options - grouped by language code, for use with dropdowns
  */
-export function languageDropdownOptions (languageObj) {
+export function languageDropdownOptions (languageObj, {selection} = {}) {
   const options = {
     get items () {
       return this[ACTIVE.LANG.code] || this[LANGUAGE.ENGLISH.code] || []
@@ -58,9 +61,16 @@ export function languageDropdownOptions (languageObj) {
     for (const lang in langs) {
       const text = langs[lang]
       options[lang] = (options[lang] || []).concat({
-        text: `${text} ${name}`, // make option searchable both in chosen and native language
+        text: selection
+          ? (
+            <Row className='input--dropdown__option middle'>
+              <Image className='margin-right-smaller' name={`${code.toLowerCase()}.svg`} path={`${PATH_IMAGES}flags/`}/>
+              <Text className='no-wrap'>{toUpperCase(code)}</Text>
+            </Row>
+          )
+          : `${text} ${name}`, // make option searchable both in chosen and native language
         value: code,
-        content: <Row className='input--dropdown__option bottom'>
+        content: <Row className='input--dropdown__option middle'>
           <Image className='margin-right-small' name={`${code.toLowerCase()}.svg`} path={`${PATH_IMAGES}flags/`}/>
           <Text>{text}</Text>
         </Row>

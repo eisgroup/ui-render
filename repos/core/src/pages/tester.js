@@ -19,6 +19,7 @@ import { SliderField } from '../modules/form/inputs'
 import { testPayload } from '../modules/popup/data'
 import { history } from '../modules/router'
 import { openModal } from '../modules/router/history'
+import LanguageSelection from '../modules/settings/views/LanguageSelection'
 
 const query = `mutation {
   login (email: "example@gmail.com", password: "TEST!@#$%") {
@@ -59,6 +60,7 @@ export default class Tester extends Component {
     return (
       <View fill className='app__page wrap padding'>
         <h1>Tester</h1>
+        <LanguageSelection/>
         <View className='max-width-320'>
           <Slider step={1} min={1} max={100} onChange={console.warn} defaultValue={30}/>
           <Space/>

@@ -29,8 +29,8 @@ export default class select {
 
   static language = () => [
     (state) => state[NAME].data.language,
-    (val) => {
-      ACTIVE.LANG = findObjByKeys(LANGUAGE, {code: val}) || findObjByKeys(LANGUAGE, {code: DEFAULT.LANGUAGE})
+    (val = DEFAULT.LANGUAGE) => {
+      ACTIVE.LANG = findObjByKeys(LANGUAGE, {code: val})
       return val
     }
   ]

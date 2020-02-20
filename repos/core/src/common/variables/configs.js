@@ -1,4 +1,4 @@
-import { FIVE_MINUTES, THIRTY_SECONDS, THREE_SECONDS, TWO_SECONDS } from '../constants'
+import { FIVE_MINUTES, LANGUAGE, THIRTY_SECONDS, THREE_SECONDS, TWO_SECONDS } from '../constants'
 import { ENV } from './_envs'
 
 /**
@@ -31,6 +31,7 @@ export const TYPING_DELAY = 300  // Milliseconds - 300 is deal for debouncing in
 export const TOOLTIP_DELAY = 777  // Milliseconds
 export const FORM_SYNC_THROTTLE = THREE_SECONDS  // Milliseconds - debounce input changes duration
 export const ANIMATION_DURATION = 500  // Milliseconds - match with CSS @speed-base in /repos/web/style/_variables.less
+export const LANGUAGE_OPTIONS = [LANGUAGE.ENGLISH, LANGUAGE.RUSSIAN] // enabled languages
 export const THEME = {
   LIGHT: 'LIGHT',
   DARK: 'DARK',
