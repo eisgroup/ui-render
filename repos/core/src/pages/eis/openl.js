@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from '../../common/redux'
 import { cloneDeep, logRender, set, warn } from '../../common/utils'
 import { FIELD } from '../../common/variables'
+import Json from '../../components/Json'
 import ScrollView from '../../components/ScrollView'
 import Render, { metaToProps } from '../../components/views/Render'
 import { reset } from '../../modules/form'
@@ -66,9 +67,9 @@ export default class OpenL extends Component {
           </form>
         </ScrollView>
 
-        {/*<ScrollView className='padding bg-neutral inverted'>*/}
-        {/*  <Json data={meta} inverted/>*/}
-        {/*</ScrollView>*/}
+        <ScrollView className='padding bg-neutral inverted'>
+          <Json data={meta} inverted/>
+        </ScrollView>
       </>
     )
   }
