@@ -23,6 +23,7 @@ if (_SHOULD_SHOW_TEST_) ROUTES_FOR_NAV.push(...[
   {path: ROUTE.TESTER, name: 'Tester', icon: 'test'},
   {path: ROUTE.THEME, name: 'Theme', icon: 'theme'},
 ])
+export const ROUTES_WITHOUT_NAV = []
 
 /**
  * HELPER FUNCTIONS ------------------------------------------------------------

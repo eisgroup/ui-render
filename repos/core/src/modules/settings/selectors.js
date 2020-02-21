@@ -1,7 +1,8 @@
 import { LANGUAGE } from '../../common/constants'
 import selector from '../../common/selector'
 import { findObjByKeys, isInList } from '../../common/utils'
-import { ACTIVE, CURRENCY, DEFAULT, ROUTES_FOR_NAV } from '../../common/variables'
+import { ACTIVE, CURRENCY, DEFAULT, ROUTES_FOR_NAV, ROUTES_WITHOUT_NAV } from '../../common/variables'
+import * as routerSelect from '../router/selectors'
 import userSelect from '../user/selectors'
 import { NAME } from './constants'
 
@@ -52,8 +53,17 @@ export default class select {
 
   static routesForNav = function () {
     return [
+      routerSelect.activeRoute,
       userSelect.role,
-      (userRole) => ROUTES_FOR_NAV.filter(r => !r.userRoles || isInList(r.userRoles, userRole))
+      userSelect.isLoggedIn,
+      (activeRoute, userRole, isLoggedIn) => {
+        if (isInList(ROUTES_WITHOUT_NAV, activeRoute)) return []
+        return ROUTES_FOR_NAV.filter(r => {
+          if (r.userRoles != null && !isInList(r.userRoles, userRole)) return false
+          if (r.isLoggedIn != null && r.isLoggedIn !== isLoggedIn) return false
+          return true
+        })
+      }
     ]
   }
 }
