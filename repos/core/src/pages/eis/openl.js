@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import fetch from '../../common/fetch'
 import { connect } from '../../common/redux'
 import { cloneDeep, logRender, set, warn } from '../../common/utils'
 import { FIELD } from '../../common/variables'
@@ -37,9 +38,15 @@ export default class OpenL extends Component {
     this.setState(set(this.state, keyPath, value))
   }
 
+  fetch = async (url, data, callback) => {
+    const action = await fetch(url, data)
+    if (callback) callback(action)
+  }
+
   state = {
     reset: (FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm), // must be declared before using `metaToProps`
     setState: (FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates), // must be declared before using `metaToProps`
+    fetch: (FIELD.FUNC[FIELD.ACTION.FETCH] = this.fetch), // must be declared before using `metaToProps`
     data,
     active: {
       // plan: 1,

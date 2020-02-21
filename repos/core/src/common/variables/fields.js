@@ -34,6 +34,7 @@ FIELD.RENDER = {
 FIELD.ACTION = {
   RESET: 'reset',
   SET_STATE: 'setState',
+  FETCH: 'fetch',
 }
 
 // Action Methods by Action Type Definitions
