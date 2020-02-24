@@ -216,16 +216,17 @@ function mapProps (data, mapper) {
  * Get Function from Definition String
  * @example:
  *    getFunctionFromConfig('reset,0')
- *    >>> function reset().bind(this, '0')
+ *    >>> function reset(...argumentsSuppliedFromCaller, '0') {...}
  *
  * @param {String} string - name of function to get, with optional arguments, separated by comma
  * @param {*} [fallback] - value to use when function not found, defaults to given `string`
- * @returns {any}
+ * @returns {Function|String} method - that receives caller arguments as its first arguments,
+ *    along with optionally defined arguments in the config string
  */
 function getFunctionFromConfig (string, fallback = string) {
   const [name, ...args] = string.split(',')
   const func = FIELD.FUNC[name]
-  return ((args.length && func) ? func.bind(this, ...args) : func) || fallback
+  return ((args.length && func) ? ((...arg) => func(...arg, ...args)) : func) || fallback
 }
 
 /**

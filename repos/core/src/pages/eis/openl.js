@@ -34,7 +34,11 @@ export default class OpenL extends Component {
     dispatch(reset(form))
   }
 
-  setStates = (keyPath, value) => {
+  // @Note: functions should have consistent pattern of receiving important arguments first,
+  // followed by optional arguments.
+  // Positional arguments was chosen instead of keyword arguments because
+  // it provides more flexibility and separation of concerns between different configs.
+  setStates = (value, keyPath) => {
     this.setState(set(this.state, keyPath, value))
   }
 
@@ -51,6 +55,7 @@ export default class OpenL extends Component {
     active: {
       // plan: 1,
     },
+    showMeta: false,
   }
 
   /**
@@ -63,7 +68,7 @@ export default class OpenL extends Component {
   handleSubmit = this.props.handleSubmit(this.submit)
 
   render () {
-    const {data} = this.state
+    const {data, showMeta} = this.state
     const props = metaToProps(cloneDeep(meta), data, this)
     console.warn('props', props)
     return (
@@ -74,9 +79,11 @@ export default class OpenL extends Component {
           </form>
         </ScrollView>
 
+        {showMeta &&
         <ScrollView className='padding bg-neutral inverted'>
           <Json data={meta} inverted/>
         </ScrollView>
+        }
       </>
     )
   }

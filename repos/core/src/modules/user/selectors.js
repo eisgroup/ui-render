@@ -1,4 +1,5 @@
 import selector from '../../common/selector'
+import { DEFAULT } from '../../common/variables'
 import { NAME } from './constants'
 
 /**
@@ -22,6 +23,11 @@ export default class select {
   static role = () => [
     (state) => state[NAME].data.self.role,
     (val) => val
+  ]
+
+  static isLoggedIn = () => [
+    (state) => state[NAME].data.self.updated,
+    (updated) => Date.now() - updated < DEFAULT.LOGIN_DURATION
   ]
 
   static ui = () => [
