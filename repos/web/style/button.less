@@ -33,11 +33,11 @@
   &:not(:disabled) {
     &:hover, &:focus, &:active {
       &.transparent {
-        color: @color-primary-light !important;
+        color: @color-primary;
 
         .inverted & {
-          color: @color-white !important;
-          border-color: @color-white !important;
+          color: @color-white;
+          border-color: @color-white;
         }
       }
 
@@ -100,6 +100,7 @@
   }
 
   &.transparent {
+    text-shadow: inherit;
     border-color: transparent !important;
 
     .inverted & {
@@ -127,6 +128,19 @@
 
   &.bg-white {
     &:extend(.bg-white all);
+
+    @{select-interaction} {
+      &:extend(.bg-grey-lightest all);
+    }
+  }
+
+  &.bg-translucent {
+    text-shadow: inherit;
+    &:extend(.bg-translucent all);
+
+    @{select-interaction} {
+      &:extend(.bg-translucent all);
+    }
   }
 
   &.bg-grey {
@@ -199,7 +213,7 @@
     }
 
     .inverted & {
-      color: @colorValLight;
+      color: @color-white;
       border-color: @colorValLight;
 
       &:not(:disabled) {

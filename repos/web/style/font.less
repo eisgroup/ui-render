@@ -5,6 +5,10 @@
   .font(@lineHeight: 1)
 }
 
+.font-family-secondary {
+  font-family: @font-family-secondary;
+}
+
 .text, .p, p, li {
   .colors();
 
@@ -101,6 +105,24 @@
 
 .text-highlight {
   .text-highlight();
+}
+
+.text-outline {
+  &:extend(.text-highlight);
+
+  &.inverted,
+  .inverted & {
+    &:extend(.text-shadow);
+  }
+}
+
+.text-outline-solid {
+  .text-highlight(@opacity: 1; @x: 1px; @y: 1px; @blur: 0px;);
+
+  &.inverted,
+  .inverted & {
+    .text-shadow(@opacity: 1; @x: 1px; @y: 1px; @blur: 0px;);
+  }
 }
 
 .uppercase {

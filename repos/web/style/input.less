@@ -399,6 +399,10 @@ input, select, textarea {
     textarea:not(:focus):not(:hover) {
       border-color: fade(@input-color, 35%);
       border-style: dashed;
+
+      .inverted & {
+        border-color: fade(@input-color-inverse, 35%);
+      }
     }
   }
 
