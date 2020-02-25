@@ -1,6 +1,17 @@
 import classNames from 'classnames'
 import React from 'react'
-import { get, interpolateString, isList, isNumeric, isObject, isString, toPercent } from '../../common/utils'
+import {
+  get,
+  hasListValue,
+  interpolateString,
+  isAsync,
+  isFunction,
+  isList,
+  isNumeric,
+  isObject,
+  isString,
+  toPercent
+} from '../../common/utils'
 import { ACTIVE, FIELD } from '../../common/variables'
 import Button from '../Button'
 import PieChart from '../charts/PieChart'
@@ -163,7 +174,7 @@ export function metaToProps (meta, data, instance) {
           ...definition.name && {name: interpolateString(definition.name, {index, value})},
           // Filter for row data from parent table (in default layout)
           ...definition.filterItems && {parentItem: value},
-          ...isString(definition.onClick) && self && !getFunctionFromConfig(definition.onClick, null) &&
+          ...isString(definition.onClick) && self && !getFunctionFromString(definition.onClick, null) &&
           {onClick: self[definition.onClick]},
           // Recursively map definitions within Render function
           ...definition.items && {items: metaToProps(definition.items, data, instance)},
@@ -215,7 +226,7 @@ function mapProps (data, mapper) {
 /**
  * Get Function from Definition String
  * @example:
- *    getFunctionFromConfig('reset,0')
+ *    getFunctionFromString('reset,0')
  *    >>> function reset(...argumentsSuppliedFromCaller, '0') {...}
  *
  * @param {String} string - name of function to get, with optional arguments, separated by comma
@@ -223,10 +234,43 @@ function mapProps (data, mapper) {
  * @returns {Function|String} method - that receives caller arguments as its first arguments,
  *    along with optionally defined arguments in the config string
  */
-function getFunctionFromConfig (string, fallback = string) {
+function getFunctionFromString (string, fallback = string) {
   const [name, ...args] = string.split(',')
   const func = FIELD.FUNC[name]
   return ((args.length && func) ? ((...arg) => func(...arg, ...args)) : func) || fallback
+}
+
+/**
+ * Get Function/s from Definition Object Recursively
+ * @example:
+ *    getFunctionFromObject({name: 'reset', args: [0], onDone: 'setState,active.plan'})
+ *    >>> function (...argumentsSuppliedFromCaller) {
+ *          return setState(reset(...argumentsSuppliedFromCaller, 0), 'active.plan')
+ *        }
+ *
+ * @param {Object<name, args, onDone>} definition - of function to call
+ *    - @param {String} name - of the function
+ *    - @param {Array} [args] - last arguments to pass to the function
+ *    - @param {String|Object} [onDone] - callback recursive function definitions
+ * @param {*} [fallback] - value to use when function not found, defaults to given `name`
+ * @returns {Function|String} method - that receives caller arguments as its first arguments,
+ *    and will chain function calls `onDone` recursively
+ */
+function getFunctionFromObject (definition, fallback = definition.name) {
+  const {name, args, onDone} = definition
+  const func = FIELD.FUNC[name]
+  if (onDone) metaToFunctions(definition)
+  if ((hasListValue(args) && func)) {
+    const hasCallback = isFunction(definition.onDone)
+    if (hasCallback && isAsync(func)) {
+      return (...arg) => func(...arg, ...args).then(definition.onDone)
+    } else if (hasCallback) {
+      return (...arg) => definition.onDone(func(...arg, ...args))
+    } else {
+      return (...arg) => func(...arg, ...args)
+    }
+  }
+  return func || fallback
 }
 
 /**
@@ -236,8 +280,12 @@ function getFunctionFromConfig (string, fallback = string) {
  * @param {Array} [funcNames] - list of definitions keys to check for function transform
  * @returns {Object} definition - with names replaced by functions (by mutation)
  */
-function metaToFunctions (definition, funcNames = ['onClick', 'onChange']) {
+function metaToFunctions (definition, funcNames = ['onClick', 'onChange', 'onDone']) {
   funcNames.forEach(name => {
-    if (isString(definition[name])) definition[name] = getFunctionFromConfig(definition[name])
+    if (isString(definition[name])) {
+      definition[name] = getFunctionFromString(definition[name])
+    } else if (isObject(definition[name])) {
+      definition[name] = getFunctionFromObject(definition[name])
+    }
   })
 }

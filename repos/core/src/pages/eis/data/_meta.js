@@ -112,22 +112,64 @@ export default {
           {
             view: 'Text', children: 'Rate Details - ', className: 'margin-right-small'
           },
-          {
-            view: 'Dropdown',
-            name: 'plan', // `plan` must be unique key path identifier that does not exist in *_data.json
-            value: {name: '{state.active.plan,0}'},
-            onChange: 'setState,active.plan',
-            options: {name: 'planCalculations'}, // `planCalculations` is key path pointing to array in *_data.json
-            mapOptions: {
-              text: 'planName', // `planName` is key path pointing to value for each item in `options` above
-              value: '{index}', // using index of item, instead of its value as ID
-            },
-          }
         ]
       },
       className: 'border-gradient-h-right',
       expanded: true,
       items: [
+        {
+          view: 'Row',
+          className: 'wrap',
+          items: [
+            {
+              view: 'Dropdown',
+              name: 'plan', // `plan` must be unique key path identifier that does not exist in *_data.json
+              value: {name: '{state.active.plan,0}'},
+              onChange: 'setState,active.plan', // function defined as string
+              options: {name: 'planCalculations'}, // `planCalculations` is key path pointing to array in *_data.json
+              mapOptions: {
+                text: 'planName', // `planName` is key path pointing to value for each item in `options` above
+                value: '{index}', // using index of item, instead of its value as ID
+              },
+            },
+            {
+              view: 'Dropdown',
+              name: 'plan', // `plan` must be unique key path identifier that does not exist in *_data.json
+              value: {name: '{state.active.plan,0}'},
+              onChange: { // function defined as object
+                name: 'setState',
+                args: ['active.plan'],
+              },
+              options: {name: 'planCalculations'}, // `planCalculations` is key path pointing to array in *_data.json
+              mapOptions: {
+                text: 'planName', // `planName` is key path pointing to value for each item in `options` above
+                value: '{index}', // using index of item, instead of its value as ID
+              },
+            },
+            {
+              view: 'Dropdown',
+              name: 'plan', // `plan` must be unique key path identifier that does not exist in *_data.json
+              value: {name: '{state.active.plan,0}'},
+              onChange: { // function defined as object with nested callback
+                name: 'setState',
+                args: ['active.plan'],
+                onDone: {
+                  name: 'warn',
+                  args: ['Dropdown.onChange -> onDone.warn'],
+                  onDone: {
+                    name: 'warn',
+                    args: ['Dropdown.onChange -> onDone.warn -> onDone.warn'],
+                  }
+                },
+              },
+              options: {name: 'planCalculations'}, // `planCalculations` is key path pointing to array in *_data.json
+              mapOptions: {
+                text: 'planName', // `planName` is key path pointing to value for each item in `options` above
+                value: '{index}', // using index of item, instead of its value as ID
+              },
+            },
+          ],
+        },
         {
           view: 'Tabs',
           // defaultIndex: 1,

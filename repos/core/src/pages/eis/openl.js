@@ -39,7 +39,7 @@ export default class OpenL extends Component {
   // Positional arguments was chosen instead of keyword arguments because
   // it provides more flexibility and separation of concerns between different configs.
   setStates = (value, keyPath) => {
-    this.setState(set(this.state, keyPath, value))
+    return this.setState(set(this.state, keyPath, value))
   }
 
   fetch = async (url, data, callback) => {
@@ -70,7 +70,7 @@ export default class OpenL extends Component {
   render () {
     const {data, showMeta} = this.state
     const props = metaToProps(cloneDeep(meta), data, this)
-    console.warn('props', props)
+    console.warn('meta transformed', props)
     return (
       <>
         <ScrollView fill className='fade-in bg-texture'>

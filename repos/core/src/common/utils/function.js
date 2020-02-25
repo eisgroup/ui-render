@@ -19,9 +19,25 @@ import { randomString } from './string'
  */
 export function isFunction (func) {
   // When 'GeneratorFunction' is defined globally, use it instead of isFunction.Generator
-  return !!func && (func.constructor === Function || func.constructor === isFunction.Generator)
+  return !!func && (
+    func.constructor === Function ||
+    func.constructor === isFunction.Async ||
+    func.constructor === isFunction.Generator
+  )
 }
+
 isFunction.Generator = (function * () {}).constructor
+isFunction.Async = (async () => {}).constructor
+
+/**
+ * Check if given function is Asynchronous
+ *
+ * @param {Function} func - to check
+ * @returns {Boolean} true - if it is
+ */
+export function isAsync (func) {
+  return func.constructor.name === 'AsyncFunction'
+}
 
 /**
  * Check for a Valid Enumerable Value and Throw Error If It's Not

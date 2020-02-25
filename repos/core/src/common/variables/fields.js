@@ -35,10 +35,13 @@ FIELD.ACTION = {
   RESET: 'reset',
   SET_STATE: 'setState',
   FETCH: 'fetch',
+  WARN: 'warn',
 }
 
 // Action Methods by Action Type Definitions
-FIELD.FUNC = {}
+FIELD.FUNC = {
+  [FIELD.ACTION.WARN]: console.warn,
+}
 
 // Field IDs for uniquely identifying field definitions
 FIELD.ID = {
