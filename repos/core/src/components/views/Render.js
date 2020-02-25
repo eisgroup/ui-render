@@ -230,7 +230,7 @@ function getFunctionFromConfig (string, fallback = string) {
 }
 
 /**
- * Transform Definition Functions if they exists
+ * Transform Definition Functions if they exist
  *
  * @param {Object} definition - containing function names
  * @param {Array} [funcNames] - list of definitions keys to check for function transform
