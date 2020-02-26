@@ -148,25 +148,23 @@ export default {
             },
             {
               view: 'Dropdown',
-              name: 'plan', // `plan` must be unique key path identifier that does not exist in *_data.json
-              value: {name: '{state.active.plan,0}'},
+              name: 'url', // must be unique key path identifier that does not exist in *_data.json
+              placeholder: 'Select fetch API',
               onChange: { // function defined as object with nested callback
-                name: 'setState',
-                args: ['active.plan'],
+                name: 'fetch',
                 onDone: {
                   name: 'warn',
-                  args: ['Dropdown.onChange -> onDone.warn'],
+                  args: ['Dropdown.onChange -> fetch.onDone -> warn'],
                   onDone: {
                     name: 'warn',
-                    args: ['Dropdown.onChange -> onDone.warn -> onDone.warn'],
+                    args: ['Dropdown.onChange -> fetch.onDone -> warn.onDone -> warn'],
                   }
                 },
               },
-              options: {name: 'planCalculations'}, // `planCalculations` is key path pointing to array in *_data.json
-              mapOptions: {
-                text: 'planName', // `planName` is key path pointing to value for each item in `options` above
-                value: '{index}', // using index of item, instead of its value as ID
-              },
+              options: [
+                {text: 'IP Address', value: 'https://api.ipify.org/?format=json'},
+                {text: 'Geolocation Data', value: 'http://ip-api.com/json'}
+              ],
             },
           ],
         },

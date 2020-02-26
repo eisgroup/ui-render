@@ -2,9 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 import {
   get,
-  hasListValue,
   interpolateString,
-  isAsync,
   isFunction,
   isList,
   isNumeric,
@@ -257,15 +255,16 @@ function getFunctionFromString (string, fallback = string) {
  *    and will chain function calls `onDone` recursively
  */
 function getFunctionFromObject (definition, fallback = definition.name) {
-  const {name, args, onDone} = definition
+  const {name, args = [], onDone} = definition
   const func = FIELD.FUNC[name]
   if (onDone) metaToFunctions(definition)
-  if ((hasListValue(args) && func)) {
-    const hasCallback = isFunction(definition.onDone)
-    if (hasCallback && isAsync(func)) {
-      return (...arg) => func(...arg, ...args).then(definition.onDone)
-    } else if (hasCallback) {
-      return (...arg) => definition.onDone(func(...arg, ...args))
+  if (func) {
+    if (isFunction(definition.onDone)) {
+      return (...arg) => {
+        const result = func(...arg, ...args)
+        if (result instanceof Promise) return result.then(definition.onDone)
+        return definition.onDone(result)
+      }
     } else {
       return (...arg) => func(...arg, ...args)
     }
