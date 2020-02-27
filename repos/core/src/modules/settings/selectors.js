@@ -30,8 +30,8 @@ export default class select {
 
   static language = () => [
     (state) => state[NAME].data.language,
-    (val = DEFAULT.LANGUAGE) => {
-      ACTIVE.LANG = findObjByKeys(LANGUAGE, {code: val})
+    (val) => { // @note: do not add default language here to trigger setLanguageFlow saga
+      ACTIVE.LANG = findObjByKeys(LANGUAGE, {code: val}) || LANGUAGE.ENGLISH
       return val
     }
   ]

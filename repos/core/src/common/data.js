@@ -1,5 +1,7 @@
 import { languageDropdownOptions } from '../components/renders'
-import { LANGUAGE } from './constants'
+import { l, LANGUAGE } from './constants'
+import { isInList } from './utils'
+import { DEFAULT, LANGUAGE_OPTIONS } from './variables'
 import { OPTIONS } from './variables/definitions'
 
 /**
@@ -9,9 +11,15 @@ import { OPTIONS } from './variables/definitions'
  */
 
 export const LANGUAGE_BY = { // country code
-  AU: LANGUAGE.ENGLISH.code,
-  US: LANGUAGE.ENGLISH.code,
-  UK: LANGUAGE.ENGLISH.code,
-  RU: LANGUAGE.RUSSIAN.code,
+  AU: getSupportedLanguageCode(l.ENGLISH),
+  US: getSupportedLanguageCode(l.ENGLISH),
+  UK: getSupportedLanguageCode(l.ENGLISH),
+  RU: getSupportedLanguageCode(l.RUSSIAN),
+  BY: getSupportedLanguageCode(l.RUSSIAN),
+  UA: getSupportedLanguageCode(l.RUSSIAN),
 }
 OPTIONS.LANGUAGE = languageDropdownOptions(LANGUAGE)
+
+function getSupportedLanguageCode (langCode, options = LANGUAGE_OPTIONS.map(l => l.code)) {
+  return (isInList(options, langCode)) ? langCode : DEFAULT.LANGUAGE
+}

@@ -184,6 +184,10 @@ export const LANGUAGE = { // https://en.wikipedia.org/wiki/List_of_ISO_639-1_cod
   KOREAN: {code: 'ko', lang: '한국어', 'en': 'Korean'},
   JAPANESE: {code: 'ja', lang: '日本語', 'en': 'Japanese'},
 }
+export const l = {} // object mapping of language to their code
+for (const key in LANGUAGE) {
+  l[key] = LANGUAGE[key].code
+}
 export const LANGUAGE_LEVEL = {
   UNKNOWN: {
     code: 0,

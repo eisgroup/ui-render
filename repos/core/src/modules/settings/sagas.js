@@ -2,6 +2,7 @@ import { SET, stateAction } from '../../common/actions'
 import { fetchResponseProcessing } from '../../common/api/utils/helpers'
 import { LANGUAGE_BY } from '../../common/data'
 import { call, put, selectState, spawn } from '../../common/saga/utils'
+import { isString, toLowerCase } from '../../common/utils'
 import { DEFAULT } from '../../common/variables'
 import { NAME } from './constants'
 import select from './selectors'
@@ -40,9 +41,8 @@ export default function * init () {
 function * setLanguageFlow () {
   const language = yield selectState(select.language)
   if (language) return
-  let country = yield call(getUserCountry)
+  const {country} = yield call(getUserGeolocation)
   if (!country || typeof country !== 'string' || country.length > 3) return
-  country = country.toUpperCase()
   yield put(stateAction(NAME, SET, {country, language: LANGUAGE_BY[country] || DEFAULT.LANGUAGE}))
 }
 
@@ -52,13 +52,16 @@ function * setLanguageFlow () {
  */
 
 /**
- * Request User Country via external API if no Country has been set
+ * Request User Geolocation via external API if no Country has been set
  */
-function * getUserCountry () {
-  const result = yield selectState(select.country)
-  if (result) return result
-  const response = yield call(fetch, '//ip-api.com/json')
+function * getUserGeolocation () {
+  const result = {}
+  result.country = yield selectState(select.country)
+  if (result.country) return result
+  const response = yield call(fetch, 'https://ipapi.co/json')
   const info = yield call(fetchResponseProcessing, response)
-  const {countryCode: country} = info || {}
-  return country
+  const {country_code: country, languages} = info || {}
+  if (isString(country)) result.country = country.toUpperCase()
+  if (isString(languages)) result.language = toLowerCase(languages).split(',').shift()
+  return result
 }
