@@ -157,7 +157,7 @@ export function metaToProps (meta, data, instance) {
     // Map `onClick` functions by name (if exists)
     // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
     if (isObject(definition)) {
-      metaToFunctions(definition)
+      metaToFunctions(definition, {data})
       if (definition.name) definition.name = interpolateString(definition.name, instance, {suppressError: true})
     }
 
@@ -250,41 +250,62 @@ function getFunctionFromString (string, fallback = string) {
  *    - @param {String} name - of the function
  *    - @param {Array} [args] - last arguments to pass to the function
  *    - @param {String|Object} [onDone] - callback recursive function definitions
+ * @param {Object} data - json
  * @param {*} [fallback] - value to use when function not found, defaults to given `name`
  * @returns {Function|String} method - that receives caller arguments as its first arguments,
  *    and will chain function calls `onDone` recursively
  */
-function getFunctionFromObject (definition, fallback = definition.name) {
-  const {name, args = [], onDone} = definition
+function getFunctionFromObject (definition, {data, fallback = definition.name} = {}) {
+  const {name, mapArgs, args = [], onDone} = definition
   const func = FIELD.FUNC[name]
-  if (onDone) metaToFunctions(definition)
+  if (onDone) metaToFunctions(definition, {data})
   if (func) {
+    const hasMapArgs = isList(mapArgs)
     if (isFunction(definition.onDone)) {
-      return (...arg) => {
-        const result = func(...arg, ...args)
+      return (...values) => {
+        if (hasMapArgs) values = mapArgs.map(val => transformDefinition(val, {data, args: values}))
+        const result = func(...values, ...args)
         if (result instanceof Promise) return result.then(definition.onDone)
         return definition.onDone(result)
       }
     } else {
-      return (...arg) => func(...arg, ...args)
+      return (...values) => {
+        if (hasMapArgs) values = mapArgs.map(val => transformDefinition(val, {data, args: values}))
+        return func(...values, ...args)
+      }
     }
   }
   return func || fallback
+}
+
+function transformDefinition (value, {data, args}) {
+  if (isString(value)) return interpolateString(
+    interpolateString(value, args, {suppressError: true}),
+    data,
+    {suppressError: true},
+  )
+  if (isObject(value) || isList(value)) {
+    for (const key in value) {
+      value[key] = transformDefinition(value[key], {data, args})
+    }
+  }
+  return value
 }
 
 /**
  * Transform Definition Functions if they exist
  *
  * @param {Object} definition - containing function names
+ * @param {Object} data - json
  * @param {Array} [funcNames] - list of definitions keys to check for function transform
  * @returns {Object} definition - with names replaced by functions (by mutation)
  */
-function metaToFunctions (definition, funcNames = ['onClick', 'onChange', 'onDone']) {
+function metaToFunctions (definition, {data, funcNames = ['onClick', 'onChange', 'onDone']} = {}) {
   funcNames.forEach(name => {
     if (isString(definition[name])) {
       definition[name] = getFunctionFromString(definition[name])
     } else if (isObject(definition[name])) {
-      definition[name] = getFunctionFromObject(definition[name])
+      definition[name] = getFunctionFromObject(definition[name], {data})
     }
   })
 }

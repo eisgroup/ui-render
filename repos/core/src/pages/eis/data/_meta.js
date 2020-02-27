@@ -153,11 +153,15 @@ export default {
               onChange: { // function defined as object with nested callback
                 name: 'fetch',
                 onDone: {
-                  name: 'warn',
-                  args: ['Dropdown.onChange -> fetch.onDone -> warn'],
+                  name: 'fetch',
+                  mapArgs: [ // function will first receive `mapArgs`, then followed by `args`, as arguments
+                    // variable `{0.payload.ip}` can be defined to get data from arguments, in addition to *_data.json
+                    'https://ipapi.co/{0.payload.ip}/json', // this is the first argument passed to the function
+                    // ...second (subsequent) argument/s can be defined as object/array/number/etc.
+                  ],
                   onDone: {
                     name: 'warn',
-                    args: ['Dropdown.onChange -> fetch.onDone -> warn.onDone -> warn'],
+                    args: ['Dropdown.onChange -> fetch.onDone -> fetch.onDone -> warn'],
                   }
                 },
               },
