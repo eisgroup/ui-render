@@ -50,7 +50,7 @@ export default class OpenL extends Component {
     active: {
       // plan: 1,
     },
-    showMeta: false,
+    showMeta: true,
   }
 
   /**
@@ -75,7 +75,7 @@ export default class OpenL extends Component {
         </ScrollView>
 
         {showMeta &&
-        <ScrollView className='padding bg-neutral inverted'>
+        <ScrollView className='padding bg-neutral inverted json-tree'>
           <Json data={meta} inverted/>
         </ScrollView>
         }
