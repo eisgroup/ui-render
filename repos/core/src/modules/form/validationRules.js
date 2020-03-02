@@ -3,6 +3,7 @@ import isLength from 'validator/lib/isLength'
 import isURL from 'validator/lib/isURL'
 import { isEmpty, isNumeric, isPhoneNumber, pluralize, toList } from '../../common/utils'
 import { isGoodPassword } from '../../common/utils/utility'
+import { FIELD } from '../../common/variables'
 
 /**
  * VALIDATION RULES ============================================================
@@ -69,4 +70,20 @@ export function timeRanges (value) {
   if (!values.find(({from}) => from != null)) return 'Must have start time'
   if (!values.find(({to}) => to != null)) return 'Must have end time'
   return OK
+}
+
+// Validation Definitions
+FIELD.VALIDATE = {
+  EMAIL: 'email',
+  MAX_LENGTH: 'maxLength',
+  PASSWORD: 'password',
+  REQUIRED: 'required',
+  URL: 'url',
+}
+FIELD.VALIDATION = {
+  [FIELD.VALIDATE.EMAIL]: email,
+  [FIELD.VALIDATE.MAX_LENGTH]: maxLength,
+  [FIELD.VALIDATE.PASSWORD]: password,
+  [FIELD.VALIDATE.REQUIRED]: isRequired,
+  [FIELD.VALIDATE.URL]: url,
 }

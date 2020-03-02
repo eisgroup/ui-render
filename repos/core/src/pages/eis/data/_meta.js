@@ -22,7 +22,8 @@ export default {
               label: 'Number of claims per employee',
               name: 'adminExpenses.perEmployeeClaims',
               type: 'number',
-              min: 1
+              min: 1,
+              validate: 'required',
             },
             {
               view: 'Table',

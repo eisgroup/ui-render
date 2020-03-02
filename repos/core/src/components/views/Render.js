@@ -8,6 +8,8 @@ import {
   isNumeric,
   isObject,
   isString,
+  removeNilValues,
+  toList,
   toPercent
 } from '../../common/utils'
 import { ACTIVE, FIELD } from '../../common/variables'
@@ -301,6 +303,8 @@ function transformDefinition (value, {data, args}) {
  * @returns {Object} definition - with names replaced by functions (by mutation)
  */
 function metaToFunctions (definition, {data, funcNames = ['onClick', 'onChange', 'onDone']} = {}) {
+  const validations = toList(definition.validate)
+  if (isString(validations[0])) definition.validate = removeNilValues(validations.map(id => FIELD.VALIDATION[id]))
   funcNames.forEach(name => {
     if (isString(definition[name])) {
       definition[name] = getFunctionFromString(definition[name])
