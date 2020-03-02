@@ -1,4 +1,5 @@
 import { round } from '../../common/utils'
+import { FIELD } from '../../common/variables'
 
 /**
  * NORMALIZERS =================================================================
@@ -6,7 +7,7 @@ import { round } from '../../common/utils'
  * =============================================================================
  */
 
-export const integer = (value) => parseInt(value, 10)
+export const integer = (value) => value && parseInt(value, 10)
 export const uppercase = (value) => value.toUpperCase()
 export const emptyStringToNull = (value) => ((value === '') ? null : value)
 
@@ -121,4 +122,20 @@ export function phone (value) {
     .replace(/([^\d]+)?\)([^\d\s]+)?/g, ')')
     .replace(/([^\d]+)?-([^\d]+)?/g, '-')
     .replace(/\s\s+/g, ' ')
+}
+
+// Validation Definitions
+FIELD.NORMALIZE = {
+  DATE: 'date',
+  HOUR_MINUTE: 'hh:mm',
+  INTEGER: 'integer',
+  PHONE: 'phone',
+  UPPERCASE: 'uppercase',
+}
+FIELD.NORMALIZER = {
+  [FIELD.NORMALIZE.DATE]: date,
+  [FIELD.NORMALIZE.HOUR_MINUTE]: hourMinute,
+  [FIELD.NORMALIZE.INTEGER]: integer,
+  [FIELD.NORMALIZE.PHONE]: phone,
+  [FIELD.NORMALIZE.UPPERCASE]: uppercase,
 }

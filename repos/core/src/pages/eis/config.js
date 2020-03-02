@@ -25,9 +25,10 @@ const field = {
   // Meta data
   view: 'Col', // * name of React Component used to render this field
   items: [], // recursively nested fields
+  children: 'Any', // nested content to render inside field
+  onClick: Function, // example: `{onClick: 'setState,active.plan'}` - `setState` function with `active.plan` argument
   style: Object, // css style to apply
   className: 'CSS class name to apply',
-  onClick: Function, // example: `{onClick: 'setState,active.plan'}` - `setState` function with `active.plan` argument
 
   // Generic input props
   name: 'adminCosts.adminCategory', // * path to field value within *_data.json
@@ -41,7 +42,7 @@ const field = {
   float: Boolean, // whether label should float above input when in focus
   disabled: Boolean, // disabled input
   readonly: Boolean, // read-only input, makes all nested fields disabled, with `readonly` css class applied
-  normalize: [Function], // redux-form input value normalizer function/s
+  normalize: Function, // redux-form input value normalizer function/s
   validate: [Function], // redux-form input value validation function/s
   value: undefined, // controlled input value
   defaultValue: undefined, // to be used on init if `value` not set

@@ -23,6 +23,7 @@ export default {
               name: 'adminExpenses.perEmployeeClaims',
               type: 'number',
               min: 1,
+              normalize: 'integer',
               validate: 'required',
             },
             {

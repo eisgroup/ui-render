@@ -305,6 +305,7 @@ function transformDefinition (value, {data, args}) {
 function metaToFunctions (definition, {data, funcNames = ['onClick', 'onChange', 'onDone']} = {}) {
   const validations = toList(definition.validate)
   if (isString(validations[0])) definition.validate = removeNilValues(validations.map(id => FIELD.VALIDATION[id]))
+  if (isString(definition.normalize)) definition.normalize = FIELD.NORMALIZER[definition.normalize]
   funcNames.forEach(name => {
     if (isString(definition[name])) {
       definition[name] = getFunctionFromString(definition[name])
