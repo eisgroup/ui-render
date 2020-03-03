@@ -10,16 +10,16 @@ export const FIELD = getSetDefinition('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', '
 // Field Type Definitions
 FIELD.TYPE = {
   BUTTON: 'Button',
-  EXPAND: 'Expand',
-  COL: 'Col',
-  COUNTER: 'Counter',
+  EXPAND: 'Expand', // Expandable/collapsing content with clickable `title` or `renderTitle` area
+  COL: 'Col', // Vertical column layout
+  COUNTER: 'Counter', // Animated number changing from `start` to `end` values
   LABEL: 'Label',
-  PIE_CHART: 'PieChart',
-  ROW: 'Row',
+  PIE_CHART: 'PieChart', // Pie chat (can be in shape of donut) with optional legends
+  ROW: 'Row', // Horizontal row layout
   TABLE: 'Table',
   TABS: 'Tabs',
   TEXT: 'Text',
-  TITLE: 'Title',
+  TITLE: 'Title', // A customised `Text` view with certain styling for consistent look and feel
   // ...to be populated by modules
 }
 
