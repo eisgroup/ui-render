@@ -29,6 +29,10 @@ export default {
             {
               view: 'Table',
               name: 'adminCosts',
+              sorts: [
+                {id: 'annualAmt', order: 0},
+                {id: 'premiumPct', order: 1, /*sortKey: 'amt.pct'*/},
+              ],
               headers: [
                 {
                   id: 'adminCategory',

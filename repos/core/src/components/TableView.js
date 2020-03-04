@@ -12,10 +12,9 @@ import View from './View'
 // import Table, { Column } from 'react-virtualized/dist/commonjs/Table' // adds 80 KB to final bundle.js
 // import 'react-virtualized/styles.css'
 
-const sortStates = [-1, 0, 1, undefined]
 const sortObj = {
   id: PropTypes.string.isRequired, // id of the header, used for grouping columns/rows
-  sort: PropTypes.oneOf(sortStates),
+  order: PropTypes.oneOf([-1, 0, 1, undefined]),
   sortKey: PropTypes.string, // path to item's value used for sorting objects
 }
 
@@ -42,7 +41,7 @@ export default class TableView extends Component {
       })
     ),
     sorts: PropTypes.arrayOf(PropTypes.shape({...sortObj})),
-    onSort: PropTypes.func, // receives header `id` as argument
+    onSort: PropTypes.func, // receives clicked sort object {id, order, sortKey} as argument
     renderItem: PropTypes.func, // callback to render extra table rows in default layout
     itemsExpanded: PropTypes.bool,
     // ...other Table props
@@ -53,6 +52,7 @@ export default class TableView extends Component {
       expanded: this.props.itemsExpanded,
       expandedByIndex: {},
     },
+    sorts: this.props.sorts,
   }
 
   // LOGIC ---------------------------------------------------------------------
@@ -68,7 +68,8 @@ export default class TableView extends Component {
 
   get itemsSorted () {
     if (this._itemsSorted) return this._itemsSorted
-    const {items, sorts} = this.props
+    const {items} = this.props
+    const {sorts} = this.state
     this._itemsSorted = items
 
     // Multiple Header Sorting according to the order they are given
@@ -76,8 +77,8 @@ export default class TableView extends Component {
       // Create new list to avoid mutating original data
       this._itemsSorted = [...items]
       const sortKeys = []
-      sorts.forEach(({id, sort, sortKey}) => {
-        if (sort) sortKeys.push((sort < 0 ? '-' : '') + (sortKey ? `${id}.${sortKey}` : id))
+      sorts.forEach(({id, order, sortKey}) => {
+        if (order) sortKeys.push((order < 0 ? '-' : '') + (sortKey ? `${id}.${sortKey}` : id))
       })
       this._itemsSorted.sort(by(...sortKeys))
     }
@@ -89,11 +90,10 @@ export default class TableView extends Component {
     const {items, sorts} = this.props
 
     // Reset if items or sorting if items changed
-    if (
-      !isEqualList(next.items, items) ||
-      (sorts && !isEqual(next.sorts, sorts))
-    ) {
+    if (!isEqualList(next.items, items)) this._itemsSorted = null
+    if (!isEqual(next.sorts, sorts)) {
       this._itemsSorted = null
+      this.setState({sorts: next.sorts})
     }
 
     // Reset Header definitions if not defined and item structure changed
@@ -119,15 +119,33 @@ export default class TableView extends Component {
     })
   }
 
+  handleSort = (id) => {
+    const {onSort} = this.props
+    let sort
+    this._itemsSorted = null
+    this.setState({
+      sorts: this.state.sorts.map(s => {
+        if (s.id === id) {
+          sort = {...s, order: s.order ? (s.order < 0 ? 1 : 0) : -1}
+          return sort
+        }
+        return s
+      })
+    })
+    onSort && onSort(sort)
+  }
+
   // RENDERS -------------------------------------------------------------------
 
   renderHeader = ({id, title, children, className, style}) => {
-    const {sorts, onSort} = this.props
+    const {sorts} = this.state
+    const hasSort = sorts && !!sorts.find(s => s.id === id)
     return (
       <Table.HeaderCell key={id}>
-        <Row className={classNames('middle', className)} style={style} onClick={onSort && onSort.bind(this, id)}>
+        <Row className={classNames('middle', className)} style={style}
+             onClick={hasSort && this.handleSort.bind(this, id)}>
           {children || <Text>{title || id}</Text>}
-          {sorts && renderSort((sorts.find(item => item.id === id) || {}).sort, {className: 'margin-left-small'})}
+          {hasSort && renderSort(sorts.find(item => item.id === id) || {})}
         </Row>
       </Table.HeaderCell>
     )

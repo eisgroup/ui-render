@@ -174,10 +174,17 @@ export function renderFilters ({type, ...field}, i) {
  * Render Sort Icon
  *
  * @param {Number|Undefined} order - sorting order, one of renderSort.icon keys
+ * @param {Number|Undefined} [id] - of the column or row to sort
+ * @param {Function} [onClick] - callback when sort Icon is clicked, received clicked sort object
+ * @param {String} [className] - CSS class names to add
  */
-export function renderSort (order) {
+export function renderSort ({id, order}, {onClick, className} = {}) {
   return (
-    <Icon className={classNames('app__sort__icon no-margin', {active: !order})} name={renderSort.icon[order || 0]}/>
+    <Icon
+      className={classNames('app__sort__icon', className, {active: !order})}
+      name={renderSort.icon[order || 0]}
+      onClick={onClick && (() => onClick({id, order}))}
+    />
   )
 }
 
