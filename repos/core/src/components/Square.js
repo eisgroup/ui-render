@@ -60,7 +60,7 @@ Square.Row = asSquare(Row)
  * @param {Class|Function} Component - to render as square
  */
 export function asSquare (Component) {
-  return function Square ({top, right, bottom, left, width, height, ...props}) {
+  return function Square ({top, right, bottom, left, width, height, className, ...props}) {
     const ratio = width && height ? width / height : 1
     const isRectangle = ratio !== 1
     return <SizeMe monitorHeight children={({size: {width, height}}) => {
@@ -84,9 +84,11 @@ export function asSquare (Component) {
       // SizeMe will attempt to render placeholder (wrapped component) first to detect width and height.
       // The placeholder till take className and style applied to wrapped component.
       // We need two wrapper components to minimize re-renders, because React does not allow mutating this.props
+      // @Note: filling child element of `square-wrap` causes major UI lagging in Chrome (example UploadGrid)
+      // The fix is to make immediate child positioned absolute within the square.
       return <View fill className={classNames('square-placeholder', position({top, right, bottom, left}))}>
-        <View className='square' style={style}>
-          <Component {...props}/>
+        <View className='square-wrap' style={style}>
+          <Component className={classNames('position-fill', className)} {...props}/>
         </View>
       </View>
     }}/>
