@@ -13,6 +13,7 @@ export * from './definitions'
 export * from './fields'
 export * from './files'
 export * from './routes'
+export * from './translations'
 export * from './urls'
 export * from './validations'
 
