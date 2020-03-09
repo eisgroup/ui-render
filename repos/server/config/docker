@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Ignore Errors and execute all commands
+set +e
+echo "Deploy Docker..."
+sudo docker-compose stop && \
+sudo docker-compose up -d --force-recreate --build --remove-orphans

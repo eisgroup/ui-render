@@ -1,0 +1,115 @@
+# =============================================================================
+# GRAPHQL SCHEMA
+# Type definitions for Clients
+# =============================================================================
+scalar Timestamp # in milliseconds
+scalar JSON
+scalar Upload
+scalar URL # example: https://example.com
+enum Operator {
+    or
+    and
+}
+
+# -----------------------------------------------------------------------------
+# SUMMARY
+# -----------------------------------------------------------------------------
+type Query {
+    cursor: JSON! # for querying large lists requiring pagination
+}
+
+type Mutation {
+    _: String
+}
+
+type Subscription {
+    alerts: [Alert!]!
+}
+
+# -----------------------------------------------------------------------------
+# TYPES
+# -----------------------------------------------------------------------------
+
+type Action {
+    type: String
+    payload: JSON
+    meta: JSON
+    error: Boolean
+}
+
+type Alert {
+    id: ID!
+    title: String!
+    content: String!
+    created: Timestamp!
+}
+
+type KeyVal {
+    key: String
+    val: JSON
+}
+
+
+type Photo {
+    src: URL!
+    name: String
+    i: Int # index position
+    created: Timestamp!
+}
+
+type Range {
+    min: Int!
+    max: Int
+}
+
+type TimeRange {
+    from: Timestamp
+    to: Timestamp
+}
+
+#type Phone {
+#    mobile: String
+#    home: String
+#    work: String
+#}
+
+
+# -----------------------------------------------------------------------------
+# INPUTS
+# -----------------------------------------------------------------------------
+
+input FileInput {
+    file: Upload # binary File object uploaded from client
+    remove: Boolean # whether the file should be deleted
+    i: Int # index position of the file in collection
+
+    # Unused fields for Frontend convinience,
+    # so GraphQL does not complain about extra field
+    src: String
+    name: String
+    created: Timestamp
+}
+
+input FilesInput {
+    kind: String
+    files: [FileInput!]
+}
+
+input KeyValInput {
+    key: String
+    val: JSON
+}
+
+input RangeInput {
+    min: Int!
+    max: Int
+}
+
+input TimeRangeInput {
+    from: Timestamp
+    to: Timestamp
+}
+
+# -----------------------------------------------------------------------------
+# INTERFACES
+# -----------------------------------------------------------------------------

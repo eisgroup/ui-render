@@ -1,0 +1,21 @@
+{
+  "verbose": true,
+  "ignore": [
+    ".idea",
+    ".git",
+    "node_modules",
+    "build",
+    "docs",
+    "public"
+  ],
+  "env": {
+    "BABEL_DISABLE_CACHE": 1
+  },
+  "execMap": {
+    "js": "babel-node --root-mode upward --ignore node_modules"
+  },
+  "ext": "js json graphql gql",
+  "watch": [
+    "./src/"
+  ]
+}

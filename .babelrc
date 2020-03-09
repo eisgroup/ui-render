@@ -1,0 +1,12 @@
+{
+  "plugins": [
+    "transform-decorators-legacy",
+    "transform-export-extensions",
+    "import-graphql"
+  ],
+  "presets": [
+    "env",
+    "stage-0",
+    "react"
+  ]
+}

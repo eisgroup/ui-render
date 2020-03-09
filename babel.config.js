@@ -32,7 +32,7 @@ module.exports = (api) => {
       ],
       '@babel/plugin-proposal-class-properties',
       'transform-export-extensions',
-      // 'import-graphql',
+      'import-graphql',
     ],
     presets: [
       [
