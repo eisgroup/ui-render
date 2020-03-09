@@ -12,3 +12,6 @@ while `children` is a single nested component, or a `string/number` value.
 - What is `className`?
 `className` is HTML's `class` attribute used for adding CSS class names (as strings) to an HTML element. 
 It is called `className`, instead of `class`, because the UI is written in JavaScript, which reserves the word `class` as a language keyword.
+- What style is responsible for $ or % display in table cells?
+renderCell: 'Currency' -> outputs number as currency with $ sign.
+renderCell: 'Percent' -> outputs number as percent with % sign.
