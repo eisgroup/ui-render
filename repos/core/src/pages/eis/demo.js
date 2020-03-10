@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { ALERT, stateAction } from '../../common/actions'
 import fetch from '../../common/fetch'
 import { connect } from '../../common/redux'
-import { cloneDeep, logRender, set } from '../../common/utils'
+import { cloneDeep, isEmpty, logRender, set } from '../../common/utils'
 import { _, FIELD, FILE_TYPE } from '../../common/variables'
 import Json from '../../components/Json'
 import Row from '../../components/Row'
@@ -14,7 +15,6 @@ import { settings } from '../../modules'
 import { POPUP } from '../../modules/exports'
 import { reset } from '../../modules/form'
 import { withForm } from '../../modules/form/utils'
-import router from '../../modules/router'
 import LanguageSelection from '../../modules/settings/views/LanguageSelection'
 import Upload from '../../modules/upload/views/Upload'
 import data from './data/_data'
@@ -26,8 +26,6 @@ import meta from './data/_meta'
  */
 const mapStateToProps = (state) => ({
   lang: settings.select.language(state), // to trigger re-render
-  activeRoute: router.select.activeRoute(state),
-  initialValues: data,
 })
 const mapDispatchToProps = (dispatch) => ({
   actions: {
@@ -40,7 +38,6 @@ const mapDispatchToProps = (dispatch) => ({
  * -----------------------------------------------------------------------------
  */
 @connect(mapStateToProps, mapDispatchToProps)
-@withForm({form: 'DEMO', enableReinitialize: true})
 @logRender
 export default class Demo extends Component {
   resetForm = () => {
@@ -62,26 +59,17 @@ export default class Demo extends Component {
     setState: (FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates), // must be declared before using `metaToProps`
     fetch: (FIELD.FUNC[FIELD.ACTION.FETCH] = fetch), // must be declared before using `metaToProps`
     data: {
-      json: data,
+      json: undefined,
       name: undefined,
     },
     meta: {
-      json: meta,
+      json: undefined,
       name: undefined,
     },
     active: {
       // plan: 1,
     },
   }
-
-  /**
-   * Handle Redux-Form submit, which expects a promise return value
-   */
-  submit = (values) => {
-    return this.props.actions.popup({title: 'Submitted Form with these values', content: <Json data={values}/>})
-  }
-
-  handleSubmit = this.props.handleSubmit(this.submit)
 
   handleUpload = (kind, [file], type) => {
     if (!file) return
@@ -119,46 +107,76 @@ export default class Demo extends Component {
   render () {
     const {lang} = this.props
     const {data, meta, showMeta} = this.state
-    const props = metaToProps(cloneDeep(meta.json), data.json, this)
+    const hasData = !isEmpty(data.json)
+    const hasMeta = !isEmpty(meta.json)
+    const props = (hasData && hasMeta) ? metaToProps(cloneDeep(meta.json), data.json, this) : null
     const uploadProps = {
       hasHeader: false,
       multiple: false,
       lang,
       id: FILE_TYPE.JSON,
-      className: 'radius-large',
     }
     return (
       <>
-        <ScrollView fill className='fade-in bg-texture'>
-          <form onSubmit={this.handleSubmit}>
-            <Render data={data.json} {...props}/>
-          </form>
+        <ScrollView fill className='fade-in bg-texture min-height-290'>
+          {hasData && hasMeta && <Renderer data={data.json} meta={props} initialValues={data.json}/>}
         </ScrollView>
 
         {showMeta &&
         <ScrollView className='padding-smaller bg-neutral inverted json-tree'>
           <Row className='wrap spread'>
             <View className='margin-smaller'>
-              <Upload {...uploadProps} label='*_data.json' onUpload={this.handleUpload.bind(this, 'data')}>
+              <Upload {...uploadProps} label='*_data.json' onUpload={this.handleUpload.bind(this, 'data')}
+                      className={'radius-large' + (!hasData ? ' blink' : '')}
+              >
                 {data.name && <View><Text className='h4'>{_.UPLOADED}</Text><Text>{data.name}</Text></View>}
               </Upload>
             </View>
             <View className='margin-smaller'>
-              <Upload {...uploadProps} label='*_meta.json' onUpload={this.handleUpload.bind(this, 'meta')}>
+              <Upload {...uploadProps} label='*_meta.json' onUpload={this.handleUpload.bind(this, 'meta')}
+                      className={'radius-large' + (hasData && !hasMeta ? ' blink' : '')}
+                      disabled={!hasData}
+              >
                 {meta.name && <View><Text className='h4'>{_.UPLOADED}</Text><Text>{meta.name}</Text></View>}
               </Upload>
             </View>
             <View className='margin-smaller' style={{minWidth: '45%'}}>
               <Row className='middle justify'>
-                <Text className='h6 no-margin'>{_.CONFIG_USED}</Text>
+                {hasMeta && <Text className='h6 no-margin fade-in-up'>{_.CONFIG_USED}</Text>}
                 <LanguageSelection className='right margin-left-small'/>
               </Row>
-              <Json data={meta.json} inverted/>
+              {hasMeta && <View className='fade-in-down'><Json data={meta.json} inverted/></View>}
             </View>
           </Row>
         </ScrollView>
         }
       </>
+    )
+  }
+}
+
+@connect(mapStateToProps, mapDispatchToProps)
+@withForm({form: 'DEMO', enableReinitialize: true})
+class Renderer extends Component {
+  static propTypes = {
+    data: PropTypes.any.isRequired,
+    meta: PropTypes.any.isRequired,
+  }
+  /**
+   * Handle Redux-Form submit, which expects a promise return value
+   */
+  submit = (values) => {
+    return this.props.actions.popup({title: 'Submitted Form with these values', content: <Json data={values}/>})
+  }
+
+  handleSubmit = this.props.handleSubmit(this.submit)
+
+  render () {
+    const {data, meta} = this.props
+    return (
+      <form onSubmit={this.handleSubmit}>
+        {<Render data={data} {...meta}/>}
+      </form>
     )
   }
 }

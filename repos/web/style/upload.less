@@ -28,13 +28,17 @@
   &:hover, &:focus, &:active, &.active {
     border-style: solid;
     border-color: @color-link;
-    background: @color-shadow;
+    background-color: @color-shadow;
     cursor: pointer;
     outline: none;
 
     .inverted & {
       border-color: @color-link-inverse;
     }
+  }
+
+  &.disabled {
+    opacity: 0.75;
   }
 
   .app__modal__box__content & {

@@ -54,6 +54,8 @@ export default class Upload extends Component {
     ]),
     onUpload: PropTypes.func, // callback onDrop files with (acceptedFiles, this.id) arguments
     isLoading: PropTypes.bool,
+    disabled: PropTypes.bool, // whether to disable upload
+    readonly: PropTypes.bool, // whether to make upload viewable only
     multiple: PropTypes.bool, // whether to allow multiple file uploads, true by default
     hasHeader: PropTypes.bool, // whether to show title above the upload
     showTypes: PropTypes.bool, // whether to show file types tooltip
@@ -150,7 +152,7 @@ export default class Upload extends Component {
   }
 
   render () {
-    const {ui, id, hasHeader, isLoading, children, className, round, multiple, showTypes} = this.props
+    const {ui, id, hasHeader, isLoading, children, className, round, multiple, disabled, readonly, showTypes} = this.props
     const label = this.props.label || id || this.id
     const {active} = this.state
     const fileTypes = this.fileTypes
@@ -159,8 +161,8 @@ export default class Upload extends Component {
         {id == null && this.renderClose(this.handleCloseModal)}
         {hasHeader && <h2>{`${_.UPLOAD} ${capitalize(label) || _.FILE}`}</h2>}
         <Dropzone
-          tabIndex="0"
-          className={classNames('app__upload__dropzone', className, {active, round})}
+          tabIndex={disabled ? -1 : 0}
+          className={classNames('app__upload__dropzone', className, {active, round, disabled, readonly})}
           ref={(node) => { this.dropzone = node }}
           onDragEnter={this.onDragEnter}
           onDragLeave={this.onDragLeave}
@@ -168,6 +170,7 @@ export default class Upload extends Component {
           onKeyPress={this.handleKeyPress}
           accept={fileTypes}
           multiple={multiple}
+          disabled={disabled || readonly}
         >
           {children || <Fragment>
             <Icon name="picture" className="text largest no-margin"/>

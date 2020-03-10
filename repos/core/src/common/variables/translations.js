@@ -38,7 +38,7 @@ let _ = {
   },
   FILES_ONLY: {
     [l.ENGLISH]: 'files only',
-    [l.RUSSIAN]: 'только файлы',
+    [l.RUSSIAN]: 'файлы только',
   },
   SELECT_OR_DROP: {
     [l.ENGLISH]: 'Select or Drop',
