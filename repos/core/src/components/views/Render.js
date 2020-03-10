@@ -112,10 +112,12 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
 
       case FIELD.TYPE.TEXT:
         if (items.length) props.children = items.map(Render)
+        if (props.title) props.children = props.title
         return <Text {...props}/>
 
       case FIELD.TYPE.TITLE:
         if (items.length) props.children = items.map(Render)
+        if (props.title) props.children = props.title
         return <Text {...props} className={classNames('h3', props.className)}/>
 
       default:
@@ -132,7 +134,8 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
 Render.onError = (err, props) => ACTIVE.store.dispatch(stateAction(POPUP, ALERT, {
   items: [
     {
-      title: `${Render.name} Error!`, content: <View>
+      title: `${Render.name} Error!`,
+      content: <View>
         <Text className='h5'>{_.ERROR_MESSAGE}</Text>
         <Text className='p'>{String(err)}</Text>
         <Text className='h5 padding-top'>{_.DATA_CAUSING_ERROR}</Text>

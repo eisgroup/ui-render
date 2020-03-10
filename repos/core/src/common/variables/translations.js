@@ -7,6 +7,13 @@ import { ACTIVE } from './_envs'
  */
 
 let _ = {
+  // Project Specific
+  // ---------------------------------------------------------------------------
+  CONFIG_USED: {
+    [l.ENGLISH]: 'Config Used',
+    [l.RUSSIAN]: 'Используемый Конфиг',
+  },
+
   // Forms and Validations
   // ---------------------------------------------------------------------------
   FILE: {
@@ -95,6 +102,10 @@ let _ = {
   ERROR_MESSAGE: {
     [l.ENGLISH]: 'Error Message',
     [l.RUSSIAN]: 'Сообщение Ошибки',
+  },
+  ERROR_INFO: {
+    [l.ENGLISH]: 'Error Info',
+    [l.RUSSIAN]: 'Информация об Ошибке',
   },
   DATA_CAUSING_ERROR: {
     [l.ENGLISH]: 'Data Causing Error',

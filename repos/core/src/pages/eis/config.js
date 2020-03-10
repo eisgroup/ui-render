@@ -23,7 +23,7 @@
  */
 const field = {
   // Meta data
-  view: 'Col', // * name of React Component used to render this field
+  view: 'Col', // (required)* name of React Component used to render this field
   items: [], // recursively nested fields
   children: 'Any', // nested content to render inside field
   onClick: Function, // example: `{onClick: 'setState,active.plan'}` - `setState` function with `active.plan` argument
@@ -31,7 +31,7 @@ const field = {
   className: 'CSS class name to apply',
 
   // Generic input props
-  name: 'adminCosts.adminCategory', // * path to field value within *_data.json
+  name: 'adminCosts.adminCategory', // (required for inputs)* path to field value within *_data.json
   label: 'Input label',
   placeholder: 'To appear inside empty input when focused',
   type: 'number', // 'text', 'textarea', 'email', etc.
@@ -67,7 +67,7 @@ const field = {
   // @see: <TableView /> docs for other props
   inverted: Boolean, // whether to style table in dark mode
   striped: Boolean, // whether to alternate background shade of items (rows in default layout)
-  headers: [
+  headers: [ // headers are columns in default layout, used for configuring how to show each cell data under the header
     {
       id: String,
       renderCell: String, // name of render Function to use
@@ -104,6 +104,13 @@ const field = {
     //  ╭ key path to value in this child-table's item to use for filtering
     {'state': 'state'},
     //           ╰ key path to value from parent-table's item to match against
+  ],
+  sorts: [ // adds sorting icon in table headers
+    {
+      id: String, // id of the header item to enable sorting
+      order: 0, // 0 = unsorted by default, 1 = sorted ascending by default, -1 = sorted descending by default
+      sortKey: 'item.attribute.used.for.sorting' // optional
+    },
   ],
 
   // Pie Chart

@@ -90,6 +90,20 @@ export default class Demo extends Component {
     reader.readAsText(file)
   }
 
+  componentDidCatch (error, errorInfo) {
+    this.props.actions.popup({
+      title: `${this.constructor.name} Error!`,
+      content: <View>
+        <Text className='h5'>{_.ERROR_MESSAGE}</Text>
+        <Text className='p'>{error.toString()}</Text>
+        <Text className='h5 padding-top'>{_.ERROR_INFO}</Text>
+        <View style={{textAlign: 'left'}}>
+          <Json data={errorInfo} inverted/>
+        </View>
+      </View>
+    })
+  }
+
   render () {
     const {lang} = this.props
     const {data, meta, showMeta} = this.state
@@ -110,17 +124,26 @@ export default class Demo extends Component {
         </ScrollView>
 
         {showMeta &&
-        <ScrollView className='padding bg-neutral inverted json-tree'>
-          <Row className='spread'>
-            <View><Upload {...uploadProps} label='*_data.json' onUpload={this.handleUpload.bind(this, 'data')}>
-              {data.name && <View><Text className='h4'>{_.UPLOADED}</Text><Text>{data.name}</Text></View>}
-            </Upload></View>
-            <View><Upload {...uploadProps} label='*_meta.json' onUpload={this.handleUpload.bind(this, 'meta')}>
-              {meta.name && <View><Text className='h4'>{_.UPLOADED}</Text><Text>{meta.name}</Text></View>}
-            </Upload></View>
-            <Json data={meta.json} inverted/>
+        <ScrollView className='padding-smaller bg-neutral inverted json-tree'>
+          <Row className='wrap spread'>
+            <View className='margin-smaller'>
+              <Upload {...uploadProps} label='*_data.json' onUpload={this.handleUpload.bind(this, 'data')}>
+                {data.name && <View><Text className='h4'>{_.UPLOADED}</Text><Text>{data.name}</Text></View>}
+              </Upload>
+            </View>
+            <View className='margin-smaller'>
+              <Upload {...uploadProps} label='*_meta.json' onUpload={this.handleUpload.bind(this, 'meta')}>
+                {meta.name && <View><Text className='h4'>{_.UPLOADED}</Text><Text>{meta.name}</Text></View>}
+              </Upload>
+            </View>
+            <View className='margin-smaller' style={{minWidth: '45%'}}>
+              <Row className='middle justify'>
+                <Text className='h6 no-margin'>{_.CONFIG_USED}</Text>
+                <LanguageSelection className='right margin-left-small'/>
+              </Row>
+              <Json data={meta.json} inverted/>
+            </View>
           </Row>
-          <LanguageSelection className='position-top-right'/>
         </ScrollView>
         }
       </>
