@@ -11,7 +11,7 @@ export const __CLIENT__ = (typeof window !== 'undefined')
 export const __BACKEND__ = !__CLIENT__
 export const __IOS__ = false
 export const _INIT_ = __BACKEND__ && (__PROD__ || __STAGE__)
-export const _SHOULD_SHOW_TEST_ = true
+export const _SHOULD_SHOW_TEST_ = __DEV__
 export const _WORK_DIR_ = (typeof process !== 'undefined') ? process.cwd() : '.' // relative to root `index.js`
 export const UNDEFINED = (Undefined => Undefined)()
 

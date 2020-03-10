@@ -1,5 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
+import { ALERT, stateAction } from '../../common/actions'
 import {
   get,
   interpolateString,
@@ -12,11 +13,13 @@ import {
   toList,
   toPercent
 } from '../../common/utils'
-import { ACTIVE, FIELD } from '../../common/variables'
+import { _, ACTIVE, FIELD, TIME_DURATION_INSTANT } from '../../common/variables'
+import { POPUP } from '../../modules/exports'
 import Button from '../Button'
 import PieChart from '../charts/PieChart'
 import Counter from '../Counter'
 import Expand from '../Expand'
+import Json from '../Json'
 import Label from '../Label'
 import { renderCurrency } from '../renders'
 import Row from '../Row'
@@ -36,90 +39,110 @@ import View from '../View'
  * @returns {*} Node - React component/s
  */
 export default function Render ({data: info, view, items = [], ...props}, i) {
-  if (props.key == null) props.key = i
-  // Pass down data to child renderers, if defined
-  let data = info
-  if (props.name) data = get(info, props.name)
-  if (info) items = items.map((item) => ({...item, data: info}))
-  switch (view) {
-    case FIELD.TYPE.BUTTON:
-      if (items.length) props.children = items.map(Render)
-      return <Button {...props}/>
+  try {
+    if (props.key == null) props.key = i
+    // Pass down data to child renderers, if defined
+    let data = info
+    if (props.name) data = get(info, props.name)
+    if (info) items = items.map((item) => ({...item, data: info}))
+    switch (view) {
+      case FIELD.TYPE.BUTTON:
+        if (items.length) props.children = items.map(Render)
+        return <Button {...props}/>
 
-    case FIELD.TYPE.EXPAND:
-      if (props.name != null && props.title == null) props.title = props.name
-      return <Expand {...props}>{() => items.map(Render)}</Expand>
+      case FIELD.TYPE.EXPAND:
+        if (props.name != null && props.title == null) props.title = props.name
+        return <Expand {...props}>{() => items.map(Render)}</Expand>
 
-    case FIELD.TYPE.COUNTER:
-      return <Counter {...props}/>
+      case FIELD.TYPE.COUNTER:
+        return <Counter {...props}/>
 
-    case FIELD.TYPE.COL:
-      return <View {...props}>{items.map(Render)}</View>
+      case FIELD.TYPE.COL:
+        return <View {...props}>{items.map(Render)}</View>
 
-    case FIELD.TYPE.LABEL:
-      if (items.length) props.children = items.map(Render)
-      return <Label {...props}/>
+      case FIELD.TYPE.LABEL:
+        if (items.length) props.children = items.map(Render)
+        return <Label {...props}/>
 
-    case FIELD.TYPE.PIE_CHART:
-      const {mapItems, ...prop} = props
-      if (mapItems) data = mapProps(data, mapItems)
-      return <PieChart items={data} {...prop}/>
+      case FIELD.TYPE.PIE_CHART:
+        const {mapItems, ...prop} = props
+        if (mapItems) data = mapProps(data, mapItems)
+        return <PieChart items={data} {...prop}/>
 
-    case FIELD.TYPE.ROW:
-      return <Row {...props}>{items.map(Render)}</Row>
+      case FIELD.TYPE.ROW:
+        return <Row {...props}>{items.map(Render)}</Row>
 
-    case FIELD.TYPE.TABLE:
-      const {extraItems, filterItems, parentItem, ...more} = props
-      if (filterItems && parentItem) {
-        data = data.filter(item => {
-          return !filterItems.find(filter => {
-            for (const key in filter) {
-              // If mismatch in value found, filter out given item
-              if (get(item, key) !== get(parentItem, filter[key])) return true
-            }
-            return false
+      case FIELD.TYPE.TABLE:
+        const {extraItems, filterItems, parentItem, ...more} = props
+        if (filterItems && parentItem) {
+          data = data.filter(item => {
+            return !filterItems.find(filter => {
+              for (const key in filter) {
+                // If mismatch in value found, filter out given item
+                if (get(item, key) !== get(parentItem, filter[key])) return true
+              }
+              return false
+            })
           })
-        })
-      }
-      if (extraItems) data = data.concat(extraItems.map(item => {
-        for (const key in item) {
-          const definition = item[key]
-          if (isObject(definition)) {
-            if ((definition.name && Object.keys(definition).length === 1)) {
-              item[key] = get(info, definition.name)
-            } else if (definition.name && definition.render) {
-              item[key].data = get(info, definition.name)
-            } else if (definition.view) {
-              item[key] = (_, index, props) => Render({...props, ...definition})
+        }
+        if (extraItems) data = data.concat(extraItems.map(item => {
+          for (const key in item) {
+            const definition = item[key]
+            if (isObject(definition)) {
+              if ((definition.name && Object.keys(definition).length === 1)) {
+                item[key] = get(info, definition.name)
+              } else if (definition.name && definition.render) {
+                item[key].data = get(info, definition.name)
+              } else if (definition.view) {
+                item[key] = (_, index, props) => Render({...props, ...definition})
+              }
             }
           }
-        }
-        return item
-      }))
-      return <TableView items={data} {...more}/>
+          return item
+        }))
+        return <TableView items={data} {...more}/>
 
-    case FIELD.TYPE.TABS:
-      const tabs = items.map(({tab}, i) => isObject(tab) ? Render(tab, i) : tab)
-      const panels = items.map(({content, data}, i) => isObject(content)
-        ? Render.bind(this, {...content, data}, i)
-        : content
-      )
-      return <Tabs items={tabs} panels={panels} {...props}/>
+      case FIELD.TYPE.TABS:
+        const tabs = items.map(({tab}, i) => isObject(tab) ? Render(tab, i) : tab)
+        const panels = items.map(({content, data}, i) => isObject(content)
+          ? Render.bind(this, {...content, data}, i)
+          : content
+        )
+        return <Tabs items={tabs} panels={panels} {...props}/>
 
-    case FIELD.TYPE.TEXT:
-      if (items.length) props.children = items.map(Render)
-      return <Text {...props}/>
+      case FIELD.TYPE.TEXT:
+        if (items.length) props.children = items.map(Render)
+        return <Text {...props}/>
 
-    case FIELD.TYPE.TITLE:
-      if (items.length) props.children = items.map(Render)
-      return <Text {...props} className={classNames('h3', props.className)}/>
+      case FIELD.TYPE.TITLE:
+        if (items.length) props.children = items.map(Render)
+        return <Text {...props} className={classNames('h3', props.className)}/>
 
-    default:
-      const {mapOptions, ...rest} = props
-      if (mapOptions) rest.options = mapProps(props.options || [], mapOptions)
-      return ACTIVE.renderField({view, items, ...rest})
+      default:
+        const {mapOptions, ...rest} = props
+        if (mapOptions) rest.options = mapProps(props.options || [], mapOptions)
+        return ACTIVE.renderField({view, items, ...rest})
+    }
+  } catch (err) {
+    setTimeout(() => Render.onError(err, {data: info, view, items, ...props}), TIME_DURATION_INSTANT)
   }
+  return null
 }
+
+Render.onError = (err, props) => ACTIVE.store.dispatch(stateAction(POPUP, ALERT, {
+  items: [
+    {
+      title: `${Render.name} Error!`, content: <View>
+        <Text className='h5'>{_.ERROR_MESSAGE}</Text>
+        <Text className='p'>{String(err)}</Text>
+        <Text className='h5 padding-top'>{_.DATA_CAUSING_ERROR}</Text>
+        <View style={{textAlign: 'left'}}>
+          <Json data={props} inverted/>
+        </View>
+      </View>
+    }
+  ]
+}))
 
 /**
  * Render Value Function Getter

@@ -7,6 +7,224 @@ import { ACTIVE } from './_envs'
  */
 
 let _ = {
+  // Forms and Validations
+  // ---------------------------------------------------------------------------
+  FILE: {
+    [l.ENGLISH]: 'File',
+    [l.RUSSIAN]: 'Файл',
+  },
+  UPLOAD: { // as verb
+    [l.ENGLISH]: 'Upload',
+    [l.RUSSIAN]: 'Загрузите',
+  },
+  UPLOADED: { // as verb
+    [l.ENGLISH]: 'Uploaded',
+    [l.RUSSIAN]: 'Загружён',
+  },
+  UPDATING: {
+    [l.ENGLISH]: 'Updating',
+    [l.RUSSIAN]: 'Обновление',
+  },
+  FILE_UPLOAD_FAILED: {
+    [l.ENGLISH]: 'File Upload Failed!',
+    [l.RUSSIAN]: 'Ошибка Загрузки Файла!',
+  },
+  FILES_ONLY: {
+    [l.ENGLISH]: 'files only',
+    [l.RUSSIAN]: 'только файлы',
+  },
+  SELECT_OR_DROP: {
+    [l.ENGLISH]: 'Select or Drop',
+    [l.RUSSIAN]: 'Выберите или Бросьте',
+  },
+  INVALID_ASPECT_RATIO: {
+    [l.ENGLISH]: 'Invalid Aspect Ratio!',
+    [l.RUSSIAN]: 'Неверное Соотношение Сторон!',
+  },
+  DIMENSION_MUST_BE_ONE_OF: {
+    [l.ENGLISH]: 'dimension must be one of',
+    [l.RUSSIAN]: 'измерение должно быть одним из',
+  },
+  MAXIMUM_FILE_SIZE_EXCEEDED: {
+    [l.ENGLISH]: 'Maximum File Size Exceeded!',
+    [l.RUSSIAN]: 'Превышен Максимальный Размер Файла!',
+  },
+  MUST_BE_UNDER: {
+    [l.ENGLISH]: 'must be under',
+    [l.RUSSIAN]: 'должен быть до',
+  },
+
+  // Actions
+  // ---------------------------------------------------------------------------
+  CLICK_HERE: {
+    [l.ENGLISH]: 'Click here',
+    [l.RUSSIAN]: 'Кликните сюда',
+  },
+  CONTACT_US: {
+    [l.ENGLISH]: 'Contact Us',
+    [l.RUSSIAN]: 'Связаться с Нами',
+  },
+  CONFIRM_ACTION: {
+    [l.ENGLISH]: 'Confirm Action',
+    [l.RUSSIAN]: 'Подтвердите Действие',
+  },
+  COPY: { // as verb
+    [l.ENGLISH]: 'Copy',
+    [l.RUSSIAN]: 'Копировать',
+  },
+  COPIED: {
+    [l.ENGLISH]: 'Copied',
+    [l.RUSSIAN]: 'Скопированно',
+  },
+  NO: {
+    [l.ENGLISH]: 'No',
+    [l.RUSSIAN]: 'Нет',
+  },
+  YES: {
+    [l.ENGLISH]: 'Yes',
+    [l.RUSSIAN]: 'Да',
+  },
+  OK: {
+    [l.ENGLISH]: 'Ok',
+    [l.RUSSIAN]: 'Ок',
+  },
+  ERROR: {
+    [l.ENGLISH]: 'Error',
+    [l.RUSSIAN]: 'Ошибка',
+  },
+  ERROR_MESSAGE: {
+    [l.ENGLISH]: 'Error Message',
+    [l.RUSSIAN]: 'Сообщение Ошибки',
+  },
+  DATA_CAUSING_ERROR: {
+    [l.ENGLISH]: 'Data Causing Error',
+    [l.RUSSIAN]: 'Данные Вызывающие Ошибку',
+  },
+  CLOSE: {
+    [l.ENGLISH]: 'Close',
+    [l.RUSSIAN]: 'Закрыть',
+  },
+  OPEN: {
+    [l.ENGLISH]: 'Open',
+    [l.RUSSIAN]: 'Открыть',
+  },
+  BACK: {
+    [l.ENGLISH]: 'Back',
+    [l.RUSSIAN]: 'Обратно',
+  },
+  NEXT: {
+    [l.ENGLISH]: 'Next',
+    [l.RUSSIAN]: 'Следующий',
+  },
+  NEW: {
+    [l.ENGLISH]: 'New',
+    [l.RUSSIAN]: 'Новое',
+  },
+  LOGIN: {
+    [l.ENGLISH]: 'Login',
+    [l.RUSSIAN]: 'Войти',
+  },
+  LOGIN_noun: {
+    [l.ENGLISH]: 'Login',
+    [l.RUSSIAN]: 'Вход',
+  },
+  LOGOUT: {
+    [l.ENGLISH]: 'Logout',
+    [l.RUSSIAN]: 'Выйти',
+  },
+  REGISTER: {
+    [l.ENGLISH]: 'Register',
+    [l.RUSSIAN]: 'Зарегистрировать',
+  },
+  RESET: {
+    [l.ENGLISH]: 'Reset',
+    [l.RUSSIAN]: 'Сбросить',
+  },
+  RETRY: {
+    [l.ENGLISH]: 'Retry',
+    [l.RUSSIAN]: 'Повторить',
+  },
+  SELECT: {
+    [l.ENGLISH]: 'Select',
+    [l.RUSSIAN]: 'Выбрать',
+  },
+  SEARCH: {
+    [l.ENGLISH]: 'Search',
+    [l.RUSSIAN]: 'Поиск',
+  },
+  SEARCHING___: {
+    [l.ENGLISH]: 'Searching...',
+    [l.RUSSIAN]: 'В поиске...',
+  },
+  SIGN_IN: {
+    [l.ENGLISH]: 'Sign in',
+    [l.RUSSIAN]: 'Войти',
+  },
+  SIGN_IN_noun: {
+    [l.ENGLISH]: 'Sign in',
+    [l.RUSSIAN]: 'Вход',
+  },
+  SIGNUP: {
+    [l.ENGLISH]: 'Signup',
+    [l.RUSSIAN]: 'Зарегистрироваться',
+  },
+  SIGNUP_noun: {
+    [l.ENGLISH]: 'Signup',
+    [l.RUSSIAN]: 'Регистрация',
+  },
+  SEND: {
+    [l.ENGLISH]: 'Send',
+    [l.RUSSIAN]: 'Послать',
+  },
+  SUBMIT: {
+    [l.ENGLISH]: 'Submit',
+    [l.RUSSIAN]: 'Послать',
+  },
+  SAVE_TO_FAVORITES: {
+    [l.ENGLISH]: 'Save to Favorites',
+    [l.RUSSIAN]: 'Сохранить в Избранное',
+  },
+  TYPE_A_MESSAGE: {
+    [l.ENGLISH]: 'Type a message',
+    [l.RUSSIAN]: 'Введите сообщение',
+  },
+  ARE_YOU_SURE_YOU_WANT_TO: {
+    [l.ENGLISH]: 'Are you sure you want to',
+    [l.RUSSIAN]: 'Вы уверены, что хотите',
+  },
+  ARE_YOU_SURE_YOU_WANT_TO_REMOVE: {
+    [l.ENGLISH]: 'Are you sure you want to remove',
+    [l.RUSSIAN]: 'Вы уверены, что хотите удалить',
+  },
+  HIDE: {
+    [l.ENGLISH]: 'Hide',
+    [l.RUSSIAN]: 'Скрыть',
+  },
+  SHOW: {
+    [l.ENGLISH]: 'Show',
+    [l.RUSSIAN]: 'Показать',
+  },
+  SHOW_ADDRESS: {
+    [l.ENGLISH]: 'Show address',
+    [l.RUSSIAN]: 'Показать адрес',
+  },
+  SHOW_DISTANCE: {
+    [l.ENGLISH]: 'Show distance',
+    [l.RUSSIAN]: 'Показать расстояние',
+  },
+  SHOW_HOURS: {
+    [l.ENGLISH]: 'Show hours',
+    [l.RUSSIAN]: 'Показать часы',
+  },
+  SHOW_LESS: {
+    [l.ENGLISH]: 'Show less',
+    [l.RUSSIAN]: 'Показать меньше',
+  },
+  READ_MORE: {
+    [l.ENGLISH]: 'Read more',
+    [l.RUSSIAN]: 'Читать далее',
+  },
+
   // Common
   // ---------------------------------------------------------------------------
   BY: {

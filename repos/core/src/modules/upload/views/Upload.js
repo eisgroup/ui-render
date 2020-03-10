@@ -6,7 +6,7 @@ import { SIZE_KB, stateAction } from '../../../common/actions'
 import { OPEN, SET } from '../../../common/constants'
 import { connect } from '../../../common/redux'
 import { capitalize, get, hasListValue, isFunction, log, pluralize, shortNumber } from '../../../common/utils'
-import { ROUTE_HOME, UPLOAD_BY_ROUTE } from '../../../common/variables'
+import { _, ROUTE_HOME, UPLOAD_BY_ROUTE } from '../../../common/variables'
 import Icon from '../../../components/Icon'
 import Loading from '../../../components/Loading'
 import Row from '../../../components/Row'
@@ -29,7 +29,7 @@ const mapStateToProps = (state) => ({
 })
 const mapDispatchToProps = (dispatch) => ({
   actions: {
-    upload: (files, id) => dispatch(stateAction(UPLOAD, SET, { files, id })),
+    upload: (files, id) => dispatch(stateAction(UPLOAD, SET, {files, id})),
     popup: (item) => dispatch(stateAction(POPUP, OPEN, {
       activePopup: POPUP_ALERT,
       [POPUP_ALERT]: {
@@ -54,11 +54,18 @@ export default class Upload extends Component {
     ]),
     onUpload: PropTypes.func, // callback onDrop files with (acceptedFiles, this.id) arguments
     isLoading: PropTypes.bool,
-    hasTooltip: PropTypes.bool, // default is true - show file types tooltip
     multiple: PropTypes.bool, // whether to allow multiple file uploads, true by default
+    hasHeader: PropTypes.bool, // whether to show title above the upload
+    showTypes: PropTypes.bool, // whether to show file types tooltip
     round: PropTypes.bool, // whether to add `round` css class
     label: PropTypes.string, // optional label to show in the title
     children: PropTypes.any
+  }
+
+  static defaultProps = {
+    multiple: true,
+    hasHeader: true,
+    showTypes: true,
   }
 
   state = {
@@ -81,8 +88,8 @@ export default class Upload extends Component {
     return get(this.props, 'location.pathname', ROUTE_HOME)
   }
 
-  onDragEnter = () => this.setState({ active: true })
-  onDragLeave = () => this.setState({ active: false })
+  onDragEnter = () => this.setState({active: true})
+  onDragLeave = () => this.setState({active: false})
 
   openInModal = (uri) => {
     openModal(uri || this.uri, {className: 'fill--three-quarter'})
@@ -95,31 +102,31 @@ export default class Upload extends Component {
   handleUpload = (acceptedFiles, rejectedFiles) => {
     log('acceptedFiles:', acceptedFiles)
     log('rejectedFiles:', rejectedFiles)
-    const { actions, onUpload } = this.props
+    const {actions, onUpload} = this.props
     if (hasListValue(acceptedFiles)) {
       const maxSize = this.maxSize
       for (const file of acceptedFiles) {
         if (file.size > maxSize) return actions.popup({
-          title: 'Maximum File Size Exceeded!',
+          title: _.MAXIMUM_FILE_SIZE_EXCEEDED,
           content: <Row className='center wrap'>
             <Text className='bold margin-h-smaller'>{file.name}</Text>
-            <Text>must be under</Text>
+            <Text>{_.MUST_BE_UNDER}</Text>
             <Text className='bold margin-h-smaller'>{shortNumber(maxSize, 3, SIZE_KB)}B</Text>
           </Row>,
-          closeLabel: 'OK'
+          closeLabel: _.OK
         })
       }
       actions.upload(acceptedFiles, this.id)
       isFunction(onUpload) && onUpload(acceptedFiles, this.id)
     } else {
       actions.popup({
-        title: 'File Upload Failed!',
+        title: _.FILE_UPLOAD_FAILED,
         content: <View className='center wrap'>
-          <Text>{`Upload`}</Text>
+          <Text>{_.UPLOAD}</Text>
           <Text className='p bold'>{this.fileTypes}</Text>
-          <Text>{`files only`}</Text>
+          <Text>{_.FILES_ONLY}</Text>
         </View>,
-        closeLabel: 'OK'
+        closeLabel: _.OK
       })
     }
   }
@@ -131,7 +138,7 @@ export default class Upload extends Component {
   renderClose = (handleClose) => (
     <View className='app__view--close' onClick={handleClose}>
       <Text className='app__view--close__icon'>{'✕'}</Text>
-      <Tooltip top>Close</Tooltip>
+      <Tooltip top>{_.CLOSE}</Tooltip>
     </View>
   )
 
@@ -143,17 +150,17 @@ export default class Upload extends Component {
   }
 
   render () {
-    const { ui, id, hasHeader = true, isLoading, children, className, round, multiple = true, hasTooltip = true } = this.props
+    const {ui, id, hasHeader, isLoading, children, className, round, multiple, showTypes} = this.props
     const label = this.props.label || id || this.id
-    const { active } = this.state
+    const {active} = this.state
     const fileTypes = this.fileTypes
     return (
-      <View className={classNames('app__upload', { round })}>
+      <View className={classNames('app__upload', {round})}>
         {id == null && this.renderClose(this.handleCloseModal)}
-        {hasHeader && <h2>{`Upload ${capitalize(label) || 'File'}`}</h2>}
+        {hasHeader && <h2>{`${_.UPLOAD} ${capitalize(label) || _.FILE}`}</h2>}
         <Dropzone
           tabIndex="0"
-          className={classNames('app__upload__dropzone', className, { active, round })}
+          className={classNames('app__upload__dropzone', className, {active, round})}
           ref={(node) => { this.dropzone = node }}
           onDragEnter={this.onDragEnter}
           onDragLeave={this.onDragLeave}
@@ -163,18 +170,21 @@ export default class Upload extends Component {
           multiple={multiple}
         >
           {children || <Fragment>
-            <Icon name="media" className="text largest no-margin"/>
-            <Text className='p'>
-              Select or Drop<br/>
+            <Icon name="picture" className="text largest no-margin"/>
+            <Text className='p margin-top-smallest'>
+              {_.SELECT_OR_DROP}<br/>
               {pluralize(capitalize(label), multiple ? 2 : 1)}
             </Text>
           </Fragment>
           }
-          {hasTooltip &&
-          <Tooltip top className='flex--col'>
-            <Text className='margin-bottom-smaller'>File Types</Text>
-            <Text className='bold p'>{fileTypes}</Text>
-          </Tooltip>
+          {showTypes &&
+          <View className='position-fill align-center appear-on-hover'>
+            <View className='padding text-outline'>
+              <View className='position-fill bg-neutral radius-large' style={{opacity: 0.8}}/>
+              <Text className='margin-bottom-smaller'>{_.FILE}</Text>
+              <Text className='bold p'>{fileTypes}</Text>
+            </View>
+          </View>
           }
         </Dropzone>
         <Loading isLoading={isLoading || ui.isLoading}/>

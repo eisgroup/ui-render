@@ -8,16 +8,17 @@ export const ROUTE_SLASH = ROUTE_HOME.slice(-1) === '/' ? '' : '/' // used when 
 export const ROUTE_BASE = `${ROUTE_HOME}${ROUTE_SLASH}`
 export const ROUTE = {
   HOME: ROUTE_HOME,
-  REPORT: `${ROUTE_BASE}report`,
+  DEMO: `${ROUTE_BASE}demo`,
   PRIVACY: `${ROUTE_BASE}privacy`,
   TESTER: `${ROUTE_BASE}tester`, // for development only
   THEME: `${ROUTE_BASE}theme`, // for development only
 }
 export const ROUTES = createNestedRoutes(ROUTE, {  // used for Routes definition
-  [ROUTE.REPORT]: '/:id?',
+  [ROUTE.DEMO]: '/:id?',
 })
 export const ROUTES_FOR_NAV = [ // shown in Navigation
-  {path: ROUTE.HOME, name: 'Home', icon: 'home'},
+  {path: ROUTE.HOME, name: 'Report', icon: 'home'},
+  {path: ROUTE.DEMO, name: 'Demo', icon: 'test'},
 ]
 if (_SHOULD_SHOW_TEST_) ROUTES_FOR_NAV.push(...[
   {path: ROUTE.TESTER, name: 'Tester', icon: 'test'},
