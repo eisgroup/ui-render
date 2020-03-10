@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { ALERT, stateAction } from '../../common/actions'
 import fetch from '../../common/fetch'
 import { connect } from '../../common/redux'
-import { cloneDeep, fromJSON, logRender, set } from '../../common/utils'
+import { cloneDeep, logRender, set } from '../../common/utils'
 import { _, FIELD, FILE_TYPE } from '../../common/variables'
 import Json from '../../components/Json'
 import Row from '../../components/Row'
@@ -83,10 +83,22 @@ export default class Demo extends Component {
 
   handleSubmit = this.props.handleSubmit(this.submit)
 
-  handleUpload = (kind, [file]) => {
+  handleUpload = (kind, [file], type) => {
     if (!file) return
     const reader = new FileReader()
-    reader.onload = () => this.setState({[kind]: {json: fromJSON(reader.result), name: file.name}})
+    reader.onload = () => {
+      try {
+        this.setState({[kind]: {json: JSON.parse(reader.result), name: file.name}})
+      } catch (error) {
+        this.props.actions.popup({
+          title: `${file.name} is invalid .${type} file`,
+          content: <View>
+            <Text className='h5'>{_.ERROR_MESSAGE}</Text>
+            <Text className='p'>{String(error)}</Text>
+          </View>
+        })
+      }
+    }
     reader.readAsText(file)
   }
 
