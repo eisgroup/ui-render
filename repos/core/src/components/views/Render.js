@@ -58,6 +58,7 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
         return <Counter {...props}/>
 
       case FIELD.TYPE.COL:
+      case FIELD.TYPE.COLUMN:
         return <View {...props}>{items.map(Render)}</View>
 
       case FIELD.TYPE.LABEL:

@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import { ALERT, stateAction } from '../../common/actions'
 import fetch from '../../common/fetch'
 import { connect } from '../../common/redux'
-import { cloneDeep, isEmpty, logRender, set } from '../../common/utils'
+import { cloneDeep, isEmpty, logRender, sanitizeGqlResponse, set } from '../../common/utils'
 import { _, FIELD, FILE_TYPE } from '../../common/variables'
 import Json from '../../components/Json'
 import Row from '../../components/Row'
@@ -73,7 +73,9 @@ export default class Demo extends Component {
     const reader = new FileReader()
     reader.onload = () => {
       try {
-        this.setState({[kind]: {json: JSON.parse(reader.result), name: file.name}})
+        let json = JSON.parse(reader.result)
+        if (kind === 'meta') json = sanitizeGqlResponse(json, {tags: []})
+        this.setState({[kind]: {json, name: file.name}})
       } catch (error) {
         this.props.actions.popup({
           title: `${file.name} is invalid .${type} file`,
@@ -137,7 +139,7 @@ export default class Demo extends Component {
                 {meta.name && <View><Text className='h4'>{_.UPLOADED}</Text><Text>{meta.name}</Text></View>}
               </Upload>
             </View>
-            <View className='margin-smaller' style={{minWidth: '45%'}}>
+            <View className='margin-smaller min-width-290'>
               <Row className='middle justify'>
                 {hasMeta && <Text className='h6 no-margin fade-in-up'>{_.CONFIG_USED}</Text>}
                 <LanguageSelection className='right margin-left-small'/>

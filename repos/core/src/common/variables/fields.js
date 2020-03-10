@@ -11,7 +11,8 @@ export const FIELD = getSetDefinition('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', '
 FIELD.TYPE = {
   BUTTON: 'Button',
   EXPAND: 'Expand', // Expandable/collapsing content with clickable `title` or `renderTitle` area
-  COL: 'Col', // Vertical column layout
+  COL: 'Col', // alias for Column
+  COLUMN: 'Column', // Vertical column layout
   COUNTER: 'Counter', // Animated number changing from `start` to `end` values
   LABEL: 'Label',
   PIE_CHART: 'PieChart', // Pie chat (can be in shape of donut) with optional legends
