@@ -40,11 +40,6 @@ const mapDispatchToProps = (dispatch) => ({
 @connect(mapStateToProps, mapDispatchToProps)
 @logRender
 export default class Demo extends Component {
-  resetForm = () => {
-    const {dispatch, form} = this.props
-    dispatch(reset(form))
-  }
-
   // @Note: functions should have consistent pattern of receiving important arguments first,
   // followed by optional arguments.
   // Positional arguments was chosen instead of keyword arguments because
@@ -52,6 +47,8 @@ export default class Demo extends Component {
   setStates = (value, keyPath) => {
     return this.setState(set(this.state, keyPath, value))
   }
+
+  resetForm = (...args) => this._resetForm(...args)
 
   state = {
     showMeta: true,
@@ -119,7 +116,7 @@ export default class Demo extends Component {
     return (
       <>
         <ScrollView fill className='fade-in bg-texture min-height-290'>
-          {hasData && hasMeta && <Renderer data={data.json} meta={props} initialValues={data.json}/>}
+          {hasData && hasMeta && <Renderer data={data.json} meta={props} initialValues={data.json} instance={this}/>}
         </ScrollView>
 
         {showMeta &&
@@ -161,7 +158,18 @@ class Renderer extends Component {
   static propTypes = {
     data: PropTypes.any.isRequired,
     meta: PropTypes.any.isRequired,
+    instance: PropTypes.any, // parent instance to attach data from this component
   }
+
+  componentDidMount () {
+    if (this.props.instance) this.props.instance._resetForm = this.resetForm
+  }
+
+  resetForm = () => {
+    const {dispatch, form} = this.props
+    dispatch(reset(form))
+  }
+
   /**
    * Handle Redux-Form submit, which expects a promise return value
    */

@@ -42,7 +42,7 @@ let _ = {
   },
   SELECT_OR_DROP: {
     [l.ENGLISH]: 'Select or Drop',
-    [l.RUSSIAN]: 'Выберите или Бросьте',
+    [l.RUSSIAN]: 'Выберите или Перетащите',
   },
   INVALID_ASPECT_RATIO: {
     [l.ENGLISH]: 'Invalid Aspect Ratio!',
