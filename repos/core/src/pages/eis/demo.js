@@ -89,20 +89,6 @@ export default class Demo extends Component {
     reader.readAsText(file)
   }
 
-  componentDidCatch (error, errorInfo) {
-    this.props.actions.popup({
-      title: `${this.constructor.name} Error!`,
-      content: <View>
-        <Text className='h5'>{_.ERROR_MESSAGE}</Text>
-        <Text className='p'>{error.toString()}</Text>
-        <Text className='h5 padding-top'>{_.ERROR_INFO}</Text>
-        <View style={{textAlign: 'left'}}>
-          <Json data={errorInfo} inverted/>
-        </View>
-      </View>
-    })
-  }
-
   render () {
     const {lang} = this.props
     const {data, meta, showMeta} = this.state

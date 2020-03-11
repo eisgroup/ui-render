@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React from 'react'
+import React, { Component } from 'react'
 import { ALERT, stateAction } from '../../common/actions'
 import {
   get,
@@ -13,7 +13,7 @@ import {
   toList,
   toPercent
 } from '../../common/utils'
-import { _, ACTIVE, FIELD, TIME_DURATION_INSTANT } from '../../common/variables'
+import { _, ACTIVE, FIELD } from '../../common/variables'
 import { POPUP } from '../../modules/exports'
 import Button from '../Button'
 import PieChart from '../charts/PieChart'
@@ -21,6 +21,7 @@ import Counter from '../Counter'
 import Expand from '../Expand'
 import Json from '../Json'
 import Label from '../Label'
+import Placeholder from '../Placeholder'
 import { renderCurrency } from '../renders'
 import Row from '../Row'
 import TableView from '../TableView'
@@ -38,9 +39,24 @@ import View from '../View'
  * @param {Number} [i] - index of field in the list
  * @returns {*} Node - React component/s
  */
-export default function Render ({data: info, view, items = [], ...props}, i) {
-  try {
-    if (props.key == null) props.key = i
+export default function Render (props, i) {
+  return <RenderClass {...props} key={typeof i !== 'object' ? i : undefined}/>
+}
+
+class RenderClass extends Component {
+  state = {
+    error: false,
+  }
+
+  componentDidCatch (error, errorInfo) {
+    this.setState({error}, () => Render.onError(error, errorInfo, this.props))
+  }
+
+  // @Note: try block only catches error in this Render function,
+  // Errors in components will propagate up to componentDidCatch in parent class.
+  render () {
+    if (this.state.error) return <Placeholder>{String(this.state.error)}</Placeholder>
+    let {data: info, view, items = [], ...props} = this.props
     // Pass down data to child renderers, if defined
     let data = info
     if (props.name) data = get(info, props.name)
@@ -101,7 +117,7 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
           }
           return item
         }))
-        return <TableView items={data} {...more}/>
+        return isList(data) ? <TableView items={data} {...more}/> : null
 
       case FIELD.TYPE.TABS:
         const tabs = items.map(({tab}, i) => isObject(tab) ? Render(tab, i) : tab)
@@ -126,13 +142,11 @@ export default function Render ({data: info, view, items = [], ...props}, i) {
         if (mapOptions) rest.options = mapProps(props.options || [], mapOptions)
         return ACTIVE.renderField({view, items, ...rest})
     }
-  } catch (err) {
-    setTimeout(() => Render.onError(err, {data: info, view, items, ...props}), TIME_DURATION_INSTANT)
+    return null
   }
-  return null
 }
 
-Render.onError = (err, props) => ACTIVE.store.dispatch(stateAction(POPUP, ALERT, {
+Render.onError = (err, errInfo, props) => ACTIVE.store.dispatch(stateAction(POPUP, ALERT, {
   items: [
     {
       title: `${Render.name} Error!`,
@@ -141,7 +155,11 @@ Render.onError = (err, props) => ACTIVE.store.dispatch(stateAction(POPUP, ALERT,
         <Text className='p'>{String(err)}</Text>
         <Text className='h5 padding-top'>{_.DATA_CAUSING_ERROR}</Text>
         <View style={{textAlign: 'left'}}>
-          <Json data={props} inverted/>
+          <Json data={props}/>
+        </View>
+        <Text className='h5 padding-top'>{_.ERROR_INFO}</Text>
+        <View style={{textAlign: 'left'}}>
+          <Json data={errInfo}/>
         </View>
       </View>
     }

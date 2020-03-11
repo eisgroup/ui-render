@@ -107,6 +107,10 @@ let _ = {
     [l.ENGLISH]: 'Error Info',
     [l.RUSSIAN]: 'Информация об Ошибке',
   },
+  ERROR_STACK: {
+    [l.ENGLISH]: 'Error Stack',
+    [l.RUSSIAN]: 'Стек Ошибок',
+  },
   DATA_CAUSING_ERROR: {
     [l.ENGLISH]: 'Data Causing Error',
     [l.RUSSIAN]: 'Данные Вызывающие Ошибку',
