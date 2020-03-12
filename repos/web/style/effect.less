@@ -1,7 +1,7 @@
 @import "_mixins";
 
 .appear-on-hover {
-  &:extend(.disappear all);
+  &:extend(.disappear-slow all);
   z-index: 1;
 
   @{select-interaction},
@@ -193,14 +193,19 @@
   &.large {
     &:extend(.max-width-360 all);
   }
-
-  .card__text {
-    &:extend(.padding-left);
-    max-width: calc(100% - @size-avatar-large);
-  }
 }
 
-.disabled {
+.card__text {
+  &:extend(.padding-left);
+  max-width: calc(100% - @size-avatar-large);
+}
+
+.card__text__summary__item {
+  &:extend(.padding-smaller);
+  &:extend(.no-padding-left);
+}
+
+.disabled, *:disabled {
   border-style: dotted !important;
   cursor: default !important;
 }

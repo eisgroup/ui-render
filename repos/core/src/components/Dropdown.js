@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { Dropdown as DropDown } from 'semantic-ui-react' // adds 27 KB to final js bundle
 import { hasListValue } from '../common/utils'
+import { _ } from '../common/variables'
 import Text from './Text'
 import View from './View'
 
@@ -46,7 +47,7 @@ export default function Dropdown
     onSelect,
     onSearch,
     label,
-    placeholder = 'select',
+    placeholder = _.SELECT,
     done,
     error,
     info,
@@ -58,8 +59,10 @@ export default function Dropdown
     optionsLabel,
     initialValues, // not used, removing from DOM
     readonly,
+    autofocus,
     ...props
   }) {
+  // if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability
   if (readonly) props.disabled = true // Semantic Dropdown does not accept `readOnly` prop
   if (onChange || onSelect) props.onChange = (event, data) => {
     tempValue = data.value // store value temporarily for onSelect event
@@ -96,12 +99,12 @@ export default function Dropdown
   }
 
   /* Error handling */
-  if (hasListValue(props.value) && props.value.length === options.length) props.noResultsMessage = 'No Options Left'
+  if (hasListValue(props.value) && props.value.length === options.length) props.noResultsMessage = _.NO_OPTIONS_LEFT
   if (done == null) done = !error && (props.multiple ? hasListValue(props.value) : (!!props.value || props.value === 0))
 
   return (
     <View className={classNames('input--wrapper', {
-      float, done, labeled: label, readonly, 'fill-width': !props.compact && fill,
+      float, done, labeled: label, 'fill-width': !props.compact && fill,
     }, className)} style={style}>
       <DropDown
         className={classNames({info, readonly})}

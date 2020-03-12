@@ -28,6 +28,12 @@
   border-style: dotted !important;
 }
 
+.input-readonly {
+  cursor: default;
+  pointer-events: none;
+  border-style: dashed !important;
+}
+
 .input-tag {
   &:extend(.margin-h-smallest all);
   &:extend(.margin-v-smaller all);
@@ -81,6 +87,10 @@ input {
   }
 }
 
+textarea {
+  &:extend(.min-width-260 all);
+}
+
 .input__unit,
 .ui.selection.dropdown,
 input, select, textarea {
@@ -124,6 +134,14 @@ input, select, textarea {
   &.disabled:not(.readonly),
   &:disabled {
     &:extend(.input-disabled all);
+
+    + label {
+      cursor: default;
+    }
+  }
+
+  &.readonly {
+    &:extend(.input-readonly all);
 
     + label {
       cursor: default;
@@ -390,9 +408,9 @@ input, select, textarea {
   }
 
   &.done {
-    &.readonly input,
-    &.readonly select,
-    &.readonly textarea,
+    input.readonly,
+    select.readonly,
+    textarea.readonly,
     .ui.selection.dropdown:not(.active):not(:hover),
     input:not(:focus):not(:hover),
     select:not(:focus):not(:hover),
@@ -412,20 +430,18 @@ input, select, textarea {
     }
   }
 
-  &.readonly {
-    .ui.selection.dropdown {
-      .label {
-        &:extend(.input-tag all);
-        box-shadow: none;
+  .ui.selection.dropdown.readonly {
+    .label {
+      &:extend(.input-tag all);
+      box-shadow: none;
 
-        .icon.delete {
-          display: none;
-        }
-      }
-
-      > .icon.dropdown {
+      .icon.delete {
         display: none;
       }
+    }
+
+    > .icon.dropdown {
+      display: none;
     }
   }
 

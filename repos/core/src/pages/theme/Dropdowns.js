@@ -14,6 +14,7 @@ import { isRequired } from '../../modules/form/validationRules'
 @reduxForm({form: 'TEST', enableReinitialize: true})
 export default class Dropdowns extends Component {
   render () {
+    const options = ['Alpha', 'Beta', 'Mega']
     return (
       <View className='full-width'>
 
@@ -21,9 +22,17 @@ export default class Dropdowns extends Component {
         <Row className='full-width center wrap margin'>
           {/* Raw Inputs */}
           <form className='app__form full-width max-width-290 padding-h-small'>
-            <Dropdown placeholder='Enter address' search selection float options={['Alpha', 'Beta', 'Mega']}/>
-            <Dropdown placeholder='Loading...' search selection loading float options={[1, 2, 3]}/>
-            <Dropdown placeholder='Array values' value={[1]} search selection loading float options={[
+            <Dropdown placeholder='Select' float options={options}/>
+            <Dropdown placeholder='Disabled' disabled float options={options}/>
+            <Dropdown placeholder='Disabled' label='disabled' value={options[0]} disabled float options={options}/>
+            <Dropdown placeholder='Loading...' loading float options={options}/>
+          </form>
+          {/* Raw Inputs */}
+          <form className='app__form full-width max-width-290 padding-h-small'>
+            <Dropdown placeholder='Search' search float options={options}/>
+            <Dropdown placeholder='Readonly' readonly float options={options}/>
+            <Dropdown placeholder='Readonly' label='readonly' value={options[0]} readonly float options={options}/>
+            <Dropdown placeholder='Loading...' label='done' value={[1]} loading search float options={[
               {text: '[1]', value: '1'},
               {text: '[2]', value: '2'},
             ]}/>

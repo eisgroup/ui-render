@@ -21,17 +21,17 @@ import { onPressHoc } from './utils'
  */
 export default function Button
   ({
-     onClick,
-     disabled = false,
-     loading = false,
-     circle,
-     children,
-     size,
-     type = 'button',
-     sound,
-     className,
-     ...props
-   }) {
+    onClick,
+    disabled = false,
+    loading = false,
+    circle,
+    children,
+    size,
+    type = 'button',
+    sound,
+    className,
+    ...props
+  }) {
 
   return (
     <button
@@ -42,7 +42,7 @@ export default function Button
       {...props}
     >
       {children}
-      {loading && <Loading/>}
+      {loading && <Loading isLoading/>}
     </button>
   )
 }

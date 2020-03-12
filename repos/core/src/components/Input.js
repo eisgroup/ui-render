@@ -26,9 +26,11 @@ import View from './View'
  * @param {Boolean} [stickyPlaceholder] - whether to persist placeholder as user types
  * @param {Boolean} [resize] - whether to adjust input height to match typed in text
  * @param {Boolean} [readonly] - whether to disable input and add `readonly` css class
+ * @param {Boolean} [autofocus] - whether to make input focused on page load
  * @param {String|Object} [error] - message to display
  * @param {String|Object} [info] - explanation message to display under input
  * @param {String} [className] - css class to add
+ * @param {String} [classNameIcon] - css class to add to Icon
  * @param {Object} [style] - css styles
  * @param {String|Object} [children] - React component
  * @param {*} props - attributes to pass to `<input />`
@@ -45,10 +47,12 @@ export default function Input
     disabled,
     done,
     className,
+    classNameIcon,
     children,
     stickyPlaceholder, // only works with controlled component when `props.value` is provided
     resize,
     readonly,
+    autofocus,
     float,
     error,
     info,
@@ -58,8 +62,11 @@ export default function Input
     ...props
   }) {
   const [active, setState] = useState(props.autoFocus)
-  // if (info) console.warn('mounted', active)
-  if (readonly) props.readOnly = readonly // React wants `readonly` to be `readOnly`
+  if (autofocus) props.autoFocus = autofocus // React fix
+  if (readonly) {
+    props.className = 'readonly'
+    props.readOnly = readonly
+  } // React fix
   if (props.type === 'hidden') return <InputNative {...props} />
   if (float || label) {
     if (!label) label = capitalize(props.name)
@@ -71,13 +78,12 @@ export default function Input
   if (done == null) done = !error && hasValue
   return (
     <View
-      className={classNames('input--wrapper', className, {float, done, resize, readonly})}
+      className={classNames('input--wrapper', className, {float, done, resize})}
       style={style}
     >
       {!float && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
-      <Row className={classNames('input', {active, icon, lefty, disabled, error, info})}
-           style={{...unit && {zIndex: 0}}} /* z-index is sometimes required to show unit, which has z-index -1 */>
-        {icon && lefty && <Icon name={icon} onClick={onClickIcon}/>}
+      <Row className={classNames('input', {active, icon, lefty, error, info})}>
+        {icon && lefty && <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>}
         {unit && hasValue &&
         <Text className='input__unit truncate'>
           <Text className='invisible' aria-hidden='true'>{props.value}</Text> {unit}
@@ -102,7 +108,7 @@ export default function Input
           }}
           {...props}
         />
-        {icon && !lefty && <Icon name={icon} onClick={onClickIcon}/>}
+        {icon && !lefty && <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>}
         {float && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
       </Row>
       {(error || info) &&

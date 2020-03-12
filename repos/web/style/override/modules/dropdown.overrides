@@ -114,6 +114,11 @@
     }
   }
 
+  // Non-clickable option item with disabled class
+  .disabled.item {
+    border-style: initial !important; // override default .disabled style
+  }
+
   &.text.blue {
     .inverted & {
       // Placeholder
