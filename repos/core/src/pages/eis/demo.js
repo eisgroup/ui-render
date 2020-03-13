@@ -108,7 +108,7 @@ export default class Demo extends Component {
         </ScrollView>
 
         {showMeta &&
-        <ScrollView className='padding-smaller bg-neutral inverted json-tree'>
+        <ScrollView className='padding-smaller bg-neutral inverted'>
           <Row className='wrap spread'>
             <View className='margin-smaller'>
               <Upload {...uploadProps} label='*_data.json' onUpload={this.handleUpload.bind(this, 'data')}

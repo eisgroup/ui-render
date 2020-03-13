@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "concurrently \"yarn workspace web start\"",
+    "build": "yarn workspace web build && yarn workspace server build",
     "scan": "./node_modules/.bin/madge --circular repos --exclude 'node_modules/'",
     "test": "jest",
     "reset": "yarn clear && yarn cache clean && yarn",
