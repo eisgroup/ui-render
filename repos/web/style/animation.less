@@ -70,6 +70,10 @@
   animation: disappear @speed-base forwards;
 }
 
+.disappear-slow {
+  animation: disappear @speed-base*2 forwards;
+}
+
 /* Collapse Vertically */
 @keyframes collapse-v {
   from {
@@ -258,8 +262,8 @@
 }
 
 .signal-pulse {
-  @color: @color-primary-light;
-  @size: 4;
+  @color: @color-violet-light;
+  @size: 20;
   @duration: 2s;
   .circle(size(@size));
   background: @color;

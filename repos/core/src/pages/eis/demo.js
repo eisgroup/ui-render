@@ -103,7 +103,7 @@ export default class Demo extends Component {
     }
     return (
       <>
-        <ScrollView fill className='fade-in bg-texture min-height-290'>
+        <ScrollView fill className='fade-in bg-grey bg-texture min-height-290'>
           {hasData && hasMeta && <Renderer data={data.json} meta={props} initialValues={data.json} instance={this}/>}
         </ScrollView>
 

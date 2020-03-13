@@ -68,7 +68,7 @@ export default class OpenL extends Component {
     console.warn('meta transformed', props)
     return (
       <>
-        <ScrollView fill className='fade-in bg-texture'>
+        <ScrollView fill className='fade-in bg-grey bg-texture'>
           <form onSubmit={this.handleSubmit}>
             <Render data={data} {...props}/>
           </form>

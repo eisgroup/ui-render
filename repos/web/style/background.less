@@ -41,26 +41,6 @@
   }
 }
 
-.bg-texture {
-  &:extend(.bg-grey all);
-  .background-image(@name: 'diamonds-dimmed.png'; @size: 120px 108px;);
-}
-
-.bg-texture-faded {
-  &:before {
-    .object();
-    &:extend(.position-fill all);
-    &:extend(.bg-texture all);
-    &:extend(.bg-fade-to-top all);
-  }
-}
-
-// To be used as inner content of container with background image
-.bg-blur {
-  backdrop-filter: blur(7px);
-  z-index: -1; // avoid covering other absolutely positioned elements
-}
-
 .bg-fixed {
   // Disabled this for iOS, or `background-size: cover` will not work
   @media screen and (min-width: @screen-large) {
@@ -138,6 +118,26 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+.bg-texture {
+  .background-image(@name: 'diamonds-dimmed.png'; @size: 120px 108px;);
+}
+
+.bg-texture-faded {
+  &:before {
+    .object();
+    &:extend(.position-fill all);
+    &:extend(.bg-grey all);
+    &:extend(.bg-texture all);
+    &:extend(.bg-fade-to-top all);
+  }
+}
+
+// To be used as inner content of container with background image
+.bg-blur {
+  backdrop-filter: blur(7px);
+  z-index: -1; // avoid covering other absolutely positioned elements
 }
 
 // -----------------------------------------------------------------------------
@@ -246,6 +246,10 @@
   border-width: 0 0 @border-size;
 }
 
+.border-gradient-bottom-grey {
+  &:extend(.border-gradient-h-grey all);
+  border-width: 0 0 @border-size;
+}
 
 .border-gradient-left {
   .border-gradient-v;
