@@ -1,7 +1,7 @@
 import { ENV } from './_envs'
 
 /* API Endpoints */
-export const API_URL = ENV.REACT_APP_API_URL || ''
+export const API_URL = ENV.REACT_APP_API_URL || (__CLIENT__ ? window.location.origin : '')
 export const API_TEST_URL = 'https://ipapi.co/json'
 export const API_GQL_URI = '/gql'
 export const API_GQL_URL = API_URL + API_GQL_URI

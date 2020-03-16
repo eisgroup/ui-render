@@ -17,8 +17,6 @@ import { reset } from '../../modules/form'
 import { withForm } from '../../modules/form/utils'
 import LanguageSelection from '../../modules/settings/views/LanguageSelection'
 import Upload from '../../modules/upload/views/Upload'
-import data from './data/_data'
-import meta from './data/_meta'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
