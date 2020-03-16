@@ -105,6 +105,17 @@ export default class TableView extends Component {
   }
 
   // HANDLERS ------------------------------------------------------------------
+  handleToggleExpandAll = (...args) => {
+    this.setState({
+      items: {
+        ...this.state.items,
+        expanded: !this.state.items.expanded,
+      }
+    })
+    console.warn('handleToggleExpandAll', ...args) // todo : fix input checkbox type firing callback twice
+    // todo: fix syncing on expanded items
+  }
+
   handleItemExpand = ({key, value, expanded}) => {
     const {items} = this.props
     value = String(value).toLowerCase()
@@ -137,14 +148,19 @@ export default class TableView extends Component {
 
   // RENDERS -------------------------------------------------------------------
 
-  renderHeader = ({id, title, children, className, style}) => {
+  renderHeader = ({id, title, children: cell, data, className, style, renderHeader}) => {
     const {sorts} = this.state
     const hasSort = sorts && !!sorts.find(s => s.id === id)
+    const render = isFunction(cell) ? cell : renderHeader
+    const value = data != null ? data : (cell || title)
     return (
       <Table.HeaderCell key={id}>
         <Row className={classNames('middle', className)} style={style}
              onClick={hasSort && this.handleSort.bind(this, id)}>
-          {children || <Text>{title || id}</Text>}
+          {render
+            ? render(value, id, {className, style}, this)
+            : (typeof cell === 'object' ? cell : <Text className='p'>{cell || title || id}</Text>)
+          }
           {hasSort && renderSort(sorts.find(item => item.id === id) || {})}
         </Row>
       </Table.HeaderCell>

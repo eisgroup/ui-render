@@ -75,13 +75,14 @@ export default function Input
   if (float && !props.placeholder) props.placeholder = ' ' // required for Float label CSS to work
   const idHelp = id + '-help'
   const hasValue = props.value != null && props.value !== ''
+  const isCheckbox = props.type === 'checkbox'
   if (done == null) done = !error && hasValue
   return (
     <View
       className={classNames('input--wrapper', className, {float, done, resize})}
       style={style}
     >
-      {!float && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
+      {!float && !isCheckbox && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
       <Row className={classNames('input', {active, icon, lefty, error, info})}>
         {icon && lefty && <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>}
         {unit && hasValue &&
@@ -109,7 +110,7 @@ export default function Input
           {...props}
         />
         {icon && !lefty && <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>}
-        {float && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
+        {(float || isCheckbox) && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
       </Row>
       {(error || info) &&
       <View id={idHelp} className='field-help'>

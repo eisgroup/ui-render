@@ -219,8 +219,10 @@ export function metaToProps (meta, data, instance) {
           ...definition.name && {name: interpolateString(definition.name, {index, value})},
           // Filter for row data from parent table (in default layout)
           ...definition.filterItems && {parentItem: value},
-          ...isString(definition.onClick) && self && !getFunctionFromString(definition.onClick, null) &&
-          {onClick: self[definition.onClick]},
+          // Inject functions by their name string
+          ...removeNilValues(FUNCTION_NAMES.map(func => isString(definition[func]) && self &&
+            !getFunctionFromString(definition[func], null) && {[func]: self[definition[func]]}
+          )).reduce((obj, item) => ({...obj, ...item}), {}),
           // Recursively map definitions within Render function
           ...definition.items && {items: metaToProps(definition.items, data, instance)},
           ...props,
@@ -347,7 +349,7 @@ function transformDefinition (value, {data, args}) {
  * @param {Array} [funcNames] - list of definitions keys to check for function transform
  * @returns {Object} definition - with names replaced by functions (by mutation)
  */
-function metaToFunctions (definition, {data, funcNames = ['onClick', 'onChange', 'onDone']} = {}) {
+function metaToFunctions (definition, {data, funcNames = FUNCTION_NAMES} = {}) {
   const validations = toList(definition.validate)
   if (isString(validations[0])) definition.validate = removeNilValues(validations.map(id => FIELD.VALIDATION[id]))
   if (isString(definition.normalize)) definition.normalize = FIELD.NORMALIZER[definition.normalize]
@@ -359,3 +361,5 @@ function metaToFunctions (definition, {data, funcNames = ['onClick', 'onChange',
     }
   })
 }
+
+const FUNCTION_NAMES = ['onClick', 'onChange', 'onDone']

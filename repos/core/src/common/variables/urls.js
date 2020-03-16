@@ -1,4 +1,4 @@
-import { ENV } from './_envs'
+import { __CLIENT__, ENV } from './_envs'
 
 /* API Endpoints */
 export const API_URL = ENV.REACT_APP_API_URL || (__CLIENT__ ? window.location.origin : '')
