@@ -38,13 +38,17 @@ export default class Forms extends Component {
               </Row>
               <Row className='justify'>
                 <InputField float name='begin' icon='clock' placeholder='hh:mm' stickyPlaceholder
-                            normalize={hourMinute}>
+                            normalize={hourMinute} onChange={console.warn}>
                   <Tooltip top>Begin Time</Tooltip>
                 </InputField>
                 <InputField float name='finish' icon='clock' placeholder='hh:mm' stickyPlaceholder
                             normalize={hourMinute}>
                   <Tooltip top>Finish Time</Tooltip>
                 </InputField>
+              </Row>
+              <Row className='justify'>
+                <InputField name='check' type='checkbox' label='checkbox' onChange={console.warn}/>
+                <InputField name='choice' type='radio' label='radio' onChange={console.warn}/>
               </Row>
             </form>
             <form className='app__form max-width-290 padding-h-small'>

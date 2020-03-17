@@ -38,8 +38,8 @@ export class DateField extends Component {
   }
 
   render = () => {
-    const {name, disabled, validate} = this.props
-    return <Field {...{name, disabled, validate}} component={this.input}/>
+    const {name, disabled, normalize, validate} = this.props
+    return <Field {...{name, disabled, normalize, validate}} component={this.input}/>
   }
 }
 
@@ -64,8 +64,8 @@ export class DatesField extends Component {
   }
 
   render = () => {
-    const {name, disabled, validate} = this.props
-    return <Field {...{name, disabled, validate}} component={this.input}/>
+    const {name, disabled, normalize, validate} = this.props
+    return <Field {...{name, disabled, normalize, validate}} component={this.input}/>
   }
 }
 
@@ -89,8 +89,8 @@ export class DropdownField extends Component {
   }
 
   render = () => {
-    const {name, disabled, options, validate} = this.props
-    return <Field {...{name, disabled, options, validate}} component={this.input}/>
+    const {name, disabled, normalize, validate, options} = this.props
+    return <Field {...{name, disabled, normalize, validate, options}} component={this.input}/>
   }
 }
 
@@ -129,10 +129,10 @@ export class InputField extends Component {
     )
   }
 
-  // Rerender Field for all prop changes
-  render () {
-    const {error: _, info: __, lefty: ___, float: ____, stickyPlaceholder: _____, ...props} = this.props
-    return <Field {...props} component={this.input}/>
+  // Do not pass 'onChange' to Field because it fires event as argument
+  render = () => {
+    const {name, disabled, normalize, validate} = this.props
+    return <Field {...{name, disabled, normalize, validate}} component={this.input}/>
   }
 }
 
@@ -171,8 +171,8 @@ export class SliderField extends Component {
   }
 
   render = () => {
-    const {name, disabled, normalize} = this.props
-    return <Field {...{name, disabled, normalize}} component={this.input}/>
+    const {name, disabled, normalize, validate} = this.props
+    return <Field {...{name, disabled, normalize, validate}} component={this.input}/>
   }
 }
 

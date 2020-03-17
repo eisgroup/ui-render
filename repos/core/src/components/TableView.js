@@ -106,14 +106,18 @@ export default class TableView extends Component {
 
   // HANDLERS ------------------------------------------------------------------
   handleToggleExpandAll = (...args) => {
+    const expanded = !this.state.items.expanded
+    const expandedByIndex = {}
+    for (const i in this.state.items.expandedByIndex) {
+      expandedByIndex[i] = expanded
+    }
     this.setState({
       items: {
         ...this.state.items,
-        expanded: !this.state.items.expanded,
+        expandedByIndex,
+        expanded,
       }
     })
-    console.warn('handleToggleExpandAll', ...args) // todo : fix input checkbox type firing callback twice
-    // todo: fix syncing on expanded items
   }
 
   handleItemExpand = ({key, value, expanded}) => {
