@@ -5,6 +5,7 @@ import { by, hasListValue, isEqual, isEqualList, isFunction } from '../common/ut
 import Placeholder from './Placeholder'
 import { renderSort } from './renders'
 import Row from './Row'
+import ScrollView from './ScrollView'
 import Table from './Table'
 import Text from './Text'
 import View from './View'
@@ -151,7 +152,6 @@ export default class TableView extends Component {
   }
 
   // RENDERS -------------------------------------------------------------------
-
   renderHeader = ({id, title, children: cell, data, className, style, renderHeader}) => {
     const {sorts} = this.state
     const hasSort = sorts && !!sorts.find(s => s.id === id)
@@ -171,6 +171,7 @@ export default class TableView extends Component {
     )
   }
 
+  // Render Rows (in default layout)
   renderItem = (item, i) => {
     const {renderItem} = this.props
     const {items: {expanded, expandedByIndex}} = this.state
@@ -212,19 +213,21 @@ export default class TableView extends Component {
   render () {
     const headers = this.headers
     if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
-    const {sorts, onSort, items: _, headers: __, renderItem: ___, ...props} = this.props
+    const {sorts, onSort, items: _, headers: __, renderItem: ___, className, ...props} = this.props
     const items = this.itemsSorted
     return (
-      <Table {...props}>
-        <Table.Header className='font-normal'>
-          <Table.Row>
-            {headers.map(this.renderHeader)}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {items.map(this.renderItem)}
-        </Table.Body>
-      </Table>
+      <ScrollView row classNameInner='fill-width'>
+        <Table className={classNames('full-width', className)} {...props}>
+          <Table.Header className='font-normal'>
+            <Table.Row>
+              {headers.map(this.renderHeader)}
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {items.map(this.renderItem)}
+          </Table.Body>
+        </Table>
+      </ScrollView>
     )
   }
 }

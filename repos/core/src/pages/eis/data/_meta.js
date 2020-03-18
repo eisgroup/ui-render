@@ -36,7 +36,6 @@ export default {
               headers: [
                 {
                   id: 'adminCategory',
-                  classNameCell: 'uppercase',
                   // - String renderCell -> maps to FIELD.RENDER function
                   // - Object renderCell -> maps to FIELD.TYPE recursive Render by matching values
                   //                     -> can optionally specify `default` FIELD.RENDER function
@@ -73,7 +72,9 @@ export default {
                     },
                     // default: 'Currency',
                   },
-                  title: 'Description'
+                  title: 'Description',
+                  className: 'bg-grey',
+                  classNameCell: 'bg-grey-light uppercase',
                 },
                 {
                   id: 'annualAmt',
