@@ -152,14 +152,14 @@ export default class TableView extends Component {
   }
 
   // RENDERS -------------------------------------------------------------------
-  renderHeader = ({id, title, children: cell, data, className, style, renderHeader}) => {
+  renderHeader = ({id, title, children: cell, data, classNameHeader, className, style, renderHeader}) => {
     const {sorts} = this.state
     const hasSort = sorts && !!sorts.find(s => s.id === id)
     const render = isFunction(cell) ? cell : renderHeader
     const value = data != null ? data : (cell || title)
     return (
-      <Table.HeaderCell key={id}>
-        <Row className={classNames('middle', className)} style={style}
+      <Table.HeaderCell key={id} className={classNameHeader}>
+        <Row className={classNames('middle', className, {sort: hasSort})} style={style}
              onClick={hasSort && this.handleSort.bind(this, id)}>
           {render
             ? render(value, id, {className, style}, this)

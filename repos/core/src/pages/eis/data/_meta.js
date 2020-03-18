@@ -6,7 +6,7 @@ export default {
       view: 'Expand',
       title: 'Admin Expenses',
       className: 'border-gradient-h-right',
-      // expanded: true,
+      expanded: true,
       items: [
         {
           view: 'Col',
@@ -73,7 +73,7 @@ export default {
                     // default: 'Currency',
                   },
                   title: 'Description',
-                  className: 'bg-grey',
+                  classNameHeader: 'bg-grey',
                   classNameCell: 'bg-grey-light uppercase',
                 },
                 {
@@ -122,7 +122,7 @@ export default {
         ]
       },
       className: 'border-gradient-h-right',
-      expanded: true,
+      // expanded: true,
       items: [
         {
           view: 'Row',

@@ -1,23 +1,71 @@
 @import "_mixins";
+@table-color-border: @color-border;
+@table-border: @border-size @border-style @table-color-border;
+@table-border-radius: @radius-base;
+@table-header-bg-color: @color-bg-grey-light;
+
+table {
+  border-spacing: 0; // remove spacing between tr rows
+  border: @table-border;
+  border-radius: @table-border-radius;
+
+  .app__sort__icon {
+    &:extend(.padding-smaller all);
+    &:extend(.padding-right-small all);
+  }
+
+  th:first-child,
+  th:first-child > * {
+    border-top-left-radius: @table-border-radius;
+  }
+
+  th:last-child,
+  th:last-child > * {
+    border-top-right-radius: @table-border-radius;
+  }
+
+  tbody tr:last-child {
+    td:first-child,
+    td:first-child > * {
+      border-bottom-left-radius: @table-border-radius;
+    }
+
+    td:last-child,
+    td:last-child > * {
+      border-bottom-right-radius: @table-border-radius;
+    }
+  }
+}
+
+// Minimise nested styling to allow easy config override
+th {
+  background-color: @table-header-bg-color;
+}
+
+td {
+  padding: 0; // remove cell spacing
+  border-top: @table-border;
+}
+
+.ui.table {
+  th > * {
+    &:extend(.padding-v-smaller all);
+    &:extend(.padding-left-small all);
+
+    &:not(.sort) {
+      &:extend(.padding-right-small all);
+    }
+  }
+
+  td > * {
+    &:extend(.padding-v-smaller all);
+    &:extend(.padding-h-small all);
+  }
+}
 
 .app__table__filters,
 .app__table__options {
   > * {
     &:extend(.margin all);
-  }
-}
-
-.ui.table thead th {
-  //&:extend(.uppercase all);
-}
-
-.ui.table td > * {
-  &:extend(.padding-v-smaller all);
-  &:extend(.padding-h-small all);
-}
-
-.table {
-  .app__sort__icon {
-    &:extend(.padding-smaller all);
   }
 }
