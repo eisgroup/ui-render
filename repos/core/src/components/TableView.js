@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component, Fragment } from 'react'
-import { by, hasListValue, isEqual, isEqualList, isFunction } from '../common/utils'
+import { by, get, hasListValue, isEqual, isEqualList, isFunction } from '../common/utils'
 import Placeholder from './Placeholder'
 import { renderSort } from './renders'
 import Row from './Row'
@@ -45,6 +45,12 @@ export default class TableView extends Component {
     onSort: PropTypes.func, // receives clicked sort object {id, order, sortKey} as argument
     renderItem: PropTypes.func, // callback to render extra table rows in default layout
     itemsExpanded: PropTypes.bool,
+    itemClassNames: PropTypes.arrayOf( // conditional class names for table items (rows in default layout)
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        values: PropTypes.object.isRequired,
+      })
+    )
     // ...other Table props
   }
 
@@ -173,11 +179,26 @@ export default class TableView extends Component {
 
   // Render Rows (in default layout)
   renderItem = (item, i) => {
-    const {renderItem} = this.props
+    const {renderItem, itemClassNames} = this.props
     const {items: {expanded, expandedByIndex}} = this.state
+    let className
+    if (itemClassNames) {
+      className = []
+      itemClassNames.forEach(({id, values}) => {
+        const value = get(item, id)
+        if (value == null) return
+        for (const match in values) {
+          if (match === String(value)) {
+            className.push(values[match])
+            break
+          }
+        }
+      })
+      className = className.length ? className.join(' ') : undefined
+    }
     return (
       <Fragment key={i}>
-        <Table.Row>
+        <Table.Row className={className}>
           {this.headers.map(this.renderItemData.bind(this, item, i))}
         </Table.Row>
         {renderItem && (expanded || expandedByIndex[i]) &&

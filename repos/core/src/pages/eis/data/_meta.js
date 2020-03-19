@@ -105,6 +105,21 @@ export default {
                   title: 'Per Employee'
                 },
               ],
+              itemClassNames: [
+                {
+                  id: 'adminCategory',
+                  values: {
+                    'Administration Total': 'bg-green-light',
+                    'Grand Total': 'bg-green-light',
+                  }
+                },
+                {
+                  id: 'premiumPct',
+                  values: {
+                    '1': 'text bold',
+                  }
+                }
+              ]
             }
           ]
         }
