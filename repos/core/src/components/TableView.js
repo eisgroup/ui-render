@@ -234,7 +234,7 @@ export default class TableView extends Component {
   render () {
     const headers = this.headers
     if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
-    const {sorts, onSort, items: _, headers: __, renderItem: ___, className, ...props} = this.props
+    const {sorts, onSort, items: _, headers: __, renderItem: ___, itemClassNames: ____, className, ...props} = this.props
     const items = this.itemsSorted
     return (
       <ScrollView row classNameInner='fill-width'>
