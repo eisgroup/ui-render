@@ -8,6 +8,7 @@ table {
   border-spacing: 0; // remove spacing between tr rows
   border: @table-border;
   border-radius: @table-border-radius;
+  &:extend(.bg-neutral all); // style cell using table to allow styling tr background
 
   .app__sort__icon {
     &:extend(.padding-smaller all);
