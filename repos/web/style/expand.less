@@ -1,11 +1,6 @@
 @import "_mixins";
 
-.app__collapse__content {
-  overflow: hidden;
-  transition: @speed-transition * 2;
-}
-
-
+// Accordion styles
 .app__expand {
   > .expand__content > * > .app__expand,
   + .app__expand {
@@ -45,8 +40,17 @@
       background: @color-shadow;
     }
   }
+
+  > .text > i.icon:first-child {
+    &:extend(.margin-right-small all);
+  }
 }
 
 .expand__content {
   &:extend(.margin-left all);
+}
+
+.app__collapse__content {
+  overflow: hidden;
+  transition: @speed-transition * 2;
 }

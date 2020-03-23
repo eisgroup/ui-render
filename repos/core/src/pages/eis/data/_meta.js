@@ -5,7 +5,6 @@ export default {
     {
       view: 'Expand',
       title: 'Admin Expenses',
-      className: 'border-gradient-h-right',
       expanded: true,
       items: [
         {
@@ -136,7 +135,6 @@ export default {
           },
         ]
       },
-      className: 'border-gradient-h-right',
       // expanded: true,
       items: [
         {
