@@ -1,7 +1,7 @@
 /*******************************
         User Overrides
 *******************************/
-
+@import "../../fonts/icons/variables";
 // @IMPORTANT: Color overrides only!
 // For styles affecting layout, edit inside `input.less`
 .ui.selection.dropdown {
@@ -52,6 +52,10 @@
 
   &.readonly {
     opacity: initial !important; //override .disabled styling
+  }
+
+  > .dropdown.icon:before {
+    content: @dropdown;
   }
 
   // Placeholder
