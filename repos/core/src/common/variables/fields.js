@@ -11,12 +11,14 @@ export const FIELD = getSetDefinition('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', '
 FIELD.TYPE = {
   BUTTON: 'Button',
   EXPAND: 'Expand', // Expandable/collapsing content with clickable `title` or `renderTitle` area
-  COL: 'Col', // alias for Column
-  COLUMN: 'Column', // Vertical column layout
+  COL: 'Col', // Vertical column layout
+  COL2: 'Column', // alias for Column
+  COL3: 'VerticalLayout', // alias for Column
   COUNTER: 'Counter', // Animated number changing from `start` to `end` values
   LABEL: 'Label',
   PIE_CHART: 'PieChart', // Pie chat (can be in shape of donut) with optional legends
   ROW: 'Row', // Horizontal row layout
+  ROW2: 'HorizontalLayout', // alias for Row
   TABLE: 'Table',
   TABS: 'Tabs',
   TEXT: 'Text',

@@ -74,7 +74,8 @@ class RenderClass extends Component {
         return <Counter {...props}/>
 
       case FIELD.TYPE.COL:
-      case FIELD.TYPE.COLUMN:
+      case FIELD.TYPE.COL2:
+      case FIELD.TYPE.COL3:
         return <View {...props}>{items.map(Render)}</View>
 
       case FIELD.TYPE.LABEL:
@@ -87,6 +88,7 @@ class RenderClass extends Component {
         return <PieChart items={data} {...prop}/>
 
       case FIELD.TYPE.ROW:
+      case FIELD.TYPE.ROW2:
         return <Row {...props}>{items.map(Render)}</Row>
 
       case FIELD.TYPE.TABLE:
