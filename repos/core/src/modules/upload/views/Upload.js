@@ -173,7 +173,7 @@ export default class Upload extends Component {
           disabled={disabled || readonly}
         >
           {children || <Fragment>
-            <Icon name="picture" className="text largest no-margin"/>
+            <Icon name="image" className="text largest no-margin"/>
             <Text className='p margin-top-smallest'>
               {_.SELECT_OR_DROP}<br/>
               {pluralize(capitalize(label), multiple ? 2 : 1)}

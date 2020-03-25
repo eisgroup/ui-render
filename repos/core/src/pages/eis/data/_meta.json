@@ -1,11 +1,9 @@
 {
   "view": "Col",
-  "className": "bg-grey-lighter",
   "items": [
     {
       "view": "Expand",
       "title": "Admin Expenses",
-      "className": "border-gradient-h-right",
       "items": [
         {
           "view": "Col",
@@ -129,8 +127,6 @@
           }
         ]
       },
-      "className": "border-gradient-h-right",
-      "expanded": true,
       "items": [
         {
           "view": "Row",

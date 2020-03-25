@@ -1,11 +1,10 @@
 export default {
   view: 'Col',
-  className: 'bg-grey-lighter',
   items: [
     {
       view: 'Expand',
       title: 'Admin Expenses',
-      expanded: true,
+      // expanded: true,
       items: [
         {
           view: 'Col',
