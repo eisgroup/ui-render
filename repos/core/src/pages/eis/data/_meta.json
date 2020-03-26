@@ -1,5 +1,5 @@
 {
-  "view": "Col",
+  "view": "VerticalLayout",
   "items": [
     {
       "view": "Expand",
@@ -19,15 +19,26 @@
               "label": "Number of claims per employee",
               "name": "adminExpenses.perEmployeeClaims",
               "type": "number",
-              "min": 1
+              "min": 1,
+              "format": "integer",
+              "validate": "required"
             },
             {
               "view": "Table",
               "name": "adminCosts",
+              "sorts": [
+                {
+                  "id": "annualAmt",
+                  "order": 0
+                },
+                {
+                  "id": "premiumPct",
+                  "order": 1
+                }
+              ],
               "headers": [
                 {
                   "id": "adminCategory",
-                  "classNameCell": "uppercase",
                   "renderCell": {
                     "values": {
                       "Adjusted Fixed": {
@@ -78,35 +89,52 @@
                       }
                     }
                   },
-                  "title": "Description"
+                  "title": "Description",
+                  "classNameHeader": "bg-grey",
+                  "classNameCell": "bg-grey-light uppercase"
                 },
                 {
                   "id": "annualAmt",
                   "className": "right",
                   "classNameCell": "right",
-                  "renderCell": "Currency",
+                  "renderCell": "currency",
                   "title": "Annual Amount"
                 },
                 {
                   "id": "premiumPct",
                   "className": "right",
                   "classNameCell": "right",
-                  "renderCell": "Percent",
+                  "renderCell": "percent",
                   "title": "% of Premium"
                 },
                 {
                   "id": "perClaimAmt",
                   "className": "right",
                   "classNameCell": "right",
-                  "renderCell": "Currency",
+                  "renderCell": "currency",
                   "title": "Per Claim"
                 },
                 {
                   "id": "perEmployeeAmt",
                   "className": "right",
                   "classNameCell": "right",
-                  "renderCell": "Currency",
+                  "renderCell": "currency",
                   "title": "Per Employee"
+                }
+              ],
+              "itemClassNames": [
+                {
+                  "id": "adminCategory",
+                  "values": {
+                    "Administration Total": "bg-green-light",
+                    "Grand Total": "bg-green-light"
+                  }
+                },
+                {
+                  "id": "premiumPct",
+                  "values": {
+                    "1": "text bold"
+                  }
                 }
               ]
             }
@@ -292,6 +320,16 @@
                       {
                         "id": "enrolledPct",
                         "label": "Enrolled Percent"
+                      },
+                      {
+                        "id": "#",
+                        "renderHeader": {
+                          "view": "Input",
+                          "name": "expandAllStates",
+                          "type": "checkbox",
+                          "label": "Expand All",
+                          "onChange": "handleToggleExpandAll"
+                        }
                       }
                     ]
                   }
@@ -412,7 +450,9 @@
                                   {
                                     "view": "Input",
                                     "name": "planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].rateCalcEmp",
-                                    "label": "Areas"
+                                    "label": "Areas",
+                                    "type": "number",
+                                    "format": "double5"
                                   },
                                   {
                                     "view": "Input",
@@ -536,11 +576,11 @@
                       },
                       {
                         "id": "adjManualRate",
-                        "renderCell": "Currency"
+                        "renderCell": "currency"
                       },
                       {
                         "id": "adjFormulaRate",
-                        "renderCell": "Currency"
+                        "renderCell": "currency"
                       },
                       {
                         "id": "manualRate",
@@ -555,11 +595,11 @@
                       },
                       {
                         "id": "formulaRate",
-                        "renderCell": "Currency"
+                        "renderCell": "currency"
                       },
                       {
                         "id": "proposedRate",
-                        "renderCell": "Currency"
+                        "renderCell": "currency"
                       }
                     ],
                     "extraItems": [
