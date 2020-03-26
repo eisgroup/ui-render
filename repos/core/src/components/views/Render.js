@@ -265,11 +265,12 @@ export function metaToProps (meta, data, instance) {
  * @returns {Array} list - mapped from given data
  */
 function mapProps (data, mapper) {
-  const mapData = typeof mapper === 'string' ? (item) => get(item, mapper) : (item, index) => {
+  const mapData = typeof mapper === 'string' ? (item) => get(item, mapper, item) : (item, index) => {
     const result = {}
     for (const key in mapper) {
       // `index` must be converted to string to match fallback value defined in config (which can only be string)
-      result[key] = mapper[key] === '{index}' ? String(index) : get(item, mapper[key])
+      // fallback to item if key not found
+      result[key] = mapper[key] === '{index}' ? String(index) : get(item, mapper[key], item)
     }
     return result
   }

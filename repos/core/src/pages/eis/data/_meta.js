@@ -134,26 +134,24 @@ export default {
           },
         ]
       },
-      // expanded: true,
+      expanded: true,
       items: [
         {
           view: 'Row',
           className: 'wrap',
           items: [
-            {
+
+            { // Shorthand definition version (must have `name` defined, but `onChange` undefined)
               view: 'Dropdown',
-              name: 'plan', // `plan` must be unique key path identifier that does not exist in *_data.json
-              value: {name: '{state.active.plan,0}'},
-              onChange: 'setState,active.plan', // function defined as string
-              options: {name: 'planCalculations'}, // `planCalculations` is key path pointing to array in *_data.json
-              mapOptions: {
-                text: 'planName', // `planName` is key path pointing to value for each item in `options` above
-                value: '{index}', // using index of item, instead of its value as ID
-              },
+              name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
+              options: {name: 'planCalculations'}, // -> key path pointing to array in *_data.json
+              mapOptions: 'planName', // -> key path pointing to human readable value within each option (used as label)
+              // value: {name: '{state.active.plan,0}'}, // -> automatically added by default due to OpenL rules
+              // onChange: 'setState,active.plan', // function defined as string, added by default due to OpenL rules
             },
-            {
+            { // Full definition version
               view: 'Dropdown',
-              name: 'plan', // `plan` must be unique key path identifier that does not exist in *_data.json
+              name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
               value: {name: '{state.active.plan,0}'},
               onChange: { // function defined as object
                 name: 'setState',
