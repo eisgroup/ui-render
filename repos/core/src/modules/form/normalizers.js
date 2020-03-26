@@ -8,8 +8,9 @@ import { FIELD } from '../../common/variables'
  */
 
 export const integer = (value) => value && parseInt(value, 10)
-export const uppercase = (value) => value.toUpperCase()
+export const double5 = (value) => value && round(value, 5)
 export const emptyStringToNull = (value) => ((value === '') ? null : value)
+export const uppercase = (value) => value.toUpperCase()
 
 export function number ({min = -Infinity, max = Infinity, decimals}) {
   return (value) => {
@@ -128,6 +129,7 @@ export function phone (value) {
 FIELD.NORMALIZE = {
   DATE: 'date',
   HOUR_MINUTE: 'hh:mm',
+  DOUBLE5: 'double5',
   INTEGER: 'integer',
   PHONE: 'phone',
   UPPERCASE: 'uppercase',
@@ -135,6 +137,7 @@ FIELD.NORMALIZE = {
 FIELD.NORMALIZER = {
   [FIELD.NORMALIZE.DATE]: date,
   [FIELD.NORMALIZE.HOUR_MINUTE]: hourMinute,
+  [FIELD.NORMALIZE.DOUBLE5]: double5,
   [FIELD.NORMALIZE.INTEGER]: integer,
   [FIELD.NORMALIZE.PHONE]: phone,
   [FIELD.NORMALIZE.UPPERCASE]: uppercase,

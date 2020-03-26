@@ -28,9 +28,10 @@ FIELD.TYPE = {
 
 // Value Renderer Definitions
 FIELD.RENDER = {
-  CURRENCY: 'Currency',
-  PERCENT: 'Percent',
-  TITLE_n_INPUT: 'Title+Input',
+  CURRENCY: 'currency',
+  PERCENT: 'percent',
+  DOUBLE5: 'double5',
+  TITLE_n_INPUT: 'title+input',
 }
 
 // Action Type Definitions

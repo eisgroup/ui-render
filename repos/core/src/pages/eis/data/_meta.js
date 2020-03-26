@@ -1,5 +1,5 @@
 export default {
-  view: 'Col',
+  view: 'VerticalLayout',
   items: [
     {
       view: 'Expand',
@@ -21,7 +21,7 @@ export default {
               name: 'adminExpenses.perEmployeeClaims',
               type: 'number',
               min: 1,
-              normalize: 'integer',
+              format: 'integer',
               validate: 'required',
             },
             {
@@ -78,28 +78,28 @@ export default {
                   id: 'annualAmt',
                   className: 'right',
                   classNameCell: 'right',
-                  renderCell: 'Currency',
+                  renderCell: 'currency',
                   title: 'Annual Amount'
                 },
                 {
                   id: 'premiumPct',
                   className: 'right',
                   classNameCell: 'right',
-                  renderCell: 'Percent',
+                  renderCell: 'percent',
                   title: '% of Premium'
                 },
                 {
                   id: 'perClaimAmt',
                   className: 'right',
                   classNameCell: 'right',
-                  renderCell: 'Currency',
+                  renderCell: 'currency',
                   title: 'Per Claim'
                 },
                 {
                   id: 'perEmployeeAmt',
                   className: 'right',
                   classNameCell: 'right',
-                  renderCell: 'Currency',
+                  renderCell: 'currency',
                   title: 'Per Employee'
                 },
               ],
@@ -402,6 +402,8 @@ export default {
                                     view: 'Input',
                                     name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].rateCalcEmp',
                                     label: 'Areas',
+                                    type: 'number',
+                                    format: 'double5',
                                   },
                                   {
                                     view: 'Input',
@@ -518,11 +520,11 @@ export default {
                       },
                       {
                         id: 'adjManualRate',
-                        renderCell: 'Currency',
+                        renderCell: 'currency',
                       },
                       {
                         id: 'adjFormulaRate',
-                        renderCell: 'Currency',
+                        renderCell: 'currency',
                       },
                       {
                         id: 'manualRate',
@@ -537,11 +539,11 @@ export default {
                       },
                       {
                         id: 'formulaRate',
-                        renderCell: 'Currency',
+                        renderCell: 'currency',
                       },
                       {
                         id: 'proposedRate',
-                        renderCell: 'Currency',
+                        renderCell: 'currency',
                       },
                     ],
                     extraItems: [

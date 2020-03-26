@@ -4,6 +4,7 @@ import { ALERT, stateAction } from '../../common/actions'
 import {
   get,
   interpolateString,
+  isCollection,
   isFunction,
   isList,
   isNumeric,
@@ -11,6 +12,7 @@ import {
   isString,
   removeNilValues,
   toList,
+  toLowerCase,
   toPercent
 } from '../../common/utils'
 import { _, ACTIVE, FIELD } from '../../common/variables'
@@ -22,7 +24,7 @@ import Expand from '../Expand'
 import Json from '../Json'
 import Label from '../Label'
 import Placeholder from '../Placeholder'
-import { renderCurrency } from '../renders'
+import { renderCurrency, renderFloat } from '../renders'
 import Row from '../Row'
 import TableView from '../TableView'
 import Tabs from '../Tabs'
@@ -175,12 +177,14 @@ Render.onError = (err, errInfo, props) => ACTIVE.store.dispatch(stateAction(POPU
  * @returns {Function} renderer - that takes value as the first argument, and renders value in desired format
  */
 export function RenderFunc (Name) {
-  switch (Name) {
+  switch (toLowerCase(Name)) {
     case FIELD.RENDER.CURRENCY:
       return (val, index, {id, ...props} = {}) => (isNumeric(val)
           ? <Row {...props}><Text className='margin-right-smaller'>$</Text> {renderCurrency(val, 2)}</Row>
           : null
       )
+    case FIELD.RENDER.DOUBLE5:
+      return (val, index, {id, ...props} = {}) => renderFloat(val, 5, props)
     case FIELD.RENDER.PERCENT:
       return (val, index, {decimals} = {}) => toPercent(val, decimals)
     case FIELD.RENDER.TITLE_n_INPUT:
@@ -240,7 +244,7 @@ export function metaToProps (meta, data, instance) {
     }
 
     // Process Object definitions
-    else if (isObject(definition) || isList(definition)) {
+    else if (isCollection(definition)) {
       if ((definition.name != null && Object.keys(definition).length === 1)) {
         // Transform {name} - single key objects with name to their values
         meta[key] = isString(definition.name) ? get(data, definition.name, definition.name) : definition.name
@@ -335,7 +339,7 @@ function transformDefinition (value, {data, args}) {
     data,
     {suppressError: true},
   )
-  if (isObject(value) || isList(value)) {
+  if (isCollection(value)) {
     for (const key in value) {
       value[key] = transformDefinition(value[key], {data, args})
     }
