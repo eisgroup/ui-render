@@ -41,6 +41,16 @@ export function hasCommonListValue (...args) {
 }
 
 /**
+ * Check if the data passed is an array or object.
+ *
+ * @param {*} data - The variable to check
+ * @return {boolean}
+ */
+export function isCollection (data) {
+  return (!!data && (data.constructor === Array || data.constructor === Object))
+}
+
+/**
  * Check if Given Arrays are Equal in Values by Element References
  *
  * @param {Array|*} a
