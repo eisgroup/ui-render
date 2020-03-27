@@ -43,17 +43,8 @@ export default class Demo extends Component {
   // followed by optional arguments.
   // Positional arguments was chosen instead of keyword arguments because
   // it provides more flexibility and separation of concerns between different configs.
-  setStates = (value, keyPath) => {
-    return this.setState(set(this.state, keyPath, value))
-  }
-
-  resetForm = (...args) => this._resetForm(...args)
-
   state = {
     showMeta: true,
-    reset: (FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm), // must be declared before using `metaToProps`
-    setState: (FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates), // must be declared before using `metaToProps`
-    fetch: (FIELD.FUNC[FIELD.ACTION.FETCH] = fetch), // must be declared before using `metaToProps`
     data: {
       json: undefined,
       name: undefined,
@@ -65,6 +56,18 @@ export default class Demo extends Component {
     active: {
       // plan: 1,
     },
+  }
+
+  setStates = (value, keyPath) => {
+    return this.setState(set(this.state, keyPath, value))
+  }
+
+  resetForm = (...args) => this._resetForm(...args)
+
+  setup = {
+    reset: (FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm), // must be declared before using `metaToProps`
+    setState: (FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates), // must be declared before using `metaToProps`
+    fetch: (FIELD.FUNC[FIELD.ACTION.FETCH] = fetch), // must be declared before using `metaToProps`
   }
 
   handleUpload = (kind, [file], type) => {

@@ -38,28 +38,32 @@ const mapDispatchToProps = (dispatch) => ({
 @withForm({form: 'TEST', enableReinitialize: true})
 @logRender
 export default class OpenL extends Component {
-  resetForm = () => {
-    const {dispatch, form} = this.props
-    dispatch(reset(form))
+  state = {
+    showMeta: true,
+    data,
+    active: {
+      // plan: 1,
+    },
   }
 
   // @Note: functions should have consistent pattern of receiving important arguments first,
   // followed by optional arguments.
   // Positional arguments was chosen instead of keyword arguments because
+
+  resetForm = () => {
+    const {dispatch, form} = this.props
+    dispatch(reset(form))
+  }
+
   // it provides more flexibility and separation of concerns between different configs.
   setStates = (value, keyPath) => {
     return this.setState(set(this.state, keyPath, value))
   }
 
-  state = {
+  setup = {
     reset: (FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm), // must be declared before using `metaToProps`
     setState: (FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates), // must be declared before using `metaToProps`
     fetch: (FIELD.FUNC[FIELD.ACTION.FETCH] = fetch), // must be declared before using `metaToProps`
-    data,
-    active: {
-      // plan: 1,
-    },
-    showMeta: true,
   }
 
   /**

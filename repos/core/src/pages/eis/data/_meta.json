@@ -155,6 +155,7 @@
           }
         ]
       },
+      "expanded": true,
       "items": [
         {
           "view": "Row",
@@ -162,22 +163,15 @@
           "items": [
             {
               "view": "Dropdown",
-              "name": "plan",
-              "value": {
-                "name": "{state.active.plan,0}"
-              },
-              "onChange": "setState,active.plan",
+              "name": "active.plan",
               "options": {
                 "name": "planCalculations"
               },
-              "mapOptions": {
-                "text": "planName",
-                "value": "{index}"
-              }
+              "mapOptions": "planName"
             },
             {
               "view": "Dropdown",
-              "name": "plan",
+              "name": "active.plan",
               "value": {
                 "name": "{state.active.plan,0}"
               },
