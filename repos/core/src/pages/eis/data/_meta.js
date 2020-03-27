@@ -144,7 +144,7 @@ export default {
             { // Shorthand definition version (must have `name` defined, but `onChange` undefined)
               view: 'Dropdown',
               name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
-              options: {name: 'planCalculations'}, // -> key path pointing to array in *_data.json
+              options: 'planCalculations', // -> key path pointing to array in *_data.json
               mapOptions: 'planName', // -> key path pointing to human readable value within each option (used as label)
               // value: {name: '{state.active.plan,0}'}, // -> automatically added by default due to OpenL rules
               // onChange: 'setState,active.plan', // function defined as string, added by default due to OpenL rules

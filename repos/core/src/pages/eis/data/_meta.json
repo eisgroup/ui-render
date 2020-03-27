@@ -164,9 +164,7 @@
             {
               "view": "Dropdown",
               "name": "active.plan",
-              "options": {
-                "name": "planCalculations"
-              },
+              "options": "planCalculations",
               "mapOptions": "planName"
             },
             {

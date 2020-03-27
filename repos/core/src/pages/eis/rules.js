@@ -1,4 +1,4 @@
-import { isCollection, isObject, sanitizeGqlResponse } from '../../common/utils'
+import { isCollection, isObject, isString, sanitizeGqlResponse } from '../../common/utils'
 import { FIELD } from '../../common/variables'
 
 /**
@@ -17,6 +17,7 @@ export function toOpenLConfig (meta) {
         meta[key].onChange = FIELD.ACTION.SET_STATE + ',' + val.name
         if (val.value == null) meta[key].value = {name: `{state.${val.name},0}`}
         if (val.options != null) {
+          if (isString(val.options)) meta[key].options = {name: val.options}
           if (isObject(val.mapOptions)) {
             if (val.mapOptions.value == null) meta[key].mapOptions.value = '{index}'
           } else {

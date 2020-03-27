@@ -143,7 +143,7 @@ class RenderClass extends Component {
 
       default:
         const {mapOptions, ...rest} = props
-        if (mapOptions) rest.options = mapProps(props.options || [], mapOptions)
+        if (mapOptions) rest.options = mapProps(rest.options || [], mapOptions)
         return ACTIVE.renderField({view, items, ...rest})
     }
     return null
