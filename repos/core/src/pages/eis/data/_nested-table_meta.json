@@ -1,0 +1,80 @@
+{
+  "view": "Table",
+  "name": "coverages",
+  "headers": [
+    {
+      "id": "coverageID",
+      "title": "Coverage Name",
+      "renderCell": {
+        "view": "Expand",
+        "name": "{value}",
+        "id": "coverageID",
+        "onClick": "handleItemExpand"
+      }
+    },
+    {
+      "id": "fundingStructure.contributionType",
+      "title": "Contribution Type"
+    },
+    {
+      "id": "fundingStructure.requiredParticipationPrct",
+      "title": "Contribution",
+      "renderCell": "percent"
+    },
+    {
+      "id": "rate",
+      "title": "Quote Rate",
+      "renderCell": "double5"
+    },
+    {
+      "id": "annualPremium",
+      "title": "Annual Premium",
+      "renderCell": "currency"
+    },
+    {
+      "id": "#",
+      "renderHeader": {
+        "view": "Input",
+        "name": "expandAllStates",
+        "type": "checkbox",
+        "label": "Expand All",
+        "onChange": "handleToggleExpandAll"
+      }
+    }
+  ],
+  "renderItem": {
+    "view": "Table",
+    "name": "classes",
+    "relativeData": true,
+    "headers": [
+      {
+        "id": "classID",
+        "title": "Class Name",
+        "renderCell": {
+          "view": "Expand",
+          "name": "{value}",
+          "id": "classID",
+          "onClick": "handleItemExpand"
+        }
+      },
+      {
+        "id": "numberOfLives",
+        "title": "Number of Participants"
+      },
+      {
+        "id": "totalVolume",
+        "title": "Total Volume",
+        "renderCell": "float"
+      },
+      {
+        "id": "annualPremium",
+        "title": "Annual Premium"
+      }
+    ],
+    "renderItem": {
+      "view": "Table",
+      "name": "rateCards",
+      "relativeData": true
+    }
+  }
+}

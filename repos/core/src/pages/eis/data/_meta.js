@@ -317,7 +317,7 @@ export default {
                             items: [
                               {
                                 view: 'Text',
-                                className: 'h3 pink margin-bottom-small',
+                                className: 'h3 warning margin-bottom-small',
                                 items: [
                                   {
                                     view: 'Counter',
@@ -339,7 +339,7 @@ export default {
                             items: [
                               {
                                 view: 'Text',
-                                className: 'h3 violet margin-bottom-small',
+                                className: 'h3 info margin-bottom-small',
                                 items: [
                                   {
                                     view: 'Counter',

@@ -1,0 +1,42 @@
+{
+  "planID": "Golden",
+  "coverages": [
+    {
+      "coverageID": "STD Core",
+      "fundingStructure": {
+        "contributionType": "Non-contributory",
+        "requiredParticipationPrct": 0.25,
+        "sponsorPaymentMode": 1,
+        "memberPaymentModes": [
+          1,
+          12
+        ]
+      },
+      "rate": 0.7,
+      "annualPremium": 12600,
+      "sponsorAnnualPremium": 12222,
+      "memberAnnualPremium": 378,
+      "classes": [
+        {
+          "classID": "1",
+          "numberOfLives": 10,
+          "totalVolume": 15000,
+          "annualPremium": 12600,
+          "rate": 0.7,
+          "sponsorAnnualPremium": 12222,
+          "memberAnnualPremium": 378,
+          "rateCards": [
+            {
+              "ageBandName": "<25",
+              "numberOfLives": 13,
+              "rate": 1.08,
+              "annualPremium": 1200,
+              "sponsorAnnualPremium": 12222,
+              "memberAnnualPremium": 378
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
