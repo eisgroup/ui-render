@@ -31,6 +31,7 @@ FIELD.RENDER = {
   CURRENCY: 'currency',
   PERCENT: 'percent',
   DOUBLE5: 'double5',
+  FLOAT: 'float',
   TITLE_n_INPUT: 'title+input',
 }
 

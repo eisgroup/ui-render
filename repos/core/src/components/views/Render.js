@@ -185,6 +185,8 @@ export function RenderFunc (Name) {
       )
     case FIELD.RENDER.DOUBLE5:
       return (val, index, {id, ...props} = {}) => renderFloat(val, 5, props)
+    case FIELD.RENDER.FLOAT:
+      return (val, index, {id, ...props} = {}) => renderFloat(val, undefined, props)
     case FIELD.RENDER.PERCENT:
       return (val, index, {decimals} = {}) => toPercent(val, decimals)
     case FIELD.RENDER.TITLE_n_INPUT:
@@ -218,24 +220,26 @@ export function metaToProps (meta, data, instance) {
     if (key.indexOf('render') === 0) {
       if (typeof definition === 'string') meta[key] = RenderFunc(meta[key])
       if (isObject(definition)) meta[key] = (value, index, props, self) => {
-        console.warn(key, definition)
         if (definition.relativeData) data = value
 
         // Render is a field definition
-        if (definition.view) return Render({
-          ...definition,
-          ...definition.name && {name: interpolateString(definition.name, {index, value})},
-          // Filter for row data from parent table (in default layout)
-          ...definition.filterItems && {parentItem: value},
-          // Inject functions by their name string
-          ...removeNilValues(FUNCTION_NAMES.map(func => isString(definition[func]) && self &&
-            !getFunctionFromString(definition[func], null) && {[func]: self[definition[func]]}
-          )).reduce((obj, item) => ({...obj, ...item}), {}),
-          // Recursively map definitions within Render function
-          ...definition.items && {items: metaToProps(definition.items, data, instance)},
-          ...props,
-          data,
-        })
+        if (definition.view) {
+          const {name, filterItems, ...configs} = definition
+          return Render({
+            // Recursively map definitions within Render function
+            ...metaToProps(configs, data, instance),
+            // Transform key path with actual data
+            ...name && {name: interpolateString(definition.name, {index, value})},
+            // Filter for row data from parent table (in default layout)
+            ...filterItems && {parentItem: value},
+            // Inject functions by their name string
+            ...removeNilValues(FUNCTION_NAMES.map(func => isString(definition[func]) && self &&
+              !getFunctionFromString(definition[func], null) && {[func]: self[definition[func]]}
+            )).reduce((obj, item) => ({...obj, ...item}), {}),
+            ...props,
+            data,
+          })
+        }
 
         // Render has conditional match by values
         const valueProps = get(definition, `values[${value}]`, definition.default)

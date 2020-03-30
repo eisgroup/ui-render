@@ -49,17 +49,48 @@ export default {
       },
     },
   ],
-  // Extra render function for Table Items (rows in default layout)
+
+  // Nested Table (one level deep)
   renderItem: {
     view: 'Table',
     name: 'classes',
     relativeData: true, // use attribute `name` above as key path relative to each Table item's data, not *_data.json
-    headers: [
+    headers: [ // -> must be defined if data contains nested tables
       {
         id: 'classID',
-        title: 'Class Name'
-      }
-    ]
+        title: 'Class Name',
+        // Custom render function for Table Cells (columns in default layout)
+        renderCell: {
+          view: 'Expand',
+          name: '{value}',
+          id: 'classID',
+          // toggle extra table item expansion (row in default layout)
+          onClick: 'handleItemExpand', // function is injected by TableView instance on render
+          // items: [{}], // can also make it expand any content inside clicked cell
+        },
+      },
+      {
+        id: 'numberOfLives',
+        title: 'Number of Participants',
+      },
+      {
+        id: 'totalVolume',
+        title: 'Total Volume',
+        renderCell: 'float',
+      },
+      {
+        id: 'annualPremium',
+        title: 'Annual Premium',
+      },
+    ],
+
+    // Nested Table (two levels deep)
+    renderItem: {
+      view: 'Table',
+      name: 'rateCards',
+      relativeData: true, // use attribute `name` above as key path relative to each Table item's data, not *_data.json
+      // headers: [] // -> optional when has no nested tables
+    },
   },
 }
 
