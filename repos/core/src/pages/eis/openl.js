@@ -11,8 +11,8 @@ import { POPUP } from '../../modules/exports'
 import { reset } from '../../modules/form'
 import { withForm } from '../../modules/form/utils'
 import router from '../../modules/router'
-import data from './data/_data'
-import meta from './data/_meta'
+import data from './data/_nested-table_data'
+import meta from './data/_nested-table_meta'
 import { transformConfig } from './rules'
 
 /**

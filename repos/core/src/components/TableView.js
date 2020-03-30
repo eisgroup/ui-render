@@ -215,7 +215,7 @@ export default class TableView extends Component {
   // Render Row Cells (in default layout)
   renderItemData = (item, index, {id, renderCell, classNameCell: className, styleCell: style}) => {
     // Conditional rendering logic based on given cell data
-    const cell = item[id]
+    const cell = get(item, id)
     const {render: r, data} = cell || {}
     const render = isFunction(cell) ? cell : (r || renderCell)
     const value = data != null ? data : cell

@@ -58,7 +58,7 @@ class RenderClass extends Component {
   // Errors in components will propagate up to componentDidCatch in parent class.
   render () {
     if (this.state.error) return <Placeholder>{String(this.state.error)}</Placeholder>
-    let {data: info, view, items = [], ...props} = this.props
+    let {data: info, view, items = [], relativeData: _, ...props} = this.props
     // Pass down data to child renderers, if defined
     let data = info
     if (props.name) data = get(info, props.name)
@@ -218,6 +218,8 @@ export function metaToProps (meta, data, instance) {
     if (key.indexOf('render') === 0) {
       if (typeof definition === 'string') meta[key] = RenderFunc(meta[key])
       if (isObject(definition)) meta[key] = (value, index, props, self) => {
+        console.warn(key, definition)
+        if (definition.relativeData) data = value
 
         // Render is a field definition
         if (definition.view) return Render({
