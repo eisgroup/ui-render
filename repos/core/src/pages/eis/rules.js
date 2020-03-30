@@ -34,7 +34,11 @@ export function toOpenLConfig (meta) {
       meta.normalize = val
       delete meta[key]
     }
-    // todo: Dropdown default behavior
+    // Convert `styles` attribute to `className`
+    else if (key === 'styles') {
+      meta.className = val
+      delete meta[key]
+    }
   }
   return meta
 }
