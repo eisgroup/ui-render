@@ -26,7 +26,7 @@ let _ = {
   },
   UPLOADED: { // as verb
     [l.ENGLISH]: 'Uploaded',
-    [l.RUSSIAN]: 'Загружён',
+    [l.RUSSIAN]: 'Загружен',
   },
   UPDATING: {
     [l.ENGLISH]: 'Updating',
