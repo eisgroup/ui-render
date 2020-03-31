@@ -66,9 +66,17 @@ class RenderClass extends Component {
     switch (view) {
       case FIELD.TYPE.BUTTON:
         if (items.length) props.children = items.map(Render)
+        if (props.label != null && props.children == null) {
+          props.children = props.label
+          delete props.label
+        }
         return <Button {...props}/>
 
       case FIELD.TYPE.EXPAND:
+        if (props.label != null && props.title == null) {
+          props.title = props.label
+          delete props.label
+        }
         if (props.name != null && props.title == null) props.title = props.name
         return <Expand {...props}>{() => items.map(Render)}</Expand>
 
@@ -132,14 +140,14 @@ class RenderClass extends Component {
         return <Tabs items={tabs} panels={panels} {...props}/>
 
       case FIELD.TYPE.TEXT:
-        if (items.length) props.children = items.map(Render)
-        if (props.title) props.children = props.title
-        return <Text {...props}/>
-
       case FIELD.TYPE.TITLE:
         if (items.length) props.children = items.map(Render)
-        if (props.title) props.children = props.title
-        return <Text {...props} className={classNames('h3', props.className)}/>
+        if (props.label != null && props.children == null) {
+          props.children = props.label
+          delete props.label
+        }
+        if (view === FIELD.TYPE.TITLE) props.className = classNames('h3', props.className)
+        return <Text {...props}/>
 
       default:
         const {mapOptions, ...rest} = props

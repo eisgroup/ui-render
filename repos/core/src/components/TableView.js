@@ -33,8 +33,8 @@ export default class TableView extends Component {
       PropTypes.shape({
         ...sortObj,
         renderCell: PropTypes.func, // cell render function(value, index, props) for items under the header
-        title: PropTypes.string, // header title, falls back to `id` if not given, and `children` not defined
-        children: PropTypes.any, // custom header content to render, overrides `title`
+        label: PropTypes.string, // header title, falls back to `id` if not given, and `children` not defined
+        children: PropTypes.any, // custom header content to render, overrides `label`
         className: PropTypes.string, // css class name
         classNameCell: PropTypes.string, // css class name for items under the header
         style: PropTypes.object, // css inline styles
@@ -158,18 +158,18 @@ export default class TableView extends Component {
   }
 
   // RENDERS -------------------------------------------------------------------
-  renderHeader = ({id, title, children: cell, data, classNameHeader, className, style, renderHeader}) => {
+  renderHeader = ({id, label, children: cell, data, classNameHeader, className, style, renderHeader}) => {
     const {sorts} = this.state
     const hasSort = sorts && !!sorts.find(s => s.id === id)
     const render = isFunction(cell) ? cell : renderHeader
-    const value = data != null ? data : (cell || title)
+    const value = data != null ? data : (cell || label)
     return (
       <Table.HeaderCell key={id} className={classNameHeader}>
         <Row className={classNames('middle', className, {sort: hasSort})} style={style}
              onClick={hasSort && this.handleSort.bind(this, id)}>
           {render
             ? render(value, id, {className, style}, this)
-            : (typeof cell === 'object' ? cell : <Text className='p'>{cell || title || id}</Text>)
+            : (typeof cell === 'object' ? cell : <Text className='p'>{cell || label || id}</Text>)
           }
           {hasSort && renderSort(sorts.find(item => item.id === id) || {})}
         </Row>

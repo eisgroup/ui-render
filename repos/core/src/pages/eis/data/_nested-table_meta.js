@@ -58,7 +58,7 @@ export default {
     headers: [ // -> must be defined if data contains nested tables
       {
         id: 'classID',
-        title: 'Class Name',
+        label: 'Class Name',
         // Custom render function for Table Cells (columns in default layout)
         renderCell: {
           view: 'Expand',
@@ -71,16 +71,16 @@ export default {
       },
       {
         id: 'numberOfLives',
-        title: 'Number of Participants',
+        label: 'Number of Participants',
       },
       {
         id: 'totalVolume',
-        title: 'Total Volume',
+        label: 'Total Volume',
         renderCell: 'float',
       },
       {
         id: 'annualPremium',
-        title: 'Annual Premium',
+        label: 'Annual Premium',
       },
     ],
 

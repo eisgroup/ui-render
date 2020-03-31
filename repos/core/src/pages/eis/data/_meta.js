@@ -3,7 +3,7 @@ export default {
   items: [
     {
       view: 'Expand',
-      title: 'Admin Expenses',
+      label: 'Admin Expenses',
       // expanded: true,
       items: [
         {
@@ -12,7 +12,7 @@ export default {
           items: [
             {
               view: 'Title',
-              children: 'Fully Insured'
+              label: 'Fully Insured'
             },
             {
               view: 'Input',
@@ -42,7 +42,7 @@ export default {
                       'Adjusted Fixed': {
                         view: 'Row',
                         items: [
-                          {view: 'Text', fill: true, children: 'Adjusted Fixed'},
+                          {view: 'Text', fill: true, label: 'Adjusted Fixed'},
                           {
                             view: 'Col',
                             fill: true,
@@ -56,7 +56,7 @@ export default {
                       'Adjusted Variable': {
                         view: 'Row',
                         items: [
-                          {view: 'Text', fill: true, children: 'Adjusted Variable'},
+                          {view: 'Text', fill: true, label: 'Adjusted Variable'},
                           {
                             view: 'Col',
                             fill: true,
@@ -70,7 +70,7 @@ export default {
                     },
                     // default: 'Currency',
                   },
-                  title: 'Description',
+                  label: 'Description',
                   classNameHeader: 'bg-grey',
                   classNameCell: 'bg-grey-light uppercase',
                 },
@@ -79,28 +79,28 @@ export default {
                   className: 'right',
                   classNameCell: 'right',
                   renderCell: 'currency',
-                  title: 'Annual Amount'
+                  label: 'Annual Amount'
                 },
                 {
                   id: 'premiumPct',
                   className: 'right',
                   classNameCell: 'right',
                   renderCell: 'percent',
-                  title: '% of Premium'
+                  label: '% of Premium'
                 },
                 {
                   id: 'perClaimAmt',
                   className: 'right',
                   classNameCell: 'right',
                   renderCell: 'currency',
-                  title: 'Per Claim'
+                  label: 'Per Claim'
                 },
                 {
                   id: 'perEmployeeAmt',
                   className: 'right',
                   classNameCell: 'right',
                   renderCell: 'currency',
-                  title: 'Per Employee'
+                  label: 'Per Employee'
                 },
               ],
               itemClassNames: [
@@ -130,7 +130,7 @@ export default {
         className: 'middle',
         items: [
           {
-            view: 'Text', children: 'Rate Details - ', className: 'margin-right-small'
+            view: 'Text', label: 'Rate Details - ', className: 'margin-right-small'
           },
         ]
       },
@@ -329,7 +329,7 @@ export default {
                               {
                                 view: 'Text',
                                 className: 'bold',
-                                children: 'PPO Penetration'
+                                label: 'PPO Penetration'
                               }
                             ]
                           },
@@ -351,7 +351,7 @@ export default {
                               {
                                 view: 'Text',
                                 className: 'bold',
-                                children: 'Net Utilization'
+                                label: 'Net Utilization'
                               }
                             ]
                           },
@@ -392,7 +392,7 @@ export default {
                             view: 'Col',
                             className: 'padding no-padding-top border',
                             items: [
-                              {view: 'Text', className: 'padding-top', children: 'COPAY'},
+                              {view: 'Text', className: 'padding-top', label: 'COPAY'},
                               {
                                 view: 'Row', className: 'wrap app__form',
                                 items: [

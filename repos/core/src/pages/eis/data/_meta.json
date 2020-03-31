@@ -3,7 +3,7 @@
   "items": [
     {
       "view": "Expand",
-      "title": "Admin Expenses",
+      "label": "Admin Expenses",
       "items": [
         {
           "view": "Col",
@@ -11,7 +11,7 @@
           "items": [
             {
               "view": "Title",
-              "children": "Fully Insured"
+              "label": "Fully Insured"
             },
             {
               "view": "Input",
@@ -47,7 +47,7 @@
                           {
                             "view": "Text",
                             "fill": true,
-                            "children": "Adjusted Fixed"
+                            "label": "Adjusted Fixed"
                           },
                           {
                             "view": "Col",
@@ -70,7 +70,7 @@
                           {
                             "view": "Text",
                             "fill": true,
-                            "children": "Adjusted Variable"
+                            "label": "Adjusted Variable"
                           },
                           {
                             "view": "Col",
@@ -89,7 +89,7 @@
                       }
                     }
                   },
-                  "title": "Description",
+                  "label": "Description",
                   "classNameHeader": "bg-grey",
                   "classNameCell": "bg-grey-light uppercase"
                 },
@@ -98,28 +98,28 @@
                   "className": "right",
                   "classNameCell": "right",
                   "renderCell": "currency",
-                  "title": "Annual Amount"
+                  "label": "Annual Amount"
                 },
                 {
                   "id": "premiumPct",
                   "className": "right",
                   "classNameCell": "right",
                   "renderCell": "percent",
-                  "title": "% of Premium"
+                  "label": "% of Premium"
                 },
                 {
                   "id": "perClaimAmt",
                   "className": "right",
                   "classNameCell": "right",
                   "renderCell": "currency",
-                  "title": "Per Claim"
+                  "label": "Per Claim"
                 },
                 {
                   "id": "perEmployeeAmt",
                   "className": "right",
                   "classNameCell": "right",
                   "renderCell": "currency",
-                  "title": "Per Employee"
+                  "label": "Per Employee"
                 }
               ],
               "itemClassNames": [
@@ -150,7 +150,7 @@
         "items": [
           {
             "view": "Text",
-            "children": "Rate Details - ",
+            "label": "Rate Details - ",
             "className": "margin-right-small"
           }
         ]
@@ -351,7 +351,7 @@
                             "items": [
                               {
                                 "view": "Text",
-                                "className": "h3 pink margin-bottom-small",
+                                "className": "h3 warning margin-bottom-small",
                                 "items": [
                                   {
                                     "view": "Counter",
@@ -365,7 +365,7 @@
                               {
                                 "view": "Text",
                                 "className": "bold",
-                                "children": "PPO Penetration"
+                                "label": "PPO Penetration"
                               }
                             ]
                           },
@@ -375,7 +375,7 @@
                             "items": [
                               {
                                 "view": "Text",
-                                "className": "h3 violet margin-bottom-small",
+                                "className": "h3 info margin-bottom-small",
                                 "items": [
                                   {
                                     "view": "Counter",
@@ -389,7 +389,7 @@
                               {
                                 "view": "Text",
                                 "className": "bold",
-                                "children": "Net Utilization"
+                                "label": "Net Utilization"
                               }
                             ]
                           }
@@ -433,7 +433,7 @@
                               {
                                 "view": "Text",
                                 "className": "padding-top",
-                                "children": "COPAY"
+                                "label": "COPAY"
                               },
                               {
                                 "view": "Row",
