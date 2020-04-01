@@ -4,7 +4,7 @@ export default {
   headers: [  // -> must be defined if data contains nested tables, because rendering cells as objects will cause errors
     {
       id: 'coverageID',
-      title: 'Coverage Name',
+      label: 'Coverage Name',
       // Custom render function for Table Cells (columns in default layout)
       renderCell: {
         view: 'Expand',
@@ -17,25 +17,25 @@ export default {
     },
     {
       id: 'fundingStructure.contributionType',
-      title: 'Contribution Type'
+      label: 'Contribution Type'
     },
     {
       id: 'fundingStructure.requiredParticipationPrct',
-      title: 'Contribution',
+      label: 'Contribution',
       renderCell: 'percent',
     },
     {
       id: 'rate',
-      title: 'Quote Rate',
+      label: 'Quote Rate',
       renderCell: 'double5',
     },
     // {
     //   id: 'rate', // declaring duplicate ID will work, but will give warning in debug console.
-    //   title: 'Manual Rate',
+    //   label: 'Manual Rate',
     // },
     {
       id: 'annualPremium',
-      title: 'Annual Premium',
+      label: 'Annual Premium',
       renderCell: 'currency',
     },
     {
@@ -52,45 +52,84 @@ export default {
 
   // Nested Table (one level deep)
   renderItem: {
-    view: 'Table',
-    name: 'classes',
-    relativeData: true, // use attribute `name` above as key path relative to each Table item's data, not *_data.json
-    headers: [ // -> must be defined if data contains nested tables
+    view: 'Col',
+    relativeData: true,
+    items: [
       {
-        id: 'classID',
-        label: 'Class Name',
-        // Custom render function for Table Cells (columns in default layout)
-        renderCell: {
-          view: 'Expand',
-          name: '{value}',
-          id: 'classID',
-          // toggle extra table item expansion (row in default layout)
-          onClick: 'handleItemExpand', // function is injected by TableView instance on render
-          // items: [{}], // can also make it expand any content inside clicked cell
-        },
+        view: 'Col',
+        styles: 'margin-bottom-small radius',
+        items: [
+          {
+            view: 'Title',
+            label: 'Cost Summary',
+            styles: 'padding no-margin',
+          },
+          {
+            view: 'Col',
+            styles: 'border radius',
+            items: [
+              {
+                view: 'Row',
+                styles: 'justify padding',
+                items: [
+                  {view: 'Text', label: 'Annual Rate'},
+                  {view: 'Text', label: {name: 'rate'}, renderLabel: 'percent'},
+                ]
+              },
+              {
+                view: 'Row',
+                styles: 'justify padding border-top',
+                items: [
+                  {view: 'Text', label: 'Annual Premium'},
+                  {view: 'Text', label: {name: 'annualPremium'}, renderLabel: 'currency'},
+                ]
+              },
+            ],
+          },
+        ]
       },
       {
-        id: 'numberOfLives',
-        label: 'Number of Participants',
-      },
-      {
-        id: 'totalVolume',
-        label: 'Total Volume',
-        renderCell: 'float',
-      },
-      {
-        id: 'annualPremium',
-        label: 'Annual Premium',
-      },
-    ],
+        view: 'Table',
+        name: 'classes',
+        relativeData: true, // use attribute `name` above as key path relative to each Table item's data, not *_data.json
+        headers: [ // -> must be defined if data contains nested tables
+          {
+            id: 'classID',
+            label: 'Class Name',
+            // Custom render function for Table Cells (columns in default layout)
+            renderCell: {
+              view: 'Expand',
+              name: '{value}',
+              id: 'classID',
+              // toggle extra table item expansion (row in default layout)
+              onClick: 'handleItemExpand', // function is injected by TableView instance on render
+              // items: [{}], // can also make it expand any content inside clicked cell
+            },
+          },
+          {
+            id: 'numberOfLives',
+            label: 'Number of Participants',
+          },
+          {
+            id: 'totalVolume',
+            label: 'Total Volume',
+            renderCell: 'float',
+          },
+          {
+            id: 'annualPremium',
+            label: 'Annual Premium',
+          },
+        ],
 
-    // Nested Table (two levels deep)
-    renderItem: {
-      view: 'Table',
-      name: 'rateCards',
-      relativeData: true, // use attribute `name` above as key path relative to each Table item's data, not *_data.json
-      // headers: [] // -> optional when has no nested tables
-    },
+        // Nested Table (two levels deep)
+        renderItem: {
+          view: 'Table',
+          name: 'rateCards',
+          relativeData: true, // use attribute `name` above as key path relative to each Table item's data, not *_data.json
+          // headers: [] // -> optional when has no nested tables
+        },
+      }
+    ],
   },
 }
 

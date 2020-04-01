@@ -53,10 +53,20 @@ h1, h2, h3, h4, h5, h6,
   margin: @margin-base 0;
   padding: 0;
   //line-height: 1; // for simplicity of styling and crisp display with whole pixels
+
+  .flex--col > & {
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 h1, .h1 {
-  font-size: (@size-h1 / @size-base * 100%);  // define in percentage to work nicely on mobile
+  font-size: (@size-h1 / @size-base * 100%); // define in percentage to work nicely on mobile
 
   small {
     color: inherit;
@@ -90,7 +100,7 @@ h2, .h2 {
 }
 
 h3, .h3 {
-  font-size: (@size-h3 / @size-base * 100%);  // define in percentage to work nicely on mobile
+  font-size: (@size-h3 / @size-base * 100%); // define in percentage to work nicely on mobile
 
   small {
     color: inherit;
@@ -105,16 +115,16 @@ h3, .h3 {
 }
 
 h4, .h4 {
-  font-size: (@size-h4 / @size-base * 100%);  // define in percentage to work nicely on mobile
+  font-size: (@size-h4 / @size-base * 100%); // define in percentage to work nicely on mobile
 }
 
 h5, .h5 {
-  font-size: (@size-h5 / @size-base * 100%);  // define in percentage to work nicely on mobile
+  font-size: (@size-h5 / @size-base * 100%); // define in percentage to work nicely on mobile
 }
 
 h6, .h6 {
-  font-size: (@size-h6 / @size-base * 100%);  // define in percentage to work nicely on mobile
-  margin: calc(2rem - 0.14285714em ) 0 1rem;
+  font-size: (@size-h6 / @size-base * 100%); // define in percentage to work nicely on mobile
+  margin: calc(2rem - 0.14285714em) 0 1rem;
 }
 
 p, .p {
@@ -153,21 +163,27 @@ img {
   &.smallest {
     font-size: @size-icon-smallest;
   }
+
   &.smaller {
     font-size: @size-icon-smaller;
   }
+
   &.small {
     font-size: @size-icon-small;
   }
+
   &.base {
     font-size: @size-icon;
   }
+
   &.large {
     font-size: @size-icon-large;
   }
+
   &.larger {
     font-size: @size-icon-larger;
   }
+
   &.largest {
     font-size: @size-icon-largest;
   }
@@ -177,6 +193,7 @@ ul, ol {
   li {
     max-width: size(600);
   }
+
   li + li {
     margin-top: @margin-base;
   }
