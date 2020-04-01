@@ -39,6 +39,12 @@ table {
 }
 
 // Minimise nested styling to allow easy config override
+tr {
+  @{select-interaction} {
+    &:extend(.bg-primary-lighter all);
+  }
+}
+
 th {
   background-color: @table-header-bg-color;
 }

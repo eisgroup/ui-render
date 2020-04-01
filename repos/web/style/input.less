@@ -165,9 +165,14 @@ input, select, textarea {
       border-color: @input-color-inverse;
     }
 
-    &:checked:before {
-      &:extend(.position-center all);
-      .icon(@checkmark);
+    &:checked {
+      border: none;
+
+      &:before {
+        &:extend(.position-center all);
+        .icon(@checkbox-filled);
+        color: @color-primary;
+      }
     }
 
     + label {
