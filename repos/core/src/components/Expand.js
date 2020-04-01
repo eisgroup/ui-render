@@ -20,7 +20,7 @@ export default class Expand extends Component {
       PropTypes.func,  // function to render content when expanded, receives `id` if given
       PropTypes.any,  // pre-rendered content (not recommended for performance reasons)
     ]),
-    renderTitle: PropTypes.func, // function to render title
+    renderLabel: PropTypes.func, // function to render title
     expanded: PropTypes.bool, // whether should render as expanded
     active: PropTypes.bool, // whether to add `active` css class
     justify: PropTypes.bool, // whether should render expand icon spread out from `title`
@@ -82,12 +82,12 @@ export default class Expand extends Component {
     onClick && onClick({expanded, key: id, value: String(title)})
   }
 
-  renderTitle = () => {
-    const {title, renderTitle, justify = false, children, iconOpened, iconClosed} = this.props
-    if (title == null && !renderTitle) return null
+  renderLabel = () => {
+    const {title, renderLabel, justify = false, children, iconOpened, iconClosed} = this.props
+    if (title == null && !renderLabel) return null
     const {expanded} = this.state
     const hasContent = children != null
-    const Title = renderTitle ? renderTitle(title) : title
+    const Title = renderLabel ? renderLabel(title) : title
     return (
       <Text
         className={classNames('row fill-width middle padding-small', {justify})}
@@ -114,7 +114,7 @@ export default class Expand extends Component {
       justify: __,
       iconClosed: ___,
       iconOpened: ____,
-      renderTitle: _____,
+      renderLabel: _____,
       ...props
     } = this.props
     const {expanded, changing} = this.state
@@ -122,7 +122,7 @@ export default class Expand extends Component {
     const content = hasContent && (expanded || changing) && this.content
     return (
       <View className={classNames('app__expand', className, {expanded, active})} {...props}>
-        {this.renderTitle()}
+        {this.renderLabel()}
         {hasContent &&
         <AnimateHeight expanded={expanded} duration={duration} className='expand__content'>{content}</AnimateHeight>
         }

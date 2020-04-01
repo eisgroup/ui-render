@@ -11,8 +11,20 @@ export default {
           className: 'padding',
           items: [
             {
-              view: 'Title',
-              label: 'Fully Insured'
+              view: 'Row',
+              styles: 'middle margin-bottom',
+              items: [
+                {
+                  view: 'Title',
+                  label: 'Fully Insured - ',
+                  styles: 'margin-right-small'
+                },
+                {
+                  view: 'Title',
+                  label: {name: 'asoAdminCost.admExpencesAmt'},
+                  renderLabel: 'currency',
+                },
+              ]
             },
             {
               view: 'Input',
@@ -42,7 +54,11 @@ export default {
                       'Adjusted Fixed': {
                         view: 'Row',
                         items: [
-                          {view: 'Text', fill: true, label: 'Adjusted Fixed'},
+                          {
+                            view: 'Text',
+                            fill: true,
+                            label: 'Adjusted Fixed'
+                          },
                           {
                             view: 'Col',
                             fill: true,
@@ -125,12 +141,15 @@ export default {
     },
     {
       view: 'Expand',
-      renderTitle: {
+      renderLabel: {
         view: 'Row',
         className: 'middle',
         items: [
           {
-            view: 'Text', label: 'Rate Details - ', className: 'margin-right-small'
+            view: 'Text', label: 'Rate Details for Policy ID - ', className: 'margin-right-small'
+          },
+          {
+            view: 'Text', label: {name: 'policyID'},
           },
         ]
       },
@@ -199,7 +218,10 @@ export default {
                 view: 'Col',
                 className: 'padding',
                 items: [
-                  {view: 'Title', children: 'Summary'},
+                  {
+                    view: 'Title',
+                    children: 'Summary'
+                  },
                   {
                     view: 'Row',
                     className: 'wrap',
@@ -247,7 +269,11 @@ export default {
                       },
                     ],
                   },
-                  {view: 'Title', children: 'Enrolled by State', className: 'margin-top-largest'},
+                  {
+                    view: 'Title',
+                    label: 'Enrolled by State',
+                    className: 'margin-top-largest'
+                  },
                   {
                     view: 'Table',
                     name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.enrollmentByState',

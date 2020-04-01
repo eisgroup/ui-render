@@ -141,10 +141,15 @@ class RenderClass extends Component {
 
       case FIELD.TYPE.TEXT:
       case FIELD.TYPE.TITLE:
-        if (items.length) props.children = items.map(Render)
         if (props.label != null && props.children == null) {
           props.children = props.label
           delete props.label
+        }
+        if (items.length) {
+          props.children = items.map(Render)
+        } else if (props.renderLabel) {
+          props.children = props.renderLabel(props.children)
+          delete props.renderLabel
         }
         if (view === FIELD.TYPE.TITLE) props.className = classNames('h3', props.className)
         return <Text {...props}/>

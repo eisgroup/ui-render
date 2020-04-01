@@ -10,8 +10,22 @@
           "className": "padding",
           "items": [
             {
-              "view": "Title",
-              "label": "Fully Insured"
+              "view": "Row",
+              "styles": "middle margin-bottom",
+              "items": [
+                {
+                  "view": "Title",
+                  "label": "Fully Insured - ",
+                  "styles": "margin-right-small"
+                },
+                {
+                  "view": "Title",
+                  "label": {
+                    "name": "asoAdminCost.admExpencesAmt"
+                  },
+                  "renderLabel": "currency"
+                }
+              ]
             },
             {
               "view": "Input",
@@ -144,14 +158,20 @@
     },
     {
       "view": "Expand",
-      "renderTitle": {
+      "renderLabel": {
         "view": "Row",
         "className": "middle",
         "items": [
           {
             "view": "Text",
-            "label": "Rate Details - ",
+            "label": "Rate Details for Policy ID - ",
             "className": "margin-right-small"
+          },
+          {
+            "view": "Text",
+            "label": {
+              "name": "policyID"
+            }
           }
         ]
       },
@@ -280,7 +300,7 @@
                   },
                   {
                     "view": "Title",
-                    "children": "Enrolled by State",
+                    "label": "Enrolled by State",
                     "className": "margin-top-largest"
                   },
                   {

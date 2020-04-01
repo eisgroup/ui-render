@@ -10,7 +10,7 @@ export const FIELD = getSetDefinition('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', '
 // Field Type Definitions
 FIELD.TYPE = {
   BUTTON: 'Button',
-  EXPAND: 'Expand', // Expandable/collapsing content with clickable `title` or `renderTitle` area
+  EXPAND: 'Expand', // Expandable/collapsing content with clickable `title` or `renderLabel` area
   COL: 'Col', // Vertical column layout
   COL2: 'Column', // alias for Column
   COL3: 'VerticalLayout', // alias for Column
