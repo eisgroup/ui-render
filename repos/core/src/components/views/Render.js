@@ -243,6 +243,7 @@ export function metaToProps (meta, data, instance) {
         if (definition.view) {
           const {name, filterItems, ...configs} = definition
           return Render({
+            ...props,
             // Recursively map definitions within Render function
             ...metaToProps(configs, data, instance),
             // Transform key path with actual data
@@ -253,7 +254,6 @@ export function metaToProps (meta, data, instance) {
             ...removeNilValues(FUNCTION_NAMES.map(func => isString(definition[func]) && self &&
               !getFunctionFromString(definition[func], null) && {[func]: self[definition[func]]}
             )).reduce((obj, item) => ({...obj, ...item}), {}),
-            ...props,
             data,
           })
         }
@@ -261,7 +261,7 @@ export function metaToProps (meta, data, instance) {
         // Render has conditional match by values
         const valueProps = get(definition, `values[${value}]`, definition.default)
         return (isObject(valueProps))
-          ? Render({...valueProps, ...props, data})
+          ? Render({...props, ...valueProps, data})
           : RenderFunc(valueProps).apply(this, [value, index, {...props, data}])
       }
     }

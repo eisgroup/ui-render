@@ -42,6 +42,11 @@ table {
 tr {
   @{select-interaction} {
     &:extend(.bg-primary-lighter all);
+
+    > td,
+    > td > * {
+      &:extend(.bg-primary-lighter all);
+    }
   }
 }
 

@@ -58,12 +58,12 @@ export default {
                           {
                             view: 'Text',
                             fill: true,
-                            label: 'Adjusted Fixed'
+                            label: 'Adjusted Fixed',
                           },
                           {
                             view: 'Col',
                             fill: true,
-                            className: 'bg-grey padding',
+                            className: 'bg-white padding',
                             items: [
                               {view: 'Input', name: 'required1', label: 'UW Exception Dollar Amount', type: 'number'},
                             ]
@@ -77,19 +77,24 @@ export default {
                           {
                             view: 'Col',
                             fill: true,
-                            className: 'bg-grey padding',
+                            className: 'bg-white padding',
                             items: [
                               {view: 'Input', name: 'required2', label: 'Risk Adjustment Percent', type: 'number'},
                             ]
                           },
                         ]
                       },
+                      'Administration Total': {
+                        view: 'Text',
+                        styles: 'row p bg-success-light',
+                        label: 'Administration Total',
+                      }
                     },
                     // default: 'Currency',
                   },
                   label: 'Description',
-                  classNameHeader: 'bg-grey',
-                  classNameCell: 'bg-grey-light uppercase',
+                  classNameHeader: 'bg-primary-light2',
+                  classNameCell: 'bg-info-light uppercase',
                 },
                 {
                   id: 'annualAmt',
@@ -124,8 +129,8 @@ export default {
                 {
                   id: 'adminCategory',
                   values: {
-                    'Administration Total': 'bg-green-light',
-                    'Grand Total': 'bg-green-light',
+                    'Administration Total': 'bg-success-light',
+                    'Grand Total': 'bg-success-light',
                   }
                 },
                 {

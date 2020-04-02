@@ -16,14 +16,14 @@ import { accessibilitySupport } from './utils'
  * @returns {Object} - React Component
  */
 export default function Text
-({
-   className,
-   fill,
-   reverse,
-   rtl,
-   sound,
-   ...props
- }) {
+  ({
+    className,
+    fill,
+    reverse,
+    rtl,
+    sound,
+    ...props
+  }) {
   props = accessibilitySupport(props, sound)
   return (
     <span className={classNames('text', {fill, reverse, rtl, pointer: props.onClick}, className)} {...props} />
