@@ -30,6 +30,7 @@ export default class Expand extends Component {
     id: PropTypes.string, // argument to pass to 'onClick' callback as `key`
     duration: PropTypes.number, // milliseconds for the animation
     className: PropTypes.string,
+    classNameItems: PropTypes.string,
   }
 
   static defaultProps = {
@@ -109,6 +110,7 @@ export default class Expand extends Component {
       active,
       duration,
       className,
+      classNameItems,
       children,
       expanded: _,
       justify: __,
@@ -124,7 +126,10 @@ export default class Expand extends Component {
       <View className={classNames('app__expand', className, {expanded, active})} {...props}>
         {this.renderLabel()}
         {hasContent &&
-        <AnimateHeight expanded={expanded} duration={duration} className='expand__content'>{content}</AnimateHeight>
+        <AnimateHeight expanded={expanded} duration={duration}
+                       className={classNames('expand__content', classNameItems)}>
+          {content}
+        </AnimateHeight>
         }
       </View>
     )

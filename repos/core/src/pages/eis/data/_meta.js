@@ -1,5 +1,6 @@
 export default {
   view: 'VerticalLayout',
+  styles: 'border-bottom',
   items: [
     {
       view: 'Expand',
@@ -16,7 +17,7 @@ export default {
               items: [
                 {
                   view: 'Title',
-                  label: 'Fully Insured - ',
+                  label: 'Fully Insured',
                   styles: 'margin-right-small'
                 },
                 {
@@ -143,74 +144,79 @@ export default {
       view: 'Expand',
       renderLabel: {
         view: 'Row',
-        className: 'middle',
+        className: 'wrap middle fill-width',
         items: [
           {
-            view: 'Text', label: 'Rate Details for Policy ID - ', className: 'margin-right-small'
+            view: 'Text', label: 'Rate Details', className: 'margin-right-small'
+          },
+          { // Shorthand definition version (must have `name` defined, but `onChange` undefined)
+            view: 'Dropdown',
+            name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
+            options: 'planCalculations', // -> key path pointing to array in *_data.json
+            mapOptions: 'planName', // -> key path pointing to human readable value within each option (used as label)
+            // value: {name: '{state.active.plan,0}'}, // -> automatically added by default due to OpenL rules
+            // onChange: 'setState,active.plan', // function defined as string, added by default due to OpenL rules
+            styles: 'margin-h-smaller',
+          },
+          { // Full definition version
+            view: 'Dropdown',
+            name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
+            value: {name: '{state.active.plan,0}'},
+            onChange: { // function defined as object
+              name: 'setState',
+              args: ['active.plan'],
+            },
+            options: {name: 'planCalculations'}, // `planCalculations` is key path pointing to array in *_data.json
+            mapOptions: {
+              text: 'planName', // `planName` is key path pointing to value for each item in `options` above
+              value: '{index}', // using index of item, instead of its value as ID
+            },
+            styles: 'margin-h-smaller',
           },
           {
-            view: 'Text', label: {name: 'policyID'},
+            view: 'Dropdown',
+            name: 'url', // must be unique key path identifier that does not exist in *_data.json
+            placeholder: 'Select fetch API',
+            onChange: { // function defined as object with nested callback
+              name: 'fetch',
+              onDone: {
+                name: 'fetch',
+                mapArgs: [ // function will first receive `mapArgs`, then followed by `args`, as arguments
+                  // variable `{0.payload.ip}` can be defined to get data from arguments, in addition to *_data.json
+                  'https://ipapi.co/{0.payload.ip}/json', // this is the first argument passed to the function
+                  // ...second (subsequent) argument/s can be defined as object/array/number/etc.
+                ],
+                onDone: {
+                  name: 'warn',
+                  args: ['Dropdown.onChange -> fetch.onDone -> fetch.onDone -> warn'],
+                }
+              },
+            },
+            options: [
+              {text: 'IP Address', value: 'https://api.ipify.org/?format=json'},
+              {text: 'Geolocation Data', value: 'http://ip-api.com/json'}
+            ],
+            styles: 'margin-h-smaller',
           },
         ]
       },
       expanded: true,
+      classNameItems: 'padding-right',
       items: [
         {
           view: 'Row',
-          className: 'wrap',
+          className: 'wrap middle padding-h',
           items: [
-
-            { // Shorthand definition version (must have `name` defined, but `onChange` undefined)
-              view: 'Dropdown',
-              name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
-              options: 'planCalculations', // -> key path pointing to array in *_data.json
-              mapOptions: 'planName', // -> key path pointing to human readable value within each option (used as label)
-              // value: {name: '{state.active.plan,0}'}, // -> automatically added by default due to OpenL rules
-              // onChange: 'setState,active.plan', // function defined as string, added by default due to OpenL rules
-            },
-            { // Full definition version
-              view: 'Dropdown',
-              name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
-              value: {name: '{state.active.plan,0}'},
-              onChange: { // function defined as object
-                name: 'setState',
-                args: ['active.plan'],
-              },
-              options: {name: 'planCalculations'}, // `planCalculations` is key path pointing to array in *_data.json
-              mapOptions: {
-                text: 'planName', // `planName` is key path pointing to value for each item in `options` above
-                value: '{index}', // using index of item, instead of its value as ID
-              },
+            {
+              view: 'Title', label: 'Policy ID',
             },
             {
-              view: 'Dropdown',
-              name: 'url', // must be unique key path identifier that does not exist in *_data.json
-              placeholder: 'Select fetch API',
-              onChange: { // function defined as object with nested callback
-                name: 'fetch',
-                onDone: {
-                  name: 'fetch',
-                  mapArgs: [ // function will first receive `mapArgs`, then followed by `args`, as arguments
-                    // variable `{0.payload.ip}` can be defined to get data from arguments, in addition to *_data.json
-                    'https://ipapi.co/{0.payload.ip}/json', // this is the first argument passed to the function
-                    // ...second (subsequent) argument/s can be defined as object/array/number/etc.
-                  ],
-                  onDone: {
-                    name: 'warn',
-                    args: ['Dropdown.onChange -> fetch.onDone -> fetch.onDone -> warn'],
-                  }
-                },
-              },
-              options: [
-                {text: 'IP Address', value: 'https://api.ipify.org/?format=json'},
-                {text: 'Geolocation Data', value: 'http://ip-api.com/json'}
-              ],
+              view: 'Text', children: {name: 'policyID'}, styles: 'padding',
             },
           ],
         },
         {
           view: 'Tabs',
-          styles: 'padding-right',
           // defaultIndex: 1,
           items: [
             {
@@ -558,7 +564,7 @@ export default {
                           view: 'Input',
                           name: 'planCalculations.0.tierRates.{index}.manualRate',
                           type: 'number',
-                          icon: 'USD',
+                          icon: 'dollar',
                           unit: '/ person',
                           lefty: true,
                         },
@@ -585,7 +591,7 @@ export default {
                           view: 'Input',
                           name: 'planCalculations.{state.active.plan,0}.formulaCompositeRate',
                           type: 'number',
-                          unit: 'USD',
+                          unit: 'dollar',
                           placeholder: 'placeholder'
                         },
                         proposedRate: {name: 'planCalculations.{state.active.plan,0}.proposedCompositeRate'},
