@@ -26,6 +26,7 @@ import Label from '../Label'
 import Placeholder from '../Placeholder'
 import { renderCurrency, renderFloat } from '../renders'
 import Row from '../Row'
+import Space from '../Space'
 import TableView from '../TableView'
 import Tabs from '../Tabs'
 import Text from '../Text'
@@ -100,6 +101,9 @@ class RenderClass extends Component {
       case FIELD.TYPE.ROW:
       case FIELD.TYPE.ROW2:
         return <Row {...props}>{items.map(Render)}</Row>
+
+      case FIELD.TYPE.SPACE:
+        return <Space {...props}/>
 
       case FIELD.TYPE.TABLE:
         const {extraItems, filterItems, parentItem, ...more} = props

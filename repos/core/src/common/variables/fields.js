@@ -19,6 +19,7 @@ FIELD.TYPE = {
   PIE_CHART: 'PieChart', // Pie chat (can be in shape of donut) with optional legends
   ROW: 'Row', // Horizontal row layout
   ROW2: 'HorizontalLayout', // alias for Row
+  SPACE: 'Space', // for adding space between items
   TABLE: 'Table',
   TABS: 'Tabs',
   TEXT: 'Text',

@@ -21,6 +21,15 @@
 @input-label-size: size(round(@input-label-size-ratio * px(@input-font-size))); // offset space for Label to sit at the top
 @input-label-size-offset: @input-label-size + @input-padding-v-value + (@input-label-size-default-ratio - @input-label-size-ratio) * @input-label-line-height * @input-font-size;
 
+.input-done {
+  border-color: fade(@input-color, 35%);
+  //border-style: dashed;
+
+  .inverted & {
+    border-color: fade(@input-color-inverse, 35%);
+  }
+}
+
 .input-disabled {
   cursor: default;
   pointer-events: none;
@@ -420,12 +429,7 @@ input, select, textarea {
     input:not(:focus):not(:hover),
     select:not(:focus):not(:hover),
     textarea:not(:focus):not(:hover) {
-      border-color: fade(@input-color, 35%);
-      border-style: dashed;
-
-      .inverted & {
-        border-color: fade(@input-color-inverse, 35%);
-      }
+      &:extend(.input-done all);
     }
   }
 

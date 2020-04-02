@@ -1,5 +1,8 @@
 @import "_mixins";
 
+@tabs-active-border-size: size(4);
+@tabs-active-border-color: @color-primary-light;
+
 .tabs {
   &:extend(.max-width all); // for ScrollView to work
   &:extend(.max-height all); // for ScrollView to work
@@ -10,9 +13,9 @@
 }
 
 .tabs__item {
-  @activeBorderColor: @color-secondary;
   &:extend(.padding-h);
-  &:extend(.padding-top-small);
+  &:extend(.padding-v-small);
+  &:extend(.border-bottom all);
   line-height: @line-height-base;
 
   &.active {
@@ -20,11 +23,12 @@
 
     &:after {
       .tabs:not(.buttoned) & {
-        &:extend(.margin-top-smaller);
+        &:extend(.position-bottom); // underline covering padding
+        //&:extend(.margin-top-smaller); // underline not covering padding
         .object();
         width: 100%;
-        height: @border-size;
-        background: @activeBorderColor;
+        height: @tabs-active-border-size;
+        background: @tabs-active-border-color;
       }
     }
 
@@ -32,7 +36,7 @@
       &:extend(.border);
       &:extend(.margin-h-small);
       &:extend(.padding-v-small);
-      border-color: @activeBorderColor;
+      border-color: @tabs-active-border-color;
       border-style: dashed;
     }
   }

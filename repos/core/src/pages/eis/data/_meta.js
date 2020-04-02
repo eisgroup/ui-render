@@ -210,13 +210,14 @@ export default {
         },
         {
           view: 'Tabs',
+          styles: 'padding-right',
           // defaultIndex: 1,
           items: [
             {
               tab: 'Demographic',
               content: {
                 view: 'Col',
-                className: 'padding',
+                className: 'padding-v',
                 items: [
                   {
                     view: 'Title',
@@ -228,7 +229,7 @@ export default {
                     items: [
                       {
                         view: 'Row',
-                        className: 'fill bg-white border radius margin-right center',
+                        className: 'fill bg-white border radius center',
                         items: [
                           {
                             view: 'Label',
@@ -247,9 +248,10 @@ export default {
                           }
                         ]
                       },
+                      {view: 'Space', styles: 'visible-from-tablet'},
                       {
                         view: 'Row',
-                        className: 'fill bg-white border radius margin-right center',
+                        className: 'fill bg-white border radius center',
                         items: [
                           {
                             view: 'Label',
@@ -327,7 +329,7 @@ export default {
               tab: 'Factors',
               content: {
                 view: 'Col',
-                className: 'padding',
+                className: 'padding-v',
                 items: [
                   {view: 'Title', children: 'PPO'},
                   {
@@ -531,7 +533,7 @@ export default {
               tab: 'Redistribution Calculator',
               content: {
                 view: 'Col',
-                className: 'padding',
+                className: 'padding-v',
                 items: [
                   {view: 'Title', children: 'Calculate Rate'},
                   {
