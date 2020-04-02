@@ -591,7 +591,7 @@ export default {
                           view: 'Input',
                           name: 'planCalculations.{state.active.plan,0}.formulaCompositeRate',
                           type: 'number',
-                          unit: 'dollar',
+                          unit: 'USD',
                           placeholder: 'placeholder'
                         },
                         proposedRate: {name: 'planCalculations.{state.active.plan,0}.proposedCompositeRate'},

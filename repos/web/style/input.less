@@ -579,6 +579,10 @@ div.select {
     }
   }
 
+  &.unit {
+    z-index: 0; // to show unit with z-index -1
+  }
+
   .inverted & {
     .colors(@colors: @input-colors; @property: border-color; @suffix: '-light'; @postSelector:  ~'*');
     .colors(@colors: @input-colors; @property: color; @suffix: '-light'; @postSelector:  ~'*');

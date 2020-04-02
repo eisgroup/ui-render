@@ -83,7 +83,7 @@ export default function Input
       style={style}
     >
       {!float && !isCheckbox && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
-      <Row className={classNames('input', {active, icon, lefty, error, info})}>
+      <Row className={classNames('input', {active, icon, lefty, error, info, unit})}>
         {icon && lefty && <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>}
         {unit && hasValue &&
         <Text className='input__unit truncate'>
