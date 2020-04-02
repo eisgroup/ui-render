@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { ALERT, stateAction } from '../../common/actions'
+import { ALERT, GET, SET, stateAction } from '../../common/actions'
 import fetch from '../../common/fetch'
 import { connect } from '../../common/redux'
-import { cloneDeep, isEmpty, logRender, set } from '../../common/utils'
+import { cloneDeep, isEmpty, logRender, performStorage, set } from '../../common/utils'
 import { _, FIELD, FILE_TYPE } from '../../common/variables'
 import Json from '../../components/Json'
 import Row from '../../components/Row'
@@ -18,6 +18,8 @@ import { withForm } from '../../modules/form/utils'
 import LanguageSelection from '../../modules/settings/views/LanguageSelection'
 import Upload from '../../modules/upload/views/Upload'
 import { transformConfig } from './rules'
+
+const DEMO_JSON_STORAGE_KEY = 'DEMO_JSON'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
@@ -45,7 +47,7 @@ export default class Demo extends Component {
   // it provides more flexibility and separation of concerns between different configs.
   state = {
     showMeta: true,
-    data: {
+    data: (performStorage(GET, DEMO_JSON_STORAGE_KEY) || {}).data || {
       json: undefined,
       name: undefined,
     },
@@ -77,7 +79,9 @@ export default class Demo extends Component {
       try {
         let json = JSON.parse(reader.result)
         if (kind === 'meta') json = transformConfig(json)
-        this.setState({[kind]: {json, name: file.name}})
+        this.setState({[kind]: {json, name: file.name}}, () => {
+          if (kind === 'data') performStorage(SET, DEMO_JSON_STORAGE_KEY, {[kind]: this.state.data})
+        })
       } catch (error) {
         this.props.actions.popup({
           title: `${file.name} is invalid .${type} file`,
