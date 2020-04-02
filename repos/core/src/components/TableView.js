@@ -219,12 +219,12 @@ export default class TableView extends Component {
     const {render: r, data} = cell || {}
     const render = isFunction(cell) ? cell : (r || renderCell)
     const value = data != null ? data : cell
-    const content = render ? render(value, index, {}, this) : cell
+    const content = render ? render(value, index, {className, style}, this) : cell
     return (
-      <Table.Cell key={id} className={className} style={style}>
+      <Table.Cell key={id}>
         {typeof content === 'object'
           ? content
-          : <View><Text className='p'>{content}</Text></View>
+          : <View className={className} style={style}><Text className='p'>{content}</Text></View>
         }
       </Table.Cell>
     )
