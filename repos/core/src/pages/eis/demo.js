@@ -114,14 +114,14 @@ export default class Demo extends Component {
           <Row className='wrap spread'>
             <View className='margin-smaller'>
               <Upload {...uploadProps} label='*_data.json' onUpload={this.handleUpload.bind(this, 'data')}
-                      className={'radius-large' + (!hasData ? ' blink' : '')}
+                      className={'radius-large' + (!hasData ? ' bg-primary-dark' : '')}
               >
                 {data.name && <View><Text className='h4'>{_.UPLOADED}</Text><Text>{data.name}</Text></View>}
               </Upload>
             </View>
             <View className='margin-smaller'>
               <Upload {...uploadProps} label='*_meta.json' onUpload={this.handleUpload.bind(this, 'meta')}
-                      className={'radius-large' + (hasData && !hasMeta ? ' blink' : '')}
+                      className={'radius-large' + (hasData && !hasMeta ? ' bg-primary-dark' : '')}
                       disabled={!hasData}
               >
                 {meta.name && <View><Text className='h4'>{_.UPLOADED}</Text><Text>{meta.name}</Text></View>}
