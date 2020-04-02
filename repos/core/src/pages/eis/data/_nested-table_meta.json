@@ -4,13 +4,7 @@
   "headers": [
     {
       "id": "coverageID",
-      "label": "Coverage Name",
-      "renderCell": {
-        "view": "Expand",
-        "name": "{value}",
-        "id": "coverageID",
-        "onClick": "handleItemExpand"
-      }
+      "label": "Coverage Name"
     },
     {
       "id": "fundingStructure.contributionType",
