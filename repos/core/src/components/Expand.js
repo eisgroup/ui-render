@@ -30,6 +30,7 @@ export default class Expand extends Component {
     id: PropTypes.string, // argument to pass to 'onClick' callback as `key`
     duration: PropTypes.number, // milliseconds for the animation
     className: PropTypes.string,
+    classNameLabel: PropTypes.string,
     classNameItems: PropTypes.string,
   }
 
@@ -84,14 +85,14 @@ export default class Expand extends Component {
   }
 
   renderLabel = () => {
-    const {title, renderLabel, justify = false, children, iconOpened, iconClosed} = this.props
+    const {title, renderLabel, justify = false, children, iconOpened, iconClosed, classNameLabel} = this.props
     if (title == null && !renderLabel) return null
     const {expanded} = this.state
     const hasContent = children != null
     const Title = renderLabel ? renderLabel(title) : title
     return (
       <Text
-        className={classNames('row fill-width middle padding-small', {justify})}
+        className={classNames('row fill-width middle padding-small', {justify}, classNameLabel)}
         onClick={hasContent && this.handleToggleExpand}
       >
         {justify && Title}
@@ -110,6 +111,7 @@ export default class Expand extends Component {
       active,
       duration,
       className,
+      classNameLabel,
       classNameItems,
       children,
       expanded: _,

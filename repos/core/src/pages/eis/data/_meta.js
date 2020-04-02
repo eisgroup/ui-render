@@ -5,7 +5,7 @@ export default {
     {
       view: 'Expand',
       label: 'Admin Expenses',
-      // expanded: true,
+      classNameLabel: 'bg-white',
       items: [
         {
           view: 'Col',
@@ -142,6 +142,7 @@ export default {
     },
     {
       view: 'Expand',
+      classNameLabel: 'bg-white',
       renderLabel: {
         view: 'Row',
         className: 'wrap middle fill-width',
@@ -201,7 +202,7 @@ export default {
         ]
       },
       expanded: true,
-      classNameItems: 'padding-right',
+      classNameItems: 'padding-h',
       items: [
         {
           view: 'Row',

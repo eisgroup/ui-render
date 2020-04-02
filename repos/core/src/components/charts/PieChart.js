@@ -64,7 +64,7 @@ export default class PieChart extends Component {
 
   renderReference = () => {
     return (
-      <View className='app__pie-chart__ref__items'>
+      <View className='app__pie-chart__ref__items padding-v-small'>
         {this.data.map(({name, color, value}) => (
           <Row key={name} className='app__pie-chart__ref__item justify'>
             <Text className='truncate padding-right'>{name}</Text>

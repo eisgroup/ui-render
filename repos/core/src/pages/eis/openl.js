@@ -39,7 +39,7 @@ const mapDispatchToProps = (dispatch) => ({
 @logRender
 export default class OpenL extends Component {
   state = {
-    showMeta: true,
+    showMeta: false,
     data,
     active: {
       // plan: 1,
