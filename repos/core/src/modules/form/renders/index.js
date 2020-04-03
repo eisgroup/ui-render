@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { ACTIVE, FIELD } from '../../../common/variables'
 import Label from '../../../components/Label'
+import PlaceholderField from '../../../components/PlaceholderField'
 import Row from '../../../components/Row'
 import { withGroupInputChange } from '../../../components/utils'
 import { DateField, DatesField, DropdownField, InputField, ToggleField } from '../inputs'
@@ -91,7 +92,7 @@ export function renderField (fieldDefinition, i) {
       Field = UploadGridField
       break
     default:
-      Field = InputField
+      Field = PlaceholderField.bind(this, {name: view})
   }
   return <Field key={i} {...props} />
 }

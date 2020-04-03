@@ -13,6 +13,10 @@ let _ = {
     [l.ENGLISH]: 'Config Used',
     [l.RUSSIAN]: 'Используемый Конфиг',
   },
+  FIELD_DOES_NOT_EXIST: {
+    [l.ENGLISH]: 'Field does not exist!',
+    [l.RUSSIAN]: 'Поля не существует!',
+  },
 
   // Forms and Validations
   // ---------------------------------------------------------------------------

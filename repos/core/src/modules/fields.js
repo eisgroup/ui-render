@@ -48,7 +48,7 @@ export function fieldsFrom (fields, {initialValues: initValues = {}} = {}) {
   // Collect definitions
   return fields.map(({id, ...field}) => ({...FIELD.DEF[id], ...field}))
     // Process prefixes
-    .map(({name = '', namePrefix = '', options, items, float = true, required, disabled, readonly, ...field}) => {
+    .map(({name = '', namePrefix = '', options, items, float, required, disabled, readonly, ...field}) => {
       name = namePrefix + name
       const initialValues = get(initValues, name)
       return {
