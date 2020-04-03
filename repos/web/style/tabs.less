@@ -2,6 +2,7 @@
 
 @tabs-active-border-size: size(4);
 @tabs-active-border-color: @color-primary-light;
+@tabs-active-color: @color-primary-light;
 
 .tabs {
   &:extend(.max-width all); // for ScrollView to work
@@ -23,7 +24,9 @@
   }
 
   &.active {
+    &:extend(.text.bold);
     border-color: transparent;
+    color: @tabs-active-color;
 
     &:after {
       .tabs:not(.buttoned) & {

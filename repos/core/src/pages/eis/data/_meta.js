@@ -21,7 +21,7 @@ export default {
                   styles: 'margin-right-small'
                 },
                 {
-                  view: 'Title',
+                  view: 'Text',
                   label: {name: 'asoAdminCost.admExpencesAmt'},
                   renderLabel: 'currency',
                 },
@@ -86,7 +86,7 @@ export default {
                       },
                       'Administration Total': {
                         view: 'Text',
-                        styles: 'row p bg-success-light',
+                        styles: 'row p bg-success-light uppercase',
                         label: 'Administration Total',
                       }
                     },
@@ -304,6 +304,7 @@ export default {
                     headers: [
                       {
                         id: 'state',
+                        label: 'State',
                         // Custom render function for Table Cells (columns in default layout)
                         renderCell: {
                           view: 'Expand',
@@ -411,16 +412,19 @@ export default {
                                 name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].area',
                                 label: 'Area',
                               },
+                              {view: 'Space'},
                               {
                                 view: 'Input',
                                 name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].trend',
                                 label: 'trend',
                               },
+                              {view: 'Space'},
                               {
                                 view: 'Input',
                                 name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].maximumEEandSP',
                                 label: 'maximum (EE and SP)',
                               },
+                              {view: 'Space'},
                               {
                                 view: 'Input',
                                 name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].maximumCH',
@@ -443,6 +447,7 @@ export default {
                                     type: 'number',
                                     format: 'double5',
                                   },
+                                  {view: 'Space'},
                                   {
                                     view: 'Input',
                                     name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].rateCalcWOEmp',
@@ -470,47 +475,56 @@ export default {
                             name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.initialLoad',
                             label: 'Initial Load',
                           },
+                          {view: 'Space'},
                           {
                             view: 'Input',
                             name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.occupationFactor',
                             label: 'Occupation',
                           },
+                          {view: 'Space'},
                           {
                             view: 'Input',
                             name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.occupation',
                             label: 'Occupation Code',
                             readonly: true,
                           },
+                          {view: 'Space'},
                           {
                             view: 'Input',
                             name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.waitGroupSize',
                             label: 'Wait Grp Size',
                           },
+                          {view: 'Space'},
                           {
                             view: 'Input',
                             name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.planUtilization',
                             label: 'Plan Util',
                           },
+                          {view: 'Space'},
                           {
                             view: 'Input',
                             name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.groupSize',
                             label: 'Group Size',
                           },
+                          {view: 'Space'},
                           {
                             view: 'Input',
                             name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.yearLoad',
                             label: 'Cal Year Load',
                           },
+                          {view: 'Space'},
                           {
                             view: 'Input',
                             name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.voluntaryLoad',
                             label: 'Vol Load',
                           },
+                          {view: 'Space'},
                           {
                             view: 'Input',
                             name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.waitingLoad',
                             label: 'Wait Load',
                           },
+                          {view: 'Space'},
                           {
                             view: 'Input',
                             name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.rolloverLoad',
@@ -554,18 +568,21 @@ export default {
                     headers: [
                       {
                         id: 'tier',
-                        className: 'uppercase',
+                        label: 'Tier',
                       },
                       {
                         id: 'adjManualRate',
+                        label: 'Adj. Manual Rate',
                         renderCell: 'currency',
                       },
                       {
                         id: 'adjFormulaRate',
+                        label: 'Adj. Formula Rate',
                         renderCell: 'currency',
                       },
                       {
                         id: 'manualRate',
+                        label: 'Manual Rate',
                         renderCell: {
                           view: 'Input',
                           name: 'planCalculations.0.tierRates.{index}.manualRate',
@@ -577,10 +594,12 @@ export default {
                       },
                       {
                         id: 'formulaRate',
+                        label: 'Formula Rate',
                         renderCell: 'currency',
                       },
                       {
                         id: 'proposedRate',
+                        label: 'Proposed Rate',
                         renderCell: 'currency',
                       },
                     ],
