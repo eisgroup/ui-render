@@ -40,6 +40,9 @@ const mapDispatchToProps = (dispatch) => ({
       query,
       headers: {'Content-Type': 'application/json'}
     })),
+    post: () => dispatch(apiAction('http://mnsopenl.exigengroup.com:9998/ui-config/GeneratePageStructure',
+      CREATE, {body: {}}, {headers: {'Content-Type': 'application/json'}}
+    )),
     login: () => history.push({pathname: ROUTE.LOGIN, state: {isModal: true}}),
     contact: () => openModal(ROUTE.CONTACT),
     openInModal: () => openModal(ROUTE.THEME),
@@ -72,6 +75,7 @@ export default class Tester extends Component {
 
         <View className='center wrap margin-top-largest border-top fill-width'>
           <Button className='margin primary basic' onClick={actions.login}>Login Modal</Button>
+          <Button className='margin primary basic' onClick={actions.post}>POST Request</Button>
           <Button className='margin primary basic' onClick={actions.mutate}>GraphQL Mutation</Button>
           <Button className='margin secondary basic' onClick={actions.contact}>Contact</Button>
           <Button className='margin primary basic' onClick={actions.openInModal}>Open in Modal</Button>
