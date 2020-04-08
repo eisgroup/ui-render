@@ -41,7 +41,7 @@ const mapDispatchToProps = (dispatch) => ({
       headers: {'Content-Type': 'application/json'}
     })),
     post: () => dispatch(apiAction('http://mnsopenl.exigengroup.com:9998/ui-config/GeneratePageStructure',
-      CREATE, {body: {}}, {headers: {'Content-Type': 'application/json'}}
+      CREATE, {body: ''}, {headers: {'Content-Type': 'application/json'}, callRequest: true}
     )),
     login: () => history.push({pathname: ROUTE.LOGIN, state: {isModal: true}}),
     contact: () => openModal(ROUTE.CONTACT),

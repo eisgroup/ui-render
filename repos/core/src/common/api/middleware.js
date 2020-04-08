@@ -75,7 +75,7 @@ const hasFetch = typeof fetch !== 'undefined'
  *          method: 'POST',  // if provided, will override fetch method created by apiAction()
  *          responseHandler: (response) => {},  // default is undefined - callback after response resolves
  *          related: ['ormModel'],  // list of related ORM Models to fetch (to be handled by Sagas)
- *          callRequest: false,  // if false, dispatch REQUEST action, default is false
+ *          callRequest: false,  // if true, dispatch REQUEST action, default is false
  *          callError: true,  // if false, will not dispatch ERROR action, default is true
  *          timeout: 30000,  // milliseconds, default is REQUEST_TIMEOUT, will dispatch CANCEL action
  *        }
