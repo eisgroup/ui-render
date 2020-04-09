@@ -79,7 +79,7 @@ export default class OpenL extends Component {
     const {meta} = this.props
     const {data, showMeta} = this.state
     const props = metaToProps(cloneDeep(meta), data, this)
-    console.warn('meta transformed', props)
+    console.warn('RENDER!!!')
     return (
       <>
         <ScrollView fill className='fade-in bg-neutral'>

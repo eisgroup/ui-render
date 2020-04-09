@@ -2,6 +2,7 @@ import classNames from 'classnames'
 import React, { Component } from 'react'
 import { ALERT, stateAction } from '../../common/actions'
 import {
+  cloneDeep,
   get,
   interpolateString,
   isCollection,
@@ -21,6 +22,7 @@ import Button from '../Button'
 import PieChart from '../charts/PieChart'
 import Counter from '../Counter'
 import Expand from '../Expand'
+import ExpandList from '../ExpandList'
 import Json from '../Json'
 import Label from '../Label'
 import Placeholder from '../Placeholder'
@@ -79,7 +81,11 @@ class RenderClass extends Component {
           delete props.label
         }
         if (props.name != null && props.title == null) props.title = props.name
-        return <Expand {...props}>{() => items.map(Render)}</Expand>
+        if (items.length) props.children = () => items.map(Render)
+        return <Expand {...props}/>
+
+      case FIELD.TYPE.EXPAND_LIST:
+        return <ExpandList items={data} {...props}/>
 
       case FIELD.TYPE.COUNTER:
         return <Counter {...props}/>
@@ -236,6 +242,8 @@ export function metaToProps (meta, data, instance) {
     // Map Value Renderer Names/Objects to Actual Render Functions
     if (key.indexOf('render') === 0) {
       if (typeof definition === 'string') meta[key] = RenderFunc(meta[key])
+
+      // Below transformation only happens during render
       if (isObject(definition)) meta[key] = (value, index, props, self) => {
         if (definition.relativeData) data = value
 
@@ -245,7 +253,9 @@ export function metaToProps (meta, data, instance) {
           return Render({
             ...props,
             // Recursively map definitions within Render function
-            ...metaToProps(configs, data, instance),
+            // Note: since definition is mutated on each transform,
+            // we have to use original config for rendering lists
+            ...metaToProps(cloneDeep(configs), data, instance),
             // Transform key path with actual data
             ...name && {name: interpolateString(definition.name, {index, value})},
             // Filter for row data from parent table (in default layout)
@@ -255,13 +265,13 @@ export function metaToProps (meta, data, instance) {
               !getFunctionFromString(definition[func], null) && {[func]: self[definition[func]]}
             )).reduce((obj, item) => ({...obj, ...item}), {}),
             data,
-          })
+          }, index)
         }
 
         // Render has conditional match by values
         const valueProps = get(definition, `values[${value}]`, definition.default)
         return (isObject(valueProps))
-          ? Render({...props, ...valueProps, data})
+          ? Render({...props, ...valueProps, data}, index)
           : RenderFunc(valueProps).apply(this, [value, index, {...props, data}])
       }
     }
