@@ -85,10 +85,10 @@ export default class Expand extends Component {
   }
 
   renderLabel = () => {
-    const {title, renderLabel, justify = false, children, iconOpened, iconClosed, classNameLabel} = this.props
+    const {title, renderLabel, justify = false, iconOpened, iconClosed, classNameLabel} = this.props
     if (title == null && !renderLabel) return null
     const {expanded} = this.state
-    const hasContent = children != null
+    const hasContent = true // children != null // allow expanding remote children
     const Title = renderLabel ? renderLabel(title) : title
     return (
       <Text

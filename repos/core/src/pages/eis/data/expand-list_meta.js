@@ -52,15 +52,6 @@ export default {
           {
             id: 'classID',
             label: 'Class Name',
-            // Custom render function for Table Cells (columns in default layout)
-            renderCell: {
-              view: 'Expand',
-              name: '{value}',
-              id: 'classID',
-              // toggle extra table item expansion (row in default layout)
-              onClick: 'handleItemExpand', // function is injected by TableView instance on render
-              // items: [{}], // can also make it expand any content inside clicked cell
-            },
           },
           {
             id: 'numberOfLives',
