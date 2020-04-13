@@ -132,6 +132,12 @@ export function withUISetup ({form, ...options}) {
     })
 
     // Define instance method
+    // Update meta.json
+    Class.prototype.metaUpdate = function (value) {
+      return this.setState(set(this.state, 'meta.json', value))
+    }
+
+    // Define instance method
     // @Note: functions should have consistent pattern of receiving important arguments first,
     // followed by optional arguments.
     // Positional arguments was chosen instead of keyword arguments because
