@@ -2,7 +2,7 @@ import { delay } from 'redux-saga'
 import { call, put, race, select, take } from 'redux-saga/effects'
 import { stateAction } from '../../actions'
 import { ERROR, SUCCESS, TIMEOUT, VOID } from '../../constants'
-import { hasListValue, isInCollection, toUpperCase } from '../../utils'
+import { hasListValue, hasObjectValue, isInCollection, toUpperCase } from '../../utils'
 import { apiAction, apiActionResultsType, apiActionType, fetchToCrud } from '../actions'
 import { CLEAR_ACTIONS_PENDING_NETWORK, HTTP_401_UNAUTHORIZED, NETWORK, REQUEST_TIMEOUT, } from '../constants'
 import { actionsPendingNetwork } from '../selectors'
@@ -65,7 +65,7 @@ export function * resumeActionsPending (type) {
  */
 export function * subscribeToApiResults (URL, ACTION, meta = null, resubscribe = false) {
   /* Match specific action with given meta data */
-  if (meta) {
+  if (hasObjectValue(meta)) {
     const listener = race({
       success: take(action => isMatchingApiActionType(action, URL, ACTION, SUCCESS, meta)),
       error: take(action => isMatchingApiActionType(action, URL, ACTION, ERROR, meta)),
@@ -108,10 +108,10 @@ export function * subscribeToApiResults (URL, ACTION, meta = null, resubscribe =
  *
  * @returns {IterableIterator<*>} {payload = {}, meta: {result} = {}} - result can be one of API_RESULTS, or VOID
  */
-export function * fetchFlow ({url, payload, meta, method = 'GET'}) {
+export function * fetchFlow ({url, payload, method = 'GET', meta: {headers, ...meta}}) {
   const ACTION = fetchToCrud[toUpperCase(method)]
   // noinspection JSCheckFunctionSignatures
-  yield put(apiAction(url, ACTION, payload, meta))
+  yield put(apiAction(url, ACTION, payload, {headers, ...meta}))
   return yield call(subscribeToApiResults, url, ACTION, meta)
 }
 
