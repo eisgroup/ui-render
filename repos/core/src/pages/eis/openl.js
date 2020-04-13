@@ -7,10 +7,10 @@ import { FIELD } from '../../common/variables'
 import Json from '../../components/Json'
 import ScrollView from '../../components/ScrollView'
 import Render, { metaToProps } from '../../components/views/Render'
+import { settings } from '../../modules'
 import { POPUP } from '../../modules/exports'
 import { reset } from '../../modules/form'
 import { withForm } from '../../modules/form/utils'
-import router from '../../modules/router'
 import data from './data/_data'
 import meta from './data/_meta'
 import { transformConfig } from './rules'
@@ -20,8 +20,7 @@ import { transformConfig } from './rules'
  * -----------------------------------------------------------------------------
  */
 const mapStateToProps = (state) => ({
-  activeRoute: router.select.activeRoute(state),
-  initialValues: data,
+  lang: settings.select.language(state), // to trigger re-render
   meta: transformConfig(meta),
 })
 const mapDispatchToProps = (dispatch) => ({
@@ -35,7 +34,7 @@ const mapDispatchToProps = (dispatch) => ({
  * -----------------------------------------------------------------------------
  */
 @connect(mapStateToProps, mapDispatchToProps)
-@withForm({form: 'TEST', enableReinitialize: true})
+@withForm({form: 'TEST', enableReinitialize: true, initialValues: data})
 @logRender
 export default class OpenL extends Component {
   state = {

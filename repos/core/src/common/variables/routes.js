@@ -9,6 +9,7 @@ export const ROUTE_BASE = `${ROUTE_HOME}${ROUTE_SLASH}`
 export const ROUTE = {
   HOME: ROUTE_HOME,
   DEMO: `${ROUTE_BASE}demo`,
+  WEBSTUDIO: `${ROUTE_BASE}webstudio`,
   PRIVACY: `${ROUTE_BASE}privacy`,
   TESTER: `${ROUTE_BASE}tester`, // for development only
   THEME: `${ROUTE_BASE}theme`, // for development only
@@ -18,6 +19,7 @@ export const ROUTES = createNestedRoutes(ROUTE, {  // used for Routes definition
 })
 export const ROUTES_FOR_NAV = [ // shown in Navigation
   {path: ROUTE.HOME, name: 'Report', icon: 'home'},
+  {path: ROUTE.WEBSTUDIO, name: 'WebStudio', icon: 'logo-symbol'},
   {path: ROUTE.DEMO, name: 'Demo', icon: 'test'},
 ]
 if (_SHOULD_SHOW_TEST_) ROUTES_FOR_NAV.push(...[

@@ -1,6 +1,7 @@
 import { ROUTE } from '../common/variables'
 import Demo from './eis/demo'
 import OpenL from './eis/openl'
+import Webstudio from './eis/webstudio'
 import Tester from './tester'
 import Theme from './theme'
 
@@ -13,6 +14,7 @@ import Theme from './theme'
 
 export default {
   [ROUTE.HOME]: OpenL,
+  [ROUTE.WEBSTUDIO]: Webstudio,
   [ROUTE.DEMO]: Demo,
   [ROUTE.TESTER]: Tester,
   [ROUTE.THEME]: Theme,
