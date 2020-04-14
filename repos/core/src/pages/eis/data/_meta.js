@@ -44,6 +44,24 @@ export default {
                 {id: 'annualAmt', order: 0},
                 {id: 'premiumPct', order: 1, /*sortKey: 'amt.pct'*/},
               ],
+              extraHeaders: [
+                [
+                  {
+                    label: 'Category',
+                    classNameHeader: 'bg-primary-light2 border-right',
+                  },
+                  {
+                    colSpan: 2,
+                    label: 'Annual Premium',
+                    styles: 'center border-right',
+                  },
+                  {
+                    colSpan: 2,
+                    label: 'Amount',
+                    styles: 'center',
+                  }
+                ]
+              ],
               headers: [
                 {
                   id: 'adminCategory',
@@ -86,15 +104,15 @@ export default {
                       },
                       'Administration Total': {
                         view: 'Text',
-                        styles: 'row p bg-success-light uppercase',
+                        styles: 'row p bg-success-light uppercase border-right',
                         label: 'Administration Total',
                       }
                     },
                     // default: 'Currency',
                   },
                   label: 'Description',
-                  classNameHeader: 'bg-primary-light2',
-                  classNameCell: 'bg-info-light uppercase',
+                  classNameHeader: 'bg-primary-light2 border-right',
+                  classNameCell: 'bg-info-light uppercase border-right',
                 },
                 {
                   id: 'annualAmt',
@@ -105,8 +123,9 @@ export default {
                 },
                 {
                   id: 'premiumPct',
-                  className: 'right',
+                  className: 'right border-right',
                   classNameCell: 'right',
+                  classNameCellWrap: 'border-right',
                   renderCell: 'percent',
                   label: '% of Premium'
                 },
@@ -206,8 +225,8 @@ export default {
           },
         ]
       },
-      expanded: true,
       classNameItems: 'padding-h',
+      expanded: true,
       items: [
         {
           view: 'Row',

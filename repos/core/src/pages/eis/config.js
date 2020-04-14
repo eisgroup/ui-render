@@ -69,11 +69,13 @@ const field = {
   striped: Boolean, // whether to alternate background shade of items (rows in default layout)
   headers: [ // headers are columns in default layout, used for configuring how to show each cell data under the header
     {
-      id: String,
-      renderCell: String, // name of render Function to use
+      id: String, // required cell id
+      label: String || Number || {name: String},
+      renderCell: String || Object, // name of render Function to use
     },
     {
       id: String,
+      label: String || Number || {name: String},
       renderCell: { // dynamic rendering based on cell value
         values: {
           'value to match': {/* definition of nested fields to render */}
@@ -81,6 +83,14 @@ const field = {
         default: String,
       }
     }
+  ],
+  extraHeaders: [ // additional header layers to be rendered above/before `headers`
+    [ // layers will be rendered in the order they are defined -> this is the first level header
+      {
+        colSpan: 2, // span two `headers` columns
+        label: String || Number || {name: String},
+      }
+    ]
   ],
   extraItems: [ // list of item definitions (rows in default layout)
     { // cell definitions by ID (column in default layout)

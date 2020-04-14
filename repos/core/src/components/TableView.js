@@ -37,9 +37,21 @@ export default class TableView extends Component {
         children: PropTypes.any, // custom header content to render, overrides `label`
         className: PropTypes.string, // css class name
         classNameCell: PropTypes.string, // css class name for items under the header
+        classNameCellWrap: PropTypes.string, // css class name for items <td> wrapper under the header
         style: PropTypes.object, // css inline styles
         styleCell: PropTypes.object, // css inline styles for items under the header
       })
+    ),
+    extraHeaders: PropTypes.arrayOf( // additional header layers to be rendered above/before `headers`
+      PropTypes.arrayOf( // layers will be rendered in the order they are defined -> this is the first level header
+        PropTypes.shape({
+          colSpan: PropTypes.number, // count of `headers` columns to span, default is 1
+          label: PropTypes.string, // header title, falls back to `id` if not given, and `children` not defined
+          children: PropTypes.any, // custom header content to render, overrides `label`
+          className: PropTypes.string, // css class name
+          style: PropTypes.object, // css inline styles
+        })
+      )
     ),
     sorts: PropTypes.arrayOf(PropTypes.shape({...sortObj})),
     onSort: PropTypes.func, // receives clicked sort object {id, order, sortKey} as argument
@@ -158,13 +170,13 @@ export default class TableView extends Component {
   }
 
   // RENDERS -------------------------------------------------------------------
-  renderHeader = ({id, label, children: cell, data, classNameHeader, className, style, renderHeader}) => {
+  renderHeader = ({id, label, children: cell, data, className, style, colSpan, classNameHeader, renderHeader}, i) => {
     const {sorts} = this.state
     const hasSort = sorts && !!sorts.find(s => s.id === id)
     const render = isFunction(cell) ? cell : renderHeader
     const value = data != null ? data : (cell || label)
     return (
-      <Table.HeaderCell key={id} className={classNameHeader}>
+      <Table.HeaderCell key={id || i} colSpan={colSpan} className={classNameHeader}>
         <Row className={classNames('middle', className, {sort: hasSort})} style={style}
              onClick={hasSort && this.handleSort.bind(this, id)}>
           {render
@@ -213,7 +225,7 @@ export default class TableView extends Component {
   }
 
   // Render Row Cells (in default layout)
-  renderItemData = (item, index, {id, renderCell, classNameCell: className, styleCell: style}) => {
+  renderItemData = (item, index, {id, renderCell, classNameCellWrap, classNameCell: className, styleCell: style}) => {
     // Conditional rendering logic based on given cell data
     const cell = get(item, id)
     const {render: r, data} = cell || {}
@@ -221,7 +233,7 @@ export default class TableView extends Component {
     const value = data != null ? data : cell
     const content = render ? render(value, index, {className, style}, this) : cell
     return (
-      <Table.Cell key={id}>
+      <Table.Cell key={id} className={classNameCellWrap}>
         {typeof content === 'object'
           ? content
           : <View className={className} style={style}><Text className='p'>{content}</Text></View>
@@ -233,12 +245,19 @@ export default class TableView extends Component {
   render () {
     const headers = this.headers
     if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
-    const {sorts, onSort, items: _, headers: __, renderItem: ___, itemClassNames: ____, className, ...props} = this.props
+    const {
+      className, sorts, onSort, extraHeaders,
+      items: _, headers: __, renderItem: ___, itemClassNames: ____,
+      ...props
+    } = this.props
     const items = this.itemsSorted
     return (
       <ScrollView row classNameInner='fill-width'>
         <Table className={classNames('full-width', className)} {...props}>
           <Table.Header className='font-normal'>
+            {extraHeaders && extraHeaders.map((row, i) => (
+              <Table.Row key={i}>{row.map(this.renderHeader)}</Table.Row>
+            ))}
             <Table.Row>
               {headers.map(this.renderHeader)}
             </Table.Row>

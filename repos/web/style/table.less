@@ -15,17 +15,23 @@ table {
     &:extend(.padding-right-small all);
   }
 
-  th:first-child,
-  th:first-child > * {
-    border-top-left-radius: @table-border-radius;
-  }
+  thead tr:first-child {
+    th:first-child,
+    th:first-child > * {
+      border-top-left-radius: @table-border-radius;
+    }
 
-  th:last-child,
-  th:last-child > * {
-    border-top-right-radius: @table-border-radius;
+    th:last-child,
+    th:last-child > * {
+      border-top-right-radius: @table-border-radius;
+    }
   }
 
   tbody tr:last-child {
+    td {
+      border-bottom: none;
+    }
+
     td:first-child,
     td:first-child > * {
       border-bottom-left-radius: @table-border-radius;
@@ -54,9 +60,9 @@ th {
   background-color: @table-header-bg-color;
 }
 
-td {
+th, td {
   padding: 0; // remove cell spacing
-  border-top: @table-border;
+  border-bottom: @table-border;
 }
 
 .ui.table {
