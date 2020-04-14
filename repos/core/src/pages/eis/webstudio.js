@@ -45,7 +45,10 @@ export default class Webstudio extends Component {
         <form onSubmit={this.handleSubmit}>
           {this.hasData && this.hasMeta
             ? <Render data={data.json} {...this.meta}/>
-            : <Placeholder><Text className='h1 error'>Missing *_data.json or *_meta.json</Text></Placeholder>
+            : <Placeholder>
+              {!this.hasData && <Text className='h1 error'>Missing *_data.json</Text>}
+              {!this.hasMeta && <Text className='h1 error'>Missing *_meta.json</Text>}
+            </Placeholder>
           }
         </form>
       </ScrollView>
