@@ -110,13 +110,15 @@ export class InputField extends Component {
   }
 
   // do not use ...props from input, because it is shared by <Field> instances
-  input = ({input, meta: {touched, error} = {}}) => {
+  input = ({input, meta: {touched, error, pristine} = {}}) => {
     if (this.props.readonly && isRequired(input.value)) return null
-    const {onChange, normalize, error: errorMessage, validate: _, ...props} = this.props
+    const {onChange, normalize, error: errorMessage, defaultValue, validate: _, ...props} = this.props
+    // @Note: defaultValue is only used for UI, internal value is still undefined
+    this.value = input.value === '' ? (pristine && defaultValue != null ? defaultValue : input.value) : input.value
     return (
       <Input
         {...input}
-        value={input.value}
+        value={this.value}
         onBlur={() => input.onBlur()} // prevent value change, but need onBlur to set touched for validation
         onChange={value => {
           if (props.type === 'number') value = value !== '' ? Number(value) : null
