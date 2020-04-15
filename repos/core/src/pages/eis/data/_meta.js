@@ -320,6 +320,7 @@ export default {
                         //           ╰ key path to value from parent-table's item to match against
                       ],
                     },
+                    itemsExpanded: true,
                     headers: [
                       {
                         id: 'state',
@@ -350,6 +351,7 @@ export default {
                           type: 'checkbox',
                           label: 'Expand All',
                           onChange: 'handleToggleExpandAll', // function is injected by TableView instance on render
+                          defaultValue: true,
                         },
                       },
                     ]
