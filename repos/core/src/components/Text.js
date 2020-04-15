@@ -22,6 +22,7 @@ export default function Text
     reverse,
     rtl,
     sound,
+    expanded: _, // not used, remove to prevent warnings
     ...props
   }) {
   props = accessibilitySupport(props, sound)

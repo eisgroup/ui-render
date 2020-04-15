@@ -18,13 +18,14 @@ import { accessibilitySupport } from './utils'
  */
 export default function View
   ({
-     className,
-     fill,
-     reverse,
-     rtl,
-     sound,
-     ...props
-   }) {
+    className,
+    fill,
+    reverse,
+    rtl,
+    sound,
+    expanded: _, // not used, remove to prevent warnings
+    ...props
+  }) {
   props = accessibilitySupport(props, sound)
   return (
     <div className={classNames('flex--col', {fill, reverse, rtl, pointer: props.onClick}, className)} {...props} />

@@ -1,7 +1,6 @@
 export default {
   view: 'ExpandList',
   name: 'coverages',
-  expanded: true,
   renderLabel: {
     view: 'Text',
     relativeData: true,
