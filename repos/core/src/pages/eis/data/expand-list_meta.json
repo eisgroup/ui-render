@@ -1,47 +1,13 @@
 {
-  "view": "Table",
+  "view": "ExpandList",
   "name": "coverages",
-  "headers": [
-    {
-      "id": "coverageID",
-      "label": "Coverage Name",
-      "renderCell": {
-        "view": "Expand",
-        "name": "{value}",
-        "id": "coverageID",
-        "onClick": "handleItemExpand"
-      }
-    },
-    {
-      "id": "fundingStructure.contributionType",
-      "label": "Contribution Type"
-    },
-    {
-      "id": "fundingStructure.requiredParticipationPrct",
-      "label": "Contribution",
-      "renderCell": "percent"
-    },
-    {
-      "id": "rate",
-      "label": "Quote Rate",
-      "renderCell": "double5"
-    },
-    {
-      "id": "annualPremium",
-      "label": "Annual Premium",
-      "renderCell": "currency"
-    },
-    {
-      "id": "#",
-      "renderHeader": {
-        "view": "Input",
-        "name": "expandAllStates",
-        "type": "checkbox",
-        "label": "Expand All",
-        "onChange": "handleToggleExpandAll"
-      }
+  "renderLabel": {
+    "view": "Text",
+    "relativeData": true,
+    "children": {
+      "name": "coverageID"
     }
-  ],
+  },
   "renderItem": {
     "view": "Col",
     "relativeData": true,
