@@ -13,7 +13,7 @@ export default {
           items: [
             {
               view: 'Row',
-              styles: 'middle margin-bottom',
+              styles: 'middle',
               items: [
                 {
                   view: 'Title',
@@ -47,17 +47,17 @@ export default {
               extraHeaders: [
                 [
                   {
-                    label: 'Category',
-                    classNameHeader: 'bg-primary-light2 border-right',
+                    label: 'Description',
+                    classNameHeader: 'uppercase bg-primary-light2 border-right no-border-bottom',
                   },
                   {
                     colSpan: 2,
-                    label: 'Annual Premium',
+                    label: 'Total',
                     styles: 'center border-right',
                   },
                   {
                     colSpan: 2,
-                    label: 'Amount',
+                    label: 'Average',
                     styles: 'center',
                   }
                 ]
@@ -65,6 +65,7 @@ export default {
               headers: [
                 {
                   id: 'adminCategory',
+                  label: '',
                   // - String renderCell -> maps to FIELD.RENDER function
                   // - Object renderCell -> maps to FIELD.TYPE recursive Render by matching values
                   //                     -> can optionally specify `default` FIELD.RENDER function
@@ -110,7 +111,6 @@ export default {
                     },
                     // default: 'Currency',
                   },
-                  label: 'Description',
                   classNameHeader: 'bg-primary-light2 border-right',
                   classNameCell: 'bg-info-light uppercase border-right',
                 },

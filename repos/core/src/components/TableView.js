@@ -181,7 +181,7 @@ export default class TableView extends Component {
              onClick={hasSort && this.handleSort.bind(this, id)}>
           {render
             ? render(value, id, {className, style}, this)
-            : (typeof cell === 'object' ? cell : <Text className='p'>{cell || label || id}</Text>)
+            : (typeof cell === 'object' ? cell : <Text className='p'>{cell || (label != null ? label : id)}</Text>)
           }
           {hasSort && renderSort(sorts.find(item => item.id === id) || {})}
         </Row>
