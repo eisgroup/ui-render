@@ -30,6 +30,7 @@ import { renderCurrency, renderFloat } from '../renders'
 import Row from '../Row'
 import Space from '../Space'
 import TableView from '../TableView'
+import TabList from '../TabList'
 import Tabs from '../Tabs'
 import Text from '../Text'
 import View from '../View'
@@ -148,6 +149,9 @@ class RenderClass extends Component {
           : content
         )
         return <Tabs items={tabs} panels={panels} {...props}/>
+
+      case FIELD.TYPE.TAB_LIST:
+        return <TabList items={data} {...props}/>
 
       case FIELD.TYPE.TEXT:
       case FIELD.TYPE.TITLE:

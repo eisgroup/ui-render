@@ -23,6 +23,7 @@ FIELD.TYPE = {
   SPACE: 'Space', // for adding space between items
   TABLE: 'Table',
   TABS: 'Tabs',
+  TAB_LIST: 'TabList',
   TEXT: 'Text',
   TITLE: 'Title', // A customised `Text` view with certain styling for consistent look and feel
   // ...to be populated by modules
