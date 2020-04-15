@@ -81,6 +81,7 @@ export function toOpenLConfig (meta) {
 /**
  * React Class Decorator to setup UI with necessary variables and function definitions
  * @usage:
+ *    - this.data -> *_data.json from state, ready for <Render> component consumption
  *    - this.meta -> transformed *_meta.json data from state, ready for <Render> component consumption
  *    - this.handleSubmit -> to be used like this <form onSubmit={this.handleSubmit}>
  *    - this.hasData and this.hasMeta getters can be used for conditional check
@@ -104,6 +105,16 @@ export function withUISetup ({form, ...options}) {
       },
       ...Class.prototype.state
     }
+
+    // Define instance getter
+    Object.defineProperty(Class.prototype, 'data', {
+      get () {
+        return this.state.data.json
+      },
+      set (value) {
+        return this.setState(set(this.state, 'data.json', value))
+      }
+    })
 
     // Define instance getter
     Object.defineProperty(Class.prototype, 'meta', {
@@ -131,6 +142,14 @@ export function withUISetup ({form, ...options}) {
       },
     })
 
+    // Define instance getter
+    Object.defineProperty(Class.prototype, 'handleSubmit', {
+      get () {
+        if (this._handleSubmit != null) return this._handleSubmit
+        return this._handleSubmit = this.props.handleSubmit(this.submit.bind(this))
+      },
+    })
+
     // Define instance method
     // Update meta.json
     Class.prototype.metaUpdate = function (value) {
@@ -150,11 +169,6 @@ export function withUISetup ({form, ...options}) {
     Class.prototype.resetForm = function () {
       const {dispatch, form} = this.props
       dispatch(reset(form))
-    }
-
-    // Define instance method
-    Class.prototype.handleSubmit = function () {
-      return this.props.handleSubmit(this.submit)
     }
 
     // Define instance method
@@ -179,6 +193,6 @@ export function withUISetup ({form, ...options}) {
       if (UNSAFE_componentWillUpdate) UNSAFE_componentWillUpdate.apply(this, arguments)
     }
 
-    return withForm({form, enableReinitialize: true, initialValues: Class.prototype.state.data.json, ...options})(Class)
+    return withForm({form, enableReinitialize: true, ...options})(Class)
   }
 }

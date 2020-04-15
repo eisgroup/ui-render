@@ -16,7 +16,7 @@ const META_URL = 'http://mnsopenl.exigengroup.com:9998/ui-config/GeneratePageStr
  * VIEW TEMPLATE ---------------------------------------------------------------
  * -----------------------------------------------------------------------------
  */
-@withUISetup({form: 'WebStudio'})
+@withUISetup({form: 'WebStudio', initialValues: data})
 @logRender
 export default class Webstudio extends Component {
   state = {
@@ -39,12 +39,11 @@ export default class Webstudio extends Component {
   }
 
   render () {
-    const {data} = this.state
     return (
       <ScrollView fill className='fade-in bg-neutral'>
         <form onSubmit={this.handleSubmit}>
           {this.hasData && this.hasMeta
-            ? <Render data={data.json} {...this.meta}/>
+            ? <Render data={this.data} {...this.meta}/>
             : <Placeholder>
               {!this.hasData && <Text className='h1 error'>Missing *_data.json</Text>}
               {!this.hasMeta && <Text className='h1 error'>Missing *_meta.json</Text>}
