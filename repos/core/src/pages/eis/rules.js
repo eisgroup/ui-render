@@ -92,24 +92,22 @@ export function withUISetup ({form, ...options}) {
     const UNSAFE_componentWillMount = Class.prototype.UNSAFE_componentWillMount
     const UNSAFE_componentWillUpdate = Class.prototype.UNSAFE_componentWillUpdate
 
+    // @Note: the state shape is used for reference only, it is not instantiated
     Class.prototype.state = {
       data: {
         json: undefined, // data object
         name: undefined, // file name
-        ...(Class.prototype.props || {}).data,
       },
       meta: {
         json: undefined, // data object
         name: undefined, // file name
-        ...(Class.prototype.props || {}).meta,
       },
-      ...Class.prototype.state
     }
 
     // Define instance getter
     Object.defineProperty(Class.prototype, 'data', {
       get () {
-        return this.state.data.json
+        return get(this.state, 'data.json')
       },
       set (value) {
         return this.setState(set(this.state, 'data.json', value))
@@ -120,34 +118,11 @@ export function withUISetup ({form, ...options}) {
     Object.defineProperty(Class.prototype, 'meta', {
       get () {
         if (this._meta != null) return this._meta
-        const {data, meta} = this.state
-        return this._meta = metaToProps(cloneDeep(meta.json), data.json, this)
+        return this._meta = metaToProps(cloneDeep(get(this.state, 'meta.json')), this.data, this)
       },
       set (value) {
         return this._meta = value
       }
-    })
-
-    // Define instance getter
-    Object.defineProperty(Class.prototype, 'hasData', {
-      get () {
-        return !isEmpty(this.state.data.json)
-      },
-    })
-
-    // Define instance getter
-    Object.defineProperty(Class.prototype, 'hasMeta', {
-      get () {
-        return !isEmpty(this.state.meta.json)
-      },
-    })
-
-    // Define instance getter
-    Object.defineProperty(Class.prototype, 'handleSubmit', {
-      get () {
-        if (this._handleSubmit != null) return this._handleSubmit
-        return this._handleSubmit = this.props.handleSubmit(this.submit.bind(this))
-      },
     })
 
     // Define instance method
@@ -161,6 +136,29 @@ export function withUISetup ({form, ...options}) {
     Class.prototype.metaUpdate = function (value) {
       return this.setState(set(this.state, 'meta.json', value))
     }
+
+    // Define instance getter
+    Object.defineProperty(Class.prototype, 'hasData', {
+      get () {
+        return !isEmpty(this.data)
+      },
+    })
+
+    // Define instance getter
+    Object.defineProperty(Class.prototype, 'hasMeta', {
+      get () {
+        return !isEmpty(this.meta)
+      },
+    })
+
+    // Define instance getter
+    Object.defineProperty(Class.prototype, 'handleSubmit', {
+      get () {
+        if (this._handleSubmit != null) return this._handleSubmit
+        return this._handleSubmit = this.props.handleSubmit(this.submit.bind(this))
+      },
+    })
+
 
     // Define instance method
     // @Note: functions should have consistent pattern of receiving important arguments first,
