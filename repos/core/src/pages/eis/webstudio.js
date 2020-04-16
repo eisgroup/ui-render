@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React, { Component } from 'react'
 import { SUCCESS } from '../../common/constants'
 import fetch from '../../common/fetch'
-import { isEmpty, logRender } from '../../common/utils'
+import { get, isEmpty, logRender } from '../../common/utils'
 import Placeholder from '../../components/Placeholder'
 import ScrollView from '../../components/ScrollView'
 import Spinner from '../../components/Spinner'
@@ -25,17 +25,21 @@ export default class WebStudioPage extends Component {
     loadingMeta: true,
   }
 
+  get id () {
+    return get(this.props, 'match.params.id')
+  }
+
   componentDidMount () {
-    this.fetch(DATA_URL)
+    this.fetch(DATA_URL, {body: this.id, contentType: 'text/plain'})
       .then(data => this.setState({loadingData: false, data}))
       .catch(this.popup)
-    this.fetch(META_URL)
+    this.fetch(META_URL, {contentType: 'application/json'})
       .then(meta => this.setState({loadingMeta: false, meta}))
       .catch(this.popup)
   }
 
-  fetch = async (url) => {
-    const data = {method: 'POST', body: {}, headers: {'Content-Type': 'application/json'}}
+  fetch = async (url, {body = {}, contentType = 'application/json'}) => {
+    const data = {method: 'POST', body, headers: {'Content-Type': contentType}}
     const {payload, meta: {result} = {}} = await fetch(url, data)
     if (result === SUCCESS) return payload
     if (result != null) throw Error(result)

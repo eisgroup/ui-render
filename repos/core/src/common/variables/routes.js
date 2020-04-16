@@ -15,7 +15,7 @@ export const ROUTE = {
   THEME: `${ROUTE_BASE}theme`, // for development only
 }
 export const ROUTES = createNestedRoutes(ROUTE, {  // used for Routes definition
-  [ROUTE.DEMO]: '/:id?',
+  [ROUTE.WEBSTUDIO]: '/:id?',
 })
 export const ROUTES_FOR_NAV = [ // shown in Navigation
   {path: ROUTE.HOME, name: 'Report', icon: 'home'},
