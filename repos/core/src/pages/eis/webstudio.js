@@ -7,9 +7,9 @@ import ScrollView from '../../components/ScrollView'
 import Text from '../../components/Text'
 import Render from '../../components/views/Render'
 import data from './data/webstudio_data'
-import meta from './data/webstudio_meta'
-import { transformConfig, withUISetup } from './rules'
+import { withUISetup } from './rules'
 
+const DATA_URL = 'http://mnsopenl.exigengroup.com:9998/std-rating-report/ExtractRatingDetails'
 const META_URL = 'http://mnsopenl.exigengroup.com:9998/ui-config/GeneratePageStructure'
 
 /**
@@ -19,23 +19,24 @@ const META_URL = 'http://mnsopenl.exigengroup.com:9998/ui-config/GeneratePageStr
 @withUISetup({form: 'WebStudio', initialValues: data})
 @logRender
 export default class Webstudio extends Component {
-  state = {
-    data: {
-      json: data,
-    },
-    meta: {
-      json: transformConfig(meta),
-    },
-  }
+  // state = {
+  //   data: {
+  //     json: data,
+  //   },
+  //   meta: {
+  //     json: transformConfig(meta),
+  //   },
+  // }
 
-  fetchMeta = async () => {
+  fetch = async (url, callback) => {
     const data = {method: 'POST', body: {}, headers: {'Content-Type': 'application/json'}}
-    const {payload, meta: {result} = {}} = await fetch(META_URL, data)
-    if (result === SUCCESS) this.metaUpdate(payload)
+    const {payload, meta: {result} = {}} = await fetch(url, data)
+    if (result === SUCCESS) callback(payload)
   }
 
   componentDidMount () {
-    this.fetchMeta().catch(warn)
+    this.fetch(DATA_URL, this.dataUpdate.bind(this)).catch(warn)
+    this.fetch(META_URL, this.metaUpdate.bind(this)).catch(warn)
   }
 
   render () {

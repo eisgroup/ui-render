@@ -151,6 +151,12 @@ export function withUISetup ({form, ...options}) {
     })
 
     // Define instance method
+    // Update data.json
+    Class.prototype.dataUpdate = function (value) {
+      return this.setState(set(this.state, 'data.json', value))
+    }
+
+    // Define instance method
     // Update meta.json
     Class.prototype.metaUpdate = function (value) {
       return this.setState(set(this.state, 'meta.json', value))
