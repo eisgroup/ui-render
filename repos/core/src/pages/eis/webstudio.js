@@ -1,17 +1,15 @@
 import classNames from 'classnames'
 import React, { Component } from 'react'
-import { ALERT, stateAction } from '../../common/actions'
 import { SUCCESS } from '../../common/constants'
 import fetch from '../../common/fetch'
 import { isEmpty, logRender } from '../../common/utils'
-import { ACTIVE } from '../../common/variables'
 import Placeholder from '../../components/Placeholder'
 import ScrollView from '../../components/ScrollView'
 import Spinner from '../../components/Spinner'
 import Text from '../../components/Text'
 import View from '../../components/View'
 import Render from '../../components/views/Render'
-import { POPUP } from '../../modules/exports'
+import { popupAlert } from '../../modules/popup'
 import { withUISetup } from './rules'
 
 const DATA_URL = 'http://mnsopenl.exigengroup.com:9998/std-rating-report/ExtractRatingDetails'
@@ -43,12 +41,7 @@ export default class WebStudioPage extends Component {
     if (result != null) throw Error(result)
   }
 
-  popup = (error) => ACTIVE.store.dispatch(stateAction(POPUP, ALERT, {
-    items: [{
-      title: 'Fetch Error',
-      content: <Text>{String(error)}</Text>
-    }]
-  }))
+  popup = (error) => popupAlert('Fetch Error', <Text>{String(error)}</Text>)
 
   render () {
     const {loadingData, loadingMeta, data, meta} = this.state

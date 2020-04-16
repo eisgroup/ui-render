@@ -1,13 +1,12 @@
 import React from 'react'
-import { ALERT, stateAction } from '../../common/actions'
 import fetch from '../../common/fetch'
 import { cloneDeep, get, isCollection, isEmpty, isObject, isString, sanitizeGqlResponse, set } from '../../common/utils'
 import { FIELD } from '../../common/variables'
 import Json from '../../components/Json'
 import { metaToProps } from '../../components/views/Render'
-import { POPUP } from '../../modules/exports'
 import { reset } from '../../modules/form'
 import { withForm } from '../../modules/form/utils'
+import { popupAlert } from '../../modules/popup'
 
 /**
  * BUSINESS RULES ==============================================================
@@ -177,12 +176,7 @@ export function withUISetup ({form, ...options}) {
 
     // Define instance method
     Class.prototype.submit = function (values) {
-      return this.props.dispatch(stateAction(POPUP, ALERT, {
-        items: [{
-          title: 'Submitted Form with these values',
-          content: <Json data={values}/>,
-        }]
-      }))
+      return popupAlert('Submitted Form with these values', <Json data={values}/>)
     }
 
     Class.prototype.UNSAFE_componentWillMount = function () {
