@@ -18,7 +18,7 @@ import { popupAlert } from '../../modules/popup'
  * Transform *_meta.json API response into custom rules applied by the team
  */
 export function transformConfig (meta) {
-  return toOpenLConfig(sanitizeGqlResponse(meta, {tags: []}))
+  return toOpenLConfig(sanitizeGqlResponse(meta || {}, {tags: []}))
 }
 
 export function toOpenLConfig (meta) {
@@ -117,7 +117,7 @@ export function withUISetup ({form, ...options}) {
     Object.defineProperty(Class.prototype, 'meta', {
       get () {
         if (this._meta != null) return this._meta
-        return this._meta = metaToProps(cloneDeep(get(this.state, 'meta.json')), this.data, this)
+        return this._meta = metaToProps(transformConfig(cloneDeep(get(this.state, 'meta.json'))), this.data, this)
       },
       set (value) {
         return this._meta = value

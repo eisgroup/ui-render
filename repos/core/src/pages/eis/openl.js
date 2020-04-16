@@ -5,7 +5,7 @@ import ScrollView from '../../components/ScrollView'
 import Render from '../../components/views/Render'
 import data from './data/_data'
 import meta from './data/_meta'
-import { transformConfig, withUISetup } from './rules'
+import { withUISetup } from './rules'
 
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
@@ -20,7 +20,7 @@ export default class OpenL extends Component {
       json: data,
     },
     meta: {
-      json: transformConfig(meta),
+      json: meta,
     },
   }
 

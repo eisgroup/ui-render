@@ -7,7 +7,6 @@ import Placeholder from '../../components/Placeholder'
 import ScrollView from '../../components/ScrollView'
 import Spinner from '../../components/Spinner'
 import Text from '../../components/Text'
-import View from '../../components/View'
 import Render from '../../components/views/Render'
 import { popupAlert } from '../../modules/popup'
 import { withUISetup } from './rules'
@@ -51,24 +50,20 @@ export default class WebStudioPage extends Component {
     const {loadingData, loadingMeta, data, meta} = this.state
     this.hasData = !isEmpty(data)
     this.hasMeta = !isEmpty(meta)
-    return (
-      <View fill>
-        {this.hasData && this.hasMeta
-          ? <WebStudio data={data} meta={meta} initialValues={data}/>
-          : <Placeholder>
-            {!this.hasData &&
-            <Text className={classNames('h1', {error: !loadingData, blink: loadingData})}>
-              {loadingData ? <Text><Spinner size='large'/> Loading...</Text> : 'Missing'} *_data.json
-            </Text>
-            }
-            {!this.hasMeta &&
-            <Text className={classNames('h1', {error: !loadingMeta, blink: loadingMeta})}>
-              {loadingMeta ? <Text><Spinner size='large'/> Loading...</Text> : 'Missing'} *_meta.json
-            </Text>
-            }
-          </Placeholder>
-        }
-      </View>
+    return (this.hasData && this.hasMeta
+        ? <WebStudio data={data} meta={meta} initialValues={data}/>
+        : <Placeholder>
+          {!this.hasData &&
+          <Text className={classNames('h1', {error: !loadingData, blink: loadingData})}>
+            {loadingData ? <Text><Spinner size='large'/> Loading...</Text> : 'Missing'} *_data.json
+          </Text>
+          }
+          {!this.hasMeta &&
+          <Text className={classNames('h1', {error: !loadingMeta, blink: loadingMeta})}>
+            {loadingMeta ? <Text><Spinner size='large'/> Loading...</Text> : 'Missing'} *_meta.json
+          </Text>
+          }
+        </Placeholder>
     )
   }
 }
