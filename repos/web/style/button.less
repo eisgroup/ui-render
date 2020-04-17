@@ -41,7 +41,8 @@
         }
       }
 
-      background-color: @color-shadow-lightest;
+      opacity: 0.8;
+      //background-color: @color-shadow-lightest;
     }
   }
 
@@ -203,6 +204,8 @@
   @colorValLight: @@colorVarLight;
 
   &.@{color}, .@{color} & {
+    color: @color-white;
+    background-color: @colorVal;
     border-color: @colorVal;
 
     &:not(:disabled) {
@@ -214,6 +217,7 @@
 
     .inverted & {
       color: @color-white;
+      background-color: @colorValLight;
       border-color: @colorValLight;
 
       &:not(:disabled) {
