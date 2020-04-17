@@ -212,8 +212,8 @@ export default {
                   // ...second (subsequent) argument/s can be defined as object/array/number/etc.
                 ],
                 onDone: {
-                  name: 'warn',
-                  args: ['Dropdown.onChange -> fetch.onDone -> fetch.onDone -> warn'],
+                  name: 'popup',
+                  args: ['Dropdown.onChange\n -> fetch(IpAddress).onDone\n -> fetch(GeoData).onDone\n -> popup'],
                 }
               },
             },

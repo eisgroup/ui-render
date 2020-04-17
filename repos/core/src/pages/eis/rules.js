@@ -179,10 +179,16 @@ export function withUISetup ({form, ...options}) {
       return popupAlert('Submitted Form with these values', <Json data={values}/>)
     }
 
+    // Define instance method
+    Class.prototype.popupAlert = function (content, title) {
+      return popupAlert(title, <Json data={content}/>)
+    }
+
     Class.prototype.UNSAFE_componentWillMount = function () {
       FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
       FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
       FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
+      FIELD.FUNC[FIELD.ACTION.POPUP] = this.popupAlert
       if (UNSAFE_componentWillMount) UNSAFE_componentWillMount.apply(this, arguments)
     }
 

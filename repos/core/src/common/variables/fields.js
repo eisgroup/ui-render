@@ -43,6 +43,7 @@ FIELD.ACTION = {
   RESET: 'reset',
   SET_STATE: 'setState',
   FETCH: 'fetch',
+  POPUP: 'popup',
   WARN: 'warn',
 }
 
