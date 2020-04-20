@@ -66,7 +66,7 @@ class RenderClass extends Component {
     // Pass down data to child renderers, if defined
     let data = info
     if (props.name) data = get(info, props.name)
-    if (info) items = items.map((item) => ({...item, data: info}))
+    if (info) items = items.map((item) => ({data: info, ...item})) // allow `data` to be overridden by config
     switch (view) {
       case FIELD.TYPE.BUTTON:
         if (items.length) props.children = items.map(Render)
