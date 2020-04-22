@@ -114,6 +114,7 @@ class RenderClass extends Component {
 
       case FIELD.TYPE.TABLE:
         const {extraItems, filterItems, parentItem, ...more} = props
+        if (!isList(_data)) _data = []
         if (filterItems && parentItem) {
           _data = _data.filter(item => {
             return !filterItems.find(filter => {
@@ -140,7 +141,6 @@ class RenderClass extends Component {
           }
           return item
         }))
-        if (!isList(_data)) _data = []
         return <TableView items={_data} {...more}/>
 
       case FIELD.TYPE.TABS:
