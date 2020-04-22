@@ -62,11 +62,11 @@ class RenderClass extends Component {
   // Errors in components will propagate up to componentDidCatch in parent class.
   render () {
     if (this.state.error) return <Placeholder>{String(this.state.error)}</Placeholder>
-    let {data: info, view, items = [], relativeData: _, ...props} = this.props
+    let {data, _data, view, items = [], relativeData: _, ...props} = this.props
+    if (props.name && _data == null) _data = get(data, props.name) // local data dynamically retrieved from definition
+
     // Pass down data to child renderers, if defined
-    let data = info
-    if (props.name) data = get(info, props.name)
-    if (info) items = items.map((item) => ({data: info, ...item})) // allow `data` to be overridden by config
+    if (data) items = items.map((item) => ({data, ...item})) // allow `data` to be overridden by config
     switch (view) {
       case FIELD.TYPE.BUTTON:
         if (items.length) props.children = items.map(Render)
@@ -86,7 +86,7 @@ class RenderClass extends Component {
         return <Expand {...props}/>
 
       case FIELD.TYPE.EXPAND_LIST:
-        return <ExpandList items={data} {...props}/>
+        return <ExpandList items={_data} {...props}/>
 
       case FIELD.TYPE.COUNTER:
         return <Counter {...props}/>
@@ -102,8 +102,8 @@ class RenderClass extends Component {
 
       case FIELD.TYPE.PIE_CHART:
         const {mapItems, ...prop} = props
-        if (mapItems) data = mapProps(data, mapItems)
-        return <PieChart items={data} {...prop}/>
+        if (mapItems) _data = mapProps(_data, mapItems)
+        return <PieChart items={_data} {...prop}/>
 
       case FIELD.TYPE.ROW:
       case FIELD.TYPE.ROW2:
@@ -115,7 +115,7 @@ class RenderClass extends Component {
       case FIELD.TYPE.TABLE:
         const {extraItems, filterItems, parentItem, ...more} = props
         if (filterItems && parentItem) {
-          data = data.filter(item => {
+          _data = _data.filter(item => {
             return !filterItems.find(filter => {
               for (const key in filter) {
                 // If mismatch in value found, filter out given item
@@ -125,22 +125,23 @@ class RenderClass extends Component {
             })
           })
         }
-        if (extraItems) data = data.concat(extraItems.map(item => {
-          for (const key in item) {
-            const definition = item[key]
+        if (extraItems) _data = _data.concat(extraItems.map(item => {
+          for (const id in item) {
+            const definition = item[id]
             if (isObject(definition)) {
               if ((definition.name && Object.keys(definition).length === 1)) {
-                item[key] = get(info, definition.name)
+                item[id] = get(data, definition.name)
               } else if (definition.name && definition.render) {
-                item[key].data = get(info, definition.name)
+                item[id].data = get(data, definition.name)
               } else if (definition.view) {
-                item[key] = (_, index, props) => Render({...props, ...definition})
+                item[id] = (_, index, props) => Render({...props, ...definition})
               }
             }
           }
           return item
         }))
-        return isList(data) ? <TableView items={data} {...more}/> : null
+        if (!isList(_data)) _data = []
+        return <TableView items={_data} {...more}/>
 
       case FIELD.TYPE.TABS:
         const tabs = items.map(({tab}, i) => isObject(tab) ? Render(tab, i) : tab)
@@ -151,7 +152,7 @@ class RenderClass extends Component {
         return <Tabs items={tabs} panels={panels} {...props}/>
 
       case FIELD.TYPE.TAB_LIST:
-        return <TabList items={data} {...props}/>
+        return <TabList items={_data} {...props}/>
 
       case FIELD.TYPE.TEXT:
       case FIELD.TYPE.TITLE:

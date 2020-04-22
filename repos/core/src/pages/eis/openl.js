@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { logRender } from '../../common/utils'
 import Json from '../../components/Json'
 import ScrollView from '../../components/ScrollView'
+import Text from '../../components/Text'
 import Render from '../../components/views/Render'
 import data from './data/_data'
 import meta from './data/_meta'
@@ -29,6 +30,7 @@ export default class OpenL extends Component {
     return (
       <>
         <ScrollView fill className='fade-in bg-neutral'>
+          <Text className='h1 center padding'>Example of UI Config</Text>
           <form onSubmit={this.handleSubmit}>
             <Render data={this.data} {...this.meta}/>
           </form>
