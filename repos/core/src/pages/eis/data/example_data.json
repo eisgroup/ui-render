@@ -1,5 +1,13 @@
 {
   "planID": "Golden",
+  "layouts": [
+    {
+      "name": "Layout Alpha"
+    },
+    {
+      "name": "Layout Beta"
+    }
+  ],
   "coverages": [
     {
       "coverageID": "Gold",

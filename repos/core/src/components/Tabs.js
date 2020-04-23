@@ -24,8 +24,8 @@ export default class Tabs extends Component {
       })
     ])).isRequired, // tabs
     panels: PropTypes.arrayOf(PropTypes.any).isRequired, // content
-    activeIndex: PropTypes.number,  // opened tab index (controlled)
-    defaultIndex: PropTypes.number, // opened tab index initially (uncontrolled)
+    activeIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),  // opened tab index (controlled)
+    defaultIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]), // opened tab index initially (uncontrolled)
     onChange: PropTypes.func, // callback when tab's activeIndex changes, receives new `activeIndex` as argument
     vertical: PropTypes.bool, // render tabs as vertical layout
     centerTabs: PropTypes.bool, // align tabs to center
@@ -39,13 +39,13 @@ export default class Tabs extends Component {
   }
 
   state = {
-    activeIndex: Math.max(this.props.activeIndex || this.props.defaultIndex || 0, 0),
+    activeIndex: Math.max(+(this.props.activeIndex || this.props.defaultIndex) || 0, 0),
     transition: false
   }
 
   UNSAFE_componentWillReceiveProps (next) {
     const {activeIndex, panels} = next
-    if (activeIndex != null && activeIndex !== this.state.activeIndex) this.handleClickTab(activeIndex)
+    if (activeIndex != null && +activeIndex !== this.state.activeIndex) this.handleClickTab(+activeIndex)
 
     // Handle use case when parent changes layout and tab has less panels than previously set active index
     if (this.state.activeIndex >= panels.length) this.setState({activeIndex: 0})
