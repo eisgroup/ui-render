@@ -15,11 +15,16 @@ FIELD.TYPE = {
   COL: 'Col', // Vertical column layout
   COL2: 'Column', // alias for Column
   COL3: 'VerticalLayout', // alias for Column
+  COL_LIST: 'ColList', // alias for List
+  COL_LIST3: 'VerticalList', // alias for List
   COUNTER: 'Counter', // Animated number changing from `start` to `end` values
   LABEL: 'Label',
+  LIST: 'List', // list of Col components with dynamic `renderItem` attributes
   PIE_CHART: 'PieChart', // Pie chat (can be in shape of donut) with optional legends
   ROW: 'Row', // Horizontal row layout
   ROW2: 'HorizontalLayout', // alias for Row
+  ROW_LIST: 'RowList', // alias for List with Row layout
+  ROW_LIST2: 'HorizontalList', // alias for List with Row layout
   SPACE: 'Space', // for adding space between items
   TABLE: 'Table',
   TABS: 'Tabs',

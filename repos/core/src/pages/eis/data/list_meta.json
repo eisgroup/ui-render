@@ -1,0 +1,90 @@
+{
+  "view": "RowList",
+  "name": "coverages",
+  "styles": "justify wrap",
+  "renderItem": {
+    "view": "Col",
+    "relativeData": true,
+    "items": [
+      {
+        "view": "Col",
+        "styles": "margin-bottom-small radius",
+        "items": [
+          {
+            "view": "Title",
+            "label": "Cost Summary",
+            "styles": "padding no-margin"
+          },
+          {
+            "view": "Col",
+            "styles": "border radius",
+            "items": [
+              {
+                "view": "Row",
+                "styles": "justify padding",
+                "items": [
+                  {
+                    "view": "Text",
+                    "label": "Annual Rate"
+                  },
+                  {
+                    "view": "Text",
+                    "children": {
+                      "name": "rate"
+                    },
+                    "renderLabel": "percent"
+                  }
+                ]
+              },
+              {
+                "view": "Row",
+                "styles": "justify padding border-top",
+                "items": [
+                  {
+                    "view": "Text",
+                    "label": "Annual Premium"
+                  },
+                  {
+                    "view": "Text",
+                    "children": {
+                      "name": "annualPremium"
+                    },
+                    "renderLabel": "currency"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "view": "Table",
+        "name": "classes",
+        "headers": [
+          {
+            "id": "classID",
+            "label": "Class Name"
+          },
+          {
+            "id": "numberOfLives",
+            "label": "Number of Participants"
+          },
+          {
+            "id": "totalVolume",
+            "label": "Total Volume",
+            "renderCell": "float"
+          },
+          {
+            "id": "annualPremium",
+            "label": "Annual Premium"
+          }
+        ],
+        "renderItem": {
+          "view": "Table",
+          "name": "rateCards",
+          "relativeData": true
+        }
+      }
+    ]
+  }
+}

@@ -8,6 +8,7 @@ import data from './data/_data'
 import meta from './data/_meta'
 import { withUISetup } from './rules'
 
+// console.warn(toJSON(meta))
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
  * -----------------------------------------------------------------------------

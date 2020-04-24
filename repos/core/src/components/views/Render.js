@@ -25,6 +25,7 @@ import Expand from '../Expand'
 import ExpandList from '../ExpandList'
 import Json from '../Json'
 import Label from '../Label'
+import List from '../List'
 import Placeholder from '../Placeholder'
 import { renderCurrency, renderFloat } from '../renders'
 import Row from '../Row'
@@ -96,6 +97,11 @@ class RenderClass extends Component {
       case FIELD.TYPE.COL3:
         return <View {...props}>{items.map(Render)}</View>
 
+      case FIELD.TYPE.LIST:
+      case FIELD.TYPE.COL_LIST:
+      case FIELD.TYPE.COL_LIST3:
+        return <List items={_data} {...props}/>
+
       case FIELD.TYPE.LABEL:
         if (items.length) props.children = items.map(Render)
         return <Label {...props}/>
@@ -108,6 +114,10 @@ class RenderClass extends Component {
       case FIELD.TYPE.ROW:
       case FIELD.TYPE.ROW2:
         return <Row {...props}>{items.map(Render)}</Row>
+
+      case FIELD.TYPE.ROW_LIST:
+      case FIELD.TYPE.ROW_LIST2:
+        return <List row={true} items={_data} {...props}/>
 
       case FIELD.TYPE.SPACE:
         return <Space {...props}/>
