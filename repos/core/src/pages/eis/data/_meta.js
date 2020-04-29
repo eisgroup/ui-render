@@ -329,7 +329,7 @@ export default {
                         renderCell: {
                           view: 'Expand',
                           name: '{value}',
-                          id: 'state',
+                          index: '{index}',
                           // toggle extra table item expansion (row in default layout)
                           onClick: 'handleItemExpand', // function is injected by TableView instance on render
                           // items: [{}], // can also make it expand any content inside clicked cell

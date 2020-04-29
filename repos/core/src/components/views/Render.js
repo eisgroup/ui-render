@@ -272,6 +272,7 @@ export function metaToProps (meta, data, instance) {
             // we have to use original config for rendering lists
             ...metaToProps(cloneDeep(configs), data, instance),
             // Transform key path with actual data
+            ...definition.index && {index: interpolateString(definition.index, {index})},
             ...name && {name: interpolateString(definition.name, {index, value})},
             // Filter for row data from parent table (in default layout)
             ...filterItems && {parentItem: value},

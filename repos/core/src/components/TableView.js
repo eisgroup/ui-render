@@ -144,7 +144,14 @@ export default class TableView extends Component {
     })
   }
 
-  handleItemExpand = ({key, value, expanded}) => {
+  /**
+   * Toggle Table item expansion (row in default layout)
+   * @param {Number|String} [index] - index of item to expand
+   * @param {Number|String} [key] - id of item to expand
+   * @param {String|Number} [value] - of given id `key`, if given, to find item that needs expansion
+   * @param {Boolean} expanded - whether item should be expanded
+   */
+  handleItemExpand = ({key, value, index, expanded}) => {
     const {items} = this.props
     value = String(value).toLowerCase()
     this.setState({
@@ -152,7 +159,7 @@ export default class TableView extends Component {
         ...this.state.items,
         expandedByIndex: {
           ...this.state.items.expandedByIndex,
-          [items.findIndex(i => String(i[key]).toLowerCase() === value)]: expanded
+          [index != null ? index : items.findIndex(i => String(i[key]).toLowerCase() === value)]: expanded
         }
       }
     })

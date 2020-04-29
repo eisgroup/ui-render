@@ -8,7 +8,7 @@
       "renderCell": {
         "view": "Expand",
         "name": "{value}",
-        "id": "coverageID",
+        "index": "{index}",
         "onClick": "handleItemExpand"
       }
     },

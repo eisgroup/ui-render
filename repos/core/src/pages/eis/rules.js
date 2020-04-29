@@ -48,7 +48,7 @@ export function toOpenLConfig (meta) {
         firstHeader.renderCell = {
           view: FIELD.TYPE.EXPAND,
           name: '{value}',
-          id: firstHeader.id,
+          index: '{index}',
           onClick: 'handleItemExpand',
         }
       }

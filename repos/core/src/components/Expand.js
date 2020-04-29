@@ -28,6 +28,10 @@ export default class Expand extends Component {
     iconClosed: PropTypes.string, // name of icon for collapsed state
     onClick: PropTypes.func, // callback({expanded, key, value}) on click or Enter press (if `onKeyPress` not given)
     id: PropTypes.string, // argument to pass to 'onClick' callback as `key`
+    index: PropTypes.oneOfType([ // argument to pass to 'onClick' callback as `index`
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     duration: PropTypes.number, // milliseconds for the animation
     className: PropTypes.string,
     classNameLabel: PropTypes.string,
@@ -80,8 +84,8 @@ export default class Expand extends Component {
   }
 
   handleClick = (expanded) => {
-    const {onClick, id, title} = this.props
-    onClick && onClick({expanded, key: id, value: String(title)})
+    const {onClick, id, title, index} = this.props
+    onClick && onClick({expanded, index, key: id, value: String(title)})
   }
 
   renderLabel = () => {
