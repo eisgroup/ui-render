@@ -224,7 +224,7 @@ export function RenderFunc (Name) {
     case FIELD.RENDER.DOUBLE5:
       return (val, index, {id, ...props} = {}) => renderFloat(val, 5, props)
     case FIELD.RENDER.FLOAT:
-      return (val, index, {id, ...props} = {}) => renderFloat(val, undefined, props)
+      return (val, index, {id, ...props} = {}) => isNumeric(val) ? renderFloat(val, undefined, props) : null
     case FIELD.RENDER.PERCENT:
       return (val, index, {decimals} = {}) => toPercent(val, decimals)
     case FIELD.RENDER.TITLE_n_INPUT:
