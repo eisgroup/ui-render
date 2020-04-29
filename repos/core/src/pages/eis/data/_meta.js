@@ -275,7 +275,11 @@ export default {
                               //         ╭ key path to value within items found for given `name` attribute above
                               label: 'ageBand',
                               value: 'numberOfLives',
-                            }
+                              order: 'ageBand', // value to use for sorting, can be defined as any custom attribute
+                              // customOrder: 'ageBand.id', -> will also work with {sort: 'customOrder'}
+                            },
+                            // define which key within `mapItems` to use as sorting order (ex. 'label/value/order')
+                            sort: '-order', // prefix sort attribute with `-` for descending order
                           }
                         ]
                       },

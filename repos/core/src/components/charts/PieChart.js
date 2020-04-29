@@ -34,8 +34,8 @@ export default class PieChart extends Component {
   static propTypes = {
     items: PropTypes.arrayOf(
       PropTypes.shape({
-        value: PropTypes.number.isRequired,
         label: PropTypes.any.isRequired,
+        value: PropTypes.number.isRequired,
       })
     ).isRequired,
     height: PropTypes.number, // the size fo the pie chart
@@ -47,6 +47,10 @@ export default class PieChart extends Component {
     gradient: PropTypes.bool, // default is true
     legends: PropTypes.bool, // whether to render Legends to the side of Pie Chart, default is false
     pointers: PropTypes.bool, // whether to render reference pointers to each pie, default is true if `legends` is false
+    sort: PropTypes.oneOfType([ // items sorting order
+      PropTypes.string, // key path to value used for sorting item's order, prefix with `-` for descending order
+      PropTypes.arrayOf(PropTypes.string),
+    ]),
   }
 
   static defaultProps = {
@@ -77,14 +81,16 @@ export default class PieChart extends Component {
 
   render () {
     const {
-      items, height, unit: u, classNameWrap, className, children,
-      gradient = true, colors: colours, legends, pointers,
+      items: _items, height, unit: u, classNameWrap, className, children,
+      gradient = true, colors: colours, legends, pointers, sort,
       ...props
     } = this.props
     unit = u
+    const sorts = toList(sort, 'clean')
+    const items = sort ? [..._items].sort(by(...sorts)) : _items
     const Container = legends ? Row : Fragment
     const colors = gradientColors(items.length, colours)
-    this.data = dataNormalized(items, colors, gradient)
+    this.data = dataNormalized(items, colors, gradient, sorts)
     return (
       <Container {...legends && {className: classNames('app__pie-chart--ref middle wrap', classNameWrap)}}>
         <View className={classNames('app__pie-chart min-width-290 center', className, {gradient})} {...props}>
@@ -120,9 +126,9 @@ export default class PieChart extends Component {
 /**
  * Converted given Data to normalized list for Chart Rendering
  */
-function dataNormalized (items, colors, gradient) {
+function dataNormalized (items, colors, gradient, sorts = ['-value', 'name']) {
   const list = items.map(({id, label, value}) => ({name: id || label, gradient, value}))
-  return list.sort(by('-value', 'name')).map((item, i) => {
+  return list.sort(by(...sorts)).map((item, i) => {
     item.color = colors[i]
     return item
   })

@@ -215,6 +215,13 @@ export const LANGUAGE_LEVEL = {
   },
 }
 
+/* Mappings */
+export const SORT_ORDER = {
+  0: 'sort',
+  1: 'asc',
+  [-1]: 'desc'
+}
+
 /* Characters */
 export const PLUS = '✛'
 export const MINUS = '╍'

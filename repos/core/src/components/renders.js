@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { LANGUAGE } from '../common/constants'
+import { LANGUAGE, SORT_ORDER } from '../common/constants'
 import { debounce, shortNumber, toUpperCase } from '../common/utils'
 import { ACTIVE, PATH_IMAGES } from '../common/variables'
 import ColorSwatch from './ColorSwatch'
@@ -188,11 +188,7 @@ export function renderSort ({id, order}, {onClick, className} = {}) {
   )
 }
 
-renderSort.icon = {
-  0: 'sort',
-  1: 'asc',
-  [-1]: 'desc'
-}
+renderSort.icon = SORT_ORDER
 
 /**
  * Event handler to autosize Input height to match typed in text height
