@@ -115,6 +115,7 @@ export class InputField extends Component {
     const {onChange, normalize, error: errorMessage, defaultValue, validate: _, ...props} = this.props
     // @Note: defaultValue is only used for UI, internal value is still undefined
     this.value = input.value === '' ? (pristine && defaultValue != null ? defaultValue : input.value) : input.value
+    this.onChange = input.onChange
     return (
       <Input
         {...input}
@@ -129,6 +130,16 @@ export class InputField extends Component {
         {...props} // allow forceful value override
       />
     )
+  }
+
+  componentDidMount () {
+    // Auto dispatch action to set value if normalizer set and is different,
+    const {normalize, onChange} = this.props
+    if (!normalize || this.value === '') return
+    const valueNormalized = normalize(this.value)
+    if (this.value === valueNormalized) return
+    this.onChange(valueNormalized)
+    onChange && onChange(valueNormalized)
   }
 
   // Do not pass 'onChange' to Field because it fires event as argument
