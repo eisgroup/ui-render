@@ -280,6 +280,22 @@ export default {
                             },
                             // define which key within `mapItems` to use as sorting order (ex. 'label/value/order')
                             sort: '-order', // prefix sort attribute with `-` for descending order
+                            items: [
+                              {
+                                view: 'Col',
+                                className: 'align-center',
+                                items: [
+                                  {
+                                    view: 'Title',
+                                    label: 'Label',
+                                  },
+                                  {
+                                    view: 'Text',
+                                    label: 'Anything',
+                                  }
+                                ]
+                              }
+                            ]
                           }
                         ]
                       },

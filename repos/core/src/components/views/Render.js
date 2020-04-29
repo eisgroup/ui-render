@@ -109,6 +109,7 @@ class RenderClass extends Component {
       case FIELD.TYPE.PIE_CHART:
         const {mapItems, ...prop} = props
         if (mapItems) _data = mapProps(_data, mapItems)
+        if (items.length) prop.children = items.map(Render)
         return <PieChart items={_data} {...prop}/>
 
       case FIELD.TYPE.ROW:
