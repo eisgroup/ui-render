@@ -67,9 +67,9 @@ export default class Demo extends Component {
   resetForm = (...args) => this._resetForm(...args)
 
   setup = {
-    reset: (FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm), // must be declared before using `metaToProps`
-    setState: (FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates), // must be declared before using `metaToProps`
-    fetch: (FIELD.FUNC[FIELD.ACTION.FETCH] = fetch), // must be declared before using `metaToProps`
+    reset: (FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm),
+    setState: (FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates),
+    fetch: (FIELD.FUNC[FIELD.ACTION.FETCH] = fetch),
   }
 
   handleUpload = (kind, [file], type) => {

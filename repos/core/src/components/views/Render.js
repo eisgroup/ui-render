@@ -293,14 +293,15 @@ export function metaToProps (meta, data, instance) {
       }
     }
 
-    // Process Object definitions
+    // Process Object/List definitions
     else if (isCollection(definition)) {
       if ((definition.name != null && Object.keys(definition).length === 1)) {
         // Transform {name} - single key objects with name to their values
         meta[key] = isString(definition.name) ? get(data, definition.name, definition.name) : definition.name
       } else {
         // Recursively process the rest of definitions
-        meta[key] = metaToProps(meta[key], data, instance)
+        const _data = (definition.name != null && definition.relativeData) ? get(data, definition.name, data) : data
+        meta[key] = metaToProps(meta[key], _data, instance)
       }
     }
   }
@@ -384,6 +385,9 @@ function getFunctionFromObject (definition, {data, fallback = definition.name} =
   return func || fallback
 }
 
+/**
+ * Map function arguments definition to actual values
+ */
 function transformDefinition (value, {data, args}) {
   if (isString(value)) return interpolateString(
     interpolateString(value, args, {suppressError: true}),
