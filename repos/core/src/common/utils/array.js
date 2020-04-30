@@ -41,7 +41,7 @@ export function hasCommonListValue (...args) {
 }
 
 /**
- * Check if the data passed is an array or object.
+ * Check if the data passed is an array or plain object.
  *
  * @param {*} data - The variable to check
  * @return {boolean}

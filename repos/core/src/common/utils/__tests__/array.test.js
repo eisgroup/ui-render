@@ -4,6 +4,7 @@ import {
   hasCommonListValue,
   hasListValue,
   intersection,
+  isCollection,
   isEqualList,
   isInCollectionAny,
   isInList,
@@ -35,7 +36,26 @@ const NON_ARRAY_VALUES = [
   '',
   {},
   null,
-  undefined
+  undefined,
+  () => {},
+  new Date(),
+]
+
+const NON_COLLECTION_VALUES = [
+  100,
+  1.1,
+  0.0,
+  1e10,
+  1e-10,
+  Infinity,
+  -Infinity,
+  NaN,
+  'foo',
+  '',
+  null,
+  undefined,
+  () => {},
+  new Date(),
 ]
 
 test(`intersection() does not mutate original list, and keeps first list's order`, () => {
@@ -151,6 +171,32 @@ describe(`${hasCommonListValue.name}()`, () => {
     expect(hasCommonListValue([1, 2, 3, 4, 'id'], [1, 3], [2, 3, 4])).toEqual(true)
     expect(hasCommonListValue([1, 2, null, 4, 'id'], [1, 3], [2, 3, 4])).toEqual(false)
     expect(hasCommonListValue([4, 'id'], [1, 3])).toEqual(false)
+  })
+})
+
+describe(`${isCollection.name}()`, () => {
+  it('Returns true for an empty array', () => {
+    expect(isCollection([])).toEqual(true)
+  })
+
+  it('Returns true for a non-empty array', () => {
+    expect(isCollection([1, 2, 3])).toEqual(true)
+  })
+
+  it('Returns true for a empty object', () => {
+    expect(isCollection({})).toEqual(true)
+  })
+
+  it('Returns true for a non-empty object', () => {
+    expect(isCollection({a: 1})).toEqual(true)
+  })
+
+  describe('Returns false for non-array and non-object values', () => {
+    NON_COLLECTION_VALUES.forEach((value) => {
+      it(`[${typeof value}] ${value}`, () => {
+        expect(isList(value)).toBe(false)
+      })
+    })
   })
 })
 
