@@ -16,6 +16,14 @@
             "styles": "padding no-margin"
           },
           {
+            "view": "Input",
+            "label": "Input inside Relative Data",
+            "name": "memberAnnualPremium",
+            "relativeData": true,
+            "type": "number",
+            "styles": "padding no-margin"
+          },
+          {
             "view": "Col",
             "styles": "border radius",
             "items": [

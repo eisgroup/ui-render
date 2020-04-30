@@ -21,6 +21,14 @@ export default {
             styles: 'padding no-margin',
           },
           {
+            view: 'Input',
+            label: 'Input inside Relative Data',
+            name: 'memberAnnualPremium', // relative path
+            relativeData: true,
+            type: 'number',
+            styles: 'padding no-margin',
+          },
+          {
             view: 'Col',
             styles: 'border radius',
             items: [

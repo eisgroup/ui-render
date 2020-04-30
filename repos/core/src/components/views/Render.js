@@ -63,7 +63,7 @@ class RenderClass extends Component {
   // Errors in components will propagate up to componentDidCatch in parent class.
   render () {
     if (this.state.error) return <Placeholder>{String(this.state.error)}</Placeholder>
-    let {data, _data, view, items = [], relativeData: _, ...props} = this.props
+    let {data, _data, view, items = [], relativeData, relativePath, relativeIndex, ...props} = this.props
     if (props.name && _data == null) _data = get(data, props.name) // local data dynamically retrieved from definition
 
     // Pass down data to child renderers, if defined
@@ -181,9 +181,12 @@ class RenderClass extends Component {
         return <Text {...props}/>
 
       default:
-        const {mapOptions, ...rest} = props
-        if (mapOptions) rest.options = mapProps(rest.options || [], mapOptions)
-        return ACTIVE.renderField({view, items, ...rest})
+        const {mapOptions, ...input} = props
+        if (mapOptions) input.options = mapProps(input.options || [], mapOptions)
+        if (relativeData && relativePath != null && input.name) {
+          input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
+        }
+        return ACTIVE.renderField({view, items, ...input})
     }
     return null
   }
@@ -236,14 +239,18 @@ export function RenderFunc (Name) {
 }
 
 /**
- * Map meta.json declarations to props ready for rendering (by mutation)
+ * Recursively map meta.json declarations to props ready for rendering (by mutation)
+ * @Note: this function must only transform config, without adding data.
+ *  Because data is added at runtime on Render.
  *
  * @param {Object} meta - json
  * @param {Object} data - json
  * @param {Object} instance - of React Component class that is rendering the data, for mapping dynamic states
+ * @param {String} [relativePath] - path used for getting data of parent container
+ * @param {String|Number} [relativeIndex] - index used for getting data of parent container
  * @returns {Object} props - mutated meta
  */
-export function metaToProps (meta, data, instance) {
+export function metaToProps (meta, {data, instance, relativePath, relativeIndex}) {
   for (const key in meta) {
     const definition = meta[key]
     if (!definition) continue
@@ -266,15 +273,19 @@ export function metaToProps (meta, data, instance) {
         // Render is a field definition
         if (definition.view) {
           const {name, filterItems, ...configs} = definition
+          const revPath = {relativePath: meta.name || relativePath, relativeIndex: index}
+          const options = {data, instance, ...revPath}
           return Render({
+            // Relative Path is required for nested Inputs
+            ...revPath,
             ...props,
             // Recursively map definitions within Render function
             // Note: since definition is mutated on each transform,
             // we have to use original config for rendering lists
-            ...metaToProps(cloneDeep(configs), data, instance),
+            ...metaToProps(cloneDeep(configs), options),
             // Transform key path with actual data
-            ...definition.index && {index: interpolateString(definition.index, {index})},
             ...name && {name: interpolateString(definition.name, {index, value})},
+            ...definition.index && {index: interpolateString(definition.index, {index})},
             // Filter for row data from parent table (in default layout)
             ...filterItems && {parentItem: value},
             // Inject functions by their name string
@@ -293,18 +304,27 @@ export function metaToProps (meta, data, instance) {
       }
     }
 
-    // Process Object/List definitions
+    // Process nested Object/List definitions
     else if (isCollection(definition)) {
       if ((definition.name != null && Object.keys(definition).length === 1)) {
         // Transform {name} - single key objects with name to their values
         meta[key] = isString(definition.name) ? get(data, definition.name, definition.name) : definition.name
       } else {
         // Recursively process the rest of definitions
-        const _data = (definition.name != null && definition.relativeData) ? get(data, definition.name, data) : data
-        meta[key] = metaToProps(meta[key], _data, instance)
+        // Relative path must always be passed down, because nested Inputs inside List require absolute path for `name`
+        const options = {data, instance, relativePath: meta.name || relativePath, relativeIndex}
+        if (meta.relativeData && meta.name != null) options.data = get(data, meta.name, data)
+        meta[key] = metaToProps(meta[key], options)
       }
     }
   }
+
+  // Pass down relative path to nested views
+  if (meta.view) {
+    if (relativePath != null && meta.relativePath == null) meta.relativePath = relativePath
+    if (relativeIndex != null && meta.relativeIndex == null) meta.relativeIndex = relativeIndex
+  }
+
   return meta
 }
 

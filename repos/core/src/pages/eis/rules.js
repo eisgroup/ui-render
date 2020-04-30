@@ -117,7 +117,10 @@ export function withUISetup ({form, ...options}) {
     Object.defineProperty(Class.prototype, 'meta', {
       get () {
         if (this._meta != null) return this._meta
-        return this._meta = metaToProps(transformConfig(cloneDeep(get(this.state, 'meta.json'))), this.data, this)
+        return this._meta = metaToProps(transformConfig(cloneDeep(get(this.state, 'meta.json'))), {
+          data: this.data,
+          instance: this
+        })
       },
       set (value) {
         return this._meta = value
@@ -157,7 +160,6 @@ export function withUISetup ({form, ...options}) {
         return this._handleSubmit = this.props.handleSubmit(this.submit.bind(this))
       },
     })
-
 
     // Define instance method
     // @Note: functions should have consistent pattern of receiving important arguments first,

@@ -100,7 +100,7 @@ export default class Demo extends Component {
     const {data, meta, showMeta} = this.state
     const hasData = !isEmpty(data.json)
     const hasMeta = !isEmpty(meta.json)
-    const props = (hasData && hasMeta) ? metaToProps(cloneDeep(meta.json), data.json, this) : null
+    const props = (hasData && hasMeta) ? metaToProps(cloneDeep(meta.json), {data: data.json, instance: this}) : null
     const uploadProps = {
       hasHeader: false,
       multiple: false,
