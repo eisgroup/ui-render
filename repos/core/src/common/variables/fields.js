@@ -21,6 +21,7 @@ FIELD.TYPE = {
   LABEL: 'Label',
   LIST: 'List', // list of Col components with dynamic `renderItem` attributes
   PIE_CHART: 'PieChart', // Pie chat (can be in shape of donut) with optional legends
+  PROGRESS_STEPS: 'ProgressSteps', // Progress Steps, with content like Tabs
   ROW: 'Row', // Horizontal row layout
   ROW2: 'HorizontalLayout', // alias for Row
   ROW_LIST: 'RowList', // alias for List with Row layout

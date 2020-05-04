@@ -241,6 +241,36 @@ export default {
           ],
         },
         {
+          view: 'ProgressSteps',
+          defaultIndex: 1,
+          className: 'bg-white padding margin-v border radius',
+          classNameSteps: 'padding-h-largest',
+          items: [
+            {
+              label: 'Information',
+              done: true,
+              content: {
+                view: 'Text',
+                label: 'Step 1 content completed'
+              }
+            },
+            {
+              label: 'Requirements'
+            },
+            {
+              label: 'Submission',
+              error: true,
+              content: {
+                view: 'Text',
+                label: 'Step 3 with missing content'
+              }
+            },
+            {
+              step: '?'
+            },
+          ]
+        },
+        {
           view: 'Tabs',
           // defaultIndex: 1,
           items: [

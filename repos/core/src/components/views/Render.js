@@ -27,6 +27,7 @@ import Json from '../Json'
 import Label from '../Label'
 import List from '../List'
 import Placeholder from '../Placeholder'
+import ProgressSteps from '../ProgressSteps'
 import { renderCurrency, renderFloat } from '../renders'
 import Row from '../Row'
 import Space from '../Space'
@@ -111,6 +112,17 @@ class RenderClass extends Component {
         if (mapItems) _data = mapProps(_data, mapItems)
         if (items.length) prop.children = items.map(Render)
         return <PieChart items={_data} {...prop}/>
+
+      case FIELD.TYPE.PROGRESS_STEPS:
+        const steps = items.map(({step, label, content, data, ...info}, i) => {
+          return {
+            ...info,
+            step: isObject(step) ? Render(step, i) : step,
+            label: isObject(label) ? Render(label, i) : label,
+            content: isObject(content) ? Render.bind(this, {...content, data}, i) : content
+          }
+        })
+        return <ProgressSteps items={steps} {...props}/>
 
       case FIELD.TYPE.ROW:
       case FIELD.TYPE.ROW2:
