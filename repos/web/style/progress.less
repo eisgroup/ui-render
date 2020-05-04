@@ -125,19 +125,19 @@
 // =============================================================================
 // STEPS
 // =============================================================================
-@progress-steps-line-height: size(2);
+@progress-steps-line-height: size(3);
 @progress-steps-border-size: size(2);
-@progress-steps-button-min-width: @size-large;
+@progress-steps-button-size: @size-small;
 @progress-steps-connector-color: @color-text-grey;
 @progress-steps-connector-color-faded: fade(@color-text-grey, 50%);
-@progress-steps-connector-color-active: @color-primary-light;
-@progress-steps-connector-color-active-faded: fade(@progress-steps-connector-color-active, 50%);
+@progress-steps-connector-color-passed: @color-primary-light;
+@progress-steps-connector-color-passed-faded: fade(@progress-steps-connector-color-passed, 50%);
 
 .app__progress--steps {
 
   align-items: center;
 
-  &.connector {
+  &.connector { // vertical connect from step number
     @size: @margin-large;
     padding-bottom: @size;
 
@@ -153,18 +153,22 @@
         background-image: linear-gradient(180deg, @progress-steps-connector-color, @progress-steps-connector-color-faded);
       }
 
-      &.active:before,
-      &.done:not(.active):before {
-        background-image: linear-gradient(180deg, @progress-steps-connector-color-active, @progress-steps-connector-color-active-faded);
+      &.passed:before,
+      &.done:not(.passed):before {
+        background-image: linear-gradient(180deg, @progress-steps-connector-color-passed, @progress-steps-connector-color-passed-faded);
       }
 
-      &.done:not(.active):before {
+      &.done:not(.passed):before {
         &:extend(.fade all);
       }
     }
   }
 
   .app__progress__step {
+    &.labeled {
+      padding-bottom: @progress-steps-button-size + @padding-base;
+    }
+
     &:not(.error) {
       .button {
         .inverted & {
@@ -172,7 +176,7 @@
         }
       }
 
-      &.active, &.done {
+      &.passed, &.done {
         .button {
           &:extend(.button.primary all);
         }
@@ -188,19 +192,23 @@
 
   .button {
     &:extend(.no-outline all);
-    min-width: @progress-steps-button-min-width;
     line-height: 1;
     box-sizing: content-box;
     border-width: @progress-steps-border-size;
+
+    i.icon:before {
+      opacity: 1;
+    }
   }
 
   .app__progress--bar {
-    height: @progress-steps-line-height;
+    padding-top: @progress-steps-button-size - @progress-steps-line-height;
     flex: 1;
 
     .app__progress--bar__wrapper {
       background-color: @color-bg-grey;
       border: transparent;
+      height: @progress-steps-line-height;
     }
   }
 }

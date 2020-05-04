@@ -8,6 +8,7 @@ import Button from '../components/Button'
 import Collapse from '../components/Collapse'
 import Icon from '../components/Icon'
 import Dates from '../components/inputs/Dates'
+import ProgressSteps from '../components/ProgressSteps'
 import ScrollView from '../components/ScrollView'
 import Slider from '../components/Slider'
 import Space from '../components/Space'
@@ -67,6 +68,14 @@ export default class Tester extends Component {
       <View fill className='app__page wrap padding'>
         <h1>Tester</h1>
         <LanguageSelection/>
+        <ProgressSteps defaultIndex={1} items={
+          [
+            {label: 'Personal Info'},
+            {label: 'Requirements', done: true},
+            {label: 'Submission', error: true},
+            {step: '?'},
+          ]
+        }/>
         <View className='max-width-320'>
           <Slider step={1} min={1} max={100} onChange={console.warn} defaultValue={30}/>
           <Space/>

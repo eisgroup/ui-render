@@ -7,7 +7,7 @@
   @paddingBottom: @paddingTop * 1.2;
   @paddingH: @paddingTop * 2.2;
   @radius: @radius-base;
-  @small: @size-smallest;
+  @small: @size-smaller;
   @base: @size-large;
   @large: @size-larger;
   @background: transparent;
@@ -59,6 +59,10 @@
 
   &.small {
     .sizeScale(@small);
+
+    i.icon {
+      font-size: @small; // crisp display fix
+    }
   }
 
   &.large {
@@ -80,15 +84,18 @@
     //font-size: @base * @sizeScale;
     letter-spacing: 0 !important;
     transform: none;
+    width: @base;
 
     &.small {
       //  font-size: @small * @sizeScale;
       .scalePadding(@size: @small * @sizeScale; @top: @padding; @left: @padding;);
+      width: @small;
     }
 
     &.large {
       //  font-size: @large * @sizeScale;
       .scalePadding(@size: @large * @sizeScale; @top: @padding; @left: @padding;);
+      width: @large;
     }
 
     @{select-interaction} {
