@@ -65,13 +65,13 @@ export default class Tester extends Component {
   renderTester = () => {
     const { actions } = this.props
     return (
-      <View fill className='app__page wrap padding'>
+      <ScrollView fill className='app__page padding'>
         <h1>Tester</h1>
         <LanguageSelection/>
-        <ProgressSteps defaultIndex={1} items={
+        <ProgressSteps defaultIndex={1} classNameSteps='padding-h-largest' items={
           [
-            {label: 'Personal Info'},
-            {label: 'Requirements', done: true},
+            {label: 'Information', content: 'Step 1 content'},
+            {label: 'Requirements', done: true, content: 'Step 2 content'},
             {label: 'Submission', error: true},
             {step: '?'},
           ]
@@ -106,7 +106,7 @@ export default class Tester extends Component {
           toggleRender={isOpen => <Icon className='padding' name={isOpen ? 'minus' : 'plus'}/>}
           contentRender={isOpen => isOpen && <Text>Shown content</Text>}
         />
-      </View>
+      </ScrollView>
     )
   }
 
