@@ -1,5 +1,6 @@
 import './_init'
-import './gql'
+// import './gql'
+import './rest'
 import './store'
 // import './socket' // separate socket server (not related to GraphQL subscription)
 // import './tester' // may get import error on dev mode
