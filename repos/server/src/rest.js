@@ -1,6 +1,7 @@
-import { ACTIVE, NODE_ENV } from 'core/src/common/variables'
+import { __PROD__, ACTIVE, NODE_ENV } from 'core/src/common/variables'
 import data from 'core/src/pages/eis/data/_data'
 import meta from 'core/src/pages/eis/data/_meta'
+import cors from 'cors'
 import express from 'express'
 import { API_PORT } from './common/config'
 
@@ -11,6 +12,7 @@ import { API_PORT } from './common/config'
 
 // Server Config
 const server = express()
+if (!__PROD__) server.use(cors())
 
 // Endpoints
 server.get('/', (req, res) => res.json({name: 'Hello!'}))
