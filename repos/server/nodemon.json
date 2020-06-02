@@ -16,6 +16,7 @@
   },
   "ext": "js json graphql gql",
   "watch": [
-    "./src/"
+    "./src/",
+    "../core/src/"
   ]
 }

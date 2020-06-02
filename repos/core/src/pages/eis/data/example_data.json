@@ -2,9 +2,11 @@
   "planID": "Golden",
   "layouts": [
     {
+      "id": "1",
       "name": "Layout Alpha"
     },
     {
+      "id": "2",
       "name": "Layout Beta"
     }
   ],

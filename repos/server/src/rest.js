@@ -1,6 +1,6 @@
 import { __PROD__, ACTIVE, NODE_ENV } from 'core/src/common/variables'
-import data from 'core/src/pages/eis/data/_data'
-import meta from 'core/src/pages/eis/data/_meta'
+import meta from 'core/src/pages/eis/data/example_components'
+import data from 'core/src/pages/eis/data/example_data'
 import cors from 'cors'
 import express from 'express'
 import { API_PORT } from './common/config'
