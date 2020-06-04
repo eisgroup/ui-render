@@ -7,8 +7,13 @@ export default [
     name: 'Rating Details',
     elementConfigs: [
       {
+        view: 'Title',
+        displayName: 'Plan ID',
+        name: 'planID',
+      },
+      {
         view: 'Table',
-        // displayName: 'Coverages Table',
+        displayName: 'Coverages Table',
         name: 'coverages',
         headers: [  // -> must be defined if data contains nested tables, because rendering cells as objects will cause errors
           {
