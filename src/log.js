@@ -90,7 +90,7 @@ benchA.skip = new Function('')  // eslint-disable-line
  *
  * @requires __DEV__
  * @param {string} first - string to prepend to the log message
- * @param {Array} args - optionally pass additional arguments to log
+ * @param {*[]} [args] - optionally pass additional arguments to log
  * @return void
  */
 export function log (first, ...args) {

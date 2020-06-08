@@ -4,19 +4,20 @@
  * =============================================================================
  */
 
+export * from './_envs'
 export * from './constants'
 export * from './array'
 export * from './codec'
-export * from './color'
-// export * from './crypto'
-// export * from './file'
+// export * from './color' // to be imported directly to reduce bundle size
+// export * from './crypto' // to be imported directly to reduce bundle size
+// export * from './file' // to be imported directly to reduce bundle size
 export * from './function'
 export * from './log'
-// export * from './media'
+// export * from './media' // to be imported directly to reduce bundle size
 export * from './number'
 export * from './object'
-// export * from './storage'
+export * from './storage'
 export * from './string'
-// export * from './time'
-// export * from './utility'
-export * from './translations'
+// export * from './time' // to be imported directly to reduce bundle size
+// export * from './utility' // to be imported directly to reduce bundle size
+// export * from './translations' // to be imported directly to reduce bundle size
