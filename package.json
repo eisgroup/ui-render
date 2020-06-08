@@ -1,5 +1,5 @@
 {
-  "name": "@ecoin/utils",
+  "name": "dux-utils",
   "version": "0.0.1",
   "description": "JS Helper Functions",
   "license": "MIT",
