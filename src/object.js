@@ -243,7 +243,7 @@ export function hasObjMatch(obj, searchObj) {
  *
  * @param {*} obj - the object to check
  * @param {object} keys - key paths and values to match, e.g. { 'properties.id': 7, type: 'DRAFT' }
- * @param {enum} match - one of comparison types ['deep', 'shallow', 'include'], default is `shallow`
+ * @param {String} match - one of comparison types ['deep', 'shallow', 'include'], default is `shallow`
  * @returns {boolean} - true if a match found.
  */
 export function hasObjKeys(obj, keys = {}, match = 'deep') {
@@ -311,7 +311,7 @@ export function hasObjKeys(obj, keys = {}, match = 'deep') {
  *
  * @param {*} obj - the collection to search for matching object
  * @param {Object} keys - object with key paths and values to match, e.g. { 'properties.id': 7, type: 'DRAFT' }
- * @param {enum} match - one of comparison types ['deep', 'shallow', 'include']
+ * @param {String} match - one of comparison types ['deep', 'shallow', 'include']
  * @returns {Object} - the matching object.
  */
 export function findObjByKeys(obj, keys = {}, match = 'deep') {
