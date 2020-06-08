@@ -1,4 +1,4 @@
-import CircularJSON from 'circular-json' // do not change to `flatted` package in existing app, it breaks existing data
+import CircularJSON from 'circular-json' // do not change to `flatted` package, because it does not comply to JSON standard
 
 /**
  * DATA FORMAT FUNCTIONS =======================================================
