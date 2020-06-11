@@ -66,19 +66,30 @@ test(`intersection() does not mutate original list, and keeps first list's order
   expect(list).toEqual(listClone)
 })
 
-test(`${isEqualList.name}() returns true when elements inside two lists are the same`, () => {
-  let a = []
-  let b = a
-  expect(isEqualList(a, b)).toBe(true)
-  b.push(1)
-  expect(isEqualList(a, b)).toBe(true)
-  b = [...a]
-  expect(isEqualList(a, b)).toBe(true)
-  a = [null]
-  expect(isEqualList(a, b)).toBe(false)
-  b = [null]
-  expect(isEqualList(a, b)).toBe(true)
+
+describe(`${isEqualList.name}()`, ()=> {
+  test(`returns true when elements inside two lists are the same`, () => {
+    let a = []
+    let b = a
+    expect(isEqualList(a, b)).toBe(true)
+    b.push(1)
+    expect(isEqualList(a, b)).toBe(true)
+    b = [...a]
+    expect(isEqualList(a, b)).toBe(true)
+    a = [null]
+    expect(isEqualList(a, b)).toBe(false)
+    b = [null]
+    expect(isEqualList(a, b)).toBe(true)
+  })
+  describe('Returns false for non-array and non-object values', () => {
+    NON_ARRAY_VALUES.forEach((value) => {
+      it(`[${typeof value}] ${value}`, () => {
+        expect(isEqualList(value, [1])).toBe(false)
+      })
+    })
+  })
 })
+
 
 test(`${isInCollectionAny.name}() returns true when include match found for any element`, () => {
   expect(isInCollectionAny([{name: 'god', age: 'eternal'}], {name: 'dog'}, {name: 'god'})).toBe(true)

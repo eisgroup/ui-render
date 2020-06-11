@@ -60,6 +60,7 @@ export function isCollection (data) {
 export function isEqualList (a, b) {
 	if (a === b) return true
 	if (a && b && a.length !== b.length) return false
+	if (!a || !b) return false
 	for (const i in a) {
 		if (a[i] !== b[i]) return false
 	}
