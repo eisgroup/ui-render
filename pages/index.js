@@ -1,11 +1,21 @@
+import { logRender } from 'dux-utils'
 import Head from 'next/head'
+import React, { Component } from 'react'
 
-export default function Home() {
+export default class HomePage extends Component {
+  render () {
+    console.log(`I've rendered!!!`)
+    return <Home {...this.props}/>
+  }
+}
+logRender(HomePage)
+
+function Home () {
   return (
     <div className="container">
       <Head>
         <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.ico"/>
       </Head>
 
       <main>
