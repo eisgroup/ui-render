@@ -2,13 +2,13 @@ import { logRender } from 'dux-utils'
 import Head from 'next/head'
 import React, { Component } from 'react'
 
+@logRender
 export default class HomePage extends Component {
   render () {
     console.log(`I've rendered!!!`)
     return <Home {...this.props}/>
   }
 }
-logRender(HomePage)
 
 function Home () {
   return (

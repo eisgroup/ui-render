@@ -15,6 +15,7 @@
     "react-dom": "16.13.1"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-decorators": "^7.10.1",
     "next-transpile-modules": "^3.3.0"
   }
 }
