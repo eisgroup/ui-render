@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "chalk": "^4.1.0",
     "dux-utils": "^0.0.4",
     "next": "9.3.5",
     "react": "16.13.1",
