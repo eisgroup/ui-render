@@ -3,9 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "yarn css --sourcemap && next dev & yarn style --sourcemap",
+    "build": "yarn build:css && next build",
+    "build:css": "NODE_ENV=production yarn style css",
+    "start": "next start",
+    "restart": "yarn build && yarn start",
+    "style": "node ./node_modules/less-watcher-compiler --gulpfile ./node_modules/less-watcher-compiler/gulpfile.js --cwd ./",
+    "css": "yarn style symlink && yarn style css"
   },
   "dependencies": {
     "chalk": "^4.1.0",
@@ -16,7 +20,9 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.10.1",
+    "less-watcher-compiler": "^0.0.4",
     "next-compose-plugins": "^2.2.0",
-    "next-transpile-modules": "^3.3.0"
+    "next-transpile-modules": "^3.3.0",
+    "semantic-ui-less": "^2.4.1"
   }
 }

@@ -12,10 +12,11 @@ export default class HomePage extends Component {
 
 function Home () {
   return (
-    <div className="container">
+    <div className={'container'}>
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico"/>
+        {/*<link rel="stylesheet" href="css/all.css"/>*/}
       </Head>
 
       <main>
@@ -73,7 +74,6 @@ function Home () {
         .container {
           min-height: 100vh;
           padding: 0 0.5rem;
-          display: flex;
           flex-direction: column;
           justify-content: center;
           align-items: center;
