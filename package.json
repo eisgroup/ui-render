@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.10.1",
+    "next-compose-plugins": "^2.2.0",
     "next-transpile-modules": "^3.3.0"
   }
 }
