@@ -6,8 +6,6 @@ module.exports = function () {
         task: 'css', // name of the task to run, must be one of ['css', 'copy']
         watch: [ // file/s to watch for changes, using glob pattern
           'style/**/*.less',
-          'style/override/**/*',
-          'style/theme.config'
         ],
         compile: 'style/_all.less', // file/s to compile when changes detected, using glob pattern
         output: 'public/static/', // destination directory where new file/s should be saved
@@ -21,6 +19,17 @@ module.exports = function () {
         compile: 'style/fonts/**/*.{eot,eof,svg,ttf,woff,woff2}', // only copy over files with matched extensions
         output: 'public/static/fonts/',
         renameOptions: {dirname: ''}, // make folder structure flat on output, using `gulp-rename` npm package
+      },
+      /* Subtask to compile Semantic UI only to improve performance */
+      {
+        task: 'css',
+        watch: [
+          'style/override/**/*',
+          'style/theme.config'
+        ],
+        compile: 'style/_semantic.less',
+        output: 'public/static/',
+        renameOptions: {basename: 'semantic'}, // change output file name
       },
     ],
     symlinks: [ // useful for Semantic UI theme.config setup using `semantic-ui-less` library

@@ -6,7 +6,7 @@
 // Example: "common/*.less" is less flexible but compiles much faster
 // =============================================================================
 /* Framework */
-@import "_semantic";
+//@import "_semantic";
 /* Icons */
 @import "fonts/icons/style";
 /* Common */
@@ -14,6 +14,8 @@
 @import "_mixins";
 @import "_layout";
 @import "_app";
+@import "_spacing";
+// must be last to override styles
 
 /* Modules */
 @import "animation";
@@ -43,7 +45,6 @@
 @import "progress";
 //@import "reviews";
 @import "scrollbar";
-@import "spacing";
 @import "slider";
 @import "stats";
 //@import "svg";

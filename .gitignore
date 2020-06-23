@@ -3,6 +3,7 @@
 # ==============================================================================
 /dist
 /**/public/static/all.css
+/**/public/static/semantic.css
 /unity
 repos/server/uploads
 

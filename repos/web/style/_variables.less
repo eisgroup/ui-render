@@ -216,8 +216,7 @@
 
 /* Google Fonts Request */
 @font-sizes:                    '@{font-weight},@{font-weight-bold}';
-@font-request:                  '@{fonts-from-google}&display=swap&subset=@{font-subset}';
-.loadGoogleFonts(@font-request);
+@font-request:                  '@{fonts-from-google}&display=swap&subset=@{font-subset}'; // loaded inside `app.less`
 
 @font-family-icon-name:         'icons'; // Icons Font
 @font-family-icon:              @font-family-icon-name, sans-serif;

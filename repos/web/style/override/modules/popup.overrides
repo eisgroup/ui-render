@@ -1,9 +1,11 @@
 /*******************************
         User Overrides
 *******************************/
+@import "../../_mixins";
+
 .ui.popup {
   transition: initial;
-  
+
   &.inverted {
     border: @border-base;
 
