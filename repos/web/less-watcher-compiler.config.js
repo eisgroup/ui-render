@@ -5,7 +5,7 @@ module.exports = function () {
       {
         task: 'css', // name of the task to run, must be one of ['css', 'copy']
         watch: [ // file/s to watch for changes, using glob pattern
-          'style/**/*.less',
+          'style/*.less', // only match files in root folder, sub-folders should have their own watcher
         ],
         compile: 'style/_all.less', // file/s to compile when changes detected, using glob pattern
         output: 'public/static/', // destination directory where new file/s should be saved
@@ -25,9 +25,8 @@ module.exports = function () {
         task: 'css',
         watch: [
           'style/override/**/*',
-          'style/theme.config'
         ],
-        compile: 'style/_semantic.less',
+        compile: 'style/override/_semantic.less',
         output: 'public/static/',
         renameOptions: {basename: 'semantic'}, // change output file name
       },
@@ -35,7 +34,7 @@ module.exports = function () {
     symlinks: [ // useful for Semantic UI theme.config setup using `semantic-ui-less` library
       {
         // paths are relative to process.cwd()
-        target: 'style/theme.config', // path to the source file to reference
+        target: 'style/override/theme.config', // path to the source file to reference
         link: '../../node_modules/semantic-ui-less/theme.config' // path to the file that references the target
       }
     ],
