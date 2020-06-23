@@ -9,18 +9,19 @@
     "react-scripts": "2.1.0"
   },
   "scripts": {
-    "start": "yarn cors && yarn gql && yarn css && react-app-rewired start & yarn style",
+    "start": "yarn cors && yarn gql && yarn css --sourcemap && react-app-rewired start & yarn style --sourcemap",
     "build": "yarn css --minify && react-app-rewired build && yarn clean && yarn build-dist",
     "build-dist": "mkdir -p ../../dist/web && yarn delete ../../dist/web/* && cp -rf build/* ../../dist/web && yarn delete build && cp -rf ./config/* ../../dist/web",
+    "build:css": "NODE_ENV=production yarn style css",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
-    "css": "yarn gulp theme.config css",
+    "css": "yarn style symlink && yarn style css",
     "cors": "open -a Google\\ Chrome --args --disable-web-security --user-data-dir",
     "gulp": "../../node_modules/gulp/bin/gulp.js",
     "gql": "yarn delete ./node_modules/.cache/babel-loader",
     "delete": "../../node_modules/rimraf/bin.js",
-    "clean": "yarn delete {build/**/*.map,build/**/**/*.map}",
-    "style": "yarn gulp --sourcemap"
+    "clean": "yarn delete {build/**/*.map,buildless-watcher-compiler.config.js/**/**/*.map}",
+    "style": "node ../../node_modules/less-watcher-compiler --gulpfile ../../node_modules/less-watcher-compiler/gulpfile.js --cwd ./"
   },
   "eslintConfig": {
     "extends": "react-app",

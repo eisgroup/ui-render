@@ -12,15 +12,19 @@
 
   /* Applying transition by default causes flickering on scroll on Safari */
   //transition: @speed-transition; // animating by default creates a nice UI feel
-  /* Stop scroll flickering of content with `transform` on iOS Safari */
-  -webkit-backface-visibility: hidden;
-  //-webkit-transform: translate3d(0, 0, 0);
+  /*
+  - Improve performance by promoting all elements to Composite layer
+  - Stop scroll flickering of content with `transform` on iOS Safari
+  */
+  backface-visibility: hidden;
+  //transform: translate3d(0, 0, 0); // or this, same effect as above
 
   &:focus:not(a):not(.a) { // do not add other selectors here, like `[tabIndex="-1"]` because it will override form inputs
     .outline();
   }
 }
 
+// This may be replaced with specific class to improve performance
 *[tabIndex="-1"] {
   .no-outline();
 }
