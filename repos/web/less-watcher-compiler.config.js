@@ -6,6 +6,7 @@ module.exports = function () {
         task: 'css', // name of the task to run, must be one of ['css', 'copy']
         watch: [ // file/s to watch for changes, using glob pattern
           'style/*.less', // only match files in root folder, sub-folders should have their own watcher
+          'style/fonts/**/*.less',
         ],
         compile: 'style/_all.less', // file/s to compile when changes detected, using glob pattern
         output: 'public/static/', // destination directory where new file/s should be saved
@@ -14,7 +15,7 @@ module.exports = function () {
       {
         task: 'copy', // copy over `compile` file/s to `output` directory without compilation
         watch: [
-          'style/fonts/**/*', // watch for changes of all file types within `style/fonts/` directory
+          'style/fonts/**/*.{eot,eof,svg,ttf,woff,woff2}', // watch for changes of all file types within `style/fonts/` directory
         ],
         compile: 'style/fonts/**/*.{eot,eof,svg,ttf,woff,woff2}', // only copy over files with matched extensions
         output: 'public/static/fonts/',

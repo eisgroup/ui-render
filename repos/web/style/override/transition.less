@@ -1,0 +1,48 @@
+/*******************************
+ Transitions module replacement
+*******************************/
+.transition {
+  animation-iteration-count: 1;
+  animation-duration: 300ms;
+  animation-timing-function: ease;
+  animation-fill-mode: both;
+}
+
+/*******************************
+            States
+*******************************/
+///* Animating */
+//.animating.transition {
+// -webkit-backface-visibility: hidden;
+// backface-visibility: hidden;
+// visibility: visible !important;
+//}
+///* Loading */
+//.loading.transition {
+// position: absolute;
+// top: -99999px;
+// left: -99999px;
+//}
+
+/* Hidden */
+.hidden.transition { // required for dropdown
+  display: none;
+  visibility: hidden;
+}
+
+/* Visible */
+.visible.transition { // required for dropdown
+  display: block !important;
+  visibility: visible !important;
+}
+
+///* Disabled */
+//.disabled.transition {
+// animation-play-state: paused;
+//}
+///*******************************
+//          Variations
+//*******************************/
+//.looping.transition {
+// animation-iteration-count: infinite;
+//}

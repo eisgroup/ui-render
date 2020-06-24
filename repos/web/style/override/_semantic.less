@@ -66,4 +66,5 @@
 // & { @import "@{libPath}definitions/modules/sidebar"; }
 // & { @import "@{libPath}definitions/modules/sticky"; }
 // & { @import "@{libPath}definitions/modules/tab"; }
- & { @import "@{libPath}definitions/modules/transition"; }
+// & { @import "@{libPath}definitions/modules/transition"; } // transition package is 12kB, but mostly unused
+@import 'transition'; // replacing with our own compact version
