@@ -13,6 +13,11 @@ export default [
       },
       {
         view: 'Table',
+        displayName: 'Layouts Table',
+        name: 'layouts'
+      },
+      {
+        view: 'Table',
         displayName: 'Coverages Table',
         name: 'coverages',
         headers: [  // -> must be defined if data contains nested tables, because rendering cells as objects will cause errors
