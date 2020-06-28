@@ -103,6 +103,40 @@ export function debounceBy (duration, options) {
 }
 
 /**
+ * Decorates a class method so that it is throttled by the specified duration
+ * @Note:
+ *   - the method will have to bind manually, and cannot be defined as class property arrow function
+ *   - see `throttle()` method for docs
+ *
+ * @example:
+ *   class Search extends Component {
+ *     @throttleBy(200)
+ *     handleSearch () {...}
+ *   }
+ *
+ * @param {Number} [duration] - milliseconds to delay
+ * @param {Object} [options] - for throttle
+ * @returns {Function} decorator - for class method
+ */
+export function throttleBy (duration = TIME_DURATION_INSTANT, options) {
+	return function innerDecorator (target, key, descriptor) {
+		return {
+			configurable: true,
+			enumerable: descriptor.enumerable,
+			get: function getter () {
+				// Attach this function to the instance (not the class)
+				Object.defineProperty(this, key, {
+					configurable: true,
+					enumerable: descriptor.enumerable,
+					value: _.throttle(descriptor.value, duration, options),
+				})
+				return this[key]
+			},
+		}
+	}
+}
+
+/**
  * Delay given Function execution
  *
  * @param {Function} func - to call
