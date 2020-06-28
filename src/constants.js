@@ -97,7 +97,7 @@ export const ALL_RESULTS = [
 
 /* Distance */
 export const ONE_MM = 1
-export const ONE_CM = ONE_MM * 100
+export const ONE_CM = ONE_MM * 10
 export const ONE_METER = ONE_MM * 1000
 export const ONE_KM = ONE_METER * 1000
 
