@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import React, { useContext } from 'react'
 import { warn } from 'utils-pack'
-import { SOUND } from './files'
-import styles from './styles'
+import { SOUND } from '../files'
+import styles from '../styles'
 
 /**
  * Add Accessibility Support to React Component
