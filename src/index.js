@@ -6,6 +6,7 @@
 
 export * from './_envs'
 export * from './constants'
+export * from './definitions'
 export * from './array'
 export * from './codec'
 // export * from './color' // to be imported directly to reduce bundle size

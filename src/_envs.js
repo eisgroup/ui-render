@@ -19,6 +19,6 @@ export const UNDEFINED = (Undefined => Undefined)()
 export const ACTIVE = {
 	// will be overridden at runtime, used for avoiding circular import and env-dependent libraries
 	LANG: LANGUAGE.ENGLISH, // currently used language
-	storage: typeof localStorage !== 'undefined' ? localStorage : undefined, // LocalStorage for Node
+	Storage: typeof localStorage !== 'undefined' ? localStorage : undefined, // LocalStorage for Node
 	WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined, // WebSocket for Node
 }

@@ -1,7 +1,7 @@
-import { ADD, DELETE, GET, SET } from './constants'
 import { __DEV__, ACTIVE } from './_envs'
 import { isList } from './array'
 import { fromJSON, toJSON } from './codec'
+import { ADD, DELETE, GET, SET } from './constants'
 import { enumCheck } from './function'
 import { log } from './log'
 import { update } from './object'
@@ -55,9 +55,10 @@ performCache.cache = {}
  * @param {string} storageKey - stored value's key identifier
  * @param {*} value - value to store
  * @param {Array|Object} initialValue - used for ADD ACTION when saving the first time
+ * @param {Object} [Active] - object containing currently used storage via key path .Storage
  * @return {*} - Local or AsyncStorage promise result or stored value for GET action
  */
-export function performStorage (ACTION, storageKey, value = null, initialValue = []) {
+export function performStorage (ACTION, storageKey, value = null, initialValue = [], Active = ACTIVE) {
   /* ADD action abstraction */
   if (ACTION === ADD) {
     const oldData = performStorage(GET, storageKey) || initialValue
@@ -65,7 +66,7 @@ export function performStorage (ACTION, storageKey, value = null, initialValue =
   }
 
   /* SERVER (or missing localStorage) */
-  if (!hasLocalStorage) return ACTIVE.storage[performStorage.toServerAction[ACTION]](storageKey, value)
+  if (!hasLocalStorage) return Active.Storage[performStorage.toServerAction[ACTION]](storageKey, value)
 
   /* CLIENT */
   enumCheck([GET, SET, DELETE], ACTION, this)
