@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { toMonthYear } from 'utils-pack/src/time'
+import { toMonthYear } from 'utils-pack/time'
 import Avatar from './Avatar'
 import Row from './Row'
 import ScrollView from './ScrollView'

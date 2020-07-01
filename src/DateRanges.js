@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { useState } from 'react'
-import { toDateRange } from 'utils-pack/src/time'
+import { toDateRange } from 'utils-pack/time'
 import Icon from './Icon'
 import Dates from './inputs/Dates'
 import Text from './Text'

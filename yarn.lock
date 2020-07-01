@@ -9868,10 +9868,10 @@ util@^0.11.0:
   dependencies:
     inherits "2.0.3"
 
-utils-pack@^0.0.7:
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/utils-pack/-/utils-pack-0.0.7.tgz#ba76d56cc18d12374af80c4f07c62e83760f9eb7"
-  integrity sha512-XJMSOKqAxPor6/TiNtNK9JwHU8KWzq8cLftOZR7trpWgqhWRfvjzwefSwxImnnb8emK+qTQW4btvcqTTP593OA==
+utils-pack@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/utils-pack/-/utils-pack-0.0.8.tgz#3d7fe0add3115148c84ac12a7a0e9a20d80a6922"
+  integrity sha512-WSJb/8hMFyrlsRfq0sL8Mi7Q8pLKhg1LU1cOsX2MLJ0tFT3XYQ84C+02mO4tMrYr012Ind/xwrB5hwmMZKQI+A==
   dependencies:
     chroma-js "^2.1.0"
     circular-json "^0.5.9"

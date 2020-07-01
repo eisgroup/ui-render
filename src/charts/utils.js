@@ -1,7 +1,7 @@
 import React from 'react'
 import { Area, Cell, LabelList } from 'recharts'
 import { shortNumber, toAlphaNumId, } from 'utils-pack'
-import { toHours } from 'utils-pack/src/time'
+import { toHours } from 'utils-pack/time'
 import styles from '../styles'
 
 // =============================================================================
