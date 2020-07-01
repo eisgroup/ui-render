@@ -8,8 +8,9 @@ yarn add components-react
 
 ## 1. Setup Styles
 ```js
-import { styles } from 'components-react'
+import { files, styles } from 'components-react'
 
+files.PATH_IMAGES = '/static/img' // default is `/static/images`
 styles.ANIMATION_DURATION = 300 // default is 500
 styles.GREEN = 'rgb(55, 145, 75)' // set green color
 styles.PRIMARY = styles.GREEN // set primary color to green
