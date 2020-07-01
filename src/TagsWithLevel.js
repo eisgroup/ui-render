@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { isList } from 'dux-utils'
 import PropTypes from 'prop-types'
 import React, { useState } from 'react'
+import { isList } from 'utils-pack'
 import { DEFINITION_BY_CODE } from '../common/variables'
 import { SliderLabeled } from '../modules/form/renders'
 import Button from './Button'

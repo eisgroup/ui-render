@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { by, get, hasListValue, isEqual, isEqualList, isFunction } from 'dux-utils'
 import PropTypes from 'prop-types'
 import React, { Component, Fragment } from 'react'
+import { by, get, hasListValue, isEqual, isEqualList, isFunction } from 'utils-pack'
 import Placeholder from './Placeholder'
 import { renderSort } from './renders'
 import Row from './Row'

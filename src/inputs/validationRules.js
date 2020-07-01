@@ -1,4 +1,4 @@
-import { isGoodPassword } from 'dux-utils/src/utility'
+import { isGoodPassword } from 'utils-pack/src/utility'
 import isEmail from 'validator/lib/isEmail'
 import isLength from 'validator/lib/isLength'
 import isURL from 'validator/lib/isURL'

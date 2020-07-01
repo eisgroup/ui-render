@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { isFunction } from 'dux-utils'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import { isFunction } from 'utils-pack'
 import Icon from './Icon'
 import ScrollView from './ScrollView'
 import Text from './Text'

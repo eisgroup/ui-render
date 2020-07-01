@@ -12,7 +12,7 @@ module.exports = {
   },
   // @Note: `ignore` patterns set inside babel.config.js will not be used by Jest
   transformIgnorePatterns: [
-    'node_modules/(?!(dux-utils)/)',
+    'node_modules/(?!(utils-pack)/)',
     '^.+\\.module\\.(css|sass|scss)$',
   ],
   moduleNameMapper: {

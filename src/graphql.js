@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/react-hooks'
-import { isFunction } from 'dux-utils'
 import React from 'react'
+import { isFunction } from 'utils-pack'
 import LoadingView from './Loading'
 
 /**

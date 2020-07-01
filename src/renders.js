@@ -1,6 +1,6 @@
 import classNames from 'classnames'
-import { ACTIVE, debounce, LANGUAGE, shortNumber, SORT_ORDER, toUpperCase } from 'dux-utils'
 import React from 'react'
+import { ACTIVE, debounce, LANGUAGE, shortNumber, SORT_ORDER, toUpperCase } from 'utils-pack'
 import ColorSwatch from './ColorSwatch'
 import files from './files'
 import Icon from './Icon'

@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { distanceBetween } from 'dux-utils/src/utility'
 import PropTypes from 'prop-types'
 import React, { useState } from 'react'
+import { distanceBetween } from 'utils-pack/src/utility'
 import Icon from './Icon'
 import { renderFloat } from './renders'
 import Text from './Text'

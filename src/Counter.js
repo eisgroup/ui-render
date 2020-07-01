@@ -1,6 +1,6 @@
-import { ONE_SECOND } from 'dux-utils'
 import PropTypes from 'prop-types'
 import { Component } from 'react'
+import { ONE_SECOND } from 'utils-pack'
 import { renderFloat } from './renders'
 import styles from './styles'
 import { withTimer } from './utils'

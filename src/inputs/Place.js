@@ -1,11 +1,10 @@
 import classNames from 'classnames'
-import { debounceBy, get, isInList, warn } from 'dux-utils'
-import { createScript } from 'dux-utils/src/utility'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import { ACTIVE, debounceBy, get, isInList, warn } from 'utils-pack'
+import { createScript } from 'utils-pack/src/utility'
 import { ALERT, stateAction } from '../../common/actions'
 import { connect } from '../../common/redux'
-import { ACTIVE } from '../../common/variables'
 import { POPUP } from '../../modules/exports'
 import Dropdown from '../Dropdown'
 import Row from '../Row'
@@ -138,7 +137,7 @@ export default class Place extends Component {
       {
         // @note: types: ['address'] does not work, better return all
         // types: ['geocode', 'establishment'],
-        language: ACTIVE.LANG.code,
+        language: ACTIVE.LANG._,
         ...this.props.searchOptions,
         input,
         sessionToken: this.session

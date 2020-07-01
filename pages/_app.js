@@ -1,5 +1,5 @@
-import { ACTIVE } from 'dux-utils'
 import React from 'react'
+import { ACTIVE } from 'utils-pack'
 
 // @Note: must use `typeof window === 'undefined'` for next.js to remove backend code from client
 // @see: https://flaviocopes.com/nextjs-server-client-code/

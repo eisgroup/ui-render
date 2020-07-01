@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { get, isFunction } from 'dux-utils'
 import PropTypes from 'prop-types'
 import React, { Fragment } from 'react'
+import { get, isFunction } from 'utils-pack'
 import Button from './Button'
 import Icon from './Icon'
 import ProgressBar from './ProgressBar'

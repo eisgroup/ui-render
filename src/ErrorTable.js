@@ -1,6 +1,6 @@
-import { get, hasListValue } from 'dux-utils'
 import PropTypes from 'prop-types'
 import React from 'react'
+import { get, hasListValue } from 'utils-pack'
 import Table from './Table'
 
 /**

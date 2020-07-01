@@ -1,7 +1,7 @@
-import { shortNumber, toAlphaNumId, } from 'dux-utils'
-import { toHours } from 'dux-utils/src/time'
 import React from 'react'
 import { Area, Cell, LabelList } from 'recharts'
+import { shortNumber, toAlphaNumId, } from 'utils-pack'
+import { toHours } from 'utils-pack/src/time'
 import styles from '../styles'
 
 // =============================================================================

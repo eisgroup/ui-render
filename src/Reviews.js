@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { toMonthYear } from 'dux-utils/src/time'
 import PropTypes from 'prop-types'
 import React from 'react'
+import { toMonthYear } from 'utils-pack/src/time'
 import Avatar from './Avatar'
 import Row from './Row'
 import ScrollView from './ScrollView'

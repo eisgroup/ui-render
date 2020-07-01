@@ -1,4 +1,4 @@
-import { round } from 'dux-utils'
+import { round } from 'utils-pack'
 
 /**
  * NORMALIZERS =================================================================

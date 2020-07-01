@@ -1,12 +1,12 @@
 import classNames from 'classnames'
-import { formatNumber, last, round, toPercent } from 'dux-utils'
-import { formatDuration } from 'dux-utils/src/time'
 import PropTypes from 'prop-types'
 import 'rc-slider/assets/index.css'
 import Handle from 'rc-slider/lib/Handle'
 import Range from 'rc-slider/lib/Range'
 import RCSlider from 'rc-slider/lib/Slider' // Slider lib adds 55 KB to bundle size
 import React from 'react'
+import { formatNumber, last, round, toPercent } from 'utils-pack'
+import { formatDuration } from 'utils-pack/src/time'
 import Tooltip from './Tooltip'
 // import View from './View'
 

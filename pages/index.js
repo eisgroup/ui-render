@@ -1,6 +1,6 @@
-import { logRender } from 'dux-utils'
 import Head from 'next/head'
 import React, { Component } from 'react'
+import { logRender } from 'utils-pack'
 
 @logRender
 export default class HomePage extends Component {

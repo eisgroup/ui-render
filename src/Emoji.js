@@ -1,5 +1,5 @@
-import { round } from 'dux-utils'
 import React from 'react'
+import { round } from 'utils-pack'
 
 /**
  * Emoji - Pure Component to center emoji

@@ -1,7 +1,7 @@
-import { toLowerCase } from 'dux-utils'
-import { _ } from 'dux-utils/src/translations'
 import PropTypes from 'prop-types'
 import React from 'react'
+import { toLowerCase } from 'utils-pack'
+import { _ } from 'utils-pack/src/translations'
 import Text from './Text'
 import View from './View'
 

@@ -1,6 +1,6 @@
 import classNames from 'classnames'
-import { capitalize } from 'dux-utils'
 import React, { useState } from 'react'
+import { capitalize } from 'utils-pack'
 import Icon from './Icon'
 import InputNative from './InputNative'
 import Label from './Label'

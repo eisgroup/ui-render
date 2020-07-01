@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { removeNilValues } from 'dux-utils'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import { removeNilValues } from 'utils-pack'
 import Icon from './Icon'
 import Row from './Row'
 import View from './View'

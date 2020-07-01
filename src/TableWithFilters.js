@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { capitalize, hasListValue, isInList, isInString, pluralize } from 'dux-utils'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import { capitalize, hasListValue, isInList, isInString, pluralize } from 'utils-pack'
 import AnimateHeight from './AnimateHeight'
 import Button from './Button'
 import Checkbox from './Checkbox'

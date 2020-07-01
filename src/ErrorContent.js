@@ -1,6 +1,6 @@
-import { hasListValue } from 'dux-utils'
 import PropTypes from 'prop-types'
 import React, { Fragment } from 'react'
+import { hasListValue } from 'utils-pack'
 import ErrorTable from './ErrorTable'
 import View from './View'
 
