@@ -3,12 +3,12 @@ Reusable React Components
 # Installation
 
 ```bash
-yarn add components-react
+yarn add react-ui-pack
 ```
 
-## 1. Setup Styles
+## 1. Initial Setup
 ```js
-import { files, styles } from 'components-react'
+import { files, styles } from 'react-ui-pack'
 
 files.PATH_IMAGES = '/static/img' // default is `/static/images`
 styles.ANIMATION_DURATION = 300 // default is 500
@@ -19,5 +19,5 @@ styles.SECONDARY = styles.RED
 
 ## 2. Use Components
 ```js
-import Table from 'components-react/src/Table'
+import Table from 'react-ui-pack/src/Table'
 ```

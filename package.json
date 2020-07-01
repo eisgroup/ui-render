@@ -1,13 +1,13 @@
 {
-  "name": "components-react",
+  "name": "react-ui-pack",
   "version": "0.0.1",
   "description": "Reusable React Components",
   "license": "MIT",
   "main": "src/index.js",
-  "homepage": "https://github.com/ecoinomist/components-react",
+  "homepage": "https://github.com/ecoinomist/react-ui-pack",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ecoinomist/components-react.git"
+    "url": "https://github.com/ecoinomist/react-ui-pack.git"
   },
   "private": false,
   "keywords": [
