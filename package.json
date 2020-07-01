@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Reusable React Components",
   "license": "MIT",
-  "main": "index.js",
+  "main": "components/index.js",
   "homepage": "https://github.com/ecoinomist/components-react",
   "repository": {
     "type": "git",
