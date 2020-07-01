@@ -1,6 +1,6 @@
 {
   "name": "react-ui-pack",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Reusable React Components",
   "license": "MIT",
   "main": "index.js",
@@ -36,6 +36,8 @@
     "react": "16.x"
   },
   "dependencies": {
+    "classnames": "^2.2.6",
+    "prop-types": "^15.7.2",
     "rc-slider": "^9.3.1",
     "react-animate-height": "^2.0.21",
     "react-json-tree": "^0.11.2",
@@ -53,14 +55,12 @@
     "@testing-library/react": "^10.4.3",
     "babel-jest": "^26.1.0",
     "chalk": "^4.1.0",
-    "classnames": "^2.2.6",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.1.0",
     "less-watcher-compiler": "^0.0.8",
     "next": "9.3.5",
     "next-compose-plugins": "^2.2.0",
     "next-transpile-modules": "^3.3.0",
-    "prop-types": "^15.7.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-test-renderer": "^16.13.1",

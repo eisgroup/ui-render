@@ -4,6 +4,9 @@ import { warn } from 'utils-pack'
 import { SOUND } from './files'
 import styles from './styles'
 
+export {default as cn} from 'classnames'
+export {default as PropTypes} from 'prop-types'
+
 /**
  * Add Accessibility Support to React Component
  *
