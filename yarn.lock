@@ -2062,6 +2062,11 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
+classnames@^2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
+  integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
+
 cliui@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/cliui/-/cliui-2.1.0.tgz#4b475760ff80264c762c3a1719032e91c7fea0d1"
@@ -2776,10 +2781,10 @@ duplexify@^4.1.1:
     readable-stream "^3.1.1"
     stream-shift "^1.0.0"
 
-dux-utils@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/dux-utils/-/dux-utils-0.0.4.tgz#9c4c32be4eb53f1d3bd60f3fb83ca3e27f2ec870"
-  integrity sha512-AhjcuYdic61YCSgGI2tTpjyPHS/jD1mbSugtRTaDLpgYI2DX9dY4ZlCK0QW37zfTrrPzFVbgKqp4SKUeGCDQ/g==
+dux-utils@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/dux-utils/-/dux-utils-0.0.6.tgz#9701f80c65d107fd368c89a8dcd3afd7b8debc1c"
+  integrity sha512-WT51na5OU6lOpRi9LK/AKgsWi/ZwJ9dVXzQu7pb5COxMwKr+HixAIcn2PaMl5Xdfi4AvGwMhR3sp5iA87DOksA==
   dependencies:
     chroma-js "^2.1.0"
     circular-json "^0.5.9"
@@ -4492,10 +4497,10 @@ less-plugin-glob@^3.0.0:
   dependencies:
     globby "^8.0.1"
 
-less-watcher-compiler@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/less-watcher-compiler/-/less-watcher-compiler-0.0.4.tgz#11b984b4fc329d8963baf7230c0eee642e087d38"
-  integrity sha512-HKkCugshtgVpWaG8iS3oej7EybVCkxdEZ/lVOlm9/18VebeLCmq4dVbN+3CdDiK0FE3zl5qhDuLOelk8EybT2g==
+less-watcher-compiler@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/less-watcher-compiler/-/less-watcher-compiler-0.0.8.tgz#a112bf55810115e7f52501579025201b13b49ff4"
+  integrity sha512-m9JZZhiZWDqEyeumMBLZ9HVoTuUMYw5UcaSaTtL4mJdYAbf/RJyXMTcLsK7KTijvnjeaQJGRFvzkoxIxyPpTxw==
   dependencies:
     autoprefixer "^9.8.2"
     cssnano "^4.1.10"
@@ -6039,7 +6044,7 @@ prop-types-exact@1.2.0:
     object.assign "^4.1.0"
     reflect.ownkeys "^0.2.0"
 
-prop-types@15.7.2, prop-types@^15.6.2:
+prop-types@15.7.2, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==

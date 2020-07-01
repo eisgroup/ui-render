@@ -1,28 +1,35 @@
 {
-  "name": "learn-starter",
-  "version": "0.1.0",
+  "name": "components-react",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "dev": "yarn css --sourcemap && next dev & yarn style --sourcemap",
     "build": "yarn build:css && next build",
-    "build:css": "NODE_ENV=production yarn style css",
+    "build:css": "NODE_ENV=production yarn css",
     "start": "next start",
     "restart": "yarn build && yarn start",
     "style": "node ./node_modules/less-watcher-compiler --gulpfile ./node_modules/less-watcher-compiler/gulpfile.js --cwd ./",
     "css": "yarn style symlink && yarn style css"
   },
   "dependencies": {
-    "chalk": "^4.1.0",
-    "dux-utils": "^0.0.4",
-    "next": "9.3.5",
-    "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "dux-utils": "^0.0.6"
+  },
+  "peerDependencies": {
+    "classnames": "2.x",
+    "prop-types": "15.x",
+    "react": "16.x"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.10.1",
-    "less-watcher-compiler": "^0.0.4",
+    "chalk": "^4.1.0",
+    "classnames": "^2.2.6",
+    "less-watcher-compiler": "^0.0.8",
+    "next": "9.3.5",
     "next-compose-plugins": "^2.2.0",
     "next-transpile-modules": "^3.3.0",
+    "prop-types": "^15.7.2",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
     "semantic-ui-less": "^2.4.1"
   }
 }

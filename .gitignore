@@ -2,7 +2,7 @@
 # Repo specific
 # ==============================================================================
 /dist
-/**/public/static/all.css
+/**/public/static/**/*.css
 /unity
 repos/server/uploads
 
@@ -13,6 +13,7 @@ repos/server/uploads
 *.ppk
 *.pub
 *.map
+*.env.prod
 
 # --------------------------------------
 # DATA FILES
@@ -53,7 +54,8 @@ src/modules/exchange/modules/__data__/
 # --------------------------------------
 
 # Intellij IDEA
-.idea
+.idea/*
+!.idea/dictionaries
 
 # Vim
 .ropeproject
@@ -224,7 +226,7 @@ Temporary Items
 /node_modules
 
 # next.js
-/.next/
+.next
 /out/
 
 # production
