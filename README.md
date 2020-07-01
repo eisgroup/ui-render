@@ -19,5 +19,5 @@ styles.SECONDARY = styles.RED
 
 ## 2. Use Components
 ```js
-import Table from 'react-ui-pack/src/Table'
+import Table from 'react-ui-pack/Table'
 ```
