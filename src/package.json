@@ -16,7 +16,7 @@
     "components"
   ],
   "scripts": {
-    "push": "yarn delete src/package.json && cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish",
+    "push": "yarn delete src/package.json && cp package.json src/ && cd src && yarn publish",
     "dev": "yarn css --sourcemap && next dev & yarn style --sourcemap",
     "build": "yarn build:css && next build",
     "build:css": "NODE_ENV=production yarn css",
