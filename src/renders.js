@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { debounce, LANGUAGE, shortNumber, SORT_ORDER, toUpperCase } from 'dux-utils'
+import { ACTIVE, debounce, LANGUAGE, shortNumber, SORT_ORDER, toUpperCase } from 'dux-utils'
 import React from 'react'
 import ColorSwatch from './ColorSwatch'
 import files from './files'
@@ -17,7 +17,7 @@ import Text from './Text'
  * Create Color Swatch Options from RGB Definition for use with Dropdowns
  *
  * @param {Object|Array<Object>} colorObj - definition from variables.js
- * @param {Object} Active - object containing active LANG._
+ * @param {Object} Active - object containing active .LANG._
  * @returns {Object<lang[{text, value, content}]>} options - grouped by language code, for use with dropdowns
  */
 export function colorDropdownOptions (colorObj, Active) {
@@ -47,11 +47,11 @@ export function colorDropdownOptions (colorObj, Active) {
  * Create Language Options from Language Definition for use with Dropdowns
  *
  * @param {Object|Array<Object>} languageObj - definition from variables.js
- * @param {Object} Active - object containing active LANG._
+ * @param {Object} [Active] - object containing active .LANG._
  * @param {Boolean} [selection] - whether to render as selected language flag and code, default is searchable text
  * @returns {Object<lang[{text, value, content}]>} options - grouped by language code, for use with dropdowns
  */
-export function languageDropdownOptions (languageObj, {Active, selection}) {
+export function languageDropdownOptions (languageObj, {Active = ACTIVE, selection} = {}) {
   const options = {
     get items () {
       return this[Active.LANG._] || this[LANGUAGE.ENGLISH._] || []
