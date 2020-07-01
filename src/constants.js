@@ -162,57 +162,58 @@ export const CRYPTO = {         // mapped for cryptoSign() and cryptoHash()
 	HMAC_SHA512: 'sha512',
 	MD5: 'md5',
 }
-export const LANGUAGE = { // https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-													// @note: sync with Google standard https://developers.google.com/maps/faq#languagesupport
-	ENGLISH: { code: 'en', lang: 'English', 'en': 'English' },
-	RUSSIAN: { code: 'ru', lang: 'Русский', 'en': 'Russian' },
-	CHINESE: { code: 'zh', lang: '中文', 'en': 'Mandarin Chinese' },
-	CANTONESE: { code: 'zh-HK', lang: '廣東話', 'en': 'Cantonese Chinese' },
-	SPANISH: { code: 'es', lang: 'Español', 'en': 'Spanish' },
-	ITALIAN: { code: 'it', lang: 'Italiano', 'en': 'Italian' },
-	PORTUGUESE: { code: 'pt', lang: 'Português', 'en': 'Portuguese' },
-	GERMAN: { code: 'de', lang: 'Deutsch', 'en': 'German' },
-	DUTCH: { code: 'nl', lang: 'Nederlands', 'en': 'Dutch' },
-	FRENCH: { code: 'fr', lang: 'Français', 'en': 'French' },
-	SWEDISH: { code: 'sv', lang: 'Svenska', 'en': 'Swedish' },
-	FINNISH: { code: 'fi', lang: 'Suomi', 'en': 'Finnish' },
-	GREEK: { code: 'el', lang: 'Ελληνικά', 'en': 'Greek' },
-	HEBREW: { code: 'he', lang: 'עִבְרִית', 'en': 'Hebrew' },
-	YIDDISH: { code: 'yi', lang: 'ייִדיש', 'en': 'Yiddish' },
-	PERSIAN: { code: 'fa', lang: 'فارسی', 'en': 'Persian' },
-	ARABIC: { code: 'ar', lang: 'العَرَبِيَّة‎', 'en': 'Arabic' },
-	AFRIKAANS: { code: 'af', lang: 'Afrikaans', 'en': 'Afrikaans' },
-	KOREAN: { code: 'ko', lang: '한국어', 'en': 'Korean' },
-	JAPANESE: { code: 'ja', lang: '日本語', 'en': 'Japanese' },
+export const LANGUAGE = {
+	// https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+	// @note: sync with Google standard https://developers.google.com/maps/faq#languagesupport
+	ENGLISH: { _: 'en', lang: 'English', 'en': 'English' },
+	RUSSIAN: { _: 'ru', lang: 'Русский', 'en': 'Russian' },
+	CHINESE: { _: 'zh', lang: '中文', 'en': 'Mandarin Chinese' },
+	CANTONESE: { _: 'zh-HK', lang: '廣東話', 'en': 'Cantonese Chinese' },
+	SPANISH: { _: 'es', lang: 'Español', 'en': 'Spanish' },
+	ITALIAN: { _: 'it', lang: 'Italiano', 'en': 'Italian' },
+	PORTUGUESE: { _: 'pt', lang: 'Português', 'en': 'Portuguese' },
+	GERMAN: { _: 'de', lang: 'Deutsch', 'en': 'German' },
+	DUTCH: { _: 'nl', lang: 'Nederlands', 'en': 'Dutch' },
+	FRENCH: { _: 'fr', lang: 'Français', 'en': 'French' },
+	SWEDISH: { _: 'sv', lang: 'Svenska', 'en': 'Swedish' },
+	FINNISH: { _: 'fi', lang: 'Suomi', 'en': 'Finnish' },
+	GREEK: { _: 'el', lang: 'Ελληνικά', 'en': 'Greek' },
+	HEBREW: { _: 'he', lang: 'עִבְרִית', 'en': 'Hebrew' },
+	YIDDISH: { _: 'yi', lang: 'ייִדיש', 'en': 'Yiddish' },
+	PERSIAN: { _: 'fa', lang: 'فارسی', 'en': 'Persian' },
+	ARABIC: { _: 'ar', lang: 'العَرَبِيَّة‎', 'en': 'Arabic' },
+	AFRIKAANS: { _: 'af', lang: 'Afrikaans', 'en': 'Afrikaans' },
+	KOREAN: { _: 'ko', lang: '한국어', 'en': 'Korean' },
+	JAPANESE: { _: 'ja', lang: '日本語', 'en': 'Japanese' },
 }
 export const l = {} // object mapping of language to their code
 for (const key in LANGUAGE) {
-	l[key] = LANGUAGE[key].code
+	l[key] = LANGUAGE[key]._
 }
 export const LANGUAGE_LEVEL = {
 	UNKNOWN: {
 		code: 0,
-		[LANGUAGE.ENGLISH.code]: 'Unknown',
+		[l.ENGLISH._]: 'Unknown',
 	},
 	BASIC: {
 		code: 1,
-		[LANGUAGE.ENGLISH.code]: 'Beginner',
+		[l.ENGLISH._]: 'Beginner',
 	},
 	WORKING: {
 		code: 2,
-		[LANGUAGE.ENGLISH.code]: 'Working',
+		[l.ENGLISH._]: 'Working',
 	},
 	PROFICIENT: {
 		code: 3,
-		[LANGUAGE.ENGLISH.code]: 'Proficient',
+		[l.ENGLISH._]: 'Proficient',
 	},
 	FLUENT: {
 		code: 4,
-		[LANGUAGE.ENGLISH.code]: 'Fluent',
+		[l.ENGLISH._]: 'Fluent',
 	},
 	NATIVE: {
 		code: 5,
-		[LANGUAGE.ENGLISH.code]: 'Native',
+		[l.ENGLISH._]: 'Native',
 	},
 }
 
