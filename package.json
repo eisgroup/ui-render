@@ -16,23 +16,10 @@
     "components"
   ],
   "scripts": {
-    "push": "yarn delete src/package.json && cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish",
-    "dev": "yarn css --sourcemap && next dev & yarn style --sourcemap",
-    "build": "yarn build:css && next build",
-    "build:css": "NODE_ENV=production yarn css",
-    "start": "next start",
-    "restart": "yarn build && yarn start",
-    "style": "node ./node_modules/less-watcher-compiler --gulpfile ./node_modules/less-watcher-compiler/gulpfile.js --cwd ./",
-    "css": "yarn style symlink && yarn style css",
-    "test": "jest --watch",
-    "reset": "yarn clear && yarn cache clean && yarn",
-    "clear": "yarn delete yarn.lock node_modules",
-    "delete": "./node_modules/rimraf/bin.js"
+    "push": "yarn delete src/package.json && cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish"
   },
   "peerDependencies": {
     "chroma-js": "2.x",
-    "classnames": "2.x",
-    "prop-types": "15.x",
     "react": "16.x"
   },
   "dependencies": {
@@ -48,23 +35,5 @@
     "semantic-ui-react": "0.83.0",
     "utils-pack": "^0.0.8",
     "validator": "^13.1.1"
-  },
-  "devDependencies": {
-    "@babel/plugin-proposal-decorators": "^7.10.1",
-    "@testing-library/jest-dom": "^5.11.0",
-    "@testing-library/react": "^10.4.3",
-    "babel-jest": "^26.1.0",
-    "chalk": "^4.1.0",
-    "identity-obj-proxy": "^3.0.0",
-    "jest": "^26.1.0",
-    "less-watcher-compiler": "^0.0.8",
-    "next": "9.3.5",
-    "next-compose-plugins": "^2.2.0",
-    "next-transpile-modules": "^3.3.0",
-    "react": "16.13.1",
-    "react-dom": "16.13.1",
-    "react-test-renderer": "^16.13.1",
-    "rimraf": "^3.0.2",
-    "semantic-ui-less": "^2.4.1"
   }
 }
