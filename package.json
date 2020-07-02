@@ -15,7 +15,8 @@
     "functions"
   ],
   "scripts": {
-    "push": "yarn delete src/package.json && cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish"
+    "push": "cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish && cd ../ && yarn delete src/{README.md,LICENSE,package.json}",
+    "delete": "../../node_modules/rimraf/bin.js"
   },
   "dependencies": {
     "chroma-js": "^2.1.0",
