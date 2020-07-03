@@ -1,8 +1,8 @@
+import { isEmpty, isNumeric, isPhoneNumber, pluralize, toList } from 'utils-pack'
 import { isGoodPassword } from 'utils-pack/utility'
 import isEmail from 'validator/lib/isEmail'
 import isLength from 'validator/lib/isLength'
 import isURL from 'validator/lib/isURL'
-import { isEmpty, isNumeric, isPhoneNumber, pluralize, toList } from '../../common/utils'
 
 /**
  * VALIDATION RULES ============================================================
