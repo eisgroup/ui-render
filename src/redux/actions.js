@@ -15,7 +15,7 @@ import {
   TIMEOUT,
   VOID
 } from 'utils-pack'
-import { configs } from '../variables'
+import { STATE_ACTION_TIMEOUT } from '../variables'
 
 /**
  * ACTION CREATORS =============================================================
@@ -144,7 +144,7 @@ export function * subscribeToResults (NAME, ACTION, meta = null, actionType = st
       error: take(action => isMatchingActionType(action, NAME, ACTION, ERROR, meta, actionType)),
       cancel: take(action => isMatchingActionType(action, NAME, ACTION, CANCEL, meta, actionType)),
       timeout: take(action => isMatchingActionType(action, NAME, ACTION, TIMEOUT, meta, actionType)),
-      ...hasTimeout && {void: delay(configs.STATE_ACTION_TIMEOUT + 100)}  // in case State action was not called
+      ...hasTimeout && {void: delay(STATE_ACTION_TIMEOUT + 100)}  // in case State action was not called
     })
     let {received, success, error, cancel, timeout} = yield listener
 
