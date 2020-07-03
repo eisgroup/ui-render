@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "react-redux": "^7.2.0",
+    "react-ui-pack": "^0.1.0",
     "redux": "^4.0.5",
     "redux-actions": "^2.6.5",
     "redux-ignore": "^1.2.5",
