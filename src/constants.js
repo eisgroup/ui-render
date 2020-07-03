@@ -2,35 +2,35 @@
  * COMMON ACTION CONSTANTS =====================================================
  * =============================================================================
  */
-export const SEPARATOR = ' -> '          // ACTION type separator string
-export const RESULT_SEPARATOR = '_'           // RESULT type separator string
+export const SEPARATOR = ' -> '         // ACTION type separator string
+export const RESULT_SEPARATOR = '_'     // RESULT type separator string
 export const SYSTEM = 'SYSTEM'          // Internal app action subject
 
 /* CRUD Actions */
-export const GET = 'GET'             // Retrieving data
+export const GET = 'GET'             		// Retrieving data
 export const CREATE = 'CREATE'          // Posting new data to backend
 export const UPDATE = 'UPDATE'          // For saving remote API data (e.g. syncing with backend)
 export const DELETE = 'DELETE'          // Destroying data from backend
-export const LIST = 'LIST'            // Retrieving list of data
+export const LIST = 'LIST'            	// Retrieving list of data
 
 /* State Only Actions */
-export const SET = 'SET'             // For saving non-API data in state
+export const SET = 'SET'             		// For saving non-API data in state
 export const RESET = 'RESET'
-export const HYDRATE = 'HYDRATE'         // For Hydrating Redux Store
+export const HYDRATE = 'HYDRATE'        // For Hydrating Redux Store
 export const LOGIN = 'LOGIN'
 export const LOGOUT = 'LOGOUT'
 export const LOAD = 'LOAD'
-export const ALERT = 'ALERT'           // For broadcasting a resource
-export const SAVE = 'SAVE'            // For triggering persistence of a resource
+export const ALERT = 'ALERT'           	// For broadcasting a resource
+export const SAVE = 'SAVE'            	// For triggering persistence of a resource
 export const EDIT = 'EDIT'
 export const OPEN = 'OPEN'
 export const CLOSE = 'CLOSE'
 export const SEARCH = 'SEARCH'          // For searching for a resource
 export const SUBMIT = 'SUBMIT'          // For triggering submission of a resource
-export const ADD = 'ADD'             // For adding a resource
+export const ADD = 'ADD'             		// For adding a resource
 export const CHANGE = 'CHANGE'          // For changing state
 export const REMOVE = 'REMOVE'          // For removing state
-export const REPORT = 'REPORT'       // For broadcasting a resource
+export const REPORT = 'REPORT'       		// For broadcasting a resource
 
 /* App Specific Actions */
 
@@ -39,7 +39,7 @@ export const START = 'START'
 export const CANCEL = 'CANCEL'
 export const FINISH = 'FINISH'
 export const RECEIVED = 'RECEIVED'
-export const VOID = 'VOID'            // No response at all
+export const VOID = 'VOID'            	// No response at all
 
 /* Socket Actions */
 export const SEND = 'SEND'
