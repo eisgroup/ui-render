@@ -17,7 +17,7 @@ import saga from '../saga'
  *    - every new saga adds about 0.75 microseconds to action execution
  *    => optimize performance with `redux-ignore` library to filter actions
  *
- * @param {Array|Object} modules - list of modules to activate {NAME, middleware, reducer, saga}
+ * @param {Object[]|Object} modules - list of modules to activate {NAME, middleware, reducer, saga}
  * @returns {Object} - redux store
  */
 export default function createStore (modules = []) {

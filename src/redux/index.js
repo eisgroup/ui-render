@@ -20,7 +20,9 @@ export {
   Provider
 }
 
-export default {
+const redux = {
   middleware: thunk,
   Provider
 }
+
+export default redux

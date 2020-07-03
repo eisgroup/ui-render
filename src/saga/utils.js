@@ -1,5 +1,4 @@
-import { delay } from 'redux-saga'
-import { call, put, spawn, take } from 'redux-saga/effects'
+import { call, delay, put, spawn, take } from 'redux-saga/effects'
 import { __CLIENT__, ALERT, FINISH, LOAD, START, SYSTEM } from 'utils-pack'
 import { stateAction } from '../redux/actions'
 import middleware from './middleware'
@@ -9,9 +8,8 @@ import middleware from './middleware'
  * =============================================================================
  */
 
-export { delay }
 export {
-  all, call, fork, put, race, select as selectState, spawn,
+  all, call, delay, fork, put, race, select as selectState, spawn,
   take, takeEvery, takeLatest, throttle,
 } from 'redux-saga/effects'
 
@@ -65,7 +63,7 @@ export function loadingStart (type) {
  */
 export function loadingFinish (type, wait) {
   return function * ({payload, meta} = {}) { // eslint-disable-line
-    if (wait) yield call(delay, wait)
+    if (wait) yield delay(wait)
     yield put(stateAction(type, LOAD, FINISH, payload, meta))
   }
 }

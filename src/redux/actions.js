@@ -1,6 +1,5 @@
 import { createAction } from 'redux-actions'
-import { delay } from 'redux-saga'
-import { call, race, take } from 'redux-saga/effects'
+import { delay, race, take } from 'redux-saga/effects'
 import {
   ALL_ACTIONS,
   ALL_RESULTS,
@@ -131,10 +130,10 @@ export function stateActionNamesType (NAMES, ACTION = null, RESULT = null) {
  *
  * @param {string} NAME - action type identifier
  * @param {string} ACTION - state action method type
- * @param {Object} [meta] - meta data to match (with include comparison)
- * @param {Function} [actionType] - action type creator, default is stateActionType()
- * @param {Boolean} [hasTimeout] - whether to timeout automatically
- * @return {Object} - action with payload and meta data (payload may not exist on TIMEOUT/VOID results)
+ * @param {object} [meta] - meta data to match (with include comparison)
+ * @param {function} [actionType] - action type creator, default is stateActionType()
+ * @param {boolean} [hasTimeout] - whether to timeout automatically
+ * @return {object} - action with payload and meta data (payload may not exist on TIMEOUT/VOID results)
  */
 export function * subscribeToResults (NAME, ACTION, meta = null, actionType = stateActionType, hasTimeout = true) {
   /* Match specific action with given meta data */
@@ -145,7 +144,7 @@ export function * subscribeToResults (NAME, ACTION, meta = null, actionType = st
       error: take(action => isMatchingActionType(action, NAME, ACTION, ERROR, meta, actionType)),
       cancel: take(action => isMatchingActionType(action, NAME, ACTION, CANCEL, meta, actionType)),
       timeout: take(action => isMatchingActionType(action, NAME, ACTION, TIMEOUT, meta, actionType)),
-      ...hasTimeout && {void: call(delay, configs.STATE_ACTION_TIMEOUT + 100)}  // in case State action was not called
+      ...hasTimeout && {void: delay(configs.STATE_ACTION_TIMEOUT + 100)}  // in case State action was not called
     })
     let {received, success, error, cancel, timeout} = yield listener
 

@@ -12,8 +12,10 @@ export {
   middleware
 }
 
-export default {
+const saga = {
   NAME,
   hasEnabledSaga: true,  // for createStore() to check
   middleware,
 }
+
+export default saga
