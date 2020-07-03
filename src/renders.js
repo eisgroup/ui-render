@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { ACTIVE, debounce, LANGUAGE, shortNumber, SORT_ORDER, toUpperCase } from 'utils-pack'
 import ColorSwatch from './ColorSwatch'
-import files from './files'
+import FILE from './files'
 import Icon from './Icon'
 import Image from './Image'
 import Row from './Row'
@@ -66,14 +66,14 @@ export function languageDropdownOptions (languageObj, {Active = ACTIVE, selectio
           ? (
             <Row className='input--dropdown__option middle'>
               <Image className='margin-right-smaller' name={`${_.toLowerCase()}.svg`}
-                     path={`${files.PATH_IMAGES}flags/`}/>
+                     path={`${FILE.PATH_IMAGES}flags/`}/>
               <Text className='no-wrap'>{toUpperCase(_)}</Text>
             </Row>
           )
           : `${text} ${name}`, // make option searchable both in chosen and native language
         value: _,
         content: <Row className='input--dropdown__option middle'>
-          <Image className='margin-right-small' name={`${_.toLowerCase()}.svg`} path={`${files.PATH_IMAGES}flags/`}/>
+          <Image className='margin-right-small' name={`${_.toLowerCase()}.svg`} path={`${FILE.PATH_IMAGES}flags/`}/>
           <Text>{text}</Text>
         </Row>
       })

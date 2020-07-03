@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { fileNameWithoutExt } from 'utils-pack'
-import files from './files'
+import FILE from './files'
 
 /**
  * Image - Pure Component.
@@ -42,6 +42,6 @@ Image.Class = class extends Component {
   }
 }
 
-export function imageSrc ({avatar, src, name = '', path = files.PATH_IMAGES}) {
+export function imageSrc ({avatar, src, name = '', path = FILE.PATH_IMAGES}) {
   return avatar || src || (path + name.replace(/\s/g, '-').toLowerCase())
 }

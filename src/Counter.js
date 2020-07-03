@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types'
 import { Component } from 'react'
-import { ONE_SECOND } from 'utils-pack'
+import { ONE_SECOND, TIME_DURATION_INSTANT } from 'utils-pack'
 import { renderFloat } from './renders'
-import styles from './styles'
 import { withTimer } from './utils'
 
 /**
@@ -48,7 +47,9 @@ export default class Counter extends Component {
   setup = (props = this.props) => {
     const {
       end, start, easingFn,
-      duration = ONE_SECOND, delay = styles.TIME_DURATION_INSTANT, interval = 17
+      duration = ONE_SECOND,
+      delay = TIME_DURATION_INSTANT,
+      interval = 17
     } = props
     const steps = end === start ? 0 : Math.ceil(duration / interval)
     if (steps) {

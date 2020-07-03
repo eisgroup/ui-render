@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 import ReactAnimateHeight from 'react-animate-height'
-import styles from './styles'
+import STYLE from './styles'
 
 /**
  * Wrapper component that animates height changes
@@ -22,7 +22,7 @@ import styles from './styles'
 export default function AnimateHeight
   ({
     expanded,
-    duration = styles.ANIMATION_DURATION,
+    duration = STYLE.ANIMATION_DURATION,
     className,
     ...props
   }) {

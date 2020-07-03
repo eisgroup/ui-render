@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { isFunction } from 'utils-pack'
 import AnimateHeight from './AnimateHeight'
 import Icon from './Icon'
-import styles from './styles'
+import STYLE from './styles'
 import Text from './Text'
 import { withTimer } from './utils'
 import View from './View'
@@ -39,7 +39,7 @@ export default class Expand extends Component {
   }
 
   static defaultProps = {
-    duration: styles.ANIMATION_DURATION,
+    duration: STYLE.ANIMATION_DURATION,
     iconOpened: 'chevron-down',
     iconClosed: 'chevron-right',
   }

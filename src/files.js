@@ -1,17 +1,20 @@
+import { ACTIVE } from 'utils-pack'
+
 /**
  * FILE VARIABLES ==============================================================
  * =============================================================================
  */
 
-const files = {
+const FILE = {
   PATH_IMAGES: '/static/images/',
   PATH_SOUNDS: '/static/sounds/'
 }
 
-export default files
+export default FILE
 
-export const DEFAULT = {
-  SETTINGS: {
+if (ACTIVE.SETTINGS?.HAS_SOUND == null) {
+  ACTIVE.SETTINGS = {
+    ...ACTIVE.SETTINGS,
     HAS_SOUND: false
   }
 }
@@ -28,7 +31,6 @@ export const SOUND = {
   SLIDE: soundFile('slide.mp3'),
 }
 
-
 /**
  * HELPER FUNCTIONS ------------------------------------------------------------
  * -----------------------------------------------------------------------------
@@ -44,8 +46,8 @@ function soundFile (name) {
   let file
   return {
     play () {
-      if (!file) file = new Audio(files.PATH_SOUNDS + name)
-      if (DEFAULT.SETTINGS.HAS_SOUND && file) file.play().catch(console.error)
+      if (!file) file = new Audio(FILE.PATH_SOUNDS + name)
+      if (ACTIVE.SETTINGS.HAS_SOUND && file) file.play().catch(console.error)
     }
   }
 }

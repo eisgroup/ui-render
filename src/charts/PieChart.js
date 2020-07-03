@@ -7,7 +7,7 @@ import { by, pluralize, shortNumber, throttle, toList, toListValuesTotal, trunca
 import { gradientColors } from 'utils-pack/color'
 import { renderFloat } from '../renders'
 import Row from '../Row'
-import styles from '../styles'
+import STYLE from '../styles'
 import Text from '../Text'
 import View from '../View'
 import { chartTooltip, renderCells, renderGradients } from './utils'
@@ -142,7 +142,7 @@ function renderPercent ({cx, cy, midAngle, innerRadius, outerRadius, startAngle,
   const fontScale = Math.min(percent + 5, fontSize)  // make font size smaller if percent is low
 
   /* Inner Label */
-  const percentColor = fill === 'none' ? color : styles.TEXT_LIGHT
+  const percentColor = fill === 'none' ? color : STYLE.TEXT_LIGHT
   const {x, y} = donutPieCenterCoords({cx, cy, midAngle, innerRadius, outerRadius})
 
   return (
@@ -165,7 +165,7 @@ function renderPercentPointer ({cx, cy, midAngle, innerRadius, outerRadius, name
   const fontScale = Math.min(percent + 5, fontSize)  // make font size smaller if percent is low
 
   /* Inner Label */
-  const percentColor = fill === 'none' ? color : styles.TEXT_LIGHT
+  const percentColor = fill === 'none' ? color : STYLE.TEXT_LIGHT
   const {x, y} = donutPieCenterCoords({cx, cy, midAngle, innerRadius, outerRadius})
 
   /* Out Label */

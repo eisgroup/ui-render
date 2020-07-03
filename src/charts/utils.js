@@ -2,7 +2,7 @@ import React from 'react'
 import { Area, Cell, LabelList } from 'recharts'
 import { shortNumber, toAlphaNumId, } from 'utils-pack'
 import { toHours } from 'utils-pack/time'
-import styles from '../styles'
+import STYLE from '../styles'
 
 // =============================================================================
 // COMMON CHART OPTIONS AND HELPERS
@@ -13,12 +13,12 @@ export const chartOffsetMargin = 20 // to the right of Y-axis
 export const chartArea = {
   type: 'monotone',
   animationEasing: 'ease-in-out',
-  animationDuration: styles.ANIMATION_DURATION,
+  animationDuration: STYLE.ANIMATION_DURATION,
   fillOpacity: 1
 }
 
 export const chartCartesianGrid = {
-  stroke: styles.BORDER,
+  stroke: STYLE.BORDER,
   strokeDasharray: '3 4'
 }
 
@@ -29,7 +29,7 @@ export const chartContainer = {
 
 export const chartTooltip = {
   animationEasing: 'ease-out',
-  animationDuration: styles.ANIMATION_DURATION,
+  animationDuration: STYLE.ANIMATION_DURATION,
   wrapperStyle: {zIndex: 1}
 }
 

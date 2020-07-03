@@ -1,8 +1,9 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import { TIME_DURATION_INSTANT } from 'utils-pack'
 import { SOUND } from './files'
-import styles from './styles'
+import STYLE from './styles'
 import Text from './Text'
 import { withTimer } from './utils'
 import View from './View'
@@ -60,8 +61,8 @@ export default class ProgressBar extends Component {
     const {value} = this.props
     if (value != null) this.setTimeout(() => {
       this.setState({value})
-      this.setTimeout(SOUND.PROGRESS.play, styles.ANIMATION_DURATION * 0.8)
-    }, styles.TIME_DURATION_INSTANT)
+      this.setTimeout(SOUND.PROGRESS.play, STYLE.ANIMATION_DURATION * 0.8)
+    }, TIME_DURATION_INSTANT)
   }
 
   UNSAFE_componentWillReceiveProps ({value}) {

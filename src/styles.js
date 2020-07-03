@@ -5,9 +5,8 @@
  */
 
 /* Colors */
-const styles = {
+const STYLE = {
   ANIMATION_DURATION: 500,
-  TIME_DURATION_INSTANT: 200,
   SIZE_SCALE: 62.5, // match percentage of font-size defined in <html> root element
   GREY: 'rgb(55, 145, 70)',
   TEXT: 'rgb(23,21,31)',
@@ -33,9 +32,9 @@ const styles = {
   BORDER: 'rgba(124, 124, 153, 0.3)',
   TRANSPARENT: 'rgba(0, 0, 0, 0)',
 }
-styles.PRIMARY = styles.TEAL
-styles.PRIMARY_LIGHT = styles.TEAL_LIGHT
-styles.SECONDARY = styles.VIOLET
-styles.SECONDARY_LIGHT = styles.VIOLET_LIGHT
+STYLE.PRIMARY = STYLE.TEAL
+STYLE.PRIMARY_LIGHT = STYLE.TEAL_LIGHT
+STYLE.SECONDARY = STYLE.VIOLET
+STYLE.SECONDARY_LIGHT = STYLE.VIOLET_LIGHT
 
-export default styles
+export default STYLE

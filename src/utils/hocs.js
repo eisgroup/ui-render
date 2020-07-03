@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React, { useContext } from 'react'
 import { warn } from 'utils-pack'
 import { SOUND } from '../files'
-import styles from '../styles'
+import STYLE from '../styles'
 
 /**
  * Add Accessibility Support to React Component
@@ -53,7 +53,7 @@ export function onPressHoc (onClick, sound) {
  * @returns {String} rem - equivalent
  */
 export function toRem (pixels) {
-  return (pixels / 16 / styles.SIZE_SCALE * 100) + 'rem'
+  return (pixels / 16 / STYLE.SIZE_SCALE * 100) + 'rem'
 }
 
 /**
