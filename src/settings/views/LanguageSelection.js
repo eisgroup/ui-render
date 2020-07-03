@@ -4,7 +4,7 @@ import { languageDropdownOptions } from 'react-ui-pack'
 import Dropdown from 'react-ui-pack/Dropdown'
 import Row from 'react-ui-pack/Row'
 import { connect } from '../../redux'
-import { configs } from '../../variables'
+import { CONFIG } from '../../variables'
 import { setSettings } from '../actions'
 import select from '../selectors'
 
@@ -23,7 +23,7 @@ const mapStateToProps = (state) => ({
 @connect(mapStateToProps)
 export default class LanguageSelection extends Component {
   static defaultProps = {
-    options: languageDropdownOptions(configs.LANGUAGE_OPTIONS, {selection: true})
+    options: languageDropdownOptions(CONFIG.LANGUAGE_OPTIONS, {selection: true})
   }
 
   state = {

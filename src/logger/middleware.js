@@ -1,7 +1,7 @@
-import { isError, stateAction } from 'modules-pack/redux'
-import { socketActionSigned } from 'modules-pack/socket'
-import { SERVER, SOCKET_SERVER } from 'modules-pack/variables'
 import { __DEV__, ACTIVE, ERROR, formatNumber, log, logClear, REPORT, warn, } from 'utils-pack'
+import { socketActionSigned } from '../../todo/socket'
+import { isError, stateAction } from '../redux'
+import { SERVER, SOCKET_SERVER } from '../variables'
 import { MAX_CONSOLE_RECORDS } from './constants'
 import { actionTypeColor, latencyColor, Log } from './utils'
 

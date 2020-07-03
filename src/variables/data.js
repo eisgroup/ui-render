@@ -1,7 +1,8 @@
 import { languageDropdownOptions } from 'react-ui-pack'
 import { isInList, l, LANGUAGE } from 'utils-pack'
+import { CONFIG } from './configs'
+import { DEFAULT } from './defaults'
 import { OPTIONS } from './definitions'
-import { DEFAULT, LANGUAGE_OPTIONS } from './index'
 
 /**
  * COMMON STATE DATA ===========================================================
@@ -19,6 +20,6 @@ export const LANGUAGE_CODE_BY_COUNTRY = { // Language code by country code
 }
 OPTIONS.LANGUAGE = languageDropdownOptions(LANGUAGE)
 
-function getSupportedLanguageCode (langCode, options = LANGUAGE_OPTIONS.map(l => l._)) {
+function getSupportedLanguageCode (langCode, options = CONFIG.LANGUAGE_OPTIONS.map(l => l._)) {
   return (isInList(options, langCode)) ? langCode : DEFAULT.LANGUAGE
 }

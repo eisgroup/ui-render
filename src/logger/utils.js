@@ -1,4 +1,3 @@
-import { stateActionType } from 'modules-pack/redux'
 import { fork } from 'redux-saga/effects'
 import {
   ACTIVE,
@@ -16,6 +15,7 @@ import {
   toListValuesTotal,
   warn
 } from 'utils-pack'
+import { stateActionType } from '../redux'
 import {
   MAX_ERROR_RECORDS,
   MAX_IDLE_DURATION,

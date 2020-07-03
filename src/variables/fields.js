@@ -1,11 +1,10 @@
-import { LANGUAGE_LEVEL } from 'utils-pack'
-import { getSetDefinition } from './definitions'
+import { definitionSetup, LANGUAGE_LEVEL } from 'utils-pack'
 
 /**
  * CONSTANT VARIABLES ==========================================================
  * =============================================================================
  */
-export const FIELD = getSetDefinition('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', 'MIN_MAX', 'FOR')
+export const FIELD = definitionSetup('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', 'MIN_MAX', 'FOR')
 
 // Field Type Definitions
 FIELD.TYPE = {

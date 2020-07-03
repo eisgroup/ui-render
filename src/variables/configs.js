@@ -5,10 +5,6 @@ import { ENV, FIVE_MINUTES, LANGUAGE, THIRTY_SECONDS, THREE_SECONDS, TWO_SECONDS
  * =============================================================================
  */
 
-export default {
-  LANGUAGE_OPTIONS: [LANGUAGE.ENGLISH] // enabled languages
-}
-
 /* Network Configs */
 export const API_REQUEST_TIMEOUT = Number(ENV.API_REQUEST_TIMEOUT || ENV.REACT_APP_API_REQUEST_TIMEOUT) || THIRTY_SECONDS
 export const SOCKET_CONNECT_TIMEOUT = Number(ENV.SOCKET_CONNECT_TIMEOUT || ENV.REACT_APP_SOCKET_CONNECT_TIMEOUT) || THIRTY_SECONDS
@@ -22,16 +18,25 @@ export const APP_SUPPORT_TEAM_NAME = ENV.APP_SUPPORT_TEAM_NAME || ENV.REACT_APP_
 export const ANALYTICS_TRACKING_ID = ENV.REACT_APP_ANALYTICS_TRACKING_ID
 export const CONTACT_EMAIL = ENV.REACT_APP_CONTACT_HOST + '@' + ENV.REACT_APP_CONTACT_SERVER
 
+/* Configuration */
+export const CONFIG = {
+  LANGUAGE_OPTIONS: [LANGUAGE.ENGLISH] // enabled languages
+}
+
 /* Server */
-export const QUERY_CACHE_TIME = Number(ENV.QUERY_CACHE_TIME) || TWO_SECONDS
+export const SERVER = {
+  QUERY_CACHE_TIME: Number(ENV.QUERY_CACHE_TIME) || TWO_SECONDS
+}
 
 /* UI */
-export const SIZE_SCALE = 62.5  // match percentage of font-size defined in <html> root element
-export const TIME_DURATION_INSTANT = 200  // Milliseconds - max delay that seems instant to human
-export const TYPING_DELAY = 300  // Milliseconds - 300 is deal for debouncing input changes while typing
-export const TOOLTIP_DELAY = 777  // Milliseconds
-export const FORM_SYNC_THROTTLE = THREE_SECONDS  // Milliseconds - debounce input changes duration
-export const ANIMATION_DURATION = 500  // Milliseconds - match with CSS @speed-base in /repos/web/style/_variables.less
+export const UI = {
+  TYPING_DELAY: 300, // Milliseconds - 300 is deal for debouncing input changes while typing
+  TOOLTIP_DELAY: 777, // Milliseconds
+  FORM_SYNC_THROTTLE: THREE_SECONDS, // Milliseconds - debounce input changes duration
+  ANIMATION_DURATION: 500, // Milliseconds - match with CSS @speed-base in /repos/web/style/_variables.less
+}
+
+/* Theme Options */
 export const THEME = {
   LIGHT: 'LIGHT',
   DARK: 'DARK',
@@ -41,9 +46,11 @@ export const THEME = {
  * FOR TESTS -------------------------------------------------------------------
  * -----------------------------------------------------------------------------
  */
+
 export const TEST = {
   COUNT: 1
 }
+
 export const MOCK = {
   DATA_SEED: 7,
   UNIT_COUNT: 14,

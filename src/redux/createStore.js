@@ -26,7 +26,12 @@ export default function createStore (modules = []) {
 
   /* Register Middleware */
   const middlewares = modules.filter(({middleware}) => isFunction(middleware)).map(module => module.middleware)
-  const composeEnhancers = (__DEV__ && (typeof window !== 'undefined')) ? (get(window, '__REDUX_DEVTOOLS_EXTENSION_COMPOSE__') || compose) : compose
+  let composeEnhancers = compose
+  if (typeof window !== 'undefined') { // need to put this check on separate lite because of Next.js
+    if (__DEV__) {
+      composeEnhancers = get(window, '__REDUX_DEVTOOLS_EXTENSION_COMPOSE__', compose)
+    }
+  }
   const allMiddleware = composeEnhancers(applyMiddleware(...middlewares))
 
   /* Register Action Handlers */
