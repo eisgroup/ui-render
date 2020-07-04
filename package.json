@@ -1,6 +1,6 @@
 {
   "name": "utils-pack",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "JS Helper Functions",
   "license": "MIT",
   "main": "index.js",
@@ -15,8 +15,12 @@
     "functions"
   ],
   "scripts": {
-    "push": "cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish && cd ../ && yarn delete src/{README.md,LICENSE,package.json}",
-    "delete": "../../node_modules/rimraf/bin.js"
+    "push": "yarn prebuild && yarn build && yarn dist",
+    "prebuild": "yarn symlink ../babel.config.js ./",
+    "build": "yarn delete dist && babel src --out-dir dist",
+    "dist": "cp {README.md,LICENSE,package.json} dist/ && cd dist && yarn publish && cd ../ && yarn delete dist",
+    "delete": "../../node_modules/rimraf/bin.js",
+    "symlink": "node ../../scripts/symlink.js"
   },
   "dependencies": {
     "chroma-js": "^2.1.0",

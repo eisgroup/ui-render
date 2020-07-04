@@ -17,8 +17,9 @@ export * from './log'
 // export * from './media' // to be imported directly to reduce bundle size
 export * from './number'
 export * from './object'
+// export * from './selectors' // to be imported directly to reduce bundle size
 export * from './storage'
 export * from './string'
 // export * from './time' // to be imported directly to reduce bundle size
-// export * from './utility' // to be imported directly to reduce bundle size
 // export * from './translations' // to be imported directly to reduce bundle size
+// export * from './utility' // to be imported directly to reduce bundle size
