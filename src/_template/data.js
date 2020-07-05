@@ -5,10 +5,7 @@
  */
 
 const initState = {
-  data: {},
-  ui: {
-    isLoading: false
-  }
+  isLoading: false
 }
 
 export default initState

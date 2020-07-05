@@ -3,4 +3,4 @@
  * =============================================================================
  */
 
-export const NAME = 'NAME' // Namespace this module
+export const NAME = '_TEMPLATE' // Namespace this module

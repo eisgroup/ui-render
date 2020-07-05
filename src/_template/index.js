@@ -15,10 +15,13 @@ export {
   select,
   query,
 }
-export default {
+
+const _template = {
   NAME,
   reducer,
   query,
   saga,
   select,
 }
+
+export default _template

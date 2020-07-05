@@ -1,6 +1,6 @@
-import { combineReducers, handleActions, stateActionType, uiLoading } from 'modules-pack/redux'
+import { handleActions, stateActionType, uiLoading } from 'modules-pack/redux'
 import { SET } from 'utils-pack'
-import { NAME } from './constants'
+import { NAME as _TEMPLATE } from './constants'
 import initState from './data'
 
 /**
@@ -9,21 +9,9 @@ import initState from './data'
  * =============================================================================
  */
 
-/* Data Handler */
-const dataHandler = handleActions({
+export default handleActions({
 
-  [stateActionType(NAME, SET)]: (state, {payload}) => ({...state, ...payload})
+  [stateActionType(_TEMPLATE, SET)]: (state, {payload}) => ({...state, ...payload}),
 
-}, initState.data)
-
-/* UI Handler */
-const uiHandler = handleActions({
-  ...uiLoading(NAME)
-}, initState.ui)
-
-const allHandlers = combineReducers({
-  data: dataHandler,
-  ui: uiHandler
-})
-
-export default allHandlers
+  ...uiLoading(_TEMPLATE)
+}, initState)

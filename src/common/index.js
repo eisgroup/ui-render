@@ -1,5 +1,5 @@
 // import api from '../api'
-import logger from '../logger'
+// import logger from '../logger'
 import redux from '../redux'
 import saga from '../saga'
 // import socket from '../socket'
@@ -16,7 +16,7 @@ const commonModules = [
   saga,
   // api,
   // socket,
-  logger  // must be the last module to avoid intercepting other middleware
+  // logger  // must be the last module to avoid intercepting other middleware
 ]
 
 export default commonModules

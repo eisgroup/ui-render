@@ -6,7 +6,7 @@ import Row from 'react-ui-pack/Row'
 import Text from 'react-ui-pack/Text'
 import View from 'react-ui-pack/View'
 import { logRender, SET } from 'utils-pack'
-import { NAME } from './constants'
+import { NAME as _TEMPLATE } from './constants'
 import select from './selectors'
 
 /**
@@ -14,11 +14,11 @@ import select from './selectors'
  * -----------------------------------------------------------------------------
  */
 const mapStateToProps = (state) => ({
-  ui: select.ui(state)
+  isLoading: select.isLoading(state)
 })
 const mapDispatchToProps = (dispatch) => ({
   actions: {
-    set: (payload) => dispatch(stateAction(NAME, SET, payload))
+    set: (payload) => dispatch(stateAction(_TEMPLATE, SET, payload))
   }
 })
 
@@ -30,12 +30,12 @@ const mapDispatchToProps = (dispatch) => ({
 @logRender
 export default class _Template extends Component {
   render () {
-    const {actions, ui} = this.props
+    const {actions, isLoading} = this.props
     return (
       <View className='app__name'>
         <Row>
-          <Button onClick={actions.set}><Icon name='search'/>{ui.isLoading}</Button>
-          <Text>{NAME}</Text>
+          <Button onClick={actions.set}><Icon name='search'/>{isLoading}</Button>
+          <Text>{_TEMPLATE}</Text>
         </Row>
       </View>
     )

@@ -2,7 +2,7 @@ import fake from 'faker'
 import { createStore, stateAction } from 'modules-pack/redux'
 import { MOCK } from 'modules-pack/variables'
 import { SET } from 'utils-pack'
-import { NAME } from '../constants'
+import { NAME as _TEMPLATE } from '../constants'
 import reducer from '../reducers'
 
 /**
@@ -12,10 +12,10 @@ import reducer from '../reducers'
 
 export function mockStore (...args) {
   fake.seed(MOCK.DATA_SEED)
-  const store = createStore([{NAME, reducer}, ...args])
+  const store = createStore([{_TEMPLATE, reducer}, ...args])
 
   /* Populate with data */
-  mockStore.dispatch(stateAction(NAME, SET, {}, {}))
+  mockStore.dispatch(stateAction(_TEMPLATE, SET, {}, {}))
 
   return store
 }
