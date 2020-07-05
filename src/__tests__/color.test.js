@@ -1,11 +1,4 @@
-import { distanceBetween, toRgbaColor } from '../utility'
-
-it(`${distanceBetween.name}() returns correct distance between two points in millimeters`, () => {
-  const point1 = {lat: 40.714, lng: -74.00599999999997}
-  const point2 = {lat: 48.857, lng: 2.3519999999999754}
-  const distance = 5843670761.836855 // using google.maps.geometry.spherical.computeDistanceBetween
-  expect(distanceBetween(point1, point2)).toEqual(distance)
-})
+import { rgbToColor3, toRgbaColor } from '../color'
 
 describe(`${toRgbaColor.name}()`, () => {
   it('sanitizes given value to correct format and type', () => {
@@ -29,4 +22,9 @@ describe(`${toRgbaColor.name}()`, () => {
     expect(toRgbaColor([0, 0, 0, 1.1])).toEqual(false)
     expect(toRgbaColor('{0, 0, 0, 1}')).toEqual(false)
   })
+})
+
+test(`${rgbToColor3.name}() converts correct RGB color array to Scaled Color3 array`, () => {
+  expect(rgbToColor3([255, 0, 125])).toEqual([1, 0, 0.490196])
+  expect(rgbToColor3([0, 125, 255], 2)).toEqual([0, 0.49, 1])
 })

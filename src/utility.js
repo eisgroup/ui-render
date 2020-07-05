@@ -1,5 +1,4 @@
 import { ACTIVE, ENV } from './_envs'
-import { hasListValue, isList } from './array'
 import { fromJSON } from './codec'
 import { rad } from './number'
 
@@ -76,32 +75,6 @@ export function passStrength (password) {
  */
 export function isGoodPassword (value, strength = 2) {
   return passStrength(value) >= strength
-}
-
-/**
- * Convert given value to a standardized RGB(A) Color Array
- *
- * @param {Array|String} value - to check
- * @return {Array|Boolean} color - if it's a valid color value, else `false`
- */
-export function toRgbaColor (value) {
-  const color = hasListValue(value) ? value : String(value).split(',').map(val => Number(val.trim()))
-  return isRgba(color) && color
-}
-
-/**
- * Check if given value is a valid Array of RGB(A) color numbers/strings
- *
- * @param {Array} color - to check
- * @returns {Boolean} true - if it's valid
- */
-export function isRgba (color) {
-  if (!isList(color)) return false
-  if (color.length < 3 || color.length > 4) return false
-  if (!(color[0] >= 0 && color[0] <= 255)) return false
-  if (!(color[1] >= 0 && color[1] <= 255)) return false
-  if (!(color[2] >= 0 && color[2] <= 255)) return false
-  return !(color[3] && !(color[3] >= 0 && color[3] <= 1))
 }
 
 /**
