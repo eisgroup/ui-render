@@ -97,9 +97,13 @@ export const ALL_RESULTS = [
 
 /* Distance */
 export const ONE_MM = 1
-export const ONE_CM = ONE_MM * 10
-export const ONE_METER = ONE_MM * 1000
-export const ONE_KM = ONE_METER * 1000
+export const ONE_CM = 10 * ONE_MM
+export const ONE_METER = 1000 * ONE_MM
+export const ONE_KM = 1000 * ONE_METER
+export const ONE_INCH = 25.4 * ONE_MM
+export const ONE_FOOT = 304.8 * ONE_MM
+export const ONE_YARD = 914.4 * ONE_MM
+export const ONE_MILE = 1609344 * ONE_MM
 
 /* Formats */
 export const FORMAT_TIME = 'YYYY-MM-DD hh:mm:ss'

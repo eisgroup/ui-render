@@ -60,3 +60,14 @@ export function isRgba (color) {
 export function rgbToColor3 (color, precision = 6) {
 	return color.map(number => round(number / 255, precision))
 }
+
+/**
+ * Convert a Scaled Color3 Array to an RGB Color
+ * @note: in certain frameworks, like Babylon.js, Color3 is an array of RGB numbers ranging from 0 to 1.
+ *
+ * @param {Array<Number>} color3 - with RGB values ranging from 0 to 1
+ * @returns {Array<Number | String>} color - with RGB values ranging from 0 to 255
+ */
+export function rgbFromColor3 (color3) {
+	return color3.map(number => Math.round(number * 255))
+}
