@@ -1,4 +1,4 @@
-import { ACTIVE } from 'utils-pack'
+import { Active } from 'utils-pack'
 
 /**
  * FILE VARIABLES ==============================================================
@@ -12,9 +12,9 @@ const FILE = {
 
 export default FILE
 
-if (ACTIVE.SETTINGS?.HAS_SOUND == null) {
-  ACTIVE.SETTINGS = {
-    ...ACTIVE.SETTINGS,
+if (Active.SETTINGS?.HAS_SOUND == null) {
+  Active.SETTINGS = {
+    ...Active.SETTINGS,
     HAS_SOUND: false
   }
 }
@@ -47,7 +47,7 @@ function soundFile (name) {
   return {
     play () {
       if (!file) file = new Audio(FILE.PATH_SOUNDS + name)
-      if (ACTIVE.SETTINGS.HAS_SOUND && file) file.play().catch(console.error)
+      if (Active.SETTINGS.HAS_SOUND && file) file.play().catch(console.error)
     }
   }
 }

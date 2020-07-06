@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { ACTIVE, debounceBy, get, isInList, warn } from 'utils-pack'
+import { Active, debounceBy, get, isInList, warn } from 'utils-pack'
 import { createScript } from 'utils-pack/utility'
 import { ALERT, stateAction } from '../../common/actions'
 import { connect } from '../../common/redux'
@@ -137,7 +137,7 @@ export default class Place extends Component {
       {
         // @note: types: ['address'] does not work, better return all
         // types: ['geocode', 'establishment'],
-        language: ACTIVE.LANG._,
+        language: Active.LANG._,
         ...this.props.searchOptions,
         input,
         sessionToken: this.session

@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { ACTIVE, debounce, LANGUAGE, shortNumber, SORT_ORDER, toUpperCase } from 'utils-pack'
+import { Active, debounce, LANGUAGE, shortNumber, SORT_ORDER, toUpperCase } from 'utils-pack'
 import ColorSwatch from './ColorSwatch'
 import FILE from './files'
 import Icon from './Icon'
@@ -47,11 +47,10 @@ export function colorDropdownOptions (colorObj, Active) {
  * Create Language Options from Language Definition for use with Dropdowns
  *
  * @param {Object|Array<Object>} languageObj - definition from variables.js
- * @param {Object} [Active] - object containing active .LANG._
  * @param {Boolean} [selection] - whether to render as selected language flag and code, default is searchable text
  * @returns {Object<lang[{text, value, content}]>} options - grouped by language code, for use with dropdowns
  */
-export function languageDropdownOptions (languageObj, {Active = ACTIVE, selection} = {}) {
+export function languageDropdownOptions (languageObj, {selection} = {}) {
   const options = {
     get items () {
       return this[Active.LANG._] || this[LANGUAGE.ENGLISH._] || []
