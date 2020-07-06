@@ -1,13 +1,13 @@
-import { __PROD__, ACTIVE, ENV } from 'utils-pack'
+import { __PROD__, Active, ENV } from 'utils-pack'
 
 /* Additional Environment Variables */
 export const SECRET = __PROD__ ? ENV.SECRET : ENV.REACT_APP_SECRET  // make backend use REACT for testing socket actions
 
 /* Additional Globally Accessible Objects */
-ACTIVE.SERVICE = ENV.SERVICE
-ACTIVE.store = {}  // to avoid circular import
-ACTIVE.createStore = () => {} // to create a new store instance within sagas
-ACTIVE.client = undefined // Apollo client
-ACTIVE.passwordCheck = () => {} // password strength calculator
-ACTIVE.pubsub = undefined // GraphQL Pubsub module
-ACTIVE.usersById = {} // for storing temporary info, like user.lastOnline
+Active.SERVICE = ENV.SERVICE
+Active.store = {}  // to avoid circular import
+Active.createStore = () => {} // to create a new store instance within sagas
+Active.client = undefined // Apollo client
+Active.passwordCheck = () => {} // password strength calculator
+Active.pubsub = undefined // GraphQL Pubsub module
+Active.usersById = {} // for storing temporary info, like user.lastOnline

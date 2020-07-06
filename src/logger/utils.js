@@ -1,6 +1,6 @@
 import { fork } from 'redux-saga/effects'
 import {
-  ACTIVE,
+  Active,
   DISCONNECTED,
   ERROR,
   first,
@@ -104,7 +104,7 @@ export class Log {
    */
   static servicePrune (services) {
     toList(services).forEach(service => {
-      const id = `${ACTIVE.SERVICE}_${service}_${STATS_TYPE.SOCKET}`
+      const id = `${Active.SERVICE}_${service}_${STATS_TYPE.SOCKET}`
       delete Log._statsByService[service]
       delete Log._statsBy[id]
     })
@@ -126,7 +126,7 @@ export class Log {
       Log.errors = errors
 
       // Broadcast New Error Report
-      ACTIVE.pubsub.publish(stateActionType(ERROR, REPORT), {errorReports: [action]})
+      Active.pubsub.publish(stateActionType(ERROR, REPORT), {errorReports: [action]})
     } catch (err) {
       try {
         // Action payload from API can be an Error object
@@ -136,7 +136,7 @@ export class Log {
         Log.errors = errors
 
         // Broadcast New Error Report
-        ACTIVE.pubsub.publish(stateActionType(ERROR, REPORT), {errorReports: [action]})
+        Active.pubsub.publish(stateActionType(ERROR, REPORT), {errorReports: [action]})
       } catch (err) {
         warn('Cannot Convert to JSON!!!', action)
       }
@@ -165,7 +165,7 @@ export class Log {
    */
   static apiPrune (metaKeys) {
     toList(metaKeys).forEach(name => {
-      const id = `${ACTIVE.SERVICE}_${name}_${STATS_TYPE.API}`
+      const id = `${Active.SERVICE}_${name}_${STATS_TYPE.API}`
       delete Log._statsBy[id]
     })
   }
@@ -178,7 +178,7 @@ export class Log {
    * @param {String} type - Stats type
    */
   static request (name, record, type) {
-    const id = `${ACTIVE.SERVICE}_${name}_${type}`
+    const id = `${Active.SERVICE}_${name}_${type}`
     let result = Log._statsBy[id]
 
     // Create New Log
@@ -187,7 +187,7 @@ export class Log {
         id,
         name,
         type,
-        service: ACTIVE.SERVICE,
+        service: Active.SERVICE,
         latencies: [record]
       }
     }  // eslint-disable-line
@@ -266,7 +266,7 @@ export class Log {
     setTimeout(() => {  // avoid affecting performance by postponing logging
       const name = task.name
       const record = done ? {latency: done - start, timestamp: done} : null
-      const id = `${parentId ? '_' + parentId : ACTIVE.SERVICE}_${name}`
+      const id = `${parentId ? '_' + parentId : Active.SERVICE}_${name}`
       let result = Log._statsBy[id]
 
       // Create New Log
@@ -275,7 +275,7 @@ export class Log {
           id,
           name,
           type: STATS_TYPE.TASK,
-          service: ACTIVE.SERVICE,
+          service: Active.SERVICE,
           start,
           ...done && {
             done,
@@ -309,7 +309,7 @@ export class Log {
   static taskEnd (task, {parentId = null, done = Date.now()}) {
     setTimeout(() => {  // avoid affecting performance by postponing logging
       const name = task.name
-      const id = `${parentId ? '_' + parentId : ACTIVE.SERVICE}_${name}`
+      const id = `${parentId ? '_' + parentId : Active.SERVICE}_${name}`
       const result = Log._statsBy[id]
       if (!result) return warn(`Log.${Log.taskEnd.name} found no task named '${task.name}'`)
       result.done = done

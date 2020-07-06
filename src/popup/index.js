@@ -1,4 +1,4 @@
-import { ACTIVE, ALERT } from 'utils-pack'
+import { Active, ALERT } from 'utils-pack'
 import { stateAction } from '../redux/actions'
 import { NAME } from './constants'
 import reducer from './reducers'
@@ -26,5 +26,5 @@ const popup = {
 export default popup
 
 export function popupAlert (title, content) {
-  ACTIVE.store.dispatch(stateAction(NAME, ALERT, {items: [{title, content}]}))
+  Active.store.dispatch(stateAction(NAME, ALERT, {items: [{title, content}]}))
 }

@@ -1,4 +1,4 @@
-import { ACTIVE, findObjByKeys, isInList, LANGUAGE } from 'utils-pack'
+import { Active, findObjByKeys, isInList, LANGUAGE } from 'utils-pack'
 import selector from 'utils-pack/selectors'
 import routerSelect from '../../todo/router/selectors'
 import userSelect from '../../todo/user/selectors'
@@ -21,7 +21,7 @@ export default class select {
   static currency = () => [
     (state) => state[NAME].data.currency,
     (val) => {
-      ACTIVE.CURRENCY = findObjByKeys(CURRENCY, {code: val}) || findObjByKeys(CURRENCY, {code: DEFAULT.CURRENCY})
+      Active.CURRENCY = findObjByKeys(CURRENCY, {code: val}) || findObjByKeys(CURRENCY, {code: DEFAULT.CURRENCY})
       return val
     }
   ]
@@ -29,7 +29,7 @@ export default class select {
   static language = () => [
     (state) => state[NAME].data.language,
     (val) => { // @note: do not add default language here to trigger setLanguageFlow saga
-      ACTIVE.LANG = findObjByKeys(LANGUAGE, {code: val}) || LANGUAGE.ENGLISH
+      Active.LANG = findObjByKeys(LANGUAGE, {code: val}) || LANGUAGE.ENGLISH
       return val
     }
   ]

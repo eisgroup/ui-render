@@ -1,4 +1,4 @@
-import { ACTIVE, definitionByValue, enumFrom, l, LANGUAGE, LANGUAGE_LEVEL, optionsFrom } from 'utils-pack'
+import { Active, definitionByValue, enumFrom, l, LANGUAGE, LANGUAGE_LEVEL, optionsFrom } from 'utils-pack'
 
 /**
  * PROJECT DEFINITIONS =========================================================
@@ -15,7 +15,7 @@ export const CURRENCY = {
     [l.ENGLISH._]: 'RUB',
   },
 }
-ACTIVE.CURRENCY = CURRENCY.USD
+Active.CURRENCY = CURRENCY.USD
 
 export const PHONE = {
   MOBILE: {

@@ -1,4 +1,4 @@
-import { ACTIVE, SET } from 'utils-pack'
+import { Active, SET } from 'utils-pack'
 import { stateAction } from '../redux/actions'
 import { NAME as SETTINGS } from './constants'
 
@@ -8,5 +8,5 @@ import { NAME as SETTINGS } from './constants'
  */
 
 export function setSettings (payload) {
-  return ACTIVE.store.dispatch(stateAction(SETTINGS, SET, payload))
+  return Active.store.dispatch(stateAction(SETTINGS, SET, payload))
 }

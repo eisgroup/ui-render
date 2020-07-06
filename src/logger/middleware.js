@@ -1,4 +1,4 @@
-import { __DEV__, ACTIVE, ERROR, formatNumber, log, logClear, REPORT, warn, } from 'utils-pack'
+import { __DEV__, Active, ERROR, formatNumber, log, logClear, REPORT, warn, } from 'utils-pack'
 import { socketActionSigned } from '../../todo/socket'
 import { isError, stateAction } from '../redux'
 import { SERVER, SOCKET_SERVER } from '../variables'
@@ -51,7 +51,7 @@ export class Middleware {
     const shouldShowLatency = latency && (type.indexOf('http') === 0 || type.indexOf('ws') === 0)
     const now = Date.now()
     const stats = `+${formatNumber(now - this.lastTimestamp)} ms` +
-      (shouldShowLatency ? ', ' + ACTIVE.log.keyword(latencyColor(latency))(`~${formatNumber(latency)} ms`) : '')
+      (shouldShowLatency ? ', ' + Active.log.keyword(latencyColor(latency))(`~${formatNumber(latency)} ms`) : '')
 
     /* Clear Console when Limit exceeded */
     this.setTimestamp(now)
@@ -69,10 +69,10 @@ export class Middleware {
   /* Record Error Action */
   logError (action) {
     action.timestamp = Date.now()
-    action.service = ACTIVE.SERVICE
+    action.service = Active.SERVICE
 
     /* When Run in Server */
-    if (ACTIVE.SERVICE === SERVER) return Log.handleError(action)
+    if (Active.SERVICE === SERVER) return Log.handleError(action)
 
     /* When Run in Other Services, Notify Server about this Error */
     try {

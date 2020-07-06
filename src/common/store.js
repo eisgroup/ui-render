@@ -1,10 +1,10 @@
 import commonModules from 'modules-pack/common'
 import { createStore } from 'modules-pack/redux'
-import { ACTIVE } from 'utils-pack'
+import { Active } from 'utils-pack'
 
 // =============================================================================
 // STORE CREATION
 // =============================================================================
 
-ACTIVE.store = createStore(commonModules)
-export default ACTIVE.store
+Active.store = createStore(commonModules)
+export default Active.store
