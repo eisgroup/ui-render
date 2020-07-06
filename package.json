@@ -1,6 +1,6 @@
 {
   "name": "modules-pack",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "JavaScript Modules for Modern Frontend & Backend Projects",
   "license": "MIT",
   "main": "index.js",
@@ -28,8 +28,8 @@
   },
   "peerDependencies": {
     "react": "16.x",
-    "react-ui-pack": "0.1.x",
-    "utils-pack": "0.1.x"
+    "react-ui-pack": "0.2.x",
+    "utils-pack": "0.2.x"
   },
   "dependencies": {
     "react-redux": "^7.2.0",
