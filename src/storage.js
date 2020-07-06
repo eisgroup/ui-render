@@ -1,4 +1,4 @@
-import { __DEV__, ACTIVE } from './_envs'
+import { __DEV__, Active } from './_envs'
 import { isList } from './array'
 import { fromJSON, toJSON } from './codec'
 import { ADD, DELETE, GET, SET } from './constants'
@@ -55,10 +55,9 @@ performCache.cache = {}
  * @param {string} storageKey - stored value's key identifier
  * @param {*} value - value to store
  * @param {Array|Object} initialValue - used for ADD ACTION when saving the first time
- * @param {Object} [Active] - object containing currently used storage via key path .Storage
  * @return {*} - Local or AsyncStorage promise result or stored value for GET action
  */
-export function performStorage (ACTION, storageKey, value = null, initialValue = [], Active = ACTIVE) {
+export function performStorage (ACTION, storageKey, value = null, initialValue = []) {
   /* ADD action abstraction */
   if (ACTION === ADD) {
     const oldData = performStorage(GET, storageKey) || initialValue

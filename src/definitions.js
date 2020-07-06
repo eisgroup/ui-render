@@ -1,4 +1,4 @@
-import { ACTIVE } from './_envs'
+import { Active } from './_envs'
 import { LANGUAGE } from './constants'
 
 /**
@@ -100,10 +100,9 @@ export function enumFrom (DEFINITION) {
  *    <Dropdown options={options[LANGUAGE.ENGLISH._]} .../> // or directly via language _
  *
  * @param {Object<KEY<_...>>|Array<_...>} DEFINITION - key/value pairs of variable name with its underscore value
- * @param {Object} [Active] - object containing currently used language via key path .LANG._
  * @return {Object<items, lang[{text, value}]>} options - grouped by language underscore value, with .items pointing to active lang
  */
-export function optionsFrom (DEFINITION, Active = ACTIVE) {
+export function optionsFrom (DEFINITION) {
   const options = {
     get items () {
       return this[Active.LANG._] || this[LANGUAGE.ENGLISH._] || []
@@ -130,9 +129,8 @@ export function optionsFrom (DEFINITION, Active = ACTIVE) {
  *
  * @param {Object|Object<KEY<_...>>} DEFINITION - key/value pairs of variable name with its _ value
  *    Multiple definitions can be nested unlimited times inside a single object.
- * @param {Object} Active - object containing currently used language via key path .LANG._
  */
-export function localise (DEFINITION, Active = ACTIVE) {
+export function localise (DEFINITION) {
   for (const KEY in DEFINITION) {
     const definition = DEFINITION[KEY]
     const {_, name} = definition
@@ -160,11 +158,10 @@ export function localise (DEFINITION, Active = ACTIVE) {
  *    >>> 'Поиск'
  *
  * @param {Object|Object<KEY<_...>>} TRANSLATION - key/value pairs of variable name with its localised values
- * @param {Object} [Active] - object containing currently used language via key path .LANG._
  * @returns {Object} translations - with all definitions as javascript getters returning currently active language,
  *  (falls back to English if definition not found for active language, or empty string).
  */
-export function localiseTranslation (TRANSLATION, Active = ACTIVE) {
+export function localiseTranslation (TRANSLATION) {
   const result = {}
   for (const KEY in TRANSLATION) {
     Object.defineProperty(result, KEY, {

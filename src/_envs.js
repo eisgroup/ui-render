@@ -17,9 +17,9 @@ export const _WORK_DIR_ = typeof process !== 'undefined' ? process.cwd() : '.' /
 export const UNDEFINED = (Undefined => Undefined)()
 
 /* Globally Accessible Objects */
-export const ACTIVE = {
-	// will be overridden at runtime, used for avoiding circular import and env-dependent libraries
-	LANG: LANGUAGE.ENGLISH, // currently used language
-	Storage: typeof localStorage !== 'undefined' ? localStorage : undefined, // LocalStorage for Node
-	WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined, // WebSocket for Node
+export const Active = {
+  // will be overridden at runtime, used for avoiding circular import and env-dependent libraries
+  LANG: LANGUAGE.ENGLISH, // currently used language
+  Storage: typeof localStorage !== 'undefined' ? localStorage : undefined, // LocalStorage for Node
+  WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined, // WebSocket for Node
 }

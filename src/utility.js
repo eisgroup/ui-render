@@ -1,4 +1,4 @@
-import { ACTIVE, ENV } from './_envs'
+import { Active, ENV } from './_envs'
 import { fromJSON } from './codec'
 import { rad } from './number'
 
@@ -61,7 +61,7 @@ export function requireEnv (variables) {
  * @return {Object} strength - result
  */
 export function passStrength (password) {
-  return ACTIVE.passwordCheck(password).score
+  return Active.passwordCheck(password).score
 }
 
 /**

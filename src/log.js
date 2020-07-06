@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import now from 'performance-now'
-import { __CLIENT__, __DEV__, __TEST__, ACTIVE } from './_envs'
+import { __CLIENT__, __DEV__, __TEST__, Active } from './_envs'
 import { isFunction } from './function'
 import { formatNumber } from './number'
 import { isInString } from './string'
@@ -94,14 +94,14 @@ benchA.skip = new Function('')  // eslint-disable-line
  * @return void
  */
 export function log (first, ...args) {
-	// eslint-disable-next-line no-console
-	if (!__DEV__) return
-	if (__CLIENT__ || !ACTIVE.log?.keyword) {
-		console.log((typeof first === 'string' && isInString(args[0] || '', 'color:')) ? `%c${first}` : first, ...args)
-	} else {
-		const color = isInString(args[0] || '', 'color:') ? args.shift().split(': ')[1].toLowerCase() : ''
-		console.log((typeof first === 'string' && color) ? ACTIVE.log.keyword(color)(first) : first, ...args)
-	}
+  // eslint-disable-next-line no-console
+  if (!__DEV__) return
+  if (__CLIENT__ || !Active.log?.keyword) {
+    console.log((typeof first === 'string' && isInString(args[0] || '', 'color:')) ? `%c${first}` : first, ...args)
+  } else {
+    const color = isInString(args[0] || '', 'color:') ? args.shift().split(': ')[1].toLowerCase() : ''
+    console.log((typeof first === 'string' && color) ? Active.log.keyword(color)(first) : first, ...args)
+  }
 }
 
 /**
@@ -116,16 +116,16 @@ export function log (first, ...args) {
  */
 export function logBenchmark ({ name, type = '', duration, loop = null, result = null }) {
 	const stats = !loop ? '' : `for ${formatNumber(loop)} iterations, ` +
-		ACTIVE.log.keyword('orange')(`${formatNumber(duration / loop, { decimals: 3 })} ms`) + ' each'
+    Active.log.keyword('orange')(`${formatNumber(duration / loop, {decimals: 3})} ms`) + ' each'
 	const output = (result != null) ? ['\n>>>', result] : []
 	// eslint-disable-next-line no-console
 	console.log(
-		ACTIVE.log.green(`\n${name}()`),
-		ACTIVE.log.keyword('cyan')(`▶ ${type} took`),
-		ACTIVE.log.keyword('orange')(`${formatNumber(duration, { decimals: 3 })} ms`),
-		ACTIVE.log.keyword('cyan')(stats),
-		...output,
-	)
+    Active.log.green(`\n${name}()`),
+    Active.log.keyword('cyan')(`▶ ${type} took`),
+    Active.log.keyword('orange')(`${formatNumber(duration, {decimals: 3})} ms`),
+    Active.log.keyword('cyan')(stats),
+    ...output,
+  )
 }
 
 /**
