@@ -33,7 +33,11 @@
   },
   "dependencies": {
     "backoff": "^2.5.0",
+    "connected-react-router": "^6.8.0",
+    "history": "^5.0.0",
     "react-redux": "^7.2.0",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
     "redux": "^4.0.5",
     "redux-actions": "^2.6.5",
     "redux-ignore": "^1.2.5",
