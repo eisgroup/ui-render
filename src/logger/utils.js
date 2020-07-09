@@ -1,4 +1,3 @@
-import { fork } from 'redux-saga/effects'
 import {
   Active,
   DISCONNECTED,
@@ -16,6 +15,7 @@ import {
   warn
 } from 'utils-pack'
 import { stateActionType } from '../redux'
+import { fork } from '../saga/utils'
 import {
   MAX_ERROR_RECORDS,
   MAX_IDLE_DURATION,
