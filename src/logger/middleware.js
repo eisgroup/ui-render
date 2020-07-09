@@ -1,7 +1,7 @@
 import { __DEV__, Active, ERROR, formatNumber, log, logClear, REPORT, warn, } from 'utils-pack'
 import { isError, stateAction } from '../redux'
 import { socketActionSigned } from '../socket'
-import { SERVER, SOCKET_SERVER } from '../variables'
+import { SERVER, URL } from '../variables'
 import { MAX_CONSOLE_RECORDS } from './constants'
 import { actionTypeColor, latencyColor, Log } from './utils'
 
@@ -76,12 +76,12 @@ export class Middleware {
 
     /* When Run in Other Services, Notify Server about this Error */
     try {
-      this.store.dispatch(socketActionSigned(SOCKET_SERVER, stateAction(ERROR, REPORT, {item: action})))
+      this.store.dispatch(socketActionSigned(URL.SOCKET_SERVER, stateAction(ERROR, REPORT, {item: action})))
     } catch (err) {
       try {
         // Action payload from API can be an Error object
         action.payload = action.payload.toString()
-        this.store.dispatch(socketActionSigned(SOCKET_SERVER, stateAction(ERROR, REPORT, {item: action})))
+        this.store.dispatch(socketActionSigned(URL.SOCKET_SERVER, stateAction(ERROR, REPORT, {item: action})))
       } catch (err) {
         warn('Cannot Convert to JSON!!!', action)
       }

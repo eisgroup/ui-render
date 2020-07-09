@@ -1,5 +1,4 @@
-import { combineReducers, handleActions } from '../redux'
-import { popups, uiLoading } from '../redux/reducers'
+import { combineReducers, handleActions, popups, uiLoading } from '../redux'
 import { NAME } from './constants'
 import initState from './data'
 

@@ -13,7 +13,7 @@ import {
 } from 'utils-pack'
 import { stateAction } from '../redux/actions'
 import { call, delay, put, race, spawn, take } from '../saga/utils'
-import { SOCKET_SERVER } from '../variables'
+import { URL } from '../variables'
 import { socketAction, socketActionSigned, socketActionType } from './actions'
 import { CONNECT_TIMEOUT } from './constants'
 
@@ -107,7 +107,7 @@ export function isMatchingSocketPayloadActionType (action, ENDPOINT, RESULT, pay
  * @param {Function} [callback] - function to call on successful connection, will receives all arguments
  * @param {Function} [args] - arguments to pass to 'callback' function
  */
-export function * socketConnect (clientId = Active.SERVICE, endpoint = SOCKET_SERVER, callback = null, ...args) {
+export function * socketConnect (clientId = Active.SERVICE, endpoint = URL.SOCKET_SERVER, callback = null, ...args) {
   const payload = {clientId}
   yield put(socketActionSigned(endpoint, stateAction(clientId, CONNECTED, null, payload)))
 
