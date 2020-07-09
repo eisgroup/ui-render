@@ -11,7 +11,7 @@ import { SliderLabeled } from './renderers'
 export default class FieldsWithLevel extends Component {
   static propTypes = {
     kind: PropTypes.string.isRequired, // type of definition to use - TYPE.key enum ['lang', 'phone', etc.]
-    level: PropTypes.object.isRequired, // Definition of Level by code (ex. DEFINITION_BY_CODE.LANGUAGE_LEVEL)
+    level: PropTypes.object.isRequired, // Definition of Level by code (ex. DEFINITION_BY_VAL.LANGUAGE_LEVEL)
     options: PropTypes.arrayOf(PropTypes.shape({ // Dropdown options (ex. OPTIONS.LANGUAGE.items)
       text: PropTypes.string.isRequired,
       value: PropTypes.any.isRequired,

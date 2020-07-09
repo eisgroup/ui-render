@@ -1,7 +1,7 @@
+import routerSelect from 'modules-pack/router/selectors'
+import userSelect from 'modules-pack/user/selectors'
 import { Active, findObjByKeys, isInList, LANGUAGE } from 'utils-pack'
 import selector from 'utils-pack/selectors'
-import userSelect from '../../todo/user/selectors'
-import routerSelect from '../router/selectors'
 import { CURRENCY, DEFAULT, ROUTES } from '../variables'
 import { NAME } from './constants'
 

@@ -1,4 +1,4 @@
-const history = require('./history').createBrowserHistory()
+const history = require('history').createBrowserHistory()
 export default history
 
 export function openModal (route, state = {}) {

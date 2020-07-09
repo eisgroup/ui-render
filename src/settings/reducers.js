@@ -1,7 +1,5 @@
+import { combineReducers, handleActions, stateActionType, uiLoading } from 'modules-pack/redux'
 import { performStorage, SET } from 'utils-pack'
-import { combineReducers, handleActions } from '../redux'
-import { stateActionType } from '../redux/actions'
-import { uiLoading } from '../redux/reducers'
 import { NAME, UI } from './constants'
 import initState from './data'
 

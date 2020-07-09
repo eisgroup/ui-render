@@ -61,7 +61,7 @@ export const DEFINITION = {
   [TYPE.PHONE._]: PHONE,
 }
 
-export const DEFINITION_BY_CODE = {
+export const DEFINITION_BY_VAL = {
   LANGUAGE: definitionByValue(LANGUAGE),
   LANGUAGE_LEVEL: definitionByValue(LANGUAGE_LEVEL),
   [TYPE.LANGUAGE._]: definitionByValue(LANGUAGE),

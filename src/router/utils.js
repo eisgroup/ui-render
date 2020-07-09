@@ -1,4 +1,4 @@
-import { ROUTE, } from 'modules-pack/variables'
+import { ROUTE } from 'modules-pack/variables'
 import React from 'react'
 import { withRouter } from 'react-router'
 import { Link as LinkRouter, Route } from 'react-router-dom'
