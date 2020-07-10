@@ -1,8 +1,8 @@
+import UploadGrid from 'modules-pack/upload/views/UploadGrid'
 import React, { Component } from 'react'
 import { isRequired } from 'react-ui-pack/inputs/validationRules'
 import { Field } from 'redux-form'
 import { isFunction } from 'utils-pack'
-import UploadGrid from '../../../todo/modules/upload/views/UploadGrid'
 
 export default class UploadGridField extends Component {
   input = ({input}) => {

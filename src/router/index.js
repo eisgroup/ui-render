@@ -3,7 +3,7 @@ import { Route } from 'react-router-dom'
 import { ACTION_TYPE, NAME } from './constants'
 import history from './history'
 import select from './selectors'
-import { defineRoutes, Link } from './utils'
+import { defineRoutes } from './utils'
 
 /**
  * BROWSER ROUTER EXPORTS ======================================================
@@ -11,9 +11,11 @@ import { defineRoutes, Link } from './utils'
  * =============================================================================
  */
 
+export * from './constants'
+export * from './history'
+export * from './utils'
 export {
   history,
-  Link,
   select
 }
 
