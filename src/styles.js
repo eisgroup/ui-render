@@ -5,7 +5,7 @@
  */
 
 /* Colors */
-const STYLE = {
+export const STYLE = {
   ANIMATION_DURATION: 500,
   SIZE_SCALE: 62.5, // match percentage of font-size defined in <html> root element
   GREY: 'rgb(55, 145, 70)',

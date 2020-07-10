@@ -10,7 +10,7 @@ import View from './View'
 export default function Tags
   ({
     items,
-    defByCode, // example: DEFINITION_BY_CODE.LANGUAGE
+    defByCode, // example: DEFINITION_BY_VAL.LANGUAGE
     label,
   }) {
   if (isEmpty(items)) return null
