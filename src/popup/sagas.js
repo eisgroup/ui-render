@@ -1,14 +1,14 @@
-import { ALERT, ERROR, get, hostname, isInList, LOGOUT, OPEN, SYSTEM, toList, } from 'utils-pack'
 import {
   HTTP_401_UNAUTHORIZED,
   NAME as API,
   NETWORK,
   NETWORK_ERROR_MESSAGES,
   REQUEST_TIMEOUT_MESSAGE
-} from '../../todo/api/constants'
-import { isApiActionTypeError, isApiActionTypeTimeout } from '../../todo/api/utils'
-import { stateAction, stateActionType, } from '../redux/actions'
-import { all, call, put, takeEvery } from '../saga/utils'
+} from 'modules-pack/api/constants'
+import { isApiActionTypeError, isApiActionTypeTimeout } from 'modules-pack/api/utils'
+import { stateAction, stateActionType, } from 'modules-pack/redux/actions'
+import { all, call, put, takeEvery } from 'modules-pack/saga/utils'
+import { ALERT, ERROR, get, hostname, isInList, LOGOUT, OPEN, SYSTEM, toList, } from 'utils-pack'
 import { NAME as POPUP, POPUP_ALERT, POPUP_ERROR } from './constants'
 
 /**
