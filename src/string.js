@@ -86,7 +86,7 @@ export function isInString(string, search) {
  * Checks to see if any of the searches params exist within the string param.
  *
  * @param {string} string - haystack
- * @param {Array} searches - needles
+ * @param searches - needles
  * @return {boolean}
  */
 export function isInStringAny(string, ...searches) {
