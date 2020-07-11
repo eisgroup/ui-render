@@ -338,9 +338,54 @@ export function roundUp(number, precision = 0) {
  * @param {number} [precision] - decimal places to keep
  * @returns {number} - with rounded values
  */
-export function roundDown(number, precision = 0) {
+export function roundDown (number, precision = 0) {
 	const factor = Math.pow(10, precision)
 	return Math.floor(number * factor) / factor
+}
+
+/**
+ * Round Number to the closest Multiple of value
+ *
+ * @example:
+ *    roundTo(123.4567, 10)
+ *    >>> 120
+ *
+ * @param {number} number - value to round
+ * @param {number} [multiple] - value, the multiple of which to round to
+ * @returns {number} - rounded to given multiple of value
+ */
+export function roundTo (number, multiple = 1) {
+	return Math.round(number / multiple) * multiple
+}
+
+/**
+ * Round Down Number to the closest Multiple of value
+ *
+ * @example:
+ *    roundTo(123.4567, 10)
+ *    >>> 120
+ *
+ * @param {number} number - value to round
+ * @param {number} [multiple] - value, the multiple of which to round to
+ * @returns {number} - rounded to given multiple of value
+ */
+export function roundDownTo (number, multiple = 1) {
+	return Math.floor(number / multiple) * multiple
+}
+
+/**
+ * Round Up Number to the closest Multiple of value
+ *
+ * @example:
+ *    roundTo(123.4567, 10)
+ *    >>> 130
+ *
+ * @param {number} number - value to round
+ * @param {number} [multiple] - value, the multiple of which to round to
+ * @returns {number} - rounded to given multiple of value
+ */
+export function roundUpTo (number, multiple = 1) {
+	return Math.ceil(number / multiple) * multiple
 }
 
 /**
@@ -349,7 +394,7 @@ export function roundDown(number, precision = 0) {
  * @param {number|string} value - number to get precision for
  * @return {number} precision - decimal places
  */
-export function decimalPlaces(value) {
+export function decimalPlaces (value) {
 	const match = String(Number(value)).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/)
 	if (!match) return 0
 	return Math.max(

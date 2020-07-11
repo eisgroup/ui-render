@@ -6,7 +6,10 @@ import {
   isContinuousNumberRanges,
   isNumber,
   isNumeric,
+  roundDownTo,
   roundTail,
+  roundTo,
+  roundUpTo,
   shortNumber,
   startEndFromNumberRanges,
   toPercentage
@@ -280,6 +283,30 @@ it(`${roundTail.name}() rounds number to n* last digits`, () => {
   expect(roundTail(1234567, 3)).toEqual(1235000)
   expect(roundTail(1234567, 7)).toEqual(1000000)
   expect(roundTail(5234567, 7)).toEqual(10000000)
+})
+
+it(`${roundTo.name}() rounds number to the closet multiple of value`, () => {
+  expect(roundTo(0, 3)).toEqual(0)
+  expect(roundTo(0.001, 3)).toEqual(0)
+  expect(roundTo(1234.001)).toEqual(1234)
+  expect(roundTo(1234.001, 10)).toEqual(1230)
+  expect(roundTo(1234.001, 5)).toEqual(1235)
+})
+
+it(`${roundDownTo.name}() rounds down number to the closet multiple of value`, () => {
+  expect(roundDownTo(0, 3)).toEqual(0)
+  expect(roundDownTo(0.001, 3)).toEqual(0)
+  expect(roundDownTo(1234.001)).toEqual(1234)
+  expect(roundDownTo(1234.001, 10)).toEqual(1230)
+  expect(roundDownTo(1234.001, 5)).toEqual(1230)
+})
+
+it(`${roundUpTo.name}() rounds up number to the closet multiple of value`, () => {
+  expect(roundUpTo(0, 3)).toEqual(0)
+  expect(roundUpTo(0.001, 3)).toEqual(3)
+  expect(roundUpTo(1234.001)).toEqual(1235)
+  expect(roundUpTo(1234.001, 10)).toEqual(1240)
+  expect(roundUpTo(1234.001, 5)).toEqual(1235)
 })
 
 it(`${toPercentage.name}() returns the difference percents between numbers correctly`, () => {
