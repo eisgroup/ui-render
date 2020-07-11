@@ -101,6 +101,14 @@ export const ALL_RESULTS = [
 	VOID,
 ]
 
+/* Key Codes */
+export const KEY = {
+	UNDEFINED: -1,
+	LEFT_CLICK: 0,
+	MIDDLE_CLICK: 1,
+	RIGHT_CLICK: 2,
+}
+
 /* Distance */
 export const ONE_MM = 1
 export const ONE_CM = 10 * ONE_MM
