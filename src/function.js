@@ -142,6 +142,7 @@ export function throttleBy (duration = TIME_DURATION_INSTANT, options) {
  * @param {Function} func - to call
  * @param {Number} [wait] - milliseconds to delay
  * @param {Boolean} [leading] - whether to execute the Function immediately first
+ * @returns {function(...[*]=)} - debounced
  */
 export function debounce (func, wait = TIME_DURATION_INSTANT, { leading } = {}) {
 	let timeout
@@ -200,9 +201,10 @@ export const testMock = {
 /**
  * A wrapper around the lodash's throttle function.
  * @see {@link https://lodash.com/docs/4.17.2#throttle) for further information.
- * @param func
- * @param wait
- * @param options
+ * @param {Function} func - to call
+ * @param {Number} [wait] - milliseconds to delay
+ * @param {Object} [options]
+ * @returns {function(...[*]=)} - throttled
  */
 export function throttle (func, wait = TIME_DURATION_INSTANT, options = {}) {
 	return _.throttle(func, wait, options)
