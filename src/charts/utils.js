@@ -2,7 +2,7 @@ import React from 'react'
 import { Area, Cell, LabelList } from 'recharts'
 import { shortNumber, toAlphaNumId, } from 'utils-pack'
 import { toHours } from 'utils-pack/time'
-import STYLE from '../styles'
+import { STYLE } from '../styles'
 
 // =============================================================================
 // COMMON CHART OPTIONS AND HELPERS

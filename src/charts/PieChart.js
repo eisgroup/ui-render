@@ -7,7 +7,7 @@ import { by, pluralize, shortNumber, throttle, toList, toListValuesTotal, trunca
 import { gradientColors } from 'utils-pack/color'
 import { renderFloat } from '../renders'
 import Row from '../Row'
-import STYLE from '../styles'
+import { STYLE } from '../styles'
 import Text from '../Text'
 import View from '../View'
 import { chartTooltip, renderCells, renderGradients } from './utils'

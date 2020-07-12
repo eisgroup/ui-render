@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 import ReactAnimateHeight from 'react-animate-height'
-import STYLE from './styles'
+import { STYLE } from './styles'
 
 /**
  * Wrapper component that animates height changes

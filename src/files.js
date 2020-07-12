@@ -5,12 +5,10 @@ import { Active } from 'utils-pack'
  * =============================================================================
  */
 
-const FILE = {
+export const FILE = {
   PATH_IMAGES: '/static/images/',
   PATH_SOUNDS: '/static/sounds/'
 }
-
-export default FILE
 
 if (Active.SETTINGS?.HAS_SOUND == null) {
   Active.SETTINGS = {

@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { fileNameWithoutExt } from 'utils-pack'
-import FILE from './files'
+import { FILE } from './files'
 
 /**
  * Image - Pure Component.
