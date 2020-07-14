@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import JsonView from 'react-json-tree'
+import JsonTree from 'react-json-tree'
 import View from '../View'
 import defaultTheme from './themes'
 
@@ -18,7 +18,7 @@ import defaultTheme from './themes'
  * @param {*} props - other attributes to pass to `<div></div>`
  * @returns {Object} - React Component
  */
-export default function Json
+export default function JsonView
   ({
     data = {},
     inverted = false,
@@ -32,11 +32,11 @@ export default function Json
   if (expanded) props.shouldExpandNode = () => true
   return (
     <View className={classNames('json-tree', className, {fill})} style={style}>
-      <JsonView hideRoot invertTheme={!inverted} theme={theme} data={data} {...props} />
+      <JsonTree hideRoot invertTheme={!inverted} theme={theme} data={data} {...props} />
     </View>
   )
 }
 
-Json.propTypes = {
+JsonView.propTypes = {
   data: PropTypes.any.isRequired, // JSON data to show
 }
