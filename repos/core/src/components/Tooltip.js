@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 
 /**
- * Tooltip - Pure Component
+ * Tooltip - Pure CSS Component
  */
 export default function Tooltip ({ top, bottom, right, left, show, className, ...props }) {
   return <span

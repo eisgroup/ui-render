@@ -611,13 +611,18 @@ export default {
                             view: 'Button',
                             className: 'a transparent',
                             children: 'Apply',
-                            type: 'submit,'
+                            type: 'submit,',
+                            tooltip: 'Insert Changes',
                           },
                           {
-                            view: 'Button',
-                            className: 'a transparent',
-                            children: 'Reset',
-                            onClick: 'reset',
+                            view: 'Tooltip',
+                            label: 'Remove Changes',
+                            children: {
+                              view: 'Button',
+                              className: 'a transparent',
+                              children: 'Reset',
+                              onClick: 'reset',
+                            }
                           },
                         ]
                       },

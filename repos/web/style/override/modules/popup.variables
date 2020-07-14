@@ -1,3 +1,11 @@
 /*******************************
     User Variable Overrides
 *******************************/
+@import "../../_variables";
+
+@invertedBackground: @color-gray;
+@invertedColor: @color-text-inverse;
+@invertedBorder: none;
+@invertedBoxShadow: none;
+@invertedHeaderBackground: @color-bg-black;
+@invertedHeaderColor: @color-text-inverse;

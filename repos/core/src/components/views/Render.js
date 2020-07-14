@@ -35,6 +35,7 @@ import TableView from '../TableView'
 import TabList from '../TabList'
 import Tabs from '../Tabs'
 import Text from '../Text'
+import TooltipPop from '../TooltipPop'
 import View from '../View'
 
 /**
@@ -64,6 +65,12 @@ class RenderClass extends Component {
   // Errors in components will propagate up to componentDidCatch in parent class.
   render () {
     if (this.state.error) return <Placeholder>{String(this.state.error)}</Placeholder>
+    // Wrap component with Tooltip automatically
+    if (this.props.tooltip != null) {
+      const {tooltip, ...props} = this.props
+      return <TooltipPop inverted title={tooltip}>{Render(props)}</TooltipPop>
+    }
+
     let {data, _data, view, items = [], relativeData, relativePath, relativeIndex, ...props} = this.props
     if (props.name && _data == null) _data = get(data, props.name) // local data dynamically retrieved from definition
 
@@ -191,6 +198,22 @@ class RenderClass extends Component {
         }
         if (view === FIELD.TYPE.TITLE) props.className = classNames('h3', props.className)
         return <Text {...props}/>
+
+      case FIELD.TYPE.TOOLTIP:
+        if (props.label != null && props.content == null) {
+          props.content = props.label
+          delete props.label
+        }
+        if (props.renderLabel) {
+          props.content = props.renderLabel(props.content)
+          delete props.renderLabel
+        }
+        if (items.length) {
+          props.children = items.map(Render)
+        } else if (isObject(props.children)) {
+          props.children = Render(props.children)
+        }
+        return <TooltipPop inverted {...props}/>
 
       default:
         const {mapOptions, ...input} = props
