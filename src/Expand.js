@@ -27,7 +27,10 @@ export default class Expand extends Component {
     iconOpened: PropTypes.string, // name of icon for expanded state
     iconClosed: PropTypes.string, // name of icon for collapsed state
     onClick: PropTypes.func, // callback({expanded, key, value}) on click or Enter press (if `onKeyPress` not given)
-    id: PropTypes.string, // argument to pass to 'onClick' callback as `key`
+    id: PropTypes.oneOfType([  // argument to pass to 'onClick' callback as `key`
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     index: PropTypes.oneOfType([ // argument to pass to 'onClick' callback as `index`
       PropTypes.string,
       PropTypes.number,
