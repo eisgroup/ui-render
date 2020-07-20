@@ -2,14 +2,6 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "core": "*",
-    "react-dom": "16.8.0",
-    "react-scripts": "2.1.0"
-  },
-  "peerDependencies": {
-    "react": "16.8.0"
-  },
   "scripts": {
     "start": "yarn cors && yarn gql && yarn css --sourcemap && react-app-rewired start & yarn style --sourcemap",
     "build": "yarn css --minify && react-app-rewired build && yarn clean && yarn build-dist",
@@ -57,6 +49,16 @@
       "require",
       "URL"
     ]
+  },
+  "peerDependencies": {
+    "react": "16.8.0"
+  },
+  "dependencies": {
+    "connected-react-router": "^6.8.0",
+    "core": "*",
+    "react-dom": "16.8.0",
+    "react-scripts": "2.1.0",
+    "redux-form": "^8.3.6"
   },
   "devDependencies": {
     "customize-cra": "^0.5.0",

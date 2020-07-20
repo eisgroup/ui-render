@@ -203,7 +203,7 @@ export default {
             name: 'url', // must be unique key path identifier that does not exist in *_data.json
             placeholder: 'Select fetch API',
             onChange: { // function defined as object with nested callback
-              name: 'fetch',
+              name: 'fetch', //todo: rename to `call`?
               onDone: {
                 name: 'fetch',
                 mapArgs: [ // function will first receive `mapArgs`, then followed by `args`, as arguments
