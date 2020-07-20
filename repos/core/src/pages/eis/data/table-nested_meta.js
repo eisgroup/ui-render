@@ -24,7 +24,7 @@ export default {
     {
       id: 'fundingStructure.requiredParticipationPrct',
       label: 'Contribution',
-      renderCell: 'percent',
+      renderCell: 'Percent',
     },
     {
       id: 'rate',
@@ -38,7 +38,7 @@ export default {
     {
       id: 'annualPremium',
       label: 'Annual Premium',
-      renderCell: 'currency',
+      renderCell: 'Currency',
     },
     {
       id: '#',

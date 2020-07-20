@@ -23,7 +23,7 @@ export default {
                 {
                   view: 'Text',
                   label: {name: 'asoAdminCost.admExpencesAmt'},
-                  renderLabel: 'currency',
+                  renderLabel: 'Currency',
                 },
               ]
             },
@@ -118,7 +118,7 @@ export default {
                   id: 'annualAmt',
                   className: 'right',
                   classNameCell: 'right',
-                  renderCell: 'currency',
+                  renderCell: 'Currency',
                   label: 'Annual Amount'
                 },
                 {
@@ -126,21 +126,21 @@ export default {
                   className: 'right border-right',
                   classNameCell: 'right',
                   classNameCellWrap: 'border-right',
-                  renderCell: 'percent',
+                  renderCell: 'Percent',
                   label: '% of Premium'
                 },
                 {
                   id: 'perClaimAmt',
                   className: 'right',
                   classNameCell: 'right',
-                  renderCell: 'currency',
+                  renderCell: 'Currency',
                   label: 'Per Claim'
                 },
                 {
                   id: 'perEmployeeAmt',
                   className: 'right',
                   classNameCell: 'right',
-                  renderCell: 'currency',
+                  renderCell: 'Currency',
                   label: 'Per Employee'
                 },
               ],
@@ -649,12 +649,12 @@ export default {
                       {
                         id: 'adjManualRate',
                         label: 'Adj. Manual Rate',
-                        renderCell: 'currency',
+                        renderCell: 'Currency',
                       },
                       {
                         id: 'adjFormulaRate',
                         label: 'Adj. Formula Rate',
-                        renderCell: 'currency',
+                        renderCell: 'Currency',
                       },
                       {
                         id: 'manualRate',
@@ -671,12 +671,12 @@ export default {
                       {
                         id: 'formulaRate',
                         label: 'Formula Rate',
-                        renderCell: 'currency',
+                        renderCell: 'Currency',
                       },
                       {
                         id: 'proposedRate',
                         label: 'Proposed Rate',
-                        renderCell: 'currency',
+                        renderCell: 'Currency',
                       },
                     ],
                     extraItems: [

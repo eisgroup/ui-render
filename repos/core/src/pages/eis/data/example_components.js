@@ -62,7 +62,7 @@ export default [
                       styles: 'justify padding',
                       items: [
                         {view: 'Text', label: 'Annual Rate'},
-                        {view: 'Text', children: {name: 'rate'}, renderLabel: 'percent'},
+                        {view: 'Text', children: {name: 'rate'}, renderLabel: 'Percent'},
                       ]
                     },
                     {
@@ -70,7 +70,7 @@ export default [
                       styles: 'justify padding border-top',
                       items: [
                         {view: 'Text', label: 'Annual Premium'},
-                        {view: 'Text', children: {name: 'annualPremium'}, renderLabel: 'currency'},
+                        {view: 'Text', children: {name: 'annualPremium'}, renderLabel: 'Currency'},
                       ]
                     },
                   ],

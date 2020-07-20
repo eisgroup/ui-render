@@ -13,7 +13,6 @@ import {
   isString,
   removeNilValues,
   toList,
-  toLowerCase,
   toPercent
 } from '../../common/utils'
 import { _, ACTIVE, FIELD } from '../../common/variables'
@@ -254,7 +253,7 @@ Render.onError = (err, errInfo, props) => ACTIVE.store.dispatch(stateAction(POPU
  * @returns {Function} renderer - that takes value as the first argument, and renders value in desired format
  */
 export function RenderFunc (Name) {
-  switch (toLowerCase(Name)) {
+  switch (Name) {
     case FIELD.RENDER.CURRENCY:
       return (val, index, {id, ...props} = {}) => (isNumeric(val)
           ? <Row {...props}><Text className='margin-right-smaller'>$</Text> {renderCurrency(val, 2)}</Row>
