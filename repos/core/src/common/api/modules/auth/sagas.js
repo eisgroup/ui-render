@@ -1,5 +1,4 @@
-import { delay } from 'redux-saga'
-import { all, call, cancel, cancelled, fork, put, select, take, takeEvery, takeLatest } from 'redux-saga/effects'
+import { all, call, cancel, cancelled, delay, fork, put, select, take, takeEvery, takeLatest } from 'redux-saga/effects'
 import { stateAction, stateActionType } from '../../../actions'
 import { enumCheck, get, isInStringAny, logTask } from '../../../utils'
 import { ANIMATION_DURATION, URL_LOGIN, URL_LOGIN_REFRESH, URL_LOGOUT } from '../../../variables'
@@ -153,7 +152,7 @@ function * loginSuccessFlow () {
 function * loginCheckFlow () {
   // Delay check to ensure all kinds of transition animations have completed
   const duration = Math.max(ANIMATION_DURATION * 3, 300)
-  yield call(delay, duration)
+  yield delay(duration)
 
   logTask('loginCheckFlow')
   let token = yield select(tokenSelector)

@@ -1,5 +1,4 @@
-import { delay } from 'redux-saga'
-import { call, put, race, spawn, take } from 'redux-saga/effects'
+import { call, delay, put, race, spawn, take } from 'redux-saga/effects'
 import { stateAction } from '../actions'
 import { CLOSE, CONNECTED, DISCONNECTED, ERROR, MESSAGE, TEN_SECONDS, TIMEOUT } from '../constants'
 import { formatNumber, isFunction, isInCollection } from '../utils'
@@ -25,7 +24,7 @@ export function * subscribeToSocketMessage (ENDPOINT, payload, meta) {
     message: take(action => isMatchingSocketPayloadActionType(action, ENDPOINT, MESSAGE, payload, meta)),
     error: take(action => isMatchingSocketActionType(action, ENDPOINT, ERROR, meta)),
     disconnected: take(action => isMatchingSocketActionType(action, ENDPOINT, DISCONNECTED, meta)),
-    timeout: call(delay, CONNECT_TIMEOUT)
+    timeout: delay(CONNECT_TIMEOUT)
   })
 
   let response = yield listener
@@ -46,7 +45,7 @@ export function * subscribeToSocketResults (ENDPOINT, meta) {
     success: take(action => isMatchingSocketActionType(action, ENDPOINT, MESSAGE, meta)),
     error: take(action => isMatchingSocketActionType(action, ENDPOINT, ERROR, meta)),
     disconnected: take(action => isMatchingSocketActionType(action, ENDPOINT, DISCONNECTED, meta)),
-    timeout: call(delay, CONNECT_TIMEOUT)
+    timeout: delay(CONNECT_TIMEOUT)
   })
 
   let response = yield listener
@@ -106,7 +105,7 @@ export function * socketConnect (clientId = ACTIVE.SERVICE, endpoint = SOCKET_SE
 
   /* Retry until Connected */
   if (result !== MESSAGE) {
-    yield call(delay, TEN_SECONDS)  // throttle retries
+    yield delay(TEN_SECONDS)  // throttle retries
     socketConnect.attempts += 1
 
     // Close Socket after Max Tries because Retrying closed Socket does not work

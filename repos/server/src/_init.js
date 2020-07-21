@@ -1,7 +1,7 @@
 import chalk from 'chalk' // causes `ansi-styles` module not found error inside Docker container if not installed
 import { ACTIVE, SERVER } from 'core/src/common/variables'
 import localStorage from 'node-persist' // adds about 318 KB to final js bundle
-import passwordChecker from 'zxcvbn' // adds 800 KB to bundle size, consider loading with script tag
+// import passwordChecker from 'zxcvbn' // adds 800 KB to bundle size, consider loading with script tag
 import pubsub from './common/pubsub'
 
 /**
@@ -10,7 +10,7 @@ import pubsub from './common/pubsub'
  * =============================================================================
  */
 
-ACTIVE.passwordCheck = passwordChecker
+// ACTIVE.passwordCheck = passwordChecker
 if (!ACTIVE.SERVICE) ACTIVE.SERVICE = SERVER
 if (!ACTIVE.log) ACTIVE.log = chalk
 if (!ACTIVE.pubsub) ACTIVE.pubsub = pubsub

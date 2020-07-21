@@ -1,5 +1,4 @@
-import { delay } from 'redux-saga'
-import { call, race, take } from 'redux-saga/effects'
+import { delay, race, take } from 'redux-saga/effects'
 import {
   ALL_ACTIONS,
   ALL_RESULTS,
@@ -145,7 +144,7 @@ export function * subscribeToResults (NAME, ACTION, meta = null, actionType = st
       error: take(action => isMatchingActionType(action, NAME, ACTION, ERROR, meta, actionType)),
       cancel: take(action => isMatchingActionType(action, NAME, ACTION, CANCEL, meta, actionType)),
       timeout: take(action => isMatchingActionType(action, NAME, ACTION, TIMEOUT, meta, actionType)),
-      ...hasTimeout && {void: call(delay, STATE_ACTION_TIMEOUT + 100)}  // in case State action was not called
+      ...hasTimeout && {void: delay(STATE_ACTION_TIMEOUT + 100)}  // in case State action was not called
     })
     let {received, success, error, cancel, timeout} = yield listener
 

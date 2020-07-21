@@ -66,7 +66,7 @@ function * loginSuccessFlow ({meta: {form} = {}}) {
   const {state: {isModal} = {}} = history.location
   if (isModal) {
     history.goBack()
-    yield call(delay, 10)
+    yield delay(10)
     routeToRefresh = yield selectState(routerSelect.activeRoute)
     // Refresh Requested Route
     // Because react-router has no refresh function any more
@@ -77,7 +77,7 @@ function * loginSuccessFlow ({meta: {form} = {}}) {
   // Get Required Info
   yield all([
     call(infoGqlFlow),
-    call(delay, 10)
+    delay(10)
   ])
 
   history.push(routeToRefresh)

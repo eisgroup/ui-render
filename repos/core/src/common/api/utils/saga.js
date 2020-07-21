@@ -1,5 +1,4 @@
-import { delay } from 'redux-saga'
-import { call, put, race, select, take } from 'redux-saga/effects'
+import { call, delay, put, race, select, take } from 'redux-saga/effects'
 import { stateAction } from '../../actions'
 import { ERROR, SUCCESS, TIMEOUT, VOID } from '../../constants'
 import { hasListValue, hasObjectValue, isInCollection, toUpperCase } from '../../utils'
@@ -70,7 +69,7 @@ export function * subscribeToApiResults (URL, ACTION, meta = null, resubscribe =
       success: take(action => isMatchingApiActionType(action, URL, ACTION, SUCCESS, meta)),
       error: take(action => isMatchingApiActionType(action, URL, ACTION, ERROR, meta)),
       timeout: take(action => isMatchingApiActionType(action, URL, ACTION, TIMEOUT, meta)),
-      void: call(delay, REQUEST_TIMEOUT + 100)  // in case API request was not called
+      void: delay(REQUEST_TIMEOUT + 100)  // in case API request was not called
     })
     let response = yield listener
 
@@ -87,7 +86,7 @@ export function * subscribeToApiResults (URL, ACTION, meta = null, resubscribe =
   else {
     const listener = race({
       action: take(apiActionResultsType(URL, ACTION)),
-      void: call(delay, REQUEST_TIMEOUT + 100)  // in case API request was not called
+      void: delay(REQUEST_TIMEOUT + 100)  // in case API request was not called
     })
     let response = yield listener
 
