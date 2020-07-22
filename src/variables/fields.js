@@ -34,16 +34,17 @@ FIELD.TYPE = {
   TAB_LIST: 'TabList',
   TEXT: 'Text',
   TITLE: 'Title', // A customised `Text` view with certain styling for consistent look and feel
+  TOOLTIP: 'Tooltip', // A hint components that pops up when element is being hovered
   // ...to be populated by modules
 }
 
 // Value Renderer Definitions
 FIELD.RENDER = {
-  CURRENCY: 'currency',
-  PERCENT: 'percent',
-  DOUBLE5: 'double5',
-  FLOAT: 'float',
-  TITLE_n_INPUT: 'title+input',
+  CURRENCY: 'Currency',
+  PERCENT: 'Percent',
+  DOUBLE5: 'Double5',
+  FLOAT: 'Float',
+  TITLE_n_INPUT: 'Title+Input',
 }
 
 // Action Type Definitions
