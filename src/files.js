@@ -1,4 +1,4 @@
-import { Active } from 'utils-pack'
+import { Active, get } from 'utils-pack'
 
 /**
  * FILE VARIABLES ==============================================================
@@ -10,7 +10,7 @@ export const FILE = {
   PATH_SOUNDS: '/static/sounds/'
 }
 
-if (Active.SETTINGS?.HAS_SOUND == null) {
+if (get(Active, 'SETTINGS.HAS_SOUND') == null) {
   Active.SETTINGS = {
     ...Active.SETTINGS,
     HAS_SOUND: false
