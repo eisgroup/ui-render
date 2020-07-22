@@ -12,7 +12,7 @@ export default class select {
 
   static isLoading = () => [
     state => state[_TEMPLATE].isLoading,
-    (val) => val || {}
+    (val) => val
   ]
 }
 
