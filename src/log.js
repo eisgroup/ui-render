@@ -96,12 +96,12 @@ benchA.skip = new Function('')  // eslint-disable-line
 export function log (first, ...args) {
   // eslint-disable-next-line no-console
   if (!__DEV__) return
-  if (__CLIENT__ || !Active.log?.keyword) {
-    console.log((typeof first === 'string' && isInString(args[0] || '', 'color:')) ? `%c${first}` : first, ...args)
-  } else {
-    const color = isInString(args[0] || '', 'color:') ? args.shift().split(': ')[1].toLowerCase() : ''
-    console.log((typeof first === 'string' && color) ? Active.log.keyword(color)(first) : first, ...args)
-  }
+	if (__CLIENT__ || (!Active.log || !Active.log.keyword)) {
+		console.log((typeof first === 'string' && isInString(args[0] || '', 'color:')) ? `%c${first}` : first, ...args)
+	} else {
+		const color = isInString(args[0] || '', 'color:') ? args.shift().split(': ')[1].toLowerCase() : ''
+		console.log((typeof first === 'string' && color) ? Active.log.keyword(color)(first) : first, ...args)
+	}
 }
 
 /**

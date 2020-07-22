@@ -2,7 +2,10 @@ import { LANGUAGE } from './constants'
 
 /* Environment Variables */
 export let ENV = typeof process !== 'undefined' ? process.env : {}
-if (!Object.keys(ENV).length) ENV = require('./_envsNext')
+if (!Object.keys(ENV).length) {
+  // Must create dynamic require using process.env as condition to avoid error in CRA
+  ENV = require(process.env.REACT_APP_NAME ? './constants' : './_envsNext') || {}
+}
 export const NODE_ENV = ENV.NODE_ENV // @Note: Next.js does not automatically add NODE_ENV, set inside next.config.js
 export const __PROD__ = NODE_ENV === 'production'
 export const __STAGE__ = NODE_ENV === 'stage'
