@@ -3,29 +3,10 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { Active, debounceBy, get, isInList, warn } from 'utils-pack'
 import { createScript } from 'utils-pack/utility'
-import { ALERT, stateAction } from '../../common/actions'
-import { connect } from '../../common/redux'
-import { POPUP } from '../../modules/exports'
 import Dropdown from '../Dropdown'
 import Row from '../Row'
 import Text from '../Text'
-// todo: fix imports
 
-/**
- * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
- * -----------------------------------------------------------------------------
- */
-const mapDispatchToProps = (dispatch) => ({
-  actions: {
-    popupAlert: (message) => dispatch(stateAction(POPUP, ALERT, {
-      items: [{
-        title: 'An Error Has Occurred!',
-        content: message,
-        closeLabel: 'Ok'  // optional
-      }]
-    })),
-  }
-})
 let hasLoadedScript
 
 /**
@@ -33,18 +14,6 @@ let hasLoadedScript
  * Address Input Field powered by Google Places Autocomplete
  * -----------------------------------------------------------------------------
  */
-// @withGql({
-//   query: {
-//     query, variables: {
-//       apiKey: {
-//         api: API_PLACES,
-//         provider: API_PROVIDER_GOOGLE,
-//         platform: API_PLATFORM_WEB,
-//       }
-//     }
-//   }
-// })
-@connect(null, mapDispatchToProps)
 export default class Place extends Component {
   static propTypes = {
     value: PropTypes.shape({ // PlaceInput
@@ -54,6 +23,7 @@ export default class Place extends Component {
     apiKey: PropTypes.shape({key: PropTypes.string.isRequired}).isRequired, // required
     onChange: PropTypes.func, // callback when a place is selected, receives PlaceInput as argument with sessionToken
     onError: PropTypes.func, // callback when Google Maps API responds with an error
+    onAlert: PropTypes.func, // callback when Google Maps API is missing a valid apiKey
     searchOptions: PropTypes.object, // to pass to to Google Places API, like bounds, types of result, etc.
   }
 
@@ -196,7 +166,7 @@ export default class Place extends Component {
     if (!window.google || !window.google.maps || !window.google.maps.places) {
       if (!hasLoadedScript) { // must load script because pure API has CORS blocking
         const apiKey = get(this.props, 'apiKey.key')
-        if (!apiKey) return this.props.actions.popupAlert(`API Key not found for ${this.constructor.name}`)
+        if (!apiKey) return (this.props.onAlert || alert)(`API Key not found for ${this.constructor.name}`)
         createScript(`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`, this.init)
         hasLoadedScript = true
         return
