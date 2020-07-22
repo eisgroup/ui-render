@@ -1,13 +1,32 @@
-import common from 'core/src/common'
-import createStore from 'core/src/common/redux/createStore'
-import { ACTIVE } from 'core/src/common/variables'
-import webModules from 'core/src/modules'
+// import api from 'modules-pack/api'
+import form from 'modules-pack/form'
+import popup from 'modules-pack/popup'
+import redux, { createStore } from 'modules-pack/redux'
+import router from 'modules-pack/router'
+import saga from 'modules-pack/saga'
+import settings from 'modules-pack/settings'
+import socket from 'modules-pack/socket'
+import upload from 'modules-pack/upload'
+import user from 'modules-pack/user'
+import { Active } from 'utils-pack'
 
 /**
  * STORE CREATION ==============================================================
  * =============================================================================
  */
 
-ACTIVE.store = createStore(common.concat(webModules))
-ACTIVE.createStore = () => createStore(common.concat(webModules))
-export default ACTIVE.store
+const modulesActivated = [
+  redux,
+  saga,
+  // api,
+  socket,
+  router,
+  form,
+  popup,
+  settings,
+  upload,
+  user,
+]
+Active.store = createStore(modulesActivated)
+Active.createStore = () => createStore(modulesActivated)
+export default Active.store

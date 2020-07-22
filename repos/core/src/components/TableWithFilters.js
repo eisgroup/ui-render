@@ -2,6 +2,7 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { capitalize, hasListValue, isInList, isInString, pluralize } from '../common/utils'
+import Render from '../pages/eis/Render'
 import AnimateHeight from './AnimateHeight'
 import Button from './Button'
 import Checkbox from './Checkbox'
@@ -10,7 +11,6 @@ import Row from './Row'
 import TableView from './TableView'
 import Text from './Text'
 import View from './View'
-import Render from './views/Render'
 
 /**
  * Table Layout with Filters and Options to Show/Hide Columns/Rows

@@ -1,12 +1,11 @@
+import { fetch } from 'modules-pack/api'
+import { reset, withForm } from 'modules-pack/form'
+import { popupAlert } from 'modules-pack/popup'
 import React from 'react'
-import fetch from '../../common/fetch'
-import { cloneDeep, get, isCollection, isEmpty, isObject, isString, sanitizeGqlResponse, set } from '../../common/utils'
+import Json from 'react-ui-pack/JsonView'
+import { cloneDeep, get, isCollection, isEmpty, isObject, isString, sanitizeGqlResponse, set } from 'utils-pack'
 import { FIELD } from '../../common/variables'
-import Json from '../../components/Json'
-import { metaToProps } from '../../components/views/Render'
-import { reset } from '../../modules/form'
-import { withForm } from '../../modules/form/utils'
-import { popupAlert } from '../../modules/popup'
+import { metaToProps } from './Render'
 
 /**
  * BUSINESS RULES ==============================================================

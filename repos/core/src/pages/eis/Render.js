@@ -1,7 +1,26 @@
-import classNames from 'classnames'
+import { NAME as POPUP } from 'modules-pack/popup'
 import React, { Component } from 'react'
-import { ALERT, stateAction } from '../../common/actions'
+import { cn } from 'react-ui-pack'
+import Button from 'react-ui-pack/Button'
+import PieChart from 'react-ui-pack/charts/PieChart'
+import Counter from 'react-ui-pack/Counter'
+import Expand from 'react-ui-pack/Expand'
+import ExpandList from 'react-ui-pack/ExpandList'
+import Json from 'react-ui-pack/JsonView'
+import Label from 'react-ui-pack/Label'
+import List from 'react-ui-pack/List'
+import Placeholder from 'react-ui-pack/Placeholder'
+import ProgressSteps from 'react-ui-pack/ProgressSteps'
+import { renderCurrency, renderFloat } from 'react-ui-pack/renders'
+import Row from 'react-ui-pack/Row'
+import Space from 'react-ui-pack/Space'
+import TableView from 'react-ui-pack/TableView'
+import TabList from 'react-ui-pack/TabList'
+import Tabs from 'react-ui-pack/Tabs'
+import Text from 'react-ui-pack/Text'
+import View from 'react-ui-pack/View'
 import {
+  Active,
   cloneDeep,
   get,
   interpolateString,
@@ -14,28 +33,11 @@ import {
   removeNilValues,
   toList,
   toPercent
-} from '../../common/utils'
-import { _, ACTIVE, FIELD } from '../../common/variables'
-import { POPUP } from '../../modules/exports'
-import Button from '../Button'
-import PieChart from '../charts/PieChart'
-import Counter from '../Counter'
-import Expand from '../Expand'
-import ExpandList from '../ExpandList'
-import Json from '../Json'
-import Label from '../Label'
-import List from '../List'
-import Placeholder from '../Placeholder'
-import ProgressSteps from '../ProgressSteps'
-import { renderCurrency, renderFloat } from '../renders'
-import Row from '../Row'
-import Space from '../Space'
-import TableView from '../TableView'
-import TabList from '../TabList'
-import Tabs from '../Tabs'
-import Text from '../Text'
-import TooltipPop from '../TooltipPop'
-import View from '../View'
+} from 'utils-pack'
+import { _ } from 'utils-pack/translations'
+import { ALERT, stateAction } from '../../common/actions'
+import { FIELD } from '../../common/variables'
+import TooltipPop from '../../components/TooltipPop'
 
 /**
  * Recursive Field Renderer
@@ -195,7 +197,7 @@ class RenderClass extends Component {
           props.children = props.renderLabel(props.children)
           delete props.renderLabel
         }
-        if (view === FIELD.TYPE.TITLE) props.className = classNames('h3', props.className)
+        if (view === FIELD.TYPE.TITLE) props.className = cn('h3', props.className)
         return <Text {...props}/>
 
       case FIELD.TYPE.TOOLTIP:
@@ -220,13 +222,13 @@ class RenderClass extends Component {
         if (relativeData && relativePath != null && input.name) {
           input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
         }
-        return ACTIVE.renderField({view, items, ...input})
+        return Active.renderField({view, items, ...input})
     }
     return null
   }
 }
 
-Render.onError = (err, errInfo, props) => ACTIVE.store.dispatch(stateAction(POPUP, ALERT, {
+Render.onError = (err, errInfo, props) => Active.store.dispatch(stateAction(POPUP, ALERT, {
   items: [
     {
       title: `${Render.name} Error!`,

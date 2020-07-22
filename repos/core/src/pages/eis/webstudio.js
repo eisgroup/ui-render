@@ -1,14 +1,13 @@
-import classNames from 'classnames'
+import { fetch } from 'modules-pack/api'
+import { popupAlert } from 'modules-pack/popup'
 import React, { Component } from 'react'
-import { SUCCESS } from '../../common/constants'
-import fetch from '../../common/fetch'
-import { get, isEmpty, logRender } from '../../common/utils'
-import Placeholder from '../../components/Placeholder'
-import ScrollView from '../../components/ScrollView'
-import Spinner from '../../components/Spinner'
-import Text from '../../components/Text'
-import Render from '../../components/views/Render'
-import { popupAlert } from '../../modules/popup'
+import { cn } from 'react-ui-pack'
+import Placeholder from 'react-ui-pack/Placeholder'
+import ScrollView from 'react-ui-pack/ScrollView'
+import Spinner from 'react-ui-pack/Spinner'
+import Text from 'react-ui-pack/Text'
+import { get, isEmpty, logRender, SUCCESS } from 'utils-pack'
+import Render from './Render'
 import { withUISetup } from './rules'
 
 const DATA_URL = 'http://mnsopenl.exigengroup.com:9998/std-rating-report/ExtractRatingDetails'
@@ -54,12 +53,12 @@ export default class WebStudioPage extends Component {
         ? <WebStudio data={data} meta={meta} initialValues={data}/>
         : <Placeholder>
           {!this.hasData &&
-          <Text className={classNames('h1', {error: !loadingData, blink: loadingData})}>
+          <Text className={cn('h1', {error: !loadingData, blink: loadingData})}>
             {loadingData ? <Text><Spinner size='large'/> Loading...</Text> : 'Missing'} *_data.json
           </Text>
           }
           {!this.hasMeta &&
-          <Text className={classNames('h1', {error: !loadingMeta, blink: loadingMeta})}>
+          <Text className={cn('h1', {error: !loadingMeta, blink: loadingMeta})}>
             {loadingMeta ? <Text><Spinner size='large'/> Loading...</Text> : 'Missing'} *_meta.json
           </Text>
           }

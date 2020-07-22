@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import { logRender } from '../../common/utils'
-import Json from '../../components/Json'
-import ScrollView from '../../components/ScrollView'
-import Text from '../../components/Text'
-import Render from '../../components/views/Render'
+import JsonView from 'react-ui-pack/JsonView'
+import ScrollView from 'react-ui-pack/ScrollView'
+import Text from 'react-ui-pack/Text'
+import { logRender } from 'utils-pack'
 import data from './data/_data'
 import meta from './data/_meta'
+import Render from './Render'
 import { withUISetup } from './rules'
 
 // console.warn(toJSON(meta))
@@ -39,7 +39,7 @@ export default class OpenL extends Component {
 
         {showMeta &&
         <ScrollView className='padding bg-neutral inverted json-tree'>
-          <Json data={meta.json} inverted/>
+          <JsonView data={meta.json} inverted/>
         </ScrollView>
         }
       </>

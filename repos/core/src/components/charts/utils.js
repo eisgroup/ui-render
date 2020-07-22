@@ -1,7 +1,7 @@
 import React from 'react'
 import { Area, Cell, LabelList } from 'recharts'
+import { shortNumber, toAlphaNumId, toHours } from 'utils-pack'
 import { BORDER } from '../../common/styles'
-import { shortNumber, toAlphaNumId, toHours } from '../../common/utils'
 import { ANIMATION_DURATION } from '../../common/variables'
 
 // =============================================================================

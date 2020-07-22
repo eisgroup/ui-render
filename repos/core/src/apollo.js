@@ -4,12 +4,11 @@ import { ApolloClient } from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
 import { onError } from 'apollo-link-error'
 import { createUploadLink } from 'apollo-upload-client'
-import { stateAction } from 'core/src/common/actions'
-import { HTTP_401_UNAUTHORIZED } from 'core/src/common/api/constants'
-import { ERROR, LOGIN } from 'core/src/common/constants'
-import { get, toList, warn } from 'core/src/common/utils'
-import { _, ACTIVE, API_GQL_URL } from 'core/src/common/variables'
-import { POPUP } from 'core/src/modules/exports'
+import { API_GQL_URL } from 'modules-pack'
+import { HTTP_401_UNAUTHORIZED } from 'modules-pack/api'
+import { NAME as POPUP } from 'modules-pack/popup'
+import { stateAction } from 'modules-pack/redux/actions'
+import { _, Active, ERROR, get, LOGIN, toList, warn } from 'utils-pack'
 
 /**
  * APOLLO CLIENT SETUP =========================================================
@@ -27,10 +26,10 @@ const client = new ApolloClient({
     onError(({graphQLErrors, networkError}) => {
       if (get(graphQLErrors, '[0].statusCode') === HTTP_401_UNAUTHORIZED) {
         warn(`GraphQL Response ${HTTP_401_UNAUTHORIZED}!!!`)
-        ACTIVE.store.dispatch(stateAction(LOGIN))
+        Active.store.dispatch(stateAction(LOGIN))
       } else {
         warn('GraphQL Request failed!!!', graphQLErrors, networkError)
-        ACTIVE.store.dispatch(stateAction(POPUP, ERROR, {
+        Active.store.dispatch(stateAction(POPUP, ERROR, {
           title: graphQLErrors ? _.REQUEST_FAILED : _.SERVER_DISCONNECTED,
           errors: toList(graphQLErrors || networkError)
         }))
@@ -49,4 +48,4 @@ export default {
   client,
 }
 
-ACTIVE.client = client
+Active.client = client

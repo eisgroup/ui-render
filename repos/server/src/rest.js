@@ -1,4 +1,4 @@
-import { __PROD__, ACTIVE, NODE_ENV } from 'core/src/common/variables'
+import { __PROD__, Active, NODE_ENV } from 'core/src/common/variables'
 import meta from 'core/src/pages/eis/data/example_components'
 import data from 'core/src/pages/eis/data/example_data'
 import cors from 'cors'
@@ -23,5 +23,5 @@ server.get('/meta', (req, res) => res.json(meta))
 // Start Server
 server.listen(API_PORT, () => {
   const localServer = `http://localhost:${API_PORT}`
-  console.log(`🚀  REST API ${ACTIVE.SERVICE} is listening in '${NODE_ENV}' mode @ ${localServer}`)
+  console.log(`🚀  REST API ${Active.SERVICE} is listening in '${NODE_ENV}' mode @ ${localServer}`)
 })

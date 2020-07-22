@@ -1,5 +1,4 @@
-import { LANGUAGE, LANGUAGE_LEVEL } from '../constants'
-import { ACTIVE } from './_envs'
+import { Active, LANGUAGE, LANGUAGE_LEVEL } from 'utils-pack'
 
 /**
  * PROJECT DEFINITIONS =========================================================
@@ -9,41 +8,41 @@ import { ACTIVE } from './_envs'
 export const CURRENCY = {
   USD: {
     code: 'USD',
-    [LANGUAGE.ENGLISH.code]: 'USD',
+    [LANGUAGE.ENGLISH._]: 'USD',
   },
   RUB: {
     code: 'RUB',
-    [LANGUAGE.ENGLISH.code]: 'RUB',
+    [LANGUAGE.ENGLISH._]: 'RUB',
   },
 }
-ACTIVE.CURRENCY = CURRENCY.USD
+Active.CURRENCY = CURRENCY.USD
 export const PHONE = {
   MOBILE: {
     code: 'mobile',
-    [LANGUAGE.ENGLISH.code]: 'Mobile Phone'
+    [LANGUAGE.ENGLISH._]: 'Mobile Phone'
   },
   HOME: {
     code: 'home',
-    [LANGUAGE.ENGLISH.code]: 'Home Phone'
+    [LANGUAGE.ENGLISH._]: 'Home Phone'
   },
   WORK: {
     code: 'work',
-    [LANGUAGE.ENGLISH.code]: 'Work Phone'
+    [LANGUAGE.ENGLISH._]: 'Work Phone'
   },
 }
 
 export const TYPE = {
   LANGUAGE: {
     key: 'lang',
-    [LANGUAGE.ENGLISH.code]: 'Language'
+    [LANGUAGE.ENGLISH._]: 'Language'
   },
   LANGUAGE_LEVEL: {
     key: 'langLevel',
-    [LANGUAGE.ENGLISH.code]: 'Language Level'
+    [LANGUAGE.ENGLISH._]: 'Language Level'
   },
   PHONE: {
     key: 'phones',
-    [LANGUAGE.ENGLISH.code]: 'Phone'
+    [LANGUAGE.ENGLISH._]: 'Phone'
   },
 }
 export const TYPE_BY = {
@@ -136,7 +135,7 @@ export function definitionByCode (DEFINITION) {
   const result = {}
   for (const name in DEFINITION) {
     const def = DEFINITION[name]
-    result[def.code] = def
+    result[def._] = def
   }
   return result
 }
@@ -146,7 +145,7 @@ export function definitionByCode (DEFINITION) {
  * @example:
  *    const options = optionsFrom(LANGUAGE)
  *    <Dropdown options={options.items} .../> // options for currently active language can be accessed via `items`,
- *    <Dropdown options={options[LANGUAGE.ENGLISH.code]} .../> // or directly via language code
+ *    <Dropdown options={options[LANGUAGE.ENGLISH._]} .../> // or directly via language code
  *
  * @param {Object<NAME<code...>>|Array<code...>} DEFINITION - key/value pairs of variable name with its code value
  * @return {Object<items, lang[{text, value}]>} options - grouped by language code, with .items pointing to active lang
@@ -154,7 +153,7 @@ export function definitionByCode (DEFINITION) {
 export function optionsFrom (DEFINITION) {
   const options = {
     get items () {
-      return this[ACTIVE.LANG.code] || this[LANGUAGE.ENGLISH.code] || []
+      return this[Active.LANG._] || this[LANGUAGE.ENGLISH._] || []
     }
   }
   for (const key in DEFINITION) {
@@ -178,7 +177,7 @@ export function optionsFrom (DEFINITION) {
 export function initValuesFor (DEFINITION, initValue = 1) {
   const initValues = {}
   for (const key in DEFINITION) {
-    initValues[DEFINITION[key].code] = initValue
+    initValues[DEFINITION[key]._] = initValue
   }
   return initValues
 }
@@ -201,7 +200,7 @@ export function localise (DEFINITION) {
     if (name == null && (code != null || key != null)) {
       Object.defineProperty(DEFINITION[NAME], 'name', {
         get () {
-          return this[ACTIVE.LANG.code] || this[LANGUAGE.ENGLISH.code] || String(code != null ? code : key)
+          return this[Active.LANG._] || this[LANGUAGE.ENGLISH._] || String(code != null ? code : key)
         }
       })
     } else {

@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { LANGUAGE, SORT_ORDER } from '../common/constants'
 import { debounce, shortNumber, toUpperCase } from '../common/utils'
-import { ACTIVE, PATH_IMAGES } from '../common/variables'
+import { Active, PATH_IMAGES } from '../common/variables'
 import ColorSwatch from './ColorSwatch'
 import Icon from './Icon'
 import Image from './Image'
@@ -23,7 +23,7 @@ import Text from './Text'
 export function colorDropdownOptions (colorObj) {
   const options = {
     get items () {
-      return this[ACTIVE.LANG.code] || this[LANGUAGE.ENGLISH.code] || []
+      return this[Active.LANG._] || this[LANGUAGE.ENGLISH._] || []
     }
   }
   for (const key in colorObj) {
@@ -53,7 +53,7 @@ export function colorDropdownOptions (colorObj) {
 export function languageDropdownOptions (languageObj, {selection} = {}) {
   const options = {
     get items () {
-      return this[ACTIVE.LANG.code] || this[LANGUAGE.ENGLISH.code] || []
+      return this[Active.LANG._] || this[LANGUAGE.ENGLISH._] || []
     }
   }
   for (const key in languageObj) {
@@ -167,7 +167,7 @@ export function renderFloatShort (value, digits = 3, props) {
  * @returns {Array<Object>} list - of React Components
  */
 export function renderFilters ({type, ...field}, i) {
-  return ACTIVE.renderField({view: type, done: false, ...field}, i)
+  return Active.renderField({view: type, done: false, ...field}, i)
 }
 
 /**

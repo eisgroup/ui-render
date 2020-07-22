@@ -1,12 +1,12 @@
 import coreModules from 'core/src/common'
 import createStore from 'core/src/common/redux/createStore'
-import { ACTIVE } from 'core/src/common/variables'
+import { Active } from 'core/src/common/variables'
+import serverModules from 'modules-pack'
 import commonModules from './common'
-import serverModules from './modules'
 
 // =============================================================================
 // STORE CREATION
 // =============================================================================
 
-ACTIVE.store = createStore(coreModules.concat(commonModules).concat(serverModules))
-export default ACTIVE.store
+Active.store = createStore(coreModules.concat(commonModules).concat(serverModules))
+export default Active.store

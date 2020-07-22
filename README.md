@@ -70,7 +70,7 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 2. Install Git <https://git-scm.com/downloads>.
 
-3. Enable Git password caching by installing <https://gitcredentialstore.codeplex.com/>.
+3. Enable Git password caching by installing <https://gitcredentialstore._plex.com/>.
 
 4. Setup up git global configs at C:\Users\username (OPTIONAL)
 - Option 1: Add this to .gitconfig file (usually located at C:\Users\username)

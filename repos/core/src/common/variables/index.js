@@ -1,5 +1,5 @@
+import { localise } from 'utils-pack'
 import * as definitions from './definitions'
-import { localise } from './definitions'
 
 /**
  * GLOBAL VARIABLES ============================================================

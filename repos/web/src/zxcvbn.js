@@ -1,5 +1,5 @@
 import { asyncLoad } from 'core/src/common/utils/utility'
-import { ACTIVE } from 'core/src/common/variables'
+import { Active } from 'core/src/common/variables'
 
 /**
  * WEB INITIALISATION ==========================================================
@@ -10,4 +10,4 @@ import { ACTIVE } from 'core/src/common/variables'
 // Lazy load Password Checker
 // cross-browser asynchronous script loading for zxcvbn.
 // adapted from http://friendlybit.com/js/lazy-loading-asyncronous-javascript/
-asyncLoad('/static/js/zxcvbn.js', () => ACTIVE.passwordCheck = window.zxcvbn)
+asyncLoad('/static/js/zxcvbn.js', () => Active.passwordCheck = window.zxcvbn)

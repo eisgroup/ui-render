@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import PieChart from '../../components/charts/PieChart'
-import { renderCurrency } from '../../components/renders'
-import Row from '../../components/Row'
-import StatsChange from '../../components/StatsChange'
-import Text from '../../components/Text'
-import View from '../../components/View'
+import PieChart from 'react-ui-pack/charts/PieChart'
+import { renderCurrency } from 'react-ui-pack/renders'
+import Row from 'react-ui-pack/Row'
+import StatsChange from 'react-ui-pack/StatsChange'
+import Text from 'react-ui-pack/Text'
+import View from 'react-ui-pack/View'
 
 /**
  * Charts

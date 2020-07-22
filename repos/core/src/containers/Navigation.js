@@ -1,15 +1,13 @@
-import classNames from 'classnames'
-import PropTypes from 'prop-types'
+import { connect, stateAction } from 'modules-pack/redux'
+import router from 'modules-pack/router'
+import settings, { UI } from 'modules-pack/settings'
 import React, { Component } from 'react'
-import { SET, stateAction } from '../common/actions'
-import { connect } from '../common/redux'
+import { cn, PropTypes } from 'react-ui-pack'
+import MenuButton from 'react-ui-pack/MenuButton'
+import Row from 'react-ui-pack/Row'
+import View from 'react-ui-pack/View'
+import { SET } from 'utils-pack'
 import { NAV_HEADER_MAX_LINKS, SOUND } from '../common/variables'
-import MenuButton from '../components/MenuButton'
-import Row from '../components/Row'
-import View from '../components/View'
-import router from '../modules/router'
-import settings from '../modules/settings'
-import { UI } from '../modules/settings/constants'
 import NavLinks from './NavLinks'
 
 /**
@@ -90,12 +88,12 @@ export default class Sidebar extends Component {
       ? 'slide-in-right'
       : (isOpenSidebar === false ? 'slide-out-right' : 'hide')
     return (
-      <Row className={classNames('app__sidebar', containerClass, className)}>
+      <Row className={cn('app__sidebar', containerClass, className)}>
         {/* Empty overlay in Mobile view */}
         {isMobile && <View className='fill no-outline' onClick={this.handleCloseSidebar} tabIndex={-2}/>}
 
         {/* Nav items */}
-        <View className={classNames('fill-height ', contentClass)}>
+        <View className={cn('fill-height ', contentClass)}>
           <View className='overflow-scroll no-scrollbar'>
             <View className='app__sidebar__items min-height'>
               <NavLinks

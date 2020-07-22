@@ -20,7 +20,7 @@ export default function ErrorTable
      ...props
    }) {
   const hasId = !!get(items, '[0].id')
-  const hasStatus = !!get(items, '[0].status') || !!get(items, '[0].statusCode') || !!get(items, '[0].code')
+  const hasStatus = !!get(items, '[0].status') || !!get(items, '[0].statusCode') || !!get(items, '[0]._')
   const hasTitle = !!get(items, '[0].title') || !!get(items, '[0].error')
   return (
     <Table inverted={inverted} striped {...props}>

@@ -1,15 +1,15 @@
 import cookies from 'cookies'
 import { merge, set } from 'core/src/common/utils'
-import { ACTIVE, API_GQL_URI, DEFAULT, NODE_ENV } from 'core/src/common/variables'
+import { Active, API_GQL_URI, DEFAULT, NODE_ENV } from 'core/src/common/variables'
 import { GraphQLError } from 'graphql'
 import { formatErrorGenerator, SevenBoom as Response } from 'graphql-apollo-errors'
 import { GraphQLServer } from 'graphql-yoga'
+import modules from 'modules-pack'
 import commonModules from './common'
 import { API_PORT, SECRET } from './common/config'
 import commonResolver from './common/resolvers'
 import commonSchema from './common/schema.gql'
-import modules from './modules'
-// import { onConnect, tokenParser } from './modules/user/auth'
+// import { onConnect, tokenParser } from 'modules-pack/user/auth'
 
 const resolvers = merge(
   commonResolver,
@@ -34,7 +34,7 @@ const server = new GraphQLServer({
   // insert Token payload into GraphQl Context
   context: ({request: req, response: res, connection: sub}) => {
     const user = req.token
-    if (user && user.id) set(ACTIVE.usersById, `${user.id}.lastOnline`, Date.now())
+    if (user && user.id) set(Active.usersById, `${user.id}.lastOnline`, Date.now())
     return {req, res, sub, user}
   }
 })
@@ -65,5 +65,5 @@ server.start({
   }),
 }, () => {
   const localServer = `http://localhost:${API_PORT}`
-  console.log(`🚀  GraphQL ${ACTIVE.SERVICE} is listening in '${NODE_ENV}' mode @ ${localServer}${API_GQL_URI}`)
+  console.log(`🚀  GraphQL ${Active.SERVICE} is listening in '${NODE_ENV}' mode @ ${localServer}${API_GQL_URI}`)
 })

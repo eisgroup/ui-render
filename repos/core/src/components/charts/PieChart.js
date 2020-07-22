@@ -3,17 +3,8 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component, Fragment } from 'react'
 import { Pie, PieChart as Piechart, ResponsiveContainer, Tooltip } from 'recharts'
+import { by, gradientColors, pluralize, shortNumber, throttle, toList, toListValuesTotal, truncate } from 'utils-pack'
 import { TEXT_LIGHT } from '../../common/styles'
-import {
-  by,
-  gradientColors,
-  pluralize,
-  shortNumber,
-  throttle,
-  toList,
-  toListValuesTotal,
-  truncate
-} from '../../common/utils'
 import { renderFloat } from '../renders'
 import Row from '../Row'
 import Text from '../Text'

@@ -1,5 +1,4 @@
-import { findObjByKeys } from '../utils/object'
-import { _SHOULD_SHOW_TEST_ } from './_envs'
+import { _SHOULD_SHOW_TEST_, findObjByKeys } from 'utils-pack'
 
 /* Routes */
 export const NAV_HEADER_MAX_LINKS = 5 // show up to 5 links in Header navigation

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import { cleanList, formatTime, isEqual, timestampFromDate } from 'utils-pack'
 import { FORMAT_DATE } from '../../common/constants'
-import { cleanList, formatTime, isEqual, timestampFromDate } from '../../common/utils'
 import { date } from '../../modules/form/normalizers'
 import { dateMonthYear } from '../../modules/form/validationRules'
 import Input from '../Input'

@@ -1,5 +1,4 @@
-import { SIZE_MB_16, SIZE_MB_2 } from '../constants'
-import { _WORK_DIR_, ENV } from './_envs'
+import { _WORK_DIR_, ENV, SIZE_MB_16, SIZE_MB_2 } from 'utils-pack'
 import { PATH_SOUNDS } from './configs'
 import { DEFAULT } from './defaults'
 

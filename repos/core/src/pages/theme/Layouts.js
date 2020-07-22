@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
+import Icon from 'react-ui-pack/Icon'
+import Loading from 'react-ui-pack/Loading'
+import Row from 'react-ui-pack/Row'
+import Spinner from 'react-ui-pack/Spinner'
+import Square from 'react-ui-pack/Square'
+import View from 'react-ui-pack/View'
 import { PATH_IMAGES } from '../../common/variables'
-import Icon from '../../components/Icon'
-import Loading from '../../components/Loading'
-import Row from '../../components/Row'
-import Spinner from '../../components/Spinner'
-import Square from '../../components/Square'
-import View from '../../components/View'
 
 /**
  * Layouts

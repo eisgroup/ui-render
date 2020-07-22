@@ -1,8 +1,7 @@
-import { get, hasListValue } from '../common/utils'
-import { OPTIONS, TYPE } from '../common/variables/definitions'
-import { FIELD } from '../common/variables/fields'
-import { phone } from './form/normalizers'
-import { email, isRequired, phoneNumber } from './form/validationRules'
+import { OPTIONS, TYPE } from 'modules-pack/variables'
+import { email, isRequired, phone, phoneNumber } from 'react-ui-pack/inputs/normalizers'
+import { get, hasListValue } from 'utils-pack'
+import { FIELD } from '../../common/variables/fields'
 
 /**
  * FIELD DEFINITIONS ===========================================================

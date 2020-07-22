@@ -1,10 +1,10 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import { createScript, debounceBy, get, isInList, warn } from 'utils-pack'
 import { ALERT, stateAction } from '../../common/actions'
 import { connect } from '../../common/redux'
-import { createScript, debounceBy, get, isInList, warn } from '../../common/utils'
-import { ACTIVE } from '../../common/variables'
+import { Active } from '../../common/variables'
 import { POPUP } from '../../modules/exports'
 import Dropdown from '../Dropdown'
 import Row from '../Row'
@@ -136,7 +136,7 @@ export default class Place extends Component {
       {
         // @note: types: ['address'] does not work, better return all
         // types: ['geocode', 'establishment'],
-        language: ACTIVE.LANG.code,
+        language: Active.LANG._,
         ...this.props.searchOptions,
         input,
         sessionToken: this.session

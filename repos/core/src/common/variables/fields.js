@@ -1,11 +1,11 @@
-import { LANGUAGE_LEVEL } from '../constants'
-import { getSetDefinition } from './definitions'
+import { date, double5, hourMinute, integer, phone, uppercase } from 'react-ui-pack/inputs/normalizers'
+import { definitionSetup, LANGUAGE_LEVEL } from 'utils-pack'
 
 /**
  * CONSTANT VARIABLES ==========================================================
  * =============================================================================
  */
-export const FIELD = getSetDefinition('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', 'MIN_MAX', 'FOR')
+export const FIELD = definitionSetup('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', 'MIN_MAX', 'FOR')
 
 // Field Type Definitions
 FIELD.TYPE = {
@@ -77,7 +77,7 @@ FIELD.ID = {
 // Field Min/Max Value Definitions by ID (used for extending base definitions from FIELD.DEF)
 FIELD.MIN_MAX = {
   // Common
-  [FIELD.ID.LANGUAGE]: [LANGUAGE_LEVEL.BASIC.code, LANGUAGE_LEVEL.NATIVE.code],
+  [FIELD.ID.LANGUAGE]: [LANGUAGE_LEVEL.BASIC._, LANGUAGE_LEVEL.NATIVE._],
   // ...to be populated by modules
 }
 
@@ -89,4 +89,22 @@ FIELD.DEF = {
 // List of Field IDs with optional base definition overrides
 FIELD.FOR = {
   // ...to be populated by modules
+}
+
+// Validation Definitions
+FIELD.NORMALIZE = {
+  DATE: 'date',
+  HOUR_MINUTE: 'hh:mm',
+  DOUBLE5: 'double5',
+  INTEGER: 'integer',
+  PHONE: 'phone',
+  UPPERCASE: 'uppercase',
+}
+FIELD.NORMALIZER = {
+  [FIELD.NORMALIZE.DATE]: date,
+  [FIELD.NORMALIZE.HOUR_MINUTE]: hourMinute,
+  [FIELD.NORMALIZE.DOUBLE5]: double5,
+  [FIELD.NORMALIZE.INTEGER]: integer,
+  [FIELD.NORMALIZE.PHONE]: phone,
+  [FIELD.NORMALIZE.UPPERCASE]: uppercase,
 }

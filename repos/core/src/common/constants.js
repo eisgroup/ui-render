@@ -186,32 +186,32 @@ export const LANGUAGE = { // https://en.wikipedia.org/wiki/List_of_ISO_639-1_cod
 }
 export const l = {} // object mapping of language to their code
 for (const key in LANGUAGE) {
-  l[key] = LANGUAGE[key].code
+  l[key] = LANGUAGE[key]._
 }
 export const LANGUAGE_LEVEL = {
   UNKNOWN: {
     code: 0,
-    [LANGUAGE.ENGLISH.code]: 'Unknown'
+    [LANGUAGE.ENGLISH._]: 'Unknown'
   },
   BASIC: {
     code: 1,
-    [LANGUAGE.ENGLISH.code]: 'Beginner'
+    [LANGUAGE.ENGLISH._]: 'Beginner'
   },
   WORKING: {
     code: 2,
-    [LANGUAGE.ENGLISH.code]: 'Working'
+    [LANGUAGE.ENGLISH._]: 'Working'
   },
   PROFICIENT: {
     code: 3,
-    [LANGUAGE.ENGLISH.code]: 'Proficient'
+    [LANGUAGE.ENGLISH._]: 'Proficient'
   },
   FLUENT: {
     code: 4,
-    [LANGUAGE.ENGLISH.code]: 'Fluent'
+    [LANGUAGE.ENGLISH._]: 'Fluent'
   },
   NATIVE: {
     code: 5,
-    [LANGUAGE.ENGLISH.code]: 'Native'
+    [LANGUAGE.ENGLISH._]: 'Native'
   },
 }
 

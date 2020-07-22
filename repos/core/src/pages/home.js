@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import Helmet from 'react-helmet'
+import View from 'react-ui-pack/View'
 import { connect } from '../common/redux'
 import { logRender } from '../common/utils'
 import { APP_NAME } from '../common/variables'
-import View from '../components/View'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------

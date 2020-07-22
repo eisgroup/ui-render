@@ -1,12 +1,12 @@
-import PropTypes from 'prop-types'
+import { connect } from 'modules-pack/redux'
+import router, { Link } from 'modules-pack/router'
 import React, { Component, Fragment } from 'react'
-import { connect } from '../common/redux'
+import { PropTypes } from 'react-ui-pack'
+import AlertCounter from 'react-ui-pack/AlertCounter'
+import Icon from 'react-ui-pack/Icon'
+import Text from 'react-ui-pack/Text'
+import { withTimer } from 'react-ui-pack/utils'
 import { ANIMATION_DURATION, ROUTE } from '../common/variables'
-import AlertCounter from '../components/AlertCounter'
-import Icon from '../components/Icon'
-import Text from '../components/Text'
-import { withTimer } from '../components/utils'
-import router, { Link } from '../modules/router'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------

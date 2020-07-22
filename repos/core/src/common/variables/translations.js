@@ -1,5 +1,4 @@
-import { l, LANGUAGE } from '../constants'
-import { ACTIVE } from './_envs'
+import { Active, l, LANGUAGE } from 'utils-pack'
 
 /**
  * PROJECT TRANSLATIONS ========================================================
@@ -387,7 +386,7 @@ function localiseTranslation (TRANSLATION) {
   for (const NAME in TRANSLATION) {
     Object.defineProperty(result, NAME, {
       get () {
-        return TRANSLATION[NAME][ACTIVE.LANG.code] || TRANSLATION[NAME][LANGUAGE.ENGLISH.code] || NAME || ''
+        return TRANSLATION[NAME][Active.LANG._] || TRANSLATION[NAME][LANGUAGE.ENGLISH._] || NAME || ''
       }
     })
   }

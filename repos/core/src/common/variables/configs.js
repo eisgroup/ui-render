@@ -1,5 +1,4 @@
-import { FIVE_MINUTES, LANGUAGE, THIRTY_SECONDS, THREE_SECONDS, TWO_SECONDS } from '../constants'
-import { ENV } from './_envs'
+import { ENV, FIVE_MINUTES, LANGUAGE, THIRTY_SECONDS, THREE_SECONDS, TWO_SECONDS } from 'utils-pack'
 
 /**
  * APP CONFIGURATIONS ==========================================================

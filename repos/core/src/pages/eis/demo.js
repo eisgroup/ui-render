@@ -1,22 +1,20 @@
-import PropTypes from 'prop-types'
+import { fetch } from 'modules-pack/api'
+import { reset, withForm } from 'modules-pack/form'
+import { NAME as POPUP } from 'modules-pack/popup/constants'
+import { connect, stateAction } from 'modules-pack/redux'
+import settings from 'modules-pack/settings'
+import LanguageSelection from 'modules-pack/settings/views/LanguageSelection'
+import Upload from 'modules-pack/upload/views/Upload'
 import React, { Component } from 'react'
-import { ALERT, GET, SET, stateAction } from '../../common/actions'
-import fetch from '../../common/fetch'
-import { connect } from '../../common/redux'
-import { cloneDeep, isEmpty, logRender, performStorage, set } from '../../common/utils'
+import { PropTypes } from 'react-ui-pack'
+import JsonView from 'react-ui-pack/JsonView'
+import Row from 'react-ui-pack/Row'
+import ScrollView from 'react-ui-pack/ScrollView'
+import Text from 'react-ui-pack/Text'
+import View from 'react-ui-pack/View'
+import { ALERT, cloneDeep, GET, isEmpty, logRender, performStorage, SET, set } from 'utils-pack'
 import { _, FIELD, FILE_TYPE } from '../../common/variables'
-import Json from '../../components/Json'
-import Row from '../../components/Row'
-import ScrollView from '../../components/ScrollView'
-import Text from '../../components/Text'
-import View from '../../components/View'
-import Render, { metaToProps } from '../../components/views/Render'
-import { settings } from '../../modules'
-import { POPUP } from '../../modules/exports'
-import { reset } from '../../modules/form'
-import { withForm } from '../../modules/form/utils'
-import LanguageSelection from '../../modules/settings/views/LanguageSelection'
-import Upload from '../../modules/upload/views/Upload'
+import Render, { metaToProps } from './Render'
 import { transformConfig } from './rules'
 
 const DEMO_JSON_STORAGE_KEY = 'DEMO_JSON'
@@ -136,7 +134,7 @@ export default class Demo extends Component {
                 {hasMeta && <Text className='h6 no-margin fade-in-up'>{_.CONFIG_USED}</Text>}
                 <LanguageSelection className='right margin-left-small'/>
               </Row>
-              {hasMeta && <View className='fade-in-down'><Json data={meta.json} inverted/></View>}
+              {hasMeta && <View className='fade-in-down'><JsonView data={meta.json} inverted/></View>}
             </View>
           </Row>
         </ScrollView>
@@ -168,7 +166,7 @@ class Renderer extends Component {
    * Handle Redux-Form submit, which expects a promise return value
    */
   submit = (values) => {
-    return this.props.actions.popup({title: 'Submitted Form with these values', content: <Json data={values}/>})
+    return this.props.actions.popup({title: 'Submitted Form with these values', content: <JsonView data={values}/>})
   }
 
   handleSubmit = this.props.handleSubmit(this.submit)

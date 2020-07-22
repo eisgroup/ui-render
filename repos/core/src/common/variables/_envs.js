@@ -18,7 +18,7 @@ export const UNDEFINED = (Undefined => Undefined)()
 export const SECRET = __PROD__ ? ENV.SECRET : ENV.REACT_APP_SECRET  // make backend use REACT for testing socket actions
 
 /* Globally Accessible Objects */
-export const ACTIVE = { // will be overridden at runtime, used for avoiding circular import and env-dependent libraries
+export const Active = { // will be overridden at runtime, used for avoiding circular import and env-dependent libraries
   SERVICE: ENV.SERVICE,
   store: {},  // to avoid circular import
   createStore: () => {}, // to create a new store instance within sagas
