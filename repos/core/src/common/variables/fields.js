@@ -5,7 +5,7 @@ import { definitionSetup, LANGUAGE_LEVEL } from 'utils-pack'
  * CONSTANT VARIABLES ==========================================================
  * =============================================================================
  */
-export const FIELD = definitionSetup('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', 'MIN_MAX', 'FOR')
+export const FIELD = definitionSetup('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', 'MIN_MAX', 'FOR', 'NORMALIZE', 'NORMALIZER')
 
 // Field Type Definitions
 FIELD.TYPE = {

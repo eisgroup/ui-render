@@ -1,9 +1,9 @@
+import { connect } from 'modules-pack/redux'
+import { APP_NAME } from 'modules-pack/variables'
 import React, { Component } from 'react'
 import Helmet from 'react-helmet'
 import View from 'react-ui-pack/View'
-import { connect } from '../common/redux'
-import { logRender } from '../common/utils'
-import { APP_NAME } from '../common/variables'
+import { logRender } from 'utils-pack'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------

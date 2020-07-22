@@ -1,12 +1,12 @@
 import { connect } from 'modules-pack/redux'
 import router, { Link } from 'modules-pack/router'
 import React, { Component, Fragment } from 'react'
-import { PropTypes } from 'react-ui-pack'
+import { PropTypes, STYLE } from 'react-ui-pack'
 import AlertCounter from 'react-ui-pack/AlertCounter'
 import Icon from 'react-ui-pack/Icon'
 import Text from 'react-ui-pack/Text'
 import { withTimer } from 'react-ui-pack/utils'
-import { ANIMATION_DURATION, ROUTE } from '../common/variables'
+import { ROUTE } from '../common/variables'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
@@ -45,7 +45,7 @@ export default class NavLinks extends Component {
     return (
       <Fragment>
         {items.map(({path, name, icon}, i) => {
-          const delay = (i + 1) * ANIMATION_DURATION * 0.3
+          const delay = (i + 1) * STYLE.ANIMATION_DURATION * 0.3
           if (sound && !this.itemDidMount[i]) {
             this.setTimeout(sound.play, delay + 200)
             this.itemDidMount[i] = true

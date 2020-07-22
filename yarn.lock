@@ -10569,10 +10569,10 @@ module-lookup-amd@^6.1.0:
     requirejs "^2.3.5"
     requirejs-config-file "^3.1.1"
 
-modules-pack@^0.2.4:
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.2.4.tgz#e8731ac75dd249bcf00f9badfcbdc17a46700f73"
-  integrity sha512-m3Zvh11OlMPP7VzkoPFq39E4K5Q7YG+7Rjv2TjG9nIphZvty+gH7IY0CcMTf6uctwX+IPeCyKeVOWRzONDCHiQ==
+modules-pack@^0.2.6:
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.2.6.tgz#c38f1cf223048c6bf813306f023e0f8d4e94c887"
+  integrity sha512-igCy2olELvLQh7dMXw9qeoUSoSLwp/2dzeKl01hiBZqjS819LpMomwhzEZGO+P2umeCCsxyiKm/NBpgSdh6Wyw==
   dependencies:
     axios "^0.19.2"
     backoff "^2.5.0"

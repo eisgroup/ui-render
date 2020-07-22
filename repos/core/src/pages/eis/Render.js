@@ -1,4 +1,5 @@
 import { NAME as POPUP } from 'modules-pack/popup'
+import { stateAction } from 'modules-pack/redux'
 import React, { Component } from 'react'
 import { cn } from 'react-ui-pack'
 import Button from 'react-ui-pack/Button'
@@ -21,6 +22,7 @@ import Text from 'react-ui-pack/Text'
 import View from 'react-ui-pack/View'
 import {
   Active,
+  ALERT,
   cloneDeep,
   get,
   interpolateString,
@@ -35,7 +37,6 @@ import {
   toPercent
 } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
-import { ALERT, stateAction } from '../../common/actions'
 import { FIELD } from '../../common/variables'
 import TooltipPop from '../../components/TooltipPop'
 
