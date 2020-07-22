@@ -14,7 +14,6 @@ import Webstudio from './eis/webstudio'
 
 export default {
   [ROUTE.HOME]: OpenL,
-  [ROUTE.HOME]: Demo,
   [ROUTE.WEBSTUDIO]: Webstudio,
   [ROUTE.DEMO]: Demo,
   // [ROUTE.TESTER]: Tester,

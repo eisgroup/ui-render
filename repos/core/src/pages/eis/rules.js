@@ -1,10 +1,10 @@
 import { fetch } from 'modules-pack/api'
 import { reset, withForm } from 'modules-pack/form'
 import { popupAlert } from 'modules-pack/popup'
+import { FIELD } from 'modules-pack/variables'
 import React from 'react'
 import Json from 'react-ui-pack/JsonView'
 import { cloneDeep, get, isCollection, isEmpty, isObject, isString, sanitizeGqlResponse, set } from 'utils-pack'
-import { FIELD } from '../../common/variables'
 import { metaToProps } from './Render'
 
 /**

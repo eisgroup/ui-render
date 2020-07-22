@@ -3,7 +3,6 @@
  * =============================================================================
  */
 
-export * from './fields'
 export * from './routes'
 
 /* Platform Prefixes */
