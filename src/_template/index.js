@@ -10,6 +10,8 @@ import select from './selectors'
  * =============================================================================
  */
 
+export * from './constants'
+export * from './utils'
 export {
   NAME,
   select,

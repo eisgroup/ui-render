@@ -11,6 +11,7 @@ import select from './selectors'
  * =============================================================================
  */
 
+export * from './constants'
 export {
   NAME,
   select,

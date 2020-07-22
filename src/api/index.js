@@ -9,7 +9,9 @@ import * as select from './selectors'
  * =============================================================================
  */
 
+export * from './constants'
 export * from './actions'
+export * from './fetch'
 export * from './utils'
 
 /** See apiMiddleware for more documentation */

@@ -12,4 +12,4 @@ import initState from './data'
 export default handleActions({
   [stateActionType(UPLOAD, SET)]: (state, {payload}) => ({...state, ...payload}),
   ...uiLoading(UPLOAD)
-}, initState.data)
+}, initState)

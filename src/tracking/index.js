@@ -14,6 +14,7 @@ import { withTracker } from './utils'
  * =============================================================================
  */
 
+export * from './constants'
 export {
   NAME,
   withTracker

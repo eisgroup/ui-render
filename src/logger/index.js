@@ -10,6 +10,7 @@ import { createLoggerMiddleware } from './middleware'
  * =============================================================================
  */
 
+export * from './constants'
 const logger = {
   // ...(__DEV__ && __CLIENT__) && {middleware: require('redux-logger').createLogger()}, // direct console.log output
   ...__BACKEND__ && { middleware: createLoggerMiddleware() }

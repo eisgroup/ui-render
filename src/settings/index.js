@@ -9,6 +9,8 @@ import select from './selectors'
  * =============================================================================
  */
 
+export * from './constants'
+export * from './actions'
 export {
   NAME,
   UI,

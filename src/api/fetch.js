@@ -20,6 +20,6 @@ import { fetchFlow } from './utils'
  * @param {Object} [meta] - additional metadata to attach to the request
  * @returns {Promise<{payload, meta}>} action - result is always a Flux Standard Action with `meta.result`
  */
-export default function fetch (url, {method, body, params, ...meta} = {}) {
+export function fetch (url, {method, body, params, ...meta} = {}) {
   return runTask(fetchFlow, {url, method, payload: {body, params}, meta})
 }
