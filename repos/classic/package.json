@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "yarn cors && yarn gql && yarn css --sourcemap && react-app-rewired start & yarn style --sourcemap",
-    "build": "yarn css --minify && react-app-rewired build && yarn clean && yarn build-dist",
+    "build": "NODE_ENV=production yarn build:css && react-app-rewired build && yarn clean && yarn build-dist",
     "build-dist": "mkdir -p ../../dist/classic && yarn delete ../../dist/classic/* && cp -rf build/* ../../dist/classic && yarn delete build",
     "build:css": "NODE_ENV=production yarn style css",
     "test": "react-app-rewired test",
