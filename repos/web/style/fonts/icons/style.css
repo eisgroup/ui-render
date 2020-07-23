@@ -1,10 +1,10 @@
 @font-face {
-  font-family: 'icons';
-  src:  url('fonts/icons.eot?9d5gmp');
-  src:  url('fonts/icons.eot?9d5gmp#iefix') format('embedded-opentype'),
-    url('fonts/icons.ttf?9d5gmp') format('truetype'),
-    url('fonts/icons.woff?9d5gmp') format('woff'),
-    url('fonts/icons.svg?9d5gmp#icons') format('svg');
+  font-family: 'iconsOpenL';
+  src:  url('fonts/iconsOpenL.eot?ws8loc');
+  src:  url('fonts/iconsOpenL.eot?ws8loc#iefix') format('embedded-opentype'),
+    url('fonts/iconsOpenL.ttf?ws8loc') format('truetype'),
+    url('fonts/iconsOpenL.woff?ws8loc') format('woff'),
+    url('fonts/iconsOpenL.svg?ws8loc#iconsOpenL') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -12,8 +12,8 @@
 
 .icon {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'icons' !important;
-  speak: none;
+  font-family: 'iconsOpenL' !important;
+  speak: never;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
