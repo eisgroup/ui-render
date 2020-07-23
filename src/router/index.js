@@ -11,6 +11,8 @@ import { defineRoutes } from './utils'
  * =============================================================================
  */
 
+export { Switch } from 'react-router-dom'
+export { withRouter } from 'react-router'
 export * from './constants'
 export * from './history'
 export * from './utils'

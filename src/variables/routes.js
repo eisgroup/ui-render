@@ -51,7 +51,7 @@ if (_SHOULD_SHOW_TEST_) ROUTES.FOR_NAV.push(...[
  *      ]},
  *    ]
  */
-function createNestedRoutes (routeObj, matches = {}) {
+export function createNestedRoutes (routeObj, matches = {}) {
   const result = []
   for (const key in routeObj) {
     const path = routeObj[key]

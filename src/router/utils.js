@@ -53,5 +53,3 @@ export function withRouteId (constructor) {
   })
   return withRouter(constructor)
 }
-
-export { withRouter } from 'react-router'
