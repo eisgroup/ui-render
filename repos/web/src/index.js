@@ -1,3 +1,4 @@
+import 'core/src/common/variables'
 import './main'
 import * as serviceWorker from './serviceWorker'
 // import './zxcvbn'

@@ -1,13 +1,13 @@
 import { connect, stateAction } from 'modules-pack/redux'
 import router from 'modules-pack/router'
 import settings, { UI } from 'modules-pack/settings'
+import { ROUTES } from 'modules-pack/variables'
 import React, { Component } from 'react'
 import { cn, PropTypes, SOUND } from 'react-ui-pack'
 import MenuButton from 'react-ui-pack/MenuButton'
 import Row from 'react-ui-pack/Row'
 import View from 'react-ui-pack/View'
 import { SET } from 'utils-pack'
-import { NAV_HEADER_MAX_LINKS } from '../common/variables'
 import NavLinks from './NavLinks'
 
 /**
@@ -45,9 +45,9 @@ export class Header extends Component {
     const { isMobile, isOpenSidebar, items } = this.props
     if (!items.length) return null
     if (!isMobile) return null
-    const hasSidebar = items.length > NAV_HEADER_MAX_LINKS
+    const hasSidebar = items.length > ROUTES.NAV_HEADER_MAX_LINKS
     const links = [...items]
-    if (hasSidebar) links.length = NAV_HEADER_MAX_LINKS - 1
+    if (hasSidebar) links.length = ROUTES.NAV_HEADER_MAX_LINKS - 1
     return (
       <Row className='app__header__items fill-width'>
         <NavLinks
@@ -79,7 +79,7 @@ export default class Sidebar extends Component {
   render () {
     const { isMobile, isOpenSidebar, className, items } = this.props
     if (!items.length) return null
-    const links = isMobile ? items.slice(NAV_HEADER_MAX_LINKS - 1) : items
+    const links = isMobile ? items.slice(ROUTES.NAV_HEADER_MAX_LINKS - 1) : items
     const showSidebar = !isMobile || isOpenSidebar
     const containerClass = showSidebar
       ? 'active' // do not add `fade-in` class because of Safari bug

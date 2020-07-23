@@ -1,12 +1,12 @@
 import { connect } from 'modules-pack/redux'
 import router, { Link } from 'modules-pack/router'
+import { ROUTE } from 'modules-pack/variables'
 import React, { Component, Fragment } from 'react'
 import { PropTypes, STYLE } from 'react-ui-pack'
 import AlertCounter from 'react-ui-pack/AlertCounter'
 import Icon from 'react-ui-pack/Icon'
 import Text from 'react-ui-pack/Text'
 import { withTimer } from 'react-ui-pack/utils'
-import { ROUTE } from '../common/variables'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------

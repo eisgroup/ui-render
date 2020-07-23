@@ -1,4 +1,4 @@
-import { ROUTE } from '../common/variables'
+import { ROUTE } from 'modules-pack/variables'
 import Demo from './eis/demo'
 import OpenL from './eis/openl'
 import Webstudio from './eis/webstudio'

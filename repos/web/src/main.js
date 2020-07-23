@@ -1,9 +1,9 @@
 // import Apollo from 'core/src/apollo'
 import App from 'core/src/App'
-import { ROUTES } from 'core/src/common/variables'
 import pages from 'core/src/pages'
 import Redux from 'modules-pack/redux'
 import router from 'modules-pack/router'
+import { ROUTES } from 'modules-pack/variables'
 import React from 'react'
 import { render } from 'react-dom'
 import store from './store'
@@ -14,13 +14,13 @@ import store from './store'
  */
 
 const {Router, history} = router
-
+console.log('routes', ROUTES)
 render(
   // <Apollo.Provider client={Apollo.client}>
   <Redux.Provider store={store}>
     <Router history={history}>
       <App>
-        {router.defineRoutes(ROUTES, pages)}
+        {router.defineRoutes(ROUTES.FOR_DEFINITION, pages)}
         {/*<Route exact path={ROUTE.SETTINGS} component={settings.View}/>*/}
       </App>
     </Router>

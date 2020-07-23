@@ -11,7 +11,7 @@
     "apollo-upload-client": "^12.1.0",
     "flat": "^4.1.0",
     "graphql": "^14.6.0",
-    "modules-pack": "^0.2.7",
+    "modules-pack": "^0.2.10",
     "react": "16.8.0",
     "react-autofill": "^1.1.4",
     "react-helmet": "^5.2.0",

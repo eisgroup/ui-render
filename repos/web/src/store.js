@@ -1,4 +1,4 @@
-// import api from 'modules-pack/api'
+import api from 'modules-pack/api'
 import form from 'modules-pack/form'
 import popup from 'modules-pack/popup'
 import redux, { createStore } from 'modules-pack/redux'
@@ -18,7 +18,7 @@ import { Active } from 'utils-pack'
 const modulesActivated = [
   redux,
   saga,
-  // api,
+  api,
   socket,
   router,
   form,

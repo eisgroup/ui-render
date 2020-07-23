@@ -51,17 +51,15 @@
     ]
   },
   "peerDependencies": {
-    "react": "16.8.0",
     "modules-pack": "*",
+    "react": "16.8.0",
     "react-ui-pack": "*",
     "utils-pack": "*"
   },
   "dependencies": {
-    "connected-react-router": "^6.8.0",
     "core": "*",
     "react-dom": "16.8.0",
-    "react-scripts": "2.1.0",
-    "redux-form": "^8.3.6"
+    "react-scripts": "2.1.0"
   },
   "devDependencies": {
     "customize-cra": "^0.5.0",
