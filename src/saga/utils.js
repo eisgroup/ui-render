@@ -73,7 +73,7 @@ export function loadingFinish (type, wait) {
  *
  * @param {Function} func - generator function to run
  * @param {*} args - arguments to pass to generator function
- * @return {Object} Task - redux-saga task description, with .done, .cancel(), etc.
+ * @return {Object} Task - redux-saga task description, with .toPromise(), .cancel(), etc.
  */
 export function runSaga (func, ...args) {
   return middleware.run(func.bind(this, ...args))
@@ -86,7 +86,7 @@ export function runSaga (func, ...args) {
  *    const result = await runTask(sagaFlowGeneratorFunction, {payload: {...}})
  */
 export function runTask (...args) {
-  return runSaga(...args).done
+  return runSaga(...args).toPromise()
 }
 
 /* Dispatch Alert Message Action to be Handled by Appropriate Platform */

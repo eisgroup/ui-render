@@ -10,6 +10,7 @@ import { fetchFlow } from './utils'
  * Wrapper for fetch request with identical interface to Fetch API,
  * but using redux actions (via the `core/src/common/api` module).
  * This makes it easy to debug because requests are logged to console (if `core/src/common/logger` module is enabled).
+ * @todo: write test because upgrading may break current implementation
  * @example:
  *    const {payload = {}, meta: {result} = {}} = await fetch(url, {params: {q: 'query'}})
  *

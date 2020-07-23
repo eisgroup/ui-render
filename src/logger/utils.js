@@ -246,7 +246,7 @@ export class Log {
   static * saga (func, ...args) {
     const start = Date.now()
     const task = yield fork(func, ...args)
-    return yield task.done
+    return yield task.toPromise()
       .then(result => {
         Log.task(task, {start, done: Date.now()})
         return result
