@@ -1,6 +1,7 @@
 {
   "name": "classic",
   "version": "0.1.0",
+  "homepage": ".",
   "private": true,
   "scripts": {
     "start": "yarn cors && yarn gql && yarn css --sourcemap && react-app-rewired start & yarn style --sourcemap",
