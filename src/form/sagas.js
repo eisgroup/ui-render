@@ -1,5 +1,5 @@
-import { apiAction } from 'modules-pack/../../api/actions'
-import { subscribeToApiResults } from 'modules-pack/../../api/utils'
+import { apiAction } from 'modules-pack/api/actions'
+import { subscribeToApiResults } from 'modules-pack/api/utils'
 import { stateActionType } from 'modules-pack/redux/actions'
 import { all, call, put, takeEvery } from 'modules-pack/saga/utils'
 import { GET, get, toList } from 'utils-pack'
