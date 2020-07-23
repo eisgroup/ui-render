@@ -5,7 +5,6 @@ import redux, { createStore } from 'modules-pack/redux'
 import router from 'modules-pack/router'
 import saga from 'modules-pack/saga'
 import settings from 'modules-pack/settings'
-import socket from 'modules-pack/socket'
 import upload from 'modules-pack/upload'
 import user from 'modules-pack/user'
 import { Active } from 'utils-pack'
@@ -19,7 +18,6 @@ const modulesActivated = [
   redux,
   saga,
   api,
-  socket,
   router,
   form,
   popup,

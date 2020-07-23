@@ -1,8 +1,11 @@
+// import Apollo from 'core/src/apollo'
 import App from 'core/src/App'
 import Redux from 'modules-pack/redux'
 import router from 'modules-pack/router'
+import { ROUTES } from 'modules-pack/variables'
 import React from 'react'
 import { render } from 'react-dom'
+import pages from './pages'
 import store from './store'
 
 /**
@@ -12,10 +15,15 @@ import store from './store'
 
 const {Router, history} = router
 render(
+  // <Apollo.Provider client={Apollo.client}>
   <Redux.Provider store={store}>
     <Router history={history}>
-      <App/>
+      <App>
+        {router.defineRoutes(ROUTES.FOR_DEFINITION, pages)}
+        {/*<Route exact path={ROUTE.SETTINGS} component={settings.View}/>*/}
+      </App>
     </Router>
   </Redux.Provider>
-  , document.getElementById('root')
+  // </Apollo.Provider>
+  , document.getElementById('react-app')
 )

@@ -25,5 +25,5 @@ render(
     </Router>
   </Redux.Provider>
   // </Apollo.Provider>
-  , document.getElementById('root')
+  , document.getElementById('react-app')
 )
