@@ -9745,10 +9745,10 @@ less-plugin-glob@^3.0.0:
   dependencies:
     globby "^8.0.1"
 
-less-watcher-compiler@^0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/less-watcher-compiler/-/less-watcher-compiler-0.0.8.tgz#a112bf55810115e7f52501579025201b13b49ff4"
-  integrity sha512-m9JZZhiZWDqEyeumMBLZ9HVoTuUMYw5UcaSaTtL4mJdYAbf/RJyXMTcLsK7KTijvnjeaQJGRFvzkoxIxyPpTxw==
+less-watcher-compiler@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/less-watcher-compiler/-/less-watcher-compiler-0.1.0.tgz#ffa49909090a2619f0b51187ee46bfcb60675b8a"
+  integrity sha512-9D3nvxCsKsf1lDtnGdjvREghkUWGNfBWbk1WSiYvXlg1MTMGX9pHylqUue2zNABaobQSYRCqcn7UTnzRUKwjig==
   dependencies:
     autoprefixer "^9.8.2"
     cssnano "^4.1.10"

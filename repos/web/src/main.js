@@ -14,7 +14,6 @@ import store from './store'
  */
 
 const {Router, history} = router
-console.log('routes', ROUTES)
 render(
   // <Apollo.Provider client={Apollo.client}>
   <Redux.Provider store={store}>
