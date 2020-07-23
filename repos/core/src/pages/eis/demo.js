@@ -65,6 +65,7 @@ export default class Demo extends Component {
 
   resetForm = (...args) => this._resetForm(...args)
 
+  // noinspection JSDeprecatedSymbols
   setup = {
     reset: (FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm),
     setState: (FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates),

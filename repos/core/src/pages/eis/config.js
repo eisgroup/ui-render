@@ -1,7 +1,7 @@
 /**
  * @Summary of strategies used:
  *    1. Recursive Field definitions (i.e. objects with `view` attribute can have nested `items`)
- *        - Field can by any view rendering component or input
+ *        - Field can be any view rendering component or input
  *
  *    2. Function definitions by name (i.e. attributes starting with the word `render`, etc.)
  *        - Arguments can be defined, separated by comma (i.e. `"setState,plan"` -> use "plan" as argument)
