@@ -25,4 +25,10 @@ export const Active = {
   LANG: LANGUAGE.ENGLISH, // currently used language
   Storage: typeof localStorage !== 'undefined' ? localStorage : undefined, // LocalStorage for Node
   WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined, // WebSocket for Node
+  iconClass: '', // CSS className for <Icon />
+  iconClassPrefix: 'icon-', // CSS className prefix for <Icon />
+  client: undefined, // Apollo client
+  log: undefined, // backend console logger
+  passwordCheck: () => {}, // password strength calculator
+  usersById: {} // for storing temporary info, like user.lastOnline
 }

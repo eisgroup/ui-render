@@ -300,6 +300,7 @@ describe(`${removeFromList.name}()`, () => {
     const list = [1, 7, 'id']
     const listClone = cloneDeep(list)
     expect(removeFromList(list, [1, 'id'])).toEqual([7])
+    expect(removeFromList(list, [1, 7, 'id'])).toEqual([])
     expect(list).toEqual(listClone)
   })
 })
