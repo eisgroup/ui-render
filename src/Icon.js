@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import { Active } from 'utils-pack'
 import { accessibilitySupport } from './utils'
 
 /**
@@ -24,7 +25,11 @@ export default function Icon
  }) {
   props = accessibilitySupport(props, sound)
   return (
-    <i className={classNames('icon', name, className, { large, small, pointer: props.onClick })}
+    <i className={classNames(Active.iconClass, Active.iconClassPrefix + name, className, {
+      large,
+      small,
+      pointer: props.onClick
+    })}
        aria-hidden='true' {...props} />
   )
 }
