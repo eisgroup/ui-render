@@ -179,7 +179,7 @@ input, select, textarea {
 
       &:before {
         &:extend(.position-center all);
-        .icon(@checkbox-filled);
+        .icon(@icon-checkbox-filled);
         color: @color-primary;
       }
     }
@@ -594,7 +594,7 @@ div.select {
 
   &:after { // :after does not work on <select> so have to apply to wrapper
     @offset: (@input-padding-h-value * @size-smaller / @input-font-size);
-    .icon(@chevron-down);
+    .icon(@icon-chevron-down);
     font-size: @size-smaller;
     margin-left: -(@offset + @size-smaller);
     margin-right: @offset; // fix negative margin layout
