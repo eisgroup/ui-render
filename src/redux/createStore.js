@@ -18,9 +18,10 @@ import saga from '../saga'
  *    => optimize performance with `redux-ignore` library to filter actions
  *
  * @param {Object[]|Object} modules - list of modules to activate {NAME, middleware, reducer, saga}
+ * @param {Boolean} [ignore] - whether to filter reducers using `ignoreActions` from `redux-ignore` library, default is false
  * @returns {Object} - redux store
  */
-export default function createStore (modules = []) {
+export default function createStore (modules = [], {ignore} = {}) {
   modules = toList(modules)
   if (!hasListValue(modules)) return reduxCreateStore(state => state)
 
@@ -38,7 +39,7 @@ export default function createStore (modules = []) {
   let handlers = {}
   modules.forEach(({NAME, ACTION_TYPE, reducer}) => {
     if (!NAME || !isFunction(reducer)) return
-    handlers[NAME] = ignoreActions(reducer, ({type}) => (!type || type.indexOf(ACTION_TYPE || NAME) !== 0))
+    handlers[NAME] = ignore ? ignoreActions(reducer, ({type}) => (!type || type.indexOf(ACTION_TYPE || NAME) !== 0)) : reducer
   })
   const rootReducer = hasObjectValue(handlers) ? combineReducers(handlers) : (state => state)
   const allHandlers = (state, action) => {
