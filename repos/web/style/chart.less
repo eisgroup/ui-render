@@ -141,7 +141,7 @@
   align-self: flex-end;
   color: @color-text-grey;
 
-  i.icon {
+  @{select-icon} {
     font-size: @size-icon-larger;
   }
 }
@@ -158,7 +158,7 @@
 
 
 .app__stats-change {
-  i.icon.caret-up {
+  i.icon-caret-up {
     color: @color-green;
 
     .inverted & {
@@ -166,7 +166,7 @@
     }
   }
 
-  i.icon.caret-down {
+  i.icon-caret-down {
     color: @color-red;
 
     .inverted & {

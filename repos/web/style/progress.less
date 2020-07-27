@@ -92,7 +92,7 @@
     border-color: inherit;
     border-radius: @progress-bar-radius;
 
-    i.icon {
+    @{select-icon} {
       font-size: @size-icon-small;
     }
   }
@@ -196,8 +196,10 @@
     box-sizing: content-box;
     border-width: @progress-steps-border-size;
 
-    i.icon:before {
-      opacity: 1;
+    @{select-icon} {
+      &:before {
+        opacity: 1;
+      }
     }
   }
 

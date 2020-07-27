@@ -53,14 +53,14 @@
 
   .sizeScale(@base);
 
-  i.icon {
+  @{select-icon} {
     font-size: @size-icon; // crisp display fix
   }
 
   &.small {
     .sizeScale(@small);
 
-    i.icon {
+    @{select-icon} {
       font-size: @small; // crisp display fix
     }
   }
@@ -68,7 +68,7 @@
   &.large {
     .sizeScale(@large);
 
-    i.icon {
+    @{select-icon} {
       font-size: @size-icon-larger; // crisp display fix
     }
   }

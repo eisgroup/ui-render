@@ -41,8 +41,10 @@
     }
   }
 
-  > .text > i.icon:first-child {
-    &:extend(.margin-right-small all);
+  > .text > @{select-icon} {
+    &:first-child {
+      &:extend(.margin-right-small all);
+    }
   }
 }
 

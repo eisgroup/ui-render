@@ -161,7 +161,7 @@ input, select, textarea {
     box-shadow: inherit; // fix for Firefox
   }
 
-  + i.icon {
+  + @{select-icon} {
     font-size: @size-icon; // ensure icon is crisp
   }
 
@@ -194,7 +194,7 @@ input, select, textarea {
     font-size: @input-font-size-large;
     .scalePadding(@size: @input-font-size-large, @top: @input-padding-v, @left: @input-padding-h);
 
-    + i.icon {
+    + @{select-icon} {
       font-size: @input-font-size-large-icon;
     }
   }
@@ -336,8 +336,10 @@ input, select, textarea {
     .scalePadding(@size: @input-font-size, @top: @input-padding-v, @left: @input-padding-h);
   }
 
-  &.loading > i.icon {
-    padding: size(17) !important; // quick fix
+  &.loading > {
+    @{select-icon} {
+      padding: size(17) !important; // quick fix
+    }
   }
 
   &.compact {
@@ -509,7 +511,7 @@ div.select {
   &.icon {
     font-size: inherit; // prevent Semantic UI override
 
-    i.icon {
+    @{select-icon} {
       z-index: 1;
       .no-outline();
 
@@ -521,7 +523,7 @@ div.select {
     }
 
     &.top {
-      i.icon {
+      @{select-icon} {
         .padding-v(@input-padding-v-value);
       }
     }
@@ -545,7 +547,7 @@ div.select {
 
     .iconPosition(@padding; @offset; @margin;) {
       @icon-padding: @input-padding-v-value;
-      i.icon {
+      @{select-icon} {
         padding: @icon-padding;
       }
       &:not(.lefty) {
@@ -554,7 +556,7 @@ div.select {
           padding-right: @padding
         }
 
-        i.icon {
+        @{select-icon} {
           margin-left: -(@margin + @icon-padding);
           margin-right: @offset - @icon-padding;
         }
@@ -570,7 +572,7 @@ div.select {
           }
         }
 
-        i.icon {
+        @{select-icon} {
           margin-right: -(@margin + @icon-padding);
           margin-left: @offset - @icon-padding;
         }
@@ -737,8 +739,10 @@ div.select {
       &:extend(.bg-transparent all);
     }
 
-    ~ i.icon:not(.dropdown) {
-      display: none;
+    ~ @{select-icon} {
+      &:not(.dropdown) {
+        display: none;
+      }
     }
   }
 }*/
@@ -913,7 +917,7 @@ input.checkbox.toggle {
       .margin-v(@checkbox-padding-size * 2);
       .margin-h(@checkbox-padding-size * 4);
 
-      i.icon {
+      @{select-icon} {
         .font-size(@size-smaller);
         margin: 0;
       }
