@@ -1,5 +1,5 @@
-import ClassicPage from 'core/src/pages/eis/classic'
-import { ROUTE } from 'modules-pack/variables'
+import WebStudioPage from 'core/src/pages/eis/webstudio'
+import { ROUTE, ROUTES } from 'modules-pack/variables'
 
 /**
  * EXPORTS =====================================================================
@@ -9,5 +9,7 @@ import { ROUTE } from 'modules-pack/variables'
  */
 
 export default {
-  [ROUTE.HOME]: ClassicPage,
+  [ROUTE.HOME]: WebStudioPage,
 }
+
+ROUTES.FOR_NAV = []

@@ -6,12 +6,12 @@ import Placeholder from 'react-ui-pack/Placeholder'
 import ScrollView from 'react-ui-pack/ScrollView'
 import Spinner from 'react-ui-pack/Spinner'
 import Text from 'react-ui-pack/Text'
-import { get, isEmpty, logRender, SUCCESS } from 'utils-pack'
+import { ENV, get, isEmpty, logRender, SUCCESS } from 'utils-pack'
 import Render from './Render'
 import { withUISetup } from './rules'
 
-const DATA_URL = 'http://mnsopenl.exigengroup.com:9998/std-rating-report/ExtractRatingDetails'
-const META_URL = 'http://mnsopenl.exigengroup.com:9998/ui-config/GeneratePageStructure'
+const DATA_URL = ENV.REACT_APP_DATA_URL
+const META_URL = ENV.REACT_APP_META_URL
 
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
@@ -24,7 +24,7 @@ export default class WebStudioPage extends Component {
   }
 
   get id () {
-    return get(this.props, 'match.params.id')
+    return get(this.props, 'match.params.id') || ''
   }
 
   componentDidMount () {
