@@ -3,7 +3,7 @@ import { connect } from 'modules-pack/redux'
 import { Switch, withRouter } from 'modules-pack/router'
 import { select, SETTING } from 'modules-pack/settings'
 import { withTracker } from 'modules-pack/tracking'
-import AcceptCookie from 'modules-pack/tracking/views/AcceptCookie'
+// import AcceptCookie from 'modules-pack/tracking/views/AcceptCookie'
 import { ANALYTICS_TRACKING_ID, DEFAULT } from 'modules-pack/variables'
 import React, { Component } from 'react'
 import Modal from 'react-ui-pack/Modal'
@@ -112,7 +112,7 @@ export default class App extends Component {
     return (
       <UIContext.Provider value={this.state}>
         <View className={`app fade-in lang--${lang} ${currency}` + (inverted ? ' inverted text-shadow' : '')}>
-          <AcceptCookie/>
+          {/*<AcceptCookie/>*/}
 
           {/* Header */}
           <Header isMobile={isMobile} {...props} />

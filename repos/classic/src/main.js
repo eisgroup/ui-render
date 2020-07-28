@@ -2,7 +2,7 @@
 import App from 'core/src/App'
 import Redux from 'modules-pack/redux'
 import router from 'modules-pack/router'
-import { ROUTES } from 'modules-pack/variables'
+import { ROUTE, ROUTES } from 'modules-pack/variables'
 import React from 'react'
 import { render } from 'react-dom'
 import pages from './pages'
@@ -27,3 +27,4 @@ render(
   // </Apollo.Provider>
   , document.getElementById('react-app')
 )
+history.push(ROUTE.HOME)
