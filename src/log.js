@@ -159,7 +159,7 @@ export function logRender (constructor) {
 			const name = constructor.name
 			const start = Date.now()
 			const result = original.apply(this, arguments)
-			log(`♦♦♦♦♦♦♦ RENDER ${name} [${Date.now() - start} ms] ♦♦♦♦♦♦♦`, 'color: Blue')
+			log(`♦♦♦♦♦♦♦ RENDER ${name} [${Date.now() - start} ms] ♦♦♦♦♦♦♦`, 'color: Teal')
 			return result
 		}
 		return original.apply(this, arguments)
