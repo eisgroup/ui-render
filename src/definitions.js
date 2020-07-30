@@ -147,7 +147,8 @@ export function localise (DEFINITION) {
 }
 
 /**
- * Prepare translations for localisation, so they can be accessed directly via .TEXT property
+ * Prepare translations for localisation by mutation, so they can be accessed directly via .TEXT property
+ * @Note: can be applied repeatedly to add new translations or languages
  *
  * @example:
  *    const _ = localiseTranslation(TRANSLATIONS)
@@ -162,15 +163,16 @@ export function localise (DEFINITION) {
  *  (falls back to English if definition not found for active language, or empty string).
  */
 export function localiseTranslation (TRANSLATION) {
-  const result = {}
   for (const KEY in TRANSLATION) {
-    Object.defineProperty(result, KEY, {
+    const data = TRANSLATION[KEY]
+    delete TRANSLATION[KEY] // remove it to prevent repeated iteration
+    Object.defineProperty(TRANSLATION, KEY, {
       get () {
-        return TRANSLATION[KEY][Active.LANG._] || TRANSLATION[KEY][LANGUAGE.ENGLISH._] || KEY || ''
+        return data[Active.LANG._] || data[LANGUAGE.ENGLISH._] || KEY || ''
       },
     })
   }
-  return result
+  return TRANSLATION
 }
 
 /**

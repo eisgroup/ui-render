@@ -6,7 +6,7 @@ import { localiseTranslation } from './definitions'
  * =============================================================================
  */
 
-export const TRANSLATION = {
+export const _ = {
   // Project Specific
   // ---------------------------------------------------------------------------
   CONFIG_USED: {
@@ -368,6 +368,4 @@ export const TRANSLATION = {
   },
 }
 
-export const _ = localiseTranslation(TRANSLATION)
-export default _
-
+localiseTranslation(_)
