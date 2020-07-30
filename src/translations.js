@@ -6,7 +6,23 @@ import { localiseTranslation } from './definitions'
  * =============================================================================
  */
 
-export const _ = {
+/**
+ * Translation Definition (can be extended by adding new terms or languages)
+ * @usage:
+ *    import { l, localiseTranslation } from 'utils-pack'
+ *    import { TRANSLATION } from 'utils-pack/translations'
+ *    export const _ = {
+ *      ...TRANSLATION,
+ *      NEW_PHRASE: {
+ *        [l.ENGLISH]: 'New Phrase',
+ *        [l.RUSSIAN]: 'Новая Фраза',
+ *      },
+ *    }
+ *    localiseTranslation(_)
+ *    console.log(_.NEW_PHRASE)
+ *    >>> 'New Phrase'
+ */
+export const TRANSLATION = {
   // Project Specific
   // ---------------------------------------------------------------------------
   CONFIG_USED: {
@@ -368,4 +384,6 @@ export const _ = {
   },
 }
 
+// Create definition copy to enable IDE suggestion
+export const _ = {...TRANSLATION}
 localiseTranslation(_)
