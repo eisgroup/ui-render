@@ -180,34 +180,48 @@ export const CRYPTO = {         // mapped for cryptoSign() and cryptoHash()
 	HMAC_SHA512: 'sha512',
 	MD5: 'md5',
 }
+
+/**
+ * Language Definition
+ * @see: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+ * @note: sync with Google standard https://developers.google.com/maps/faq#languagesupport
+ */
 export const LANGUAGE = {
-	// https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-	// @note: sync with Google standard https://developers.google.com/maps/faq#languagesupport
-	ENGLISH: { _: 'en', lang: 'English', 'en': 'English' },
-	RUSSIAN: { _: 'ru', lang: 'Русский', 'en': 'Russian' },
-	CHINESE: { _: 'zh', lang: '中文', 'en': 'Mandarin Chinese' },
-	CANTONESE: { _: 'zh-HK', lang: '廣東話', 'en': 'Cantonese Chinese' },
-	SPANISH: { _: 'es', lang: 'Español', 'en': 'Spanish' },
-	ITALIAN: { _: 'it', lang: 'Italiano', 'en': 'Italian' },
-	PORTUGUESE: { _: 'pt', lang: 'Português', 'en': 'Portuguese' },
-	GERMAN: { _: 'de', lang: 'Deutsch', 'en': 'German' },
-	DUTCH: { _: 'nl', lang: 'Nederlands', 'en': 'Dutch' },
-	FRENCH: { _: 'fr', lang: 'Français', 'en': 'French' },
-	SWEDISH: { _: 'sv', lang: 'Svenska', 'en': 'Swedish' },
-	FINNISH: { _: 'fi', lang: 'Suomi', 'en': 'Finnish' },
-	GREEK: { _: 'el', lang: 'Ελληνικά', 'en': 'Greek' },
-	HEBREW: { _: 'he', lang: 'עִבְרִית', 'en': 'Hebrew' },
-	YIDDISH: { _: 'yi', lang: 'ייִדיש', 'en': 'Yiddish' },
-	PERSIAN: { _: 'fa', lang: 'فارسی', 'en': 'Persian' },
-	ARABIC: { _: 'ar', lang: 'العَرَبِيَّة‎', 'en': 'Arabic' },
-	AFRIKAANS: { _: 'af', lang: 'Afrikaans', 'en': 'Afrikaans' },
-	KOREAN: { _: 'ko', lang: '한국어', 'en': 'Korean' },
-	JAPANESE: { _: 'ja', lang: '日本語', 'en': 'Japanese' },
+	ENGLISH: 		{_: 'en', 	lang: 'English',     'en': 'English'},
+	RUSSIAN: 		{_: 'ru', 	lang: 'Русский',     'en': 'Russian'},
+	CHINESE: 		{_: 'zh', 	lang: '中文',         'en': 'Mandarin Chinese'},
+	CANTONESE: 	{_: 'zh-HK',lang: '廣東話',       'en': 'Cantonese Chinese'},
+	SPANISH: 		{_: 'es', 	lang: 'Español',     'en': 'Spanish'},
+	ITALIAN: 		{_: 'it', 	lang: 'Italiano',    'en': 'Italian'},
+	PORTUGUESE: {_: 'pt', 	lang: 'Português',   'en': 'Portuguese'},
+	GERMAN: 		{_: 'de', 	lang: 'Deutsch',     'en': 'German'},
+	DUTCH: 			{_: 'nl', 	lang: 'Nederlands',  'en': 'Dutch'},
+	FRENCH: 		{ _: 'fr', 	lang: 'Français',    'en': 'French' },
+	SWEDISH: 		{ _: 'sv', 	lang: 'Svenska',     'en': 'Swedish' },
+	FINNISH: 		{_: 'fi',   lang: 'Suomi',       'en': 'Finnish'},
+	GREEK: 			{_: 'el',   lang: 'Ελληνικά',    'en': 'Greek'},
+	HEBREW: 		{_: 'he',   lang: 'עִבְרִית',       'en': 'Hebrew'},
+	YIDDISH: 		{_: 'yi',   lang: 'ייִדיש',        'en': 'Yiddish'},
+	PERSIAN: 		{_: 'fa',   lang: 'فارسی',       'en': 'Persian'},
+	ARABIC:			{_: 'ar',   lang: 'العَرَبِيَّة‎',     'en': 'Arabic'},
+	AFRIKAANS: 	{_: 'af',   lang: 'Afrikaans',   'en': 'Afrikaans'},
+	KOREAN: 		{_: 'ko',   lang: '한국어',        'en': 'Korean'},
+	JAPANESE: 	{_: 'ja',   lang: '日本語',       'en': 'Japanese'},
 }
-export const l = {} // object mapping of language to their code
+
+/**
+ * Object mapping of language to their code
+ */
+export const l = {
+	...LANGUAGE // enable IDE suggestion
+}
 for (const key in LANGUAGE) {
 	l[key] = LANGUAGE[key]._
 }
+
+/**
+ * Spoken Language Fluency Definition
+ */
 export const LANGUAGE_LEVEL = {
 	UNKNOWN: {
 		_: 0,
