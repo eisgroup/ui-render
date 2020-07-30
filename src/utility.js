@@ -95,7 +95,13 @@ export function asyncLoad (src, callback) {
   }
 }
 
+/**
+ * Create HTML DOM <script/>
+ * @param {String} src
+ * @param {Function} callback - to fire on script loaded
+ */
 export function createScript (src, callback) {
+  if (typeof document === 'undefined') return
   const d = document, t = 'script',
     o = d.createElement(t),
     s = d.getElementsByTagName(t)[0]
@@ -103,4 +109,26 @@ export function createScript (src, callback) {
   o.async = true
   if (callback) { o.addEventListener('load', callback, false) }
   s.parentNode.insertBefore(o, s)
+}
+
+/**
+ * Add Event Listener
+ *
+ * @param {String} event - name (i.e. 'keydown', 'keyup', etc.)
+ * @param {Function} callback - event handler to add, receives `event` as argument
+ */
+export function subscribeTo (event, callback) {
+  if (typeof document === 'undefined') return
+  document.addEventListener(event, callback)
+}
+
+/**
+ * Remove Event Listener
+ *
+ * @param {String} event - name (i.e. 'keydown', 'keyup', etc.)
+ * @param {Function} callback - event handler to remove
+ */
+export function unsubscribeFrom (event, callback) {
+  if (typeof document === 'undefined') return
+  document.removeEventListener(event, callback)
 }
