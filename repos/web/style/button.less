@@ -84,18 +84,18 @@
     //font-size: @base * @sizeScale;
     letter-spacing: 0 !important;
     transform: none;
-    width: @base;
+    width: @base !important;
 
     &.small {
       //  font-size: @small * @sizeScale;
       .scalePadding(@size: @small * @sizeScale; @top: @padding; @left: @padding;);
-      width: @small;
+      width: @small !important;
     }
 
     &.large {
       //  font-size: @large * @sizeScale;
       .scalePadding(@size: @large * @sizeScale; @top: @padding; @left: @padding;);
-      width: @large;
+      width: @large !important;
     }
 
     @{select-interaction} {

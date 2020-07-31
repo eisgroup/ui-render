@@ -56,12 +56,8 @@
     opacity: initial !important; //override .disabled styling
   }
 
-  > .dropdown.icon {
-    .icon();
-
-    &:before {
-      content: @icon-dropdown;
-    }
+  > .dropdown.icon:before {
+    .icon(@icon-dropdown);
   }
 
   // Placeholder
