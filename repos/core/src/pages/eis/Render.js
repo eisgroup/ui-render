@@ -324,7 +324,7 @@ export function metaToProps (meta, {data, instance, relativePath, relativeIndex}
             ...name && {name: interpolateString(definition.name, {index, value})},
             ...definition.index && {index: interpolateString(definition.index, {index})},
             // Filter for row data from parent table (in default layout)
-            ...filterItems && {parentItem: value},
+            ...filterItems && {filterItems, parentItem: value},
             // Inject functions by their name string
             ...removeNilValues(FUNCTION_NAMES.map(func => isString(definition[func]) && self &&
               !getFunctionFromString(definition[func], null) && {[func]: self[definition[func]]}
