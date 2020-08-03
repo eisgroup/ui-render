@@ -1,0 +1,263 @@
+{
+  "view": "VerticalLayout",
+  "label": "MainLayout",
+  "styles": "border radius",
+  "items": [
+    {
+      "view": "HorizontalLayout",
+      "label": "PlanList",
+      "styles": "justify padding border-top",
+      "items": [
+        {
+          "view": "Text",
+          "label": "Plans"
+        },
+        {
+          "view": "Dropdown",
+          "name": "plan",
+          "options": {
+            "name": "coveragesDetails"
+          },
+          "mapOptions": "planID"
+        }
+      ]
+    },
+    {
+      "view": "VerticalLayout",
+      "label": "Coverage",
+      "styles": "border radius",
+      "items": [
+        {
+          "view": "Title",
+          "label": "Coverage Summary",
+          "styles": "padding"
+        },
+        {
+          "view": "Table",
+          "name": "coveragesDetails",
+          "headers": [
+            {
+              "id": "coverageID",
+              "label": "Coverage Name"
+            },
+            {
+              "id": "numberOfLives",
+              "label": "Number of Lives"
+            },
+            {
+              "id": "annualPremium",
+              "label": "Annual Premium",
+              "renderCell": "Currency"
+            },
+            {
+              "id": "rate",
+              "label": "Manual Rate"
+            }
+          ],
+          "renderItem": {
+            "view": "VerticalLayout",
+            "label": "CoverageSummary",
+            "styles": "border radius",
+            "relativeData": true,
+            "items": [
+              {
+                "view": "Tabs",
+                "items": [
+                  {
+                    "view": "Tab",
+                    "name": "Cost Summary",
+                    "tab": "Cost Summary",
+                    "content": {
+                      "view": "VerticalLayout",
+                      "label": "CostSummaryTabBlock",
+                      "styles": "border radius",
+                      "items": [
+                        {
+                          "view": "HorizontalLayout",
+                          "label": "CostSummaryTotalNetClaimCostRow",
+                          "styles": "justify padding border-top",
+                          "items": [
+                            {
+                              "view": "Text",
+                              "label": "Total Net Claim Cost"
+                            },
+                            {
+                              "view": "Text",
+                              "children": {
+                                "name": "totalNetClaimCost"
+                              },
+                              "renderLabel": "Currency"
+                            }
+                          ]
+                        },
+                        {
+                          "view": "HorizontalLayout",
+                          "label": "CoverageNumberOfLivesRow",
+                          "styles": "justify padding border-top",
+                          "items": [
+                            {
+                              "view": "Text",
+                              "label": "Total Number Of Lives"
+                            },
+                            {
+                              "view": "Text",
+                              "children": {
+                                "name": "numberOfLives"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "view": "Tab",
+                    "name": "Expenses",
+                    "tab": "ExpensesTab",
+                    "content": {
+                      "view": "VerticalLayout",
+                      "label": "ExpensesTabBlock",
+                      "styles": "border radius",
+                      "items": [
+                        {
+                          "view": "HorizontalLayout",
+                          "label": "CommissionRow",
+                          "styles": "justify padding border-top",
+                          "items": [
+                            {
+                              "view": "Text",
+                              "label": "Commissions"
+                            },
+                            {
+                              "view": "Text",
+                              "children": {
+                                "name": "commission"
+                              },
+                              "renderLabel": "Currency"
+                            }
+                          ]
+                        },
+                        {
+                          "view": "HorizontalLayout",
+                          "label": "ExpensesTaxRow",
+                          "styles": "justify padding border-top",
+                          "items": [
+                            {
+                              "view": "Text",
+                              "label": "Tax"
+                            },
+                            {
+                              "view": "Text",
+                              "children": {
+                                "name": "tax"
+                              },
+                              "renderLabel": "Percent"
+                            }
+                          ]
+                        },
+                        {
+                          "view": "HorizontalLayout",
+                          "label": "ProfitRow",
+                          "styles": "justify padding border-top",
+                          "items": [
+                            {
+                              "view": "Text",
+                              "label": "Profit"
+                            },
+                            {
+                              "view": "Text",
+                              "children": {
+                                "name": "profit"
+                              },
+                              "renderLabel": "Percent"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "view": "Table",
+                "name": "ratesAndPremiumByClass",
+                "headers": [
+                  {
+                    "id": "classID",
+                    "label": "Class Name"
+                  },
+                  {
+                    "id": "numberOfLives",
+                    "label": "Number of Lives"
+                  },
+                  {
+                    "id": "annualPremium",
+                    "label": "Annual Premium",
+                    "renderCell": "Currency"
+                  },
+                  {
+                    "id": "rate",
+                    "label": "Manual Rate"
+                  }
+                ],
+                "relativeData": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "view": "VerticalLayout",
+      "label": "CensusSummary",
+      "styles": "border radius",
+      "items": [
+        {
+          "view": "Title",
+          "label": "Census Summary",
+          "styles": "padding"
+        },
+        {
+          "view": "PieChart",
+          "name": "censusSummary.censusByAgeBand",
+          "mapItems": {
+            "label": "rateCard",
+            "value": "numberOfLives"
+          },
+          "legends": true
+        },
+        {
+          "view": "Table",
+          "name": "censusSummary.censusByClass",
+          "headers": [
+            {
+              "id": "classID",
+              "label": "Class Name"
+            },
+            {
+              "id": "averageSalary",
+              "label": "Average Salary",
+              "renderCell": "Currency"
+            },
+            {
+              "id": "topFirstWeeklySalary",
+              "label": "Top 1 Weekly Salary",
+              "renderCell": "Currency"
+            },
+            {
+              "id": "topSecondWeeklySalary",
+              "label": "Top 2 Weekly Salary",
+              "renderCell": "Currency"
+            },
+            {
+              "id": "topThirdWeeklySalary",
+              "label": "Top 3 Weekly Salary",
+              "renderCell": "Currency"
+            }
+          ],
+          "relativeData": true
+        }
+      ]
+    }
+  ]
+}

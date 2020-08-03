@@ -1,0 +1,1228 @@
+{
+  "PolicyRatesAndPremiums": [
+    {
+      "Plan": "Gold",
+      "CoverageType": "STDCore",
+      "ContributionType": "Non-contributory",
+      "Contribution": 0,
+      "SponsorPaymentMode": 1,
+      "Payor": "Sponsor",
+      "PaymentMode": "1/1",
+      "ModalPremium": "6960.36/0.0",
+      "NumberOfLives": 8,
+      "TotalVolume": 9938,
+      "Rate": 0.58,
+      "AnnualPremium": 6961.92,
+      "MonthlyPremium": 580.16,
+      "RatesAndPremiumByClass": [
+        {
+          "ClassName": "Executives",
+          "Rate": 0.62,
+          "MonthlyPremium": 523.16,
+          "AnnualPremium": 6277.92,
+          "NumberOfLives": 7,
+          "TotalVolume": 8438,
+          "Payor": "Sponsor",
+          "PaymentMode": "1/1",
+          "ModalPremium": "6276.36/0.0",
+          "AgeBandedRateCards": [
+            {
+              "AgeBand": "<25",
+              "Rate": 0.56,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "25 - 29",
+              "Rate": 0.62,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "30 - 34",
+              "Rate": 0.68,
+              "MonthlyPremium": 204,
+              "AnnualPremium": 2448,
+              "NumberOfLives": 2,
+              "TotalVolume": 3000,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "2448.0/0.0"
+            },
+            {
+              "AgeBand": "35 - 39",
+              "Rate": 0.5,
+              "MonthlyPremium": 75,
+              "AnnualPremium": 900,
+              "NumberOfLives": 1,
+              "TotalVolume": 1500,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "900.0/0.0"
+            },
+            {
+              "AgeBand": "40 - 44",
+              "Rate": 0.7,
+              "MonthlyPremium": 45.5,
+              "AnnualPremium": 546,
+              "NumberOfLives": 1,
+              "TotalVolume": 650,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "546.0/0.0"
+            },
+            {
+              "AgeBand": "45 - 49",
+              "Rate": 0.63,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "50 - 54",
+              "Rate": 0.57,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "55 - 59",
+              "Rate": 0.5,
+              "MonthlyPremium": 115.65,
+              "AnnualPremium": 1387.8,
+              "NumberOfLives": 2,
+              "TotalVolume": 2313,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "1387.8/0.0"
+            },
+            {
+              "AgeBand": "60 - 64",
+              "Rate": 0.68,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "65+",
+              "Rate": 0.85,
+              "MonthlyPremium": 82.88,
+              "AnnualPremium": 994.56,
+              "NumberOfLives": 1,
+              "TotalVolume": 975,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "994.56/0.0"
+            }
+          ]
+        },
+        {
+          "ClassName": "Directors",
+          "Rate": 0.38,
+          "MonthlyPremium": 57,
+          "AnnualPremium": 684,
+          "NumberOfLives": 1,
+          "TotalVolume": 1500,
+          "Payor": "Sponsor",
+          "PaymentMode": "1/1",
+          "ModalPremium": "684.0/0.0",
+          "AgeBandedRateCards": [
+            {
+              "AgeBand": "<25",
+              "Rate": 0.19,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "25 - 29",
+              "Rate": 0.21,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "30 - 34",
+              "Rate": 0.23,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "35 - 39",
+              "Rate": 0.25,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "40 - 44",
+              "Rate": 0.27,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "45 - 49",
+              "Rate": 0.29,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "50 - 54",
+              "Rate": 0.31,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "55 - 59",
+              "Rate": 0.33,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "60 - 64",
+              "Rate": 0.36,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "65+",
+              "Rate": 0.38,
+              "MonthlyPremium": 57,
+              "AnnualPremium": 684,
+              "NumberOfLives": 1,
+              "TotalVolume": 1500,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "684.0/0.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Plan": "Gold",
+      "CoverageType": "STDBuyUp",
+      "ContributionType": "Contributory",
+      "Contribution": 1,
+      "SponsorPaymentMode": 1,
+      "Payor": "Sponsor / Member",
+      "PaymentMode": "1/1",
+      "ModalPremium": "2000.0/-886.28",
+      "NumberOfLives": 3,
+      "TotalVolume": 2484.5,
+      "Rate": 0.37,
+      "AnnualPremium": 1108.8,
+      "MonthlyPremium": 92.39999999999999,
+      "RatesAndPremiumByClass": [
+        {
+          "ClassName": "Executives",
+          "Rate": 0.39,
+          "MonthlyPremium": 82.27,
+          "AnnualPremium": 987.24,
+          "NumberOfLives": 2,
+          "TotalVolume": 2109.5,
+          "Payor": "Sponsor / Member",
+          "PaymentMode": "1/1",
+          "ModalPremium": "1000.0/-7.84",
+          "AgeBandedRateCards": [
+            {
+              "AgeBand": "<25",
+              "Rate": 0.43,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "25 - 29",
+              "Rate": 0.48,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "30 - 34",
+              "Rate": 0.52,
+              "MonthlyPremium": 39,
+              "AnnualPremium": 468,
+              "NumberOfLives": 1,
+              "TotalVolume": 750,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/368.0"
+            },
+            {
+              "AgeBand": "35 - 39",
+              "Rate": 0.39,
+              "MonthlyPremium": 14.63,
+              "AnnualPremium": 175.56,
+              "NumberOfLives": 1,
+              "TotalVolume": 375,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/75.56"
+            },
+            {
+              "AgeBand": "40 - 44",
+              "Rate": 0.45,
+              "MonthlyPremium": 7.31,
+              "AnnualPremium": 87.72,
+              "NumberOfLives": 1,
+              "TotalVolume": 162.5,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-12.28"
+            },
+            {
+              "AgeBand": "45 - 49",
+              "Rate": 0.37,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "50 - 54",
+              "Rate": 0.3,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "55 - 59",
+              "Rate": 0.22,
+              "MonthlyPremium": 12.72,
+              "AnnualPremium": 152.64,
+              "NumberOfLives": 1,
+              "TotalVolume": 578.25,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/52.64"
+            },
+            {
+              "AgeBand": "60 - 64",
+              "Rate": 0.3,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "65+",
+              "Rate": 0.37,
+              "MonthlyPremium": 9.02,
+              "AnnualPremium": 108.24,
+              "NumberOfLives": 1,
+              "TotalVolume": 243.75,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/8.24"
+            }
+          ]
+        },
+        {
+          "ClassName": "Directors",
+          "Rate": 0.27,
+          "MonthlyPremium": 10.13,
+          "AnnualPremium": 121.56,
+          "NumberOfLives": 1,
+          "TotalVolume": 375,
+          "Payor": "Sponsor / Member",
+          "PaymentMode": "1/1",
+          "ModalPremium": "1000.0/-878.44",
+          "AgeBandedRateCards": [
+            {
+              "AgeBand": "<25",
+              "Rate": 0.14,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "25 - 29",
+              "Rate": 0.15,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "30 - 34",
+              "Rate": 0.17,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "35 - 39",
+              "Rate": 0.18,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "40 - 44",
+              "Rate": 0.2,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "45 - 49",
+              "Rate": 0.21,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "50 - 54",
+              "Rate": 0.23,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "55 - 59",
+              "Rate": 0.24,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "60 - 64",
+              "Rate": 0.26,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/-100.0"
+            },
+            {
+              "AgeBand": "65+",
+              "Rate": 0.27,
+              "MonthlyPremium": 10.13,
+              "AnnualPremium": 121.56,
+              "NumberOfLives": 1,
+              "TotalVolume": 375,
+              "Payor": "Sponsor / Member",
+              "PaymentMode": "1/1",
+              "ModalPremium": "100.0/21.56"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Plan": "Silver",
+      "CoverageType": "STDCore",
+      "ContributionType": "Non-contributory",
+      "Contribution": 0,
+      "SponsorPaymentMode": 1,
+      "Payor": "Sponsor",
+      "PaymentMode": "1/1",
+      "ModalPremium": "6960.36/0.0",
+      "NumberOfLives": 8,
+      "TotalVolume": 9938,
+      "Rate": 0.58,
+      "AnnualPremium": 6961.92,
+      "MonthlyPremium": 580.16,
+      "RatesAndPremiumByClass": [
+        {
+          "ClassName": "Executives",
+          "Rate": 0.62,
+          "MonthlyPremium": 523.16,
+          "AnnualPremium": 6277.92,
+          "NumberOfLives": 7,
+          "TotalVolume": 8438,
+          "Payor": "Sponsor",
+          "PaymentMode": "1/1",
+          "ModalPremium": "6276.36/0.0",
+          "AgeBandedRateCards": [
+            {
+              "AgeBand": "<25",
+              "Rate": 0.56,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "25 - 29",
+              "Rate": 0.62,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "30 - 34",
+              "Rate": 0.68,
+              "MonthlyPremium": 204,
+              "AnnualPremium": 2448,
+              "NumberOfLives": 2,
+              "TotalVolume": 3000,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "2448.0/0.0"
+            },
+            {
+              "AgeBand": "35 - 39",
+              "Rate": 0.5,
+              "MonthlyPremium": 75,
+              "AnnualPremium": 900,
+              "NumberOfLives": 1,
+              "TotalVolume": 1500,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "900.0/0.0"
+            },
+            {
+              "AgeBand": "40 - 44",
+              "Rate": 0.7,
+              "MonthlyPremium": 45.5,
+              "AnnualPremium": 546,
+              "NumberOfLives": 1,
+              "TotalVolume": 650,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "546.0/0.0"
+            },
+            {
+              "AgeBand": "45 - 49",
+              "Rate": 0.63,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "50 - 54",
+              "Rate": 0.57,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "55 - 59",
+              "Rate": 0.5,
+              "MonthlyPremium": 115.65,
+              "AnnualPremium": 1387.8,
+              "NumberOfLives": 2,
+              "TotalVolume": 2313,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "1387.8/0.0"
+            },
+            {
+              "AgeBand": "60 - 64",
+              "Rate": 0.68,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "65+",
+              "Rate": 0.85,
+              "MonthlyPremium": 82.88,
+              "AnnualPremium": 994.56,
+              "NumberOfLives": 1,
+              "TotalVolume": 975,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "994.56/0.0"
+            }
+          ]
+        },
+        {
+          "ClassName": "Directors",
+          "Rate": 0.38,
+          "MonthlyPremium": 57,
+          "AnnualPremium": 684,
+          "NumberOfLives": 1,
+          "TotalVolume": 1500,
+          "Payor": "Sponsor",
+          "PaymentMode": "1/1",
+          "ModalPremium": "684.0/0.0",
+          "AgeBandedRateCards": [
+            {
+              "AgeBand": "<25",
+              "Rate": 0.19,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "25 - 29",
+              "Rate": 0.21,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "30 - 34",
+              "Rate": 0.23,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "35 - 39",
+              "Rate": 0.25,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "40 - 44",
+              "Rate": 0.27,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "45 - 49",
+              "Rate": 0.29,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "50 - 54",
+              "Rate": 0.31,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "55 - 59",
+              "Rate": 0.33,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "60 - 64",
+              "Rate": 0.36,
+              "MonthlyPremium": 0,
+              "AnnualPremium": 0,
+              "NumberOfLives": 0,
+              "TotalVolume": 0,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "0.0/0.0"
+            },
+            {
+              "AgeBand": "65+",
+              "Rate": 0.38,
+              "MonthlyPremium": 57,
+              "AnnualPremium": 684,
+              "NumberOfLives": 1,
+              "TotalVolume": 1500,
+              "Payor": "Sponsor",
+              "PaymentMode": "1/1",
+              "ModalPremium": "684.0/0.0"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "PolicyFactors": {
+    "GeographicFactor": 0.713,
+    "OtherProductsFactor": 1,
+    "RateGuaranteeFactor": 1,
+    "IndustryFactor": 1.3052159999999997,
+    "SizeFactor": 0.89,
+    "PolicyFactor": 0.828
+  },
+  "Plans": [
+    {
+      "Plan": "Gold",
+      "Coverages": [
+        {
+          "CoverageType": "Core",
+          "NumberOfEligible": 8,
+          "NumberOfEnrolled": 2,
+          "MonthlyPremium": 580.16,
+          "TotalMonthlyPreExpenseCost": 339.02,
+          "TotalNetClaimCost": 353.15,
+          "TotalWeeklyBenefit": 9938,
+          "Rate": 0.58,
+          "Factors": {
+            "HospitalConfinementWaiverRate": 1,
+            "PortabilityFactor": 1.06,
+            "DisabilityDefinitionFactor": 1,
+            "FICAMatchingFactor": 1,
+            "BenefitPercentFactor": 1.05,
+            "ReturnToWorkFactor": 1.08,
+            "CoverageFactor": 1,
+            "ProgressiveIllnessProtection": 1,
+            "WorkIncentiveFactor": 1,
+            "NetClaimCostAggregatedFactor": 1.2
+          },
+          "Tax": 0.0235,
+          "Commission": 81.23,
+          "Expense": 0.1875,
+          "Profit": 0.04,
+          "DemographicSummary": {
+            "AverageTotalWeklyBenefit": 1242.25,
+            "FemalePercent": 0.45280740591668345,
+            "PercentFemaleUnder40": 0.45280740591668345,
+            "PercentFemaleUnder45": 0.5182129201046488,
+            "AverageAge": 49,
+            "AverageAnnualSalary": 231647,
+            "LowestAnnualSalary": 52000,
+            "TopFirstAnnualSalary": 546000,
+            "TopSecondAnnualSalary": 376480,
+            "TopThirdAnnualSalary": 368784,
+            "Top3WeeklySalaryAverage": 8277.33
+          },
+          "DemographicByAgeBands": [
+            {
+              "RateCard": "<25",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "25 - 29",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "30 - 34",
+              "NumberOfLives": 2
+            },
+            {
+              "RateCard": "35 - 39",
+              "NumberOfLives": 1
+            },
+            {
+              "RateCard": "40 - 44",
+              "NumberOfLives": 1
+            },
+            {
+              "RateCard": "45 - 49",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "50 - 54",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "55 - 59",
+              "NumberOfLives": 2
+            },
+            {
+              "RateCard": "60 - 64",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "65+",
+              "NumberOfLives": 2
+            }
+          ],
+          "WeeklySummaryByAgeBands": [
+            {
+              "AgeBand": "<25",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "25 - 29",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "30 - 34",
+              "WeeklySalaryFemale": 10240,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 10240
+            },
+            {
+              "AgeBand": "35 - 39",
+              "WeeklySalaryFemale": 7092,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 7092
+            },
+            {
+              "AgeBand": "40 - 44",
+              "WeeklySalaryFemale": 1000,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 1000
+            },
+            {
+              "AgeBand": "45 - 49",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "50 - 54",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "55 - 59",
+              "WeeklySalaryFemale": 1250,
+              "WeeklySalaryMale": 10500,
+              "WeeklySalaryTotal": 11750
+            },
+            {
+              "AgeBand": "60 - 64",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "65+",
+              "WeeklySalaryFemale": 4056,
+              "WeeklySalaryMale": 1500,
+              "WeeklySalaryTotal": 5556
+            }
+          ]
+        },
+        {
+          "CoverageType": "BuyUp",
+          "NumberOfEligible": 8,
+          "NumberOfEnrolled": 2,
+          "MonthlyPremium": 92.39999999999999,
+          "TotalMonthlyPreExpenseCost": 62.76,
+          "TotalNetClaimCost": 65.37,
+          "TotalWeeklyBenefit": 2484.5,
+          "Rate": 0.37,
+          "Factors": {
+            "HospitalConfinementWaiverRate": 1,
+            "PortabilityFactor": 1.06,
+            "DisabilityDefinitionFactor": 1,
+            "FICAMatchingFactor": 1,
+            "BenefitPercentFactor": 1.05,
+            "ReturnToWorkFactor": 1.08,
+            "CoverageFactor": 1,
+            "ProgressiveIllnessProtection": 1,
+            "WorkIncentiveFactor": 1,
+            "NetClaimCostAggregatedFactor": 1.2
+          },
+          "Tax": 0.0235,
+          "Commission": 3.27,
+          "Expense": 0.1875,
+          "Profit": 0.04,
+          "DemographicSummary": {
+            "AverageTotalWeklyBenefit": 4142.25,
+            "FemalePercent": 0.5230249260667512,
+            "PercentFemaleUnder40": 0.5230249260667512,
+            "PercentFemaleUnder45": 0.5532017623272376,
+            "AverageAge": 49,
+            "AverageAnnualSalary": 231647,
+            "LowestAnnualSalary": 52000,
+            "TopFirstAnnualSalary": 546000,
+            "TopSecondAnnualSalary": 376480,
+            "TopThirdAnnualSalary": 368784,
+            "Top3WeeklySalaryAverage": 8277.33
+          },
+          "DemographicByAgeBands": [
+            {
+              "RateCard": "<25",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "25 - 29",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "30 - 34",
+              "NumberOfLives": 2
+            },
+            {
+              "RateCard": "35 - 39",
+              "NumberOfLives": 1
+            },
+            {
+              "RateCard": "40 - 44",
+              "NumberOfLives": 1
+            },
+            {
+              "RateCard": "45 - 49",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "50 - 54",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "55 - 59",
+              "NumberOfLives": 2
+            },
+            {
+              "RateCard": "60 - 64",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "65+",
+              "NumberOfLives": 2
+            }
+          ],
+          "WeeklySummaryByAgeBands": [
+            {
+              "AgeBand": "<25",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "25 - 29",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "30 - 34",
+              "WeeklySalaryFemale": 10240,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 10240
+            },
+            {
+              "AgeBand": "35 - 39",
+              "WeeklySalaryFemale": 7092,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 7092
+            },
+            {
+              "AgeBand": "40 - 44",
+              "WeeklySalaryFemale": 1000,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 1000
+            },
+            {
+              "AgeBand": "45 - 49",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "50 - 54",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "55 - 59",
+              "WeeklySalaryFemale": 1250,
+              "WeeklySalaryMale": 10500,
+              "WeeklySalaryTotal": 11750
+            },
+            {
+              "AgeBand": "60 - 64",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "65+",
+              "WeeklySalaryFemale": 4056,
+              "WeeklySalaryMale": 1500,
+              "WeeklySalaryTotal": 5556
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Plan": "Silver",
+      "Coverages": [
+        {
+          "CoverageType": "Core",
+          "NumberOfEligible": 8,
+          "NumberOfEnrolled": 2,
+          "MonthlyPremium": 580.16,
+          "TotalMonthlyPreExpenseCost": 339.02,
+          "TotalNetClaimCost": 353.15,
+          "TotalWeeklyBenefit": 9938,
+          "Rate": 0.58,
+          "Factors": {
+            "HospitalConfinementWaiverRate": 1,
+            "PortabilityFactor": 1.06,
+            "DisabilityDefinitionFactor": 1,
+            "FICAMatchingFactor": 1,
+            "BenefitPercentFactor": 1.05,
+            "ReturnToWorkFactor": 1.08,
+            "CoverageFactor": 1,
+            "ProgressiveIllnessProtection": 1,
+            "WorkIncentiveFactor": 1,
+            "NetClaimCostAggregatedFactor": 1.2
+          },
+          "Tax": 0.0235,
+          "Commission": 81.23,
+          "Expense": 0.1875,
+          "Profit": 0.04,
+          "DemographicSummary": {
+            "AverageTotalWeklyBenefit": 1242.25,
+            "FemalePercent": 0.45280740591668345,
+            "PercentFemaleUnder40": 0.45280740591668345,
+            "PercentFemaleUnder45": 0.5182129201046488,
+            "AverageAge": 49,
+            "AverageAnnualSalary": 231647,
+            "LowestAnnualSalary": 52000,
+            "TopFirstAnnualSalary": 546000,
+            "TopSecondAnnualSalary": 376480,
+            "TopThirdAnnualSalary": 368784,
+            "Top3WeeklySalaryAverage": 8277.33
+          },
+          "DemographicByAgeBands": [
+            {
+              "RateCard": "<25",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "25 - 29",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "30 - 34",
+              "NumberOfLives": 2
+            },
+            {
+              "RateCard": "35 - 39",
+              "NumberOfLives": 1
+            },
+            {
+              "RateCard": "40 - 44",
+              "NumberOfLives": 1
+            },
+            {
+              "RateCard": "45 - 49",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "50 - 54",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "55 - 59",
+              "NumberOfLives": 2
+            },
+            {
+              "RateCard": "60 - 64",
+              "NumberOfLives": 0
+            },
+            {
+              "RateCard": "65+",
+              "NumberOfLives": 2
+            }
+          ],
+          "WeeklySummaryByAgeBands": [
+            {
+              "AgeBand": "<25",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "25 - 29",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "30 - 34",
+              "WeeklySalaryFemale": 10240,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 10240
+            },
+            {
+              "AgeBand": "35 - 39",
+              "WeeklySalaryFemale": 7092,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 7092
+            },
+            {
+              "AgeBand": "40 - 44",
+              "WeeklySalaryFemale": 1000,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 1000
+            },
+            {
+              "AgeBand": "45 - 49",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "50 - 54",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "55 - 59",
+              "WeeklySalaryFemale": 1250,
+              "WeeklySalaryMale": 10500,
+              "WeeklySalaryTotal": 11750
+            },
+            {
+              "AgeBand": "60 - 64",
+              "WeeklySalaryFemale": 0,
+              "WeeklySalaryMale": 0,
+              "WeeklySalaryTotal": 0
+            },
+            {
+              "AgeBand": "65+",
+              "WeeklySalaryFemale": 4056,
+              "WeeklySalaryMale": 1500,
+              "WeeklySalaryTotal": 5556
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

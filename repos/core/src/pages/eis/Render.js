@@ -73,11 +73,11 @@ class RenderClass extends Component {
       return <TooltipPop inverted title={tooltip}>{Render(props)}</TooltipPop>
     }
 
-    let {data, _data, view, items = [], relativeData, relativePath, relativeIndex, ...props} = this.props
+    let {data, _data, view, items = [], relativeData, relativePath, relativeIndex, debug, ...props} = this.props
     if (props.name && _data == null) _data = get(data, props.name) // local data dynamically retrieved from definition
 
     // Pass down data to child renderers, if defined
-    if (data) items = items.map((item) => ({data, ...item})) // allow `data` to be overridden by config
+    if (data) items = items.map((item) => ({data, debug, ...item})) // allow `data` to be overridden by config
     switch (view) {
       case FIELD.TYPE.BUTTON:
         if (items.length) props.children = items.map(Render)
@@ -118,7 +118,7 @@ class RenderClass extends Component {
 
       case FIELD.TYPE.PIE_CHART:
         const {mapItems, ...prop} = props
-        if (mapItems) _data = mapProps(_data, mapItems)
+        if (mapItems) _data = mapProps(_data, mapItems, {debug})
         if (items.length) prop.children = items.map(Render)
         return <PieChart items={_data} {...prop}/>
 
@@ -167,7 +167,7 @@ class RenderClass extends Component {
               } else if (definition.name && definition.render) {
                 item[id].data = get(data, definition.name)
               } else if (definition.view) {
-                item[id] = (_, index, props) => Render({...props, ...definition})
+                item[id] = (_, index, props) => Render({debug, ...props, ...definition})
               }
             }
           }
@@ -178,7 +178,7 @@ class RenderClass extends Component {
       case FIELD.TYPE.TABS:
         const tabs = items.map(({tab}, i) => isObject(tab) ? Render(tab, i) : tab)
         const panels = items.map(({content, data}, i) => isObject(content)
-          ? Render.bind(this, {...content, data}, i)
+          ? Render.bind(this, {...content, data, debug}, i)
           : content
         )
         return <Tabs items={tabs} panels={panels} {...props}/>
@@ -213,13 +213,13 @@ class RenderClass extends Component {
         if (items.length) {
           props.children = items.map(Render)
         } else if (isObject(props.children)) {
-          props.children = Render(props.children)
+          props.children = Render({debug, ...props.children})
         }
         return <TooltipPop inverted {...props}/>
 
       default:
         const {mapOptions, ...input} = props
-        if (mapOptions) input.options = mapProps(input.options || [], mapOptions)
+        if (mapOptions) input.options = mapProps(input.options || [], mapOptions, {debug})
         if (relativeData && relativePath != null && input.name) {
           input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
         }
@@ -285,9 +285,10 @@ export function RenderFunc (Name) {
  * @param {Object} instance - of React Component class that is rendering the data, for mapping dynamic states
  * @param {String} [relativePath] - path used for getting data of parent container
  * @param {String|Number} [relativeIndex] - index used for getting data of parent container
+ * @param {Boolean} [debug] - whether debug mode is enabled - certain errors will be raised, instead of silenced
  * @returns {Object} props - mutated meta
  */
-export function metaToProps (meta, {data, instance, relativePath, relativeIndex}) {
+export function metaToProps (meta, {data, instance, relativePath, relativeIndex, debug = false}) {
   for (const key in meta) {
     const definition = meta[key]
     if (!definition) continue
@@ -370,9 +371,10 @@ export function metaToProps (meta, {data, instance, relativePath, relativeIndex}
  *
  * @param {Array} data - to map
  * @param {Object|String} mapper - object of key / value pairs (value being key path from `data`), or key path string
+ * @param {Boolean} [debug] - whether to raise silenced error if data is missing or of incorrect type
  * @returns {Array} list - mapped from given data
  */
-function mapProps (data, mapper) {
+function mapProps (data, mapper, {debug} = {}) {
   const mapData = typeof mapper === 'string' ? (item) => get(item, mapper, item) : (item, index) => {
     const result = {}
     for (const key in mapper) {
@@ -382,7 +384,7 @@ function mapProps (data, mapper) {
     }
     return result
   }
-  return data.map(mapData)
+  return (debug ? data : toList(data, 'clean')).map(mapData)
 }
 
 /**
