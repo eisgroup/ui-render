@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import Markdown from 'react-markdown'
 import ScrollView from 'react-ui-pack/ScrollView'
+import Tabs from 'react-ui-pack/Tabs'
 import toc from 'remark-toc'
 import { logRender } from 'utils-pack'
 import docs from './docs.md'
+import faq from './fag.md'
 
 /**
  * EXAMPLE TEMPLATE ------------------------------------------------------------
@@ -12,20 +14,34 @@ import docs from './docs.md'
 @logRender
 export default class Docs extends Component {
   state = {
-    text: undefined
+    docs: undefined,
+    examples: undefined,
+    faq: undefined,
   }
 
   componentDidMount () {
-    fetch(docs).then(r => r.text()).then(text => this.setState({text}))
+    fetch(docs).then(r => r.text()).then(docs => this.setState({docs}))
+    fetch(faq).then(r => r.text()).then(faq => this.setState({faq}))
   }
 
   render () {
+    const mdProps = {
+      plugins: [toc],
+      renderers: {heading: HeadingRenderer},
+    }
     return (
       <ScrollView fill className={'app-docs padding-large'}>
-        <Markdown
-          source={this.state.text} plugins={[toc]}
-          renderers={{heading: HeadingRenderer}}
+        <h1>{'UI Renderer'}</h1>
+        <Tabs
+          items={['Summary', 'Examples', 'FAQ']}
+          panels={[
+            () => <Markdown source={this.state.docs} {...mdProps}/>,
+            () => <Markdown source={this.state.examples} {...mdProps}/>,
+            () => <Markdown source={this.state.faq} {...mdProps}/>,
+          ]}
+          classNamePanels='padding-v margin-v'
         />
+
       </ScrollView>
     )
   }

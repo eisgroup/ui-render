@@ -1,5 +1,3 @@
-# UI Renderer
-
 ## Table of Contents
 
 ## Overview
@@ -35,4 +33,4 @@ It must start with a single `Root` object. Within each object, you can define ne
 
 A React component is a predefined component that the UI has available to display given data. It is configured by specifying the attribute `view` (example: `view: "Table"` will use Table as the React Component). 
 
-If you need a custom React component that does not yet exist in the [examples](/examples), please submit a ticket to request new feature from the developer.
+If you need a custom React component that does not yet exist in the `examples`, please submit a ticket to request new feature from the developer.
