@@ -178,7 +178,7 @@ class RenderClass extends Component {
       case FIELD.TYPE.TABS:
         const tabs = items.map(({tab}, i) => isObject(tab) ? Render(tab, i) : tab)
         const panels = items.map(({content, data}, i) => isObject(content)
-          ? Render.bind(this, {...content, data, debug}, i)
+          ? Render.bind(this, {debug, ...content, data}, i)
           : content
         )
         return <Tabs items={tabs} panels={panels} {...props}/>
