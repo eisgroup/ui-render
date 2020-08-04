@@ -10,8 +10,10 @@ import { ENV, get, isEmpty, logRender, SUCCESS } from 'utils-pack'
 import Render from './Render'
 import { withUISetup } from './rules'
 
-const DATA_URL = ENV.REACT_APP_DATA_URL
-const META_URL = ENV.REACT_APP_META_URL
+let urlPrefix = document.getElementById('react-app').getAttribute('data-prefix-url') || ''
+if (urlPrefix) urlPrefix = window.location.origin + urlPrefix
+const DATA_URL = urlPrefix + ENV.REACT_APP_DATA_URL
+const META_URL = urlPrefix + ENV.REACT_APP_META_URL
 
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
