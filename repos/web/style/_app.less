@@ -154,9 +154,13 @@ p, .p {
 }
 
 a, .a {
-  .padding-h(@padding-smallest); // default padding for `:focus` state
   .click-color();
   text-decoration: none;
+
+  &:focus {
+    .padding-h(@padding-smallest);
+    .margin-h(-@padding-smallest);
+  }
 }
 
 img {

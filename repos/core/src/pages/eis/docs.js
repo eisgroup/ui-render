@@ -29,6 +29,7 @@ export default class Docs extends Component {
       plugins: [toc],
       renderers: {heading: HeadingRenderer},
     }
+    // todo: show config.js file
     return (
       <ScrollView fill className={'app-docs padding-large'}>
         <h1>{'UI Renderer'}</h1>
@@ -36,7 +37,7 @@ export default class Docs extends Component {
           items={['Summary', 'Examples', 'FAQ']}
           panels={[
             () => <Markdown source={this.state.docs} {...mdProps}/>,
-            () => <Markdown source={this.state.examples} {...mdProps}/>,
+            () => null,
             () => <Markdown source={this.state.faq} {...mdProps}/>,
           ]}
           classNamePanels='padding-v margin-v'

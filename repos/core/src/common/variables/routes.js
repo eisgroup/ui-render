@@ -10,8 +10,8 @@ ROUTES.FOR_DEFINITION = createNestedRoutes(ROUTE, {
 ROUTES.FOR_NAV = [ // shown in Navigation
   {path: ROUTE.HOME, name: 'Example', icon: 'home'},
   {path: ROUTE.DOCS, name: 'Docs', icon: 'theme'},
-  {path: ROUTE.WEBSTUDIO, name: 'WebStudio', icon: 'logo-symbol'},
   {path: ROUTE.DEMO, name: 'Demo', icon: 'test'},
+  {path: ROUTE.WEBSTUDIO, name: 'WebStudio', icon: 'logo-symbol'},
 ]
 if (_SHOULD_SHOW_TEST_) ROUTES.FOR_NAV.push(...[
   {path: ROUTE.TESTER, name: 'Tester', icon: 'test'},
