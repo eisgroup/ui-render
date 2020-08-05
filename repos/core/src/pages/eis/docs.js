@@ -4,8 +4,15 @@ import ScrollView from 'react-ui-pack/ScrollView'
 import Tabs from 'react-ui-pack/Tabs'
 import toc from 'remark-toc'
 import { logRender } from 'utils-pack'
+import CodeBlock from './CodeBlock'
+import config from './config.md'
 import docs from './docs.md'
 import faq from './fag.md'
+
+const mdProps = {
+  plugins: [toc],
+  renderers: {code: CodeBlock, heading: HeadingRenderer},
+}
 
 /**
  * EXAMPLE TEMPLATE ------------------------------------------------------------
@@ -15,28 +22,27 @@ import faq from './fag.md'
 export default class Docs extends Component {
   state = {
     docs: undefined,
+    config: undefined,
     examples: undefined,
     faq: undefined,
   }
 
   componentDidMount () {
     fetch(docs).then(r => r.text()).then(docs => this.setState({docs}))
+    fetch(config).then(r => r.text()).then(config => this.setState({config}))
     fetch(faq).then(r => r.text()).then(faq => this.setState({faq}))
   }
 
   render () {
-    const mdProps = {
-      plugins: [toc],
-      renderers: {heading: HeadingRenderer},
-    }
-    // todo: show config.js file
     return (
       <ScrollView fill className={'app-docs padding-large'}>
         <h1>{'UI Renderer'}</h1>
         <Tabs
-          items={['Summary', 'Examples', 'FAQ']}
+          defaultIndex={1}
+          items={['Summary', 'Configuration', 'Examples', 'FAQ']}
           panels={[
             () => <Markdown source={this.state.docs} {...mdProps}/>,
+            () => <Markdown source={this.state.config} {...mdProps}/>,
             () => null,
             () => <Markdown source={this.state.faq} {...mdProps}/>,
           ]}

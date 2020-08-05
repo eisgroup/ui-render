@@ -1,4 +1,4 @@
-## Table of Contents
+### Table of Contents
 
 ## What is `view`?
 `view` is equivalent to field ID - used for identifying which UI component to use for rendering.

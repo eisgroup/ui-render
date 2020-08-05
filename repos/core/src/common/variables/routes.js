@@ -8,7 +8,7 @@ ROUTES.FOR_DEFINITION = createNestedRoutes(ROUTE, {
   [ROUTE.WEBSTUDIO]: '/:id?', // add id to this route
 })
 ROUTES.FOR_NAV = [ // shown in Navigation
-  {path: ROUTE.HOME, name: 'Example', icon: 'home'},
+  {path: ROUTE.HOME, name: 'Features', icon: 'home'},
   {path: ROUTE.DOCS, name: 'Docs', icon: 'theme'},
   {path: ROUTE.DEMO, name: 'Demo', icon: 'test'},
   {path: ROUTE.WEBSTUDIO, name: 'WebStudio', icon: 'logo-symbol'},

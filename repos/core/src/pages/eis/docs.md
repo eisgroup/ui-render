@@ -1,4 +1,4 @@
-## Table of Contents
+### Table of Contents
 
 ## Overview
 
@@ -27,7 +27,7 @@ The illustration below demonstrates the structure of UI components, and their sh
 
 ![ui-architecture](static/images/ui-architecture.png)
 
-It must start with a single `Root` object. Within each object, you can define nested objects, under the attribute `items` - an array of nested child objects.
+It must start with a single `Root` Field object. Within each Field object, you can define nested Fields, under the attribute `items` - an array of nested child objects.
 
 ## React Component
 
