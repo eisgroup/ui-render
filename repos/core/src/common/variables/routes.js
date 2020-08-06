@@ -4,6 +4,7 @@ import { _SHOULD_SHOW_TEST_ } from 'utils-pack'
 ROUTE.DOCS = `${ROUTE_BASE}docs`
 ROUTE.WEBSTUDIO = `${ROUTE_BASE}webstudio`
 ROUTES.FOR_DEFINITION = createNestedRoutes(ROUTE, {
+  [ROUTE.DOCS]: '/:id?', // add id to this route
   [ROUTE.DEMO]: '/:id?', // add id to this route
   [ROUTE.WEBSTUDIO]: '/:id?', // add id to this route
 })

@@ -3,7 +3,7 @@ import Markdown from 'react-markdown'
 import ScrollView from 'react-ui-pack/ScrollView'
 import Tabs from 'react-ui-pack/Tabs'
 import toc from 'remark-toc'
-import { logRender } from 'utils-pack'
+import { get, logRender } from 'utils-pack'
 import CodeBlock from './CodeBlock'
 import config from './config.md'
 import docs from './docs.md'
@@ -27,6 +27,25 @@ export default class Docs extends Component {
     faq: undefined,
   }
 
+  get id () {
+    return get(this.props, 'match.params.id') || ''
+  }
+
+  get tabIndex () {
+    const id = this.id
+    switch (id) {
+      case 'examples':
+        return 2
+      case 'configuration':
+        return 1
+      case 'faq':
+        return 3
+      default:
+        return 0
+
+    }
+  }
+
   componentDidMount () {
     fetch(docs).then(r => r.text()).then(docs => this.setState({docs}))
     fetch(config).then(r => r.text()).then(config => this.setState({config}))
@@ -38,7 +57,7 @@ export default class Docs extends Component {
       <ScrollView fill className={'app-docs padding-large'}>
         <h1>{'UI Renderer'}</h1>
         <Tabs
-          defaultIndex={1}
+          defaultIndex={this.tabIndex}
           items={['Summary', 'Configuration', 'Examples', 'FAQ']}
           panels={[
             () => <Markdown source={this.state.docs} {...mdProps}/>,
