@@ -33,6 +33,6 @@ It must start with a single `Root` Field object. Within each Field object, you c
 
 A React component is a predefined component that the UI has available to display given data. It is configured by specifying the `view` along with other component attributes (example: `{view: "Table"}` will use Table as the React Component). 
 
-Please refer to [configuration](configuration) for available options to customise React Components.
+Please refer to [configuration](/docs/configuration) for available options to customise React Components.
 
-If you need a custom React component that does not yet exist in the [examples](examples), please submit a ticket to request new feature from the developer.
+If you need a custom React component that does not yet exist in the [examples](/docs/examples), please submit a ticket to request new feature from the developer.
