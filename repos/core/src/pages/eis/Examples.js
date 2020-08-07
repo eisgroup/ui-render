@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import Expand from 'react-ui-pack/Expand'
+import JsonView from 'react-ui-pack/JsonView'
+import Row from 'react-ui-pack/Row'
 import ScrollView from 'react-ui-pack/ScrollView'
 import View from 'react-ui-pack/View'
 import { logRender } from 'utils-pack'
@@ -46,8 +48,27 @@ export default class Examples extends Component {
             index={i}
             expanded={i === activeIndex}
             title={title}
-            onClick={this.toggleExpand}>
-            {() => <Example data={data} meta={meta} initialValues={data}/>}
+            onClick={this.toggleExpand}
+            classNameLabel='inverted bg-inverse'
+            classNameItems='bg-inverse'
+          >
+            {() => (
+              <>
+                <Example data={data} meta={meta} initialValues={data}/>
+                <ScrollView className='padding-smaller bg-neutral inverted'>
+                  <Row className='wrap spread'>
+                    <View fill className='padding-smaller min-width-320'>
+                      <h3>{'Data.json'}</h3>
+                      <JsonView data={data} inverted/>
+                    </View>
+                    <View fill className='padding-smaller min-width-320'>
+                      <h3>{'Meta.json'}</h3>
+                      <JsonView data={meta} inverted/>
+                    </View>
+                  </Row>
+                </ScrollView>
+              </>
+            )}
           </Expand>
         ))}
       </View>
