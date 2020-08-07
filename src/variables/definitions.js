@@ -32,17 +32,18 @@ export const PHONE = {
   },
 }
 
+/* Match with GraphQL Type */
 export const TYPE = {
   LANGUAGE: {
-    _: 'lang',
+    _: 'Language',
     [l.ENGLISH._]: 'Language'
   },
   LANGUAGE_LEVEL: {
-    _: 'langLevel',
+    _: 'LanguageLevel',
     [l.ENGLISH._]: 'Language Level'
   },
   PHONE: {
-    _: 'phones',
+    _: 'Phone',
     [l.ENGLISH._]: 'Phone'
   },
 }
