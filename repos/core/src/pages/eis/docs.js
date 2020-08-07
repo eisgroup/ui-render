@@ -7,6 +7,7 @@ import { get, logRender } from 'utils-pack'
 import CodeBlock from './CodeBlock'
 import config from './config.md'
 import docs from './docs.md'
+import Examples from './Examples'
 import faq from './fag.md'
 
 const mdProps = {
@@ -62,7 +63,7 @@ export default class Docs extends Component {
           panels={[
             () => <Markdown source={this.state.docs} {...mdProps}/>,
             () => <Markdown source={this.state.config} {...mdProps}/>,
-            () => null,
+            () => <Examples/>,
             () => <Markdown source={this.state.faq} {...mdProps}/>,
           ]}
           classNamePanels='padding-v margin-v'

@@ -1,9 +1,11 @@
 {
   "view": "VerticalLayout",
+  "styles": "border-bottom",
   "items": [
     {
       "view": "Expand",
       "label": "Admin Expenses",
+      "classNameLabel": "bg-white",
       "items": [
         {
           "view": "Col",
@@ -11,19 +13,19 @@
           "items": [
             {
               "view": "Row",
-              "styles": "middle margin-bottom",
+              "styles": "middle",
               "items": [
                 {
                   "view": "Title",
-                  "label": "Fully Insured - ",
+                  "label": "Fully Insured",
                   "styles": "margin-right-small"
                 },
                 {
-                  "view": "Title",
+                  "view": "Text",
                   "label": {
                     "name": "asoAdminCost.admExpencesAmt"
                   },
-                  "renderLabel": "currency"
+                  "renderLabel": "Currency"
                 }
               ]
             },
@@ -50,9 +52,28 @@
                   "order": 1
                 }
               ],
+              "extraHeaders": [
+                [
+                  {
+                    "label": "Description",
+                    "classNameHeader": "uppercase bg-primary-light2 border-right no-border-bottom"
+                  },
+                  {
+                    "colSpan": 2,
+                    "label": "Total",
+                    "styles": "center border-right"
+                  },
+                  {
+                    "colSpan": 2,
+                    "label": "Average",
+                    "styles": "center"
+                  }
+                ]
+              ],
               "headers": [
                 {
                   "id": "adminCategory",
+                  "label": "",
                   "renderCell": {
                     "values": {
                       "Adjusted Fixed": {
@@ -66,7 +87,7 @@
                           {
                             "view": "Col",
                             "fill": true,
-                            "className": "bg-grey padding",
+                            "className": "bg-white padding",
                             "items": [
                               {
                                 "view": "Input",
@@ -89,7 +110,7 @@
                           {
                             "view": "Col",
                             "fill": true,
-                            "className": "bg-grey padding",
+                            "className": "bg-white padding",
                             "items": [
                               {
                                 "view": "Input",
@@ -100,39 +121,44 @@
                             ]
                           }
                         ]
+                      },
+                      "Administration Total": {
+                        "view": "Text",
+                        "styles": "row p bg-success-light uppercase border-right",
+                        "label": "Administration Total"
                       }
                     }
                   },
-                  "label": "Description",
-                  "classNameHeader": "bg-grey",
-                  "classNameCell": "bg-grey-light uppercase"
+                  "classNameHeader": "bg-primary-light2 border-right",
+                  "classNameCell": "bg-info-light uppercase border-right"
                 },
                 {
                   "id": "annualAmt",
                   "className": "right",
                   "classNameCell": "right",
-                  "renderCell": "currency",
+                  "renderCell": "Currency",
                   "label": "Annual Amount"
                 },
                 {
                   "id": "premiumPct",
-                  "className": "right",
+                  "className": "right border-right",
                   "classNameCell": "right",
-                  "renderCell": "percent",
+                  "classNameCellWrap": "border-right",
+                  "renderCell": "Percent",
                   "label": "% of Premium"
                 },
                 {
                   "id": "perClaimAmt",
                   "className": "right",
                   "classNameCell": "right",
-                  "renderCell": "currency",
+                  "renderCell": "Currency",
                   "label": "Per Claim"
                 },
                 {
                   "id": "perEmployeeAmt",
                   "className": "right",
                   "classNameCell": "right",
-                  "renderCell": "currency",
+                  "renderCell": "Currency",
                   "label": "Per Employee"
                 }
               ],
@@ -140,8 +166,8 @@
                 {
                   "id": "adminCategory",
                   "values": {
-                    "Administration Total": "bg-green-light",
-                    "Grand Total": "bg-green-light"
+                    "Administration Total": "bg-success-light",
+                    "Grand Total": "bg-success-light"
                   }
                 },
                 {
@@ -158,84 +184,124 @@
     },
     {
       "view": "Expand",
+      "classNameLabel": "bg-white",
       "renderLabel": {
         "view": "Row",
-        "className": "middle",
+        "className": "wrap middle fill-width",
         "items": [
           {
             "view": "Text",
-            "label": "Rate Details for Policy ID - ",
+            "label": "Rate Details",
             "className": "margin-right-small"
           },
           {
-            "view": "Text",
-            "label": {
-              "name": "policyID"
-            }
+            "view": "Dropdown",
+            "name": "active.plan",
+            "options": "planCalculations",
+            "mapOptions": "planName",
+            "styles": "margin-h-smaller"
+          },
+          {
+            "view": "Dropdown",
+            "name": "active.plan",
+            "value": {
+              "name": "{state.active.plan,0}"
+            },
+            "onChange": {
+              "name": "setState",
+              "args": [
+                "active.plan"
+              ]
+            },
+            "options": {
+              "name": "planCalculations"
+            },
+            "mapOptions": {
+              "text": "planName",
+              "value": "{index}"
+            },
+            "styles": "margin-h-smaller"
+          },
+          {
+            "view": "Dropdown",
+            "name": "url",
+            "placeholder": "Select fetch API",
+            "onChange": {
+              "name": "fetch",
+              "onDone": {
+                "name": "fetch",
+                "mapArgs": [
+                  "https://ipapi.co/{0.payload.ip}/json"
+                ],
+                "onDone": {
+                  "name": "popup",
+                  "args": [
+                    "Dropdown.onChange\n -> fetch(IpAddress).onDone\n -> fetch(GeoData).onDone\n -> popup"
+                  ]
+                }
+              }
+            },
+            "options": [
+              {
+                "text": "IP Address",
+                "value": "https://api.ipify.org/?format=json"
+              },
+              {
+                "text": "Geolocation Data",
+                "value": "http://ip-api.com/json"
+              }
+            ],
+            "styles": "margin-h-smaller"
           }
         ]
       },
+      "classNameItems": "padding-h",
       "expanded": true,
       "items": [
         {
           "view": "Row",
-          "className": "wrap",
+          "className": "wrap middle padding-h",
           "items": [
             {
-              "view": "Dropdown",
-              "name": "active.plan",
-              "options": "planCalculations",
-              "mapOptions": "planName"
+              "view": "Title",
+              "label": "Policy ID"
             },
             {
-              "view": "Dropdown",
-              "name": "active.plan",
-              "value": {
-                "name": "{state.active.plan,0}"
+              "view": "Text",
+              "children": {
+                "name": "policyID"
               },
-              "onChange": {
-                "name": "setState",
-                "args": [
-                  "active.plan"
-                ]
-              },
-              "options": {
-                "name": "planCalculations"
-              },
-              "mapOptions": {
-                "text": "planName",
-                "value": "{index}"
+              "styles": "padding"
+            }
+          ]
+        },
+        {
+          "view": "ProgressSteps",
+          "defaultIndex": 1,
+          "className": "bg-white padding margin-v border radius",
+          "classNameSteps": "padding-h-largest",
+          "items": [
+            {
+              "label": "Information",
+              "done": true,
+              "content": {
+                "view": "Text",
+                "label": "Step 1 content completed"
               }
             },
             {
-              "view": "Dropdown",
-              "name": "url",
-              "placeholder": "Select fetch API",
-              "onChange": {
-                "name": "fetch",
-                "onDone": {
-                  "name": "fetch",
-                  "mapArgs": [
-                    "https://ipapi.co/{0.payload.ip}/json"
-                  ],
-                  "onDone": {
-                    "name": "warn",
-                    "args": [
-                      "Dropdown.onChange -> fetch.onDone -> fetch.onDone -> warn"
-                    ]
-                  }
-                }
-              },
-              "options": [
-                {
-                  "text": "IP Address",
-                  "value": "https://api.ipify.org/?format=json"
-                },
-                {
-                  "text": "Geolocation Data",
-                  "value": "http://ip-api.com/json"
-                }
-              ]
+              "label": "Requirements"
+            },
+            {
+              "label": "Submission",
+              "error": true,
+              "content": {
+                "view": "Text",
+                "label": "Step 3 with missing content"
+              }
+            },
+            {
+              "step": "?"
             }
           ]
         },
@@ -246,7 +312,7 @@
               "tab": "Demographic",
               "content": {
                 "view": "Col",
-                "className": "padding",
+                "className": "padding-v",
                 "items": [
                   {
                     "view": "Title",
@@ -258,7 +324,7 @@
                     "items": [
                       {
                         "view": "Row",
-                        "className": "fill bg-white border radius margin-right center",
+                        "className": "fill bg-white border radius center",
                         "items": [
                           {
                             "view": "Label",
@@ -271,14 +337,36 @@
                             "legends": true,
                             "mapItems": {
                               "label": "ageBand",
-                              "value": "numberOfLives"
-                            }
+                              "value": "numberOfLives",
+                              "order": "ageBand"
+                            },
+                            "sort": "-order",
+                            "items": [
+                              {
+                                "view": "Col",
+                                "className": "align-center",
+                                "items": [
+                                  {
+                                    "view": "Title",
+                                    "label": "Label"
+                                  },
+                                  {
+                                    "view": "Text",
+                                    "label": "Anything"
+                                  }
+                                ]
+                              }
+                            ]
                           }
                         ]
                       },
                       {
+                        "view": "Space",
+                        "styles": "visible-from-tablet"
+                      },
+                      {
                         "view": "Row",
-                        "className": "fill bg-white border radius margin-right center",
+                        "className": "fill bg-white border radius center",
                         "items": [
                           {
                             "view": "Label",
@@ -315,13 +403,15 @@
                         }
                       ]
                     },
+                    "itemsExpanded": true,
                     "headers": [
                       {
                         "id": "state",
+                        "label": "State",
                         "renderCell": {
                           "view": "Expand",
                           "name": "{value}",
-                          "id": "state",
+                          "index": "{index}",
                           "onClick": "handleItemExpand"
                         }
                       },
@@ -340,7 +430,8 @@
                           "name": "expandAllStates",
                           "type": "checkbox",
                           "label": "Expand All",
-                          "onChange": "handleToggleExpandAll"
+                          "onChange": "handleToggleExpandAll",
+                          "defaultValue": true
                         }
                       }
                     ]
@@ -352,7 +443,7 @@
               "tab": "Factors",
               "content": {
                 "view": "Col",
-                "className": "padding",
+                "className": "padding-v",
                 "items": [
                   {
                     "view": "Title",
@@ -430,14 +521,23 @@
                                 "label": "Area"
                               },
                               {
+                                "view": "Space"
+                              },
+                              {
                                 "view": "Input",
                                 "name": "planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].trend",
                                 "label": "trend"
                               },
                               {
+                                "view": "Space"
+                              },
+                              {
                                 "view": "Input",
                                 "name": "planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].maximumEEandSP",
                                 "label": "maximum (EE and SP)"
+                              },
+                              {
+                                "view": "Space"
                               },
                               {
                                 "view": "Input",
@@ -465,6 +565,9 @@
                                     "label": "Areas",
                                     "type": "number",
                                     "format": "double5"
+                                  },
+                                  {
+                                    "view": "Space"
                                   },
                                   {
                                     "view": "Input",
@@ -498,9 +601,15 @@
                             "label": "Initial Load"
                           },
                           {
+                            "view": "Space"
+                          },
+                          {
                             "view": "Input",
                             "name": "planCalculations.{state.active.plan,0}.manualClaimDetail.occupationFactor",
                             "label": "Occupation"
+                          },
+                          {
+                            "view": "Space"
                           },
                           {
                             "view": "Input",
@@ -509,9 +618,15 @@
                             "readonly": true
                           },
                           {
+                            "view": "Space"
+                          },
+                          {
                             "view": "Input",
                             "name": "planCalculations.{state.active.plan,0}.manualClaimDetail.waitGroupSize",
                             "label": "Wait Grp Size"
+                          },
+                          {
+                            "view": "Space"
                           },
                           {
                             "view": "Input",
@@ -519,9 +634,15 @@
                             "label": "Plan Util"
                           },
                           {
+                            "view": "Space"
+                          },
+                          {
                             "view": "Input",
                             "name": "planCalculations.{state.active.plan,0}.manualClaimDetail.groupSize",
                             "label": "Group Size"
+                          },
+                          {
+                            "view": "Space"
                           },
                           {
                             "view": "Input",
@@ -529,14 +650,23 @@
                             "label": "Cal Year Load"
                           },
                           {
+                            "view": "Space"
+                          },
+                          {
                             "view": "Input",
                             "name": "planCalculations.{state.active.plan,0}.manualClaimDetail.voluntaryLoad",
                             "label": "Vol Load"
                           },
                           {
+                            "view": "Space"
+                          },
+                          {
                             "view": "Input",
                             "name": "planCalculations.{state.active.plan,0}.manualClaimDetail.waitingLoad",
                             "label": "Wait Load"
+                          },
+                          {
+                            "view": "Space"
                           },
                           {
                             "view": "Input",
@@ -553,13 +683,18 @@
                             "view": "Button",
                             "className": "a transparent",
                             "children": "Apply",
-                            "type": "submit,"
+                            "type": "submit,",
+                            "tooltip": "Insert Changes"
                           },
                           {
-                            "view": "Button",
-                            "className": "a transparent",
-                            "children": "Reset",
-                            "onClick": "reset"
+                            "view": "Tooltip",
+                            "label": "Remove Changes",
+                            "children": {
+                              "view": "Button",
+                              "className": "a transparent",
+                              "children": "Reset",
+                              "onClick": "reset"
+                            }
                           }
                         ]
                       }
@@ -572,7 +707,7 @@
               "tab": "Redistribution Calculator",
               "content": {
                 "view": "Col",
-                "className": "padding",
+                "className": "padding-v",
                 "items": [
                   {
                     "view": "Title",
@@ -584,34 +719,39 @@
                     "headers": [
                       {
                         "id": "tier",
-                        "className": "uppercase"
+                        "label": "Tier"
                       },
                       {
                         "id": "adjManualRate",
-                        "renderCell": "currency"
+                        "label": "Adj. Manual Rate",
+                        "renderCell": "Currency"
                       },
                       {
                         "id": "adjFormulaRate",
-                        "renderCell": "currency"
+                        "label": "Adj. Formula Rate",
+                        "renderCell": "Currency"
                       },
                       {
                         "id": "manualRate",
+                        "label": "Manual Rate",
                         "renderCell": {
                           "view": "Input",
                           "name": "planCalculations.0.tierRates.{index}.manualRate",
                           "type": "number",
-                          "icon": "USD",
+                          "icon": "dollar",
                           "unit": "/ person",
                           "lefty": true
                         }
                       },
                       {
                         "id": "formulaRate",
-                        "renderCell": "currency"
+                        "label": "Formula Rate",
+                        "renderCell": "Currency"
                       },
                       {
                         "id": "proposedRate",
-                        "renderCell": "currency"
+                        "label": "Proposed Rate",
+                        "renderCell": "Currency"
                       }
                     ],
                     "extraItems": [
