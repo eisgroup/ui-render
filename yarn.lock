@@ -13261,10 +13261,10 @@ react-transition-group@^2.5.0:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react-ui-pack@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.3.1.tgz#6124263113ea9eb7888d99bac89086e46d6a400a"
-  integrity sha512-ynnjRjijRUd7S5itE5v1wjNOBEDRsdzEx+0l0NXr6qRAVQ+2mDie5G+z7KBocR8UWwLf7M2l+t+HWG5KDtP9XQ==
+react-ui-pack@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.3.2.tgz#17b59d305cac1f7a860571569cda70708ef3179c"
+  integrity sha512-gTO0VM1iQxUvNaKP8LUq58j8lhIX9I1Bow9s7mx7bk3+RYC3QmfMST0OVppxNYET+5zQPIawq9jSLuyntwkR9g==
   dependencies:
     classnames "^2.2.6"
     prop-types "^15.7.2"

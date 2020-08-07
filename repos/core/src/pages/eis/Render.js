@@ -20,6 +20,7 @@ import TableView from 'react-ui-pack/TableView'
 import TabList from 'react-ui-pack/TabList'
 import Tabs from 'react-ui-pack/Tabs'
 import Text from 'react-ui-pack/Text'
+import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
 import {
   Active,
@@ -38,7 +39,6 @@ import {
   toPercent
 } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
-import TooltipPop from '../../components/TooltipPop'
 
 /**
  * Recursive Field Renderer

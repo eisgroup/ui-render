@@ -17,7 +17,7 @@
     "react-autofill": "^1.1.4",
     "react-helmet": "^5.2.0",
     "react-markdown": "^4.3.1",
-    "react-ui-pack": "^0.3.1",
+    "react-ui-pack": "^0.3.2",
     "remark-toc": "^7.0.0",
     "utils-pack": "^0.2.5"
   },
