@@ -115,17 +115,30 @@ export function log (first, ...args) {
  * @return void
  */
 export function logBenchmark ({ name, type = '', duration, loop = null, result = null }) {
-	const stats = !loop ? '' : `for ${formatNumber(loop)} iterations, ` +
-    Active.log.keyword('orange')(`${formatNumber(duration / loop, {decimals: 3})} ms`) + ' each'
+	const task = `\n${name}()`
+	const took = `▶ ${type} took`
+	const ms = `${formatNumber(duration, {decimals: 3})} ms`
+	const iteration = !loop ? '' : `for ${formatNumber(loop)} iterations, `
+	const time = `${formatNumber(duration / loop, {decimals: 3})} ms`
+	const each = 'each'
 	const output = (result != null) ? ['\n>>>', result] : []
-	// eslint-disable-next-line no-console
-	console.log(
-    Active.log.green(`\n${name}()`),
-    Active.log.keyword('cyan')(`▶ ${type} took`),
-    Active.log.keyword('orange')(`${formatNumber(duration, {decimals: 3})} ms`),
-    Active.log.keyword('cyan')(stats),
-    ...output,
-  )
+	if (Active.log) {
+		console.log(
+			Active.log.green(task),
+			Active.log.keyword('cyan')(took),
+			Active.log.keyword('orange')(ms),
+			Active.log.keyword('cyan')(iteration),
+			Active.log.keyword('orange')(time),
+			each,
+			...output,
+		)
+	} else {
+		console.log(
+			`%c${task} %c${took} %c${ms} %c${iteration} %c${time}`,
+			'color: Green;','color: Teal;', 'color: Orange;','color: Teal;', 'color: Orange;', 'each',
+			...output
+		)
+	}
 }
 
 /**
