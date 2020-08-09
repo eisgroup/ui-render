@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect'
+import { formatNumber } from 'utils-pack/number'
 import { logSelector } from './log'
+import now from 'performance-now' // adds almost zero KB to bundle size because browsers have window.performance.now()
 import { __DEV__ } from './_envs'
 
 /**
@@ -31,6 +33,7 @@ import { __DEV__ } from './_envs'
  * @returns {Function} decorator - that transforms given class' static properties
  */
 export default function selector (NAME) {
+  let start, end
   return function (constructor) {
     for (const key in constructor) {
       const selectors = constructor[key]()
@@ -38,10 +41,9 @@ export default function selector (NAME) {
       constructor[key] = createSelector(
         ...selectors,
         function () {
-          // __DEV__ && console.time(`${NAME} ${key}`)
+          __DEV__ && (start = now())
           const result = lastFunc(...arguments)
-          // __DEV__ && console.timeEnd(`${NAME} ${key}`)
-          __DEV__ && logSelector(`${NAME} ${key}`, result)
+          __DEV__ && (end = now()) && logSelector(`${NAME} ${key} [${formatNumber(end - start, {decimals: 3})} ms]`, result)
           return result
         }
       )

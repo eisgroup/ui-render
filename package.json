@@ -1,6 +1,6 @@
 {
   "name": "utils-pack",
-  "version": "0.2.11",
+  "version": "0.2.13",
   "description": "JS Helper Functions",
   "license": "MIT",
   "main": "index.js",
