@@ -1,8 +1,9 @@
 import { createSelector } from 'reselect'
+import { ONE_MILLISECOND } from 'utils-pack/constants'
 import { formatNumber } from 'utils-pack/number'
 import { logSelector } from './log'
 import now from 'performance-now' // adds almost zero KB to bundle size because browsers have window.performance.now()
-import { __DEV__ } from './_envs'
+import { __CLIENT__, __DEV__, Active } from './_envs'
 
 /**
  * Selector Decorator to turn all class static property functions into Memoized Functions
@@ -30,10 +31,11 @@ import { __DEV__ } from './_envs'
  *     }
  *   }
  * @param {String} NAME - module's namespace
+ * @param {Number} [maxTime] - milliseconds, to be considered slow (highlights execution time as red), default is 5 ms
  * @returns {Function} decorator - that transforms given class' static properties
  */
-export default function selector (NAME) {
-  let start, end
+export default function selector (NAME, maxTime = 5 * ONE_MILLISECOND) {
+  let start
   return function (constructor) {
     for (const key in constructor) {
       const selectors = constructor[key]()
@@ -43,7 +45,20 @@ export default function selector (NAME) {
         function () {
           __DEV__ && (start = now())
           const result = lastFunc(...arguments)
-          __DEV__ && (end = now()) && logSelector(`${NAME} ${key} [${formatNumber(end - start, {decimals: 3})} ms]`, result)
+          if (__DEV__) {
+            const duration = now() - start
+            let time = `${formatNumber(duration, {decimals: 3})} ms`
+            if (duration >= maxTime) {
+              if (__CLIENT__ || (!Active.log || !Active.log.keyword)) {
+                time = '%c' + time + '%c'
+                logSelector(`${NAME} ${key} [${time}]`, result, 'color: Red', 'color: Orange')
+              }
+              // Chalk logger is available
+              else {
+                logSelector(`${NAME} ${key} [`, result, Active.log.keyword('red')(time), Active.log.keyword('orange')(']'))
+              }
+            }
+          }
           return result
         }
       )

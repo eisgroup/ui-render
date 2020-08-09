@@ -141,6 +141,7 @@ export const SIZE_MB_16 = SIZE_MB * 16
 /* Time */
 export const TIME_DURATION_INSTANT = 200
 export const NOW = Date.now()
+export const ONE_MILLISECOND = 1
 export const HALF_SECOND = 500
 export const HALF_MINUTE = HALF_SECOND * 60
 export const HALF_HOUR = HALF_MINUTE * 60
