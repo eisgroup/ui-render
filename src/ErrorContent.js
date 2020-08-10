@@ -11,8 +11,7 @@ import View from './View'
  * @param {*} props - other attributes to pass to `<Table>`
  * @returns {Object} - React table component
  */
-export default function ErrorContent
-({
+function ErrorContent ({
   items,
   ...props
 }) {
@@ -48,3 +47,5 @@ ErrorContent.propTypes = {
     })
   ])).isRequired
 }
+
+export default React.memo(ErrorContent)

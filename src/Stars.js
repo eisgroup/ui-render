@@ -15,16 +15,15 @@ import Text from './Text'
  * @param {*} props - other attributes to pass to component
  * @returns {Object} - React Component
  */
-export default function Stars
-  ({
-     rating,
-     className,
-     large,
-     small,
-     ...props
-   }) {
+function Stars ({
+  rating,
+  className,
+  large,
+  small,
+  ...props
+}) {
   if (props.readonly == null) props.readonly = true
-  return <Text className={classNames('stars', className, { large, small })}>
+  return <Text className={classNames('stars', className, {large, small})}>
     <Rating
       emptySymbol='icon star-empty'
       fullSymbol='icon star-full'
@@ -41,3 +40,5 @@ Stars.propTypes = {
   small: PropTypes.bool,
   className: PropTypes.string,
 }
+
+export default React.memo(Stars)

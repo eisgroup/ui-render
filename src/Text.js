@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { Component } from 'react'
+import React from 'react'
 import { accessibilitySupport } from './utils'
 
 /**
@@ -15,24 +15,19 @@ import { accessibilitySupport } from './utils'
  * @param {*} props - other attributes to pass to `<div></div>`
  * @returns {Object} - React Component
  */
-export default function Text
-  ({
-    className,
-    fill,
-    reverse,
-    rtl,
-    sound,
-    expanded: _, // not used, remove to prevent warnings
-    ...props
-  }) {
+function Text ({
+  className,
+  fill,
+  reverse,
+  rtl,
+  sound,
+  expanded: _, // not used, remove to prevent warnings
+  ...props
+}) {
   props = accessibilitySupport(props, sound)
   return (
     <span className={classNames('text', {fill, reverse, rtl, pointer: props.onClick}, className)} {...props} />
   )
 }
 
-Text.Class = class extends Component {
-  render () {
-    return <Text {...this.props} />
-  }
-}
+export default React.memo(Text)

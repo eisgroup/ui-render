@@ -22,21 +22,20 @@ import View from './View'
  * @param {Object} [children] - extra content to render inside avatar
  * @returns {Object} - React component
  */
-export default function Avatar
-  ({
-    name = '',
-    status = '',
-    hideName = true,
-    src = '',
-    secure,
-    small,
-    large,
-    larger,
-    className,
-    onClick,
-    style,
-    children,
-  }) {
+function Avatar ({
+  name = '',
+  status = '',
+  hideName = true,
+  src = '',
+  secure,
+  small,
+  large,
+  larger,
+  className,
+  onClick,
+  style,
+  children,
+}) {
   const hasImage = src && !secure
   return (
     <View
@@ -76,3 +75,5 @@ Avatar.propTypes = {
   onClick: PropTypes.func,
   children: PropTypes.any,
 }
+
+export default React.memo(Avatar)

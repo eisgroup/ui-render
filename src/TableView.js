@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component, Fragment } from 'react'
+import React, { Fragment, PureComponent } from 'react'
 import { by, get, hasListValue, isEqual, isEqualList, isFunction } from 'utils-pack'
 import Placeholder from './Placeholder'
 import { renderSort } from './renders'
@@ -23,7 +23,7 @@ const sortObj = {
  * Table with Dynamic Headers - Component
  * @Note: check <Table> component for props documentation
  */
-export default class TableView extends Component {
+export default class TableView extends PureComponent {
   static propTypes = {
     items: PropTypes.arrayOf( // in default layout, items are rows
       PropTypes.object.isRequired, // nested object by key matching `id` in `headers` prop

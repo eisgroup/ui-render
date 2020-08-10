@@ -9,16 +9,15 @@ import Text from './Text'
 /**
  * Show Date Ranges as short string, with option to expand for details
  */
-export default function DateRanges
-  ({
-    start,
-    end,
-    times = [],
-    className,
-    style,
-    children,
-    ...props
-  }) {
+function DateRanges ({
+  start,
+  end,
+  times = [],
+  className,
+  style,
+  children,
+  ...props
+}) {
   const [isString, toggleDisplay] = useState(true)
   const hasDetails = times.length > 0
   return (
@@ -52,3 +51,4 @@ DateRanges.propTypes = {
   children: PropTypes.any,
 }
 
+export default React.memo(DateRanges)

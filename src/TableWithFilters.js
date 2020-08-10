@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { capitalize, hasListValue, isInList, isInString, pluralize } from 'utils-pack'
 import AnimateHeight from './AnimateHeight'
 import Button from './Button'
@@ -16,7 +16,7 @@ import View from './View'
  *
  * @Note: check <TableView> component for props documentation
  */
-export default class TableWithFilters extends Component {
+export default class TableWithFilters extends PureComponent {
   static propTypes = {
     filters: PropTypes.arrayOf(PropTypes.shape({
       id: PropTypes.string.isRequired, // id of the column/row to be filtered

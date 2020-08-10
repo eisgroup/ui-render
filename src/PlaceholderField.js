@@ -8,7 +8,7 @@ import View from './View'
 /**
  * Placeholder Field - Pure Component.
  */
-export default function PlaceholderField ({name, ...props} = {}) {
+function PlaceholderField ({name, ...props} = {}) {
   if (props.children == null)
     props.children = <Text className='p error padding border'>
       <Text className='bold'>{name}</Text>{toLowerCase(_.FIELD_DOES_NOT_EXIST)}
@@ -19,3 +19,5 @@ export default function PlaceholderField ({name, ...props} = {}) {
 PlaceholderField.propTypes = {
   name: PropTypes.any
 }
+
+export default React.memo(PlaceholderField)

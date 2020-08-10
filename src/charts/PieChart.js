@@ -1,7 +1,7 @@
 import chroma from 'chroma-js'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component, Fragment } from 'react'
+import React, { Fragment, PureComponent } from 'react'
 import { Pie, PieChart as Piechart, ResponsiveContainer, Tooltip } from 'recharts'
 import { by, pluralize, shortNumber, throttle, toList, toListValuesTotal, truncate } from 'utils-pack'
 import { gradientColors } from 'utils-pack/color'
@@ -22,7 +22,7 @@ let decimals, unit
 /**
  * Pie Chart Component
  */
-export default class PieChart extends Component {
+export default class PieChart extends PureComponent {
   static propTypes = {
     items: PropTypes.arrayOf(
       PropTypes.shape({

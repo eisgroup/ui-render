@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React from 'react'
 import { fileNameWithoutExt } from 'utils-pack'
 import { FILE } from './files'
 
@@ -13,16 +13,15 @@ import { FILE } from './files'
  * @param {*} [props] - other attributes to pass to `<img>`
  * @returns {Object} - React component
  */
-export default function Image
-  ({
-     name,
-     path,
-     className = '',
-     ...props
-   }) {
+function Image ({
+  name,
+  path,
+  className = '',
+  ...props
+}) {
   return (
     <img
-      src={imageSrc({ name, path })}
+      src={imageSrc({name, path})}
       alt={fileNameWithoutExt(name)}
       className={classNames('app__image', className)}
       {...props}
@@ -36,12 +35,8 @@ Image.propTypes = {
   className: PropTypes.string,
 }
 
-Image.Class = class extends Component {
-  render () {
-    return <Image {...this.props} />
-  }
-}
-
 export function imageSrc ({avatar, src, name = '', path = FILE.PATH_IMAGES}) {
   return avatar || src || (path + name.replace(/\s/g, '-').toLowerCase())
 }
+
+export default React.memo(Image)

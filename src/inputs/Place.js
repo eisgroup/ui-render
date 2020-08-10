@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { Active, debounceBy, get, isInList, warn } from 'utils-pack'
 import { createScript } from 'utils-pack/utility'
 import Dropdown from '../Dropdown'
@@ -14,7 +14,7 @@ let hasLoadedScript
  * Address Input Field powered by Google Places Autocomplete
  * -----------------------------------------------------------------------------
  */
-export default class Place extends Component {
+export default class Place extends PureComponent {
   static propTypes = {
     value: PropTypes.shape({ // PlaceInput
       id: PropTypes.string.isRequired, // placeId

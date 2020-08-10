@@ -19,16 +19,15 @@ import View from './View'
  * @param {*} props - other attributes to pass to `<div></div>`
  * @returns {Object} - React Component
  */
-export default function Reviews
-  ({
-     items,
-     onClickAvatar,
-     className,
-     ...props
-   }) {
+function Reviews ({
+  items,
+  onClickAvatar,
+  className,
+  ...props
+}) {
   return (
     <ScrollView className={classNames('reviews', className)} {...props}>
-      {items.map(({ id, rating, time, text, user: { id: userId, name, avatar }, }, i) => {
+      {items.map(({id, rating, time, text, user: {id: userId, name, avatar},}, i) => {
         return (
           <View key={id || i} className='review'>
             <Row className='review__user'>
@@ -65,3 +64,5 @@ Reviews.propTypes = {
   onClickAvatar: PropTypes.func.isRequired,
   className: PropTypes.string,
 }
+
+export default React.memo(Reviews)

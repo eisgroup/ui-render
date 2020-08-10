@@ -9,16 +9,15 @@ import Text from './Text'
 /**
  * Show Distance in km away if given, or address of the place, with toggle option
  */
-export default function AddressDistance
-  ({
-    address,
-    distance, // from user location
-    location, // geo location of given address
-    point, // user geo location to calculate distance from given `address`, if `distance` not given
-    unit = 'km',
-    className,
-    style,
-  }) {
+function AddressDistance ({
+  address,
+  distance, // from user location
+  location, // geo location of given address
+  point, // user geo location to calculate distance from given `address`, if `distance` not given
+  unit = 'km',
+  className,
+  style,
+}) {
   if (distance == null && point && location) distance = distanceBetween(location, point, unit)
   const hasDistance = distance != null
   const [isDistance, toggleDisplay] = useState(hasDistance)
@@ -49,4 +48,6 @@ AddressDistance.propTypes = {
   className: PropTypes.string,
   style: PropTypes.string,
 }
+
+export default React.memo(AddressDistance)
 

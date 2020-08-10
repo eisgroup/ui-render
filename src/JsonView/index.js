@@ -18,17 +18,16 @@ import defaultTheme from './themes'
  * @param {*} props - other attributes to pass to `<div></div>`
  * @returns {Object} - React Component
  */
-export default function JsonView
-  ({
-    data = {},
-    inverted = false,
-    expanded = false,
-    theme = defaultTheme,
-    className,
-    style,
-    fill,
-    ...props
-  }) {
+function JsonView ({
+  data = {},
+  inverted = false,
+  expanded = false,
+  theme = defaultTheme,
+  className,
+  style,
+  fill,
+  ...props
+}) {
   if (expanded) props.shouldExpandNode = () => true
   return (
     <View className={classNames('json-tree', className, {fill})} style={style}>
@@ -40,3 +39,5 @@ export default function JsonView
 JsonView.propTypes = {
   data: PropTypes.any.isRequired, // JSON data to show
 }
+
+export default React.memo(JsonView)

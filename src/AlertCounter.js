@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import Badge from './Badge'
 import { SOUND } from './files'
 
@@ -9,7 +9,7 @@ import { SOUND } from './files'
  * @Usage: to be wrapped using @withGql decorator
  * -----------------------------------------------------------------------------
  */
-export default class AlertCounter extends Component {
+class AlertCounter extends PureComponent {
   static propTypes = {
     alert: PropTypes.number.isRequired,
   }

@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React from 'react'
 import { isFunction } from 'utils-pack'
 import Label from './Label'
 
@@ -18,17 +18,16 @@ import Label from './Label'
  * @param {*} [props] - other attributes to pass to `<select>`
  * @returns {Object} - React select component
  */
-export default function Select
-  ({
-     name,
-     label = name,
-     value = '',
-     options,
-     onChange,
-     placeholder,
-     defaultValue = '',
-     className,
-   }) {
+function Select ({
+  name,
+  label = name,
+  value = '',
+  options,
+  onChange,
+  placeholder,
+  defaultValue = '',
+  className,
+}) {
   const id = 'select-' + label
   if (typeof options[0] === 'string') options = options.map(value => ({ text: value, value }))
   if (typeof options[0] === 'number') options = options.map(value => ({ text: String(value), value }))
@@ -64,9 +63,4 @@ Select.propTypes = {
   placeholder: PropTypes.any
 }
 
-Select.Class = class extends Component {
-  render () {
-    return <Select {...this.props} />
-  }
-}
-
+export default React.memo(Select)

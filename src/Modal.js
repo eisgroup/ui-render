@@ -5,14 +5,13 @@ import View from './View'
 /**
  * Modal - Pure Component
  */
-export default function Modal
-  ({
-     isOpen = false,
-     canClose = true,
-     onClose,
-     className,
-     children
-   }) {
+function Modal ({
+  isOpen = false,
+  canClose = true,
+  onClose,
+  className,
+  children
+}) {
   return (
     <View className={'app__modal fade-in' + (isOpen ? ' active' : '')}>
       <View
@@ -29,3 +28,5 @@ export default function Modal
     </View>
   )
 }
+
+export default React.memo(Modal)

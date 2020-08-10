@@ -36,18 +36,17 @@ import View from './View'
  * @param {*} props - attributes to pass to `<input />`
  * @returns {Object} - React Component
  */
-export default function Input
-  ({
-    icon,
-    lefty,
-    onClickIcon,
-    unit,
-    label,
-    id,
-    disabled,
-    done,
-    className,
-    classNameIcon,
+function Input ({
+  icon,
+  lefty,
+  onClickIcon,
+  unit,
+  label,
+  id,
+  disabled,
+  done,
+  className,
+  classNameIcon,
     children,
     stickyPlaceholder, // only works with controlled component when `props.value` is provided
     resize,
@@ -123,3 +122,5 @@ export default function Input
     </View>
   )
 }
+
+export default React.memo(Input)

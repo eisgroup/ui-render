@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { removeNilValues } from 'utils-pack'
 import Icon from './Icon'
 import Row from './Row'
@@ -19,7 +19,7 @@ import View from './View'
  *      contentClosed={<Text>Closed content</Text>}
  *    />
  */
-export default class Collapse extends Component {
+export default class Collapse extends PureComponent {
   static propTypes = {
     isOpen: PropTypes.bool,
     horizontal: PropTypes.bool,

@@ -6,14 +6,13 @@ import Text from './Text'
 /**
  * Color Swatch - Pure Component.
  */
-export default function ColorSwatch
-  ({
-     code,
-     small,
-     large,
-     className,
-   }) {
-  const style = { backgroundColor: `rgb(${code})` }
+export default function ColorSwatch ({
+  code,
+  small,
+  large,
+  className,
+}) {
+  const style = {backgroundColor: `rgb(${code})`}
   if (String(code) === '255,255,255') style.border = '1px solid rgba(127,127,127,0.5)'
   return <Text className={classNames('color__swatch', className, {small, large})} style={style}/>
 }
@@ -27,3 +26,5 @@ ColorSwatch.propTypes = {
   large: PropTypes.bool,
   className: PropTypes.string,
 }
+
+export default React.memo(ColorSwatch)

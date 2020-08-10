@@ -5,10 +5,10 @@ import Expand from './Expand'
 /**
  * Dynamic List of Expandable Rows - Pure Component.
  */
-export default function ExpandList ({renderLabel, renderItem, items, ...props}) {
+function ExpandList ({renderLabel, renderItem, items, ...props}) {
   return (
     items.map((item, i) => (
-      <Expand key={item.id || i} {...props} title={renderLabel(item, i)}>{renderItem(item, i)}</Expand>
+      <Expand key={item.id || i} {...props} title={renderLabel(item, i)}>{() => renderItem(item, i)}</Expand>
     ))
   )
 }
@@ -17,3 +17,4 @@ ExpandList.propTypes = {
   renderLabel: PropTypes.func.isRequired,
   renderItem: PropTypes.func.isRequired,
 }
+export default React.memo(ExpandList)

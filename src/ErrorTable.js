@@ -12,13 +12,12 @@ import Table from './Table'
  * @param {*} props - other attributes to pass to `<Table>`
  * @returns {Object} - React table component
  */
-export default function ErrorTable
-  ({
-    items,
-    isServerError,
-    inverted,
-    ...props
-  }) {
+function ErrorTable ({
+  items,
+  isServerError,
+  inverted,
+  ...props
+}) {
   const hasId = !!get(items, '[0].id')
   const hasStatus = !!get(items, '[0].status') || !!get(items, '[0].statusCode') || !!get(items, '[0].code')
   const hasTitle = !!get(items, '[0].title') || !!get(items, '[0].error')
@@ -63,3 +62,5 @@ ErrorTable.propTypes = {
     })
   ])).isRequired
 }
+
+export default React.memo(ErrorTable)

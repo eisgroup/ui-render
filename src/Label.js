@@ -9,14 +9,15 @@ import React from 'react'
  * @param {*} props - other attributes to pass to `<label></label>`
  * @returns {Object}
  */
-export default function Label
-({
-   children,
-   ...props
- }) {
+function Label ({
+  children,
+  ...props
+}) {
   return <label {...props}>{children}</label>
 }
 
 Label.propTypes = {
   children: PropTypes.any
 }
+
+export default React.memo(Label)

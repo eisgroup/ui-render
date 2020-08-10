@@ -19,18 +19,17 @@ import View from './View'
  * @param {*} props - other props
  * @returns {Object} - React component
  */
-export default function ScrollView
-  ({
-    className,
-    classNameInner,
-    style,
-    styleInner,
-    row,
-    fill,
-    reverse,
-    rtl,
-    center,
-    // Remove tab to prevent Error
+function ScrollView ({
+  className,
+  classNameInner,
+  style,
+  styleInner,
+  row,
+  fill,
+  reverse,
+  rtl,
+  center,
+  // Remove tab to prevent Error
     tab, // eslint-disable-line
     ...props
   }) {
@@ -65,3 +64,5 @@ ScrollView.propTypes = {
   styleInner: PropTypes.object,
   children: PropTypes.any.isRequired
 }
+
+export default React.memo(ScrollView)

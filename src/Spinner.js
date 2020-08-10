@@ -12,13 +12,12 @@ import View from './View'
  * @param {*} props - other attributes to pass to spinner
  * @returns {object} - React Component
  */
-export default function Spinner
-  ({
-     size = 'base',  // Enum
-     color = 'primary',  // Enum
-     className,
-     ...props
-   }) {
+function Spinner ({
+  size = 'base',  // Enum
+  color = 'primary',  // Enum
+  className,
+  ...props
+}) {
   return <View className={classNames('app__spinner', size, color, className)} {...props} />
 }
 
@@ -27,3 +26,5 @@ Spinner.propTypes = {
   color: PropTypes.oneOf(['primary', 'secondary', 'text', 'inverse', 'white', 'black']),
   className: PropTypes.string
 }
+
+export default React.memo(Spinner)

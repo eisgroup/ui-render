@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { hasListValue, isEmpty, isEqual, ONE_DAY, removeNilValues } from 'utils-pack'
 import { fromTimeRanges, toTimeRange } from 'utils-pack/time'
 import Button from '../Button'
@@ -16,7 +16,7 @@ import { date, hourMinute } from './normalizers'
  * Dynamic list of Date with From and To time fields
  * -----------------------------------------------------------------------------
  */
-export default class Dates extends Component {
+export default class Dates extends PureComponent {
   static propTypes = {
     value: PropTypes.arrayOf(PropTypes.shape({ // TimeRangeInput
       from: PropTypes.number,

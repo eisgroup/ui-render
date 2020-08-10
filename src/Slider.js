@@ -28,18 +28,17 @@ import Tooltip from './Tooltip'
  * @param {Object} [props] - other props to pass
  * @return {Object} - React Component
  */
-export default function Slider
-  ({
-    className,
-    range,
-    rangeLabels,
-    rangeOptions,
-    step,
-    tooltipProps,
-    unit,
-    render,
-    readonly,
-    ...props
+function Slider ({
+  className,
+  range,
+  rangeLabels,
+  rangeOptions,
+  step,
+  tooltipProps,
+  unit,
+  render,
+  readonly,
+  ...props
   }) {
   const classNameFinal = classNames('app__slider', className, {readonly})
   const SliderComponent = (typeof props.value === 'object') ? Range : RCSlider
@@ -127,8 +126,10 @@ function sliderIntervals (range, { formatLabel, isTime, isCurrency, currency, is
 
   // Add Defined Mark Steps
   range.forEach(value => {
-    intervalSteps[value] = { style: { whiteSpace: 'nowrap' }, label: formatLabel(value) }
+    intervalSteps[value] = {style: {whiteSpace: 'nowrap'}, label: formatLabel(value)}
   })
 
   return intervalSteps
 }
+
+export default React.memo(Slider)

@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React from 'react'
 import { Active } from 'utils-pack'
 import { accessibilitySupport } from './utils'
 
@@ -14,15 +14,14 @@ import { accessibilitySupport } from './utils'
  * @param {*} props - other attributes to pass to Icon
  * @returns {Object} - React Component
  */
-export default function Icon
-({
-   name,
-   className,
-   large,
-   small,
-   sound,
-   ...props
- }) {
+function Icon ({
+  name,
+  className,
+  large,
+  small,
+  sound,
+  ...props
+}) {
   props = accessibilitySupport(props, sound)
   return (
     <i className={classNames(Active.iconClass, Active.iconClassPrefix + name, className, {
@@ -42,8 +41,4 @@ Icon.propTypes = {
   className: PropTypes.string,
 }
 
-Icon.Class = class extends Component {
-  render () {
-    return <Icon {...this.props} />
-  }
-}
+export default React.memo(Icon)

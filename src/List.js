@@ -6,7 +6,7 @@ import View from './View'
 /**
  * Dynamic List of Views/Rows - Pure Component.
  */
-export default function List ({renderItem, items, row, ...props}) {
+function List ({renderItem, items, row, ...props}) {
   const Container = row ? Row : View
   return (
     <Container {...props}>
@@ -20,3 +20,5 @@ List.propTypes = {
   renderItem: PropTypes.func.isRequired,
   row: PropTypes.bool,
 }
+
+export default React.memo(List)

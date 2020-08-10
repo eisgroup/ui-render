@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { isFunction } from 'utils-pack'
 import Icon from './Icon'
 import ScrollView from './ScrollView'
@@ -12,7 +12,7 @@ import View from './View'
  * Tabs - Self Contained Container.
  */
 @withTimer
-export default class Tabs extends Component {
+export default class Tabs extends PureComponent {
   static propTypes = {
     items: PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.string,

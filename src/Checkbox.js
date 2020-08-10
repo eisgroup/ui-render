@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component, Fragment } from 'react'
+import React, { Fragment } from 'react'
 import Label from './Label'
 import Row from './Row'
 import View from './View'
@@ -27,18 +27,17 @@ import View from './View'
  * @return {*}
  * @constructor
  */
-export default function Checkbox
-  ({
-    value,
-    valueTrue = true,
-    valueFalse = false,
-    defaultValue = false,
-    onChange,
-    type = 'checkbox',
-    label,
-    labelTrue,
-    labelFalse,
-    id,
+function Checkbox ({
+  value,
+  valueTrue = true,
+  valueFalse = false,
+  defaultValue = false,
+  onChange,
+  type = 'checkbox',
+  label,
+  labelTrue,
+  labelFalse,
+  id,
     readonly,
     danger,
     className,
@@ -90,8 +89,4 @@ Checkbox.propTypes = {
   className: PropTypes.string,
 }
 
-Checkbox.Class = class extends Component {
-  render () {
-    return <Checkbox {...this.props} />
-  }
-}
+export default React.memo(Checkbox)

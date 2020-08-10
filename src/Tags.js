@@ -7,12 +7,11 @@ import Text from './Text'
 import View from './View'
 
 // List of Tags
-export default function Tags
-  ({
-    items,
-    defByCode, // example: DEFINITION_BY_VAL.LANGUAGE
-    label,
-  }) {
+function Tags ({
+  items,
+  defByCode, // example: DEFINITION_BY_VAL.LANGUAGE
+  label,
+}) {
   if (isEmpty(items)) return null
   const Wrap = label ? View : Row
   return (
@@ -34,3 +33,5 @@ Tags.propTypes = {
   defByCode: PropTypes.object.isRequired,
   label: PropTypes.string,
 }
+
+export default React.memo(Tags)

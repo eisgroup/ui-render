@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { Component } from 'react'
+import React from 'react'
 import { accessibilitySupport } from './utils'
 
 /**
@@ -16,8 +16,7 @@ import { accessibilitySupport } from './utils'
  * @param {*} props - other attributes to pass to `<div></div>`
  * @returns {Object} - React Component
  */
-export default function Row
-({
+function Row ({
   className,
   fill,
   reverse,
@@ -32,8 +31,4 @@ export default function Row
   )
 }
 
-Row.Class = class extends Component {
-  render () {
-    return <Row {...this.props} />
-  }
-}
+export default React.memo(Row)

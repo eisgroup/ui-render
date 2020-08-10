@@ -5,8 +5,7 @@ import { round } from 'utils-pack'
  * Emoji - Pure Component to center emoji
  * @see: https://stackoverflow.com/questions/44142464/how-do-i-horizontally-center-an-emoji
  */
-export default function Emoji
-  ({small, large, ...props}) {
+function Emoji ({small, large, ...props}) {
   let size = 4
   if (small) size *= 0.75
   if (large) size *= 2
@@ -20,3 +19,5 @@ export default function Emoji
     }}/>
   )
 }
+
+export default React.memo(Emoji)

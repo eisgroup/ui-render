@@ -5,6 +5,8 @@ import View from './View'
 /**
  * Space - Pure Component
  */
-export default function Space ({small, large, className, ...props}) {
+function Space ({small, large, className, ...props}) {
   return <View className={classNames('space' + (small ? '-small' : (large ? '-large' : '')), className)} {...props}/>
 }
+
+export default React.memo(Space)

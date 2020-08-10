@@ -8,7 +8,7 @@ import View from './View'
 /**
  * Placeholder - Pure Component.
  */
-export default function Placeholder ({className, ...props}) {
+function Placeholder ({className, ...props}) {
   return <View
     fill
     className={classNames('bg-texture-faded full-screen middle center fade-in-up padding-largest', className)}
@@ -38,3 +38,5 @@ Placeholder.Searching = function ({title, ...props}) {
 Placeholder.Searching.propTypes = {
   title: PropTypes.any.isRequired
 }
+
+export default React.memo(Placeholder)

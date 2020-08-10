@@ -8,16 +8,15 @@ import View from './View'
 
 const ResponsiveEllipsis = responsiveHOC()(LinesEllipsis)
 
-export default function ReadMore
-  ({
-    children,
-    lines,
-    more,
-    less,
-    rtl,
-    className,
-    style,
-  }) {
+function ReadMore ({
+  children,
+  lines,
+  more,
+  less,
+  rtl,
+  className,
+  style,
+}) {
   const [expanded, toggleExpansion] = useState(false)
   return (
     <View className={classNames('app__read-more', className)} style={style}>
@@ -55,3 +54,4 @@ ReadMore.propTypes = {
   style: PropTypes.string,
 }
 
+export default React.memo(ReadMore)

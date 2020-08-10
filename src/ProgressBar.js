@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { TIME_DURATION_INSTANT } from 'utils-pack'
 import { SOUND } from './files'
 import { STYLE } from './styles'
@@ -19,7 +19,7 @@ import View from './View'
  * @returns {Object} - React Component
  */
 @withTimer
-export default class ProgressBar extends Component {
+export default class ProgressBar extends PureComponent {
   static propTypes = {
     value: PropTypes.number.isRequired, // fraction from 0 to 1
     label: PropTypes.any, // content to render inside the filled bar

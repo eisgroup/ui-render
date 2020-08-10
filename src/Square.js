@@ -11,7 +11,7 @@ import View from './View'
  * @Note: alternatively use @asSquare decorator, which works cross platform, but may not resize when screen shrinks
  * @Use: <Square.View> or <Square.Row>
  */
-export default function Square ({
+function Square ({
   top, right, bottom, left,
   children, className, classNameInner, styleInner,
   width = 1, height = 1, // ratio used to render rectangle (must be whole integer), default is square
@@ -98,3 +98,5 @@ export function asSquare (Component) {
 function position ({top, right, bottom, left}) {
   return {middle: !bottom && !top, center: !left && !right, top, right, bottom, left}
 }
+
+export default React.memo(Square)

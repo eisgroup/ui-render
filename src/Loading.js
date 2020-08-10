@@ -17,16 +17,15 @@ import View from './View'
  * @param {*} props - other attributes to pass to spinner
  * @returns {object} - React Component
  */
-export default function Loading
-  ({
-     isLoading = true,
-     size = 'larger',  // Enum
-     className,
-     iconClassName,
-     transparent = false,
-     children,
-     ...props
-   }) {
+function Loading ({
+  isLoading = true,
+  size = 'larger',  // Enum
+  className,
+  iconClassName,
+  transparent = false,
+  children,
+  ...props
+}) {
   return (isLoading &&
     <View className={classNames('app__loading', className, {transparent})}>
       <Spinner className={iconClassName} size={size} {...props} />
@@ -41,3 +40,5 @@ Loading.propTypes = {
   className: PropTypes.string,
   iconClassName: PropTypes.string
 }
+
+export default React.memo(Loading)

@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { isFunction } from 'utils-pack'
 import AnimateHeight from './AnimateHeight'
 import Icon from './Icon'
@@ -13,7 +13,7 @@ import View from './View'
  * Expandable Row - Pure Component.
  */
 @withTimer
-export default class Expand extends Component {
+export default class Expand extends PureComponent {
   static propTypes = {
     title: PropTypes.any, // string or component to always show
     children: PropTypes.oneOfType([

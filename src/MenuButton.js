@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React from 'react'
 import Button from './Button'
 import { SOUND } from './files'
 
@@ -12,12 +12,11 @@ import { SOUND } from './files'
  * @param {*} [props] - other props
  * @returns {Object} - React button component
  */
-export default function MenuButton
-  ({
-     active,
-     className,
-     ...props
-   }) {
+function MenuButton ({
+  active,
+  className,
+  ...props
+}) {
   return (
     <Button
       className={classNames('app__menu__button transparent', {active}, className)}
@@ -37,8 +36,4 @@ MenuButton.propTypes = {
   className: PropTypes.string,
 }
 
-MenuButton.Class = class extends Component {
-  render () {
-    return <MenuButton {...this.props} />
-  }
-}
+export default React.memo(MenuButton)

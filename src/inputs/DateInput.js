@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { cleanList, FORMAT_DATE, isEqual } from 'utils-pack'
 import { formatTime, timestampFromDate } from 'utils-pack/time'
 import Input from '../Input'
@@ -11,7 +11,7 @@ import { dateMonthYear } from './validationRules'
  * Date Input that takes Timestamp as value, and formats it as date string for humans (ex. dd.mm.yyyy)
  * -----------------------------------------------------------------------------
  */
-export default class DateInput extends Component {
+export default class DateInput extends PureComponent {
   static propTypes = {
     value: PropTypes.number, // Timestamp
     onChange: PropTypes.func, // callback when input changes

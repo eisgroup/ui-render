@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { ONE_SECOND, TIME_DURATION_INSTANT } from 'utils-pack'
 import { renderFloat } from './renders'
 import { withTimer } from './utils'
@@ -8,7 +8,7 @@ import { withTimer } from './utils'
  * Animated Number Counter using Localised Render Float function
  */
 @withTimer
-export default class Counter extends Component {
+export default class Counter extends PureComponent {
   static propTypes = {
     start: PropTypes.number, // default is 0
     end: PropTypes.number.isRequired,

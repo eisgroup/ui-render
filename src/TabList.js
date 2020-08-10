@@ -5,11 +5,11 @@ import Tabs from './Tabs'
 /**
  * Dynamic List of Tabs - Pure Component.
  */
-export default function TabList ({renderLabel, renderItem, items, ...props}) {
+function TabList ({renderLabel, renderItem, items, ...props}) {
   return <Tabs
     {...props}
     items={items.map((item, i) => renderLabel(item, i))}
-    panels={items.map((item, i) => renderItem(item, i))}
+    panels={items.map((item, i) => () => renderItem(item, i))}
   />
 }
 
@@ -18,3 +18,5 @@ TabList.propTypes = {
   renderLabel: PropTypes.func.isRequired,
   renderItem: PropTypes.func.isRequired,
 }
+
+export default React.memo(TabList)

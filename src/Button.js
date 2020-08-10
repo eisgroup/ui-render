@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React from 'react'
 import Loading from './Loading'
 import { onPressHoc } from './utils'
 
@@ -19,18 +19,17 @@ import { onPressHoc } from './utils'
  * @param {*} [props] - other attributes to pass
  * @returns {Object} - React component
  */
-export default function Button
-  ({
-    onClick,
-    disabled = false,
-    loading = false,
-    circle,
-    children,
-    size,
-    type = 'button',
-    sound,
-    className,
-    ...props
+function Button ({
+  onClick,
+  disabled = false,
+  loading = false,
+  circle,
+  children,
+  size,
+  type = 'button',
+  sound,
+  className,
+  ...props
   }) {
 
   return (
@@ -53,8 +52,4 @@ Button.propTypes = {
   children: PropTypes.any
 }
 
-Button.Class = class extends Component {
-  render () {
-    return <Button {...this.props} />
-  }
-}
+export default React.memo(Button)

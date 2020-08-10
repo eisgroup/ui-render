@@ -19,16 +19,17 @@ import { STYLE } from './styles'
  * @param {*} [props] - Other attributes to pass to the container
  * @returns {Object} - React element
  */
-export default function AnimateHeight
-  ({
-    expanded,
-    duration = STYLE.ANIMATION_DURATION,
-    className,
-    ...props
-  }) {
+function AnimateHeight ({
+  expanded,
+  duration = STYLE.ANIMATION_DURATION,
+  className,
+  ...props
+}) {
   return <ReactAnimateHeight
     className={classNames('position-relative', className)}
     duration={duration} height={expanded ? 'auto' : 0}
     {...props}
   />
 }
+
+export default React.memo(AnimateHeight)

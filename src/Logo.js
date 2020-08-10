@@ -10,14 +10,13 @@ import View from './View'
  * @param {string} link - relative or absolute URL link. Will default to root of app
  * @returns {Object} - React element
  */
-export default function Logo
-({
-   name,
-   link = '/'
- }) {
+function Logo ({
+  name,
+  link = '/'
+}) {
   return (
     <View className='app__logo align-center' href={link}>
-      <Icon name='logo' /> {name}
+      <Icon name='logo'/> {name}
     </View>
   )
 }
@@ -26,3 +25,5 @@ Logo.propTypes = {
   name: PropTypes.string,
   link: PropTypes.string
 }
+
+export default React.memo(Logo)

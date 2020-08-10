@@ -11,7 +11,7 @@ import View from './View'
 /**
  * Stats with Percentage Difference and Optional Content Underneath
  */
-export default function StatsChange ({start, end, children, className, render = shortNumber, ...props}) {
+function StatsChange ({start, end, children, className, render = shortNumber, ...props}) {
   const percentChange = toPercentage(end, start)
   return (
     <View className={classNames('app__stats-change', className)} {...props}>
@@ -38,3 +38,5 @@ StatsChange.propTypes = {
 function percentChangeRenderer (number) {
   return Math.floor(Math.abs(number))
 }
+
+export default React.memo(StatsChange)

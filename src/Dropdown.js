@@ -40,28 +40,27 @@ import View from './View'
  * @param {*} [props] - other attributes to pass to `<select>`
  * @returns {Object}
  */
-export default function Dropdown
-  ({
-    options,
-    onChange,
-    onSelect,
-    onSearch,
-    label,
-    placeholder = _.SELECT,
-    done,
-    error,
-    info,
-    float,
-    className,
-    style,
-    fill = true,
-    lazyLoad = true,
-    optionsLabel,
-    initialValues, // not used, removing from DOM
-    readonly,
-    autofocus,
-    ...props
-  }) {
+function Dropdown ({
+  options,
+  onChange,
+  onSelect,
+  onSearch,
+  label,
+  placeholder = _.SELECT,
+  done,
+  error,
+  info,
+  float,
+  className,
+  style,
+  fill = true,
+  lazyLoad = true,
+  optionsLabel,
+  initialValues, // not used, removing from DOM
+  readonly,
+  autofocus,
+  ...props
+}) {
   // if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability
   if (readonly) props.disabled = true // Semantic Dropdown does not accept `readOnly` prop
   if (onChange || onSelect) props.onChange = (event, data) => {
@@ -143,3 +142,5 @@ Dropdown.propTypes = {
 }
 
 let tempValue
+
+export default React.memo(Dropdown)

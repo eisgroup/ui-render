@@ -4,7 +4,9 @@ import React from 'react'
 /**
  * Tooltip - Pure Component
  */
-export default function Tooltip ({ top, bottom, right, left, show, className, ...props }) {
+function Tooltip ({top, bottom, right, left, show, className, ...props}) {
   return <span
-    className={classNames('tooltip no-wrap', { top, bottom, right, left, show }, className)} {...props} />
+    className={classNames('tooltip no-wrap', {top, bottom, right, left, show}, className)} {...props} />
 }
+
+export default React.memo(Tooltip)

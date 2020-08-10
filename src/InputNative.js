@@ -16,17 +16,16 @@ import { onPressHoc } from './utils'
  * @param {*} props - attributes to pass to `<input />`
  * @returns {Object} - React Component
  */
-export default function InputNative
-  ({
-     onChange = (val) => console.log('Input onChange', typeof val, val),
-     normalize,
-     disabledSpellCheck,
-     resize,
-     sound = SOUND.TOUCH,
-     ...props
-   }) {
+function InputNative ({
+  onChange = (val) => console.log('Input onChange', typeof val, val),
+  normalize,
+  disabledSpellCheck,
+  resize,
+  sound = SOUND.TOUCH,
+  ...props
+}) {
   delete props.initialValues
-  if (disabledSpellCheck) props = { ...noSpellCheck, ...props }
+  if (disabledSpellCheck) props = {...noSpellCheck, ...props}
   if (resize) {
     props.type = 'textarea' // only textarea can resize
     // Must use onKeyUp because onKeyDown/onKeyPress does not register `Enter` or fire too many times
@@ -58,3 +57,5 @@ function onKeyUp (callBack, e) {
   const textHeightFunc = e.key === 'Enter' ? toTextHeightFunc : toTextHeight // adjust height instantly for Enter
   callBack ? (textHeightFunc(e) || callBack(e)) : textHeightFunc(e)
 }
+
+export default React.memo(InputNative)
