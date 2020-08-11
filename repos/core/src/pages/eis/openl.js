@@ -13,6 +13,7 @@ import { withUISetup } from './rules'
  * VIEW TEMPLATE ---------------------------------------------------------------
  * -----------------------------------------------------------------------------
  */
+// todo: refactor to PureComponent
 @withUISetup({form: 'HOME', initialValues: data})
 @logRender
 export default class OpenL extends Component {

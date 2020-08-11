@@ -1,0 +1,10 @@
+{
+  "view": "Dropdown",
+  "name": "coverage",
+  "options": "coverages",
+  "mapOptions": "coverageID",
+  "placeholder": "Select Coverage",
+  "style": {
+    "minHeight": 120
+  }
+}
