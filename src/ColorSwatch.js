@@ -6,7 +6,7 @@ import Text from './Text'
 /**
  * Color Swatch - Pure Component.
  */
-export default function ColorSwatch ({
+function ColorSwatch ({
   code,
   small,
   large,

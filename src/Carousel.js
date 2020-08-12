@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { isFunction } from 'utils-pack'
 import { formatDuration, } from 'utils-pack/time'
 import Icon from './Icon'
@@ -17,7 +17,7 @@ import View from './View'
  * Carousel - Self Contained Container.
  */
 @withTimer
-export default class Carousel extends Component {
+export default class Carousel extends PureComponent {
   static propTypes = {
     items: PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.shape({
