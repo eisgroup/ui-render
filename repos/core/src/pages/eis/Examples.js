@@ -15,6 +15,7 @@ import expandListMeta from './examples/expand-list_meta.json'
 import invalidArrayData from './examples/invalid-array_data.json'
 import invalidArrayMeta from './examples/invalid-array_meta.json'
 import listMeta from './examples/list_meta.json'
+import piechartMeta from './examples/piechart_meta.json'
 import tabListMeta from './examples/tab-list_meta.json'
 import tableNestedMeta from './examples/table-nested_meta.json'
 import Render from './Render'
@@ -55,6 +56,11 @@ const examples = [
     title: 'Invalid Array Data',
     data: invalidArrayData,
     meta: invalidArrayMeta,
+  },
+  {
+    title: 'Pie Chart',
+    data,
+    meta: piechartMeta,
   },
   {
     title: 'All Possible Configurations',

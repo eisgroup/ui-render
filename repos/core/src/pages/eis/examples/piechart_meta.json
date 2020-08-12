@@ -1,0 +1,27 @@
+{
+  "view": "PieChart",
+  "name": "planCalculations.0.manualClaimDetail.ageBreakdown",
+  "legends": true,
+  "mapItems": {
+    "label": "ageBand",
+    "value": "numberOfLives",
+    "order": "ageBand"
+  },
+  "sort": "-order",
+  "items": [
+    {
+      "view": "Col",
+      "className": "align-center",
+      "items": [
+        {
+          "view": "Title",
+          "label": "Label"
+        },
+        {
+          "view": "Text",
+          "label": "Anything"
+        }
+      ]
+    }
+  ]
+}
