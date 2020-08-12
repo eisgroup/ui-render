@@ -1,5 +1,12 @@
 @import "_mixins";
 
+.app-docs {
+  .li, li,
+  p, .p {
+    &:extend(.max-width all);
+  }
+}
+
 label {
   &:extend(.uppercase all);
 
