@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Component, Fragment } from 'react'
+import React, { Fragment, PureComponent } from 'react'
 import Text from 'react-ui-pack/Text'
 import { isList } from 'utils-pack'
 import Fields from './Fields'
@@ -8,7 +8,7 @@ import { SliderLabeled } from './renderers'
 /**
  * Slider Fields with Levels, with dropdown search input to add and remove fields (ex. Languages)
  */
-export default class FieldsWithLevel extends Component {
+export default class FieldsWithLevel extends PureComponent {
   static propTypes = {
     kind: PropTypes.string.isRequired, // type of definition to use - TYPE.key enum ['lang', 'phone', etc.]
     level: PropTypes.object.isRequired, // Definition of Level by code (ex. DEFINITION_BY_VAL.LANGUAGE_LEVEL)

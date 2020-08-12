@@ -1,6 +1,6 @@
 import { Link } from 'modules-pack/router'
 import { ROUTE } from 'modules-pack/variables'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import Button from 'react-ui-pack/Button'
 import Row from 'react-ui-pack/Row'
 import Text from 'react-ui-pack/Text'
@@ -11,7 +11,7 @@ import { tracking } from '../utils'
  * VIEW TEMPLATE ---------------------------------------------------------------
  * -----------------------------------------------------------------------------
  */
-export default class AcceptCookie extends Component {
+export default class AcceptCookie extends PureComponent {
   state = {
     isOpen: tracking.showCookiePolicy
   }

@@ -3,7 +3,7 @@ import { NAME as POPUP, POPUP_ALERT, POPUP_CONFIRM } from 'modules-pack/popup/co
 import { connect, stateAction } from 'modules-pack/redux'
 import { ROUTE_HOME } from 'modules-pack/variables'
 import PropTypes from 'prop-types'
-import React, { Component, Fragment } from 'react'
+import React, { Fragment, PureComponent } from 'react'
 import Icon from 'react-ui-pack/Icon'
 import Row from 'react-ui-pack/Row'
 import Text from 'react-ui-pack/Text'
@@ -54,7 +54,7 @@ const mapDispatchToProps = (dispatch) => ({
  * -----------------------------------------------------------------------------
  */
 @connect(null, mapDispatchToProps)
-export default class UploadGrid extends Component {
+export default class UploadGrid extends PureComponent {
   static propTypes = {
     id: PropTypes.string, // Upload file type, falls back to Route pathname, and default is 'images'
     value: PropTypes.arrayOf(PropTypes.shape({ // list of Dropzone file objects

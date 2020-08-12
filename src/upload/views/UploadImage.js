@@ -1,6 +1,6 @@
 import { connect } from 'modules-pack/redux'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import Image from 'react-ui-pack/Image'
 import { isEqual, toList } from 'utils-pack'
 import select from '../selectors'
@@ -19,7 +19,7 @@ const mapStateToProps = (state) => ({
  * -----------------------------------------------------------------------------
  */
 @connect(mapStateToProps)
-export default class UploadImage extends Component {
+export default class UploadImage extends PureComponent {
   static propTypes = {
     id: PropTypes.string, // Upload file type, default is 'images'
     hasPreview: PropTypes.bool, // whether to show first uploaded image preview, default is true

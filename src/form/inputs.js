@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import Checkbox from 'react-ui-pack/Checkbox'
 import DropDown from 'react-ui-pack/Dropdown'
 import Input from 'react-ui-pack/Input'
@@ -16,7 +16,7 @@ import { isFunction, isList, isNumber } from 'utils-pack'
  * =============================================================================
  */
 
-export class DateField extends Component {
+export class DateField extends PureComponent {
   input = ({input, meta: {touched, error} = {}}) => {
     if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, normalize, error: errorMessage, validate: _, ...props} = this.props
@@ -43,7 +43,7 @@ export class DateField extends Component {
   }
 }
 
-export class DatesField extends Component {
+export class DatesField extends PureComponent {
   input = ({input, meta: {touched, error} = {}}) => {
     if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, normalize, error: errorMessage, ...props} = this.props
@@ -69,7 +69,7 @@ export class DatesField extends Component {
   }
 }
 
-export class DropdownField extends Component {
+export class DropdownField extends PureComponent {
   input = ({input, meta: {touched, error} = {}}) => {
     if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, normalize, error: errorMessage, validate: _, ...props} = this.props
@@ -94,7 +94,7 @@ export class DropdownField extends Component {
   }
 }
 
-export class InputField extends Component {
+export class InputField extends PureComponent {
   static propTypes = {
     name: PropTypes.string.isRequired,
     label: PropTypes.string,
@@ -152,7 +152,7 @@ export class InputField extends Component {
 /**
  * Generic Slider that can be rendered horizontally or vertically, with label or tooltip
  */
-export class SliderField extends Component {
+export class SliderField extends PureComponent {
   input = ({input}) => {
     if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, defaultValue, denormalize, normalize, ...props} = this.props
@@ -189,7 +189,7 @@ export class SliderField extends Component {
   }
 }
 
-export class ToggleField extends Component {
+export class ToggleField extends PureComponent {
   static propTypes = {
     name: PropTypes.string.isRequired,
     label: PropTypes.string,

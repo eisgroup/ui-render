@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { DEFINITION, TYPE_BY } from 'modules-pack/variables/definitions'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import Dropdown from 'react-ui-pack/Dropdown'
 import View from 'react-ui-pack/View'
 import { Field } from 'redux-form'
@@ -11,7 +11,7 @@ import { InputField } from '../inputs'
 /**
  * List of Predefined Form Fields with dropdown search input to add and remove them (ex. Languages)
  */
-export default class Fields extends Component {
+export default class Fields extends PureComponent {
   static propTypes = {
     kind: PropTypes.string.isRequired, // TYPE key (ex. TYPE.PHONE._)
     options: PropTypes.arrayOf(PropTypes.shape({ // Dropdown options (ex. OPTIONS.PHONE.items)

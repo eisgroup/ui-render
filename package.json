@@ -1,6 +1,6 @@
 {
   "name": "modules-pack",
-  "version": "0.2.13",
+  "version": "0.3.0",
   "description": "JavaScript Modules for Modern Frontend & Backend Projects",
   "license": "MIT",
   "main": "index.js",
@@ -28,7 +28,7 @@
   },
   "peerDependencies": {
     "react": "16.x",
-    "react-ui-pack": "0.2.x",
+    "react-ui-pack": "0.4.x",
     "utils-pack": "0.2.x"
   },
   "dependencies": {

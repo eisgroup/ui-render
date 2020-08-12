@@ -1,10 +1,10 @@
 import UploadGrid from 'modules-pack/upload/views/UploadGrid'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { isRequired } from 'react-ui-pack/inputs/validationRules'
 import { Field } from 'redux-form'
 import { isFunction } from 'utils-pack'
 
-export default class UploadGridField extends Component {
+export default class UploadGridField extends PureComponent {
   input = ({input}) => {
     if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, ...props} = this.props

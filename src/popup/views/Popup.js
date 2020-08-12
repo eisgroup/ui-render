@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { Component, Fragment } from 'react'
+import React, { Fragment, PureComponent } from 'react'
 import Button from 'react-ui-pack/Button'
 import ErrorContent from 'react-ui-pack/ErrorContent'
 import Row from 'react-ui-pack/Row'
@@ -34,7 +34,7 @@ const mapDispatchToProps = (dispatch) => ({
  */
 @connect(mapStateToProps, mapDispatchToProps)
 @logRender
-export default class Popup extends Component {
+export default class Popup extends PureComponent {
   render () {
     const {
       activePopups,

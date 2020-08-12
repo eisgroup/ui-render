@@ -1,6 +1,6 @@
 import { NAME as POPUP } from 'modules-pack/popup'
 import { connect, stateAction } from 'modules-pack/redux'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import Place from 'react-ui-pack/inputs/Place'
 import { isRequired } from 'react-ui-pack/inputs/validationRules'
 import { Field } from 'redux-form'
@@ -33,7 +33,7 @@ const mapDispatchToProps = (dispatch) => ({
 //   }
 // })
 const PlaceContainer = connect(null, mapDispatchToProps)(Place)
-export default class PlaceField extends Component {
+export default class PlaceField extends PureComponent {
   input = ({input, meta: {touched, error} = {}}) => {
     if (this.props.readonly && isRequired(input.value)) return null
     const {onChange, error: errorMessage, ...props} = this.props

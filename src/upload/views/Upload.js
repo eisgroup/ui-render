@@ -4,7 +4,7 @@ import { connect, stateAction } from 'modules-pack/redux'
 import { history, openModal } from 'modules-pack/router'
 import { ROUTE_HOME, UPLOAD as U } from 'modules-pack/variables'
 import PropTypes from 'prop-types'
-import React, { Component, Fragment } from 'react'
+import React, { Fragment, PureComponent } from 'react'
 import Dropzone from 'react-dropzone'
 import { withTimer } from 'react-ui-pack'
 import Icon from 'react-ui-pack/Icon'
@@ -43,7 +43,7 @@ const mapDispatchToProps = (dispatch) => ({
  */
 @connect(mapStateToProps, mapDispatchToProps)
 @withTimer
-export default class Upload extends Component {
+export default class Upload extends PureComponent {
   static propTypes = {
     // If 'id' given, will render as embedded component, instead of Modal route
     id: PropTypes.oneOfType([

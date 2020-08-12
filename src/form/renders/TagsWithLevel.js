@@ -14,18 +14,17 @@ import { SliderLabeled } from '../renders'
  * @example:
  *    <TagsWithLevel {...FIELD.DEF[FIELD.ID.LANGUAGE]} items={items}/>
  */
-export default function TagsWithLevel
-  ({
-    kind,
-    level,
-    items,
-    min,
-    max,
-    unit,
-    className,
-    style,
-    ...props
-  }) {
+function TagsWithLevel ({
+  kind,
+  level,
+  items,
+  min,
+  max,
+  unit,
+  className,
+  style,
+  ...props
+}) {
   const [slider, setDisplay] = useState(null)
   if (!items.length) return
   const definitionByCode = DEFINITION_BY_VAL[kind]
@@ -87,3 +86,5 @@ TagsWithLevel.propTypes = {
   className: PropTypes.string,
   style: PropTypes.object,
 }
+
+export default React.memo(TagsWithLevel)

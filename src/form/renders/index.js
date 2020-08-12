@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { FIELD } from 'modules-pack/variables'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { withGroupInputChange } from 'react-ui-pack'
 import Label from 'react-ui-pack/Label'
 import PlaceholderField from 'react-ui-pack/PlaceholderField'
@@ -26,7 +26,7 @@ export * from './renderers'
  * Semantically Related Fields Rendered in a single row
  */
 @withGroupInputChange
-export class FieldsInGroup extends Component {
+export class FieldsInGroup extends PureComponent {
   static propTypes = {
     hint: PropTypes.string, // label to show at the top before rendering fields,
   }
