@@ -1,9 +1,9 @@
+import now from 'performance-now' // adds almost zero KB to bundle size because browsers have window.performance.now()
 import { createSelector } from 'reselect'
 import { ONE_MILLISECOND } from 'utils-pack/constants'
 import { formatNumber } from 'utils-pack/number'
-import { logSelector } from './log'
-import now from 'performance-now' // adds almost zero KB to bundle size because browsers have window.performance.now()
 import { __CLIENT__, __DEV__, Active } from './_envs'
+import { logSelector } from './log'
 
 /**
  * Selector Decorator to turn all class static property functions into Memoized Functions
@@ -57,6 +57,8 @@ export default function selector (NAME, maxTime = 5 * ONE_MILLISECOND) {
               else {
                 logSelector(`${NAME} ${key} [`, result, Active.log.keyword('red')(time), Active.log.keyword('orange')(']'))
               }
+            } else {
+              logSelector(`${NAME} ${key} [${time}]`, result)
             }
           }
           return result
