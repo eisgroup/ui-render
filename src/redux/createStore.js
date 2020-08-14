@@ -1,7 +1,7 @@
 import { applyMiddleware, combineReducers, compose, createStore as reduxCreateStore } from 'redux'
 import { ignoreActions } from 'redux-ignore'
 import { all } from 'redux-saga/effects'
-import { __DEV__, get, hasListValue, hasObjectValue, HYDRATE, isFunction, RESET, toList } from 'utils-pack'
+import { __DEV__, Active, get, hasListValue, hasObjectValue, HYDRATE, isFunction, RESET, toList } from 'utils-pack'
 import saga from '../saga'
 
 /**
@@ -45,7 +45,7 @@ export default function createStore (modules = [], {ignore} = {}) {
   const allHandlers = (state, action) => {
     if (RESET === action.type) state = undefined  // reset App to initial state
     if (HYDRATE === action.type) return action.payload  // set App to given state
-    return rootReducer(state, action)
+    return Active.state = rootReducer(state, action)
   }
 
   /* Register Store */
