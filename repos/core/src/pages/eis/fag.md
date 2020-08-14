@@ -23,3 +23,10 @@ It is called `className`, instead of `class`, because the UI is written in JavaS
 ## What style is responsible for `$` or `%` display in table cells?
 `renderCell: "Currency"` -> outputs number as currency with $ sign.
 `renderCell: "Percent"` -> outputs number as percent with % sign.
+
+## How to set custom CSS styles?
+The recommended way to style a component is to use the UI Renderer's built in styles, calling them by name as a string, via the `className` attribute.
+Example: `{className: "padding border"}` -> add standard padding and border to a Field.
+
+Custom CSS styling can be set by directly writing CSS in [React way](https://reactjs.org/docs/faq-styling.html) via the `style` attribute.
+Example: `{style: {color: "rgba(255, 255, 255, 0.30)", backgroundColor: "red"}}`
