@@ -36,6 +36,7 @@ export const REPORT = 'REPORT'       		// For broadcasting a resource
 export const PREFETCH = 'PREFETCH'      // For pre-loading resources
 export const PRESET = 'PRESET'					// For preparing a resource
 export const SELECT = 'SELECT'      		// For picking a resource
+export const TOGGLE = 'TOGGLE'      		// For switching between states
 
 /* App Specific Actions */
 
@@ -91,6 +92,7 @@ export const ALL_ACTIONS = [
 	PREFETCH,
 	PRESET,
 	SELECT,
+	TOGGLE,
 ]
 
 export const ALL_RESULTS = [
