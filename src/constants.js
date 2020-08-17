@@ -15,7 +15,6 @@ export const LIST = 'LIST'            	// Retrieving list of data
 
 /* State Only Actions */
 export const SET = 'SET'             		// For saving non-API data in state
-export const PRESET = 'PRESET'
 export const RESET = 'RESET'
 export const REFRESH = 'REFRESH'
 export const HYDRATE = 'HYDRATE'        // For Hydrating Redux Store
@@ -30,10 +29,13 @@ export const CLOSE = 'CLOSE'
 export const SEARCH = 'SEARCH'          // For searching for a resource
 export const SUBMIT = 'SUBMIT'          // For triggering submission of a resource
 export const ADD = 'ADD'             		// For adding a resource
+export const APPLY = 'APPLY'            // For administering a resource
 export const CHANGE = 'CHANGE'          // For changing state
 export const REMOVE = 'REMOVE'          // For removing state
 export const REPORT = 'REPORT'       		// For broadcasting a resource
 export const PREFETCH = 'PREFETCH'      // For pre-loading resources
+export const PRESET = 'PRESET'					// For preparing a resource
+export const SELECT = 'SELECT'      		// For picking a resource
 
 /* App Specific Actions */
 
@@ -68,7 +70,6 @@ export const ALL_ACTIONS = [
 	DELETE,
 	LIST,
 	SET,
-	PRESET,
 	RESET,
 	REFRESH,
 	HYDRATE,
@@ -82,11 +83,14 @@ export const ALL_ACTIONS = [
 	SUBMIT,
 	SEARCH,
 	ADD,
+	APPLY,
 	ALERT,
 	CHANGE,
 	REMOVE,
 	REPORT,
 	PREFETCH,
+	PRESET,
+	SELECT,
 ]
 
 export const ALL_RESULTS = [
