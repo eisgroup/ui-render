@@ -1,8 +1,8 @@
-import { __PROD__, Active, NODE_ENV } from 'core/src/common/variables'
-import meta from 'core/src/pages/eis/data/example_components'
-import data from 'core/src/pages/eis/data/example_data'
+import meta from 'core/src/pages/eis/examples/example_components'
+import data from 'core/src/pages/eis/examples/example_data'
 import cors from 'cors'
 import express from 'express'
+import { __PROD__, Active, NODE_ENV } from 'utils-pack'
 import { API_PORT } from './common/config'
 
 /**

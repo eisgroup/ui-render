@@ -1,3 +1,4 @@
+console.log('babel.config loaded!!!')
 module.exports = (api) => {
   // if (process.env.NODE_ENV !== 'test') console.log('⚡ babel.config.js loaded!')
 
@@ -45,7 +46,8 @@ module.exports = (api) => {
       ],
       '@babel/preset-react'
     ],
-    ignore: [/node_modules/], // required to transform packages outside of current working directory for each package
+    // required to transform packages outside of current working directory for each package
+    ignore: [/node_modules\/(?!utils-pack|react-ui-pack|modules-pack)/],
     babelrcRoots: [
       // Keep the root as a root
       '.',

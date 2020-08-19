@@ -1,8 +1,8 @@
-import coreModules from 'core/src/common'
-import createStore from 'core/src/common/redux/createStore'
-import { Active } from 'core/src/common/variables'
-import serverModules from 'modules-pack'
+import coreModules from 'modules-pack/common'
+import { createStore } from 'modules-pack/redux'
+import { Active } from 'utils-pack'
 import commonModules from './common'
+import serverModules from './modules'
 
 // =============================================================================
 // STORE CREATION

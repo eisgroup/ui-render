@@ -23,6 +23,7 @@
  *
  * Minification: - does not work, including with UglifyJsPlugin
  */
+console.log('webpack.config loaded!!!!!!!!!')
 module.exports = {
   mode: 'production',
   target: 'node',  // ignore built-in modules like path, fs, etc.
@@ -38,12 +39,14 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        exclude: /node_modules/, // do not match js files inside node-modules in this directory
+        // do not match js files inside node-modules in this directory
+        exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
           options: {
             rootMode: 'upward',
-            ignore: [/node_modules/], // do not use babel-loader on files inside upward node-modules
+            // do not use babel-loader on files inside upward node-modules
+            ignore: [/node_modules\/(?!utils-pack|react-ui-pack|modules-pack)/],
           }
         }
       }

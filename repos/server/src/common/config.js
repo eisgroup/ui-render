@@ -1,5 +1,5 @@
-import { __BACKEND__, __PROD__, __TEST__ } from 'core/src/common/variables'
 import dotenv from 'dotenv'
+import { __BACKEND__, __PROD__, __TEST__ } from 'utils-pack'
 
 /**
  * BACKEND SERVER CONFIG =======================================================
