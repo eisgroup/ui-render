@@ -8,10 +8,10 @@ Similar to most frameworks, the UI Renderer provides `built-in UI components`, s
 
 But instead of being limited to what built-in components can do, you are given complete freedom to mix and match different attributes within each UI component - or `Render Field`, as we call it.
 
-There are `conceptual patterns` you can apply to any component. This is the secret sauce that enables the UI Renderer to be both declarative and dynamic in nature, allowing `unlimited configuration`.
+There are `transform patterns` you can apply to any component. This is the secret sauce that enables the UI Renderer to be both declarative and dynamic in nature, allowing `unlimited configuration`.
 
 
-## Conceptual Patterns
+## Transform Patterns
 
 1. **Recursive Field definitions**
     - A Field can be any view or input component, such as Button, Table, Dropdown...
