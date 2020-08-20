@@ -3,4 +3,17 @@
 // =============================================================================
 
 @import "_all";
-@import "_classic.variables";
+@import "_mixins";
+@import "_classic_variables";
+
+// -----------------------------------------------------------------------------
+// CLASSIC STYLE FIXES
+// -----------------------------------------------------------------------------
+
+// Keep circular buttons as circle, without background image
+button {
+  &[type="button"] {
+    height: auto;
+    background-image: inherit;
+  }
+}

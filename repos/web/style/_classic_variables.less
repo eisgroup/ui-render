@@ -1,12 +1,12 @@
 // =============================================================================
 // VARIABLES OVERRIDES
-// Classic has default font-size 12px, and html root font-size at 100%
-// => default font-size is 0.75rem
+// Classic has default html root font-size at 12px
+// => default font-size is 1rem, size-scale is 75%
 // =============================================================================
 
 // Sizes
-@size-scale: 100%;
-@size-base: 0.75rem; // default text size, used to scale all other sizes, like button, etc.
+@size-scale: 75%;
+@size-base: 1rem; // default text size, used to scale all other sizes, like button, etc.
 @size-base-px: px(@size-base);
 @size-base-space: size(round(@size-base-px * 1/4)); // character spacing
 @size-smallest: size(round(11/16 * @size-base-px)); // round to whole pixel, then convert to rem
@@ -67,19 +67,8 @@
 @border-base: @border @color-border;
 @border-base-light: @border @color-border-light;
 @border-base-dark: @border @color-border-dark;
-@radius-base: 0.25rem;
-@radius-small: 0.1875rem;
-@radius-large: 0.4375rem;
-@radius-larger: 0.625rem;
-@radius-largest: 0.8125rem;
-
-
-// -----------------------------------------------------------------------------
-// CLASSIC STYLE FIXES
-// -----------------------------------------------------------------------------
-
-// Keep circular buttons as circle, without background image
-button[type="button"] {
-  height: auto;
-  background-image: inherit;
-}
+@radius-base:           size(4);
+@radius-small:          size(3);
+@radius-large:          size(7);
+@radius-larger:         size(10);
+@radius-largest:        size(13);
