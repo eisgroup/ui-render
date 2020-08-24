@@ -1,4 +1,4 @@
-import { Active, get } from 'utils-pack'
+import { Active, get, warn } from 'utils-pack'
 
 /**
  * FILE VARIABLES ==============================================================
@@ -44,7 +44,12 @@ function soundFile (name) {
   let file
   return {
     play () {
-      if (!file) file = new Audio(FILE.PATH_SOUNDS + name)
+      // IE 11 does not support Audio()
+      if (!file) try {
+        file = new Audio(FILE.PATH_SOUNDS + name)
+      } catch (err) {
+        warn(err)
+      }
       if (Active.SETTINGS.HAS_SOUND && file) file.play().catch(console.error)
     }
   }
