@@ -2,7 +2,7 @@ import React from 'react'
 import { Table as TableS } from 'semantic-ui-react' // adds 4 KB to final js bundle, but has many features
 import View from './View'
 
-function Table ({
+export default function Table ({
   fixedHeader = false,
   ...props
 }) {
@@ -22,5 +22,3 @@ Table.Row = TableS.Row
 Table.Cell = TableS.Cell
 Table.Body = TableS.Body
 Table.Footer = TableS.Footer
-
-export default React.memo(Table)

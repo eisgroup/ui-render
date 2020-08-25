@@ -9,7 +9,7 @@ import { SOUND } from './files'
  * @Usage: to be wrapped using @withGql decorator
  * -----------------------------------------------------------------------------
  */
-class AlertCounter extends PureComponent {
+export default class AlertCounter extends PureComponent {
   static propTypes = {
     alert: PropTypes.number.isRequired,
   }
