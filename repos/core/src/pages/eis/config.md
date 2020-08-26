@@ -171,3 +171,5 @@ const RenderField = {
 
 }
 ```
+
+For a full list of values to use for `view` and formatting functions, check [Field Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/variables/fields.js) and [Form Input Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/form/constants.js).
