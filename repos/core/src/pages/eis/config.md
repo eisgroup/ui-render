@@ -160,6 +160,15 @@ const RenderField = {
       sortKey: 'item.attribute.used.for.sorting' // optional
     },
   ],
+  itemsExpanded: Boolean, // expand all Rows/Columns by default
+  itemClassNames: [ // conditional class names for table items (rows in default layout)
+    { 
+      id: String, // cell id to apply className to
+      values: {
+        'value to match': String // css className to apply
+      },
+    }
+  ],
 
   // Pie Chart attributes
   // @see: <PieChart/> docs for other props
