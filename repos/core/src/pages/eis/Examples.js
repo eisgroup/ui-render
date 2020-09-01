@@ -8,6 +8,7 @@ import { logRender } from 'utils-pack'
 import data from './examples/_data.json'
 import meta from './examples/_meta.json'
 import listData from './examples/array-nested_data.json'
+import decimalMeta from './examples/decimal_meta.json'
 import dropdownMeta from './examples/dropdown_meta.json'
 import exampleData from './examples/example_data.json'
 import exampleMeta from './examples/example_meta.json'
@@ -22,6 +23,11 @@ import Render from './Render'
 import { withUISetup } from './rules'
 
 const examples = [
+  {
+    title: 'Decimal Point Customisation',
+    data: exampleData,
+    meta: decimalMeta,
+  },
   {
     title: 'Dropdown',
     data: exampleData,

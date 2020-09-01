@@ -1,0 +1,44 @@
+{
+  "view": "Column",
+  "styles": "padding",
+  "items": [
+    {
+      "view": "Table",
+      "name": "coverages",
+      "headers": [
+        {
+          "id": "rate",
+          "label": "Percent with 2 decimals",
+          "renderCell": {
+            "name": "Percent",
+            "decimals": 2
+          }
+        }
+      ]
+    },
+    {
+      "view": "Title",
+      "label": {
+        "name": "coverages.0.rate"
+      },
+      "renderLabel": {
+        "name": "Percent",
+        "decimals": 2
+      }
+    },
+    {
+      "view": "Title",
+      "label": "Float with 3 decimals"
+    },
+    {
+      "view": "Title",
+      "label": {
+        "name": "coverages.0.rate"
+      },
+      "renderLabel": {
+        "name": "Float",
+        "decimals": 3
+      }
+    }
+  ]
+}

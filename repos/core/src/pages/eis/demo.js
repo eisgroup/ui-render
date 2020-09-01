@@ -16,7 +16,6 @@ import View from 'react-ui-pack/View'
 import { ALERT, cloneDeep, GET, isEmpty, logRender, performStorage, SET, set } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import Render, { metaToProps } from './Render'
-import metaJson from './response_Meta'
 import { transformConfig } from './rules'
 
 const DEMO_JSON_STORAGE_KEY = 'DEMO_JSON'
@@ -52,8 +51,8 @@ export default class Demo extends Component {
       name: undefined,
     },
     meta: {
-      json: metaJson,
-      name: 'metaJson',
+      json: undefined,
+      name: undefined,
     },
     active: {
       // plan: 1,
