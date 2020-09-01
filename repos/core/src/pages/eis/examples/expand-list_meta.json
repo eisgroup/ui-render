@@ -38,7 +38,7 @@
                     "children": {
                       "name": "rate"
                     },
-                    "renderLabel": "percent"
+                    "renderLabel": "Percent"
                   }
                 ]
               },
@@ -55,7 +55,7 @@
                     "children": {
                       "name": "annualPremium"
                     },
-                    "renderLabel": "currency"
+                    "renderLabel": "Currency"
                   }
                 ]
               }

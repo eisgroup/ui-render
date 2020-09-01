@@ -144,7 +144,7 @@
         {
           "id": "fundingStructure.requiredParticipationPrct",
           "label": "Contribution",
-          "renderCell": "percent"
+          "renderCell": "Percent"
         },
         {
           "id": "rate",
@@ -154,7 +154,7 @@
         {
           "id": "annualPremium",
           "label": "Annual Premium",
-          "renderCell": "currency"
+          "renderCell": "Currency"
         },
         {
           "id": "#",
@@ -197,7 +197,7 @@
                         "children": {
                           "name": "rate"
                         },
-                        "renderLabel": "percent"
+                        "renderLabel": "Percent"
                       }
                     ]
                   },
@@ -214,7 +214,7 @@
                         "children": {
                           "name": "annualPremium"
                         },
-                        "renderLabel": "currency"
+                        "renderLabel": "Currency"
                       }
                     ]
                   }
