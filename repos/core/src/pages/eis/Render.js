@@ -258,20 +258,20 @@ Render.onError = (err, errInfo, props) => Active.store.dispatch(stateAction(POPU
 export function RenderFunc (Name) {
   switch (Name) {
     case FIELD.RENDER.CURRENCY:
-      return (val, index, {id, ...props} = {}) => (isNumeric(val)
-          ? <Row {...props}><Text className='margin-right-smaller'>$</Text> {renderCurrency(val, 2)}</Row>
+      return (val, index, {id, decimals = 2, ...props} = {}) => (isNumeric(val)
+          ? <Row {...props}><Text className='margin-right-smaller'>$</Text> {renderCurrency(val, decimals)}</Row>
           : null
       )
     case FIELD.RENDER.DOUBLE5:
       return (val, index, {id, ...props} = {}) => renderFloat(val, 5, props)
     case FIELD.RENDER.FLOAT:
-      return (val, index, {id, ...props} = {}) => isNumeric(val) ? renderFloat(val, undefined, props) : null
+      return (val, index, {id, decimals, ...props} = {}) => isNumeric(val) ? renderFloat(val, decimals, props) : null
     case FIELD.RENDER.PERCENT:
       return (val, index, {decimals} = {}) => toPercent(val, decimals)
     case FIELD.RENDER.TITLE_n_INPUT:
       return (val, index, {id, ...props} = {}) => <Row {...props}><Text>{val}</Text></Row>
     default:
-      return (val) => val
+      return
   }
 }
 
@@ -334,11 +334,23 @@ export function metaToProps (meta, {data, instance, relativePath, relativeIndex,
           }, index)
         }
 
-        // Render has conditional match by values
-        const valueProps = get(definition, `values[${value}]`, definition.default)
-        return (isObject(valueProps))
-          ? Render({...props, ...valueProps, data}, index)
-          : RenderFunc(valueProps).apply(this, [value, index, {...props, data}])
+        // Render is a function definition
+        else if (definition.name) {
+          return getFunctionFromObject(definition, {data}).apply(this, [value, index, {...props, ...definition, data}])
+        }
+
+        // Render is conditional match by values definitions
+        else if (definition.values) {
+          const valueDefinition = definition.values[value] || definition.default
+          if (!valueDefinition) return value
+          return (isObject(valueDefinition))
+            ? (valueDefinition.view
+                ? Render({...props, ...valueDefinition, data}, index)
+                : getFunctionFromObject(valueDefinition, {data})
+                  .apply(this, [value, index, {...props, ...valueDefinition, data}])
+            )
+            : RenderFunc(valueDefinition).apply(this, [value, index, {...props, data}])
+        }
       }
     }
 
@@ -441,7 +453,7 @@ function getFunctionFromObject (definition, {data, fallback = definition.name} =
       }
     }
   }
-  return func || fallback
+  return func || RenderFunc(name) || fallback
 }
 
 /**
@@ -463,6 +475,9 @@ function transformDefinition (value, {data, args}) {
 
 /**
  * Transform Definition Functions if they exist
+ * @example:
+ *    const definition = {onChange: 'functionName'}
+ *    >>> {onChange: Function}
  *
  * @param {Object} definition - containing function names
  * @param {Object} data - json
