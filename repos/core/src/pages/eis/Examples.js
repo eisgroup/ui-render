@@ -24,7 +24,7 @@ import { withUISetup } from './rules'
 
 const examples = [
   {
-    title: 'Decimal Point Customisation',
+    title: 'Decimal Points',
     data: exampleData,
     meta: decimalMeta,
   },
