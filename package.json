@@ -10,6 +10,7 @@
     "url": "https://github.com/ecoinomist/modules-pack.git"
   },
   "private": false,
+  "sideEffects": false,
   "keywords": [
     "modules",
     "react",
@@ -35,8 +36,10 @@
     "axios": "^0.19.2",
     "backoff": "^2.5.0",
     "connected-react-router": "^6.8.0",
+    "final-form": "^4.20.1",
     "history": "4.10.1",
     "react-dropzone": "4",
+    "react-final-form": "^6.5.1",
     "react-ga": "^3.1.2",
     "react-redux": "^7.2.0",
     "react-router": "^5.2.0",

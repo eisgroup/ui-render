@@ -1,12 +1,18 @@
+import { stateAction } from 'modules-pack/redux'
 import { UI } from 'modules-pack/variables'
-import { fieldsFrom } from 'modules-pack/variables/fields'
+import { FIELD, fieldsFrom } from 'modules-pack/variables/fields'
 import PropTypes from 'prop-types'
 import React from 'react'
 import Text from 'react-ui-pack/Text'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
-import { reduxForm } from 'redux-form' // produces smallest js bundle size
-import { Active, debounce, isEmpty, isEqual, objChanges, toJSON } from 'utils-pack'
+import { formValueSelector, getFormValues, reduxForm } from 'redux-form' // produces smallest js bundle size
+import { Active, debounce, GET, get, hasListValue, isEmpty, isEqual, objChanges, toJSON } from 'utils-pack'
+import { FORM_ASYNC_VALIDATE } from '../form/constants'
+import { NAME } from './constants'
+
+// import { apolloForm as apolloReduxForm } from '@fundflow/apollo-redux-form'
+// import { schema } from '../../../server/modules/schemas'  // Note: this will expose GraphQL schema to frontend bundle
 
 /**
  * STATE SELECTORS =============================================================
@@ -14,32 +20,36 @@ import { Active, debounce, isEmpty, isEqual, objChanges, toJSON } from 'utils-pa
  * =============================================================================
  */
 
-/**
- * Get Form's Field Values
- * @param {Object} form - instance from react-final-form
- */
-export function fieldValues (form) {
-  // todo
+export function fieldValues (formName) {
+  return getFormValues(formName)(Active.store.getState())
 }
 
 /**
  * Get Form's Registered Field Values
  *
- * @param {Object} form - instance from react-final-form
+ * @param {String} formName - to get values for
  * @returns {Object|Boolean} values - nested mapping of field values by their name, or `false` if no field values found
  */
-export function registeredFieldValues (form) {
-  // todo:
+export function registeredFieldValues (formName) {
+  const state = Active.store.getState()
+  const registeredFieldNames = Object.values(get(state, `${NAME}.${formName}.registeredFields`, {})).map(f => f.name)
+  if (!registeredFieldNames.length) return
+
+  // Force returning object mapping of values, because redux form may return a single value
+  if (registeredFieldNames.length === 1) registeredFieldNames.push('_')
+  const values = formValueSelector(formName)(state, ...registeredFieldNames)
+  return !isEmpty(values) && values
 }
 
 /**
  * Get Form's Registered Field Errors
  *
- * @param {Object} form - instance from react-final-form
+ * @param {String} formName - to get values for
  * @returns {Object|Undefined} errors - key values of field names and error messages
  */
-export function registeredFieldErrors (form) {
-  // todo
+export function registeredFieldErrors (formName) {
+  const state = Active.store.getState()
+  return get(state, `${NAME}.${formName}.syncErrors`)
 }
 
 /**
@@ -48,7 +58,8 @@ export function registeredFieldErrors (form) {
  */
 
 /**
- * React Component React Final Form Decorator with getters to detect form input changes:
+ * React Component Redux-Form Decorator with getters to detect form input changes:
+ * @note: cannot wrap connected to redux component, @connect must be declared before
  * @usage
  *  - this.canSave - getter boolean: true if form has input changes, no validation error exists, and is not loading
  *  - this.changedValues - getter object: key value pairs of form input values that have changed since initial values
@@ -64,7 +75,7 @@ export function registeredFieldErrors (form) {
  *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
  *
  *  @example:
- *    @withForm({form: USER})
+ *    @withFormRedux({form: USER})
  *    export default class UserEdit extends Component {
  *      state = {
  *        company: {}
@@ -81,7 +92,7 @@ export function registeredFieldErrors (form) {
  * @param {Object} [options - redux-form HOC options
  * @returns {Function} decorator - HOC wrapper function for given React component
  */
-export function withForm ({form, ...options}) {
+export function withFormRedux ({form, ...options}) {
   return function Decorator (Class) {
     const componentDidUpdate = Class.prototype.componentDidUpdate
     const componentWillUnmount = Class.prototype.componentWillUnmount
@@ -201,3 +212,54 @@ export function withForm ({form, ...options}) {
     return reduxForm({form, enableReinitialize: true, ...options})(Class)
   }
 }
+
+/**
+ * Handles async validation of fields for a redux-form component as the form is being filled out
+ *
+ * @example
+ *  FormView = reduxForm({
+ *    form: CONTACT,
+ *    asyncValidate: asyncValidateForm,
+ *  })(FormView);
+ *
+ * @param {Object} values - The current form values
+ * @param {Function} dispatch - Redux dispatch function
+ * @param {Object} props - All the props given to the redux-form wrapped component
+ * @param {String} blurredField - The name of the field that was blurred
+ * @returns {Promise} - A promise that will be resolved with an object specifying any errors
+ */
+export function asyncValidateForm (values, dispatch, props, blurredField) {
+  return new Promise((resolve) => {
+    const existingAsyncErrors = props.asyncErrors || {}
+    const asyncValidators = get(FIELD, `${blurredField}.validateAsync`, [])
+    if (!hasListValue(asyncValidators)) return resolve(existingAsyncErrors)
+
+    // Add blurred field to async validator descriptors
+    const blurredFieldValue = values[blurredField]
+    const items = asyncValidators.map((asyncValidator) => {
+      const validatorDescriptor = asyncValidator(blurredFieldValue, values)
+      return {
+        ...validatorDescriptor,
+        field: blurredField
+      }
+    })
+
+    // Dispatch action to run async validation via sagas
+    dispatch(stateAction(FORM_ASYNC_VALIDATE, GET, {
+      items,
+      callback: (errors) => resolve({...existingAsyncErrors, ...errors})
+    }))
+  })
+}
+
+/**
+ * Apollo Redux Form Wrapper (disabled because of breaking changes in graphql 0.13)
+ *
+ * @param {Object} gqlOperation - a GraphQL executable Query, Mutation or Subscription
+ * @param {Object} [options] - to pass to Apollo Redux Form library
+ */
+// export function apolloForm (gqlOperation, options = {}) {
+//   if (!options.schema) options.schema = schema
+//   if (!options.renderers) options.renderers = renderers
+//   return apolloReduxForm(gqlOperation, options)
+// }

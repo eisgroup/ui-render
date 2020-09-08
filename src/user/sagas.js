@@ -1,5 +1,5 @@
 import { apiAction, subscribeToApiResults } from 'modules-pack/api'
-import { FORM_ACTION_TYPE } from 'modules-pack/form/constants'
+import { FORM_ACTION_TYPE } from 'modules-pack/formRedux/constants'
 import { stateAction, stateActionType } from 'modules-pack/redux'
 import { history, select as routerSelect } from 'modules-pack/router'
 import { all, call, delay, put, selectState, spawn, takeLatest } from 'modules-pack/saga/utils'

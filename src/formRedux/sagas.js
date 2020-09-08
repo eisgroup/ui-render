@@ -4,7 +4,7 @@ import { stateActionType } from 'modules-pack/redux/actions'
 import { all, call, put, takeEvery } from 'modules-pack/saga/utils'
 import { GET, get, toList } from 'utils-pack'
 
-import { API_VALIDATE_FAIL_CODE, FORM_ASYNC_VALIDATE } from './constants'
+import { API_VALIDATE_FAIL_CODE, FORM_ASYNC_VALIDATE } from '../form/constants'
 
 /**
  * ASYNC TASKS =================================================================
