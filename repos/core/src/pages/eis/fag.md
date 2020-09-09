@@ -33,3 +33,21 @@ Example: `{style: {color: "rgba(255, 255, 255, 0.30)", backgroundColor: "red"}}`
 
 ## How to conditionally render Text/Title for `null` or empty value?
 If you want to leave the field empty when its value is `null` or `undefined`, add attribute `{"renderLabel": "Float"}` or `{"renderLabel": "Title+Input"}`.
+
+## Why Text component does not show `children` or `label`?
+Do not simultaneously define `renderLabel` attribute as empty object or object with `null` values, because the rendering priority is this:
+`renderLabel` > `items` > `children` > `label`
+You can, however, retrieve `children` or `label` value dynamically, then use `renderLabel` to format that value.
+Example:
+```json
+{
+  "view": "Text",
+  "label": {
+    "name":  "path.to.number.value.from.data.json"
+  },
+  "renderLabel": {
+    "name": "Percent",
+    "decimals": 2
+  }
+}
+```
