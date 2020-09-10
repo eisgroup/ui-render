@@ -15,15 +15,18 @@ if (!Active.Field) Active.Field = Field
 /**
  * FORM FIELDS =================================================================
  * Wrapper Proxy for react-final-form or redux-form Field with unified API.
- * Note: must use Class to prevent input from loosing focus on input 'onChange'
+ * Note:
+ *    - `normalize` does not exist in react-final-form, only `format` and `parse`
+ *      => Make `format` and `parse` fallback to `normalize`, when undefined,
+ *         for compatibility with redux-form.
+ *    - must use Class to prevent input from loosing focus on input 'onChange'
  * =============================================================================
  */
 
 export class DateField extends PureComponent {
   input = ({input, meta: {touched, error} = {}}) => {
     if (this.props.readonly && isRequired(input.value)) return null
-    const {onChange, error: errorMessage, validate: _, normalize, parse, ...props} = this.props
-    const sanitize = parse || normalize
+    const {onChange, error: errorMessage, validate: _, normalize, format, parse = normalize, ...props} = this.props
     return (
       <DateInput
         {...input}
@@ -32,7 +35,7 @@ export class DateField extends PureComponent {
         onBlur={() => input.onBlur()} // prevent value change, but need onBlur to set touched for validation
         onChange={value => {
           input.onChange(value)
-          isFunction(onChange) && onChange(sanitize ? sanitize(value) : value)
+          isFunction(onChange) && onChange(parse ? parse(value) : value)
         }}
         error={touched && error && (errorMessage || error)}
         touched={touched}
@@ -42,7 +45,7 @@ export class DateField extends PureComponent {
   }
 
   render = () => {
-    const {name, disabled, normalize, format, parse, validate} = this.props
+    const {name, disabled, normalize, format = normalize, parse = normalize, validate} = this.props
     return <Active.Field {...{name, disabled, normalize, format, parse, validate}} component={this.input}/>
   }
 }
@@ -50,8 +53,7 @@ export class DateField extends PureComponent {
 export class DatesField extends PureComponent {
   input = ({input, meta: {touched, error} = {}}) => {
     if (this.props.readonly && isRequired(input.value)) return null
-    const {onChange, error: errorMessage, normalize, parse, ...props} = this.props
-    const sanitize = parse || normalize
+    const {onChange, error: errorMessage, normalize, format, parse = normalize, ...props} = this.props
     return (
       <Dates
         {...input}
@@ -59,7 +61,7 @@ export class DatesField extends PureComponent {
         onBlur={() => input.onBlur()} // prevent value change, but need onBlur to set touched for validation
         onChange={value => {
           input.onChange(value)
-          isFunction(onChange) && onChange(sanitize ? sanitize(value) : value)
+          isFunction(onChange) && onChange(parse ? parse(value) : value)
         }}
         error={touched && error && (errorMessage || error)}
         touched={touched}
@@ -69,7 +71,7 @@ export class DatesField extends PureComponent {
   }
 
   render = () => {
-    const {name, disabled, normalize, format, parse, validate} = this.props
+    const {name, disabled, normalize, format = normalize, parse = normalize, validate} = this.props
     return <Active.Field {...{name, disabled, normalize, format, parse, validate}} component={this.input}/>
   }
 }
@@ -77,8 +79,7 @@ export class DatesField extends PureComponent {
 export class DropdownField extends PureComponent {
   input = ({input, meta: {touched, error} = {}}) => {
     if (this.props.readonly && isRequired(input.value)) return null
-    const {onChange, error: errorMessage, validate: _, normalize, parse, ...props} = this.props
-    const sanitize = parse || normalize
+    const {onChange, error: errorMessage, validate: _, normalize, format, parse = normalize, ...props} = this.props
     return (
       <DropDown
         {...input}
@@ -86,7 +87,7 @@ export class DropdownField extends PureComponent {
         onBlur={() => input.onBlur()} // prevent value change, but need onBlur to set touched for validation
         onChange={value => {
           input.onChange(value)
-          isFunction(onChange) && onChange(sanitize ? sanitize(value) : value)
+          isFunction(onChange) && onChange(parse ? parse(value) : value)
         }}
         error={touched && error && (errorMessage || error)}
         {...props}
@@ -95,8 +96,9 @@ export class DropdownField extends PureComponent {
   }
 
   render = () => {
-    const {name, disabled, normalize, format, parse, validate, options} = this.props
-    return <Active.Field {...{name, disabled, normalize, format, parse, validate, options}} component={this.input}/>
+    const {name, disabled, normalize, format = normalize, parse = normalize, validate, options} = this.props
+    return <Active.Field {...{name, disabled, normalize, format, parse, validate, options}}
+                         component={this.input}/>
   }
 }
 
@@ -112,14 +114,15 @@ export class InputField extends PureComponent {
     value: PropTypes.any,
     onChange: PropTypes.func,
     normalize: PropTypes.func,
+    parse: PropTypes.func,
+    format: PropTypes.func,
     // @Note: see <Input> component for docs
   }
 
   // do not use ...props from input, because it is shared by <Active.Field> instances
   input = ({input, meta: {touched, error, pristine} = {}}) => {
     if (this.props.readonly && isRequired(input.value)) return null
-    const {onChange, error: errorMessage, defaultValue, validate: _, normalize, parse, ...props} = this.props
-    const sanitize = parse || normalize
+    const {onChange, error: errorMessage, defaultValue, validate: _, normalize, format, parse = normalize, ...props} = this.props
     // @Note: defaultValue is only used for UI, internal value is still undefined
     this.value = input.value === '' ? (pristine && defaultValue != null ? defaultValue : input.value) : input.value
     this.onChange = input.onChange
@@ -131,7 +134,7 @@ export class InputField extends PureComponent {
         onChange={value => {
           if (props.type === 'number') value = value !== '' ? Number(value) : null
           input.onChange(value)
-          isFunction(onChange) && onChange(sanitize ? sanitize(value) : value)
+          isFunction(onChange) && onChange(parse ? parse(value) : value)
         }}
         error={touched && error && (errorMessage || error)}
         {...props} // allow forceful value override
@@ -141,9 +144,9 @@ export class InputField extends PureComponent {
 
   componentDidMount () {
     // Auto dispatch action to set value if normalizer set and is different,
-    const {normalize, onChange} = this.props
-    if (!normalize || this.value === '') return
-    const valueNormalized = normalize(this.value)
+    const {normalize, parse = normalize, onChange} = this.props
+    if (!parse || this.value === '') return
+    const valueNormalized = parse(this.value)
     if (this.value === valueNormalized) return
     this.onChange(valueNormalized)
     onChange && onChange(valueNormalized)
@@ -151,7 +154,7 @@ export class InputField extends PureComponent {
 
   // Do not pass 'onChange' to Field because it fires event as argument
   render = () => {
-    const {name, disabled, normalize, format, parse, validate} = this.props
+    const {name, disabled, normalize, format = normalize, parse = normalize, validate} = this.props
     return <Active.Field {...{name, disabled, normalize, format, parse, validate}} component={this.input}/>
   }
 }
@@ -162,8 +165,7 @@ export class InputField extends PureComponent {
 export class SliderField extends PureComponent {
   input = ({input}) => {
     if (this.props.readonly && isRequired(input.value)) return null
-    const {onChange, defaultValue, denormalize, normalize, parse, ...props} = this.props
-    const sanitize = parse || normalize
+    const {onChange, defaultValue, denormalize, normalize, format, parse = normalize, ...props} = this.props
     this.val = input.value
     this.value = isList(input.value) ? input.value : (isNumber(input.value) ? input.value : defaultValue)
     this.onChange = input.onChange
@@ -172,7 +174,7 @@ export class SliderField extends PureComponent {
         value={denormalize ? denormalize(this.value) : this.value}
         onChange={value => {
           input.onChange(value)
-          isFunction(onChange) && onChange(sanitize ? sanitize(value) : value)
+          isFunction(onChange) && onChange(parse ? parse(value) : value)
         }}
         {...props}
       />
@@ -192,7 +194,7 @@ export class SliderField extends PureComponent {
   }
 
   render = () => {
-    const {name, disabled, normalize, format, parse, validate} = this.props
+    const {name, disabled, normalize, format = normalize, parse = normalize, validate} = this.props
     return <Active.Field {...{name, disabled, normalize, format, parse, validate}} component={this.input}/>
   }
 }
@@ -205,7 +207,6 @@ export class ToggleField extends PureComponent {
     labelFalse: PropTypes.string,
     value: PropTypes.bool,
     onChange: PropTypes.func,
-    normalize: PropTypes.func,
     id: PropTypes.string,
     danger: PropTypes.bool,
     // @Note: see <Checkbox> component for docs

@@ -2,11 +2,11 @@ import { UI } from 'modules-pack/variables'
 import { fieldsFrom } from 'modules-pack/variables/fields'
 import PropTypes from 'prop-types'
 import React from 'react'
+import { Form } from 'react-final-form'
 import Text from 'react-ui-pack/Text'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
-import { reduxForm } from 'redux-form' // produces smallest js bundle size
-import { Active, debounce, isEmpty, isEqual, objChanges, toJSON } from 'utils-pack'
+import { Active, debounce, isEmpty, isEqual, objChanges, toJSON, warn } from 'utils-pack'
 
 /**
  * STATE SELECTORS =============================================================
@@ -17,29 +17,50 @@ import { Active, debounce, isEmpty, isEqual, objChanges, toJSON } from 'utils-pa
 /**
  * Get Form's Field Values
  * @param {Object} form - instance from react-final-form
+ * @return {Object} formValues - key values of field names and values
  */
 export function fieldValues (form) {
-  // todo
+  return form.getState().values
 }
 
 /**
  * Get Form's Registered Field Values
  *
- * @param {Object} form - instance from react-final-form
- * @returns {Object|Boolean} values - nested mapping of field values by their name, or `false` if no field values found
+ * @param {FormApi} form - instance from react-final-form
+ * @returns {Object|Boolean|Undefined} values - nested mapping of field values by their name, or `false` if no field values found
  */
 export function registeredFieldValues (form) {
-  // todo:
+  const registeredFieldNames = form.getRegisteredFields()
+  if (!registeredFieldNames.length) return
+
+  // Return object mapping of registered values,
+  // unfilled fields are considered as non-registered.
+  const values = {}
+  registeredFieldNames.forEach(field => {
+    const {value} = form.getFieldState(field)
+    if (value != null) values[field] = value
+  })
+  return !isEmpty(values) && values
 }
 
 /**
  * Get Form's Registered Field Errors
  *
- * @param {Object} form - instance from react-final-form
- * @returns {Object|Undefined} errors - key values of field names and error messages
+ * @param {FormApi} form - instance from react-final-form
+ * @returns {Object|Boolean|Undefined} errors - key values of field names and error messages
  */
 export function registeredFieldErrors (form) {
-  // todo
+  const registeredFieldNames = form.getRegisteredFields()
+  if (!registeredFieldNames.length) return
+
+  // Return object mapping of registered field errors,
+  // unfilled fields are considered as non-registered.
+  const errors = {}
+  registeredFieldNames.forEach(field => {
+    const {error} = form.getFieldState(field)
+    if (error != null) errors[field] = error
+  })
+  return !isEmpty(errors) && errors
 }
 
 /**
@@ -64,7 +85,7 @@ export function registeredFieldErrors (form) {
  *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
  *
  *  @example:
- *    @withForm({form: USER})
+ *    @withForm({enableReinitialize: true})
  *    export default class UserEdit extends Component {
  *      state = {
  *        company: {}
@@ -77,11 +98,10 @@ export function registeredFieldErrors (form) {
  *      )
  *    }
  *
- * @param {String} form - NAME, used by redux-form
- * @param {Object} [options - redux-form HOC options
+ * @param {Object} [options] - for <Form/> from redux-final-form
  * @returns {Function} decorator - HOC wrapper function for given React component
  */
-export function withForm ({form, ...options}) {
+export function withForm (options) {
   return function Decorator (Class) {
     const componentDidUpdate = Class.prototype.componentDidUpdate
     const componentWillUnmount = Class.prototype.componentWillUnmount
@@ -198,6 +218,8 @@ export function withForm ({form, ...options}) {
       if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
     }
 
-    return reduxForm({form, enableReinitialize: true, ...options})(Class)
+    return function WithForm (props) {
+      return <Form enableReinitialize onSubmit={warn} {...options} {...props} component={Class}/>
+    }
   }
 }

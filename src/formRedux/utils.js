@@ -28,7 +28,7 @@ export function fieldValues (formName) {
  * Get Form's Registered Field Values
  *
  * @param {String} formName - to get values for
- * @returns {Object|Boolean} values - nested mapping of field values by their name, or `false` if no field values found
+ * @returns {Object|Boolean|Undefined} values - nested mapping of field values by their name, or `false` if no field values found
  */
 export function registeredFieldValues (formName) {
   const state = Active.store.getState()
