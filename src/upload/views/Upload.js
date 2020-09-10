@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 import { NAME as POPUP, POPUP_ALERT } from 'modules-pack/popup/constants'
 import { connect, stateAction } from 'modules-pack/redux'
-import { history, openModal } from 'modules-pack/router'
 import { ROUTE_HOME, UPLOAD as U } from 'modules-pack/variables'
 import PropTypes from 'prop-types'
 import React, { Fragment, PureComponent } from 'react'
@@ -50,7 +49,12 @@ export default class Upload extends PureComponent {
       PropTypes.string,
       PropTypes.number
     ]),
-    onUpload: PropTypes.func, // callback onDrop files with (acceptedFiles, this.id) arguments
+    /* Callback(acceptedFiles, this.id) onDrop files */
+    onUpload: PropTypes.func,
+    /* Callback when close button is clicked (ex. history.goBack()) */
+    onClose: PropTypes.func,
+    /* Callback(instance, ...componentWillMountProps) before component mounts */
+    onComponentWillMount: PropTypes.func,
     isLoading: PropTypes.bool,
     disabled: PropTypes.bool, // whether to disable upload
     readonly: PropTypes.bool, // whether to make upload viewable only
@@ -59,7 +63,7 @@ export default class Upload extends PureComponent {
     showTypes: PropTypes.bool, // whether to show file types tooltip
     round: PropTypes.bool, // whether to add `round` css class
     label: PropTypes.string, // optional label to show in the title
-    children: PropTypes.any
+    children: PropTypes.any,
   }
 
   static defaultProps = {
@@ -90,14 +94,6 @@ export default class Upload extends PureComponent {
 
   onDragEnter = () => this.setState({active: true})
   onDragLeave = () => this.setState({active: false})
-
-  openInModal = (uri) => {
-    openModal(uri || this.uri, {className: 'fill--three-quarter'})
-  }
-
-  handleCloseModal = () => {
-    history.goBack()
-  }
 
   handleUpload = (acceptedFiles, rejectedFiles) => {
     log('acceptedFiles:', acceptedFiles)
@@ -135,18 +131,21 @@ export default class Upload extends PureComponent {
     if (event.key === 'Enter') this.dropzone.open()
   }
 
-  renderClose = (handleClose) => (
+  renderClose = (handleClose = this.props.onClose) => (
     <View className='app__view--close' onClick={handleClose}>
       <Text className='app__view--close__icon'>{'✕'}</Text>
       <Tooltip top>{_.CLOSE}</Tooltip>
     </View>
   )
 
-  UNSAFE_componentWillMount () {
-    if (this.props.id == null && !window.prevLocation) {  // if this route is accessed directly in browser
-      history.push(ROUTE_HOME)  // go to homepage first,
-      this.setTimeout(this.openInModal, 100)  // then open as Modal
-    }
+  UNSAFE_componentWillMount (...args) {
+    this.props.onComponentWillMount && this.props.onComponentWillMount(this, ...args)
+    // if (this.props.id == null && !window.prevLocation) {  // if this route is accessed directly in browser
+    //   history.push(ROUTE_HOME)  // go to homepage first,
+    //   this.setTimeout(() => { // then open as Modal
+    //     openModal(this.uri, {className: 'fill--three-quarter'})
+    //   }, 100)
+    // }
   }
 
   render () {
@@ -156,7 +155,7 @@ export default class Upload extends PureComponent {
     const fileTypes = this.fileTypes
     return (
       <View className={classNames('app__upload', {round})}>
-        {id == null && this.renderClose(this.handleCloseModal)}
+        {id == null && this.renderClose()}
         {hasHeader && <h2>{`${_.UPLOAD} ${capitalize(label) || _.FILE}`}</h2>}
         <Dropzone
           tabIndex={disabled ? -1 : 0}

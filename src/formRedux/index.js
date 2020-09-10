@@ -2,11 +2,16 @@ import { change, Field, formValues, getFormValues, reducer, reduxForm, registerF
 import { Active } from 'utils-pack' // produces smallest js bundle size
 import * as asyncValidate from './asyncValidators'
 import { ACTION_TYPE, NAME } from './constants'
-import './renders' // to trigger all definitions
 import saga from './sagas'
 
 /**
  * REDUX FORM EXPORTS ==========================================================
+ * @Note:
+ *  - redux-form produces extra 22 KB gzipped compared to react-final-form,
+ *    however, it does not cause rerender of the entire form when input changes.
+ *  - react-final-form can be fine tuned to only rerender individual inputs.
+ *    @see: https://final-form.org/docs/react-final-form/examples/subscriptions
+ *
  * Modules' Exposing API - to enable consistent and maintainable app integration
  * =============================================================================
  */
