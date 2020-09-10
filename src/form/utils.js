@@ -85,7 +85,7 @@ export function registeredFieldErrors (form) {
  *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
  *
  *  @example:
- *    @withForm({enableReinitialize: true})
+ *    @withForm({subscription: {submitting: true, pristine: true}})
  *    export default class UserEdit extends Component {
  *      state = {
  *        company: {}
@@ -98,10 +98,10 @@ export function registeredFieldErrors (form) {
  *      )
  *    }
  *
- * @param {Object} [options] - for <Form/> from redux-final-form
+ * @param {FormProps|Object} [options] - for <Form/> see: https://final-form.org/docs/react-final-form/types/FormProps
  * @returns {Function} decorator - HOC wrapper function for given React component
  */
-export function withForm (options) {
+export function withForm (options = {subscription: {submitting: true, pristine: true}}) {
   return function Decorator (Class) {
     const componentDidUpdate = Class.prototype.componentDidUpdate
     const componentWillUnmount = Class.prototype.componentWillUnmount
