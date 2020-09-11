@@ -69,8 +69,12 @@ export function registeredFieldErrors (form) {
  */
 
 /**
- * React Component React Final Form Decorator with getters to detect form input changes:
- * @usage
+ * React Component React Final Form Decorator with getters to detect form input changes
+ * @note:
+ *  - cannot wrap connected to redux component, @connect must be declared before
+ * @usage:
+ *  Below methods only work when using this.renderInput(FIELDS),
+ *  or apply <Input onChange={this.handleChangeInput.bind(this)}/> manually:
  *  - this.canSave - getter boolean: true if form has input changes, no validation error exists, and is not loading
  *  - this.changedValues - getter object: key value pairs of form input values that have changed since initial values
  *  - this.registeredValues - getter object: key value pairs of registered form input values
@@ -79,13 +83,14 @@ export function registeredFieldErrors (form) {
  *  - this.props.onChangeState - function: callback when internal state changes, receives this class instance,
  *        or {} on unmount. This is useful for nested forms with remote submit button within parent container.
  *
- * @helpers
+ * @helpers:
  *  - this.state.hasInputChanges - boolean: true if current state has form input value changes
  *  - this.handleChangeInput() - function: that triggers input changes update (hooked to this.renderInput)
  *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
  *
  *  @example:
- *    @withForm({subscription: {submitting: true, pristine: true}})
+ *    @connect(mapStateToProps)
+ *    @withForm({subscription: {pristine: true, valid: true}})
  *    export default class UserEdit extends Component {
  *      state = {
  *        company: {}
@@ -101,125 +106,140 @@ export function registeredFieldErrors (form) {
  * @param {FormProps|Object} [options] - for <Form/> see: https://final-form.org/docs/react-final-form/types/FormProps
  * @returns {Function} decorator - HOC wrapper function for given React component
  */
-export function withForm (options = {subscription: {submitting: true, pristine: true}}) {
+export function withForm (options = {subscription: {pristine: true, valid: true}}) {
   return function Decorator (Class) {
-    const componentDidUpdate = Class.prototype.componentDidUpdate
-    const componentWillUnmount = Class.prototype.componentWillUnmount
-    const handleChangeInput = Class.prototype.handleChangeInput
-
-    Class.propTypes = {
-      initialValues: PropTypes.object, // form initial values
-      onChangeState: PropTypes.func, // onChangeState(this: Class)
-      ...Class.propTypes
-    }
-
-    Class.prototype.state = {
-      hasInputChanges: false,
-      canSave: false, // only used internally to compare changes for re-rendering
-      ...Class.prototype.state
-    }
-
-    // Define instance getter
-    Object.defineProperty(Class.prototype, 'canSave', {
-      get () {
-        const {valid, loading} = this.props
-        const {hasInputChanges} = this.state
-        return hasInputChanges && valid && !loading
-      }
-    })
-
-    // Define instance getter
-    Object.defineProperty(Class.prototype, 'formValues', {
-      get () {
-        return fieldValues(this.props.form)
-      }
-    })
-
-    // Define instance getter
-    Object.defineProperty(Class.prototype, 'registeredValues', {
-      get () {
-        return registeredFieldValues(this.props.form)
-      }
-    })
-
-    // Define instance getter
-    Object.defineProperty(Class.prototype, 'changedValues', {
-      get () {
-        // Have to select all form values, because registered values may not include all input values
-        return objChanges(this.props.initialValues, this.formValues)
-      }
-    })
-
-    // Define instance getter
-    Object.defineProperty(Class.prototype, 'validationErrorsTooltip', {
-      get () {
-        const errors = registeredFieldErrors(this.props.form)
-        return errors && <Tooltip top>
-          <View className='padding-h-smaller'>
-            <Text className='margin-v-small bold'>Please complete:</Text>
-            {(() => {
-              const messages = []
-              for (const k in errors) {
-                messages.push(<Text key={k} className='margin-bottom-smaller'>{`- ${k}: ${toJSON(errors[k])}`}</Text>)
-              }
-              return messages
-            })()}
-          </View>
-        </Tooltip>
-      }
-    })
-
-    // Define instance method
-    Class.prototype.renderInput = function (FIELDS, {onChange} = {}) {
-      const {initialValues} = this.props
-      return fieldsFrom(FIELDS, {initialValues})
-        .map(field => ({
-          ...field,
-          onChange: (...args) => {
-            field.onChange && field.onChange(...args)
-            this.handleChangeInput(...args)
-            onChange && onChange(...args)
-          },
-        }))
-        .map(Active.renderField)
-    }
-
-    // Define instance method
-    Class.prototype.handleChangeInput = debounce(function () {
-      // To handle use case when all fields in a group are removed, and no registered values are sent to backend,
-      // use placeholder parent field that reserves as registered null value field for the entire group.
-      // See <Fields> component for example.
-      this.syncInputChanges()
-      if (handleChangeInput) handleChangeInput.apply(this, arguments)
-    }, UI.TYPING_DELAY)
-
-    // Define instance method
-    Class.prototype.syncInputChanges = function () {
-      // todo: Phase 2 - put back deleted flag from FieldsWithLevel
-      const {initialValues, valid, loading} = this.props
-      const registeredValues = this.registeredValues
-      const hasInputChanges = (registeredValues && isEmpty(initialValues)) || !!this.changedValues
-      const canSave = hasInputChanges && valid && !loading
-      if (hasInputChanges !== this.state.hasInputChanges || canSave !== this.state.canSave) {
-        this.setState({hasInputChanges, canSave})
-        if (this.props.onChangeState) this.props.onChangeState(this)
-      }
-    }
-
-    Class.prototype.componentDidUpdate = function (old) {
-      if (!isEqual(old.initialValues, this.props.initialValues)) {
-        this.syncInputChanges()
-      }
-      if (componentDidUpdate) componentDidUpdate.apply(this, arguments)
-    }
-
-    Class.prototype.componentWillUnmount = function () {
-      if (this.props.onChangeState) this.props.onChangeState({})
-      if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
-    }
-
+    withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors})
     return function WithForm (props) {
       return <Form enableReinitialize onSubmit={warn} {...options} {...props} component={Class}/>
     }
   }
+}
+
+/**
+ * Mixin to add Class Attributes and Methods commonly used with forms
+ * @note: works with redux-form and react-final-form
+ *
+ * @param {Object} Class - React Component or PureComponent to decorate
+ * @param {Function} [fieldValues] - callback to get form values
+ * @param {Function} [registeredFieldValues] - callback to get form registered values
+ * @param {Function} [registeredFieldErrors] - callback to get form registered errors
+ * @returns {Object} Class - mutated with form properties
+ */
+export function withFormSetup (Class, {fieldValues, registeredFieldValues, registeredFieldErrors}) {
+  const componentDidUpdate = Class.prototype.componentDidUpdate
+  const componentWillUnmount = Class.prototype.componentWillUnmount
+  const handleChangeInput = Class.prototype.handleChangeInput
+
+  Class.propTypes = {
+    initialValues: PropTypes.object, // form initial values
+    onChangeState: PropTypes.func, // onChangeState(this: Class)
+    ...Class.propTypes
+  }
+
+  Class.prototype.state = {
+    hasInputChanges: false,
+    canSave: false, // only used internally to compare changes for re-rendering
+    ...Class.prototype.state
+  }
+
+  // Define instance getter
+  Object.defineProperty(Class.prototype, 'canSave', {
+    get () {
+      const {valid, loading} = this.props
+      const {hasInputChanges} = this.state
+      return hasInputChanges && valid && !loading
+    }
+  })
+
+  // Define instance getter
+  Object.defineProperty(Class.prototype, 'formValues', {
+    get () {
+      return fieldValues(this.props.form)
+    }
+  })
+
+  // Define instance getter
+  Object.defineProperty(Class.prototype, 'registeredValues', {
+    get () {
+      return registeredFieldValues(this.props.form)
+    }
+  })
+
+  // Define instance getter
+  Object.defineProperty(Class.prototype, 'changedValues', {
+    get () {
+      // Have to select all form values, because registered values may not include all input values
+      return objChanges(this.props.initialValues, this.formValues)
+    }
+  })
+
+  // Define instance getter
+  Object.defineProperty(Class.prototype, 'validationErrorsTooltip', {
+    get () {
+      const errors = registeredFieldErrors(this.props.form)
+      return errors && <Tooltip top>
+        <View className='padding-h-smaller'>
+          <Text className='margin-v-small bold'>Please complete:</Text>
+          {(() => {
+            const messages = []
+            for (const k in errors) {
+              messages.push(<Text key={k} className='margin-bottom-smaller'>{`- ${k}: ${toJSON(errors[k])}`}</Text>)
+            }
+            return messages
+          })()}
+        </View>
+      </Tooltip>
+    }
+  })
+
+  // Define instance method
+  Class.prototype.renderInput = function (FIELDS, {onChange} = {}) {
+    const {initialValues} = this.props
+    return fieldsFrom(FIELDS, {initialValues})
+      .map(field => ({
+        ...field,
+        onChange: (...args) => {
+          field.onChange && field.onChange(...args)
+          this.handleChangeInput(...args)
+          onChange && onChange(...args)
+        },
+      }))
+      .map(Active.renderField)
+  }
+
+  // Define instance method
+  Class.prototype.handleChangeInput = debounce(function () {
+    // To handle use case when all fields in a group are removed, and no registered values are sent to backend,
+    // use placeholder parent field that reserves as registered null value field for the entire group.
+    // See <Fields> component for example.
+    this.syncInputChanges()
+    if (handleChangeInput) handleChangeInput.apply(this, arguments)
+  }, UI.TYPING_DELAY)
+
+  // Define instance method
+  Class.prototype.syncInputChanges = function () {
+    // todo: Phase 2 - put back deleted flag from FieldsWithLevel
+    const {initialValues, valid, loading} = this.props
+    const registeredValues = this.registeredValues
+    const hasInputChanges = (registeredValues && isEmpty(initialValues)) || !!this.changedValues
+    const canSave = hasInputChanges && valid && !loading
+    if (hasInputChanges !== this.state.hasInputChanges || canSave !== this.state.canSave) {
+      this.setState({hasInputChanges, canSave})
+      if (this.props.onChangeState) this.props.onChangeState(this)
+    }
+  }
+
+  Class.prototype.componentDidUpdate = function (old) {
+    if (!isEqual(old.initialValues, this.props.initialValues)) {
+      this.syncInputChanges()
+    }
+    if (componentDidUpdate) componentDidUpdate.apply(this, arguments)
+  }
+
+  Class.prototype.componentWillUnmount = function () {
+    if (this.props.onChangeState) this.props.onChangeState({})
+    if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
+  }
+
+  return Class
 }
