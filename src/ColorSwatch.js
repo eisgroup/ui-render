@@ -7,14 +7,14 @@ import Text from './Text'
  * Color Swatch - Pure Component.
  */
 function ColorSwatch ({
-  code,
+  value,
   small,
   large,
   className,
   style,
   ...props
 }) {
-  const color = String(code)
+  const color = String(value)
   return <Text
     className={cn('color__swatch', className, {small, large, white: color === '255,255,255', black: color === '0,0,0'})}
     style={{backgroundColor: `rgb(${color})`, ...style}}
@@ -24,7 +24,7 @@ function ColorSwatch ({
 
 ColorSwatch.propTypes = {
   /** RGB Value */
-  code: PropTypes.oneOfType([
+  value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.arrayOf(PropTypes.number)
   ]).isRequired,

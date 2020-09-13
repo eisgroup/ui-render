@@ -9,7 +9,7 @@ import { onPressHoc } from './utils'
  * Abstraction layer for React Web
  *
  * @param {Function} onChange - callBack when input value changes
- * @param {Function} [normalize] - validator function
+ * @param {Function} [normalize] - sanitization function
  * @param {Boolean} [disabledSpellCheck] - no spell check or correction
  * @param {Boolean} [resize] - whether to adjust input height to match typed in text
  * @param {Object} [sound] - new Audio(URL) sound file

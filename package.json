@@ -1,6 +1,6 @@
 {
   "name": "react-ui-pack",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Reusable React Components",
   "license": "MIT",
   "main": "index.js",
@@ -10,6 +10,7 @@
     "url": "https://github.com/ecoinomist/react-ui-pack.git"
   },
   "private": false,
+  "sideEffects": false,
   "keywords": [
     "ui",
     "react",

@@ -47,19 +47,19 @@ function Input ({
   done,
   className,
   classNameIcon,
-    children,
-    stickyPlaceholder, // only works with controlled component when `props.value` is provided
-    resize,
-    readonly,
-    autofocus,
-    float,
-    error,
-    info,
-    style,
-    onFocus,
-    onBlur,
-    ...props
-  }) {
+  children,
+  stickyPlaceholder, // only works with controlled component when `props.value` is provided
+  resize,
+  readonly,
+  autofocus,
+  float,
+  error,
+  info,
+  style,
+  onFocus,
+  onBlur,
+  ...props
+}) {
   const [active, setState] = useState(props.autoFocus)
   if (autofocus) props.autoFocus = autofocus // React fix
   if (readonly) {

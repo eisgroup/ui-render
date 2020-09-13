@@ -27,14 +27,15 @@ export function colorDropdownOptions (colorObj, Active) {
     }
   }
   for (const key in colorObj) {
-    const {code, ...langs} = colorObj[key]
+    const {_, ...langs} = colorObj[key]
+    const value = String(_) // Dropdown `value` cannot be array
     for (const lang in langs) {
       const text = langs[lang]
       options[lang] = (options[lang] || []).concat({
         text,
-        value: code.constructor === Array ? code.join(',') : code,  // Dropdown `value` cannot be array
+        value,
         content: <Row className='input--dropdown__option middle'>
-          <ColorSwatch code={code} className='input--dropdown__option__color'/>
+          <ColorSwatch value={value} className='input--dropdown__option__color'/>
           <Text className='margin-top-smallest'>{text}</Text>
         </Row>
       })
@@ -97,7 +98,7 @@ export function languageDropdownOptions (languageObj, {selection} = {}) {
 export function colorDropdownChoice (obj) {
   return {
     content: <Text className='bottom'>
-      <ColorSwatch code={obj.value} className='input--dropdown__option__color'/>
+      <ColorSwatch value={obj.value} className='input--dropdown__option__color'/>
       <Text>{obj.text}</Text>
     </Text>
   }
