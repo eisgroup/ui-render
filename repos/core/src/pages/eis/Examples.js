@@ -126,7 +126,7 @@ export default class Examples extends Component {
   }
 }
 
-@withUISetup({form: 'Example'})
+@withUISetup()
 @logRender
 export class Example extends Component {
   state = {

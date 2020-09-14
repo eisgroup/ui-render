@@ -1,6 +1,6 @@
 import { apiAction } from 'modules-pack/api'
 import { POPUP } from 'modules-pack/exports'
-import { reduxForm } from 'modules-pack/form'
+import { withForm } from 'modules-pack/form'
 import { SliderField } from 'modules-pack/form/inputs'
 import { testPayload } from 'modules-pack/popup/data'
 import { connect, stateAction } from 'modules-pack/redux'
@@ -58,7 +58,7 @@ const mapDispatchToProps = (dispatch) => ({
  * -----------------------------------------------------------------------------
  */
 @connect(mapStateToProps, mapDispatchToProps)
-@reduxForm({form: 'TEST', enableReinitialize: true})
+@withForm()
 @logRender
 export default class Tester extends Component {
   renderTester = () => {

@@ -36,7 +36,7 @@ If you want to leave the field empty when its value is `null` or `undefined`, ad
 
 ## Why Text component does not show `children` or `label`?
 Do not simultaneously define `renderLabel` attribute as empty object or object with `null` values, because the rendering priority is this:
-`renderLabel` > `items` > `children` > `label`
+`renderLabel` > `items` > `children` > `label`.
 You can, however, retrieve `children` or `label` value dynamically, then use `renderLabel` to format that value.
 Example:
 ```json

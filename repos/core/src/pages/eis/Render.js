@@ -1,3 +1,4 @@
+import { renderField } from 'modules-pack/form/renders'
 import { NAME as POPUP } from 'modules-pack/popup'
 import { stateAction } from 'modules-pack/redux'
 import { FIELD } from 'modules-pack/variables'
@@ -39,6 +40,8 @@ import {
   toPercent
 } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
+
+Active.renderField = renderField
 
 /**
  * Recursive Field Renderer

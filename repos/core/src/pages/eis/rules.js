@@ -1,5 +1,5 @@
 import { fetch } from 'modules-pack/api'
-import { reset, withForm } from 'modules-pack/form'
+import { withForm } from 'modules-pack/form'
 import { popupAlert } from 'modules-pack/popup'
 import { FIELD } from 'modules-pack/variables'
 import React from 'react'
@@ -85,7 +85,7 @@ export function toOpenLConfig (meta) {
  *    - this.hasData and this.hasMeta getters can be used for conditional check
  *    - Initialize with data by overriding initial state
  */
-export function withUISetup ({form, ...options}) {
+export function withUISetup (formConfig) {
   return function Decorator (Class) {
     const UNSAFE_componentWillMount = Class.prototype.UNSAFE_componentWillMount
     const UNSAFE_componentWillUpdate = Class.prototype.UNSAFE_componentWillUpdate
@@ -171,8 +171,7 @@ export function withUISetup ({form, ...options}) {
 
     // Define instance method
     Class.prototype.resetForm = function () {
-      const {dispatch, form} = this.props
-      dispatch(reset(form))
+      this.props.form.reset()
     }
 
     // Define instance method
@@ -198,6 +197,6 @@ export function withUISetup ({form, ...options}) {
       if (UNSAFE_componentWillUpdate) UNSAFE_componentWillUpdate.apply(this, arguments)
     }
 
-    return withForm({form, enableReinitialize: true, ...options})(Class)
+    return withForm(formConfig)(Class)
   }
 }

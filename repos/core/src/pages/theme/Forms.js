@@ -1,3 +1,4 @@
+import { withForm } from 'modules-pack/form'
 import React, { Component } from 'react'
 import Checkbox from 'react-ui-pack/Checkbox'
 import Input from 'react-ui-pack/Input'
@@ -7,7 +8,6 @@ import Select from 'react-ui-pack/Select'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
 import { PATH_IMAGES } from '../../common/variables'
-import { reduxForm } from '../../modules/form'
 import { DropdownField, InputField, ToggleField } from '../../modules/form/inputs'
 import { hourMinute, number } from '../../modules/form/normalizers'
 import { isRequired, url } from '../../modules/form/validationRules'
@@ -15,7 +15,7 @@ import { isRequired, url } from '../../modules/form/validationRules'
 /**
  * Form Inputs
  */
-@reduxForm({form: 'TEST', enableReinitialize: true})
+@withForm()
 export default class Forms extends Component {
   render () {
     return (

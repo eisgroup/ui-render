@@ -1,5 +1,5 @@
 import { fetch } from 'modules-pack/api'
-import { reset, withForm } from 'modules-pack/form'
+import { withForm } from 'modules-pack/form'
 import { NAME as POPUP } from 'modules-pack/popup/constants'
 import { connect, stateAction } from 'modules-pack/redux'
 import settings from 'modules-pack/settings'
@@ -147,7 +147,7 @@ export default class Demo extends Component {
 }
 
 @connect(mapStateToProps, mapDispatchToProps)
-@withForm({form: 'DEMO', enableReinitialize: true})
+@withForm()
 class Renderer extends Component {
   static propTypes = {
     data: PropTypes.any.isRequired,
@@ -160,8 +160,7 @@ class Renderer extends Component {
   }
 
   resetForm = () => {
-    const {dispatch, form} = this.props
-    dispatch(reset(form))
+    this.props.form.reset()
   }
 
   /**

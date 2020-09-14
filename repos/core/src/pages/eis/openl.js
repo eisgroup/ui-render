@@ -14,7 +14,7 @@ import { withUISetup } from './rules'
  * -----------------------------------------------------------------------------
  */
 // todo: refactor to PureComponent
-@withUISetup({form: 'HOME', initialValues: data})
+@withUISetup({initialValues: data, subscription: {pristine: true, valid: true}})
 @logRender
 export default class OpenL extends Component {
   state = {
