@@ -1,5 +1,12 @@
 ### Table of Contents
 
+## Prerequisites
+
+To understand and work with the UI Renderer, basic understanding of HTML and CSS is required:
+- [What is HTML?](https://www.w3schools.com/whatis/whatis_html.asp)
+- [What is CSS?](https://www.w3schools.com/whatis/whatis_css.asp)
+
+
 ## Overview
 
 The UI Renderer is a declarative dynamic [React](https://reactjs.org/) component that is capable of rendering almost any user interface, in any platform (web, mobile, desktop, etc.).
