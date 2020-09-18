@@ -27,10 +27,12 @@ function Select ({
   placeholder,
   defaultValue = '',
   className,
+  ...props
 }) {
   const id = 'select-' + label
-  if (typeof options[0] === 'string') options = options.map(value => ({ text: value, value }))
-  if (typeof options[0] === 'number') options = options.map(value => ({ text: String(value), value }))
+  if (typeof options[0] === 'string') options = options.map(value => ({text: value, value}))
+  if (typeof options[0] === 'number') options = options.map(value => ({text: String(value), value}))
+  if (value && !onChange) throw new Error('Select.value is only used when `onChange` or `readOnly` provided')
   return (
     <div className={classNames('select', className)}>
       <Label htmlFor={id} className="sr-only">Select {label}</Label>
@@ -38,8 +40,10 @@ function Select ({
         id={id}
         name={name}
         {...isFunction(onChange) ? {value, onChange: ({target: {value}}) => onChange(value)} : {defaultValue}}
+        {...props}
       >
-        <option value='' disabled>{placeholder || 'Select ' + (label ? label : '')}</option>
+        {(value == null || !!label) &&
+        <option value='' disabled>{placeholder || 'Select ' + (label ? label : '')}</option>}
         {options.map(({text, value, key}, index) => (
           <option key={key || index} value={value != null ? value : text}>{text}</option>
         ))}
