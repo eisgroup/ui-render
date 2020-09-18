@@ -50,7 +50,7 @@ function soundFile (name) {
       } catch (err) {
         warn(err)
       }
-      if (Active.SETTINGS.HAS_SOUND && file) file.play().catch(console.error)
+      if (Active.SETTINGS.HAS_SOUND && file) file.play().catch()
     }
   }
 }
