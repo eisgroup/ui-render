@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
+import { Active } from 'utils-pack'
 import Button from './Button'
 import { SOUND } from './files'
 
@@ -21,7 +22,7 @@ function MenuButton ({
     <Button
       className={classNames('app__menu__button transparent', {active}, className)}
       aria-label={(active ? 'Close' : 'Open') + ' Menu'}
-      sound={SOUND.TOUCH}
+      sound={Active.SETTINGS.HAS_SOUND && SOUND.TOUCH}
       {...props}
     >
       <span className='box'>

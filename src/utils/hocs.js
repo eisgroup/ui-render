@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { useContext } from 'react'
-import { warn } from 'utils-pack'
+import { Active, warn } from 'utils-pack'
 import { SOUND } from '../files'
 import { STYLE } from '../styles'
 
@@ -11,7 +11,7 @@ import { STYLE } from '../styles'
  * @param {Object} [sound] - new Audio(URL) file
  * @returns {Object} props - mutated with necessary accessibility attributes
  */
-export function accessibilitySupport (props, sound = SOUND.TOUCH) {
+export function accessibilitySupport (props, sound = Active.SETTINGS.HAS_SOUND && SOUND.TOUCH) {
   /* Remove key press and click event if necessary */
   if (props.tabIndex === -1) {
     delete props.onKeyPress
