@@ -35,6 +35,11 @@ export default class InputNative extends PureComponent {
     onMount: PropTypes.func,
   }
 
+  componentDidUpdate (prev, prevState, snapshot) {
+    const {value, compact} = this.props
+    if (compact && prev.value !== value) resizeToContent(this.element.value, this.element.style, compact)
+  }
+
   onChange = ({target: {value, style}}) => {
     const {onChange, compact} = this.props
     if (compact) resizeToContent(value, style, compact)
@@ -43,6 +48,7 @@ export default class InputNative extends PureComponent {
 
   onMountResize = (element) => {
     const {compact, onMount} = this.props
+    this.element = element
     resizeToContent(element.value, element.style, compact)
     onMount && onMount(element)
   }
