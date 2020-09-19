@@ -8,6 +8,13 @@ import Image from './Image'
 import Row from './Row'
 import Text from './Text'
 
+export const noSpellCheck = {
+  autoComplete: 'off',
+  autoCorrect: 'off',
+  autoCapitalize: 'off',
+  spellCheck: false,
+}
+
 /**
  * RENDER HELPERS ==============================================================
  * =============================================================================
@@ -175,6 +182,20 @@ export function renderSort ({id, order}, {onClick, className} = {}) {
 }
 
 renderSort.icon = SORT_ORDER
+
+/**
+ * Resize Element Width to Match Content Length
+ *
+ * @param {String} value - of the element to resize
+ * @param {Object} style - of the element to resize
+ * @param {Boolean|Number} offset - count of characters to add to final width
+ */
+export function resizeToContent (value, style, offset = 1) {
+  // Add additional character to prevent truncation from uneven fonts
+  // boolean `offset` evaluates to 1 by default.
+  style.width = value.length + Number(offset) + 'ch'
+  style.boxSizing = 'content-box'
+}
 
 /**
  * Event handler to autosize Input height to match typed in text height
