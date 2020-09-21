@@ -66,7 +66,7 @@ export function asSquare (Component) {
   return function Square ({top, right, bottom, left, wScale, hScale, className, ...props}) {
     const ratio = wScale && hScale ? wScale / hScale : 1
     const isRectangle = ratio !== 1
-    return <SizeMe monitorHeight children={({size: {width, height}}) => {
+    return <SizeMe monitorWidth monitorHeight children={({size: {width, height}}) => {
       const smallerSize = Math.floor(Math.min(width || 0, height || 0))
       const style = {width: smallerSize, height: smallerSize} // square case
 
@@ -91,7 +91,7 @@ export function asSquare (Component) {
       // The fix is to make immediate child positioned absolute within the square.
       return <View fill className={classNames('square-placeholder', position({top, right, bottom, left}))}>
         <View className='square-wrap' style={style}>
-          <Component className={classNames('position-fill', className)} {...props}/>
+          <Component className={classNames('position-fill', className)} {...style} {...props}/>
         </View>
       </View>
     }}/>

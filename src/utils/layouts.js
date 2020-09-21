@@ -23,7 +23,7 @@ export function withResponsiveSize (Component) {
       <SizeMe monitorWidth monitorHeight children={({size: {width, height}}) => (
         <View fill className='responsive-size'>
           <View className='position-fill'>
-            <Component {...{...props, width, height}} />
+            <Component {...{width, height, ...props}} />
           </View>
         </View>
       )}/>
