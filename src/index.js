@@ -13,6 +13,7 @@ export * from './codec'
 // export * from './crypto' // to be imported directly to reduce bundle size
 // export * from './file' // to be imported directly to reduce bundle size
 export * from './function'
+export * from './math'
 export * from './log'
 // export * from './media' // to be imported directly to reduce bundle size
 export * from './number'
