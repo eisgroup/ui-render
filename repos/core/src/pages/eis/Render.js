@@ -22,7 +22,6 @@ import {
   isObject,
   isString,
   removeNilValues,
-  toList,
   toPercent
 } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
@@ -309,8 +308,10 @@ function transformDefinition (value, {data, args}) {
  * @returns {Object} definition - with names replaced by functions (by mutation)
  */
 function metaToFunctions (definition, {data, funcNames = FUNCTION_NAMES} = {}) {
-  const validations = toList(definition.validate)
-  if (isString(validations[0])) definition.validate = removeNilValues(validations.map(id => FIELD.VALIDATION[id]))
+  /* react-final-form does not support validate as array, like redux-form */
+  // const validations = toList(definition.validate)
+  // if (isString(validations[0])) definition.validate = removeNilValues(validations.map(id => FIELD.VALIDATION[id]))
+  if (isString(definition.validate)) definition.validate = FIELD.VALIDATION[definition.validate]
   if (isString(definition.normalize)) definition.normalize = FIELD.NORMALIZER[definition.normalize]
   funcNames.forEach(name => {
     if (isString(definition[name])) {

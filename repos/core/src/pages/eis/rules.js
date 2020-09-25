@@ -156,6 +156,7 @@ export function withUISetup (formConfig) {
     Object.defineProperty(Class.prototype, 'handleSubmit', {
       get () {
         if (this._handleSubmit != null) return this._handleSubmit
+        // For redux-form
         return this._handleSubmit = this.props.handleSubmit(this.submit.bind(this))
       },
     })
