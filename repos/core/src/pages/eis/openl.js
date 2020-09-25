@@ -13,7 +13,9 @@ import { withUISetup } from './rules'
  * VIEW TEMPLATE ---------------------------------------------------------------
  * -----------------------------------------------------------------------------
  */
-// todo: refactor to PureComponent
+// todo: adds docs about debug attribute
+// todo: Table vertical layout
+// todo: fix Dropdown causing form submit
 @withUISetup({initialValues: data, subscription: {pristine: true, valid: true}})
 @logRender
 export default class OpenL extends Component {

@@ -51,6 +51,40 @@ There are `transform patterns` you can apply to any component. This is the secre
       `{state.key.path.to.value}`
     - See the [example](#render-field-attributes) of Dropdown `onChange` attribute
  
+8. **Global/Relative Data access**
+    - When you specify the `name` attribute of a Field, it retrieves values from the root `data.json` object by default
+    - Use `{relativeData: true}` to make `name` attribute retrieve values from local data passed down from parent/grandparent/etc. fields.
+    - Example:
+    ```js
+    const localData = {
+      view: "GrandParent",
+      name: "path.to.item.0",
+      items: [
+        {
+          view: "Parent",
+          name: "plan.0", // => this will resolve to "root.path.to.item.0.plan.0"
+          relativeData: true,
+          items: [
+            {
+              view: "Child",
+              name: "id", // => this will resolve to "root.path.to.item.0.plan.0.id"
+              relativeData: true,
+            },
+            {
+              view: "Child",
+              name: "id", // => this will resolve to "root.id"
+              relativeData: false,
+            },
+            {
+              view: "Child",
+              name: "id", // => this will resolve to "root.id"
+            },
+          ]
+        },
+      ]
+    }
+    ```
+      
 ## Render Field Attributes
 ```js
 const RenderField = {
