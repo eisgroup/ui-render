@@ -20,8 +20,6 @@ import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
 import { Active, get, isList, isObject, toList } from 'utils-pack'
 
-Active.renderField = renderField
-
 /**
  * UI RENDERER COMPONENTS SETUP ================================================
  * Map Component props for recursive rendering
@@ -213,7 +211,7 @@ export default function RenderComponent ({
       if (relativeData && relativePath != null && input.name) {
         input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
       }
-      return Active.renderField({view, items, ...input})
+      return renderField({view, items, ...input})
     }
   }
 }

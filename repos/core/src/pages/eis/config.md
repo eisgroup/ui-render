@@ -29,7 +29,7 @@ There are `transform patterns` you can apply to any component. This is the secre
       Example: `renderCell: { default: "Currency" }`
 
 4. **Data mapping by key paths**
-    - See the [example](#render-field-attributes) if `mapItems` and `mapOptions`
+    - See the [example](#render-field-attributes) of `mapItems` and `mapOptions`
     - String can be used as a mapper
       Example: `{mapOptions: "planName"}` -> use `planName` attribute as options value
 
@@ -139,6 +139,7 @@ const RenderField = {
   // @see: <TableView /> docs for other props
   inverted: Boolean, // whether to style table in dark mode
   striped: Boolean, // whether to alternate background shade of items (rows in default layout)
+  vertical: Boolean, // whether to render the first Table column as header
   headers: [ // headers are columns in default layout, used for configuring how to show each cell data under the header
     {
       id: String, // required cell id

@@ -14,7 +14,6 @@ import { withUISetup } from './rules'
  * -----------------------------------------------------------------------------
  */
 // todo: adds docs about debug attribute
-// todo: Table vertical layout
 // todo: fix Dropdown causing form submit
 @withUISetup({initialValues: data, subscription: {pristine: true, valid: true}})
 @logRender
