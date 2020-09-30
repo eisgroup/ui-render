@@ -1,7 +1,6 @@
 {
   "view": "Table",
   "name": "coverages",
-  "vertical": true,
   "headers": [
     {
       "id": "coverageID",

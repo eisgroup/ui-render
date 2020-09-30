@@ -19,6 +19,7 @@ import listMeta from './examples/list_meta.json'
 import piechartMeta from './examples/piechart_meta.json'
 import tabListMeta from './examples/tab-list_meta.json'
 import tableNestedMeta from './examples/table-nested_meta.json'
+import tableVerticalMeta from './examples/table-vertical_meta.json'
 import Render from './Render'
 import { withUISetup } from './rules'
 
@@ -57,6 +58,11 @@ const examples = [
     title: 'Table Nested within Table',
     data: listData,
     meta: tableNestedMeta,
+  },
+  {
+    title: 'Table Rows as Columns (Vertical Layout)',
+    data: listData,
+    meta: tableVerticalMeta,
   },
   {
     title: 'Invalid Array Data',

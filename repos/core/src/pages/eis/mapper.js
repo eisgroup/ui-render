@@ -126,7 +126,7 @@ export default function RenderComponent ({
     }
 
     case FIELD.TYPE.TABLE: {
-      const {extraItems, filterItems, parentItem, ...more} = props
+      const {extraItems, filterItems, parentItem, ...table} = props
       if (!isList(_data)) _data = []
       if (filterItems && parentItem) {
         _data = _data.filter(item => {
@@ -154,7 +154,7 @@ export default function RenderComponent ({
         }
         return item
       }))
-      return <TableView items={_data} {...more}/>
+      return <TableView items={_data} {...table}/>
     }
 
     case FIELD.TYPE.TABS: {
