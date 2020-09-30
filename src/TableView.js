@@ -62,7 +62,8 @@ export default class TableView extends PureComponent {
         id: PropTypes.string.isRequired,
         values: PropTypes.object.isRequired,
       })
-    )
+    ),
+    vertical: PropTypes.bool, // whether to render rows as columns (first column as Header)
     // ...other Table props
   }
 
@@ -235,6 +236,20 @@ export default class TableView extends PureComponent {
     )
   }
 
+  // Render Rows (in Vertical layout)
+  // @Note: in Vertical layout, the first column in each item is a header
+  renderItemsVertical = (header, index) => {
+    const items = this.itemsSorted
+    return (
+      /* `itemClassNames` is not supported yet */
+      <Table.Row key={index}>
+        {this.renderHeader(header, index)}
+        {items.map((item, i) => this.renderItemData(item, i, header))}
+      </Table.Row>
+      /* Vertical layout has no expandable row */
+    )
+  }
+
   // Render Row Cells (in default layout)
   renderItemData = (item, index, {id, renderCell, classNameCellWrap, classNameCell: className, styleCell: style}) => {
     // Conditional rendering logic based on given cell data
@@ -244,7 +259,7 @@ export default class TableView extends PureComponent {
     const value = data != null ? data : cell
     const content = render ? render(value, index, {className, style, expanded: this.expandedByRow(index)}, this) : cell
     return (
-      <Table.Cell key={id} className={classNameCellWrap}>
+      <Table.Cell key={this.props.vertical ? index : id} className={classNameCellWrap}>
         {typeof content === 'object'
           ? content
           : <View className={className} style={style}><Text className='p'>{content}</Text></View>
@@ -253,28 +268,28 @@ export default class TableView extends PureComponent {
     )
   }
 
+
   render () {
     const headers = this.headers
     if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
     const {
-      className, sorts, onSort, extraHeaders,
+      className, sorts, onSort, extraHeaders, vertical,
       items: _, headers: __, renderItem: ___, itemClassNames: ____, itemsExpanded: _____,
       ...props
     } = this.props
     const items = this.itemsSorted
     return (
       <ScrollView row classNameInner='fill-width'>
-        <Table className={classNames('full-width', className)} {...props}>
+        <Table className={classNames('full-width', className, {vertical})} {...props}>
           <Table.Header className='font-normal'>
             {extraHeaders && extraHeaders.map((row, i) => (
               <Table.Row key={i}>{row.map(this.renderHeader)}</Table.Row>
             ))}
-            <Table.Row>
-              {headers.map(this.renderHeader)}
-            </Table.Row>
+            {/* Vertical layout does not have horizontal headers */}
+            {!vertical && <Table.Row>{headers.map(this.renderHeader)}</Table.Row>}
           </Table.Header>
           <Table.Body>
-            {items.map(this.renderItem)}
+            {vertical ? headers.map(this.renderItemsVertical) : items.map(this.renderItem)}
           </Table.Body>
         </Table>
       </ScrollView>
