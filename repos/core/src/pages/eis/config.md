@@ -139,7 +139,7 @@ const RenderField = {
   // @see: <TableView /> docs for other props
   inverted: Boolean, // whether to style table in dark mode
   striped: Boolean, // whether to alternate background shade of items (rows in default layout)
-  vertical: Boolean, // whether to render the first Table column as header
+  vertical: Boolean, // whether to render Table rows as columns (does not work with `renderItem`)
   headers: [ // headers are columns in default layout, used for configuring how to show each cell data under the header
     {
       id: String, // required cell id
@@ -197,7 +197,7 @@ const RenderField = {
   ],
   itemsExpanded: Boolean, // expand all Rows/Columns by default
   itemClassNames: [ // conditional class names for table items (rows in default layout)
-    { 
+    { // does not work when `vertical: true` because not possible to apply CSS across table rows
       id: String, // cell id to apply className to
       values: {
         'value to match': String // css className to apply
