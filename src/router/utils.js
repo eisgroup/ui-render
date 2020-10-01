@@ -3,7 +3,7 @@ import React from 'react'
 import { withRouter } from 'react-router'
 import { Link as LinkRouter, Route } from 'react-router-dom'
 import { onPressHoc, SOUND } from 'react-ui-pack'
-import { hasListValue } from 'utils-pack'
+import { Active, hasListValue } from 'utils-pack'
 
 /**
  * Recursively Declare Routes using Absolute Paths
@@ -27,7 +27,7 @@ export function defineRoutes (routes, pages) {
 /**
  * Link HOC for react-router to play sound onClick
  */
-export function Link ({onClick, sound = SOUND.TOUCH, ...props}) {
+export function Link ({onClick, sound = Active.SETTINGS.HAS_SOUND && SOUND.TOUCH, ...props}) {
   return <LinkRouter onClick={onPressHoc(onClick, sound)} {...props}/>
 }
 

@@ -102,7 +102,7 @@ FIELD.DEF = {
 // Field Min/Max Value Definitions by ID (used for extending base definitions from FIELD.DEF)
 FIELD.MIN_MAX = {
   // Common
-  [FIELD.ID.LANGUAGE]: [LANGUAGE_LEVEL.BASIC.code, LANGUAGE_LEVEL.NATIVE.code],
+  [FIELD.ID.LANGUAGE]: [LANGUAGE_LEVEL.BASIC._, LANGUAGE_LEVEL.NATIVE._],
   // ...to be populated by modules
 }
 
