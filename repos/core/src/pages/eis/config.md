@@ -105,14 +105,16 @@ const RenderField = {
   unit: 'Input value unit label (e.x. "USD" for currency input)',
   icon: 'dollar', // icon css class name -> displays Icon inside Input
   lefty: Boolean, // whether to show icon on the left, default is on the right
-  onChange: Function, // callback for input value changes
   float: Boolean, // whether label should float above input when in focus
   disabled: Boolean, // disabled input
   readonly: Boolean, // read-only input, makes all nested fields disabled, with `readonly` css class applied
-  normalize: Function, // redux-form input value normalizer function/s
-  validate: [Function], // redux-form input value validation function/s
+  format: String, // name of the format function
+  normalize: String, // name of the normalizer function
+  parse: String, // name of the parser function
+  validate: String, // name of the validation function
   value: undefined, // controlled input value
   defaultValue: undefined, // to be used on init if `value` not set
+  onChange: String, // name of the callback function for input value changes
   hint: 'Displayed as title text above input',
   info: 'Content to render when input is in focus',
   error: 'Content to render when input is invalid',

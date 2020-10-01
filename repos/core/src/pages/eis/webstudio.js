@@ -6,7 +6,7 @@ import Placeholder from 'react-ui-pack/Placeholder'
 import ScrollView from 'react-ui-pack/ScrollView'
 import Spinner from 'react-ui-pack/Spinner'
 import Text from 'react-ui-pack/Text'
-import { ENV, get, isEmpty, logRender, SUCCESS } from 'utils-pack'
+import { ENV, fromJSON, get, isEmpty, isString, logRender, SUCCESS } from 'utils-pack'
 import Render from './Render'
 import { withUISetup } from './rules'
 
@@ -30,6 +30,17 @@ export default class WebStudioPage extends Component {
   }
 
   componentDidMount () {
+    /* Use local variables, if set */
+    if (typeof window !== 'undefined') {
+      const {dataJson, metaJson} = window
+      if (dataJson && metaJson) {
+        const data = isString(dataJson) ? fromJSON(dataJson) : dataJson
+        const meta = isString(metaJson) ? fromJSON(metaJson) : metaJson
+        return this.setState({loadingData: false, loadingMeta: false, data, meta})
+      }
+    }
+
+    /* Fetch JSON from external API */
     this.fetch(DATA_URL, {body: this.id, contentType: 'text/plain'})
       .then(data => this.setState({loadingData: false, data}))
       .catch(this.popup)
@@ -69,7 +80,7 @@ export default class WebStudioPage extends Component {
   }
 }
 
-@withUISetup({form: 'WebStudio'})
+@withUISetup({subscription: {pristine: true, valid: true}})
 @logRender
 export class WebStudio extends Component {
   state = {
