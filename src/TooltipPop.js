@@ -7,9 +7,10 @@ import { Popup as Pop } from 'semantic-ui-react'
 export default function TooltipPop ({
   title,
   children,
+  inverted = true,
   ...props
 }) {
   return (
-    <Pop trigger={children} content={title} {...props}/>
+    <Pop inverted trigger={children} content={title} {...props}/>
   )
 }

@@ -36,7 +36,7 @@ import View from './View'
  * @param {*} props - attributes to pass to `<input />`
  * @returns {Object} - React Component
  */
-function Input ({
+export function Input ({
   icon,
   lefty,
   onClickIcon,
@@ -73,7 +73,8 @@ function Input ({
   }
   if (float && !props.placeholder) props.placeholder = ' ' // required for Float label CSS to work
   const idHelp = id + '-help'
-  const hasValue = props.value != null && props.value !== ''
+  const value = props.value != null ? props.value : props.defaultValue
+  const hasValue = value || value === 0
   const isCheckbox = props.type === 'checkbox'
   if (done == null) done = !error && hasValue
   return (
@@ -86,7 +87,7 @@ function Input ({
         {icon && lefty && <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>}
         {unit && hasValue &&
         <Text className='input__unit truncate'>
-          <Text className='invisible' aria-hidden='true'>{props.value}</Text> {unit}
+          <Text className='invisible' aria-hidden='true'>{value}</Text> {unit}
         </Text>
         }
         {stickyPlaceholder && props.placeholder && hasValue &&

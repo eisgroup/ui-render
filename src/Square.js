@@ -54,16 +54,17 @@ export default Square
 
 /**
  * React Component Decorator (HOC) to Render as Square/Rectangle, taking all available width and height
+ * @todo: fix - does not resize back when screen is smaller if wScale and hScale defined
  * @example:
  *    @asSquare
  *    class UploadGrid extends Component {
  *       //...
  *    }
  *
- * @param {Class|Function} Component - to render as square
+ * @param {Class|Function|MemoExoticComponent|NamedExoticComponent} Component - to render as square
  */
 export function asSquare (Component) {
-  return function Square ({top, right, bottom, left, wScale, hScale, className, ...props}) {
+  function Square ({top, right, bottom, left, wScale, hScale, className, ...props}) {
     const ratio = wScale && hScale ? wScale / hScale : 1
     const isRectangle = ratio !== 1
     return <SizeMe monitorWidth monitorHeight children={({size: {width, height}}) => {
@@ -96,6 +97,8 @@ export function asSquare (Component) {
       </View>
     }}/>
   }
+
+  return React.memo(Square)
 }
 
 function position ({top, right, bottom, left}) {
