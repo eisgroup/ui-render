@@ -105,27 +105,32 @@ export function asField (InputComponent, {sanitize} = {}) {
     }
 
     // do not use ...props from input, because it is shared by <Active.Field> instances
-    input = ({input, meta: {touched, error, pristine} = {}}) => {
+    Input = ({input, meta: {touched, error, pristine} = {}}) => {
       if (this.props.readonly && isRequired(input.value)) return null
-      const {onChange, error: errorMessage, defaultValue, validate: _, normalize, format, parse = normalize, ...props} = this.props
+      const {onChange, error: errorMessage, defaultValue, validate: _, normalize, format, parse, ...props} = this.props
       // @Note: defaultValue is only used for UI, internal value is still undefined
       this.value = input.value === '' ? (pristine && defaultValue != null ? defaultValue : input.value) : input.value
-      this.onChange = input.onChange
+      this.input = input
       if (this.value === undefined) this.value = ''
       return (
         <InputComponent
           {...input}
           value={sanitize ? sanitize(this.value, this.props) : this.value}
-          onBlur={() => input.onBlur()} // prevent value change, but need onBlur to set touched for validation
-          onChange={value => {
-            if (this.props.type === 'number') value = value !== '' ? Number(value) : null
-            input.onChange(value)
-            onChange && onChange(parse ? parse(value) : value)
-          }}
+          onBlur={this.handleBlur} // prevent value change, but need onBlur to set touched for validation
+          onChange={this.handleChange}
           error={touched && error && (errorMessage || error)}
           {...props} // allow forceful value override
         />
       )
+    }
+
+    handleBlur = () => this.input.onBlur()
+
+    handleChange = (value) => {
+      const {onChange, type, normalize, parse = normalize} = this.props
+      if (type === 'number') value = value !== '' ? Number(value) : null
+      this.input.onChange(value)
+      onChange && onChange(parse ? parse(value) : value)
     }
 
     componentDidMount () {
@@ -134,14 +139,14 @@ export function asField (InputComponent, {sanitize} = {}) {
       if (!parse || this.value === '') return
       const valueNormalized = parse(this.value)
       if (this.value === valueNormalized) return
-      this.onChange(valueNormalized)
+      this.input.onChange(valueNormalized)
       onChange && onChange(valueNormalized)
     }
 
     // Do not pass 'onChange' to Field because it fires event as argument
     render () {
       const {name, disabled, normalize, format = normalize, parse = normalize, validate, options} = this.props
-      return <Active.Field {...{name, disabled, normalize, format, parse, validate, options}} component={this.input}/>
+      return <Active.Field {...{name, disabled, normalize, format, parse, validate, options}} component={this.Input}/>
     }
   }
 
