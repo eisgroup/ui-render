@@ -11,7 +11,7 @@ import View from './View'
  * @param {*} props - other attributes to pass to `<Table>`
  * @returns {Object} - React table component
  */
-function ErrorContent ({
+export function ErrorContent ({
   items,
   ...props
 }) {

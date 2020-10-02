@@ -6,7 +6,7 @@ import Text from './Text'
 /**
  * Texture Swatch - Pure Component.
  */
-function TextureSwatch ({
+export function TextureSwatch ({
   src,
   small,
   large,

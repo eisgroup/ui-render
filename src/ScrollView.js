@@ -19,7 +19,7 @@ import View from './View'
  * @param {*} props - other props
  * @returns {Object} - React component
  */
-function ScrollView ({
+export function ScrollView ({
   className,
   classNameInner,
   style,

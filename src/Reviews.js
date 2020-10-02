@@ -19,7 +19,7 @@ import View from './View'
  * @param {*} props - other attributes to pass to `<div></div>`
  * @returns {Object} - React Component
  */
-function Reviews ({
+export function Reviews ({
   items,
   onClickAvatar,
   className,

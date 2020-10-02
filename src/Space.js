@@ -5,7 +5,7 @@ import View from './View'
 /**
  * Space - Pure Component
  */
-function Space ({small, large, className, ...props}) {
+export function Space ({small, large, className, ...props}) {
   return <View className={classNames('space' + (small ? '-small' : (large ? '-large' : '')), className)} {...props}/>
 }
 

@@ -9,7 +9,7 @@ import React from 'react'
  * @param {*} props - other attributes to pass to `<label></label>`
  * @returns {Object}
  */
-function Label ({
+export function Label ({
   children,
   ...props
 }) {

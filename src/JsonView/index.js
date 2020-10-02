@@ -18,7 +18,7 @@ import defaultTheme from './themes'
  * @param {*} props - other attributes to pass to `<div></div>`
  * @returns {Object} - React Component
  */
-function JsonView ({
+export function JsonView ({
   data = {},
   inverted = false,
   expanded = false,

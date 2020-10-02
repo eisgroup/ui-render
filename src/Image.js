@@ -13,7 +13,7 @@ import { FILE } from './files'
  * @param {*} [props] - other attributes to pass to `<img>`
  * @returns {Object} - React component
  */
-function Image ({
+export function Image ({
   name,
   path,
   className = '',

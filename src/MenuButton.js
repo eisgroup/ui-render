@@ -13,7 +13,7 @@ import { SOUND } from './files'
  * @param {*} [props] - other props
  * @returns {Object} - React button component
  */
-function MenuButton ({
+export function MenuButton ({
   active,
   className,
   ...props

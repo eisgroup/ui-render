@@ -5,7 +5,7 @@ import View from './View'
 /**
  * Modal - Pure Component
  */
-function Modal ({
+export function Modal ({
   isOpen = false,
   canClose = true,
   onClose,

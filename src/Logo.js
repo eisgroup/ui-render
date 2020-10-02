@@ -10,7 +10,7 @@ import View from './View'
  * @param {string} link - relative or absolute URL link. Will default to root of app
  * @returns {Object} - React element
  */
-function Logo ({
+export function Logo ({
   name,
   link = '/'
 }) {

@@ -6,7 +6,7 @@ import View from './View'
 /**
  * Dynamic List of Views/Rows - Pure Component.
  */
-function List ({renderItem, items, row, ...props}) {
+export function List ({renderItem, items, row, ...props}) {
   const Container = row ? Row : View
   return (
     <Container {...props}>

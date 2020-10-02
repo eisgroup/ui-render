@@ -11,7 +11,7 @@ import View from './View'
 /**
  * Stats with Percentage Difference and Optional Content Underneath
  */
-function StatsChange ({start, end, children, className, render = shortNumber, ...props}) {
+export function StatsChange ({start, end, children, className, render = shortNumber, ...props}) {
   const percentChange = toPercentage(end, start)
   return (
     <View className={classNames('app__stats-change', className)} {...props}>

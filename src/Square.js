@@ -11,7 +11,7 @@ import View from './View'
  * @Note: alternatively use @asSquare decorator, which works cross platform, but may not resize when screen shrinks
  * @Use: <Square.View> or <Square.Row>
  */
-function SquareRender ({
+export function SquareRender ({
   top, right, bottom, left,
   children, className, classNameInner, styleInner,
   wScale = 1, hScale = 1, // ratio used to render rectangle (must be whole integer), default is square

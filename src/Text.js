@@ -15,7 +15,7 @@ import { accessibilitySupport } from './utils'
  * @param {*} props - other attributes to pass to `<div></div>`
  * @returns {Object} - React Component
  */
-function Text ({
+export function Text ({
   className,
   fill,
   reverse,

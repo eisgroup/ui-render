@@ -19,7 +19,7 @@ import { STYLE } from './styles'
  * @param {*} [props] - Other attributes to pass to the container
  * @returns {Object} - React element
  */
-function AnimateHeight ({
+export function AnimateHeight ({
   expanded,
   duration = STYLE.ANIMATION_DURATION,
   className,

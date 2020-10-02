@@ -9,7 +9,7 @@ import Text from './Text'
 /**
  * Show Distance in km away if given, or address of the place, with toggle option
  */
-function AddressDistance ({
+export function AddressDistance ({
   address,
   distance, // from user location
   location, // geo location of given address

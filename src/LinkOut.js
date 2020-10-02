@@ -9,7 +9,7 @@ import React from 'react'
  * @param {*} [props] - other attributes to pass
  * @returns {Object} - React component
  */
-function LinkOut ({to, children, ...props}) {
+export function LinkOut ({to, children, ...props}) {
   return (
     <a href={to} target='_blank' rel='noopener noreferrer' {...props}>{children}</a>
   )

@@ -8,7 +8,7 @@ import View from './View'
 
 const ResponsiveEllipsis = responsiveHOC()(LinesEllipsis)
 
-function ReadMore ({
+export function ReadMore ({
   children,
   lines,
   more,

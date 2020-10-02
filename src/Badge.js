@@ -7,7 +7,7 @@ import View from './View'
 /**
  * Badge Counter - Pure Component.
  */
-function Badge ({
+export function Badge ({
   count,
   digits = 2,
   className,

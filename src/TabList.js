@@ -5,7 +5,7 @@ import Tabs from './Tabs'
 /**
  * Dynamic List of Tabs - Pure Component.
  */
-function TabList ({renderLabel, renderItem, items, ...props}) {
+export function TabList ({renderLabel, renderItem, items, ...props}) {
   return <Tabs
     {...props}
     items={items.map((item, i) => renderLabel(item, i))}

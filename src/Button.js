@@ -19,7 +19,7 @@ import { onPressHoc } from './utils'
  * @param {*} [props] - other attributes to pass
  * @returns {Object} - React component
  */
-function Button ({
+export function Button ({
   onClick,
   disabled = false,
   loading = false,

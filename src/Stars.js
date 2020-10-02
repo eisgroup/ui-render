@@ -15,7 +15,7 @@ import Text from './Text'
  * @param {*} props - other attributes to pass to component
  * @returns {Object} - React Component
  */
-function Stars ({
+export function Stars ({
   rating,
   className,
   large,

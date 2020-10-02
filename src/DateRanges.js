@@ -9,7 +9,7 @@ import Text from './Text'
 /**
  * Show Date Ranges as short string, with option to expand for details
  */
-function DateRanges ({
+export function DateRanges ({
   start,
   end,
   times = [],

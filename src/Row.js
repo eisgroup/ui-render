@@ -16,7 +16,7 @@ import { accessibilitySupport } from './utils'
  * @param {*} props - other attributes to pass to `<div></div>`
  * @returns {Object} - React Component
  */
-function Row ({
+export function Row ({
   className,
   fill,
   reverse,

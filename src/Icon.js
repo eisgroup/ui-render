@@ -14,7 +14,7 @@ import { accessibilitySupport } from './utils'
  * @param {*} props - other attributes to pass to Icon
  * @returns {Object} - React Component
  */
-function Icon ({
+export function Icon ({
   name,
   className,
   large,

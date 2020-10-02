@@ -28,7 +28,7 @@ import Tooltip from './Tooltip'
  * @param {Object} [props] - other props to pass
  * @return {Object} - React Component
  */
-function Slider ({
+export function Slider ({
   className,
   range,
   rangeLabels,

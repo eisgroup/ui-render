@@ -7,7 +7,7 @@ import Text from './Text'
 import View from './View'
 
 // List of Tags
-function Tags ({
+export function Tags ({
   items,
   defByCode, // example: DEFINITION_BY_VAL.LANGUAGE
   label,

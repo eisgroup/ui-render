@@ -5,7 +5,7 @@ import Expand from './Expand'
 /**
  * Dynamic List of Expandable Rows - Pure Component.
  */
-function ExpandList ({renderLabel, renderItem, items, ...props}) {
+export function ExpandList ({renderLabel, renderItem, items, ...props}) {
   return (
     items.map((item, i) => (
       <Expand key={item.id || i} {...props} title={renderLabel(item, i)}>{() => renderItem(item, i)}</Expand>

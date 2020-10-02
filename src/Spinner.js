@@ -12,7 +12,7 @@ import View from './View'
  * @param {*} props - other attributes to pass to spinner
  * @returns {object} - React Component
  */
-function Spinner ({
+export function Spinner ({
   size = 'base',  // Enum
   color = 'primary',  // Enum
   className,

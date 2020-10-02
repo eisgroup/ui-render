@@ -17,7 +17,7 @@ import View from './View'
  * @param {*} props - other attributes to pass to spinner
  * @returns {object} - React Component
  */
-function Loading ({
+export function Loading ({
   isLoading = true,
   size = 'larger',  // Enum
   className,

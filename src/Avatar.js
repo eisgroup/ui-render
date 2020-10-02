@@ -22,7 +22,7 @@ import View from './View'
  * @param {Object} [children] - extra content to render inside avatar
  * @returns {Object} - React component
  */
-function Avatar ({
+export function Avatar ({
   name = '',
   status = '',
   hideName = true,

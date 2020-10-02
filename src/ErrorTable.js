@@ -12,7 +12,7 @@ import Table from './Table'
  * @param {*} props - other attributes to pass to `<Table>`
  * @returns {Object} - React table component
  */
-function ErrorTable ({
+export function ErrorTable ({
   items,
   isServerError,
   inverted,

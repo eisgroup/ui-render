@@ -18,7 +18,7 @@ import Label from './Label'
  * @param {*} [props] - other attributes to pass to `<select>`
  * @returns {Object} - React select component
  */
-function Select ({
+export function Select ({
   name,
   label = name,
   value = '',

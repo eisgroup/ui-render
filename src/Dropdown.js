@@ -40,7 +40,7 @@ import View from './View'
  * @param {*} [props] - other attributes to pass to `<select>`
  * @returns {Object}
  */
-function Dropdown ({
+export function Dropdown ({
   options,
   onChange,
   onSelect,

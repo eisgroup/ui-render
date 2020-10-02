@@ -27,7 +27,7 @@ import View from './View'
  * @return {*}
  * @constructor
  */
-function Checkbox ({
+export function Checkbox ({
   value,
   valueTrue = true,
   valueFalse = false,

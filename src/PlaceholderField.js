@@ -8,7 +8,7 @@ import View from './View'
 /**
  * Placeholder Field - Pure Component.
  */
-function PlaceholderField ({name, ...props} = {}) {
+export function PlaceholderField ({name, ...props} = {}) {
   if (props.children == null)
     props.children = <Text className='p error padding border'>
       <Text className='bold'>{name}</Text>{toLowerCase(_.FIELD_DOES_NOT_EXIST)}
