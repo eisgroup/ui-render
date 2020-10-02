@@ -7,7 +7,7 @@ import Text from 'react-ui-pack/Text'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
 import { isList } from 'utils-pack'
-import { SliderField } from '../inputs'
+import SliderField from '../inputs/SliderField'
 
 /**
  * FORM FIELD RENDERERS ========================================================

@@ -1,8 +1,9 @@
 import { UI } from 'modules-pack/variables'
 import { fieldsFrom } from 'modules-pack/variables/fields'
 import PropTypes from 'prop-types'
-import React from 'react'
-import { Form } from 'react-final-form'
+import React, { PureComponent } from 'react'
+import { Field, Form } from 'react-final-form'
+import { isRequired } from 'react-ui-pack/inputs/validationRules'
 import Text from 'react-ui-pack/Text'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
@@ -67,6 +68,86 @@ export function registeredFieldErrors (form) {
  * HELPER FUNCTIONS ============================================================
  * =============================================================================
  */
+
+/**
+ * Wrapper Proxy for react-final-form or redux-form Field with unified API.
+ * @Note:
+ *    - `normalize` does not exist in react-final-form, only `format` and `parse`
+ *      => Make `format` and `parse` fallback to `normalize`, when undefined,
+ *         for compatibility with redux-form.
+ *    - must use Class to prevent input from loosing focus on input 'onChange'
+ *
+ * @param InputComponent - React component to use for input
+ * @param {Function} sanitize(value, props) - callback to parse value from input Field to InputComponent
+ * @returns {Class} React InputComponentField - connected to react-final-form or redux-form
+ */
+export function asField (InputComponent, {sanitize} = {}) {
+  if (!Active.Field) Active.Field = Field
+  // noinspection JSPotentiallyInvalidUsageOfThis
+  const Class = class extends PureComponent {
+    static propTypes = {
+      name: PropTypes.string.isRequired,
+      label: PropTypes.string,
+      id: PropTypes.string,
+      // HTML Input type attribute
+      type: PropTypes.string,
+      // Input placeholder
+      placeholder: PropTypes.string,
+      // help text or component to show on focus
+      info: PropTypes.any,
+      // help text or component to show on invalid input
+      error: PropTypes.any,
+      value: PropTypes.any,
+      onChange: PropTypes.func,
+      format: PropTypes.func,
+      normalize: PropTypes.func,
+      parse: PropTypes.func,
+    }
+
+    // do not use ...props from input, because it is shared by <Active.Field> instances
+    input = ({input, meta: {touched, error, pristine} = {}}) => {
+      if (this.props.readonly && isRequired(input.value)) return null
+      const {onChange, error: errorMessage, defaultValue, validate: _, normalize, format, parse = normalize, ...props} = this.props
+      // @Note: defaultValue is only used for UI, internal value is still undefined
+      this.value = input.value === '' ? (pristine && defaultValue != null ? defaultValue : input.value) : input.value
+      this.onChange = input.onChange
+      if (this.value === undefined) this.value = ''
+      return (
+        <InputComponent
+          {...input}
+          value={sanitize ? sanitize(this.value, this.props) : this.value}
+          onBlur={() => input.onBlur()} // prevent value change, but need onBlur to set touched for validation
+          onChange={value => {
+            if (this.props.type === 'number') value = value !== '' ? Number(value) : null
+            input.onChange(value)
+            onChange && onChange(parse ? parse(value) : value)
+          }}
+          error={touched && error && (errorMessage || error)}
+          {...props} // allow forceful value override
+        />
+      )
+    }
+
+    componentDidMount () {
+      // Auto dispatch action to set value if normalizer set and is different,
+      const {normalize, parse = normalize, onChange} = this.props
+      if (!parse || this.value === '') return
+      const valueNormalized = parse(this.value)
+      if (this.value === valueNormalized) return
+      this.onChange(valueNormalized)
+      onChange && onChange(valueNormalized)
+    }
+
+    // Do not pass 'onChange' to Field because it fires event as argument
+    render () {
+      const {name, disabled, normalize, format = normalize, parse = normalize, validate, options} = this.props
+      return <Active.Field {...{name, disabled, normalize, format, parse, validate, options}} component={this.input}/>
+    }
+  }
+
+  Object.defineProperty(Class, 'name', {value: InputComponent.name || InputComponent.constructor.name})
+  return Class
+}
 
 /**
  * React Component React Final Form Decorator with getters to detect form input changes
