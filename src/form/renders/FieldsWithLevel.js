@@ -11,7 +11,7 @@ import { SliderLabeled } from './renderers'
 export default class FieldsWithLevel extends PureComponent {
   static propTypes = {
     kind: PropTypes.string.isRequired, // type of definition to use - TYPE.key enum ['lang', 'phone', etc.]
-    level: PropTypes.object.isRequired, // Definition of Level by code (ex. DEFINITION_BY_VAL.LANGUAGE_LEVEL)
+    level: PropTypes.object.isRequired, // Definition of Level by _ (ex. DEFINITION_BY_VAL.LANGUAGE_LEVEL)
     options: PropTypes.arrayOf(PropTypes.shape({ // Dropdown options (ex. OPTIONS.LANGUAGE.items)
       text: PropTypes.string.isRequired,
       value: PropTypes.any.isRequired,
@@ -31,13 +31,13 @@ export default class FieldsWithLevel extends PureComponent {
 
   // RENDERS -------------------------------------------------------------------
   renderSlider = (obj, i, onRemove) => {
-    const {lang, kind, name, level, options: _, renderField, min = 1, max = 5, unit, ...props} = this.props
-    const {code} = obj
-    const id = name ? `${name}.${code}` : `${kind}.${code}`
+    const {lang, kind, name, level, options, renderField, min = 1, max = 5, unit, ...props} = this.props
+    const {_} = obj
+    const id = name ? `${name}.${_}` : `${kind}.${_}`
     // Prepare props for <SliderLabeled> or <SliderTooltip> component
     return renderField({
       name: id,
-      id: code,
+      id: _,
       label: obj.name,
       onRemove,
       min,

@@ -1,6 +1,8 @@
+import { OPTIONS, TYPE } from 'modules-pack/variables/definitions'
 import { FIELD } from 'modules-pack/variables/fields'
 import { date, double5, hourMinute, integer, phone, uppercase } from 'react-ui-pack/inputs/normalizers'
-import { email, isRequired, maxLength, password, url } from 'react-ui-pack/inputs/validationRules'
+import { email, isRequired, maxLength, password, phoneNumber, url } from 'react-ui-pack/inputs/validationRules'
+import { _ } from 'utils-pack/translations'
 
 /**
  * CONSTANT VARIABLES ==========================================================
@@ -16,10 +18,10 @@ FIELD.TYPE = {
   DROPDOWN: 'Dropdown', // Semantic UI Dropdown
   DATE: 'Date',
   DATES: 'Dates', // multiple date ranges with `from` and `to` times
+  GROUP: 'Group', // group of semantically related fields (i.e. pay rate and currency)
   INPUT: 'Input', // generic input of different types (i.e. type='text', 'textarea', etc.)
   SLIDER: 'SliderLabel', // slider field with label
   TOGGLE: 'Toggle', // checkbox rendered as toggle button
-  GROUP: 'Group', // group of semantically related fields (i.e. pay rate and currency)
   MULTIPLE: 'Fields', // multiple fields of the same type (i.e. mobile/work/home phone numbers)
   MULTIPLE_LEVEL: 'FieldsWithLevel',  // multiple fields of the same type, each having a value in predefined scale
   PLACE: 'Place',  // Google Places Autocomplete
@@ -58,6 +60,31 @@ FIELD.VALIDATION = {
   [FIELD.VALIDATE.PASSWORD]: password,
   [FIELD.VALIDATE.REQUIRED]: isRequired,
   [FIELD.VALIDATE.URL]: url,
+}
+
+// Field Definitions
+FIELD.DEF = {
+  [FIELD.ID.EMAIL]: {
+    name: 'email',
+    get label () {return _.EMAIL},
+    get hint () {return _.MY_EMAIL_ADDRESS_IS},
+    placeholder: 'example@gmail.com',
+    type: 'email',
+    validate: email,
+    view: FIELD.TYPE.INPUT, // required definition
+  },
+  [FIELD.ID.PHONE]: {
+    name: 'phones',
+    kind: TYPE.PHONE._,
+    options: OPTIONS.PHONE,
+    minFields: 1,
+    hint: 'My phone number is',
+    placeholder: '+7 (555) 555-55-55',
+    type: 'tel',
+    normalize: phone,
+    validate: [phoneNumber],
+    view: FIELD.TYPE.MULTIPLE,
+  },
 }
 
 // Field props

@@ -1,10 +1,23 @@
-import { phone } from 'react-ui-pack/inputs/normalizers'
-import { email, isRequired, phoneNumber } from 'react-ui-pack/inputs/validationRules'
-import { definitionSetup, get, hasListValue, LANGUAGE_LEVEL } from 'utils-pack'
-import { OPTIONS, TYPE } from './definitions'
+import { isRequired } from 'react-ui-pack/inputs/validationRules'
+import { definitionSetup, get, hasListValue, LANGUAGE_LEVEL, toList } from 'utils-pack'
+import { TYPE } from './definitions'
 
 /**
  * FIELD DEFINITIONS ===========================================================
+ * @usage:
+ *    FIELD.FOR = {
+ *      CONTACT: [
+ *        {id: FIELD.ID.EMAIL, required: true},
+ *        {id: FIELD.ID.PHONE},
+ *      ]
+ *    }
+ *
+ *    @withForm()
+ *    export default class ContactForm extends PureComponent {
+ *      render () {
+ *        return this.renderInput(FIELD.FOR.CONTACT)
+ *      }
+ *    }
  * =============================================================================
  */
 export const FIELD = definitionSetup('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', 'MIN_MAX', 'FOR')
@@ -76,29 +89,6 @@ FIELD.ID = {
   // ...to be populated by modules
 }
 
-// Project Field Definitions
-FIELD.DEF = {
-  [FIELD.ID.EMAIL]: {
-    name: 'email',
-    label: 'Email',
-    placeholder: 'example@gmail.com',
-    type: 'email',
-    validate: [email],
-  },
-  [FIELD.ID.PHONE]: {
-    name: 'phones',
-    kind: TYPE.PHONE._,
-    options: OPTIONS.PHONE,
-    minFields: 1,
-    hint: 'My phone number is',
-    placeholder: '+7 (555) 555-55-55',
-    type: 'tel',
-    view: FIELD.TYPE.MULTIPLE,
-    normalize: phone,
-    validate: [phoneNumber]
-  },
-}
-
 // Field Min/Max Value Definitions by ID (used for extending base definitions from FIELD.DEF)
 FIELD.MIN_MAX = {
   // Common
@@ -108,7 +98,7 @@ FIELD.MIN_MAX = {
 
 // Field Definitions by ID
 FIELD.DEF = {
-  // ...to be populated by modules
+  // ...to be populated by modules (see form/constants for reference)
 }
 
 // List of Field IDs with optional base definition overrides
@@ -132,9 +122,12 @@ export function fieldsFrom (fields, {initialValues: initValues = {}} = {}) {
   // Collect definitions
   return fields.map(({id, ...field}) => ({...FIELD.DEF[id], ...field}))
     // Process prefixes
-    .map(({name = '', namePrefix = '', options, items, float, required, disabled, readonly, ...field}) => {
+    .map(({name = '', namePrefix = '', options, items, float, required, disabled, readonly, validate, ...field}) => {
       name = namePrefix + name
       const initialValues = get(initValues, name)
+      const validations = []
+      if (required) validations.push(isRequired)
+      if (validate) validations.push(...toList(validate, 'clean'))
       return {
         float,
         ...field,
@@ -143,7 +136,7 @@ export function fieldsFrom (fields, {initialValues: initValues = {}} = {}) {
         ...disabled != null && {disabled},
         ...readonly != null && {readonly},
         ...required != null && {required}, // required may be false for nested field inside required group
-        ...required && {validate: [isRequired, ...(field.validate || [])]},
+        ...validations.length && {validate: validateMultiple(validations)},
         ...options && {options: options.items || options}, // options need to fallback in case lang already set
         ...items && { // nested fields in group
           items: fieldsFrom(items.map(i => ({
@@ -155,6 +148,16 @@ export function fieldsFrom (fields, {initialValues: initValues = {}} = {}) {
         },
       }
     })
+}
+
+/* Convert multiple validation functions into a single function */
+function validateMultiple (validations) {
+  return function (...args) {
+    for (const validate of validations) {
+      const error = validate(...args)
+      if (error) return error
+    }
+  }
 }
 
 /**

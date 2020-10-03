@@ -196,7 +196,8 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
   return function Decorator (Class) {
     withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors})
     return function WithForm (props) {
-      return <Form enableReinitialize onSubmit={warn} {...options} {...props} component={Class}/>
+      return <Form enableReinitialize onSubmit={warn} {...options} {...props}
+                   children={(formProps) => <Class {...{...formProps, ...props}}/>}/>
     }
   }
 }

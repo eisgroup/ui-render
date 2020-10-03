@@ -2,11 +2,13 @@ import classNames from 'classnames'
 import { DEFINITION, TYPE_BY } from 'modules-pack/variables/definitions'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
+import { Field } from 'react-final-form'
 import Dropdown from 'react-ui-pack/Dropdown'
 import View from 'react-ui-pack/View'
-import { Field } from 'redux-form'
-import { cleanList, findObjByKeys, isEqual } from 'utils-pack'
+import { Active, cleanList, findObjByKeys, isEqual } from 'utils-pack'
 import { InputField } from '../inputs'
+
+if (!Active.Field) Active.Field = Field
 
 /**
  * List of Predefined Form Fields with dropdown search input to add and remove them (ex. Languages)
@@ -36,7 +38,7 @@ export default class Fields extends PureComponent {
   }
 
   fields (props = this.props) {
-    return cleanList(Object.keys(props.initialValues).map(code => findObjByKeys(DEFINITION[props.kind], {code})))
+    return cleanList(Object.keys(props.initialValues).map(_ => findObjByKeys(DEFINITION[props.kind], {_})))
   }
 
   UNSAFE_componentWillReceiveProps (next) {
@@ -45,7 +47,7 @@ export default class Fields extends PureComponent {
   }
 
   handleDeleteField = (name) => {
-    const fields = this.state.fields.filter(field => field.code !== name)
+    const fields = this.state.fields.filter(field => field._ !== name)
     this.setState({fields}, () => {
       // When no fields are left, dispatch action to set parent wrapper field as null to reset on backend,
       // because redux-form persists the deleted field value in state.
@@ -54,9 +56,9 @@ export default class Fields extends PureComponent {
     })
   }
 
-  handleAddField = (code) => {
-    if (!code) return
-    const field = findObjByKeys(DEFINITION[this.props.kind], {code})
+  handleAddField = (_) => {
+    if (!_) return
+    const field = findObjByKeys(DEFINITION[this.props.kind], {_})
     this.setState({fields: cleanList(this.state.fields.concat(field))})
     // When new field is added, dispatch action to set value so the form can detect changes from initial values
     // this should be done by defining prop `dispatchChangeOnMount` = true, then let SliderField handle it,
@@ -71,11 +73,11 @@ export default class Fields extends PureComponent {
   // RENDERS -------------------------------------------------------------------
   renderField = (obj) => {
     const {name, kind, minFields, fields: __, ...props} = this.props
-    const {code} = obj
-    const id = name ? `${name}.${code}` : `${kind}.${code}`
+    const {_} = obj
+    const id = name ? `${name}.${_}` : `${kind}.${_}`
     if (!props.readonly && (!minFields || minFields < this.state.fields.length)) {
       props.icon = 'delete'
-      props.onClickIcon = () => this.handleDeleteField(code)
+      props.onClickIcon = () => this.handleDeleteField(_)
     }
     return <InputField key={id} name={id} label={obj.name} {...props}/>
   }
@@ -85,7 +87,7 @@ export default class Fields extends PureComponent {
     const {fields} = this.state
     const renderItem = renderField ? ((obj, i) => renderField(obj, i, this.handleDeleteField)) : this.renderField
     const fieldOptions = options
-      .filter(({value}) => value && !fields.find(({code}) => code === value)) // filter out empty string '' and 0
+      .filter(({value}) => value && !fields.find(({_}) => _ === value)) // filter out empty string '' and 0
     return (
       // `min-width` is required to prevent sliders from collapsing when placeholder Dropdown has short text.
       // This only happen in FormInSteps or modals, where container is centered and has undetermined minimum width.
@@ -96,7 +98,7 @@ export default class Fields extends PureComponent {
         because if registered when there are existing fields, withForm's  this.changedValues grabs all values within it,
         and will make deleting fields impossible.
         */}
-        {name && !fields.length && <Field name={name} component={this.placeholderInput}/>}
+        {name && !fields.length && <Active.Field name={name} component={this.placeholderInput}/>}
         {fields.map(renderItem)}
         {!readonly && !!fieldOptions.length &&
         <Dropdown

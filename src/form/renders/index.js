@@ -4,15 +4,13 @@ import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import { withGroupInputChange } from 'react-ui-pack'
 import Label from 'react-ui-pack/Label'
-import PlaceholderField from 'react-ui-pack/PlaceholderField'
+import { PlaceholderField } from 'react-ui-pack/PlaceholderField'
 import Row from 'react-ui-pack/Row'
 import { Active } from 'utils-pack'
-import { DateField, DatesField, DropdownField, InputField, ToggleField } from '../inputs'
+import { DateField, DatesField, DropdownField, InputField, PlaceField, ToggleField, UploadGridField } from '../inputs'
 import Fields from './Fields'
 import FieldsWithLevel from './FieldsWithLevel'
-import PlaceField from './PlaceField'
 import { SliderLabeled } from './renderers'
-import UploadGridField from './UploadGridField'
 
 /**
  * EXPORTS =====================================================================

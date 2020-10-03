@@ -21,7 +21,7 @@ export default class select {
   static currency = () => [
     (state) => state[NAME].data.currency,
     (val) => {
-      Active.CURRENCY = findObjByKeys(CURRENCY, {code: val}) || findObjByKeys(CURRENCY, {code: DEFAULT.CURRENCY})
+      Active.CURRENCY = findObjByKeys(CURRENCY, {_: val}) || findObjByKeys(CURRENCY, {_: DEFAULT.CURRENCY})
       return val
     }
   ]
@@ -29,7 +29,7 @@ export default class select {
   static language = () => [
     (state) => state[NAME].data.language,
     (val) => { // @note: do not add default language here to trigger setLanguageFlow saga
-      Active.LANG = findObjByKeys(LANGUAGE, {code: val}) || LANGUAGE.ENGLISH
+      Active.LANG = findObjByKeys(LANGUAGE, {_: val}) || LANGUAGE.ENGLISH
       return val
     }
   ]

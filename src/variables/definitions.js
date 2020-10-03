@@ -8,11 +8,11 @@ import { Active, definitionByValue, enumFrom, l, LANGUAGE, LANGUAGE_LEVEL, optio
 export const CURRENCY = {
   USD: {
     _: 'USD',
-    [l.ENGLISH._]: 'USD',
+    [l.ENGLISH]: 'USD',
   },
   RUB: {
     _: 'RUB',
-    [l.ENGLISH._]: 'RUB',
+    [l.ENGLISH]: 'RUB',
   },
 }
 Active.CURRENCY = CURRENCY.USD
@@ -20,15 +20,15 @@ Active.CURRENCY = CURRENCY.USD
 export const PHONE = {
   MOBILE: {
     _: 'mobile',
-    [l.ENGLISH._]: 'Mobile Phone'
+    [l.ENGLISH]: 'Mobile Phone'
   },
   HOME: {
     _: 'home',
-    [l.ENGLISH._]: 'Home Phone'
+    [l.ENGLISH]: 'Home Phone'
   },
   WORK: {
     _: 'work',
-    [l.ENGLISH._]: 'Work Phone'
+    [l.ENGLISH]: 'Work Phone'
   },
 }
 
@@ -36,15 +36,15 @@ export const PHONE = {
 export const TYPE = {
   LANGUAGE: {
     _: 'Language',
-    [l.ENGLISH._]: 'Language'
+    [l.ENGLISH]: 'Language'
   },
   LANGUAGE_LEVEL: {
     _: 'LanguageLevel',
-    [l.ENGLISH._]: 'Language Level'
+    [l.ENGLISH]: 'Language Level'
   },
   PHONE: {
     _: 'Phone',
-    [l.ENGLISH._]: 'Phone'
+    [l.ENGLISH]: 'Phone'
   },
 }
 export const TYPE_BY = {
