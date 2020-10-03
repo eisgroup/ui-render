@@ -36,6 +36,30 @@ export const TRANSLATION = {
 
   // Forms and Validations
   // ---------------------------------------------------------------------------
+  REQUIRED: {
+    [l.ENGLISH]: 'Required',
+    [l.RUSSIAN]: 'Обязательный',
+  },
+  EMAIL: {
+    [l.ENGLISH]: 'Email',
+    [l.RUSSIAN]: 'Email',
+  },
+  MY_EMAIL_ADDRESS_IS: {
+    [l.ENGLISH]: 'My email address is',
+    [l.RUSSIAN]: 'Мой еmail:',
+  },
+  INVALID_EMAIL_ADDRESS: {
+    [l.ENGLISH]: 'Invalid email address',
+    [l.RUSSIAN]: 'Неправильный адрес',
+  },
+  PLEASE_ENTER_A_VALID_EMAIL_ADDRESS: {
+    [l.ENGLISH]: 'Please enter a valid email address',
+    [l.RUSSIAN]: 'Пожалуйста ведите верный адрес',
+  },
+  NOT_A_VALID_URL: {
+    [l.ENGLISH]: 'Not a valid URL',
+    [l.RUSSIAN]: 'Неверный URL',
+  },
   FILE: {
     [l.ENGLISH]: 'File',
     [l.RUSSIAN]: 'Файл',

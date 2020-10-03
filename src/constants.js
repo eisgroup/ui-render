@@ -298,27 +298,27 @@ for (const key in LANGUAGE) {
 export const LANGUAGE_LEVEL = {
 	UNKNOWN: {
 		_: 0,
-		[l.ENGLISH._]: 'Unknown',
+		[l.ENGLISH]: 'Unknown',
 	},
 	BASIC: {
 		_: 1,
-		[l.ENGLISH._]: 'Beginner',
+		[l.ENGLISH]: 'Beginner',
 	},
 	WORKING: {
 		_: 2,
-		[l.ENGLISH._]: 'Working',
+		[l.ENGLISH]: 'Working',
 	},
 	PROFICIENT: {
 		_: 3,
-		[l.ENGLISH._]: 'Proficient',
+		[l.ENGLISH]: 'Proficient',
 	},
 	FLUENT: {
 		_: 4,
-		[l.ENGLISH._]: 'Fluent',
+		[l.ENGLISH]: 'Fluent',
 	},
 	NATIVE: {
 		_: 5,
-		[l.ENGLISH._]: 'Native',
+		[l.ENGLISH]: 'Native',
 	},
 }
 
