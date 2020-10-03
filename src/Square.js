@@ -104,3 +104,63 @@ export function asSquare (Component) {
 function position ({top, right, bottom, left}) {
   return {middle: !bottom && !top, center: !left && !right, top, right, bottom, left}
 }
+
+/**
+ * React Component Decorator (HOC) to Render as compact Square, taking all available width
+ * @example:
+ *    @asSquareFullWidth
+ *    class UploadGrid extends Component {
+ *       //...
+ *    }
+ *
+ * @param {Class|Function|MemoExoticComponent|NamedExoticComponent} Component - to render as square
+ */
+export function asSquareFullWidth (Component) {
+  // SizeMe will attempt to render placeholder (wrapped component) first to detect width and height.
+  // The placeholder till take className and style applied to wrapped component.
+  return function SquareWrapper ({style, ...props}) {
+    return (
+      <SizeMe monitorWidth children={({size: {width, height}}) => {
+        height = width = width || 0 // initially width and height are undefined
+        const fill = !(width && height)
+        const style = fill ? style : {height, width, ...style}
+        return (
+          /* Wrapper is required, because fixed width/height style applied prevents further resize calculation */
+          <View fill={fill}>
+            <Component {...{width, height, style, ...props}} />
+          </View>
+        )
+      }}/>
+    )
+  }
+}
+
+/**
+ * React Component Decorator (HOC) to Render as compact Square, taking all available height
+ * @example:
+ *    @asSquareFullWidth
+ *    class UploadGrid extends Component {
+ *       //...
+ *    }
+ *
+ * @param {Class|Function|MemoExoticComponent|NamedExoticComponent} Component - to render as square
+ */
+export function asSquareFullHeight (Component) {
+  // SizeMe will attempt to render placeholder (wrapped component) first to detect width and height.
+  // The placeholder till take className and style applied to wrapped component.
+  return function SquareWrapper ({style, ...props}) {
+    return (
+      <SizeMe monitorHeight monitorWidth={false} children={({size: {width, height}}) => {
+        height = width = height || 0 // initially width and height are undefined
+        const fill = !(width && height)
+        const style = fill ? style : {height, width, ...style}
+        return (
+          /* Wrapper is required, because fixed width/height style applied prevents further resize calculation */
+          <View fill={fill}>
+            <Component {...{width, height, style, ...props}} />
+          </View>
+        )
+      }}/>
+    )
+  }
+}
