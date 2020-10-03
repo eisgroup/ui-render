@@ -69,6 +69,7 @@ export default class InputNative extends PureComponent {
       compact,
       sound,
       onMount,
+      initialValues,
       ...props
     } = this.props
     if (disabledSpellCheck) props = {...noSpellCheck, ...props}

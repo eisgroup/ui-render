@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React, { useState } from 'react'
-import { capitalize } from 'utils-pack'
+import { capitalize, isString } from 'utils-pack'
 import Icon from './Icon'
 import InputNative from './InputNative'
 import Label from './Label'
@@ -12,7 +12,7 @@ import View from './View'
  * Input Wrapper - Pure Component.
  * @Note: see `InputNative` component for more documentation
  *
- * @param {String} [icon] - name, rendered after input by default
+ * @param {String|Object|Boolean} [icon] - name or rendered component, rendered after input by default
  * @param {Boolean} [lefty] - whether to render icon on the left before input
  * @param {Function} [onClickIcon] - callback function when clicking on the icon if given
  * @param {Function} [onFocus] - callback when input gets focus
@@ -84,7 +84,10 @@ export function Input ({
     >
       {!float && !isCheckbox && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
       <Row className={classNames('input', {active, icon, lefty, error, info, unit})}>
-        {icon && lefty && <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>}
+        {icon && lefty && (isString(icon)
+            ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
+            : icon
+        )}
         {unit && hasValue &&
         <Text className='input__unit truncate'>
           <Text className='invisible' aria-hidden='true'>{value}</Text> {unit}
@@ -109,7 +112,10 @@ export function Input ({
           }}
           {...props}
         />
-        {icon && !lefty && <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>}
+        {icon && !lefty && (isString(icon)
+            ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
+            : icon
+        )}
         {(float || isCheckbox) && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
       </Row>
       {(error || info) &&

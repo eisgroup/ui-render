@@ -1,4 +1,5 @@
 import { isEmpty, isNumeric, isPhoneNumber, pluralize, toList } from 'utils-pack'
+import { _ } from 'utils-pack/translations'
 import { isGoodPassword } from 'utils-pack/utility'
 import isEmail from 'validator/lib/isEmail'
 import isLength from 'validator/lib/isLength'
@@ -13,15 +14,15 @@ import isURL from 'validator/lib/isURL'
 export const OK = undefined // Return type when validation passes
 
 export function isRequired (value) {
-  return (value == null || value === '' || Number.isNaN(value) || (typeof value === 'object' && isEmpty(value))) ? 'Required' : OK
+  return (value == null || value === '' || Number.isNaN(value) || (typeof value === 'object' && isEmpty(value))) ? _.REQUIRED : OK
 }
 
 export function url (value) {
-  return (value && !isURL(String(value), {require_protocol: true})) ? 'Not a valid URL' : OK
+  return (value && !isURL(String(value), {require_protocol: true})) ? _.NOT_A_VALID_URL : OK
 }
 
 export function email (value) {
-  return value && (isEmail(String(value)) ? OK : 'Invalid email address')
+  return value && (isEmail(String(value)) ? OK : _.INVALID_EMAIL_ADDRESS)
 }
 
 export function maxLength (length = 100) {
