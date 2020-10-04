@@ -1,4 +1,4 @@
-import { rgbFromColor3, rgbToColor3, toRgbaColor } from '../color'
+import { rgbFromColor3, rgbFromHex, rgbToColor3, rgbToHex, toRgbaColor } from '../color'
 
 describe(`${toRgbaColor.name}()`, () => {
   it('sanitizes given value to correct format and type', () => {
@@ -32,4 +32,20 @@ test(`${rgbToColor3.name}() converts correct RGB color array to Scaled Color3 ar
 test(`${rgbFromColor3.name}() converts correct Scaled Color3 array to RGB color`, () => {
   expect(rgbFromColor3([1, 0, 0.490196])).toEqual([255, 0, 125])
   expect(rgbFromColor3([0, 0.49, 1])).toEqual([0, 125, 255])
+})
+
+test(`${rgbToHex.name}() converts correct RGB color to Hex string`, () => {
+  expect(rgbToHex([0, 51, 255])).toEqual('#0033ff')
+  expect(() => rgbToHex(['0', '51', '255'])).toThrow()
+  expect(() => rgbToHex('[0, 51, 255]')).toThrow()
+  expect(() => rgbToHex('0, 51, 255')).toThrow()
+})
+
+test(`${rgbFromHex.name}() converts correct Hex string to RGB color`, () => {
+  expect(rgbFromHex('#0033ff')).toEqual([0, 51, 255])
+  expect(rgbFromHex('0033ff')).toEqual([0, 51, 255])
+  expect(rgbFromHex('')).toBe(null)
+  expect(rgbFromHex('#')).toBe(null)
+  expect(rgbFromHex('#0033f')).toBe(null)
+  expect(rgbFromHex('#0033fp')).toBe(null)
 })
