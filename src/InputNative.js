@@ -46,6 +46,23 @@ export default class InputNative extends PureComponent {
     onChange && onChange(value)
   }
 
+  onChangeCheckbox = ({target: {checked}}) => {
+    const {onChange, sound} = this.props
+    onChange && onPressHoc(onChange, sound)(checked)
+  }
+
+  // @see: https://stackoverflow.com/questions/11167281/webkit-css-to-control-the-box-around-the-color-in-an-inputtype-color
+  onChangeColor = ({target}) => {
+    const {onChange} = this.props
+    target.style.backgroundColor = target.value
+    onChange && onChange(target.value)
+  }
+
+  onMountColor = (element) => {
+    if (!element) return
+    element.style.backgroundColor = element.value
+  }
+
   onMountResize = (element) => {
     if (!element) return
     const {compact, onMount} = this.props
@@ -63,7 +80,6 @@ export default class InputNative extends PureComponent {
 
   render () {
     let {
-      onChange,
       disabledSpellCheck,
       resize,
       compact,
@@ -79,18 +95,23 @@ export default class InputNative extends PureComponent {
       props.type = 'textarea' // only textarea can resize
       if (!props.rows) props.rows = 1
     }
-    props.onChange = this.onChange
     if (compact) props.ref = this.onMountResize
     switch (props.type) {
       case 'select':
         return <Select {...props} />
-      case 'textarea':
-        return <textarea {...props} />
       case 'checkbox':
-        props.onChange = ({target: {checked}}) => onPressHoc(onChange, sound)(checked)
+        props.onChange = this.onChangeCheckbox
         if (props.checked == null && props.value != null) props.checked = props.value
         return <input {...props} />
+      case 'color':
+        props.onChange = this.onChangeColor
+        props.ref = this.onMountColor
+        return <input {...props} />
+      case 'textarea':
+        props.onChange = this.onChange
+        return <textarea {...props} />
       default:
+        props.onChange = this.onChange
         return <input {...props} />
     }
   }
