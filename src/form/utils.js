@@ -105,11 +105,12 @@ export function asField (InputComponent, {sanitize} = {}) {
     }
 
     // do not use ...props from input, because it is shared by <Active.Field> instances
-    Input = ({input, meta: {touched, error, pristine} = {}}) => {
-      if (this.props.readonly && isRequired(input.value)) return null
+    // @Note: react-final-form fires `format()` when `input.value` getter is called
+    Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}) => {
+      if (this.props.readonly && isRequired(value)) return null
       const {onChange, error: errorMessage, defaultValue, validate: _, normalize, format, parse, ...props} = this.props
       // @Note: defaultValue is only used for UI, internal value is still undefined
-      this.value = input.value === '' ? (pristine && defaultValue != null ? defaultValue : input.value) : input.value
+      this.value = value === '' ? (pristine && defaultValue != null ? defaultValue : value) : value
       this.input = input
       if (this.value === undefined) this.value = ''
       return (
@@ -129,23 +130,26 @@ export function asField (InputComponent, {sanitize} = {}) {
     handleChange = (value) => {
       const {onChange, type, normalize, parse = normalize} = this.props
       if (type === 'number') value = value !== '' ? Number(value) : null
+      // both redux-form and final-form input.onChange can accept 'event' or 'value'
       this.input.onChange(value)
       onChange && onChange(parse ? parse(value) : value)
     }
 
-    componentDidMount () {
-      // Auto dispatch action to set value if normalizer set and is different,
-      const {normalize, parse = normalize, onChange} = this.props
-      if (!parse || this.value === '') return
-      const valueNormalized = parse(this.value)
-      if (this.value === valueNormalized) return
-      this.input.onChange(valueNormalized)
-      onChange && onChange(valueNormalized)
-    }
+    // @Note: this is not needed as default behavior, because inputs like color always trigger onChange
+    //        the logic was used for redux-form to normalize input initially
+    // componentDidMount () {
+    //   // Normalize initialValue
+    //   const {normalize, parse = normalize, onChange} = this.props
+    //   if (!parse || this.value === '') return
+    //   const valueNormalized = parse(this.value)
+    //   if (this.value === valueNormalized) return
+    //   this.input.onChange(valueNormalized)
+    //   onChange && onChange(valueNormalized)
+    // }
 
     // Do not pass 'onChange' to Field because it fires event as argument
     render () {
-      const {name, disabled, normalize, format = normalize, parse = normalize, validate, options} = this.props
+      const {name, disabled, normalize, format, parse = normalize, validate, options} = this.props
       return <Active.Field {...{name, disabled, normalize, format, parse, validate, options}} component={this.Input}/>
     }
   }
