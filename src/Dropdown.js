@@ -98,22 +98,24 @@ export function Dropdown ({
   }
 
   /* Error handling */
-  if (hasListValue(props.value) && props.value.length === options.length) props.noResultsMessage = _.NO_OPTIONS_LEFT
+  // @Note: below logic only works as DropdownField with controlled value
   if (done == null) done = !error && (props.multiple ? hasListValue(props.value) : (!!props.value || props.value === 0))
 
   return (
     <View className={classNames('input--wrapper', {
       float, done, labeled: label, 'fill-width': !props.compact && fill,
     }, className)} style={style}>
+      {label && !float && <Text className='input__label'>{label + (props.required ? '*' : '')}</Text>}
       <DropDown
         className={classNames({info, readonly})}
         options={options}
         placeholder={placeholder}
         error={!!error}
         lazyLoad={lazyLoad}
+        noResultsMessage={(hasListValue(props.value) && props.value.length === options.length) ? _.NO_OPTIONS_LEFT : _.NOTHING_FOUND}
         {...props}
       />
-      {label && <Text className='input__label'>{label + (props.required ? '*' : '')}</Text>}
+      {label && float && <Text className='input__label'>{label + (props.required ? '*' : '')}</Text>}
       {(error || info) &&
       <View id={props.id} className='field-help'>
         {error && <Text className='error'>{error}</Text>}
