@@ -382,6 +382,10 @@ export const TRANSLATION = {
     [l.ENGLISH]: 'Nothing found',
     [l.RUSSIAN]: 'Ничего не найдено',
   },
+  NO_OPTIONS_LEFT: {
+    [l.ENGLISH]: 'No options left',
+    [l.RUSSIAN]: 'Больше нет выборов',
+  },
   CHECK_BACK_IN_LATER: {
     [l.ENGLISH]: 'Check back in later',
     [l.RUSSIAN]: 'Зайдите позже',
