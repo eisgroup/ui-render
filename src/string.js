@@ -352,7 +352,7 @@ export function randomFromString(string) {
  */
 export function randomString(min = 32, max = 64, { alphaNum = false, hex = false } = {}) {
 	const searchSpace = hex ? 16 : 36
-	return [...Array(randomNumberInRange(min, max))]
+	const result = [...Array(randomNumberInRange(min, max))]
 		.map(() => {
 			const random = Math.random()
 			if (!alphaNum && !hex && random < symbolRatio) return randomFromString(symbols)
@@ -360,6 +360,8 @@ export function randomString(min = 32, max = 64, { alphaNum = false, hex = false
 			return !hex && random > upperThreshold ? string.toUpperCase() : string
 		})
 		.join('')
+	if (result === randomString.prevResult) return randomString(min, max, {alphaNum, hex})
+	return randomString.prevResult = result
 }
 
 /**
