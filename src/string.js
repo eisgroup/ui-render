@@ -290,6 +290,17 @@ export function mergeStrings(str1, str2) {
 }
 
 /**
+ * Pad Left given String with Template String
+ *
+ * @param {String} padTemplate - example: '000'
+ * @param {String} string - to be padded, example 7
+ * @return {String} padded with template - example: '007'
+ */
+export function padStringLeft (padTemplate, string) {
+	return String(padTemplate + string).slice(-(Math.max(string.length, padTemplate.length)))
+}
+
+/**
  * Converts the given singular word to it's plural version
  *
  * @example
