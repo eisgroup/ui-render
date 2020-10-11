@@ -39,9 +39,7 @@ export function SliderLabeled ({name, id = name, label = id, onRemove, tooltip, 
           {label}
         </Text>
         {onRemove && !readonly &&
-        <Button circle className='app__slider__remove small' onClick={() => onRemove(id)}><Icon
-          name='delete'/></Button>
-        }
+        <Button className='input__delete' onClick={() => onRemove(id)}><Icon name='delete'/></Button>}
         {tooltip && <Tooltip top>{tooltip}</Tooltip>}
       </Row>
       <Slide
