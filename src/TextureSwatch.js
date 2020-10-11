@@ -14,11 +14,8 @@ export function TextureSwatch ({
   style,
   ...props
 }) {
-  return <Text
-    className={cn('texture__swatch', className, {small, large})}
-    style={{backgroundImage: `url('${src}')`, ...style}}
-    {...props}
-  />
+  if (src) style = {backgroundImage: `url('${src}')`, ...style}
+  return <Text className={cn('texture__swatch', className, {small, large})} style={style} {...props}/>
 }
 
 TextureSwatch.propTypes = {

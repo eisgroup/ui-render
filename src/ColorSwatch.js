@@ -14,10 +14,11 @@ export function ColorSwatch ({
   style,
   ...props
 }) {
-  const color = String(value)
+  const color = String(value || '')
+  if (color) style = {backgroundColor: `rgb(${color})`, ...style}
   return <Text
     className={cn('color__swatch', className, {small, large, white: color === '255,255,255', black: color === '0,0,0'})}
-    style={{backgroundColor: `rgb(${color})`, ...style}}
+    style={style}
     {...props}
   />
 }
