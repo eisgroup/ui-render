@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import React, { useState } from 'react'
 import { capitalize, isString } from 'utils-pack'
+import Button from './Button'
 import Icon from './Icon'
 import InputNative from './InputNative'
 import Label from './Label'
@@ -12,11 +13,13 @@ import View from './View'
  * Input Wrapper - Pure Component.
  * @Note: see `InputNative` component for more documentation
  *
+ * @param {String} [name] - input name attribute
  * @param {String|Object|Boolean} [icon] - name or rendered component, rendered after input by default
  * @param {Boolean} [lefty] - whether to render icon on the left before input
  * @param {Function} [onClickIcon] - callback function when clicking on the icon if given
  * @param {Function} [onFocus] - callback when input gets focus
  * @param {Function} [onBlur] - callback when input loses focus
+ * @param {Function} [onRemove] - callback(id || name) when input is deleted
  * @param {String} [unit] - text to display next to entered input value
  * @param {String} [label] - text to display next to input
  * @param {String} [id] - unique identifier for label
@@ -37,12 +40,13 @@ import View from './View'
  * @returns {Object} - React Component
  */
 export function Input ({
+  name,
+  id = name,
   icon,
   lefty,
   onClickIcon,
   unit,
   label,
-  id,
   disabled,
   done,
   className,
@@ -58,6 +62,7 @@ export function Input ({
   style,
   onFocus,
   onBlur,
+  onRemove,
   ...props
 }) {
   const [active, setState] = useState(props.autoFocus)
@@ -67,11 +72,11 @@ export function Input ({
     props.readOnly = readonly
   } // React fix
   if (props.type === 'hidden') return <InputNative {...props} />
-  if (float || label) {
-    if (!label) label = capitalize(props.name)
-    if (!id) id = 'input-' + label.replace(/ +?/g, '-')
+  if (float) {
+    if (!label && name) label = capitalize(name)
+    if (!props.placeholder) props.placeholder = ' ' // required for Float label CSS to work
   }
-  if (float && !props.placeholder) props.placeholder = ' ' // required for Float label CSS to work
+  if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
   const idHelp = id + '-help'
   const value = props.value != null ? props.value : props.defaultValue
   const hasValue = value || value === 0
@@ -79,10 +84,16 @@ export function Input ({
   if (done == null) done = !error && hasValue
   return (
     <View
-      className={classNames('input--wrapper', className, {float, done, resize})}
+      className={classNames('input--wrapper', className, {float, done, resize, swatch: props.type === 'color'})}
       style={style}
     >
-      {!float && !isCheckbox && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
+      {!float &&
+      <Row className='middle'>
+        {!isCheckbox && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
+        {onRemove && !readonly &&
+        <Button className='input__delete' onClick={() => onRemove(id)}><Icon name='delete'/></Button>}
+      </Row>
+      }
       <Row className={classNames('input', {active, icon, lefty, error, info, unit})}>
         {icon && lefty && (isString(icon)
             ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
@@ -99,14 +110,12 @@ export function Input ({
         </Text>
         }
         <InputNative
-          id={id} disabled={disabled} resize={resize} aria-describedby={idHelp}
+          name={name} id={id} disabled={disabled} resize={resize} aria-describedby={idHelp}
           onFocus={(...args) => {
-            // console.warn('onFocus!')
             !active && setState(true)
             onFocus && onFocus(...args)
           }}
           onBlur={(...args) => {
-            // console.warn('onBlur!')
             active && setState(false)
             onBlur && onBlur(...args)
           }}
