@@ -2,10 +2,20 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { Dropdown as DropDown } from 'semantic-ui-react' // adds 27 KB to final js bundle
-import { hasListValue } from 'utils-pack'
+import { hasListValue, l, localiseTranslation } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import Text from './Text'
 import View from './View'
+
+_.NOTHING_FOUND = {
+  [l.ENGLISH]: 'Nothing found',
+  // [l.RUSSIAN]: 'Ничего не найдено',
+}
+_.NO_OPTIONS_LEFT = {
+  [l.ENGLISH]: 'No options left',
+  // [l.RUSSIAN]: 'Больше нет выборов',
+}
+localiseTranslation(_)
 
 /**
  * Drop Down Select - Pure Component.

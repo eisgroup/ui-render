@@ -1,9 +1,15 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { toLowerCase } from 'utils-pack'
+import { l, localiseTranslation, toLowerCase } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import Text from './Text'
 import View from './View'
+
+_.FIELD_DOES_NOT_EXIST = {
+  [l.ENGLISH]: 'Field does not exist!',
+  // [l.RUSSIAN]: 'Поля не существует!',
+}
+localiseTranslation(_)
 
 /**
  * Placeholder Field - Pure Component.
