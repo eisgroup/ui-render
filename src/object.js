@@ -9,6 +9,7 @@ import {
 	isPlainObject,
 	matches,
 	merge as _merge,
+	property,
 	setWith,
 	unset
 } from 'lodash'
@@ -590,83 +591,74 @@ export function queryString(obj) {
 // LODASH CLONES
 // -----------------------------------------------------------------------------
 
-/**
- * Search an object safely for a value via the keyPath and returns the value.
- *
- * @NOTE: this method is x10 times slower than Object property direct access
- *    - try and catch block is even slower
- *    - Object destructuring is much faster (more noticeable on big objects)
- *    => best to use Object destructuring with default fallback
- *
- * @uses lodash
- * @see https://lodash.com/docs/4.17.1#get
- * @param {Object} obj - the object to get the value from
- * @param {string|Array} keyPath - the path to the desired value
- * @param {*} [defaultValue] - The value returned for `undefined` resolved values
- * @return {*} the value at the keyPath
- */
-export { get } from 'lodash'
+export {
+	cloneDeep,
+	/**
+	 * Search an object safely for a value via the keyPath and returns the value.
+	 *
+	 * @NOTE: this method is x10 times slower than Object property direct access
+	 *    - try and catch block is even slower
+	 *    - Object destructuring is much faster (more noticeable on big objects)
+	 *    => best to use Object destructuring with default fallback
+	 *
+	 * @uses lodash
+	 * @see https://lodash.com/docs/4.17.1#get
+	 * @param {Object} obj - the object to get the value from
+	 * @param {string|Array} keyPath - the path to the desired value
+	 * @param {*} [defaultValue] - The value returned for `undefined` resolved values
+	 * @return {*} the value at the keyPath
+	 */
+	get,
 
-/**
- * Check if two Objects are Equal
- * @example:
- *    const a = [{ code: 'en' }, { code: 'ru' }]
- *    const b = [{ code: 'en' }, { code: 'ru' }]
- *    >>> isEqual(a, b)
- *    >>> true
- *
- * @uses lodash
- * @see https://lodash.com/docs/4.17.4#isEqual
- *
- * @param {Object} object - the object to compare against
- * @param {Object} object2 - the object to compare with
- * @return {boolean} - true or false
- */
-export { isEqual } from 'lodash'
+	/**
+	 * Check if two Objects are Equal
+	 * @example:
+	 *    const a = [{ code: 'en' }, { code: 'ru' }]
+	 *    const b = [{ code: 'en' }, { code: 'ru' }]
+	 *    >>> isEqual(a, b)
+	 *    >>> true
+	 *
+	 * @uses lodash
+	 * @see https://lodash.com/docs/4.17.4#isEqual
+	 *
+	 * @param {Object} object - the object to compare against
+	 * @param {Object} object2 - the object to compare with
+	 * @return {boolean} - true or false
+	 */
+		isEqual,
 
-/**
- * Checks if value is an empty object, collection, map or set
- *
- * @param {*} value - The value to check
- * @return {boolean} - Returns true if value is empty, else false
- */
-export { isEmpty } from 'lodash'
+	/**
+	 * Checks if value is an empty object, collection, map or set
+	 *
+	 * @param {*} value - The value to check
+	 * @return {boolean} - Returns true if value is empty, else false
+	 */
+		isEmpty,
 
-/**
- * A wrapper around the lodash's cloneDeep function
- *
- * @uses lodash
- * @see {@link https://lodash.com/docs/4.17.4#cloneDeep} for further information.
- *
- * @param value
- * @returns {*} - cloned version of the value
- */
-export { cloneDeep } from 'lodash'
+	/**
+	 * Creates a function that returns the value at path of a given object
+	 *
+	 * @example
+	 *  [{ name: 'Neo', ... }, { name: 'Morpheus', ... }].map(property('name'))
+	 *  >>> ['Neo', 'Morpheus']
+	 *
+	 * @uses lodash
+	 * @see {@link https://lodash.com/docs/4.17.4#property} for further information
+	 *
+	 * @param {Array|string} path - The path of the property to get
+	 * @returns {Function} - Returns the new accessor function
+	 */
+		property,
 
-/**
- * Creates a function that returns the value at path of a given object
- *
- * @example
- *  [{ name: 'Neo', ... }, { name: 'Morpheus', ... }].map(property('name'))
- *  >>> ['Neo', 'Morpheus']
- *
- * @uses lodash
- * @see {@link https://lodash.com/docs/4.17.4#property} for further information
- *
- * @param {Array|string} path - The path of the property to get
- * @returns {Function} - Returns the new accessor function
- */
-export { property } from 'lodash'
-
-/**
- * Removes the Property at Path of Object by Mutation
- *
- * @uses lodash
- * @see https://lodash.com/docs/4.17.4#unset
- *
- * @param {Object} object - to remove property from
- * @param {String|Array} path - of the property to unset.
- * @return {boolean} - whether the value was removed from object
- */
-export { unset } from 'lodash'
-
+	/**
+	 * Removes the Property at Path of Object by Mutation
+	 *
+	 * @uses lodash
+	 * @see https://lodash.com/docs/4.17.4#unset
+	 *
+	 * @param {Object} object - to remove property from
+	 * @param {String|Array} path - of the property to unset.
+	 * @return {boolean} - whether the value was removed from object
+	 */
+		unset,
+}

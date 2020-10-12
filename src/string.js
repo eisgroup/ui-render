@@ -1,4 +1,4 @@
-import { get } from 'lodash'
+import { capitalize, get } from 'lodash'
 import pluralizer from 'pluralize'
 
 // Random String Generation (with increased search space to 88^n)
@@ -583,17 +583,19 @@ for (let i = 0; i < 256; i++) {
 // LODASH CLONES
 // -----------------------------------------------------------------------------
 
-/**
- * A wrapper around the lodash's capitalize function
- *
- * @uses lodash
- * @see {@link https://lodash.com/docs/4.17.4#capitalize} for further information.
- *
- * @param {string} string - the string to capitalize
- * @returns {string} - the capitalized string
- */
-export { capitalize } from 'lodash'
+export {
+	/**
+	 * A wrapper around the lodash's capitalize function
+	 *
+	 * @uses lodash
+	 * @see {@link https://lodash.com/docs/4.17.4#capitalize} for further information.
+	 *
+	 * @param {string} string - the string to capitalize
+	 * @returns {string} - the capitalized string
+	 */
+		capitalize,
+}
 
-function randomNumberInRange(min, max) {
+function randomNumberInRange (min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min
 }

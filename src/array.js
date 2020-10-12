@@ -1,4 +1,17 @@
-import { difference, flatten, get, isEqual, some, union, unionBy, uniqWith } from 'lodash'
+import {
+  difference,
+  flatten,
+  get,
+  intersection,
+  isEqual,
+  max,
+  min,
+  some,
+  union,
+  unionBy,
+  unionWith,
+  uniqWith
+} from 'lodash'
 import thenby from 'thenby'
 
 /**
@@ -13,7 +26,7 @@ import thenby from 'thenby'
  * @return {boolean}
  */
 export function hasListValue (data) {
-	return (isList(data) && data.length > 0)
+  return (isList(data) && data.length > 0)
 }
 
 /**
@@ -23,21 +36,21 @@ export function hasListValue (data) {
  * @return {boolean} - true if a common value is found among given lists
  */
 export function hasCommonListValue (...args) {
-	// Find the list with the shortest length
-	let listLength = Infinity
-	let shortestList = []
-	args.forEach(list => {
-		if (list.length < listLength) {
-			listLength = list.length
-			shortestList = list
-		}
-	})
+  // Find the list with the shortest length
+  let listLength = Infinity
+  let shortestList = []
+  args.forEach(list => {
+    if (list.length < listLength) {
+      listLength = list.length
+      shortestList = list
+    }
+  })
 
-	// If at least one value found among all lists, skip the loop and return true
-	return shortestList.some(value => {
-		// If value does not exist in at least one list, skip to next value
-		return !args.some(list => !isInList(list, value))
-	})
+  // If at least one value found among all lists, skip the loop and return true
+  return shortestList.some(value => {
+    // If value does not exist in at least one list, skip to next value
+    return !args.some(list => !isInList(list, value))
+  })
 }
 
 /**
@@ -47,7 +60,7 @@ export function hasCommonListValue (...args) {
  * @return {boolean}
  */
 export function isCollection (data) {
-	return (!!data && (data.constructor === Array || data.constructor === Object))
+  return (!!data && (data.constructor === Array || data.constructor === Object))
 }
 
 /**
@@ -58,13 +71,13 @@ export function isCollection (data) {
  * @returns {Boolean} true - if all elements of `a` are equal to all elements of `b` using exact equality match
  */
 export function isEqualList (a, b) {
-	if (a === b) return true
-	if (a && b && a.length !== b.length) return false
-	if (!a || !b) return false
-	for (const i in a) {
-		if (a[i] !== b[i]) return false
-	}
-	return true
+  if (a === b) return true
+  if (a && b && a.length !== b.length) return false
+  if (!a || !b) return false
+  for (const i in a) {
+    if (a[i] !== b[i]) return false
+  }
+  return true
 }
 
 /**
@@ -74,7 +87,7 @@ export function isEqualList (a, b) {
  * @return {boolean}
  */
 export function isList (data) {
-	return (!!data && data.constructor === Array)
+  return (!!data && data.constructor === Array)
 }
 
 /**
@@ -85,7 +98,7 @@ export function isList (data) {
  * @return {boolean}
  */
 export function isInList (array, value) {
-	return array.indexOf(value) >= 0
+  return array.indexOf(value) >= 0
 }
 
 /**
@@ -95,12 +108,12 @@ export function isInList (array, value) {
  * @param {*} args - the values to search for
  */
 export function isInListAny (array, ...args) {
-	for (const value of args) {
-		if (array.indexOf(value) >= 0) {
-			return true
-		}
-	}
-	return false
+  for (const value of args) {
+    if (array.indexOf(value) >= 0) {
+      return true
+    }
+  }
+  return false
 }
 
 /**
@@ -111,7 +124,7 @@ export function isInListAny (array, ...args) {
  * @return {Boolean} true - if element found in given collection with shallow include match
  */
 export function isInCollection (collection, element) {
-	return some(collection, element)
+  return some(collection, element)
 }
 
 /**
@@ -126,10 +139,10 @@ export function isInCollection (collection, element) {
  * @return {boolean} true - if any of the given elements found in the collection
  */
 export function isInCollectionAny (collection, ...elements) {
-	for (const element of elements) {
-		if (isInCollection(collection, element)) return true
-	}
-	return false
+  for (const element of elements) {
+    if (isInCollection(collection, element)) return true
+  }
+  return false
 }
 
 /**
@@ -138,7 +151,7 @@ export function isInCollectionAny (collection, ...elements) {
  * @param array2
  */
 export function isSameList (array1, array2) {
-	return isEqual(array1.sort(), array2.sort())
+  return isEqual(array1.sort(), array2.sort())
 }
 
 /**
@@ -149,7 +162,7 @@ export function isSameList (array1, array2) {
  * @return {Array} - returns the new array of filtered values
  */
 export function cleanList (array) {
-	return array.filter(v => v)
+  return array.filter(v => v)
 }
 
 /**
@@ -160,8 +173,8 @@ export function cleanList (array) {
  * @return {Array}
  */
 export function toList (value, clean) { // eslint-disable-line no-shadow
-	if (!isList(value)) value = [value]
-	return clean ? value.filter(v => v) : value
+  if (!isList(value)) value = [value]
+  return clean ? value.filter(v => v) : value
 }
 
 /**
@@ -171,11 +184,11 @@ export function toList (value, clean) { // eslint-disable-line no-shadow
  * @returns {number} - the average value
  */
 export function toListAvg (array) {
-	let sum = 0
-	for (const value of array) {
-		sum += value
-	}
-	return (sum / array.length)
+  let sum = 0
+  for (const value of array) {
+    sum += value
+  }
+  return (sum / array.length)
 }
 
 /**
@@ -189,11 +202,11 @@ export function toListAvg (array) {
  * @returns {number} total - value of all elements
  */
 export function toListTotal (array = []) {
-	let sum = 0
-	for (const value of array) {
-		sum += value
-	}
-	return sum
+  let sum = 0
+  for (const value of array) {
+    sum += value
+  }
+  return sum
 }
 
 /**
@@ -209,11 +222,11 @@ export function toListTotal (array = []) {
  * @returns {Number} total - of all element values
  */
 export function toListValuesTotal (array = [], key = 'value', fallback = 0) {
-	let sum = 0
-	for (const obj of array) {
-		sum += obj[key] || fallback
-	}
-	return sum
+  let sum = 0
+  for (const obj of array) {
+    sum += obj[key] || fallback
+  }
+  return sum
 }
 
 /**
@@ -228,7 +241,7 @@ export function toListValuesTotal (array = [], key = 'value', fallback = 0) {
  * @return {Array}
  */
 export function toUniqueList (array) {
-	return uniqWith(toList(array), isEqual)
+  return uniqWith(toList(array), isEqual)
 }
 
 /**
@@ -238,7 +251,7 @@ export function toUniqueList (array) {
  * @return {Array} - new array
  */
 export function toUniqueListFast (array) {
-	return array.filter((value, index, self) => self.indexOf(value) === index)
+  return array.filter((value, index, self) => self.indexOf(value) === index)
 }
 
 /**
@@ -252,7 +265,7 @@ export function toUniqueListFast (array) {
  * @returns {Array} list - of unique objects
  */
 export function toUniqueListByKey (newList, oldList, key) {
-	return unionBy(newList, oldList, key)
+  return unionBy(newList, oldList, key)
 }
 
 /**
@@ -263,9 +276,9 @@ export function toUniqueListByKey (newList, oldList, key) {
  * @param {number} [limit] - optionally trim array to this length
  */
 export function prependToList (array, value, limit) {
-	const result = [value, ...array]
-	if (limit && result.length > limit) result.length = limit
-	return result
+  const result = [value, ...array]
+  if (limit && result.length > limit) result.length = limit
+  return result
 }
 
 /**
@@ -275,7 +288,7 @@ export function prependToList (array, value, limit) {
  * @returns {Array} - merged list with unique values
  */
 export function mergeLists (...arrays) {
-	return union(...arrays)
+  return union(...arrays)
 }
 
 /**
@@ -286,14 +299,14 @@ export function mergeLists (...arrays) {
  * @return {Array} - new array with value removed
  */
 export function removeFromList (listToKeep, valueToRemove) {
-	// Value is Array
-	if (isList(valueToRemove)) return difference(listToKeep, valueToRemove)
+  // Value is Array
+  if (isList(valueToRemove)) return difference(listToKeep, valueToRemove)
 
-	// Value is of primitive type
-	const result = [...listToKeep]
-	const index = listToKeep.indexOf(valueToRemove)
-	if (index > -1) result.splice(index, 1)
-	return result
+  // Value is of primitive type
+  const result = [...listToKeep]
+  const index = listToKeep.indexOf(valueToRemove)
+  if (index > -1) result.splice(index, 1)
+  return result
 }
 
 /**
@@ -303,7 +316,7 @@ export function removeFromList (listToKeep, valueToRemove) {
  * @returns {*} - The first element of the array
  */
 export function firstListValue (array) {
-	return isList(array) ? array[0] : array
+  return isList(array) ? array[0] : array
 }
 
 /**
@@ -313,7 +326,7 @@ export function firstListValue (array) {
  * @return {*} - The last element of the given array
  */
 export function first (array) {
-	return array[0]
+  return array[0]
 }
 
 /**
@@ -323,26 +336,26 @@ export function first (array) {
  * @return {*} - The last element of the given array
  */
 export function last (array) {
-	return array[array.length - 1]
+  return array[array.length - 1]
 }
 
 /**
  * Get a random value from provided list
  */
 export function randomFromList (array) {
-	return array[Math.floor(Math.random() * array.length)]
+  return array[Math.floor(Math.random() * array.length)]
 }
 
 /**
  * Get a random value from provided list, removing it from the list
  */
 export function randomFromListExtract (array) {
-	const index = Math.floor(Math.random() * array.length)
-	return array.splice(index, 1)[0]
+  const index = Math.floor(Math.random() * array.length)
+  return array.splice(index, 1)[0]
 }
 
 export function listAlphabetically (array) {
-	return array.sort(sortAscending)
+  return array.sort(sortAscending)
 }
 
 /**
@@ -357,9 +370,9 @@ export function listAlphabetically (array) {
  * @return {number} - whether values should be re-arranged
  */
 export function sortAscending (a, b) {
-	if (a < b) return -1
-	if (a > b) return 1
-	return 0
+  if (a < b) return -1
+  if (a > b) return 1
+  return 0
 }
 
 /**
@@ -374,9 +387,9 @@ export function sortAscending (a, b) {
  * @return {number} - whether values should be re-arranged
  */
 export function sortDescending (a, b) {
-	if (a < b) return 1
-	if (a > b) return -1
-	return 0
+  if (a < b) return 1
+  if (a > b) return -1
+  return 0
 }
 
 /**
@@ -391,8 +404,8 @@ export function sortDescending (a, b) {
  * @return {Function} - to be used as argument for native Array.sort()
  */
 export function sort (key, order = 'asc') {
-	const sortFunc = order === 'asc' ? sortAscending : sortDescending
-	return (a, b) => sortFunc(a[key], b[key])
+  const sortFunc = order === 'asc' ? sortAscending : sortDescending
+  return (a, b) => sortFunc(a[key], b[key])
 }
 
 /**
@@ -407,41 +420,41 @@ export function sort (key, order = 'asc') {
  * @param {String|Function} args - compare function, object Key, or Path (prepend string with '-' for descending)
  */
 export function by (...args) {
-	return (a, b) => {
-		let result = 0
+  return (a, b) => {
+    let result = 0
 
-		// Loop through given sort arguments
-		for (let key of args) {
-			if (key.constructor === String) {
-				if (key.indexOf('-') === 0) {
-					key = key.substring(1)
-					if (key.indexOf('.') > 0) {
-						result = sortDescending(get(a, key), get(b, key))
-					} else {
-						result = sortDescending(a[key], b[key])
-					}
-				} else {
-					if (key.indexOf('.') > 0) {
-						result = sortAscending(get(a, key), get(b, key))
-					} else {
-						result = sortAscending(a[key], b[key])
-					}
-				}
+    // Loop through given sort arguments
+    for (let key of args) {
+      if (key.constructor === String) {
+        if (key.indexOf('-') === 0) {
+          key = key.substring(1)
+          if (key.indexOf('.') > 0) {
+            result = sortDescending(get(a, key), get(b, key))
+          } else {
+            result = sortDescending(a[key], b[key])
+          }
+        } else {
+          if (key.indexOf('.') > 0) {
+            result = sortAscending(get(a, key), get(b, key))
+          } else {
+            result = sortAscending(a[key], b[key])
+          }
+        }
 
-				// exit function when has sorting to perform,
-				// else keep looping to the next sort argument
-				if (result) return result
-			} else if (key.constructor === Function) {
-				result = key(a, b)
+        // exit function when has sorting to perform,
+        // else keep looping to the next sort argument
+        if (result) return result
+      } else if (key.constructor === Function) {
+        result = key(a, b)
 
-				// exit function when has sorting to perform,
-				// else keep looping to the next sort argument
-				if (result) return result
-			}
-		}
+        // exit function when has sorting to perform,
+        // else keep looping to the next sort argument
+        if (result) return result
+      }
+    }
 
-		return result
-	}
+    return result
+  }
 }
 
 /**
@@ -454,27 +467,27 @@ export function by (...args) {
  * @return {Array} colors - grouped in distinct gradients
  */
 export function colorScaleDistinct (colors, hues) {
-	// The number of color groups is also the distance between colors within new groups
-	let groupCount = colors.length / hues
-	if (groupCount < 2) return colors
-	groupCount = Math.ceil(groupCount)  // round up to include extra colors from whole groups
+  // The number of color groups is also the distance between colors within new groups
+  let groupCount = colors.length / hues
+  if (groupCount < 2) return colors
+  groupCount = Math.ceil(groupCount)  // round up to include extra colors from whole groups
 
-	const result = []
-	let lastIndex = 0
-	let groupIndex = 0
-	for (let i = 0; i < colors.length; i++) {
-		if (groupIndex === hues) groupIndex = 0
-		// Each Color within new group jumps the distance of group count
-		if (groupIndex) {  // middle to end of the group
-			lastIndex = Math.min(lastIndex + groupCount, colors.length - 1)
-		} else {  // start of the group - use the first unused index from given colors
-			lastIndex = Math.floor(i / hues)
-		}
-		result[i] = colors[lastIndex]
-		groupIndex++
-	}
+  const result = []
+  let lastIndex = 0
+  let groupIndex = 0
+  for (let i = 0; i < colors.length; i++) {
+    if (groupIndex === hues) groupIndex = 0
+    // Each Color within new group jumps the distance of group count
+    if (groupIndex) {  // middle to end of the group
+      lastIndex = Math.min(lastIndex + groupCount, colors.length - 1)
+    } else {  // start of the group - use the first unused index from given colors
+      lastIndex = Math.floor(i / hues)
+    }
+    result[i] = colors[lastIndex]
+    groupIndex++
+  }
 
-	return result
+  return result
 }
 
 /**
@@ -493,7 +506,7 @@ export function colorScaleDistinct (colors, hues) {
  * @return {Function} - A new sortBy function
  */
 export function firstBy (sort, options) {
-	return thenby(sort, options)
+  return thenby(sort, options)
 }
 
 /**
@@ -503,32 +516,47 @@ export function firstBy (sort, options) {
  * @return {Array} list - mutated with shuffled values
  */
 export function shuffle (list) {
-	for (let i = list.length - 1; i > 0; i--) {
-		let j = Math.floor(Math.random() * (i + 1));
-		[list[i], list[j]] = [list[j], list[i]]
-	}
-	return list
+  for (let i = list.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [list[i], list[j]] = [list[j], list[i]]
+  }
+  return list
 }
 
 // LODASH CLONES
 // -----------------------------------------------------------------------------
 
-export { min } from 'lodash'
+export {
+  min,
+  max,
 
-export { max } from 'lodash'
+  /**
+   * Creates an array of array values not included in the other given arrays
+   */
+    difference,
 
-/**
- * Creates an array of unique values from all given arrays using the provided 'comparator' function
- * to determine value equality
- *
- * @uses lodash
- * @see {@link https://lodash.com/docs/4.17.4#unionWith} for further information.
- *
- * @param {...Array} arrays - The arrays to inspect
- * @param {Function} comparator - The comparator invoked per element
- * @return {Array} - The new array of combined values
- */
-export { unionWith } from 'lodash'
+  /**
+   * Create a new list of values that exist in all given lists using SameValueZero equality check.
+   * The order and references of result values are determined by the first array.
+   *
+   * @param {Array} args - lists to check for intersection
+   * @return {Array} list - of common values
+   */
+    intersection,
+
+  /**
+   * Creates an array of unique values from all given arrays using the provided 'comparator' function
+   * to determine value equality
+   *
+   * @uses lodash
+   * @see {@link https://lodash.com/docs/4.17.4#unionWith} for further information.
+   *
+   * @param {...Array} arrays - The arrays to inspect
+   * @param {Function} comparator - The comparator invoked per element
+   * @return {Array} - The new array of combined values
+   */
+    unionWith,
+}
 
 /**
  * Flatten an Array a single level deep
@@ -537,17 +565,3 @@ export { unionWith } from 'lodash'
  * @return {Array} - The new flattened array
  */
 export const toFlatList = flatten
-
-/**
- * Create a new list of values that exist in all given lists using SameValueZero equality check.
- * The order and references of result values are determined by the first array.
- *
- * @param {Array} args - lists to check for intersection
- * @return {Array} list - of common values
- */
-export { intersection } from 'lodash'
-
-/**
- * Creates an array of array values not included in the other given arrays
- */
-export { difference } from 'lodash'
