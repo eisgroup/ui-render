@@ -1,6 +1,5 @@
-import chroma from 'chroma-js'
 import { isString } from 'utils-pack/string'
-import { colorScaleDistinct, hasListValue, isList } from './array'
+import { hasListValue, isList } from './array'
 import { round } from './number'
 
 /**
@@ -8,20 +7,37 @@ import { round } from './number'
  * =============================================================================
  */
 
-const PINK = 'rgb(235, 77, 164)'
-const TEAL = 'rgb(0, 172, 188)'
-const VIOLET = 'rgb(90, 55, 187)'
-
 /**
- * Generate User-friendly Evenly Distributed Colors with Distinct Adjacent Hues
+ * Turn Gradient Color Scale into Divided Groups of Gradients with more Distinct Hues Between Adjacent Colors
+ * @example:
+ *    colorScaleDistinct(chroma.scale([GOLD_INVERSE, TEAL_INVERSE, VIOLET_INVERSE]).colors(keys.length), 3)
  *
- * @param {Number} count - number of colors to generate
- * @param {Array} [colors] - list of rgb/a or hex colors to use
- * @param {Number} [hueCount] - number of distinct hues to use
- * @returns {Array} colors - list of colors
+ * @param {Array} colors - list of gradient color values to make distinct
+ * @param {Number} hues - count of distinct colors used in the given gradient
+ * @return {Array} colors - grouped in distinct gradients
  */
-export function gradientColors (count, colors = [PINK, TEAL, VIOLET], hueCount = 3) {
-  return colorScaleDistinct(chroma.scale(colors).colors(count), hueCount)
+export function colorScaleDistinct (colors, hues) {
+  // The number of color groups is also the distance between colors within new groups
+  let groupCount = colors.length / hues
+  if (groupCount < 2) return colors
+  groupCount = Math.ceil(groupCount)  // round up to include extra colors from whole groups
+
+  const result = []
+  let lastIndex = 0
+  let groupIndex = 0
+  for (let i = 0; i < colors.length; i++) {
+    if (groupIndex === hues) groupIndex = 0
+    // Each Color within new group jumps the distance of group count
+    if (groupIndex) {  // middle to end of the group
+      lastIndex = Math.min(lastIndex + groupCount, colors.length - 1)
+    } else {  // start of the group - use the first unused index from given colors
+      lastIndex = Math.floor(i / hues)
+    }
+    result[i] = colors[lastIndex]
+    groupIndex++
+  }
+
+  return result
 }
 
 /**
