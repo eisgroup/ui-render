@@ -1,6 +1,8 @@
+import chroma from 'chroma-js'
 import React from 'react'
 import { Area, Cell, LabelList } from 'recharts'
 import { shortNumber, toAlphaNumId, } from 'utils-pack'
+import { colorScaleDistinct } from 'utils-pack/color'
 import { toHours } from 'utils-pack/time'
 import { STYLE } from '../styles'
 
@@ -8,6 +10,21 @@ import { STYLE } from '../styles'
 // COMMON CHART OPTIONS AND HELPERS
 // =============================================================================
 export const chartOffsetMargin = 20 // to the right of Y-axis
+const PINK = 'rgb(235, 77, 164)'
+const TEAL = 'rgb(0, 172, 188)'
+const VIOLET = 'rgb(90, 55, 187)'
+
+/**
+ * Generate User-friendly Evenly Distributed Colors with Distinct Adjacent Hues
+ *
+ * @param {Number} count - number of colors to generate
+ * @param {Array} [colors] - list of rgb/a or hex colors to use
+ * @param {Number} [hueCount] - number of distinct hues to use
+ * @returns {Array} colors - list of colors
+ */
+export function gradientColors (count, colors = [PINK, TEAL, VIOLET], hueCount = 3) {
+  return colorScaleDistinct(chroma.scale(colors).colors(count), hueCount)
+}
 
 /* Area Chart Common Props */
 export const chartArea = {

@@ -4,13 +4,12 @@ import PropTypes from 'prop-types'
 import React, { Fragment, PureComponent } from 'react'
 import { Pie, PieChart as Piechart, ResponsiveContainer, Tooltip } from 'recharts'
 import { by, pluralize, shortNumber, throttle, toList, toListValuesTotal, truncate } from 'utils-pack'
-import { gradientColors } from 'utils-pack/color'
 import { renderFloat } from '../renders'
 import Row from '../Row'
 import { STYLE } from '../styles'
 import Text from '../Text'
 import View from '../View'
-import { chartTooltip, renderCells, renderGradients } from './utils'
+import { chartTooltip, gradientColors, renderCells, renderGradients } from './utils'
 
 const RADIAN = Math.PI / 180
 const fontSize = 14 // label size
