@@ -283,14 +283,6 @@ export const TRANSLATION = {
     [l.ENGLISH]: `Don't Show Again`,
     // [l.RUSSIAN]: `Больше Не Показывать`,
   },
-  NOTHING_FOUND: {
-    [l.ENGLISH]: 'Nothing found',
-    // [l.RUSSIAN]: 'Ничего не найдено',
-  },
-  NO_OPTIONS_LEFT: {
-    [l.ENGLISH]: 'No options left',
-    // [l.RUSSIAN]: 'Больше нет выборов',
-  },
   ERROR_ID: {
     [l.ENGLISH]: 'Error ID',
     // [l.RUSSIAN]: 'Ошибка ID',
