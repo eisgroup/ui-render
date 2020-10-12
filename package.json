@@ -1,6 +1,6 @@
 {
   "name": "react-ui-pack",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Reusable React Components",
   "license": "MIT",
   "main": "index.js",
@@ -23,7 +23,7 @@
   "peerDependencies": {
     "chroma-js": "2.x",
     "react": "16.x",
-    "utils-pack": "0.2.x"
+    "utils-pack": "0.3.x"
   },
   "dependencies": {
     "classnames": "^2.2.6",
