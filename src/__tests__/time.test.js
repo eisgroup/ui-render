@@ -12,7 +12,7 @@ import {
   toTimestamp
 } from '../time'
 
-const date = '11.11.1987'
+const date = '31.12.2000'
 const timestamp = timestampFromDate(date)
 
 it(`${formatDuration.name}() renders durations correctly`, () => {

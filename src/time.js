@@ -1,5 +1,5 @@
+import moment from 'dayjs'
 import humanizeDuration from 'humanize-duration'
-import moment from 'moment'
 import {
   FIFTEEN_MINUTES,
   FORMAT_DATE,
