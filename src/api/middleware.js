@@ -1,5 +1,5 @@
 import axios from 'axios' // 'axios' adds 13 KB to final js bundle size
-import _ from 'lodash'
+import { cloneDeep, isNil, omitBy, startsWith } from 'lodash'
 import { stateAction } from 'modules-pack/redux/actions'
 import qs from 'querystring'
 import {
@@ -253,14 +253,14 @@ export class ApiMiddleware {
 
     return [
       payload.endpoint,
-      _.omitBy({
+      omitBy({
         method,
         [this.isFetch ? 'body' : 'data']: data,
         credentials,
         headers,
         httpsAgent,
         timeout: this.REQUEST_TIMEOUT
-      }, _.isNil)  // remove null/undefined
+      }, isNil)  // remove null/undefined
     ]
   }
 
@@ -270,9 +270,9 @@ export class ApiMiddleware {
     const {contentType} = this.meta.headers
     if (
       !contentType ||
-      _.startsWith(contentType, 'application/json') ||
-      _.startsWith(contentType, 'text/html') ||
-      _.startsWith(contentType, 'text/javascript')
+      startsWith(contentType, 'application/json') ||
+      startsWith(contentType, 'text/html') ||
+      startsWith(contentType, 'text/javascript')
     ) return response.json()
     return response
   }
@@ -290,8 +290,8 @@ export class ApiMiddleware {
       response.data.constructor === String &&
       (
         !contentType ||
-        _.startsWith(contentType, 'text/html') ||
-        _.startsWith(contentType, 'text/javascript')
+        startsWith(contentType, 'text/html') ||
+        startsWith(contentType, 'text/javascript')
       )
     ) return fromJSON(response.data)
     return response.data
@@ -423,17 +423,17 @@ export class ApiMiddleware {
 
   pendingAuth () {
     // Store action to resume when LOGIN SUCCESS
-    this.dispatch(stateAction(ADD_ACTIONS_PENDING_AUTH, [_.cloneDeep(this.action)]))
+    this.dispatch(stateAction(ADD_ACTIONS_PENDING_AUTH, [cloneDeep(this.action)]))
   }
 
   pendingLocation () {
     // Store action to resume when LOCATION UPDATED
-    this.dispatch(stateAction(ADD_ACTIONS_PENDING_LOCATION, [_.cloneDeep(this.action)]))
+    this.dispatch(stateAction(ADD_ACTIONS_PENDING_LOCATION, [cloneDeep(this.action)]))
   }
 
   pendingNetwork (error) {
     // Store action to resume when NETWORK CONNECTED
-    this.dispatch(stateAction(ADD_ACTIONS_PENDING_NETWORK, [_.cloneDeep(this.action)]))
+    this.dispatch(stateAction(ADD_ACTIONS_PENDING_NETWORK, [cloneDeep(this.action)]))
     this.dispatch(stateAction(NETWORK, ERROR, error))
   }
 
