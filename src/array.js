@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { difference, flatten, get, isEqual, some, union, unionBy, uniqWith } from 'lodash'
 import thenby from 'thenby'
 
 /**
@@ -111,7 +111,7 @@ export function isInListAny (array, ...args) {
  * @return {Boolean} true - if element found in given collection with shallow include match
  */
 export function isInCollection (collection, element) {
-	return _.some(collection, element)
+	return some(collection, element)
 }
 
 /**
@@ -138,7 +138,7 @@ export function isInCollectionAny (collection, ...elements) {
  * @param array2
  */
 export function isSameList (array1, array2) {
-	return _.isEqual(array1.sort(), array2.sort())
+	return isEqual(array1.sort(), array2.sort())
 }
 
 /**
@@ -228,7 +228,7 @@ export function toListValuesTotal (array = [], key = 'value', fallback = 0) {
  * @return {Array}
  */
 export function toUniqueList (array) {
-	return _.uniqWith(toList(array), _.isEqual)
+	return uniqWith(toList(array), isEqual)
 }
 
 /**
@@ -252,7 +252,7 @@ export function toUniqueListFast (array) {
  * @returns {Array} list - of unique objects
  */
 export function toUniqueListByKey (newList, oldList, key) {
-	return _.unionBy(newList, oldList, key)
+	return unionBy(newList, oldList, key)
 }
 
 /**
@@ -275,7 +275,7 @@ export function prependToList (array, value, limit) {
  * @returns {Array} - merged list with unique values
  */
 export function mergeLists (...arrays) {
-	return _.union(...arrays)
+	return union(...arrays)
 }
 
 /**
@@ -416,13 +416,13 @@ export function by (...args) {
 				if (key.indexOf('-') === 0) {
 					key = key.substring(1)
 					if (key.indexOf('.') > 0) {
-						result = sortDescending(_.get(a, key), _.get(b, key))
+						result = sortDescending(get(a, key), get(b, key))
 					} else {
 						result = sortDescending(a[key], b[key])
 					}
 				} else {
 					if (key.indexOf('.') > 0) {
-						result = sortAscending(_.get(a, key), _.get(b, key))
+						result = sortAscending(get(a, key), get(b, key))
 					} else {
 						result = sortAscending(a[key], b[key])
 					}
@@ -510,13 +510,12 @@ export function shuffle (list) {
 	return list
 }
 
-// -----------------------------------------------------------------------------
 // LODASH CLONES
 // -----------------------------------------------------------------------------
 
-export function min (array) { return _.min(array) }
+export { min } from 'lodash'
 
-export function max (array) { return _.max(array) }
+export { max } from 'lodash'
 
 /**
  * Creates an array of unique values from all given arrays using the provided 'comparator' function
@@ -529,7 +528,7 @@ export function max (array) { return _.max(array) }
  * @param {Function} comparator - The comparator invoked per element
  * @return {Array} - The new array of combined values
  */
-export const unionWith = _.unionWith
+export { unionWith } from 'lodash'
 
 /**
  * Flatten an Array a single level deep
@@ -537,7 +536,7 @@ export const unionWith = _.unionWith
  * @param {Array} array - The array to flatten
  * @return {Array} - The new flattened array
  */
-export const toFlatList = _.flatten
+export const toFlatList = flatten
 
 /**
  * Create a new list of values that exist in all given lists using SameValueZero equality check.
@@ -546,9 +545,9 @@ export const toFlatList = _.flatten
  * @param {Array} args - lists to check for intersection
  * @return {Array} list - of common values
  */
-export const intersection = _.intersection
+export { intersection } from 'lodash'
 
 /**
  * Creates an array of array values not included in the other given arrays
  */
-export const difference = _.difference
+export { difference } from 'lodash'

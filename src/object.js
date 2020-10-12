@@ -1,6 +1,17 @@
 import dotProp from 'dot-prop-immutable'
 import flatten from 'flat'
-import _ from 'lodash'
+import {
+	cloneDeep,
+	get,
+	isEmpty,
+	isEqual,
+	isObjectLike,
+	isPlainObject,
+	matches,
+	merge as _merge,
+	setWith,
+	unset
+} from 'lodash'
 import qs from 'querystring'
 
 /**
@@ -21,8 +32,21 @@ export function clone(obj) {
  * @param {*} obj - value to check
  * @returns {boolean} - true if value is an Object with value
  */
-export function hasObjectValue(obj) {
+export function hasObjectValue (obj) {
 	return isObject(obj) && Object.keys(obj).length > 0
+}
+
+/**
+ * Checks if value is the language type of Object
+ *
+ * @uses lodash
+ * @see https://lodash.com/docs/4.17.4#isPlainObject
+ *
+ * @param {*} value - any value to check
+ * @return {boolean}
+ */
+export function isObject (value) {
+	return isPlainObject(value)
 }
 
 /**
@@ -44,8 +68,8 @@ export function hasObjectValue(obj) {
  * @param {Object} obj - the object to list
  * @return {Object} generator's yielded value
  */
-export function* listProps(obj) {
-	if (!_.isObjectLike(obj)) {
+export function * listProps (obj) {
+	if (!isObjectLike(obj)) {
 		return []
 	}
 
@@ -55,15 +79,27 @@ export function* listProps(obj) {
 }
 
 /**
+ * Creates a new object that merges properties from all given objects. Properties from the right take precedence
+ * over properties on the left
+ * @Note: use update() for faster performance of x5 times (without cloneDeep) and x3 times (with cloneDeep)
+ *
+ * @param {Array|Object} objects - Objects to merge
+ * @return {Object} - A new object
+ */
+export function merge (...objects) {
+	return _merge({}, ...objects)
+}
+
+/**
  * Compare Original Object vs. Changed Object and keep only changed values
  *
  * @param {Object|Undefined|Null} original - to compare against
  * @param {Object|Undefined|Null} changed - object to keep changes
  * @returns {Object|Undefined|Null} changedOnly - new object with only changes values kept, or undefined if no changes
  */
-export function objChanges(original, changed) {
+export function objChanges (original, changed) {
 	if (!original) original = {}
-	const result = changed ? { ...changed } : changed
+	const result = changed ? {...changed} : changed
 	for (const field in result) {
 		if (isEqual(original[field], result[field])) {
 			delete result[field]
@@ -94,21 +130,7 @@ export function objChanges(original, changed) {
  * @returns {Object}
  */
 export function set(object, path, value, customizer) {
-	return _.setWith(object, path, value, customizer)
-}
-
-/**
- * Removes the Property at Path of Object by Mutation
- *
- * @uses lodash
- * @see https://lodash.com/docs/4.17.4#unset
- *
- * @param {Object} object - to remove property from
- * @param {String|Array} path - of the property to unset.
- * @return {boolean} - whether the value was removed from object
- */
-export function unset(object, path) {
-	return _.unset(object, path)
+	return setWith(object, path, value, customizer)
 }
 
 /**
@@ -188,19 +210,6 @@ export function update(state, payload, shouldCloneDeep = false) {
 }
 
 /**
- * Gets all values of an object
- *
- * @uses lodash
- * @see https://lodash.com/docs/4.17.4#values
- *
- * @param {Object} object - the object to get the values from
- * @return {Array}
- */
-export function getValues(object) {
-	return _.values(object)
-}
-
-/**
  * Check Recursively for Matching Object within Nested Object or Collection.
  *
  * @example:
@@ -216,9 +225,9 @@ export function hasObjMatch(obj, searchObj) {
 		if (!{}.hasOwnProperty.call(obj, key)) return
 		const value = obj[key]
 
-		if (_.matches(searchObj)(value)) {
+		if (matches(searchObj)(value)) {
 			return true
-		} else if (_.isObjectLike(value)) {
+		} else if (isObjectLike(value)) {
 			const nestedMatch = hasObjMatch(value, searchObj)
 			if (nestedMatch) return true
 		}
@@ -249,7 +258,7 @@ export function hasObjMatch(obj, searchObj) {
 export function hasObjKeys(obj, keys = {}, match = 'deep') {
 	for (const key in keys) {
 		const value = keys[key]
-		const searchValue = _.get(obj, key)
+		const searchValue = get(obj, key)
 
 		// Deep comparison
 		if (match === 'deep') {
@@ -258,7 +267,7 @@ export function hasObjKeys(obj, keys = {}, match = 'deep') {
 
 		// Shallow comparison
 		else if (match === 'shallow') {
-			if ((_.isObjectLike(searchValue) && !_.matches(value)(searchValue)) || searchValue != value) {
+			if ((isObjectLike(searchValue) && !matches(value)(searchValue)) || searchValue != value) {
 				// eslint-disable-line eqeqeq
 				return false
 			}
@@ -266,12 +275,12 @@ export function hasObjKeys(obj, keys = {}, match = 'deep') {
 
 		// Include comparison
 		else if (match === 'include') {
-			if (searchValue !== value && !_.isObjectLike(searchValue)) {
+			if (searchValue !== value && !isObjectLike(searchValue)) {
 				return false
 			}
 
-			if (!_.matches(value)(searchValue)) {
-				if (_.isObjectLike(searchValue)) return hasObjMatch(searchValue, value)
+			if (!matches(value)(searchValue)) {
+				if (isObjectLike(searchValue)) return hasObjMatch(searchValue, value)
 
 				return false
 			}
@@ -319,7 +328,7 @@ export function findObjByKeys(obj, keys = {}, match = 'deep') {
 		if (!{}.hasOwnProperty.call(obj, key)) return
 		const value = obj[key]
 
-		if (!_.isObjectLike(value)) continue
+		if (!isObjectLike(value)) continue
 
 		if (hasObjKeys(value, keys, match)) return value
 
@@ -350,15 +359,15 @@ export function findAllObjsByKeys(obj, keys = {}, match = 'deep') {
  *
  * @param {Array} result - this is the return array. Pass in an empty array and it will be populated with the found objects
  * @param {Object} obj - Object or Collection to search from
- * @param {object} keys - object with key paths and values to match, e.g. { 'properties.id': 7, type: 'DRAFT' }
- * @param {enum} match - one of comparison types ['deep', 'shallow', 'include']
+ * @param {Object} keys - object with key paths and values to match, e.g. { 'properties.id': 7, type: 'DRAFT' }
+ * @param {String} match - one of comparison types ['deep', 'shallow', 'include']
  */
 function _findAllObjsByKeys(result, obj, keys = {}, match = 'deep') {
 	for (const key in obj) {
 		if (!{}.hasOwnProperty.call(obj, key)) return
 		const value = obj[key]
 
-		if (!_.isObjectLike(value)) continue
+		if (!isObjectLike(value)) continue
 
 		if (hasObjKeys(value, keys, match)) result.push(value)
 
@@ -384,8 +393,8 @@ export const fromFlatObj = flatten.unflatten
  * @return {*}
  */
 export function pop(obj, keyPath, fallback) {
-	const value = _.get(obj, keyPath) || null
-	if (value) _.unset(obj, keyPath)
+	const value = get(obj, keyPath) || null
+	if (value) unset(obj, keyPath)
 	return value || fallback
 }
 
@@ -473,7 +482,7 @@ export function removeDeletedItems(collection) {
  * @return {Object|Array} - without graphql tags
  */
 export function sanitizeGqlResponse(collection, { tags = ['__typename'], clone = false } = {}) {
-	const result = clone ? _.cloneDeep(collection) : collection
+	const result = clone ? cloneDeep(collection) : collection
 
 	for (const key in result) {
 		if (tags.includes(key)) {
@@ -578,7 +587,6 @@ export function queryString(obj) {
 	return qs.stringify(obj)
 }
 
-// -----------------------------------------------------------------------------
 // LODASH CLONES
 // -----------------------------------------------------------------------------
 
@@ -597,9 +605,7 @@ export function queryString(obj) {
  * @param {*} [defaultValue] - The value returned for `undefined` resolved values
  * @return {*} the value at the keyPath
  */
-export function get(obj, keyPath, defaultValue) {
-	return _.get(obj, keyPath, defaultValue)
-}
+export { get } from 'lodash'
 
 /**
  * Check if two Objects are Equal
@@ -616,9 +622,7 @@ export function get(obj, keyPath, defaultValue) {
  * @param {Object} object2 - the object to compare with
  * @return {boolean} - true or false
  */
-export function isEqual(object, object2) {
-	return _.isEqual(object, object2)
-}
+export { isEqual } from 'lodash'
 
 /**
  * Checks if value is an empty object, collection, map or set
@@ -626,9 +630,7 @@ export function isEqual(object, object2) {
  * @param {*} value - The value to check
  * @return {boolean} - Returns true if value is empty, else false
  */
-export function isEmpty(value) {
-	return _.isEmpty(value)
-}
+export { isEmpty } from 'lodash'
 
 /**
  * A wrapper around the lodash's cloneDeep function
@@ -639,22 +641,7 @@ export function isEmpty(value) {
  * @param value
  * @returns {*} - cloned version of the value
  */
-export function cloneDeep(value) {
-	return _.cloneDeep(value)
-}
-
-/**
- * Checks if value is the language type of Object
- *
- * @uses lodash
- * @see https://lodash.com/docs/4.17.4#isPlainObject
- *
- * @param {*} value - any value to check
- * @return {boolean}
- */
-export function isObject(value) {
-	return _.isPlainObject(value)
-}
+export { cloneDeep } from 'lodash'
 
 /**
  * Creates a function that returns the value at path of a given object
@@ -669,18 +656,17 @@ export function isObject(value) {
  * @param {Array|string} path - The path of the property to get
  * @returns {Function} - Returns the new accessor function
  */
-export function property(path) {
-	return _.property(path)
-}
+export { property } from 'lodash'
 
 /**
- * Creates a new object that merges properties from all given objects. Properties from the right take precedence
- * over properties on the left
- * @Note: use update() for faster performance of x5 times (without cloneDeep) and x3 times (with cloneDeep)
+ * Removes the Property at Path of Object by Mutation
  *
- * @param {Array|Object} objects - Objects to merge
- * @return {Object} - A new object
+ * @uses lodash
+ * @see https://lodash.com/docs/4.17.4#unset
+ *
+ * @param {Object} object - to remove property from
+ * @param {String|Array} path - of the property to unset.
+ * @return {boolean} - whether the value was removed from object
  */
-export function merge(...objects) {
-	return _.merge({}, ...objects)
-}
+export { unset } from 'lodash'
+

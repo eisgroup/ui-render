@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { get } from 'lodash'
 import pluralizer from 'pluralize'
 
 // Random String Generation (with increased search space to 88^n)
@@ -185,7 +185,7 @@ export function interpolateString(string, variables = {}, { formatKey, name, sup
 		let key = match
 		if (formatKey) key = formatKey.replace('key', key)
 		// noinspection JSCheckFunctionSignatures
-		const result = _.get(variables, ...key.split(','))
+		const result = get(variables, ...key.split(','))
 		if (result === undefined) {
 			if (!suppressError) {
 				throw new Error(`${name || interpolateString.name + '()'} expects variable '${key}', got '${variables[key]}'`)
@@ -267,7 +267,7 @@ export function hostname(url) {
  * @returns {string} - matching string between `before` and `after` strings if found, or an empty string if not
  */
 export function matchBetween(string, before, after) {
-	return _.get(string.match(`${before}(.*)${after}`), '[1]') || ''
+	return get(string.match(`${before}(.*)${after}`), '[1]') || ''
 }
 
 /**
@@ -580,7 +580,6 @@ for (let i = 0; i < 256; i++) {
 	lut[i] = (i < 16 ? '0' : '') + i.toString(16)
 }
 
-// -----------------------------------------------------------------------------
 // LODASH CLONES
 // -----------------------------------------------------------------------------
 
@@ -593,9 +592,7 @@ for (let i = 0; i < 256; i++) {
  * @param {string} string - the string to capitalize
  * @returns {string} - the capitalized string
  */
-export function capitalize(string) {
-	return _.capitalize(string)
-}
+export { capitalize } from 'lodash'
 
 function randomNumberInRange(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min

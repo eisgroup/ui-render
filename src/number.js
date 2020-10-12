@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { hasListValue } from './array'
 import { isInString } from './string'
 
@@ -26,7 +25,7 @@ import { isInString } from './string'
  * @param {*} val - The value to check.
  * @returns {boolean} - Returns true if value is a number, else false.
  */
-export const isNumber = _.isNumber
+export { isNumber } from 'lodash'
 
 /**
  * Returns true if the given variable is a number,

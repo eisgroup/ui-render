@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { throttle as _throttle } from 'lodash'
 import { __DEV__ } from './_envs'
 import { isInListAny } from './array'
 import { NOW, ONE_DAY, ONE_HOUR, TIME_DURATION_INSTANT } from './constants'
@@ -50,7 +50,7 @@ export function enumCheck (enums, value, self) {
 
 	if (!isInListAny(enums, value)) {
 		const callerFunctionName = isFunction(self) ? self.name : 'function'
-		throw new TypeError(`${callerFunctionName} expected @value to be one of ${enums}, but got`, value)
+		throw new TypeError(`${callerFunctionName} expected @value to be one of ${enums}, but got '${value}'`,)
 	}
 }
 
@@ -128,7 +128,7 @@ export function throttleBy (duration = TIME_DURATION_INSTANT, options) {
 				Object.defineProperty(this, key, {
 					configurable: true,
 					enumerable: descriptor.enumerable,
-					value: _.throttle(descriptor.value, duration, options),
+					value: throttle(descriptor.value, duration, options),
 				})
 				return this[key]
 			},
@@ -207,5 +207,5 @@ export const testMock = {
  * @returns {function(...[*]=)} - throttled
  */
 export function throttle (func, wait = TIME_DURATION_INSTANT, options = {}) {
-	return _.throttle(func, wait, options)
+	return _throttle(func, wait, options)
 }

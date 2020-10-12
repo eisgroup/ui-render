@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { get } from 'lodash'
 import now from 'performance-now'
 import { __CLIENT__, __DEV__, __TEST__, Active } from './_envs'
 import { isFunction } from './function'
@@ -38,7 +38,7 @@ export function bench ({type, log, name, loop}, func, ...args) {
   }
   const duration = now() - start
 
-  result = (log != null) ? (isFunction(log) ? log(result) : _.get(result, log, result)) : null
+  result = (log != null) ? (isFunction(log) ? log(result) : get(result, log, result)) : null
 
   logBenchmark({
     name: name || func.name,
@@ -69,7 +69,7 @@ export async function benchA ({type, log, name, loop}, func, ...args) {
   }
   const duration = now() - start
 
-  result = (log != null) ? (isFunction(log) ? log(result) : _.get(result, log, result)) : null
+  result = (log != null) ? (isFunction(log) ? log(result) : get(result, log, result)) : null
 
   logBenchmark({
     name: name || func.name,
