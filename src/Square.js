@@ -123,7 +123,7 @@ export function asSquareFullWidth (Component) {
       <SizeMe monitorWidth children={({size: {width, height}}) => {
         height = width = width || 0 // initially width and height are undefined
         const fill = !(width && height)
-        const style = fill ? style : {height, width, ...style}
+        style = fill ? style : {height, width, ...style}
         return (
           /* Wrapper is required, because fixed width/height style applied prevents further resize calculation */
           <View fill={fill}>
@@ -153,7 +153,7 @@ export function asSquareFullHeight (Component) {
       <SizeMe monitorHeight monitorWidth={false} children={({size: {width, height}}) => {
         height = width = height || 0 // initially width and height are undefined
         const fill = !(width && height)
-        const style = fill ? style : {height, width, ...style}
+        style = fill ? style : {height, width, ...style}
         return (
           /* Wrapper is required, because fixed width/height style applied prevents further resize calculation */
           <View fill={fill}>
