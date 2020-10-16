@@ -48,14 +48,14 @@ export function offsetFrom (event, rectangle) {
  *
  * @param {Object} current - props
  * @param {Object} next - props
- * @param {Component|PureComponent} instance - React component
+ * @param {Object|Class|Component|PureComponent} instance - React component
  * @param {Function} [callback] - after state update
  * @return {Boolean} true - if state was synced
  */
 export function syncState (current, next, instance, callback) {
   const update = {}
   for (const key in current) {
-    if (next[key] !== current[key]) update[key] = next[key]
+    if (next[key] != null && next[key] !== current[key]) update[key] = next[key]
   }
   if (Object.keys(update).length) {
     instance.setState(update, callback)
