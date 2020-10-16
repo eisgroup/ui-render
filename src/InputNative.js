@@ -60,6 +60,7 @@ export default class InputNative extends PureComponent {
 
   onMountColor = (element) => {
     if (!element) return
+    this.element = element
     element.style.backgroundColor = element.value
   }
 
@@ -104,7 +105,10 @@ export default class InputNative extends PureComponent {
         if (props.checked == null && props.value != null) props.checked = props.value
         return <input {...props} />
       case 'color':
-        props.onChange = this.onChangeColor
+        if (this.element && props.value !== this.element.value) {
+          this.element.style.backgroundColor = props.value // update color for controlled input
+        }
+        props.onChange = this.onChangeColor // update color for uncontrolled input
         props.ref = this.onMountColor
         return <input {...props} />
       case 'textarea':
