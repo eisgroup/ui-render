@@ -174,8 +174,8 @@ export function asField (InputComponent, {sanitize} = {}) {
  *        or {} on unmount. This is useful for nested forms with remote submit button within parent container.
  *
  * @helpers:
- *  - this.state.hasInputChanges - boolean: true if current state has form input value changes
- *  - this.handleChangeInput() - function: that triggers input changes update (hooked to this.renderInput)
+ *  - this.state.hasInputChanges - boolean: true if state has form value changes (ensure handleChangeInput is called)
+ *  - this.handleChangeInput() - function: updates state.hasInputChanges (hooked to this.renderInput, must be defined as function)
  *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
  *
  *  @example:
