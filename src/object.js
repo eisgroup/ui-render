@@ -93,25 +93,30 @@ export function merge (...objects) {
 
 /**
  * Compare Original Object vs. Changed Object and keep only changed values
+ * @note: deleted props will output as `null` value
  *
  * @param {Object|Undefined|Null} original - to compare against
  * @param {Object|Undefined|Null} changed - object to keep changes
- * @returns {Object|Undefined|Null} changedOnly - new object with only changes values kept, or undefined if no changes
+ * @returns {Object|Undefined|Null} changedOnly - new object with only changed values kept, or undefined if no changes
  */
 export function objChanges (original, changed) {
-	if (!original) original = {}
-	const result = changed ? {...changed} : changed
-	for (const field in result) {
-		if (isEqual(original[field], result[field])) {
-			delete result[field]
+	// clone so we can delete keys while iterating
+	original = {...original}
+	changed = {...changed}
+	for (const field in changed) {
+		if (isEqual(original[field], changed[field])) {
+			delete changed[field]
 		} else {
 			// Recursively check for nested field changes
-			if (hasObjectValue(original[field]) && hasObjectValue(result[field]))
-				result[field] = objChanges(original[field], result[field])
+			if (hasObjectValue(original[field]) && hasObjectValue(changed[field]))
+				changed[field] = objChanges(original[field], changed[field])
 		}
+		delete original[field]
 	}
-	if (isEmpty(result)) return
-	return result
+	for (const deleted in original) {
+		changed[deleted] = null
+	}
+	return isEmpty(changed) ? undefined : changed
 }
 
 /**

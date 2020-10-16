@@ -159,19 +159,24 @@ describe(`${objChanges.name}()`, () => {
     expect(objChanges(undefined, null)).toEqual(undefined)
     expect(objChanges(null, null)).toEqual(undefined)
     expect(objChanges(null, undefined)).toEqual(undefined)
-    expect(objChanges({a: 1}, null)).toEqual(undefined)
+    expect(objChanges({a: 1}, null)).toEqual({a: null})
     expect(objChanges(null, {a: 1})).toEqual({a: 1})
     expect(objChanges({a: 1}, {a: 1, b: 2})).toEqual({b: 2})
   })
   test(`keeps only changed values when nested recursively`, () => {
     expect(objChanges({a: {b: 2}}, {a: {b: 2, c: 3}})).toEqual({a: {c: 3}})
+    expect(objChanges({a: {b: 2, c: 3}}, {a: {b: 2}})).toEqual({a: {c: null}})
+    expect(objChanges({a: {b: 2, c: 3}}, {a: {b: 2, c: null}})).toEqual({a: {c: null}})
+    expect(objChanges({a: {b: 2, c: 3}}, {a: {b: 2, c: Infinity}})).toEqual({a: {c: Infinity}})
   })
-  test(`does not mutate given changed object`, () => {
+  test(`does not mutate given 'original' or 'changed' object`, () => {
     const original = {a: 1, b: {c: 2}}
     const changed = {a: 1, b: {c: 2, d: 3}}
     const result = {b: {d: 3}}
+    const originalImmutable = cloneDeep(original)
     const changedImmutable = cloneDeep(changed)
     expect(objChanges(original, changed)).toEqual(result)
+    expect(original).toEqual(originalImmutable)
     expect(changed).toEqual(changedImmutable)
   })
 })
