@@ -38,17 +38,17 @@ export function Checkbox ({
   labelTrue,
   labelFalse,
   id,
-    readonly,
-    danger,
-    className,
-    float: _, // not used
-    initialValues: __, // not used
-    ...props
-  }) {
+  readonly,
+  danger,
+  className,
+  float: _, // not used
+  initialValues: __, // not used
+  ...props
+}) {
   if (readonly) props.readOnly = readonly // React wants `readonly` to be `readOnly`
-  labelTrue = labelTrue || 'ON'
-  labelFalse = labelFalse || 'OFF'
-  if (!id) id = 'checkbox-' + label.replace(/ +?/g, '-')
+  labelTrue = labelTrue || label || 'ON'
+  labelFalse = labelFalse || label || 'OFF'
+  if (!id && label) id = 'checkbox-' + label.replace(/ +?/g, '-')
   if (value === valueTrue) value = true
   if (value === valueFalse) value = false
   props.checked = (value === true || value === false) ? value : defaultValue
