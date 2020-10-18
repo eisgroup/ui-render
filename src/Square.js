@@ -118,14 +118,19 @@ function position ({top, right, bottom, left}) {
 export function asSquareFullWidth (Component) {
   // SizeMe will attempt to render placeholder (wrapped component) first to detect width and height.
   // The placeholder till take className and style applied to wrapped component.
-  return function SquareWrapper ({style, ...props}) {
+  return function SquareWrapper ({style: s, ...props}) {
     return (
       <SizeMe monitorWidth children={({size: {width, height}}) => {
         height = width = width || 0 // initially width and height are undefined
         const fill = !(width && height)
-        style = fill ? style : {height, width, ...style}
+        // On subsequent renders, the wrapper has no styling, to allow full control of Component styles
+        let style = s
+        if (!fill) { // only create new style object when needed to minimze rendering
+          if (!s || s.width !== width || s.height !== height) style = {width, height, ...s} // allow custome override
+        }
         return (
           /* Wrapper is required, because fixed width/height style applied prevents further resize calculation */
+          // For wrapper only use fill, so it collapses if Component has position-absolute
           <View fill={fill}>
             <Component {...{width, height, style, ...props}} />
           </View>
@@ -153,9 +158,14 @@ export function asSquareFullHeight (Component) {
       <SizeMe monitorHeight monitorWidth={false} children={({size: {width, height}}) => {
         height = width = height || 0 // initially width and height are undefined
         const fill = !(width && height)
-        style = fill ? style : {height, width, ...style}
+        // On subsequent renders, the wrapper has no styling, to allow full control of Component styles
+        let style = s
+        if (!fill) { // only create new style object when needed to minimze rendering
+          if (!s || s.width !== width || s.height !== height) style = {width, height, ...s} // allow custome override
+        }
         return (
           /* Wrapper is required, because fixed width/height style applied prevents further resize calculation */
+          // For wrapper only use fill, so it collapses if Component has position-absolute
           <View fill={fill}>
             <Component {...{width, height, style, ...props}} />
           </View>
