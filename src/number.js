@@ -344,7 +344,9 @@ export function roundDown (number, precision = 0) {
 
 /**
  * Round Number to the closest Multiple of value
- *
+ * @Note: this function is faster than round(), but has floating point issues, because of the last operation is multiply
+ *    => example: roundTo(1.2, 0.1)
+ *    >>> 1.2000000000000002
  * @example:
  *    roundTo(123.4567, 10)
  *    >>> 120
