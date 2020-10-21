@@ -4,6 +4,7 @@ import { accessibilitySupport } from './utils'
 
 /**
  * View - Pure Component.
+ * @todo: test rendering without React.memo on large scene to see which is faster.
  * With default `display: flex` style
  * (to be used as replacement for `<div></div>` and `<span></span>` for cross platform integration)
  *

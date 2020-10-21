@@ -1,8 +1,9 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import Row from './Row'
-import View from './View'
+import { isFunction } from 'utils-pack'
+import { Row } from './Row'
+import { View } from './View'
 
 /**
  * View with Custom Scroll Bar - Pure Component
@@ -16,6 +17,7 @@ import View from './View'
  * @param {Boolean} [reverse] - whether to reverse order of rendering
  * @param {Boolean} [rtl] - whether to use right to left direction
  * @param {Boolean} [center] - whether to center align content
+ * @param {*} [ref] - callback(element) when component mounts, or from React.createRef()
  * @param {*} props - other props
  * @returns {Object} - React component
  */
@@ -30,19 +32,20 @@ export function ScrollView ({
   rtl,
   center,
   // Remove tab to prevent Error
-    tab, // eslint-disable-line
-    ...props
-  }) {
+  tab, // eslint-disable-line
+  ...props
+}, ref) {
   const Container = row ? Row : View
   return (
-    <Container
+    <div
       className={classNames(
         'overflow-scroll',
-        row ? 'max-width' : 'max-height',
+        row ? 'flex--row max-width' : 'flex--col max-height',
         {fill, rtl, center: center && !row},
         className,
       )}
       style={style}
+      {...isFunction(ref) && {ref}}
     >
       <Container
         className={classNames(
@@ -53,9 +56,11 @@ export function ScrollView ({
         style={styleInner}
         {...props}
       />
-    </Container>
+    </div>
   )
 }
+
+export const ScrollViewRef = React.forwardRef(ScrollView)
 
 ScrollView.propTypes = {
   className: PropTypes.string,
