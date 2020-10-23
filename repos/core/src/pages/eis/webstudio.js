@@ -6,7 +6,7 @@ import Placeholder from 'react-ui-pack/Placeholder'
 import ScrollView from 'react-ui-pack/ScrollView'
 import Spinner from 'react-ui-pack/Spinner'
 import Text from 'react-ui-pack/Text'
-import { ENV, fromJSON, get, isEmpty, isString, logRender, SUCCESS } from 'utils-pack'
+import { ENV, fromJSON, get, isEmpty, isFunction, isString, logRender, SUCCESS } from 'utils-pack'
 import Render from './Render'
 import { withUISetup } from './rules'
 
@@ -15,6 +15,7 @@ if (urlPrefix) urlPrefix = window.location.origin + urlPrefix
 const DATA_URL = urlPrefix + ENV.REACT_APP_DATA_URL
 const META_URL = urlPrefix + ENV.REACT_APP_META_URL
 
+// noinspection JSConstantReassignment
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
  * -----------------------------------------------------------------------------
@@ -34,9 +35,11 @@ export default class WebStudioPage extends Component {
     if (typeof window !== 'undefined') {
       const {dataJson, metaJson} = window
       if (dataJson && metaJson) {
-        const data = isString(dataJson) ? fromJSON(dataJson) : dataJson
-        const meta = isString(metaJson) ? fromJSON(metaJson) : metaJson
-        return this.setState({loadingData: false, loadingMeta: false, data, meta})
+        return this.update(dataJson, metaJson)
+      } else if (isFunction(window.POST)) {
+        this.POST = window.POST
+        if (!window.UPDATE) window.UPDATE = this.update
+        return window.POST().then(({data, meta}) => this.update(data, meta)).catch(this.popup)
       }
     }
 
@@ -49,6 +52,12 @@ export default class WebStudioPage extends Component {
       .catch(this.popup)
   }
 
+  update = (dataJson, metaJson) => {
+    const data = isString(dataJson) ? fromJSON(dataJson) : dataJson
+    const meta = isString(metaJson) ? fromJSON(metaJson) : metaJson
+    return this.setState({loadingData: false, loadingMeta: false, data, meta})
+  }
+
   fetch = async (url, {body = {}, contentType = 'application/json'}) => {
     const data = {method: 'POST', body, headers: {'Content-Type': contentType}}
     const {payload, meta: {result} = {}} = await fetch(url, data)
@@ -58,12 +67,17 @@ export default class WebStudioPage extends Component {
 
   popup = (error) => popupAlert('Fetch Error', <Text>{String(error)}</Text>)
 
+  submit = (formValues) => {
+    if (this.POST) return this.POST(formValues).then(({data, meta}) => this.update(data, meta)).catch(this.popup)
+    console.warn(formValues)
+  }
+
   render () {
     const {loadingData, loadingMeta, data, meta} = this.state
     this.hasData = !isEmpty(data)
     this.hasMeta = !isEmpty(meta)
     return (this.hasData && this.hasMeta
-        ? <WebStudio data={data} meta={meta} initialValues={data}/>
+        ? <WebStudio data={data} meta={meta} initialValues={data} onSubmit={this.submit}/>
         : <Placeholder>
           {!this.hasData &&
           <Text className={cn('h1', {error: !loadingData, blink: loadingData})}>
@@ -95,7 +109,7 @@ export class WebStudio extends Component {
   render () {
     return (
       <ScrollView fill className='fade-in bg-neutral'>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.props.handleSubmit}>
           {this.hasData && this.hasMeta && <Render data={this.data} {...this.meta}/>}
         </form>
       </ScrollView>
