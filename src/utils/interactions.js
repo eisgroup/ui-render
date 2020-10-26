@@ -35,6 +35,8 @@ export function inlineSvg (svgString, x = 0, y = 0) {
  * @return {{x: number, y: number}} offset - coordinates relative to event.target
  */
 export function offsetFrom (event, rectangle) {
+  // @Note: there is a difference between rectangle.left vs. rectangle.x
+  // @see: https://stackoverflow.com/questions/27169534/in-google-chrome-getboundingclientrect-x-is-undefined/29741969
   return {x: event.clientX - rectangle.left, y: event.clientY - rectangle.top}
 }
 

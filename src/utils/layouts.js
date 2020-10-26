@@ -1,6 +1,5 @@
 import React from 'react'
 import { SizeMe } from 'react-sizeme'
-import View from '../View'
 
 /**
  * React Component Responsive Size Decorator that provides available `width` and `height` props
@@ -21,11 +20,11 @@ export function withResponsiveSize (Component) {
   return function ResponsiveWrapper (props) {
     return (
       <SizeMe monitorWidth monitorHeight children={({size: {width, height}}) => (
-        <View fill className='responsive-size'>
-          <View className='position-fill'>
-            <Component {...{width, height, ...props}} />
-          </View>
-        </View>
+        // <View fill className='responsive-size'>
+        //   <View className='position-fill'>
+        <Component {...{width, height, ...props}} />
+        // </View>
+        // </View>
       )}/>
     )
   }
