@@ -344,9 +344,10 @@ export function roundDown (number, precision = 0) {
 
 /**
  * Round Number to the closest Multiple of value
- * @Note: this function is faster than round(), but has floating point issues, because of the last operation is multiply
+ * @Note: this function need precision rounding because of floating point issues, as the last operation is multiply
  *    => example: roundTo(1.2, 0.1)
- *    >>> 1.2000000000000002
+ *    >>> 1.2000000000000002 -> this is the output without precision rounding
+ *
  * @example:
  *    roundTo(123.4567, 10)
  *    >>> 120
@@ -356,11 +357,14 @@ export function roundDown (number, precision = 0) {
  * @returns {number} - rounded to given multiple of value
  */
 export function roundTo (number, multiple = 1) {
-	return Math.round(number / multiple) * multiple
+	return +(Math.round(number / multiple) * multiple).toPrecision(15)
 }
 
 /**
  * Round Down Number to the closest Multiple of value
+ * @Note: this function needs rounding twice, because
+ *    => example: 1.2 / 0.1
+ *    >>> 11.999999999999998 -> rounds down to 11
  *
  * @example:
  *    roundTo(123.4567, 10)
@@ -371,11 +375,12 @@ export function roundTo (number, multiple = 1) {
  * @returns {number} - rounded to given multiple of value
  */
 export function roundDownTo (number, multiple = 1) {
-	return Math.floor(number / multiple) * multiple
+	return +(Math.floor(+(number / multiple).toPrecision(15)) * multiple).toPrecision(15)
 }
 
 /**
  * Round Up Number to the closest Multiple of value
+ * @Note: this function needs rounding twice, like roundDownTo
  *
  * @example:
  *    roundTo(123.4567, 10)
@@ -386,7 +391,7 @@ export function roundDownTo (number, multiple = 1) {
  * @returns {number} - rounded to given multiple of value
  */
 export function roundUpTo (number, multiple = 1) {
-	return Math.ceil(number / multiple) * multiple
+	return +(Math.ceil(+(number / multiple).toPrecision(15)) * multiple).toPrecision(15)
 }
 
 /**

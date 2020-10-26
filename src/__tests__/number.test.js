@@ -64,7 +64,7 @@ it(`${createIncrementCounter.name}() increments counts correctly`, () => {
 })
 
 it(`${formatNumber.name}() outputs correct string`, () => {
-  const europeanStyle = { sectionDelimiter: '.', decimalDelimiter: ',' }
+  const europeanStyle = {sectionDelimiter: '.', decimalDelimiter: ','}
   expect(formatNumber('Not a number')).toEqual('Not a number')
   expect(formatNumber('77777.00001')).toEqual('77,777.00001')
   expect(formatNumber('-77777.00001')).toEqual('-77,777.00001')
@@ -80,28 +80,28 @@ it(`${formatNumber.name}() outputs correct string`, () => {
   expect(formatNumber('-0.00007')).toEqual('-0.00007')
   expect(formatNumber(0.00007)).toEqual('0.00007')
   expect(formatNumber(-0.00007)).toEqual('-0.00007')
-  expect(formatNumber('1.1', { decimals: 2 })).toEqual('1.10')
-  expect(formatNumber(1.1, { decimals: 2 })).toEqual('1.10')
-  expect(formatNumber('77777.00001', { decimals: 2, delimits: 3, ...europeanStyle })).toEqual('77.777,00')
-  expect(formatNumber('-77777.00001', { decimals: 2, delimits: 3, ...europeanStyle })).toEqual('-77.777,00')
-  expect(formatNumber(77777.00001, { decimals: 2, delimits: 3, ...europeanStyle })).toEqual('77.777,00')
-  expect(formatNumber(-77777.00001, { decimals: 2, delimits: 3, ...europeanStyle })).toEqual('-77.777,00')
-  expect(formatNumber('7777777', { decimals: 2, delimits: 5, ...europeanStyle })).toEqual('77.77777,00')
-  expect(formatNumber('-7777777', { decimals: 2, delimits: 5, ...europeanStyle })).toEqual('-77.77777,00')
-  expect(formatNumber(7777777, { decimals: 2, delimits: 5, ...europeanStyle })).toEqual('77.77777,00')
-  expect(formatNumber(-7777777, { decimals: 2, delimits: 5, ...europeanStyle })).toEqual('-77.77777,00')
-  expect(formatNumber('0', { decimals: 2, delimits: 3 })).toEqual('0.00')
-  expect(formatNumber(0, { decimals: 2, delimits: 3 })).toEqual('0.00')
-  expect(formatNumber('0.00007', { decimals: 0, delimits: 3 })).toEqual('0')
-  expect(formatNumber('-0.00007', { decimals: 4, delimits: 3 })).toEqual('-0.0001')
-  expect(formatNumber('-0.00007', { decimals: 3, delimits: 3 })).toEqual('0.000')
-  expect(formatNumber('-0.00007', { decimals: 0, delimits: 3 })).toEqual('0')
-  expect(formatNumber(0.00007, { decimals: 0, delimits: 3 })).toEqual('0')
-  expect(formatNumber(-0.00007, { decimals: 4, delimits: 3 })).toEqual('-0.0001')
-  expect(formatNumber(-0.00007, { decimals: 3, delimits: 3 })).toEqual('0.000')
-  expect(formatNumber(-0.00007, { decimals: 0, delimits: 3 })).toEqual('0')
-  expect(formatNumber(0.00007, { decimals: 0, delimits: 3, ordinal: true })).toEqual('0th')
-  expect(formatNumber(-0.00007, { decimals: 0, delimits: 3, ordinal: true })).toEqual('0th')
+  expect(formatNumber('1.1', {decimals: 2})).toEqual('1.10')
+  expect(formatNumber(1.1, {decimals: 2})).toEqual('1.10')
+  expect(formatNumber('77777.00001', {decimals: 2, delimits: 3, ...europeanStyle})).toEqual('77.777,00')
+  expect(formatNumber('-77777.00001', {decimals: 2, delimits: 3, ...europeanStyle})).toEqual('-77.777,00')
+  expect(formatNumber(77777.00001, {decimals: 2, delimits: 3, ...europeanStyle})).toEqual('77.777,00')
+  expect(formatNumber(-77777.00001, {decimals: 2, delimits: 3, ...europeanStyle})).toEqual('-77.777,00')
+  expect(formatNumber('7777777', {decimals: 2, delimits: 5, ...europeanStyle})).toEqual('77.77777,00')
+  expect(formatNumber('-7777777', {decimals: 2, delimits: 5, ...europeanStyle})).toEqual('-77.77777,00')
+  expect(formatNumber(7777777, {decimals: 2, delimits: 5, ...europeanStyle})).toEqual('77.77777,00')
+  expect(formatNumber(-7777777, {decimals: 2, delimits: 5, ...europeanStyle})).toEqual('-77.77777,00')
+  expect(formatNumber('0', {decimals: 2, delimits: 3})).toEqual('0.00')
+  expect(formatNumber(0, {decimals: 2, delimits: 3})).toEqual('0.00')
+  expect(formatNumber('0.00007', {decimals: 0, delimits: 3})).toEqual('0')
+  expect(formatNumber('-0.00007', {decimals: 4, delimits: 3})).toEqual('-0.0001')
+  expect(formatNumber('-0.00007', {decimals: 3, delimits: 3})).toEqual('0.000')
+  expect(formatNumber('-0.00007', {decimals: 0, delimits: 3})).toEqual('0')
+  expect(formatNumber(0.00007, {decimals: 0, delimits: 3})).toEqual('0')
+  expect(formatNumber(-0.00007, {decimals: 4, delimits: 3})).toEqual('-0.0001')
+  expect(formatNumber(-0.00007, {decimals: 3, delimits: 3})).toEqual('0.000')
+  expect(formatNumber(-0.00007, {decimals: 0, delimits: 3})).toEqual('0')
+  expect(formatNumber(0.00007, {decimals: 0, delimits: 3, ordinal: true})).toEqual('0th')
+  expect(formatNumber(-0.00007, {decimals: 0, delimits: 3, ordinal: true})).toEqual('0th')
 })
 
 it(`${shortNumber.name}() formats number correctly`, () => {
@@ -291,6 +291,7 @@ it(`${roundTo.name}() rounds number to the closet multiple of value`, () => {
   expect(roundTo(1234.001)).toEqual(1234)
   expect(roundTo(1234.001, 10)).toEqual(1230)
   expect(roundTo(1234.001, 5)).toEqual(1235)
+  expect(roundTo(1.2, 0.1)).toEqual(1.2) // floating point issue 1.2000000000000002
 })
 
 it(`${roundDownTo.name}() rounds down number to the closet multiple of value`, () => {
@@ -299,6 +300,8 @@ it(`${roundDownTo.name}() rounds down number to the closet multiple of value`, (
   expect(roundDownTo(1234.001)).toEqual(1234)
   expect(roundDownTo(1234.001, 10)).toEqual(1230)
   expect(roundDownTo(1234.001, 5)).toEqual(1230)
+  expect(roundDownTo(1.2, 0.1)).toEqual(1.2) // floating point issue 1.2000000000000002
+
 })
 
 it(`${roundUpTo.name}() rounds up number to the closet multiple of value`, () => {
@@ -307,6 +310,7 @@ it(`${roundUpTo.name}() rounds up number to the closet multiple of value`, () =>
   expect(roundUpTo(1234.001)).toEqual(1235)
   expect(roundUpTo(1234.001, 10)).toEqual(1240)
   expect(roundUpTo(1234.001, 5)).toEqual(1235)
+  expect(roundUpTo(1.2, 0.1)).toEqual(1.2) // floating point issue 1.2000000000000002
 })
 
 it(`${toPercentage.name}() returns the difference percents between numbers correctly`, () => {
