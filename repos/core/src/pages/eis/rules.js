@@ -89,6 +89,7 @@ export function withUISetup (formConfig) {
   return function Decorator (Class) {
     const UNSAFE_componentWillMount = Class.prototype.UNSAFE_componentWillMount
     const UNSAFE_componentWillUpdate = Class.prototype.UNSAFE_componentWillUpdate
+    const UNSAFE_componentWillReceiveProps = Class.prototype.UNSAFE_componentWillReceiveProps
 
     // @Note: the state shape is used for reference only, it is not instantiated
     Class.prototype.state = {
@@ -194,8 +195,15 @@ export function withUISetup (formConfig) {
     }
 
     Class.prototype.UNSAFE_componentWillUpdate = function (nextProps, nextState) {
-      if (this.state !== nextState) this.meta = null
+      if (this.state !== nextState) this.meta = null // update changes by UI interactions (i.e. Dropdown onChange)
       if (UNSAFE_componentWillUpdate) UNSAFE_componentWillUpdate.apply(this, arguments)
+    }
+
+    Class.prototype.UNSAFE_componentWillReceiveProps = function (next, _) {
+      const {data, meta} = this.props
+      if (next.data != null && next.data !== data) this.dataUpdate(next.data) // external API changes
+      if (next.meta != null && next.meta !== meta) this.metaUpdate(next.meta) // external API changes
+      if (UNSAFE_componentWillReceiveProps) UNSAFE_componentWillReceiveProps.apply(this, arguments)
     }
 
     return withForm(formConfig)(Class)

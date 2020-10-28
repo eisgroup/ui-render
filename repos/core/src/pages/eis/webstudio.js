@@ -52,10 +52,11 @@ export default class WebStudioPage extends Component {
       .catch(this.popup)
   }
 
-  update = (dataJson, metaJson) => {
-    const data = isString(dataJson) ? fromJSON(dataJson) : dataJson
-    const meta = isString(metaJson) ? fromJSON(metaJson) : metaJson
-    return this.setState({loadingData: false, loadingMeta: false, data, meta})
+  update = (dataJson, metaJson = null) => {
+    const state = {loadingData: false, loadingMeta: false}
+    state.data = isString(dataJson) ? fromJSON(dataJson) : dataJson
+    if (metaJson) state.meta = isString(metaJson) ? fromJSON(metaJson) : metaJson
+    return this.setState(state)
   }
 
   fetch = async (url, {body = {}, contentType = 'application/json'}) => {

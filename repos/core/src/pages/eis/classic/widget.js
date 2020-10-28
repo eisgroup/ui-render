@@ -10,14 +10,22 @@ window.POST = function (dataJson, metaJson) {
     window.POST.resolve = resolve
     window.POST.reject = reject
 
-    // return onComplete('{"readonly": true}', '{"view": "Button", "type": "submit", "children": "save"}') // example
-    if (dataJson == null) { // checks for undefined or null values
-      // initial load, no data provided
-      return onComplete(window.dataJson, window.metaJson)
-    } else {
-      // call to server to update dataJson (as object)
-      // ...
-    }
+    // Simulate network request delay
+    setTimeout(() => {
+
+      if (dataJson == null) { // checks for undefined or null values
+        // initial load, no data provided
+        console.warn('loaded!!!')
+        return onComplete('{"button": "loaded"}', '{"view": "Button", "type": "submit", "children": {"name": "button"}}') // example
+        // return onComplete(window.dataJson, window.metaJson)
+      } else {
+        // call to server to update dataJson (as object)
+        // ...
+        console.warn('updated!!!')
+        return onComplete('{"button": "updated"}', '{"view": "Button", "type": "submit", "children": {"name": "button"}}') // example
+      }
+
+    }, 1000)
   })
 }
 
