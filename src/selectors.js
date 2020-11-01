@@ -26,7 +26,8 @@ import { logSelector } from './log'
  *        // noinspection JSPotentiallyInvalidUsageOfClassThis
  *        return [
  *          this.activeRoute,
- *          (route) => route.split('/').pop()
+ *          (state) => get(state, `${this.NAME}.location.id`),
+ *          (route, id) => route.split('/').pop()
  *        ]
  *     }
  *   }
@@ -65,6 +66,7 @@ export default function selector (NAME, maxTime = 5 * ONE_MILLISECOND) {
         }
       )
     }
+    constructor.NAME = NAME // can be accessed as instance `this.NAME` within selectors
   }
 }
 
