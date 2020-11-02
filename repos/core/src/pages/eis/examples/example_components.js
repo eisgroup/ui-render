@@ -7,15 +7,24 @@ export default [
     name: 'Rating Details',
     elementConfigs: [
       {
-        view: 'Title',
-        displayName: 'Plan ID',
-        name: 'planID',
+        view: 'Dropdown',
+        displayName: 'Plan Dropdown',
+        name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
+        options: 'coverages', // -> key path pointing to array in *_data.json
+        mapOptions: 'coverageID', // -> key path pointing to human readable value within each option (used as label)
       },
       {
-        view: 'Table',
-        displayName: 'Layouts Table',
-        name: 'layouts'
+        view: 'Text',
+        displayName: 'Plan Text',
+        label: {
+          name: 'coverages.{state.active.plan,0}.coverageID'
+        },
       },
+      // {
+      //   view: 'Table',
+      //   displayName: 'Layouts Table',
+      //   name: 'layouts'
+      // },
       {
         view: 'Table',
         displayName: 'Coverages Table',
