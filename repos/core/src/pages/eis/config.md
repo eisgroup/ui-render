@@ -139,6 +139,7 @@ const RenderField = {
 
   // Table attributes
   // @see: <TableView /> docs for other props
+  hideOnEmpty: Boolean, // whether to hide the table if no data exists
   inverted: Boolean, // whether to style table in dark mode
   striped: Boolean, // whether to alternate background shade of items (rows in default layout)
   vertical: Boolean, // whether to render Table rows as columns (does not work with `renderItem`)
