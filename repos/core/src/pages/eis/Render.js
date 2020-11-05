@@ -319,6 +319,8 @@ function metaToFunctions (definition, {data, funcNames = FUNCTION_NAMES} = {}) {
   // const validations = toList(definition.validate)
   // if (isString(validations[0])) definition.validate = removeNilValues(validations.map(id => FIELD.VALIDATION[id]))
   if (isString(definition.validate)) definition.validate = FIELD.VALIDATION[definition.validate]
+  if (isString(definition.format)) definition.format = FIELD.NORMALIZER[definition.format]
+  if (isString(definition.parse)) definition.parse = FIELD.NORMALIZER[definition.parse]
   if (isString(definition.normalize)) definition.normalize = FIELD.NORMALIZER[definition.normalize]
   funcNames.forEach(name => {
     if (isString(definition[name])) {

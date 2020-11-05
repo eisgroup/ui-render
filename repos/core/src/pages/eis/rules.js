@@ -60,17 +60,17 @@ export function toOpenLConfig (meta) {
       meta[key] = toOpenLConfig(val)
     }
 
-    // Convert `format` attribute to `normalize`
-    else if (key === 'format') {
-      meta.normalize = val
-      delete meta[key]
-    }
-
     // Convert `styles` attribute to `className`
     else if (key === 'styles') {
       meta.className = val
       delete meta[key]
     }
+
+    // @deprecated: Convert `format` attribute to `normalize` (previously used redux-form)
+    // else if (key === 'format') {
+    //   meta.normalize = val
+    //   delete meta[key]
+    // }
   }
 
   return meta
