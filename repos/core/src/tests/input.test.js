@@ -37,7 +37,7 @@ describe(`<${Input.name}/>`, () => {
     const className = 'padding-h'
     const color = 'red'
     render(<Input label={label} className={className} style={{color}}/>)
-    const input = screen.getByText(label).parentElement
+    const input = screen.getByText(label).parentElement.parentElement
     expect(input).toHaveClass(className)
     expect(input).toHaveStyle(`color: ${color}`)
   })
