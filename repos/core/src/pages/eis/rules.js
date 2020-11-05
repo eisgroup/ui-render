@@ -81,7 +81,9 @@ export function toOpenLConfig (meta) {
  * @usage:
  *    - this.data -> *_data.json from state, ready for <Render> component consumption
  *    - this.meta -> transformed *_meta.json data from state, ready for <Render> component consumption
- *    - this.handleSubmit -> to be used like this <form onSubmit={this.handleSubmit}>
+ *    - this.handleSubmit:
+ *        1. final-form: to be used like this <form onSubmit={this.props.handleSubmit}>
+ *        2. redux-form: to be used like this <form onSubmit={this.handleSubmit}>
  *    - this.hasData and this.hasMeta getters can be used for conditional check
  *    - Initialize with data by overriding initial state
  */

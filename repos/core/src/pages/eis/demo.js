@@ -170,12 +170,13 @@ class Renderer extends Component {
     return this.props.actions.popup({title: 'Submitted Form with these values', content: <JsonView data={values}/>})
   }
 
+  // redux-form use only
   handleSubmit = this.props.handleSubmit(this.submit)
 
   render () {
     const {data, meta} = this.props
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.props.handleSubmit}>
         {<Render debug data={data} {...meta}/>}
       </form>
     )

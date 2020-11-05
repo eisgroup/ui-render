@@ -147,7 +147,7 @@ export class Example extends Component {
   render () {
     return (
       <ScrollView fill className='fade-in bg-neutral'>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.props.handleSubmit}>
           {this.hasData && this.hasMeta && <Render data={this.data} {...this.meta}/>}
         </form>
       </ScrollView>
