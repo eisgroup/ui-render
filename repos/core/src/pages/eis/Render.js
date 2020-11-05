@@ -41,6 +41,7 @@ export default function Render (props, i) {
   return <RenderClass {...props} key={typeof i !== 'object' ? i : undefined}/>
 }
 Active.Render = Render
+
 class RenderClass extends Component {
   state = {
     error: false,
@@ -133,6 +134,12 @@ export function RenderFunc (Name) {
  * @returns {Object} props - mutated meta
  */
 export function metaToProps (meta, {data, instance, relativePath, relativeIndex, debug = false}) {
+  // Transform Root attributes
+  if (isObject(meta)) {
+    metaToFunctions(meta, {data})
+    if (meta.name) meta.name = interpolateString(meta.name, instance, {suppressError: true})
+  }
+
   for (const key in meta) {
     const definition = meta[key]
     if (!definition) continue
