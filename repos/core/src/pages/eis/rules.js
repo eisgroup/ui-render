@@ -22,9 +22,10 @@ export function transformConfig (meta) {
 
 export function toOpenLConfig (meta) {
   if (isObject(meta)) {
+    const {view} = meta
 
     // Apply default Dropdown config if onChange is not defined
-    if (meta.view === FIELD.TYPE.DROPDOWN && meta.name != null && meta.onChange == null) {
+    if ((view === FIELD.TYPE.DROPDOWN || view === FIELD.TYPE.SELECT) && meta.name != null && meta.onChange == null) {
       meta.onChange = FIELD.ACTION.SET_STATE + ',' + meta.name
       if (meta.value == null) meta.value = {name: `{state.${meta.name},0}`}
       if (meta.options != null) {
@@ -41,7 +42,7 @@ export function toOpenLConfig (meta) {
     }
 
     // Add Table Expand to first column if `renderItem` defined, but `renderCell` is undefined
-    else if (meta.view === FIELD.TYPE.TABLE && meta.renderItem != null) {
+    else if (view === FIELD.TYPE.TABLE && meta.renderItem != null) {
       const firstHeader = get(meta.headers, '[0]')
       if (isObject(firstHeader) && firstHeader.renderCell == null) {
         firstHeader.renderCell = {

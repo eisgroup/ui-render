@@ -5,6 +5,7 @@ import { cn } from 'react-ui-pack'
 import Button from 'react-ui-pack/Button'
 import PieChart from 'react-ui-pack/charts/PieChart'
 import Counter from 'react-ui-pack/Counter'
+import Dropdown from 'react-ui-pack/Dropdown'
 import Expand from 'react-ui-pack/Expand'
 import ExpandList from 'react-ui-pack/ExpandList'
 import Label from 'react-ui-pack/Label'
@@ -212,7 +213,13 @@ export default function RenderComponent ({
       if (relativeData && relativePath != null && input.name) {
         input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
       }
-      return renderField({view, items, ...input})
+      // Render Dropdown separately, to avoid triggering form value changes
+      if (view === FIELD.TYPE.DROPDOWN) {
+        // proxy onChange to prevent event sent as second argument
+        const {onChange, ...dropdown} = input
+        return <Dropdown onChange={onChange ? (value => onChange(value)) : undefined} {...dropdown}/>
+      }
+      return renderField({view, ...input})
     }
   }
 }

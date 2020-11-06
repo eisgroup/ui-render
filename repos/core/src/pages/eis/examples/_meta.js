@@ -199,7 +199,7 @@ export default {
             styles: 'margin-h-smaller',
           },
           {
-            view: 'Dropdown',
+            view: 'Select',
             name: 'url', // must be unique key path identifier that does not exist in *_data.json
             placeholder: 'Select fetch API',
             onChange: { // function defined as object with nested callback

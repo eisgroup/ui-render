@@ -223,7 +223,7 @@
             "styles": "margin-h-smaller"
           },
           {
-            "view": "Dropdown",
+            "view": "Select",
             "name": "url",
             "placeholder": "Select fetch API",
             "onChange": {

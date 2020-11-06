@@ -119,7 +119,8 @@ const RenderField = {
   info: 'Content to render when input is in focus',
   error: 'Content to render when input is invalid',
 
-  // Dropdown attributes (using react Semantic UI Dropdown)
+  // Dropdown/Select attributes (using react Semantic UI Dropdown)
+  // Select is used for changing Input values, whereas Dropdown for changing UI state only
   compact: Boolean,
   multiple: Boolean,
   search: Boolean, // whether dropdown options are searchable
@@ -138,7 +139,6 @@ const RenderField = {
   pushable: Number, // minimum slider increments between two handles
 
   // Table attributes
-  // @see: <TableView /> docs for other props
   hideOnEmpty: Boolean, // whether to hide the table if no data exists
   inverted: Boolean, // whether to style table in dark mode
   striped: Boolean, // whether to alternate background shade of items (rows in default layout)
@@ -209,7 +209,6 @@ const RenderField = {
   ],
 
   // Pie Chart attributes
-  // @see: <PieChart/> docs for other props
   mapItems: Object, // data mapper key/value pairs (ex. {label: 'pieLabelKeyFromData', value: 'pieValueKeyFromData'}
 
   // Upload and other input attributes
