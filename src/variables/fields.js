@@ -33,6 +33,7 @@ FIELD.TYPE = {
   COL_LIST: 'ColList', // alias for List
   COL_LIST3: 'VerticalList', // alias for List
   COUNTER: 'Counter', // Animated number changing from `start` to `end` values
+  DROPDOWN: 'Dropdown', // Semantic UI Dropdown
   LABEL: 'Label',
   LIST: 'List', // list of Col components with dynamic `renderItem` attributes
   PIE_CHART: 'PieChart', // Pie chat (can be in shape of donut) with optional legends

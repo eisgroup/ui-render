@@ -15,11 +15,11 @@ export const API_VALIDATE_FAIL_CODE = 422
 
 // Field Type Definitions
 FIELD.TYPE = {
-  DROPDOWN: 'Dropdown', // Semantic UI Dropdown
   DATE: 'Date',
   DATES: 'Dates', // multiple date ranges with `from` and `to` times
   GROUP: 'Group', // group of semantically related fields (i.e. pay rate and currency)
   INPUT: 'Input', // generic input of different types (i.e. type='text', 'textarea', etc.)
+  SELECT: 'Select', // Semantic UI Dropdown
   SLIDER: 'SliderLabel', // slider field with label
   TOGGLE: 'Toggle', // checkbox rendered as toggle button
   MULTIPLE: 'Fields', // multiple fields of the same type (i.e. mobile/work/home phone numbers)

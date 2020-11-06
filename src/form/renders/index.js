@@ -59,8 +59,7 @@ export function renderField (fieldDefinition, i) {
     case FIELD.TYPE.INPUT:
       Field = InputField
       break
-    case FIELD.TYPE.DROPDOWN:
-      if (props.selection == null) props.selection = true
+    case FIELD.TYPE.SELECT:
       Field = DropdownField
       break
     case FIELD.TYPE.DATE:
