@@ -1,4 +1,5 @@
 import { renderField } from 'modules-pack/form/renders'
+import AutoSave from 'modules-pack/form/views/AutoSave'
 import { FIELD } from 'modules-pack/variables'
 import React from 'react'
 import { cn } from 'react-ui-pack'
@@ -27,6 +28,10 @@ import { Active, get, isList, isObject, toList } from 'utils-pack'
  * Map Component props for recursive rendering
  * =============================================================================
  */
+
+FIELD.TYPE = {
+  AUTOSAVE: 'AutoSave',
+}
 
 /**
  * Map UI Renderer props to final Rendering Component/s
@@ -70,6 +75,10 @@ export default function RenderComponent ({
     case FIELD.TYPE.ROW_LIST:
     case FIELD.TYPE.ROW_LIST2: {
       return <List items={_data} {...props} row/>
+    }
+
+    case FIELD.TYPE.AUTOSAVE: {
+      return <AutoSave {...props}/>
     }
 
     case FIELD.TYPE.CHECKBOX: {

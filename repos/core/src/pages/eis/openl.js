@@ -1,4 +1,3 @@
-import AutoSave from 'modules-pack/form/views/AutoSave'
 import React, { Component } from 'react'
 import JsonView from 'react-ui-pack/JsonView'
 import ScrollView from 'react-ui-pack/ScrollView'
@@ -37,7 +36,6 @@ export default class OpenL extends Component {
           <Text className='h1 center padding bg-grey no-margin'>All Possible Configurations of The UI Renderer</Text>
           <form onSubmit={this.props.handleSubmit}>
             <Render data={this.data} {...this.meta}/>
-            <AutoSave save={save} partial showLoader/>
           </form>
         </ScrollView>
 
@@ -49,11 +47,4 @@ export default class OpenL extends Component {
       </>
     )
   }
-}
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-
-const save = async values => {
-  console.warn('Saving', values)
-  await sleep(2000)
 }

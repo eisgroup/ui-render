@@ -703,6 +703,19 @@ export default {
           ]
         }
       ]
+    },
+    {
+      view: 'AutoSave',
+      onChange: { // required attribute
+        name: 'popupDelay',
+        args: [
+          'Popup Title',
+        ]
+      },
+      delay: 1000, // 1 second (i.e. 1000 milliseconds), default is 200
+      partial: true, // whether to submit only changed values
+      showLoader: true,
+      loadContent: 'Calculating...'
     }
   ]
 }

@@ -7,6 +7,10 @@ import Json from 'react-ui-pack/JsonView'
 import { cloneDeep, get, isCollection, isEmpty, isObject, isString, sanitizeGqlResponse, set } from 'utils-pack'
 import { metaToProps } from './Render'
 
+FIELD.ACTION = {
+  POPUP_DELAY: 'popupDelay',
+}
+
 /**
  * BUSINESS RULES ==============================================================
  * UI Config transform logic specific to OpenL reports
@@ -194,6 +198,7 @@ export function withUISetup (formConfig) {
       FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
       FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
       FIELD.FUNC[FIELD.ACTION.POPUP] = this.popupAlert
+      FIELD.FUNC[FIELD.ACTION.POPUP_DELAY] = delayed(this.popupAlert)
       if (UNSAFE_componentWillMount) UNSAFE_componentWillMount.apply(this, arguments)
     }
 
@@ -210,5 +215,14 @@ export function withUISetup (formConfig) {
     }
 
     return withForm(formConfig)(Class)
+  }
+}
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+function delayed (func, delay = 2000) {
+  return async (...args) => {
+    await sleep(delay)
+    return func(...args)
   }
 }
