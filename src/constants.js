@@ -35,6 +35,8 @@ export const REMOVE = 'REMOVE'          // For removing state
 export const REPORT = 'REPORT'       		// For broadcasting a resource
 export const PREFETCH = 'PREFETCH'      // For pre-loading resources
 export const PRESET = 'PRESET'					// For preparing a resource
+export const PRE_ADD = 'PRE_ADD'				// For preparing a resource
+export const PRE_REMOVE = 'PRE_REMOVE'	// For preparing a resource
 export const SELECT = 'SELECT'      		// For picking a resource
 export const TOGGLE = 'TOGGLE'      		// For switching between states
 
@@ -91,6 +93,8 @@ export const ALL_ACTIONS = [
 	REPORT,
 	PREFETCH,
 	PRESET,
+	PRE_ADD,
+	PRE_REMOVE,
 	SELECT,
 	TOGGLE,
 ]

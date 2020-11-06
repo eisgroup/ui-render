@@ -9,6 +9,7 @@ import { padStringLeft, randomString } from './string'
  */
 
 /**
+ * Todo: test creating 1000 items per second and filter for duplicate
  * Create Short Auto Incrementing ID string derived from Timestamp in milliseconds
  * @Important: modifying this function may break existing database implementations
  * @Rationale: primary use case is for generating globally unique Ids from frontend
