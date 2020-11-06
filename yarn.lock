@@ -10927,10 +10927,10 @@ module-lookup-amd@^6.1.0:
     requirejs "^2.3.5"
     requirejs-config-file "^3.1.1"
 
-modules-pack@^0.5.9:
-  version "0.5.9"
-  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.5.9.tgz#093e222ea556b6b6f4ad3e664bb4bcee8883589b"
-  integrity sha512-W/S2UUfhz4ilAhCJqyhlFKnhAJmW14abLlmsp0TLfK6wvw3CqV9gN6anenRXhh2/Il5lqcQHdB3eM/FJNgbC6Q==
+modules-pack@^0.5.10:
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.5.10.tgz#8ad3fb7407a75e1cfc15908e4e2a81a69a25acf5"
+  integrity sha512-y2/MCDu/RJEnkvrqo0LtRxZH3IYzfg7/1684BXiL20qZJGmmNH3Pj5mxBKmdckds8w5nvx3tzfY7ngZJGMyJ5A==
   dependencies:
     axios "^0.19.2"
     backoff "^2.5.0"
@@ -13524,10 +13524,10 @@ react-transition-group@^2.5.0:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react-ui-pack@^0.6.15:
-  version "0.6.15"
-  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.6.15.tgz#3f4ef7b7bc3b431de362a5b2dbbb0e8a3b8b6b36"
-  integrity sha512-bbMd2y6Mr6LBrCStuRXX37lCwYVbwDhhm1Ie6jamHFPyuWXDfk7kE7kPJhJcAXOgkcH9GQ3sHJCTKLdUYhkEGA==
+react-ui-pack@^0.6.16:
+  version "0.6.16"
+  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.6.16.tgz#e61b3748a63cb5845a5aed21a45706cce2375a75"
+  integrity sha512-t9B04XXpL6dJ3Zg5hKn7YtiAGkJFzBk9pvVOOdn7v5aXRepSAtYUfUB/PuPjbInNYdXoCzvuIxarkPT+0H9U5w==
   dependencies:
     chroma-js "^2.1.0"
     classnames "^2.2.6"

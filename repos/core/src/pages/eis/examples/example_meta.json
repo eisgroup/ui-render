@@ -159,9 +159,7 @@
         {
           "id": "#",
           "renderHeader": {
-            "view": "Input",
-            "name": "expandAllStates",
-            "type": "checkbox",
+            "view": "Checkbox",
             "label": "Expand All",
             "onChange": "handleToggleExpandAll"
           }

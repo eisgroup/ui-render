@@ -43,9 +43,7 @@ export default {
     {
       id: '#',
       renderHeader: {
-        view: 'Input',
-        name: 'expandAllStates', // unique name that does not exist in *_data.json
-        type: 'checkbox',
+        view: 'Checkbox',
         label: 'Expand All',
         onChange: 'handleToggleExpandAll', // function is injected by TableView instance on render
       },

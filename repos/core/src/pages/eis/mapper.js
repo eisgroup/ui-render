@@ -4,6 +4,7 @@ import React from 'react'
 import { cn } from 'react-ui-pack'
 import Button from 'react-ui-pack/Button'
 import PieChart from 'react-ui-pack/charts/PieChart'
+import { Checkbox } from 'react-ui-pack/Checkbox'
 import Counter from 'react-ui-pack/Counter'
 import Dropdown from 'react-ui-pack/Dropdown'
 import Expand from 'react-ui-pack/Expand'
@@ -69,6 +70,10 @@ export default function RenderComponent ({
     case FIELD.TYPE.ROW_LIST:
     case FIELD.TYPE.ROW_LIST2: {
       return <List items={_data} {...props} row/>
+    }
+
+    case FIELD.TYPE.CHECKBOX: {
+      return <Checkbox {...props}/>
     }
 
     case FIELD.TYPE.EXPAND: {
@@ -219,6 +224,23 @@ export default function RenderComponent ({
         const {onChange, ...dropdown} = input
         return <Dropdown onChange={onChange ? (value => onChange(value)) : undefined} {...dropdown}/>
       }
+
+      // Form value changing fields should have 'Input' as view
+      if (view === FIELD.TYPE.INPUT) {
+        // eslint-disable-next-line default-case
+        switch (input.type) {
+          case 'select':
+            view = FIELD.TYPE.SELECT
+            break
+          case 'slider':
+            view = FIELD.TYPE.SLIDER
+            break
+          case 'toggle':
+            view = FIELD.TYPE.TOGGLE
+            break
+        }
+      }
+
       return renderField({view, ...input})
     }
   }

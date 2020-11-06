@@ -101,7 +101,7 @@ const RenderField = {
   name: 'adminCosts.adminCategory', // (required for inputs)* path to field value within *_data.json
   label: 'Input label',
   placeholder: 'To appear inside empty input when focused',
-  type: 'number', // 'text', 'textarea', 'email', etc.
+  type: 'number', // 'checkbox', 'email', 'number', 'select', 'slider', 'text', 'textarea', 'toggle', etc. (HTML input types)
   unit: 'Input value unit label (e.x. "USD" for currency input)',
   icon: 'dollar', // icon css class name -> displays Icon inside Input
   lefty: Boolean, // whether to show icon on the left, default is on the right
