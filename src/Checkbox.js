@@ -31,7 +31,7 @@ export function Checkbox ({
   value,
   valueTrue = true,
   valueFalse = false,
-  defaultValue = false,
+  defaultValue,
   onChange,
   type = 'checkbox',
   label,
@@ -51,7 +51,11 @@ export function Checkbox ({
   if (!id && label) id = 'checkbox-' + label.replace(/ +?/g, '-')
   if (value === valueTrue) value = true
   if (value === valueFalse) value = false
-  props.checked = (value === true || value === false) ? value : defaultValue
+  if (value == null) {
+    if (defaultValue != null) props.defaultChecked = defaultValue
+  } else {
+    props.checked = !!value
+  }
   return (
     <Row className={classNames('checkbox--wrapper', className)}>
       <input
@@ -85,7 +89,9 @@ Checkbox.propTypes = {
   labelFalse: PropTypes.any,
   onChange: PropTypes.func,
   value: PropTypes.any,
-  defaultValue: PropTypes.any,
+  valueTrue: PropTypes.any,
+  valueFalse: PropTypes.any,
+  defaultValue: PropTypes.bool,
   className: PropTypes.string,
 }
 
