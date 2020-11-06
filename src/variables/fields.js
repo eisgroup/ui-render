@@ -27,6 +27,7 @@ FIELD.TYPE = {
   BUTTON: 'Button',
   EXPAND: 'Expand', // Expandable/collapsing content with clickable `title` or `renderLabel` area
   EXPAND_LIST: 'ExpandList', // list of Expand components with dynamic `renderLabel` and `renderItem` attributes
+  CHECKBOX: 'Checkbox', // checkbox with optional label
   COL: 'Col', // Vertical column layout
   COL2: 'Column', // alias for Column
   COL3: 'VerticalLayout', // alias for Column
