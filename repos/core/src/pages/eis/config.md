@@ -22,6 +22,37 @@ There are `transform patterns` you can apply to any component. This is the secre
       Example: `renderItem`, `renderLabel`...
     - Arguments can be defined, separated by comma
       Example: `"setState,plan"` -> use `plan` as argument
+    - Function can be defined as object
+      Example: `
+        {
+          name: "fetch",
+          args: [
+            "https://url.to.fetch.com/api",
+            {
+              method: "POST",
+              ...
+            }
+          ]
+        }
+      `
+    - Function can ba chained with arguments mapped dynamically
+      Example: `
+        {
+          name: "fetch",
+          onDone: {
+            name: 'fetch',
+            mapArgs: [ // function will first receive `mapArgs`, then followed by `args`, as arguments
+              // variable `{0.payload.ip}` can be defined to get data from arguments, in addition to *_data.json
+              'https://ipapi.co/{0.payload.ip}/json', // this is the first argument passed to the function
+              // ...second (subsequent) argument/s can be defined as object/array/number/etc.
+            ],
+            onDone: {
+              name: 'popup',
+              args: ['Dropdown.onChange\n -> fetch(IpAddress).onDone\n -> fetch(GeoData).onDone\n -> popup'],
+            }
+          },
+        }
+      `
 
 3. **Custom rendering by matching values**
     - See the [example](#render-field-attributes) of `renderCell: { values: {...} }` in Table view
