@@ -23,7 +23,8 @@ There are `transform patterns` you can apply to any component. This is the secre
     - Arguments can be defined, separated by comma
       Example: `"setState,plan"` -> use `plan` as argument
     - Function can be defined as object
-      Example: `
+      Example: 
+      ```js
         {
           name: "fetch",
           args: [
@@ -34,9 +35,10 @@ There are `transform patterns` you can apply to any component. This is the secre
             }
           ]
         }
-      `
-    - Function can ba chained with arguments mapped dynamically
-      Example: `
+      ```
+    - Function can be chained with arguments mapped dynamically
+      Example:
+      ```js
         {
           name: "fetch",
           onDone: {
@@ -50,9 +52,9 @@ There are `transform patterns` you can apply to any component. This is the secre
               name: 'popup',
               args: ['Dropdown.onChange\n -> fetch(IpAddress).onDone\n -> fetch(GeoData).onDone\n -> popup'],
             }
-          },
+          }
         }
-      `
+      ```
 
 3. **Custom rendering by matching values**
     - See the [example](#render-field-attributes) of `renderCell: { values: {...} }` in Table view

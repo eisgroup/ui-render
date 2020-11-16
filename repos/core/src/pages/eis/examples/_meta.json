@@ -31,13 +31,14 @@
             },
             {
               "view": "Input",
-              "className": "margin-bottom",
+              "className": "margin-bottom max-width-290",
               "label": "Number of claims per employee",
               "name": "adminExpenses.perEmployeeClaims",
               "type": "number",
               "min": 1,
               "format": "integer",
-              "validate": "required"
+              "validate": "required",
+              "removable": true
             },
             {
               "view": "Table",
@@ -784,6 +785,19 @@
           ]
         }
       ]
+    },
+    {
+      "view": "AutoSave",
+      "onChange": {
+        "name": "popupDelay",
+        "args": [
+          "Popup Title"
+        ]
+      },
+      "delay": 1000,
+      "partial": true,
+      "showLoader": true,
+      "loadContent": "Calculating..."
     }
   ]
 }
