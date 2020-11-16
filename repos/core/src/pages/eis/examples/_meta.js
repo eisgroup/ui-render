@@ -29,13 +29,14 @@ export default {
             },
             {
               view: 'Input',
-              className: 'margin-bottom',
+              className: 'margin-bottom max-width-290',
               label: 'Number of claims per employee',
               name: 'adminExpenses.perEmployeeClaims',
               type: 'number',
               min: 1,
               format: 'integer',
               validate: 'required',
+              removable: true,
             },
             {
               view: 'Table',

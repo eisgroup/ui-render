@@ -44,12 +44,13 @@ FIELD.TYPE = {
  * @param {Boolean} relativeData - whether to retrieve values from local `_data`, defaults to global `data`
  * @param {Number|String} relativeIndex - used when component is rendered in array
  * @param {String} relativePath - path used to compute form input "name" attribute
+ * @param {Form|Object} form - react-final-form
  * @param {Function} [Render] - the recursive renderer
  * @param {*} [props] - other component props
  * @returns {JSX.Element|*} React component
  */
 export default function RenderComponent ({
-  view, items, data, _data, debug,
+  view, items, data, _data, debug, form,
   relativeData, relativeIndex, relativePath,
   Render = Active.Render,
   ...props
@@ -128,9 +129,9 @@ export default function RenderComponent ({
       const steps = items.map(({step, label, content, data, _data, ...info}, i) => {
         return {
           ...info,
-          step: isObject(step) ? Render.call(this, {data, _data, debug, ...step}, i) : step,
-          label: isObject(label) ? Render.call(this, {data, _data, debug, ...label}, i) : label,
-          content: isObject(content) ? Render.bind(this, {data, _data, debug, ...content}, i) : content
+          step: isObject(step) ? Render.call(this, {data, _data, debug, form, ...step}, i) : step,
+          label: isObject(label) ? Render.call(this, {data, _data, debug, form, ...label}, i) : label,
+          content: isObject(content) ? Render.bind(this, {data, _data, debug, form, ...content}, i) : content
         }
       })
       return <ProgressSteps items={steps} {...props}/>
@@ -175,10 +176,10 @@ export default function RenderComponent ({
 
     case FIELD.TYPE.TABS: {
       const tabs = items.map(({tab, _data, data}, i) => isObject(tab) ? Render.call(this, {
-        data, _data, debug, ...tab
+        data, _data, debug, form, ...tab
       }, i) : tab)
       const panels = items.map(({content, _data, data}, i) => isObject(content)
-        ? Render.bind(this, {data, _data, debug, ...content}, i)
+        ? Render.bind(this, {data, _data, debug, form, ...content}, i)
         : content
       )
       return <Tabs items={tabs} panels={panels} {...props}/>
@@ -222,7 +223,7 @@ export default function RenderComponent ({
     }
 
     default: {
-      const {mapOptions, ...input} = props
+      const {mapOptions, removable, ...input} = props
       if (mapOptions) input.options = mapProps(input.options || [], mapOptions, {debug})
       if (relativeData && relativePath != null && input.name) {
         input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
@@ -247,6 +248,15 @@ export default function RenderComponent ({
           case 'toggle':
             view = FIELD.TYPE.TOGGLE
             break
+        }
+      }
+
+      // Input clearing
+      if (removable) {
+        const {onRemove} = input
+        input.onRemove = (name) => {
+          form.change(name, null)
+          onRemove && onRemove(name)
         }
       }
 

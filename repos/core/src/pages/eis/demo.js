@@ -174,10 +174,10 @@ class Renderer extends Component {
   // handleSubmit = this.props.handleSubmit(this.submit)
 
   render () {
-    const {data, meta} = this.props
+    const {data, meta, form} = this.props
     return (
       <form onSubmit={this.props.handleSubmit}>
-        {<Render debug data={data} {...meta}/>}
+        {<Render debug data={data} {...meta} form={form}/>}
       </form>
     )
   }

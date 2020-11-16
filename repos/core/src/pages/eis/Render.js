@@ -62,13 +62,13 @@ class RenderClass extends Component {
       return <TooltipPop inverted title={tooltip}>{Render(props)}</TooltipPop>
     }
 
-    let {data, _data, items = [], relativeData, relativePath, relativeIndex, debug, view, ...props} = this.props
+    let {data, _data, debug, form, items = [], relativeData, relativePath, relativeIndex, view, ...props} = this.props
 
     // Global/Relative Data access
     if (props.name) _data = get((relativeData && _data) || data, props.name) // local data dynamically retrieved from definition
 
     // Pass down data to child renderers
-    items = items.map((item) => ({data, _data, debug, ...item})) // allow `data` and `_data` to be overridden by config
+    items = items.map((item) => ({data, _data, debug, form, ...item})) // allow `data` and `_data` to be overridden by config
 
     return RenderComponent.call(this, {...this.props, _data, items})
   }

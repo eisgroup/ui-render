@@ -28,13 +28,14 @@ export default class OpenL extends Component {
   }
 
   render () {
+    const {form, handleSubmit} = this.props
     const {meta, showMeta} = this.state
     return (
       <>
         <ScrollView fill className='fade-in bg-neutral'>
           <Text className='h1 center padding bg-grey no-margin'>All Possible Configurations of The UI Renderer</Text>
-          <form onSubmit={this.props.handleSubmit}>
-            <Render data={this.data} {...this.meta}/>
+          <form onSubmit={handleSubmit}>
+            <Render data={this.data} {...this.meta} form={form}/>
           </form>
         </ScrollView>
 

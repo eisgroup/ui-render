@@ -34,16 +34,16 @@
     &:hover, &:focus, &:active {
       &.transparent {
         color: @color-primary;
-
-        .inverted & {
-          color: @color-white;
-          border-color: @color-white;
-        }
       }
 
-      opacity: 0.8;
+      font-weight: @font-weight-bold;
       //background-color: @color-shadow-lightest;
     }
+  }
+
+  .inverted & {
+    color: @color-white;
+    border-color: @color-white;
   }
 
   &:disabled {
@@ -78,28 +78,24 @@
     //@padding: @paddingTop * unit(@size-base / @size-icon * @size-base / @size-icon); // and padding smaller
     @sizeScale: 1;
     @padding: @paddingCircle;
-    &:extend(.round all);
-
     .scalePadding(@size: @base * @sizeScale; @top: @padding; @left: @padding;);
     //font-size: @base * @sizeScale;
     letter-spacing: 0 !important;
     transform: none;
-    width: @base !important;
+    &:extend(.circle);
+
+    @{select-interaction} {
+      border-radius: 50% !important;
+    }
 
     &.small {
       //  font-size: @small * @sizeScale;
       .scalePadding(@size: @small * @sizeScale; @top: @padding; @left: @padding;);
-      width: @small !important;
     }
 
     &.large {
       //  font-size: @large * @sizeScale;
       .scalePadding(@size: @large * @sizeScale; @top: @padding; @left: @padding;);
-      width: @large !important;
-    }
-
-    @{select-interaction} {
-      &:extend(.round all);
     }
   }
 
@@ -218,7 +214,8 @@
     &:not(:disabled) {
       @{select-interaction} {
         //color: @colorVal;
-        box-shadow: inset 0 0 0 @border-size @colorVal;
+        //box-shadow: inset 0 0 0 @border-size @colorVal;
+        background-color: darken(@colorVal, 7%);
       }
     }
 
@@ -230,12 +227,10 @@
       &:not(:disabled) {
         @{select-interaction} {
           //color: @colorValLight;
-          box-shadow: inset 0 0 0 @border-size @colorValLight;
+          //box-shadow: inset 0 0 0 @border-size @colorValLight;
+          background-color: lighten(@colorVal, 7%);
         }
       }
     }
   }
 }
-
-/* Delete Button */
-// <Button circle className='app__slider__remove small' onClick={}><Icon name='delete'/></Button>

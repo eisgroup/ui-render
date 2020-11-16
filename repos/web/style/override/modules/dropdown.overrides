@@ -56,8 +56,12 @@
     opacity: initial !important; //override .disabled styling
   }
 
-  > .dropdown.icon:before {
-    .icon(@icon-dropdown);
+  > .dropdown.icon {
+    .icon();
+
+    &:before {
+      content: @icon-dropdown-chevron;
+    }
   }
 
   // Placeholder
@@ -71,8 +75,10 @@
 
   // Buttons for Multiple Search Selection
   > .label {
-    white-space: nowrap;;
     .outline();
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;;
     font-weight: normal;
     color: @color-text;
     background-color: @color-bg;
@@ -201,5 +207,32 @@
         }
       }
     }
+  }
+}
+
+.ui.multiple.dropdown {
+  // Selected tags
+  > .label {
+    padding-right: @padding-smaller; // quick fix
+
+    > i.icon.delete {
+      .icon();
+
+      &:before {
+        content: @icon-dropdown-delete;
+      }
+    }
+  }
+}
+
+// Fix use case when <Dropdown search /> - without `multiple`, no default text collapses menu
+.ui.search.dropdown > input.search:not([value=""]) {
+  position: static;
+  padding: 0;
+  max-width: 100%;
+  transition: none;
+
+  + .filtered.text {
+    display: none;
   }
 }
