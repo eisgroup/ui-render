@@ -141,6 +141,7 @@ const RenderField = {
   float: Boolean, // whether label should float above input when in focus
   disabled: Boolean, // disabled input
   readonly: Boolean, // read-only input, makes all nested fields disabled, with `readonly` css class applied
+  removable: Boolean, // whether to show cross icon that sets input value to null when clicked
   format: String, // name of the format function
   normalize: String, // name of the normalizer function
   parse: String, // name of the parser function
@@ -148,6 +149,8 @@ const RenderField = {
   value: undefined, // controlled input value
   defaultValue: undefined, // to be used on init if `value` not set
   onChange: String, // name of the callback function for input value changes
+  min: Number, // minimum value
+  max: Number, // maximum value
   hint: 'Displayed as title text above input',
   info: 'Content to render when input is in focus',
   error: 'Content to render when input is invalid',
@@ -166,8 +169,6 @@ const RenderField = {
   },
 
   // Slider attributes
-  min: Number, // minimum value
-  max: Number, // maximum value
   step: Number, // slider increment
   pushable: Number, // minimum slider increments between two handles
 
