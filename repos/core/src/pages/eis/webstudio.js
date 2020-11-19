@@ -1,5 +1,6 @@
 import { fetch } from 'modules-pack/api'
 import { popupAlert } from 'modules-pack/popup'
+import { FIELD } from 'modules-pack/variables'
 import React, { Component } from 'react'
 import { cn } from 'react-ui-pack'
 import Placeholder from 'react-ui-pack/Placeholder'
@@ -14,6 +15,9 @@ let urlPrefix = document.getElementById('react-app').getAttribute('data-prefix-u
 if (urlPrefix) urlPrefix = window.location.origin + urlPrefix
 const DATA_URL = urlPrefix + ENV.REACT_APP_DATA_URL
 const META_URL = urlPrefix + ENV.REACT_APP_META_URL
+FIELD.ACTION = {
+  UPDATE: 'update',
+}
 
 // noinspection JSConstantReassignment
 /**
@@ -37,7 +41,7 @@ export default class WebStudioPage extends Component {
       if (dataJson && metaJson) {
         return this.update(dataJson, metaJson)
       } else if (isFunction(window.POST)) {
-        this.POST = window.POST
+        FIELD.FUNC[FIELD.ACTION.UPDATE] = this.POST = window.POST
         if (!window.UPDATE) window.UPDATE = this.update
         return window.POST().then(({data, meta}) => this.update(data, meta)).catch(this.popup)
       }
