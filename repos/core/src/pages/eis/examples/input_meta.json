@@ -1,0 +1,16 @@
+{
+  "view": "Input",
+  "name": "coverages.0.annualPremium",
+  "className": "margin-bottom max-width-290",
+  "label": "Annual Premium",
+  "icon": "dollar",
+  "unit": "USD",
+  "type": "number",
+  "format": "integer",
+  "validate": "required",
+  "min": 0,
+  "max": 100000,
+  "lefty": true,
+  "removable": true,
+  "autoSubmit": true
+}

@@ -13,6 +13,7 @@ import dropdownMeta from './examples/dropdown_meta.json'
 import exampleData from './examples/example_data.json'
 import exampleMeta from './examples/example_meta.json'
 import expandListMeta from './examples/expand-list_meta.json'
+import inputMeta from './examples/input_meta.json'
 import invalidArrayData from './examples/invalid-array_data.json'
 import invalidArrayMeta from './examples/invalid-array_meta.json'
 import listMeta from './examples/list_meta.json'
@@ -48,6 +49,11 @@ const examples = [
     title: 'Expand List',
     data: listData,
     meta: expandListMeta,
+  },
+  {
+    title: 'Input',
+    data: exampleData,
+    meta: inputMeta,
   },
   {
     title: 'Tab List',
