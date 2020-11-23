@@ -787,7 +787,7 @@
       ]
     },
     {
-      "view": "AutoSave",
+      "view": "AutoSubmit",
       "onChange": {
         "name": "popupDelay",
         "args": [

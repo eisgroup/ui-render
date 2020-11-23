@@ -30,7 +30,7 @@ import { Active, get, isList, isObject, toList } from 'utils-pack'
  */
 
 FIELD.TYPE = {
-  AUTOSAVE: 'AutoSave',
+  AUTOSAVE: 'AutoSubmit',
 }
 
 /**

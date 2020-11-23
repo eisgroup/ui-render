@@ -706,7 +706,7 @@ export default {
       ]
     },
     {
-      view: 'AutoSave',
+      view: 'AutoSubmit',
       onChange: { // required attribute
         name: 'popupDelay',
         args: [

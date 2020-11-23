@@ -22,6 +22,9 @@ FIELD.ACTION = {
 // noinspection JSConstantReassignment
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
+ * todo:
+ *  - add attribute autosubmit to inputs
+ *  - move cross inside input
  * -----------------------------------------------------------------------------
  */
 export default class WebStudioPage extends Component {
