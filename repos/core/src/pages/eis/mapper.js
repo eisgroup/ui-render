@@ -21,7 +21,7 @@ import Tabs from 'react-ui-pack/Tabs'
 import Text from 'react-ui-pack/Text'
 import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
-import { Active, get, isList, isObject, toList } from 'utils-pack'
+import { Active, debounce, get, isList, isObject, TIME_DURATION_INSTANT, toList } from 'utils-pack'
 
 /**
  * UI RENDERER COMPONENTS SETUP ================================================
@@ -223,7 +223,7 @@ export default function RenderComponent ({
     }
 
     default: {
-      const {mapOptions, removable, ...input} = props
+      const {mapOptions, removable, autoSubmit, ...input} = props
       if (mapOptions) input.options = mapProps(input.options || [], mapOptions, {debug})
       if (relativeData && relativePath != null && input.name) {
         input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
@@ -249,6 +249,14 @@ export default function RenderComponent ({
             view = FIELD.TYPE.TOGGLE
             break
         }
+        if (autoSubmit) {
+          const {onChange} = input
+          const submit = debounce(form.submit, autoSubmit.delay >= 0 ? autoSubmit.delay : TIME_DURATION_INSTANT)
+          input.onChange = (value) => {
+            onChange && onChange(value)
+            submit()
+          }
+        }
       }
 
       // Input clearing
@@ -257,6 +265,7 @@ export default function RenderComponent ({
         input.onRemove = (name) => {
           form.change(name, null)
           onRemove && onRemove(name)
+          autoSubmit && input.onChange(null)
         }
       }
 

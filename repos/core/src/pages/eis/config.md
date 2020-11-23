@@ -154,6 +154,10 @@ const RenderField = {
   hint: 'Displayed as title text above input',
   info: 'Content to render when input is in focus',
   error: 'Content to render when input is invalid',
+  autoSubmit: Boolean, // whether input should submit form on changes
+  autoSubmit: { // second way to define auto submission with customized options
+    delay: Number, // specify delay in milliseconds for input submission on changes, default is 200 milliseconds
+  },
 
   // Dropdown/Select attributes (using react Semantic UI Dropdown)
   // Select is used for changing Input values, whereas Dropdown for changing UI state only
@@ -249,6 +253,9 @@ const RenderField = {
   kind: 'Type of file or input, for example, "images"',
   count: Number, // number of files/inputs
 
+  // AutoSubmit attributes
+  delay: Number,  // specify delay in milliseconds for input submission on changes, default is 200 milliseconds
+  partial: true, // whether to submit only changed values
 }
 ```
 

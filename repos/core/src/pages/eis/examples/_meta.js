@@ -37,6 +37,7 @@ export default {
               format: 'integer',
               validate: 'required',
               removable: true,
+              autoSubmit: true,
             },
             {
               view: 'Table',
@@ -481,12 +482,17 @@ export default {
                                 view: 'Input',
                                 name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].area',
                                 label: 'Area',
+                                removable: true,
+                                autoSubmit: {
+                                  delay: 1000
+                                }
                               },
                               {view: 'Space'},
                               {
                                 view: 'Input',
                                 name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].trend',
                                 label: 'trend',
+                                removable: true,
                               },
                               {view: 'Space'},
                               {
@@ -705,18 +711,18 @@ export default {
         }
       ]
     },
-    {
-      view: 'AutoSubmit',
-      onChange: { // required attribute
-        name: 'popupDelay',
-        args: [
-          'Popup Title',
-        ]
-      },
-      delay: 1000, // 1 second (i.e. 1000 milliseconds), default is 200
-      partial: true, // whether to submit only changed values
-      showLoader: true,
-      loadContent: 'Calculating...'
-    }
+    // {
+    //   view: 'AutoSubmit',
+    //   onChange: { // required attribute
+    //     name: 'popupDelay',
+    //     args: [
+    //       'Popup Title',
+    //     ]
+    //   },
+    //   delay: 1000, // 1 second (i.e. 1000 milliseconds), default is 200
+    //   partial: true, // whether to submit only changed values
+    //   showLoader: true,
+    //   loadContent: 'Calculating...'
+    // }
   ]
 }
