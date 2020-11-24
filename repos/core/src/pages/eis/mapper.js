@@ -249,13 +249,15 @@ export default function RenderComponent ({
             view = FIELD.TYPE.TOGGLE
             break
         }
-        if (autoSubmit) {
-          const {onChange} = input
-          const submit = debounce(form.submit, autoSubmit.delay >= 0 ? autoSubmit.delay : TIME_DURATION_INSTANT)
-          input.onChange = (value) => {
-            onChange && onChange(value)
-            submit()
-          }
+      }
+
+      // Auto submit on changes
+      if (autoSubmit) {
+        const {onChange} = input
+        const submit = debounce(form.submit, autoSubmit.delay >= 0 ? autoSubmit.delay : TIME_DURATION_INSTANT)
+        input.onChange = (value) => {
+          onChange && onChange(value)
+          submit()
         }
       }
 

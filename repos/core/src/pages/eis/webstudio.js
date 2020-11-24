@@ -23,7 +23,6 @@ FIELD.ACTION = {
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
  * todo:
- *  - add attribute autosubmit to inputs
  *  - move cross inside input
  * -----------------------------------------------------------------------------
  */

@@ -187,7 +187,8 @@ export function metaToProps (meta, {data, instance, relativePath, relativeIndex,
 
         // Render is a function definition
         else if (definition.name) {
-          return getFunctionFromObject(definition, {data}).apply(this, [value, index, {...props, ...definition, data}])
+          const func = getFunctionFromObject(definition, {data})
+          return isFunction(func) ? func.apply(this, [value, index, {...props, ...definition, data}]) : func
         }
 
         // Render is conditional match by values definitions
