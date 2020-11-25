@@ -224,6 +224,7 @@ export default function RenderComponent ({
 
     default: {
       const {mapOptions, removable, autoSubmit, ...input} = props
+      const {readonly, disabled} = data || {}
       if (mapOptions) input.options = mapProps(input.options || [], mapOptions, {debug})
       if (relativeData && relativePath != null && input.name) {
         input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
@@ -271,7 +272,7 @@ export default function RenderComponent ({
         }
       }
 
-      return renderField({view, ...input})
+      return renderField({view, ...input, ...readonly && {readonly}, ...disabled && {disabled}})
     }
   }
 }
