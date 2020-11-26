@@ -3,6 +3,7 @@
   "name": "coverages.0.annualPremium",
   "className": "margin-bottom max-width-290",
   "label": "Annual Premium",
+  "placeholder": "Enter amount...",
   "icon": "dollar",
   "unit": "USD",
   "type": "number",
