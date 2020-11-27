@@ -10,6 +10,7 @@ import Counter from 'react-ui-pack/Counter'
 import Dropdown from 'react-ui-pack/Dropdown'
 import Expand from 'react-ui-pack/Expand'
 import ExpandList from 'react-ui-pack/ExpandList'
+import { OK } from 'react-ui-pack/inputs/validationRules'
 import Label from 'react-ui-pack/Label'
 import List from 'react-ui-pack/List'
 import ProgressSteps from 'react-ui-pack/ProgressSteps'
@@ -270,6 +271,16 @@ export default function RenderComponent ({
           form.change(name, null)
           onRemove && onRemove(name)
           autoSubmit && input.onChange(null)
+        }
+      }
+
+      // Validate type="number" with min/max
+      if (input.type === 'number') {
+        const {validate, min, max} = input
+        if (min != null || max != null) input.validate = (value) => {
+          if (min != null && value < min) return `Must be minimum ${min}`
+          if (max != null && value > max) return `Must be maximum ${max}`
+          return (validate && validate(value)) || OK
         }
       }
 
