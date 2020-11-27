@@ -500,6 +500,12 @@ input, select, textarea {
     }
   }
 
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    &:extend(.input-done all);
+  }
+
   &.resize {
     textarea {
       resize: none;

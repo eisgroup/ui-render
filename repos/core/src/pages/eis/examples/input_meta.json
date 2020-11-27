@@ -12,6 +12,8 @@
   "min": 0,
   "max": 100000,
   "lefty": true,
+  "readonly": false,
+  "disabled": false,
   "removable": true,
   "autoSubmit": true
 }
