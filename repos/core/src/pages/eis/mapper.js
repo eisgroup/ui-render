@@ -46,13 +46,14 @@ FIELD.TYPE = {
  * @param {String} relativePath - path used to compute form input "name" attribute
  * @param {Form|Object} form - react-final-form
  * @param {Function} [Render] - the recursive renderer
+ * @param {String} [version] - of the config
  * @param {*} [props] - other component props
  * @returns {JSX.Element|*} React component
  */
 export default function RenderComponent ({
   view, items, data, _data, debug, form,
   relativeData, relativeIndex, relativePath,
-  Render = Active.Render,
+  Render = Active.Render, version,
   ...props
 }) {
   switch (view) {

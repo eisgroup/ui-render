@@ -1,7 +1,7 @@
 {
   "view": "Input",
   "name": "coverages.0.annualPremium",
-  "className": "margin-bottom max-width-290",
+  "className": "margin max-width-290",
   "label": "Annual Premium",
   "placeholder": "Enter amount...",
   "icon": "dollar",
