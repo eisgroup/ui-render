@@ -137,7 +137,7 @@ export function renderFloat (value, decimals, props) {
     <Text {...props}>
       {Math.floor(value).toLocaleString()}
       {decimals !== 0 && decimal &&
-      <Text className='fade--quarter normal no-margin'>
+      <Text className='fade--quarter no-margin'>
         {Number('0.' + decimal).toLocaleString(undefined, decimals == null ? undefined : {
           minimumFractionDigits: decimals,
           maximumFractionDigits: decimals,
