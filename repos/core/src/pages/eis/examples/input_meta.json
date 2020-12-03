@@ -11,6 +11,7 @@
   "validate": "required",
   "min": 0,
   "max": 100000,
+  "step": 5,
   "lefty": true,
   "readonly": false,
   "disabled": false,
