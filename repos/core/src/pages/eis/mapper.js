@@ -46,13 +46,14 @@ FIELD.TYPE = {
  * @param {Number|String} relativeIndex - used when component is rendered in array
  * @param {String} relativePath - path used to compute form input "name" attribute
  * @param {Form|Object} form - react-final-form
+ * @param {Boolean} [hideOnEmpty] - whether to not render the component if it's value is null/undefined/empty string
  * @param {Function} [Render] - the recursive renderer
  * @param {String} [version] - of the config
  * @param {*} [props] - other component props
  * @returns {JSX.Element|*} React component
  */
 export default function RenderComponent ({
-  view, items, data, _data, debug, form,
+  view, items, data, _data, debug, form, hideOnEmpty,
   relativeData, relativeIndex, relativePath,
   Render = Active.Render, version,
   ...props
@@ -117,6 +118,7 @@ export default function RenderComponent ({
 
     case FIELD.TYPE.LABEL: {
       if (items.length) props.children = items.map(Render)
+      if (hideOnEmpty && (props.children == null || props.children === '')) return null
       return <Label {...props}/>
     }
 
@@ -124,6 +126,7 @@ export default function RenderComponent ({
       const {mapItems, ...prop} = props
       if (mapItems) _data = mapProps(_data, mapItems, {debug})
       if (items.length) prop.children = items.map(Render)
+      if (hideOnEmpty && (_data == null || !_data.length)) return null
       return <PieChart items={_data} {...prop}/>
     }
 
@@ -144,7 +147,7 @@ export default function RenderComponent ({
     }
 
     case FIELD.TYPE.TABLE: {
-      const {extraItems, filterItems, parentItem, hideOnEmpty, ...table} = props
+      const {extraItems, filterItems, parentItem, ...table} = props
       if (!isList(_data)) _data = []
       if (filterItems && parentItem) {
         _data = _data.filter(item => {
@@ -204,6 +207,7 @@ export default function RenderComponent ({
         delete props.renderLabel
       }
       if (view === FIELD.TYPE.TITLE) props.className = cn('h3', props.className)
+      if (hideOnEmpty && (props.children == null || props.children === '')) return null
       return <Text {...props}/>
     }
 

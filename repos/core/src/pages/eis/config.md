@@ -129,6 +129,7 @@ const RenderField = {
   onClick: Function, // example: `{onClick: 'setState,active.plan'}` - `setState` function with `active.plan` argument
   style: Object, // css style to apply
   className: 'CSS class name to apply',
+  hideOnEmpty: Boolean, // whether to not render the component if it's value is null/undefined/empty string
 
   // Input attributes
   name: 'adminCosts.adminCategory', // (required for inputs)* path to field value within *_data.json
@@ -177,7 +178,6 @@ const RenderField = {
   pushable: Number, // minimum slider increments between two handles
 
   // Table attributes
-  hideOnEmpty: Boolean, // whether to hide the table if no data exists
   inverted: Boolean, // whether to style table in dark mode
   striped: Boolean, // whether to alternate background shade of items (rows in default layout)
   vertical: Boolean, // whether to render Table rows as columns (does not work with `renderItem`)
