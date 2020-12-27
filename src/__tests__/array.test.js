@@ -9,6 +9,7 @@ import {
   isInList,
   isInListAny,
   isList,
+  listToObj,
   mergeLists,
   prependToList,
   removeFromList,
@@ -119,6 +120,17 @@ test(`${toListValuesTotal.name}() computes correct total number of values provid
   expect(toListValuesTotal('')).toEqual(0)
   // expect(toListTotal(null)).toEqual(0)
   // expect(toListTotal(NaN)).toEqual(0)
+})
+
+test(`${listToObj.name}() converts array of objects to new kay-value object using element id as keys`, () => {
+  const element = {id: 'unique', name: 'test'}
+  const element2 = {id: 'unique2', name: 'test'}
+  expect([element].reduce(listToObj, {})).toEqual({'unique': element})
+  expect([element, element2].reduce(listToObj, {})).toEqual({'unique': element, 'unique2': element2})
+
+  // when .reduce is not given init value, it will mutate the first element
+  expect([element].reduce(listToObj)).toEqual(element)
+  expect([element, element2].reduce(listToObj)).toEqual(element)
 })
 
 test(`${shuffle.name}() randomizes list value orders`, () => {

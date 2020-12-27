@@ -359,6 +359,19 @@ export function listAlphabetically (array) {
 }
 
 /**
+ * Array.reduce callback to convert list of objects with .id attributes to a key-value hashmap object
+ * @usage:
+ *    [{id: "unique", name: "test"}].reduce(listToObj, {})
+ *    >>> {"unique": {id: "unique", name: "test"}}
+ *
+ * @returns {Object} object with element.id being keys, and elements of array being values
+ */
+export function listToObj (obj, data) {
+  obj[data.id] = data
+  return obj
+}
+
+/**
  * Sort List in Ascending Order
  * (Fastest)
  *
