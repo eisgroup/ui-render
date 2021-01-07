@@ -120,6 +120,14 @@ export const TRANSLATION = {
     [l.ENGLISH]: 'Open',
     // [l.RUSSIAN]: 'Открыть',
   },
+  DELETE: {
+    [l.ENGLISH]: 'Delete',
+    // [l.RUSSIAN]: 'Удалить',
+  },
+  REMOVE: {
+    [l.ENGLISH]: 'Remove',
+    // [l.RUSSIAN]: 'Убрать',
+  },
   BACK: {
     [l.ENGLISH]: 'Back',
     // [l.RUSSIAN]: 'Обратно',
