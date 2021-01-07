@@ -25,6 +25,7 @@ FIELD.TYPE = {
   MULTIPLE: 'Fields', // multiple fields of the same type (i.e. mobile/work/home phone numbers)
   MULTIPLE_LEVEL: 'FieldsWithLevel',  // multiple fields of the same type, each having a value in predefined scale
   PLACE: 'Place',  // Google Places Autocomplete
+  UPLOAD: 'Upload',  // single file upload with drag & drop
   UPLOAD_GRID: 'UploadGrid',  // multiple uploads in grid layout
 }
 
@@ -95,6 +96,7 @@ export const readonly = true
 export const multiple = true
 export const required = true
 export const search = true
+export const upward = true
 
 /**
  * Populate List of Field Definition with Slider Field required props

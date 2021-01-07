@@ -49,7 +49,7 @@ export class FieldsInGroup extends PureComponent {
  *    {FIELDS_FOR_CONTACT.map(renderField)}
  *
  * @param {Object} fieldDefinition - attributes
- * @param {Number} i - index of the field in the list
+ * @param {Number} [i] - index of the field in the list
  * @returns {Object} - React component
  */
 export function renderField (fieldDefinition, i) {

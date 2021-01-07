@@ -79,14 +79,15 @@ FIELD.FUNC = {
 // Field IDs for uniquely identifying field definitions
 FIELD.ID = {
   // Common Inputs
-  NAME: 'NAME',
-  EMAIL: 'EMAIL',
-  ABOUT: 'ABOUT',
-  ADDRESS: 'ADDRESS',
-  LANGUAGE: 'LANGUAGE',
-  PHONE: 'PHONE',
-  WEBSITE: 'WEBSITE',
-  ID_HIDDEN: 'ID_HIDDEN', // default input `name` is `id`
+  ID: 'id', // use lower case value so it can be used as input.name by default
+  ID_HIDDEN: 'id_hidden', // input `name` should be set to `id`, defining with underscore to avoid potential conflict
+  NAME: 'name',
+  EMAIL: 'email',
+  ABOUT: 'about',
+  ADDRESS: 'address',
+  LANGUAGE: 'language',
+  PHONE: 'phone',
+  WEBSITE: 'website',
 
   // ...to be populated by modules
 }
