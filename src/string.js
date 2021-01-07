@@ -12,6 +12,17 @@ const upperThreshold = 1 - 26 / (62 + symbols.length) // minimum Math.random() r
  */
 
 /**
+ * Replace multiple spaces, tabs, newlines, etc. in a String with a single space
+ * and trim spaces at the beginning and end.
+ *
+ * @param {String} string -  to sanitize
+ * @returns {String} trimmed
+ */
+export function cleanSpaces (string) {
+	return string.replace(/\s\s+/g, ' ').trim()
+}
+
+/**
  * Get Cookie Value by Name from Cookie String
  *
  * @example:
@@ -107,9 +118,19 @@ export function isInStringAny(string, ...searches) {
  * @param {string|number} value - the string to insert
  * @returns {string}
  */
-export function insertToString(string, index, value) {
+export function insertToString (string, index, value) {
 	if (index > 0) return string.substring(0, index) + value + string.substring(index, string.length)
 	return value + string
+}
+
+/**
+ * Check if Given Value is a Base64 Encoded String
+ *
+ * @param {String} string - value to check
+ * @returns {Boolean} true - if it is a valid Base64 encoded string
+ */
+export function isBase64 (string) {
+	return /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/.test(string)
 }
 
 /**
@@ -118,7 +139,7 @@ export function insertToString(string, index, value) {
  * @param {*} address - value to check
  * @returns {Boolean} true - if value given is a valid IP address string
  */
-export function isIpAddress(address) {
+export function isIpAddress (address) {
 	return typeof address === 'string' && isIpAddress.pattern.test(address)
 }
 
@@ -216,8 +237,26 @@ export function formatKeyPath(keyPath) {
  *
  * @param {string} fileName - full file name with extension
  */
-export function fileExtension(fileName) {
+export function fileExtension (fileName) {
 	return fileName.split('.').pop()
+}
+
+/**
+ * Get File Extension used in Backend from User submitted file name
+ *
+ * @param {String|Null|Undefined} fileName - to extract extension
+ * @returns {String|Undefined} file extension
+ */
+export function fileExtensionNormalized (fileName) {
+	if (!fileName) return
+	const ext = fileExtension(toLowerCase(fileName))
+	switch (ext) {
+		case 'jpeg':
+		case 'jpg':
+			return 'jpg'
+		default:
+			return ext
+	}
 }
 
 /**
@@ -225,7 +264,7 @@ export function fileExtension(fileName) {
  *
  * @param {string} fileName - full file name with extension
  */
-export function fileNameWithoutExt(fileName) {
+export function fileNameWithoutExt (fileName) {
 	return fileName.replace(/\.[^.$]+$/, '')
 }
 
