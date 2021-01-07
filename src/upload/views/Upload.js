@@ -22,7 +22,7 @@ import { _ } from '../translations'
  * -----------------------------------------------------------------------------
  */
 const mapStateToProps = (state) => ({
-  isLoading: select.isLoading(state)
+  loading: select.isLoading(state)
 })
 const mapDispatchToProps = (dispatch) => ({
   actions: {
@@ -53,9 +53,13 @@ export default class Upload extends PureComponent {
     onUpload: PropTypes.func,
     /* Callback when close button is clicked (ex. history.goBack()) */
     onClose: PropTypes.func,
+    /* Callback when cancel upload or on drag leave */
+    onBlur: PropTypes.func,
+    /* Callback when choose file or on drag enter */
+    onFocus: PropTypes.func,
     /* Callback(instance, ...componentWillMountProps) before component mounts */
     onComponentWillMount: PropTypes.func,
-    isLoading: PropTypes.bool,
+    loading: PropTypes.bool,
     disabled: PropTypes.bool, // whether to disable upload
     readonly: PropTypes.bool, // whether to make upload viewable only
     multiple: PropTypes.bool, // whether to allow multiple file uploads, true by default
@@ -92,8 +96,8 @@ export default class Upload extends PureComponent {
     return get(this.props, 'location.pathname', ROUTE_HOME)
   }
 
-  onDragEnter = () => this.setState({active: true})
-  onDragLeave = () => this.setState({active: false})
+  onDragEnter = (...args) => this.setState({active: true}, () => this.props.onFocus && this.props.onFocus(...args))
+  onDragLeave = (...args) => this.setState({active: false}, () => this.props.onBlur && this.props.onBlur(...args))
 
   handleUpload = (acceptedFiles, rejectedFiles) => {
     log('acceptedFiles:', acceptedFiles)
@@ -149,7 +153,10 @@ export default class Upload extends PureComponent {
   }
 
   render () {
-    const {id, hasHeader, isLoading, children, className, round, multiple, disabled, readonly, showTypes} = this.props
+    const {
+      id, loading, children, multiple, disabled, readonly, onBlur, onFocus,
+      className, hasHeader, round, showTypes
+    } = this.props
     const label = this.props.label || id || this.id
     const {active} = this.state
     const fileTypes = this.fileTypes
@@ -158,12 +165,16 @@ export default class Upload extends PureComponent {
         {id == null && this.renderClose()}
         {hasHeader && <h2>{`${_.UPLOAD} ${capitalize(label) || _.FILE}`}</h2>}
         <Dropzone
+          // @note: When tabbing to dropzone with keyboard, input[type="file"] also gets event -> causing open twice.
+          //      => input is hidden by dropzone because it has ugly "Choose File" button
+          inputProps={inputProps}
           tabIndex={disabled ? -1 : 0}
-          className={classNames('app__upload__dropzone', className, {active, round, disabled, readonly})}
+          className={classNames('upload__dropzone', className, {active, round, disabled, readonly})}
           ref={(node) => { this.dropzone = node }}
           onDragEnter={this.onDragEnter}
           onDragLeave={this.onDragLeave}
           onDrop={this.handleUpload}
+          onFileDialogCancel={onBlur}
           onKeyPress={this.handleKeyPress}
           accept={fileTypes}
           multiple={multiple}
@@ -187,8 +198,10 @@ export default class Upload extends PureComponent {
           </View>
           }
         </Dropzone>
-        <Loading isLoading={isLoading}/>
+        <Loading isLoading={loading}/>
       </View>
     )
   }
 }
+
+const inputProps = {tabIndex: -1}

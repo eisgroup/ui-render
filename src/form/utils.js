@@ -217,6 +217,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
  * @returns {Object} Class - mutated with form properties
  */
 export function withFormSetup (Class, {fieldValues, registeredFieldValues, registeredFieldErrors}) {
+  if (!Active.renderField) throw new Error(`${withFormSetup.name} requires Active.renderField to be registered`)
   const componentDidUpdate = Class.prototype.componentDidUpdate
   const componentWillUnmount = Class.prototype.componentWillUnmount
   const handleChangeInput = Class.prototype.handleChangeInput

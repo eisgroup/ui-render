@@ -60,6 +60,7 @@ export function renderField (fieldDefinition, i) {
       Field = InputField
       break
     case FIELD.TYPE.SELECT:
+    case FIELD.TYPE.DROPDOWN:
       Field = DropdownField
       break
     case FIELD.TYPE.DATE:
