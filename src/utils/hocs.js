@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import React, { useContext } from 'react'
 import { Active, warn } from 'utils-pack'
 import { SOUND } from '../files'
-import { STYLE } from '../styles'
 
 /**
  * Add Accessibility Support to React Component
@@ -44,16 +43,6 @@ export function onPressHoc (onClick, sound) {
     if (sound) sound.play()
     onClick && onClick(...arguments)
   }
-}
-
-/**
- * Convert unitless pixels value to Rem equivalent
- *
- * @param {Number} pixels - to convert to rem
- * @returns {String} rem - equivalent
- */
-export function toRem (pixels) {
-  return (pixels / 16 / STYLE.SIZE_SCALE * 100) + 'rem'
 }
 
 /**
