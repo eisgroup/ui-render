@@ -1,4 +1,4 @@
-import { fileExtensionNormalized, isBase64 } from 'utils-pack/src'
+import { fileExtensionNormalized, isBase64 } from 'utils-pack'
 import { STYLE } from '../styles'
 
 /**
