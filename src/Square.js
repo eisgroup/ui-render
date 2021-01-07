@@ -67,8 +67,8 @@ export function asSquare (Component) {
   function Square ({top, right, bottom, left, wScale, hScale, className, ...props}) {
     const ratio = wScale && hScale ? wScale / hScale : 1
     const isRectangle = ratio !== 1
-    return <SizeMe monitorWidth monitorHeight children={({size: {width, height}}) => {
-      const smallerSize = Math.floor(Math.min(width || 0, height || 0))
+    return <SizeMe monitorWidth monitorHeight children={({size: {width = 0, height = 0}}) => {
+      const smallerSize = Math.floor(Math.min(width || height, height || width))
       const style = {width: smallerSize, height: smallerSize} // square case
 
       // Rectangle case
