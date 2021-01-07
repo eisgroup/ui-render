@@ -3,12 +3,16 @@ import { NAME as POPUP, POPUP_ALERT, POPUP_CONFIRM } from 'modules-pack/popup/co
 import { connect, stateAction } from 'modules-pack/redux'
 import { ROUTE_HOME } from 'modules-pack/variables'
 import PropTypes from 'prop-types'
-import React, { Fragment, PureComponent } from 'react'
+import React, { Component, Fragment } from 'react'
 import Icon from 'react-ui-pack/Icon'
+import Loading from 'react-ui-pack/Loading'
 import Row from 'react-ui-pack/Row'
+import Square from 'react-ui-pack/Square'
 import Text from 'react-ui-pack/Text'
+import { cssBgImageFrom } from 'react-ui-pack/utils'
 import View from 'react-ui-pack/View'
 import { by, get, isEqual, OPEN } from 'utils-pack'
+import { _ } from 'utils-pack/translations'
 import UploadImage from './UploadImage'
 
 /**
@@ -21,13 +25,13 @@ const mapDispatchToProps = (dispatch) => ({
       activePopup: POPUP_ALERT,
       [POPUP_ALERT]: {
         items: [{
-          title: 'Invalid Aspect Ratio!',
+          title: _.INVALID_ASPECT_RATIO,
           content: <Row className='center wrap'>
             <Text className='bold margin-h-smaller'>{file.name}'s</Text>
-            <Text>dimension must be one of </Text>
+            <Text>{_.DIMENSION_MUST_BE_ONE_OF} </Text>
             <Text className='bold margin-h-smaller'>{aspectRatios.join(', ')}</Text>
           </Row>,
-          closeLabel: 'OK'
+          closeLabel: _.OK
         }]
       }
     })),
@@ -35,9 +39,8 @@ const mapDispatchToProps = (dispatch) => ({
       activePopup: POPUP_CONFIRM,
       [POPUP_CONFIRM]: {
         items: [{
-          title: 'Confirm Action',
-          content: `Are you sure you want to remove ${file.name}?`,
-          confirmLabel: 'Remove',
+          content: `${_.ARE_YOU_SURE_YOU_WANT_TO_REMOVE} ${file.name}?`,
+          confirmLabel: _.REMOVE,
           action: callback,
         }]
       }
@@ -49,29 +52,41 @@ const mapDispatchToProps = (dispatch) => ({
  * VIEW TEMPLATE ---------------------------------------------------------------
  * Separate Media Files Uploader in Grid Layout (currently supports Images only)
  * @Note:
- *    - will register as redux form field when mounted
- *    - `onChange` fires redux form change action by default
+ *    - @todo - UploadGridField initializes twice on file change, showing old files while loading
+ *      (first init uses the very first initialValues - related to Apollo useQuery when using fetchPolicy 'no-cache')
  * -----------------------------------------------------------------------------
  */
 @connect(null, mapDispatchToProps)
-export default class UploadGrid extends PureComponent {
+export default class UploadGrid extends Component {
   static propTypes = {
-    id: PropTypes.string, // Upload file type, falls back to Route pathname, and default is 'images'
-    value: PropTypes.arrayOf(PropTypes.shape({ // list of Dropzone file objects
+    initialValues: PropTypes.arrayOf(PropTypes.shape({ // list of Dropzone file objects
       i: PropTypes.number.isRequired, // file position in the grid
-      src: PropTypes.string, // file source URL
+      src: PropTypes.string, // file source URL or base64 encoded string
       name: PropTypes.string,
     })).isRequired,
-    onChange: PropTypes.func, // callback when list of Media files changes, receives list of edited files as argument
+    onChangeLast: PropTypes.func, // callback when files change, receives list of last changed files as argument
+    onChange: PropTypes.func, // callback when files change, receives list of all changed files since initialization
     count: PropTypes.number, // number of files that can be uploaded, default is 9
+    square: PropTypes.bool, // whether to render as square
+    id: PropTypes.string, // Upload file type, falls back to Route pathname, and default is 'images'
+    loading: PropTypes.bool,
     // @Note: see Upload module for other props (src/web/modules/upload/_View.js)
+  }
+
+  static defaultProps = {
+    count: 1
   }
 
   // Internal state synced with props for rendering temporary UI changes and keeping track of current files
   state = {
-    files: this.props.value || []
+    files: this.props.initialValues || []
   }
 
+  // @Note: for file uploads, we don't want to resubmit unchanged files, thus only changed values need to be tracked.
+  // `onChange` should receive only changed files in state, not like typical redux-form pattern (all files).
+  // Because files may be uploaded/removed without submission, redux-form state value is used
+  // is track changed values to send to backend once submitted.
+  // If the form is re-initialized, then changed values should be reset
   changedValues = {}
 
   get id () {
@@ -84,19 +99,21 @@ export default class UploadGrid extends PureComponent {
 
   // File Previews and Placeholders
   get previews () {
+    const {count} = this.props
     const {files} = this.state
-    const placeholders = Array(this.count).fill(true).map((val, i) => ({i}))
-    return files
-      .concat(placeholders.filter(({i}) => !files.find(file => file.i === i)))
-      .sort(by('i'))
+    const placeholders = Array(count).fill(true).map((_, i) => ({i})).filter(({i}) => !files.find(f => f.i === i))
+    return files.concat(placeholders).sort(by('i'))
   }
 
   get count () {
     return this.props.count || 9
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    if (!isEqual(this.props.value, nextProps.value)) this.update(nextProps)
+  UNSAFE_componentWillReceiveProps (nextProps, _) {
+    if (!isEqual(this.props.initialValues, nextProps.initialValues)) {
+      this.changedValues = {}
+      this.update(nextProps)
+    }
   }
 
   // Validate Uploaded Files & Update Internal State
@@ -108,37 +125,46 @@ export default class UploadGrid extends PureComponent {
       file.i = position // cannot destruct object to preserve File object
       file.src = file.preview // this will mutate redux state, but it does not matter since we are only adding fields
     })
-    this.updateFiles(this.state.files.filter(file => !indexBy[file.i]).concat(files), files)
+    this.updateFiles(
+      this.state.files.filter(file => !indexBy[file.i]).concat(files),
+      files.map(file => ({i: file.i, file}))
+    )
   }
 
   // Remove file from State
   handleRemove = (file, event) => {
     event.stopPropagation() // disable onClick for Dropzone
     const files = this.state.files.filter(({src}) => file.src !== src) // name may not be unique, using URI
-    this.props.actions.remove(file, () => this.updateFiles(files, [{remove: true, i: file.i}]))
+    this.props.actions.remove(file, () => this.updateFiles(files, [{i: file.i, remove: true}]))
   }
 
   // Sync internal state with props
-  update = ({value = []} = this.props) => {
-    this.setState({files: value})
+  update = ({initialValues = []} = this.props) => {
+    this.setState({files: initialValues})
   }
 
-  // Update Internal State
+  /**
+   * Update Internal State
+   *
+   * @param {Array} files - all files in state
+   * @param {Array<Object<i, remove, file>>} changedFiles - list of changed files meta date
+   */
   updateFiles = (files, changedFiles) => {
-    const {onChange} = this.props
+    const {onChange, onChangeLast, count} = this.props
     files.sort(by('i'))
-    if (files.length > this.count) files.length = this.count
-    this.setState({files})
+    this.setState({files: files.filter(f => f.i < count)})
     if (onChange) {
-      changedFiles.forEach(file => this.changedValues[file.i] = {i: file.i, remove: file.remove, src: file.src, file})
+      changedFiles.forEach(file => this.changedValues[file.i] = file)
       onChange(Object.values(this.changedValues))
     }
+    if (onChangeLast) onChangeLast(changedFiles)
   }
 
   render () {
-    const {className, value: _, onChange: __, actions: ___, ...props} = this.props
+    const {loading, square, className, style} = this.props
+    const Grid = square ? Square.Row : Row
     return (
-      <Row fill className={classNames('app__upload--grid', className)} {...props}>
+      <Grid fill className={classNames('app__upload--grid', className)} style={style}>
         {this.previews.map((file, i) => (
           <View
             key={file.src || i}
@@ -146,12 +172,12 @@ export default class UploadGrid extends PureComponent {
             <UploadImage
               multiple
               hasPreview={false}
+              showTypes={!file.src}
               onUpload={(files) => this.handleChange(files, i)}
             >
               {file.src
                 ? (
-                  <View className='app__upload__file'
-                        style={{backgroundImage: `url('${encodeURI(file.src)}')`}}>
+                  <View className='app__upload__file' style={{backgroundImage: cssBgImageFrom(file)}}>
                     <Text className='app__upload__file__number'>{i + 1}</Text>
                     <Icon
                       onClick={(event) => this.handleRemove(file, event)}
@@ -168,7 +194,8 @@ export default class UploadGrid extends PureComponent {
             </UploadImage>
           </View>
         ))}
-      </Row>
+        <Loading isLoading={loading} classNameChild='round padding bg-neutral'>{`${_.UPDATING}...`}</Loading>
+      </Grid>
     )
   }
 }
