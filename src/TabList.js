@@ -8,7 +8,7 @@ import Tabs from './Tabs'
 export function TabList ({renderLabel, renderItem, items, ...props}) {
   return <Tabs
     {...props}
-    items={items.map((item, i) => renderLabel(item, i))}
+    tabs={items.map((item, i) => renderLabel(item, i))}
     panels={items.map((item, i) => () => renderItem(item, i))}
   />
 }

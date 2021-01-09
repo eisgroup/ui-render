@@ -16,6 +16,7 @@ type.Decimal = PropTypes.number // precision decimal points count
 type.Enum = PropTypes.oneOf
 type.Float = PropTypes.number
 type.Fraction = PropTypes.number // between 0 - 1
+type.Getter = PropTypes.func // Javascript getter function
 type.Id = PropTypes.string
 type.Int = PropTypes.number
 type.List = PropTypes.array
@@ -35,6 +36,13 @@ type.UrlOrNode = type.OneOf(type.String, type.Object, type.Method)
 type.UrlOrObject = type.OneOf(type.String, type.Object)
 
 /* Component Types */
+type.Definition = type.Of({ // localised definition (example: LANGUAGE.ENGLISH object)
+  _: type.Any.isRequired, // identifier code that is language agnostic
+  name: type.Getter.isRequired, // definition's `name` string for currently active Language
+  en: type.String, // `name` string in English
+  // 'ru': other definition's `name` strings by their language code
+})
+type.DefinitionSet = type.ObjectOf(type.Definition.isRequired) // set of localised definitions (example: LANGUAGE object)
 type.Option = type.OneOf( // dropdown option
   type.String,
   type.Number,

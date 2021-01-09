@@ -14,7 +14,8 @@ import View from './View'
 @withTimer
 export default class Tabs extends PureComponent {
   static propTypes = {
-    items: PropTypes.arrayOf(PropTypes.oneOfType([
+    // Tab Titles - clickable buttons
+    tabs: PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number,
       PropTypes.object, // JSX
@@ -23,14 +24,22 @@ export default class Tabs extends PureComponent {
         icon: PropTypes.string,
       })
     ])).isRequired, // tabs
-    panels: PropTypes.arrayOf(PropTypes.any).isRequired, // content
-    activeIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),  // opened tab index (controlled)
-    defaultIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]), // opened tab index initially (uncontrolled)
-    onChange: PropTypes.func, // callback when tab's activeIndex changes, receives new `activeIndex` as argument
-    vertical: PropTypes.bool, // render tabs as vertical layout
-    centerTabs: PropTypes.bool, // align tabs to center
-    buttoned: PropTypes.bool, // style tabs as buttons
-    children: PropTypes.any, // extra content to render inside Tabs
+    // Tab Contents - matching index of `tabs`
+    panels: PropTypes.arrayOf(PropTypes.any).isRequired,
+    // Opened tab index (controlled)
+    activeIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    // Opened tab index initially (uncontrolled)
+    defaultIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    // Callback when tab's activeIndex changes, receives new `activeIndex` as argument
+    onChange: PropTypes.func,
+    // Render tabs as vertical layout
+    vertical: PropTypes.bool,
+    // Align tabs to center
+    centerTabs: PropTypes.bool,
+    // Style tabs as buttons
+    buttoned: PropTypes.bool,
+    // Extra content to render inside Tabs
+    children: PropTypes.any,
     className: PropTypes.string,
     classNameTabs: PropTypes.string,
     classNamePanels: PropTypes.string,
@@ -61,7 +70,7 @@ export default class Tabs extends PureComponent {
 
   render () {
     const {
-      vertical, buttoned, items, panels, children, centerTabs,
+      vertical, buttoned, tabs, panels, children, centerTabs,
       className, classNameTabs, classNamePanels, styleTabs, stylePanels,
       activeIndex: _, defaultIndex: __, onChange: ___,
       ...props
@@ -76,8 +85,8 @@ export default class Tabs extends PureComponent {
       >
         <ScrollView row={!vertical} center={centerTabs}
                     className={classNames('tabs__items no-scrollbar', classNameTabs)} style={styleTabs}>
-          {items.map((tab, i) => (
-            <View key={i} className={classNames('tabs__item', {active: activeIndex === i && items.length > 1})}
+          {tabs.map((tab, i) => (
+            <View key={i} className={classNames('tabs__item', {active: activeIndex === i && tabs.length > 1})}
                   onClick={activeIndex !== i && (() => this.handleClickTab(i))}>
               {typeof tab === 'object'
                 ? (tab.icon ? <Text><Icon name={tab.icon}/>{tab.text}</Text> : tab)
