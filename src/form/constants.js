@@ -27,6 +27,7 @@ FIELD.TYPE = {
   PLACE: 'Place',  // Google Places Autocomplete
   UPLOAD: 'Upload',  // single file upload with drag & drop
   UPLOAD_GRID: 'UploadGrid',  // multiple uploads in grid layout
+  UPLOAD_GRIDS: 'UploadGrids',  // multiple uploads in grid layout of different kinds as separate tabs
 }
 
 // Validation Definitions

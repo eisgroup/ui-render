@@ -26,7 +26,7 @@ const mapStateToProps = (state) => ({
 })
 const mapDispatchToProps = (dispatch) => ({
   actions: {
-    upload: (files, id) => dispatch(stateAction(UPLOAD, SET, {files, id})),
+    upload: (files, type) => dispatch(stateAction(UPLOAD, SET, {files, type})),
     popup: (item) => dispatch(stateAction(POPUP, OPEN, {
       activePopup: POPUP_ALERT,
       [POPUP_ALERT]: {
@@ -44,12 +44,13 @@ const mapDispatchToProps = (dispatch) => ({
 @withTimer
 export default class Upload extends PureComponent {
   static propTypes = {
-    // If 'id' given, will render as embedded component, instead of Modal route
-    id: PropTypes.oneOfType([
+    // Upload file type, falls back to Route pathname, and default is 'images'
+    // If given, will render as embedded component, instead of Modal route
+    type: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.number
     ]),
-    /* Callback(acceptedFiles, this.id) onDrop files */
+    /* Callback(acceptedFiles, this.type) onDrop files */
     onUpload: PropTypes.func,
     /* Callback when close button is clicked (ex. history.goBack()) */
     onClose: PropTypes.func,
@@ -81,15 +82,15 @@ export default class Upload extends PureComponent {
   }
 
   get fileTypes () {
-    return (U.BY_ROUTE[this.id] || {}).fileTypes
+    return (U.BY_ROUTE[this.type] || {}).fileTypes
   }
 
   get maxSize () {
-    return (U.BY_ROUTE[this.id] || {}).maxSize
+    return (U.BY_ROUTE[this.type] || {}).maxSize
   }
 
-  get id () {
-    return this.props.id || this.uri.split(/\//).pop().toLowerCase()
+  get type () {
+    return this.props.type || this.uri.split(/\//).pop().toLowerCase()
   }
 
   get uri () {
@@ -116,8 +117,8 @@ export default class Upload extends PureComponent {
           closeLabel: _.OK
         })
       }
-      actions.upload(acceptedFiles, this.id)
-      isFunction(onUpload) && onUpload(acceptedFiles, this.id)
+      actions.upload(acceptedFiles, this.type)
+      isFunction(onUpload) && onUpload(acceptedFiles, this.type)
     } else {
       actions.popup({
         title: _.FILE_UPLOAD_FAILED,
@@ -144,7 +145,7 @@ export default class Upload extends PureComponent {
 
   UNSAFE_componentWillMount (...args) {
     this.props.onComponentWillMount && this.props.onComponentWillMount(this, ...args)
-    // if (this.props.id == null && !window.prevLocation) {  // if this route is accessed directly in browser
+    // if (this.props.type == null && !window.prevLocation) {  // if this route is accessed directly in browser
     //   history.push(ROUTE_HOME)  // go to homepage first,
     //   this.setTimeout(() => { // then open as Modal
     //     openModal(this.uri, {className: 'fill--three-quarter'})
@@ -154,15 +155,15 @@ export default class Upload extends PureComponent {
 
   render () {
     const {
-      id, loading, children, multiple, disabled, readonly, onBlur, onFocus,
+      type, loading, children, multiple, disabled, readonly, onBlur,
       className, hasHeader, round, showTypes
     } = this.props
-    const label = this.props.label || id || this.id
+    const label = this.props.label || type || this.type
     const {active} = this.state
     const fileTypes = this.fileTypes
     return (
       <View className={classNames('app__upload', {round})}>
-        {id == null && this.renderClose()}
+        {type == null && this.renderClose()}
         {hasHeader && <h2>{`${_.UPLOAD} ${capitalize(label) || _.FILE}`}</h2>}
         <Dropzone
           // @note: When tabbing to dropzone with keyboard, input[type="file"] also gets event -> causing open twice.

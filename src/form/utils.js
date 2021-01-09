@@ -87,12 +87,12 @@ export function asField (InputComponent, {sanitize} = {}) {
   const Class = class extends PureComponent {
     static propTypes = {
       name: PropTypes.string.isRequired,
-      label: PropTypes.string,
+      label: PropTypes.any,
       id: PropTypes.string,
       // HTML Input type attribute
       type: PropTypes.string,
       // Input placeholder
-      placeholder: PropTypes.string,
+      placeholder: PropTypes.any,
       // help text or component to show on focus
       info: PropTypes.any,
       // help text or component to show on invalid input

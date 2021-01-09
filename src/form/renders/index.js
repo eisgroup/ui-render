@@ -7,7 +7,16 @@ import Label from 'react-ui-pack/Label'
 import { PlaceholderField } from 'react-ui-pack/PlaceholderField'
 import Row from 'react-ui-pack/Row'
 import { Active } from 'utils-pack'
-import { DateField, DatesField, DropdownField, InputField, PlaceField, ToggleField, UploadGridField } from '../inputs'
+import {
+  DateField,
+  DatesField,
+  DropdownField,
+  InputField,
+  PlaceField,
+  ToggleField,
+  UploadGridField,
+  UploadGridsField
+} from '../inputs'
 import Fields from './Fields'
 import FieldsWithLevel from './FieldsWithLevel'
 import { SliderLabeled } from './renderers'
@@ -89,6 +98,9 @@ export function renderField (fieldDefinition, i) {
       break
     case FIELD.TYPE.UPLOAD_GRID:
       Field = UploadGridField
+      break
+    case FIELD.TYPE.UPLOAD_GRIDS:
+      Field = UploadGridsField
       break
     default:
       Field = PlaceholderField.bind(this, {name: view})
