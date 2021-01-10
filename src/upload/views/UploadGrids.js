@@ -72,11 +72,12 @@ export default class UploadGrids extends Component {
         <Tabs
           centerTabs
           tabs={kinds.map(k => k.name)}
-          panels={kinds.map(({_}) => () => (
+          panels={kinds.map(({_, versions}) => () => (
             <UploadGrid
               {...props}
               // key={_} // do not add key to avoid unmounting
               kind={_}
+              versions={versions}
               initialValues={files.filter(f => f.kind === _)}
               onChangeLast={this.handleChange}
             />

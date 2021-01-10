@@ -3,6 +3,7 @@ import { NAME as POPUP, POPUP_ALERT, POPUP_CONFIRM } from 'modules-pack/popup/co
 import { connect, stateAction } from 'modules-pack/redux'
 import PropTypes from 'prop-types'
 import React, { Component, Fragment } from 'react'
+import { type } from 'react-ui-pack'
 import Icon from 'react-ui-pack/Icon'
 import Label from 'react-ui-pack/Label'
 import Loading from 'react-ui-pack/Loading'
@@ -68,19 +69,15 @@ export default class UploadGrid extends Component {
      *  we won't be able to collect the list of all uploaded/deleted/edited files since previous 'save' submission,
      *  since form input `value` will always be in sync with current component state.
      */
-    initialValues: PropTypes.arrayOf(PropTypes.shape({ // list of Dropzone file objects
-      i: PropTypes.any.isRequired, // identifier or index position of the file in the grid
-      src: PropTypes.string, // file source URL or base64 encoded string
-      name: PropTypes.string, // file name with extension
-      kind: PropTypes.any, // type of file (example: public, private...)
-      // file: File, -> sent by onChange callbacks for upload to backend
-    })),
+    initialValues: type.ListOf(type.FileInput),
     // Callback when files change, receives list of all changed files since initialization
     onChange: PropTypes.func,
     // Callback when files change, receives list of last changed files as argument, will not call `onChange` if given
     onChangeLast: PropTypes.func,
-    // Number of files that can be uploaded
+    // Number of files that can be uploaded, ignored if `versions` are defined
     count: PropTypes.number,
+    // Explicitly define identifiers for each upload in the grid
+    versions: type.ListOf(type.Definition.isRequired),
     // Type of file (added to new uploads)
     kind: PropTypes.any,
     // Render grid as square (can be defined as Square props)
@@ -96,6 +93,10 @@ export default class UploadGrid extends Component {
     onFocus: PropTypes.func,
     // Remove File previews when unmounted
     autoClean: PropTypes.bool,
+    // Show incremental File position count
+    showCount: PropTypes.bool,
+    // Show File name once uploaded, defaults to count or version type
+    showName: PropTypes.bool,
     error: PropTypes.any,
     // info: PropTypes.any, // not yet available because `active` state within Upload is not propagated to UploadGrid
     //                         and it is not visible use-case since choose file window will obscure information.
@@ -125,16 +126,32 @@ export default class UploadGrid extends Component {
   // For garbage cleaning previews
   cachedFiles = {}
 
-  // File Previews and Placeholders
-  get previews () {
-    const {count} = this.props
-    const {files} = this.state
-    const placeholders = Array(count).fill(true).map((_, i) => ({i})).filter(({i}) => !files.find(f => f.i === i))
-    return files.concat(placeholders).sort(by('i'))
+  // Grid count
+  get count () {
+    const {versions, count} = this.props
+    return (versions && versions.length) || count
   }
 
-  get count () {
-    return this.props.count || 9
+  get isIncremental () {
+    return !this.props.versions || !this.props.versions.length
+  }
+
+  // File Previews and Placeholders
+  get previews () {
+    const {versions, count, showName} = this.props
+    const {files} = this.state
+    if (!this.isIncremental) { // explicitly defined identifiers
+      // Sort placeholder by identifier versions order
+      return versions.map(v => {
+        const file = files.find(f => f.i === v._)
+        if (!showName && file) file.name = v.name // show version type, instead of File.name
+        return file || {i: v._, name: v.name}
+      })
+    } else { // sort by incremental count
+      const placeholders = Array(count).fill(true).map((_, i) => ({i})).filter(({i}) => !files.find(f => f.i === i))
+      // noinspection JSCheckFunctionSignatures
+      return files.concat(placeholders).sort(by('i'))
+    }
   }
 
   UNSAFE_componentWillReceiveProps (nextProps, _) {
@@ -148,21 +165,31 @@ export default class UploadGrid extends Component {
     this.props.autoClean && Object.keys(this.cachedFiles).forEach(src => URL.revokeObjectURL(src))
   }
 
-  // Validate Uploaded Files & Update Internal State
-  handleChange = (files, index) => {
+  /**
+   * Validate Uploaded Files & Update Internal State
+   * @param {Object<preview, name>[]} files - File objects from Dropzone
+   * @param {*} i - identifier or index position
+   */
+  handleChange = (files, i) => {
     const indexBy = {}
-    const {kind} = this.props
-    files.forEach((file, i) => {
-      const position = index + i
-      indexBy[position] = true
+    const {kind, showName} = this.props
+    const isIncremental = this.isIncremental
+    files.forEach((file, index) => { // index here is from Dropzone accepted files list
+      const identifier = isIncremental ? i + index : i
+      indexBy[identifier] = true
       // Cannot destruct object to preserve File object
-      file.i = position
+      file.i = identifier
       file.kind = kind
       file.src = file.preview // this mutates redux state, but it does not matter since only adding fields
     })
+    // noinspection JSUnresolvedVariable
+    const filesInput = files.map(file => ({
+      i: file.i, kind: file.kind, src: file.src, file,
+      ...showName && {name: file.name}
+    }))
     this.updateFiles(
-      this.state.files.filter(file => !indexBy[file.i]).concat(files),
-      files.map(file => ({i: file.i, kind: file.kind, src: file.src, file}))
+      this.state.files.filter(file => !indexBy[file.i]).concat(filesInput),
+      filesInput
     )
   }
 
@@ -175,18 +202,17 @@ export default class UploadGrid extends Component {
 
   /**
    * Update Internal State
-   *
-   * @param {Array} files - all files in state
-   * @param {Array<Object<i, remove, file>>} changedFiles - list of changed files meta date
+   * @param {Array} files - all files in state of type.FileInput
+   * @param {Array<Object<i, remove, file>>} changedFiles - list of changed files of type.FileInput
    */
   updateFiles = (files, changedFiles) => {
-    const {onChange, onChangeLast, count} = this.props
+    const {onChange, onChangeLast} = this.props
+    const count = this.count
     changedFiles.forEach(file => {
       this.cachedFiles[file.src] = file
       this.changedValues[file.i] = file
     })
-    files.sort(by('i'))
-    this.setState({files: files.filter(f => f.i < count)})
+    this.setState({files: this.isIncremental ? files.sort(by('i')).filter(f => f.i < count) : files})
     if (onChangeLast) {
       onChangeLast(changedFiles)
     } else if (onChange) {
@@ -196,11 +222,14 @@ export default class UploadGrid extends Component {
 
   render () {
     const {
-      label, loading, placeholder, square, count,
+      label, loading, placeholder, square, count: _, kind, versions, showCount, showName,
       error, info, iconUpload, iconRemove,
       className, style,
       ...props
     } = this.props
+    const count = this.count
+    const hasCount = showCount && count > 1 && this.isIncremental
+    const shouldCount = showCount && !showName && hasCount
     const Grid = square ? Square.Row : Row
     return (
       <View className={classNames('input--wrapper', className)} style={style}>
@@ -212,16 +241,16 @@ export default class UploadGrid extends Component {
               className={classNames('upload-grid__item', {preview: !!file.src})}>
               <Upload
                 {...props}
-                multiple
+                multiple={count > 1}
                 autoClean={false}
                 hasHeader={false}
                 showTypes={!file.src}
-                onUpload={(files) => this.handleChange(files, i)}
+                onUpload={(files) => this.handleChange(files, file.i)}
               >
                 {file.src
                   ? (
                     <View className='upload__file' style={{backgroundImage: cssBgImageFrom(file)}}>
-                      {count > 1 && <Text className='upload__file__number'>{i + 1}</Text>}
+                      <Text className='upload__file__label'>{shouldCount ? (i + 1) : file.name}</Text>
                       <Icon
                         onClick={(event) => this.handleRemove(file, event)}
                         name={iconRemove}
@@ -231,7 +260,7 @@ export default class UploadGrid extends Component {
                   )
                   : (<Fragment>
                     {placeholder && <Text className='upload__file__placeholder'>{placeholder}</Text>}
-                    {count > 1 && <Text className='upload__file__number large'>{i + 1}</Text>}
+                    <Text className='upload__file__label'>{hasCount ? (i + 1) : file.name}</Text>
                     <Icon className='upload__file__add large' name={iconUpload}/>
                   </Fragment>)
                 }

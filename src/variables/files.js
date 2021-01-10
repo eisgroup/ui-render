@@ -18,7 +18,7 @@ export const UPLOAD = {
   DIR: `/uploads`, // relative to site's root for frontend, and _WORK_DIR_ for backend
   BY_ROUTE: {
     [FILE_TYPE.JSON]: {fileTypes: '.json', maxSize: SIZE_MB_16},
-    [FILE_TYPE.IMAGE]: {fileTypes: '.jpg, .jpeg', maxSize: SIZE_MB_2},
+    [FILE_TYPE.IMAGE]: {fileTypes: '.jpg, .jpeg, .png', maxSize: SIZE_MB_2},
     [FILE_TYPE.VIDEO]: {fileTypes: '.mp4', maxSize: SIZE_MB_16}
   },
 }
