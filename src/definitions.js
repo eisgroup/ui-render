@@ -137,7 +137,9 @@ export function localise (DEFINITION) {
     if (name == null && _ != null) {
       Object.defineProperty(DEFINITION[KEY], 'name', {
         get () {
-          return this[Active.LANG._] || this[LANGUAGE.ENGLISH._] || String(_)
+          return this[Active.LANG._] != null
+            ? this[Active.LANG._]
+            : (this[LANGUAGE.ENGLISH._] != null ? this[LANGUAGE.ENGLISH._] : String(_))
         }
       })
     } else {
