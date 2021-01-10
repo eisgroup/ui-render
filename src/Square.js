@@ -73,8 +73,8 @@ export function asSquare (Component) {
 
       // Rectangle case
       if (isRectangle) {
-        const maxWidth = Math.floor(width || 0)
-        const maxHeight = Math.floor(height || 0)
+        const maxWidth = Math.floor(width || height)
+        const maxHeight = Math.floor(height || width)
         // First take full available width
         style.width = maxWidth
         style.height = Math.floor(style.width / ratio)
