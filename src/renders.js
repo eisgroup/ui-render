@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { Active, debounce, LANGUAGE, shortNumber, SORT_ORDER, toUpperCase } from 'utils-pack'
+import { Active, debounce, LANGUAGE, round, shortNumber, SORT_ORDER, toUpperCase } from 'utils-pack'
 import ColorSwatch from './ColorSwatch'
 import { FILE } from './files'
 import Icon from './Icon'
@@ -124,26 +124,30 @@ export function renderCurrency (amount, decimals, props) {
 }
 
 /**
- * Render Float Number as Localised String with Faded Decimals
+ * Render Float Number as Localised String with Faded Fraction
  *
  * @param {String|Number} value
- * @param {Number|Undefined} [decimals] - the number of decimal digits to keep, default has no decimals (rounded down)
- * @param {*} [props] - other pros to pass
+ * @param {Number|Undefined} [decimals] - the number of fraction digits to keep, default has no fraction (Integer)
+ * @param {*} [props<truncated>] - other pros to pass
+ *    `truncated: true` will not apply rounding, but only trim excess fraction
  * @return {Object} - React component
  */
 export function renderFloat (value, decimals, props) {
-  const decimal = String(value).split('.')[1]
+  const {truncated, ...options} = props || {}
+  let fraction = String(value).split('.')[1] || '0' // extract fraction before rounding, because we need fixed length
+  if (!truncated && decimals != null) value = round(value, decimals)
+  const showFraction = decimals > 0
+  if (showFraction) {
+    fraction = truncated ? fraction.substr(0, decimals == null ? undefined : decimals) : fraction
+    fraction = Number('0.' + fraction).toLocaleString(undefined, decimals == null ? undefined : {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).substr(1) // toLocalString will return fixed length fraction to given decimals number
+  }
   return (
-    <Text {...props}>
+    <Text {...options}>
       {Math.floor(value).toLocaleString()}
-      {decimals !== 0 && decimal &&
-      <Text className='fade--quarter no-margin'>
-        {Number('0.' + decimal).toLocaleString(undefined, decimals == null ? undefined : {
-          minimumFractionDigits: decimals,
-          maximumFractionDigits: decimals,
-        }).substr(1)}
-      </Text>
-      }
+      {showFraction && <Text className='fade--quarter no-margin'>{fraction}</Text>}
     </Text>
   )
 }
