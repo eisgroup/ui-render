@@ -331,12 +331,23 @@ export function mergeStrings(str1, str2) {
 /**
  * Pad Left given String with Template String
  *
- * @param {String} padTemplate - example: '000'
  * @param {String} string - to be padded, example 7
+ * @param {String} padTemplate - example: '000'
  * @return {String} padded with template - example: '007'
  */
-export function padStringLeft (padTemplate, string) {
-	return String(padTemplate + string).slice(-(Math.max(string.length, padTemplate.length)))
+export function padStringLeft (string, padTemplate) {
+	return `${padTemplate}${string}`.slice(-(Math.max(string.length, padTemplate.length)))
+}
+
+/**
+ * Pad Right given String with Template String
+ *
+ * @param {String} string - to be padded, example 7
+ * @param {String} padTemplate - example: '000'
+ * @return {String} padded with template - example: '700'
+ */
+export function padStringRight (string, padTemplate) {
+	return `${string}${padTemplate}`.substr(0, Math.max(string.length, padTemplate.length))
 }
 
 /**

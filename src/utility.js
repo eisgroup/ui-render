@@ -46,7 +46,7 @@ export function Id ({timestamp = Date.now(), alphabet = Id.alphabet, suffix = ra
   }
   time.unshift(alphabet[timestamp])
   time = time.join('')
-  return padStringLeft(Id.padTime, time) + suffix
+  return padStringLeft(time, Id.padTime) + suffix
 }
 
 // !Important: changing values below may break existing database implementations
