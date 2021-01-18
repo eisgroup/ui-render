@@ -3,6 +3,70 @@
   "styles": "padding",
   "items": [
     {
+      "view": "Row",
+      "styles": "middle",
+      "items": [
+        {
+          "view": "Text",
+          "label": {
+            "name": "coverages.0.rate"
+          },
+          "renderLabel": {
+            "name": "Float",
+            "decimals": 5,
+            "truncated": true
+          }
+        },
+        {
+          "view": "Text",
+          "label": " → Float with 5 decimals truncated without rounding"
+        }
+      ]
+    },
+    {
+      "view": "Row",
+      "styles": "middle",
+      "items": [
+        {
+          "view": "Text",
+          "label": {
+            "name": "coverages.0.rate"
+          },
+          "renderLabel": {
+            "name": "Float",
+            "decimals": 5,
+            "faded": false
+          }
+        },
+        {
+          "view": "Text",
+          "label": " → Float with 5 decimals rounded, and no fraction fading"
+        }
+      ]
+    },
+    {
+      "view": "Row",
+      "styles": "middle",
+      "items": [
+        {
+          "view": "Text",
+          "styles": "h6",
+          "label": {
+            "name": "coverages.1.rate"
+          },
+          "renderLabel": {
+            "name": "Float",
+            "decimals": 0
+          }
+        },
+        {
+          "view": "Text",
+          "styles": "h6",
+          "label": " → Float rounded to whole Integer, rendered as h6"
+        }
+      ]
+    },
+    {
       "view": "Table",
       "name": "coverages",
       "headers": [
@@ -24,20 +88,6 @@
       "renderLabel": {
         "name": "Percent",
         "decimals": 2
-      }
-    },
-    {
-      "view": "Title",
-      "label": "Float with 3 decimals"
-    },
-    {
-      "view": "Title",
-      "label": {
-        "name": "coverages.0.rate"
-      },
-      "renderLabel": {
-        "name": "Float",
-        "decimals": 3
       }
     }
   ]
