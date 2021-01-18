@@ -128,12 +128,13 @@ export function renderCurrency (amount, decimals, props) {
  *
  * @param {String|Number} value
  * @param {Number|Undefined} [decimals] - the number of fraction digits to keep, default has no fraction (Integer)
- * @param {*} [props<truncated>] - other pros to pass
+ * @param {*} [props<truncated, faded>] - other pros to pass
  *    `truncated: true` will not apply rounding, but only trim excess fraction
+ *    `faded: false` will not apply fraction part with faded CSS style
  * @return {Object} - React component
  */
 export function renderFloat (value, decimals, props) {
-  const {truncated, ...options} = props || {}
+  const {truncated, faded = true, ...options} = props || {}
   let fraction = String(value).split('.')[1] || '0' // extract fraction before rounding, because we need fixed length
   if (!truncated && decimals != null) value = round(value, decimals)
   const showFraction = decimals > 0
@@ -147,7 +148,7 @@ export function renderFloat (value, decimals, props) {
   return (
     <Text {...options}>
       {Math.floor(value).toLocaleString()}
-      {showFraction && <Text className='fade--quarter no-margin'>{fraction}</Text>}
+      {showFraction && (faded ? <Text className='fade--quarter no-margin'>{fraction}</Text> : fraction)}
     </Text>
   )
 }
