@@ -59,7 +59,7 @@ export default class Docs extends Component {
         <h1>{'UI Renderer'}</h1>
         <Tabs
           defaultIndex={this.tabIndex}
-          items={['Summary', 'Configuration', 'Examples', 'FAQ']}
+          tabs={['Summary', 'Configuration', 'Examples', 'FAQ']}
           panels={[
             () => <Markdown source={this.state.docs} {...mdProps}/>,
             () => <Markdown source={this.state.config} {...mdProps}/>,

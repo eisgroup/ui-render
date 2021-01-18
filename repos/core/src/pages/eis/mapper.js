@@ -187,7 +187,7 @@ export default function RenderComponent ({
         ? Render.bind(this, {data, _data, debug, form, ...content}, i)
         : content
       )
-      return <Tabs items={tabs} panels={panels} {...props}/>
+      return <Tabs tabs={tabs} panels={panels} {...props}/>
     }
 
     case FIELD.TYPE.TAB_LIST: {

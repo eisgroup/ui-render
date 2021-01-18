@@ -10927,10 +10927,10 @@ module-lookup-amd@^6.1.0:
     requirejs "^2.3.5"
     requirejs-config-file "^3.1.1"
 
-modules-pack@^0.5.11:
-  version "0.5.11"
-  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.5.11.tgz#4c5f321bbb14a5c69f1855e455618f37fc5118c6"
-  integrity sha512-1hRbjFOp4scH+DwytLbIZj07PYhp/wsG/7PL645riXtIKRnn4i3DOe/AsCTcmcdykUCS1bjQH9yDScRqpo+gsg==
+modules-pack@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.6.0.tgz#ac6329e5d39021c4a320fc0420a74ad51aae8baf"
+  integrity sha512-d+JVxL+PRt4/f4Vnge+35CYlV5STvMrb6a34Emy7ihSUR1g8AUEmp9jFe9+hp/WJxMk7iNK+oQ84zK8Mi+yBzg==
   dependencies:
     axios "^0.19.2"
     backoff "^2.5.0"
@@ -13524,10 +13524,10 @@ react-transition-group@^2.5.0:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react-ui-pack@^0.6.17:
-  version "0.6.17"
-  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.6.17.tgz#96fe8d9cdf330d3a84330cc14607442e0555c66c"
-  integrity sha512-2gmCRrFGknk3tx6Ud+EaW+ubkVeI5lpwfW1ujqYlrKW/A3LSbOCcYRO0dIxIddY3m6J8r9mQFCKkTVo20oKPdQ==
+react-ui-pack@^0.7.3:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.7.3.tgz#bc1601a01edd06ba6f3f00b397af4f2f4af7573b"
+  integrity sha512-VBRqdo/YjSmiodCHB42AkOQxIAgPP9fr23tgtnGkLFYv9fJNB5AWcV3J2TDz7VVjHOhW7rXLtWvQ6DjxKVYqzQ==
   dependencies:
     chroma-js "^2.1.0"
     classnames "^2.2.6"
@@ -16263,10 +16263,10 @@ utils-merge@1.0.1:
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
 
-utils-pack@^0.3.7:
-  version "0.3.7"
-  resolved "https://registry.yarnpkg.com/utils-pack/-/utils-pack-0.3.7.tgz#43d3c75dee235aa6b4d66e0f3d1123584c6cf9e0"
-  integrity sha512-OhKVdAwpplbDSyhz0NF0MTfZ85hyLGMt6onHpVu9rYeclTMeqmE6j7TbFfwCX38HBoTdWsXaznD6Oa/eQuKC7w==
+utils-pack@^0.3.13:
+  version "0.3.13"
+  resolved "https://registry.yarnpkg.com/utils-pack/-/utils-pack-0.3.13.tgz#064b3756dd3fe9348b4955c76417f3f6f46dd116"
+  integrity sha512-uy6tATDpQXTsPTXDCRQAcXzH1HMVAbwL0a8Vq5/r9nBtXl2XKlirerQ3ZeYCM5IPlcI3m8rwUvxdsVC4Zb3QlA==
   dependencies:
     bson-objectid "^1.3.1"
     circular-json "^0.5.9"

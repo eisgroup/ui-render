@@ -12,14 +12,14 @@
     "flat": "^4.1.0",
     "graphql": "^14.6.0",
     "highlight.js": "^10.1.2",
-    "modules-pack": "^0.5.11",
+    "modules-pack": "^0.6.0",
     "react": "16.8.0",
     "react-autofill": "^1.1.4",
     "react-helmet": "^5.2.0",
     "react-markdown": "^4.3.1",
-    "react-ui-pack": "^0.6.17",
+    "react-ui-pack": "^0.7.3",
     "remark-toc": "^7.0.0",
-    "utils-pack": "^0.3.7"
+    "utils-pack": "^0.3.13"
   },
   "scripts": {},
   "eslintConfig": {
