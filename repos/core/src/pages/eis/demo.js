@@ -105,7 +105,7 @@ export default class Demo extends Component {
       hasHeader: false,
       multiple: false,
       lang,
-      id: FILE_TYPE.JSON,
+      type: FILE_TYPE.JSON,
     }
     return (
       <>
