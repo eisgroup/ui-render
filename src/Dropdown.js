@@ -1,12 +1,16 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Dropdown as DropDown } from 'semantic-ui-react' // adds 27 KB to final js bundle
-import { hasListValue, l, localiseTranslation } from 'utils-pack'
+import { hasListValue, l, localiseTranslation, toLowerCase } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import Text from './Text'
 import View from './View'
 
+_.ADD_ = {
+  [l.ENGLISH]: 'Add ',
+  // [l.RUSSIAN]: 'Добавить ',
+}
 _.NOTHING_FOUND = {
   [l.ENGLISH]: 'Nothing found',
   // [l.RUSSIAN]: 'Ничего не найдено',
@@ -35,6 +39,7 @@ localiseTranslation(_)
  * @param {Function} [onChange] - callback when user changes input value, receives value as argument
  * @param {Function} [onSelect] - callback when user selects an option, receives value as argument
  * @param {Function} [onSearch] - callback when user types in the input, receives value as argument
+ * @param {Function} [onAddItem] - callback when user adds new options, must enable `allowAdditions: true`
  * @param {String} [label] - text to display next to input
  * @param {String} [placeholder] - text
  * @param {Boolean} [done] - whether input is completed
@@ -51,7 +56,7 @@ localiseTranslation(_)
  * @returns {Object}
  */
 export function Dropdown ({
-  options,
+  options: opts,
   onChange,
   onSelect,
   onSearch,
@@ -69,8 +74,24 @@ export function Dropdown ({
   initialValues, // not used, removing from DOM
   readonly,
   autofocus,
+  onAddItem,
   ...props
 }) {
+  // Store options as state to allow additions
+  let [options, setOptions] = useState(opts)
+  useEffect(() => {options !== opts && setOptions(opts)}, [opts])
+
+  if (props.allowAdditions) {
+    props.onAddItem = (event, {value}) => {
+      const val = toLowerCase(value)
+      if (!options.find(({text}) => toLowerCase(text) === val)) {
+        setOptions([{text: value, value}, ...options])
+        onAddItem && onAddItem(value, event)
+      }
+    }
+    if (props.additionLabel == null) props.additionLabel = _.ADD_
+  }
+
   // if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability
   if (readonly) props.disabled = true // Semantic Dropdown does not accept `readOnly` prop
   if (onChange || onSelect) props.onChange = (event, data) => {
@@ -92,10 +113,18 @@ export function Dropdown ({
   // }
 
   /* Sanitize Options */
-  if (typeof options[0] === 'string') options = options.map(value => ({text: value, value}))
-  if (typeof options[0] === 'number') options = options.map(value => ({text: String(value), value}))
-  if (typeof options[0] === 'object' && typeof options[0].value === 'object') // value is an array (ex. Color)
-    options = options.map(({value, ...option}) => ({value: String(value), ...option}))
+  switch (typeof options[0]) {
+    case 'string':
+      options = options.map(value => ({text: value, value}))
+      break
+    case 'number':
+      options = options.map(value => ({text: String(value), value}))
+      break
+    case 'object':
+      if (typeof options[0].value === 'object')  // value is an array (ex. Color)
+        options = options.map(({value, ...option}) => ({value: String(value), ...option}))
+      break
+  }
 
   if (optionsLabel) options = [...options, {key: '', text: '', content: optionsLabel, disabled: true}]
 
@@ -150,6 +179,7 @@ Dropdown.propTypes = {
   onChange: PropTypes.func,
   onSelect: PropTypes.func,
   onSearch: PropTypes.func,
+  onAddItem: PropTypes.func,
   placeholder: PropTypes.any
 }
 
