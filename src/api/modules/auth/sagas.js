@@ -262,7 +262,7 @@ function * tokenRequest (URL, apiPayload, apiMeta) {
   }  // eslint-disable-line brace-style
 
     /* Request Canceled */ finally {
-    // Unset isLoading state without alert, by omitting payload
+    // Unset loading state without alert, by omitting payload
     if (yield cancelled()) yield put(stateAction(API, LOGIN, CANCEL))
   }
 }

@@ -71,7 +71,7 @@ export default class AutoSave extends PureComponent {
     const {showLoader, loadContent} = this.props
     const {submitting} = this.state
     if (!showLoader || !submitting) return null
-    return <Loading isLoading>{loadContent || _.SYNCING___}</Loading>
+    return <Loading loading>{loadContent || _.SYNCING___}</Loading>
   }
 
   // Make a HOC

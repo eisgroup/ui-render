@@ -1,4 +1,4 @@
-import { NAME } from './constants'
+import { _TEMPLATE } from './constants'
 import * as query from './queries'
 import reducer from './reducers'
 import saga from './sagas'
@@ -13,13 +13,12 @@ import select from './selectors'
 export * from './constants'
 export * from './utils'
 export {
-  NAME,
   select,
   query,
 }
 
 const _template = {
-  NAME,
+  NAME: _TEMPLATE,
   reducer,
   query,
   saga,

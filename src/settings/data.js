@@ -12,7 +12,7 @@ const initState = {
     ...performStorage(GET, NAME)
   },
   ui: {
-    isLoading: false,
+    loading: false,
   }
 }
 

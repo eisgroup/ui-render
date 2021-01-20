@@ -69,9 +69,9 @@ export function popups (NAME) {
 export function uiLoading (NAME) {
   return {
     /* Subscribe to loading start action */
-    [stateActionType(NAME, LOAD, START)]: (state) => ({...state, isLoading: true}),
+    [stateActionType(NAME, LOAD, START)]: (state) => ({...state, loading: true}),
 
     /* Subscribe to loading complete action */
-    [stateActionType(NAME, LOAD, FINISH)]: (state) => ({...state, isLoading: false})
+    [stateActionType(NAME, LOAD, FINISH)]: (state) => ({...state, loading: false})
   }
 }

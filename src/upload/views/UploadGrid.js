@@ -267,7 +267,7 @@ export default class UploadGrid extends Component {
               </Upload>
             </View>
           ))}
-          <Loading isLoading={loading} classNameChild='round padding bg-neutral'>{`${_.UPDATING}...`}</Loading>
+          <Loading loading={loading} classNameChild='round padding bg-neutral'>{`${_.UPDATING}...`}</Loading>
         </Grid>
         {/* Below element is used to trigger error animation because grid may be nested inside square */}
         <View className={classNames('input', {error, info})}/>

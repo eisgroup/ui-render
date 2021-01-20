@@ -6,7 +6,7 @@
 const initState = {
   files: [],
   type: undefined,
-  isLoading: false
+  loading: false
 }
 
 export default initState

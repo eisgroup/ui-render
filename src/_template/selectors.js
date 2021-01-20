@@ -1,5 +1,5 @@
 import selector from 'utils-pack/selectors'
-import { NAME as _TEMPLATE } from './constants'
+import { _TEMPLATE } from './constants'
 
 /**
  * STATE SELECTORS =============================================================
@@ -10,8 +10,8 @@ import { NAME as _TEMPLATE } from './constants'
 @selector(_TEMPLATE)
 export default class select {
 
-  static isLoading = () => [
-    state => state[_TEMPLATE].isLoading,
+  static loading = () => [
+    state => state[_TEMPLATE].loading,
     (val) => val
   ]
 }

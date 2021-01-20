@@ -30,8 +30,8 @@ export default class select {
     (updated) => Date.now() - updated < DEFAULT.LOGIN_DURATION
   ]
 
-  static ui = () => [
-    state => state[USER].ui,
+  static loading = () => [
+    state => state[USER].loading,
     (val) => val || {}
   ]
 }

@@ -52,7 +52,7 @@ const initState = {
     }
   },
   ui: {
-    isLoading: false,
+    loading: false,
     className: ''
   }
 }

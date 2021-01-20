@@ -42,9 +42,9 @@ export function * takeFirst (actionType, callback, ...args) {
  * @returns {Function} - A generator function that will dispatch the loading START action
  */
 export function loadingStart (type) {
-  return function * ({payload, meta, meta: {isLoading = true} = {}} = {}) {  // eslint-disable-line
+  return function * ({payload, meta, meta: {loading = true} = {}} = {}) {  // eslint-disable-line
     // Don't dispatch action if told not to
-    if (!isLoading) return
+    if (!loading) return
 
     // Dispatch the load action
     yield put(stateAction(type, LOAD, START, payload, meta))

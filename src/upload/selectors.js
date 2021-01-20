@@ -23,8 +23,8 @@ export default class select {
     ]
   }
 
-  static isLoading = () => [
-    state => state[UPLOAD].isLoading,
+  static loading = () => [
+    state => state[UPLOAD].loading,
     (val) => val
   ]
 }

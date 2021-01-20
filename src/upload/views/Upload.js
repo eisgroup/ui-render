@@ -22,7 +22,7 @@ import { _ } from '../translations'
  * -----------------------------------------------------------------------------
  */
 const mapStateToProps = (state) => ({
-  loading: select.isLoading(state)
+  loading: select.loading(state)
 })
 const mapDispatchToProps = (dispatch) => ({
   actions: {
@@ -199,7 +199,7 @@ export default class Upload extends PureComponent {
           </View>
           }
         </Dropzone>
-        <Loading isLoading={loading}/>
+        <Loading loading={loading}/>
       </View>
     )
   }

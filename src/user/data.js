@@ -11,7 +11,7 @@ const initState = {
   self: {
     ...performStorage(GET, USER),
   },
-  isLoading: false
+  loading: false
 }
 
 export default initState

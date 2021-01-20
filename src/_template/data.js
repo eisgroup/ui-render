@@ -5,7 +5,7 @@
  */
 
 const initState = {
-  isLoading: false
+  loading: false
 }
 
 export default initState
