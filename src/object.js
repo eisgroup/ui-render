@@ -444,12 +444,12 @@ export function removeEmptyValues(collection, { recursive = true } = {}) {
  * @param {Boolean} [recursive] - whether to remove nil values recursively
  * @return {Object|Array} - without null or undefined keys
  */
-export function removeNilValues(collection, { recursive = true } = {}) {
+export function removeNilValues (collection, {recursive = true} = {}) {
 	for (const key in collection) {
 		if (collection[key] == null) {
 			delete collection[key]
 		} else if (recursive && typeof collection[key] === 'object') {
-			collection[key] = removeNilValues(collection[key], { recursive })
+			collection[key] = removeNilValues(collection[key], {recursive})
 		}
 	}
 

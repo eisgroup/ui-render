@@ -201,7 +201,7 @@ export function isString(value) {
  * @param {Boolean} [suppressError] - whether to ignore error when replacement string not found, and leave as is
  * @return {String} output - with interpolated variables
  */
-export function interpolateString(string, variables = {}, { formatKey, name, suppressError } = {}) {
+export function interpolateString (string, variables = {}, {formatKey, name, suppressError} = {}) {
 	return string.replace(/{([^{}]+)}/g, (__, match) => {
 		let key = match
 		if (formatKey) key = formatKey.replace('key', key)

@@ -150,7 +150,7 @@ export function localise (DEFINITION) {
 
 /**
  * Prepare translations for localisation by mutation, so they can be accessed directly via .TEXT property
- * @Note: can be applied repeatedly to add new translations or languages
+ * @Note: can be applied repeatedly to add new translations or languages after requests from API
  *
  * @example:
  *    const _ = localiseTranslation(TRANSLATIONS)
@@ -160,18 +160,31 @@ export function localise (DEFINITION) {
  *    # if active language is Russian
  *    >>> 'Поиск'
  *
+ * Add language:
+ *    _.SEARCH = {
+ *      ..., // previous definitions
+ *      [l.CHINESE]: '搜索', // language addition
+ *    }
+ *    log(_.SEARCH)
+ *    # if active language is Chinese
+ *    >>> 搜索
+ *
  * @param {Object|Object<KEY<_...>>} TRANSLATION - key/value pairs of variable name with its localised values
  * @returns {Object} translations - with all definitions as javascript getters returning currently active language,
  *  (falls back to English if definition not found for active language, or empty string).
  */
 export function localiseTranslation (TRANSLATION) {
   for (const KEY in TRANSLATION) {
-    const data = TRANSLATION[KEY]
+    const _data = TRANSLATION[KEY]
     delete TRANSLATION[KEY] // remove it to prevent repeated iteration
     Object.defineProperty(TRANSLATION, KEY, {
       get () {
+        const data = this['~' + KEY] || _data
         return data[Active.LANG._] || data[LANGUAGE.ENGLISH._] || KEY || ''
       },
+      set (data) {
+        this['~' + KEY] = data
+      }
     })
   }
   return TRANSLATION
