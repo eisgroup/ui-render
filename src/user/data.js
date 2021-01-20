@@ -1,5 +1,5 @@
 import { GET, performStorage } from 'utils-pack'
-import { NAME } from './constants'
+import { USER } from './constants'
 
 /**
  * STATE DATA ==================================================================
@@ -9,7 +9,7 @@ import { NAME } from './constants'
 
 const initState = {
   self: {
-    ...performStorage(GET, NAME),
+    ...performStorage(GET, USER),
   },
   isLoading: false
 }

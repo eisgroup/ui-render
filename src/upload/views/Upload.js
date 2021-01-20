@@ -44,7 +44,7 @@ const mapDispatchToProps = (dispatch) => ({
 @withTimer
 export default class Upload extends PureComponent {
   static propTypes = {
-    // Upload file type, falls back to Route pathname, and default is 'images'
+    // Upload file type, falls back to Route pathname
     // If given, will render as embedded component, instead of Modal route
     type: PropTypes.oneOfType([
       PropTypes.string,

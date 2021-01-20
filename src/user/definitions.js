@@ -1,6 +1,5 @@
-import { DEFAULT } from 'modules-pack/variables/defaults'
 import { DEFINITION_BY_VAL, ENUM } from 'modules-pack/variables/definitions'
-import { definitionByValue, enumFrom, LANGUAGE } from 'utils-pack'
+import { definitionByValue, enumFrom, l } from 'utils-pack'
 
 /**
  * LOCALISED DEFINITIONS =======================================================
@@ -8,49 +7,57 @@ import { definitionByValue, enumFrom, LANGUAGE } from 'utils-pack'
  */
 
 
-export const USER = {
-  TYPE: {
+export const _USER = {
+
+  ROLE: {
     // 0: 'Any' - zero value code is used to delete record in database
     // Language is the bottom most in hierarchy because code should be defined only once
     // and it's easier to see all translation of the same word together
-    COMPANY: {
-      _: 'c',
-      [LANGUAGE.ENGLISH._]: 'Company'
-    },
-    FREELANCER: {
-      _: 'i',
-      [LANGUAGE.ENGLISH._]: 'Freelancer'
-    },
-  },
-
-  ROLE: {
     // We use numbered code for security reasons so it's harder for hackers to guess.
     // Numbered code also allows computation of permissions with quick `<` or `>` checks
-    ADMIN: {
-      _: 999,
-      [LANGUAGE.ENGLISH._]: 'Admin'
+    USER: {
+      _: 0, // default role -> undefined in database
+      [l.ENGLISH]: 'User',
+      // [l.RUSSIAN]: 'Пользователь',
     },
     STAFF: {
       _: 99,
-      [LANGUAGE.ENGLISH._]: 'Staff'
+      [l.ENGLISH]: 'Staff',
+      // [l.RUSSIAN]: 'Сотрудник',
+    },
+    ADMIN: {
+      _: 999,
+      [l.ENGLISH]: 'Admin',
+      // [l.RUSSIAN]: 'Админ',
     },
   },
 
-  ACTION: {},
+  TYPE: {
+    INDIVIDUAL: {
+      _: 0,
+      [l.ENGLISH]: 'Individual',
+      // [l.RUSSIAN]: 'Частное Лицо',
+    },
+    COMPANY: {
+      _: 1,
+      [l.ENGLISH]: 'Company',
+      // [l.RUSSIAN]: 'Компания',
+    },
+  },
 }
 
 export const SEX = { // code needs to be incrementing value for slider
   ANY: {
     _: 0,
-    [LANGUAGE.ENGLISH._]: 'Any',
+    [l.ENGLISH]: 'Any',
   },
   FEMALE: {
     _: 1,
-    [LANGUAGE.ENGLISH._]: 'Female',
+    [l.ENGLISH]: 'Female',
   },
   MALE: {
     _: 2,
-    [LANGUAGE.ENGLISH._]: 'Male',
+    [l.ENGLISH]: 'Male',
   }
 }
 
@@ -61,26 +68,29 @@ export const PERMISSION = {
   // Example: User with permission {'1': true, '99': true} cannot update/delete.
   READ: {
     _: 1,
-    [LANGUAGE.ENGLISH._]: 'Read',
+    [l.ENGLISH]: 'Read',
+    // [l.RUSSIAN]: 'Читать',
   },
   UPDATE: {
     _: 2,
-    [LANGUAGE.ENGLISH._]: 'Update',
+    [l.ENGLISH]: 'Update',
+    // [l.RUSSIAN]: 'Обновить',
   },
   DELETE: {
     _: 3,
-    [LANGUAGE.ENGLISH._]: 'Delete',
+    [l.ENGLISH]: 'Delete',
+    // [l.RUSSIAN]: 'Удалить',
   },
   MANAGE_USERS: { // add/remove users and set permissions
     _: 99, // same as STAFF authorization level
-    [LANGUAGE.ENGLISH._]: 'Manage Users',
+    [l.ENGLISH]: 'Manage Users',
+    // [l.RUSSIAN]: 'Организовать Пользователей',
   },
 }
 
-DEFAULT.SEX = SEX.FEMALE._
-DEFINITION_BY_VAL.USER_ROLE = definitionByValue(USER.ROLE)
-DEFINITION_BY_VAL.USER_TYPE = definitionByValue(USER.TYPE)
+DEFINITION_BY_VAL.USER_ROLE = definitionByValue(_USER.ROLE)
+DEFINITION_BY_VAL.USER_TYPE = definitionByValue(_USER.TYPE)
 DEFINITION_BY_VAL.SEX = definitionByValue(SEX)
-ENUM.USER_ROLE = enumFrom(USER.ROLE)
-ENUM.USER_TYPE = enumFrom(USER.TYPE)
+ENUM.USER_ROLE = enumFrom(_USER.ROLE)
+ENUM.USER_TYPE = enumFrom(_USER.TYPE)
 ENUM.SEX = enumFrom(SEX)

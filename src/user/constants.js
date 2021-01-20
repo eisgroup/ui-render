@@ -1,59 +1,70 @@
-import { required, stickyPlaceholder } from 'modules-pack/form/constants'
+import { stickyPlaceholder } from 'modules-pack/form/constants'
 import { FIELD } from 'modules-pack/variables/fields'
 import { timeInThePast } from 'react-ui-pack/inputs/validationRules'
 import { optionsFrom } from 'utils-pack'
-import { SEX, USER } from './definitions'
+import { _USER, SEX } from './definitions'
+import { _ } from './translations'
 
 /**
  * CONSTANT VARIABLES ==========================================================
  * =============================================================================
  */
 
-export const NAME = 'USER' // Namespace this module
-export const SELF = `${NAME}_SELF`
-export const USER_LOGIN = `${NAME}_LOGIN`
-export const USER_SETTINGS = `${NAME}_SETTINGS`
+export const USER = 'USER' // Namespace this module
+export const SELF = `${USER}_SELF`
+export const USER_LOGIN = `${USER}_LOGIN`
 
 // Field IDs
 FIELD.ID = {
-  FIRST_NAME: `${NAME}_FIRST_NAME`,
-  LAST_NAME: `${NAME}_LAST_NAME`,
-  FULL_NAME: `${NAME}_FULL_NAME`,
-  BIRTHDAY: `${NAME}_BIRTHDAY`,
-  BIRTH_n_SEX: `${NAME}_BIRTH_&_SEX`,
-  ROLE: `${NAME}_ROLE`,
-  SEX: `${NAME}_SEX`,
+  GIVEN_NAME: `${USER}_GIVEN_NAME`,
+  SURNAME: `${USER}_SURNAME`,
+  FULL_NAME: `${USER}_FULL_NAME`,
+  BIRTHDAY: `${USER}_BIRTHDAY`,
+  BIRTH_n_SEX: `${USER}_BIRTH_&_SEX`,
+  ROLE: `${USER}_ROLE`,
+  SEX: `${USER}_SEX`,
 }
 
 // Lists
 FIELD.FOR = {
-  USER_CONTACTS: [
-    {id: FIELD.ID.EMAIL, required},
-    {id: FIELD.ID.PHONE, required},
-    {id: FIELD.ID.ADDRESS},
-  ],
-  USER_PROFILE: [
-    {id: FIELD.ID.FULL_NAME},
-    {id: FIELD.ID.BIRTH_n_SEX},
-  ],
+  /* To be defined on implementation */
+  // USER_CONTACTS: [
+  //   {id: FIELD.ID.EMAIL, required},
+  //   {id: FIELD.ID.PHONE, required},
+  //   {id: FIELD.ID.ADDRESS},
+  // ],
+  // USER_PROFILE: [
+  //   {id: FIELD.ID.FULL_NAME},
+  //   {id: FIELD.ID.BIRTH_n_SEX},
+  // ],
 }
 
 // Field Definitions
 FIELD.DEF = {
-  [FIELD.ID.FIRST_NAME]: {
+  [FIELD.ID.GIVEN_NAME]: {
     name: 'name',
-    label: 'First Name',
-    hint: 'My first name is',
+    get label () {return _.GIVEN_NAME},
+    get hint () {return _.MY_GIVEN_NAME_IS},
+    view: FIELD.TYPE.INPUT,
   },
-  [FIELD.ID.LAST_NAME]: {
+  [FIELD.ID.SURNAME]: {
     name: 'surname',
-    label: 'Last Name',
-    hint: 'My family name is',
+    get label () {return _.SURNAME},
+    get hint () {return _.MY_SURNAME_IS},
+    view: FIELD.TYPE.INPUT,
+  },
+  [FIELD.ID.ABOUT_ME]: {
+    name: 'about',
+    get label () {return _.ABOUT_ME},
+    get hint () {return _.ABOUT_ME},
+    get placeholder () {return _.BRIEF_DESCRIPTION},
+    type: 'textarea',
+    view: FIELD.TYPE.INPUT,
   },
   [FIELD.ID.BIRTHDAY]: {
     name: 'birthday',
-    label: 'Date of Birth',
-    hint: 'I was born on',
+    get label () {return _.DATE_OF_BIRTH},
+    get hint () {return _.I_WAS_BORN},
     placeholder: 'dd.mm.yyyy',
     stickyPlaceholder,
     validate: [timeInThePast],
@@ -61,24 +72,27 @@ FIELD.DEF = {
   },
   [FIELD.ID.ROLE]: {
     name: 'role',
-    label: 'User Role',
-    hint: 'Register me as',
-    options: optionsFrom([USER.ROLE.ADMIN, USER.ROLE.STAFF]),
+    get label () {return _.MY_ROLE},
+    get hint () {return _.REGISTER_ME_AS},
+    options: optionsFrom([_USER.ROLE.STAFF, _USER.ROLE.USER]),
     view: FIELD.TYPE.DROPDOWN,
   },
   [FIELD.ID.SEX]: {
     name: 'sex',
-    label: 'Gender',
-    hint: 'I am',
+    get label () {return _.GENDER},
+    get hint () {return _.I_AM},
     options: optionsFrom([SEX.FEMALE, SEX.MALE]),
     view: FIELD.TYPE.DROPDOWN,
+    // Cannot use minWidth because it causes overflow for long text, add minWidth for FormInSteps only
+    // style: {minWidth: 120},
   },
   [FIELD.ID.FULL_NAME]: {
-    items: [{id: FIELD.ID.FIRST_NAME, required}, {id: FIELD.ID.LAST_NAME, required}],
+    // `required` can be passed down as group, leave undefined by default for customisation
+    items: [{id: FIELD.ID.GIVEN_NAME}, {id: FIELD.ID.SURNAME}],
     view: FIELD.TYPE.GROUP,
   },
   [FIELD.ID.BIRTH_n_SEX]: {
-    items: [{id: FIELD.ID.BIRTHDAY, required}, {id: FIELD.ID.SEX, required}],
+    items: [{id: FIELD.ID.BIRTHDAY}, {id: FIELD.ID.SEX}],
     view: FIELD.TYPE.GROUP,
   },
 }

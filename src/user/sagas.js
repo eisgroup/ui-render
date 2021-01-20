@@ -1,10 +1,9 @@
 import { apiAction, subscribeToApiResults } from 'modules-pack/api'
-import { FORM_ACTION_TYPE } from 'modules-pack/formRedux/constants'
 import { stateAction, stateActionType } from 'modules-pack/redux'
 import { history, select as routerSelect } from 'modules-pack/router'
 import { all, call, delay, put, selectState, spawn, takeLatest } from 'modules-pack/saga/utils'
 import { ROUTE, URL } from 'modules-pack/variables'
-import { CREATE, LOGIN, RESET, sanitizeGqlResponse, SET, SUBMIT, SUCCESS } from 'utils-pack'
+import { Active, CREATE, LOGIN, RESET, sanitizeGqlResponse, SET, SUCCESS } from 'utils-pack'
 import { SELF, USER_LOGIN } from './constants'
 // import { user as mutation } from './mutations'
 // import { user as query } from './queries'
@@ -32,7 +31,7 @@ function * watch () {
     // List task subscriptions here
     takeLatest(stateActionType(LOGIN), loginOpen),
     takeLatest(stateActionType(SELF, SET), userUpdate),
-    takeLatest(FORM_ACTION_TYPE[SUBMIT][SUCCESS], loginSuccessFlow)
+    takeLatest(stateActionType(LOGIN, SUCCESS), loginSuccessFlow),
   ])
 }
 
@@ -50,7 +49,7 @@ function * watch () {
  * Close Login Modal, Get Required Info and Refresh Requested Route
  */
 function * loginSuccessFlow ({meta: {form} = {}}) {
-  if (form !== USER_LOGIN || ROUTE.LOGIN !== (yield selectState(routerSelect.activeRoute))) return
+  if ((form && form !== USER_LOGIN) || ROUTE.LOGIN !== (yield selectState(routerSelect.activeRoute))) return
   let routeToRefresh = ROUTE.HOME
 
   // Close Login Modal
@@ -74,19 +73,22 @@ function * loginSuccessFlow ({meta: {form} = {}}) {
   // Get Required Info
   yield all([
     call(infoGqlFlow),
-    delay(10)
+    delay(10),
   ])
 
   history.push(routeToRefresh)
 }
+
 
 /**
  * Get User Profile Data from GraphQl Server
  */
 export function * infoGqlFlow () {
   /* API Request and Wait for Response */
-  yield put(apiAction(URL.API_GQL, CREATE, {body: {query}}, {query, headers: {'Content-Type': 'application/json'}}))
-  const {payload = {}, meta: {result} = {}} = yield call(subscribeToApiResults, URL.API_GQL, CREATE, {query})
+  if (!Active.UserQuery) throw new Error('GraphQL Active.UserQuery must be defined first')
+  const body = {query: Active.UserQuery}
+  yield put(apiAction(URL.API_GQL, CREATE, {body}, {...body, headers}))
+  const {payload = {}, meta: {result} = {}} = yield call(subscribeToApiResults, URL.API_GQL, CREATE, body)
   if (result !== SUCCESS) return
 
   /* Update State */
@@ -112,10 +114,9 @@ function * loginOpen () {
 }
 
 function * userMutate ({payload}) {
-  const variables = {user: payload}
-  const query = mutation
-  yield put(apiAction(URL.API_GQL, CREATE, {body: {query, variables}}, {
-    query, variables,
-    headers: {'Content-Type': 'application/json'}
-  }))
+  if (!Active.UserMutation) throw new Error('GraphQL Active.UserMutation must be defined first')
+  const body = {query: Active.UserMutation, variables: {user: payload}}
+  yield put(apiAction(URL.API_GQL, CREATE, {body}, {...body, headers}))
 }
+
+const headers = {'Content-Type': 'application/json'}
