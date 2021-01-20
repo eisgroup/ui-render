@@ -1,4 +1,4 @@
-import { NAME } from './constants'
+import { UPLOAD } from './constants'
 import reducer from './reducers'
 import select from './selectors'
 
@@ -10,7 +10,7 @@ import select from './selectors'
 
 export * from './constants'
 const upload = {
-  NAME,
+  NAME: UPLOAD,
   reducer,
   select,
 }

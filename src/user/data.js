@@ -9,7 +9,9 @@ import { USER } from './constants'
 
 const initState = {
   self: {
-    ...performStorage(GET, USER),
+    // @Note: in backend, performStorage returns promise, and resolves to nothing,
+    // but it does not matter, since only frontend needs to retrieve from localStorage.
+    ...(typeof window === 'undefined') ? {} : performStorage(GET, USER),
   },
   loading: false
 }

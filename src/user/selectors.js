@@ -1,3 +1,4 @@
+import { isAdmin, isCompany, isIndividual, isStaff } from 'modules-pack/user/logic'
 import { DEFAULT } from 'modules-pack/variables'
 import selector from 'utils-pack/selectors'
 import { USER } from './constants'
@@ -25,14 +26,47 @@ export default class select {
     (val) => val
   ]
 
-  static isLoggedIn = () => [
-    (state) => state[USER].self.updated,
-    (updated) => Date.now() - updated < DEFAULT.LOGIN_DURATION
+  static kind = () => [
+    (state) => state[USER].self.kind,
+    (val) => val
   ]
 
   static loading = () => [
     state => state[USER].loading,
     (val) => val || {}
   ]
+
+  static isLoggedIn = () => [
+    (state) => state[USER].self.updated,
+    (updated) => Date.now() - updated < DEFAULT.LOGIN_DURATION
+  ]
+
+  static isAdmin = function () {
+    return [
+      this.role,
+      isAdmin,
+    ]
+  }
+
+  static isStaff = function () {
+    return [
+      this.role,
+      isStaff,
+    ]
+  }
+
+  static isCompany = function () {
+    return [
+      this.kind,
+      isCompany,
+    ]
+  }
+
+  static isIndividual = function () {
+    return [
+      this.kind,
+      isIndividual,
+    ]
+  }
 }
 

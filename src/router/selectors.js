@@ -1,6 +1,6 @@
 import { get } from 'utils-pack'
 import selector from 'utils-pack/selectors'
-import { NAME } from './constants'
+import { ROUTER } from './constants'
 
 /**
  * STATE SELECTORS =============================================================
@@ -8,10 +8,10 @@ import { NAME } from './constants'
  * =============================================================================
  */
 
-@selector(NAME)
+@selector(ROUTER)
 export default class select {
   static activeRoute = () => [
-    (state) => get(state, `${NAME}.location.pathname`),
+    (state) => get(state, `${ROUTER}.location.pathname`),
     (val) => val
   ]
 }

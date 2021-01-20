@@ -6,9 +6,10 @@ import { definitionByValue, enumFrom, l } from 'utils-pack'
  * =============================================================================
  */
 
-
 export const _USER = {
-
+  // @Note: User Authorization can have matching values with User Role, but incrementing in between.
+  //    Example: a Supervising Staff may have authorization level 200, while New Hire - level 99.
+  //    It is then possible to set access threshold for certain features based on auth level.
   ROLE: {
     // 0: 'Any' - zero value code is used to delete record in database
     // Language is the bottom most in hierarchy because code should be defined only once
@@ -32,7 +33,7 @@ export const _USER = {
     },
   },
 
-  TYPE: {
+  KIND: {
     INDIVIDUAL: {
       _: 0,
       [l.ENGLISH]: 'Individual',
@@ -89,8 +90,8 @@ export const PERMISSION = {
 }
 
 DEFINITION_BY_VAL.USER_ROLE = definitionByValue(_USER.ROLE)
-DEFINITION_BY_VAL.USER_TYPE = definitionByValue(_USER.TYPE)
+DEFINITION_BY_VAL.USER_KIND = definitionByValue(_USER.KIND)
 DEFINITION_BY_VAL.SEX = definitionByValue(SEX)
 ENUM.USER_ROLE = enumFrom(_USER.ROLE)
-ENUM.USER_TYPE = enumFrom(_USER.TYPE)
+ENUM.USER_KIND = enumFrom(_USER.KIND)
 ENUM.SEX = enumFrom(SEX)

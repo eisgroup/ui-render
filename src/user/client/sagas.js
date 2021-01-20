@@ -4,7 +4,7 @@ import { history, select as routerSelect } from 'modules-pack/router'
 import { all, call, delay, put, selectState, spawn, takeLatest } from 'modules-pack/saga/utils'
 import { ROUTE, URL } from 'modules-pack/variables'
 import { Active, CREATE, LOGIN, RESET, sanitizeGqlResponse, SET, SUCCESS } from 'utils-pack'
-import { SELF, USER_LOGIN } from './constants'
+import { SELF, USER_LOGIN } from '../constants'
 // import { user as mutation } from './mutations'
 // import { user as query } from './queries'
 

@@ -3,4 +3,4 @@
  * =============================================================================
  */
 
-export const NAME = 'UPLOAD' // namespace this module
+export const UPLOAD = 'UPLOAD' // namespace this module

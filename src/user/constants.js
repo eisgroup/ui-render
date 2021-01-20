@@ -11,6 +11,7 @@ import { _ } from './translations'
  */
 
 export const USER = 'USER' // Namespace this module
+export const USER_CLIENT = 'USER~CLIENT' // Namespace this module for frontend
 export const SELF = `${USER}_SELF`
 export const USER_LOGIN = `${USER}_LOGIN`
 

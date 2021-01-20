@@ -13,7 +13,7 @@ import Text from 'react-ui-pack/Text'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
 import { capitalize, get, hasListValue, isFunction, log, OPEN, pluralize, SET, shortNumber, SIZE_KB } from 'utils-pack'
-import { NAME as UPLOAD } from '../constants'
+import { UPLOAD } from '../constants'
 import select from '../selectors'
 import { _ } from '../translations'
 

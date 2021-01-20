@@ -1,5 +1,5 @@
 import selector from 'utils-pack/selectors'
-import { NAME as UPLOAD } from './constants'
+import { UPLOAD } from './constants'
 
 /**
  * STATE SELECTORS =============================================================
@@ -16,15 +16,15 @@ export default class select {
     (val) => val || []
   ]
 
+  static loading = () => [
+    state => state[UPLOAD].loading,
+    (val) => val
+  ]
+
   static images = function () {
     return [
       this.files,
       (files) => files.filter(({preview}) => !!preview)
     ]
   }
-
-  static loading = () => [
-    state => state[UPLOAD].loading,
-    (val) => val
-  ]
 }

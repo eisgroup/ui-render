@@ -1,6 +1,5 @@
 import { USER } from './constants'
 import reducer from './reducers'
-import saga from './sagas'
 import select from './selectors'
 
 /**
@@ -18,7 +17,6 @@ export {
 const user = {
   NAME: USER,
   reducer,
-  saga,
   select,
 }
 
