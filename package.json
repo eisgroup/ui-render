@@ -33,7 +33,7 @@
     "utils-pack": "0.3.x"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "backoff": "^2.5.0",
     "connected-react-router": "^6.8.0",
     "final-form": "^4.20.1",
