@@ -44,8 +44,13 @@ performCache.cache = {}
 /**
  * Perform localStorage (for the Web), node-persist (for Node.js) or AsyncStorage (for React Native)
  *
+ * @setup (for backend):
+ *   if (!Active.Storage) {
+ *     Active.Storage = require('node-persist')
+ *     performStorage.init() // initiate local storage as async method to avoid blocking concurrent processes
+ *   }
  * @example:
- performStorage(SET, 'token', 'Wait_for_it___Legendary_Genius')
+ *    performStorage(SET, 'token', 'Wait_for_it___Legendary_Genius')
  *
  * @NOTE:
  *  AsyncStorage takes 5 milliseconds delay on average for each storage operation, and can add up.
@@ -55,23 +60,28 @@ performCache.cache = {}
  * @param {string} storageKey - stored value's key identifier
  * @param {*} value - value to store
  * @param {Array|Object} initialValue - used for ADD ACTION when saving the first time
- * @return {*} - Local or AsyncStorage promise result or stored value for GET action
+ * @return {*} - Synchronous/Asynchronous promise result of Local Storage (or stored value for GET action)
  */
 export function performStorage (ACTION, storageKey, value = null, initialValue = []) {
   /* ADD action abstraction */
   if (ACTION === ADD) {
+    if (performStorage.isAsync) {
+      return performStorage(GET, storageKey)
+        .then(value => value || initialValue)
+        .then(oldData => performStorage(SET, storageKey, isList(oldData) ? oldData.concat(value) : update(oldData, value)))
+    }
     const oldData = performStorage(GET, storageKey) || initialValue
     return performStorage(SET, storageKey, isList(oldData) ? oldData.concat(value) : update(oldData, value))
   }
 
   /* SERVER (or missing localStorage) */
-  if (!hasLocalStorage) return Active.Storage[performStorage.toServerAction[ACTION]](storageKey, value)
+  if (!hasLocalStorage) return Active.Storage[performStorage.toServer[ACTION]](storageKey, value)
 
   /* CLIENT */
   enumCheck([GET, SET, DELETE], ACTION, this)
   const args = [storageKey]
   if (value != null) args.push(toJSON(value))
-  let result = localStorage[performStorage.toClientAction[ACTION]](...args)
+  let result = localStorage[performStorage.toClient[ACTION]](...args)
 
   // Storage Retrieval
   if (GET === ACTION && result) result = fromJSON(result)  // Deserialize data
@@ -82,14 +92,30 @@ export function performStorage (ACTION, storageKey, value = null, initialValue =
   log(`STORAGE -> ${ACTION}: ${storageKey} as:`, `color: teal`, result || value)
   return result
 }
-performStorage.toClientAction = {
+
+performStorage.toClient = {
   [GET]: 'getItem',
   [SET]: 'setItem',
   [DELETE]: 'removeItem'
 }
-performStorage.toServerAction = {
+performStorage.toServer = {
+  [GET]: 'getItem',
+  [SET]: 'setItem',
+  [DELETE]: 'removeItem'
+}
+performStorage.toServerSync = {
   [GET]: 'getItemSync',
   [SET]: 'setItemSync',
   [DELETE]: 'removeItemSync'
+}
+// Setup Asynchronous Local Storage
+performStorage.init = function (...args) {
+  performStorage.isAsync = true
+  return Active.Storage.init(...args)
+}
+// Setup Synchronous Local Storage (not recommended)
+performStorage.initSync = function (...args) {
+  performStorage.toServer = performStorage.toServerSync
+  return Active.Storage.initSync(...args)
 }
 
