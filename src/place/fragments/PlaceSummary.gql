@@ -1,0 +1,5 @@
+fragment PlaceSummary on Place {
+    id
+    address
+    name
+}

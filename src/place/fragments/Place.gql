@@ -1,0 +1,15 @@
+fragment Place on Place {
+    id
+    address
+    name
+    city
+    country
+    location {
+        lat
+        lng
+    }
+    photos {
+        src
+    }
+    updated
+}

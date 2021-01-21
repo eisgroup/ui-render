@@ -1,0 +1,49 @@
+# =============================================================================
+# GRAPHQL SCHEMA
+# Type definitions for Clients
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# SUMMARY
+# -----------------------------------------------------------------------------
+
+type Location  {
+    lat: Float!
+    lng: Float!
+    accuracy: Float
+    timestamp: Timestamp
+}
+
+type Place {
+    id: ID!
+    location: Location!
+    address: String!
+    name: String
+    city: String
+    country: String
+    provider: String
+    photos: [File!]
+    created: Timestamp!
+    updated: Timestamp!
+}
+
+input PlaceInput {
+    id: ID!
+    sessionToken: String
+    provider: String
+    # Below fields are not used, only here to prevent errors if frontend sends initial values as is
+    location: LocationInput
+    address: String
+    name: String
+    city: String
+    country: String
+    created: Timestamp
+    updated: Timestamp
+}
+
+input LocationInput  {
+    lat: Float!
+    lng: Float!
+    accuracy: Float
+    timestamp: Timestamp
+}
