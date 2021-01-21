@@ -41,7 +41,7 @@ export function Button ({
       {...props}
     >
       {children}
-      {loading && <Loading isLoading/>}
+      {loading && <Loading loading/>}
     </button>
   )
 }

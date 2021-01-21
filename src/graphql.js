@@ -43,7 +43,7 @@ import LoadingView from './Loading'
  * @param {Object} [Loading] - Loading React component to render while waiting fetch
  * @returns {Function} decorator - HOC wrapper function for given React component
  */
-export function withGql ({query = null, mutation = null, Loading = <LoadingView isLoading/>}) {
+export function withGql ({query = null, mutation = null, Loading = <LoadingView loading/>}) {
   return function Decorator (WrappedComponent) {
     let props = {} // persist props as closure object in between component life cycles
     return function GqlHOC (initialProps) {

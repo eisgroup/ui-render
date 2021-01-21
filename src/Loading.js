@@ -8,7 +8,7 @@ import View from './View'
 /**
  * Loading Overlay - Pure Component
  *
- * @param {Boolean} [isLoading] - whether to show this Component or not
+ * @param {Boolean} [loading] - whether to show this Component or not
  * @param {String} [size] - spinner size
  * @param {String} [className] - css class to add
  * @param {String} [iconClassName] - css class to add to spinner icon
@@ -18,7 +18,7 @@ import View from './View'
  * @returns {object} - React Component
  */
 export function Loading ({
-  isLoading = true,
+  loading = true,
   size = 'larger',  // Enum
   className,
   iconClassName,
@@ -26,7 +26,7 @@ export function Loading ({
   children,
   ...props
 }) {
-  return (isLoading &&
+  return (loading &&
     <View className={classNames('app__loading', className, {transparent})}>
       <Spinner className={iconClassName} size={size} {...props} />
       {children && <Text className='h4 blink'>{children}</Text>}
@@ -35,7 +35,7 @@ export function Loading ({
 }
 
 Loading.propTypes = {
-  isLoading: PropTypes.bool,
+  loading: PropTypes.bool,
   size: PropTypes.any,
   className: PropTypes.string,
   iconClassName: PropTypes.string
