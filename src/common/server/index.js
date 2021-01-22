@@ -1,3 +1,4 @@
+import { assertBackend } from 'utils-pack'
 import { COMMON_SERVER } from '../constants'
 import schema from '../schema.gql'
 import resolver from './resolvers'
@@ -7,6 +8,7 @@ import resolver from './resolvers'
  * Modules' Exposing API - to enable consistent and maintainable app integration
  * =============================================================================
  */
+assertBackend()
 
 const commonServer = {
   NAME: COMMON_SERVER,

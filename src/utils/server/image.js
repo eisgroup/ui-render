@@ -1,10 +1,12 @@
 import { FILE } from 'react-ui-pack'
 import sharp from 'sharp'
+import { assertBackend } from 'utils-pack'
 
 /**
  * IMAGE HELPERS ===============================================================
  * =============================================================================
  */
+assertBackend()
 
 /**
  * Create Resize Stream Pipeline

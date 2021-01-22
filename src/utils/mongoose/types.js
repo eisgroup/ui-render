@@ -2,6 +2,7 @@ import { CURRENCY, PERMISSION, PHONE, VALIDATE } from 'modules-pack/variables'
 import mongoose from 'mongoose'
 import { phone } from 'react-ui-pack/inputs/normalizers'
 import {
+  assertBackend,
   by,
   enumFrom,
   get,
@@ -16,6 +17,7 @@ import isEmail from 'validator/es/lib/isEmail'
 import isURL from 'validator/es/lib/isURL'
 import './database' // initialize database automatically on import of this file
 
+assertBackend()
 /**
  * DATABASE HELPERS ============================================================
  * =============================================================================

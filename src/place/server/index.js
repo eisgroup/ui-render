@@ -1,3 +1,4 @@
+import { assertBackend } from 'utils-pack'
 import { PLACE_SERVER } from '../constants'
 import schema from '../schema.gql'
 import Model from './models'
@@ -7,6 +8,7 @@ import Model from './models'
  * Modules' Exposing API - to enable consistent and maintainable app integration
  * =============================================================================
  */
+assertBackend()
 
 const placeServer = {
   NAME: PLACE_SERVER,

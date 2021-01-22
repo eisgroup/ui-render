@@ -1,3 +1,4 @@
+import { assertBackend } from 'utils-pack'
 import { _TEMPLATE_SERVER } from '../constants'
 import schema from '../schema.gql'
 // import Model from './models'
@@ -8,6 +9,7 @@ import schema from '../schema.gql'
  * Modules' Exposing API - to enable consistent and maintainable app integration
  * =============================================================================
  */
+assertBackend()
 
 const _templateServer = {
   NAME: _TEMPLATE_SERVER,
