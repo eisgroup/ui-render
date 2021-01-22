@@ -1,0 +1,7 @@
+fragment UserSummary on User {
+    id
+    avatar
+    name
+    surname
+    lastOnline
+}

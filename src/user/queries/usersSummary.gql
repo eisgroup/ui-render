@@ -1,0 +1,6 @@
+#import "../fragments/UserSummary.gql"
+query usersSummary($ids: [Id!], $sort: JSON) {
+    users(ids: $ids, sort: $sort) {
+        ...UserSummary
+    }
+}

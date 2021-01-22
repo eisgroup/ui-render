@@ -1,0 +1,13 @@
+fragment Self on User {
+    auth
+    birthday
+    verified {
+        email
+    }
+    referrer {
+        key
+        val
+    }
+    lastLogin
+    updated
+}

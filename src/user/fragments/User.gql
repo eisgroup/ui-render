@@ -1,0 +1,10 @@
+#import "./Self.gql"
+#import "./UserContacts.gql"
+#import "./UserDetails.gql"
+#import "./UserSummary.gql"
+fragment AllUserInfo on User {
+    ...UserSummary
+    ...UserDetails
+    ...UserContacts
+    ...Self
+}

@@ -1,0 +1,120 @@
+# =============================================================================
+# GRAPHQL SCHEMA
+# Type definitions for Clients
+# =============================================================================
+scalar UserPhotos
+
+# -----------------------------------------------------------------------------
+# SUMMARY
+# -----------------------------------------------------------------------------
+extend type Query {
+    user(id: Id): User # if no `id` given, returns self
+    users(ids: [Id!], sort: JSON): [User!] # if no `ids` given, returns last updated users for Staff or higher level
+    logout: Logout
+}
+
+extend type Mutation {
+    login(email: Email!, password: Password!): User
+    signup(email: Email!, password: Password!, referrer: KeyValInput): User
+    user(user: UserInput!): User # if no `id` given, updates self
+}
+
+#extend type Subscription {
+#}
+
+
+# -----------------------------------------------------------------------------
+# TYPES
+# -----------------------------------------------------------------------------
+
+type User {
+    id: Id! # can be used to derive created Timestamp
+    auth: Int
+    email: Email # for privacy reasons, may not be shown, but always exists
+    avatar: URL
+    name: String
+    surname: String
+    sex: Int
+    role: Int
+    kind: Int
+    birthday: Timestamp
+    lastOnline: Timestamp
+    lastLogin: Timestamp! # for privacy reasons, may not be shown, used to check whether instance is User
+    updated: Timestamp!
+    # Contacts
+    phones: Phones
+    place: Place
+    # Details
+    about: String
+    photos: [File]
+    # Settings
+    currency: CurrencySymbol
+    language: LanguageCode
+    reportsLimit: Int
+    # Others
+    verified: Verification
+    referrer: KeyVal
+    social: Social
+}
+
+input UserInput { # only used for updating existing record
+    id: Id # only required when not requested by User themselves (example: by Admin), else it is ignored
+    email: Email
+    password: Password
+    newPassword: Password
+    referrer: KeyValInput
+    name: String
+    surname: String
+    sex: Int
+    role: Int
+    kind: String
+    birthday: Timestamp
+    # Contacts
+    phones: Phones
+    place: PlaceInput
+    # Details
+    about: String
+    photos: [FileInput]
+    # Settings
+    currency: CurrencySymbol
+    language: LanguageCode
+    reportsLimit: Int
+}
+
+type Verification {
+    email: Email
+    updated: Timestamp!
+}
+
+type Social {
+    # Only one type of social account exists for each user,
+    # because we cannot link profile.id between different services
+    it: SocialAccount # instagram
+    fb: SocialAccount
+    vk: SocialAccount
+}
+
+type SocialAccount {
+    id: ID!
+    email: Email # 'work' or the first email is used to set User.email for the first time
+    phone: String
+    updated: Timestamp! # last login time
+}
+
+type Logout {
+    id: Id
+}
+
+# -----------------------------------------------------------------------------
+# INTERFACES
+# -----------------------------------------------------------------------------
+
+type UserPermission { # embeded type within other GraphQL types (example: Company.people: [UserPermission])
+    user: User!
+    permissions: Permissions!
+}
+
+input UserPermissionInput {
+    user: Id!
+    permissions: Permissions!
+}

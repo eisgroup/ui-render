@@ -17,6 +17,13 @@ export * from './urls'
 export * from './validations'
 
 /* Platform Prefixes */
-export const SERVER = 'SERVER'
+export const CLIENT = 'CLIENT'
+export const SERVICE = {
+  BOT: 'BOT',
+  CLIENT: 'CLIENT',
+  MOBILE: 'MOBILE',
+  SERVER: 'SERVER',
+  WEB: 'WEB',
+}
 
 localise(definitions)

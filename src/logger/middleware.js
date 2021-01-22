@@ -1,7 +1,7 @@
 import { __DEV__, Active, ERROR, formatNumber, log, logClear, REPORT, warn, } from 'utils-pack'
 import { isError, stateAction } from '../redux'
 import { socketActionSigned } from '../socket'
-import { SERVER, URL } from '../variables'
+import { SERVICE, URL } from '../variables'
 import { MAX_CONSOLE_RECORDS } from './constants'
 import { actionTypeColor, latencyColor, Log } from './utils'
 
@@ -72,7 +72,7 @@ export class Middleware {
     action.service = Active.SERVICE
 
     /* When Run in Server */
-    if (Active.SERVICE === SERVER) return Log.handleError(action)
+    if (Active.SERVICE === SERVICE.SERVER) return Log.handleError(action)
 
     /* When Run in Other Services, Notify Server about this Error */
     try {

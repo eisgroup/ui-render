@@ -62,33 +62,6 @@ export const SEX = { // code needs to be incrementing value for slider
   }
 }
 
-export const PERMISSION = {
-  // @note: permissions are defined as separate access levels.
-  // To have full access, one must have all permissions defined below.
-  // This way we keep the logic for checking permissions simple.
-  // Example: User with permission {'1': true, '99': true} cannot update/delete.
-  READ: {
-    _: 1,
-    [l.ENGLISH]: 'Read',
-    // [l.RUSSIAN]: 'Читать',
-  },
-  UPDATE: {
-    _: 2,
-    [l.ENGLISH]: 'Update',
-    // [l.RUSSIAN]: 'Обновить',
-  },
-  DELETE: {
-    _: 3,
-    [l.ENGLISH]: 'Delete',
-    // [l.RUSSIAN]: 'Удалить',
-  },
-  MANAGE_USERS: { // add/remove users and set permissions
-    _: 99, // same as STAFF authorization level
-    [l.ENGLISH]: 'Manage Users',
-    // [l.RUSSIAN]: 'Организовать Пользователей',
-  },
-}
-
 DEFINITION_BY_VAL.USER_ROLE = definitionByValue(_USER.ROLE)
 DEFINITION_BY_VAL.USER_KIND = definitionByValue(_USER.KIND)
 DEFINITION_BY_VAL.SEX = definitionByValue(SEX)

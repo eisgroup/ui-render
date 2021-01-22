@@ -23,6 +23,11 @@ export const CONFIG = {
   LANGUAGE_OPTIONS: [LANGUAGE.ENGLISH] // enabled languages
 }
 
+/* Client */
+export const CLIENT = {
+  // add env variables for frontend
+}
+
 /* Server */
 export const SERVER = {
   QUERY_CACHE_TIME: Number(ENV.QUERY_CACHE_TIME) || TWO_SECONDS

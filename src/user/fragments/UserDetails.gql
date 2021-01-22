@@ -1,0 +1,9 @@
+fragment UserDetails on User {
+    about
+    photos {
+        src
+    }
+    kind
+    role
+    sex
+}

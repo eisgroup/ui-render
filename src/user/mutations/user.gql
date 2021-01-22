@@ -1,0 +1,6 @@
+#import "../fragments/User.gql"
+mutation user($user: UserInput!) {
+    user(user: $user) {
+        ...AllUserInfo
+    }
+}

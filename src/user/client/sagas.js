@@ -5,8 +5,8 @@ import { all, call, delay, put, selectState, spawn, takeLatest } from 'modules-p
 import { ROUTE, URL } from 'modules-pack/variables'
 import { Active, CREATE, LOGIN, RESET, sanitizeGqlResponse, SET, SUCCESS } from 'utils-pack'
 import { SELF, USER_LOGIN } from '../constants'
-// import { user as mutation } from './mutations'
-// import { user as query } from './queries'
+import '../mutations' // setup Active.UserMutation
+import '../queries' // setup Active.UserQuery
 
 /**
  * ASYNC TASKS =================================================================
@@ -85,7 +85,6 @@ function * loginSuccessFlow ({meta: {form} = {}}) {
  */
 export function * infoGqlFlow () {
   /* API Request and Wait for Response */
-  if (!Active.UserQuery) throw new Error('GraphQL Active.UserQuery must be defined first')
   const body = {query: Active.UserQuery}
   yield put(apiAction(URL.API_GQL, CREATE, {body}, {...body, headers}))
   const {payload = {}, meta: {result} = {}} = yield call(subscribeToApiResults, URL.API_GQL, CREATE, body)
@@ -114,7 +113,6 @@ function * loginOpen () {
 }
 
 function * userMutate ({payload}) {
-  if (!Active.UserMutation) throw new Error('GraphQL Active.UserMutation must be defined first')
   const body = {query: Active.UserMutation, variables: {user: payload}}
   yield put(apiAction(URL.API_GQL, CREATE, {body}, {...body, headers}))
 }

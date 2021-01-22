@@ -1,0 +1,9 @@
+fragment File on File {
+    src
+    name
+    i
+    kind
+    creatorId
+    created
+    updated
+}
