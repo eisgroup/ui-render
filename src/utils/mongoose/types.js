@@ -1,5 +1,4 @@
-import { PERMISSION } from 'modules-pack/user/definitions'
-import { CURRENCY, PHONE, VALIDATE } from 'modules-pack/variables'
+import { CURRENCY, PERMISSION, PHONE, VALIDATE } from 'modules-pack/variables'
 import mongoose from 'mongoose'
 import { phone } from 'react-ui-pack/inputs/normalizers'
 import {

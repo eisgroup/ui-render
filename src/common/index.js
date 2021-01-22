@@ -5,7 +5,7 @@ import saga from '../saga'
 import socket from '../socket'
 
 /**
- * EXPORTS =====================================================================
+ * EXAMPLE EXPORTS =============================================================
  * Modules' Exposing API - to enable consistent and maintainable app integration
  * =============================================================================
  */

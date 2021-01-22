@@ -1,0 +1,47 @@
+# =============================================================================
+# GRAPHQL SCHEMA
+# Type definitions for Clients
+# =============================================================================
+scalar CurrencyAmount
+scalar CurrencySymbol # example: enum of [USD, EUR...]
+
+# -----------------------------------------------------------------------------
+# SUMMARY
+# -----------------------------------------------------------------------------
+#extend type Query {
+#}
+
+#extend type Mutation {
+#}
+
+#extend type Subscription {
+#}
+
+
+# -----------------------------------------------------------------------------
+# TYPES
+# -----------------------------------------------------------------------------
+type Pay {
+    currency: CurrencySymbol
+    interval: Int # milliseconds - i.e. ONE_HOUR = pay per hour, ONE_DAY = pay per day
+    min: CurrencyAmount
+    max: CurrencyAmount
+    total: CurrencyAmount # takes priority over min/max and interval (not in initial release)
+}
+
+input PayInput {
+    currency: CurrencySymbol
+    interval: Int # milliseconds - i.e. ONE_HOUR = pay per hour, ONE_DAY = pay per day
+    min: CurrencyAmount
+    max: CurrencyAmount
+    total: CurrencyAmount
+}
+
+# -----------------------------------------------------------------------------
+# INTERFACES
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# APP SPECIFIC
+# -----------------------------------------------------------------------------
