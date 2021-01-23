@@ -1,7 +1,3 @@
-import { USER } from './constants'
-import reducer from './reducers'
-import select from './selectors'
-
 /**
  * EXPORTS =====================================================================
  * Modules' Exposing API - to enable consistent and maintainable app integration
@@ -9,17 +5,3 @@ import select from './selectors'
  */
 
 export * from './constants'
-export * from './actions'
-export * from './definitions'
-export * from './logic'
-export {
-  select,
-}
-
-const user = {
-  NAME: USER,
-  reducer,
-  select,
-}
-
-export default user

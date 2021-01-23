@@ -13,5 +13,7 @@ export const DEFAULT = {
   LOGIN_DURATION: __PROD__ ? ONE_WEEK : ONE_DAY, // match `TOKEN_LIFESPAN_JWT`
   GRADIENT_HUE_COUNT: 3,
   PAY_INTERVAL: ONE_HOUR,
+  QUERY_ID_LIMIT: 10000, // about 2.9 KB for 100 ObjectIds, allowing 33k IDs per 1 MB
+  QUERY_USER_LIMIT: 300, // each user response takes about ?, GraphQl default limit is 1 MB
   THEME: THEME.LIGHT,
 }

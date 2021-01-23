@@ -1,7 +1,7 @@
 import { stickyPlaceholder } from 'modules-pack/form/constants'
-import { FIELD, SERVICE } from 'modules-pack/variables'
+import { FIELD } from 'modules-pack/variables'
 import { timeInThePast } from 'react-ui-pack/inputs/validationRules'
-import { optionsFrom } from 'utils-pack'
+import { Active, capitalize, optionsFrom } from 'utils-pack'
 import { namespace } from 'utils-pack/utility'
 import { _USER, SEX } from './definitions'
 import { _ } from './translations'
@@ -12,7 +12,9 @@ import { _ } from './translations'
  */
 
 export const USER = 'USER' // Namespace this module
-export const USER_CLIENT = namespace(USER, SERVICE.CLIENT) // Namespace this module for frontend
+export const USER_CLIENT = namespace(USER, Active.SERVICE) // Namespace this module for frontend
+export const USER_SERVER = namespace(USER, Active.SERVICE) // Namespace this module for backend
+export const USER_MODEL = capitalize(USER) // db model name
 export const SELF = `${USER}_SELF`
 export const USER_LOGIN = `${USER}_LOGIN`
 

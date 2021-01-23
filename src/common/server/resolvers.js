@@ -1,9 +1,10 @@
 import { GraphQLScalarType } from 'graphql'
 import JSON from 'graphql-type-json'
 import { Kind } from 'graphql/language'
-import { gqlDynamicObjType, gqlEnumType, Response } from 'modules-pack/utils/server/resolver'
+import { gqlDynamicObjType, gqlEnumType, gqlTagLevelType, Response } from 'modules-pack/utils/server/resolver'
 import { PERMISSION, PHONE } from 'modules-pack/variables'
-import { isPhoneNumber, LANGUAGE } from 'utils-pack'
+import { isPhoneNumber, LANGUAGE, LANGUAGE_LEVEL } from 'utils-pack'
+import { toRgbaColor } from 'utils-pack/color'
 import { toTimestamp } from 'utils-pack/time'
 import { isGoodPassword, isId } from 'utils-pack/utility'
 import isEmail from 'validator/lib/isEmail'
@@ -67,6 +68,21 @@ export const Permissions = gqlDynamicObjType('Permissions', PERMISSION, Boolean)
 export const Phones = gqlDynamicObjType('Phones', PHONE, String, {validate: isPhoneNumber})
 
 export const LanguageCode = gqlEnumType('LanguageCode', LANGUAGE)
+export const LanguageLevel = gqlTagLevelType('LanguageLevel', LANGUAGE, LANGUAGE_LEVEL)
+export const LanguageLevelRange = gqlTagLevelType('LanguageLevelRange', LANGUAGE, LANGUAGE_LEVEL, {range: true})
+
+const Color = new GraphQLScalarType({
+  name: 'Color',
+  description: 'RGB(A) color code. Example input: String `"150,190,220"` or Array `[150,190,220,0.87]`',
+  serialize: (value) => value,  // value sent to the client
+  parseValue (value) {return this._fromClient(value)},
+  parseLiteral (ast) {return this._fromClient(ast.value)},
+})
+Color._fromClient = function (value) {
+  const color = toRgbaColor(value)
+  if (color) return color
+  throw Response.badRequest(`Invalid ${this.name} ${value}, must be an RGB(A) array of numbers`)
+}
 
 export default {
   Id,
@@ -76,6 +92,9 @@ export default {
   Permissions,
   Phones,
   LanguageCode,
+  LanguageLevel,
+  LanguageLevelRange,
+  Color,
   JSON,
   Query: {
     cursor: (_, __, {res}) => {

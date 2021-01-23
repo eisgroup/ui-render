@@ -29,15 +29,15 @@ extend type Mutation {
 
 type User {
     id: Id! # can be used to derive created Timestamp
-    auth: Int
+    auth: Int # authorization level
     email: Email # for privacy reasons, may not be shown, but always exists
     avatar: URL
     name: String
     surname: String
+    birthday: Timestamp
     sex: Int
     role: Int
     kind: Int
-    birthday: Timestamp
     lastOnline: Timestamp
     lastLogin: Timestamp! # for privacy reasons, may not be shown, used to check whether instance is User
     updated: Timestamp!

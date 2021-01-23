@@ -1,4 +1,4 @@
-import { SERVICE } from 'modules-pack/variables'
+import { Active } from 'utils-pack'
 import { namespace } from 'utils-pack/utility'
 
 /**
@@ -7,4 +7,4 @@ import { namespace } from 'utils-pack/utility'
  */
 
 export const COMMON = 'COMMON' // Namespace this module
-export const COMMON_SERVER = namespace(COMMON, SERVICE.SERVER) // Namespace this module for backend
+export const COMMON_SERVER = namespace(COMMON, Active.SERVICE) // Namespace this module for backend

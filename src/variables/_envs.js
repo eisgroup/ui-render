@@ -1,10 +1,20 @@
-import { __PROD__, Active, ENV } from 'utils-pack'
+import { __CLIENT__, __PROD__, Active, ENV } from 'utils-pack'
+
+/* Platform Prefixes */
+export const SERVICE = {
+  BOT: 'BOT',
+  CLIENT: 'CLIENT',
+  DESKTOP: 'DESKTOP',
+  MOBILE: 'MOBILE',
+  SERVER: 'SERVER',
+  WEB: 'WEB',
+}
 
 /* Additional Environment Variables */
 export const SECRET = __PROD__ ? ENV.SECRET : ENV.REACT_APP_SECRET  // make backend use REACT for testing socket actions
 
 /* Additional Globally Accessible Objects */
-Active.SERVICE = ENV.SERVICE
+Active.SERVICE = ENV.SERVICE || (__CLIENT__ ? SERVICE.CLIENT : SERVICE.SERVER)
 Active.state = undefined  // current Store State
 Active.store = {}  // Redux Store
 Active.createStore = () => {} // to create a new store instance within sagas without importing `redux` module

@@ -10,6 +10,7 @@ import Model from './models'
  */
 assertBackend()
 
+export * from './validators'
 const placeServer = {
   NAME: PLACE_SERVER,
   Model,

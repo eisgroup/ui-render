@@ -2,7 +2,7 @@ import { GraphQLScalarType } from 'graphql'
 import { SevenBoom as Response } from 'graphql-apollo-errors'
 import { Kind } from 'graphql/language'
 import { SERVER, UPLOAD } from 'modules-pack/variables'
-import { __DEV__, definitionByValue, enumFrom, fileExtensionNormalized } from 'utils-pack'
+import { __DEV__, definitionByValue, enumFrom, fileExtensionNormalized, hasListValue, isObject } from 'utils-pack'
 import { base64Encode } from './file'
 
 export { Response }
@@ -121,8 +121,8 @@ export function gqlDynamicObjType (name, DEFINITION, ValueType = String, {valida
  * @returns {GraphQLScalarType} tag/level - type
  */
 export function gqlTagLevelType (name, TAG, TAG_LEVEL, {description, range = false} = {}) {
-  const tagBy = definitionByCode(TAG)
-  const tagLevelBy = definitionByCode(TAG_LEVEL)
+  const tagBy = definitionByValue(TAG)
+  const tagLevelBy = definitionByValue(TAG_LEVEL)
   const tagEnums = enumFrom(TAG)
   const tagLevelEnums = enumFrom(TAG_LEVEL)
   const Type = new GraphQLScalarType({
@@ -178,7 +178,7 @@ export function gqlFileType (name, KINDS = ['public'], {description} = {}) {
   KINDS.forEach(kind => (isAllowed[kind] = true))
   const Type = new GraphQLScalarType({
     name,
-    description: description || ('An object mapping of file kinds `[' + KINDS + ']` to list of files `[{i, src, name, created}]`'),
+    description: description || ('Object with dynamic key/value pairs:\n- Key \`String\` `[' + KINDS + ']` to list of files `[{i, src, name, created}]`'),
     serialize: ({dir, data}) => {
       const result = {}
       const uploadPath = `${__DEV__ ? UPLOAD_PATH : UPLOAD_DIR}${dir}`

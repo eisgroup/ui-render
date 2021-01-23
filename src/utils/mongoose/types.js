@@ -9,6 +9,7 @@ import {
   isContinuousNumberRanges,
   isNumeric,
   isPhoneNumber,
+  LANGUAGE,
   startEndFromNumberRanges
 } from 'utils-pack'
 import { toRgbaColor } from 'utils-pack/color'
@@ -51,6 +52,18 @@ export const ActionHistory = {type: [Action], set: val => val.sort(by('-meta.tim
 export const Color = {type: [Number], validate: isColor, default: undefined}
 export const CurrencySymbol = {type: String, enum: enumFrom(CURRENCY), default: undefined}
 export const Email = {type: String, validate: isEmail}
+export const LanguageCode = {type: String, enum: enumFrom(LANGUAGE), default: undefined}
+export const FileType = new Schema({
+  src: String, // may be absent (to be computed with resolvers if the file is stored by the server)
+  i: String,
+  kind: String,
+  name: {type: String, maxLength: VALIDATE.FILE_NAME_MAX_LENGTH},
+  creatorId: Id,
+  created: Timestamp,
+  updated: Timestamp,
+  _id: false,
+})
+export const Files = {type: [FileType], default: undefined}
 export const Location = new Schema({
   lat: {type: Number, required},
   lng: {type: Number, required},
@@ -85,17 +98,6 @@ export const Phones = new Schema({
   }), {}),
   _id: false,
 }, {timestamps: false, default: undefined})
-export const FileType = new Schema({
-  src: String, // may be absent (to be computed with resolvers if the file is stored by the server)
-  i: String,
-  kind: String,
-  name: {type: String, maxLength: VALIDATE.FILE_NAME_MAX_LENGTH},
-  creatorId: Id,
-  created: Timestamp,
-  updated: Timestamp,
-  _id: false,
-})
-export const FileList = {type: [FileType], default: undefined}
 export const TimeRange = {from: Timestamp, to: Timestamp, _id: false}
 export const TimeRanges = {
   type: [TimeRange],
@@ -170,7 +172,7 @@ export function ForeignKey (modelName, options) {
     type: ObjectId, // todo: test if it works with custom Id string and nested queries work as well
     ref: modelName,
     validate: {
-      validator: (input) => mongoose.model(modelName).findById(input),
+      validator: input => mongoose.model(modelName).findById(input),
       message: props => `Foreign key ID ${props.value} does not exist`
     },
     ...options,
@@ -202,23 +204,6 @@ export function ForeignDynamicKey (refField, options) {
     },
     ...options,
   }
-}
-
-/**
- * todo: Files Type Creator for Mongoose Model Field
- *
- * @param {Array<String>} [kinds] - list of photo kinds, example ['public', 'private']
- * @returns {Object<dir, data>} type - for Mongoose field definition
- * @constructor
- */
-export function Files (kinds = ['public']) {
-  const data = {}
-  kinds.forEach(key => (data[key] = FileList))
-  return new Schema({
-    dir: {type: String, required}, // relative path to UPLOAD_PATH where photos are saved, for resolver to compute src
-    data,
-    _id: false,
-  }, {timestamps: false})
 }
 
 /**

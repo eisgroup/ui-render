@@ -2,7 +2,8 @@ import { __CLIENT__, ENV } from 'utils-pack'
 
 /* API Endpoints */
 export const URI = {
-  GQL: '/gql'
+  GQL: '/gql',
+  GQL_SUBSCRIPTIONS: '/subscriptions',
 }
 export const URL = {
   API: ENV.API_URL || ENV.REACT_APP_API_URL || (__CLIENT__ ? window.location.origin : ''),

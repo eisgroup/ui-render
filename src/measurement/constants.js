@@ -1,4 +1,4 @@
-import { SERVICE } from 'modules-pack/variables'
+import { Active } from 'utils-pack'
 import { namespace } from 'utils-pack/utility'
 
 /**
@@ -7,4 +7,4 @@ import { namespace } from 'utils-pack/utility'
  */
 
 export const MEASUREMENT = 'MEASUREMENT' // Namespace this module
-export const MEASUREMENT_SERVER = namespace(MEASUREMENT, SERVICE.SERVER) // Namespace this module for backend
+export const MEASUREMENT_SERVER = namespace(MEASUREMENT, Active.SERVICE) // Namespace this module for backend
