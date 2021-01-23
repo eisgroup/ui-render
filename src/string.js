@@ -5,6 +5,7 @@ import pluralizer from 'pluralize'
 const symbols = `~!@#%^&*()[]|{}<>:;,.?-+_=` // only use safe symbols
 const symbolRatio = symbols.length / (62 + symbols.length) // rate of symbols against alphanumeric characters
 const upperThreshold = 1 - 26 / (62 + symbols.length) // minimum Math.random() result for upper case
+const upperThresholdAlphaNum = 1 - 26 / 62 // minimum Math.random() result for upper case
 
 /**
  * STRING FUNCTIONS ===========================================================
@@ -400,19 +401,20 @@ export function randomFromString(string) {
  * @param {Boolean} [hex] - whether to create hex string only
  * @returns {String} random - ASCII compliant string
  */
-export function randomString(min = 32, max = 64, { alphaNum = false, hex = false } = {}) {
+export function randomString (min = 32, max = 64, {alphaNum = false, hex = false} = {}) {
 	const searchSpace = hex ? 16 : 36
-	const result = [...Array(randomNumberInRange(min, max))]
+	const uppercase = alphaNum ? upperThresholdAlphaNum : upperThreshold
+	return [...Array(randomNumberInRange(min, max))]
 		.map(() => {
 			const random = Math.random()
 			if (!alphaNum && !hex && random < symbolRatio) return randomFromString(symbols)
 			const string = (~~(random * searchSpace)).toString(searchSpace)
-			return !hex && random > upperThreshold ? string.toUpperCase() : string
+			return !hex && random > uppercase ? string.toUpperCase() : string
 		})
 		.join('')
-	if (result === randomString.prevResult) return randomString(min, max, {alphaNum, hex})
-	return randomString.prevResult = result
 }
+
+randomString.history = []
 
 /**
  * Hash ASCII String using SHA256

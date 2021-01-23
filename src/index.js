@@ -23,4 +23,4 @@ export * from './storage'
 export * from './string'
 // export * from './time' // to be imported directly to reduce bundle size
 // export * from './translations' // to be imported directly to reduce bundle size
-// export * from './utility' // to be imported directly to reduce bundle size
+export * from './utility'

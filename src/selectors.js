@@ -1,9 +1,9 @@
 import now from 'performance-now' // adds almost zero KB to bundle size because browsers have window.performance.now()
 import { createSelector } from 'reselect'
-import { ONE_MILLISECOND } from 'utils-pack/constants'
-import { formatNumber } from 'utils-pack/number'
 import { __CLIENT__, __DEV__, Active } from './_envs'
+import { ONE_MILLISECOND } from './constants'
 import { logSelector } from './log'
+import { formatNumber } from './number'
 
 /**
  * Selector Decorator to turn all class static property functions into Memoized Functions

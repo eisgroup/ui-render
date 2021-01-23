@@ -1,6 +1,7 @@
 import {
   by,
   hasCommonListValue,
+  hasDuplicateInList,
   hasListValue,
   intersection,
   isCollection,
@@ -167,6 +168,28 @@ describe(`${hasCommonListValue.name}()`, () => {
     expect(hasCommonListValue([1, 2, 3, 4, 'id'], [1, 3], [2, 3, 4])).toEqual(true)
     expect(hasCommonListValue([1, 2, null, 4, 'id'], [1, 3], [2, 3, 4])).toEqual(false)
     expect(hasCommonListValue([4, 'id'], [1, 3])).toEqual(false)
+  })
+})
+
+describe(`${hasDuplicateInList.name}()`, () => {
+  it('returns true when at least one duplicate value is found in the array', () => {
+    expect(hasDuplicateInList([1, 2, 3, 4, 5, 1])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, 4, 5, 1, 1, 5])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, '5', '5'])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, '', ''])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, null, null])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, false, false])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, undefined, undefined])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, Infinity, Infinity])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, -Infinity, -Infinity])).toEqual(true)
+  })
+  it('returns false when no duplicate found in the array', () => {
+    expect(hasDuplicateInList([1, 2, 3, 4, 5])).toEqual(false)
+    expect(hasDuplicateInList([1, 2, 3, 4, 0, null, false, undefined, Infinity, -Infinity])).toEqual(false)
+    expect(hasDuplicateInList([1, 2, 3, 4, '1'])).toEqual(false)
+    expect(hasDuplicateInList([1, 2, 3, 4, '1', '5'])).toEqual(false)
+    expect(hasDuplicateInList(NON_ARRAY_VALUES.filter(v => !isNaN(v)))).toEqual(false)
+    expect(hasDuplicateInList(NON_COLLECTION_VALUES.filter(v => !isNaN(v)))).toEqual(false)
   })
 })
 

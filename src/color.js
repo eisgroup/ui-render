@@ -1,6 +1,6 @@
-import { isString } from 'utils-pack/string'
 import { hasListValue, isList } from './array'
 import { round } from './number'
+import { isString } from './string'
 
 /**
  * COLOR FUNCTIONS =============================================================

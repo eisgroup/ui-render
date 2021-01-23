@@ -1,7 +1,8 @@
+import { isInList } from 'utils-pack/array'
 import { Active, ENV } from './_envs'
 import { fromJSON } from './codec'
 import { rad } from './number'
-import { padStringLeft, randomString } from './string'
+import { isString, padStringLeft, randomString } from './string'
 
 /**
  * AD HOC FUNCTIONS ============================================================
@@ -9,8 +10,7 @@ import { padStringLeft, randomString } from './string'
  */
 
 /**
- * Todo: test creating 1000 items per second and filter for duplicate
- * Create Short Auto Incrementing ID string derived from Timestamp in milliseconds
+ * Create Case-Sensitive Short Auto Incrementing ID string derived from Timestamp in milliseconds
  * @Important: modifying this function may break existing database implementations
  * @Rationale: primary use case is for generating globally unique Ids from frontend
  *
@@ -22,7 +22,7 @@ import { padStringLeft, randomString } from './string'
  *           => Sorting will stop working after May 15, 2109, because 64^7 limit padding is reached
  *              -> The solution is to increment the Id.padCount to 8, which will work until Aug 02, the year 10,889.
  *
- *    - first 8 characters is Hex string of Timestamp
+ *    - first 7 characters is Hex string of Timestamp
  *    - Last 3 character is randomized using alphanumeric characters to avoid collision
  *    - Collision probability is near zero in practice, because 3 random string suffix
  *      using 62 characters have 62^3 = 238,328 possibilities,
@@ -30,12 +30,29 @@ import { padStringLeft, randomString } from './string'
  *    - Collision from the same User can be prevented with `throttle` function
  *      => this function is purposely slow to prevent generating too many Ids within one millisecond.
  *
- * @param {Number} [timestamp] - custom timestamp to generate ID for, defaults to Date.now()
+ * @param {Number|String} [timestamp] - custom timestamp to generate ID for, defaults to Date.now()
  * @param {String} [alphabet] - custom characters to use for Id generation, default to alphaNumeric characters
  * @param {String} [suffix] - string to append to ID timestamp, default is random alphanumeric 3 characters string
  * @return {String} ID - example: 'MJ8FU-RVRo'
  */
 export function Id ({timestamp = Date.now(), alphabet = Id.alphabet, suffix = randomString(3, 3, {alphaNum: true})} = {}) {
+  // Ensure unique suffix for each millisecond
+  const history = Id.history[timestamp]
+  if (history) {
+    while (isInList(history, suffix)) {
+      suffix = randomString(3, 3, {alphaNum: true})
+    }
+    history.push(suffix)
+  } else {
+    Id.history[timestamp] = [suffix]
+  }
+
+  // Garbage clean Id history
+  for (const time in Id.history) {
+    if (time < timestamp) delete Id.history[time]
+  }
+
+  // Create hashed Id from Timestamp
   const charsCount = alphabet.length
   let time = []
   let remainder = 0
@@ -53,6 +70,17 @@ export function Id ({timestamp = Date.now(), alphabet = Id.alphabet, suffix = ra
 Id.alphabet = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
 Id.padCount = 7
 Id.padTime = Array(Id.padCount).fill(Id.alphabet[0]).join('')
+Id.pattern = new RegExp(`^[${Id.alphabet}]+$`)
+Id.history = {} // log of previously generated Ids by timestamp
+
+/**
+ * Check if given string is a valid Short Auto Incrementing ID derived from Timestamp in milliseconds
+ * @param {*} value - to check
+ * @return {Boolean} true - if valid, else false
+ */
+export function isId (value) {
+  return isString(value) && Id.pattern.test(value)
+}
 
 /**
  * Get Timestamp in Milliseconds from Id string
@@ -148,6 +176,16 @@ export function createScript (src, callback) {
   o.async = true
   if (callback) { o.addEventListener('load', callback, false) }
   s.parentNode.insertBefore(o, s)
+}
+
+/**
+ * Create standardized constant for namespacing modules
+ * @param {String} constant - to be used as unique module name
+ * @param {String} service - usually from ENV.SERVICE (example: "WEB", "SERVER", "API")
+ * @returns {String} namespace - prefixed with service name (example: "~WEB USER_LOGIN")
+ */
+export function namespace (constant, service) {
+  return `~${service} ${constant}`
 }
 
 /**

@@ -1,4 +1,14 @@
-import { ONE_HOUR, ONE_MINUTE, ONE_MONTH, ONE_SECOND, ONE_WEEK, ONE_YEAR } from 'utils-pack'
+import {
+  cloneDeep,
+  hasDuplicateInList,
+  isId,
+  ONE_HOUR,
+  ONE_MINUTE,
+  ONE_MONTH,
+  ONE_SECOND,
+  ONE_WEEK,
+  ONE_YEAR
+} from 'utils-pack'
 import { distanceBetween, Id, timestampFromId } from '../utility'
 
 test(`${distanceBetween.name}() returns correct distance between two points in millimeters`, () => {
@@ -8,19 +18,12 @@ test(`${distanceBetween.name}() returns correct distance between two points in m
   expect(distanceBetween(point1, point2)).toEqual(distance)
 })
 
-describe(`${Id.name}() and ${timestampFromId.name}()`, () => {
+describe(`${Id.name}(), ${isId.name}(), and ${timestampFromId.name}()`, () => {
   const timeCharCount = Id.padCount
   const id = Id()
   const limit = Math.pow(64, timeCharCount) // the limit of timestamp
 
   test(`${Id.name}() generates auto incrementing ID string using Timestamp`, () => {
-    // let count = 333
-    // const result = []
-    // while (count > 0) {
-    //   count--
-    //   result.push(Id())
-    // }
-    // console.log(result)
     expect(id.length).toBeGreaterThanOrEqual(Id.padCount + 3)
     expect(Id({timestamp: 0}).substring(0, timeCharCount)).toEqual('-------')
     expect(Id({timestamp: 1}).substring(0, timeCharCount)).toEqual('------0')
@@ -45,6 +48,10 @@ describe(`${Id.name}() and ${timestampFromId.name}()`, () => {
     const id6 = Id({timestamp: now + ONE_MONTH})
     const id7 = Id({timestamp: now + ONE_YEAR})
     const id8 = Id({timestamp: now + 10 * ONE_YEAR})
+    const id9 = Id({timestamp: now + 20 * ONE_YEAR})
+    const list = [id, id1, id2, id3, id4, id5, id6, id7, id8, id9]
+    const listSorted = cloneDeep(list)
+    listSorted.sort()
     expect(id1 > id).toBe(true)
     expect(id2 > id1).toBe(true)
     expect(id3 > id2).toBe(true)
@@ -53,6 +60,41 @@ describe(`${Id.name}() and ${timestampFromId.name}()`, () => {
     expect(id6 > id5).toBe(true)
     expect(id7 > id6).toBe(true)
     expect(id8 > id7).toBe(true)
+    expect(id9 > id8).toBe(true)
+    expect(list).toEqual(listSorted)
+  })
+
+  const testCount = 10000
+  const start = Date.now()
+  const list = Array(testCount).fill(true).map(() => Id())
+  const end = Date.now()
+  const total = Math.round(testCount / (end - start)).toLocaleString()
+  const totalPerSec = (total * 1000).toLocaleString()
+
+  test(`${Id.name}() can generate ${total} Ids per millisecond (${totalPerSec}/s) without duplicate`, () => {
+    expect(hasDuplicateInList(list)).toBe(false)
+  })
+
+  test(`${isId.name}() returns true for correct string format`, () => {
+    expect(isId(Id.alphabet)).toBe(true)
+  })
+
+  test(`${isId.name}() returns false for incorrect format`, () => {
+    expect(isId(Id.alphabet + '#')).toBe(false)
+    expect(isId(Id.alphabet + '!')).toBe(false)
+    expect(isId(Id.alphabet + '@')).toBe(false)
+    expect(isId(Id.alphabet + '>')).toBe(false)
+    expect(isId('<' + Id.alphabet + '>')).toBe(false)
+  })
+
+  test(`${isId.name}() returns false for numbers or non-string types`, () => {
+    expect(isId(12345567890)).toBe(false)
+    expect(isId({})).toBe(false)
+    expect(isId([])).toBe(false)
+    expect(isId(null)).toBe(false)
+    expect(isId(false)).toBe(false)
+    expect(isId(undefined)).toBe(false)
+    expect(isId(NaN)).toBe(false)
   })
 
   test(`${timestampFromId.name}() converts Id string to Timestamp in milliseconds`, () => {

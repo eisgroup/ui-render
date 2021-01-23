@@ -32,14 +32,14 @@ export function hasListValue (data) {
 /**
  * Check if given lists have at least one intersecting value in each list
  *
- * @param {Array} args - lists to test
+ * @param {Array[]} lists - array of arrays to test
  * @return {boolean} - true if a common value is found among given lists
  */
-export function hasCommonListValue (...args) {
+export function hasCommonListValue (...lists) {
   // Find the list with the shortest length
   let listLength = Infinity
   let shortestList = []
-  args.forEach(list => {
+  lists.forEach(list => {
     if (list.length < listLength) {
       listLength = list.length
       shortestList = list
@@ -49,8 +49,18 @@ export function hasCommonListValue (...args) {
   // If at least one value found among all lists, skip the loop and return true
   return shortestList.some(value => {
     // If value does not exist in at least one list, skip to next value
-    return !args.some(list => !isInList(list, value))
+    return !lists.some(list => !isInList(list, value))
   })
+}
+
+/**
+ * Check if given list contains primitive duplicate values
+ * @Note: array.indexOf(NaN) always returns -1, even if the array has `NaN` value
+ * @param {*[]} array - to check for duplicates
+ * @returns {Boolean} true - if duplicate found
+ */
+export function hasDuplicateInList (array) {
+  return array.some((value, index, self) => self.indexOf(value) !== index)
 }
 
 /**

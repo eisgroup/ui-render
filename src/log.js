@@ -1,6 +1,7 @@
 import { get } from 'lodash'
 import now from 'performance-now'
-import { __CLIENT__, __DEV__, __TEST__, Active } from './_envs'
+import { __BACKEND__, __CLIENT__, __DEV__, __TEST__, Active } from './_envs'
+import { WARN } from './constants'
 import { isFunction } from './function'
 import { formatNumber } from './number'
 import { isInString } from './string'
@@ -274,4 +275,18 @@ export function warn (...args) {
   } else {
     console.warn('✋ ', ...args)
   }
+}
+
+/**
+ * Ensure file is loaded in correct platform
+ */
+export function assertFrontend () {
+  if (__BACKEND__) throw new Error(`${WARN} WARNING! Backend file loaded in Frontend!!!`)
+}
+
+/**
+ * Ensure file is loaded in correct platform
+ */
+export function assertBackend () {
+  if (__CLIENT__) throw new Error(`${WARN} WARNING! Frontend file loaded in Backend!!!`)
 }
