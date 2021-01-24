@@ -159,7 +159,7 @@ export function gqlTagLevelType (name, TAG, TAG_LEVEL, {description, range = fal
 /**
  * GraphQL File Type - Dynamically defined given list of allow file kinds
  * @example:
- *    const UserPhotos = graphQlFileType('UserPhotos')
+ *    const UserPhotos = gqlFileType('UserPhotos')
  *    >>> {
  *          'public': {
  *              i

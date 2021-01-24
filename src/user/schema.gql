@@ -2,7 +2,7 @@
 # GRAPHQL SCHEMA
 # Type definitions for Clients
 # =============================================================================
-scalar UserPhotos
+#scalar UserPhotos
 
 # -----------------------------------------------------------------------------
 # SUMMARY
