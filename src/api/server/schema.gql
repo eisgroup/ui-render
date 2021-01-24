@@ -1,0 +1,53 @@
+# =============================================================================
+# GRAPHQL SCHEMA
+# Type definitions for Clients
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# SUMMARY
+# -----------------------------------------------------------------------------
+extend type Query {
+    apiKey(filter: ApiKeyInput!): ApiKey
+    apiKeys(filter: ApiKeyInput): [ApiKey!]!
+}
+
+#extend type Mutation {
+#}
+
+#extend type Subscription {
+#}
+
+
+type ApiKey {
+    api: String
+    key: String
+    platform: String
+    provider: String
+    active: Boolean
+    fail: ApiKeyFail
+    created: Timestamp!
+    updated: Timestamp!
+}
+
+type ApiKeyFail {
+    time: Timestamp
+    reason: String
+    message: String
+    request: JSON
+}
+
+input ApiKeyInput {
+    api: String
+    key: String
+    platform: String
+    provider: String
+    active: Boolean
+    fail: ApiKeyFailInput
+}
+
+input ApiKeyFailInput {
+    time: Timestamp
+    reason: String
+    message: String
+    request: JSON
+}

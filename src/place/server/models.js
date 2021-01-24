@@ -1,7 +1,7 @@
+import GooglePlaces from 'modules-pack/api/server/GooglePlaces'
+import { Address, createModel, Files, index, Name, Point, required, URL } from 'modules-pack/utils/mongoose'
 import { hasListValue, isInList, ONE_MONTH, toUpperCase } from 'utils-pack'
 import { toTimestamp } from 'utils-pack/time'
-import { Address, createModel, index, Name, PhotoList, Point, required, URL } from '../../common/utils/db'
-import GooglePlaces from '../api/GooglePlaces' // todo
 import { PLACE_MODEL } from '../constants'
 
 /**
@@ -19,7 +19,7 @@ const Place = createModel(PLACE_MODEL, {
   country: Name,
   icon: URL,
   provider: {type: String, default: 'google'},
-  photos: PhotoList,
+  photos: Files,
 })
 export default Place
 

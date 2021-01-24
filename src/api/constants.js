@@ -1,5 +1,18 @@
 import { API_REQUEST_TIMEOUT } from 'modules-pack/variables'
-import { CREATE, DELETE, ERROR, GET, LIST, REQUEST, SUCCESS, TIMEOUT, UPDATE } from 'utils-pack'
+import {
+  Active,
+  capitalize,
+  CREATE,
+  DELETE,
+  ERROR,
+  GET,
+  LIST,
+  namespace,
+  REQUEST,
+  SUCCESS,
+  TIMEOUT,
+  UPDATE
+} from 'utils-pack'
 
 /**
  * CONSTANT VARIABLES ==========================================================
@@ -7,31 +20,33 @@ import { CREATE, DELETE, ERROR, GET, LIST, REQUEST, SUCCESS, TIMEOUT, UPDATE } f
  */
 
 /* State Action Types (must have NAME prefix) */
-export const NAME = 'API'  // Namespace this module
+export const API = 'API'  // Namespace this module
+export const API_SEVER = namespace(API, Active.SERVICE)  // Namespace this module for backend
+export const API_MODEL = capitalize(API)  // db model name
 export const API_PLATFORM_ANDROID = 'android'
 export const API_PLATFORM_IOS = 'ios'
 export const API_PLATFORM_WEB = 'web'
 export const API_PLACES = 'places'
 export const API_PROVIDER_GOOGLE = 'google'
 
-export const NETWORK = `${NAME}_NETWORK`  // Network connection
-export const ADD_ACTIONS_PENDING_AUTH = `${NAME}_ACTIONS_PENDING_AUTH`
-export const CLEAR_ACTIONS_PENDING_AUTH = `${NAME}_CLEAR_ACTIONS_PENDING_AUTH`
-export const ADD_ACTIONS_PENDING_LOCATION = `${NAME}_ACTIONS_PENDING_LOCATION`
-export const CLEAR_ACTIONS_PENDING_LOCATION = `${NAME}_CLEAR_ACTIONS_PENDING_LOCATION`
-export const ADD_ACTIONS_PENDING_NETWORK = `${NAME}_ACTIONS_PENDING_NETWORK`
-export const CLEAR_ACTIONS_PENDING_NETWORK = `${NAME}_CLEAR_ACTIONS_PENDING_NETWORK`
+export const NETWORK = `${API}_NETWORK`  // Network connection
+export const ADD_ACTIONS_PENDING_AUTH = `${API}_ACTIONS_PENDING_AUTH`
+export const CLEAR_ACTIONS_PENDING_AUTH = `${API}_CLEAR_ACTIONS_PENDING_AUTH`
+export const ADD_ACTIONS_PENDING_LOCATION = `${API}_ACTIONS_PENDING_LOCATION`
+export const CLEAR_ACTIONS_PENDING_LOCATION = `${API}_CLEAR_ACTIONS_PENDING_LOCATION`
+export const ADD_ACTIONS_PENDING_NETWORK = `${API}_ACTIONS_PENDING_NETWORK`
+export const CLEAR_ACTIONS_PENDING_NETWORK = `${API}_CLEAR_ACTIONS_PENDING_NETWORK`
 
 /* General */
-export const STORAGE_KEY_TOKEN = `${NAME}_TOKEN`
+export const STORAGE_KEY_TOKEN = `${API}_TOKEN`
 export const REQUEST_TIMEOUT = API_REQUEST_TIMEOUT
 export const AUTH = 'AUTH'  // Authentication resume action type
 export const LOCATION = 'LOCATION'  // Location resume action type
-export const API_CALL = `${NAME}_CALL`  // -> apiActionType identifier
+export const API_CALL = `${API}_CALL`  // -> apiActionType identifier
 export const API_ACTIONS = [GET, CREATE, UPDATE, DELETE, LIST]
 export const API_RESULTS = [REQUEST, SUCCESS, ERROR, TIMEOUT]
 export const NETWORK_ERROR_MESSAGES = ['Network Error']
-export const REQUEST_TIMEOUT_MESSAGE = `${NAME} Call Timeout`
+export const REQUEST_TIMEOUT_MESSAGE = `${API} Call Timeout`
 
 /**
  * RESPONSE STATUS CODES (same as Django Rest Framework) -----------------------

@@ -4,7 +4,7 @@
  */
 
 export {
-  NAME as API,
+  API,
   AUTH,
   NETWORK,
   ADD_ACTIONS_PENDING_AUTH

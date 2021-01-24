@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import { logSelector } from 'utils-pack'
-import { NAME as API } from '../../constants'
+import { API } from '../../constants'
 import { NAME as AUTH } from './constants'
 
 /**

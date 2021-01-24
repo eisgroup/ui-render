@@ -26,6 +26,11 @@ export const _USER = {
       [l.ENGLISH]: 'Staff',
       // [l.RUSSIAN]: 'Сотрудник',
     },
+    DEVELOPER: {
+      _: 199,
+      [l.ENGLISH]: 'Developer',
+      // [l.RUSSIAN]: 'Девелопер',
+    },
     ADMIN: {
       _: 999,
       [l.ENGLISH]: 'Admin',

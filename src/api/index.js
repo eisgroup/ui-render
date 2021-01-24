@@ -1,4 +1,4 @@
-import { NAME } from './constants'
+import { API } from './constants'
 import middleware, { createApiMiddleware } from './middleware'
 import reducer from './reducers'
 import * as select from './selectors'
@@ -18,7 +18,7 @@ export * from './utils'
 export { createApiMiddleware }
 
 const api = {
-  NAME,
+  NAME: API,
   reducer,
   select,
   middleware

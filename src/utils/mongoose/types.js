@@ -14,7 +14,7 @@ import {
 } from 'utils-pack'
 import { toRgbaColor } from 'utils-pack/color'
 import { isId } from 'utils-pack/utility'
-import isEmail from 'validator/es/lib/isEmail'
+import isEmailValidator from 'validator/es/lib/isEmail'
 import isURL from 'validator/es/lib/isURL'
 import './database' // initialize database automatically on import of this file
 
@@ -30,7 +30,7 @@ export const ObjectId = Schema.Types.ObjectId
 export const index = true
 export const required = true
 export const unique = true
-export const isEmail = [isEmail, 'Please enter a valid email address']
+export const isEmail = [isEmailValidator, 'Please enter a valid email address']
 export const isColor = [toRgbaColor, 'Please enter a valid RGBA(A) Color']
 export const Json = {type: Mixed, default: undefined}
 

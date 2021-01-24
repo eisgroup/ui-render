@@ -9,7 +9,7 @@ import { URL } from 'modules-pack/variables'
 import { CREATE, DELETE, ERROR, GET, isFunction, isList, LIST, REQUEST, SUCCESS, TIMEOUT, toJSON } from 'utils-pack'
 import mockStore from '../__mocks__/store'
 import { apiActionTest, apiActionType } from '../actions'
-import { ADD_ACTIONS_PENDING_NETWORK, NAME as API, NETWORK, NETWORK_ERROR_MESSAGES, } from '../constants'
+import { ADD_ACTIONS_PENDING_NETWORK, API, NETWORK, NETWORK_ERROR_MESSAGES, } from '../constants'
 import { urlWithParams } from '../middleware'
 
 const mock = new MockAdapter(request)

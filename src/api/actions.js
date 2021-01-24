@@ -18,7 +18,7 @@ import {
   UPDATE,
   warn
 } from 'utils-pack'
-import { API_ACTIONS, API_CALL, API_RESULTS, NAME, NETWORK, STORAGE_KEY_TOKEN } from './constants'
+import { API, API_ACTIONS, API_CALL, API_RESULTS, NETWORK, STORAGE_KEY_TOKEN } from './constants'
 
 /**
  * ACTION CREATORS =============================================================
@@ -104,11 +104,11 @@ export function apiActionTest (URL, ACTION, payload = {}, meta = {}) {
 export function apiActionType (URL, ACTION = GET, RESULT = null) {
   if (__DEV__) {
     if (ACTION && !isInList(API_ACTIONS, ACTION)) {
-      warn(new TypeError(`${NAME} action must be one of ${API_ACTIONS}`))
+      warn(new TypeError(`${API} action must be one of ${API_ACTIONS}`))
     }
 
     if (RESULT && !isInList(API_RESULTS, RESULT)) {
-      warn(new TypeError(`${NAME} result must be one of ${API_RESULTS}`))
+      warn(new TypeError(`${API} result must be one of ${API_RESULTS}`))
     }
   }
 
@@ -208,7 +208,7 @@ export function createAction ({type, payload, meta}, RESULT) {
  */
 export default class Api {
   static storeToken (token) {
-    if (!token) throw new Error(`${NAME} expects token, got ${token}`)
+    if (!token) throw new Error(`${API} expects token, got ${token}`)
     return performStorage(SET, STORAGE_KEY_TOKEN, token)
   }
 

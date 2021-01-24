@@ -13,6 +13,13 @@ export function hasAdminAuth (auth) {
 }
 
 /**
+ * Check if User has Developer or higher authorization based on User.auth
+ */
+export function hasDeveloperOrHigherAuth (auth) {
+  return auth >= _USER.ROLE.DEVELOPER._
+}
+
+/**
  * Check if User has Staff or higher authorization based on User.auth
  */
 export function hasStaffOrHigherAuth (auth) {
