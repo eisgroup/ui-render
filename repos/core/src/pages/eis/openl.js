@@ -2,10 +2,10 @@ import React, { Component } from 'react'
 import JsonView from 'react-ui-pack/JsonView'
 import ScrollView from 'react-ui-pack/ScrollView'
 import Text from 'react-ui-pack/Text'
+import Render from 'ui-renderer'
 import { logRender } from 'utils-pack'
 import data from './examples/_data'
 import meta from './examples/_meta'
-import Render from './Render'
 import { withUISetup } from './rules'
 
 // console.warn(toJSON(meta))

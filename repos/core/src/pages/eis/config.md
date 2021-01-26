@@ -128,10 +128,10 @@ const RenderField = {
   children: 'Any', // nested content to render inside field
   onClick: Function, // example: `{onClick: 'setState,active.plan'}` - `setState` function with `active.plan` argument
   style: Object, // css style to apply
-  className: 'CSS class name to apply',
-  hideOnEmpty: Boolean, // whether to not render the component if it's value is null/undefined/empty string
+   className: 'CSS class name to apply',
+   hideOnEmpty: Boolean, // whether to not render the component if its value is null/undefined/empty string
 
-  // Input attributes
+   // Input attributes
   name: 'adminCosts.adminCategory', // (required for inputs)* path to field value within *_data.json
   label: 'Input label',
   placeholder: 'To appear inside empty input when focused',

@@ -1,4 +1,4 @@
-console.log('babel.config loaded!!!')
+// console.log('babel.config loaded!!!')
 module.exports = (api) => {
   // if (process.env.NODE_ENV !== 'test') console.log('⚡ babel.config.js loaded!')
 

@@ -1,5 +1,7 @@
 import { renderField } from 'modules-pack/form/renders'
 import AutoSave from 'modules-pack/form/views/AutoSave'
+import { NAME as POPUP } from 'modules-pack/popup'
+import { stateAction } from 'modules-pack/redux'
 import { FIELD } from 'modules-pack/variables'
 import React from 'react'
 import { cn } from 'react-ui-pack'
@@ -11,9 +13,11 @@ import Dropdown from 'react-ui-pack/Dropdown'
 import Expand from 'react-ui-pack/Expand'
 import ExpandList from 'react-ui-pack/ExpandList'
 import { OK } from 'react-ui-pack/inputs/validationRules'
+import Json from 'react-ui-pack/JsonView'
 import Label from 'react-ui-pack/Label'
 import List from 'react-ui-pack/List'
 import ProgressSteps from 'react-ui-pack/ProgressSteps'
+import { renderCurrency, renderFloat } from 'react-ui-pack/renders'
 import Row from 'react-ui-pack/Row'
 import Space from 'react-ui-pack/Space'
 import TableView from 'react-ui-pack/TableView'
@@ -22,17 +26,21 @@ import Tabs from 'react-ui-pack/Tabs'
 import Text from 'react-ui-pack/Text'
 import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
-import { Active, debounce, get, isList, isObject, TIME_DURATION_INSTANT, toList } from 'utils-pack'
+import Render, { mapProps } from 'ui-renderer'
+import { Active, ALERT, debounce, get, isList, isNumeric, isObject, TIME_DURATION_INSTANT, toPercent } from 'utils-pack'
+import { _ } from 'utils-pack/translations'
 
 /**
  * UI RENDERER COMPONENTS SETUP ================================================
- * Map Component props for recursive rendering
+ * Map Component props and Methods for recursive rendering
  * =============================================================================
  */
 
 FIELD.TYPE = {
-  AUTOSAVE: 'AutoSubmit',
+  AUTO_SUBMIT: 'AutoSubmit',
 }
+
+Render.Tooltip = TooltipPop
 
 /**
  * Map UI Renderer props to final Rendering Component/s
@@ -45,17 +53,16 @@ FIELD.TYPE = {
  * @param {Boolean} relativeData - whether to retrieve values from local `_data`, defaults to global `data`
  * @param {Number|String} relativeIndex - used when component is rendered in array
  * @param {String} relativePath - path used to compute form input "name" attribute
- * @param {Form|Object} form - react-final-form
+ * @param {Object} form - react-final-form FormApi instance
  * @param {Boolean} [hideOnEmpty] - whether to not render the component if it's value is null/undefined/empty string
  * @param {Function} [Render] - the recursive renderer
  * @param {String} [version] - of the config
  * @param {*} [props] - other component props
  * @returns {JSX.Element|*} React component
  */
-export default function RenderComponent ({
+Render.Component = function RenderComponent ({
   view, items, data, _data, debug, form, hideOnEmpty,
-  relativeData, relativeIndex, relativePath,
-  Render = Active.Render, version,
+  relativeData, relativeIndex, relativePath, version,
   ...props
 }) {
   switch (view) {
@@ -81,7 +88,7 @@ export default function RenderComponent ({
       return <List items={_data} {...props} row/>
     }
 
-    case FIELD.TYPE.AUTOSAVE: {
+    case FIELD.TYPE.AUTO_SUBMIT: {
       return <AutoSave {...props}/>
     }
 
@@ -294,22 +301,50 @@ export default function RenderComponent ({
 }
 
 /**
- * Map Data by given Mapper definition
+ * Render Value Function Getter
  *
- * @param {Array} data - to map
- * @param {Object|String} mapper - object of key / value pairs (value being key path from `data`), or key path string
- * @param {Boolean} [debug] - whether to raise silenced error if data is missing or of incorrect type
- * @returns {Array} list - mapped from given data
+ * @param {String} Name - one of FIELD.TYPE definitions
+ * @returns {Function} renderer - that takes value as the first argument, and renders value in desired format
  */
-function mapProps (data, mapper, {debug} = {}) {
-  const mapData = typeof mapper === 'string' ? (item) => get(item, mapper, item) : (item, index) => {
-    const result = {}
-    for (const key in mapper) {
-      // `index` must be converted to string to match fallback value defined in config (which can only be string)
-      // fallback to item if key not found
-      result[key] = mapper[key] === '{index}' ? String(index) : get(item, mapper[key], item)
-    }
-    return result
+Render.Method = function RenderMethod (Name) {
+  switch (Name) {
+    case FIELD.RENDER.CURRENCY:
+      return (val, index, {id, decimals = 2, ...props} = {}) => (isNumeric(val)
+          ? <Row {...props}><Text className='margin-right-smaller'>$</Text> {renderCurrency(val, decimals)}</Row>
+          : null
+      )
+    case FIELD.RENDER.DOUBLE5:
+      return (val, index, {id, ...props} = {}) => renderFloat(val, 5, props)
+    case FIELD.RENDER.FLOAT:
+      return (val, index, {id, decimals, ...props} = {}) => isNumeric(val) ? renderFloat(val, decimals, props) : null
+    case FIELD.RENDER.PERCENT:
+      return (val, index, {decimals} = {}) => toPercent(val, decimals)
+    case FIELD.RENDER.TITLE_n_INPUT:
+      return (val, index, {id, ...props} = {}) => <Row {...props}><Text>{val}</Text></Row>
+    default:
+      return
   }
-  return (debug ? data : toList(data, 'clean')).map(mapData)
 }
+
+/**
+ * Error handling when something breaks because of mis-configured meta.json
+ */
+Render.onError = ({err, errInfo, props}) => Active.store.dispatch(stateAction(POPUP, ALERT, {
+  items: [
+    {
+      title: `${Render.name} Error!`,
+      content: <View>
+        <Text className='h5'>{_.ERROR_MESSAGE}</Text>
+        <Text className='p'>{String(err)}</Text>
+        <Text className='h5 padding-top'>{_.DATA_CAUSING_ERROR}</Text>
+        <View style={{textAlign: 'left'}}>
+          <Json data={props}/>
+        </View>
+        <Text className='h5 padding-top'>{_.ERROR_INFO}</Text>
+        <View style={{textAlign: 'left'}}>
+          <Json data={errInfo}/>
+        </View>
+      </View>
+    }
+  ]
+}))

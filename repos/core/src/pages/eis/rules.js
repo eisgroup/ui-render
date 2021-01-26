@@ -4,8 +4,9 @@ import { popupAlert } from 'modules-pack/popup'
 import { FIELD } from 'modules-pack/variables'
 import React from 'react'
 import Json from 'react-ui-pack/JsonView'
+import { metaToProps } from 'ui-renderer'
 import { cloneDeep, get, isCollection, isEmpty, isObject, isString, sanitizeGqlResponse, set } from 'utils-pack'
-import { metaToProps } from './Render'
+import './mapper' // Set up UI Renderer components and methods
 
 FIELD.ACTION = {
   POPUP_DELAY: 'popupDelay',
@@ -124,9 +125,16 @@ export function withUISetup (formConfig) {
     Object.defineProperty(Class.prototype, 'meta', {
       get () {
         if (this._meta != null) return this._meta
+        const data = this.data
         return this._meta = metaToProps(transformConfig(cloneDeep(get(this.state, 'meta.json'))), {
-          data: this.data,
-          instance: this
+          data,
+          instance: this,
+          funcConfig: {
+            data,
+            fieldValidation: FIELD.VALIDATION,
+            fieldNormalizer: FIELD.NORMALIZER,
+            fieldFunc: FIELD.FUNC,
+          }
         })
       },
       set (value) {

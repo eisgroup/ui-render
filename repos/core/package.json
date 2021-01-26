@@ -19,7 +19,8 @@
     "react-markdown": "^4.3.1",
     "react-ui-pack": "^0.7.3",
     "remark-toc": "^7.0.0",
-    "utils-pack": "^0.3.13"
+    "utils-pack": "^0.3.13",
+    "ui-renderer": "*"
   },
   "scripts": {},
   "eslintConfig": {
