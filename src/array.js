@@ -4,6 +4,7 @@ import {
   get,
   intersection,
   isEqual,
+  isPlainObject,
   max,
   min,
   some,
@@ -70,7 +71,7 @@ export function hasDuplicateInList (array) {
  * @return {boolean}
  */
 export function isCollection (data) {
-  return (!!data && (data.constructor === Array || data.constructor === Object))
+  return (!!data && (data.constructor === Array || isPlainObject(data)))
 }
 
 /**
