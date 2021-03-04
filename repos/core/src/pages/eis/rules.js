@@ -5,7 +5,7 @@ import { FIELD } from 'modules-pack/variables'
 import React from 'react'
 import Json from 'react-ui-pack/JsonView'
 import { metaToProps } from 'ui-renderer'
-import { cloneDeep, get, isCollection, isEmpty, isObject, isString, sanitizeGqlResponse, set } from 'utils-pack'
+import { cloneDeep, get, isEmpty, isList, isObject, isString, sanitizeGqlResponse, set } from 'utils-pack'
 import './mapper' // Set up UI Renderer components and methods
 
 FIELD.ACTION = {
@@ -62,7 +62,7 @@ export function toOpenLConfig (meta) {
 
   for (const key in meta) {
     const val = meta[key]
-    if (isCollection(val)) {
+    if (isList(val) || (isObject(val) && val.view)) {
       meta[key] = toOpenLConfig(val)
     }
 
