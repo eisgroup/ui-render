@@ -112,6 +112,23 @@ export function withUISetup (formConfig) {
     }
 
     // Define instance getter
+    Object.defineProperty(Class.prototype, 'config', {
+      get () {
+        const data = this.data
+        return {
+          data,
+          instance: this,
+          funcConfig: {
+            data,
+            fieldValidation: FIELD.VALIDATION,
+            fieldNormalizer: FIELD.NORMALIZER,
+            fieldFunc: FIELD.FUNC,
+          }
+        }
+      }
+    })
+
+    // Define instance getter
     Object.defineProperty(Class.prototype, 'data', {
       get () {
         return get(this.state, 'data.json')
@@ -125,17 +142,7 @@ export function withUISetup (formConfig) {
     Object.defineProperty(Class.prototype, 'meta', {
       get () {
         if (this._meta != null) return this._meta
-        const data = this.data
-        return this._meta = metaToProps(transformConfig(cloneDeep(get(this.state, 'meta.json'))), {
-          data,
-          instance: this,
-          funcConfig: {
-            data,
-            fieldValidation: FIELD.VALIDATION,
-            fieldNormalizer: FIELD.NORMALIZER,
-            fieldFunc: FIELD.FUNC,
-          }
-        })
+        return this._meta = metaToProps(transformConfig(cloneDeep(get(this.state, 'meta.json'))), this.config)
       },
       set (value) {
         return this._meta = value
