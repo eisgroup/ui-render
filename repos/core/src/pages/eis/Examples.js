@@ -120,12 +120,12 @@ export default class Examples extends Component {
                 <ScrollView className='padding-smaller bg-neutral inverted'>
                   <Row className='wrap spread'>
                     <View fill className='padding-smaller min-width-320'>
-                      <h3>{'Data.json'}</h3>
-                      <JsonView data={data} inverted/>
-                    </View>
-                    <View fill className='padding-smaller min-width-320'>
                       <h3>{'Meta.json'}</h3>
                       <JsonView data={meta} inverted/>
+                    </View>
+                    <View fill className='padding-smaller min-width-320'>
+                      <h3>{'Data.json'}</h3>
+                      <JsonView data={data} inverted/>
                     </View>
                   </Row>
                 </ScrollView>
