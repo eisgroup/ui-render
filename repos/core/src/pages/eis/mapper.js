@@ -17,7 +17,7 @@ import Json from 'react-ui-pack/JsonView'
 import Label from 'react-ui-pack/Label'
 import List from 'react-ui-pack/List'
 import ProgressSteps from 'react-ui-pack/ProgressSteps'
-import { renderCurrency, renderFloat } from 'react-ui-pack/renders'
+import { renderFloat } from 'react-ui-pack/renders'
 import Row from 'react-ui-pack/Row'
 import Space from 'react-ui-pack/Space'
 import TableView from 'react-ui-pack/TableView'
@@ -27,7 +27,7 @@ import Text from 'react-ui-pack/Text'
 import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
 import Render, { mapProps } from 'ui-renderer'
-import { Active, ALERT, debounce, get, isList, isNumeric, isObject, TIME_DURATION_INSTANT, toPercent } from 'utils-pack'
+import { Active, ALERT, debounce, get, isList, isNumeric, isObject, TIME_DURATION_INSTANT } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 
 /**
@@ -312,20 +312,29 @@ Render.Component = function RenderComponent ({
 Render.Method = function RenderMethod (Name) {
   switch (Name) {
     case FIELD.RENDER.CURRENCY:
-      return (val, index, {id, decimals = 2, ...props} = {}) => (isNumeric(val)
-          ? <Row {...props}><Text className='margin-right-smaller'>$</Text> {renderCurrency(val, decimals)}</Row>
+      return (val, index, {id, decimals = 2, symbol = '$', ...props} = {}) => (isNumeric(val)
+          ? <Row>
+            <Text className='margin-right-smallest'>{symbol}</Text>
+            {renderFloat(val, decimals, props)}
+          </Row>
           : null
       )
     case FIELD.RENDER.DOUBLE5:
-      return (val, index, {id, ...props} = {}) => renderFloat(val, 5, props)
+      return (val, index, {id, decimals, ...props} = {}) => isNumeric(val) ? renderFloat(val, 5, props) : null
     case FIELD.RENDER.FLOAT:
       return (val, index, {id, decimals, ...props} = {}) => isNumeric(val) ? renderFloat(val, decimals, props) : null
     case FIELD.RENDER.PERCENT:
-      return (val, index, {decimals} = {}) => toPercent(val, decimals)
+      return (val, index, {id, decimals, ...props} = {}) => (isNumeric(val)
+          ? <Row>
+            {renderFloat(Number(val) * 100, decimals, props)}
+            <Text className='margin-left-smallest'>%</Text>
+          </Row>
+          : null
+      )
     case FIELD.RENDER.TITLE_n_INPUT:
       return (val, index, {id, ...props} = {}) => <Row {...props}><Text>{val}</Text></Row>
     default:
-      return
+      return (val) => <Text>{val}</Text>
   }
 }
 

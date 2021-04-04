@@ -12,6 +12,27 @@
             "name": "coverages.0.rate"
           },
           "renderLabel": {
+            "name": "Currency",
+            "decimals": 5,
+            "truncated": true
+          }
+        },
+        {
+          "view": "Text",
+          "label": " → Currency with 5 decimals truncated without rounding"
+        }
+      ]
+    },
+    {
+      "view": "Row",
+      "styles": "middle",
+      "items": [
+        {
+          "view": "Text",
+          "label": {
+            "name": "coverages.0.rate"
+          },
+          "renderLabel": {
             "name": "Float",
             "decimals": 5,
             "truncated": true
@@ -81,14 +102,25 @@
       ]
     },
     {
-      "view": "Title",
-      "label": {
-        "name": "coverages.0.rate"
-      },
-      "renderLabel": {
-        "name": "Percent",
-        "decimals": 2
-      }
+      "view": "Row",
+      "styles": "middle",
+      "items": [
+        {
+          "view": "Title",
+          "label": {
+            "name": "coverages.0.rate"
+          },
+          "renderLabel": {
+            "name": "Percent",
+            "decimals": 3,
+            "truncated": true
+          }
+        },
+        {
+          "view": "Text",
+          "label": " → Percent with 3 decimals truncated without rounding"
+        }
+      ]
     }
   ]
 }
