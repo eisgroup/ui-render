@@ -36,7 +36,14 @@ export default class PieChart extends PureComponent {
     colors: PropTypes.array,
     children: PropTypes.any, // content to render inside the pie, will override default Label
     gradient: PropTypes.bool, // default is true
-    legends: PropTypes.bool, // whether to render Legends to the side of Pie Chart, default is false
+    legends: PropTypes.oneOfType([
+      PropTypes.bool, // whether to render Legends to the side of Pie Chart, default is false
+      PropTypes.shape({
+        background: PropTypes.bool, // whether to make legends have background, default is true
+        bottom: PropTypes.bool, // whether to keep legends on the bottom, under the Pie
+        columns: PropTypes.number, // the number of columns to break down long list of legends
+      })
+    ]),
     pointers: PropTypes.bool, // whether to render reference pointers to each pie, default is true if `legends` is false
     sort: PropTypes.oneOfType([ // items sorting order
       PropTypes.string, // key path to value used for sorting item's order, prefix with `-` for descending order
@@ -58,17 +65,34 @@ export default class PieChart extends PureComponent {
   }
 
   renderReference = () => {
-    return (
-      <View className='app__pie-chart__ref__items padding-small'>
-        {this.data.map(({name, color, value}) => (
-          <Row key={name} className='app__pie-chart__ref__item justify'>
-            <Text className='truncate padding-right'>{name}</Text>
-            <Text style={{color}}>{value.toLocaleString()}</Text>
-          </Row>
-        ))}
-      </View>
-    )
+    const {bottom, columns, background = true} = this.props.legends || {}
+    const classes = classNames('app__pie-chart__ref__items padding-small', {background, wrap: columns > 0})
+    const offsetTop = bottom ? {marginTop: this.props.height * -0.1} : undefined
+    let result
+    let itemsLength
+    if (columns > 0) {
+      itemsLength = Math.ceil(this.data.length / columns)
+      result =
+        <Row className='top' style={offsetTop}>
+          {Array(columns).fill(true).map((_, index) => {
+            const start = index * itemsLength
+            return <View key={index} className={classes}>
+              {this.data.slice(start, start + itemsLength).map(this.renderReferenceItem)}
+            </View>
+          })}
+        </Row>
+    } else {
+      result = <View className={classes} style={offsetTop}>{this.data.map(this.renderReferenceItem)}</View>
+    }
+    return result
   }
+
+  renderReferenceItem = ({name, color, value}) => (
+    <Row key={name} className='app__pie-chart__ref__item justify'>
+      <Text className='truncate padding-right'>{name}</Text>
+      <Text style={{color}}>{value.toLocaleString()}</Text>
+    </Row>
+  )
 
   render () {
     const {
@@ -79,11 +103,11 @@ export default class PieChart extends PureComponent {
     unit = u
     const sorts = toList(sort, 'clean')
     const items = sort ? [..._items].sort(by(...sorts)) : _items
-    const Container = legends ? Row : Fragment
+    const Container = legends ? (legends.bottom ? View : Row) : Fragment
     const colors = gradientColors(items.length, colours)
     this.data = dataNormalized(items, colors, gradient, sorts)
     return (
-      <Container {...legends && {className: classNames('app__pie-chart--ref middle wrap', classNameWrap)}}>
+      <Container {...legends && {className: classNames('app__pie-chart--ref middle center wrap', classNameWrap)}}>
         <View className={classNames('app__pie-chart min-width-290 center', className, {gradient})} {...props}>
           <ResponsiveContainer height={height}>
             <Piechart>
@@ -135,7 +159,19 @@ function donutPieCenterCoords ({cx, cy, midAngle, innerRadius, outerRadius}) {
   return {x, y}
 }
 
-function renderPercent ({cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, name, percent, fill, color}) {
+function renderPercent ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  startAngle,
+  endAngle,
+  name,
+  percent,
+  fill,
+  color
+}) {
   percent = percent * 100
   if (percent < 1) return null
   const fontScale = Math.min(percent + 5, fontSize)  // make font size smaller if percent is low
