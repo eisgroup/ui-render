@@ -65,6 +65,9 @@ Render.Component = function RenderComponent ({
   relativeData, relativeIndex, relativePath, version,
   ...props
 }) {
+  /* General hideOnEmpty logic */
+  if (hideOnEmpty && (_data == null || !_data.length)) return null
+
   switch (view) {
     case FIELD.TYPE.COL:
     case FIELD.TYPE.COL2:
