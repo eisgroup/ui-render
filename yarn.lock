@@ -13524,10 +13524,10 @@ react-transition-group@^2.5.0:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react-ui-pack@^0.7.3:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.7.3.tgz#bc1601a01edd06ba6f3f00b397af4f2f4af7573b"
-  integrity sha512-VBRqdo/YjSmiodCHB42AkOQxIAgPP9fr23tgtnGkLFYv9fJNB5AWcV3J2TDz7VVjHOhW7rXLtWvQ6DjxKVYqzQ==
+react-ui-pack@^0.7.6:
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.7.6.tgz#5c5ff1de47cb4fbc42b5ca052c92d0b4a22fd104"
+  integrity sha512-G2WH+D038IAiVMWLBC0bffI9pldLwENNa9RynYtjChBQ6gqI0W2end6+R9HkZJBEtc2XH/noBbI1hBEnYgi4Fg==
   dependencies:
     chroma-js "^2.1.0"
     classnames "^2.2.6"
@@ -15922,6 +15922,11 @@ uglifyjs-webpack-plugin@^1.2.4:
     uglify-es "^3.3.4"
     webpack-sources "^1.1.0"
     worker-farm "^1.5.2"
+
+ui-renderer@*:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/ui-renderer/-/ui-renderer-0.0.1.tgz#b254a5e6450fb39e113e7b57e98f744cab5faa0d"
+  integrity sha512-jQIuM9zZQKqpRW3MfL/rr4ZyEqT2eGUIhFD0gT6AZNDFxJbeqRIctM3MpKwWSHOK0UQndvezDqCIrN9hvlnszw==
 
 unc-path-regex@^0.1.0, unc-path-regex@^0.1.2:
   version "0.1.2"

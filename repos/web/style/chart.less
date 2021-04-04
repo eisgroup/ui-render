@@ -148,14 +148,16 @@
 
 
 .app__pie-chart__ref__item {
-  &:extend(.bg-grey-lighter all);
-  &:extend(.bg-gradient--right all);
   &:extend(.margin-smallest all);
   &:extend(.padding-v-small all);
   &:extend(.padding-h all);
   &:extend(.radius all);
-}
 
+  .background > & {
+    &:extend(.bg-grey-lighter all);
+    &:extend(.bg-gradient--right all);
+  }
+}
 
 .app__stats-change {
   i.icon-caret-up {
