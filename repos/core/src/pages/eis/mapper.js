@@ -312,8 +312,8 @@ Render.Component = function RenderComponent ({
 Render.Method = function RenderMethod (Name) {
   switch (Name) {
     case FIELD.RENDER.CURRENCY:
-      return (val, index, {id, decimals = 2, symbol = '$', ...props} = {}) => (isNumeric(val)
-          ? <Row>
+      return (val, index, {id, decimals = 2, symbol = '$', className, style, ...props} = {}) => (isNumeric(val)
+          ? <Row className={className} style={style}>
             <Text className='margin-right-smallest'>{symbol}</Text>
             {renderFloat(val, decimals, props)}
           </Row>
@@ -324,8 +324,8 @@ Render.Method = function RenderMethod (Name) {
     case FIELD.RENDER.FLOAT:
       return (val, index, {id, decimals, ...props} = {}) => isNumeric(val) ? renderFloat(val, decimals, props) : null
     case FIELD.RENDER.PERCENT:
-      return (val, index, {id, decimals, ...props} = {}) => (isNumeric(val)
-          ? <Row>
+      return (val, index, {id, decimals, className, style, ...props} = {}) => (isNumeric(val)
+          ? <Row className={className} style={style}>
             {renderFloat(Number(val) * 100, decimals, props)}
             <Text className='margin-left-smallest'>%</Text>
           </Row>
