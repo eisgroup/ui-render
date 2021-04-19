@@ -34,7 +34,7 @@ export default class WebStudioPage extends Component {
   }
 
   get id () {
-    return get(this.props, 'match.params.id') || ''
+    return get(this.props, 'match.params.id') || ((typeof document !== 'undefined' && document.id) || '')
   }
 
   componentDidMount () {
