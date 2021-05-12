@@ -12,6 +12,26 @@
             "name": "coverages.0.rate"
           },
           "renderLabel": {
+            "name": "Float",
+            "decimals": 10
+          }
+        },
+        {
+          "view": "Text",
+          "label": " → Float without truncating"
+        }
+      ]
+    },
+    {
+      "view": "Row",
+      "styles": "middle",
+      "items": [
+        {
+          "view": "Text",
+          "label": {
+            "name": "coverages.0.rate"
+          },
+          "renderLabel": {
             "name": "Currency",
             "decimals": 5,
             "truncated": true

@@ -11,10 +11,6 @@ import Render from 'ui-renderer'
 import { ENV, fromJSON, get, isEmpty, isFunction, isString, logRender, SUCCESS } from 'utils-pack'
 import { withUISetup } from './rules'
 
-let urlPrefix = document.getElementById('react-app').getAttribute('data-prefix-url') || ''
-if (urlPrefix) urlPrefix = window.location.origin + urlPrefix
-const DATA_URL = urlPrefix + ENV.REACT_APP_DATA_URL
-const META_URL = urlPrefix + ENV.REACT_APP_META_URL
 FIELD.ACTION = {
   UPDATE: 'update',
 }
@@ -38,6 +34,11 @@ export default class WebStudioPage extends Component {
   }
 
   componentDidMount () {
+    let urlPrefix = document.getElementById('ui-render').getAttribute('data-prefix-url') || ''
+    if (urlPrefix) urlPrefix = window.location.origin + urlPrefix
+    const DATA_URL = urlPrefix + ENV.REACT_APP_DATA_URL
+    const META_URL = urlPrefix + ENV.REACT_APP_META_URL
+
     /* Use local variables, if set */
     if (typeof window !== 'undefined') {
       const {dataJson, metaJson} = window
@@ -68,6 +69,13 @@ export default class WebStudioPage extends Component {
 
   fetch = async (url, {body = {}, contentType = 'application/json'}) => {
     const data = {method: 'POST', body, headers: {'Content-Type': contentType}}
+
+    // todo: remove temporary mock for Policy demo
+    if (url === 'https://dxp-gateway-nightly.genci0.eisgroup.com/backoffice-rating-std-master/poc/details/policy1/1') {
+      data.method = 'GET'
+      delete data.body
+    }
+
     const {payload, meta: {result} = {}} = await fetch(url, data)
     if (result === SUCCESS) return payload
     if (result != null) throw Error(result)

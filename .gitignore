@@ -5,6 +5,7 @@
 /**/public/static/**/*.css
 /unity
 repos/server/uploads
+/repos/ui-builder
 
 # ==============================================================================
 # Development Files

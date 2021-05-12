@@ -1,14 +1,6 @@
-<!-- <head> Section -->
-<link href="http://mnsopenl.exigengroup.com/policy/static/semantic.css?v=0.21.1" rel="stylesheet">
-<link href="http://mnsopenl.exigengroup.com/policy/static/all.css?v=0.21.1" rel="stylesheet">
-<link href="http://mnsopenl.exigengroup.com/policy/static/css/1.fee87b7e.chunk.css" rel="stylesheet">
+document.id = 'policy1'
 
-<!-- Place inside <body> where UI Render should be -->
-<div data-prefix-url="" id="ui-render"></div>
-
-<!-- Scripts to load Widget -->
-<script>document.id = 'policy1'</script>
-<script>!function (l) {
+!function (l) {
   function e (e) {
     for (var r, t, n = e[0], o = e[1], u = e[2], f = 0, i = []; f < n.length; f++) t = n[f], p[t] && i.push(p[t][0]), p[t] = 0
     for (r in o) Object.prototype.hasOwnProperty.call(o, r) && (l[r] = o[r])
@@ -58,6 +50,23 @@
   for (var o = 0; o < r.length; o++) e(r[o])
   var s = n
   a()
-}([])</script>
-<script src="http://mnsopenl.exigengroup.com/policy/static/js/1.ff11734f.chunk.js"></script>
-<script src="http://mnsopenl.exigengroup.com/policy/static/js/main.ce470fc9.chunk.js"></script>
+}([])
+
+/**
+ * Create HTML DOM <script/>
+ * @param {String} src
+ * @param {Function} callback - to fire on script loaded
+ */
+function createScript (src, callback) {
+  if (typeof document === 'undefined') return
+  const d = document, t = 'script',
+    o = d.createElement(t),
+    s = d.getElementsByTagName(t)[0]
+  o.src = src
+  o.async = true
+  if (callback) { o.addEventListener('load', callback, false) }
+  s.parentNode.insertBefore(o, s)
+}
+
+createScript('http://mnsopenl.exigengroup.com/policy/static/js/1.ff11734f.chunk.js')
+createScript('http://mnsopenl.exigengroup.com/policy/static/js/main.ce470fc9.chunk.js')

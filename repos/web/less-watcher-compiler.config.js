@@ -62,7 +62,7 @@ module.exports = function () {
       'less-plugin-functions',
     ],
     // postcssPlugins: [
-    //   ['postcss-prefixwrap', '#react-app']
+    //   ['postcss-prefixwrap', '#ui-render']
     // ]
   }
 }

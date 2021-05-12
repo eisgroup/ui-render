@@ -17,5 +17,5 @@ render(
       <WebStudioPage/>
     </AppElement>
   </Redux.Provider>
-  , document.getElementById('react-app')
+  , document.getElementById('ui-render')
 )
