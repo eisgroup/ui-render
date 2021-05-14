@@ -3,6 +3,7 @@ import { _SHOULD_SHOW_TEST_ } from 'utils-pack'
 
 ROUTE.DOCS = `${ROUTE_BASE}docs`
 ROUTE.WEBSTUDIO = `${ROUTE_BASE}webstudio`
+ROUTE.WEBSTUDIO_POLICY = `${ROUTE_BASE}webstudio/policy`
 ROUTES.FOR_DEFINITION = createNestedRoutes(ROUTE, {
   [ROUTE.DOCS]: '/:id?', // add id to this route
   [ROUTE.DEMO]: '/:id?', // add id to this route
@@ -13,6 +14,10 @@ ROUTES.FOR_NAV = [ // shown in Navigation
   {path: ROUTE.DOCS, name: 'Docs', icon: 'theme'},
   {path: ROUTE.DEMO, name: 'Demo', icon: 'test'},
   {path: ROUTE.WEBSTUDIO, name: 'WebStudio', icon: 'logo-symbol'},
+]
+// Pages without Navigation
+ROUTES.WITHOUT_NAV = [
+  ROUTE.WEBSTUDIO_POLICY,
 ]
 if (_SHOULD_SHOW_TEST_) ROUTES.FOR_NAV.push(...[
   {path: ROUTE.TESTER, name: 'Tester', icon: 'test'},

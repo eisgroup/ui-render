@@ -2,7 +2,7 @@ import { fetch } from 'modules-pack/api'
 import { popupAlert } from 'modules-pack/popup'
 import { FIELD } from 'modules-pack/variables'
 import React, { Component } from 'react'
-import { cn } from 'react-ui-pack'
+import { cn, type } from 'react-ui-pack'
 import Placeholder from 'react-ui-pack/Placeholder'
 import ScrollView from 'react-ui-pack/ScrollView'
 import Spinner from 'react-ui-pack/Spinner'
@@ -24,6 +24,11 @@ FIELD.ACTION = {
  * -----------------------------------------------------------------------------
  */
 export default class WebStudioPage extends Component {
+  static propTypes = {
+    dataUrl: type.Url,
+    metaUrl: type.Url,
+  }
+
   state = {
     loadingData: true,
     loadingMeta: true,
@@ -33,12 +38,14 @@ export default class WebStudioPage extends Component {
     return get(this.props, 'match.params.id') || ((typeof document !== 'undefined' && document.id) || '')
   }
 
-  componentDidMount () {
-    let urlPrefix = document.getElementById('ui-render').getAttribute('data-prefix-url') || ''
-    if (urlPrefix) urlPrefix = window.location.origin + urlPrefix
-    const DATA_URL = urlPrefix + ENV.REACT_APP_DATA_URL
-    const META_URL = urlPrefix + ENV.REACT_APP_META_URL
+  get urlPrefix () {
+    if (this._urlPrefix != null) return this._urlPrefix
+    this._urlPrefix = document.getElementById('ui-render').getAttribute('data-prefix-url') || ''
+    if (this._urlPrefix) this._urlPrefix = window.location.origin + this._urlPrefix
+    return this._urlPrefix
+  }
 
+  componentDidMount () {
     /* Use local variables, if set */
     if (typeof window !== 'undefined') {
       const {dataJson, metaJson} = window
@@ -52,10 +59,14 @@ export default class WebStudioPage extends Component {
     }
 
     /* Fetch JSON from external API */
-    this.fetch(DATA_URL, {body: this.id, contentType: 'text/plain'})
+    const {
+      dataUrl = this.urlPrefix + ENV.REACT_APP_DATA_URL,
+      metaUrl = this.urlPrefix + ENV.REACT_APP_META_URL
+    } = this.props
+    this.fetch(dataUrl, {body: this.id, contentType: 'text/plain'})
       .then(data => this.setState({loadingData: false, data}))
       .catch(this.popup)
-    this.fetch(META_URL, {contentType: 'application/json'})
+    this.fetch(metaUrl, {contentType: 'application/json'})
       .then(meta => this.setState({loadingMeta: false, meta}))
       .catch(this.popup)
   }
