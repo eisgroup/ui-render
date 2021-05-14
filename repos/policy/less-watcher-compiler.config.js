@@ -7,7 +7,7 @@ module.exports = function () {
         watch: [ // file/s to watch for changes, using glob pattern
           'style/*.less', // only match files in root folder, sub-folders should have their own watcher
         ],
-        compile: '../web/style/_all.less', // file/s to compile when changes detected, using glob pattern
+        compile: '../web/style/_policy.less', // file/s to compile when changes detected, using glob pattern
         output: 'public/static/', // destination directory where new file/s should be saved
         renameOptions: {basename: 'all'}, // change output file name
       },
@@ -26,7 +26,7 @@ module.exports = function () {
         watch: [
           'style/override/**/*',
         ],
-        compile: '../web/style/override/_semantic.less',
+        compile: '../web/style/override/_policy.less',
         output: 'public/static/',
         renameOptions: {basename: 'semantic'}, // change output file name
       },
