@@ -18,7 +18,7 @@ export default {
   [ROUTE.HOME]: OpenL,
   [ROUTE.DOCS]: Docs,
   [ROUTE.WEBSTUDIO]: Webstudio,
-  [ROUTE.WEBSTUDIO_POLICY]: PolicyPage,
+  [ROUTE.TEST_POLICY]: PolicyPage,
   [ROUTE.DEMO]: Demo,
   // [ROUTE.TESTER]: Tester,
   // [ROUTE.THEME]: Theme,

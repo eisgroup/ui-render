@@ -39,6 +39,16 @@ if (process.env.NODE_ENV === 'test') {
       'transform-export-extensions',
       // 'import-graphql', // for importing .graphql and .gql files
       // 'semantic-ui-react' imports are already pruned correctly by CRA 2
-    )
+    ),
+    jsonpRename,
   )
+}
+
+/* Avoid conflict with Genesis UI Webpack config */
+function jsonpRename (config) {
+  config.output = {
+    ...config.output,
+    jsonpFunction: 'jsonpUiRender'
+  }
+  return config
 }
