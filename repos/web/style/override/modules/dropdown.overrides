@@ -2,7 +2,7 @@
         User Overrides
 *******************************/
 @import "../../fonts/icons/variables";
-@import "../../_mixins";
+//@import "../../_mixins";
 
 // @IMPORTANT: Color overrides only!
 // For styles affecting layout, edit inside `input.less`

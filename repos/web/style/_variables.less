@@ -285,7 +285,7 @@
 @padding-largest:       @margin-largest;
 
 // Border
-@border-size:           size(1);
+@border-size:           1px; // EIS alignment fix with px, because html font size cannot be adjusted to @size-scale
 @border-size-thick:     @border-size * 2;
 @border-style:          solid;
 @border:                @border-size @border-style;
