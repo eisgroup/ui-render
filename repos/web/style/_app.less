@@ -17,7 +17,7 @@
   - Improve performance by promoting all elements to Composite layer
   - Stop scroll flickering of content with `transform` on iOS Safari
   */
-  backface-visibility: hidden;
+  //backface-visibility: hidden; -> cause irregular table row/cell bottom borders
   //transform: translate3d(0, 0, 0); // or this, same effect as above
 
   &:focus:not(a):not(.a) { // do not add other selectors here, like `[tabIndex="-1"]` because it will override form inputs
