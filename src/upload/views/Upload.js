@@ -72,6 +72,7 @@ export default class Upload extends PureComponent {
   }
 
   static defaultProps = {
+    loading: false,
     multiple: true,
     hasHeader: true,
     showTypes: true,

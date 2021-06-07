@@ -32,7 +32,7 @@ Place.getOrCreate = async function ({
   sessionToken,
   provider = 'google',
   cache = ONE_MONTH,
-  withPhotos = false
+  withPhotos = false,
 } = {}) {
   if (provider !== 'google') throw Error(`provider '${provider}' is not supported.`)
   let result = await Place.findById(id)

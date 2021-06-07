@@ -2,6 +2,7 @@ import { __CLIENT__, __PROD__, Active, ENV } from 'utils-pack'
 
 /* Platform Prefixes */
 export const SERVICE = {
+  API: 'API',
   BOT: 'BOT',
   CLIENT: 'CLIENT',
   DESKTOP: 'DESKTOP',
