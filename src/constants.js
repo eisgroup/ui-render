@@ -267,28 +267,32 @@ export const CRYPTO = {         // mapped for cryptoSign() and cryptoHash()
  * Language Definition
  * @see: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
  * @note: sync with Google standard https://developers.google.com/maps/faq#languagesupport
+ *    - Correct syntax for <html lang="zh-CN"> uses hyphen, including Google API,
+ *		however, GraphQL name, database tables and many backends only accept undersacore.
+ *		=> Use _ for better compatibility between systems.
  */
 export const LANGUAGE = {
-	ENGLISH: 		{_: 'en', 	lang: 'English',     'en': 'English'},
-	RUSSIAN: 		{_: 'ru', 	lang: 'Русский',     'en': 'Russian'},
-	CHINESE: 		{_: 'zh', 	lang: '中文',         'en': 'Mandarin Chinese'},
-	CANTONESE: 	{_: 'zh-HK',lang: '廣東話',       'en': 'Cantonese Chinese'},
-	SPANISH: 		{_: 'es', 	lang: 'Español',     'en': 'Spanish'},
-	ITALIAN: 		{_: 'it', 	lang: 'Italiano',    'en': 'Italian'},
-	PORTUGUESE: {_: 'pt', 	lang: 'Português',   'en': 'Portuguese'},
-	GERMAN: 		{_: 'de', 	lang: 'Deutsch',     'en': 'German'},
-	DUTCH: 			{_: 'nl', 	lang: 'Nederlands',  'en': 'Dutch'},
-	FRENCH: 		{_: 'fr', 	lang: 'Français',    'en': 'French' },
-	SWEDISH: 		{_: 'sv', 	lang: 'Svenska',     'en': 'Swedish' },
-	FINNISH: 		{_: 'fi',   lang: 'Suomi',       'en': 'Finnish'},
-	GREEK: 			{_: 'el',   lang: 'Ελληνικά',    'en': 'Greek'},
-	HEBREW: 		{_: 'he',   lang: 'עִבְרִית',       'en': 'Hebrew'},
-	YIDDISH: 		{_: 'yi',   lang: 'ייִדיש',        'en': 'Yiddish'},
-	PERSIAN: 		{_: 'fa',   lang: 'فارسی',       'en': 'Persian'},
-	ARABIC:			{_: 'ar',   lang: 'العَرَبِيَّة‎',  'en': 'Arabic'},
-	AFRIKAANS: 	{_: 'af',   lang: 'Afrikaans',   'en': 'Afrikaans'},
-	KOREAN: 		{_: 'ko',   lang: '한국어',        'en': 'Korean'},
-	JAPANESE: 	{_: 'ja',   lang: '日本語',       'en': 'Japanese'},
+	ENGLISH:    {_: 'en', lang: 'English',       'en': 'English'},
+	RUSSIAN:    {_: 'ru', lang: 'Русский',       'en': 'Russian'},
+	CHINESE:    {_: 'zh_CN', lang: '中文 (中国)', 'en': 'Chinese (Simplified)'},
+	CHINESE_HK: {_: 'zh_HK', lang: '中文 (香港)', 'en': 'Chinese (Hong Kong)'},
+	CHINESE_TW: {_: 'zh_TW', lang: '中文 (台灣)', 'en': 'Chinese (Traditional)'},
+	GERMAN:     {_: 'de', lang: 'Deutsch',       'en': 'German'},
+	SPANISH:    {_: 'es', lang: 'Español',       'en': 'Spanish'},
+	ITALIAN:    {_: 'it', lang: 'Italiano',      'en': 'Italian'},
+	PORTUGUESE: {_: 'pt', lang: 'Português',     'en': 'Portuguese'},
+	DUTCH:      {_: 'nl', lang: 'Nederlands',    'en': 'Dutch'},
+	FRENCH:     {_: 'fr', lang: 'Français',      'en': 'French'},
+	SWEDISH:    {_: 'sv', lang: 'Svenska',       'en': 'Swedish'},
+	FINNISH:    {_: 'fi', lang: 'Suomi',         'en': 'Finnish'},
+	GREEK:      {_: 'el', lang: 'Ελληνικά',      'en': 'Greek'},
+	KOREAN:     {_: 'ko', lang: '한국어',          'en': 'Korean'},
+	JAPANESE:   {_: 'ja', lang: '日本語',         'en': 'Japanese'},
+	HEBREW:     {_: 'he', lang: 'עִבְרִית',         'en': 'Hebrew'},
+	PERSIAN:    {_: 'fa', lang: 'فارسی',         'en': 'Persian'},
+	YIDDISH:    {_: 'yi', lang: 'ייִדיש',         'en': 'Yiddish'},
+	ARABIC:     {_: 'ar', lang: 'العَرَبِيَّة‎',    'en': 'Arabic'},
+	AFRIKAANS:  {_: 'af', lang: 'Afrikaans',     'en': 'Afrikaans'},
 }
 
 /**

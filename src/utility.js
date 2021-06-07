@@ -163,6 +163,26 @@ export function asyncLoad (src, callback) {
 }
 
 /**
+ * Create HTML Element and insert it to DOM, before similar element type found in existing DOM
+ * @param {String} type - HTML element kind (i.e. 'script', 'link', etc.)
+ * @param {Object} props - element attributes
+ * @returns {Promise<element, event>|void} promise - resolves when element loaded, with arguments of `addEventListener`
+ */
+function createElement ({type = 'script', ...props}) {
+  if (typeof document === 'undefined') return
+  const element = document.createElement(type)
+  const sameType = document.getElementsByTagName(type)[0]
+  for (const attribute in props) {
+    element.attribute = props[attribute]
+  }
+  const result = new Promise((resolve) => {
+    element.addEventListener('load', resolve, false)
+  })
+  sameType.parentNode.insertBefore(element, sameType)
+  return result
+}
+
+/**
  * Create HTML DOM <script/>
  * @param {String} src
  * @param {Function} callback - to fire on script loaded

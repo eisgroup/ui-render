@@ -21,9 +21,19 @@ import qs from 'querystring'
  */
 
 /**
+ * Get The List of Class Instance Method Names
+ * @param {Class} Class - to get methods names from
+ * @returns {String[]} list - of all instance methods, including async (but excludes properties, and static methods)
+ */
+export function classInstanceMethodNames (Class) {
+	const [_, ...methodNames] = Object.getOwnPropertyNames(Class.prototype)
+	return methodNames
+}
+
+/**
  * Clone Object/Collection/Class
  */
-export function clone(obj) {
+export function clone (obj) {
 	return Object.assign(Object.create(Object.getPrototypeOf(obj)), obj)
 }
 

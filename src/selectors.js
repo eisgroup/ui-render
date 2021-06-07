@@ -41,6 +41,7 @@ export default function selector (NAME, maxTime = 5 * ONE_MILLISECOND) {
     for (const key in constructor) {
       const selectors = constructor[key]()
       const lastFunc = selectors.pop()
+      selectors.forEach((selector, i) => selector || console.error(`${lastFunc.name} is missing selector ${i + 1}!`))
       constructor[key] = createSelector(
         ...selectors,
         function () {

@@ -84,11 +84,15 @@ export function definitionByValue (DEFINITION) {
  *  enumFrom(LANGUAGE)
  *  >>> ['en', 'fr'...]
  *
- * @param {Object<KEY<_...>>} DEFINITION - key/value pairs of variable name with its underscore value
+ * @param {Object<KEY<_...>>|Array<_...>} DEFINITION - key/value pairs of variable name with its underscore value
  * @returns {Array<String>} enums - list of enumerable values
  */
 export function enumFrom (DEFINITION) {
-  return Object.values(DEFINITION).map(({_}) => _)
+  const list = []
+  for (const index in DEFINITION) {
+    list.push(DEFINITION[index]._)
+  }
+  return list
 }
 
 /*
@@ -108,8 +112,8 @@ export function optionsFrom (DEFINITION) {
       return this[Active.LANG._] || this[LANGUAGE.ENGLISH._] || []
     }
   }
-  for (const key in DEFINITION) {
-    const {_: value, ...langs} = DEFINITION[key]
+  for (const index in DEFINITION) {
+    const {_: value, ...langs} = DEFINITION[index]
     for (const lang in langs) {
       const text = langs[lang]
       // Dropdown `value` cannot be array because of shallow match

@@ -1,4 +1,5 @@
 import {
+  classInstanceMethodNames,
   cloneDeep,
   findAllObjsByKeys,
   findObjByKeys,
@@ -54,6 +55,46 @@ const obj = {
     }
   ]
 }
+
+test(`${classInstanceMethodNames.name}() returns instance methods (async/getter/setter), but not static methods or props`, () => {
+  class Query {
+    propA = 3
+
+    get GetterProp () {
+      return this.propA
+    }
+
+    set SetterProp (val) {
+      this.propsA = val
+    }
+
+    static StaticMethod (a, b) {
+      return a + b
+    }
+
+    static StaticProp = (a, b) => {
+      return a + b
+    }
+
+    MethodProp = (a, b) => {
+      return a + b
+    }
+
+    MethodPropAsync = async (a, b) => {
+      return new Promise(resolve => resolve(a + b))
+    }
+
+    Method (a, b) {
+      return a + b
+    }
+
+    async AsyncMethod (a, b) {
+      return new Promise(resolve => resolve(a + b))
+    }
+  }
+
+  expect(classInstanceMethodNames(Query)).toEqual(['GetterProp', 'SetterProp', 'Method', 'AsyncMethod'])
+})
 
 it(`${hasObjMatch.name}() returns 'true' when nested Collection has a matching Object, else 'false'`, () => {
   const resultTrue = hasObjMatch([[[1, -1], [2, -2]]], [1, -1])
