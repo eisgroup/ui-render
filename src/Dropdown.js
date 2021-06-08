@@ -142,9 +142,9 @@ export function Dropdown ({
 
   return (
     <View className={classNames('input--wrapper', {
-      float, done, labeled: label, 'fill-width': !props.compact && fill,
+      float, done, labeled: label, 'fill-width': !props.compact && fill, required: props.required,
     }, className)} style={style}>
-      {label && !float && <Text className='input__label'>{label + (props.required ? '*' : '')}</Text>}
+      {label && !float && <Text className="input__label">{label}</Text>}
       <DropDown
         className={classNames({info, readonly})}
         options={options}
@@ -154,11 +154,11 @@ export function Dropdown ({
         noResultsMessage={(hasListValue(props.value) && props.value.length === options.length) ? _.NO_OPTIONS_LEFT : _.NOTHING_FOUND}
         {...props}
       />
-      {label && float && <Text className='input__label'>{label + (props.required ? '*' : '')}</Text>}
+      {label && float && <Text className="input__label">{label}</Text>}
       {(error || info) &&
-      <View id={props.id} className='field-help'>
-        {error && <Text className='error'>{error}</Text>}
-        {info && <Text className='into'>{info}</Text>}
+      <View id={props.id} className="field-help">
+        {error && <Text className="error">{error}</Text>}
+        {info && <Text className="into">{info}</Text>}
       </View>
       }
     </View>

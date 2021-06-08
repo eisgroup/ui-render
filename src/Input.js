@@ -84,14 +84,16 @@ export function Input ({
   if (done == null) done = !error && hasValue
   return (
     <View
-      className={classNames('input--wrapper', className, {float, done, resize, swatch: props.type === 'color'})}
+      className={classNames('input--wrapper', className, {
+        float, done, resize, swatch: props.type === 'color', required: props.required
+      })}
       style={style}
     >
       {!float &&
-      <Row className='middle'>
-        {!isCheckbox && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
+      <Row className="middle">
+        {!isCheckbox && label && <Label htmlFor={id}>{label}</Label>}
         {onRemove && !readonly &&
-        <Button className='input__delete' onClick={() => onRemove(id)}><Icon name='delete'/></Button>}
+        <Button className="input__delete" onClick={() => onRemove(id)}><Icon name="delete"/></Button>}
       </Row>
       }
       <Row className={classNames('input', {active, icon, lefty, error, info, unit})}>
@@ -125,7 +127,7 @@ export function Input ({
             ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
             : icon
         )}
-        {(float || isCheckbox) && label && <Label htmlFor={id}>{label + (props.required ? '*' : '')}</Label>}
+        {(float || isCheckbox) && label && <Label htmlFor={id}>{label}</Label>}
       </Row>
       {(error || info) &&
       <View id={idHelp} className='field-help'>
