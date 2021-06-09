@@ -30,7 +30,7 @@ import { ObjectId, Schema, toObjectId, unique } from './types'
  */
 export function createModel (name, fields, {schema: {options, config, methods, virtuals} = {}, uniqueTogether} = {}) {
   // Schema Setup
-  const schema = new Schema(fields, {timestamps: {updatedAt: 'updated'}, ...options})
+  const schema = new Schema(fields, {timestamps: false, ...options})
   schema.plugin(eventHooks)
   schema.set('toJSON', {virtuals: true, ...config})
   schema.set('toObject', {virtuals: true, ...config})
