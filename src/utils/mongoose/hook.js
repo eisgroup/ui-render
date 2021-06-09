@@ -14,8 +14,8 @@
  * Now the model emits lifecycle events before and after persistence operations:
  * You can listen to these events directly on the model.
  *      import User from './models'
- *      User.on('beforeInsert', function(book) {
- *        // do stuff...
+ *      User.on('beforeInsert', function(entry) {
+ *        // do stuff with entry object...
  *      })
  *
  *  - beforeInsert

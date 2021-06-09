@@ -30,7 +30,7 @@ extend type Mutation {
 type User {
     id: Id! # can be used to derive created Timestamp
     auth: Int # authorization level
-    email: Email # for privacy reasons, may not be shown, but always exists
+    email: Email! # for privacy reasons, may not be shown, but always exists
     avatar: URL
     name: String
     surname: String
@@ -40,7 +40,7 @@ type User {
     kind: Int
     lastOnline: Timestamp
     lastLogin: Timestamp! # for privacy reasons, may not be shown, used to check whether instance is User
-    updated: Timestamp!
+    updated: Timestamp
     # Contacts
     phones: Phones
     place: Place

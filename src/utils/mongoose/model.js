@@ -14,7 +14,7 @@ import {
   warn
 } from 'utils-pack'
 import { eventHooks } from './hook'
-import { ObjectId, Schema, toObjectId, unique } from './types'
+import { ObjectId, Schema, Timestamp, toObjectId, unique } from './types'
 
 /**
  * Wrapper around mongoose.model() method to add all extra base helpers and defaults
@@ -64,15 +64,21 @@ export function createModel (name, fields, {schema: {options, config, methods, v
   model.deleteByIds = deleteByIds(model)
 
   // Setup event hooks
-  model.on('afterInsert', (instance) => {
-    Active.store.dispatch(stateAction(name, CREATE, SUCCESS, instance))
-  })
-  model.on('afterUpdate', (instance) => {
-    Active.store.dispatch(stateAction(name, UPDATE, SUCCESS, instance))
-  })
-  model.on('afterRemove', (instance) => {
-    Active.store.dispatch(stateAction(name, DELETE, SUCCESS, instance))
-  })
+  if (Active.store) {
+    model.on('afterInsert', (entry) => {
+      Active.store.dispatch(stateAction(name, CREATE, SUCCESS, entry))
+    })
+    model.on('afterUpdate', (entry) => {
+      Active.store.dispatch(stateAction(name, UPDATE, SUCCESS, entry))
+    })
+    model.on('afterRemove', (entry) => {
+      Active.store.dispatch(stateAction(name, DELETE, SUCCESS, entry))
+    })
+  }
+
+  // Updated Timestamp (new Users will have updated = null)
+  if (fields.updated === Timestamp) model.on('beforeUpdate', (entry) => {entry.updated = Date.now()})
+
   return model
 }
 

@@ -6,6 +6,7 @@ import {
   by,
   enumFrom,
   get,
+  Id as _Id,
   isContinuousNumberRanges,
   isNumeric,
   isPhoneNumber,
@@ -40,7 +41,7 @@ export const Json = {type: Mixed, default: undefined}
 // @Note: add `default: undefined` to easily declare fallback when destructuring instances,
 // else, Mongoose will default to empty of given type (a.k.a. default for objects will be empty `{}`)
 // @note: For array of sub-documents, sub-documents cannot be declared with nested `type` prop.
-export const Id = {type: String, validate: isId, default: undefined}
+export const Id = {type: String, validate: isId, default: () => _Id()}
 export const Ids = {type: [Id], default: undefined}
 export const Timestamp = {type: Number, validate: isNumeric, default: undefined}
 export const URL = {type: String, validate: isURL, default: undefined}
@@ -169,7 +170,7 @@ export function isObjectID (value) {
 export function ForeignKey (modelName, options) {
   // noinspection JSUnresolvedFunction
   return {
-    type: ObjectId, // todo: test if it works with custom Id string and nested queries work as well
+    type: String, // @note: setting `type: Id` throws error, but works with String or ObjectId
     ref: modelName,
     validate: {
       validator: input => mongoose.model(modelName).findById(input),
@@ -194,7 +195,7 @@ export function ForeignKey (modelName, options) {
  */
 export function ForeignDynamicKey (refField, options) {
   return {
-    type: ObjectId,
+    type: String,
     refPath: refField,
     validate: {
       validator (input) { // noinspection JSUnresolvedFunction
