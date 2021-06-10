@@ -1,4 +1,5 @@
 import {
+  escapeRegExp,
   fileNameWithoutExt,
   formatKeyPath,
   getParamByKey,
@@ -8,6 +9,7 @@ import {
   isIpAddress,
   isPhoneNumber,
   randomString,
+  regexExp,
   sha256,
   truncate
 } from '../string'
@@ -26,6 +28,16 @@ const NON_STRING_VALUES = [
   null,
   undefined
 ]
+
+it(`${escapeRegExp.name}() returns escaped string ready for RegexExp use`, () => {
+  expect(escapeRegExp('a | b')).toEqual('a \\| b')
+  expect(escapeRegExp('a \\ b')).toEqual('a \\\\ b')
+})
+
+it(`${regexExp.name}() returns escaped string RegexExp`, () => {
+  expect(regexExp('a | b')).toEqual(/a \| b/)
+  expect(regexExp('a \\ b', 'i')).toEqual(/a \\ b/i)
+})
 
 it(`${isInString.name}() returns true when match found, else false`, () => {
   expect(isInString('God', 'o')).toBe(true)

@@ -24,6 +24,27 @@ export function cleanSpaces (string) {
 }
 
 /**
+ * Escape String for use in Regex Expression
+ * @see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
+ * @param {String} string - to be sanitized
+ * @returns {String} string - escaped for Regex use
+ */
+export function escapeRegExp (string) {
+	return string.replace(escapeRegExp.pattern, '\\$&') // $& means the whole matched string
+}
+
+escapeRegExp.pattern = /[.*+?^${}()|[\]\\]/g
+
+/**
+ * Convert String to RegexExp (with given String being escaped first)
+ * @param {String} string - to be converted to Regex
+ * @param {*[]} [args] - to be passed to RegexExp initialization
+ */
+export function regexExp (string, ...args) {
+	return new RegExp(escapeRegExp(string), ...args)
+}
+
+/**
  * Get Cookie Value by Name from Cookie String
  *
  * @example:
