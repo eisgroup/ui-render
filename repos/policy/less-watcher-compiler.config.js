@@ -61,7 +61,7 @@ module.exports = function () {
       'less-plugin-functions',
     ],
     postcssPlugins: [
-      ['postcss-prefixwrap', '.ui-render']
+      // ['postcss-prefixwrap', '.ui-render']
     ]
   }
 }

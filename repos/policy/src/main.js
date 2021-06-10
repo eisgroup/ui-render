@@ -11,12 +11,15 @@ import store from './store'
  * =============================================================================
  */
 
-render(
-  <Redux.Provider store={store}>
-    <AppElement>
-      <WebStudioPage/>
-    </AppElement>
-  </Redux.Provider>,
-  // <div>Tester React UI</div>,
-  document.getElementById('ui-render')
-)
+if (typeof window === 'undefined') {
+  console.error(`window object is required for RatingDetails!`)
+} else {
+  window._renderRatingDetails = ({id, dataUrl, metaUrl}) => render(
+    <Redux.Provider store={store}>
+      <AppElement>
+        <WebStudioPage dataUrl={dataUrl} metaUrl={metaUrl}/>
+      </AppElement>
+    </Redux.Provider>,
+    document.getElementById(id)
+  )
+}

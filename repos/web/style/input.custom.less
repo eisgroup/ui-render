@@ -8,4 +8,22 @@
   > .field-help {
     &:extend(.no-padding-left all);
   }
+
+  &.required {
+    > .input__label,
+    > * > label {
+      &:before {
+        content: "*";
+        display: inline-block;
+        width: 4px;
+        height: 4px;
+        font-size: 10px;
+        line-height: 1;
+        margin-right: 4px;
+        vertical-align: text-top;
+        font-family: SimSun, sans-serif;
+        color: rgb(218, 20, 20);
+      }
+    }
+  }
 }
