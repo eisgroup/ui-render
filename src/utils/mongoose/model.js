@@ -44,14 +44,33 @@ export function createModel (name, fields, {schema: {options, config, methods, v
   // Localised String Virtuals (using ...Localised(fields) method)
   if (fields._) {
     if (virtuals == null) virtuals = {}
+    // Virtual .lang prop is required to allow Model instance to store user's lang code with Object.assign
+    if (virtuals.lang == null) {
+      virtuals.lang = {
+        get () {return this._lang},
+        set (val) {return this._lang = val || DEFAULT.LANGUAGE}
+      }
+    }
     Object.keys(fields._.type ? fields._.type : fields._).forEach(field => {
       if (virtuals[field]) return // skip manually defined virtuals
       virtuals[field] = {
         get () {
-          return get(this, `_.${field}.${this.lang || DEFAULT.LANGUAGE}`)
+          // @note: if the field is required, but only one language exists, it will throw error for other lang requests
+          // thus, fallback to default language, then fallback to the first value found among translated values
+          let result = get(this, `_.${field}.${this.lang}`)
+          if (result == null && this.lang !== DEFAULT.LANGUAGE) result = get(this, `_.${field}.${DEFAULT.LANGUAGE}`)
+          if (result == null) {
+            const localString = get(this, `_.${field}`)
+            if (localString == null) return
+            for (const lang in localString) {
+              if (localString[lang]) return localString[lang]
+            }
+          }
+          return result
         },
         set (val) {
-          return set(this, `_.${field}.${this.lang || DEFAULT.LANGUAGE}`, val)
+          this.markModified('_')
+          return set(this, `_.${field}.${this.lang}`, val)
         }
       }
     })

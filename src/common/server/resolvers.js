@@ -70,7 +70,6 @@ const Phones = gqlDynamicObjType('Phones', PHONE, String, {validate: isPhoneNumb
 const LanguageCode = gqlEnumType('LanguageCode', LANGUAGE)
 const LanguageLevel = gqlTagLevelType('LanguageLevel', LANGUAGE, LANGUAGE_LEVEL)
 const LanguageLevelRange = gqlTagLevelType('LanguageLevelRange', LANGUAGE, LANGUAGE_LEVEL, {range: true})
-const LocalString = gqlDynamicObjType('LocalString', LANGUAGE, String)
 
 const Color = new GraphQLScalarType({
   name: 'Color',
@@ -95,7 +94,6 @@ export default {
   LanguageCode,
   LanguageLevel,
   LanguageLevelRange,
-  LocalString,
   Color,
   JSON,
   Query: {

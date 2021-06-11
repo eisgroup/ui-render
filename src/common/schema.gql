@@ -9,7 +9,7 @@ scalar Id # Incremental ID string generated based on Timestamp
 scalar LanguageCode # language ISO code
 scalar LanguageLevel # key/value pair of language code as `key`, and spoken fluency level as `value`
 scalar LanguageLevelRange # key/value pair of language code as `key`, and range of spoken fluency levels as `value`
-scalar LocalString # key/value pair of language code as `key`, and translated String as `value`
+#scalar LocalString # this is better to be static type defined in project to allow querying speficic language
 scalar Password # string with password strength validator
 scalar Permissions # key/value pair of permission code as `key`, and boolean as `value` (example: {'1': true, '2': false})
 scalar Phones # key/value pair of phone kind as `key`, and number as `value` (example: {'home': '+111', 'work': '+123'})
