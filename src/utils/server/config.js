@@ -39,7 +39,7 @@ if (__BACKEND__) {
     }
   })
 } else {
-  throw new Error(`Cannot use backend config, import from 'src/common/variables.js' instead!`)
+  if (!__TEST__) throw new Error(`Cannot use backend config, import from 'src/common/variables.js' instead!`)
 }
 
 export const {

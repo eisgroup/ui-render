@@ -1,4 +1,4 @@
-import { CURRENCY, PERMISSION, PHONE, VALIDATE } from 'modules-pack/variables'
+import { CONFIG, CURRENCY, PERMISSION, PHONE, VALIDATE } from 'modules-pack/variables'
 import mongoose from 'mongoose'
 import { phone } from 'react-ui-pack/inputs/normalizers'
 import {
@@ -6,12 +6,13 @@ import {
   by,
   enumFrom,
   get,
+  hasObjectValue,
   Id as _Id,
   isContinuousNumberRanges,
   isNumeric,
   isPhoneNumber,
   LANGUAGE,
-  startEndFromNumberRanges
+  startEndFromNumberRanges,
 } from 'utils-pack'
 import { toRgbaColor } from 'utils-pack/color'
 import { isId } from 'utils-pack/utility'
@@ -125,33 +126,83 @@ export const allPermissions = enumFrom(PERMISSION).reduce((o, k) => ({...o, [k]:
  */
 
 /**
- * Convert String ID to ObjectId
+ * Localised String Fields Definition for MongoDB using createModel() setup
+ * => Each defined field can then be set using virtuals for currently active language,
+ *  or set Localised String object directly for multiple languages.
  *
- * @param {String} id - to convert
- * @return {Object} ID
+ * @example:
+ *    const schema = {
+ *      _id: Id,
+ *      ...Localised({
+ *        about: String,
+ *        name: {maxLength: VALIDATE.NAME_MAX_LENGTH, required},
+ *      })
+ *    }
+ *    export const Model = createModel(MODEL, schema)
+ *    => Results in below schema if LocalString has `en` and `ru` languages activated
+ *    >>> schema: {
+ *      _id: Id,
+ *      _: {
+ *        type: {
+ *          about: {
+ *            en: String,
+ *            ru: String,
+ *          },
+ *          name: {
+ *            type: {
+ *              en: {type: String, maxLength: VALIDATE.NAME_MAX_LENGTH},
+ *              ru: {type: String, maxLength: VALIDATE.NAME_MAX_LENGTH},
+ *            },
+ *            required,
+ *          }
+ *        },
+ *        required,
+ *      },
+ *      // about - becomes virtual getter/setter
+ *      // name - becomes virtual getter/setter
+ *    }
+ *
+ * @param {Object} fields - to be localised, each can be either a String, or Object type definition used in Mongoose
+ * @param {Object} [LocalString] - nested key/value pairs of activated languages by their ISO code
+ * @returns {{_: Object}} fields - defined under `_` property of the schema, and virtuals are to be set by createModel()
  */
-export function toObjectId (id) {
-  return mongoose.Types.ObjectId(id)
-}
+export function Localised (fields, LocalString) {
+  if (!LocalString) {
+    LocalString = {}
+    enumFrom(CONFIG.LANGUAGE_OPTIONS).forEach(key => LocalString[key] = String)
+  }
+  const result = {}
+  let isRequired
+  for (const key in fields) {
+    const field = fields[key]
+    const isObj = hasObjectValue(field)
+    if (!isObj && field !== String)
+      throw new Error(`${Localised.name}.${key} can only be String or plain Object with value, not ${field}`)
+    if (isObj) {
+      // Pass declared field options to activated language codes
+      const {required, ...options} = field
+      const localString = hasObjectValue(options) ? {type: String, ...options} : String
+      if (required) {
+        isRequired = true
+        result[key] = {type: {}, required}
+        for (const lang in LocalString) {
+          result[key].type[lang] = localString
+        }
+      } else {
+        result[key] = {}
+        for (const lang in LocalString) {
+          result[key][lang] = localString
+        }
+      }
+    } else {
+      result[key] = LocalString
+    }
+  }
 
-/**
- * Check if given value is a MongoDb Object ID
- *
- * @param {*} value - to check
- * @returns {Boolean} true - if it is
- */
-export function isObjectId (value) {
-  return value instanceof mongoose.Types.ObjectId
-}
-
-/**
- * Check if given String is of valid MongoDb Object ID format
- *
- * @param {String} value - to check
- * @returns {Boolean} true - if it is
- */
-export function isObjectID (value) {
-  return /^[0-9a-fA-F]{24}$/.test(value)
+  // Then set declared fields as virtuals inside createModel()...
+  return {
+    _: isRequired ? {type: result, required} : result
+  }
 }
 
 /**
@@ -205,6 +256,36 @@ export function ForeignDynamicKey (refField, options) {
     },
     ...options,
   }
+}
+
+/**
+ * Convert String ID to ObjectId
+ *
+ * @param {String} id - to convert
+ * @return {Object} ID
+ */
+export function toObjectId (id) {
+  return mongoose.Types.ObjectId(id)
+}
+
+/**
+ * Check if given value is a MongoDb Object ID
+ *
+ * @param {*} value - to check
+ * @returns {Boolean} true - if it is
+ */
+export function isObjectId (value) {
+  return value instanceof mongoose.Types.ObjectId
+}
+
+/**
+ * Check if given String is of valid MongoDb Object ID format
+ *
+ * @param {String} value - to check
+ * @returns {Boolean} true - if it is
+ */
+export function isObjectID (value) {
+  return /^[0-9a-fA-F]{24}$/.test(value)
 }
 
 /**
