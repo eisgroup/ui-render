@@ -48,7 +48,7 @@ cachedQuery.clean = function (cacheTime = SERVER.QUERY_CACHE_TIME) {
  * @example:
  *    const Language = graphQlEnumType(LANGUAGE, 'Language')
  * @param {String} name - of GraphQL type, cannot contain space
- * @param {Object<NAME<code>>} DEFINITION - key/value pairs of variable name with its code value
+ * @param {Object<KEY<_...>>|Array<_...>} DEFINITION - key/value pairs of variable name with its _ value
  * @param {String} [description] - of GraphQL type
  * @returns {GraphQLScalarType} enum - type
  */
@@ -75,7 +75,7 @@ export function gqlEnumType (name, DEFINITION, {description} = {}) {
  * @example:
  *    const Phones = graphQlObjType(PHONE, String, 'Phones', {validate: isPhoneNumber})
  * @param {String} name - of GraphQL type, cannot contain space
- * @param {Object<NAME<code...>>} DEFINITION - key/value pairs of variable name with its code value
+ * @param {Object<KEY<_...>>|Array<_...>} DEFINITION - key/value pairs of variable name with its _ value
  * @param {*} ValueType - type of the value i.e String, Number, Array, etc.
  * @param {String} [description] - of GraphQL type
  * @param {Function} [validate] - function that returns true/false if value is valid/invalid
@@ -84,9 +84,10 @@ export function gqlEnumType (name, DEFINITION, {description} = {}) {
 export function gqlDynamicObjType (name, DEFINITION, ValueType = String, {validate, description} = {}) {
   const keyBy = definitionByValue(DEFINITION)
   const keyEnums = enumFrom(DEFINITION)
+  const example = `\n- {\n- ` + keyEnums.map(key => `&nbsp;&nbsp;${key}: \`${ValueType.name}\``).join(`\n- `) + `\n- }`
   const Type = new GraphQLScalarType({
     name,
-    description: description || `Object with dynamic key/value pairs:\n- Key \`String\` [${keyEnums}]\n- Value \`${ValueType.name}\``,
+    description: description || `${name} DEFINITION type:${example}`,
     serialize: (value) => value,  // value sent to the client
     parseValue (value) {return this._fromClient(value)},
     parseLiteral () {return this._fromClient(parseLiteral(...arguments))},
@@ -114,8 +115,8 @@ export function gqlDynamicObjType (name, DEFINITION, ValueType = String, {valida
  * @example:
  *    const LanguageLevel = graphQlTagLevelType(LANGUAGE, LANGUAGE_LEVEL, 'LanguageLevel')
  * @param {String} name - of GraphQL type, cannot contain space
- * @param {Object<NAME<code...>>} TAG - definition
- * @param {Object<NAME<code...>>} TAG_LEVEL - definition
+ * @param {Object<KEY<_...>>|Array<_...>} TAG - key/value pairs of variable name with its _ value
+ * @param {Object<KEY<_...>>|Array<_...>} TAG_LEVEL - key/value pairs of variable name with its _ value
  * @param {String} [description] - of GraphQL type
  * @param {Boolean} [range] - whether each level must be a list of values (for sliders)
  * @returns {GraphQLScalarType} tag/level - type

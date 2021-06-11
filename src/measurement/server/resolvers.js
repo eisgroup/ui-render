@@ -21,7 +21,7 @@ Kg._fromClient = function (value) {
 }
 
 export const Km = new GraphQLScalarType({
-  name: 'Kilometre',
+  name: 'Kilometer',
   description: 'Measurement unit for length, saved as `Int millimeter` in database, and `Float km` in client side',
   serialize: (value) => round(value / 1000000, 6),  // value sent to the client
   parseValue (value) {return this._fromClient(value)},

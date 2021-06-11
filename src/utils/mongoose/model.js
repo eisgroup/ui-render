@@ -1,13 +1,16 @@
 import { stateAction } from 'modules-pack/redux/actions'
+import { DEFAULT } from 'modules-pack/variables/defaults'
 import mongoose from 'mongoose'
 import {
   Active,
   capitalize,
   CREATE,
   DELETE,
+  get,
   hasListValue,
   isEmpty,
   isEqual,
+  set,
   SUCCESS,
   toList,
   UPDATE,
@@ -37,16 +40,36 @@ export function createModel (name, fields, {schema: {options, config, methods, v
   for (const method in methods) {
     schema.methods[method] = methods[method]
   }
+
+  // Localised String Virtuals (using ...Localised(fields) method)
+  if (fields._) {
+    if (virtuals == null) virtuals = {}
+    Object.keys(fields._.type ? fields._.type : fields._).forEach(field => {
+      if (virtuals[field]) return // skip manually defined virtuals
+      virtuals[field] = {
+        get () {
+          return get(this, `_.${field}.${this.lang || DEFAULT.LANGUAGE}`)
+        },
+        set (val) {
+          return set(this, `_.${field}.${this.lang || DEFAULT.LANGUAGE}`, val)
+        }
+      }
+    })
+  }
+
+  // Virtuals Setup
   for (const prop in virtuals) {
     const {get, set} = virtuals[prop]
     let v = schema.virtual(prop)
     if (get) v.get(get)
     if (set) v.set(set)
   }
+
+  // Indices Setup
   if (uniqueTogether) {
-    const fields = {}
-    uniqueTogether.forEach(field => {fields[field] = 1})
-    schema.index(fields, {unique})
+    const _fields = {}
+    uniqueTogether.forEach(field => {_fields[field] = 1})
+    schema.index(_fields, {unique})
   }
 
   // Extract ObjectID fields in schema definition for automatic ObjectId transform on updates
@@ -63,7 +86,7 @@ export function createModel (name, fields, {schema: {options, config, methods, v
   model.findByIds = findByIds(model)
   model.deleteByIds = deleteByIds(model)
 
-  // Setup event hooks
+  // Event hooks setup
   if (Active.store) {
     model.on('afterInsert', (entry) => {
       Active.store.dispatch(stateAction(name, CREATE, SUCCESS, entry))
@@ -76,7 +99,7 @@ export function createModel (name, fields, {schema: {options, config, methods, v
     })
   }
 
-  // Updated Timestamp (new Users will have updated = null)
+  // Updated Timestamp automatic generation (new Users will have updated = null)
   if (fields.updated === Timestamp) model.on('beforeUpdate', (entry) => {entry.updated = Date.now()})
 
   return model

@@ -21,6 +21,13 @@
 # TYPES
 # -----------------------------------------------------------------------------
 
+#type Template {
+#    name: String! # translated virtual getter/setter using user's language
+#    _: Localised_Template! # direct translations query/mutation
+#}
+#type Localised_Template {
+#    name: LocalString!
+#}
 
 # -----------------------------------------------------------------------------
 # INTERFACES
