@@ -281,12 +281,12 @@ export function warn (...args) {
  * Ensure file is loaded in correct platform
  */
 export function assertFrontend () {
-  if (__BACKEND__) throw new Error(`${WARN} WARNING! Backend file loaded in Frontend!!!`)
+  if (__BACKEND__ && !__TEST__) throw new Error(`${WARN} WARNING! Backend file loaded in Frontend!!!`)
 }
 
 /**
  * Ensure file is loaded in correct platform
  */
 export function assertBackend () {
-  if (__CLIENT__) throw new Error(`${WARN} WARNING! Frontend file loaded in Backend!!!`)
+  if (__CLIENT__ && !__TEST__) throw new Error(`${WARN} WARNING! Frontend file loaded in Backend!!!`)
 }

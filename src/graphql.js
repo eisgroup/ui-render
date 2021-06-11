@@ -1,4 +1,6 @@
 import { SevenBoom as Response } from 'graphql-apollo-errors'
+import { Active } from './_envs'
+import { isList } from './array'
 
 /**
  * GRAPHQL HELPERS =============================================================
@@ -42,4 +44,29 @@ export function authLevel (userRole) {
     }
     return descriptor
   }
+}
+
+/**
+ * HOC Decorator to Process Localised Strings (by mutation) for GraphQL Resolvers
+ *    - Injects `user.lang` or `lang` from Context to the `entry.lang` Payload Argument
+ *    - Injects language code to returned doc/s for resolving entry virtual getters/setters
+ * @default: fallbacks to active language code used by the application
+ * @example: see `authenticated` decorator
+ */
+export function localised (target, key, descriptor) {
+  const func = descriptor.value
+  descriptor.value = async function (...args) {
+    const [_, payload, {user = {}, lang}] = args
+    const langCode = user.lang || lang || Active.LANG._
+    // .lang prop must be the first in entry object for virtuals to work, because of Object.assign order
+    if (payload.entry && payload.entry.lang == null) payload.entry = {lang: langCode, ...payload.entry}
+    const result = await func.apply(this, args)
+    if (isList(result)) {
+      result.forEach(entry => {entry.lang = langCode})
+    } else if (result) {
+      result.lang = langCode
+    }
+    return result
+  }
+  return descriptor
 }

@@ -65,13 +65,13 @@ export function definitionSetup (...props) {
  *        ...
  *      }
  *
- * @param {Object<KEY<_...>>} DEFINITION - key/value pairs of variable name with its underscore value
+ * @param {Object<KEY<_...>>|Array<_...>} DEFINITION - key/value pairs of variable name with its underscore value
  * @return {Object<_<_...>>} definition - grouped by its underscore value
  */
 export function definitionByValue (DEFINITION) {
   const result = {}
-  for (const name in DEFINITION) {
-    const def = DEFINITION[name]
+  for (const index in DEFINITION) {
+    const def = DEFINITION[index]
     result[def._] = def
   }
   return result
@@ -131,15 +131,15 @@ export function optionsFrom (DEFINITION) {
  *    console.log(LANGUAGE.ENGLISH.name)
  *    >>> English
  *
- * @param {Object|Object<KEY<_...>>} DEFINITION - key/value pairs of variable name with its _ value
+ * @param {Object|Object<KEY<_...>>|Array<_...>} DEFINITION - key/value pairs of variable name with its _ value
  *    Multiple definitions can be nested unlimited times inside a single object.
  */
 export function localise (DEFINITION) {
-  for (const KEY in DEFINITION) {
-    const definition = DEFINITION[KEY]
+  for (const index in DEFINITION) {
+    const definition = DEFINITION[index]
     const {_, name} = definition
     if (name == null && _ != null) {
-      Object.defineProperty(DEFINITION[KEY], 'name', {
+      Object.defineProperty(DEFINITION[index], 'name', {
         get () {
           return this[Active.LANG._] != null
             ? this[Active.LANG._]
