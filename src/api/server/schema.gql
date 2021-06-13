@@ -19,14 +19,14 @@ extend type Query {
 
 
 type ApiKey {
-    api: String
-    key: String
+    api: String!
+    key: String!
     platform: String
-    provider: String
+    provider: String!
     active: Boolean
     fail: ApiKeyFail
     created: Timestamp!
-    updated: Timestamp!
+    updated: Timestamp
 }
 
 type ApiKeyFail {

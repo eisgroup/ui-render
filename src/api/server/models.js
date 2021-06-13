@@ -1,4 +1,4 @@
-import { createModel, index, Mixed, required, Timestamp } from 'modules-pack/utils/mongoose'
+import { createModel, Id, index, Mixed, required, Timestamp } from 'modules-pack/utils/mongoose'
 import { DEFAULT } from 'modules-pack/variables/defaults'
 import { ONE_DAY, warn } from 'utils-pack'
 import { API_MODEL, API_PLACES, API_PLATFORM_WEB, API_PROVIDER_GOOGLE } from '../constants'
@@ -14,6 +14,7 @@ if (!DEFAULT.API_PLATFORM) DEFAULT.API_PLATFORM = API_PLATFORM_WEB
 
 // Model Definition
 const ApiKey = createModel(API_MODEL, {
+  _id: Id,
   provider: {type: String, required, index}, // ex. 'google'
   api: {type: String, required, index}, // ex. 'places'
   key: {type: String, required, index},
@@ -28,6 +29,8 @@ const ApiKey = createModel(API_MODEL, {
     },
     default: undefined,
   },
+  created: Timestamp,
+  updated: Timestamp,
 }, {uniqueTogether: ['provider', 'api', 'key', 'platform']})
 export default ApiKey
 
@@ -39,7 +42,7 @@ export default ApiKey
  * @param {String} provider - third party service provider for given API (ex. 'google')
  * @returns {Promise<Array<Object>>} list - of API Key entries if found, else empty list
  */
-ApiKey.list = function ({api = DEFAULT.API, provider = DEFAULT.API_PROVIDER, ...otherFilters} = {}) {
+ApiKey.list = function ({api = DEFAULT.API_KIND, provider = DEFAULT.API_PROVIDER, ...otherFilters} = {}) {
   const resetTime = Date.now() - ONE_DAY
   return ApiKey.find({
     $and: [
@@ -60,7 +63,7 @@ ApiKey.list = function ({api = DEFAULT.API, provider = DEFAULT.API_PROVIDER, ...
  * @note: see ApiKey.list for docs
  * @returns {Promise<Array<Object>|Undefined>} entry - of API Key if found, else undefined
  */
-ApiKey.get = function ({api = DEFAULT.API, provider = DEFAULT.API_PROVIDER, ...otherFilters} = {}) {
+ApiKey.get = function ({api = DEFAULT.API_KIND, provider = DEFAULT.API_PROVIDER, ...otherFilters} = {}) {
   return ApiKey.list({api, provider, ...otherFilters}).limit(1).then(list => list[0])
 }
 

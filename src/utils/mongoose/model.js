@@ -118,7 +118,8 @@ export function createModel (name, fields, {schema: {options, config, methods, v
     })
   }
 
-  // Updated Timestamp automatic generation (new Users will have updated = null)
+  // Timestamp automatic generation (new Users will have updated = null)
+  if (fields.created === Timestamp) model.on('beforeInsert', (entry) => {entry.created = Date.now()})
   if (fields.updated === Timestamp) model.on('beforeUpdate', (entry) => {entry.updated = Date.now()})
 
   return model
