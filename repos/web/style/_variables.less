@@ -43,7 +43,7 @@
 @color-black:         rgb(0, 0, 0);
 @color-off-white:     rgb(250,250,250);
 @color-grey:          rgb(127,127,127);
-@color-off-black:     rgb(25,25,25);
+@color-off-black:     rgb(68,68,68); // Neutral/Default
 // !IMPORTANT: do not use these variables directly, use `Semantic Colors` below
 @color-grey-dark-90:  darken(@color-grey, 47%);
 @color-grey-dark-80:  darken(@color-grey, 44%);
@@ -73,14 +73,14 @@
 @color-brown:         rgb(88, 72, 53);
 @color-red-darker:    rgb(138, 42, 43);
 @color-red-dark:      rgb(189, 5, 18);
-@color-red:           rgb(216, 25, 32);
+@color-red:           rgb(200, 48, 37);
 @color-red-light:     rgb(247, 111, 170);
 @color-red-lighter:   rgb(254, 239, 239);
 @color-pink-light:    rgb(255, 125, 205);
 @color-pink:          rgb(235, 77, 164);
 @color-pink-dark:     rgb(193, 35, 193);
 @color-orange-dark:   rgb(215, 90, 30);
-@color-orange:        rgb(240, 142, 40);
+@color-orange:        rgb(229, 146, 55);
 @color-orange-light:  rgb(254, 130, 114);
 @color-orange-lighter:rgb(255, 246, 240);
 @color-gold:          rgb(239, 165, 44);
@@ -95,7 +95,7 @@
 @color-lime:          rgb(120, 190, 32);
 @color-green-lighter: rgb(236, 246, 237);
 @color-green-light:   rgb(36, 210, 187);
-@color-green:         rgb(64, 159, 30);
+@color-green:         rgb(88, 157, 47);
 @color-green-dark:    rgb(29, 114, 61);
 @color-emerald:       rgb(27, 158, 129);
 @color-emerald-light: rgb(87, 203, 158);
@@ -104,11 +104,11 @@
 @color-cyan-lighter:  rgb(100, 217, 245);
 @color-cyan-light:    rgb(55, 169, 224);
 @color-cyan:          rgb(0, 144, 218);
-@color-blue-lightest: rgb(242, 247, 253);
+@color-blue-lightest: rgb(243, 247, 252);
 @color-blue-lighter:  rgb(237, 245, 255);
 @color-blue-light2:   rgb(193, 217, 244);
 @color-blue-light:    rgb(78, 146, 223);
-@color-blue:          rgb(44, 101, 167);
+@color-blue:          rgb(46, 110, 177);
 @color-blue-dark:     rgb(55, 87, 152);
 @color-navy:          rgb(32, 50, 110);
 @color-purple:        rgb(55, 21, 130);
@@ -140,11 +140,12 @@
 @color-bg-black:          @color-off-black;
 @color-bg-panel-header:   lighten(@color-bg-black, 5%);
 @color-bg-green-light:    rgb(215,248,246);
-@color-bg-grey-lightest:  @color-grey-light-60;
-@color-bg-grey-lighter:   @color-grey-light-50;
-@color-bg-grey-light:     @color-grey-light-40;
-@color-bg-grey:           rgb(217,217,217);
-@color-bg-grey-dark:      darken(@color-grey, 15%);
+@color-bg-grey-lightest:  rgb(245, 245, 245); // L6
+@color-bg-grey-lighter:   rgb(239, 239, 239); // L5
+@color-bg-grey-light:     rgb(217, 217, 217); // L4
+@color-bg-grey:           rgb(191, 190, 190); // L3
+@color-bg-grey-dark:      rgb(128, 128, 128); // L2
+@color-bg-grey-darker:    rgb(102, 102, 102); // L1
 @color-link:              @color-primary;
 @color-link-inverse:      @color-primary-light;
 @color-shadow-lightest:   rgba(0, 0, 0, 0.05);
@@ -161,7 +162,7 @@
 @color-highlight-darker:  rgba(255, 255, 255, 0.05);
 @color-highlight-darkest: rgba(255, 255, 255, 0.02);
 @color-neutral:           fade(@color-gray, 30%);
-@color-border:            fade(@color-grey, 30%);
+@color-border:            @color-bg-grey-light;
 @color-border-inverse:    fade(@color-grey, 30%);
 @color-border-light:      @color-grey-light-40;
 @color-border-lighter:    @color-grey-light-70;
@@ -189,13 +190,15 @@
 @color-success-light:     @color-green-lighter;
 @color-warning:           @color-orange;
 @color-warning-light:     @color-orange-lighter;
+@color-focus:             ~"rgb(40 99 169 / 20%)";
+@color-focus-error:       ~"rgb(218 20 20 / 20%)";
 
 // -----------------------------------------------------------------------------
 // FONTS
 // -----------------------------------------------------------------------------
 @default-unit:                  rem;
-@font-weight:                   300;
-@font-weight-bold:              600;
+@font-weight:                   400;
+@font-weight-bold:              500;
 @font-subset:                   'cyrillic'; // or `latin` for smaller subset, check Google Fonts for options
 
 // Font Family                  // @Note: adjust font.less icon alignment with text depending on chosen font
@@ -221,32 +224,33 @@
 //.font-face(@font-family-icon-name);
 
 // Sizes
-@size-scale:            62.5%; // set this to html element so `1rem = 10px` for easier `rem` interpretation
-@size-base:             1.6rem; // default text size, used to scale all other sizes, like button, etc.
-@size-base-px:          px(@size-base);
+@size-scale:            100%; // set this to 62.5% so html element `1rem = 10px` for easier `rem` interpretation
+@size-base:             0.875rem; // default text size 14px, used to scale all other sizes, like button, etc.
+@size-base-px:          14px;
 @size-base-space:       size(round(@size-base-px * 1/4)); // character spacing
-@size-smallest:         size(round(11/16 * @size-base-px));  // round to whole pixel, then convert to rem
-@size-smaller:          size(round(12/16 * @size-base-px));
-@size-small:            size(round(14/16 * @size-base-px));
-@size-large:            size(round(20/16 * @size-base-px));
-@size-larger:           size(round(24/16 * @size-base-px));
-@size-largest:          size(round(32/16 * @size-base-px));
-@size-h6:               size(round(18/16 * @size-base-px));  // actual header sizes will be converted to %
-@size-h5:               size(round(20/16 * @size-base-px));
-@size-h4:               size(round(24/16 * @size-base-px));
-@size-h3:               size(round(24/16 * @size-base-px));
-@size-h2:               size(round(28/16 * @size-base-px));
-@size-h1:               size(round(36/16 * @size-base-px));
+@size-smallest:         size(round(10/14 * @size-base-px));  // round to whole pixel, then convert to rem
+@size-smaller:          size(round(11/14 * @size-base-px));
+@size-small:            size(round(12/14 * @size-base-px));
+@size-large:            size(round(16/14 * @size-base-px));
+@size-larger:           size(round(20/14 * @size-base-px));
+@size-largest:          size(round(28/14 * @size-base-px));
+@size-h6:               18px;  // actual header sizes will be converted to %
+@size-h5:               20px;
+@size-h4:               24px;
+@size-h3:               24px;
+@size-h2:               28px;
+@size-h1:               36px;
 
 // Icons
-@size-icon:             1.6rem; // Custom icon fonts http://icomoon.io/app/#/select
-@size-icon-px:          px(@size-icon);
-@size-icon-smallest:    size(round(12/16 * @size-icon-px));
-@size-icon-smaller:     size(round(14/16 * @size-icon-px));
-@size-icon-small:       size(round(16/16 * @size-icon-px));
-@size-icon-large:       size(round(24/16 * @size-icon-px));
-@size-icon-larger:      size(round(32/16 * @size-icon-px));
-@size-icon-largest:     size(round(40/16 * @size-icon-px));
+@size-icon:             0.875rem; // Custom icon fonts http://icomoon.io/app/#/select
+@size-icon-px:          14px;
+@size-icon-smallest:    size(round(8/14 * @size-icon-px));
+@size-icon-smaller:     size(round(10/14 * @size-icon-px));
+@size-icon-small:       size(round(12/14 * @size-icon-px));
+@size-icon-large:       size(round(16/14 * @size-icon-px));
+@size-icon-larger:      size(round(24/14 * @size-icon-px));
+@size-icon-largest:     size(round(36/14 * @size-icon-px));
+@icon-opacity:          0.7;
 
 // Line Heights
 @line-height-scale:     1.37; // 1.37 works for Open Sans (use unitless number to scale dynamically)
@@ -267,7 +271,7 @@
 // -----------------------------------------------------------------------------
 
 // Margin
-@margin-base:           1.6rem;
+@margin-base:           1rem;
 @margin-smallest:       (@margin-base * 4  /16);
 @margin-smaller:        (@margin-base * 8  /16);
 @margin-small:          (@margin-base * 12 /16);

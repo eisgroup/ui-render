@@ -249,7 +249,7 @@ Render.Component = function RenderComponent ({
       if (view === FIELD.TYPE.DROPDOWN) {
         // proxy onChange to prevent event sent as second argument
         const {onChange, ...dropdown} = input
-        return <Dropdown onChange={onChange ? (value => onChange(value)) : undefined} {...dropdown}/>
+        return <Dropdown lazyLoad={false} onChange={onChange ? (value => onChange(value)) : undefined} {...dropdown}/>
       }
 
       // Form value changing fields should have 'Input' as view

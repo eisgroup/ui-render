@@ -483,6 +483,7 @@ export default {
                                 name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].area',
                                 label: 'Area',
                                 removable: true,
+                                required: true,
                                 autoSubmit: {
                                   delay: 1000
                                 }

@@ -106,6 +106,38 @@
   animation: expand-v @speed-base forwards;
 }
 
+
+/* Expand Vertically */
+@keyframes expand-down {
+  from {
+    max-height: 0;
+  }
+  to {
+    max-height: 70vh;
+  }
+}
+
+.expand-down {
+  max-height: 0;
+  animation: expand-down @speed-base forwards;
+}
+
+
+/* Expand Vertically */
+@keyframes collapse-up {
+  from {
+    max-height: 70vh;
+  }
+  to {
+    max-height: 0;
+  }
+}
+
+.collapse-up {
+  max-height: 70vh;
+  animation: collapse-up @speed-base forwards;
+}
+
 /* Fade In */
 @keyframes fade-in {
   from {

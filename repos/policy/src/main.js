@@ -11,10 +11,10 @@ import store from './store'
  * =============================================================================
  */
 
-if (typeof window === 'undefined') {
-  console.error(`window object is required for RatingDetails!`)
+if (typeof document === 'undefined') {
+  console.error(`document object is required for RatingDetails!`)
 } else {
-  window._renderRatingDetails = ({id, dataUrl, metaUrl}) => render(
+  document._renderRatingDetails = ({id, dataUrl, metaUrl}) => render(
     <Redux.Provider store={store}>
       <AppElement>
         <WebStudioPage dataUrl={dataUrl} metaUrl={metaUrl}/>

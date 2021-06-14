@@ -2,7 +2,7 @@
 @table-color-border: @color-border;
 @table-border: @border-size @border-style @table-color-border;
 @table-border-radius: @radius-base;
-@table-header-bg-color: @color-bg-grey-light;
+@table-header-bg-color: @color-bg-grey-lightest;
 
 table {
   border-spacing: 0; // remove spacing between tr rows
@@ -15,7 +15,7 @@ table {
     &:extend(.padding-right-small all);
   }
 
-  thead tr:first-child {
+  thead > tr:first-child {
     th:first-child,
     th:first-child > * {
       border-top-left-radius: @table-border-radius;
@@ -27,7 +27,7 @@ table {
     }
   }
 
-  tbody tr:last-child {
+  tbody > tr:last-child {
     > th,
     > td {
       border-bottom: none;
@@ -48,16 +48,17 @@ table {
 // Minimise nested styling to allow easy config override
 tr {
   @{select-interaction} {
-    &:extend(.bg-primary-lighter all);
+    &:extend(.bg-primary-lightest all);
 
     > td,
     > td > * {
-      &:extend(.bg-primary-lighter all);
+      &:extend(.bg-primary-lightest all);
     }
   }
 }
 
 th {
+  &:extend(.bold);
   background-color: @table-header-bg-color;
 }
 
@@ -86,5 +87,14 @@ th, td {
 .app__table__options {
   > * {
     &:extend(.margin all);
+  }
+}
+
+// Expand inside table row
+th, td {
+  > .app__expand {
+    > *:focus {
+      &:extend(.no-outline);
+    }
   }
 }

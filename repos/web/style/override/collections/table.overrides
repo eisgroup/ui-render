@@ -1,7 +1,7 @@
 /*******************************
          Site Overrides
 *******************************/
-//@import "../../_mixins";
+@import "../../_mixins";
 .ui.table {
   margin: 0;
   &.inverted {

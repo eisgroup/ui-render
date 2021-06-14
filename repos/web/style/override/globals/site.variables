@@ -1,7 +1,7 @@
 /*******************************
      User Global Variables
 *******************************/
-//@import "../../_mixins";
+@import "../../_mixins";
 /* Reference: /node_modules/semantic-ui-less/themes/default/globals/site.variables */
 
 @fontPath               : @path-fonts;

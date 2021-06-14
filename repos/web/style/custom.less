@@ -7,6 +7,13 @@
   }
 }
 
+@{select-icon},
+i.icon.dropdown {
+  &:before {
+    opacity: @icon-opacity;
+  }
+}
+
 label {
   .json-tree & {
     text-transform: initial;
@@ -15,4 +22,24 @@ label {
 
 .app__tag {
   &:extend(.input-tag all);
+}
+
+.app__expand {
+  > *:first-child {
+    font-size: @size-large;
+  }
+}
+
+.tabs__item {
+  font-size: @size-large;
+
+  &:focus {
+    &:extend(.no-outline);
+  }
+}
+
+table {
+  thead {
+    color: @color-bg-grey-darker;
+  }
 }

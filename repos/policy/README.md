@@ -40,4 +40,8 @@ postcssPlugins: [
 @import url("https://fonts.googleapis.com/css?family=Roboto:300,600|Open Sans:300,600&display=swap&subset=cyrillic");
 ```
 
-5. Rename all `.css` files to `.less`
+5. Remove all instances of query string added inside compiled css files, for example
+
+`fonts/iconsOpenL.eot?id0mra`
+
+6. Rename all `.css` files to `.less`

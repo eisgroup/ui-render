@@ -14,80 +14,80 @@ There are `transform patterns` you can apply to any component. This is the secre
 ## Transform Patterns
 
 1. **Recursive Field definitions**
-    - A Field can be any view or input component, such as Button, Table, Dropdown...
-    - Objects with `view` attribute can have other fields nested inside `items` attribute.
+   - A Field can be any view or input component, such as Button, Table, Dropdown...
+   - Objects with `view` attribute can have other fields nested inside `items` attribute.
 
 2. **Function definitions by name**
-    - A Function can be defined using attributes starting with the word `render`
-      Example: `renderItem`, `renderLabel`...
-    - Arguments can be defined, separated by comma
-      Example: `"setState,plan"` -> use `plan` as argument
-    - Function can be defined as object
-      Example: 
-      ```js
-        {
-          name: "fetch",
-          args: [
-            "https://url.to.fetch.com/api",
-            {
-              method: "POST",
-              ...
-            }
-          ]
-        }
-      ```
-    - Function can be chained with arguments mapped dynamically
-      Example:
-      ```js
-        {
-          name: "fetch",
-          onDone: {
-            name: 'fetch',
-            mapArgs: [ // function will first receive `mapArgs`, then followed by `args`, as arguments
-              // variable `{0.payload.ip}` can be defined to get data from arguments, in addition to *_data.json
-              'https://ipapi.co/{0.payload.ip}/json', // this is the first argument passed to the function
-              // ...second (subsequent) argument/s can be defined as object/array/number/etc.
-            ],
-            onDone: {
-              name: 'popup',
-              args: ['Dropdown.onChange\n -> fetch(IpAddress).onDone\n -> fetch(GeoData).onDone\n -> popup'],
-            }
-          }
-        }
-      ```
+   - A Function can be defined using attributes starting with the word `render`
+     Example: `renderItem`, `renderLabel`...
+   - Arguments can be defined, separated by comma
+     Example: `"setState,plan"` -> use `plan` as argument
+   - Function can be defined as object
+     Example:
+     ```js
+       {
+         name: "fetch",
+         args: [
+           "https://url.to.fetch.com/api",
+           {
+             method: "POST",
+             ...
+           }
+         ]
+       }
+     ```
+   - Function can be chained with arguments mapped dynamically
+     Example:
+     ```js
+       {
+         name: "fetch",
+         onDone: {
+           name: 'fetch',
+           mapArgs: [ // function will first receive `mapArgs`, then followed by `args`, as arguments
+             // variable `{0.payload.ip}` can be defined to get data from arguments, in addition to *_data.json
+             'https://ipapi.co/{0.payload.ip}/json', // this is the first argument passed to the function
+             // ...second (subsequent) argument/s can be defined as object/array/number/etc.
+           ],
+           onDone: {
+             name: 'popup',
+             args: ['Dropdown.onChange\n -> fetch(IpAddress).onDone\n -> fetch(GeoData).onDone\n -> popup'],
+           }
+         }
+       }
+     ```
 
 3. **Custom rendering by matching values**
-    - See the [example](#render-field-attributes) of `renderCell: { values: {...} }` in Table view
-    - Default function can be defined when no value matches
-      Example: `renderCell: { default: "Currency" }`
+   - See the [example](#render-field-attributes) of `renderCell: { values: {...} }` in Table view
+   - Default function can be defined when no value matches
+     Example: `renderCell: { default: "Currency" }`
 
 4. **Data mapping by key paths**
-    - See the [example](#render-field-attributes) of `mapItems` and `mapOptions`
-    - String can be used as a mapper
-      Example: `{mapOptions: "planName"}` -> use `planName` attribute as options value
+   - See the [example](#render-field-attributes) of `mapItems` and `mapOptions`
+   - String can be used as a mapper
+     Example: `{mapOptions: "planName"}` -> use `planName` attribute as options value
 
-5. **Dynamic definition with curly brace transform** 
-    - The curly brace surrounding a key path will replace it with value found in `data.json` or in `state`
-      Example: `{name: "{key}"}` -> becomes `{name: "value"}`
-    - Fallback value can be defined after a comma
-      Example: `{name: "{key,0}}"` -> falls back to `{name: "0"}`)
+5. **Dynamic definition with curly brace transform**
+   - The curly brace surrounding a key path will replace it with value found in `data.json` or in `state`
+     Example: `{name: "{key}"}` -> becomes `{name: "value"}`
+   - Fallback value can be defined after a comma
+     Example: `{name: "{key,0}}"` -> falls back to `{name: "0"}`)
 
-6. **Value transform for objects with a single attribute "name"** 
-    - Example: `{title: {name: "{key}"}}` -> becomes `{title: "value"}`
-    - Curly brace transform of the `{key}` attribute will happen first in the example
+6. **Value transform for objects with a single attribute "name"**
+   - Example: `{title: {name: "{key}"}}` -> becomes `{title: "value"}`
+   - Curly brace transform of the `{key}` attribute will happen first in the example
 
-7. **State dependent config** 
-    - Dynamic states are used to transform the `meta.json` config on each render
-    - Define the function triggering state update as:
-      `{name: "setState", args: ["state.key.path.to.set"]}` 
-    - Then in the dynamic config, use curly brace transform with: 
-      `{state.key.path.to.value}`
-    - See the [example](#render-field-attributes) of Dropdown `onChange` attribute
- 
+7. **State dependent config**
+   - Dynamic states are used to transform the `meta.json` config on each render
+   - Define the function triggering state update as:
+     `{name: "setState", args: ["state.key.path.to.set"]}`
+   - Then in the dynamic config, use curly brace transform with:
+     `{state.key.path.to.value}`
+   - See the [example](#render-field-attributes) of Dropdown `onChange` attribute
+
 8. **Global/Relative Data access**
-    - When you specify the `name` attribute of a Field, it retrieves values from the root `data.json` object by default
-    - Use `{relativeData: true}` to make `name` attribute retrieve values from local data passed down from parent/grandparent/etc. fields.
-    - Example:
+   - When you specify the `name` attribute of a Field, it retrieves values from the root `data.json` object by default
+   - Use `{relativeData: true}` to make `name` attribute retrieve values from local data passed down from parent/grandparent/etc. fields.
+   - Example:
     ```js
     const localData = {
       view: "GrandParent",
@@ -117,8 +117,9 @@ There are `transform patterns` you can apply to any component. This is the secre
       ]
     }
     ```
-      
+
 ## Render Field Attributes
+
 ```js
 const RenderField = {
 
@@ -128,10 +129,11 @@ const RenderField = {
   children: 'Any', // nested content to render inside field
   onClick: Function, // example: `{onClick: 'setState,active.plan'}` - `setState` function with `active.plan` argument
   style: Object, // css style to apply
-   className: 'CSS class name to apply',
-   hideOnEmpty: Boolean, // whether to not render the component if its value is null/undefined/empty string
-
-   // Input attributes
+  className: 'CSS class name to apply',
+  hideOnEmpty: Boolean, // whether to not render the component if its value is null/undefined/empty string
+  debug: Boolean, // whether to suppress certain erros related to incorrect data type, default is false in production
+   
+  // Input attributes
   name: 'adminCosts.adminCategory', // (required for inputs)* path to field value within *_data.json
   label: 'Input label',
   placeholder: 'To appear inside empty input when focused',
@@ -259,4 +261,6 @@ const RenderField = {
 }
 ```
 
-For a full list of values to use for `view` and formatting functions, check [Field Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/variables/fields.js) and [Form Input Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/form/constants.js).
+For a full list of values to use for `view` and formatting functions,
+check [Field Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/variables/fields.js)
+and [Form Input Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/form/constants.js).

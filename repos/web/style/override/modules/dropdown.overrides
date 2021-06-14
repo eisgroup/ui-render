@@ -2,7 +2,7 @@
         User Overrides
 *******************************/
 @import "../../fonts/icons/variables";
-//@import "../../_mixins";
+@import "../../_mixins";
 
 // @IMPORTANT: Color overrides only!
 // For styles affecting layout, edit inside `input.less`
@@ -24,7 +24,10 @@
     }
   }
 
+  // Focus state
   &.active {
+    .outline() !important;
+
     .inverted & {
       border-color: @color-primary-light !important;
     }
@@ -129,6 +132,17 @@
   // Non-clickable option item with disabled class
   .disabled.item {
     border-style: initial !important; // override default .disabled style
+  }
+
+  .menu {
+    .active.item {
+      font-weight: @font-weight-bold;
+    }
+
+    @color-shadow: ~"rgb(0 0 0 / 15%)";
+    border: none !important;
+    margin-top: @margin-smallest;
+    box-shadow: 0 2px 8px @color-shadow !important;
   }
 
   &.text.blue {

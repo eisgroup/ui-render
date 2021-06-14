@@ -2,14 +2,13 @@
   "name": "@eisgroup/rating-details",
   "version": "0.1.0",
   "homepage": ".",
-  "private": true,
   "sideEffects": false,
   "license": "UNLICENSED",
   "publishConfig": {
     "registry": "http://sfoeisnexus03.exigengroup.com/repository/genesis-npm/"
   },
   "scripts": {
-    "push": "cp {README.md,LICENSE,package.json} dist/ && cd dist && yarn publish && cd ../",
+    "push": "cp {README.md,LICENSE,package.json} dist/ && cd dist && npm publish && cd ../",
     "build": "tsc",
     "delete": "../../node_modules/rimraf/bin.js",
     "clean": "yarn delete {build/**/*.map,buildless-watcher-compiler.config.js/**/**/*.map}"

@@ -71,7 +71,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 h1, .h1 {
-  font-size: (@size-h1 / @size-base * 100%); // define in percentage to work nicely on mobile
+  font-size: @size-h1; // define in percentage to work nicely on mobile
 
   small {
     color: inherit;
@@ -80,32 +80,32 @@ h1, .h1 {
 
   /* Resize on mobile */
   @media screen and (max-width: @screen-tablet - @screen-unit) {
-    font-size: 0.8 * (@size-h1 / @size-base * 100%);
+    font-size: 0.8 * @size-h1;
   }
 
   /* Resize on mobile */
   @media screen and (max-width: @screen-mobile-small) {
-    font-size: 0.7 * (@size-h1 / @size-base * 100%);
+    font-size: 0.7 * @size-h1;
   }
 }
 
 h2, .h2 {
-  font-size: (@size-h2 / @size-base * 100%); // define in percentage to work nicely on mobile
+  font-size: @size-h2; // define in percentage to work nicely on mobile
   text-transform: capitalize;
 
   /* Resize on mobile */
   @media screen and (max-width: @screen-tablet - @screen-unit) {
-    font-size: 0.85 * (@size-h2 / @size-base * 100%);
+    font-size: 0.85 * @size-h2;
   }
 
   /* Resize on mobile */
   @media screen and (max-width: @screen-mobile-small) {
-    font-size: 0.75 * (@size-h2 / @size-base * 100%);
+    font-size: 0.75 * @size-h2;
   }
 }
 
 h3, .h3 {
-  font-size: (@size-h3 / @size-base * 100%); // define in percentage to work nicely on mobile
+  font-size: @size-h3; // define in percentage to work nicely on mobile
 
   small {
     color: inherit;
@@ -115,20 +115,20 @@ h3, .h3 {
 
   /* Resize on mobile */
   @media screen and (max-width: @screen-tablet - @screen-unit) {
-    font-size: 0.9 * (@size-h3 / @size-base * 100%);
+    font-size: 0.9 * @size-h3;
   }
 }
 
 h4, .h4 {
-  font-size: (@size-h4 / @size-base * 100%); // define in percentage to work nicely on mobile
+  font-size: @size-h4; // define in percentage to work nicely on mobile
 }
 
 h5, .h5 {
-  font-size: (@size-h5 / @size-base * 100%); // define in percentage to work nicely on mobile
+  font-size: @size-h5; // define in percentage to work nicely on mobile
 }
 
 h6, .h6 {
-  font-size: (@size-h6 / @size-base * 100%); // define in percentage to work nicely on mobile
+  font-size: @size-h6; // define in percentage to work nicely on mobile
   margin: calc(2rem - 0.14285714em) 0 1rem;
 }
 
@@ -168,7 +168,7 @@ img {
 }
 
 @{select-icon} {
-  font-size: (@size-icon / @size-base * 100%); // scale size with text
+  font-size: @size-icon; // scale size with text
   line-height: 1; // fix line height inherited from frameworks
   &.smallest {
     font-size: @size-icon-smallest;
@@ -219,7 +219,7 @@ b, strong {
 }
 
 @{select-icon} {
-  font-size: (@size-icon / @size-base * 100%);
+  font-size: @size-icon;
 }
 
 .app {

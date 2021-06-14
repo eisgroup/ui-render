@@ -1,15 +1,15 @@
 @import "_mixins";
 
 @input-colors: primary;
-@input-color: @color-black; // label and border color
+@input-color: @color-text; // label + text
 @input-color-inverse: @color-text-grey; // inverted label and border color
 @input-color-active: @color-primary; // label and border color
 @input-color-active-inverse: @color-primary-light; // inverted label and border color
-@input-border: @border @input-color;
+@input-border: @border @color-bg-grey;
 @input-background-color: transparent;
 @input-background-color-interaction: transparent;
-@input-padding-v: 0.4;
-@input-padding-h: @input-padding-v * 2;
+@input-padding-v: 0.8;
+@input-padding-h: @input-padding-v * 1;
 @input-padding-h-value: size(round(@input-padding-h * @size-base-px));
 @input-padding-v-value: size(round(@input-padding-v * @size-base-px));
 @input-line-height-fix: 1; // for consistent input height (this value depends on chosen font)
@@ -18,21 +18,22 @@
 @input-font-size-large-icon: @size-icon-large;
 @input-option-swatch-size: @size-icon-large;
 // Floating Label Calculation
-@input-label-size-default-ratio: 16/16; // shown as placeholder
-@input-label-size-ratio: 14/16; // minimized at the top
+@input-help-size-ratio: 1;
+@input-label-size-default-ratio: 1; // shown as placeholder
+@input-label-size-ratio: 12/14; // minimized at the top
 @input-label-line-height: 1.3;
-@input-label-size: size(round(@input-label-size-ratio * px(@input-font-size))); // offset space for Label to sit at the top
+@input-label-size: size(round(@input-label-size-ratio * @input-font-size)); // offset space for Label to sit at the top
 @input-label-size-offset: @input-label-size + @input-padding-v-value + (@input-label-size-default-ratio - @input-label-size-ratio) * @input-label-line-height * @input-font-size;
 // Color swatch
 @input-swatch-width: size(40);
 @input-swatch-height: size(33);
 
 .input-done {
-  border-color: fade(@input-color, 35%);
+  //border-color: fade(@input-color, 35%);
   //border-style: dashed;
 
   .inverted & {
-    border-color: fade(@input-color-inverse, 35%);
+    //border-color: fade(@input-color-inverse, 35%);
   }
 }
 
@@ -142,6 +143,7 @@ input, select, textarea {
   &:extend(.transition all); // prevent flickering on hover of float fields
   .font(@size: @input-font-size; @lineHeight: normal; @weight: @font-weight);
   .scalePadding(@size: @input-font-size, @top: @input-padding-v, @left: @input-padding-h);
+  color: @input-color;
   display: inline-flex;
   width: 100%; // this is needed for input to dynamically adjust to available width
   background-color: @input-background-color;
@@ -247,6 +249,7 @@ input, select, textarea {
 .input__label {
   &:extend(.margin-smaller all);
   &:extend(.round all);
+  &:extend(.bold);
   color: @input-color;
   font-size: @input-label-size-default-ratio * 100%; // use percent unit so it scales automatically
   line-height: @input-label-line-height;
@@ -416,7 +419,7 @@ input, select, textarea {
     &:extend(.no-margin all);
     top: @border-size;
     right: @border-size;
-    opacity: 1;
+    opacity: @icon-opacity;
     font-size: @size-icon;
     color: @input-color;
 
@@ -568,7 +571,7 @@ input, select, textarea {
         }
 
         &:focus {
-          .outline(@color: @color-error; @color-inverse: @color-error-light);
+          .outline(@color: @color-focus-error; @color-inverse: @color-error-light);
         }
       }
     }
@@ -734,7 +737,7 @@ div.select {
 
 /* Input Helper Info */
 .input__field-help {
-  font-size: size(round(px(@input-font-size) * 0.8));
+  font-size: size(round(px(@input-font-size) * @input-help-size-ratio));
   padding: @padding-smaller @input-padding-h-value;
   opacity: 0;
 
