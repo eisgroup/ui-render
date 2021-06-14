@@ -14,6 +14,7 @@ import store from './store'
 if (typeof document === 'undefined') {
   console.error(`document object is required for RatingDetails!`)
 } else {
+  document._dataFetchMethod = 'GET'
   document._renderRatingDetails = ({id, dataUrl, metaUrl}) => render(
     <Redux.Provider store={store}>
       <AppElement>

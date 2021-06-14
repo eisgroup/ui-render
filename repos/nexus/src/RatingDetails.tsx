@@ -21,10 +21,10 @@ export default class RatingDetails extends Component<Props, any> {
     // Mount UI Render to given DOM element by ID
     componentDidMount() {
         // @ts-ignore
-        if (!window._renderRatingDetails) return console.error(`window._renderRatingDetails is required for ${this.constructor.name}!`)
+        if (!document._renderRatingDetails) return console.error(`window._renderRatingDetails is required for ${this.constructor.name}!`)
         const {dataUrl, metaUrl} = this.props
         // @ts-ignore
-        window._renderRatingDetails({id: this.id, dataUrl, metaUrl})
+        document._renderRatingDetails({id: this.id, dataUrl, metaUrl})
     }
 
     render() {

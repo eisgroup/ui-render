@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "0.21.2",
+  "version": "0.21.3",
   "private": true,
   "scripts": {
     "start": "yarn cors && yarn gql && yarn css --sourcemap && react-app-rewired start & yarn style --sourcemap",

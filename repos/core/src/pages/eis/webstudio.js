@@ -41,7 +41,9 @@ export default class WebStudioPage extends Component {
   get urlPrefix () {
     if (this._urlPrefix != null) return this._urlPrefix
     this._urlPrefix = document.getElementById('ui-render').getAttribute('data-prefix-url') || ''
-    if (this._urlPrefix) this._urlPrefix = window.location.origin + this._urlPrefix
+    if (typeof window !== 'undefined') {
+      if (this._urlPrefix) this._urlPrefix = window.location.origin + this._urlPrefix
+    }
     return this._urlPrefix
   }
 
@@ -63,7 +65,8 @@ export default class WebStudioPage extends Component {
       dataUrl = this.urlPrefix + ENV.REACT_APP_DATA_URL,
       metaUrl = this.urlPrefix + ENV.REACT_APP_META_URL
     } = this.props
-    this.fetch(dataUrl, {body: this.id, contentType: 'text/plain'})
+    // todo: remove temporary mock for Policy UI for fetch method
+    this.fetch(dataUrl, {body: this.id, contentType: 'text/plain', method: document._dataFetchMethod})
       .then(data => this.setState({loadingData: false, data}))
       .catch(this.popup)
     this.fetch(metaUrl, {contentType: 'application/json'})
@@ -78,12 +81,10 @@ export default class WebStudioPage extends Component {
     return this.setState(state)
   }
 
-  fetch = async (url, {body = {}, contentType = 'application/json'}) => {
-    const data = {method: 'POST', body, headers: {'Content-Type': contentType}}
+  fetch = async (url, {body = {}, contentType = 'application/json', method = 'POST'}) => {
+    const data = {method, body, headers: {'Content-Type': contentType}}
 
-    // todo: remove temporary mock for Policy demo
-    if (url === 'https://dxp-gateway-nightly.genci0.eisgroup.com/backoffice-rating-std-master/poc/details/policy1/1') {
-      data.method = 'GET'
+    if (data.method === 'GET') {
       delete data.body
     }
 
