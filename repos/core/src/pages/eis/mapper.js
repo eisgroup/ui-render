@@ -43,7 +43,7 @@ FIELD.TYPE = {
 Render.Tooltip = TooltipPop
 
 /**
- * Map UI Renderer props to final Rendering Component/s
+ * Map UI Render props to final Rendering Component/s
  *
  * @param {String} view - component type (one of FIELD.TYPE values)
  * @param {Array} items - nested child component props

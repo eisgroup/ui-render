@@ -9,6 +9,7 @@ import config from './config.md'
 import docs from './docs.md'
 import Examples from './Examples'
 import faq from './fag.md'
+import styles from './styles.md'
 
 const mdProps = {
   plugins: [toc],
@@ -25,6 +26,7 @@ export default class Docs extends Component {
     docs: undefined,
     config: undefined,
     examples: undefined,
+    styles: undefined,
     faq: undefined,
   }
 
@@ -35,12 +37,14 @@ export default class Docs extends Component {
   get tabIndex () {
     const id = this.id
     switch (id) {
-      case 'examples':
-        return 2
       case 'configuration':
         return 1
-      case 'faq':
+      case 'examples':
+        return 2
+      case 'styles':
         return 3
+      case 'faq':
+        return 4
       default:
         return 0
 
@@ -50,20 +54,22 @@ export default class Docs extends Component {
   componentDidMount () {
     fetch(docs).then(r => r.text()).then(docs => this.setState({docs}))
     fetch(config).then(r => r.text()).then(config => this.setState({config}))
+    fetch(styles).then(r => r.text()).then(styles => this.setState({styles}))
     fetch(faq).then(r => r.text()).then(faq => this.setState({faq}))
   }
 
   render () {
     return (
       <ScrollView fill className={'app-docs padding-large'}>
-        <h1>{'UI Renderer'}</h1>
+        <h1>{'UI Render'}</h1>
         <Tabs
           defaultIndex={this.tabIndex}
-          tabs={['Summary', 'Configuration', 'Examples', 'FAQ']}
+          tabs={['Summary', 'Configuration', 'Examples', 'Styles', 'FAQ']}
           panels={[
             () => <Markdown source={this.state.docs} {...mdProps}/>,
             () => <Markdown source={this.state.config} {...mdProps}/>,
             () => <Examples/>,
+            () => <Markdown source={this.state.styles} {...mdProps}/>,
             () => <Markdown source={this.state.faq} {...mdProps}/>,
           ]}
           classNamePanels='padding-v margin-v'

@@ -25,7 +25,7 @@ It is called `className`, instead of `class`, because the UI is written in JavaS
 `renderCell: "Percent"` -> outputs number as percent with % sign.
 
 ## How to set custom CSS styles?
-The recommended way to style a component is to use the UI Renderer's built in styles, calling them by name as a string, via the `className` attribute.
+The recommended way to style a component is to use the UI Render's built in styles, calling them by name as a string, via the `className` attribute.
 Example: `{className: "padding border"}` -> add standard padding and border to a Field.
 
 Custom CSS styling can be set by directly writing CSS in [React way](https://reactjs.org/docs/faq-styling.html) via the `style` attribute.

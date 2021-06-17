@@ -33,7 +33,7 @@ export default class OpenL extends Component {
     return (
       <>
         <ScrollView fill className='fade-in bg-neutral'>
-          <Text className='h1 center padding bg-grey no-margin'>All Possible Configurations of The UI Renderer</Text>
+          <Text className='h1 center padding bg-grey no-margin'>All Possible Configurations of The UI Render</Text>
           <form onSubmit={handleSubmit}>
             <Render data={this.data} {...this.meta} form={form}/>
           </form>

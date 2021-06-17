@@ -2,13 +2,13 @@
 
 ## The Pattern Driven Design
 
-The UI Renderer takes a conceptually different approach, unlike most UI frameworks you may be familiar with (ex. Bootstrap, Material Design, AntD...).
+The UI Render takes a conceptually different approach, unlike most UI frameworks you may be familiar with (ex. Bootstrap, Material Design, AntD...).
 
-Similar to most frameworks, the UI Renderer provides `built-in UI components`, such as Button, Table, Dropdown, etc. - with different set of attributes available for each.
+Similar to most frameworks, the UI Render provides `built-in UI components`, such as Button, Table, Dropdown, etc. - with different set of attributes available for each.
 
 But instead of being limited to what built-in components can do, you are given complete freedom to mix and match different attributes within each UI component - or `Render Field`, as we call it.
 
-There are `transform patterns` you can apply to any component. This is the secret sauce that enables the UI Renderer to be both declarative and dynamic in nature, allowing `unlimited configuration`.
+There are `transform patterns` you can apply to any component. This is the secret sauce that enables the UI Render to be both declarative and dynamic in nature, allowing `unlimited configuration`.
 
 
 ## Transform Patterns
@@ -86,7 +86,7 @@ There are `transform patterns` you can apply to any component. This is the secre
 
 8. **Global/Relative Data access**
    - When you specify the `name` attribute of a Field, it retrieves values from the root `data.json` object by default
-   - Use `{relativeData: true}` to make `name` attribute retrieve values from local data passed down from parent/grandparent/etc. fields.
+   - Use `{relativeData: true}` to make `name` attribute retrieve values from local data passed down (inherited) from parent/grandparent/etc. fields.
    - Example:
     ```js
     const localData = {
