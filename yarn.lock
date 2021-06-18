@@ -16259,10 +16259,10 @@ utils-merge@1.0.1:
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
 
-utils-pack@^0.3.17:
-  version "0.3.17"
-  resolved "https://registry.yarnpkg.com/utils-pack/-/utils-pack-0.3.17.tgz#6a8c42d09883d3f3eb6e78ebbb36854218ddd05d"
-  integrity sha512-dzON/wio8PxZdfYuVK5+wf/2kbRNWJ0piwZ2/ZvzfFZgpNoDj9FpoP5xU36txKbv/GY4kD3NVCzjQW203BBYHw==
+utils-pack@^0.3.21:
+  version "0.3.21"
+  resolved "https://registry.yarnpkg.com/utils-pack/-/utils-pack-0.3.21.tgz#ec180f59d83611e7a0503f75b0f77e79a3e83391"
+  integrity sha512-T5vecr3F2LxHdUANRUhzMYHluaHaLU3rElfq9CvcRviIEdcTH5c2pgcXrFKe2vjOjxvjHlGsHqIltCu8Kvl/Gg==
   dependencies:
     bson-objectid "^1.3.1"
     circular-json "^0.5.9"

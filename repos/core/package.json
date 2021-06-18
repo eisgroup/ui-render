@@ -21,7 +21,7 @@
     "react-ui-pack": "^0.7.7",
     "remark-toc": "^7.0.0",
     "ui-renderer": "*",
-    "utils-pack": "^0.3.17"
+    "utils-pack": "^0.3.21"
   },
   "scripts": {},
   "eslintConfig": {

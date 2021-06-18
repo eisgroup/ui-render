@@ -27,7 +27,7 @@ import Text from 'react-ui-pack/Text'
 import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
 import Render, { mapProps } from 'ui-renderer'
-import { Active, ALERT, debounce, get, isList, isNumeric, isObject, TIME_DURATION_INSTANT } from 'utils-pack'
+import { Active, ALERT, debounce, get, isList, isNumeric, isObject, isTruthy, TIME_DURATION_INSTANT } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 
 /**
@@ -66,7 +66,7 @@ Render.Component = function RenderComponent ({
   ...props
 }) {
   /* General hideOnEmpty logic */
-  if (hideOnEmpty && (_data == null || !_data.length)) return null
+  if (hideOnEmpty && !isTruthy(_data)) return null
 
   switch (view) {
     case FIELD.TYPE.COL:
@@ -136,7 +136,7 @@ Render.Component = function RenderComponent ({
       const {mapItems, ...prop} = props
       if (mapItems) _data = mapProps(_data, mapItems, {debug})
       if (items.length) prop.children = items.map(Render)
-      if (hideOnEmpty && (_data == null || !_data.length)) return null
+      if (hideOnEmpty && !isTruthy(_data)) return null
       return <PieChart items={_data} {...prop}/>
     }
 
@@ -185,7 +185,7 @@ Render.Component = function RenderComponent ({
         }
         return item
       }))
-      if (hideOnEmpty && !_data.length) return null
+      if (hideOnEmpty && !isTruthy(_data)) return null
       return <TableView items={_data} {...table}/>
     }
 
