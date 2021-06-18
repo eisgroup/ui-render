@@ -35,26 +35,26 @@ Example: `{style: {color: "rgba(255, 255, 255, 0.30)", backgroundColor: "red"}}`
 If you want to leave the field empty when its value is `null` or `undefined`, add attribute `{"renderLabel": "Float"}` or `{"renderLabel": "Title+Input"}`.
 
 ## How to format `extraItems` in Table?
-```json
+```js
 {
-"extraItems": [
-  {
-    "Description": "Eligible Lives",
-    "Core": {
-      "view": "Text",
-      "label": {
-        "name": "Plans[{state.plan,0}].Coverages[0].NumberOfEligible"
+  "extraItems": [
+    {
+      "Description": "Eligible Lives", 
+      "Core": {
+        "view": "Text",
+        "label": {
+          "name": "Plans.{state.plan,0}.Coverages[0].NumberOfEligible"
+        },
+        "renderLabel": {
+          "name": "Percent",
+          "decimals": 2
+        }
       },
-      "renderLabel": {
-        "name": "Percent",
-        "decimals": 2
+      "BuyUp": {
+        "name": "Plans.{state.plan,0}.Coverages[1].NumberOfEligible"
       }
-    },
-    "BuyUp": {
-      "name": "Plans[{state.plan,0}].Coverages[1].NumberOfEligible"
     }
-  }
-]
+  ]
 }
 ```
 
@@ -63,11 +63,11 @@ Do not simultaneously define `renderLabel` attribute as empty object or object w
 `renderLabel` > `items` > `children` > `label`.
 You can, however, retrieve `children` or `label` value dynamically, then use `renderLabel` to format that value.
 Example:
-```json
+```js
 {
   "view": "Text",
   "label": {
-    "name":  "path.to.number.value.from.data.json"
+    "name": "path.to.number.value.from.data.json"
   },
   "renderLabel": {
     "name": "Percent",

@@ -2,91 +2,59 @@
 
 ## The Pattern Driven Design
 
-The UI Render takes a conceptually different approach, unlike most UI frameworks you may be familiar with (ex. Bootstrap, Material Design, AntD...).
+The UI Render takes a conceptually different approach from most UI frameworks you may be familiar with (ex. Bootstrap, Material Design, Ant Design...).
 
-Similar to most frameworks, the UI Render provides `built-in UI components`, such as Button, Table, Dropdown, etc. - with different set of attributes available for each.
+Like most frameworks, it has `built-in UI components`, such as Button, Table, Dropdown, etc. - with different set of attributes available for each.
 
-But instead of being limited to what built-in components can do, you are given complete freedom to mix and match different attributes within each UI component - or `Render Field`, as we call it.
+However, instead of being limited to what built-in components can do, you have complete freedom to mix them in any way you like. Similar to building something from Lego.
 
-There are `transform patterns` you can apply to any component. This is the secret sauce that enables the UI Render to be both declarative and dynamic in nature, allowing `unlimited configuration`.
+The freedom of configuration comes from UI Render's `transform patterns`. 
+These patterns allow you to turn static `meta.json` files into dynamic configurations, by transforming attributes on the fly.
+
+In short, the UI Render is both declarative and dynamic in nature, with the possibility of `unlimited customisation`.
 
 
 ## Transform Patterns
 
-1. **Recursive Field definitions**
-   - A Field can be any view or input component, such as Button, Table, Dropdown...
-   - Objects with `view` attribute can have other fields nested inside `items` attribute.
+1. **Recursive Field definition**
+   - A Field can be any component, identified by `view` attribute, such as: Row, Button, Table, Dropdown, Piechart...
+   - Objects with `view` attribute can have other Fields nested inside `items` attribute.
 
-2. **Function definitions by name**
-   - A Function can be defined using attributes starting with the word `render`
-     Example: `renderItem`, `renderLabel`...
-   - Arguments can be defined, separated by comma
-     Example: `"setState,plan"` -> use `plan` as argument
-   - Function can be defined as object
-     Example:
-     ```js
-       {
-         name: "fetch",
-         args: [
-           "https://url.to.fetch.com/api",
-           {
-             method: "POST",
-             ...
-           }
-         ]
-       }
-     ```
-   - Function can be chained with arguments mapped dynamically
-     Example:
-     ```js
-       {
-         name: "fetch",
-         onDone: {
-           name: 'fetch',
-           mapArgs: [ // function will first receive `mapArgs`, then followed by `args`, as arguments
-             // variable `{0.payload.ip}` can be defined to get data from arguments, in addition to *_data.json
-             'https://ipapi.co/{0.payload.ip}/json', // this is the first argument passed to the function
-             // ...second (subsequent) argument/s can be defined as object/array/number/etc.
-           ],
-           onDone: {
-             name: 'popup',
-             args: ['Dropdown.onChange\n -> fetch(IpAddress).onDone\n -> fetch(GeoData).onDone\n -> popup'],
-           }
-         }
-       }
-     ```
-
-3. **Custom rendering by matching values**
-   - See the [example](#render-field-attributes) of `renderCell: { values: {...} }` in Table view
-   - Default function can be defined when no value matches
-     Example: `renderCell: { default: "Currency" }`
-
-4. **Data mapping by key paths**
-   - See the [example](#render-field-attributes) of `mapItems` and `mapOptions`
-   - String can be used as a mapper
-     Example: `{mapOptions: "planName"}` -> use `planName` attribute as options value
-
-5. **Dynamic definition with curly brace transform**
+2. **Dynamic State**
+   - Besides `data.json`, you can use dynamic `state` when configuring `meta.json`
+   - You can create new or update existing state using `functions` (see point 8):
+     Example of setting active plan using `onChange` function: `"onChange": "setState,plan"`
+   - To read the state, define `name` attribute with key path like this:
+     `"name": "plan.{state.plan,0}"` (next point explains how this works)
+   - For advanced config, see the [example](#component-attributes) of Dropdown `onChange` attribute
+   
+3. **Curly Brace Transform**
    - The curly brace surrounding a key path will replace it with value found in `data.json` or in `state`
-     Example: `{name: "{key}"}` -> becomes `{name: "value"}`
-   - Fallback value can be defined after a comma
-     Example: `{name: "{key,0}}"` -> falls back to `{name: "0"}`)
+     Example: `"name": "plan.{state.plan}.title"` -> becomes `"name": "plan.undefined.title"`
+   - Fallback value can be defined after a comma, to avoid `undefined` value on initialization
+     Example: `"name": "plan.{state.plan,0}.title"` -> falls back to `"name": "plan.0.title"`
 
-6. **Value transform for objects with a single attribute "name"**
-   - Example: `{title: {name: "{key}"}}` -> becomes `{title: "value"}`
-   - Curly brace transform of the `{key}` attribute will happen first in the example
+4. **Value Transform (for objects with a single attribute "name" and optional "relativeData")**
+   - Example: `"title": { "name": "{key}" }` -> becomes `"title": "relative value"`
+   - Example: `"title": { "name": "{key}", relativeData: false }` -> becomes `"title": "root value"`
+   - Curly brace transform of the `{key}` attribute will happen first in above examples
+   - See point 7 for the explanation of how `relativeData` works
 
-7. **State dependent config**
-   - Dynamic states are used to transform the `meta.json` config on each render
-   - Define the function triggering state update as:
-     `{name: "setState", args: ["state.key.path.to.set"]}`
-   - Then in the dynamic config, use curly brace transform with:
-     `{state.key.path.to.value}`
-   - See the [example](#render-field-attributes) of Dropdown `onChange` attribute
+5. **Data Mapping (by key paths)**
+   - Use this to link attributes within `data.json` or `state` to attributes required by the component
+   - You can define data mappers as object or string: 
+     a) `Object` example: `"mapOptions": {"component.attribute": "data.or.state.key.path"}`
+     b) `String` example: `"mapOptions": "planName"` -> use `planName` attribute as options value
+   - See the [example](#component-attributes) of `mapItems` and `mapOptions`
 
-8. **Global/Relative Data access**
+6. **Custom Rendering (by matching values)**
+   - See the [example](#component-attributes) of `renderCell: { values: {...} }` in Table view
+   - Default function can be defined when no value matches
+     Example: `"renderCell": { "default": "Currency" }`
+
+7. **Relative Data**
    - When you specify the `name` attribute of a Field, it retrieves values from the root `data.json` object by default
-   - Use `{relativeData: true}` to make `name` attribute retrieve values from local data passed down (inherited) from parent/grandparent/etc. fields.
+   - Use `{"relativeData": true}` to make `name` attribute retrieve values from local data passed down (inherited) from parent/grandparent/etc. fields.
    - Example:
     ```js
     const localData = {
@@ -118,10 +86,51 @@ There are `transform patterns` you can apply to any component. This is the secre
     }
     ```
 
-## Render Field Attributes
+8. **Function definitions**
+    - A Function gives you a way to format data for display in the UI (ex. `Currency`, `Float`, `Percent`...)
+    - A Function can be defined using `['onClick', 'onChange', 'onDone']` attributes, or starting with the word `render`
+      Example: `renderLabel`, `renderCell`...
+    - Function can be defined as `String`, with arguments separated by comma/s
+      Example: `"setState,plan"` -> use `setSate` function with `plan` as argument
+    - Function can be defined as `Object`
+      Example:
+      ```js
+        {
+          name: "fetch",
+          args: [
+            "https://url.to.fetch.com/api",
+            {
+              method: "POST",
+              ...
+            }
+          ]
+        }
+      ```
+    - Functions can perform complex UI logic by chaining with nested definitions.
+      However, this requires coding skills. It is better to ask a developer (if you are not) for such cases.
+      Example:
+      ```js
+        {
+          name: "fetch",
+          onDone: {
+            name: 'fetch',
+            mapArgs: [ // function will first receive `mapArgs`, then followed by `args`, as arguments
+              // variable `{0.payload.ip}` can be defined to get data from arguments, in addition to *_data.json
+              'https://ipapi.co/{0.payload.ip}/json', // this is the first argument passed to the function
+              // ...second (subsequent) argument/s can be defined as object/array/number/etc.
+            ],
+            onDone: {
+              name: 'popup',
+              args: ['Dropdown.onChange\n -> fetch(IpAddress).onDone\n -> fetch(GeoData).onDone\n -> popup'],
+            }
+          }
+        }
+      ```
+
+## Component Attributes
 
 ```js
-const RenderField = {
+const Component = {
 
   // Common attributes (available in all UI components)
   view: 'Col', // (required)* name of the React Component used to display this field

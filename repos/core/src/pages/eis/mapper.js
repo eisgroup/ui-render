@@ -27,7 +27,18 @@ import Text from 'react-ui-pack/Text'
 import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
 import Render, { mapProps } from 'ui-renderer'
-import { Active, ALERT, debounce, get, isList, isNumeric, isObject, isTruthy, TIME_DURATION_INSTANT } from 'utils-pack'
+import {
+  Active,
+  ALERT,
+  debounce,
+  get,
+  isList,
+  isNumeric,
+  isObject,
+  isString,
+  isTruthy,
+  TIME_DURATION_INSTANT
+} from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 
 /**
@@ -54,6 +65,7 @@ Render.Tooltip = TooltipPop
  * @param {Number|String} relativeIndex - used when component is rendered in array
  * @param {String} relativePath - path used to compute form input "name" attribute
  * @param {Object} form - react-final-form FormApi instance
+ * @param {String|Object} [showIf] - whether to not render the component if it evaluates to truthy value
  * @param {Boolean} [hideOnEmpty] - whether to not render the component if it's value is null/undefined/empty string
  * @param {Function} [Render] - the recursive renderer
  * @param {String} [version] - of the config
@@ -61,12 +73,22 @@ Render.Tooltip = TooltipPop
  * @returns {JSX.Element|*} React component
  */
 Render.Component = function RenderComponent ({
-  view, items, data, _data, debug, form, hideOnEmpty,
+  view, items, data, _data, debug, form, hideOnEmpty, showIf,
   relativeData, relativeIndex, relativePath, version,
   ...props
 }) {
-  /* General hideOnEmpty logic */
+  /* todo: deprecated in v0.23.0 General hideOnEmpty logic */
   if (hideOnEmpty && !isTruthy(_data)) return null
+  /* General showIf logic */
+  if (showIf) {
+    // UI Render should not 'Value Transform' `showIf` attribute
+    if (isString(showIf)) {
+      const __data = get((relativeData && _data) || data, showIf)
+      if (!isTruthy(__data)) return null
+    } else if (false) {
+
+    }
+  }
 
   switch (view) {
     case FIELD.TYPE.COL:
