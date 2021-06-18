@@ -2,6 +2,7 @@ import {
   cloneDeep,
   hasDuplicateInList,
   isId,
+  isTruthy,
   ONE_HOUR,
   ONE_MINUTE,
   ONE_MONTH,
@@ -10,6 +11,101 @@ import {
   ONE_YEAR
 } from 'utils-pack'
 import { distanceBetween, Id, timestampFromId } from '../utility'
+
+const NON_TRUTHY_VALUES = [
+  false,
+  undefined,
+  null,
+  NaN,
+  0,
+  0.0,
+  -0,
+  +0,
+  -0.0,
+  +0.0,
+  '',
+  {},
+  [],
+]
+const TRUTHY_VALUES = [
+  true,
+  1,
+  -1,
+  +1,
+  1.1,
+  100,
+  10n,
+  1e7,
+  1e-7,
+  Infinity,
+  -Infinity,
+  '0',
+  '0.0',
+  '-0',
+  '+0',
+  '-0.0',
+  '+0.0',
+  '0.0b',
+  '1',
+  '1.1',
+  '1a',
+  'foo',
+  ['0'],
+  ['1'],
+  {0: 0},
+  [0],
+  () => {},
+  new Date(),
+]
+const ALL_VALUE_TYPES = [
+  undefined,
+  null,
+  NaN,
+  0,
+  -0,
+  +0,
+  0.0,
+  -0.0,
+  +0.0,
+  1,
+  -1,
+  +1,
+  1.1,
+  100,
+  10n,
+  1e7,
+  1e-7,
+  Infinity,
+  -Infinity,
+  '',
+  '0',
+  '0.0',
+  '0.0b',
+  '1',
+  '1.1',
+  '1a',
+  'foo',
+  [],
+  [0],
+  {},
+  {0: 0},
+  () => {},
+  new Date(),
+]
+
+describe(`${isTruthy.name}() returns false for all non truthy values, true otherwise`, () => {
+  NON_TRUTHY_VALUES.forEach((value) => {
+    test(`[${typeof value}] ${value}`, () => {
+      expect(isTruthy(value)).toBe(false)
+    })
+  })
+
+  TRUTHY_VALUES.forEach((value) => {
+    test(`[${typeof value}] ${value}`, () => {
+      expect(isTruthy(value)).toBe(true)
+    })
+  })
+})
 
 test(`${distanceBetween.name}() returns correct distance between two points in millimeters`, () => {
   const point1 = {lat: 40.714, lng: -74.00599999999997}

@@ -1,7 +1,8 @@
-import { isInList } from 'utils-pack/array'
 import { Active, ENV } from './_envs'
+import { isInList, isList } from './array'
 import { fromJSON } from './codec'
 import { rad } from './number'
+import { isObject } from './object'
 import { isString, padStringLeft, randomString } from './string'
 
 /**
@@ -80,6 +81,20 @@ Id.history = {} // log of previously generated Ids by timestamp
  */
 export function isId (value) {
   return isString(value) && Id.pattern.test(value)
+}
+
+/**
+ * Check if given value is truthy.
+ * A value is considered to be falsy, if it's one of these:
+ *    false, undefined, null, NaN, 0, 0.0, -0, +0, -0.0, +0.0, '', {}, [],
+ *
+ * @param {*} val - to evaluate for truthiness
+ * @returns {boolean}
+ */
+export function isTruthy (val) {
+  if (!val) return false
+  if (isList(val) && val.length === 0) return false
+  return !(isObject(val) && Object.keys(val).length === 0)
 }
 
 /**

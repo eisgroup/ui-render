@@ -11,7 +11,7 @@ import {
   union,
   unionBy,
   unionWith,
-  uniqWith
+  uniqWith,
 } from 'lodash'
 import thenby from 'thenby'
 
