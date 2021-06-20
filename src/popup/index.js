@@ -1,6 +1,6 @@
 import { Active, ALERT } from 'utils-pack'
 import { stateAction } from '../redux/actions'
-import { NAME } from './constants'
+import { POPUP } from './constants'
 import reducer from './reducers'
 import saga from './sagas'
 import select from './selectors'
@@ -13,12 +13,12 @@ import select from './selectors'
 
 export * from './constants'
 export {
-  NAME,
+  POPUP,
   select,
 }
 
 const popup = {
-  NAME,
+  NAME: POPUP,
   reducer,
   saga,
   select,
@@ -27,5 +27,5 @@ const popup = {
 export default popup
 
 export function popupAlert (title, content) {
-  Active.store.dispatch(stateAction(NAME, ALERT, {items: [{title, content}]}))
+  Active.store.dispatch(stateAction(POPUP, ALERT, {items: [{title, content}]}))
 }

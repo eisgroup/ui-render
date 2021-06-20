@@ -9,7 +9,7 @@ import { isApiActionTypeError, isApiActionTypeTimeout } from 'modules-pack/api/u
 import { stateAction, stateActionType, } from 'modules-pack/redux/actions'
 import { all, call, put, takeEvery } from 'modules-pack/saga/utils'
 import { ALERT, ERROR, get, hostname, isInList, LOGOUT, OPEN, SYSTEM, toList, } from 'utils-pack'
-import { NAME as POPUP, POPUP_ALERT, POPUP_ERROR } from './constants'
+import { POPUP, POPUP_ALERT, POPUP_ERROR } from './constants'
 
 /**
  * ASYNC TASKS =================================================================

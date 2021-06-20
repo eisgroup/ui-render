@@ -1,5 +1,5 @@
 import { combineReducers, handleActions, popups, uiLoading } from '../redux'
-import { NAME } from './constants'
+import { POPUP } from './constants'
 import initState from './data'
 
 /**
@@ -10,12 +10,12 @@ import initState from './data'
 
 /* Data Handler */
 const dataHandler = handleActions({
-  ...popups(NAME)
+  ...popups(POPUP)
 }, initState.data)
 
 /* UI Handler */
 const uiHandler = handleActions({
-  ...uiLoading(NAME)
+  ...uiLoading(POPUP)
 }, initState.ui)
 
 const allHandlers = combineReducers({

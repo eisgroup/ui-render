@@ -1,5 +1,5 @@
 import { asField } from 'modules-pack/form'
-import { NAME as POPUP } from 'modules-pack/popup'
+import { POPUP } from 'modules-pack/popup'
 import { connect, stateAction } from 'modules-pack/redux'
 import React from 'react'
 import Place from 'react-ui-pack/inputs/Place'

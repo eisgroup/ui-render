@@ -1,6 +1,6 @@
 import { CLOSE, OPEN } from 'utils-pack'
 import { stateAction } from '../../redux/actions'
-import { NAME as POPUP, POPUP_ERROR } from '../constants'
+import { POPUP, POPUP_ERROR } from '../constants'
 import initState from '../data'
 import reducer from '../reducers'
 

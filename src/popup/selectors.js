@@ -1,5 +1,5 @@
 import selector from 'utils-pack/selectors'
-import { NAME, POPUP_ALERT, POPUP_CONFIRM, POPUP_ERROR } from './constants'
+import { POPUP, POPUP_ALERT, POPUP_CONFIRM, POPUP_ERROR } from './constants'
 
 /**
  * STATE SELECTORS =============================================================
@@ -7,31 +7,31 @@ import { NAME, POPUP_ALERT, POPUP_CONFIRM, POPUP_ERROR } from './constants'
  * =============================================================================
  */
 
-@selector(NAME)
+@selector(POPUP)
 export default class select {
 
   static activePopups = () => [
-    state => state[NAME].data.activePopups,
+    state => state[POPUP].data.activePopups,
     (val) => val
   ]
 
   static alert = () => [
-    state => state[NAME].data[POPUP_ALERT],
+    state => state[POPUP].data[POPUP_ALERT],
     (val) => val
   ]
 
   static confirm = () => [
-    state => state[NAME].data[POPUP_CONFIRM],
+    state => state[POPUP].data[POPUP_CONFIRM],
     (val) => val
   ]
 
   static error = () => [
-    state => state[NAME].data[POPUP_ERROR],
+    state => state[POPUP].data[POPUP_ERROR],
     (val) => val
   ]
 
   static ui = () => [
-    state => state[NAME].ui,
+    state => state[POPUP].ui,
     val => val || {}
   ]
 }

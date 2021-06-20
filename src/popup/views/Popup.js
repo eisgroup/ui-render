@@ -8,7 +8,7 @@ import View from 'react-ui-pack/View'
 import { CLOSE, hasListValue, isInList, logRender } from 'utils-pack'
 import { connect } from '../../redux'
 import { stateAction } from '../../redux/actions'
-import { NAME, POPUP_ALERT, POPUP_CONFIRM, POPUP_ERROR } from '../constants'
+import { POPUP, POPUP_ALERT, POPUP_CONFIRM, POPUP_ERROR } from '../constants'
 import select from '../selectors'
 
 /**
@@ -24,7 +24,7 @@ const mapStateToProps = (state) => ({
 })
 const mapDispatchToProps = (dispatch) => ({
   actions: {
-    close: (activePopup) => dispatch(stateAction(NAME, CLOSE, {activePopup}))
+    close: (activePopup) => dispatch(stateAction(POPUP, CLOSE, {activePopup}))
   }
 })
 

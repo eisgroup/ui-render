@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { NAME as POPUP, POPUP_ALERT } from 'modules-pack/popup/constants'
+import { POPUP, POPUP_ALERT } from 'modules-pack/popup/constants'
 import { connect, stateAction } from 'modules-pack/redux'
 import { ROUTE_HOME, UPLOAD as U } from 'modules-pack/variables'
 import PropTypes from 'prop-types'
