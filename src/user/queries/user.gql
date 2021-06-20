@@ -1,5 +1,5 @@
 #import "../fragments/User.gql"
-query user($id: Id) {
+query user($id: ID) {
     user(id: $id) {
         ...AllUserInfo
     }

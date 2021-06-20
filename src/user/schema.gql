@@ -8,8 +8,8 @@
 # SUMMARY
 # -----------------------------------------------------------------------------
 extend type Query {
-    user(id: Id): User # if no `id` given, returns self
-    users(ids: [Id!], sort: JSON): [User!] # if no `ids` given, returns last updated users for Staff or higher level
+    user(id: ID): User # if no `id` given, returns self
+    users(ids: [ID!], sort: JSON): [User!] # if no `ids` given, returns last updated users for Staff or higher level
     logout: Logout
 }
 
@@ -28,7 +28,7 @@ extend type Mutation {
 # -----------------------------------------------------------------------------
 
 type User {
-    id: Id! # can be used to derive created Timestamp
+    id: ID! # can be used to derive created Timestamp
     auth: Int # authorization level
     email: Email! # for privacy reasons, may not be shown, but always exists
     avatar: URL
@@ -58,7 +58,7 @@ type User {
 }
 
 input UserInput { # only used for updating existing record
-    id: Id # only required when not requested by User themselves (example: by Admin), else it is ignored
+    id: ID # only required when not requested by User themselves (example: by Admin), else it is ignored
     email: Email
     password: Password
     newPassword: Password
@@ -102,7 +102,7 @@ type SocialAccount {
 }
 
 type Logout {
-    id: Id
+    id: ID
 }
 
 # -----------------------------------------------------------------------------
@@ -115,6 +115,6 @@ type UserPermission { # embeded type within other GraphQL types (example: Compan
 }
 
 input UserPermissionInput {
-    user: Id!
+    user: ID!
     permissions: Permissions!
 }
