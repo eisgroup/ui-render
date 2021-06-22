@@ -12,16 +12,16 @@ import listData from './examples/array-nested_data.json'
 import decimalMeta from './examples/decimal_meta.json'
 import dropdownMeta from './examples/dropdown_meta.json'
 import exampleData from './examples/example_data.json'
-import exampleMeta from './examples/example_meta.json'
-import expandListMeta from './examples/expand-list_meta.json'
-import inputMeta from './examples/input_meta.json'
-import invalidArrayData from './examples/invalid-array_data.json'
-import invalidArrayMeta from './examples/invalid-array_meta.json'
-import listMeta from './examples/list_meta.json'
-import piechartMeta from './examples/piechart_meta.json'
-import tabListMeta from './examples/tab-list_meta.json'
-import tableNestedMeta from './examples/table-nested_meta.json'
-import tableVerticalMeta from './examples/table-vertical_meta.json'
+import exampleMeta from './examples/example_meta'
+import expandListMeta from './examples/expand-list_meta'
+import inputMeta from './examples/input_meta'
+import invalidArrayData from './examples/invalid-array_data'
+import invalidArrayMeta from './examples/invalid-array_meta'
+import listMeta from './examples/list_meta'
+import piechartMeta from './examples/piechart_meta'
+import tabListMeta from './examples/tab-list_meta'
+import tableNestedMeta from './examples/table-nested_meta'
+import tableVerticalMeta from './examples/table-vertical_meta'
 import { withUISetup } from './rules'
 
 const examples = [
@@ -51,11 +51,6 @@ const examples = [
     meta: expandListMeta,
   },
   {
-    title: 'Input',
-    data: exampleData,
-    meta: inputMeta,
-  },
-  {
     title: 'Tab List',
     data: listData,
     meta: tabListMeta,
@@ -71,14 +66,19 @@ const examples = [
     meta: tableVerticalMeta,
   },
   {
-    title: 'Invalid Array Data',
-    data: invalidArrayData,
-    meta: invalidArrayMeta,
-  },
-  {
     title: 'Pie Chart',
     data,
     meta: piechartMeta,
+  },
+  {
+    title: 'Input',
+    data: exampleData,
+    meta: inputMeta,
+  },
+  {
+    title: 'Invalid Array Data',
+    data: invalidArrayData,
+    meta: invalidArrayMeta,
   },
   {
     title: 'All Possible Configurations',

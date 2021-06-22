@@ -3,8 +3,10 @@ export default {
   name: 'coverages',
   renderLabel: {
     view: 'Text',
-    relativeData: true,
-    children: {name: 'coverageID'},
+    children: {
+      name: 'coverageID',
+      relativeData: true,
+    },
   },
   // Each Expand Item
   renderItem: {
@@ -37,51 +39,12 @@ export default {
                 styles: 'justify padding',
                 items: [
                   {view: 'Text', label: 'Annual Rate'},
-                  {view: 'Text', children: {name: 'rate'}, renderLabel: 'Percent'},
+                  {view: 'Text', children: {name: 'rate', relativeData: true}, renderLabel: 'Percent'},
                 ]
-              },
-              {
-                view: 'Row',
-                styles: 'justify padding border-top',
-                items: [
-                  {view: 'Text', label: 'Annual Premium'},
-                  {view: 'Text', children: {name: 'annualPremium'}, renderLabel: 'Currency'},
-                ]
-              },
+              }
             ],
           },
         ]
-      },
-      {
-        view: 'Table',
-        name: 'classes',
-        headers: [ // -> must be defined if data contains nested tables
-          {
-            id: 'classID',
-            label: 'Class Name',
-          },
-          {
-            id: 'numberOfLives',
-            label: 'Number of Participants',
-          },
-          {
-            id: 'totalVolume',
-            label: 'Total Volume',
-            renderCell: 'float',
-          },
-          {
-            id: 'annualPremium',
-            label: 'Annual Premium',
-          },
-        ],
-
-        // Nested Table (two levels deep)
-        renderItem: {
-          view: 'Table',
-          name: 'rateCards',
-          relativeData: true, // use attribute `name` above as key path relative to each Table item's data, not *_data.json
-          // headers: [] // -> optional when has no nested tables
-        },
       }
     ],
   },

@@ -1,5 +1,40 @@
+import { cloneDeep } from 'utils-pack'
 import meta from './expand-list_meta'
 
+const nestedTable = cloneDeep(meta.renderItem)
+// Most nested inner Table
+nestedTable.items.push({
+  view: 'Table',
+  name: 'classes',
+  relativeData: true,
+  headers: [ // -> must be defined if data contains nested tables
+    {
+      id: 'classID',
+      label: 'Class Name',
+    },
+    {
+      id: 'numberOfLives',
+      label: 'Number of Participants',
+    },
+    {
+      id: 'totalVolume',
+      label: 'Total Volume',
+      renderCell: 'float',
+    },
+    {
+      id: 'annualPremium',
+      label: 'Annual Premium',
+    },
+  ],
+
+  // Nested Table (two levels deep)
+  renderItem: {
+    view: 'Table',
+    name: 'rateCards',
+    relativeData: true, // use attribute `name` above as key path relative to each Table item's data, not *_data.json
+    // headers: [] // -> optional when has no nested tables
+  }
+})
 export default {
   view: 'Table',
   name: 'coverages',
@@ -51,6 +86,6 @@ export default {
   ],
 
   // Nested Table (one level deep)
-  renderItem: meta.renderItem,
+  renderItem: nestedTable
 }
 
