@@ -28,66 +28,79 @@ import { withUISetup } from './rules'
 const examples = [
   {
     title: 'Decimal Points',
+    id: 'decimal',
     data: exampleData,
     meta: decimalMeta,
   },
   {
     title: 'Dropdown',
+    id: 'dropdown',
     data: exampleData,
     meta: dropdownMeta,
   },
   {
     title: 'Dynamic Layout',
+    id: 'layout',
     data: exampleData,
     meta: exampleMeta,
   },
   {
     title: 'Dynamic List',
+    id: 'list',
     data: listData,
     meta: listMeta,
   },
   {
     title: 'Expand List',
+    id: 'expandList',
     data: listData,
     meta: expandListMeta,
   },
   {
     title: 'Tab List',
+    id: 'tabList',
     data: listData,
     meta: tabListMeta,
   },
   {
     title: 'Table Nested within Table',
+    id: 'table',
     data: listData,
     meta: tableNestedMeta,
   },
   {
     title: 'Table Rows as Columns (Vertical Layout)',
+    id: 'tableVertical',
     data: listData,
     meta: tableVerticalMeta,
   },
   {
     title: 'Pie Chart',
+    id: 'pieChart',
     data,
     meta: piechartMeta,
   },
   {
-    title: 'ShowIf Condition',
+    title: 'Show If Condition',
+    id: 'showIf',
     data: exampleData,
     meta: showIfCondition,
   },
   {
     title: 'Input',
+    id: 'input',
     data: exampleData,
     meta: inputMeta,
   },
   {
     title: 'Invalid Array Data',
+    id: 'invalidArray',
     data: invalidArrayData,
     meta: invalidArrayMeta,
   },
   {
     title: 'All Possible Configurations',
+    id: 'all',
     data,
     meta,
   },
@@ -111,26 +124,27 @@ export default class Examples extends Component {
     const {activeIndex} = this.state
     return (
       <View className='app__examples bg-white border'>
-        {examples.map(({data, meta, title}, i) => (
+        {examples.map(({data, meta, title, id}, i) => (
           <Expand
+            id={id}
             key={title}
             index={i}
             expanded={i === activeIndex}
             title={title}
             onClick={this.toggleExpand}
-            classNameLabel='inverted bg-inverse'
-            classNameItems='bg-inverse'
+            classNameLabel="inverted bg-inverse"
+            classNameItems="bg-inverse"
           >
             {() => (
               <>
                 <Example data={data} meta={meta} initialValues={data}/>
-                <ScrollView className='padding-smaller bg-neutral inverted'>
-                  <Row className='wrap spread'>
-                    <View fill className='padding-smaller min-width-320'>
+                <ScrollView className="padding-smaller bg-neutral inverted">
+                  <Row className="wrap spread">
+                    <View fill className="padding-smaller min-width-320">
                       <h3>{'Meta.json'}</h3>
                       <JsonView data={meta} inverted/>
                     </View>
-                    <View fill className='padding-smaller min-width-320'>
+                    <View fill className="padding-smaller min-width-320">
                       <h3>{'Data.json'}</h3>
                       <JsonView data={data} inverted/>
                     </View>

@@ -4,6 +4,7 @@ import ScrollView from 'react-ui-pack/ScrollView'
 import Tabs from 'react-ui-pack/Tabs'
 import toc from 'remark-toc'
 import { get, logRender } from 'utils-pack'
+import changelog from './changelog.md'
 import CodeBlock from './CodeBlock'
 import config from './config.md'
 import docs from './docs.md'
@@ -27,6 +28,7 @@ export default class Docs extends Component {
     config: undefined,
     examples: undefined,
     styles: undefined,
+    changelog: undefined,
     faq: undefined,
   }
 
@@ -43,8 +45,10 @@ export default class Docs extends Component {
         return 2
       case 'styles':
         return 3
-      case 'faq':
+      case 'changelog':
         return 4
+      case 'faq':
+        return 5
       default:
         return 0
 
@@ -55,6 +59,7 @@ export default class Docs extends Component {
     fetch(docs).then(r => r.text()).then(docs => this.setState({docs}))
     fetch(config).then(r => r.text()).then(config => this.setState({config}))
     fetch(styles).then(r => r.text()).then(styles => this.setState({styles}))
+    fetch(changelog).then(r => r.text()).then(changelog => this.setState({changelog}))
     fetch(faq).then(r => r.text()).then(faq => this.setState({faq}))
   }
 
@@ -64,12 +69,13 @@ export default class Docs extends Component {
         <h1>{'UI Render'}</h1>
         <Tabs
           defaultIndex={this.tabIndex}
-          tabs={['Summary', 'Configuration', 'Examples', 'Styles', 'FAQ']}
+          tabs={['Summary', 'Configuration', 'Examples', 'Styles', 'Change Log', 'FAQ']}
           panels={[
             () => <Markdown source={this.state.docs} {...mdProps}/>,
             () => <Markdown source={this.state.config} {...mdProps}/>,
             () => <Examples/>,
             () => <Markdown source={this.state.styles} {...mdProps}/>,
+            () => <Markdown source={this.state.changelog} {...mdProps}/>,
             () => <Markdown source={this.state.faq} {...mdProps}/>,
           ]}
           classNamePanels='padding-v margin-v'

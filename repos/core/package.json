@@ -18,9 +18,9 @@
     "react-dom": "16.8.6",
     "react-helmet": "^5.2.0",
     "react-markdown": "^4.3.1",
-    "react-ui-pack": "^0.7.7",
+    "react-ui-pack": "^0.7.8",
     "remark-toc": "^7.0.0",
-    "ui-renderer": "1.1.0",
+    "ui-renderer": "*",
     "utils-pack": "^0.3.21"
   },
   "scripts": {},

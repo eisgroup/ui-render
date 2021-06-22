@@ -13515,10 +13515,10 @@ react-transition-group@^2.5.0:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react-ui-pack@^0.7.7:
-  version "0.7.7"
-  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.7.7.tgz#c674210705671297806c6c7be85d0de8fb65862f"
-  integrity sha512-wkcnsPyb/oN/nUWj687xSH/pX8TAjsq7mre7DkX7jCP96BTzRNr4rgKaylAQFwoyZwd+iUH+M959Bj3lvROSJA==
+react-ui-pack@^0.7.8:
+  version "0.7.8"
+  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.7.8.tgz#48dd41ca1cbf2dab3b6ac547326f4a7b5f88f3d2"
+  integrity sha512-GpVfO7M6dbNbDrwcMEu2dwWTXDckrCegMSwW88SApcVJl38fBUte7+jRFd83Gn3KC0ey0USmdXGRff+F8L/1Kw==
   dependencies:
     chroma-js "^2.1.0"
     classnames "^2.2.6"
