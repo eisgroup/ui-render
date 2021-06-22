@@ -132,7 +132,7 @@ export default class Expand extends PureComponent {
     const hasContent = children != null
     const content = hasContent && (expanded || changing) && this.content
     return (
-      <View className={classNames('app__expand', className, {expanded, active})} {...props}>
+      <View className={classNames('app__expand', className, {expanded, active})} id={String(id)} {...props}>
         {this.renderLabel()}
         {hasContent &&
         <AnimateHeight expanded={expanded} duration={duration}
