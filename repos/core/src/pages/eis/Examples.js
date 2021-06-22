@@ -19,6 +19,7 @@ import invalidArrayData from './examples/invalid-array_data'
 import invalidArrayMeta from './examples/invalid-array_meta'
 import listMeta from './examples/list_meta'
 import piechartMeta from './examples/piechart_meta'
+import showIfCondition from './examples/showIf'
 import tabListMeta from './examples/tab-list_meta'
 import tableNestedMeta from './examples/table-nested_meta'
 import tableVerticalMeta from './examples/table-vertical_meta'
@@ -69,6 +70,11 @@ const examples = [
     title: 'Pie Chart',
     data,
     meta: piechartMeta,
+  },
+  {
+    title: 'ShowIf Condition',
+    data: exampleData,
+    meta: showIfCondition,
   },
   {
     title: 'Input',

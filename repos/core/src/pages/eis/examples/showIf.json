@@ -1,0 +1,55 @@
+{
+  "view": "List",
+  "name": "coverages",
+  "renderItem": {
+    "view": "Column",
+    "styles": "padding border",
+    "items": [
+      {
+        "view": "Title",
+        "label": {
+          "name": "coverageID",
+          "relativeData": true
+        }
+      },
+      {
+        "view": "Text",
+        "label": "I'm Hidden because there is no 'data.coverageID'",
+        "showIf": "coverageID"
+      },
+      {
+        "view": "Text",
+        "label": "You see this because <\"showIf\": {\"name\": \"coverageID\", \"relativeData\": true}> resolves to 'data.coverages.{index}.coverageID', which is considered 'Truthy'",
+        "showIf": {
+          "name": "",
+          "relativeData": true
+        },
+        "styles": "padding"
+      },
+      {
+        "view": "Text",
+        "name": "coverageID",
+        "relativeData": true,
+        "label": "And here is how to evaluate it <\"showIf\": {\"name\": \"\", \"relativeData\": true, \"equal\": \"Gold\"}>",
+        "showIf": {
+          "name": "",
+          "relativeData": true,
+          "equal": "Gold"
+        },
+        "styles": "padding"
+      },
+      {
+        "view": "Text",
+        "label": "Finally, only Silver shows up because <\"equal\": {\"name\": \"coverages.1.coverageID\"}> evaluates to 'Silver'",
+        "showIf": {
+          "name": "coverageID",
+          "relativeData": true,
+          "equal": {
+            "name": "coverages.1.coverageID"
+          }
+        },
+        "styles": "padding"
+      }
+    ]
+  }
+}

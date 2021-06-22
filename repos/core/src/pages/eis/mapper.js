@@ -32,6 +32,8 @@ import {
   ALERT,
   debounce,
   get,
+  hasObjectValue,
+  isEqual,
   isList,
   isNumeric,
   isObject,
@@ -85,8 +87,14 @@ Render.Component = function RenderComponent ({
     if (isString(showIf)) {
       const __data = get((relativeData && _data) || data, showIf)
       if (!isTruthy(__data)) return null
-    } else if (false) {
-
+    } else if (hasObjectValue(showIf)) {
+      const {name, relativeData, equal} = showIf
+      const __data = (relativeData && name === '' && _data) || get((relativeData && _data) || data, name)
+      if (equal !== undefined) {
+        if (!isEqual(__data, equal)) return null
+      } else {
+        if (!isTruthy(__data)) return null
+      }
     }
   }
 
