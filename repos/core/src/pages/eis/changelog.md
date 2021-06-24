@@ -1,5 +1,18 @@
 ### Table of Contents
 
+### v0.23.0
+
+#### Breaking Changes
+- **relativeData** pattern defaults to `true` if not defined. To use global data.json, do this:
+  ```js
+  { 
+    "name": "path.to.data.json",
+    "relativeData": false
+  }
+  ```
+- [Show If condition example updated](/docs/examples#showIf)
+
+
 ### v0.22.0
 
 #### New Features

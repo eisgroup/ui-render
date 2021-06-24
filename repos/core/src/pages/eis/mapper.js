@@ -85,11 +85,11 @@ Render.Component = function RenderComponent ({
   if (showIf) {
     // UI Render should not 'Value Transform' `showIf` attribute
     if (isString(showIf)) {
-      const __data = get((relativeData && _data) || data, showIf)
+      const __data = get((relativeData !== false && _data) || data, showIf)
       if (!isTruthy(__data)) return null
     } else if (hasObjectValue(showIf)) {
       const {name, relativeData, equal} = showIf
-      const __data = (relativeData && name === '' && _data) || get((relativeData && _data) || data, name)
+      const __data = (relativeData !== false && !name && _data) || get((relativeData !== false && _data) || data, name)
       if (equal !== undefined) {
         if (!isEqual(__data, equal)) return null
       } else {
@@ -272,7 +272,7 @@ Render.Component = function RenderComponent ({
       const {mapOptions, removable, autoSubmit, ...input} = props
       const {readonly, disabled} = data || {}
       if (mapOptions) input.options = mapProps(input.options || [], mapOptions, {debug})
-      if (relativeData && relativePath != null && input.name) {
+      if (relativeData !== false && relativePath != null && input.name) {
         input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
       }
       // Render Dropdown separately, to avoid triggering form value changes

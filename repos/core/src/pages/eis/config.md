@@ -64,8 +64,11 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
         {
           view: "Parent",
           name: "plan.0", // => this will resolve to "root.path.to.item.0.plan.0"
-          relativeData: true,
           items: [
+            {
+              view: "Child",
+              name: "id", // => this will resolve to "root.path.to.item.0.plan.0.id"
+            },
             {
               view: "Child",
               name: "id", // => this will resolve to "root.path.to.item.0.plan.0.id"
@@ -75,13 +78,9 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
               view: "Child",
               name: "id", // => this will resolve to "root.id"
               relativeData: false,
-            },
-            {
-              view: "Child",
-              name: "id", // => this will resolve to "root.id"
-            },
+            }
           ]
-        },
+        }
       ]
     }
     ```
@@ -139,8 +138,14 @@ const Component = {
   onClick: Function, // example: `{onClick: 'setState,active.plan'}` - `setState` function with `active.plan` argument
   style: Object, // css style to apply
   className: 'CSS class name to apply',
-  hideOnEmpty: Boolean, // whether to not render the component if its value is null/undefined/empty string
   debug: Boolean, // whether to suppress certain erros related to incorrect data type, default is false in production
+  hideOnEmpty: Boolean, // deprecated, whether to not render the component if its value is null/undefined/empty string
+  showIf: "path.to.data.that.exists", // whether to render the component if given path resolves to `truthy` value
+  showIf: { // object notation
+    "name": "path.to.data.that.exists", // optional
+    "relativeData": Boolean, // optional
+    "equal": Any, // optional, value to match against, can also make `equal` an object like so `{name, relativeData}`
+  },
    
   // Input attributes
   name: 'adminCosts.adminCategory', // (required for inputs)* path to field value within *_data.json

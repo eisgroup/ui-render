@@ -362,10 +362,12 @@ export default {
                   {
                     view: 'Table',
                     name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.enrollmentByState',
+                    relativeData: false,
                     // Extra render function for Table Items (rows in default layout)
                     renderItem: {
                       view: 'Table',
                       name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.enrollmentByMSA',
+                      relativeData: false,
                       filterItems: [
                         //  ╭ key path to value in this child-table's item to use for filtering
                         {'state': 'state'},
@@ -668,6 +670,7 @@ export default {
                         renderCell: {
                           view: 'Input',
                           name: 'planCalculations.0.tierRates.{index}.manualRate',
+                          relativeData: false,
                           type: 'number',
                           icon: 'dollar',
                           unit: '/ person',
@@ -688,20 +691,31 @@ export default {
                     extraItems: [
                       {
                         tier: 'Composite Rate',
-                        adjManualRate: {name: 'planCalculations.{state.active.plan,0}.adjManualCompositeRate'}, // null
-                        adjFormulaRate: {name: 'planCalculations.{state.active.plan,0}.adjFormulaCompositeRate'}, // undefined
+                        adjManualRate: {
+                          name: 'planCalculations.{state.active.plan,0}.adjManualCompositeRate',
+                          relativeData: false,
+                        }, // null
+                        adjFormulaRate: {
+                          name: 'planCalculations.{state.active.plan,0}.adjFormulaCompositeRate',
+                          relativeData: false,
+                        }, // undefined
                         manualRate: {
                           name: 'planCalculations.{state.active.plan,0}.manualCompositeRate',
+                          relativeData: false,
                           render: 'Currency',
                         },
                         formulaRate: {
                           view: 'Input',
                           name: 'planCalculations.{state.active.plan,0}.formulaCompositeRate',
+                          relativeData: false,
                           type: 'number',
                           unit: 'USD',
                           placeholder: 'placeholder'
                         },
-                        proposedRate: {name: 'planCalculations.{state.active.plan,0}.proposedCompositeRate'},
+                        proposedRate: {
+                          name: 'planCalculations.{state.active.plan,0}.proposedCompositeRate',
+                          relativeData: false,
+                        },
                       }
                     ],
                   },
