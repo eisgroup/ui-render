@@ -53,8 +53,9 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
      Example: `"renderCell": { "default": "Currency" }`
 
 7. **Relative Data**
-   - When you specify the `name` attribute of a Field, it retrieves values from the root `data.json` object by default
-   - Use `{"relativeData": true}` to make `name` attribute retrieve values from local data passed down (inherited) from parent/grandparent/etc. fields.
+   - When you specify the `name` attribute of a Field, it retrieves values from local `data.json` object by default
+   - Local Data is passed down (inherited) from parent/grandparent/etc. fields.
+   - Use `{"relativeData": false}` to make `name` attribute retrieve values from global (root `data.json`)
    - Example:
     ```js
     const localData = {
