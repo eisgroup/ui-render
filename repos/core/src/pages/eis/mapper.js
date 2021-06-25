@@ -82,7 +82,7 @@ Render.Component = function RenderComponent ({
   /* todo: deprecated in v0.23.0 General hideOnEmpty logic */
   if (hideOnEmpty && !isTruthy(_data)) return null
   /* General showIf logic */
-  if (showIf) {
+  if (showIf != null) {
     // UI Render should not 'Value Transform' `showIf` attribute
     if (isString(showIf)) {
       const __data = get((relativeData !== false && _data) || data, showIf)
@@ -95,6 +95,8 @@ Render.Component = function RenderComponent ({
       } else {
         if (!isTruthy(__data)) return null
       }
+    } else if (isObject(showIf)) {
+      if (!isTruthy(_data)) return null
     }
   }
 
