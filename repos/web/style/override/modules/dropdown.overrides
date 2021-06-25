@@ -139,7 +139,6 @@
       font-weight: @font-weight-bold;
     }
 
-    @color-shadow: ~"rgb(0 0 0 / 15%)";
     border: none !important;
     margin-top: @margin-smallest;
     box-shadow: 0 2px 8px @color-shadow !important;

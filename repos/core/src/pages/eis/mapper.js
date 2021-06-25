@@ -79,7 +79,7 @@ Render.Component = function RenderComponent ({
   relativeData, relativeIndex, relativePath, version,
   ...props
 }) {
-  /* todo: deprecated in v0.23.0 General hideOnEmpty logic */
+  /* todo: deprecated in v0.24.0 General hideOnEmpty logic */
   if (hideOnEmpty && !isTruthy(_data)) return null
   /* General showIf logic */
   if (showIf != null) {
