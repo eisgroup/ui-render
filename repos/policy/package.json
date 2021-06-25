@@ -1,6 +1,6 @@
 {
   "name": "policy",
-  "version": "0.23.0",
+  "version": "0.23.1",
   "homepage": ".",
   "private": true,
   "scripts": {

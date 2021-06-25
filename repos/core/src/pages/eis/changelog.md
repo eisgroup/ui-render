@@ -1,4 +1,8 @@
 ### Table of Contents
+### v0.23.1
+#### Changes
+- **showIf** can be empty object. The logic works like this:
+  ![showIf-logic](/static/images/showIf.png)
 
 ### v0.23.0
 
