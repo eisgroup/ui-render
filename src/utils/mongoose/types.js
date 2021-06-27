@@ -126,9 +126,11 @@ export const allPermissions = enumFrom(PERMISSION).reduce((o, k) => ({...o, [k]:
  */
 
 /**
- * Localised String Fields Definition for MongoDB using createModel() setup
- * => Each defined field can then be set using virtuals for currently active language,
- *  or set Localised String object directly for multiple languages.
+ * Localised String Fields Definition for MongoDB
+ *   - Requires createModel() setup and @localised decorator for GQL Resolver.
+ *   - Each defined field then becomes virtual getter/setter for currently active language.
+ *   - Virtual fields fallback to default language, or to the first value found among translated values.
+ *   - You can also set Localised String object directly for multiple languages.
  *
  * @example:
  *    const schema = {
@@ -203,6 +205,10 @@ export function Localised (fields, LocalString) {
   return {
     _: isRequired ? {type: result, required} : result
   }
+}
+
+Localised.path = function (field, lang) {
+  return `_[${field}][${lang}]`
 }
 
 /**

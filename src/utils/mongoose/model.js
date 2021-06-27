@@ -1,21 +1,8 @@
 import { stateAction } from 'modules-pack/redux/actions'
 import { DEFAULT } from 'modules-pack/variables/defaults'
 import mongoose from 'mongoose'
-import {
-  Active,
-  capitalize,
-  CREATE,
-  DELETE,
-  get,
-  hasListValue,
-  isEmpty,
-  isEqual,
-  set,
-  SUCCESS,
-  toList,
-  UPDATE,
-  warn
-} from 'utils-pack'
+import { Active, capitalize, get, hasListValue, isEmpty, isEqual, set, toList, warn } from 'utils-pack'
+import { CREATE, DELETE, SUCCESS, UPDATE } from 'utils-pack/constants'
 import { eventHooks } from './hook'
 import { ObjectId, Schema, Timestamp, toObjectId, unique } from './types'
 
@@ -122,7 +109,8 @@ export function createModel (name, fields, {schema: {options, config, methods, v
   if (fields.created === Timestamp) model.on('beforeInsert', (entry) => {entry.created = Date.now()})
   if (fields.updated === Timestamp) model.on('beforeUpdate', (entry) => {entry.updated = Date.now()})
 
-  return model
+  if (!Active.modelByName) Active.modelByName = {}
+  return Active.modelByName[name] = model
 }
 
 /**

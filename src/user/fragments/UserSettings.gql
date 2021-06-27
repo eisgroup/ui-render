@@ -1,0 +1,5 @@
+fragment UserSettings on User {
+    currency
+    lang
+    reportsLimit
+}

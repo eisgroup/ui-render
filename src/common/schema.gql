@@ -16,7 +16,7 @@ scalar Phones # key/value pair of phone kind as `key`, and number as `value` (ex
 scalar Timestamp # in milliseconds since the Unix epoch
 scalar URL # example: https://example.com
 scalar Upload # built-in Graphql Type for File
-enum Operator {
+enum Operator { # must be lower case values to match with MongoDB operators by default
     or
     and
 }

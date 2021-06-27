@@ -1,6 +1,7 @@
 fragment Self on User {
     auth
     birthday
+    lastLogin
     verified {
         email
     }
@@ -8,6 +9,16 @@ fragment Self on User {
         key
         val
     }
-    lastLogin
+    social {
+        fb {
+            id
+        }
+        it {
+            id
+        }
+        vk {
+            id
+        }
+    }
     updated
 }
