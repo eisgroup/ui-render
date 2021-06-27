@@ -7,7 +7,7 @@ import { isRequired } from 'react-ui-pack/inputs/validationRules'
 import Text from 'react-ui-pack/Text'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
-import { Active, debounce, isEmpty, isEqual, objChanges, toJSON, warn } from 'utils-pack'
+import { Active, debounce, isEmpty, isEqual, objChanges, set, toJSON, warn } from 'utils-pack'
 
 /**
  * STATE SELECTORS =============================================================
@@ -39,7 +39,7 @@ export function registeredFieldValues (form) {
   const values = {}
   registeredFieldNames.forEach(field => {
     const {value} = form.getFieldState(field)
-    if (value != null) values[field] = value
+    if (value != null) set(values, field, value) // use set() to convert nested paths to objects
   })
   return !isEmpty(values) && values
 }
@@ -102,6 +102,17 @@ export function asField (InputComponent, {sanitize} = {}) {
       format: PropTypes.func,
       normalize: PropTypes.func,
       parse: PropTypes.func,
+    }
+
+    // Handle onRemove field in FIELD.TYPE.MULTIPLE*
+    componentWillUnmount () {
+      // Call onChange for the deleted input, setting it to `null`:
+      // - if input is not registered, its value will not pass to backend
+      //   => this should be fine, because if registeredValues are used,
+      //      then backend should override the entire object (i.e. removing unregistered fields automatically).
+      // - if changedValues are used, the deleted `null` value will be sent to backend,
+      //      because changedValues does not depend on registered values.
+      this.input.onChange(null)
     }
 
     // do not use ...props from input, because it is shared by <Active.Field> instances
@@ -229,7 +240,8 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   }
 
   Class.prototype.state = {
-    hasInputChanges: false,
+    // This state only updates on input changes, for changes in parent props, use this.changedValues
+    hasInputChanges: false, // only used to force re-render of the parent container for save button
     canSave: false, // only used internally to compare changes for re-rendering
     ...Class.prototype.state
   }
@@ -238,8 +250,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   Object.defineProperty(Class.prototype, 'canSave', {
     get () {
       const {valid, loading} = this.props
-      const {hasInputChanges} = this.state
-      return hasInputChanges && valid && !loading
+      return valid && !loading && !!this.changedValues
     }
   })
 

@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
 import { Active, capitalize, get, hasListValue, isEmpty, isEqual, set, toList, warn } from 'utils-pack'
 import { CREATE, DELETE, SUCCESS, UPDATE } from 'utils-pack/constants'
 import { eventHooks } from './hook'
-import { ObjectId, Schema, Timestamp, toObjectId, unique } from './types'
+import { Localised, ObjectId, Schema, Timestamp, toObjectId, unique } from './types'
 
 /**
  * Wrapper around mongoose.model() method to add all extra base helpers and defaults
@@ -44,8 +44,8 @@ export function createModel (name, fields, {schema: {options, config, methods, v
         get () {
           // @note: if the field is required, but only one language exists, it will throw error for other lang requests
           // thus, fallback to default language, then fallback to the first value found among translated values
-          let result = get(this, `_.${field}.${this.lang}`)
-          if (result == null && this.lang !== DEFAULT.LANGUAGE) result = get(this, `_.${field}.${DEFAULT.LANGUAGE}`)
+          let result = get(this, Localised.path(field, this.lang))
+          if (result == null && this.lang !== DEFAULT.LANGUAGE) result = get(this, Localised.path(field, DEFAULT.LANGUAGE))
           if (result == null) {
             const localString = get(this, `_.${field}`)
             if (localString == null) return
@@ -57,7 +57,7 @@ export function createModel (name, fields, {schema: {options, config, methods, v
         },
         set (val) {
           this.markModified('_')
-          return set(this, `_.${field}.${this.lang}`, val)
+          return set(this, Localised.path(field, this.lang), val)
         }
       }
     })

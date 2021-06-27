@@ -15,6 +15,7 @@ if (!Active.Field) Active.Field = Field
  */
 export default class Fields extends PureComponent {
   static propTypes = {
+    // `kind` is used to render "+ Add Kind" dropdown label, because `options` has no translated value for the `kind`
     kind: PropTypes.string.isRequired, // TYPE key (ex. TYPE.PHONE._)
     options: PropTypes.arrayOf(PropTypes.shape({ // Dropdown options (ex. OPTIONS.PHONE.items)
       text: PropTypes.string.isRequired,
@@ -46,13 +47,13 @@ export default class Fields extends PureComponent {
       this.setState({fields: this.fields(next)})
   }
 
-  handleDeleteField = (name) => {
-    const fields = this.state.fields.filter(field => field._ !== name)
+  // @see asField.componentWillUnmount for reference
+  handleDeleteField = (kind) => {
+    const fields = this.state.fields.filter(field => field._ !== kind)
     this.setState({fields}, () => {
       // When no fields are left, dispatch action to set parent wrapper field as null to reset on backend,
       // because redux-form persists the deleted field value in state.
       if (!fields.length && this.onChange) this.onChange(null)
-      if (this.props.onChange) this.props.onChange(fields, {deleted: {name}})
     })
   }
 

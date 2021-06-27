@@ -26,11 +26,20 @@ assertBackend()
  * =============================================================================
  */
 
+/**
+ * TYPE OPTIONS ----------------------------------------------------------------
+ * @reference: https://mongoosejs.com/docs/schematypes.html
+ */
 export const Schema = mongoose.Schema
 export const Mixed = Schema.Types.Mixed
 export const ObjectId = Schema.Types.ObjectId
 export const index = true
+export const immutable = true
+export const lowercase = true
+export const uppercase = true
 export const required = true
+export const select = true
+export const trim = true
 export const unique = true
 export const isEmail = [isEmailValidator, 'Please enter a valid email address']
 export const isColor = [toRgbaColor, 'Please enter a valid RGBA(A) Color']
