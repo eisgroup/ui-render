@@ -200,6 +200,14 @@ export const TRANSLATION = {
     [l.ENGLISH]: 'Submit',
     // [l.RUSSIAN]: 'Послать',
   },
+  SAVE: {
+    [l.ENGLISH]: 'Save',
+    // [l.RUSSIAN]: 'Сохранить',
+  },
+  SAVED: {
+    [l.ENGLISH]: 'Saved',
+    // [l.RUSSIAN]: 'Сохранено',
+  },
   SAVE_TO_FAVORITES: {
     [l.ENGLISH]: 'Save to Favorites',
     // [l.RUSSIAN]: 'Сохранить в Избранное',

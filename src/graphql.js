@@ -48,7 +48,7 @@ export function authLevel (userRole) {
 
 /**
  * HOC Decorator to Process Localised Strings (by mutation) for GraphQL Resolvers
- *    - Injects `user.lang` or `lang` from Context to the `entry.lang` Payload Argument
+ *    - Injects `user.lang` or `lang` from Context to the `entry.lang` Payload argument
  *    - Injects language code to returned doc/s for resolving entry virtual getters/setters
  * @default: fallbacks to active language code used by the application
  * @example: see `authenticated` decorator
