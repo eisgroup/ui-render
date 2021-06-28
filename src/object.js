@@ -488,7 +488,7 @@ export function removeDeletedItems(collection) {
 	return collection.constructor === Array ? collection.filter(v => v) : collection
 }
 
-const GQL_HIDDEN_FIELDS = [
+export const GQL_HIDDEN_FIELDS = [
 	'__typename', 'id', 'updated', 'created', 'creator', 'creatorId'
 ]
 
