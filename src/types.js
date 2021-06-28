@@ -39,14 +39,36 @@ type.UrlOrNode = type.OneOf(type.String, type.Object, type.Method)
 type.UrlOrObject = type.OneOf(type.String, type.Object)
 
 /* Component Types */
-type.Definition = type.Of({ // localised definition (example: LANGUAGE.ENGLISH object)
+
+// localised definition (example: LANGUAGE.ENGLISH object)
+type.Definition = type.Of({
   _: type.Any.isRequired, // identifier code that is language agnostic
   name: type.GetterString.isRequired, // definition's `name` string for currently active Language
   en: type.String, // `name` string in English
   // 'ru': other definition's `name` strings by their language code
 })
-type.DefinitionSet = type.ObjectOf(type.Definition.isRequired) // set of localised definitions (example: LANGUAGE object)
-type.Option = type.OneOf( // dropdown option
+
+// set of localised definitions (example: LANGUAGE object)
+type.DefinitionSet = type.ObjectOf(type.Definition.isRequired)
+
+type.FileInput = type.Of({
+  i: type.Any, // identifier or index position of the file in the grid
+  src: type.UrlOrBase64, // file source URL or base64 encoded string
+  name: type.String, // file name with extension
+  kind: type.Any, // type of file (example: public, private...)
+  file: type.File, // -> sent by onChange callbacks for upload to backend (example: Dropzone file object)
+  remove: type.Boolean, // -> sent by onChange callbacks for deletion to backend
+})
+
+// FIELD.FOR.TAG for example
+type.FieldForList = type.ListOf(type.Of({
+  id: type.String.isRequired,
+}))
+// One of @withForm() value getters
+type.FormValueType = type.Enum(['changedValues', 'registeredValues', 'formValues'])
+
+// Dropdown option
+type.Option = type.OneOf(
   type.String,
   type.Number,
   type.Of({
@@ -56,11 +78,3 @@ type.Option = type.OneOf( // dropdown option
   }),
 )
 type.Options = type.ListOf(type.Option.isRequired)
-type.FileInput = type.Of({
-  i: type.Any, // identifier or index position of the file in the grid
-  src: type.UrlOrBase64, // file source URL or base64 encoded string
-  name: type.String, // file name with extension
-  kind: type.Any, // type of file (example: public, private...)
-  file: type.File, // -> sent by onChange callbacks for upload to backend (example: Dropzone file object)
-  remove: type.Boolean, // -> sent by onChange callbacks for deletion to backend
-})
