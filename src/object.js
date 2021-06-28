@@ -488,16 +488,21 @@ export function removeDeletedItems(collection) {
 	return collection.constructor === Array ? collection.filter(v => v) : collection
 }
 
+const GQL_HIDDEN_FIELDS = [
+	'__typename', 'id', 'updated', 'created', 'creator', 'creatorId'
+]
+
 /**
  * Remove GraphQL Tags and Null values from given Collection
- * (Falsey values will be removed from Array)
+ *  - Falsey values will be removed from Array
+ *  - Commonly uneditable attributes are deleted by default, see `tags` list
  *
  * @param {Object|Array} collection - to remove graphql tags from
  * @param {Array} [tags] - list of tags to remove
  * @param {Boolean} [clone] - whether to clone the object before mutating
  * @return {Object|Array} - without graphql tags
  */
-export function sanitizeGqlResponse(collection, { tags = ['__typename'], clone = false } = {}) {
+export function sanitizeGqlResponse (collection, {tags = GQL_HIDDEN_FIELDS, clone = false} = {}) {
 	const result = clone ? cloneDeep(collection) : collection
 
 	for (const key in result) {
