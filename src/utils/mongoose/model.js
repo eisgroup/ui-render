@@ -1,7 +1,7 @@
 import { stateAction } from 'modules-pack/redux/actions'
 import { DEFAULT } from 'modules-pack/variables/defaults'
 import mongoose from 'mongoose'
-import { Active, capitalize, get, hasListValue, isEmpty, isEqual, set, toList, warn } from 'utils-pack'
+import { Active, capitalize, get, hasListValue, Id, isEmpty, isEqual, set, toList, warn, } from 'utils-pack'
 import { CREATE, DELETE, SUCCESS, UPDATE } from 'utils-pack/constants'
 import { eventHooks } from './hook'
 import { Localised, ObjectId, Schema, Timestamp, toObjectId, unique } from './types'
@@ -127,7 +127,7 @@ function createOrUpdate (model, objectIdFields = []) {
     try {
       const data = {...entry}
       objectIdFields.forEach(field => {if (data[field]) data[field] = toObjectId(data[field])})
-      return model.findOneAndUpdate({_id: data.id || data._id}, {updated: Date.now(), ...data}, {
+      return model.findOneAndUpdate({_id: data.id || data._id || Id()}, {updated: Date.now(), ...data}, {
         new: true,
         upsert: true,
         runValidators: true,
@@ -154,10 +154,11 @@ function createOrUpdateMany (model, objectIdFields = []) {
     try {
       return model.bulkWrite(toList(items, 'clean').map(({id, _id, ...data}) => {
         objectIdFields.forEach(field => {if (data[field]) data[field] = toObjectId(data[field])})
+        _id = id || _id || Id()
         return ({
           updateOne: {
-            filter: {_id: id || _id},
-            update: {_id: id || _id, updated: Date.now(), ...data},
+            filter: {_id},
+            update: {_id, updated: Date.now(), ...data},
             upsert: true,
             runValidators: true,
             setDefaultsOnInsert: true,

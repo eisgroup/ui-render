@@ -132,7 +132,6 @@ export function asField (InputComponent, {sanitize} = {}) {
     // do not use ...props from input, because it is shared by <Active.Field> instances
     // @Note: react-final-form fires `format()` when `input.value` getter is called
     Input = ({input: {value, ...input}, meta: {touched, error, pristine, ...meta} = {}}, ...more) => {
-      // console.warn('asField.input', input, 'meta', meta, 'more', more)
       if (this.props.readonly && isRequired(value)) return null
       const {onChange, error: errorMessage, defaultValue, validate: _, normalize, format, parse, ...props} = this.props
       // @Note: defaultValue is only used for UI, internal value is still undefined

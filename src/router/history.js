@@ -1,6 +1,6 @@
 // history requires DOM and will throw error in Node when used with Next.js
 // thus need to do conditional check before importing
-export const history = require('history').createBrowserHistory()
+export const history = typeof window !== 'undefined' ? require('history').createBrowserHistory() : {}
 export default history
 
 export function openModal (route, state = {}) {
