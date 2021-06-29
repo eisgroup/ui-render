@@ -489,7 +489,7 @@ export function removeDeletedItems(collection) {
 }
 
 export const GQL_HIDDEN_FIELDS = [
-	'__typename', 'id', 'updated', 'created', 'creator', 'creatorId'
+	'__typename', 'updated', 'created', 'creator', 'creatorId'
 ]
 
 /**

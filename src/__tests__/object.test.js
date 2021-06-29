@@ -3,6 +3,7 @@ import {
   cloneDeep,
   findAllObjsByKeys,
   findObjByKeys,
+  GQL_HIDDEN_FIELDS,
   hasObjKeys,
   hasObjMatch,
   objChanges,
@@ -343,8 +344,10 @@ it(`${removeDeletedItems.name}() deletes all objects with truthy 'delete' proper
 })
 
 it(`${sanitizeGqlResponse.name}() deletes all GraphQL tags, Null/Undefined values from Collection (Falsey values from List)`, () => {
+  const hiddenFields = {}
+  GQL_HIDDEN_FIELDS.forEach(name => hiddenFields[name] = true)
   const object = {
-    id: 7,
+    ...hiddenFields,
     name: null,
     age: undefined,
     beliefs: [null, undefined, false, NaN, 0, '', 7, {person: [null, 'God']}],
@@ -357,13 +360,12 @@ it(`${sanitizeGqlResponse.name}() deletes all GraphQL tags, Null/Undefined value
     __typename: 'Profile'
   }
   const expected = {
-    id: 7,
     beliefs: [7, {person: ['God']}],
     address: {
       planet: 'Earth'
     }
   }
-  expect(sanitizeGqlResponse(object)).toEqual(expected)
+  expect(sanitizeGqlResponse(object, {tags: GQL_HIDDEN_FIELDS})).toEqual(expected)
 })
 
 it(`${sortObjKeys.name}() returns new Object with Keys in given sort order`, () => {
