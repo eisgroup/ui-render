@@ -112,12 +112,27 @@ export function asField (InputComponent, {sanitize} = {}) {
       //      then backend should override the entire object (i.e. removing unregistered fields automatically).
       // - if changedValues are used, the deleted `null` value will be sent to backend,
       //      because changedValues does not depend on registered values.
-      this.input.onChange(null)
+      // Use setTimeout to avoid triggering `valid: false` for required fields
+      // @scenario:
+      //  - onChange(null) triggers `valid: false` for FIELD.TYPE.MULTIPLE with `required`, thus canSave gets disabled
+      //    => to fix it, need to call onChange(null) after input unmounts, or disable validation temporarily
+      //        => both cases do not update `pristine`, so cannot rely on this for `canSave` state.
+      // @Note:
+      //  - this.props.onChange is callback defined in withFormSetup - does not update form values, or change `pristine`
+      //  - this.input.onChange is callback from final-form/redux-form - does not trigger parent re-render directly, only when `valid` prob changes
+      // => the best logic is to change input value after it unmounts, and call `onChange` to update parent state,
+      //    because this avoids validation, ties all operations together and persists `state.hasInputChanges`.
+      const {form, name, onChange} = this.props
+      setTimeout(() => {
+        form && form.change(name, null)
+        onChange && onChange(null)
+      }, 0)
     }
 
     // do not use ...props from input, because it is shared by <Active.Field> instances
     // @Note: react-final-form fires `format()` when `input.value` getter is called
-    Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}) => {
+    Input = ({input: {value, ...input}, meta: {touched, error, pristine, ...meta} = {}}, ...more) => {
+      // console.warn('asField.input', input, 'meta', meta, 'more', more)
       if (this.props.readonly && isRequired(value)) return null
       const {onChange, error: errorMessage, defaultValue, validate: _, normalize, format, parse, ...props} = this.props
       // @Note: defaultValue is only used for UI, internal value is still undefined
@@ -297,7 +312,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   // Define instance method
   Class.prototype.renderInput = function (FIELDS, {onChange} = {}) {
-    const {initialValues} = this.props
+    const {initialValues, form} = this.props
     return fieldsFrom(FIELDS, {initialValues})
       .map(field => ({
         ...field,
@@ -306,6 +321,9 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
           this.handleChangeInput(...args)
           onChange && onChange(...args)
         },
+        // pass `form` to each Field for custom behavior inside `asField`.
+        // `form` is instance for final-form, and string for redux-form.
+        form,
       }))
       .map(Active.renderField)
   }
