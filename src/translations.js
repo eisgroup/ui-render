@@ -48,6 +48,10 @@ export const TRANSLATION = {
     [l.ENGLISH]: 'Please enter a valid email address',
     // [l.RUSSIAN]: 'Пожалуйста ведите верный адрес',
   },
+  PLEASE_COMPLETE_: {
+    [l.ENGLISH]: 'Please complete:',
+    // [l.RUSSIAN]: 'Заполните, пожалуйста:',
+  },
   NOT_A_VALID_URL: {
     [l.ENGLISH]: 'Not a valid URL',
     // [l.RUSSIAN]: 'Неверный URL',
@@ -59,6 +63,10 @@ export const TRANSLATION = {
 
   // Actions
   // ---------------------------------------------------------------------------
+  ADD: {
+    [l.ENGLISH]: 'Add',
+    // [l.RUSSIAN]: 'Добавить',
+  },
   CLICK_HERE: {
     [l.ENGLISH]: 'Click here',
     // [l.RUSSIAN]: 'Кликните сюда',
