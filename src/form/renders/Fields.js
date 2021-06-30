@@ -6,6 +6,7 @@ import { Field } from 'react-final-form'
 import Dropdown from 'react-ui-pack/Dropdown'
 import View from 'react-ui-pack/View'
 import { Active, cleanList, findObjByKeys, isEqual } from 'utils-pack'
+import { _ } from 'utils-pack/translations'
 import { InputField } from '../inputs'
 
 if (!Active.Field) Active.Field = Field
@@ -26,7 +27,7 @@ export default class Fields extends PureComponent {
     initialValues: PropTypes.object, // used to initiate fields to show at the beginning
     minFields: PropTypes.number, // minimum number of fields to keep before allow removing fields
     addPlaceholder: PropTypes.string, // placeholder for adding fields
-    onChange: PropTypes.func, // hook for when fields changes - onChange(fields - in state)
+    labelGroup: PropTypes.string, // label used when no fields selected
     // ...other props to pass to <Field/> component
   }
 
@@ -73,7 +74,7 @@ export default class Fields extends PureComponent {
 
   // RENDERS -------------------------------------------------------------------
   renderField = (obj) => {
-    const {name, kind, minFields, fields: __, ...props} = this.props
+    const {name, kind, minFields, fields, addPlaceholder, labelGroup, renderField, ...props} = this.props
     const {_} = obj
     const id = name ? `${name}.${_}` : `${kind}.${_}`
     if (!props.readonly && (!minFields || minFields < this.state.fields.length)) {
@@ -84,8 +85,14 @@ export default class Fields extends PureComponent {
   }
 
   render () {
-    const {name, kind, options, renderField, addPlaceholder, readonly, className, style} = this.props
+    const {
+      name, kind, options, renderField, labelGroup, addPlaceholder,
+      readonly, required, validate,
+      className, style
+    } = this.props
     const {fields} = this.state
+    const hasFields = fields.length > 0
+    const fieldsLabel = hasFields ? undefined : (labelGroup || TYPE_BY[kind].name)
     const renderItem = renderField ? ((obj, i) => renderField(obj, i, this.handleDeleteField)) : this.renderField
     const fieldOptions = options
       .filter(({value}) => value && !fields.find(({_}) => _ === value)) // filter out empty string '' and 0
@@ -99,13 +106,15 @@ export default class Fields extends PureComponent {
         because if registered when there are existing fields, withForm's  this.changedValues grabs all values within it,
         and will make deleting fields impossible.
         */}
-        {name && !fields.length && <Active.Field name={name} component={this.placeholderInput}/>}
+        {name && !fields.length && <Active.Field name={name} validate={validate} component={this.placeholderInput}/>}
         {fields.map(renderItem)}
         {!readonly && !!fieldOptions.length &&
         <Dropdown
           search selection
-          value=''
-          placeholder={addPlaceholder || `+ Add ${TYPE_BY[kind].name}`}
+          value=""
+          label={fieldsLabel}
+          required={required && !hasFields}
+          placeholder={addPlaceholder || `+ ${_.ADD} ${TYPE_BY[kind].name}`}
           onSelect={this.handleAddField}
           options={fieldOptions}
         />}

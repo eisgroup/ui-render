@@ -8,6 +8,7 @@ import Text from 'react-ui-pack/Text'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
 import { Active, debounce, isEmpty, isEqual, objChanges, set, toJSON, warn } from 'utils-pack'
+import { _ } from 'utils-pack/translations'
 
 /**
  * STATE SELECTORS =============================================================
@@ -188,20 +189,21 @@ export function asField (InputComponent, {sanitize} = {}) {
  * @note:
  *  - cannot wrap connected to redux component, @connect must be declared before
  * @usage:
- *  Below methods only work when using this.renderInput(FIELDS),
+ *  Below methods only work when using this.renderInput(FIELD.FOR.LIST),
  *  or apply <Input onChange={this.handleChangeInput.bind(this)}/> manually:
  *  - this.canSave - getter boolean: true if form has input changes, no validation error exists, and is not loading
  *  - this.changedValues - getter object: key value pairs of form input values that have changed since initial values
  *  - this.registeredValues - getter object: key value pairs of registered form input values
  *  - this.formValues - getter object: key value pairs of all form input values
- *  - this.renderInput(FIELDS) - function: to render form inputs using FIELDS definition (hooks `onChange` to inputs)
- *  - this.props.onChangeState - function: callback when internal state changes, receives this class instance,
- *        or {} on unmount. This is useful for nested forms with remote submit button within parent container.
+ *  - this.renderInput - function: to render form inputs using FIELD.FOR.LIST definition (hooks `onChange` to inputs).
  *
  * @helpers:
+ *  - this._fields - list: of FIELD.FOR.LIST hydrated with props and initialValues, ready for rendering.
  *  - this.state.hasInputChanges - boolean: true if state has form value changes (ensure handleChangeInput is called)
  *  - this.handleChangeInput() - function: updates state.hasInputChanges (hooked to this.renderInput, must be defined as function)
  *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
+ *  - this.props.onChangeState - function: callback when internal state changes, receives this class instance,
+ *        or {} on unmount. This is useful for nested forms with remote submit button within parent container.
  *
  *  @example:
  *    @connect(mapStateToProps)
@@ -294,16 +296,19 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   Object.defineProperty(Class.prototype, 'validationErrorsTooltip', {
     get () {
       const errors = registeredFieldErrors(this.props.form)
-      return errors && <Tooltip top>
-        <View className='padding-h-smaller'>
-          <Text className='margin-v-small bold'>Please complete:</Text>
-          {(() => {
-            const messages = []
-            for (const k in errors) {
-              messages.push(<Text key={k} className='margin-bottom-smaller'>{`- ${k}: ${toJSON(errors[k])}`}</Text>)
-            }
-            return messages
-          })()}
+      if (!errors) return null
+      const messages = []
+      // Use label if defined, for more intuitive error messages
+      const fields = this._fields || []
+      for (const k in errors) {
+        let {label, labelGroup} = fields.find(({name}) => name === k) || {}
+        label = labelGroup || label || k
+        messages.push(<Text key={k} className="margin-bottom-smaller">{`• ${label}: ${toJSON(errors[k])}`}</Text>)
+      }
+      return <Tooltip top>
+        <View className="padding-h-smaller">
+          <Text className="margin-v-small bold">{_.PLEASE_COMPLETE_}</Text>
+          {messages}
         </View>
       </Tooltip>
     }
@@ -312,7 +317,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   // Define instance method
   Class.prototype.renderInput = function (FIELDS, {onChange} = {}) {
     const {initialValues, form} = this.props
-    return fieldsFrom(FIELDS, {initialValues})
+    this._fields = fieldsFrom(FIELDS, {initialValues})
       .map(field => ({
         ...field,
         onChange: (...args) => {
@@ -324,7 +329,8 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
         // `form` is instance for final-form, and string for redux-form.
         form,
       }))
-      .map(Active.renderField)
+    return this._fields.map(Active.renderField)
+
   }
 
   // Define instance method
@@ -338,7 +344,6 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   // Define instance method
   Class.prototype.syncInputChanges = function () {
-    // todo: Phase 2 - put back deleted flag from FieldsWithLevel
     const {initialValues, valid, loading} = this.props
     const registeredValues = this.registeredValues
     const hasInputChanges = (registeredValues && isEmpty(initialValues)) || !!this.changedValues
