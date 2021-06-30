@@ -123,7 +123,7 @@ FIELD.FOR = {
  */
 export function fieldsFrom (fields, {initialValues: initValues = {}} = {}) {
   // Collect definitions
-  return fields.map(({id, ...field}) => ({...FIELD.DEF[id], ...field}))
+  return fields.map(({id, ...field}) => ({id, ...FIELD.DEF[id], ...field}))
     // Process prefixes
     .map(({name = '', namePrefix = '', options, items, float, required, disabled, readonly, validate, ...field}) => {
       name = namePrefix + name

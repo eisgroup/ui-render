@@ -27,7 +27,10 @@ export const ROUTES = {
   ],
 
   // not shown in Navigation
-  WITHOUT_NAV: []
+  WITHOUT_NAV: [],
+
+  // ID for new EntryEdit
+  NEW: 'new'
 }
 
 if (_SHOULD_SHOW_TEST_) ROUTES.FOR_NAV.push(...[

@@ -125,6 +125,8 @@ export function asField (InputComponent, {sanitize} = {}) {
       //    because this avoids validation, ties all operations together and persists `state.hasInputChanges`.
       const {form, name, onChange} = this.props
       setTimeout(() => {
+        // only call this if the form is not unmounted
+        if (!form.getRegisteredFields().length) return
         form && form.change(name, null)
         onChange && onChange(null)
       }, 0)
@@ -132,8 +134,9 @@ export function asField (InputComponent, {sanitize} = {}) {
 
     // do not use ...props from input, because it is shared by <Active.Field> instances
     // @Note: react-final-form fires `format()` when `input.value` getter is called
-    Input = ({input: {value, ...input}, meta: {touched, error, pristine, ...meta} = {}}, ...more) => {
-      if (this.props.readonly && isRequired(value)) return null
+    Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}) => {
+      // Hide this field if it's readonly and has no value.
+      if (this.props.readonly && isRequired(this.props.value)) return null
       const {onChange, error: errorMessage, defaultValue, validate: _, normalize, format, parse, ...props} = this.props
       // @Note: defaultValue is only used for UI, internal value is still undefined
       this.value = value === '' ? (pristine && defaultValue != null ? defaultValue : value) : value
@@ -174,6 +177,7 @@ export function asField (InputComponent, {sanitize} = {}) {
     // }
 
     // Do not pass 'onChange' to Field because it fires event as argument
+    // final-form does not take controlled `value`
     render () {
       const {name, disabled, normalize, format, parse = normalize, validate, options} = this.props
       return <Active.Field {...{name, disabled, normalize, format, parse, validate, options}} component={this.Input}/>
@@ -315,10 +319,12 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   })
 
   // Define instance method
-  Class.prototype.renderInput = function (FIELDS, {onChange} = {}) {
+  Class.prototype.renderInput = function (FIELDS, {onChange, fieldsSetup} = {}) {
     const {initialValues, form} = this.props
     this._fields = fieldsFrom(FIELDS, {initialValues})
-      .map(field => ({
+    if (fieldsSetup) this._fields = this._fields.map(fieldsSetup)
+    return this._fields
+      .map(({id, ...field}) => ({ // remove id just before rendering
         ...field,
         onChange: (...args) => {
           field.onChange && field.onChange(...args)
@@ -329,8 +335,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
         // `form` is instance for final-form, and string for redux-form.
         form,
       }))
-    return this._fields.map(Active.renderField)
-
+      .map(Active.renderField)
   }
 
   // Define instance method
