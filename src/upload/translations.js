@@ -1,6 +1,11 @@
 import { l, localiseTranslation } from 'utils-pack'
 
-export const _ = {
+/**
+ * LOCALISED TRANSLATIONS (i18n) ===============================================
+ * =============================================================================
+ */
+export { _ } from 'utils-pack/translations'
+const TRANSLATION = {
   FILE: {
     [l.ENGLISH]: 'File',
     // [l.RUSSIAN]: 'Файл',
@@ -47,5 +52,4 @@ export const _ = {
     // [l.RUSSIAN]: 'Неверное Соотношение Сторон!',
   },
 }
-
-localiseTranslation(_)
+localiseTranslation(TRANSLATION)

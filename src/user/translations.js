@@ -1,6 +1,12 @@
 import { l, localiseTranslation } from 'utils-pack'
 
-export const _ = {
+/**
+ * LOCALISED TRANSLATIONS (i18n) ===============================================
+ * =============================================================================
+ */
+
+export { _ } from 'utils-pack/translations'
+const TRANSLATION = {
   GIVEN_NAME: {
     [l.ENGLISH]: 'Given Name',
     // [l.RUSSIAN]: 'Имя',
@@ -50,5 +56,4 @@ export const _ = {
     // [l.RUSSIAN]: 'Я',
   },
 }
-
-localiseTranslation(_)
+localiseTranslation(TRANSLATION)

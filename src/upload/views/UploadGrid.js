@@ -13,7 +13,7 @@ import Text from 'react-ui-pack/Text'
 import { cssBgImageFrom } from 'react-ui-pack/utils'
 import View from 'react-ui-pack/View'
 import { by, isEqual, OPEN } from 'utils-pack'
-import { _ } from 'utils-pack/translations'
+import { _ } from '../translations'
 import Upload from './Upload'
 
 /**

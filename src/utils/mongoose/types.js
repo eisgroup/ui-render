@@ -8,6 +8,7 @@ import {
   get,
   hasObjectValue,
   Id as _Id,
+  interpolateString,
   isContinuousNumberRanges,
   isNumeric,
   isPhoneNumber,
@@ -19,6 +20,7 @@ import { isId } from 'utils-pack/utility'
 import isEmailValidator from 'validator/es/lib/isEmail'
 import isURL from 'validator/es/lib/isURL'
 import './database' // initialize database automatically on import of this file
+import { _ } from './translations'
 
 assertBackend()
 /**
@@ -114,7 +116,7 @@ export const TimeRanges = {
   type: [TimeRange],
   validate: {
     validator: (input) => isContinuousNumberRanges(input.toObject()),
-    message: props => `${props.value} is not a valid list of continuous timestamp ranges.`
+    message: props => interpolateString(_.TIME_RANGES_MUST_BE_A_LIST_OF_CONTINUOUS_TIMESTAMP_RANGES, {timeRanges: props.value})
   },
   set (times) {
     const {start, end} = startEndFromNumberRanges(times)
@@ -240,7 +242,7 @@ export function ForeignKey (modelName, options) {
     ref: modelName,
     validate: {
       validator: input => mongoose.model(modelName).findById(input),
-      message: props => `Foreign key ID ${props.value} does not exist`
+      message: props => interpolateString(_.INVALID_MODEL_NAME_ID, {modelName, id: props.value})
     },
     ...options,
   }
@@ -267,7 +269,7 @@ export function ForeignDynamicKey (refField, options) {
       validator (input) { // noinspection JSUnresolvedFunction
         return mongoose.model(get(this, refField)).findById(input)
       },
-      message: props => `Foreign key ID ${props.value} does not exist for ${get(this, refField)}`
+      message: props => interpolateString(_.INVALID_MODEL_NAME_ID, {modelName: get(this, refField), id: props.value})
     },
     ...options,
   }

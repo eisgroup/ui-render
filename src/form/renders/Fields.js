@@ -37,6 +37,7 @@ export default class Fields extends PureComponent {
 
   state = {
     fields: this.fields(), // example: [PHONE.MOBILE]
+    justAddedField: '', // one of options.value - to enable autofocus
   }
 
   fields (props = this.props) {
@@ -61,7 +62,7 @@ export default class Fields extends PureComponent {
   handleAddField = (_) => {
     if (!_) return
     const field = findObjByKeys(DEFINITION[this.props.kind], {_})
-    this.setState({fields: cleanList(this.state.fields.concat(field))})
+    this.setState({fields: cleanList(this.state.fields.concat(field)), justAddedField: _})
     // When new field is added, dispatch action to set value so the form can detect changes from initial values
     // this should be done by defining prop `dispatchChangeOnMount` = true, then let SliderField handle it,
     // because this container does not know which form the field belongs to.
@@ -75,13 +76,14 @@ export default class Fields extends PureComponent {
   // RENDERS -------------------------------------------------------------------
   renderField = (obj) => {
     const {name, kind, minFields, fields, addPlaceholder, labelGroup, renderField, ...props} = this.props
+    const {justAddedField} = this.state
     const {_} = obj
     const id = name ? `${name}.${_}` : `${kind}.${_}`
     if (!props.readonly && (!minFields || minFields < this.state.fields.length)) {
       props.icon = 'delete'
       props.onClickIcon = () => this.handleDeleteField(_)
     }
-    return <InputField key={id} name={id} label={obj.name} {...props}/>
+    return <InputField key={id} name={id} label={obj.name} autofocus={justAddedField === _} {...props}/>
   }
 
   render () {
