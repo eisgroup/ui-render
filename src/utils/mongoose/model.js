@@ -1,7 +1,20 @@
 import { stateAction } from 'modules-pack/redux/actions'
 import { DEFAULT } from 'modules-pack/variables/defaults'
 import mongoose from 'mongoose'
-import { Active, capitalize, get, hasListValue, Id, isEmpty, isEqual, set, toList, warn, } from 'utils-pack'
+import {
+  Active,
+  capitalize,
+  get,
+  hasListValue,
+  Id,
+  isEmpty,
+  isEqual,
+  isObject,
+  set,
+  toFlatList,
+  toList,
+  warn,
+} from 'utils-pack'
 import { CREATE, DELETE, SUCCESS, UPDATE } from 'utils-pack/constants'
 import { eventHooks } from './hook'
 import { Localised, ObjectId, Schema, Timestamp, toObjectId, unique } from './types'
@@ -111,6 +124,80 @@ export function createModel (name, fields, {schema: {options, config, methods, v
 
   if (!Active.modelByName) Active.modelByName = {}
   return Active.modelByName[name] = model
+}
+
+/**
+ * Extract Foreign Keys from Mongoose Schema Recursively
+ * @see: model.test.js for scenarios
+ *
+ * @param {Object} schema - Mongoose Schema instance or plain object
+ * @param {String} [separator] - for joining result list to string
+ * @returns {String[]|{STRING}} LIST - of foreign keys, with LIST.STRING as space separated String value by default
+ */
+export function foreignKeys (schema, separator = ' ') {
+  // ForeignKey can be nested within lists, or objects, need to recursively find them all
+  const result = []
+  if (schema instanceof Schema) schema = schema.obj
+  for (const key in schema) {
+    let nestedList = []
+    let definition = schema[key]
+    if (definition instanceof Schema) definition = definition.obj
+    if (isObject(definition)) {
+      // Direct ForeignKey definition
+      let {ref, refPath, type} = definition
+      if (ref || refPath) {
+        result.push(key)
+      } else if (type) {
+        if (type instanceof Schema) type = type.obj
+        if (isObject(type)) {
+          // Direct `type` ForeignKey definition
+          const {ref, refPath} = type
+          if (ref || refPath) {
+            result.push(key)
+          } else {
+            // Nested schema object (`type` as nested key)
+            nestedList = foreignKeys(type, separator)
+          }
+        } else if (hasListValue(type)) {
+          // Nested schema list (`type` as nested key)
+          nestedList = foreignKeys.list(type, separator, key, result)
+        }
+      } else {
+        // Nested schema object
+        nestedList = foreignKeys(definition, separator)
+      }
+    } else if (hasListValue(definition)) {
+      // Nested schema list
+      nestedList = foreignKeys.list(definition, separator, key, result)
+    }
+
+    if (nestedList.length > 0) result.push(...nestedList.map(path => `${key}.${path}`))
+  }
+
+  result.STRING = result.join(separator)
+  return result
+}
+
+// internal helper function to process nested list and avoid repeating code
+foreignKeys.list = function (list, separator, key, result) {
+  let nestedList = []
+  if (list[0] instanceof Schema) list = list.map(schema => schema.obj)
+  if (isObject(list[0])) {
+    if (list.length === 1) {
+      // Direct List ForeignKey definition
+      const {ref, refPath} = list[0]
+      if (ref || refPath) {
+        result.push(key)
+      } else {
+        // Nested schema object
+        nestedList = foreignKeys(list[0], separator)
+      }
+    } else {
+      // Nested schema list
+      nestedList = toFlatList(list.map(schema => foreignKeys(schema, separator)))
+    }
+  }
+  return nestedList
 }
 
 /**
