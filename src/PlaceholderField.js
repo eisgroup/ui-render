@@ -5,19 +5,20 @@ import { _ } from 'utils-pack/translations'
 import Text from './Text'
 import View from './View'
 
-_.FIELD_DOES_NOT_EXIST = {
-  [l.ENGLISH]: 'Field does not exist!',
-  // [l.RUSSIAN]: 'Поля не существует!',
-}
-localiseTranslation(_)
+localiseTranslation({
+  FIELD_DOES_NOT_EXIST_: {
+    [l.ENGLISH]: 'Field does not exist!',
+    // [l.RUSSIAN]: 'Поля не существует!',
+  }
+})
 
 /**
  * Placeholder Field - Pure Component.
  */
 export function PlaceholderField ({name, ...props} = {}) {
   if (props.children == null)
-    props.children = <Text className='p error padding border'>
-      <Text className='bold'>{name}</Text>{toLowerCase(_.FIELD_DOES_NOT_EXIST)}
+    props.children = <Text className="p error padding border">
+      <Text className="bold">{name}</Text>{toLowerCase(_.FIELD_DOES_NOT_EXIST_)}
     </Text>
   return <View {...props}/>
 }

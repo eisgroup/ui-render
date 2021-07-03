@@ -7,19 +7,20 @@ import { _ } from 'utils-pack/translations'
 import Text from './Text'
 import View from './View'
 
-_.ADD_ = {
-  [l.ENGLISH]: 'Add ',
-  // [l.RUSSIAN]: 'Добавить ',
-}
-_.NOTHING_FOUND = {
-  [l.ENGLISH]: 'Nothing found',
-  // [l.RUSSIAN]: 'Ничего не найдено',
-}
-_.NO_OPTIONS_LEFT = {
-  [l.ENGLISH]: 'No options left',
-  // [l.RUSSIAN]: 'Больше нет выборов',
-}
-localiseTranslation(_)
+localiseTranslation({
+  ADD_: {
+    [l.ENGLISH]: 'Add ',
+    // [l.RUSSIAN]: 'Добавить ',
+  },
+  NOTHING_FOUND: {
+    [l.ENGLISH]: 'Nothing found',
+    // [l.RUSSIAN]: 'Ничего не найдено',
+  },
+  NO_OPTIONS_LEFT: {
+    [l.ENGLISH]: 'No options left',
+    // [l.RUSSIAN]: 'Больше нет выборов',
+  }
+})
 
 /**
  * Drop Down Select - Pure Component.
