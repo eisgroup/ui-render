@@ -2,27 +2,40 @@ import { l } from './constants'
 import { localiseTranslation } from './definitions'
 
 /**
- * PROJECT TRANSLATIONS ========================================================
+ * LOCALISED TRANSLATIONS (i18n) ===============================================
  * =============================================================================
  */
 
 /**
- * Translation Definition (can be extended by adding new terms or languages)
- * @usage:
+ * Localised String Object (can be extended by adding new terms or languages)
+ * @note: follow the example to ensure only one instance of translation exists.
+ * @example:
  *    import { l, localiseTranslation } from 'utils-pack'
- *    import { TRANSLATION } from 'utils-pack/translations'
- *    export const _ = {
- *      ...TRANSLATION,
+ *    export { _ } from 'utils-pack/translations'
+ *    const TRANSLATION = {
  *      NEW_PHRASE: {
  *        [l.ENGLISH]: 'New Phrase',
  *        [l.RUSSIAN]: 'Новая Фраза',
  *      },
  *    }
- *    localiseTranslation(_)
+ *    localiseTranslation(TRANSLATION)
  *    console.log(_.NEW_PHRASE)
  *    >>> 'New Phrase'
+ *    console.log(_.THANK_YOU)
+ *    >>> 'Thank You!'
+ * @returns {Object} localised string - that returns localised 'Untranslated' string if no translation found
  */
-export const TRANSLATION = {
+export const _ = new Proxy(localiseTranslation.instance, {
+  get (target, prop) {
+    return target[prop] || target.UNTRANSLATED
+  }
+})
+const TRANSLATION = {
+  // Default messaged for undefined strings
+  UNTRANSLATED: {
+    [l.ENGLISH]: 'Untranslated',
+  },
+
   // Forms and Validations
   // ---------------------------------------------------------------------------
   REQUIRED: {
@@ -380,6 +393,4 @@ export const TRANSLATION = {
   // },
 }
 
-// Create definition copy to enable IDE suggestion
-export const _ = {...TRANSLATION}
-localiseTranslation(_)
+localiseTranslation(TRANSLATION)

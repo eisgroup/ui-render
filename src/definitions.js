@@ -180,19 +180,29 @@ export function localise (DEFINITION) {
 export function localiseTranslation (TRANSLATION) {
   for (const KEY in TRANSLATION) {
     const _data = TRANSLATION[KEY]
-    delete TRANSLATION[KEY] // remove it to prevent repeated iteration
-    Object.defineProperty(TRANSLATION, KEY, {
-      get () {
-        const data = this['~' + KEY] || _data
-        return data[Active.LANG._] || data[LANGUAGE.ENGLISH._] || KEY || ''
-      },
-      set (data) {
-        this['~' + KEY] = data
-      }
-    })
+    // Update existing translations
+    if (KEY in localiseTranslation.instance) {
+      localiseTranslation.instance[KEY] = _data
+    } else {
+      // Define translations for the first time
+      const _key = '~' + KEY
+      Object.defineProperty(localiseTranslation.instance, KEY, {
+        get () {
+          // initially cannot use setter to define translations, thus fallback to _data
+          const data = localiseTranslation.instance[_key] || (localiseTranslation.instance[_key] = _data)
+          return data[Active.LANG._] || data[Active.DEFAULT.LANGUAGE] || KEY || ''
+        },
+        set (data) {
+          // merge new translations with existing
+          localiseTranslation.instance[_key] = {...localiseTranslation.instance[_key], ...data}
+        }
+      })
+    }
   }
-  return TRANSLATION
+  return localiseTranslation.instance
 }
+
+localiseTranslation.instance = {}
 
 /**
  * Create Initial Values for given Object Definition
