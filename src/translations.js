@@ -12,13 +12,13 @@ import { localiseTranslation } from './definitions'
  * @example:
  *    import { l, localiseTranslation } from 'utils-pack'
  *    export { _ } from 'utils-pack/translations'
- *    const TRANSLATION = {
+ *    localiseTranslation({
  *      NEW_PHRASE: {
  *        [l.ENGLISH]: 'New Phrase',
  *        [l.RUSSIAN]: 'Новая Фраза',
  *      },
- *    }
- *    localiseTranslation(TRANSLATION)
+ *    })
+ * @usage:
  *    console.log(_.NEW_PHRASE)
  *    >>> 'New Phrase'
  *    console.log(_.THANK_YOU)
@@ -30,7 +30,7 @@ export const _ = new Proxy(localiseTranslation.instance, {
     return target[prop] || target.UNTRANSLATED
   }
 })
-const TRANSLATION = {
+localiseTranslation({
   // Default messaged for undefined strings
   UNTRANSLATED: {
     [l.ENGLISH]: 'Untranslated',
@@ -391,6 +391,4 @@ const TRANSLATION = {
   //   [l.ENGLISH]: 'Show hours',
   //   // [l.RUSSIAN]: 'Показать часы',
   // },
-}
-
-localiseTranslation(TRANSLATION)
+})
