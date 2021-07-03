@@ -6,7 +6,7 @@ import { l, localiseTranslation } from 'utils-pack'
  */
 
 export { _ } from 'utils-pack/translations'
-const TRANSLATION = {
+localiseTranslation({
   GIVEN_NAME: {
     [l.ENGLISH]: 'Given Name',
     // [l.RUSSIAN]: 'Имя',
@@ -55,5 +55,4 @@ const TRANSLATION = {
     [l.ENGLISH]: 'I am',
     // [l.RUSSIAN]: 'Я',
   },
-}
-localiseTranslation(TRANSLATION)
+})

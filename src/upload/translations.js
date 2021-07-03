@@ -5,7 +5,7 @@ import { l, localiseTranslation } from 'utils-pack'
  * =============================================================================
  */
 export { _ } from 'utils-pack/translations'
-const TRANSLATION = {
+localiseTranslation({
   FILE: {
     [l.ENGLISH]: 'File',
     // [l.RUSSIAN]: 'Файл',
@@ -51,5 +51,4 @@ const TRANSLATION = {
     [l.ENGLISH]: 'Invalid Aspect Ratio!',
     // [l.RUSSIAN]: 'Неверное Соотношение Сторон!',
   },
-}
-localiseTranslation(TRANSLATION)
+})

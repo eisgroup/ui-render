@@ -5,12 +5,11 @@ import { Loading } from 'react-ui-pack/Loading'
 import { debounce, l, localiseTranslation, objChanges, TIME_DURATION_INSTANT } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 
-if (!_.SYNCING___) {
-  _.SYNCING___ = {
+localiseTranslation({
+  SYNCING___: {
     [l.ENGLISH]: 'Syncing...',
-  }
-  localiseTranslation(_)
-}
+  },
+})
 
 /**
  * Final Form Auto Save on Input Value Changes

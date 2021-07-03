@@ -5,10 +5,9 @@ import { l, localiseTranslation } from 'utils-pack'
  * =============================================================================
  */
 export { _ } from 'utils-pack/translations'
-const TRANSLATION = {
+localiseTranslation({
   TEMPLATE: {
     [l.ENGLISH]: 'Template',
     // [l.RUSSIAN]: 'Шаблон',
   },
-}
-localiseTranslation(TRANSLATION)
+})
