@@ -229,6 +229,7 @@ function createOrUpdate (model, objectIdFields = []) {
 
 /**
  * Create or Update Given Entries
+ * @note: uses .bulkWrite - a direct MongoDB method, and does not work with Mongoose `virtuals`
  *
  * @param {Object} model - database model class
  * @param {Array} [objectIdFields] - model fields that need to be converted to ObjectIds

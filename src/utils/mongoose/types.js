@@ -219,7 +219,7 @@ export function Localised (fields, LocalString) {
 }
 
 Localised.path = function (field, lang) {
-  return `_[${field}][${lang}]`
+  return `_.${field}.${lang}` // must use dot notation to work as MongoDB filter
 }
 
 /**

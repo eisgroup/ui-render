@@ -49,8 +49,8 @@ type Subscription {
 #   }
 #
 # Note: File type is flexible by design, and is to be used with these Components:
-#   - <UploadGrid/>: list of a single or multiple file versions of the same `kind`
-#   - <UploadGrids/>: list of kinds, each with a single or multiple file versions
+#   - <UploadGrid/>: list of a single or multiple file types of the same `kind`
+#   - <UploadGrids/>: list of kinds, each with a single or multiple file types
 #   => using FIELD definition, they automatically map File types from backend,
 #       and autosave/query/mutate without manual setup in frontend.
 #

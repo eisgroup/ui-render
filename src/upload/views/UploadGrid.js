@@ -74,10 +74,10 @@ export default class UploadGrid extends Component {
     onChange: PropTypes.func,
     // Callback when files change, receives list of last changed files as argument, will not call `onChange` if given
     onChangeLast: PropTypes.func,
-    // Number of files that can be uploaded, ignored if `versions` are defined
+    // Number of files that can be uploaded, ignored if `types` are defined
     count: PropTypes.number,
     // Explicitly define identifiers for each upload in the grid
-    versions: type.ListOf(type.Definition.isRequired),
+    types: type.ListOf(type.Definition.isRequired),
     // Type of file (added to new uploads)
     kind: PropTypes.any,
     // Render grid as square (can be defined as Square props)
@@ -128,21 +128,21 @@ export default class UploadGrid extends Component {
 
   // Grid count
   get count () {
-    const {versions, count} = this.props
-    return (versions && versions.length) || count
+    const {types, count} = this.props
+    return (types && types.length) || count
   }
 
   get isIncremental () {
-    return !this.props.versions || !this.props.versions.length
+    return !this.props.types || !this.props.types.length
   }
 
   // File Previews and Placeholders
   get previews () {
-    const {versions, count, showName} = this.props
+    const {types, count, showName} = this.props
     const {files} = this.state
     if (!this.isIncremental) { // explicitly defined identifiers
-      // Sort placeholder by identifier versions order
-      return versions.map(v => {
+      // Sort placeholder by identifier types order
+      return types.map(v => {
         const file = files.find(f => f.i === v._)
         if (!showName && file) file.name = v.name // show version type, instead of File.name
         return file || {i: v._, name: v.name}
@@ -222,7 +222,7 @@ export default class UploadGrid extends Component {
 
   render () {
     const {
-      label, loading, placeholder, square, count: _, kind, versions, showCount, showName,
+      label, loading, placeholder, square, count: _, kind, types, showCount, showName,
       error, info, iconUpload, iconRemove,
       className, style,
       ...props
@@ -230,11 +230,14 @@ export default class UploadGrid extends Component {
     const count = this.count
     const hasCount = showCount && count > 1 && this.isIncremental
     const shouldCount = showCount && !showName && hasCount
-    const Grid = square ? Square.Row : Row
+    // Render as square by default, if square root of count is a whole number
+    // All other cases render as a wrapping Row to let css `upload.less` control the layout
+    const squared = square == null ? ((Math.sqrt(count) % 1) === 0) : square
+    const Grid = squared ? Square.Row : Row
     return (
       <View className={classNames('input--wrapper', className)} style={style}>
         {label && <Label>{label}</Label>}
-        <Grid fill className={classNames(`upload-grid count-${count}`, {error, info})} {...square}>
+        <Grid fill className={classNames(`upload-grid count-${count}`, {error, info, wrap: !squared})} {...square}>
           {this.previews.map((file, i) => (
             <View
               key={file.i || i}

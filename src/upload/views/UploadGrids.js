@@ -20,13 +20,13 @@ export default class UploadGrids extends Component {
     kinds: type.ListOf(type.Of({
       _: type.Any.isRequired, // identifier code that is language agnostic
       name: type.GetterString.isRequired, // localised label for the kind
-      versions: type.ListOf(type.Definition), // localised labels for file types of the kind
+      types: type.ListOf(type.Definition), // localised labels for file types of the kind
     }).isRequired).isRequired,
     // other <UploadGrid/> ...props to be passed down (only one kind of UploadGrid is rendered at any time)
   }
 
   static defaultProps = {
-    initialValues: [], // flat list of all File kinds and versions
+    initialValues: [], // flat list of all File kinds and types
   }
 
   state = {
@@ -72,12 +72,12 @@ export default class UploadGrids extends Component {
         <Tabs
           centerTabs
           tabs={kinds.map(k => k.name)}
-          panels={kinds.map(({_, versions}) => () => (
+          panels={kinds.map(({_, types}) => () => (
             <UploadGrid
               {...props}
               // key={_} // do not add key to avoid unmounting
               kind={_}
-              versions={versions}
+              types={types}
               initialValues={files.filter(f => f.kind === _)}
               onChangeLast={this.handleChange}
             />
