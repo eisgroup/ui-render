@@ -1,13 +1,15 @@
 import classNames from 'classnames'
-import { TYPE_BY } from 'modules-pack/variables/definitions'
+import { FIELD } from 'modules-pack/variables'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import { Field } from 'react-final-form'
 import Dropdown from 'react-ui-pack/Dropdown'
 import View from 'react-ui-pack/View'
-import { Active, cleanList, isEqual } from 'utils-pack'
+import { Active, cleanList, interpolateString, isEqual } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
-import { InputField } from '../inputs'
+import '../constants' // init FIELD.TYPE setup
+import { DropdownField, InputField } from '../inputs'
+import '../translations'
 
 if (!Active.Field) Active.Field = Field
 
@@ -16,23 +18,25 @@ if (!Active.Field) Active.Field = Field
  */
 export default class Fields extends PureComponent {
   static propTypes = {
-    // `kind` is used to render "+ Add Kind" dropdown label, because `options` has no translated value for the `kind`,
-    kind: PropTypes.string.isRequired, // TYPE underscore value (ex. TYPE.LANGUAGE._)
     options: PropTypes.arrayOf(PropTypes.shape({ // Dropdown options (ex. OPTIONS.LANGUAGE.items)
       value: PropTypes.any.isRequired, // ID or DEFINITION._ value
       text: PropTypes.string.isRequired, // Localised String or getter DEFINITION.name
     })).isRequired,
-    name: PropTypes.string, // input name prefix for redux form (ex. `phones.`), defaults to given `kind`
-    renderField: PropTypes.func, // function(field, index, onRemove) to render each field, defaults to <InputField/>
+    kind: PropTypes.string, // one of FIELD.TYPE, defaults to FIELD.TYPE.INPUT
+    kindProps: PropTypes.func, // Function<field, instance> to map props for each input field - where instance is `this` Class
+    name: PropTypes.string, // input name prefix for redux form (ex. `phones.`)
     initialValues: PropTypes.object, // used to initiate fields to show at the beginning
+    labelGroup: PropTypes.string, // label used when no fields selected, fallback to `labelType`
+    labelType: PropTypes.string, // required if missing `addPlaceholder`, for Dropdown "+ Add {labelType}" placeholder
+    addPlaceholder: PropTypes.string, // the entire Dropdown placeholder for adding fields (ignores `labelType`)
     minFields: PropTypes.number, // minimum number of fields to keep before allow removing fields
-    addPlaceholder: PropTypes.string, // placeholder for adding fields
-    labelGroup: PropTypes.string, // label used when no fields selected
+    renderField: PropTypes.func, // function(field, index, onRemove) to render each field, defaults to <InputField/>
     // ...other props to pass to <Field/> component
   }
 
   static defaultProps = {
-    initialValues: {}
+    initialValues: {},
+    kind: FIELD.TYPE.INPUT,
   }
 
   state = {
@@ -75,27 +79,38 @@ export default class Fields extends PureComponent {
 
   // RENDERS -------------------------------------------------------------------
   renderField = (field) => {
-    const {name, kind, minFields, fields, addPlaceholder, labelGroup, renderField, ...props} = this.props
+    const {
+      name, kind, kindProps, minFields, options, renderField,
+      addPlaceholder, labelGroup, labelType,
+      ...props
+    } = this.props
     const {justAddedField} = this.state
     const {value, text} = field
-    const id = name ? `${name}.${value}` : `${kind}.${value}`
+    const id = name ? `${name}.${value}` : value
     if (!props.readonly && (!minFields || minFields < this.state.fields.length)) {
       props.icon = 'delete'
       props.onClickIcon = () => this.handleDeleteField(value)
     }
-    return <InputField key={id} name={id} label={text} autofocus={justAddedField === value} {...props}/>
+    Object.assign(props, {key: id, name: id, label: text, autofocus: justAddedField === value})
+    if (kindProps) Object.assign(props, kindProps(field, this))
+    switch (kind) {
+      case FIELD.TYPE.SELECT:
+        return <DropdownField {...props}/>
+      default:
+        return <InputField {...props}/>
+    }
   }
 
   render () {
     const {
-      name, kind, options, renderField, labelGroup, addPlaceholder,
+      name, options, renderField, labelGroup, labelType, addPlaceholder,
       readonly, required, validate,
       className, style
     } = this.props
     const {fields} = this.state
     const hasFields = fields.length > 0
-    const fieldsLabel = hasFields ? undefined : (labelGroup || TYPE_BY[kind].name)
-    const renderItem = renderField ? ((obj, i) => renderField(obj, i, this.handleDeleteField)) : this.renderField
+    const fieldsLabel = hasFields ? undefined : labelGroup
+    const renderItem = renderField ? ((obj, i) => renderField(obj, i, this.handleDeleteField, this)) : this.renderField
     const fieldOptions = options
       .filter(({value}) => value && !fields.find(f => f.value === value)) // filter out empty string '' and 0
     return (
@@ -116,7 +131,7 @@ export default class Fields extends PureComponent {
           value=""
           label={fieldsLabel}
           required={required && !hasFields}
-          placeholder={addPlaceholder || `+ ${_.ADD} ${TYPE_BY[kind].name}`}
+          placeholder={addPlaceholder || interpolateString(_.plus_ADD_type, {type: labelType})}
           onSelect={this.handleAddField}
           options={fieldOptions}
         />}

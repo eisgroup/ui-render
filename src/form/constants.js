@@ -3,6 +3,7 @@ import { FIELD } from 'modules-pack/variables/fields'
 import { date, double5, hourMinute, integer, phone, uppercase } from 'react-ui-pack/inputs/normalizers'
 import { email, isRequired, maxLength, password, phoneNumber, url } from 'react-ui-pack/inputs/validationRules'
 import { _ } from 'utils-pack/translations'
+import './translations'
 
 /**
  * CONSTANT VARIABLES ==========================================================
@@ -70,18 +71,18 @@ FIELD.DEF = {
     name: 'email',
     get label () {return _.EMAIL},
     get hint () {return _.MY_EMAIL_ADDRESS_IS},
-    placeholder: 'example@gmail.com',
+    get placeholder () {return _.EXAMPLE_GMAIL_COM},
     type: 'email',
     validate: email,
     view: FIELD.TYPE.INPUT, // required definition
   },
   [FIELD.ID.PHONE]: {
     name: 'phones',
-    kind: TYPE.PHONE._,
+    get labelType () {return TYPE.PHONE.name},
+    get hint () {return _.MY_PHONE_NUMBER_IS},
+    get placeholder () {return _.plus_1_555_555_55_55},
     options: OPTIONS.PHONE,
     minFields: 1,
-    hint: 'My phone number is',
-    placeholder: '+7 (555) 555-55-55',
     type: 'tel',
     normalize: phone,
     validate: [phoneNumber],

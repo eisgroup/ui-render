@@ -137,7 +137,7 @@ export function asField (InputComponent, {sanitize} = {}) {
     Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}) => {
       // Hide this field if it's readonly and has no value.
       if (this.props.readonly && isRequired(this.props.value)) return null
-      const {onChange, error: errorMessage, defaultValue, validate: _, normalize, format, parse, ...props} = this.props
+      const {onChange, error: errMsg, defaultValue, normalize, format, parse, validate, form, ...props} = this.props
       // @Note: defaultValue is only used for UI, internal value is still undefined
       this.value = value === '' ? (pristine && defaultValue != null ? defaultValue : value) : value
       this.input = input
@@ -148,7 +148,7 @@ export function asField (InputComponent, {sanitize} = {}) {
           value={sanitize ? sanitize(this.value, this.props) : this.value}
           onBlur={this.handleBlur} // prevent value change, but need onBlur to set touched for validation
           onChange={this.handleChange}
-          error={touched && error && (errorMessage || error)}
+          error={touched && error && (errMsg || error)}
           {...props} // allow forceful value override
         />
       )

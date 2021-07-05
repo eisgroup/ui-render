@@ -30,6 +30,10 @@ localiseTranslation({
     [l.ENGLISH]: 'Select or Drop',
     // [l.RUSSIAN]: 'Выберите или Перетащите',
   },
+  UPDATING: {
+    [l.ENGLISH]: 'Updating',
+    // [l.RUSSIAN]: 'Обновление',
+  },
   UPLOAD: {
     // as verb
     [l.ENGLISH]: 'Upload',

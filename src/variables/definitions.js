@@ -65,6 +65,10 @@ export const PERMISSION = {
 
 /* Match with GraphQL Type */
 export const TYPE = {
+  CURRENCY: {
+    _: 'Currency',
+    [l.ENGLISH]: 'Currency'
+  },
   LANGUAGE: {
     _: 'Language',
     [l.ENGLISH]: 'Language'
@@ -75,20 +79,23 @@ export const TYPE = {
   },
   PHONE: {
     _: 'Phone',
-    [l.ENGLISH]: 'Phone'
+    [l.ENGLISH]: 'Phone Number'
   },
 }
 export const TYPE_BY = {
+  [TYPE.CURRENCY._]: TYPE.CURRENCY,
   [TYPE.LANGUAGE._]: TYPE.LANGUAGE,
   [TYPE.PHONE._]: TYPE.PHONE,
 }
 
 export const OPTIONS = {
   CURRENCY: optionsFrom(CURRENCY),
+  LANGUAGE: optionsFrom(LANGUAGE),
   PHONE: optionsFrom(PHONE),
 }
 
 export const DEFINITION = {
+  [TYPE.CURRENCY._]: CURRENCY,
   [TYPE.LANGUAGE._]: LANGUAGE,
   [TYPE.PHONE._]: PHONE,
 }

@@ -10,13 +10,12 @@ import { SliderLabeled } from './renderers'
  */
 export default class FieldsWithLevel extends PureComponent {
   static propTypes = {
-    kind: PropTypes.string.isRequired, // type of definition to use - TYPE.key enum ['lang', 'phone', etc.]
     level: PropTypes.object.isRequired, // Definition of Level by _ (ex. DEFINITION_BY_VAL.LANGUAGE_LEVEL)
     options: PropTypes.arrayOf(PropTypes.shape({ // Dropdown options (ex. OPTIONS.LANGUAGE.items)
       text: PropTypes.string.isRequired,
       value: PropTypes.any.isRequired,
     })).isRequired,
-    name: PropTypes.string, // input name prefix for redux form (ex. `lang.`), defaults to given `kind`
+    name: PropTypes.string, // input name prefix for redux form (ex. `lang.`)
     renderField: PropTypes.func, // function to render each Slider field
     min: PropTypes.number.isRequired, // Slider's minimum value
     max: PropTypes.number.isRequired, // Slider's maximum value
@@ -31,9 +30,9 @@ export default class FieldsWithLevel extends PureComponent {
 
   // RENDERS -------------------------------------------------------------------
   renderSlider = (field, i, onRemove) => {
-    const {lang, kind, name, level, options, renderField, min = 1, max = 5, unit, ...props} = this.props
+    const {name, level, options, renderField, min = 1, max = 5, unit, ...props} = this.props
     const {value, text} = field
-    const id = name ? `${name}.${value}` : `${kind}.${value}`
+    const id = name ? `${name}.${value}` : value
     // Prepare props for <SliderLabeled> or <SliderTooltip> component
     return renderField({
       name: id,
