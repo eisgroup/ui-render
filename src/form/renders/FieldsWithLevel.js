@@ -30,15 +30,15 @@ export default class FieldsWithLevel extends PureComponent {
   }
 
   // RENDERS -------------------------------------------------------------------
-  renderSlider = (obj, i, onRemove) => {
+  renderSlider = (field, i, onRemove) => {
     const {lang, kind, name, level, options, renderField, min = 1, max = 5, unit, ...props} = this.props
-    const {_} = obj
-    const id = name ? `${name}.${_}` : `${kind}.${_}`
+    const {value, text} = field
+    const id = name ? `${name}.${value}` : `${kind}.${value}`
     // Prepare props for <SliderLabeled> or <SliderTooltip> component
     return renderField({
       name: id,
-      id: _,
-      label: obj.name,
+      id: value,
+      label: text,
       onRemove,
       min,
       max,
@@ -48,7 +48,7 @@ export default class FieldsWithLevel extends PureComponent {
         ? (
           <>
             {(level[value[0]] || {}).name}
-            <Text className='fade margin-h-smaller'>-</Text>
+            <Text className="fade margin-h-smaller">-</Text>
             {(level[value[1]] || {}).name} {unit}
           </>
         )
