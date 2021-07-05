@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { Dropdown as DropDown } from 'semantic-ui-react' // adds 27 KB to final js bundle
 import { hasListValue, l, localiseTranslation, toLowerCase } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
+import Icon from './Icon'
 import Text from './Text'
 import View from './View'
 
@@ -68,6 +69,7 @@ export function Dropdown ({
   info,
   float,
   className,
+  classNameIcon,
   style,
   fill = true,
   lazyLoad = true,
@@ -76,6 +78,7 @@ export function Dropdown ({
   readonly,
   autofocus,
   onAddItem,
+  onClickIcon,
   ...props
 }) {
   // Store options as state to allow additions
@@ -93,7 +96,12 @@ export function Dropdown ({
     if (props.additionLabel == null) props.additionLabel = _.ADD_
   }
 
-  // if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability
+  // Convert Icon to Node because Semantic has no `onClickIcon` callback
+  if (onClickIcon) {
+    props.icon = <Icon name={props.icon || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
+  }
+
+  if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability - why?
   if (readonly) props.disabled = true // Semantic Dropdown does not accept `readOnly` prop
   if (onChange || onSelect) props.onChange = (event, data) => {
     tempValue = data.value // store value temporarily for onSelect event
