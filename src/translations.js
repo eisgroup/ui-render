@@ -34,44 +34,9 @@ localiseTranslation({
   // Default messaged for undefined strings
   UNTRANSLATED: {
     [l.ENGLISH]: 'Untranslated',
-  },
-
-  // Forms and Validations
-  // ---------------------------------------------------------------------------
-  REQUIRED: {
-    [l.ENGLISH]: 'Required',
     // @Note: only english is provided in the bundle definition
     // All other languages are to be loaded on the fly as static assets,
     // so that they can be cached by the the browser.
-    // [l.RUSSIAN]: 'Обязательный',
-  },
-  EMAIL: {
-    [l.ENGLISH]: 'Email',
-    // [l.RUSSIAN]: 'Email',
-  },
-  MY_EMAIL_ADDRESS_IS: {
-    [l.ENGLISH]: 'My email address is',
-    // [l.RUSSIAN]: 'Мой еmail:',
-  },
-  INVALID_EMAIL_ADDRESS: {
-    [l.ENGLISH]: 'Invalid email address',
-    // [l.RUSSIAN]: 'Неправильный адрес',
-  },
-  PLEASE_ENTER_A_VALID_EMAIL_ADDRESS: {
-    [l.ENGLISH]: 'Please enter a valid email address',
-    // [l.RUSSIAN]: 'Пожалуйста ведите верный адрес',
-  },
-  PLEASE_COMPLETE_: {
-    [l.ENGLISH]: 'Please complete:',
-    // [l.RUSSIAN]: 'Заполните, пожалуйста:',
-  },
-  NOT_A_VALID_URL: {
-    [l.ENGLISH]: 'Not a valid URL',
-    // [l.RUSSIAN]: 'Неверный URL',
-  },
-  UPDATING: {
-    [l.ENGLISH]: 'Updating',
-    // [l.RUSSIAN]: 'Обновление',
   },
 
   // Actions
