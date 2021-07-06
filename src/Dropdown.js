@@ -2,7 +2,16 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import { Dropdown as DropDown } from 'semantic-ui-react' // adds 27 KB to final js bundle
-import { hasListValue, l, localiseTranslation, toLowerCase } from 'utils-pack'
+import {
+  hasListValue,
+  isList,
+  isString,
+  l,
+  last,
+  localiseTranslation,
+  toLowerCase,
+  toUniqueListCaseInsensitive
+} from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import Icon from './Icon'
 import Text from './Text'
@@ -85,27 +94,43 @@ export function Dropdown ({
   let [options, setOptions] = useState(opts)
   useEffect(() => {options !== opts && setOptions(opts)}, [opts])
 
+  // Convert Icon to Node because Semantic has no `onClickIcon` callback
+  if (onClickIcon) {
+    props.icon = <Icon name={props.icon || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
+  }
+
+  // Case and diacritics insensitive search
+  if (props.search && props.deburr == null) props.deburr = true
+
+  // Sanitize options from duplicates on addition
   if (props.allowAdditions) {
+    if (!props.upward && props.additionPosition == null) props.additionPosition = 'bottom'
+    // This may add duplicate item for non-matching cases
     props.onAddItem = (event, {value}) => {
       const val = toLowerCase(value)
-      if (!options.find(({text}) => toLowerCase(text) === val)) {
-        setOptions([{text: value, value}, ...options])
+      // The duplicate can be exiting options, or a newly added option
+      const duplicate = options.find(({text}) => toLowerCase(text) === val)
+      const newOption = {text: value, value} // `options` is always a list of objects because of sanitization below
+      if (duplicate) {
+        // Override only newly added duplicate option to match the last case entered
+        if (toLowerCase(duplicate.value) === val) Object.assign(duplicate, newOption)
+      } else {
+        setOptions([newOption, ...options])
         onAddItem && onAddItem(value, event)
       }
     }
     if (props.additionLabel == null) props.additionLabel = _.ADD_
   }
 
-  // Convert Icon to Node because Semantic has no `onClickIcon` callback
-  if (onClickIcon) {
-    props.icon = <Icon name={props.icon || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
-  }
-
   if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability - why?
   if (readonly) props.disabled = true // Semantic Dropdown does not accept `readOnly` prop
-  if (onChange || onSelect) props.onChange = (event, data) => {
-    tempValue = data.value // store value temporarily for onSelect event
-    onChange && onChange(data.value, event)
+  if (onChange || onSelect) props.onChange = (event, {value}) => {
+    // Sanitize value for `allowAdditions`, because it adds duplicates for non-matching cases.
+    // Keep the last entered value.
+    // @Note: the list of values can be a mix of primitive Number and String
+    // Store value temporarily for onSelect event.
+    tempValue = (isList(value) && isString(last(value))) ? toUniqueListCaseInsensitive(value.reverse()).reverse() : value
+    onChange && onChange(tempValue, event)
   }
   if (onSelect) props.onClose = (event) => onSelect(tempValue, event)
   if (onSearch) props.onSearchChange = (event, data) => onSearch(data.searchQuery, event)
