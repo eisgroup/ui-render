@@ -4,13 +4,16 @@ import React, { useEffect, useState } from 'react'
 import { Dropdown as DropDown } from 'semantic-ui-react' // adds 27 KB to final js bundle
 import {
   hasListValue,
-  isList,
+  isEqual,
+  isObject,
   isString,
   l,
   last,
   localiseTranslation,
   toLowerCase,
-  toUniqueListCaseInsensitive
+  toLowerCaseAny,
+  toUniqueListCaseInsensitive,
+  trimSpaces
 } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import Icon from './Icon'
@@ -92,61 +95,14 @@ export function Dropdown ({
 }) {
   // Store options as state to allow additions
   let [options, setOptions] = useState(opts)
-  useEffect(() => {options !== opts && setOptions(opts)}, [opts])
-
-  // Convert Icon to Node because Semantic has no `onClickIcon` callback
-  if (onClickIcon) {
-    props.icon = <Icon name={props.icon || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
-  }
-
-  // Case and diacritics insensitive search
-  if (props.search && props.deburr == null) props.deburr = true
-
-  // Sanitize options from duplicates on addition
-  if (props.allowAdditions) {
-    if (!props.upward && props.additionPosition == null) props.additionPosition = 'bottom'
-    // This may add duplicate item for non-matching cases
-    props.onAddItem = (event, {value}) => {
-      const val = toLowerCase(value)
-      // The duplicate can be exiting options, or a newly added option
-      const duplicate = options.find(({text}) => toLowerCase(text) === val)
-      const newOption = {text: value, value} // `options` is always a list of objects because of sanitization below
-      if (duplicate) {
-        // Override only newly added duplicate option to match the last case entered
-        if (toLowerCase(duplicate.value) === val) Object.assign(duplicate, newOption)
-      } else {
-        setOptions([newOption, ...options])
-        onAddItem && onAddItem(value, event)
-      }
-    }
-    if (props.additionLabel == null) props.additionLabel = _.ADD_
-  }
+  useEffect(() => {!isEqual(options, opts) && setOptions(opts)}, [opts])
 
   if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability - why?
   if (readonly) props.disabled = true // Semantic Dropdown does not accept `readOnly` prop
-  if (onChange || onSelect) props.onChange = (event, {value}) => {
-    // Sanitize value for `allowAdditions`, because it adds duplicates for non-matching cases.
-    // Keep the last entered value.
-    // @Note: the list of values can be a mix of primitive Number and String
-    // Store value temporarily for onSelect event.
-    tempValue = (isList(value) && isString(last(value))) ? toUniqueListCaseInsensitive(value.reverse()).reverse() : value
-    onChange && onChange(tempValue, event)
-  }
-  if (onSelect) props.onClose = (event) => onSelect(tempValue, event)
-  if (onSearch) props.onSearchChange = (event, data) => onSearch(data.searchQuery, event)
-  // Always include existing value to avoid having a hidden selection because it's no longer in available options
-  // if (props.value != null) {
-  // if (typeof options[0] === 'object') {
-  //   if (!options.find(({ value }) => props.value === value)) options = options.concat({
-  //     text: props.value,
-  //     value: props.value
-  //   })
-  // } else {
-  //   if (!isInList(options, props.value)) options = options.concat(props.value)
-  // }
-  // }
+  if (props.selection == null) props.selection = true
+  if (props.search && props.deburr == null) props.deburr = true // Case and diacritics insensitive search
 
-  /* Sanitize Options */
+  // Sanitize
   switch (typeof options[0]) {
     case 'string':
       options = options.map(value => ({text: value, value}))
@@ -159,20 +115,82 @@ export function Dropdown ({
         options = options.map(({value, ...option}) => ({value: String(value), ...option}))
       break
   }
-
   if (optionsLabel) options = [...options, {key: '', text: '', content: optionsLabel, disabled: true}]
 
-  if (props.selection == null) props.selection = true
+  // Convert Icon to Node because Semantic has no `onClickIcon` callback
+  if (onClickIcon) props.icon = <Icon name={props.icon || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
 
-  /* Sanitize Value (for Colors) */
+  // On Change gets called before `onAddItem`
+  if (onChange || onSelect) props.onChange = (event, {value}) => {
+    // Since there is no option to disable addition when search matches existing options (case-insensitive),
+    // and temporarily disabling addition will remove new additions,
+    // => sanitize onChange to have value from existing options.
+    let val = props.multiple ? last(value) : value
+    if (val && isString(val)) {
+      val = trimSpaces(val).toLowerCase()
+      const duplicate = options.find(({text}) => toLowerCase(text) === val)
+      if (duplicate && toLowerCaseAny(duplicate.value) !== val) {
+        if (props.multiple) {
+          value[value.length - 1] = duplicate.value
+        } else {
+          value = duplicate.value
+        }
+      }
+    }
+
+    // Remove duplicates for non-matching cases, or value converted to Id from the operation above.
+    // Keep the last entered value for new additions.
+    // @Note: the list of values can be a mix of primitive Number and String
+    // Store value temporarily for onSelect event.
+    tempValue = (props.multiple && !isObject(last(value))) ? toUniqueListCaseInsensitive(value.reverse()).reverse() : value
+    onChange && onChange(tempValue, event)
+  }
+  if (onSelect) props.onClose = (event) => onSelect(tempValue, event)
+  if (onSearch) props.onSearchChange = (event, data) => onSearch(data.searchQuery, event)
+
+  // Sanitize options from duplicates on addition
+  if (props.allowAdditions) {
+    if (props.additionLabel == null) props.additionLabel = _.ADD_
+    if (!props.upward && props.additionPosition == null) props.additionPosition = 'bottom'
+
+    // This may add duplicate item for non-matching cases
+    props.onAddItem = (event, {value}) => {
+      value = trimSpaces(value)
+      const val = toLowerCase(value)
+      // The duplicate can be exiting options, or a newly added option
+      const duplicate = options.find(({text}) => toLowerCase(text) === val)
+      const newOption = {text: value, value} // `options` is always a list of objects because of sanitization below
+      if (duplicate) {
+        // Override only newly added duplicate option to match the last case entered
+        if (toLowerCaseAny(duplicate.value) === val) Object.assign(duplicate, newOption)
+      } else {
+        setOptions([newOption, ...options])
+        onAddItem && onAddItem(value, event)
+      }
+    }
+  }
+
+  // Sanitize Value (for Colors)
   if (props.value && props.value.constructor === Array && props.value.length) {
     if (!props.multiple) props.value = props.value.join(',')
     if (props.multiple && props.value[0].constructor === Array) props.value = props.value.map(v => v.join(','))
   }
 
-  /* Error handling */
+  /// Error handling
   // @Note: below logic only works as DropdownField with controlled value
   if (done == null) done = !error && (props.multiple ? hasListValue(props.value) : (!!props.value || props.value === 0))
+
+  // Always include existing value to avoid having a hidden selection because it's no longer in available options
+  // if (props.value != null) {
+  // if (typeof options[0] === 'object') {
+  //   if (!options.find(({ value }) => props.value === value)) options = options.concat({
+  //     text: props.value,
+  //     value: props.value
+  //   })
+  // } else {
+  //   if (!isInList(options, props.value)) options = options.concat(props.value)
+  // }
+  // }
 
   return (
     <View className={classNames('input--wrapper', {
