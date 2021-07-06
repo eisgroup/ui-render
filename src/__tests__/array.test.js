@@ -3,6 +3,7 @@ import {
   hasCommonListValue,
   hasDuplicateInList,
   hasListValue,
+  indexesOf,
   intersection,
   isCollection,
   isEqualList,
@@ -20,6 +21,7 @@ import {
   toListTotal,
   toListValuesTotal,
   toUniqueList,
+  toUniqueListCaseInsensitive,
   toUniqueListFast
 } from '../array'
 import { cloneDeep } from '../object'
@@ -67,7 +69,6 @@ test(`intersection() does not mutate original list, and keeps first list's order
   expect(list).toEqual(listClone)
 })
 
-
 describe(`${isEqualList.name}()`, ()=> {
   test(`returns true when elements inside two lists are the same`, () => {
     let a = []
@@ -90,7 +91,6 @@ describe(`${isEqualList.name}()`, ()=> {
     })
   })
 })
-
 
 test(`${isInCollectionAny.name}() returns true when include match found for any element`, () => {
   expect(isInCollectionAny([{name: 'god', age: 'eternal'}], {name: 'dog'}, {name: 'god'})).toBe(true)
@@ -190,6 +190,17 @@ describe(`${hasDuplicateInList.name}()`, () => {
     expect(hasDuplicateInList([1, 2, 3, 4, '1', '5'])).toEqual(false)
     expect(hasDuplicateInList(NON_ARRAY_VALUES.filter(v => !isNaN(v)))).toEqual(false)
     expect(hasDuplicateInList(NON_COLLECTION_VALUES.filter(v => !isNaN(v)))).toEqual(false)
+  })
+})
+
+describe(`${indexesOf.name}()`, () => {
+  const val = 'god'
+  const list = [val, 1, null, val]
+  it('returns all indices of a value in given list', () => {
+    expect(indexesOf(list, val)).toEqual([0, 3])
+  })
+  it('returns empty list when a value is not in given list', () => {
+    expect(indexesOf(list, val.toUpperCase())).toEqual([])
   })
 })
 
@@ -343,7 +354,7 @@ describe(`${toUniqueList.name}()`, () => {
   it('keeps only unique values', () => {
     expect(toUniqueList(['id', 'id', 2, 2, [], [], {}, {}])).toEqual(['id', 2, [], {}])
   })
-  it(`'does not remove falsey values, like: 0, '', NaN, undefined, null'`, () => {
+  it(`does not remove falsey values, like: 0, '', NaN, undefined, null`, () => {
     expect(toUniqueList([0, '', NaN, undefined, null])).toEqual([0, '', NaN, undefined, null])
   })
 })
@@ -357,8 +368,19 @@ describe(`${toUniqueListFast.name}()`, () => {
       '5aab0ee727cc2b15ebb25767'
     ])).toEqual(['5ae9ba3ea1de6c7ecf6eacce', '5aab0ee727cc2b15ebb25767'])
   })
-  it(`'does not remove falsey values, like: 0, '', undefined, null', except 'NaN'`, () => {
+  it(`does not remove falsey values, like: 0, '', undefined, null, except 'NaN'`, () => {
     expect(toUniqueListFast([0, '', NaN, undefined, null])).toEqual([0, '', undefined, null])
+  })
+})
+
+describe(`${toUniqueListCaseInsensitive.name}()`, () => {
+  it('keeps only unique string values in array', () => {
+    const list = ['God', 'now', 'god']
+    expect(toUniqueListCaseInsensitive(list)).toEqual(['God', 'now'])
+  })
+  it('keeps only unique values in mixed types array', () => {
+    const list = [...NON_ARRAY_VALUES, ...NON_COLLECTION_VALUES]
+    expect(toUniqueListCaseInsensitive(list)).toEqual(NON_ARRAY_VALUES)
   })
 })
 

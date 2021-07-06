@@ -597,20 +597,48 @@ export function truncate(string, length = 15, lastChars = 3) {
 
 /**
  * Convert All Characters to lower case
- * @param {*} string - value to make lower case
- * @returns {String} - in upper case
+ * @param {String|*} string - value to make lower case
+ * @returns {String|*} - in lower case
  */
-export function toLowerCase(string) {
-	return String(string || '').toLowerCase()
+export function toLowerCase (string) {
+	return string && string.toLowerCase()
+}
+
+/**
+ * Convert Any Value type to lower case String
+ * @param {*} value - make lower case
+ * @returns {String} value - in lower case
+ */
+export function toLowerCaseAny (value) {
+	return String(value).toLowerCase()
 }
 
 /**
  * Convert All Characters to UPPER CASE
- * @param {*} string - value to make upper case
- * @returns {String} - in upper case
+ * @param {String|*} string - value to make upper case
+ * @returns {String|*} - in upper case
  */
-export function toUpperCase(string) {
-	return String(string || '').toUpperCase()
+export function toUpperCase (string) {
+	return string && string.toUpperCase()
+}
+
+/**
+ * Convert Any Value type to UPPER CASE String
+ * @param {*} value - make UPPER CASE
+ * @returns {String} value - in UPPER CASE
+ */
+export function toUpperCaseAny (value) {
+	return String(value).toUpperCase()
+}
+
+/**
+ * Trim spaces at the start and end of String, and convert multiples spaces,
+ * including tabs, newline, etc. in between to a single space.
+ * @param {String|*} string - to trim
+ * @returns {String|*} string - trimmed
+ */
+export function trimSpaces (string) {
+	return string && string.replace(/\s\s+/g, ' ').trim()
 }
 
 /**
@@ -619,7 +647,7 @@ export function toUpperCase(string) {
  * @see: https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
  * @returns {String} uuid - in this format 'xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx'
  */
-export function uuid() {
+export function uuid () {
 	const d0 = (Math.random() * 0xffffffff) | 0
 	const d1 = (Math.random() * 0xffffffff) | 0
 	const d2 = (Math.random() * 0xffffffff) | 0

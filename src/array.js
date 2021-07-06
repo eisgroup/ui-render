@@ -14,6 +14,7 @@ import {
   uniqWith,
 } from 'lodash'
 import thenby from 'thenby'
+import { toLowerCaseAny } from './string'
 
 /**
  * ARRAY FUNCTIONS =============================================================
@@ -62,6 +63,20 @@ export function hasCommonListValue (...lists) {
  */
 export function hasDuplicateInList (array) {
   return array.some((value, index, self) => self.indexOf(value) !== index)
+}
+
+/**
+ * Get All Indexes of Value in Array
+ * @param {Array<*>} list - to search for index list
+ * @param {*} value - to find indexes for
+ * @returns {Number[]} index - list of value indexes, or empty array if nothing found
+ */
+export function indexesOf (list, value) {
+  let indices = [], i = -1
+  while ((i = list.indexOf(value, i + 1)) !== -1) {
+    indices.push(i)
+  }
+  return indices
 }
 
 /**
@@ -263,6 +278,17 @@ export function toUniqueList (array) {
  */
 export function toUniqueListFast (array) {
   return array.filter((value, index, self) => self.indexOf(value) === index)
+}
+
+/**
+ * Ensure array has only unique values case insensitive keeping the first occurrence of duplicates.
+ *
+ * @param {Array<*>} array - the array to enforce unique values for (can be mix of value types)
+ * @return {Array<*>} list - new array containing only unique values, case insensitive
+ */
+export function toUniqueListCaseInsensitive (array) {
+  const listLower = array.map(toLowerCaseAny)
+  return array.filter((v, i) => listLower.indexOf(toLowerCaseAny(v)) === i)
 }
 
 /**
