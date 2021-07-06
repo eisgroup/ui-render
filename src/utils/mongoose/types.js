@@ -14,6 +14,8 @@ import {
   isPhoneNumber,
   LANGUAGE,
   startEndFromNumberRanges,
+  toLowerCase,
+  trimSpaces,
 } from 'utils-pack'
 import { toRgbaColor } from 'utils-pack/color'
 import { isId } from 'utils-pack/utility'
@@ -64,7 +66,7 @@ export const Actions = {type: [Action], default: undefined}
 export const ActionHistory = {type: [Action], set: val => val.sort(by('-meta.time')), default: undefined}
 export const Color = {type: [Number], validate: isColor, default: undefined}
 export const CurrencySymbol = {type: String, enum: enumFrom(CURRENCY), default: undefined}
-export const Email = {type: String, validate: isEmail}
+export const Email = {type: String, validate: isEmail, set: toLowerCase}
 export const LanguageCode = {type: String, enum: enumFrom(LANGUAGE), default: undefined}
 export const FileType = new Schema({
   src: String, // may be absent (to be computed with resolvers if the file is stored by the server)
@@ -84,7 +86,7 @@ export const Location = new Schema({
   timestamp: Timestamp,
   _id: false,
 }, {timestamps: false, default: undefined})
-export const Name = {type: String, maxLength: VALIDATE.NAME_MAX_LENGTH, default: undefined}
+export const Name = {type: String, maxLength: VALIDATE.NAME_MAX_LENGTH, set: trimSpaces, default: undefined}
 export const KeyVal = {
   type: String,
   value: Mixed,
