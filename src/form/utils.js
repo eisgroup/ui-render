@@ -7,7 +7,7 @@ import { isRequired } from 'react-ui-pack/inputs/validationRules'
 import Text from 'react-ui-pack/Text'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
-import { Active, debounce, isEmpty, isEqual, objChanges, set, toJSON, warn } from 'utils-pack'
+import { Active, debounce, isEmpty, isEqual, isEqualJSON, objChanges, set, toJSON, warn } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 
 /**
@@ -230,10 +230,36 @@ export function asField (InputComponent, {sanitize} = {}) {
 export function withForm (options = {subscription: {pristine: true, valid: true}}) {
   return function Decorator (Class) {
     withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors})
-    return function WithForm (props) {
-      return <Form enableReinitialize onSubmit={warn} {...options} {...props}
-                   children={(formProps) => <Class {...{...formProps, ...props}}/>}/>
+    let _props, _initVals
+
+    // @see: https://final-form.org/docs/react-final-form/types/FormProps
+    // Form only calls `render` function when `subscription` changes, or itself rerenders.
+    // `formState` can remain unchanged, even if `initialValues` changed.
+    // thus comparing formState is not suitable for memoizing when props change.
+    // `formProps` does not pass through `initialValues` (it's undefined).
+    // => better to let `render` function always run, and memoize at the highest <WithForm> level.
+    // => this way, rerender is minimized to only when props changed, or form state changed.
+    function WithForm (props) {
+      console.warn('-->>WithForm-------------------------------------------')
+      const {initialValues, ...restProps} = props
+      _props = restProps
+
+      // Only assign `initialValues` when it truly changes
+      if (_initVals !== initialValues && !isEqualJSON(_initVals, initialValues)) _initVals = initialValues
+
+      // @Note: when form is submitted, it triggers loading true, and receives old initialValues.
+      // If the `initialValues` is computed on the fly and changes reference each time,
+      // <Form/> reinitializes while loading, causing the flickering.
+      // => either cache `initialValues`, or better, stop <Form/> from reinitializing while loading.
+      return <Form onSubmit={warn} {...options} initialValues={_initVals} render={FormRender}/>
     }
+
+    function FormRender (formProps) {
+      console.warn('===>>>FormRender==>')
+      return <Class {...formProps} {..._props} initialValues={_initVals}/>
+    }
+
+    return React.memo(WithForm, isEqualJSON)
   }
 }
 
