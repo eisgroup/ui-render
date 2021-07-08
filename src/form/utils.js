@@ -7,7 +7,7 @@ import { isRequired } from 'react-ui-pack/inputs/validationRules'
 import Text from 'react-ui-pack/Text'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
-import { Active, debounce, isEmpty, isEqual, isEqualJSON, objChanges, set, toJSON, warn } from 'utils-pack'
+import { Active, debounce, isEmpty, isEqualJSON, objChanges, set, toJSON, warn } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 
 /**
@@ -88,6 +88,7 @@ export function asField (InputComponent, {sanitize} = {}) {
   const Class = class extends PureComponent {
     static propTypes = {
       name: PropTypes.string.isRequired,
+      closure: PropTypes.object.isRequired, // formProps getter from final-form
       label: PropTypes.any,
       id: PropTypes.string,
       // HTML Input type attribute
@@ -107,6 +108,7 @@ export function asField (InputComponent, {sanitize} = {}) {
 
     // Handle onRemove field in FIELD.TYPE.MULTIPLE*
     componentWillUnmount () {
+      // warn('-------componentWillUnmount', this.constructor.name)
       // Call onChange for the deleted input, setting it to `null`:
       // - if input is not registered, its value will not pass to backend
       //   => this should be fine, because if registeredValues are used,
@@ -123,11 +125,12 @@ export function asField (InputComponent, {sanitize} = {}) {
       //  - this.input.onChange is callback from final-form/redux-form - does not trigger parent re-render directly, only when `valid` prob changes
       // => the best logic is to change input value after it unmounts, and call `onChange` to update parent state,
       //    because this avoids validation, ties all operations together and persists `state.hasInputChanges`.
-      const {form, name, onChange} = this.props
-      setTimeout(() => {
+      const {closure, name, onChange} = this.props
+      setTimeout(() => { // @note: it's too complex to have conditional check whether form is resetting, so run always
         // only call this if the form is not unmounted
-        if (!form.getRegisteredFields().length) return
-        form && form.change(name, null)
+        const form = closure.form
+        if (!form || !form.getRegisteredFields().length) return
+        form.change(name, null)
         onChange && onChange(null)
       }, 0)
     }
@@ -137,7 +140,7 @@ export function asField (InputComponent, {sanitize} = {}) {
     Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}) => {
       // Hide this field if it's readonly and has no value.
       if (this.props.readonly && isRequired(this.props.value)) return null
-      const {onChange, error: errMsg, defaultValue, normalize, format, parse, validate, form, ...props} = this.props
+      const {onChange, error: err, defaultValue, normalize, format, parse, validate, closure, ...props} = this.props
       // @Note: defaultValue is only used for UI, internal value is still undefined
       this.value = value === '' ? (pristine && defaultValue != null ? defaultValue : value) : value
       this.input = input
@@ -148,7 +151,7 @@ export function asField (InputComponent, {sanitize} = {}) {
           value={sanitize ? sanitize(this.value, this.props) : this.value}
           onBlur={this.handleBlur} // prevent value change, but need onBlur to set touched for validation
           onChange={this.handleChange}
-          error={touched && error && (errMsg || error)}
+          error={touched && error && (err || error)}
           {...props} // allow forceful value override
         />
       )
@@ -229,8 +232,15 @@ export function asField (InputComponent, {sanitize} = {}) {
  */
 export function withForm (options = {subscription: {pristine: true, valid: true}}) {
   return function Decorator (Class) {
-    withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors})
-    let _props, _initVals
+    let _props, _initValues, _form, _handleSubmit
+    const closure = {
+      get form () {return _form},
+      get handleSubmit () {return _handleSubmit},
+    }
+    // @Note: form field re-renders because of constantly changing formProps reference
+    // => convert it to closure getter, so `asField` does not depend on formProps.
+    //  => cannot use context, because it triggers re-render of all child components.
+    withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors, closure})
 
     // @see: https://final-form.org/docs/react-final-form/types/FormProps
     // Form only calls `render` function when `subscription` changes, or itself rerenders.
@@ -240,23 +250,28 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
     // => better to let `render` function always run, and memoize at the highest <WithForm> level.
     // => this way, rerender is minimized to only when props changed, or form state changed.
     function WithForm (props) {
-      console.warn('-->>WithForm-------------------------------------------')
+      // warn('-->>WithForm-------------------------------------------')
       const {initialValues, ...restProps} = props
       _props = restProps
 
       // Only assign `initialValues` when it truly changes
-      if (_initVals !== initialValues && !isEqualJSON(_initVals, initialValues)) _initVals = initialValues
+      if (_initValues !== initialValues && !isEqualJSON(_initValues, initialValues)) _initValues = initialValues
 
       // @Note: when form is submitted, it triggers loading true, and receives old initialValues.
       // If the `initialValues` is computed on the fly and changes reference each time,
-      // <Form/> reinitializes while loading, causing the flickering.
+      // <Form/> reinitialises while loading, causing the flickering.
       // => either cache `initialValues`, or better, stop <Form/> from reinitializing while loading.
-      return <Form onSubmit={warn} {...options} initialValues={_initVals} render={FormRender}/>
+      //    because final-form always re-initializes, there is no `enableReinitialize` like redux-form.
+      return <Form onSubmit={warn} {...options} initialValues={_initValues} render={FormRender}/>
     }
 
-    function FormRender (formProps) {
-      console.warn('===>>>FormRender==>')
-      return <Class {...formProps} {..._props} initialValues={_initVals}/>
+    function FormRender ({form, handleSubmit, ...formProps}) {
+      // formProps `form` and `handleSubmit` props always change, possibly due to inline fat arrow function.
+      _form = form
+      _handleSubmit = handleSubmit
+
+      // Class should use PureComponent to take advantage of caching
+      return <Class {..._props} formProps={formProps} initialValues={_initValues}/>
     }
 
     return React.memo(WithForm, isEqualJSON)
@@ -265,21 +280,23 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
 
 /**
  * Mixin to add Class Attributes and Methods commonly used with forms
- * @note: works with redux-form and react-final-form
+ * @note: works with react-final-form, redux-form requires update with `closure`
  *
  * @param {Object} Class - React Component or PureComponent to decorate
- * @param {Function} [fieldValues] - callback to get form values
- * @param {Function} [registeredFieldValues] - callback to get form registered values
- * @param {Function} [registeredFieldErrors] - callback to get form registered errors
+ * @param {Function} fieldValues - callback to get form values
+ * @param {Function} registeredFieldValues - callback to get form registered values
+ * @param {Function} registeredFieldErrors - callback to get form registered errors
+ * @param {Object<form, handleSubmit>} closure - formProps object for getting the form instance
  * @returns {Object} Class - mutated with form properties
  */
-export function withFormSetup (Class, {fieldValues, registeredFieldValues, registeredFieldErrors}) {
+export function withFormSetup (Class, {fieldValues, registeredFieldValues, registeredFieldErrors, closure}) {
   if (!Active.renderField) throw new Error(`${withFormSetup.name} requires Active.renderField to be registered`)
   const componentDidUpdate = Class.prototype.componentDidUpdate
   const componentWillUnmount = Class.prototype.componentWillUnmount
   const handleChangeInput = Class.prototype.handleChangeInput
 
   Class.propTypes = {
+    formProps: PropTypes.object.isRequired, // form props, without `form` and `handleSubmit`
     initialValues: PropTypes.object, // form initial values
     onChangeState: PropTypes.func, // onChangeState(this: Class)
     ...Class.propTypes
@@ -293,9 +310,14 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   }
 
   // Define instance getter
+  Object.defineProperty(Class.prototype, 'form', {
+    get () {return closure.form}
+  })
+
+  // Define instance getter
   Object.defineProperty(Class.prototype, 'canSave', {
     get () {
-      const {valid, loading} = this.props
+      const {loading, formProps: {valid}} = this.props
       return valid && !loading && !!this.changedValues
     }
   })
@@ -303,14 +325,14 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   // Define instance getter
   Object.defineProperty(Class.prototype, 'formValues', {
     get () {
-      return fieldValues(this.props.form)
+      return fieldValues(closure.form)
     }
   })
 
   // Define instance getter
   Object.defineProperty(Class.prototype, 'registeredValues', {
     get () {
-      return registeredFieldValues(this.props.form)
+      return registeredFieldValues(closure.form)
     }
   })
 
@@ -325,7 +347,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   // Define instance getter
   Object.defineProperty(Class.prototype, 'validationErrorsTooltip', {
     get () {
-      const errors = registeredFieldErrors(this.props.form)
+      const errors = registeredFieldErrors(closure.form)
       if (!errors) return null
       const messages = []
       // Use label if defined, for more intuitive error messages
@@ -346,20 +368,19 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   // Define instance method
   Class.prototype.renderInput = function (FIELDS, {onChange, fieldsSetup} = {}) {
-    const {initialValues, form} = this.props
+    const {initialValues} = this.props
     this._fields = fieldsFrom(FIELDS, {initialValues})
     if (fieldsSetup) this._fields = this._fields.map(fieldsSetup)
     return this._fields
-      .map(({id, ...field}) => ({ // remove id just before rendering
+      .map(({id, ...field}) => ({ // convert id to key just before rendering, to prevent unmounts on form.reset()
+        key: id,
         ...field,
         onChange: (...args) => {
           field.onChange && field.onChange(...args)
           this.handleChangeInput(...args)
           onChange && onChange(...args)
         },
-        // pass `form` to each Field for custom behavior inside `asField`.
-        // `form` is instance for final-form, and string for redux-form.
-        form,
+        closure,
       }))
       .map(Active.renderField)
   }
@@ -375,7 +396,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   // Define instance method
   Class.prototype.syncInputChanges = function () {
-    const {initialValues, valid, loading} = this.props
+    const {initialValues, loading, formProps: {valid}} = this.props
     const registeredValues = this.registeredValues
     const hasInputChanges = (registeredValues && isEmpty(initialValues)) || !!this.changedValues
     const canSave = hasInputChanges && valid && !loading
@@ -386,7 +407,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   }
 
   Class.prototype.componentDidUpdate = function (old) {
-    if (!isEqual(old.initialValues, this.props.initialValues)) {
+    if (!isEqualJSON(old.initialValues, this.props.initialValues)) {
       this.syncInputChanges()
     }
     if (componentDidUpdate) componentDidUpdate.apply(this, arguments)
