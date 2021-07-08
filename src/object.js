@@ -48,6 +48,19 @@ export function hasObjectValue (obj) {
 }
 
 /**
+ * Compare if two values are the same by converting them to JSON strings
+ * @example:
+ *    React.memo(func, isEqualJSON)
+ *
+ * @param {*} oldVal - to compare
+ * @param {*} newVal - to compare
+ * @returns {Boolean} true - if JSON string of given values are the same
+ */
+export function isEqualJSON (oldVal, newVal) {
+	return JSON.stringify(oldVal) === JSON.stringify(newVal)
+}
+
+/**
  * Checks if value is the language type of Object
  *
  * @uses lodash

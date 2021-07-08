@@ -31,5 +31,6 @@ export const Active = {
   client: undefined, // Apollo client
   log: undefined, // backend console logger
   passwordCheck: () => {}, // password strength calculator
+  user: {}, // the current user, for quick access to user info, such as auth
   usersById: {} // for storing temporary info, like user.lastOnline
 }

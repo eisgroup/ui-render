@@ -13,7 +13,7 @@ export { Response }
  * Decorator to Enforce Existence of Logged in User ID for GraphQL Resolvers
  * @example:
  *    class Query {
- *      @authenticated
+ *     *@authenticated
  *      user(parent, args, context, info) {
  *        // ...resolver logic
  *      }
