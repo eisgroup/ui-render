@@ -27,3 +27,32 @@ UPLOAD.PATH = ENV.UPLOAD_PATH || `${_WORK_DIR_}${UPLOAD.DIR}` // full upload pat
 export const IMAGE = {
   MAX_RES: 1200
 }
+
+/**
+ * Create relative upload File path (or File Name) for use in absolute File `src` string
+ * in this format: `{id}/{kind}_{i}.{ext}`
+ *
+ * @example: possible outputs
+ *    const file = {id: 'test', kind: 'public', i: 'thumb', ext: 'jpg'}
+ *    >>> 'test/public_thumb.jpg'
+ *    const file = {id: 'test', kind: 'public', ext: 'jpg'}
+ *    >>> 'test/public.jpg'
+ *    const file = {id: 'test', i: 'thumb'}
+ *    >>> 'test/thumb'
+ *    const file = {id: 'test', ext: 'jpg'}
+ *    >>> 'test.jpg'
+ *
+ * @param {FileInput|Object<[id], [kind], [i], [ext]>} file - FileInput object (ex. from GraphQL)
+ * @returns {String} path - relative file path, including file name and optional extension
+ */
+export function filePath (file) {
+  let {id, kind, i, ext} = file
+  id = id != null ? String(id) : ''
+  kind = kind != null ? String(kind) : ''
+  i = i != null ? String(i) : ''
+  ext = ext != null ? String(ext) : ''
+  const slash = id && (kind || i) && '/'
+  const _ = kind && i && '_'
+  const dot = ext && '.'
+  return `${id}${slash}${kind}${_}${i}${dot}${ext}`
+}

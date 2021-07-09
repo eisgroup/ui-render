@@ -1,8 +1,8 @@
 import { GraphQLScalarType } from 'graphql'
 import { SevenBoom as Response } from 'graphql-apollo-errors'
 import { Kind } from 'graphql/language'
-import { SERVER, UPLOAD } from 'modules-pack/variables'
-import { __DEV__, definitionByValue, enumFrom, fileExtensionNormalized, hasListValue, isObject } from 'utils-pack'
+import { filePath, SERVER, UPLOAD } from 'modules-pack/variables'
+import { __DEV__, definitionByValue, enumFrom, fileExtensionNormalized, isObject } from 'utils-pack'
 import { base64Encode } from './file'
 
 export { Response }
@@ -158,120 +158,22 @@ export function gqlTagLevelType (name, TAG, TAG_LEVEL, {description, range = fal
 }
 
 /**
- * GraphQL File Type - Dynamically defined given list of allow file kinds
- * @example:
- *    const UserPhotos = gqlFileType('UserPhotos')
- *    >>> {
- *          'public': {
- *              i
- *              src
- *              name
- *              created
- *           }
- *        }
- * @param {String} name - of GraphQL type, cannot contain space
- * @param {Array<String>} KINDS - enumerable list of allowed file kinds, defaults to ['public']
- * @param {String} [description] - of GraphQL type
- * @returns {GraphQLScalarType} files - type
- */
-export function gqlFileType (name, KINDS = ['public'], {description} = {}) {
-  const isAllowed = {}
-  KINDS.forEach(kind => (isAllowed[kind] = true))
-  const Type = new GraphQLScalarType({
-    name,
-    description: description || ('Object with dynamic key/value pairs:\n- Key \`String\` `[' + KINDS + ']` to list of files `[{i, src, name, created}]`'),
-    serialize: ({dir, data}) => {
-      const result = {}
-      const uploadPath = `${__DEV__ ? UPLOAD_PATH : UPLOAD_DIR}${dir}`
-      for (const kind in data.toObject()) {
-        const [...fileList] = data[kind] || []
-        if (!fileList.length) continue
-        result[kind] = []
-        fileList.forEach(({i, name, created}) => {
-          result[kind].push({i, name, created, src: srcFrom({i, name, created}, {uploadPath, kind})})
-        })
-      }
-      return result
-    },  // value sent to the client
-    parseValue (value) {return this._fromClient(value)},
-    parseLiteral () {return this._fromClient(parseLiteral(...arguments))},
-  })
-
-  // @Note: this is not used, replaced by `[FileInput!]`
-  Type._fromClient = function (value) {
-    if (isObject(value)) {
-      for (const kind in value) {
-        if (!isAllowed[kind])
-          throw Response.badRequest(`Invalid ${this.name} kind ${kind}, must be one of [${KINDS}]`)
-        const files = value[kind]
-        if (!hasListValue(files))
-          throw Response.badRequest(`Invalid ${this.name} input for kind ${kind}, must be array of FileInput, got ${files}`)
-      }
-      return value
-    }
-    throw Response.badRequest(`Invalid ${this.name} ${value}, must be key/value pairs`)
-  }
-  return Type
-}
-
-/**
- * Get Avatar URL from given Instance Photos object
- *
- * @param {String} [photosPath] - to retrieve photos from instance
- * @param {String} [kind] - of file kind to use, defaults to 'public'
- * @return {Function} resolver - for GraphQL
- *    @returns {String|Null} URL - if exists
- */
-export function avatarFromPhotos ({kind = 'public', photosPath = 'photos'} = {}) {
-  return function (instance) {
-    const {[photosPath]: photos} = instance || {}
-    if (!photos) return null
-    const {dir} = photos
-    const {i, name, created} = get(photos, `data.${kind}.0`) || {}
-    if (i == null || dir == null) return null
-    return srcFrom({i, name, created}, {dir, kind})
-  }
-}
-
-/**
  * Compute File Source String for Client Consumption
  *    - Append `created` query string to force clearing cache when User updates a file
  *    - Base encode image files while in Dev mode because CSS background-image cannot load local files
  *
- * @param {Object<i, name, created>} fileData - to get src for
- * @param {String} [dir] - directory path of given file to compute `uploadPath`
- * @param {String} [uploadPath] - where the file is located, required if `dir` not defined
+ * @param {Object<[id], [kind], [i], name, updated>} fileData - to get src for
+ * @param {String} [dir] - relative directory path from the base upload directory (starts with '/')
+ * @param {String} [uploadPath] - absolute upload path for frontend (relative to WORK_DIR for backend), defaults to base upload directory
  * @param {String} [kind] - of file kind to use, defaults to 'public'
  * @returns {String} source - file path or base64 encoded data
  */
-export function srcFrom ({i, name, created}, {dir, uploadPath, kind = 'public'}) {
-  if (!uploadPath && !dir) throw new Error(`${srcFrom.name}() requires either \`dir\` or \`uploadPath\``)
-  if (!uploadPath) uploadPath = `${__DEV__ ? UPLOAD.PATH : UPLOAD.DIR}${dir}`
+export function fileSrc ({id, kind, i, name, updated}, {dir, uploadPath} = {}) {
+  // point to absolute file path in frontend local development, because there is no web server
+  if (!uploadPath) uploadPath = `${__DEV__ ? UPLOAD.PATH : UPLOAD.DIR}${dir ? dir : ''}`
   const ext = fileExtensionNormalized(name) || ''
-  const filePath = `${uploadPath}/${kind}/${i}${ext && `.${ext}`}`
-  return (__DEV__ && ext === 'jpg') ? base64Encode(filePath) : `${filePath}?t=${created}`
-}
-
-/**
- * Get Queried Field Names
- *
- * @param {Object} info - 4th argument in resolver function
- * @param {String} queryName - to get fields for, example: 'users'
- * @returns {Object} field - with queried field names as keys
- */
-export function queryFields (info, queryName) {
-  const result = {}
-  const query = info.fieldNodes.find(({name: {kind, value} = {}}) => kind === 'Name' && value === queryName)
-  const queries = [query]
-  for (const key in info.fragments) {
-    queries.push(info.fragments[key])
-  }
-  queries.forEach(q => {
-    get(q, 'selectionSet.selections', []).forEach(({name: {value} = {}}) => {
-      if (value) result[value] = {} // only checking first level fields for now.
-    })
-  })
-  return result
+  const fullPath = `${uploadPath}/${filePath({id, kind, i, ext})}`
+  return (__DEV__ && ext === 'jpg') ? base64Encode(fullPath) : `${fullPath}?v=${updated}`
 }
 
 /**

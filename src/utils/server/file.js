@@ -1,7 +1,7 @@
 import fs from 'fs'
 import mkdirp from 'mkdirp'
 import { UPLOAD } from 'modules-pack/variables'
-import sanitizeName from 'sanitize-filename'
+import sanitizeName from 'sanitize-filename' // this package may have large dependency, so do not include it by default
 import { _WORK_DIR_, warn } from 'utils-pack'
 
 /**

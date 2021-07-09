@@ -1,7 +1,7 @@
 import { GraphQLScalarType } from 'graphql'
 import JSON from 'graphql-type-json'
 import { Kind } from 'graphql/language'
-import { gqlDynamicObjType, gqlEnumType, gqlTagLevelType, Response } from 'modules-pack/utils/server/resolver'
+import { fileSrc, gqlDynamicObjType, gqlEnumType, gqlTagLevelType, Response } from 'modules-pack/utils/server/resolver'
 import { PERMISSION, PHONE } from 'modules-pack/variables'
 import { isPhoneNumber, LANGUAGE, LANGUAGE_LEVEL } from 'utils-pack'
 import { toRgbaColor } from 'utils-pack/color'
@@ -96,6 +96,9 @@ export default {
   LanguageLevelRange,
   Color,
   JSON,
+  File: {
+    src: fileSrc
+  },
   Query: {
     cursor: (_, __, {res}) => {
       return res.cursor || {}
