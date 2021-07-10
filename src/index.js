@@ -6,7 +6,6 @@
 
 export * from './_envs'
 export * from './constants'
-export * from './decorators'
 export * from './definitions'
 export * from './array'
 export * from './codec'

@@ -24,6 +24,7 @@ export const Active = {
   // will be overridden at runtime, used for avoiding circular import and env-dependent libraries
   DEFAULT: {LANGUAGE: LANGUAGE.ENGLISH._},
   LANG: LANGUAGE.ENGLISH, // currently used language
+  SETTINGS: {}, // User settings
   Storage: typeof localStorage !== 'undefined' ? localStorage : undefined, // LocalStorage for Node
   WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined, // WebSocket for Node
   iconClass: '', // CSS className for <Icon />

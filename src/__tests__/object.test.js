@@ -3,7 +3,6 @@ import {
   cloneDeep,
   findAllObjsByKeys,
   findObjByKeys,
-  GQL_HIDDEN_FIELDS,
   hasObjKeys,
   hasObjMatch,
   objChanges,
@@ -12,7 +11,7 @@ import {
   removeEmptyValues,
   removeNilValues,
   reset,
-  sanitizeGqlResponse,
+  sanitizeResponse,
   sortObjKeys,
   toObjValuesKeyTotal,
   toObjValuesTotal,
@@ -343,9 +342,12 @@ it(`${removeDeletedItems.name}() deletes all objects with truthy 'delete' proper
   expect(removeDeletedItems(list)).toEqual(expectedList)
 })
 
-it(`${sanitizeGqlResponse.name}() deletes all GraphQL tags, Null/Undefined values from Collection (Falsey values from List)`, () => {
+it(`${sanitizeResponse.name}() deletes all GraphQL tags, Null/Undefined values from Collection (Falsey values from List)`, () => {
   const hiddenFields = {}
-  GQL_HIDDEN_FIELDS.forEach(name => hiddenFields[name] = true)
+  const tags = [
+    '__typename', 'updated', 'created', 'creator', 'creatorId'
+  ]
+  tags.forEach(name => hiddenFields[name] = true)
   const object = {
     ...hiddenFields,
     name: null,
@@ -365,7 +367,7 @@ it(`${sanitizeGqlResponse.name}() deletes all GraphQL tags, Null/Undefined value
       planet: 'Earth'
     }
   }
-  expect(sanitizeGqlResponse(object, {tags: GQL_HIDDEN_FIELDS})).toEqual(expected)
+  expect(sanitizeResponse(object, {tags})).toEqual(expected)
 })
 
 it(`${sortObjKeys.name}() returns new Object with Keys in given sort order`, () => {
