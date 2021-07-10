@@ -1,6 +1,7 @@
 import { GraphQLScalarType } from 'graphql'
-import { queriedFields, Response } from 'modules-pack/graphql/server/resolver'
-import { isString, last } from 'utils-pack'
+import { queryFields, Response } from 'modules-pack/graphql/server/resolver'
+import mongoose from 'mongoose'
+import { get, isString, last } from 'utils-pack'
 import { isObjectID } from './types'
 
 /**
@@ -64,8 +65,8 @@ export function populated (...opts) {
 
       // return result without populating if no foreign key queried
       if (foreignKeys.length) {
-        const queriedFieldsObj = queriedFields(last(args))
-        const nestedFields = foreignKeys.filter(path => get(queriedFieldsObj, path))
+        const queriedFields = queryFields(last(args))
+        const nestedFields = foreignKeys.filter(path => get(queriedFields, path))
         if (!nestedFields.length) return result
         _opts = [nestedFields.join(' '), ...options]
       }

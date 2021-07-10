@@ -1,12 +1,13 @@
 import { GraphQLScalarType } from 'graphql'
 import { SevenBoom as Response } from 'graphql-apollo-errors'
+import gqlFields from 'graphql-fields'
 import { Kind } from 'graphql/language'
 import { base64Encode } from 'modules-pack/utils/server/file'
 import { filePath, SERVER, UPLOAD } from 'modules-pack/variables'
 import { __DEV__, definitionByValue, enumFrom, fileExtensionNormalized, isObject } from 'utils-pack'
 
 export { Response }
-export { default as queriedFields } from 'graphql-fields'
+export const queryFields = gqlFields
 
 /**
  * GRAPHQL RESOLVER HELPERS ====================================================
