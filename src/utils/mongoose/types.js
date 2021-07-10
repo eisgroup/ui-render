@@ -69,12 +69,13 @@ export const CurrencySymbol = {type: String, enum: enumFrom(CURRENCY), default: 
 export const Email = {type: String, validate: isEmail, set: toLowerCase}
 export const LanguageCode = {type: String, enum: enumFrom(LANGUAGE), default: undefined}
 export const FileType = new Schema({
-  id: Timestamp,
+  id: Id,
   src: String, // may be absent (to be computed with resolvers if the file is stored by the server)
-  i: String,
   kind: String,
+  i: String,
   name: {type: String, maxLength: VALIDATE.FILE_NAME_MAX_LENGTH}, // filename gets sanitized during upload
   creatorId: Id,
+  created: Timestamp,
   updated: Timestamp,
   _id: false,
 })

@@ -1,9 +1,10 @@
 import { GraphQLScalarType } from 'graphql'
-import { Response } from 'modules-pack/graphql/server/resolver'
+import { queriedFields, Response } from 'modules-pack/graphql/server/resolver'
+import { isString, last } from 'utils-pack'
 import { isObjectID } from './types'
 
 /**
- * TYPE RESOLVERS ==============================================================
+ * GRAPHQL TYPE RESOLVERS ======================================================
  * =============================================================================
  */
 
@@ -21,4 +22,62 @@ ObjectID._fromClient = function (value) {
 
 export default {
   ObjectID
+}
+
+/**
+ * GRAPHQL RESOLVER DECORATORS =================================================
+ * =============================================================================
+ */
+
+/**
+ * Decorator to hydrate Mongoose returned Documents with queried Nested Collections for GraphQL Resolvers
+ * It assumes that GraphQL nested query structure matches that of Mongoose schema.
+ *
+ * @example:
+ *    // After Model.find* queries
+ *   *@populated(CAT_FOREIGN_KEYS.STRING)
+ *    cat (_, {id}) {
+ *      return id ? Cat.findById(id) : null
+ *    }
+ *    // After Model.createOrUpdate query
+ *   *@populated(CAT_FOREIGN_KEYS.STRING)
+ *    cat (_, {entry}) {
+ *      return Cat.createOrUpdate(entry)
+ *    }
+ *    // After document.save()
+ *   *@populated(CAT_FOREIGN_KEYS.STRING)
+ *    async cat (_, {entry}) {
+ *      const instance = await Cat.findById(entry.id)
+ *      return Object.assign(instance, entry).save()
+ *    }
+ *
+ * @param {*[]} opts - Mongoose populate arguments,
+ */
+export function populated (...opts) {
+  const [arg, ...options] = opts // the first argument is usually a foreign keys string, but it can be object of paths
+  const foreignKeys = isString(arg) ? String(arg).split(' ') : [] // for now only handle the key string case
+  return function (target, key, descriptor) {
+    const func = descriptor.value
+    descriptor.value = function (...args) {
+      const result = func.apply(this, args)
+      let _opts = opts
+
+      // return result without populating if no foreign key queried
+      if (foreignKeys.length) {
+        const queriedFieldsObj = queriedFields(last(args))
+        const nestedFields = foreignKeys.filter(path => get(queriedFieldsObj, path))
+        if (!nestedFields.length) return result
+        _opts = [nestedFields.join(' '), ...options]
+      }
+
+      // populate the result with queried foreign keys
+      return result instanceof mongoose.Query
+        ? result.populate(..._opts)
+        : (result instanceof Promise
+            ? result.then(doc => doc instanceof mongoose.Document ? doc.populate(..._opts).execPopulate() : doc)
+            : result
+        )
+    }
+    return descriptor
+  }
 }

@@ -3,7 +3,7 @@ import { stateAction, stateActionType } from 'modules-pack/redux'
 import { history, select as routerSelect } from 'modules-pack/router'
 import { all, call, delay, put, selectState, spawn, takeLatest } from 'modules-pack/saga/utils'
 import { ROUTE, URL } from 'modules-pack/variables'
-import { Active, CREATE, LOGIN, RESET, sanitizeGqlResponse, SET, SUCCESS } from 'utils-pack'
+import { Active, CREATE, LOGIN, RESET, sanitizeResponse, SET, SUCCESS } from 'utils-pack'
 import { SELF, USER_LOGIN } from '../constants'
 import '../mutations' // setup Active.UserMutation
 import '../queries' // setup Active.UserQuery
@@ -92,7 +92,7 @@ export function * infoGqlFlow () {
 
   /* Update State */
   const {user} = payload.data || {}
-  if (user) yield put(stateAction(SELF, RESET, sanitizeGqlResponse(user)))
+  if (user) yield put(stateAction(SELF, RESET, sanitizeResponse(user)))
 }
 
 // Sync User Data with Backend

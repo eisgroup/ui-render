@@ -1,7 +1,7 @@
 import { ROUTE } from 'modules-pack/variables'
 import React from 'react'
 import { withRouter } from 'react-router'
-import { Link as LinkRouter, Route } from 'react-router-dom'
+import { Link as ClientLink, Route } from 'react-router-dom'
 import { onPressHoc, SOUND } from 'react-ui-pack'
 import { Active, hasListValue } from 'utils-pack'
 
@@ -25,10 +25,30 @@ export function defineRoutes (routes, pages) {
 }
 
 /**
- * Link HOC for react-router to play sound onClick
+ * Get Route ID from Component Props
+ * @Note: react-router does not update props `location` or `match` with history.push
+ *    => derive ID from history object directly for consistent API in all platforms
+ * @param {Object} props - React Component props
+ * @returns {String|Undefined} ID - from route location path, if found
  */
-export function Link ({onClick, sound = Active.SETTINGS.HAS_SOUND && SOUND.TOUCH, ...props}) {
-  return <LinkRouter onClick={onPressHoc(onClick, sound)} {...props}/>
+export function idFromRoute (props) {
+  let id = get(props, 'history.location.pathname', '')
+  if (id) id = id.substr(id.lastIndexOf('/') + 1)
+  if (!id && props.router) id = get(props.router, 'query.id') // next.js
+  return id
+}
+
+/**
+ * Get Current Route from Component Props
+ * @param {Object} props - React Component props
+ * @param {String} [suffix] - string to append at the end, '/' for example
+ * @returns {String} route - path without query ID and without the ending slash
+ */
+export function routeFrom (props, suffix = '') {
+  let route = get(props, 'history.location.pathname', '')
+  if (route) route = route.substr(0, route.lastIndexOf('/'))
+  if (!route && props.router) route = props.router.pathname.replace('/[id]', '') // next.js
+  return route + suffix
 }
 
 /**
@@ -47,9 +67,15 @@ export function withRouteId (constructor) {
   // Define instance getter
   Object.defineProperty(constructor.prototype, 'id', {
     get () {
-      const {match: {params: {id}}} = this.props
-      return id
+      return idFromRoute(this.props)
     }
   })
   return withRouter(constructor)
+}
+
+/**
+ * Link HOC for react-router to play sound onClick
+ */
+export function Link ({onClick, sound = Active.SETTINGS.HAS_SOUND && SOUND.TOUCH, ...props}) {
+  return <ClientLink onClick={onPressHoc(onClick, sound)} {...props}/>
 }

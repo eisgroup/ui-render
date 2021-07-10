@@ -1,5 +1,5 @@
 import { assertBackend } from 'utils-pack'
-import { COMMON_SERVER } from '../constants'
+import { GRAPHQL_SERVER } from '../constants'
 import schema from '../schema.gql'
 import resolver from './resolvers'
 
@@ -10,10 +10,12 @@ import resolver from './resolvers'
  */
 assertBackend()
 
-const commonServer = {
-  NAME: COMMON_SERVER,
+export * from './decorator'
+export * from './resolver'
+const graphqlServer = {
+  NAME: GRAPHQL_SERVER,
   resolver,
   schema,
 }
 
-export default commonServer
+export default graphqlServer

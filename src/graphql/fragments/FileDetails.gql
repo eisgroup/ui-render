@@ -1,8 +1,6 @@
-fragment File on File {
-    src
+fragment FileDetails on File {
+    id
     name
-    i
-    kind
     creatorId
     created
     updated

@@ -9,10 +9,9 @@ import {
   Response
 } from 'modules-pack/graphql/server/resolver'
 import { PERMISSION, PHONE } from 'modules-pack/variables'
-import { isPhoneNumber, LANGUAGE, LANGUAGE_LEVEL } from 'utils-pack'
+import { isGoodPassword, isId, isPhoneNumber, LANGUAGE, LANGUAGE_LEVEL } from 'utils-pack'
 import { toRgbaColor } from 'utils-pack/color'
 import { toTimestamp } from 'utils-pack/time'
-import { isGoodPassword, isId } from 'utils-pack/utility'
 import isEmail from 'validator/lib/isEmail'
 
 /**

@@ -6,6 +6,7 @@ import { filePath, SERVER, UPLOAD } from 'modules-pack/variables'
 import { __DEV__, definitionByValue, enumFrom, fileExtensionNormalized, isObject } from 'utils-pack'
 
 export { Response }
+export { default as queriedFields } from 'graphql-fields'
 
 /**
  * GRAPHQL RESOLVER HELPERS ====================================================
@@ -43,6 +44,29 @@ cachedQuery.clean = function (cacheTime = SERVER.QUERY_CACHE_TIME) {
   }
 }
 
+/**
+ * Compute File Source String for Client Consumption
+ *    - Append `updated` query string to force clearing cache when User updates a file
+ *    - Base encode image files while in Dev mode because CSS background-image cannot load local files
+ *
+ * @param {Object<[id], [kind], [i], name, updated>} fileData - to get src for
+ * @param {String} [dir] - relative directory path from the base upload directory (starts with '/'), ignored if `uploadPath` given
+ * @param {String} [uploadPath] - absolute upload path for frontend (relative to WORK_DIR for backend), defaults to base upload directory
+ * @param {String} [kind] - of file kind to use
+ * @returns {String} source - file path or base64 encoded data
+ */
+export function fileSrc ({id, kind, i, name, updated}, {dir, uploadPath} = {}) {
+  // point to absolute file path in frontend local development, because there is no web server
+  if (!uploadPath) uploadPath = `${__DEV__ ? UPLOAD.PATH : UPLOAD.DIR}${dir ? dir : ''}`
+  const ext = fileExtensionNormalized(name) || ''
+  const fullPath = `${uploadPath}/${filePath({id, kind, i, ext})}`
+  return (__DEV__ && ext === 'jpg') ? base64Encode(fullPath) : `${fullPath}?v=${updated}`
+}
+
+/**
+ * GRAPHQL TYPE DEFINITIONS ----------------------------------------------------
+ * -----------------------------------------------------------------------------
+ */
 /**
  * GraphQL Enum Type - Dynamically defined given Definition Object
  * @example:
@@ -155,25 +179,6 @@ export function gqlTagLevelType (name, TAG, TAG_LEVEL, {description, range = fal
     throw Response.badRequest(`Invalid ${this.name} ${value}, must be key/value pairs`)
   }
   return Type
-}
-
-/**
- * Compute File Source String for Client Consumption
- *    - Append `created` query string to force clearing cache when User updates a file
- *    - Base encode image files while in Dev mode because CSS background-image cannot load local files
- *
- * @param {Object<[id], [kind], [i], name, updated>} fileData - to get src for
- * @param {String} [dir] - relative directory path from the base upload directory (starts with '/')
- * @param {String} [uploadPath] - absolute upload path for frontend (relative to WORK_DIR for backend), defaults to base upload directory
- * @param {String} [kind] - of file kind to use, defaults to 'public'
- * @returns {String} source - file path or base64 encoded data
- */
-export function fileSrc ({id, kind, i, name, updated}, {dir, uploadPath} = {}) {
-  // point to absolute file path in frontend local development, because there is no web server
-  if (!uploadPath) uploadPath = `${__DEV__ ? UPLOAD.PATH : UPLOAD.DIR}${dir ? dir : ''}`
-  const ext = fileExtensionNormalized(name) || ''
-  const fullPath = `${uploadPath}/${filePath({id, kind, i, ext})}`
-  return (__DEV__ && ext === 'jpg') ? base64Encode(fullPath) : `${fullPath}?v=${updated}`
 }
 
 /**
