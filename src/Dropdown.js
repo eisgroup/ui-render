@@ -123,8 +123,10 @@ export function Dropdown ({
   // On Change gets called before `onAddItem`
   if (onChange || onSelect) props.onChange = (event, {value}) => {
     // Since there is no option to disable addition when search matches existing options (case-insensitive),
-    // and temporarily disabling addition will remove new additions,
     // => sanitize onChange to have value from existing options.
+    // @note: it's possible to temporarily disable addition, but that logic is more complex,
+    //    and shows 'No options left' message, instead of 'Add value',
+    //    which may be more intuitive, because it simply moves the selected value to the end.
     let val = props.multiple ? last(value) : value
     if (val && isString(val)) {
       val = trimSpaces(val).toLowerCase()
