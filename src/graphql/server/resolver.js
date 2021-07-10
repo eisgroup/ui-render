@@ -1,9 +1,9 @@
 import { GraphQLScalarType } from 'graphql'
 import { SevenBoom as Response } from 'graphql-apollo-errors'
 import { Kind } from 'graphql/language'
+import { base64Encode } from 'modules-pack/utils/server/file'
 import { filePath, SERVER, UPLOAD } from 'modules-pack/variables'
 import { __DEV__, definitionByValue, enumFrom, fileExtensionNormalized, isObject } from 'utils-pack'
-import { base64Encode } from './file'
 
 export { Response }
 

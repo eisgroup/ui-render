@@ -1,5 +1,5 @@
 import { GraphQLScalarType } from 'graphql'
-import { gqlEnumType, Response } from 'modules-pack/utils/server/resolver'
+import { gqlEnumType, Response } from 'modules-pack/graphql/server/resolver'
 import { CURRENCY } from 'modules-pack/variables'
 import { isNumeric, round } from 'utils-pack'
 

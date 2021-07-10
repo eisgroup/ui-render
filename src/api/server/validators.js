@@ -1,4 +1,4 @@
-import { Response } from 'modules-pack/utils/server/resolver'
+import { Response } from 'modules-pack/graphql/server/resolver'
 import { isEmpty } from 'utils-pack'
 
 /**
