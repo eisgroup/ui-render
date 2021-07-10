@@ -3,8 +3,8 @@ import { SevenBoom as Response } from 'graphql-apollo-errors'
 import gqlFields from 'graphql-fields'
 import { Kind } from 'graphql/language'
 import { base64Encode } from 'modules-pack/utils/server/file'
-import { filePath, SERVER, UPLOAD } from 'modules-pack/variables'
-import { __DEV__, definitionByValue, enumFrom, fileExtensionNormalized, isObject } from 'utils-pack'
+import { IMAGE, SERVER } from 'modules-pack/variables'
+import { __DEV__, _WORK_DIR_, definitionByValue, enumFrom, fileExtensionNormalized, isObject } from 'utils-pack'
 
 export { Response }
 export const queryFields = gqlFields
@@ -46,22 +46,19 @@ cachedQuery.clean = function (cacheTime = SERVER.QUERY_CACHE_TIME) {
 }
 
 /**
- * Compute File Source String for Client Consumption
- *    - Append `updated` query string to force clearing cache when User updates a file
- *    - Base encode image files while in Dev mode because CSS background-image cannot load local files
+ * Compute File Source String for Client Consumption in Local Development Environment
+ *    - Base encode image files in local development because CSS background-image cannot load local files
+ *    - Prepend `src` with absolute file path in local development
+ *    - TBD: Prepend `src` with CDN URL in production
  *
- * @param {Object<[id], [kind], [i], name, updated>} fileData - to get src for
- * @param {String} [dir] - relative directory path from the base upload directory (starts with '/'), ignored if `uploadPath` given
- * @param {String} [uploadPath] - absolute upload path for frontend (relative to WORK_DIR for backend), defaults to base upload directory
- * @param {String} [kind] - of file kind to use
+ * @param {Object<src, name>} fileData - to get src for
  * @returns {String} source - file path or base64 encoded data
  */
-export function fileSrc ({id, kind, i, name, updated}, {dir, uploadPath} = {}) {
-  // point to absolute file path in frontend local development, because there is no web server
-  if (!uploadPath) uploadPath = `${__DEV__ ? UPLOAD.PATH : UPLOAD.DIR}${dir ? dir : ''}`
+export function fileSrc ({src, name}) {
+  if (!__DEV__) return src
   const ext = fileExtensionNormalized(name) || ''
-  const fullPath = `${uploadPath}/${filePath({id, kind, i, ext})}`
-  return (__DEV__ && ext === 'jpg') ? base64Encode(fullPath) : `${fullPath}?v=${updated}`
+  const localPath = `${_WORK_DIR_}${src}` // point to absolute file path, because there is no web server
+  return (IMAGE.EXTENSIONS.includes(ext)) ? base64Encode(localPath) : localPath
 }
 
 /**

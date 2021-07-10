@@ -1,5 +1,5 @@
 import { connect } from 'modules-pack/redux'
-import { FILE_TYPE } from 'modules-pack/variables'
+import { FILE } from 'modules-pack/variables'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import Image from 'react-ui-pack/Image'
@@ -39,7 +39,7 @@ export default class UploadImage extends PureComponent {
   }
 
   static defaultProps = {
-    type: FILE_TYPE.IMAGE
+    type: FILE.TYPE.IMAGE
   }
 
   get file () {

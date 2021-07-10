@@ -38,7 +38,7 @@ type Subscription {
 
 
 # -----------------------------------------------------------------------------
-# UPLOADS
+# FILE UPLOADS
 #
 # @example:
 #   type User {
@@ -91,13 +91,17 @@ type Subscription {
 # @note: `src` cannot be computed by frontend, because it does not control upload path
 # -----------------------------------------------------------------------------
 type File {
-    # `id` can be derived from the entry type having the file,
-    # or duplicated for different versions of the same file, see example above
-    id: Id # created Timestamp
-    src: URL! # computed by server, or saved to db (the actual ID for GraphQL caching)
-    kind: JSON # type of file (example: public/private...)
-    i: JSON # identifier or index position, stored by db (ex. thumb/small/large...)
-    name: String # file name with extension for UI use only, stored by db
+    # Computed by the server, or saved to db (the actual ID for GraphQL caching)
+    src: URL!
+    # Type of file (ex. public/private...)
+    kind: JSON
+    # Identifier or index position, stored by db (ex. thumb/small/large...)
+    i: JSON
+    # Optional - created Timestamp (better to use entry type ID).
+    # `id` does no guarantee uniqueness, because different versions of the file can have the same `id`.
+    id: Id
+    # File name with extension for UI use and to get `ext` only, stored by db
+    name: String
     creatorId: Id
     created: Timestamp # need this field because `id` may not exist (derived from entry type)
     updated: Timestamp
@@ -105,16 +109,21 @@ type File {
 
 # built-in input `Upload` can be used directly with all `FileInput` attributes attached
 input FileInput {
-    file: Upload # binary File object uploaded from the client
-    kind: JSON # type of file (example: public, private...)
-    i: JSON # identifier or index position of the file in collection
-    remove: Boolean # whether the file should be deleted
+    # Binary File object uploaded from the client, required if `remove` is not true
+    file: Upload
+    # Type of file (ex. public/private...)
+    kind: JSON
+    # Identifier or index position, stored by db (ex. thumb/small/large...)
+    i: JSON
+    # Created Timestamp, can be used to unique identify the file
+    id: Id
+    # Whether to delete the file, it's called `remove` because `delete` is JS keyword
+    remove: Boolean
 
     # Unused fields for Frontend convinience,
     # so GraphQL does not complain about extra fields
-    #id: Id # created Timestamp
+    #name: String # ignored during upload, uses GQL Upload.filename instead.
     #src: String
-    #name: String # GQL Upload.filename is used instead
     #creatorId: Id
     #created: Timestamp
     #updated: Timestamp

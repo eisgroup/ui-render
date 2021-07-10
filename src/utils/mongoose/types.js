@@ -1,24 +1,12 @@
-import { CONFIG, CURRENCY, PERMISSION, PHONE, VALIDATE } from 'modules-pack/variables'
+import { CONFIG, CURRENCY, PERMISSION, PHONE, UPLOAD, VALIDATE } from 'modules-pack/variables'
+import { fileName, folderFrom, resolvePath } from 'modules-pack/variables/files'
 import mongoose from 'mongoose'
 import { phone } from 'react-ui-pack/inputs/normalizers'
-import {
-  assertBackend,
-  by,
-  enumFrom,
-  get,
-  hasObjectValue,
-  Id as _Id,
-  interpolateString,
-  isContinuousNumberRanges,
-  isNumeric,
-  isPhoneNumber,
-  LANGUAGE,
-  startEndFromNumberRanges,
-  toLowerCase,
-  trimSpaces,
-} from 'utils-pack'
+import { assertBackend, by, enumFrom, get, hasObjectValue, LANGUAGE } from 'utils-pack'
 import { toRgbaColor } from 'utils-pack/color'
-import { isId } from 'utils-pack/utility'
+import { isContinuousNumberRanges, isNumeric, startEndFromNumberRanges, } from 'utils-pack/number'
+import { interpolateString, isPhoneNumber, toLowerCase, trimSpaces, } from 'utils-pack/string'
+import { Id as _Id, isId } from 'utils-pack/utility'
 import isEmailValidator from 'validator/es/lib/isEmail'
 import isURL from 'validator/es/lib/isURL'
 import './database' // initialize database automatically on import of this file
@@ -53,8 +41,15 @@ export const Json = {type: Mixed, default: undefined}
  * TYPES -----------------------------------------------------------------------
  */
 // @Note: add `default: undefined` to easily declare fallback when destructuring instances,
-// else, Mongoose will default to empty of given type (a.k.a. default for objects will be empty `{}`)
-// @note: For array of sub-documents, sub-documents cannot be declared with nested `type` prop.
+//        else, Mongoose will default to empty of given type (a.k.a. default for objects will be empty `{}`)
+// @Note: For array of sub-documents, sub-documents cannot be declared with nested `type` object, only primitives.
+//        This is because Mongoose only supports array of SchemaTypes or nested Schemas.
+//        However, it's possible to declare array of objects without nested `type` object.
+//        @see: https://mongoosejs.com/docs/schematypes.html#arrays
+// @Note: nested Schema is needed when:
+//        - having getters/setters,
+//        - `type` as nested object within array
+//        @see: https://mongoosejs.com/docs/subdocs.html
 export const Id = {type: String, validate: isId, default: () => _Id()}
 export const Ids = {type: [Id], default: undefined}
 export const Timestamp = {type: Number, validate: isNumeric, default: undefined}
@@ -69,16 +64,25 @@ export const CurrencySymbol = {type: String, enum: enumFrom(CURRENCY), default: 
 export const Email = {type: String, validate: isEmail, set: toLowerCase}
 export const LanguageCode = {type: String, enum: enumFrom(LANGUAGE), default: undefined}
 export const FileType = new Schema({
-  id: Id,
-  src: String, // may be absent (to be computed with resolvers if the file is stored by the server)
+  // File src for frontend can be stored in db, or computed dynamically
+  src: {
+    type: String, get (v) {
+      if (v != null) return v
+      // Prepend `version` query string to force clearing cache when User updates a file
+      const folder = folderFrom(this.parent())
+      const version = this.updated || this.created || '0'
+      return `${resolvePath({folder, filename: fileName(this), workDir: UPLOAD.DIR}).path}?v=${version}`
+    }
+  },
   kind: String,
   i: String,
+  id: {...Id, default: undefined},
   name: {type: String, maxLength: VALIDATE.FILE_NAME_MAX_LENGTH}, // filename gets sanitized during upload
-  creatorId: Id,
+  creatorId: {...Id, default: undefined},
   created: Timestamp,
   updated: Timestamp,
   _id: false,
-})
+}, {timestamps: false, default: undefined})
 export const Files = {type: [FileType], default: undefined}
 export const Location = new Schema({
   lat: {type: Number, required},
@@ -241,7 +245,7 @@ Localised.path = function (field, lang) {
 export function ForeignKey (modelName, options) {
   // noinspection JSUnresolvedFunction
   return {
-    type: String, // @note: setting `type: Id` throws error, but works with String or ObjectId
+    type: String, // @note: type can only be primitive, ObjectId or Mixed, see @Note at the top
     ref: modelName,
     validate: {
       validator: input => mongoose.model(modelName).findById(input),

@@ -1,6 +1,6 @@
 import fs from 'fs'
 import mkdirp from 'mkdirp'
-import { UPLOAD } from 'modules-pack/variables'
+import { resolvePath } from 'modules-pack/variables'
 import sanitizeName from 'sanitize-filename' // this package may have large dependency, so do not include it by default
 import { _WORK_DIR_, warn } from 'utils-pack'
 
@@ -26,14 +26,15 @@ export function makeDirectory (dir, options) {
 /**
  * Open and read File content
  *
- * @param {String} filename - path to file relative to 'workingDirectory'
- * @param {String} [workingDirectory] - path used to open file
+ * @param {Object<filename, folder, dir, path>} filePath - see `resolvePath()` arguments
+ * @param {String} [workDir] - working directory
  * @param {String|Object} [options] - read file options
  * @return {Promise<any>} content - from file
  */
-export function read (filename, workingDirectory = _WORK_DIR_, options = 'utf8') {
+export function read ({options = 'utf8', workDir = _WORK_DIR_, ...filePath}) {
+  const {path} = resolvePath({workDir, ...filePath})
   return new Promise(function (resolve, reject) {
-    fs.readFile(workingDirectory + '/' + filename, options, function (err, data) {
+    fs.readFile(path, options, function (err, data) {
       if (err) {
         reject(err)
       } else {
@@ -44,46 +45,39 @@ export function read (filename, workingDirectory = _WORK_DIR_, options = 'utf8')
 }
 
 /**
- * Save Uploaded File to Local Folder
+ * Save File to Local Server
  *
- * @param {Object} stream - of file buffer
- * @param {String} filename - example: photo.jpg
- * @param {String} [folders] - sub folders path relative to UPLOAD_DIR to save to, if `dir` not given (e.x. '/userId')
- * @param {String} [dir] - full directory path, excluding file name, to use (e.x. `/data/uploads`)
- * @param {Object} [resize] - transform pipeline to use before saving file (e.x. resize = sharp().resize(width, height))
- * @returns {Promise<path>} path - to file saved if successful
+ * @param {Object} stream - of file buffer, the result of createReadStream(absoluteFilePath)
+ * @param {Object<filename, folder, dir, path>} filePath - see `resolvePath()` arguments
+ * @param {Object} [transform] - pipeline to use before saving file (e.x. transform = sharp().resize(width, height))
+ * @returns {Promise<Object>} {path, name} - to file saved if successful, else error
  */
-export async function saveFile ({stream, filename, folders = '', dir = null, resize = null}) {
-  if (!dir) dir = UPLOAD.PATH + folders
+export async function saveFile ({stream, transform, ...filePath}) {
+  const {dir, path, name} = resolvePath(filePath)
   const {error} = await makeDirectory(dir)
   if (error) throw new Error(error)
-  const path = dir + '/' + filename
 
   return new Promise((resolve, reject) => {
-      let file = stream
-        .on('error', error => {
-          if (stream.truncated) fs.unlinkSync(path) // Delete the truncated file.
-          reject(error)
-        })
-      if (resize) file = file.pipe(resize)
+    let file = stream
+      .on('error', error => {
+        if (stream.truncated) fs.unlinkSync(path) // Delete the truncated file.
+        reject(error)
+      })
+    if (transform) file = file.pipe(transform)
       return file.pipe(fs.createWriteStream(path))
         .on('error', error => reject(error))
-        .on('finish', () => resolve({path}))
+        .on('finish', () => resolve({path, name}))
     }
   )
 }
 
 /**
- * Remove Uploaded File by its name and folder path (or absolute path)
- *
- * @param {String} filename - example: photo.jpg
- * @param {String} [folders] - sub folders path relative to UPLOAD_DIR to save to, if `dir` not given (e.x. '/userId')
- * @param {String} [dir] - full directory path, excluding file name, to use (e.x. `/data/uploads`)
- * @param {String} [path] - full directory path, including file name, to use (e.x. `/data/uploads`)
- * @returns {Promise<path, removed>} path - to file removed if successful, else error object
+ * Remove File from Local Server
+ * @param {Object<filename, folder, dir, path>} filePath - see `resolvePath()` arguments
+ * @returns {Promise<Object>} {path, removed} - to file removed if successful, else error object
  */
-export function removeFile ({filename, folders = '', dir = null, path = null}) {
-  if (!path) path = (dir || (UPLOAD.PATH + folders)) + '/' + filename
+export function removeFile (filePath) {
+  const {path} = resolvePath(filePath)
   return new Promise((resolve, reject) => fs.unlink(path, (err) => {
     if (err) return reject(err)
     return resolve({path, removed: true})
