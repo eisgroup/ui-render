@@ -46,7 +46,8 @@ export default class UploadGrids extends Component {
     const {onChange, onChangeLast} = this.props
     let {files} = this.state
     changedFiles.forEach(file => {
-      this.changedValues[file.i] = file // store session changes
+      const {kind, i} = file
+      this.changedValues[`${kind}_${i}`] = file // store session changes
       if (file.remove) { // remove from state if deleted
         files = files.filter(f => f.i !== file.i || f.kind !== file.kind)
       } else if (!files.find(f => f.i === file.i && f.kind === file.kind)) { // add new file

@@ -18,7 +18,7 @@ localiseTranslation({
  *    const resolvers = {}
  *   *@exportTo(resolvers)
  *    class Query {
- *      user(parent, args, context, info) {
+ *      user (parent, args, context, info) {
  *        // ...resolver logic
  *      }
  *    }
@@ -41,7 +41,7 @@ export function exportTo (resolvers) {
  * @example:
  *    class Query {
  *     *@authenticated
- *      user(parent, args, context, info) {
+ *      user (parent, args, context, info) {
  *        // ...resolver logic
  *      }
  *    }

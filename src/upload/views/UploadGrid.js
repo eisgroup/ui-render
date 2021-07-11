@@ -209,8 +209,9 @@ export default class UploadGrid extends Component {
     const {onChange, onChangeLast} = this.props
     const count = this.count
     changedFiles.forEach(file => {
-      this.cachedFiles[file.src] = file
-      this.changedValues[file.i] = file
+      const {src, kind, i} = file
+      this.cachedFiles[src] = file
+      this.changedValues[`${kind}_${i}`] = file
     })
     this.setState({files: this.isIncremental ? files.sort(by('i')).filter(f => f.i < count) : files})
     if (onChangeLast) {

@@ -59,25 +59,23 @@ export function populated (...opts) {
   const foreignKeys = isString(arg) ? String(arg).split(' ') : [] // for now only handle the key string case
   return function (target, key, descriptor) {
     const func = descriptor.value
-    descriptor.value = function (...args) {
-      const result = func.apply(this, args)
+    descriptor.value = async function (...args) {
+      let instance = func.apply(this, args)
       let _opts = opts
 
-      // return result without populating if no foreign key queried
+      // Return result without populating if no foreign key queried
       if (foreignKeys.length) {
         const queriedFields = queryFields(last(args))
         const nestedFields = foreignKeys.filter(path => get(queriedFields, path))
-        if (!nestedFields.length) return result
+        if (!nestedFields.length) return instance
         _opts = [nestedFields.join(' '), ...options]
       }
 
-      // populate the result with queried foreign keys
-      return result instanceof mongoose.Query
-        ? result.populate(..._opts)
-        : (result instanceof Promise
-            ? result.then(doc => doc instanceof mongoose.Document ? doc.populate(..._opts).execPopulate() : doc)
-            : result
-        )
+      // Populate the result with queried foreign keys
+      instance = (instance instanceof Promise) ? (await instance) : instance
+      if (instance instanceof mongoose.Query) return instance.populate(..._opts)
+      if (instance instanceof mongoose.Document) return instance.populate(..._opts).execPopulate()
+      return instance
     }
     return descriptor
   }

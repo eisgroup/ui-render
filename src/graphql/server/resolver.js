@@ -62,6 +62,43 @@ export function fileSrc ({src, name}) {
 }
 
 /**
+ * Resolve the final return value (Document/Query/Error) from GraphQL Resolvers.
+ * @note: this function is for reference only, do not delete it.
+ *        See content of the function for implementation example.
+ * @example: if the resolver returns Promise, Promise.then() or `await` keyword resolves to the final result,
+ *        no matter how many promises are nested.
+ * Case 1.
+ * resolver() {
+ *    return Model.find()
+ * }
+ * >>> `result`: Query
+ *
+ * Case 2.
+ * async resolver() {
+ *    return Model.findById()
+ * }
+ * >>> `result`: Promise<Document>
+ *
+ * Case 3.
+ * async resolver() {
+ *    const instance = await Model.findById()
+ *    return Object.assign(instance, entry).save()
+ * }
+ * >>> `result`: Promise<Document>
+ *
+ * Usage inside a Decorator that wraps the resolver:
+ * function resolvePromise () {
+ * -----------------------------------------------------------------------------
+ //   descriptor.value = async function (...args) {
+ //     // If result is a Promise, resolve it, else use as is without resolving
+ //     let instance = func.apply(this, args)
+ //     instance = (instance instanceof Promise) ? (await instance) : instance
+ *    }
+ * -----------------------------------------------------------------------------
+ * }
+ */
+
+/**
  * GRAPHQL TYPE DEFINITIONS ----------------------------------------------------
  * -----------------------------------------------------------------------------
  */

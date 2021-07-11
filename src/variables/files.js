@@ -1,5 +1,5 @@
 import { FILE as _FILE } from 'react-ui-pack/files'
-import { _WORK_DIR_, ENV, fileExtensionNormalized, fileNameWithoutExt, SIZE_MB_16, SIZE_MB_2 } from 'utils-pack'
+import { _WORK_DIR_, ENV, fileExtensionNormalized, fileNameWithoutExt, isList, SIZE_MB_16, SIZE_MB_2 } from 'utils-pack'
 
 /**
  * FILE VARIABLES ==============================================================
@@ -13,6 +13,7 @@ export const FILE = {
     GIF: 'gif',
     JSON: 'json',
     JPG: 'jpg',
+    JPEG: 'jpeg',
     MP3: 'mp3',
     MP4: 'mp4',
     PNG: 'png',
@@ -41,7 +42,7 @@ export const FILE = {
 
 export const IMAGE = {
   MAX_RES: 1200,
-  EXTENSIONS: [FILE.EXT.JPG, FILE.EXT.PNG, FILE.EXT.SVG, FILE.EXT.GIF, FILE.EXT.WEBP],
+  EXTENSIONS: [FILE.EXT.JPG, FILE.EXT.JPEG, FILE.EXT.PNG, FILE.EXT.SVG, FILE.EXT.GIF, FILE.EXT.WEBP],
   MIME_TYPES: [FILE.MIME_TYPE.JPG, FILE.MIME_TYPE.PNG, FILE.MIME_TYPE.SVG, FILE.MIME_TYPE.GIF, FILE.MIME_TYPE.WEBP],
 }
 
@@ -131,4 +132,18 @@ export function resolvePath ({filename = '', folder = '', dir = '', path = '', w
   }
   const name = path.substr(path.lastIndexOf('/') + 1)
   return {dir, path, name}
+}
+
+/**
+ * Parse <UploadGrid/> onChange(files) values to match Backend API
+ * @param {FileInput[]|FileInput} files - single or list of FileInputs to parse
+ * @returns {Object} {file, kind, i, remove}[] - single or list of FileInputs for backend
+ */
+export function fileParser (files) {
+  if (isList(files)) {
+    return files.map(fileParser)
+  } else {
+    const {file, kind, i, remove} = files
+    return {file, kind, i, remove}
+  }
 }

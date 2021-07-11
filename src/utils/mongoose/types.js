@@ -74,8 +74,8 @@ export const FileType = new Schema({
       return `${resolvePath({folder, filename: fileName(this), workDir: UPLOAD.DIR}).path}?v=${version}`
     }
   },
-  kind: String,
-  i: String,
+  kind: Mixed,
+  i: Mixed,
   id: {...Id, default: undefined},
   name: {type: String, maxLength: VALIDATE.FILE_NAME_MAX_LENGTH}, // filename gets sanitized during upload
   creatorId: {...Id, default: undefined},

@@ -36,17 +36,17 @@ localiseTranslation({
  * @param {Object<kind, i, id>} fileInput - File props from resolver payload
  * @param {File} [file] - required for upload, native File object to createReadStream()
  * @param {Boolean} [remove] - whether to remove file
- * @param {String} [filename] - existing file `name` to remove, required to resolvePath()
+ * @param {String} [name] - existing file `name` to remove, required to resolvePath()
  * @param {String[]} [mimetypes] - allowed file types
  * @param {Object} [filePath] - options to pass to `saveFile()` or `removeFile()`
  * @returns {Promise<path...>|Promise<removed...>} - given FileInput props with saved `path` and `name`,
  *   - or `removed` boolean
  *   - or error if unsuccessful
  */
-export async function uploadFile ({file, remove, filename, mimetypes, ...fileInput}, filePath) {
+export async function uploadFile ({file, remove, mimetypes, ...fileInput}, filePath) {
   // Remove File
   if (remove) {
-    const result = await removeFile({filename, ...filePath})
+    const result = await removeFile({filename: fileName(fileInput), ...filePath})
     if (!result.removed)
       throw Response.badRequest(interpolateString(_.REMOVE_FILE_ERROR_error, {error: result}))
     return {...fileInput, removed: result.removed}
@@ -92,7 +92,7 @@ export async function updateFiles ({
     files = files.map(fileInput => {
       if (fileInput.remove) {
         const fileID = fileId(fileInput)
-        fileInput.filename = (oldFiles.find(oldInput => fileId(oldInput) === fileID) || {}).name
+        fileInput.name = (oldFiles.find(oldInput => fileId(oldInput) === fileID) || {}).name
       }
       return fileInput
     })
@@ -156,7 +156,7 @@ export async function updateFiles ({
  *
  * @example:
  *   *@filesUploaded({field: 'files', mimeTypes: IMAGE.MIME_TYPES}) // defaults
- *    user(parent, args, context, info) {
+ *    user (parent, args, context, info) {
  *      // ...resolver logic
  *      return new User(entry)
  *    }
@@ -176,9 +176,12 @@ export function filesUploaded ({
   return function (target, key, descriptor) {
     const func = descriptor.value
     descriptor.value = async function (...args) {
-      const instance = func.apply(this, args)
+      // If result is a Promise, resolve it, else use as is without resolving
+      let instance = func.apply(this, args)
+      instance = (instance instanceof Promise) ? (await instance) : instance
+      if (instance instanceof Error) return instance
       if (!(instance instanceof mongoose.Document))
-        return Response.badRequest(`@${filesUploaded.name} requires a Mongoose Document instance as return value`)
+        return Response.badImplementation(`@${filesUploaded.name} requires a Mongoose Document instance as return value`)
 
       // Simply save the instance, if no files uploaded
       const [__, {entry}] = args
