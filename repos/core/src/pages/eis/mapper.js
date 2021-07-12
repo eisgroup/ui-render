@@ -1,6 +1,6 @@
 import { renderField } from 'modules-pack/form/renders'
 import AutoSave from 'modules-pack/form/views/AutoSave'
-import { NAME as POPUP } from 'modules-pack/popup'
+import { NAME as POPUP, popupAlert } from 'modules-pack/popup'
 import { stateAction } from 'modules-pack/redux'
 import { FIELD } from 'modules-pack/variables'
 import React from 'react'
@@ -197,9 +197,13 @@ Render.Component = function RenderComponent ({
       // Matrix table headers and data transform
       if (group) {
         // `header` must exist as a single object, otherwise there is no way to group tables
-        const {by: {id, label, renderLabel, ...groupByProps}, header, extraHeader = {}} = group
-        if (!header || header.id == null)
-          throw new Error(`${view}.group.header must have 'id', got '${toJSON(header)}'`)
+        let {by: {id, label, renderLabel, ...groupByProps} = {}, header, extraHeader = {}} = group
+        const errorTitle = `Incorrect config for ${view} with {name: "${props.name}"}!`
+        if (id == null) popupAlert(errorTitle, `${view}.group.by must have 'id', got '${toJSON(group.by, null, 2)}'`)
+        if (!header || header.id == null) {
+          popupAlert(errorTitle, `${view}.group.header must have 'id', got '${toJSON(header, null, 2)}'`)
+          header = {} // prevent breaking code
+        }
 
         // First, check data to determine headers
         const groupsByValue = {}
@@ -219,8 +223,10 @@ Render.Component = function RenderComponent ({
 
           // Label grouped tables
           if (label != null) {
-            if (!hasObjectValue(label))
-              throw new Error(`${view}.group.by.label must resolve to object of labels by id 'value', got '${toJSON(label)}'`)
+            if (!hasObjectValue(label)) popupAlert(errorTitle,
+              `${view}.group.by.label must resolve to object of labels by ${id} 'value', got '${toJSON(label, null, 2)}'`
+            )
+
             const groupHeaders = groupIds.map(id => ({
               colSpan: _headers.length,
               label: renderLabel ? renderLabel(label[id]) : label[id],

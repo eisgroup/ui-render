@@ -93,6 +93,7 @@ export const meta = {
   },
 }
 
+// The minimum required config
 export const metaRequired = {
   view: 'Table',
   name: 'matrixTable',
