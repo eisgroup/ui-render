@@ -1,6 +1,7 @@
 import {
   classInstanceMethodNames,
   cloneDeep,
+  deleteProp,
   findAllObjsByKeys,
   findObjByKeys,
   hasObjKeys,
@@ -94,6 +95,12 @@ test(`${classInstanceMethodNames.name}() returns instance methods (async/getter/
   }
 
   expect(classInstanceMethodNames(Query)).toEqual(['GetterProp', 'SetterProp', 'Method', 'AsyncMethod'])
+})
+
+test(`${deleteProp.name}() removes nested property from object`, () => {
+  const obj = {a: {b: 5, c: 1}}
+  expect(deleteProp(obj, 'a.b')).toBe(true)
+  expect(obj).toEqual({a: {c: 1}})
 })
 
 it(`${hasObjMatch.name}() returns 'true' when nested Collection has a matching Object, else 'false'`, () => {

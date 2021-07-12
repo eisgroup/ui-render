@@ -38,6 +38,22 @@ export function clone (obj) {
 }
 
 /**
+ * Delete Nested Property of an Object by given Key Path
+ * @param {Object} obj - to delete property from
+ * @param {String|*} path - key path to nested property for deletion
+ * @returns {Boolean} return value of the `delete` keyword
+ */
+export function deleteProp (obj, path) {
+	if (!obj || !path) return false
+	if (typeof path === 'string') path = path.split('.')
+	for (let i = 0; i < path.length - 1; i++) {
+		obj = obj[path[i]]
+		if (typeof obj === 'undefined') return false
+	}
+	return delete obj[path.pop()]
+}
+
+/**
  * Check if value provided is an Object with at least one attribute
  *
  * @param {*} obj - value to check
