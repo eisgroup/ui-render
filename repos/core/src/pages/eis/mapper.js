@@ -197,7 +197,7 @@ Render.Component = function RenderComponent ({
       // Matrix table headers and data transform
       if (group) {
         // `header` must exist as a single object, otherwise there is no way to group tables
-        let {by: {id, label, renderLabel, ...groupByProps} = {}, header, extraHeader = {}} = group
+        let {by: {id, label, renderLabel, ...groupByProps} = {}, header, extraHeader = {label: ''}} = group
         const errorTitle = `Incorrect config for ${view} with {name: "${props.name}"}!`
         if (id == null) popupAlert(errorTitle, `${view}.group.by must have 'id', got '${toJSON(group.by, null, 2)}'`)
         if (!header || header.id == null) {
@@ -222,21 +222,17 @@ Render.Component = function RenderComponent ({
           table.headers = [header].concat(newHeaders)
 
           // Label grouped tables
-          if (label != null) {
-            if (!hasObjectValue(label)) popupAlert(errorTitle,
-              `${view}.group.by.label must resolve to object of labels by ${id} 'value', got '${toJSON(label, null, 2)}'`
-            )
-
-            const groupHeaders = groupIds.map(id => ({
-              colSpan: _headers.length,
-              label: renderLabel ? renderLabel(label[id]) : label[id],
-              ...groupByProps,
-            }))
-            const newExtraHeaders = [
-              [extraHeader].concat(groupHeaders)
-            ]
-            table.extraHeaders = (props.extraHeaders || []).concat(newExtraHeaders)
-          }
+          if (label != null && !hasObjectValue(label)) popupAlert(errorTitle,
+            `${view}.group.by.label must resolve to object of labels by ${id} 'value', got '${toJSON(label, null, 2)}'`)
+          const groupHeaders = groupIds.map(id => ({
+            colSpan: _headers.length,
+            label: label ? (renderLabel ? renderLabel(label[id]) : label[id]) : id,
+            ...groupByProps,
+          }))
+          const newExtraHeaders = [
+            [extraHeader].concat(groupHeaders)
+          ]
+          table.extraHeaders = (props.extraHeaders || []).concat(newExtraHeaders)
 
           // Transform data by grouping them with `commonValue`
           _data = Object.values(rowsByCommonValue).map(rows => {
@@ -411,7 +407,7 @@ Render.Method = function RenderMethod (Name) {
     case FIELD.RENDER.CURRENCY:
       return (val, index, {id, decimals = 2, symbol = '$', className, style, ...props} = {}) => (isNumeric(val)
           ? <Row className={className} style={style}>
-            <Text className='margin-right-smallest'>{symbol}</Text>
+            <Text className="margin-right-smallest">{symbol}</Text>
             {renderFloat(val, decimals, props)}
           </Row>
           : null
@@ -424,7 +420,7 @@ Render.Method = function RenderMethod (Name) {
       return (val, index, {id, decimals, className, style, ...props} = {}) => (isNumeric(val)
           ? <Row className={className} style={style}>
             {renderFloat(Number(val) * 100, decimals, props)}
-            <Text className='margin-left-smallest'>%</Text>
+            <Text className="margin-left-smallest">%</Text>
           </Row>
           : null
       )
@@ -443,13 +439,13 @@ Render.onError = ({err, errInfo, props}) => Active.store.dispatch(stateAction(PO
     {
       title: `${Render.name} Error!`,
       content: <View>
-        <Text className='h5'>{_.ERROR_MESSAGE}</Text>
-        <Text className='p'>{String(err)}</Text>
-        <Text className='h5 padding-top'>{_.DATA_CAUSING_ERROR}</Text>
+        <Text className="h5">{_.ERROR_MESSAGE}</Text>
+        <Text className="p">{String(err)}</Text>
+        <Text className="h5 padding-top">{_.DATA_CAUSING_ERROR}</Text>
         <View style={{textAlign: 'left'}}>
           <Json data={props}/>
         </View>
-        <Text className='h5 padding-top'>{_.ERROR_INFO}</Text>
+        <Text className="h5 padding-top">{_.ERROR_INFO}</Text>
         <View style={{textAlign: 'left'}}>
           <Json data={errInfo}/>
         </View>
