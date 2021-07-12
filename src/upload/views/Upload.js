@@ -38,6 +38,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
+ * todo: fix Dropzone opening upload window twice (try fast upload)
  * -----------------------------------------------------------------------------
  */
 @connect(mapStateToProps, mapDispatchToProps)

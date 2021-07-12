@@ -2,7 +2,7 @@ import { SevenBoom as Response } from 'graphql-apollo-errors'
 import { fileId, fileName, folderFrom, IMAGE } from 'modules-pack/variables'
 import mongoose from 'mongoose'
 import PromiseAll from 'promises-all'
-import { get, interpolateString, l, localiseTranslation, toJSON, toList, warn } from 'utils-pack'
+import { deleteProp, get, interpolateString, l, localiseTranslation, toJSON, toList, warn } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import { removeFile, sanitize, saveFile } from './file'
 import { resize } from './image'
@@ -92,7 +92,7 @@ export async function updateFiles ({
     files = files.map(fileInput => {
       if (fileInput.remove) {
         const fileID = fileId(fileInput)
-        fileInput.name = (oldFiles.find(oldInput => fileId(oldInput) === fileID) || {}).name
+        fileInput.name = (oldFiles.find(({kind, i, id}) => fileId({kind, i, id}) === fileID) || {}).name
       }
       return fileInput
     })
@@ -117,21 +117,22 @@ export async function updateFiles ({
 
   // Create/Update Files list for Updated/Removed Files
   if (resolve.length) {
-    if (oldFiles) output.result = [...oldFiles]
+    if (oldFiles.length) output.result = [...oldFiles]
     instance.markModified(field) // needed to update nested arrays in Mongoose
     const created = Date.now()
     const updated = Date.now()
     resolve.forEach(({path, removed, ...fileInput}) => {
-      if (fileInput.created == null) fileInput.created = created
       const fileID = fileId(fileInput) // a file can have different versions under the same ID
       if (removed) {
-        output.result = output.result.filter(oldInput => fileId(oldInput) !== fileID)
+        // @note: when iterating array of Mongoose sub-documents (nested Schemas), need to explicitly destruct all props
+        output.result = output.result.filter(({kind, i, id}) => fileId({kind, i, id}) !== fileID)
       } else if (path) {
-        const index = output.result.findIndex(oldInput => fileId(oldInput) === fileID)
+        const index = output.result.findIndex(({kind, i, id}) => fileId({kind, i, id}) === fileID)
         if (index > -1) {
           fileInput.updated = updated
           output.result[index] = fileInput
         } else {
+          fileInput.created = created
           output.result.push(fileInput)
         }
       }
@@ -176,6 +177,11 @@ export function filesUploaded ({
   return function (target, key, descriptor) {
     const func = descriptor.value
     descriptor.value = async function (...args) {
+      // Extract files from payload entry so it doesn't get assigned to instance
+      const [__, {entry}] = args
+      const files = toList(get(entry, field), 'clean')
+      deleteProp(entry, field)
+
       // If result is a Promise, resolve it, else use as is without resolving
       let instance = func.apply(this, args)
       instance = (instance instanceof Promise) ? (await instance) : instance
@@ -184,8 +190,6 @@ export function filesUploaded ({
         return Response.badImplementation(`@${filesUploaded.name} requires a Mongoose Document instance as return value`)
 
       // Simply save the instance, if no files uploaded
-      const [__, {entry}] = args
-      const files = toList(entry[field], 'clean')
       if (!files.length) return instance.save()
 
       // Validate FileInput before uploads

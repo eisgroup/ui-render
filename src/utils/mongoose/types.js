@@ -63,15 +63,15 @@ export const Color = {type: [Number], validate: isColor, default: undefined}
 export const CurrencySymbol = {type: String, enum: enumFrom(CURRENCY), default: undefined}
 export const Email = {type: String, validate: isEmail, set: toLowerCase}
 export const LanguageCode = {type: String, enum: enumFrom(LANGUAGE), default: undefined}
+// @note: when iterating array of Mongoose sub-documents (nested Schemas), need to explicitly destruct all props
+// example: files.filter(({kind, i, id}) => fileId({kind, i, id}) !== fileID)
 export const FileType = new Schema({
   // File src for frontend can be stored in db, or computed dynamically
   src: {
     type: String, get (v) {
       if (v != null) return v
-      // Prepend `version` query string to force clearing cache when User updates a file
       const folder = folderFrom(this.parent())
-      const version = this.updated || this.created || '0'
-      return `${resolvePath({folder, filename: fileName(this), workDir: UPLOAD.DIR}).path}?v=${version}`
+      return resolvePath({folder, filename: fileName(this), workDir: UPLOAD.DIR}).path
     }
   },
   kind: Mixed,

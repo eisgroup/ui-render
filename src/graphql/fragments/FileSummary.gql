@@ -2,4 +2,5 @@ fragment FileSummary on File {
     src
     kind
     i
+    name
 }

@@ -1,6 +1,5 @@
 fragment FileDetails on File {
     id
-    name
     creatorId
     created
     updated
