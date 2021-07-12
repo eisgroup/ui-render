@@ -92,3 +92,27 @@ export const meta = {
     // sort: '-year', // todo
   },
 }
+
+export const metaRequired = {
+  view: 'Table',
+  name: 'matrixTable',
+  headers: [
+    {
+      id: 'undiffRate',
+    },
+    {
+      id: 'smokerRate',
+    },
+    {
+      id: 'nonSmokerRate',
+    },
+  ],
+  group: {
+    by: { // required
+      id: 'tier', // required
+    },
+    header: { // required, common header to group items by
+      id: 'ageBand', // required
+    },
+  },
+}

@@ -18,6 +18,7 @@ import inputMeta from './examples/input_meta'
 import invalidArrayData from './examples/invalid-array_data'
 import invalidArrayMeta from './examples/invalid-array_meta'
 import listMeta from './examples/list_meta'
+import * as matrixTable from './examples/matrix_table'
 import piechartMeta from './examples/piechart_meta'
 import showIfCondition from './examples/showIf'
 import tabListMeta from './examples/tab-list_meta'
@@ -73,6 +74,18 @@ const examples = [
     id: 'tableVertical',
     data: listData,
     meta: tableVerticalMeta,
+  },
+  {
+    title: 'Table with Matrix Data',
+    id: 'tableMatrix',
+    data: matrixTable.data,
+    meta: matrixTable.meta,
+  },
+  {
+    title: 'Table with Matrix Data (minimum required config)',
+    id: 'tableMatrixRequired',
+    data: matrixTable.data,
+    meta: matrixTable.metaRequired,
   },
   {
     title: 'Pie Chart',

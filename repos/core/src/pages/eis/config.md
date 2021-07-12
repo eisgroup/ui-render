@@ -262,6 +262,15 @@ const Component = {
       },
     }
   ],
+  group: { // matrix table data grouping
+    by: { // required, common attribute for repeating set of items
+      id: 'tier', // required
+      label: Object, // must resolve to object of labels by `tier` value (ex. {"employee": "Employee/Spouse"})
+    }, 
+    header: { // required, common header to group items by
+      id: 'ageBand', // required
+    },
+  },
 
   // Pie Chart attributes
   mapItems: Object, // data mapper key/value pairs (ex. {label: 'pieLabelKeyFromData', value: 'pieValueKeyFromData'}

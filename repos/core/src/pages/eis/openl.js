@@ -4,9 +4,8 @@ import ScrollView from 'react-ui-pack/ScrollView'
 import Text from 'react-ui-pack/Text'
 import Render from 'ui-renderer'
 import { logRender } from 'utils-pack'
-// import data from './examples/_data'
-// import meta from './examples/_meta'
-import { data, meta } from './examples/matrix_table'
+import data from './examples/_data'
+import meta from './examples/_meta'
 import { withUISetup } from './rules'
 
 // console.warn(toJSON(meta))
