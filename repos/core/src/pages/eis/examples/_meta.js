@@ -55,12 +55,12 @@ export default {
                   {
                     colSpan: 2,
                     label: 'Total',
-                    styles: 'center border-right',
+                    className: 'center border-right',
                   },
                   {
                     colSpan: 2,
                     label: 'Average',
-                    styles: 'center',
+                    className: 'center',
                   }
                 ]
               ],

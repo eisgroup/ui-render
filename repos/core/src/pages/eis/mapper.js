@@ -39,7 +39,9 @@ import {
   isObject,
   isString,
   isTruthy,
-  TIME_DURATION_INSTANT
+  TIME_DURATION_INSTANT,
+  toFlatList,
+  toJSON
 } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 
@@ -189,8 +191,63 @@ Render.Component = function RenderComponent ({
     }
 
     case FIELD.TYPE.TABLE: {
-      const {extraItems, filterItems, parentItem, ...table} = props
+      const {extraItems, filterItems, parentItem, group, ...table} = props
       if (!isList(_data)) _data = []
+
+      // Matrix table headers and data transform
+      if (group) {
+        // `header` must exist as a single object, otherwise there is no way to group tables
+        const {by: {id, label, renderLabel, ...groupByProps}, header, extraHeader = {}} = group
+        if (!header || header.id == null)
+          throw new Error(`${view}.group.header must have 'id', got '${toJSON(header)}'`)
+
+        // First, check data to determine headers
+        const groupsByValue = {}
+        const rowsByCommonValue = {}
+        for (const row of _data) {
+          const {[id]: groupId, [header.id]: commonValue} = row
+          if (groupId != null) groupsByValue[groupId] = groupId
+          if (commonValue != null) rowsByCommonValue[commonValue] = [...(rowsByCommonValue[commonValue] || []), row]
+        }
+        const groupIds = Object.values(groupsByValue)
+        if (groupIds.length) {
+
+          // Transform headers
+          const _headers = (props.headers || [])
+          const newHeaders = toFlatList(groupIds.map(_id => _headers.map(({id, ...h}) => ({id: `${id}_${_id}`, ...h}))))
+          table.headers = [header].concat(newHeaders)
+
+          // Label grouped tables
+          if (label != null) {
+            if (!hasObjectValue(label))
+              throw new Error(`${view}.group.by.label must resolve to object of labels by id 'value', got '${toJSON(label)}'`)
+            const groupHeaders = groupIds.map(id => ({
+              colSpan: _headers.length,
+              label: renderLabel ? renderLabel(label[id]) : label[id],
+              ...groupByProps,
+            }))
+            const newExtraHeaders = [
+              [extraHeader].concat(groupHeaders)
+            ]
+            table.extraHeaders = (props.extraHeaders || []).concat(newExtraHeaders)
+          }
+
+          // Transform data by grouping them with `commonValue`
+          _data = Object.values(rowsByCommonValue).map(rows => {
+            const item = {}
+            rows.forEach(row => {
+              const {[id]: groupId, [header.id]: commonValue, ..._item} = row
+              item[header.id] = commonValue
+              for (const key in _item) {
+                item[`${key}_${groupId}`] = _item[key]
+              }
+            })
+            return item
+          })
+        }
+      }
+
+      // Mixed array nested table data filtering
       if (filterItems && parentItem) {
         _data = _data.filter(item => {
           return !filterItems.find(filter => {
@@ -202,6 +259,8 @@ Render.Component = function RenderComponent ({
           })
         })
       }
+
+      // Table with custom rows
       if (extraItems) _data = _data.concat(extraItems.map(item => {
         for (const id in item) {
           const definition = item[id]
