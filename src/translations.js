@@ -27,7 +27,8 @@ import { localiseTranslation } from './definitions'
  */
 export const _ = new Proxy(localiseTranslation.instance, {
   get (target, prop) {
-    return target[prop] || target.UNTRANSLATED
+    if (prop === 'queriedById') return localiseTranslation.queriedById
+    return localiseTranslation.queriedById[prop] = (target[prop] || target.UNTRANSLATED)
   }
 })
 localiseTranslation({
