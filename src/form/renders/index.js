@@ -1,11 +1,6 @@
-import classNames from 'classnames'
 import { FIELD } from 'modules-pack/variables'
-import PropTypes from 'prop-types'
-import React, { PureComponent } from 'react'
-import { withGroupInputChange } from 'react-ui-pack'
-import Label from 'react-ui-pack/Label'
+import React from 'react'
 import { PlaceholderField } from 'react-ui-pack/PlaceholderField'
-import Row from 'react-ui-pack/Row'
 import { Active } from 'utils-pack'
 import {
   DateField,
@@ -18,6 +13,7 @@ import {
   UploadGridsField
 } from '../inputs'
 import Fields from './Fields'
+import FieldsInGroup from './FieldsInGroup'
 import FieldsWithLevel from './FieldsWithLevel'
 import { SliderLabeled } from './renderers'
 
@@ -28,29 +24,6 @@ import { SliderLabeled } from './renderers'
  */
 
 export * from './renderers'
-
-/**
- * Semantically Related Fields Rendered in a single row
- */
-@withGroupInputChange
-export class FieldsInGroup extends PureComponent {
-  static propTypes = {
-    hint: PropTypes.string, // label to show at the top before rendering fields,
-  }
-
-  // RENDERS -------------------------------------------------------------------
-  render () {
-    const {hint, className, style} = this.props
-    return (
-      <>
-        {hint && <Label>{hint}</Label>}
-        <Row className={classNames('fields-in-group top justify', className)} style={style}>
-          {this.fields.map(renderField)}
-        </Row>
-      </>
-    )
-  }
-}
 
 /**
  * Dynamic Field Renderer based on given Field attributes
@@ -68,8 +41,8 @@ export function renderField (fieldDefinition, i) {
     case FIELD.TYPE.INPUT:
       Field = InputField
       break
-    case FIELD.TYPE.SELECT:
     case FIELD.TYPE.DROPDOWN:
+    case FIELD.TYPE.SELECT:
       Field = DropdownField
       break
     case FIELD.TYPE.DATE:

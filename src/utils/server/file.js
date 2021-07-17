@@ -49,7 +49,7 @@ export function read ({options = 'utf8', workDir = _WORK_DIR_, ...filePath}) {
  *
  * @param {Object} stream - of file buffer, the result of createReadStream(absoluteFilePath)
  * @param {Object<filename, folder, dir, path>} filePath - see `resolvePath()` arguments
- * @param {Object} [read] - read pipeline to use before `transform`
+ * @param {Object} [read] - pipeline to use before `transform`
  * @param {Object} [transform] - pipeline to use before saving file (e.x. transform = sharp().resize(width, height))
  * @returns {Promise<Object>} {path, name} - to file saved if successful, else error
  */
