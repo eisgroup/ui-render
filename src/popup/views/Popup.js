@@ -5,12 +5,29 @@ import ErrorContent from 'react-ui-pack/ErrorContent'
 import Row from 'react-ui-pack/Row'
 import Text from 'react-ui-pack/Text'
 import View from 'react-ui-pack/View'
-import { CLOSE, hasListValue, isInList, logRender } from 'utils-pack'
+import { CLOSE, hasListValue, isInList, l, localiseTranslation, logRender } from 'utils-pack'
+import { _ } from 'utils-pack/translations'
 import { connect } from '../../redux'
 import { stateAction } from '../../redux/actions'
 import { POPUP, POPUP_ALERT, POPUP_CONFIRM, POPUP_ERROR } from '../constants'
 import select from '../selectors'
 
+localiseTranslation({
+  CANCEL: {
+    [l.ENGLISH]: 'Cancel',
+  },
+  CONFIRM: {
+    [l.ENGLISH]: 'Confirm',
+  },
+  CONFIRM_ACTION: {
+    [l.ENGLISH]: 'Confirm Action',
+    // [l.RUSSIAN]: 'Подтвердите Действие',
+  },
+  ERROR_excMark: {
+    [l.ENGLISH]: 'Error!',
+    // [l.RUSSIAN]: 'Ошибка!',
+  },
+})
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
  * -----------------------------------------------------------------------------
@@ -68,7 +85,7 @@ export default class Popup extends PureComponent {
                     <Text className='app__popup__box__body p center'>{content}</Text>
                   </View>
                   <View className='app__popup__box__footer center'>
-                    <Button onClick={closeAlert} className='primary'>{closeLabel || 'Ok'}</Button>
+                    <Button onClick={closeAlert} className="primary">{closeLabel || _.OK}</Button>
                   </View>
                 </Fragment>
               ))}
@@ -80,17 +97,17 @@ export default class Popup extends PureComponent {
                 <Fragment key={id || index}>
                   <View>
                     <View className='app__popup__box__header'>
-                      <Text className='app__popup__box__header__title'>{title || 'Confirm Action'}</Text>
+                      <Text className="app__popup__box__header__title">{title || _.CONFIRM_ACTION}</Text>
                     </View>
                     <Text className='app__popup__box__body p center'>{content}</Text>
                   </View>
                   <Row className='app__popup__box__footer center'>
                     <Button onClick={closeConfirm}
-                            className='basic grey margin-smaller'>{cancelLabel || 'No'}</Button>
+                            className="basic grey margin-smaller">{cancelLabel || _.CANCEL}</Button>
                     <Button onClick={() => {
                       closeConfirm()
                       action(id)
-                    }} className={'margin-smaller ' + confirmClass}>{confirmLabel || 'Yes'}</Button>
+                    }} className={'margin-smaller ' + confirmClass}>{confirmLabel || _.CONFIRM}</Button>
                   </Row>
                 </Fragment>
               ))}
@@ -99,7 +116,7 @@ export default class Popup extends PureComponent {
             {hasError &&
             <View>
               <View className='app__popup__box__header'>
-                <Text className='app__popup__box__header__title'>{error.title || `Error!`}</Text>
+                <Text className="app__popup__box__header__title">{error.title || _.ERROR_excMark}</Text>
               </View>
               <View className='app__popup__box__body'>
                 <ErrorContent items={error.items} {...props}/>

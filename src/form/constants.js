@@ -91,6 +91,7 @@ FIELD.DEF = {
 }
 
 // Field props
+export const allowAdditions = true
 export const stickyPlaceholder = true
 export const lefty = true
 export const disabled = true

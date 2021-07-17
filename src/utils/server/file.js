@@ -49,21 +49,23 @@ export function read ({options = 'utf8', workDir = _WORK_DIR_, ...filePath}) {
  *
  * @param {Object} stream - of file buffer, the result of createReadStream(absoluteFilePath)
  * @param {Object<filename, folder, dir, path>} filePath - see `resolvePath()` arguments
+ * @param {Object} [read] - read pipeline to use before `transform`
  * @param {Object} [transform] - pipeline to use before saving file (e.x. transform = sharp().resize(width, height))
  * @returns {Promise<Object>} {path, name} - to file saved if successful, else error
  */
-export async function saveFile ({stream, transform, ...filePath}) {
+export async function saveFile ({stream, read, transform, ...filePath}) {
   const {dir, path, name} = resolvePath(filePath)
   const {error} = await makeDirectory(dir)
   if (error) throw new Error(error)
 
   return new Promise((resolve, reject) => {
-    let file = stream
-      .on('error', error => {
-        if (stream.truncated) fs.unlinkSync(path) // Delete the truncated file.
-        reject(error)
-      })
-    if (transform) file = file.pipe(transform)
+      let file = stream
+        .on('error', error => {
+          if (stream.truncated) fs.unlinkSync(path) // Delete the truncated file.
+          reject(error)
+        })
+      if (read) file = file.pipe(read)
+      if (transform) file = file.pipe(transform)
       return file.pipe(fs.createWriteStream(path))
         .on('error', error => reject(error))
         .on('finish', () => resolve({path, name}))

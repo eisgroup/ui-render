@@ -1,11 +1,11 @@
 import { SevenBoom as Response } from 'graphql-apollo-errors'
-import { fileId, fileName, folderFrom, IMAGE } from 'modules-pack/variables'
+import { FILE, fileId, fileName, folderFrom, IMAGE } from 'modules-pack/variables'
 import mongoose from 'mongoose'
 import PromiseAll from 'promises-all'
-import { deleteProp, get, interpolateString, l, localiseTranslation, toJSON, toList, warn } from 'utils-pack'
+import { deleteProp, get, interpolateString, l, localiseTranslation, set, toJSON, toList, warn } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import { removeFile, sanitize, saveFile } from './file'
-import { resize } from './image'
+import { imgMeta, resize } from './image'
 
 /**
  * UPLOAD PROCESS HELPERS ======================================================
@@ -39,7 +39,7 @@ localiseTranslation({
  * @param {String} [name] - existing file `name` to remove, required to resolvePath()
  * @param {String[]} [mimetypes] - allowed file types
  * @param {Object} [filePath] - options to pass to `saveFile()` or `removeFile()`
- * @returns {Promise<path...>|Promise<removed...>} - given FileInput props with saved `path` and `name`,
+ * @returns {Promise<path...>|Promise<removed...>} - given FileInput props with saved `path`, `name`, and optional `metaData`
  *   - or `removed` boolean
  *   - or error if unsuccessful
  */
@@ -56,11 +56,20 @@ export async function uploadFile ({file, remove, mimetypes, ...fileInput}, fileP
   if (mimetypes && !mimetypes.includes(mimetype))
     throw Response.badRequest(interpolateString(_.INVALID_FILE_TYPE_mimetype, {mimetype}))
 
+  // Always resize the image using Sharp, so sharp can optimize and sanitize it, even if resizing is not needed
   const stream = createReadStream()
-  const result = await saveFile({stream, transform: resize(), filename: fileName({...fileInput, name}), ...filePath})
+  const options = {stream, filename: fileName({...fileInput, name}), ...filePath}
+  if (IMAGE.MIME_TYPES.includes(mimetype)) {
+    options.metaData = {format: FILE.SHARP_FORMAT_BY_MIME_TYPE[mimetype]}
+    options.read = imgMeta(options.metaData)
+    options.transform = resize(options.metaData)
+  }
+  const result = await saveFile(options)
   if (!result.path)
     throw Response.badRequest(interpolateString(_.UPLOAD_FILE_ERROR_error, {error: result}))
-  return {...fileInput, ...result, name: sanitize(name)} // `name` is for UI, does not match `path` for the actual file
+  // @note: - `name` is for UI, does not match `path` for the actual file
+  //        - `metaData` is from the original file, the actual width/height may be smaller (i.e. VALIDATE.IMAGE_MAX_RES)
+  return {...fileInput, ...options.metaData, ...result, name: sanitize(name)}
 }
 
 // noinspection JSUnresolvedVariable
@@ -109,8 +118,9 @@ export async function updateFiles ({
   // For failed uploads, simply ignore.
   if (reject.length) {
     // To simplify UI, we will not throw error, because it may be
-    // caused by uploading, then removing file too quickly,
-    // which causes unlink error for non-existing file path
+    // caused by uploading, then removing file, then uploading another file and save.
+    // The server then uploads successfully another file, but fails to remove the not-yet uploaded file,
+    // which causes unlink error for non-existing file path.
     warn(`❌ ${uploadFile.name}() has error ${toJSON(reject, null, 2)}`)
     output.errors = reject
   }
@@ -130,7 +140,7 @@ export async function updateFiles ({
         const index = output.result.findIndex(({kind, i, id}) => fileId({kind, i, id}) === fileID)
         if (index > -1) {
           fileInput.updated = updated
-          output.result[index] = fileInput
+          output.result[index] = Object.assign(output.result[index], fileInput)
         } else {
           fileInput.created = created
           output.result.push(fileInput)
@@ -165,6 +175,7 @@ export async function updateFiles ({
  * @param {String} [field] - path to files field as defined in given model instance
  * @param {*[]} [kinds] - allowed file kinds
  * @param {*[]} [is] - allowed file identifiers
+ * @param {Function} [update<{instance, files}>] - custom callback to update instance with uploaded files
  * @param {Object<[folder], [dir], [limit], [mimetypes]>} [options] - custom upload configs, see `updateFiles` arguments
  * @returns {Function} decorator - that handles files upload/update/delete with all validations required
  */
@@ -172,6 +183,7 @@ export function filesUploaded ({
   field = 'files',
   kinds,
   is,
+  update,
   ...options
 } = {}) {
   return function (target, key, descriptor) {
@@ -210,7 +222,11 @@ export function filesUploaded ({
       // todo: test returning array of promises with errors
       // @see: https://stackoverflow.com/questions/67378814/apollo-server-throw-multiple-errors-with-partial-data
       const {result, errors} = await updateFiles({instance, files, field, ...options})
-      instance[field] = result
+      if (update) {
+        update({instance, files: result})
+      } else {
+        set(instance, field, result)
+      }
       return instance.save()
     }
     return descriptor
