@@ -65,15 +65,7 @@ export const Email = {type: String, validate: isEmail, set: toLowerCase}
 export const LanguageCode = {type: String, enum: enumFrom(LANGUAGE), default: undefined}
 // @note: when iterating array of Mongoose sub-documents (nested Schemas), need to explicitly destruct all props
 // example: files.filter(({kind, i, id}) => fileId({kind, i, id}) !== fileID)
-export const FileType = new Schema({
-  // File src for frontend can be stored in db, or computed dynamically
-  src: {
-    type: String, get (v) {
-      if (v != null) return v
-      const folder = folderFrom(this.parent())
-      return resolvePath({folder, filename: fileName(this), workDir: UPLOAD.DIR}).path
-    }
-  },
+const file = {
   kind: Mixed,
   i: Mixed,
   id: {...Id, default: undefined},
@@ -82,8 +74,23 @@ export const FileType = new Schema({
   created: Timestamp,
   updated: Timestamp,
   _id: false,
-}, {timestamps: false, default: undefined})
+  // File src for frontend can be stored in db, or computed dynamically
+  src: {
+    type: String, get (v) {
+      if (v != null) return v
+      const folder = folderFrom(this.parent())
+      return resolvePath({folder, filename: fileName(this), workDir: UPLOAD.DIR}).path
+    }
+  },
+}
+export const FileType = new Schema(file, {timestamps: false, default: undefined})
 export const Files = {type: [FileType], default: undefined}
+export const Img = new Schema({
+  ...file,
+  width: Number,
+  height: Number,
+}, {timestamps: false, default: undefined})
+export const Imgs = {type: [Img], default: undefined}
 export const Location = new Schema({
   lat: {type: Number, required},
   lng: {type: Number, required},

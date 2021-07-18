@@ -15,7 +15,7 @@ assertBackend()
  *
  * @param {Number} width - maximum width
  * @param {Number} [height] - maximum height
- * @param {String} [fit] - sharp option
+ * @param {String} [fit] - sharp option, see https://sharp.pixelplumbing.com/api-resize
  * @param {String} [format] - sharp file extension in lowercase
  * @returns {Sharp} - transform pipeline
  */

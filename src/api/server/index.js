@@ -1,7 +1,7 @@
 import { API_SEVER } from '../constants'
+import schema from '../schema.gql'
 import Model from './models'
 import resolver from './resolvers'
-import schema from './schema.gql'
 
 /**
  * EXPORTS =====================================================================

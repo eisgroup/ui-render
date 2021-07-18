@@ -1,18 +1,12 @@
 import { GraphQLScalarType } from 'graphql'
 import JSON from 'graphql-type-json'
 import { Kind } from 'graphql/language'
-import {
-  fileSrc,
-  gqlDynamicObjType,
-  gqlEnumType,
-  gqlTagLevelType,
-  Response
-} from 'modules-pack/graphql/server/resolver'
 import { PERMISSION, PHONE } from 'modules-pack/variables'
 import { isGoodPassword, isId, isPhoneNumber, LANGUAGE, LANGUAGE_LEVEL } from 'utils-pack'
 import { toRgbaColor } from 'utils-pack/color'
 import { toTimestamp } from 'utils-pack/time'
 import isEmail from 'validator/lib/isEmail'
+import { gqlDynamicObjType, gqlEnumType, gqlTagLevelType, Response } from './resolver'
 
 /**
  * COMMON TYPE RESOLVERS =======================================================
@@ -101,9 +95,6 @@ export default {
   LanguageLevelRange,
   Color,
   JSON,
-  File: {
-    src: fileSrc
-  },
   Query: {
     cursor: (_, __, {res}) => {
       return res.cursor || {}

@@ -144,15 +144,16 @@ export function resolvePath ({filename = '', folder = '', dir = '', path = '', w
 }
 
 /**
- * Parse <UploadGrid/> onChange(files) values to match Backend API
+ * Parse <UploadGridField/> onChange(files) values to match Backend API
  * @param {FileInput[]|FileInput} files - single or list of FileInputs to parse
- * @returns {Object} {file, kind, i, remove}[] - single or list of FileInputs for backend
+ * @returns {Object[]|Object|void} {file, kind, i, remove}[] - single or list of FileInputs for backend
  */
 export function fileParser (files) {
   if (isList(files)) {
-    return files.map(fileParser)
+    const list = files.map(fileParser).filter(v => v)
+    if (list.length) return list
   } else {
     const {file, kind, i, remove} = files
-    return {file, kind, i, remove}
+    if (file || remove) return {file, kind, i, remove}
   }
 }
