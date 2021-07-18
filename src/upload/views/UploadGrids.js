@@ -22,6 +22,8 @@ export default class UploadGrids extends Component {
       name: type.GetterString.isRequired, // localised label for the kind
       types: type.ListOf(type.Definition), // localised labels for file types of the kind
     }).isRequired).isRequired,
+    // For direct nested FileType object as field, use `FieldsInGroup` with `items` being <UploadGridField/>
+    initialValues: type.ListOf(type.FileInput),
     // other <UploadGrid/> ...props to be passed down (only one kind of UploadGrid is rendered at any time)
   }
 
@@ -65,22 +67,24 @@ export default class UploadGrids extends Component {
   }
 
   render () {
-    const {kinds, label, className, style, onChange: _, onChangeLast: __, ...props} = this.props
+    const {kinds, label, className, style, onChange: _, onChangeLast: __, centerTabs, ...props} = this.props
     const {files} = this.state
     return (
       <View className={classNames('input--wrapper', className)} style={style}>
         {label && <Label>{label}</Label>}
         <Tabs
-          centerTabs
+          centerTabs={centerTabs}
           tabs={kinds.map(k => k.name)}
           panels={kinds.map(({_, types}) => () => (
             <UploadGrid
               {...props}
-              // key={_} // do not add key to avoid unmounting
+              // key={_} // do not add key to avoid unmounting, which causes layout shift
+              // Component updates between tab changes by having different initialValues
               kind={_}
               types={types}
               initialValues={files.filter(f => f.kind === _)}
               onChangeLast={this.handleChange}
+              multiple // ensure value is always stored as list, if `types` only has one definition
             />
           ))}
         />

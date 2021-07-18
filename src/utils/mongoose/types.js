@@ -70,7 +70,7 @@ const file = {
   i: Mixed,
   id: {...Id, default: undefined},
   name: {type: String, maxLength: VALIDATE.FILE_NAME_MAX_LENGTH}, // filename gets sanitized during upload
-  creatorId: {...Id, default: undefined},
+  creatorId: {...Id, default: undefined}, // cannot use foreign key here because we don't know model type
   created: Timestamp,
   updated: Timestamp,
   _id: false,

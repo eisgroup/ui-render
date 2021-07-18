@@ -12,7 +12,7 @@ import Square from 'react-ui-pack/Square'
 import Text from 'react-ui-pack/Text'
 import { cssBgImageFrom } from 'react-ui-pack/utils'
 import View from 'react-ui-pack/View'
-import { by, isEqual, OPEN } from 'utils-pack'
+import { by, isEqual, OPEN, toList } from 'utils-pack'
 import { _ } from '../translations'
 import Upload from './Upload'
 
@@ -69,11 +69,13 @@ export default class UploadGrid extends Component {
      *  we won't be able to collect the list of all uploaded/deleted/edited files since previous 'save' submission,
      *  since form input `value` will always be in sync with current component state.
      */
-    initialValues: type.ListOf(type.FileInput),
+    initialValues: type.OneOf(type.ListOf(type.FileInput), type.FileInput),
     // Callback when files change, receives list of all changed files since initialization
     onChange: PropTypes.func,
     // Callback when files change, receives list of last changed files as argument, will not call `onChange` if given
     onChangeLast: PropTypes.func,
+    // Whether to store values as list, even if count = 1, ignored if `count > 1` or `types` are defined
+    multiple: type.Boolean,
     // Number of files that can be uploaded, ignored if `types` are defined
     count: PropTypes.number,
     // Explicitly define identifiers for each upload in the grid
@@ -107,14 +109,13 @@ export default class UploadGrid extends Component {
     autoClean: true,
     count: 1,
     loading: false,
-    initialValues: [],
     iconUpload: 'plus-circle',
     iconRemove: 'cross-circle',
   }
 
   // Internal state synced with props for rendering temporary UI changes and keeping track of current files
   state = {
-    files: this.props.initialValues
+    files: toList(this.props.initialValues, 'clean')
   }
 
   // @Note: for file uploads, we don't want to resubmit unchanged files, thus only changed values need to be tracked.
@@ -157,7 +158,7 @@ export default class UploadGrid extends Component {
   UNSAFE_componentWillReceiveProps (nextProps, _) {
     if (!isEqual(this.props.initialValues, nextProps.initialValues)) {
       this.changedValues = {}
-      this.setState({files: nextProps.initialValues})
+      this.setState({files: toList(nextProps.initialValues, 'clean')})
     }
   }
 
@@ -206,8 +207,9 @@ export default class UploadGrid extends Component {
    * @param {Array<Object<i, remove, file>>} changedFiles - list of changed files of type.FileInput
    */
   updateFiles = (files, changedFiles) => {
-    const {onChange, onChangeLast} = this.props
+    const {onChange, onChangeLast, multiple} = this.props
     const count = this.count
+    const isArray = count > 1 || multiple
     changedFiles.forEach(file => {
       const {src, kind, i} = file
       this.cachedFiles[src] = file
@@ -215,9 +217,9 @@ export default class UploadGrid extends Component {
     })
     this.setState({files: this.isIncremental ? files.sort(by('i')).filter(f => f.i < count) : files})
     if (onChangeLast) {
-      onChangeLast(changedFiles)
+      onChangeLast(isArray ? changedFiles : changedFiles[0])
     } else if (onChange) {
-      onChange(Object.values(this.changedValues))
+      onChange(isArray ? Object.values(this.changedValues) : changedFiles[0])
     }
   }
 

@@ -18,6 +18,10 @@ localiseTranslation({
     [l.ENGLISH]: 'File Upload Failed!',
     // [l.RUSSIAN]: 'Ошибка Загрузки Файла!',
   },
+  FORMAT: {
+    [l.ENGLISH]: 'Format',
+    // [l.RUSSIAN]: 'Формат',
+  },
   MAXIMUM_FILE_SIZE_EXCEEDED: {
     [l.ENGLISH]: 'Maximum File Size Exceeded!',
     // [l.RUSSIAN]: 'Превышен Максимальный Размер Файла!',
@@ -38,6 +42,11 @@ localiseTranslation({
     // as verb
     [l.ENGLISH]: 'Upload',
     // [l.RUSSIAN]: 'Загрузите',
+  },
+  UPLOAD_file: {
+    // as verb
+    [l.ENGLISH]: 'Upload {file}',
+    // [l.RUSSIAN]: 'Загрузите {file}',
   },
   UPLOADED: {
     // as verb

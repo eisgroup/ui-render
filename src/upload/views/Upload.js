@@ -12,7 +12,19 @@ import Row from 'react-ui-pack/Row'
 import Text from 'react-ui-pack/Text'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
-import { capitalize, get, hasListValue, isFunction, log, OPEN, pluralize, SET, shortNumber, SIZE_KB } from 'utils-pack'
+import {
+  capitalize,
+  get,
+  hasListValue,
+  interpolateString,
+  isFunction,
+  log,
+  OPEN,
+  pluralize,
+  SET,
+  shortNumber,
+  SIZE_KB
+} from 'utils-pack'
 import { UPLOAD } from '../constants'
 import select from '../selectors'
 import { _ } from '../translations'
@@ -166,7 +178,7 @@ export default class Upload extends PureComponent {
     return (
       <View className={classNames('app__upload', {round})}>
         {type == null && this.renderClose()}
-        {hasHeader && <h2>{`${_.UPLOAD} ${capitalize(label) || _.FILE}`}</h2>}
+        {hasHeader && <h2>{interpolateString(_.UPLOAD_file, {file: capitalize(label || _.FILE)})}</h2>}
         <Dropzone
           // @note: When tabbing to dropzone with keyboard, input[type="file"] also gets event -> causing open twice.
           //      => input is hidden by dropzone because it has ugly "Choose File" button
@@ -192,11 +204,11 @@ export default class Upload extends PureComponent {
           </Fragment>
           }
           {showTypes &&
-          <View className='position-fill align-center appear-on-hover'>
-            <View className='padding text-outline'>
-              <View className='position-fill bg-neutral radius-large' style={{opacity: 0.8}}/>
-              <Text className='margin-bottom-smaller'>{_.FILE}</Text>
-              <Text className='bold p'>{fileTypes}</Text>
+          <View className="position-fill align-center appear-on-hover">
+            <View className="padding text-outline">
+              <View className="position-fill bg-neutral radius-large" style={{opacity: 0.8}}/>
+              <Text className="margin-bottom-smaller">{_.FORMAT}</Text>
+              <Text className="bold p">{fileTypes.replace(/\./g, '')}</Text>
             </View>
           </View>
           }

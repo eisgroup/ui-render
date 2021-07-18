@@ -90,7 +90,7 @@ export function asField (InputComponent, {sanitize} = {}) {
       // Input `name` attribute
       name: PropTypes.string.isRequired,
       // Instance of the Class component decorated withFormSetup (i.e withForm)
-      instance: PropTypes.object.isRequired,
+      instance: PropTypes.object,
       label: PropTypes.any,
       id: PropTypes.string,
       // HTML Input type attribute
@@ -128,7 +128,8 @@ export function asField (InputComponent, {sanitize} = {}) {
       // => the best logic is to change input value after it unmounts, and call `onChange` to update parent state,
       //    because this avoids validation, ties all operations together and persists `state.hasInputChanges`.
       const {instance, name, onChange} = this.props
-      setTimeout(() => { // @note: it's too complex to have conditional check whether form is resetting, so run always
+      // @note: it's too complex to have conditional check whether form is resetting, so run always
+      if (instance) setTimeout(() => {
         // only call this if the form is not unmounted
         const form = instance.form
         if (!form || !form.getRegisteredFields().length) return
@@ -381,8 +382,8 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
     this._fields = fieldsFrom(FIELDS, {initialValues})
     if (fieldsSetup) this._fields = this._fields.map(fieldsSetup)
     return this._fields
-      .map(({id, ...field}) => ({ // convert id to key just before rendering, to prevent unmounts on form.reset()
-        key: id,
+      .map(({id, ...field}, i) => ({ // convert id to key just before rendering, to prevent unmounts on form.reset()
+        key: `${id}_${field.name || i}`,
         ...field,
         onChange: (...args) => {
           field.onChange && field.onChange(...args)

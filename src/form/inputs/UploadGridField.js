@@ -4,7 +4,7 @@ import React from 'react'
 
 /**
  * Upload Grid Field connected with react-final-form or redux-form.
- * @note: use `parse: fileParser` when defining form input, and processing mutation variables.
+ * @note: use `fileParser` for processing mutation variables.
  * @example: // requests.js
  *    if (entry.files) entry.files = fileParser(entry.files)
  *
@@ -14,4 +14,4 @@ import React from 'react'
  * - When user removes or updates a file, form value changes to list of only updated files.
  *   => this is fine because backend only updates given files, others remain unchanged.
  */
-export default asField(UploadGrid, {sanitize: (value) => value || []})
+export default asField(UploadGrid, {sanitize: (value) => value || undefined})

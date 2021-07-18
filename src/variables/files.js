@@ -1,5 +1,5 @@
 import { FILE as _FILE } from 'react-ui-pack/files'
-import { _WORK_DIR_, ENV, fileExtensionNormalized, fileNameWithoutExt, isList, SIZE_MB_16, SIZE_MB_2 } from 'utils-pack'
+import { _WORK_DIR_, ENV, fileExtensionNormalized, fileNameWithoutExt, isList, SIZE_MB_16 } from 'utils-pack'
 
 /**
  * FILE VARIABLES ==============================================================
@@ -50,7 +50,7 @@ FILE.SHARP_FORMAT_BY_MIME_TYPE = {
 }
 
 export const IMAGE = {
-  MAX_RES: 1200,
+  MAX_RES: SIZE_MB_16, // total Image width*height resolution limit (16 MB is about 4K image)
   EXTENSIONS: [FILE.EXT.JPG, FILE.EXT.JPEG, FILE.EXT.PNG, FILE.EXT.SVG, FILE.EXT.GIF, FILE.EXT.WEBP],
   MIME_TYPES: [FILE.MIME_TYPE.JPG, FILE.MIME_TYPE.PNG, FILE.MIME_TYPE.SVG, FILE.MIME_TYPE.GIF, FILE.MIME_TYPE.WEBP],
 }
@@ -59,7 +59,7 @@ export const UPLOAD = {
   DIR: `/uploads`, // relative to site's root for frontend, and _WORK_DIR_ for backend
   BY_ROUTE: {
     [FILE.TYPE.JSON]: {fileTypes: '.json', maxSize: SIZE_MB_16},
-    [FILE.TYPE.IMAGE]: {fileTypes: '.' + IMAGE.EXTENSIONS.join(' .'), maxSize: SIZE_MB_2},
+    [FILE.TYPE.IMAGE]: {fileTypes: '.' + IMAGE.EXTENSIONS.join(', .'), maxSize: SIZE_MB_16},
     [FILE.TYPE.SOUND]: {fileTypes: '.mp3', maxSize: SIZE_MB_16},
     [FILE.TYPE.VIDEO]: {fileTypes: '.mp4', maxSize: SIZE_MB_16},
   },
