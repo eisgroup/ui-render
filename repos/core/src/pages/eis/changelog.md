@@ -1,4 +1,18 @@
 ### Table of Contents
+
+### v0.24.0
+#### New Features
+- [FAQ: **How to check UI Render Version**](/docs/faq)
+- [Example: **Matrix Table** configuration](/docs/examples#tableMatrix) (+ minimum config provided)
+- [Example: **showEmptyAs** attribute for Table](/docs/examples#tableExtraItems) (see 'Table with Custom Data' example)
+- **onClickIcon** callback added for Dropdown to remove/delete Select field
+- localised validation messages
+
+#### Fixes
+- Multiple Form instances for UI Render on the same page
+- **readonly** state for all form fields no longer hides the input
+- **onRemove** Input Field sets form value to null for the Input
+  
 ### v0.23.1
 #### Changes
 - **showIf** can be empty object. The logic works like this:

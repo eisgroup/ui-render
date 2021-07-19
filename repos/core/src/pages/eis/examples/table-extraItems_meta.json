@@ -1,0 +1,32 @@
+{
+  "view": "Table",
+  "name": "no_data_exists",
+  "showEmptyAs": "😀",
+  "headers": [
+    {
+      "id": "tier"
+    },
+    {
+      "id": "formulaRate"
+    },
+    {
+      "id": "proposedRate"
+    }
+  ],
+  "extraItems": [
+    {
+      "tier": "Composite Rate",
+      "formulaRate": {
+        "view": "Input",
+        "name": "coverages.{state.active.plan,0}.rate",
+        "relativeData": false,
+        "type": "number",
+        "unit": "USD"
+      },
+      "proposedRate": {
+        "name": "coverages.{state.active.plan,0}.proposedRate",
+        "relativeData": false
+      }
+    }
+  ]
+}
