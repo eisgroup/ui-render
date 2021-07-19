@@ -458,7 +458,7 @@ export function toPercentage(newNumber, baseNumber) {
  * @param {Number} [decimals] - number of digits to show after the dot
  * @returns {String} percentage - formatted string with set decimal places and '%', or empty string
  */
-export function toPercent(number, decimals = 0) {
+export function toPercent (number, decimals = 0) {
 	if (!isNumeric(number)) return ''
 	return (Number(number) * 100).toFixed(decimals).toLocaleString() + '%'
 }

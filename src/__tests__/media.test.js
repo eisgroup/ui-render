@@ -1,4 +1,4 @@
-import { aspectRatio } from '../media'
+import { aspectRatio, widthScaled } from '../media'
 
 test(`${aspectRatio.name}() returns correct aspect ratio from given width and height`, () => {
   // 4:3
@@ -44,4 +44,15 @@ test(`${aspectRatio.name}() returns correct aspect ratio from given width and he
   expect(aspectRatio(1601, 360)).not.toBe('40:9')
   expect(aspectRatio(1601, 361)).not.toBe('40:9')
   expect(aspectRatio(1600, 359)).not.toBe('40:9')
+})
+
+test(`${widthScaled.name}() returns correct size for given resolution and original width/height`, () => {
+  expect(widthScaled(50, 10, 20)).toEqual(5)
+  expect(widthScaled(5000, 100, 200)).toEqual(50)
+  expect(widthScaled(100, 10, 10)).toEqual(10)
+  expect(widthScaled(100, 1000, 1000)).toEqual(10)
+  expect(widthScaled(100, 25, 25)).toEqual(10)
+  expect(widthScaled(10, 3, 1)).toEqual(5) // x2
+  expect(widthScaled(20, 2, 1)).toEqual(6) // x3
+  expect(widthScaled(30, 3, 1)).toEqual(9) // x3
 })

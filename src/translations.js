@@ -27,7 +27,6 @@ import { localiseTranslation } from './definitions'
  */
 export const _ = new Proxy(localiseTranslation.instance, {
   get (target, prop) {
-    if (prop === 'queriedById') return localiseTranslation.queriedById
     return localiseTranslation.queriedById[prop] = (target[prop] || target.UNTRANSLATED)
   }
 })
@@ -53,10 +52,6 @@ localiseTranslation({
   CONTACT_US: {
     [l.ENGLISH]: 'Contact Us',
     // [l.RUSSIAN]: 'Связаться с Нами',
-  },
-  CONFIRM_ACTION: {
-    [l.ENGLISH]: 'Confirm Action',
-    // [l.RUSSIAN]: 'Подтвердите Действие',
   },
   COPY: {
     // as verb
