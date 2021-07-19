@@ -1,11 +1,22 @@
 import { SevenBoom as Response } from 'graphql-apollo-errors'
-import { FILE, fileId, fileName, folderFrom, IMAGE } from 'modules-pack/variables'
+import { fileId, fileName, folderFrom, IMAGE } from 'modules-pack/variables'
 import mongoose from 'mongoose'
 import PromiseAll from 'promises-all'
-import { deleteProp, get, interpolateString, l, localiseTranslation, set, toJSON, toList, warn } from 'utils-pack'
+import {
+  deleteProp,
+  get,
+  interpolateString,
+  l,
+  localiseTranslation,
+  set,
+  toFlatList,
+  toJSON,
+  toList,
+  warn
+} from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import { removeFile, sanitize, saveFile } from './file'
-import { imgMeta, resize } from './image'
+import { resizes } from './image'
 
 /**
  * UPLOAD PROCESS HELPERS ======================================================
@@ -32,6 +43,7 @@ localiseTranslation({
 
 /**
  * Process File Upload
+ * todo: remove old file with different extension (does not get overridden)
  *
  * @param {Object<kind, i, id>} fileInput - File props from resolver payload
  * @param {File} [file] - required for upload, native File object to createReadStream()
@@ -43,7 +55,7 @@ localiseTranslation({
  *   - or `removed` boolean
  *   - or error if unsuccessful
  */
-export async function uploadFile ({file, remove, mimetypes, ...fileInput}, filePath) {
+export async function uploadFile ({file, remove, mimetypes, sizes, ...fileInput}, filePath) {
   // Remove File
   if (remove) {
     const result = await removeFile({filename: fileName(fileInput), ...filePath})
@@ -51,6 +63,7 @@ export async function uploadFile ({file, remove, mimetypes, ...fileInput}, fileP
       throw Response.badRequest(interpolateString(_.REMOVE_FILE_ERROR_error, {error: result}))
     return {...fileInput, removed: result.removed}
   }
+
   // Upload File (use filename derived from the file itself)
   const {createReadStream, filename: name, mimetype} = await file
   if (mimetypes && !mimetypes.includes(mimetype))
@@ -59,11 +72,7 @@ export async function uploadFile ({file, remove, mimetypes, ...fileInput}, fileP
   // Always resize the image using Sharp, so sharp can optimize and sanitize it, even if resizing is not needed
   const stream = createReadStream()
   const options = {stream, filename: fileName({...fileInput, name}), ...filePath}
-  if (IMAGE.MIME_TYPES.includes(mimetype)) {
-    options.metaData = {format: FILE.SHARP_FORMAT_BY_MIME_TYPE[mimetype]}
-    options.read = imgMeta(options.metaData)
-    options.transform = resize(options.metaData)
-  }
+  if (IMAGE.MIME_TYPES.includes(mimetype)) options.writeStream = resizes({filePath: options, sizes})
   const result = await saveFile(options)
   if (!result.path)
     throw Response.badRequest(interpolateString(_.UPLOAD_FILE_ERROR_error, {error: result}))
@@ -79,24 +88,25 @@ export async function uploadFile ({file, remove, mimetypes, ...fileInput}, fileP
  *
  * @param {Document} instance - of Mongoose model containing files to be updated
  * @param {Object<file, kind, i, id, remove>[]} files - list of `FileInput` from resolver payload
- * @param {String} [field] - path to files field as defined in given model instance
+ * @param {String} field - path to files field as defined in given model instance
  * @param {String} [folder] - see `resolvePath()` for argument
  * @param {Object} [filePath] - see `resolvePath()` for argument
  * @param {String[]} [mimetypes] - allowed file types
+ * @param {Object} [sizes] - required for image sharp.resize() see `resizes()` for argument
  * @param {Number} [limit] - maximum number of files allowed for upload (for unstructured `index` based files)
- * @returns {Promise<Object>} {result, errors}
- *    - `result` is updated files field for model instance to save, can be empty [] if nothing to updated
+ * @returns {Promise<Object>} {field, files, errors}
+ *    - `files` is updated files field for model instance to save, can be empty [] if nothing to updated
  *    - `errors` optional list of encountered rejections
  */
 export async function updateFiles ({
-  instance, files, field = 'files', folder = folderFrom(instance),
-  mimetypes = IMAGE.MIME_TYPES, limit,
+  instance, files, field, folder = folderFrom(instance),
+  mimetypes = IMAGE.MIME_TYPES, limit, sizes = IMAGE.SIZES,
   ...filePath
 }) {
-  const output = {result: []}
+  const output = {field, files: []}
 
   // Populate fileInput with `filename` attribute required for removal to resolvePath()
-  const oldFiles = get(instance, field, [])
+  const oldFiles = toList(get(instance, field), 'clean') // field can be a single or list of FileInputs
   if (oldFiles.length) {
     files = files.map(fileInput => {
       if (fileInput.remove) {
@@ -109,7 +119,7 @@ export async function updateFiles ({
 
   // Upload/Remove files
   const fileInputs = limit != null ? files.filter(f => f.i < limit) : files
-  const uploads = fileInputs.map(fileInput => uploadFile({mimetypes, ...fileInput}, {folder, ...filePath}))
+  const uploads = fileInputs.map(fileInput => uploadFile({mimetypes, sizes, ...fileInput}, {folder, ...filePath}))
   const {resolve, reject} = await PromiseAll.all(uploads)
 
   // Error Handling
@@ -127,7 +137,7 @@ export async function updateFiles ({
 
   // Create/Update Files list for Updated/Removed Files
   if (resolve.length) {
-    if (oldFiles.length) output.result = [...oldFiles]
+    if (oldFiles.length) output.files = [...oldFiles]
     instance.markModified(field) // needed to update nested arrays in Mongoose
     const created = Date.now()
     const updated = Date.now()
@@ -135,15 +145,15 @@ export async function updateFiles ({
       const fileID = fileId(fileInput) // a file can have different versions under the same ID
       if (removed) {
         // @note: when iterating array of Mongoose sub-documents (nested Schemas), need to explicitly destruct all props
-        output.result = output.result.filter(({kind, i, id}) => fileId({kind, i, id}) !== fileID)
+        output.files = output.files.filter(({kind, i, id}) => fileId({kind, i, id}) !== fileID)
       } else if (path) {
-        const index = output.result.findIndex(({kind, i, id}) => fileId({kind, i, id}) === fileID)
+        const index = output.files.findIndex(({kind, i, id}) => fileId({kind, i, id}) === fileID)
         if (index > -1) {
           fileInput.updated = updated
-          output.result[index] = Object.assign(output.result[index], fileInput)
+          output.files[index] = Object.assign(output.files[index], fileInput)
         } else {
           fileInput.created = created
-          output.result.push(fileInput)
+          output.files.push(fileInput)
         }
       }
     })
@@ -166,33 +176,39 @@ export async function updateFiles ({
  * If above fields are omitted, the server falls back to entry ID for file name.
  *
  * @example:
- *   *@filesUploaded({field: 'files', mimeTypes: IMAGE.MIME_TYPES}) // defaults
+ *   *@filesUploaded({fields: 'files', mimeTypes: IMAGE.MIME_TYPES}) // defaults
  *    user (parent, args, context, info) {
  *      // ...resolver logic
  *      return new User(entry)
  *    }
  *
- * @param {String} [field] - path to files field as defined in given model instance
+ * @param {String|String[]} [fields] - path to files field as defined in given model instance
  * @param {*[]} [kinds] - allowed file kinds
  * @param {*[]} [is] - allowed file identifiers
+ * @param {Boolean} [multiple] - whether upload should be saved as list of files for each given `field`
  * @param {Function} [update<{instance, files}>] - custom callback to update instance with uploaded files
  * @param {Object<[folder], [dir], [limit], [mimetypes]>} [options] - custom upload configs, see `updateFiles` arguments
  * @returns {Function} decorator - that handles files upload/update/delete with all validations required
  */
 export function filesUploaded ({
-  field = 'files',
+  fields = 'files',
   kinds,
   is,
+  multiple,
   update,
   ...options
 } = {}) {
+  fields = toList(fields, 'clean')
   return function (target, key, descriptor) {
     const func = descriptor.value
     descriptor.value = async function (...args) {
       // Extract files from payload entry so it doesn't get assigned to instance
       const [__, {entry}] = args
-      const files = toList(get(entry, field), 'clean')
-      deleteProp(entry, field)
+      const filesByField = {}
+      fields.forEach(field => {
+        filesByField[field] = toList(get(entry, field), 'clean')
+        deleteProp(entry, field)
+      })
 
       // If result is a Promise, resolve it, else use as is without resolving
       let instance = func.apply(this, args)
@@ -202,6 +218,7 @@ export function filesUploaded ({
         return Response.badImplementation(`@${filesUploaded.name} requires a Mongoose Document instance as return value`)
 
       // Simply save the instance, if no files uploaded
+      const files = toFlatList(Object.values(filesByField))
       if (!files.length) return instance.save()
 
       // Validate FileInput before uploads
@@ -219,14 +236,22 @@ export function filesUploaded ({
       }
 
       // Upload/Update/Remove Files
-      // todo: test returning array of promises with errors
-      // @see: https://stackoverflow.com/questions/67378814/apollo-server-throw-multiple-errors-with-partial-data
-      const {result, errors} = await updateFiles({instance, files, field, ...options})
-      if (update) {
-        update({instance, files: result})
-      } else {
-        set(instance, field, result)
+      const updates = []
+      for (const field in filesByField) {
+        updates.push(updateFiles({instance, files: filesByField[field], field, ...options}))
       }
+      const {resolve, reject} = await PromiseAll.all(updates)
+      resolve.forEach(({field, files, errors}) => {
+        // todo: test returning array of promises with errors
+        // @see: https://stackoverflow.com/questions/67378814/apollo-server-throw-multiple-errors-with-partial-data
+        if (!files.length) return
+        if (update) {
+          update({instance, field, files, errors})
+        } else {
+          set(instance, field, multiple ? files : files[0])
+        }
+      })
+      reject.forEach(warn)
       return instance.save()
     }
     return descriptor

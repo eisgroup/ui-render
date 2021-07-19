@@ -46,31 +46,34 @@ export function read ({options = 'utf8', workDir = _WORK_DIR_, ...filePath}) {
 
 /**
  * Save File to Local Server
+ * @example: upload to Amazon S3
+ * https://stackoverflow.com/questions/60053008/typescript-sharp-js-transform-a-stream-into-multiple-sizes-and-upload-it-to-s3
  *
  * @param {Object} stream - of file buffer, the result of createReadStream(absoluteFilePath)
  * @param {Object<filename, folder, dir, path>} filePath - see `resolvePath()` arguments
  * @param {Object} [read] - pipeline to use before `transform`
  * @param {Object} [transform] - pipeline to use before saving file (e.x. transform = sharp().resize(width, height))
+ * @param {Object} [writeStream] - pipeline to use for saving file, uses fs.createWriteStream(path) by default
  * @returns {Promise<Object>} {path, name} - to file saved if successful, else error
  */
-export async function saveFile ({stream, read, transform, ...filePath}) {
+export async function saveFile ({stream, read, transform, writeStream, ...filePath}) {
   const {dir, path, name} = resolvePath(filePath)
   const {error} = await makeDirectory(dir)
   if (error) throw new Error(error)
 
   return new Promise((resolve, reject) => {
-      let file = stream
-        .on('error', error => {
-          if (stream.truncated) fs.unlinkSync(path) // Delete the truncated file.
-          reject(error)
-        })
-      if (read) file = file.pipe(read)
-      if (transform) file = file.pipe(transform)
-      return file.pipe(fs.createWriteStream(path))
-        .on('error', error => reject(error))
-        .on('finish', () => resolve({path, name}))
-    }
-  )
+    // file requires reassigning after each pipe
+    let file = stream // if error during stream reading
+      .on('error', error => {
+        if (stream.truncated) fs.unlinkSync(path) // Delete the truncated file.
+        reject(error)
+      })
+    if (read) file = file.pipe(read)
+    if (transform) file = file.pipe(transform)
+    file.pipe(writeStream || fs.createWriteStream(path))
+      .on('error', error => reject(error))
+      .on('finish', () => resolve({path, name}))
+  })
 }
 
 /**

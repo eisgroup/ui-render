@@ -40,19 +40,16 @@ export const FILE = {
   },
 }
 
-// For use with `sharp` npm package
-FILE.SHARP_FORMAT_BY_MIME_TYPE = {
-  [FILE.MIME_TYPE.JPG]: FILE.EXT.JPEG,
-  [FILE.MIME_TYPE.PNG]: FILE.EXT.PNG,
-  [FILE.MIME_TYPE.GIF]: FILE.EXT.GIF,
-  [FILE.MIME_TYPE.SVG]: FILE.EXT.SVG,
-  [FILE.MIME_TYPE.WEBP]: FILE.EXT.WEBP,
-}
-
 export const IMAGE = {
   MAX_RES: SIZE_MB_16, // total Image width*height resolution limit (16 MB is about 4K image)
   EXTENSIONS: [FILE.EXT.JPG, FILE.EXT.JPEG, FILE.EXT.PNG, FILE.EXT.SVG, FILE.EXT.GIF, FILE.EXT.WEBP],
   MIME_TYPES: [FILE.MIME_TYPE.JPG, FILE.MIME_TYPE.PNG, FILE.MIME_TYPE.SVG, FILE.MIME_TYPE.GIF, FILE.MIME_TYPE.WEBP],
+  SIZES: { // default sharp.resize() config for image uploads
+    // @see: https://sharp.pixelplumbing.com/api-resize
+    thumb: {width: 150, height: 150, fit: 'cover'},
+    medium: {width: 1200, height: 1200, fit: 'inside'},
+    '': {res: SIZE_MB_16}, // max 4K resolution for the original file
+  }
 }
 
 export const UPLOAD = {

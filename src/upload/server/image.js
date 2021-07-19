@@ -1,6 +1,8 @@
-import { VALIDATE } from 'modules-pack/variables'
+import fs from 'fs'
+import { resolvePath, VALIDATE } from 'modules-pack/variables'
 import sharp from 'sharp'
-import { assertBackend } from 'utils-pack'
+import { assertBackend, fileExtensionNormalized, fileNameWithoutExt, warn } from 'utils-pack'
+import { widthScaled } from 'utils-pack/media'
 
 /**
  * IMAGE HELPERS ===============================================================
@@ -21,6 +23,40 @@ assertBackend()
  */
 export function resize ({width = VALIDATE.IMAGE_MAX_RES, height = null, fit = 'inside', format = 'jpeg'} = {}) {
   return sharp().resize(width, height, {fit, withoutEnlargement: true}).toFormat(format)
+}
+
+/**
+ * Create Resizes Stream Pipeline
+ * @param {Object} filePath - see `resolvePath()` for argument
+ * @param {Object} sizes<res, width, height, fit> - resize() options by the file `size` name (i.e. thumb/medium/...)
+ * @returns {*} resizes - write stream pipeline
+ */
+export function resizes ({filePath, sizes}) {
+  const pipeline = sharp()
+  const {dir, name} = resolvePath(filePath)
+  const filename = fileNameWithoutExt(name)
+  const ext = fileExtensionNormalized(name)
+  const extension = ext ? `.${ext}` : ''
+  pipeline.metadata()
+    .then((meta) => {
+      for (const label in sizes) {
+        const size = label ? `_${label}` : ''
+        let {res, width, height, fit = 'inside'} = sizes[size]
+        // Compute width/height based on `res` limit
+        if (res) {
+          width = widthScaled(res, meta.width, meta.height)
+          height = null
+        }
+        pipeline
+          .clone()
+          .resize(width, height, {fit, withoutEnlargement: true})
+          .toFormat(meta.format) // sanitizes the file
+          .pipe(fs.createWriteStream(`${dir}/${filename}${size}${extension}`))
+      }
+      return pipeline
+    })
+    .catch(warn)
+  return pipeline
 }
 
 /**
