@@ -52,10 +52,11 @@ type.Definition = type.Of({
 type.DefinitionSet = type.ObjectOf(type.Definition.isRequired)
 
 type.FileInput = type.Of({
-  i: type.Any, // identifier or index position of the file in the grid
   src: type.UrlOrBase64, // file source URL or base64 encoded string
+  kind: type.Any, // type of file (ex: public/private...)
+  i: type.Any, // identifier or index position of the file in the grid (ex. thumb/small/large...)
+  id: type.String, // optional ID
   name: type.String, // file name with extension
-  kind: type.Any, // type of file (example: public, private...)
   file: type.File, // -> sent by onChange callbacks for upload to backend (example: Dropzone file object)
   remove: type.Boolean, // -> sent by onChange callbacks for deletion to backend
 })

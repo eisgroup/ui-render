@@ -1,6 +1,5 @@
-import PropTypes from 'prop-types'
 import React, { useContext } from 'react'
-import { Active, warn } from 'utils-pack'
+import { Active } from 'utils-pack'
 import { SOUND } from '../files'
 
 /**
@@ -92,69 +91,6 @@ export function withTimer (Class) {
   }
 
   return Class
-}
-
-/**
- * React Component Group Input Change Decorator to fire onChange callback as group of fields together
- *
- * @usage:
- *  - provides this.fields prop that is automatically hooked with `onChange` to fire callback as group of inputs
- *
- * @example:
- *    @withGroupInputChange
- *    class Fields extends Component {
- *      render () {
- *        return this.fields.map(renderField)
- *      }
- *    }
- *
- * @param {Object} constructor - class
- */
-export function withGroupInputChange (constructor) {
-  const componentDidMount = constructor.prototype.componentDidMount
-
-  constructor.propTypes = {
-    name: PropTypes.string, // top level field prefix
-    items: PropTypes.array.isRequired, // list of fields attributes to render
-    initialValues: PropTypes.object, // input default values, required for `onChange` callback to work properly
-    onChange: PropTypes.func, // callback, receiving all nested field value changes combined, grouped by input name
-    required: PropTypes.bool, // input prop
-    disabled: PropTypes.bool, // input prop
-    ...constructor.propTypes,
-  }
-
-  // Define instance getter
-  Object.defineProperty(constructor.prototype, 'fields', {
-    get () {
-      // Hook to `onChange` call from each field in the group
-      const {items, name: prefix} = this.props
-      return items.map(({name, onChange, ...field}) => ({
-        name: prefix ? (prefix + '.' + name) : name,
-        onChange: (val, ...args) => {
-          onChange && onChange(val, ...args)
-          this.handleChangeInput(name, val)
-        },
-        ...field,
-      }))
-    }
-  })
-
-  constructor.prototype.handleChangeInput = function (name, value) {
-    const {onChange} = this.props
-    if (!onChange) return
-    this.values = {...this.values, [name]: value}
-    onChange(this.values)
-  }
-
-  constructor.prototype.componentDidMount = function () {
-    const {onChange, initialValues, name} = this.props
-    if (name && onChange && initialValues === undefined)
-      warn(this.constructor.name, `.${name} requires 'initialValues', if 'onChange(values)' is used`)
-    if (initialValues) this.values = {...initialValues}
-    if (componentDidMount) componentDidMount.apply(this, arguments)
-  }
-
-  return constructor
 }
 
 export const UIContext = React.createContext({})

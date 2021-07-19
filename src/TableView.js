@@ -53,6 +53,8 @@ export default class TableView extends PureComponent {
         })
       )
     ),
+    // When the cell is empty (i.e. falsey value), render it as given value
+    showEmptyAs: PropTypes.any,
     sorts: PropTypes.arrayOf(PropTypes.shape({...sortObj})),
     onSort: PropTypes.func, // receives clicked sort object {id, order, sortKey} as argument
     renderItem: PropTypes.func, // callback to render extra table rows in default layout
@@ -257,12 +259,13 @@ export default class TableView extends PureComponent {
     const {render: r, data} = cell || {}
     const render = isFunction(cell) ? cell : (r || renderCell)
     const value = data != null ? data : cell
-    const content = render ? render(value, index, {className, style, expanded: this.expandedByRow(index)}, this) : cell
+    let content = render ? render(value, index, {className, style, expanded: this.expandedByRow(index)}, this) : cell
+    if (!content && content !== 0) content = this.props.showEmptyAs
     return (
       <Table.Cell key={this.props.vertical ? index : id} className={classNameCellWrap}>
         {typeof content === 'object'
           ? content
-          : <View className={className} style={style}><Text className='p'>{content}</Text></View>
+          : <View className={className} style={style}><Text className="p">{content}</Text></View>
         }
       </Table.Cell>
     )
@@ -273,7 +276,7 @@ export default class TableView extends PureComponent {
     const headers = this.headers
     if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
     const {
-      className, sorts, onSort, extraHeaders, vertical,
+      className, sorts, onSort, extraHeaders, showEmptyAs, vertical,
       items: _, headers: __, renderItem: ___, itemClassNames: ____, itemsExpanded: _____,
       ...props
     } = this.props
@@ -295,9 +298,4 @@ export default class TableView extends PureComponent {
       </ScrollView>
     )
   }
-}
-
-function rowClassName ({index}) {
-  if (index < 0) return 'app__table__row--header'
-  return index % 2 === 0 ? 'app__table__row--even' : 'app__table__row--odd'
 }
