@@ -54,11 +54,15 @@ localiseTranslation({
     // [l.RUSSIAN]: 'Загружен',
   },
 
-  // Project Specific
+  // Popup Messages
   // ---------------------------------------------------------------------------
-  DIMENSION_MUST_BE_ONE_OF: {
-    [l.ENGLISH]: 'dimension must be one of',
-    // [l.RUSSIAN]: 'измерение должно быть одним из',
+  ARE_YOU_SURE_YOU_WANT_TO_REMOVE_file: {
+    [l.ENGLISH]: 'Are you sure you want to remove {file}?',
+    // [l.RUSSIAN]: 'Вы уверены, что хотите удалить {file}?',
+  },
+  DIMENSION_OF_file_MUST_BE_ONE_OF_aspectRatios: {
+    [l.ENGLISH]: 'Dimension of {file} must be one of {aspectRatios}',
+    // [l.RUSSIAN]: 'Измерение {file} должно быть одним из {aspectRatios}',
   },
   INVALID_ASPECT_RATIO: {
     [l.ENGLISH]: 'Invalid Aspect Ratio!',

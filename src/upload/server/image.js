@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { fileNameSized, resolvePath, VALIDATE } from 'modules-pack/variables'
 import PromiseAll from 'promises-all'
 import sharp from 'sharp'
@@ -26,11 +27,33 @@ export function resize ({width = VALIDATE.IMAGE_MAX_RES, height = null, fit = 'i
 }
 
 /**
+ * Remove Image with different Sizes from Local Server
+ * @param {Object} filePath - see `resolvePath()` for argument
+ * @param {Object} sizes<res, width, height, fit> - resize() options by the file `size` name (i.e. thumb/medium/...)
+ * @returns {Promise<Object>} {[path], [removed], errors} - to original image removed if successful, else error objects
+ */
+export function removeImgSizes ({filePath, sizes}) {
+  const {dir, path, name} = resolvePath(filePath)
+  const removals = []
+  for (const size in sizes) {
+    const path = `${dir}/${fileNameSized(name, size)}`
+    removals.push(new Promise((resolve, reject) => fs.unlink(path, (err) => {
+      if (err) return reject(err)
+      return resolve({path, removed: true})
+    })))
+  }
+  return PromiseAll.all(removals)
+    .then(({resolve, reject: errors}) => {
+      return resolve.length ? {path, removed: true, errors} : {errors}
+    })
+}
+
+/**
  * Resizes an Image to Different Sizes from given File Stream and Saves them to Local Server
  * @param {Stream} stream - readable file stream from `createReadStream()` to create Images for
  * @param {Object} filePath - see `resolvePath()` for argument
  * @param {Object} sizes<res, width, height, fit> - resize() options by the file `size` name (i.e. thumb/medium/...)
- * @returns {Promise<path, name, metadata...>|Error[]} result from PromiseAll.all()
+ * @returns {Promise<Object>} {[path], [name], ...[metaData], errors} - to original image saved if successful, else error objects
  */
 export async function saveImgSizes ({stream, filePath, sizes}) {
   const {dir, path, name} = resolvePath(filePath)
@@ -51,8 +74,8 @@ export async function saveImgSizes ({stream, filePath, sizes}) {
       }
       return PromiseAll.all(uploads)
     })
-    .then(({resolve, reject}) => {
-      return (resolve.length && !reject.length) ? {...metadata, path, name} : reject
+    .then(({resolve, reject: errors}) => {
+      return resolve.length ? {...metadata, path, name, errors} : {errors}
     })
 }
 

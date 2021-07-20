@@ -12,7 +12,7 @@ import Square from 'react-ui-pack/Square'
 import Text from 'react-ui-pack/Text'
 import { cssBgImageFrom } from 'react-ui-pack/utils'
 import View from 'react-ui-pack/View'
-import { by, isEqual, OPEN, toList } from 'utils-pack'
+import { by, interpolateString, isEqual, OPEN, toList } from 'utils-pack'
 import { _ } from '../translations'
 import Upload from './Upload'
 
@@ -27,10 +27,11 @@ const mapDispatchToProps = (dispatch) => ({
       [POPUP_ALERT]: {
         items: [{
           title: _.INVALID_ASPECT_RATIO,
-          content: <Row className='center wrap'>
-            <Text className='bold margin-h-smaller'>{file.name}'s</Text>
-            <Text>{_.DIMENSION_MUST_BE_ONE_OF} </Text>
-            <Text className='bold margin-h-smaller'>{aspectRatios.join(', ')}</Text>
+          content: <Row className="center wrap">
+            <Text className="bold margin-h-smaller">{interpolateString(
+              _.DIMENSION_OF_file_MUST_BE_ONE_OF_aspectRatios,
+              {file: file.name, aspectRatios: aspectRatios.join(', ')}
+            )}</Text>
           </Row>,
           closeLabel: _.OK
         }]
@@ -40,7 +41,7 @@ const mapDispatchToProps = (dispatch) => ({
       activePopup: POPUP_CONFIRM,
       [POPUP_CONFIRM]: {
         items: [{
-          content: `${_.ARE_YOU_SURE_YOU_WANT_TO_REMOVE} ${file.name}?`,
+          content: `${interpolateString(_.ARE_YOU_SURE_YOU_WANT_TO_REMOVE_file, {file: file.name})}`,
           confirmLabel: _.REMOVE,
           action: callback,
         }]
@@ -260,32 +261,32 @@ export default class UploadGrid extends Component {
               >
                 {file.src
                   ? (
-                    <View className='upload__file' style={{backgroundImage: cssBgImageFrom(file)}}>
-                      <Text className='upload__file__label'>{shouldCount ? (i + 1) : file.name}</Text>
+                    <View className="upload__file" style={{backgroundImage: cssBgImageFrom(file)}}>
+                      <Text className="upload__file__label">{shouldCount ? (i + 1) : file.name}</Text>
                       <Icon
                         onClick={(event) => this.handleRemove(file, event)}
                         name={iconRemove}
-                        className='upload__file__remove larger'
+                        className="upload__file__remove larger"
                       />
                     </View>
                   )
                   : (<Fragment>
-                    {placeholder && <Text className='upload__file__placeholder'>{placeholder}</Text>}
-                    <Text className='upload__file__label'>{hasCount ? (i + 1) : file.name}</Text>
-                    <Icon className='upload__file__add large' name={iconUpload}/>
+                    {placeholder && <Text className="upload__file__placeholder">{placeholder}</Text>}
+                    <Text className="upload__file__label">{hasCount ? (i + 1) : file.name}</Text>
+                    <Icon className="upload__file__add large" name={iconUpload}/>
                   </Fragment>)
                 }
               </Upload>
             </View>
           ))}
-          <Loading loading={loading} classNameChild='round padding bg-neutral'>{`${_.UPDATING}...`}</Loading>
+          <Loading loading={loading} classNameChild="round padding bg-neutral">{`${_.UPDATING}...`}</Loading>
         </Grid>
         {/* Below element is used to trigger error animation because grid may be nested inside square */}
         <View className={classNames('input', {error, info})}/>
         {(error || info) &&
-        <View className='field-help'>
-          {error && <Text className='error'>{error}</Text>}
-          {info && <Text className='into'>{info}</Text>}
+        <View className="field-help">
+          {error && <Text className="error">{error}</Text>}
+          {info && <Text className="into">{info}</Text>}
         </View>
         }
       </View>

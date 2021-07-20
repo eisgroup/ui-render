@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import PromiseAll from 'promises-all'
 import {
   deleteProp,
+  fileExtensionNormalized,
   get,
   interpolateString,
   l,
@@ -16,7 +17,7 @@ import {
 } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import { removeFile, sanitize, saveFile } from './file'
-import { saveImgSizes } from './image'
+import { removeImgSizes, saveImgSizes } from './image'
 
 /**
  * UPLOAD PROCESS HELPERS ======================================================
@@ -56,9 +57,16 @@ localiseTranslation({
  *   - or error if unsuccessful
  */
 export async function uploadFile ({file, remove, mimetypes, sizes, ...fileInput}, filePath) {
+  let result
+
   // Remove File
   if (remove) {
-    const result = await removeFile({filename: fileName(fileInput), ...filePath})
+    filePath = {filename: fileName(fileInput), ...filePath}
+    if (IMAGE.EXTENSIONS.includes(fileExtensionNormalized(filePath.filename))) {
+      result = await removeImgSizes({filePath, sizes})
+    } else {
+      result = await removeFile(filePath)
+    }
     if (!result.removed)
       throw Response.badRequest(interpolateString(_.REMOVE_FILE_ERROR_error, {error: result}))
     return {...fileInput, removed: result.removed}
@@ -72,7 +80,6 @@ export async function uploadFile ({file, remove, mimetypes, sizes, ...fileInput}
   // Always resize the image using Sharp, so sharp can optimize and sanitize it, even if resizing is not needed
   const stream = createReadStream()
   const options = {stream, filePath: {filename: fileName({...fileInput, name}), ...filePath}}
-  let result
   if (IMAGE.MIME_TYPES.includes(mimetype)) {
     result = await saveImgSizes({...options, sizes})
   } else {
@@ -234,7 +241,7 @@ export function filesUploaded ({
       }
       if (is) {
         for (const {i} of files) {
-          if (i == null && !is.includes(i))
+          if (i != null && !is.includes(i))
             return Response.badRequest(interpolateString(_.INVALID_FILE_IDENTIFIER_i_MUST_BE_ONE_OF_is, {i, is}))
         }
       }

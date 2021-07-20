@@ -26,7 +26,7 @@ export function makeDirectory (dir, options) {
 /**
  * Open and read File content
  *
- * @param {Object<filename, folder, dir, path>} filePath - see `resolvePath()` arguments
+ * @param {Object} filePath - see `resolvePath()` arguments
  * @param {String} [workDir] - working directory
  * @param {String|Object} [options] - read file options
  * @return {Promise<any>} content - from file
@@ -50,7 +50,7 @@ export function read ({options = 'utf8', workDir = _WORK_DIR_, ...filePath}) {
  * https://stackoverflow.com/questions/60053008/typescript-sharp-js-transform-a-stream-into-multiple-sizes-and-upload-it-to-s3
  *
  * @param {Object} stream - of file buffer, the result of createReadStream(absoluteFilePath)
- * @param {Object<filename, folder, dir, path>} filePath - see `resolvePath()` arguments
+ * @param {Object} filePath - see `resolvePath()` arguments
  * @param {Object} [read] - pipeline to use before `transform`
  * @param {Object} [transform] - pipeline to use before saving file (e.x. transform = sharp().resize(width, height))
  * @param {Object} [writeStream] - pipeline to use for saving file, uses fs.createWriteStream(path) by default
@@ -78,7 +78,7 @@ export async function saveFile ({stream, read, transform, writeStream, filePath}
 
 /**
  * Remove File from Local Server
- * @param {Object<filename, folder, dir, path>} filePath - see `resolvePath()` arguments
+ * @param {Object} filePath - see `resolvePath()` arguments
  * @returns {Promise<Object>} {path, removed} - to file removed if successful, else error object
  */
 export function removeFile (filePath) {
