@@ -198,14 +198,6 @@ localiseTranslation({
     [l.ENGLISH]: 'Type a message',
     // [l.RUSSIAN]: 'Введите сообщение',
   },
-  ARE_YOU_SURE_YOU_WANT_TO: {
-    [l.ENGLISH]: 'Are you sure you want to',
-    // [l.RUSSIAN]: 'Вы уверены, что хотите',
-  },
-  ARE_YOU_SURE_YOU_WANT_TO_REMOVE: {
-    [l.ENGLISH]: 'Are you sure you want to remove',
-    // [l.RUSSIAN]: 'Вы уверены, что хотите удалить',
-  },
   HIDE: {
     [l.ENGLISH]: 'Hide',
     // [l.RUSSIAN]: 'Скрыть',
