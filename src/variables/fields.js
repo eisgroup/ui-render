@@ -126,8 +126,8 @@ export function fieldsFrom (fields, {initialValues: initValues = {}} = {}) {
   return fields.map(({id, ...field}) => ({id, ...FIELD.DEF[id], ...field}))
     // Process prefixes
     .map(({name = '', namePrefix = '', options, items, float, required, disabled, readonly, validate, ...field}) => {
-      name = namePrefix + name
-      const initialValues = get(initValues, name)
+      name = `${namePrefix}${name}`
+      const initialValues = name ? get(initValues, name) : initValues
       const validations = []
       if (required) validations.push(isRequired)
       if (validate) validations.push(...toList(validate, 'clean'))

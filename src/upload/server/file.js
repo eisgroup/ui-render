@@ -56,7 +56,7 @@ export function read ({options = 'utf8', workDir = _WORK_DIR_, ...filePath}) {
  * @param {Object} [writeStream] - pipeline to use for saving file, uses fs.createWriteStream(path) by default
  * @returns {Promise<Object>} {path, name} - to file saved if successful, else error
  */
-export async function saveFile ({stream, read, transform, writeStream, ...filePath}) {
+export async function saveFile ({stream, read, transform, writeStream, filePath}) {
   const {dir, path, name} = resolvePath(filePath)
   const {error} = await makeDirectory(dir)
   if (error) throw new Error(error)

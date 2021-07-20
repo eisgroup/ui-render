@@ -16,7 +16,7 @@ import {
 } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import { removeFile, sanitize, saveFile } from './file'
-import { resizes } from './image'
+import { saveImgSizes } from './image'
 
 /**
  * UPLOAD PROCESS HELPERS ======================================================
@@ -71,14 +71,18 @@ export async function uploadFile ({file, remove, mimetypes, sizes, ...fileInput}
 
   // Always resize the image using Sharp, so sharp can optimize and sanitize it, even if resizing is not needed
   const stream = createReadStream()
-  const options = {stream, filename: fileName({...fileInput, name}), ...filePath}
-  if (IMAGE.MIME_TYPES.includes(mimetype)) options.writeStream = resizes({filePath: options, sizes})
-  const result = await saveFile(options)
+  const options = {stream, filePath: {filename: fileName({...fileInput, name}), ...filePath}}
+  let result
+  if (IMAGE.MIME_TYPES.includes(mimetype)) {
+    result = await saveImgSizes({...options, sizes})
+  } else {
+    result = await saveFile(options)
+  }
   if (!result.path)
     throw Response.badRequest(interpolateString(_.UPLOAD_FILE_ERROR_error, {error: result}))
   // @note: - `name` is for UI, does not match `path` for the actual file
   //        - `metaData` is from the original file, the actual width/height may be smaller (i.e. VALIDATE.IMAGE_MAX_RES)
-  return {...fileInput, ...options.metaData, ...result, name: sanitize(name)}
+  return {...fileInput, ...result, name: sanitize(name)}
 }
 
 // noinspection JSUnresolvedVariable
@@ -95,7 +99,7 @@ export async function uploadFile ({file, remove, mimetypes, sizes, ...fileInput}
  * @param {Object} [sizes] - required for image sharp.resize() see `resizes()` for argument
  * @param {Number} [limit] - maximum number of files allowed for upload (for unstructured `index` based files)
  * @returns {Promise<Object>} {field, files, errors}
- *    - `files` is updated files field for model instance to save, can be empty [] if nothing to updated
+ *    - `files` is updated files field for model instance to save, can be `undefined` if nothing updated
  *    - `errors` optional list of encountered rejections
  */
 export async function updateFiles ({
@@ -103,7 +107,7 @@ export async function updateFiles ({
   mimetypes = IMAGE.MIME_TYPES, limit, sizes = IMAGE.SIZES,
   ...filePath
 }) {
-  const output = {field, files: []}
+  const output = {field}
 
   // Populate fileInput with `filename` attribute required for removal to resolvePath()
   const oldFiles = toList(get(instance, field), 'clean') // field can be a single or list of FileInputs
@@ -137,7 +141,7 @@ export async function updateFiles ({
 
   // Create/Update Files list for Updated/Removed Files
   if (resolve.length) {
-    if (oldFiles.length) output.files = [...oldFiles]
+    output.files = oldFiles.length ? [...oldFiles] : []
     instance.markModified(field) // needed to update nested arrays in Mongoose
     const created = Date.now()
     const updated = Date.now()
@@ -192,8 +196,8 @@ export async function updateFiles ({
  */
 export function filesUploaded ({
   fields = 'files',
-  kinds,
-  is,
+  kinds = [], // enables validation by default
+  is = [], // pass as null to disable validation
   multiple,
   update,
   ...options
@@ -224,13 +228,13 @@ export function filesUploaded ({
       // Validate FileInput before uploads
       if (kinds) {
         for (const {kind} of files) {
-          if (!kinds.includes(kind))
+          if (kind != null && !kinds.includes(kind))
             return Response.badRequest(interpolateString(_.INVALID_FILE_KIND_kind_MUST_BE_ONE_OF_kinds, {kind, kinds}))
         }
       }
       if (is) {
         for (const {i} of files) {
-          if (!is.includes(i))
+          if (i == null && !is.includes(i))
             return Response.badRequest(interpolateString(_.INVALID_FILE_IDENTIFIER_i_MUST_BE_ONE_OF_is, {i, is}))
         }
       }
@@ -238,13 +242,14 @@ export function filesUploaded ({
       // Upload/Update/Remove Files
       const updates = []
       for (const field in filesByField) {
+        if (!filesByField[field].length) continue
         updates.push(updateFiles({instance, files: filesByField[field], field, ...options}))
       }
       const {resolve, reject} = await PromiseAll.all(updates)
       resolve.forEach(({field, files, errors}) => {
         // todo: test returning array of promises with errors
         // @see: https://stackoverflow.com/questions/67378814/apollo-server-throw-multiple-errors-with-partial-data
-        if (!files.length) return
+        if (!files) return // files can be empty array if a single file was removed
         if (update) {
           update({instance, field, files, errors})
         } else {

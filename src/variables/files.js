@@ -46,9 +46,9 @@ export const IMAGE = {
   MIME_TYPES: [FILE.MIME_TYPE.JPG, FILE.MIME_TYPE.PNG, FILE.MIME_TYPE.SVG, FILE.MIME_TYPE.GIF, FILE.MIME_TYPE.WEBP],
   SIZES: { // default sharp.resize() config for image uploads
     // @see: https://sharp.pixelplumbing.com/api-resize
-    thumb: {width: 150, height: 150, fit: 'cover'},
-    medium: {width: 1200, height: 1200, fit: 'inside'},
     '': {res: SIZE_MB_16}, // max 4K resolution for the original file
+    medium: {width: 1200, height: 1200, fit: 'inside'},
+    thumb: {width: 150, height: 150, fit: 'cover'},
   }
 }
 
@@ -92,6 +92,21 @@ export function fileName (fileInput) {
   const _ = kind && i && '_'
   const dot = ext && '.'
   return `${id}${slash}${kind}${_}${i}${dot}${ext}`
+}
+
+/**
+ * Compute File Name with given Size label
+ *
+ * @param {String} filename - with extension, result of `fileName()`
+ * @param {String} size - for given `filename`
+ * @returns {String} filename with size added to the name.
+ */
+export function fileNameSized (filename, size) {
+  if (!size) return filename
+  const name = fileNameWithoutExt(filename)
+  const ext = fileExtensionNormalized(filename)
+  const extension = ext ? `.${ext}` : ''
+  return `${name}_${size}${extension}`
 }
 
 /**
@@ -151,6 +166,19 @@ export function fileParser (files) {
     if (list.length) return list
   } else {
     const {file, kind, i, remove} = files
-    if (file || remove) return {file, kind, i, remove}
+    if (file) return {file, kind, i}
+    if (remove) return {kind, i, remove}
   }
+}
+
+/**
+ * Parse <UploadGridField/> onChange(files) values to have `kind` as given
+ * @param fileInput
+ * @param {String} kind - to use
+ * @returns {{kind, remove}|{file, kind}} fileInput for backend with kind inserted
+ */
+export function fileKindParser (fileInput, kind) {
+  const {file, remove} = fileInput
+  if (file) return {file, kind}
+  if (remove) return {kind, remove}
 }

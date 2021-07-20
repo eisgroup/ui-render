@@ -83,10 +83,10 @@ const file = {
     }
   },
 }
-export const FileType = new Schema(file, {timestamps: false, default: undefined})
+export const FileType = new Schema({...file}, {timestamps: false, default: undefined})
 export const Files = {type: [FileType], default: undefined}
 export const Img = new Schema({
-  ...file,
+  ...file, // to reduce network payload, compute different image sizes in frontend
   width: Number,
   height: Number,
 }, {timestamps: false, default: undefined})

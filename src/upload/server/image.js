@@ -1,7 +1,7 @@
-import fs from 'fs'
-import { resolvePath, VALIDATE } from 'modules-pack/variables'
+import { fileNameSized, resolvePath, VALIDATE } from 'modules-pack/variables'
+import PromiseAll from 'promises-all'
 import sharp from 'sharp'
-import { assertBackend, fileExtensionNormalized, fileNameWithoutExt, warn } from 'utils-pack'
+import { assertBackend } from 'utils-pack'
 import { widthScaled } from 'utils-pack/media'
 
 /**
@@ -26,37 +26,46 @@ export function resize ({width = VALIDATE.IMAGE_MAX_RES, height = null, fit = 'i
 }
 
 /**
- * Create Resizes Stream Pipeline
+ * Resizes an Image to Different Sizes from given File Stream and Saves them to Local Server
+ * @param {Stream} stream - readable file stream from `createReadStream()` to create Images for
  * @param {Object} filePath - see `resolvePath()` for argument
  * @param {Object} sizes<res, width, height, fit> - resize() options by the file `size` name (i.e. thumb/medium/...)
- * @returns {*} resizes - write stream pipeline
+ * @returns {Promise<path, name, metadata...>|Error[]} result from PromiseAll.all()
  */
-export function resizes ({filePath, sizes}) {
+export async function saveImgSizes ({stream, filePath, sizes}) {
+  const {dir, path, name} = resolvePath(filePath)
+  const uploads = []
   const pipeline = sharp()
-  const {dir, name} = resolvePath(filePath)
-  const filename = fileNameWithoutExt(name)
-  const ext = fileExtensionNormalized(name)
-  const extension = ext ? `.${ext}` : ''
-  pipeline.metadata()
+  let metadata
+  return stream.pipe(pipeline).metadata()
     .then((meta) => {
-      for (const label in sizes) {
-        const size = label ? `_${label}` : ''
-        let {res, width, height, fit = 'inside'} = sizes[size]
-        // Compute width/height based on `res` limit
-        if (res) {
-          width = widthScaled(res, meta.width, meta.height)
-          height = null
-        }
-        pipeline
-          .clone()
-          .resize(width, height, {fit, withoutEnlargement: true})
-          .toFormat(meta.format) // sanitizes the file
-          .pipe(fs.createWriteStream(`${dir}/${filename}${size}${extension}`))
+      metadata = meta
+      for (const size in sizes) {
+        uploads.push(
+          pipeline
+            .clone()
+            .resize(...resizeArgs(sizes[size], meta))
+            .toFormat(meta.format) // force format to sanitize the file
+            .toFile(`${dir}/${fileNameSized(name, size)}`)
+        )
       }
-      return pipeline
+      return PromiseAll.all(uploads)
     })
-    .catch(warn)
-  return pipeline
+    .then(({resolve, reject}) => {
+      return (resolve.length && !reject.length) ? {...metadata, path, name} : reject
+    })
+}
+
+/**
+ * Convert IMAGE.SIZES values to sharp.resize() chain method
+ */
+function resizeArgs ({res, width, height, fit = 'inside'}, meta) {
+  // Compute width/height based on `res` limit
+  if (res) {
+    width = widthScaled(res, meta.width, meta.height)
+    height = null
+  }
+  return [width, height, {fit, withoutEnlargement: true}]
 }
 
 /**
