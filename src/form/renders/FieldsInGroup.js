@@ -49,7 +49,10 @@ export default class FieldsInGroup extends PureComponent {
         props.panels = []
         props.children = (activeIndex) => items
           .filter((f, i) => i !== activeIndex)
-          .map(({name, validate}) => <Active.Field key={name} name={name} validate={validate} component={() => null}/>)
+          .map(({name, validate}) => {
+            if (props.name) name = `${props.name}.${name}`
+            return <Active.Field key={name} name={name} validate={validate} component={() => null}/>
+          })
         items.forEach(({label, ...field}) => {
           props.tabs.push(<Label className={cn({required: field.required})}>{label || field.name}</Label>)
           props.panels.push(() => {
@@ -60,8 +63,7 @@ export default class FieldsInGroup extends PureComponent {
             //        - avoid `parser: fileParser` because it strips away file.src needed to show preview
             if (field.view === FIELD.TYPE.UPLOAD_GRID) {
               // Set initialValues to changeValues to recover changed state on tab changes
-              const name = [field.name]
-              if (props.name) name.unshift(props.name)
+              const name = props.name ? `${props.name}.${field.name}` : field.name
               field.initialValues = get(instance.formValues, name) || field.initialValues
             }
             return Active.renderField(field)

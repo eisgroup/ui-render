@@ -5,9 +5,11 @@ import React, { PureComponent } from 'react'
 import { Field, Form } from 'react-final-form'
 import { isRequired } from 'react-ui-pack/inputs/validationRules'
 import Text from 'react-ui-pack/Text'
-import Tooltip from 'react-ui-pack/Tooltip'
+import ToolTip from 'react-ui-pack/Tooltip'
+import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
-import { Active, debounce, hasObjectValue, isEmpty, isEqualJSON, objChanges, set, toJSON, warn } from 'utils-pack'
+import { Active, debounce, isEmpty, isEqualJSON, toJSON, warn } from 'utils-pack'
+import { hasObjectValue, isObject, objChanges, set } from 'utils-pack/object'
 import { _ } from 'utils-pack/translations'
 
 /**
@@ -213,6 +215,7 @@ export function asField (InputComponent, {sanitize} = {}) {
  *  - this.state.hasInputChanges - boolean: true if state has form value changes (ensure handleChangeInput is called)
  *  - this.handleChangeInput() - function: updates state.hasInputChanges (hooked to this.renderInput, must be defined as function)
  *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
+ *  - this.props.tooltip - object|boolean: automatically wrap rendered input with Semantic UI Popup
  *  - this.props.onChangeState - function: callback when internal state changes, receives this class instance,
  *        or {} on unmount. This is useful for nested forms with remote submit button within parent container.
  *
@@ -232,15 +235,16 @@ export function asField (InputComponent, {sanitize} = {}) {
  *    }
  *
  * @param {FormProps|Object} [options] - for <Form/> see: https://final-form.org/docs/react-final-form/types/FormProps
+ * @param {Component} [Tooltip] - React component to wrap inputs with tooltip
  * @returns {Function} decorator - HOC wrapper function for given React component
  */
-export function withForm (options = {subscription: {pristine: true, valid: true}}) {
+export function withForm (options = {subscription: {pristine: true, valid: true}}, Tooltip = TooltipPop) {
   return function Decorator (Class) {
     // @Note: form field re-renders because of constantly changing formProps reference
     //        => convert it to instance getter, so `asField` does not depend on formProps.
     //        => cannot use context, because it triggers re-render of all child components.
     // Define withFormSetup here to load it only once on App init
-    withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors})
+    withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors, Tooltip})
 
     // @Note: to avoid several WithForm instances sharing the same closure props,
     //        this decorator must return a class component that stores its internal state between re-renders.
@@ -292,9 +296,10 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
  * @param {Function} fieldValues - callback to get form values
  * @param {Function} registeredFieldValues - callback to get form registered values
  * @param {Function} registeredFieldErrors - callback to get form registered errors
+ * @param {Component} [Tooltip] - React component to wrap inputs with tooltip
  * @returns {Object} Class - mutated with form properties
  */
-export function withFormSetup (Class, {fieldValues, registeredFieldValues, registeredFieldErrors}) {
+export function withFormSetup (Class, {fieldValues, registeredFieldValues, registeredFieldErrors, Tooltip}) {
   if (!Active.renderField) throw new Error(`${withFormSetup.name} requires Active.renderField to be registered`)
   const componentDidUpdate = Class.prototype.componentDidUpdate
   const componentWillUnmount = Class.prototype.componentWillUnmount
@@ -329,8 +334,9 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   Object.defineProperty(Class.prototype, 'canSave', {
     get () {
       // @note: do not use `pristine` because it only reflects visible (i.e. registered inputs)
-      const {loading, formProps: {valid}} = this.props
-      return valid && !loading && !!this.changedValues
+      //        do not use `valid` because it does not compute correctly on tab changes in FieldsInGroup
+      const {loading} = this.props
+      return !loading && !registeredFieldErrors(this.form) && !!this.changedValues
     }
   })
 
@@ -377,12 +383,12 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
         label = labelGroup || label || k
         messages.push(<Text key={k} className="margin-bottom-smaller">{`• ${label}: ${toJSON(errors[k])}`}</Text>)
       }
-      return <Tooltip top>
+      return <ToolTip top>
         <View className="padding-h-smaller">
           <Text className="margin-v-small bold">{_.PLEASE_COMPLETE_}</Text>
           {messages}
         </View>
-      </Tooltip>
+      </ToolTip>
     }
   })
 
@@ -402,7 +408,13 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
         },
         instance: this,
       }))
-      .map(Active.renderField)
+      .map(({tooltip, ...field}) => {
+        const result = Active.renderField(field)
+        // Wrap component with Tooltip automatically
+        if (tooltip != null)
+          return <Tooltip key={field.key}{...isObject(tooltip) ? tooltip : {title: tooltip}}>{result}</Tooltip>
+        return result
+      })
   }
 
   // Define instance method

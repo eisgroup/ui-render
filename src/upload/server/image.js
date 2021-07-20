@@ -4,6 +4,7 @@ import PromiseAll from 'promises-all'
 import sharp from 'sharp'
 import { assertBackend } from 'utils-pack'
 import { widthScaled } from 'utils-pack/media'
+import { makeDirectory } from './file'
 
 /**
  * IMAGE HELPERS ===============================================================
@@ -57,6 +58,8 @@ export function removeImgSizes ({filePath, sizes}) {
  */
 export async function saveImgSizes ({stream, filePath, sizes}) {
   const {dir, path, name} = resolvePath(filePath)
+  const {error} = await makeDirectory(dir)
+  if (error) return {errors: [error]}
   const uploads = []
   const pipeline = sharp()
   let metadata
