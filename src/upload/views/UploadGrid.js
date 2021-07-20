@@ -134,14 +134,14 @@ export default class UploadGrid extends Component {
   }
 
   get isIncremental () {
-    return !this.props.types || !this.props.types.length
+    return (!this.props.types || !this.props.types.length) && this.count > 1
   }
 
   // File Previews and Placeholders
   get previews () {
     const {types, count, showName} = this.props
     const {files} = this.state
-    if (!this.isIncremental) { // explicitly defined identifiers
+    if (types) { // explicitly defined identifiers
       // Sort placeholder by identifier types order
       return types.map(v => {
         const file = files.find(f => f.i === v._)
@@ -149,14 +149,17 @@ export default class UploadGrid extends Component {
         return file || {i: v._, name: v.name}
       })
     } else { // sort by incremental count
-      const placeholders = Array(count).fill(true).map((_, i) => ({i})).filter(({i}) => !files.find(f => f.i === i))
+      const placeholders = files.length < count
+        ? Array(count).fill(true).map((_, i) => ({i})).filter(({i}) => !files.find(f => String(f.i) === String(i)))
+        : []
       // noinspection JSCheckFunctionSignatures
       return files.concat(placeholders).sort(by('i'))
     }
   }
 
   UNSAFE_componentWillReceiveProps (nextProps, _) {
-    if (!isEqual(this.props.initialValues, nextProps.initialValues)) {
+    // Compare `name` to reset state on tab changes
+    if (!isEqual(this.props.initialValues, nextProps.initialValues) || this.props.name !== nextProps.name) {
       this.changedValues = {}
       this.setState({files: toList(nextProps.initialValues, 'clean')})
     }
@@ -215,6 +218,7 @@ export default class UploadGrid extends Component {
       this.cachedFiles[src] = file
       this.changedValues[`${kind}_${i}`] = file
     })
+    // `i` may be undefined or NaN for single upload
     this.setState({files: this.isIncremental ? files.sort(by('i')).filter(f => f.i < count) : files})
     if (onChangeLast) {
       onChangeLast(isArray ? changedFiles : changedFiles[0])
@@ -231,7 +235,8 @@ export default class UploadGrid extends Component {
       ...props
     } = this.props
     const count = this.count
-    const hasCount = showCount && count > 1 && this.isIncremental
+    const multiple = this.isIncremental
+    const hasCount = showCount && multiple
     const shouldCount = showCount && !showName && hasCount
     // Render as square by default, if square root of count is a whole number
     // All other cases render as a wrapping Row to let css `upload.less` control the layout
@@ -247,7 +252,7 @@ export default class UploadGrid extends Component {
               className={classNames('upload-grid__item', {preview: !!file.src})}>
               <Upload
                 {...props}
-                multiple={count > 1}
+                multiple={multiple}
                 autoClean={false}
                 hasHeader={false}
                 showTypes={!file.src}

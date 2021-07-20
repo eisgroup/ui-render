@@ -7,7 +7,7 @@ import { isRequired } from 'react-ui-pack/inputs/validationRules'
 import Text from 'react-ui-pack/Text'
 import Tooltip from 'react-ui-pack/Tooltip'
 import View from 'react-ui-pack/View'
-import { Active, debounce, isEmpty, isEqualJSON, objChanges, set, toJSON, warn } from 'utils-pack'
+import { Active, debounce, hasObjectValue, isEmpty, isEqualJSON, objChanges, set, toJSON, warn } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 
 /**
@@ -29,7 +29,7 @@ export function fieldValues (form) {
  * Get Form's Registered Field Values
  *
  * @param {FormApi} form - instance from react-final-form
- * @returns {Object|Boolean|Undefined} values - nested mapping of field values by their name, or `false` if no field values found
+ * @returns {Object|Undefined} values - nested mapping of field values by their name, or `false` if no field values found
  */
 export function registeredFieldValues (form) {
   const registeredFieldNames = form.getRegisteredFields()
@@ -42,14 +42,14 @@ export function registeredFieldValues (form) {
     const {value} = form.getFieldState(field)
     if (value != null) set(values, field, value) // use set() to convert nested paths to objects
   })
-  return !isEmpty(values) && values
+  if (hasObjectValue(values)) return values
 }
 
 /**
  * Get Form's Registered Field Errors
  *
  * @param {FormApi} form - instance from react-final-form
- * @returns {Object|Boolean|Undefined} errors - key values of field names and error messages
+ * @returns {Object|Undefined} errors - key values of field names and error messages
  */
 export function registeredFieldErrors (form) {
   const registeredFieldNames = form.getRegisteredFields()
@@ -62,7 +62,7 @@ export function registeredFieldErrors (form) {
     const {error} = form.getFieldState(field)
     if (error != null) errors[field] = error
   })
-  return !isEmpty(errors) && errors
+  if (hasObjectValue(errors)) return errors
 }
 
 /**
@@ -204,6 +204,7 @@ export function asField (InputComponent, {sanitize} = {}) {
  *  - this.canSave - getter boolean: true if form has input changes, no validation error exists, and is not loading
  *  - this.changedValues - getter object: key value pairs of form input values that have changed since initial values
  *  - this.registeredValues - getter object: key value pairs of registered form input values
+ *  - this.changedAndRegisteredValues - getter object: combination of above
  *  - this.formValues - getter object: key value pairs of all form input values
  *  - this.renderInput - function: to render form inputs using FIELD.FOR.LIST definition (hooks `onChange` to inputs).
  *
@@ -327,6 +328,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   // Define instance getter
   Object.defineProperty(Class.prototype, 'canSave', {
     get () {
+      // @note: do not use `pristine` because it only reflects visible (i.e. registered inputs)
       const {loading, formProps: {valid}} = this.props
       return valid && !loading && !!this.changedValues
     }
@@ -351,6 +353,14 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
     get () {
       // Have to select all form values, because registered values may not include all input values
       return objChanges(this.props.initialValues, this.formValues)
+    }
+  })
+
+  // Define instance getter
+  Object.defineProperty(Class.prototype, 'changedAndRegisteredValues', {
+    get () {
+      const values = Object.assign({}, this.registeredValues || {}, this.changedValues || {})
+      if (hasObjectValue(values)) return values
     }
   })
 
@@ -489,7 +499,8 @@ export function withGroupInputChange (constructor) {
     const {onChange, initialValues, name} = this.props
     if (name && onChange && initialValues === undefined)
       warn(this.constructor.name, `.${name} requires 'initialValues', if 'onChange(values)' is used`)
-    if (initialValues) this.values = {...initialValues}
+    // Oly pre-populate group values if initialValues was subset of the entire form, so changes can be submitted together
+    if (initialValues && name) this.values = {...initialValues}
     if (componentDidMount) componentDidMount.apply(this, arguments)
   }
 

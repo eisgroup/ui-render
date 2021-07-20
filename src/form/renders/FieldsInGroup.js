@@ -5,7 +5,7 @@ import React, { PureComponent } from 'react'
 import Label from 'react-ui-pack/Label'
 import Row from 'react-ui-pack/Row'
 import Tabs from 'react-ui-pack/Tabs'
-import { Active } from 'utils-pack'
+import { Active, get } from 'utils-pack'
 import { withGroupInputChange } from '../utils'
 
 /**
@@ -28,7 +28,7 @@ export default class FieldsInGroup extends PureComponent {
   }
 
   renderContainer = () => {
-    const {kind, className, style, onChange, instance, items: __, float, ...containerProps} = this.props
+    const {kind, className, style, onChange, instance, items: __, float, initialValues, ...containerProps} = this.props
     const items = this.fields
     const props = {className: classNames('fields-in-group top justify', className), style, ...containerProps}
     switch (kind) {
@@ -38,11 +38,16 @@ export default class FieldsInGroup extends PureComponent {
         items.forEach(({label, ...field}) => {
           props.tabs.push(label || field.name)
           props.panels.push(() => {
+            // @Note: currently only supports uploads for a single file, for multiple files, use UploadGrids.
+            //        => this is because initialValues gets reset to only changed files on tab changes.
             // Simulate state change using initialValues, so that component updates between tab changes
             // @note: - avoid using `key`, because unmounting component causes layout shift
             //        - avoid `parser: fileParser` because it strips away file.src needed to show preview
             if (field.view === FIELD.TYPE.UPLOAD_GRID) {
-              field.initialValues = (this.values || {})[field.name] || field.initialValues
+              // Set initialValues to changeValues to recover changed state on tab changes
+              const name = [field.name]
+              if (containerProps.name) name.unshift(containerProps.name)
+              field.initialValues = get(instance.formValues, name) || field.initialValues
             }
             return Active.renderField(field)
           })
@@ -58,10 +63,11 @@ export default class FieldsInGroup extends PureComponent {
   }
 
   render () {
-    const {hint} = this.props
+    const {hint, label} = this.props
     return (
       <>
         {hint && <Label>{hint}</Label>}
+        {label && <Label>{label}</Label>}
         {this.renderContainer()}
       </>
     )
