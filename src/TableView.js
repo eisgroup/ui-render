@@ -260,7 +260,7 @@ export default class TableView extends PureComponent {
     const render = isFunction(cell) ? cell : (r || renderCell)
     const value = data != null ? data : cell
     let content = render ? render(value, index, {className, style, expanded: this.expandedByRow(index)}, this) : cell
-    if (!content && content !== 0) content = this.props.showEmptyAs
+    if ((content == null || content === '') && this.props.showEmptyAs != null) content = this.props.showEmptyAs
     return (
       <Table.Cell key={this.props.vertical ? index : id} className={classNameCellWrap}>
         {typeof content === 'object'

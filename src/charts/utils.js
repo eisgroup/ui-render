@@ -22,7 +22,7 @@ const VIOLET = 'rgb(90, 55, 187)'
  * @param {Number} [hueCount] - number of distinct hues to use
  * @returns {Array} colors - list of colors
  */
-export function gradientColors (count, colors = [PINK, TEAL, VIOLET], hueCount = 3) {
+export function gradientColors (count, colors = [PINK, TEAL, VIOLET], hueCount = colors.length) {
   return colorScaleDistinct(chroma.scale(colors).colors(count), hueCount)
 }
 

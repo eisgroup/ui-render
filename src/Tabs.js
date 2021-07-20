@@ -99,7 +99,7 @@ export default class Tabs extends PureComponent {
                     style={stylePanels}>
           {typeof content === 'object' ? content : (isFunction(content) ? content() : <Text>{content}</Text>)}
         </ScrollView>
-        {children}
+        {isFunction(children) ? children(activeIndex) : children}
       </ScrollView>
     )
   }
