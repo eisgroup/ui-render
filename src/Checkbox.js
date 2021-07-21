@@ -62,7 +62,7 @@ export function Checkbox ({
         type={type === 'toggle' ? 'checkbox' : type}
         className={classNames('checkbox', type)}
         id={id}
-        onChange={({target: {checked}}) => onChange(checked ? valueTrue : valueFalse)}
+        onChange={readonly ? null : ({target: {checked}}) => onChange(checked ? valueTrue : valueFalse)}
         {...props}
       />
       <Label
