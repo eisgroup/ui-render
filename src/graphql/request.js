@@ -140,14 +140,16 @@ export function withGql ({query = null, mutation = null, Loading = LoadingView})
         args = [q, options]
       }
 
-      const {loading, error, data, called: fetched, ...more} = useQuery(...args)
-      // Let query override props only after a successful HTTP 200 response, or route changed.
+      const {loading, error, data, previousData, called: fetched, ...more} = useQuery(...args)
+      // Let query override props only after a successful HTTP 200 response, cache update, or route changes.
       // This avoids overriding nested mutation data when higher up containers,
       // like App.js force re-rendering (ex. layout/language/currency change).
       // => Also not possible to call .propsMapper for `fallback` value
       if (
-        (prevQueryLoading && !loading && !error && fetched && data) ||
-        prevURI !== (uri = uriFrom(initialProps))
+        // successful HTTP 200 response or re-render from `updateCacheList()`
+        // (`previousData` must exist, else `data` is always different from `previousData`)
+        (data && fetched && !error && !loading && (prevQueryLoading || (data !== previousData && previousData))) ||
+        (prevURI && prevURI !== (uri = uriFrom(initialProps))) // route change
       ) {
         prevURI = uri
         ownProps = {
@@ -272,7 +274,8 @@ export function gqlRequestDecorator ({
   // @see: https://github.com/apollographql/apollo-client/issues/6760
   // 'cache-and-network' literally forces query to refetch after mutation
   fetchPolicy = 'cache-and-network',
-  nextFetchPolicy = 'cache-first', // 'cache-first' -> in case of mutation with 'cache-and-network'
+  // 'cache-first' for mutations with 'cache-and-network' fetchPolicy
+  nextFetchPolicy = 'cache-first',
   errorPolicy,
   skip = reusable ? false : querySkip,
   optimistic = reusable,
