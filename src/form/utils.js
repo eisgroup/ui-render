@@ -8,7 +8,7 @@ import Text from 'react-ui-pack/Text'
 import ToolTip from 'react-ui-pack/Tooltip'
 import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
-import { Active, debounce, isEmpty, isEqualJSON, toJSON, warn } from 'utils-pack'
+import { Active, debounce, isEqualJSON, toJSON, warn } from 'utils-pack'
 import { hasObjectValue, isObject, objChanges, set } from 'utils-pack/object'
 import { _ } from 'utils-pack/translations'
 
@@ -128,16 +128,18 @@ export function asField (InputComponent, {sanitize} = {}) {
       //  - this.props.onChange is callback defined in withFormSetup - does not update form values, or change `pristine`
       //  - this.input.onChange is callback from final-form/redux-form - does not trigger parent re-render directly, only when `valid` prob changes
       // => the best logic is to change input value after it unmounts, and call `onChange` to update parent state,
-      //    because this avoids validation, ties all operations together and persists `state.hasInputChanges`.
+      //    because this avoids validation, ties all operations together and persists `state.canSave`.
       const {instance, name, onChange} = this.props
-      // @note: it's too complex to have conditional check whether form is resetting, so run always
-      if (instance) setTimeout(() => {
-        // only call this if the form is not unmounted
-        const form = instance.form
-        if (!form || !form.getRegisteredFields().length) return
-        form.change(name, null)
-        onChange && onChange(null)
-      }, 0)
+      if (instance) {
+        setTimeout(() => {
+          // only call this if the form is not unmounted and initialValues remained (i.e. not between transitions)
+          const form = instance.form
+          if (form && this.initValues === instance.props.initialValues) {
+            form.change(name, null)
+            onChange && onChange(null)
+          }
+        }, 0)
+      }
     }
 
     // do not use ...props from input, because it is shared by <Active.Field> instances
@@ -150,6 +152,7 @@ export function asField (InputComponent, {sanitize} = {}) {
       this.value = value === '' ? (pristine && defaultValue != null ? defaultValue : value) : value
       this.input = input
       if (this.value === undefined) this.value = ''
+      if (instance) this.initValues = instance.props.initialValues
       return (
         <InputComponent
           {...input}
@@ -212,8 +215,7 @@ export function asField (InputComponent, {sanitize} = {}) {
  *
  * @helpers:
  *  - this._fields - list: of FIELD.FOR.LIST hydrated with props and initialValues, ready for rendering.
- *  - this.state.hasInputChanges - boolean: true if state has form value changes (ensure handleChangeInput is called)
- *  - this.handleChangeInput() - function: updates state.hasInputChanges (hooked to this.renderInput, must be defined as function)
+ *  - this.handleChangeInput() - function: updates state.canSave (hooked to this.renderInput, must be defined as function)
  *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
  *  - this.props.tooltip - object|boolean: automatically wrap rendered input with Semantic UI Popup
  *  - this.props.onChangeState - function: callback when internal state changes, receives this class instance,
@@ -301,7 +303,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
  */
 export function withFormSetup (Class, {fieldValues, registeredFieldValues, registeredFieldErrors, Tooltip}) {
   if (!Active.renderField) throw new Error(`${withFormSetup.name} requires Active.renderField to be registered`)
-  const componentDidUpdate = Class.prototype.componentDidUpdate
+  const UNSAFE_componentWillReceiveProps = Class.prototype.UNSAFE_componentWillReceiveProps
   const componentWillUnmount = Class.prototype.componentWillUnmount
   const handleChangeInput = Class.prototype.handleChangeInput
 
@@ -315,8 +317,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   Class.prototype.state = {
     // This state only updates on input changes, for changes in parent props, use this.changedValues
-    hasInputChanges: false, // only used to force re-render of the parent container for save button
-    canSave: false, // only used internally to compare changes for re-rendering
+    canSave: false, // used to compare changes for re-rendering, like 'Save' button
     ...Class.prototype.state
   }
 
@@ -428,21 +429,25 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   // Define instance method
   Class.prototype.syncInputChanges = function () {
-    const {initialValues, loading, formProps: {valid}} = this.props
-    const registeredValues = this.registeredValues
-    const hasInputChanges = (registeredValues && isEmpty(initialValues)) || !!this.changedValues
-    const canSave = hasInputChanges && valid && !loading
-    if (hasInputChanges !== this.state.hasInputChanges || canSave !== this.state.canSave) {
-      this.setState({hasInputChanges, canSave})
+    const canSave = this.canSave
+    if (canSave !== this.state.canSave) {
+      this.setState({canSave})
       if (this.props.onChangeState) this.props.onChangeState(this)
     }
   }
 
-  Class.prototype.componentDidUpdate = function (old) {
-    if (!isEqualJSON(old.initialValues, this.props.initialValues)) {
+  Class.prototype.UNSAFE_componentWillReceiveProps = function (next) {
+    // @Note: using componentDidUpdate comparison logic is not reliable,
+    // because on the last re-render, Form may trigger `pristine` update without changing initialValues,
+    // which will make .canSave false, but this.syncInputChanges() only updated in the previous render, which was true.
+    // => thus need to take formProps into consideration
+    if (
+      !isEqualJSON(next.initialValues, this.props.initialValues) ||
+      !isEqualJSON(next.formProps, this.props.formProps)
+    ) {
       this.syncInputChanges()
     }
-    if (componentDidUpdate) componentDidUpdate.apply(this, arguments)
+    if (UNSAFE_componentWillReceiveProps) UNSAFE_componentWillReceiveProps.apply(this, arguments)
   }
 
   Class.prototype.componentWillUnmount = function () {
