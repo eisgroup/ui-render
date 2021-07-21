@@ -204,9 +204,9 @@ export default class Upload extends PureComponent {
           </Fragment>
           }
           {showTypes &&
-          <View className="position-fill align-center appear-on-hover">
+          <View className="dropzone__hover position-fill align-center appear-on-hover">
             <View className="padding text-outline">
-              <View className="position-fill bg-neutral radius-large" style={{opacity: 0.8}}/>
+              <View className="dropzone__hover__bg position-fill bg-neutral radius-large"/>
               <Text className="margin-bottom-smaller">{_.FORMAT}</Text>
               <Text className="bold p">{fileTypes.replace(/\./g, '')}</Text>
             </View>

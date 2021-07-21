@@ -39,7 +39,7 @@ export function idFromRoute (props) {
 }
 
 /**
- * Get Current Route from Component Props
+ * Get Current Route Definition from Component Props (without ID)
  * @param {Object} props - React Component props
  * @param {String} [suffix] - string to append at the end, '/' for example
  * @returns {String} route - path without query ID and without the ending slash
@@ -49,6 +49,19 @@ export function routeFrom (props, suffix = '') {
   if (route) route = route.substr(0, route.lastIndexOf('/'))
   if (!route && props.router) route = props.router.pathname.replace('/[id]', '') // next.js
   return route + suffix
+}
+
+/**
+ * Get Current Route URI Path from Component Props (without query string and hash)
+ * @param {Object} props - React Component props
+ * @returns {String} uri - path relative to TLD without query string and without string after `#`
+ */
+export function uriFrom (props) {
+  let uri = get(props, 'history.location.pathname', '')
+  if (!uri) {// next.js has no no reliable props to get pathname!
+    if (typeof window !== 'undefined') uri = get(window, 'location.pathname', '')
+  }
+  return uri
 }
 
 /**

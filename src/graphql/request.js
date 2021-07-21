@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { idFromRoute } from 'modules-pack/router/utils'
+import { idFromRoute, uriFrom } from 'modules-pack/router/utils'
 import { ROUTES } from 'modules-pack/variables'
 import React from 'react'
 import { getOriginalClass } from 'react-ui-pack'
@@ -25,7 +25,17 @@ import { GQL_HIDDEN_FIELDS } from './constants'
  * =============================================================================
  */
 
+/** `gqlRequestDecorator()` config flag to set defaults for requests without variables that always need querying */
+export const reusable = true
+/** whether to render the component immediately (good for non-blocking chained requests) */
 export const optimistic = true
+/**
+ * `gqlRequestDecorator()` configs for using the request response as dropdown options
+ * @example:
+ *    gqlRequestDecorator({
+ *      propsMapperOptions: {asProp: 'tagOptions', ...asDropdownOptions},
+ *    })
+ */
 export const asDropdownOptions = {
   mapEntry: (list) => list.map(entry => ({text: entry.name, value: entry.id})),
   initialValues: false,
@@ -97,6 +107,7 @@ export function querySkip (props, variables) {
 export function withGql ({query = null, mutation = null, Loading = LoadingView}) {
   return function GqlDecorator (Component) {
     let ownProps = {} // persist props as closure object in between component life cycles
+    let prevURI, uri
     let prevQueryLoading = false
     let prevMutationLoading = false
     let _mutate
@@ -130,11 +141,15 @@ export function withGql ({query = null, mutation = null, Loading = LoadingView})
       }
 
       const {loading, error, data, called: fetched, ...more} = useQuery(...args)
-      // Let query override props only after a successful HTTP 200 response.
+      // Let query override props only after a successful HTTP 200 response, or route changed.
       // This avoids overriding nested mutation data when higher up containers,
-      // like App.js force re-rendering (ex. language/currency change).
+      // like App.js force re-rendering (ex. layout/language/currency change).
       // => Also not possible to call .propsMapper for `fallback` value
-      if (prevQueryLoading && !loading && !error && fetched && data) {
+      if (
+        (prevQueryLoading && !loading && !error && fetched && data) ||
+        prevURI !== (uri = uriFrom(initialProps))
+      ) {
+        prevURI = uri
         ownProps = {
           ...ownProps,
           ...(query.propsMapper ? query.propsMapper({props, data, fetched, ...more}) : {...data, fetched, ...more})
@@ -226,6 +241,7 @@ export function withGql ({query = null, mutation = null, Loading = LoadingView})
  * @param {String} field - GraphQL entry field to be queried/mutated
  * @param {Object} query - imported query.gql file
  * @param {Object} mutation - imported mutation.gql file
+ * @param {Boolean} [reusable] - whether to use default configs for requests without variables that always need querying
  * @param {Function<{props, data, fetched, saved, ...useQueryOrMutation}>} [propsMapper] - Component props mapper
  * @param {Object} [propsMapperOptions] - see `createPropsMapper` for reference
  * @param {String[]} [hiddenFields] - list of GraphQL Type fields to remove from response to sync with `form` state
@@ -246,18 +262,20 @@ export function gqlRequestDecorator ({
   field,
   query,
   mutation,
+  // config shortcuts
+  reusable,
   // Optional
   propsMapper,
   propsMapperOptions,
   hiddenFields,
-  variables = queryVariables,
+  variables = reusable ? {} : queryVariables,
   // @see: https://github.com/apollographql/apollo-client/issues/6760
   // 'cache-and-network' literally forces query to refetch after mutation
   fetchPolicy = 'cache-and-network',
-  nextFetchPolicy = 'cache-first',
+  nextFetchPolicy = 'cache-first', // 'cache-first' -> in case of mutation with 'cache-and-network'
   errorPolicy,
-  skip = querySkip,
-  optimistic,
+  skip = reusable ? false : querySkip,
+  optimistic = reusable,
   mutate,
   update,
   optimisticResponse,
