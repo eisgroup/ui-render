@@ -397,13 +397,13 @@ export function listAlphabetically (array) {
 
 /**
  * Array.reduce callback to convert list of objects with .id attributes to a key-value hashmap object
- * @usage:
- *    [{id: "unique", name: "test"}].reduce(listToObj, {})
+ * @example:
+ *    [{id: "unique", name: "test"}].reduce(listToMap, {})
  *    >>> {"unique": {id: "unique", name: "test"}}
  *
- * @returns {Object} object with element.id being keys, and elements of array being values
+ * @returns {Object} object with element.id being keys, and elements of original array being values
  */
-export function listToObj (obj, data) {
+export function listToMap (obj, data) {
   obj[data.id] = data
   return obj
 }

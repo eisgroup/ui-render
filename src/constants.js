@@ -197,7 +197,7 @@ export const ONE_MILE = 1609344 * ONE_MM
 
 /* Formats */
 export const FORMAT_TIME = 'YYYY-MM-DD hh:mm:ss'
-export const FORMAT_TIME_FOR_HUMAN = 'ddd, Do MMM - hh:mm a'
+export const FORMAT_TIME_FOR_HUMAN = 'ddd, D MMM - hh:mm a'
 export const FORMAT_DATE = 'DD.MM.YYYY'
 export const FORMAT_DATE_ISO = 'YYYY-MM-DD'
 export const FORMAT_HH_MM = 'HH[:]mm'

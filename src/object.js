@@ -236,11 +236,11 @@ export function reset(collection, payload) {
  >>> {user: {name: 'Chris'}, {sign: 'scorpion'}}
  *
  * @param {Object|Array} state - collection to be updated
- * @param {Object} payload - the nested Object to update with
- * @param {boolean} shouldCloneDeep - whether to return new Object instead of mutating it
+ * @param {Object|Array} payload - the nested Object to update with
+ * @param {Boolean} shouldCloneDeep - whether to return new Object instead of mutating it
  * @return {Object|Array} - mutated/cloned Object with nested update
  */
-export function update(state, payload, shouldCloneDeep = false) {
+export function update (state, payload, shouldCloneDeep = false) {
 	if (shouldCloneDeep) state = cloneDeep(state)
 
 	for (const key in payload) {

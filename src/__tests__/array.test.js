@@ -11,7 +11,7 @@ import {
   isInList,
   isInListAny,
   isList,
-  listToObj,
+  listToMap,
   mergeLists,
   prependToList,
   removeFromList,
@@ -123,15 +123,15 @@ test(`${toListValuesTotal.name}() computes correct total number of values provid
   // expect(toListTotal(NaN)).toEqual(0)
 })
 
-test(`${listToObj.name}() converts array of objects to new kay-value object using element id as keys`, () => {
+test(`${listToMap.name}() converts array of objects to new kay-value object using element id as keys`, () => {
   const element = {id: 'unique', name: 'test'}
   const element2 = {id: 'unique2', name: 'test'}
-  expect([element].reduce(listToObj, {})).toEqual({'unique': element})
-  expect([element, element2].reduce(listToObj, {})).toEqual({'unique': element, 'unique2': element2})
+  expect([element].reduce(listToMap, {})).toEqual({'unique': element})
+  expect([element, element2].reduce(listToMap, {})).toEqual({'unique': element, 'unique2': element2})
 
   // when .reduce is not given init value, it will mutate the first element
-  expect([element].reduce(listToObj)).toEqual(element)
-  expect([element, element2].reduce(listToObj)).toEqual(element)
+  expect([element].reduce(listToMap)).toEqual(element)
+  expect([element, element2].reduce(listToMap)).toEqual(element)
 })
 
 test(`${shuffle.name}() randomizes list value orders`, () => {
