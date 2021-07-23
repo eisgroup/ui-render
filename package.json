@@ -1,6 +1,6 @@
 {
   "name": "modules-pack",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "JavaScript Modules for Modern Frontend & Backend Projects",
   "license": "MIT",
   "main": "index.js",
@@ -29,11 +29,11 @@
   },
   "peerDependencies": {
     "@apollo/client": "x",
-    "mkdirp": "x",
     "graphql": "x",
     "graphql-apollo-errors": "x",
     "graphql-fields": "x",
     "graphql-type-json": "x",
+    "mkdirp": "x",
     "react": "16.x",
     "react-ui-pack": "0.7.x",
     "sanitize-filename": "x",
@@ -51,6 +51,7 @@
     "react-redux": "^7.2.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
+    "reduce-reducers": "^1.0.4",
     "redux": "^4.0.5",
     "redux-actions": "^2.6.5",
     "redux-form": "^8.3.6",

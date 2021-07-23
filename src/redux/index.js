@@ -1,4 +1,5 @@
 import { connect, Provider } from 'react-redux' // import like this produces smallest js bundle size
+import mergeReducers from 'reduce-reducers'
 import { combineReducers } from 'redux'
 import { createAction, handleActions } from 'redux-actions' // import like this produces smallest js bundle size
 import thunk from 'redux-thunk' // Middleware for async tasks
@@ -15,8 +16,9 @@ export { default as createStore } from './createStore'
 export {
   combineReducers,
   connect,
-  handleActions,
   createAction,
+  handleActions,
+  mergeReducers,
   Provider
 }
 
