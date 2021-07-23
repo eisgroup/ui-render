@@ -93,6 +93,8 @@ export function asField (InputComponent, {sanitize} = {}) {
       name: PropTypes.string.isRequired,
       // Instance of the Class component decorated withFormSetup (i.e withForm)
       instance: PropTypes.object,
+      // Whether to fire Field.onChange(null) when its component unmounts
+      onRemoveChange: PropTypes.bool,
       label: PropTypes.any,
       id: PropTypes.string,
       // HTML Input type attribute
@@ -129,8 +131,8 @@ export function asField (InputComponent, {sanitize} = {}) {
       //  - this.input.onChange is callback from final-form/redux-form - does not trigger parent re-render directly, only when `valid` prob changes
       // => the best logic is to change input value after it unmounts, and call `onChange` to update parent state,
       //    because this avoids validation, ties all operations together and persists `state.canSave`.
-      const {instance, name, onChange} = this.props
-      if (instance) {
+      const {instance, name, onChange, onRemoveChange} = this.props
+      if (instance && onRemoveChange) {
         setTimeout(() => {
           // only call this if the form is not unmounted and initialValues remained (i.e. not between transitions)
           const form = instance.form
@@ -147,7 +149,10 @@ export function asField (InputComponent, {sanitize} = {}) {
     Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}) => {
       // Hide this field if it's readonly and has no value.
       if (this.props.readonly && isRequired(this.props.value)) return null
-      const {onChange, error: err, defaultValue, normalize, format, parse, validate, instance, ...props} = this.props
+      const {
+        onChange, error: err, defaultValue, normalize, format, parse, validate,
+        instance, onRemoveChange, ...props
+      } = this.props
       // @Note: defaultValue is only used for UI, internal value is still undefined
       this.value = value === '' ? (pristine && defaultValue != null ? defaultValue : value) : value
       this.input = input

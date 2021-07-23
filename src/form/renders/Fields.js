@@ -37,6 +37,7 @@ export default class Fields extends PureComponent {
   static defaultProps = {
     initialValues: {},
     kind: FIELD.TYPE.INPUT,
+    onRemoveChange: true, // calls field.onChange(null) on unmounting
   }
 
   state = {
