@@ -93,7 +93,7 @@ export function Input ({
       <Row className="middle">
         {!isCheckbox && label && <Label htmlFor={id}>{label}</Label>}
         {onRemove && !readonly &&
-        <Button className="input__delete" onClick={() => onRemove(id)}><Icon name="delete"/></Button>}
+        <Button className="input__delete" onClick={() => onRemove(name || id)}><Icon name="delete"/></Button>}
       </Row>
       }
       <Row className={classNames('input', {active, icon, lefty, error, info, unit})}>

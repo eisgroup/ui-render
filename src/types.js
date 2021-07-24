@@ -33,6 +33,7 @@ type.OneOf = (...types) => PropTypes.oneOfType(types)
 type.Px = PropTypes.number // screen unit
 type.String = PropTypes.string
 type.StringOrNumber = PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+type.Timestamp = PropTypes.number
 type.Url = PropTypes.string
 type.UrlOrBase64 = type.String
 type.UrlOrNode = type.OneOf(type.String, type.Object, type.Method)
