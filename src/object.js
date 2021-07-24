@@ -237,15 +237,18 @@ export function reset(collection, payload) {
  *
  * @param {Object|Array} state - collection to be updated
  * @param {Object|Array} payload - the nested Object to update with
- * @param {Boolean} shouldCloneDeep - whether to return new Object instead of mutating it
+ * @param {Boolean} [shouldCloneDeep] - whether to return new Object instead of mutating it
+ * @param {Boolean} [deleteNull] - whether to remove `null` props instead of updating them
  * @return {Object|Array} - mutated/cloned Object with nested update
  */
-export function update (state, payload, shouldCloneDeep = false) {
+export function update (state, payload, shouldCloneDeep = false, deleteNull = false) {
 	if (shouldCloneDeep) state = cloneDeep(state)
 
 	for (const key in payload) {
 		const value = payload[key]
-		if (isObject(value)) {
+		if (value === null && deleteNull) {
+			delete state[key]
+		} else if (isObject(value)) {
 			state[key] = state[key] ? update(state[key], value) : value
 		} else {
 			state[key] = value
