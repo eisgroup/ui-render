@@ -522,9 +522,10 @@ export default {
                                   {
                                     view: 'Input',
                                     name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].rateCalcEmp',
-                                    label: 'Areas',
+                                    label: 'Areas (format: double5)',
                                     type: 'number',
                                     format: 'double5',
+                                    removable: true,
                                   },
                                   {view: 'Space'},
                                   {

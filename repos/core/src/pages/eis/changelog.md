@@ -6,7 +6,8 @@
 - [Example: **Tabs Buttoned**](/docs/examples#tabsButtoned) (+ [Tabs](/docs/examples#tabs) default example)
 - [Example: **showEmptyAs**](/docs/examples#tableExtraItems) attribute for Table (cell value must be `null` or empty string for it to work)
 - **onClickIcon** callback added for Dropdown to remove/delete Select field
-- localised validation messages
+- Localised validation messages
+- Updated chevron icons to the latest DSM style guide.
   
 #### Documentation Improvements
 - [FAQ: **How to check UI Render Version**](/docs/faq)
