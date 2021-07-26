@@ -23,3 +23,16 @@ if (_SHOULD_SHOW_TEST_) ROUTES.FOR_NAV.push(...[
   {path: ROUTE.TESTER, name: 'Tester', icon: 'test'},
   {path: ROUTE.THEME, name: 'Theme', icon: 'theme'},
 ])
+
+export function goTo (uri, title = uri, page = uri) {
+  if (typeof window === 'undefined') return
+// eslint-disable-next-line no-restricted-globals
+  if (typeof history === 'undefined') return
+// eslint-disable-next-line no-restricted-globals
+  if (typeof history.pushState !== 'undefined') {
+// eslint-disable-next-line no-restricted-globals
+    history.pushState({page: page}, title, uri)
+  } else {
+    window.location.assign(uri)
+  }
+}

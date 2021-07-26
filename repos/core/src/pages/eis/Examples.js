@@ -6,6 +6,7 @@ import ScrollView from 'react-ui-pack/ScrollView'
 import View from 'react-ui-pack/View'
 import Render from 'ui-renderer'
 import { logRender } from 'utils-pack'
+import { goTo } from '../../common/variables'
 import data from './examples/_data.json'
 import meta from './examples/_meta'
 import listData from './examples/array-nested_data.json'
@@ -66,7 +67,7 @@ const examples = [
   },
   {
     title: 'Table Nested within Table',
-    id: 'table',
+    id: 'tableNested',
     data: listData,
     meta: tableNestedMeta,
   },
@@ -136,20 +137,22 @@ export default class Examples extends Component {
     activeIndex: null
   }
 
-  toggleExpand = ({expanded, value}) => {
+  toggleExpand = ({expanded, value, key: id}) => {
     this.setState({activeIndex: expanded ? value : null})
+    if (expanded) goTo(`#${id}`)
   }
 
   render () {
     const {activeIndex} = this.state
+    const hash = (typeof window !== 'undefined') ? (window.location.hash || '').substr(1) : ''
     return (
-      <View className='app__examples bg-white border'>
+      <View className="app__examples bg-white border">
         {examples.map(({data, meta, title, id}, i) => (
           <Expand
             id={id}
             key={title}
             index={i}
-            expanded={i === activeIndex}
+            expanded={i === activeIndex || id === hash}
             title={title}
             onClick={this.toggleExpand}
             classNameLabel="inverted bg-inverse"

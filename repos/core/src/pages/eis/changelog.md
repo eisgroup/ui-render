@@ -3,15 +3,18 @@
 ### v0.24.0
 #### New Features
 - [FAQ: **How to check UI Render Version**](/docs/faq)
-- [Example: **Matrix Table** configuration](/docs/examples#tableMatrix) (+ minimum config provided)
-- [Example: **showEmptyAs** attribute for Table](/docs/examples#tableExtraItems) (see 'Table with Custom Data' example) - the cell value must be `null` or empty string for it to work
+- [Example: **Matrix Table** configuration](/docs/examples#tableMatrix) (+ [minimum config](/docs/examples#tableMatrixRequired) example)
+- [Example: **showEmptyAs** attribute for Table](/docs/examples#tableExtraItems) (cell value must be `null` or empty string for it to work)
 - **onClickIcon** callback added for Dropdown to remove/delete Select field
 - localised validation messages
+- Clicking links to `Examples` with hash, like [this](/docs/examples#all), automatically opens the example. 
+  In the same way, you can link to an example directly by first expanding it, then copying URL in the browser.
 
 #### Fixes
 - Multiple Form instances for UI Render on the same page
 - **readonly** state for all form fields no longer hides the input
 - **onRemove** Input Field sets form value to null for the Input
+- Tabs shown in [`/docs`](/docs) now sync with browser URL
 
 #### Removed
 - **hideOnEmpty** attribute

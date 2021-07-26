@@ -4,12 +4,13 @@ import ScrollView from 'react-ui-pack/ScrollView'
 import Tabs from 'react-ui-pack/Tabs'
 import toc from 'remark-toc'
 import { get, logRender } from 'utils-pack'
+import { goTo } from '../../common/variables'
 import changelog from './changelog.md'
 import CodeBlock from './CodeBlock'
 import config from './config.md'
 import docs from './docs.md'
 import Examples from './Examples'
-import faq from './fag.md'
+import faq from './faq.md'
 import styles from './styles.md'
 
 const mdProps = {
@@ -32,27 +33,26 @@ export default class Docs extends Component {
     faq: undefined,
   }
 
+  tabs = [
+    {id: '', title: 'Summary'},
+    {id: 'configuration', title: 'Configuration'},
+    {id: 'examples', title: 'Examples'},
+    {id: 'styles', title: 'Styles'},
+    {id: 'changelog', title: 'Change Log'},
+    {id: 'faq', title: 'FAQ'},
+  ]
+
   get id () {
     return get(this.props, 'match.params.id') || ''
   }
 
   get tabIndex () {
-    const id = this.id
-    switch (id) {
-      case 'configuration':
-        return 1
-      case 'examples':
-        return 2
-      case 'styles':
-        return 3
-      case 'changelog':
-        return 4
-      case 'faq':
-        return 5
-      default:
-        return 0
+    return this.tabs.findIndex(v => v.id === this.id)
+  }
 
-    }
+  onClickTab = (index) => {
+    const id = this.tabs[index].id
+    goTo(`/docs${id && '/'}${id}`)
   }
 
   componentDidMount () {
@@ -69,7 +69,8 @@ export default class Docs extends Component {
         <h1>{'UI Render'}</h1>
         <Tabs
           defaultIndex={this.tabIndex}
-          tabs={['Summary', 'Configuration', 'Examples', 'Styles', 'Change Log', 'FAQ']}
+          onChange={this.onClickTab}
+          tabs={this.tabs.map(v => v.title)}
           panels={[
             () => <Markdown source={this.state.docs} {...mdProps}/>,
             () => <Markdown source={this.state.config} {...mdProps}/>,
@@ -78,7 +79,7 @@ export default class Docs extends Component {
             () => <Markdown source={this.state.changelog} {...mdProps}/>,
             () => <Markdown source={this.state.faq} {...mdProps}/>,
           ]}
-          classNamePanels='padding-v margin-v'
+          classNamePanels="padding-v margin-v"
         />
 
       </ScrollView>
