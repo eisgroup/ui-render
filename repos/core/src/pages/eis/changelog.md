@@ -17,6 +17,7 @@
 
 #### Fixes
 - Multiple Form instances for UI Render on the same page
+- **removable** attribute shows delete icon inside Input  
 - **readonly** state for all form fields no longer hides the input if it has value
 - **onRemove** Input Field sets form value to null for the Input
 

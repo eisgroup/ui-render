@@ -366,11 +366,15 @@ Render.Component = function RenderComponent ({
 
       // Input clearing
       if (removable) {
-        const {onRemove} = input
-        input.onRemove = (name) => {
-          form.change(name, null)
-          onRemove && onRemove(name)
+        const {onRemove, onClickIcon} = input
+        input.icon = 'delete'
+        input.classNameIcon = 'button circle small transparent appear-on-hover'
+        input.onClickIcon = (...args) => {
+          // todo: for some reason Dropdown/Select have `form` undefined
+          form.change(input.name, null)
+          onRemove && onRemove(input.name)
           autoSubmit && input.onChange(null)
+          onClickIcon && onClickIcon(...args)
         }
       }
 

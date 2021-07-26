@@ -482,8 +482,8 @@ export default {
                             items: [
                               {
                                 view: 'Input',
-                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].area',
-                                label: 'Area',
+                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails.0.area',
+                                label: 'Area (autoSubmit)',
                                 removable: true,
                                 required: true,
                                 autoSubmit: {
@@ -493,20 +493,20 @@ export default {
                               {view: 'Space'},
                               {
                                 view: 'Input',
-                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].trend',
+                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails.0.trend',
                                 label: 'trend',
                                 removable: true,
                               },
                               {view: 'Space'},
                               {
                                 view: 'Input',
-                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].maximumEEandSP',
+                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails.0.maximumEEandSP',
                                 label: 'maximum (EE and SP)',
                               },
                               {view: 'Space'},
                               {
                                 view: 'Input',
-                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].maximumCH',
+                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails.0.maximumCH',
                                 label: 'maximum (CH)',
                               },
                             ],
