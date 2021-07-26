@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import Expand from 'react-ui-pack/Expand'
+import Icon from 'react-ui-pack/Icon'
 import JsonView from 'react-ui-pack/JsonView'
+import { LinkOut } from 'react-ui-pack/LinkOut'
 import Row from 'react-ui-pack/Row'
 import ScrollView from 'react-ui-pack/ScrollView'
 import View from 'react-ui-pack/View'
 import Render from 'ui-renderer'
-import { logRender } from 'utils-pack'
+import { logRender, toJSON } from 'utils-pack'
 import { goTo } from '../../common/variables'
 import data from './examples/_data.json'
 import meta from './examples/_meta'
@@ -164,11 +166,25 @@ export default class Examples extends Component {
                 <ScrollView className="padding-smaller bg-neutral inverted">
                   <Row className="wrap spread">
                     <View fill className="padding-smaller min-width-320">
-                      <h3>{'Meta.json'}</h3>
+                      <h3>
+                        <LinkOut
+                          to={`data:text/json;charset=utf-8,${encodeURIComponent(toJSON(meta, null, 2))}`}
+                          download={`${id}_meta.json`}
+                        >
+                          {'Meta.json'} <Icon name="file-download" className="large"/>
+                        </LinkOut>
+                      </h3>
                       <JsonView data={meta} inverted/>
                     </View>
                     <View fill className="padding-smaller min-width-320">
-                      <h3>{'Data.json'}</h3>
+                      <h3>
+                        <LinkOut
+                          to={`data:text/json;charset=utf-8,${encodeURIComponent(toJSON(data, null, 2))}`}
+                          download={`${id}_data.json`}
+                        >
+                          {'Data.json'} <Icon name="file-download" className="large"/>
+                        </LinkOut>
+                      </h3>
                       <JsonView data={data} inverted/>
                     </View>
                   </Row>
