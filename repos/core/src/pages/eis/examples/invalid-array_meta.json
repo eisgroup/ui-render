@@ -35,7 +35,6 @@
         {
           "view": "Table",
           "name": "coveragesDetails",
-          "hideOnEmpty": true,
           "headers": [
             {
               "id": "coverageID",

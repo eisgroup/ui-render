@@ -70,19 +70,16 @@ Render.Tooltip = TooltipPop
  * @param {String} relativePath - path used to compute form input "name" attribute
  * @param {Object} form - react-final-form FormApi instance
  * @param {String|Object} [showIf] - whether to not render the component if it evaluates to truthy value
- * @param {Boolean} [hideOnEmpty] - whether to not render the component if it's value is null/undefined/empty string
  * @param {Function} [Render] - the recursive renderer
  * @param {String} [version] - of the config
  * @param {*} [props] - other component props
  * @returns {JSX.Element|*} React component
  */
 Render.Component = function RenderComponent ({
-  view, items, data, _data, debug, form, hideOnEmpty, showIf,
+  view, items, data, _data, debug, form, showIf,
   relativeData, relativeIndex, relativePath, version,
   ...props
 }) {
-  /* todo: deprecated in v0.24.0 General hideOnEmpty logic */
-  if (hideOnEmpty && !isTruthy(_data)) return null
   /* General showIf logic */
   if (showIf != null) {
     // UI Render should not 'Value Transform' `showIf` attribute
@@ -162,7 +159,6 @@ Render.Component = function RenderComponent ({
 
     case FIELD.TYPE.LABEL: {
       if (items.length) props.children = items.map(Render)
-      if (hideOnEmpty && (props.children == null || props.children === '')) return null
       return <Label {...props}/>
     }
 
@@ -170,7 +166,6 @@ Render.Component = function RenderComponent ({
       const {mapItems, ...prop} = props
       if (mapItems) _data = mapProps(_data, mapItems, {debug})
       if (items.length) prop.children = items.map(Render)
-      if (hideOnEmpty && !isTruthy(_data)) return null
       return <PieChart items={_data} {...prop}/>
     }
 
@@ -278,7 +273,6 @@ Render.Component = function RenderComponent ({
         }
         return item
       }))
-      if (hideOnEmpty && !isTruthy(_data)) return null
       return <TableView items={_data} {...table}/>
     }
 
@@ -310,7 +304,6 @@ Render.Component = function RenderComponent ({
         delete props.renderLabel
       }
       if (view === FIELD.TYPE.TITLE) props.className = cn('h3', props.className)
-      if (hideOnEmpty && (props.children == null || props.children === '')) return null
       return <Text {...props}/>
     }
 

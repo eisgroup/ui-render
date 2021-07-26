@@ -12,6 +12,9 @@
 - Multiple Form instances for UI Render on the same page
 - **readonly** state for all form fields no longer hides the input
 - **onRemove** Input Field sets form value to null for the Input
+
+#### Removed
+- **hideOnEmpty** attribute
   
 ### v0.23.1
 #### Changes
