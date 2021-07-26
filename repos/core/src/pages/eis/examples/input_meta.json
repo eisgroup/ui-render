@@ -16,6 +16,6 @@
   "lefty": true,
   "readonly": false,
   "disabled": false,
-  "removable": true,
+  "removable": false,
   "autoSubmit": true
 }
