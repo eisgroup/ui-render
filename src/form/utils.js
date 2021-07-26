@@ -147,14 +147,15 @@ export function asField (InputComponent, {sanitize} = {}) {
     // do not use ...props from input, because it is shared by <Active.Field> instances
     // @Note: react-final-form fires `format()` when `input.value` getter is called
     Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}) => {
-      // Hide this field if it's readonly and has no value.
-      if (this.props.readonly && isRequired(this.props.value)) return null
       const {
         onChange, error: err, defaultValue, normalize, format, parse, validate,
         instance, onRemoveChange, ...props
       } = this.props
       // @Note: defaultValue is only used for UI, internal value is still undefined
       this.value = value === '' ? (pristine && defaultValue != null ? defaultValue : value) : value
+      // Hide this field if it's readonly and has no value.
+      if (this.props.readonly && isRequired(this.value != null ? this.value : this.props.value)) return null
+
       this.input = input
       if (this.value === undefined) this.value = ''
       if (instance) this.initValues = instance.props.initialValues

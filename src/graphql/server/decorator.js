@@ -9,6 +9,9 @@ import { Response } from './resolver'
 localiseTranslation({
   PLEASE_ADD_decorator_BEFORE_USING_func: {
     [l.ENGLISH]: 'Please add @{decorator} before using @{func}',
+  },
+  YOU_CANNOT_ACCESS_PROTECTED_RESOURCE: {
+    [l.ENGLISH]: 'You cannot access protected resource',
   }
 })
 
@@ -65,8 +68,8 @@ export function authLevel (userRole) {
   return function (target, key, descriptor) {
     const func = descriptor.value
     descriptor.value = function (...args) {
-      const [_, __, {user: {id, auth} = {}}] = args
-      if (!(auth >= userRole)) return Response.unauthorized(id)
+      const [_, __, {user: {auth} = {}}] = args
+      if (!(auth >= userRole)) return Response.forbidden(_.YOU_CANNOT_ACCESS_PROTECTED_RESOURCE)
       return func.apply(this, args)
     }
     return descriptor
@@ -74,7 +77,7 @@ export function authLevel (userRole) {
 }
 
 /**
- * Decorator to Delay GraphQL Resolvers for Testing Puspose
+ * Decorator to Delay GraphQL Resolvers for Testing Purpose
  * @example: see `authenticated` decorator
  * @param {Number} milliseconds - to delay
  */

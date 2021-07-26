@@ -270,7 +270,7 @@ export function gqlRequestDecorator ({
   propsMapper,
   propsMapperOptions,
   hiddenFields,
-  variables = reusable ? {} : queryVariables,
+  variables = reusable ? {} : queryVariables, // GraphQL treats any new empty object {} as the same variables
   // @see: https://github.com/apollographql/apollo-client/issues/6760
   // 'cache-and-network' literally forces query to refetch after mutation
   fetchPolicy = 'cache-and-network',
