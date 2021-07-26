@@ -5,7 +5,7 @@ import { FIELD } from 'modules-pack/variables'
 import React from 'react'
 import Json from 'react-ui-pack/JsonView'
 import { metaToProps } from 'ui-renderer'
-import { cloneDeep, get, isEmpty, isList, isObject, isString, sanitizeGqlResponse, set } from 'utils-pack'
+import { cloneDeep, get, isEmpty, isList, isObject, isString, sanitizeResponse, set } from 'utils-pack'
 import './mapper' // Set up UI Renderer components and methods
 
 FIELD.ACTION = {
@@ -22,7 +22,7 @@ FIELD.ACTION = {
  * Transform *_meta.json API response into custom rules applied by the team
  */
 export function transformConfig (meta) {
-  return toOpenLConfig(sanitizeGqlResponse(meta || {}, {tags: []}))
+  return toOpenLConfig(sanitizeResponse(meta || {}, {tags: []}))
 }
 
 export function toOpenLConfig (meta) {
@@ -88,7 +88,7 @@ export function toOpenLConfig (meta) {
  *    - this.data -> *_data.json from state, ready for <Render> component consumption
  *    - this.meta -> transformed *_meta.json data from state, ready for <Render> component consumption
  *    - this.handleSubmit:
- *        1. final-form: to be used like this <form onSubmit={this.props.handleSubmit}>
+ *        1. final-form: to be used like this <form onSubmit={this.handleSubmit}>
  *        2. redux-form: to be used like this <form onSubmit={this.handleSubmit}>
  *    - this.hasData and this.hasMeta getters can be used for conditional check
  *    - Initialize with data by overriding initial state
@@ -176,13 +176,13 @@ export function withUISetup (formConfig) {
     })
 
     // Define instance getter
-    Object.defineProperty(Class.prototype, 'handleSubmit', {
-      get () {
-        if (this._handleSubmit != null) return this._handleSubmit
-        // For redux-form
-        return this._handleSubmit = this.props.handleSubmit(this.submit.bind(this))
-      },
-    })
+    // Object.defineProperty(Class.prototype, 'handleSubmit', {
+    //   get () {
+    //     // For redux-form
+    //     if (this._handleSubmit != null) return this._handleSubmit
+    //     return this._handleSubmit = this.props.handleSubmit(this.submit.bind(this))
+    //   },
+    // })
 
     // Define instance method
     // @Note: functions should have consistent pattern of receiving important arguments first,
@@ -195,7 +195,7 @@ export function withUISetup (formConfig) {
 
     // Define instance method
     Class.prototype.resetForm = function () {
-      this.props.form.reset()
+      this.form.reset()
     }
 
     // Define instance method

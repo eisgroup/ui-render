@@ -1,6 +1,6 @@
 import { renderField } from 'modules-pack/form/renders'
 import AutoSave from 'modules-pack/form/views/AutoSave'
-import { NAME as POPUP, popupAlert } from 'modules-pack/popup'
+import { POPUP, popupAlert } from 'modules-pack/popup'
 import { stateAction } from 'modules-pack/redux'
 import { FIELD } from 'modules-pack/variables'
 import React from 'react'

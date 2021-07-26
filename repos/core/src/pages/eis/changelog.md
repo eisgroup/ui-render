@@ -4,7 +4,7 @@
 #### New Features
 - [FAQ: **How to check UI Render Version**](/docs/faq)
 - [Example: **Matrix Table** configuration](/docs/examples#tableMatrix) (+ minimum config provided)
-- [Example: **showEmptyAs** attribute for Table](/docs/examples#tableExtraItems) (see 'Table with Custom Data' example)
+- [Example: **showEmptyAs** attribute for Table](/docs/examples#tableExtraItems) (see 'Table with Custom Data' example) - the cell value must be `null` or empty string for it to work
 - **onClickIcon** callback added for Dropdown to remove/delete Select field
 - localised validation messages
 

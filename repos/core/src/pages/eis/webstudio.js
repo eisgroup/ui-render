@@ -135,11 +135,10 @@ export class WebStudio extends Component {
   }
 
   render () {
-    const {form, handleSubmit} = this.props
     return (
-      <ScrollView fill className='fade-in bg-neutral'>
-        <form onSubmit={handleSubmit}>
-          {this.hasData && this.hasMeta && <Render data={this.data} {...this.meta} form={form}/>}
+      <ScrollView fill className="fade-in bg-neutral">
+        <form onSubmit={this.handleSubmit}>
+          {this.hasData && this.hasMeta && <Render data={this.data} {...this.meta} form={this.form}/>}
         </form>
       </ScrollView>
     )

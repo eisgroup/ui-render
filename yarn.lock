@@ -10918,10 +10918,10 @@ module-lookup-amd@^6.1.0:
     requirejs "^2.3.5"
     requirejs-config-file "^3.1.1"
 
-modules-pack@^0.6.3:
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.6.3.tgz#54b72919008cc0336030c6fa4168eb17b0e9f857"
-  integrity sha512-ZM3n6EbDFt0bddoLLmrntjzcG14INsunNFnDaSPocvpkA2pEjOwVUDddPB5l/kYxYCYjJ7SQmnji80KZfNtN2Q==
+modules-pack@^0.9.7:
+  version "0.9.7"
+  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.9.7.tgz#45495c717345b8453b3f1ea77ab5a1f5155f0864"
+  integrity sha512-xkbL6oyyhEYTZwnwfCrl8iM70NA3sKdAW4QvE6uZ1H+OALMwk13+NrT6gP7Ydj3ha1rJcOrqAWHV9FysZc139Q==
   dependencies:
     axios "^0.21.1"
     backoff "^2.5.0"
@@ -10934,6 +10934,7 @@ modules-pack@^0.6.3:
     react-redux "^7.2.0"
     react-router "^5.2.0"
     react-router-dom "^5.2.0"
+    reduce-reducers "^1.0.4"
     redux "^4.0.5"
     redux-actions "^2.6.5"
     redux-form "^8.3.6"
@@ -13515,10 +13516,10 @@ react-transition-group@^2.5.0:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react-ui-pack@^0.7.8:
-  version "0.7.8"
-  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.7.8.tgz#48dd41ca1cbf2dab3b6ac547326f4a7b5f88f3d2"
-  integrity sha512-GpVfO7M6dbNbDrwcMEu2dwWTXDckrCegMSwW88SApcVJl38fBUte7+jRFd83Gn3KC0ey0USmdXGRff+F8L/1Kw==
+react-ui-pack@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.9.0.tgz#153abfdda6c0c81c7839619139104e3890b5e541"
+  integrity sha512-+pgAxCFMKRi6bkNaQ7ZP7UPc5QSt1VsjdRXYqmHWIgWjDjE2wTtsFpMLfBWtlvp5VEe+fQKyNGo1VJ/v1VByJQ==
   dependencies:
     chroma-js "^2.1.0"
     classnames "^2.2.6"
@@ -13726,6 +13727,11 @@ reduce-reducers@^0.4.3:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/reduce-reducers/-/reduce-reducers-0.4.3.tgz#8e052618801cd8fc2714b4915adaa8937eb6d66c"
   integrity sha512-+CNMnI8QhgVMtAt54uQs3kUxC3Sybpa7Y63HR14uGLgI9/QR5ggHvpxwhGGe3wmx5V91YwqQIblN9k5lspAmGw==
+
+reduce-reducers@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/reduce-reducers/-/reduce-reducers-1.0.4.tgz#fb77e751a9eb0201760ac5a605ca8c9c2d0537f8"
+  integrity sha512-Mb2WZ2bJF597exiqX7owBzrqJ74DHLK3yOQjCyPAaNifRncE8OD0wFIuoMhXxTnHK07+8zZ2SJEKy/qtiyR7vw==
 
 redux-actions@^2.6.5:
   version "2.6.5"
@@ -16259,10 +16265,10 @@ utils-merge@1.0.1:
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
 
-utils-pack@^0.3.21:
-  version "0.3.21"
-  resolved "https://registry.yarnpkg.com/utils-pack/-/utils-pack-0.3.21.tgz#ec180f59d83611e7a0503f75b0f77e79a3e83391"
-  integrity sha512-T5vecr3F2LxHdUANRUhzMYHluaHaLU3rElfq9CvcRviIEdcTH5c2pgcXrFKe2vjOjxvjHlGsHqIltCu8Kvl/Gg==
+utils-pack@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/utils-pack/-/utils-pack-0.9.0.tgz#9b038e9f671f54bae2a16c68ea932657d7d543b5"
+  integrity sha512-QUvPySibWp6CQTmr41CoEzEL1+bK7FzrgqdHCrtTPfSGUg2VD53DvQHjiPtXhU4/amwQR0mxmgiFsX0StuUyPw==
   dependencies:
     bson-objectid "^1.3.1"
     circular-json "^0.5.9"

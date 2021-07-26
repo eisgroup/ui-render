@@ -140,7 +140,6 @@ const Component = {
   style: Object, // css style to apply
   className: 'CSS class name to apply',
   debug: Boolean, // whether to suppress certain erros related to incorrect data type, default is false in production
-  hideOnEmpty: Boolean, // deprecated, whether to not render the component if its value is null/undefined/empty string
   showIf: "path.to.data.that.exists", // whether to render the component if given path resolves to `truthy` value
   showIf: { // object notation
     "name": "path.to.data.that.exists", // optional
@@ -246,22 +245,6 @@ const Component = {
     {'state': 'state'},
     //           ╰ key path to value from parent-table's item to match against
   ],
-  sorts: [ // adds sorting icon in table headers
-    {
-      id: String, // id of the header item to enable sorting
-      order: 0, // 0 = unsorted by default, 1 = sorted ascending by default, -1 = sorted descending by default
-      sortKey: 'item.attribute.used.for.sorting' // optional
-    },
-  ],
-  itemsExpanded: Boolean, // expand all Rows/Columns by default
-  itemClassNames: [ // conditional class names for table items (rows in default layout)
-    { // does not work when `vertical: true` because not possible to apply CSS across table rows
-      id: String, // cell id to apply className to
-      values: {
-        'value to match': String // css className to apply
-      },
-    }
-  ],
   group: { // matrix table data grouping
     by: { // required, common attribute for repeating set of items
       id: 'tier', // required
@@ -271,6 +254,23 @@ const Component = {
       id: 'ageBand', // required
     },
   },
+  itemsExpanded: Boolean, // expand all Rows/Columns by default
+  itemClassNames: [ // conditional class names for table items (rows in default layout)
+    { // does not work when `vertical: true` because not possible to apply CSS across table rows
+      id: String, // cell id to apply className to
+      values: {
+        'value to match': String // css className to apply
+      },
+    }
+  ],
+  showEmptyAs: Any, // placeholder for empty cell values (i.e. must be `null` or empty string '') for it to work
+  sorts: [ // adds sorting icon in table headers
+    {
+      id: String, // id of the header item to enable sorting
+      order: 0, // 0 = unsorted by default, 1 = sorted ascending by default, -1 = sorted descending by default
+      sortKey: 'item.attribute.used.for.sorting' // optional
+    },
+  ],
 
   // Pie Chart attributes
   mapItems: Object, // data mapper key/value pairs (ex. {label: 'pieLabelKeyFromData', value: 'pieValueKeyFromData'}

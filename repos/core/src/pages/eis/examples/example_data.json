@@ -26,6 +26,7 @@
       "annualPremium": 12600,
       "sponsorAnnualPremium": 12222,
       "memberAnnualPremium": 378,
+      "proposedRate": null,
       "classes": [
         {
           "classID": "1",
@@ -63,6 +64,7 @@
       "annualPremium": 22600,
       "sponsorAnnualPremium": 22222,
       "memberAnnualPremium": 478,
+      "proposedRate": null,
       "classes": [
         {
           "classID": "2",

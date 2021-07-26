@@ -1,11 +1,11 @@
 import { fetch } from 'modules-pack/api'
 import { withForm } from 'modules-pack/form'
-import { NAME as POPUP } from 'modules-pack/popup/constants'
+import { POPUP } from 'modules-pack/popup/constants'
 import { connect, stateAction } from 'modules-pack/redux'
 import settings from 'modules-pack/settings'
 import LanguageSelection from 'modules-pack/settings/views/LanguageSelection'
 import Upload from 'modules-pack/upload/views/Upload'
-import { FIELD, FILE_TYPE } from 'modules-pack/variables'
+import { FIELD, FILE } from 'modules-pack/variables'
 import React, { Component } from 'react'
 import { PropTypes } from 'react-ui-pack'
 import JsonView from 'react-ui-pack/JsonView'
@@ -114,7 +114,7 @@ export default class Demo extends Component {
       hasHeader: false,
       multiple: false,
       lang,
-      type: FILE_TYPE.JSON,
+      type: FILE.TYPE.JSON,
     }
     return (
       <>
@@ -169,7 +169,7 @@ class Renderer extends Component {
   }
 
   resetForm = () => {
-    this.props.form.reset()
+    this.form.reset()
   }
 
   /**
@@ -183,10 +183,10 @@ class Renderer extends Component {
   // handleSubmit = this.props.handleSubmit(this.submit)
 
   render () {
-    const {data, meta, form} = this.props
+    const {data, meta} = this.props
     return (
-      <form onSubmit={this.props.handleSubmit}>
-        {<Render debug data={data} {...meta} form={form}/>}
+      <form onSubmit={this.handleSubmit}>
+        {<Render debug data={data} {...meta} form={this.form}/>}
       </form>
     )
   }
