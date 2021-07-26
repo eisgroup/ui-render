@@ -2,8 +2,9 @@
 
 ### v0.24.0
 #### New Features
-- [Example: **Matrix Table** configuration](/docs/examples#tableMatrix) (+ [minimum config](/docs/examples#tableMatrixRequired) example)
-- [Example: **showEmptyAs** attribute for Table](/docs/examples#tableExtraItems) (cell value must be `null` or empty string for it to work)
+- [Example: **Matrix Table**](/docs/examples#tableMatrix) (+ [minimum config](/docs/examples#tableMatrixRequired) example)
+- [Example: **Tabs Buttoned**](/docs/examples#tabsButtoned) (+ [Tabs](/docs/examples#tabs) default example)
+- [Example: **showEmptyAs**](/docs/examples#tableExtraItems) attribute for Table (cell value must be `null` or empty string for it to work)
 - **onClickIcon** callback added for Dropdown to remove/delete Select field
 - localised validation messages
   

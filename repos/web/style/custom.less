@@ -41,6 +41,12 @@ label {
 .tabs__item {
   font-size: @size-large;
 
+  .tabs.buttoned & {
+    .padding-v(size(10));
+    .padding-h(size(16));
+    line-height: size(18);
+  }
+
   &:focus {
     &:extend(.no-outline);
   }

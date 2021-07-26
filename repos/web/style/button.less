@@ -1,12 +1,13 @@
 @import "_mixins";
 @import "effect";
 
+@paddingTop: 0.8;
+@paddingBottom: @paddingTop * 1.2;
+@paddingH: @paddingTop * 1;
+@button-radius: @radius-base;
+
 .button {
   @paddingCircle: 0.35;
-  @paddingTop: 0.8;
-  @paddingBottom: @paddingTop * 1.2;
-  @paddingH: @paddingTop * 1;
-  @radius: @radius-base;
   @small: @size-small;
   @base: @size-base;
   @large: @size-large;
@@ -175,7 +176,7 @@
     @ratio: @size / @size-base;
     .scalePadding(@size: @size; @top: @paddingTop; @left: @paddingH; @bottom: @paddingBottom;);
     font-size: @size;
-    border-radius: size(round(@ratio * px(@radius)));
+    border-radius: size(round(@ratio * px(@button-radius)));
   }
 }
 

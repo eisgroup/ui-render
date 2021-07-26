@@ -28,6 +28,7 @@ import tableExtraItemsMeta from './examples/table-extraItems_meta.json'
 import tableNestedMeta from './examples/table-nested_meta'
 import tableVerticalMeta from './examples/table-vertical_meta'
 import * as tableMatrix from './examples/table_matrix'
+import * as tabs from './examples/tabs_meta'
 import { withUISetup } from './rules'
 
 const examples = [
@@ -66,6 +67,18 @@ const examples = [
     id: 'tabList',
     data: listData,
     meta: tabListMeta,
+  },
+  {
+    title: 'Tabs',
+    id: 'tabs',
+    data: listData,
+    meta: tabs.meta,
+  },
+  {
+    title: 'Tabs Buttoned',
+    id: 'tabsButtoned',
+    data: listData,
+    meta: tabs.buttoned,
   },
   {
     title: 'Table Nested within Table',

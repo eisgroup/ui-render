@@ -1,8 +1,10 @@
 @import "_mixins";
+@import "button";
 
-@tabs-active-border-size: size(4);
+@tabs-active-border-size: size(1);
 @tabs-active-border-color: @color-primary-light;
 @tabs-active-color: @color-primary-light;
+@tabs-hover-bg-color: @color-bg-grey-lightest;
 
 .tabs {
   &:extend(.max-width all); // for ScrollView to work
@@ -16,40 +18,64 @@
 .tabs__item {
   &:extend(.padding-h);
   &:extend(.padding-v-small);
-  &:extend(.border-bottom all);
   line-height: @line-height-base;
+  border-bottom: @border-base; // .tabs:not(.buttoned) does not work for some reason
 
   @{select-interaction} {
-    &:extend(.bg-grey-lightest);
-  }
-
-  &.active {
-    &:extend(.text.bold);
-    border-color: transparent;
-    color: @tabs-active-color;
-
-    &:after {
-      .tabs:not(.buttoned) & {
-        &:extend(.position-bottom); // underline covering padding
-        //&:extend(.margin-top-smaller); // underline not covering padding
-        .object();
-        width: 100%;
-        height: @tabs-active-border-size;
-        background: @tabs-active-border-color;
-      }
-    }
+    background-color: @tabs-hover-bg-color;
 
     .tabs.buttoned & {
-      &:extend(.border);
-      &:extend(.margin-h-small);
-      &:extend(.padding-v-small);
-      border-color: @tabs-active-border-color;
-      border-style: dashed;
+      border-radius: initial;
     }
   }
 
   .tabs.buttoned & {
-    &:extend(.round);
+    border: @border-size @border-style @color-neutral;
+
+    // by default hide right border,
+    // only active and last child tabs have all borders
+    &:not(.active):not(:last-child) {
+      border-right: none;
+    }
+
+    // Then hide left border for the tab following active tab
+    &.active + .tabs__item {
+      border-left: none;
+    }
+
+    &:first-child {
+      border-top-left-radius: @button-radius;
+      border-bottom-left-radius: @button-radius;
+    }
+
+    &:last-child {
+      border-top-right-radius: @button-radius;
+      border-bottom-right-radius: @button-radius;
+    }
+  }
+
+  &.active {
+    &:extend(.text.bold);
+    border-color: @tabs-active-border-color;
+    color: @tabs-active-color;
+
+    &:after {
+      &:extend(.position-bottom); // underline covering padding
+      //&:extend(.margin-top-smaller); // underline not covering padding
+      .object();
+      width: 100%;
+      height: @tabs-active-border-size;
+      background: @tabs-active-border-color;
+
+      .tabs.buttoned & {
+        display: none;
+      }
+    }
+
+    .tabs.buttoned & {
+      background-color: @tabs-hover-bg-color;
+      border-color: @tabs-active-border-color;
+    }
   }
 }
 

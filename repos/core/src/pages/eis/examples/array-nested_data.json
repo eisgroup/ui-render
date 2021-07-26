@@ -41,7 +41,7 @@
     {
       "coverageID": "Silver",
       "fundingStructure": {
-        "contributionType": "Non-contributory",
+        "contributionType": "Contributory",
         "requiredParticipationPrct": 0.55,
         "sponsorPaymentMode": 1,
         "memberPaymentModes": [
