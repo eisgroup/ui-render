@@ -18,6 +18,7 @@ FIELD.ACTION = {
 // noinspection JSConstantReassignment
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
+ * todo: remove loading screen background?
  * todo:
  *  - readonly for classic to disable all inputs (defined in data.json root)
  *  - move cross inside input

@@ -14,11 +14,17 @@ import ScrollView from 'react-ui-pack/ScrollView'
 import Text from 'react-ui-pack/Text'
 import View from 'react-ui-pack/View'
 import Render, { metaToProps } from 'ui-renderer'
-import { ALERT, cloneDeep, GET, isEmpty, logRender, performStorage, SET, set } from 'utils-pack'
+import { ALERT, cloneDeep, GET, isEmpty, l, localiseTranslation, logRender, performStorage, SET, set } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
 import { transformConfig } from './rules'
 
 const DEMO_JSON_STORAGE_KEY = 'DEMO_JSON'
+
+localiseTranslation({
+  CONFIG_USED: {
+    [l.ENGLISH]: 'Config Used',
+  },
+})
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
