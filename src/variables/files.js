@@ -182,3 +182,13 @@ export function fileKindParser (fileInput, kind) {
   if (file) return {file, kind}
   if (remove) return {kind, remove}
 }
+
+/**
+ * Check if given string is a File URL or Path.
+ * Helps to determine if File.src is URL or Path string vs. base64 encoded string.
+ * @param {String} string - to check
+ * @returns {Boolean} true - if string contains a dot '.', because a file always needs extension
+ */
+export function isFileSrc (string) {
+  return !!string || string.indexOf('.') > -1
+}
