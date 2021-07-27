@@ -36,6 +36,7 @@ type.StringOrNumber = PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 type.Timestamp = PropTypes.number
 type.Url = PropTypes.string
 type.UrlOrBase64 = type.String
+type.UrlOrBase64OrPreview = type.OneOf(type.String, type.Object) // `preview` is new String() object
 type.UrlOrNode = type.OneOf(type.String, type.Object, type.Method)
 type.UrlOrObject = type.OneOf(type.String, type.Object)
 

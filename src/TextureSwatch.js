@@ -1,7 +1,7 @@
 import cn from 'classnames'
-import PropTypes from 'prop-types'
 import React from 'react'
 import Text from './Text'
+import { type } from './types'
 
 /**
  * Texture Swatch - Pure Component.
@@ -19,12 +19,12 @@ export function TextureSwatch ({
 }
 
 TextureSwatch.propTypes = {
-  /** Full Path, URL or Base64 String of Texture Image file */
-  src: PropTypes.string.isRequired,
-  small: PropTypes.bool,
-  large: PropTypes.bool,
-  className: PropTypes.string,
-  style: PropTypes.object,
+  /** Full Path, URL, Base64 or Preview String object of Image file */
+  src: type.UrlOrBase64OrPreview.isRequired,
+  small: type.Boolean,
+  large: type.Boolean,
+  className: type.String,
+  style: type.Object,
 }
 
 export default React.memo(TextureSwatch)
