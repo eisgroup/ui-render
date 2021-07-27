@@ -1,6 +1,6 @@
 {
   "name": "utils-pack",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "JS Helper Functions",
   "license": "MIT",
   "main": "index.js",
@@ -21,6 +21,7 @@
     "build": "yarn delete dist && babel src --out-dir dist",
     "push:dist": "cp {README.md,LICENSE,package.json} dist/ && cd dist && yarn publish && cd ../ && yarn delete dist",
     "push:src": "cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish && cd ../ && yarn delete src/{README.md,LICENSE,package.json}",
+    "update": "yarn push && git push",
     "delete": "../../node_modules/rimraf/bin.js",
     "symlink": "node ../../scripts/symlink.js"
   },

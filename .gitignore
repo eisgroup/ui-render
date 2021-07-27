@@ -16,6 +16,7 @@ repos/server/uploads
 *.pub
 *.map
 *.env.prod
+*.npmrc
 
 # --------------------------------------
 # DATA FILES

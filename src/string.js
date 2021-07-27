@@ -163,6 +163,16 @@ export function isBase64 (string) {
 isBase64.pattern = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/
 
 /**
+ * Check if given string is a File URL or Path.
+ * Helps to determine if File.src is URL or Path string vs. base64 encoded string.
+ * @param {String} string - to check
+ * @returns {Boolean} true - if string contains a dot '.', because a file always needs extension
+ */
+export function isFileSrc (string) {
+	return !!string && string.indexOf('.') > -1
+}
+
+/**
  * Check if Given String is a Valid IP v4 Address
  *
  * @param {*} address - value to check
