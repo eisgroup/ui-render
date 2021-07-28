@@ -1,6 +1,6 @@
 {
   "name": "modules-pack",
-  "version": "0.9.11",
+  "version": "0.9.12",
   "description": "JavaScript Modules for Modern Frontend & Backend Projects",
   "license": "MIT",
   "main": "index.js",
@@ -25,6 +25,7 @@
   ],
   "scripts": {
     "push": "cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish && cd ../ && yarn delete src/{README.md,LICENSE,package.json}",
+    "update": "yarn push && git push",
     "delete": "../../node_modules/rimraf/bin.js"
   },
   "peerDependencies": {
@@ -62,7 +63,7 @@
   "devDependencies": {
     "axios-mock-adapter": "1.15.0",
     "dotenv": "^10.0.0",
-    "mongoose": "5.6.10",
+    "mongoose": "5.7.5",
     "mongoose-sanitizer": "^1.0.0",
     "mongoose-unique-validator": "^2.0.3",
     "redux-mock-store": "^1.5.4"
