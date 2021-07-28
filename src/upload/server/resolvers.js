@@ -22,7 +22,7 @@ export function fileSrc ({src, name, created, updated}) {
   if (!__DEV__) return `${src}?v=${updated || created || '0'}`
   const ext = fileExtensionNormalized(name) || ''
   const localPath = `${_WORK_DIR_}${src}` // point to absolute file path, because there is no web server
-  return (IMAGE.EXTENSIONS.includes(ext)) ? base64Encode(localPath) : localPath
+  return (IMAGE.EXTENSIONS.includes(ext)) ? `data:image/${ext};base64,${base64Encode(localPath)}` : localPath
 }
 
 export default {
