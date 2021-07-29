@@ -37,12 +37,12 @@ export const meta = {
             items: [
               {
                 view: 'Title',
-                label: {name: 'annualPremium'},
+                label: {name: 'manualPremium'},
                 renderLabel: 'Currency',
               },
               {
                 view: 'Text',
-                label: 'Enrolled Lives'
+                label: 'Monthly Manual Premium'
               }
             ]
           },
@@ -123,7 +123,7 @@ export const data = {
     {
       title: 'Core Coverage',
       enrolled: 55,
-      annualPremium: 48250.00,
+      manualPremium: 48250.00,
       commissions: 44.00,
       tax: 0.02,
       profit: 0.04,
@@ -133,7 +133,7 @@ export const data = {
     {
       title: 'Buy-Up Coverage',
       enrolled: 32,
-      annualPremium: 23950.00,
+      manualPremium: 23950.00,
       commissions: 24.00,
       tax: 0.09,
       profit: 0.11,
