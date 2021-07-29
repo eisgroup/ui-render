@@ -23,6 +23,7 @@ import invalidArrayMeta from './examples/invalid-array_meta'
 import listMeta from './examples/list_meta'
 import piechartMeta from './examples/piechart_meta'
 import showIfCondition from './examples/showIf'
+import * as summaryBox from './examples/summary-box'
 import tabListMeta from './examples/tab-list_meta'
 import tableExtraItemsMeta from './examples/table-extraItems_meta.json'
 import tableNestedMeta from './examples/table-nested_meta'
@@ -121,6 +122,12 @@ const examples = [
     id: 'showIf',
     data: exampleData,
     meta: showIfCondition,
+  },
+  {
+    title: 'Summary Box',
+    id: 'summaryBox',
+    data: summaryBox.data,
+    meta: summaryBox.meta,
   },
   {
     title: 'Input',
