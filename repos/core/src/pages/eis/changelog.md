@@ -1,4 +1,7 @@
 ### Table of Contents
+### v0.24.1
+#### New Example
+- [Example: **Summary Box**](/docs/examples#summaryBox)
 
 ### v0.24.0
 #### New Features
