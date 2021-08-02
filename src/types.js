@@ -31,6 +31,7 @@ type.ObjectOf = PropTypes.objectOf
 type.Of = PropTypes.shape
 type.OneOf = (...types) => PropTypes.oneOfType(types)
 type.Px = PropTypes.number // screen unit
+type.PrimitiveOrObject = PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]) // tooltip prop
 type.String = PropTypes.string
 type.StringOrNumber = PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 type.Timestamp = PropTypes.number

@@ -5,7 +5,10 @@
  */
 
 export function cursorSet (name) {
-  if (typeof window !== 'undefined') document.body.style.cursor = name
+  if (typeof window !== 'undefined') {
+    document.body.style.cursor = null // Safari fix
+    document.body.style.cursor = name
+  }
 }
 
 /**

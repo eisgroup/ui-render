@@ -11,6 +11,6 @@ export default function TooltipPop ({
   ...props
 }) {
   return (
-    <Pop inverted trigger={children} content={title} {...props}/>
+    <Pop inverted={inverted} trigger={children} content={title} {...props}/>
   )
 }
