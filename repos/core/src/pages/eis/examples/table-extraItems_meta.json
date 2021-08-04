@@ -1,7 +1,6 @@
 {
   "view": "Table",
   "name": "no_data_exists",
-  "showEmptyAs": "😀",
   "headers": [
     {
       "id": "tier"

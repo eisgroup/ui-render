@@ -263,7 +263,6 @@ const Component = {
       },
     }
   ],
-  showEmptyAs: Any, // placeholder for empty cell values (i.e. must be `null` or empty string '') for it to work
   sorts: [ // adds sorting icon in table headers
     {
       id: String, // id of the header item to enable sorting

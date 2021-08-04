@@ -1,4 +1,9 @@
 ### Table of Contents
+
+### v0.24.2
+#### Removed
+- **showEmptyAs** example
+
 ### v0.24.1
 #### New Example
 - [Example: **Summary Box**](/docs/examples#summaryBox)
