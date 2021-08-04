@@ -1,12 +1,12 @@
 import classNames from 'classnames'
 import React from 'react'
-import { tooltipProps } from 'utils/components'
 import Button from './Button'
 import Icon from './Icon'
 import Row from './Row'
 import Text from './Text'
 import TooltipPop from './TooltipPop'
 import { type } from './types'
+import { tooltipProps } from './utils/components'
 import View from './View'
 
 /**
@@ -48,9 +48,9 @@ Buttons.propTypes = {
     icon: type.String,
     children: type.Any,
     active: type.Boolean,
-    tooltip: type.PrimitiveOrObject,
+    tooltip: type.Any,
     // second tooltip for <span/> inside each button
-    tooltipInner: type.PrimitiveOrObject,
+    tooltipInner: type.Any,
     // ...other <Button/> props
   })).isRequired,
   // Whether to render Buttons vertically
