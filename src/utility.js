@@ -17,11 +17,11 @@ import { isString, padStringLeft, randomString } from './string'
  *
  * @Note:
  *    - The ID is 10 characters long:
- *        1. URL safe - case sensitive and includes hyphen and underscore to shorten its length (64 radix)
+ *        1. URL safe - case sensitive alphanumeric only characters (62 radix)
  *        2. Safe for use as HTML id attribute
  *        2. Sorts chronologically without conversion (replacing the need for database timestamp)
- *           => Sorting will stop working after May 15, 2109, because 64^7 limit padding is reached
- *              -> The solution is to increment the Id.padCount to 8, which will work until Aug 02, the year 10,889.
+ *           => Sorting will stop working after August 5, 2081, because 62^7 limit padding is reached
+ *              -> The solution is to increment the Id.padCount to 8, which will work until December 2, the year 8888.
  *
  *    - first 7 characters is Hex string of Timestamp
  *    - Last 3 character is randomized using alphanumeric characters to avoid collision
@@ -68,7 +68,7 @@ export function Id ({timestamp = Date.now(), alphabet = Id.alphabet, suffix = ra
 }
 
 // !Important: changing values below may break existing database implementations
-Id.alphabet = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
+Id.alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 Id.padCount = 7
 Id.padTime = Array(Id.padCount).fill(Id.alphabet[0]).join('')
 Id.pattern = new RegExp(`^[${Id.alphabet}]+$`)
@@ -80,7 +80,7 @@ Id.history = {} // log of previously generated Ids by timestamp
  * @return {Boolean} true - if valid, else false
  */
 export function isId (value) {
-  return isString(value) && Id.pattern.test(value)
+  return isString(value) && value.length >= Id.padCount && Id.pattern.test(value)
 }
 
 /**
@@ -105,7 +105,7 @@ export function isTruthy (val) {
 export function timestampFromId (string) {
   const alphabet = Id.alphabet
   const radix = alphabet.length
-  const id = string.replace(/^(-)+/, '') // remove time padding
+  const id = string.replace(timestampFromId.padPattern, '') // remove time padding
   const [...chars] = id.substring(0, id.length - 3) // trim out random strings
   let result = 0
   chars.reverse()
@@ -116,6 +116,8 @@ export function timestampFromId (string) {
   }
   return result
 }
+
+timestampFromId.padPattern = new RegExp(`^(${Id.alphabet[0]})+`)
 
 /**
  * Calculate Distance between two Geometry Points (with latitude and longitude)

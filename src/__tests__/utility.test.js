@@ -117,21 +117,20 @@ test(`${distanceBetween.name}() returns correct distance between two points in m
 describe(`${Id.name}(), ${isId.name}(), and ${timestampFromId.name}()`, () => {
   const timeCharCount = Id.padCount
   const id = Id()
-  const limit = Math.pow(64, timeCharCount) // the limit of timestamp
+  const limit = Math.pow(Id.alphabet.length, timeCharCount) // the limit of timestamp
 
   test(`${Id.name}() generates auto incrementing ID string using Timestamp`, () => {
     expect(id.length).toBeGreaterThanOrEqual(Id.padCount + 3)
-    expect(Id({timestamp: 0}).substring(0, timeCharCount)).toEqual('-------')
-    expect(Id({timestamp: 1}).substring(0, timeCharCount)).toEqual('------0')
-    expect(Id({timestamp: 11}).substring(0, timeCharCount)).toEqual('------A')
-    expect(Id({timestamp: 36}).substring(0, timeCharCount)).toEqual('------Z')
-    expect(Id({timestamp: 37}).substring(0, timeCharCount)).toEqual('------_')
-    expect(Id({timestamp: 38}).substring(0, timeCharCount)).toEqual('------a')
-    expect(Id({timestamp: 63}).substring(0, timeCharCount)).toEqual('------z')
-    expect(Id({timestamp: 64}).substring(0, timeCharCount)).toEqual('-----0-')
-    expect(Id({timestamp: 65}).substring(0, timeCharCount)).toEqual('-----00')
+    expect(Id({timestamp: 0}).substring(0, timeCharCount)).toEqual('0000000')
+    expect(Id({timestamp: 1}).substring(0, timeCharCount)).toEqual('0000001')
+    expect(Id({timestamp: 10}).substring(0, timeCharCount)).toEqual('000000A')
+    expect(Id({timestamp: 35}).substring(0, timeCharCount)).toEqual('000000Z')
+    expect(Id({timestamp: 36}).substring(0, timeCharCount)).toEqual('000000a')
+    expect(Id({timestamp: 61}).substring(0, timeCharCount)).toEqual('000000z')
+    expect(Id({timestamp: 62}).substring(0, timeCharCount)).toEqual('0000010')
+    expect(Id({timestamp: 63}).substring(0, timeCharCount)).toEqual('0000011')
     expect(Id({timestamp: limit - 1}).substring(0, timeCharCount)).toEqual('zzzzzzz')
-    expect(Id({timestamp: limit}).substring(0, timeCharCount + 1)).toEqual('0-------')
+    expect(Id({timestamp: limit}).substring(0, timeCharCount + 1)).toEqual('10000000')
   })
 
   test(`${Id.name}() string generated sorts chronologically`, () => {
@@ -194,19 +193,20 @@ describe(`${Id.name}(), ${isId.name}(), and ${timestampFromId.name}()`, () => {
   })
 
   test(`${timestampFromId.name}() converts Id string to Timestamp in milliseconds`, () => {
-    expect(timestampFromId('-------God')).toEqual(0)
-    expect(timestampFromId('----------God')).toEqual(0)
-    expect(timestampFromId('------_god')).toEqual(37)
-    expect(timestampFromId('-----0-Sex')).toEqual(64)
-    expect(timestampFromId('-----00Sex')).toEqual(65)
+    // The last three characters are random string, not used for timestamp
+    expect(timestampFromId('0000000God')).toEqual(0)
+    expect(timestampFromId('0000000000God')).toEqual(0)
+    expect(timestampFromId('000000ZGod')).toEqual(35)
+    expect(timestampFromId('0000010Sex')).toEqual(62)
+    expect(timestampFromId('0000011Sex')).toEqual(63)
     expect(timestampFromId('zzzzzzzL0L')).toEqual(limit - 1)
-    expect(timestampFromId('0-------abs')).toEqual(limit)
+    expect(timestampFromId('10000000abs')).toEqual(limit)
   })
 
   test(`${timestampFromId.name}() throws error for invalid Id string`, () => {
-    expect(() => timestampFromId('-------$God')).toThrow()
-    expect(() => timestampFromId('-----0.Sex')).toThrow()
+    expect(() => timestampFromId('0000000$God')).toThrow()
+    expect(() => timestampFromId('000000.Sex')).toThrow()
     expect(() => timestampFromId('~zzzzzzzL0L')).toThrow()
-    expect(() => timestampFromId('0---~----abs')).toThrow()
+    expect(() => timestampFromId('0000~0000abs')).toThrow()
   })
 })
