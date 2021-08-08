@@ -41,6 +41,8 @@ export default class Tabs extends PureComponent {
     centerTabs: PropTypes.bool,
     // Style tabs as buttons
     buttoned: PropTypes.bool,
+    // Whether to enable transition during force update via props
+    transitionUpdate: PropTypes.bool,
     // Extra content to render inside Tabs
     children: PropTypes.any,
     className: PropTypes.string,
@@ -66,25 +68,30 @@ export default class Tabs extends PureComponent {
   UNSAFE_componentWillReceiveProps (next) {
     const {activeIndex, items} = next
     if (!isEqual(items, this.props.items)) this._tabs = this._contents = null
-    if (activeIndex != null && +activeIndex !== this.state.activeIndex) this.setTab(+activeIndex)
+    if (activeIndex != null && +activeIndex !== this.state.activeIndex) this.setTab(+activeIndex, next.transitionUpdate)
 
     // Handle use case when parent changes layout and tab has less panels than previously set active index
     if (this.state.activeIndex >= items.length) this.setState({activeIndex: 0})
   }
 
-  setTab = (index) => {
-    this.setState({transition: true})
-    this.setTimeout(() => {
-      this.setState({activeIndex: index, transition: false})
-      if (this.props.onChange) this.props.onChange(index)
-    }, 50) // 50 ms is needed to allow full rendering so css transition can take effect
+  setTab = (activeIndex, transition = true) => {
+    const updateTab = () => {
+      this.setState({activeIndex, transition: false})
+      if (this.props.onChange) this.props.onChange(activeIndex)
+    }
+    if (transition) {
+      this.setState({transition: true})
+      this.setTimeout(updateTab, 50) // 50 ms is needed to allow full rendering so css transition can take effect
+    } else {
+      updateTab()
+    }
   }
 
   render () {
     const {
       vertical, buttoned, items, children, centerTabs,
       className, classNameTabs, classNamePanels, styleTabs, stylePanels,
-      activeIndex: _, defaultIndex: __, onChange: ___,
+      activeIndex: _, defaultIndex: __, onChange: ___, transitionUpdate: ____,
       ...props
     } = this.props
     const {activeIndex, transition} = this.state
