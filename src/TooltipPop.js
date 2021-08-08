@@ -8,8 +8,8 @@ import { isFunction } from 'utils-pack'
 export default function TooltipPop ({
   title,
   children,
-  delay = 500, // improve UX by avoiding accidental popup when use is already familiar with the UI
-  inverted = true,
+  delay,
+  inverted,
   ...props
 }) {
   // fix for Semantic UI issue https://github.com/Semantic-Org/Semantic-UI-React/pull/4029
@@ -17,4 +17,10 @@ export default function TooltipPop ({
   return (
     <Pop inverted={inverted} trigger={children} content={title} mouseEnterDelay={delay} {...props}/>
   )
+}
+
+// Override `defaultProps` attributes for custom behavior
+TooltipPop.defaultProps = {
+  // improve UX by avoiding accidental popup when user is already familiar with the UI
+  delay: 500,
 }

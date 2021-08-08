@@ -1,10 +1,11 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
-import { isFunction } from 'utils-pack'
+import { isEqual, isFunction } from 'utils-pack'
 import Icon from './Icon'
 import ScrollView from './ScrollView'
 import Text from './Text'
+import { type } from './types'
 import { withTimer } from './utils'
 import View from './View'
 
@@ -14,18 +15,20 @@ import View from './View'
 @withTimer
 export default class Tabs extends PureComponent {
   static propTypes = {
-    // Tab Titles - clickable buttons
-    tabs: PropTypes.arrayOf(PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-      PropTypes.object, // JSX
-      PropTypes.shape({
-        text: PropTypes.string.isRequired,
-        icon: PropTypes.string,
-      })
-    ])).isRequired, // tabs
-    // Tab Contents - matching index of `tabs`
-    panels: PropTypes.arrayOf(PropTypes.any).isRequired,
+    items: type.ListOf(type.Of({
+      // Tab Title - clickable buttons
+      tab: type.OneOf(
+        type.String,
+        type.Number,
+        type.Node, // JSX
+        type.Of({
+          text: PropTypes.string.isRequired,
+          icon: PropTypes.string,
+        })
+      ).isRequired,
+      // Tab Content
+      content: type.Any.isRequired,
+    })).isRequired,
     // Opened tab index (controlled)
     activeIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     // Opened tab index initially (uncontrolled)
@@ -52,15 +55,24 @@ export default class Tabs extends PureComponent {
     transition: false
   }
 
-  UNSAFE_componentWillReceiveProps (next) {
-    const {activeIndex, panels} = next
-    if (activeIndex != null && +activeIndex !== this.state.activeIndex) this.handleClickTab(+activeIndex)
-
-    // Handle use case when parent changes layout and tab has less panels than previously set active index
-    if (this.state.activeIndex >= panels.length) this.setState({activeIndex: 0})
+  get tabs () {
+    return this._tabs || (this._tabs = this.props.items.map(({tab}) => tab))
   }
 
-  handleClickTab = (index) => {
+  get contents () {
+    return this._contents || (this._contents = this.props.items.map(({content}) => content))
+  }
+
+  UNSAFE_componentWillReceiveProps (next) {
+    const {activeIndex, items} = next
+    if (!isEqual(items, this.props.items)) this._tabs = this._contents = null
+    if (activeIndex != null && +activeIndex !== this.state.activeIndex) this.setTab(+activeIndex)
+
+    // Handle use case when parent changes layout and tab has less panels than previously set active index
+    if (this.state.activeIndex >= items.length) this.setState({activeIndex: 0})
+  }
+
+  setTab = (index) => {
     this.setState({transition: true})
     this.setTimeout(() => {
       this.setState({activeIndex: index, transition: false})
@@ -70,24 +82,24 @@ export default class Tabs extends PureComponent {
 
   render () {
     const {
-      vertical, buttoned, tabs, panels, children, centerTabs,
+      vertical, buttoned, items, children, centerTabs,
       className, classNameTabs, classNamePanels, styleTabs, stylePanels,
       activeIndex: _, defaultIndex: __, onChange: ___,
       ...props
     } = this.props
     const {activeIndex, transition} = this.state
-    const content = panels[activeIndex]
+    const content = this.contents[activeIndex]
     return (
       <ScrollView
         className={classNames('tabs fade-in', className, {buttoned})}
-        classNameInner='max-height' // fix to allow child ScrollViews to take 100% of available height
+        classNameInner="max-height" // fix to allow child ScrollViews to take 100% of available height
         {...props}
       >
         <ScrollView row={!vertical} center={centerTabs}
                     className={classNames('tabs__items no-scrollbar', classNameTabs)} style={styleTabs}>
-          {tabs.map((tab, i) => (
+          {this.tabs.map((tab, i, tabs) => (
             <View key={i} className={classNames('tabs__item', {active: activeIndex === i && tabs.length > 1})}
-                  onClick={activeIndex !== i && (() => this.handleClickTab(i))}>
+                  onClick={activeIndex !== i && (() => this.setTab(i))}>
               {typeof tab === 'object'
                 ? (tab.icon ? <Text><Icon name={tab.icon}/>{tab.text}</Text> : tab)
                 : <Text>{tab}</Text>
@@ -97,7 +109,7 @@ export default class Tabs extends PureComponent {
         </ScrollView>
         <ScrollView fill className={classNames('tabs__content', {'fade-in': !transition}, classNamePanels)}
                     style={stylePanels}>
-          {typeof content === 'object' ? content : (isFunction(content) ? content() : <Text>{content}</Text>)}
+          {typeof content === 'object' ? content : (isFunction(content) ? content(this) : <Text>{content}</Text>)}
         </ScrollView>
         {isFunction(children) ? children(activeIndex) : children}
       </ScrollView>

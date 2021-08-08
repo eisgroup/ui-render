@@ -24,6 +24,7 @@ type.List = PropTypes.array
 type.ListOf = PropTypes.arrayOf
 type.Method = PropTypes.func
 type.Mm = PropTypes.number // millimeter
+type.Node = PropTypes.object
 type.Number = PropTypes.number
 type.NumberOrString = PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 type.Object = PropTypes.object

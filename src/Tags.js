@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { isEmpty } from 'utils-pack'
@@ -9,22 +10,24 @@ import View from './View'
 // List of Tags
 export function Tags ({
   items,
-  defByCode, // example: DEFINITION_BY_VAL.LANGUAGE
+  defByCode, // example: tag.select.tagById(state)
   label,
+  className,
+  ...props
 }) {
   if (isEmpty(items)) return null
-  const Wrap = label ? View : Row
+  const Container = label ? View : Row
   return (
-    <Wrap className='margin-v-smaller'>
-      <Text><Icon name='tags'/>{label}</Text>
-      <Row className='wrap'>
+    <Container className={classNames('app__tags margin-v-smaller', className)} {...props}>
+      <Text><Icon name="tags"/>{label}</Text>
+      <Row className="wrap">
         {items.map(tag => (
-          <View key={tag} className='app__tag no-pointer no-interaction'>
+          <View key={tag} className="app__tag no-pointer no-interaction">
             {(defByCode[tag] || {}).name}
           </View>
         ))}
       </Row>
-    </Wrap>
+    </Container>
   )
 }
 
