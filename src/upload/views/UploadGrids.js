@@ -74,19 +74,21 @@ export default class UploadGrids extends Component {
         {label && <Label>{label}</Label>}
         <Tabs
           centerTabs={centerTabs}
-          tabs={kinds.map(k => k.name)}
-          panels={kinds.map(({_, types}) => () => (
-            <UploadGrid
-              {...props}
-              // key={_} // do not add key to avoid unmounting, which causes layout shift
-              // Component updates between tab changes by having different initialValues
-              kind={_}
-              types={types}
-              initialValues={files.filter(f => f.kind === _)}
-              onChangeLast={this.handleChange}
-              multiple // ensure value is always stored as list, if `types` only has one definition
-            />
-          ))}
+          items={kinds.map(({_, name, types}) => ({
+            tab: name,
+            content: () => (
+              <UploadGrid
+                {...props}
+                // key={_} // do not add key to avoid unmounting, which causes layout shift
+                // Component updates between tab changes by having different initialValues
+                kind={_}
+                types={types}
+                initialValues={files.filter(f => f.kind === _)}
+                onChangeLast={this.handleChange}
+                multiple // ensure value is always stored as list, if `types` only has one definition
+              />
+            )
+          }))}
         />
       </View>
     )

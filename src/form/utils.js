@@ -3,13 +3,14 @@ import { fieldsFrom } from 'modules-pack/variables/fields'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import { Field, Form } from 'react-final-form'
+import { tooltipProps } from 'react-ui-pack'
 import { isRequired } from 'react-ui-pack/inputs/validationRules'
 import Text from 'react-ui-pack/Text'
 import ToolTip from 'react-ui-pack/Tooltip'
 import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
 import { Active, debounce, isEqualJSON, toJSON, warn } from 'utils-pack'
-import { hasObjectValue, isObject, objChanges, set } from 'utils-pack/object'
+import { hasObjectValue, objChanges, set } from 'utils-pack/object'
 import { _ } from 'utils-pack/translations'
 
 /**
@@ -419,7 +420,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
         const result = Active.renderField(field)
         // Wrap component with Tooltip automatically
         if (tooltip != null)
-          return <Tooltip key={field.key}{...isObject(tooltip) ? tooltip : {title: tooltip}}>{result}</Tooltip>
+          return <Tooltip key={field.key} {...tooltipProps(tooltip)}>{result}</Tooltip>
         return result
       })
   }

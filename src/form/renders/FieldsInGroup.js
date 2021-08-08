@@ -47,27 +47,29 @@ export default class FieldsInGroup extends PureComponent {
       case FIELD.TYPE.TABS: // turn each item label to Tab, the rest as tab content
         props.tabs = []
         props.panels = []
-        props.children = (activeIndex) => items
-          .filter((f, i) => i !== activeIndex)
+        props.children = (self) => items
+          .filter((f, i) => i !== self.state.activeIndex)
           .map(({name, validate}) => {
             if (props.name) name = `${props.name}.${name}`
             return <Active.Field key={name} name={name} validate={validate} component={() => null}/>
           })
-        items.forEach(({label, ...field}) => {
-          props.tabs.push(<Label className={cn({required: field.required})}>{label || field.name}</Label>)
-          props.panels.push(() => {
-            // @Note: currently only supports uploads for a single file, for multiple files, use UploadGrids.
-            //        => this is because initialValues gets reset to only changed files on tab changes.
-            // Simulate state change using initialValues, so that component updates between tab changes
-            // @note: - avoid using `key`, because unmounting component causes layout shift
-            //        - avoid `parser: fileParser` because it strips away file.src needed to show preview
-            if (field.view === FIELD.TYPE.UPLOAD_GRID) {
-              // Set initialValues to changeValues to recover changed state on tab changes
-              const name = props.name ? `${props.name}.${field.name}` : field.name
-              field.initialValues = get(instance.formValues, name) || field.initialValues
+        props.items = items.map(({label, ...field}) => {
+          return {
+            tab: <Label className={cn({required: field.required})}>{label || field.name}</Label>,
+            content: () => {
+              // @Note: currently only supports uploads for a single file, for multiple files, use UploadGrids.
+              //        => this is because initialValues gets reset to only changed files on tab changes.
+              // Simulate state change using initialValues, so that component updates between tab changes
+              // @note: - avoid using `key`, because unmounting component causes layout shift
+              //        - avoid `parser: fileParser` because it strips away file.src needed to show preview
+              if (field.view === FIELD.TYPE.UPLOAD_GRID) {
+                // Set initialValues to changeValues to recover changed state on tab changes
+                const name = props.name ? `${props.name}.${field.name}` : field.name
+                field.initialValues = get(instance.formValues, name) || field.initialValues
+              }
+              return Active.renderField(field)
             }
-            return Active.renderField(field)
-          })
+          }
         })
         return <Tabs {...props} />
       default:
