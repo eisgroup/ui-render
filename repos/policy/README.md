@@ -6,7 +6,7 @@ Below manual hacks are required for Genesis UI Integration, because their UI:
 - cannot handle static assets without processing them through webpack import.
 
 ## Hack Steps
-1. Compile CSS with `yarn build:css`
+1. Compile CSS with `yarn build`
 
 2. Rename `public/static/semantic.css` and `public/static/semantic.css` to `.less`
    
@@ -38,21 +38,48 @@ postcssPlugins: [
 
 6. Uncomment prefix CSS in step 3 
 
-7. Replace all variables below to string literals in `public/static`:
+7. Remove all `.css` files
+
+8. Replace all variables below to string literals in `public/static`:
 ```less
 @color-focus:             ~"rgb(40 99 169/20%)";
 @color-focus-error:       ~"rgb(218 20 20/20%)";
 @color-shadow:            ~"rgb(0 0 0/15%)";
 ```
 
-8. Remove Google Fonts `@import` statement from `public/static/all.less`
+9. Remove Google Fonts `@import` statement from `public/static/all.less`
 
 ```css
 @import url("https://fonts.googleapis.com/css?family=Roboto:300,600|Open Sans:300,600&display=swap&subset=cyrillic");
 ```
 
-9. Remove all instances of query string added inside `.less` files, for example
+10. Remove all instances of query string added inside `.less` files, for example
 
 `fonts/iconsOpenL.eot?id0mra`
 
-10. Remove all `.css` files
+11. Modify this at the top of `all.less` (or remove commented section)
+```less
+// todo: fix temporary hack for OpenL icons because `policy-benefits-application` 'infra.config.js' has broken webpack config
+//@font-face {
+////    font-family: iconsOpenL;
+////    src: url(fonts/iconsOpenL.eot);
+////    src: url(fonts/iconsOpenL.eot) format('embedded-opentype'), url(fonts/iconsOpenL.ttf) format('truetype'),
+////        url(fonts/iconsOpenL.woff) format('woff'), url(fonts/iconsOpenL.svg) format('svg');
+////    font-weight: 400;
+////    font-style: normal;
+////    font-display: block;
+////}
+.ui-render i[class*=' icon-'],
+.ui-render i[class^='icon-'] {
+  font-family: iconsOpenL !important;
+  speak: never;
+  font-style: normal;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+```
+
+12. Replace all `fonts` files in `/ui-eis-genesis/prototypes/applications/packages/cem-dxp-app/src/fonts/`
