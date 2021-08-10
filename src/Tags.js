@@ -19,8 +19,9 @@ export function Tags ({
   const Container = label ? View : Row
   return (
     <Container className={classNames('app__tags margin-v-smaller', className)} {...props}>
-      <Text><Icon name="tags"/>{label}</Text>
-      <Row className="wrap">
+      {label && <Text><Icon name="tags"/>{label}</Text>}
+      <Row className="wrap middle">
+        {!label && <Icon name="tags" className="margin-right-smaller"/>}
         {items.map(tag => (
           <View key={tag} className="app__tag no-pointer no-interaction">
             {(defByCode[tag] || {}).name}

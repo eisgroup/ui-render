@@ -47,9 +47,9 @@ export default class Tabs extends PureComponent {
     children: PropTypes.any,
     className: PropTypes.string,
     classNameTabs: PropTypes.string,
-    classNamePanels: PropTypes.string,
+    classNameContent: PropTypes.string,
     styleTabs: PropTypes.object,
-    stylePanels: PropTypes.object,
+    styleContent: PropTypes.object,
   }
 
   state = {
@@ -90,14 +90,16 @@ export default class Tabs extends PureComponent {
   render () {
     const {
       vertical, buttoned, items, children, centerTabs,
-      className, classNameTabs, classNamePanels, styleTabs, stylePanels,
+      className, classNameTabs, classNameContent, styleTabs, styleContent,
       activeIndex: _, defaultIndex: __, onChange: ___, transitionUpdate: ____,
       ...props
     } = this.props
     const {activeIndex, transition} = this.state
     const content = this.contents[activeIndex]
     return (
-      <ScrollView
+      // In Safari, the entire .tabs container scrolls, but in Chrome, only .tabs__content scrolls
+      // the solution is to enforce `min-height: initial` for this wrapper in `classNameInner`
+      <ScrollView // ScrollView is needed so inner content scroll does not overlap tabs, and has correct height
         className={classNames('tabs fade-in', className, {buttoned})}
         classNameInner="max-height" // fix to allow child ScrollViews to take 100% of available height
         {...props}
@@ -114,8 +116,8 @@ export default class Tabs extends PureComponent {
             </View>
           ))}
         </ScrollView>
-        <ScrollView fill className={classNames('tabs__content', {'fade-in': !transition}, classNamePanels)}
-                    style={stylePanels}>
+        <ScrollView fill className={classNames('tabs__content', {'fade-in': !transition}, classNameContent)}
+                    style={styleContent}>
           {typeof content === 'object' ? content : (isFunction(content) ? content(this) : <Text>{content}</Text>)}
         </ScrollView>
         {isFunction(children) ? children(this) : children}
