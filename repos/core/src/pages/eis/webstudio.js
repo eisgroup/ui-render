@@ -20,7 +20,6 @@ FIELD.ACTION = {
  * VIEW TEMPLATE ---------------------------------------------------------------
  * todo:
  *  - readonly for classic to disable all inputs (defined in data.json root)
- *  - move cross inside input
  * -----------------------------------------------------------------------------
  */
 export default class WebStudioPage extends Component {
