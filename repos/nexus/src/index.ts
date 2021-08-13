@@ -1,7 +1,8 @@
-import './static/css.less'
 import './static/loader.js'
-import './static/1.9d0d9fa5.chunk.js'
-import './static/main.66f1c612.chunk.js'
+import './static/chunk.js'
+import './static/main.js'
+import './static/semantic.css'
+import './static/all.css'
 import RatingDetails from './RatingDetails'
 
 export {RatingDetails}

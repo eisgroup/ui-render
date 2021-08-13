@@ -8,20 +8,25 @@ interface Props {
     metaUrl: string
     _id?: string
 }
-
-export default class RatingDetails extends Component<Props, any> {
-
+export class RatingDetails extends Component<Props, any> {
+    // tslint:disable:variable-name
     private _id: string | undefined
 
+    // tslint:disable:typedef
     get id() {
-        if (!this._id) return this._id = uuid()
+        if (!this._id) {
+            return (this._id = uuid())
+        }
         return this._id
     }
 
     // Mount UI Render to given DOM element by ID
+    // tslint:disable:typedef
     componentDidMount() {
         // @ts-ignore
-        if (!document._renderRatingDetails) return console.error(`window._renderRatingDetails is required for ${this.constructor.name}!`)
+        if (!document._renderRatingDetails) {
+            return console.error(`document._renderRatingDetails is required for ${this.constructor.name}!`)
+        }
         const {dataUrl, metaUrl} = this.props
         // @ts-ignore
         document._renderRatingDetails({id: this.id, dataUrl, metaUrl})
@@ -29,10 +34,11 @@ export default class RatingDetails extends Component<Props, any> {
 
     render() {
         const {dataUrl, metaUrl, className, ...props} = this.props
-        return <div id={this.id} className={`${UI_RENDER} ${className || ''}`} {...props}/>
+        return <div id={this.id} data-version='0.24.2' className={`${UI_RENDER} ${className || ''}`} {...props} />
     }
 }
 
+export default RatingDetails
 
 /**
  * Create RFC4122 Complaint Version 4 UUID
@@ -40,7 +46,8 @@ export default class RatingDetails extends Component<Props, any> {
  * @see: https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
  * @returns {String} uuid - in this format 'xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx'
  */
-function uuid() {
+function uuid(): string {
+    // tslint:disable:no-bitwise
     const d0 = (Math.random() * 0xffffffff) | 0
     const d1 = (Math.random() * 0xffffffff) | 0
     const d2 = (Math.random() * 0xffffffff) | 0

@@ -1,15 +1,16 @@
 {
   "name": "@eisgroup/rating-details",
-  "version": "0.1.0",
+  "version": "0.24.2",
+  "description": "OpenL Rating Details with UI Render",
   "homepage": ".",
   "sideEffects": false,
   "license": "UNLICENSED",
   "publishConfig": {
-    "registry": "http://sfoeisnexus03.exigengroup.com/repository/genesis-npm/"
+    "registry": "https://sfoeisgennexus01.exigengroup.com/repository/genesis_npm_release/"
   },
   "scripts": {
     "push": "cp {README.md,LICENSE,package.json} dist/ && cd dist && npm publish && cd ../",
-    "build": "tsc",
+    "build": "tsc && cp {README.md,LICENSE,package.json} dist/",
     "delete": "../../node_modules/rimraf/bin.js",
     "clean": "yarn delete {build/**/*.map,buildless-watcher-compiler.config.js/**/**/*.map}"
   },
