@@ -16,6 +16,16 @@ export function cssBgImageFrom ({src, name}) {
 }
 
 /**
+ * Compute Preview Image src from dynamic `preview` attribute
+ * @param {String|Object} preview - type.UrlOrBase64OrPreview
+ * @param {String} [size] - one of thumb/medium/large/etc.
+ * @returns {String|Object} preview src ready for consumption by Components
+ */
+export function previewSize (preview, size = 'thumb') {
+  return typeof preview === 'object' ? (preview[size] || preview) : preview
+}
+
+/**
  * Convert unitless pixels value to Rem equivalent
  *
  * @param {Number} pixels - to convert to rem
