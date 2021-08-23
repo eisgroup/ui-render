@@ -56,6 +56,8 @@ export default class select {
       userSelect.isLoggedIn,
       (activeRoute, userRole, isLoggedIn) => {
         if (isInList(ROUTES.WITHOUT_NAV, activeRoute)) return []
+        const routeWithoutId = activeRoute.substring(0, activeRoute.lastIndexOf('/'))
+        if (routeWithoutId && isInList(ROUTES.WITHOUT_NAV, routeWithoutId)) return []
         return ROUTES.FOR_NAV.filter(r => {
           if (r.userRoles != null && !isInList(r.userRoles, userRole)) return false
           if (r.isLoggedIn != null && r.isLoggedIn !== isLoggedIn) return false
