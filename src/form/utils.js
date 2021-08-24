@@ -260,6 +260,10 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
     // Use PureComponent to avoid double checking large payloads.
     // noinspection JSPotentiallyInvalidUsageOfThis
     return class WithForm extends PureComponent {
+      get initValues () {
+        return this._initValues || (this._initValues = this.props.initialValues)
+      }
+
       // @see: https://final-form.org/docs/react-final-form/types/FormProps
       // Form only calls `render` function when `subscription` changes, or itself rerenders.
       // `formState` can remain unchanged, even if `initialValues` changed.
@@ -278,25 +282,28 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         return <Class {...this._props} formProps={this._formProps} initialValues={this._initValues} instance={this}/>
       }
 
-      render () {
-        // warn('-->>WithForm-------------------------------------------')
-        const {initialValues: initVal, ...restProps} = this.props
-        this._props = restProps
-
+      UNSAFE_componentWillReceiveProps (next, nextContext) {
+        const {initialValues} = next
         // Only assign `initialValues` when it truly changes
-        if (this._initValues !== initVal && !isEqualJSON(this._initValues, initVal)) {
-          this._initValues = initVal
+        if (this._initValues !== initialValues && !isEqualJSON(this._initValues, initialValues)) {
+          this._initValues = initialValues
           // explicitly reset to new values when entries change,
           // because final-form only resets to the very first initialValues.
           if (this.form) this.form.reset(this._initValues)
         }
+      }
+
+      render () {
+        // warn('-->>WithForm-------------------------------------------')
+        const {initialValues, ...restProps} = this.props
+        this._props = restProps
 
         // @Note: when form is submitted, it triggers loading true, and receives old initialValues.
         // If the `initialValues` is computed on the fly and changes reference each time,
         // <Form/> reinitialises while loading, causing the flickering.
         // => either cache `initialValues`, or better, stop <Form/> from reinitializing while loading.
         //    because final-form always re-initializes, there is no `enableReinitialize` like redux-form.
-        return <Form onSubmit={warn} {...options} initialValues={this._initValues} render={this.renderForm}/>
+        return <Form onSubmit={warn} {...options} initialValues={this.initValues} render={this.renderForm}/>
       }
     }
   }
