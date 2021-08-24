@@ -4,7 +4,18 @@ import { ROUTES } from 'modules-pack/variables'
 import React from 'react'
 import { getOriginalClass } from 'react-ui-pack'
 import LoadingView from 'react-ui-pack/Loading'
-import { get, isEmpty, isEqual, isFunction, isList, sanitizeResponse, set, toList, toLowerCase } from 'utils-pack'
+import {
+  Active,
+  get,
+  isEmpty,
+  isEqual,
+  isFunction,
+  isList,
+  sanitizeResponse,
+  set,
+  toList,
+  toLowerCase
+} from 'utils-pack'
 import { GQL_HIDDEN_FIELDS } from './constants'
 
 /**
@@ -131,6 +142,8 @@ export function withGql ({query = null, mutation = null, Loading = LoadingView})
         if (isFunction(options.variables)) options.variables = options.variables(props)
         if (isFunction(options.skip)) options.skip = options.skip(props, options.variables)
 
+        // Provide default Apollo.client so components can render as nested child (i.e. content: () => <Component/>)
+        if (options.client === undefined) options.client = Active.client
         // Fix for chaining queries when used as the last query
         // @see: issue: https://github.com/apollographql/react-apollo/issues/3774
         if (options.pollInterval == null) options.pollInterval = 0
@@ -180,6 +193,8 @@ export function withGql ({query = null, mutation = null, Loading = LoadingView})
       /* Mutation Setup */
       if (mutation.mutation) {
         const {mutation: m, ...options} = mutation
+        // Provide default Apollo.client so components can render as nested child (i.e. content: () => <Component/>)
+        if (options.client === undefined) options.client = Active.client
         if (isFunction(options.variables)) options.variables = options.variables(props)
         args = [m, options]
       }
@@ -455,4 +470,3 @@ export function updateCacheList (queryDecorator, mutatedPath) {
     })
   }
 }
-
