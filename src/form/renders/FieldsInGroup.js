@@ -45,8 +45,6 @@ export default class FieldsInGroup extends PureComponent {
        *        => thus always register input so validation and form changes work as expected.
        */
       case FIELD.TYPE.TABS: // turn each item label to Tab, the rest as tab content
-        props.tabs = []
-        props.panels = []
         props.children = (self) => items
           .filter((f, i) => i !== self.state.activeIndex)
           .map(({name, validate}) => {
@@ -63,7 +61,10 @@ export default class FieldsInGroup extends PureComponent {
               // @note: - avoid using `key`, because unmounting component causes layout shift
               //        - avoid `parser: fileParser` because it strips away file.src needed to show preview
               if (field.view === FIELD.TYPE.UPLOAD_GRID) {
-                // Set initialValues to changeValues to recover changed state on tab changes
+                // Set initialValues to changedValues to recover changed state on tab changes
+                // Need to also take into account use case when `initialValues` changes between different entries,
+                // and use new initialValues, instead of one from previous entry.
+                // The proper solution is to have withForm reset on entry.id changes.
                 const name = props.name ? `${props.name}.${field.name}` : field.name
                 field.initialValues = get(instance.formValues, name) || field.initialValues
               }

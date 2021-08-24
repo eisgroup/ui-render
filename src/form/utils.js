@@ -284,7 +284,12 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         this._props = restProps
 
         // Only assign `initialValues` when it truly changes
-        if (this._initValues !== initVal && !isEqualJSON(this._initValues, initVal)) this._initValues = initVal
+        if (this._initValues !== initVal && !isEqualJSON(this._initValues, initVal)) {
+          this._initValues = initVal
+          // explicitly reset to new values when entries change,
+          // because final-form only resets to the very first initialValues.
+          if (this.form) this.form.reset(this._initValues)
+        }
 
         // @Note: when form is submitted, it triggers loading true, and receives old initialValues.
         // If the `initialValues` is computed on the fly and changes reference each time,
