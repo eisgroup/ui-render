@@ -134,12 +134,14 @@ export function asField (InputComponent, {sanitize} = {}) {
       //    because this avoids validation, ties all operations together and persists `state.canSave`.
       const {instance, name, onChange, onRemoveChange} = this.props
       if (instance && onRemoveChange) {
+        const initialValues = this.initValues
         setTimeout(() => {
           // only call this if the form is not unmounted and initialValues remained (i.e. not between transitions)
+          if (instance.isUnmounting) return
           const form = instance.form
-          if (form && this.initValues === instance.props.initialValues) {
+          if (form && initialValues === instance.props.initialValues) {
             form.change(name, null)
-            onChange && onChange(null)
+            onChange && onChange(null) // update Save button state
           }
         }, 0)
       }
@@ -355,7 +357,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
     get () {
       // @note: do not use `pristine` because it only reflects visible (i.e. registered inputs)
       //        do not use `valid` because it does not compute correctly on tab changes in FieldsInGroup
-      const {loading} = this.props
+      const {loading} = this._props || this.props
       return !loading && !registeredFieldErrors(this.form) && !!this.changedValues
     }
   })
@@ -378,7 +380,8 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   Object.defineProperty(Class.prototype, 'changedValues', {
     get () {
       // Have to select all form values, because registered values may not include all input values
-      return objChanges(this.props.initialValues, this.formValues)
+      const {initialValues} = this._props || this.props
+      return objChanges(initialValues, this.formValues)
     }
   })
 
@@ -451,7 +454,8 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
     const canSave = this.canSave
     if (canSave !== this.state.canSave) {
       this.setState({canSave})
-      if (this.props.onChangeState) this.props.onChangeState(this)
+      const {onChangeState} = this._props || this.props
+      if (onChangeState) onChangeState(this)
     }
   }
 
@@ -464,12 +468,16 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
       !isEqualJSON(next.initialValues, this.props.initialValues) ||
       !isEqualJSON(next.formProps, this.props.formProps)
     ) {
+      // temporarily set to next props for state computation
+      this._props = next
       this.syncInputChanges()
+      this._props = null
     }
     if (UNSAFE_componentWillReceiveProps) UNSAFE_componentWillReceiveProps.apply(this, arguments)
   }
 
   Class.prototype.componentWillUnmount = function () {
+    this.isUnmounting = true
     if (this.props.onChangeState) this.props.onChangeState({})
     if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
   }
