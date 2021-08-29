@@ -394,7 +394,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   })
 
   // Define instance getter
-  Object.defineProperty(Class.prototype, 'validationErrorsTooltip', {
+  Object.defineProperty(Class.prototype, 'validationErrors', {
     get () {
       const errors = registeredFieldErrors(this.form)
       if (!errors) return null
@@ -406,12 +406,18 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
         label = labelGroup || label || k
         messages.push(<Text key={k} className="margin-bottom-smaller">{`• ${label}: ${toJSON(errors[k])}`}</Text>)
       }
-      return <ToolTip top>
+      return (
         <View className="padding-h-smaller">
           <Text className="margin-v-small bold">{_.PLEASE_COMPLETE_}</Text>
           {messages}
         </View>
-      </ToolTip>
+      )
+    }
+  })
+  Object.defineProperty(Class.prototype, 'validationErrorsTooltip', {
+    get () {
+      const errors = this.validationErrors
+      return errors ? <ToolTip top>{errors}</ToolTip> : null
     }
   })
 
