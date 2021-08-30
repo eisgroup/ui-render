@@ -7,8 +7,8 @@ import Placeholder from 'react-ui-pack/Placeholder'
 import ScrollView from 'react-ui-pack/ScrollView'
 import Spinner from 'react-ui-pack/Spinner'
 import Text from 'react-ui-pack/Text'
-import Render from 'ui-renderer'
 import { ENV, fromJSON, get, isEmpty, isFunction, isString, logRender, SUCCESS } from 'utils-pack'
+import Render from '../../ui-render'
 import { withUISetup } from './rules'
 
 FIELD.ACTION = {

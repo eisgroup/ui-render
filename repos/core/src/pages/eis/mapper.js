@@ -26,24 +26,11 @@ import Tabs from 'react-ui-pack/Tabs'
 import Text from 'react-ui-pack/Text'
 import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
-import Render, { mapProps } from 'ui-renderer'
-import {
-  Active,
-  ALERT,
-  debounce,
-  get,
-  hasObjectValue,
-  isEqual,
-  isList,
-  isNumeric,
-  isObject,
-  isString,
-  isTruthy,
-  TIME_DURATION_INSTANT,
-  toFlatList,
-  toJSON
-} from 'utils-pack'
+import { Active, debounce, isList, isNumeric, isString, isTruthy, toFlatList, toJSON } from 'utils-pack'
+import { ALERT, TIME_DURATION_INSTANT } from 'utils-pack/constants'
+import { get, hasObjectValue, isEqual, isObject, } from 'utils-pack/object'
 import { _ } from 'utils-pack/translations'
+import Render, { mapProps } from '../../ui-render'
 
 /**
  * UI RENDERER COMPONENTS SETUP ================================================

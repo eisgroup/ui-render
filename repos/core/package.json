@@ -20,7 +20,6 @@
     "react-markdown": "^4.3.1",
     "react-ui-pack": "^0.9.0",
     "remark-toc": "^7.0.0",
-    "ui-renderer": "*",
     "utils-pack": "^0.9.0"
   },
   "scripts": {},

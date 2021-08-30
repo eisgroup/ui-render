@@ -4,8 +4,8 @@ import { popupAlert } from 'modules-pack/popup'
 import { FIELD } from 'modules-pack/variables'
 import React from 'react'
 import Json from 'react-ui-pack/JsonView'
-import { metaToProps } from 'ui-renderer'
 import { cloneDeep, get, isEmpty, isList, isObject, isString, sanitizeResponse, set } from 'utils-pack'
+import { metaToProps } from '../../ui-render'
 import './mapper' // Set up UI Renderer components and methods
 
 FIELD.ACTION = {
