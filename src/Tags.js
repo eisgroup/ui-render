@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import cn from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { isEmpty } from 'utils-pack'
@@ -13,17 +13,23 @@ export function Tags ({
   defByCode, // example: tag.select.tagById(state)
   label,
   className,
+  classNameItem,
+  onClick,
   ...props
 }) {
   if (isEmpty(items)) return null
   const Container = label ? View : Row
   return (
-    <Container className={classNames('app__tags margin-v-smaller', className)} {...props}>
+    <Container className={cn('app__tags margin-v-smaller', className)} {...props}>
       {label && <Text><Icon name="tags"/>{label}</Text>}
       <Row className="wrap middle">
         {!label && <Icon name="tags" className="margin-right-smaller"/>}
         {items.map(tag => (
-          <View key={tag} className="app__tag no-pointer no-interaction">
+          <View
+            key={tag}
+            className={cn('app__tag', classNameItem, {'no-pointer no-interaction': !onClick})}
+            onClick={() => onClick && onClick(tag)}
+          >
             {(defByCode[tag] || {}).name}
           </View>
         ))}
