@@ -35,8 +35,8 @@
   
 ### v0.23.1
 #### Changes
-- **showIf** can be empty object. The logic works like this:
-  ![showIf-logic](/static/images/showIf.png)
+- **showIf** can be empty object. The logic works like [this](/docs/configuration#showif-logic).
+  
 
 ### v0.23.0
 

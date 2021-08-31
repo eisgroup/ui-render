@@ -18,7 +18,6 @@ const mapStateToProps = () => ({
  * VIEW TEMPLATE ---------------------------------------------------------------
  * -----------------------------------------------------------------------------
  */
-// todo: redo showIf logic table reference to beautiful numbers files
 // todo: adds docs about debug attribute
 @connect(mapStateToProps)
 @withUISetup({subscription: {pristine: true, valid: true}})
