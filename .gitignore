@@ -7,6 +7,8 @@ dist
 /unity
 repos/server/uploads
 /repos/ui-builder
+/cypress/integration/1-getting-started/
+/cypress/integration/2-advanced-examples/
 
 # ==============================================================================
 # Development Files

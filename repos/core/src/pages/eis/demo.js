@@ -129,29 +129,29 @@ export default class Demo extends Component {
         </ScrollView>
 
         {showMeta &&
-        <ScrollView className='padding-smaller bg-neutral inverted'>
-          <Row className='wrap spread'>
-            <View className='margin-smaller'>
-              <Upload {...uploadProps} label='*_data.json' onUpload={this.handleUpload.bind(this, 'data')}
-                      className={'radius-large' + (!hasData ? ' bg-primary-dark' : '')}
+        <ScrollView className="padding-smaller bg-neutral inverted">
+          <Row className="wrap spread">
+            <View className="margin-smaller">
+              <Upload {...uploadProps} label="*_data.json" onUpload={this.handleUpload.bind(this, 'data')}
+                      className={'test-data radius-large' + (!hasData ? ' bg-primary-dark' : '')}
               >
-                {data.name && <View><Text className='h4'>{_.UPLOADED}</Text><Text>{data.name}</Text></View>}
+                {data.name && <View><Text className="h4">{_.UPLOADED}</Text><Text>{data.name}</Text></View>}
               </Upload>
             </View>
-            <View className='margin-smaller'>
-              <Upload {...uploadProps} label='*_meta.json' onUpload={this.handleUpload.bind(this, 'meta')}
-                      className={'radius-large' + (hasData && !hasMeta ? ' bg-primary-dark' : '')}
+            <View className="margin-smaller">
+              <Upload {...uploadProps} label="*_meta.json" onUpload={this.handleUpload.bind(this, 'meta')}
+                      className={'test-meta radius-large' + (hasData && !hasMeta ? ' bg-primary-dark' : '')}
                       disabled={!hasData}
               >
-                {meta.name && <View><Text className='h4'>{_.UPLOADED}</Text><Text>{meta.name}</Text></View>}
+                {meta.name && <View><Text className="h4">{_.UPLOADED}</Text><Text>{meta.name}</Text></View>}
               </Upload>
             </View>
-            <View className='margin-smaller min-width-290'>
-              <Row className='middle justify'>
-                {hasMeta && <Text className='h6 no-margin fade-in-up'>{_.CONFIG_USED}</Text>}
-                <LanguageSelection className='right margin-left-small'/>
+            <View className="margin-smaller min-width-290">
+              <Row className="middle justify">
+                {hasMeta && <Text className="h6 no-margin fade-in-up">{_.CONFIG_USED}</Text>}
+                <LanguageSelection className="right margin-left-small"/>
               </Row>
-              {hasMeta && <View className='fade-in-down'><JsonView data={meta.json} inverted/></View>}
+              {hasMeta && <View className="fade-in-down"><JsonView data={meta.json} inverted/></View>}
             </View>
           </Row>
         </ScrollView>
