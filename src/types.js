@@ -31,6 +31,10 @@ type.Object = PropTypes.object
 type.ObjectOf = PropTypes.objectOf
 type.Of = PropTypes.shape
 type.OneOf = (...types) => PropTypes.oneOfType(types)
+type.Promise = PropTypes.shape({
+  then: PropTypes.func.isRequired,
+  catch: PropTypes.func.isRequired
+})
 type.Px = PropTypes.number // screen unit
 type.PrimitiveOrObject = PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]) // tooltip prop
 type.String = PropTypes.string
