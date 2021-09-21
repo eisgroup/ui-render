@@ -278,23 +278,25 @@ export function formatKeyPath(keyPath) {
 formatKeyPath.pattern = /(\[)(.*?)(\])/g
 
 /**
- * Get File Name Extension from String
+ * Get File Name Format Extension from String
  *
- * @param {string} fileName - full file name with extension
+ * @param {string} fileName - full file name with format extension (ex. 'image.png')
+ * @returns {string} extension - file format if exists (ex. 'png') or empty string if it does not
  */
-export function fileExtension (fileName) {
-	return fileName.split('.').pop()
+export function fileFormat (fileName) {
+	const array = fileName.split('.')
+	return array.length > 1 ? array.pop() : ''
 }
 
 /**
  * Get File Extension used in Backend from User submitted file name
  *
  * @param {String|Null|Undefined} fileName - to extract extension
- * @returns {String|Undefined} file extension
+ * @returns {String|Undefined} file format extension, or empty string, or undefined
  */
-export function fileExtensionNormalized (fileName) {
+export function fileFormatNormalized (fileName) {
 	if (!fileName) return
-	const ext = fileExtension(toLowerCase(fileName))
+	const ext = fileFormat(toLowerCase(fileName))
 	switch (ext) {
 		case 'jpeg':
 		case 'jpg':
@@ -316,12 +318,41 @@ export function fileNameWithoutExt (fileName) {
 fileNameWithoutExt.pattern = /\.[^.$]+$/
 
 /**
+ * Convert Data URL, such as Base64 Image string to JS File object
+ * @param {String} dataUrl
+ * @param {String} filename
+ * @returns {File} file - object
+ */
+export function fileFromDataUrl (dataUrl, filename) {
+	const arr = dataUrl.split(',')
+	const mime = arr[0].match(/:(.*?);/)[1]
+	const str = atob(arr[1])
+	let n = str.length
+	const u8arr = new Uint8Array(n)
+
+	while (n--) {
+		u8arr[n] = str.charCodeAt(n)
+	}
+
+	return new File([u8arr], filename, {type: mime})
+}
+
+/**
+ * Get File Mime Type from Data URL
+ * @param {String} dataUrl - see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+ * @returns {String|undefined} mime type
+ */
+export function mimeTypeFromDataUrl (dataUrl) {
+	return dataUrl.split(',')[0].match(/:(.*?);/)[1]
+}
+
+/**
  * Get hostname from URL string
  *
  * @param {string} url - to extract hostname
  * @return {string} - hostname
  */
-export function hostname(url) {
+export function hostname (url) {
 	let hostname
 
 	// find & remove protocol (http, ftp, etc.) and get hostname
