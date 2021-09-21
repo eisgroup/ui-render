@@ -1,5 +1,13 @@
 import { FILE as _FILE } from 'react-ui-pack/files'
-import { _WORK_DIR_, ENV, fileExtensionNormalized, fileNameWithoutExt, isList, SIZE_MB_16 } from 'utils-pack'
+import {
+  _WORK_DIR_,
+  ENV,
+  fileFormatNormalized,
+  fileNameWithoutExt,
+  isList,
+  mimeTypeFromDataUrl,
+  SIZE_MB_16
+} from 'utils-pack'
 
 /**
  * FILE VARIABLES ==============================================================
@@ -40,6 +48,18 @@ export const FILE = {
   },
 }
 
+FILE.FORMAT_BY_MIME_TYPE = {
+  [FILE.MIME_TYPE.CSV]: 'csv',
+  [FILE.MIME_TYPE.GIF]: 'gif',
+  [FILE.MIME_TYPE.JSON]: 'json',
+  [FILE.MIME_TYPE.JPG]: 'jpg',
+  [FILE.MIME_TYPE.MP3]: 'mp3',
+  [FILE.MIME_TYPE.MP4]: 'mp4',
+  [FILE.MIME_TYPE.PNG]: 'png',
+  [FILE.MIME_TYPE.SVG]: 'svg',
+  [FILE.MIME_TYPE.WEBP]: 'webp',
+}
+
 export const IMAGE = {
   MAX_RES: SIZE_MB_16, // total Image width*height resolution limit (16 MB is about 4K image)
   EXTENSIONS: [FILE.EXT.JPG, FILE.EXT.JPEG, FILE.EXT.PNG, FILE.EXT.SVG, FILE.EXT.GIF, FILE.EXT.WEBP],
@@ -62,6 +82,15 @@ export const UPLOAD = {
   },
 }
 UPLOAD.PATH = ENV.UPLOAD_PATH || `${_WORK_DIR_}${UPLOAD.DIR}` // full upload path
+
+/**
+ * Get File Format Extension from Data URL String
+ * @param {String} dataUrl - see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+ * @returns {String} format - example: 'png'
+ */
+export function fileFormatFromDataUrl (dataUrl) {
+  return FILE.FORMAT_BY_MIME_TYPE[mimeTypeFromDataUrl(dataUrl)]
+}
 
 /**
  * Create File Name (with optional ID folder) from FileInput object in this format:
@@ -87,7 +116,7 @@ export function fileName (fileInput) {
   id = id != null ? String(id) : ''
   kind = kind != null ? String(kind) : ''
   i = i != null ? String(i) : ''
-  const ext = name != null ? fileExtensionNormalized(name) : ''
+  const ext = name != null ? fileFormatNormalized(name) : ''
   const slash = id && (kind || i) && '/'
   const _ = kind && i && '_'
   const dot = ext && '.'
@@ -104,7 +133,7 @@ export function fileName (fileInput) {
 export function fileNameSized (filename, size) {
   if (!size) return filename
   const name = fileNameWithoutExt(filename)
-  const ext = fileExtensionNormalized(filename)
+  const ext = fileFormatNormalized(filename)
   const extension = ext ? `.${ext}` : ''
   return `${name}_${size}${extension}`
 }
@@ -181,4 +210,19 @@ export function fileKindParser (fileInput, kind) {
   const {file, remove} = fileInput
   if (file) return {file, kind}
   if (remove) return {kind, remove}
+}
+
+/**
+ * Load Image file
+ *
+ * @param {String} src - full image file path
+ * @return {Promise<Image|Error>} promise - resolves to loaded Image file or error
+ */
+export function loadImage (src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
 }

@@ -29,7 +29,7 @@ type File {
 # But it's better to separate them for more explicit API.
 input FileInput {
     # Binary File object uploaded from the client, required if `remove` is not true.
-    # For security reasons, do not allow User to upload arbitary URL as src string.
+    # For security reasons, do not allow User to upload arbitrary URL as src string.
     file: Upload
     # Type of file (ex. public/private...)
     kind: JSON
@@ -37,7 +37,7 @@ input FileInput {
     i: JSON
     # Created Timestamp, can be used to unique identify the file
     id: Id
-    # Ignored, upload uses GQL Upload.filename instead, for frontend convinience only.
+    # Ignored, upload uses GQL Upload.filename instead, for frontend convenience only.
     name: String
     # Whether to delete the file, it's called `remove` because `delete` is JS keyword
     remove: Boolean

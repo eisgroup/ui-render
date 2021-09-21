@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
 import PromiseAll from 'promises-all'
 import {
   deleteProp,
-  fileExtensionNormalized,
+  fileFormatNormalized,
   get,
   interpolateString,
   l,
@@ -62,7 +62,7 @@ export async function uploadFile ({file, remove, mimetypes, sizes, ...fileInput}
   // Remove File
   if (remove) {
     filePath = {filename: fileName(fileInput), ...filePath}
-    if (IMAGE.EXTENSIONS.includes(fileExtensionNormalized(filePath.filename))) {
+    if (IMAGE.EXTENSIONS.includes(fileFormatNormalized(filePath.filename))) {
       result = await removeImgSizes({filePath, sizes})
     } else {
       result = await removeFile(filePath)

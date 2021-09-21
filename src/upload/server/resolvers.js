@@ -1,5 +1,5 @@
 import { IMAGE } from 'modules-pack/variables'
-import { __DEV__, _WORK_DIR_, fileExtensionNormalized } from 'utils-pack'
+import { __DEV__, _WORK_DIR_, fileFormatNormalized } from 'utils-pack'
 import { base64Encode } from './file'
 
 /**
@@ -20,7 +20,7 @@ import { base64Encode } from './file'
  */
 export function fileSrc ({src, name, created, updated}) {
   if (!__DEV__) return `${src}?v=${updated || created || '0'}`
-  const ext = fileExtensionNormalized(name) || ''
+  const ext = fileFormatNormalized(name) || ''
   const localPath = `${_WORK_DIR_}${src}` // point to absolute file path, because there is no web server
   return (IMAGE.EXTENSIONS.includes(ext)) ? `data:image/${ext};base64,${base64Encode(localPath)}` : localPath
 }
