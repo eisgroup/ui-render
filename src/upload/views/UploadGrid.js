@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import cn from 'classnames'
 import { POPUP, POPUP_ALERT, POPUP_CONFIRM } from 'modules-pack/popup/constants'
 import { connect, stateAction } from 'modules-pack/redux'
 import PropTypes from 'prop-types'
@@ -12,7 +12,7 @@ import Square from 'react-ui-pack/Square'
 import Text from 'react-ui-pack/Text'
 import { cssBgImageFrom } from 'react-ui-pack/utils'
 import View from 'react-ui-pack/View'
-import { by, interpolateString, isEqual, OPEN, toList } from 'utils-pack'
+import { by, interpolateString, isEqual, isFunction, OPEN, toList } from 'utils-pack'
 import { _ } from '../translations'
 import Upload from './Upload'
 
@@ -100,6 +100,8 @@ export default class UploadGrid extends Component {
     showCount: PropTypes.bool,
     // Show File name once uploaded, defaults to count or version type
     showName: PropTypes.bool,
+    // Custom function preview<fileInput, i, this> or node to render on uploaded file
+    preview: type.Any,
     error: PropTypes.any,
     // info: PropTypes.any, // not yet available because `active` state within Upload is not propagated to UploadGrid
     //                         and it is not visible use-case since choose file window will obscure information.
@@ -231,7 +233,7 @@ export default class UploadGrid extends Component {
   render () {
     const {
       label, loading, placeholder, square, count: _, kind, types, showCount, showName,
-      error, info, iconUpload, iconRemove,
+      error, info, iconUpload, iconRemove, preview,
       className, style,
       ...props
     } = this.props
@@ -244,13 +246,13 @@ export default class UploadGrid extends Component {
     const squared = square == null ? ((Math.sqrt(count) % 1) === 0) : square
     const Grid = squared ? Square.Row : Row
     return (
-      <View className={classNames('input--wrapper', className)} style={style}>
+      <View className={cn('input--wrapper', className)} style={style}>
         {label && <Label>{label}</Label>}
-        <Grid fill className={classNames(`upload-grid count-${count}`, {error, info, wrap: !squared})} {...square}>
+        <Grid fill className={cn(`upload-grid count-${count}`, {error, info, wrap: !squared})} {...square}>
           {this.previews.map((file, i) => (
             <View
               key={file.i || i}
-              className={classNames('upload-grid__item', {preview: !!file.src})}>
+              className={cn('upload-grid__item', {preview: !!file.src})}>
               <Upload
                 {...props}
                 multiple={multiple}
@@ -261,7 +263,9 @@ export default class UploadGrid extends Component {
               >
                 {file.src
                   ? (
-                    <View className="upload__file" style={{backgroundImage: cssBgImageFrom(file)}}>
+                    <View className="upload__file"
+                          style={{...preview == null && {backgroundImage: cssBgImageFrom(file)}}}>
+                      {isFunction(preview) ? preview(file, i, this) : preview}
                       <Text className="upload__file__label">{shouldCount ? (i + 1) : file.name}</Text>
                       <Icon
                         onClick={(event) => this.handleRemove(file, event)}
@@ -282,7 +286,7 @@ export default class UploadGrid extends Component {
           <Loading loading={loading} classNameChild="round padding bg-neutral">{`${_.UPDATING}...`}</Loading>
         </Grid>
         {/* Below element is used to trigger error animation because grid may be nested inside square */}
-        <View className={classNames('input', {error, info})}/>
+        <View className={cn('input', {error, info})}/>
         {(error || info) &&
         <View className="field-help">
           {error && <Text className="error">{error}</Text>}

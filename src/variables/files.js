@@ -29,6 +29,7 @@ export const FILE = {
     WEBP: 'webp',
   },
   MIME_TYPE: {
+    BIN: 'application/octet-stream',
     CSV: 'text/csv',
     GIF: 'image/gif',
     JSON: 'application/json',
@@ -49,6 +50,7 @@ export const FILE = {
 }
 
 FILE.FORMAT_BY_MIME_TYPE = {
+  [FILE.MIME_TYPE.BIN]: 'bin',
   [FILE.MIME_TYPE.CSV]: 'csv',
   [FILE.MIME_TYPE.GIF]: 'gif',
   [FILE.MIME_TYPE.JSON]: 'json',
@@ -81,7 +83,10 @@ export const UPLOAD = {
     [FILE.TYPE.VIDEO]: {fileTypes: '.mp4', maxSize: SIZE_MB_16},
   },
 }
-UPLOAD.PATH = ENV.UPLOAD_PATH || `${_WORK_DIR_}${UPLOAD.DIR}` // full upload path
+
+// @important: for backend, insert this at the top of _init.js:
+// import 'modules-pack/utils/server/config' // load .env file variables
+UPLOAD.PATH = `${ENV.UPLOAD_PATH || _WORK_DIR_}${UPLOAD.DIR}` // full upload path
 
 /**
  * Get File Format Extension from Data URL String

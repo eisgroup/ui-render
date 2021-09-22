@@ -1,7 +1,3 @@
-import { IMAGE } from 'modules-pack/variables'
-import { __DEV__, _WORK_DIR_, fileFormatNormalized } from 'utils-pack'
-import { base64Encode } from './file'
-
 /**
  * GRAPHQL DATA MAPPING ========================================================
  * Define how field values are returned, to encapsulate away backend integration
@@ -11,18 +7,14 @@ import { base64Encode } from './file'
 /**
  * Compute File Source String for Client Consumption in Local Development Environment
  *    - Append `version` query string to force clearing cache when User updates a file
- *    - Base encode image files in local development because CSS background-image cannot load local files
- *    - Prepend `src` with absolute file path in local development
  *    - TBD: Prepend `src` with CDN URL in production
  *
  * @param {Object<src, name>} fileData - to get src for
  * @returns {String} source - file path or base64 encoded data
  */
-export function fileSrc ({src, name, created, updated}) {
-  if (!__DEV__) return `${src}?v=${updated || created || '0'}`
-  const ext = fileFormatNormalized(name) || ''
-  const localPath = `${_WORK_DIR_}${src}` // point to absolute file path, because there is no web server
-  return (IMAGE.EXTENSIONS.includes(ext)) ? `data:image/${ext};base64,${base64Encode(localPath)}` : localPath
+export function fileSrc ({src, created, updated}) {
+  // to load files in local development, set server .env variable for UPLOAD_PATH to ../web/public
+  return `${src}?v=${updated || created || '0'}`
 }
 
 export default {

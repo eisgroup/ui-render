@@ -1,3 +1,5 @@
+// noinspection JSUnresolvedFunction
+
 import { SevenBoom as Response } from 'graphql-apollo-errors'
 import { fileId, fileName, folderFrom, IMAGE } from 'modules-pack/variables'
 import mongoose from 'mongoose'
@@ -24,75 +26,124 @@ import { removeImgSizes, saveImgSizes } from './image'
  * =============================================================================
  */
 
-localiseTranslation({
-  INVALID_FILE_KIND_kind_MUST_BE_ONE_OF_kinds: {
-    [l.ENGLISH]: `Invalid file kind '{kind}', must be one of [{kinds}]`
-  },
-  INVALID_FILE_IDENTIFIER_i_MUST_BE_ONE_OF_is: {
-    [l.ENGLISH]: `Invalid file identifier '{i}', must be one of [{is}]`
-  },
-  INVALID_FILE_TYPE_mimetype: {
-    [l.ENGLISH]: `Invalid file type '{mimetype}`
-  },
-  REMOVE_FILE_ERROR_error: {
-    [l.ENGLISH]: `Remove file error '{error}!`
-  },
-  UPLOAD_FILE_ERROR_error: {
-    [l.ENGLISH]: `Upload file error '{error}!`
-  },
-})
-
 /**
- * Process File Upload
- * todo: remove old file with different extension (does not get overridden)
+ * Decorator to handle File Uploads for GraphQL Resolvers
+ * @requirement:
+ *    - the resolver must return a Mongoose model instance
+ *    - this decorator should be the last because it calls .save()
  *
- * @param {Object<kind, i, id>} fileInput - File props from resolver payload
- * @param {File} [file] - required for upload, native File object to createReadStream()
- * @param {Boolean} [remove] - whether to remove file
- * @param {String} [name] - existing file `name` to remove, required to resolvePath()
- * @param {String[]} [mimetypes] - allowed file types
- * @param {Object} [filePath] - options to pass to `saveFile()` or `removeFile()`
- * @returns {Promise<path...>|Promise<removed...>} - given FileInput props with saved `path`, `name`, and optional `metaData`
- *   - or `removed` boolean
- *   - or error if unsuccessful
+ * This uses a flexible structured file name system by design, which allows both
+ * unstructured index based files, as well as ID or custom folder based uploads.
+ * The structure comes from `FileInput` fields: `kind`, `i`, `id` and `name` (computed by the server).
+ * If above fields are omitted, the server falls back to entry ID for file name.
+ *
+ * @example:
+ *   *@filesUploaded({fields: 'files', mimetypes: IMAGE.MIME_TYPES}) // defaults
+ *    user (parent, args, context, info) {
+ *      // ...resolver logic
+ *      return new User(entry)
+ *    }
+ * @param {Object|Object[]} configs - see fileUploaded() for config props
  */
-export async function uploadFile ({file, remove, mimetypes, sizes, ...fileInput}, filePath) {
-  let result
+export function filesUploaded (...configs) {
+  return function (target, key, descriptor) {
+    const func = descriptor.value
+    descriptor.value = async function (...args) {
+      const [, {entry}] = args
 
-  // Remove File
-  if (remove) {
-    filePath = {filename: fileName(fileInput), ...filePath}
-    if (IMAGE.EXTENSIONS.includes(fileFormatNormalized(filePath.filename))) {
-      result = await removeImgSizes({filePath, sizes})
-    } else {
-      result = await removeFile(filePath)
+      // First, extract files from payload entry so it doesn't get assigned to instance
+      const filesByFieldList = configs.map(({fields = 'files'}) => {
+        const filesByField = {}
+        toList(fields, 'clean').forEach(field => {
+          filesByField[field] = toList(get(entry, field), 'clean')
+          deleteProp(entry, field)
+        })
+        return filesByField
+      })
+
+      // Second, apply all other decorators to get entry instance.
+      // If the result is a Promise, resolve it, else use as is without resolving
+      let instance = func.apply(this, args)
+      instance = (instance instanceof Promise) ? (await instance) : instance
+      if (instance instanceof Error) return instance
+      if (!(instance instanceof mongoose.Document))
+        return Response.badImplementation(`@${filesUploaded.name} requires a Mongoose Document instance as return value`)
+
+      // Third, process all file uploads
+      const {resolve, reject} = await PromiseAll.all(configs.map(({fields, ...config}, index) => {
+        return fileUploaded({instance, filesByField: filesByFieldList[index], ...config})
+      }))
+      reject.forEach(warn)
+
+      // Finally, check the results to return.
+      // If any upload fails, do not save the record to avoid broken database and return the error.
+      const error = resolve.find(({success}) => !success)
+      if (error) return error
+      return instance.save()
     }
-    if (!result.removed)
-      throw Response.badRequest(interpolateString(_.REMOVE_FILE_ERROR_error, {error: result}))
-    return {...fileInput, removed: result.removed}
+    return descriptor
   }
-
-  // Upload File (use filename derived from the file itself)
-  const {createReadStream, filename: name, mimetype} = await file
-  if (mimetypes && !mimetypes.includes(mimetype))
-    throw Response.badRequest(interpolateString(_.INVALID_FILE_TYPE_mimetype, {mimetype}))
-
-  // Always resize the image using Sharp, so sharp can optimize and sanitize it, even if resizing is not needed
-  const stream = createReadStream()
-  const options = {stream, filePath: {filename: fileName({...fileInput, name}), ...filePath}}
-  if (IMAGE.MIME_TYPES.includes(mimetype)) {
-    result = await saveImgSizes({...options, sizes})
-  } else {
-    result = await saveFile(options)
-  }
-  if (!result.path)
-    throw Response.badRequest(interpolateString(_.UPLOAD_FILE_ERROR_error, {error: result}))
-  // @note: - `name` is for UI, does not match `path` for the actual file
-  //        - `metaData` is from the original file, the actual width/height may be smaller (i.e. VALIDATE.IMAGE_MAX_RES)
-  return {...fileInput, ...result, name: sanitize(name)}
 }
 
-// noinspection JSUnresolvedVariable
+/**
+ * Process Files Upload for given Config
+ * @param {String|String[]} [fields] - path to files field as defined in given model instance
+ * @param {*[]} [kinds] - allowed file kinds
+ * @param {*[]} [is] - allowed file identifiers
+ * @param {Boolean} [multiple] - whether upload should be saved as list of files for each given `field`
+ * @param {Function} [update<{instance, files}>] - custom callback to update instance with uploaded files
+ * @param {Object<[folder], [dir], [limit], [mimetypes]>} [options] - custom upload configs, see `updateFiles` arguments
+ * @returns {Function} decorator - that handles files upload/update/delete with all validations required
+ */
+async function fileUploaded ({
+  kinds = [], // enables validation by default
+  is = [], // pass as null to disable validation
+  multiple,
+  update,
+  instance, // private prop from filesUploaded()
+  filesByField,  // private prop from filesUploaded()
+  ...options
+} = {}) {
+  // Simply save the instance, if no files uploaded
+  const success = true
+  const files = toFlatList(Object.values(filesByField))
+  if (!files.length) return {success}
+
+  // Validate FileInput before uploads
+  if (kinds) {
+    for (const {kind} of files) {
+      if (kind != null && !kinds.includes(kind))
+        return Response.badRequest(interpolateString(_.INVALID_FILE_KIND_kind_MUST_BE_ONE_OF_kinds, {kind, kinds}))
+    }
+  }
+  if (is) {
+    for (const {i} of files) {
+      if (i != null && !is.includes(i))
+        return Response.badRequest(interpolateString(_.INVALID_FILE_IDENTIFIER_i_MUST_BE_ONE_OF_is, {i, is}))
+    }
+  }
+
+  // Upload/Update/Remove Files
+  const updates = []
+  for (const field in filesByField) {
+    if (!filesByField[field].length) continue
+    updates.push(updateFiles({instance, files: filesByField[field], field, ...options}))
+  }
+  const {resolve, reject} = await PromiseAll.all(updates)
+  resolve.forEach(({field, files, errors}) => {
+    // todo: test returning array of promises with errors
+    // @see: https://stackoverflow.com/questions/67378814/apollo-server-throw-multiple-errors-with-partial-data
+    if (!files) return // files can be empty array if a single file was removed
+    if (update) {
+      update({instance, field, files, errors})
+    } else {
+      set(instance, field, multiple ? files : files[0])
+    }
+  })
+  reject.forEach(warn)
+  return {success}
+}
+
 /**
  * Process Files Upload/Update/Removal for given Mongoose model instance.
  * Returns new full files list [FileInput] ready for saving the instance.
@@ -176,96 +227,71 @@ export async function updateFiles ({
 }
 
 /**
- * Decorator to handle File Uploads for GraphQL Resolvers
- * @description:
- *    - the resolver must return a Mongoose model instance
- *    - this decorator should be the last because it calls .save()
+ * Process File Upload
+ * todo: remove old file with different extension (does not get overridden)
  *
- * This uses a flexible structured file name system by design, which allows both
- * unstructured index based files, as well as ID or custom folder based uploads.
- * The structure comes from `FileInput` fields: `kind`, `i`, `id` and `name` (computed by the server).
- * If above fields are omitted, the server falls back to entry ID for file name.
- *
- * @example:
- *   *@filesUploaded({fields: 'files', mimeTypes: IMAGE.MIME_TYPES}) // defaults
- *    user (parent, args, context, info) {
- *      // ...resolver logic
- *      return new User(entry)
- *    }
- *
- * @param {String|String[]} [fields] - path to files field as defined in given model instance
- * @param {*[]} [kinds] - allowed file kinds
- * @param {*[]} [is] - allowed file identifiers
- * @param {Boolean} [multiple] - whether upload should be saved as list of files for each given `field`
- * @param {Function} [update<{instance, files}>] - custom callback to update instance with uploaded files
- * @param {Object<[folder], [dir], [limit], [mimetypes]>} [options] - custom upload configs, see `updateFiles` arguments
- * @returns {Function} decorator - that handles files upload/update/delete with all validations required
+ * @param {Object<kind, i, id>} fileInput - File props from resolver payload
+ * @param {File} [file] - required for upload, native File object to createReadStream()
+ * @param {Boolean} [remove] - whether to remove file
+ * @param {String} [name] - existing file `name` to remove, required to resolvePath()
+ * @param {String[]} [mimetypes] - allowed file types
+ * @param {Object} [filePath] - options to pass to `saveFile()` or `removeFile()`
+ * @returns {Promise} Promise<path...>|Promise<removed...>
+ *   - given FileInput props with saved `path`, `name`, and optional `metaData`
+ *   - or `removed` boolean
+ *   - or error if unsuccessful
  */
-export function filesUploaded ({
-  fields = 'files',
-  kinds = [], // enables validation by default
-  is = [], // pass as null to disable validation
-  multiple,
-  update,
-  ...options
-} = {}) {
-  fields = toList(fields, 'clean')
-  return function (target, key, descriptor) {
-    const func = descriptor.value
-    descriptor.value = async function (...args) {
-      // Extract files from payload entry so it doesn't get assigned to instance
-      const [__, {entry}] = args
-      const filesByField = {}
-      fields.forEach(field => {
-        filesByField[field] = toList(get(entry, field), 'clean')
-        deleteProp(entry, field)
-      })
+export async function uploadFile ({file, remove, mimetypes, sizes, ...fileInput}, filePath) {
+  let result
 
-      // If result is a Promise, resolve it, else use as is without resolving
-      let instance = func.apply(this, args)
-      instance = (instance instanceof Promise) ? (await instance) : instance
-      if (instance instanceof Error) return instance
-      if (!(instance instanceof mongoose.Document))
-        return Response.badImplementation(`@${filesUploaded.name} requires a Mongoose Document instance as return value`)
-
-      // Simply save the instance, if no files uploaded
-      const files = toFlatList(Object.values(filesByField))
-      if (!files.length) return instance.save()
-
-      // Validate FileInput before uploads
-      if (kinds) {
-        for (const {kind} of files) {
-          if (kind != null && !kinds.includes(kind))
-            return Response.badRequest(interpolateString(_.INVALID_FILE_KIND_kind_MUST_BE_ONE_OF_kinds, {kind, kinds}))
-        }
-      }
-      if (is) {
-        for (const {i} of files) {
-          if (i != null && !is.includes(i))
-            return Response.badRequest(interpolateString(_.INVALID_FILE_IDENTIFIER_i_MUST_BE_ONE_OF_is, {i, is}))
-        }
-      }
-
-      // Upload/Update/Remove Files
-      const updates = []
-      for (const field in filesByField) {
-        if (!filesByField[field].length) continue
-        updates.push(updateFiles({instance, files: filesByField[field], field, ...options}))
-      }
-      const {resolve, reject} = await PromiseAll.all(updates)
-      resolve.forEach(({field, files, errors}) => {
-        // todo: test returning array of promises with errors
-        // @see: https://stackoverflow.com/questions/67378814/apollo-server-throw-multiple-errors-with-partial-data
-        if (!files) return // files can be empty array if a single file was removed
-        if (update) {
-          update({instance, field, files, errors})
-        } else {
-          set(instance, field, multiple ? files : files[0])
-        }
-      })
-      reject.forEach(warn)
-      return instance.save()
+  // Remove File
+  if (remove) {
+    filePath = {filename: fileName(fileInput), ...filePath}
+    if (IMAGE.EXTENSIONS.includes(fileFormatNormalized(filePath.filename))) {
+      result = await removeImgSizes({filePath, sizes})
+    } else {
+      result = await removeFile(filePath)
     }
-    return descriptor
+    if (!result.removed)
+      throw Response.badRequest(interpolateString(_.REMOVE_FILE_ERROR_error, {error: result}))
+    return {...fileInput, removed: result.removed}
   }
+
+  // Upload File (use filename derived from the file itself)
+  const {createReadStream, filename: name, mimetype} = await file
+  if (mimetypes && !mimetypes.includes(mimetype))
+    throw Response.badRequest(interpolateString(_.INVALID_FILE_TYPE_mimetype, {mimetype}))
+
+  // Always resize the image using Sharp, so sharp can optimize and sanitize it, even if resizing is not needed
+  const stream = createReadStream()
+  const options = {stream, filePath: {filename: fileName({...fileInput, name}), ...filePath}}
+  if (IMAGE.MIME_TYPES.includes(mimetype)) {
+    result = await saveImgSizes({...options, sizes})
+  } else {
+    result = await saveFile(options)
+  }
+  if (!result.path)
+    throw Response.badRequest(interpolateString(_.UPLOAD_FILE_ERROR_error, {error: result}))
+  // @note: - `name` is for UI, does not match `path` for the actual file
+  //        - `metaData` is from the original file, the actual width/height may be smaller (i.e. VALIDATE.IMAGE_MAX_RES)
+  return {...fileInput, ...result, name: sanitize(name)}
 }
+
+// Translations
+localiseTranslation({
+  INVALID_FILE_KIND_kind_MUST_BE_ONE_OF_kinds: {
+    [l.ENGLISH]: `Invalid file kind '{kind}', must be one of [{kinds}]`
+  },
+  INVALID_FILE_IDENTIFIER_i_MUST_BE_ONE_OF_is: {
+    [l.ENGLISH]: `Invalid file identifier '{i}', must be one of [{is}]`
+  },
+  INVALID_FILE_TYPE_mimetype: {
+    [l.ENGLISH]: `Invalid file type '{mimetype}`
+  },
+  REMOVE_FILE_ERROR_error: {
+    [l.ENGLISH]: `Remove file error '{error}!`
+  },
+  UPLOAD_FILE_ERROR_error: {
+    [l.ENGLISH]: `Upload file error '{error}!`
+  },
+})
