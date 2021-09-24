@@ -244,6 +244,7 @@ export default class UploadGrid extends Component {
     // Render as square by default, if square root of count is a whole number
     // All other cases render as a wrapping Row to let css `upload.less` control the layout
     const squared = square == null ? ((Math.sqrt(count) % 1) === 0) : square
+    const hasRemove = count > 1 || !props.required
     const Grid = squared ? Square.Row : Row
     return (
       <View className={cn('input--wrapper', className)} style={style}>
@@ -267,11 +268,14 @@ export default class UploadGrid extends Component {
                           style={{...preview == null && {backgroundImage: cssBgImageFrom(file)}}}>
                       {isFunction(preview) ? preview(file, i, this) : preview}
                       <Text className="upload__file__label">{shouldCount ? (i + 1) : file.name}</Text>
-                      <Icon
-                        onClick={(event) => this.handleRemove(file, event)}
-                        name={iconRemove}
-                        className="upload__file__remove larger"
-                      />
+                      {hasRemove
+                        ? <Icon
+                          onClick={(event) => this.handleRemove(file, event)}
+                          name={iconRemove}
+                          className="upload__file__remove larger"
+                        />
+                        : <Icon className="upload__file__add larger" name={iconUpload} onClick={() => {}}/>
+                      }
                     </View>
                   )
                   : (<Fragment>
