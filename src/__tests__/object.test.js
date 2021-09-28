@@ -364,14 +364,16 @@ it(`${sanitizeResponse.name}() deletes all GraphQL tags, Null/Undefined values f
       street: null,
       city: undefined,
       planet: 'Earth',
+      location: [0, 0.1, 2],
       __typename: 'Address'
     },
     __typename: 'Profile'
   }
   const expected = {
-    beliefs: [7, {person: ['God']}],
+    beliefs: [false, NaN, 0, '', 7, {person: ['God']}],
     address: {
-      planet: 'Earth'
+      planet: 'Earth',
+      location: [0, 0.1, 2],
     }
   }
   expect(sanitizeResponse(object, {tags})).toEqual(expected)

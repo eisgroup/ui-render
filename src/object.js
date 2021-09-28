@@ -522,7 +522,7 @@ export function removeDeletedItems(collection) {
 
 /**
  * Remove GraphQL Tags and Null values from given Collection
- *  - Falsey values will be removed from Array
+ *  - Nullable values will be removed from Array
  *  - Commonly uneditable attributes listed in `tags` are deleted, see `GQL_HIDDEN_FIELDS` for example
  *
  * @param {Object|Array} collection - to remove graphql tags from
@@ -543,7 +543,7 @@ export function sanitizeResponse (collection, {tags = ['__typename'], clone = fa
 		}
 	}
 
-	return result.constructor === Array ? result.filter(v => v) : result
+	return result.constructor === Array ? result.filter(v => v != null) : result
 }
 
 /**
