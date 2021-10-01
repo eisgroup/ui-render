@@ -170,14 +170,16 @@ export function formatNumber(
  * @param {number|string} value - number to format
  * @param {Number} [digits] - maximum number of digits to keep (will add/remove decimals to match final length)
  * @param {Number} [divider] - value to divide by when determining exponent steps, example: 1024 for bytes
+ * @param {String} [delimiter] - character to insert between computed value and suffix
+ * @param {Object} [suffixes] - list of suffixes to use for each exponent
  * @return {String} number - shorten to digits length with suffix if needed
  */
-export function shortNumber(value, digits = 3, divider = 1000) {
+export function shortNumber (value, digits = 3, divider = 1000, delimiter, suffixes) {
 	let number = Number(value)
 	if (number === 0) return '0'
 
 	/* Suffix Required */
-	if (number >= divider || number <= -divider) return formatSI(number, digits, undefined, divider)
+	if (number >= divider || number <= -divider) return formatSI(number, digits, divider, delimiter, suffixes)
 
 	/* No Suffix Truncate (for numbers less than 1k, with decimals rounded if needed) */
 	const decimals = Math.max(0, digits - String(~~Math.abs(number)).length)
@@ -191,11 +193,12 @@ export function shortNumber(value, digits = 3, divider = 1000) {
  *
  * @param {Number} number - to format
  * @param {Number} [precision] - number of significant digits to keep, will round number if 0 given
- * @param {Object} [suffixes] - list of suffixes to use for each exponent
  * @param {Number} [divider] - value to divide by when determining exponent steps, example: 1024 for bytes
+ * @param {String} [delimiter] - character to insert between computed value and suffix
+ * @param {Object} [suffixes] - list of suffixes to use for each exponent
  * @return {string} number - with unit suffix if needed
  */
-export function formatSI(number, precision = 3, suffixes = formatSI.PREFIXES, divider = 1000) {
+export function formatSI (number, precision = 3, divider = 1000, delimiter = '', suffixes = formatSI.PREFIXES) {
 	if (number === 0) return '0'
 
 	let result = Math.abs(number) // significand
@@ -214,9 +217,9 @@ export function formatSI(number, precision = 3, suffixes = formatSI.PREFIXES, di
 	if (result > divider) {
 		// exponent == 24
 		// significand can be arbitrarily long
-		return prefix + result.toFixed(0) + suffixes[exponent]
+		return `${prefix}${result.toFixed(0)}${delimiter}${suffixes[exponent]}`
 	}
-	return prefix + (precision ? Number(result.toPrecision(precision)) : Math.round(result)) + suffixes[exponent]
+	return `${prefix}${(precision ? Number(result.toPrecision(precision)) : Math.round(result))}${delimiter}${suffixes[exponent]}`
 }
 
 formatSI.PREFIXES = {
