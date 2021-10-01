@@ -16,7 +16,7 @@ import {
   capitalize,
   get,
   hasListValue,
-  interpolateString,
+  interpolateString as parseString,
   isFunction,
   log,
   OPEN,
@@ -81,6 +81,7 @@ export default class Upload extends PureComponent {
     showTypes: PropTypes.bool, // whether to show file types tooltip
     round: PropTypes.bool, // whether to add `round` css class
     label: PropTypes.string, // optional label to show in the title
+    labelOnHover: PropTypes.string, // optional label to show on Dropzone hover
     children: PropTypes.any,
   }
 
@@ -169,16 +170,18 @@ export default class Upload extends PureComponent {
 
   render () {
     const {
-      type, loading, children, multiple, disabled, readonly, onBlur,
+      type, loading, children, multiple, disabled, readonly, onBlur, labelOnHover,
       className, hasHeader, round, showTypes
     } = this.props
-    const label = this.props.label || type || this.type
+    const label = this.props.label || this.type || _.FILE
     const {active} = this.state
     const fileTypes = this.fileTypes
+    const fileLabel = capitalize(label)
+    const file = capitalize(this.type || '')
     return (
       <View className={classNames('app__upload', {round})}>
         {type == null && this.renderClose()}
-        {hasHeader && <h2>{interpolateString(_.UPLOAD_file, {file: capitalize(label || _.FILE)})}</h2>}
+        {hasHeader && <h2>{parseString(_.UPLOAD_file, {file: fileLabel})}</h2>}
         <Dropzone
           // @note: When tabbing to dropzone with keyboard, input[type="file"] also gets event -> causing open twice.
           //      => input is hidden by dropzone because it has ugly "Choose File" button
@@ -199,7 +202,7 @@ export default class Upload extends PureComponent {
             <Icon name="image" className="text largest no-margin"/>
             <Text className='p margin-top-smallest'>
               {_.SELECT_OR_DROP}<br/>
-              {pluralize(capitalize(label), multiple ? 2 : 1)}
+              {pluralize(fileLabel, multiple ? 2 : 1)}
             </Text>
           </Fragment>
           }
@@ -207,7 +210,7 @@ export default class Upload extends PureComponent {
           <View className="dropzone__hover position-fill align-center appear-on-hover">
             <View className="padding text-outline">
               <View className="dropzone__hover__bg position-fill bg-neutral radius-large"/>
-              <Text className="margin-bottom-smaller">{_.FORMAT}</Text>
+              <Text className="margin-bottom-smaller">{labelOnHover || parseString(_.UPLOAD_file_FILE, {file})}</Text>
               <Text className="bold p">{fileTypes.replace(/\./g, '')}</Text>
             </View>
           </View>

@@ -89,6 +89,19 @@ export const UPLOAD = {
 UPLOAD.PATH = `${ENV.UPLOAD_PATH || _WORK_DIR_}${UPLOAD.DIR}` // full upload path
 
 /**
+ * Create JS File Object from given URL
+ * @param {String} url - to fetch file, can be Base64 string, http url, dataURL, blobURL, etc...
+ * @param {String} filename - to use
+ * @param {FilePropertyBag|undefined} [options] - attributes to pass to new File()
+ * @returns {Promise<File>} file object if resolved
+ */
+export function fileFromUrl (url, filename, options) {
+  return fetch(url)
+    .then((res) => res.arrayBuffer())
+    .then((buf) => new File([buf], filename, options))
+}
+
+/**
  * Get File Format Extension from Data URL String
  * @param {String} dataUrl - see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
  * @returns {String} format - example: 'png'

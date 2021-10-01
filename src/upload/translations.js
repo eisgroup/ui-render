@@ -48,6 +48,9 @@ localiseTranslation({
     [l.ENGLISH]: 'Upload {file}',
     // [l.RUSSIAN]: 'Загрузите {file}',
   },
+  UPLOAD_file_FILE: {
+    [l.ENGLISH]: 'Upload {file} File',
+  },
   UPLOADED: {
     // as verb
     [l.ENGLISH]: 'Uploaded',
