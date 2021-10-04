@@ -35,14 +35,22 @@ export default class InputNative extends PureComponent {
     onMount: PropTypes.func,
   }
 
-  componentDidUpdate (prev, prevState, snapshot) {
-    const {value, compact} = this.props
-    if (compact && prev.value !== value) resizeToContent(this.element.value, this.element.style, compact)
+  UNSAFE_componentWillReceiveProps (next, nextContext) {
+    const {compact, value} = this.props
+    if (next.compact != null) {
+      let inputValue
+      if (next.value !== value) {
+        inputValue = next.value
+      } else if (next.compact !== compact) {
+        inputValue = this.element.value
+      }
+      if (inputValue) resizeToContent(inputValue, this.element.style, next.compact)
+    }
   }
 
   onChange = ({target: {value, style}}) => {
     const {onChange, compact} = this.props
-    if (compact) resizeToContent(value, style, compact)
+    if (compact != null) resizeToContent(value, style, compact)
     onChange && onChange(value)
   }
 
@@ -96,7 +104,7 @@ export default class InputNative extends PureComponent {
       props.type = 'textarea' // only textarea can resize
       if (!props.rows) props.rows = 1
     }
-    if (compact) props.ref = this.onMountResize
+    if (compact != null) props.ref = this.onMountResize
     switch (props.type) {
       case 'select':
         return <Select {...props} />

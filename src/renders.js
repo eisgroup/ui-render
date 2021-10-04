@@ -200,6 +200,7 @@ export function resizeToContent (value, style, offset = 1) {
   // boolean `offset` evaluates to 1 by default.
   style.width = value.length + Number(offset) + 'ch'
   style.boxSizing = 'content-box'
+  if (!style.transition) style.transition = 'width 200ms'
 }
 
 /**

@@ -12,6 +12,7 @@ import Label from './Label'
  * @param {Function} onChange - callback when user selects an option, receives value as argument
  * @param {String} [name] - input name identification for form submission
  * @param {String} [label] - select label
+ * @param {String} [id] - to map label with Select for accessibility
  * @param {String} [placeholder] - text
  * @param {String} [defaultValue] - text
  * @param {String} [className] - css class name to apply
@@ -21,6 +22,7 @@ import Label from './Label'
 export function Select ({
   name,
   label = name,
+  id = 'select-' + name,
   value = '',
   options,
   onChange,
@@ -29,7 +31,6 @@ export function Select ({
   className,
   ...props
 }) {
-  const id = 'select-' + label
   if (typeof options[0] === 'string') options = options.map(value => ({text: value, value}))
   if (typeof options[0] === 'number') options = options.map(value => ({text: String(value), value}))
   if (value && !onChange) throw new Error('Select.value is only used when `onChange` or `readOnly` provided')
