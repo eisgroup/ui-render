@@ -16,6 +16,7 @@ import Label from './Label'
  * @param {String} [placeholder] - text
  * @param {String} [defaultValue] - text
  * @param {String} [className] - css class name to apply
+ * @param {Object} [style] - css to apply
  * @param {*} [props] - other attributes to pass to `<select>`
  * @returns {Object} - React select component
  */
@@ -29,13 +30,14 @@ export function Select ({
   placeholder,
   defaultValue = '',
   className,
+  style,
   ...props
 }) {
   if (typeof options[0] === 'string') options = options.map(value => ({text: value, value}))
   if (typeof options[0] === 'number') options = options.map(value => ({text: String(value), value}))
   if (value && !onChange) throw new Error('Select.value is only used when `onChange` or `readOnly` provided')
   return (
-    <div className={classNames('select', className)}>
+    <div className={classNames('select', className)} style={style}>
       <Label htmlFor={id} className="sr-only">Select {label}</Label>
       <select
         id={id}
@@ -44,7 +46,7 @@ export function Select ({
         {...props}
       >
         {(value == null || !!label) &&
-        <option value='' disabled>{placeholder || 'Select ' + (label ? label : '')}</option>}
+        <option value="" disabled>{placeholder || 'Select ' + (label ? label : '')}</option>}
         {options.map(({text, value, key}, index) => (
           <option key={key || index} value={value != null ? value : text}>{text}</option>
         ))}

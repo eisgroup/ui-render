@@ -1,6 +1,6 @@
 {
   "name": "react-ui-pack",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Reusable React Components",
   "license": "MIT",
   "main": "index.js",
@@ -17,8 +17,8 @@
     "components"
   ],
   "scripts": {
+    "release": "yarn push && git push",
     "push": "cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish && cd ../ && yarn delete src/{README.md,LICENSE,package.json}",
-    "update": "yarn push && git push",
     "delete": "../../node_modules/rimraf/bin.js"
   },
   "peerDependencies": {
