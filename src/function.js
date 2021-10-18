@@ -152,13 +152,16 @@ export function debounce (func, wait = TIME_DURATION_INSTANT, { leading } = {}) 
 
 		function later () {
 			timeout = null
-			if (!leading) func.apply(self, args)
+			func.apply(self, args)
 		}
 
 		const callNow = leading && !timeout
 		clearTimeout(timeout)
 		timeout = setTimeout(later, wait)
-		if (callNow) func.apply(self, args)
+		if (callNow) {
+			clearTimeout(timeout)
+			func.apply(self, args)
+		}
 	}
 }
 
