@@ -2,21 +2,73 @@ import { fetch } from 'modules-pack/api'
 import { withForm } from 'modules-pack/form'
 import { popupAlert } from 'modules-pack/popup'
 import { FIELD } from 'modules-pack/variables'
-import React from 'react'
+import React, { Component } from 'react'
+import { type } from 'react-ui-pack'
 import Json from 'react-ui-pack/JsonView'
-import { cloneDeep, get, isEmpty, isList, isObject, isString, sanitizeResponse, set } from 'utils-pack'
-import { metaToProps } from '../../ui-render'
+import ScrollView from 'react-ui-pack/ScrollView'
+import { cloneDeep, get, isEmpty, isList, isObject, isString, logRender, sanitizeResponse, set } from 'utils-pack'
+import { hasObjectValue } from 'utils-pack/object'
+import Render, { metaToProps } from '../../ui-render'
 import './mapper' // Set up UI Renderer components and methods
-
-FIELD.ACTION = {
-  POPUP_DELAY: 'popupDelay',
-}
 
 /**
  * BUSINESS RULES ==============================================================
  * UI Config transform logic specific to OpenL reports
  * =============================================================================
  */
+
+FIELD.ACTION = {
+  POPUP_DELAY: 'popupDelay',
+}
+
+/**
+ * UI Render Instance Component
+ * @example:
+ *    <UIRender data={data} meta={meta} initialValues={data} onSubmit={this.submit}/>
+ */
+@withUISetup({subscription: {pristine: true, valid: true}})
+@logRender
+export default class UIRender extends Component {
+  static propTypes = {
+    data: type.Any.isRequired,
+    meta: type.Object.isRequired,
+    initialValues: type.Any, // should be the same as `data` initially
+    childBefore: type.Any,
+    childAfter: type.Any,
+  }
+
+  state = {
+    data: {
+      json: this.props.data
+    },
+    meta: {
+      json: this.props.meta
+    }
+  }
+
+  UNSAFE_componentWillReceiveProps (next, nextContext) {
+    const {data, meta} = this.props
+    const update = {}
+    if (next.data !== data) set(update, 'data.json', next.data)
+    if (next.meta !== meta) set(update, 'meta.json', next.meta)
+    if (hasObjectValue(update)) this.setState(update)
+  }
+
+  render () {
+    const {childBefore, childAfter} = this.props
+    return (
+      <ScrollView fill className="fade-in bg-neutral">
+        {childBefore}
+        <form onSubmit={this.handleSubmit}>
+          {this.hasData && this.hasMeta &&
+          <Render data={this.data} {...this.meta} form={this.form}/>
+          }
+        </form>
+        {childAfter}
+      </ScrollView>
+    )
+  }
+}
 
 /**
  * Transform *_meta.json API response into custom rules applied by the team
@@ -199,6 +251,7 @@ export function withUISetup (formConfig) {
     }
 
     // Define instance method
+    // todo - remove - not used because auto-submit would open too many popups
     Class.prototype.submit = function (values) {
       return popupAlert('Submitted Form with these values', <Json data={values}/>)
     }

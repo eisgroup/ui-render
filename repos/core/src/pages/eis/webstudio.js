@@ -4,12 +4,10 @@ import { FIELD } from 'modules-pack/variables'
 import React, { Component } from 'react'
 import { cn, type } from 'react-ui-pack'
 import Placeholder from 'react-ui-pack/Placeholder'
-import ScrollView from 'react-ui-pack/ScrollView'
 import Spinner from 'react-ui-pack/Spinner'
 import Text from 'react-ui-pack/Text'
-import { ENV, fromJSON, get, isEmpty, isFunction, isString, logRender, SUCCESS } from 'utils-pack'
-import Render from '../../ui-render'
-import { withUISetup } from './rules'
+import { ENV, fromJSON, get, isEmpty, isFunction, isString, SUCCESS } from 'utils-pack'
+import UIRender from './rules'
 
 FIELD.ACTION = {
   UPDATE: 'update',
@@ -104,16 +102,16 @@ export default class WebStudioPage extends Component {
     this.hasData = !isEmpty(data)
     this.hasMeta = !isEmpty(meta)
     return (this.hasData && this.hasMeta
-        ? <WebStudio data={data} meta={meta} initialValues={data} onSubmit={this.submit}/>
+        ? <UIRender data={data} meta={meta} initialValues={data} onSubmit={this.submit}/>
         : <Placeholder>
           {!this.hasData &&
           <Text className={cn('h1', {error: !loadingData, blink: loadingData})}>
-            {loadingData ? <Text><Spinner size='large'/> Loading...</Text> : 'Missing'} *_data.json
+            {loadingData ? <Text><Spinner size="large"/> Loading...</Text> : 'Missing'} *_data.json
           </Text>
           }
           {!this.hasMeta &&
           <Text className={cn('h1', {error: !loadingMeta, blink: loadingMeta})}>
-            {loadingMeta ? <Text><Spinner size='large'/> Loading...</Text> : 'Missing'} *_meta.json
+            {loadingMeta ? <Text><Spinner size="large"/> Loading...</Text> : 'Missing'} *_meta.json
           </Text>
           }
         </Placeholder>
@@ -121,25 +119,4 @@ export default class WebStudioPage extends Component {
   }
 }
 
-@withUISetup({subscription: {pristine: true, valid: true}})
-@logRender
-export class WebStudio extends Component {
-  state = {
-    data: {
-      json: this.props.data
-    },
-    meta: {
-      json: this.props.meta
-    }
-  }
 
-  render () {
-    return (
-      <ScrollView fill className="fade-in bg-neutral">
-        <form onSubmit={this.handleSubmit}>
-          {this.hasData && this.hasMeta && <Render data={this.data} {...this.meta} form={this.form}/>}
-        </form>
-      </ScrollView>
-    )
-  }
-}

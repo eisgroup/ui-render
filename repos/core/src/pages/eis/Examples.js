@@ -6,9 +6,8 @@ import { LinkOut } from 'react-ui-pack/LinkOut'
 import Row from 'react-ui-pack/Row'
 import ScrollView from 'react-ui-pack/ScrollView'
 import View from 'react-ui-pack/View'
-import { logRender, toJSON } from 'utils-pack'
+import { toJSON } from 'utils-pack'
 import { goTo } from '../../common/variables'
-import Render from '../../ui-render'
 import data from './examples/_data.json'
 import meta from './examples/_meta'
 import listData from './examples/array-nested_data.json'
@@ -30,7 +29,7 @@ import tableNestedMeta from './examples/table-nested_meta'
 import tableVerticalMeta from './examples/table-vertical_meta'
 import * as tableMatrix from './examples/table_matrix'
 import * as tabs from './examples/tabs_meta'
-import { withUISetup } from './rules'
+import UIRender from './rules'
 
 const examples = [
   {
@@ -149,9 +148,9 @@ const examples = [
   },
 ]
 
-// todo: Enable json file download
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
+ * List of UI Render Documentation Examples Accordion
  * -----------------------------------------------------------------------------
  */
 export default class Examples extends Component {
@@ -182,7 +181,7 @@ export default class Examples extends Component {
           >
             {() => (
               <>
-                <Example data={data} meta={meta} initialValues={data}/>
+                <UIRender data={data} meta={meta} initialValues={data}/>
                 <ScrollView className="padding-smaller bg-neutral inverted">
                   <Row className="wrap spread">
                     <View fill className="padding-smaller min-width-320">
@@ -214,29 +213,6 @@ export default class Examples extends Component {
           </Expand>
         ))}
       </View>
-    )
-  }
-}
-
-@withUISetup()
-@logRender
-export class Example extends Component {
-  state = {
-    data: {
-      json: this.props.data
-    },
-    meta: {
-      json: this.props.meta
-    }
-  }
-
-  render () {
-    return (
-      <ScrollView fill className="fade-in bg-neutral">
-        <form onSubmit={this.handleSubmit}>
-          {this.hasData && this.hasMeta && <Render data={this.data} {...this.meta} form={this.form}/>}
-        </form>
-      </ScrollView>
     )
   }
 }
