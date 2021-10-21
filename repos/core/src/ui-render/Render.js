@@ -73,7 +73,6 @@ class RenderClass extends Component {
         if (this.state.error) return String(this.state.error)
 
         // Wrap component with Tooltip automatically
-        // @ts-ignore
         if (this.props.tooltip != null) {
             // @ts-ignore
             const {tooltip, ...props} = this.props
@@ -82,17 +81,15 @@ class RenderClass extends Component {
             return <Render.Tooltip {...tooltipProps}>{Render(props)}</Render.Tooltip>
         }
 
-        // @ts-ignore
-        let {data, _data, debug, form, items, relativeData, relativePath, relativeIndex, view, ...props} = this.props
+        let {data, _data, debug, form, instance, items, relativeData, name} = this.props
 
         // Global/Relative Data access
-        // @ts-ignore
-        if (props.name) _data = get((relativeData !== false && _data) || data, props.name) // local data dynamically retrieved from definition
+        if (name) _data = get((relativeData !== false && _data) || data, name) // local data dynamically retrieved from definition
 
         // Pass down data to child renderers
-        items = items.map((item) => ({data, _data, debug, form, ...item})) // allow `data` and `_data` to be overridden by config
+        // allow `data` and `_data` to be overridden by config
+        items = items.map((item) => ({data, _data, debug, form, instance, ...item}))
 
-        // @ts-ignore
         return Render.Component.call(this, {...this.props, _data, items})
     }
 }

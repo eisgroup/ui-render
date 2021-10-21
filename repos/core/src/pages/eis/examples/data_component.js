@@ -4,7 +4,7 @@ import exampleData from './example_data.json'
 
 const dropdownPlan = {
   view: 'Row',
-  styles: 'middle',
+  styles: 'middle margin-v',
   items: [
     {...dropdownMeta, compact: true, style: {}},
     {
@@ -22,9 +22,9 @@ const dropdownPlan = {
   ]
 }
 
-export const dataMeta = {
+export const metaJson = {
   view: 'Col',
-  styles: 'app__form left padding',
+  styles: 'app__form left padding margin bg-success-light',
   items: [
     {
       view: 'Text',
@@ -40,6 +40,13 @@ export const dataMeta = {
           name: 'startDate',
           label: 'Start Date',
           validate: 'required',
+          verify: {
+            dataKind: 'period',
+            validate: {
+              name: 'notWithinRange',
+              args: ['startDate', 'endDate'],
+            },
+          }
         },
         {
           view: 'Input',
@@ -47,11 +54,10 @@ export const dataMeta = {
           label: 'End Date',
           validate: 'required',
           verify: {
-            kind: 'period',
+            dataKind: 'period',
             validate: {
-              name: 'noOverlap',
-              start: 'startDate',
-              end: 'endDate',
+              name: 'notWithinRange',
+              args: ['startDate', 'endDate'],
             },
           }
         },
@@ -69,7 +75,7 @@ export const dataMeta = {
 
 export const meta = {
   view: 'Col',
-  styles: 'padding left',
+  styles: 'padding left bg-info-light',
   items: [
     {
       view: 'Text',
@@ -78,10 +84,38 @@ export const meta = {
     },
     cloneDeep(dropdownPlan),
     {
+      view: 'Table',
+      name: 'dataKind.period',
+      styles: 'margin-v',
+      showIf: {},
+      headers: [
+        {
+          id: 'startDate',
+          label: 'Start Date',
+          classNameHeader: 'border-right',
+          classNameCell: 'border-right',
+        },
+        {
+          id: 'endDate',
+          label: 'End Date',
+        },
+      ],
+      extraHeaders: [
+        [
+          {
+            colSpan: 2,
+            label: 'Table using Data Components',
+            classNameHeader: 'bg-warning-light',
+          },
+        ]
+      ],
+    },
+    {
       view: 'Data',
       kind: 'period',
       name: 'dataComponent',
-      meta: dataMeta,
+      styles: 'max-width-400',
+      meta: metaJson,
       // rootData: true,
     }
   ]

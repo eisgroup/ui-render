@@ -54,6 +54,7 @@ Render.Tooltip = TooltipPop
  * @param {Object|Array} data - global data object to be passed down to child components
  * @param {*} _data - local data object to be consumed by the component for rendering
  * @param {Boolean} debug - whether to use debug mode
+ * @param {Class} instance - UI Render instance
  * @param {Boolean} relativeData - whether to retrieve values from local `_data`, defaults to global `data`
  * @param {Number|String} relativeIndex - used when component is rendered in array
  * @param {String} relativePath - path used to compute form input "name" attribute
@@ -65,8 +66,8 @@ Render.Tooltip = TooltipPop
  * @returns {JSX.Element|*} React component
  */
 Render.Component = function RenderComponent ({
-  view, items, data, _data, debug, form, showIf,
-  relativeData, relativeIndex, relativePath, version,
+  view, items, data, _data, debug, form, instance,
+  showIf, relativeData, relativeIndex, relativePath, version,
   ...props
 }) {
   /* General showIf logic */
@@ -90,7 +91,7 @@ Render.Component = function RenderComponent ({
 
   switch (view) {
     case FIELD.TYPE.DATA:
-      return <Data data={_data || data} {...props}/>
+      return <Data instance={instance} data={_data || data} {...props}/>
 
     case FIELD.TYPE.COL:
     case FIELD.TYPE.COL2:
@@ -265,6 +266,7 @@ Render.Component = function RenderComponent ({
         }
         return item
       }))
+      console.warn('Table.data', _data, table)
       return <TableView items={_data} {...table}/>
     }
 

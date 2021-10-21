@@ -3,7 +3,7 @@ import { withForm } from 'modules-pack/form'
 import { popupAlert } from 'modules-pack/popup'
 import { FIELD } from 'modules-pack/variables'
 import React, { Component } from 'react'
-import { type } from 'react-ui-pack'
+import { cn, type } from 'react-ui-pack'
 import Json from 'react-ui-pack/JsonView'
 import ScrollView from 'react-ui-pack/ScrollView'
 import { Active, get, isEmpty, isList, isString, logRender, sanitizeResponse, warn, } from 'utils-pack'
@@ -37,7 +37,9 @@ export default class UIRender extends Component {
     childBefore: type.Any,
     childAfter: type.Any,
     // If given, will render <form onSubmit {...form} />
-    form: type.Object,
+    form: type.Of({
+      kind: type.Id,
+    }),
   }
 
   state = {
@@ -46,7 +48,7 @@ export default class UIRender extends Component {
     },
     meta: {
       json: this.props.meta
-    }
+    },
   }
 
   UNSAFE_componentWillReceiveProps (next, nextContext) {
@@ -58,10 +60,11 @@ export default class UIRender extends Component {
   }
 
   render () {
-    const {childBefore, childAfter, form} = this.props
-    const content = this.hasData && this.hasMeta && <Render data={this.data} {...this.meta} form={this.form}/>
+    const {childBefore, childAfter, form, className, style} = this.props
+    const content = this.hasData && this.hasMeta &&
+      <Render data={this.data} {...this.meta} form={this.form} instance={this}/>
     return (
-      <ScrollView fill className="ui__render fade-in bg-neutral">
+      <ScrollView fill className={cn('ui__render fade-in bg-neutral', className)} style={style}>
         {childBefore}
         {form ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
         {childAfter}
@@ -168,7 +171,21 @@ export function withUISetup (formConfig) {
     Object.defineProperty(Class.prototype, 'config', {
       get () {
         const data = this.data
-        FIELD.FUNC[FIELD.ACTION.ADD_DATA] = (e) => warn(e.target)
+        const {form, parent} = this.props
+        // Add current Form values to parent UI Render instance state
+        FIELD.FUNC[FIELD.ACTION.ADD_DATA] = (parent && form)
+          ? () => {
+            // Add directly to data.json, to keep all data patterns consistent, and to enable backend override.
+            // And store a copy in state for rehydration when backend updates response without added data.
+            const {data} = parent.state
+            const {dataKind = {}} = data.json
+            dataKind[form.kind] = [...dataKind[form.kind] || [], this.registeredValues]
+            data.json.dataKind = dataKind
+            parent.setState({data: {...data}, dataKind}, () => {
+              console.warn('parent.state', parent.state)
+            })
+          }
+          : (e) => warn('Missing parent UI Render instance to add form values to!', e)
         FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
         FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
         FIELD.FUNC[FIELD.ACTION.FETCH] = fetch

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { type } from 'react-ui-pack'
-import { Active, cloneDeep, isCollection, isInList } from 'utils-pack'
+import { Active } from 'utils-pack'
 
 /**
  * Component to hold independent UI Render Instance Data
@@ -23,15 +23,17 @@ import { Active, cloneDeep, isCollection, isInList } from 'utils-pack'
  */
 export default class Data extends Component {
   static propTypes = {
+    // Identifier for this type of data.
+    // Data of the same `kind` are grouped into array as list, and used for complex validation (together as group).
+    kind: type.Id.isRequired,
+    // The UI Render Instance containing this Data component
+    instance: type.Object.isRequired,
     // Data.json to use
     data: type.Any,
     // Meta.json to use
     meta: type.Object,
     // Data.json to initialize with
     initialValues: type.Object,
-    // Identifier for this type of data.
-    // Data of the same `kind` are grouped into array as list, and used for complex validation (together as group).
-    kind: type.Id,
     // Whether the `name` attribute should use data relative to root UI Render instance, defaults to this instance.
     rootData: type.Boolean,
   }
@@ -55,32 +57,15 @@ export default class Data extends Component {
   }
 
   render () {
-    const {kind} = this.props
+    const {kind, instance, className, style} = this.props
     const {data, meta, initialValues} = this.state
-    console.warn('data.props', this.props)
     // Use Active.UIRender to avoid circular import
     const UIRender = Active.UIRender
-    return <UIRender data={data} meta={meta} initialValues={initialValues} form={{kind}}/>
+    return <UIRender
+      data={data} meta={meta} initialValues={initialValues} form={{kind}} parent={instance}
+      {...{className, style}}
+    />
   }
-}
-
-/**
- * Recursively remove given list of keys from object or collection
- * @param {Object|Array} obj - or collection to remove keys from
- * @param {String[]} keys - list of keys to remove
- * @param {Boolean} [clone] - whether to return new object, defaults to mutating existing
- * @param {Boolean} [recursive] - whether to parse given obj recursively
- */
-function removeKeys (obj, keys, {clone = false, recursive = false} = {}) {
-  const data = clone ? cloneDeep(obj) : obj
-  for (const key in data) {
-    if (isInList(keys, key)) {
-      delete data[key]
-    } else if (recursive && isCollection(data[key])) {
-      data[key] = removeKeys(data[key], keys, {recursive})
-    }
-  }
-  return data
 }
 
 // =============================================================================

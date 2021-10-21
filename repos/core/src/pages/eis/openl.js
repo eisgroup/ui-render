@@ -24,7 +24,7 @@ export default class OpenL extends PureComponent {
           initialValues={data}
           data={data}
           meta={meta}
-          childeBefore={
+          childBefore={
             <Text className="h1 center padding bg-grey no-margin">All Possible Configurations of The UI Render</Text>
           }/>
 
