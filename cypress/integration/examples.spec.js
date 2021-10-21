@@ -4,7 +4,7 @@ describe(`Examples`, () => {
   })
 
   it(`Decimal Points have correct rounding and truncated values`, () => {
-    cy.get('#decimal').click().get('form').within(() => {
+    cy.get('#decimal').click().get('.ui__render').within(() => {
       cy.contains('.7123456789')
       cy.contains('.71234')
       cy.get('table').within(() => {
@@ -14,7 +14,7 @@ describe(`Examples`, () => {
   })
 
   it(`Dropdown has options and changes option when selected`, () => {
-    cy.get('#dropdown').click().get('form').within(() => {
+    cy.get('#dropdown').click().get('.ui__render').within(() => {
       cy.contains('Gold')
       const dropdown = cy.get('.ui.selection.dropdown')
       dropdown.click()
@@ -25,7 +25,7 @@ describe(`Examples`, () => {
   })
 
   it(`Dynamic Layout changes with dropdown selection`, () => {
-    cy.get('#layout').click().get('form').within(() => {
+    cy.get('#layout').click().get('.ui__render').within(() => {
       cy.get('.bg-primary').should('exist')
       cy.get('.bg-primary-light').should('not.exist')
       cy.get('.bg-grey').should('not.exist')
@@ -41,7 +41,7 @@ describe(`Examples`, () => {
   })
 
   it(`Dynamic List renders as two sections`, () => {
-    cy.get('#list').click().get('form').within(() => {
+    cy.get('#list').click().get('.ui__render').within(() => {
       cy.get('input').should('have.length', 2)
       cy.get('input').first().should('have.value', 378)
       cy.get('input').last().should('have.value', 478)
@@ -49,7 +49,7 @@ describe(`Examples`, () => {
   })
 
   it(`Expand List renders as two collapsible sections`, () => {
-    cy.get('#expandList').click().get('form').within(() => {
+    cy.get('#expandList').click().get('.ui__render').within(() => {
       cy.get('.app__expand').should('have.length', 2)
       cy.get('.app__expand').first().click().within(() => {
         cy.get('input').should('have.value', 378)
@@ -61,7 +61,7 @@ describe(`Examples`, () => {
   })
 
   it(`Tab List renders as two tabbed sections`, () => {
-    cy.get('#tabList').click().get('form').within(() => {
+    cy.get('#tabList').click().get('.ui__render').within(() => {
       cy.get('.tabs__item').should('have.length', 2)
       cy.get('.tabs__item').first().click()
       cy.get('input').should('have.value', 378)
@@ -71,7 +71,7 @@ describe(`Examples`, () => {
   })
 
   it(`Tabs renders correctly`, () => {
-    cy.get('#tabs').click().get('form').within(() => {
+    cy.get('#tabs').click().get('.ui__render').within(() => {
       cy.get('.tabs__item').should('have.length', 2)
       cy.contains('Non-contributory')
       cy.get('.tabs__item').last().click()
@@ -80,7 +80,7 @@ describe(`Examples`, () => {
   })
 
   it(`Tabs Buttoned renders correctly`, () => {
-    cy.get('#tabsButtoned').click().get('form').within(() => {
+    cy.get('#tabsButtoned').click().get('.ui__render').within(() => {
       cy.get('.tabs__item').should('have.length', 2)
       cy.contains('Non-contributory')
       cy.get('.tabs__item').last().click()
@@ -89,7 +89,7 @@ describe(`Examples`, () => {
   })
 
   it(`Table Nested within Table Collapse/Expand All one level deep`, () => {
-    cy.get('#tableNested').click().get('form').within(() => {
+    cy.get('#tableNested').click().get('.ui__render').within(() => {
       cy.get('.table').should('have.length', 1)
       cy.get('.app__expand').first().click()
       cy.get('.table').should('have.length', 2)
@@ -107,7 +107,7 @@ describe(`Examples`, () => {
   })
 
   it(`Table Rows as Columns (Vertical Layout)`, () => {
-    cy.get('#tableVertical').click().get('form').within(() => {
+    cy.get('#tableVertical').click().get('.ui__render').within(() => {
       cy.get('.table').should('have.length', 1)
       cy.contains('Contribution Type').parents('th')
         .next().children().children().should('have.text', 'Non-contributory').parents('td')
@@ -116,7 +116,7 @@ describe(`Examples`, () => {
   })
 
   it(`Table with Custom Data renders input with value`, () => {
-    cy.get('#tableExtraItems').click().get('form').within(() => {
+    cy.get('#tableExtraItems').click().get('.ui__render').within(() => {
       cy.get('.table').should('have.length', 1).within(() => {
         cy.get('input').should('have.value', 0.7123456789)
       })
@@ -124,7 +124,7 @@ describe(`Examples`, () => {
   })
 
   it(`Table with Matrix Data renders items grouped into sections`, () => {
-    cy.get('#tableMatrix').click().get('form').within(() => {
+    cy.get('#tableMatrix').click().get('.ui__render').within(() => {
       cy.get('.table').should('have.length', 1).within(() => {
         // Headers
         cy.get('thead tr:first-child th:nth-child(2) .text').first().should('have.text', 'Final Manual Rate (with UW Adj)')
@@ -155,7 +155,7 @@ describe(`Examples`, () => {
   })
 
   it(`Pie Chart renders legend and total label`, () => {
-    cy.get('#pieChart').click().get('form').within(() => {
+    cy.get('#pieChart').click().get('.ui__render').within(() => {
       cy.get('.app__pie-chart').should('have.length', 2)
       cy.get('.app__pie-chart--ref').first().within(() => {
         cy.contains('19')
@@ -173,7 +173,7 @@ describe(`Examples`, () => {
   })
 
   it(`Show If Condition works correctly`, () => {
-    cy.get('#showIf').click().get('form').within(() => {
+    cy.get('#showIf').click().get('.ui__render').within(() => {
       cy.contains('Gold')
         .next().should('have.text', 'You see this because <"showIf": "coverageID"> resolves to \'data.coverages.{index}.coverageID\', which is considered \'Truthy\'')
         .next().should('have.text', 'And here is how to evaluate it <"showIf": {"equal": "Gold"}>')
@@ -184,7 +184,7 @@ describe(`Examples`, () => {
   })
 
   it(`Input renders labels with required star, icon and unit`, () => {
-    cy.get('#input').click().get('form').within(() => {
+    cy.get('#input').click().get('.ui__render').within(() => {
       cy.get('label').should('have.text', 'Annual Premium')
       cy.get('input').should('have.value', 12600)
       cy.get('i.icon-dollar').should('exist')
@@ -194,7 +194,7 @@ describe(`Examples`, () => {
   })
 
   it(`Invalid Array Data renders without error`, () => {
-    cy.get('#invalidArray').click().get('form').within(() => {
+    cy.get('#invalidArray').click().get('.ui__render').within(() => {
       cy.contains('Coverage Summary')
       cy.get('table').should('have.length', 2)
     })

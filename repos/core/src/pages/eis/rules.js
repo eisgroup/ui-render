@@ -6,8 +6,8 @@ import React, { Component } from 'react'
 import { type } from 'react-ui-pack'
 import Json from 'react-ui-pack/JsonView'
 import ScrollView from 'react-ui-pack/ScrollView'
-import { cloneDeep, get, isEmpty, isList, isObject, isString, logRender, sanitizeResponse, set } from 'utils-pack'
-import { hasObjectValue } from 'utils-pack/object'
+import { Active, get, isEmpty, isList, isString, logRender, sanitizeResponse, warn, } from 'utils-pack'
+import { cloneDeep, hasObjectValue, isObject, set } from 'utils-pack/object'
 import Render, { metaToProps } from '../../ui-render'
 import './mapper' // Set up UI Renderer components and methods
 
@@ -18,6 +18,7 @@ import './mapper' // Set up UI Renderer components and methods
  */
 
 FIELD.ACTION = {
+  ADD_DATA: 'addData',
   POPUP_DELAY: 'popupDelay',
 }
 
@@ -35,6 +36,8 @@ export default class UIRender extends Component {
     initialValues: type.Any, // should be the same as `data` initially
     childBefore: type.Any,
     childAfter: type.Any,
+    // If given, will render <form onSubmit {...form} />
+    form: type.Object,
   }
 
   state = {
@@ -55,20 +58,19 @@ export default class UIRender extends Component {
   }
 
   render () {
-    const {childBefore, childAfter} = this.props
+    const {childBefore, childAfter, form} = this.props
+    const content = this.hasData && this.hasMeta && <Render data={this.data} {...this.meta} form={this.form}/>
     return (
-      <ScrollView fill className="fade-in bg-neutral">
+      <ScrollView fill className="ui__render fade-in bg-neutral">
         {childBefore}
-        <form onSubmit={this.handleSubmit}>
-          {this.hasData && this.hasMeta &&
-          <Render data={this.data} {...this.meta} form={this.form}/>
-          }
-        </form>
+        {form ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
         {childAfter}
       </ScrollView>
     )
   }
 }
+
+Active.UIRender = UIRender
 
 /**
  * Transform *_meta.json API response into custom rules applied by the team
@@ -147,7 +149,6 @@ export function toOpenLConfig (meta) {
  */
 export function withUISetup (formConfig) {
   return function Decorator (Class) {
-    const UNSAFE_componentWillMount = Class.prototype.UNSAFE_componentWillMount
     const UNSAFE_componentWillUpdate = Class.prototype.UNSAFE_componentWillUpdate
     const UNSAFE_componentWillReceiveProps = Class.prototype.UNSAFE_componentWillReceiveProps
 
@@ -167,6 +168,12 @@ export function withUISetup (formConfig) {
     Object.defineProperty(Class.prototype, 'config', {
       get () {
         const data = this.data
+        FIELD.FUNC[FIELD.ACTION.ADD_DATA] = (e) => warn(e.target)
+        FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
+        FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
+        FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
+        FIELD.FUNC[FIELD.ACTION.POPUP] = this.popupAlert
+        FIELD.FUNC[FIELD.ACTION.POPUP_DELAY] = delayed(this.popupAlert)
         return {
           data,
           instance: this,
@@ -174,7 +181,7 @@ export function withUISetup (formConfig) {
             data,
             fieldValidation: FIELD.VALIDATION,
             fieldNormalizer: FIELD.NORMALIZER,
-            fieldFunc: FIELD.FUNC,
+            fieldFunc: {...FIELD.FUNC}, // bind definition to this instance
           }
         }
       }
@@ -216,7 +223,7 @@ export function withUISetup (formConfig) {
     // Define instance getter
     Object.defineProperty(Class.prototype, 'hasData', {
       get () {
-        return !isEmpty(this.data)
+        return this.data != null
       },
     })
 
@@ -259,15 +266,6 @@ export function withUISetup (formConfig) {
     // Define instance method
     Class.prototype.popupAlert = function (content, title) {
       return popupAlert(title, <Json data={content}/>)
-    }
-
-    Class.prototype.UNSAFE_componentWillMount = function () {
-      FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
-      FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
-      FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
-      FIELD.FUNC[FIELD.ACTION.POPUP] = this.popupAlert
-      FIELD.FUNC[FIELD.ACTION.POPUP_DELAY] = delayed(this.popupAlert)
-      if (UNSAFE_componentWillMount) UNSAFE_componentWillMount.apply(this, arguments)
     }
 
     Class.prototype.UNSAFE_componentWillUpdate = function (nextProps, nextState) {

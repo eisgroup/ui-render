@@ -31,6 +31,7 @@ import { ALERT, TIME_DURATION_INSTANT } from 'utils-pack/constants'
 import { get, hasObjectValue, isEqual, isObject, } from 'utils-pack/object'
 import { _ } from 'utils-pack/translations'
 import Render, { mapProps } from '../../ui-render'
+import Data from './Data'
 
 /**
  * UI RENDERER COMPONENTS SETUP ================================================
@@ -40,6 +41,7 @@ import Render, { mapProps } from '../../ui-render'
 
 FIELD.TYPE = {
   AUTO_SUBMIT: 'AutoSubmit',
+  DATA: 'Data',
 }
 
 Render.Tooltip = TooltipPop
@@ -87,6 +89,9 @@ Render.Component = function RenderComponent ({
   }
 
   switch (view) {
+    case FIELD.TYPE.DATA:
+      return <Data data={_data || data} {...props}/>
+
     case FIELD.TYPE.COL:
     case FIELD.TYPE.COL2:
     case FIELD.TYPE.COL3: {
