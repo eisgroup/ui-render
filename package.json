@@ -1,6 +1,6 @@
 {
   "name": "modules-pack",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "description": "JavaScript Modules for Modern Frontend & Backend Projects",
   "license": "MIT",
   "main": "index.js",
@@ -24,8 +24,8 @@
     "backend"
   ],
   "scripts": {
+    "release": "yarn push && git push",
     "push": "cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish && cd ../ && yarn delete src/{README.md,LICENSE,package.json}",
-    "update": "yarn push && git push",
     "delete": "../../node_modules/rimraf/bin.js"
   },
   "peerDependencies": {

@@ -17,6 +17,10 @@ export const USER_SERVER = namespace(USER, Active.SERVICE) // Namespace this mod
 export const USER_MODEL = capitalize(USER) // db model name
 export const SELF = `${USER}_SELF`
 export const USER_LOGIN = `${USER}_LOGIN`
+export const ROLE = {} // object of role values by name
+for (const name in _USER.ROLE) {
+  ROLE[name] = _USER.ROLE[name]._
+}
 
 // Field IDs
 FIELD.ID = {
