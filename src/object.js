@@ -14,6 +14,7 @@ import {
 	unset
 } from 'lodash'
 import qs from 'querystring'
+import { isCollection } from './array'
 
 /**
  * OBJECT FUNCTIONS ============================================================
@@ -453,9 +454,28 @@ export function pop(obj, keyPath, fallback) {
  * @param {string} key - Object property to delete
  * @return {Object} - without the deleted key property
  */
-export function removeKey(obj, key) {
-	const { [key]: _, ...rest } = obj // eslint-disable-line
+export function removeKey (obj, key) {
+	const {[key]: _, ...rest} = obj // eslint-disable-line
 	return rest
+}
+
+/**
+ * Recursively remove given list of keys from object or collection
+ * @param {Object|Array} obj - or collection to remove keys from
+ * @param {String[]} keys - list of keys to remove
+ * @param {Boolean} [clone] - whether to return new object, defaults to mutating existing
+ * @param {Boolean} [recursive] - whether to parse given obj recursively
+ */
+export function removeKeys (obj, keys, {clone = false, recursive = false} = {}) {
+	const data = clone ? cloneDeep(obj) : obj
+	for (const key in data) {
+		if (keys.indexOf(key) >= 0) {
+			delete data[key]
+		} else if (recursive && isCollection(data[key])) {
+			data[key] = removeKeys(data[key], keys, {recursive})
+		}
+	}
+	return data
 }
 
 /**
@@ -466,7 +486,7 @@ export function removeKey(obj, key) {
  * @param {Boolean} [recursive] - whether to remove empty values recursively
  * @return {Object|Array} - without empty strings
  */
-export function removeEmptyValues(collection, { recursive = true } = {}) {
+export function removeEmptyValues (collection, {recursive = true} = {}) {
 	for (const key in collection) {
 		if (collection[key] === '') {
 			delete collection[key]
