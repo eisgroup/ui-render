@@ -6,7 +6,7 @@ import { Active } from 'utils-pack'
  * Component to hold independent UI Render Instance Data
  *
  * @interface:
- *  a. The entire component is like a separate instance of UI render
+ *  a. The entire component is a separate instance of UI render
  *  b. Data component can be created via meta.json config, or by uploading a meta.json file.
  *    {
  *      view: 'Data',
@@ -28,6 +28,8 @@ export default class Data extends Component {
     kind: type.Id.isRequired,
     // The UI Render Instance containing this Data component
     instance: type.Object.isRequired,
+    // The Index of this Data component in the array of rendered data for removing itself
+    index: type.NumberOrString,
     // Data.json to use
     data: type.Any,
     // Meta.json to use
@@ -57,12 +59,13 @@ export default class Data extends Component {
   }
 
   render () {
-    const {kind, instance, className, style} = this.props
+    const {kind, instance, index, className, style, noContainer} = this.props
     const {data, meta, initialValues} = this.state
     // Use Active.UIRender to avoid circular import
     const UIRender = Active.UIRender
     return <UIRender
-      data={data} meta={meta} initialValues={initialValues} form={{kind}} parent={instance}
+      data={data} meta={meta} initialValues={initialValues} form={{kind}}
+      parent={instance} index={index} noContainer={noContainer}
       {...{className, style}}
     />
   }

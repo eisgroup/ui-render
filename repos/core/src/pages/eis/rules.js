@@ -2,7 +2,7 @@ import { fetch } from 'modules-pack/api'
 import { withForm } from 'modules-pack/form'
 import { popupAlert } from 'modules-pack/popup'
 import { FIELD } from 'modules-pack/variables'
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { cn, type } from 'react-ui-pack'
 import Json from 'react-ui-pack/JsonView'
 import ScrollView from 'react-ui-pack/ScrollView'
@@ -19,6 +19,7 @@ import './mapper' // Set up UI Renderer components and methods
 
 FIELD.ACTION = {
   ADD_DATA: 'addData',
+  REMOVE_DATA: 'removeData',
   POPUP_DELAY: 'popupDelay',
 }
 
@@ -40,6 +41,8 @@ export default class UIRender extends Component {
     form: type.Of({
       kind: type.Id,
     }),
+    // Whether to disable rendering of wrapper scroll view and html form
+    noContainer: type.Boolean,
   }
 
   state = {
@@ -60,15 +63,21 @@ export default class UIRender extends Component {
   }
 
   render () {
-    const {childBefore, childAfter, form, className, style} = this.props
+    const {childBefore, childAfter, form, noContainer, className, style} = this.props
     const content = this.hasData && this.hasMeta &&
       <Render data={this.data} {...this.meta} form={this.form} instance={this}/>
+    const Container = noContainer ? Fragment : ScrollView
+    const props = noContainer ? undefined : {
+      fill: true,
+      className: cn('ui__render fade-in bg-neutral', className),
+      style,
+    }
     return (
-      <ScrollView fill className={cn('ui__render fade-in bg-neutral', className)} style={style}>
+      <Container {...props}>
         {childBefore}
-        {form ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
+        {(form && !noContainer) ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
         {childAfter}
-      </ScrollView>
+      </Container>
     )
   }
 }
@@ -171,8 +180,8 @@ export function withUISetup (formConfig) {
     Object.defineProperty(Class.prototype, 'config', {
       get () {
         const data = this.data
-        const {form, parent} = this.props
-        // Add current Form values to parent UI Render instance state
+        const {form, parent, index} = this.props
+        // Add current Form values to parent UI Render instance.state
         FIELD.FUNC[FIELD.ACTION.ADD_DATA] = (parent && form)
           ? () => {
             // Add directly to data.json, to keep all data patterns consistent, and to enable backend override.
@@ -185,7 +194,21 @@ export function withUISetup (formConfig) {
               console.warn('parent.state', parent.state)
             })
           }
-          : (e) => warn('Missing parent UI Render instance to add form values to!', e)
+          : dataActionWarning
+        // Remove current Form values from parent UI Render instance.state
+        FIELD.FUNC[FIELD.ACTION.REMOVE_DATA] = (parent && form)
+          ? () => {
+            const {data} = parent.state
+            const {dataKind = {}} = data.json
+            const array = [...dataKind[form.kind] || []]
+            array.splice(index, 1)
+            dataKind[form.kind] = array
+            data.json.dataKind = dataKind
+            parent.setState({data: {...data}, dataKind}, () => {
+              console.warn('parent.state', parent.state)
+            })
+          }
+          : dataActionWarning
         FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
         FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
         FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
@@ -309,3 +332,5 @@ function delayed (func, delay = 2000) {
     return func(...args)
   }
 }
+
+const dataActionWarning = (e) => warn('Missing parent UI Render instance to modify form values!', e)

@@ -93,6 +93,7 @@ export function metaToProps (meta, config) {
                           !getFunctionFromString(definition[func], {...funcConfig, fallback: null}) &&
                           {[func]: self[definition[func]]}
                         )).reduce((obj, item) => ({...obj, ...item}), {}),
+                        ...definition.view.indexOf('Data') === 0 && {instance, index},
                         data,
                         _data,
                     }, index)

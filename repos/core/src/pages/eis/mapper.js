@@ -20,7 +20,7 @@ import ProgressSteps from 'react-ui-pack/ProgressSteps'
 import { renderFloat } from 'react-ui-pack/renders'
 import Row from 'react-ui-pack/Row'
 import Space from 'react-ui-pack/Space'
-import TableView from 'react-ui-pack/TableView'
+import Table from 'react-ui-pack/Table'
 import TabList from 'react-ui-pack/TabList'
 import Tabs from 'react-ui-pack/Tabs'
 import Text from 'react-ui-pack/Text'
@@ -32,6 +32,7 @@ import { get, hasObjectValue, isEqual, isObject, } from 'utils-pack/object'
 import { _ } from 'utils-pack/translations'
 import Render, { mapProps } from '../../ui-render'
 import Data from './Data'
+import TableView from './TableView'
 
 /**
  * UI RENDERER COMPONENTS SETUP ================================================
@@ -42,6 +43,7 @@ import Data from './Data'
 FIELD.TYPE = {
   AUTO_SUBMIT: 'AutoSubmit',
   DATA: 'Data',
+  TABLE_CELLS: 'TableCells',
 }
 
 Render.Tooltip = TooltipPop
@@ -113,6 +115,10 @@ Render.Component = function RenderComponent ({
     case FIELD.TYPE.ROW_LIST:
     case FIELD.TYPE.ROW_LIST2: {
       return <List items={_data} {...props} row/>
+    }
+
+    case FIELD.TYPE.TABLE_CELLS: {
+      return <>{items.map((item, i) => <Table.Cell key={i} {...props}>{Render(item, i)}</Table.Cell>)}</>
     }
 
     case FIELD.TYPE.AUTO_SUBMIT: {

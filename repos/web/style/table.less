@@ -68,7 +68,7 @@ th, td {
 }
 
 .ui.table {
-  th > * {
+  th > *:not(.button) {
     &:extend(.padding-v-smaller all);
     &:extend(.padding-left-small all);
 
@@ -77,7 +77,7 @@ th, td {
     }
   }
 
-  td > * {
+  td > *:not(.button) {
     &:extend(.padding-v-smaller all);
     &:extend(.padding-h-small all);
   }

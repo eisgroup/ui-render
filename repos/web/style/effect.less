@@ -62,6 +62,10 @@
   border-right: none !important;
 }
 
+.no-border-right-last-item:last-child {
+  border-right: none !important;
+}
+
 .border-bottom {
   border-bottom: @border-base !important;
 }
@@ -107,6 +111,22 @@
   }
 
   .colors(@colors: red; @property: background-color;);
+}
+
+// Apply to .input--wrapper > .input
+.input--wrapper.border-on-hover > .input {
+  input:not(:focus):not(:hover) {
+    border-color: transparent;
+  }
+
+  input:hover:not(:focus) {
+    cursor: pointer;
+  }
+
+  @{select-icon} {
+    color: fade(@color-neutral, 50%);
+    pointer-events: none;
+  }
 }
 
 .radius {

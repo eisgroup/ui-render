@@ -21,108 +21,167 @@ const dropdownPlan = {
     },
   ]
 }
-
-export const metaJson = {
-  view: 'Col',
-  styles: 'app__form left padding margin bg-success-light',
-  items: [
-    {
-      view: 'Text',
-      styles: 'h3 padding-top',
-      label: 'Data Component (UI Render)',
-    },
-    cloneDeep(dropdownPlan),
-    {
-      view: 'Row',
-      items: [
-        {
-          view: 'Input',
-          name: 'startDate',
-          label: 'Start Date',
-          validate: 'required',
-          verify: {
-            dataKind: 'period',
-            validate: {
-              name: 'notWithinRange',
-              args: ['startDate', 'endDate'],
-            },
-          }
-        },
-        {
-          view: 'Input',
-          name: 'endDate',
-          label: 'End Date',
-          validate: 'required',
-          verify: {
-            dataKind: 'period',
-            validate: {
-              name: 'notWithinRange',
-              args: ['startDate', 'endDate'],
-            },
-          }
-        },
-      ]
-    },
-    {
-      view: 'Button',
-      styles: 'margin-v',
-      children: 'Add',
-      type: 'submit',
-      onClick: 'addData',
-    },
-  ]
+const verify = {
+  dataKind: 'period',
+  validate: {
+    name: 'notWithinRange',
+    args: ['startDate', 'endDate'],
+  },
+}
+const inputStartDate = {
+  view: 'Input',
+  name: 'startDate',
+  validate: 'required',
+  verify: cloneDeep(verify),
+}
+const inputEndDate = {
+  view: 'Input',
+  name: 'endDate',
+  validate: 'required',
+  verify: cloneDeep(verify),
 }
 
+const inputs = [inputStartDate, inputEndDate]
 export const meta = {
   view: 'Col',
   styles: 'padding left bg-info-light',
   items: [
     {
-      view: 'Text',
-      styles: 'h1',
-      label: 'Global (UI Render)'
-    },
-    cloneDeep(dropdownPlan),
-    {
       view: 'Table',
       name: 'dataKind.period',
       styles: 'margin-v',
-      showIf: {},
+      // showIf: {},
+      extraHeaders: [
+        [
+          {
+            colSpan: 999,
+            label: 'Data Components',
+            classNameHeader: 'bg-warning-light',
+            className: 'h5 align-center',
+          },
+        ]
+      ],
       headers: [
         {
           id: 'startDate',
           label: 'Start Date',
-          classNameHeader: 'border-right',
-          classNameCell: 'border-right',
+          classNameHeader: 'padding-left-small border-right',
         },
         {
           id: 'endDate',
           label: 'End Date',
-          classNameHeader: 'border-right',
-          classNameCell: 'border-right',
+          classNameHeader: 'padding-left-small border-right',
         },
         {
-          id: 'action',
+          id: 'null',
+          label: 'Action',
+          className: 'align-center',
         },
       ],
-      extraHeaders: [
-        [
-          {
-            colSpan: 2,
-            label: 'Table using Data Components',
-            classNameHeader: 'bg-warning-light',
-          },
-        ]
-      ],
+      renderItemCells: {
+        view: 'Data',
+        kind: 'period',
+        noContainer: true,
+        meta: {
+          view: 'TableCells',
+          styles: 'border-right no-border-right-last-item',
+          style: {verticalAlign: 'top'},
+          items: [
+            {
+              ...cloneDeep(inputStartDate),
+              className: 'border-on-hover',
+            },
+            {
+              ...cloneDeep(inputEndDate),
+              className: 'border-on-hover',
+            },
+            {
+              view: 'Col',
+              items: [
+                {
+                  view: 'Button',
+                  styles: 'a transparent',
+                  children: 'Remove',
+                  onClick: 'removeData',
+                },
+              ]
+            },
+          ],
+        },
+      },
+      renderExtraItem: {
+        view: 'Data',
+        kind: 'period',
+        name: 'dataComponent',
+        noContainer: true,
+        meta: {
+          view: 'TableCells',
+          styles: 'border-right no-border-right-last-item',
+          style: {verticalAlign: 'top'},
+          items: [
+            {
+              placeholder: 'Start Date',
+              ...cloneDeep(inputStartDate),
+            },
+            {
+              placeholder: 'End Date',
+              ...cloneDeep(inputEndDate),
+            },
+            {
+              view: 'Col',
+              items: [
+                {
+                  view: 'Button',
+                  styles: 'a transparent',
+                  children: 'Add',
+                  onClick: 'addData',
+                },
+              ]
+            },
+          ],
+        },
+      },
     },
     {
       view: 'Data',
       kind: 'period',
       name: 'dataComponent',
       styles: 'max-width-400',
-      meta: metaJson,
+      meta: {
+        view: 'Col',
+        styles: 'app__form left padding margin bg-success-light',
+        items: [
+          {
+            view: 'Text',
+            styles: 'h3 padding-top',
+            label: 'Data Component (UI Render)',
+          },
+          {
+            view: 'Row',
+            items: [
+              {
+                label: 'Start Date',
+                ...cloneDeep(inputStartDate)
+              },
+              {
+                label: 'End Date',
+                ...cloneDeep(inputEndDate)
+              },
+            ],
+          },
+          {
+            view: 'Button',
+            styles: 'margin-v',
+            children: 'Add',
+            type: 'submit',
+            onClick: 'addData',
+          },
+          // cloneDeep(dropdownPlan),
+        ]
+      },
       // rootData: true,
-    }
+    },
+    cloneDeep(dropdownPlan),
   ]
 }
 
@@ -132,4 +191,10 @@ export const data = {
     ...exampleData,
   },
   ...exampleData,
+  dataKind: {
+    period: [
+      {startDate: 2, endDate: 9},
+      {startDate: 5, endDate: 11},
+    ]
+  }
 }
