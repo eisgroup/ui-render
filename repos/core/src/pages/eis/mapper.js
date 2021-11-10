@@ -266,7 +266,6 @@ Render.Component = function RenderComponent ({
         }
         return item
       }))
-      console.warn('Table.data', _data, table)
       return <TableView items={_data} {...table}/>
     }
 

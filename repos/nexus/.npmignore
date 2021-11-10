@@ -1,0 +1,7 @@
+config
+pages
+public
+style
+node_modules
+.next
+.idea

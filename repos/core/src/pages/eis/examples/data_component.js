@@ -98,6 +98,11 @@ export const meta = {
         {
           id: 'endDate',
           label: 'End Date',
+          classNameHeader: 'border-right',
+          classNameCell: 'border-right',
+        },
+        {
+          id: 'action',
         },
       ],
       extraHeaders: [
