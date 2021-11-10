@@ -23,20 +23,24 @@ const dropdownPlan = {
 }
 const verify = {
   dataKind: 'period',
-  validate: {
-    name: 'notWithinRange',
-    args: ['startDate', 'endDate'],
-  },
+  validate: [
+    {
+      name: 'notWithinRange',
+      args: ['startDate', 'endDate'],
+    }
+  ],
 }
 const inputStartDate = {
   view: 'Input',
   name: 'startDate',
+  type: 'number',
   validate: 'required',
   verify: cloneDeep(verify),
 }
 const inputEndDate = {
   view: 'Input',
   name: 'endDate',
+  type: 'number',
   validate: 'required',
   verify: cloneDeep(verify),
 }
@@ -49,14 +53,14 @@ export const meta = {
     {
       view: 'Table',
       name: 'dataKind.period',
-      styles: 'margin-v',
+      styles: 'outline margin-v',
       // showIf: {},
       extraHeaders: [
         [
           {
             colSpan: 999,
             label: 'Data Components',
-            classNameHeader: 'bg-warning-light',
+            classNameHeader: 'bg-success-light',
             className: 'h5 align-center',
           },
         ]
@@ -193,8 +197,8 @@ export const data = {
   ...exampleData,
   dataKind: {
     period: [
-      {startDate: 2, endDate: 9},
-      {startDate: 5, endDate: 11},
+      {startDate: 2, endDate: 4},
+      {startDate: 7, endDate: 9},
     ]
   }
 }

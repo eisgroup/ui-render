@@ -1,5 +1,5 @@
 import { interpolateString, isCollection, isFunction, isList, isString, removeNilValues, toList } from 'utils-pack'
-import { cloneDeep, get, isObject } from 'utils-pack/object'
+import { cloneDeep, get, hasObjectValue, isObject } from 'utils-pack/object'
 import Render from './Render'
 
 const FUNCTION_NAMES = ['onClick', 'onChange', 'onDone']
@@ -179,10 +179,19 @@ function metaToFunctions(definition, config) {
     /* react-final-form does not support validate as array, like redux-form */
     // const validations = toList(definition.validate)
     // if (isString(validations[0])) definition.validate = removeNilValues(validations.map(id => FIELD.VALIDATION[id]))
-    if (isString(definition.validate)) definition.validate = fieldValidation[definition.validate]
     if (isString(definition.format)) definition.format = fieldNormalizer[definition.format]
     if (isString(definition.parse)) definition.parse = fieldNormalizer[definition.parse]
     if (isString(definition.normalize)) definition.normalize = fieldNormalizer[definition.normalize]
+    if (isString(definition.validate)) definition.validate = fieldValidation[definition.validate]
+    if (hasObjectValue(definition.verify)) {
+        // in the future, verify can have multiple validator functions, so compose them
+        const {dataKind, validate} = definition.verify
+        // final-form only passes input `value` to validate function
+        const validators = validate.map(({name, args}) => (value) => fieldValidation[name](value, {dataKind, args}))
+        if (definition.validate) validators.unshift(definition.validate)
+        definition.validate = composeValidators(...validators)
+        delete definition.verify
+    }
     funcNames.forEach(name => {
         if (isString(definition[name])) {
             definition[name] = getFunctionFromString(definition[name], {fieldFunc})
@@ -191,6 +200,8 @@ function metaToFunctions(definition, config) {
         }
     })
 }
+
+const composeValidators = (...validators) => (value) => validators.reduce((error, validator) => error || validator(value), undefined)
 
 /**
  * Get Function/s from Definition Object Recursively

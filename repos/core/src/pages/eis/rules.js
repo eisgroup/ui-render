@@ -10,6 +10,7 @@ import { Active, get, isEmpty, isList, isString, logRender, sanitizeResponse, wa
 import { cloneDeep, hasObjectValue, isObject, set } from 'utils-pack/object'
 import Render, { metaToProps } from '../../ui-render'
 import './mapper' // Set up UI Renderer components and methods
+import { notWithinRange } from './validators'
 
 /**
  * BUSINESS RULES ==============================================================
@@ -21,6 +22,9 @@ FIELD.ACTION = {
   ADD_DATA: 'addData',
   REMOVE_DATA: 'removeData',
   POPUP_DELAY: 'popupDelay',
+}
+FIELD.VALIDATE = {
+  NOT_WITHIN_RANGE: 'notWithinRange',
 }
 
 /**
@@ -149,6 +153,47 @@ export function toOpenLConfig (meta) {
 }
 
 /**
+ * Decorator to extend UI Render instance with nested Data component interface
+ */
+export function withDataKind (Class) {
+  // Register child instance from parent instance
+  Class.prototype.registerDataKind = function (instance, kind, index) {
+    if (!this.dataKind) this.dataKind = {}
+    if (!this.dataKind[kind]) this.dataKind[kind] = {}
+    this.dataKind[kind][index] = instance
+  }
+
+  // Unregister child instance from parent instance
+  Class.prototype.unregisterDataKind = function (instance, kind, index) {
+    if (!this.dataKind) this.dataKind = {}
+    if (this.dataKind[kind]) delete this.dataKind[kind][index]
+  }
+
+  /**
+   * Retrieve current forms' values for given data kind, with fallback to data in state
+   * @param {String}kind - Data component kind
+   * @param {Number} [index] - Data component index
+   * @returns {Object|Undefined} all forms values by index map, or form values for given index, if found, else undefined
+   */
+  Class.prototype.getDataKind = function (kind, index) {
+    if (index != null) {
+      const values = get(this.dataKind, `${kind}.${index}`, {}).formValues
+      return values != null ? values : get(this.state.dataKind, `${kind}.${index}`)
+    }
+    const stateBy = get(this.state.data.json.dataKind, kind)
+    const instancesBy = get(this.dataKind, kind, {})
+    const resultByIndex = {}
+    for (const index in stateBy) {
+      const instance = instancesBy[index]
+      resultByIndex[index] = instance ? instance.formValues : stateBy[index]
+    }
+    return resultByIndex
+  }
+
+  return Class
+}
+
+/**
  * React Class Decorator to setup UI with necessary variables and function definitions
  * @usage:
  *    - this.data -> *_data.json from state, ready for <Render> component consumption
@@ -161,8 +206,11 @@ export function toOpenLConfig (meta) {
  */
 export function withUISetup (formConfig) {
   return function Decorator (Class) {
+    const componentWillUnmount = Class.prototype.componentWillUnmount
+    const UNSAFE_componentWillMount = Class.prototype.UNSAFE_componentWillMount
     const UNSAFE_componentWillUpdate = Class.prototype.UNSAFE_componentWillUpdate
     const UNSAFE_componentWillReceiveProps = Class.prototype.UNSAFE_componentWillReceiveProps
+    withDataKind(Class)
 
     // @Note: the state shape is used for reference only, it is not instantiated
     Class.prototype.state = {
@@ -184,6 +232,9 @@ export function withUISetup (formConfig) {
         // Add current Form values to parent UI Render instance.state
         FIELD.FUNC[FIELD.ACTION.ADD_DATA] = (parent && form)
           ? () => {
+            // Call form submit to run validation
+            if (!this.canSave) return this.handleSubmit()
+
             // Add directly to data.json, to keep all data patterns consistent, and to enable backend override.
             // And store a copy in state for rehydration when backend updates response without added data.
             const {data} = parent.state
@@ -191,7 +242,7 @@ export function withUISetup (formConfig) {
             dataKind[form.kind] = [...dataKind[form.kind] || [], this.registeredValues]
             data.json.dataKind = dataKind
             parent.setState({data: {...data}, dataKind}, () => {
-              console.warn('parent.state', parent.state)
+              this.form.restart()
             })
           }
           : dataActionWarning
@@ -204,24 +255,38 @@ export function withUISetup (formConfig) {
             array.splice(index, 1)
             dataKind[form.kind] = array
             data.json.dataKind = dataKind
-            parent.setState({data: {...data}, dataKind}, () => {
-              console.warn('parent.state', parent.state)
-            })
+            parent.setState({data: {...data}, dataKind})
           }
           : dataActionWarning
+        // Cross UI Render instances validation
+        FIELD.VALIDATION[FIELD.VALIDATE.NOT_WITHIN_RANGE] = (value, {dataKind, args: [start, end]}) => {
+          const {form, index, parent} = this.props
+          // Retrieve current state from all Forms, with fallback to parent instance.state
+          const valuesBy = parent.getDataKind(dataKind)
+          const ranges = []
+          const thisIndex = form.kind === dataKind ? String(index) : null
+          for (const i in valuesBy) {
+            if (i === thisIndex) continue
+            const {[start]: a, [end]: b} = valuesBy[i]
+            ranges.push([+a, +b])
+          }
+          // console.warn('notWithinRange', value, thisIndex, valuesBy)
+          return notWithinRange(+value, ranges)
+        }
         FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
         FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
         FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
         FIELD.FUNC[FIELD.ACTION.POPUP] = this.popupAlert
         FIELD.FUNC[FIELD.ACTION.POPUP_DELAY] = delayed(this.popupAlert)
+
         return {
           data,
           instance: this,
           funcConfig: {
             data,
-            fieldValidation: FIELD.VALIDATION,
-            fieldNormalizer: FIELD.NORMALIZER,
             fieldFunc: {...FIELD.FUNC}, // bind definition to this instance
+            fieldNormalizer: {...FIELD.NORMALIZER},
+            fieldValidation: {...FIELD.VALIDATION},
           }
         }
       }
@@ -306,6 +371,18 @@ export function withUISetup (formConfig) {
     // Define instance method
     Class.prototype.popupAlert = function (content, title) {
       return popupAlert(title, <Json data={content}/>)
+    }
+
+    Class.prototype.componentWillUnmount = function (nextProps, nextState) {
+      const {parent, form, index} = this.props
+      if (parent && index != null) parent.unregisterDataKind(this, form.kind, index)
+      if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
+    }
+
+    Class.prototype.UNSAFE_componentWillMount = function (nextProps, nextState) {
+      const {parent, form, index} = this.props
+      if (parent && index != null) parent.registerDataKind(this, form.kind, index)
+      if (UNSAFE_componentWillMount) UNSAFE_componentWillMount.apply(this, arguments)
     }
 
     Class.prototype.UNSAFE_componentWillUpdate = function (nextProps, nextState) {
