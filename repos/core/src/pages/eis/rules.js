@@ -167,6 +167,14 @@ export function withDataKind (Class) {
   Class.prototype.unregisterDataKind = function (instance, kind, index) {
     if (!this.dataKind) this.dataKind = {}
     if (this.dataKind[kind]) delete this.dataKind[kind][index]
+
+    // Update current parent state in case the component was edited, then unmounted from changing Tabs
+    const {data} = this.state
+    const {dataKind = {}} = data.json
+    if (dataKind[kind] && dataKind[kind][index]) {
+      dataKind[kind][index] = instance.formValues
+      this.setState({data: {...data}, dataKind})
+    }
   }
 
   /**

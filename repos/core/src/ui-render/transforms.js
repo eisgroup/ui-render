@@ -185,9 +185,9 @@ function metaToFunctions(definition, config) {
     if (isString(definition.validate)) definition.validate = fieldValidation[definition.validate]
     if (hasObjectValue(definition.verify)) {
         // in the future, verify can have multiple validator functions, so compose them
-        const {dataKind, validate} = definition.verify
+        const {validate, ...opt} = definition.verify
         // final-form only passes input `value` to validate function
-        const validators = validate.map(({name, args}) => (value) => fieldValidation[name](value, {dataKind, args}))
+        const validators = toList(validate).map(({name, ...args}) => (v) => fieldValidation[name](v, {...opt, ...args}))
         if (definition.validate) validators.unshift(definition.validate)
         definition.validate = composeValidators(...validators)
         delete definition.verify
