@@ -8,12 +8,14 @@
 @input-border: @border @color-bg-grey;
 @input-background-color: transparent;
 @input-background-color-interaction: transparent;
-@input-padding-v: 0.8;
-@input-padding-h: @input-padding-v * 1;
+@input-padding-v: 0.8; // ratio
+@input-padding-h: @input-padding-v * 1; // ratio
+@input-padding-h-icon: 1.3; // ratio relative to standard padding
 @input-padding-h-value: size(round(@input-padding-h * @size-base-px));
 @input-padding-v-value: size(round(@input-padding-v * @size-base-px));
 @input-line-height-fix: 1; // for consistent input height (this value depends on chosen font)
 @input-font-size: @size-base;
+@input-font-size-icon: @size-icon;
 @input-font-size-large: @size-larger;
 @input-font-size-large-icon: @size-icon-large;
 @input-option-swatch-size: @size-icon-large;
@@ -22,12 +24,17 @@
 @input-label-size-default-ratio: 1; // shown as placeholder
 @input-label-size-ratio: 12/14; // minimized at the top
 @input-label-line-height: 1.3;
-@input-label-size: size(round(@input-label-size-ratio * @input-font-size)); // offset space for Label to sit at the top
+@input-label-size: size(round(@input-label-size-ratio * px(@input-font-size))); // offset space for Label to sit at the top
 @input-label-size-offset: @input-label-size + @input-padding-v-value + (@input-label-size-default-ratio - @input-label-size-ratio) * @input-label-line-height * @input-font-size;
 // Color swatch
 @input-swatch-width: size(40);
-@input-swatch-height: size(33);
+@input-swatch-height: size(36);
+// Icons
+@select-icons: ~'> i.icon.delete, > i.icon.dropdown, > i.icon.search, > i[class^="icon-"], > i[class*=" icon-"]';
 
+// -----------------------------------------------------------------------------
+// MIXINS ----------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 .input-done {
   //border-color: fade(@input-color, 35%);
   //border-style: dashed;
@@ -38,16 +45,15 @@
 }
 
 .input-disabled {
-  cursor: default;
+  &:extend(.disabled all);
   pointer-events: none;
   opacity: 0.9;
-  border-style: dotted !important;
 }
 
 .input-readonly {
   cursor: default;
   pointer-events: none;
-  border-style: dashed !important;
+  border-style: dotted !important;
 }
 
 .input-tag {
@@ -56,14 +62,22 @@
   &:extend(.button all);
   &:extend(.button.small all);
   background-color: @color-bg-white !important;
-  border: @border-size dashed @color-text;
-  border-style: dashed;
+  border: @border-size dotted @color-text;
+  text-transform: none;
 
   &.disabled,
   &.no-pointer {
     border-style: dotted;
   }
 }
+
+//label.required {
+//  &:after {
+//    content: '*';
+//    display: inline-block;
+//    margin-left: @margin-smaller;
+//  }
+//}
 
 // -----------------------------------------------------------------------------
 // DEFAULT INPUT ---------------------------------------------------------------
@@ -161,10 +175,10 @@ input, select, textarea {
     outline: 0;
     box-shadow: none; // overrides Semantic UI dropdown, but not default focus styling
     background-color: @input-background-color-interaction;
-    border-color: @color-primary;
+    border-color: @input-color-active;
 
     .inverted & {
-      border-color: @color-primary-light;
+      border-color: @input-color-active-inverse;
     }
   }
 
@@ -186,7 +200,7 @@ input, select, textarea {
       cursor: default;
     }
 
-    > i.icon.dropdown {
+    @{select-icons} {
       opacity: 0.4;
     }
   }
@@ -222,7 +236,7 @@ input, select, textarea {
       &:before {
         &:extend(.position-center all);
         .icon(@icon-checkbox-filled);
-        color: @color-primary;
+        color: @input-color-active;
       }
     }
 
@@ -236,6 +250,7 @@ input, select, textarea {
     font-size: @input-font-size-large;
     .scalePadding(@size: @input-font-size-large, @top: @input-padding-v, @left: @input-padding-h);
 
+    // TBD: improvement - this does not target lefty icons
     + @{select-icon} {
       font-size: @input-font-size-large-icon;
     }
@@ -329,7 +344,7 @@ input, select, textarea {
     + .input__label {
       &:extend(.position-top-left all);
       top: @input-label-size-offset; // offset label size
-      z-index: -1; // make clicking input set focus immediately
+      pointer-events: none; // make clicking input set focus immediately
 
       .input--wrapper:not(.done) & {
         &:extend(.no-margin all); // need for multiple
@@ -343,7 +358,7 @@ input, select, textarea {
     .input--wrapper.done & {
       border-color: transparent;
 
-      i.icon.dropdown {
+      @{select-icons} {
         opacity: 0;
       }
     }
@@ -375,12 +390,12 @@ input, select, textarea {
   // Padding syncing:
   + .input__label,
   > .text.default,
-  i.icon.dropdown {
+  @{select-icons} {
     .scalePadding(@size: @input-font-size, @top: @input-padding-v, @left: @input-padding-h);
   }
 
-  &.loading > {
-    i.icon.dropdown {
+  &.loading {
+    @{select-icons} {
       &:extend(.spin all);
       .scalePadding(@size: @input-font-size, @top: @input-padding-v, @left: @input-padding-h) !important;
       height: initial !important;
@@ -409,14 +424,15 @@ input, select, textarea {
 
     + .input__label,
     > .text.default,
-    i.icon.dropdown {
+    @{select-icons} {
       .scalePadding(@size: @input-font-size, @top: @input-padding-v, @left: @input-padding-h / 2);
     }
   }
 
-  i.icon.dropdown {
+  @{select-icons} {
     &:extend(.position-absolute);
     &:extend(.no-margin all);
+    &:extend(.no-outline all);
     top: @border-size;
     right: @border-size;
     opacity: @icon-opacity;
@@ -582,6 +598,10 @@ input, select, textarea {
       &:extend(.appear all);
     }
   }
+
+  @{select-icon} {
+    font-size: @input-font-size-icon; // hard code size to ensure icon is crisp
+  }
 }
 
 div.input,
@@ -601,8 +621,8 @@ div.select {
     font-size: inherit; // prevent Semantic UI override
 
     @{select-icon} {
+      &:extend(.no-outline all);
       z-index: 1;
-      .no-outline();
 
       &.pointer {
         @{select-interaction} {
@@ -620,15 +640,15 @@ div.select {
     /* Base Size */
 
     &:not(.large) {
-      @padding: @size-icon + @input-padding-h-value * 1.5;
+      @padding: size(round(px(@input-font-size-icon + @input-padding-h-value * @input-padding-h-icon)));
       @offset: @input-padding-h-value;
-      @margin: @size-icon + @offset;
+      @margin: @input-font-size-icon + @offset;
       .iconPosition(@padding; @offset; @margin;)
     }
 
     &.large {
       @ratio: @input-font-size-large / @input-font-size;
-      @padding: @input-font-size-large-icon + @input-padding-h-value * 1.5 * @ratio;
+      @padding: size(round(px(@input-font-size-large-icon + @input-padding-h-value * @input-padding-h-icon * @ratio)));
       @offset: size(round(px(@input-padding-h-value * @ratio)));
       @margin: @input-font-size-large-icon + @offset;
       .iconPosition(@padding; @offset; @margin;);
@@ -660,7 +680,7 @@ div.select {
         input, select, textarea {
           padding-left: @padding;
 
-          // Float label
+          // floated label
           &:placeholder-shown:not(:focus) ~ label {
             padding-left: @padding;
           }
@@ -701,7 +721,8 @@ div.select {
   select {
     position: relative;
     z-index: 1;
-    padding-right: @size-smaller + @input-padding-h-value * 1.3; // add padding for icon
+    // add padding for icon (this one is more compact than normal icon)
+    padding-right: size(round(px(@input-font-size-icon + @input-padding-h-value)));
     //line-height: @input-line-height-fix;
   }
 }
@@ -797,10 +818,11 @@ div.select {
         &:extend(.bg-transparent all);
         &:extend(.input__label all);
         &:extend(.no-margin all);
-        z-index: -1; // make clicking input set focus immediately
-        top: @input-label-size-offset;
+        pointer-events: none; // make clicking input set focus immediately
+        top: @input-label-size-offset - size(@border-size);
         padding: 0 @input-padding-h-value; // match input padding
         font-weight: normal;
+        line-height: @input-line-height-fix;
       }
     }
   }
@@ -830,7 +852,7 @@ div.select {
       &:extend(.no-padding-v all);
     }
 
-    i.icon.dropdown {
+    @{select-icons} {
       opacity: 0;
     }
   }
@@ -885,17 +907,17 @@ input {
 // -----------------------------------------------------------------------------
 // CHECKBOX - TOGGLE (with custom true / false text)
 // -----------------------------------------------------------------------------
-@checkbox-size: @size-base * 2; // height of the whole checkbox label
+@checkbox-size: size(30); // height of the whole checkbox label - looks better without matching button height
 @checkbox-padding-size: size(3); // padding around label
 @checkbox-border-size: @border-size; // border around label
 @checkbox-button-size: @checkbox-size - @checkbox-border-size * 2; //  - size(@checkbox-padding-size * 6) width of the circle
 @checkbox-button-offset-border: -@checkbox-border-size;
 @checkbox-button-offset-label: @checkbox-border-size + @checkbox-padding-size; // offset padding for label text
-@checked-bg-color: fade(@color-primary, 75%); // checked toggle color
+@checked-bg-color: fade(@input-color-active, 75%); // checked toggle color
 @checked-border-color: @checked-bg-color; // checked toggle color
 @unchecked-bg-color: transparent; // unchecked toggle color
 @unchecked-border-color: @input-color; // unchecked toggle color
-@checked-bg-color-inverse: fade(@color-primary-light, 50%);
+@checked-bg-color-inverse: fade(@input-color-active-inverse, 50%);
 @checked-border-color-inverse: @checked-bg-color-inverse;
 @unchecked-bg-color-inverse: fade(@input-color-inverse, 50%);
 @unchecked-border-color-inverse: @unchecked-bg-color-inverse;
@@ -913,6 +935,7 @@ input.checkbox.toggle {
 
   + label { // slide container
     position: relative;
+    margin-left: 0; // override default label styling
     cursor: pointer;
     user-select: none;
     background-color: @unchecked-bg-color;
@@ -964,16 +987,19 @@ input.checkbox.toggle {
     }
   }
 
-  &:disabled {
-    + label {
-      &:extend(.input-disabled all);
-      opacity: 0.5;
+  &:disabled + label {
+    &:extend(.input-disabled all);
+    opacity: 0.5;
 
-      .inverted & {
-        background-color: transparent !important;
-        border-color: @color-border-light !important;
-      }
+    .inverted & {
+      background-color: transparent !important;
+      border-color: @color-border-light !important;
     }
+  }
+
+  &[readonly] + label {
+    &:extend(.input-readonly all);
+    pointer-events: initial !important; // for tooltip to work
   }
 }
 
@@ -981,7 +1007,7 @@ input.checkbox.toggle {
 input.checkbox.toggle {
   + label { // slide container
     //.text-shadow();
-    .font-size(@size-small);
+    .font-size(@size-base);
     &:extend(.uppercase);
     border-radius: @checkbox-size !important;
     //border-color: transparent !important;

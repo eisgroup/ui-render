@@ -120,15 +120,19 @@ export const meta = {
         noContainer: true,
         meta: {
           view: 'TableCells',
-          styles: 'border-right no-border-right-last-item',
+          // styles: 'border-top',
           style: {verticalAlign: 'top'},
           items: [
             {
-              placeholder: 'Start Date',
+              float: true,
+              label: 'Start Date',
+              placeholder: 'mm/dd/yy',
               ...cloneDeep(inputStartDate),
             },
             {
-              placeholder: 'End Date',
+              float: true,
+              label: 'End Date',
+              placeholder: 'mm/dd/yy',
               ...cloneDeep(inputEndDate),
             },
             {
@@ -136,7 +140,7 @@ export const meta = {
               items: [
                 {
                   view: 'Button',
-                  styles: 'a transparent',
+                  styles: 'a transparent margin-v-small',
                   children: 'Add',
                   onClick: 'addData',
                 },
@@ -146,46 +150,46 @@ export const meta = {
         },
       },
     },
-    {
-      view: 'Data',
-      kind: 'period',
-      name: 'dataComponent',
-      styles: 'max-width-400',
-      meta: {
-        view: 'Col',
-        styles: 'app__form left padding margin bg-success-light',
-        items: [
-          {
-            view: 'Text',
-            styles: 'h3 padding-top',
-            label: 'Data Component (UI Render)',
-          },
-          {
-            view: 'Row',
-            items: [
-              {
-                label: 'Start Date',
-                ...cloneDeep(inputStartDate)
-              },
-              {
-                label: 'End Date',
-                ...cloneDeep(inputEndDate)
-              },
-            ],
-          },
-          {
-            view: 'Button',
-            styles: 'margin-v',
-            children: 'Add',
-            type: 'submit',
-            onClick: 'addData',
-          },
-          // cloneDeep(dropdownPlan),
-        ]
-      },
-      // rootData: true,
-    },
-    cloneDeep(dropdownPlan),
+    // {
+    //   view: 'Data',
+    //   kind: 'period',
+    //   name: 'dataComponent',
+    //   styles: 'max-width-400',
+    //   meta: {
+    //     view: 'Col',
+    //     styles: 'app__form left padding margin bg-success-light',
+    //     items: [
+    //       {
+    //         view: 'Text',
+    //         styles: 'h3 padding-top',
+    //         label: 'Data Component (UI Render)',
+    //       },
+    //       {
+    //         view: 'Row',
+    //         items: [
+    //           {
+    //             label: 'Start Date',
+    //             ...cloneDeep(inputStartDate)
+    //           },
+    //           {
+    //             label: 'End Date',
+    //             ...cloneDeep(inputEndDate)
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         view: 'Button',
+    //         styles: 'margin-v',
+    //         children: 'Add',
+    //         type: 'submit',
+    //         onClick: 'addData',
+    //       },
+    //       // cloneDeep(dropdownPlan),
+    //     ]
+    //   },
+    //   // rootData: true,
+    // },
+    // cloneDeep(dropdownPlan),
   ]
 }
 
