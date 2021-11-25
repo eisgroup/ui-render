@@ -276,10 +276,10 @@ export function withUISetup (formConfig) {
           for (const i in valuesBy) {
             if (i === thisIndex) continue
             const {[start]: a, [end]: b} = valuesBy[i]
-            ranges.push([+a, +b])
+            ranges.push([a, b])
           }
           // console.warn('notWithinRange', value, thisIndex, valuesBy)
-          return notWithinRange(+value, ranges)
+          return notWithinRange(value, ranges)
         }
         FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
         FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)

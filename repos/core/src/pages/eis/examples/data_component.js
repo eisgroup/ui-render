@@ -33,14 +33,15 @@ const verify = {
 const inputStartDate = {
   view: 'Input',
   name: 'startDate',
-  type: 'number',
+  type: 'date',
   validate: 'required',
   verify: cloneDeep(verify),
+  onChange: 'warn',
 }
 const inputEndDate = {
   view: 'Input',
   name: 'endDate',
-  type: 'number',
+  type: 'date',
   validate: 'required',
   verify: cloneDeep(verify),
 }
@@ -126,13 +127,11 @@ export const meta = {
             {
               float: true,
               label: 'Start Date',
-              placeholder: 'mm/dd/yy',
               ...cloneDeep(inputStartDate),
             },
             {
               float: true,
               label: 'End Date',
-              placeholder: 'mm/dd/yy',
               ...cloneDeep(inputEndDate),
             },
             {
@@ -201,8 +200,8 @@ export const data = {
   ...exampleData,
   dataKind: {
     period: [
-      {startDate: 2, endDate: 4},
-      {startDate: 7, endDate: 9},
+      {startDate: '2022-01-01', endDate: '2022-03-31'},
+      {startDate: '2022-04-01', endDate: '2022-06-30'},
     ]
   }
 }

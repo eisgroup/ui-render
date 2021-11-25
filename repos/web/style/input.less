@@ -103,12 +103,15 @@ input {
 
     /* Fix to ensure consistent input height */
 
-    &::-webkit-inner-spin-button { // the increment number button
-      display: none;
-    }
+    &:not(:focus) {
+      &::-webkit-inner-spin-button { // the increment number button
+        display: none;
+      }
 
-    &::-webkit-calendar-picker-indicator {
-      display: none;
+      &::-webkit-calendar-picker-indicator {
+        display: none;
+      }
+
     }
   }
 
