@@ -11,6 +11,7 @@ import { goTo } from '../../common/variables'
 import data from './examples/_data.json'
 import meta from './examples/_meta'
 import listData from './examples/array-nested_data.json'
+import * as tableForm from './examples/data_component'
 import decimalMeta from './examples/decimal_meta.json'
 import dropdownMeta from './examples/dropdown_meta.json'
 import exampleData from './examples/example_data.json'
@@ -109,6 +110,12 @@ const examples = [
     id: 'tableMatrixRequired',
     data: tableMatrix.data,
     meta: tableMatrix.metaRequired,
+  },
+  {
+    title: 'Table with Form Inputs',
+    id: 'tableForm',
+    data: tableForm.data,
+    meta: tableForm.meta,
   },
   {
     title: 'Pie Chart',
