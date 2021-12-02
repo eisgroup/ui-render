@@ -193,10 +193,10 @@ export const meta = {
 }
 
 export const data = {
-  dataComponent: {
-    startDate: Date.now(),
-    ...exampleData,
-  },
+  // dataComponent: {
+  //   startDate: Date.now(),
+  //   ...exampleData,
+  // },
   ...exampleData,
   dataKind: {
     period: [

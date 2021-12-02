@@ -1,28 +1,29 @@
-import { fetch } from 'modules-pack/api'
-import { withForm } from 'modules-pack/form'
 import { POPUP } from 'modules-pack/popup/constants'
 import { connect, stateAction } from 'modules-pack/redux'
 import settings from 'modules-pack/settings'
 import LanguageSelection from 'modules-pack/settings/views/LanguageSelection'
 import Upload from 'modules-pack/upload/views/Upload'
-import { FIELD, FILE } from 'modules-pack/variables'
+import { FILE } from 'modules-pack/variables'
 import React, { Component } from 'react'
-import { PropTypes } from 'react-ui-pack'
 import JsonView from 'react-ui-pack/JsonView'
 import Row from 'react-ui-pack/Row'
 import ScrollView from 'react-ui-pack/ScrollView'
 import Text from 'react-ui-pack/Text'
 import View from 'react-ui-pack/View'
-import { ALERT, cloneDeep, GET, isEmpty, l, localiseTranslation, logRender, performStorage, SET, set } from 'utils-pack'
+import { ALERT, GET, isEmpty, l, localiseTranslation, logRender, performStorage, SET } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
-import Render, { metaToProps } from '../../ui-render'
-import { transformConfig } from './rules'
+import UIRender from './rules'
 
 const DEMO_JSON_STORAGE_KEY = 'DEMO_JSON'
 
 localiseTranslation({
   CONFIG_USED: {
     [l.ENGLISH]: 'Config Used',
+    [l.RUSSIAN]: 'Используемая Конфигурация',
+  },
+  UPLOADED: {
+    [l.ENGLISH]: 'Uploaded',
+    [l.RUSSIAN]: 'Загружено',
   },
 })
 
@@ -65,26 +66,12 @@ export default class Demo extends Component {
     },
   }
 
-  setStates = (value, keyPath) => {
-    return this.setState(set(this.state, keyPath, value))
-  }
-
-  resetForm = (...args) => this._resetForm(...args)
-
-  // noinspection JSDeprecatedSymbols
-  setup = {
-    reset: (FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm),
-    setState: (FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates),
-    fetch: (FIELD.FUNC[FIELD.ACTION.FETCH] = fetch),
-  }
-
   handleUpload = (kind, [file], type) => {
     if (!file) return
     const reader = new FileReader()
     reader.onload = () => {
       try {
         let json = JSON.parse(reader.result)
-        if (kind === 'meta') json = transformConfig(json)
         this.setState({[kind]: {json, name: file.name}}, () => {
           if (kind === 'data') performStorage(SET, DEMO_JSON_STORAGE_KEY, {[kind]: this.state.data})
         })
@@ -106,16 +93,6 @@ export default class Demo extends Component {
     const {data, meta, showMeta} = this.state
     const hasData = !isEmpty(data.json)
     const hasMeta = !isEmpty(meta.json)
-    const props = (hasData && hasMeta) ? metaToProps(cloneDeep(meta.json), {
-      data: data.json,
-      instance: this,
-      funcConfig: {
-        data: data.json,
-        fieldValidation: FIELD.VALIDATION,
-        fieldNormalizer: FIELD.NORMALIZER,
-        fieldFunc: FIELD.FUNC,
-      }
-    }) : null
     const uploadProps = {
       hasHeader: false,
       multiple: false,
@@ -124,9 +101,11 @@ export default class Demo extends Component {
     }
     return (
       <>
-        <ScrollView fill className='fade-in bg-neutral min-height-290'>
-          {hasData && hasMeta && <Renderer data={data.json} meta={props} initialValues={data.json} instance={this}/>}
-        </ScrollView>
+        <UIRender
+          initialValues={data.json}
+          data={data.json}
+          meta={meta.json}
+        />
 
         {showMeta &&
         <ScrollView className="padding-smaller bg-neutral inverted">
@@ -157,43 +136,6 @@ export default class Demo extends Component {
         </ScrollView>
         }
       </>
-    )
-  }
-}
-
-@connect(mapStateToProps, mapDispatchToProps)
-@withForm()
-class Renderer extends Component {
-  static propTypes = {
-    data: PropTypes.any.isRequired,
-    meta: PropTypes.any.isRequired,
-    instance: PropTypes.any, // parent instance to attach data from this component
-  }
-
-  componentDidMount () {
-    if (this.props.instance) this.props.instance._resetForm = this.resetForm
-  }
-
-  resetForm = () => {
-    this.form.reset()
-  }
-
-  /**
-   * Handle Redux-Form submit, which expects a promise return value
-   */
-  submit = (values) => {
-    return this.props.actions.popup({title: 'Submitted Form with these values', content: <JsonView data={values}/>})
-  }
-
-  // @deprecated: redux-form use only
-  // handleSubmit = this.props.handleSubmit(this.submit)
-
-  render () {
-    const {data, meta} = this.props
-    return (
-      <form onSubmit={this.handleSubmit}>
-        {<Render debug data={data} {...meta} form={this.form}/>}
-      </form>
     )
   }
 }
