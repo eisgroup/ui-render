@@ -43,6 +43,7 @@ Below you can find the list of commonly used CSS styles.
 - **border-h** - add border to the left and right
 - **border-v** - add border to the top and bottom
 - **border-left/right/top/bottom** - add border to the specified direction (i.e. "border-right" = lines to the right)
+- **border-on-hover** - for inline Inputs to look like text when not active
 - **box-shadow** - add drop shadow
 - **circle** - turn the component into a circular shape
 - **radius** - rounded corners

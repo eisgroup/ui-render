@@ -59,13 +59,13 @@ export default class Data extends Component {
   }
 
   render () {
-    const {kind, instance, index, className, style, noContainer} = this.props
+    const {kind, instance, index, className, style, embedded} = this.props
     const {data, meta, initialValues} = this.state
     // Use Active.UIRender to avoid circular import
     const UIRender = Active.UIRender
     return <UIRender
       data={data} meta={meta} initialValues={initialValues} form={{kind}}
-      parent={instance} index={index} noContainer={noContainer}
+      parent={instance} index={index} embedded={embedded}
       {...{className, style}}
     />
   }

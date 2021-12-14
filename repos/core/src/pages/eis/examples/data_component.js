@@ -86,7 +86,7 @@ export const meta = {
       renderItemCells: {
         view: 'Data',
         kind: 'period',
-        noContainer: true,
+        embedded: true,
         meta: {
           view: 'TableCells',
           styles: 'border-right no-border-right-last-item',
@@ -118,7 +118,7 @@ export const meta = {
         view: 'Data',
         kind: 'period',
         name: 'dataComponent',
-        noContainer: true,
+        embedded: true,
         meta: {
           view: 'TableCells',
           // styles: 'border-top',

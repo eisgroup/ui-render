@@ -10,6 +10,7 @@ import { Active, get, isEmpty, isList, isString, logRender, sanitizeResponse, wa
 import { cloneDeep, hasObjectValue, isObject, set } from 'utils-pack/object'
 import Render, { metaToProps } from '../../ui-render'
 import './mapper' // Set up UI Renderer components and methods
+import './translations'
 import { notWithinRange } from './validators'
 
 /**
@@ -46,7 +47,7 @@ export default class UIRender extends Component {
       kind: type.Id,
     }),
     // Whether to disable rendering of wrapper scroll view and html form
-    noContainer: type.Boolean,
+    embedded: type.Boolean,
   }
 
   state = {
@@ -67,11 +68,11 @@ export default class UIRender extends Component {
   }
 
   render () {
-    const {childBefore, childAfter, form, noContainer, className, style} = this.props
+    const {childBefore, childAfter, form, embedded, className, style} = this.props
     const content = this.hasData && this.hasMeta &&
       <Render data={this.data} {...this.meta} form={this.form} instance={this}/>
-    const Container = noContainer ? Fragment : ScrollView
-    const props = noContainer ? undefined : {
+    const Container = embedded ? Fragment : ScrollView
+    const props = embedded ? undefined : {
       fill: true,
       className: cn('ui__render fade-in bg-neutral', className),
       style,
@@ -79,7 +80,7 @@ export default class UIRender extends Component {
     return (
       <Container {...props}>
         {childBefore}
-        {(form && !noContainer) ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
+        {(form && !embedded) ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
         {childAfter}
       </Container>
     )
