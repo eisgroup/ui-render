@@ -29,5 +29,11 @@
 }
 
 input {
-  height: size(40) !important; // fix for date pickers
+  &[type="date"],
+  &[type="datetime-local"],
+  &[type="time"],
+  &[type="month"],
+  &[type="week"] {
+    height: size(40) !important; // fix for date pickers
+  }
 }
