@@ -74,7 +74,10 @@ export function metaToProps (meta, config) {
                 // Render is a field definition
                 if (definition.view) {
                     const {name, filterItems, ...configs} = definition
-                    const revPath = {relativePath: meta.name || relativePath, relativeIndex: index}
+                    const revPath = {
+                        relativePath: relativePathFrom(meta, relativePath, relativeIndex),
+                        relativeIndex: index
+                    }
                     return Render({
                         // Relative Path is required for nested Inputs
                         ...revPath,
@@ -141,7 +144,10 @@ export function metaToProps (meta, config) {
             } else {
                 // Recursively process the rest of definitions
                 // Relative path must always be passed down, because nested Inputs inside List require absolute path for `name`
-                const options = {data, _data, instance, relativePath: meta.name || relativePath, relativeIndex}
+                const options = {
+                    data, _data, instance,
+                    relativePath: relativePathFrom(meta, relativePath, relativeIndex), relativeIndex
+                }
                 // Resolve local `_data` for nested definitions
                 // noinspection PointlessBooleanExpressionJS
                 if (meta.relativeData !== false && meta.name != null) options._data = get(_data || data, meta.name, _data)
@@ -280,4 +286,21 @@ function mapFunctionArgs (template, {data, args}) {
         }
     }
     return template
+}
+
+/**
+ * Compute Relative Path for given config
+ * @param {Object|*[]|*} meta - config of the parent node
+ * @param {String} relativePath - inherited from parent node
+ * @param {String|Number} relativeIndex - inherited from parent node
+ * @returns {String} relativePath - calculated from root path for current config
+ */
+function relativePathFrom (meta, relativePath, relativeIndex) {
+    let result = relativePath || meta.name
+    // If `meta.name` is relative, concatenate it with inherited `relativePath` for absolute relative path,
+    // to pass down to nested configs (ex. Expand inside Table.headers = [{id, renderCell: {...}}] )
+    if (meta.name != null && meta.relativeData !== false) {
+        result = relativePath != null ? `${relativePath}.${relativeIndex}.${meta.name}` : meta.name
+    }
+    return result
 }
