@@ -15,6 +15,7 @@ import View from './View'
  * @param {Function} onChange - callback on value change
  * @param {Boolean|*} value - checked or unchecked state
  * @param {String} [type] - one of ['toggle']
+ * @param {String} [title] - tooltip
  * @param {Boolean} [defaultValue] - checked or unchecked state
  * @param {String|Object} [labelTrue] - text to show for checked state
  * @param {String|Object} [labelFalse] - text to show for unchecked state
@@ -34,6 +35,7 @@ export function Checkbox ({
   defaultValue,
   onChange,
   type = 'checkbox',
+  title,
   label,
   labelTrue,
   labelFalse,
@@ -41,8 +43,8 @@ export function Checkbox ({
   readonly,
   danger,
   className,
-  float: _, // not used
-  initialValues: __, // not used
+  float: _0, // not used
+  initialValues: _1, // not used
   ...props
 }) {
   if (readonly) props.readOnly = readonly // React wants `readonly` to be `readOnly`
@@ -66,7 +68,7 @@ export function Checkbox ({
         {...props}
       />
       <Label
-        htmlFor={id}
+        htmlFor={id} title={title}
         className={classNames('flex--row middle justify', {danger})}
       >
         {type === 'toggle'

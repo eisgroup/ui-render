@@ -57,12 +57,13 @@ export function offsetFrom (event, rectangle) {
  * @param {Function} [callback] - after state update
  * @return {Boolean} true - if state was synced
  */
-export function syncState (current, next, instance, callback) {
+export function syncState (current, next, instance, callback, preCallback) {
   const update = {}
   for (const key in current) {
     if (next[key] != null && next[key] !== current[key]) update[key] = next[key]
   }
   if (Object.keys(update).length) {
+    if (preCallback) preCallback(update)
     instance.setState(update, callback)
     return true
   }

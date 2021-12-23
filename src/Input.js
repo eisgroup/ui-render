@@ -32,6 +32,7 @@ import View from './View'
  * @param {Boolean} [autofocus] - whether to make input focused on page load
  * @param {String|Object} [error] - message to display
  * @param {String|Object} [info] - explanation message to display under input
+ * @param {String} [title] - tooltip
  * @param {String} [className] - css class to add
  * @param {String} [classNameIcon] - css class to add to Icon
  * @param {Object} [style] - css styles
@@ -63,6 +64,7 @@ export function Input ({
   onFocus,
   onBlur,
   onRemove,
+  title,
   ...props
 }) {
   const [active, setState] = useState(props.autoFocus)
@@ -77,6 +79,7 @@ export function Input ({
     if (!props.placeholder) props.placeholder = ' ' // required for Float label CSS to work
   }
   if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
+  if (!label && title) props.title = title
   const idHelp = id + '-help'
   const value = props.value != null ? props.value : props.defaultValue
   const hasValue = value || value === 0
@@ -91,7 +94,7 @@ export function Input ({
     >
       {!float &&
       <Row className="middle">
-        {!isCheckbox && label && <Label htmlFor={id}>{label}</Label>}
+        {!isCheckbox && label && <Label htmlFor={id} title={title}>{label}</Label>}
         {onRemove && !readonly &&
         <Button className="input__delete" onClick={() => onRemove(name || id)}><Icon name="delete"/></Button>}
       </Row>
@@ -127,7 +130,7 @@ export function Input ({
             ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
             : icon
         )}
-        {(float || isCheckbox) && label && <Label htmlFor={id}>{label}</Label>}
+        {(float || isCheckbox) && label && <Label htmlFor={id} title={title}>{label}</Label>}
       </Row>
       {(error || info) &&
       <View id={idHelp} className='field-help'>

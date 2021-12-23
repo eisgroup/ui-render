@@ -10,7 +10,7 @@ import { withTimer } from './utils'
 import View from './View'
 
 /**
- * Tabs - Self Contained Container.
+ * Tabs Component with overridable self-managed state and overflow scrollbars.
  */
 @withTimer
 export default class Tabs extends PureComponent {
