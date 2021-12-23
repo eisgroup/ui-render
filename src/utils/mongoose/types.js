@@ -130,7 +130,7 @@ export const TimeRanges = {
   type: [TimeRange],
   validate: {
     validator: (input) => isContinuousNumberRanges(input.toObject()),
-    message: props => interpolateString(_.TIME_RANGES_MUST_BE_A_LIST_OF_CONTINUOUS_TIMESTAMP_RANGES, {timeRanges: props.value})
+    message: props => interpolateString(_.timeRanges_MUST_BE_A_LIST_OF_CONTINUOUS_TIMESTAMP_RANGES, {timeRanges: props.value})
   },
   set (times) {
     const {start, end} = startEndFromNumberRanges(times)
@@ -237,6 +237,30 @@ Localised.path = function (field, lang) {
 }
 
 /**
+ * Foreign Id Type Creator for Mongoose Model Field (automatically verifies integrity)
+ *
+ * @note: unlike ForeignKey() function, this does not include the field in foreignKeys() list for population.
+ * @example:
+ *    eventSchema = new Schema({
+ *      hostId: ForeignId('User')
+ *    })
+ *
+ * @param {String} modelName - that the foreign key belongs to
+ * @param {Object} [options] - extra field attributes
+ * @returns {Object} type - Id String field that validates itself for the given model name
+ */
+export function ForeignId (modelName, options) {
+  return {
+    type: String,
+    validate: {
+      validator: input => mongoose.model(modelName).findById(input),
+      message: props => interpolateString(_.INVALID_modelName_ID_id, {modelName, id: props.value})
+    },
+    ...options,
+  }
+}
+
+/**
  * Foreign Key Type Creator for Mongoose Model Field (automatically verifies integrity)
  *
  * @note: Mongoose does not validate that the foreign key points to existing document by default
@@ -256,7 +280,7 @@ export function ForeignKey (modelName, options) {
     ref: modelName,
     validate: {
       validator: input => mongoose.model(modelName).findById(input),
-      message: props => interpolateString(_.INVALID_MODEL_NAME_ID, {modelName, id: props.value})
+      message: props => interpolateString(_.INVALID_modelName_ID_id, {modelName, id: props.value})
     },
     ...options,
   }
@@ -283,7 +307,7 @@ export function ForeignDynamicKey (refField, options) {
       validator (input) { // noinspection JSUnresolvedFunction
         return mongoose.model(get(this, refField)).findById(input)
       },
-      message: props => interpolateString(_.INVALID_MODEL_NAME_ID, {modelName: get(this, refField), id: props.value})
+      message: props => interpolateString(_.INVALID_modelName_ID_id, {modelName: get(this, refField), id: props.value})
     },
     ...options,
   }
