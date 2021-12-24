@@ -509,6 +509,13 @@ input, select, textarea {
     &:extend(.input__label all);
   }
 
+  &.bold {
+    input,
+    select, textarea {
+      &:extend(.bold);
+    }
+  }
+
   &.done {
     input.readonly,
     select.readonly,

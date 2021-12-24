@@ -453,7 +453,9 @@ export const meta = {
                             'label': 'RateCard',
                             'value': 'NumberOfLives'
                           },
-                          'legends': true
+                          'legends': {
+                            columns: 2
+                          }
                         }
                       ],
                       'version': 'CoveragesDemographicPieChartColumn'
@@ -959,7 +961,7 @@ export const meta = {
                                     'autoSubmit': true,
                                     'removable': true,
                                     compact: true,
-                                    styles: 'reverse border-on-hover',
+                                    styles: 'bold reverse border-on-hover',
                                     'min': 0
                                   }
                                 ],
@@ -988,7 +990,7 @@ export const meta = {
                                     'relativeData': false,
                                     'autoSubmit': true,
                                     'removable': true,
-                                    styles: 'reverse border-on-hover',
+                                    styles: 'bold reverse border-on-hover',
                                     compact: true,
                                     'min': 0
                                   }
