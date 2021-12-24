@@ -107,7 +107,7 @@ export default {
                       },
                       'Administration Total': {
                         view: 'Text',
-                        styles: 'row p bg-success-light uppercase border-right',
+                        className: 'row p bg-success-light uppercase border-right',
                         label: 'Administration Total',
                       }
                     },
