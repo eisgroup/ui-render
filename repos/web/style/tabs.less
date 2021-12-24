@@ -54,6 +54,12 @@
     }
   }
 
+  // For use case when there is childrenBeforeTabs content
+  .tabs.buttoned *:not(.tabs__item) + & {
+    border-top-left-radius: @button-radius;
+    border-bottom-left-radius: @button-radius;
+  }
+
   &.active {
     &:extend(.text.bold);
     border-color: @tabs-active-border-color;

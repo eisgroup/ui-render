@@ -5,7 +5,7 @@ export const meta = {
   renderItem: {
     view: 'Col',
     styles: 'padding-largest margin-v bg-white',
-    style: {minWidth: '48%'},
+    style: {minWidth: '48%'}, // If number of blocks is `n`, and space between blocks is `s` minWidth = (100% - s * (n - 1)) / n
     items: [
       {
         view: 'Title',

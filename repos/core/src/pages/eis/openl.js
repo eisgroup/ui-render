@@ -21,6 +21,7 @@ export default class OpenL extends PureComponent {
     return (
       <>
         <UIRender
+          className="bg-info-light"
           initialValues={data}
           data={data}
           meta={meta}

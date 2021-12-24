@@ -22,6 +22,7 @@ import invalidArrayData from './examples/invalid-array_data'
 import invalidArrayMeta from './examples/invalid-array_meta'
 import listMeta from './examples/list_meta'
 import piechartMeta from './examples/piechart_meta'
+import * as ratingDetails from './examples/rating_details'
 import showIfCondition from './examples/showIf'
 import * as summaryBox from './examples/summary-box'
 import tabListMeta from './examples/tab-list_meta'
@@ -146,6 +147,12 @@ const examples = [
     id: 'invalidArray',
     data: invalidArrayData,
     meta: invalidArrayMeta,
+  },
+  {
+    title: 'Rating Details',
+    id: 'ratingDetails',
+    data: ratingDetails.data,
+    meta: ratingDetails.meta,
   },
   {
     title: 'All Possible Configurations',

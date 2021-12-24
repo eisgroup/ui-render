@@ -21,8 +21,6 @@ import { renderFloat } from 'react-ui-pack/renders'
 import Row from 'react-ui-pack/Row'
 import Space from 'react-ui-pack/Space'
 import Table from 'react-ui-pack/Table'
-import TabList from 'react-ui-pack/TabList'
-import Tabs from 'react-ui-pack/Tabs'
 import Text from 'react-ui-pack/Text'
 import TooltipPop from 'react-ui-pack/TooltipPop'
 import View from 'react-ui-pack/View'
@@ -31,8 +29,10 @@ import { ALERT, TIME_DURATION_INSTANT } from 'utils-pack/constants'
 import { get, hasObjectValue, isEqual, isObject, } from 'utils-pack/object'
 import { _ } from 'utils-pack/translations'
 import Render, { mapProps } from '../../ui-render'
+import TableView from './components/TableView'
+import TabList from './components/TabList'
+import Tabs from './components/Tabs'
 import Data from './Data'
-import TableView from './TableView'
 
 /**
  * UI RENDERER COMPONENTS SETUP ================================================
@@ -276,14 +276,16 @@ Render.Component = function RenderComponent ({
     }
 
     case FIELD.TYPE.TABS: {
-      const tabs = items.map(({tab, _data, data}, i) => isObject(tab) ? Render.call(this, {
-        data, _data, debug, form, ...tab
-      }, i) : tab)
-      const panels = items.map(({content, _data, data}, i) => isObject(content)
-        ? Render.bind(this, {data, _data, debug, form, ...content}, i)
-        : content
-      )
-      return <Tabs tabs={tabs} panels={panels} {...props}/>
+      const {childrenBeforeTabs, childrenAfterTabs} = props
+      const _items = items.map(({tab, content, _data, data}, i) => ({
+        tab: isObject(tab) ? Render.call(this, {data, _data, debug, form, ...tab}, i) : tab,
+        content: isObject(content) ? Render.bind(this, {data, _data, debug, form, ...content}, i) : content,
+      }))
+      if (hasObjectValue(childrenBeforeTabs))
+        props.childrenBeforeTabs = Render.bind(this, {data, _data, debug, form, ...childrenBeforeTabs})
+      if (hasObjectValue(childrenAfterTabs))
+        props.childrenAfterTabs = Render.bind(this, {data, _data, debug, form, ...childrenAfterTabs})
+      return <Tabs items={_items} {...props}/>
     }
 
     case FIELD.TYPE.TAB_LIST: {
