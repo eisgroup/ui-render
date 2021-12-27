@@ -65,6 +65,22 @@ th {
 th, td {
   padding: 0; // remove cell spacing
   border-bottom: @table-border;
+
+  // Expand inside table row
+  > .app__expand {
+    > *:focus {
+      &:extend(.no-outline);
+    }
+  }
+
+  // Make empty Cell take full height to show border correctly
+  > *:only-child:empty,
+  > *:only-child > *:only-child:empty {
+    &:before {
+      content: 'A';
+      visibility: hidden;
+    }
+  }
 }
 
 .ui.table {
@@ -87,14 +103,5 @@ th, td {
 .app__table__options {
   > * {
     &:extend(.margin all);
-  }
-}
-
-// Expand inside table row
-th, td {
-  > .app__expand {
-    > *:focus {
-      &:extend(.no-outline);
-    }
   }
 }

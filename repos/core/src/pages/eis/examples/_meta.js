@@ -302,7 +302,9 @@ export default {
                           {
                             view: 'PieChart',
                             name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.ageBreakdown',
-                            legends: true,
+                            legends: {
+                              columns: 2,
+                            },
                             mapItems: {
                               //         ╭ key path to value within items found for given `name` attribute above
                               label: 'ageBand',
