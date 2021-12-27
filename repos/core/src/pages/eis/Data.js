@@ -35,7 +35,7 @@ export default class Data extends Component {
     // Meta.json to use
     meta: type.Object,
     // Data.json to initialize with
-    initialValues: type.Object,
+    initialValues: type.Any,
     // Whether the `name` attribute should use data relative to root UI Render instance, defaults to this instance.
     rootData: type.Boolean,
   }
@@ -52,15 +52,8 @@ export default class Data extends Component {
   //   return meta
   // }
 
-  state = {
-    data: this.props.data,
-    meta: this.props.meta,
-    initialValues: this.props.initialValues || this.props.data,
-  }
-
   render () {
-    const {kind, instance, index, className, style, embedded} = this.props
-    const {data, meta, initialValues} = this.state
+    const {kind, instance, index, data, meta, initialValues = data, className, style, embedded} = this.props
     // Use Active.UIRender to avoid circular import
     const UIRender = Active.UIRender
     return <UIRender

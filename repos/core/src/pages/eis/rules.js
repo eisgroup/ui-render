@@ -259,7 +259,7 @@ export function withUISetup (formConfig) {
         FIELD.FUNC[FIELD.ACTION.REMOVE_DATA] = (parent && form)
           ? () => {
             const {data} = parent.state
-            const {dataKind = {}} = data.json
+            const dataKind = {...data.json.dataKind}
             const array = [...dataKind[form.kind] || []]
             array.splice(index, 1)
             dataKind[form.kind] = array

@@ -118,6 +118,7 @@ export const meta = {
         // This component must have undefined `name` so that it automatically grabs all data for given `kind`
         view: 'Data',
         kind: 'period',
+        initialValues: {},
         embedded: true,
         meta: {
           view: 'TableCells',
