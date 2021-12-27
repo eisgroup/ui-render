@@ -291,6 +291,12 @@ export function withUISetup (formConfig) {
             ranges.push([a, b])
           }
 
+          // Validate against overlap
+          if (_a != null && _b != null) {
+            const range = ranges.find((([a, b]) => _a < a && b < _b))
+            if (range) return `Cannot overlap [${range}] range`
+          }
+
           return notWithinRange(value, ranges)
         }
         FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
