@@ -270,8 +270,19 @@ export function withUISetup (formConfig) {
         // Cross UI Render instances validation
         FIELD.VALIDATION[FIELD.VALIDATE.NOT_WITHIN_RANGE] = (value, {dataKind, args: [start, end]}) => {
           const {form, index, parent} = this.props
+
+          // Validate against self
+          const {[start]: _a, [end]: _b} = this.formValues
+          if (_a === _b) {
+            return `${start} and ${end} cannot be the same`
+          } else if (_a === value && _b < _a) {
+            return `${start} cannot be more than ${end}`
+          } else if (_b === value && _b < _a) {
+            return `${end} cannot be less than ${start}`
+          }
+
           // Retrieve current state from all Forms, with fallback to parent instance.state
-          const valuesBy = parent.getDataKind(dataKind)
+          const valuesBy = parent.getDataKind(dataKind) // this only includes values in `data.dataKind` state
           const ranges = []
           const thisIndex = form.kind === dataKind ? String(index) : null
           for (const i in valuesBy) {
@@ -279,7 +290,7 @@ export function withUISetup (formConfig) {
             const {[start]: a, [end]: b} = valuesBy[i]
             ranges.push([a, b])
           }
-          // console.warn('notWithinRange', value, thisIndex, valuesBy)
+
           return notWithinRange(value, ranges)
         }
         FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
