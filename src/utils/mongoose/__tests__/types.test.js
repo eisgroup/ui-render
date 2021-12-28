@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import { Id, Localised, required } from '../types'
 
 describe(`${Localised.name}()`, () => {

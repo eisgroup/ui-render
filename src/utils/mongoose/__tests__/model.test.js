@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import { foreignKeys } from '../model'
 import { ForeignKey, Id, index, Localised, Name, ObjectId, required, Schema, Timestamp, trim } from '../types'
 

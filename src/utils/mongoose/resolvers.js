@@ -74,7 +74,7 @@ export function populated (...opts) {
       // Populate the result with queried foreign keys
       instance = (instance instanceof Promise) ? (await instance) : instance
       if (instance instanceof mongoose.Query) return instance.populate(..._opts)
-      if (instance instanceof mongoose.Document) return instance.populate(..._opts).execPopulate()
+      if (instance instanceof mongoose.Document) return instance.populate(..._opts)//.execPopulate() removed in Mongoose 6
       return instance
     }
     return descriptor

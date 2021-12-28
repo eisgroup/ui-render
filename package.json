@@ -1,6 +1,6 @@
 {
   "name": "modules-pack",
-  "version": "0.10.5",
+  "version": "0.10.6",
   "description": "JavaScript Modules for Modern Frontend & Backend Projects",
   "license": "MIT",
   "main": "index.js",
@@ -63,9 +63,9 @@
   "devDependencies": {
     "axios-mock-adapter": "1.15.0",
     "dotenv": "^10.0.0",
-    "mongoose": "5.7.5",
+    "mongoose": "^6.1.4",
     "mongoose-sanitizer": "^1.0.0",
-    "mongoose-unique-validator": "^2.0.3",
+    "mongoose-unique-validator": "^3.0.0",
     "redux-mock-store": "^1.5.4"
   }
 }
