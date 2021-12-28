@@ -26,7 +26,7 @@ export default class ApiService {
       const entry = {...this.service, platform, key}
       return ({
         updateOne: {
-          filter: entry,
+          filter: {...entry}, // this object gets mutated
           update: entry,
           upsert: true,
           runValidators: true,

@@ -28,7 +28,7 @@ class GooglePlaces extends ApiService {
     const apiKeys = 'API_KEYS_GOOGLE_PLACES_WEB'
     const {[apiKeys]: keys} = requireEnv({[apiKeys]: 'Array of Google Places API Keys'})
     if (!hasListValue(keys)) throw new Error(`Invalid ${apiKeys} ${keys}`)
-    this.addKeys(keys)
+    this.addKeys(keys).catch(console.error)
   }
 
   fetchDetails = async (placeId, {sessiontoken, key = this.key, fields} = {}) => {

@@ -51,7 +51,7 @@ export function createModel (name, fields, {schema: {options, config, methods, v
         set (val) {return this._lang = val || DEFAULT.LANGUAGE}
       }
     }
-    Object.keys(fields._.type ? fields._.type : fields._).forEach(field => {
+    Object.keys(fields._.type ? fields._.type : fields._).filter(f => f !== '_id').forEach(field => {
       if (virtuals[field]) return // skip manually defined virtuals
       virtuals[field] = {
         get () {

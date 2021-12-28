@@ -22,6 +22,7 @@ const ApiKey = createModel(API_MODEL, {
   active: {type: Boolean, default: true}, // for manually disabling API Key
   fail: {
     type: {
+      _id: false,
       time: Timestamp,
       reason: String,
       message: String,

@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 import sanitizer from 'mongoose-sanitizer'
-import uniqueValidator from 'mongoose-unique-validator'
 import { __TEST__ } from 'utils-pack'
 import { DB_HOST, DB_NAME, DB_PORT } from '../server/config'
 
@@ -16,12 +15,13 @@ if (__TEST__) {
   const uri = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`
   mongoose.Promise = Promise  // use Promise, instead of default Node.js function (err, ...) callbacks
   mongoose.plugin(sanitizer)
-  mongoose.plugin(uniqueValidator)
+  // mongoose.plugin(uniqueValidator) // causes Error in Mongoose 6
   mongoose.connect(uri, {
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+    // Mongoose 5.7.5 only options
+    // useCreateIndex: true,
+    // useFindAndModify: false,
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true
   })
     .then(() => console.log(`⚡  Mongoose connected to ${uri}`))
     .catch(err => {
@@ -29,5 +29,3 @@ if (__TEST__) {
       process.exit(1)
     })
 }
-
-

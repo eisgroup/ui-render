@@ -2,7 +2,7 @@ import { CONFIG, CURRENCY, PERMISSION, PHONE, UPLOAD, VALIDATE } from 'modules-p
 import { fileName, folderFrom, resolvePath } from 'modules-pack/variables/files'
 import mongoose from 'mongoose'
 import { phone } from 'react-ui-pack/inputs/normalizers'
-import { assertBackend, by, enumFrom, get, hasObjectValue, LANGUAGE } from 'utils-pack'
+import { assertBackend, by, enumFrom, get, hasObjectValue, LANGUAGE, truncate } from 'utils-pack'
 import { toRgbaColor } from 'utils-pack/color'
 import { isContinuousNumberRanges, isNumeric, startEndFromNumberRanges, } from 'utils-pack/number'
 import { interpolateString, isPhoneNumber, toLowerCase, trimSpaces, } from 'utils-pack/string'
@@ -69,7 +69,7 @@ const file = {
   kind: Mixed,
   i: Mixed,
   id: {...Id, default: undefined},
-  name: {type: String, maxLength: VALIDATE.FILE_NAME_MAX_LENGTH}, // filename gets sanitized during upload
+  name: {type: String, set: v => truncate(v, VALIDATE.FILE_NAME_MAX_LENGTH, 7)}, // filename gets sanitized during upload
   creatorId: {...Id, default: undefined}, // cannot use foreign key here because we don't know model type
   created: Timestamp,
   updated: Timestamp,
@@ -171,12 +171,15 @@ export const allPermissions = enumFrom(PERMISSION).reduce((o, k) => ({...o, [k]:
  *      _id: Id,
  *      _: {
  *        type: {
+ *          _id: false,
  *          about: {
+ *            _id: false,
  *            en: String,
  *            ru: String,
  *          },
  *          name: {
  *            type: {
+ *              _id: false,
  *              en: {type: String, maxLength: VALIDATE.NAME_MAX_LENGTH},
  *              ru: {type: String, maxLength: VALIDATE.NAME_MAX_LENGTH},
  *            },
@@ -198,7 +201,7 @@ export function Localised (fields, LocalString) {
     LocalString = {}
     enumFrom(CONFIG.LANGUAGE_OPTIONS).forEach(key => LocalString[key] = String)
   }
-  const result = {}
+  const result = {_id: false} // `_id: false` because Mongoose 6 converts nested path to SubDoc
   let isRequired
   for (const key in fields) {
     const field = fields[key]
@@ -211,18 +214,18 @@ export function Localised (fields, LocalString) {
       const localString = hasObjectValue(options) ? {type: String, ...options} : String
       if (required) {
         isRequired = true
-        result[key] = {type: {}, required}
+        result[key] = {type: {_id: false}, required}
         for (const lang in LocalString) {
           result[key].type[lang] = localString
         }
       } else {
-        result[key] = {}
+        result[key] = {_id: false}
         for (const lang in LocalString) {
           result[key][lang] = localString
         }
       }
     } else {
-      result[key] = LocalString
+      result[key] = {_id: false, ...LocalString}
     }
   }
 

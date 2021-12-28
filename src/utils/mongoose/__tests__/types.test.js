@@ -16,10 +16,13 @@ describe(`${Localised.name}()`, () => {
     const result = {
       _id: Id,
       _: {
+        _id: false,
         about: {
+          _id: false,
           en: String,
         },
         name: {
+          _id: false,
           en: {type: String, maxLength},
         }
       },
@@ -39,11 +42,14 @@ describe(`${Localised.name}()`, () => {
       _id: Id,
       _: {
         type: {
+          _id: false,
           about: {
+            _id: false,
             en: String,
           },
           name: {
             type: {
+              _id: false,
               en: {type: String, maxLength},
             },
             required,
@@ -67,11 +73,14 @@ describe(`${Localised.name}()`, () => {
       _id: Id,
       _: {
         type: {
+          _id: false,
           about: {
+            _id: false,
             en: String,
           },
           name: {
             type: {
+              _id: false,
               en: String,
             },
             required,
