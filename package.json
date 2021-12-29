@@ -1,6 +1,6 @@
 {
   "name": "modules-pack",
-  "version": "0.10.7",
+  "version": "0.10.8",
   "description": "JavaScript Modules for Modern Frontend & Backend Projects",
   "license": "MIT",
   "main": "index.js",

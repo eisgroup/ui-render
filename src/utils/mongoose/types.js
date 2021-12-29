@@ -100,25 +100,27 @@ export const Location = new Schema({
 }, {timestamps: false, default: undefined})
 export const Name = {type: String, maxLength: VALIDATE.NAME_MAX_LENGTH, set: trimSpaces, default: undefined}
 export const KeyVal = {
-  type: String,
+  key: String,
   value: Mixed,
+  _id: false,
 }
-export const Pay = {
-  type: {
-    currency: CurrencySymbol,
-    interval: Timestamp,
-    min: Number,
-    max: Number,
-    total: Number,
-  },
+export const Pay = new Schema({
+  currency: CurrencySymbol,
+  interval: Timestamp,
+  min: Number,
+  max: Number,
+  total: Number,
   _id: false,
   // @IMPORTANT!
   // default: undefined - cannot be undefined to prevent 500 errors when required
   // However, `default: {}` does not work either because Mongo does not save empty {}.
   // Solution is to prevent model.save() with this field being required and empty.
+}, {timestamps: false, default: undefined})
+export const Permissions = {
+  type: enumFrom(PERMISSION).reduce((o, k) => ({...o, [k]: Boolean}), {_id: false}),
+  default: undefined
 }
-export const Permissions = {type: enumFrom(PERMISSION).reduce((o, k) => ({...o, [k]: Boolean}), {}), default: undefined}
-export const Point = {type: {lat: Number, lng: Number}, default: undefined}
+export const Point = {type: {lat: Number, lng: Number, _id: false}, default: undefined}
 export const Phones = new Schema({
   ...enumFrom(PHONE).reduce((o, k) => ({
     ...o, [k]: {type: String, validate: isPhoneNumber, set: (v) => phone(v).replace(/[^\d]+$/g, '')}
@@ -144,7 +146,7 @@ export const TimeRanges = {
 /**
  * VALUES ----------------------------------------------------------------------
  */
-export const allPermissions = enumFrom(PERMISSION).reduce((o, k) => ({...o, [k]: true}), {})
+export const allPermissions = enumFrom(PERMISSION).reduce((o, k) => ({...o, [k]: true}), {_id: false})
 
 /**
  * HELPERS ---------------------------------------------------------------------
