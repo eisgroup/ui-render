@@ -60,8 +60,9 @@ export function createModel (name, fields, {schema: {options, config, methods, v
           let result = get(this, Localised.path(field, this.lang))
           if (result == null && this.lang !== DEFAULT.LANGUAGE) result = get(this, Localised.path(field, DEFAULT.LANGUAGE))
           if (result == null) {
-            const localString = get(this, `_.${field}`)
+            let localString = get(this, `_.${field}`)
             if (localString == null) return
+            localString = localString.toObject()
             for (const lang in localString) {
               if (localString[lang]) return localString[lang]
             }
