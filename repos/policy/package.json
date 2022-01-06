@@ -6,7 +6,7 @@
   "scripts": {
     "start": "yarn cors && yarn gql && yarn css --sourcemap && react-app-rewired start & yarn style --sourcemap",
     "build": "NODE_ENV=production yarn build:css && react-app-rewired build && yarn clean && yarn build-dist",
-    "build-dist": "mkdir -p ../../dist/policy && yarn delete ../../dist/policy/* && cp -rf build/* ../../dist/policy && yarn delete build",
+    "build-dist": "mkdir -p dist && yarn delete dist/* && cp -rf build/* dist && yarn delete build",
     "build:css": "NODE_ENV=production yarn style css",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",

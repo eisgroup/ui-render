@@ -19,6 +19,7 @@ postcssPlugins: [
   // ['postcss-prefixwrap', '.ui-render']
 ]
 ```
+then `yarn build:css`
 
 4. Copy Semantic UI `Popup` line in `public/static/semantic.css`
 
@@ -83,4 +84,13 @@ postcssPlugins: [
 }
 ```
 
-12. Replace all `fonts` files in `/ui-eis-genesis/prototypes/applications/packages/cem-dxp-app/src/fonts/`
+12. Rename all `.less` files to `.css` and move them to `/repos/npm/dist/static`
+
+13. Replace all `fonts` files in `/ui-eis-genesis/prototypes/applications/packages/cem-dxp-app/src/fonts/`
+
+14. Rename and move these files from `./dist/static/js` to `/repos/npm/dist/static`:
+    - `chunk.js`
+    - `main.js`
+    - `loader.js` -> copied from script content of `index.html`
+    
+15. Got to `/repos/npm` and `yarn build`, then `yarn push` to publish to npm.
