@@ -1,13 +1,10 @@
 {
-  "name": "@eisgroup/rating-details",
-  "version": "0.24.2",
-  "description": "OpenL Rating Details with UI Render",
+  "name": "eis-ui-render",
+  "version": "0.25.4",
+  "description": "UI Render for EIS Integration",
   "homepage": ".",
   "sideEffects": false,
-  "license": "UNLICENSED",
-  "publishConfig": {
-    "registry": "https://sfoeisgennexus01.exigengroup.com/repository/genesis_npm_release/"
-  },
+  "license": "Apache 2.0",
   "scripts": {
     "push": "cp {README.md,LICENSE,package.json} dist/ && cd dist && npm publish && cd ../",
     "build": "tsc && cp {README.md,LICENSE,package.json} dist/",

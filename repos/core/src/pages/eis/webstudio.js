@@ -16,8 +16,7 @@ FIELD.ACTION = {
 // noinspection JSConstantReassignment
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
- * todo:
- *  - readonly for classic to disable all inputs (defined in data.json root)
+ * UI Render wrapper Container to handle data/meta fetching and submit updates.
  * -----------------------------------------------------------------------------
  */
 export default class WebStudioPage extends Component {
@@ -62,6 +61,7 @@ export default class WebStudioPage extends Component {
       dataUrl = this.urlPrefix + ENV.REACT_APP_DATA_URL,
       metaUrl = this.urlPrefix + ENV.REACT_APP_META_URL
     } = this.props
+
     // todo: remove temporary mock for Policy UI for fetch method
     this.fetch(dataUrl, {body: this.id, contentType: 'text/plain', method: document._dataFetchMethod})
       .then(data => this.setState({loadingData: false, data}))
@@ -93,7 +93,10 @@ export default class WebStudioPage extends Component {
   popup = (error) => popupAlert('Fetch Error', <Text>{String(error)}</Text>)
 
   submit = (formValues) => {
+    // In Classic UI, there is no backend API, the window.POST method is simulated in Java template to return promise.
     if (this.POST) return this.POST(formValues).then(({data, meta}) => this.update(data, meta)).catch(this.popup)
+
+    // todo: logic to update backend (waiting for Backend API to be done)
     console.warn(formValues)
   }
 

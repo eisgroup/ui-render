@@ -36,7 +36,11 @@ You will also see any lint errors in the console.
 Launches the test runner (or `yarn test --watch -o` to run in interactive watch mode).<br>
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `yarn build`
+### `yarn e2e`
+
+Launches end-to-end integration tests using Cypress.
+
+### `yarn workspace web build`
 
 Builds the app for production to the `dist` folder.<br>
 It correctly bundles React in production mode and optimizes the build for the best performance.
