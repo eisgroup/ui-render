@@ -39,11 +39,11 @@ class DOMProxy extends PureComponent {
 }
 
 // Setup global method for UIRender.tsx to use for mounting to the DOM.
-if (typeof document === 'undefined') {
-  console.error(`document object is required for UIRender!`)
+if (typeof window === 'undefined') {
+  console.error(`window object is required for UIRender!`)
 } else {
-  document._dataFetchMethod = 'GET'
-  document._mountUIRender = ({id, ...props}) => render(
+  window._dataFetchMethod = 'GET'
+  window._mountUIRender = ({id, ...props}) => render(
     <Redux.Provider store={store}>
       <AppElement>
         <DOMProxy {...props}/>

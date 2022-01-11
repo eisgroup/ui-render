@@ -30,7 +30,7 @@ interface Props {
  *
  * @logic:
  *      1. This Component creates an empty <div/> inside Genesis UI HTML DOM (where UI Render wil be)
- *      2. When mounted, it calls global `document._mountUIRender` method defined in `/repos/policy/src/main.js`
+ *      2. When mounted, it calls global `window._mountUIRender` method defined in `/repos/policy/src/main.js`
  *      3. Above method mounts pre-bundled UI Render to the above created <div/>, initiating UI Render instance.
  *      4. On subsequent prop changes, it passes them to UI Render via <DOMProxy/> container
  *         (this is a workaround hack for Genesis UI).
@@ -55,12 +55,12 @@ export class UIRender extends Component<Props, any> {
     // tslint:disable:typedef
     componentDidMount() {
         // @ts-ignore
-        if (!document._mountUIRender) {
-            return console.error(`document._mountUIRender is required for ${this.constructor.name}!`)
+        if (!window._mountUIRender) {
+            return console.error(`window._mountUIRender is required for ${this.constructor.name}!`)
         }
         const {id, className, style, ...props} = this.props
         // @ts-ignore
-        document._mountUIRender({...props, id: this.id, onMount: this.onMount})
+        window._mountUIRender({...props, id: this.id, onMount: this.onMount})
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<any>, snapshot?: any) {
@@ -72,7 +72,7 @@ export class UIRender extends Component<Props, any> {
 
     render() {
         const {className, style} = this.props
-        return <div id={this.id} data-version='0.25.4' className={`${UI_RENDER} ${className || ''}`} style={style}/>
+        return <div id={this.id} data-version='0.25.5' className={`${UI_RENDER} ${className || ''}`} style={style}/>
     }
 }
 

@@ -63,7 +63,7 @@ export default class WebStudioPage extends Component {
     } = this.props
 
     // todo: remove temporary mock for Policy UI for fetch method
-    this.fetch(dataUrl, {body: this.id, contentType: 'text/plain', method: document._dataFetchMethod})
+    this.fetch(dataUrl, {body: this.id, contentType: 'text/plain', method: window._dataFetchMethod})
       .then(data => this.setState({loadingData: false, data}))
       .catch(this.popup)
     this.fetch(metaUrl, {contentType: 'application/json'})
