@@ -84,7 +84,7 @@ then `yarn build:css`
 }
 ```
 
-12. Rename all `.less` files to `.css` and move them to `/repos/npm/dist/static`
+12. Move these `.less` files to `/repos/npm/dist/static` because Genesis UI cannot import `.css`
 
 13. Replace all `fonts` files in `/ui-eis-genesis/prototypes/applications/packages/cem-dxp-app/src/fonts/`
 
