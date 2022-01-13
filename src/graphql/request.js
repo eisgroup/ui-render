@@ -80,11 +80,11 @@ export function querySkip (props, variables) {
 }
 
 /**
- * Decorator for React Components to Query or Mutate GraphQL API
- *
+ * Decorator for React Components to Query or Mutate GraphQL API.
+ * NOTE: use gqlRequestDecorator() creator for consistent and well tested behavior.
  * @example:
  *    // 1. Simple GraphQL decorated view
- *    @withGql({query})
+ *   *@withGql({query})
  *    export default class UserProfile extends Component {
  *      mutate = () => {
  *        this.props.mutate({variables: {user}})
@@ -97,8 +97,8 @@ export function querySkip (props, variables) {
  *      initialValues: !isEqual(props.user, user) ? {...init, ...sanitizeGqlResponse(user || {}, {clone: true})} : init,
  *      user,
  *    })
- *    @withGql({query: {query, props}, mutation: {mutation, props}})
- *    @withForm({form: USER, enableReinitialize: true})
+ *   *@withGql({query: {query, props}, mutation: {mutation, props}})
+ *   *@withForm({form: USER, enableReinitialize: true})
  *    export default class UserProfile extends Component {
  *      ...
  *    }
@@ -254,50 +254,77 @@ export function withGql ({query = null, mutation = null, Loading = LoadingView})
 
 /**
  * Create Query and Mutation (using route Id) GraphQL Decorator
+ * @example:
+ *  // Composable decorator that can be chained with other Entry request decorators
+ *  // @example:
+ *  //    @withTagOptions
+ *  //    @withCatEditRoute
+ *  //    export default class CatEditView extends PureComponent {...}
+ *  export const withTagOptions = gqlRequestDecorator({
+ *    field: TAGS,
+ *    query: tagsSummary,
+ *    // map GQL response to `tagOptions` prop when inside another Entry Component,
+ *    // by default it maps to field.toLowerCase()
+ *    propsMapperOptions: {asProp: 'tagOptions', ...asDropdownOptions},
+ *    reusable,
+ *  })
  *
- * @param {String} field - GraphQL entry field to be queried/mutated
- * @param {Object} query - imported query.gql file
- * @param {Object} mutation - imported mutation.gql file
- * @param {Boolean} [reusable] - whether to use default configs for requests without variables that always need querying
- * @param {Function<{props, data, fetched, saved, ...useQueryOrMutation}>} [propsMapper] - Component props mapper
- * @param {Object} [propsMapperOptions] - see `createPropsMapper` for reference
- * @param {String[]} [hiddenFields] - list of GraphQL Type fields to remove from response to sync with `form` state
- * @param {Function<props>|Object} [variables] - initial query variables mapper
- * @param {String} [fetchPolicy] - https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
- * @param {String} [nextFetchPolicy] - see above
- * @param {String} [errorPolicy] - query policy to ignore errors
- * @param {Function<props>} [skip] - return true to skip initial fetching
- * @param {Boolean} [optimistic] - whether to render the component immediately (good for non-blocking chained requests)
- * @param {Function<options, instance>|Function[]} [mutate] - wrapper/s around Apollo mutate function, to use as form middleware
- * @param {Function|Function[]} [update] - cache after mutation https://www.apollographql.com/docs/react/data/mutations/#usemutation-api
- * @param {Object} [optimisticResponse] - see above link
- * @param {Array<string|{query, variables}>} [refetchQueries] - see above link
- * @param {*} [options] - more GQL query options to pass
+ *  // Query with Mutation that auto-updates list cache
+ *  export const withTagEditRoute = gqlRequestDecorator({
+ *    field: TAG,
+ *    query,
+ *    mutation,
+ *    update: updateCacheList(withTagOptions, TAG),
+ *    hiddenFields: ['name'] // list of fields to remove from GQL response to sync with formValues
+ *  })
+ *
+ *  // Simple Query
+ *  export const withTranslations = gqlRequestDecorator({
+ *    field: TRANSLATIONS,
+ *    query: translationsQuery,
+ *    skip: false, // always request to prevent stale cache (even if `variables` is empty/undefined)
+ *  })
+ *
  * @returns {Function<Component>|{asProp, field, query, variables}} Decorator - HOC wrapper for Class/Function Component
  */
 export function gqlRequestDecorator ({
+  // {String} field - GraphQL entry field to be queried/mutated
   field,
+  // {Object} query - imported query.gql file, optional (mutation is expected)
   query,
+  // {Object} mutation - imported mutation.gql file, optional (query is expected)
   mutation,
-  // config shortcuts
+  // {Boolean} [reusable] - whether to use default configs for requests without variables that always need querying
   reusable,
-  // Optional
+  // {Function<{props, data, fetched, saved, ...useQueryOrMutation}>} [propsMapper] - Component props mapper
   propsMapper,
+  // {Object} [propsMapperOptions] - see `createPropsMapper` for reference
   propsMapperOptions,
+  // {String[]} [hiddenFields] - list of GraphQL Type fields to remove from response to sync with `form` state
   hiddenFields,
+  // {Function<props>|Object} [variables] - initial query variables mapper
   variables = reusable ? {} : queryVariables, // GraphQL treats any new empty object {} as the same variables
   // @see: https://github.com/apollographql/apollo-client/issues/6760
   // 'cache-and-network' literally forces query to refetch after mutation
+  // {String} [fetchPolicy] - https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
   fetchPolicy = 'cache-and-network',
-  // 'cache-first' for mutations with 'cache-and-network' fetchPolicy
+  // {String} 'cache-first' for mutations with 'cache-and-network' fetchPolicy
   nextFetchPolicy = 'cache-first',
+  // {String} [errorPolicy] - query policy to ignore errors
   errorPolicy,
+  // {Function<props>} [skip] - return true to skip initial fetching
   skip = reusable ? false : querySkip,
+  // {Boolean} [optimistic] - whether to render the component immediately (good for non-blocking chained requests)
   optimistic = reusable,
+  // {Function<options, instance>|Function[]} [mutate] - wrapper/s around Apollo mutate function, to use as form middleware
   mutate,
+  // {Function|Function[]} [update] - cache after mutation https://www.apollographql.com/docs/react/data/mutations/#usemutation-api
   update,
+  // {Object} [optimisticResponse] - see above link
   optimisticResponse,
+  // {Array<string|{query, variables}>} [refetchQueries] - see above link
   refetchQueries,
+  // {*} [options] - more GQL query options to pass
   ...options
 }) {
   field = toLowerCase(field)

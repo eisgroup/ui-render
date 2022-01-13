@@ -124,6 +124,18 @@ export const tracking = {
     }
   },
 
+  /**
+   * Reset Referrer Info in Local Storage from Query String
+   */
+  resetReferrer () {
+    this.refType = null
+    this.refCode = null
+    this.getRefFromParams()
+    // Set Referrer Code in Local Storage
+    performStorage(SET, REF.STORAGE.TYPE_KEY, this.refType || '')
+    performStorage(SET, REF.STORAGE.CODE_KEY, this.refCode || '')
+  },
+
   getReferrer () {
     if (!this.refType || !this.refCode) {
       this.setReferrer()

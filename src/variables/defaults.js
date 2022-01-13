@@ -1,4 +1,4 @@
-import { __PROD__, Active, ONE_DAY, ONE_HOUR, ONE_WEEK } from 'utils-pack'
+import { __PROD__, Active, ONE_HOUR, ONE_MONTH, ONE_WEEK } from 'utils-pack'
 import { THEME } from './configs'
 import { CURRENCY } from './definitions'
 
@@ -10,7 +10,7 @@ import { CURRENCY } from './definitions'
 export const DEFAULT = {
   LANGUAGE: Active.LANG._,
   CURRENCY: CURRENCY.USD._,
-  LOGIN_DURATION: __PROD__ ? ONE_WEEK : ONE_DAY, // match `TOKEN_LIFESPAN_JWT`
+  LOGIN_DURATION: __PROD__ ? ONE_MONTH : ONE_WEEK, // match `TOKEN_LIFESPAN_JWT`
   GRADIENT_HUE_COUNT: 3,
   PAY_INTERVAL: ONE_HOUR,
   QUERY_LIMIT: 1000, // generic limit

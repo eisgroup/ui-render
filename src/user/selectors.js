@@ -1,5 +1,6 @@
 import { isAdmin, isCompany, isIndividual, isStaff } from 'modules-pack/user/logic'
 import { DEFAULT } from 'modules-pack/variables'
+import { Active } from 'utils-pack'
 import selector from 'utils-pack/selectors'
 import { USER } from './constants'
 
@@ -38,7 +39,7 @@ export default class select {
 
   static isLoggedIn = () => [
     (state) => state[USER].self.updated,
-    (updated) => Date.now() - updated < DEFAULT.LOGIN_DURATION
+    (updated) => (Active.user.isLoggedIn = ((Date.now() - updated) < DEFAULT.LOGIN_DURATION))
   ]
 
   static isAdmin = function () {

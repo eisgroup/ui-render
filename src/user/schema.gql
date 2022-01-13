@@ -8,8 +8,8 @@
 # SUMMARY
 # -----------------------------------------------------------------------------
 extend type Query {
-    user(id: ID): User # if no `id` given, returns self
-    users(ids: [ID!], sort: JSON): [User!] # if no `ids` given, returns last updated users for Staff or higher level
+    user(id: Id): User # if no `id` given, returns self
+    users(ids: [Id!], sort: JSON): [User!] # if no `ids` given, returns last updated users for Staff or higher level
     logout: Logout
 }
 
@@ -28,9 +28,10 @@ extend type Mutation {
 # -----------------------------------------------------------------------------
 
 type User {
-    id: ID! # can be used to derive created Timestamp
-    auth: Int # authorization level
-    email: Email! # for privacy reasons, may not be shown, but always exists
+    id: ID!
+    auth: Int
+    # For privacy reasons, may not be shown, but always exists
+    email: Email!
     avatar: URL
     name: String
     surname: String
@@ -39,26 +40,34 @@ type User {
     role: Int
     kind: Int
     lastOnline: Timestamp
-    lastLogin: Timestamp! # for privacy reasons, may not be shown, used to check whether instance is User
+
+    # For privacy reasons, may not be shown, used to check whether instance is User
+    lastLogin: Timestamp!
     updated: Timestamp
+
     # Contacts
     phones: Phones
     place: Place
+
     # Details
     about: String
     photos: [File]
+
     # Settings
     currency: CurrencySymbol
     lang: LanguageCode
     reportsLimit: Int
+
     # Others
     verified: Verification
     referrer: KeyVal
     social: Social
 }
 
-input UserInput { # only used for updating existing record
-    id: ID # only required when not requested by User themselves (example: by Admin), else it is ignored
+# Only used for updating existing record
+input UserInput {
+    # Only required when not requested by User themselves (example: by Admin), else it is ignored
+    id: Id
     email: Email
     password: Password
     newPassword: Password
@@ -109,7 +118,8 @@ type Logout {
 # INTERFACES
 # -----------------------------------------------------------------------------
 
-type UserPermission { # embeded type within other GraphQL types (example: Company.people: [UserPermission])
+# Embedded type within other GraphQL types (example: Company.people: [UserPermission])
+type UserPermission {
     user: User!
     permissions: Permissions!
 }

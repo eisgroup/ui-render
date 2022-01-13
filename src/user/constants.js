@@ -12,6 +12,7 @@ import { _ } from './translations'
  */
 
 export const USER = 'USER' // Namespace this module
+export const USERS = 'USERS' // GraphQL field type for list query (to be lower-cased)
 export const USER_CLIENT = namespace(USER, Active.SERVICE) // Namespace this module for frontend
 export const USER_SERVER = namespace(USER, Active.SERVICE) // Namespace this module for backend
 export const USER_MODEL = capitalize(USER) // db model name
