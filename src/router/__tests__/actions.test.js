@@ -1,7 +1,7 @@
 import { ROUTE } from 'modules-pack/variables'
 import { CHANGE } from 'utils-pack'
-import { isRouterActionType } from '../actions'
-import { ROUTER_ACTION_TYPE } from '../constants'
+import { isRouterActionType } from '../browser/actions'
+import { ROUTER_ACTION_TYPE } from '../browser/constants'
 
 it(`${isRouterActionType.name}() matches correct action type`, () => {
   const action = {type: ROUTER_ACTION_TYPE[CHANGE], payload: {pathname: ROUTE.TESTER}}

@@ -1,7 +1,6 @@
 import { apiAction, subscribeToApiResults } from 'modules-pack/api'
 import { stateAction, stateActionType } from 'modules-pack/redux'
-import { history, select as routerSelect } from 'modules-pack/router'
-import { all, call, delay, put, selectState, spawn, takeLatest } from 'modules-pack/saga/utils'
+import { all, call, delay, put, spawn, takeLatest } from 'modules-pack/saga/utils'
 import { ROUTE, URL } from 'modules-pack/variables'
 import { Active, CREATE, LOGIN, RESET, sanitizeResponse, SET, SUCCESS } from 'utils-pack'
 import { SELF, USER_LOGIN } from '../constants'
@@ -49,7 +48,8 @@ function * watch () {
  * Close Login Modal, Get Required Info and Refresh Requested Route
  */
 function * loginSuccessFlow ({meta: {form} = {}}) {
-  if ((form && form !== USER_LOGIN) || ROUTE.LOGIN !== (yield selectState(routerSelect.activeRoute))) return
+  if ((form && form !== USER_LOGIN) || ROUTE.LOGIN !== Active.history.location.pathname) return
+  const {history} = Active
   let routeToRefresh = ROUTE.HOME
 
   // Close Login Modal
@@ -61,9 +61,10 @@ function * loginSuccessFlow ({meta: {form} = {}}) {
   // and only fire history.goBack() if it was opened as Modal.
   const {state: {isModal} = {}} = history.location
   if (isModal) {
-    history.goBack()
+    // the standard uses history.back() while `react-router` uses history.goBack
+    (history.back || history.goBack)()
     yield delay(10)
-    routeToRefresh = yield selectState(routerSelect.activeRoute)
+    routeToRefresh = Active.history.location.pathname
     // Refresh Requested Route
     // Because react-router has no refresh function any more
     // we have to manually force Component re-mount by first pushing Loading route
@@ -108,8 +109,8 @@ function * userUpdate ({payload, meta}) {
  */
 
 function * loginOpen () {
-  if (ROUTE.LOGIN === (yield selectState(routerSelect.activeRoute))) return
-  history.push({pathname: ROUTE.LOGIN, state: {isModal: true, canCloseModal: false}})
+  if (ROUTE.LOGIN === Active.history.location.pathname) return
+  Active.history.push({pathname: ROUTE.LOGIN, state: {isModal: true, canCloseModal: false}})
 }
 
 function * userMutate ({payload}) {

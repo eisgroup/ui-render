@@ -5,10 +5,9 @@ export const ROUTE_HOME = '/'
 export const ROUTE_SLASH = ROUTE_HOME.slice(-1) === '/' ? '' : '/' // used when ROUTE_HOME does not end with `/`
 export const ROUTE_BASE = `${ROUTE_HOME}${ROUTE_SLASH}`
 
+// Define only SSR/SPA routes here for navigating to external server (i.e. WordPress)
 export const ROUTE = {
-  HOME: ROUTE_HOME,
-  DEMO: `${ROUTE_BASE}demo`,
-  PRIVACY: `${ROUTE_BASE}privacy`,
+  HOME: ROUTE_HOME, // required fallback route when nothing matches
   TESTER: `${ROUTE_BASE}tester`, // for development only
   THEME: `${ROUTE_BASE}theme`, // for development only
   LOGIN: `${ROUTE_BASE}login`,
@@ -21,7 +20,7 @@ export const ROUTES = {
 
   // used for Routes definition
   FOR_DEFINITION: createNestedRoutes(ROUTE, {
-    [ROUTE.DEMO]: '/:id?', // add id to this route
+    [ROUTE.TESTER]: '/:id?', // add id to this route using `react-router`
   }),
 
   // shown in Navigation

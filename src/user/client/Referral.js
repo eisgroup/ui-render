@@ -1,5 +1,5 @@
 import { tracking } from 'modules-pack/tracking/utils'
-import React from 'react'
+import React, { PureComponent } from 'react'
 import { cn } from 'react-ui-pack'
 import Icon from 'react-ui-pack/Icon'
 import Text from 'react-ui-pack/Text'
@@ -22,22 +22,26 @@ export function ReferralStatus (props) {
   return <ReferralUser {...props} id={id}/>
 }
 
-const ReferralUser = withUserFetch(function ReferralUserInfo ({user = {}, onReset, canReset, className, style}) {
-  const isValid = !!user.id
-  const message = isValid
-    ? interpolateString(_.REFERRED_BY_name_surname, user, {suppressError: true})
-    : _.INVALID_REFERRAL_CODE
-  return <View className={cn('fade-in-down', className)} style={style}>
-    <Text className={'p ' + (isValid ? 'success' : 'error')}>
-      <Icon name={isValid ? 'check-circle' : 'cross-circle'}/>{message}
-      {(canReset || !isValid) &&
-      <Text className="margin-left-smaller">
-        - <Text className="a" onClick={onReset}>{_.RESET}</Text>
+@withUserFetch // gqlDecorator can only decorate classes for chained requests
+class ReferralUser extends PureComponent {
+  render () {
+    const {user = {}, onReset, canReset, className, style} = this.props
+    const isValid = !!user.id
+    const message = isValid
+      ? interpolateString(_.REFERRED_BY_name_surname, user, {suppressError: true})
+      : _.INVALID_REFERRAL_CODE
+    return <View className={cn('fade-in-down', className)} style={style}>
+      <Text className={'p ' + (isValid ? 'success' : 'error')}>
+        <Icon name={isValid ? 'check-circle' : 'cross-circle'}/>{message}
+        {(canReset || !isValid) &&
+        <Text className="margin-left-smaller">
+          - <Text className="a" onClick={onReset}>{_.RESET}</Text>
+        </Text>
+        }
       </Text>
-      }
-    </Text>
-  </View>
-})
+    </View>
+  }
+}
 
 localiseTranslation({
   INVALID_REFERRAL_CODE: {

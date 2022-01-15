@@ -408,7 +408,7 @@ export function createPropsMapper ({
    * @param {Object|Undefined} data - GraphQL server response
    * @param {Function} refetch - query options
    */
-  return ({props, data = {}}) => {
+  return ({props, data = {}, refetch}) => {
     const {[field]: entry, ...gqlResponse} = data
     // When nothing changed, must return undefined to prevent overriding global props for chained requests
     if (props[_field] === entry || isEqual(props[_field], entry)) return
@@ -422,6 +422,7 @@ export function createPropsMapper ({
       [_field]: entry,
       // pass around additional responses not in the main entry query
       data: {...props.data, ...(mapData ? mapData(data) : gqlResponse)},
+      refetch
     })
   }
 }

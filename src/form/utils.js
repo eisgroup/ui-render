@@ -556,3 +556,12 @@ export function withGroupInputChange (constructor) {
 
   return constructor
 }
+
+/**
+ * Compose Validators Array into a Single Validator Function
+ * @param {Function[]|function(any)} validators - to compose
+ * @returns {Function} validator for use with react-final-form
+ */
+export function composeValidators (...validators) {
+  return (value) => validators.reduce((error, validator) => error || validator(value), undefined)
+}

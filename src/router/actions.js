@@ -1,23 +1,17 @@
-import { CHANGE } from 'utils-pack'
-import { ROUTER_ACTION_TYPE } from './constants'
+import { Active } from 'utils-pack'
 
 /**
  * ACTION CREATORS =============================================================
+ * Works both using Next.js router and Browser react-router
  * =============================================================================
  */
 
 /**
- * Check if Action is of Router Action Type with Matching Result
- *
- * @param {string} ROUTE - pathname of the route to match
- * @param {string} ACTION - one of the ROUTE_ACTIONS constants
- * @return {function(action)} - function that accepts a single action argument to check against
- *    @function return: {boolean} - whether the action provided matches action type
+ * Open given Route as Modal overlaying existing Page/Scene
+ * @param {String} route - URL to open
+ * @param {Object} [state] - location state
  */
-export function isRouterActionType (ROUTE, ACTION = CHANGE) {
-  return (action) => {
-    const {type = '', payload: {pathname} = {}} = action
-    return (ROUTE === pathname) &&
-      (new RegExp(`^${ROUTER_ACTION_TYPE[ACTION]}`).test(type))
-  }
+export function openModal (route, state = {}) {
+  if (window.innerWidth <= 375) state.classNameModal = 'full-screen no-radius ' + (state.classNameModal || '')
+  return Active.history.push({pathname: route, state: {isModal: true, ...state}})
 }

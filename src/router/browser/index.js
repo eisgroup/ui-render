@@ -1,9 +1,10 @@
 import { ConnectedRouter, connectRouter, routerMiddleware } from 'connected-react-router'
 import { Route } from 'react-router-dom'
-import { ACTION_TYPE, ROUTER } from './constants'
+import { ROUTER } from '../constants'
+import select from '../selectors'
+import { defineRoutes } from './components'
+import { ACTION_TYPE } from './constants'
 import history from './history'
-import select from './selectors'
-import { defineRoutes } from './utils'
 
 /**
  * BROWSER ROUTER EXPORTS ======================================================
@@ -13,9 +14,12 @@ import { defineRoutes } from './utils'
 
 export { Switch } from 'react-router-dom'
 export { withRouter } from 'react-router'
+export * from '../utils'
+export * from '../constants'
 export * from './constants'
+export * from './components'
+export * from './actions'
 export * from './history'
-export * from './utils'
 export {
   select
 }
