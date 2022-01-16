@@ -1,4 +1,4 @@
-import { GET, performStorage } from 'utils-pack'
+import { Active, GET, performStorage } from 'utils-pack'
 import { USER } from './constants'
 
 /**
@@ -8,7 +8,7 @@ import { USER } from './constants'
  */
 
 const initState = {
-  self: {
+  self: Active.user = {
     // @Note: in backend, performStorage returns promise, and resolves to nothing,
     // but it does not matter, since only frontend needs to retrieve from localStorage.
     ...(typeof window === 'undefined') ? {} : performStorage(GET, USER),

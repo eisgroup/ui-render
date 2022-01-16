@@ -45,8 +45,9 @@ export default class select {
   ]
 
   static isLoggedIn = () => [
+    (state) => state[USER].self.id,
     (state) => state[USER].self.lastLogin,
-    (lastLogin) => (Active.user.isLoggedIn = ((Date.now() - lastLogin) < DEFAULT.LOGIN_DURATION))
+    (id, lastLogin) => (Active.user.isLoggedIn = (!!id && (Date.now() - lastLogin) < DEFAULT.LOGIN_DURATION))
   ]
 
   static isAdmin = function () {
@@ -77,4 +78,3 @@ export default class select {
     ]
   }
 }
-
