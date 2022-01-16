@@ -4,6 +4,7 @@ import { Active } from 'utils-pack'
 import selector from 'utils-pack/selectors'
 import { USER } from './constants'
 
+// noinspection JSPotentiallyInvalidUsageOfClassThis
 /**
  * STATE SELECTORS =============================================================
  * Memoized Functions - to retrieve specific branches of the app state
@@ -32,14 +33,20 @@ export default class select {
     (val) => val
   ]
 
+  // This selector is used to compute whether to show Login or Signup popup, without identifying user
+  static lastLogin = () => [
+    (state) => state[USER].self.lastLogin,
+    (val) => val
+  ]
+
   static loading = () => [
     state => state[USER].loading,
     (val) => val || {}
   ]
 
   static isLoggedIn = () => [
-    (state) => state[USER].self.updated,
-    (updated) => (Active.user.isLoggedIn = ((Date.now() - updated) < DEFAULT.LOGIN_DURATION))
+    (state) => state[USER].self.lastLogin,
+    (lastLogin) => (Active.user.isLoggedIn = ((Date.now() - lastLogin) < DEFAULT.LOGIN_DURATION))
   ]
 
   static isAdmin = function () {

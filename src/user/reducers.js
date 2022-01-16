@@ -1,5 +1,5 @@
 import { handleActions, stateActionType, uiLoading } from 'modules-pack/redux'
-import { performStorage, RESET, SET } from 'utils-pack'
+import { Active, performStorage, RESET, SET } from 'utils-pack'
 import { SELF, USER } from './constants'
 import initState from './data'
 
@@ -15,15 +15,15 @@ export default handleActions({
   [stateActionType(SELF, SET)]: (state, {payload}) => {
     const data = {
       ...state,
-      self: {...state.self, ...payload}
+      self: Active.user = {...state.self, ...payload}
     }
     performStorage(SET, USER, data.self)
     return data
   },
   [stateActionType(SELF, RESET)]: (state, {payload}) => {
     const data = {
-      ...state,
-      self: payload || {},
+      ...state, // always keep `lastLogin` for checking if user is new or returning visitor
+      self: Active.user = {lastLogin: state.self.lastLogin, ...payload},
     }
     performStorage(SET, USER, data.self)
     return data
