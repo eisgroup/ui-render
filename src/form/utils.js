@@ -212,6 +212,14 @@ export function asField (InputComponent, {sanitize} = {}) {
  * React Component React Final Form Decorator with getters to detect form input changes
  * @note:
  *  - cannot wrap connected to redux component, @connect must be declared before
+ *  - onSubmit can be passed to the decorated Class component
+ * @example:
+ *     *@withForm()
+ *      class SigninForm extends PureComponent {}
+ *      // later in the render()
+ *      <SigninForm onSubmit={(formValues, form, callback: ?(errors?) => void) => ?Object | Promise<?Object> | void}/>
+ *      // see https://final-form.org/docs/react-final-form/types/FormProps#onsubmit
+ *
  * @usage:
  *  Below methods only work when using this.renderInput(FIELD.FOR.LIST),
  *  or apply <Input onChange={this.handleChangeInput.bind(this)}/> manually:
@@ -297,7 +305,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
 
       render () {
         // warn('-->>WithForm-------------------------------------------')
-        const {initialValues, ...restProps} = this.props
+        const {initialValues, onSubmit = warn, ...restProps} = this.props
         this._props = restProps
 
         // @Note: when form is submitted, it triggers loading true, and receives old initialValues.
@@ -305,7 +313,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         // <Form/> reinitialises while loading, causing the flickering.
         // => either cache `initialValues`, or better, stop <Form/> from reinitializing while loading.
         //    because final-form always re-initializes, there is no `enableReinitialize` like redux-form.
-        return <Form onSubmit={warn} {...options} initialValues={this.initValues} render={this.renderForm}/>
+        return <Form onSubmit={onSubmit} {...options} initialValues={this.initValues} render={this.renderForm}/>
       }
     }
   }

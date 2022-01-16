@@ -310,7 +310,8 @@ export function gqlRequestDecorator ({
   fetchPolicy = 'cache-and-network',
   // {String} 'cache-first' for mutations with 'cache-and-network' fetchPolicy
   nextFetchPolicy = 'cache-first',
-  // {String} [errorPolicy] - query policy to ignore errors
+  // {String} [errorPolicy] - query policy to ignore errors.
+  // Note: 'ignore' policy does not prevent error popup for 400 errors, it simply returns response `data` with null type value, instead of undefined
   errorPolicy,
   // {Function<props>} [skip] - return true to skip initial fetching
   skip = reusable ? false : querySkip,

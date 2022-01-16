@@ -32,7 +32,7 @@ type User {
     auth: Int
     # For privacy reasons, may not be shown, but always exists
     email: Email!
-    avatar: URL
+    avatar: File
     name: String
     surname: String
     birthday: Timestamp

@@ -1,6 +1,8 @@
 fragment UserSummary on User {
     id
-    avatar
+    avatar {
+        src
+    }
     name
     surname
     lastOnline
