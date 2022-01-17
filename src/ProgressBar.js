@@ -1,10 +1,10 @@
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import { TIME_DURATION_INSTANT } from 'utils-pack'
 import { SOUND } from './files'
 import { STYLE } from './styles'
 import Text from './Text'
+import { type } from './types'
 import { withTimer } from './utils'
 import View from './View'
 
@@ -21,13 +21,20 @@ import View from './View'
 @withTimer
 export default class ProgressBar extends PureComponent {
   static propTypes = {
-    value: PropTypes.number.isRequired, // fraction from 0 to 1
-    label: PropTypes.any, // content to render inside the filled bar
-    hasTooltip: PropTypes.bool, // default is false
-    className: PropTypes.string,
-    color: PropTypes.string, // bar color
-    children: PropTypes.any,
-    gradient: PropTypes.bool, // default is true
+    // fraction from 0 to 1
+    value: type.Fraction.isRequired,
+    // content to render inside the filled bar
+    label: type.Any,
+    // default is false
+    hasTooltip: type.Boolean,
+    className: type.String,
+    // CSS bar color
+    color: type.String,
+    children: type.Any,
+    // default is true
+    gradient: type.Boolean,
+    // style the percentage bar itself
+    styleBar: type.Object,
   }
 
   state = {
@@ -35,12 +42,12 @@ export default class ProgressBar extends PureComponent {
   }
 
   get progressBar () {
-    const {children, color, label, hasTooltip = false} = this.props
+    const {children, color, label, hasTooltip = false, styleBar} = this.props
     const {value} = this.state
     const percentage = Math.round(value * 100)
     const width = percentage + '%'
     const tooltip = this.props.value >= 0 ? (children || width) : 'No Data'
-    const style = {width}
+    const style = {width, ...styleBar}
     if (color) style.backgroundColor = color
     return (
       <View className='app__progress__bar' style={style}>
@@ -70,7 +77,7 @@ export default class ProgressBar extends PureComponent {
   }
 
   render () {
-    const {className, gradient = true, children: __, value: _, ...props} = this.props
+    const {className, gradient = true, children: _1, value: _2, styleBar: _3, ...props} = this.props
     return (
       <View className={classNames('app__progress--bar', className, {gradient})} {...props}>
         <View className={'app__progress--bar__wrapper'}>

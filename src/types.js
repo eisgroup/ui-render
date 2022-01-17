@@ -23,6 +23,7 @@ type.Int = PropTypes.number
 type.List = PropTypes.array
 type.ListOf = PropTypes.arrayOf
 type.Method = PropTypes.func
+type.Milliseconds = PropTypes.number
 type.Mm = PropTypes.number // millimeter
 type.Node = PropTypes.object
 type.Number = PropTypes.number
