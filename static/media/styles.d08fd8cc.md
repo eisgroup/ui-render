@@ -2,7 +2,7 @@
 
 ## Overview
 
-All available CSS styles can be found in the repository, under the [style](https://mnsgitlab01.exigengroup.com/openl-report/client/-/tree/master/repos/web/style) folder (Minsk VPN is required to access).
+All available CSS styles can be found in the repository, under the [style](https://github.com/eisgroup/ui-render/tree/master/repos/web/style) folder.
 
 Below you can find the list of commonly used CSS styles.
 

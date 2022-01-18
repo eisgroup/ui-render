@@ -6,23 +6,23 @@
 
 ### v0.24.1
 #### New Example
-- [Example: **Summary Box**](/docs/examples#summaryBox)
+- [Example: **Summary Box**](examples#summaryBox)
 
 ### v0.24.0
 #### New Features
-- [Example: **Matrix Table**](/docs/examples#tableMatrix) (+ [minimum config](/docs/examples#tableMatrixRequired) example)
-- [Example: **Tabs Buttoned**](/docs/examples#tabsButtoned) (+ [Tabs](/docs/examples#tabs) default example)
-- [Example: **showEmptyAs**](/docs/examples#tableExtraItems) attribute for Table (cell value must be `null` or empty string for it to work)
+- [Example: **Matrix Table**](examples#tableMatrix) (+ [minimum config](examples#tableMatrixRequired) example)
+- [Example: **Tabs Buttoned**](examples#tabsButtoned) (+ [Tabs](examples#tabs) default example)
+- [Example: **showEmptyAs**](examples#tableExtraItems) attribute for Table (cell value must be `null` or empty string for it to work)
 - **onClickIcon** callback added for Dropdown to remove/delete Select field
 - Localised validation messages
 - Updated chevron icons to the latest DSM style guide.
   
 #### Documentation Improvements
-- [FAQ: **How to check UI Render Version**](/docs/faq)
+- [FAQ: **How to check UI Render Version**](faq)
 - Examples: clicking `Meta.json` or `Data.json` will download respective `json` files.
-- Examples: clicking links to `examples#id` with hash, like [this](/docs/examples#all), automatically opens the example. 
+- Examples: clicking links to `examples#id` with hash, like [this](examples#all), automatically opens the example. 
   In the same way, you can link to an example directly by first expanding it, then copying URL in the browser.
-- Tabs shown in [`/docs`](/docs) now sync with browser URL
+- Tabs shown in [`docs`](/ui-render) now sync with browser URL
 
 #### Fixes
 - Multiple Form instances for UI Render on the same page
@@ -35,7 +35,7 @@
   
 ### v0.23.1
 #### Changes
-- **showIf** can be empty object. The logic works like [this](/docs/configuration#showif-logic).
+- **showIf** can be empty object. The logic works like [this](configuration#showif-logic).
   
 
 ### v0.23.0
@@ -48,15 +48,15 @@
     "relativeData": false
   }
   ```
-- [Show If condition example updated](/docs/examples#showIf)
+- [Show If condition example updated](examples#showIf)
 
 
 ### v0.22.0
 
 #### New Features
-- [Styles documentation](/docs/styles)
-- [Configuration docs updated](/docs/configuration)
-- [Show If condition](/docs/examples#showIf)
+- [Styles documentation](styles)
+- [Configuration docs updated](configuration)
+- [Show If condition](examples#showIf)
 - **Truthy** evaluation: if a value used in `showIf` or `hideOnEmpty` matches listed values below, it is considered `empty` (i.e. **untruthy**):
     ```js
     const NON_TRUTHY_VALUES = [
