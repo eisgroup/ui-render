@@ -3,9 +3,9 @@
 ## How to check UI Render version?
 1. In Chrome browser on your desktop computer (laptop), right click anywhere inside UI Render
 2. Choose "Inspect"
-   ![ui-render-inspect](/static/images/ui-render-inspect.png)
+   ![ui-render-inspect](/ui-render/static/images/ui-render-inspect.png)
 3. Under `Elements` tab, search (press Ctrl + F for Windows, or Cmd + F for Mac) and type `ui-render`.
-   ![ui-render-version](/static/images/ui-render-version.png)
+   ![ui-render-version](/ui-render/static/images/ui-render-version.png)
 The UI Render version is `data-version` from `<div class="ui-render"...` or `<html..`.
    
 ## What is `view`?

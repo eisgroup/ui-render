@@ -4,8 +4,8 @@ import Markdown from 'react-markdown'
 import ScrollView from 'react-ui-pack/ScrollView'
 import Tabs from 'react-ui-pack/Tabs'
 import toc from 'remark-toc'
-import { get, logRender } from 'utils-pack'
-import { goTo } from '../../common/variables'
+import { __PROD__, get, logRender } from 'utils-pack'
+import { goTo, ROUTE } from '../../common/variables'
 import changelog from './changelog.md'
 import CodeBlock from './CodeBlock'
 import config from './config.md'
@@ -55,7 +55,7 @@ export default class Docs extends Component {
 
   onClickTab = (index) => {
     const id = this.tabs[index].id
-    goTo(`/docs${id && '/'}${id}`)
+    goTo(`${ROUTE.DOCS}${__PROD__ ? '' : (id && '/')}${id}`)
   }
 
   componentDidMount () {

@@ -1,14 +1,17 @@
-import { createNestedRoutes, ROUTE, ROUTE_BASE, ROUTES } from 'modules-pack/variables'
+import { createNestedRoutes, ROUTE, ROUTES } from 'modules-pack/variables'
+import { __PROD__, ENV } from 'utils-pack'
 
+const ROUTE_BASE = __PROD__ ? `${ENV.REACT_APP_HOMEPAGE}/` : '/'
 const _ROUTE = {
-  DOCS: `${ROUTE_BASE}docs`,
+  HOME: ROUTE_BASE,
+  DOCS: __PROD__ ? ROUTE_BASE : `${ROUTE_BASE}docs`,
   TEST_POLICY: `${ROUTE_BASE}test/policy`,
 }
 Object.assign(ROUTE, _ROUTE)
 
 const _ROUTES = {
   FOR_DEFINITION: createNestedRoutes(ROUTE, {
-    [ROUTE.DOCS]: '/:id?', // add id to this route
+    [ROUTE.DOCS]: __PROD__ ? ':id?' : '/:id?', // add id to this route
   }),
   FOR_NAV: [],
   WITHOUT_NAV: [
@@ -17,6 +20,7 @@ const _ROUTES = {
 }
 
 Object.assign(ROUTES, _ROUTES)
+export { ROUTE, ROUTES }
 
 export function goTo (uri, title = uri, page = uri) {
   if (typeof window === 'undefined') return

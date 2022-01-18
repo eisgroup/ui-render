@@ -32,7 +32,7 @@ The `meta.json` file is responsible for the Look & Feel of the UI, as well as `d
 
 The illustration below demonstrates the structure of UI components, and their shape in the `meta.json` file:
 
-![ui-architecture](/static/images/ui-architecture.png)
+![ui-architecture](/ui-render/static/images/ui-architecture.png)
 
 It must start with a single `Root` Field object. Within each Field object, you can define nested Fields, under the attribute `items` - an array of nested child objects.
 
@@ -42,10 +42,10 @@ A React component is a predefined component that the UI has available to display
 It is configured by specifying the `view` along with other component attributes.
 For example: `{"view": "Table"}` will use Table as the React Component.
 
-Please refer to [configuration](/docs/configuration) and [styles](/docs/styles) for available options to customise React Components, as well, as the [FAQ](/docs/faq) section.
+Please refer to [configuration](configuration) and [styles](styles) for available options to customise React Components, as well, as the [FAQ](faq) section.
 
-If you need a custom React component that does not yet exist in the [examples](/docs/examples), please submit a ticket to request new feature from the developer.
+If you need a custom React component that does not yet exist in the [examples](examples), please submit a ticket to request new feature from the developer.
 
 ## Testing
 
-You can play around with configurations by uploading `data.json` and `meta.json` files [here](/demo).
+You can play around with configurations by uploading `data.json` and `meta.json` files [here](demo).

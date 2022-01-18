@@ -290,4 +290,4 @@ and [Form Input Definitions](https://github.com/ecoinomist/modules-pack/blob/mas
 
 ### ShowIf Logic
 
-![showIf-logic](/static/images/showIf.png)
+![showIf-logic](/ui-render/static/images/showIf.png)
