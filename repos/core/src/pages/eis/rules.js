@@ -389,6 +389,7 @@ export function withUISetup (formConfig) {
     }
 
     // Define instance method
+    // todo: upgrade modules-pack to fix onSubmit not being passed
     // todo - remove - not used because auto-submit would open too many popups
     Class.prototype.submit = function (values) {
       return popupAlert('Submitted Form with these values', <Json data={values}/>)

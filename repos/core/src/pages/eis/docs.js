@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Helmet } from 'react-helmet'
 import Markdown from 'react-markdown'
 import ScrollView from 'react-ui-pack/ScrollView'
 import Tabs from 'react-ui-pack/Tabs'
@@ -8,6 +9,7 @@ import { goTo } from '../../common/variables'
 import changelog from './changelog.md'
 import CodeBlock from './CodeBlock'
 import config from './config.md'
+import Demo from './demo'
 import docs from './docs.md'
 import Examples from './Examples'
 import faq from './faq.md'
@@ -36,6 +38,7 @@ export default class Docs extends Component {
   tabs = [
     {id: '', title: 'Summary'},
     {id: 'configuration', title: 'Configuration'},
+    {id: 'demo', title: 'Demo'},
     {id: 'examples', title: 'Examples'},
     {id: 'styles', title: 'Styles'},
     {id: 'changelog', title: 'Change Log'},
@@ -65,8 +68,10 @@ export default class Docs extends Component {
 
   render () {
     return (
-      <ScrollView fill className={'app-docs padding-large'}>
-        <h1>{'UI Render'}</h1>
+      <ScrollView fill className={'app-docs padding-large no-padding-top'}>
+        <Helmet>
+          <title>{'UI Render'}</title>
+        </Helmet>
         <Tabs
           defaultIndex={this.tabIndex}
           onChange={this.onClickTab}
@@ -74,6 +79,7 @@ export default class Docs extends Component {
           panels={[
             () => <Markdown source={this.state.docs} {...mdProps}/>,
             () => <Markdown source={this.state.config} {...mdProps}/>,
+            () => <Demo/>,
             () => <Examples/>,
             () => <Markdown source={this.state.styles} {...mdProps}/>,
             () => <Markdown source={this.state.changelog} {...mdProps}/>,
