@@ -74,6 +74,7 @@ input UserInput {
     password: Password
     newPassword: Password
     referrer: KeyValInput
+    avatar: FileInput
     name: String
     surname: String
     sex: Int
