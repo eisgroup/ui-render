@@ -53,7 +53,7 @@ export function exportTo (resolvers) {
 export function authenticated (target, key, descriptor) {
   const func = descriptor.value
   descriptor.value = function (...args) {
-    const [_, __, {user: {id} = {}}] = args
+    const [_1, _2, {user: {id} = {}}] = args
     if (!id) return Response.unauthorized(id)
     return func.apply(this, args)
   }
@@ -69,7 +69,7 @@ export function authLevel (userRole) {
   return function (target, key, descriptor) {
     const func = descriptor.value
     descriptor.value = function (...args) {
-      const [_, __, {user: {auth} = {}}] = args
+      const [_1, _2, {user: {auth} = {}}] = args
       if (!(auth >= userRole)) return Response.forbidden(_.YOU_CANNOT_ACCESS_PROTECTED_RESOURCE)
       return func.apply(this, args)
     }
@@ -116,7 +116,7 @@ export function filtered (validator, ...filtersToApply) {
         const error = await validator.apply(this, args)
         if (error) return error
       }
-      const [__, payload] = args
+      const [_1, payload] = args
       const {filter, match} = payload
       if (filter && match) {
         const conditions = []
@@ -142,7 +142,7 @@ export function filtered (validator, ...filtersToApply) {
 export function localised (target, key, descriptor) {
   const func = descriptor.value
   descriptor.value = async function (...args) {
-    const [__, payload, {user = {}, lang}] = args
+    const [_1, payload, {user = {}, lang}] = args
     const langCode = user.lang || lang || Active.LANG._
     // .lang prop must be the first in entry object for virtuals to work, because of Object.assign order
     if (payload.entry && payload.entry.lang == null) payload.entry = {lang: langCode, ...payload.entry}
@@ -167,7 +167,7 @@ export function localised (target, key, descriptor) {
  */
 export function requiredLocalised (schema) {
   if (!schema._.required) throw new Error(`${requiredLocalised.name} not needed for schema \n${toJSON(schema, null, 2)}`)
-  return function validation (__, {entry}) {
+  return function validation (_1, {entry}) {
 
     if (!entry._) {
       // Skip check for existing entry if LocalString is not updated directly

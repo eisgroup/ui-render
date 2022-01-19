@@ -8,15 +8,17 @@
 # SUMMARY
 # -----------------------------------------------------------------------------
 extend type Query {
-    user(id: Id): User # if no `id` given, returns self
-    users(ids: [Id!], sort: JSON): [User!] # if no `ids` given, returns last updated users for Staff or higher level
     logout: Logout
+    # if no `id` given, returns self
+    user(id: Id): User
+    # if no `ids` given, returns last updated users for Staff or higher level
+    users(ids: [Id!], filter: UserInput, match: Operator, sort: JSON): [User!]
 }
 
 extend type Mutation {
     login(email: Email!, password: Password!): User
     signup(email: Email!, password: Password!, referrer: KeyValInput): User
-    user(user: UserInput!): User # if no `id` given, updates self
+    user(entry: UserInput!): User # if no `id` given, updates self
 }
 
 #extend type Subscription {
