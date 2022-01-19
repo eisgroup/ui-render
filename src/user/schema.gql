@@ -17,7 +17,7 @@ extend type Query {
 
 extend type Mutation {
     login(email: Email!, password: Password!): User
-    signup(email: Email!, password: Password!, referrer: KeyValInput): User
+    signup(email: Email!, password: Password!, name: String, referrer: KeyValInput): User
     user(entry: UserInput!): User # if no `id` given, updates self
 }
 

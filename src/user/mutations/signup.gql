@@ -1,5 +1,5 @@
-mutation signup($email: Email!, $password: Password!, $referrer: KeyValInput) {
-    signup(email: $email, password: $password, referrer: $referrer) {
+mutation signup($email: Email!, $password: Password!, $name: String, $referrer: KeyValInput) {
+    signup(email: $email, password: $password, name: $name, referrer: $referrer) {
         id
         name
         email
