@@ -1,7 +1,8 @@
+#import "modules-pack/upload/fragments/FileSummary.gql"
 fragment UserSummary on User {
     id
     avatar {
-        src
+        ...FileSummary
     }
     name
     surname

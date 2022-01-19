@@ -86,7 +86,7 @@ const client = new ApolloClient({
 # UserSummary.gql
 #import "modules-pack/graphql/fragments/FileSummary.gql"
 fragment UserSummary on User {
-    files {
+    photos {
         ...FileSummary
     }
 }
