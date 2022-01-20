@@ -12,6 +12,9 @@ import {
   l,
   localiseTranslation,
   set,
+  shortNumber,
+  SIZE_KB,
+  SIZE_MB_10,
   toFlatList,
   toJSON,
   toList,
@@ -44,12 +47,13 @@ import { removeImgSizes, saveImgSizes } from './image'
  *      return new User(entry)
  *    }
  * @param {Object|Object[]} configs - see fileUploaded() for config props
+ * @returns {Function} decorator - that handles files upload/update/delete with all validations required
  */
 export function filesUploaded (...configs) {
   return function (target, key, descriptor) {
     const func = descriptor.value
     descriptor.value = async function (...args) {
-      const [, {entry}] = args
+      const [, {entry}, {user: {id, auth} = {}}] = args
 
       // First, extract files from payload entry so it doesn't get assigned to instance
       const filesByFieldList = configs.map(({fields = 'files'}) => {
@@ -69,16 +73,63 @@ export function filesUploaded (...configs) {
       if (!(instance instanceof mongoose.Document))
         return Response.badImplementation(`@${filesUploaded.name} requires a Mongoose Document instance as return value`)
 
-      // Third, process all file uploads
-      const {resolve, reject} = await PromiseAll.all(configs.map(({fields, ...config}, index) => {
-        return fileUploaded({instance, filesByField: filesByFieldList[index], ...config})
-      }))
+      // Third, process all file uploads with validation
+      const promises = []
+      let user, uploadLimit, uploadRemain
+      for (const index in configs) {
+        const {fields, uploadLimit: _uploadLimit, uploadLimitlessLevel, User, ...config} = configs[index]
+
+        if (_uploadLimit && !User)
+          return Response.badImplementation(`@${filesUploaded.name} requires User model for 'uploadLimit' validation`)
+
+        // Enforce uploadLimit if `uploadLimitlessLevel` is nullable, or `auth` undefined, or less than required level
+        if (_uploadLimit && (uploadLimitlessLevel == null || auth == null || !(auth >= uploadLimitlessLevel))) {
+
+          // Only compute uploadLimit once
+          if (uploadRemain == null) {
+            let uploadUsed = 0
+            user = await User.findById(id)
+            if (!(user instanceof User))
+              return Response.badImplementation(`@${filesUploaded.name} no User found with id ${id} to run 'uploadLimit' validation`)
+
+            // Mongoose Map can only be retrieved with .get()
+            if (user.uploadUsed) {
+              for (const [key, value] of user.uploadUsed.entries()) {
+                if (key.indexOf(instance.id) === 0) continue
+                uploadUsed += value
+              }
+            }
+
+            // Note: after image resize, user may end up exceeding quota, and cannot update other files
+            // so always convert to positive value if the remaining quota is negative
+            uploadLimit = user.uploadLimit || SIZE_MB_10 // fallback if limit is not defined
+            uploadRemain = Math.abs(uploadLimit - uploadUsed) || SIZE_MB_10 // fallback in case of 0 or NaN
+          }
+
+          // Set uploadLimit in Bytes
+          config.uploadLimit = uploadLimit
+          config.uploadRemain = uploadRemain
+        }
+
+        promises.push(fileUploaded({instance, filesByField: filesByFieldList[index], ...config}))
+      }
+      const {resolve, reject} = await PromiseAll.all(promises)
       reject.forEach(warn)
 
       // Finally, check the results to return.
       // If any upload fails, do not save the record to avoid broken database and return the error.
-      const error = resolve.find(({success}) => !success)
+      let uploadUsed = 0
+      const error = resolve.find(({success, uploadSize}) => {
+        uploadUsed += uploadSize
+        return !success
+      })
       if (error) return error
+
+      // Save record for successful uploads
+      if (uploadUsed) {
+        user.set(`uploadUsed.${instance.id}`, uploadUsed)
+        user.save()
+      }
       return instance.save()
     }
     return descriptor
@@ -90,37 +141,71 @@ export function filesUploaded (...configs) {
  * @param {String|String[]} [fields] - path to files field as defined in given model instance
  * @param {*[]} [kinds] - allowed file kinds
  * @param {*[]} [is] - allowed file identifiers
+ * @param {String[]} [mimetypes] - allowed file types
  * @param {Boolean} [multiple] - whether upload should be saved as list of files for each given `field`
  * @param {Function} [update<{instance, files}>] - custom callback to update instance with uploaded files
- * @param {Object<[folder], [dir], [limit], [mimetypes]>} [options] - custom upload configs, see `updateFiles` arguments
- * @returns {Function} decorator - that handles files upload/update/delete with all validations required
+ * @param {Object<[folder], [dir], [limit]>} [options] - custom upload configs, see `updateFiles` arguments
  */
 async function fileUploaded ({
   kinds = [], // enables validation by default
   is = [], // pass as null to disable validation
+  mimetypes = IMAGE.MIME_TYPES,
   multiple,
   update,
+  uploadLimit, // total upload size in Bytes from User account, if `config.uploadLimit` = truthy
+  uploadRemain, // computed remaining upload size in Bytes from User account, if `config.uploadLimit` = truthy
   instance, // private prop from filesUploaded()
   filesByField,  // private prop from filesUploaded()
   ...options
 } = {}) {
   // Simply save the instance, if no files uploaded
   const success = true
-  const files = toFlatList(Object.values(filesByField))
-  if (!files.length) return {success}
+  const fileInputs = toFlatList(Object.values(filesByField))
+  if (!fileInputs.length) return {success}
 
   // Validate FileInput before uploads
   if (kinds) {
-    for (const {kind} of files) {
+    for (const {kind} of fileInputs) {
       if (kind != null && !kinds.includes(kind))
         return Response.badRequest(interpolateString(_.INVALID_FILE_KIND_kind_MUST_BE_ONE_OF_kinds, {kind, kinds}))
     }
   }
   if (is) {
-    for (const {i} of files) {
+    for (const {i} of fileInputs) {
       if (i != null && !is.includes(i))
         return Response.badRequest(interpolateString(_.INVALID_FILE_IDENTIFIER_i_MUST_BE_ONE_OF_is, {i, is}))
     }
+  }
+
+  // Validate File types, and upload limit (can only count byte stream to get size)
+  let uploadSize = 0 // total upload size should not exceed User's upload limit
+  let error, validateStream
+  for (const {file} of fileInputs) {
+    const {createReadStream, mimetype} = await file
+
+    if (mimetypes && !mimetypes.includes(mimetype))
+      return Response.badRequest(interpolateString(_.INVALID_FILE_TYPE_mimetype, {mimetype}, {suppressError: true}))
+
+    if (uploadLimit) {
+      validateStream = createReadStream()
+      for await (const chunk of validateStream) { // see https://github.com/jaydenseric/graphql-upload/issues/204
+        uploadSize += chunk.byteLength
+        if (uploadSize > uploadRemain) {
+          error = Response.badRequest(interpolateString(
+            _.UPLOAD_LIMIT_EXCEEDED_YOU_HAVE_remaining_LEFT_OF_MAXIUM_size_FOR_ALL_UPLOADS_PLEASE_REDUCE_FILE_SIZES_OR_CONTACT_SUPPORT,
+            {
+              remaining: `${shortNumber(uploadRemain, 3, SIZE_KB)}B`,
+              size: `${shortNumber(uploadLimit, 3, SIZE_KB)}B`,
+            }
+          ))
+          break
+        }
+      }
+      validateStream.destroy()
+      validateStream = null
+    }
+
+    if (error) return error
   }
 
   // Upload/Update/Remove Files
@@ -129,6 +214,8 @@ async function fileUploaded ({
     if (!filesByField[field].length) continue
     updates.push(updateFiles({instance, files: filesByField[field], field, ...options}))
   }
+
+  // Resolve results
   const {resolve, reject} = await PromiseAll.all(updates)
   resolve.forEach(({field, files, errors}) => {
     // todo: test returning array of promises with errors
@@ -141,7 +228,7 @@ async function fileUploaded ({
     }
   })
   reject.forEach(warn)
-  return {success}
+  return {success, uploadSize}
 }
 
 /**
@@ -153,7 +240,6 @@ async function fileUploaded ({
  * @param {String} field - path to files field as defined in given model instance
  * @param {String} [folder] - see `resolvePath()` for argument
  * @param {Object} [filePath] - see `resolvePath()` for argument
- * @param {String[]} [mimetypes] - allowed file types
  * @param {Object} [sizes] - required for image sharp.resize() see `resizes()` for argument
  * @param {Number} [limit] - maximum number of files allowed for upload (for unstructured `index` based files)
  * @returns {Promise<Object>} {field, files, errors}
@@ -162,7 +248,7 @@ async function fileUploaded ({
  */
 export async function updateFiles ({
   instance, files, field, folder = folderFrom(instance),
-  mimetypes = IMAGE.MIME_TYPES, limit, sizes = IMAGE.SIZES,
+  limit, sizes,
   ...filePath
 }) {
   const output = {field}
@@ -181,7 +267,7 @@ export async function updateFiles ({
 
   // Upload/Remove files
   const fileInputs = limit != null ? files.filter(f => f.i < limit) : files
-  const uploads = fileInputs.map(fileInput => uploadFile({mimetypes, sizes, ...fileInput}, {folder, ...filePath}))
+  const uploads = fileInputs.map(fileInput => uploadFile({sizes, ...fileInput}, {folder, ...filePath}))
   const {resolve, reject} = await PromiseAll.all(uploads)
 
   // Error Handling
@@ -234,14 +320,13 @@ export async function updateFiles ({
  * @param {File} [file] - required for upload, native File object to createReadStream()
  * @param {Boolean} [remove] - whether to remove file
  * @param {String} [name] - existing file `name` to remove, required to resolvePath()
- * @param {String[]} [mimetypes] - allowed file types
  * @param {Object} [filePath] - options to pass to `saveFile()` or `removeFile()`
  * @returns {Promise} Promise<path...>|Promise<removed...>
  *   - given FileInput props with saved `path`, `name`, and optional `metaData`
  *   - or `removed` boolean
  *   - or error if unsuccessful
  */
-export async function uploadFile ({file, remove, mimetypes, sizes, ...fileInput}, filePath) {
+export async function uploadFile ({file, remove, sizes = IMAGE.SIZES, ...fileInput}, filePath) {
   let result
 
   // Remove File
@@ -259,13 +344,9 @@ export async function uploadFile ({file, remove, mimetypes, sizes, ...fileInput}
 
   // Upload File (use filename derived from the file itself)
   const {createReadStream, filename: name, mimetype} = await file
-  if (mimetypes && !mimetypes.includes(mimetype))
-    throw Response.badRequest(interpolateString(_.INVALID_FILE_TYPE_mimetype, {mimetype}))
-
-  // Always resize the image using Sharp, so sharp can optimize and sanitize it, even if resizing is not needed
-  const stream = createReadStream()
-  const options = {stream, filePath: {filename: fileName({...fileInput, name}), ...filePath}}
+  const options = {stream: createReadStream(), filePath: {filename: fileName({...fileInput, name}), ...filePath}}
   if (IMAGE.MIME_TYPES.includes(mimetype)) {
+    // Always resize the image using Sharp, so sharp can optimize and sanitize it, even if resizing is not needed
     result = await saveImgSizes({...options, sizes})
   } else {
     result = await saveFile(options)
@@ -293,5 +374,8 @@ localiseTranslation({
   },
   UPLOAD_FILE_ERROR_error: {
     [l.ENGLISH]: `Upload file error '{error}!`
+  },
+  UPLOAD_LIMIT_EXCEEDED_YOU_HAVE_remaining_LEFT_OF_MAXIUM_size_FOR_ALL_UPLOADS_PLEASE_REDUCE_FILE_SIZES_OR_CONTACT_SUPPORT: {
+    [l.ENGLISH]: `Upload limit exceeded! You have {remaining} left of maximum {size} for ALL Uploads. Please reduce file sizes or contact support.`
   },
 })

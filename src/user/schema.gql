@@ -60,6 +60,10 @@ type User {
     lang: LanguageCode
     reportsLimit: Int
 
+    # Project
+    uploadLimit: Int
+    uploadUsed: JSON
+
     # Others
     verified: Verification
     referrer: KeyVal
@@ -82,16 +86,22 @@ input UserInput {
     role: Int
     kind: String
     birthday: Timestamp
+
     # Contacts
     phones: Phones
     place: PlaceInput
+
     # Details
     about: String
     photos: [FileInput]
+
     # Settings
     currency: CurrencySymbol
     lang: LanguageCode
     reportsLimit: Int
+
+    # Project
+    uploadLimit: Int
 }
 
 type Verification {

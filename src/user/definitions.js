@@ -27,7 +27,7 @@ export const _USER = {
       // [l.RUSSIAN]: 'Сотрудник',
     },
     DEVELOPER: {
-      _: 199,
+      _: 699,
       [l.ENGLISH]: 'Developer',
       // [l.RUSSIAN]: 'Девелопер',
     },

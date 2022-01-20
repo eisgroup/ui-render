@@ -2,4 +2,6 @@ fragment UserSettings on User {
     currency
     lang
     reportsLimit
+    uploadLimit
+    uploadUsed
 }
