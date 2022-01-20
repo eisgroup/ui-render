@@ -32,7 +32,8 @@ export const ROUTES = {
   WITHOUT_NAV: [],
 
   // ID for new EntryEdit
-  NEW: 'new'
+  NEW: 'new',
+  LOGIN: 'login', // prevent GQL from querying it as Id
 }
 
 if (_SHOULD_SHOW_TEST_) ROUTES.FOR_NAV.push(...[

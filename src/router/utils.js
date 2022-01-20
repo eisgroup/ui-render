@@ -1,5 +1,5 @@
 import React from 'react'
-import { get } from 'utils-pack'
+import { get, isId } from 'utils-pack'
 
 /**
  * Get Route ID from Component Props
@@ -12,7 +12,7 @@ export function idFromRoute (props) {
   let id = get(props, 'history.location.pathname', '')
   if (id) id = id.substr(id.lastIndexOf('/') + 1)
   if (!id && props.router) id = get(props.router, 'query.id') // next.js
-  return id
+  return isId(id) ? id : ''
 }
 
 /**

@@ -9,9 +9,10 @@ import { interpolateString, isPhoneNumber, toLowerCase, trimSpaces, } from 'util
 import { Id as _Id, isId } from 'utils-pack/utility'
 import isEmailValidator from 'validator/es/lib/isEmail'
 import isURL from 'validator/es/lib/isURL'
-import './database' // initialize database automatically on import of this file
+import * as d from './database' // initialize database automatically on import of this file
 import { _ } from './translations'
 
+const sideEffects = {d}
 assertBackend()
 /**
  * DATABASE HELPERS ============================================================

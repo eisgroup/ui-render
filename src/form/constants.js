@@ -3,7 +3,9 @@ import { FIELD } from 'modules-pack/variables/fields'
 import { date, double5, hourMinute, integer, phone, uppercase } from 'react-ui-pack/inputs/normalizers'
 import { email, isRequired, maxLength, password, phoneNumber, url } from 'react-ui-pack/inputs/validationRules'
 import { _ } from 'utils-pack/translations'
-import './translations'
+import * as t from './translations'
+
+const sideEffects = {t}
 
 /**
  * CONSTANT VARIABLES ==========================================================

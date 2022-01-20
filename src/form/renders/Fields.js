@@ -7,10 +7,11 @@ import Dropdown from 'react-ui-pack/Dropdown'
 import View from 'react-ui-pack/View'
 import { Active, cleanList, interpolateString, isEqual } from 'utils-pack'
 import { _ } from 'utils-pack/translations'
-import '../constants' // init FIELD.TYPE setup
+import * as c from '../constants' // init FIELD.TYPE setup
 import { DropdownField, InputField } from '../inputs'
-import '../translations'
+import * as t from '../translations'
 
+const sideEffects = {c, t}
 if (!Active.Field) Active.Field = Field
 
 /**

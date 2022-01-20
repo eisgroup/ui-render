@@ -4,8 +4,10 @@ import { all, call, delay, put, spawn, takeLatest } from 'modules-pack/saga/util
 import { ROUTE, URL } from 'modules-pack/variables'
 import { Active, CREATE, LOGIN, RESET, sanitizeResponse, SET, SUCCESS } from 'utils-pack'
 import { SELF, USER_LOGIN } from '../constants'
-import '../mutations' // setup Active.UserMutation
-import '../queries' // setup Active.UserQuery
+import * as m from '../mutations' // setup Active.UserMutation
+import * as q from '../queries' // setup Active.UserQuery
+
+const sideEffects = {m, q}
 
 /**
  * ASYNC TASKS =================================================================

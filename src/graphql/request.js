@@ -67,7 +67,7 @@ export const asDropdownOptions = {
  */
 export function queryVariables (props) {
   const id = props.id || idFromRoute(props)
-  return (id && id !== ROUTES.NEW) ? {id} : {}
+  return (id && id !== ROUTES.NEW && id !== ROUTES.LOGIN) ? {id} : {}
 }
 
 /**
