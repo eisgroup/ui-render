@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React, { PureComponent } from 'react'
-import { TIME_DURATION_INSTANT } from 'utils-pack'
+import { Active, TIME_DURATION_INSTANT } from 'utils-pack'
 import { SOUND } from './files'
 import { STYLE } from './styles'
 import Text from './Text'
@@ -68,7 +68,7 @@ export default class ProgressBar extends PureComponent {
     const {value} = this.props
     if (value != null) this.setTimeout(() => {
       this.setState({value})
-      this.setTimeout(SOUND.PROGRESS.play, STYLE.ANIMATION_DURATION * 0.8)
+      if (Active.SETTINGS.HAS_SOUND) this.setTimeout(SOUND.PROGRESS.play, STYLE.ANIMATION_DURATION * 0.8)
     }, TIME_DURATION_INSTANT)
   }
 

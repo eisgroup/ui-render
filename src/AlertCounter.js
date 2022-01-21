@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
+import { Active } from 'utils-pack'
 import Badge from './Badge'
 import { SOUND } from './files'
 
@@ -19,7 +20,7 @@ export default class AlertCounter extends PureComponent {
   }
 
   componentDidUpdate (prev) {
-    if (prev.alert < this.props.alert) SOUND.ALERT.play()
+    if (prev.alert < this.props.alert && Active.SETTINGS.HAS_SOUND) SOUND.ALERT.play()
   }
 
   render () {
