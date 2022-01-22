@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import sanitizer from 'mongoose-sanitizer'
 import { __TEST__ } from 'utils-pack'
-import { DB_HOST, DB_NAME, DB_PORT } from '../server/config'
+import { DB_HOST, DB_NAME, DB_PORT, DOMAIN } from '../server/config'
 
 /**
  * DATABASE CONFIG =============================================================
@@ -12,7 +12,7 @@ import { DB_HOST, DB_NAME, DB_PORT } from '../server/config'
 if (__TEST__) {
   console.log(`⚡  Mongoose disabled for JEST tests`)
 } else {
-  const uri = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`
+  const uri = `mongodb://${DB_HOST}${DOMAIN ? ('-' + DOMAIN) : ''}:${DB_PORT}/${DB_NAME}`
   mongoose.Promise = Promise  // use Promise, instead of default Node.js function (err, ...) callbacks
   mongoose.plugin(sanitizer)
   // mongoose.plugin(uniqueValidator) // causes Error in Mongoose 6
