@@ -4,7 +4,10 @@ import { timeInThePast } from 'react-ui-pack/inputs/validationRules'
 import { Active, capitalize, optionsFrom } from 'utils-pack'
 import { namespace } from 'utils-pack/utility'
 import { _USER, SEX } from './definitions'
+import * as t from './translations'
 import { _ } from './translations'
+
+const sideEffects = {t}
 
 /**
  * CONSTANT VARIABLES ==========================================================

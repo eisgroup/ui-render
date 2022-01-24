@@ -1,6 +1,6 @@
 {
   "name": "modules-pack",
-  "version": "0.11.13",
+  "version": "0.11.14",
   "description": "JavaScript Modules for Modern Frontend & Backend Projects",
   "license": "MIT",
   "main": "index.js",
@@ -29,16 +29,16 @@
     "delete": "../../node_modules/rimraf/bin.js"
   },
   "peerDependencies": {
-    "@apollo/client": "x",
-    "graphql": "x",
-    "graphql-apollo-errors": "x",
-    "graphql-fields": "x",
-    "graphql-type-json": "x",
-    "mkdirp": "x",
-    "react": "16.x",
-    "react-ui-pack": "0.7.x",
-    "sanitize-filename": "x",
-    "utils-pack": "0.3.x"
+    "@apollo/client": "*",
+    "graphql": "*",
+    "graphql-apollo-errors": "*",
+    "graphql-fields": "*",
+    "graphql-type-json": "*",
+    "mkdirp": "*",
+    "react": "16.*",
+    "react-ui-pack": "*",
+    "sanitize-filename": "*",
+    "utils-pack": "*"
   },
   "dependencies": {
     "axios": "^0.21.1",

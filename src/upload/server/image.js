@@ -58,8 +58,7 @@ export function removeImgSizes ({filePath, sizes}) {
  */
 export async function saveImgSizes ({stream, filePath, sizes}) {
   const {dir, path, name} = resolvePath(filePath)
-  const {error} = await makeDirectory(dir)
-  if (error) return {errors: [error]}
+  await makeDirectory(dir)
   const uploads = []
   const pipeline = sharp()
   let metadata

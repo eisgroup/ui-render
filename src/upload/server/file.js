@@ -12,15 +12,16 @@ import { _WORK_DIR_, warn } from 'utils-pack'
 /**
  * Promisified version of mkdirp lib
  * @see: https://www.npmjs.com/package/mkdirp for docs
+ * @example:
+ *    await makeDirectory(dir) // error will be thrown as rejection
  *
  * @param {String} dir - path to make
  * @param {Object|String} [options]
- * @returns {Promise<{made, error}>}
+ * @returns {Promise<String|undefined>} promise that resolves to first directory `made` that had to be created,
+ *    or undefined if everything already exists. Promise rejects if any errors are encountered.
  */
 export function makeDirectory (dir, options) {
-  return new Promise((resolve, reject) => {
-    mkdirp(dir, options, (error, made) => error === null ? resolve({made}) : reject({error}))
-  })
+  return mkdirp(dir, options) // old `mkdirp` callback signature only worked in 0.5.1 in Linux
 }
 
 /**
@@ -58,8 +59,7 @@ export function read ({options = 'utf8', workDir = _WORK_DIR_, ...filePath}) {
  */
 export async function saveFile ({stream, read, transform, writeStream, filePath}) {
   const {dir, path, name} = resolvePath(filePath)
-  const {error} = await makeDirectory(dir)
-  if (error) throw new Error(error)
+  await makeDirectory(dir)
 
   return new Promise((resolve, reject) => {
     // file requires reassigning after each pipe
