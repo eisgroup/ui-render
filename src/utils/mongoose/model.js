@@ -64,7 +64,7 @@ export function createModel (name, fields, {schema: {options, config, methods, v
             if (localString == null) return
             localString = localString.toObject()
             for (const lang in localString) {
-              if (localString[lang]) return localString[lang]
+              if (localString[lang] != null) return localString[lang]
             }
           }
           return result
