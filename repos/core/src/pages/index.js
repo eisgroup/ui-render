@@ -1,5 +1,6 @@
 import { ROUTE } from '../common/variables'
 import Docs from './eis/docs'
+import OpenL from './eis/openl'
 import PolicyPage from './eis/Policy'
 // import Tester from './tester'
 // import Theme from './theme'
@@ -18,6 +19,7 @@ import PolicyPage from './eis/Policy'
 export default {
   [ROUTE.HOME]: Docs,
   [ROUTE.DOCS]: Docs,
+  [ROUTE.TEST]: OpenL,
   [ROUTE.TEST_POLICY]: PolicyPage,
   // [ROUTE.TESTER]: Tester,
   // [ROUTE.THEME]: Theme,

@@ -5,6 +5,7 @@ const ROUTE_BASE = __PROD__ ? `${ENV.REACT_APP_HOMEPAGE}/` : '/'
 const _ROUTE = {
   HOME: ROUTE_BASE,
   DOCS: __PROD__ ? ROUTE_BASE : `${ROUTE_BASE}docs`,
+  TEST: `${ROUTE_BASE}test`,
   TEST_POLICY: `${ROUTE_BASE}test/policy`,
 }
 Object.assign(ROUTE, _ROUTE)
