@@ -1,5 +1,27 @@
 ### Table of Contents
 
+### v0.25.4
+#### New
+- Multiple UIRender instances on a Page
+- [Data Component](examples#tableForm) for rendering nested UIRender instances
+- Complex validation with multiple validator methods using `verify` attribute (see Data Component for examples)
+- `notWithinRange` validation (see Data Component for examples)
+- Input for date (see Data Component for examples)
+- [Example Rating Details config](examples#ratingDetails)
+- Cypress End-to-End Tests for Examples
+- UIRender can be used directly with `data/meta` JS objects
+- Docs available on GitHub Pages.
+
+#### Updated
+- ShowIf logic docs
+- UIRender developer integration README.md
+- Policy production build bundle instructions
+
+#### Fixes
+- relativePath for inputs nested in lists
+- Localised translations not resolving in production
+- Increased API timeout to 1 minute for production build
+
 ### v0.24.2
 #### Removed
 - **showEmptyAs** example
