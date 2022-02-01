@@ -1,0 +1,109 @@
+### Table of Contents
+
+### v0.25.4
+#### New
+- Multiple UIRender instances on a Page
+- [Data Component](examples#tableForm) for rendering nested UIRender instances
+- Complex validation with multiple validator methods using `verify` attribute (see Data Component for examples)
+- `notWithinRange` validation (see Data Component for examples)
+- Input for date (see Data Component for examples)
+- [Example Rating Details config](examples#ratingDetails)
+- Cypress End-to-End Tests for Examples
+- UIRender can be used directly with `data/meta` JS objects
+- Docs available on GitHub Pages.
+
+#### Updated
+- ShowIf logic docs
+- UIRender developer integration README.md
+- Policy production build bundle instructions
+
+#### Fixes
+- relativePath for inputs nested in lists
+- Localised translations not resolving in production
+- Increased API timeout to 1 minute for production build
+
+### v0.24.2
+#### Removed
+- **showEmptyAs** example
+
+### v0.24.1
+#### New Example
+- [Example: **Summary Box**](examples#summaryBox)
+
+### v0.24.0
+#### New Features
+- [Example: **Matrix Table**](examples#tableMatrix) (+ [minimum config](examples#tableMatrixRequired) example)
+- [Example: **Tabs Buttoned**](examples#tabsButtoned) (+ [Tabs](examples#tabs) default example)
+- [Example: **showEmptyAs**](examples#tableExtraItems) attribute for Table (cell value must be `null` or empty string for it to work)
+- **onClickIcon** callback added for Dropdown to remove/delete Select field
+- Localised validation messages
+- Updated chevron icons to the latest DSM style guide.
+  
+#### Documentation Improvements
+- [FAQ: **How to check UI Render Version**](faq)
+- Examples: clicking `Meta.json` or `Data.json` will download respective `json` files.
+- Examples: clicking links to `examples#id` with hash, like [this](examples#all), automatically opens the example. 
+  In the same way, you can link to an example directly by first expanding it, then copying URL in the browser.
+- Tabs shown in [`docs`](/ui-render) now sync with browser URL
+
+#### Fixes
+- Multiple Form instances for UI Render on the same page
+- **removable** attribute shows delete icon inside Input  
+- **readonly** state for all form fields no longer hides the input if it has value
+- **onRemove** Input Field sets form value to null for the Input
+
+#### Removed
+- **hideOnEmpty** attribute
+  
+### v0.23.1
+#### Changes
+- **showIf** can be empty object. The logic works like [this](configuration#showif-logic).
+  
+
+### v0.23.0
+
+#### Breaking Changes
+- **relativeData** pattern defaults to `true` if not defined. To use global data.json, do this:
+  ```js
+  { 
+    "name": "path.to.data.json",
+    "relativeData": false
+  }
+  ```
+- [Show If condition example updated](examples#showIf)
+
+
+### v0.22.0
+
+#### New Features
+- [Styles documentation](styles)
+- [Configuration docs updated](configuration)
+- [Show If condition](examples#showIf)
+- **Truthy** evaluation: if a value used in `showIf` or `hideOnEmpty` matches listed values below, it is considered `empty` (i.e. **untruthy**):
+    ```js
+    const NON_TRUTHY_VALUES = [
+        false,
+        undefined,
+        null,
+        NaN,
+        0,
+        0.0,
+        -0,
+        +0,
+        -0.0,
+        +0.0,
+        '',
+        {},
+        [],
+    ]
+    ```
+    All other values are not empty (i.e. **truthy**) for evaluation when `equal` is undefined.
+
+#### Bug Fixes
+- **hideOnEmpty**: values listed above are now considered empty (i.e. **untruthy**)
+
+#### Changes
+- **hideOnEmpty** will be deprecated in the next release version
+- Updated CSS styles to match latest EIS DSM style guide
+- Refactored CSS variables and bundling process for Genesis UI Integration
+- Refactored JS code bundling process for Genesis UI Integration
