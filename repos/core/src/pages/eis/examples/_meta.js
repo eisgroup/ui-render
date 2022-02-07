@@ -635,6 +635,17 @@ export default {
                               onClick: 'reset',
                             }
                           },
+                          {
+                            view: 'Button',
+                            className: 'a transparent',
+                            items: [
+                              {
+                                view: 'Icon',
+                                name: 'trash'
+                              },
+                            ],
+                            onClick: 'popup'
+                          }
                         ]
                       },
                     ]

@@ -11,6 +11,7 @@ import { goTo } from '../../common/variables'
 import data from './examples/_data.json'
 import meta from './examples/_meta'
 import listData from './examples/array-nested_data.json'
+import icon_meta from './examples/button-icon_meta'
 import * as tableForm from './examples/data_component'
 import decimalMeta from './examples/decimal_meta.json'
 import dropdownMeta from './examples/dropdown_meta.json'
@@ -34,6 +35,12 @@ import * as tabs from './examples/tabs_meta'
 import UIRender from './rules'
 
 const examples = [
+  {
+    title: 'Button with Icon',
+    id: 'buttonIcon',
+    data: {},
+    meta: icon_meta,
+  },
   {
     title: 'Decimal Points',
     id: 'decimal',

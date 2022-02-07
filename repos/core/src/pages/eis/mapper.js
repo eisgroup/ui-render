@@ -12,6 +12,7 @@ import Counter from 'react-ui-pack/Counter'
 import Dropdown from 'react-ui-pack/Dropdown'
 import Expand from 'react-ui-pack/Expand'
 import ExpandList from 'react-ui-pack/ExpandList'
+import Icon from 'react-ui-pack/Icon'
 import { OK } from 'react-ui-pack/inputs/validationRules'
 import Json from 'react-ui-pack/JsonView'
 import Label from 'react-ui-pack/Label'
@@ -43,6 +44,7 @@ import Data from './Data'
 FIELD.TYPE = {
   AUTO_SUBMIT: 'AutoSubmit',
   DATA: 'Data',
+  ICON: 'Icon',
   TABLE_CELLS: 'TableCells',
 }
 
@@ -154,6 +156,11 @@ Render.Component = function RenderComponent ({
 
     case FIELD.TYPE.COUNTER: {
       return <Counter {...props}/>
+    }
+
+    case FIELD.TYPE.ICON: {
+      if (items.length) props.children = items.map(Render)
+      return <Icon {...props}/>
     }
 
     case FIELD.TYPE.LABEL: {
