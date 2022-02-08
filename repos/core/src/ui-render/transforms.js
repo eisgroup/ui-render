@@ -75,8 +75,21 @@ export function metaToProps (meta, config) {
                 if (definition.view) {
                     const {name, filterItems, ...configs} = definition
                     const revPath = {
-                        relativePath: relativePathFrom(meta, relativePath, relativeIndex),
                         relativeIndex: index
+                    }
+                    // `meta.name` is undefined when Table.headers.renderCell is defined,
+                    // this leads to nested Table with incorrect Input.name, which relies on correct `relativePath`.
+                    // The condition is met when:
+                    //    - meta.name === undefined
+                    //    - relativePath != null
+                    //    - relativeIndex != null
+                    // And requires Table.name to be appended to existing `relativePath`:
+                    //    `${relativePath}.${relativeIndex}.${Table.name}`
+                    // @solution: extract Table.name from class instance `self` because `meta` only has parent config.
+                    if (meta.name == null && relativePath != null && relativeIndex != null && self && self.props) {
+                        revPath.relativePath = relativePathFrom(self.props, relativePath, relativeIndex)
+                    } else {
+                        revPath.relativePath = relativePathFrom(meta, relativePath, relativeIndex)
                     }
                     return Render({
                         // Relative Path is required for nested Inputs

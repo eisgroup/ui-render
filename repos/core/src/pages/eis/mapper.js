@@ -326,12 +326,15 @@ Render.Component = function RenderComponent ({
     }
 
     default: {
-      const {mapOptions, removable, autoSubmit, ...input} = props
+      const {mapOptions, removable, autoSubmit, expanded: _1, ...input} = props
       const {readonly, disabled} = data || {}
       if (mapOptions) input.options = mapProps(input.options || [], mapOptions, {debug})
+
+      // Resolve Input name dynamic path
       if (relativeData !== false && relativePath != null && input.name) {
         input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
       }
+
       // Render Dropdown separately, to avoid triggering form value changes
       if (view === FIELD.TYPE.DROPDOWN) {
         // proxy onChange to prevent event sent as second argument
