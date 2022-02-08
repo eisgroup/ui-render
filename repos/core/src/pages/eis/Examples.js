@@ -159,7 +159,7 @@ const examples = [
   },
   {
     title: 'Experience Ratings',
-    id: 'experienceDetails',
+    id: 'experienceRatings',
     data: experienceDetails_data,
     meta: experienceDetails_meta,
   },
