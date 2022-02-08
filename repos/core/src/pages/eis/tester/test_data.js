@@ -45,17 +45,6 @@ export default {
   'TrendAssumption': 1.03,
   'Credibility': 1,
   'ShowExperienceRating': true,
-  'Plans': [
-    {
-      label: 'Plan 1',
-      Value: 1,
-    },
-    {
-      label: 'Plan 2',
-      Value: 2
-    },
-  ],
-
   'RatesAndExposure': [
     {
       PlanName: 'Plan 1',
