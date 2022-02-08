@@ -33,6 +33,8 @@ import tableVerticalMeta from './examples/table-vertical_meta'
 import * as tableMatrix from './examples/table_matrix'
 import * as tabs from './examples/tabs_meta'
 import UIRender from './rules'
+import experienceDetails_data from './tester/test_data'
+import experienceDetails_meta from './tester/test_meta'
 
 const examples = [
   {
@@ -154,6 +156,12 @@ const examples = [
     id: 'invalidArray',
     data: invalidArrayData,
     meta: invalidArrayMeta,
+  },
+  {
+    title: 'Experience Ratings',
+    id: 'experienceDetails',
+    data: experienceDetails_data,
+    meta: experienceDetails_meta,
   },
   {
     title: 'Rating Details',

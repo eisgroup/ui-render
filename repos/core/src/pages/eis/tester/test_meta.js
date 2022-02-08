@@ -544,8 +544,8 @@ const historicalInformation = {
 export default {
   view: 'Col',
   items: [
-    // experienceRating,
-    // experiencePeriods,
+    experienceRating,
+    experiencePeriods,
     experienceRatesAndExposure,
     historicalInformation,
   ]
