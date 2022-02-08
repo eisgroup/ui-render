@@ -31,6 +31,7 @@
 @input-swatch-height: size(36);
 // Icons
 @select-icons: ~'> i.icon.delete, > i.icon.dropdown, > i.icon.search, > i[class^="icon-"], > i[class*=" icon-"]';
+@input-select-icon: ~'.text.icon, i[class^="icon-"], i[class*=" icon-"]';
 
 // -----------------------------------------------------------------------------
 // MIXINS ----------------------------------------------------------------------
@@ -217,7 +218,7 @@ input, select, textarea {
     box-shadow: inherit; // fix for Firefox
   }
 
-  + @{select-icon} {
+  + @{input-select-icon} {
     font-size: @size-icon; // ensure icon is crisp
   }
 
@@ -251,7 +252,7 @@ input, select, textarea {
     .scalePadding(@size: @input-font-size-large, @top: @input-padding-v, @left: @input-padding-h);
 
     // TBD: improvement - this does not target lefty icons
-    + @{select-icon} {
+    + @{input-select-icon} {
       font-size: @input-font-size-large-icon;
     }
   }
@@ -606,7 +607,7 @@ input, select, textarea {
     }
   }
 
-  @{select-icon} {
+  @{input-select-icon} {
     font-size: @input-font-size-icon; // hard code size to ensure icon is crisp
   }
 }
@@ -627,7 +628,7 @@ div.select {
   &.icon {
     font-size: inherit; // prevent Semantic UI override
 
-    @{select-icon} {
+    @{input-select-icon} {
       &:extend(.no-outline all);
       z-index: 1;
 
@@ -639,7 +640,7 @@ div.select {
     }
 
     &.top {
-      @{select-icon} {
+      @{input-select-icon} {
         .padding-v(@input-padding-v-value);
       }
     }
@@ -666,7 +667,7 @@ div.select {
       @iconOffsetBefore: @margin + @iconPadding;
       @iconOffsetAfter: @offset - @iconPadding;
 
-      @{select-icon} {
+      @{input-select-icon} {
         padding: @iconPadding;
       }
 
@@ -676,7 +677,7 @@ div.select {
           padding-right: @padding
         }
 
-        @{select-icon} {
+        @{input-select-icon} {
           margin-left: -@iconOffsetBefore;
           margin-right: @iconOffsetAfter;
         }
@@ -693,7 +694,7 @@ div.select {
           }
         }
 
-        @{select-icon} {
+        @{input-select-icon} {
           margin-right: -@iconOffsetBefore;
           margin-left: @iconOffsetAfter;
         }
@@ -874,7 +875,7 @@ div.select {
       &:extend(.bg-transparent all);
     }
 
-    ~ @{select-icon} {
+    ~ @{input-select-icon} {
       &:not(.dropdown) {
         display: none;
       }
@@ -1056,7 +1057,7 @@ input.checkbox.toggle {
       .margin-v(@checkbox-padding-size * 2);
       .margin-h(@checkbox-padding-size * 4);
 
-      @{select-icon} {
+      @{input-select-icon} {
         .font-size(@size-smaller);
         margin: 0;
       }

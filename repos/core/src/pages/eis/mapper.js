@@ -41,13 +41,6 @@ import Data from './Data'
  * =============================================================================
  */
 
-FIELD.TYPE = {
-  AUTO_SUBMIT: 'AutoSubmit',
-  DATA: 'Data',
-  ICON: 'Icon',
-  TABLE_CELLS: 'TableCells',
-}
-
 Render.Tooltip = TooltipPop
 
 /**
@@ -360,6 +353,7 @@ Render.Component = function RenderComponent ({
             view = FIELD.TYPE.TOGGLE
             break
         }
+        if (input.icon && input.icon.view) input.icon = Render({debug, ...input.icon})
       }
 
       // Auto submit on changes

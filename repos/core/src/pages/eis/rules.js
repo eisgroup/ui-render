@@ -24,8 +24,23 @@ FIELD.ACTION = {
   REMOVE_DATA: 'removeData',
   POPUP_DELAY: 'popupDelay',
 }
+FIELD.TYPE = {
+  AUTO_SUBMIT: 'AutoSubmit',
+  DATA: 'Data',
+  ICON: 'Icon',
+  TABLE_CELLS: 'TableCells',
+}
 FIELD.VALIDATE = {
   NOT_WITHIN_RANGE: 'notWithinRange',
+}
+FIELD.NORMALIZE = {
+  ...FIELD.NORMALIZE,
+  CURRENCY: 'currency',
+}
+FIELD.NORMALIZER = {
+  ...FIELD.NORMALIZER,
+  [FIELD.NORMALIZE.DATE]: (val) => val && val.split('T')[0],
+  [FIELD.NORMALIZE.CURRENCY]: (val) => Number((val || 0) || 0).toFixed(2),
 }
 
 /**
