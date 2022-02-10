@@ -45,6 +45,10 @@ export default {
   'TrendAssumption': 1.03,
   'Credibility': 1,
   'ShowExperienceRating': true,
+  'ReportPeriods': [
+    {PeriodName: 'Year'},
+    {PeriodName: 'Month'},
+  ],
   'RatesAndExposure': [
     {
       PlanName: 'Plan 1',

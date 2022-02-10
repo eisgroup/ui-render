@@ -23,6 +23,17 @@ const dropdownPlan = {
   'compact': true
 }
 
+const dropdownPeriod = {
+  'view': 'Dropdown',
+  'name': 'period',
+  'options': {
+    name: 'ReportPeriods',
+    relativeData: false
+  },
+  'mapOptions': 'PeriodName',
+  'compact': true
+}
+
 const tableCellInputCurrency = {
   view: 'Input',
   format: 'currency',
@@ -533,11 +544,24 @@ const historicalInformation = {
   styles: 'bg-neutral padding-larger margin-top-larger',
   items: [
     {
-      view: 'Title',
-      children: 'Historical Information',
-      styles: 'padding-v-smaller'
+      view: 'Row',
+      styles: 'wrap bottom justify margin-v-smaller',
+      items: [
+        {
+          view: 'Title',
+          children: 'Historical Information',
+        },
+        dropdownPeriod,
+      ]
     },
-    tableHistoricalInformation,
+    {
+      ...cloneDeep(tableHistoricalInformation),
+      showIf: {
+        name: 'ReportPeriods.{state.period,0}.PeriodName',
+        equal: 'Year',
+        relativeData: false,
+      }
+    },
   ],
 }
 
