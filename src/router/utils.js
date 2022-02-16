@@ -23,7 +23,7 @@ export function idFromRoute (props) {
  */
 export function routeFrom (props, suffix = '') {
   let route = get(props, 'history.location.pathname', '')
-  if (route) route = route.substr(0, route.lastIndexOf('/'))
+  if (route && route.lastIndexOf('/') !== route.indexOf('/')) route = route.substr(0, route.lastIndexOf('/'))
   if (!route && props.router) route = props.router.pathname.replace('/[id]', '') // next.js
   return route + suffix
 }

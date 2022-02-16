@@ -1,4 +1,4 @@
-import { isAdmin, isCompany, isIndividual, isStaff } from 'modules-pack/user/logic'
+import { hasStaffOrHigherRole, isAdmin, isCompany, isIndividual, isStaff } from 'modules-pack/user/logic'
 import { DEFAULT } from 'modules-pack/variables'
 import { Active } from 'utils-pack'
 import selector from 'utils-pack/selectors'
@@ -15,7 +15,7 @@ import { USER } from './constants'
 export default class select {
   static self = () => [
     (state) => state[USER].self,
-    (val) => val || {}
+    (val) => Active.user = val || {}
   ]
 
   static id = () => [
@@ -61,6 +61,13 @@ export default class select {
     return [
       this.role,
       isStaff,
+    ]
+  }
+
+  static hasStaffOrHigherRole = function () {
+    return [
+      this.role,
+      hasStaffOrHigherRole,
     ]
   }
 
