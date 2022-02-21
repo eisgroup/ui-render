@@ -13,6 +13,7 @@ export function Tags ({
   defByCode, // example: tag.select.tagById(state)
   label,
   className,
+  classNameInner,
   classNameItem,
   onClick,
   ...props
@@ -22,7 +23,7 @@ export function Tags ({
   return (
     <Container className={cn('app__tags margin-v-smaller', className)} {...props}>
       {label && <Text><Icon name="tags"/>{label}</Text>}
-      <Row className="wrap middle">
+      <Row className={cn('wrap middle', classNameInner)}>
         {!label && <Icon name="tags" className="margin-right-smaller"/>}
         {items.map(tag => (
           <View

@@ -1,6 +1,6 @@
 {
   "name": "react-ui-pack",
-  "version": "0.10.5",
+  "version": "0.10.6",
   "description": "Reusable React Components",
   "license": "MIT",
   "main": "index.js",
@@ -22,9 +22,8 @@
     "delete": "../../node_modules/rimraf/bin.js"
   },
   "peerDependencies": {
-    "chroma-js": "2.x",
-    "react": "16.x",
-    "utils-pack": "0.3.x"
+    "react": "16.*",
+    "utils-pack": "*"
   },
   "dependencies": {
     "chroma-js": "^2.1.0",
