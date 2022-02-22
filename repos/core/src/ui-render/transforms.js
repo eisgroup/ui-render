@@ -83,10 +83,14 @@ export function metaToProps (meta, config) {
                     //    - meta.name === undefined
                     //    - relativePath != null
                     //    - relativeIndex != null
+                    //    - self.props.name !== relativePath.split('.').pop() // when Table is nested inside List
                     // And requires Table.name to be appended to existing `relativePath`:
                     //    `${relativePath}.${relativeIndex}.${Table.name}`
                     // @solution: extract Table.name from class instance `self` because `meta` only has parent config.
-                    if (meta.name == null && relativePath != null && relativeIndex != null && self && self.props) {
+                    if (
+                      meta.name == null && relativePath != null && relativeIndex != null &&
+                      self && self.props && self.props.name !== relativePath.split('.').pop()
+                    ) {
                         revPath.relativePath = relativePathFrom(self.props, relativePath, relativeIndex)
                     } else {
                         revPath.relativePath = relativePathFrom(meta, relativePath, relativeIndex)

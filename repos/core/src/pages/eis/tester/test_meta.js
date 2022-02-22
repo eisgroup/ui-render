@@ -272,7 +272,7 @@ const tableRatesAndExposure = {
       'label': 'Exposure - Current Period',
       'classNameHeader': 'padding-h-small text-align-left',
       renderCell: {
-        ...tableCellInputCurrency,
+        ...cloneDeep(tableCellInputCurrency),
         name: 'ExposureCurrentPeriod'
       }
     },
@@ -288,7 +288,7 @@ const tableRatesAndExposure = {
       'label': 'Manual Rates - Current Period',
       'classNameHeader': 'padding-h-small text-align-left',
       renderCell: {
-        ...tableCellInputCurrency,
+        ...cloneDeep(tableCellInputCurrency),
         name: 'ManualRatesCurrentPeriod'
       }
     },
@@ -297,7 +297,7 @@ const tableRatesAndExposure = {
       'label': 'Charge Rates - 1st Period',
       'classNameHeader': 'padding-h-small text-align-left',
       renderCell: {
-        ...tableCellInputCurrency,
+        ...cloneDeep(tableCellInputCurrency),
         name: 'ChargeRates1stPeriod'
       }
     },
@@ -306,7 +306,7 @@ const tableRatesAndExposure = {
       'label': 'Charge Rates - 2nd Period',
       'classNameHeader': 'padding-h-small text-align-left',
       renderCell: {
-        ...tableCellInputCurrency,
+        ...cloneDeep(tableCellInputCurrency),
         name: 'ChargeRates2ndPeriod'
       }
     },
@@ -315,7 +315,7 @@ const tableRatesAndExposure = {
       'label': 'Charge Rates - 3rd Period',
       'classNameHeader': 'padding-h-small text-align-left',
       renderCell: {
-        ...tableCellInputCurrency,
+        ...cloneDeep(tableCellInputCurrency),
         name: 'ChargeRates3rdPeriod'
       }
     },
@@ -328,7 +328,7 @@ const tableHistoricalInformationHeaders = [
     'label': 'Billed Premium',
     'classNameHeader': 'padding-h-small text-align-left',
     renderCell: {
-      ...tableCellInputCurrency,
+      ...cloneDeep(tableCellInputCurrency),
       name: 'BilledPremium'
     }
   },
@@ -337,7 +337,7 @@ const tableHistoricalInformationHeaders = [
     'label': 'Exposure',
     'classNameHeader': 'padding-h-small text-align-left',
     renderCell: {
-      ...tableCellInputCurrency,
+      ...cloneDeep(tableCellInputCurrency),
       name: 'Exposure'
     }
   },
@@ -346,7 +346,7 @@ const tableHistoricalInformationHeaders = [
     'label': 'Paid Claims',
     'classNameHeader': 'padding-h-small text-align-left',
     renderCell: {
-      ...tableCellInputCurrency,
+      ...cloneDeep(tableCellInputCurrency),
       name: 'PaidClaims'
     }
   },
@@ -355,7 +355,7 @@ const tableHistoricalInformationHeaders = [
     'label': 'Completion Factor',
     'classNameHeader': 'padding-h-small text-align-left',
     renderCell: {
-      ...tableCellInputCurrency,
+      ...cloneDeep(tableCellInputCurrency),
       name: 'CompletionFactor'
     }
   },
@@ -364,7 +364,7 @@ const tableHistoricalInformationHeaders = [
     'label': 'Fully Incurred Claims',
     'classNameHeader': 'padding-h-small text-align-left',
     renderCell: {
-      ...tableCellInputCurrency,
+      ...cloneDeep(tableCellInputCurrency),
       name: 'FullyIncurredClaims'
     }
   },
@@ -373,7 +373,7 @@ const tableHistoricalInformationHeaders = [
     'label': 'IBNR',
     'classNameHeader': 'padding-h-small text-align-left',
     renderCell: {
-      ...tableCellInputCurrency,
+      ...cloneDeep(tableCellInputCurrency),
       name: 'IBNR'
     }
   },
