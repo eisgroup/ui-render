@@ -27,6 +27,7 @@ export const Active = {
   SETTINGS: {}, // User settings
   Storage: typeof localStorage !== 'undefined' ? localStorage : undefined, // LocalStorage for Node
   WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : undefined, // WebSocket for Node
+  history: {}, // Cross Platform route history object
   iconClass: '', // CSS className for <Icon />
   iconClassPrefix: 'icon-', // CSS className prefix for <Icon />
   client: undefined, // Apollo client

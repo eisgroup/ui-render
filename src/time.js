@@ -22,7 +22,7 @@ import { isNumeric, startEndFromNumberRanges } from './number'
  * Convert Time Duration to User Friendly and Readable Format
  *
  * @param {Number} milliseconds - duration in milliseconds to convert
- * @param {Array} [options] - other humanize options, like `largest` to trim down units
+ * @param {Object} [options] - other humanize options, like `largest` to trim down units
  * @param {Boolean} [shorten] - whether to shorten words, like `seconds` to `s`
  * @returns {String} - formatted time
  */

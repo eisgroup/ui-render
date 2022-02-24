@@ -170,7 +170,7 @@ export function objChanges (original, changed) {
  * @see https://lodash.com/docs/4.17.4#set
  *
  * @param {Object} object - The object to modify
- * @param {String|String[]} path - The path in the given object to set the provided values
+ * @param {String|String[]|Number|Number[]} path - The path in the given object to set the provided values
  * @param {*} value - The value to set
  * @param {Function} [customizer] - An optional function that specifies how to fill in a missing path
  * @returns {Object}
