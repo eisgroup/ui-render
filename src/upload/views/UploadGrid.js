@@ -265,7 +265,7 @@ export default class UploadGrid extends Component {
                 {file.src
                   ? (
                     <View className="upload__file"
-                          style={{...preview == null && {backgroundImage: cssBgImageFrom(file)}}}>
+                          style={{...preview == null && {backgroundImage: cssBgImageFrom(file.src)}}}>
                       {isFunction(preview) ? preview(file, i, this) : preview}
                       <Text className="upload__file__label">{shouldCount ? (i + 1) : file.name}</Text>
                       {hasRemove
