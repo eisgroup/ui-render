@@ -1,14 +1,14 @@
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 import React from 'react'
 import { fileNameWithoutExt } from 'utils-pack'
 import { FILE } from './files'
+import { type } from './types'
 
 /**
  * Image - Pure Component.
  *
- * @param {String} name - file name path
- * @param {String} [path] - file directory path
+ * @param {String} name - file name
+ * @param {String} [path] - file directory path to use if `src` not given
  * @param {String} [className] - optional css class
  * @param {*} [props] - other attributes to pass to `<img>`
  * @returns {Object} - React component
@@ -16,23 +16,25 @@ import { FILE } from './files'
 export function Image ({
   name,
   path,
-  className = '',
+  className,
   ...props
 }) {
-  return (
-    <img
-      src={imageSrc({name, path})}
-      alt={fileNameWithoutExt(name)}
-      className={classNames('app__image', className)}
-      {...props}
-    />
-  )
+  if (props.src == null) props.src = imageSrc({name, path})
+  if (props.alt == null) props.alt = fileNameWithoutExt(name)
+  return <img className={classNames('app__image', className)} {...props}/>
 }
 
+Image.defaultProps = {
+  decoding: 'async',
+  loading: 'lazy',
+}
 Image.propTypes = {
-  name: PropTypes.string.isRequired,
-  path: PropTypes.string,
-  className: PropTypes.string,
+  // Required if `src` or `alt` not defined
+  name: type.String,
+  path: type.String,
+  className: type.String,
+  decoding: type.Enum(['auto', 'async', 'sync']),
+  loading: type.Enum(['eager', 'lazy']),
 }
 
 export function imageSrc ({avatar, src, name = '', path = FILE.PATH_IMAGES}) {
