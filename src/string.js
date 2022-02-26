@@ -1,6 +1,16 @@
 import { capitalize, get } from 'lodash'
 import pluralizer from 'pluralize'
 
+export const alphaNumPattern = /[^a-zA-Z0-9]/g
+export const alphaNumIdPattern = /[^a-zA-Z0-9_-]/g
+export const escapeRegExpPattern = /[.*+?^${}()|[\]\\]/g
+export const fileNameWithoutExtPattern = /\.[^.$]+$/
+export const hyphensPattern = /-+/g
+export const hyphensTrimPattern = /^-+|-+$/g
+export const isBase64Pattern = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/
+// Matches multiples spaces, including tabs, newline, etc.
+export const spacesPattern = /\s\s+/g
+
 // Random String Generation (with increased search space to 88^n)
 const symbols = `~!@#%^&*()[]|{}<>:;,.?-+_=` // only use safe symbols
 const symbolRatio = symbols.length / (62 + symbols.length) // rate of symbols against alphanumeric characters
@@ -13,29 +23,14 @@ const upperThresholdAlphaNum = 1 - 26 / 62 // minimum Math.random() result for u
  */
 
 /**
- * Replace multiple spaces, tabs, newlines, etc. in a String with a single space
- * and trim spaces at the beginning and end.
- *
- * @param {String} string -  to sanitize
- * @returns {String} trimmed
- */
-export function cleanSpaces (string) {
-	return string.replace(cleanSpaces, ' ').trim()
-}
-
-cleanSpaces.pattern = /\s\s+/g
-
-/**
  * Escape String for use in Regex Expression
  * @see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
  * @param {String} string - to be sanitized
  * @returns {String} string - escaped for Regex use
  */
 export function escapeRegExp (string) {
-	return string.replace(escapeRegExp.pattern, '\\$&') // $& means the whole matched string
+	return string.replace(escapeRegExpPattern, '\\$&') // $& means the whole matched string
 }
-
-escapeRegExp.pattern = /[.*+?^${}()|[\]\\]/g
 
 /**
  * Convert String to RegexExp (with given String being escaped first)
@@ -79,16 +74,16 @@ export function getCookie(cookie, key) {
  * @returns {String|Undefined} - value if found, else undefined
  */
 export function getParamByKey (key, url = window.location.href) {
-	key = key.replace(getParamByKey.pattern, '\\$&')
+	key = key.replace(getParamByKeyPattern, '\\$&')
 	const regex = new RegExp('[?&]' + key + '(=([^&#]*)|&|#|$)')
 	const results = regex.exec(url)
 	if (!results) return undefined
 	if (!results[2]) return ''
-	return decodeURIComponent(results[2].replace(getParamByKey.patternSpace, ' '))
+	return decodeURIComponent(results[2].replace(getParamByKeySpacePattern, ' '))
 }
 
-getParamByKey.pattern = /[[\]]/g
-getParamByKey.patternSpace = /\+/g
+export const getParamByKeyPattern = /[[\]]/g
+export const getParamByKeySpacePattern = /\+/g
 
 /**
  * Get URI from given URL string
@@ -157,10 +152,8 @@ export function insertToString (string, index, value) {
  * @returns {Boolean} true - if it is a valid Base64 encoded string
  */
 export function isBase64 (string) {
-	return isBase64.pattern.test(string)
+	return isBase64Pattern.test(string)
 }
-
-isBase64.pattern = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/
 
 /**
  * Check if given string is a File URL or Path.
@@ -179,10 +172,10 @@ export function isFileSrc (string) {
  * @returns {Boolean} true - if value given is a valid IP address string
  */
 export function isIpAddress (address) {
-	return typeof address === 'string' && isIpAddress.pattern.test(address)
+	return typeof address === 'string' && isIpAddressPattern.test(address)
 }
 
-isIpAddress.pattern = new RegExp(
+export const isIpAddressPattern = new RegExp(
 	'^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}' +
 	'([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$|^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)' +
 	'*([A-Za-z]|[A-Za-z][A-Za-z0-9\\-]*[A-Za-z0-9])$|^\\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|((' +
@@ -206,10 +199,10 @@ isIpAddress.pattern = new RegExp(
  * @returns {Boolean} true - if is valid phone number
  */
 export function isPhoneNumber(string) {
-	return isPhoneNumber.pattern.test(string)
+	return isPhoneNumberPattern.test(string)
 }
 
-isPhoneNumber.pattern = /^\+[0-9()\-\s]+$/
+export const isPhoneNumberPattern = /^\+[0-9()\-\s]+$/
 
 /**
  * Check if given value is a String
@@ -243,7 +236,7 @@ export function isString(value) {
  * @return {String} output - with interpolated variables
  */
 export function interpolateString (string, variables = {}, {formatKey, name, suppressError} = {}) {
-	return string.replace(interpolateString.pattern, (__, match) => {
+	return string.replace(interpolateStringPattern, (__, match) => {
 		let key = match
 		if (formatKey) key = formatKey.replace('key', key)
 		// noinspection JSCheckFunctionSignatures
@@ -258,7 +251,7 @@ export function interpolateString (string, variables = {}, {formatKey, name, sup
 	})
 }
 
-interpolateString.pattern = /{([^{}]+)}/g
+export const interpolateStringPattern = /{([^{}]+)}/g
 
 /**
  * Remove brackets around strings (add a dot before it, except when bracket is the first character)
@@ -270,12 +263,11 @@ interpolateString.pattern = /{([^{}]+)}/g
  */
 export function formatKeyPath(keyPath) {
 	return keyPath.replace(
-		formatKeyPath.pattern,
-		(match, match1, match2, match3, offset) => (offset > 0 ? '.' : '') + String(match2)
+		formatKeyPathPattern, (match, match1, match2, match3, offset) => (offset > 0 ? '.' : '') + String(match2)
 	)
 }
 
-formatKeyPath.pattern = /(\[)(.*?)(\])/g
+export const formatKeyPathPattern = /(\[)(.*?)(\])/g
 
 /**
  * Get File Name Format Extension from String
@@ -312,10 +304,8 @@ export function fileFormatNormalized (fileName) {
  * @param {string} fileName - full file name with extension
  */
 export function fileNameWithoutExt (fileName) {
-	return fileName.replace(fileNameWithoutExt.pattern, '')
+	return fileName.replace(fileNameWithoutExtPattern, '')
 }
-
-fileNameWithoutExt.pattern = /\.[^.$]+$/
 
 /**
  * Convert Data URL, such as Base64 Image string to JS File object
@@ -623,10 +613,8 @@ export function toHex(string) {
  * @returns {String} - with alpha numeric characters only
  */
 export function toAlphaNum(string) {
-	return string.replace(toAlphaNum.pattern, '')
+	return string.replace(alphaNumPattern, '')
 }
-
-toAlphaNum.pattern = /[^a-zA-Z0-9]/g
 
 /**
  * Convert String to Alpha Numeric Characters with dashes and underscores
@@ -635,10 +623,21 @@ toAlphaNum.pattern = /[^a-zA-Z0-9]/g
  * @returns {String} - with alpha numeric characters, dash and underscore only
  */
 export function toAlphaNumId(string) {
-	return string.replace(toAlphaNumId.pattern, '')
+	return string.replace(alphaNumIdPattern, '')
 }
 
-toAlphaNumId.pattern = /[^a-zA-Z0-9_-]/g
+/**
+ * Sanitize String for use in URL without encoding.
+ * @param {String} string - to sanitize, can contain any characters
+ * @returns {String} URI - sanitized for browser URL, without encoding/decoding
+ */
+export function toURI (string) {
+	return string && string.replace(spacesPattern, '-') // remove spaces/newlines before stripping special characters
+		.replace(alphaNumIdPattern, '-') // convert all invalid characters to hyphen
+		.replace(hyphensPattern, '-') // may have hyphen at the start or end
+		.replace(hyphensTrimPattern, '')
+		.toLowerCase()
+}
 
 /**
  * Truncate a String to Given Character Length, Showing the Last n Characters at the End
@@ -698,10 +697,8 @@ export function toUpperCaseAny (value) {
  * @returns {String|*} string - trimmed
  */
 export function trimSpaces (string) {
-	return string && string.replace(trimSpaces.pattern, ' ').trim()
+	return string && string.replace(spacesPattern, ' ').trim()
 }
-
-trimSpaces.pattern = /\s\s+/g
 
 /**
  * Create RFC4122 Complaint Version 4 UUID

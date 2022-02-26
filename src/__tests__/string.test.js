@@ -11,6 +11,7 @@ import {
   randomString,
   regexExp,
   sha256,
+  toURI,
   truncate
 } from '../string'
 
@@ -85,6 +86,14 @@ it(`${fileNameWithoutExt.name}() returns file name without extension`, () => {
 
 it(`${sha256.name}() hashes string correctly to 64 characters long`, () => {
   expect(sha256(randomString()).length).toEqual(64)
+})
+
+it(`${toURI.name}() returns sanitized AlphaNumericHyphen string for use in browser URL`, () => {
+  expect(toURI('')).toEqual('')
+  expect(toURI(' Test dot.   count!?123 4567*&^%  \n"')).toEqual('test-dot-count-123-4567')
+  expect(toURI('\n Test dot.   count!?123 4567*&^%  \n"')).toEqual('test-dot-count-123-4567')
+  expect(toURI('\n Test dot.   count!?\n123 4567*&^%  \n\n"')).toEqual('test-dot-count-123-4567')
+  expect(toURI('\n Test dot. \tcount!?\n123 4567*&^%  \n\n"')).toEqual('test-dot-count-123-4567')
 })
 
 it(`${truncate.name}() return shortened string with ellipses and last n characters`, () => {
