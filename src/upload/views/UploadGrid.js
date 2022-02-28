@@ -213,7 +213,7 @@ export default class UploadGrid extends Component {
    * @param {Array<Object<i, remove, file>>} changedFiles - list of changed files of type.FileInput
    */
   updateFiles = (files, changedFiles) => {
-    const {onChange, onChangeLast, multiple} = this.props
+    const {onChange, onChangeLast, multiple, name} = this.props
     const count = this.count
     const isArray = count > 1 || multiple
     changedFiles.forEach(file => {
@@ -224,15 +224,15 @@ export default class UploadGrid extends Component {
     // `i` may be undefined or NaN for single upload
     this.setState({files: this.isIncremental ? files.sort(by('i')).filter(f => f.i < count) : files})
     if (onChangeLast) {
-      onChangeLast(isArray ? changedFiles : changedFiles[0])
+      onChangeLast(isArray ? changedFiles : changedFiles[0], name)
     } else if (onChange) {
-      onChange(isArray ? Object.values(this.changedValues) : changedFiles[0])
+      onChange(isArray ? Object.values(this.changedValues) : changedFiles[0], name)
     }
   }
 
   render () {
     const {
-      label, loading, placeholder, square, count: _, kind, types, showCount, showName,
+      label, loading, placeholder, square, count: _, name, kind, types, showCount, showName,
       error, info, iconUpload, iconRemove, preview,
       className, style,
       ...props
@@ -250,12 +250,13 @@ export default class UploadGrid extends Component {
       <View className={cn('input--wrapper', className)} style={style}>
         {label && <Label>{label}</Label>}
         <Grid fill className={cn(`upload-grid count-${count}`, {error, info, wrap: !squared})} {...square}>
-          {this.previews.map((file, i) => (
+          {this.previews.map((file, i, arr) => (
             <View
               key={file.i || i}
               className={cn('upload-grid__item', {preview: !!file.src})}>
               <Upload
                 {...props}
+                name={name + (arr.length > 1 ? `.${file.i}` : '')}
                 multiple={multiple}
                 autoClean={false}
                 hasHeader={false}

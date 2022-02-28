@@ -82,6 +82,7 @@ export default class UploadGrids extends Component {
                 // key={_} // do not add key to avoid unmounting, which causes layout shift
                 // Component updates between tab changes by having different initialValues
                 kind={_}
+                name={_}
                 types={types}
                 initialValues={files.filter(f => f.kind === _)}
                 onChangeLast={this.handleChange}

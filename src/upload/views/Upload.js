@@ -63,7 +63,7 @@ export default class Upload extends PureComponent {
       PropTypes.string,
       PropTypes.number
     ]),
-    /* Callback(acceptedFiles, this.type) onDrop files */
+    /* Callback(acceptedFiles, name) onDrop files */
     onUpload: PropTypes.func,
     /* Callback when close button is clicked (ex. history.goBack()) */
     onClose: PropTypes.func,
@@ -118,7 +118,7 @@ export default class Upload extends PureComponent {
   handleUpload = (acceptedFiles, rejectedFiles) => {
     log('acceptedFiles:', acceptedFiles)
     log('rejectedFiles:', rejectedFiles)
-    const {actions, onUpload} = this.props
+    const {actions, onUpload, name} = this.props
     if (hasListValue(acceptedFiles)) {
       const maxSize = this.maxSize
       for (const file of acceptedFiles) {
@@ -133,7 +133,7 @@ export default class Upload extends PureComponent {
         })
       }
       actions.upload(acceptedFiles, this.type)
-      isFunction(onUpload) && onUpload(acceptedFiles, this.type)
+      isFunction(onUpload) && onUpload(acceptedFiles, name)
     } else {
       actions.popup({
         title: _.FILE_UPLOAD_FAILED,
@@ -170,8 +170,8 @@ export default class Upload extends PureComponent {
 
   render () {
     const {
-      type, loading, children, multiple, disabled, readonly, onBlur, labelOnHover,
-      className, hasHeader, round, showTypes
+      type, loading, children, multiple, disabled, readonly, onBlur, name, labelOnHover,
+      className, hasHeader, round, showTypes, title,
     } = this.props
     const label = this.props.label || this.type || _.FILE
     const {active} = this.state
@@ -185,6 +185,8 @@ export default class Upload extends PureComponent {
         <Dropzone
           // @note: When tabbing to dropzone with keyboard, input[type="file"] also gets event -> causing open twice.
           //      => input is hidden by dropzone because it has ugly "Choose File" button
+          name={name}
+          title={title}
           inputProps={inputProps}
           tabIndex={disabled ? -1 : 0}
           className={classNames('upload__dropzone', className, {active, round, disabled, readonly})}
