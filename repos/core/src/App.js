@@ -1,6 +1,6 @@
 import Popup from 'modules-pack/popup/views/Popup'
 import { connect } from 'modules-pack/redux'
-import { Switch, withRouter } from 'modules-pack/router'
+import { Switch, withRouter } from 'modules-pack/router/browser'
 import { select, SETTING } from 'modules-pack/settings'
 import { withTracker } from 'modules-pack/tracking'
 // import AcceptCookie from 'modules-pack/tracking/views/AcceptCookie'

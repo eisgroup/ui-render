@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "yarn workspace web start",
-    "build": "yarn workspace web build && yarn workspace server build",
+    "build": "yarn workspace web build",
     "deploy": "yarn workspace web deploy",
     "scan": "./node_modules/.bin/madge --circular repos --exclude 'node_modules/'",
     "test": "jest",

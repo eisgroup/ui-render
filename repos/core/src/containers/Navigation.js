@@ -1,5 +1,5 @@
 import { connect, stateAction } from 'modules-pack/redux'
-import router from 'modules-pack/router'
+import router from 'modules-pack/router/browser'
 import settings, { UI } from 'modules-pack/settings'
 import { ROUTES } from 'modules-pack/variables'
 import React, { Component } from 'react'

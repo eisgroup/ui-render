@@ -11353,10 +11353,10 @@ module-lookup-amd@^6.1.0:
     requirejs "^2.3.5"
     requirejs-config-file "^3.1.1"
 
-modules-pack@^0.9.8:
-  version "0.9.8"
-  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.9.8.tgz#8990e41d0c86501c664bd3a7c2699ee61abd453d"
-  integrity sha512-uf4hNu509sYafF+gW6U91G+ik35JCQcGhfzdgPbfBed9/KPWZsg6H/x5FSmB9ig2OL4zaQ/CpGHA+pwffUgwcQ==
+modules-pack@^0.11.18:
+  version "0.11.18"
+  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.11.18.tgz#90e16ca3fcb113ab26b66603e2d2629217916535"
+  integrity sha512-ab3qoC8luInuNf5ipvsvQ4aV107CqULpBC0Ce5CvFwJocvFwPme51usVUQJtITf/J1Vg3HoD0sVligjmgHn7wg==
   dependencies:
     axios "^0.21.1"
     backoff "^2.5.0"
@@ -13973,10 +13973,10 @@ react-transition-group@^2.5.0:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react-ui-pack@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.9.0.tgz#153abfdda6c0c81c7839619139104e3890b5e541"
-  integrity sha512-+pgAxCFMKRi6bkNaQ7ZP7UPc5QSt1VsjdRXYqmHWIgWjDjE2wTtsFpMLfBWtlvp5VEe+fQKyNGo1VJ/v1VByJQ==
+react-ui-pack@^0.10.8:
+  version "0.10.8"
+  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.10.8.tgz#42e897d9a16618bab86ddaf4c073f2958f8d6823"
+  integrity sha512-EqR023+VCKlPmoSTkASs8v427WoN11eVMdsDsKv/sa+mAv1QwvzRWuO0nCTEzinJAmlRPPCYyva0xsq5NGFbdw==
   dependencies:
     chroma-js "^2.1.0"
     classnames "^2.2.6"
@@ -16797,10 +16797,10 @@ utils-merge@1.0.1:
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
 
-utils-pack@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/utils-pack/-/utils-pack-0.9.0.tgz#9b038e9f671f54bae2a16c68ea932657d7d543b5"
-  integrity sha512-QUvPySibWp6CQTmr41CoEzEL1+bK7FzrgqdHCrtTPfSGUg2VD53DvQHjiPtXhU4/amwQR0mxmgiFsX0StuUyPw==
+utils-pack@^0.10.8:
+  version "0.10.8"
+  resolved "https://registry.yarnpkg.com/utils-pack/-/utils-pack-0.10.8.tgz#b237eb30403a12715bf00b64290d10cebe41e431"
+  integrity sha512-9OtYxOS/aBKNnqGb91raElzEsmtwHOtbUR0KZ1L+JQS1H7PuKRUncRjUNONm7t10s8pmVzQsG+l2e1N2jcwzEw==
   dependencies:
     bson-objectid "^1.3.1"
     circular-json "^0.5.9"

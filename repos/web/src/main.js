@@ -2,7 +2,7 @@
 import App from 'core/src/App'
 import pages from 'core/src/pages'
 import Redux from 'modules-pack/redux'
-import router from 'modules-pack/router'
+import router from 'modules-pack/router/browser'
 import { ROUTES } from 'modules-pack/variables'
 import React from 'react'
 import { render } from 'react-dom'

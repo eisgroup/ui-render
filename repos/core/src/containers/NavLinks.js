@@ -1,5 +1,5 @@
 import { connect } from 'modules-pack/redux'
-import router, { Link } from 'modules-pack/router'
+import router, { Link } from 'modules-pack/router/browser'
 import { ROUTE } from 'modules-pack/variables'
 import React, { Component, Fragment } from 'react'
 import { PropTypes, STYLE } from 'react-ui-pack'

@@ -2,12 +2,12 @@ import React, { Component } from 'react'
 import { Helmet } from 'react-helmet'
 import Markdown from 'react-markdown'
 import ScrollView from 'react-ui-pack/ScrollView'
-import Tabs from 'react-ui-pack/Tabs'
 import toc from 'remark-toc'
 import { __PROD__, get, logRender } from 'utils-pack'
 import { goTo, ROUTE } from '../../common/variables'
 import changelog from './changelog.md'
 import CodeBlock from './CodeBlock'
+import Tabs from './components/Tabs'
 import config from './config.md'
 import Demo from './demo'
 import docs from './docs.md'
@@ -36,13 +36,34 @@ export default class Docs extends Component {
   }
 
   tabs = [
-    {id: '', title: 'Summary'},
-    {id: 'configuration', title: 'Configuration'},
-    {id: 'demo', title: 'Demo'},
-    {id: 'examples', title: 'Examples'},
-    {id: 'styles', title: 'Styles'},
-    {id: 'changelog', title: 'Change Log'},
-    {id: 'faq', title: 'FAQ'},
+    {
+      id: '', tab: 'Summary',
+      content: () => <Markdown source={this.state.docs} {...mdProps}/>,
+    },
+    {
+      id: 'configuration', tab: 'Configuration',
+      content: () => <Markdown source={this.state.config} {...mdProps}/>,
+    },
+    {
+      id: 'demo', tab: 'Demo',
+      content: () => <Demo/>,
+    },
+    {
+      id: 'examples', tab: 'Examples',
+      content: () => <Examples/>,
+    },
+    {
+      id: 'styles', tab: 'Styles',
+      content: () => <Markdown source={this.state.styles} {...mdProps}/>,
+    },
+    {
+      id: 'changelog', tab: 'Change Log',
+      content: () => <Markdown source={this.state.changelog} {...mdProps}/>,
+    },
+    {
+      id: 'faq', tab: 'FAQ',
+      content: () => <Markdown source={this.state.faq} {...mdProps}/>,
+    },
   ]
 
   get id () {
@@ -75,17 +96,8 @@ export default class Docs extends Component {
         <Tabs
           defaultIndex={this.tabIndex}
           onChange={this.onClickTab}
-          tabs={this.tabs.map(v => v.title)}
-          panels={[
-            () => <Markdown source={this.state.docs} {...mdProps}/>,
-            () => <Markdown source={this.state.config} {...mdProps}/>,
-            () => <Demo/>,
-            () => <Examples/>,
-            () => <Markdown source={this.state.styles} {...mdProps}/>,
-            () => <Markdown source={this.state.changelog} {...mdProps}/>,
-            () => <Markdown source={this.state.faq} {...mdProps}/>,
-          ]}
-          classNamePanels="padding-v margin-v"
+          items={[...this.tabs]}
+          classNameContent="padding-v margin-v"
         />
 
       </ScrollView>
