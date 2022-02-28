@@ -145,10 +145,10 @@ export function Dropdown ({
     // @Note: the list of values can be a mix of primitive Number and String
     // Store value temporarily for onSelect event.
     tempValue = (props.multiple && !isObject(last(value))) ? toUniqueListCaseInsensitive(value.reverse()).reverse() : value
-    onChange && onChange(tempValue, event)
+    onChange && onChange(tempValue, props.name, event)
   }
-  if (onSelect) props.onClose = (event) => onSelect(tempValue, event)
-  if (onSearch) props.onSearchChange = (event, data) => onSearch(data.searchQuery, event)
+  if (onSelect) props.onClose = (event) => onSelect(tempValue, props.name, event)
+  if (onSearch) props.onSearchChange = (event, data) => onSearch(data.searchQuery, props.name, event)
 
   // Sanitize options from duplicates on addition
   if (props.allowAdditions) {
@@ -167,7 +167,7 @@ export function Dropdown ({
         if (toLowerCaseAny(duplicate.value) === val) Object.assign(duplicate, newOption)
       } else {
         setOptions([newOption, ...options])
-        onAddItem && onAddItem(value, event)
+        onAddItem && onAddItem(value, props.name, event)
       }
     }
   }

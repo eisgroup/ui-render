@@ -48,22 +48,25 @@ export default class InputNative extends PureComponent {
     }
   }
 
-  onChange = ({target: {value, style}}) => {
-    const {onChange, compact} = this.props
+  onChange = (event) => {
+    const {target: {value, style}} = event
+    const {onChange, compact, name} = this.props
     if (compact != null) resizeToContent(value, style, compact)
-    onChange && onChange(value)
+    onChange && onChange(value, name, event)
   }
 
-  onChangeCheckbox = ({target: {checked}}) => {
-    const {onChange, sound} = this.props
-    onChange && onPressHoc(onChange, sound)(checked)
+  onChangeCheckbox = (event) => {
+    const {target: {checked}} = event
+    const {onChange, sound, name} = this.props
+    onChange && onPressHoc(onChange, sound)(checked, name, event)
   }
 
   // @see: https://stackoverflow.com/questions/11167281/webkit-css-to-control-the-box-around-the-color-in-an-inputtype-color
-  onChangeColor = ({target}) => {
-    const {onChange} = this.props
+  onChangeColor = (event) => {
+    const {target} = event
+    const {onChange, name} = this.props
     target.style.backgroundColor = target.value
-    onChange && onChange(target.value)
+    onChange && onChange(target.value, name, event)
   }
 
   onMountColor = (element) => {

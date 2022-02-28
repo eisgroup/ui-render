@@ -1,7 +1,8 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { isFunction } from 'utils-pack'
+import { interpolateString, isFunction, l, localiseTranslation } from 'utils-pack'
+import { _ } from 'utils-pack/translations'
 import Label from './Label'
 
 /**
@@ -36,17 +37,21 @@ export function Select ({
   if (typeof options[0] === 'string') options = options.map(value => ({text: value, value}))
   if (typeof options[0] === 'number') options = options.map(value => ({text: String(value), value}))
   if (value && !onChange) throw new Error('Select.value is only used when `onChange` or `readOnly` provided')
+  if (label == null) label = ''
+  const selectLabel = interpolateString(_.SELECT_option, {option: label})
   return (
     <div className={classNames('select', className)} style={style}>
-      <Label htmlFor={id} className="sr-only">Select {label}</Label>
+      <Label htmlFor={id} className="sr-only">{selectLabel}</Label>
       <select
         id={id}
         name={name}
-        {...isFunction(onChange) ? {value, onChange: ({target: {value}}) => onChange(value)} : {defaultValue}}
+        {...isFunction(onChange) ? {
+          value, onChange: (event) => onChange(event.target.value, name, event)
+        } : {defaultValue}}
         {...props}
       >
         {(value == null || !!label) &&
-        <option value="" disabled>{placeholder || 'Select ' + (label ? label : '')}</option>}
+        <option value="" disabled>{placeholder || selectLabel}</option>}
         {options.map(({text, value, key}, index) => (
           <option key={key || index} value={value != null ? value : text}>{text}</option>
         ))}
@@ -71,3 +76,9 @@ Select.propTypes = {
 }
 
 export default React.memo(Select)
+
+localiseTranslation({
+  SELECT_option: {
+    [l.ENGLISH]: 'Select {option}',
+  },
+})
