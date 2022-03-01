@@ -6,9 +6,9 @@ export default {
   type: 'file', // use dropzone file input
   title: 'Upload CSV File', // hint
   styles: 'button margin-largest', // style dropzone as button
-  label: 'Data', // only used in dropzone style
+  // label: 'Report', // only used in dropzone style when `showTypes = true`
   formats: ['csv'], // required
-  maxSize: SIZE_MB_16, // required
+  maxSize: SIZE_MB_16, // maximum allowed file size in bytes
   multiple: false, // only allow single file upload
   showTypes: false, // disable on hover hint for dropzone
   autoSubmit: true,

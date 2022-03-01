@@ -78,16 +78,9 @@ export default class Demo extends Component {
   }
 
   render () {
-    const {lang} = this.props
     const {data, meta, showMeta} = this.state
     const hasData = !isEmpty(data.json)
     const hasMeta = !isEmpty(meta.json)
-    const uploadProps = {
-      hasHeader: false,
-      multiple: false,
-      lang,
-      type: FILE.TYPE.JSON,
-    }
     return (
       <>
         <UIRender
@@ -126,6 +119,15 @@ export default class Demo extends Component {
         }
       </>
     )
+  }
+}
+
+const uploadProps = {
+  hasHeader: false,
+  multiple: false,
+  fileType: FILE.TYPE.JSON,
+  get labelOnHover () {
+    return _.FORMAT
   }
 }
 

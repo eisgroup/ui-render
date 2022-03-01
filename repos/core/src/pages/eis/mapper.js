@@ -1,4 +1,3 @@
-import { renderField } from 'modules-pack/form/renders'
 import AutoSave from 'modules-pack/form/views/AutoSave'
 import { POPUP, popupAlert } from 'modules-pack/popup'
 import { stateAction } from 'modules-pack/redux'
@@ -30,6 +29,7 @@ import { ALERT, TIME_DURATION_INSTANT } from 'utils-pack/constants'
 import { get, hasObjectValue, isEqual, isObject, } from 'utils-pack/object'
 import { _ } from 'utils-pack/translations'
 import Render, { mapProps } from '../../ui-render'
+import { renderField } from './components/renders'
 import TableView from './components/TableView'
 import TabList from './components/TabList'
 import Tabs from './components/Tabs'
@@ -326,6 +326,7 @@ Render.Component = function RenderComponent ({
     }
 
     default: {
+      if (items.length) props.children = items.map(Render)
       const {mapOptions, removable, autoSubmit, expanded: _1, ...input} = props
       const {readonly, disabled} = data || {}
       if (mapOptions) input.options = mapProps(input.options || [], mapOptions, {debug})
@@ -354,6 +355,10 @@ Render.Component = function RenderComponent ({
             break
           case 'toggle':
             view = FIELD.TYPE.TOGGLE
+            break
+          case 'file':
+            view = FIELD.TYPE.UPLOAD
+            input.className = cn('input--wrapper', input.className)
             break
         }
         if (input.icon && input.icon.view) input.icon = Render({debug, ...input.icon})

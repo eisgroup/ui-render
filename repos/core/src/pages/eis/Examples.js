@@ -18,6 +18,8 @@ import dropdownMeta from './examples/dropdown_meta.json'
 import exampleData from './examples/example_data.json'
 import exampleMeta from './examples/example_meta.json'
 import expandListMeta from './examples/expand-list_meta'
+import experienceData from './examples/experience_data'
+import experienceMeta from './examples/experience_meta'
 import inputMeta from './examples/input_meta'
 import invalidArrayData from './examples/invalid-array_data'
 import invalidArrayMeta from './examples/invalid-array_meta'
@@ -32,9 +34,8 @@ import tableNestedMeta from './examples/table-nested_meta'
 import tableVerticalMeta from './examples/table-vertical_meta'
 import * as tableMatrix from './examples/table_matrix'
 import * as tabs from './examples/tabs_meta'
+import uploadMeta from './examples/upload_meta'
 import UIRender from './rules'
-import experienceDetails_data from './tester/test_data'
-import experienceDetails_meta from './tester/test_meta'
 
 const examples = [
   {
@@ -146,6 +147,12 @@ const examples = [
     meta: summaryBox.meta,
   },
   {
+    title: 'Upload',
+    id: 'upload',
+    data: {},
+    meta: uploadMeta,
+  },
+  {
     title: 'Input',
     id: 'input',
     data: exampleData,
@@ -160,8 +167,8 @@ const examples = [
   {
     title: 'Experience Ratings',
     id: 'experienceRatings',
-    data: experienceDetails_data,
-    meta: experienceDetails_meta,
+    data: experienceData,
+    meta: experienceMeta,
   },
   {
     title: 'Rating Details',
