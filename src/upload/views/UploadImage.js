@@ -23,8 +23,8 @@ const mapStateToProps = (state) => ({
 @connect(mapStateToProps)
 export default class UploadImage extends PureComponent {
   static propTypes = {
-    // Upload file type, default is 'images'
-    type: PropTypes.string,
+    // Upload file type, default is 'image'
+    fileType: PropTypes.string,
     // Show first uploaded image preview, default is true
     hasPreview: PropTypes.bool,
     // list of Dropzone file objects to override default selector
@@ -39,7 +39,7 @@ export default class UploadImage extends PureComponent {
   }
 
   static defaultProps = {
-    type: FILE.TYPE.IMAGE
+    fileType: FILE.TYPE.IMAGE
   }
 
   get file () {

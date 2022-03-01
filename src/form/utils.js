@@ -176,12 +176,12 @@ export function asField (InputComponent, {sanitize} = {}) {
 
     handleBlur = () => this.input.onBlur()
 
-    handleChange = (value) => {
+    handleChange = (value, ...args) => {
       const {onChange, type, normalize, parse = normalize} = this.props
       if (type === 'number') value = value !== '' ? Number(value) : null
       // both redux-form and final-form input.onChange can accept 'event' or 'value'
       this.input.onChange(value)
-      onChange && onChange(parse ? parse(value) : value)
+      onChange && onChange(parse ? parse(value) : value, ...args)
     }
 
     // @Note: this is not needed as default behavior, because inputs like color always trigger onChange

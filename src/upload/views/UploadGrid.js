@@ -261,7 +261,7 @@ export default class UploadGrid extends Component {
                 autoClean={false}
                 hasHeader={false}
                 showTypes={!file.src}
-                onUpload={(files) => this.handleChange(files, file.i)}
+                onChange={(files) => this.handleChange(files, file.i)}
               >
                 {file.src
                   ? (

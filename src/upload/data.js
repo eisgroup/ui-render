@@ -5,7 +5,7 @@
  */
 const initState = {
   files: [],
-  type: undefined,
+  fileType: undefined,
   loading: false
 }
 
