@@ -55,7 +55,7 @@ export default class Demo extends Component {
     },
   }
 
-  handleUpload = (kind, [file], type) => {
+  handleUpload = (kind, [file], name) => {
     if (!file) return
     const reader = new FileReader()
     reader.onload = () => {
@@ -66,10 +66,10 @@ export default class Demo extends Component {
         })
       } catch (error) {
         this.props.actions.popup({
-          title: `${file.name} is invalid .${type} file`,
+          title: `${file.name} is invalid ${name} file`,
           content: <View>
-            <Text className='h5'>{_.ERROR_MESSAGE}</Text>
-            <Text className='p'>{String(error)}</Text>
+            <Text className="h5">{_.ERROR_MESSAGE}</Text>
+            <Text className="p">{String(error)}</Text>
           </View>
         })
       }
@@ -83,24 +83,18 @@ export default class Demo extends Component {
     const hasMeta = !isEmpty(meta.json)
     return (
       <>
-        <UIRender
-          initialValues={data.json}
-          data={data.json}
-          meta={meta.json}
-        />
-
         {showMeta &&
         <ScrollView className="padding-smaller bg-neutral inverted">
           <Row className="wrap spread">
             <View className="margin-smaller">
-              <Upload {...uploadProps} label="*_data.json" onUpload={this.handleUpload.bind(this, 'data')}
+              <Upload {...uploadProps} label="*_data.json" onChange={this.handleUpload.bind(this, 'data')}
                       className={'test-data radius-large' + (!hasData ? ' bg-primary-dark' : '')}
               >
                 {data.name && <View><Text className="h4">{_.UPLOADED}</Text><Text>{data.name}</Text></View>}
               </Upload>
             </View>
             <View className="margin-smaller">
-              <Upload {...uploadProps} label="*_meta.json" onUpload={this.handleUpload.bind(this, 'meta')}
+              <Upload {...uploadProps} label="*_meta.json" onChange={this.handleUpload.bind(this, 'meta')}
                       className={'test-meta radius-large' + (hasData && !hasMeta ? ' bg-primary-dark' : '')}
                       disabled={!hasData}
               >
@@ -117,6 +111,12 @@ export default class Demo extends Component {
           </Row>
         </ScrollView>
         }
+        <UIRender
+          className="bg-info-light"
+          initialValues={data.json}
+          data={data.json}
+          meta={meta.json}
+        />
       </>
     )
   }

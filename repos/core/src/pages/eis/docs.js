@@ -97,7 +97,6 @@ export default class Docs extends Component {
           defaultIndex={this.tabIndex}
           onChange={this.onClickTab}
           items={[...this.tabs]}
-          classNameContent="padding-v margin-v"
         />
 
       </ScrollView>
