@@ -32,7 +32,22 @@ export const Active = {
   iconClassPrefix: 'icon-', // CSS className prefix for <Icon />
   client: undefined, // Apollo client
   log: undefined, // backend console logger
-  passwordCheck: () => {}, // password strength calculator
   user: {}, // the current user, for quick access to user info, such as auth
-  usersById: {} // for storing temporary info, like user.lastOnline
+  usersById: {}, // for storing temporary info, like user.lastOnline
+
+  /**
+   * Password Strength Calculator
+   * @example: <script async src="/static/zxcvbn.js"/>
+   *    - Frontend uses async script in <head/> section to load static zxcvbn.js for faster page load.
+   *    - Backend should override this prop with `Active.passwordCheck = require('zxcvbn')`
+   * @returns {zxcvbn|(function(): {score: number})|*}
+   */
+  get passwordCheck () {
+    // When not loaded, skip password validation in frontend
+    if (typeof window !== 'undefined') return window.zxcvbn || (() => ({score: Infinity}))
+    return this.zxcvbn
+  },
+  set passwordCheck (zxcvbn) {
+    this.zxcvbn = zxcvbn
+  }
 }
