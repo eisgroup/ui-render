@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types'
 import React from 'react'
+import { type } from './types'
 
 /**
  * Link to external resources - Pure component
@@ -16,8 +16,8 @@ export function LinkOut ({to, children, ...props}) {
 }
 
 LinkOut.propTypes = {
-  to: PropTypes.string.isRequired,
-  children: PropTypes.any.isRequired,
+  to: type.UrlOrBase64OrPreview.isRequired,
+  children: type.Any.isRequired,
 }
 
 export default React.memo(LinkOut)

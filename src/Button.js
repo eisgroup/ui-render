@@ -13,6 +13,7 @@ import { onPressHoc } from './utils'
  * @param {String} [className] - optional, will be prepended with `button `
  * @param {Boolean} [disabled] - optional, whether the button is disabled
  * @param {Boolean} [loading] - optional, show spinner instead of children
+ * @param {Boolean} [active] - whether to add `active` css class=
  * @param {Boolean} [circle] - whether to add `circle` css class with even padding
  * @param {Boolean} [square] - whether to add `square` css class with even padding
  * @param {Object} [sound] - new Audio(URL) sound file
@@ -24,6 +25,7 @@ export function Button ({
   onClick,
   disabled = false,
   loading = false,
+  active,
   circle,
   square,
   children,
@@ -36,7 +38,7 @@ export function Button ({
 
   return (
     <button
-      className={classNames('button', size, className, {circle, square, loading})}
+      className={classNames('button', size, className, {circle, square, active, loading})}
       disabled={disabled || loading}
       type={type}
       onClick={onPressHoc(onClick, sound)}

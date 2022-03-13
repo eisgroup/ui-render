@@ -21,7 +21,7 @@ export function Image ({
 }) {
   if (props.src == null) props.src = imageSrc({name, path})
   if (props.alt == null) props.alt = fileNameWithoutExt(name)
-  return <img className={classNames('app__image', className)} {...props}/>
+  return <img className={classNames('img', className)} {...props}/>
 }
 
 Image.defaultProps = {

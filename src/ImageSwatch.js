@@ -2,7 +2,7 @@ import cn from 'classnames'
 import React from 'react'
 import Image from './Image'
 import { type } from './types'
-import View from './View'
+import { View } from './View'
 
 /**
  * Image Swatch - Pure Component.
@@ -17,7 +17,8 @@ export function ImageSwatch ({
   ...props
 }) {
   // Use <img> for SEO and lazy load performance
-  return <View className={cn('image__swatch', className, {small, large})} {...props}>
+  // Use cached <Image/> component to reduce rendering because `src` and `alt` are unlikely to change, unlike `onClick`
+  return <View className={cn('img__swatch', className, {small, large})} {...props}>
     <Image src={src} alt={name}/>
     {children}
   </View>
@@ -28,7 +29,7 @@ ImageSwatch.defaultProps = {
 }
 ImageSwatch.propTypes = {
   /** Full Path, URL, Base64 or Preview String object of Image file */
-  src: type.UrlOrBase64.isRequired,
+  src: type.UrlOrBase64OrPreview.isRequired,
   small: type.Boolean,
   large: type.Boolean,
   className: type.String,
