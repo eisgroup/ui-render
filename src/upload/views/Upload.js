@@ -170,13 +170,13 @@ export default class Upload extends PureComponent {
   render () {
     const {
       loading, children, multiple, disabled, readonly, onBlur, name, labelOnHover, onClose,
-      className, hasHeader, round, showTypes, title,
+      className, classWrap, hasHeader, round, showTypes, title,
     } = this.props
     const label = this.props.label || this.fileType || _.FILE
     const {active} = this.state
     const formats = this.formats
     return (
-      <View className={classNames('app__upload', {round})}>
+      <View className={classNames('app__upload', classWrap, {round})}>
         {onClose && this.renderClose(onClose)}
         {hasHeader && <h2>{parseString(_.UPLOAD_file, {file: label})}</h2>}
         <Dropzone

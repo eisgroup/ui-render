@@ -21,4 +21,7 @@ export default {
   File: {
     src: fileSrc
   },
+  Image: {
+    src: fileSrc
+  }
 }

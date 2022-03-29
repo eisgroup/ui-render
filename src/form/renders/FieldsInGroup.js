@@ -33,7 +33,7 @@ export default class FieldsInGroup extends PureComponent {
 
   renderContainer = () => {
     const {
-      kind, onChange, float, initialValues, instance, items: __,
+      kind, onChange, float, initialValues, instance, items: __, validate, required,
       hint, label, className, style, ...props
     } = this.props
     const items = this.fields

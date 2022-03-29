@@ -90,6 +90,14 @@ export const Img = new Schema({
   ...file, // to reduce network payload, compute different image sizes in frontend
   width: Number,
   height: Number,
+  sizes: {
+    type: [{
+      key: Mixed, // file name suffix (resolution key)
+      val: Number, // file size in bytes
+      _id: false,
+    }],
+    default: undefined,
+  },
 }, {timestamps: false, default: undefined})
 export const Imgs = {type: [Img], default: undefined}
 export const Location = new Schema({
@@ -102,7 +110,7 @@ export const Location = new Schema({
 export const Name = {type: String, maxLength: VALIDATE.NAME_MAX_LENGTH, set: trimSpaces, default: undefined}
 export const KeyVal = {
   key: String,
-  value: Mixed,
+  val: Mixed,
   _id: false,
 }
 export const Pay = new Schema({

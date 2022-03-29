@@ -204,7 +204,10 @@ export default class UploadGrid extends Component {
   handleRemove = (file, event) => {
     event.stopPropagation() // disable onClick for Dropzone
     const files = this.state.files.filter(({i}) => file.i !== i) // name may not be unique, using URI
-    this.props.actions.remove(file, () => this.updateFiles(files, [{i: file.i, kind: file.kind, remove: true}]))
+    this.props.actions.remove(file, () => {
+      if (this.props.autoClean && file.file && file.file.preview) URL.revokeObjectURL(file.file.preview)
+      this.updateFiles(files, [{i: file.i, kind: file.kind, remove: true}])
+    })
   }
 
   /**

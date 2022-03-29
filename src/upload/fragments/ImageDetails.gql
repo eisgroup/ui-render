@@ -1,0 +1,10 @@
+fragment ImageDetails on Image {
+    width
+    height
+    sizes {
+        key
+        val
+    }
+    created
+    updated
+}

@@ -48,3 +48,21 @@ input FileInput {
     #created: Timestamp
     #updated: Timestamp
 }
+
+# Extends type `File` See `file.doc.md` for documentation, uses FileInput
+type Image {
+    width: Int!
+    height: Int!
+    # List of file size suffixes as `key`, and sizes in bytes as `val`
+    sizes: [KeyVal!]
+
+    # File attributes
+    src: URL!
+    kind: JSON
+    i: JSON
+    id: Id
+    name: String
+    creatorId: Id
+    created: Timestamp
+    updated: Timestamp
+}

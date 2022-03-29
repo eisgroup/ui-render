@@ -181,6 +181,7 @@ async function fileUploaded ({
   let uploadSize = 0 // total upload size should not exceed User's upload limit
   let error, validateStream
   for (const {file} of fileInputs) {
+    if (!file) continue // file may be removed
     const {createReadStream, mimetype} = await file
 
     if (mimetypes && !mimetypes.includes(mimetype))
@@ -233,7 +234,7 @@ async function fileUploaded ({
 
 /**
  * Process Files Upload/Update/Removal for given Mongoose model instance.
- * Returns new full files list [FileInput] ready for saving the instance.
+ * Returns new full files list [FileInput|ImageInput] ready for saving the instance.
  *
  * @param {Document} instance - of Mongoose model containing files to be updated
  * @param {Object<file, kind, i, id, remove>[]} files - list of `FileInput` from resolver payload
