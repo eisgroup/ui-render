@@ -16,9 +16,9 @@ export function accessibilitySupport (props, sound = Active.SETTINGS.HAS_SOUND &
     delete props.onClick
   } else {
     const {onClick, onKeyPress, tabIndex} = props
-    if (onKeyPress) props.onKeyPress = onPressHoc(onKeyPress, sound)
+    if (sound && onKeyPress) props.onKeyPress = onPressHoc(onKeyPress, sound)
     if (onClick) {
-      props.onClick = onPressHoc(onClick, sound)
+      if (sound) props.onClick = onPressHoc(onClick, sound)
       if (tabIndex == null) props.tabIndex = 0  // add keyboard accessibility for onClick
       if (!onKeyPress) props.onKeyPress = (event) => (event.key === 'Enter' && props.onClick(event))
     } else {

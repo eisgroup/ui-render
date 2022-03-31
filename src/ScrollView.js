@@ -2,8 +2,7 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { isFunction } from 'utils-pack'
-import { Row } from './Row'
-import { View } from './View'
+import { accessibilitySupport } from './utils'
 
 /**
  * View with Custom Scroll Bar - Pure Component
@@ -17,6 +16,8 @@ import { View } from './View'
  * @param {Boolean} [reverse] - whether to reverse order of rendering
  * @param {Boolean} [rtl] - whether to use right to left direction
  * @param {Boolean} [center] - whether to center align content
+ * @param {Object} [sound] - new Audio(URL) sound file
+ * @param {*} [tab]
  * @param {*} [ref] - callback(element) when component mounts, or from React.createRef()
  * @param {*} props - other props
  * @returns {Object} - React component
@@ -31,27 +32,23 @@ export function ScrollView ({
   reverse,
   rtl,
   center,
+  sound,
   // Remove tab to prevent Error
-  tab, // eslint-disable-line
+  tab,
   ...props
 }, ref) {
-  const Container = row ? Row : View
+  props = accessibilitySupport(props, sound)
   return (
     <div
-      className={classNames(
-        'overflow-scroll',
+      className={classNames('overflow-scroll',
         row ? 'flex--row max-width' : 'flex--col max-height',
-        {fill, rtl, center: center && !row},
-        className,
+        {fill, rtl, center: center && !row}, className,
       )}
       style={style}
-      {...isFunction(ref) && {ref}}
-    >
-      <Container
-        className={classNames(
-          row ? 'min-width' : 'min-height',
-          {fill, reverse, rtl, 'margin-auto': center},
-          classNameInner,
+      {...isFunction(ref) && {ref}}>
+      <div
+        className={classNames(row ? 'flex--row min-width' : 'flex--col min-height',
+          {fill, reverse, rtl, pointer: props.onClick, 'margin-auto': center}, classNameInner,
         )}
         style={styleInner}
         {...props}
