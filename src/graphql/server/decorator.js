@@ -105,9 +105,13 @@ export function delayed (milliseconds) {
     if (__PROD__) return descriptor
     const func = descriptor.value
     descriptor.value = function (...args) {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         setTimeout(() => {
-          resolve(func.apply(this, args))
+          try {
+            resolve(func.apply(this, args))
+          } catch (error) {
+            reject(error)
+          }
         }, milliseconds)
       })
     }

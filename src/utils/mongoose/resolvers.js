@@ -1,7 +1,8 @@
 import { GraphQLScalarType } from 'graphql'
 import { queryFields, Response } from 'modules-pack/graphql/server/resolver'
 import mongoose from 'mongoose'
-import { get, isString, last } from 'utils-pack'
+import { get, interpolateString, isString, l, last, localiseTranslation } from 'utils-pack'
+import { _ } from 'utils-pack/translations'
 import { isObjectID } from './types'
 
 /**
@@ -72,7 +73,19 @@ export function populated (...opts) {
       }
 
       // Populate the result with queried foreign keys
-      instance = (instance instanceof Promise) ? (await instance) : instance
+      if (instance instanceof Promise) {
+        try { // needed to catch inside model.save() because MongoDB returns non-standard error object, resulting in 500
+          instance = await instance
+        } catch (error) {
+          const errMsg = String(error)
+          if (errMsg.indexOf('MongoServerError: E11000 duplicate key error collection') === 0) {
+            return Response.badRequest(interpolateString(_.DUPLICATE_FOUND_FOR_UNIQUE_FIELD_value, {
+              value: errMsg.split(' dup key: ').pop(),
+            }, {suppressError: true}))
+          }
+          return Response.badRequest(error)
+        }
+      }
       if (instance instanceof mongoose.Query) return instance.populate(..._opts)
       if (instance instanceof mongoose.Document) return instance.populate(..._opts)//.execPopulate() removed in Mongoose 6
       return instance
@@ -80,3 +93,9 @@ export function populated (...opts) {
     return descriptor
   }
 }
+
+localiseTranslation({
+  DUPLICATE_FOUND_FOR_UNIQUE_FIELD_value: {
+    [l.ENGLISH]: 'Duplicate found for unique field: {value}',
+  },
+})
