@@ -435,9 +435,10 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
     this._fields = fieldsFrom(FIELDS, {initialValues})
     if (fieldsSetup) this._fields = this._fields.map(fieldsSetup)
     return this._fields
-      .map(({id, ...field}, i) => ({ // convert id to key just before rendering, to prevent unmounts on form.reset()
+      .map(({id, onRenderProps, ...field}, i) => ({ // convert id to key just before rendering, to prevent unmounts on form.reset()
         key: `${id}_${field.name || i}`,
         ...field,
+        ...onRenderProps && onRenderProps(this, initialValues),
         onChange: (...args) => {
           field.onChange && field.onChange(...args)
           this.handleChangeInput(...args)
