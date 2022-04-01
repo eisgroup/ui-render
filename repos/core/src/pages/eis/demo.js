@@ -79,7 +79,7 @@ export default class Demo extends Component {
 
   render () {
     const {data, meta, showMeta} = this.state
-    const hasData = !isEmpty(data.json)
+    const hasData = data.json != null // data.json can be empty object
     const hasMeta = !isEmpty(meta.json)
     return (
       <>
