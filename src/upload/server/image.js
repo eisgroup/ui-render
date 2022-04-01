@@ -2,7 +2,7 @@ import fs from 'fs'
 import { fileNameSized, resolvePath, VALIDATE } from 'modules-pack/variables'
 import PromiseAll from 'promises-all'
 import sharp from 'sharp'
-import { assertBackend } from 'utils-pack'
+import { assertBackend, warn } from 'utils-pack'
 import { widthScaled } from 'utils-pack/media'
 import { makeDirectory } from './file'
 
@@ -23,7 +23,7 @@ assertBackend()
  * @param {String} [format] - sharp file extension in lowercase
  * @returns {Sharp} - transform pipeline
  */
-export function resize ({width = VALIDATE.IMAGE_MAX_RES, height = null, fit = 'inside', format = 'jpeg'} = {}) {
+export function resize ({width = VALIDATE.IMAGE_MAX_PIXELS, height = null, fit = 'inside', format = 'jpeg'} = {}) {
   return sharp().resize(width, height, {fit, withoutEnlargement: true}).toFormat(format)
 }
 
@@ -57,12 +57,14 @@ export function removeImgSizes ({filePath, sizes}) {
  * @param {Object} sizes<res, width, height, fit> - resize() options by the file `size` name (i.e. thumb/medium/...)
  * @returns {Promise<Object>} {[path], [name], ...[metaData], errors} - to original image saved if successful, else error objects
  */
-export async function saveImgSizes ({stream, filePath, sizes: sizeDef}) {
+export async function saveImgSizes ({
+  stream, filePath, sizes: sizeDef, sharpOptions = {limitInputPixels: VALIDATE.IMAGE_RES_LIMIT}
+}) {
   const {dir, path, name} = resolvePath(filePath)
   await makeDirectory(dir)
   const sizes = []
   const uploads = []
-  const pipeline = sharp()
+  const pipeline = sharp(sharpOptions)
   let metadata
   return stream.pipe(pipeline).metadata()
     .then((meta) => {
@@ -83,9 +85,9 @@ export async function saveImgSizes ({stream, filePath, sizes: sizeDef}) {
       }
       return PromiseAll.all(uploads)
     })
-    .then(({resolve, reject: errors}) => {
+    .then(({resolve, reject: errors}) => { // this does not get called if Image size exceeds pixel limit
       return resolve.length ? {...metadata, path, name, sizes, errors} : {errors}
-    })
+    }).catch(warn) // this is the best way found to show message, because it does not propagate well
 }
 
 /**

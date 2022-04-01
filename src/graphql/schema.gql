@@ -48,10 +48,22 @@ type Action {
     error: Boolean
 }
 
+input ActionInput {
+    type: String
+    payload: JSON
+    meta: JSON
+}
+
 type Alert {
     id: ID! # created Timestamp
     title: String!
     content: String!
+}
+
+type Error {
+    status: String
+    message: String
+    data: JSON
 }
 
 type KeyVal {

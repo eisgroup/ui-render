@@ -1,9 +1,10 @@
 import cn from 'classnames'
 import { POPUP, POPUP_ALERT, POPUP_CONFIRM } from 'modules-pack/popup/constants'
 import { connect, stateAction } from 'modules-pack/redux'
+import { previewSizes } from 'modules-pack/variables/files'
 import PropTypes from 'prop-types'
 import React, { Component, Fragment } from 'react'
-import { type } from 'react-ui-pack'
+import { previewSize, type } from 'react-ui-pack'
 import Icon from 'react-ui-pack/Icon'
 import Label from 'react-ui-pack/Label'
 import Loading from 'react-ui-pack/Loading'
@@ -269,7 +270,10 @@ export default class UploadGrid extends Component {
                 {file.src
                   ? (
                     <View className="upload__file"
-                          style={{...preview == null && {backgroundImage: cssBgImageFrom(file.src)}}}>
+                          style={{
+                            ...preview == null &&
+                            {backgroundImage: cssBgImageFrom(previewSize(previewSizes(file, null), 'medium'))}
+                          }}>
                       {isFunction(preview) ? preview(file, i, this) : preview}
                       <Text className="upload__file__label">{shouldCount ? (i + 1) : file.name}</Text>
                       {hasRemove

@@ -440,7 +440,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
         ...field,
         ...onRenderProps && onRenderProps(this, initialValues),
         onChange: (...args) => {
-          field.onChange && field.onChange(...args)
+          field.onChange && field.onChange(...args, this)
           this.handleChangeInput(...args)
           onChange && onChange(...args)
         },

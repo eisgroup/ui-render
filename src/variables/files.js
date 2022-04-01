@@ -1,13 +1,6 @@
 import { FILE as _FILE } from 'react-ui-pack/files'
-import {
-  _WORK_DIR_,
-  ENV,
-  fileFormatNormalized,
-  fileNameWithoutExt,
-  isList,
-  mimeTypeFromDataUrl,
-  SIZE_MB_16
-} from 'utils-pack'
+import { _WORK_DIR_, ENV, isList, SIZE_MB_16 } from 'utils-pack'
+import { fileFormatNormalized, fileNameWithoutExt, isFileSrc, mimeTypeFromDataUrl } from 'utils-pack/string'
 
 /**
  * FILE VARIABLES ==============================================================
@@ -244,3 +237,46 @@ export function loadImage (src) {
     img.src = src
   })
 }
+
+/**
+ * Compute Image `preview` URL/pathname (can accept Base64 string) in different sizes for consumption by frontend:
+ *  - `preview` matches original `src`
+ *  - `preview.medium` matches medium size of `src`
+ *  - `preview.thumb` matches thumbnail size of `src`
+ *
+ * => pass in `null` as the second parameter to disable default fallback to IMAGE.SIZES.
+ *
+ * @example:
+ *    const preview = previewSizes(image)
+ *    preview == image.src >>> true
+ *    preview.medium >>> string
+ *    preview.thumb >>> string
+ *
+ * Scenarios:
+ *  1. Production file: use `src` suffixed with 'medium' for default size, else `src` as 'original'
+ *  2. Local dev file: user `src` as base64 data if it is of base64 type, else same as point 1.
+ * @param {Object} - FileInput with `src` and optional `sizes` attribute (ex. [{key: 'medium', val: 99}])
+ * @param {String[]|Null} [resKeys] - use predefined image size keys when FileInput.sizes not available
+ * @return {Object|Undefined} preview<medium, thumb...> - string object with sizes attached as props of `preview`
+ */
+export function previewSizes ({src, sizes}, resKeys = imgSizes) {
+  if (!src) return
+  if ((sizes || resKeys) && isFileSrc(src)) {
+    // noinspection JSPrimitiveTypeWrapperUsage
+    const preview = new String(src)
+    if (sizes) {
+      for (const size of sizes) {
+        const {key} = size
+        if (!key) continue
+        preview[key] = fileNameSized(src, key)
+      }
+    } else {
+      // fallback is needed to compute sizes for EntrySummary that likely doesn't query `sizes`,
+      resKeys.forEach(key => key && (preview[key] = fileNameSized(src, key)))
+    }
+    return preview
+  }
+  return src
+}
+
+const imgSizes = Object.keys(IMAGE.SIZES)
