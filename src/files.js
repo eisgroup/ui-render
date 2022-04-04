@@ -1,13 +1,16 @@
-import { Active, get, warn } from 'utils-pack'
+import { Active, ENV, get, warn } from 'utils-pack'
 
 /**
  * FILE VARIABLES ==============================================================
  * =============================================================================
  */
 
+export const CDN_URL = ENV.REACT_APP_CDN_URL || ''
+
 export const FILE = {
-  PATH_IMAGES: '/static/images/',
-  PATH_SOUNDS: '/static/sounds/'
+  PATH_IMAGES: `${CDN_URL}/static/images/`,
+  PATH_SOUNDS: `${CDN_URL}/static/sounds/`,
+  CDN_URL,
 }
 
 if (get(Active, 'SETTINGS.HAS_SOUND') == null) {

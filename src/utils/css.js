@@ -1,4 +1,4 @@
-import { isFileSrc } from 'utils-pack'
+import { ENV, isFileSrc } from 'utils-pack'
 import { STYLE } from '../styles'
 
 /**
@@ -14,14 +14,17 @@ export function cssBgImageFrom (src) {
   return `url('${isFileSrc(src) ? encodeURI(src) : src}')`
 }
 
+const previewPrefix = ENV.REACT_APP_CDN_URL || ''
+
 /**
  * Compute Preview Image src from dynamic `preview` attribute
  * @param {String|Object} preview - type.UrlOrBase64OrPreview
  * @param {String} [size] - one of thumb/medium/large/etc.
+ * @param {String} [prefix] - url prefix (defaults to CDN url, if set in .env variable REACT_APP_CDN_URL)
  * @returns {String|Object} preview src ready for consumption by Components
  */
-export function previewSize (preview, size = 'thumb') {
-  return typeof preview === 'object' ? (preview[size] || preview) : preview
+export function previewSize (preview, size = 'thumb', prefix = previewPrefix) {
+  return prefix + (typeof preview === 'object' ? (preview[size] || preview) : preview)
 }
 
 /**

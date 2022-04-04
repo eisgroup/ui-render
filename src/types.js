@@ -68,6 +68,10 @@ type.FileInput = type.Of({
   name: type.String, // file name with extension
   file: type.File, // -> sent by onChange callbacks for upload to backend (example: Dropzone file object)
   remove: type.Boolean, // -> sent by onChange callbacks for deletion to backend
+  sizes: type.ListOf(type.Of({ // for ImageInput
+    key: type.String, // resKey (ex. 'thumb', 'medium', '')
+    val: type.Number, // size in bytes
+  })),
 })
 
 // FIELD.FOR.TAG for example
