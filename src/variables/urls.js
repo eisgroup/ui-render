@@ -8,7 +8,8 @@ export const URI = {
 export const URL = {
   API: ENV.API_URL || ENV.REACT_APP_API_URL || (__CLIENT__ ? window.location.origin : ''),
   API_TEST: 'https://ipapi.co/json',
-  SOCKET_SERVER: `${ENV.SOCKET_PROTOCOL}://${ENV.SOCKET_HOST}${ENV.SOCKET_PORT ? ':' + ENV.SOCKET_PORT : ''}`
+  CDN: ENV.REACT_APP_CDN_URL || '',
+  SOCKET_SERVER: `${ENV.SOCKET_PROTOCOL}://${ENV.SOCKET_HOST}${ENV.SOCKET_PORT ? ':' + ENV.SOCKET_PORT : ''}`,
 }
 
 URL.API_GQL = `${URL.API}${URI.GQL}`

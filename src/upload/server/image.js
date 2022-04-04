@@ -1,10 +1,10 @@
-import fs from 'fs'
 import { fileNameSized, resolvePath, VALIDATE } from 'modules-pack/variables'
 import PromiseAll from 'promises-all'
 import sharp from 'sharp'
 import { assertBackend, warn } from 'utils-pack'
 import { widthScaled } from 'utils-pack/media'
-import { makeDirectory } from './file'
+import s3 from '../cdn/s3'
+import { makeDirectory, removeFilePromise } from './file'
 
 /**
  * IMAGE HELPERS ===============================================================
@@ -32,17 +32,15 @@ export function resize ({width = VALIDATE.IMAGE_MAX_PIXELS, height = null, fit =
  * @note: tested deleting file with missing in-between resolutions from declared `sizes` definition
  * @param {Object} filePath - see `resolvePath()` for argument
  * @param {Object} sizes<res, width, height, fit> - resize() options by the file `size` name (i.e. thumb/medium/...)
+ * @param {Object} [cdn] - S3 instance - if provided, will delete file from s3 bucket
  * @returns {Promise<Object>} {[path], [removed], errors} - to original image removed if successful, else error objects
  */
-export function removeImgSizes ({filePath, sizes}) {
+export function removeImgSizes ({filePath, sizes, cdn}) {
   const {dir, path, name} = resolvePath(filePath)
   const removals = []
   for (const size in sizes) {
     const path = `${dir}/${fileNameSized(name, size)}`
-    removals.push(new Promise((resolve, reject) => fs.unlink(path, (err) => {
-      if (err) return reject(err)
-      return resolve({path, removed: true})
-    })))
+    removals.push(removeFilePromise(path, cdn))
   }
   return PromiseAll.all(removals)
     .then(({resolve, reject: errors}) => {
@@ -55,17 +53,18 @@ export function removeImgSizes ({filePath, sizes}) {
  * @param {Stream} stream - readable file stream from `createReadStream()` to create Images for
  * @param {Object} filePath - see `resolvePath()` for argument
  * @param {Object} sizes<res, width, height, fit> - resize() options by the file `size` name (i.e. thumb/medium/...)
+ * @param {Object} [cdn] - S3 instance - if provided, will upload to s3 bucket
  * @returns {Promise<Object>} {[path], [name], ...[metaData], errors} - to original image saved if successful, else error objects
  */
 export async function saveImgSizes ({
-  stream, filePath, sizes: sizeDef, sharpOptions = {limitInputPixels: VALIDATE.IMAGE_RES_LIMIT}
+  stream, filePath, sizes: sizeDef, mimetype, cdn = s3, sharpOptions = {limitInputPixels: VALIDATE.IMAGE_RES_LIMIT}
 }) {
   const {dir, path, name} = resolvePath(filePath)
   await makeDirectory(dir)
   const sizes = []
   const uploads = []
   const pipeline = sharp(sharpOptions)
-  let metadata
+  let metadata, pipe
   return stream.pipe(pipeline).metadata()
     .then((meta) => {
       metadata = meta
@@ -74,14 +73,20 @@ export async function saveImgSizes ({
           const {width, height} = sizeDef[key]
           if (width >= meta.width || height >= meta.height) continue
         }
-        uploads.push(
-          pipeline
-            .clone()
-            .resize(...resizeArgs(sizeDef[key], meta))
-            .toFormat(meta.format) // force format to sanitize the file
-            .toFile(`${dir}/${fileNameSized(name, key)}`)
-            .then(({size}) => sizes.push({key, val: size}))
-        )
+        // @example: '../web/public/uploads/Model/Id/base_thumb.png' if UPLOAD_PATH=../web/public
+        const path = `${dir}/${fileNameSized(name, key)}`
+        pipe = pipeline.clone()
+          .resize(...resizeArgs(sizeDef[key], meta))
+          .toFormat(meta.format) // force format to sanitize the file
+        if (cdn) {
+          pipe = pipe.toBuffer({resolveWithObject: true}).then(({data, info}) => {
+            return cdn.upload({Key: path, Body: data, ContentType: mimetype})
+              .then(() => info)
+          })
+        } else {
+          pipe = pipe.toFile(path)
+        }
+        uploads.push(pipe.then(({size}) => sizes.push({key, val: size})))
       }
       return PromiseAll.all(uploads)
     })

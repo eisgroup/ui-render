@@ -3,6 +3,7 @@ import mkdirp from 'mkdirp'
 import { resolvePath } from 'modules-pack/variables'
 import sanitizeName from 'sanitize-filename' // this package may have large dependency, so do not include it by default
 import { _WORK_DIR_, warn } from 'utils-pack'
+import s3 from '../cdn/s3'
 
 /**
  * FILE HELPERS ================================================================
@@ -47,17 +48,19 @@ export function read ({options = 'utf8', workDir = _WORK_DIR_, ...filePath}) {
 
 /**
  * Save File to Local Server
- * @example: upload to Amazon S3
+ * @example: upload to Amazon S3 with file stream
  * https://stackoverflow.com/questions/60053008/typescript-sharp-js-transform-a-stream-into-multiple-sizes-and-upload-it-to-s3
  *
  * @param {Object} stream - of file buffer, the result of createReadStream(absoluteFilePath)
  * @param {Object} filePath - see `resolvePath()` arguments
+ * @param {Object} [cdn] - S3 instance - if provided, will upload to s3 bucket
+ * @param {String} [mimetype] - S3 ContentType
  * @param {Object} [read] - pipeline to use before `transform`
  * @param {Object} [transform] - pipeline to use before saving file (e.x. transform = sharp().resize(width, height))
  * @param {Object} [writeStream] - pipeline to use for saving file, uses fs.createWriteStream(path) by default
  * @returns {Promise<Object>} {path, name} - to file saved if successful, else error
  */
-export async function saveFile ({stream, read, transform, writeStream, filePath}) {
+export async function saveFile ({stream, read, transform, writeStream, filePath, mimetype, cdn = s3}) {
   const {dir, path, name} = resolvePath(filePath)
   await makeDirectory(dir)
 
@@ -70,7 +73,7 @@ export async function saveFile ({stream, read, transform, writeStream, filePath}
       })
     if (read) file = file.pipe(read)
     if (transform) file = file.pipe(transform)
-    file.pipe(writeStream || fs.createWriteStream(path))
+    file.pipe(writeStream || (cdn ? cdn.uploadStream({Key: path, ContentType: mimetype}) : fs.createWriteStream(path)))
       .on('error', error => reject(error))
       .on('finish', () => resolve({path, name}))
   })
@@ -79,14 +82,28 @@ export async function saveFile ({stream, read, transform, writeStream, filePath}
 /**
  * Remove File from Local Server
  * @param {Object} filePath - see `resolvePath()` arguments
- * @returns {Promise<Object>} {path, removed} - to file removed if successful, else error object
+ * @param {Object} [cdn] - S3 instance - if provided, will delete file from s3 bucket
+ * @returns {Promise<Object|Error>} {path, removed} - to file removed if successful, else error object
  */
-export function removeFile (filePath) {
+export function removeFile (filePath, cdn) {
   const {path} = resolvePath(filePath)
-  return new Promise((resolve, reject) => fs.unlink(path, (err) => {
-    if (err) return reject(err)
-    return resolve({path, removed: true})
-  }))
+  return removeFilePromise(path, cdn)
+}
+
+/**
+ * Create removeFile Promise
+ * @param {String} path - full file path to remove
+ * @param {Object} [cdn] - S3 instance - if provided, will delete file from s3 bucket
+ * @returns {Promise<Object|Error>} {path, removed} - to file removed if successful, else error object
+ */
+export function removeFilePromise (path, cdn = s3) {
+  return new Promise((resolve, reject) => {
+    if (cdn) return cdn.remove({Key: path}).then(() => resolve({path, removed: true})).catch(reject)
+    return fs.unlink(path, (err) => {
+      if (err) return reject(err)
+      return resolve({path, removed: true})
+    })
+  })
 }
 
 /**

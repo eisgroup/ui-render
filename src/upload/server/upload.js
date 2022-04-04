@@ -348,9 +348,9 @@ export async function uploadFile ({file, remove, sizes = IMAGE.SIZES, ...fileInp
   const options = {stream: createReadStream(), filePath: {filename: fileName({...fileInput, name}), ...filePath}}
   if (IMAGE.MIME_TYPES.includes(mimetype)) {
     // Always resize the image using Sharp, so sharp can optimize and sanitize it, even if resizing is not needed
-    result = await saveImgSizes({...options, sizes})
+    result = await saveImgSizes({...options, mimetype, sizes})
   } else {
-    result = await saveFile(options)
+    result = await saveFile({...options, mimetype})
   }
   if (!result.path)
     throw Response.badRequest(interpolateString(_.UPLOAD_FILE_ERROR_error, {error: result}))
