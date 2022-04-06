@@ -236,7 +236,7 @@ export default class UploadGrid extends Component {
 
   render () {
     const {
-      label, loading, placeholder, square, count: _, name, kind, types, showCount, showName,
+      label, loading, placeholder, square, count: _1, name, kind, types, showCount, showName,
       error, info, iconUpload, iconRemove, preview,
       className, style,
       ...props
@@ -288,6 +288,8 @@ export default class UploadGrid extends Component {
                         />
                         : <Icon className="upload__file__add larger" name={iconUpload} onClick={() => {}}/>
                       }
+                      {file.width && file.height &&
+                      <Text className="upload__file__size">{interpolateString(_.width_X_height, file)}</Text>}
                     </View>
                   )
                   : (<Fragment>

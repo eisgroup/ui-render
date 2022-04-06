@@ -57,6 +57,12 @@ localiseTranslation({
     // [l.RUSSIAN]: 'Загружен',
   },
 
+  width_X_height: {
+    // as verb
+    [l.ENGLISH]: '{width} x {height}',
+    // [l.RUSSIAN]: 'Загружен',
+  },
+
   // Popup Messages
   // ---------------------------------------------------------------------------
   ARE_YOU_SURE_YOU_WANT_TO_REMOVE_file: {
