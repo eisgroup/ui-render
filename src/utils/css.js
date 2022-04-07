@@ -23,12 +23,14 @@ const previewPrefix = ENV.REACT_APP_CDN_URL || ''
  * @param {String} [prefix] - url prefix (defaults to CDN url, if set in .env variable REACT_APP_CDN_URL)
  * @returns {String|Object} preview src ready for consumption by Components
  */
-export function previewSize (preview, size = 'thumb', prefix = previewPrefix) {
-  return prefix + (typeof preview === 'object' ? (preview[size] || preview) : preview)
+export function previewSize (preview, size = 'thumb',
+  prefix = ((typeof preview === 'string' && preview.indexOf('blob:') === 0) ? '' : previewPrefix)) {
+  // typeof DOMString/ObjectURL === 'string' and typeof new String() === 'object'
+  return preview && (prefix + (typeof preview === 'object' ? (preview[size] || preview) : preview))
 }
 
 /**
- * Convert unitless pixels value to Rem equivalent
+ * Convert unit-less pixels value to Rem equivalent
  *
  * @param {Number} pixels - to convert to rem
  * @returns {String} rem - equivalent
