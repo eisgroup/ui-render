@@ -241,7 +241,7 @@ export function interpolateString (string, variables = {}, {formatKey, name, sup
 		if (formatKey) key = formatKey.replace('key', key)
 		// noinspection JSCheckFunctionSignatures
 		const result = get(variables, ...key.split(','))
-		if (result === undefined) {
+		if (result === void 0) {
 			if (!suppressError && !variables.hasOwnProperty(key.split(',')[0])) {
 				throw new Error(`${name || interpolateString.name + '()'} expects variable '${key}', got '${variables[key]}'`)
 			}
