@@ -1,4 +1,4 @@
-import { cloneDeep } from 'utils-pack'
+import { __DEV__, cloneDeep, SIZE_MB_16 } from 'utils-pack'
 
 const buttonTrash = {
   view: 'Button',
@@ -417,10 +417,24 @@ const experienceRating = {
       styles: 'padding-v-smaller'
     },
     {
-      view: 'Input',
-      name: 'ShowExperienceRating',
-      type: 'checkbox',
-      label: 'Experience Rating',
+      view: 'Row',
+      styles: 'middle',
+      items: [
+        {
+          view: 'Input',
+          name: 'ShowExperienceRating',
+          id: 'toggleShowExperienceRating',
+          styles: 'margin-right-smaller',
+          type: 'toggle',
+          label: ' ',
+        },
+        {
+          view: 'Label',
+          htmlFor: 'toggleShowExperienceRating',
+          styles: 'bold pointer',
+          children: 'Experience Rating'
+        }
+      ]
     },
     {
       view: 'Row',
@@ -457,13 +471,27 @@ const experienceRating = {
             },
           ],
           onClick: {
-            name: 'openLink',
-            args: ['url']
+            name: 'download',
+            args: [
+              // Using path relative to the URL the page is on
+              (__DEV__ ? '' : '/ui-render') + '/static/images/ui-architecture.png',
+              'optional-file-name-to-save-as.png'
+            ]
           }
         },
         {
-          view: 'Button',
-          styles: 'margin-right',
+          view: 'Input',
+          name: 'path.to.file', // path in data.json
+          type: 'file', // use dropzone file input
+          title: 'Upload CSV File', // hint
+          classWrap: 'left',
+          styles: 'button', // style dropzone as button
+          // label: 'Report', // only used in dropzone style when `showTypes = true`
+          formats: ['csv'], // required
+          maxSize: SIZE_MB_16, // maximum allowed file size in bytes
+          multiple: false, // only allow single file upload
+          showTypes: false, // disable on hover hint for dropzone
+          autoSubmit: true,
           items: [
             {
               view: 'Icon',
@@ -474,11 +502,7 @@ const experienceRating = {
               view: 'Text',
               children: 'Upload File'
             },
-          ],
-          onClick: {
-            name: '_upload',
-            args: ['todo']
-          }
+          ]
         }
       ],
     }
