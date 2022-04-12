@@ -25,11 +25,13 @@ FIELD.ACTION = {
   DOWNLOAD: 'download',
   REMOVE_DATA: 'removeData',
   POPUP_DELAY: 'popupDelay',
+  POPUP_OPEN: 'popupOpen',
 }
 FIELD.TYPE = {
   AUTO_SUBMIT: 'AutoSubmit',
   DATA: 'Data',
   ICON: 'Icon',
+  POPUP: 'Popup',
   TABLE_CELLS: 'TableCells',
 }
 FIELD.VALIDATE = {
@@ -291,6 +293,17 @@ export function withUISetup (formConfig) {
             parent.setState({data: {...data}, dataKind})
           }
           : dataActionWarning
+
+        // Popup Content Opening
+        FIELD.FUNC[FIELD.ACTION.POPUP_OPEN] = (...args) => {
+          // The first argument can be Button Event
+          if (typeof args[0] === 'object') args.shift()
+          // noinspection JSCheckFunctionSignatures
+          const [id, options] = args
+          const {[id]: {content, title = '', ...props} = {}} = this.popupById || {}
+          popupAlert(title, content, {...props, ...options})
+        }
+
         // Cross UI Render instances validation
         FIELD.VALIDATION[FIELD.VALIDATE.NOT_WITHIN_RANGE] = (value, {dataKind, args: [start, end]}) => {
           const {form, index, parent} = this.props

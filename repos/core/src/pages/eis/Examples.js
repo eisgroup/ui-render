@@ -27,6 +27,7 @@ import invalidArrayData from './examples/invalid-array_data'
 import invalidArrayMeta from './examples/invalid-array_meta'
 import listMeta from './examples/list_meta'
 import piechartMeta from './examples/piechart_meta'
+import popupMeta from './examples/popup_meta'
 import * as ratingDetails from './examples/rating_details'
 import showIfCondition from './examples/showIf'
 import * as summaryBox from './examples/summary-box'
@@ -141,6 +142,12 @@ const examples = [
     id: 'pieChart',
     data,
     meta: piechartMeta,
+  },
+  {
+    title: 'Popup Content',
+    id: 'popupContent',
+    data: listData,
+    meta: popupMeta,
   },
   {
     title: 'Show If Condition',

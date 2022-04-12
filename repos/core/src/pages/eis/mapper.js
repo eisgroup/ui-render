@@ -1,8 +1,9 @@
+import { withForm } from 'modules-pack/form'
 import AutoSave from 'modules-pack/form/views/AutoSave'
 import { POPUP, popupAlert } from 'modules-pack/popup'
 import { stateAction } from 'modules-pack/redux'
 import { FIELD } from 'modules-pack/variables'
-import React from 'react'
+import React, { PureComponent } from 'react'
 import { cn } from 'react-ui-pack'
 import Button from 'react-ui-pack/Button'
 import PieChart from 'react-ui-pack/charts/PieChart'
@@ -323,6 +324,26 @@ Render.Component = function RenderComponent ({
         props.children = Render({debug, ...props.children})
       }
       return <TooltipPop inverted {...props}/>
+    }
+
+    case FIELD.TYPE.POPUP: {
+      if (!instance.popupById) instance.popupById = {}
+      const {id, ...popup} = props
+
+      /**
+       * Popup is a special case, it does not render content to the DOM immediately, only as VirtualDOM.
+       * When user clicks on a button that opens popup, the VirtualDOM is inserted to Popup component for rendering.
+       * @withForm needs to wrap the entire content to provide Form field instance using existing form.
+       */
+      @withForm({form: instance.form})
+      class PopupContent extends PureComponent {
+        render () {
+          return items.map(Render)
+        }
+      }
+
+      instance.popupById[id] = {...popup, content: <PopupContent/>}
+      return null
     }
 
     default: {
