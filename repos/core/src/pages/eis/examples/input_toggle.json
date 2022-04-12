@@ -1,0 +1,10 @@
+{
+  "view": "Input",
+  "name": "coverages.0.checkbox",
+  "styles": "margin",
+  "label": "Label (used if `labelTrue` or `labelFalse` undefined)",
+  "labelTrue": "True Label",
+  "labelFalse": "False Label",
+  "type": "toggle",
+  "defaultValue": true
+}

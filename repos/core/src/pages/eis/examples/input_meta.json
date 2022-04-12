@@ -1,36 +1,21 @@
 {
-  "view": "Row",
-  "styles": "app__form bottom margin",
-  "items": [
-    {
-      "view": "Input",
-      "name": "coverages.0.annualPremium",
-      "styles": "max-width-290 margin-right",
-      "label": "Annual Premium",
-      "placeholder": "Enter amount...",
-      "icon": "dollar",
-      "unit": "USD",
-      "type": "number",
-      "format": "integer",
-      "validate": "required",
-      "min": 0,
-      "max": 100000,
-      "step": 0.1,
-      "required": true,
-      "lefty": true,
-      "readonly": false,
-      "disabled": false,
-      "removable": false,
-      "autoSubmit": true
-    },
-    {
-      "view": "Input",
-      "name": "coverages.0.checkbox",
-      "label": "Label",
-      "labelTrue": "True Label",
-      "labelFalse": "False Label",
-      "type": "toggle",
-      "defaultValue": true
-    }
-  ]
+  "view": "Input",
+  "name": "coverages.0.annualPremium",
+  "styles": "max-width-290 margin",
+  "label": "Annual Premium",
+  "placeholder": "Enter amount...",
+  "icon": "dollar",
+  "unit": "USD",
+  "type": "number",
+  "format": "integer",
+  "validate": "required",
+  "min": 0,
+  "max": 100000,
+  "step": 0.1,
+  "required": true,
+  "lefty": true,
+  "readonly": false,
+  "disabled": false,
+  "removable": false,
+  "autoSubmit": true
 }

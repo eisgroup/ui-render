@@ -22,6 +22,7 @@ import expandListMeta from './examples/expand-list_meta'
 import experienceData from './examples/experience_data'
 import experienceMeta from './examples/experience_meta'
 import inputMeta from './examples/input_meta'
+import inputToggle from './examples/input_toggle'
 import invalidArrayData from './examples/invalid-array_data'
 import invalidArrayMeta from './examples/invalid-array_meta'
 import listMeta from './examples/list_meta'
@@ -164,6 +165,12 @@ const examples = [
     id: 'input',
     data: exampleData,
     meta: inputMeta,
+  },
+  {
+    title: 'Input Toggle Checkbox',
+    id: 'inputToggle',
+    data: exampleData,
+    meta: inputToggle,
   },
   {
     title: 'Invalid Array Data',
