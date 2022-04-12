@@ -9,8 +9,9 @@ import ScrollView from 'react-ui-pack/ScrollView'
 import { Active, get, isEmpty, isList, isString, logRender, sanitizeResponse, warn, } from 'utils-pack'
 import { cloneDeep, hasObjectValue, isObject, set } from 'utils-pack/object'
 import Render, { metaToProps } from '../../ui-render'
+import { downloadFile } from './actions/file'
 import './mapper' // Set up UI Renderer components and methods
-import './translations'
+import { _ } from './translations'
 import { notWithinRange } from './validators'
 
 /**
@@ -21,6 +22,7 @@ import { notWithinRange } from './validators'
 
 FIELD.ACTION = {
   ADD_DATA: 'addData',
+  DOWNLOAD: 'download',
   REMOVE_DATA: 'removeData',
   POPUP_DELAY: 'popupDelay',
 }
@@ -253,6 +255,13 @@ export function withUISetup (formConfig) {
       get () {
         const data = this.data
         const {form, parent, index} = this.props
+        // Download file from URL
+        FIELD.FUNC[FIELD.ACTION.DOWNLOAD] = (...args) => {
+          // The first argument can be Button Event
+          if (typeof args[0] === 'object') args.shift()
+          // noinspection JSCheckFunctionSignatures
+          downloadFile(...args).catch(err => this.popupAlert(err, _.DOWNLOAD_FAILED_))
+        }
         // Add current Form values to parent UI Render instance.state
         FIELD.FUNC[FIELD.ACTION.ADD_DATA] = (parent && form)
           ? () => {

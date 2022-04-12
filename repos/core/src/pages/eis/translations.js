@@ -1,5 +1,7 @@
 import { l, localiseTranslation } from 'utils-pack'
 
+export { _ } from 'utils-pack/translations'
+
 /**
  * LOCALISED TRANSLATIONS (i18n) ===============================================
  * =============================================================================

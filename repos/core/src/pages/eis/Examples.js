@@ -11,6 +11,7 @@ import { goTo } from '../../common/variables'
 import data from './examples/_data.json'
 import meta from './examples/_meta'
 import listData from './examples/array-nested_data.json'
+import download_meta from './examples/button-download_meta'
 import icon_meta from './examples/button-icon_meta'
 import * as tableForm from './examples/data_component'
 import decimalMeta from './examples/decimal_meta.json'
@@ -43,6 +44,12 @@ const examples = [
     id: 'buttonIcon',
     data: {},
     meta: icon_meta,
+  },
+  {
+    title: 'Button for Download File URL',
+    id: 'buttonDownload',
+    data: {},
+    meta: download_meta,
   },
   {
     title: 'Decimal Points',
