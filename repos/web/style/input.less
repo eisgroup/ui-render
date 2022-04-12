@@ -916,8 +916,9 @@ input {
 // CHECKBOX - TOGGLE (with custom true / false text)
 // -----------------------------------------------------------------------------
 @checkbox-size: size(30); // height of the whole checkbox label - looks better without matching button height
+@checkbox-font-size: @size-base;
 @checkbox-padding-size: size(3); // padding around label
-@checkbox-border-size: @border-size; // border around label
+@checkbox-border-size: size(@border-size); // border around label
 @checkbox-button-size: @checkbox-size - @checkbox-border-size * 2; //  - size(@checkbox-padding-size * 6) width of the circle
 @checkbox-button-offset-border: -@checkbox-border-size;
 @checkbox-button-offset-label: @checkbox-border-size + @checkbox-padding-size; // offset padding for label text
@@ -1015,8 +1016,8 @@ input.checkbox.toggle {
 input.checkbox.toggle {
   + label { // slide container
     //.text-shadow();
-    .font-size(@size-base);
-    &:extend(.uppercase);
+    .font-size(@checkbox-font-size);
+    //&:extend(.uppercase);
     border-radius: @checkbox-size !important;
     //border-color: transparent !important;
     white-space: nowrap;
@@ -1076,7 +1077,7 @@ input.checkbox.toggle {
   &:checked { // true state
     + label { // slide container
       &:extend(.text.bold);
-      &:extend(.text-shadow all);
+      &:extend(.text-shadow);
       text-align: right;
       color: @color-white;
 
