@@ -1,7 +1,7 @@
 export const data = {
   reportName: 'Final Manual Rate (with UW Adj)',
   groupLabel: 'Tier',
-  labelByDate: {
+  labelById: {
     'employee': 'Employee/Spouse/Child',
     'employer': 'Employer',
   },
@@ -70,7 +70,7 @@ export const meta = {
     by: { // required
       id: 'tier', // required
       label: {
-        name: 'labelByDate',
+        name: 'labelById',
         relativeData: false,
       },
       className: 'center bg-success-light border-h',

@@ -1,5 +1,6 @@
 {
   "planID": "Golden",
+  "classLabel": "Dynamic Class",
   "coverages": [
     {
       "coverageID": "Gold",

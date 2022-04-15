@@ -10,7 +10,10 @@ nestedTable.items.push({
   headers: [ // -> must be defined if data contains nested tables
     {
       id: 'classID',
-      label: 'Class Name',
+      label: {
+        name: 'classLabel',
+        relativeData: false,
+      },
     },
     {
       id: 'numberOfLives',
