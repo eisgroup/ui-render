@@ -15,7 +15,7 @@ import {
   TIMEOUT,
   VOID
 } from 'utils-pack'
-import { STATE_ACTION_TIMEOUT } from '../variables'
+import { STATE_ACTION_TIMEOUT } from '../variables/configs'
 
 /**
  * ACTION CREATORS =============================================================
