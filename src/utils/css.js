@@ -24,7 +24,7 @@ const previewPrefix = ENV.REACT_APP_CDN_URL || ''
  * @returns {String|Object} preview src ready for consumption by Components
  */
 export function previewSize (preview, size = 'thumb',
-  prefix = ((typeof preview === 'string' && preview.indexOf('blob:') === 0) ? '' : previewPrefix)) {
+  prefix = ((typeof preview === 'string' && (preview.indexOf('blob:') === 0 || preview.indexOf('http') === 0)) ? '' : previewPrefix)) {
   // typeof DOMString/ObjectURL === 'string' and typeof new String() === 'object'
   return preview && (prefix + (typeof preview === 'object' ? (preview[size] || preview) : preview))
 }
