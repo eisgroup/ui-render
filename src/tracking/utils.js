@@ -1,5 +1,3 @@
-import React, { Component } from 'react'
-import GoogleAnalytics from 'react-ga'
 import { GET, getParamByKey, performStorage, SET } from 'utils-pack'
 import {
   COOKIE_ACCEPTED_TIMESTAMP_KEY,
@@ -15,11 +13,25 @@ import {
  */
 
 export const tracking = {
-  init (analyticsTrackingId) {
+  /**
+   * Initialize Analytics Tracking
+   * @example:
+   *   import GoogleAnalytics from 'react-ga'
+   *   const initAnalytics = (trackingId, tracking) => {
+   *     tracking.ga = GoogleAnalytics
+   *     tracking.ga.initialize(trackingId)
+   *     if (this.user) tracking.ga.set({userId: this.user})
+   *   }
+   *   tracking.init(ENV.REACT_APP_ANALYTICS_TRACKING_ID, initAnalytics)
+   *
+   * @param {String|undefined} analyticsTrackingId
+   * @param {Function} initAnalytics - Callback(this) instance to initialize Analytics if activated
+   */
+  init (analyticsTrackingId, initAnalytics) {
     this.setFirstVisitTimestamp()
     this.setReferrer()
     this.setUser()
-    this.setAnalytics(analyticsTrackingId)
+    this.setAnalytics(analyticsTrackingId, initAnalytics)
   },
 
   /**
@@ -40,7 +52,7 @@ export const tracking = {
   /**
    * Setup Google Analytics
    */
-  setAnalytics (trackingId) {
+  setAnalytics (trackingId, initAnalytics) {
     // Only Activate Analytics on Production Site (if tracking ID given)
     // Disable Analytics if invite query string is defined as excluded from tracking
     const isProd = window.location.hostname !== 'localhost'
@@ -60,10 +72,8 @@ export const tracking = {
       window.history.replaceState(null, null, newURI)
     }
 
-    /* Initialize tracking data */
-    this.ga = GoogleAnalytics
-    this.ga.initialize(trackingId)
-    if (this.user) this.ga.set({userId: this.user})
+    /* Initialize tracking data with Analytics */
+    initAnalytics(trackingId, this)
   },
 
   setFirstVisitTimestamp () {
@@ -165,34 +175,3 @@ export const tracking = {
   },
 }
 
-/**
- * Higher Order React Component Wrapper to enable Analytics
- * @param {String} trackingId - analytics tracking ID
- * @return {Function<WrappedComponent>} decorator function that accepts React Component
- */
-export function withTracker (trackingId) {
-  tracking.init(trackingId)  // sets `userId` internally as `options`
-
-  function trackPage (page) {
-    if (!tracking.ga) return
-    tracking.ga.pageview(page)
-  }
-
-  return function (WrappedComponent) {
-    return class HOC extends Component {
-      componentDidMount () {
-        trackPage(this.props.location.pathname)
-      }
-
-      UNSAFE_componentWillReceiveProps (nextProps) {
-        const currentPage = this.props.location.pathname
-        const nextPage = nextProps.location.pathname
-        if (currentPage !== nextPage) trackPage(nextPage)
-      }
-
-      render () {
-        return <WrappedComponent {...this.props} />
-      }
-    }
-  }
-}

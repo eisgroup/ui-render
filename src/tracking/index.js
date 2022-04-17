@@ -1,5 +1,4 @@
 import { NAME } from './constants'
-import { withTracker } from './utils'
 
 /**
  * App Tracking:
@@ -15,9 +14,9 @@ import { withTracker } from './utils'
  */
 
 export * from './constants'
+export * from './utils'
 export {
   NAME,
-  withTracker
 }
 
 const tracking = {
