@@ -7,7 +7,7 @@ It uses:
 * [Semantic UI](https://react.semantic-ui.com/)
 * [LESS](http://lesscss.org/)
 
-Check [overview](./docs/overview.md) to get a basic understanding of the project's overall architecture, as well as [coding standards](./docs/standards.md) before continuing.
+Check the [/docs](./docs) folder to get a basic understanding of the project's [architecture](./docs/Architecture.md) and [coding standards](./docs/standards.md) before continuing.
 
 ## Development Installation
 
@@ -40,9 +40,13 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 
 Launches end-to-end integration tests using Cypress.
 
+### `yarn deploy`
+
+Build the app under `web` workspace and push it to GitHub pages [documentation](https://eisgroup.github.io/ui-render/).
+
 ### `yarn workspace web build`
 
-Builds the app for production to the `dist` folder.<br>
+Builds the app for production to the `/repos/web/build` folder.<br>
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
 The build is minified and the filenames include the hashes.<br>

@@ -5,6 +5,7 @@ export default {
   name: 'path.to.file', // path in data.json
   type: 'file', // use dropzone file input
   title: 'Upload CSV File', // hint
+  classWrap: 'left', // move button to the left, instead of centered by default
   styles: 'button margin-largest', // style dropzone as button
   // label: 'Report', // only used in dropzone style when `showTypes = true`
   formats: ['csv'], // required
