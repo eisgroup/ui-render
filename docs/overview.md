@@ -246,5 +246,3 @@ Example on how to show popup alert whenever an API fetch error occurs:
       }));
     }
     ```
-
-[More merged request examples](https://mnsgitlab01.exigengroup.com/openl-report/client/merge_requests).

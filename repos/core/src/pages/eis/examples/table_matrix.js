@@ -12,18 +12,18 @@ export const data = {
     {tier: 'employer', ageBand: '19-29', undiffRate: 0.16, smokerRate: 0.13, nonSmokerRate: 0.17},
   ],
   // >>> matrixTable converts to this internally:
-  _ui_converts_to_this_matrixTable: [
-    {
-      ageBand: '0-19',
-      undiffRate_employee: 1.05, smokerRate_employee: 1.09, nonSmokerRate_employee: 1.04,
-      undiffRate_employer: 0.06, smokerRate_employer: 0.03, nonSmokerRate_employer: 0.07
-    },
-    {
-      ageBand: '19-29',
-      undiffRate_employee: 1.15, smokerRate_employee: 1.19, nonSmokerRate_employee: 1.14,
-      undiffRate_employer: 0.16, smokerRate_employer: 0.13, nonSmokerRate_employer: 0.17
-    },
-  ]
+  // _ui_converts_to_this_matrixTable: [
+  //   {
+  //     ageBand: '0-19',
+  //     undiffRate_employee: 1.05, smokerRate_employee: 1.09, nonSmokerRate_employee: 1.04,
+  //     undiffRate_employer: 0.06, smokerRate_employer: 0.03, nonSmokerRate_employer: 0.07
+  //   },
+  //   {
+  //     ageBand: '19-29',
+  //     undiffRate_employee: 1.15, smokerRate_employee: 1.19, nonSmokerRate_employee: 1.14,
+  //     undiffRate_employer: 0.16, smokerRate_employer: 0.13, nonSmokerRate_employer: 0.17
+  //   },
+  // ]
 }
 
 export const meta = {

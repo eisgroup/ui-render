@@ -22,13 +22,14 @@
 }
 
 .app__modal__backdrop {
-  &:extend(.position-fill all);
+  &:extend(.position-fill);
 }
 
 .app__modal__box {
+  @heightOffset: size(@screen-height-offset);
   &:extend(.overflow-scroll all);
   z-index: 1; // for float label forms
-  max-height: calc(100vh - size(@screen-height-offset));
+  max-height: ~'calc(100vh - @{heightOffset})';
   box-shadow: 0 0.1rem 0.4rem 0 rgba(0, 0, 0, 0.3);
   border-radius: @radius-large;
 

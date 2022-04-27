@@ -2,15 +2,15 @@ import Popup from 'modules-pack/popup/views/Popup'
 import { connect } from 'modules-pack/redux'
 import { Switch, withRouter } from 'modules-pack/router/browser'
 import { select, SETTING } from 'modules-pack/settings'
-import { withTracker } from 'modules-pack/tracking'
-// import AcceptCookie from 'modules-pack/tracking/views/AcceptCookie'
-import { ANALYTICS_TRACKING_ID, DEFAULT } from 'modules-pack/variables'
+import { DEFAULT } from 'modules-pack/variables'
 import React, { Component } from 'react'
+import Button from 'react-ui-pack/Button'
+import Icon from 'react-ui-pack/Icon'
 import Modal from 'react-ui-pack/Modal'
 import Row from 'react-ui-pack/Row'
 import { UIContext } from 'react-ui-pack/utils'
 import View from 'react-ui-pack/View'
-import { debounceBy, get, log, logRender, TIME_DURATION_INSTANT } from 'utils-pack'
+import { Active, debounceBy, get, log, logRender, TIME_DURATION_INSTANT } from 'utils-pack'
 import Sidebar, { Header } from './containers/Navigation'
 
 /**
@@ -24,7 +24,6 @@ const mapStateToProps = (state) => ({
 })
 
 @withRouter
-@withTracker(ANALYTICS_TRACKING_ID)
 @connect(mapStateToProps)
 @logRender
 export default class App extends Component {
@@ -105,6 +104,13 @@ export default class App extends Component {
     this.resize()
   }
 
+  renderClosePopup = ({closePopup}) => {
+    return Active.popupCLoseButton ||
+      <View className="position-top-right padding-right-small padding-top-small" style={styleCloseButton}>
+        <Button className="primary circle small" onClick={closePopup}><Icon name="close"/></Button>
+      </View>
+  }
+
   render () {
     const {children, theme = DEFAULT.THEME, lang = DEFAULT.LANGUAGE, currency, ...props} = this.props
     const {isMobile} = this.state
@@ -130,7 +136,7 @@ export default class App extends Component {
               {this.isModal && this.renderModal()}
 
               {/* Popup */}
-              <Popup inverted={inverted}/>
+              <Popup canClose inverted={inverted} renderClose={this.renderClosePopup}/>
             </View>
 
           </Row>
@@ -139,3 +145,5 @@ export default class App extends Component {
     )
   }
 }
+
+const styleCloseButton = {zIndex: 9}
