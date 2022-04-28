@@ -23,7 +23,7 @@
   display: inline-flex; // align content in the middle
   position: relative; // for Spinner
   //text-transform: uppercase;
-  //color: @color-white;
+  color: inherit;
   font-family: @font-family;
   background-color: @background;
   border: @border;
@@ -56,6 +56,9 @@
 
   @{select-icon} {
     font-size: @size-icon; // crisp display fix
+    &:before {
+      opacity: 1;
+    }
   }
 
   &.small {
