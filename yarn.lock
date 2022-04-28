@@ -12267,10 +12267,10 @@ module-lookup-amd@^6.1.0:
     requirejs "^2.3.5"
     requirejs-config-file "^3.1.1"
 
-modules-pack@^0.11.31:
-  version "0.11.31"
-  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.11.31.tgz#0a9a3aa451dff51aa99241a9c220e17734611ff6"
-  integrity sha512-2HEkO4rsuvW7G9uahJEJfBZlHOrMfGHj2SppwGnc7W4OxzCl0f39UJj5skJd5oAjBBAMhzBOwC8I+sIS+u3KSA==
+modules-pack@^0.11.32:
+  version "0.11.32"
+  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.11.32.tgz#e52aa5f5b0799888372d9f53ee7a70efae741ee1"
+  integrity sha512-4EXdRHJuIJvvM4604vdNQzLEW3cWlr4UOXVHNSRKIUdSL/Fi47on7r8TskW5cFJRVwcHfdlm/7CFbPg38nAQ2Q==
   dependencies:
     "@aws-sdk/client-s3" "^3.58.0"
     "@aws-sdk/lib-storage" "^3.58.0"
@@ -14889,10 +14889,10 @@ react-transition-group@^2.5.0:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react-ui-pack@^0.10.14:
-  version "0.10.14"
-  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.10.14.tgz#126b5dfabd8ee6fcdf2fabcead79444ca249a8e1"
-  integrity sha512-M7PShz5sDjmPF3HSsO/5jyfkYMFhMUlVJkcqZojPDday0uWRrzxhY6qKagTCy555oVDC2ZeWYC/7DAvu82VkLQ==
+react-ui-pack@^0.10.15:
+  version "0.10.15"
+  resolved "https://registry.yarnpkg.com/react-ui-pack/-/react-ui-pack-0.10.15.tgz#bf8987f6a4aefa7bb86bac1e961ab07ccd3f07e5"
+  integrity sha512-jxf3oiZe32ZyAKzHypjmGtj14cXplpNDMG9GJ/r/orjEfWuXM0LJciLGQnIyX3fBltu1yu5KnKzvZKq5e2sY0g==
   dependencies:
     chroma-js "^2.1.0"
     classnames "^2.2.6"
