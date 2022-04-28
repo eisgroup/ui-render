@@ -179,7 +179,7 @@ export function asField (InputComponent, {sanitize} = {}) {
           value={sanitize ? sanitize(this.value, this.props) : this.value}
           onBlur={this.handleBlur} // prevent value change, but need onBlur to set touched for validation
           onChange={this.handleChange}
-          error={touched && error && (err || error)}
+          error={error && (touched || !pristine) && (err || error)} // only show error after user interaction
           {...props} // allow forceful value override
         />
       )
