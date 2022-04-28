@@ -113,6 +113,10 @@ export function asField (InputComponent, {sanitize} = {}) {
       parse: PropTypes.func,
     }
 
+    componentDidMount () {
+      this.didMount = true
+    }
+
     // Handle onRemove field in FIELD.TYPE.MULTIPLE*
     componentWillUnmount () {
       // warn('-------componentWillUnmount', this.constructor.name)
@@ -151,16 +155,23 @@ export function asField (InputComponent, {sanitize} = {}) {
     // @Note: react-final-form fires `format()` when `input.value` getter is called
     Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}) => {
       const {
-        onChange, error: err, defaultValue, normalize, format, parse, validate,
+        onChange, error: err, defaultValue, normalize, format, formatOnBlur = !!format, parse, validate,
         instance, onRemoveChange, ...props
       } = this.props
       // @Note: defaultValue is only used for UI, internal value is still undefined
       this.value = value === '' ? (pristine && defaultValue != null ? defaultValue : value) : value
+
       // Hide this field if it's readonly and has no value.
       if (this.props.readonly && isRequired(this.value != null ? this.value : this.props.value)) return null
 
       this.input = input
-      if (this.value === undefined) this.value = ''
+
+      if (this.value === undefined) {
+        this.value = ''
+      } else if (!this.didMount && formatOnBlur && format) {
+        this.value = format(this.value) // format value initially
+      }
+
       if (instance) this.initValues = instance.props.initialValues
       return (
         <InputComponent
@@ -199,8 +210,11 @@ export function asField (InputComponent, {sanitize} = {}) {
     // Do not pass 'onChange' to Field because it fires event as argument
     // final-form does not take controlled `value`
     render () {
-      const {name, disabled, normalize, format, parse = normalize, validate, options} = this.props
-      return <Active.Field {...{name, disabled, normalize, format, parse, validate, options}} component={this.Input}/>
+      const {
+        name, disabled, normalize, format, formatOnBlur = !!format, parse = normalize, validate, options
+      } = this.props
+      return <Active.Field {...{name, disabled, normalize, format, formatOnBlur, parse, validate, options}}
+                           component={this.Input}/>
     }
   }
 
