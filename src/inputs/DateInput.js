@@ -48,7 +48,7 @@ export default class DateInput extends PureComponent {
   }
 
   render () {
-    const {className, style, normalize: _, validate: __, format: ___, error, touched, ...props} = this.props
+    const {className, style, normalize: _, validate: __, format: ___, error, touched, pristine, ...props} = this.props
     const {date, errors} = this.state
     return (
       <Input
@@ -56,7 +56,7 @@ export default class DateInput extends PureComponent {
         className={className}
         style={style}
         value={date}
-        error={touched && (error || errors.join(', '))}
+        error={(touched || !pristine) ? (error || errors.join(', ')) : void 0}
         onChange={this.handleChange}
       />
     )
