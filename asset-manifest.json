@@ -1,9 +1,9 @@
 {
-  "main.js": "/ui-render/static/js/main.a8850eb9.chunk.js",
-  "main.js.map": "/ui-render/static/js/main.a8850eb9.chunk.js.map",
-  "static/css/1.35eefba4.chunk.css": "/ui-render/static/css/1.35eefba4.chunk.css",
-  "static/js/1.1630f988.chunk.js": "/ui-render/static/js/1.1630f988.chunk.js",
-  "static/js/1.1630f988.chunk.js.map": "/ui-render/static/js/1.1630f988.chunk.js.map",
+  "main.js": "/ui-render/static/js/main.4c5a2dac.chunk.js",
+  "main.js.map": "/ui-render/static/js/main.4c5a2dac.chunk.js.map",
+  "static/css/1.b14276be.chunk.css": "/ui-render/static/css/1.b14276be.chunk.css",
+  "static/js/1.b0d77032.chunk.js": "/ui-render/static/js/1.b0d77032.chunk.js",
+  "static/js/1.b0d77032.chunk.js.map": "/ui-render/static/js/1.b0d77032.chunk.js.map",
   "runtime~main.js": "/ui-render/static/js/runtime~main.0ca886b2.js",
   "runtime~main.js.map": "/ui-render/static/js/runtime~main.0ca886b2.js.map",
   "static/media/changelog.md": "/ui-render/static/media/changelog.7c8abff3.md",
@@ -11,8 +11,8 @@
   "static/media/docs.md": "/ui-render/static/media/docs.5ce88312.md",
   "static/media/faq.md": "/ui-render/static/media/faq.1d393b82.md",
   "static/media/styles.md": "/ui-render/static/media/styles.d08fd8cc.md",
-  "static/css/1.35eefba4.chunk.css.map": "/ui-render/static/css/1.35eefba4.chunk.css.map",
+  "static/css/1.b14276be.chunk.css.map": "/ui-render/static/css/1.b14276be.chunk.css.map",
   "index.html": "/ui-render/index.html",
-  "precache-manifest.894dc35e579c20c435de106c4d2ea860.js": "/ui-render/precache-manifest.894dc35e579c20c435de106c4d2ea860.js",
+  "precache-manifest.5fdfad7b8594e36f6b0002f4747c9fce.js": "/ui-render/precache-manifest.5fdfad7b8594e36f6b0002f4747c9fce.js",
   "service-worker.js": "/ui-render/service-worker.js"
 }
