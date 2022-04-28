@@ -62,9 +62,9 @@ export default class UIRender extends Component {
     childBefore: type.Any,
     childAfter: type.Any,
     // If given, will render <form onSubmit {...form} />
-    form: type.Of({
+    form: type.OneOf(type.Boolean, type.Of({
       kind: type.Id,
-    }),
+    })),
     // Whether to disable rendering of wrapper scroll view and html form
     embedded: type.Boolean,
   }

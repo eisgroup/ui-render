@@ -33,7 +33,7 @@ class DOMProxy extends PureComponent {
   render () {
     const {onMount, dataUrl, metaUrl, ...props} = this.state
     return (dataUrl && metaUrl)
-      ? <WebStudioPage dataUrl={dataUrl} metaUrl={metaUrl}/>
+      ? <WebStudioPage dataUrl={dataUrl} metaUrl={metaUrl} {...props}/>
       : <UIRender {...props}/>
   }
 }

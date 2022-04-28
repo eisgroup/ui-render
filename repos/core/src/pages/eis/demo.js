@@ -112,10 +112,12 @@ export default class Demo extends Component {
         </ScrollView>
         }
         <UIRender
+          form
           className="bg-info-light"
           initialValues={data.json}
           data={data.json}
           meta={meta.json}
+          onSubmit={console.warn}
         />
       </>
     )

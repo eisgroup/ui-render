@@ -105,7 +105,7 @@ export default class WebStudioPage extends Component {
     this.hasData = !isEmpty(data)
     this.hasMeta = !isEmpty(meta)
     return (this.hasData && this.hasMeta
-        ? <UIRender data={data} meta={meta} initialValues={data} onSubmit={this.submit}/>
+        ? <UIRender onSubmit={this.submit} {...this.props} data={data} meta={meta} initialValues={data}/>
         : <Placeholder>
           {!this.hasData &&
           <Text className={cn('h1', {error: !loadingData, blink: loadingData})}>

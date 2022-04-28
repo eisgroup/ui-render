@@ -238,7 +238,7 @@ export default class Examples extends Component {
           >
             {() => (
               <>
-                <UIRender data={data} meta={meta} initialValues={data}/>
+                <UIRender data={data} meta={meta} initialValues={data} form={obj} onSubmit={console.warn}/>
                 <ScrollView className="padding-smaller bg-neutral inverted">
                   <Row className="wrap spread">
                     <View fill className="padding-smaller min-width-320">
@@ -273,3 +273,5 @@ export default class Examples extends Component {
     )
   }
 }
+
+const obj = {id: 'example'} // can be boolean true

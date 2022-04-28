@@ -16,8 +16,8 @@ components consumption.
 Events triggered from React components can fire predefined `actions` that will either update the UI Render instance's
 state, or call `API` to refetch/update data.json and/or meta.json.
 
-This UI state or API update causes UI Render to recompute `props` for React components, causing rerendering only for those React
-components that have changed props.
+This UI state or API update causes UI Render to recompute `props` for React components, resulting in rerendering only
+for those React components that have changed props.
 
 The cycle repeats every time there is an `action` causing UI state or API update.
 
