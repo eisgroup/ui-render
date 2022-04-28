@@ -12267,10 +12267,10 @@ module-lookup-amd@^6.1.0:
     requirejs "^2.3.5"
     requirejs-config-file "^3.1.1"
 
-modules-pack@^0.11.30:
-  version "0.11.30"
-  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.11.30.tgz#bb8f697aa59c4773950b6ee110c5826252b0873f"
-  integrity sha512-ql7P5TypmFWuDBtp0EPGgXyUN2kLNx8ZZ6o29mWgVyXQPEqqMBIcb0ffvIOnuYn0zZC2FkmXbAc2QwSDZ9cBPQ==
+modules-pack@^0.11.31:
+  version "0.11.31"
+  resolved "https://registry.yarnpkg.com/modules-pack/-/modules-pack-0.11.31.tgz#0a9a3aa451dff51aa99241a9c220e17734611ff6"
+  integrity sha512-2HEkO4rsuvW7G9uahJEJfBZlHOrMfGHj2SppwGnc7W4OxzCl0f39UJj5skJd5oAjBBAMhzBOwC8I+sIS+u3KSA==
   dependencies:
     "@aws-sdk/client-s3" "^3.58.0"
     "@aws-sdk/lib-storage" "^3.58.0"

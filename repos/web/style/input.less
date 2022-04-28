@@ -664,7 +664,7 @@ div.select {
 
     .iconPosition(@padding; @offset; @margin;) {
       @iconPadding: @input-padding-v-value;
-      @iconOffsetBefore: @margin + @iconPadding;
+      @iconOffsetBefore: @margin; // + @iconPadding;
       @iconOffsetAfter: @offset - @iconPadding;
 
       @{input-select-icon} {
@@ -680,6 +680,7 @@ div.select {
         @{input-select-icon} {
           margin-left: -@iconOffsetBefore;
           margin-right: @iconOffsetAfter;
+          padding-left: 0; // prevent icon obscuring cursor to input
         }
       }
 
@@ -697,6 +698,7 @@ div.select {
         @{input-select-icon} {
           margin-right: -@iconOffsetBefore;
           margin-left: @iconOffsetAfter;
+          padding-right: 0; // prevent icon obscuring cursor to input
         }
       }
     }
