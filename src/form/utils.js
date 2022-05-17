@@ -82,7 +82,7 @@ export function registeredFieldErrors (form) {
  *    - must use Class to prevent input from loosing focus on input 'onChange'
  *
  * @param InputComponent - React component to use for input
- * @param {Function} sanitize(value, props) - callback to parse value from input Field to InputComponent
+ * @param {Function} sanitize(value, props) - callback to parse (formatted) value from input Field to InputComponent
  * @returns {Class} React InputComponentField - connected to react-final-form or redux-form
  */
 export function asField (InputComponent, {sanitize} = {}) {
@@ -111,6 +111,15 @@ export function asField (InputComponent, {sanitize} = {}) {
       format: PropTypes.func,
       normalize: PropTypes.func,
       parse: PropTypes.func,
+    }
+
+    get value () {
+      if (this._value !== void 0) return this._value
+      return ''
+    }
+
+    set value (v) {
+      this._value = v
     }
 
     componentDidMount () {
@@ -155,28 +164,27 @@ export function asField (InputComponent, {sanitize} = {}) {
     // @Note: react-final-form fires `format()` when `input.value` getter is called
     Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}) => {
       const {
-        onChange, error: err, defaultValue, normalize, format, formatOnBlur = !!format, parse, validate,
+        onChange, error: err, defaultValue, normalize, format, parse, validate,
         instance, onRemoveChange, ...props
       } = this.props
-      // @Note: defaultValue is only used for UI, internal value is still undefined
-      this.value = value === '' ? (pristine && defaultValue != null ? defaultValue : value) : value
+
+      if (!this.hasFocus) { // use cached `value` while editing to prevent format/parse bugs and rerender
+        // @Note: defaultValue is only used for UI, internal value is still undefined
+        this.value = value === void 0 ? (pristine && defaultValue != null ? (format ? format(defaultValue) : defaultValue) : value) : value
+      }
 
       // Hide this field if it's readonly and has no value.
       if (this.props.readonly && isRequired(this.value != null ? this.value : this.props.value)) return null
 
       this.input = input
 
-      if (this.value === undefined) {
-        this.value = ''
-      } else if (!this.didMount && formatOnBlur && format) {
-        this.value = format(this.value) // format value initially
-      }
-
       if (instance) this.initValues = instance.props.initialValues
+
       return (
         <InputComponent
           {...input}
           value={sanitize ? sanitize(this.value, this.props) : this.value}
+          onFocus={this.handleFocus}
           onBlur={this.handleBlur} // prevent value change, but need onBlur to set touched for validation
           onChange={this.handleChange}
           error={error && (touched || !pristine) && (err || error)} // only show error after user interaction
@@ -185,13 +193,32 @@ export function asField (InputComponent, {sanitize} = {}) {
       )
     }
 
-    handleBlur = () => this.input.onBlur()
+    handleFocus = (...args) => {
+      this.hasFocus = true
+      return this.input.onFocus(...args)
+    }
+
+    handleBlur = () => {
+      this.hasFocus = false
+      return this.input.onBlur()
+    }
 
     handleChange = (value, ...args) => {
       const {onChange, type, normalize, parse = normalize} = this.props
+      /**
+       * @Note:
+       *  - `parse` gets called by final-form automatically on input.onChange,
+       *    but `formatOnBlur` (needed to prevent cursor jumping) only calls format onBlur,
+       *    even if input did not change. This causes extra call on `format` when input did not change,
+       *    and doesn't call `format` when `parse` was called onChange.
+       *    => the solution is to cache `value` internally to prevent Input rerender while in focus,
+       *      and remove `formatOnBlur` because it's buggy behavior (does not format on initial mount).
+       */
+      if (this.hasFocus) {
+        this.value = value // store value exactly as typed in (example: value of '1.0' to work nicely with `unit` = '%')
+      }
       if (type === 'number') value = value !== '' ? Number(value) : null
-      // both redux-form and final-form input.onChange can accept 'event' or 'value'
-      this.input.onChange(value)
+      this.input.onChange(value) // both redux-form and final-form input.onChange can accept 'event' or 'value'
       onChange && onChange(parse ? parse(value) : value, ...args)
     }
 
@@ -211,9 +238,9 @@ export function asField (InputComponent, {sanitize} = {}) {
     // final-form does not take controlled `value`
     render () {
       const {
-        name, disabled, normalize, format, formatOnBlur = !!format, parse = normalize, validate, options
+        name, disabled, normalize, format, parse = normalize, validate, options
       } = this.props
-      return <Active.Field {...{name, disabled, normalize, format, formatOnBlur, parse, validate, options}}
+      return <Active.Field {...{name, disabled, normalize, format, parse, validate, options}}
                            component={this.Input}/>
     }
   }
