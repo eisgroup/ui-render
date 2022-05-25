@@ -288,13 +288,13 @@ export default class TableView extends PureComponent {
     const headers = this.headers
     if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
     const {
-      className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical,
+      fill, className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical,
       items: _, headers: _2, renderItem: _3, renderItemCells: _4, itemClassNames: _5, itemsExpanded: _6,
       ...props
     } = this.props
     const items = this.itemsSorted
     return (
-      <ScrollView row classNameInner="fill-width">
+      <ScrollView row classNameInner="fill-width" fill={fill}>
         <Table className={cn('full-width', className, {vertical})} {...props}>
           <Table.Header className="font-normal">
             {extraHeaders && extraHeaders.map((row, i) => (

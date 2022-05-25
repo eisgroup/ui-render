@@ -28,6 +28,20 @@
   }
 }
 
+.card-glass {
+  padding: size(7);
+  &:extend(.radius-large);
+  &:extend(.bg-highlight);
+  &:extend(.box-shadow-large);
+}
+
+.card-glass--inner-bg-neutral {
+  > * {
+    &:extend(.bg-neutral);
+    &:extend(.radius);
+  }
+}
+
 .border {
   border: @border-base;
 }
@@ -94,6 +108,14 @@
   .box-shadow(@opacity: 0.1; @x: size(1); @y: 0; @blur: size(3));
 }
 
+.box-shadow-large {
+  box-shadow: 0 size(5) size(7) rgba(0, 0, 0, 0.15);
+}
+
+.box-shadow-largest {
+  box-shadow: 0 size(25) size(45) rgba(0, 0, 0, 0.2);
+}
+
 .circle {
   border-radius: 50%;
 }
@@ -118,20 +140,30 @@
 }
 
 // Apply to .input--wrapper > .input
-.input--wrapper.border-on-hover > .input {
-  input:not(:focus):not(:hover) {
-    border-color: transparent;
+.input--wrapper.border-on-hover {
+  > .input {
+    input:not(:focus):not(:hover) {
+      border-color: transparent;
+    }
+
+    input:hover:not(:focus) {
+      cursor: pointer;
+    }
+
+    // Comment this out for delete icon to work inside input with border-on-hover
+    //@{select-icon} {
+    //  color: fade(@color-neutral, 50%);
+    //  pointer-events: none;
+    //}
   }
 
-  input:hover:not(:focus) {
-    cursor: pointer;
-  }
+  > .ui.dropdown:not(.active):not(:hover) {
+    border-color: transparent !important;
 
-  // Comment this out for delete icon to work inside input with border-on-hover
-  //@{select-icon} {
-  //  color: fade(@color-neutral, 50%);
-  //  pointer-events: none;
-  //}
+    > i.icon.dropdown {
+      display: none !important;
+    }
+  }
 }
 
 .radius {
@@ -171,6 +203,16 @@
 
 .no-radius {
   border-radius: 0 !important;
+}
+
+.no-radius-top {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
+.no-radius-bottom {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
 }
 
 .round {

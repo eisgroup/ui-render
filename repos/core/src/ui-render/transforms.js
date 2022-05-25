@@ -36,6 +36,7 @@ export function mapProps (data, mapper, {debug} = {}) {
  */
 export function metaToProps (meta, config) {
     const {
+        form,
         instance, // contains dynamic `state` to hydrate meta data
         relativePath,
         relativeIndex,
@@ -113,9 +114,8 @@ export function metaToProps (meta, config) {
                           !getFunctionFromString(definition[func], {...funcConfig, fallback: null}) &&
                           {[func]: self[definition[func]]}
                         )).reduce((obj, item) => ({...obj, ...item}), {}),
-                        ...definition.view.indexOf('Data') === 0 && {instance, index},
-                        data,
-                        _data,
+                        ...definition.view.indexOf('Data') === 0 && {index},
+                        data, _data, form, instance,
                     }, index)
                 }
 
@@ -196,6 +196,7 @@ function metaToFunctions(definition, config) {
     const {
         fieldValidation,
         fieldNormalizer,
+        fieldParser,
         fieldFunc,
         funcNames = FUNCTION_NAMES
     } = config
@@ -203,7 +204,7 @@ function metaToFunctions(definition, config) {
     // const validations = toList(definition.validate)
     // if (isString(validations[0])) definition.validate = removeNilValues(validations.map(id => FIELD.VALIDATION[id]))
     if (isString(definition.format)) definition.format = fieldNormalizer[definition.format]
-    if (isString(definition.parse)) definition.parse = fieldNormalizer[definition.parse]
+    if (isString(definition.parse)) definition.parse = fieldParser[definition.parse] || fieldNormalizer[definition.parse]
     if (isString(definition.normalize)) definition.normalize = fieldNormalizer[definition.normalize]
     if (isString(definition.validate)) definition.validate = fieldValidation[definition.validate]
     if (hasObjectValue(definition.verify)) {

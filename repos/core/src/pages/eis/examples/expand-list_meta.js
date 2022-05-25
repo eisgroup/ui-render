@@ -29,6 +29,7 @@ export default {
             relativeData: true,
             type: 'number',
             styles: 'padding no-margin',
+            autoSubmit: true,
           },
           {
             view: 'Col',
@@ -49,4 +50,3 @@ export default {
     ],
   },
 }
-

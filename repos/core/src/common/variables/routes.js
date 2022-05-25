@@ -1,7 +1,7 @@
 import { createNestedRoutes, ROUTE, ROUTES } from 'modules-pack/variables'
 import { __PROD__, ENV } from 'utils-pack'
 
-const ROUTE_BASE = __PROD__ ? `${ENV.REACT_APP_HOMEPAGE}/` : '/'
+export const ROUTE_BASE = __PROD__ ? `${ENV.REACT_APP_HOMEPAGE || ''}/` : '/'
 const _ROUTE = {
   HOME: ROUTE_BASE,
   DOCS: __PROD__ ? ROUTE_BASE : `${ROUTE_BASE}docs`,

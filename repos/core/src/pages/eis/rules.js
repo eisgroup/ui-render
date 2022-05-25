@@ -6,7 +6,7 @@ import React, { Component, Fragment } from 'react'
 import { cn, type } from 'react-ui-pack'
 import Json from 'react-ui-pack/JsonView'
 import ScrollView from 'react-ui-pack/ScrollView'
-import { Active, get, isEmpty, isList, isString, logRender, sanitizeResponse, warn, } from 'utils-pack'
+import { Active, get, isEmpty, isList, isString, logRender, round, sanitizeResponse, warn, } from 'utils-pack'
 import { cloneDeep, hasObjectValue, isObject, set } from 'utils-pack/object'
 import Render, { metaToProps } from '../../ui-render'
 import { downloadFile } from './actions/file'
@@ -26,11 +26,14 @@ FIELD.ACTION = {
   REMOVE_DATA: 'removeData',
   POPUP_DELAY: 'popupDelay',
   POPUP_OPEN: 'popupOpen',
+  SUBMIT: 'submit',
 }
 FIELD.TYPE = {
   AUTO_SUBMIT: 'AutoSubmit',
   DATA: 'Data',
   ICON: 'Icon',
+  IMAGE: 'Image',
+  LINK: 'Link',
   POPUP: 'Popup',
   TABLE_CELLS: 'TableCells',
 }
@@ -40,11 +43,21 @@ FIELD.VALIDATE = {
 FIELD.NORMALIZE = {
   ...FIELD.NORMALIZE,
   CURRENCY: 'currency',
+  PERCENT: 'percent',
 }
 FIELD.NORMALIZER = {
   ...FIELD.NORMALIZER,
   [FIELD.NORMALIZE.DATE]: (val) => val && val.split('T')[0],
-  [FIELD.NORMALIZE.CURRENCY]: (val) => Number((val || 0) || 0).toFixed(2),
+  [FIELD.NORMALIZE.CURRENCY]: (v) => v == null ? v : Number((v || 0) || 0).toFixed(2),
+  [FIELD.NORMALIZE.PERCENT]: (v) => {
+    return v == null ? v : (Number((v || 0) || 0) * 100).toLocaleString()
+  },
+}
+FIELD.PARSER = {
+  ...FIELD.PARSER,
+  [FIELD.NORMALIZE.PERCENT]: function fromPercent (v) {
+    return v && round(v / 100, 5)
+  },
 }
 
 /**
@@ -151,8 +164,8 @@ export function toOpenLConfig (meta) {
   }
 
   for (const key in meta) {
-    const val = meta[key]
-    if (isList(val) || (isObject(val) && val.view)) {
+    const val = meta[key] // need to also transform Tabs.items collection of objects, which have no `view`
+    if (isList(val) || (isObject(val) && (val.view || val.content || val.id))) {
       meta[key] = toOpenLConfig(val)
     }
 
@@ -341,14 +354,17 @@ export function withUISetup (formConfig) {
         FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
         FIELD.FUNC[FIELD.ACTION.POPUP] = this.popupAlert
         FIELD.FUNC[FIELD.ACTION.POPUP_DELAY] = delayed(this.popupAlert)
+        FIELD.FUNC[FIELD.ACTION.SUBMIT] = this.form.submit
 
         return {
           data,
+          form: this.form,
           instance: this,
           funcConfig: {
             data,
             fieldFunc: {...FIELD.FUNC}, // bind definition to this instance
             fieldNormalizer: {...FIELD.NORMALIZER},
+            fieldParser: {...FIELD.PARSER},
             fieldValidation: {...FIELD.VALIDATION},
           }
         }

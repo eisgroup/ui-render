@@ -22,12 +22,12 @@
   }
 
   &:last-child {
-    .striped & {
+    .striped:not(table) & {
       border-bottom: @border-base;
     }
   }
 
-  .striped & {
+  .striped:not(table) & {
     border-top: @border-base;
   }
 

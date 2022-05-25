@@ -1,4 +1,5 @@
 @import "_mixins";
+
 @table-color-border: @color-border;
 @table-border: @border-size @border-style @table-color-border;
 @table-border-radius: @radius-base;
@@ -6,13 +7,22 @@
 
 table {
   border-spacing: 0; // remove spacing between tr rows
-  border: @table-border;
-  border-radius: @table-border-radius;
-  &:extend(.bg-neutral all); // style cell using table to allow styling tr background
+
+  &:not(.as-layout) {
+    border: @table-border;
+    border-radius: @table-border-radius;
+    &:extend(.bg-neutral all); // style cell using table to allow styling tr background
+  }
 
   .app__sort__icon {
     &:extend(.padding-smaller all);
     &:extend(.padding-right-small all);
+  }
+
+  &.striped {
+    tr:nth-child(even) {
+      background-color: fade(@color-neutral, 3%);
+    }
   }
 
   thead > tr:first-child {
@@ -43,28 +53,36 @@ table {
       border-bottom-right-radius: @table-border-radius;
     }
   }
-}
 
-// Minimise nested styling to allow easy config override
-tr {
-  @{select-interaction} {
-    &:extend(.bg-primary-lightest all);
-
-    > td,
-    > td > * {
-      &:extend(.bg-primary-lightest all);
-    }
+  th {
+    &:extend(.bold);
   }
 }
 
-th {
-  &:extend(.bold);
-  background-color: @table-header-bg-color;
+table:not(.as-layout) {
+  tr {
+    @{select-interaction} {
+      &:extend(.bg-primary-lightest all);
+
+      > td,
+      > td > * {
+        &:extend(.bg-primary-lightest all);
+      }
+    }
+  }
+
+  th {
+    background-color: @table-header-bg-color;
+  }
+
+  th, td {
+    border-bottom: @table-border;
+  }
 }
 
+// Minimise nested styling to allow easy config override
 th, td {
   padding: 0; // remove cell spacing
-  border-bottom: @table-border;
 
   // Expand inside table row
   > .app__expand {

@@ -2,6 +2,7 @@ import { withForm } from 'modules-pack/form'
 import AutoSave from 'modules-pack/form/views/AutoSave'
 import { POPUP, popupAlert } from 'modules-pack/popup'
 import { stateAction } from 'modules-pack/redux'
+// import { Link } from 'modules-pack/router/browser'
 import { FIELD } from 'modules-pack/variables'
 import React, { PureComponent } from 'react'
 import { cn } from 'react-ui-pack'
@@ -13,6 +14,7 @@ import Dropdown from 'react-ui-pack/Dropdown'
 import Expand from 'react-ui-pack/Expand'
 import ExpandList from 'react-ui-pack/ExpandList'
 import Icon from 'react-ui-pack/Icon'
+import Image from 'react-ui-pack/Image'
 import { OK } from 'react-ui-pack/inputs/validationRules'
 import Json from 'react-ui-pack/JsonView'
 import Label from 'react-ui-pack/Label'
@@ -157,10 +159,20 @@ Render.Component = function RenderComponent ({
       return <Icon {...props}/>
     }
 
+    case FIELD.TYPE.IMAGE: {
+      if (items.length) props.children = items.map(Render)
+      return <Image {...props}/>
+    }
+
     case FIELD.TYPE.LABEL: {
       if (items.length) props.children = items.map(Render)
       return <Label {...props}/>
     }
+    //
+    // case FIELD.TYPE.LINK: { // Internal router link
+    //   if (items.length) props.children = items.map(Render)
+    //   return <Link {...props}/>
+    // }
 
     case FIELD.TYPE.PIE_CHART: {
       const {mapItems, ...prop} = props
@@ -276,21 +288,25 @@ Render.Component = function RenderComponent ({
       return <TableView items={_data} {...table}/>
     }
 
-    case FIELD.TYPE.TABS: {
+    case FIELD.TYPE.TABS:
+    case FIELD.TYPE.TAB_LIST: {
       const {childrenBeforeTabs, childrenAfterTabs} = props
-      const _items = items.map(({tab, content, _data, data}, i) => ({
-        tab: isObject(tab) ? Render.call(this, {data, _data, debug, form, ...tab}, i) : tab,
-        content: isObject(content) ? Render.bind(this, {data, _data, debug, form, ...content}, i) : content,
-      }))
       if (hasObjectValue(childrenBeforeTabs))
         props.childrenBeforeTabs = Render.bind(this, {data, _data, debug, form, ...childrenBeforeTabs})
       if (hasObjectValue(childrenAfterTabs))
         props.childrenAfterTabs = Render.bind(this, {data, _data, debug, form, ...childrenAfterTabs})
-      return <Tabs items={_items} {...props}/>
-    }
 
-    case FIELD.TYPE.TAB_LIST: {
-      return <TabList items={_data} {...props}/>
+      switch (view) {
+        case FIELD.TYPE.TAB_LIST:
+          return <TabList items={_data} {...props}/>
+
+        case FIELD.TYPE.TABS:
+        default:
+          return <Tabs items={items.map(({tab, content, _data, data}, i) => ({
+            tab: isObject(tab) ? Render.call(this, {data, _data, debug, form, ...tab}, i) : tab,
+            content: isObject(content) ? Render.bind(this, {data, _data, debug, form, ...content}, i) : content,
+          }))} {...props}/>
+      }
     }
 
     case FIELD.TYPE.TEXT:
@@ -420,9 +436,9 @@ Render.Component = function RenderComponent ({
       }
 
       // Always format dates
-      if (input.type === 'date' && input.format) {
-        input.formatOnBlur = false // this is true by default to prevent cursor jumping
-      }
+      // if (input.type === 'date' && input.format) {
+      //   input.formatOnBlur = false // this is true by default to prevent cursor jumping
+      // }
 
       return renderField({view, ...input, ...readonly && {readonly}, ...disabled && {disabled}})
     }
