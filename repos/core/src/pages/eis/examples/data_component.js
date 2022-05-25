@@ -150,6 +150,12 @@ export const meta = {
         },
       },
     },
+    {
+      view: 'Button',
+      className: 'primary',
+      onClick: 'submit',
+      children: 'Submit (open Chrome Console to check changed values)'
+    },
     // {
     //   view: 'Data',
     //   kind: 'period',

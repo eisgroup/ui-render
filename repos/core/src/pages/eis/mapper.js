@@ -404,7 +404,7 @@ Render.Component = function RenderComponent ({
       // Auto submit on changes
       if (autoSubmit) {
         const {onChange} = input
-        const submit = debounce(form.submit, autoSubmit.delay >= 0 ? autoSubmit.delay : TIME_DURATION_INSTANT)
+        const submit = debounce(instance.submit, autoSubmit.delay >= 0 ? autoSubmit.delay : TIME_DURATION_INSTANT)
         input.onChange = (value) => {
           onChange && onChange(value)
           submit()

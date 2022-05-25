@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.26.3
+#### Fixes
+- Extract changed form values for nested Data Components before submission - [example](examples#tableForm)
+
 ### v0.26.2
 #### New
 - [Toggle Input](examples#inputToggle)

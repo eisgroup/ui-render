@@ -214,7 +214,7 @@ export function withDataKind (Class) {
    * Retrieve current forms' values for given data kind, with fallback to data in state
    * @param {String}kind - Data component kind
    * @param {Number} [index] - Data component index
-   * @returns {Object|Undefined} all forms values by index map, or form values for given index, if found, else undefined
+   * @returns {Array|Object|Undefined} all forms values by index array, or form values for given index object, else undefined
    */
   Class.prototype.getDataKind = function (kind, index) {
     if (index != null) {
@@ -223,7 +223,7 @@ export function withDataKind (Class) {
     }
     const stateBy = get(this.state.data.json.dataKind, kind)
     const instancesBy = get(this.dataKind, kind, {})
-    const resultByIndex = {}
+    const resultByIndex = []
     for (const index in stateBy) {
       const instance = instancesBy[index]
       resultByIndex[index] = instance ? instance.formValues : stateBy[index]
@@ -354,7 +354,7 @@ export function withUISetup (formConfig) {
         FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
         FIELD.FUNC[FIELD.ACTION.POPUP] = this.popupAlert
         FIELD.FUNC[FIELD.ACTION.POPUP_DELAY] = delayed(this.popupAlert)
-        FIELD.FUNC[FIELD.ACTION.SUBMIT] = this.form.submit
+        FIELD.FUNC[FIELD.ACTION.SUBMIT] = this.submit
 
         return {
           data,
@@ -442,13 +442,6 @@ export function withUISetup (formConfig) {
     }
 
     // Define instance method
-    // todo: upgrade modules-pack to fix onSubmit not being passed
-    // todo - remove - not used because auto-submit would open too many popups
-    Class.prototype.submit = function (values) {
-      return popupAlert('Submitted Form with these values', <Json data={values}/>)
-    }
-
-    // Define instance method
     Class.prototype.popupAlert = function (content, title) {
       return popupAlert(title, <Json data={content}/>)
     }
@@ -460,6 +453,15 @@ export function withUISetup (formConfig) {
     }
 
     Class.prototype.UNSAFE_componentWillMount = function (nextProps, nextState) {
+      // Wrap form.submit with HOC to extract nested form values before submission
+      this.submit = (...args) => {
+        const {dataKind} = this.formValues
+        for (const kind in dataKind) {
+          dataKind[kind] = this.getDataKind(kind).map((v, index) => isEmpty(v) ? dataKind[kind][index] : v)
+        }
+        return this.form.submit(...args)
+      }
+
       const {parent, form, index} = this.props
       if (parent && index != null) parent.registerDataKind(this, form.kind, index)
       if (UNSAFE_componentWillMount) UNSAFE_componentWillMount.apply(this, arguments)
