@@ -185,9 +185,9 @@ Render.Component = function RenderComponent ({
       const steps = items.map(({step, label, content, data, _data, ...info}, i) => {
         return {
           ...info,
-          step: isObject(step) ? Render.call(this, {data, _data, debug, form, ...step}, i) : step,
-          label: isObject(label) ? Render.call(this, {data, _data, debug, form, ...label}, i) : label,
-          content: isObject(content) ? Render.bind(this, {data, _data, debug, form, ...content}, i) : content
+          step: isObject(step) ? Render.call(this, {data, _data, debug, form, instance, ...step}, i) : step,
+          label: isObject(label) ? Render.call(this, {data, _data, debug, form, instance, ...label}, i) : label,
+          content: isObject(content) ? Render.bind(this, {data, _data, debug, form, instance, ...content}, i) : content
         }
       })
       return <ProgressSteps items={steps} {...props}/>
@@ -292,9 +292,9 @@ Render.Component = function RenderComponent ({
     case FIELD.TYPE.TAB_LIST: {
       const {childrenBeforeTabs, childrenAfterTabs} = props
       if (hasObjectValue(childrenBeforeTabs))
-        props.childrenBeforeTabs = Render.bind(this, {data, _data, debug, form, ...childrenBeforeTabs})
+        props.childrenBeforeTabs = Render.bind(this, {data, _data, debug, form, instance, ...childrenBeforeTabs})
       if (hasObjectValue(childrenAfterTabs))
-        props.childrenAfterTabs = Render.bind(this, {data, _data, debug, form, ...childrenAfterTabs})
+        props.childrenAfterTabs = Render.bind(this, {data, _data, debug, form, instance, ...childrenAfterTabs})
 
       switch (view) {
         case FIELD.TYPE.TAB_LIST:
@@ -303,8 +303,10 @@ Render.Component = function RenderComponent ({
         case FIELD.TYPE.TABS:
         default:
           return <Tabs items={items.map(({tab, content, _data, data}, i) => ({
-            tab: isObject(tab) ? Render.call(this, {data, _data, debug, form, ...tab}, i) : tab,
-            content: isObject(content) ? Render.bind(this, {data, _data, debug, form, ...content}, i) : content,
+            tab: isObject(tab) ? Render.call(this, {data, _data, debug, form, instance, ...tab}, i) : tab,
+            content: isObject(content) ? Render.bind(this, {
+              data, _data, debug, form, instance, ...content
+            }, i) : content,
           }))} {...props}/>
       }
     }
