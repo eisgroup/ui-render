@@ -1,5 +1,28 @@
 ### Table of Contents
 
+### v0.26.2
+#### New
+- [Toggle Input](examples#inputToggle)
+- [Download File Template](examples#buttonDownload)
+- [Popup Content](examples#popupContent)
+
+#### Fixes
+- fix Input delete icon not working for `border-on-hover`
+- fix Input validation message not showing on Tab changes
+- fix Input cursor jumping when using `format`
+- fix Date `format`
+- fix e2e tests
+
+### v0.26.0
+#### New
+- Upload file Input + [example](examples#upload)
+
+#### Updated
+- Upgraded major dependencies
+
+#### Fixes
+- Input nested inside Table not getting correct index
+
 ### v0.25.4
 #### New
 - Multiple UIRender instances on a Page
