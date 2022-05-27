@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "0.26.2",
+  "version": "0.26.3",
   "homepage": "/ui-render",
   "scripts": {
     "predeploy": "yarn build && yarn build-gh1 && yarn build-gh2",
