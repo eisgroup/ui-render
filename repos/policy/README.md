@@ -21,7 +21,7 @@ postcssPlugins: [
 ```
 then `yarn build:css`
 
-4. Copy Semantic UI `Popup` line in `public/static/semantic.css`
+4. Copy Semantic UI `Popup` line in `public/static/semantic.css` to the clipboard (keep the copy somewhere)
 
 ```css
 /*!
