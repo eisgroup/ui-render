@@ -6,8 +6,8 @@
   "sideEffects": false,
   "license": "Apache 2.0",
   "scripts": {
-    "push": "cp {README.md,LICENSE,package.json} dist/ && cd dist && npm publish && cd ../",
-    "build": "tsc && cp {README.md,LICENSE,package.json} dist/",
+    "push": "cp README.md LICENSE package.json dist/ && cd dist && npm publish && cd ../",
+    "build": "tsc",
     "delete": "../../node_modules/rimraf/bin.js",
     "clean": "yarn delete {build/**/*.map,buildless-watcher-compiler.config.js/**/**/*.map}"
   },
