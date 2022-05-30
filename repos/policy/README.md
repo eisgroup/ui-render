@@ -91,7 +91,8 @@ then `yarn build:css`
 14. Rename files inside `./dist/static/js` to remove hash for example: `1.94a8b9f9.chunk.js` to `chunk.js`, so the following files should be named:
     - `chunk.js`
     - `main.js`
+    And move them to `./dist/static` folder
 
-15. Extract (copy) the script from the content of `./dist/index.html` to `./dist/static/js/loader.js`
+15. Extract (copy) the script from the content of `./dist/index.html` to `./dist/static/loader.js`
     
 16. Got to `/repos/npm` and `yarn build`, then `yarn push` to publish to npm.
