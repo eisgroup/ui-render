@@ -9,7 +9,7 @@ Below manual hacks are required for Genesis UI Integration, because their UI:
 ## Hack Steps
 1. Compile CSS with `yarn build`
 
-2. Rename `public/static/semantic.css` and `public/static/semantic.css` to `.less`
+2. Rename `.css` extensions in `public/static/semantic.css` and `public/static/all.css` to `.less`
    
 3. Compile CSS without `ui-render` prefix
 
