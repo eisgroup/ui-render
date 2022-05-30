@@ -84,7 +84,7 @@ then `yarn build:css`
 }
 ```
 
-12. Move these `.less` files to `/repos/policy/dist/static` because Genesis UI cannot import `.css`
+12. Move `semantic.less` and `all.less` files to `/repos/policy/dist/static` because Genesis UI cannot import `.css` and duplicate to `semantic.css` and `all.css`.
 
 13. Replace all `fonts` files in `/ui-eis-genesis/prototypes/applications/packages/cem-dxp-app/src/fonts/`
 
