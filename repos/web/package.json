@@ -5,7 +5,7 @@
   "scripts": {
     "predeploy": "yarn build && yarn build-gh1 && yarn build-gh2",
     "deploy": "gh-pages -d build",
-    "start": "yarn cors && yarn gql && yarn css --sourcemap && react-app-rewired start & yarn style --sourcemap",
+    "start": "yarn gql && yarn css --sourcemap && react-app-rewired start & yarn style --sourcemap",
     "build": "NODE_ENV=production yarn build:css && react-app-rewired build && yarn clean",
     "build-gh": "yarn build-gh1 && yarn build-gh2",
     "build-gh1": "cp build/index.html build/changelog.html && cp build/index.html build/configuration.html && cp build/index.html build/demo.html",
