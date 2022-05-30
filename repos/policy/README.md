@@ -11,7 +11,7 @@ Below manual hacks are required for Genesis UI Integration, because their UI:
 
 2. Rename `.css` extensions in `public/static/semantic.css` and `public/static/all.css` to `.less`
    
-3. Compile CSS without `ui-render` prefix
+3. Compile CSS without `ui-render` prefix (temporary comment `postcss-prefixwrap` line)
 
 ```js
 // less-watcher-compiler.config.js
