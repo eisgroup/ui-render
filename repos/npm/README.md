@@ -116,4 +116,4 @@ Due to limitations in Genesis UI (no static asset folder), the build of this pac
 3. Then navigate to `/repos/policy/` folder and follow `README.md` instructions
 4. Copy generated `/repos/policy/dist/static` folder to `/repos/npm/dist/static`
 5. Add `/repos/npm/dist/.npmrc` with the content `//registry.npmjs.org/:_authToken=<npm_your_private_tocken>
-6. Then publish to npm: `yarn push`
+6. Then publish to npm: `npm run push`
