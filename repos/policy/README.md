@@ -55,9 +55,9 @@ then `yarn build:css`
 @import url("https://fonts.googleapis.com/css?family=Roboto:300,600|Open Sans:300,600&display=swap&subset=cyrillic");
 ```
 
-10. Remove all instances of query string added inside `.less` files, for example
+10. Remove all instances of query string (?queryParam) added inside `.less` files, for example
 
-`fonts/iconsOpenL.eot?id0mra`
+`fonts/iconsOpenL.eot?id0mra` to `fonts/iconsOpenL.eot`
 
 11. Modify this at the top of `all.less` (or remove commented section)
 ```less
@@ -84,13 +84,14 @@ then `yarn build:css`
 }
 ```
 
-12. Move these `.less` files to `/repos/npm/dist/static` because Genesis UI cannot import `.css`
+12. Move these `.less` files to `/repos/policy/dist/static` because Genesis UI cannot import `.css`
 
 13. Replace all `fonts` files in `/ui-eis-genesis/prototypes/applications/packages/cem-dxp-app/src/fonts/`
 
-14. Rename and move these files from `./dist/static/js` to `/repos/npm/dist/static`:
+14. Rename files inside `./dist/static/js` to remove hash for example: `1.94a8b9f9.chunk.js` to `chunk.js`, so the following files should be named:
     - `chunk.js`
     - `main.js`
-    - `loader.js` -> copied from script content of `index.html`
+
+15. Extract (copy) the script from the content of `./dist/index.html` to `./dist/static/js/loader.js`
     
-15. Got to `/repos/npm` and `yarn build`, then `yarn push` to publish to npm.
+16. Got to `/repos/npm` and `yarn build`, then `yarn push` to publish to npm.
