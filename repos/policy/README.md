@@ -42,7 +42,7 @@ then `yarn build:css`
 
 7. Remove all `.css` files
 
-8. Replace all variables below to string literals in `public/static`:
+8. Replace all strings like `~"rgb(40 99 169/20%)"` to `rgb(40 99 169/20%)` in `public/static` if exist:
 ```less
 @color-focus:             ~"rgb(40 99 169/20%)";
 @color-focus-error:       ~"rgb(218 20 20/20%)";
