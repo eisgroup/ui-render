@@ -112,7 +112,7 @@ function handleSubmit(formValues) {
 Due to limitations in Genesis UI (no static asset folder), the build of this package has to be done and deployed manually:
 
 1. Clone this package `git clone https://github.com/eisgroup/ui-render.git`
-2. Then `cd ui-render`, go to `/repos/policy/README.md` and follow given instructions
-3. Move generated files to`/repos/npm/dist` folder
-4. Inside `/repos/npm/` run `yarn build`
+2. Inside `/repos/npm/` run `yarn build`
+3. Then navigate to `/repos/policy/` folder and follow to `README.md` instructions
+4. Copy generated `/repos/policy/dist/static` folder to `/repos/npm/dist/static` 
 5. Then publish to npm: `npm publish`
