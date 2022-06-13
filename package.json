@@ -1,15 +1,12 @@
 {
   "name": "utils-pack",
-  "version": "0.10.10",
+  "version": "0.10.11",
   "description": "JS Helper Functions",
   "license": "MIT",
   "main": "index.js",
   "homepage": "https://github.com/ecoinomist/utils-pack",
   "private": false,
   "sideEffects": false,
-  "engines": {
-    "node": ">=6.0.0"
-  },
   "keywords": [
     "helper",
     "utils",
