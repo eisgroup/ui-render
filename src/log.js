@@ -1,4 +1,4 @@
-import { get } from 'lodash'
+import { get } from 'lodash-es'
 import now from 'performance-now'
 import { __BACKEND__, __CLIENT__, __DEV__, __TEST__, Active } from './_envs'
 import { WARN } from './constants'

@@ -1,4 +1,4 @@
-import { throttle as _throttle } from 'lodash'
+import { throttle as _throttle } from 'lodash-es'
 import { __DEV__ } from './_envs'
 import { isInListAny } from './array'
 import { NOW, ONE_DAY, ONE_HOUR, TIME_DURATION_INSTANT } from './constants'

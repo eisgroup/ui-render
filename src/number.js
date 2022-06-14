@@ -25,7 +25,7 @@ import { isInString } from './string'
  * @param {*} val - The value to check.
  * @returns {boolean} - Returns true if value is a number, else false.
  */
-export { isNumber } from 'lodash'
+export { isNumber } from 'lodash-es'
 
 /**
  * Returns true if the given variable is a number,

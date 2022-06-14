@@ -12,7 +12,7 @@ import {
   unionBy,
   unionWith,
   uniqWith,
-} from 'lodash'
+} from 'lodash-es'
 import thenby from 'thenby'
 import { toLowerCaseAny } from './string'
 

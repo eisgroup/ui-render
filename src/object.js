@@ -12,7 +12,7 @@ import {
 	property,
 	setWith,
 	unset
-} from 'lodash'
+} from 'lodash-es'
 import qs from 'querystring'
 import { isCollection } from './array'
 

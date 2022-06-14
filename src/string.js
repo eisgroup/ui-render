@@ -1,4 +1,4 @@
-import { capitalize, get } from 'lodash'
+import { capitalize, get } from 'lodash-es'
 import pluralizer from 'pluralize'
 
 export const alphaNumPattern = /[^a-zA-Z0-9]/g
