@@ -1,9 +1,9 @@
 import now from 'performance-now' // adds almost zero KB to bundle size because browsers have window.performance.now()
 import { createSelector } from 'reselect'
-import { __CLIENT__, __DEV__, Active } from './_envs'
-import { ONE_MILLISECOND } from './constants'
-import { logSelector } from './log'
-import { formatNumber } from './number'
+import { __CLIENT__, __DEV__, Active } from './_envs.js'
+import { ONE_MILLISECOND } from './constants.js'
+import { logSelector } from './log.js'
+import { formatNumber } from './number.js'
 
 /**
  * Selector Decorator to turn all class static property functions into Memoized Functions

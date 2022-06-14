@@ -1,10 +1,10 @@
 import { get } from 'lodash-es'
 import now from 'performance-now'
-import { __BACKEND__, __CLIENT__, __DEV__, __TEST__, Active } from './_envs'
-import { WARN } from './constants'
-import { isFunction } from './function'
-import { formatNumber } from './number'
-import { isInString } from './string'
+import { __BACKEND__, __CLIENT__, __DEV__, __TEST__, Active } from './_envs.js'
+import { WARN } from './constants.js'
+import { isFunction } from './function.js'
+import { formatNumber } from './number.js'
+import { isInString } from './string.js'
 
 /**
  * LOGGING FUNCTIONS ===========================================================

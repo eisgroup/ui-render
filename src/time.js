@@ -10,8 +10,8 @@ import {
   ONE_HOUR,
   ONE_MINUTE,
   THIRTY_MINUTES
-} from './constants'
-import { isNumeric, startEndFromNumberRanges } from './number'
+} from './constants.js'
+import { isNumeric, startEndFromNumberRanges } from './number.js'
 
 /**
  * TIME FUNCTIONS ==============================================================

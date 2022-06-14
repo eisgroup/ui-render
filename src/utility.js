@@ -1,9 +1,9 @@
-import { Active, ENV } from './_envs'
-import { isInList, isList } from './array'
-import { fromJSON } from './codec'
-import { rad } from './number'
-import { isObject } from './object'
-import { isString, padStringLeft, randomString } from './string'
+import { Active, ENV } from './_envs.js'
+import { isInList, isList } from './array.js'
+import { fromJSON } from './codec.js'
+import { rad } from './number.js'
+import { isObject } from './object.js'
+import { isString, padStringLeft, randomString } from './string.js'
 
 /**
  * AD HOC FUNCTIONS ============================================================

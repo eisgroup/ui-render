@@ -1,5 +1,5 @@
-import { hasListValue } from './array'
-import { isInString } from './string'
+import { hasListValue } from './array.js'
+import { isInString } from './string.js'
 
 /**
  * NUMBER FUNCTIONS ============================================================

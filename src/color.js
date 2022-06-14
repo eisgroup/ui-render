@@ -1,6 +1,6 @@
-import { hasListValue, isList } from './array'
-import { round } from './number'
-import { isString } from './string'
+import { hasListValue, isList } from './array.js'
+import { round } from './number.js'
+import { isString } from './string.js'
 
 /**
  * COLOR FUNCTIONS =============================================================

@@ -14,7 +14,7 @@ import {
 	unset
 } from 'lodash-es'
 import qs from 'querystring'
-import { isCollection } from './array'
+import { isCollection } from './array.js'
 
 /**
  * OBJECT FUNCTIONS ============================================================

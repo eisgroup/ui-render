@@ -1,5 +1,5 @@
 import csv from 'papaparse'
-import { removeEmptyValues, } from './object'
+import { removeEmptyValues, } from './object.js'
 
 /**
  * FILE HANDLING FUNCTIONS =====================================================

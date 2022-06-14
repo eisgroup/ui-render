@@ -14,7 +14,7 @@ import {
   uniqWith,
 } from 'lodash-es'
 import thenby from 'thenby'
-import { toLowerCaseAny } from './string'
+import { toLowerCaseAny } from './string.js'
 
 /**
  * ARRAY FUNCTIONS =============================================================

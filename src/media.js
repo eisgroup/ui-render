@@ -1,4 +1,4 @@
-import { greatestCommonDivisor } from './number'
+import { greatestCommonDivisor } from './number.js'
 
 /**
  * MEDIA FUNCTIONS =============================================================

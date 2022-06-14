@@ -1,5 +1,5 @@
-import { Active } from './_envs'
-import { LANGUAGE } from './constants'
+import { Active } from './_envs.js'
+import { LANGUAGE } from './constants.js'
 
 /**
  * PROJECT DEFINITIONS =========================================================
