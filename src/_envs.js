@@ -1,11 +1,14 @@
 import { LANGUAGE } from './constants'
 
-/* Environment Variables */
-export let ENV = {}
-if (typeof process !== 'undefined') {
-  // Application must explicitly set `process.isNextJs = true` before importing this module
-  ENV = (process.isNextJs ? require('./_envsNext') : process.env) || {}
-}
+/**
+ * Environment Variables
+ * @note: for Next.js, explicitly set variable on initialisation like so:
+ *   import config from 'next/config'
+ *   import { ENV } from 'utils-pack'
+ *
+ *   Object.assign(ENV, config().publicRuntimeConfig)
+ */
+export let ENV = (typeof process !== 'undefined' && process.env) || {}
 export const NODE_ENV = ENV.NODE_ENV // @Note: Next.js does not automatically add NODE_ENV, set inside next.config.js
 export const __PROD__ = NODE_ENV === 'production'
 export const __STAGE__ = NODE_ENV === 'stage'
