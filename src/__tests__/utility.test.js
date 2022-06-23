@@ -115,35 +115,36 @@ test(`${distanceBetween.name}() returns correct distance between two points in m
 })
 
 describe(`${Id.name}(), ${isId.name}(), and ${timestampFromId.name}()`, () => {
-  const timeCharCount = Id.padCount
-  const id = Id()
-  const limit = Math.pow(Id.alphabet.length, timeCharCount) // the limit of timestamp
+  const padCount = 7
+  const args = {caseSensitive: true, padCount}
+  const id = Id(args)
+  const limit = Math.pow(Id.alphabet.length, padCount) // the limit of timestamp
 
   test(`${Id.name}() generates auto incrementing ID string using Timestamp`, () => {
-    expect(id.length).toBeGreaterThanOrEqual(Id.padCount + 3)
-    expect(Id({timestamp: 0}).substring(0, timeCharCount)).toEqual('0000000')
-    expect(Id({timestamp: 1}).substring(0, timeCharCount)).toEqual('0000001')
-    expect(Id({timestamp: 10}).substring(0, timeCharCount)).toEqual('000000A')
-    expect(Id({timestamp: 35}).substring(0, timeCharCount)).toEqual('000000Z')
-    expect(Id({timestamp: 36}).substring(0, timeCharCount)).toEqual('000000a')
-    expect(Id({timestamp: 61}).substring(0, timeCharCount)).toEqual('000000z')
-    expect(Id({timestamp: 62}).substring(0, timeCharCount)).toEqual('0000010')
-    expect(Id({timestamp: 63}).substring(0, timeCharCount)).toEqual('0000011')
-    expect(Id({timestamp: limit - 1}).substring(0, timeCharCount)).toEqual('zzzzzzz')
-    expect(Id({timestamp: limit}).substring(0, timeCharCount + 1)).toEqual('10000000')
+    expect(id.length).toBeGreaterThanOrEqual(padCount + 3)
+    expect(Id({timestamp: 0, ...args}).substring(0, padCount)).toEqual('0000000')
+    expect(Id({timestamp: 1, ...args}).substring(0, padCount)).toEqual('0000001')
+    expect(Id({timestamp: 10, ...args}).substring(0, padCount)).toEqual('000000A')
+    expect(Id({timestamp: 35, ...args}).substring(0, padCount)).toEqual('000000Z')
+    expect(Id({timestamp: 36, ...args}).substring(0, padCount)).toEqual('000000a')
+    expect(Id({timestamp: 61, ...args}).substring(0, padCount)).toEqual('000000z')
+    expect(Id({timestamp: 62, ...args}).substring(0, padCount)).toEqual('0000010')
+    expect(Id({timestamp: 63, ...args}).substring(0, padCount)).toEqual('0000011')
+    expect(Id({timestamp: limit - 1, ...args}).substring(0, padCount)).toEqual('zzzzzzz')
+    expect(Id({timestamp: limit, ...args}).substring(0, padCount + 1)).toEqual('10000000')
   })
 
   test(`${Id.name}() string generated sorts chronologically`, () => {
-    const id1 = Id()
+    const id1 = Id(args)
     const now = Date.now()
-    const id2 = Id({timestamp: now + ONE_SECOND})
-    const id3 = Id({timestamp: now + ONE_MINUTE})
-    const id4 = Id({timestamp: now + ONE_HOUR})
-    const id5 = Id({timestamp: now + ONE_WEEK})
-    const id6 = Id({timestamp: now + ONE_MONTH})
-    const id7 = Id({timestamp: now + ONE_YEAR})
-    const id8 = Id({timestamp: now + 10 * ONE_YEAR})
-    const id9 = Id({timestamp: now + 20 * ONE_YEAR})
+    const id2 = Id({timestamp: now + ONE_SECOND, ...args})
+    const id3 = Id({timestamp: now + ONE_MINUTE, ...args})
+    const id4 = Id({timestamp: now + ONE_HOUR, ...args})
+    const id5 = Id({timestamp: now + ONE_WEEK, ...args})
+    const id6 = Id({timestamp: now + ONE_MONTH, ...args})
+    const id7 = Id({timestamp: now + ONE_YEAR, ...args})
+    const id8 = Id({timestamp: now + 10 * ONE_YEAR, ...args})
+    const id9 = Id({timestamp: now + 20 * ONE_YEAR, ...args})
     const list = [id, id1, id2, id3, id4, id5, id6, id7, id8, id9]
     const listSorted = cloneDeep(list)
     listSorted.sort()
@@ -161,7 +162,7 @@ describe(`${Id.name}(), ${isId.name}(), and ${timestampFromId.name}()`, () => {
 
   const testCount = 10000
   const start = Date.now()
-  const list = Array(testCount).fill(true).map(() => Id())
+  const list = Array(testCount).fill(true).map(() => Id(args))
   const end = Date.now()
   const total = Math.round(testCount / (end - start)).toLocaleString()
   const totalPerSec = (total * 1000).toLocaleString()

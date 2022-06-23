@@ -12,36 +12,51 @@ import { isString, padStringLeft, randomString } from './string.js'
 
 /**
  * Create Case-Sensitive Short Auto Incrementing ID string derived from Timestamp in milliseconds
- * @Important: modifying this function may break existing database implementations
- * @Rationale: primary use case is for generating globally unique Ids from frontend
+ * @Important:
+ *  - modifying this function may break existing database implementations.
+ *  - directory/file names in Linux are case-sensitive, but are not in macOS or Windows;
+ *    => it is better to only use lower case characters for this reason.
+ * @Rationale: the primary use case is for generating globally unique Ids from frontend that can be used in backend.
  *
  * @Note:
  *    - The ID is 10 characters long:
- *        1. URL safe - case sensitive alphanumeric only characters (62 radix)
- *        2. Safe for use as HTML id attribute
+ *        1. URL safe - case-insensitive alphanumeric only characters (36 radix)
+ *        2. Safe for use as HTML5 id attribute
  *        2. Sorts chronologically without conversion (replacing the need for database timestamp)
- *           => Sorting will stop working after August 5, 2081, because 62^7 limit padding is reached
- *              -> The solution is to increment the Id.padCount to 8, which will work until December 2, the year 8888.
+ *           => Sorting will stop working after April 22, the year 5,188, because 36^9 limit padding is reached
+ *              -> The solution is to increment the padCount to 10, which will work until January 18, the year 117,829.
  *
- *    - first 7 characters is Hex string of Timestamp
+ *    - first 9 characters is Hex string of Timestamp
  *    - Last 3 character is randomized using alphanumeric characters to avoid collision
  *    - Collision probability is near zero in practice, because 3 random string suffix
- *      using 62 characters have 62^3 = 238,328 possibilities,
- *      and it is unlikely two people would create more than that possibilities in the same millisecond.
- *    - Collision from the same User can be prevented with `throttle` function
- *      => this function is purposely slow to prevent generating too many Ids within one millisecond.
+ *        a. using 36 (case-insensitive) characters have 36^3 = 46,656 possibilities,
+ *        b. using 62 (case-sensitive) characters have 62^3 = 238,328 possibilities,
+ *        => it is unlikely two people would create more than that possibilities in the same millisecond.
+ *    - Collision from the same user is prevented by checking for suffix duplicates within each millisecond.
+ *    - This function is purposely slow with de-optimization to prevent generating too many Ids within one millisecond.
  *
  * @param {Number|String} [timestamp] - custom timestamp to generate ID for, defaults to Date.now()
  * @param {String} [alphabet] - custom characters to use for Id generation, default to alphaNumeric characters
+ * @param {Boolean} [caseSensitive] - whether to use case-sensitive characters
+ * @param {Number} [padCount] - if generated ID length is less than this, it's padded with the first character in the `alphabet`
  * @param {String} [suffix] - string to append to ID timestamp, default is random alphanumeric 3 characters string
  * @return {String} ID - example: 'MJ8FU-RVRo'
  */
-export function Id ({timestamp = Date.now(), alphabet = Id.alphabet, suffix = randomString(3, 3, {alphaNum: true})} = {}) {
+export function Id ({
+  timestamp = Date.now(),
+  caseSensitive = false,
+  alphabet = caseSensitive ? Id.alphabet : Id.alphabetLower,
+  padCount = caseSensitive ? 7 : 9,
+  suffix = randomString(3, 3, {alphaNum: true}),
+} = {}) {
+  if (!caseSensitive) suffix = suffix.toLowerCase()
+
   // Ensure unique suffix for each millisecond
   const history = Id.history[timestamp]
   if (history) {
     while (isInList(history, suffix)) {
       suffix = randomString(3, 3, {alphaNum: true})
+      if (!caseSensitive) suffix = suffix.toLowerCase()
     }
     history.push(suffix)
   } else {
@@ -64,13 +79,13 @@ export function Id ({timestamp = Date.now(), alphabet = Id.alphabet, suffix = ra
   }
   time.unshift(alphabet[timestamp])
   time = time.join('')
-  return padStringLeft(time, Id.padTime) + suffix
+  return padStringLeft(time, Array(padCount).fill(alphabet[0]).join('')) + suffix
 }
 
 // !Important: changing values below may break existing database implementations
 Id.alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-Id.padCount = 7
-Id.padTime = Array(Id.padCount).fill(Id.alphabet[0]).join('')
+Id.alphabetLower = '0123456789abcdefghijklmnopqrstuvwxyz'
+Id.minLength = 10 // minimum case-sensitive ID length, including suffix
 Id.pattern = new RegExp(`^[${Id.alphabet}]+$`)
 Id.history = {} // log of previously generated Ids by timestamp
 
@@ -80,7 +95,7 @@ Id.history = {} // log of previously generated Ids by timestamp
  * @return {Boolean} true - if valid, else false
  */
 export function isId (value) {
-  return isString(value) && value.length >= Id.padCount && Id.pattern.test(value)
+  return isString(value) && value.length >= Id.minLength && Id.pattern.test(value)
 }
 
 /**
