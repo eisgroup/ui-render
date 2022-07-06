@@ -251,6 +251,7 @@ export function interpolateString (string, variables = {}, {formatKey, name, sup
 	})
 }
 
+export const ips = interpolateString
 export const interpolateStringPattern = /{([^{}]+)}/g
 
 /**
