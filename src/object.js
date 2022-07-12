@@ -234,7 +234,7 @@ export function reset(collection, payload) {
  *
  * @example:
  update({user: {name: 'Chris'}}, {user: {sign: 'scorpion'}})
- >>> {user: {name: 'Chris'}, {sign: 'scorpion'}}
+ >>> {user: {name: 'Chris', sign: 'scorpion'}}
  *
  * @param {Object|Array} state - collection to be updated
  * @param {Object|Array} payload - the nested Object to update with
