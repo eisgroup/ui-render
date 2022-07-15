@@ -219,6 +219,9 @@ export const SIZE_MB_8 = SIZE_MB * 8
 export const SIZE_MB_10 = SIZE_MB * 10
 export const SIZE_MB_16 = SIZE_MB * 16
 
+/* Storage Keys */
+export const UI_STATE = 'UI_STATE'
+
 /* Time */
 export const TIME_DURATION_INSTANT = 200
 export const NOW = Date.now()
