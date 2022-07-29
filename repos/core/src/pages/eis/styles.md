@@ -24,6 +24,15 @@ Below you can find the list of commonly used CSS styles.
 - **wrap** - required for horizontal layout to be responsive (arranges child items to new lines on narrow/mobile screens)
 
 ## Effects
+- **inverted** - inverts text/border color
+- **primary** - 
+- **secondary** -
+- **error** -  
+- **info** - 
+- **success** - 
+- **warning** - 
+- **grey** - 
+- 
 - **bg-grey** - grey background color
 - **bg-grey-light/lighter/lightest** - grey background color with adjusted tone (i.e. "bg-grey-lightest" = lightest)
 - **bg-black** - black background color
