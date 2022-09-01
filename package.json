@@ -1,13 +1,13 @@
 {
-  "name": "modules-pack",
-  "version": "0.12.0",
+  "name": "ui-modules-pack",
+  "version": "0.1.0",
   "description": "JavaScript Modules for Modern Frontend & Backend Projects",
   "license": "MIT",
   "main": "index.js",
-  "homepage": "https://github.com/ecoinomist/modules-pack",
+  "homepage": "https://github.com/eisgroup/ui-modules-pack",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ecoinomist/modules-pack.git"
+    "url": "https://github.com/eisgroup/ui-modules-pack.git"
   },
   "private": false,
   "sideEffects": false,
@@ -24,9 +24,9 @@
     "backend"
   ],
   "scripts": {
-    "release": "yarn push && git push",
-    "push": "cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish && cd ../ && yarn delete src/{README.md,LICENSE,package.json}",
-    "delete": "../../node_modules/rimraf/bin.js"
+    "release": "npm run files:copy && cd src && npm publish && cd ../ && npm run files:delete",
+    "files:copy": "cp {README.md,LICENSE,package.json} src/",
+    "files:delete": "rm src/{README.md,LICENSE,package.json}"
   },
   "peerDependencies": {
     "@apollo/client": "*",
