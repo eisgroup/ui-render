@@ -1,10 +1,14 @@
 {
-  "name": "utils-pack",
-  "version": "0.11.8",
+  "name": "ui-utils-pack",
+  "version": "0.1.0",
   "description": "JS Helper Functions",
   "license": "MIT",
   "main": "index.js",
-  "homepage": "https://github.com/ecoinomist/utils-pack",
+  "homepage": "https://github.com/eisgroup/ui-utils-pack",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eisgroup/ui-utils-pack.git"
+  },
   "private": false,
   "sideEffects": false,
   "type": "module",
@@ -14,14 +18,9 @@
     "functions"
   ],
   "scripts": {
-    "release": "yarn push && git push",
-    "push": "yarn push:src",
-    "prebuild": "yarn symlink ../babel.config.js ./",
-    "build": "yarn delete dist && babel src --out-dir dist",
-    "push:dist": "cp {README.md,LICENSE,package.json} dist/ && cd dist && yarn publish && cd ../ && yarn delete dist",
-    "push:src": "cp {README.md,LICENSE,package.json} src/ && cd src && yarn publish && cd ../ && yarn delete src/{README.md,LICENSE,package.json}",
-    "delete": "../../node_modules/rimraf/bin.js",
-    "symlink": "node ../../scripts/symlink.js"
+    "release": "npm run files:copy && cd src && npm publish && cd ../ && npm run files:delete",
+    "files:copy": "cp {README.md,LICENSE,package.json} src/",
+    "files:delete": "rm src/{README.md,LICENSE,package.json}"
   },
   "dependencies": {
     "bson-objectid": "^1.3.1",
