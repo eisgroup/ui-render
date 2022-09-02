@@ -4,7 +4,7 @@ Below manual hacks are required for Genesis UI Integration, because their UI:
 
 - does not have a static asset folder.
 - cannot handle static assets without processing them through webpack import.
-- cannot bundle pure js packages that use ES6 (like `module-pack`, `react-ui-pack`, `utils-pack`, `validator`...).
+- cannot bundle pure js packages that use ES6 (like `module-pack`, `ui-react-pack`, `utils-pack`, `validator`...).
 
 ## Hack Steps
 1. Compile CSS with `yarn build`

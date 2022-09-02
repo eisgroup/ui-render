@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import { get, isObject } from 'utils-pack'
+import { get, isObject } from 'ui-utils-pack'
 
 /**
  * Recursive Field Renderer
  * @setup:
  *      // mapper.js
  *      import { Render } from 'ui-render'
- *      import TooltipPop from 'react-ui-pack/TooltipPop'
+ *      import TooltipPop from 'ui-react-pack/TooltipPop'
  *
  *      // Setup common components/callbacks
  *      Render.Tooltip = TooltipPop

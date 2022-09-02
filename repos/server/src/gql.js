@@ -4,12 +4,12 @@ import { Active, API_GQL_URI, DEFAULT, NODE_ENV } from 'core/src/common/variable
 import { GraphQLError } from 'graphql'
 import { formatErrorGenerator, SevenBoom as Response } from 'graphql-apollo-errors'
 import { GraphQLServer } from 'graphql-yoga'
-import modules from 'modules-pack'
+import modules from 'ui-modules-pack'
 import commonModules from './common'
 import { API_PORT, SECRET } from './common/config'
 import commonResolver from './common/resolvers'
 import commonSchema from './common/schema.gql'
-// import { onConnect, tokenParser } from 'modules-pack/user/auth'
+// import { onConnect, tokenParser } from 'ui-modules-pack/user/auth'
 
 const resolvers = merge(
   commonResolver,

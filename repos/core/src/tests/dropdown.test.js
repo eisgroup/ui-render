@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
-import Dropdown from 'react-ui-pack/Dropdown'
+import Dropdown from 'ui-react-pack/Dropdown'
 
 // Setup test
 beforeEach(() => {

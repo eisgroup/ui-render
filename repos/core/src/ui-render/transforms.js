@@ -1,5 +1,5 @@
-import { interpolateString, isCollection, isFunction, isList, isString, removeNilValues, toList } from 'utils-pack'
-import { cloneDeep, get, hasObjectValue, isObject } from 'utils-pack/object'
+import { interpolateString, isCollection, isFunction, isList, isString, removeNilValues, toList } from 'ui-utils-pack'
+import { cloneDeep, get, hasObjectValue, isObject } from 'ui-utils-pack/object'
 import Render from './Render'
 
 const FUNCTION_NAMES = ['onClick', 'onChange', 'onDone']

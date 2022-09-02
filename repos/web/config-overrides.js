@@ -27,9 +27,9 @@ if (process.env.NODE_ENV === 'test') {
     babelInclude([
       path.resolve('src'), // make sure you link your own source
       path.resolve('../core/src'),
-      path.resolve('../../node_modules/modules-pack'),
-      path.resolve('../../node_modules/react-ui-pack'),
-      path.resolve('../../node_modules/utils-pack'),
+      path.resolve('../../node_modules/ui-modules-pack'),
+      path.resolve('../../node_modules/ui-react-pack'),
+      path.resolve('../../node_modules/ui-utils-pack'),
     ]),
     useEslintRc(),  // to enable decorators before `export` keyword for intuitive developer experience
     addDecoratorsLegacy(),  // requires `@babel/plugin-proposal-decorators`

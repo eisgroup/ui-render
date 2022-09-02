@@ -1,9 +1,9 @@
 import classNames from 'classnames'
 import React, { Component } from 'react'
-import Button from 'react-ui-pack/Button'
-import Icon from 'react-ui-pack/Icon'
-import Row from 'react-ui-pack/Row'
-import View from 'react-ui-pack/View'
+import Button from 'ui-react-pack/Button'
+import Icon from 'ui-react-pack/Icon'
+import Row from 'ui-react-pack/Row'
+import View from 'ui-react-pack/View'
 
 /**
  * Button States

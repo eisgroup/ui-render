@@ -1,5 +1,5 @@
-import { interpolateString, l, localiseTranslation } from 'utils-pack'
-import { _ } from 'utils-pack/translations'
+import { interpolateString, l, localiseTranslation } from 'ui-utils-pack'
+import { _ } from 'ui-utils-pack/translations'
 
 /**
  * Download a single file from url (works for cross origin urls) in the browser

@@ -1,4 +1,4 @@
-import { __DEV__, cloneDeep, SIZE_MB_16 } from 'utils-pack'
+import { __DEV__, cloneDeep, SIZE_MB_16 } from 'ui-utils-pack'
 
 const buttonTrash = {
   view: 'Button',

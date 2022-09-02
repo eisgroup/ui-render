@@ -1,4 +1,4 @@
-import { cloneDeep } from 'utils-pack'
+import { cloneDeep } from 'ui-utils-pack'
 
 const DailyInformation = {
   Date: '2022-02-02',

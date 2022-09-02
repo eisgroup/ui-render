@@ -1,5 +1,5 @@
 import React from 'react'
-import { PropTypes } from 'react-ui-pack'
+import { PropTypes } from 'ui-react-pack'
 import Tabs from './Tabs'
 
 /**

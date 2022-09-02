@@ -1,12 +1,12 @@
 import React, { PureComponent } from 'react'
-import { cn, PropTypes } from 'react-ui-pack'
-import Icon from 'react-ui-pack/Icon'
-import ScrollView from 'react-ui-pack/ScrollView'
-import Text from 'react-ui-pack/Text'
-import { type } from 'react-ui-pack/types'
-import { withTimer } from 'react-ui-pack/utils'
-import View from 'react-ui-pack/View'
-import { isEqual, isFunction } from 'utils-pack'
+import { cn, PropTypes } from 'ui-react-pack'
+import Icon from 'ui-react-pack/Icon'
+import ScrollView from 'ui-react-pack/ScrollView'
+import Text from 'ui-react-pack/Text'
+import { type } from 'ui-react-pack/types'
+import { withTimer } from 'ui-react-pack/utils'
+import View from 'ui-react-pack/View'
+import { isEqual, isFunction } from 'ui-utils-pack'
 
 type.Node = PropTypes.object
 

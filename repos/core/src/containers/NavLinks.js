@@ -1,12 +1,12 @@
-import { connect } from 'modules-pack/redux'
-import router, { Link } from 'modules-pack/router/browser'
-import { ROUTE } from 'modules-pack/variables'
+import { connect } from 'ui-modules-pack/redux'
+import router, { Link } from 'ui-modules-pack/router/browser'
+import { ROUTE } from 'ui-modules-pack/variables'
 import React, { Component, Fragment } from 'react'
-import { PropTypes, STYLE } from 'react-ui-pack'
-import AlertCounter from 'react-ui-pack/AlertCounter'
-import Icon from 'react-ui-pack/Icon'
-import Text from 'react-ui-pack/Text'
-import { withTimer } from 'react-ui-pack/utils'
+import { PropTypes, STYLE } from 'ui-react-pack'
+import AlertCounter from 'ui-react-pack/AlertCounter'
+import Icon from 'ui-react-pack/Icon'
+import Text from 'ui-react-pack/Text'
+import { withTimer } from 'ui-react-pack/utils'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------

@@ -2,7 +2,7 @@ import { apiAction } from 'core/src/common/api/actions'
 import { GET } from 'core/src/common/constants'
 import { bench } from 'core/src/common/utils'
 import { API_TEST_URL } from 'core/src/common/variables'
-import User from 'modules-pack/user/models'
+import User from 'ui-modules-pack/user/models'
 import store from './store'
 
 /**
