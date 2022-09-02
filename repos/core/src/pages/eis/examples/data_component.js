@@ -1,4 +1,4 @@
-import { cloneDeep } from 'utils-pack'
+import { cloneDeep } from 'ui-utils-pack'
 import dropdownMeta from './dropdown_meta.json'
 import exampleData from './example_data.json'
 

@@ -1,13 +1,13 @@
-import api from 'modules-pack/api'
-import form from 'modules-pack/form'
-import popup from 'modules-pack/popup'
-import redux, { createStore } from 'modules-pack/redux'
-import router from 'modules-pack/router/browser'
-import saga from 'modules-pack/saga'
-import settings from 'modules-pack/settings'
-import upload from 'modules-pack/upload'
-import user from 'modules-pack/user'
-import { Active } from 'utils-pack'
+import api from 'ui-modules-pack/api'
+import form from 'ui-modules-pack/form'
+import popup from 'ui-modules-pack/popup'
+import redux, { createStore } from 'ui-modules-pack/redux'
+import router from 'ui-modules-pack/router/browser'
+import saga from 'ui-modules-pack/saga'
+import settings from 'ui-modules-pack/settings'
+import upload from 'ui-modules-pack/upload'
+import user from 'ui-modules-pack/user'
+import { Active } from 'ui-utils-pack'
 
 /**
  * STORE CREATION ==============================================================

@@ -51,10 +51,10 @@
     ]
   },
   "peerDependencies": {
-    "modules-pack": "*",
+    "ui-modules-pack": "0.1.2",
     "react": "16.8.6",
-    "react-ui-pack": "*",
-    "utils-pack": "*"
+    "ui-react-pack": "0.1.1",
+    "ui-utils-pack": "0.1.1"
   },
   "dependencies": {
     "core": "*",

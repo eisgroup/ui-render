@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
-import Input from 'react-ui-pack/Input'
+import Input from 'ui-react-pack/Input'
 import { withMarkup } from '../common/utils/tests'
 
 // Setup test

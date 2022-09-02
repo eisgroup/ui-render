@@ -1,4 +1,4 @@
-import { __DEV__ } from 'utils-pack'
+import { __DEV__ } from 'ui-utils-pack'
 
 export default {
   view: 'Button',

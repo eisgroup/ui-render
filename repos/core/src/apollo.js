@@ -4,11 +4,11 @@ import { ApolloClient } from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
 import { onError } from 'apollo-link-error'
 import { createUploadLink } from 'apollo-upload-client'
-import { API_GQL_URL } from 'modules-pack'
-import { HTTP_401_UNAUTHORIZED } from 'modules-pack/api'
-import { NAME as POPUP } from 'modules-pack/popup'
-import { stateAction } from 'modules-pack/redux/actions'
-import { _, Active, ERROR, get, LOGIN, toList, warn } from 'utils-pack'
+import { API_GQL_URL } from 'ui-modules-pack'
+import { HTTP_401_UNAUTHORIZED } from 'ui-modules-pack/api'
+import { NAME as POPUP } from 'ui-modules-pack/popup'
+import { stateAction } from 'ui-modules-pack/redux/actions'
+import { _, Active, ERROR, get, LOGIN, toList, warn } from 'ui-utils-pack'
 
 /**
  * APOLLO CLIENT SETUP =========================================================

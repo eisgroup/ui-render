@@ -1,10 +1,10 @@
 // import Apollo from 'core/src/apollo'
 import UIRender from 'core/src/pages/eis/rules'
 import WebStudioPage from 'core/src/pages/eis/webstudio'
-import Redux from 'modules-pack/redux'
+import Redux from 'ui-modules-pack/redux'
 import React, { PureComponent } from 'react'
 import { render } from 'react-dom'
-import { syncState } from 'react-ui-pack'
+import { syncState } from 'ui-react-pack'
 import AppElement from './AppElement'
 import store from './store'
 

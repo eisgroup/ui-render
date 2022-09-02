@@ -1,13 +1,13 @@
 import { Header } from 'core/src/containers/Navigation'
-import Popup from 'modules-pack/popup/views/Popup'
-import { connect } from 'modules-pack/redux'
-import { select, SETTING } from 'modules-pack/settings'
-import { DEFAULT } from 'modules-pack/variables'
+import Popup from 'ui-modules-pack/popup/views/Popup'
+import { connect } from 'ui-modules-pack/redux'
+import { select, SETTING } from 'ui-modules-pack/settings'
+import { DEFAULT } from 'ui-modules-pack/variables'
 import React, { Component } from 'react'
-import Row from 'react-ui-pack/Row'
-import { UIContext } from 'react-ui-pack/utils'
-import View from 'react-ui-pack/View'
-import { debounceBy, logRender, TIME_DURATION_INSTANT } from 'utils-pack'
+import Row from 'ui-react-pack/Row'
+import { UIContext } from 'ui-react-pack/utils'
+import View from 'ui-react-pack/View'
+import { debounceBy, logRender, TIME_DURATION_INSTANT } from 'ui-utils-pack'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------

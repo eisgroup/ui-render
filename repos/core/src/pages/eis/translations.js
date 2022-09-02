@@ -1,6 +1,6 @@
-import { l, localiseTranslation } from 'utils-pack'
+import { l, localiseTranslation } from 'ui-utils-pack'
 
-export { _ } from 'utils-pack/translations'
+export { _ } from 'ui-utils-pack/translations'
 
 /**
  * LOCALISED TRANSLATIONS (i18n) ===============================================

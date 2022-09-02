@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
-import Expand from 'react-ui-pack/Expand'
+import Expand from 'ui-react-pack/Expand'
 
 // Setup test
 beforeEach(() => {

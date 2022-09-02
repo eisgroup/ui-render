@@ -1,6 +1,6 @@
 // import Apollo from 'core/src/apollo'
 import WebStudioPage from 'core/src/pages/eis/webstudio'
-import Redux from 'modules-pack/redux'
+import Redux from 'ui-modules-pack/redux'
 import React from 'react'
 import { render } from 'react-dom'
 import AppElement from './AppElement'

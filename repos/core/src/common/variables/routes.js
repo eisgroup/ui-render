@@ -1,5 +1,5 @@
-import { createNestedRoutes, ROUTE, ROUTES } from 'modules-pack/variables'
-import { __PROD__, ENV } from 'utils-pack'
+import { createNestedRoutes, ROUTE, ROUTES } from 'ui-modules-pack/variables'
+import { __PROD__, ENV } from 'ui-utils-pack'
 
 export const ROUTE_BASE = __PROD__ ? `${ENV.REACT_APP_HOMEPAGE || ''}/` : '/'
 const _ROUTE = {

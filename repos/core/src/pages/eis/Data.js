@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { type } from 'react-ui-pack'
-import { Active } from 'utils-pack'
+import { type } from 'ui-react-pack'
+import { Active } from 'ui-utils-pack'
 
 /**
  * Component to hold independent UI Render Instance Data

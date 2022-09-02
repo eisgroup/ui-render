@@ -1,4 +1,4 @@
-import { SIZE_MB_16 } from 'utils-pack'
+import { SIZE_MB_16 } from 'ui-utils-pack'
 
 export default {
   view: 'Input',

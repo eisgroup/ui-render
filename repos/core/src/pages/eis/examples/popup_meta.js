@@ -1,4 +1,4 @@
-import { cloneDeep } from 'utils-pack'
+import { cloneDeep } from 'ui-utils-pack'
 import content from './table-nested_meta'
 
 export default {

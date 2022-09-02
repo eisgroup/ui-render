@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import Icon from 'react-ui-pack/Icon'
-import Loading from 'react-ui-pack/Loading'
-import Row from 'react-ui-pack/Row'
-import Spinner from 'react-ui-pack/Spinner'
-import Square from 'react-ui-pack/Square'
-import View from 'react-ui-pack/View'
+import Icon from 'ui-react-pack/Icon'
+import Loading from 'ui-react-pack/Loading'
+import Row from 'ui-react-pack/Row'
+import Spinner from 'ui-react-pack/Spinner'
+import Square from 'ui-react-pack/Square'
+import View from 'ui-react-pack/View'
 import { PATH_IMAGES } from '../../common/variables'
 
 /**

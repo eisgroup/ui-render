@@ -28,7 +28,7 @@ if (process.env.NODE_ENV === 'test') {
       path.resolve('src'), // make sure you link your own source
       path.resolve('../core/src'),
       path.resolve('../../node_modules/modules-pack'),
-      path.resolve('../../node_modules/react-ui-pack'),
+      path.resolve('../../node_modules/ui-react-pack'),
       path.resolve('../../node_modules/utils-pack'),
     ]),
     useEslintRc(),  // to enable decorators before `export` keyword for intuitive developer experience
