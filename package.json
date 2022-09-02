@@ -1,6 +1,6 @@
 {
   "name": "ui-utils-pack",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "JS Helper Functions",
   "license": "MIT",
   "main": "index.js",
