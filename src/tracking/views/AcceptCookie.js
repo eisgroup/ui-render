@@ -1,5 +1,5 @@
-import { Link } from 'modules-pack/router/browser'
-import { ROUTE_BASE } from 'modules-pack/variables/routes'
+import { Link } from 'ui-modules-pack/router/browser'
+import { ROUTE_BASE } from 'ui-modules-pack/variables/routes'
 import React, { PureComponent } from 'react'
 import { cn } from 'ui-react-pack'
 import Button from 'ui-react-pack/Button'

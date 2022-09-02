@@ -1,4 +1,4 @@
-import { connect, stateAction } from 'modules-pack/redux'
+import { connect, stateAction } from 'ui-modules-pack/redux'
 import React, { Component } from 'react'
 import Select from 'ui-react-pack/Select'
 import View from 'ui-react-pack/View'

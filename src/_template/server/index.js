@@ -5,7 +5,7 @@ import schema from '../schema.gql'
 // import resolver from './resolvers'
 
 // -----------------------------------------------------------------------------
-// import schema from 'modules-pack/_template/schema.gql'
+// import schema from 'ui-modules-pack/_template/schema.gql'
 // -> does not compile with Nodemon when importing schema from package,
 // but can import the '_templateServer' index.js module with schema attached,
 // or import schema from symlink.

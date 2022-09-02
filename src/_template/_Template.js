@@ -1,4 +1,4 @@
-import { connect, stateAction } from 'modules-pack/redux'
+import { connect, stateAction } from 'ui-modules-pack/redux'
 import React, { Component } from 'react'
 import Button from 'ui-react-pack/Button'
 import Icon from 'ui-react-pack/Icon'

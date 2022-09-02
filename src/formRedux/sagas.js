@@ -1,7 +1,7 @@
-import { apiAction } from 'modules-pack/api/actions'
-import { subscribeToApiResults } from 'modules-pack/api/utils'
-import { stateActionType } from 'modules-pack/redux/actions'
-import { all, call, put, takeEvery } from 'modules-pack/saga/utils'
+import { apiAction } from 'ui-modules-pack/api/actions'
+import { subscribeToApiResults } from 'ui-modules-pack/api/utils'
+import { stateActionType } from 'ui-modules-pack/redux/actions'
+import { all, call, put, takeEvery } from 'ui-modules-pack/saga/utils'
 import { GET, get, toList } from 'ui-utils-pack'
 
 import { API_VALIDATE_FAIL_CODE, FORM_ASYNC_VALIDATE } from '../form/constants'

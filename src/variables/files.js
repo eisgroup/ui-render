@@ -78,7 +78,7 @@ export const UPLOAD = {
 }
 
 // @important: for backend, insert this at the top of _init.js:
-// import 'modules-pack/utils/server/config' // load .env file variables
+// import 'ui-modules-pack/utils/server/config' // load .env file variables
 // Bucket name must be empty string so that backend can set bucket during runtime
 UPLOAD.PATH = `${ENV.CDN_BUCKET_NAME ? '' : (ENV.UPLOAD_PATH || _WORK_DIR_)}${UPLOAD.DIR}` // full upload path
 

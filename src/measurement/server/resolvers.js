@@ -1,5 +1,5 @@
 import { GraphQLScalarType } from 'graphql'
-import { Response } from 'modules-pack/graphql/server/resolver'
+import { Response } from 'ui-modules-pack/graphql/server/resolver'
 import { round } from 'ui-utils-pack'
 
 /**

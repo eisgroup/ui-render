@@ -1,4 +1,4 @@
-#import "modules-pack/upload/fragments/FileSummary.gql"
+#import "ui-modules-pack/upload/fragments/FileSummary.gql"
 fragment UserDetails on User {
     about
     photos {

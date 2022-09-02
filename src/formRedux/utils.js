@@ -1,6 +1,6 @@
-import { withFormSetup } from 'modules-pack/form/utils'
-import { stateAction } from 'modules-pack/redux'
-import { FIELD } from 'modules-pack/variables/fields'
+import { withFormSetup } from 'ui-modules-pack/form/utils'
+import { stateAction } from 'ui-modules-pack/redux'
+import { FIELD } from 'ui-modules-pack/variables/fields'
 import React from 'react'
 import { formValueSelector, getFormValues, reduxForm } from 'redux-form' // produces smallest js bundle size
 import { Active, GET, get, hasListValue, isEmpty } from 'ui-utils-pack'
