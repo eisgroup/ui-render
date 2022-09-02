@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { capitalize, isString } from 'ui-utils-pack'
 import Button from './Button'
 import Icon from './Icon'
@@ -68,6 +68,7 @@ export function Input ({
   ...props
 }) {
   const [active, setState] = useState(props.autoFocus)
+  const max = useRef(props.type === 'date' ? '9999-01-01' : null);
   if (autofocus) props.autoFocus = autofocus // React fix
   if (readonly) {
     props.className = 'readonly'
@@ -124,6 +125,7 @@ export function Input ({
             active && setState(false)
             onBlur && onBlur(...args)
           }}
+          max={max.current}
           {...props}
         />
         {icon && !lefty && (isString(icon)
