@@ -9,7 +9,7 @@ import {
   ONE_SECOND,
   ONE_WEEK,
   ONE_YEAR
-} from 'utils-pack'
+} from 'ui-utils-pack'
 import { distanceBetween, Id, timestampFromId } from '../utility'
 
 const NON_TRUTHY_VALUES = [

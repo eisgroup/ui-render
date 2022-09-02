@@ -10,8 +10,8 @@ import { localiseTranslation } from './definitions'
  * Localised String Object (can be extended by adding new terms or languages)
  * @note: follow the example to ensure only one instance of translation exists.
  * @example:
- *    import { l, localiseTranslation } from 'utils-pack'
- *    export { _ } from 'utils-pack/translations'
+ *    import { l, localiseTranslation } from 'ui-utils-pack'
+ *    export { _ } from 'ui-utils-pack/translations'
  *    localiseTranslation({
  *      NEW_PHRASE: {
  *        [l.ENGLISH]: 'New Phrase',

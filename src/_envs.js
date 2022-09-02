@@ -4,7 +4,7 @@ import { LANGUAGE } from './constants.js'
  * Environment Variables
  * @note: for Next.js, explicitly set variable on initialisation like so:
  *   import config from 'next/config'
- *   import { ENV } from 'utils-pack'
+ *   import { ENV } from 'ui-utils-pack'
  *
  *   Object.assign(ENV, config().publicRuntimeConfig)
  */
