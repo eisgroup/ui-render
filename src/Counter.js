@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
-import { ONE_SECOND, TIME_DURATION_INSTANT } from 'utils-pack'
+import { ONE_SECOND, TIME_DURATION_INSTANT } from 'ui-utils-pack'
 import { renderFloat } from './renders'
 import { withTimer } from './utils'
 

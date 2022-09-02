@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { isFunction } from 'utils-pack'
+import { isFunction } from 'ui-utils-pack'
 import { accessibilitySupport } from './utils'
 
 /**

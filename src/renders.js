@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { Active, debounce, LANGUAGE, round, shortNumber, SORT_ORDER, toUpperCase } from 'utils-pack'
+import { Active, debounce, LANGUAGE, round, shortNumber, SORT_ORDER, toUpperCase } from 'ui-utils-pack'
 import ColorSwatch from './ColorSwatch'
 import { FILE } from './files'
 import Icon from './Icon'

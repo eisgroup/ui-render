@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { Active } from 'utils-pack'
+import { Active } from 'ui-utils-pack'
 import Button from './Button'
 import { SOUND } from './files'
 

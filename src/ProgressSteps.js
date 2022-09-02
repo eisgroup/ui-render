@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Fragment, PureComponent } from 'react'
-import { get, isFunction } from 'utils-pack'
+import { get, isFunction } from 'ui-utils-pack'
 import Button from './Button'
 import Icon from './Icon'
 import ProgressBar from './ProgressBar'

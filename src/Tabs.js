@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
-import { isEqual, isFunction } from 'utils-pack'
+import { isEqual, isFunction } from 'ui-utils-pack'
 import Icon from './Icon'
 import ScrollView from './ScrollView'
 import Text from './Text'

@@ -1,4 +1,4 @@
-import { ENV, isFileSrc } from 'utils-pack'
+import { ENV, isFileSrc } from 'ui-utils-pack'
 import { STYLE } from '../styles'
 
 /**

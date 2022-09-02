@@ -5,8 +5,8 @@ import Handle from 'rc-slider/lib/Handle'
 import Range from 'rc-slider/lib/Range'
 import RCSlider from 'rc-slider/lib/Slider' // Slider lib adds 55 KB to bundle size
 import React from 'react'
-import { formatNumber, last, round, toPercent } from 'utils-pack'
-import { formatDuration } from 'utils-pack/time'
+import { formatNumber, last, round, toPercent } from 'ui-utils-pack'
+import { formatDuration } from 'ui-utils-pack/time'
 import Tooltip from './Tooltip'
 // import View from './View'
 

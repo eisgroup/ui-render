@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
-import { Active } from 'utils-pack'
+import { Active } from 'ui-utils-pack'
 import Badge from './Badge'
 import { SOUND } from './files'
 

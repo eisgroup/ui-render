@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { Fragment } from 'react'
-import { hasListValue } from 'utils-pack'
+import { hasListValue } from 'ui-utils-pack'
 import ErrorTable from './ErrorTable'
 import View from './View'
 

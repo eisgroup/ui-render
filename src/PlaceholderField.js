@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { l, localiseTranslation, toLowerCase } from 'utils-pack'
-import { _ } from 'utils-pack/translations'
+import { l, localiseTranslation, toLowerCase } from 'ui-utils-pack'
+import { _ } from 'ui-utils-pack/translations'
 import Text from './Text'
 import View from './View'
 

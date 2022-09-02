@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React from 'react'
-import { isFunction } from 'utils-pack'
+import { isFunction } from 'ui-utils-pack'
 import { accessibilitySupport } from './utils'
 
 /**

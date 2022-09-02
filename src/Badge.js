@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { shortNumber } from 'utils-pack'
+import { shortNumber } from 'ui-utils-pack'
 import View from './View'
 
 /**

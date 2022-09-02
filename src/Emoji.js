@@ -1,5 +1,5 @@
 import React from 'react'
-import { round } from 'utils-pack'
+import { round } from 'ui-utils-pack'
 
 /**
  * Emoji - Pure Component to center emoji

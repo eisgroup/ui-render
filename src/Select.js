@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { interpolateString, isFunction, l, localiseTranslation } from 'utils-pack'
-import { _ } from 'utils-pack/translations'
+import { interpolateString, isFunction, l, localiseTranslation } from 'ui-utils-pack'
+import { _ } from 'ui-utils-pack/translations'
 import Label from './Label'
 
 /**

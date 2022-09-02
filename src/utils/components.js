@@ -1,4 +1,4 @@
-import { isObject } from 'utils-pack'
+import { isObject } from 'ui-utils-pack'
 
 /**
  * Semantic UI Popup props for nested Dropdown Menu (usually Buttons)

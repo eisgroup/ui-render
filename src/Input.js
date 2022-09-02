@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import React, { useState } from 'react'
-import { capitalize, isString } from 'utils-pack'
+import { capitalize, isString } from 'ui-utils-pack'
 import Button from './Button'
 import Icon from './Icon'
 import InputNative from './InputNative'

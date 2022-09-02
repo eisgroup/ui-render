@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { isEmpty } from 'utils-pack'
+import { isEmpty } from 'ui-utils-pack'
 import Icon from './Icon'
 import Row from './Row'
 import Text from './Text'

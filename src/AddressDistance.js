@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { useState } from 'react'
-import { distanceBetween } from 'utils-pack/utility'
+import { distanceBetween } from 'ui-utils-pack/utility'
 import Icon from './Icon'
 import { renderFloat } from './renders'
 import Text from './Text'

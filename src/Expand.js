@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
-import { isFunction } from 'utils-pack'
+import { isFunction } from 'ui-utils-pack'
 import AnimateHeight from './AnimateHeight'
 import Icon from './Icon'
 import { STYLE } from './styles'

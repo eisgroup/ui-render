@@ -1,6 +1,6 @@
 import React from 'react'
 import { Popup as Pop } from 'semantic-ui-react'
-import { isFunction } from 'utils-pack'
+import { isFunction } from 'ui-utils-pack'
 
 /**
  * Tooltip Component using Semantic UI Popup

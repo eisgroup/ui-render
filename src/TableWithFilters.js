@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
-import { capitalize, hasListValue, isInList, isInString, pluralize } from 'utils-pack'
+import { capitalize, hasListValue, isInList, isInString, pluralize } from 'ui-utils-pack'
 import AnimateHeight from './AnimateHeight'
 import Button from './Button'
 import Checkbox from './Checkbox'

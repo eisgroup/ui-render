@@ -14,8 +14,8 @@ import {
   toLowerCaseAny,
   toUniqueListCaseInsensitive,
   trimSpaces
-} from 'utils-pack'
-import { _ } from 'utils-pack/translations'
+} from 'ui-utils-pack'
+import { _ } from 'ui-utils-pack/translations'
 import Icon from './Icon'
 import Text from './Text'
 import View from './View'

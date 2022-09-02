@@ -1,9 +1,9 @@
 import chroma from 'chroma-js'
 import React from 'react'
 import { Area, Cell, LabelList } from 'recharts'
-import { shortNumber, toAlphaNumId, } from 'utils-pack'
-import { colorScaleDistinct } from 'utils-pack/color'
-import { toHours } from 'utils-pack/time'
+import { shortNumber, toAlphaNumId, } from 'ui-utils-pack'
+import { colorScaleDistinct } from 'ui-utils-pack/color'
+import { toHours } from 'ui-utils-pack/time'
 import { STYLE } from '../styles'
 
 // =============================================================================

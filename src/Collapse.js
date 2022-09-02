@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
-import { removeNilValues } from 'utils-pack'
+import { removeNilValues } from 'ui-utils-pack'
 import Icon from './Icon'
 import Row from './Row'
 import View from './View'

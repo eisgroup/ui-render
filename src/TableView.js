@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Fragment, PureComponent } from 'react'
-import { by, get, hasListValue, isEqual, isEqualList, isFunction } from 'utils-pack'
+import { by, get, hasListValue, isEqual, isEqualList, isFunction } from 'ui-utils-pack'
 import Placeholder from './Placeholder'
 import { renderSort } from './renders'
 import Row from './Row'

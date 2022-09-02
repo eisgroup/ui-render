@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { shortNumber, toPercentage } from 'utils-pack'
+import { shortNumber, toPercentage } from 'ui-utils-pack'
 import Counter from './Counter'
 import Icon from './Icon'
 import Row from './Row'
