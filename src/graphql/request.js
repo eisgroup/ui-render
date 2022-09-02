@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { idFromRoute, uriFrom } from 'modules-pack/router/utils'
-import { ROUTES } from 'modules-pack/variables'
+import { idFromRoute, uriFrom } from 'ui-modules-pack/router/utils'
+import { ROUTES } from 'ui-modules-pack/variables'
 import React from 'react'
-import { getOriginalClass } from 'react-ui-pack'
-import LoadingView from 'react-ui-pack/Loading'
+import { getOriginalClass } from 'ui-react-pack'
+import LoadingView from 'ui-react-pack/Loading'
 import {
   Active,
   get,
@@ -15,7 +15,7 @@ import {
   set,
   toList,
   toLowerCase
-} from 'utils-pack'
+} from 'ui-utils-pack'
 import { GQL_HIDDEN_FIELDS } from './constants'
 
 /**

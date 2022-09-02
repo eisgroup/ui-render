@@ -1,5 +1,5 @@
-import { stateAction } from 'modules-pack/redux/actions'
-import { Active, SET } from 'utils-pack'
+import { stateAction } from 'ui-modules-pack/redux/actions'
+import { Active, SET } from 'ui-utils-pack'
 import { NAME as SETTINGS } from './constants'
 
 /**

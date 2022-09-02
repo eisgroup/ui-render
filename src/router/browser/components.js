@@ -1,9 +1,9 @@
-import { ROUTE } from 'modules-pack'
+import { ROUTE } from 'ui-modules-pack'
 import React from 'react'
 import { withRouter } from 'react-router'
 import { Link as ClientLink, Route } from 'react-router-dom'
-import { onPressHoc, SOUND } from 'react-ui-pack'
-import { Active, hasListValue } from 'utils-pack'
+import { onPressHoc, SOUND } from 'ui-react-pack'
+import { Active, hasListValue } from 'ui-utils-pack'
 import { idFromRoute } from '../utils'
 
 /**

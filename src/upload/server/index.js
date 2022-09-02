@@ -1,4 +1,4 @@
-import { assertBackend } from 'utils-pack'
+import { assertBackend } from 'ui-utils-pack'
 import { UPLOAD_SERVER } from '../constants'
 import schema from '../schema.gql'
 import resolver from './resolvers'

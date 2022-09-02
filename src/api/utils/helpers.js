@@ -1,4 +1,4 @@
-import { fromJSON } from 'utils-pack'
+import { fromJSON } from 'ui-utils-pack'
 
 /**
  * API HELPERS =================================================================

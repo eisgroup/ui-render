@@ -1,5 +1,5 @@
-import { DEFINITION_BY_VAL, ENUM } from 'modules-pack/variables/definitions'
-import { definitionByValue, enumFrom, l } from 'utils-pack'
+import { DEFINITION_BY_VAL, ENUM } from 'ui-modules-pack/variables/definitions'
+import { definitionByValue, enumFrom, l } from 'ui-utils-pack'
 
 /**
  * LOCALISED DEFINITIONS =======================================================

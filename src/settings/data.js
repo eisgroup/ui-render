@@ -1,4 +1,4 @@
-import { GET, performStorage } from 'utils-pack'
+import { GET, performStorage } from 'ui-utils-pack'
 import { NAME } from './constants'
 
 /**

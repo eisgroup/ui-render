@@ -1,4 +1,4 @@
-import { interpolateString } from 'utils-pack'
+import { interpolateString } from 'ui-utils-pack'
 import { fileName, resolvePath } from '../files'
 
 const id = 'test'

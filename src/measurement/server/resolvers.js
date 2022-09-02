@@ -1,6 +1,6 @@
 import { GraphQLScalarType } from 'graphql'
 import { Response } from 'modules-pack/graphql/server/resolver'
-import { round } from 'utils-pack'
+import { round } from 'ui-utils-pack'
 
 /**
  * TYPE RESOLVERS ==============================================================

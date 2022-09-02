@@ -1,6 +1,6 @@
 import { stringify } from 'querystring'
-import { __DEV__, Active, isInList, MESSAGE, RESULT_SEPARATOR, warn } from 'utils-pack'
-import { cryptoSign, cryptoSignVerify } from 'utils-pack/crypto'
+import { __DEV__, Active, isInList, MESSAGE, RESULT_SEPARATOR, warn } from 'ui-utils-pack'
+import { cryptoSign, cryptoSignVerify } from 'ui-utils-pack/crypto'
 import { SECRET } from '../variables'
 import { SOCKET_CALL, SOCKET_RESULTS } from './constants'
 

@@ -1,4 +1,4 @@
-import { CLOSE, FINISH, isInList, LOAD, OPEN, START } from 'utils-pack'
+import { CLOSE, FINISH, isInList, LOAD, OPEN, START } from 'ui-utils-pack'
 import { stateActionType } from './actions'
 
 /**

@@ -1,5 +1,5 @@
-import { handleActions, stateActionType, uiLoading } from 'modules-pack/redux'
-import { Active, performStorage, RESET, SET } from 'utils-pack'
+import { handleActions, stateActionType, uiLoading } from 'ui-modules-pack/redux'
+import { Active, performStorage, RESET, SET } from 'ui-utils-pack'
 import { SELF, USER } from './constants'
 import initState from './data'
 

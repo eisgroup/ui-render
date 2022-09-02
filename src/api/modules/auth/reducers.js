@@ -1,6 +1,6 @@
-import { combineReducers, handleActions } from 'modules-pack/redux'
-import { stateActionType } from 'modules-pack/redux/actions'
-import { LOGIN, LOGOUT, SUCCESS, UPDATE } from 'utils-pack'
+import { combineReducers, handleActions } from 'ui-modules-pack/redux'
+import { stateActionType } from 'ui-modules-pack/redux/actions'
+import { LOGIN, LOGOUT, SUCCESS, UPDATE } from 'ui-utils-pack'
 import { API } from './constants'
 import initState from './data'
 

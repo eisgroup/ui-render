@@ -1,4 +1,4 @@
-import { assertFrontend } from 'utils-pack'
+import { assertFrontend } from 'ui-utils-pack'
 import { USER_CLIENT } from '../constants'
 import saga from './sagas'
 

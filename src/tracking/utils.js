@@ -1,4 +1,4 @@
-import { GET, getParamByKey, performStorage, SET } from 'utils-pack'
+import { GET, getParamByKey, performStorage, SET } from 'ui-utils-pack'
 import {
   COOKIE_ACCEPTED_TIMESTAMP_KEY,
   EXCLUDED_TRACKING_INVITE_CODE,

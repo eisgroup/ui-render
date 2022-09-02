@@ -1,7 +1,7 @@
 // noinspection JSUnresolvedFunction
 
 import { SevenBoom as Response } from 'graphql-apollo-errors'
-import { fileId, fileName, folderFrom, IMAGE } from 'modules-pack/variables'
+import { fileId, fileName, folderFrom, IMAGE } from 'ui-modules-pack/variables'
 import mongoose from 'mongoose'
 import PromiseAll from 'promises-all'
 import {
@@ -19,8 +19,8 @@ import {
   toJSON,
   toList,
   warn
-} from 'utils-pack'
-import { _ } from 'utils-pack/translations'
+} from 'ui-utils-pack'
+import { _ } from 'ui-utils-pack/translations'
 import { removeFile, sanitize, saveFile } from './file'
 import { removeImgSizes, saveImgSizes } from './image'
 

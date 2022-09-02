@@ -1,4 +1,4 @@
-import { Active } from 'utils-pack'
+import { Active } from 'ui-utils-pack'
 import logout from './logout.gql'
 import user from './user.gql'
 import usersSummary from './usersSummary.gql'

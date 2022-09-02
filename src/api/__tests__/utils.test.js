@@ -1,5 +1,5 @@
-import { URL } from 'modules-pack/variables'
-import { cloneDeep, GET, SUCCESS } from 'utils-pack'
+import { URL } from 'ui-modules-pack/variables'
+import { cloneDeep, GET, SUCCESS } from 'ui-utils-pack'
 import { apiActionType } from '../actions'
 import { isMatchingApiActionType } from '../utils'
 

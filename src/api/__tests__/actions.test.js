@@ -1,4 +1,4 @@
-import { GET } from 'utils-pack'
+import { GET } from 'ui-utils-pack'
 import { apiAction } from '../actions'
 import { API_CALL } from '../constants'
 

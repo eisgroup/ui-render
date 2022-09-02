@@ -1,4 +1,4 @@
-import selector from 'utils-pack/selectors'
+import selector from 'ui-utils-pack/selectors'
 import { POPUP, POPUP_ALERT, POPUP_CONFIRM, POPUP_ERROR } from './constants'
 
 /**

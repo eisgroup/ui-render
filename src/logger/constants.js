@@ -1,4 +1,4 @@
-import { ONE_MINUTE } from 'utils-pack'
+import { ONE_MINUTE } from 'ui-utils-pack'
 import { REQUEST_TIMEOUT_BACKOFF_DURATION } from '../variables'
 
 /**

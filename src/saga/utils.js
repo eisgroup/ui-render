@@ -1,5 +1,5 @@
 import { call, delay, put, spawn, take } from 'redux-saga/effects'
-import { __CLIENT__, ALERT, FINISH, LOAD, START, SYSTEM } from 'utils-pack'
+import { __CLIENT__, ALERT, FINISH, LOAD, START, SYSTEM } from 'ui-utils-pack'
 import { stateAction } from '../redux/actions'
 import middleware from './middleware'
 

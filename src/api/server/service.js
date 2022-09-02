@@ -1,4 +1,4 @@
-import { DEFAULT } from 'modules-pack/variables/defaults'
+import { DEFAULT } from 'ui-modules-pack/variables/defaults'
 import ApiKey from './models'
 
 /**

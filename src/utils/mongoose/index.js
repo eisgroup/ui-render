@@ -1,4 +1,4 @@
-import { assertBackend } from 'utils-pack'
+import { assertBackend } from 'ui-utils-pack'
 
 /**
  * MONGOOSE HELPERS ============================================================

@@ -1,11 +1,11 @@
 import classNames from 'classnames'
-import { DEFINITION_BY_VAL } from 'modules-pack/variables/definitions'
+import { DEFINITION_BY_VAL } from 'ui-modules-pack/variables/definitions'
 import PropTypes from 'prop-types'
 import React, { useState } from 'react'
-import Button from 'react-ui-pack/Button'
-import Row from 'react-ui-pack/Row'
-import Text from 'react-ui-pack/Text'
-import { isList } from 'utils-pack'
+import Button from 'ui-react-pack/Button'
+import Row from 'ui-react-pack/Row'
+import Text from 'ui-react-pack/Text'
+import { isList } from 'ui-utils-pack'
 import { SliderLabeled } from '../renders'
 
 /**

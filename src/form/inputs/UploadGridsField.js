@@ -1,5 +1,5 @@
-import { asField } from 'modules-pack/form'
-import UploadGrids from 'modules-pack/upload/views/UploadGrids'
+import { asField } from 'ui-modules-pack/form'
+import UploadGrids from 'ui-modules-pack/upload/views/UploadGrids'
 import React from 'react'
 
 /**

@@ -1,7 +1,7 @@
-import GooglePlaces from 'modules-pack/api/server/GooglePlaces'
-import { Address, createModel, Files, index, Name, Point, required, Timestamp, URL } from 'modules-pack/utils/mongoose'
-import { hasListValue, isInList, ONE_MONTH, toUpperCase } from 'utils-pack'
-import { toTimestamp } from 'utils-pack/time'
+import GooglePlaces from 'ui-modules-pack/api/server/GooglePlaces'
+import { Address, createModel, Files, index, Name, Point, required, Timestamp, URL } from 'ui-modules-pack/utils/mongoose'
+import { hasListValue, isInList, ONE_MONTH, toUpperCase } from 'ui-utils-pack'
+import { toTimestamp } from 'ui-utils-pack/time'
 import { PLACE_MODEL } from '../constants'
 
 /**

@@ -3,7 +3,7 @@ import { stateAction } from 'modules-pack/redux'
 import { FIELD } from 'modules-pack/variables/fields'
 import React from 'react'
 import { formValueSelector, getFormValues, reduxForm } from 'redux-form' // produces smallest js bundle size
-import { Active, GET, get, hasListValue, isEmpty } from 'utils-pack'
+import { Active, GET, get, hasListValue, isEmpty } from 'ui-utils-pack'
 import { FORM_ASYNC_VALIDATE } from '../form/constants'
 import { NAME } from './constants'
 

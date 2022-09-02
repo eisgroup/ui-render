@@ -1,4 +1,4 @@
-import { __BACKEND__ } from 'utils-pack'
+import { __BACKEND__ } from 'ui-utils-pack'
 import { createLoggerMiddleware } from './middleware'
 
 /**

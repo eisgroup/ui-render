@@ -1,9 +1,9 @@
-import { asField } from 'modules-pack/form'
-import { POPUP } from 'modules-pack/popup'
-import { connect, stateAction } from 'modules-pack/redux'
+import { asField } from 'ui-modules-pack/form'
+import { POPUP } from 'ui-modules-pack/popup'
+import { connect, stateAction } from 'ui-modules-pack/redux'
 import React from 'react'
-import Place from 'react-ui-pack/inputs/Place'
-import { ALERT } from 'utils-pack'
+import Place from 'ui-react-pack/inputs/Place'
+import { ALERT } from 'ui-utils-pack'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------

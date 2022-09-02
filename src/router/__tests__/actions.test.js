@@ -1,5 +1,5 @@
-import { ROUTE } from 'modules-pack/variables'
-import { CHANGE } from 'utils-pack'
+import { ROUTE } from 'ui-modules-pack/variables'
+import { CHANGE } from 'ui-utils-pack'
 import { isRouterActionType } from '../browser/actions'
 import { ROUTER_ACTION_TYPE } from '../browser/constants'
 

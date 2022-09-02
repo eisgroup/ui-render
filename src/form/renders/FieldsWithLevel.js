@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Fragment, PureComponent } from 'react'
-import Text from 'react-ui-pack/Text'
-import { isList } from 'utils-pack'
+import Text from 'ui-react-pack/Text'
+import { isList } from 'ui-utils-pack'
 import Fields from './Fields'
 import { SliderLabeled } from './renderers'
 

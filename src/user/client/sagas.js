@@ -1,8 +1,8 @@
-import { apiAction, subscribeToApiResults } from 'modules-pack/api'
-import { stateAction, stateActionType } from 'modules-pack/redux'
-import { all, call, delay, put, spawn, takeLatest } from 'modules-pack/saga/utils'
-import { ROUTE, URL } from 'modules-pack/variables'
-import { Active, CREATE, LOGIN, RESET, sanitizeResponse, SET, SUCCESS } from 'utils-pack'
+import { apiAction, subscribeToApiResults } from 'ui-modules-pack/api'
+import { stateAction, stateActionType } from 'ui-modules-pack/redux'
+import { all, call, delay, put, spawn, takeLatest } from 'ui-modules-pack/saga/utils'
+import { ROUTE, URL } from 'ui-modules-pack/variables'
+import { Active, CREATE, LOGIN, RESET, sanitizeResponse, SET, SUCCESS } from 'ui-utils-pack'
 import { SELF, USER_LOGIN } from '../constants'
 import * as m from '../mutations' // setup Active.UserMutation
 import * as q from '../queries' // setup Active.UserQuery

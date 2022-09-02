@@ -1,7 +1,7 @@
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import stream from 'stream'
-import { assertBackend, ENV, warn } from 'utils-pack'
+import { assertBackend, ENV, warn } from 'ui-utils-pack'
 
 /**
  * CDN S3 CLIENT HELPERS =======================================================

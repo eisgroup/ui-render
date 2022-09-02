@@ -1,4 +1,4 @@
-import { ALL_ACTIONS, ALL_RESULTS, CANCEL, ERROR, GET, RECEIVED, SUCCESS, TIMEOUT, WORKER } from 'utils-pack'
+import { ALL_ACTIONS, ALL_RESULTS, CANCEL, ERROR, GET, RECEIVED, SUCCESS, TIMEOUT, WORKER } from 'ui-utils-pack'
 import { actionFromType, isError, stateAction, stateActionType, subscribeToResults } from '../../redux/actions'
 import createStore from '../../redux/createStore'
 import { call } from '../../saga/utils'

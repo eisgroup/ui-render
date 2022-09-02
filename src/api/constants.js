@@ -1,4 +1,4 @@
-import { API_REQUEST_TIMEOUT } from 'modules-pack/variables'
+import { API_REQUEST_TIMEOUT } from 'ui-modules-pack/variables'
 import {
   Active,
   capitalize,
@@ -12,7 +12,7 @@ import {
   SUCCESS,
   TIMEOUT,
   UPDATE
-} from 'utils-pack'
+} from 'ui-utils-pack'
 
 /**
  * CONSTANT VARIABLES ==========================================================

@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { logSelector } from 'utils-pack'
+import { logSelector } from 'ui-utils-pack'
 import { API } from '../../constants'
 import { NAME as AUTH } from './constants'
 

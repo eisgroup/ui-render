@@ -1,5 +1,5 @@
 import React from 'react'
-import { get, isId } from 'utils-pack'
+import { get, isId } from 'ui-utils-pack'
 
 /**
  * Get Route ID from Component Props

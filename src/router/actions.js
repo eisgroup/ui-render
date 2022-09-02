@@ -1,4 +1,4 @@
-import { Active } from 'utils-pack'
+import { Active } from 'ui-utils-pack'
 
 /**
  * ACTION CREATORS =============================================================

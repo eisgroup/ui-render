@@ -1,6 +1,6 @@
-import { stateAction } from 'modules-pack/redux'
+import { stateAction } from 'ui-modules-pack/redux'
 import { call, delay, put, race, select, take } from 'redux-saga/effects'
-import { ERROR, hasListValue, hasObjectValue, isInCollection, SUCCESS, TIMEOUT, toUpperCase, VOID } from 'utils-pack'
+import { ERROR, hasListValue, hasObjectValue, isInCollection, SUCCESS, TIMEOUT, toUpperCase, VOID } from 'ui-utils-pack'
 import { apiAction, apiActionResultsType, apiActionType, fetchToCrud } from '../actions'
 import { CLEAR_ACTIONS_PENDING_NETWORK, HTTP_401_UNAUTHORIZED, NETWORK, REQUEST_TIMEOUT, } from '../constants'
 import { actionsPendingNetwork } from '../selectors'

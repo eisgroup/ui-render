@@ -1,7 +1,7 @@
-import { hasStaffOrHigherRole, isAdmin, isCompany, isIndividual, isStaff } from 'modules-pack/user/logic'
-import { DEFAULT } from 'modules-pack/variables'
-import { Active } from 'utils-pack'
-import selector from 'utils-pack/selectors'
+import { hasStaffOrHigherRole, isAdmin, isCompany, isIndividual, isStaff } from 'ui-modules-pack/user/logic'
+import { DEFAULT } from 'ui-modules-pack/variables'
+import { Active } from 'ui-utils-pack'
+import selector from 'ui-utils-pack/selectors'
 import { USER } from './constants'
 
 // noinspection JSPotentiallyInvalidUsageOfClassThis

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import sanitizer from 'mongoose-sanitizer'
-import { __TEST__ } from 'utils-pack'
+import { __TEST__ } from 'ui-utils-pack'
 import { DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER, DOMAIN } from '../server/config'
 
 /**

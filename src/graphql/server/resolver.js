@@ -2,8 +2,8 @@ import { GraphQLScalarType } from 'graphql'
 import { SevenBoom as Response } from 'graphql-apollo-errors'
 import gqlFields from 'graphql-fields'
 import { Kind } from 'graphql/language'
-import { SERVER } from 'modules-pack/variables'
-import { definitionByValue, enumFrom, isObject } from 'utils-pack'
+import { SERVER } from 'ui-modules-pack/variables'
+import { definitionByValue, enumFrom, isObject } from 'ui-utils-pack'
 
 export { Response }
 export const queryFields = gqlFields

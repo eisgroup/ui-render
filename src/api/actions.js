@@ -1,4 +1,4 @@
-import { stateActionType } from 'modules-pack/redux/actions'
+import { stateActionType } from 'ui-modules-pack/redux/actions'
 import {
   __DEV__,
   CREATE,
@@ -17,7 +17,7 @@ import {
   swapKeyWithValue,
   UPDATE,
   warn
-} from 'utils-pack'
+} from 'ui-utils-pack'
 import { API, API_ACTIONS, API_CALL, API_RESULTS, NETWORK, STORAGE_KEY_TOKEN } from './constants'
 
 /**

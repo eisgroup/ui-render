@@ -1,5 +1,5 @@
-import { gqlRequestDecorator, updateCacheList } from 'modules-pack/graphql'
-import { LOGOUT } from 'utils-pack'
+import { gqlRequestDecorator, updateCacheList } from 'ui-modules-pack/graphql'
+import { LOGOUT } from 'ui-utils-pack'
 import { USER, USERS } from './constants'
 import { user as mutation } from './mutations'
 import { logout, user as query, usersSummary } from './queries'

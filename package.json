@@ -1,6 +1,6 @@
 {
   "name": "ui-modules-pack",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "JavaScript Modules for Modern Frontend & Backend Projects",
   "license": "MIT",
   "main": "index.js",
@@ -36,9 +36,9 @@
     "graphql-type-json": "*",
     "mkdirp": "*",
     "react": "16.*",
-    "react-ui-pack": "*",
+    "ui-react-pack": "*",
     "sanitize-filename": "*",
-    "utils-pack": "*"
+    "ui-utils-pack": "*"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.58.0",

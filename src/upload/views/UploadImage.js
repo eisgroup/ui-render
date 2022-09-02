@@ -1,9 +1,9 @@
-import { connect } from 'modules-pack/redux'
-import { FILE } from 'modules-pack/variables'
+import { connect } from 'ui-modules-pack/redux'
+import { FILE } from 'ui-modules-pack/variables'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
-import Image from 'react-ui-pack/Image'
-import { isEqual, toList } from 'utils-pack'
+import Image from 'ui-react-pack/Image'
+import { isEqual, toList } from 'ui-utils-pack'
 import select from '../selectors'
 import Upload from './Upload'
 

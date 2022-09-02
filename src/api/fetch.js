@@ -1,4 +1,4 @@
-import { runTask } from 'modules-pack/saga/utils'
+import { runTask } from 'ui-modules-pack/saga/utils'
 import { fetchFlow } from './utils'
 
 /**

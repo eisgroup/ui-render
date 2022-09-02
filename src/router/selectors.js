@@ -1,5 +1,5 @@
-import { get } from 'utils-pack'
-import selector from 'utils-pack/selectors'
+import { get } from 'ui-utils-pack'
+import selector from 'ui-utils-pack/selectors'
 import { ROUTER } from './constants'
 
 /**

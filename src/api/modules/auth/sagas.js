@@ -1,6 +1,6 @@
-import { stateAction, stateActionType } from 'modules-pack/redux'
-import { URL } from 'modules-pack/variables'
-import { STYLE } from 'react-ui-pack'
+import { stateAction, stateActionType } from 'ui-modules-pack/redux'
+import { URL } from 'ui-modules-pack/variables'
+import { STYLE } from 'ui-react-pack'
 import { all, call, cancel, cancelled, delay, fork, put, select, take, takeEvery, takeLatest } from 'redux-saga/effects'
 import {
   CANCEL,
@@ -22,7 +22,7 @@ import {
   SUCCESS,
   TIMEOUT,
   UPDATE
-} from 'utils-pack'
+} from 'ui-utils-pack'
 import Api, { apiAction, apiActionType } from '../../actions'
 import { isApiActionTypeSuccess, resumeActionsPending } from '../../utils'
 import { ADD_ACTIONS_PENDING_AUTH, API, AUTH, LOGIN_CHECK, } from './constants'

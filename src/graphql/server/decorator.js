@@ -1,5 +1,5 @@
-import { __PROD__, Active, classInstanceMethodNames, get, isList, l, localiseTranslation, toJSON } from 'utils-pack'
-import { _ } from 'utils-pack/translations'
+import { __PROD__, Active, classInstanceMethodNames, get, isList, l, localiseTranslation, toJSON } from 'ui-utils-pack'
+import { _ } from 'ui-utils-pack/translations'
 import { Response } from './resolver'
 
 /**

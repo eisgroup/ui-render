@@ -1,4 +1,4 @@
-import { SIZE_KB } from 'utils-pack'
+import { SIZE_KB } from 'ui-utils-pack'
 
 export const VALIDATE = {
   ABOUT_MAX_LENGTH: 700 * 7, // 700 words, with average 7 characters per word

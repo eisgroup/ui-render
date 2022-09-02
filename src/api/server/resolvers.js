@@ -1,6 +1,6 @@
-import { Response } from 'modules-pack/graphql/server/resolver'
-import { hasDeveloperOrHigherAuth } from 'modules-pack/user/logic'
-import { __PROD__, toFlatObj } from 'utils-pack'
+import { Response } from 'ui-modules-pack/graphql/server/resolver'
+import { hasDeveloperOrHigherAuth } from 'ui-modules-pack/user/logic'
+import { __PROD__, toFlatObj } from 'ui-utils-pack'
 import ApiKey from './models'
 import { apiKeyQueryValidate } from './validators'
 

@@ -1,5 +1,5 @@
 import moment from 'dayjs'
-import { __IOS__ } from 'utils-pack'
+import { __IOS__ } from 'ui-utils-pack'
 
 /**
  * Get User Location

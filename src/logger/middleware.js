@@ -1,4 +1,4 @@
-import { __DEV__, Active, ERROR, formatNumber, log, logClear, REPORT, warn, } from 'utils-pack'
+import { __DEV__, Active, ERROR, formatNumber, log, logClear, REPORT, warn, } from 'ui-utils-pack'
 import { isError, stateAction } from '../redux'
 import { socketActionSigned } from '../socket'
 import { SERVICE, URL } from '../variables'

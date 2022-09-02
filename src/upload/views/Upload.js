@@ -1,16 +1,16 @@
 import classNames from 'classnames'
-import { POPUP, POPUP_ALERT } from 'modules-pack/popup/constants'
-import { connect, stateAction } from 'modules-pack/redux'
-import { ROUTE_HOME, UPLOAD as U } from 'modules-pack/variables'
+import { POPUP, POPUP_ALERT } from 'ui-modules-pack/popup/constants'
+import { connect, stateAction } from 'ui-modules-pack/redux'
+import { ROUTE_HOME, UPLOAD as U } from 'ui-modules-pack/variables'
 import React, { Fragment, PureComponent } from 'react'
 import Dropzone from 'react-dropzone'
-import { type, withTimer } from 'react-ui-pack'
-import Icon from 'react-ui-pack/Icon'
-import Loading from 'react-ui-pack/Loading'
-import Row from 'react-ui-pack/Row'
-import Text from 'react-ui-pack/Text'
-import Tooltip from 'react-ui-pack/Tooltip'
-import View from 'react-ui-pack/View'
+import { type, withTimer } from 'ui-react-pack'
+import Icon from 'ui-react-pack/Icon'
+import Loading from 'ui-react-pack/Loading'
+import Row from 'ui-react-pack/Row'
+import Text from 'ui-react-pack/Text'
+import Tooltip from 'ui-react-pack/Tooltip'
+import View from 'ui-react-pack/View'
 import {
   get,
   hasListValue,
@@ -22,7 +22,7 @@ import {
   SET,
   shortNumber,
   SIZE_KB
-} from 'utils-pack'
+} from 'ui-utils-pack'
 import { UPLOAD } from '../constants'
 import select from '../selectors'
 import { _ } from '../translations'

@@ -1,4 +1,4 @@
-import { CONNECTED, DISCONNECTED, ERROR, MESSAGE, REQUEST } from 'utils-pack'
+import { CONNECTED, DISCONNECTED, ERROR, MESSAGE, REQUEST } from 'ui-utils-pack'
 import { SOCKET_CONNECT_TIMEOUT } from '../variables'
 
 // =============================================================================

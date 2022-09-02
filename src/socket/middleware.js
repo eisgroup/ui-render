@@ -1,5 +1,5 @@
 import { stringify } from 'querystring'
-import { CLOSE, CONNECTED, DISCONNECTED, ERROR, isEqual, MESSAGE } from 'utils-pack'
+import { CLOSE, CONNECTED, DISCONNECTED, ERROR, isEqual, MESSAGE } from 'ui-utils-pack'
 import Connection from './_Connection'
 import { createAction } from './actions'
 import { SOCKET_CALL, SOCKET_CLOSE_EVENT } from './constants'

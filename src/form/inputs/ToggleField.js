@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import { Field } from 'react-final-form'
-import { Checkbox } from 'react-ui-pack/Checkbox'
-import { isRequired } from 'react-ui-pack/inputs/validationRules'
-import { Active, isFunction } from 'utils-pack'
+import { Checkbox } from 'ui-react-pack/Checkbox'
+import { isRequired } from 'ui-react-pack/inputs/validationRules'
+import { Active, isFunction } from 'ui-utils-pack'
 
 if (!Active.Field) Active.Field = Field
 

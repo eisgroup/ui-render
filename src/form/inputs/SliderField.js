@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
 import { Field } from 'react-final-form'
-import { isRequired } from 'react-ui-pack/inputs/validationRules'
-import { Slider } from 'react-ui-pack/Slider'
-import { Active, isFunction, isList, isNumber } from 'utils-pack'
+import { isRequired } from 'ui-react-pack/inputs/validationRules'
+import { Slider } from 'ui-react-pack/Slider'
+import { Active, isFunction, isList, isNumber } from 'ui-utils-pack'
 
 if (!Active.Field) Active.Field = Field
 

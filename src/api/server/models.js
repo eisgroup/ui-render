@@ -1,6 +1,6 @@
-import { createModel, Id, index, Mixed, required, Timestamp } from 'modules-pack/utils/mongoose'
-import { DEFAULT } from 'modules-pack/variables/defaults'
-import { ONE_DAY, warn } from 'utils-pack'
+import { createModel, Id, index, Mixed, required, Timestamp } from 'ui-modules-pack/utils/mongoose'
+import { DEFAULT } from 'ui-modules-pack/variables/defaults'
+import { ONE_DAY, warn } from 'ui-utils-pack'
 import { API_MODEL, API_PLACES, API_PLATFORM_WEB, API_PROVIDER_GOOGLE } from '../constants'
 
 /**

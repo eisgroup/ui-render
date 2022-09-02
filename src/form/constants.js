@@ -1,8 +1,8 @@
-import { OPTIONS, TYPE } from 'modules-pack/variables/definitions'
-import { FIELD } from 'modules-pack/variables/fields'
-import { date, double5, hourMinute, integer, phone, uppercase } from 'react-ui-pack/inputs/normalizers'
-import { email, isRequired, maxLength, password, phoneNumber, url } from 'react-ui-pack/inputs/validationRules'
-import { _ } from 'utils-pack/translations'
+import { OPTIONS, TYPE } from 'ui-modules-pack/variables/definitions'
+import { FIELD } from 'ui-modules-pack/variables/fields'
+import { date, double5, hourMinute, integer, phone, uppercase } from 'ui-react-pack/inputs/normalizers'
+import { email, isRequired, maxLength, password, phoneNumber, url } from 'ui-react-pack/inputs/validationRules'
+import { _ } from 'ui-utils-pack/translations'
 import * as t from './translations'
 
 const sideEffects = {t}

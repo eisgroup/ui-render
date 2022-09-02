@@ -1,8 +1,8 @@
-import { fileNameSized, resolvePath, VALIDATE } from 'modules-pack/variables'
+import { fileNameSized, resolvePath, VALIDATE } from 'ui-modules-pack/variables'
 import PromiseAll from 'promises-all'
 import sharp from 'sharp'
-import { assertBackend, warn } from 'utils-pack'
-import { widthScaled } from 'utils-pack/media'
+import { assertBackend, warn } from 'ui-utils-pack'
+import { widthScaled } from 'ui-utils-pack/media'
 import s3 from '../cdn/s3'
 import { makeDirectory, removeFilePromise } from './file'
 

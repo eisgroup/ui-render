@@ -1,5 +1,5 @@
-import { combineReducers, handleActions } from 'modules-pack/redux'
-import { toUniqueList } from 'utils-pack'
+import { combineReducers, handleActions } from 'ui-modules-pack/redux'
+import { toUniqueList } from 'ui-utils-pack'
 import { ADD_ACTIONS_PENDING_NETWORK, CLEAR_ACTIONS_PENDING_NETWORK } from './constants'
 import initState from './data'
 // import modules, { auth, location } from './modules'

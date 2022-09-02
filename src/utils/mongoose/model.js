@@ -1,5 +1,5 @@
-import { stateAction } from 'modules-pack/redux/actions'
-import { DEFAULT } from 'modules-pack/variables/defaults'
+import { stateAction } from 'ui-modules-pack/redux/actions'
+import { DEFAULT } from 'ui-modules-pack/variables/defaults'
 import mongoose from 'mongoose'
 import {
   Active,
@@ -14,8 +14,8 @@ import {
   toFlatList,
   toList,
   warn,
-} from 'utils-pack'
-import { CREATE, DELETE, SUCCESS, UPDATE } from 'utils-pack/constants'
+} from 'ui-utils-pack'
+import { CREATE, DELETE, SUCCESS, UPDATE } from 'ui-utils-pack/constants'
 import { eventHooks } from './hook'
 import { Localised, ObjectId, Schema, Timestamp, toObjectId, unique } from './types'
 

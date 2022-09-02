@@ -1,4 +1,4 @@
-import { Active, ALERT } from 'utils-pack'
+import { Active, ALERT } from 'ui-utils-pack'
 import { stateAction } from '../redux/actions'
 import { POPUP } from './constants'
 

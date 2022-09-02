@@ -1,6 +1,6 @@
-import { FILE as _FILE } from 'react-ui-pack/files'
-import { _WORK_DIR_, ENV, isList, SIZE_MB_16 } from 'utils-pack'
-import { fileFormatNormalized, fileNameWithoutExt, isFileSrc, mimeTypeFromDataUrl } from 'utils-pack/string'
+import { FILE as _FILE } from 'ui-react-pack/files'
+import { _WORK_DIR_, ENV, isList, SIZE_MB_16 } from 'ui-utils-pack'
+import { fileFormatNormalized, fileNameWithoutExt, isFileSrc, mimeTypeFromDataUrl } from 'ui-utils-pack/string'
 
 /**
  * FILE VARIABLES ==============================================================

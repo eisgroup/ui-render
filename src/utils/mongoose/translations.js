@@ -1,11 +1,11 @@
-import { l, localiseTranslation } from 'utils-pack'
-import { _ } from 'utils-pack/translations'
+import { l, localiseTranslation } from 'ui-utils-pack'
+import { _ } from 'ui-utils-pack/translations'
 
 /**
  * LOCALISED TRANSLATIONS (i18n) ===============================================
  * =============================================================================
  */
-export { _ } from 'utils-pack/translations'
+export { _ } from 'ui-utils-pack/translations'
 localiseTranslation({
   INVALID_modelName_ID_id: {
     [l.ENGLISH]: 'Invalid {modelName} ID {id}'

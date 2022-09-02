@@ -1,4 +1,4 @@
-import { ENV, FIVE_MINUTES, LANGUAGE, THIRTY_SECONDS, THREE_SECONDS, TWO_SECONDS } from 'utils-pack'
+import { ENV, FIVE_MINUTES, LANGUAGE, THIRTY_SECONDS, THREE_SECONDS, TWO_SECONDS } from 'ui-utils-pack'
 
 /**
  * APP CONFIGURATIONS ==========================================================

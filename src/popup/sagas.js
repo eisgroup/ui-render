@@ -4,11 +4,11 @@ import {
   NETWORK,
   NETWORK_ERROR_MESSAGES,
   REQUEST_TIMEOUT_MESSAGE
-} from 'modules-pack/api/constants'
-import { isApiActionTypeError, isApiActionTypeTimeout } from 'modules-pack/api/utils'
-import { stateAction, stateActionType, } from 'modules-pack/redux/actions'
-import { all, call, put, takeEvery } from 'modules-pack/saga/utils'
-import { ALERT, ERROR, get, hostname, isInList, LOGOUT, OPEN, SYSTEM, toList, } from 'utils-pack'
+} from 'ui-modules-pack/api/constants'
+import { isApiActionTypeError, isApiActionTypeTimeout } from 'ui-modules-pack/api/utils'
+import { stateAction, stateActionType, } from 'ui-modules-pack/redux/actions'
+import { all, call, put, takeEvery } from 'ui-modules-pack/saga/utils'
+import { ALERT, ERROR, get, hostname, isInList, LOGOUT, OPEN, SYSTEM, toList, } from 'ui-utils-pack'
 import { POPUP, POPUP_ALERT, POPUP_ERROR } from './constants'
 
 /**

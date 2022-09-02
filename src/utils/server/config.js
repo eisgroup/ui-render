@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import { __BACKEND__, __PROD__, __TEST__ } from 'utils-pack'
+import { __BACKEND__, __PROD__, __TEST__ } from 'ui-utils-pack'
 
 /**
  * BACKEND SERVER CONFIG =======================================================

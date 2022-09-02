@@ -1,6 +1,6 @@
-import commonModules from 'modules-pack/common'
-import { createStore } from 'modules-pack/redux'
-import { Active } from 'utils-pack'
+import commonModules from 'ui-modules-pack/common'
+import { createStore } from 'ui-modules-pack/redux'
+import { Active } from 'ui-utils-pack'
 
 /**
  * EXAMPLE STORE CREATION ======================================================

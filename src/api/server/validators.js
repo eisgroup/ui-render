@@ -1,5 +1,5 @@
-import { Response } from 'modules-pack/graphql/server/resolver'
-import { isEmpty } from 'utils-pack'
+import { Response } from 'ui-modules-pack/graphql/server/resolver'
+import { isEmpty } from 'ui-utils-pack'
 
 /**
  * VALIDATION HELPERS ==========================================================

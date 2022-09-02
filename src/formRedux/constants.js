@@ -1,4 +1,4 @@
-import { CHANGE, ERROR, FINISH, START, SUBMIT, SUCCESS } from 'utils-pack'
+import { CHANGE, ERROR, FINISH, START, SUBMIT, SUCCESS } from 'ui-utils-pack'
 
 /**
  * CONSTANT VARIABLES ==========================================================

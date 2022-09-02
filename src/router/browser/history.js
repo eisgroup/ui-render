@@ -1,4 +1,4 @@
-import { Active } from 'utils-pack'
+import { Active } from 'ui-utils-pack'
 
 // history requires DOM and will throw error in Node when used with Next.js
 // thus need to do conditional check before importing

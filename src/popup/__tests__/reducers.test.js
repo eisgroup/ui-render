@@ -1,4 +1,4 @@
-import { CLOSE, OPEN } from 'utils-pack'
+import { CLOSE, OPEN } from 'ui-utils-pack'
 import { stateAction } from '../../redux/actions'
 import { POPUP, POPUP_ERROR } from '../constants'
 import initState from '../data'

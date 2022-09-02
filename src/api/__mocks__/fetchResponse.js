@@ -1,4 +1,4 @@
-import { toJSON } from 'utils-pack'
+import { toJSON } from 'ui-utils-pack'
 
 /**
  * Mock Fetch Response

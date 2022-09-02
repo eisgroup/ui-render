@@ -1,6 +1,6 @@
 import axios from 'axios' // 'axios' adds 13 KB to final js bundle size
 import { cloneDeep, isNil, omitBy, startsWith } from 'lodash'
-import { stateAction } from 'modules-pack/redux/actions'
+import { stateAction } from 'ui-modules-pack/redux/actions'
 import qs from 'querystring'
 import {
   ERROR,
@@ -14,7 +14,7 @@ import {
   SUCCESS,
   TIMEOUT,
   toJSON
-} from 'utils-pack'
+} from 'ui-utils-pack'
 import { createAction } from './actions'
 import {
   ADD_ACTIONS_PENDING_AUTH,

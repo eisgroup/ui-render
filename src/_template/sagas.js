@@ -1,4 +1,4 @@
-import { all, spawn } from 'modules-pack/saga/utils'
+import { all, spawn } from 'ui-modules-pack/saga/utils'
 
 /**
  * ASYNC TASKS =================================================================

@@ -10,7 +10,7 @@ import {
   MESSAGE,
   TEN_SECONDS,
   TIMEOUT
-} from 'utils-pack'
+} from 'ui-utils-pack'
 import { stateAction } from '../redux/actions'
 import { call, delay, put, race, spawn, take } from '../saga/utils'
 import { URL } from '../variables'

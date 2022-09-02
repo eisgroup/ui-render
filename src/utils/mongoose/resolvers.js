@@ -1,8 +1,8 @@
 import { GraphQLScalarType } from 'graphql'
-import { queryFields, Response } from 'modules-pack/graphql/server/resolver'
+import { queryFields, Response } from 'ui-modules-pack/graphql/server/resolver'
 import mongoose from 'mongoose'
-import { get, interpolateString, isString, l, last, localiseTranslation } from 'utils-pack'
-import { _ } from 'utils-pack/translations'
+import { get, interpolateString, isString, l, last, localiseTranslation } from 'ui-utils-pack'
+import { _ } from 'ui-utils-pack/translations'
 import { isObjectID } from './types'
 
 /**

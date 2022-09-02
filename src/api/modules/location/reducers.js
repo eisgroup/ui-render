@@ -1,6 +1,6 @@
-import { handleActions } from 'modules-pack/redux'
-import { stateActionType } from 'modules-pack/redux/actions'
-import { ERROR, UPDATE } from 'utils-pack'
+import { handleActions } from 'ui-modules-pack/redux'
+import { stateActionType } from 'ui-modules-pack/redux/actions'
+import { ERROR, UPDATE } from 'ui-utils-pack'
 import { NAME as LOCATION, } from './constants'
 import initState from './data'
 

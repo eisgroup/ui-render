@@ -1,7 +1,7 @@
 import { GraphQLScalarType } from 'graphql'
-import { gqlEnumType, Response } from 'modules-pack/graphql/server/resolver'
-import { CURRENCY } from 'modules-pack/variables'
-import { isNumeric, round } from 'utils-pack'
+import { gqlEnumType, Response } from 'ui-modules-pack/graphql/server/resolver'
+import { CURRENCY } from 'ui-modules-pack/variables'
+import { isNumeric, round } from 'ui-utils-pack'
 
 export const CurrencyAmount = new GraphQLScalarType({
   name: 'CurrencyAmount',

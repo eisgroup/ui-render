@@ -1,10 +1,10 @@
 import classNames from 'classnames'
 import React, { Component } from 'react'
-import { type } from 'react-ui-pack'
-import Label from 'react-ui-pack/Label'
-import Tabs from 'react-ui-pack/Tabs'
-import View from 'react-ui-pack/View'
-import { isEqual } from 'utils-pack'
+import { type } from 'ui-react-pack'
+import Label from 'ui-react-pack/Label'
+import Tabs from 'ui-react-pack/Tabs'
+import View from 'ui-react-pack/View'
+import { isEqual } from 'ui-utils-pack'
 import UploadGrid from './UploadGrid'
 
 /**

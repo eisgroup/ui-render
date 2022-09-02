@@ -1,5 +1,5 @@
-import { Active } from 'utils-pack'
-import { namespace } from 'utils-pack/utility'
+import { Active } from 'ui-utils-pack'
+import { namespace } from 'ui-utils-pack/utility'
 
 /**
  * CONSTANT VARIABLES ==========================================================

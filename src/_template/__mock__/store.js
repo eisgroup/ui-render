@@ -1,7 +1,7 @@
 import fake from 'faker'
 import { createStore, stateAction } from 'modules-pack/redux'
 import { MOCK } from 'modules-pack/variables'
-import { SET } from 'utils-pack'
+import { SET } from 'ui-utils-pack'
 import { _TEMPLATE } from '../constants'
 import reducer from '../reducers'
 

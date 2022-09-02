@@ -13,7 +13,7 @@ import {
   toList,
   toListValuesTotal,
   warn
-} from 'utils-pack'
+} from 'ui-utils-pack'
 import { stateActionType } from '../redux'
 import { fork } from '../saga/utils'
 import {

@@ -1,4 +1,4 @@
-import { Active, GET, performStorage } from 'utils-pack'
+import { Active, GET, performStorage } from 'ui-utils-pack'
 import { USER } from './constants'
 
 /**

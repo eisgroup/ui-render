@@ -1,4 +1,4 @@
-import { _SHOULD_SHOW_TEST_, findObjByKeys } from 'utils-pack'
+import { _SHOULD_SHOW_TEST_, findObjByKeys } from 'ui-utils-pack'
 
 /* Routes */
 export const ROUTE_HOME = '/'

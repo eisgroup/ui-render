@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
 import { FormSpy } from 'react-final-form'
-import { PropTypes } from 'react-ui-pack'
-import { Loading } from 'react-ui-pack/Loading'
-import { debounce, l, localiseTranslation, objChanges, TIME_DURATION_INSTANT } from 'utils-pack'
-import { _ } from 'utils-pack/translations'
+import { PropTypes } from 'ui-react-pack'
+import { Loading } from 'ui-react-pack/Loading'
+import { debounce, l, localiseTranslation, objChanges, TIME_DURATION_INSTANT } from 'ui-utils-pack'
+import { _ } from 'ui-utils-pack/translations'
 
 localiseTranslation({
   SYNCING___: {

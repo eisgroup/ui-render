@@ -1,5 +1,5 @@
 import { handleActions, stateActionType, uiLoading } from 'modules-pack/redux'
-import { SET } from 'utils-pack'
+import { SET } from 'ui-utils-pack'
 import { _TEMPLATE } from './constants'
 import initState from './data'
 

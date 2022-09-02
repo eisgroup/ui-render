@@ -1,7 +1,7 @@
-import { FIELD } from 'modules-pack/variables'
+import { FIELD } from 'ui-modules-pack/variables'
 import React from 'react'
-import { PlaceholderField } from 'react-ui-pack/PlaceholderField'
-import { Active } from 'utils-pack'
+import { PlaceholderField } from 'ui-react-pack/PlaceholderField'
+import { Active } from 'ui-utils-pack'
 import {
   DateField,
   DatesField,

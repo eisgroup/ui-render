@@ -4,9 +4,9 @@
 // (until figure out how to mock API timeout in Node.js)
 import request from 'axios'
 import MockAdapter from 'axios-mock-adapter'
-import { stateActionType } from 'modules-pack/redux/actions'
-import { URL } from 'modules-pack/variables'
-import { CREATE, DELETE, ERROR, GET, isFunction, isList, LIST, REQUEST, SUCCESS, TIMEOUT, toJSON } from 'utils-pack'
+import { stateActionType } from 'ui-modules-pack/redux/actions'
+import { URL } from 'ui-modules-pack/variables'
+import { CREATE, DELETE, ERROR, GET, isFunction, isList, LIST, REQUEST, SUCCESS, TIMEOUT, toJSON } from 'ui-utils-pack'
 import mockStore from '../__mocks__/store'
 import { apiActionTest, apiActionType } from '../actions'
 import { ADD_ACTIONS_PENDING_NETWORK, API, NETWORK, NETWORK_ERROR_MESSAGES, } from '../constants'

@@ -1,7 +1,7 @@
 import { applyMiddleware, combineReducers, compose, createStore as reduxCreateStore } from 'redux'
 import { ignoreActions } from 'redux-ignore'
 import { all } from 'redux-saga/effects'
-import { __DEV__, Active, get, hasListValue, hasObjectValue, HYDRATE, isFunction, RESET, toList } from 'utils-pack'
+import { __DEV__, Active, get, hasListValue, hasObjectValue, HYDRATE, isFunction, RESET, toList } from 'ui-utils-pack'
 import saga from '../saga'
 
 /**

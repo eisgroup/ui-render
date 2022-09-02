@@ -1,8 +1,8 @@
-import { asField } from 'modules-pack/form'
+import { asField } from 'ui-modules-pack/form'
 import React from 'react'
 import { Field } from 'react-final-form'
-import DateInput from 'react-ui-pack/inputs/DateInput'
-import { Active } from 'utils-pack'
+import DateInput from 'ui-react-pack/inputs/DateInput'
+import { Active } from 'ui-utils-pack'
 
 if (!Active.Field) Active.Field = Field
 

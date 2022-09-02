@@ -1,8 +1,8 @@
 import fs from 'fs'
 import mkdirp from 'mkdirp'
-import { resolvePath } from 'modules-pack/variables'
+import { resolvePath } from 'ui-modules-pack/variables'
 import sanitizeName from 'sanitize-filename' // this package may have large dependency, so do not include it by default
-import { _WORK_DIR_, warn } from 'utils-pack'
+import { _WORK_DIR_, warn } from 'ui-utils-pack'
 import s3 from '../cdn/s3'
 
 /**

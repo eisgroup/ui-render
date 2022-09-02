@@ -1,4 +1,4 @@
-import { bench } from 'utils-pack'
+import { bench } from 'ui-utils-pack'
 import mockStore from './__mock__/store'
 
 /**

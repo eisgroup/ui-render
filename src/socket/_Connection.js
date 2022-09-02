@@ -1,5 +1,5 @@
 import backOff from 'backoff'
-import { Active, Json } from 'utils-pack'
+import { Active, Json } from 'ui-utils-pack'
 import { SOCKET_CLOSE_EVENT } from './constants'
 
 // =============================================================================

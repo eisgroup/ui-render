@@ -1,5 +1,5 @@
-import { stateAction } from 'modules-pack/redux'
-import { Active, RESET, SET } from 'utils-pack'
+import { stateAction } from 'ui-modules-pack/redux'
+import { Active, RESET, SET } from 'ui-utils-pack'
 import { SELF } from './constants'
 
 /**

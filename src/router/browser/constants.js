@@ -1,4 +1,4 @@
-import { CHANGE } from 'utils-pack'
+import { CHANGE } from 'ui-utils-pack'
 
 /**
  * CONSTANT VARIABLES ==========================================================

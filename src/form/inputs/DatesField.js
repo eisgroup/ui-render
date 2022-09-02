@@ -1,6 +1,6 @@
-import { asField } from 'modules-pack/form'
+import { asField } from 'ui-modules-pack/form'
 import React from 'react'
-import Dates from 'react-ui-pack/inputs/Dates'
+import Dates from 'ui-react-pack/inputs/Dates'
 
 /**
  * Dates From - To Fields connected with react-final-form or redux-form

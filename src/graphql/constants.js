@@ -1,4 +1,4 @@
-import { Active, namespace } from 'utils-pack'
+import { Active, namespace } from 'ui-utils-pack'
 
 /**
  * CONSTANT VARIABLES ==========================================================

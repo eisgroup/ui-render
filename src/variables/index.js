@@ -1,4 +1,4 @@
-import { localise } from 'utils-pack'
+import { localise } from 'ui-utils-pack'
 import * as definitions from './definitions'
 
 /**

@@ -1,4 +1,4 @@
-import { get } from 'utils-pack'
+import { get } from 'ui-utils-pack'
 
 /**
  * HELPER FUNCTIONS ============================================================

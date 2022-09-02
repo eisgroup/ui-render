@@ -1,4 +1,4 @@
-import { ERROR, FINISH, START, SUBMIT, SUCCESS } from 'utils-pack'
+import { ERROR, FINISH, START, SUBMIT, SUCCESS } from 'ui-utils-pack'
 import { isFormActionType } from '../actions'
 import { FORM_ACTION_TYPE } from '../constants'
 

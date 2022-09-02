@@ -1,4 +1,4 @@
-import { DISCONNECTED, ERROR, RESULT_SEPARATOR, SEPARATOR, SET, SUCCESS, TIMEOUT, UPDATE } from 'utils-pack'
+import { DISCONNECTED, ERROR, RESULT_SEPARATOR, SEPARATOR, SET, SUCCESS, TIMEOUT, UPDATE } from 'ui-utils-pack'
 import { actionTypeColor } from '../utils'
 
 it(`${actionTypeColor.name}() returns correct color`, () => {

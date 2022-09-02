@@ -1,6 +1,6 @@
-import { asField } from 'modules-pack/form'
+import { asField } from 'ui-modules-pack/form'
 import React from 'react'
-import { Dropdown } from 'react-ui-pack/Dropdown'
+import { Dropdown } from 'ui-react-pack/Dropdown'
 
 /**
  * Dropdown Field connected with react-final-form or redux-form

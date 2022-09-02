@@ -1,4 +1,4 @@
-import { tracking } from 'modules-pack/tracking/utils'
+import { tracking } from 'ui-modules-pack/tracking/utils'
 import React, { Component } from 'react'
 import GoogleAnalytics from 'react-ga'
 

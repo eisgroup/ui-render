@@ -1,4 +1,4 @@
-import { Active, definitionByValue, enumFrom, l, LANGUAGE, LANGUAGE_LEVEL, optionsFrom } from 'utils-pack'
+import { Active, definitionByValue, enumFrom, l, LANGUAGE, LANGUAGE_LEVEL, optionsFrom } from 'ui-utils-pack'
 
 /**
  * PROJECT DEFINITIONS =========================================================

@@ -1,5 +1,5 @@
-import { languageDropdownOptions } from 'react-ui-pack'
-import { isInList, l, LANGUAGE } from 'utils-pack'
+import { languageDropdownOptions } from 'ui-react-pack'
+import { isInList, l, LANGUAGE } from 'ui-utils-pack'
 import { CONFIG } from './configs'
 import { DEFAULT } from './defaults'
 import { OPTIONS } from './definitions'

@@ -1,5 +1,5 @@
-import { Active, capitalize } from 'utils-pack'
-import { namespace } from 'utils-pack/utility'
+import { Active, capitalize } from 'ui-utils-pack'
+import { namespace } from 'ui-utils-pack/utility'
 
 /**
  * CONSTANT VARIABLES ==========================================================

@@ -1,7 +1,7 @@
-import { stateAction } from 'modules-pack/redux/actions'
+import { stateAction } from 'ui-modules-pack/redux/actions'
 import qs from 'querystring'
-import { SEND } from 'utils-pack'
-import { cryptoSign } from 'utils-pack/crypto'
+import { SEND } from 'ui-utils-pack'
+import { cryptoSign } from 'ui-utils-pack/crypto'
 import { isSigned } from '../actions'
 import { NAME as SOCKET } from '../constants'
 

@@ -1,4 +1,4 @@
-import { hasListValue, requireEnv, SUCCESS, toJSON, warn } from 'utils-pack'
+import { hasListValue, requireEnv, SUCCESS, toJSON, warn } from 'ui-utils-pack'
 import { API_PLACES, API_PLATFORM_WEB, API_PROVIDER_GOOGLE } from '../constants'
 import { fetch } from '../fetch'
 import ApiService from './service'

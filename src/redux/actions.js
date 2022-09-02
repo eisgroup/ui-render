@@ -14,7 +14,7 @@ import {
   SUCCESS,
   TIMEOUT,
   VOID
-} from 'utils-pack'
+} from 'ui-utils-pack'
 import { STATE_ACTION_TIMEOUT } from '../variables/configs'
 
 /**

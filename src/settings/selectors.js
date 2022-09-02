@@ -1,7 +1,7 @@
-import routerSelect from 'modules-pack/router/selectors'
-import userSelect from 'modules-pack/user/selectors'
-import { Active, findObjByKeys, isInList, LANGUAGE } from 'utils-pack'
-import selector from 'utils-pack/selectors'
+import routerSelect from 'ui-modules-pack/router/selectors'
+import userSelect from 'ui-modules-pack/user/selectors'
+import { Active, findObjByKeys, isInList, LANGUAGE } from 'ui-utils-pack'
+import selector from 'ui-utils-pack/selectors'
 import { CURRENCY, DEFAULT, ROUTES } from '../variables'
 import { NAME } from './constants'
 

@@ -1,5 +1,5 @@
-import { isRequired } from 'react-ui-pack/inputs/validationRules'
-import { definitionSetup, get, hasListValue, LANGUAGE_LEVEL, toList } from 'utils-pack'
+import { isRequired } from 'ui-react-pack/inputs/validationRules'
+import { definitionSetup, get, hasListValue, LANGUAGE_LEVEL, toList } from 'ui-utils-pack'
 import { TYPE } from './definitions'
 
 /**
