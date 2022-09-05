@@ -22,8 +22,7 @@
     "files:delete": "rm src/{README.md,LICENSE,package.json}"
   },
   "peerDependencies": {
-    "react": "16.*",
-    "ui-utils-pack": "*"
+    "react": "16.*"
   },
   "dependencies": {
     "chroma-js": "^2.1.0",

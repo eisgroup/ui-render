@@ -1,7 +1,6 @@
 module.exports = {
   modulesToTranspile: [
-    'ui-modules-pack',
-    'ui-utils-pack',
+    'ui-modules-pack'
   ],
   monoreposToResolve: []
 }
