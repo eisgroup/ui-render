@@ -1,0 +1,6 @@
+#import "./FileSummary.gql"
+#import "./FileDetails.gql"
+fragment File on File {
+    ...FileSummary
+    ...FileDetails
+}

@@ -1,0 +1,6 @@
+#import "../fragments/User.gql"
+mutation login($email: Email!, $password: Password!) {
+    login(email: $email, password: $password) {
+        ...AllUserInfo
+    }
+}

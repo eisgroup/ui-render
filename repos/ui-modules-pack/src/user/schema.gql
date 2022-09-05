@@ -1,0 +1,144 @@
+# =============================================================================
+# GRAPHQL SCHEMA
+# Type definitions for Clients
+# =============================================================================
+#scalar UserPhotos
+
+# -----------------------------------------------------------------------------
+# SUMMARY
+# -----------------------------------------------------------------------------
+extend type Query {
+    logout: Logout
+    # if no `id` given, returns self
+    user(id: Id): User
+    # if no `ids` given, returns last updated users for Staff or higher level
+    users(ids: [Id!], filter: UserInput, match: Operator, sort: JSON): [User!]
+}
+
+extend type Mutation {
+    login(email: Email!, password: Password!): User
+    signup(email: Email!, password: Password!, name: String, referrer: KeyValInput): User
+    user(entry: UserInput!): User # if no `id` given, updates self
+}
+
+#extend type Subscription {
+#}
+
+
+# -----------------------------------------------------------------------------
+# TYPES
+# -----------------------------------------------------------------------------
+
+type User {
+    id: ID!
+    auth: Int
+    # For privacy reasons, may not be shown, but always exists
+    email: Email!
+    avatar: File
+    name: String
+    surname: String
+    birthday: Timestamp
+    sex: Int
+    role: Int
+    kind: Int
+    lastOnline: Timestamp
+
+    # For privacy reasons, may not be shown, used to check whether instance is User
+    lastLogin: Timestamp!
+    updated: Timestamp
+
+    # Contacts
+    phones: Phones
+    place: Place
+
+    # Details
+    about: String
+    photos: [File]
+
+    # Settings
+    currency: CurrencySymbol
+    lang: LanguageCode
+    reportsLimit: Int
+
+    # Project
+    uploadLimit: Int
+    uploadUsed: JSON
+
+    # Others
+    verified: Verification
+    referrer: KeyVal
+    social: Social
+}
+
+# Only used for updating existing record
+input UserInput {
+    # Only required when not requested by User themselves (example: by Admin), else it is ignored
+    id: Id
+    email: Email
+    password: Password
+    newPassword: Password
+    referrer: KeyValInput
+    avatar: FileInput
+    name: String
+    surname: String
+    sex: Int
+    auth: Int
+    role: Int
+    kind: String
+    birthday: Timestamp
+
+    # Contacts
+    phones: Phones
+    place: PlaceInput
+
+    # Details
+    about: String
+    photos: [FileInput]
+
+    # Settings
+    currency: CurrencySymbol
+    lang: LanguageCode
+    reportsLimit: Int
+
+    # Project
+    uploadLimit: Int
+}
+
+type Verification {
+    email: Email
+    updated: Timestamp!
+}
+
+type Social {
+    # Only one type of social account exists for each user,
+    # because we cannot link profile.id between different services
+    it: SocialAccount # instagram
+    fb: SocialAccount
+    vk: SocialAccount
+}
+
+type SocialAccount {
+    id: ID!
+    email: Email # 'work' or the first email is used to set User.email for the first time
+    phone: String
+    updated: Timestamp! # last login time
+}
+
+type Logout {
+    id: ID
+}
+
+# -----------------------------------------------------------------------------
+# INTERFACES
+# -----------------------------------------------------------------------------
+
+# Embedded type within other GraphQL types (example: Company.people: [UserPermission])
+type UserPermission {
+    user: User!
+    permissions: Permissions!
+}
+
+input UserPermissionInput {
+    user: ID!
+    permissions: Permissions!
+}

@@ -1,0 +1,6 @@
+fragment Location on Location {
+    lat
+    lng
+    accuracy
+    timestamp
+}

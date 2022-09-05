@@ -1,0 +1,12 @@
+mutation signup($email: Email!, $password: Password!, $name: String, $referrer: KeyValInput) {
+    signup(email: $email, password: $password, name: $name, referrer: $referrer) {
+        id
+        name
+        email
+        lastLogin
+        referrer {
+            key
+            val
+        }
+    }
+}

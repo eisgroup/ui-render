@@ -1,0 +1,6 @@
+fragment ImageSummary on Image {
+    src
+    kind
+    i
+    name
+}

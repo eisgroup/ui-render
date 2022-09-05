@@ -1,0 +1,10 @@
+#import "ui-modules-pack/upload/fragments/FileSummary.gql"
+fragment UserDetails on User {
+    about
+    photos {
+        ...FileSummary
+    }
+    kind
+    role
+    sex
+}
