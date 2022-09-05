@@ -2,7 +2,7 @@
  * customize-cra simply makes react-app-rewired config easier with helper functions
  * (but it seems to ignore jest config set in package.json or jest.config.js, tested with "react-app-rewired": "^1.6.2")
  */
-const { addBabelPlugins, addDecoratorsLegacy, override, useEslintRc, babelInclude } = require('customize-cra')
+const { addBabelPlugins, addDecoratorsLegacy, override, useEslintRc, babelInclude, addWebpackAlias } = require('customize-cra')
 const path = require('path')
 
 /* Override default CRA config */
@@ -28,9 +28,12 @@ if (process.env.NODE_ENV === 'test') {
       path.resolve('src'), // make sure you link your own source
       path.resolve('../core/src'),
       path.resolve('../../node_modules/ui-modules-pack'),
-      path.resolve('../../node_modules/ui-react-pack'),
       path.resolve('../../node_modules/ui-utils-pack'),
+      path.resolve('../ui-react-pack/src'),
     ]),
+    addWebpackAlias({
+      'ui-react-pack': path.resolve(__dirname, '../ui-react-pack/src')
+    }),
     useEslintRc(),  // to enable decorators before `export` keyword for intuitive developer experience
     addDecoratorsLegacy(),  // requires `@babel/plugin-proposal-decorators`
     ...addBabelPlugins(

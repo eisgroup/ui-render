@@ -18,7 +18,6 @@
     "react-dom": "16.8.6",
     "react-helmet": "^5.2.0",
     "react-markdown": "^4.3.1",
-    "ui-react-pack": "0.1.4",
     "remark-toc": "^7.0.0",
     "ui-utils-pack": "0.1.3"
   },
