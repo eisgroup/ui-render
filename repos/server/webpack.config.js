@@ -44,9 +44,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            rootMode: 'upward',
-            // do not use babel-loader on files inside upward node-modules
-            ignore: [/node_modules\/(?!ui-modules-pack)/],
+            rootMode: 'upward'
           }
         }
       }

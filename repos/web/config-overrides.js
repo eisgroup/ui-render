@@ -30,11 +30,12 @@ if (process.env.NODE_ENV === 'test') {
     babelInclude([
       path.resolve('src'), // make sure you link your own source
       path.resolve('../core/src'),
-      path.resolve('../../node_modules/ui-modules-pack'),
+      path.resolve('../ui-modules-pack/src'),
       path.resolve('../ui-react-pack/src'),
       path.resolve('../ui-utils-pack/src'),
     ]),
     addWebpackAlias({
+      'ui-modules-pack': path.resolve(__dirname, '../ui-modules-pack/src'),
       'ui-react-pack': path.resolve(__dirname, '../ui-react-pack/src'),
       'ui-utils-pack': path.resolve(__dirname, '../ui-utils-pack/src')
     }),

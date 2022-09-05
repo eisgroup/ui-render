@@ -46,8 +46,6 @@ module.exports = (api) => {
       ],
       '@babel/preset-react'
     ],
-    // required to transform packages outside of current working directory for each package
-    ignore: [/node_modules\/(?!ui-modules-pack)/],
     babelrcRoots: [
       // Keep the root as a root
       '.',

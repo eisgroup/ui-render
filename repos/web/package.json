@@ -55,7 +55,6 @@
     ]
   },
   "peerDependencies": {
-    "ui-modules-pack": "0.1.4",
     "react": "16.8.6"
   },
   "dependencies": {
