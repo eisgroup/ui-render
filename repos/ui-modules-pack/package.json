@@ -36,9 +36,7 @@
     "graphql-type-json": "*",
     "mkdirp": "*",
     "react": "16.*",
-    "ui-react-pack": "*",
-    "sanitize-filename": "*",
-    "ui-utils-pack": "*"
+    "sanitize-filename": "*"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.58.0",
