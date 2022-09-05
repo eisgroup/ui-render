@@ -1,0 +1,445 @@
+import {
+  by,
+  hasCommonListValue,
+  hasDuplicateInList,
+  hasListValue,
+  indexesOf,
+  intersection,
+  isCollection,
+  isEqualList,
+  isInCollectionAny,
+  isInList,
+  isInListAny,
+  isList,
+  listToMap,
+  mergeLists,
+  prependToList,
+  removeFromList,
+  shuffle,
+  toList,
+  toListAvg,
+  toListTotal,
+  toListValuesTotal,
+  toUniqueList,
+  toUniqueListCaseInsensitive,
+  toUniqueListFast
+} from '../array'
+import { cloneDeep } from '../object'
+
+const NON_ARRAY_VALUES = [
+  100,
+  1.1,
+  0.0,
+  1e10,
+  1e-10,
+  Infinity,
+  -Infinity,
+  NaN,
+  'foo',
+  '',
+  {},
+  null,
+  undefined,
+  () => {},
+  new Date(),
+]
+
+const NON_COLLECTION_VALUES = [
+  100,
+  1.1,
+  0.0,
+  1e10,
+  1e-10,
+  Infinity,
+  -Infinity,
+  NaN,
+  'foo',
+  '',
+  null,
+  undefined,
+  () => {},
+  new Date(),
+]
+
+test(`intersection() does not mutate original list, and keeps first list's order`, () => {
+  const list = [1, 2, 3, 4, 5]
+  const listClone = cloneDeep(list)
+  const list2 = [5, 3]
+  expect(intersection(list, list2)).toEqual([3, 5])
+  expect(list).toEqual(listClone)
+})
+
+describe(`${isEqualList.name}()`, ()=> {
+  test(`returns true when elements inside two lists are the same`, () => {
+    let a = []
+    let b = a
+    expect(isEqualList(a, b)).toBe(true)
+    b.push(1)
+    expect(isEqualList(a, b)).toBe(true)
+    b = [...a]
+    expect(isEqualList(a, b)).toBe(true)
+    a = [null]
+    expect(isEqualList(a, b)).toBe(false)
+    b = [null]
+    expect(isEqualList(a, b)).toBe(true)
+  })
+  describe('Returns false for non-array and non-object values', () => {
+    NON_ARRAY_VALUES.forEach((value) => {
+      it(`[${typeof value}] ${value}`, () => {
+        expect(isEqualList(value, [1])).toBe(false)
+      })
+    })
+  })
+})
+
+test(`${isInCollectionAny.name}() returns true when include match found for any element`, () => {
+  expect(isInCollectionAny([{name: 'god', age: 'eternal'}], {name: 'dog'}, {name: 'god'})).toBe(true)
+  expect(isInCollectionAny([{name: 'god', age: 'eternal'}], {name: 'dog'}, {name: 'goddess'})).toBe(false)
+  expect(isInCollectionAny({entity: {name: 'god', age: 'eternal'}}, {name: 'dog'}, {name: 'god'})).toBe(true)
+  expect(isInCollectionAny({name: 'god', age: 'eternal'}, {name: 'dog'}, {name: 'god'})).toBe(false)
+  expect(isInCollectionAny({name: 'god', age: 'eternal'}, [undefined])).toBe(false)
+})
+
+test(`${toListAvg.name}() computes correct average number of values provided`, () => {
+  expect(toListAvg([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])).toEqual(5.5)
+})
+
+test(`${toListTotal.name}() computes correct total number of values provided`, () => {
+  expect(toListTotal([1, 2, 3, 0])).toEqual(6)
+  expect(toListTotal(undefined)).toEqual(0)
+  expect(toListTotal([])).toEqual(0)
+  expect(toListTotal('')).toEqual(0)
+  // expect(toListTotal(null)).toEqual(0)
+  // expect(toListTotal(NaN)).toEqual(0)
+})
+
+test(`${toListValuesTotal.name}() computes correct total number of values provided`, () => {
+  expect(toListValuesTotal([{value: 1}, {value: 2}, {value: 0}])).toEqual(3)
+  expect(toListValuesTotal([{count: 1}, {count: 2}, {count: 0}], 'count')).toEqual(3)
+  expect(toListValuesTotal(undefined)).toEqual(0)
+  expect(toListValuesTotal([])).toEqual(0)
+  expect(toListValuesTotal('')).toEqual(0)
+  // expect(toListTotal(null)).toEqual(0)
+  // expect(toListTotal(NaN)).toEqual(0)
+})
+
+test(`${listToMap.name}() converts array of objects to new kay-value object using element id as keys`, () => {
+  const element = {id: 'unique', name: 'test'}
+  const element2 = {id: 'unique2', name: 'test'}
+  expect([element].reduce(listToMap, {})).toEqual({'unique': element})
+  expect([element, element2].reduce(listToMap, {})).toEqual({'unique': element, 'unique2': element2})
+
+  // when .reduce is not given init value, it will mutate the first element
+  expect([element].reduce(listToMap)).toEqual(element)
+  expect([element, element2].reduce(listToMap)).toEqual(element)
+})
+
+test(`${shuffle.name}() randomizes list value orders`, () => {
+  const list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
+  const listClone = cloneDeep(list)
+  const result = shuffle(list)
+  expect(list).not.toEqual(listClone)
+  expect(list.length).toEqual(listClone.length)
+  expect(result).toEqual(list)
+})
+
+describe(`${hasListValue.name}()`, () => {
+  it('Returns true when an array with at least one item is supplied', () => {
+    expect(hasListValue([1])).toEqual(true)
+  })
+
+  it('Returns false when an empty array is supplied', () => {
+    expect(hasListValue([])).toEqual(false)
+  })
+
+  describe('Returns false for non-array values', () => {
+    NON_ARRAY_VALUES.forEach((value) => {
+      it(`[${typeof value}] ${value}`, () => {
+        expect(hasListValue(value)).toBe(false)
+      })
+    })
+  })
+})
+
+describe(`${hasCommonListValue.name}()`, () => {
+  it('returns true when at least one common value is found in all arrays', () => {
+    expect(hasCommonListValue([1, 2, 3, 4, 5], [1])).toEqual(true)
+    expect(hasCommonListValue([1, 2, 3, 4, 5], [1], [1, 2, 4])).toEqual(true)
+    expect(hasCommonListValue([1, 2, 3, 4, 'id'], [1, 3], [2, 3, 4])).toEqual(true)
+    expect(hasCommonListValue([1, 2, null, 4, 'id'], [1, 3], [2, 3, 4])).toEqual(false)
+    expect(hasCommonListValue([4, 'id'], [1, 3])).toEqual(false)
+  })
+})
+
+describe(`${hasDuplicateInList.name}()`, () => {
+  it('returns true when at least one duplicate value is found in the array', () => {
+    expect(hasDuplicateInList([1, 2, 3, 4, 5, 1])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, 4, 5, 1, 1, 5])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, '5', '5'])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, '', ''])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, null, null])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, false, false])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, undefined, undefined])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, Infinity, Infinity])).toEqual(true)
+    expect(hasDuplicateInList([1, 2, 3, -Infinity, -Infinity])).toEqual(true)
+  })
+  it('returns false when no duplicate found in the array', () => {
+    expect(hasDuplicateInList([1, 2, 3, 4, 5])).toEqual(false)
+    expect(hasDuplicateInList([1, 2, 3, 4, 0, null, false, undefined, Infinity, -Infinity])).toEqual(false)
+    expect(hasDuplicateInList([1, 2, 3, 4, '1'])).toEqual(false)
+    expect(hasDuplicateInList([1, 2, 3, 4, '1', '5'])).toEqual(false)
+    expect(hasDuplicateInList(NON_ARRAY_VALUES.filter(v => !isNaN(v)))).toEqual(false)
+    expect(hasDuplicateInList(NON_COLLECTION_VALUES.filter(v => !isNaN(v)))).toEqual(false)
+  })
+})
+
+describe(`${indexesOf.name}()`, () => {
+  const val = 'god'
+  const list = [val, 1, null, val]
+  it('returns all indices of a value in given list', () => {
+    expect(indexesOf(list, val)).toEqual([0, 3])
+  })
+  it('returns empty list when a value is not in given list', () => {
+    expect(indexesOf(list, val.toUpperCase())).toEqual([])
+  })
+})
+
+describe(`${isCollection.name}()`, () => {
+  it('Returns true for an empty array', () => {
+    expect(isCollection([])).toEqual(true)
+  })
+
+  it('Returns true for a non-empty array', () => {
+    expect(isCollection([1, 2, 3])).toEqual(true)
+  })
+
+  it('Returns true for a empty object', () => {
+    expect(isCollection({})).toEqual(true)
+  })
+
+  it('Returns true for a non-empty object', () => {
+    expect(isCollection({a: 1})).toEqual(true)
+  })
+
+  describe('Returns false for non-array and non-object values', () => {
+    NON_COLLECTION_VALUES.forEach((value) => {
+      it(`[${typeof value}] ${value}`, () => {
+        expect(isList(value)).toBe(false)
+      })
+    })
+  })
+})
+
+describe(`${isList.name}()`, () => {
+  it('Returns true for an empty array', () => {
+    expect(isList([])).toEqual(true)
+  })
+
+  it('Returns true for a non-empty array', () => {
+    expect(isList([1, 2, 3])).toEqual(true)
+  })
+
+  describe('Returns false for non-array values', () => {
+    NON_ARRAY_VALUES.forEach((value) => {
+      it(`[${typeof value}] ${value}`, () => {
+        expect(isList(value)).toBe(false)
+      })
+    })
+  })
+})
+
+describe(`${isInList.name}()`, () => {
+  it('Returns true when match found', () => {
+    expect(isInList([1, 2, 3], 2)).toEqual(true)
+    expect(isInList([1, 2, 3], 'id')).toEqual(false)
+    expect(isInList([1, 2, 'id', 3], 'id')).toEqual(true)
+  })
+  it('Returns false for an empty array', () => {
+    expect(isInList([], '')).toEqual(false)
+    expect(isInList([], null)).toEqual(false)
+  })
+  // Disable this for performance reasons
+  // describe('Returns false for non-array values', () => {
+  //   NON_ARRAY_VALUES.forEach((value) => {
+  //     it(`[${typeof value}] ${value}`, () => {
+  //       expect(isInList(value, '')).toBe(false)
+  //     })
+  //   })
+  // })
+})
+
+describe(`${isInListAny.name}()`, () => {
+  it('Returns true when match found', () => {
+    expect(isInListAny([1, 2, 3], 2, 1)).toEqual(true)
+    expect(isInListAny([1, 2, 3], 'id', 9)).toEqual(false)
+    expect(isInListAny([1, 2, 'id', 3], null, 'id')).toEqual(true)
+    expect(isInListAny([1, 2, 'id', 3], 'id')).toEqual(true)
+  })
+  it('Returns false for an empty array', () => {
+    expect(isInListAny([], '')).toEqual(false)
+    expect(isInListAny([], null)).toEqual(false)
+    expect(isInListAny([], null, 0)).toEqual(false)
+  })
+  // Disable this for performance reasons
+  // describe('Returns false for non-array values', () => {
+  //   NON_ARRAY_VALUES.forEach((value) => {
+  //     it(`[${typeof value}] ${value}`, () => {
+  //       expect(isInListAny(value, '')).toBe(false)
+  //     })
+  //   })
+  // })
+})
+
+describe(`${mergeLists.name}()`, () => {
+  it('merges multiple lists in one unique list', () => {
+    expect(mergeLists([1, 2, 3, 'id'], [1, 3, 4, 'id'])).toEqual([1, 2, 3, 'id', 4])
+  })
+  it(`'does not remove falsey values, like: 0, '', NaN, undefined, null'`, () => {
+    expect(mergeLists([0, '', NaN, undefined, null])).toEqual([0, '', NaN, undefined, null])
+  })
+})
+
+describe(`${prependToList.name}()`, () => {
+  it('Adds value to the beginning of array', () => {
+    expect(prependToList([7], 1)).toEqual([1, 7])
+  })
+  it('Trims the list down when limit provided', () => {
+    expect(prependToList([7, 7, 7, 7, 7], 1, 2)).toEqual([1, 7])
+  })
+})
+
+describe(`${removeFromList.name}()`, () => {
+  it('Removes primitive value from array as expected, without mutation', () => {
+    const list = [1, 'id']
+    const listClone = cloneDeep(list)
+    expect(removeFromList(list, 1)).toEqual(['id'])
+    expect(list).toEqual(listClone)
+  })
+  it('Removes values of one array from another, without mutation', () => {
+    const list = [1, 7, 'id']
+    const listClone = cloneDeep(list)
+    expect(removeFromList(list, [1, 'id'])).toEqual([7])
+    expect(removeFromList(list, [1, 7, 'id'])).toEqual([])
+    expect(list).toEqual(listClone)
+  })
+})
+
+describe(`${toList.name}()`, () => {
+  it('returns the same value if given array', () => {
+    const list = [{name: 'list'}]
+    expect(toList(list)).toBe(list)
+  })
+
+  describe('returns list of given value for non array values', () => {
+    NON_ARRAY_VALUES.forEach((value) => {
+      it(`[${typeof value}] ${value}`, () => {
+        expect(toList(value)).toEqual([value])
+      })
+    })
+  })
+
+  describe('removes nil values without mutation when passing `clean` argument ', () => {
+    const original = cloneDeep(NON_ARRAY_VALUES)
+    const result = toList(NON_ARRAY_VALUES, 'clean')
+    result.forEach(value => {
+      it(`[${typeof value}] ${value}`, () => {
+        expect(value).toBeTruthy()
+      })
+    })
+    expect(NON_ARRAY_VALUES).toEqual(original)
+  })
+})
+
+describe(`${toUniqueList.name}()`, () => {
+  it('keeps only unique values', () => {
+    expect(toUniqueList(['id', 'id', 2, 2, [], [], {}, {}])).toEqual(['id', 2, [], {}])
+  })
+  it(`does not remove falsey values, like: 0, '', NaN, undefined, null`, () => {
+    expect(toUniqueList([0, '', NaN, undefined, null])).toEqual([0, '', NaN, undefined, null])
+  })
+})
+
+describe(`${toUniqueListFast.name}()`, () => {
+  it('keeps only unique primitive values', () => {
+    expect(toUniqueListFast(['id', 'id', 2, 2, [], [], {}, {}])).toEqual(['id', 2, [], [], {}, {}])
+    expect(toUniqueListFast([
+      '5ae9ba3ea1de6c7ecf6eacce',
+      '5aab0ee727cc2b15ebb25767',
+      '5aab0ee727cc2b15ebb25767'
+    ])).toEqual(['5ae9ba3ea1de6c7ecf6eacce', '5aab0ee727cc2b15ebb25767'])
+  })
+  it(`does not remove falsey values, like: 0, '', undefined, null, except 'NaN'`, () => {
+    expect(toUniqueListFast([0, '', NaN, undefined, null])).toEqual([0, '', undefined, null])
+  })
+})
+
+describe(`${toUniqueListCaseInsensitive.name}()`, () => {
+  it('keeps only unique string values in array', () => {
+    const list = ['God', 'now', 'god']
+    expect(toUniqueListCaseInsensitive(list)).toEqual(['God', 'now'])
+  })
+  it('keeps only unique values in mixed types array', () => {
+    const list = [...NON_ARRAY_VALUES, ...NON_COLLECTION_VALUES]
+    expect(toUniqueListCaseInsensitive(list)).toEqual(NON_ARRAY_VALUES)
+  })
+})
+
+describe(`${by.name}()`, () => {
+  const i1 = {name: 'a', rank: 1, age: '27', user: {id: 1}}  // 1
+  const i2 = {name: 'a', rank: 1, age: '28', user: {id: 2}}  // 1
+  const i3 = {name: 'a', rank: 2, age: '27', user: {id: 3}}  // 0.5
+  const i4 = {name: 'ben', rank: 1, age: '27', user: {id: 4}}  // 3
+  const i5 = {name: 'cool', rank: 1, age: '27', user: {id: 5}}  // 4
+  const list = [i4, i2, i5, i3, i1]
+  const descending = (a, b) => {
+    if ((a.name.length / a.rank) > (b.name.length / b.rank)) return -1
+    if ((a.name.length / a.rank) < (b.name.length / b.rank)) return 1
+    return 0
+  }
+
+  it(`sorts list ascending using String Key (with chaining)`, () => {
+    expect(cloneDeep(list).sort(by('name'))).toEqual([i2, i3, i1, i4, i5])
+    expect(cloneDeep(list).sort(by('name', 'rank'))).toEqual([i2, i1, i3, i4, i5])
+    expect(cloneDeep(list).sort(by('name', 'rank', 'age'))).toEqual([i1, i2, i3, i4, i5])
+  })
+  it(`sorts list descending using String Key (with chaining)`, () => {
+    expect(cloneDeep(list).sort(by('-name'))).toEqual([i5, i4, i2, i3, i1])
+    expect(cloneDeep(list).sort(by('-name', '-rank'))).toEqual([i5, i4, i3, i2, i1])
+    expect(cloneDeep(list).sort(by('-name', '-rank', '-age'))).toEqual([i5, i4, i3, i2, i1])
+  })
+  it(`sorts list ascending with descending combination using String Key`, () => {
+    expect(cloneDeep(list).sort(by('-name', 'rank'))).toEqual([i5, i4, i2, i1, i3])
+    expect(cloneDeep(list).sort(by('-name', 'rank', '-age'))).toEqual([i5, i4, i2, i1, i3])
+    expect(cloneDeep(list).sort(by('-name', 'rank', 'age'))).toEqual([i5, i4, i1, i2, i3])
+    expect(cloneDeep(list).sort(by('name', '-rank'))).toEqual([i3, i2, i1, i4, i5])
+    expect(cloneDeep(list).sort(by('name', '-rank', '-age'))).toEqual([i3, i2, i1, i4, i5])
+    expect(cloneDeep(list).sort(by('name', '-rank', 'age'))).toEqual([i3, i1, i2, i4, i5])
+  })
+  it(`sorts list using String Path`, () => {
+    expect(cloneDeep(list).sort(by('user.id'))).toEqual([i1, i2, i3, i4, i5])
+    expect(cloneDeep(list).sort(by('-user.id'))).toEqual([i5, i4, i3, i2, i1])
+  })
+  it(`sorts list using Function`, () => {
+    expect(cloneDeep(list).sort(by(descending))).toEqual([i5, i4, i2, i1, i3])
+  })
+  it(`sorts list using Function, String Key and Path combination`, () => {
+    expect(cloneDeep(list).sort(by(descending, 'age'))).toEqual([i5, i4, i1, i2, i3])
+    expect(cloneDeep(list).sort(by('name', descending))).toEqual([i2, i1, i3, i4, i5])
+    expect(cloneDeep(list).sort(by('name', descending, 'user.id'))).toEqual([i1, i2, i3, i4, i5])
+    expect(cloneDeep(list).sort(by('name', descending, 'age'))).toEqual([i1, i2, i3, i4, i5])
+  })
+  it(`sorts list of objects with numbered strings`, () => {
+    const i1 = {name: 'C_1'}
+    const i2 = {name: 'C_2'}
+    const i9 = {name: 'C_9'}
+    const i10 = {name: 'C_10'}
+    const i11 = {name: 'C_11'}
+    const i20 = {name: 'C_20'}
+    const i21 = {name: 'C_21'}
+    const i101 = {name: 'C_101'}
+    const list = [i20, i10, i21, i101, i1, i11, i2, i9]
+    const expected = [i1, i2, i9, i10, i11, i20, i21, i101]
+    expect(list.sort(by('name.length', 'name'))).toEqual(expected)
+    expect(list.sort(by('-name.length', '-name'))).toEqual(expected.reverse())
+  })
+})
