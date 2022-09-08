@@ -38,6 +38,9 @@ export default class Data extends Component {
     initialValues: type.Any,
     // Whether the `name` attribute should use data relative to root UI Render instance, defaults to this instance.
     rootData: type.Boolean,
+
+    relativePath: type.String,
+    relativeIndex: type.Number
   }
 
   static defaultProps = {
@@ -56,6 +59,13 @@ export default class Data extends Component {
     const {kind, instance, index, data, meta, initialValues = data, className, style, embedded} = this.props
     // Use Active.UIRender to avoid circular import
     const UIRender = Active.UIRender
+
+    // For 'TableCells' add additional params to generate unique IDs
+    if (meta.view === 'TableCells') {
+      meta.relativePath = this.props.relativePath;
+      meta.relativeIndex = this.props.relativeIndex;
+    }
+
     return <UIRender
       data={data} meta={meta} initialValues={initialValues} form={{kind}}
       parent={instance} index={index} embedded={embedded}
