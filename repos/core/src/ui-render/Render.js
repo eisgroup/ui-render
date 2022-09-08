@@ -88,7 +88,15 @@ class RenderClass extends Component {
 
         // Pass down data to child renderers
         // allow `data` and `_data` to be overridden by config
-        items = items.map((item) => ({data, _data, debug, form, instance, ...item}))
+        items = items.map((item) => {
+            const mappedData = {data, _data, debug, form, instance, ...item};
+            if (this.props.view === 'TableCells' && this.props.relativeIndex !== undefined) {
+                mappedData.relativePath = this.props.relativePath;
+                mappedData.relativeIndex = this.props.relativeIndex;
+            }
+
+            return mappedData;
+        })
 
         return Render.Component.call(this, {...this.props, _data, items})
     }

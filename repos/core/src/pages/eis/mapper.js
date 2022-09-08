@@ -2,7 +2,6 @@ import { withForm } from 'ui-modules-pack/form'
 import AutoSave from 'ui-modules-pack/form/views/AutoSave'
 import { POPUP, popupAlert } from 'ui-modules-pack/popup'
 import { stateAction } from 'ui-modules-pack/redux'
-// import { Link } from 'ui-modules-pack/router/browser'
 import { FIELD } from 'ui-modules-pack/variables'
 import React, { PureComponent } from 'react'
 import { cn } from 'ui-react-pack'
@@ -91,7 +90,7 @@ Render.Component = function RenderComponent ({
 
   switch (view) {
     case FIELD.TYPE.DATA:
-      return <Data instance={instance} data={_data || data} {...props}/>
+      return <Data instance={instance} data={_data || data} {...props} relativeIndex={relativeIndex} relativePath={relativePath} />
 
     case FIELD.TYPE.COL:
     case FIELD.TYPE.COL2:
@@ -372,7 +371,11 @@ Render.Component = function RenderComponent ({
 
       // Resolve Input name dynamic path
       if (relativeData !== false && relativePath != null && input.name) {
-        input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
+        if (_data) { // Case for tables with input fields to generate unique IDs
+          input.id = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
+        } else {
+          input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
+        }
       }
 
       // Render Dropdown separately, to avoid triggering form value changes
