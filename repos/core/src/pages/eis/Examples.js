@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Button from 'ui-react-pack/Button'
 import Expand from 'ui-react-pack/Expand'
 import Icon from 'ui-react-pack/Icon'
 import JsonView from 'ui-react-pack/JsonView'
@@ -220,6 +221,13 @@ export default class Examples extends Component {
     if (expanded) goTo(`#${id}`)
   }
 
+  // getFormData = () => {}
+
+  onExperienceRatingsButtonClick = () => {
+    const data = this.getFormData();
+    console.info('Form data: ', data);
+  }
+
   render () {
     const {activeIndex} = this.state
     const hash = (typeof window !== 'undefined') ? (window.location.hash || '').substr(1) : ''
@@ -238,7 +246,29 @@ export default class Examples extends Component {
           >
             {() => (
               <>
-                <UIRender data={data} meta={meta} initialValues={data} form={obj} onSubmit={console.warn}/>
+                { id === 'experienceRatings' || id === 'tableForm' || id === 'ratingDetails' ? (
+                  <>
+                    <UIRender
+                      data={data}
+                      meta={meta}
+                      initialValues={data}
+                      form={obj}
+                      getFormData={(f) => this.getFormData = f}
+                      onSubmit={console.warn}
+                    />
+                    <View className="app__examples bg-white border">
+                      <Button onClick={this.onExperienceRatingsButtonClick}>Get Data (the ability to request data from outside)</Button>
+                    </View>
+                  </>
+                ) : (
+                  <UIRender
+                    data={data}
+                    meta={meta}
+                    initialValues={data}
+                    form={obj}
+                    onSubmit={console.warn}
+                  />
+                )}
                 <ScrollView className="padding-smaller bg-neutral inverted">
                   <Row className="wrap spread">
                     <View fill className="padding-smaller min-width-320">
