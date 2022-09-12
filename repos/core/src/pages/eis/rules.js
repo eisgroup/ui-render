@@ -13,6 +13,7 @@ import { downloadFile } from './actions/file'
 import './mapper' // Set up UI Renderer components and methods
 import { _ } from './translations'
 import { notWithinRange } from './validators'
+import { getFormsData } from './utils'
 
 /**
  * BUSINESS RULES ==============================================================
@@ -60,6 +61,12 @@ FIELD.PARSER = {
   },
 }
 
+/*
+  FormStorage is used for storing all active forms.
+  This solution provides ability to get data from all forms
+ */
+export const formsStorage = new Map();
+
 /**
  * UI Render Instance Component
  * @example:
@@ -80,6 +87,7 @@ export default class UIRender extends Component {
     })),
     // Whether to disable rendering of wrapper scroll view and html form
     embedded: type.Boolean,
+    getFormData: type.Method,
   }
 
   state = {
@@ -97,6 +105,28 @@ export default class UIRender extends Component {
     if (next.data !== data) set(update, 'data.json', next.data)
     if (next.meta !== meta) set(update, 'meta.json', next.meta)
     if (hasObjectValue(update)) this.setState(update)
+  }
+
+  componentDidMount () {
+    // initialValues should be immutable, so we use it as Key
+    formsStorage.set(this.form.getState().initialValues, {
+      meta: this.meta,
+      form: this.form
+    });
+
+    if (typeof this.props.getFormData === 'function') {
+      this.props.getFormData(this.getAllFormsData)
+    }
+  }
+
+  componentWillUnmount () {
+    formsStorage.delete(this.form.getState().initialValues);
+  }
+
+  getAllFormsData = () => {
+    // TODO: investigate realisation with this.data
+    // this.data contains related data but there no all changes
+    return getFormsData(formsStorage)
   }
 
   render () {
