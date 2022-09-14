@@ -1,4 +1,4 @@
-import { merge } from 'ui-utils-pack/object'
+import { merge, isObject } from 'ui-utils-pack/object'
 
 export const getFormsData = (forms) => {
   const formDataArray = [];
@@ -69,3 +69,18 @@ const mergeData = (formData) => {
   return result;
 }
 
+export const deepReplace = (object, key, value) => {
+  if (Array.isArray(object)) {
+    object.forEach(item => {
+      deepReplace(item, key, value)
+    })
+  } else if (isObject(object)) {
+    if (object.hasOwnProperty(key)) {
+      object[key] = value;
+    }
+
+    Object.keys(object).forEach(k => {
+      deepReplace(object[k], key, value)
+    })
+  }
+};

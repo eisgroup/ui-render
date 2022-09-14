@@ -13,7 +13,7 @@ import { downloadFile } from './actions/file'
 import './mapper' // Set up UI Renderer components and methods
 import { _ } from './translations'
 import { notWithinRange } from './validators'
-import { getFormsData } from './utils'
+import { deepReplace, getFormsData } from './utils'
 
 /**
  * BUSINESS RULES ==============================================================
@@ -28,6 +28,7 @@ FIELD.ACTION = {
   POPUP_DELAY: 'popupDelay',
   POPUP_OPEN: 'popupOpen',
   SUBMIT: 'submit',
+  UPDATE_DATA_ON_CHANGE: 'updateDataOnChange',
 }
 FIELD.TYPE = {
   AUTO_SUBMIT: 'AutoSubmit',
@@ -345,6 +346,17 @@ export function withUISetup (formConfig) {
           const [id, options] = args
           const {[id]: {content, title = '', ...props} = {}} = this.popupById || {}
           popupAlert(title, content, {...props, ...options})
+        }
+
+        // this.data is not updated dynamically at the moment
+        // Implemented as temporary solution
+        FIELD.FUNC.UPDATE_DATA_ON_CHANGE = (value, ...params) => {
+          if (typeof value !== 'object' && Array.isArray(params)) {
+            const { name } = params[0];
+            if (name) {
+              deepReplace(this.data, name, value)
+            }
+          }
         }
 
         // Cross UI Render instances validation
