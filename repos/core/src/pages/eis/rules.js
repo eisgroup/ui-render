@@ -350,7 +350,7 @@ export function withUISetup (formConfig) {
 
         // this.data is not updated dynamically at the moment
         // Implemented as temporary solution
-        FIELD.FUNC.UPDATE_DATA_ON_CHANGE = (value, ...params) => {
+        FIELD.FUNC[FIELD.ACTION.UPDATE_DATA_ON_CHANGE] = (value, ...params) => {
           if (typeof value !== 'object' && Array.isArray(params)) {
             const { name } = params[0];
             if (name) {
