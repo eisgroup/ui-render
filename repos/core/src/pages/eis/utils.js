@@ -69,10 +69,10 @@ const mergeData = (formData) => {
   return result;
 }
 
-export const deepReplace = (object, key, value) => {
+export const replaceDeep = (object, key, value) => {
   if (Array.isArray(object)) {
     object.forEach(item => {
-      deepReplace(item, key, value)
+      replaceDeep(item, key, value)
     })
   } else if (isObject(object)) {
     if (object.hasOwnProperty(key)) {
@@ -80,7 +80,7 @@ export const deepReplace = (object, key, value) => {
     }
 
     Object.keys(object).forEach(k => {
-      deepReplace(object[k], key, value)
+      replaceDeep(object[k], key, value)
     })
   }
 };

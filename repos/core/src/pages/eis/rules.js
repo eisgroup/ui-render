@@ -13,7 +13,7 @@ import { downloadFile } from './actions/file'
 import './mapper' // Set up UI Renderer components and methods
 import { _ } from './translations'
 import { notWithinRange } from './validators'
-import { deepReplace, getFormsData } from './utils'
+import { replaceDeep, getFormsData } from './utils'
 
 /**
  * BUSINESS RULES ==============================================================
@@ -354,7 +354,8 @@ export function withUISetup (formConfig) {
           if (typeof value !== 'object' && Array.isArray(params)) {
             const { name } = params[0];
             if (name) {
-              deepReplace(this.data, name, value)
+              replaceDeep(this.data, name, value)
+              this.data = cloneDeep(this.data);
             }
           }
         }
