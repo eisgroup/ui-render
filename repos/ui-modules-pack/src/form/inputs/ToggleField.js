@@ -48,7 +48,7 @@ export default class ToggleField extends PureComponent {
         value={input.value}
         onChange={value => {
           input.onChange(value)
-          isFunction(onChange) && onChange(value)
+          isFunction(onChange) && onChange(value, { name })
         }}
         {...props} // allow forceful value override
       />

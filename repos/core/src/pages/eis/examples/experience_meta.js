@@ -427,6 +427,7 @@ const experienceRating = {
           styles: 'margin-right-smaller',
           type: 'toggle',
           label: ' ',
+          onChange: 'updateDataOnChange',
         },
         {
           view: 'Label',
@@ -512,6 +513,7 @@ const experienceRating = {
 const experiencePeriods = {
   view: 'Col',
   styles: 'bg-neutral padding-larger margin-top-larger',
+  showIf: 'ShowExperienceRating',
   items: [
     {
       view: 'Title',

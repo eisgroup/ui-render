@@ -12,6 +12,7 @@ interface Props {
     meta?: object
     initialValues?: object
     onSubmit(formValues: object): void
+    getFormData?(fn: Function): void
 
     // Optional
     className?: string
