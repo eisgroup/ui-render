@@ -371,10 +371,11 @@ Render.Component = function RenderComponent ({
 
       // Resolve Input name dynamic path
       if (relativeData !== false && relativePath != null && input.name) {
+        const uniqueIdentificator = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
         if (_data) { // Case for tables with input fields to generate unique IDs
-          input.id = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
+          input.id = uniqueIdentificator
         } else {
-          input.name = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
+          input.name = uniqueIdentificator
         }
       }
 
