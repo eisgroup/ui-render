@@ -429,7 +429,12 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   Object.defineProperty(Class.prototype, 'changedValues', {
     get () {
       // Have to select all form values, because registered values may not include all input values
-      const {initialValues} = this._props || this.props
+      const {initialValues, onDataChanged, parent = {}} = this._props || this.props
+      if (typeof onDataChanged === 'function') {
+        onDataChanged();
+      } else if (parent && typeof parent.onDataChanged === 'function') {
+        parent.onDataChanged();
+      }
       return objChanges(initialValues, this.formValues)
     }
   })

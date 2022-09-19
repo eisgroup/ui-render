@@ -13,6 +13,7 @@ interface Props {
     initialValues?: object
     onSubmit(formValues: object): void
     getFormData?(fn: Function): void
+    onDataChanged?(): void
 
     // Optional
     className?: string
@@ -49,7 +50,6 @@ export class UIRender extends Component<Props, any> {
         return this._id
     }
 
-
     onMount = (instance: any) => this._instance = instance
 
     // Mount UI Render to given DOM element by ID
@@ -69,7 +69,6 @@ export class UIRender extends Component<Props, any> {
         const {id, className, style, ...props} = this.props
         this._instance.setState(props) // pass updates to UI Render
     }
-
 
     render() {
         const {className, style} = this.props

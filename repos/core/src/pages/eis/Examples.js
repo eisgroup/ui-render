@@ -228,6 +228,10 @@ export default class Examples extends Component {
     console.info('Form data: ', data);
   }
 
+  onSomeDataChanged = () => {
+    console.info('Form data has been changed')
+  }
+
   render () {
     const {activeIndex} = this.state
     const hash = (typeof window !== 'undefined') ? (window.location.hash || '').substr(1) : ''
@@ -254,6 +258,7 @@ export default class Examples extends Component {
                       initialValues={data}
                       form={obj}
                       getFormData={(f) => this.getFormData = f}
+                      onDataChanged={this.onSomeDataChanged}
                       onSubmit={console.warn}
                     />
                     <View className="app__examples bg-white border">

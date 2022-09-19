@@ -89,6 +89,7 @@ export default class UIRender extends Component {
     // Whether to disable rendering of wrapper scroll view and html form
     embedded: type.Boolean,
     getFormData: type.Method,
+    onDataChanged: type.Method,
   }
 
   state = {
@@ -118,6 +119,12 @@ export default class UIRender extends Component {
     if (typeof this.props.getFormData === 'function') {
       this.props.getFormData(this.getAllFormsData)
     }
+
+    if (typeof this.props.onDataChanged === 'function') {
+      this.onDataChanged = this.props.onDataChanged;
+    } else if (this.props.parent && typeof this.props.parent.onDataChanged === 'function') {
+      this.onDataChanged = this.props.parent.onDataChanged;
+    }
   }
 
   componentWillUnmount () {
@@ -130,10 +137,12 @@ export default class UIRender extends Component {
     return getFormsData(formsStorage)
   }
 
+  onDataChanged = undefined;
+
   render () {
     const {childBefore, childAfter, form, embedded, className, style} = this.props
     const content = this.hasData && this.hasMeta &&
-      <Render data={this.data} {...this.meta} form={this.form} instance={this}/>
+      <Render data={this.data} {...this.meta} form={this.form} instance={this} onDataChanged={this.onDataChanged}/>
     const Container = embedded ? Fragment : ScrollView
     const props = embedded ? undefined : {
       fill: true,
@@ -296,6 +305,17 @@ export function withUISetup (formConfig) {
       },
     }
 
+    const callOnDataChanged = (props) => {
+      if (props
+        && props.instance
+        && props.instance.props
+        && props.instance.props.parent
+        && typeof props.instance.props.parent.onDataChanged === 'function'
+      ) {
+        props.instance.props.parent.onDataChanged()
+      }
+    }
+
     // Define instance getter
     Object.defineProperty(Class.prototype, 'config', {
       get () {
@@ -322,6 +342,7 @@ export function withUISetup (formConfig) {
             data.json.dataKind = dataKind
             parent.setState({data: {...data}, dataKind}, () => {
               this.form.restart()
+              callOnDataChanged(this.props)
             })
           }
           : dataActionWarning
@@ -335,6 +356,7 @@ export function withUISetup (formConfig) {
             dataKind[form.kind] = array
             data.json.dataKind = dataKind
             parent.setState({data: {...data}, dataKind})
+            callOnDataChanged(this.props)
           }
           : dataActionWarning
 
