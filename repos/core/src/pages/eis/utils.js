@@ -24,6 +24,9 @@ const getStructuredDataFromFormObject = (form, meta) => {
   const formState = form.getState().values;
 
   if (!relativePath) {
+    if (formState.dataKind) {
+      delete formState.dataKind;
+    }
     return formState;
   }
 
@@ -50,7 +53,7 @@ const mergeData = (formData) => {
   // Find Master object which contains all data structure
   // It should be one object in array
   // All other objects contain only one property at the first level of the structure
-  const result = formData.find((formValues, index) => {
+  let result = formData.find((formValues, index) => {
     if (Object.keys(formValues).length !== 1) {
       masterDataIndex = index;
       return true
@@ -63,7 +66,7 @@ const mergeData = (formData) => {
       return;
     }
 
-    merge(result, formValues);
+    result = merge(result, formValues);
   })
 
   return result;
