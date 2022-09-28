@@ -1,4 +1,5 @@
 import { merge, isObject } from 'ui-utils-pack/object'
+import { errorsMap } from './rules'
 
 export const getFormsData = (forms) => {
   const formDataArray = [];
@@ -87,3 +88,99 @@ export const replaceDeep = (object, key, value) => {
     })
   }
 };
+
+function getKeyAndPathFromMetaData(meta) {
+  const { relativeIndex, relativePath } = meta;
+  let path = '';
+  let key = 'master';
+
+  if (relativePath && typeof relativeIndex === 'undefined') {
+    return {};
+  }
+
+  if (relativePath) {
+    path = `${relativePath}[${relativeIndex}].`;
+    key = path;
+  }
+
+  return { key, path }
+}
+
+export function errorsProcessing(form, meta) {
+  const { key, path } = getKeyAndPathFromMetaData(meta);
+  const errors = {};
+
+  if (!key) {
+    return;
+  }
+
+  const registeredFieldNames = form.getRegisteredFields()
+  if (!registeredFieldNames.length) return;
+
+  registeredFieldNames.forEach(field => {
+    const { name, error } = form.getFieldState(field);
+    if (error) {
+      let errorText = error;
+      if (errorText === 'Required') {
+        errorText = convertFieldNameToTitleCaseText(name) + ' is Required'
+      }
+      errors[`${path}${name}`] = errorText;
+    }
+  })
+
+  if (Object.keys(errors).length) {
+    errorsMap[key] = errors;
+  } else {
+    delete errorsMap[key];
+  }
+}
+
+export const clearErrorsMap = (form, meta) => {
+  const { key } = getKeyAndPathFromMetaData(meta);
+
+  if (!key) {
+    return;
+  }
+
+  delete errorsMap[key];
+}
+
+/*
+ Expected format of filed validation object (from Policy team)
+ {
+    "quote.termDetails[0].termEffectiveDate": {
+        "messages": [
+            {
+                "text": "Master Policy should be effective on the 1st day of month."
+            }
+        ],
+    }
+}
+ */
+export const mapErrorObjectToUIFormat = (errors) => {
+  const result = {};
+
+  Object.keys(errors).forEach(key => {
+    Object.keys(errors[key]).forEach(fieldName => {
+      result[fieldName] = {
+        messages: [
+          {
+            text: errors[key][fieldName]
+          }
+        ]
+      }
+    })
+  })
+
+  return result;
+}
+
+export const convertFieldNameToTitleCaseText = (str) => {
+  let fieldName = str;
+  if (fieldName.includes('.')) {
+    fieldName = fieldName.split('.').pop();
+  }
+  const result = fieldName.replace(/([A-Z])/g, " $1").trim();
+
+  return result.charAt(0).toUpperCase() + result.slice(1);
+}

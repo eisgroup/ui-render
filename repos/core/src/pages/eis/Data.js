@@ -40,7 +40,7 @@ export default class Data extends Component {
     rootData: type.Boolean,
 
     relativePath: type.String,
-    relativeIndex: type.Number
+    relativeIndex: type.Number,
   }
 
   static defaultProps = {
@@ -67,8 +67,13 @@ export default class Data extends Component {
     }
 
     return <UIRender
-      data={data} meta={meta} initialValues={initialValues} form={{kind}}
-      parent={instance} index={index} embedded={embedded}
+      data={data}
+      meta={meta}
+      initialValues={initialValues}
+      form={{kind}}
+      parent={instance}
+      index={index}
+      embedded={embedded}
       {...{className, style}}
     />
   }

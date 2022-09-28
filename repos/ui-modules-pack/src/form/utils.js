@@ -12,6 +12,8 @@ import View from 'ui-react-pack/View'
 import { Active, debounce, isEqualJSON, toJSON, warn } from 'ui-utils-pack'
 import { hasObjectValue, objChanges, set } from 'ui-utils-pack/object'
 import { _ } from 'ui-utils-pack/translations'
+import { clearErrorsMap, errorsProcessing } from 'core/src/pages/eis/utils'
+import { errorsMap } from 'core/src/pages/eis/rules'
 
 /**
  * STATE SELECTORS =============================================================
@@ -468,6 +470,14 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
       )
     }
   })
+
+  // Define instance getter
+  Object.defineProperty(Class.prototype, 'validationErrorsMap', {
+    get () {
+      return errorsMap
+    }
+  })
+
   Object.defineProperty(Class.prototype, 'validationErrorsTooltip', {
     get () {
       const errors = this.validationErrors
@@ -533,11 +543,14 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
       this._props = next
       this.syncInputChanges()
       this._props = null
+      errorsProcessing(this.form, this._meta);
     }
     if (UNSAFE_componentWillReceiveProps) UNSAFE_componentWillReceiveProps.apply(this, arguments)
   }
 
   Class.prototype.componentWillUnmount = function () {
+    clearErrorsMap(this.form, this._meta);
+
     this.isUnmounting = true
     if (this.props.onChangeState) this.props.onChangeState({})
     if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
