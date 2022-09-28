@@ -13,7 +13,8 @@ import { downloadFile } from './actions/file'
 import './mapper' // Set up UI Renderer components and methods
 import { _ } from './translations'
 import { notWithinRange } from './validators'
-import { replaceDeep, getFormsData } from './utils'
+import { replaceDeep, getFormsData, mapErrorObjectToUIFormat } from './utils'
+import deepEqual from 'deep-equal';
 
 /**
  * BUSINESS RULES ==============================================================
@@ -68,12 +69,20 @@ FIELD.PARSER = {
  */
 export const formsStorage = new Map();
 
+
+/*
+  Accumulate validation errors from all Form instances
+ */
+export const errorsMap = {};
+
+let errorHandlerFunction = undefined;
+
 /**
  * UI Render Instance Component
  * @example:
  *    <UIRender data={data} meta={meta} initialValues={data} onSubmit={this.submit}/>
  */
-@withUISetup({subscription: {pristine: true, valid: true}})
+@withUISetup({subscription: {pristine: true, valid: true, values: true}})
 @logRender
 export default class UIRender extends Component {
   static propTypes = {
@@ -90,6 +99,14 @@ export default class UIRender extends Component {
     embedded: type.Boolean,
     getFormData: type.Method,
     onDataChanged: type.Method,
+    getValidationErrors: type.Method,
+  }
+
+  constructor (props) {
+    super(props);
+    if (typeof errorHandlerFunction !== 'function') {
+      errorHandlerFunction = props.getValidationErrors;
+    }
   }
 
   state = {
@@ -99,11 +116,21 @@ export default class UIRender extends Component {
     meta: {
       json: this.props.meta
     },
+    errors: {}
   }
 
   UNSAFE_componentWillReceiveProps (next, nextContext) {
-    const {data, meta} = this.props
     const update = {}
+    const {data, meta} = this.props
+
+    if (typeof errorHandlerFunction === 'function'
+      && next.parent
+      && !deepEqual(next.parent.validationErrorsMap, this.state.errors)
+    ) {
+      update.errors = cloneDeep(next.parent.validationErrorsMap);
+      errorHandlerFunction(mapErrorObjectToUIFormat(update.errors))
+    }
+
     if (next.data !== data) set(update, 'data.json', next.data)
     if (next.meta !== meta) set(update, 'meta.json', next.meta)
     if (hasObjectValue(update)) this.setState(update)
@@ -142,7 +169,13 @@ export default class UIRender extends Component {
   render () {
     const {childBefore, childAfter, form, embedded, className, style} = this.props
     const content = this.hasData && this.hasMeta &&
-      <Render data={this.data} {...this.meta} form={this.form} instance={this} onDataChanged={this.onDataChanged}/>
+      <Render
+        data={this.data}
+        {...this.meta}
+        form={this.form}
+        instance={this}
+        onDataChanged={this.onDataChanged}
+      />
     const Container = embedded ? Fragment : ScrollView
     const props = embedded ? undefined : {
       fill: true,
@@ -482,15 +515,6 @@ export function withUISetup (formConfig) {
         return !isEmpty(this.meta)
       },
     })
-
-    // Define instance getter
-    // Object.defineProperty(Class.prototype, 'handleSubmit', {
-    //   get () {
-    //     // For redux-form
-    //     if (this._handleSubmit != null) return this._handleSubmit
-    //     return this._handleSubmit = this.props.handleSubmit(this.submit.bind(this))
-    //   },
-    // })
 
     // Define instance method
     // @Note: functions should have consistent pattern of receiving important arguments first,

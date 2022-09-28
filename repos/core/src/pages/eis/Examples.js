@@ -232,6 +232,10 @@ export default class Examples extends Component {
     console.info('Form data has been changed')
   }
 
+  showValidationErrors = (errors) => {
+    console.log('Validation errors', errors)
+  }
+
   render () {
     const {activeIndex} = this.state
     const hash = (typeof window !== 'undefined') ? (window.location.hash || '').substr(1) : ''
@@ -260,6 +264,7 @@ export default class Examples extends Component {
                       getFormData={(f) => this.getFormData = f}
                       onDataChanged={this.onSomeDataChanged}
                       onSubmit={console.warn}
+                      getValidationErrors={this.showValidationErrors}
                     />
                     <View className="app__examples bg-white border">
                       <Button onClick={this.onExperienceRatingsButtonClick}>Get Data (the ability to request data from outside)</Button>
