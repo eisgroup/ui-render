@@ -1,5 +1,15 @@
 ### Table of Contents
 
+### v0.27.0
+#### New
+ - Added `getValidationErrors` listener. Returns list of active validation errors
+ - Added `updateDataOnChange` for Toggle component. Uses in Meta config to update data object. Allow to change UI state to show/hide form controls
+ - Added `getFormData` callback. Provided ability to get actual data state of UI-Render
+ - Added `onDataChanged` listener. It is called every time on forms are changed from initials values
+#### Fixes
+- Date Input is allow to enter 4 digits for the year field 
+- Generate unique IDs for nested UI-Render instances
+
 ### v0.26.3
 #### Fixes
 - Extract changed form values for nested Data Components before submission - [example](examples#tableForm)
