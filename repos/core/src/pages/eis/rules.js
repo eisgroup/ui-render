@@ -40,7 +40,7 @@ FIELD.TYPE = {
   POPUP: 'Popup',
   TABLE_CELLS: 'TableCells',
 }
-FIELD.VALIDATE = {
+FIELD.CROSS_VALIDATE = {
   NOT_WITHIN_RANGE: 'notWithinRange',
 }
 FIELD.NORMALIZE = {
@@ -416,7 +416,7 @@ export function withUISetup (formConfig) {
         }
 
         // Cross UI Render instances validation
-        FIELD.VALIDATION[FIELD.VALIDATE.NOT_WITHIN_RANGE] = (value, {dataKind, args: [start, end]}) => {
+        FIELD.VALIDATION[FIELD.CROSS_VALIDATE.NOT_WITHIN_RANGE] = (value, {dataKind, args: [start, end]}) => {
           const {form, index, parent} = this.props
 
           // Validate against self

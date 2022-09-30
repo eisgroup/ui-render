@@ -90,4 +90,4 @@ then `yarn build:css`
 
 14. Rename `chunk` and `main` files inside `./dist/static/js` to remove hash for example: `1.94a8b9f9.chunk.js` to `chunk.js` and move them to `./dist/static` folder.    
 
-15. Create `./dist/static/loader.js` file with the <script> content of `index.html`
+15. Create `./dist/static/loader.js` file with the `<script>` content of `index.html`
