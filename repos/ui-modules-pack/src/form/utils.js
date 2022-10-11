@@ -431,12 +431,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   Object.defineProperty(Class.prototype, 'changedValues', {
     get () {
       // Have to select all form values, because registered values may not include all input values
-      const {initialValues, onDataChanged, parent = {}} = this._props || this.props
-      if (typeof onDataChanged === 'function') {
-        onDataChanged();
-      } else if (parent && typeof parent.onDataChanged === 'function') {
-        parent.onDataChanged();
-      }
+      const {initialValues} = this._props || this.props
       return objChanges(initialValues, this.formValues)
     }
   })
@@ -522,6 +517,15 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   // Define instance method
   Class.prototype.syncInputChanges = function () {
+    const { formProps, onDataChanged, parent = {} } = this._props || this.props;
+    if (!formProps.pristine) {
+      if (typeof onDataChanged === 'function') {
+        onDataChanged()
+      } else if (parent && typeof parent.onDataChanged === 'function') {
+        parent.onDataChanged();
+      }
+    }
+
     const canSave = this.canSave
     if (canSave !== this.state.canSave) {
       this.setState({canSave})
