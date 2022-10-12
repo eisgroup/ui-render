@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.27.2
+#### Fixes
+- `onDataChanged` is called on any input change
+
 ### v0.27.1
 #### Fixes
 - The name of validation constant has been changed to avoid build crashes in production.
