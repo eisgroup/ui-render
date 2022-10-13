@@ -245,8 +245,8 @@ const composeValidators = (...validators) => (value) => validators.reduce((error
  */
 function getFunctionFromObject(definition, config) {
     const {name, mapArgs, args = [], onDone} = definition
-    const {data, fieldFunc, fallback = definition.name} = config
-    const func = fieldFunc[name]
+    const {data, fieldFunc, fieldMethods, fallback = definition.name} = config
+    const func = fieldFunc[name] || fieldMethods[name]
     if (onDone) metaToFunctions(definition, config)
     if (func) {
         const hasMapArgs = isList(mapArgs)

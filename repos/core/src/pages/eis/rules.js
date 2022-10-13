@@ -100,6 +100,7 @@ export default class UIRender extends Component {
     getFormData: type.Method,
     onDataChanged: type.Method,
     getValidationErrors: type.Method,
+    methods: type.ObjectOf(type.Method),
     translate: type.Method,
   }
 
@@ -166,6 +167,11 @@ export default class UIRender extends Component {
     // TODO: investigate realisation with this.data
     // this.data contains related data but there no all changes
     return getFormsData(formsStorage)
+  }
+
+  getCalledMethod = () => {
+    const { methods = {} } = this.props
+    return methods
   }
 
   onDataChanged = undefined;
@@ -319,7 +325,6 @@ export function withDataKind (Class) {
  *    - this.meta -> transformed *_meta.json data from state, ready for <Render> component consumption
  *    - this.handleSubmit:
  *        1. final-form: to be used like this <form onSubmit={this.handleSubmit}>
- *        2. redux-form: to be used like this <form onSubmit={this.handleSubmit}>
  *    - this.hasData and this.hasMeta getters can be used for conditional check
  *    - Initialize with data by overriding initial state
  */
@@ -420,6 +425,8 @@ export function withUISetup (formConfig) {
           }
         }
 
+        FIELD.METHODS = this.getCalledMethod()
+
         // Cross UI Render instances validation
         FIELD.VALIDATION[FIELD.CROSS_VALIDATE.NOT_WITHIN_RANGE] = (value, {dataKind, args: [start, end]}) => {
           const {form, index, parent} = this.props
@@ -469,6 +476,7 @@ export function withUISetup (formConfig) {
             fieldNormalizer: {...FIELD.NORMALIZER},
             fieldParser: {...FIELD.PARSER},
             fieldValidation: {...FIELD.VALIDATION},
+            fieldMethods: {...FIELD.METHODS},
           }
         }
       }
