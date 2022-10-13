@@ -14,12 +14,13 @@ interface Props {
     onSubmit(formValues: object): void
     getFormData?(fn: Function): void
     onDataChanged?(): void
+    methods?: Record<string, Function>
 
     // Optional
     className?: string
     style?: object
     id?: string
-    translate: Function
+    translate(v: string): string
 }
 
 /**

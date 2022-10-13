@@ -1,5 +1,33 @@
 ### Table of Contents
 
+### vX.XX.X
+#### New
+- Added `translate` property which accept localization function
+- Added `methods` property. Provided ability to add callback functions. This functions will be called on buttons with related `onClick` function names. For example:
+
+#### **`meta.json`**
+```json
+{
+  "view": "Button",
+  "items": [
+    {
+      "view": "Text",
+      "label": "Apply Periods"
+    }
+  ],
+  "onClick": {
+    "name": "onApplyPeriods"
+  }
+}
+```
+```jsx
+<UIRender
+  methods={{
+    onApplyPeriods: this.onApplyPeriods,
+  }}
+/>
+```
+
 ### v0.27.2
 #### Fixes
 - `onDataChanged` is called on any input change
