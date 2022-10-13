@@ -100,12 +100,16 @@ export default class UIRender extends Component {
     getFormData: type.Method,
     onDataChanged: type.Method,
     getValidationErrors: type.Method,
+    translate: type.Method,
   }
 
   constructor (props) {
     super(props);
     if (typeof errorHandlerFunction !== 'function') {
       errorHandlerFunction = props.getValidationErrors;
+    }
+    if (typeof props.translate === 'function') {
+      Active.translate = props.translate
     }
   }
 
@@ -167,13 +171,14 @@ export default class UIRender extends Component {
   onDataChanged = undefined;
 
   render () {
-    const {childBefore, childAfter, form, embedded, className, style} = this.props
+    const {childBefore, childAfter, form, embedded, className, style, translate} = this.props
     const content = this.hasData && this.hasMeta &&
       <Render
         data={this.data}
         {...this.meta}
         form={this.form}
         instance={this}
+        translate={translate}
         onDataChanged={this.onDataChanged}
       />
     const Container = embedded ? Fragment : ScrollView

@@ -19,6 +19,7 @@ import { _ } from 'ui-utils-pack/translations'
 import Icon from './Icon'
 import Text from './Text'
 import View from './View'
+import { Active } from 'ui-utils-pack'
 
 localiseTranslation({
   ADD_: {
@@ -91,6 +92,7 @@ export function Dropdown ({
   autofocus,
   onAddItem,
   onClickIcon,
+  translate = Active.translate,
   ...props
 }) {
   // Store options as state to allow additions
@@ -105,14 +107,17 @@ export function Dropdown ({
   // Sanitize
   switch (typeof options[0]) {
     case 'string':
-      options = options.map(value => ({text: value, value}))
+      options = options.map(value => ({text: translate(value), value}))
       break
     case 'number':
       options = options.map(value => ({text: String(value), value}))
       break
     case 'object':
-      if (typeof options[0].value === 'object')  // value is an array (ex. Color)
-        options = options.map(({value, ...option}) => ({value: String(value), ...option}))
+      if (typeof options[0].value === 'object') { // value is an array (ex. Color)
+        options = options.map(({ value, text, ...option }) => ({ value: String(value), text: translate(text), ...option }))
+      } else if (typeof options[0].value === 'string') {
+        options = options.map(({ value, text, ...option }) => ({ value: value, text: translate(text), ...option }))
+      }
       break
   }
   if (optionsLabel) options = [...options, {key: '', text: '', content: optionsLabel, disabled: true}]
@@ -130,7 +135,7 @@ export function Dropdown ({
     let val = props.multiple ? last(value) : value
     if (val && isString(val)) {
       val = trimSpaces(val).toLowerCase()
-      const duplicate = options.find(({text}) => toLowerCase(text) === val)
+      const duplicate = options.find(({text}) => typeof text === 'string' && toLowerCase(text) === val)
       if (duplicate && toLowerCaseAny(duplicate.value) !== val) {
         if (props.multiple) {
           value[value.length - 1] = duplicate.value
@@ -198,21 +203,21 @@ export function Dropdown ({
     <View className={classNames('input--wrapper', {
       float, done, labeled: label, 'fill-width': !props.compact && fill, required: props.required,
     }, className)} style={style}>
-      {label && !float && <Text className="input__label">{label}</Text>}
+      {label && !float && <Text className="input__label">{translate(label)}</Text>}
       <DropDown
         className={classNames({info, readonly})}
         options={options}
-        placeholder={placeholder}
+        placeholder={translate(placeholder)}
         error={!!error}
         lazyLoad={lazyLoad}
         noResultsMessage={(hasListValue(props.value) && props.value.length === options.length) ? _.NO_OPTIONS_LEFT : _.NOTHING_FOUND}
         {...props}
       />
-      {label && float && <Text className="input__label">{label}</Text>}
+      {label && float && <Text className="input__label">{translate(label)}</Text>}
       {(error || info) &&
       <View id={props.id} className="field-help">
-        {error && <Text className="error">{error}</Text>}
-        {info && <Text className="into">{info}</Text>}
+        {error && <Text className="error">{translate(error)}</Text>}
+        {info && <Text className="into">{translate(info)}</Text>}
       </View>
       }
     </View>

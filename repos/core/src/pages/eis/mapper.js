@@ -69,6 +69,7 @@ Render.Component = function RenderComponent ({
   showIf, relativeData, relativeIndex, relativePath, version,
   ...props
 }) {
+  const translate = Active.translate
   /* General showIf logic */
   if (showIf != null) {
     // UI Render should not 'Value Transform' `showIf` attribute
@@ -90,7 +91,13 @@ Render.Component = function RenderComponent ({
 
   switch (view) {
     case FIELD.TYPE.DATA:
-      return <Data instance={instance} data={_data || data} {...props} relativeIndex={relativeIndex} relativePath={relativePath} />
+      return <Data
+        instance={instance}
+        data={_data || data}
+        {...props}
+        relativeIndex={relativeIndex}
+        relativePath={relativePath}
+      />
 
     case FIELD.TYPE.COL:
     case FIELD.TYPE.COL2:
@@ -146,7 +153,7 @@ Render.Component = function RenderComponent ({
         props.children = props.label
         delete props.label
       }
-      return <Button {...props}/>
+      return <Button {...props} translate={translate}/>
     }
 
     case FIELD.TYPE.COUNTER: {
@@ -284,7 +291,11 @@ Render.Component = function RenderComponent ({
         }
         return item
       }))
-      return <TableView items={_data} {...table}/>
+      return <TableView
+        items={_data}
+        {...table}
+        translate={translate}
+      />
     }
 
     case FIELD.TYPE.TABS:
@@ -323,7 +334,7 @@ Render.Component = function RenderComponent ({
         delete props.renderLabel
       }
       if (view === FIELD.TYPE.TITLE) props.className = cn('h3', props.className)
-      return <Text {...props}/>
+      return <Text {...props} translate={translate}/>
     }
 
     case FIELD.TYPE.TOOLTIP: {
@@ -383,7 +394,12 @@ Render.Component = function RenderComponent ({
       if (view === FIELD.TYPE.DROPDOWN) {
         // proxy onChange to prevent event sent as second argument
         const {onChange, ...dropdown} = input
-        return <Dropdown lazyLoad={false} onChange={onChange ? (value => onChange(value)) : undefined} {...dropdown}/>
+        return <Dropdown
+          lazyLoad={false}
+          onChange={onChange ? (value => onChange(value)) : undefined}
+          {...dropdown}
+          translate={translate}
+        />
       }
 
       // Form value changing fields should have 'Input' as view
@@ -446,7 +462,7 @@ Render.Component = function RenderComponent ({
       //   input.formatOnBlur = false // this is true by default to prevent cursor jumping
       // }
 
-      return renderField({view, ...input, ...readonly && {readonly}, ...disabled && {disabled}})
+      return renderField({view, ...input, ...readonly && {readonly}, ...disabled && {disabled}, translate})
     }
   }
 }

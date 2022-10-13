@@ -13,6 +13,9 @@ import View from 'ui-react-pack/View'
 import { ALERT, GET, isEmpty, l, localiseTranslation, logRender, performStorage, SET } from 'ui-utils-pack'
 import { _ } from 'ui-utils-pack/translations'
 import UIRender from './rules'
+import { LocalizationUtils } from '@eisgroup/common'
+
+const translate = LocalizationUtils.translate
 
 const DEMO_JSON_STORAGE_KEY = 'DEMO_JSON'
 
@@ -77,7 +80,28 @@ export default class Demo extends Component {
     reader.readAsText(file)
   }
 
+  changeLocale = (lang) => {
+    if (lang === 'fr') {
+      LocalizationUtils.changeLocale({country: 'FR', language :'fr' })
+    } else {
+      LocalizationUtils.changeLocale({country: 'US', language :'en' })
+    }
+  }
+
+  UNSAFE_componentWillMount() {
+    const { lang } = this.props
+    this.changeLocale(lang)
+  }
+
+  UNSAFE_componentWillUpdate(nextProps) {
+    const { lang } = nextProps
+    if (this.props.lang !== lang) {
+      this.changeLocale(lang)
+    }
+  }
+
   render () {
+    const {lang} = this.props
     const {data, meta, showMeta} = this.state
     const hasData = data.json != null // data.json can be empty object
     const hasMeta = !isEmpty(meta.json)
@@ -117,6 +141,8 @@ export default class Demo extends Component {
           initialValues={data.json}
           data={data.json}
           meta={meta.json}
+          translate={translate}
+          key={lang}
           onSubmit={console.warn}
         />
       </>

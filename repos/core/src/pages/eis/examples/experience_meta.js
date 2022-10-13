@@ -55,27 +55,27 @@ const tablePeriod = {
   'headers': [
     {
       'id': 'PeriodName',
-      'label': 'Period',
+      'label': 'common:period',
       'classNameHeader': 'padding-left-small border-right'
     },
     {
       'id': 'StartDate',
-      'label': 'Period Start',
+      'label': 'common:start_date',
       'classNameHeader': 'padding-left-small'
     },
     {
       'id': 'EndDate',
-      'label': 'Period End',
+      'label': 'common:end_date',
       'classNameHeader': 'padding-left-small'
     },
     {
       'id': 'Weight',
-      'label': 'Weight',
+      'label': 'common:weight',
       'classNameHeader': 'padding-left-small'
     },
     {
       'id': 'NumberOfMonth',
-      'label': '# of Month',
+      'label': 'common:number_of_month',
       'classNameHeader': 'padding-left-small'
     },
     {
@@ -178,14 +178,14 @@ const tablePeriod = {
       },
       'items': [
         {
-          'label': 'Period',
+          'label': 'common:period',
           'view': 'Input',
           'name': 'PeriodName',
           'type': 'text',
           'validate': 'required'
         },
         {
-          'label': 'Start Date',
+          'label': 'common:start_date',
           'view': 'Input',
           'name': 'StartDate',
           format: 'date',
@@ -206,7 +206,7 @@ const tablePeriod = {
           'onChange': 'warn'
         },
         {
-          'label': 'End Date',
+          'label': 'common:end_date',
           'view': 'Input',
           'name': 'EndDate',
           format: 'date',
@@ -226,14 +226,14 @@ const tablePeriod = {
           }
         },
         {
-          'label': 'Weight',
+          'label': 'common:weight',
           'view': 'Input',
           'name': 'Weight',
           'type': 'number',
           'validate': 'required'
         },
         {
-          'label': 'Number of Month',
+          'label': 'common:number_of_month',
           'view': 'Input',
           'name': 'NumberOfMonth',
           'type': 'number',
@@ -246,7 +246,7 @@ const tablePeriod = {
               'view': 'Button',
               'styles': 'a transparent',
               'style': {marginTop: 35},
-              'children': 'Add',
+              'children': 'common:add',
               'onClick': 'addData'
             }
           ]
@@ -263,7 +263,7 @@ const tableRatesAndExposure = {
   'headers': [
     {
       'id': 'Tier',
-      'label': 'Tier',
+      'label': 'common:tier',
       'classNameHeader': 'padding-h-small text-align-left border-right',
       'classNameCellWrap': 'padding-smaller border-right'
     },
@@ -413,7 +413,7 @@ const experienceRating = {
   items: [
     {
       view: 'Title',
-      children: 'Experience Rating',
+      children: 'common:experience_rating',
       styles: 'padding-v-smaller'
     },
     {
@@ -525,15 +525,15 @@ const experiencePeriods = {
       styles: 'wrap margin-bottom-smaller',
       items: [
         {
-          'label': 'Credibility',
+          'label': 'common:credibility',
           'view': 'Input',
           'name': 'Credibility',
           'type': 'text',
-          'placeholder': 'Text Example',
+          'placeholder': 'common:title',
           'styles': 'margin-right-larger'
         },
         {
-          'label': 'Trend Assumption',
+          'label': 'common:trend_assumption',
           'view': 'Input',
           'name': 'TrendAssumption',
           'type': 'text',
@@ -584,7 +584,7 @@ const historicalInformation = {
       ...cloneDeep(tableHistoricalInformation),
       showIf: {
         name: 'ReportPeriods.{state.period,0}.PeriodName',
-        equal: 'Year',
+        equal: 'common:year',
         relativeData: false,
       }
     },

@@ -41,6 +41,10 @@ import * as tabs from './examples/tabs_meta'
 import uploadMeta from './examples/upload_meta'
 import UIRender from './rules'
 
+import { LocalizationUtils } from '@eisgroup/common'
+
+const t = LocalizationUtils.translate
+
 const examples = [
   {
     title: 'Button with Icon',
@@ -265,6 +269,7 @@ export default class Examples extends Component {
                       onDataChanged={this.onSomeDataChanged}
                       onSubmit={console.warn}
                       getValidationErrors={this.showValidationErrors}
+                      translate={t}
                     />
                     <View className="app__examples bg-white border">
                       <Button onClick={this.onExperienceRatingsButtonClick}>Get Data (the ability to request data from outside)</Button>

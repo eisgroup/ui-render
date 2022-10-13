@@ -13,6 +13,11 @@ import View from 'ui-react-pack/View'
 import { Active, debounceBy, get, log, logRender, TIME_DURATION_INSTANT } from 'ui-utils-pack'
 import Sidebar, { Header } from './containers/Navigation'
 
+import { LocalizationUtils } from '@eisgroup/common'
+import { ioc } from './localization'
+
+const t = LocalizationUtils.translate
+
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
  * -----------------------------------------------------------------------------
@@ -29,6 +34,7 @@ const mapStateToProps = (state) => ({
 export default class App extends Component {
   state = {
     isMobile: false,
+    isLocalizationLoaded: false,
     screenRatio: 1,
   }
 
@@ -100,6 +106,11 @@ export default class App extends Component {
   }
 
   componentDidMount () {
+    ioc.finally(() => {
+      this.setState({
+        isLocalizationLoaded: true
+      })
+    })
     window.addEventListener('resize', this.resize.bind(this))
     this.resize()
   }
@@ -113,9 +124,9 @@ export default class App extends Component {
 
   render () {
     const {children, theme = DEFAULT.THEME, lang = DEFAULT.LANGUAGE, currency, ...props} = this.props
-    const {isMobile} = this.state
+    const {isMobile, isLocalizationLoaded} = this.state
     const inverted = theme === SETTING.THEME.DARK
-    return (
+    return isLocalizationLoaded && (
       <UIContext.Provider value={this.state}>
         <View className={`app fade-in lang--${lang} ${currency}` + (inverted ? ' inverted text-shadow' : '')}>
           {/*<AcceptCookie/>*/}

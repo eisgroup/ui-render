@@ -41,17 +41,17 @@ const HistoricalInformation = [
 
 export default {
   'UseExperienceRating': false,
-  'PaidClaimsBasis': 'Year',
+  'PaidClaimsBasis': 'common:year',
   'TrendAssumption': 1.03,
   'Credibility': 1,
   'ShowExperienceRating': true,
   'ReportPeriods': [
-    {PeriodName: 'Year'},
-    {PeriodName: 'Month'},
+    {PeriodName: 'common:year'},
+    {PeriodName: 'common:month'},
   ],
   'RatesAndExposure': [
     {
-      PlanName: 'Plan 1',
+      PlanName: 'common:plan_1',
       HistoricalInformation: cloneDeep(HistoricalInformation),
       Rates: [
         {
@@ -75,7 +75,7 @@ export default {
       ],
     },
     {
-      PlanName: 'Plan 2',
+      PlanName: 'common:plan_2',
       HistoricalInformation: cloneDeep(HistoricalInformation),
       Rates: [
         {

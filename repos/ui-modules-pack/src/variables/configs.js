@@ -20,7 +20,7 @@ export const CONTACT_EMAIL = ENV.REACT_APP_CONTACT_HOST + '@' + ENV.REACT_APP_CO
 
 /* Configuration */
 export const CONFIG = {
-  LANGUAGE_OPTIONS: [LANGUAGE.ENGLISH] // enabled languages
+  LANGUAGE_OPTIONS: [LANGUAGE.ENGLISH, LANGUAGE.FRENCH] // enabled languages
 }
 
 /* Client */
