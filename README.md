@@ -15,7 +15,8 @@ Check the [/docs](./docs) folder to get a basic understanding of the project's [
 2. Install [Yarn package manager](https://yarnpkg.com/en/), if you haven't already.
 3. Install [LiveReload Chrome extension](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei), for hot-reloading of CSS style changes.
 4. Install [Webstorm](https://www.jetbrains.com/webstorm/) IDE, then configure [code style](docs/code-style.png), install `Save Action` plugin and configure it like this [screenshot](docs/save-action.png);
-4. Navigate to project root folder and install dependencies by running this command in terminal:
+5. Create `.npmrc` configuration file based on `.npmrc.example`
+6. Navigate to project root folder and install dependencies by running this command in terminal:
 
 ### `yarn`
 

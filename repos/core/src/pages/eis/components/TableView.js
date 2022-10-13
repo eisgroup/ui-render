@@ -69,6 +69,7 @@ export default class TableView extends PureComponent {
     ),
     vertical: PropTypes.bool, // whether to render rows as columns (first column as Header)
     // ...other Table props
+    translate: PropTypes.func
   }
 
   state = {
@@ -199,7 +200,8 @@ export default class TableView extends PureComponent {
     styleHeader,
     renderHeader
   }, i) => {
-    const {sorts} = this.state
+    const { translate } = this.props
+    const { sorts } = this.state
     const hasSort = sorts && !!sorts.find(s => s.id === id)
     const render = isFunction(cell) ? cell : renderHeader
     const value = data != null ? data : (cell || label)
@@ -209,7 +211,7 @@ export default class TableView extends PureComponent {
              onClick={hasSort && this.handleSort.bind(this, id)}>
           {render
             ? render(value, id, {className, style}, this)
-            : (typeof cell === 'object' ? cell : <Text className="p">{cell || (label != null ? label : id)}</Text>)
+            : (typeof cell === 'object' ? cell : <Text className="p">{cell || (label != null ? translate(label) : id)}</Text>)
           }
           {hasSort && renderSort(sorts.find(item => item.id === id) || {})}
         </Row>
@@ -289,7 +291,7 @@ export default class TableView extends PureComponent {
     if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
     const {
       fill, className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical,
-      items: _, headers: _2, renderItem: _3, renderItemCells: _4, itemClassNames: _5, itemsExpanded: _6,
+      items: _, headers: _2, renderItem: _3, renderItemCells: _4, itemClassNames: _5, itemsExpanded: _6, translate: _7,
       ...props
     } = this.props
     const items = this.itemsSorted

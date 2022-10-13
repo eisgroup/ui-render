@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 import { accessibilitySupport } from './utils'
+import { Active } from 'ui-utils-pack'
 
 /**
  * Text View - Pure Component.
@@ -22,11 +23,15 @@ export function Text ({
   rtl,
   sound,
   expanded: _, // not used, remove to prevent warnings
+  children,
+  translate = Active.translate,
   ...props
 }) {
   props = accessibilitySupport(props, sound)
   return (
-    <span className={classNames('text', {fill, reverse, rtl, pointer: props.onClick}, className)} {...props} />
+    <span className={classNames('text', {fill, reverse, rtl, pointer: props.onClick}, className)} {...props}>
+      {(typeof children === 'string') ? translate(children) : children}
+    </span>
   )
 }
 

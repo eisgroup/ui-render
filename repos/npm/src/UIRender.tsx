@@ -19,6 +19,7 @@ interface Props {
     className?: string
     style?: object
     id?: string
+    translate: Function
 }
 
 /**

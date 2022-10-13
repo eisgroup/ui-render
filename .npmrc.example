@@ -1,0 +1,12 @@
+#
+#   Need to request access to Nexus NPM Repository:
+#   example: https://jira.exigeninsurance.com/browse/EISHELP-72011
+#
+#   To generate auth token use next command (unix):
+#   echo -n "<your AD login>:<your AD password>" | base64
+#
+
+registry=https://sfoeisgennexus01.exigengroup.com/repository/GENESIS_NPM/
+email=<DOMAIN_NAME>@eisgroup.com
+always-auth=true
+_auth=<GENERATED_TOKEN>

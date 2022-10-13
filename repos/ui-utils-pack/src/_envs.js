@@ -37,6 +37,7 @@ export const Active = {
   log: undefined, // backend console logger
   user: {}, // the current user, for quick access to user info, such as auth
   usersById: {}, // for storing temporary info, like user.lastOnline
+  translate: (value) => value, // Global translate function
 
   /**
    * Password Strength Calculator

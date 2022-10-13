@@ -113,6 +113,7 @@ export function asField (InputComponent, {sanitize} = {}) {
       format: PropTypes.func,
       normalize: PropTypes.func,
       parse: PropTypes.func,
+      translate: PropTypes.func,
     }
 
     get value () {

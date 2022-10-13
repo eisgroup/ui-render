@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Loading from './Loading'
 import { onPressHoc } from './utils'
+import { Active } from 'ui-utils-pack'
 
 /**
  * Button - Pure Component.
@@ -33,6 +34,7 @@ export function Button ({
   type = 'button',
   sound,
   className,
+  translate = Active.translate,
   ...props
 }) {
 
@@ -44,7 +46,7 @@ export function Button ({
       onClick={onPressHoc(onClick, sound)}
       {...props}
     >
-      {children}
+      {(typeof children === 'string') ? translate(children) : children}
       {loading && <Loading loading/>}
     </button>
   )

@@ -8,6 +8,7 @@ import Label from './Label'
 import Row from './Row'
 import Text from './Text'
 import View from './View'
+import { Active } from 'ui-utils-pack'
 
 /**
  * Input Wrapper - Pure Component.
@@ -65,6 +66,8 @@ export function Input ({
   onBlur,
   onRemove,
   title,
+  placeholder,
+  translate = Active.translate,
   ...props
 }) {
   const [active, setState] = useState(props.autoFocus)
@@ -77,7 +80,7 @@ export function Input ({
   if (props.type === 'hidden') return <InputNative {...props} />
   if (float) {
     if (!label && name) label = capitalize(name)
-    if (!props.placeholder) props.placeholder = ' ' // required for Float label CSS to work
+    if (!placeholder) placeholder = ' ' // required for Float label CSS to work
   }
   if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
   if (!label && title) props.title = title
@@ -95,7 +98,7 @@ export function Input ({
     >
       {!float &&
       <Row className="middle">
-        {!isCheckbox && label && <Label htmlFor={id} title={title}>{label}</Label>}
+        {!isCheckbox && label && <Label htmlFor={id} title={title}>{translate(label)}</Label>}
         {onRemove && !readonly &&
         <Button className="input__delete" onClick={() => onRemove(name || id)}><Icon name="delete"/></Button>}
       </Row>
@@ -110,9 +113,9 @@ export function Input ({
           <Text className='invisible' aria-hidden='true'>{value}</Text> {unit}
         </Text>
         }
-        {stickyPlaceholder && props.placeholder && hasValue &&
+        {stickyPlaceholder && placeholder && hasValue &&
         <Text className='input__unit' aria-hidden='true'>
-          <Text className='invisible no-margin'>{props.value}</Text>{props.placeholder.substring(props.value.length)}
+          <Text className='invisible no-margin'>{props.value}</Text>{placeholder.substring(props.value.length)}
         </Text>
         }
         <InputNative
@@ -126,18 +129,19 @@ export function Input ({
             onBlur && onBlur(...args)
           }}
           max={max.current}
+          placeholder={translate(placeholder)}
           {...props}
         />
         {icon && !lefty && (isString(icon)
             ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
             : icon
         )}
-        {(float || isCheckbox) && label && <Label htmlFor={id} title={title}>{label}</Label>}
+        {(float || isCheckbox) && label && <Label htmlFor={id} title={title}>{translate(label)}</Label>}
       </Row>
       {(error || info) &&
       <View id={idHelp} className='field-help'>
-        {error && <Text className='error'>{error}</Text>}
-        {info && <Text className='into'>{info}</Text>}
+        {error && <Text className='error'>{translate(error)}</Text>}
+        {info && <Text className='into'>{translate(info)}</Text>}
       </View>
       }
       {/* Reserved for Tooltip or other things */}
