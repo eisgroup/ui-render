@@ -1,0 +1,420 @@
+{
+  "showExperienceRating": true,
+  "periodBasis": [
+    {
+      "periodBasisType": "Month"
+    },
+    {
+      "periodBasisType": "Year"
+    }
+  ],
+  "trendAssumption": 1.03,
+  "credibility": 1,
+  "dataKind": {
+    "experiencePeriods": [
+      {
+        "periodName": "Current Period",
+        "startDate": "2021-01-01",
+        "endDate": "2022-01-01",
+        "weight": 0.5,
+        "numberOfMonths": 12
+      },
+      {
+        "periodName": "1st Period",
+        "startDate": "2020-01-01",
+        "endDate": "2021-01-01",
+        "weight": 0.3,
+        "numberOfMonths": 12
+      },
+      {
+        "periodName": "2nd Period",
+        "startDate": "2019-01-01",
+        "endDate": "2020-01-01",
+        "weight": 0.2,
+        "numberOfMonths": 12
+      }
+    ]
+  },
+  "ratesAndHistoricalInfo": [
+    {
+      "planName": "High",
+      "historicalInformation": [
+        {
+          "periodName": "Current Period",
+          "historicalInfoEntries": [
+            {
+              "periodDate": "2021-01-01"
+            },
+            {
+              "periodDate": "2021-02-01"
+            },
+            {
+              "periodDate": "2021-03-01"
+            },
+            {
+              "periodDate": "2021-04-01"
+            },
+            {
+              "periodDate": "2021-05-01"
+            },
+            {
+              "periodDate": "2021-06-01"
+            },
+            {
+              "periodDate": "2021-07-01"
+            },
+            {
+              "periodDate": "2021-08-01"
+            },
+            {
+              "periodDate": "2021-09-01"
+            },
+            {
+              "periodDate": "2021-10-01"
+            },
+            {
+              "periodDate": "2021-11-01"
+            },
+            {
+              "periodDate": "2021-12-01"
+            }
+          ]
+        },
+        {
+          "periodName": "1st Period",
+          "historicalInfoEntries": [
+            {
+              "periodDate": "2020-01-01"
+            },
+            {
+              "periodDate": "2020-02-01"
+            },
+            {
+              "periodDate": "2020-03-01"
+            },
+            {
+              "periodDate": "2020-04-01"
+            },
+            {
+              "periodDate": "2020-05-01"
+            },
+            {
+              "periodDate": "2020-06-01"
+            },
+            {
+              "periodDate": "2020-07-01"
+            },
+            {
+              "periodDate": "2020-08-01"
+            },
+            {
+              "periodDate": "2020-09-01"
+            },
+            {
+              "periodDate": "2020-10-01"
+            },
+            {
+              "periodDate": "2020-11-01"
+            },
+            {
+              "periodDate": "2020-12-01"
+            }
+          ]
+        },
+        {
+          "periodName": "2nd Period",
+          "historicalInfoEntries": [
+            {
+              "periodDate": "2019-01-01"
+            },
+            {
+              "periodDate": "2019-02-01"
+            },
+            {
+              "periodDate": "2019-03-01"
+            },
+            {
+              "periodDate": "2019-04-01"
+            },
+            {
+              "periodDate": "2019-05-01"
+            },
+            {
+              "periodDate": "2019-06-01"
+            },
+            {
+              "periodDate": "2019-07-01"
+            },
+            {
+              "periodDate": "2019-08-01"
+            },
+            {
+              "periodDate": "2019-09-01"
+            },
+            {
+              "periodDate": "2019-10-01"
+            },
+            {
+              "periodDate": "2019-11-01"
+            },
+            {
+              "periodDate": "2019-12-01"
+            }
+          ]
+        }
+      ],
+      "rates": [
+        {
+          "tier": "Individual",
+          "tierName": "Individual",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "IndividualAndSpouse",
+          "tierName": "Individual + Spouse",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "IndividualAndChildren",
+          "tierName": "Individual + Child(ren)",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "Family",
+          "tierName": "Family",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "planName": "Low",
+      "historicalInformation": [
+        {
+          "periodName": "Current Period",
+          "historicalInfoEntries": [
+            {
+              "periodDate": "2021-01-01"
+            },
+            {
+              "periodDate": "2021-02-01"
+            },
+            {
+              "periodDate": "2021-03-01"
+            },
+            {
+              "periodDate": "2021-04-01"
+            },
+            {
+              "periodDate": "2021-05-01"
+            },
+            {
+              "periodDate": "2021-06-01"
+            },
+            {
+              "periodDate": "2021-07-01"
+            },
+            {
+              "periodDate": "2021-08-01"
+            },
+            {
+              "periodDate": "2021-09-01"
+            },
+            {
+              "periodDate": "2021-10-01"
+            },
+            {
+              "periodDate": "2021-11-01"
+            },
+            {
+              "periodDate": "2021-12-01"
+            }
+          ]
+        },
+        {
+          "periodName": "1st Period",
+          "historicalInfoEntries": [
+            {
+              "periodDate": "2020-01-01"
+            },
+            {
+              "periodDate": "2020-02-01"
+            },
+            {
+              "periodDate": "2020-03-01"
+            },
+            {
+              "periodDate": "2020-04-01"
+            },
+            {
+              "periodDate": "2020-05-01"
+            },
+            {
+              "periodDate": "2020-06-01"
+            },
+            {
+              "periodDate": "2020-07-01"
+            },
+            {
+              "periodDate": "2020-08-01"
+            },
+            {
+              "periodDate": "2020-09-01"
+            },
+            {
+              "periodDate": "2020-10-01"
+            },
+            {
+              "periodDate": "2020-11-01"
+            },
+            {
+              "periodDate": "2020-12-01"
+            }
+          ]
+        },
+        {
+          "periodName": "2nd Period",
+          "historicalInfoEntries": [
+            {
+              "periodDate": "2019-01-01"
+            },
+            {
+              "periodDate": "2019-02-01"
+            },
+            {
+              "periodDate": "2019-03-01"
+            },
+            {
+              "periodDate": "2019-04-01"
+            },
+            {
+              "periodDate": "2019-05-01"
+            },
+            {
+              "periodDate": "2019-06-01"
+            },
+            {
+              "periodDate": "2019-07-01"
+            },
+            {
+              "periodDate": "2019-08-01"
+            },
+            {
+              "periodDate": "2019-09-01"
+            },
+            {
+              "periodDate": "2019-10-01"
+            },
+            {
+              "periodDate": "2019-11-01"
+            },
+            {
+              "periodDate": "2019-12-01"
+            }
+          ]
+        }
+      ],
+      "rates": [
+        {
+          "tier": "Individual",
+          "tierName": "Individual",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "IndividualAndSpouse",
+          "tierName": "Individual + Spouse",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "IndividualAndChildren",
+          "tierName": "Individual + Child(ren)",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "Family",
+          "tierName": "Family",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

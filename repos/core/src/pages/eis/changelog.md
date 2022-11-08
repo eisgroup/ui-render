@@ -4,6 +4,7 @@
 #### New
 - Added `translate` property which accept localization function
 - Added `methods` property. Provided ability to add callback functions. This functions will be called on buttons with related `onClick` function names. For example:
+- Select reorders options in Data object and invokes onDataChanged callback
 
 #### **`meta.json`**
 ```json
