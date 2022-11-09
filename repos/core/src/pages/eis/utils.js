@@ -1,6 +1,7 @@
 import { merge, isObject } from 'ui-utils-pack/object'
 import { errorsMap } from './rules'
 import { FIELD } from 'ui-modules-pack'
+import { cloneDeep } from 'ui-utils-pack'
 
 export const getFormsData = (forms) => {
   const formDataArray = [];
@@ -23,7 +24,8 @@ const getStructuredDataFromFormObject = (form, meta) => {
     return;
   }
 
-  const formState = changeOptionOrderForSelectFields(form.getState().values, meta);
+  const formValues = cloneDeep(form.getState().values);
+  const formState = changeOptionOrderForSelectFields(formValues, meta);
 
   if (!relativePath) {
     if (formState.dataKind) {
