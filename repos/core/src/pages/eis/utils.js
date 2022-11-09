@@ -189,12 +189,12 @@ export const convertFieldNameToTitleCaseText = (str) => {
 // Find Select fields and change options order in case select was changed
 const changeOptionOrderForSelectFields = (data, meta) => {
   // find data related to Select and change options order
-  const recursiveDataParser = (data2, optionName, selectValue) => {
+  const recursiveDataParser = (data, optionName, selectValue) => {
     let isDataOrderChanged = false
-    if (isObject(data2)) {
-      Object.keys(data2).forEach(key => {
-        if (Array.isArray(data2[key]) && data2[key][0] && data2[key][0][optionName]) {
-          data2[key].unshift(data2[key].splice(selectValue, 1)[0]);
+    if (isObject(data)) {
+      Object.keys(data).forEach(key => {
+        if (Array.isArray(data[key]) && data[key][0] && data[key][0][optionName]) {
+          data[key].unshift(data[key].splice(selectValue, 1)[0]);
           isDataOrderChanged = true
         }
       })
