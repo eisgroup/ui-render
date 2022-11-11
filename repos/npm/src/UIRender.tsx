@@ -16,6 +16,9 @@ interface Props {
     onDataChanged?(): void
     getValidationErrors?(errors: object): void
     methods?: Record<string, Function>
+    apiCalls?: {
+        updateExperienceRating: Promise<any>
+    }
 
     // Optional
     className?: string

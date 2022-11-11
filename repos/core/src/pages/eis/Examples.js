@@ -42,10 +42,17 @@ import uploadMeta from './examples/upload_meta'
 import UIRender from './rules'
 
 import { LocalizationUtils } from '@eisgroup/common'
+import { updateExperienceData } from '../../../../web/api/gdn-rating-alg'
 
 const t = LocalizationUtils.translate
 
 const examples = [
+  {
+    title: 'Experience Ratings',
+    id: 'experienceRatings',
+    data: experienceData,
+    meta: experienceMeta,
+  },
   {
     title: 'Button with Icon',
     id: 'buttonIcon',
@@ -191,12 +198,6 @@ const examples = [
     meta: invalidArrayMeta,
   },
   {
-    title: 'Experience Ratings',
-    id: 'experienceRatings',
-    data: experienceData,
-    meta: experienceMeta,
-  },
-  {
     title: 'Rating Details',
     id: 'ratingDetails',
     data: ratingDetails.data,
@@ -225,8 +226,6 @@ export default class Examples extends Component {
     if (expanded) goTo(`#${id}`)
   }
 
-  // getFormData = () => {}
-
   onExperienceRatingsButtonClick = () => {
     const data = this.getFormData();
     console.info('Form data: ', data);
@@ -237,7 +236,7 @@ export default class Examples extends Component {
   }
 
   showValidationErrors = (errors) => {
-    console.log('Validation errors', errors)
+    console.info('Validation errors', errors)
   }
 
   render () {
@@ -270,6 +269,9 @@ export default class Examples extends Component {
                       onSubmit={console.warn}
                       getValidationErrors={this.showValidationErrors}
                       translate={t}
+                      apiCalls={{
+                        updateExperienceData
+                      }}
                     />
                     <View className="app__examples bg-white border">
                       <Button onClick={this.onExperienceRatingsButtonClick}>Get Data (the ability to request data from outside)</Button>
