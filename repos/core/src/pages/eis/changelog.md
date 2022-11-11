@@ -27,6 +27,7 @@
   }}
 />
 ```
+- Added `apiCalls` property for UI-Render component and `onApplyPeriods` listener for `Button` component. If `apiCalls` contain `updateExperienceData` method, it will be calls on click button with `onApplyPeriods` listener
 
 ### v0.27.2
 #### Fixes

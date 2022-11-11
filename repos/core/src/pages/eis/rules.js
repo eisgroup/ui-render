@@ -6,14 +6,14 @@ import React, { Component, Fragment } from 'react'
 import { cn, type } from 'ui-react-pack'
 import Json from 'ui-react-pack/JsonView'
 import ScrollView from 'ui-react-pack/ScrollView'
-import { Active, get, isEmpty, isList, isString, logRender, round, sanitizeResponse, warn, } from 'ui-utils-pack'
+import { Active, get, isEmpty, isList, isString, logRender, round, sanitizeResponse, warn } from 'ui-utils-pack'
 import { cloneDeep, hasObjectValue, isObject, set } from 'ui-utils-pack/object'
 import Render, { metaToProps } from '../../ui-render'
 import { downloadFile } from './actions/file'
 import './mapper' // Set up UI Renderer components and methods
 import { _ } from './translations'
 import { notWithinRange } from './validators'
-import { replaceDeep, getFormsData, mapErrorObjectToUIFormat } from './utils'
+import { replaceDeep, getFormsData, mapErrorObjectToUIFormat, getDateStringFromDateObject } from './utils'
 import deepEqual from 'deep-equal';
 
 /**
@@ -50,7 +50,12 @@ FIELD.NORMALIZE = {
 }
 FIELD.NORMALIZER = {
   ...FIELD.NORMALIZER,
-  [FIELD.NORMALIZE.DATE]: (val) => val && val.split('T')[0],
+  [FIELD.NORMALIZE.DATE]: (val) => {
+    if (val) {
+      const date = new Date(val);
+      return getDateStringFromDateObject(date);
+    }
+  },
   [FIELD.NORMALIZE.CURRENCY]: (v) => v == null ? v : Number((v || 0) || 0).toFixed(2),
   [FIELD.NORMALIZE.PERCENT]: (v) => {
     return v == null ? v : (Number((v || 0) || 0) * 100).toLocaleString()
@@ -102,6 +107,7 @@ export default class UIRender extends Component {
     getValidationErrors: type.Method,
     methods: type.ObjectOf(type.Method),
     translate: type.Method,
+    apiCalls: type.ObjectOf(type.Method),
   }
 
   constructor (props) {
@@ -172,6 +178,11 @@ export default class UIRender extends Component {
   getCalledMethod = () => {
     const { methods = {} } = this.props
     return methods
+  }
+
+  getAPICalls = () => {
+    const { apiCalls = {} } = this.props
+    return apiCalls
   }
 
   onDataChanged = undefined;
@@ -282,8 +293,12 @@ export function withDataKind (Class) {
 
   // Unregister child instance from parent instance
   Class.prototype.unregisterDataKind = function (instance, kind, index) {
-    if (!this.dataKind) this.dataKind = {}
-    if (this.dataKind[kind]) delete this.dataKind[kind][index]
+    if (!this.dataKind) {
+      this.dataKind = {}
+    }
+    if (this.dataKind[kind] && this.dataKind[kind][index]) {
+      delete this.dataKind[kind][index]
+    }
 
     // Update current parent state in case the component was edited, then unmounted from changing Tabs
     const {data} = this.state
@@ -422,6 +437,24 @@ export function withUISetup (formConfig) {
               replaceDeep(this.data, name, value)
               this.data = cloneDeep(this.data);
             }
+          }
+        }
+
+        FIELD.FUNC['onApplyPeriods'] = async () => {
+          const { updateExperienceData } = this.getAPICalls();
+          if (typeof updateExperienceData !== 'function') {
+            return false;
+          }
+          const data = this.getAllFormsData();
+          try {
+            const response = await updateExperienceData(data);
+            this.setState({
+              data: {
+                json: response
+              }
+            })
+          } catch (error) {
+            console.error(error)
           }
         }
 

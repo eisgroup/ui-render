@@ -20,8 +20,8 @@ import dropdownMeta from './examples/dropdown_meta.json'
 import exampleData from './examples/example_data.json'
 import exampleMeta from './examples/example_meta.json'
 import expandListMeta from './examples/expand-list_meta'
-import experienceData from './examples/experience_data'
-import experienceMeta from './examples/experience_meta'
+import experienceData from './examples/experience_data.json'
+import experienceMeta from './examples/experience_meta.json'
 import inputMeta from './examples/input_meta'
 import inputToggle from './examples/input_toggle'
 import invalidArrayData from './examples/invalid-array_data'
@@ -42,10 +42,17 @@ import uploadMeta from './examples/upload_meta'
 import UIRender from './rules'
 
 import { LocalizationUtils } from '@eisgroup/common'
+import { updateExperienceData } from '../../../../web/api/gdn-rating-alg'
 
 const t = LocalizationUtils.translate
 
 const examples = [
+  {
+    title: 'Experience Ratings',
+    id: 'experienceRatings',
+    data: experienceData,
+    meta: experienceMeta,
+  },
   {
     title: 'Button with Icon',
     id: 'buttonIcon',
@@ -191,12 +198,6 @@ const examples = [
     meta: invalidArrayMeta,
   },
   {
-    title: 'Experience Ratings',
-    id: 'experienceRatings',
-    data: experienceData,
-    meta: experienceMeta,
-  },
-  {
     title: 'Rating Details',
     id: 'ratingDetails',
     data: ratingDetails.data,
@@ -225,8 +226,6 @@ export default class Examples extends Component {
     if (expanded) goTo(`#${id}`)
   }
 
-  // getFormData = () => {}
-
   onExperienceRatingsButtonClick = () => {
     const data = this.getFormData();
     console.info('Form data: ', data);
@@ -237,7 +236,7 @@ export default class Examples extends Component {
   }
 
   showValidationErrors = (errors) => {
-    console.log('Validation errors', errors)
+    console.info('Validation errors', errors)
   }
 
   render () {
@@ -270,6 +269,9 @@ export default class Examples extends Component {
                       onSubmit={console.warn}
                       getValidationErrors={this.showValidationErrors}
                       translate={t}
+                      apiCalls={{
+                        updateExperienceData
+                      }}
                     />
                     <View className="app__examples bg-white border">
                       <Button onClick={this.onExperienceRatingsButtonClick}>Get Data (the ability to request data from outside)</Button>

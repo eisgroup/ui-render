@@ -1,0 +1,485 @@
+{
+  "showExperienceRating": true,
+  "periodBasis": [
+    {
+      "periodBasisType": "Month"
+    },
+    {
+      "periodBasisType": "Year"
+    }
+  ],
+  "trendAssumption": 1.03,
+  "credibility": 1,
+  "dataKind": {
+    "experiencePeriods": [
+      {
+        "periodName": "Current Period",
+        "startDate": "2021-01-01",
+        "endDate": "2021-12-30",
+        "weight": 0.5,
+        "numberOfMonths": 12
+      },
+      {
+        "periodName": "1st Period",
+        "startDate": "2020-01-01",
+        "endDate": "2020-12-30",
+        "weight": 0.3,
+        "numberOfMonths": 12
+      }
+    ]
+  },
+  "ratesAndHistoricalInfo": [
+    {
+      "planName": "High",
+      "historicalInformation": [
+        {
+          "periodName": "Current Period",
+          "historicalInfoEntries": [
+            {
+              "planName": "High",
+              "periodDate": "2020-12-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2021-01-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2021-02-28"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2021-03-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2021-04-30"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2021-05-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2021-06-30"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2021-07-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2021-08-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2021-09-30"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2021-10-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2021-11-30"
+            }
+          ]
+        },
+        {
+          "periodName": "1st Period",
+          "historicalInfoEntries": [
+            {
+              "planName": "High",
+              "periodDate": "2019-12-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2020-01-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2020-02-29"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2020-03-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2020-04-30"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2020-05-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2020-06-30"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2020-07-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2020-08-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2020-09-30"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2020-10-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2020-11-30"
+            }
+          ]
+        },
+        {
+          "periodName": "2nd Period",
+          "historicalInfoEntries": [
+            {
+              "planName": "High",
+              "periodDate": "2018-12-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2019-01-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2019-02-28"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2019-03-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2019-04-30"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2019-05-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2019-06-30"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2019-07-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2019-08-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2019-09-30"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2019-10-31"
+            },
+            {
+              "planName": "High",
+              "periodDate": "2019-11-30"
+            }
+          ]
+        }
+      ],
+      "rates": [
+        {
+          "tier": "Individual",
+          "tierName": "Individual",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "IndividualAndSpouse",
+          "tierName": "Individual + Spouse",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "IndividualAndChildren",
+          "tierName": "Individual + Child(ren)",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "Family",
+          "tierName": "Family",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "planName": "Low",
+      "historicalInformation": [
+        {
+          "periodName": "Current Period",
+          "historicalInfoEntries": [
+            {
+              "planName": "Low",
+              "periodDate": "2020-12-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2021-01-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2021-02-28"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2021-03-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2021-04-30"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2021-05-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2021-06-30"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2021-07-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2021-08-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2021-09-30"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2021-10-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2021-11-30"
+            }
+          ]
+        },
+        {
+          "periodName": "1st Period",
+          "historicalInfoEntries": [
+            {
+              "planName": "Low",
+              "periodDate": "2019-12-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2020-01-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2020-02-29"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2020-03-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2020-04-30"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2020-05-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2020-06-30"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2020-07-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2020-08-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2020-09-30"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2020-10-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2020-11-30"
+            }
+          ]
+        },
+        {
+          "periodName": "2nd Period",
+          "historicalInfoEntries": [
+            {
+              "planName": "Low",
+              "periodDate": "2018-12-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2019-01-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2019-02-28"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2019-03-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2019-04-30"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2019-05-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2019-06-30"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2019-07-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2019-08-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2019-09-30"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2019-10-31"
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2019-11-30"
+            }
+          ]
+        }
+      ],
+      "rates": [
+        {
+          "tier": "Individual",
+          "tierName": "Individual",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "IndividualAndSpouse",
+          "tierName": "Individual + Spouse",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "IndividualAndChildren",
+          "tierName": "Individual + Child(ren)",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        },
+        {
+          "tier": "Family",
+          "tierName": "Family",
+          "tierRates": [
+            {
+              "periodName": "Current Period"
+            },
+            {
+              "periodName": "1st Period"
+            },
+            {
+              "periodName": "2nd Period"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

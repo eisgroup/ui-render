@@ -15,6 +15,9 @@ interface Props {
     getFormData?(fn: Function): void
     onDataChanged?(): void
     methods?: Record<string, Function>
+    apiCalls?: {
+        updateExperienceRating: Promise<any>
+    }
 
     // Optional
     className?: string
