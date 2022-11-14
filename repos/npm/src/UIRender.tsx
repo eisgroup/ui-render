@@ -14,6 +14,7 @@ interface Props {
     onSubmit(formValues: object): void
     getFormData?(fn: Function): void
     onDataChanged?(): void
+    getValidationErrors?(errors: object): void
     methods?: Record<string, Function>
 
     // Optional
