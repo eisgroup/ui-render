@@ -28,6 +28,9 @@
 />
 ```
 
+###  Fixes
+- Add TS annotation for  `getValidationErrors` listener
+
 ### v0.27.2
 #### Fixes
 - `onDataChanged` is called on any input change
