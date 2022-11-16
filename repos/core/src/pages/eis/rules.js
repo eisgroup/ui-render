@@ -9,7 +9,6 @@ import ScrollView from 'ui-react-pack/ScrollView'
 import { Active, get, isEmpty, isList, isString, logRender, round, sanitizeResponse, warn } from 'ui-utils-pack'
 import { cloneDeep, hasObjectValue, isObject, set } from 'ui-utils-pack/object'
 import Render, { metaToProps } from '../../ui-render'
-import { downloadFile } from './actions/file'
 import './mapper' // Set up UI Renderer components and methods
 import { _ } from './translations'
 import { notWithinRange } from './validators'
@@ -25,6 +24,7 @@ import deepEqual from 'deep-equal';
 FIELD.ACTION = {
   ADD_DATA: 'addData',
   DOWNLOAD: 'download',
+  UPLOAD: 'upload',
   REMOVE_DATA: 'removeData',
   POPUP_DELAY: 'popupDelay',
   POPUP_OPEN: 'popupOpen',
@@ -383,8 +383,34 @@ export function withUISetup (formConfig) {
         FIELD.FUNC[FIELD.ACTION.DOWNLOAD] = (...args) => {
           // The first argument can be Button Event
           if (typeof args[0] === 'object') args.shift()
-          // noinspection JSCheckFunctionSignatures
-          downloadFile(...args).catch(err => this.popupAlert(err, _.DOWNLOAD_FAILED_))
+          const [fileName] = args
+          const { downloadFile } = this.getAPICalls();
+          if (typeof downloadFile !== 'function') {
+            return false;
+          }
+          downloadFile(fileName).catch(err => this.popupAlert(err, _.DOWNLOAD_FAILED_))
+        }
+        // File upload
+        FIELD.FUNC[FIELD.ACTION.UPLOAD] = async (files, path, dropzoneRef) => {
+          const { uploadFile } = this.getAPICalls()
+          const [file] = files
+          if (file && typeof uploadFile === 'function') {
+            const data = this.getAllFormsData();
+            delete data[path];
+            try {
+              const response = await uploadFile(JSON.stringify(data), file)
+              // clear input value
+              dropzoneRef.fileInputEl.value = null
+              this.setState({
+                data: {
+                  json: response
+                }
+              })
+            } catch (error) {
+              console.error(error)
+            }
+
+          }
         }
         // Add current Form values to parent UI Render instance.state
         FIELD.FUNC[FIELD.ACTION.ADD_DATA] = (parent && form)

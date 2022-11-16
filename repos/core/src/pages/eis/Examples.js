@@ -42,7 +42,11 @@ import uploadMeta from './examples/upload_meta'
 import UIRender from './rules'
 
 import { LocalizationUtils } from '@eisgroup/common'
-import { updateExperienceData } from '../../../../web/api/gdn-rating-alg'
+import {
+  updateExperienceData,
+  downloadHistoricalFileTemplate,
+  uploadHistoricalFile
+} from '../../../../web/api/gdn-rating-alg'
 
 const t = LocalizationUtils.translate
 
@@ -270,7 +274,9 @@ export default class Examples extends Component {
                       getValidationErrors={this.showValidationErrors}
                       translate={t}
                       apiCalls={{
-                        updateExperienceData
+                        updateExperienceData,
+                        downloadFile: downloadHistoricalFileTemplate,
+                        uploadFile: uploadHistoricalFile
                       }}
                     />
                     <View className="app__examples bg-white border">

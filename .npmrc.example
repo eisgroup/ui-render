@@ -6,7 +6,7 @@
 #   echo -n "<your AD login>:<your AD password>" | base64
 #
 
-registry=<PATH_TO_LOCAL_NPM_REGISTRY>
+<REGISTRY_SCOPE>:registry=<PATH_TO_LOCAL_NPM_REGISTRY>
 email=<DOMAIN_NAME>@eisgroup.com
 always-auth=true
 _auth=<GENERATED_TOKEN>

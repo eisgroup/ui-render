@@ -595,7 +595,7 @@
                     }
                   ],
                   "onClick": {
-                    "name": "applyPeriod"
+                    "name": "onApplyPeriods"
                   },
                   "disabled": false
                 }
@@ -748,7 +748,7 @@
                   "onClick": {
                     "name": "download",
                     "args": [
-                      "https://dxp-gateway-nightly.genci0.eisgroup.com/backoffice-rating-dn-master/v1/files/historical-data-template.csv"
+                      "historical-data-template.csv"
                     ]
                   },
                   "disabled": false
@@ -760,7 +760,7 @@
                     {
                       "@class": "org.openl.generated.beans.File",
                       "view": "Input",
-                      "name": "path.to.file",
+                      "name": "file",
                       "type": "file",
                       "title": "Upload CSV File",
                       "className": "button margin-right",
@@ -769,7 +769,7 @@
                       ],
                       "multiple": false,
                       "maxSize": 16777216,
-                      "autoSubmit": true,
+                      "autoSubmit": false,
                       "showTypes": false,
                       "items": [
                         {
@@ -784,7 +784,8 @@
                           "label": "Upload File"
                         }
                       ],
-                      "disabled": false
+                      "disabled": false,
+                      "onChange": "upload"
                     }
                   ]
                 }
