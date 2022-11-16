@@ -344,4 +344,11 @@ localiseTranslation({
   //   [l.ENGLISH]: 'Show hours',
   //   // [l.RUSSIAN]: 'Показать часы',
   // },
+
+  DOWNLOAD_FAILED_: {
+    [l.ENGLISH]: 'Download Failed!',
+  },
+  REQUEST_FAILED_FOR_url: {
+    [l.ENGLISH]: 'Request failed for {url}',
+  },
 })

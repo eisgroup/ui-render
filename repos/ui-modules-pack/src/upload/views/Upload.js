@@ -132,7 +132,7 @@ export default class Upload extends PureComponent {
         })
       }
       actions.upload(acceptedFiles, this.fileType)
-      isFunction(onChange) && onChange(acceptedFiles, name)
+      isFunction(onChange) && onChange(acceptedFiles, name, this.dropzone)
     } else {
       actions.popup({
         title: _.FILE_UPLOAD_FAILED,

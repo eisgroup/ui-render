@@ -29,6 +29,7 @@
 />
 ```
 - Added `apiCalls` property for UI-Render component and `onApplyPeriods` listener for `Button` component. If `apiCalls` contain `updateExperienceData` method, it will be calls on click button with `onApplyPeriods` listener
+- Added `downloadFile` and `uploadFile` methods into `apiCalls` property. They accept api calls to process 'download' and 'upload' events on fields
 
 ###  Fixes
 - Add TS annotation for  `getValidationErrors` listener
