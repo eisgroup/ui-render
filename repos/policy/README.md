@@ -7,6 +7,7 @@ Below manual hacks are required for Genesis UI Integration, because their UI:
 - cannot bundle pure js packages that use ES6 (like `module-pack`, `ui-react-pack`, `utils-pack`, `validator`...).
 
 ## Hack Steps
+0. Pre-Build: Run `yarn start` to generate `css` files in `public/static` directory
 1. Compile CSS with `yarn build`
 
 2. Rename `.css` extensions in `public/static/semantic.css` and `public/static/all.css` to `.less`
