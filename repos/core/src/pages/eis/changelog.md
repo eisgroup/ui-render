@@ -1,6 +1,6 @@
 ### Table of Contents
 
-### vX.XX.X
+### v0.28.0
 #### New
 - Select reorders options in Data object and invokes onDataChanged callback
 - Added `translate` property which accept localization function
@@ -32,7 +32,7 @@
 - Added `downloadFile` and `uploadFile` methods into `apiCalls` property. They accept api calls to process 'download' and 'upload' events on fields
 
 ###  Fixes
-- Add TS annotation for  `getValidationErrors` listener
+- Add TS annotation for `getValidationErrors` listener
 
 ### v0.27.2
 #### Fixes
