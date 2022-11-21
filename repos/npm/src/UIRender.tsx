@@ -18,6 +18,8 @@ interface Props {
     methods?: Record<string, Function>
     apiCalls?: {
         updateExperienceRating: Promise<any>
+        downloadFile: Promise<any>
+        uploadFile: Promise<any>
     }
 
     // Optional
