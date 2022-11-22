@@ -719,7 +719,7 @@
                 {
                   "@class": "org.openl.generated.beans.Select",
                   "view": "Select",
-                  "name": "periodBasisForSelection",
+                  "name": "periodBasisSelection",
                   "options": {
                     "name": "periodBasis"
                   },
@@ -883,7 +883,7 @@
               ],
               "showIf": {
                 "relativeData": false,
-                "name": "periodBasis.{state.periodBasis,0}.periodBasisType",
+                "name": "periodBasis.{state.periodBasisSelection,0}.periodBasisType",
                 "equal": "Year"
               }
             },
@@ -944,7 +944,7 @@
               ],
               "showIf": {
                 "relativeData": false,
-                "name": "periodBasis.{state.periodBasis,0}.periodBasisType",
+                "name": "periodBasis.{state.periodBasisSelection,0}.periodBasisType",
                 "equal": "Month"
               },
               "renderItem": {
