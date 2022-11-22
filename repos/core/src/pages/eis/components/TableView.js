@@ -9,9 +9,7 @@ import Table from 'ui-react-pack/Table'
 import Text from 'ui-react-pack/Text'
 import View from 'ui-react-pack/View'
 import { by, get, hasListValue, isEqual, isEqualList, isFunction } from 'ui-utils-pack'
-// import { Column, Table } from 'react-virtualized' // adds 132 KB to final bundle.js
-// import Table, { Column } from 'react-virtualized/dist/commonjs/Table' // adds 80 KB to final bundle.js
-// import 'react-virtualized/styles.css'
+import { getDateStringFromDateObject } from '../utils'
 
 const sortObj = {
   id: PropTypes.string.isRequired, // id of the header, used for grouping columns/rows
@@ -276,6 +274,9 @@ export default class TableView extends PureComponent {
     const value = data != null ? data : cell
     let content = render ? render(value, index, {className, style, expanded: this.expandedByRow(index)}, this) : cell
     if ((content == null || content === '') && this.props.showEmptyAs != null) content = this.props.showEmptyAs
+    if (content instanceof Date) {
+      content = getDateStringFromDateObject(content)
+    }
     return (
       <Table.Cell key={this.props.vertical ? index : id} className={classNameCellWrap}>
         {typeof content === 'object'
