@@ -14,6 +14,7 @@ import { ALERT, GET, isEmpty, l, localiseTranslation, logRender, performStorage,
 import { _ } from 'ui-utils-pack/translations'
 import UIRender from './rules'
 import { LocalizationUtils } from '@eisgroup/common'
+import { downloadHistoricalFileTemplate, updateExperienceData, uploadHistoricalFile } from 'web/api/gdn-rating-alg'
 
 const translate = LocalizationUtils.translate
 
@@ -144,6 +145,11 @@ export default class Demo extends Component {
           translate={translate}
           key={lang}
           onSubmit={console.warn}
+          apiCalls={{
+            updateExperienceData,
+            downloadFile: downloadHistoricalFileTemplate,
+            uploadFile: uploadHistoricalFile
+          }}
         />
       </>
     )
