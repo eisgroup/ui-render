@@ -3,13 +3,16 @@
   "name": "no_data_exists",
   "headers": [
     {
-      "id": "tier"
+      "id": "tier",
+      "label": "Tier"
     },
     {
-      "id": "formulaRate"
+      "id": "formulaRate",
+      "label": "Formula Rate"
     },
     {
-      "id": "proposedRate"
+      "id": "proposedRate",
+      "label": "Proposed Rate"
     }
   ],
   "extraItems": [
