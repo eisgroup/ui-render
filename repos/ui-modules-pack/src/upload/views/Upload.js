@@ -26,6 +26,7 @@ import {
 import { UPLOAD } from '../constants'
 import select from '../selectors'
 import { _ } from '../translations'
+import { Active } from 'ui-utils-pack'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
@@ -89,6 +90,7 @@ export default class Upload extends PureComponent {
     loading: false,
     multiple: true,
     showTypes: true,
+    translate: Active.translate
   }
 
   state = {
