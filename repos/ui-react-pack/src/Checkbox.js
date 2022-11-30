@@ -43,6 +43,7 @@ export function Checkbox ({
   readonly,
   danger,
   className,
+  translate = Active.translate,
   float: _0, // not used
   initialValues: _1, // not used
   ...props
@@ -68,16 +69,16 @@ export function Checkbox ({
         {...props}
       />
       <Label
-        htmlFor={id} title={title}
+        htmlFor={id} title={translate(title)}
         className={classNames('flex--row middle justify', {danger})}
       >
         {type === 'toggle'
           ? <Fragment>
-            <View className="checkbox__true">{labelTrue}</View>
+            <View className="checkbox__true">{translate(labelTrue)}</View>
             <View className="checkbox__button"/>
-            <View className="checkbox__false">{labelFalse}</View>
+            <View className="checkbox__false">{translate(labelFalse)}</View>
           </Fragment>
-          : (label || id)
+          : (translate(label) || id)
         }
       </Label>
     </Row>

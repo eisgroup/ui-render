@@ -83,7 +83,7 @@ export function Input ({
     if (!placeholder) placeholder = ' ' // required for Float label CSS to work
   }
   if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
-  if (!label && title) props.title = title
+  if (!label && title) props.title = translate(title)
   const idHelp = id + '-help'
   const value = props.value != null ? props.value : props.defaultValue
   const hasValue = value || value === 0
@@ -98,7 +98,7 @@ export function Input ({
     >
       {!float &&
       <Row className="middle">
-        {!isCheckbox && label && <Label htmlFor={id} title={title}>{translate(label)}</Label>}
+        {!isCheckbox && label && <Label htmlFor={id} title={translate(title)}>{translate(label)}</Label>}
         {onRemove && !readonly &&
         <Button className="input__delete" onClick={() => onRemove(name || id)}><Icon name="delete"/></Button>}
       </Row>
@@ -136,7 +136,7 @@ export function Input ({
             ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
             : icon
         )}
-        {(float || isCheckbox) && label && <Label htmlFor={id} title={title}>{translate(label)}</Label>}
+        {(float || isCheckbox) && label && <Label htmlFor={id} title={translate(title)}>{translate(label)}</Label>}
       </Row>
       {(error || info) &&
       <View id={idHelp} className='field-help'>

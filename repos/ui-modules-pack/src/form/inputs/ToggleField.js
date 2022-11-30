@@ -36,20 +36,22 @@ export default class ToggleField extends PureComponent {
     onChange: PropTypes.func,
     id: PropTypes.string,
     danger: PropTypes.bool,
+    translate: PropTypes.func,
     // @Note: see <Checkbox> component for docs
   }
   input = ({input}) => {
     if (this.props.readonly && isRequired(input.value)) return null
-    const {onChange, label, name, instance, ...props} = this.props
+    const {onChange, label, name, instance, translate, ...props} = this.props
     return (
       <Checkbox
         type='toggle'
-        label={label || name}
+        label={translate(label) || name}
         value={input.value}
         onChange={value => {
           input.onChange(value)
           isFunction(onChange) && onChange(value, { name })
         }}
+        translate={translate}
         {...props} // allow forceful value override
       />
     )

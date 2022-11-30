@@ -82,6 +82,7 @@ export default class Upload extends PureComponent {
     label: type.String, // optional label to show in the title
     labelOnHover: type.String, // optional label to show on Dropzone hover
     children: type.Any,
+    translate: type.Method,
   }
 
   static defaultProps = {
@@ -170,7 +171,7 @@ export default class Upload extends PureComponent {
   render () {
     const {
       loading, children, multiple, disabled, readonly, onBlur, name, labelOnHover, onClose,
-      className, classWrap, hasHeader, round, showTypes, title,
+      className, classWrap, hasHeader, round, showTypes, title, translate
     } = this.props
     const label = this.props.label || this.fileType || _.FILE
     const {active} = this.state
@@ -183,7 +184,7 @@ export default class Upload extends PureComponent {
           // @note: When tabbing to dropzone with keyboard, input[type="file"] also gets event -> causing open twice.
           //      => input is hidden by dropzone because it has ugly "Choose File" button
           name={name}
-          title={title}
+          title={translate(title)}
           inputProps={inputProps}
           tabIndex={disabled ? -1 : 0}
           className={classNames('upload__dropzone', className, {active, round, disabled, readonly})}

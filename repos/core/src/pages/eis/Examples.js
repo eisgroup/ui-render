@@ -46,7 +46,7 @@ import {
   updateExperienceData,
   downloadHistoricalFileTemplate,
   uploadHistoricalFile
-} from '../../../../web/api/gdn-rating-alg'
+} from 'web/api/gdn-rating-alg'
 
 const t = LocalizationUtils.translate
 
@@ -261,7 +261,7 @@ export default class Examples extends Component {
           >
             {() => (
               <>
-                { id === 'experienceRatings' || id === 'tableForm' || id === 'ratingDetails' ? (
+                { ['experienceRatings', 'tableForm', 'ratingDetails'].includes(id) ? (
                   <>
                     <UIRender
                       data={data}

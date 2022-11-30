@@ -130,7 +130,7 @@ Render.Component = function RenderComponent ({
     }
 
     case FIELD.TYPE.CHECKBOX: {
-      return <Checkbox {...props}/>
+      return <Checkbox {...props} translate={translate} />
     }
 
     case FIELD.TYPE.EXPAND: {
@@ -172,7 +172,7 @@ Render.Component = function RenderComponent ({
 
     case FIELD.TYPE.LABEL: {
       if (items.length) props.children = items.map(Render)
-      return <Label {...props}/>
+      return <Label {...props} translate={translate}/>
     }
     //
     // case FIELD.TYPE.LINK: { // Internal router link

@@ -11,9 +11,11 @@ import React from 'react'
  */
 export function Label ({
   children,
+  translate,
   ...props
 }) {
-  return <label {...props}>{children}</label>
+  const child = (typeof children === 'string' && typeof translate === 'function') ? translate(children) : children
+  return <label {...props}>{child}</label>
 }
 
 Label.propTypes = {
