@@ -76,7 +76,9 @@ const mergeData = (formData) => {
   return result;
 }
 
-export const replaceDeep = (object, key, value) => {
+export const replaceDeep = (object, keyPath, value) => {
+  const key = keyPath.split('.').slice(-1).pop();
+
   if (Array.isArray(object)) {
     object.forEach(item => {
       replaceDeep(item, key, value)

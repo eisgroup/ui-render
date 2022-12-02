@@ -430,10 +430,10 @@ export function withUISetup (formConfig) {
             // Add directly to data.json, to keep all data patterns consistent, and to enable backend override.
             // And store a copy in state for rehydration when backend updates response without added data.
             const {data} = parent.state
-            const {dataKind = {}} = data.json
+            const {dataKind = {}} = data.json.ExperienceData
             dataKind[form.kind] = [...dataKind[form.kind] || [], this.registeredValues]
-            data.json.dataKind = dataKind
-            parent.setState({data: {...data}, dataKind}, () => {
+            data.json.ExperienceData.dataKind = dataKind
+            parent.setState({data: {...data}}, () => {
               this.form.restart()
               callOnDataChanged(this.props)
             })
@@ -442,13 +442,15 @@ export function withUISetup (formConfig) {
         // Remove current Form values from parent UI Render instance.state
         FIELD.FUNC[FIELD.ACTION.REMOVE_DATA] = (parent && form)
           ? () => {
+            console.log('parent && form', parent, form, index)
             const {data} = parent.state
-            const dataKind = {...data.json.dataKind}
+            const dataKind = {...data.json.ExperienceData.dataKind}
             const array = [...dataKind[form.kind] || []]
             array.splice(index, 1)
             dataKind[form.kind] = array
-            data.json.dataKind = dataKind
-            parent.setState({data: {...data}, dataKind})
+            data.json.ExperienceData.dataKind = dataKind
+            parent.setState({data: {...data}})
+            // console.log('{data: {...data}, dataKind}',{data: {...data}, dataKind})
             callOnDataChanged(this.props)
           }
           : dataActionWarning

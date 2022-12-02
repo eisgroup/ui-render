@@ -7,7 +7,8 @@ import { __PROD__, ENV } from 'ui-utils-pack'
 
 export * from './routes'
 
-if (__PROD__) FILE.PATH_IMAGES = `${ENV.REACT_APP_HOMEPAGE}/static/images/`
+const homePage = typeof ENV.REACT_APP_HOMEPAGE !== 'undefined' && ENV.REACT_APP_HOMEPAGE !== 'undefined' ? ENV.REACT_APP_HOMEPAGE : ''
+if (__PROD__) FILE.PATH_IMAGES = `${homePage}/static/images/`
 
 /* Platform Prefixes */
 export const SERVER = 'SERVER'

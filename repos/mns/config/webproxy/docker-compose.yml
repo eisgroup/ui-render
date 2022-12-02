@@ -1,0 +1,25 @@
+version: '3'
+# Last tested 14.02.2020 - working with nginx:1.17.8, Docker version 19.03.5, docker-compose version 1.20.1
+services:
+  nginx:
+    image: nginx
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+    container_name: nginx
+    # Note: `unless-stopped` option doesn't restart consistently on boot
+    # Enable auto-restart once all is working
+    #restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ${NGINX_FILES_PATH}/conf.d:/etc/nginx/conf.d
+      - ${NGINX_FILES_PATH}/vhost.d:/etc/nginx/vhost.d
+      - ${NGINX_FILES_PATH}/html:/usr/share/nginx/html
+      - ${NGINX_FILES_PATH}/certs:/etc/nginx/certs:ro
+      - ${WEBSITES_PATH}:/var/www:ro
+
+networks:
+  default:
+    external:
+      name: webproxy
