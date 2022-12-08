@@ -405,6 +405,8 @@ export function withUISetup (formConfig) {
                 data: {
                   json: response
                 }
+              }, () => {
+                this.form.restart(response)
               })
             } catch (error) {
               console.error(error)
