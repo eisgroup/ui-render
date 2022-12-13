@@ -1,5 +1,11 @@
 ### Table of Contents
 
+### v0.28.1
+###  Fixes
+- Format Date values in tables
+- Add localization support for button title, checkbox, toggle, label
+- Reinitialize form values on file was uploaded
+
 ### v0.28.0
 #### New
 - Select reorders options in Data object and invokes onDataChanged callback
