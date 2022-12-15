@@ -1,5 +1,11 @@
 ### Table of Contents
 
+### v0.28.2
+###  Fixes
+- Add missed icons
+- Return actual errors list through `getValidationErrors` listener
+- Do not include to error list untouched fields
+
 ### v0.28.1
 ###  Fixes
 - Format Date values in tables
