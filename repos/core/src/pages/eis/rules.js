@@ -112,7 +112,7 @@ export default class UIRender extends Component {
 
   constructor (props) {
     super(props);
-    if (typeof errorHandlerFunction !== 'function') {
+    if (typeof props.getValidationErrors === 'function') {
       errorHandlerFunction = props.getValidationErrors;
     }
     if (typeof props.translate === 'function') {
@@ -134,14 +134,6 @@ export default class UIRender extends Component {
     const update = {}
     const {data, meta} = this.props
 
-    if (typeof errorHandlerFunction === 'function'
-      && next.parent
-      && !deepEqual(next.parent.validationErrorsMap, this.state.errors)
-    ) {
-      update.errors = cloneDeep(next.parent.validationErrorsMap);
-      errorHandlerFunction(mapErrorObjectToUIFormat(update.errors))
-    }
-
     if (next.data !== data) set(update, 'data.json', next.data)
     if (next.meta !== meta) set(update, 'meta.json', next.meta)
     if (hasObjectValue(update)) this.setState(update)
@@ -162,6 +154,16 @@ export default class UIRender extends Component {
       this.onDataChanged = this.props.onDataChanged;
     } else if (this.props.parent && typeof this.props.parent.onDataChanged === 'function') {
       this.onDataChanged = this.props.parent.onDataChanged;
+    }
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    if (typeof errorHandlerFunction === 'function'
+      && !deepEqual(errorsMap, this.state.errors)
+    ) {
+      const errors = cloneDeep(errorsMap);
+      errorHandlerFunction(mapErrorObjectToUIFormat(errors))
+      this.setState({ errors })
     }
   }
 

@@ -467,13 +467,6 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
     }
   })
 
-  // Define instance getter
-  Object.defineProperty(Class.prototype, 'validationErrorsMap', {
-    get () {
-      return errorsMap
-    }
-  })
-
   Object.defineProperty(Class.prototype, 'validationErrorsTooltip', {
     get () {
       const errors = this.validationErrors
