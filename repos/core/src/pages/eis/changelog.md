@@ -4,6 +4,7 @@
 ###  Fixes
 - Add missed icons
 - Return actual errors list through `getValidationErrors` listener
+- Do not include to error list untouched fields
 
 ### v0.28.1
 ###  Fixes

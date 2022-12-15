@@ -12,7 +12,13 @@ import Render, { metaToProps } from '../../ui-render'
 import './mapper' // Set up UI Renderer components and methods
 import { _ } from './translations'
 import { notWithinRange } from './validators'
-import { replaceDeep, getFormsData, mapErrorObjectToUIFormat, getDateStringFromDateObject } from './utils'
+import {
+  replaceDeep,
+  getFormsData,
+  mapErrorObjectToUIFormat,
+  getDateStringFromDateObject,
+  errorsProcessing
+} from './utils'
 import deepEqual from 'deep-equal';
 
 /**
@@ -87,7 +93,7 @@ let errorHandlerFunction = undefined;
  * @example:
  *    <UIRender data={data} meta={meta} initialValues={data} onSubmit={this.submit}/>
  */
-@withUISetup({subscription: {pristine: true, valid: true, values: true}})
+@withUISetup({subscription: {pristine: true, valid: true, values: true, touched: true}})
 @logRender
 export default class UIRender extends Component {
   static propTypes = {
@@ -157,7 +163,8 @@ export default class UIRender extends Component {
     }
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate () {
+    errorsProcessing(this.form, this.props.meta)
     if (typeof errorHandlerFunction === 'function'
       && !deepEqual(errorsMap, this.state.errors)
     ) {

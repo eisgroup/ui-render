@@ -118,11 +118,13 @@ export function errorsProcessing(form, meta) {
   }
 
   const registeredFieldNames = form.getRegisteredFields()
-  if (!registeredFieldNames.length) return;
+  if (!registeredFieldNames.length) {
+    return;
+  }
 
   registeredFieldNames.forEach(field => {
-    const { name, error } = form.getFieldState(field);
-    if (error) {
+    const { name, error, touched } = form.getFieldState(field);
+    if (error && touched) {
       let errorText = error;
       if (errorText === 'Required') {
         errorText = convertFieldNameToTitleCaseText(name) + ' is Required'
