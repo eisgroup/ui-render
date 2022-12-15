@@ -1,6 +1,6 @@
 ### Table of Contents
 
-### vX.XX.X
+### v0.28.2
 ###  Fixes
 - Add missed icons
 - Return actual errors list through `getValidationErrors` listener
