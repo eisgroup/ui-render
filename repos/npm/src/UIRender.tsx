@@ -17,9 +17,9 @@ interface Props {
     getValidationErrors?(errors: object): void
     methods?: Record<string, Function>
     apiCalls?: {
-        updateExperienceRating: Promise<any>
-        downloadFile: Promise<any>
-        uploadFile: Promise<any>
+        updateExperienceData?: (data: any) => Promise<any>
+        downloadFile?: (fileName: string) => Promise<any>
+        uploadFile?: (data: string, file: Blob) => Promise<any>
     }
 
     // Optional
