@@ -164,7 +164,10 @@ export default class UIRender extends Component {
   }
 
   componentDidUpdate () {
-    errorsProcessing(this.form, this.props.meta)
+    if (this.props.meta) {
+      errorsProcessing(this.form, this.props.meta)
+    }
+
     if (typeof errorHandlerFunction === 'function'
       && !deepEqual(errorsMap, this.state.errors)
     ) {
