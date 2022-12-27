@@ -4,6 +4,7 @@
 ### New
 - Added `no-header` style for tables. Ability to not display table header
 - Added `highlight-1-last`, `highlight-2-last`, `highlight-3-last` styles to highlight up to 3 last table rows
+- Added `width-25p`, `width-50p`, `width-75p` styles. Content takes 25%, 50%, 75% of width
 ### Fixes
 - Fixed runtime error then data.json provided without meta.json 
 
