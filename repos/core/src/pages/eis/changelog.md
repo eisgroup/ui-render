@@ -2,7 +2,8 @@
 
 ### vX.XX.X
 ### New
-- Added 'no-header' style for tables. Ability to not display table header
+- Added `no-header` style for tables. Ability to not display table header
+- Added `highlight-1-last`, `highlight-2-last`, `highlight-3-last` styles to highlight up to 3 last table rows
 ### Fixes
 - Fixed runtime error then data.json provided without meta.json 
 

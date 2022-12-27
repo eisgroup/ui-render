@@ -66,6 +66,13 @@ table {
       display: none;
     }
   }
+
+  &.highlight-1-last tbody > tr:last-child,
+  &.highlight-2-last tbody > tr:nth-last-child(-n+2),
+  &.highlight-3-last tbody > tr:nth-last-child(-n+3) {
+    background-color: @color-table-lightest;
+    font-weight: 500!important;
+  }
 }
 
 table:not(.as-layout) {

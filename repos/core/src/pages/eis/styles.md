@@ -98,5 +98,8 @@ Below you can find the list of commonly used CSS styles.
 - **max-height** - component takes maximum 100% height (to stay within the boundaries of the parent container)
 - **max-size** - component takes maximum 100% width and height (to stay within the boundaries of the parent container)
 
-## Display
+## Table
 - **no-header** - table style. Do not display header
+- **highlight-1-last** highlight 1 last table row
+- **highlight-2-last** highlight 2 last table rows
+- **highlight-3-last** highlight 3 last table rows
