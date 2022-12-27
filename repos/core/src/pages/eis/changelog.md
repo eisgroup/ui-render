@@ -1,5 +1,11 @@
 ### Table of Contents
 
+### vX.XX.X
+### New
+- Added 'no-header' style for tables. Ability to not display table header
+### Fixes
+- Fixed runtime error then data.json provided without meta.json 
+
 ### v0.28.2
 ###  Fixes
 - Add missed icons

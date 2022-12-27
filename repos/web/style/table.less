@@ -57,6 +57,15 @@ table {
   th {
     &:extend(.bold);
   }
+
+  &.no-header {
+    &.vertical > tbody > tr > th {
+      display: none;
+    }
+    > thead {
+      display: none;
+    }
+  }
 }
 
 table:not(.as-layout) {
