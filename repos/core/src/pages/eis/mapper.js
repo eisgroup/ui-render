@@ -497,6 +497,13 @@ Render.Method = function RenderMethod (Name) {
       )
     case FIELD.RENDER.TITLE_n_INPUT:
       return (val, index, {id, ...props} = {}) => <Row {...props}><Text>{val}</Text></Row>
+    case FIELD.RENDER.STRING:
+      return (val, index, {_data, meta = {}}) => {
+        if (meta.label !== undefined && meta.label === _data) {
+          return <Text>{''}</Text>
+        }
+        return <Text>{val}</Text>
+      }
     default:
       return (val) => <Text>{val}</Text>
   }

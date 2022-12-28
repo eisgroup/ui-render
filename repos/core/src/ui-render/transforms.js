@@ -123,7 +123,7 @@ export function metaToProps (meta, config) {
                 else if (definition.name) {
                     const func = getFunctionFromObject(definition, {...funcConfig, data})
                     // @ts-ignore
-                    return isFunction(func) ? func.apply(this, [value, index, {...props, ...definition, data, _data}])
+                    return isFunction(func) ? func.apply(this, [value, index, {...props, ...definition, data, _data, meta}])
                       : func
                 }
 
