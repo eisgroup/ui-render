@@ -80,7 +80,7 @@ export class UIRender extends Component<Props, any> {
 
     render() {
         const {className, style} = this.props
-        return <div id={this.id} data-version='0.28.2' className={`${UI_RENDER} ${className || ''}`} style={style}/>
+        return <div id={this.id} data-version='0.28.3' className={`${UI_RENDER} ${className || ''}`} style={style}/>
     }
 }
 
