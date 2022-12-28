@@ -41,6 +41,7 @@ Example: `{style: {color: "rgba(255, 255, 255, 0.30)", backgroundColor: "red"}}`
 
 ## How to conditionally render Text/Title for `null` or empty value?
 If you want to leave the field empty when its value is `null` or `undefined`, add attribute `{"renderLabel": "Float"}` or `{"renderLabel": "Title+Input"}`.
+If no value is provided for label at all, use `{"renderLabel": "String"}`
 
 ## How to format `extraItems` in Table?
 ```js
