@@ -17,7 +17,7 @@ import {
   getFormsData,
   mapErrorObjectToUIFormat,
   getDateStringFromDateObject,
-  errorsProcessing
+  errorsProcessing, normalizeIncomingData
 } from './utils'
 import deepEqual from 'deep-equal';
 
@@ -411,19 +411,18 @@ export function withUISetup (formConfig) {
             delete data[path];
             try {
               const response = await uploadFile(JSON.stringify(data), file)
-              // clear input value
+              const normalizedResponse = normalizeIncomingData(response)
               dropzoneRef.fileInputEl.value = null
               this.setState({
                 data: {
-                  json: response
+                  json: normalizedResponse
                 }
               }, () => {
-                this.form.restart(response)
+                this.form.restart(normalizedResponse)
               })
             } catch (error) {
               console.error(error)
             }
-
           }
         }
         // Add current Form values to parent UI Render instance.state
@@ -490,7 +489,7 @@ export function withUISetup (formConfig) {
             const response = await updateExperienceData(data);
             this.setState({
               data: {
-                json: response
+                json: normalizeIncomingData(response)
               }
             })
           } catch (error) {

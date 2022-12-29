@@ -234,3 +234,27 @@ export const getDateStringFromDateObject = (date) => {
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
+export const normalizeIncomingData = (data) => {
+  if (typeof data === 'string' || typeof data === 'number') {
+    return data
+  }
+
+  if (data instanceof Date) {
+    return getDateStringFromDateObject(data);
+  }
+
+  if (Array.isArray(data)) {
+    return data.map(item => normalizeIncomingData(item))
+  }
+
+  if (Object.keys(data).length) {
+    const nextData = {};
+    Object.keys(data).forEach(key => {
+      nextData[key] = normalizeIncomingData(data[key])
+    })
+    return nextData;
+  }
+
+  return data;
+}
