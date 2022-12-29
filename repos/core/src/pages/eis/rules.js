@@ -36,6 +36,7 @@ FIELD.ACTION = {
   POPUP_OPEN: 'popupOpen',
   SUBMIT: 'submit',
   UPDATE_DATA_ON_CHANGE: 'updateDataOnChange',
+  ON_APPLY_PERIODS : 'onApplyPeriods',
 }
 FIELD.TYPE = {
   AUTO_SUBMIT: 'AutoSubmit',
@@ -479,18 +480,21 @@ export function withUISetup (formConfig) {
           }
         }
 
-        FIELD.FUNC['onApplyPeriods'] = async () => {
+        FIELD.FUNC[FIELD.ACTION.ON_APPLY_PERIODS] = async () => {
           const { updateExperienceData } = this.getAPICalls();
           if (typeof updateExperienceData !== 'function') {
             return false;
           }
           const data = this.getAllFormsData();
           try {
-            const response = await updateExperienceData(data);
+            const response = await updateExperienceData(data)
+            const normalizedResponse = normalizeIncomingData(response)
             this.setState({
               data: {
-                json: normalizeIncomingData(response)
+                json: normalizedResponse
               }
+            }, () => {
+              this.form.restart(normalizedResponse)
             })
           } catch (error) {
             console.error(error)
