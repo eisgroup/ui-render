@@ -1,5 +1,10 @@
 ### Table of Contents
 
+### v0.28.4
+### Fixes
+- Normalize incoming data
+- Restart forms with correct data on response
+
 ### v0.28.3
 ### New
 - Added `no-header` style for tables. Ability to not display table header
