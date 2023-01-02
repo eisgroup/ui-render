@@ -157,7 +157,9 @@ export function metaToProps (meta, config) {
                   : definition.name
                 // Leave this to help users debug unresolved values
                 if (meta[attribute] === definition.name && isString(definition.name) && isNaN(+definition.name)) {
-                    if (_data === undefined) {
+                    // meta.view is equal to undefined in case of table headers (in some cases)
+                    // in other cases no need to display label name
+                    if (meta.view !== undefined) {
                         meta[attribute] = "";
                     }
                     console.warn(`${meta.view}.${attribute}`, definition, '\n❌ Not found! relative _data:', _data)
