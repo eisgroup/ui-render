@@ -236,6 +236,10 @@ export const getDateStringFromDateObject = (date) => {
 }
 
 export const normalizeIncomingData = (data) => {
+  if (!data) {
+    return data
+  }
+
   if (typeof data === 'string' || typeof data === 'number') {
     return data
   }
