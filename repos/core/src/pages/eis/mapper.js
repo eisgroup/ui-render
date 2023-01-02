@@ -501,6 +501,12 @@ Render.Method = function RenderMethod (Name) {
       return (val) => {
         return <Text>{val}</Text>
       }
+    case FIELD.RENDER.DATE: {
+      return (val) => {
+        const date = (new Intl.DateTimeFormat()).format(new Date(val))
+        return <Text>{date}</Text>
+      }
+    }
     default:
       return (val) => <Text>{val}</Text>
   }

@@ -17,7 +17,8 @@ import {
   getFormsData,
   mapErrorObjectToUIFormat,
   getDateStringFromDateObject,
-  errorsProcessing, normalizeIncomingData
+  errorsProcessing,
+  normalizeIncomingData
 } from './utils'
 import deepEqual from 'deep-equal';
 
@@ -129,7 +130,7 @@ export default class UIRender extends Component {
 
   state = {
     data: {
-      json: this.props.data
+      json: normalizeIncomingData(this.props.data)
     },
     meta: {
       json: this.props.meta
@@ -141,7 +142,7 @@ export default class UIRender extends Component {
     const update = {}
     const {data, meta} = this.props
 
-    if (next.data !== data) set(update, 'data.json', next.data)
+    if (next.data !== data) set(update, 'data.json', normalizeIncomingData(next.data))
     if (next.meta !== meta) set(update, 'meta.json', next.meta)
     if (hasObjectValue(update)) this.setState(update)
   }

@@ -60,7 +60,8 @@ FIELD.RENDER = {
   DOUBLE5: 'Double5',
   FLOAT: 'Float',
   TITLE_n_INPUT: 'Title+Input',
-  STRING: 'String'
+  STRING: 'String',
+  DATE: 'Date'
 }
 
 // Action Type Definitions
