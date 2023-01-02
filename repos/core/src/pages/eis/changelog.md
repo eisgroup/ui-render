@@ -1,5 +1,10 @@
 ### Table of Contents
 
+### v0.28.5
+### Fixes
+- Avoid render field name on value is not provided
+- Added Date type in renderLabel method
+
 ### v0.28.4
 ### Fixes
 - Normalize incoming data
