@@ -123,7 +123,7 @@ export function metaToProps (meta, config) {
                 else if (definition.name) {
                     const func = getFunctionFromObject(definition, {...funcConfig, data})
                     // @ts-ignore
-                    return isFunction(func) ? func.apply(this, [value, index, {...props, ...definition, data, _data, meta}])
+                    return isFunction(func) ? func.apply(this, [value, index, {...props, ...definition, data, _data}])
                       : func
                 }
 
@@ -156,8 +156,10 @@ export function metaToProps (meta, config) {
                   ? get((definition.relativeData !== false && _data) || data, definition.name, definition.name)
                   : definition.name
                 // Leave this to help users debug unresolved values
-                if (meta[attribute] === definition.name && isString(definition.name) && isNaN(+definition.name))
-                    console.warn(`${meta.view}.${attribute}`, definition, '\n❌Not found! relative _data:', _data)
+                if (meta[attribute] === definition.name && isString(definition.name) && isNaN(+definition.name)) {
+                    meta[attribute] = "";
+                    console.warn(`${meta.view}.${attribute}`, definition, '\n❌ Not found! relative _data:', _data)
+                }
             } else {
                 // Recursively process the rest of definitions
                 // Relative path must always be passed down, because nested Inputs inside List require absolute path for `name`
