@@ -2,8 +2,6 @@ import { ROUTE } from '../common/variables'
 import Docs from './eis/docs'
 import PolicyPage from './eis/Policy'
 import Tester from './eis/Tester'
-// import Tester from './tester'
-// import Theme from './theme'
 
 /**
  * EXPORTS =====================================================================
@@ -21,6 +19,4 @@ export default {
   [ROUTE.DOCS]: Docs,
   [ROUTE.TEST]: Tester,
   [ROUTE.TEST_POLICY]: PolicyPage,
-  // [ROUTE.TESTER]: Tester,
-  // [ROUTE.THEME]: Theme,
 }

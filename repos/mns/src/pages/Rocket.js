@@ -2,13 +2,12 @@ import UIRender from 'core/src/pages/eis/rules'
 import { fetch } from 'ui-modules-pack/api'
 import React, { PureComponent } from 'react'
 import { cloneDeep, SUCCESS, warn } from 'ui-utils-pack'
-import initialData from '../examples/rocket_data'
-import meta from '../examples/rocket_meta'
+import initialData from '../examples/rocket/rocket_data'
+import meta from '../examples/rocket/rocket_meta'
 import { downloadHistoricalFileTemplate, updateExperienceData, uploadHistoricalFile } from 'web/api/gdn-rating-alg'
-import response from '../examples/rocket_response_mocked'
+import response from '../examples/rocket/rocket_response_mocked'
 
 const body = cloneDeep(initialData)
-
 
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------

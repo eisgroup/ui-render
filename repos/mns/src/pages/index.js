@@ -1,7 +1,9 @@
 import pages from 'core/src/pages'
 import { ROUTE } from 'ui-modules-pack/variables'
-import Rocket from './Rocket'
 import Dashboard from './Dashboard'
+import Earth from './Earth'
+import Rocket from './Rocket'
 
 pages[ROUTE.HOME] = Dashboard
+pages[ROUTE.EARTH] = Earth
 pages[ROUTE.ROCKET] = Rocket

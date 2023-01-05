@@ -95,6 +95,7 @@ export const replaceDeep = (object, keyPath, value) => {
 };
 
 function getKeyAndPathFromMetaData(meta) {
+  console.log(meta)
   const { relativeIndex, relativePath } = meta;
   let path = '';
   let key = 'master';

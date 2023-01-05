@@ -3,6 +3,7 @@ import { createNestedRoutes, ROUTE, ROUTES } from 'ui-modules-pack/variables'
 
 const _ROUTE = {
   DOCS: `${ROUTE_BASE}docs`,
+  EARTH: `${ROUTE_BASE}earth`,
   ROCKET: `${ROUTE_BASE}rocket`,
 }
 Object.assign(ROUTE, _ROUTE)
