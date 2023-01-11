@@ -1,6 +1,6 @@
 import { merge, isObject } from 'ui-utils-pack/object'
 import { errorsMap } from './rules'
-import { FIELD } from 'ui-modules-pack'
+import { FIELD, ISO_8601_FULL } from 'ui-modules-pack'
 import { cloneDeep } from 'ui-utils-pack'
 
 export const getFormsData = (forms) => {
@@ -240,7 +240,17 @@ export const normalizeIncomingData = (data) => {
     return data
   }
 
-  if (typeof data === 'string' || typeof data === 'number') {
+  if (typeof data === 'string') {
+    if (ISO_8601_FULL.test(data)) {
+      const date = new Date(data)
+      // based on previous solution from Normalize function
+      return date.split('T')[0]
+    }
+
+    return data
+  }
+
+  if (typeof data === 'number') {
     return data
   }
 
