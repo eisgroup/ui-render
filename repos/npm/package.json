@@ -1,6 +1,6 @@
 {
   "name": "eis-ui-render",
-  "version": "0.28.5",
+  "version": "0.28.6",
   "description": "UI Render for EIS Integration",
   "homepage": ".",
   "sideEffects": false,
