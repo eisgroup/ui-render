@@ -1,5 +1,12 @@
 ### Table of Contents
 
+### v0.28.6
+### Fixes
+- Normalize date values to prevent errors
+- Fixed adding and deleting rows in tables
+- Fixed styles of modals
+- Change file processing flow to support integration with other apps
+
 ### v0.28.5
 ### Fixes
 - Avoid render field name on value is not provided
