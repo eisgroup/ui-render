@@ -242,9 +242,8 @@ export const normalizeIncomingData = (data) => {
 
   if (typeof data === 'string') {
     if (ISO_8601_FULL.test(data)) {
-      const date = new Date(data)
       // based on previous solution from Normalize function
-      return date.split('T')[0]
+      return data.split('T')[0]
     }
 
     return data

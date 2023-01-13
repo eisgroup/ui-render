@@ -1,8 +1,11 @@
 ### Table of Contents
 
-### v0.28.6
+### v0.28.7
 ### Fixes
 - Normalize date values to prevent errors
+
+### v0.28.6
+### Fixes
 - Fixed adding and deleting rows in tables
 - Fixed styles of modals
 - Change file processing flow to support integration with other apps
