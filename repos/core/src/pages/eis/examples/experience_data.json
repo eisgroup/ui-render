@@ -25,6 +25,13 @@
         "endDate": "2020-12-30",
         "weight": 0.3,
         "numberOfMonths": 12
+      },
+      {
+        "periodName": "2st Period",
+        "startDate": "2019-01-01",
+        "endDate": "2019-12-30",
+        "weight": 0.1,
+        "numberOfMonths": 12
       }
     ]
   },

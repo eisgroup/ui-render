@@ -148,12 +148,6 @@ export default class UIRender extends Component {
   }
 
   componentDidMount () {
-    // initialValues should be immutable, so we use it as Key
-    formsStorage.set(this.form.getState().initialValues, {
-      meta: this.meta,
-      form: this.form
-    });
-
     if (typeof this.props.getFormData === 'function') {
       this.props.getFormData(this.getAllFormsData)
     }
@@ -177,10 +171,6 @@ export default class UIRender extends Component {
       errorHandlerFunction(mapErrorObjectToUIFormat(errors))
       this.setState({ errors })
     }
-  }
-
-  componentWillUnmount () {
-    formsStorage.delete(this.form.getState().initialValues);
   }
 
   getAllFormsData = () => {

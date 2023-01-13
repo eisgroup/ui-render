@@ -13,7 +13,7 @@ import { Active, debounce, isEqualJSON, toJSON, warn } from 'ui-utils-pack'
 import { hasObjectValue, objChanges, set } from 'ui-utils-pack/object'
 import { _ } from 'ui-utils-pack/translations'
 import { clearErrorsMap, errorsProcessing } from 'core/src/pages/eis/utils'
-import { errorsMap } from 'core/src/pages/eis/rules'
+import { formsStorage } from 'core/src/pages/eis/rules'
 
 /**
  * STATE SELECTORS =============================================================
@@ -318,6 +318,8 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         return this._initValues || (this._initValues = this.props.initialValues)
       }
 
+      prevInitialValues = null;
+
       // @see: https://final-form.org/docs/react-final-form/types/FormProps
       // Form only calls `render` function when `subscription` changes, or itself rerenders.
       // `formState` can remain unchanged, even if `initialValues` changed.
@@ -336,15 +338,36 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         return <Class {...this._props} formProps={this._formProps} initialValues={this._initValues} instance={this}/>
       }
 
+      componentDidMount () {
+        const { meta, initialValues } = this.props
+        this.prevInitialValues = {...initialValues}
+        formsStorage.set(this.prevInitialValues, {
+          meta: meta,
+          form: this.form
+        });
+      }
+
       UNSAFE_componentWillReceiveProps (next, nextContext) {
-        const {initialValues} = next
+        const {initialValues, meta} = next
         // Only assign `initialValues` when it truly changes
         if (this._initValues !== initialValues && !isEqualJSON(this._initValues, initialValues)) {
+          formsStorage.delete(this.prevInitialValues)
           this._initValues = initialValues
+          this.prevInitialValues = {...initialValues}
           // explicitly reset to new values when entries change,
           // because final-form only resets to the very first initialValues.
-          if (this.form) this.form.reset(this._initValues)
+          if (this.form) {
+            this.form.reset(this._initValues)
+            formsStorage.set(this.prevInitialValues, {
+              meta: meta,
+              form: this.form
+            });
+          }
         }
+      }
+
+      componentWillUnmount () {
+        formsStorage.delete(this.prevInitialValues)
       }
 
       render () {

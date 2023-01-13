@@ -13,7 +13,7 @@ axiosInstance.interceptors.response.use(response => {
   const { response: { data = '' } = {} } = error
   const { message: axiosErrorMessage } = error
   if (data && data.message) {
-    errorMessage = data.message
+    errorMessage = processErrorMessage(data.message)
   } else {
     errorMessage = axiosErrorMessage || error
   }
@@ -22,3 +22,11 @@ axiosInstance.interceptors.response.use(response => {
 })
 
 export default axiosInstance;
+
+const processErrorMessage = (error) => {
+  if (typeof error === 'string' && error.startsWith('Error')) {
+    return error.match(/message\=(.*)errors/)[1] || error
+  }
+
+  return error;
+}
