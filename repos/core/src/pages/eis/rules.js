@@ -21,6 +21,7 @@ import {
   normalizeIncomingData
 } from './utils'
 import deepEqual from 'deep-equal';
+import { downloadFile as downloadFileProcessing } from 'web/services/downloadFile'
 
 /**
  * BUSINESS RULES ==============================================================
@@ -392,7 +393,10 @@ export function withUISetup (formConfig) {
           if (typeof downloadFile !== 'function') {
             return false;
           }
-          downloadFile(fileName).catch(err => this.popupAlert(err, _.DOWNLOAD_FAILED_))
+          downloadFile(fileName)
+            .then(response => response.blob())
+            .then(downloadFileProcessing(fileName))
+            .catch(err => this.popupAlert(err, _.DOWNLOAD_FAILED_))
         }
         // File upload
         FIELD.FUNC[FIELD.ACTION.UPLOAD] = async (files, path, dropzoneRef) => {
@@ -488,6 +492,8 @@ export function withUISetup (formConfig) {
               this.form.restart(normalizedResponse)
             })
           } catch (error) {
+            console.log('errors')
+            this.popupAlert(error, 'Error')
             console.error(error)
           }
         }
