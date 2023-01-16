@@ -10,6 +10,7 @@ import Text from 'ui-react-pack/Text'
 import View from 'ui-react-pack/View'
 import { by, get, hasListValue, isEqual, isEqualList, isFunction } from 'ui-utils-pack'
 import { getDateStringFromDateObject } from '../utils'
+import TableColGroup from './TableColGroup'
 
 const sortObj = {
   id: PropTypes.string.isRequired, // id of the header, used for grouping columns/rows
@@ -67,7 +68,12 @@ export default class TableView extends PureComponent {
     ),
     vertical: PropTypes.bool, // whether to render rows as columns (first column as Header)
     // ...other Table props
-    translate: PropTypes.func
+    translate: PropTypes.func,
+    colGroup: PropTypes.arrayOf(
+      PropTypes.shape({
+        styles: PropTypes.object
+      })
+    )
   }
 
   state = {
@@ -292,7 +298,7 @@ export default class TableView extends PureComponent {
     const headers = this.headers
     if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
     const {
-      fill, className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical,
+      fill, className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical, colGroup,
       items: _, headers: _2, renderItem: _3, renderItemCells: _4, itemClassNames: _5, itemsExpanded: _6, translate: _7,
       ...props
     } = this.props
@@ -300,6 +306,7 @@ export default class TableView extends PureComponent {
     return (
       <ScrollView row classNameInner="fill-width" fill={fill}>
         <Table className={cn('full-width', className, {vertical})} {...props}>
+          {colGroup && <TableColGroup colGroup={colGroup} />}
           <Table.Header className="font-normal">
             {extraHeaders && extraHeaders.map((row, i) => (
               <Table.Row key={i}>{row.map(this.renderHeader)}</Table.Row>

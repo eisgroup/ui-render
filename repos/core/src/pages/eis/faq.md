@@ -1,54 +1,73 @@
 ### Table of Contents
 
 ## How to check UI Render version?
+
 1. In Chrome browser on your desktop computer (laptop), right click anywhere inside UI Render
 2. Choose "Inspect"
    ![ui-render-inspect](/ui-render/static/images/ui-render-inspect.png)
 3. Under `Elements` tab, search (press Ctrl + F for Windows, or Cmd + F for Mac) and type `ui-render`.
    ![ui-render-version](/ui-render/static/images/ui-render-version.png)
-The UI Render version is `data-version` from `<div class="ui-render"...` or `<html..`.
-   
+   The UI Render version is `data-version` from `<div class="ui-render"...` or `<html..`.
+
 ## What is `view`?
+
 `view` is equivalent to field ID - used for identifying which UI component to use for rendering.
 
-The reason it is not called `id` is because in HTML, `id` attribute is used for uniquely identifying an element on a page.
+The reason it is not called `id` is because in HTML, `id` attribute is used for uniquely identifying an element on a
+page.
 
 ## What is `render`?
-Field attributes starting with the word `render...` are used as function or field definition for displaying certain parts of a UI component. For example, in `Table` view, there is `renderCell` attribute used for customizing how value in each cell should be displayed (e.x. `renderCell: "Currency"` will render float numbers as currency with dollar sign, keeping a maximum of two decimal points).
+
+Field attributes starting with the word `render...` are used as function or field definition for displaying certain
+parts of a UI component. For example, in `Table` view, there is `renderCell` attribute used for customizing how value in
+each cell should be displayed (e.x. `renderCell: "Currency"` will render float numbers as currency with dollar sign,
+keeping a maximum of two decimal points).
 
 ## What is `children`?
+
 `children` is nested content to render inside a field, it can be any data type (string/number/function).
 
-`children` and `items` are almost aliases, the difference being that `items` is a list of nested components, while `children` is a single nested component, or a `string/number` value.
+`children` and `items` are almost aliases, the difference being that `items` is a list of nested components,
+while `children` is a single nested component, or a `string/number` value.
 
-`children` is primarily used for rendering custom content inside a field without having to fully declare them as nested UI components.
+`children` is primarily used for rendering custom content inside a field without having to fully declare them as nested
+UI components.
 
-##  What is `className`?
-`className` is HTML's `class` attribute used for adding CSS class names (as strings) to an HTML element. 
+## What is `className`?
 
-It is called `className`, instead of `class`, because the UI is written in JavaScript, which reserves the word `class` as a language keyword.
+`className` is HTML's `class` attribute used for adding CSS class names (as strings) to an HTML element.
+
+It is called `className`, instead of `class`, because the UI is written in JavaScript, which reserves the word `class`
+as a language keyword.
 
 ## What style is responsible for `$` or `%` display in table cells?
+
 `renderCell: "Currency"` -> outputs number as currency with $ sign.
 `renderCell: "Percent"` -> outputs number as percent with % sign.
 
 ## How to set custom CSS styles?
-The recommended way to style a component is to use the UI Render's built in styles, calling them by name as a string, via the `className` attribute.
+
+The recommended way to style a component is to use the UI Render's built in styles, calling them by name as a string,
+via the `className` attribute.
 Example: `{className: "padding border"}` -> add standard padding and border to a Field.
 
-Custom CSS styling can be set by directly writing CSS in [React way](https://reactjs.org/docs/faq-styling.html) via the `style` attribute.
+Custom CSS styling can be set by directly writing CSS in [React way](https://reactjs.org/docs/faq-styling.html) via
+the `style` attribute.
 Example: `{style: {color: "rgba(255, 255, 255, 0.30)", backgroundColor: "red"}}`
 
 ## How to conditionally render Text/Title for `null` or empty value?
-If you want to leave the field empty when its value is `null` or `undefined`, add attribute `{"renderLabel": "Float"}` or `{"renderLabel": "Title+Input"}`.
+
+If you want to leave the field empty when its value is `null` or `undefined`, add attribute `{"renderLabel": "Float"}`
+or `{"renderLabel": "Title+Input"}`.
 If no value is provided for label at all, use `{"renderLabel": "String"}`
 
 ## How to format `extraItems` in Table?
-```js
+
+```json
 {
   "extraItems": [
     {
-      "Description": "Eligible Lives", 
+      "Description": "Eligible Lives",
       "Core": {
         "view": "Text",
         "label": {
@@ -69,12 +88,31 @@ If no value is provided for label at all, use `{"renderLabel": "String"}`
 }
 ```
 
+## How to set table column width?
+
+```json
+{
+  "view": "Table",
+  "name": "path.to.data",
+  "colGroup": [
+    {
+      "style": {
+        "min-width": "200px"
+      }
+    }
+  ]
+}
+```
+
 ## Why Text component does not show `children` or `label`?
-Do not simultaneously define `renderLabel` attribute as empty object or object with `null` values, because the rendering priority is this:
+
+Do not simultaneously define `renderLabel` attribute as empty object or object with `null` values, because the rendering
+priority is this:
 `renderLabel` > `items` > `children` > `label`.
 You can, however, retrieve `children` or `label` value dynamically, then use `renderLabel` to format that value.
 Example:
-```js
+
+```json
 {
   "view": "Text",
   "label": {

@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### vX.XX.X
+### New
+- Added `colGroup` attribute to define table column styles
+
 ### v0.28.7
 ### Fixes
 - Normalize date values to prevent errors
