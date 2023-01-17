@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React from 'react'
-import { isFunction } from 'ui-utils-pack'
+import React, { useRef, useState } from 'react'
 import { accessibilitySupport } from './utils'
 
 /**
@@ -18,11 +17,10 @@ import { accessibilitySupport } from './utils'
  * @param {Boolean} [center] - whether to center align content
  * @param {Object} [sound] - new Audio(URL) sound file
  * @param {*} [tab]
- * @param {*} [ref] - callback(element) when component mounts, or from React.createRef()
  * @param {*} props - other props
  * @returns {Object} - React component
  */
-export function ScrollView ({
+const ScrollView = ({
   className,
   classNameInner,
   style,
@@ -36,16 +34,28 @@ export function ScrollView ({
   // Remove tab to prevent Error
   tab,
   ...props
-}, ref) {
+}) => {
+  const thisRef = useRef(null)
+  const [scrollYPosition, setScrollYPosition] = useState(0)
+
+  const handleScroll = (e) => {
+    if (e.target === thisRef.current) {
+      setScrollYPosition(e.target.scrollLeft)
+    }
+  }
+
   props = accessibilitySupport(props, sound)
   return (
     <div
+      ref={thisRef}
       className={classNames('overflow-scroll',
         row ? 'flex--row max-width' : 'flex--col max-height',
+        scrollYPosition && 'vertical-scroll',
         {fill, rtl, center: center && !row}, className,
       )}
       style={style}
-      {...isFunction(ref) && {ref}}>
+      onScroll={handleScroll}
+    >
       <div
         className={classNames(row ? 'flex--row min-width' : 'flex--col min-height',
           {fill, reverse, rtl, pointer: props.onClick, 'margin-auto': center}, classNameInner,
@@ -57,8 +67,6 @@ export function ScrollView ({
   )
 }
 
-export const ScrollViewRef = React.forwardRef(ScrollView)
-
 ScrollView.propTypes = {
   className: PropTypes.string,
   classNameInner: PropTypes.string,
@@ -67,4 +75,4 @@ ScrollView.propTypes = {
   children: PropTypes.any.isRequired
 }
 
-export default React.memo(ScrollView)
+export default ScrollView

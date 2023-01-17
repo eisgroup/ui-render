@@ -73,7 +73,8 @@ export default class TableView extends PureComponent {
       PropTypes.shape({
         styles: PropTypes.object
       })
-    )
+    ),
+    additionalCellsStyles: PropTypes.array
   }
 
   state = {
@@ -191,6 +192,22 @@ export default class TableView extends PureComponent {
     onSort && onSort(sort)
   }
 
+  getStickyCellClassName = (styles, className, nextCellStyles) => {
+    if (styles.position === 'sticky') {
+      if (typeof className === 'string' && className.length && !className.includes('sticky')) {
+        className += ' sticky'
+      } else {
+        className = 'sticky'
+      }
+    }
+
+    if (!(nextCellStyles.position === 'sticky')) {
+      className += '-last'
+    }
+
+    return className;
+  }
+
   // RENDERS -------------------------------------------------------------------
   renderHeader = ({
     id,
@@ -261,7 +278,10 @@ export default class TableView extends PureComponent {
   // Render Rows (in Vertical layout)
   // @Note: in Vertical layout, the first column in each item is a header
   renderItemsVertical = (header, index) => {
+    const { additionalCellsStyles } = this.props
     const items = this.itemsSorted
+    header.styleHeader = additionalCellsStyles[0] || {}
+    header.classNameHeader = this.getStickyCellClassName(header.styleHeader, header.classNameHeader, additionalCellsStyles[1] || {})
     return (
       /* `itemClassNames` is not supported yet */
       <Table.Row key={index}>
@@ -273,8 +293,9 @@ export default class TableView extends PureComponent {
   }
 
   // Render Row Cells (in default layout)
-  renderItemData = (item, index, {id, renderCell, classNameCellWrap, classNameCell: className, styleCell: style}) => {
+  renderItemData = (item, index, {id, renderCell, classNameCellWrap = '', classNameCell: className, styleCell: style}) => {
     // Conditional rendering logic based on given cell data
+    const { additionalCellsStyles } = this.props
     const cell = get(item, id)
     const {render: r, data} = cell || {}
     const render = isFunction(cell) ? cell : (r || renderCell)
@@ -284,8 +305,10 @@ export default class TableView extends PureComponent {
     if (content instanceof Date) {
       content = getDateStringFromDateObject(content)
     }
+    const cellStyle = additionalCellsStyles[index+1] || {}
+    const cellClassName = this.getStickyCellClassName(cellStyle, classNameCellWrap, additionalCellsStyles[index+2] || {})
     return (
-      <Table.Cell key={this.props.vertical ? index : id} className={classNameCellWrap}>
+      <Table.Cell key={this.props.vertical ? index : id} className={cellClassName} style={cellStyle}>
         {typeof content === 'object'
           ? content
           : <View className={className} style={style}><Text className="p">{content}</Text></View>
@@ -299,7 +322,8 @@ export default class TableView extends PureComponent {
     if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
     const {
       fill, className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical, colGroup,
-      items: _, headers: _2, renderItem: _3, renderItemCells: _4, itemClassNames: _5, itemsExpanded: _6, translate: _7,
+      items: _, headers: _2, renderItem: _3, renderItemCells: _4, itemClassNames: _5,
+      itemsExpanded: _6, translate: _7, sellStyles: _8, additionalCellsStyles: _9,
       ...props
     } = this.props
     const items = this.itemsSorted

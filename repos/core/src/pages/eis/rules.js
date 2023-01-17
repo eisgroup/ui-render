@@ -492,8 +492,7 @@ export function withUISetup (formConfig) {
               this.form.restart(normalizedResponse)
             })
           } catch (error) {
-            console.log('errors')
-            this.popupAlert(error, 'Error')
+            this.popupAlert({ message: error }, 'Error')
             console.error(error)
           }
         }

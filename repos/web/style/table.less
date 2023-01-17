@@ -85,6 +85,10 @@ table:not(.as-layout) {
         &:extend(.bg-primary-lightest all);
       }
     }
+
+    th {
+      background-color: @table-header-bg-color;
+    }
   }
 
   th {
@@ -93,6 +97,7 @@ table:not(.as-layout) {
 
   th, td {
     border-bottom: @table-border;
+    background-color: @color-table-body-bg;
   }
 }
 
@@ -137,5 +142,24 @@ th, td {
 .app__table__options {
   > * {
     &:extend(.margin all);
+  }
+}
+
+.overflow-scroll.vertical-scroll {
+  table {
+    tr td.sticky-last::after,
+    tr th.sticky-last::after {
+        box-shadow: inset 10px 0 8px -8px rgba(5,5,5,0.16);
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: -1px;
+        width: 30px;
+        transform: translateX(100%);
+        transition: box-shadow .3s;
+        content: "";
+        pointer-events: none;
+      // box-shadow: inset 4px 1px 7px -5px rgba(0,0,0,0.75);
+    }
   }
 }

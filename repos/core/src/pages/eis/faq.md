@@ -97,7 +97,30 @@ If no value is provided for label at all, use `{"renderLabel": "String"}`
   "colGroup": [
     {
       "style": {
-        "min-width": "200px"
+        "minWidth": "200px"
+      }
+    }
+  ]
+}
+```
+
+## How to freeze column on the left side of the table
+
+```json
+{
+  "view": "Table",
+  "name": "path.to.data",
+  "colGroup": [
+    {
+      "isFixed": true,
+      "style": {
+        "minWidth": "150px"
+      }
+    },
+    {
+      "isFixed": true,
+      "style": {
+        "minWidth": "100px"
       }
     }
   ]

@@ -122,7 +122,8 @@ Render.Component = function RenderComponent ({
     }
 
     case FIELD.TYPE.TABLE_CELLS: {
-      return <>{items.map((item, i) => <Table.Cell key={i} {...props}>{Render(item, i)}</Table.Cell>)}</>
+      const { onDataChanged: _1, ...rest } = props
+      return <>{items.map((item, i) => <Table.Cell key={i} {...rest}>{Render(item, i)}</Table.Cell>)}</>
     }
 
     case FIELD.TYPE.AUTO_SUBMIT: {
@@ -205,6 +206,7 @@ Render.Component = function RenderComponent ({
 
     case FIELD.TYPE.TABLE: {
       const {extraItems, filterItems, parentItem, group, ...table} = props
+      const additionalCellsStyles = []
       if (!isList(_data)) _data = []
 
       // Matrix table headers and data transform
@@ -291,8 +293,24 @@ Render.Component = function RenderComponent ({
         }
         return item
       }))
+
+      if (table.colGroup) {
+        let accumulatedWidth = 0;
+        table.colGroup.forEach(col => {
+          if (col.isFixed && col.style) {
+            additionalCellsStyles.push({
+              left: `${accumulatedWidth}px`,
+              position: 'sticky',
+              zIndex: 1,
+            })
+            accumulatedWidth += parseInt(col.style.minWidth) || 0
+          }
+        })
+      }
+
       return <TableView
         items={_data}
+        additionalCellsStyles={additionalCellsStyles}
         {...table}
         translate={translate}
       />

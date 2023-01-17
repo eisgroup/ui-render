@@ -570,7 +570,9 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   }
 
   Class.prototype.componentWillUnmount = function () {
-    clearErrorsMap(this.form, this._meta);
+    if (this._meta) {
+      clearErrorsMap(this.form, this._meta)
+    }
 
     this.isUnmounting = true
     if (this.props.onChangeState) this.props.onChangeState({})

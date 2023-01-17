@@ -27,6 +27,7 @@ export function View ({
   sound,
   expanded: _, // not used, remove to prevent warnings
   translate: _2,
+  onDataChanged: _3,
   ...props
 }, ref) {
   props = accessibilitySupport(props, sound)

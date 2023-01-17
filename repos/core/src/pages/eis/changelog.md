@@ -3,6 +3,7 @@
 ### vX.XX.X
 ### New
 - Added `colGroup` attribute to define table column styles
+- Added `isFixed` attribute to set sticky style for columns
 
 ### v0.28.7
 ### Fixes
