@@ -1,6 +1,6 @@
 ### Table of Contents
 
-### vX.XX.X
+### v0.29.0
 ### New
 - Added `colGroup` attribute to define table column styles
 - Added `isFixed` attribute to set sticky style for columns
