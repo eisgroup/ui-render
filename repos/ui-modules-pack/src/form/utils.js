@@ -564,7 +564,9 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
       this._props = next
       this.syncInputChanges()
       this._props = null
-      errorsProcessing(this.form, this._meta);
+      if (this._meta) {
+        errorsProcessing(this.form, this._meta);
+      }
     }
     if (UNSAFE_componentWillReceiveProps) UNSAFE_componentWillReceiveProps.apply(this, arguments)
   }
