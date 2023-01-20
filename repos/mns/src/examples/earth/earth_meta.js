@@ -1418,7 +1418,7 @@ const header = {
           items: [
             {
               view: 'Image',
-              name: 'aflac.png',
+              name: 'logo.svg',
               style: {
                 height: 36,
               },
@@ -1487,7 +1487,7 @@ const header = {
         },
         {
           view: 'Image',
-          name: 'aflac.png',
+          name: 'logo.svg',
         },
         {
           view: 'Text',

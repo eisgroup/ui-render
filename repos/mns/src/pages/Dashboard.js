@@ -15,13 +15,13 @@ export default class Dashboard extends PureComponent {
     return (
       <ScrollView fill className="app__dashboard padding-smaller bg-gradient">
         <Row fill className="middle wrap spread">
-          <Link className="img__swatch" to={ROUTE.DOCS}>
+          <Link className="img__swatch" to={ROUTE.DOCS} style={card}>
             <Image name="logo.svg" style={card} />
           </Link>
-          <Link className="img__swatch" to={ROUTE.EARTH}>
+          <Link className="img__swatch" to={ROUTE.EARTH} style={card}>
             <Image name="earth.png" style={card} />
           </Link>
-          <Link className="img__swatch" to={ROUTE.ROCKET}>
+          <Link className="img__swatch" to={ROUTE.ROCKET} style={card}>
             <Image name="rocket.png" style={card} />
           </Link>
         </Row>
