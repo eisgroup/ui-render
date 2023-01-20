@@ -243,7 +243,6 @@ export default class TableView extends PureComponent {
   // Render Rows (in default layout)
   renderItem = (item, index) => {
     const {renderItem, renderItemCells, itemClassNames} = this.props
-    const isExpanded = this.expandedByRow(index)
     let className
     if (itemClassNames) {
       className = []
@@ -264,8 +263,8 @@ export default class TableView extends PureComponent {
         <Table.Row className={className}>
           {renderItemCells ? renderItemCells(item, index) : this.headers.map(this.renderItemData.bind(this, item, index))}
         </Table.Row>
-        {renderItem &&
-          <Table.Row style={{ display: isExpanded ? 'table-row' : 'none' }}>
+        {renderItem && this.expandedByRow(index) &&
+          <Table.Row>
             <Table.Cell colSpan={this.headers.length}>
               {renderItem(item, index)}
             </Table.Cell>
