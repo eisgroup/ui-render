@@ -1418,7 +1418,7 @@ const header = {
           items: [
             {
               view: 'Image',
-              name: 'logo.svg',
+              name: 'earth.png',
               style: {
                 height: 36,
               },
@@ -1487,7 +1487,7 @@ const header = {
         },
         {
           view: 'Image',
-          name: 'logo.svg',
+          name: 'earth.png',
         },
         {
           view: 'Text',

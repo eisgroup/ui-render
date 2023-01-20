@@ -36,6 +36,7 @@ import TableView from './components/TableView'
 import TabList from './components/TabList'
 import Tabs from './components/Tabs'
 import Data from './Data'
+import { Link } from 'ui-modules-pack/router/browser'
 
 /**
  * UI RENDERER COMPONENTS SETUP ================================================
@@ -176,10 +177,10 @@ Render.Component = function RenderComponent ({
       return <Label {...props} translate={translate}/>
     }
     //
-    // case FIELD.TYPE.LINK: { // Internal router link
-    //   if (items.length) props.children = items.map(Render)
-    //   return <Link {...props}/>
-    // }
+    case FIELD.TYPE.LINK: { // Internal router link
+      if (items.length) props.children = items.map(Render)
+      return <Link {...props}/>
+    }
 
     case FIELD.TYPE.PIE_CHART: {
       const {mapItems, ...prop} = props
