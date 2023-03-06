@@ -136,7 +136,8 @@ export default class UIRender extends Component {
     meta: {
       json: this.props.meta
     },
-    errors: {}
+    errors: {},
+    key: new Date()
   }
 
   UNSAFE_componentWillReceiveProps (next, nextContext) {
@@ -194,8 +195,10 @@ export default class UIRender extends Component {
 
   render () {
     const {childBefore, childAfter, form, embedded, className, style, translate} = this.props
+    const {key} = this.state
     const content = this.hasData && this.hasMeta &&
       <Render
+        key={key}
         data={this.data}
         {...this.meta}
         form={this.form}
@@ -414,6 +417,7 @@ export function withUISetup (formConfig) {
                   json: normalizedResponse
                 }
               }, () => {
+                this.setState({key: new Date()})
                 this.form.restart(normalizedResponse)
               })
             } catch (error) {
