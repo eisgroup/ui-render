@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.29.1
+### Fixes
+- Rerender instance on file is uploaded
+
 ### v0.29.0
 ### New
 - Added `colGroup` attribute to define table column styles
