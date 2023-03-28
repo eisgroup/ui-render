@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.29.2
+### Fixes
+- Call onDataChanged listener every time on form was changed once
+
 ### v0.29.1
 ### Fixes
 - Rerender instance on file is uploaded
