@@ -21,6 +21,8 @@ import { formsStorage } from 'core/src/pages/eis/rules'
  * =============================================================================
  */
 
+let isDataChangedListenerCalled = false;
+
 /**
  * Get Form's Field Values
  * @param {Object} form - instance from react-final-form
@@ -535,7 +537,8 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   // Define instance method
   Class.prototype.syncInputChanges = function () {
     const { formProps, onDataChanged, parent = {} } = this._props || this.props;
-    if (!formProps.pristine) {
+    if (!formProps.pristine || isDataChangedListenerCalled) {
+      isDataChangedListenerCalled = true
       if (typeof onDataChanged === 'function') {
         onDataChanged()
       } else if (parent && typeof parent.onDataChanged === 'function') {
