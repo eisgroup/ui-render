@@ -401,9 +401,15 @@ Render.Component = function RenderComponent ({
       // Resolve Input name dynamic path
       if (relativeData !== false && relativePath != null && input.name) {
         const uniqueIdentificator = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
-        if (_data) { // Case for tables with input fields to generate unique IDs
+        if (typeof _data !== 'undefined') { // Case for tables with input fields to generate unique IDs
           input.id = uniqueIdentificator
         } else {
+          input.name = uniqueIdentificator
+        }
+
+        // Fix for single checkboxes. Allow correctly load data from JSON and set different names for each one
+        if (input.type === 'checkbox') {
+          input.id = uniqueIdentificator
           input.name = uniqueIdentificator
         }
       }
