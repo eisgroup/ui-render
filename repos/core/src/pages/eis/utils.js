@@ -209,8 +209,11 @@ const changeOptionOrderForSelectFields = (data, meta) => {
   if (meta.view === FIELD.TYPE.SELECT) {
     const selectName = meta.name;
     if (typeof data[selectName] === 'string') {
-      const { mapOptions: { text: optionName, value: optionValue } } = meta;
-      if (optionValue === '{index}') {
+      const { mapOptions } = meta;
+      const { text: optionName, value: optionValue } = mapOptions
+      if (typeof mapOptions === 'string') {
+        recursiveDataParser(data, mapOptions, data[selectName]) && delete data[selectName]
+      } else if (optionValue === '{index}') {
         recursiveDataParser(data, optionName, data[selectName]) && delete data[selectName]
       }
     }
@@ -218,6 +221,10 @@ const changeOptionOrderForSelectFields = (data, meta) => {
 
   if (Array.isArray(meta.items)) {
     meta.items.forEach(item => {
+      changeOptionOrderForSelectFields(data, item)
+    })
+  } else if (meta.renderItem && Array.isArray(meta.renderItem.items)) {
+    meta.renderItem.items.forEach(item => {
       changeOptionOrderForSelectFields(data, item)
     })
   }

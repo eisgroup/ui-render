@@ -98,7 +98,12 @@ class RenderClass extends Component {
             return mappedData;
         })
 
-        return Render.Component.call(this, {...this.props, _data, items})
+        // return Render.Component.call(this, {...this.props, _data, items})
+        return <Render.Component
+          {...this.props}
+          _data={_data}
+          items={items}
+         />
     }
 }
 

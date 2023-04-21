@@ -93,10 +93,13 @@ export function Dropdown ({
   onAddItem,
   onClickIcon,
   translate = Active.translate,
+  value: initialValue,
   ...props
 }) {
   // Store options as state to allow additions
   let [options, setOptions] = useState(opts)
+  const [value, setValue] = useState(initialValue)
+  let tempValue
   useEffect(() => {!isEqual(options, opts) && setOptions(opts)}, [opts])
 
   if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability - why?
@@ -126,32 +129,36 @@ export function Dropdown ({
   if (onClickIcon) props.icon = <Icon name={props.icon || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
 
   // On Change gets called before `onAddItem`
-  if (onChange || onSelect) props.onChange = (event, {value}) => {
-    // Since there is no option to disable addition when search matches existing options (case-insensitive),
-    // => sanitize onChange to have value from existing options.
-    // @note: it's possible to temporarily disable addition, but that logic is more complex,
-    //    and shows 'No options left' message, instead of 'Add value',
-    //    which may be more intuitive, because it simply moves the selected value to the end.
-    let val = props.multiple ? last(value) : value
-    if (val && isString(val)) {
-      val = trimSpaces(val).toLowerCase()
-      const duplicate = options.find(({text}) => typeof text === 'string' && toLowerCase(text) === val)
-      if (duplicate && toLowerCaseAny(duplicate.value) !== val) {
-        if (props.multiple) {
-          value[value.length - 1] = duplicate.value
-        } else {
-          value = duplicate.value
+  if (onChange || onSelect) {
+    props.onChange = (event, {value}) => {
+      // Since there is no option to disable addition when search matches existing options (case-insensitive),
+      // => sanitize onChange to have value from existing options.
+      // @note: it's possible to temporarily disable addition, but that logic is more complex,
+      //    and shows 'No options left' message, instead of 'Add value',
+      //    which may be more intuitive, because it simply moves the selected value to the end.
+      let val = props.multiple ? last(value) : value
+      if (val && isString(val)) {
+        val = trimSpaces(val).toLowerCase()
+        const duplicate = options.find(({text}) => typeof text === 'string' && toLowerCase(text) === val)
+        if (duplicate && toLowerCaseAny(duplicate.value) !== val) {
+          if (props.multiple) {
+            value[value.length - 1] = duplicate.value
+          } else {
+            value = duplicate.value
+          }
         }
       }
-    }
 
-    // Remove duplicates for non-matching cases, or value converted to Id from the operation above.
-    // Keep the last entered value for new additions.
-    // @Note: the list of values can be a mix of primitive Number and String
-    // Store value temporarily for onSelect event.
-    tempValue = (props.multiple && !isObject(last(value))) ? toUniqueListCaseInsensitive(value.reverse()).reverse() : value
-    onChange && onChange(tempValue, props.name, event)
+      // Remove duplicates for non-matching cases, or value converted to Id from the operation above.
+      // Keep the last entered value for new additions.
+      // @Note: the list of values can be a mix of primitive Number and String
+      // Store value temporarily for onSelect event.
+      tempValue = (props.multiple && !isObject(last(value))) ? toUniqueListCaseInsensitive(value.reverse()).reverse() : value
+      setValue(value)
+      onChange && onChange(tempValue, props.name, event)
+    }
   }
+
   if (onSelect) props.onClose = (event) => onSelect(tempValue, props.name, event)
   if (onSearch) props.onSearchChange = (event, data) => onSearch(data.searchQuery, props.name, event)
 
@@ -211,6 +218,7 @@ export function Dropdown ({
         error={!!error}
         lazyLoad={lazyLoad}
         noResultsMessage={(hasListValue(props.value) && props.value.length === options.length) ? _.NO_OPTIONS_LEFT : _.NOTHING_FOUND}
+        value={value}
         {...props}
       />
       {label && float && <Text className="input__label">{translate(label)}</Text>}
@@ -241,7 +249,5 @@ Dropdown.propTypes = {
   onAddItem: PropTypes.func,
   placeholder: PropTypes.any
 }
-
-let tempValue
 
 export default React.memo(Dropdown)

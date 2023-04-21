@@ -64,11 +64,11 @@ Render.Tooltip = TooltipPop
  * @param {*} [props] - other component props
  * @returns {JSX.Element|*} React component
  */
-Render.Component = function RenderComponent ({
+const RenderComponent = ({
   view, items, data, _data, debug, form, instance,
   showIf, relativeData, relativeIndex, relativePath, version,
   ...props
-}) {
+}) => {
   const translate = Active.translate
   /* General showIf logic */
   if (showIf != null) {
@@ -558,3 +558,5 @@ Render.onError = ({err, errInfo, props}) => Active.store.dispatch(stateAction(PO
     }
   ]
 }))
+
+Render.Component = RenderComponent

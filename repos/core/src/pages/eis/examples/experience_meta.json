@@ -724,7 +724,10 @@
                   "options": {
                     "name": "periodBasis"
                   },
-                  "mapOptions": "periodBasisType",
+                  "mapOptions": {
+                    "value": "{index}",
+                    "text": "periodBasisType"
+                  },
                   "styles": "margin-right",
                   "disabled": false,
                   "compact": true

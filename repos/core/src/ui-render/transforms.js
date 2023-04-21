@@ -59,7 +59,9 @@ export function metaToProps (meta, config) {
         // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
         if (isObject(definition)) {
             metaToFunctions(definition, {...funcConfig, data})
-            if (definition.name) definition.name = interpolateString(definition.name, instance, {suppressError: true})
+            if (definition.name) {
+                definition.name = interpolateString(definition.name, instance, {suppressError: true})
+            }
         }
 
         // Map Value Renderer Names/Objects to Actual Render Functions
@@ -96,6 +98,7 @@ export function metaToProps (meta, config) {
                     } else {
                         revPath.relativePath = relativePathFrom(meta, relativePath, relativeIndex)
                     }
+
                     return Render({
                         // Relative Path is required for nested Inputs
                         ...revPath,
