@@ -155,7 +155,9 @@ export function asField (InputComponent, {sanitize} = {}) {
         const initialValues = this.initValues
         setTimeout(() => {
           // only call this if the form is not unmounted and initialValues remained (i.e. not between transitions)
-          if (instance.isUnmounting) return
+          if (instance.isUnmounting) {
+            return
+          }
           const form = instance.form
           if (form && initialValues === instance.props.initialValues) {
             form.change(name, null)

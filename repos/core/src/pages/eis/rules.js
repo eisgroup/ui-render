@@ -292,11 +292,30 @@ export function toOpenLConfig (meta) {
  * Decorator to extend UI Render instance with nested Data component interface
  */
 export function withDataKind (Class) {
+  Class.prototype.getDataKindByRelativePath = function (dataJson) {
+    if (!this.dataKindPath) {
+      return dataJson
+    }
+
+    return get(dataJson, this.dataKindPath)
+  }
+
+  Class.prototype.getDataKindPath = function (relativePath, kind) {
+    const pathToData = `.dataKind.${kind}`
+
+    if (relativePath.includes(pathToData)) {
+      return relativePath.replace(pathToData, "")
+    }
+
+    return ''
+  }
+
   // Register child instance from parent instance
   Class.prototype.registerDataKind = function (instance, kind, index) {
     if (!this.dataKind) this.dataKind = {}
     if (!this.dataKind[kind]) this.dataKind[kind] = {}
     this.dataKind[kind][index] = instance
+    this.dataKindPath = this.getDataKindPath(instance.props.meta.relativePath, kind)
   }
 
   // Unregister child instance from parent instance
@@ -310,10 +329,11 @@ export function withDataKind (Class) {
 
     // Update current parent state in case the component was edited, then unmounted from changing Tabs
     const {data} = this.state
-    const {dataKind = {}} = data.json
+    const {dataKind = {}} = this.getDataKindByRelativePath(data.json)
     if (dataKind[kind] && dataKind[kind][index]) {
       dataKind[kind][index] = instance.formValues
-      this.setState({data: {...data}, dataKind})
+      const dataKindStructure = set({}, this.dataKindPath, dataKind)
+      this.setState({data: {...data}, ...dataKindStructure})
     }
   }
 
@@ -328,7 +348,8 @@ export function withDataKind (Class) {
       const values = get(this.dataKind, `${kind}.${index}`, {}).formValues
       return values != null ? values : get(this.state.dataKind, `${kind}.${index}`)
     }
-    const stateBy = get(this.state.data.json.dataKind, kind)
+
+    const stateBy = this.getDataKindByRelativePath(this.state.data.json)
     const instancesBy = get(this.dataKind, kind, {})
     const resultByIndex = []
     for (const index in stateBy) {
@@ -434,10 +455,12 @@ export function withUISetup (formConfig) {
             // Add directly to data.json, to keep all data patterns consistent, and to enable backend override.
             // And store a copy in state for rehydration when backend updates response without added data.
             const {data} = parent.state
-            const {dataKind = {}} = data.json
+            const dataKindPath = parent.dataKindPath ? `${parent.dataKindPath}.dataKind` : 'dataKind'
+            const dataKind = get(data.json, dataKindPath)
             dataKind[form.kind] = [...dataKind[form.kind] || [], this.registeredValues]
-            data.json.dataKind = dataKind
-            parent.setState({data: {...data}, dataKind}, () => {
+            const dataKindStructure = set({}, dataKindPath, dataKind)
+            data.json = set(data.json, dataKindPath, dataKind)
+            parent.setState({data: {...data}, ...dataKindStructure}, () => {
               this.form.restart()
               callOnDataChanged(this.props)
             })
@@ -447,12 +470,14 @@ export function withUISetup (formConfig) {
         FIELD.FUNC[FIELD.ACTION.REMOVE_DATA] = (parent && form)
           ? () => {
             const {data} = parent.state
-            const dataKind = {...data.json.dataKind}
+            const dataKindPath = parent.dataKindPath ? `${parent.dataKindPath}.dataKind` : 'dataKind'
+            const dataKind = get(data.json, dataKindPath)
             const array = [...dataKind[form.kind] || []]
             array.splice(index, 1)
             dataKind[form.kind] = array
-            data.json.dataKind = dataKind
-            parent.setState({data: {...data}, dataKind})
+            const dataKindStructure = set({}, dataKindPath, dataKind)
+            data.json = set(data.json, dataKindPath, dataKind)
+            parent.setState({data: {...data}, ...dataKindStructure})
             callOnDataChanged(this.props)
           }
           : dataActionWarning
@@ -641,8 +666,13 @@ export function withUISetup (formConfig) {
       }
 
       const {parent, form, index} = this.props
-      if (parent && index != null) parent.registerDataKind(this, form.kind, index)
-      if (UNSAFE_componentWillMount) UNSAFE_componentWillMount.apply(this, arguments)
+
+      if (parent && index != null) {
+        parent.registerDataKind(this, form.kind, index)
+      }
+      if (UNSAFE_componentWillMount) {
+        UNSAFE_componentWillMount.apply(this, arguments)
+      }
     }
 
     Class.prototype.UNSAFE_componentWillUpdate = function (nextProps, nextState) {
