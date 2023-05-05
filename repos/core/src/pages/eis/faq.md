@@ -148,3 +148,52 @@ Example:
   }
 }
 ```
+
+## How to set options for Dropdown field in `renderExtraItem` area
+In `meta.json` you have to set `"relativeData": false` to receive options from `data.json` root
+```json
+{
+   "renderExtraItem": {
+      "view": "Data",
+      "embedded": true,
+      "relativeData": false,
+      "meta": {
+         "view": "TableCells",
+         "items": [
+            {
+               "view": "Select",
+               "name": "periodName",
+               "options": {
+                  "name": "experienceRatingInputs.periodNameList"
+               },
+               "mapOptions": {
+                  "text": "periodName",
+                  "value": "periodName"
+               }
+            }
+         ]
+      }
+   }
+}
+```
+```js
+const dataJson = {
+   "experienceRatingInputs": {
+      "dataKind": [], // Options should not to store here. `dataKind` can be epmty
+      "periodNameList": [
+         {
+            "periodName": "Current Period"
+         },
+         {
+            "periodName": "First Prior Period"
+         },
+         {
+            "periodName": "Second Prior Period"
+         },
+         {
+            "periodName": "Third Prior Period"
+         }
+      ]
+   }
+}
+```

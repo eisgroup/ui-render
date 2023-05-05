@@ -69,10 +69,13 @@ export function metaToProps (meta, config) {
             if (typeof definition === 'string') { // @ts-ignore
                 meta[attribute] = Render.Method(meta[attribute])
             }
-
             // Below transformation only happens during render
             if (isObject(definition)) meta[attribute] = (value, index, props, self) => {
-                _data = value
+                if (definition.relativeData === false) {
+                    _data = data
+                } else {
+                    _data = value
+                }
 
                 // Render is a field definition
                 if (definition.view) {
