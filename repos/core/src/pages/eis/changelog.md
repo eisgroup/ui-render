@@ -1,5 +1,15 @@
 ### Table of Contents
 
+### v0.29.3
+### New 
+- Added Name attribute for checkboxes
+- Added parsing data to define dataKind attribute on nested levels
+- Ability to use not relative data in renderExtraItem attribute of tables
+- New Input Number Component with ability to format output
+
+### Fixes
+- Fixed behavior of Dropdowns in RowList view
+
 ### v0.29.2
 ### Fixes
 - Call onDataChanged listener every time on form was changed once

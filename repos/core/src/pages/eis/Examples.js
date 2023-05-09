@@ -41,6 +41,9 @@ import * as tabs from './examples/tabs_meta'
 import uploadMeta from './examples/upload_meta'
 import UIRender from './rules'
 
+import exampleData1 from './examples/data1.js'
+import exampleMeta1 from './examples/meta1.js'
+
 import { LocalizationUtils } from '@eisgroup/common'
 import {
   updateExperienceData,
@@ -51,6 +54,12 @@ import {
 const t = LocalizationUtils.translate
 
 const examples = [
+  {
+    title: 'Experience',
+    id: 'qwe',
+    data: exampleData1,
+    meta: exampleMeta1,
+  },
   {
     title: 'Experience Ratings',
     id: 'experienceRatings',
@@ -261,7 +270,7 @@ export default class Examples extends Component {
           >
             {() => (
               <>
-                { ['experienceRatings', 'tableForm', 'ratingDetails'].includes(id) ? (
+                { ['experienceRatings', 'tableForm', 'ratingDetails', 'qwe'].includes(id) ? (
                   <>
                     <UIRender
                       data={data}
