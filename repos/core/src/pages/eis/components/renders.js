@@ -1,5 +1,5 @@
 import { asField } from 'ui-modules-pack/form'
-import { DropdownField, InputField, ToggleField, } from 'ui-modules-pack/form/inputs'
+import { DropdownField, InputField, ToggleField, InputNumberField } from 'ui-modules-pack/form/inputs'
 import Upload from 'ui-modules-pack/upload/views/Upload'
 import { FIELD } from 'ui-modules-pack/variables'
 import React from 'react'
@@ -10,7 +10,7 @@ const UploadField = asField(Upload, {sanitize: (value) => value || undefined})
 
 export function renderField (fieldDefinition, i) {
   let Field
-  const {view, ...props} = fieldDefinition
+  const {view, type, ...props} = fieldDefinition
   switch (view) {
     case FIELD.TYPE.INPUT:
       Field = InputField
@@ -28,7 +28,12 @@ export function renderField (fieldDefinition, i) {
     default:
       Field = PlaceholderField.bind(this, {name: view})
   }
-  return <Field key={i} {...props} />
+
+  if (type === 'number') {
+    Field = InputNumberField
+  }
+
+  return <Field key={i} {...props} type={type} />
 }
 
 Active.renderField = renderField

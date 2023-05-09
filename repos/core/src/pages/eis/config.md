@@ -289,6 +289,10 @@ const Component = {
   // AutoSubmit attributes
   delay: Number,  // specify delay in milliseconds for input submission on changes, default is 200 milliseconds
   partial: true, // whether to submit only changed values
+  outputFormat: { // for Inputs with type 'number'
+      decimals: number, // define how many fractional digits to show
+      separateThousands: boolean // separate thousands in big numbers
+  }
 }
 ```
 

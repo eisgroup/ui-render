@@ -197,3 +197,19 @@ const dataJson = {
    }
 }
 ```
+
+## How to format input number output
+`decimals` - define how many fractional digits to show
+
+`separateThousands` - separate thousands in big numbers
+```json
+{
+   "view": "Input",
+   "name": "calculatedWeight",
+   "type": "number",
+   "outputFormat": {
+      "decimals": 2,
+      "separateThousands": true
+   }
+},
+```

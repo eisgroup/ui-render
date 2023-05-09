@@ -93,14 +93,21 @@ export function Dropdown ({
   onAddItem,
   onClickIcon,
   translate = Active.translate,
-  value: initialValue,
+  value: valueFromParent,
   ...props
 }) {
   // Store options as state to allow additions
   let [options, setOptions] = useState(opts)
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState(valueFromParent)
   let tempValue
-  useEffect(() => {!isEqual(options, opts) && setOptions(opts)}, [opts])
+
+  useEffect(() => {
+    !isEqual(options, opts) && setOptions(opts)
+  }, [opts])
+
+  useEffect(() => {
+    setValue(valueFromParent)
+  }, [valueFromParent])
 
   if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability - why?
   if (readonly) props.disabled = true // Semantic Dropdown does not accept `readOnly` prop
@@ -193,18 +200,6 @@ export function Dropdown ({
   /// Error handling
   // @Note: below logic only works as DropdownField with controlled value
   if (done == null) done = !error && (props.multiple ? hasListValue(props.value) : (!!props.value || props.value === 0))
-
-  // Always include existing value to avoid having a hidden selection because it's no longer in available options
-  // if (props.value != null) {
-  // if (typeof options[0] === 'object') {
-  //   if (!options.find(({ value }) => props.value === value)) options = options.concat({
-  //     text: props.value,
-  //     value: props.value
-  //   })
-  // } else {
-  //   if (!isInList(options, props.value)) options = options.concat(props.value)
-  // }
-  // }
 
   return (
     <View className={classNames('input--wrapper', {

@@ -190,12 +190,13 @@ export function asField (InputComponent, {sanitize} = {}) {
       return (
         <InputComponent
           {...input}
-          value={sanitize ? sanitize(this.value, this.props) : this.value}
+          // value={sanitize ? sanitize(this.value, this.props) : this.value}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur} // prevent value change, but need onBlur to set touched for validation
           onChange={this.handleChange}
           error={error && (touched || !pristine) && (err || error)} // only show error after user interaction
           {...props} // allow forceful value override
+          value={sanitize ? sanitize(this.value, this.props) : this.value}
         />
       )
     }
@@ -228,18 +229,6 @@ export function asField (InputComponent, {sanitize} = {}) {
       this.input.onChange(value) // both redux-form and final-form input.onChange can accept 'event' or 'value'
       onChange && onChange(parse ? parse(value) : value, ...args)
     }
-
-    // @Note: this is not needed as default behavior, because inputs like color always trigger onChange
-    //        the logic was used for redux-form to normalize input initially
-    // componentDidMount () {
-    //   // Normalize initialValue
-    //   const {normalize, parse = normalize, onChange} = this.props
-    //   if (!parse || this.value === '') return
-    //   const valueNormalized = parse(this.value)
-    //   if (this.value === valueNormalized) return
-    //   this.input.onChange(valueNormalized)
-    //   onChange && onChange(valueNormalized)
-    // }
 
     // Do not pass 'onChange' to Field because it fires event as argument
     // final-form does not take controlled `value`
