@@ -29,7 +29,7 @@ import 'cypress-file-upload'
 // @example:
 //    cy.upload('example_data.json', 'example_meta.json')
 //    cy.upload('example_data.json') // defaults to example_meta.json
-Cypress.Commands.add('upload', (data, meta, path = '../../repos/core/src/pages/eis/examples/') => {
+Cypress.Commands.add('upload', (data, meta, path = '../../repos/core/src/pages/main/examples/') => {
   if (!meta) meta = data.replace('data.json', 'meta.json')
   return cy.get('.test-data input[type="file"]')
     .attachFile(`${path}${data}`, {subjectType: 'drag-n-drop'})

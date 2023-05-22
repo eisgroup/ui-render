@@ -30,20 +30,16 @@ interface Props {
 }
 
 /**
- * Thin wrapper to avoid compiling UI Render inside Genesis UI Build process,
- * because they have limited TypeScript build config that cannot process npm packages using pure JS in ES6.
- *
  * UI Render makes use of many npm packages written in pure JS using ES6 for these reasons:
  *      - Automatic tree shaking to optimize production bundle size by removing unused code imported from npm packages
  *      - IDE instant function/variable suggestions and automatic import
  *      - Easier for developers to read source code of imported npm packages, than reading compiled minified code.
  *
  * @logic:
- *      1. This Component creates an empty <div/> inside Genesis UI HTML DOM (where UI Render wil be)
+ *      1. This Component creates an empty <div/> inside HTML DOM (where UI Render will be)
  *      2. When mounted, it calls global `window._mountUIRender` method defined in `/repos/policy/src/main.js`
  *      3. Above method mounts pre-bundled UI Render to the above created <div/>, initiating UI Render instance.
  *      4. On subsequent prop changes, it passes them to UI Render via <DOMProxy/> container
- *         (this is a workaround hack for Genesis UI).
  */
 export class UIRender extends Component<Props, any> {
     // tslint:disable:variable-name
@@ -80,7 +76,7 @@ export class UIRender extends Component<Props, any> {
 
     render() {
         const {className, style} = this.props
-        return <div id={this.id} data-version='0.29.3' className={`${UI_RENDER} ${className || ''}`} style={style}/>
+        return <div id={this.id} data-version='0.29.4' className={`${UI_RENDER} ${className || ''}`} style={style}/>
     }
 }
 

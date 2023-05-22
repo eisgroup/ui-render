@@ -12,8 +12,8 @@ import View from 'ui-react-pack/View'
 import { Active, debounce, isEqualJSON, toJSON, warn } from 'ui-utils-pack'
 import { hasObjectValue, objChanges, set } from 'ui-utils-pack/object'
 import { _ } from 'ui-utils-pack/translations'
-import { clearErrorsMap, errorsProcessing } from 'core/src/pages/eis/utils'
-import { formsStorage } from 'core/src/pages/eis/rules'
+import { clearErrorsMap, errorsProcessing } from 'core/src/pages/main/utils'
+import { formsStorage } from 'core/src/pages/main/rules'
 
 /**
  * STATE SELECTORS =============================================================

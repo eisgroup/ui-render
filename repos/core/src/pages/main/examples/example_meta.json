@@ -1,0 +1,87 @@
+{
+  "view": "Column",
+  "className": "padding",
+  "items": [
+    {
+      "view": "Column",
+      "label": "Dynamic Layout",
+      "items": [
+        {
+          "view": "Dropdown",
+          "name": "layout",
+          "options": "layouts",
+          "mapOptions": "name",
+          "placeholder": "Select Layout"
+        },
+        {
+          "view": "Row",
+          "items": [
+            {
+              "view": "Title",
+              "label": "Plan chosen:"
+            },
+            {
+              "view": "Title",
+              "className": "padding-h",
+              "label": {
+                "name": "layouts.{state.layout,0}.name"
+              }
+            }
+          ]
+        },
+        {
+          "view": "Tabs",
+          "activeIndex": {
+            "name": "{state.layout,0}"
+          },
+          "classNameTabs": "hide",
+          "items": [
+            {
+              "content": {
+                "view": "Row",
+                "className": "bg-primary",
+                "style": {
+                  "display": "block",
+                  "width": 100,
+                  "height": 100
+                }
+              }
+            },
+            {
+              "content": {
+                "view": "Row",
+                "items": [
+                  {
+                    "view": "Col",
+                    "className": "bg-grey",
+                    "style": {
+                      "display": "block",
+                      "width": 100,
+                      "height": 100
+                    }
+                  },
+                  {
+                    "view": "Col",
+                    "className": "bg-primary-light",
+                    "style": {
+                      "display": "block",
+                      "width": 100,
+                      "height": 100
+                    }
+                  },
+                  {
+                    "view": "Col",
+                    "className": "bg-primary",
+                    "style": {
+                      "display": "block", "width": 100, "height": 100}
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

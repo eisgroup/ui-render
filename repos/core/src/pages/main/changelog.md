@@ -11,55 +11,55 @@
 - Fixed behavior of Dropdowns in RowList view
 
 ### v0.29.2
-### Fixes
+#### Fixes
 - Call onDataChanged listener every time on form was changed once
 
 ### v0.29.1
-### Fixes
+#### Fixes
 - Rerender instance on file is uploaded
 
 ### v0.29.0
-### New
+#### New
 - Added `colGroup` attribute to define table column styles
 - Added `isFixed` attribute to set sticky style for columns
 
 ### v0.28.7
-### Fixes
+#### Fixes
 - Normalize date values to prevent errors
 
 ### v0.28.6
-### Fixes
+#### Fixes
 - Fixed adding and deleting rows in tables
 - Fixed styles of modals
 - Change file processing flow to support integration with other apps
 
 ### v0.28.5
-### Fixes
+#### Fixes
 - Avoid render field name on value is not provided
 - Added Date type in renderLabel method
 
 ### v0.28.4
-### Fixes
+#### Fixes
 - Normalize incoming data
 - Restart forms with correct data on response
 
 ### v0.28.3
-### New
+#### New
 - Added `no-header` style for tables. Ability to not display table header
 - Added `highlight-1-last`, `highlight-2-last`, `highlight-3-last` styles to highlight up to 3 last table rows
 - Added `width-25p`, `width-50p`, `width-75p` styles. Content takes 25%, 50%, 75% of width
 - Added type String for renderLabel method
-### Fixes
+#### Fixes
 - Fixed runtime error then data.json provided without meta.json 
 
 ### v0.28.2
-###  Fixes
+####  Fixes
 - Add missed icons
 - Return actual errors list through `getValidationErrors` listener
 - Do not include to error list untouched fields
 
 ### v0.28.1
-###  Fixes
+####  Fixes
 - Format Date values in tables
 - Add localization support for button title, checkbox, toggle, label
 - Reinitialize form values on file was uploaded
@@ -70,7 +70,7 @@
 - Added `translate` property which accept localization function
 - Added `methods` property. Provided ability to add callback functions. This functions will be called on buttons with related `onClick` function names. For example:
 
-#### **`meta.json`**
+**`meta.json`**
 ```json
 {
   "view": "Button",
@@ -95,7 +95,7 @@
 - Added `apiCalls` property for UI-Render component and `onApplyPeriods` listener for `Button` component. If `apiCalls` contain `updateExperienceData` method, it will be calls on click button with `onApplyPeriods` listener
 - Added `downloadFile` and `uploadFile` methods into `apiCalls` property. They accept api calls to process 'download' and 'upload' events on fields
 
-###  Fixes
+####  Fixes
 - Add TS annotation for `getValidationErrors` listener
 
 ### v0.27.2
@@ -247,6 +247,6 @@
 
 #### Changes
 - **hideOnEmpty** will be deprecated in the next release version
-- Updated CSS styles to match latest EIS DSM style guide
-- Refactored CSS variables and bundling process for Genesis UI Integration
-- Refactored JS code bundling process for Genesis UI Integration
+- Updated CSS styles to match the latest DSM style guide
+- Refactored CSS variables and bundling process for UI Integration
+- Refactored JS code bundling process for UI Integration

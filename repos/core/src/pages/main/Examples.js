@@ -41,14 +41,11 @@ import * as tabs from './examples/tabs_meta'
 import uploadMeta from './examples/upload_meta'
 import UIRender from './rules'
 
-import { LocalizationUtils } from '@eisgroup/common'
 import {
   updateExperienceData,
   downloadHistoricalFileTemplate,
   uploadHistoricalFile
 } from 'web/api/gdn-rating-alg'
-
-const t = LocalizationUtils.translate
 
 const examples = [
   {
@@ -272,7 +269,7 @@ export default class Examples extends Component {
                       onDataChanged={this.onSomeDataChanged}
                       onSubmit={console.warn}
                       getValidationErrors={this.showValidationErrors}
-                      translate={t}
+                      translate={(v) => v}
                       apiCalls={{
                         updateExperienceData,
                         downloadFile: downloadHistoricalFileTemplate,

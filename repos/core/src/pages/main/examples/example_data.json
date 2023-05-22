@@ -1,0 +1,91 @@
+{
+  "planID": "Golden",
+  "layouts": [
+    {
+      "id": "1",
+      "name": "Layout Alpha"
+    },
+    {
+      "id": "2",
+      "name": "Layout Beta"
+    }
+  ],
+  "coverages": [
+    {
+      "coverageID": "Gold",
+      "fundingStructure": {
+        "contributionType": "Non-contributory",
+        "requiredParticipationPrct": 0.25,
+        "sponsorPaymentMode": 1,
+        "memberPaymentModes": [
+          1,
+          12
+        ]
+      },
+      "rate": 0.7123456789,
+      "annualPremium": 12600,
+      "sponsorAnnualPremium": 12222,
+      "memberAnnualPremium": 378,
+      "proposedRate": null,
+      "classes": [
+        {
+          "classID": "1",
+          "numberOfLives": 10,
+          "totalVolume": 15000,
+          "annualPremium": 12600,
+          "rate": 0.7,
+          "sponsorAnnualPremium": 12222,
+          "memberAnnualPremium": 378,
+          "rateCards": [
+            {
+              "ageBandName": "<25",
+              "numberOfLives": 13,
+              "rate": 1.08,
+              "annualPremium": 1200,
+              "sponsorAnnualPremium": 12222,
+              "memberAnnualPremium": 378
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "coverageID": "Silver",
+      "fundingStructure": {
+        "contributionType": "Non-contributory",
+        "requiredParticipationPrct": 0.55,
+        "sponsorPaymentMode": 1,
+        "memberPaymentModes": [
+          1,
+          11
+        ]
+      },
+      "rate": 0.999999999,
+      "annualPremium": 22600,
+      "sponsorAnnualPremium": 22222,
+      "memberAnnualPremium": 478,
+      "proposedRate": null,
+      "classes": [
+        {
+          "classID": "2",
+          "numberOfLives": 20,
+          "totalVolume": 25000,
+          "annualPremium": 22600,
+          "rate": 0.65,
+          "sponsorAnnualPremium": 22222,
+          "memberAnnualPremium": 478,
+          "rateCards": [
+            {
+              "ageBandName": "<25",
+              "numberOfLives": 11,
+              "rate": 2.08,
+              "annualPremium": 2100,
+              "sponsorAnnualPremium": 22222,
+              "memberAnnualPremium": 255
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
