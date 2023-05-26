@@ -563,7 +563,7 @@ input, select, textarea {
   }
 
   &.fill-width {
-    input, select, textarea, .ui.selection.dropdown {
+     input, select, textarea, .ui.selection.dropdown, .rc-input-number {
       &:extend(.full-width all);
     }
   }
@@ -846,44 +846,6 @@ div.select {
     background-size: 8px 10px;
   }
 }
-
-// -----------------------------------------------------------------------------
-// FILLED INPUT SUMMARY DISPLAY ------------------------------------------------
-// -----------------------------------------------------------------------------
-// Uncomment the block below to enable Summary style for completed fields
-/*.input--wrapper.done {
-  // Completed state
-  .ui.selection.dropdown:not(.active):not(:hover) {
-    border-color: transparent;
-
-    + .input__label {
-      &:extend(.bold all);
-      &:extend(.no-margin all);
-      &:extend(.no-padding-v all);
-    }
-
-    @{select-icons} {
-      opacity: 0;
-    }
-  }
-
-  input:not(:focus) {
-    &:extend(.bg-transparent all);
-    border: none;
-
-    ~ label {
-      &:extend(.bold all);
-      &:extend(.no-margin-left all);
-      &:extend(.bg-transparent all);
-    }
-
-    ~ @{input-select-icon} {
-      &:not(.dropdown) {
-        display: none;
-      }
-    }
-  }
-}*/
 
 // -----------------------------------------------------------------------------
 // DISABLE AUTOFILL BACKGROUND COLOR -------------------------------------------
