@@ -10,36 +10,6 @@ import View from './View'
 import { Active } from 'ui-utils-pack'
 import RCInputNumber from 'rc-input-number'
 
-/**
- * Input Wrapper - Pure Component.
- * @Note: see `InputNative` component for more documentation
- *
- * @param {String} [name] - input name attribute
- * @param {String|Object|Boolean} [icon] - name or rendered component, rendered after input by default
- * @param {Boolean} [lefty] - whether to render icon on the left before input
- * @param {Function} [onClickIcon] - callback function when clicking on the icon if given
- * @param {Function} [onFocus] - callback when input gets focus
- * @param {Function} [onBlur] - callback when input loses focus
- * @param {Function} [onRemove] - callback(id || name) when input is deleted
- * @param {String} [unit] - text to display next to entered input value
- * @param {String} [label] - text to display next to input
- * @param {String} [id] - unique identifier for label
- * @param {Boolean} [float] - whether display as float-label input
- * @param {Boolean} [disabled] - whether input is disabled
- * @param {Boolean} [done] - whether input is completed
- * @param {Boolean} [stickyPlaceholder] - whether to persist placeholder as user types
- * @param {Boolean} [resize] - whether to adjust input height to match typed in text
- * @param {Boolean} [readonly] - whether to disable input and add `readonly` css class
- * @param {String|Object} [error] - message to display
- * @param {String|Object} [info] - explanation message to display under input
- * @param {String} [title] - tooltip
- * @param {String} [className] - css class to add
- * @param {String} [classNameIcon] - css class to add to Icon
- * @param {Object} [style] - css styles
- * @param {String|Object} [children] - React component
- * @param {*} props - attributes to pass to `<input />`
- * @returns {Object} - React Component
- */
 const InputNumber = ({
   name,
   id = name,
@@ -75,8 +45,6 @@ const InputNumber = ({
 }) => {
   const [active, setState] = useState(false)
   const [value, setValue] = useState(valueFromParent)
-  let format = (v) => v
-  // const [formattedValue, setFormattedValue] = useState()
   if (readonly) {
     props.className = 'readonly'
     props.readOnly = readonly
@@ -119,7 +87,7 @@ const InputNumber = ({
     return numberPart.replace(thousands, ' ') + (decimalPart ? '.' + decimalPart : '');
   }
 
-  format = (value, {userTyping, input}) => {
+  const format = (value, {userTyping, input}) => {
     if (outputFormat && outputFormat.separateThousands) {
       return commify(value)
     }

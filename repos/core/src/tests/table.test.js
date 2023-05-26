@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import React from 'react'
-import TableView from 'ui-react-pack/TableView'
+import TableView from '../pages/main/components/TableView'
 
 // Setup test
 beforeEach(() => {
