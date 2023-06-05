@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet'
 import Markdown from 'react-markdown'
 import ScrollView from 'ui-react-pack/ScrollView'
 import toc from 'remark-toc'
-import { __PROD__, get, logRender } from 'ui-utils-pack'
+import { __PROD__, get } from 'ui-utils-pack'
 import { goTo, ROUTE } from '../../common/variables'
 import changelog from './changelog.md'
 import CodeBlock from './CodeBlock'
@@ -24,7 +24,6 @@ const mdProps = {
  * EXAMPLE TEMPLATE ------------------------------------------------------------
  * -----------------------------------------------------------------------------
  */
-@logRender
 export default class Docs extends Component {
   state = {
     docs: undefined,

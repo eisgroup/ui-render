@@ -6,7 +6,7 @@ import React, { Component, Fragment } from 'react'
 import { cn, type } from 'ui-react-pack'
 import Json from 'ui-react-pack/JsonView'
 import ScrollView from 'ui-react-pack/ScrollView'
-import { Active, get, isEmpty, isList, isString, logRender, round, sanitizeResponse, warn } from 'ui-utils-pack'
+import { Active, get, isEmpty, isList, isString, round, sanitizeResponse, warn } from 'ui-utils-pack'
 import { cloneDeep, hasObjectValue, isObject, set } from 'ui-utils-pack/object'
 import Render, { metaToProps } from '../../ui-render'
 import './mapper' // Set up UI Renderer components and methods
@@ -96,9 +96,7 @@ let errorHandlerFunction = undefined;
  * @example:
  *    <UIRender data={data} meta={meta} initialValues={data} onSubmit={this.submit}/>
  */
-@withUISetup({subscription: {pristine: true, valid: true, values: true, touched: true}})
-@logRender
-export default class UIRender extends Component {
+export class UIRender extends Component {
   static propTypes = {
     data: type.Any.isRequired,
     meta: type.Object.isRequired,

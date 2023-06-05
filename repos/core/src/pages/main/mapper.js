@@ -412,6 +412,15 @@ const RenderComponent = ({
           input.id = uniqueIdentificator
           input.name = uniqueIdentificator
         }
+
+        // if (input.type === 'number') {
+        //   input.id = uniqueIdentificator
+        //   input.name = uniqueIdentificator
+        // if (_data) {
+        //   input.value = _data
+        // }
+
+        // }
       }
 
       // Render Dropdown separately, to avoid triggering form value changes

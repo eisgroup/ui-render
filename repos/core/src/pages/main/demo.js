@@ -10,7 +10,7 @@ import Row from 'ui-react-pack/Row'
 import ScrollView from 'ui-react-pack/ScrollView'
 import Text from 'ui-react-pack/Text'
 import View from 'ui-react-pack/View'
-import { ALERT, GET, isEmpty, l, localiseTranslation, logRender, performStorage, SET } from 'ui-utils-pack'
+import { ALERT, GET, isEmpty, l, localiseTranslation, performStorage, SET } from 'ui-utils-pack'
 import { _ } from 'ui-utils-pack/translations'
 import UIRender from './rules'
 import { downloadHistoricalFileTemplate, updateExperienceData, uploadHistoricalFile } from 'web/api/gdn-rating-alg'
@@ -35,7 +35,6 @@ const mapDispatchToProps = (dispatch) => ({
  * -----------------------------------------------------------------------------
  */
 @connect(mapStateToProps, mapDispatchToProps)
-@logRender
 export default class Demo extends Component {
   // @Note: functions should have consistent pattern of receiving important arguments first,
   // followed by optional arguments.

@@ -3,7 +3,6 @@ import { APP_NAME } from 'ui-modules-pack/variables'
 import React, { Component } from 'react'
 import Helmet from 'react-helmet'
 import View from 'ui-react-pack/View'
-import { logRender } from 'ui-utils-pack'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
@@ -19,7 +18,6 @@ const mapDispatchToProps = () => ({
  * -----------------------------------------------------------------------------
  */
 @connect(mapStateToProps, mapDispatchToProps)
-@logRender
 export default class Home extends Component {
   render () {
     return (

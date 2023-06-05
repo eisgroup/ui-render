@@ -10,7 +10,7 @@ import Modal from 'ui-react-pack/Modal'
 import Row from 'ui-react-pack/Row'
 import { UIContext } from 'ui-react-pack/utils'
 import View from 'ui-react-pack/View'
-import { Active, debounceBy, get, log, logRender, TIME_DURATION_INSTANT } from 'ui-utils-pack'
+import { Active, debounceBy, get, log, TIME_DURATION_INSTANT } from 'ui-utils-pack'
 import Sidebar, { Header } from './containers/Navigation'
 
 const mapStateToProps = (state) => ({
@@ -21,7 +21,6 @@ const mapStateToProps = (state) => ({
 
 @withRouter
 @connect(mapStateToProps)
-@logRender
 export default class App extends Component {
   state = {
     isMobile: false,

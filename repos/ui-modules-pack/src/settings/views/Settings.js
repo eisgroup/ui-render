@@ -2,7 +2,7 @@ import { connect, stateAction } from 'ui-modules-pack/redux'
 import React, { Component } from 'react'
 import Select from 'ui-react-pack/Select'
 import View from 'ui-react-pack/View'
-import { logRender, SET } from 'ui-utils-pack'
+import { SET } from 'ui-utils-pack'
 import { DEFAULT } from '../../variables'
 import { NAME, SETTING } from '../constants'
 import select from '../selectors'
@@ -25,7 +25,6 @@ const mapDispatchToProps = (dispatch) => ({
  * -----------------------------------------------------------------------------
  */
 @connect(mapStateToProps, mapDispatchToProps)
-@logRender
 export default class Settings extends Component {
   handleSetTheme = (theme) => {
     if (typeof theme === 'string' && this.props.theme !== theme) {

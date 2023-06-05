@@ -3,7 +3,6 @@ import Helmet from 'react-helmet'
 import Button from 'ui-react-pack/Button'
 import Row from 'ui-react-pack/Row'
 import ScrollView from 'ui-react-pack/ScrollView'
-import { logRender } from 'ui-utils-pack'
 import { APP_NAME } from '../../common/variables'
 import Buttons from './Buttons'
 import Charts from './Charts'
@@ -11,7 +10,6 @@ import Dropdowns from './Dropdowns'
 import Forms from './Forms'
 import Layouts from './Layouts'
 
-@logRender
 export default class Theme extends Component {
   state = {
     activeIndex: 1,
