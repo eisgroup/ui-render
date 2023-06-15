@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { type } from 'ui-react-pack'
 import { Active } from 'ui-utils-pack'
+import UIRenderWithUISetup from './rules'
 
 /**
  * Component to hold independent UI Render Instance Data
@@ -48,22 +49,29 @@ export default class Data extends Component {
     meta: {},
   }
 
-  // not needed for now because `meta` config does not get parsed
-  // stateFromMeta = (meta) => {
-  //   const {rootData} = this.props
-  //   if (!rootData) removeKeys(meta, ['relativePath'], {recursive: true})
-  //   return meta
-  // }
-
   render () {
-    const {kind, instance, index, data, meta, initialValues = data, className, style, embedded} = this.props
+    const {kind, instance, index, data, meta, initialValues = data, className, style, embedded, useForm} = this.props
     // Use Active.UIRender to avoid circular import
     const UIRender = Active.UIRender
 
     // For 'TableCells' add additional params to generate unique IDs
-    if (meta.view === 'TableCells') {
+    if (meta.view === 'TableCells' || meta.view === 'Data') {
       meta.relativePath = this.props.relativePath;
       meta.relativeIndex = this.props.relativeIndex;
+    }
+
+    if (useForm) {
+      return <UIRenderWithUISetup
+        data={data}
+        meta={meta}
+        initialValues={initialValues}
+        form={{kind}}
+        parent={instance}
+        // instance={instance}
+        index={index}
+        embedded={embedded}
+        {...{className, style}}
+      />
     }
 
     return <UIRender
@@ -72,6 +80,7 @@ export default class Data extends Component {
       initialValues={initialValues}
       form={{kind}}
       parent={instance}
+      // instance={instance}
       index={index}
       embedded={embedded}
       {...{className, style}}

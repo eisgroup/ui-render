@@ -28,9 +28,6 @@ const getStructuredDataFromFormObject = (form, meta) => {
   const formState = changeOptionOrderForSelectFields(formValues, meta);
 
   if (!relativePath) {
-    if (formState.dataKind) {
-      delete formState.dataKind;
-    }
     return formState;
   }
 

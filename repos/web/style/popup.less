@@ -5,8 +5,13 @@
   &:extend(.app__modal all);
 
   &.active {
+    justify-content: flex-start;
     min-height: 100%;
     z-index: 9999999; // navbar z-index is 1000
+  }
+
+  .app__popup__box {
+    margin-top: 200px;
   }
 }
 

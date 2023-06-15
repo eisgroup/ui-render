@@ -11,6 +11,7 @@ import View from 'ui-react-pack/View'
 import { by, get, hasListValue, isEqual, isEqualList, isFunction } from 'ui-utils-pack'
 import { getDateStringFromDateObject } from '../utils'
 import TableColGroup from './TableColGroup'
+import { FieldArray } from 'react-final-form-arrays'
 
 const sortObj = {
   id: PropTypes.string.isRequired, // id of the header, used for grouping columns/rows
@@ -258,6 +259,7 @@ export default class TableView extends PureComponent {
       })
       className = className.length ? className.join(' ') : undefined
     }
+
     return (
       <Fragment key={index}>
         <Table.Row className={className}>
@@ -326,6 +328,14 @@ export default class TableView extends PureComponent {
       ...props
     } = this.props
     const items = this.itemsSorted
+
+    const tableBody = (
+      <>
+        {vertical ? headers.map(this.renderItemsVertical) : items.map(this.renderItem)}
+        {renderExtraItem && <Table.Row>{renderExtraItem(items)}</Table.Row>}
+      </>
+    )
+
     return (
       <ScrollView row classNameInner="fill-width" fill={fill}>
         <Table className={cn('full-width', className, {vertical})} {...props}>
@@ -338,8 +348,11 @@ export default class TableView extends PureComponent {
             {!vertical && <Table.Row>{headers.map(this.renderHeader)}</Table.Row>}
           </Table.Header>
           <Table.Body>
-            {vertical ? headers.map(this.renderItemsVertical) : items.map(this.renderItem)}
-            {renderExtraItem && <Table.Row>{renderExtraItem(items)}</Table.Row>}
+            {this.props.name ? (
+              <FieldArray name={this.props.name}>
+                {({ fields }) => tableBody}
+              </FieldArray>
+            ) : tableBody}
           </Table.Body>
         </Table>
       </ScrollView>

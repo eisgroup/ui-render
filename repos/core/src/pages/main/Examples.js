@@ -227,7 +227,7 @@ export default class Examples extends Component {
     if (expanded) goTo(`#${id}`)
   }
 
-  onExperienceRatingsButtonClick = () => {
+  onGetDataButtonClick = () => {
     const data = this.getFormData();
     console.info('Form data: ', data);
   }
@@ -277,7 +277,7 @@ export default class Examples extends Component {
                       }}
                     />
                     <View className="app__examples bg-white border">
-                      <Button onClick={this.onExperienceRatingsButtonClick}>Get Data (the ability to request data from outside)</Button>
+                      <Button onClick={this.onGetDataButtonClick}>Get Data (the ability to request data from outside)</Button>
                     </View>
                   </>
                 ) : (

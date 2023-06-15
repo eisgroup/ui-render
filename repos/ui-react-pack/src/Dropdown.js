@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Dropdown as DropDown } from 'semantic-ui-react' // adds 27 KB to final js bundle
 import {
   hasListValue,
@@ -98,7 +98,11 @@ export function Dropdown ({
 }) {
   // Store options as state to allow additions
   let [options, setOptions] = useState(opts)
-  const [value, setValue] = useState(valueFromParent)
+  const defaultValue = useRef(typeof valueFromParent !== 'undefined'
+    ? valueFromParent
+    : ((Array.isArray(opts) && opts[0] && opts[0].value) || undefined)
+  )
+  const [value, setValue] = useState(defaultValue.current)
   let tempValue
 
   useEffect(() => {
@@ -106,8 +110,12 @@ export function Dropdown ({
   }, [opts])
 
   useEffect(() => {
-    setValue(valueFromParent)
+    setValue(valueFromParent || null)
   }, [valueFromParent])
+
+  useEffect(() => {
+    setValue(defaultValue.current)
+  }, [])
 
   if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability - why?
   if (readonly) props.disabled = true // Semantic Dropdown does not accept `readOnly` prop

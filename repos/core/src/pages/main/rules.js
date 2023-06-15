@@ -1,8 +1,8 @@
+import React, { Component, Fragment } from 'react'
 import { fetch } from 'ui-modules-pack/api'
 import { withForm } from 'ui-modules-pack/form'
 import { popupAlert } from 'ui-modules-pack/popup'
 import { FIELD } from 'ui-modules-pack/variables'
-import React, { Component, Fragment } from 'react'
 import { cn, type } from 'ui-react-pack'
 import Json from 'ui-react-pack/JsonView'
 import ScrollView from 'ui-react-pack/ScrollView'
@@ -22,6 +22,7 @@ import {
 } from './utils'
 import deepEqual from 'deep-equal';
 import { downloadFile as downloadFileProcessing } from 'web/services/downloadFile'
+import Popup from 'ui-modules-pack/popup/views/Popup'
 
 /**
  * BUSINESS RULES ==============================================================
@@ -192,15 +193,16 @@ export class UIRender extends Component {
   onDataChanged = undefined;
 
   render () {
-    const {childBefore, childAfter, form, embedded, className, style, translate} = this.props
+    const {childBefore, childAfter, form, embedded, className, style, translate, parent} = this.props
     const {key} = this.state
+
     const content = this.hasData && this.hasMeta &&
       <Render
         key={key}
         data={this.data}
         {...this.meta}
-        form={this.form}
-        instance={this}
+        form={this.form || parent.form}
+        instance={parent || this}
         translate={translate}
         onDataChanged={this.onDataChanged}
       />
@@ -215,10 +217,14 @@ export class UIRender extends Component {
         {childBefore}
         {(form && !embedded) ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
         {childAfter}
+        <Popup />
       </Container>
     )
   }
 }
+
+const UIRenderWithUISetup = withUISetup({subscription: {pristine: true, valid: true, values: true, touched: true}})(UIRender)
+export default UIRenderWithUISetup
 
 Active.UIRender = UIRender
 
@@ -236,7 +242,7 @@ export function toOpenLConfig (meta) {
     // Apply default Dropdown config if onChange is not defined
     if ((view === FIELD.TYPE.DROPDOWN || view === FIELD.TYPE.SELECT) && meta.name != null && meta.onChange == null) {
       meta.onChange = FIELD.ACTION.SET_STATE + ',' + meta.name
-      if (meta.value == null) meta.value = {name: `{state.${meta.name},0}`}
+      // if (meta.value == null) meta.value = {name: `{state.${meta.name},0}`}
       if (meta.options != null) {
         if (isString(meta.options)) meta.options = {name: meta.options}
         if (isObject(meta.mapOptions)) {
@@ -449,19 +455,16 @@ export function withUISetup (formConfig) {
           ? () => {
             // Call form submit to run validation
             if (!this.canSave) return this.handleSubmit()
-
+            const registeredValues = this.registeredValues
             // Add directly to data.json, to keep all data patterns consistent, and to enable backend override.
             // And store a copy in state for rehydration when backend updates response without added data.
             const {data} = parent.state
             const dataKindPath = parent.dataKindPath ? `${parent.dataKindPath}.dataKind` : 'dataKind'
             const dataKind = get(data.json, dataKindPath)
-            dataKind[form.kind] = [...dataKind[form.kind] || [], this.registeredValues]
-            const dataKindStructure = set({}, dataKindPath, dataKind)
-            data.json = set(data.json, dataKindPath, dataKind)
-            parent.setState({data: {...data}, ...dataKindStructure}, () => {
-              this.form.restart()
-              callOnDataChanged(this.props)
-            })
+            dataKind[form.kind] = [...dataKind[form.kind] || [], registeredValues]
+            const parentForm = this.props.parent.props.instance.form
+            parentForm.mutators.push(`${dataKindPath}.${form.kind}`, registeredValues)
+            this.form.restart()
           }
           : dataActionWarning
         // Remove current Form values from parent UI Render instance.state
@@ -473,10 +476,8 @@ export function withUISetup (formConfig) {
             const array = [...dataKind[form.kind] || []]
             array.splice(index, 1)
             dataKind[form.kind] = array
-            const dataKindStructure = set({}, dataKindPath, dataKind)
-            data.json = set(data.json, dataKindPath, dataKind)
-            parent.setState({data: {...data}, ...dataKindStructure})
-            callOnDataChanged(this.props)
+            const parentForm = this.props.parent.props.instance.form
+            parentForm.mutators.remove(`${dataKindPath}.${form.kind}`, index)
           }
           : dataActionWarning
 
@@ -529,15 +530,16 @@ export function withUISetup (formConfig) {
         // Cross UI Render instances validation
         FIELD.VALIDATION[FIELD.CROSS_VALIDATE.NOT_WITHIN_RANGE] = (value, {dataKind, args: [start, end]}) => {
           const {form, index, parent} = this.props
-
           // Validate against self
           const {[start]: _a, [end]: _b} = this.formValues
-          if (_a === _b) {
-            return `${start} and ${end} cannot be the same`
-          } else if (_a === value && _b < _a) {
-            return `${start} cannot be more than ${end}`
-          } else if (_b === value && _b < _a) {
-            return `${end} cannot be less than ${start}`
+          if (_a !== undefined && _b !== undefined) {
+            if (_a === _b) {
+              return `${start} and ${end} cannot be the same`
+            } else if (_a === value && _b < _a) {
+              return `${start} cannot be more than ${end}`
+            } else if (_b === value && _b < _a) {
+              return `${end} cannot be less than ${start}`
+            }
           }
 
           // Retrieve current state from all Forms, with fallback to parent instance.state

@@ -78,7 +78,16 @@ const RenderComponent = ({
       if (!isTruthy(__data)) return null
     } else if (hasObjectValue(showIf)) {
       const {name, relativeData, equal} = showIf
-      const __data = (relativeData !== false && !name && _data) || get((relativeData !== false && _data) || data, name)
+      let __data;
+      if (relativePath && typeof relativeIndex !== undefined && name) {
+        // Get from form instead of initial data
+        // It is important to get the value from form, because it might have been changed
+        const formData = instance.getAllFormsData();
+        __data = get(formData, `${relativePath}[${relativeIndex}].${name}`, undefined)
+      } else {
+        // Get from initial data
+        __data = (relativeData !== false && !name && _data) || get((relativeData !== false && _data) || data, name)
+      }
       if (equal !== undefined) {
         if (!isEqual(__data, equal)) return null
       } else {
@@ -175,11 +184,6 @@ const RenderComponent = ({
       if (items.length) props.children = items.map(Render)
       return <Label {...props} translate={translate}/>
     }
-    //
-    // case FIELD.TYPE.LINK: { // Internal router link
-    //   if (items.length) props.children = items.map(Render)
-    //   return <Link {...props}/>
-    // }
 
     case FIELD.TYPE.PIE_CHART: {
       const {mapItems, ...prop} = props
@@ -375,13 +379,11 @@ const RenderComponent = ({
     case FIELD.TYPE.POPUP: {
       if (!instance.popupById) instance.popupById = {}
       const {id, ...popup} = props
-
       /**
        * Popup is a special case, it does not render content to the DOM immediately, only as VirtualDOM.
        * When user clicks on a button that opens popup, the VirtualDOM is inserted to Popup component for rendering.
        * @withForm needs to wrap the entire content to provide Form field instance using existing form.
        */
-      @withForm({form: instance.form})
       class PopupContent extends PureComponent {
         render () {
           return items.map(Render)
@@ -401,26 +403,8 @@ const RenderComponent = ({
       // Resolve Input name dynamic path
       if (relativeData !== false && relativePath != null && input.name) {
         const uniqueIdentificator = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
-        if (typeof _data !== 'undefined') { // Case for tables with input fields to generate unique IDs
-          input.id = uniqueIdentificator
-        } else {
-          input.name = uniqueIdentificator
-        }
-
-        // Fix for single checkboxes. Allow correctly load data from JSON and set different names for each one
-        if (input.type === 'checkbox') {
-          input.id = uniqueIdentificator
-          input.name = uniqueIdentificator
-        }
-
-        // if (input.type === 'number') {
-        //   input.id = uniqueIdentificator
-        //   input.name = uniqueIdentificator
-        // if (_data) {
-        //   input.value = _data
-        // }
-
-        // }
+        input.id = uniqueIdentificator
+        input.name = uniqueIdentificator
       }
 
       // Render Dropdown separately, to avoid triggering form value changes
@@ -536,8 +520,11 @@ Render.Method = function RenderMethod (Name) {
       }
     case FIELD.RENDER.DATE: {
       return (val) => {
-        const date = (new Intl.DateTimeFormat()).format(new Date(val))
-        return <Text>{date}</Text>
+        if (val) {
+          const date = (new Intl.DateTimeFormat()).format(new Date(val))
+          return <Text>{date}</Text>
+        }
+        return null
       }
     }
     default:

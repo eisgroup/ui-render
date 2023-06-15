@@ -71,6 +71,10 @@ export function metaToProps (meta, config) {
             }
             // Below transformation only happens during render
             if (isObject(definition)) meta[attribute] = (value, index, props, self) => {
+                if (attribute === 'renderExtraItem') {
+                    definition.useForm = true
+                }
+
                 if (definition.relativeData === false) {
                     _data = data
                 } else {
@@ -113,6 +117,7 @@ export function metaToProps (meta, config) {
                         // Transform key path with actual data
                         ...name && {name: interpolateString(definition.name, {index, value})},
                         ...definition.index && {index: interpolateString(definition.index, {index})},
+                        ...definition.useForm && {useForm: true},
                         // Filter for row data from parent table (in default layout)
                         ...filterItems && {filterItems, parentItem: value},
                         // Inject functions by their name string
@@ -264,18 +269,20 @@ function getFunctionFromObject(definition, config) {
         const hasMapArgs = isList(mapArgs)
         if (isFunction(definition.onDone)) {
             return (...values) => {
-                // @ts-ignore
-                if (hasMapArgs) values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
+                if (hasMapArgs) {
+                    values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
+                }
                 const result = func(...values, ...args)
-                // @ts-ignore
-                if (result instanceof Promise) return result.then(definition.onDone)
-                // @ts-ignore
+                if (result instanceof Promise) {
+                    return result.then(definition.onDone)
+                }
                 return definition.onDone(result)
             }
         } else {
             return (...values) => {
-                // @ts-ignore
-                if (hasMapArgs) values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
+                if (hasMapArgs) {
+                    values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
+                }
                 return func(...values, ...args)
             }
         }

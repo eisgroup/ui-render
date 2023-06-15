@@ -15,7 +15,6 @@ export function renderField (fieldDefinition, i) {
     case FIELD.TYPE.INPUT:
       Field = InputField
       break
-    case FIELD.TYPE.DROPDOWN:
     case FIELD.TYPE.SELECT:
       Field = DropdownField
       break

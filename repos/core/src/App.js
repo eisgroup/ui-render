@@ -1,9 +1,8 @@
-import Popup from 'ui-modules-pack/popup/views/Popup'
+import React, { Component } from 'react'
 import { connect } from 'ui-modules-pack/redux'
 import { Switch, withRouter } from 'ui-modules-pack/router/browser'
 import { select, SETTING } from 'ui-modules-pack/settings'
 import { DEFAULT } from 'ui-modules-pack/variables'
-import React, { Component } from 'react'
 import Button from 'ui-react-pack/Button'
 import Icon from 'ui-react-pack/Icon'
 import Modal from 'ui-react-pack/Modal'
@@ -128,9 +127,6 @@ export default class App extends Component {
 
               {/* Modal */}
               {this.isModal && this.renderModal()}
-
-              {/* Popup */}
-              <Popup canClose inverted={inverted} renderClose={this.renderClosePopup}/>
             </View>
 
           </Row>

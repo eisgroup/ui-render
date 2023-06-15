@@ -14,6 +14,7 @@ import { hasObjectValue, objChanges, set } from 'ui-utils-pack/object'
 import { _ } from 'ui-utils-pack/translations'
 import { clearErrorsMap, errorsProcessing } from 'core/src/pages/main/utils'
 import { formsStorage } from 'core/src/pages/main/rules'
+import arrayMutators from 'final-form-arrays'
 
 /**
  * STATE SELECTORS =============================================================
@@ -118,8 +119,14 @@ export function asField (InputComponent, {sanitize} = {}) {
       translate: PropTypes.func,
     }
 
+    state = {
+      selectPreviousValue: null
+    }
+
     get value () {
-      if (this._value !== void 0) return this._value
+      if (this._value !== void 0) {
+        return this._value
+      }
       return ''
     }
 
@@ -177,7 +184,10 @@ export function asField (InputComponent, {sanitize} = {}) {
 
       if (!this.hasFocus) { // use cached `value` while editing to prevent format/parse bugs and rerender
         // @Note: defaultValue is only used for UI, internal value is still undefined
-        this.value = value === void 0 ? (pristine && defaultValue != null ? (format ? format(defaultValue) : defaultValue) : value) : value
+        this.value = value === void 0
+          ? (pristine && defaultValue != null ? (format ? format(defaultValue) : defaultValue) : value)
+          : value
+
       }
 
       // Hide this field if it's readonly and has no value.
@@ -187,16 +197,35 @@ export function asField (InputComponent, {sanitize} = {}) {
 
       if (instance) this.initValues = instance.props.initialValues
 
+      const nextValue = (InputComponent.name || InputComponent.constructor.name) === 'Dropdown'
+        ? (value === '' ? undefined : value)
+        : sanitize
+          ? sanitize(this.value, this.props)
+          : this.value
+
+      if ((InputComponent.name || InputComponent.constructor.name) === 'Dropdown') {
+        if (nextValue === value) {
+          this.setState({
+            selectPreviousValue: nextValue
+          })
+        } else if (nextValue !== value && this.state.selectPreviousValue !== null) {
+          props.value = nextValue
+          this.setState({
+            selectPreviousValue: null
+          })
+        }
+
+      }
+
       return (
         <InputComponent
           {...input}
-          // value={sanitize ? sanitize(this.value, this.props) : this.value}
+          value={nextValue}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur} // prevent value change, but need onBlur to set touched for validation
           onChange={this.handleChange}
           error={error && (touched || !pristine) && (err || error)} // only show error after user interaction
           {...props} // allow forceful value override
-          value={sanitize ? sanitize(this.value, this.props) : this.value}
         />
       )
     }
@@ -241,7 +270,7 @@ export function asField (InputComponent, {sanitize} = {}) {
     }
   }
 
-  Object.defineProperty(Class, 'name', {value: InputComponent.name || InputComponent.constructor.name})
+  Object.defineProperty(Class, 'name', {value: (InputComponent.name || InputComponent.constructor.name) + 'AsField'})
   return Class
 }
 
@@ -373,7 +402,15 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         // <Form/> reinitialises while loading, causing the flickering.
         // => either cache `initialValues`, or better, stop <Form/> from reinitializing while loading.
         //    because final-form always re-initializes, there is no `enableReinitialize` like redux-form.
-        return <Form onSubmit={onSubmit} {...options} initialValues={this.initValues} render={this.renderForm}/>
+        return <Form
+          onSubmit={onSubmit}
+          {...options}
+          mutators={{
+            ...arrayMutators
+          }}
+          initialValues={this.initValues}
+          render={this.renderForm}
+        />
       }
     }
   }
@@ -412,12 +449,16 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   // Define instance getter
   Object.defineProperty(Class.prototype, 'form', {
-    get () {return this.props.instance.form}
+    get () {
+      return this.props.instance ? this.props.instance.form : this.props.parent.form
+    }
   })
 
   // Define instance getter
   Object.defineProperty(Class.prototype, 'handleSubmit', {
-    get () {return this.props.instance.handleSubmit}
+    get () {
+      return this.props.instance ? this.props.instance.handleSubmit : this.props.parent.handleSubmit
+    }
   })
 
   // Define instance getter
@@ -528,7 +569,8 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   // Define instance method
   Class.prototype.syncInputChanges = function () {
     const { formProps, onDataChanged, parent = {} } = this._props || this.props;
-    if (!formProps.pristine || isDataChangedListenerCalled) {
+    // console.log('syncInputChanges', formProps.pristine, isDataChangedListenerCalled)
+    if (formProps && !formProps.pristine || isDataChangedListenerCalled) {
       isDataChangedListenerCalled = true
       if (typeof onDataChanged === 'function') {
         onDataChanged()
