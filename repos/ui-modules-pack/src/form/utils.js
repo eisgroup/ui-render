@@ -197,13 +197,13 @@ export function asField (InputComponent, {sanitize} = {}) {
 
       if (instance) this.initValues = instance.props.initialValues
 
-      const nextValue = (InputComponent.name || InputComponent.constructor.name) === 'Dropdown'
+      const nextValue = (InputComponent.displayName) === 'Dropdown'
         ? (value === '' ? undefined : value)
         : sanitize
           ? sanitize(this.value, this.props)
           : this.value
 
-      if ((InputComponent.name || InputComponent.constructor.name) === 'Dropdown') {
+      if ((InputComponent.displayName) === 'Dropdown') {
         if (nextValue === value) {
           this.setState({
             selectPreviousValue: nextValue

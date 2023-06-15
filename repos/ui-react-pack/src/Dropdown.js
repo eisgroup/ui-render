@@ -235,6 +235,8 @@ export function Dropdown ({
   )
 }
 
+Dropdown.displayName = 'Dropdown'
+
 Dropdown.propTypes = {
   value: PropTypes.any,
   options: PropTypes.arrayOf(PropTypes.oneOfType([

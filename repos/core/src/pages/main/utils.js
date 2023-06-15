@@ -18,9 +18,9 @@ export const getFormsData = (forms) => {
 }
 
 const getStructuredDataFromFormObject = (form, meta) => {
-  const { relativePath, relativeIndex } = meta;
+  const { relativePath, relativeIndex } = meta || {}
 
-  if (relativePath && typeof relativeIndex === 'undefined') {
+  if ((relativePath && typeof relativeIndex === 'undefined') || (relativePath === undefined && relativeIndex === undefined)) {
     return;
   }
 
