@@ -46,8 +46,19 @@ const InputNumber = ({
   type: _1,
   ...props
 }) => {
+  const formatDecimals = (value) => {
+    if (value && outputFormat && outputFormat.decimals) {
+      const pattern = `^\\d*(\\.\\d{0,${outputFormat.decimals}})?$`
+      const re = new RegExp(pattern, 'g')
+      if (!(re.test(value.toString()))) {
+        return parseFloat(value).toFixed(outputFormat.decimals);
+      }
+    }
+    return value
+  }
+
   const [active, setState] = useState(false)
-  const [value, setValue] = useState(valueFromParent)
+  const [value, setValue] = useState(formatDecimals(valueFromParent))
   if (readonly) {
     props.className = 'readonly'
     props.readOnly = readonly
@@ -65,19 +76,12 @@ const InputNumber = ({
 
   useEffect(() => {
     if (valueFromParent !== value) {
-      setValue(valueFromParent)
+      setValue(formatDecimals(valueFromParent))
     }
   }, [valueFromParent])
 
   const onChangeHandler = (value, name, event) => {
-    let nextValue = value
-    if (value && outputFormat && outputFormat.decimals) {
-      const pattern = `^\\d*(\\.\\d{0,${outputFormat.decimals}})?$`
-      const re = new RegExp(pattern, 'g')
-      if (!(re.test(value.toString()))) {
-        nextValue = parseFloat(value).toFixed(outputFormat.decimals);
-      }
-    }
+    let nextValue = formatDecimals(value)
     onChange(nextValue, name, event)
     setValue(nextValue)
   }
@@ -109,6 +113,7 @@ const InputNumber = ({
         return Number(value.replace(' %', ''))
       }
     }
+    return value
   }
 
   return (
