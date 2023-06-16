@@ -37,7 +37,10 @@ const InputNumber = ({
   defaultValue,
   placeholder,
   translate = Active.translate,
-  outputFormat = {},
+  outputFormat = {
+    percentage: false,
+    separateThousands: false,
+  },
   onChange,
   value: valueFromParent,
   type: _1,
@@ -88,10 +91,24 @@ const InputNumber = ({
   }
 
   const format = (value, {userTyping, input}) => {
-    if (outputFormat && outputFormat.separateThousands) {
-      return commify(value)
+    if (outputFormat) {
+      if (outputFormat.percentage) {
+        return value + ' %'
+      }
+      if (outputFormat.separateThousands) {
+        return commify(value)
+      }
     }
+
     return value
+  }
+
+  const parser = (value) => {
+    if (outputFormat) {
+      if (outputFormat.percentage) {
+        return Number(value.replace(' %', ''))
+      }
+    }
   }
 
   return (
@@ -141,6 +158,7 @@ const InputNumber = ({
           onChange={onChangeHandler}
           {...props}
           value={value}
+          parser={parser}
           formatter={format}
         />
         {icon && !lefty && (isString(icon)

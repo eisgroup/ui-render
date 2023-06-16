@@ -291,7 +291,8 @@ const Component = {
   partial: true, // whether to submit only changed values
   outputFormat: { // for Inputs with type 'number'
       decimals: number, // define how many fractional digits to show
-      separateThousands: boolean // separate thousands in big numbers
+      percentage: boolean, // add percent 
+      separateThousands: boolean // separate thousands in big numbers. don't works with percentage attribute
   }
 }
 ```

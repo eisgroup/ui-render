@@ -254,7 +254,11 @@ export function asField (InputComponent, {sanitize} = {}) {
       if (this.hasFocus) {
         this.value = value // store value exactly as typed in (example: value of '1.0' to work nicely with `unit` = '%')
       }
-      if (type === 'number') value = value !== '' ? Number(value) : null
+      // Possible need to remove this transformation
+      // Value is already a number or null by the time it gets here
+      // if (type === 'number') {
+      //   value = value !== '' ? Number(value) : null
+      // }
       this.input.onChange(value) // both redux-form and final-form input.onChange can accept 'event' or 'value'
       onChange && onChange(parse ? parse(value) : value, ...args)
     }
