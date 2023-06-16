@@ -79,13 +79,19 @@ const RenderComponent = ({
     } else if (hasObjectValue(showIf)) {
       const {name, relativeData, equal} = showIf
       let __data;
-      if (relativePath && typeof relativeIndex !== undefined && name) {
+      // if (relativePath && typeof relativeIndex !== undefined && name) {
+      if (name) {
         // Get from form instead of initial data
         // It is important to get the value from form, because it might have been changed
         const formData = instance.getAllFormsData();
-        __data = get(formData, `${relativePath}[${relativeIndex}].${name}`, undefined)
+        if (relativePath && typeof relativeIndex !== undefined) {
+          __data = get(formData, `${relativePath}[${relativeIndex}].${name}`, undefined)
+        } else {
+          __data = get(formData, name, undefined)
+        }
       } else {
-        // Get from initial data
+        // Get from initial data.
+        // TODO: review this logic. It might be better to get from form instead of initial data
         __data = (relativeData !== false && !name && _data) || get((relativeData !== false && _data) || data, name)
       }
       if (equal !== undefined) {

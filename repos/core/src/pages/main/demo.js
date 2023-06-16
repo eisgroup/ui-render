@@ -14,6 +14,7 @@ import { ALERT, GET, isEmpty, l, localiseTranslation, performStorage, SET } from
 import { _ } from 'ui-utils-pack/translations'
 import UIRender from './rules'
 import { downloadHistoricalFileTemplate, updateExperienceData, uploadHistoricalFile } from 'web/api/gdn-rating-alg'
+import { Button } from 'ui-react-pack/Button'
 
 const DEMO_JSON_STORAGE_KEY = 'DEMO_JSON'
 
@@ -53,6 +54,11 @@ export default class Demo extends Component {
     active: {
       // plan: 1,
     },
+  }
+
+  onGetDataButtonClick = () => {
+    const data = this.getFormData();
+    console.info('Form data: ', data);
   }
 
   handleUpload = (kind, [file], name) => {
@@ -119,12 +125,18 @@ export default class Demo extends Component {
           meta={meta.json}
           translate={(v) => v}
           onSubmit={console.warn}
+          getFormData={(f) => this.getFormData = f}
           apiCalls={{
             updateExperienceData,
             downloadFile: downloadHistoricalFileTemplate,
             uploadFile: uploadHistoricalFile
           }}
         />
+        {hasData && hasMeta &&
+          <View className="app__examples bg-white border" style={{marginTop: 20}}>
+            <Button onClick={this.onGetDataButtonClick}>Output the current data state to the dev console</Button>
+          </View>
+        }
       </>
     )
   }

@@ -18,9 +18,9 @@ export const getFormsData = (forms) => {
 }
 
 const getStructuredDataFromFormObject = (form, meta) => {
-  const { relativePath, relativeIndex } = meta || {}
+  const { relativePath, relativeIndex } = meta || {};
 
-  if ((relativePath && typeof relativeIndex === 'undefined') || (relativePath === undefined && relativeIndex === undefined)) {
+  if (relativePath && typeof relativeIndex === 'undefined') {
     return;
   }
 
@@ -203,7 +203,7 @@ const changeOptionOrderForSelectFields = (data, meta) => {
     return isDataOrderChanged
   }
 
-  if (meta.view === FIELD.TYPE.SELECT) {
+  if (meta && meta.view === FIELD.TYPE.SELECT) {
     const selectName = meta.name;
     if (typeof data[selectName] === 'string') {
       const { mapOptions } = meta;
@@ -216,11 +216,11 @@ const changeOptionOrderForSelectFields = (data, meta) => {
     }
   }
 
-  if (Array.isArray(meta.items)) {
+  if (meta && Array.isArray(meta.items)) {
     meta.items.forEach(item => {
       changeOptionOrderForSelectFields(data, item)
     })
-  } else if (meta.renderItem && Array.isArray(meta.renderItem.items)) {
+  } else if (meta && meta.renderItem && Array.isArray(meta.renderItem.items)) {
     meta.renderItem.items.forEach(item => {
       changeOptionOrderForSelectFields(data, item)
     })
