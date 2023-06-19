@@ -534,7 +534,9 @@ export function withUISetup (formConfig) {
           // Validate against overlap
           if (_a && _b) {
             const range = ranges.find((([a, b]) => _a < a && b < _b))
-            if (range) return `Cannot overlap [${range}] range`
+            if (range) {
+              return `Periods cannot overlap`
+            }
 
             const error = ranges.find(([start, end]) => start <= value && value <= end)
             if (error) {
