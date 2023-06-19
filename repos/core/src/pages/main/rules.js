@@ -11,7 +11,6 @@ import { cloneDeep, hasObjectValue, isObject, set } from 'ui-utils-pack/object'
 import Render, { metaToProps } from '../../ui-render'
 import './mapper' // Set up UI Renderer components and methods
 import { _ } from './translations'
-import { notWithinRange } from './validators'
 import {
   replaceDeep,
   getFormsData,
@@ -522,7 +521,6 @@ export function withUISetup (formConfig) {
               return `${end} cannot be less than ${start}`
             }
           }
-
           // Retrieve current state from all Forms, with fallback to parent instance.state
           const valuesBy = parent.getDataKind(dataKind) // this only includes values in `data.dataKind` state
           const ranges = []
@@ -534,12 +532,17 @@ export function withUISetup (formConfig) {
           }
 
           // Validate against overlap
-          if (_a != null && _b != null) {
+          if (_a && _b) {
             const range = ranges.find((([a, b]) => _a < a && b < _b))
             if (range) return `Cannot overlap [${range}] range`
+
+            const error = ranges.find(([start, end]) => start <= value && value <= end)
+            if (error) {
+              return `Cannot be in [${error[0]}, ${error[1]}] range`
+            }
           }
 
-          return notWithinRange(value, ranges)
+          return undefined
         }
         FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
         FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
