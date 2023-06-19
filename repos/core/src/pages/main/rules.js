@@ -306,7 +306,6 @@ export function withDataKind (Class) {
 
   Class.prototype.getDataKindPath = function (relativePath, kind) {
     const pathToData = `.dataKind.${kind}`
-
     if (relativePath.includes(pathToData)) {
       return relativePath.replace(pathToData, "")
     }
@@ -330,15 +329,6 @@ export function withDataKind (Class) {
     if (this.dataKind[kind] && this.dataKind[kind][index]) {
       delete this.dataKind[kind][index]
     }
-
-    // Update current parent state in case the component was edited, then unmounted from changing Tabs
-    const {data} = this.state
-    const {dataKind = {}} = this.getDataKindByRelativePath(data.json)
-    if (dataKind[kind] && dataKind[kind][index]) {
-      dataKind[kind][index] = instance.formValues
-      const dataKindStructure = set({}, this.dataKindPath, dataKind)
-      this.setState({data: {...data}, ...dataKindStructure})
-    }
   }
 
   /**
@@ -347,20 +337,11 @@ export function withDataKind (Class) {
    * @param {Number} [index] - Data component index
    * @returns {Array|Object|Undefined} all forms values by index array, or form values for given index object, else undefined
    */
-  Class.prototype.getDataKind = function (kind, index) {
-    if (index != null) {
-      const values = get(this.dataKind, `${kind}.${index}`, {}).formValues
-      return values != null ? values : get(this.state.dataKind, `${kind}.${index}`)
-    }
+  Class.prototype.getDataKind = function (kind) {
+    const dataJson = this.state.data.json
+    const pathToDataKindArray = this.dataKindPath ? this.dataKindPath + '.dataKind.' + kind : 'dataKind.' + kind
 
-    const stateBy = this.getDataKindByRelativePath(this.state.data.json)
-    const instancesBy = get(this.dataKind, kind, {})
-    const resultByIndex = []
-    for (const index in stateBy) {
-      const instance = instancesBy[index]
-      resultByIndex[index] = instance ? instance.formValues : stateBy[index]
-    }
-    return resultByIndex
+    return get(dataJson, pathToDataKindArray, [])
   }
 
   return Class
