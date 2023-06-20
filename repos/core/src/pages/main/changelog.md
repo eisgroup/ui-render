@@ -1,13 +1,32 @@
 ### Table of Contents
 
+### v0.29.5
+#### New
+- Added final-form-arrays library to support nested arrays in forms
+- Added ability to see the current data state on demo page
+- Added percent formatting to InputNumber component
+#### Fixes
+- Fixed InputNumber component
+- Truncate integer part of number to avoid rounding
+- Fixed Input margins
+- Added Popup component in UI-Render
+- Use single instance of UI-Render with form wrapper 
+- Added unique names for all fields 
+- Format initial values in InputNumber component
+- Fix date range validation and change validation message
+
+### v0.29.4
+#### Fixes
+- Clear code base
+
 ### v0.29.3
-### New 
+#### New 
 - Added Name attribute for checkboxes
 - Added parsing data to define dataKind attribute on nested levels
 - Ability to use not relative data in renderExtraItem attribute of tables
 - New Input Number Component with ability to format output
 
-### Fixes
+#### Fixes
 - Fixed behavior of Dropdowns in RowList view
 
 ### v0.29.2
