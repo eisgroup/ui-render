@@ -240,7 +240,9 @@ export function toOpenLConfig (meta) {
 
     // Apply default Dropdown config if onChange is not defined
     if ((view === FIELD.TYPE.DROPDOWN || view === FIELD.TYPE.SELECT) && meta.name != null && meta.onChange == null) {
-      meta.onChange = FIELD.ACTION.SET_STATE + ',' + meta.name
+      if (view === FIELD.TYPE.DROPDOWN) {
+        meta.onChange = FIELD.ACTION.SET_STATE + ',' + meta.name
+      }
       // if (meta.value == null) meta.value = {name: `{state.${meta.name},0}`}
       if (meta.options != null) {
         if (isString(meta.options)) meta.options = {name: meta.options}
