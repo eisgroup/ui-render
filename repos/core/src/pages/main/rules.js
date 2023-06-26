@@ -216,7 +216,7 @@ export class UIRender extends Component {
         {childBefore}
         {(form && !embedded) ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
         {childAfter}
-        <Popup />
+        {!parent && <Popup />}
       </Container>
     )
   }
