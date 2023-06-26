@@ -1,5 +1,14 @@
 ### Table of Contents
 
+### v0.30.0
+#### New
+- New Popup component with own context
+#### Fixes
+- Add parser for thousands separator in InputNumber component
+- Use popup in parent UI-Render instance only
+- Parse ReadableSteam to get Error message
+- Fixed behavior for selects with reordered options
+
 ### v0.29.5
 #### New
 - Added final-form-arrays library to support nested arrays in forms
