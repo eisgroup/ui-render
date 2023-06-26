@@ -112,6 +112,9 @@ const InputNumber = ({
       if (outputFormat.percentage) {
         return Number(value.replace(' %', ''))
       }
+      if (outputFormat.separateThousands) {
+        return Number(value.toString().replace(/ /g, ''))
+      }
     }
     return value
   }
