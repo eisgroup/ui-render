@@ -1,4 +1,3 @@
-import { withForm } from 'ui-modules-pack/form'
 import AutoSave from 'ui-modules-pack/form/views/AutoSave'
 import { POPUP, popupAlert } from 'ui-modules-pack/popup'
 import { stateAction } from 'ui-modules-pack/redux'

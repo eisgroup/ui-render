@@ -21,7 +21,8 @@ import {
 } from './utils'
 import deepEqual from 'deep-equal';
 import { downloadFile as downloadFileProcessing } from 'web/services/downloadFile'
-import Popup from 'ui-modules-pack/popup/views/Popup'
+import OldPopup from 'ui-modules-pack/popup/views/Popup'
+import Popup from './components/Popup'
 
 /**
  * BUSINESS RULES ==============================================================
@@ -91,6 +92,17 @@ export const errorsMap = {};
 
 let errorHandlerFunction = undefined;
 
+// Context for Popup component
+// TODO: replace redux state for pupup with this context
+export const PopupContext = React.createContext({
+  isOpen: false,
+  togglePopupState: () => {},
+  title: '',
+  content: '',
+});
+
+export const usePopup = () => React.useContext(PopupContext)
+
 /**
  * UI Render Instance Component
  * @example:
@@ -125,17 +137,37 @@ export class UIRender extends Component {
     if (typeof props.translate === 'function') {
       Active.translate = props.translate
     }
-  }
 
-  state = {
-    data: {
-      json: normalizeIncomingData(this.props.data)
-    },
-    meta: {
-      json: this.props.meta
-    },
-    errors: {},
-    key: new Date()
+    this.togglePopupState = ({title = '', content = ''}) => {
+      if (title && content) {
+        this.setState({
+          isPopupOpen: true,
+          popupTitle: title,
+          popupContent: content
+        });
+      } else {
+        this.setState({
+          isPopupOpen: false,
+          popupTitle: '',
+          popupContent: ''
+        });
+      }
+    }
+
+    this.state = {
+      data: {
+        json: normalizeIncomingData(this.props.data)
+      },
+      meta: {
+        json: this.props.meta
+      },
+      errors: {},
+      key: new Date(),
+      isPopupOpen: false,
+      togglePopupState: this.togglePopupState,
+      popupTitle: '',
+      popupContent: '',
+    }
   }
 
   UNSAFE_componentWillReceiveProps (next, nextContext) {
@@ -193,7 +225,7 @@ export class UIRender extends Component {
 
   render () {
     const {childBefore, childAfter, form, embedded, className, style, translate, parent} = this.props
-    const {key} = this.state
+    const { key, isPopupOpen, togglePopupState, popupTitle, popupContent } = this.state
 
     const content = this.hasData && this.hasMeta &&
       <Render
@@ -211,13 +243,25 @@ export class UIRender extends Component {
       className: cn('ui__render fade-in bg-neutral', className),
       style,
     }
-    return (
-      <Container {...props}>
+
+    if (parent) {
+      return <Container {...props}>
         {childBefore}
         {(form && !embedded) ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
         {childAfter}
-        {!parent && <Popup />}
       </Container>
+    }
+
+    return (
+      <PopupContext.Provider value={{ isOpen: isPopupOpen, togglePopupState, title: popupTitle, content: popupContent }}>
+        <Container {...props}>
+          {childBefore}
+          {(form && !embedded) ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
+          {childAfter}
+          <Popup />
+          <OldPopup />
+        </Container>
+      </PopupContext.Provider>
     )
   }
 }
@@ -532,7 +576,13 @@ export function withUISetup (formConfig) {
               }
             }
 
-            this.popupAlert({ message }, 'Error')
+            // const popup = usePopup()
+            this.togglePopupState({
+              title: 'Error',
+              content: <Json data={{message}}/>
+            })
+
+            // this.popupAlert({ message }, 'Error')
             console.error(error)
           }
         }
