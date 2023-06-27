@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.30.1
+#### Fixes
+- Fixed error message displaying
+
 ### v0.30.0
 #### New
 - New Popup component with own context
