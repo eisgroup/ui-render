@@ -550,39 +550,27 @@ export function withUISetup (formConfig) {
             let message = error
             // Fix to get error message from Response object
             if (error instanceof Response) {
-              const reader = error.body.getReader();
+              const errorText = await error.text()
+              const errorObject = JSON.parse(errorText.replace(/(\w+:)|(\w+ :)/g, function(s) {
+                return '"' + s.substring(0, s.length-1) + '":';
+              }));
+              message = errorObject;
+              if (errorObject.message) {
+                message = errorObject.message
 
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done) {
-                  return;
-                }
-                const b64 = Buffer.from(value).toString('base64');
-                const jsonStr = atob(b64).replace(/(\w+:)|(\w+ :)/g, function(s) {
-                  return '"' + s.substring(0, s.length-1) + '":';
-                });
-                const responseBody = JSON.parse(jsonStr);
-                message = responseBody;
-                if (responseBody.message) {
-                  message = responseBody.message
-
-                  if (/message=(.*)errors.*/.test(message)) {
-                    const subMessage = message.match(/message=(.*)errors.*/)[1]
-                    if (subMessage) {
-                      message = subMessage
-                    }
+                if (/message=(.*)errors.*/.test(message)) {
+                  const subMessage = message.match(/message=(.*)errors.*/)[1]
+                  if (subMessage) {
+                    message = subMessage
                   }
                 }
               }
             }
 
-            // const popup = usePopup()
             this.togglePopupState({
               title: 'Error',
               content: <Json data={{message}}/>
             })
-
-            // this.popupAlert({ message }, 'Error')
             console.error(error)
           }
         }
