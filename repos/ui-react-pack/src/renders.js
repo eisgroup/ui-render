@@ -147,7 +147,7 @@ export function renderFloat (value, decimals, props) {
   }
   return (
     <Text {...options}>
-      {Math.floor(value).toLocaleString()}
+      {Math.trunc(value).toLocaleString()}
       {showFraction && (faded ? <Text className='fade--quarter no-margin'>{fraction}</Text> : fraction)}
     </Text>
   )

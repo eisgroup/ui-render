@@ -5,7 +5,7 @@ import Icon from 'ui-react-pack/Icon'
 import Row from 'ui-react-pack/Row'
 import Text from 'ui-react-pack/Text'
 import View from 'ui-react-pack/View'
-import { logRender, SET } from 'ui-utils-pack'
+import { SET } from 'ui-utils-pack'
 import { _TEMPLATE } from './constants'
 import select from './selectors'
 
@@ -27,7 +27,6 @@ const mapDispatchToProps = (dispatch) => ({
  * -----------------------------------------------------------------------------
  */
 @connect(mapStateToProps, mapDispatchToProps)
-@logRender
 export default class _Template extends Component {
   render () {
     const {actions, loading} = this.props

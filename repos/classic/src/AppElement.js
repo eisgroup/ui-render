@@ -7,7 +7,7 @@ import React, { Component } from 'react'
 import Row from 'ui-react-pack/Row'
 import { UIContext } from 'ui-react-pack/utils'
 import View from 'ui-react-pack/View'
-import { debounceBy, logRender, TIME_DURATION_INSTANT } from 'ui-utils-pack'
+import { debounceBy, TIME_DURATION_INSTANT } from 'ui-utils-pack'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
@@ -24,7 +24,6 @@ const mapStateToProps = (state) => ({
  * -----------------------------------------------------------------------------
  */
 @connect(mapStateToProps)
-@logRender
 export default class AppElement extends Component {
   state = {
     isMobile: false,

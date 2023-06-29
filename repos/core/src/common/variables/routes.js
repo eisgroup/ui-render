@@ -5,8 +5,7 @@ export const ROUTE_BASE = __PROD__ ? `${ENV.REACT_APP_HOMEPAGE || ''}/` : '/'
 const _ROUTE = {
   HOME: ROUTE_BASE,
   DOCS: __PROD__ ? ROUTE_BASE : `${ROUTE_BASE}docs`,
-  TEST: `${ROUTE_BASE}test`,
-  TEST_POLICY: `${ROUTE_BASE}test/policy`,
+  TEST: `${ROUTE_BASE}test`
 }
 Object.assign(ROUTE, _ROUTE)
 
@@ -15,9 +14,7 @@ const _ROUTES = {
     [ROUTE.DOCS]: __PROD__ ? ':id?' : '/:id?', // add id to this route
   }),
   FOR_NAV: [],
-  WITHOUT_NAV: [
-    ROUTE.TEST_POLICY,
-  ]
+  WITHOUT_NAV: []
 }
 
 Object.assign(ROUTES, _ROUTES)

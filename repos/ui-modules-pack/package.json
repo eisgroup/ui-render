@@ -47,7 +47,7 @@
     "final-form": "^4.20.1",
     "history": "4.10.1",
     "react-dropzone": "4",
-    "react-final-form": "^6.5.1",
+    "react-final-form": "^6.5.9",
     "react-ga": "^3.1.2",
     "react-redux": "^7.2.0",
     "react-router": "^5.2.0",

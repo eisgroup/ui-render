@@ -160,38 +160,6 @@ export function logMapping (NAME, value) {
 }
 
 /**
- * React Component Log Render Decorator
- * @example:
- *    @logRender
- *    class Homepage extends Component {...}
- *    >>> ♦♦♦♦♦♦♦ RENDER Homepage ♦♦♦♦♦♦♦
- *
- * @param {Object} constructor - class
- */
-export function logRender (constructor) {
-  const original = constructor.prototype.render
-
-  constructor.prototype.render = function () {
-    if (__DEV__) {
-      const name = constructor.name
-      const start = now()
-      const result = original.apply(this, arguments)
-      const duration = now() - start
-      const colors = ['color: Teal']
-      let time = `${formatNumber(duration, {decimals: 3})} ms`
-      // Render is considered slow if it reaches near one frame in 60 FPS
-      if (__CLIENT__ && duration >= 15) {
-        time = '%c' + time + '%c'
-        colors.push('color: Red', 'color: Teal')
-      }
-      log(`♦♦♦♦♦♦♦ RENDER ${name} [${time}] ♦♦♦♦♦♦♦`, ...colors)
-      return result
-    }
-    return original.apply(this, arguments)
-  }
-}
-
-/**
  * Console log proxy for memoized Selectors with standardised colors and format.
  * Only runs in dev.
  *

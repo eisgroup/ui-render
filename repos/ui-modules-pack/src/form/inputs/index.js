@@ -5,6 +5,7 @@
  */
 
 export { default as InputField } from './InputField'
+export { default as InputNumberField } from './InputNumberField'
 export { default as DropdownField } from './DropdownField'
 export { default as ToggleField } from './ToggleField'
 export { default as UploadGridField } from './UploadGridField'

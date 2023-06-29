@@ -1,8 +1,8 @@
 {
   "name": "eis-ui-render",
-  "version": "0.29.0",
-  "description": "UI Render for EIS Integration",
-  "homepage": ".",
+  "version": "0.30.1",
+  "description": "UI generation based on JSON schemas",
+  "homepage": "https://eisgroup.github.io/ui-render/",
   "sideEffects": false,
   "license": "Apache 2.0",
   "scripts": {

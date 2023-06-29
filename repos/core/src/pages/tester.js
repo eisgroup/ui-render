@@ -18,7 +18,7 @@ import Slider from 'ui-react-pack/Slider'
 import Space from 'ui-react-pack/Space'
 import Text from 'ui-react-pack/Text'
 import View from 'ui-react-pack/View'
-import { ALERT, CREATE, logRender, warn, } from 'ui-utils-pack'
+import { ALERT, CREATE, warn, } from 'ui-utils-pack'
 import { API_GQL_URL, ROUTE } from '../common/variables'
 
 const query = `mutation {
@@ -59,7 +59,6 @@ const mapDispatchToProps = (dispatch) => ({
  */
 @connect(mapStateToProps, mapDispatchToProps)
 @withForm()
-@logRender
 export default class Tester extends Component {
   renderTester = () => {
     const { actions } = this.props

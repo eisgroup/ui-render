@@ -1,6 +1,6 @@
 // import Apollo from 'core/src/apollo'
-import UIRender from 'core/src/pages/eis/rules'
-import WebStudioPage from 'core/src/pages/eis/webstudio'
+import UIRender from 'core/src/pages/main/rules'
+import WebStudioPage from 'core/src/pages/main/webstudio'
 import Redux from 'ui-modules-pack/redux'
 import React, { PureComponent } from 'react'
 import { render } from 'react-dom'

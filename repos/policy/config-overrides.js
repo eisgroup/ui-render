@@ -52,7 +52,7 @@ if (process.env.NODE_ENV === 'test') {
   )
 }
 
-/* Avoid conflict with Genesis UI Webpack config */
+/* Avoid conflict with Webpack config of parent application*/
 function jsonpRename (config) {
   config.output = {
     ...config.output,

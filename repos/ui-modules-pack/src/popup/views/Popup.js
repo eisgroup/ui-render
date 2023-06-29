@@ -6,7 +6,7 @@ import ErrorContent from 'ui-react-pack/ErrorContent'
 import Row from 'ui-react-pack/Row'
 import Text from 'ui-react-pack/Text'
 import View from 'ui-react-pack/View'
-import { CLOSE, hasListValue, isInList, l, localiseTranslation, logRender } from 'ui-utils-pack'
+import { CLOSE, hasListValue, isInList, l, localiseTranslation } from 'ui-utils-pack'
 import { _ } from 'ui-utils-pack/translations'
 import { connect } from '../../redux'
 import { stateAction } from '../../redux/actions'
@@ -51,7 +51,6 @@ const mapDispatchToProps = (dispatch) => ({
  * -----------------------------------------------------------------------------
  */
 @connect(mapStateToProps, mapDispatchToProps)
-@logRender
 export default class Popup extends PureComponent {
   static propTypes = {
     actions: type.Object,

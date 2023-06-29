@@ -1,27 +1,17 @@
-import Popup from 'ui-modules-pack/popup/views/Popup'
+import React, { Component } from 'react'
 import { connect } from 'ui-modules-pack/redux'
 import { Switch, withRouter } from 'ui-modules-pack/router/browser'
 import { select, SETTING } from 'ui-modules-pack/settings'
 import { DEFAULT } from 'ui-modules-pack/variables'
-import React, { Component } from 'react'
 import Button from 'ui-react-pack/Button'
 import Icon from 'ui-react-pack/Icon'
 import Modal from 'ui-react-pack/Modal'
 import Row from 'ui-react-pack/Row'
 import { UIContext } from 'ui-react-pack/utils'
 import View from 'ui-react-pack/View'
-import { Active, debounceBy, get, log, logRender, TIME_DURATION_INSTANT } from 'ui-utils-pack'
+import { Active, debounceBy, get, log, TIME_DURATION_INSTANT } from 'ui-utils-pack'
 import Sidebar, { Header } from './containers/Navigation'
 
-import { LocalizationUtils } from '@eisgroup/common'
-import { ioc } from './localization'
-
-const t = LocalizationUtils.translate
-
-/**
- * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
- * -----------------------------------------------------------------------------
- */
 const mapStateToProps = (state) => ({
   lang: select.language(state),
   currency: select.currency(state),
@@ -30,11 +20,9 @@ const mapStateToProps = (state) => ({
 
 @withRouter
 @connect(mapStateToProps)
-@logRender
 export default class App extends Component {
   state = {
     isMobile: false,
-    isLocalizationLoaded: false,
     screenRatio: 1,
   }
 
@@ -68,7 +56,6 @@ export default class App extends Component {
   }
 
   scrollToTop = () => {
-    // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
     this.content.current.scrollIntoView({behavior: 'auto'})
   }
 
@@ -106,11 +93,6 @@ export default class App extends Component {
   }
 
   componentDidMount () {
-    ioc.finally(() => {
-      this.setState({
-        isLocalizationLoaded: true
-      })
-    })
     window.addEventListener('resize', this.resize.bind(this))
     this.resize()
   }
@@ -124,9 +106,9 @@ export default class App extends Component {
 
   render () {
     const {children, theme = DEFAULT.THEME, lang = DEFAULT.LANGUAGE, currency, ...props} = this.props
-    const {isMobile, isLocalizationLoaded} = this.state
+    const {isMobile} = this.state
     const inverted = theme === SETTING.THEME.DARK
-    return isLocalizationLoaded && (
+    return (
       <UIContext.Provider value={this.state}>
         <View className={`app fade-in lang--${lang} ${currency}` + (inverted ? ' inverted text-shadow' : '')}>
           {/*<AcceptCookie/>*/}
@@ -145,9 +127,6 @@ export default class App extends Component {
 
               {/* Modal */}
               {this.isModal && this.renderModal()}
-
-              {/* Popup */}
-              <Popup canClose inverted={inverted} renderClose={this.renderClosePopup}/>
             </View>
 
           </Row>

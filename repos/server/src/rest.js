@@ -1,5 +1,5 @@
-import meta from 'core/src/pages/eis/examples/example_components'
-import data from 'core/src/pages/eis/examples/example_data'
+import meta from 'core/src/pages/main/examples/example_components'
+import data from 'core/src/pages/main/examples/example_data'
 import cors from 'cors'
 import express from 'express'
 import { __PROD__, Active, NODE_ENV } from 'ui-utils-pack'

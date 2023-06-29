@@ -12,14 +12,17 @@ import View from 'ui-react-pack/View'
 import { Active, debounce, isEqualJSON, toJSON, warn } from 'ui-utils-pack'
 import { hasObjectValue, objChanges, set } from 'ui-utils-pack/object'
 import { _ } from 'ui-utils-pack/translations'
-import { clearErrorsMap, errorsProcessing } from 'core/src/pages/eis/utils'
-import { formsStorage } from 'core/src/pages/eis/rules'
+import { clearErrorsMap, errorsProcessing } from 'core/src/pages/main/utils'
+import { formsStorage } from 'core/src/pages/main/rules'
+import arrayMutators from 'final-form-arrays'
 
 /**
  * STATE SELECTORS =============================================================
  * Memoized Functions - to retrieve specific branches of the app state
  * =============================================================================
  */
+
+let isDataChangedListenerCalled = false;
 
 /**
  * Get Form's Field Values
@@ -116,8 +119,14 @@ export function asField (InputComponent, {sanitize} = {}) {
       translate: PropTypes.func,
     }
 
+    state = {
+      selectPreviousValue: null
+    }
+
     get value () {
-      if (this._value !== void 0) return this._value
+      if (this._value !== void 0) {
+        return this._value
+      }
       return ''
     }
 
@@ -153,7 +162,9 @@ export function asField (InputComponent, {sanitize} = {}) {
         const initialValues = this.initValues
         setTimeout(() => {
           // only call this if the form is not unmounted and initialValues remained (i.e. not between transitions)
-          if (instance.isUnmounting) return
+          if (instance.isUnmounting) {
+            return
+          }
           const form = instance.form
           if (form && initialValues === instance.props.initialValues) {
             form.change(name, null)
@@ -173,7 +184,10 @@ export function asField (InputComponent, {sanitize} = {}) {
 
       if (!this.hasFocus) { // use cached `value` while editing to prevent format/parse bugs and rerender
         // @Note: defaultValue is only used for UI, internal value is still undefined
-        this.value = value === void 0 ? (pristine && defaultValue != null ? (format ? format(defaultValue) : defaultValue) : value) : value
+        this.value = value === void 0
+          ? (pristine && defaultValue != null ? (format ? format(defaultValue) : defaultValue) : value)
+          : value
+
       }
 
       // Hide this field if it's readonly and has no value.
@@ -183,10 +197,30 @@ export function asField (InputComponent, {sanitize} = {}) {
 
       if (instance) this.initValues = instance.props.initialValues
 
+      const nextValue = (InputComponent.displayName) === 'Dropdown'
+        ? (value === '' ? undefined : value)
+        : sanitize
+          ? sanitize(this.value, this.props)
+          : this.value
+
+      if ((InputComponent.displayName) === 'Dropdown') {
+        if (nextValue === value) {
+          this.setState({
+            selectPreviousValue: nextValue
+          })
+        } else if (nextValue !== value && this.state.selectPreviousValue !== null) {
+          props.value = nextValue
+          this.setState({
+            selectPreviousValue: null
+          })
+        }
+
+      }
+
       return (
         <InputComponent
           {...input}
-          value={sanitize ? sanitize(this.value, this.props) : this.value}
+          value={nextValue}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur} // prevent value change, but need onBlur to set touched for validation
           onChange={this.handleChange}
@@ -220,22 +254,14 @@ export function asField (InputComponent, {sanitize} = {}) {
       if (this.hasFocus) {
         this.value = value // store value exactly as typed in (example: value of '1.0' to work nicely with `unit` = '%')
       }
-      if (type === 'number') value = value !== '' ? Number(value) : null
+      // Possible need to remove this transformation
+      // Value is already a number or null by the time it gets here
+      // if (type === 'number') {
+      //   value = value !== '' ? Number(value) : null
+      // }
       this.input.onChange(value) // both redux-form and final-form input.onChange can accept 'event' or 'value'
       onChange && onChange(parse ? parse(value) : value, ...args)
     }
-
-    // @Note: this is not needed as default behavior, because inputs like color always trigger onChange
-    //        the logic was used for redux-form to normalize input initially
-    // componentDidMount () {
-    //   // Normalize initialValue
-    //   const {normalize, parse = normalize, onChange} = this.props
-    //   if (!parse || this.value === '') return
-    //   const valueNormalized = parse(this.value)
-    //   if (this.value === valueNormalized) return
-    //   this.input.onChange(valueNormalized)
-    //   onChange && onChange(valueNormalized)
-    // }
 
     // Do not pass 'onChange' to Field because it fires event as argument
     // final-form does not take controlled `value`
@@ -248,7 +274,7 @@ export function asField (InputComponent, {sanitize} = {}) {
     }
   }
 
-  Object.defineProperty(Class, 'name', {value: InputComponent.name || InputComponent.constructor.name})
+  Object.defineProperty(Class, 'name', {value: (InputComponent.name || InputComponent.constructor.name) + 'AsField'})
   return Class
 }
 
@@ -380,7 +406,15 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         // <Form/> reinitialises while loading, causing the flickering.
         // => either cache `initialValues`, or better, stop <Form/> from reinitializing while loading.
         //    because final-form always re-initializes, there is no `enableReinitialize` like redux-form.
-        return <Form onSubmit={onSubmit} {...options} initialValues={this.initValues} render={this.renderForm}/>
+        return <Form
+          onSubmit={onSubmit}
+          {...options}
+          mutators={{
+            ...arrayMutators
+          }}
+          initialValues={this.initValues}
+          render={this.renderForm}
+        />
       }
     }
   }
@@ -419,12 +453,16 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   // Define instance getter
   Object.defineProperty(Class.prototype, 'form', {
-    get () {return this.props.instance.form}
+    get () {
+      return this.props.instance ? this.props.instance.form : this.props.parent.form
+    }
   })
 
   // Define instance getter
   Object.defineProperty(Class.prototype, 'handleSubmit', {
-    get () {return this.props.instance.handleSubmit}
+    get () {
+      return this.props.instance ? this.props.instance.handleSubmit : this.props.parent.handleSubmit
+    }
   })
 
   // Define instance getter
@@ -535,7 +573,9 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   // Define instance method
   Class.prototype.syncInputChanges = function () {
     const { formProps, onDataChanged, parent = {} } = this._props || this.props;
-    if (!formProps.pristine) {
+    // console.log('syncInputChanges', formProps.pristine, isDataChangedListenerCalled)
+    if (formProps && !formProps.pristine || isDataChangedListenerCalled) {
+      isDataChangedListenerCalled = true
       if (typeof onDataChanged === 'function') {
         onDataChanged()
       } else if (parent && typeof parent.onDataChanged === 'function') {

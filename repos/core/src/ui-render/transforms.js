@@ -59,7 +59,9 @@ export function metaToProps (meta, config) {
         // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
         if (isObject(definition)) {
             metaToFunctions(definition, {...funcConfig, data})
-            if (definition.name) definition.name = interpolateString(definition.name, instance, {suppressError: true})
+            if (definition.name) {
+                definition.name = interpolateString(definition.name, instance, {suppressError: true})
+            }
         }
 
         // Map Value Renderer Names/Objects to Actual Render Functions
@@ -67,10 +69,17 @@ export function metaToProps (meta, config) {
             if (typeof definition === 'string') { // @ts-ignore
                 meta[attribute] = Render.Method(meta[attribute])
             }
-
             // Below transformation only happens during render
             if (isObject(definition)) meta[attribute] = (value, index, props, self) => {
-                _data = value
+                if (attribute === 'renderExtraItem') {
+                    definition.useForm = true
+                }
+
+                if (definition.relativeData === false) {
+                    _data = data
+                } else {
+                    _data = value
+                }
 
                 // Render is a field definition
                 if (definition.view) {
@@ -96,6 +105,7 @@ export function metaToProps (meta, config) {
                     } else {
                         revPath.relativePath = relativePathFrom(meta, relativePath, relativeIndex)
                     }
+
                     return Render({
                         // Relative Path is required for nested Inputs
                         ...revPath,
@@ -107,6 +117,7 @@ export function metaToProps (meta, config) {
                         // Transform key path with actual data
                         ...name && {name: interpolateString(definition.name, {index, value})},
                         ...definition.index && {index: interpolateString(definition.index, {index})},
+                        ...definition.useForm && {useForm: true},
                         // Filter for row data from parent table (in default layout)
                         ...filterItems && {filterItems, parentItem: value},
                         // Inject functions by their name string
@@ -258,18 +269,20 @@ function getFunctionFromObject(definition, config) {
         const hasMapArgs = isList(mapArgs)
         if (isFunction(definition.onDone)) {
             return (...values) => {
-                // @ts-ignore
-                if (hasMapArgs) values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
+                if (hasMapArgs) {
+                    values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
+                }
                 const result = func(...values, ...args)
-                // @ts-ignore
-                if (result instanceof Promise) return result.then(definition.onDone)
-                // @ts-ignore
+                if (result instanceof Promise) {
+                    return result.then(definition.onDone)
+                }
                 return definition.onDone(result)
             }
         } else {
             return (...values) => {
-                // @ts-ignore
-                if (hasMapArgs) values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
+                if (hasMapArgs) {
+                    values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
+                }
                 return func(...values, ...args)
             }
         }

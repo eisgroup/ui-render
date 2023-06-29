@@ -1,6 +1,6 @@
 # Deployment Guide
 
-Below manual hacks are required for Genesis UI Integration, because their UI:
+Below manual hacks are required for integration with the parent application, as a parent UI may have nex restrictions:
 
 - does not have a static asset folder.
 - cannot handle static assets without processing them through webpack import.
@@ -85,10 +85,8 @@ then `yarn build:css`
 }
 ```
 
-12. Move `semantic.less` and `all.less` files to `/repos/policy/dist/static` because Genesis UI cannot import `.css` and duplicate to `semantic.css` and `all.css`.
+12. Move `semantic.less` and `all.less` files to `/repos/policy/dist/static` and duplicate to `semantic.css` and `all.css`.
 
-13. Replace all `fonts` files in `/ui-eis-genesis/prototypes/applications/packages/cem-dxp-app/src/fonts/`
+13. Rename `chunk` and `main` files inside `./dist/static/js` to remove hash for example: `1.94a8b9f9.chunk.js` to `chunk.js` and move them to `./dist/static` folder.    
 
-14. Rename `chunk` and `main` files inside `./dist/static/js` to remove hash for example: `1.94a8b9f9.chunk.js` to `chunk.js` and move them to `./dist/static` folder.    
-
-15. Create `./dist/static/loader.js` file with the `<script>` content of `index.html`
+14. Create `./dist/static/loader.js` file with the `<script>` content of `index.html`
