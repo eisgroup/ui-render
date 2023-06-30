@@ -1,4 +1,4 @@
-import uploadButton from 'core/src/pages/eis/examples/upload_meta'
+import uploadButton from 'core/src/pages/main/examples/upload_meta'
 import { cloneDeep } from 'ui-utils-pack'
 import Demographic from './earth_meta_Demographic'
 import ExperienceRating from './earth_meta_ExperienceRating'

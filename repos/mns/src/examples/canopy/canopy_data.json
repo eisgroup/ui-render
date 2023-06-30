@@ -1,0 +1,199 @@
+{
+  "request": {
+    "policy": {
+      "policyNumber": "P00001",
+      "rateEffectiveDate": "2023-08-01T00:00:00.000Z",
+      "requestDate": "2023-07-06T00:00:00.000Z",
+      "plans": [
+        {
+          "planName": "GIP",
+          "benefitMultiple": 4,
+          "paymentFrequency": "Half yearly",
+          "fcl": 1500000,
+          "reinsuranceLevel": 200000
+        }
+      ],
+      "census": [
+        {
+          "employeeID": "1",
+          "age": "35",
+          "gender": "Female",
+          "salary": 49021.5440091376,
+          "location": "Central London",
+          "occupation": "Retail"
+        },
+        {
+          "employeeID": "2",
+          "age": "29",
+          "gender": "Male",
+          "salary": 41890.8250564155,
+          "location": "Central London",
+          "occupation": "Retail"
+        },
+        {
+          "employeeID": "3",
+          "age": "21",
+          "gender": "Female",
+          "salary": 93142.1065753421,
+          "location": "Central London",
+          "occupation": "Finance"
+        },
+        {
+          "employeeID": "4",
+          "age": "25",
+          "gender": "Male",
+          "salary": 33354.9256192293,
+          "location": "Central London",
+          "occupation": "Finance"
+        },
+        {
+          "employeeID": "5",
+          "age": "31",
+          "gender": "Male",
+          "salary": 91380.1674115764,
+          "location": "Central London",
+          "occupation": "Finance"
+        },
+        {
+          "employeeID": "6",
+          "age": "34",
+          "gender": "Female",
+          "salary": 89296.2946046123,
+          "location": "Dorset",
+          "occupation": "Insurance"
+        },
+        {
+          "employeeID": "7",
+          "age": "29",
+          "gender": "Male",
+          "salary": 73395.932982514,
+          "location": "Dorset",
+          "occupation": "Insurance"
+        },
+        {
+          "employeeID": "8",
+          "age": "32",
+          "gender": "Female",
+          "salary": 48366.2672950652,
+          "location": "Dorset",
+          "occupation": "Insurance"
+        },
+        {
+          "employeeID": "9",
+          "age": "23",
+          "gender": "Male",
+          "salary": 61115.9891031104,
+          "location": "Dorset",
+          "occupation": "Retail"
+        },
+        {
+          "employeeID": "10",
+          "age": "31",
+          "gender": "Female",
+          "salary": 4947.64789688851,
+          "location": "Dorset",
+          "occupation": "Retail"
+        }
+      ],
+      "experienceData": {
+        "showExperienceRating": true,
+        "periodBasisType": "Month",
+        "credibility": 0.574116202376211,
+        "actualClaims":   149942.5956084730,
+        "overallExpectedClaims":   370947.5929260680,
+        "ae": 0.4042,
+        "claimsLoading": 0.6580,
+        "ratesAndHistoricalInfo": [
+          {
+            "planName": "GIP",
+            "historicalInformation": [
+              {
+                "periodName": "Year 1",
+                "startDate": "2023-01-02T00:00:00.000Z",
+                "endDate": "2023-04-02T00:00:00.000Z",
+                "numberOfLives": 152,
+                "totalBenefit": 4360043,
+                "totalClaims": 46768.4617557784,
+                "basicUnitRate": 0.8252,
+                "loading1": 1.6342,
+                "loading2": 1.6089,
+                "expectedClaims":  94598.4998916491,
+                "expectedClaimsPeriod":  23325.6575075299
+              },
+              {
+                "periodName": "Year 2",
+                "startDate": "2022-01-02T00:00:00.000Z",
+                "endDate": "2023-01-02T00:00:00.000Z",
+                "numberOfLives": 829,
+                "totalBenefit": 3239892,
+                "totalClaims": 59037.8493923244,
+                "basicUnitRate": 0.903,
+                "loading1": 1.3522,
+                "loading2": 1.2385,
+                "expectedClaims":  48995.3908287046,
+                "expectedClaimsPeriod":  48995.3908287046
+              },
+              {
+                "periodName": "Year 3",
+                "startDate": "2021-01-02T00:00:00.000Z",
+                "endDate": "2022-01-02T00:00:00.000Z",
+                "numberOfLives": 505,
+                "totalBenefit": 9768214,
+                "totalClaims": 7173.58325352324,
+                "basicUnitRate": 0.6491,
+                "loading1": 1.1686,
+                "loading2": 1.5074,
+                "expectedClaims":  111691.7685027790,
+                "expectedClaimsPeriod":  111691.7685027790
+              },
+              {
+                "periodName": "Year 4",
+                "startDate": "2020-01-02T00:00:00.000Z",
+                "endDate": "2021-01-02T00:00:00.000Z",
+                "numberOfLives": 955,
+                "totalBenefit": 7099175,
+                "totalClaims": 9598.79423575365,
+                "basicUnitRate": 0.8976,
+                "loading1": 1.4882,
+                "loading2": 1.9576,
+                "expectedClaims":  185641.8905019420,
+                "expectedClaimsPeriod":  186150.4984211260
+              },
+              {
+                "periodName": "Year 5",
+                "startDate": "2019-01-02T00:00:00.000Z",
+                "endDate": "2020-01-02T00:00:00.000Z",
+                "numberOfLives": 44,
+                "totalBenefit": 7256699,
+                "totalClaims": 27363.9069710934,
+                "basicUnitRate": 0.0053,
+                "loading1": 1.4403,
+                "loading2": 1.4158,
+                "expectedClaims":  784.2776659290,
+                "expectedClaimsPeriod":  784.2776659290
+              }
+            ]
+          }
+        ]
+      },
+      "lta": [
+        {
+          "employeeID": 1,
+          "age": 28,
+          "gender": "Male",
+          "dateOfFirstAbsence": "2023-01-01T00:00:00.000Z",
+          "reason": "Pancreatic cancer",
+          "cost": 1000
+        },
+        {
+          "employeeID": 2,
+          "age": 31,
+          "gender": "Female",
+          "dateOfFirstAbsence": "2023-02-03T00:00:00.000Z",
+          "reason": "MS",
+          "cost": 2000
+        }
+      ]
+    }
+  }
+}

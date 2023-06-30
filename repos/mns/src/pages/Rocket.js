@@ -1,4 +1,4 @@
-import UIRender from 'core/src/pages/eis/rules'
+import UIRender from 'core/src/pages/main/rules'
 import { fetch } from 'ui-modules-pack/api'
 import React, { PureComponent } from 'react'
 import { cloneDeep, SUCCESS, warn } from 'ui-utils-pack'

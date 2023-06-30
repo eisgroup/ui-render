@@ -24,6 +24,9 @@ export default class Dashboard extends PureComponent {
           <Link className="img__swatch" to={ROUTE.ROCKET} style={card}>
             <Image name="rocket.png" style={card} />
           </Link>
+          <Link className="img__swatch" to={ROUTE.CANOPY} style={card}>
+            <Image name="canopy.jpg" style={card} />
+          </Link>
         </Row>
       </ScrollView>
     )

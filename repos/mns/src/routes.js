@@ -5,6 +5,7 @@ const _ROUTE = {
   DOCS: `${ROUTE_BASE}docs`,
   EARTH: `${ROUTE_BASE}earth`,
   ROCKET: `${ROUTE_BASE}rocket`,
+  CANOPY: `${ROUTE_BASE}canopy`,
 }
 Object.assign(ROUTE, _ROUTE)
 
