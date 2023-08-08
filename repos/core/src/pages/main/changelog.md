@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.30.2
+#### Fixes
+- Align behavior of InputNumber component with other inputs
+
 ### v0.30.1
 #### Fixes
 - Fixed error message displaying
