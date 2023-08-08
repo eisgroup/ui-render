@@ -113,6 +113,9 @@ const InputNumber = ({
         return Number(value.replace(' %', ''))
       }
       if (outputFormat.separateThousands) {
+        if (!value) {
+          return value
+        }
         return Number(value.toString().replace(/ /g, ''))
       }
     }
