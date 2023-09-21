@@ -579,9 +579,19 @@ export function withUISetup (formConfig) {
 
         // Cross UI Render instances validation
         FIELD.VALIDATION[FIELD.CROSS_VALIDATE.NOT_WITHIN_RANGE] = (value, {dataKind, args: [start, end]}) => {
-          const {form, index, parent} = this.props
-          // Validate against self
-          const {[start]: _a, [end]: _b} = this.formValues
+          const {form, index, parent, meta} = this.props
+          // get relative path and index to field from formValues
+          const { relativeIndex, relativePath } = meta || {}
+          let _a, _b;
+
+          if (relativePath && typeof relativeIndex === 'number') {
+            _a = get(this.formValues, `${relativePath}.${relativeIndex}.${start}`)
+            _b = get(this.formValues, `${relativePath}.${relativeIndex}.${end}`)
+          } else {
+            _a = this.formValues[start]
+            _b = this.formValues[end]
+          }
+
           if (_a !== undefined && _b !== undefined) {
             if (_a === _b) {
               return `${start} and ${end} cannot be the same`
