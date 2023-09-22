@@ -671,7 +671,7 @@ export function withUISetup (formConfig) {
     // Define instance method
     // Update data.json
     Class.prototype.dataUpdate = function (value) {
-      return this.setState(set(this.state, 'data.json', value))
+      return this.setState(set(this.state, 'data.json', normalizeIncomingData(value)))
     }
 
     // Define instance method
