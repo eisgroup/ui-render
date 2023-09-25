@@ -31,22 +31,6 @@ FIELD.TYPE = {
 }
 
 // Validation Definitions
-FIELD.NORMALIZE = {
-  DATE: 'date',
-  HOUR_MINUTE: 'hh:mm',
-  DOUBLE5: 'double5',
-  INTEGER: 'integer',
-  PHONE: 'phone',
-  UPPERCASE: 'uppercase',
-}
-FIELD.NORMALIZER = {
-  [FIELD.NORMALIZE.DOUBLE5]: double5,
-  [FIELD.NORMALIZE.INTEGER]: integer,
-  [FIELD.NORMALIZE.PHONE]: phone,
-  [FIELD.NORMALIZE.UPPERCASE]: uppercase,
-}
-
-// Validation Definitions
 FIELD.VALIDATE = {
   EMAIL: 'email',
   MAX_LENGTH: 'maxLength',

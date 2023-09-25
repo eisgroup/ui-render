@@ -23,6 +23,7 @@ import deepEqual from 'deep-equal';
 import { downloadFile as downloadFileProcessing } from 'web/services/downloadFile'
 import OldPopup from 'ui-modules-pack/popup/views/Popup'
 import Popup from './components/Popup'
+import { double5, integer, phone, uppercase } from 'ui-react-pack/inputs/normalizers'
 
 /**
  * BUSINESS RULES ==============================================================
@@ -54,12 +55,21 @@ FIELD.CROSS_VALIDATE = {
   NOT_WITHIN_RANGE: 'notWithinRange',
 }
 FIELD.NORMALIZE = {
-  ...FIELD.NORMALIZE,
+  DATE: 'date',
+  HOUR_MINUTE: 'hh:mm',
+  DOUBLE5: 'double5',
+  INTEGER: 'integer',
+  PHONE: 'phone',
+  UPPERCASE: 'uppercase',
   CURRENCY: 'currency',
   PERCENT: 'percent',
 }
+
 FIELD.NORMALIZER = {
-  ...FIELD.NORMALIZER,
+  [FIELD.NORMALIZE.DOUBLE5]: double5,
+  [FIELD.NORMALIZE.INTEGER]: integer,
+  [FIELD.NORMALIZE.PHONE]: phone,
+  [FIELD.NORMALIZE.UPPERCASE]: uppercase,
   [FIELD.NORMALIZE.DATE]: (val) => {
     if (val) {
       const date = new Date(val);
@@ -668,18 +678,6 @@ export function withUISetup (formConfig) {
       }
     })
 
-    // Define instance method
-    // Update data.json
-    Class.prototype.dataUpdate = function (value) {
-      return this.setState(set(this.state, 'data.json', normalizeIncomingData(value)))
-    }
-
-    // Define instance method
-    // Update meta.json
-    Class.prototype.metaUpdate = function (value) {
-      return this.setState(set(this.state, 'meta.json', value))
-    }
-
     // Define instance getter
     Object.defineProperty(Class.prototype, 'hasData', {
       get () {
@@ -746,9 +744,17 @@ export function withUISetup (formConfig) {
 
     Class.prototype.UNSAFE_componentWillReceiveProps = function (next, _) {
       const {data, meta} = this.props
-      if (next.data != null && next.data !== data) this.dataUpdate(next.data) // external API changes
-      if (next.meta != null && next.meta !== meta) this.metaUpdate(next.meta) // external API changes
-      if (UNSAFE_componentWillReceiveProps) UNSAFE_componentWillReceiveProps.apply(this, arguments)
+      // external API changes
+      if (next.data != null && next.data !== data) {
+        this.setState(set(this.state, 'data.json', normalizeIncomingData(next.data)))
+      }
+      // external API changes
+      if (next.meta != null && next.meta !== meta) {
+        this.setState(set(this.state, 'meta.json', next.meta))
+      }
+      if (UNSAFE_componentWillReceiveProps) {
+        UNSAFE_componentWillReceiveProps.apply(this, arguments)
+      }
     }
 
     return withForm(formConfig)(Class)
