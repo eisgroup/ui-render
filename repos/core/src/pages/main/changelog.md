@@ -1,5 +1,12 @@
 ### Table of Contents
 
+### v0.30.5
+#### Fixes
+- Display errors on tabs switch
+- Fix definition of input format function
+- Normalize incoming data
+- Fix table validation rules
+
 ### v0.30.2
 #### Fixes
 - Align behavior of InputNumber component with other inputs
