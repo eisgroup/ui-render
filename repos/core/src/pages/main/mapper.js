@@ -479,11 +479,6 @@ const RenderComponent = ({
         }
       }
 
-      // Always format dates
-      // if (input.type === 'date' && input.format) {
-      //   input.formatOnBlur = false // this is true by default to prevent cursor jumping
-      // }
-
       return renderField({view, ...input, ...readonly && {readonly}, ...disabled && {disabled}, translate})
     }
   }

@@ -98,7 +98,7 @@ export const formsStorage = new Map();
 /*
   Accumulate validation errors from all Form instances
  */
-export const errorsMap = {};
+export let errorsMap = {};
 
 let errorHandlerFunction = undefined;
 
@@ -112,6 +112,10 @@ export const PopupContext = React.createContext({
 });
 
 export const usePopup = () => React.useContext(PopupContext)
+
+export const clearErrorsMap = () => {
+  errorsMap = {};
+}
 
 /**
  * UI Render Instance Component

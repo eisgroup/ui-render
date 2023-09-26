@@ -173,7 +173,7 @@ export function metaToProps (meta, config) {
                     if (meta.view !== undefined) {
                         meta[attribute] = "";
                     }
-                    console.warn(`${meta.view}.${attribute}`, definition, '\n❌ Not found! relative _data:', _data)
+                    // console.warn(`${meta.view}.${attribute}`, definition, '\n❌ Not found! relative _data:', _data)
                 }
             } else {
                 // Recursively process the rest of definitions

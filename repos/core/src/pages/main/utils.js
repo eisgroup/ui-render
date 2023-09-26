@@ -121,30 +121,17 @@ export function errorsProcessing(form, meta) {
 
   registeredFieldNames.forEach(field => {
     const { name, error, touched } = form.getFieldState(field);
+
     if (error && touched) {
       let errorText = error;
       if (errorText === 'Required') {
         errorText = convertFieldNameToTitleCaseText(name) + ' is Required'
       }
-      errors[`${path}${name}`] = errorText;
+      errorsMap[name] = errorText;
+    } else {
+      delete errorsMap[name];
     }
   })
-
-  if (Object.keys(errors).length) {
-    errorsMap[key] = errors;
-  } else {
-    delete errorsMap[key];
-  }
-}
-
-export const clearErrorsMap = (form, meta) => {
-  const { key } = getKeyAndPathFromMetaData(meta);
-
-  if (!key) {
-    return;
-  }
-
-  delete errorsMap[key];
 }
 
 /*
@@ -162,16 +149,14 @@ export const clearErrorsMap = (form, meta) => {
 export const mapErrorObjectToUIFormat = (errors) => {
   const result = {};
 
-  Object.keys(errors).forEach(key => {
-    Object.keys(errors[key]).forEach(fieldName => {
-      result[fieldName] = {
-        messages: [
-          {
-            text: errors[key][fieldName]
-          }
-        ]
-      }
-    })
+  Object.keys(errors).forEach(fieldName => {
+    result[fieldName] = {
+      messages: [
+        {
+          text: errors[fieldName]
+        }
+      ]
+    }
   })
 
   return result;

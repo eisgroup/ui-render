@@ -12,8 +12,8 @@ import View from 'ui-react-pack/View'
 import { Active, debounce, isEqualJSON, toJSON, warn } from 'ui-utils-pack'
 import { hasObjectValue, objChanges, set } from 'ui-utils-pack/object'
 import { _ } from 'ui-utils-pack/translations'
-import { clearErrorsMap, errorsProcessing } from 'core/src/pages/main/utils'
-import { formsStorage } from 'core/src/pages/main/rules'
+import { errorsProcessing } from 'core/src/pages/main/utils'
+import { clearErrorsMap, formsStorage } from 'core/src/pages/main/rules'
 import arrayMutators from 'final-form-arrays'
 
 /**
@@ -23,6 +23,9 @@ import arrayMutators from 'final-form-arrays'
  */
 
 let isDataChangedListenerCalled = false;
+
+let formInitialValues = null;
+export let storedTouched = {};
 
 /**
  * Get Form's Field Values
@@ -217,6 +220,8 @@ export function asField (InputComponent, {sanitize} = {}) {
 
       }
 
+      const errorText = error && (storedTouched[input.name] || touched || !pristine) && (err || error)
+
       return (
         <InputComponent
           {...input}
@@ -224,7 +229,7 @@ export function asField (InputComponent, {sanitize} = {}) {
           onFocus={this.handleFocus}
           onBlur={this.handleBlur} // prevent value change, but need onBlur to set touched for validation
           onChange={this.handleChange}
-          error={error && (touched || !pristine) && (err || error)} // only show error after user interaction
+          error={errorText} // only show error after user interaction
           {...props} // allow forceful value override
         />
       )
@@ -335,6 +340,27 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
     // Define withFormSetup here to load it only once on App init
     withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors, Tooltip})
 
+    const formSubscription = (form) => ({touched, initialValues, error, errors}) => {
+      if (formInitialValues === null) {
+        formInitialValues = initialValues;
+      }
+
+      if (formInitialValues !== initialValues && Object.keys(initialValues).length) {
+        formInitialValues = initialValues;
+        for(const field of Object.keys(storedTouched)){
+          form.mutators.setFieldTouched(field, false)
+        }
+        storedTouched = {}
+        clearErrorsMap()
+      } else {
+        for(const field of Object.keys(touched)) {
+          if(touched[field]) {
+            storedTouched[field] = true;
+          }
+        }
+      }
+    }
+
     // @Note: to avoid several WithForm instances sharing the same closure props,
     //        this decorator must return a class component that stores its internal state between re-renders.
     // Use PureComponent to avoid double checking large payloads.
@@ -354,11 +380,15 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       // => better to let `render` function always run, and memoize at the highest <WithForm> level.
       // => this way, rerender is minimized to only when props changed, or form state changed.
       renderForm = ({form, handleSubmit, ...formProps}) => {
-        // warn('-->>renderForm-----------------')
         // formProps `form` and `handleSubmit` props always change, possibly due to inline fat arrow function.
         this.form = form
         this.handleSubmit = handleSubmit
-        if (!isEqualJSON(this._formProps, formProps)) this._formProps = formProps
+
+        if (!isEqualJSON(this._formProps, formProps)) {
+          this._formProps = formProps
+        }
+
+        form.subscribe(formSubscription(form), {touched: true, initialValues: true, error: true, errors: true})
 
         // Class should use PureComponent to take advantage of caching
         return <Class {...this._props} formProps={this._formProps} initialValues={this._initValues} instance={this}/>
@@ -410,13 +440,23 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
           onSubmit={onSubmit}
           {...options}
           mutators={{
-            ...arrayMutators
+            ...arrayMutators,
+            setFieldTouched
           }}
           initialValues={this.initValues}
           render={this.renderForm}
         />
       }
     }
+  }
+}
+
+const setFieldTouched = (args, state) => {
+  const [name, touched] = args
+  const field = state.fields[name]
+
+  if (field) {
+    field.touched = touched
   }
 }
 
@@ -573,7 +613,6 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   // Define instance method
   Class.prototype.syncInputChanges = function () {
     const { formProps, onDataChanged, parent = {} } = this._props || this.props;
-    // console.log('syncInputChanges', formProps.pristine, isDataChangedListenerCalled)
     if (formProps && !formProps.pristine || isDataChangedListenerCalled) {
       isDataChangedListenerCalled = true
       if (typeof onDataChanged === 'function') {
@@ -613,7 +652,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   Class.prototype.componentWillUnmount = function () {
     if (this._meta) {
-      clearErrorsMap(this.form, this._meta)
+      clearErrorsMap()
     }
 
     this.isUnmounting = true
@@ -622,79 +661,4 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   }
 
   return Class
-}
-
-/**
- * React Component Group Input Change Decorator to fire onChange callback as group of fields together
- *
- * @usage:
- *  - provides this.fields prop that is automatically hooked with `onChange` to fire callback as group of inputs
- *
- * @example:
- *    @withGroupInputChange
- *    class Fields extends Component {
- *      render () {
- *        return this.fields.map(renderField)
- *      }
- *    }
- *
- * @param {Object} constructor - class
- */
-export function withGroupInputChange (constructor) {
-  const componentDidMount = constructor.prototype.componentDidMount
-
-  constructor.propTypes = {
-    name: PropTypes.string, // top level field prefix
-    items: PropTypes.array.isRequired, // list of fields attributes to render
-    instance: PropTypes.object.isRequired, // Instance of the Class component decorated withFormSetup (i.e withForm)
-    initialValues: PropTypes.object, // input default values, required for `onChange` callback to work properly
-    onChange: PropTypes.func, // callback, receiving all nested field value changes combined, grouped by input name
-    required: PropTypes.bool, // input prop
-    disabled: PropTypes.bool, // input prop
-    ...constructor.propTypes,
-  }
-
-  // Define instance getter
-  Object.defineProperty(constructor.prototype, 'fields', {
-    get () {
-      // Hook to `onChange` call from each field in the group
-      const {items, name: prefix, instance} = this.props
-      return items.map(({name, onChange, ...field}) => ({
-        name: prefix ? (prefix + '.' + name) : name,
-        onChange: (val, ...args) => {
-          onChange && onChange(val, ...args)
-          this.handleChangeInput(name, val)
-        },
-        ...field,
-        instance,
-      }))
-    }
-  })
-
-  constructor.prototype.handleChangeInput = function (name, value) {
-    const {onChange} = this.props
-    if (!onChange) return
-    this.values = {...this.values, [name]: value}
-    onChange(this.values)
-  }
-
-  constructor.prototype.componentDidMount = function () {
-    const {onChange, initialValues, name} = this.props
-    if (name && onChange && initialValues === undefined)
-      warn(this.constructor.name, `.${name} requires 'initialValues', if 'onChange(values)' is used`)
-    // Oly pre-populate group values if initialValues was subset of the entire form, so changes can be submitted together
-    if (initialValues && name) this.values = {...initialValues}
-    if (componentDidMount) componentDidMount.apply(this, arguments)
-  }
-
-  return constructor
-}
-
-/**
- * Compose Validators Array into a Single Validator Function
- * @param {Function[]|function(any)} validators - to compose
- * @returns {Function} validator for use with react-final-form
- */
-export function composeValidators (...validators) {
-  return (value) => validators.reduce((error, validator) => error || validator(value), undefined)
 }

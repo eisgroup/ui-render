@@ -67,7 +67,6 @@ export default class Data extends Component {
         initialValues={initialValues}
         form={{kind}}
         parent={instance}
-        // instance={instance}
         index={index}
         embedded={embedded}
         {...{className, style}}
@@ -80,7 +79,6 @@ export default class Data extends Component {
       initialValues={initialValues}
       form={{kind}}
       parent={instance}
-      // instance={instance}
       index={index}
       embedded={embedded}
       {...{className, style}}
