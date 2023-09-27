@@ -1,6 +1,6 @@
 ### Table of Contents
 
-### v0.30.5
+### v0.30.6
 #### Fixes
 - Display errors on tabs switch
 - Fix definition of input format function
