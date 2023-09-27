@@ -2,6 +2,7 @@ import { merge, isObject } from 'ui-utils-pack/object'
 import { errorsMap } from './rules'
 import { FIELD, ISO_8601_FULL } from 'ui-modules-pack'
 import { cloneDeep } from 'ui-utils-pack'
+import { storedTouched } from 'ui-modules-pack/form'
 
 export const getFormsData = (forms) => {
   const formDataArray = [];
@@ -122,7 +123,7 @@ export function errorsProcessing(form, meta) {
   registeredFieldNames.forEach(field => {
     const { name, error, touched } = form.getFieldState(field);
 
-    if (error && touched) {
+    if (error && (touched || storedTouched[name])) {
       let errorText = error;
       if (errorText === 'Required') {
         errorText = convertFieldNameToTitleCaseText(name) + ' is Required'
