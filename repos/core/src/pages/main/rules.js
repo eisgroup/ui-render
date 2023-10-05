@@ -397,7 +397,7 @@ export function withDataKind (Class) {
    * @returns {Array|Object|Undefined} all forms values by index array, or form values for given index object, else undefined
    */
   Class.prototype.getDataKind = function (kind) {
-    const dataJson = this.state.data.json
+    const dataJson = getFormsData(formsStorage)
     const pathToDataKindArray = this.dataKindPath ? this.dataKindPath + '.dataKind.' + kind : 'dataKind.' + kind
 
     return get(dataJson, pathToDataKindArray, [])
