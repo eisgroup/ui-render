@@ -340,7 +340,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
     // Define withFormSetup here to load it only once on App init
     withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors, Tooltip})
 
-    const formSubscription = (form) => ({touched, initialValues, error, errors}) => {
+    const formSubscription = (form) => ({touched, initialValues}) => {
       if (formInitialValues === null) {
         formInitialValues = initialValues;
       }

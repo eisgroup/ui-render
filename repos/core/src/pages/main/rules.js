@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { fetch } from 'ui-modules-pack/api'
-import { withForm } from 'ui-modules-pack/form'
+import { storedTouched, withForm } from 'ui-modules-pack/form'
 import { popupAlert } from 'ui-modules-pack/popup'
 import { FIELD } from 'ui-modules-pack/variables'
 import { cn, type } from 'ui-react-pack'
@@ -505,6 +505,9 @@ export function withUISetup (formConfig) {
             const parentForm = this.props.parent.props.instance.form
             parentForm.mutators.push(`${dataKindPath}.${form.kind}`, registeredValues)
             this.form.restart()
+            this.form.getRegisteredFields().forEach(field => {
+              delete storedTouched[field]
+            })
           }
           : dataActionWarning
         // Remove current Form values from parent UI Render instance.state
