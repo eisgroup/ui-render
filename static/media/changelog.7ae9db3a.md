@@ -1,5 +1,11 @@
 ### Table of Contents
 
+### v0.30.7
+#### Fixes
+- Fix validation message
+- Validate date ranges using current form state
+- Clear fields state on subform reset
+
 ### v0.30.6
 #### Fixes
 - Display errors on tabs switch
