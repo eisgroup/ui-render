@@ -611,11 +611,11 @@ export function withUISetup (formConfig) {
 
           if (_a !== undefined && _b !== undefined) {
             if (_a === _b) {
-              return `${start} and ${end} cannot be the same`
+              return `Start date and end date cannot be the same`
             } else if (_a === value && _b < _a) {
-              return `${start} cannot be more than ${end}`
+              return `Start date cannot be more than end date`
             } else if (_b === value && _b < _a) {
-              return `${end} cannot be less than ${start}`
+              return `End date cannot be less than start date`
             }
           }
           // Retrieve current state from all Forms, with fallback to parent instance.state
