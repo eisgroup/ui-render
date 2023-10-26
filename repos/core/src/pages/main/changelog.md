@@ -1,5 +1,8 @@
 ### Table of Contents
 
+### v0.30.8
+- Fix form initial values
+
 ### v0.30.7
 #### Fixes
 - Fix validation message

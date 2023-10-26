@@ -345,7 +345,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         formInitialValues = initialValues;
       }
 
-      if (formInitialValues !== initialValues && Object.keys(initialValues).length) {
+      if (formInitialValues !== initialValues && initialValues && Object.keys(initialValues).length) {
         formInitialValues = initialValues;
         for(const field of Object.keys(storedTouched)){
           form.mutators.setFieldTouched(field, false)
