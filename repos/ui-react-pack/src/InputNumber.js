@@ -47,7 +47,7 @@ const InputNumber = ({
   ...props
 }) => {
   const formatDecimals = (value) => {
-    if (value && outputFormat && outputFormat.decimals) {
+    if (value && outputFormat && typeof outputFormat.decimals === 'number' && outputFormat.decimals >= 0) {
       const pattern = `^\\d*(\\.\\d{0,${outputFormat.decimals}})?$`
       const re = new RegExp(pattern, 'g')
       if (!(re.test(value.toString()))) {
@@ -57,8 +57,9 @@ const InputNumber = ({
     return value
   }
 
-  const [active, setState] = useState(false)
+  const [active, setActive] = useState(false)
   const [value, setValue] = useState(formatDecimals(valueFromParent))
+
   if (readonly) {
     props.className = 'readonly'
     props.readOnly = readonly
@@ -159,11 +160,11 @@ const InputNumber = ({
           aria-describedby={idHelp}
           placeholder={translate(placeholder)}
           onFocus={(...args) => {
-            !active && setState(true)
+            !active && setActive(true)
             onFocus && onFocus(...args)
           }}
           onBlur={(...args) => {
-            active && setState(false)
+            active && setActive(false)
             onBlur && onBlur(...args)
           }}
           onChange={onChangeHandler}

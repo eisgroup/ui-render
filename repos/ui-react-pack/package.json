@@ -28,7 +28,7 @@
     "chroma-js": "^2.1.0",
     "classnames": "^2.2.6",
     "prop-types": "^15.7.2",
-    "rc-input-number": "^7.4.2",
+    "rc-input-number": "^8.5.0",
     "rc-slider": "^9.3.1",
     "react-animate-height": "^2.0.21",
     "react-json-tree": "^0.11.2",
