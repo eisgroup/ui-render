@@ -1,5 +1,8 @@
 ### Table of Contents
 
+### v0.30.9
+- Fix Input Number field to display number with 0 decimals
+
 ### v0.30.8
 - Fix form initial values
 
