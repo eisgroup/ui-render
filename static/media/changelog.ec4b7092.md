@@ -1,9 +1,15 @@
 ### Table of Contents
 
+### v0.30.10
+#### Fixes
+- Entered date changes automatically when time zone is changed
+
 ### v0.30.9
+#### Fixes
 - Fix Input Number field to display number with 0 decimals
 
 ### v0.30.8
+#### Fixes
 - Fix form initial values
 
 ### v0.30.7
