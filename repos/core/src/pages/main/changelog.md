@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.30.11
+#### Fixes
+- Remove dependency
+
 ### v0.30.10
 #### Fixes
 - Entered date changes automatically when time zone is changed
