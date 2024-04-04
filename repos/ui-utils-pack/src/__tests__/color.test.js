@@ -1,30 +1,4 @@
-import { colorScaleDistinct, rgbFromColor3, rgbFromHex, rgbToColor3, rgbToHex, toRgbaColor } from '../color'
-
-test(`${colorScaleDistinct.name}() computes color orders correctly`, () => {
-  let colors = [0, 1, 2, 3, 4, 5]
-  let hues
-
-  hues = 2  // 3 whole groups
-  expect(colorScaleDistinct(colors, hues)).toEqual([0, 3, 1, 4, 2, 5])
-
-  hues = 3  // 2 whole groups
-  expect(colorScaleDistinct(colors, hues)).toEqual([0, 2, 4, 1, 3, 5])
-
-  hues = 4  // not enough groups to re-order
-  expect(colorScaleDistinct(colors, hues)).toEqual([0, 1, 2, 3, 4, 5])
-
-  colors = [0, 1, 2, 3, 4, 5, 6]
-  hues = 2  // 3 groups + 1 extra color
-  expect(colorScaleDistinct(colors, hues)).toEqual([0, 4, 1, 5, 2, 6, 3])
-
-  colors = [0, 1, 2, 3, 4, 5, 6]
-  hues = 3  // 2 groups + 1 extra color
-  expect(colorScaleDistinct(colors, hues)).toEqual([0, 3, 6, 1, 4, 6, 2])
-
-  colors = [0, 1, 2, 3, 4, 5, 6, 7]
-  hues = 3  // 2 groups + 2 extra color
-  expect(colorScaleDistinct(colors, hues)).toEqual([0, 3, 6, 1, 4, 7, 2, 5])
-})
+import { rgbFromColor3, rgbFromHex, rgbToColor3, rgbToHex, toRgbaColor } from '../color'
 
 test(`${rgbToColor3.name}() converts correct RGB color array to Scaled Color3 array`, () => {
   expect(rgbToColor3([255, 0, 125])).toEqual([1, 0, 0.490196])

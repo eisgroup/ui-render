@@ -1,4 +1,3 @@
-import chroma from 'chroma-js'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { Fragment, PureComponent } from 'react'
@@ -9,13 +8,15 @@ import Row from '../Row'
 import { STYLE } from '../styles'
 import Text from '../Text'
 import View from '../View'
-import { chartTooltip, gradientColors, renderCells, renderGradients } from './utils'
+import { chartTooltip, renderCells, renderGradients } from './utils'
+import { colorsPalette } from './constants'
 
 const RADIAN = Math.PI / 180
 const fontSize = 14 // label size
 const id = 'pc' // unique id prefix for this chart type
 const renderCell = renderCells(id)
 const renderGradient = renderGradients({id, startOpacity: 0.67, stopOpacity: 1})
+const textColor = '#444'
 let decimals, unit
 
 /**
@@ -33,7 +34,6 @@ export default class PieChart extends PureComponent {
     unit: PropTypes.string, // text to render next to value
     className: PropTypes.string,
     classNameWrap: PropTypes.string,
-    colors: PropTypes.array,
     children: PropTypes.any, // content to render inside the pie, will override default Label
     gradient: PropTypes.bool, // default is true
     legends: PropTypes.oneOfType([
@@ -97,15 +97,14 @@ export default class PieChart extends PureComponent {
   render () {
     const {
       items: _items, height, unit: u, classNameWrap, className, children,
-      gradient = true, colors: colours, legends, pointers, sort,
+      gradient = true, legends, pointers, sort,
       ...props
     } = this.props
     unit = u
     const sorts = toList(sort, 'clean')
     const items = sort ? [..._items].sort(by(...sorts)) : _items
     const Container = legends ? (legends.bottom ? View : Row) : Fragment
-    const colors = gradientColors(items.length, colours)
-    this.data = dataNormalized(items, colors, gradient, sorts)
+    this.data = dataNormalized(items, gradient, sorts)
     return (
       <Container {...legends && {className: classNames('app__pie-chart--ref middle center wrap', classNameWrap)}}>
         <View className={classNames('app__pie-chart min-width-290 center', className, {gradient})} {...props}>
@@ -142,9 +141,10 @@ export default class PieChart extends PureComponent {
  * Converted given Data to normalized list for Chart Rendering
  */
 function dataNormalized (items, colors, gradient, sorts = ['-value', 'name']) {
+  const itemsLength = items.length
   const list = items.map(({id, label, value}) => ({name: id || label, gradient, value}))
   return list.sort(by(...sorts)).map((item, i) => {
-    item.color = colors[i]
+    item.color = colorsPalette[i % itemsLength]
     return item
   })
 }
@@ -177,7 +177,7 @@ function renderPercent ({
   const fontScale = Math.min(percent + 5, fontSize)  // make font size smaller if percent is low
 
   /* Inner Label */
-  const percentColor = fill === 'none' ? color : STYLE.TEXT_LIGHT
+  const percentColor = fill === 'none' ? color : textColor
   const {x, y} = donutPieCenterCoords({cx, cy, midAngle, innerRadius, outerRadius})
 
   return (
@@ -204,7 +204,6 @@ function renderPercentPointer ({cx, cy, midAngle, innerRadius, outerRadius, name
   const {x, y} = donutPieCenterCoords({cx, cy, midAngle, innerRadius, outerRadius})
 
   /* Out Label */
-  const labelColor = chroma(color).alpha(0.7).css()
   const labelSize = Math.max(fontScale - Math.max(0, name.length - 5) * angleEffect, 6)  // scale to characters and angle
   const lineScale = Math.min(percent + 2, radiusEffect)  // scale line length proportionally to percent and chart size
   const lineSize = lineScale * (1 - angleEffect / 2)  // reduce to 50% size when approaching start or end angles
@@ -218,12 +217,12 @@ function renderPercentPointer ({cx, cy, midAngle, innerRadius, outerRadius, name
   const xOuter = ex + (cos >= 0 ? 1 : -1) * lineScale / 2
   return (
     <g>
-      <text x={x} y={y} fill={percentColor} textAnchor='middle' dominantBaseline='central' fontSize={fontScale - 2}>
+      <text x={x} y={y} fill={percentColor} stroke={textColor} textAnchor='middle' dominantBaseline='central' fontSize={fontScale - 2}>
         {Math.round(percent) + '%'}
       </text>
-      <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={labelColor} fill="none"/>
-      <circle cx={ex} cy={ey} r={Math.min(lineSize / 4, 2)} fill={labelColor} stroke="none"/>
-      <text x={xOuter} y={ey} dy={labelSize / 3} textAnchor={textAnchor} fill={labelColor}
+      <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={textColor} fill="none"/>
+      <circle cx={ex} cy={ey} r={Math.min(lineSize / 4, 2)} fill={textColor} stroke="none"/>
+      <text x={xOuter} y={ey} dy={labelSize / 3} textAnchor={textAnchor} fill={textColor}
             fontSize={labelSize}>{name}</text>
     </g>
   )
@@ -245,7 +244,7 @@ const renderTooltip = throttle(({active, payload}) => {
 function renderTooltipItem ({payload: {name, value, color} = {}}, i) {
   return (
     <View key={name || i} className='fill--width center'>
-      <Text className='truncate' style={{color}}>{name}</Text>
+      <Text className='truncate'>{name}</Text>
       <Text className='row'>{renderFloat(Number(value).toFixed(decimals))} {unit ? pluralize(unit, value) : ''}</Text>
     </View>
   )
