@@ -82,11 +82,6 @@ export const TYPE = {
     [l.ENGLISH]: 'Phone Number'
   },
 }
-export const TYPE_BY = {
-  [TYPE.CURRENCY._]: TYPE.CURRENCY,
-  [TYPE.LANGUAGE._]: TYPE.LANGUAGE,
-  [TYPE.PHONE._]: TYPE.PHONE,
-}
 
 export const OPTIONS = {
   CURRENCY: optionsFrom(CURRENCY),

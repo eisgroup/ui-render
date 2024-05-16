@@ -51,6 +51,7 @@ export default class Tabs extends PureComponent {
     classNameContent: PropTypes.string,
     styleTabs: PropTypes.object,
     styleContent: PropTypes.object,
+    currencyCode: PropTypes.string,
 
     // UI Render specific
     // Extra content to render inside Tabs
@@ -96,12 +97,13 @@ export default class Tabs extends PureComponent {
   render () {
     const {
       vertical, buttoned, items, children, childrenBeforeTabs, childrenAfterTabs, centerTabs,
-      className, classNameTabs, classNameContent, styleTabs, styleContent,
+      className, classNameTabs, classNameContent, styleTabs, styleContent, currencyCode,
       activeIndex: _, defaultIndex: __, onChange: ___, transitionUpdate: ____,
       ...props
     } = this.props
     const {activeIndex, transition} = this.state
     const content = this.contents[activeIndex]
+
     return (
       // In Safari, the entire .tabs container scrolls, but in Chrome, only .tabs__content scrolls
       // the solution is to enforce `min-height: initial` for this wrapper in `classNameInner`

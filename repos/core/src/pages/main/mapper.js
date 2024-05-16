@@ -327,7 +327,7 @@ const RenderComponent = ({
 
     case FIELD.TYPE.TABS:
     case FIELD.TYPE.TAB_LIST: {
-      const {childrenBeforeTabs, childrenAfterTabs} = props
+      const {childrenBeforeTabs, childrenAfterTabs, currencyCode} = props
       if (hasObjectValue(childrenBeforeTabs))
         props.childrenBeforeTabs = Render.bind(this, {data, _data, debug, form, instance, ...childrenBeforeTabs})
       if (hasObjectValue(childrenAfterTabs))
@@ -340,9 +340,9 @@ const RenderComponent = ({
         case FIELD.TYPE.TABS:
         default:
           return <Tabs items={items.map(({tab, content, _data, data}, i) => ({
-            tab: isObject(tab) ? Render.call(this, {data, _data, debug, form, instance, ...tab}, i) : tab,
+            tab: isObject(tab) ? Render.call(this, {data, _data, debug, form, instance, currencyCode, ...tab}, i) : tab,
             content: isObject(content) ? Render.bind(this, {
-              data, _data, debug, form, instance, ...content
+              data, _data, debug, form, instance, currencyCode, ...content
             }, i) : content,
           }))} {...props}/>
       }
@@ -493,13 +493,15 @@ const RenderComponent = ({
 Render.Method = function RenderMethod (Name) {
   switch (Name) {
     case FIELD.RENDER.CURRENCY:
-      return (val, index, {id, decimals = 2, symbol = '$', className, style, ...props} = {}) => (isNumeric(val)
-          ? <Row className={className} style={style}>
-            <Text className="margin-right-smallest">{symbol}</Text>
-            {renderFloat(val, decimals, props)}
-          </Row>
-          : null
-      )
+      return (val, index, {id, decimals = 2, symbol = '$', className, style, ...props} = {}) => {
+        return (isNumeric(val)
+                ? <Row className={className} style={style}>
+                  <Text className="margin-right-smallest">{symbol}</Text>
+                  {renderFloat(val, decimals, props)}
+                </Row>
+                : null
+        )
+      }
     case FIELD.RENDER.DOUBLE5:
       return (val, index, {id, decimals, ...props} = {}) => isNumeric(val) ? renderFloat(val, 5, props) : null
     case FIELD.RENDER.FLOAT:

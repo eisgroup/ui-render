@@ -103,7 +103,7 @@ export let errorsMap = {};
 let errorHandlerFunction = undefined;
 
 // Context for Popup component
-// TODO: replace redux state for pupup with this context
+// TODO: replace redux state for popup with this context
 export const PopupContext = React.createContext({
   isOpen: false,
   togglePopupState: () => {},
@@ -181,6 +181,7 @@ export class UIRender extends Component {
       togglePopupState: this.togglePopupState,
       popupTitle: '',
       popupContent: '',
+      currencyCode: (this.props.meta && this.props.meta.currencyCode) || 'USD',
     }
   }
 
@@ -250,6 +251,7 @@ export class UIRender extends Component {
         instance={parent || this}
         translate={translate}
         onDataChanged={this.onDataChanged}
+        currencyCode={this.state.currencyCode}
       />
     const Container = embedded ? Fragment : ScrollView
     const props = embedded ? undefined : {

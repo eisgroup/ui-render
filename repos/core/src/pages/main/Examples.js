@@ -20,8 +20,6 @@ import dropdownMeta from './examples/dropdown_meta.json'
 import exampleData from './examples/example_data.json'
 import exampleMeta from './examples/example_meta.json'
 import expandListMeta from './examples/expand-list_meta'
-import experienceData from './examples/experience_data.json'
-import experienceMeta from './examples/experience_meta.json'
 import inputMeta from './examples/input_meta'
 import inputToggle from './examples/input_toggle'
 import invalidArrayData from './examples/invalid-array_data'
@@ -41,6 +39,11 @@ import * as tabs from './examples/tabs_meta'
 import uploadMeta from './examples/upload_meta'
 import UIRender from './rules'
 
+// import experienceData from './examples/experience_data.json'
+// import experienceMeta from './examples/experience_meta.json'
+// import aData from './examples/a_data.js'
+// import aMeta from './examples/a_meta.js'
+
 import {
   updateExperienceData,
   downloadHistoricalFileTemplate,
@@ -48,12 +51,18 @@ import {
 } from 'web/api/gdn-rating-alg'
 
 const examples = [
-  {
-    title: 'Experience Ratings',
-    id: 'experienceRatings',
-    data: experienceData,
-    meta: experienceMeta,
-  },
+  // {
+  //   title: 'A',
+  //   id: 'a',
+  //   data: aData,
+  //   meta: aMeta,
+  // },
+  // {
+  //   title: 'Experience Ratings',
+  //   id: 'experienceRatings',
+  //   data: experienceData,
+  //   meta: experienceMeta,
+  // },
   {
     title: 'Button with Icon',
     id: 'buttonIcon',

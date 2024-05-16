@@ -134,6 +134,8 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
 
 ```js
 const Component = {
+  // Root level attributes
+  currencyCode: 'USD', // default currency code for displaing currency symbol (does not support by Input fileds). Supported codes: 'USD', 'EUR', 'GBP'
 
   // Common attributes (available in all UI components)
   view: 'Col', // (required)* name of the React Component used to display this field
@@ -155,7 +157,6 @@ const Component = {
   label: 'Input label',
   placeholder: 'To appear inside empty input when focused',
   type: 'number', // 'checkbox', 'email', 'number', 'select', 'slider', 'text', 'textarea', 'toggle', etc. (HTML input types)
-  unit: 'Input value unit label (e.x. "USD" for currency input)',
   icon: 'dollar', // icon css class name -> displays Icon inside Input
   lefty: Boolean, // whether to show icon on the left, default is on the right
   float: Boolean, // whether label should float above input when in focus

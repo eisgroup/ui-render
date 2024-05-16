@@ -74,14 +74,17 @@ class RenderClass extends Component {
 
         // Wrap component with Tooltip automatically
         if (this.props.tooltip != null) {
-            // @ts-ignore
             const {tooltip, ...props} = this.props
             const tooltipProps = {...Render.TooltipDefaultProps, ...isObject(tooltip) ? tooltip : {title: tooltip}}
-            // @ts-ignore
             return <Render.Tooltip {...tooltipProps}>{Render(props)}</Render.Tooltip>
         }
 
-        let {data, _data, debug, form, instance, items, relativeData, name} = this.props
+        let {data, _data, debug, form, instance, items, relativeData, name, currencyCode} = this.props
+
+        // Set currencyCode from instance if not given
+        if (currencyCode === undefined && instance) {
+            currencyCode = instance.state.currencyCode
+        }
 
         // Global/Relative Data access
         if (name) _data = get((relativeData !== false && _data) || data, name) // local data dynamically retrieved from definition
@@ -89,7 +92,7 @@ class RenderClass extends Component {
         // Pass down data to child renderers
         // allow `data` and `_data` to be overridden by config
         items = items.map((item) => {
-            const mappedData = {data, _data, debug, form, instance, ...item};
+            const mappedData = {data, _data, debug, form, instance, currencyCode, ...item};
             if (this.props.view === 'TableCells' && this.props.relativeIndex !== undefined) {
                 mappedData.relativePath = this.props.relativePath;
                 mappedData.relativeIndex = this.props.relativeIndex;
@@ -103,6 +106,7 @@ class RenderClass extends Component {
           {...this.props}
           _data={_data}
           items={items}
+          currencyCode={currencyCode}
          />
     }
 }

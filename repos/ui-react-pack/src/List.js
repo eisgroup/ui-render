@@ -6,11 +6,11 @@ import View from './View'
 /**
  * Dynamic List of Views/Rows - Pure Component.
  */
-export function List ({renderItem, items, row, ...props}) {
+export function List ({renderItem, items, row, currencyCode, ...props}) {
   const Container = row ? Row : View
   return (
     <Container {...props}>
-      {items.map((item, i) => renderItem(item, i))}
+      {items.map((item, i) => renderItem({...item, currencyCode}, i))}
     </Container>
   )
 }

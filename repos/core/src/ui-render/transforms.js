@@ -25,6 +25,20 @@ export function mapProps (data, mapper, {debug} = {}) {
     return (debug ? data : toList(data, true)).map(mapData)
 }
 
+export function getCurrencySymbol (currencyCode) {
+    if (!currencyCode) return null
+    switch (currencyCode) {
+        case 'USD':
+            return '$'
+        case 'EUR':
+            return '€'
+        case 'GBP':
+            return '£'
+        default:
+            return null
+    }
+}
+
 /**
  * Recursively map meta.json declarations to props ready for rendering (by mutation)
  * @Note: this function must only transform config, without adding data.
@@ -134,7 +148,9 @@ export function metaToProps (meta, config) {
                 else if (definition.name) {
                     const func = getFunctionFromObject(definition, {...funcConfig, data})
                     // @ts-ignore
-                    return isFunction(func) ? func.apply(this, [value, index, {...props, ...definition, data, _data}])
+                    const currencyCode = (definition.currencyCode) || (instance && instance.state && instance.state.currencyCode)
+                    const currencySymbol = getCurrencySymbol(currencyCode)
+                    return isFunction(func) ? func.apply(this, [value, index, {...props, ...definition, symbol: currencySymbol ,data, _data}])
                       : func
                 }
 
