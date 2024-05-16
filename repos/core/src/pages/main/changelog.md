@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.30.12
+#### New
+- Added root attribute `currencyCode`
+
 ### v0.30.11
 #### Fixes
 - Remove dependency
