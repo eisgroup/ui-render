@@ -1,6 +1,6 @@
 {
   "name": "classic",
-  "version": "0.30.12",
+  "version": "0.30.13",
   "homepage": ".",
   "private": true,
   "scripts": {

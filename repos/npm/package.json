@@ -1,6 +1,6 @@
 {
   "name": "eis-ui-render",
-  "version": "0.30.12",
+  "version": "0.30.13",
   "description": "UI generation based on JSON schemas",
   "homepage": "https://eisgroup.github.io/ui-render/",
   "sideEffects": false,
