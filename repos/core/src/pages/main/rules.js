@@ -191,6 +191,9 @@ export class UIRender extends Component {
 
     if (next.data !== data) set(update, 'data.json', normalizeIncomingData(next.data))
     if (next.meta !== meta) set(update, 'meta.json', next.meta)
+    if (next.meta && next.meta.currencyCode !== this.state.currencyCode) {
+        update.currencyCode = next.meta.currencyCode
+    }
     if (hasObjectValue(update)) this.setState(update)
   }
 
