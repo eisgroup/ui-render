@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.30.13
+#### Fixes
+- Update currency on new meta is loaded
+
 ### v0.30.12
 #### New
 - Added root attribute `currencyCode`
