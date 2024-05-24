@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.30.14
+#### Fixes
+- Fix build styles
+
 ### v0.30.13
 #### Fixes
 - Update currency on new meta is loaded
