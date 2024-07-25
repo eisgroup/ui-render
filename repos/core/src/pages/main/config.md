@@ -135,7 +135,7 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
 ```js
 const Component = {
   // Root level attributes
-  currencyCode: 'USD', // default currency code for displaing currency symbol (does not support by Input fileds). Supported codes: 'USD', 'EUR', 'GBP'
+  currencyCode: 'USD', // default currency code for displaying currency symbol (does not support by Input fields). Supported codes: 'USD', 'EUR', 'GBP'
 
   // Common attributes (available in all UI components)
   view: 'Col', // (required)* name of the React Component used to display this field

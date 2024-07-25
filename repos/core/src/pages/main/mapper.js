@@ -82,7 +82,8 @@ const RenderComponent = ({
       if (name) {
         // Get from form instead of initial data
         // It is important to get the value from form, because it might have been changed
-        const formData = instance.getAllFormsData();
+        // On first render the value might not be available in form, so get from initial data
+        const formData = instance.getAllFormsData() || data;
         if (relativePath && typeof relativeIndex !== 'undefined') {
           __data = get(formData, `${relativePath}[${relativeIndex}].${name}`, undefined)
         } else {
