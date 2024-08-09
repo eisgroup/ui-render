@@ -42,7 +42,10 @@ import { get, isObject } from 'ui-utils-pack'
  * @returns {*} Node - React component/s
  */
 export default function Render (props, index) {
-    return <RenderClass {...props} key={typeof index !== 'object' ? index : undefined}/>
+    const {dateFormat, ...rest} = props
+    return (
+        <RenderClass {...rest} key={typeof index !== 'object' ? index : undefined} />
+    )
 }
 
 class RenderClass extends Component {
@@ -55,9 +58,7 @@ class RenderClass extends Component {
     }
 
     componentDidMount () {
-        // @ts-ignore
         if (!Render.Component) throw new Error(`Please setup Render.Component mapper first`)
-        // @ts-ignore
         if (!Render.Method) throw new Error(`Please setup Render.Method mapper first`)
     }
 

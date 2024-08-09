@@ -27,6 +27,7 @@ interface Props {
     style?: object
     id?: string
     translate(v: string): string
+    dateFormat?: string
 }
 
 /**

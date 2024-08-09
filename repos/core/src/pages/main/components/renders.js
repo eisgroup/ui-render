@@ -1,5 +1,5 @@
 import { asField } from 'ui-modules-pack/form'
-import { DropdownField, InputField, ToggleField, InputNumberField } from 'ui-modules-pack/form/inputs'
+import { DropdownField, InputField, ToggleField, InputNumberField, InputDateField } from 'ui-modules-pack/form/inputs'
 import Upload from 'ui-modules-pack/upload/views/Upload'
 import { FIELD } from 'ui-modules-pack/variables'
 import React from 'react'
@@ -30,6 +30,10 @@ export function renderField (fieldDefinition, i) {
 
   if (type === 'number') {
     Field = InputNumberField
+  }
+
+  if (type === 'date') {
+    Field = InputDateField
   }
 
   return <Field key={i} {...props} type={type} />

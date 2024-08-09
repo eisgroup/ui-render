@@ -24,6 +24,7 @@ import { downloadFile as downloadFileProcessing } from 'web/services/downloadFil
 import OldPopup from 'ui-modules-pack/popup/views/Popup'
 import Popup from './components/Popup'
 import { double5, integer, phone, uppercase } from 'ui-react-pack/inputs/normalizers'
+import ConfigContext from '../../providers/ConfigProvider'
 
 /**
  * BUSINESS RULES ==============================================================
@@ -141,6 +142,7 @@ export class UIRender extends Component {
     methods: type.ObjectOf(type.Method),
     translate: type.Method,
     apiCalls: type.ObjectOf(type.Method),
+    dateFormat: type.String,
   }
 
   constructor (props) {
@@ -242,7 +244,7 @@ export class UIRender extends Component {
   onDataChanged = undefined;
 
   render () {
-    const {childBefore, childAfter, form, embedded, className, style, translate, parent} = this.props
+    const {childBefore, childAfter, form, embedded, className, style, translate, parent, dateFormat} = this.props
     const { key, isPopupOpen, togglePopupState, popupTitle, popupContent } = this.state
 
     const content = this.hasData && this.hasMeta &&
@@ -255,6 +257,7 @@ export class UIRender extends Component {
         translate={translate}
         onDataChanged={this.onDataChanged}
         currencyCode={this.state.currencyCode}
+        dateFormat={dateFormat}
       />
     const Container = embedded ? Fragment : ScrollView
     const props = embedded ? undefined : {
@@ -272,15 +275,17 @@ export class UIRender extends Component {
     }
 
     return (
-      <PopupContext.Provider value={{ isOpen: isPopupOpen, togglePopupState, title: popupTitle, content: popupContent }}>
-        <Container {...props}>
-          {childBefore}
-          {(form && !embedded) ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
-          {childAfter}
-          <Popup />
-          <OldPopup />
-        </Container>
-      </PopupContext.Provider>
+      <ConfigContext.Provider value={{ dateFormat }}>
+        <PopupContext.Provider value={{ isOpen: isPopupOpen, togglePopupState, title: popupTitle, content: popupContent }}>
+          <Container {...props}>
+            {childBefore}
+            {(form && !embedded) ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
+            {childAfter}
+            <Popup />
+            <OldPopup />
+          </Container>
+        </PopupContext.Provider>
+      </ConfigContext.Provider>
     )
   }
 }

@@ -279,6 +279,7 @@ export default class Examples extends Component {
                       onSubmit={console.warn}
                       getValidationErrors={this.showValidationErrors}
                       translate={(v) => v}
+                      dateFormat={"MM-DD-YYYY"}
                       apiCalls={{
                         updateExperienceData,
                         downloadFile: downloadHistoricalFileTemplate,

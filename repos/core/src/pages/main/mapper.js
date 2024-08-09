@@ -1,8 +1,8 @@
+import React, { PureComponent } from 'react'
 import AutoSave from 'ui-modules-pack/form/views/AutoSave'
 import { POPUP, popupAlert } from 'ui-modules-pack/popup'
 import { stateAction } from 'ui-modules-pack/redux'
 import { FIELD } from 'ui-modules-pack/variables'
-import React, { PureComponent } from 'react'
 import { cn } from 'ui-react-pack'
 import Button from 'ui-react-pack/Button'
 import PieChart from 'ui-react-pack/charts/PieChart'
@@ -17,6 +17,7 @@ import { OK } from 'ui-react-pack/inputs/validationRules'
 import Json from 'ui-react-pack/JsonView'
 import Label from 'ui-react-pack/Label'
 import List from 'ui-react-pack/List'
+import TextDateValue from 'ui-react-pack/TextDateValue'
 import ProgressSteps from 'ui-react-pack/ProgressSteps'
 import { renderFloat } from 'ui-react-pack/renders'
 import Row from 'ui-react-pack/Row'
@@ -524,8 +525,7 @@ Render.Method = function RenderMethod (Name) {
     case FIELD.RENDER.DATE: {
       return (val) => {
         if (val) {
-          const date = (new Intl.DateTimeFormat()).format(new Date(val))
-          return <Text>{date}</Text>
+          return <TextDateValue value={val} />
         }
         return null
       }

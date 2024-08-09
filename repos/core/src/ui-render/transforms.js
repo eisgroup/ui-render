@@ -147,7 +147,6 @@ export function metaToProps (meta, config) {
                 // Render is a function definition
                 else if (definition.name) {
                     const func = getFunctionFromObject(definition, {...funcConfig, data})
-                    // @ts-ignore
                     const currencyCode = (definition.currencyCode) || (instance && instance.state && instance.state.currencyCode)
                     const currencySymbol = getCurrencySymbol(currencyCode)
                     return isFunction(func) ? func.apply(this, [value, index, {...props, ...definition, symbol: currencySymbol ,data, _data}])
@@ -163,7 +162,7 @@ export function metaToProps (meta, config) {
                           ? Render({...props, ...valueDefinition, data, _data}, index)
                           : getFunctionFromObject(valueDefinition, {...funcConfig, data}) // @ts-ignore
                             .apply(this, [value, index, {...props, ...valueDefinition, data, _data}])
-                      ) // @ts-ignore
+                      )
                       : Render.Method(valueDefinition).apply(this, [value, index, {...props, data, _data}])
                 }
             }

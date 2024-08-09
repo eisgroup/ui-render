@@ -172,6 +172,7 @@ const InputNumber = ({
           value={value}
           parser={parser}
           formatter={format}
+          wheel={false}
         />
         {icon && !lefty && (isString(icon)
             ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>

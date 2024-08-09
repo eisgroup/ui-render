@@ -1,5 +1,10 @@
 ### Table of Contents
 
+### v0.30.15
+#### New
+- Added DatePicker component
+- Added dateFormat attribute to show date in different formats
+
 ### v0.30.14
 #### Fixes
 - Fix build styles
