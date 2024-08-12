@@ -1,5 +1,11 @@
 ### Table of Contents
 
+### v0.30.16
+#### New
+- Added label attribute to DatePicker component
+#### Fixes
+- Fixed DatePicker styles
+
 ### v0.30.15
 #### New
 - Added DatePicker component
