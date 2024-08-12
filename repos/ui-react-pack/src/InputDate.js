@@ -1,15 +1,14 @@
 import classNames from 'classnames'
-import React, { useState, useRef, useMemo, useContext } from 'react'
+import React, { useState, useMemo, useContext } from 'react'
 import Row from './Row'
 import Text from './Text'
 import View from './View'
+import Label from './Label'
 import { Active } from 'ui-utils-pack'
 import Picker from 'rc-picker'
 import enUs from 'rc-picker/lib/locale/en_US'
 import generateConfig from "rc-picker/lib/generate/moment"
 import moment from 'moment'
-
-import './inputDate.css'
 import ConfigContext from 'core/src/providers/ConfigProvider'
 
 const InputDate = ({
@@ -73,6 +72,9 @@ const InputDate = ({
             })}
             style={style}
         >
+            <Row className="middle">
+                {label && <Label htmlFor={id} title={translate(title)}>{translate(label)}</Label>}
+            </Row>
             <Row className={classNames('input', {active, icon, lefty, error, info, unit})}>
                 <Picker
                     name={name}
