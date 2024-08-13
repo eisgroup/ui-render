@@ -79,6 +79,8 @@ const InputDate = ({
                 <Picker
                     name={name}
                     id={id}
+                    prefixCls={'ui-render-picker'}
+                    className={'ui-render-picker'}
                     disabled={disabled}
                     resize={resize}
                     aria-describedby={idHelp}
