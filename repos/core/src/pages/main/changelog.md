@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.30.18
+#### Fixes
+- Do not call external API on init
+
 ### v0.30.17
 #### Fixes
 - Fixed DatePicker styles
