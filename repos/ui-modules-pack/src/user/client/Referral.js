@@ -49,7 +49,6 @@ localiseTranslation({
   },
   NO_REFERRAL_CODE_FOUND: {
     [l.ENGLISH]: `No referral code found!`,
-    // [l.RUSSIAN]: 'Код реферала не найден!',
   },
   REFERRED_BY_name_surname: {
     [l.ENGLISH]: `Referred by {name} {surname}.`,

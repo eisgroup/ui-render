@@ -24,15 +24,12 @@ import { Active } from 'ui-utils-pack'
 localiseTranslation({
   ADD_: {
     [l.ENGLISH]: 'Add ',
-    // [l.RUSSIAN]: 'Добавить ',
   },
   NOTHING_FOUND: {
     [l.ENGLISH]: 'Nothing found',
-    // [l.RUSSIAN]: 'Ничего не найдено',
   },
   NO_OPTIONS_LEFT: {
     [l.ENGLISH]: 'No options left',
-    // [l.RUSSIAN]: 'Больше нет выборов',
   }
 })
 

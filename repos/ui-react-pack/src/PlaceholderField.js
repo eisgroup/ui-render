@@ -8,7 +8,6 @@ import View from './View'
 localiseTranslation({
   FIELD_DOES_NOT_EXIST_: {
     [l.ENGLISH]: 'Field does not exist!',
-    // [l.RUSSIAN]: 'Поля не существует!',
   }
 })
 

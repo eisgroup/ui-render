@@ -8,6 +8,5 @@ export { _ } from 'ui-utils-pack/translations'
 localiseTranslation({
   TEMPLATE: {
     [l.ENGLISH]: 'Template',
-    // [l.RUSSIAN]: 'Шаблон',
   },
 })

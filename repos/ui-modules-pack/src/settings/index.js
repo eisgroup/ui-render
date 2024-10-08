@@ -1,6 +1,5 @@
 import { NAME, SETTING, UI } from './constants'
 import reducer from './reducers'
-import saga from './sagas'
 import select from './selectors'
 
 /**
@@ -22,7 +21,7 @@ const settings = {
   NAME,
   SETTING,
   reducer,
-  saga,
+  sagas: {},
   select,
 }
 

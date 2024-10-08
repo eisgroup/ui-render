@@ -22,11 +22,9 @@ localiseTranslation({
   },
   CONFIRM_ACTION: {
     [l.ENGLISH]: 'Confirm Action',
-    // [l.RUSSIAN]: 'Подтвердите Действие',
   },
   ERROR_excMark: {
     [l.ENGLISH]: 'Error!',
-    // [l.RUSSIAN]: 'Ошибка!',
   },
 })
 /**

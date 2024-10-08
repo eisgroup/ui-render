@@ -44,22 +44,18 @@ export const PERMISSION = {
   READ: {
     _: 1,
     [l.ENGLISH]: 'Read',
-    // [l.RUSSIAN]: 'Читать',
   },
   UPDATE: {
     _: 2,
     [l.ENGLISH]: 'Update',
-    // [l.RUSSIAN]: 'Обновить',
   },
   DELETE: {
     _: 3,
     [l.ENGLISH]: 'Delete',
-    // [l.RUSSIAN]: 'Удалить',
   },
-  MANAGE_USERS: { // add/remove users and set permissions
+  MANAGE_USERS: {
     _: 99, // same as STAFF authorization level
     [l.ENGLISH]: 'Manage Users',
-    // [l.RUSSIAN]: 'Организовать Пользователей',
   },
 }
 

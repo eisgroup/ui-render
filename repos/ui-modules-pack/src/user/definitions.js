@@ -19,22 +19,18 @@ export const _USER = {
     USER: {
       _: 0, // default role -> undefined in database
       [l.ENGLISH]: 'User',
-      // [l.RUSSIAN]: 'Пользователь',
     },
     STAFF: {
       _: 99,
       [l.ENGLISH]: 'Staff',
-      // [l.RUSSIAN]: 'Сотрудник',
     },
     DEVELOPER: {
       _: 699,
       [l.ENGLISH]: 'Developer',
-      // [l.RUSSIAN]: 'Девелопер',
     },
     ADMIN: {
       _: 999,
       [l.ENGLISH]: 'Admin',
-      // [l.RUSSIAN]: 'Админ',
     },
   },
 
@@ -42,12 +38,10 @@ export const _USER = {
     INDIVIDUAL: {
       _: 0,
       [l.ENGLISH]: 'Individual',
-      // [l.RUSSIAN]: 'Частное Лицо',
     },
     COMPANY: {
       _: 1,
       [l.ENGLISH]: 'Company',
-      // [l.RUSSIAN]: 'Компания',
     },
   },
 }
