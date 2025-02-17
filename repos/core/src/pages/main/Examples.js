@@ -39,11 +39,6 @@ import * as tabs from './examples/tabs_meta'
 import uploadMeta from './examples/upload_meta'
 import UIRender from './rules'
 
-// import experienceData from './examples/experience_data.json'
-// import experienceMeta from './examples/experience_meta.json'
-// import aData from './examples/a_data.js'
-// import aMeta from './examples/a_meta.js'
-
 import {
   updateExperienceData,
   downloadHistoricalFileTemplate,
@@ -51,18 +46,6 @@ import {
 } from 'web/api/gdn-rating-alg'
 
 const examples = [
-  // {
-  //   title: 'A',
-  //   id: 'a',
-  //   data: aData,
-  //   meta: aMeta,
-  // },
-  // {
-  //   title: 'Experience Ratings',
-  //   id: 'experienceRatings',
-  //   data: experienceData,
-  //   meta: experienceMeta,
-  // },
   {
     title: 'Button with Icon',
     id: 'buttonIcon',

@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.30.19
+#### New
+- Added `usePagination` and `rowsPerPage` attribute to Table component
+
 ### v0.30.18
 #### Fixes
 - Do not call external API on init

@@ -279,6 +279,8 @@ const Component = {
       style: Object // CSS styles
     },
   ],
+  usePagination: false, // whether to use pagination for table
+  rowsPerPage: 20, // number of rows per page
 
   // Pie Chart attributes
   mapItems: Object, // data mapper key/value pairs (ex. {label: 'pieLabelKeyFromData', value: 'pieValueKeyFromData'}
