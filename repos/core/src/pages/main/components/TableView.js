@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Fragment, PureComponent } from 'react'
+import React, { Fragment, PureComponent, createRef } from 'react'
 import { cn } from 'ui-react-pack'
 import Placeholder from 'ui-react-pack/Placeholder'
 import { renderSort } from 'ui-react-pack/renders'
@@ -12,6 +12,7 @@ import { by, get, hasListValue, isEqual, isEqualList, isFunction } from 'ui-util
 import { getDateStringFromDateObject } from '../utils'
 import TableColGroup from './TableColGroup'
 import { FieldArray } from 'react-final-form-arrays'
+import { Pagination } from 'semantic-ui-react'
 
 const sortObj = {
   id: PropTypes.string.isRequired, // id of the header, used for grouping columns/rows
@@ -75,7 +76,10 @@ export default class TableView extends PureComponent {
         styles: PropTypes.object
       })
     ),
-    additionalCellsStyles: PropTypes.array
+    additionalCellsStyles: PropTypes.array,
+    // Pagination props
+    usePagination: PropTypes.bool,
+    rowsPerPage: PropTypes.number,
   }
 
   state = {
@@ -84,7 +88,11 @@ export default class TableView extends PureComponent {
       expandedByIndex: {},
     },
     sorts: this.props.sorts,
+    activePage: 1,
+    rowsPerPage: this.props.rowsPerPage || 20,
   }
+
+  tableWrapper = createRef()
 
   // LOGIC ---------------------------------------------------------------------
 
@@ -209,6 +217,11 @@ export default class TableView extends PureComponent {
     return className;
   }
 
+  handlePaginationChange = (e, { activePage }) => {
+    this.tableWrapper.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    this.setState({ activePage })
+  }
+
   // RENDERS -------------------------------------------------------------------
   renderHeader = ({
     id,
@@ -322,12 +335,18 @@ export default class TableView extends PureComponent {
     const headers = this.headers
     if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
     const {
-      fill, className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical, colGroup,
+      fill, className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical, colGroup, usePagination,
       items: _, headers: _2, renderItem: _3, renderItemCells: _4, itemClassNames: _5,
-      itemsExpanded: _6, translate: _7, sellStyles: _8, additionalCellsStyles: _9,
+      itemsExpanded: _6, translate: _7, sellStyles: _8, additionalCellsStyles: _9, rowsPerPage: _10,
       ...props
     } = this.props
-    const items = this.itemsSorted
+    const {activePage, rowsPerPage} = this.state
+    let items = this.itemsSorted
+    const totalPages = Math.ceil(items.length / rowsPerPage)
+
+    if (usePagination && totalPages > 1) {
+      items = items.slice((activePage - 1) * rowsPerPage, activePage * rowsPerPage)
+    }
 
     const tableBody = (
       <>
@@ -337,25 +356,36 @@ export default class TableView extends PureComponent {
     )
 
     return (
-      <ScrollView row classNameInner="fill-width" fill={fill}>
-        <Table className={cn('full-width', className, {vertical})} {...props}>
-          {colGroup && <TableColGroup colGroup={colGroup} />}
-          <Table.Header className="font-normal">
-            {extraHeaders && extraHeaders.map((row, i) => (
-              <Table.Row key={i}>{row.map(this.renderHeader)}</Table.Row>
-            ))}
-            {/* Vertical layout does not have horizontal headers */}
-            {!vertical && <Table.Row>{headers.map(this.renderHeader)}</Table.Row>}
-          </Table.Header>
-          <Table.Body>
-            {this.props.name ? (
-              <FieldArray name={this.props.name}>
-                {({ fields }) => tableBody}
-              </FieldArray>
-            ) : tableBody}
-          </Table.Body>
-        </Table>
-      </ScrollView>
+      <div ref={this.tableWrapper}>
+        <ScrollView row classNameInner="fill-width" fill={fill}>
+          <Table className={cn('full-width', className, {vertical})} {...props}>
+            {colGroup && <TableColGroup colGroup={colGroup} />}
+            <Table.Header className="font-normal">
+              {extraHeaders && extraHeaders.map((row, i) => (
+                  <Table.Row key={i}>{row.map(this.renderHeader)}</Table.Row>
+              ))}
+              {/* Vertical layout does not have horizontal headers */}
+              {!vertical && <Table.Row>{headers.map(this.renderHeader)}</Table.Row>}
+            </Table.Header>
+            <Table.Body>
+              {this.props.name ? (
+                  <FieldArray name={this.props.name}>
+                    {({ fields }) => tableBody}
+                  </FieldArray>
+              ) : tableBody}
+            </Table.Body>
+          </Table>
+        </ScrollView>
+        {usePagination && totalPages > 1 && (
+          <ScrollView row styleInner={{ justifyContent: 'center', marginTop: 20 }} classNameInner="fill-width" fill={fill}>
+            <Pagination
+              activePage={activePage}
+              totalPages={totalPages}
+              onPageChange={this.handlePaginationChange}
+            />
+          </ScrollView>
+        )}
+      </div>
     )
   }
 }
