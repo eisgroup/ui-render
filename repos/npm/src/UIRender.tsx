@@ -77,7 +77,7 @@ export class UIRender extends Component<Props, any> {
 
     render() {
         const {className, style} = this.props
-        return <div id={this.id} data-version='0.30.19' className={`${UI_RENDER} ${className || ''}`} style={style}/>
+        return <div id={this.id} data-version='0.30.20' className={`${UI_RENDER} ${className || ''}`} style={style}/>
     }
 }
 

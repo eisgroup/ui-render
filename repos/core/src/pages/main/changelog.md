@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.30.20
+#### Fixes
+- Fix pagination styles
+
 ### v0.30.19
 #### New
 - Added `usePagination` and `rowsPerPage` attribute to Table component
