@@ -19,7 +19,5 @@ Active.SERVICE = ENV.SERVICE || (__CLIENT__ ? SERVICE.CLIENT : SERVICE.SERVER)
 Active.state = undefined  // current Store State
 Active.store = {}  // Redux Store
 Active.createStore = () => {} // to create a new store instance within sagas without importing `redux` module
-Active.client = undefined // Apollo client
 Active.passwordCheck = () => {} // password strength calculator
-Active.pubsub = undefined // GraphQL Pubsub module
 Active.usersById = {} // for storing temporary info, like user.lastOnline

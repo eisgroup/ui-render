@@ -27,7 +27,6 @@ repos/server/uploads
 /data
 /dbbackup
 /localStorage
-.node-persist
 log/
 /static
 !static/robots.txt

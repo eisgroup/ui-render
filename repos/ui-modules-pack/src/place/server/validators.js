@@ -1,4 +1,3 @@
-import { SevenBoom as Response } from 'graphql-apollo-errors'
 import { toJSON } from 'ui-utils-pack'
 import Place from './models'
 

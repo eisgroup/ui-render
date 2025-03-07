@@ -7,7 +7,7 @@ import Label from './Label'
 import { Active } from 'ui-utils-pack'
 import Picker from 'rc-picker'
 import enUs from 'rc-picker/lib/locale/en_US'
-import generateConfig from "rc-picker/lib/generate/moment"
+import generateConfig from 'rc-picker/lib/generate/moment'
 import moment from 'moment'
 import ConfigContext from 'core/src/providers/ConfigProvider'
 
@@ -38,10 +38,10 @@ const InputDate = ({
     placeholder,
     translate = Active.translate,
     onChange,
+    onSelect,
     ...props
 }) => {
     const config = useContext(ConfigContext)
-    const [active, setState] = useState(props.autoFocus)
 
     const dateFormat = useMemo(() => config.dateFormat || 'DD/MM/YYYY', [config])
 
@@ -75,7 +75,7 @@ const InputDate = ({
             <Row className="middle">
                 {label && <Label htmlFor={id} title={translate(title)}>{translate(label)}</Label>}
             </Row>
-            <Row className={classNames('input', {active, icon, lefty, error, info, unit})}>
+            <Row className={classNames('input', {icon, lefty, error, info, unit})}>
                 <Picker
                     name={name}
                     id={id}
@@ -84,14 +84,6 @@ const InputDate = ({
                     disabled={disabled}
                     resize={resize}
                     aria-describedby={idHelp}
-                    onFocus={(...args) => {
-                        !active && setState(true)
-                        onFocus && onFocus(...args)
-                    }}
-                    onBlur={(...args) => {
-                        active && setState(false)
-                        onBlur && onBlur(...args)
-                    }}
                     placeholder={translate(placeholder)}
                     generateConfig={generateConfig}
                     {...props}
@@ -99,8 +91,9 @@ const InputDate = ({
                     allowClear={false}
                     locale={enUs}
                     picker='date'
-                    format={dateFormat}
+                    format={[dateFormat, 'YYYY-MM-DD']}
                     onChange={onDateChanged}
+                    onCalendarChange={onSelect}
                 />
             </Row>
             {(error || info) &&
@@ -114,5 +107,5 @@ const InputDate = ({
     )
 }
 
-export { InputDate }
-export default React.memo(InputDate)
+export default InputDate
+// export default React.memo(InputDate)

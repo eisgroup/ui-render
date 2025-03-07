@@ -20,7 +20,6 @@ services:
     depends_on:
       - database  # to ensure correct order of startup
     volumes:
-      - ./data/storage:/home/node/app/.node-persist/storage
       - ./uploads:/home/node/app/uploads
       - ./service:/home/node/app/service  # enable changing service variables without restarting server
     environment:

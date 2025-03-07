@@ -1,7 +1,0 @@
-fragment Pay on Pay {
-    currency
-    interval
-    min
-    max
-    total
-}

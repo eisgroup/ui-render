@@ -1,9 +1,7 @@
 import { UI } from 'ui-modules-pack/variables'
-import { fieldsFrom } from 'ui-modules-pack/variables/fields'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import { Field, Form } from 'react-final-form'
-import { tooltipProps } from 'ui-react-pack'
 import { isRequired } from 'ui-react-pack/inputs/validationRules'
 import Text from 'ui-react-pack/Text'
 import ToolTip from 'ui-react-pack/Tooltip'
@@ -82,16 +80,14 @@ export function registeredFieldErrors (form) {
  */
 
 /**
- * Wrapper Proxy for react-final-form or redux-form Field with unified API.
+ * Wrapper Proxy for react-final-form Field with unified API.
  * @Note:
  *    - `normalize` does not exist in react-final-form, only `format` and `parse`
- *      => Make `format` and `parse` fallback to `normalize`, when undefined,
- *         for compatibility with redux-form.
  *    - must use Class to prevent input from loosing focus on input 'onChange'
  *
  * @param InputComponent - React component to use for input
  * @param {Function} sanitize(value, props) - callback to parse (formatted) value from input Field to InputComponent
- * @returns {Class} React InputComponentField - connected to react-final-form or redux-form
+ * @returns {Class} React InputComponentField - connected to react-final-form
  */
 export function asField (InputComponent, {sanitize} = {}) {
   if (!Active.Field) Active.Field = Field
@@ -137,10 +133,6 @@ export function asField (InputComponent, {sanitize} = {}) {
       this._value = v
     }
 
-    componentDidMount () {
-      this.didMount = true
-    }
-
     // Handle onRemove field in FIELD.TYPE.MULTIPLE*
     componentWillUnmount () {
       // warn('-------componentWillUnmount', this.constructor.name)
@@ -157,7 +149,7 @@ export function asField (InputComponent, {sanitize} = {}) {
       //        => both cases do not update `pristine`, so cannot rely on this for `canSave` state.
       // @Note:
       //  - this.props.onChange is callback defined in withFormSetup - does not update form values, or change `pristine`
-      //  - this.input.onChange is callback from final-form/redux-form - does not trigger parent re-render directly, only when `valid` prob changes
+      //  - this.input.onChange is callback from final-form - does not trigger parent re-render directly, only when `valid` prob changes
       // => the best logic is to change input value after it unmounts, and call `onChange` to update parent state,
       //    because this avoids validation, ties all operations together and persists `state.canSave`.
       const {instance, name, onChange, onRemoveChange} = this.props
@@ -264,7 +256,7 @@ export function asField (InputComponent, {sanitize} = {}) {
       // if (type === 'number') {
       //   value = value !== '' ? Number(value) : null
       // }
-      this.input.onChange(value) // both redux-form and final-form input.onChange can accept 'event' or 'value'
+      this.input.onChange(value) // final-form input.onChange can accept 'event' or 'value'
       onChange && onChange(parse ? parse(value) : value, ...args)
     }
 
@@ -296,17 +288,14 @@ export function asField (InputComponent, {sanitize} = {}) {
  *      // see https://final-form.org/docs/react-final-form/types/FormProps#onsubmit
  *
  * @usage:
- *  Below methods only work when using this.renderInput(FIELD.FOR.LIST),
  *  or apply <Input onChange={this.handleChangeInput.bind(this)}/> manually:
  *  - this.canSave - getter boolean: true if form has input changes, no validation error exists, and is not loading
  *  - this.changedValues - getter object: key value pairs of form input values that have changed since initial values
  *  - this.registeredValues - getter object: key value pairs of registered form input values
  *  - this.changedAndRegisteredValues - getter object: combination of above
  *  - this.formValues - getter object: key value pairs of all form input values
- *  - this.renderInput - function: to render form inputs using FIELD.FOR.LIST definition (hooks `onChange` to inputs).
  *
  * @helpers:
- *  - this._fields - list: of FIELD.FOR.LIST hydrated with props and initialValues, ready for rendering.
  *  - this.handleChangeInput() - function: updates state.canSave (hooked to this.renderInput, must be defined as function)
  *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
  *  - this.props.tooltip - object|boolean: automatically wrap rendered input with Semantic UI Popup
@@ -435,7 +424,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         // If the `initialValues` is computed on the fly and changes reference each time,
         // <Form/> reinitialises while loading, causing the flickering.
         // => either cache `initialValues`, or better, stop <Form/> from reinitializing while loading.
-        //    because final-form always re-initializes, there is no `enableReinitialize` like redux-form.
+        //    because final-form always re-initializes
         return <Form
           onSubmit={onSubmit}
           {...options}
@@ -462,7 +451,7 @@ const setFieldTouched = (args, state) => {
 
 /**
  * Mixin to add Class Attributes and Methods commonly used with forms
- * @note: works with react-final-form, redux-form requires update with parent `instance` for `this.form` to work
+ * @note: works with react-final-form
  *
  * @param {Object} Class - React Component or PureComponent to decorate
  * @param {Function} fieldValues - callback to get form values
@@ -574,32 +563,6 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
       return errors ? <ToolTip top>{errors}</ToolTip> : null
     }
   })
-
-  // Define instance method
-  Class.prototype.renderInput = function (FIELDS, {onChange, fieldsSetup} = {}) {
-    const {initialValues} = this.props
-    this._fields = fieldsFrom(FIELDS, {initialValues})
-    if (fieldsSetup) this._fields = this._fields.map(fieldsSetup)
-    return this._fields
-      .map(({id, onRenderProps, ...field}, i) => ({ // convert id to key just before rendering, to prevent unmounts on form.reset()
-        key: `${id}_${field.name || i}`,
-        ...field,
-        ...onRenderProps && onRenderProps(this, initialValues),
-        onChange: (...args) => {
-          field.onChange && field.onChange(...args, this)
-          this.handleChangeInput(...args)
-          onChange && onChange(...args)
-        },
-        instance: this,
-      }))
-      .map(({tooltip, ...field}) => {
-        const result = Active.renderField(field)
-        // Wrap component with Tooltip automatically
-        if (tooltip != null)
-          return <Tooltip key={field.key} {...tooltipProps(tooltip)}>{result}</Tooltip>
-        return result
-      })
-  }
 
   // Define instance method
   Class.prototype.handleChangeInput = debounce(function () {

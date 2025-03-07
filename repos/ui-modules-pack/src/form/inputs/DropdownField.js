@@ -3,7 +3,7 @@ import React from 'react'
 import { Dropdown } from 'ui-react-pack/Dropdown'
 
 /**
- * Dropdown Field connected with react-final-form or redux-form
+ * Dropdown Field connected with react-final-form
  */
 export default asField(Dropdown, {
   sanitize: (value, { multiple }) => {

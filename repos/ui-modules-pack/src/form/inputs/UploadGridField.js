@@ -3,7 +3,7 @@ import UploadGrid from 'ui-modules-pack/upload/views/UploadGrid'
 import React from 'react'
 
 /**
- * Upload Grid Field connected with react-final-form or redux-form.
+ * Upload Grid Field connected with react-final-form
  * @note: use `fileParser` for processing mutation variables.
  * @example: // requests.js
  *    if (entry.files) entry.files = fileParser(entry.files)

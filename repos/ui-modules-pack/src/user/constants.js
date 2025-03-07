@@ -38,20 +38,6 @@ FIELD.ID = {
   SEX: `${USER}_SEX`,
 }
 
-// Lists
-FIELD.FOR = {
-  /* To be defined on implementation */
-  // USER_CONTACTS: [
-  //   {id: FIELD.ID.EMAIL, required},
-  //   {id: FIELD.ID.PHONE, required},
-  //   {id: FIELD.ID.ADDRESS},
-  // ],
-  // USER_PROFILE: [
-  //   {id: FIELD.ID.FULL_NAME},
-  //   {id: FIELD.ID.BIRTH_n_SEX},
-  // ],
-}
-
 // Field Definitions
 FIELD.DEF = {
   [FIELD.ID.GIVEN_NAME]: {

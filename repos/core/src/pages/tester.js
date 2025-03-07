@@ -87,7 +87,6 @@ export default class Tester extends Component {
           <Button className='margin primary basic' onClick={actions.login}>Login Modal</Button>
           <Button className='margin primary basic' onClick={actions.getData}>GET DATA</Button>
           <Button className='margin primary basic' onClick={actions.post}>POST Request</Button>
-          <Button className='margin primary basic' onClick={actions.mutate}>GraphQL Mutation</Button>
           <Button className='margin secondary basic' onClick={actions.contact}>Contact</Button>
           <Button className='margin primary basic' onClick={actions.openInModal}>Open in Modal</Button>
           <Button className='margin secondary basic' onClick={actions.popupAlert}>Popup Alert</Button>

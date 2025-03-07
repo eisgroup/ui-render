@@ -1,6 +1,5 @@
 // noinspection JSUnresolvedFunction
 
-import { SevenBoom as Response } from 'graphql-apollo-errors'
 import { fileId, fileName, folderFrom, IMAGE } from 'ui-modules-pack/variables'
 import mongoose from 'mongoose'
 import PromiseAll from 'promises-all'
@@ -219,8 +218,6 @@ async function fileUploaded ({
   // Resolve results
   const {resolve, reject} = await PromiseAll.all(updates)
   resolve.forEach(({field, files, errors}) => {
-    // todo: test returning array of promises with errors
-    // @see: https://stackoverflow.com/questions/67378814/apollo-server-throw-multiple-errors-with-partial-data
     if (!files) return // files can be empty array if a single file was removed
     if (update) {
       update({instance, field, files, errors})

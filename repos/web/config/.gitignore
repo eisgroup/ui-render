@@ -10,7 +10,6 @@ env/
 /data
 /dbbackup
 /localStorage
-/.node-persist
 log/
 !static/robots.txt
 *.crt

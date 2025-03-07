@@ -11,7 +11,9 @@ Below manual hacks are required for integration with the parent application, as 
 1. Compile CSS with `yarn build`
 
 2. Rename `.css` extensions in `public/static/semantic.css` and `public/static/all.css` to `.less`
-   
+
+// Deprecated #3, #4, #5, #6, #8, #10
+
 3. Compile CSS without `ui-render` prefix (temporary comment `postcss-prefixwrap` line)
 
 ```js

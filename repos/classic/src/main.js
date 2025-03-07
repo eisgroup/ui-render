@@ -1,4 +1,3 @@
-// import Apollo from 'core/src/apollo'
 import WebStudioPage from 'core/src/pages/main/webstudio'
 import Redux from 'ui-modules-pack/redux'
 import React from 'react'

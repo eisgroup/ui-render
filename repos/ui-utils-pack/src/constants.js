@@ -271,7 +271,7 @@ export const CRYPTO = {         // mapped for cryptoSign() and cryptoHash()
  * @see: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
  * @note: sync with Google standard https://developers.google.com/maps/faq#languagesupport
  *    - Correct syntax for <html lang="zh-CN"> uses hyphen, including Google API,
- *		however, GraphQL name, database tables and many backends only accept undersacore.
+ *		however, database tables and many backends only accept undersacore.
  *		=> Use _ for better compatibility between systems.
  */
 export const LANGUAGE = {

@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { get } from 'core/src/common/utils'
 import { QUERY_CACHE_TIME } from 'core/src/common/variables'
-import { Kind } from 'graphql/language'
 
 /**
  * HELPER FUNCTIONS ============================================================

@@ -14,7 +14,7 @@
   "execMap": {
     "js": "babel-node --root-mode upward --ignore node_modules"
   },
-  "ext": "js json graphql gql",
+  "ext": "js json gql",
   "watch": [
     "./src/",
     "../core/src/"

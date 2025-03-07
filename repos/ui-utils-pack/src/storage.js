@@ -42,13 +42,8 @@ export function performCache (ACTION, key, value) {
 performCache.cache = {}
 
 /**
- * Perform localStorage (for the Web), node-persist (for Node.js) or AsyncStorage (for React Native)
+ * Perform localStorage (for the Web)
  *
- * @setup (for backend):
- *   if (!Active.Storage) {
- *     Active.Storage = require('node-persist')
- *     performStorage.init() // initiate local storage as async method to avoid blocking concurrent processes
- *   }
  * @example:
  *    performStorage(SET, 'token', 'Wait_for_it___Legendary_Genius')
  *

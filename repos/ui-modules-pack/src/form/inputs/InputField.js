@@ -3,6 +3,6 @@ import React from 'react'
 import { Input } from 'ui-react-pack/Input'
 
 /**
- * Input Field connected with react-final-form or redux-form
+ * Input Field connected with react-final-form
  */
 export default asField(Input)

@@ -350,12 +350,6 @@ export function toOpenLConfig (meta) {
       meta.className = val
       delete meta[key]
     }
-
-    // @deprecated: Convert `format` attribute to `normalize` (previously used redux-form)
-    // else if (key === 'format') {
-    //   meta.normalize = val
-    //   delete meta[key]
-    // }
   }
 
   return meta

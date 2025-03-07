@@ -14,5 +14,4 @@ RUN yarn install --production
 COPY index.js ./
 
 # Set the user to use when running this image
-# USER node - disabled because permission denied for node-persist in Ubuntu
 CMD ["pm2", "start", "index.js", "--no-daemon"]

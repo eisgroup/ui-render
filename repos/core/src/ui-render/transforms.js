@@ -232,7 +232,7 @@ function metaToFunctions(definition, config) {
         fieldFunc,
         funcNames = FUNCTION_NAMES
     } = config
-    /* react-final-form does not support validate as array, like redux-form */
+    /* react-final-form does not support validate as array */
     // const validations = toList(definition.validate)
     // if (isString(validations[0])) definition.validate = removeNilValues(validations.map(id => FIELD.VALIDATION[id]))
     if (isString(definition.format)) definition.format = fieldNormalizer[definition.format]

@@ -8,7 +8,7 @@ import { Active, isFunction } from 'ui-utils-pack'
 if (!Active.Field) Active.Field = Field
 
 /**
- * Toggle Field connected with react-final-form or redux-form
+ * Toggle Field connected with react-final-form
  * @note: do not use `asField` because this component needs all props passed to Field for proper updates.
  * @example:
  *  [FIELD.ID.TOGGLE]: {

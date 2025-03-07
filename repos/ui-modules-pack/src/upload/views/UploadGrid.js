@@ -123,8 +123,8 @@ export default class UploadGrid extends Component {
   }
 
   // @Note: for file uploads, we don't want to resubmit unchanged files, thus only changed values need to be tracked.
-  // `onChange` should receive only changed files in state, not like typical redux-form pattern (all files).
-  // Because files may be uploaded/removed without submission, redux-form state value is used
+  // `onChange` should receive only changed files in state.
+  // Because files may be uploaded/removed without submission
   // to track changed values to send to backend once submitted.
   // If the form is re-initialized, then changed values should be reset
   changedValues = {}

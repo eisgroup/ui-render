@@ -1,6 +1,0 @@
-fragment Action on Action {
-    type
-    payload
-    meta
-    error
-}

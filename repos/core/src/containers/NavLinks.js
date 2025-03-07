@@ -31,25 +31,15 @@ export default class NavLinks extends Component {
       icon: PropTypes.string,
     })).isRequired,
     onChangeRoute: PropTypes.func,
-    sound: PropTypes.object, // sound file
-  }
-
-  itemDidMount = {}
-
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    if (nextProps.sound && !this.props.sound) this.itemDidMount = {} // reset sound
   }
 
   render () {
-    const {activeRoute, items, onChangeRoute, sound} = this.props
+    const {activeRoute, items, onChangeRoute} = this.props
     return (
       <Fragment>
         {items.map(({path, name, icon}, i) => {
           const delay = (i + 1) * STYLE.ANIMATION_DURATION * 0.3
-          if (sound && !this.itemDidMount[i]) {
-            this.setTimeout(sound.play, delay + 200)
-            this.itemDidMount[i] = true
-          }
+
           return (
             <Link
               key={path || i}
