@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.30.21
+#### Fixes
+- Fix DatePicker
+
 ### v0.30.20
 #### Fixes
 - Fix pagination styles
