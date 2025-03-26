@@ -1,6 +1,0 @@
-/*******************************
-    User Variable Overrides
-*******************************/
-@import "../../_mixins";
-@selectedBackground: @color-blue-lightest;
-@hoveredItemBackground: @color-blue-lighter;

@@ -1,7 +1,7 @@
 System.config({
   "paths": {
-    "ui-modules-pack/*": "./repos/ui-modules-pack/src/*",
-    "ui-react-pack/*": "./repos/ui-react-pack/src/*",
-    "ui-utils-pack/*": "./repos/ui-utils-pack/src/*",
+    "ui-modules-pack/*": "./src/core/modules/*",
+    "ui-react-pack/*": "./src/core/components/*",
+    "ui-utils-pack/*": "./src/core/utils/*",
   }
 });

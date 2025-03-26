@@ -1,6 +1,0 @@
-/*******************************
-         Site Overrides
-*******************************/
-.ui.icon:not(i) {
-  font-size: inherit; // override stupid Semantic UI reset.
-}
