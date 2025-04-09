@@ -9,5 +9,5 @@ import { POPUP } from './constants'
  */
 export function popupAlert (title, content) {
   console.log('popupAlert')
-  // Active.store.dispatch(stateAction(POPUP, ALERT, {items: [{title, content}]}))
+  Active.store.dispatch(stateAction(POPUP, ALERT, {items: [{title, content}]}))
 }

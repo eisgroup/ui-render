@@ -1,4 +1,4 @@
-import { Active, definitionByValue, enumFrom, l, LANGUAGE, LANGUAGE_LEVEL, optionsFrom } from 'ui-utils-pack'
+import { enumFrom, l, LANGUAGE, LANGUAGE_LEVEL, optionsFrom } from 'ui-utils-pack'
 
 /**
  * PROJECT DEFINITIONS =========================================================
@@ -14,12 +14,7 @@ export const CURRENCY = {
     _: 'EUR',
     [l.ENGLISH]: 'EUR',
   },
-  RUB: {
-    _: 'RUB',
-    [l.ENGLISH]: 'RUB',
-  },
 }
-Active.CURRENCY = CURRENCY.USD
 
 export const PHONE = {
   MOBILE: {
@@ -33,29 +28,6 @@ export const PHONE = {
   WORK: {
     _: 'work',
     [l.ENGLISH]: 'Work Phone'
-  },
-}
-
-export const PERMISSION = {
-  // @note: permissions are defined as separate access levels.
-  // To have full access, one must have all permissions defined below.
-  // This way we keep the logic for checking permissions simple.
-  // Example: User with permission {'1': true, '99': true} cannot update/delete.
-  READ: {
-    _: 1,
-    [l.ENGLISH]: 'Read',
-  },
-  UPDATE: {
-    _: 2,
-    [l.ENGLISH]: 'Update',
-  },
-  DELETE: {
-    _: 3,
-    [l.ENGLISH]: 'Delete',
-  },
-  MANAGE_USERS: {
-    _: 99, // same as STAFF authorization level
-    [l.ENGLISH]: 'Manage Users',
   },
 }
 
@@ -89,12 +61,6 @@ export const DEFINITION = {
   [TYPE.CURRENCY._]: CURRENCY,
   [TYPE.LANGUAGE._]: LANGUAGE,
   [TYPE.PHONE._]: PHONE,
-}
-
-export const DEFINITION_BY_VAL = {
-  LANGUAGE: definitionByValue(LANGUAGE),
-  LANGUAGE_LEVEL: definitionByValue(LANGUAGE_LEVEL),
-  [TYPE.LANGUAGE._]: definitionByValue(LANGUAGE),
 }
 
 export const ENUM = {

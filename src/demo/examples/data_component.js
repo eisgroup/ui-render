@@ -1,26 +1,6 @@
 import { cloneDeep } from 'ui-utils-pack'
-import dropdownMeta from './dropdown_meta.json'
 import exampleData from './example_data.json'
 
-const dropdownPlan = {
-  view: 'Row',
-  styles: 'middle margin-v',
-  items: [
-    {...dropdownMeta, compact: true, style: {}},
-    {
-      view: 'Text',
-      styles: 'padding no-padding-right bold',
-      label: 'Plan:',
-    },
-    {
-      view: 'Text',
-      styles: 'padding',
-      label: {
-        name: 'coverages.{state.coverage,0}.coverageID'
-      }
-    },
-  ]
-}
 const verify = {
   dataKind: 'period',
   validate: [
@@ -46,7 +26,6 @@ const inputEndDate = {
   verify: cloneDeep(verify),
 }
 
-const inputs = [inputStartDate, inputEndDate]
 export const meta = {
   view: 'Col',
   styles: 'padding left bg-info-light',
@@ -155,55 +134,11 @@ export const meta = {
       className: 'primary',
       onClick: 'submit',
       children: 'Submit (open Chrome Console to check changed values)'
-    },
-    // {
-    //   view: 'Data',
-    //   kind: 'period',
-    //   name: 'dataComponent',
-    //   styles: 'max-width-400',
-    //   meta: {
-    //     view: 'Col',
-    //     styles: 'app__form left padding margin bg-success-light',
-    //     items: [
-    //       {
-    //         view: 'Text',
-    //         styles: 'h3 padding-top',
-    //         label: 'Data Component (UI Render)',
-    //       },
-    //       {
-    //         view: 'Row',
-    //         items: [
-    //           {
-    //             label: 'Start Date',
-    //             ...cloneDeep(inputStartDate)
-    //           },
-    //           {
-    //             label: 'End Date',
-    //             ...cloneDeep(inputEndDate)
-    //           },
-    //         ],
-    //       },
-    //       {
-    //         view: 'Button',
-    //         styles: 'margin-v',
-    //         children: 'Add',
-    //         type: 'submit',
-    //         onClick: 'addData',
-    //       },
-    //       // cloneDeep(dropdownPlan),
-    //     ]
-    //   },
-    //   // rootData: true,
-    // },
-    // cloneDeep(dropdownPlan),
+    }
   ]
 }
 
 export const data = {
-  // dataComponent: {
-  //   startDate: Date.now(),
-  //   ...exampleData,
-  // },
   ...exampleData,
   dataKind: {
     period: [

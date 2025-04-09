@@ -1,6 +1,6 @@
 import { __DEV__ } from 'ui-utils-pack'
 
-export default {
+const buttonDownloadMeta = {
   view: 'Button',
   items: [
     {
@@ -23,3 +23,4 @@ export default {
   }
 }
 
+export default buttonDownloadMeta

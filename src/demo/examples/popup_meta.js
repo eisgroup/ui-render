@@ -1,7 +1,7 @@
 import { cloneDeep } from 'ui-utils-pack'
 import content from './table-nested_meta'
 
-export default {
+const popupMeta = {
   view: 'Col',
   styles: 'fill middle center padding',
   items: [
@@ -27,3 +27,5 @@ export default {
     cloneDeep(content), // for testing changes made inside Popup -> should sync
   ]
 }
+
+export default popupMeta

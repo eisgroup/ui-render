@@ -4,23 +4,6 @@ import { all } from 'redux-saga/effects'
 import { __DEV__, Active, get, hasListValue, hasObjectValue, HYDRATE, isFunction, RESET, toList } from 'ui-utils-pack'
 import saga from '../saga'
 
-/**
- * STORE CREATION ==============================================================
- * =============================================================================
- */
-
-/**
- * Creates the Redux store for the app
- * @Note:
- *    - redux action execution takes 0.5 microseconds by default
- *    - every new reducer adds about 0.45 microseconds to action execution
- *    - every new saga adds about 0.75 microseconds to action execution
- *    => optimize performance with `redux-ignore` library to filter actions
- *
- * @param {Object[]|Object} modules - list of modules to activate {NAME, middleware, reducer, saga}
- * @param {Boolean} [ignore] - whether to filter reducers using `ignoreActions` from `redux-ignore` library, default is false
- * @returns {Object} - redux store
- */
 export default function createStore (modules = [], {ignore} = {}) {
   modules = toList(modules)
   if (!hasListValue(modules)) return reduxCreateStore(state => state)

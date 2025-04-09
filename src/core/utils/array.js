@@ -31,54 +31,6 @@ export function hasListValue (data) {
 }
 
 /**
- * Check if given lists have at least one intersecting value in each list
- *
- * @param {Array[]} lists - array of arrays to test
- * @return {boolean} - true if a common value is found among given lists
- */
-export function hasCommonListValue (...lists) {
-  // Find the list with the shortest length
-  let listLength = Infinity
-  let shortestList = []
-  lists.forEach(list => {
-    if (list.length < listLength) {
-      listLength = list.length
-      shortestList = list
-    }
-  })
-
-  // If at least one value found among all lists, skip the loop and return true
-  return shortestList.some(value => {
-    // If value does not exist in at least one list, skip to next value
-    return !lists.some(list => !isInList(list, value))
-  })
-}
-
-/**
- * Check if given list contains primitive duplicate values
- * @Note: array.indexOf(NaN) always returns -1, even if the array has `NaN` value
- * @param {*[]} array - to check for duplicates
- * @returns {Boolean} true - if duplicate found
- */
-export function hasDuplicateInList (array) {
-  return array.some((value, index, self) => self.indexOf(value) !== index)
-}
-
-/**
- * Get All Indexes of Value in Array
- * @param {Array<*>} list - to search for index list
- * @param {*} value - to find indexes for
- * @returns {Number[]} index - list of value indexes, or empty array if nothing found
- */
-export function indexesOf (list, value) {
-  let indices = [], i = -1
-  while ((i = list.indexOf(value, i + 1)) !== -1) {
-    indices.push(i)
-  }
-  return indices
-}
-
-/**
  * Check if the data passed is an array or plain object.
  *
  * @param {*} data - The variable to check
@@ -153,44 +105,6 @@ export function isInCollection (collection, element) {
 }
 
 /**
- * Check if any given Element exists in the Collection, with shallow include match
- *
- * @example:
- *    isInCollectionAny([{name: 'god', age: 'eternal'}], {name: 'dog'}, {name: 'god'})
- *    >>> true
- *
- * @param {Array|Object} collection - to search from
- * @param {*} elements - to search for
- * @return {boolean} true - if any of the given elements found in the collection
- */
-export function isInCollectionAny (collection, ...elements) {
-  for (const element of elements) {
-    if (isInCollection(collection, element)) return true
-  }
-  return false
-}
-
-/**
- * Compare two Arrays and determine if they have the same values
- * @param array1
- * @param array2
- */
-export function isSameList (array1, array2) {
-  return isEqual(array1.sort(), array2.sort())
-}
-
-/**
- * Creates an array with all falsey values removed
- * (values false, null, 0, "", undefined, and NaN are falsey)
- *
- * @param {Array} array - the array to clean from falsey values
- * @return {Array} - returns the new array of filtered values
- */
-export function cleanList (array) {
-  return array.filter(v => v)
-}
-
-/**
  * Converts Any Value to Array (or keep it as is if already Array)
  *
  * @param {*} value - the value to convert
@@ -200,38 +114,6 @@ export function cleanList (array) {
 export function toList (value, clean) { // eslint-disable-line no-shadow
   if (!isList(value)) value = [value]
   return clean ? value.filter(v => v) : value
-}
-
-/**
- * Compute the Average Number from Array Elements
- *
- * @param {Array} array - list of numbers to calculate average of
- * @returns {number} - the average value
- */
-export function toListAvg (array) {
-  let sum = 0
-  for (const value of array) {
-    sum += value
-  }
-  return (sum / array.length)
-}
-
-/**
- * Compute the Total Number from Array Elements
- * @Note: ~2.5 times faster than array.reduce() in Node.js
- * @example:
- *    toListTotal([1, 2])
- *    >>> 3
- *
- * @param {Array} array - list of numbers to calculate total of
- * @returns {number} total - value of all elements
- */
-export function toListTotal (array = []) {
-  let sum = 0
-  for (const value of array) {
-    sum += value
-  }
-  return sum
 }
 
 /**
@@ -380,18 +262,6 @@ export function last (array) {
  */
 export function randomFromList (array) {
   return array[Math.floor(Math.random() * array.length)]
-}
-
-/**
- * Get a random value from provided list, removing it from the list
- */
-export function randomFromListExtract (array) {
-  const index = Math.floor(Math.random() * array.length)
-  return array.splice(index, 1)[0]
-}
-
-export function listAlphabetically (array) {
-  return array.sort(sortAscending)
 }
 
 /**

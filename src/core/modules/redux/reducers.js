@@ -1,22 +1,6 @@
 import { CLOSE, FINISH, isInList, LOAD, OPEN, START } from 'ui-utils-pack'
 import { stateActionType } from './actions'
 
-/**
- * ACTION HANDLER HELPERS ======================================================
- * =============================================================================
- */
-
-// See `popup` module for reference
-export const popupsInitState = {
-  activePopups: [
-    // ROUTE.RESULT,
-    // ROUTE.MATCH,
-  ],
-  // [ROUTE.RESULT]: {
-  //   items: [],
-  // },
-}
-
 export function popups (NAME) {
   return {
     /* Subscribe to POPUP action */

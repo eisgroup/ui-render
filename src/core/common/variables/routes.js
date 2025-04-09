@@ -1,4 +1,4 @@
-import { createNestedRoutes, ROUTE, ROUTES } from 'ui-modules-pack/variables'
+import { ROUTE, ROUTES } from 'ui-modules-pack/variables'
 import { __PROD__, ENV } from 'ui-utils-pack'
 
 export const ROUTE_BASE = __PROD__ ? `${ENV.REACT_APP_HOMEPAGE || ''}/` : '/'
@@ -10,9 +10,6 @@ const _ROUTE = {
 Object.assign(ROUTE, _ROUTE)
 
 const _ROUTES = {
-  FOR_DEFINITION: createNestedRoutes(ROUTE, {
-    [ROUTE.DOCS]: __PROD__ ? ':id?' : '/:id?', // add id to this route
-  }),
   FOR_NAV: [],
   WITHOUT_NAV: []
 }

@@ -56,35 +56,6 @@ export function isObject (value) {
 }
 
 /**
- * List the keys and values of an object for iteration.
- * @Note: use for convenience only because it takes 0.5 microseconds per loop, which is:
- *    - x2-3 times longer than looping with `for (const key in obj) {...}` (0.2 microseconds),
- *    - x4-5 times longer than `forEach` or `for i++` loop using array (0.1 microseconds).
- *    => For performance, best to store list as array.
- *
- * @uses generator
- * @uses lodash
- * @see https://lodash.com/docs/#isObjectLike
- *
- * @example:
- for (const [key, value] of listProps(obj)) {
-   console.log(key, value);
- }
- *
- * @param {Object} obj - the object to list
- * @return {Object} generator's yielded value
- */
-export function * listProps (obj) {
-	if (!isObjectLike(obj)) {
-		return []
-	}
-
-	for (const key of Object.keys(obj)) {
-		yield [key, obj[key]]
-	}
-}
-
-/**
  * Creates a new object that merges properties from all given objects. Properties from the right take precedence
  * over properties on the left
  * @Note: use update() for faster performance of x5 times (without cloneDeep) and x3 times (with cloneDeep)
@@ -142,34 +113,6 @@ export function objChanges (original, changed) {
  */
 export function set(object, path, value, customizer) {
 	return setWith(object, path, value, customizer)
-}
-
-/**
- * Set Object to be given Payload recursively, by Mutation
- *
- * @example:
- reset({user: {name: 'Chris'}}, {user: {sign: 'scorpion'}})
- >>> {user: {sign: 'scorpion'}}
- *
- * @param {Object|Array} collection - collection to be reset
- * @param {Object} payload - the nested Object to update with
- * @return {Object|Array} - mutated collection that has properties of payload
- */
-export function reset(collection, payload) {
-	for (const key in payload) {
-		const value = payload[key]
-		if (isObject(value)) {
-			collection[key] = collection[key] ? reset(collection[key], value) : value
-		} else {
-			collection[key] = value
-		}
-	}
-
-	for (const key in collection) {
-		if (!payload[key]) delete collection[key]
-	}
-
-	return collection
 }
 
 /**
@@ -567,26 +510,6 @@ export function toObjValuesTotal(obj) {
 	return sum
 }
 
-/**
- * Compute the Total Number from Object Values given Key Property
- * @example:
- *    toObjValuesKeyTotal({'a': {'count': 1}, 'b': {'count': 2}}, 'count')
- *    >>> 3
- *
- * @param {Object} obj - with nested values to calculate total for
- * @param {String} [key] - nested obj value key to extract amount for calculation
- * @returns {number} total - value of object values for given key property
- */
-export function toObjValuesKeyTotal(obj, key = 'value') {
-	let sum = 0
-	for (const val in obj) {
-		sum += obj[val][key]
-	}
-	return sum
-}
-
-// LODASH CLONES
-// -----------------------------------------------------------------------------
 
 export {
 	cloneDeep,

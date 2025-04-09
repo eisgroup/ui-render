@@ -1,8 +1,0 @@
-#import "ui-modules-pack/place/fragments/Place.gql"
-fragment UserContacts on User {
-    email
-    phones
-    place {
-        ...Place
-    }
-}

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Active } from 'ui-utils-pack'
 import { SOUND } from '../files'
 
@@ -41,16 +41,6 @@ export function onPressHoc (onClick, sound) {
   return function onPress () {
     if (sound) sound.play()
     onClick && onClick(...arguments)
-  }
-}
-
-/**
- * React Component Context Decorator
- */
-export function withContext (Component) {
-  return function ContextWrapper (props) {
-    const context = useContext(UIContext)
-    return <Component {...context} {...props}/>
   }
 }
 

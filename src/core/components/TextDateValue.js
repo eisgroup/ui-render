@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import moment from 'moment'
 import Text from './Text'
-import ConfigContext from '../providers/ConfigProvider'
+import { ConfigContext } from '../contexts'
 
 const TextDateValue = ({value, dateFormat = 'DD/MM/YYYY', ...props}) => {
     const config = useContext(ConfigContext)

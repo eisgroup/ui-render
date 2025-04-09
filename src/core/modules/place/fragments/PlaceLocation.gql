@@ -1,7 +1,0 @@
-fragment PlaceLocation on Place {
-    id
-    location {
-        lat
-        lng
-    }
-}

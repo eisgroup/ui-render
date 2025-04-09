@@ -3,7 +3,6 @@ import { isList } from './array.js'
 import { fromJSON, toJSON } from './codec.js'
 import { ADD, DELETE, GET, SET } from './constants.js'
 import { enumCheck } from './function.js'
-import { log } from './log.js'
 import { update } from './object.js'
 
 /**
@@ -12,34 +11,6 @@ import { update } from './object.js'
  */
 
 const hasLocalStorage = typeof localStorage !== 'undefined'  // eslint-disable-line
-
-/**
- * Closure Function to Store Data in Memory (RAM)
- *
- * @param {Object|Array = Object} [initValue] - initialized value
- * @return {function(ACTION, key, value)} - to store or retrieve data in memory
- */
-export function memoryCache (initValue = {}) {
-  return function memoryCache (ACTION, key, value) {
-    if (ACTION === GET) return initValue[key]  // eslint-disable-line
-    if (ACTION === SET) return initValue[key] = value  // eslint-disable-line
-    if (ACTION === DELETE) return delete initValue[key]  // eslint-disable-line
-  }
-}
-
-/**
- * Perform fastest possible cache in RAM
- *
- * @param {string} ACTION - one of GET, SET, or DELETE
- * @param {string} key - stored value's key identifier
- * @param {*} value - value to store
- */
-export function performCache (ACTION, key, value) {
-  if (ACTION === GET) return performCache.cache[key]  // eslint-disable-line
-  if (ACTION === SET) return performCache.cache[key] = value  // eslint-disable-line
-  if (ACTION === DELETE) return delete performCache.cache[key]  // eslint-disable-line
-}
-performCache.cache = {}
 
 /**
  * Perform localStorage (for the Web)
@@ -81,10 +52,6 @@ export function performStorage (ACTION, storageKey, value = null, initialValue =
   // Storage Retrieval
   if (GET === ACTION && result) result = fromJSON(result)  // Deserialize data
 
-  if (!__DEV__) return result
-
-  // Development Logging
-  log(`STORAGE -> ${ACTION}: ${storageKey} as:`, `color: teal`, result || value)
   return result
 }
 

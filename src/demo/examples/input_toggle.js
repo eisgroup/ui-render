@@ -1,4 +1,4 @@
-export default {
+const inputToggle = {
   view: 'Row',
   items: [
     {
@@ -33,3 +33,5 @@ export default {
     },
   ]
 }
+
+export default inputToggle

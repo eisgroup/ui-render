@@ -1,17 +1,9 @@
-/**
- * EXPORTS =====================================================================
- * Modules' Exposing API - to enable consistent and maintainable app integration
- * =============================================================================
- */
-
 export * from './_envs.js'
 export * from './constants.js'
 export * from './definitions.js'
 export * from './array.js'
 export * from './codec.js'
 export * from './function.js'
-export * from './math.js'
-export * from './log.js'
 export * from './number.js'
 export * from './object.js'
 export * from './storage.js'

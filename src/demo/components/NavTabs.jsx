@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react'
-import { useLocation, useParams, useNavigate} from 'react-router-dom'
+import { useLocation, useNavigate} from 'react-router-dom'
 import Markdown from 'react-markdown'
 import ScrollView from 'ui-react-pack/ScrollView'
 import toc from 'remark-toc'
-import { __PROD__, get } from 'ui-utils-pack'
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
 import {oneLight} from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { goTo, ROUTE } from '../../core/common/variables'
 import changelogMarkdown from '../markdowns/changelog.md'
 import stylesMarkdown from '../markdowns/styles.md'
 import configMarkdown from '../markdowns/config.md'
@@ -31,13 +29,8 @@ const NavTabs = (props) => {
     const [changelog, setChangelog] = React.useState(undefined)
     const [faq, setFaq] = React.useState(undefined)
 
-    let params = useParams();
     let location = useLocation();
     let navigate = useNavigate();
-
-    console.log('NavTabs params', params)
-    console.log('NavTabs location', location)
-    console.log('NavTabs navigate', navigate)
 
     useEffect(() => {
         fetch(docsMarkdown).then(r => r.text()).then(docs => setDocs(docs))
@@ -97,11 +90,6 @@ const NavTabs = (props) => {
             content: () => <Markdown {...mdProps} components={components}>{faq}</Markdown>,
         },
     ]
-
-    const id = get(props, 'match.params.id') || ''
-
-    console.log('NavTabs id', id)
-    console.log('NavTabs props', props)
 
     const tabIndex = tabs.findIndex(v => v.path === location.pathname)
 

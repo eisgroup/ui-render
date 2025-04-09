@@ -1,4 +1,4 @@
-export default {
+const buttonIconMeta = {
   view: 'Button',
   items: [
     {
@@ -9,3 +9,4 @@ export default {
   onClick: 'popup'
 }
 
+export default buttonIconMeta

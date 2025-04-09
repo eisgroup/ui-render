@@ -1,9 +1,7 @@
 import { throttle as _throttle } from 'lodash-es'
 import { __DEV__ } from './_envs.js'
 import { isInListAny } from './array.js'
-import { NOW, ONE_DAY, ONE_HOUR, TIME_DURATION_INSTANT } from './constants.js'
-import { randomNumberInRange } from './number.js'
-import { randomString } from './string.js'
+import { TIME_DURATION_INSTANT } from './constants.js'
 
 /**
  * FUNCTION HELPERS ============================================================
@@ -52,20 +50,6 @@ export function enumCheck (enums, value, self) {
 		const callerFunctionName = isFunction(self) ? self.name : 'function'
 		throw new TypeError(`${callerFunctionName} expected @value to be one of ${enums}, but got '${value}'`,)
 	}
-}
-
-/**
- * Check if values provided do match, using given comparison operator
- *
- * @param {string} type - comparison operator (i.e. enum(['AND', 'OR']))
- * @return {function<Array>} that takes boolean arguments and return true or false based on match type
- */
-export function matchByType (type) {
-	enumCheck(['AND', 'OR'], type, this)
-	return {
-		'AND': (...args) => !args.some(v => !v),
-		'OR': (...args) => args.some(v => v),
-	}[type]
 }
 
 /**
@@ -163,37 +147,6 @@ export function debounce (func, wait = TIME_DURATION_INSTANT, { leading } = {}) 
 			func.apply(self, args)
 		}
 	}
-}
-
-/**
- * Mock Data for Testing
- */
-export const testMock = {
-	i: 0,
-	dayCount: 0,
-	hourCount: 0,
-
-	/* Get Decrementing Day From Now */
-	get dayDecrementing () {
-		return NOW - ONE_DAY * this.dayCount++
-	},
-
-	/* Get Decrementing Hour From Now */
-	get hourDecrementing () {
-		return NOW - ONE_HOUR * this.hourCount++
-	},
-
-	get id () {
-		return randomString(7, 7)
-	},
-
-	get index () {
-		return this.i++
-	},
-
-	get number () {
-		return randomNumberInRange(1, 1000000)
-	},
 }
 
 /**

@@ -1,7 +1,6 @@
 import moment from 'dayjs'
 import humanizeDuration from 'humanize-duration'
 import {
-  FIFTEEN_MINUTES,
   FORMAT_DATE,
   FORMAT_DD_MMM,
   FORMAT_DD_MMM_YYYY,
@@ -9,7 +8,6 @@ import {
   FORMAT_TIME_FOR_HUMAN,
   ONE_HOUR,
   ONE_MINUTE,
-  THIRTY_MINUTES
 } from './constants.js'
 import { isNumeric, startEndFromNumberRanges } from './number.js'
 
@@ -75,16 +73,6 @@ export function msFromHourMinute (hourMinute = '') {
 }
 
 /**
- * Convert Number to String with leading zero/s at specified character length
- * @param {Number|String} number - to format
- * @param {Number} [length] - total character length of output, default is 2
- * @returns {String} time - string with leading zero/s if needed
- */
-export function toLeadingZero (number, length = 2) {
-  return ('0' + number).slice(-length)
-}
-
-/**
  * Convert time to full hour string
  *
  * @param {String|Number|Date} time - date string, Unix timestamp, Date object, etc.
@@ -92,16 +80,6 @@ export function toLeadingZero (number, length = 2) {
  */
 export function toHours (time) {
   return formatTime(time, 'h a')
-}
-
-/**
- * Convert time to hour and minute string
- *
- * @param {String|Number|Date} time - date string, Unix timestamp, Date object, etc.
- * @return {String} - hours and minutes
- */
-export function toHourMinutes (time) {
-  return formatTime(time, 'h:mm A')
 }
 
 /**
@@ -253,40 +231,4 @@ export function toTimestamp (time, fallback) {
  */
 export function timeSince (timestamp) {
   return formatDuration(Date.now() - timestamp, { largest: 1 })
-}
-
-/* Time Utilities */
-export class Time {
-  /**
-   * Get Milliseconds Until the Next Full Hour
-   */
-  static get tillNextHour () {
-    const d = new Date()
-    const minutes = d.getMinutes()
-    const seconds = d.getSeconds()
-    const milliseconds = d.getMilliseconds()
-    return ONE_HOUR - (minutes * 60 + seconds) * 1000 - milliseconds
-  }
-
-  /**
-   * Get Milliseconds Until the Next Full 30 Minutes
-   */
-  static get tillNext30Mins () {
-    return Time.tillNextHour % THIRTY_MINUTES
-  }
-
-  /**
-   * Get Milliseconds Until the Next Full 15 Minutes
-   */
-  static get tillNext15Mins () {
-    return Time.tillNextHour % FIFTEEN_MINUTES
-  }
-
-  /**
-   * Get Milliseconds Until the Next Full Duration Provided
-   * (duration given must be less than ONE_HOUR)
-   */
-  static tillNext (duration) {
-    return Time.tillNextHour % duration
-  }
 }

@@ -1,4 +1,4 @@
-export default {
+const expandListMeta = {
   view: 'ExpandList',
   name: 'coverages',
   renderLabel: {
@@ -50,3 +50,5 @@ export default {
     ],
   },
 }
+
+export default expandListMeta

@@ -9,5 +9,5 @@ import { NAME as SETTINGS } from './constants'
 
 export function setSettings (payload) {
   console.log('setSettings')
-  // return Active.store.dispatch(stateAction(SETTINGS, SET, payload))
+  return Active.store.dispatch(stateAction(SETTINGS, SET, payload))
 }

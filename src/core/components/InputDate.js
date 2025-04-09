@@ -9,7 +9,7 @@ import Picker from 'rc-picker'
 import enUs from 'rc-picker/lib/locale/en_US'
 import generateConfig from 'rc-picker/lib/generate/moment'
 import moment from 'moment'
-import ConfigContext from '../providers/ConfigProvider'
+import { ConfigContext } from '../contexts'
 
 const InputDate = ({
     name,

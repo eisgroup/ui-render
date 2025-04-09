@@ -105,18 +105,6 @@ export function stateActionType (NAME, ACTION = null, RESULT = null) {
 }
 
 /**
- * Multiple State Action Types Creator
- *
- * @param {Array} NAMES - list of action type identifiers
- * @param {string|null} ACTION - optional, action type name suffix, if not provided, 2nd argument can be @RESULT
- * @param {string|null} RESULT - optional, action type name result suffix
- * @return {Array} - list of action types
- */
-export function stateActionNamesType (NAMES, ACTION = null, RESULT = null) {
-  return NAMES.reduce((list, NAME) => list.concat(stateActionType(NAME, ACTION, RESULT)), [])
-}
-
-/**
  * ACTION HELPERS --------------------------------------------------------------
  * -----------------------------------------------------------------------------
  */

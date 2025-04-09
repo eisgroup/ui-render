@@ -258,14 +258,6 @@ export const FORTY_SECONDS = ONE_SECOND * 40
 export const HUNDRED_SECONDS = ONE_SECOND * 100
 export const HUNDRED_MINUTES = ONE_MINUTE * 100
 
-/* Mappings */
-export const CRYPTO = {         // mapped for cryptoSign() and cryptoHash()
-	HMAC_SHA256: 'sha256',
-	HMAC_SHA384: 'sha384',
-	HMAC_SHA512: 'sha512',
-	MD5: 'md5',
-}
-
 /**
  * Language Definition
  * @see: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
@@ -344,60 +336,3 @@ export const SORT_ORDER = {
 	1: 'asc',
 	[-1]: 'desc',
 }
-
-/* Characters */
-export const PLUS = '✛'
-export const MINUS = '╍'
-export const DOT = '•'
-export const CROSS = '✕'
-export const CROSSMARK = '❌'
-export const CHECK = '✓'
-export const CHECKBOX = '✅'
-export const CLOVER = '☘'
-export const RECYCLE = '♻️'
-export const HEART = '♥'
-export const HEART_EXCLAMATION = '❣'
-export const SPARKLES = '✨'
-export const THUNDER = '⚡'
-export const FIREWORK = '💥'
-export const ROCKET = '🚀'
-export const BLOCK = '🚷'
-export const CHICKEN = '🐣'
-export const SKULL = '☠'
-export const WARN = '✋'
-export const WORKER = '👷'
-
-/*
- * Special Characters Reference for Documentation Use
- * ┌───┬───────────────────────────────────────────────────────────────────────┐
- * │ 1 │     ╭ ─ ╮                                                             │
- * │   │     │ 5 │                                                             │
- * │ 2 │     ╰ ─ ╯                                                             │
- * ├───┼───────────────────────────────────────────────────────────────────────┤
- * │ 3 │                                                                       │
- * └───┴───────────────────────────────────────────────────────────────────────┘
- *     ├─┬─> A ⟶ B
- *     │ ├─> A ⟵ B
- *     │ └─> C ⟶ B
- *     │
- *     └─┬─> C ⟶ D
- *       └─> C ⟵ D
- *                               Time
- *                                │
- *    Start someFunctionName() -> ├───> Action A (start) ─────┐
- *                                ├───> Action B (start) ───────┐
- *                                │                           │ │
- *     Call someFunctionName() -> │╭ ──── Action A (end) ─────┘ │
- *     (dispatch new actions)     │╰ ─> Action C (start) ──────────┐
- *                                │                             │  │
- *                                │                             │  │
- *     Call someFunctionName() -> │╭ ── Action D <─ User Input  │  │
- *     (dispatch new actions)     │╰ ─> Action E (start) ─────────────┐
- *                                │                             │  │  │
- *                                │                             │  │  │
- *     Call someFunctionName() -> │  <─── Action B (end) ───────┘  │  │
- *   (no more actions, wait...)   │  <─── Action C (end) ──────────┘  │
- *                                │                                   │
- *      End someFunctionName() -> │  <─── Action E (end) ─────────────┘
- *                                │
-*/

@@ -45,24 +45,6 @@ export function isNumeric(val) {
 }
 
 /**
- * Check if given list of {from: Number, to: Number} is in continuous incrementing order
- * (useful for checking schedules of time durations in milliseconds)
- *
- * @param {Array<{from: Number, to: Number}>} arrayOfNumberRanges - to check for validity
- * @returns {Boolean} true - if it is a continuously incrementing ranges of numbers
- */
-export function isContinuousNumberRanges(arrayOfNumberRanges) {
-	if (!hasListValue(arrayOfNumberRanges)) return false
-	let result = true
-	let lastTo = -Infinity
-	arrayOfNumberRanges.forEach(({ from, to }) => {
-		if (from <= lastTo || from >= to) result = false
-		if (to) lastTo = to
-	})
-	return result
-}
-
-/**
  * Extract the Starting and Ending Number in given list of continuously incrementing number ranges
  *
  * @param {Array<{from: Number, to: Number}>} arrayOfNumberRanges - to check for values
@@ -73,55 +55,6 @@ export function startEndFromNumberRanges(arrayOfNumberRanges) {
 	let end = ([...arrayOfNumberRanges].reverse().find(({ to }) => to != null) || {}).to
 	if (end <= start) end = undefined
 	return { start, end }
-}
-
-/**
- * Increment Counter
- *
- * @example:
- *  - This is a Closure Function, declare at the start to instantiate the environment:
- *    const addCount = createIncrementCounter(7)
- *  - Then perform incrementing:
- *    addCount()
- *    >>> 8
- *  - Add 2 to current count:
- *    addCount(2)
- *    >>> 10
- *  - Reset Count:
- *    addCount(0)
- *    >>> 0
- *  - Subtract 2 from current count:
- *    addCount(-2)
- *    >>> -2
- *
- * @param {number} initValue - initial count
- * @return {Function} - closure that stores a local number count,
- *    and increments count by 1 when no argument passed
- * @return
- */
-export function createIncrementCounter(initValue = 0) {
-	let count = initValue
-	return value => {
-		if (value === 0) {
-			count = value // Reset count
-		} else if (isNumeric(value)) {
-			count += Number(value)
-		} else {
-			count++ // eslint-disable-line
-		}
-
-		return count
-	}
-}
-
-/**
- * Format Currency
- *
- * @param {Number|String} value - to format with currency symbol
- * @param {String} [symbol] - currency code to use, default is `$`
- */
-export function formatCurrency(value, { symbol = '$' } = {}) {
-	return `${symbol} ${shortNumber(value, 3)}`
 }
 
 /**
@@ -243,17 +176,6 @@ formatSI.PREFIXES = {
 }
 
 /**
- * Calculate Logarithm for given exponent and base numbers
- *
- * @param {Number} exponent
- * @param {Number} base
- * @returns {number} log
- */
-export function mathLog(exponent, base) {
-	return Math.log(exponent) / Math.log(base)
-}
-
-/**
  * Format Number to Ordinal Numeric String
  *
  * @param {number|string} number - to format
@@ -274,27 +196,6 @@ toOrdinal.list = ['th', 'st', 'nd', 'rd']
  */
 export function rad(degree) {
 	return (degree * Math.PI) / 180
-}
-
-/**
- * Round off a number to n* last digits
- * (e.g. converting timestamps into whole seconds)
- *
- * @example:
- *    roundTail(1234567, 3)
- *    >>> 1235000
- *    roundTail(1234567, 7)
- *    >>> 1000000
- *    roundTail(5234567, 7)
- *    >>> 10000000
- * @param {number} number - the value to convert
- * @param {number} lastDigits - the number of digits to round off to 0 at the end
- * @returns {number} - rounded number
- */
-export function roundTail(number, lastDigits) {
-	if (-1 < number && number < 1) return 0
-	const precision = Math.pow(10, lastDigits)
-	return Math.round(number / precision) * precision || precision / 10
 }
 
 /**

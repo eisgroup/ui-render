@@ -4,14 +4,12 @@ import Modal from 'ui-react-pack/Modal'
 import Row from 'ui-react-pack/Row'
 import { UIContext } from 'ui-react-pack/utils'
 import View from 'ui-react-pack/View'
-import { debounceBy, get, log, TIME_DURATION_INSTANT } from 'ui-utils-pack'
-import Sidebar, { Header } from './demo/components/Navigation'
+import { debounceBy, get, TIME_DURATION_INSTANT } from 'ui-utils-pack'
 import Routes from './demo/routes'
 
 // const mapStateToProps = (state) => ({
 //   lang: select.language(state),
 //   currency: select.currency(state),
-//   theme: select.theme(state)
 // })
 
 export default class App extends Component {
@@ -27,7 +25,7 @@ export default class App extends Component {
 
     renderModal = () => {
         const {
-            onModalClose = get(this, 'props.history.goBack') || (() => log('modal close')),
+            onModalClose = get(this, 'props.history.goBack') || (() => console.log('modal close')),
             canCloseModal = true,
             classNameModal
         } = get(this, 'props.location.state', {})
@@ -75,26 +73,16 @@ export default class App extends Component {
     }
 
     render () {
-        const { children, lang = DEFAULT.LANGUAGE, currency, ...props } = this.props
+        const { lang = DEFAULT.LANGUAGE, currency } = this.props
         const { isMobile } = this.state
 
         return (
             <UIContext.Provider value={this.state}>
                 <View className={`app fade-in lang--${lang} ${currency}`}>
-                    {/* Header */}
-                    <Header isMobile={isMobile} {...props} />
-
                     <Row fill reverse={isMobile} className="max-size">
-                        {/* Sidebar */}
-                        <Sidebar isMobile={isMobile} {...props}/>
-
-                        {/* Content */}
                         <View className="app__content">
                             <div ref={this.content}/>
-
                             <Routes/>
-
-                            {/* Modal */}
                             {this.isModal && this.renderModal()}
                         </View>
 

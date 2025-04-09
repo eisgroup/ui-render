@@ -12,8 +12,6 @@ export const STATE_ACTION_TIMEOUT = Number(ENV.STATE_ACTION_TIMEOUT || ENV.REACT
 export const REQUEST_TIMEOUT_BACKOFF_DURATION = Number(ENV.REQUEST_TIMEOUT_BACKOFF_DURATION || ENV.REACT_APP_REQUEST_TIMEOUT_BACKOFF_DURATION) || FIVE_MINUTES
 
 /* Client App */
-export const APP_NAME = ENV.APP_NAME || ENV.REACT_APP_NAME || 'APP_NAME'
-export const APP_RELEASE_VERSION = parseFloat(ENV.APP_RELEASE_VERSION || ENV.REACT_APP_RELEASE_VERSION || '1.0')
 export const APP_SUPPORT_TEAM_NAME = ENV.APP_SUPPORT_TEAM_NAME || ENV.REACT_APP_SUPPORT_TEAM_NAME || 'Support'
 export const ANALYTICS_TRACKING_ID = ENV.REACT_APP_ANALYTICS_TRACKING_ID
 export const CONTACT_EMAIL = ENV.REACT_APP_CONTACT_HOST + '@' + ENV.REACT_APP_CONTACT_SERVER
@@ -21,11 +19,6 @@ export const CONTACT_EMAIL = ENV.REACT_APP_CONTACT_HOST + '@' + ENV.REACT_APP_CO
 /* Configuration */
 export const CONFIG = {
   LANGUAGE_OPTIONS: [LANGUAGE.ENGLISH, LANGUAGE.FRENCH] // enabled languages
-}
-
-/* Client */
-export const CLIENT = {
-  // add env variables for frontend
 }
 
 /* Server */
@@ -45,18 +38,4 @@ export const UI = {
 export const THEME = {
   LIGHT: 'LIGHT',
   DARK: 'DARK',
-}
-
-/**
- * FOR TESTS -------------------------------------------------------------------
- * -----------------------------------------------------------------------------
- */
-
-export const TEST = {
-  COUNT: 1
-}
-
-export const MOCK = {
-  DATA_SEED: 7,
-  UNIT_COUNT: 14,
 }

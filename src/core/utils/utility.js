@@ -1,6 +1,5 @@
-import { Active, ENV } from './_envs.js'
+import { Active } from './_envs.js'
 import { isInList, isList } from './array.js'
-import { fromJSON } from './codec.js'
 import { rad } from './number.js'
 import { isObject } from './object.js'
 import { isString, padStringLeft, randomString } from './string.js'
@@ -174,22 +173,6 @@ export function distanceBetween (point1, point2, unit = 'mm') {
  */
 export function isGoodPassword (value, strength = 2) {
   return passStrength(value) >= strength
-}
-
-/**
- * Create HTML DOM <script/>
- * @param {String} src
- * @param {Function} callback - to fire on script loaded
- */
-export function createScript (src, callback) {
-  if (typeof document === 'undefined') return
-  const d = document, t = 'script',
-    o = d.createElement(t),
-    s = d.getElementsByTagName(t)[0]
-  o.src = src
-  o.async = true
-  if (callback) { o.addEventListener('load', callback, false) }
-  s.parentNode.insertBefore(o, s)
 }
 
 /**

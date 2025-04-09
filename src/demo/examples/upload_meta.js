@@ -1,6 +1,6 @@
 import { SIZE_MB_16 } from 'ui-utils-pack'
 
-export default {
+const uploadMeta = {
   view: 'Input',
   name: 'path.to.file', // path in data.json
   type: 'file', // use dropzone file input
@@ -25,3 +25,6 @@ export default {
     },
   ]
 }
+
+
+export default uploadMeta

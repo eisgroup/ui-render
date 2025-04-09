@@ -1,6 +1,6 @@
 import { FILE as _FILE } from 'ui-react-pack/files'
-import { _WORK_DIR_, ENV, isList, SIZE_MB_16 } from 'ui-utils-pack'
-import { fileFormatNormalized, fileNameWithoutExt, isFileSrc, mimeTypeFromDataUrl } from 'ui-utils-pack/string'
+import { _WORK_DIR_, ENV, SIZE_MB_16 } from 'ui-utils-pack'
+import { fileFormatNormalized, fileNameWithoutExt } from 'ui-utils-pack/string'
 
 /**
  * FILE VARIABLES ==============================================================
@@ -81,28 +81,6 @@ export const UPLOAD = {
 // import 'ui-modules-pack/utils/server/config' // load .env file variables
 // Bucket name must be empty string so that backend can set bucket during runtime
 UPLOAD.PATH = `${ENV.CDN_BUCKET_NAME ? '' : (ENV.UPLOAD_PATH || _WORK_DIR_)}${UPLOAD.DIR}` // full upload path
-
-/**
- * Create JS File Object from given URL
- * @param {String} url - to fetch file, can be Base64 string, http url, dataURL, blobURL, etc...
- * @param {String} filename - to use
- * @param {FilePropertyBag|undefined} [options] - attributes to pass to new File()
- * @returns {Promise<File>} file object if resolved
- */
-export function fileFromUrl (url, filename, options) {
-  return fetch(url)
-    .then((res) => res.arrayBuffer())
-    .then((buf) => new File([buf], filename, options))
-}
-
-/**
- * Get File Format Extension from Data URL String
- * @param {String} dataUrl - see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
- * @returns {String} format - example: 'png'
- */
-export function fileFormatFromDataUrl (dataUrl) {
-  return FILE.FORMAT_BY_MIME_TYPE[mimeTypeFromDataUrl(dataUrl)]
-}
 
 /**
  * Create File Name (with optional ID folder) from FileInput object in this format:
@@ -196,88 +174,3 @@ export function resolvePath ({filename = '', folder = '', dir = '', path = '', w
   return {dir, path, name}
 }
 
-/**
- * Parse <UploadGridField/> onChange(files) values to match Backend API
- * @param {FileInput[]|FileInput} files - single or list of FileInputs to parse
- * @returns {Object[]|Object|void} {file, kind, i, remove}[] - single or list of FileInputs for backend
- */
-export function fileParser (files) {
-  if (isList(files)) {
-    const list = files.map(fileParser).filter(v => v)
-    if (list.length) return list
-  } else {
-    const {file, kind, i, remove} = files
-    if (file) return {file, kind, i}
-    if (remove) return {kind, i, remove}
-  }
-}
-
-/**
- * Parse <UploadGridField/> onChange(files) values to have `kind` as given
- * @param fileInput
- * @param {String} kind - to use
- * @returns {{kind, remove}|{file, kind}} fileInput for backend with kind inserted
- */
-export function fileKindParser (fileInput, kind) {
-  const {file, remove} = fileInput
-  if (file) return {file, kind}
-  if (remove) return {kind, remove}
-}
-
-/**
- * Load Image file
- *
- * @param {String} src - full image file path
- * @return {Promise<Image|Error>} promise - resolves to loaded Image file or error
- */
-export function loadImage (src) {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = reject
-    img.src = src
-  })
-}
-
-/**
- * Compute Image `preview` URL/pathname (can accept Base64 string) in different sizes for consumption by frontend:
- *  - `preview` matches original `src`
- *  - `preview.medium` matches medium size of `src`
- *  - `preview.thumb` matches thumbnail size of `src`
- *
- * => pass in `null` as the second parameter to disable default fallback to IMAGE.SIZES.
- *
- * @example:
- *    const preview = previewSizes(image)
- *    preview == image.src >>> true
- *    preview.medium >>> string
- *    preview.thumb >>> string
- *
- * Scenarios:
- *  1. Production file: use `src` suffixed with 'medium' for default size, else `src` as 'original'
- *  2. Local dev file: user `src` as base64 data if it is of base64 type, else same as point 1.
- * @param {Object} - FileInput with `src` and optional `sizes` attribute (ex. [{key: 'medium', val: 99}])
- * @param {String[]|Null} [resKeys] - use predefined image size keys when FileInput.sizes not available
- * @return {Object|Undefined} preview<medium, thumb...> - string object with sizes attached as props of `preview`
- */
-export function previewSizes ({src, sizes}, resKeys = imgSizes) {
-  if (!src) return
-  if ((sizes || resKeys) && isFileSrc(src)) {
-    // noinspection JSPrimitiveTypeWrapperUsage
-    const preview = new String(src)
-    if (sizes) {
-      for (const size of sizes) {
-        const {key} = size
-        if (!key) continue
-        preview[key] = fileNameSized(src, key)
-      }
-    } else {
-      // fallback is needed to compute sizes for EntrySummary that likely doesn't query `sizes`,
-      resKeys.forEach(key => key && (preview[key] = fileNameSized(src, key)))
-    }
-    return preview
-  }
-  return src
-}
-
-const imgSizes = Object.keys(IMAGE.SIZES)

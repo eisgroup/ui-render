@@ -38,7 +38,7 @@ nestedTable.items.push({
     // headers: [] // -> optional when has no nested tables
   }
 })
-export default {
+const nestedTableMeta = {
   view: 'Table',
   name: 'coverages',
   headers: [  // -> must be defined if data contains nested tables, because rendering cells as objects will cause errors
@@ -92,3 +92,4 @@ export default {
   renderItem: nestedTable
 }
 
+export default nestedTableMeta

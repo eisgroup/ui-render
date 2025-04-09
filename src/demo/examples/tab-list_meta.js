@@ -1,8 +1,9 @@
 import meta from './expand-list_meta'
 
-export default {
+const tabListMeta = {
   ...meta,
   view: 'TabList',
   styles: 'padding',
 }
 
+export default tabListMeta

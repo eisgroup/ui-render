@@ -6,5 +6,3 @@ export const PopupContext = React.createContext({
     title: '',
     content: '',
 });
-
-export default PopupContext

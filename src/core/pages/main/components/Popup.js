@@ -6,7 +6,7 @@ import Text from 'ui-react-pack/Text'
 import View from 'ui-react-pack/View'
 import { l, localiseTranslation } from 'ui-utils-pack'
 import { _ } from 'ui-utils-pack/translations'
-import { PopupContext } from '../../../providers/PopupProvider'
+import { PopupContext } from '../../../contexts/PopupContext'
 
 localiseTranslation({
   CANCEL: {
@@ -38,15 +38,7 @@ export default class Popup extends Component {
 
   render () {
     const {
-      activePopups,
-      alert,
-      error,
-      confirm,
-      actions,
       ui: {className} = {},
-      canClose,
-      onClose,
-      ...props
     } = this.props
 
     return (
