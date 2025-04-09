@@ -1,4 +1,4 @@
-import { ConnectedRouter, connectRouter, routerMiddleware } from 'connected-react-router'
+// import { ConnectedRouter, connectRouter, routerMiddleware } from 'connected-react-router'
 import { Route } from 'react-router-dom'
 import { ROUTER } from '../constants'
 import select from '../selectors'
@@ -12,8 +12,8 @@ import history from './history'
  * =============================================================================
  */
 
-export { Switch } from 'react-router-dom'
-export { withRouter } from 'react-router'
+// export { Switch } from 'react-router-dom'
+// export { withRouter } from 'react-router'
 export * from '../utils'
 export * from '../constants'
 export * from './constants'
@@ -28,9 +28,9 @@ const router = {
   NAME: ROUTER,
   ACTION_TYPE,
   history,
-  middleware: typeof window !== 'undefined' ? routerMiddleware(history) : {},
-  reducer: typeof window !== 'undefined' ? connectRouter(history) : undefined,
-  Router: ConnectedRouter,
+  // middleware: typeof window !== 'undefined' ? routerMiddleware(history) : {},
+  // reducer: typeof window !== 'undefined' ? connectRouter(history) : undefined,
+  // Router: ConnectedRouter,
   Route,
   select,
   defineRoutes,

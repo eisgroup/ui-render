@@ -12,7 +12,6 @@ export const ROUTE = {
   THEME: `${ROUTE_BASE}theme`, // for development only
   LOGIN: `${ROUTE_BASE}login`,
   LOGOUT: `${ROUTE_BASE}logout`,
-  LOADING: `${ROUTE_BASE}loading`, // the loading route does not actually exist, but used for Login refresh
 }
 
 export const ROUTES = {

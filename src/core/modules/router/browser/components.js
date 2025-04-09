@@ -1,10 +1,8 @@
 import { ROUTE } from 'ui-modules-pack'
 import React from 'react'
-import { withRouter } from 'react-router'
 import { Link as ClientLink, Route } from 'react-router-dom'
 import { onPressHoc, SOUND } from 'ui-react-pack'
 import { Active, hasListValue } from 'ui-utils-pack'
-import { idFromRoute } from '../utils'
 
 /**
  * Recursively Declare Browser Routes using Absolute Paths
@@ -30,26 +28,4 @@ export function defineRoutes (routes, pages) {
  */
 export function Link ({onClick, sound = Active.SETTINGS.HAS_SOUND && SOUND.TOUCH, ...props}) {
   return <ClientLink onClick={onPressHoc(onClick, sound)} {...props}/>
-}
-
-/**
- *
- * React Component Decorator (HOC) to provide this.id getter that returns ID from Browser router pathname
- *
- * @example:
- *    https://example.com/user/edit/uuid
- *    this.id
- *    >>> 'uuid'
- *
- * @param {Class|Function} constructor - to be decorated
- * @param {Class|Function} constructor - class, wrapped using @withRouter decorator
- */
-export function withRouteId (constructor) {
-  // Define instance getter
-  Object.defineProperty(constructor.prototype, 'id', {
-    get () {
-      return idFromRoute(this.props)
-    }
-  })
-  return withRouter(constructor)
 }

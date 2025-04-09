@@ -1,29 +1,29 @@
-import { connect, stateAction } from 'ui-modules-pack/redux'
-import router from 'ui-modules-pack/router/browser'
-import settings, { UI } from 'ui-modules-pack/settings'
+// import { connect, stateAction } from 'ui-modules-pack/redux'
+// import router from 'ui-modules-pack/router/browser'
+// import settings, { UI } from 'ui-modules-pack/settings'
 import { ROUTES } from 'ui-modules-pack/variables'
 import React, { Component } from 'react'
 import { cn, PropTypes, SOUND } from 'ui-react-pack'
 import MenuButton from 'ui-react-pack/MenuButton'
 import Row from 'ui-react-pack/Row'
 import View from 'ui-react-pack/View'
-import { SET } from 'ui-utils-pack'
+// import { SET } from 'ui-utils-pack'
 import NavLinks from './NavLinks'
 
 /**
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
  * -----------------------------------------------------------------------------
  */
-const mapStateToProps = (state) => ({
-  activeRoute: router.select.activeRoute(state),
-  items: settings.select.routesForNav(state),
-  isOpenSidebar: settings.select.isOpenSidebar(state),
-})
-const mapDispatchToProps = (dispatch) => ({
-  actions: {
-    set: (payload) => dispatch(stateAction(UI, SET, payload))
-  }
-})
+// const mapStateToProps = (state) => ({
+//   activeRoute: router.select.activeRoute(state),
+//   items: settings.select.routesForNav(state),
+//   isOpenSidebar: settings.select.isOpenSidebar(state),
+// })
+// const mapDispatchToProps = (dispatch) => ({
+//   actions: {
+//     set: (payload) => dispatch(stateAction(UI, SET, payload))
+//   }
+// })
 
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------

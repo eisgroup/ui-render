@@ -4,9 +4,6 @@ import { isGoodPassword } from 'ui-utils-pack/utility'
 import isEmail from 'validator/lib/isEmail'
 import isLength from 'validator/lib/isLength'
 import isURL from 'validator/lib/isURL'
-import * as t from './translations'
-
-const sideEffects = {t}
 
 /**
  * VALIDATION RULES ============================================================

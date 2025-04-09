@@ -19,7 +19,7 @@ import {
   normalizeIncomingData
 } from './utils'
 import deepEqual from 'deep-equal';
-import { downloadFile as downloadFileProcessing } from '../../../../services/downloadFile'
+import { downloadFile as downloadFileProcessing } from '../../services/downloadFile'
 import OldPopup from 'ui-modules-pack/popup/views/Popup'
 import Popup from './components/Popup'
 import { double5, integer, phone, uppercase } from 'ui-react-pack/inputs/normalizers'

@@ -2,8 +2,8 @@ import React, { PureComponent } from 'react'
 import JsonView from 'ui-react-pack/JsonView'
 import ScrollView from 'ui-react-pack/ScrollView'
 import Text from 'ui-react-pack/Text'
-import data from './examples/_data'
-import meta from './examples/_meta'
+import data from '../examples/_data'
+import meta from '../examples/_meta'
 import UIRender from './rules'
 
 /**

@@ -1,4 +1,4 @@
-import { connect } from 'ui-modules-pack/redux'
+// import { connect } from 'ui-modules-pack/redux'
 import router, { Link } from 'ui-modules-pack/router/browser'
 import { ROUTE } from 'ui-modules-pack/variables'
 import React, { Component, Fragment } from 'react'
@@ -12,9 +12,9 @@ import { withTimer } from 'ui-react-pack/utils'
  * MAP STATE & ACTIONS TO PROPS ------------------------------------------------
  * -----------------------------------------------------------------------------
  */
-const mapStateToProps = (state) => ({
-  activeRoute: router.select.activeRoute(state),
-})
+// const mapStateToProps = (state) => ({
+//   activeRoute: router.select.activeRoute(state),
+// })
 
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
