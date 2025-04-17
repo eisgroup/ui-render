@@ -1,16 +1,9 @@
-import { interpolateString, isEmpty, isNumeric, isPhoneNumber, pluralize, toList, toLowerCase } from 'ui-utils-pack'
+import { interpolateString, isEmpty, pluralize, toLowerCase } from 'ui-utils-pack'
 import { _ } from 'ui-utils-pack/translations'
 import { isGoodPassword } from 'ui-utils-pack/utility'
 import isEmail from 'validator/lib/isEmail'
 import isLength from 'validator/lib/isLength'
 import isURL from 'validator/lib/isURL'
-
-/**
- * VALIDATION RULES ============================================================
- * Common validation rules to be used with redux-form
- * =============================================================================
- */
-
 
 export const OK = undefined // Return type when validation passes
 
@@ -44,31 +37,3 @@ password.confirm = (value) => {
   return (value === password.value) ? OK : _.PASSWORD_MISMATCH
 }
 
-export function phoneNumber (value) {
-  return (!value || isPhoneNumber(value)) ? OK : _.ENTER_NUMBER_STARTING_WITH_plus_COUNTRY_CODE
-}
-
-export function dateMonthYear (value) {
-  return /^([0-3])?[0-9]\.([0-1])?[0-9]\.\d+$/.test(value) ? OK : _.INVALID_DATE
-}
-
-export function timeInThePast (value) {
-  if (!isNumeric(value)) return OK
-  const now = Date.now()
-  return value >= now ? _.MUST_BE_IN_THE_PAST : OK
-}
-
-export function timeRangesInFuture (value) {
-  if (isEmpty(value)) return OK
-  const now = Date.now()
-  return toList(value).find(({from, to}) => (from <= now || to <= now)) ? _.MUST_BE_IN_THE_FUTURE : OK
-}
-
-// Validate that Time Ranges contain `from` and `to` time
-export function timeRanges (value) {
-  if (isEmpty(value)) return OK
-  const values = toList(value)
-  if (!values.find(({from}) => from != null)) return _.MUST_HAVE_START_TIME
-  if (!values.find(({to}) => to != null)) return _.MUST_HAVE_END_TIME
-  return OK
-}

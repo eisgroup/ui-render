@@ -37,7 +37,6 @@ export const FILE = {
   TYPE: {
     JSON: 'json',
     IMAGE: 'image',
-    SOUND: 'sound',
     VIDEO: 'video',
   },
 }
@@ -72,7 +71,6 @@ export const UPLOAD = {
   BY_ROUTE: {
     [FILE.TYPE.JSON]: {fileTypes: '.json', maxSize: SIZE_MB_16},
     [FILE.TYPE.IMAGE]: {fileTypes: '.' + IMAGE.EXTENSIONS.join(', .'), maxSize: SIZE_MB_16},
-    [FILE.TYPE.SOUND]: {fileTypes: '.mp3', maxSize: SIZE_MB_16},
     [FILE.TYPE.VIDEO]: {fileTypes: '.mp4', maxSize: SIZE_MB_16},
   },
 }

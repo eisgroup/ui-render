@@ -1,6 +1,5 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, useContext } from 'react'
 import AutoSave from 'ui-modules-pack/form/views/AutoSave'
-import { popupAlert } from 'ui-modules-pack/popup'
 import { FIELD } from 'ui-modules-pack/variables'
 import { cn } from 'ui-react-pack'
 import Button from 'ui-react-pack/Button'
@@ -33,6 +32,7 @@ import TableView from './components/TableView'
 import TabList from './components/TabList'
 import Tabs from './components/Tabs'
 import Data from './Data'
+import { PopupContext } from '../../contexts'
 
 /**
  * UI RENDERER COMPONENTS SETUP ================================================
@@ -66,6 +66,7 @@ const RenderComponent = ({
     showIf, relativeData, relativeIndex, relativePath, version,
     ...props
 }) => {
+    const { popup } = useContext(PopupContext)
     const translate = Active.translate
     /* General showIf logic */
     if (showIf != null) {
@@ -238,9 +239,19 @@ const RenderComponent = ({
                     extraHeader = { label: '' }
                 } = group
                 const errorTitle = `Incorrect config for ${view} with {name: "${props.name}"}!`
-                if (id == null) popupAlert(errorTitle, `${view}.group.by must have 'id', got '${toJSON(group.by, null, 2)}'`)
+                if (id == null) {
+                    popup.setPopupState({
+                        title: errorTitle,
+                        content: `${view}.group.by must have 'id', got '${toJSON(group.by, null, 2)}'`
+
+                    })
+                }
                 if (!header || header.id == null) {
-                    popupAlert(errorTitle, `${view}.group.header must have 'id', got '${toJSON(header, null, 2)}'`)
+                    popup.setPopupState({
+                        title: errorTitle,
+                        content: `${view}.group.header must have 'id', got '${toJSON(header, null, 2)}'`
+
+                    })
                     header = {} // prevent breaking code
                 }
 
@@ -264,8 +275,13 @@ const RenderComponent = ({
                     table.headers = [header].concat(newHeaders)
 
                     // Label grouped tables
-                    if (label != null && !hasObjectValue(label)) popupAlert(errorTitle,
-                        `${view}.group.by.label must resolve to object of labels by ${id} 'value', got '${toJSON(label, null, 2)}'`)
+                    if (label != null && !hasObjectValue(label)) {
+                        popup.setPopupState({
+                            title: errorTitle,
+                            content: `${view}.group.by.label must resolve to object of labels by ${id} 'value', got '${toJSON(label, null, 2)}'`
+
+                        })
+                    }
                     const groupHeaders = groupIds.map(id => ({
                         colSpan: _headers.length,
                         label: label ? (renderLabel ? renderLabel(label[id]) : label[id]) : id,

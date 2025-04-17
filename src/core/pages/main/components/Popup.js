@@ -1,6 +1,5 @@
-import classNames from 'classnames'
-import React, { Component } from 'react'
-import { type } from 'ui-react-pack'
+import React, { useContext } from 'react'
+import { createPortal } from 'react-dom'
 import Button from 'ui-react-pack/Button'
 import Text from 'ui-react-pack/Text'
 import View from 'ui-react-pack/View'
@@ -9,72 +8,54 @@ import { _ } from 'ui-utils-pack/translations'
 import { PopupContext } from '../../../contexts/PopupContext'
 
 localiseTranslation({
-  CANCEL: {
-    [l.ENGLISH]: 'Cancel',
-  },
-  CONFIRM: {
-    [l.ENGLISH]: 'Confirm',
-  },
-  CONFIRM_ACTION: {
-    [l.ENGLISH]: 'Confirm Action',
-  },
-  ERROR_excMark: {
-    [l.ENGLISH]: 'Error!',
-  },
+    CANCEL: {
+        [l.ENGLISH]: 'Cancel',
+    },
+    CONFIRM: {
+        [l.ENGLISH]: 'Confirm',
+    },
+    CONFIRM_ACTION: {
+        [l.ENGLISH]: 'Confirm Action',
+    },
+    ERROR_excMark: {
+        [l.ENGLISH]: 'Error!',
+    },
 })
 
+const Popup = () => {
+    const popup = useContext(PopupContext)
+    const { isOpen, title, content, togglePopupState } = popup
+    const activeClass = isOpen ? ' active' : ''
 
-export default class Popup extends Component {
-  static contextType = PopupContext
-  static propTypes = {
-    // Whether Popup can be closed by clicking outside around greyed out background area
-    canClose: type.Boolean,
-    // Callback(this) class instance when close action is fired
-    onClose: type.Method,
-    // Callback(this) class instance for rendering close Button, for example
-    renderClose: type.Method,
-  }
+    if (!isOpen) return null
 
-
-  render () {
-    const {
-      ui: {className} = {},
-    } = this.props
-
-    return (
-      <PopupContext.Consumer>
-        {(context) => {
-          const { isOpen, togglePopupState, title, content} = context
-
-          const activeClass = isOpen ? ' active' : ''
-
-          return (
+    return createPortal(
             <View className={'app__popup' + activeClass}>
-              <View
-                className="app__popup__backdrop no-outline"
-                onClick={togglePopupState}
-              />
-              <View className={classNames('app__popup__box zoomin', className)}>
-                <View className="app__popup__box__content">
-                  {isOpen && (
-                    <>
-                      <View className="app__popup__box__header">
-                        <Text className="app__popup__box__header__title">{title}</Text>
-                      </View>
-                      <View className="app__popup__box__body">
-                        {typeof content === 'string' ? <Text className="p center">{content}</Text> : content}
-                      </View>
-                      <View className="app__popup__box__footer center">
-                        <Button onClick={togglePopupState} className="primary">{_.OK}</Button>
-                      </View>
-                    </>
-                  )}
+                <View
+                    className="app__popup__backdrop no-outline"
+                    onClick={togglePopupState}
+                />
+                <View className={'app__popup__box zoomin'}>
+                    <View className="app__popup__box__content">
+                        {isOpen && (
+                            <>
+                                <View className="app__popup__box__header">
+                                    <Text className="app__popup__box__header__title">{title}</Text>
+                                </View>
+                                <View className="app__popup__box__body">
+                                    {typeof content === 'string' ? <Text
+                                        className="p center">{content}</Text> : content}
+                                </View>
+                                <View className="app__popup__box__footer center">
+                                    <Button onClick={togglePopupState} className="primary">{_.OK}</Button>
+                                </View>
+                            </>
+                        )}
+                    </View>
                 </View>
-              </View>
-            </View>
-          )
-        }}
-      </PopupContext.Consumer>
-    )
-  }
+            </View>,
+            document.getElementById('render-popup-root')
+        )
 }
+
+    export default Popup

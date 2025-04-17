@@ -1,48 +1,3 @@
-import React from 'react'
-import { Active } from 'ui-utils-pack'
-import { SOUND } from '../files'
-
-/**
- * Add Accessibility Support to React Component
- *
- * @param {Object} props - React render props
- * @param {Object} [sound] - new Audio(URL) file
- * @returns {Object} props - mutated with necessary accessibility attributes
- */
-export function accessibilitySupport (props, sound = Active.SETTINGS.HAS_SOUND && SOUND.TOUCH) {
-  /* Remove key press and click event if necessary */
-  if (props.tabIndex === -1) {
-    delete props.onKeyPress
-    delete props.onClick
-  } else {
-    const {onClick, onKeyPress, tabIndex} = props
-    if (sound && onKeyPress) props.onKeyPress = onPressHoc(onKeyPress, sound)
-    if (onClick) {
-      if (sound) props.onClick = onPressHoc(onClick, sound)
-      if (tabIndex == null) props.tabIndex = 0  // add keyboard accessibility for onClick
-      if (!onKeyPress) props.onKeyPress = (event) => (event.key === 'Enter' && props.onClick(event))
-    } else {
-      delete props.onClick
-    }
-  }
-  return props
-}
-
-/**
- * Higher Order Function Wrapper for onClick event to play sound
- * @example:
- *    <Button onClick={onPressHoc(onClick, sound)}/>
- *
- * @param {Function} onClick
- * @param {Object} [sound] - new Audio(URL) file object
- * @returns {Function} onPress - callback
- */
-export function onPressHoc (onClick, sound) {
-  return function onPress () {
-    if (sound) sound.play()
-    onClick && onClick(...arguments)
-  }
-}
 
 /**
  * React Component Timer Decorator to clearTimeout() and clearInterval() automatically on componentWillUnmount()
@@ -65,14 +20,8 @@ export function withTimer (Class) {
     this.timers.push(setTimeout(...arguments))
   }
 
-  Class.prototype.setInterval = function () {
-    if (!this.intervals) this.intervals = []
-    this.intervals.push(setInterval(...arguments))
-  }
-
   Class.prototype.clearTimer = function () {
     if (this.timers) this.timers.forEach(clearTimeout)
-    if (this.intervals) this.intervals.forEach(clearInterval)
   }
 
   Class.prototype.componentWillUnmount = function () {
@@ -82,5 +31,3 @@ export function withTimer (Class) {
 
   return Class
 }
-
-export const UIContext = React.createContext({})

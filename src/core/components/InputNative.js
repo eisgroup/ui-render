@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import { noSpellCheck, resizeToContent, toTextHeight, toTextHeightFunc } from './renders'
 import Select from './Select'
-import { onPressHoc } from './utils'
 
 /**
  * Input - Pure Component.
@@ -29,8 +28,6 @@ export default class InputNative extends PureComponent {
     resize: PropTypes.bool,
     /* Whether to have no spell check or correction */
     disabledSpellCheck: PropTypes.bool,
-    /* Audio sound file to play on touch */
-    sound: PropTypes.object,
     /* Callback(element) on mount */
     onMount: PropTypes.func,
   }
@@ -57,8 +54,8 @@ export default class InputNative extends PureComponent {
 
   onChangeCheckbox = (event) => {
     const {target: {checked}} = event
-    const {onChange, sound, name} = this.props
-    onChange && onPressHoc(onChange, sound)(checked, name, event)
+    const {onChange, name} = this.props
+    onChange && onChange(checked, name, event)
   }
 
   // @see: https://stackoverflow.com/questions/11167281/webkit-css-to-control-the-box-around-the-color-in-an-inputtype-color
@@ -95,7 +92,6 @@ export default class InputNative extends PureComponent {
       disabledSpellCheck,
       resize,
       compact,
-      sound,
       onMount,
       initialValues,
       ...props

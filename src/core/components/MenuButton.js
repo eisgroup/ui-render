@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { Active } from 'ui-utils-pack'
 import Button from './Button'
-import { SOUND } from './files'
 
 /**
  * Hamburger Style Button animating into Cross - Pure Component.
@@ -22,7 +21,6 @@ export function MenuButton ({
     <Button
       className={classNames('app__menu__button transparent', {active}, className)}
       aria-label={(active ? 'Close' : 'Open') + ' Menu'}
-      sound={Active.SETTINGS.HAS_SOUND && SOUND.TOUCH}
       {...props}
     >
       <span className='box'>

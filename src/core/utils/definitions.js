@@ -205,22 +205,3 @@ export function localiseTranslation (TRANSLATION) {
 localiseTranslation.instance = {}
 localiseTranslation.queriedById = {}
 
-/**
- * Create Initial Values for given Object Definition
- *
- * @example:
- *  initValuesFor(LANGUAGE, LANGUAGE_LEVEL.BASIC._)
- *  >>> {'en': 1, 'fr': 1, ...}
- *
- * @param {Object<KEY<_...>>} DEFINITION - key/value pairs of variable name with its underscore value
- * @param {Number} initValue - the initial value to use for each option
- * @return {Object} initial values - to use with redux form, for example
- */
-export function initValuesFor (DEFINITION, initValue = 1) {
-  const initValues = {}
-  for (const key in DEFINITION) {
-    initValues[DEFINITION[key]._] = initValue
-  }
-  return initValues
-}
-

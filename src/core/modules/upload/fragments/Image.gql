@@ -1,6 +1,0 @@
-#import "./ImageSummary.gql"
-#import "./ImageDetails.gql"
-fragment Image on Image {
-    ...ImageSummary
-    ...ImageDetails
-}

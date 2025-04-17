@@ -1,3 +1,10 @@
 import { createContext } from 'react';
 
-export const ConfigContext = createContext(null);
+export const initialConfigState = {
+    dateFormat: 'MM-DD-YYYY',
+    currency: 'USD',
+    language: 'en',
+    updateConfig: () => {},
+}
+
+export const ConfigContext = createContext();

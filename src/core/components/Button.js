@@ -2,7 +2,6 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
 import Loading from './Loading'
-import { onPressHoc } from './utils'
 import { Active } from 'ui-utils-pack'
 
 /**
@@ -17,7 +16,6 @@ import { Active } from 'ui-utils-pack'
  * @param {Boolean} [active] - whether to add `active` css class=
  * @param {Boolean} [circle] - whether to add `circle` css class with even padding
  * @param {Boolean} [square] - whether to add `square` css class with even padding
- * @param {Object} [sound] - new Audio(URL) sound file
  * @param {*} [children] - optional, content to be wrapped inside button `<button>{children}</button>`
  * @param {*} [props] - other attributes to pass
  * @returns {Object} - React component
@@ -32,7 +30,6 @@ export function Button ({
   children,
   size,
   type = 'button',
-  sound,
   className,
   translate = Active.translate,
   ...props
@@ -43,7 +40,7 @@ export function Button ({
       className={classNames('button', size, className, {circle, square, active, loading})}
       disabled={disabled || loading}
       type={type}
-      onClick={onPressHoc(onClick, sound)}
+      onClick={onClick}
       {...props}
     >
       {(typeof children === 'string') ? translate(children) : children}

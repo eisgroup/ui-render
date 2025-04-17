@@ -3,7 +3,6 @@
   "styles": "bg-info-light",
   "items": [
     {
-      "@class": "org.openl.generated.beans.Layout",
       "view": "VerticalLayout",
       "styles": "bg-neutral padding-larger margin-top-larger",
       "showIf": {
@@ -17,7 +16,6 @@
           "styles": "padding-v-smaller"
         },
         {
-          "@class": "org.openl.generated.beans.Layout",
           "view": "HorizontalLayout",
           "items": [
             {
@@ -246,7 +244,6 @@
       ]
     },
     {
-      "@class": "org.openl.generated.beans.Layout",
       "view": "VerticalLayout",
       "styles": "bg-neutral  padding-larger margin-top-larger",
       "items": [
@@ -284,7 +281,6 @@
       ]
     },
     {
-      "@class": "org.openl.generated.beans.Layout",
       "view": "VerticalLayout",
       "showIf": {
         "relativeData": false,
@@ -293,7 +289,6 @@
       },
       "items": [
         {
-          "@class": "org.openl.generated.beans.Layout",
           "view": "VerticalLayout",
           "styles": "bg-neutral padding-larger margin-top-larger",
           "items": [
@@ -304,7 +299,6 @@
               "styles": "padding-v-smaller"
             },
             {
-              "@class": "org.openl.generated.beans.Layout",
               "view": "HorizontalLayout",
               "styles": "wrap margin-bottom-smaller",
               "items": [
@@ -450,7 +444,6 @@
                       "validate": "required"
                     },
                     {
-                      "@class": "org.openl.generated.beans.Layout",
                       "view": "VerticalLayout",
                       "items": [
                         {
@@ -557,7 +550,6 @@
                       "disabled": true
                     },
                     {
-                      "@class": "org.openl.generated.beans.Layout",
                       "view": "VerticalLayout",
                       "items": [
                         {
@@ -581,7 +573,6 @@
               }
             },
             {
-              "@class": "org.openl.generated.beans.Layout",
               "view": "VerticalLayout",
               "styles": "right margin-h-largest",
               "items": [
@@ -605,7 +596,6 @@
           ]
         },
         {
-          "@class": "org.openl.generated.beans.Layout",
           "view": "HorizontalLayout",
           "styles": "bg-neutral padding-larger middle margin-top-larger",
           "items": [
@@ -633,7 +623,6 @@
           ]
         },
         {
-          "@class": "org.openl.generated.beans.Layout",
           "view": "VerticalLayout",
           "styles": "bg-neutral padding-larger margin-top-larger",
           "items": [
@@ -702,7 +691,6 @@
           ]
         },
         {
-          "@class": "org.openl.generated.beans.Layout",
           "view": "VerticalLayout",
           "styles": "bg-neutral padding-larger margin-top-larger",
           "items": [
@@ -713,7 +701,6 @@
               "styles": "padding-v-smaller"
             },
             {
-              "@class": "org.openl.generated.beans.Layout",
               "view": "HorizontalLayout",
               "styles": "wrap margin-top",
               "items": [
@@ -758,7 +745,6 @@
                   "disabled": false
                 },
                 {
-                  "@class": "org.openl.generated.beans.Layout",
                   "view": "VerticalLayout",
                   "items": [
                     {

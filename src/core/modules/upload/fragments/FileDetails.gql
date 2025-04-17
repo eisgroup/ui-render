@@ -1,6 +1,0 @@
-fragment FileDetails on File {
-    id
-    creatorId
-    created
-    updated
-}

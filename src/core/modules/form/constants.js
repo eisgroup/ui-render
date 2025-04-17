@@ -1,7 +1,5 @@
-import { OPTIONS, TYPE } from 'ui-modules-pack/variables/definitions'
 import { FIELD } from 'ui-modules-pack/variables/fields'
-import { phone } from 'ui-react-pack/inputs/normalizers'
-import { email, isRequired, maxLength, password, phoneNumber, url } from 'ui-react-pack/inputs/validationRules'
+import { email, isRequired, maxLength, password, url } from 'ui-react-pack/inputs/validationRules'
 import { _ } from 'ui-utils-pack/translations'
 
 /**
@@ -56,19 +54,7 @@ FIELD.DEF = {
     type: 'email',
     validate: email,
     view: FIELD.TYPE.INPUT, // required definition
-  },
-  [FIELD.ID.PHONE]: {
-    name: 'phones',
-    get labelType () {return TYPE.PHONE.name},
-    get hint () {return _.MY_PHONE_NUMBER_IS},
-    get placeholder () {return _.plus_1_555_555_55_55},
-    options: OPTIONS.PHONE,
-    minFields: 1,
-    type: 'tel',
-    normalize: phone,
-    validate: [phoneNumber],
-    view: FIELD.TYPE.MULTIPLE,
-  },
+  }
 }
 
 // Field props

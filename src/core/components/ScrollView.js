@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React, { useRef, useState } from 'react'
-import { accessibilitySupport } from './utils'
 
 /**
  * View with Custom Scroll Bar - Pure Component
@@ -15,7 +14,6 @@ import { accessibilitySupport } from './utils'
  * @param {Boolean} [reverse] - whether to reverse order of rendering
  * @param {Boolean} [rtl] - whether to use right to left direction
  * @param {Boolean} [center] - whether to center align content
- * @param {Object} [sound] - new Audio(URL) sound file
  * @param {*} [tab]
  * @param {*} props - other props
  * @returns {Object} - React component
@@ -30,7 +28,6 @@ const ScrollView = ({
   reverse,
   rtl,
   center,
-  sound,
   // Remove tab to prevent Error
   tab,
   ...props
@@ -44,7 +41,6 @@ const ScrollView = ({
     }
   }
 
-  props = accessibilitySupport(props, sound)
   return (
     <div
       ref={thisRef}

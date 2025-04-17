@@ -13,6 +13,7 @@ import { _ } from 'ui-utils-pack/translations'
 import { errorsProcessing } from '../../pages/main/utils'
 import { clearErrorsMap, formsStorage } from '../../pages/main/rules'
 import arrayMutators from 'final-form-arrays'
+import Popup from '../../pages/main/components/Popup'
 
 /**
  * STATE SELECTORS =============================================================

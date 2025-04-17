@@ -1,5 +1,4 @@
 import { __PROD__, Active, ONE_HOUR, ONE_MONTH, ONE_WEEK } from 'ui-utils-pack'
-import { THEME } from './configs'
 import { CURRENCY } from './definitions'
 
 /**
@@ -15,5 +14,5 @@ export const DEFAULT = {
   PAY_INTERVAL: ONE_HOUR,
   QUERY_LIMIT: 1000, // generic limit
   QUERY_ID_LIMIT: 10000, // about 2.9 KB for 100 ObjectIds, allowing 33k IDs per 1 MB
-  THEME: THEME.LIGHT,
+  THEME: 'LIGHT',
 }

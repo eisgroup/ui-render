@@ -94,18 +94,6 @@ export function isFileSrc (string) {
 }
 
 /**
- * Check if given string is a valid Phone Number
- *
- * @param {String} string - value to check
- * @returns {Boolean} true - if is valid phone number
- */
-export function isPhoneNumber(string) {
-	return isPhoneNumberPattern.test(string)
-}
-
-export const isPhoneNumberPattern = /^\+[0-9()\-\s]+$/
-
-/**
  * Check if given value is a String
  * @param {*} value - to check
  * @returns {Boolean} true - if it's a string

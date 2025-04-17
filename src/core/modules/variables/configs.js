@@ -35,7 +35,7 @@ export const UI = {
 }
 
 /* Theme Options */
-export const THEME = {
-  LIGHT: 'LIGHT',
-  DARK: 'DARK',
-}
+// export const THEME = {
+//   LIGHT: 'LIGHT',
+//   DARK: 'DARK',
+// }

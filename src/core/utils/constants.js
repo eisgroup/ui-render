@@ -1,11 +1,3 @@
-/**
- * COMMON ACTION CONSTANTS =====================================================
- * =============================================================================
- */
-export const SEPARATOR = ' -> '         // ACTION type separator string
-export const RESULT_SEPARATOR = '_'     // RESULT type separator string
-export const SYSTEM = 'SYSTEM'          // Internal app action subject
-
 /* CRUD Actions */
 export const GET = 'GET'             		// Retrieving data
 export const CREATE = 'CREATE'          // Posting new data to backend
@@ -48,11 +40,6 @@ export const CANCEL = 'CANCEL'
 export const FINISH = 'FINISH'
 export const RECEIVED = 'RECEIVED'
 export const VOID = 'VOID'            	// No response at all
-
-/* Socket Actions */
-export const SEND = 'SEND'
-export const SUBSCRIBE = 'SUBSCRIBE'
-export const UNSUBSCRIBE = 'UNSUBSCRIBE'
 
 /* Socket Network Action Result Types */
 export const CONNECTED = 'CONNECTED'
@@ -97,18 +84,6 @@ export const ALL_ACTIONS = [
 	PRE_REMOVE,
 	SELECT,
 	TOGGLE,
-]
-
-export const ALL_RESULTS = [
-	START,
-	CANCEL,
-	FINISH,
-	REQUEST,
-	SUCCESS,
-	ERROR,
-	TIMEOUT,
-	RECEIVED,
-	VOID,
 ]
 
 /* Key Codes */

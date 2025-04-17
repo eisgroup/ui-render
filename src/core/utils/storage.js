@@ -1,4 +1,4 @@
-import { __DEV__, Active } from './_envs.js'
+import { Active } from './_envs.js'
 import { isList } from './array.js'
 import { fromJSON, toJSON } from './codec.js'
 import { ADD, DELETE, GET, SET } from './constants.js'
@@ -39,9 +39,6 @@ export function performStorage (ACTION, storageKey, value = null, initialValue =
     const oldData = performStorage(GET, storageKey) || initialValue
     return performStorage(SET, storageKey, isList(oldData) ? oldData.concat(value) : update(oldData, value))
   }
-
-  /* SERVER (or missing localStorage) */
-  if (!hasLocalStorage) return Active.Storage[performStorage.toServer[ACTION]](storageKey, value)
 
   /* CLIENT */
   enumCheck([GET, SET, DELETE], ACTION, this)

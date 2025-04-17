@@ -181,8 +181,8 @@ const metaMeta = {
             name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
             options: 'planCalculations', // -> key path pointing to array in *_data.json
             mapOptions: 'planName', // -> key path pointing to human readable value within each option (used as label)
-            // value: {name: '{state.active.plan,0}'}, // -> automatically added by default due to OpenL rules
-            // onChange: 'setState,active.plan', // function defined as string, added by default due to OpenL rules
+            // value: {name: '{state.active.plan,0}'}, // -> automatically added by default due to rules
+            // onChange: 'setState,active.plan', // function defined as string, added by default due to rules
             styles: 'margin-h-smaller',
           },
           { // Full definition version

@@ -1,17 +1,16 @@
 import App from './App'
-import Redux from './core/modules/redux'
 import {BrowserRouter} from 'react-router-dom'
 import React from 'react'
 import { render } from 'react-dom'
-import store from './store'
+import { AppProvider } from './core/providers'
 
 const baseName = process.env.REACT_APP_BASE_NAME || '/'
 
 render(
-    <Redux.Provider store={store}>
+    <AppProvider>
         <BrowserRouter basename={baseName}>
             <App />
         </BrowserRouter>
-    </Redux.Provider>,
+    </AppProvider>,
     document.getElementById('ui-render')
 )

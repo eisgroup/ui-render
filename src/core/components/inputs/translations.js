@@ -8,9 +8,6 @@ localiseTranslation({
   CHARACTER: {
     [l.ENGLISH]: 'Character',
   },
-  ENTER_NUMBER_STARTING_WITH_plus_COUNTRY_CODE: {
-    [l.ENGLISH]: 'Enter number starting with + country code',
-  },
   INVALID_DATE: {
     [l.ENGLISH]: 'Invalid date',
   },

@@ -1,2 +1,2 @@
-export { ConfigContext } from './ConfigContext';
-export { PopupContext } from './PopupContext';
+export { ConfigContext, initialConfigState } from './ConfigContext';
+export { PopupContext, initialPopupState } from './PopupContext';

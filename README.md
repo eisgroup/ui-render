@@ -2,8 +2,6 @@ This is a monorepo project, bootstrapped with [Create React App](https://github.
 It uses:
 
 * [React.js](https://reactjs.org/)
-* [Redux](https://redux.js.org)
-* [Saga](https://redux-saga.js.org/docs/introduction/BeginnerTutorial.html)
 * [Semantic UI](https://react.semantic-ui.com/)
 * [LESS](http://lesscss.org/)
 
