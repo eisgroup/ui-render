@@ -1,8 +1,4 @@
-const CracoLess = require('craco-less');
-const CracoCSSModules = require('craco-css-modules');
 const path = require('path');
-const LessPluginFunctions = require('less-plugin-functions')
-const PrefixWrap = require("postcss-prefixwrap");
 
 module.exports = {
     webpack: {

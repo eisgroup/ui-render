@@ -12,6 +12,7 @@ export default {
         filename: 'index.js',
         // library: 'UIRender',
         libraryTarget: 'module',
+        clean: true,
     },
     // Ensure ES module output
     experiments: {

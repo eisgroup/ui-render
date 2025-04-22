@@ -1,11 +1,9 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import path from 'path'
-import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 import Dotenv from 'dotenv-webpack'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import { fileURLToPath } from 'url';
 import LessPluginFunctions from 'less-plugin-functions'
-import PrefixWrap from "postcss-prefixwrap"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
