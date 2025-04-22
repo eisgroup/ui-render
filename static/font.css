@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'iconsOpenL';
+    src: url('./fonts/iconsOpenL.eot?pn33hl');
+    src: url('./fonts/iconsOpenL.eot?pn33hl#iefix') format('embedded-opentype'), url('./fonts/iconsOpenL.ttf?pn33hl') format('truetype'), url('./fonts/iconsOpenL.woff?pn33hl') format('woff'), url('./fonts/iconsOpenL.svg?pn33hl#iconsOpenL') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
