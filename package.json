@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "start": "craco start --verbose",
-    "build": "craco build",
+    "build": "craco build && cp build/index.html build/404.html",
     "build-lib": "webpack --mode production --config webpack.library.config.js",
     "watch-lib": "webpack --watch --mode production --config webpack.library.config.js",
     "yalc-publish": "yarn build-lib && yalc publish --push",
