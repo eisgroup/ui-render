@@ -241,7 +241,7 @@ export default class TableView extends PureComponent {
     const render = isFunction(cell) ? cell : renderHeader
     const value = data != null ? data : (cell || label)
     return (
-      <Table.HeaderCell key={id || i} colSpan={colSpan} className={classNameHeader} style={styleHeader}>
+      <Table.HeaderCell key={id || i} colSpan={colSpan} className={cn('left', classNameHeader)} style={styleHeader}>
         <Row className={cn('middle', className, {sort: hasSort})} style={style}
              onClick={hasSort && this.handleSort.bind(this, id)}>
           {render
