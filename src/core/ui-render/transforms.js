@@ -25,7 +25,7 @@ export function mapProps (data, mapper, {debug} = {}) {
     return (debug ? data : toList(data, true)).map(mapData)
 }
 
-export function getCurrencySymbol (currencyCode) {
+export function getCurrencySymbol(currencyCode) {
     if (!currencyCode) return null
     switch (currencyCode) {
         case 'USD':
