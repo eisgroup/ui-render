@@ -51,7 +51,7 @@ const InputNumber = ({
       const pattern = `^\\d*(\\.\\d{0,${outputFormat.decimals}})?$`
       const re = new RegExp(pattern, 'g')
       if (!(re.test(value.toString()))) {
-        return parseFloat(value).toFixed(outputFormat.decimals);
+        return parseFloat(value.toString().replace(',','')).toFixed(outputFormat.decimals);
       }
     }
     return value
@@ -77,22 +77,24 @@ const InputNumber = ({
 
   useEffect(() => {
     if (valueFromParent !== value) {
-      setValue(formatDecimals(valueFromParent))
+      console.log('InputNumber update valueFromParent', valueFromParent)
+      setValue(formatDecimals(valueFromParent.replace(',','')))
     }
   }, [valueFromParent])
 
   const onChangeHandler = (value, name, event) => {
     let nextValue = formatDecimals(value)
+    console.log('InputNumber onChange', value, nextValue)
     onChange(nextValue, name, event)
     setValue(nextValue)
   }
 
-  function commify(n) {
+  function commify(n, separator = ' ') {
     var parts = n.toString().split('.');
     const numberPart = parts[0];
     const decimalPart = parts[1];
     const thousands = /\B(?=(\d{3})+(?!\d))/g;
-    return numberPart.replace(thousands, ' ') + (decimalPart ? '.' + decimalPart : '');
+    return numberPart.replace(thousands, separator) + (decimalPart ? '.' + decimalPart : '');
   }
 
   const format = (value, {userTyping, input}) => {

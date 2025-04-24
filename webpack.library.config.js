@@ -43,7 +43,7 @@ export default {
         new CopyPlugin({
             patterns: [
                 { from: 'public/static', to: './static' },
-                { from: 'package.json', to: './' },
+                { from: 'public/static', to: '../static' },
             ],
         }),
     ]
