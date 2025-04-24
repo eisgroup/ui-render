@@ -412,6 +412,8 @@ const RenderComponent = ({
             } else if (props.renderLabel) {
                 props.children = props.renderLabel(props.children)
                 delete props.renderLabel
+            } else if (props.name) {
+                props.children = _data
             }
             if (view === FIELD.TYPE.TITLE) props.className = cn('h3', props.className)
             return <Text {...props} translate={translate}/>

@@ -11,7 +11,13 @@
  */
 export const ISO_8601 = /^\d{4}(-\d\d(-\d\d(T\d\d:\d\d(:\d\d)?(\.\d+)?(([+-]\d\d:\d\d)|Z)?)?)?)?$/i
 
-
+/**
+ * RegExp to test a string for a ISO 8601 Date spec
+ *  YYYY-MM-DD
+ * @see: https://www.w3.org/TR/NOTE-datetime
+ * @type {RegExp}
+ */
+export const ISO_8601_COMPLETE_DATE = /^\d{4}-\d\d-\d\d$/i
 
 /**
  * RegExp to test a string for a full ISO 8601 Date

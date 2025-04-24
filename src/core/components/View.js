@@ -18,18 +18,17 @@ import { isFunction } from 'ui-utils-pack'
  * @returns {Object} - React Component
  */
 export function View ({
-  className,
-  fill,
-  reverse,
-  rtl,
-  expanded: _, // not used, remove to prevent warnings
-  translate: _2,
-  onDataChanged: _3,
-  ...props
+    className,
+    fill,
+    reverse,
+    rtl,
+    expanded: _, // not used, remove to prevent warnings
+    translate: _2,
+    onDataChanged: _3,
+    ...props
 }, ref) {
-  if (isFunction(ref)) props.ref = ref
-  return <div className={classNames('flex--col', {fill, reverse, rtl, pointer: props.onClick}, className)} {...props}/>
+    return <div
+        className={classNames('flex--col', { fill, reverse, rtl, pointer: props.onClick }, className)} {...props}/>
 }
 
-export const ViewRef = React.forwardRef(View)
 export default React.memo(View)

@@ -77,7 +77,7 @@ const InputNumber = ({
 
     useEffect(() => {
         if (valueFromParent !== value) {
-            setValue(formatDecimals(valueFromParent.replace(',', '')))
+            setValue(formatDecimals(valueFromParent.toString().replace(',', '')))
         }
     }, [valueFromParent])
 

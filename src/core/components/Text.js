@@ -1,6 +1,9 @@
 import classNames from 'classnames'
-import React from 'react'
+import React, { useContext } from 'react'
 import { Active } from 'ui-utils-pack'
+import { ISO_8601_COMPLETE_DATE } from 'ui-modules-pack/variables'
+import { ConfigContext } from '../contexts'
+import dayjs from 'dayjs'
 
 /**
  * Text View - Pure Component.
@@ -15,20 +18,36 @@ import { Active } from 'ui-utils-pack'
  * @returns {Object} - React Component
  */
 export function Text ({
-  className,
-  fill,
-  reverse,
-  rtl,
-  expanded: _, // not used, remove to prevent warnings
-  children,
-  translate = Active.translate,
-  ...props
+    className,
+    fill,
+    reverse,
+    rtl,
+    expanded: _, // not used, remove to prevent warnings
+    children,
+    translate = Active.translate,
+    ...props
 }) {
-  return (
-    <span className={classNames('text', {fill, reverse, rtl, pointer: props.onClick}, className)} {...props}>
-      {(typeof children === 'string') ? translate(children) : children}
-    </span>
-  )
+    const { dateFormat } = useContext(ConfigContext)
+
+    let component = children
+    if (React.isValidElement(children)) {
+        component = React.cloneElement(children, { translate })
+    } else if (typeof children === 'object') {
+        component = children
+    } else if (children && typeof children === 'number') {
+        component = children.toString()
+    } else if (children && typeof children === 'boolean') {
+        component = children ? 'Yes' : 'No'
+    } else if (typeof children === 'string') {
+        if (ISO_8601_COMPLETE_DATE.test(children)) {
+            component = dayjs(children).format(dateFormat)
+        }
+    }
+    return (
+        <span className={classNames('text', { fill, reverse, rtl, pointer: props.onClick }, className)} {...props}>
+            {(typeof children === 'string') ? translate(component) : component}
+        </span>
+    )
 }
 
 export default React.memo(Text)
