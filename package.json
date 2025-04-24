@@ -17,7 +17,7 @@
     "start": "craco start --verbose",
     "build": "craco build && cp build/index.html build/404.html",
     "build-lib": "webpack --mode production --config webpack.library.config.js",
-    "watch-lib": "webpack --watch --mode production --config webpack.library.config.js",
+    "watch-lib": "webpack --watch --mode production --config webpack.watch.config.js",
     "yalc-publish": "yarn build-lib && yalc publish --push",
     "yalc-watch": "nodemon --watch src --ext js,jsx,ts,tsx --exec 'yarn yalc-publish'",
     "gen-ts": "tsc --project tsconfig.build.json",
