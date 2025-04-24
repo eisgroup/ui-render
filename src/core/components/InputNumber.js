@@ -11,186 +11,186 @@ import { Active } from 'ui-utils-pack'
 import RCInputNumber from 'rc-input-number'
 
 const InputNumber = ({
-  name,
-  id = name,
-  icon,
-  lefty,
-  onClickIcon,
-  unit,
-  label,
-  disabled,
-  done,
-  className,
-  classNameIcon,
-  children,
-  stickyPlaceholder, // only works with controlled component when `props.value` is provided
-  resize,
-  readonly,
-  float,
-  error,
-  info,
-  style,
-  onFocus,
-  onBlur,
-  onRemove,
-  title,
-  defaultValue,
-  placeholder,
-  translate = Active.translate,
-  outputFormat = {
-    percentage: false,
-    separateThousands: false,
-  },
-  onChange,
-  value: valueFromParent,
-  type: _1,
-  ...props
+    name,
+    id = name,
+    icon,
+    lefty,
+    onClickIcon,
+    unit,
+    label,
+    disabled,
+    done,
+    className,
+    classNameIcon,
+    children,
+    stickyPlaceholder, // only works with controlled component when `props.value` is provided
+    resize,
+    readonly,
+    float,
+    error,
+    info,
+    style,
+    onFocus,
+    onBlur,
+    onRemove,
+    title,
+    defaultValue,
+    placeholder,
+    translate = Active.translate,
+    outputFormat = {
+        percentage: false,
+        separateThousands: false,
+    },
+    onChange,
+    value: valueFromParent,
+    type: _1,
+    ...props
 }) => {
-  const formatDecimals = (value) => {
-    if (value && outputFormat && typeof outputFormat.decimals === 'number' && outputFormat.decimals >= 0) {
-      const pattern = `^\\d*(\\.\\d{0,${outputFormat.decimals}})?$`
-      const re = new RegExp(pattern, 'g')
-      if (!(re.test(value.toString()))) {
-        return parseFloat(value.toString().replace(',','')).toFixed(outputFormat.decimals);
-      }
-    }
-    return value
-  }
-
-  const [active, setActive] = useState(false)
-  const [value, setValue] = useState(formatDecimals(valueFromParent))
-
-  if (readonly) {
-    props.className = 'readonly'
-    props.readOnly = readonly
-  } // React fix
-  if (float) {
-    if (!label && name) label = capitalize(name)
-    if (!placeholder) placeholder = ' ' // required for Float label CSS to work
-  }
-  if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
-  if (!label && title) props.title = translate(title)
-  const idHelp = id + '-help'
-
-  const hasValue = typeof value === 'number' && !isNaN(value)
-  if (done == null) done = !error && hasValue
-
-  useEffect(() => {
-    if (valueFromParent !== value) {
-      console.log('InputNumber update valueFromParent', valueFromParent)
-      setValue(formatDecimals(valueFromParent.replace(',','')))
-    }
-  }, [valueFromParent])
-
-  const onChangeHandler = (value, name, event) => {
-    let nextValue = formatDecimals(value)
-    console.log('InputNumber onChange', value, nextValue)
-    onChange(nextValue, name, event)
-    setValue(nextValue)
-  }
-
-  function commify(n, separator = ' ') {
-    var parts = n.toString().split('.');
-    const numberPart = parts[0];
-    const decimalPart = parts[1];
-    const thousands = /\B(?=(\d{3})+(?!\d))/g;
-    return numberPart.replace(thousands, separator) + (decimalPart ? '.' + decimalPart : '');
-  }
-
-  const format = (value, {userTyping, input}) => {
-    if (outputFormat) {
-      if (outputFormat.percentage) {
-        return value + ' %'
-      }
-      if (outputFormat.separateThousands) {
-        return commify(value)
-      }
-    }
-
-    return value
-  }
-
-  const parser = (value) => {
-    if (outputFormat) {
-      if (outputFormat.percentage) {
-        return Number(value.replace(' %', ''))
-      }
-      if (outputFormat.separateThousands) {
-        if (!value) {
-          return value
+    const formatDecimals = (value) => {
+        if (value && outputFormat && typeof outputFormat.decimals === 'number' && outputFormat.decimals >= 0) {
+            const pattern = `^\\d*(\\.\\d{0,${outputFormat.decimals}})?$`
+            const re = new RegExp(pattern, 'g')
+            if (!(re.test(value.toString()))) {
+                return parseFloat(value.toString().replace(',', '')).toFixed(outputFormat.decimals)
+            }
         }
-        return Number(value.toString().replace(/ /g, ''))
-      }
+        return value
     }
-    return value
-  }
 
-  return (
-    <View
-      className={classNames('input--wrapper', className, {
-        float, done, resize, required: props.required
-      })}
-      style={style}
-    >
-      {!float &&
-        <Row className="middle">
-          {label && <Label htmlFor={id} title={translate(title)}>{translate(label)}</Label>}
-          {onRemove && !readonly &&
-            <Button className="input__delete" onClick={() => onRemove(name || id)}><Icon name="delete"/></Button>}
-        </Row>
-      }
-      <Row className={classNames('input', {active, icon, lefty, error, info, unit})}>
-        {icon && lefty && (isString(icon)
-            ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
-            : icon
-        )}
-        {unit && hasValue &&
-          <Text className='input__unit truncate'>
-            <Text className='invisible' aria-hidden='true'>{value}</Text> {unit}
-          </Text>
+    const [active, setActive] = useState(false)
+    const [value, setValue] = useState(formatDecimals(valueFromParent))
+
+    if (readonly) {
+        props.className = 'readonly'
+        props.readOnly = readonly
+    } // React fix
+    if (float) {
+        if (!label && name) label = capitalize(name)
+        if (!placeholder) placeholder = ' ' // required for Float label CSS to work
+    }
+    if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
+    if (!label && title) props.title = translate(title)
+    const idHelp = id + '-help'
+
+    const hasValue = typeof value === 'number' && !isNaN(value)
+    if (done == null) done = !error && hasValue
+
+    useEffect(() => {
+        if (valueFromParent !== value) {
+            setValue(formatDecimals(valueFromParent.replace(',', '')))
         }
-        {stickyPlaceholder && placeholder && hasValue &&
-          <Text className='input__unit' aria-hidden='true'>
-            <Text className='invisible no-margin'>{props.value}</Text>{placeholder.substring(props.value.length)}
-          </Text>
+    }, [valueFromParent])
+
+    const onChangeHandler = (value, name, event) => {
+        let nextValue = formatDecimals(value)
+        onChange(nextValue, name, event)
+        setValue(nextValue)
+    }
+
+    function commify (n, separator = ' ') {
+        var parts = n.toString().split('.')
+        const numberPart = parts[0]
+        const decimalPart = parts[1]
+        const thousands = /\B(?=(\d{3})+(?!\d))/g
+        return numberPart.replace(thousands, separator) + (decimalPart ? '.' + decimalPart : '')
+    }
+
+    const format = (value, { userTyping, input }) => {
+        if (outputFormat) {
+            if (outputFormat.percentage) {
+                return value + ' %'
+            }
+            if (outputFormat.separateThousands) {
+                return commify(value)
+            }
         }
-        <RCInputNumber
-          name={name}
-          id={id}
-          disabled={disabled}
-          resize={resize}
-          aria-describedby={idHelp}
-          placeholder={translate(placeholder)}
-          onFocus={(...args) => {
-            !active && setActive(true)
-            onFocus && onFocus(...args)
-          }}
-          onBlur={(...args) => {
-            active && setActive(false)
-            onBlur && onBlur(...args)
-          }}
-          onChange={onChangeHandler}
-          {...props}
-          value={value}
-          parser={parser}
-          formatter={format}
-          wheel={false}
-        />
-        {icon && !lefty && (isString(icon)
-            ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
-            : icon
-        )}
-        {float && label && <Label htmlFor={id} title={translate(title)}>{translate(label)}</Label>}
-      </Row>
-      {(error || info) &&
-        <View id={idHelp} className='field-help'>
-          {error && <Text className='error'>{translate(error)}</Text>}
-          {info && <Text className='into'>{translate(info)}</Text>}
+
+        return value
+    }
+
+    const parser = (value) => {
+        if (outputFormat) {
+            if (outputFormat.percentage) {
+                return Number(value.replace(' %', ''))
+            }
+            if (outputFormat.separateThousands) {
+                if (!value) {
+                    return value
+                }
+                return Number(value.toString().replace(/ /g, ''))
+            }
+        }
+        return value
+    }
+
+    return (
+        <View
+            className={classNames('input--wrapper', className, {
+                float, done, resize, required: props.required
+            })}
+            style={style}
+        >
+            {!float &&
+                <Row className="middle">
+                    {label && <Label htmlFor={id} title={translate(title)}>{translate(label)}</Label>}
+                    {onRemove && !readonly &&
+                        <Button className="input__delete" onClick={() => onRemove(name || id)}><Icon
+                            name="delete"/></Button>}
+                </Row>
+            }
+            <Row className={classNames('input', { active, icon, lefty, error, info, unit })}>
+                {icon && lefty && (isString(icon)
+                        ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
+                        : icon
+                )}
+                {unit && hasValue &&
+                    <Text className="input__unit truncate">
+                        <Text className="invisible" aria-hidden="true">{value}</Text> {unit}
+                    </Text>
+                }
+                {stickyPlaceholder && placeholder && hasValue &&
+                    <Text className="input__unit" aria-hidden="true">
+                        <Text
+                            className="invisible no-margin">{props.value}</Text>{placeholder.substring(props.value.length)}
+                    </Text>
+                }
+                <RCInputNumber
+                    name={name}
+                    id={id}
+                    disabled={disabled}
+                    resize={resize}
+                    aria-describedby={idHelp}
+                    placeholder={translate(placeholder)}
+                    onFocus={(...args) => {
+                        !active && setActive(true)
+                        onFocus && onFocus(...args)
+                    }}
+                    onBlur={(...args) => {
+                        active && setActive(false)
+                        onBlur && onBlur(...args)
+                    }}
+                    onChange={onChangeHandler}
+                    {...props}
+                    value={value}
+                    parser={parser}
+                    formatter={format}
+                    wheel={false}
+                />
+                {icon && !lefty && (isString(icon)
+                        ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
+                        : icon
+                )}
+                {float && label && <Label htmlFor={id} title={translate(title)}>{translate(label)}</Label>}
+            </Row>
+            {(error || info) &&
+                <View id={idHelp} className="field-help">
+                    {error && <Text className="error">{translate(error)}</Text>}
+                    {info && <Text className="into">{translate(info)}</Text>}
+                </View>
+            }
+            {children}
         </View>
-      }
-      {children}
-    </View>
-  )
+    )
 }
 
 export default InputNumber
