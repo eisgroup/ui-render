@@ -18,20 +18,12 @@
     "build": "craco build && cp build/index.html build/404.html",
     "build-lib": "webpack --mode production --config webpack.library.config.js",
     "watch-lib": "webpack --watch --mode production --config webpack.watch.config.js",
-    "yalc-publish": "yarn build-lib && yalc publish --push",
-    "yalc-watch": "nodemon --watch src --ext js,jsx,ts,tsx --exec 'yarn yalc-publish'",
+    "yalc-publish": "npm run build-lib && yalc publish --push",
+    "yalc-watch": "nodemon --watch src --ext js,jsx,ts,tsx --exec 'npm run yalc-publish'",
     "gen-ts": "tsc --project tsconfig.build.json",
     "serve-dist": "serve dist -p 3102",
     "serve-build": "serve build -p 3103",
-    "predeploy": "yarn build && yarn build-gh1 && yarn build-gh2",
-    "deploy": "gh-pages -d build",
-    "old-start": "yarn gql && yarn css --sourcemap && react-app-rewired start & yarn style --sourcemap",
-    "old-build": "NODE_ENV=production yarn build:css && react-app-rewired build && yarn clean",
-    "old-build-gh": "yarn build-gh1 && yarn build-gh2",
-    "build-gh1": "cp build/index.html build/changelog.html && cp build/index.html build/configuration.html && cp build/index.html build/demo.html",
-    "build-gh2": "cp build/index.html build/examples.html && cp build/index.html build/faq.html && cp build/index.html build/styles.html",
-    "build-dist": "mkdir -p ../../dist/web && yarn delete ../../dist/web/* && cp -rf build/* ../../dist/web && yarn delete build && cp -rf ./config/* ../../dist/web",
-    "build:css": "NODE_ENV=production yarn style css"
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app",
