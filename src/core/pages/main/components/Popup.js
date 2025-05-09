@@ -5,7 +5,7 @@ import Text from 'ui-react-pack/Text'
 import View from 'ui-react-pack/View'
 import { l, localiseTranslation } from 'ui-utils-pack'
 import { _ } from 'ui-utils-pack/translations'
-import { PopupContext } from '../../../contexts/PopupContext'
+import { AppContext } from '../../../contexts'
 
 localiseTranslation({
     CANCEL: {
@@ -23,7 +23,7 @@ localiseTranslation({
 })
 
 const Popup = () => {
-    const popup = useContext(PopupContext)
+    const popup = useContext(AppContext)
     const { isOpen, title, content, togglePopupState } = popup
     const activeClass = isOpen ? ' active' : ''
 

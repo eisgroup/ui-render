@@ -32,7 +32,7 @@ import TableView from './components/TableView'
 import TabList from './components/TabList'
 import Tabs from './components/Tabs'
 import Data from './Data'
-import { PopupContext } from '../../contexts'
+import { AppContext } from '../../contexts'
 
 /**
  * UI RENDERER COMPONENTS SETUP ================================================
@@ -66,7 +66,7 @@ const RenderComponent = ({
     showIf, relativeData, relativeIndex, relativePath, version,
     ...props
 }) => {
-    const { popup } = useContext(PopupContext)
+    const { popup } = useContext(AppContext)
     const translate = Active.translate
     /* General showIf logic */
     if (showIf != null) {

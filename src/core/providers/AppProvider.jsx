@@ -1,10 +1,14 @@
 import React from 'react'
-
-import { ConfigContext, initialConfigState, PopupContext, initialPopupState} from '../contexts'
+import {
+    ConfigContext,
+    initialConfigState,
+    AppContext,
+    initialAppState,
+} from '../contexts'
 
 export const AppProvider = ({ children }) => {
     const [configState, setConfigState] = React.useState(initialConfigState)
-    const [popupState, setPopupState] = React.useState(initialPopupState)
+    const [appState, setAppState] = React.useState(initialAppState)
 
     const setConfig = (newConfig) => {
         setConfigState((prevConfig) => ({
@@ -14,17 +18,34 @@ export const AppProvider = ({ children }) => {
     }
 
     const togglePopupState = () => {
-        setPopupState((prevState) => ({
+        setAppState((prevState) => ({
             ...prevState,
             isOpen: !prevState.isOpen,
         }))
     }
 
+    const setPopupState = (newState) => {
+        const { title, content, isOpen } = newState
+        setAppState((prevState) => ({
+            ...prevState,
+            title,
+            content,
+            isOpen: typeof isOpen === 'boolean' ? isOpen : prevState.isOpen
+        }))
+    }
+
+    const setIsDataChangedListenerCalled = (isCalled) => {
+        setAppState((prevState) => ({
+            ...prevState,
+            isDataChangedListenerCalled: isCalled,
+        }))
+    }
+
     return (
         <ConfigContext.Provider value={{...configState, setConfig}}>
-            <PopupContext.Provider value={{ ...popupState, togglePopupState, setPopupState }}>
+            <AppContext.Provider value={{ ...appState, togglePopupState, setPopupState, setIsDataChangedListenerCalled }}>
                 {children}
-            </PopupContext.Provider>
+            </AppContext.Provider>
         </ConfigContext.Provider>
     )
 }

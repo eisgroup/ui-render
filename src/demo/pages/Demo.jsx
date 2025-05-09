@@ -10,7 +10,7 @@ import { GET, isEmpty, l, localiseTranslation, performStorage, SET } from 'ui-ut
 import { _ } from 'ui-utils-pack/translations'
 import UIRender from '../../core/pages/main/rules'
 import { Button } from 'ui-react-pack/Button'
-import { PopupContext } from '../../core/contexts'
+import { AppContext } from '../../core/contexts'
 
 const DEMO_JSON_STORAGE_KEY = 'DEMO_JSON'
 
@@ -27,7 +27,7 @@ const Demo = () => {
         name: undefined,
     })
     const getFormData = React.useRef()
-    const popup = React.useContext(PopupContext)
+    const popup = React.useContext(AppContext)
 
     const onGetDataButtonClick = () => {
         const data = getFormData.current()

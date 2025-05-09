@@ -8,6 +8,7 @@ module.exports = {
             );
 
             webpackConfig.resolve.plugins.splice(scopePluginIndex, 1);
+            webpackConfig.devtool = 'source-map'
 
             return webpackConfig;
         },

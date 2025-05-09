@@ -13,15 +13,12 @@ import { _ } from 'ui-utils-pack/translations'
 import { errorsProcessing } from '../../pages/main/utils'
 import { clearErrorsMap, formsStorage } from '../../pages/main/rules'
 import arrayMutators from 'final-form-arrays'
-import Popup from '../../pages/main/components/Popup'
 
 /**
  * STATE SELECTORS =============================================================
  * Memoized Functions - to retrieve specific branches of the app state
  * =============================================================================
  */
-
-let isDataChangedListenerCalled = false;
 
 let formInitialValues = null;
 export let storedTouched = {};
@@ -299,7 +296,6 @@ export function asField (InputComponent, {sanitize} = {}) {
  * @helpers:
  *  - this.handleChangeInput() - function: updates state.canSave (hooked to this.renderInput, must be defined as function)
  *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
- *  - this.props.tooltip - object|boolean: automatically wrap rendered input with Semantic UI Popup
  *  - this.props.onChangeState - function: callback when internal state changes, receives this class instance,
  *        or {} on unmount. This is useful for nested forms with remote submit button within parent container.
  *
@@ -466,6 +462,8 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   const componentWillUnmount = Class.prototype.componentWillUnmount
   const handleChangeInput = Class.prototype.handleChangeInput
 
+  // Class.contextType = StateContext
+
   Class.propTypes = {
     formProps: PropTypes.object.isRequired, // form props, without `form` and `handleSubmit`
     instance: PropTypes.object.isRequired, // {Class<form, handleSubmit>} WithForm instance for getting the form
@@ -576,8 +574,12 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   // Define instance method
   Class.prototype.syncInputChanges = function () {
     const { formProps, onDataChanged, parent = {} } = this._props || this.props;
-    if (formProps && !formProps.pristine || isDataChangedListenerCalled) {
-      isDataChangedListenerCalled = true
+    const {isDataChangedListenerCalled, setIsDataChangedListenerCalled} = this.context
+    // TODO: investigate why 'isDataChangedListenerCalled' is needed
+    if (formProps && (!formProps.pristine || isDataChangedListenerCalled)) {
+      if (!isDataChangedListenerCalled) {
+        setIsDataChangedListenerCalled(true)
+      }
       if (typeof onDataChanged === 'function') {
         onDataChanged()
       } else if (parent && typeof parent.onDataChanged === 'function') {

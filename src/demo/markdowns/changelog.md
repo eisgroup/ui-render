@@ -1,5 +1,14 @@
 ### Table of Contents
 
+### v0.31.1
+- Fixed notification about changes in the form
+
+### v0.31.0
+- Reviewed and updated libraries
+- Deleted redux
+- Deleted global instance
+- Simplified code / structure
+
 ### v0.30.22
 - Refactoring
 

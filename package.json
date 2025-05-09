@@ -1,6 +1,6 @@
 {
   "name": "eis-ui-render",
-  "version": "0.31.0",
+  "version": "0.31.1",
   "description": "UI generation based on JSON schemas",
   "homepage": "https://eisgroup.github.io/ui-render/",
   "license": "Apache 2.0",
@@ -16,7 +16,7 @@
   "scripts": {
     "start": "craco start --verbose",
     "build": "craco build && cp build/index.html build/404.html",
-    "build-lib": "webpack --mode production --config webpack.library.config.js",
+    "build-lib": "webpack --mode production --config webpack.library.config.js && npm run gen-ts",
     "watch-lib": "webpack --watch --mode production --config webpack.watch.config.js",
     "yalc-publish": "npm run build-lib && yalc publish --push",
     "yalc-watch": "nodemon --watch src --ext js,jsx,ts,tsx --exec 'npm run yalc-publish'",

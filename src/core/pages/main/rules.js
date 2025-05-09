@@ -20,7 +20,7 @@ import {
 import deepEqual from 'deep-equal'
 import { downloadFile as downloadFileProcessing } from '../../services/downloadFile'
 import { double5, integer, phone, uppercase } from 'ui-react-pack/inputs/normalizers'
-import { PopupContext } from '../../contexts'
+import { AppContext } from '../../contexts'
 import Popup from './components/Popup'
 
 FIELD.ACTION = {
@@ -91,8 +91,6 @@ export const formsStorage = new Map()
 export let errorsMap = {}
 
 let errorHandlerFunction = undefined
-
-export const usePopup = () => React.useContext(PopupContext)
 
 export const clearErrorsMap = () => {
     errorsMap = {}
@@ -266,7 +264,7 @@ export class UIRender extends Component {
     }
 }
 
-UIRender.contextType = PopupContext
+UIRender.contextType = AppContext
 
 const UIRenderWithUISetup = Decorator(UIRender)
 export default UIRenderWithUISetup

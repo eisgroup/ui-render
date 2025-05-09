@@ -20,7 +20,7 @@ import {
 } from 'ui-utils-pack'
 import { _ } from '../translations'
 import { Active } from 'ui-utils-pack'
-import { PopupContext } from '../../../contexts'
+import { AppContext } from '../../../contexts'
 
 export default class Upload extends PureComponent {
     static propTypes = {
@@ -180,4 +180,4 @@ export default class Upload extends PureComponent {
     }
 }
 
-Upload.contextType = PopupContext
+Upload.contextType = AppContext
