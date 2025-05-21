@@ -1,7 +1,12 @@
 ### Table of Contents
 
+### v0.31.2
+#### Fixes
+- Fix a text component to display fields with negative values
+
 ### v0.31.1
-- Fixed notification about changes in the form
+#### Fixes
+- Fix a notification about changes in the form
 
 ### v0.31.0
 - Reviewed and updated libraries
