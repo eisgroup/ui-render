@@ -34,9 +34,9 @@ export function Text ({
         component = React.cloneElement(children, { translate })
     } else if (typeof children === 'object') {
         component = children
-    } else if (children && typeof children === 'number') {
+    } else if (typeof children === 'number') {
         component = children.toString()
-    } else if (children && typeof children === 'boolean') {
+    } else if (typeof children === 'boolean') {
         component = children ? 'Yes' : 'No'
     } else if (typeof children === 'string') {
         if (ISO_8601_COMPLETE_DATE.test(children)) {

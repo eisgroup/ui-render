@@ -9,7 +9,7 @@ Check the [/docs](./docs) folder to get a basic understanding of the project's [
 ## Development Installation
 
 1. Install [Node.js](https://nodejs.org/), if you haven't already (version v22).
-2Navigate to project root folder and install dependencies by running this command in terminal:
+2. Navigate to project root folder and install dependencies by running this command in terminal:
 
 ### `npm install`
 
