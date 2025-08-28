@@ -34,16 +34,9 @@ export const AppProvider = ({ children }) => {
         }))
     }
 
-    const setIsDataChangedListenerCalled = (isCalled) => {
-        setAppState((prevState) => ({
-            ...prevState,
-            isDataChangedListenerCalled: isCalled,
-        }))
-    }
-
     return (
         <ConfigContext.Provider value={{...configState, setConfig}}>
-            <AppContext.Provider value={{ ...appState, togglePopupState, setPopupState, setIsDataChangedListenerCalled }}>
+            <AppContext.Provider value={{ ...appState, togglePopupState, setPopupState }}>
                 {children}
             </AppContext.Provider>
         </ConfigContext.Provider>

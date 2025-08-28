@@ -1,7 +1,9 @@
 import path from 'path';
 import CopyPlugin from 'copy-webpack-plugin';
+import { fileURLToPath } from 'url';
+import webpack from 'webpack';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default {
     mode: 'production',
@@ -10,13 +12,13 @@ export default {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'index.js',
-        // library: 'UIRender',
-        libraryTarget: 'module',
+        library: {
+            name: 'UIRender',
+            type: 'umd',
+            export: 'default',
+        },
+        globalObject: 'this',
         clean: true,
-    },
-    // Ensure ES module output
-    experiments: {
-        outputModule: true, // Enable module output
     },
     externals:{
         react: 'react',
@@ -40,6 +42,9 @@ export default {
         },
     },
     plugins: [
+        new webpack.ProvidePlugin({
+            process: 'process/browser',
+        }),
         new CopyPlugin({
             patterns: [
                 { from: 'public/static', to: './static' },

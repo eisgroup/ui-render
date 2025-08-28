@@ -574,12 +574,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
   // Define instance method
   Class.prototype.syncInputChanges = function () {
     const { formProps, onDataChanged, parent = {} } = this._props || this.props;
-    const {isDataChangedListenerCalled, setIsDataChangedListenerCalled} = this.context
-    // TODO: investigate why 'isDataChangedListenerCalled' is needed
-    if (formProps && (!formProps.pristine || isDataChangedListenerCalled)) {
-      if (!isDataChangedListenerCalled) {
-        setIsDataChangedListenerCalled(true)
-      }
+    if (formProps && (!formProps.pristine)) {
       if (typeof onDataChanged === 'function') {
         onDataChanged()
       } else if (parent && typeof parent.onDataChanged === 'function') {

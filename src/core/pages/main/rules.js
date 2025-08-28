@@ -417,17 +417,6 @@ function Decorator (Class) {
         },
     }
 
-    const callOnDataChanged = (props) => {
-        if (props
-            && props.instance
-            && props.instance.props
-            && props.instance.props.parent
-            && typeof props.instance.props.parent.onDataChanged === 'function'
-        ) {
-            props.instance.props.parent.onDataChanged()
-        }
-    }
-
     // Define instance getter
     Object.defineProperty(Class.prototype, 'config', {
         get () {
@@ -527,6 +516,7 @@ function Decorator (Class) {
                 }
             }
 
+
             FIELD.FUNC[FIELD.ACTION.ON_APPLY_PERIODS] = async () => {
                 const { updateExperienceData } = this.getAPICalls()
                 if (typeof updateExperienceData !== 'function') {
@@ -536,6 +526,11 @@ function Decorator (Class) {
 
                 try {
                     const response = await updateExperienceData(data)
+
+                    if (!response) {
+                        return
+                    }
+
                     const normalizedResponse = normalizeIncomingData(response)
                     this.setState({
                         data: {

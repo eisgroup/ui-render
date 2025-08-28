@@ -1,10 +1,9 @@
-This is a monorepo project, bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and custom [Gulp](https://gulpjs.com/) scripts.
-It uses:
 
-* [React.js](https://reactjs.org/)
+Check the [docs](https://eisgroup.github.io/ui-render/configuration) folder to get a basic understanding of the project's [architecture](https://eisgroup.github.io/ui-render) 
 
+## Demo
 
-Check the [/docs](./docs) folder to get a basic understanding of the project's [architecture](./docs/Architecture.md) and [coding standards](./docs/standards.md) before continuing.
+https://eisgroup.github.io/ui-render/
 
 ## Development Installation
 
@@ -29,7 +28,7 @@ You will also see any lint errors in the console.
 
 - Install `yalc` globally ```npm install -g yalc```
 - Run `npm start yalc-watch` to build library and life reload 
-- In your application add link to library with `yalc add eis-ui-render --link`
+- In your application add a link to the library with `yalc add eis-ui-render --link` and reinstall dependencies
 
 
 
