@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.31.3
+#### Fixes
+- Do not call onDataChange handler on new form data
+
 ### v0.31.2
 #### Fixes
 - Fix a text component to display fields with negative values

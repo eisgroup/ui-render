@@ -7,7 +7,7 @@ const AppWrapper = ({ children }) => {
     const { currency, language } = React.useContext(ConfigContext)
 
     return (
-        <div data-version='0.31.2' className={"ui-render"}>
+        <div data-version='0.31.3' className={"ui-render"}>
             <View className={`app fade-in lang--${language} ${currency}`}>
                 <Row fill className="max-size">
                     <View className="app__content">
