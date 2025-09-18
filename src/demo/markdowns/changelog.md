@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.31.4
+#### Fixes
+- Remove default sorting for PieChart component
+
 ### v0.31.3
 #### Fixes
 - Do not call onDataChange handler on new form data
