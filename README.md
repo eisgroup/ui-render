@@ -30,9 +30,13 @@ You will also see any lint errors in the console.
 - Run `npm start yalc-watch` to build library and life reload 
 - In your application add a link to the library with `yalc add eis-ui-render --link` and reinstall dependencies
 
-### How to publish
+### How to publish the library
 
 - Run `npm run build-lib`
 - Login to npm `npm login`
 - Publish new version `npm publish`
 
+### How to publish on GitHub Pages
+
+- Run `npm run build` to prepare artifacts
+- Run `npm run deploy` to upload artifacts to GitHub
