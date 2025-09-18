@@ -140,13 +140,17 @@ export default class PieChart extends PureComponent {
 /**
  * Converted given Data to normalized list for Chart Rendering
  */
-function dataNormalized (items, colors, gradient, sorts = ['-value', 'name']) {
+function dataNormalized (items, colors, gradient, sorts) {
   const itemsLength = items.length
   const list = items.map(({id, label, value}) => ({name: id || label, gradient, value}))
-  return list.sort(by(...sorts)).map((item, i) => {
+  const mapper = (item, i) => {
     item.color = colorsPalette[i % itemsLength]
     return item
-  })
+  }
+  if (sorts) {
+    return list.sort(by(...sorts)).map(mapper)
+  }
+  return list.map(mapper)
 }
 
 /**
