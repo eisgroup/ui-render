@@ -132,22 +132,6 @@ export class UIRender extends Component {
             Active.translate = props.translate
         }
 
-        this.togglePopupState = ({ title = '', content = '' }) => {
-            if (title && content) {
-                this.setState({
-                    isPopupOpen: true,
-                    popupTitle: title,
-                    popupContent: content
-                })
-            } else {
-                this.setState({
-                    isPopupOpen: false,
-                    popupTitle: '',
-                    popupContent: ''
-                })
-            }
-        }
-
         this.state = {
             data: {
                 json: normalizeIncomingData(this.props.data)
@@ -158,7 +142,6 @@ export class UIRender extends Component {
             errors: {},
             key: new Date(),
             isPopupOpen: false,
-            togglePopupState: this.togglePopupState,
             popupTitle: '',
             popupContent: '',
             currencyCode: (this.props.meta && this.props.meta.currencyCode) || 'USD',
@@ -560,7 +543,8 @@ function Decorator (Class) {
                         }
                     }
 
-                    this.togglePopupState({
+                    this.context.setPopupState({
+                        isOpen: true,
                         title: 'Error',
                         content: <Json data={{ message }}/>
                     })
