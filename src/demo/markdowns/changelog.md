@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.31.5
+#### Fixes
+- Improve InputNumber UX
+
 ### v0.31.4
 #### Fixes
 - Remove default sorting for PieChart component
