@@ -1,6 +1,6 @@
 {
   "name": "eis-ui-render",
-  "version": "0.31.5",
+  "version": "0.31.6",
   "description": "UI generation based on JSON schemas",
   "homepage": "https://eisgroup.github.io/ui-render/",
   "license": "Apache 2.0",

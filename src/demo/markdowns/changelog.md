@@ -1,5 +1,11 @@
 ### Table of Contents
 
+### v0.31.6
+#### Fixes
+- Fix popup input field names to correctly include relativePath and relativeIndex for proper form field identification
+- Fix popup positioning to display centered on screen instead of at the top
+- Ensure relativePath and relativeIndex are properly passed through Render component to nested popup fields
+
 ### v0.31.5
 #### Fixes
 - Improve InputNumber UX
