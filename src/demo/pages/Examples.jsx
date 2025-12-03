@@ -39,9 +39,6 @@ import * as tabs from '../examples/tabs_meta'
 import uploadMeta from '../examples/upload_meta'
 import UIRender from '../../core/pages/main/rules'
 
-import data1 from '../examples/1data'
-import meta1 from '../examples/1meta'
-
 import {
   updateExperienceData,
   downloadHistoricalFileTemplate,
@@ -49,12 +46,6 @@ import {
 } from '../api/gdn-rating-alg'
 
 const examples = [
-    {
-    title: 'Example 1 - Full Featured',
-    id: 'example1',
-    data: data1,
-    meta: meta1,
-    },
   {
     title: 'Button with Icon',
     id: 'buttonIcon',
