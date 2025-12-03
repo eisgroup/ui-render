@@ -55,6 +55,7 @@ export function metaToProps (meta, config) {
         relativePath,
         relativeIndex,
         funcConfig,
+        rowValue,
     } = config
     let {data, _data} = config
     // Transform Root attributes
@@ -72,7 +73,7 @@ export function metaToProps (meta, config) {
         // Map `onClick` functions by name (if exists)
         // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
         if (isObject(definition)) {
-            metaToFunctions(definition, {...funcConfig, data})
+            metaToFunctions(definition, {...funcConfig, data, relativeIndex, _data, rowValue: _data})
             if (definition.name) {
                 definition.name = interpolateString(definition.name, instance, {suppressError: true})
             }
@@ -127,7 +128,8 @@ export function metaToProps (meta, config) {
                         // Recursively map definitions within Render function
                         // Note: since definition is mutated on each transform,
                         // we have to use original config for rendering lists
-                        ...metaToProps(cloneDeep(configs), {...config, ...revPath, data, _data}),
+                        // Pass index and value for args interpolation in onClick handlers
+                        ...metaToProps(cloneDeep(configs), {...config, ...revPath, data, _data: value || _data, relativeIndex: index, rowValue: value}),
                         // Transform key path with actual data
                         ...name && {name: interpolateString(definition.name, {index, value})},
                         ...definition.index && {index: interpolateString(definition.index, {index})},
@@ -135,8 +137,17 @@ export function metaToProps (meta, config) {
                         // Filter for row data from parent table (in default layout)
                         ...filterItems && {filterItems, parentItem: value},
                         // Inject functions by their name string
+                        // Pass index, value, and relativePath for args interpolation and context
+                        // relativePath is critical for popup fields to have correct field names matching table row
                         ...removeNilValues(FUNCTION_NAMES.map(func => isString(definition[func]) && self &&
-                          !getFunctionFromString(definition[func], {...funcConfig, fallback: null}) &&
+                          !getFunctionFromString(definition[func], {
+                            ...funcConfig, 
+                            fallback: null, 
+                            relativeIndex: index, 
+                            relativePath: revPath.relativePath,
+                            _data: value,
+                            rowValue: value
+                          }) &&
                           {[func]: self[definition[func]]}
                         )).reduce((obj, item) => ({...obj, ...item}), {}),
                         ...definition.view.indexOf('Data') === 0 && {index},
@@ -195,11 +206,15 @@ export function metaToProps (meta, config) {
                 // Relative path must always be passed down, because nested Inputs inside List require absolute path for `name`
                 const options = {
                     data, _data, instance,
-                    relativePath: relativePathFrom(meta, relativePath, relativeIndex), relativeIndex
+                    relativePath: relativePathFrom(meta, relativePath, relativeIndex), relativeIndex,
+                    relativeData: meta.relativeData // Pass relativeData down to prevent automatic data extraction
                 }
                 // Resolve local `_data` for nested definitions
-                // noinspection PointlessBooleanExpressionJS
-                if (meta.relativeData !== false && meta.name != null) options._data = get(_data || data, meta.name, _data)
+                // Only extract data by name if relativeData is not explicitly false
+                // This prevents popup fields from accidentally getting the entire array instead of a single element
+                if (meta.relativeData !== false && meta.name != null) {
+                    options._data = get(_data || data, meta.name, _data)
+                }
                 meta[attribute] = metaToProps(meta[attribute], {...config, ...options})
             }
         }
@@ -277,17 +292,47 @@ const composeValidators = (...validators) => (value) => validators.reduce((error
  */
 function getFunctionFromObject(definition, config) {
     const {name, mapArgs, args = [], onDone} = definition
-    const {data, fieldFunc, fieldMethods, fallback = definition.name} = config
+    const {data, fieldFunc, fieldMethods, fallback = definition.name, relativeIndex, relativePath, _data, rowValue} = config
     const func = fieldFunc[name] || fieldMethods[name]
     if (onDone) metaToFunctions(definition, config)
+    
+    // Interpolate args if they contain template variables and we have index/value context
+    let interpolatedArgs = args
+    if (args.length > 0 && (relativeIndex != null || rowValue != null || _data != null)) {
+        interpolatedArgs = args.map(arg => {
+            if (isString(arg) && arg.includes('{')) {
+                return interpolateString(arg, { index: relativeIndex, value: rowValue || _data }, { suppressError: true })
+            }
+            return arg
+        })
+    }
+    
+    // For popupOpen, pass relativePath and relativeIndex through options to ensure popup fields match table row fields
+    const contextOptions = {}
+    if (relativePath != null) contextOptions.relativePath = relativePath
+    if (relativeIndex != null) contextOptions.relativeIndex = relativeIndex
+    
     if (func) {
         const hasMapArgs = isList(mapArgs)
+        // For popupOpen, merge context options with existing options
+        // This ensures popup fields use the same relativePath and relativeIndex as the table row
+        let finalArgs = interpolatedArgs
+        if (name === 'popupOpen' && Object.keys(contextOptions).length > 0) {
+            if (interpolatedArgs.length > 0 && typeof interpolatedArgs[interpolatedArgs.length - 1] === 'object' && interpolatedArgs[interpolatedArgs.length - 1] !== null) {
+                // Merge with existing options object
+                finalArgs = [...interpolatedArgs.slice(0, -1), {...interpolatedArgs[interpolatedArgs.length - 1], ...contextOptions}]
+            } else {
+                // Add options as second argument (id is first)
+                finalArgs = [...interpolatedArgs, contextOptions]
+            }
+        }
+        
         if (isFunction(definition.onDone)) {
             return (...values) => {
                 if (hasMapArgs) {
                     values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
                 }
-                const result = func(...values, ...args)
+                const result = func(...values, ...finalArgs)
                 if (result instanceof Promise) {
                     return result.then(definition.onDone)
                 }
@@ -298,7 +343,7 @@ function getFunctionFromObject(definition, config) {
                 if (hasMapArgs) {
                     values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
                 }
-                return func(...values, ...args)
+                return func(...values, ...finalArgs)
             }
         }
     }

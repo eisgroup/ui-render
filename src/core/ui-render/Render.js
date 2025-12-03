@@ -88,15 +88,28 @@ class RenderClass extends Component {
         }
 
         // Global/Relative Data access
-        if (name) _data = get((relativeData !== false && _data) || data, name) // local data dynamically retrieved from definition
+        // Only extract data by name if relativeData is not explicitly false
+        // This prevents popup fields from accidentally getting the entire array instead of a single element
+        if (name && relativeData !== false) {
+            _data = get(_data || data, name) // local data dynamically retrieved from definition
+        }
 
         // Pass down data to child renderers
         // allow `data` and `_data` to be overridden by config
         items = items.map((item) => {
             const mappedData = {data, _data, debug, form, instance, currencyCode, ...item};
-            if (this.props.view === 'TableCells' && this.props.relativeIndex !== undefined) {
-                mappedData.relativePath = this.props.relativePath;
+            // Always pass relativePath and relativeIndex to child items when available
+            // This is critical for popup fields to have correct input names matching table row fields
+            // Previously only passed for TableCells, but popup content also needs these values
+            if (this.props.relativeIndex !== undefined) {
                 mappedData.relativeIndex = this.props.relativeIndex;
+            }
+            if (this.props.relativePath !== undefined) {
+                mappedData.relativePath = this.props.relativePath;
+            }
+            // Also pass relativeData to prevent automatic data extraction in nested renders
+            if (this.props.relativeData !== undefined) {
+                mappedData.relativeData = this.props.relativeData;
             }
 
             return mappedData;

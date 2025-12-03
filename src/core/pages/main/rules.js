@@ -1,10 +1,10 @@
-import React, { Component, Fragment, isValidElement } from 'react'
+import React, { Component, Fragment, PureComponent, isValidElement } from 'react'
 import { storedTouched, withForm } from 'ui-modules-pack/form'
 import { FIELD } from 'ui-modules-pack/variables'
 import { cn, type } from 'ui-react-pack'
 import Json from 'ui-react-pack/JsonView'
 import ScrollView from 'ui-react-pack/ScrollView'
-import { Active, get, isEmpty, isList, isString, round, sanitizeResponse } from 'ui-utils-pack'
+import { Active, get, interpolateString, isEmpty, isList, isString, round, sanitizeResponse } from 'ui-utils-pack'
 import { cloneDeep, hasObjectValue, isObject, set } from 'ui-utils-pack/object'
 import Render, { metaToProps } from '../../ui-render'
 import './mapper' // Set up UI Renderer components and methods
@@ -479,11 +479,302 @@ function Decorator (Class) {
 
             // Popup Content Opening
             FIELD.FUNC[FIELD.ACTION.POPUP_OPEN] = (...args) => {
-                // The first argument can be Button Event
-                if (typeof args[0] === 'object') args.shift()
+                // Filter out event objects (React SyntheticEvent or native Event)
+                const filteredArgs = args.filter(arg => {
+                    if (typeof arg !== 'object' || arg === null) return true
+                    // Check if it's an event object
+                    if (arg.nativeEvent || arg.target || arg.preventDefault || arg.stopPropagation) {
+                        return false
+                    }
+                    // Check if it's a React component class
+                    if (arg.prototype && arg.prototype.isReactComponent) {
+                        return false
+                    }
+                    return true
+                })
+                
                 // noinspection JSCheckFunctionSignatures
-                const [id, options] = args
-                const { [id]: { content, title = '', ...props } = {} } = this.popupById || {}
+                // Handle different argument formats: [id, options] or [id] or [options with id]
+                let id, options = {}
+                if (filteredArgs.length === 0) {
+                    console.error('Popup Open: no arguments provided after filtering')
+                    return
+                }
+                if (typeof filteredArgs[0] === 'string') {
+                    id = filteredArgs[0]
+                    options = filteredArgs[1] || {}
+                } else if (typeof filteredArgs[0] === 'object' && filteredArgs[0] !== null) {
+                    // If first arg is object, it might be options with id, or just options
+                    options = filteredArgs[0]
+                    id = filteredArgs[1] || options.id
+                } else {
+                    id = String(filteredArgs[0])
+                    options = filteredArgs[1] || {}
+                }
+                
+                // Ensure id is a string
+                if (typeof id !== 'string' || !id) {
+                    console.error('Popup Open: id must be a non-empty string, got:', typeof id, id)
+                    return
+                }
+                
+                // Extract relativePath and relativeIndex from options if provided
+                // These come from renderItem context and ensure popup fields match table row fields
+                const contextRelativePath = options.relativePath
+                const contextRelativeIndex = options.relativeIndex
+                
+                // First, try to find popup by exact ID (may be already interpolated)
+                let popup = this.popupById && this.popupById[id]
+                if (popup) {
+                    const { content, title = '', ...props } = popup
+                    this.popupAlert(title, content, { ...props, ...options })
+                    return
+                }
+                
+                // If ID contains template variables or not found, try to find template
+                if (id && (id.includes('{') || this.popupTemplates)) {
+                    // Try to get index and path from multiple sources
+                    let relativeIndex = null
+                    let relativeData = null
+                    let relativePath = null
+                    
+                    // First, try to extract index from already interpolated ID (e.g., "InforceRateOverrideReason.0" -> 0)
+                    if (/\.\d+$/.test(id)) {
+                        const idMatch = id.match(/\.(\d+)$/)
+                        if (idMatch) {
+                            relativeIndex = parseInt(idMatch[1], 10)
+                        }
+                    }
+                    
+                    // Get form from instance (this.form) or props
+                    const currentForm = this.form || this.props.form || form
+                    
+                    // 1. Try from props (only if not already set from options)
+                    if (relativeIndex == null && this.props.relativeIndex != null) {
+                        relativeIndex = this.props.relativeIndex
+                        relativeData = this.props._data
+                        if (relativePath == null) {
+                            relativePath = this.props.relativePath
+                        }
+                    }
+                    // 2. Try from form context (only if relativeIndex not already set)
+                    else if (relativeIndex == null && currentForm && typeof currentForm.getState === 'function' && index != null) {
+                        relativeIndex = index
+                        relativeData = currentForm.getState().values
+                        relativePath = this.props.relativePath
+                    }
+                    // 3. Try to extract from form path (e.g., "name[0]" -> 0 and "name")
+                    // Only if relativeIndex not already set
+                    else if (relativeIndex == null && currentForm && typeof currentForm.getState === 'function' && this.props.relativePath) {
+                        const pathMatch = this.props.relativePath.match(/\[(\d+)\]/)
+                        if (pathMatch) {
+                            relativeIndex = parseInt(pathMatch[1], 10)
+                            // Extract base path (e.g., "experienceRatingInputs.uwOverridesCoverage" from "experienceRatingInputs.uwOverridesCoverage[0]")
+                            relativePath = this.props.relativePath.replace(/\[\d+\]$/, '')
+                        } else {
+                            relativePath = this.props.relativePath
+                        }
+                        relativeData = currentForm.getState().values
+                    }
+                    // 4. Try to extract index and path from form field names
+                    // Only if relativeIndex not already set
+                    else if (relativeIndex == null && currentForm && typeof currentForm.getState === 'function') {
+                        const formState = currentForm.getState()
+                        const registeredFields = Object.keys(formState.values || {})
+                        // Look for field names that contain array indices
+                        for (const fieldName of registeredFields) {
+                            const match = fieldName.match(/^(.+)\[(\d+)\]/)
+                            if (match) {
+                                relativePath = match[1]
+                                relativeIndex = parseInt(match[2], 10)
+                                break
+                            }
+                        }
+                        relativeData = formState.values
+                    }
+                    
+                    // Now create interpolationVars with the determined values
+                    const interpolationVars = {
+                        index: relativeIndex,
+                        value: relativeData
+                    }
+                    
+                    // Try to find popup by template ID
+                    // If ID already interpolated (e.g., "InforceRateOverrideReason.0"), 
+                    // try to find template by pattern (e.g., "InforceRateOverrideReason.{index}")
+                    let popupTemplate = null
+                    let templateId = id
+                    
+                    if (this.popupTemplates) {
+                        // First try exact match
+                        popupTemplate = this.popupTemplates[id]
+                        
+                        // If not found and ID looks interpolated (contains number at the end), try to find template
+                        if (!popupTemplate && /\.\d+$/.test(id)) {
+                            // Extract base name and try to find template with {index}
+                            const baseName = id.replace(/\.\d+$/, '')
+                            templateId = `${baseName}.{index}`
+                            popupTemplate = this.popupTemplates[templateId]
+                            
+                            // If still not found, try to find any template that matches the pattern
+                            if (!popupTemplate) {
+                                const templateKeys = Object.keys(this.popupTemplates)
+                                const matchingTemplate = templateKeys.find(key => {
+                                    const templatePattern = key.replace(/\{index\}/g, '\\d+')
+                                    const regex = new RegExp(`^${templatePattern}$`)
+                                    return regex.test(id)
+                                })
+                                if (matchingTemplate) {
+                                    templateId = matchingTemplate
+                                    popupTemplate = this.popupTemplates[matchingTemplate]
+                                }
+                            }
+                        }
+                    }
+                    if (popupTemplate) {
+                        // Interpolate ID if needed (if template ID contains {index})
+                        // If ID already interpolated, use it as-is
+                        const interpolatedId = templateId.includes('{') 
+                            ? interpolateString(templateId, interpolationVars, { suppressError: true })
+                            : id
+                        
+                        // Create new PopupContent with current context
+                        // Use the index from interpolation for relativeIndex
+                        const { items, data: templateData, _data: templateDataLocal, form: templateForm, instance: templateInstance, relativeIndex: templateRelativeIndex, relativePath: templateRelativePath, relativeData: templateRelativeData, title = '', ...popupProps } = popupTemplate
+                        
+                        // Get current data and form context from UIRender instance
+                        // Use relativeData (current row data) if available, otherwise fall back to template data
+                        const currentData = templateData || this.data
+                        // Get form from instance (this.form) or props, fallback to template form
+                        const instanceForm = this.form || this.props.form
+                        const currentForm = templateForm || instanceForm
+                        const currentInstance = templateInstance || this
+                        // Use contextRelativeIndex from options (renderItem context) with highest priority
+                        // This ensures popup fields match the exact table row that opened the popup
+                        const currentRelativeIndex = contextRelativeIndex != null ? contextRelativeIndex : (relativeIndex != null ? relativeIndex : templateRelativeIndex)
+                        // Use current row data if available (from interpolation), otherwise use template data
+                        // If relativeData is an array, extract the element at currentRelativeIndex
+                        let currentRowData = relativeData != null ? relativeData : templateDataLocal
+                        // If currentRowData is an array and we have an index, extract the specific element
+                        if (Array.isArray(currentRowData) && currentRelativeIndex != null && currentRelativePath) {
+                            // Try to get the specific row from the table
+                            const tableData = get(currentData, currentRelativePath)
+                            if (Array.isArray(tableData) && tableData[currentRelativeIndex] != null) {
+                                currentRowData = tableData[currentRelativeIndex]
+                            } else if (currentRowData[currentRelativeIndex] != null) {
+                                currentRowData = currentRowData[currentRelativeIndex]
+                            }
+                        }
+                        
+                        // Get correct relativePath for current table row context
+                        // Use contextRelativePath from options (renderItem context) with highest priority
+                        // This ensures popup fields match the exact table row that opened the popup
+                        // relativePath should be the table name (e.g., "experienceRatingInputs.uwOverridesCoverage")
+                        let currentRelativePath = contextRelativePath != null ? contextRelativePath : (relativePath || this.props.relativePath || templateRelativePath)
+                        
+                        // If relativePath still not found, try to determine from table structure
+                        // Look for table name in currentData (e.g., experienceRatingInputs.uwOverridesCoverage)
+                        if (!currentRelativePath && currentData && currentRelativeIndex != null) {
+                            // Try common table paths
+                            const possiblePaths = [
+                                'experienceRatingInputs.uwOverridesCoverage',
+                                'experienceRatingInputs.uwOverridesCommon'
+                            ]
+                            for (const path of possiblePaths) {
+                                const tableData = get(currentData, path)
+                                if (Array.isArray(tableData) && tableData[currentRelativeIndex] != null) {
+                                    currentRelativePath = path
+                                    break
+                                }
+                            }
+                        }
+                        
+                        // Check if items exist and are not empty
+                        if (!items || !Array.isArray(items) || items.length === 0) {
+                            console.error('Popup items are empty or invalid:', items)
+                            this.popupAlert(title || 'Error', 'Popup content is empty', { ...popupProps, ...options })
+                            return
+                        }
+                        
+                        // Create PopupContent component - use the same pattern as mapper.js
+                        // Pass context through props to ensure data is available
+                        class PopupContent extends PureComponent {
+                            render () {
+                                const { items, data, _data, form, instance, relativeIndex, relativePath, relativeData, currencyCode } = this.props
+                                
+                                // Map items with current data context, similar to how Render.js does it
+                                // IMPORTANT: Always pass relativePath and relativeIndex to ensure correct field IDs
+                                // Set relativeData to false to prevent Render.js from automatically extracting data by name
+                                // This ensures _data remains the single row element, not the entire array
+                                const mappedItems = items.map((item) => {
+                                    const mappedItem = {
+                                        ...item,
+                                        data,
+                                        _data,
+                                        form,
+                                        instance,
+                                        relativeIndex,
+                                        relativePath,
+                                        relativeData: false, // Prevent automatic data extraction by name in Render.js
+                                        currencyCode
+                                    }
+                                    // Ensure relativePath and relativeIndex are always set (not just for TableCells)
+                                    // These are critical for generating correct field IDs in forms
+                                    // Also set them in meta.relativePath and meta.relativeIndex so they are passed through metaToProps
+                                    if (relativePath != null) {
+                                        mappedItem.relativePath = relativePath
+                                        // Set in meta object so metaToProps can access it
+                                        if (!mappedItem.meta) mappedItem.meta = {}
+                                        mappedItem.meta.relativePath = relativePath
+                                    }
+                                    if (relativeIndex != null) {
+                                        mappedItem.relativeIndex = relativeIndex
+                                        // Set in meta object so metaToProps can access it
+                                        if (!mappedItem.meta) mappedItem.meta = {}
+                                        mappedItem.meta.relativeIndex = relativeIndex
+                                    }
+                                    return mappedItem
+                                })
+                                // Pass relativePath and relativeIndex to Render component itself
+                                // This ensures they are available in Render.props and passed down correctly
+                                // Set relativeData to false to prevent Render.js from automatically extracting data by name
+                                // This ensures _data remains the single row element throughout the render tree
+                                // Add key prop to avoid React warning about missing keys
+                                return mappedItems.map((item, idx) => Render({
+                                    ...item,
+                                    relativePath,
+                                    relativeIndex,
+                                    relativeData: false, // Prevent automatic data extraction by name in Render.js
+                                    key: item.id || item.name || `popup-item-${idx}`
+                                }))
+                            }
+                        }
+                        
+                        const content = <PopupContent 
+                            items={items}
+                            data={currentData}
+                            _data={currentRowData}
+                            form={currentForm}
+                            instance={currentInstance}
+                            relativeIndex={currentRelativeIndex}
+                            relativePath={currentRelativePath}
+                            relativeData={false}
+                            currencyCode={currentInstance.state?.currencyCode}
+                        />
+                        
+                        // Cache the popup with interpolated ID for future use
+                        if (!this.popupById) this.popupById = {}
+                        if (!this.popupById[interpolatedId]) {
+                            this.popupById[interpolatedId] = { ...popupTemplate, content, title, ...popupProps }
+                        }
+                        
+                        this.popupAlert(title, content, { ...popupProps, ...options })
+                        return
+                    }
+                }
+                
+                // Fallback to original behavior - try to find by static ID
+                const { content, title = '', ...props } = (this.popupById && this.popupById[id]) || {}
                 this.popupAlert(title, content, { ...props, ...options })
             }
 

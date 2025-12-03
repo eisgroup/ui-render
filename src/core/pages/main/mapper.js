@@ -23,7 +23,7 @@ import Table from 'ui-react-pack/Table'
 import Text from 'ui-react-pack/Text'
 import TooltipPop from 'ui-react-pack/TooltipPop'
 import View from 'ui-react-pack/View'
-import { Active, debounce, isList, isNumeric, isString, isTruthy, toFlatList, toJSON } from 'ui-utils-pack'
+import { Active, debounce, interpolateString, isList, isNumeric, isString, isTruthy, toFlatList, toJSON } from 'ui-utils-pack'
 import { TIME_DURATION_INSTANT } from 'ui-utils-pack/constants'
 import { get, hasObjectValue, isEqual, isObject, } from 'ui-utils-pack/object'
 import Render, { mapProps } from '../../ui-render'
@@ -451,7 +451,27 @@ const RenderComponent = ({
                 }
             }
 
-            instance.popupById[id] = { ...popup, content: <PopupContent/> }
+            // Store popup with template ID if it contains variables
+            // The ID will be interpolated when popup is opened
+            if (id && id.includes('{')) {
+                // Store template with items and context for later content creation
+                if (!instance.popupTemplates) instance.popupTemplates = {}
+                instance.popupTemplates[id] = { 
+                    ...popup, 
+                    // Store items and context to create new content when popup opens
+                    items,
+                    data,
+                    _data,
+                    form,
+                    instance,
+                    relativeIndex,
+                    relativePath,
+                    relativeData
+                }
+            } else {
+                // Static ID - store directly with content
+                instance.popupById[id] = { ...popup, content: <PopupContent/> }
+            }
             return null
         }
 
@@ -462,7 +482,9 @@ const RenderComponent = ({
             if (mapOptions) input.options = mapProps(input.options || [], mapOptions, { debug })
 
             // Resolve Input name dynamic path
-            if (relativeData !== false && relativePath != null && input.name) {
+            // relativePath should be used to form input name even when relativeData === false (e.g., in popups)
+            // relativeData === false only prevents automatic data extraction, but doesn't affect name generation
+            if (relativePath != null && input.name) {
                 const uniqueIdentificator = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
                 input.id = uniqueIdentificator
                 input.name = uniqueIdentificator
