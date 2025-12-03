@@ -30,12 +30,43 @@ const Popup = () => {
     if (!isOpen) return null
 
     return createPortal(
-            <View className={'app__popup' + activeClass}>
+            <View 
+                className={'app__popup' + activeClass}
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}
+            >
                 <View
                     className="app__popup__backdrop no-outline"
                     onClick={togglePopupState}
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+                    }}
                 />
-                <View className={'app__popup__box zoomin'}>
+                <View 
+                    className={'app__popup__box zoomin'}
+                    style={{
+                        position: 'relative',
+                        zIndex: 1001,
+                        maxWidth: '90%',
+                        maxHeight: '90%',
+                        overflow: 'auto',
+                        marginTop: 0
+                    }}
+                >
                     <View className="app__popup__box__content">
                         {isOpen && (
                             <>
