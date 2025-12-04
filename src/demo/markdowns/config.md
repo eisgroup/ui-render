@@ -304,6 +304,150 @@ For a full list of values to use for `view` and formatting functions,
 check [Field Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/variables/fields.js)
 and [Form Input Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/form/constants.js).
 
+### Popup Component
+
+The Popup component allows you to display modal dialogs with form fields. When used with Tables, popup fields automatically receive the correct `relativePath` and `relativeIndex` to ensure form field names match the table row that opened the popup.
+
+#### Basic Usage
+
+```js
+{
+  view: 'Button',
+  children: 'Open Popup',
+  onClick: {
+    name: 'popupOpen',
+    args: ['popupId'] // Popup ID to open
+  }
+},
+{
+  view: 'Popup',
+  id: 'popupId',
+  items: [
+    {
+      view: 'Input',
+      name: 'fieldName',
+      label: 'Field Label'
+    }
+  ]
+}
+```
+
+#### Using Popups with Tables
+
+When opening a popup from a table row (using `renderItem`), the popup fields will automatically use the correct table row context. This ensures that input field names include the proper path and index.
+
+**Example: Opening popup from table row**
+
+```js
+{
+  view: 'Table',
+  name: 'experienceRatingInputs.uwOverridesCoverage',
+  headers: [
+    { id: 'coverageType', label: 'Coverage Type' }
+  ],
+  renderItem: {
+    view: 'VerticalLayout',
+    items: [
+      {
+        view: 'Button',
+        children: 'Override',
+        onClick: {
+          name: 'popupOpen',
+          args: ['InforceRateOverrideReason.{index}'] // Use {index} to create unique popup ID per row
+        }
+      },
+      {
+        view: 'Popup',
+        id: 'InforceRateOverrideReason.{index}', // Template ID with {index} placeholder
+        items: [
+          {
+            view: 'Input',
+            name: 'inforceRateOverride', // This will automatically become:
+            // "experienceRatingInputs.uwOverridesCoverage[0].inforceRateOverride"
+            // where [0] is the row index
+            type: 'number',
+            label: 'Inforce Rate Override'
+          },
+          {
+            view: 'Input',
+            name: 'inforceRateOverrideReason',
+            label: 'Reason'
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+#### How It Works
+
+1. **Popup ID with Template Variables**: When you use `{index}` in the popup ID (e.g., `"InforceRateOverrideReason.{index}"`), the system creates a template that will be interpolated when the popup is opened.
+
+2. **Automatic Context Passing**: When a popup is opened from a table row:
+   - The `relativePath` (table name, e.g., `"experienceRatingInputs.uwOverridesCoverage"`) is automatically passed to popup fields
+   - The `relativeIndex` (row index, e.g., `0`) is automatically passed to popup fields
+   - Input field names are automatically prefixed with the full path: `"{relativePath}[{relativeIndex}].{fieldName}"`
+
+3. **Form Field Names**: The generated field names ensure that:
+   - Each table row has its own set of popup fields
+   - Form values are correctly associated with the correct table row
+   - Form validation works correctly for each row independently
+
+#### Important Notes
+
+- **Popup ID Format**: Use `{index}` in the popup ID when opening from table rows to create unique popups per row
+- **Field Names**: Input fields inside popups opened from table rows will automatically have the correct path prefix
+- **Data Context**: Popup fields receive the current row's data (`_data`) automatically, so you can reference fields directly by name
+- **Positioning**: Popups are automatically centered on screen (not at the top)
+
+#### Example: Complete Table with Popup
+
+```js
+{
+  view: 'Table',
+  name: 'items',
+  headers: [
+    { id: 'name', label: 'Item Name' },
+    { id: 'value', label: 'Value' }
+  ],
+  renderItem: {
+    view: 'HorizontalLayout',
+    items: [
+      {
+        view: 'Text',
+        name: 'name'
+      },
+      {
+        view: 'Button',
+        children: 'Edit',
+        onClick: {
+          name: 'popupOpen',
+          args: ['EditItem.{index}']
+        }
+      },
+      {
+        view: 'Popup',
+        id: 'EditItem.{index}',
+        items: [
+          {
+            view: 'Input',
+            name: 'name', // Becomes "items[0].name" for first row
+            label: 'Item Name'
+          },
+          {
+            view: 'Input',
+            name: 'value', // Becomes "items[0].value" for first row
+            label: 'Value',
+            type: 'number'
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ### ShowIf Logic
 
 ![showIf-logic](/ui-render/static/images/showIf.png)

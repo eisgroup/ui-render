@@ -1,5 +1,9 @@
 ### Table of Contents
 
+### v0.31.7
+#### Fixes
+- Fix table data display issue caused by relativeData propagation - tables now always extract data by name attribute regardless of parent relativeData setting
+
 ### v0.31.6
 #### Fixes
 - Fix popup input field names to correctly include relativePath and relativeIndex for proper form field identification

@@ -90,7 +90,9 @@ class RenderClass extends Component {
         // Global/Relative Data access
         // Only extract data by name if relativeData is not explicitly false
         // This prevents popup fields from accidentally getting the entire array instead of a single element
-        if (name && relativeData !== false) {
+        // Exception: Table components always need to extract data by name, regardless of relativeData
+        const isTable = this.props.view === 'Table'
+        if (name && (relativeData !== false || isTable)) {
             _data = get(_data || data, name) // local data dynamically retrieved from definition
         }
 
@@ -107,9 +109,11 @@ class RenderClass extends Component {
             if (this.props.relativePath !== undefined) {
                 mappedData.relativePath = this.props.relativePath;
             }
-            // Also pass relativeData to prevent automatic data extraction in nested renders
-            if (this.props.relativeData !== undefined) {
-                mappedData.relativeData = this.props.relativeData;
+            // Only pass relativeData if it's explicitly set to false (for popups)
+            // Don't pass it to Table components, as they need to extract data by name
+            // This prevents breaking table data display while still allowing popup fields to work correctly
+            if (this.props.relativeData === false && item.view !== 'Table') {
+                mappedData.relativeData = false;
             }
 
             return mappedData;
