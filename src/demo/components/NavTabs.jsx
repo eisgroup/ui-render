@@ -6,6 +6,9 @@ import toc from 'remark-toc'
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
 import {oneLight} from 'react-syntax-highlighter/dist/esm/styles/prism'
 import './markdown.css'
+
+// Use webpack's publicPath: '/ui-render/' in production, '/' in dev
+const basePath = (__webpack_public_path__ || '/').replace(/\/$/, '')
 import changelogMarkdown from '../markdowns/changelog.md'
 import stylesMarkdown from '../markdowns/styles.md'
 import configMarkdown from '../markdowns/config.md'
@@ -67,6 +70,7 @@ const NavTabs = (props) => {
         h4: heading('h4'),
         h5: heading('h5'),
         h6: heading('h6'),
+        img: ({src, ...props}) => <img src={src && src.startsWith('http') ? src : `${basePath}/${src}`} {...props} />,
         code: (props) => {
             const {children, className, node, ...rest} = props
             const match = /language-(\w+)/.exec(className || '')

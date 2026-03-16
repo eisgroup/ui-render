@@ -103,7 +103,7 @@ export default (env, argv) => {
                 ],
             }),
             ...(isProduction
-                ? [new MiniCssExtractPlugin({ filename: 'static/css/[name].[contenthash:8].css' })]
+                ? [new MiniCssExtractPlugin({ filename: 'static/[name].[contenthash:8].css' })]
                 : [new ReactRefreshWebpackPlugin()]),
         ],
         devServer: {
