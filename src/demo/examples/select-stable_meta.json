@@ -3,7 +3,7 @@
   "name": "selectedOption",
   "label": "Select option (stable id value)",
   "options": {
-    "name": "plans"
+    "name": "categories"
   },
   "mapOptions": {
     "text": "label",

@@ -258,7 +258,7 @@ export function asField (InputComponent, {sanitize} = {}) {
       if (instance && instance.form) {
         instance.form.change(this.input.name, parsedValue)
       } else {
-        this.input.onChange(value) // fallback for fields without UIRender instance
+        this.input.onChange(parsedValue) // fallback for fields without UIRender instance
       }
       onChange && onChange(parsedValue, ...args)
     }

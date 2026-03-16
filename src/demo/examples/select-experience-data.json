@@ -3,7 +3,7 @@
     "recordInputs": {
       "optionForPerformanceRatingList": [
         {
-          "optionName": "GL Plan 2",
+          "optionName": "Option B",
           "categoryForPerformanceRatingList": [
             {
               "categoryType": "GroupA"
@@ -12,7 +12,7 @@
           "categoryForPerformanceRatingSelection": "GroupA"
         },
         {
-          "optionName": "GL Plan 1",
+          "optionName": "Option A",
           "categoryForPerformanceRatingList": [
             {
               "categoryType": "GroupA"
@@ -27,7 +27,7 @@
           "categoryForPerformanceRatingSelection": "GroupA"
         }
       ],
-      "optionForPerformanceRatingSelection": "GL Plan 1",
+      "optionForPerformanceRatingSelection": "Option A",
       "XcategoryForPerformanceRatingList": [
         {
           "categoryType": "GroupA"

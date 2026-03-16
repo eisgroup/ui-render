@@ -255,6 +255,73 @@ Dependent Product Select uses `{state.categoryX,0}` to resolve the active catego
 
 See the [Select: Cascading](#selectCascading) example for a working demo.
 
+#### mapOptions — How Select Values Are Stored
+
+`mapOptions` controls which data field is displayed as option text and what value is stored when the user makes a selection. The stored value affects form data on submit.
+
+**Index-based (default)** — stores the position index of the selected option:
+
+```json
+"mapOptions": "categoryName"
+```
+Shorthand for `{ "text": "categoryName", "value": "{index}" }`.
+Selected value in form data: `"0"`, `"1"`, etc.
+On submit, `changeOptionOrderForSelectFields` moves the selected item to the front of the options array and **removes** the select field from the output data.
+
+```json
+"mapOptions": { "text": "categoryName", "value": "{index}" }
+```
+Explicit index-based — same behavior as the shorthand above.
+
+**Stable value** — stores the actual data field value:
+
+```json
+"mapOptions": { "text": "categoryName", "value": "categoryCode" }
+```
+Selected value in form data: `"TECH"`, `"DESIGN"`, etc. (actual `categoryCode` values).
+The select field **stays** in the output data with the real value. Options array is **not** reordered.
+
+**When to use which:**
+
+| Scenario | mapOptions | Stored value | Kept in output |
+|---|---|---|---|
+| UI state only (drive other fields via `{state.xxx}`) | `"fieldName"` or `{ text, value: "{index}" }` | Index (`"0"`) | No (removed on submit) |
+| Persistent selection (value matters for backend) | `{ text: "label", value: "id" }` | Real value (`"HIGH"`) | Yes |
+
+**Example: stable-value Select**
+
+data.json:
+```json
+{
+  "periodBasis": [
+    { "periodBasisType": "Month" },
+    { "periodBasisType": "Year" }
+  ]
+}
+```
+
+meta.json (index-based — default):
+```json
+{
+  "view": "Select",
+  "name": "periodBasisSelection",
+  "options": { "name": "periodBasis" },
+  "mapOptions": "periodBasisType"
+}
+```
+→ Stores `"0"` or `"1"`. Removed from output on submit.
+
+meta.json (stable-value):
+```json
+{
+  "view": "Select",
+  "name": "periodBasisSelection",
+  "options": { "name": "periodBasis" },
+  "mapOptions": { "text": "periodBasisType", "value": "periodBasisType" }
+}
+```
+→ Stores `"Month"` or `"Year"`. Kept in output data.
+
 ### Slider Attributes
 
 ```js

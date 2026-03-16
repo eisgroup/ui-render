@@ -3,6 +3,7 @@ import { useLocation, useNavigate} from 'react-router-dom'
 import Markdown from 'react-markdown'
 import ScrollView from 'ui-react-pack/ScrollView'
 import toc from 'remark-toc'
+import gfm from 'remark-gfm'
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
 import {oneLight} from 'react-syntax-highlighter/dist/esm/styles/prism'
 import './markdown.css'
@@ -20,7 +21,7 @@ import Demo from '../pages/Demo'
 import Examples from '../pages/Examples'
 
 const mdProps = {
-    remarkPlugins: [toc],
+    remarkPlugins: [gfm, toc],
 }
 
 function textContent(children) {

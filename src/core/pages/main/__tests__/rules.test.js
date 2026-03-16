@@ -158,7 +158,7 @@ describe('initSelectStatesFromData', () => {
         expect(instance.state.region).toBeUndefined()
     })
 
-    it('does nothing when data value is empty string', () => {
+    it('defaults to first option when data value is empty string', () => {
         const meta = {
             view: 'Select',
             name: 'region',
@@ -168,10 +168,10 @@ describe('initSelectStatesFromData', () => {
         }
         const data = { region: '' }
         initSelectStatesFromData(meta, data, instance)
-        expect(instance.state.region).toBeUndefined()
+        expect(instance.state.region).toBe('0')
     })
 
-    it('does nothing when data value is null', () => {
+    it('defaults to first option when data value is null', () => {
         const meta = {
             view: 'Select',
             name: 'region',
@@ -180,6 +180,36 @@ describe('initSelectStatesFromData', () => {
             options: { name: 'regions' },
         }
         const data = { region: null }
+        initSelectStatesFromData(meta, data, instance)
+        expect(instance.state.region).toBe('0')
+    })
+
+    it('defaults to first option when value is not present in data', () => {
+        const meta = {
+            view: 'Dropdown',
+            name: 'department',
+            onChange: 'setState,department',
+            mapOptions: { text: 'label', value: '{index}' },
+            options: { name: 'departments' },
+        }
+        const data = {
+            departments: [{ label: 'Engineering' }, { label: 'Design' }],
+        }
+        initSelectStatesFromData(meta, data, instance)
+        expect(instance.state.department).toBe('0')
+    })
+
+    it('does NOT default for stable-value Select when value is missing', () => {
+        const meta = {
+            view: 'Select',
+            name: 'region',
+            onChange: 'setState,region',
+            mapOptions: { text: 'label', value: 'code' },
+            options: { name: 'regions' },
+        }
+        const data = {
+            regions: [{ label: 'US', code: 'US' }, { label: 'EU', code: 'EU' }],
+        }
         initSelectStatesFromData(meta, data, instance)
         expect(instance.state.region).toBeUndefined()
     })

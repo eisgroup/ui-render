@@ -100,13 +100,20 @@ export function Dropdown ({
     : ((Array.isArray(opts) && opts[0] && opts[0].value) || undefined)
   )
   const [value, setValue] = useState(defaultValue.current)
+  const isInitialMount = useRef(true)
   let tempValue
 
   useEffect(() => {
     !isEqual(options, opts) && setOptions(opts)
   }, [opts])
 
+  // Sync internal value with parent prop.
+  // Skip on initial mount when valueFromParent is undefined to preserve defaultValue (first option).
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      if (typeof valueFromParent === 'undefined') return
+    }
     setValue(valueFromParent || null)
   }, [valueFromParent])
 

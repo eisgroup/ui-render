@@ -1,6 +1,6 @@
 {
   "selectedOption": "P",
-  "plans": [
+  "categories": [
     {
       "label": "Basic",
       "id": "B"

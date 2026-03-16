@@ -358,6 +358,9 @@ export function initSelectStatesFromData (meta, data, instance, contextPath) {
                     // Index-based: value IS the index
                     instance.state[name] = String(value)
                 }
+            } else if (!mapOptions || !mapOptions.value || mapOptions.value === '{index}') {
+                // No value in data for index-based Select — default to first option
+                instance.state[name] = '0'
             }
         }
     }
