@@ -236,7 +236,7 @@ export function asField (InputComponent, {sanitize} = {}) {
     }
 
     handleChange = (value, ...args) => {
-      const {onChange, normalize, parse = normalize} = this.props
+      const {onChange, normalize, parse = normalize, instance} = this.props
       /**
        * @Note:
        *  - `parse` gets called by final-form automatically on input.onChange,
@@ -249,13 +249,18 @@ export function asField (InputComponent, {sanitize} = {}) {
       if (this.hasFocus) {
         this.value = value // store value exactly as typed in (example: value of '1.0' to work nicely with `unit` = '%')
       }
-      // Possible need to remove this transformation
-      // Value is already a number or null by the time it gets here
-      // if (type === 'number') {
-      //   value = value !== '' ? Number(value) : null
-      // }
-      this.input.onChange(value) // final-form input.onChange can accept 'event' or 'value'
-      onChange && onChange(parse ? parse(value) : value, ...args)
+      const parsedValue = parse ? parse(value) : value
+      // Use form.change with current field name instead of this.input.onChange to avoid
+      // stale closure in react-final-form's useConstantCallback. When a parent Select
+      // changes and child field names update, React effects fire bottom-up (child before
+      // parent), so this.input.onChange may still reference the old field registration,
+      // writing the value to the wrong path and causing data corruption.
+      if (instance && instance.form) {
+        instance.form.change(this.input.name, parsedValue)
+      } else {
+        this.input.onChange(value) // fallback for fields without UIRender instance
+      }
+      onChange && onChange(parsedValue, ...args)
     }
 
     // Do not pass 'onChange' to Field because it fires event as argument

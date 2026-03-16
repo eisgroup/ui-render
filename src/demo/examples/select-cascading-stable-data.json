@@ -1,0 +1,72 @@
+{
+  "Settings": {
+    "Record": {
+      "GroupList": [
+        {
+          "GroupName": "Group A",
+          "ItemList": [
+            {
+              "ItemType": "Alpha",
+              "Status": "Active",
+              "Priority": "High"
+            },
+            {
+              "ItemType": "Beta",
+              "Status": "Pending",
+              "Priority": "Medium"
+            }
+          ],
+          "ItemSelection": "Alpha"
+        },
+        {
+          "GroupName": "Group B",
+          "ItemList": [
+            {
+              "ItemType": "Gamma",
+              "Status": "Active",
+              "Priority": "Low"
+            },
+            {
+              "ItemType": "Delta",
+              "Status": "Inactive",
+              "Priority": "High"
+            },
+            {
+              "ItemType": "Epsilon",
+              "Status": "Active",
+              "Priority": "Medium"
+            },
+            {
+              "ItemType": "Zeta",
+              "Status": "Pending",
+              "Priority": "Low"
+            }
+          ],
+          "ItemSelection": "Gamma"
+        },
+        {
+          "GroupName": "Group C",
+          "ItemList": [
+            {
+              "ItemType": "Eta",
+              "Status": "Active",
+              "Priority": "High"
+            },
+            {
+              "ItemType": "Theta",
+              "Status": "Active",
+              "Priority": "High"
+            },
+            {
+              "ItemType": "Iota",
+              "Status": "Pending",
+              "Priority": "Medium"
+            }
+          ],
+          "ItemSelection": "Eta"
+        }
+      ],
+      "GroupSelection": "Group B"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "RecordInputs": {
+    "OptionInputs": [
+      {
+        "OptionName": "Plan 1",
+        "CategoryInputs": [
+          {
+            "Option": "Plan 1",
+            "Category": "GroupA",
+            "Attribute": "Value1"
+          },
+          {
+            "Option": "Plan 1",
+            "Category": "GroupB",
+            "Attribute": "Value2"
+          },
+          {
+            "Option": "Plan 1",
+            "Category": "DepLife",
+            "Attribute": "Value3"
+          }
+        ]
+      },
+      {
+        "OptionName": "Plan 2",
+        "CategoryInputs": [
+          {
+            "Option": "Plan 2",
+            "Category": "GroupA",
+            "Attribute": "Value4"
+          }
+        ]
+      }
+    ]
+  }
+}

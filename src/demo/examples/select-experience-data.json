@@ -1,0 +1,45 @@
+{
+  "performanceRatingInputs": {
+    "recordInputs": {
+      "optionForPerformanceRatingList": [
+        {
+          "optionName": "GL Plan 2",
+          "categoryForPerformanceRatingList": [
+            {
+              "categoryType": "GroupA"
+            }
+          ],
+          "categoryForPerformanceRatingSelection": "GroupA"
+        },
+        {
+          "optionName": "GL Plan 1",
+          "categoryForPerformanceRatingList": [
+            {
+              "categoryType": "GroupA"
+            },
+            {
+              "categoryType": "GroupB"
+            },
+            {
+              "categoryType": "SuppDependent"
+            }
+          ],
+          "categoryForPerformanceRatingSelection": "GroupA"
+        }
+      ],
+      "optionForPerformanceRatingSelection": "GL Plan 1",
+      "XcategoryForPerformanceRatingList": [
+        {
+          "categoryType": "GroupA"
+        },
+        {
+          "categoryType": "GroupB"
+        },
+        {
+          "categoryType": "SuppDependent"
+        }
+      ],
+      "XcategoryForPerformanceRatingSelection": "GroupA"
+    }
+  }
+}

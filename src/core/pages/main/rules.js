@@ -267,9 +267,7 @@ export function toOpenLConfig (meta) {
 
         // Apply default Dropdown config if onChange is not defined
         if ((view === FIELD.TYPE.DROPDOWN || view === FIELD.TYPE.SELECT) && meta.name != null && meta.onChange == null) {
-            if (view === FIELD.TYPE.DROPDOWN) {
-                meta.onChange = FIELD.ACTION.SET_STATE + ',' + meta.name
-            }
+            meta.onChange = FIELD.ACTION.SET_STATE + ',' + meta.name
             // if (meta.value == null) meta.value = {name: `{state.${meta.name},0}`}
             if (meta.options != null) {
                 if (isString(meta.options)) meta.options = { name: meta.options }
@@ -312,6 +310,75 @@ export function toOpenLConfig (meta) {
     }
 
     return meta
+}
+
+/**
+ * Pre-initialize instance.state from initial data for Select/Dropdown fields.
+ * Ensures {state.xxx} interpolation resolves correctly on the first render,
+ * before any component mounts.
+ *
+ * @param {Object} meta - transformed meta (after toOpenLConfig)
+ * @param {Object} data - initial data.json
+ * @param {Object} instance - UIRender instance (state will be mutated)
+ * @param {String} [contextPath] - current data context path from parent containers
+ */
+export function initSelectStatesFromData (meta, data, instance, contextPath) {
+    if (!meta) return
+    if (Array.isArray(meta)) {
+        for (const item of meta) {
+            initSelectStatesFromData(item, data, instance, contextPath)
+        }
+        return
+    }
+    if (!isObject(meta)) return
+
+    const { view, name, onChange, mapOptions, options, items, renderItem } = meta
+    const isSelectField = view === FIELD.TYPE.SELECT || view === FIELD.TYPE.DROPDOWN
+
+    // For Select/Dropdown with auto-generated setState onChange, seed state from initial data
+    if (isSelectField && name && isString(onChange) && onChange.indexOf(FIELD.ACTION.SET_STATE) === 0) {
+        if (instance.state[name] == null) {
+            const fullPath = contextPath ? `${contextPath}.${name}` : name
+            const value = get(data, fullPath)
+
+            if (value != null && value !== '') {
+                const mapValue = mapOptions && mapOptions.value
+                if (mapValue && mapValue !== '{index}') {
+                    // Stable value: find index of matching option in data
+                    const optionsName = isObject(options) ? options.name : options
+                    if (optionsName) {
+                        const optionsPath = contextPath ? `${contextPath}.${optionsName}` : optionsName
+                        const optionsList = get(data, optionsPath)
+                        if (Array.isArray(optionsList)) {
+                            const idx = optionsList.findIndex(o => String(get(o, mapValue)) === String(value))
+                            if (idx >= 0) instance.state[name] = String(idx)
+                        }
+                    }
+                } else {
+                    // Index-based: value IS the index
+                    instance.state[name] = String(value)
+                }
+            }
+        }
+    }
+
+    // Determine child data context path
+    let childContext = contextPath
+    if (name && !isSelectField) {
+        let resolvedName = name
+        // Resolve {state.xxx} in container names using already-initialized state
+        if (resolvedName.includes('{')) {
+            resolvedName = interpolateString(resolvedName, instance, { suppressError: true })
+        }
+        // Only update context if name was fully resolved (no remaining templates)
+        if (!resolvedName.includes('{')) {
+            childContext = contextPath ? `${contextPath}.${resolvedName}` : resolvedName
+        }
+    }
+
+    // Recurse into items
+    if (items) initSelectStatesFromData(items, data, instance, childContext)
+    if (renderItem) initSelectStatesFromData(renderItem, data, instance, childContext)
 }
 
 /**
@@ -928,7 +995,11 @@ function Decorator (Class) {
     Object.defineProperty(Class.prototype, 'meta', {
         get () {
             if (this._meta != null) return this._meta
-            return this._meta = metaToProps(transformConfig(cloneDeep(get(this.state, 'meta.json'))), this.config)
+            const transformedMeta = transformConfig(cloneDeep(get(this.state, 'meta.json')))
+            // Pre-initialize state from data for Select/Dropdown fields,
+            // so {state.xxx} interpolation resolves correctly on the first render
+            initSelectStatesFromData(transformedMeta, this.data, this)
+            return this._meta = metaToProps(transformedMeta, this.config)
         },
         set (value) {
             return this._meta = value

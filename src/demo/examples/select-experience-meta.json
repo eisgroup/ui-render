@@ -1,0 +1,120 @@
+{
+  "view": "VerticalLayout",
+  "styles": "margin-top-largest",
+  "items": [
+    {
+      "view": "HorizontalLayout",
+      "styles": "no-padding no-margin width-100p layout-experienceBasis",
+      "items": [
+        {
+          "view": "VerticalLayout",
+          "styles": "middle padding-smallest no-margin width-50p layout-experienceBasisTitle",
+          "items": [
+            {
+              "view": "Text",
+              "label": "Experience Basis"
+            }
+          ]
+        },
+        {
+          "view": "VerticalLayout",
+          "name": "performanceRatingInputs.recordInputs",
+          "styles": "padding-smallest no-margin width-25p layout-experienceBasisValue",
+          "items": [
+            {
+              "view": "Select",
+              "name": "experienceBasisSelection",
+              "options": {
+                "name": "experienceBasisList"
+              },
+              "mapOptions": {
+                "text": "experienceBasis",
+                "value": "experienceBasis"
+              },
+              "styles": "middle fill-width right",
+              "disabled": false,
+              "compact": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "view": "HorizontalLayout",
+      "styles": "padding-top-largest margin-top-largest width-100p",
+      "items": [
+        {
+          "view": "VerticalLayout",
+          "styles": "middle padding-smallest no-margin width-50p",
+          "items": [
+            {
+              "view": "Text",
+              "label": "Plans Provisions"
+            }
+          ]
+        },
+        {
+          "view": "VerticalLayout",
+          "name": "performanceRatingInputs.recordInputs",
+          "styles": "padding-smallest no-margin width-25p",
+          "items": [
+            {
+              "view": "Select",
+              "name": "optionForPerformanceRatingSelection",
+              "options": {
+                "name": "optionForPerformanceRatingList"
+              },
+              "mapOptions": {
+                "text": "optionName",
+                "value": "optionName"
+              },
+              "styles": "middle fill-width right",
+              "disabled": false,
+              "compact": true,
+              "upward": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "view": "HorizontalLayout",
+      "styles": "no-padding no-margin width-100p",
+      "items": [
+        {
+          "view": "VerticalLayout",
+          "styles": "middle padding-smallest no-margin width-50p",
+          "items": [
+            {
+              "view": "Text",
+              "label": "Category Provisions",
+              "styles": "padding-v bold"
+            }
+          ]
+        },
+        {
+          "view": "VerticalLayout",
+          "name": "performanceRatingInputs.recordInputs.optionForPerformanceRatingList.{state.performanceRatingInputs.recordInputs.categoryForPerformanceRatingSelection,0}",
+          "styles": "padding-smallest no-margin width-25p",
+          "items": [
+            {
+              "view": "Select",
+              "name": "categoryForPerformanceRatingSelection",
+              "options": {
+                "name": "categoryForPerformanceRatingList"
+              },
+              "mapOptions": {
+                "text": "categoryType",
+                "value": "categoryType"
+              },
+              "styles": "middle fill-width right",
+              "disabled": false,
+              "compact": true,
+              "upward": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

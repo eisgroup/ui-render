@@ -25,7 +25,8 @@ import inputToggle from '../examples/input_toggle'
 import invalidArrayData from '../examples/invalid-array_data'
 import invalidArrayMeta from '../examples/invalid-array_meta'
 import listMeta from '../examples/list_meta'
-import piechartMeta from '../examples/piechart_meta'
+import piechartSimpleData from '../examples/piechart-simple_data.json'
+import piechartSimpleMeta from '../examples/piechart-simple_meta.json'
 import popupMeta from '../examples/popup_meta'
 import * as ratingDetails from '../examples/rating_details'
 import showIfCondition from '../examples/showIf'
@@ -39,13 +40,71 @@ import * as tabs from '../examples/tabs_meta'
 import uploadMeta from '../examples/upload_meta'
 import UIRender from '../../core/pages/main/rules'
 
+import selectIndexData from '../examples/select-index_data.json'
+import selectIndexMeta from '../examples/select-index_meta.json'
+import selectStableData from '../examples/select-stable_data.json'
+import selectStableMeta from '../examples/select-stable_meta.json'
+import dropdownExperienceData from '../examples/dropdown-experience-data.json'
+import dropdownExperienceMeta from '../examples/dropdown-experience-meta.json'
+import selectCascadingData from '../examples/select-cascading-data.json'
+import selectCascadingMeta from '../examples/select-cascading-meta.json'
+import selectCascadingStableData from '../examples/select-cascading-stable-data.json'
+import selectCascadingStableMeta from '../examples/select-cascading-stable-meta.json'
+import selectReorderData from '../examples/select-reorder-data.json'
+import selectReorderMeta from '../examples/select-reorder-meta.json'
+
 import {
-  updateExperienceData,
+  updatePerformanceData,
   downloadHistoricalFileTemplate,
   uploadHistoricalFile
 } from '../api/gdn-rating-alg'
 
 const examples = [
+  // Dropdown
+  {
+    title: 'Dropdown',
+    id: 'dropdown',
+    data: exampleData,
+    meta: dropdownMeta,
+  },
+  {
+    title: 'Dropdown: Cascading (Experience)',
+    id: 'dropdownExperience',
+    data: dropdownExperienceData,
+    meta: dropdownExperienceMeta,
+  },
+  // Select
+  {
+    title: 'Select: Index Value ({index})',
+    id: 'selectIndexValue',
+    data: selectIndexData,
+    meta: selectIndexMeta,
+  },
+  {
+    title: 'Select: Stable Value (id)',
+    id: 'selectStableValue',
+    data: selectStableData,
+    meta: selectStableMeta,
+  },
+  {
+    title: 'Select: Cascading (Category → Product)',
+    id: 'selectCascading',
+    data: selectCascadingData,
+    meta: selectCascadingMeta,
+  },
+  {
+    title: 'Select: Cascading Stable Value (string)',
+    id: 'selectCascadingStable',
+    data: selectCascadingStableData,
+    meta: selectCascadingStableMeta,
+  },
+  {
+    title: 'Select: Index Reorder on Get Data',
+    id: 'selectReorder',
+    data: selectReorderData,
+    meta: selectReorderMeta,
+  },
+  // Button
   {
     title: 'Button with Icon',
     id: 'buttonIcon',
@@ -58,18 +117,26 @@ const examples = [
     data: {},
     meta: download_meta,
   },
+  // Input
+  {
+    title: 'Input',
+    id: 'input',
+    data: exampleData,
+    meta: inputMeta,
+  },
+  {
+    title: 'Input Toggle Checkbox',
+    id: 'inputToggle',
+    data: exampleData,
+    meta: inputToggle,
+  },
   {
     title: 'Decimal Points',
     id: 'decimal',
     data: exampleData,
     meta: decimalMeta,
   },
-  {
-    title: 'Dropdown',
-    id: 'dropdown',
-    data: exampleData,
-    meta: dropdownMeta,
-  },
+  // Layout
   {
     title: 'Dynamic Layout',
     id: 'layout',
@@ -88,6 +155,7 @@ const examples = [
     data: listData,
     meta: expandListMeta,
   },
+  // Tabs
   {
     title: 'Tab List',
     id: 'tabList',
@@ -106,6 +174,7 @@ const examples = [
     data: listData,
     meta: tabs.buttoned,
   },
+  // Table
   {
     title: 'Table Nested within Table',
     id: 'tableNested',
@@ -142,17 +211,24 @@ const examples = [
     data: tableForm.data,
     meta: tableForm.meta,
   },
+  // Other
   {
     title: 'Pie Chart',
     id: 'pieChart',
-    data,
-    meta: piechartMeta,
+    data: piechartSimpleData,
+    meta: piechartSimpleMeta,
   },
   {
     title: 'Popup Content',
     id: 'popupContent',
     data: listData,
     meta: popupMeta,
+  },
+  {
+    title: 'Rating Details',
+    id: 'ratingDetails',
+    data: ratingDetails.data,
+    meta: ratingDetails.meta,
   },
   {
     title: 'Show If Condition',
@@ -173,28 +249,10 @@ const examples = [
     meta: uploadMeta,
   },
   {
-    title: 'Input',
-    id: 'input',
-    data: exampleData,
-    meta: inputMeta,
-  },
-  {
-    title: 'Input Toggle Checkbox',
-    id: 'inputToggle',
-    data: exampleData,
-    meta: inputToggle,
-  },
-  {
     title: 'Invalid Array Data',
     id: 'invalidArray',
     data: invalidArrayData,
     meta: invalidArrayMeta,
-  },
-  {
-    title: 'Rating Details',
-    id: 'ratingDetails',
-    data: ratingDetails.data,
-    meta: ratingDetails.meta,
   },
   {
     title: 'All Possible Configurations',
@@ -250,7 +308,7 @@ export default class Examples extends Component {
           >
             {() => (
               <>
-                { ['experienceRatings', 'tableForm', 'ratingDetails', 'example1', 'example2'].includes(id) ? (
+                { ['experienceRatings', 'tableForm', 'ratingDetails', 'example1', 'example2', 'buttonIcon', 'selectIndexValue', 'selectStableValue', 'selectCascading', 'selectCascadingStable', 'selectReorder'].includes(id) ? (
                   <>
                     <UIRender
                       data={data}
@@ -264,7 +322,7 @@ export default class Examples extends Component {
                       translate={(v) => v}
                       dateFormat={"MM-DD-YYYY"}
                       apiCalls={{
-                        updateExperienceData,
+                        updateExperienceData: updatePerformanceData,
                         downloadFile: downloadHistoricalFileTemplate,
                         uploadFile: uploadHistoricalFile
                       }}
