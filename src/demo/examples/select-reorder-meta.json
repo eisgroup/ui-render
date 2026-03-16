@@ -1,0 +1,67 @@
+{
+  "view": "VerticalLayout",
+  "styles": "bg-white",
+  "items": [
+    {
+      "view": "VerticalLayout",
+      "styles": "margin",
+      "items": [
+        {
+          "view": "HorizontalLayout",
+          "items": [
+            {
+              "view": "Text",
+              "label": "Region",
+              "styles": "h5 padding-right middle"
+            },
+            {
+              "view": "Select",
+              "name": "RegionSelection",
+              "options": {
+                "name": "Regions"
+              },
+              "mapOptions": {
+                "text": "RegionName",
+                "value": "{index}"
+              },
+              "styles": "middle",
+              "compact": true
+            }
+          ]
+        },
+        {
+          "view": "VerticalLayout",
+          "styles": "padding-top width-50p",
+          "items": [
+            {
+              "view": "Text",
+              "label": "Data array order (selected item moves to index 0 on Get Data):",
+              "styles": "padding-v bold"
+            },
+            {
+              "view": "Table",
+              "name": "Regions",
+              "headers": [
+                {
+                  "id": "RegionName",
+                  "label": "Region",
+                  "classNameCell": "bold bg-info-light"
+                },
+                {
+                  "id": "Code",
+                  "label": "Code"
+                },
+                {
+                  "id": "Population",
+                  "label": "Population",
+                  "renderCell": "renderNumber"
+                }
+              ],
+              "relativeData": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

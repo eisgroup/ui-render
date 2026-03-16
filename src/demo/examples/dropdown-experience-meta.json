@@ -1,0 +1,98 @@
+{
+  "view": "VerticalLayout",
+  "styles": "bg-white",
+  "items": [
+    {
+      "view": "VerticalLayout",
+      "styles": "margin",
+      "items": [
+        {
+          "view": "VerticalLayout",
+          "styles": "padding-top margin-top",
+          "items": [
+            {
+              "view": "HorizontalLayout",
+              "items": [
+                {
+                  "view": "Text",
+                  "label": "Option",
+                  "styles": "h5 padding-right middle"
+                },
+                {
+                  "view": "Dropdown",
+                  "name": "optionX",
+                  "options": {
+                    "name": "RecordInputs.OptionInputs",
+                    "relativeData": false
+                  },
+                  "mapOptions": {
+                    "text": "OptionName",
+                    "value": "{index}"
+                  },
+                  "styles": "middle",
+                  "compact": true
+                }
+              ]
+            },
+            {
+              "view": "HorizontalLayout",
+              "items": [
+                {
+                  "view": "Text",
+                  "label": "Category",
+                  "styles": "h5 padding-right middle"
+                },
+                {
+                  "view": "Dropdown",
+                  "name": "categoryX",
+                  "options": {
+                    "name": "RecordInputs.OptionInputs.{state.optionX,0}.CategoryInputs",
+                    "relativeData": false
+                  },
+                  "mapOptions": "Category",
+                  "styles": "middle",
+                  "compact": true
+                }
+              ]
+            },
+            {
+              "view": "HorizontalLayout",
+              "styles": "padding-top",
+              "items": [
+                {
+                  "view": "VerticalLayout",
+                  "styles": "padding-right width-50p",
+                  "items": [
+                    {
+                      "view": "Table",
+                      "name": "RecordInputs.OptionInputs.{state.optionX,0}.CategoryInputs",
+                      "headers": [
+                        {
+                          "id": "Option",
+                          "label": "Option",
+                          "classNameCell": "bold bg-info-light"
+                        },
+                        {
+                          "id": "Category",
+                          "label": "Category",
+                          "classNameCell": "bold bg-info-light"
+                        },
+                        {
+                          "id": "Attribute",
+                          "label": "Attribute"
+                        }
+                      ],
+                      "relativeData": true,
+                      "vertical": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "buttoned": false
+        }
+      ]
+    }
+  ]
+}

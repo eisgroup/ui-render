@@ -1,0 +1,36 @@
+{
+  "Catalog": {
+    "Categories": [
+      {
+        "CategoryName": "Category 1",
+        "Products": [
+          {
+            "Category": "Category 1",
+            "Product": "Alpha",
+            "Status": "Active"
+          },
+          {
+            "Category": "Category 1",
+            "Product": "Beta",
+            "Status": "Pending"
+          },
+          {
+            "Category": "Category 1",
+            "Product": "Gamma",
+            "Status": "Active"
+          }
+        ]
+      },
+      {
+        "CategoryName": "Category 2",
+        "Products": [
+          {
+            "Category": "Category 2",
+            "Product": "Delta",
+            "Status": "Active"
+          }
+        ]
+      }
+    ]
+  }
+}

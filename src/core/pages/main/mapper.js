@@ -523,6 +523,18 @@ const RenderComponent = ({
                 if (input.icon && input.icon.view) input.icon = Render({ debug, ...input.icon })
             }
 
+            // For stable-value Selects, convert value to index for setState (supports {state.xxx} in cascading)
+            // Only pass the converted value (not name/event) so setStates uses the config keyPath,
+            // not the modified input.name which includes relativePath prefix
+            if (view === FIELD.TYPE.SELECT && isObject(mapOptions) && mapOptions.value && mapOptions.value !== '{index}' && input.onChange) {
+                const stableOnChange = input.onChange
+                const mappedOptions = input.options || []
+                input.onChange = (value) => {
+                    const idx = mappedOptions.findIndex(o => String(o.value) === String(value))
+                    return stableOnChange(idx >= 0 ? String(idx) : value)
+                }
+            }
+
             // Auto submit on changes
             if (autoSubmit) {
                 const { onChange } = input
@@ -557,7 +569,7 @@ const RenderComponent = ({
                 }
             }
 
-            return renderField({ view, ...input, ...readonly && { readonly }, ...disabled && { disabled }, translate })
+            return renderField({ view, ...input, instance, ...readonly && { readonly }, ...disabled && { disabled }, translate })
         }
     }
 }

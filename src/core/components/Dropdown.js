@@ -110,9 +110,19 @@ export function Dropdown ({
     setValue(valueFromParent || null)
   }, [valueFromParent])
 
+  // Reset value when options change and current value is no longer valid (e.g., cascading Select)
+  const validOptionValues = (Array.isArray(opts) ? opts : []).map(o => {
+    if (typeof o === 'string' || typeof o === 'number') return String(o)
+    return String(o.value != null ? o.value : o.text)
+  })
+  const optionValuesKey = validOptionValues.join('\n')
   useEffect(() => {
-    setValue(defaultValue.current)
-  }, [])
+    if (!onChange || !validOptionValues.length) return
+    if (valueFromParent == null || valueFromParent === '') return
+    if (!validOptionValues.includes(String(valueFromParent))) {
+      onChange(validOptionValues[0])
+    }
+  }, [optionValuesKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability - why?
   if (readonly) props.disabled = true // Semantic Dropdown does not accept `readOnly` prop

@@ -135,12 +135,12 @@ export function errorsProcessing(form, meta) {
 }
 
 /*
- Expected format of filed validation object (from Policy team)
+ Expected format of field validation object
  {
     "quote.termDetails[0].termEffectiveDate": {
         "messages": [
             {
-                "text": "Master Policy should be effective on the 1st day of month."
+                "text": "Record should be effective on the 1st day of month."
             }
         ],
     }
@@ -173,7 +173,7 @@ export const convertFieldNameToTitleCaseText = (str) => {
 }
 
 // Find Select fields and change options order in case select was changed
-const changeOptionOrderForSelectFields = (data, meta) => {
+export const changeOptionOrderForSelectFields = (data, meta) => {
   // find data related to Select and change options order
   const recursiveDataParser = (data, optionName, selectValue) => {
     let isDataOrderChanged = false

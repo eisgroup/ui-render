@@ -1,0 +1,25 @@
+{
+  "RegionSelection": "1",
+  "Regions": [
+    {
+      "RegionName": "North",
+      "Code": "N",
+      "Population": 1200000
+    },
+    {
+      "RegionName": "South",
+      "Code": "S",
+      "Population": 3400000
+    },
+    {
+      "RegionName": "East",
+      "Code": "E",
+      "Population": 870000
+    },
+    {
+      "RegionName": "West",
+      "Code": "W",
+      "Population": 2100000
+    }
+  ]
+}

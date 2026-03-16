@@ -1,0 +1,109 @@
+{
+  "view": "VerticalLayout",
+  "styles": "bg-white",
+  "items": [
+    {
+      "view": "VerticalLayout",
+      "styles": "margin",
+      "items": [
+        {
+          "view": "VerticalLayout",
+          "styles": "padding-top margin-top",
+          "items": [
+            {
+              "view": "HorizontalLayout",
+              "items": [
+                {
+                  "view": "Text",
+                  "label": "Group",
+                  "styles": "h5 padding-right middle"
+                },
+                {
+                  "view": "VerticalLayout",
+                  "name": "Settings.Record",
+                  "items": [
+                    {
+                      "view": "Select",
+                      "name": "GroupSelection",
+                      "options": {
+                        "name": "GroupList"
+                      },
+                      "mapOptions": {
+                        "text": "GroupName",
+                        "value": "GroupName"
+                      },
+                      "styles": "middle",
+                      "compact": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "view": "HorizontalLayout",
+              "items": [
+                {
+                  "view": "Text",
+                  "label": "Item",
+                  "styles": "h5 padding-right middle"
+                },
+                {
+                  "view": "VerticalLayout",
+                  "name": "Settings.Record.GroupList.{state.GroupSelection,0}",
+                  "items": [
+                    {
+                      "view": "Select",
+                      "name": "ItemSelection",
+                      "options": {
+                        "name": "ItemList"
+                      },
+                      "mapOptions": {
+                        "text": "ItemType",
+                        "value": "ItemType"
+                      },
+                      "styles": "middle",
+                      "compact": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "view": "HorizontalLayout",
+              "styles": "padding-top",
+              "items": [
+                {
+                  "view": "VerticalLayout",
+                  "styles": "padding-right width-50p",
+                  "items": [
+                    {
+                      "view": "Table",
+                      "name": "Settings.Record.GroupList.{state.GroupSelection,0}.ItemList",
+                      "headers": [
+                        {
+                          "id": "ItemType",
+                          "label": "Item Type",
+                          "classNameCell": "bold bg-info-light"
+                        },
+                        {
+                          "id": "Status",
+                          "label": "Status"
+                        },
+                        {
+                          "id": "Priority",
+                          "label": "Priority"
+                        }
+                      ],
+                      "relativeData": true,
+                      "vertical": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

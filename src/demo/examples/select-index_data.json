@@ -1,0 +1,17 @@
+{
+  "selectedOption": "2",
+  "plans": [
+    {
+      "label": "Basic",
+      "id": "B"
+    },
+    {
+      "label": "Standard",
+      "id": "S"
+    },
+    {
+      "label": "Amount",
+      "id": "P"
+    }
+  ]
+}
