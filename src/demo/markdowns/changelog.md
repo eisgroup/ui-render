@@ -1,5 +1,46 @@
 ### Table of Contents
 
+### v0.32.0
+
+#### New
+- Cascading Select/Dropdown support — child options update automatically when parent selection changes
+- Pre-initialize Select/Dropdown state from initial data (`initSelectStatesFromData`) so `{state.xxx}` interpolation resolves on first render
+- Stable-value Select support — `mapOptions.value` can reference a data field (e.g. `id`) instead of `{index}`, with automatic value-to-index conversion for cascading
+- `showIf` conditional display for Select/Dropdown fields
+- Demo app: new Changelog component with syntax highlighting
+- Demo app: new examples for cascading selects, stable-value selects, select reordering, and dropdown experience
+
+#### Updated
+- **recharts** upgraded from v1.8 to v2.15 — PieChart rewritten as a functional component with hooks, `Cell` rendered as JSX children (v2 API), fixed `dataNormalized` argument bug, eliminated module-level mutable state
+- Updated PieChart demo example with neutral domain-agnostic data
+
+#### Build & Infrastructure
+- Migrated from `craco` to standalone Webpack configuration (`webpack.demo.config.mjs`)
+- Webpack configs converted from `.js` to `.mjs` (ES modules)
+- Library build now compiles LESS/CSS and outputs `dist/static/all.css` with CSS minification
+- Added standalone CSS build script (`scripts/build-css.js`)
+- Added `stylelint` for LESS linting
+- Added Jest testing infrastructure with `jest.config.js`, `@testing-library/react`, `@testing-library/jest-dom`
+- CSS contract tests to verify LESS compilation and baseline class inventory
+- Replaced `ProvidePlugin(process)` with `DefinePlugin` in webpack configs
+- Node.js engine requirement: `>=22`, `.nvmrc` updated to v24
+- Updated dependencies: `recharts` v2.15, `react-syntax-highlighter` v16, `copy-webpack-plugin` v14, `css-minimizer-webpack-plugin` v8, `remark-gfm` v3
+
+#### Fixes
+- Fix cascading Select data corruption caused by stale closure in `react-final-form` — use `form.change()` instead of `input.onChange()` for field updates
+- Fix Select `onChange` now applies to both Select and Dropdown (previously only Dropdown got auto-generated `setState` handler)
+- Fix `mapOptions.value` default to `{index}` for Select fields (consistent with Dropdown)
+- Dropdown resets value when options change and current value is no longer valid
+- Pass `instance` to form fields for direct form state access
+
+#### Tests
+- Added unit tests for `toOpenLConfig`, `initSelectStatesFromData`, `changeOptionOrderForSelectFields`
+- Added unit tests for `replaceDeep`, `mapErrorObjectToUIFormat`, `convertFieldNameToTitleCaseText`, `getDateStringFromDateObject`, `normalizeIncomingData`
+- Added unit tests for `mapProps`, `getCurrencySymbol`, `interpolateString`
+- Added component tests for Select (rendering, controlled/uncontrolled, onChange, accessibility)
+- Added component tests for Dropdown (rendering, options handling, cascading reset, done state, search mode)
+- Added CSS contract tests (LESS compilation, baseline class inventory, icon fonts, Semantic UI)
+
 ### v0.31.7
 #### Fixes
 - Fix table data display issue caused by relativeData propagation - tables now always extract data by name attribute regardless of parent relativeData setting

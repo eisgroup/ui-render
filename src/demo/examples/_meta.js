@@ -17,7 +17,7 @@ const metaMeta = {
               items: [
                 {
                   view: 'Title',
-                  label: 'Fully Insured',
+                  label: 'Fully Covered',
                   styles: 'margin-right-small'
                 },
                 {
@@ -30,8 +30,8 @@ const metaMeta = {
             {
               view: 'Input',
               className: 'margin-bottom max-width-290',
-              label: 'Number of claims per employee',
-              name: 'adminExpenses.perEmployeeClaims',
+              label: 'Number of requests per employee',
+              name: 'adminExpenses.perEmployeeRequests',
               type: 'number',
               min: 1,
               format: 'integer',
@@ -44,7 +44,7 @@ const metaMeta = {
               name: 'adminCosts',
               sorts: [
                 {id: 'annualAmt', order: 0},
-                {id: 'premiumPct', order: 1, /*sortKey: 'amt.pct'*/},
+                {id: 'amountPct', order: 1, /*sortKey: 'amt.pct'*/},
               ],
               extraHeaders: [
                 [
@@ -124,19 +124,19 @@ const metaMeta = {
                   label: 'Annual Amount'
                 },
                 {
-                  id: 'premiumPct',
+                  id: 'amountPct',
                   className: 'right border-right',
                   classNameCell: 'right',
                   classNameCellWrap: 'border-right',
                   renderCell: 'Percent',
-                  label: '% of Premium'
+                  label: '% of Amount'
                 },
                 {
-                  id: 'perClaimAmt',
+                  id: 'perRequestAmt',
                   className: 'right',
                   classNameCell: 'right',
                   renderCell: 'Currency',
-                  label: 'Per Claim'
+                  label: 'Per Request'
                 },
                 {
                   id: 'perEmployeeAmt',
@@ -155,7 +155,7 @@ const metaMeta = {
                   }
                 },
                 {
-                  id: 'premiumPct',
+                  id: 'amountPct',
                   values: {
                     '1': 'text bold',
                   }
@@ -178,24 +178,24 @@ const metaMeta = {
           },
           { // Shorthand definition version (must have `name` defined, but `onChange` undefined)
             view: 'Dropdown',
-            name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
-            options: 'planCalculations', // -> key path pointing to array in *_data.json
-            mapOptions: 'planName', // -> key path pointing to human readable value within each option (used as label)
-            // value: {name: '{state.active.plan,0}'}, // -> automatically added by default due to rules
-            // onChange: 'setState,active.plan', // function defined as string, added by default due to rules
+            name: 'active.option', // -> must be unique key path identifier that does not exist in *_data.json
+            options: 'optionCalculations', // -> key path pointing to array in *_data.json
+            mapOptions: 'optionName', // -> key path pointing to human readable value within each option (used as label)
+            // value: {name: '{state.active.option,0}'}, // -> automatically added by default due to rules
+            // onChange: 'setState,active.option', // function defined as string, added by default due to rules
             styles: 'margin-h-smaller',
           },
           { // Full definition version
             view: 'Dropdown',
-            name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
-            value: {name: '{state.active.plan,0}'},
+            name: 'active.option', // -> must be unique key path identifier that does not exist in *_data.json
+            value: {name: '{state.active.option,0}'},
             onChange: { // function defined as object
               name: 'setState',
-              args: ['active.plan'],
+              args: ['active.option'],
             },
-            options: {name: 'planCalculations'}, // `planCalculations` is key path pointing to array in *_data.json
+            options: {name: 'optionCalculations'}, // `optionCalculations` is key path pointing to array in *_data.json
             mapOptions: {
-              text: 'planName', // `planName` is key path pointing to value for each item in `options` above
+              text: 'optionName', // `optionName` is key path pointing to value for each item in `options` above
               value: '{index}', // using index of item, instead of its value as ID
             },
             styles: 'margin-h-smaller',
@@ -235,10 +235,10 @@ const metaMeta = {
           className: 'wrap middle padding-h',
           items: [
             {
-              view: 'Title', label: 'Policy ID',
+              view: 'Title', label: 'Record ID',
             },
             {
-              view: 'Text', children: {name: 'policyID'}, styles: 'padding',
+              view: 'Text', children: {name: 'recordID'}, styles: 'padding',
             },
           ],
         },
@@ -301,7 +301,7 @@ const metaMeta = {
                           },
                           {
                             view: 'PieChart',
-                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.ageBreakdown',
+                            name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.ageBreakdown',
                             legends: {
                               columns: 2,
                             },
@@ -345,7 +345,7 @@ const metaMeta = {
                           },
                           {
                             view: 'PieChart',
-                            name: 'planCalculations.{state.active.plan,0}.subGroupEnrollmentBreakdown[0].enrollmentBreakdown',
+                            name: 'optionCalculations.{state.active.option,0}.subGroupEnrollmentBreakdown[0].enrollmentBreakdown',
                             legends: true,
                             mapItems: {
                               label: 'tier',
@@ -363,12 +363,12 @@ const metaMeta = {
                   },
                   {
                     view: 'Table',
-                    name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.enrollmentByState',
+                    name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.enrollmentByState',
                     relativeData: false,
                     // Extra render function for Table Items (rows in default layout)
                     renderItem: {
                       view: 'Table',
-                      name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.enrollmentByMSA',
+                      name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.enrollmentByMSA',
                       relativeData: false,
                       filterItems: [
                         //  ╭ key path to value in this child-table's item to use for filtering
@@ -437,7 +437,7 @@ const metaMeta = {
                                 items: [
                                   {
                                     view: 'Counter',
-                                    end: {name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].ppoPenetration'},
+                                    end: {name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.networkDetails[0].ppoPenetration'},
                                     render: 'Percent'
                                   },
                                 ]
@@ -459,7 +459,7 @@ const metaMeta = {
                                 items: [
                                   {
                                     view: 'Counter',
-                                    end: {name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].netUtilization'},
+                                    end: {name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.networkDetails[0].netUtilization'},
                                     render: 'Percent'
                                   },
                                 ]
@@ -484,7 +484,7 @@ const metaMeta = {
                             items: [
                               {
                                 view: 'Input',
-                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails.0.area',
+                                name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.networkDetails.0.area',
                                 label: 'Area (autoSubmit)',
                                 removable: true,
                                 required: true,
@@ -495,14 +495,14 @@ const metaMeta = {
                               {view: 'Space'},
                               {
                                 view: 'Input',
-                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails.0.trend',
+                                name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.networkDetails.0.trend',
                                 label: 'trend',
                                 removable: true,
                               },
                               {view: 'Space'},
                               {
                                 view: 'Input',
-                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails.0.maximumEEandSP',
+                                name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.networkDetails.0.maximumEEandSP',
                                 label: 'maximum 10 (EE and SP)',
                                 type: 'number',
                                 max: 10,
@@ -510,7 +510,7 @@ const metaMeta = {
                               {view: 'Space'},
                               {
                                 view: 'Input',
-                                name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails.0.maximumCH',
+                                name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.networkDetails.0.maximumCH',
                                 label: 'minimum 1 (CH)',
                                 type: 'number',
                                 min: 1,
@@ -527,7 +527,7 @@ const metaMeta = {
                                 items: [
                                   {
                                     view: 'Input',
-                                    name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].rateCalcEmp',
+                                    name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.networkDetails[0].rateCalcEmp',
                                     label: 'Areas (format: double5)',
                                     type: 'number',
                                     format: 'double5',
@@ -536,7 +536,7 @@ const metaMeta = {
                                   {view: 'Space'},
                                   {
                                     view: 'Input',
-                                    name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.networkDetails[0].rateCalcWOEmp',
+                                    name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.networkDetails[0].rateCalcWOEmp',
                                     label: 'trends',
                                   },
                                 ],
@@ -558,62 +558,62 @@ const metaMeta = {
                         items: [
                           {
                             view: 'Input',
-                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.initialLoad',
+                            name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.initialLoad',
                             label: 'Initial Load',
                           },
                           {view: 'Space'},
                           {
                             view: 'Input',
-                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.occupationFactor',
+                            name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.occupationFactor',
                             label: 'Occupation',
                           },
                           {view: 'Space'},
                           {
                             view: 'Input',
-                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.occupation',
+                            name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.occupation',
                             label: 'Occupation Code',
                             readonly: true,
                           },
                           {view: 'Space'},
                           {
                             view: 'Input',
-                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.waitGroupSize',
+                            name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.waitGroupSize',
                             label: 'Wait Grp Size',
                           },
                           {view: 'Space'},
                           {
                             view: 'Input',
-                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.planUtilization',
+                            name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.optionUtilization',
                             label: 'Plan Util',
                           },
                           {view: 'Space'},
                           {
                             view: 'Input',
-                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.groupSize',
+                            name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.groupSize',
                             label: 'Group Size',
                           },
                           {view: 'Space'},
                           {
                             view: 'Input',
-                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.yearLoad',
+                            name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.yearLoad',
                             label: 'Cal Year Load',
                           },
                           {view: 'Space'},
                           {
                             view: 'Input',
-                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.voluntaryLoad',
+                            name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.voluntaryLoad',
                             label: 'Vol Load',
                           },
                           {view: 'Space'},
                           {
                             view: 'Input',
-                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.waitingLoad',
+                            name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.waitingLoad',
                             label: 'Wait Load',
                           },
                           {view: 'Space'},
                           {
                             view: 'Input',
-                            name: 'planCalculations.{state.active.plan,0}.manualClaimDetail.rolloverLoad',
+                            name: 'optionCalculations.{state.active.option,0}.manualRequestDetail.rolloverLoad',
                             label: 'Rollover Load',
                           },
                         ],
@@ -666,7 +666,7 @@ const metaMeta = {
                   {view: 'Title', children: 'Calculate Rate'},
                   {
                     view: 'Table',
-                    name: 'planCalculations.0.tierRates',
+                    name: 'optionCalculations.0.tierRates',
                     headers: [
                       {
                         id: 'tier',
@@ -687,7 +687,7 @@ const metaMeta = {
                         label: 'Manual Rate',
                         renderCell: {
                           view: 'Input',
-                          name: 'planCalculations.0.tierRates.{index}.manualRate',
+                          name: 'optionCalculations.0.tierRates.{index}.manualRate',
                           relativeData: false,
                           type: 'number',
                           icon: 'dollar',
@@ -710,28 +710,28 @@ const metaMeta = {
                       {
                         tier: 'Composite Rate',
                         adjManualRate: {
-                          name: 'planCalculations.{state.active.plan,0}.adjManualCompositeRate',
+                          name: 'optionCalculations.{state.active.option,0}.adjManualCompositeRate',
                           relativeData: false,
                         }, // null
                         adjFormulaRate: {
-                          name: 'planCalculations.{state.active.plan,0}.adjFormulaCompositeRate',
+                          name: 'optionCalculations.{state.active.option,0}.adjFormulaCompositeRate',
                           relativeData: false,
                         }, // undefined
                         manualRate: {
-                          name: 'planCalculations.{state.active.plan,0}.manualCompositeRate',
+                          name: 'optionCalculations.{state.active.option,0}.manualCompositeRate',
                           relativeData: false,
                           render: 'Currency',
                         },
                         formulaRate: {
                           view: 'Input',
-                          name: 'planCalculations.{state.active.plan,0}.formulaCompositeRate',
+                          name: 'optionCalculations.{state.active.option,0}.formulaCompositeRate',
                           relativeData: false,
                           type: 'number',
                           unit: 'USD',
                           placeholder: 'placeholder'
                         },
                         proposedRate: {
-                          name: 'planCalculations.{state.active.plan,0}.proposedCompositeRate',
+                          name: 'optionCalculations.{state.active.option,0}.proposedCompositeRate',
                           relativeData: false,
                         },
                       }

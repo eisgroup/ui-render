@@ -1,10 +1,10 @@
 const expandListMeta = {
   view: 'ExpandList',
-  name: 'coverages',
+  name: 'categories',
   renderLabel: {
     view: 'Text',
     children: {
-      name: 'coverageID',
+      name: 'categoryID',
       relativeData: true,
     },
   },

@@ -1,6 +1,6 @@
 {
   "view": "List",
-  "name": "coverages",
+  "name": "categories",
   "renderItem": {
     "view": "Column",
     "styles": "padding border",
@@ -8,27 +8,27 @@
       {
         "view": "Title",
         "label": {
-          "name": "coverageID",
+          "name": "categoryID",
           "relativeData": true
         }
       },
       {
         "view": "Text",
-        "label": "I'm Hidden because there is no 'data.coverageID'",
+        "label": "I'm Hidden because there is no 'data.categoryID'",
         "showIf": {
-          "name": "coverageID",
+          "name": "categoryID",
           "relativeData": false
         }
       },
       {
         "view": "Text",
-        "label": "You see this because <\"showIf\": \"coverageID\"> resolves to 'data.coverages.{index}.coverageID', which is considered 'Truthy'",
-        "showIf": "coverageID",
+        "label": "You see this because <\"showIf\": \"categoryID\"> resolves to 'data.categories.{index}.categoryID', which is considered 'Truthy'",
+        "showIf": "categoryID",
         "styles": "padding"
       },
       {
         "view": "Text",
-        "name": "coverageID",
+        "name": "categoryID",
         "relativeData": true,
         "label": "And here is how to evaluate it <\"showIf\": {\"equal\": \"Gold\"}>",
         "showIf": {
@@ -38,11 +38,11 @@
       },
       {
         "view": "Text",
-        "label": "Finally, only Silver shows up because <\"equal\": {\"name\": \"coverages.1.coverageID\", \"relativeData\": false}> evaluates to 'Silver'",
+        "label": "Finally, only Silver shows up because <\"equal\": {\"name\": \"categories.1.categoryID\", \"relativeData\": false}> evaluates to 'Silver'",
         "showIf": {
-          "name": "coverageID",
+          "name": "categoryID",
           "equal": {
-            "name": "coverages.1.coverageID",
+            "name": "categories.1.categoryID",
             "relativeData": false
           }
         },

@@ -4,9 +4,9 @@
 
 1. In Chrome browser on your desktop computer (laptop), right click anywhere inside UI Render
 2. Choose "Inspect"
-   ![ui-render-inspect](/ui-render/static/images/ui-render-inspect.png)
+   ![ui-render-inspect](static/images/ui-render-inspect.png)
 3. Under `Elements` tab, search (press Ctrl + F for Windows, or Cmd + F for Mac) and type `ui-render`.
-   ![ui-render-version](/ui-render/static/images/ui-render-version.png)
+   ![ui-render-version](static/images/ui-render-version.png)
    The UI Render version is `data-version` attribute in the corresponding node of DOM.
 
 ## What is `view`?
@@ -198,12 +198,74 @@ const dataJson = {
 }
 ```
 
+## How to keep Select value stable (index vs id)
+
+If Select uses index-based values, its selected value depends on options order:
+
+```json
+{
+  "mapOptions": {
+    "text": "label",
+    "value": "{index}"
+  }
+}
+```
+
+With this config, selected value is a string index (`"0"`, `"1"`, `"2"`...). During `getFormData()` / submit payload collection,
+UI Render may reorder options in the resulting data and remove the selected field key.
+
+Use a stable key to avoid this behavior:
+
+```json
+{
+  "mapOptions": {
+    "text": "label",
+    "value": "id"
+  }
+}
+```
+
+With `value: "id"`, selected value is stable and does not depend on options position.
+
+## How to create cascading Select fields?
+
+Use `{state.xxx}` interpolation in the dependent Select's `options.name` path.
+When the parent Select changes, it updates `state`, causing the dependent Select to resolve new options.
+
+Example: Category → Product cascading:
+```json
+{
+  "view": "Select",
+  "name": "categoryX",
+  "options": { "name": "Catalog.Categories", "relativeData": false },
+  "mapOptions": { "text": "CategoryName", "value": "{index}" }
+}
+```
+```json
+{
+  "view": "Select",
+  "name": "productX",
+  "options": {
+    "name": "Catalog.Categories.{state.categoryX,0}.Products",
+    "relativeData": false
+  },
+  "mapOptions": "Product"
+}
+```
+
+When `categoryX` changes, `{state.categoryX,0}` resolves to the selected index, and the Product Select
+reloads its options from the new category's `Products` array.
+
+**Note:** When using index-based `mapOptions` (`value: "{index}"`), `changeOptionOrderForSelectFields`
+may reorder the submitted data array. Use a stable key (e.g. `value: "id"`) if order must be preserved.
+
 ## How to format input number output
 `decimals` - define how many fractional digits to show
 
 `percentage` - add percent char
 
 `separateThousands` - separate thousands in big numbers. Don't work with `percentage`
+
 ```json
 {
    "view": "Input",

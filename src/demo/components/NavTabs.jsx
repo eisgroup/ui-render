@@ -5,17 +5,37 @@ import ScrollView from 'ui-react-pack/ScrollView'
 import toc from 'remark-toc'
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
 import {oneLight} from 'react-syntax-highlighter/dist/esm/styles/prism'
+import './markdown.css'
 import changelogMarkdown from '../markdowns/changelog.md'
 import stylesMarkdown from '../markdowns/styles.md'
 import configMarkdown from '../markdowns/config.md'
 import docsMarkdown from '../markdowns/docs.md'
 import faqMarkdown from '../markdowns/faq.md'
 import Tabs from '../../core/components/Tabs'
+import Changelog from './Changelog'
 import Demo from '../pages/Demo'
 import Examples from '../pages/Examples'
 
 const mdProps = {
     remarkPlugins: [toc],
+}
+
+function textContent(children) {
+    if (typeof children === 'string') return children
+    if (Array.isArray(children)) return children.map(textContent).join('')
+    if (children && children.props) return textContent(children.props.children)
+    return ''
+}
+
+function slugify(text) {
+    return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
+}
+
+function heading(Tag) {
+    return ({ children, ...props }) => {
+        const id = slugify(textContent(children))
+        return <Tag id={id} {...props}>{children}</Tag>
+    }
 }
 
 /**
@@ -40,7 +60,13 @@ const NavTabs = (props) => {
         fetch(faqMarkdown).then(r => r.text()).then(faq => setFaq(faq))
     }, [])
 
-    const components= {
+    const components = {
+        h1: heading('h1'),
+        h2: heading('h2'),
+        h3: heading('h3'),
+        h4: heading('h4'),
+        h5: heading('h5'),
+        h6: heading('h6'),
         code: (props) => {
             const {children, className, node, ...rest} = props
             const match = /language-(\w+)/.exec(className || '')
@@ -63,11 +89,11 @@ const NavTabs = (props) => {
     const tabs = [
         {
             path: '', tab: 'Summary',
-            content: () => <Markdown {...mdProps} components={components}>{docs}</Markdown>,
+            content: () => <div className="markdown-body"><Markdown {...mdProps} components={components}>{docs}</Markdown></div>,
         },
         {
             path: '/configuration', tab: 'Configuration',
-            content: () => <Markdown {...mdProps} components={components}>{config}</Markdown>,
+            content: () => <div className="markdown-body"><Markdown {...mdProps} components={components}>{config}</Markdown></div>,
         },
         {
             path: '/demo', tab: 'Demo',
@@ -79,15 +105,15 @@ const NavTabs = (props) => {
         },
         {
             path: '/styles', tab: 'Styles',
-            content: () => <Markdown {...mdProps} components={components}>{styles}</Markdown>,
+            content: () => <div className="markdown-body"><Markdown {...mdProps} components={components}>{styles}</Markdown></div>,
         },
         {
             path: '/changelog', tab: 'Change Log',
-            content: () => <Markdown {...mdProps} components={components}>{changelog}</Markdown>,
+            content: () => <Changelog content={changelog} />,
         },
         {
             path: '/faq', tab: 'FAQ',
-            content: () => <Markdown {...mdProps} components={components}>{faq}</Markdown>,
+            content: () => <div className="markdown-body"><Markdown {...mdProps} components={components}>{faq}</Markdown></div>,
         },
     ]
 
@@ -101,7 +127,8 @@ const NavTabs = (props) => {
     return (
         <ScrollView fill className={'app-docs padding-large no-padding-top'}>
             <Tabs
-                defaultIndex={tabIndex}
+                activeIndex={tabIndex >= 0 ? tabIndex : 0}
+                defaultIndex={tabIndex >= 0 ? tabIndex : 0}
                 onChange={onClickTab}
                 items={[...tabs]}
             />

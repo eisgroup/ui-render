@@ -1,0 +1,64 @@
+.changelog {
+    max-width: 900px;
+}
+
+.changelog__card {
+    border: 1px solid #d1d9e0;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.changelog__version {
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    background: #f6f8fa;
+    border-bottom: 1px solid #d1d9e0;
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    color: #24292f;
+}
+
+.changelog__content {
+    padding: 12px 20px 4px;
+}
+
+.changelog__content h4 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #656d76;
+    margin: 8px 0 4px;
+    padding: 0;
+    border: none;
+}
+
+.changelog__content h4:first-child {
+    margin-top: 0;
+}
+
+.changelog__content ul {
+    padding-left: 1.5em;
+    margin: 4px 0 12px;
+}
+
+.changelog__content li {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.ui-render .changelog__content ul li + li {
+    margin-top: 2px;
+}
+
+.changelog__content p {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.changelog__content pre {
+    margin: 8px 0 12px;
+}

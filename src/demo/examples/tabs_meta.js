@@ -4,23 +4,23 @@ export const meta = {
   items: [
     {
       tab: {
-        name: 'coverages.0.coverageID',
+        name: 'categories.0.categoryID',
       },
       content: {
         view: 'Text',
         label: {
-          name: 'coverages.0.fundingStructure.contributionType',
+          name: 'categories.0.configuration.inputType',
         }
       }
     },
     {
       tab: {
-        name: 'coverages.1.coverageID',
+        name: 'categories.1.categoryID',
       },
       content: {
         view: 'Text',
         label: {
-          name: 'coverages.1.fundingStructure.contributionType',
+          name: 'categories.1.configuration.inputType',
         }
       }
     },

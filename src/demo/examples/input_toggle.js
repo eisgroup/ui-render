@@ -3,7 +3,7 @@ const inputToggle = {
   items: [
     {
       view: 'Input',
-      name: 'coverages.0.checkbox',
+      name: 'categories.0.checkbox',
       styles: 'margin',
       label: 'Label (used if `labelTrue` or `labelFalse` undefined)',
       labelTrue: 'True Label',

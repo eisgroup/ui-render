@@ -35,7 +35,7 @@ export const meta = {
               {
                 '@class': 'org.openl.generated.beans.Dropdown',
                 'view': 'Dropdown',
-                'name': 'plan',
+                'name': 'option',
                 'options': {
                   'name': 'Plans'
                 },
@@ -66,7 +66,7 @@ export const meta = {
                   {
                     '@class': 'org.openl.generated.beans.RowList',
                     'view': 'RowList',
-                    'name': 'Plans[{state.plan,0}].Coverages',
+                    'name': 'Plans[{state.option,0}].Categories',
                     'styles': 'wrap justify margin-v',
                     'relativeData': true,
                     'renderItem': {
@@ -78,7 +78,7 @@ export const meta = {
                           '@class': 'org.openl.generated.beans.Text',
                           'view': 'Text',
                           'children': {
-                            'name': 'CoverageType',
+                            'name': 'CategoryType',
                             'relativeData': null
                           },
                           'styles': 'h3'
@@ -108,7 +108,7 @@ export const meta = {
                                   'label': 'Enrolled Lives'
                                 }
                               ],
-                              'version': 'CoverageExpensesRow1Column1',
+                              'version': 'CategoryExpensesRow1Column1',
                               'style': {
                                 'minWidth': '45%'
                               }
@@ -122,7 +122,7 @@ export const meta = {
                                   '@class': 'org.openl.generated.beans.Text',
                                   'view': 'Text',
                                   'children': {
-                                    'name': 'MonthlyPremium',
+                                    'name': 'MonthlyAmount',
                                     'relativeData': null
                                   },
                                   'styles': 'h3'
@@ -130,16 +130,16 @@ export const meta = {
                                 {
                                   '@class': 'org.openl.generated.beans.Text',
                                   'view': 'Text',
-                                  'label': 'Monthly Manual Premium'
+                                  'label': 'Monthly Manual Amount'
                                 }
                               ],
-                              'version': 'CoverageExpensesRow1Column2',
+                              'version': 'CategoryExpensesRow1Column2',
                               'style': {
                                 'minWidth': '45%'
                               }
                             }
                           ],
-                          'version': 'CoverageExpensesRow1'
+                          'version': 'CategoryExpensesRow1'
                         },
                         {
                           '@class': 'org.openl.generated.beans.Layout',
@@ -170,7 +170,7 @@ export const meta = {
                                   'label': 'Tax'
                                 }
                               ],
-                              'version': 'CoverageExpensesRow2Column2'
+                              'version': 'CategoryExpensesRow2Column2'
                             },
                             {
                               '@class': 'org.openl.generated.beans.Layout',
@@ -196,7 +196,7 @@ export const meta = {
                                   'label': 'Profit'
                                 }
                               ],
-                              'version': 'CoverageExpensesRow2Column3'
+                              'version': 'CategoryExpensesRow2Column3'
                             },
                             {
                               '@class': 'org.openl.generated.beans.Layout',
@@ -222,10 +222,10 @@ export const meta = {
                                   'label': 'Expenses'
                                 }
                               ],
-                              'version': 'CoverageExpensesRow2Column4'
+                              'version': 'CategoryExpensesRow2Column4'
                             }
                           ],
-                          'version': 'CoverageExpensesRow2'
+                          'version': 'CategoryExpensesRow2'
                         }
                       ],
                       'version': 'ExpenseColumn',
@@ -279,7 +279,7 @@ export const meta = {
                             'Core': {
                               'view': 'Text',
                               'label': {
-                                'name': 'Plans[{state.plan,0}].Coverages[0].NumberOfLives',
+                                'name': 'Plans[{state.option,0}].Categories[0].NumberOfLives',
                                 'relativeData': false
                               },
                               'renderLabel': {
@@ -290,7 +290,7 @@ export const meta = {
                             'BuyUp': {
                               'view': 'Text',
                               'label': {
-                                'name': 'Plans[{state.plan,0}].Coverages[1].NumberOfLives',
+                                'name': 'Plans[{state.option,0}].Categories[1].NumberOfLives',
                                 'relativeData': false
                               },
                               'renderLabel': {
@@ -305,7 +305,7 @@ export const meta = {
                             'Core': {
                               'view': 'Text',
                               'label': {
-                                'name': 'Plans[{state.plan,0}].Coverages[0].TotalMonthlyPreExpenseCost',
+                                'name': 'Plans[{state.option,0}].Categories[0].TotalMonthlyPreExpenseCost',
                                 'relativeData': false
                               },
                               'renderLabel': {
@@ -316,7 +316,7 @@ export const meta = {
                             'BuyUp': {
                               'view': 'Text',
                               'label': {
-                                'name': 'Plans[{state.plan,0}].Coverages[1].TotalMonthlyPreExpenseCost',
+                                'name': 'Plans[{state.option,0}].Categories[1].TotalMonthlyPreExpenseCost',
                                 'relativeData': false
                               },
                               'renderLabel': {
@@ -327,11 +327,11 @@ export const meta = {
                           },
                           {
                             '@class': 'org.openl.generated.beans.TableRowsItems',
-                            'Description': 'Net ClaimCost',
+                            'Description': 'Net RequestCost',
                             'Core': {
                               'view': 'Text',
                               'label': {
-                                'name': 'Plans[{state.plan,0}].Coverages[0].TotalNetClaimCost',
+                                'name': 'Plans[{state.option,0}].Categories[0].TotalNetRequestCost',
                                 'relativeData': false
                               },
                               'renderLabel': {
@@ -342,7 +342,7 @@ export const meta = {
                             'BuyUp': {
                               'view': 'Text',
                               'label': {
-                                'name': 'Plans[{state.plan,0}].Coverages[1].TotalNetClaimCost',
+                                'name': 'Plans[{state.option,0}].Categories[1].TotalNetRequestCost',
                                 'relativeData': false
                               },
                               'renderLabel': {
@@ -357,7 +357,7 @@ export const meta = {
                             'Core': {
                               'view': 'Text',
                               'label': {
-                                'name': 'Plans[{state.plan,0}].Coverages[0].TotalWeeklyBenefit',
+                                'name': 'Plans[{state.option,0}].Categories[0].TotalWeeklyBenefit',
                                 'relativeData': false
                               },
                               'renderLabel': {
@@ -368,7 +368,7 @@ export const meta = {
                             'BuyUp': {
                               'view': 'Text',
                               'label': {
-                                'name': 'Plans[{state.plan,0}].Coverages[1].TotalWeeklyBenefit',
+                                'name': 'Plans[{state.option,0}].Categories[1].TotalWeeklyBenefit',
                                 'relativeData': false
                               },
                               'renderLabel': {
@@ -383,7 +383,7 @@ export const meta = {
                             'Core': {
                               'view': 'Text',
                               'label': {
-                                'name': 'Plans[{state.plan,0}].Coverages[0].Rate',
+                                'name': 'Plans[{state.option,0}].Categories[0].Rate',
                                 'relativeData': false
                               },
                               'renderLabel': {
@@ -394,7 +394,7 @@ export const meta = {
                             'BuyUp': {
                               'view': 'Text',
                               'label': {
-                                'name': 'Plans[{state.plan,0}].Coverages[1].Rate',
+                                'name': 'Plans[{state.option,0}].Categories[1].Rate',
                                 'relativeData': false
                               },
                               'renderLabel': {
@@ -421,7 +421,7 @@ export const meta = {
                   {
                     '@class': 'org.openl.generated.beans.RowList',
                     'view': 'RowList',
-                    'name': 'Plans[{state.plan,0}].Coverages',
+                    'name': 'Plans[{state.option,0}].Categories',
                     'styles': 'wrap justify margin-v',
                     'relativeData': true,
                     'renderItem': {
@@ -439,7 +439,7 @@ export const meta = {
                           '@class': 'org.openl.generated.beans.Text',
                           'view': 'Text',
                           'children': {
-                            'name': 'CoverageType',
+                            'name': 'CategoryType',
                             'relativeData': true
                           },
                           'styles': 'h3'
@@ -458,7 +458,7 @@ export const meta = {
                           }
                         }
                       ],
-                      'version': 'CoveragesDemographicPieChartColumn'
+                      'version': 'CategoriesDemographicPieChartColumn'
                     }
                   },
                   {
@@ -500,7 +500,7 @@ export const meta = {
                               {
                                 '@class': 'org.openl.generated.beans.RowList',
                                 'view': 'RowList',
-                                'name': 'Plans[{state.plan,0}].Coverages',
+                                'name': 'Plans[{state.option,0}].Categories',
                                 'styles': 'justify wrap',
                                 'relativeData': true,
                                 'renderItem': {
@@ -516,7 +516,7 @@ export const meta = {
                                           '@class': 'org.openl.generated.beans.Text',
                                           'view': 'Text',
                                           'children': {
-                                            'name': 'CoverageType',
+                                            'name': 'CategoryType',
                                             'relativeData': true
                                           },
                                           'styles': 'h6'
@@ -638,7 +638,7 @@ export const meta = {
                                 'Core': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[0].DemographicSummary.TopFirstAnnualSalary',
+                                    'name': 'Plans[{state.option,0}].Categories[0].DemographicSummary.TopFirstAnnualSalary',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -649,7 +649,7 @@ export const meta = {
                                 'BuyUp': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[1].DemographicSummary.TopFirstAnnualSalary',
+                                    'name': 'Plans[{state.option,0}].Categories[1].DemographicSummary.TopFirstAnnualSalary',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -664,7 +664,7 @@ export const meta = {
                                 'Core': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[0].DemographicSummary.TopSecondAnnualSalary',
+                                    'name': 'Plans[{state.option,0}].Categories[0].DemographicSummary.TopSecondAnnualSalary',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -675,7 +675,7 @@ export const meta = {
                                 'BuyUp': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[1].DemographicSummary.TopSecondAnnualSalary',
+                                    'name': 'Plans[{state.option,0}].Categories[1].DemographicSummary.TopSecondAnnualSalary',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -690,7 +690,7 @@ export const meta = {
                                 'Core': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[0].DemographicSummary.TopThirdAnnualSalary',
+                                    'name': 'Plans[{state.option,0}].Categories[0].DemographicSummary.TopThirdAnnualSalary',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -701,7 +701,7 @@ export const meta = {
                                 'BuyUp': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[1].DemographicSummary.TopThirdAnnualSalary',
+                                    'name': 'Plans[{state.option,0}].Categories[1].DemographicSummary.TopThirdAnnualSalary',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -716,7 +716,7 @@ export const meta = {
                                 'Core': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[0].DemographicSummary.AverageAnnualSalary',
+                                    'name': 'Plans[{state.option,0}].Categories[0].DemographicSummary.AverageAnnualSalary',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -727,7 +727,7 @@ export const meta = {
                                 'BuyUp': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[1].DemographicSummary.AverageAnnualSalary',
+                                    'name': 'Plans[{state.option,0}].Categories[1].DemographicSummary.AverageAnnualSalary',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -800,7 +800,7 @@ export const meta = {
                                 'Core': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[0].DemographicSummary.FemalePercent',
+                                    'name': 'Plans[{state.option,0}].Categories[0].DemographicSummary.FemalePercent',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -812,7 +812,7 @@ export const meta = {
                                 'BuyUp': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[1].DemographicSummary.FemalePercent',
+                                    'name': 'Plans[{state.option,0}].Categories[1].DemographicSummary.FemalePercent',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -828,7 +828,7 @@ export const meta = {
                                 'Core': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[0].DemographicSummary.PercentFemaleUnder40',
+                                    'name': 'Plans[{state.option,0}].Categories[0].DemographicSummary.PercentFemaleUnder40',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -840,7 +840,7 @@ export const meta = {
                                 'BuyUp': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[1].DemographicSummary.PercentFemaleUnder40',
+                                    'name': 'Plans[{state.option,0}].Categories[1].DemographicSummary.PercentFemaleUnder40',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -856,7 +856,7 @@ export const meta = {
                                 'Core': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[0].DemographicSummary.PercentFemaleUnder45',
+                                    'name': 'Plans[{state.option,0}].Categories[0].DemographicSummary.PercentFemaleUnder45',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -868,7 +868,7 @@ export const meta = {
                                 'BuyUp': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[1].DemographicSummary.PercentFemaleUnder45',
+                                    'name': 'Plans[{state.option,0}].Categories[1].DemographicSummary.PercentFemaleUnder45',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -884,7 +884,7 @@ export const meta = {
                                 'Core': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[0].DemographicSummary.AverageTotalWeeklyBenefit',
+                                    'name': 'Plans[{state.option,0}].Categories[0].DemographicSummary.AverageTotalWeeklyBenefit',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -895,7 +895,7 @@ export const meta = {
                                 'BuyUp': {
                                   'view': 'Text',
                                   'label': {
-                                    'name': 'Plans[{state.plan,0}].Coverages[1].DemographicSummary.AverageTotalWeeklyBenefit',
+                                    'name': 'Plans[{state.option,0}].Categories[1].DemographicSummary.AverageTotalWeeklyBenefit',
                                     'relativeData': false
                                   },
                                   'renderLabel': {
@@ -934,7 +934,7 @@ export const meta = {
                       {
                         '@class': 'org.openl.generated.beans.Text',
                         'view': 'Text',
-                        'label': 'Policy Factors',
+                        'label': 'Record Factors',
                         'styles': 'h3'
                       },
                       {
@@ -953,7 +953,7 @@ export const meta = {
                                   {
                                     '@class': 'org.openl.generated.beans.Input',
                                     'view': 'Input',
-                                    'name': 'PolicyFactors.IndustryFactor',
+                                    'name': 'RecordFactors.IndustryFactor',
                                     'label': 'Industry factor',
                                     'type': 'number',
                                     'format': 'double5',
@@ -965,7 +965,7 @@ export const meta = {
                                     'min': 0
                                   }
                                 ],
-                                'version': 'FactorPolicyRow1Col1',
+                                'version': 'FactorRecordRow1Col1',
                                 'style': {
                                   'minWidth': '45%'
                                 }
@@ -983,7 +983,7 @@ export const meta = {
                                   {
                                     '@class': 'org.openl.generated.beans.Input',
                                     'view': 'Input',
-                                    'name': 'PolicyFactors.SizeFactor',
+                                    'name': 'RecordFactors.SizeFactor',
                                     'label': 'Size factor',
                                     'type': 'number',
                                     'format': 'double5',
@@ -995,7 +995,7 @@ export const meta = {
                                     'min': 0
                                   }
                                 ],
-                                'version': 'FactorPolicyRow1Col2',
+                                'version': 'FactorRecordRow1Col2',
                                 'style': {
                                   'minWidth': '45%'
                                 }
@@ -1019,7 +1019,7 @@ export const meta = {
                                 '@class': 'org.openl.generated.beans.Text',
                                 'view': 'Text',
                                 'children': {
-                                  'name': 'PolicyFactors.GeographicFactor',
+                                  'name': 'RecordFactors.GeographicFactor',
                                   'relativeData': null
                                 },
                                 'styles': 'h4'
@@ -1030,7 +1030,7 @@ export const meta = {
                                 'label': 'Geographic'
                               }
                             ],
-                            'version': 'FactorPolicyRow2Col1',
+                            'version': 'FactorRecordRow2Col1',
                           },
                           {
                             '@class': 'org.openl.generated.beans.Layout',
@@ -1041,7 +1041,7 @@ export const meta = {
                                 '@class': 'org.openl.generated.beans.Text',
                                 'view': 'Text',
                                 'children': {
-                                  'name': 'PolicyFactors.RateGuaranteeFactor',
+                                  'name': 'RecordFactors.RateGuaranteeFactor',
                                   'relativeData': null
                                 },
                                 'styles': 'h4'
@@ -1052,7 +1052,7 @@ export const meta = {
                                 'label': 'Rate Guarantee'
                               }
                             ],
-                            'version': 'FactorPolicyRow2Col2',
+                            'version': 'FactorRecordRow2Col2',
                           },
                           {
                             '@class': 'org.openl.generated.beans.Layout',
@@ -1064,7 +1064,7 @@ export const meta = {
                                 'view': 'Text',
                                 'styles': 'h4',
                                 'children': {
-                                  'name': 'PolicyFactors.OtherProductsFactor',
+                                  'name': 'RecordFactors.OtherProductsFactor',
                                   'relativeData': null
                                 }
                               },
@@ -1074,18 +1074,18 @@ export const meta = {
                                 'label': 'Multi-Product',
                               },
                             ],
-                            'version': 'FactorPolicyRow2Col3',
+                            'version': 'FactorRecordRow2Col3',
                           }
                         ],
-                        'version': 'FactorsPolicyRow'
+                        'version': 'FactorsRecordRow'
                       }
                     ],
-                    'version': 'FactorPolicy'
+                    'version': 'FactorRecord'
                   },
                   {
                     '@class': 'org.openl.generated.beans.RowList',
                     'view': 'RowList',
-                    'name': 'Plans[{state.plan,0}].Coverages',
+                    'name': 'Plans[{state.option,0}].Categories',
                     'styles': 'wrap justify margin-top-largest',
                     'relativeData': true,
                     'renderItem': {
@@ -1099,7 +1099,7 @@ export const meta = {
                           '@class': 'org.openl.generated.beans.Text',
                           'view': 'Text',
                           'children': {
-                            'name': 'CoverageType',
+                            'name': 'CategoryType',
                             'relativeData': true
                           },
                           'styles': 'h3'
@@ -1119,7 +1119,7 @@ export const meta = {
                                   '@class': 'org.openl.generated.beans.Text',
                                   'view': 'Text',
                                   'children': {
-                                    'name': 'Factors.CoverageFactor',
+                                    'name': 'Factors.CategoryFactor',
                                     'relativeData': null
                                   },
                                   'styles': 'h4'
@@ -1127,10 +1127,10 @@ export const meta = {
                                 {
                                   '@class': 'org.openl.generated.beans.Text',
                                   'view': 'Text',
-                                  'label': 'Coverage Factor'
+                                  'label': 'Category Factor'
                                 }
                               ],
-                              'version': 'FactorCoverageRowBlockRow1Col1',
+                              'version': 'FactorCategoryRowBlockRow1Col1',
                             },
                             {
                               '@class': 'org.openl.generated.beans.Layout',
@@ -1153,7 +1153,7 @@ export const meta = {
                                   'label': 'Definition of Disability'
                                 }
                               ],
-                              'version': 'FactorCoverageRowBlockRow1Col2',
+                              'version': 'FactorCategoryRowBlockRow1Col2',
                             },
                             {
                               '@class': 'org.openl.generated.beans.Layout',
@@ -1176,10 +1176,10 @@ export const meta = {
                                   'label': 'Benefit Percent'
                                 }
                               ],
-                              'version': 'FactorCoverageRowBlockRow1Col3',
+                              'version': 'FactorCategoryRowBlockRow1Col3',
                             }
                           ],
-                          'version': 'FactorCoverageRowBlockRow1'
+                          'version': 'FactorCategoryRowBlockRow1'
                         },
                         {
                           '@class': 'org.openl.generated.beans.Layout',
@@ -1207,7 +1207,7 @@ export const meta = {
                                   'label': 'Return to Work'
                                 }
                               ],
-                              'version': 'FactorCoverageRowBlockRow2Col1',
+                              'version': 'FactorCategoryRowBlockRow2Col1',
                             },
                             {
                               '@class': 'org.openl.generated.beans.Layout',
@@ -1230,7 +1230,7 @@ export const meta = {
                                   'label': 'Pre-Existing condition'
                                 }
                               ],
-                              'version': 'FactorCoverageRowBlockRow2Col2',
+                              'version': 'FactorCategoryRowBlockRow2Col2',
                             },
                             {
                               '@class': 'org.openl.generated.beans.Layout',
@@ -1253,10 +1253,10 @@ export const meta = {
                                 }
                               ],
                               'style': {width: '30%'},
-                              'version': 'FactorCoverageRowBlockRow2Col3',
+                              'version': 'FactorCategoryRowBlockRow2Col3',
                             }
                           ],
-                          'version': 'FactorCoverageRowBlockRow2'
+                          'version': 'FactorCategoryRowBlockRow2'
                         },
                         {
                           '@class': 'org.openl.generated.beans.Layout',
@@ -1284,7 +1284,7 @@ export const meta = {
                                   'label': 'Work Incentive'
                                 }
                               ],
-                              'version': 'FactorCoverageRowBlockRow3Col1',
+                              'version': 'FactorCategoryRowBlockRow3Col1',
                             },
                             {
                               '@class': 'org.openl.generated.beans.Layout',
@@ -1307,7 +1307,7 @@ export const meta = {
                                   'label': 'Portability'
                                 }
                               ],
-                              'version': 'FactorCoverageRowBlockRow3Col2',
+                              'version': 'FactorCategoryRowBlockRow3Col2',
                             },
                             {
                               '@class': 'org.openl.generated.beans.Layout',
@@ -1330,13 +1330,13 @@ export const meta = {
                                   'label': 'FICA Match'
                                 }
                               ],
-                              'version': 'FactorCoverageRowBlockRow3Col3',
+                              'version': 'FactorCategoryRowBlockRow3Col3',
                             }
                           ],
-                          'version': 'FactorCoverageRowBlockRow3'
+                          'version': 'FactorCategoryRowBlockRow3'
                         }
                       ],
-                      'version': 'FactorCoverageRowBlock',
+                      'version': 'FactorCategoryRowBlock',
                     }
                   }
                 ],
@@ -1351,24 +1351,24 @@ export const meta = {
   ]
 }
 export const data = {
-  'PolicyFactors': {
+  'RecordFactors': {
     'GeographicFactor': 0.713,
     'OtherProductsFactor': 1,
     'RateGuaranteeFactor': 1,
     'IndustryFactor': 1.30522,
     'SizeFactor': 0.89,
-    'PolicyFactor': 0.828
+    'RecordFactor': 0.828
   },
   'Plans': [
     {
       'Plan': 'Gold',
-      'Coverages': [
+      'Categories': [
         {
-          'CoverageType': 'Core',
+          'CategoryType': 'Core',
           'NumberOfLives': 6,
-          'MonthlyPremium': 114.29,
+          'MonthlyAmount': 114.29,
           'TotalMonthlyPreExpenseCost': 82.59,
-          'TotalNetClaimCost': 86.03,
+          'TotalNetRequestCost': 86.03,
           'TotalWeeklyBenefit': 2484.5,
           'Rate': 0.46,
           'Factors': {
@@ -1378,11 +1378,11 @@ export const data = {
             'FICAMatchingFactor': 1,
             'BenefitPercentFactor': 1.02,
             'ReturnToWorkFactor': 1.08,
-            'CoverageFactor': 1,
+            'CategoryFactor': 1,
             'ProgressiveIllnessProtection': 1,
             'PreExistingFactor': 1,
             'WorkIncentiveFactor': 1,
-            'NetClaimCostAggregatedFactor': 1.17
+            'NetRequestCostAggregatedFactor': 1.17
           },
           'Tax': 0.02,
           'Expense': 0.1875,
@@ -1506,11 +1506,11 @@ export const data = {
           ]
         },
         {
-          'CoverageType': 'BuyUp',
+          'CategoryType': 'BuyUp',
           'NumberOfLives': 6,
-          'MonthlyPremium': 65.81,
+          'MonthlyAmount': 65.81,
           'TotalMonthlyPreExpenseCost': 47.81,
-          'TotalNetClaimCost': 49.8,
+          'TotalNetRequestCost': 49.8,
           'TotalWeeklyBenefit': 2437.5,
           'Rate': 0.27,
           'Factors': {
@@ -1520,11 +1520,11 @@ export const data = {
             'FICAMatchingFactor': 1,
             'BenefitPercentFactor': 1.06,
             'ReturnToWorkFactor': 1.08,
-            'CoverageFactor': 1,
+            'CategoryFactor': 1,
             'ProgressiveIllnessProtection': 1,
             'PreExistingFactor': 1,
             'WorkIncentiveFactor': 1,
-            'NetClaimCostAggregatedFactor': 1.21
+            'NetRequestCostAggregatedFactor': 1.21
           },
           'Tax': 0.02,
           'Expense': 0.1875,
@@ -1651,13 +1651,13 @@ export const data = {
     },
     {
       'Plan': 'Silver',
-      'Coverages': [
+      'Categories': [
         {
-          'CoverageType': 'Core',
+          'CategoryType': 'Core',
           'NumberOfLives': 6,
-          'MonthlyPremium': 114.29,
+          'MonthlyAmount': 114.29,
           'TotalMonthlyPreExpenseCost': 82.59,
-          'TotalNetClaimCost': 86.03,
+          'TotalNetRequestCost': 86.03,
           'TotalWeeklyBenefit': 2484.5,
           'Rate': 0.46,
           'Factors': {
@@ -1667,11 +1667,11 @@ export const data = {
             'FICAMatchingFactor': 1,
             'BenefitPercentFactor': 1.02,
             'ReturnToWorkFactor': 1.08,
-            'CoverageFactor': 1,
+            'CategoryFactor': 1,
             'ProgressiveIllnessProtection': 1,
             'PreExistingFactor': 1,
             'WorkIncentiveFactor': 1,
-            'NetClaimCostAggregatedFactor': 1.17
+            'NetRequestCostAggregatedFactor': 1.17
           },
           'Tax': 0.02,
           'Expense': 0.1875,

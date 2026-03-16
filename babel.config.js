@@ -1,5 +1,7 @@
-export default {
-    presets: ["@babel/preset-env", "@babel/preset-react"],
+const isTest = process.env.NODE_ENV === 'test';
+
+module.exports = {
+    presets: [["@babel/preset-env", { targets: { node: "current" } }], "@babel/preset-react"],
     plugins: [["@babel/plugin-proposal-decorators", { "legacy": true }]],
-    include: ['src']
+    ...(isTest ? {} : { include: ['src'] }),
 };

@@ -1,8 +1,8 @@
 {
   "view": "Input",
-  "name": "coverages.0.annualPremium",
+  "name": "categories.0.annualAmount",
   "styles": "max-width-290 margin",
-  "label": "Annual Premium",
+  "label": "Annual Amount",
   "placeholder": "Enter amount...",
   "icon": "dollar",
   "unit": "USD",

@@ -1,5 +1,4 @@
-import 'react-app-polyfill/ie11'
-import 'react-app-polyfill/stable'
+import '../style/index.less'
 import '../core/common/variables'
 import UIRender from './main'
 

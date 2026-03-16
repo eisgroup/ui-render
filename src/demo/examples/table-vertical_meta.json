@@ -1,11 +1,11 @@
 {
   "view": "Table",
-  "name": "coverages",
+  "name": "categories",
   "vertical": true,
   "headers": [
     {
-      "id": "coverageID",
-      "label": "Coverage Name",
+      "id": "categoryID",
+      "label": "Category Name",
       "renderCell": {
         "view": "Expand",
         "name": "{value}",
@@ -14,11 +14,11 @@
       }
     },
     {
-      "id": "fundingStructure.contributionType",
+      "id": "configuration.inputType",
       "label": "Contribution Type"
     },
     {
-      "id": "fundingStructure.requiredParticipationPrct",
+      "id": "configuration.requiredParticipationPrct",
       "label": "Contribution",
       "renderCell": "Percent"
     },
@@ -28,8 +28,8 @@
       "renderCell": "double5"
     },
     {
-      "id": "annualPremium",
-      "label": "Annual Premium",
+      "id": "annualAmount",
+      "label": "Annual Amount",
       "renderCell": "Currency"
     },
     {

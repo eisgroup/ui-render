@@ -34,7 +34,7 @@ interface Props {
  *
  * @logic:
  *      1. This Component creates an empty <div/> inside HTML DOM (where UI Render will be)
- *      2. When mounted, it calls global `window._mountUIRender` method defined in `/repos/policy/src/main.js`
+ *      2. When mounted, it calls global `window._mountUIRender` method defined in the consuming app's `main.js`
  *      3. Above method mounts pre-bundled UI Render to the above created <div/>, initiating UI Render instance.
  *      4. On subsequent prop changes, it passes them to UI Render via <DOMProxy/> container
  */
@@ -73,7 +73,7 @@ export class UIRender extends Component<Props, any> {
 
     render() {
         const {className, style} = this.props
-        return <div id={this.id} data-version="0.31.7" className={`${UI_RENDER} ${className || ''}`} style={style}/>
+        return <div id={this.id} data-version="0.32.0" className={`${UI_RENDER} ${className || ''}`} style={style}/>
     }
 }
 

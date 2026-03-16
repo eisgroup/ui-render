@@ -21,12 +21,12 @@
             {
               "@class": "org.openl.generated.beans.Dropdown",
               "view": "Dropdown",
-              "name": "planResult",
+              "name": "optionResult",
               "options": {
                 "name": "experienceResults",
                 "relativeData": false
               },
-              "mapOptions": "planName",
+              "mapOptions": "optionName",
               "compact": true
             }
           ]
@@ -34,7 +34,7 @@
         {
           "@class": "org.openl.generated.beans.Table",
           "view": "Table",
-          "name": "experienceResults.{state.planResult,0}.coverages.0.experienceRatesPerTier",
+          "name": "experienceResults.{state.optionResult,0}.categories.0.experienceRatesPerTier",
           "styles": "margin-v no-border",
           "headers": [
             {
@@ -79,7 +79,7 @@
         {
           "@class": "org.openl.generated.beans.RowList",
           "view": "RowList",
-          "name": "experienceResults.{state.planResult,0}.coverages.0.experienceRatesPerTier",
+          "name": "experienceResults.{state.optionResult,0}.categories.0.experienceRatesPerTier",
           "renderItem": {
             "view": "VerticalLayout",
             "styles": "bg-neutral margin-top-larger padding-right",
@@ -129,7 +129,7 @@
         {
           "@class": "org.openl.generated.beans.Table",
           "view": "Table",
-          "name": "experienceResults.{state.planResult,0}.coverages.0.experienceDetailsPerPeriod",
+          "name": "experienceResults.{state.optionResult,0}.categories.0.experienceDetailsPerPeriod",
           "styles": "margin-v no-border",
           "headers": [
             {
@@ -153,24 +153,24 @@
               "label": "Covered Lives"
             },
             {
-              "id": "billedPremium",
-              "label": "Billed Premium",
+              "id": "billedAmount",
+              "label": "Billed Amount",
               "renderCell": {
                 "@class": "org.openl.generated.beans.RenderCell",
                 "name": "Currency"
               }
             },
             {
-              "id": "paidClaims",
-              "label": "Paid Claims",
+              "id": "paidRequests",
+              "label": "Paid Requests",
               "renderCell": {
                 "@class": "org.openl.generated.beans.RenderCell",
                 "name": "Currency"
               }
             },
             {
-              "id": "fullyIncurredClaims",
-              "label": "Fully Incurred Claims",
+              "id": "fullyIncurredRequests",
+              "label": "Fully Incurred Requests",
               "renderCell": {
                 "@class": "org.openl.generated.beans.RenderCell",
                 "name": "Currency"
@@ -213,8 +213,8 @@
               }
             },
             {
-              "id": "trendedIncurredClaims",
-              "label": "Trended Inc. Claims",
+              "id": "trendedIncurredRequests",
+              "label": "Trended Inc. Requests",
               "renderCell": {
                 "@class": "org.openl.generated.beans.RenderCell",
                 "name": "Currency"
@@ -260,7 +260,7 @@
             {
               "@class": "org.openl.generated.beans.Input",
               "view": "Input",
-              "name": "showExperienceRating",
+              "name": "showPerformanceRating",
               "label": " ",
               "type": "toggle",
               "disabled": false,
@@ -284,7 +284,7 @@
       "view": "VerticalLayout",
       "showIf": {
         "relativeData": false,
-        "name": "showExperienceRating",
+        "name": "showPerformanceRating",
         "equal": true
       },
       "items": [
@@ -612,12 +612,12 @@
             {
               "@class": "org.openl.generated.beans.Dropdown",
               "view": "Dropdown",
-              "name": "plan",
+              "name": "option",
               "options": {
                 "name": "ratesAndHistoricalInfo",
                 "relativeData": false
               },
-              "mapOptions": "planName",
+              "mapOptions": "optionName",
               "compact": true
             }
           ]
@@ -635,7 +635,7 @@
             {
               "@class": "org.openl.generated.beans.RowList",
               "view": "RowList",
-              "name": "ratesAndHistoricalInfo.{state.plan,0}.rates",
+              "name": "ratesAndHistoricalInfo.{state.option,0}.rates",
               "renderItem": {
                 "view": "VerticalLayout",
                 "styles": "bg-neutral margin-top-larger padding-right",
@@ -784,7 +784,7 @@
             {
               "@class": "org.openl.generated.beans.Table",
               "view": "Table",
-              "name": "ratesAndHistoricalInfo.{state.plan,0}.historicalInformation",
+              "name": "ratesAndHistoricalInfo.{state.option,0}.historicalInformation",
               "styles": "margin-v no-border",
               "headers": [
                 {
@@ -794,13 +794,13 @@
                   "classNameCellWrap": "padding-smaller border-right"
                 },
                 {
-                  "id": "billedPremium",
-                  "label": "Billed Premium",
+                  "id": "billedAmount",
+                  "label": "Billed Amount",
                   "classNameHeader": "padding-h-small text-align-left",
                   "renderCell": {
                     "@class": "org.openl.generated.beans.Input",
                     "view": "Input",
-                    "name": "billedPremium",
+                    "name": "billedAmount",
                     "type": "number",
                     "format": "currency",
                     "disabled": false,
@@ -830,13 +830,13 @@
                   }
                 },
                 {
-                  "id": "paidClaims",
-                  "label": "Paid Claims",
+                  "id": "paidRequests",
+                  "label": "Paid Requests",
                   "classNameHeader": "padding-h-small text-align-left",
                   "renderCell": {
                     "@class": "org.openl.generated.beans.Input",
                     "view": "Input",
-                    "name": "paidClaims",
+                    "name": "paidRequests",
                     "type": "number",
                     "format": "currency",
                     "disabled": false,
@@ -862,8 +862,8 @@
                   }
                 },
                 {
-                  "id": "fullyIncurredClaims",
-                  "label": "Fully Incurred Claims",
+                  "id": "fullyIncurredRequests",
+                  "label": "Fully Incurred Requests",
                   "classNameHeader": "padding-h-small text-align-left",
                   "renderCell": {
                     "@class": "org.openl.generated.beans.RenderCell",
@@ -880,7 +880,7 @@
             {
               "@class": "org.openl.generated.beans.Table",
               "view": "Table",
-              "name": "ratesAndHistoricalInfo.{state.plan,0}.historicalInformation",
+              "name": "ratesAndHistoricalInfo.{state.option,0}.historicalInformation",
               "styles": "margin-v no-border",
               "headers": [
                 {
@@ -890,8 +890,8 @@
                   "classNameCellWrap": "border-right"
                 },
                 {
-                  "id": "billedPremium",
-                  "label": "Billed Premium",
+                  "id": "billedAmount",
+                  "label": "Billed Amount",
                   "classNameHeader": "padding-h-small text-align-left",
                   "renderCell": {
                     "@class": "org.openl.generated.beans.RenderCell",
@@ -904,8 +904,8 @@
                   "classNameHeader": "padding-h-small text-align-left"
                 },
                 {
-                  "id": "paidClaims",
-                  "label": "Paid Claims",
+                  "id": "paidRequests",
+                  "label": "Paid Requests",
                   "classNameHeader": "padding-h-small text-align-left",
                   "renderCell": {
                     "@class": "org.openl.generated.beans.RenderCell",
@@ -923,8 +923,8 @@
                   }
                 },
                 {
-                  "id": "fullyIncurredClaims",
-                  "label": "Fully Incurred Claims",
+                  "id": "fullyIncurredRequests",
+                  "label": "Fully Incurred Requests",
                   "classNameHeader": "padding-h-small text-align-left",
                   "renderCell": {
                     "@class": "org.openl.generated.beans.RenderCell",
@@ -949,13 +949,13 @@
                     "classNameCellWrap": "border-right"
                   },
                   {
-                    "id": "billedPremium",
-                    "label": "Billed Premium",
+                    "id": "billedAmount",
+                    "label": "Billed Amount",
                     "classNameHeader": "padding-h-small text-align-left",
                     "renderCell": {
                       "@class": "org.openl.generated.beans.Input",
                       "view": "Input",
-                      "name": "billedPremium",
+                      "name": "billedAmount",
                       "type": "number",
                       "format": "currency",
                       "disabled": false,
@@ -985,13 +985,13 @@
                     }
                   },
                   {
-                    "id": "paidClaims",
-                    "label": "Paid Claims",
+                    "id": "paidRequests",
+                    "label": "Paid Requests",
                     "classNameHeader": "padding-h-small text-align-left",
                     "renderCell": {
                       "@class": "org.openl.generated.beans.Input",
                       "view": "Input",
-                      "name": "paidClaims",
+                      "name": "paidRequests",
                       "type": "number",
                       "format": "currency",
                       "disabled": false,
@@ -1017,8 +1017,8 @@
                     }
                   },
                   {
-                    "id": "fullyIncurredClaims",
-                    "label": "Fully Incurred Claims",
+                    "id": "fullyIncurredRequests",
+                    "label": "Fully Incurred Requests",
                     "classNameHeader": "padding-h-small text-align-left",
                     "renderCell": {
                       "@class": "org.openl.generated.beans.RenderCell",

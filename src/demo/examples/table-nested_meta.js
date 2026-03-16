@@ -25,8 +25,8 @@ nestedTable.items.push({
       renderCell: 'float',
     },
     {
-      id: 'annualPremium',
-      label: 'Annual Premium',
+      id: 'annualAmount',
+      label: 'Annual Amount',
     },
   ],
 
@@ -40,11 +40,11 @@ nestedTable.items.push({
 })
 const nestedTableMeta = {
   view: 'Table',
-  name: 'coverages',
+  name: 'categories',
   headers: [  // -> must be defined if data contains nested tables, because rendering cells as objects will cause errors
     {
-      id: 'coverageID',
-      label: 'Coverage Name',
+      id: 'categoryID',
+      label: 'Category Name',
       // Custom render function for Table Cells (columns in default layout)
       renderCell: {
         view: 'Expand',
@@ -56,11 +56,11 @@ const nestedTableMeta = {
       },
     },
     {
-      id: 'fundingStructure.contributionType',
+      id: 'configuration.inputType',
       label: 'Contribution Type'
     },
     {
-      id: 'fundingStructure.requiredParticipationPrct',
+      id: 'configuration.requiredParticipationPrct',
       label: 'Contribution',
       renderCell: 'Percent',
     },
@@ -74,8 +74,8 @@ const nestedTableMeta = {
     //   label: 'Manual Rate',
     // },
     {
-      id: 'annualPremium',
-      label: 'Annual Premium',
+      id: 'annualAmount',
+      label: 'Annual Amount',
       renderCell: 'Currency',
     },
     {

@@ -1,5 +1,5 @@
 {
-  "planID": "Golden",
+  "optionID": "Golden",
   "layouts": [
     {
       "id": "1",
@@ -10,11 +10,11 @@
       "name": "Layout Beta"
     }
   ],
-  "coverages": [
+  "categories": [
     {
-      "coverageID": "Gold",
-      "fundingStructure": {
-        "contributionType": "Non-contributory",
+      "categoryID": "Gold",
+      "configuration": {
+        "inputType": "Non-contributory",
         "requiredParticipationPrct": 0.25,
         "sponsorPaymentMode": 1,
         "memberPaymentModes": [
@@ -50,9 +50,9 @@
       ]
     },
     {
-      "coverageID": "Silver",
-      "fundingStructure": {
-        "contributionType": "Non-contributory",
+      "categoryID": "Silver",
+      "configuration": {
+        "inputType": "Non-contributory",
         "requiredParticipationPrct": 0.55,
         "sponsorPaymentMode": 1,
         "memberPaymentModes": [

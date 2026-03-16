@@ -1,11 +1,11 @@
 {
-  "planID": "Golden",
+  "optionID": "Golden",
   "classLabel": "Dynamic Class",
-  "coverages": [
+  "categories": [
     {
-      "coverageID": "Gold",
-      "fundingStructure": {
-        "contributionType": "Non-contributory",
+      "categoryID": "Gold",
+      "configuration": {
+        "inputType": "Non-contributory",
         "requiredParticipationPrct": 0.25,
         "sponsorPaymentMode": 1,
         "memberPaymentModes": [
@@ -40,9 +40,9 @@
       ]
     },
     {
-      "coverageID": "Silver",
-      "fundingStructure": {
-        "contributionType": "Contributory",
+      "categoryID": "Silver",
+      "configuration": {
+        "inputType": "Contributory",
         "requiredParticipationPrct": 0.55,
         "sponsorPaymentMode": 1,
         "memberPaymentModes": [
