@@ -9,15 +9,15 @@ export default [
       {
         view: 'Dropdown',
         displayName: 'Plan Dropdown',
-        name: 'active.plan', // -> must be unique key path identifier that does not exist in *_data.json
-        options: 'coverages', // -> key path pointing to array in *_data.json
-        mapOptions: 'coverageID', // -> key path pointing to human readable value within each option (used as label)
+        name: 'active.option', // -> must be unique key path identifier that does not exist in *_data.json
+        options: 'categories', // -> key path pointing to array in *_data.json
+        mapOptions: 'categoryID', // -> key path pointing to human readable value within each option (used as label)
       },
       {
         view: 'Text',
         displayName: 'Plan Text',
         label: {
-          name: 'coverages.{state.active.plan,0}.coverageID'
+          name: 'categories.{state.active.option,0}.categoryID'
         },
       },
       // {
@@ -27,12 +27,12 @@ export default [
       // },
       {
         view: 'Table',
-        displayName: 'Coverages Table',
-        name: 'coverages',
+        displayName: 'Categories Table',
+        name: 'categories',
         headers: [  // -> must be defined if data contains nested tables, because rendering cells as objects will cause errors
           {
-            id: 'coverageID',
-            label: 'Coverage Name',
+            id: 'categoryID',
+            label: 'Category Name',
             // Custom render function for Table Cells (columns in default layout)
             renderCell: {
               view: 'Expand',
@@ -44,7 +44,7 @@ export default [
             },
           },
           {
-            id: 'fundingStructure.contributionType',
+            id: 'configuration.inputType',
             label: 'Contribution Type'
           },
         ],
@@ -78,8 +78,8 @@ export default [
                       view: 'Row',
                       styles: 'justify padding border-top',
                       items: [
-                        {view: 'Text', label: 'Annual Premium'},
-                        {view: 'Text', children: {name: 'annualPremium'}, renderLabel: 'Currency'},
+                        {view: 'Text', label: 'Annual Amount'},
+                        {view: 'Text', children: {name: 'annualAmount'}, renderLabel: 'Currency'},
                       ]
                     },
                   ],
@@ -104,8 +104,8 @@ export default [
                   renderCell: 'float',
                 },
                 {
-                  id: 'annualPremium',
-                  label: 'Annual Premium',
+                  id: 'annualAmount',
+                  label: 'Annual Amount',
                 },
               ],
 

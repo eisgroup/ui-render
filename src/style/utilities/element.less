@@ -1,0 +1,21 @@
+
+.color__swatch {
+  display: inline-flex;
+  .circle(@size-icon);
+
+  &.small {
+    .square(@size-icon-small);
+  }
+
+  &.large {
+    .square(@size-icon-large);
+  }
+}
+
+.lang-selection {
+  .input--dropdown__option {
+    .app__image {
+      width: @size-base;
+    }
+  }
+}

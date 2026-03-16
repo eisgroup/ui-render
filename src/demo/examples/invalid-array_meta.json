@@ -14,39 +14,39 @@
         },
         {
           "view": "Dropdown",
-          "name": "plan",
+          "name": "option",
           "options": {
-            "name": "coveragesDetails"
+            "name": "categoriesDetails"
           },
-          "mapOptions": "planID"
+          "mapOptions": "optionID"
         }
       ]
     },
     {
       "view": "VerticalLayout",
-      "label": "Coverage",
+      "label": "Category",
       "styles": "border radius",
       "items": [
         {
           "view": "Title",
-          "label": "Coverage Summary",
+          "label": "Category Summary",
           "styles": "padding"
         },
         {
           "view": "Table",
-          "name": "coveragesDetails",
+          "name": "categoriesDetails",
           "headers": [
             {
-              "id": "coverageID",
-              "label": "Coverage Name"
+              "id": "categoryID",
+              "label": "Category Name"
             },
             {
               "id": "numberOfLives",
               "label": "Number of Lives"
             },
             {
-              "id": "annualPremium",
-              "label": "Annual Premium",
+              "id": "annualAmount",
+              "label": "Annual Amount",
               "renderCell": "Currency"
             },
             {
@@ -56,7 +56,7 @@
           ],
           "renderItem": {
             "view": "VerticalLayout",
-            "label": "CoverageSummary",
+            "label": "CategorySummary",
             "styles": "border radius",
             "relativeData": true,
             "items": [
@@ -74,17 +74,17 @@
                       "items": [
                         {
                           "view": "HorizontalLayout",
-                          "label": "CostSummaryTotalNetClaimCostRow",
+                          "label": "CostSummaryTotalNetRequestCostRow",
                           "styles": "justify padding border-top",
                           "items": [
                             {
                               "view": "Text",
-                              "label": "Total Net Claim Cost"
+                              "label": "Total Net Request Cost"
                             },
                             {
                               "view": "Text",
                               "children": {
-                                "name": "totalNetClaimCost"
+                                "name": "totalNetRequestCost"
                               },
                               "renderLabel": "Currency"
                             }
@@ -92,7 +92,7 @@
                         },
                         {
                           "view": "HorizontalLayout",
-                          "label": "CoverageNumberOfLivesRow",
+                          "label": "CategoryNumberOfLivesRow",
                           "styles": "justify padding border-top",
                           "items": [
                             {
@@ -180,7 +180,7 @@
               },
               {
                 "view": "Table",
-                "name": "ratesAndPremiumByClass",
+                "name": "ratesAndAmountByClass",
                 "headers": [
                   {
                     "id": "classID",
@@ -191,8 +191,8 @@
                     "label": "Number of Lives"
                   },
                   {
-                    "id": "annualPremium",
-                    "label": "Annual Premium",
+                    "id": "annualAmount",
+                    "label": "Annual Amount",
                     "renderCell": "Currency"
                   },
                   {

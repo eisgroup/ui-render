@@ -32,7 +32,7 @@ The `meta.json` file is responsible for the Look & Feel of the UI, as well as `d
 
 The illustration below demonstrates the structure of UI components, and their shape in the `meta.json` file:
 
-![ui-architecture](/ui-render/static/images/ui-architecture.png)
+![ui-architecture](static/images/ui-architecture.png)
 
 It must start with a single `Root` Field object. Within each Field object, you can define nested Fields, under the attribute `items` - an array of nested child objects.
 

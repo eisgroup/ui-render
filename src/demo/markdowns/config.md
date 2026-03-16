@@ -132,171 +132,219 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
 
 ## Component Attributes
 
+### Root Level
+
 ```js
-const Component = {
-  // Root level attributes
-  currencyCode: 'USD', // default currency code for displaying currency symbol (does not support by Input fields). Supported codes: 'USD', 'EUR', 'GBP'
+{
+  currencyCode: 'USD', // default currency code for displaying currency symbol
+                       // Supported codes: 'USD', 'EUR', 'GBP'
+}
+```
 
-  // Common attributes (available in all UI components)
-  view: 'Col', // (required)* name of the React Component used to display this field
-  items: [], // recursively nested fields
-  children: 'Any', // nested content to render inside field
-  onClick: Function, // example: `{onClick: 'setState,active.plan'}` - `setState` function with `active.plan` argument
-  style: Object, // css style to apply
-  className: 'CSS class name to apply',
-  debug: Boolean, // whether to suppress certain erros related to incorrect data type, default is false in production
-  showIf: "path.to.data.that.exists", // whether to render the component if given path resolves to `truthy` value
-  showIf: { // object notation
-    "name": "path.to.data.that.exists", // optional
-    "relativeData": Boolean, // optional
-    "equal": Any, // optional, value to match against, can also make `equal` an object like so `{name, relativeData}`
+### Common Attributes
+
+Available in all UI components:
+
+```js
+{
+  view: 'Col',           // (required) name of the React Component used to display this field
+  items: [],             // recursively nested fields
+  children: 'Any',       // nested content to render inside field
+  onClick: Function,     // ex: {onClick: 'setState,active.plan'}
+  style: Object,         // CSS style to apply
+  className: 'string',   // CSS class name to apply
+  debug: Boolean,        // suppress certain errors related to incorrect data type
+  showIf: "path.to.data.that.exists",  // render only if path resolves to truthy value
+  showIf: {              // object notation
+    name: "path.to.data.that.exists",
+    relativeData: Boolean,
+    equal: Any,          // value to match against
   },
+}
+```
 
-  // Input attributes
-  name: 'adminCosts.adminCategory', // (required for inputs)* path to field value within *_data.json
+### Input Attributes
+
+```js
+{
+  name: 'adminCosts.adminCategory', // (required) path to field value within data.json
   label: 'Input label',
-  placeholder: 'To appear inside empty input when focused',
-  type: 'number', // 'checkbox', 'email', 'number', 'select', 'slider', 'text', 'textarea', 'toggle', etc. (HTML input types)
-  icon: 'dollar', // icon css class name -> displays Icon inside Input
-  lefty: Boolean, // whether to show icon on the left, default is on the right
-  float: Boolean, // whether label should float above input when in focus
-  disabled: Boolean, // disabled input
-  readonly: Boolean, // read-only input, makes all nested fields disabled, with `readonly` css class applied
-  removable: Boolean, // whether to show cross icon that sets input value to null when clicked
-  format: String, // name of the format function
-  normalize: String, // name of the normalizer function
-  parse: String, // name of the parser function
-  validate: String, // name of the validation function
-  value: undefined, // controlled input value
-  defaultValue: undefined, // to be used on init if `value` not set
-  onChange: String, // name of the callback function for input value changes
-  min: Number, // minimum value
-  max: Number, // maximum value
-  hint: 'Displayed as title text above input',
-  info: 'Content to render when input is in focus',
-  error: 'Content to render when input is invalid',
-  autoSubmit: Boolean, // whether input should submit form on changes
-  autoSubmit: { // second way to define auto submission with customized options
-    delay: Number, // specify delay in milliseconds for input submission on changes, default is 200 milliseconds
+  placeholder: 'Appears inside empty input when focused',
+  type: 'number',       // 'checkbox', 'email', 'number', 'select', 'slider', 'text', 'textarea', 'toggle', etc.
+  icon: 'dollar',       // icon css class name
+  lefty: Boolean,        // show icon on the left (default: right)
+  float: Boolean,        // label floats above input when focused
+  disabled: Boolean,
+  readonly: Boolean,     // makes all nested fields disabled with readonly CSS class
+  removable: Boolean,    // show cross icon that sets input value to null
+  format: String,        // name of the format function
+  normalize: String,     // name of the normalizer function
+  parse: String,         // name of the parser function
+  validate: String,      // name of the validation function
+  value: undefined,      // controlled input value
+  defaultValue: undefined, // used on init if value not set
+  onChange: String,       // callback function name for input value changes
+  min: Number,
+  max: Number,
+  hint: 'Title text above input',
+  info: 'Content rendered when input is in focus',
+  error: 'Content rendered when input is invalid',
+  autoSubmit: Boolean,   // submit form on changes
+  autoSubmit: {          // with customized options
+    delay: Number,       // delay in ms, default 200
   },
+  outputFormat: {        // for Inputs with type 'number'
+    decimals: Number,    // fractional digits to show
+    percentage: Boolean, // add percent sign
+    separateThousands: Boolean, // separate thousands (not compatible with percentage)
+  },
+}
+```
 
-  // Dropdown/Select attributes (using react Semantic UI Dropdown)
-  // Select is used for changing Input values, whereas Dropdown for changing UI state only
+### Dropdown / Select Attributes
+
+`Select` is used for changing Input values, `Dropdown` for changing UI state only.
+Both support `{state.xxx}` interpolation — when a value is selected, it updates `state` automatically,
+so dependent fields using `{state.fieldName,fallback}` in their paths will re-render with new data.
+
+```js
+{
   compact: Boolean,
   multiple: Boolean,
-  search: Boolean, // whether dropdown options are searchable
-  options: [{ text: 'Label for Human', value: 'internal value' }],
-  mapOptions: Object, // data mapper key/value pairs or string (ex. {value: "{index}", text: "planName"})
-  value: { name: '{state.active.plan,0}' }, // dynamic config using `state`
-  onChange: { // function defined as object
-    name: 'setState', // function triggering state update
-    args: ['active.plan'], // key path of the changed value in state
+  search: Boolean,       // searchable options
+  options: [{ text: 'Label', value: 'internal value' }],
+  mapOptions: Object,    // data mapper (ex: {value: "{index}", text: "planName"})
+  // Note: mapOptions.value = "{index}" stores selected value as String index.
+  // Use a persistent key (e.g. mapOptions.value = "id") to keep value stable.
+  value: { name: '{state.active.plan,0}' }, // dynamic config using state
+  onChange: {
+    name: 'setState',
+    args: ['active.plan'],
   },
+}
+```
 
-  // Slider attributes
-  step: Number, // slider increment
-  pushable: Number, // minimum slider increments between two handles
+#### Select with Dynamic State (Cascading Selects)
 
-  // Table attributes
-  inverted: Boolean, // whether to style table in dark mode
-  striped: Boolean, // whether to alternate background shade of items (rows in default layout)
-  vertical: Boolean, // whether to render Table rows as columns (does not work with `renderItem`)
-  headers: [ // headers are columns in default layout, used for configuring how to show each cell data under the header
+Select fields now support `{state.xxx}` path interpolation, enabling cascading dependencies.
+When a Select value changes, it automatically updates `state`, so dependent fields re-render.
+
+Example: Category selection drives Product options:
+```json
+{
+  "view": "Select",
+  "name": "categoryX",
+  "options": { "name": "Catalog.Categories", "relativeData": false },
+  "mapOptions": { "text": "CategoryName", "value": "{index}" },
+  "compact": true
+}
+```
+Dependent Product Select uses `{state.categoryX,0}` to resolve the active category:
+```json
+{
+  "view": "Select",
+  "name": "productX",
+  "options": {
+    "name": "Catalog.Categories.{state.categoryX,0}.Products",
+    "relativeData": false
+  },
+  "mapOptions": "Product",
+  "compact": true
+}
+```
+
+See the [Select: Cascading](#selectCascading) example for a working demo.
+
+### Slider Attributes
+
+```js
+{
+  step: Number,          // slider increment
+  pushable: Number,      // minimum increments between two handles
+}
+```
+
+### Table Attributes
+
+```js
+{
+  inverted: Boolean,     // dark mode
+  striped: Boolean,      // alternate background shade
+  vertical: Boolean,     // render rows as columns (not compatible with renderItem)
+  headers: [
     {
-      id: String, // required cell id
+      id: String,        // required cell id
       label: String || Number || { name: String },
-      renderCell: String || Object, // name of render Function to use
+      renderCell: String || Object,
     },
     {
       id: String,
       label: String || Number || { name: String },
-      renderCell: { // dynamic rendering based on cell value
-        values: {
-          'value to match': {/* definition of nested fields to render */ }
-        },
+      renderCell: {      // dynamic rendering based on cell value
+        values: { 'value to match': { /* nested field definition */ } },
         default: String,
-      }
-    }
-  ],
-  extraHeaders: [ // additional header layers to be rendered above/before `headers`
-    [ // layers will be rendered in the order they are defined -> this is the first level header
-      {
-        colSpan: 2, // span two `headers` columns
-        label: String || Number || { name: String },
-      }
-    ]
-  ],
-  extraItems: [ // list of item definitions (rows in default layout)
-    { // cell definitions by ID (column in default layout)
-      'cellId1': String, // custom cell value
-      'cellId2': { // using value mapping by `name`, will be converted to {'cellId': 'cellValue'}
-        name: 'path.to.cell.value'
-      },
-      'cellId3': { // using render function
-        render: 'Currency',
-        name: 'path.to.cell.value',
-        // data: 'value' will be added to object based on given `name` path
-      },
-      'cellId4': { // using recursive field Render
-        view: 'Input',
-        name: 'path.to.cell.value',
       },
     },
   ],
-  renderItem: Object, // nested field definition to render after each Table item (row in default layout)
-  filterItems: [ // used for nested tables within tables
-    //  ╭ key path to value in this child-table's item to use for filtering
+  extraHeaders: [        // additional header layers rendered above headers
+    [
+      { colSpan: 2, label: String || Number || { name: String } },
+    ],
+  ],
+  extraItems: [          // additional row definitions
+    {
+      'cellId1': String,
+      'cellId2': { name: 'path.to.cell.value' },
+      'cellId3': { render: 'Currency', name: 'path.to.cell.value' },
+      'cellId4': { view: 'Input', name: 'path.to.cell.value' },
+    },
+  ],
+  renderItem: Object,    // nested field definition rendered after each Table item
+  filterItems: [         // for nested tables within tables
     { 'state': 'state' },
-    //           ╰ key path to value from parent-table's item to match against
   ],
-  group: { // matrix table data grouping
-    by: { // required, common attribute for repeating set of items
-      id: 'tier', // required
-      label: Object, // must resolve to object of labels by `tier` value (ex. {"employee": "Employee/Spouse"})
-    },
-    header: { // required, common header to group items by
-      id: 'ageBand', // required
-    },
+  group: {               // matrix table data grouping
+    by: { id: 'tier', label: Object },
+    header: { id: 'ageBand' },
   },
-  itemsExpanded: Boolean, // expand all Rows/Columns by default
-  itemClassNames: [ // conditional class names for table items (rows in default layout)
-    { // does not work when `vertical: true` because not possible to apply CSS across table rows
-      id: String, // cell id to apply className to
-      values: {
-        'value to match': String // css className to apply
-      },
-    }
+  itemsExpanded: Boolean, // expand all rows by default
+  itemClassNames: [      // conditional class names for table items
+    { id: String, values: { 'value to match': 'className' } },
   ],
-  sorts: [ // adds sorting icon in table headers
-    {
-      id: String, // id of the header item to enable sorting
-      order: 0, // 0 = unsorted by default, 1 = sorted ascending by default, -1 = sorted descending by default
-      sortKey: 'item.attribute.used.for.sorting' // optional
-    },
+  sorts: [               // sorting icon in table headers
+    { id: String, order: 0, sortKey: 'item.attribute' },
   ],
-  colGroup: [ // Create colgroup HTML node to define colunm styles
-    {
-      style: Object // CSS styles
-    },
+  colGroup: [            // column styles (colgroup HTML element)
+    { style: Object, isFixed: Boolean },
   ],
-  usePagination: false, // whether to use pagination for table
-  rowsPerPage: 20, // number of rows per page
+  usePagination: false,  // enable pagination
+  rowsPerPage: 20,       // rows per page
+}
+```
 
-  // Pie Chart attributes
-  mapItems: Object, // data mapper key/value pairs (ex. {label: 'pieLabelKeyFromData', value: 'pieValueKeyFromData'}
+### Pie Chart Attributes
 
-  // Upload and other input attributes
-  kind: 'Type of file or input, for example, "images"',
-  count: Number, // number of files/inputs
+```js
+{
+  mapItems: Object,      // data mapper (ex: {label: 'pieLabelKey', value: 'pieValueKey'})
+}
+```
 
-  // AutoSubmit attributes
-  delay: Number,  // specify delay in milliseconds for input submission on changes, default is 200 milliseconds
-  partial: true, // whether to submit only changed values
-  outputFormat: { // for Inputs with type 'number'
-      decimals: number, // define how many fractional digits to show
-      percentage: boolean, // add percent 
-      separateThousands: boolean // separate thousands in big numbers. don't works with percentage attribute
-  }
+### Upload Attributes
+
+```js
+{
+  kind: 'Type of file, e.g. "images"',
+  count: Number,         // number of files/inputs
+}
+```
+
+### AutoSubmit Attributes
+
+```js
+{
+  delay: Number,         // delay in ms, default 200
+  partial: true,         // submit only changed values
 }
 ```
 
@@ -304,11 +352,11 @@ For a full list of values to use for `view` and formatting functions,
 check [Field Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/variables/fields.js)
 and [Form Input Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/form/constants.js).
 
-### Popup Component
+## Popup Component
 
 The Popup component allows you to display modal dialogs with form fields. When used with Tables, popup fields automatically receive the correct `relativePath` and `relativeIndex` to ensure form field names match the table row that opened the popup.
 
-#### Basic Usage
+### Basic Usage
 
 ```js
 {
@@ -316,7 +364,7 @@ The Popup component allows you to display modal dialogs with form fields. When u
   children: 'Open Popup',
   onClick: {
     name: 'popupOpen',
-    args: ['popupId'] // Popup ID to open
+    args: ['popupId']
   }
 },
 {
@@ -332,7 +380,7 @@ The Popup component allows you to display modal dialogs with form fields. When u
 }
 ```
 
-#### Using Popups with Tables
+### Using Popups with Tables
 
 When opening a popup from a table row (using `renderItem`), the popup fields will automatically use the correct table row context. This ensures that input field names include the proper path and index.
 
@@ -353,18 +401,17 @@ When opening a popup from a table row (using `renderItem`), the popup fields wil
         children: 'Override',
         onClick: {
           name: 'popupOpen',
-          args: ['InforceRateOverrideReason.{index}'] // Use {index} to create unique popup ID per row
+          args: ['InforceRateOverrideReason.{index}']
         }
       },
       {
         view: 'Popup',
-        id: 'InforceRateOverrideReason.{index}', // Template ID with {index} placeholder
+        id: 'InforceRateOverrideReason.{index}',
         items: [
           {
             view: 'Input',
-            name: 'inforceRateOverride', // This will automatically become:
-            // "experienceRatingInputs.uwOverridesCoverage[0].inforceRateOverride"
-            // where [0] is the row index
+            name: 'inforceRateOverride',
+            // Becomes: "experienceRatingInputs.uwOverridesCoverage[0].inforceRateOverride"
             type: 'number',
             label: 'Inforce Rate Override'
           },
@@ -380,74 +427,21 @@ When opening a popup from a table row (using `renderItem`), the popup fields wil
 }
 ```
 
-#### How It Works
+### How It Works
 
-1. **Popup ID with Template Variables**: When you use `{index}` in the popup ID (e.g., `"InforceRateOverrideReason.{index}"`), the system creates a template that will be interpolated when the popup is opened.
+1. **Popup ID with Template Variables**: Use `{index}` in the popup ID to create unique popups per row.
 
-2. **Automatic Context Passing**: When a popup is opened from a table row:
-   - The `relativePath` (table name, e.g., `"experienceRatingInputs.uwOverridesCoverage"`) is automatically passed to popup fields
-   - The `relativeIndex` (row index, e.g., `0`) is automatically passed to popup fields
-   - Input field names are automatically prefixed with the full path: `"{relativePath}[{relativeIndex}].{fieldName}"`
+2. **Automatic Context Passing**: When a popup is opened from a table row, `relativePath` and `relativeIndex` are automatically passed to popup fields. Input field names are prefixed with the full path: `"{relativePath}[{relativeIndex}].{fieldName}"`.
 
-3. **Form Field Names**: The generated field names ensure that:
-   - Each table row has its own set of popup fields
-   - Form values are correctly associated with the correct table row
-   - Form validation works correctly for each row independently
+3. **Form Field Names**: Each table row gets its own set of popup fields with correct path associations and independent validation.
 
-#### Important Notes
+### Important Notes
 
-- **Popup ID Format**: Use `{index}` in the popup ID when opening from table rows to create unique popups per row
-- **Field Names**: Input fields inside popups opened from table rows will automatically have the correct path prefix
-- **Data Context**: Popup fields receive the current row's data (`_data`) automatically, so you can reference fields directly by name
-- **Positioning**: Popups are automatically centered on screen (not at the top)
+- Use `{index}` in the popup ID when opening from table rows
+- Input fields inside popups automatically get the correct path prefix
+- Popup fields receive the current row's data (`_data`) automatically
+- Popups are centered on screen
 
-#### Example: Complete Table with Popup
+## ShowIf Logic
 
-```js
-{
-  view: 'Table',
-  name: 'items',
-  headers: [
-    { id: 'name', label: 'Item Name' },
-    { id: 'value', label: 'Value' }
-  ],
-  renderItem: {
-    view: 'HorizontalLayout',
-    items: [
-      {
-        view: 'Text',
-        name: 'name'
-      },
-      {
-        view: 'Button',
-        children: 'Edit',
-        onClick: {
-          name: 'popupOpen',
-          args: ['EditItem.{index}']
-        }
-      },
-      {
-        view: 'Popup',
-        id: 'EditItem.{index}',
-        items: [
-          {
-            view: 'Input',
-            name: 'name', // Becomes "items[0].name" for first row
-            label: 'Item Name'
-          },
-          {
-            view: 'Input',
-            name: 'value', // Becomes "items[0].value" for first row
-            label: 'Value',
-            type: 'number'
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-### ShowIf Logic
-
-![showIf-logic](/ui-render/static/images/showIf.png)
+![showIf-logic](static/images/showIf.png)

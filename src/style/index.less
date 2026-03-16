@@ -1,0 +1,62 @@
+// =============================================================================
+// Main LESS Entry Point
+// Organized by: Icons → Core → Base → Utilities → Components → Animations → Themes → Semantic UI
+// =============================================================================
+
+/* Core */
+@import "_variables";
+@import "_mixins";
+
+/* Google Fonts are loaded via <link> tag in index.html (CSS @import inside <style> is unreliable) */
+
+/* Icons */
+@import "fonts/icons/style";
+
+/* Base layout */
+@import "base/_layout";
+@import "base/_layout.fix.less";
+
+/* Themes (headings, app base styles — must come before spacing/utilities) */
+@import "themes/_app";
+@import "themes/custom";
+@import "themes/ie11";
+
+/* Components */
+@import "components/button";
+@import "components/chart";
+@import "components/expand";
+@import "components/form";
+@import "components/input";
+@import "components/inputDate";
+@import "components/input.custom.less";
+@import "components/loading";
+@import "components/menu";
+@import "components/modal";
+@import "components/pagination";
+@import "components/popup";
+@import "components/progress";
+@import "components/scrollbar";
+@import "components/slider";
+@import "components/stats";
+@import "components/table";
+@import "components/tabs";
+@import "components/tooltip";
+@import "components/upload";
+
+/* Spacing & font utilities (after themes/components so they can override) */
+@import "base/_spacing";
+@import "base/font";
+
+/* Animations */
+@import "animations/animation";
+
+/* Utilities (after components so they win by cascade) */
+@import "utilities/background";
+@import "utilities/background.custom.less";
+@import "utilities/color";
+@import "utilities/display";
+@import "utilities/effect";
+@import "utilities/element";
+
+/* Semantic UI (selective imports) */
+@import "override/_semantic";

@@ -1,0 +1,24 @@
+/*******************************
+        User Overrides
+*******************************/
+@import "../../_mixins";
+
+.ui.popup {
+  transition: initial;
+
+  &.inverted {
+    border: @border-base;
+
+    &.top:before {
+      transform: translateY(0.1rem) rotate(45deg);
+      border-right: @border-base;
+      border-bottom: @border-base;
+    }
+
+    &.bottom:before {
+      transform: translateY(-0.1rem) rotate(45deg);
+      border-left: @border-base;
+      border-top: @border-base;
+    }
+  }
+}

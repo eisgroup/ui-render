@@ -1,9 +1,9 @@
 {
-  "coveragesDetails": [
+  "categoriesDetails": [
     {
-      "planID": "Golden",
-      "coverageID": "STD Core",
-      "contributionType": "Contributory",
+      "optionID": "Golden",
+      "categoryID": "STD Core",
+      "inputType": "Contributory",
       "annualPremium": 1000,
       "totalNetClaimCost": 703.96,
       "numberOfLives": 10,
@@ -16,7 +16,7 @@
         "sizeFactor": 0.89,
         "FICAMatchingFactor": 1,
         "benefitPercentFactor": 1.05,
-        "coverageFactor": 1,
+        "categoryFactor": 1,
         "preExistingFactor": 0.99,
         "workIncentiveFactor": 1,
         "geographicFactor": 0.713,

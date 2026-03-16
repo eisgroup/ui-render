@@ -20,13 +20,13 @@
       "tier": "Composite Rate",
       "formulaRate": {
         "view": "Input",
-        "name": "coverages.{state.active.plan,0}.rate",
+        "name": "categories.{state.active.option,0}.rate",
         "relativeData": false,
         "type": "number",
         "unit": "USD"
       },
       "proposedRate": {
-        "name": "coverages.{state.active.plan,0}.proposedRate",
+        "name": "categories.{state.active.option,0}.proposedRate",
         "relativeData": false
       }
     }

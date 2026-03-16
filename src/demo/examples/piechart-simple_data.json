@@ -1,0 +1,10 @@
+{
+  "distribution": [
+    { "category": "Engineering", "count": 42 },
+    { "category": "Design", "count": 18 },
+    { "category": "Marketing", "count": 12 },
+    { "category": "Sales", "count": 24 },
+    { "category": "Support", "count": 15 },
+    { "category": "Operations", "count": 9 }
+  ]
+}

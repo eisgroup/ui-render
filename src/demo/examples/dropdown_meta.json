@@ -1,9 +1,9 @@
 {
   "view": "Dropdown",
-  "name": "coverage",
-  "options": "coverages",
-  "mapOptions": "coverageID",
-  "placeholder": "Select Coverage",
+  "name": "category",
+  "options": "categories",
+  "mapOptions": "categoryID",
+  "placeholder": "Select Category",
   "style": {
     "minHeight": 120
   }

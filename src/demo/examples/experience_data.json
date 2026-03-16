@@ -37,57 +37,57 @@
   },
   "ratesAndHistoricalInfo": [
     {
-      "planName": "High",
+      "optionName": "High",
       "historicalInformation": [
         {
           "periodName": "Current Period",
           "historicalInfoEntries": [
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-12-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2021-01-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2021-02-28"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2021-03-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2021-04-30"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2021-05-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2021-06-30"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2021-07-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2021-08-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2021-09-30"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2021-10-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2021-11-30"
             }
           ]
@@ -96,51 +96,51 @@
           "periodName": "1st Period",
           "historicalInfoEntries": [
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-12-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-01-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-02-29"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-03-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-04-30"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-05-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-06-30"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-07-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-08-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-09-30"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-10-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2020-11-30"
             }
           ]
@@ -149,51 +149,51 @@
           "periodName": "2nd Period",
           "historicalInfoEntries": [
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2018-12-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-01-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-02-28"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-03-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-04-30"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-05-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-06-30"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-07-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-08-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-09-30"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-10-31"
             },
             {
-              "planName": "High",
+              "optionName": "High",
               "periodDate": "2019-11-30"
             }
           ]
@@ -263,57 +263,57 @@
       ]
     },
     {
-      "planName": "Low",
+      "optionName": "Low",
       "historicalInformation": [
         {
           "periodName": "Current Period",
           "historicalInfoEntries": [
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-12-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2021-01-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2021-02-28"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2021-03-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2021-04-30"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2021-05-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2021-06-30"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2021-07-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2021-08-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2021-09-30"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2021-10-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2021-11-30"
             }
           ]
@@ -322,51 +322,51 @@
           "periodName": "1st Period",
           "historicalInfoEntries": [
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-12-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-01-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-02-29"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-03-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-04-30"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-05-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-06-30"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-07-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-08-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-09-30"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-10-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2020-11-30"
             }
           ]
@@ -375,51 +375,51 @@
           "periodName": "2nd Period",
           "historicalInfoEntries": [
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2018-12-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-01-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-02-28"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-03-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-04-30"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-05-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-06-30"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-07-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-08-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-09-30"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-10-31"
             },
             {
-              "planName": "Low",
+              "optionName": "Low",
               "periodDate": "2019-11-30"
             }
           ]

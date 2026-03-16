@@ -1,0 +1,12 @@
+/*******************************
+         Site Overrides
+*******************************/
+@import "../../_mixins";
+
+input {
+  &:focus {
+    .inverted & {
+      border-color: @color-primary-light !important;
+    }
+  }
+}

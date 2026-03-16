@@ -1,0 +1,46 @@
+{
+  "view": "Row",
+  "styles": "wrap",
+  "items": [
+    {
+      "view": "PieChart",
+      "name": "distribution",
+      "legends": true,
+      "mapItems": {
+        "label": "category",
+        "value": "count"
+      }
+    },
+    {
+      "view": "PieChart",
+      "name": "distribution",
+      "legends": {
+        "background": false,
+        "bottom": true,
+        "columns": 3
+      },
+      "pointers": true,
+      "unit": "person",
+      "mapItems": {
+        "label": "category",
+        "value": "count"
+      },
+      "items": [
+        {
+          "view": "Col",
+          "className": "align-center",
+          "items": [
+            {
+              "view": "Title",
+              "label": "Team Size"
+            },
+            {
+              "view": "Text",
+              "label": "by department"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

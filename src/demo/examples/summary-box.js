@@ -1,6 +1,6 @@
 export const meta = {
   view: 'RowList',
-  name: 'coverages',
+  name: 'categories',
   styles: 'wrap justify padding-v bg-grey-lightest',
   renderItem: {
     view: 'Col',
@@ -37,12 +37,12 @@ export const meta = {
             items: [
               {
                 view: 'Title',
-                label: {name: 'manualPremium'},
+                label: {name: 'manualAmount'},
                 renderLabel: 'Currency',
               },
               {
                 view: 'Text',
-                label: 'Monthly Manual Premium'
+                label: 'Monthly Manual Amount'
               }
             ]
           },
@@ -119,11 +119,11 @@ export const meta = {
 }
 
 export const data = {
-  coverages: [
+  categories: [
     {
-      title: 'Core Coverage',
+      title: 'Core Category',
       enrolled: 55,
-      manualPremium: 48250.00,
+      manualAmount: 48250.00,
       commissions: 44.00,
       tax: 0.02,
       profit: 0.04,
@@ -131,9 +131,9 @@ export const data = {
       styles: 'padding-largest margin-v align-center bg-info-light',
     },
     {
-      title: 'Buy-Up Coverage',
+      title: 'Buy-Up Category',
       enrolled: 32,
-      manualPremium: 23950.00,
+      manualAmount: 23950.00,
       commissions: 24.00,
       tax: 0.09,
       profit: 0.11,
