@@ -1,5 +1,17 @@
 ### Table of Contents
 
+### v0.32.2
+#### Fixes
+- Fix `showIf` with `{state.xxx}` templates not resolving — Select/Dropdown state changes now correctly toggle conditional table display
+
+### v0.32.1
+#### Fixes
+- Fix Select/Dropdown default: only auto-select first option for index-based selects, not for stable-value selects
+- Fix Dropdown not clearing when parent resets value to `undefined` after initial mount
+- Fix form field `onChange` fallback using raw value instead of parsed value when UIRender instance is absent
+- Add `remark-gfm` plugin for GFM table rendering in documentation
+- Documentation: added `mapOptions` configuration guide explaining index-based vs stable-value modes
+
 ### v0.32.0
 
 #### New

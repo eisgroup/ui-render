@@ -75,7 +75,11 @@ const RenderComponent = ({
             const __data = get((relativeData !== false && _data) || data, showIf)
             if (!isTruthy(__data)) return null
         } else if (hasObjectValue(showIf)) {
-            const { name, relativeData, equal } = showIf
+            const { name: rawName, relativeData, equal } = showIf
+            // Interpolate {state.xxx} templates in showIf.name
+            const name = rawName && rawName.includes('{')
+                ? interpolateString(rawName, instance, { suppressError: true })
+                : rawName
             let __data
             // if (relativePath && typeof relativeIndex !== undefined && name) {
             if (name) {
