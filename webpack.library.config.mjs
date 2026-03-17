@@ -77,6 +77,10 @@ export default {
     plugins: [
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('production'),
+            'process.env': JSON.stringify({ NODE_ENV: 'production' }),
+        }),
+        new webpack.ProvidePlugin({
+            process: 'process/browser',
         }),
         new MiniCssExtractPlugin({
             filename: 'static/all.css',

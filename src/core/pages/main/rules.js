@@ -12,6 +12,7 @@ import { _ } from './translations'
 import {
     replaceDeep,
     getFormsData,
+    getRawFormsData,
     mapErrorObjectToUIFormat,
     getDateStringFromDateObject,
     errorsProcessing,
@@ -190,6 +191,11 @@ export class UIRender extends Component {
         // TODO: investigate realisation with this.data
         // this.data contains related data but there no all changes
         return getFormsData(formsStorage)
+    }
+
+    // Raw form values without Select array reordering — for showIf lookups
+    getRawFormsData = () => {
+        return getRawFormsData(formsStorage)
     }
 
     getCalledMethod = () => {
@@ -1029,6 +1035,9 @@ function Decorator (Class) {
     // Positional arguments was chosen instead of keyword arguments because
     // it provides more flexibility and separation of concerns between different configs.
     Class.prototype.setStates = function (value, keyPath) {
+        // Clear cached meta so {state.xxx} templates re-resolve on next render
+        // (showIf, container names, option paths all depend on current state)
+        this._meta = null
         return this.setState(set(this.state, keyPath, value))
     }
 

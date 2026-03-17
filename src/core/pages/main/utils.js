@@ -18,6 +18,30 @@ export const getFormsData = (forms) => {
   return mergeData([...formDataArray]);
 }
 
+/**
+ * Get raw form values without Select reordering.
+ * Used for showIf lookups where array indices must match the original data order.
+ */
+export const getRawFormsData = (forms) => {
+  const formDataArray = [];
+
+  forms.forEach(value => {
+    const { form, meta } = value;
+    const { relativePath, relativeIndex } = meta || {};
+    if (relativePath && typeof relativeIndex === 'undefined') return;
+
+    const formValues = cloneDeep(form.getState().values);
+
+    if (!relativePath) {
+      formDataArray.push(formValues);
+    } else {
+      formDataArray.push(createObjectStructure(formValues, relativePath, relativeIndex));
+    }
+  })
+
+  return mergeData([...formDataArray]);
+}
+
 const getStructuredDataFromFormObject = (form, meta) => {
   const { relativePath, relativeIndex } = meta || {};
 

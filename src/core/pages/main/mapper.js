@@ -83,10 +83,10 @@ const RenderComponent = ({
             let __data
             // if (relativePath && typeof relativeIndex !== undefined && name) {
             if (name) {
-                // Get from form instead of initial data
-                // It is important to get the value from form, because it might have been changed
-                // On first render the value might not be available in form, so get from initial data
-                const formData = instance.getAllFormsData() || data
+                // Use raw form data (without Select array reordering) for showIf lookups.
+                // getAllFormsData() applies changeOptionOrderForSelectFields which reorders arrays,
+                // but {state.xxx} stores indices relative to the original array order.
+                const formData = (instance.getRawFormsData && instance.getRawFormsData()) || data
                 if (relativePath && typeof relativeIndex !== 'undefined') {
                     __data = get(formData, `${relativePath}[${relativeIndex}].${name}`, undefined)
                 } else {

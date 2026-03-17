@@ -27,8 +27,8 @@ You will also see any lint errors in the console.
 ### Live build mode
 
 - Install `yalc` globally ```npm install -g yalc```
-- Run `npm start yalc-watch` to build library and life reload 
 - In your application add a link to the library with `yalc add eis-ui-render --link` and reinstall dependencies
+- Run `npm run yalc-watch` to build library and life reload 
 
 ### How to publish the library
 
