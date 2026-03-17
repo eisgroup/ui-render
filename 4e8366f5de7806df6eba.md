@@ -1,8 +1,17 @@
 ### Table of Contents
 
+### v0.32.4
+#### Fixes
+- Fix `showIf` evaluating against reordered array data — `showIf` now uses raw form values (`getRawFormsData`) without Select array reordering, so array indices from `{state.xxx}` match the original data order
+
+### v0.32.3
+#### Fixes
+- Fix `showIf` with `{state.xxx}` templates not updating after Select/Dropdown change — cached meta is now cleared on state change so templates re-resolve
+- Fix `showIf.name` interpolation in mapper for edge cases where template is not yet resolved
+
 ### v0.32.2
 #### Fixes
-- Fix `showIf` with `{state.xxx}` templates not resolving — Select/Dropdown state changes now correctly toggle conditional table display
+- Fix `showIf` with `{state.xxx}` templates not resolving in mapper — added interpolation before path lookup
 
 ### v0.32.1
 #### Fixes
