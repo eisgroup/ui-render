@@ -8,6 +8,7 @@ import {
 	isPlainObject,
 	matches,
 	merge as _merge,
+	mergeWith as _mergeWith,
 	property,
 	setWith,
 	unset
@@ -65,6 +66,16 @@ export function isObject (value) {
  */
 export function merge (...objects) {
 	return _merge({}, ...objects)
+}
+
+/**
+ * Like merge(), but replaces arrays wholesale instead of merging them element-by-element.
+ * Prevents deleted array items from being resurrected by the base object.
+ */
+export function mergeReplaceArrays (...objects) {
+	return _mergeWith({}, ...objects, (objValue, srcValue) => {
+		if (Array.isArray(srcValue)) return srcValue
+	})
 }
 
 /**

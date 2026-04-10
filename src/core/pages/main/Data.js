@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { type } from 'ui-react-pack'
 import { Active } from 'ui-utils-pack'
 import UIRenderWithUISetup from './rules'
+import LocalDraftTableRow from './components/LocalDraftTableRow'
 
 /**
  * Component to hold independent UI Render Instance Data
@@ -42,6 +43,8 @@ export default class Data extends Component {
 
     relativePath: type.String,
     relativeIndex: type.Number,
+    /** When true, TableCells draft row uses local state only until Add (no nested form / no parent values leakage). */
+    localDraft: type.Boolean,
   }
 
   static defaultProps = {
@@ -50,14 +53,33 @@ export default class Data extends Component {
   }
 
   render () {
-    const {kind, instance, index, data, meta, initialValues = data, className, style, embedded, useForm} = this.props
+    const {kind, instance, index, data, meta: metaIn, initialValues = data, className, style, embedded, useForm, localDraft} = this.props
     // Use Active.UIRender to avoid circular import
     const UIRender = Active.UIRender
 
-    // For 'TableCells' add additional params to generate unique IDs
-    if (meta.view === 'TableCells' || meta.view === 'Data') {
-      meta.relativePath = this.props.relativePath;
-      meta.relativeIndex = this.props.relativeIndex;
+    // Never mutate shared meta from config: nested tables (e.g. one Data/TableCells per outer row) reuse the
+    // same meta object reference — writing relativePath/relativeIndex on it would leave every row with the
+    // last-rendered row's paths (mixed data, inputs not updating / wrong targets).
+    const meta = (metaIn.view === 'TableCells' || metaIn.view === 'Data')
+      ? {...metaIn, relativePath: this.props.relativePath, relativeIndex: this.props.relativeIndex}
+      : metaIn
+
+    // TableCells only, or Data wrapping TableCells (e.g. renderExtraItem). Draft values stay in React state
+    // until Add — no final-form fields at dataKind.*[nextIndex], so an empty `{}` is not materialized for the draft row.
+    if (localDraft) {
+      const rel = { relativePath: this.props.relativePath, relativeIndex: this.props.relativeIndex }
+      const draftMeta = metaIn.view === 'TableCells'
+        ? meta
+        : (metaIn.meta && metaIn.meta.view === 'TableCells' ? { ...metaIn.meta, ...rel } : null)
+      if (draftMeta) {
+        return (
+          <LocalDraftTableRow
+            meta={draftMeta}
+            kind={kind}
+            parentInstance={instance}
+          />
+        )
+      }
     }
 
     if (useForm) {

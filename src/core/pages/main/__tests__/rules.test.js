@@ -1,4 +1,61 @@
-import { toOpenLConfig, initSelectStatesFromData } from '../rules'
+import { toOpenLConfig, initSelectStatesFromData, getDataKindPathFromRelative, withDataKind } from '../rules'
+
+describe('getDataKindPathFromRelative', () => {
+    it('returns empty string for root-level dataKind path (no parent before .dataKind.kind)', () => {
+        expect(getDataKindPathFromRelative('dataKind.period', 'period')).toBe('')
+    })
+
+    it('returns parent object path for a single nested dataKind table', () => {
+        expect(getDataKindPathFromRelative(
+            'experienceRatingInputs.dataKind.experiencePeriods',
+            'experiencePeriods'
+        )).toBe('experienceRatingInputs')
+    })
+
+    it('uses the last .dataKind.kind segment when the same kind key appears twice (nested)', () => {
+        const path = 'root.dataKind.experiencePeriods.0.inner.dataKind.experiencePeriods'
+        expect(getDataKindPathFromRelative(path, 'experiencePeriods')).toBe(
+            'root.dataKind.experiencePeriods.0.inner'
+        )
+    })
+
+    it('resolves a second-level dataKind with a different kind key', () => {
+        const path = 'root.dataKind.phases.0.dataKind.lineItems'
+        expect(getDataKindPathFromRelative(path, 'lineItems')).toBe('root.dataKind.phases.0')
+    })
+
+    it('returns empty when the suffix is not present', () => {
+        expect(getDataKindPathFromRelative('some.path.without.marker', 'k')).toBe('')
+    })
+
+    it('returns empty for undefined relativePath', () => {
+        expect(getDataKindPathFromRelative(undefined, 'period')).toBe('')
+    })
+
+    it('returns empty for null relativePath', () => {
+        expect(getDataKindPathFromRelative(null, 'period')).toBe('')
+    })
+
+    it('returns empty for empty string relativePath', () => {
+        expect(getDataKindPathFromRelative('', 'period')).toBe('')
+    })
+
+    it('returns empty for undefined kind', () => {
+        expect(getDataKindPathFromRelative('some.dataKind.foo', undefined)).toBe('')
+    })
+
+    it('returns empty for null kind', () => {
+        expect(getDataKindPathFromRelative('some.dataKind.foo', null)).toBe('')
+    })
+
+    it('returns empty for empty string kind', () => {
+        expect(getDataKindPathFromRelative('some.dataKind.foo', '')).toBe('')
+    })
+
+    it('returns empty when relativePath starts with dataKind but for a different kind', () => {
+        expect(getDataKindPathFromRelative('dataKind.otherKind', 'period')).toBe('')
+    })
+})
 
 describe('toOpenLConfig', () => {
     it('assigns setState onChange to Select by default', () => {
@@ -346,5 +403,96 @@ describe('initSelectStatesFromData', () => {
         }
         initSelectStatesFromData(meta, data, instance)
         expect(instance.state.region).toBe('1')
+    })
+})
+
+describe('withDataKind', () => {
+    let ParentClass, parent
+
+    function makeChild (relativePath) {
+        return { props: { meta: { relativePath } } }
+    }
+
+    beforeEach(() => {
+        ParentClass = class {}
+        withDataKind(ParentClass)
+        parent = new ParentClass()
+    })
+
+    describe('registerDataKind', () => {
+        it('registers child at root scope when dataKindPath is empty', () => {
+            const child = makeChild('dataKind.phases')
+            parent.registerDataKind(child, 'phases', 0)
+
+            expect(child.dataKindPath).toBe('')
+            expect(parent.dataKind.phases[''][0]).toBe(child)
+        })
+
+        it('registers child at nested scope based on dataKindPath', () => {
+            const child = makeChild('experienceRatingInputs.dataKind.experiencePeriods')
+            parent.registerDataKind(child, 'experiencePeriods', 0)
+
+            expect(child.dataKindPath).toBe('experienceRatingInputs')
+            expect(parent.dataKind.experiencePeriods['experienceRatingInputs'][0]).toBe(child)
+        })
+
+        it('scopes children by dataKindPath — no collision for 2-level nesting', () => {
+            const child_p0_l0 = makeChild('dataKind.phases.0.dataKind.lineItems')
+            const child_p0_l1 = makeChild('dataKind.phases.0.dataKind.lineItems')
+            const child_p1_l0 = makeChild('dataKind.phases.1.dataKind.lineItems')
+
+            parent.registerDataKind(child_p0_l0, 'lineItems', 0)
+            parent.registerDataKind(child_p0_l1, 'lineItems', 1)
+            parent.registerDataKind(child_p1_l0, 'lineItems', 0)
+
+            // All three are preserved — no overwrite
+            expect(parent.dataKind.lineItems['dataKind.phases.0'][0]).toBe(child_p0_l0)
+            expect(parent.dataKind.lineItems['dataKind.phases.0'][1]).toBe(child_p0_l1)
+            expect(parent.dataKind.lineItems['dataKind.phases.1'][0]).toBe(child_p1_l0)
+
+            expect(child_p0_l0.dataKindPath).toBe('dataKind.phases.0')
+            expect(child_p1_l0.dataKindPath).toBe('dataKind.phases.1')
+        })
+
+        it('handles missing meta gracefully', () => {
+            const child = { props: {} }
+            parent.registerDataKind(child, 'items', 0)
+
+            expect(child.dataKindPath).toBe('')
+            expect(parent.dataKind.items[''][0]).toBe(child)
+        })
+    })
+
+    describe('unregisterDataKind', () => {
+        it('removes child from the correct scope', () => {
+            const child = makeChild('dataKind.phases.0.dataKind.lineItems')
+            parent.registerDataKind(child, 'lineItems', 0)
+            parent.unregisterDataKind(child, 'lineItems', 0)
+
+            expect(parent.dataKind.lineItems['dataKind.phases.0'][0]).toBeUndefined()
+            expect(child.dataKindPath).toBeUndefined()
+        })
+
+        it('does not remove child from wrong scope', () => {
+            const child_p0 = makeChild('dataKind.phases.0.dataKind.lineItems')
+            const child_p1 = makeChild('dataKind.phases.1.dataKind.lineItems')
+            parent.registerDataKind(child_p0, 'lineItems', 0)
+            parent.registerDataKind(child_p1, 'lineItems', 0)
+
+            parent.unregisterDataKind(child_p0, 'lineItems', 0)
+
+            // child_p1 is still registered
+            expect(parent.dataKind.lineItems['dataKind.phases.1'][0]).toBe(child_p1)
+        })
+
+        it('handles null instance gracefully', () => {
+            expect(() => parent.unregisterDataKind(null, 'items', 0)).not.toThrow()
+        })
+    })
+
+    describe('getDataKindPath', () => {
+        it('delegates to getDataKindPathFromRelative', () => {
+            expect(parent.getDataKindPath('a.dataKind.b', 'b')).toBe('a')
+        })
     })
 })

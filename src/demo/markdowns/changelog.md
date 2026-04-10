@@ -1,5 +1,20 @@
 ### Table of Contents
 
+### v0.33.0
+
+#### New
+- **2-level nested dataKind tables** — Data components (`dataKind`) can now be nested inside other Data components (e.g. phases → line items). Add, remove, validation, and `showIf` work correctly across nesting levels. Each nested UIRender instance is isolated with its own form and dataKind registry scoped by parent path.
+- `localDraft` prop on `Data` component — draft row values stay in local React state until Add, preventing empty `{}` from appearing in parent form values
+
+#### Fixes
+- Fix `integer` normalizer — handles empty strings and `NaN` gracefully
+
+#### Tests
+- Added unit and component tests for nested dataKind helpers, `LocalDraftTableRow`, `Data`, `mergeReplaceArrays`, `metaToProps` renderExtraItem
+
+#### Demo
+- Added example: Nested dataKind table (add/remove inner rows)
+
 ### v0.32.4
 #### Fixes
 - Fix `showIf` evaluating against reordered array data — `showIf` now uses raw form values (`getRawFormsData`) without Select array reordering, so array indices from `{state.xxx}` match the original data order

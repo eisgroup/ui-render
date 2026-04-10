@@ -99,9 +99,19 @@ export function metaToProps (meta, config) {
                 // Render is a field definition
                 if (definition.view) {
                     const {name, filterItems, ...configs} = definition
-                    const revPath = {
-                        relativeIndex: index
+                    // TableView calls renderExtraItem(allItems) with no row index — `index` is undefined.
+                    // Inputs must bind to the next array slot (allItems.length): e.g. lineItems[2].field, not lineItems.field.
+                    let rowIndex = index
+                    if (attribute === 'renderExtraItem' && rowIndex == null && isCollection(value)) {
+                        rowIndex = value.length
                     }
+                    const revPath = {
+                        // Row index in *this* table (or next slot for renderExtraItem); used by mapper → path[line][].field
+                        relativeIndex: rowIndex
+                    }
+                    // `relativePathFrom` third arg is the *parent* row index (e.g. phase), not `rowIndex` (line item row).
+                    // Using rowIndex here produced paths like phases.0.{lineRow}.dataKind.lineItems — wrong nesting and
+                    // cross-talk between sub-tables; parent index must come from the enclosing metaToProps `config`.
                     // `meta.name` is undefined when Table.headers.renderCell is defined,
                     // this leads to nested Table with incorrect Input.name, which relies on correct `relativePath`.
                     // The condition is met when:
@@ -129,10 +139,10 @@ export function metaToProps (meta, config) {
                         // Note: since definition is mutated on each transform,
                         // we have to use original config for rendering lists
                         // Pass index and value for args interpolation in onClick handlers
-                        ...metaToProps(cloneDeep(configs), {...config, ...revPath, data, _data: value || _data, relativeIndex: index, rowValue: value}),
+                        ...metaToProps(cloneDeep(configs), {...config, ...revPath, data, _data: value || _data, relativeIndex: rowIndex, rowValue: value}),
                         // Transform key path with actual data
-                        ...name && {name: interpolateString(definition.name, {index, value})},
-                        ...definition.index && {index: interpolateString(definition.index, {index})},
+                        ...name && {name: interpolateString(definition.name, {index: rowIndex, value})},
+                        ...definition.index && {index: interpolateString(definition.index, {index: rowIndex})},
                         ...definition.useForm && {useForm: true},
                         // Filter for row data from parent table (in default layout)
                         ...filterItems && {filterItems, parentItem: value},
@@ -143,16 +153,16 @@ export function metaToProps (meta, config) {
                           !getFunctionFromString(definition[func], {
                             ...funcConfig, 
                             fallback: null, 
-                            relativeIndex: index, 
+                            relativeIndex: rowIndex, 
                             relativePath: revPath.relativePath,
                             _data: value,
                             rowValue: value
                           }) &&
                           {[func]: self[definition[func]]}
                         )).reduce((obj, item) => ({...obj, ...item}), {}),
-                        ...definition.view.indexOf('Data') === 0 && {index},
+                        ...definition.view.indexOf('Data') === 0 && {index: rowIndex},
                         data, _data, form, instance,
-                    }, index)
+                    }, rowIndex)
                 }
 
                 // Render is a function definition
@@ -392,12 +402,25 @@ function mapFunctionArgs (template, {data, args}) {
  * @param {String|Number} relativeIndex - inherited from parent node
  * @returns {String} relativePath - calculated from root path for current config
  */
-function relativePathFrom (meta, relativePath, relativeIndex) {
+export function relativePathFrom (meta, relativePath, relativeIndex) {
     let result = relativePath || meta.name
     // If `meta.name` is relative, concatenate it with inherited `relativePath` for absolute relative path,
     // to pass down to nested configs (ex. Expand inside Table.headers = [{id, renderCell: {...}}] )
     if (meta.name != null && meta.relativeData !== false) {
-        result = relativePath != null ? `${relativePath}.${relativeIndex}.${meta.name}` : meta.name
+        if (relativePath != null) {
+            if (relativeIndex != null) {
+                // List/table row: path.index.childName
+                result = `${relativePath}.${relativeIndex}.${meta.name}`
+            } else if (meta.name === relativePath || meta.name.startsWith(`${relativePath}.`)) {
+                // Full dot-path under parent (no row index), e.g. VerticalLayout + Table with absolute `name`
+                result = meta.name
+            } else {
+                // Object nesting: parentPath + short child key
+                result = `${relativePath}.${meta.name}`
+            }
+        } else {
+            result = meta.name
+        }
     }
     return result
 }

@@ -1,0 +1,37 @@
+{
+  "projectTitle": "Two-level dataKind: add/remove phases and line items (like ER Periods)",
+  "dataKind": {
+    "phases": [
+      {
+        "title": "Design",
+        "budget": 5000,
+        "dataKind": {
+          "lineItems": [
+            { "sku": "DES-001", "description": "Wireframes", "qty": 10, "unitPrice": 150 },
+            { "sku": "DES-002", "description": "Mockups", "qty": 5, "unitPrice": 200 }
+          ]
+        }
+      },
+      {
+        "title": "Development",
+        "budget": 15000,
+        "dataKind": {
+          "lineItems": [
+            { "sku": "DEV-001", "description": "Frontend", "qty": 40, "unitPrice": 175 },
+            { "sku": "DEV-002", "description": "Backend", "qty": 30, "unitPrice": 200 },
+            { "sku": "DEV-003", "description": "Database setup", "qty": 15, "unitPrice": 190 }
+          ]
+        }
+      },
+      {
+        "title": "Testing",
+        "budget": 3000,
+        "dataKind": {
+          "lineItems": [
+            { "sku": "QA-001", "description": "Unit tests", "qty": 20, "unitPrice": 100 }
+          ]
+        }
+      }
+    ]
+  }
+}

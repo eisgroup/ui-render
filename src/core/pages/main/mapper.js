@@ -25,8 +25,9 @@ import TooltipPop from 'ui-react-pack/TooltipPop'
 import View from 'ui-react-pack/View'
 import { Active, debounce, interpolateString, isList, isNumeric, isString, isTruthy, toFlatList, toJSON } from 'ui-utils-pack'
 import { TIME_DURATION_INSTANT } from 'ui-utils-pack/constants'
-import { get, hasObjectValue, isEqual, isObject, } from 'ui-utils-pack/object'
+import { get, hasObjectValue, isEqual, isObject, mergeReplaceArrays } from 'ui-utils-pack/object'
 import Render, { mapProps } from '../../ui-render'
+import { relativePathFrom } from '../../ui-render/transforms'
 import { renderField } from './components/renders'
 import TableView from './components/TableView'
 import TabList from './components/TabList'
@@ -75,7 +76,7 @@ const RenderComponent = ({
             const __data = get((relativeData !== false && _data) || data, showIf)
             if (!isTruthy(__data)) return null
         } else if (hasObjectValue(showIf)) {
-            const { name: rawName, relativeData, equal } = showIf
+            const { name: rawName, relativeData: showIfRelativeData, equal } = showIf
             // Interpolate {state.xxx} templates in showIf.name
             const name = rawName && rawName.includes('{')
                 ? interpolateString(rawName, instance, { suppressError: true })
@@ -86,8 +87,23 @@ const RenderComponent = ({
                 // Use raw form data (without Select array reordering) for showIf lookups.
                 // getAllFormsData() applies changeOptionOrderForSelectFields which reorders arrays,
                 // but {state.xxx} stores indices relative to the original array order.
-                const formData = (instance.getRawFormsData && instance.getRawFormsData()) || data
-                if (relativePath && typeof relativeIndex !== 'undefined') {
+                // Merge with `data` so an empty or partial `{}` from the form does not hide nodes whose
+                // showIf keys exist only on initialValues (e.g. root layout gated by isExperienceHidden).
+                // Note: lodash mergeWith skips undefined source values, so a form field explicitly
+                // cleared to undefined will still show the initial data value. This is acceptable
+                // because showIf targets are typically layout flags from data, not editable form fields.
+                const rawForm = instance.getRawFormsData && instance.getRawFormsData()
+                const formData = (rawForm != null && typeof rawForm === 'object')
+                    ? mergeReplaceArrays(data, rawForm)
+                    : data
+                // Draft row / renderExtraItem sets relativePath + relativeIndex to the next array slot.
+                // showIf.name may still be a global path (e.g. experienceRatingInputs.allPeriodsAdded).
+                // In that case prefixing with `[index].` is wrong — use showIf.relativeData === false or
+                // component relativeData === false to read `name` from form root.
+                if (
+                    relativePath && typeof relativeIndex !== 'undefined' &&
+                    showIfRelativeData !== false && relativeData !== false
+                ) {
                     __data = get(formData, `${relativePath}[${relativeIndex}].${name}`, undefined)
                 } else {
                     __data = get(formData, name, undefined)
@@ -95,7 +111,7 @@ const RenderComponent = ({
             } else {
                 // Get from initial data.
                 // TODO: review this logic. It might be better to get from form instead of initial data
-                __data = (relativeData !== false && !name && _data) || get((relativeData !== false && _data) || data, name)
+                __data = (showIfRelativeData !== false && !name && _data) || get((showIfRelativeData !== false && _data) || data, name)
             }
             if (equal !== undefined) {
                 if (!isEqual(__data, equal)) return null
@@ -141,7 +157,21 @@ const RenderComponent = ({
 
         case FIELD.TYPE.TABLE_CELLS: {
             const { onDataChanged: _1, ...rest } = props
-            return <>{items.map((item, i) => <Table.Cell key={i} {...rest}>{Render(item, i)}</Table.Cell>)}</>
+            // Each cell `item` must receive the parent row's relativePath/relativeIndex so Input names
+            // become e.g. `path[0].field`, not `path.field` (final-form throws on the latter when `path` is an array).
+            // metaToProps usually stamps these on each cell, but merge from `rest` when missing.
+            return <>{items.map((item, i) => {
+                const merged = {
+                    ...item,
+                    ...(item.relativePath == null && rest.relativePath != null && { relativePath: rest.relativePath }),
+                    ...(item.relativeIndex == null && rest.relativeIndex != null && { relativeIndex: rest.relativeIndex }),
+                }
+                return (
+                    <Table.Cell key={i} {...rest}>
+                        {Render(merged, i)}
+                    </Table.Cell>
+                )
+            })}</>
         }
 
         case FIELD.TYPE.AUTO_SUBMIT: {
@@ -355,9 +385,22 @@ const RenderComponent = ({
                 })
             }
 
+            // FieldArray must register the same dot-path as row Inputs (relativePathFrom), not the short `name`
+            // (e.g. `dataKind.lineItems`). Otherwise subscriptions drift and values can clear on blur while form.values
+            // still holds data under the full path.
+            let fieldArrayName = table.name
+            if (table.name != null) {
+                fieldArrayName = relativePathFrom(
+                    { name: table.name, relativeData: table.relativeData !== false },
+                    relativePath,
+                    relativeIndex
+                )
+            }
+
             return <TableView
                 items={_data}
                 additionalCellsStyles={additionalCellsStyles}
+                fieldArrayName={fieldArrayName}
                 {...table}
                 translate={translate}
             />

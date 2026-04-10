@@ -52,6 +52,8 @@ import selectCascadingStableData from '../examples/select-cascading-stable-data.
 import selectCascadingStableMeta from '../examples/select-cascading-stable-meta.json'
 import selectReorderData from '../examples/select-reorder-data.json'
 import selectReorderMeta from '../examples/select-reorder-meta.json'
+import nestedDataKindData from '../examples/nested-datakind_data.json'
+import nestedDataKindMeta from '../examples/nested-datakind_meta.json'
 
 import {
   updatePerformanceData,
@@ -211,6 +213,12 @@ const examples = [
     data: tableForm.data,
     meta: tableForm.meta,
   },
+  {
+    title: 'Nested dataKind table (add/remove inner rows)',
+    id: 'nestedDataKind',
+    data: nestedDataKindData,
+    meta: nestedDataKindMeta,
+  },
   // Other
   {
     title: 'Pie Chart',
@@ -308,7 +316,7 @@ export default class Examples extends Component {
           >
             {() => (
               <>
-                { ['experienceRatings', 'tableForm', 'ratingDetails', 'example1', 'example2', 'buttonIcon', 'selectIndexValue', 'selectStableValue', 'selectCascading', 'selectCascadingStable', 'selectReorder'].includes(id) ? (
+                { ['experienceRatings', 'tableForm', 'ratingDetails', 'example1', 'example2', 'buttonIcon', 'selectIndexValue', 'selectStableValue', 'selectCascading', 'selectCascadingStable', 'selectReorder', 'nestedDataKind'].includes(id) ? (
                   <>
                     <UIRender
                       data={data}
