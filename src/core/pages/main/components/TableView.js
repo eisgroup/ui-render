@@ -338,20 +338,25 @@ export default class TableView extends PureComponent {
       fill, className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical, colGroup, usePagination,
       items: _, headers: _2, renderItem: _3, renderItemCells: _4, itemClassNames: _5,
       itemsExpanded: _6, translate: _7, sellStyles: _8, additionalCellsStyles: _9, rowsPerPage: _10,
+      fieldArrayName: _11,
       ...props
     } = this.props
     const {activePage, rowsPerPage} = this.state
-    let items = this.itemsSorted
+    const allRows = this.itemsSorted
+    let items = allRows
     const totalPages = Math.ceil(items.length / rowsPerPage)
 
     if (usePagination && totalPages > 1) {
       items = items.slice((activePage - 1) * rowsPerPage, activePage * rowsPerPage)
     }
 
+    // Extra "add row" must use the next index in the full data array (allRows.length), not the paginated slice length.
     const tableBody = (
       <>
         {vertical ? headers.map(this.renderItemsVertical) : items.map(this.renderItem)}
-        {renderExtraItem && <Table.Row>{renderExtraItem(items)}</Table.Row>}
+        {renderExtraItem && (
+          <Table.Row>{renderExtraItem(allRows, allRows.length)}</Table.Row>
+        )}
       </>
     )
 
@@ -369,7 +374,7 @@ export default class TableView extends PureComponent {
             </Table.Header>
             <Table.Body>
               {this.props.name ? (
-                  <FieldArray name={this.props.name}>
+                  <FieldArray name={this.props.fieldArrayName || this.props.name}>
                     {({ fields }) => tableBody}
                   </FieldArray>
               ) : tableBody}

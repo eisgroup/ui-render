@@ -1,0 +1,260 @@
+{
+  "view": "Col",
+  "styles": "padding left",
+  "items": [
+    {
+      "view": "Text",
+      "children": "Nested dataKind: parent phases add/remove; each phase expands to line items (add/remove there). New phase draft is only title + budget — add lines after the phase row exists (nested form binding does not work inside the parent draft).",
+      "styles": "margin-v-small"
+    },
+    {
+      "view": "Table",
+      "name": "dataKind.phases",
+      "styles": "outline margin-v",
+      "relativeData": false,
+      "headers": [
+        {
+          "id": "title",
+          "label": { "name": "Phase" },
+          "classNameHeader": "padding-left-small border-right"
+        },
+        {
+          "id": "budget",
+          "label": { "name": "Budget" },
+          "classNameHeader": "padding-left-small border-right"
+        },
+        {
+          "id": "phaseRowActions",
+          "label": { "name": "" },
+          "classNameHeader": "align-center"
+        }
+      ],
+      "renderItemCells": {
+        "view": "Data",
+        "kind": "phases",
+        "embedded": true,
+        "meta": {
+          "view": "TableCells",
+          "style": { "verticalAlign": "top" },
+          "styles": "no-border-right-last-item",
+          "items": [
+            {
+              "view": "Input",
+              "name": "title",
+              "type": "text",
+              "className": "border-on-hover border-right",
+              "validate": "required"
+            },
+            {
+              "view": "Input",
+              "name": "budget",
+              "type": "number",
+              "className": "border-on-hover border-right"
+            },
+            {
+              "view": "VerticalLayout",
+              "items": [
+                {
+                  "view": "Button",
+                  "styles": "a transparent",
+                  "items": [{ "view": "Icon", "name": "trash" }],
+                  "onClick": { "name": "removeData" }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "renderItem": {
+        "view": "VerticalLayout",
+        "styles": "padding-small padding-top-none",
+        "items": [
+          {
+            "view": "Table",
+            "name": "dataKind.lineItems",
+            "styles": "margin-v no-border",
+            "relativeData": true,
+            "headers": [
+              {
+                "id": "sku",
+                "label": { "name": "SKU" },
+                "classNameHeader": "padding-left-small border-right"
+              },
+              {
+                "id": "description",
+                "label": { "name": "Description" },
+                "classNameHeader": "padding-left-small border-right"
+              },
+              {
+                "id": "qty",
+                "label": { "name": "Qty" },
+                "classNameHeader": "padding-left-small border-right"
+              },
+              {
+                "id": "unitPrice",
+                "label": { "name": "Unit Price" },
+                "classNameHeader": "padding-left-small border-right"
+              },
+              {
+                "id": "actions",
+                "label": { "name": "" },
+                "classNameHeader": "align-center"
+              }
+            ],
+            "renderItemCells": {
+              "view": "Data",
+              "kind": "lineItems",
+              "embedded": true,
+              "meta": {
+                "view": "TableCells",
+                "style": { "verticalAlign": "top" },
+                "styles": "no-border-right-last-item",
+                "items": [
+                  {
+                    "view": "Input",
+                    "name": "sku",
+                    "type": "text",
+                    "className": "border-on-hover border-right"
+                  },
+                  {
+                    "view": "Input",
+                    "name": "description",
+                    "type": "text",
+                    "className": "border-on-hover border-right"
+                  },
+                  {
+                    "view": "Input",
+                    "name": "qty",
+                    "type": "number",
+                    "format": "integer",
+                    "className": "border-on-hover border-right"
+                  },
+                  {
+                    "view": "Input",
+                    "name": "unitPrice",
+                    "type": "number",
+                    "className": "border-on-hover border-right"
+                  },
+                  {
+                    "view": "VerticalLayout",
+                    "items": [
+                      {
+                        "view": "Button",
+                        "styles": "a transparent",
+                        "items": [{ "view": "Icon", "name": "trash" }],
+                        "onClick": { "name": "removeData" }
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "renderExtraItem": {
+              "view": "Data",
+              "kind": "lineItems",
+              "embedded": true,
+              "localDraft": true,
+              "initialValues": {},
+              "relativeData": false,
+              "meta": {
+                "view": "TableCells",
+                "style": { "verticalAlign": "top" },
+                "styles": "fade--quarter",
+                "items": [
+                  {
+                    "view": "Input",
+                    "name": "sku",
+                    "type": "text",
+                    "validate": "required"
+                  },
+                  {
+                    "view": "Input",
+                    "name": "description",
+                    "type": "text"
+                  },
+                  {
+                    "view": "Input",
+                    "name": "qty",
+                    "type": "number",
+                    "format": "integer",
+                    "validate": "required"
+                  },
+                  {
+                    "view": "Input",
+                    "name": "unitPrice",
+                    "type": "number"
+                  },
+                  {
+                    "view": "VerticalLayout",
+                    "items": [
+                      {
+                        "view": "Button",
+                        "styles": "a transparent",
+                        "onClick": { "name": "addData" },
+                        "children": "Add line"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "itemsExpanded": true
+          }
+        ]
+      },
+      "renderExtraItem": {
+        "view": "Data",
+        "kind": "phases",
+        "embedded": true,
+        "relativeData": false,
+        "initialValues": {
+          "title": "",
+          "budget": null
+        },
+        "meta": {
+          "view": "Col",
+          "styles": "padding-small",
+          "items": [
+            {
+              "view": "Text",
+              "children": "New phase (draft)",
+              "styles": "h5 margin-bottom-small"
+            },
+            {
+              "view": "Text",
+              "children": "Add line items in the expanded section after this phase is created.",
+              "styles": "muted margin-bottom-small font-smaller"
+            },
+            {
+              "view": "Row",
+              "styles": "margin-bottom",
+              "items": [
+                {
+                  "view": "Input",
+                  "name": "title",
+                  "type": "text",
+                  "label": "Phase title",
+                  "validate": "required",
+                  "className": "margin-right"
+                },
+                {
+                  "view": "Input",
+                  "name": "budget",
+                  "type": "number",
+                  "label": "Budget"
+                }
+              ]
+            },
+            {
+              "view": "Button",
+              "className": "primary margin-top",
+              "onClick": { "name": "addData" },
+              "children": "Add phase"
+            }
+          ]
+        }
+      },
+      "itemsExpanded": true
+    }
+  ]
+}

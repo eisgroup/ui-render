@@ -1,4 +1,4 @@
-import { mapProps, getCurrencySymbol } from '../transforms'
+import { mapProps, getCurrencySymbol, relativePathFrom } from '../transforms'
 
 describe('mapProps', () => {
     it('maps object mapper with {index} to string indices', () => {
@@ -57,5 +57,23 @@ describe('getCurrencySymbol', () => {
 
     it('returns null for null', () => {
         expect(getCurrencySymbol(null)).toBeNull()
+    })
+})
+
+describe('relativePathFrom', () => {
+    const meta = (name, relativeData) => ({ name, relativeData })
+
+    it('joins list row path when relativeIndex is set', () => {
+        expect(relativePathFrom(meta('lineItems', true), 'orders', 0)).toBe('orders.0.lineItems')
+    })
+
+    it('does not embed undefined when relativeIndex is missing (final-form setIn)', () => {
+        const m = meta('parent.child.tableField', true)
+        expect(relativePathFrom(m, 'parent.child', undefined)).toBe('parent.child.tableField')
+    })
+
+    it('prefixes short name when relativePath has no index', () => {
+        const m = meta('rows', true)
+        expect(relativePathFrom(m, 'section', undefined)).toBe('section.rows')
     })
 })

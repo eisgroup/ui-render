@@ -23,6 +23,9 @@ import { downloadFile as downloadFileProcessing } from '../../services/downloadF
 import { double5, integer, phone, uppercase } from 'ui-react-pack/inputs/normalizers'
 import { AppContext } from '../../contexts'
 import Popup from './components/Popup'
+import { getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow } from './dataKindPush'
+
+export { getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow }
 
 FIELD.ACTION = {
     ADD_DATA: 'addData',
@@ -220,7 +223,10 @@ export class UIRender extends Component {
                 data={this.data}
                 {...this.meta}
                 form={this.form || parent.form}
-                instance={parent || this}
+                // Must be this UIRender instance so Inputs use this.form (via withFormSetup getter).
+                // Passing parent here made embedded Data / renderExtraItem fields call instance.form.change
+                // on the root form while Field names targeted nested paths — values leaked into the parent object.
+                instance={this}
                 translate={translate}
                 onDataChanged={this.onDataChanged}
                 currencyCode={this.state.currencyCode}
@@ -394,50 +400,60 @@ export function initSelectStatesFromData (meta, data, instance, contextPath) {
  * Decorator to extend UI Render instance with nested Data component interface
  */
 export function withDataKind (Class) {
-    Class.prototype.getDataKindByRelativePath = function (dataJson) {
-        if (!this.dataKindPath) {
-            return dataJson
-        }
-
-        return get(dataJson, this.dataKindPath)
-    }
-
     Class.prototype.getDataKindPath = function (relativePath, kind) {
-        const pathToData = `.dataKind.${kind}`
-        if (relativePath.includes(pathToData)) {
-            return relativePath.replace(pathToData, '')
-        }
-
-        return ''
+        return getDataKindPathFromRelative(relativePath, kind)
     }
 
-    // Register child instance from parent instance
+    // Register child instance from parent instance.
+    // Registry is scoped by dataKindPath so that children with the same kind+index
+    // from different parent rows (2-level nesting) do not overwrite each other.
+    // Structure: this.dataKind[kind][scope][index] = instance
     Class.prototype.registerDataKind = function (instance, kind, index) {
         if (!this.dataKind) this.dataKind = {}
         if (!this.dataKind[kind]) this.dataKind[kind] = {}
-        this.dataKind[kind][index] = instance
-        this.dataKindPath = this.getDataKindPath(instance.props.meta.relativePath, kind)
+        const relativePath = instance.props.meta && instance.props.meta.relativePath
+        const basePath = this.getDataKindPath(relativePath, kind)
+        instance.dataKindPath = basePath
+        const scope = basePath || ''
+        if (!this.dataKind[kind][scope]) this.dataKind[kind][scope] = {}
+        this.dataKind[kind][scope][index] = instance
     }
 
     // Unregister child instance from parent instance
     Class.prototype.unregisterDataKind = function (instance, kind, index) {
-        if (!this.dataKind) {
-            this.dataKind = {}
+        if (!instance) return
+        if (!this.dataKind) return
+        // Read scope before clearing it on the instance
+        const scope = instance.dataKindPath != null ? instance.dataKindPath : ''
+        if (this.dataKind[kind] && this.dataKind[kind][scope]) {
+            delete this.dataKind[kind][scope][index]
         }
-        if (this.dataKind[kind] && this.dataKind[kind][index]) {
-            delete this.dataKind[kind][index]
-        }
+        delete instance.dataKindPath
     }
 
     /**
-     * Retrieve current forms' values for given data kind, with fallback to data in state
-     * @param {String}kind - Data component kind
-     * @param {Number} [index] - Data component index
-     * @returns {Array|Object|Undefined} all forms values by index array, or form values for given index object, else undefined
+     * Retrieve current forms' values for given data kind.
+     * @param {String} kind - Data component kind
+     * @param {String} [scope] - dataKindPath scope to limit lookup to a specific parent context
+     *   (e.g., for cross-validation within a single parent row in 2-level nesting).
+     *   When omitted, derives the path from the first registered scope (backward-compatible).
+     * @returns {Array} forms values array, or empty array
      */
-    Class.prototype.getDataKind = function (kind) {
+    Class.prototype.getDataKind = function (kind, scope) {
         const dataJson = getFormsData(formsStorage)
-        const pathToDataKindArray = this.dataKindPath ? this.dataKindPath + '.dataKind.' + kind : 'dataKind.' + kind
+        let base
+        if (scope != null) {
+            base = scope
+        } else {
+            const byKind = this.dataKind && this.dataKind[kind]
+            if (byKind) {
+                const firstScope = Object.keys(byKind)[0]
+                if (firstScope != null) {
+                    base = firstScope
+                }
+            }
+        }
+        const pathToDataKindArray = base ? `${base}.dataKind.${kind}` : `dataKind.${kind}`
 
         return get(dataJson, pathToDataKindArray, [])
     }
@@ -480,7 +496,7 @@ function Decorator (Class) {
     Object.defineProperty(Class.prototype, 'config', {
         get () {
             const data = this.data
-            const { form, parent, index } = this.props
+            const { form, parent } = this.props
             // Download file from URL
             FIELD.FUNC[FIELD.ACTION.DOWNLOAD] = (...args) => {
                 // The first argument can be Button Event
@@ -525,14 +541,20 @@ function Decorator (Class) {
                     // Call form submit to run validation
                     if (!this.canSave) return this.handleSubmit()
                     const registeredValues = this.registeredValues
-                    // Add directly to data.json, to keep all data patterns consistent, and to enable backend override.
-                    // And store a copy in state for rehydration when backend updates response without added data.
-                    const { data } = parent.state
-                    const dataKindPath = parent.dataKindPath ? `${parent.dataKindPath}.dataKind` : 'dataKind'
-                    const dataKind = get(data.json, dataKindPath)
-                    dataKind[form.kind] = [...dataKind[form.kind] || [], registeredValues]
-                    const parentForm = this.props.parent.props.instance.form
-                    parentForm.mutators.push(`${dataKindPath}.${form.kind}`, registeredValues)
+                    const rel = this.props.meta && this.props.meta.relativePath
+                    const basePath = (rel != null && rel !== '')
+                        ? this.getDataKindPath(rel, form.kind)
+                        : (this.dataKindPath || '')
+                    const dataKindPath = basePath ? `${basePath}.dataKind` : 'dataKind'
+                    const existingLen = get(parent.state.data.json, `${dataKindPath}.${form.kind}`, []).length
+                    const rowObject = rowObjectForDataKindAppend(registeredValues, rel, existingLen)
+                    pushDataKindRow({
+                        parentUIRender: parent,
+                        meta: this.props.meta,
+                        kind: form.kind,
+                        rowObject,
+                        fallbackDataKindPath: this.dataKindPath || ''
+                    })
                     this.form.restart()
                     this.form.getRegisteredFields().forEach(field => {
                         delete storedTouched[field]
@@ -542,14 +564,33 @@ function Decorator (Class) {
             // Remove current Form values from parent UI Render instance.state
             FIELD.FUNC[FIELD.ACTION.REMOVE_DATA] = (parent && form)
                 ? () => {
-                    const { data } = parent.state
-                    const dataKindPath = parent.dataKindPath ? `${parent.dataKindPath}.dataKind` : 'dataKind'
-                    const dataKind = get(data.json, dataKindPath)
-                    const array = [...dataKind[form.kind] || []]
-                    array.splice(index, 1)
-                    dataKind[form.kind] = array
+                    const rel = this.props.meta && this.props.meta.relativePath
+                    const basePath = (rel != null && rel !== '')
+                        ? this.getDataKindPath(rel, form.kind)
+                        : (this.dataKindPath || '')
+                    const dataKindPath = basePath ? `${basePath}.dataKind` : 'dataKind'
+                    const arrayPath = `${dataKindPath}.${form.kind}`
                     const parentForm = this.props.parent.props.instance.form
-                    parentForm.mutators.remove(`${dataKindPath}.${form.kind}`, index)
+                    if (!parentForm || !parentForm.mutators || typeof parentForm.mutators.remove !== 'function') {
+                        console.warn('REMOVE_DATA: parent form or mutators.remove is not available')
+                        return
+                    }
+                    // Only final-form-arrays `remove` — do not splice `data.json` here: when `state.data.json`
+                    // and form values share references, a manual splice + remove would delete two rows or leave `{}`.
+                    // Use `this.props.index` at click time — not `index` from the `config` getter closure (frozen
+                    // on first `this.meta` build). After a row is deleted, sibling rows re-index; stale index
+                    // removes the wrong slot and leaves a ghost `{}` in the array.
+                    const idx = Number(this.props.index)
+                    parentForm.mutators.remove(arrayPath, idx)
+                    let nextJson = compactDataKindArrays(cloneDeep(parentForm.getState().values))
+                    parent.setState((prev) => ({
+                        data: {
+                            ...prev.data,
+                            json: nextJson,
+                        },
+                    }), () => {
+                        parentForm.reset(nextJson)
+                    })
                 }
                 : dataActionWarning
 
@@ -634,8 +675,8 @@ function Decorator (Class) {
                         }
                     }
                     // 2. Try from form context (only if relativeIndex not already set)
-                    else if (relativeIndex == null && currentForm && typeof currentForm.getState === 'function' && index != null) {
-                        relativeIndex = index
+                    else if (relativeIndex == null && currentForm && typeof currentForm.getState === 'function' && this.props.index != null) {
+                        relativeIndex = this.props.index
                         relativeData = currentForm.getState().values
                         relativePath = this.props.relativePath
                     }
@@ -689,7 +730,7 @@ function Decorator (Class) {
                         if (!popupTemplate && /\.\d+$/.test(id)) {
                             // Extract base name and try to find template with {index}
                             const baseName = id.replace(/\.\d+$/, '')
-                            templateId = `${baseName}.{index}`
+                            templateId = `${baseName}.${this.props.index}`
                             popupTemplate = this.popupTemplates[templateId]
                             
                             // If still not found, try to find any template that matches the pattern
@@ -945,14 +986,22 @@ function Decorator (Class) {
                         return `End date cannot be less than start date`
                     }
                 }
-                // Retrieve current state from all Forms, with fallback to parent instance.state
-                const valuesBy = parent.getDataKind(dataKind) // this only includes values in `data.dataKind` state
+                // Retrieve current state from all Forms, with fallback to parent instance.state.
+                // For same-kind validation, scope to the current parent context so that
+                // 2-level nested tables validate only against siblings within the same parent row.
+                const validationScope = form.kind === dataKind ? this.dataKindPath : undefined
+                const valuesBy = parent.getDataKind(dataKind, validationScope)
                 const ranges = []
                 const thisIndex = form.kind === dataKind ? String(index) : null
-                for (const i in valuesBy) {
-                    if (i === thisIndex) continue
-                    const { [start]: a, [end]: b } = valuesBy[i]
-                    ranges.push([a, b])
+                if (isList(valuesBy)) {
+                    for (let i = 0; i < valuesBy.length; i++) {
+                        if (String(i) === thisIndex) continue
+                        const row = valuesBy[i]
+                        if (row == null || typeof row !== 'object') continue
+                        const a = row[start]
+                        const b = row[end]
+                        ranges.push([a, b])
+                    }
                 }
 
                 // Validate against overlap

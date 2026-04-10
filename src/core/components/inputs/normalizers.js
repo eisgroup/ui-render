@@ -1,6 +1,10 @@
 import { round } from 'ui-utils-pack'
 
-export const integer = (value) => value && parseInt(value, 10)
+export const integer = (value) => {
+  if (value === '' || value == null) return value
+  const n = parseInt(value, 10)
+  return Number.isNaN(n) ? value : n
+}
 export const double5 = (value) => value && round(value, 5)
 export const emptyStringToNull = (value) => ((value === '') ? null : value)
 export const uppercase = (value) => value.toUpperCase()
