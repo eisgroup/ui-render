@@ -1,4 +1,4 @@
-import { merge, isObject } from 'ui-utils-pack/object'
+import { get, merge, isObject, hasObjectValue } from 'ui-utils-pack/object'
 import { errorsMap } from './rules'
 import { FIELD, ISO_8601_FULL } from 'ui-modules-pack'
 import { cloneDeep } from 'ui-utils-pack'
@@ -16,6 +16,43 @@ export const getFormsData = (forms) => {
   })
 
   return mergeData([...formDataArray]);
+}
+
+/**
+ * Live {@code dataKind.*} array: merge each row from every form that holds {@code path} in
+ * {@code form.getState().values}, shallow-merge row objects (later forms in {@code forms} order win).
+ * Length is capped to the minimum array length among those forms so a stale longer copy on the
+ * master form does not leave ghost rows after FieldArray.remove (lodash merge keeps trailing indices).
+ *
+ * @param {string} path - e.g. {@code experienceRatingInputs.dataKind.experiencePeriods} or {@code dataKind.period}
+ * @param {Map} forms - {@link formsStorage}
+ * @returns {Array<Object>}
+ */
+export function getLiveMergedDataKindArray (path, forms) {
+  const arrays = []
+  forms.forEach(({ form }) => {
+    if (!form || typeof form.getState !== 'function') return
+    const arr = get(form.getState().values, path)
+    if (Array.isArray(arr) && arr.length > 0) {
+      arrays.push(arr)
+    }
+  })
+  if (!arrays.length) {
+    return []
+  }
+  const cap = Math.min(...arrays.map(a => a.length))
+  const out = []
+  for (let i = 0; i < cap; i++) {
+    let row = {}
+    for (const arr of arrays) {
+      const piece = arr[i]
+      if (piece != null && typeof piece === 'object' && !Array.isArray(piece)) {
+        row = { ...row, ...piece }
+      }
+    }
+    out.push(hasObjectValue(row) ? row : {})
+  }
+  return out
 }
 
 /**

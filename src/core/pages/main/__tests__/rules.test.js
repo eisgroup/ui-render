@@ -1,4 +1,23 @@
-import { toOpenLConfig, initSelectStatesFromData, getDataKindPathFromRelative, withDataKind } from '../rules'
+import { toOpenLConfig, initSelectStatesFromData, getDataKindPathFromRelative, withDataKind, parseArrayPrefixAndRowIndexFromFieldName } from '../rules'
+import { getLiveMergedDataKindArray } from '../utils'
+
+describe('parseArrayPrefixAndRowIndexFromFieldName', () => {
+    it('parses final-form array field names for table rows', () => {
+        expect(parseArrayPrefixAndRowIndexFromFieldName('dataKind.experiencePeriods[0].startDate')).toEqual({
+            arrayPrefix: 'dataKind.experiencePeriods',
+            rowIndex: 0,
+        })
+        expect(parseArrayPrefixAndRowIndexFromFieldName('experienceRatingInputs.dataKind.experiencePeriods[2].endDate')).toEqual({
+            arrayPrefix: 'experienceRatingInputs.dataKind.experiencePeriods',
+            rowIndex: 2,
+        })
+    })
+
+    it('returns null when pattern does not match', () => {
+        expect(parseArrayPrefixAndRowIndexFromFieldName('flatField')).toBe(null)
+        expect(parseArrayPrefixAndRowIndexFromFieldName(null)).toBe(null)
+    })
+})
 
 describe('getDataKindPathFromRelative', () => {
     it('returns empty string for root-level dataKind path (no parent before .dataKind.kind)', () => {
@@ -494,5 +513,18 @@ describe('withDataKind', () => {
         it('delegates to getDataKindPathFromRelative', () => {
             expect(parent.getDataKindPath('a.dataKind.b', 'b')).toBe('a')
         })
+    })
+})
+
+describe('getLiveMergedDataKindArray', () => {
+    it('caps to the shortest non-empty array and shallow-merges rows (later forms overwrite)', () => {
+        const forms = new Map()
+        const masterVals = { dataKind: { periods: [{ a: 1, x: 1 }, { a: 2, x: 2 }] } }
+        const nestedVals = { dataKind: { periods: [{ a: 10 }] } }
+        forms.set(1, { form: { getState: () => ({ values: masterVals }) } })
+        forms.set(2, { form: { getState: () => ({ values: nestedVals }) } })
+        const out = getLiveMergedDataKindArray('dataKind.periods', forms)
+        expect(out).toHaveLength(1)
+        expect(out[0]).toEqual({ a: 10, x: 1 })
     })
 })

@@ -60,7 +60,7 @@ export function metaToProps (meta, config) {
     let {data, _data} = config
     // Transform Root attributes
     if (isObject(meta)) {
-        metaToFunctions(meta, {...funcConfig, data})
+        metaToFunctions(meta, {...funcConfig, data, instance})
         if (meta.name) meta.name = interpolateString(meta.name, instance, {suppressError: true})
     }
 
@@ -73,7 +73,7 @@ export function metaToProps (meta, config) {
         // Map `onClick` functions by name (if exists)
         // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
         if (isObject(definition)) {
-            metaToFunctions(definition, {...funcConfig, data, relativeIndex, _data, rowValue: _data})
+            metaToFunctions(definition, {...funcConfig, data, relativeIndex, _data, rowValue: _data, instance})
             if (definition.name) {
                 definition.name = interpolateString(definition.name, instance, {suppressError: true})
             }
@@ -106,12 +106,8 @@ export function metaToProps (meta, config) {
                         rowIndex = value.length
                     }
                     const revPath = {
-                        // Row index in *this* table (or next slot for renderExtraItem); used by mapper → path[line][].field
                         relativeIndex: rowIndex
                     }
-                    // `relativePathFrom` third arg is the *parent* row index (e.g. phase), not `rowIndex` (line item row).
-                    // Using rowIndex here produced paths like phases.0.{lineRow}.dataKind.lineItems — wrong nesting and
-                    // cross-talk between sub-tables; parent index must come from the enclosing metaToProps `config`.
                     // `meta.name` is undefined when Table.headers.renderCell is defined,
                     // this leads to nested Table with incorrect Input.name, which relies on correct `relativePath`.
                     // The condition is met when:
@@ -267,8 +263,12 @@ function metaToFunctions(definition, config) {
     if (hasObjectValue(definition.verify)) {
         // in the future, verify can have multiple validator functions, so compose them
         const {validate, ...opt} = definition.verify
-        // final-form only passes input `value` to validate function
-        const validators = toList(validate).map(({name, ...args}) => (v) => fieldValidation[name](v, {...opt, ...args}))
+        const { instance } = config
+        // final-form passes (value, allValues, meta) to field validate — forward for cross-field rules (e.g. notWithinRange)
+        const validators = toList(validate).map(({name, ...args}) => (...validateArgs) => {
+            const fn = fieldValidation[name]
+            return fn ? fn(validateArgs[0], {...opt, ...args}, validateArgs[1], validateArgs[2], instance) : undefined
+        })
         if (definition.validate) validators.unshift(definition.validate)
         definition.validate = composeValidators(...validators)
         delete definition.verify
@@ -282,7 +282,7 @@ function metaToFunctions(definition, config) {
     })
 }
 
-const composeValidators = (...validators) => (value) => validators.reduce((error, validator) => error || validator(value), undefined)
+const composeValidators = (...validators) => (...args) => validators.reduce((error, validator) => error || validator(...args), undefined)
 
 /**
  * Get Function/s from Definition Object Recursively
@@ -408,14 +408,11 @@ export function relativePathFrom (meta, relativePath, relativeIndex) {
     // to pass down to nested configs (ex. Expand inside Table.headers = [{id, renderCell: {...}}] )
     if (meta.name != null && meta.relativeData !== false) {
         if (relativePath != null) {
-            if (relativeIndex != null) {
-                // List/table row: path.index.childName
+            if (relativeIndex != null && relativeIndex !== '') {
                 result = `${relativePath}.${relativeIndex}.${meta.name}`
-            } else if (meta.name === relativePath || meta.name.startsWith(`${relativePath}.`)) {
-                // Full dot-path under parent (no row index), e.g. VerticalLayout + Table with absolute `name`
+            } else if (meta.name === relativePath || (isString(meta.name) && meta.name.startsWith(`${relativePath}.`))) {
                 result = meta.name
             } else {
-                // Object nesting: parentPath + short child key
                 result = `${relativePath}.${meta.name}`
             }
         } else {

@@ -113,8 +113,8 @@ export default {
             patterns: [
                 { from: 'src/style/semantic-stub.css', to: './static/semantic.css' },
                 { from: 'src/style/semantic-stub.css', to: '../static/semantic.css' },
-                { from: 'src/style/fonts/icons/fonts', to: './static/fonts', noErrorOnMissing: true },
-                { from: 'src/style/fonts/icons/fonts', to: '../static/fonts', noErrorOnMissing: true },
+                { from: 'src/style/fonts/icons/fonts', to: './static/fonts/icons/fonts', noErrorOnMissing: true },
+                { from: 'src/style/fonts/icons/fonts', to: '../static/fonts/icons/fonts', noErrorOnMissing: true },
                 { from: 'public/static/images', to: './static/images', noErrorOnMissing: true },
                 { from: 'public/static/images', to: '../static/images', noErrorOnMissing: true },
             ],

@@ -1,4 +1,5 @@
 import React, { Component, Fragment, PureComponent, isValidElement } from 'react'
+import 'ui-modules-pack/form/constants'
 import { storedTouched, withForm } from 'ui-modules-pack/form'
 import { FIELD } from 'ui-modules-pack/variables'
 import { cn, type } from 'ui-react-pack'
@@ -12,6 +13,7 @@ import { _ } from './translations'
 import {
     replaceDeep,
     getFormsData,
+    getLiveMergedDataKindArray,
     getRawFormsData,
     mapErrorObjectToUIFormat,
     getDateStringFromDateObject,
@@ -49,6 +51,113 @@ FIELD.TYPE = {
 FIELD.CROSS_VALIDATE = {
     NOT_WITHIN_RANGE: 'notWithinRange',
 }
+
+/**
+ * Parse `dataKind.experiencePeriods[0].startDate`-style field names for stable row index (see notWithinRangeValidator).
+ */
+export function parseArrayPrefixAndRowIndexFromFieldName (fieldName) {
+    if (!fieldName || typeof fieldName !== 'string') return null
+    const m = fieldName.match(/^(.*)\[(\d+)\]\.[^.[]+$/)
+    if (!m) return null
+    return { arrayPrefix: m[1], rowIndex: Number(m[2]) }
+}
+
+/**
+ * Cross-row period overlap validation. Uses final-form (allValues, meta.name) + per-field `instance` closure
+ * so row index stays correct after FieldArray.remove (global FIELD.VALIDATION reassignment from `config` was not safe).
+ */
+function notWithinRangeValidator (value, { dataKind, args: argsIn } = {}, allValues, meta, instance) {
+    const args = argsIn || []
+    const [start, end] = args
+    if (!start || !end || !dataKind) return undefined
+
+    const fromName = meta && meta.name ? parseArrayPrefixAndRowIndexFromFieldName(meta.name) : null
+    let rowIndexNum = fromName != null && !Number.isNaN(fromName.rowIndex) ? fromName.rowIndex : null
+
+    let relativePath = null
+    let propsRelativeIndex = null
+    if (instance && instance.props) {
+        const propsMeta = instance.props.meta
+        relativePath = (propsMeta && propsMeta.relativePath) || instance.props.relativePath
+        const ri = (propsMeta && propsMeta.relativeIndex != null) ? propsMeta.relativeIndex : instance.props.relativeIndex
+        propsRelativeIndex = ri
+        if (rowIndexNum == null && ri != null && ri !== '' && !Number.isNaN(Number(ri))) {
+            rowIndexNum = Number(ri)
+        }
+    }
+
+    const valuesRoot = allValues || (instance && instance.formValues)
+    let _a
+    let _b
+    const arrayPrefix = fromName ? fromName.arrayPrefix : relativePath
+
+    if (arrayPrefix && rowIndexNum != null && valuesRoot) {
+        _a = get(valuesRoot, `${arrayPrefix}[${rowIndexNum}].${start}`)
+        if (_a === undefined) _a = get(valuesRoot, `${arrayPrefix}.${rowIndexNum}.${start}`)
+        _b = get(valuesRoot, `${arrayPrefix}[${rowIndexNum}].${end}`)
+        if (_b === undefined) _b = get(valuesRoot, `${arrayPrefix}.${rowIndexNum}.${end}`)
+    } else if (valuesRoot) {
+        _a = valuesRoot[start]
+        _b = valuesRoot[end]
+    }
+
+    if (_a !== undefined && _b !== undefined) {
+        if (_a === _b) {
+            return `Start date and end date cannot be the same`
+        } else if (_a === value && String(_b) < String(_a)) {
+            return `Start date cannot be more than end date`
+        } else if (_b === value && String(_b) < String(_a)) {
+            return `End date cannot be less than start date`
+        }
+    }
+
+    const parentUi = (instance && instance.props && instance.props.parent) || instance
+    if (!parentUi || typeof parentUi.getDataKind !== 'function') return undefined
+
+    const form = instance && instance.props && instance.props.form
+    const validationScope = form && form.kind === dataKind ? instance.dataKindPath : undefined
+    const valuesBy = parentUi.getDataKind(dataKind, validationScope)
+    const ranges = []
+    const thisIndex = form && form.kind === dataKind && rowIndexNum != null && !Number.isNaN(rowIndexNum)
+        ? String(rowIndexNum)
+        : null
+    if (isList(valuesBy)) {
+        for (let i = 0; i < valuesBy.length; i++) {
+            if (thisIndex != null && String(i) === thisIndex) continue
+            const row = valuesBy[i]
+            if (row == null || typeof row !== 'object') continue
+            const a = row[start]
+            const b = row[end]
+            if (a == null || b == null || a === '' || b === '') continue
+            ranges.push([a, b])
+        }
+    }
+
+    if (_a && _b) {
+        let s1 = String(_a); let e1 = String(_b)
+        let curLo = s1 <= e1 ? s1 : e1
+        let curHi = s1 <= e1 ? e1 : s1
+        if (value != null && value !== '') {
+            const v = String(value)
+            if (v < curLo) curLo = v
+            else if (v > curHi) curHi = v
+        }
+        const overlapsPeer = ranges.some(([a, b]) => {
+            const sa = String(a); const sb = String(b)
+            const pLo = sa <= sb ? sa : sb
+            const pHi = sa <= sb ? sb : sa
+            return !(curHi < pLo || pHi < curLo)
+        })
+        if (overlapsPeer) {
+            return `Periods cannot overlap`
+        }
+    }
+
+    return undefined
+}
+
+FIELD.VALIDATION[FIELD.CROSS_VALIDATE.NOT_WITHIN_RANGE] = notWithinRangeValidator
+
 FIELD.NORMALIZE = {
     DATE: 'date',
     HOUR_MINUTE: 'hh:mm',
@@ -440,7 +549,6 @@ export function withDataKind (Class) {
      * @returns {Array} forms values array, or empty array
      */
     Class.prototype.getDataKind = function (kind, scope) {
-        const dataJson = getFormsData(formsStorage)
         let base
         if (scope != null) {
             base = scope
@@ -455,6 +563,11 @@ export function withDataKind (Class) {
         }
         const pathToDataKindArray = base ? `${base}.dataKind.${kind}` : `dataKind.${kind}`
 
+        const live = getLiveMergedDataKindArray(pathToDataKindArray, formsStorage)
+        if (live.length > 0) {
+            return live
+        }
+        const dataJson = getFormsData(formsStorage)
         return get(dataJson, pathToDataKindArray, [])
     }
 
@@ -962,61 +1075,6 @@ function Decorator (Class) {
 
             FIELD.METHODS = this.getCalledMethod()
 
-            // Cross UI Render instances validation
-            FIELD.VALIDATION[FIELD.CROSS_VALIDATE.NOT_WITHIN_RANGE] = (value, { dataKind, args: [start, end] }) => {
-                const { form, index, parent, meta } = this.props
-                // get relative path and index to field from formValues
-                const { relativeIndex, relativePath } = meta || {}
-                let _a, _b
-
-                if (relativePath && typeof relativeIndex === 'number') {
-                    _a = get(this.formValues, `${relativePath}.${relativeIndex}.${start}`)
-                    _b = get(this.formValues, `${relativePath}.${relativeIndex}.${end}`)
-                } else {
-                    _a = this.formValues[start]
-                    _b = this.formValues[end]
-                }
-
-                if (_a !== undefined && _b !== undefined) {
-                    if (_a === _b) {
-                        return `Start date and end date cannot be the same`
-                    } else if (_a === value && _b < _a) {
-                        return `Start date cannot be more than end date`
-                    } else if (_b === value && _b < _a) {
-                        return `End date cannot be less than start date`
-                    }
-                }
-                // Retrieve current state from all Forms, with fallback to parent instance.state.
-                // For same-kind validation, scope to the current parent context so that
-                // 2-level nested tables validate only against siblings within the same parent row.
-                const validationScope = form.kind === dataKind ? this.dataKindPath : undefined
-                const valuesBy = parent.getDataKind(dataKind, validationScope)
-                const ranges = []
-                const thisIndex = form.kind === dataKind ? String(index) : null
-                if (isList(valuesBy)) {
-                    for (let i = 0; i < valuesBy.length; i++) {
-                        if (String(i) === thisIndex) continue
-                        const row = valuesBy[i]
-                        if (row == null || typeof row !== 'object') continue
-                        const a = row[start]
-                        const b = row[end]
-                        ranges.push([a, b])
-                    }
-                }
-
-                // Validate against overlap
-                if (_a && _b) {
-                    // TODO: review this logic
-                    const range = ranges.find((([a, b]) => _a < a && b < _b))
-                    const error = ranges.find(([start, end]) => start <= value && value <= end)
-
-                    if (range || error) {
-                        return `Periods cannot overlap`
-                    }
-                }
-
-                return undefined
-            }
             FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
             FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
             FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
@@ -1157,6 +1215,18 @@ function Decorator (Class) {
         if (UNSAFE_componentWillReceiveProps) {
             UNSAFE_componentWillReceiveProps.apply(this, arguments)
         }
+    }
+
+    const componentDidUpdate = Class.prototype.componentDidUpdate
+    Class.prototype.componentDidUpdate = function (prevProps, prevState) {
+        const { parent, form, index } = this.props
+        if (parent && form && index != null && prevProps.index !== index) {
+            if (prevProps.index != null) {
+                parent.unregisterDataKind(this, form.kind, prevProps.index)
+            }
+            parent.registerDataKind(this, form.kind, index)
+        }
+        if (componentDidUpdate) componentDidUpdate.apply(this, arguments)
     }
 
     return withForm({

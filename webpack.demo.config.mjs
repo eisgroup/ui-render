@@ -55,7 +55,10 @@ export default (env, argv) => {
                         isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
                         {
                             loader: 'css-loader',
-                            options: { url: false },
+                            options: {
+                                // Resolve url() so @font-face font files are emitted and work with style-loader (dev)
+                                url: true,
+                            },
                         },
                         'postcss-loader',
                         {
