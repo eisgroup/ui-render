@@ -53,7 +53,7 @@ export default class Data extends Component {
   }
 
   render () {
-    const {kind, instance, index, data, meta: metaIn, initialValues = data, className, style, embedded, useForm, localDraft} = this.props
+    const {kind, instance, index, relativeIndex, data, meta: metaIn, initialValues = data, className, style, embedded, useForm, localDraft} = this.props
     // Use Active.UIRender to avoid circular import
     const UIRender = Active.UIRender
 
@@ -82,6 +82,10 @@ export default class Data extends Component {
       }
     }
 
+    // Table row contexts set `relativeIndex` (field array index); `index` is often unset.
+    // Prefer relativeIndex over index so row identity stays correct after FieldArray reindex (e.g. remove row).
+    const rowIndex = relativeIndex != null ? relativeIndex : index
+
     if (useForm) {
       return <UIRenderWithUISetup
         data={data}
@@ -89,7 +93,8 @@ export default class Data extends Component {
         initialValues={initialValues}
         form={{kind}}
         parent={instance}
-        index={index}
+        index={rowIndex}
+        relativeIndex={relativeIndex}
         embedded={embedded}
         {...{className, style}}
       />
@@ -101,7 +106,8 @@ export default class Data extends Component {
       initialValues={initialValues}
       form={{kind}}
       parent={instance}
-      index={index}
+      index={rowIndex}
+      relativeIndex={relativeIndex}
       embedded={embedded}
       {...{className, style}}
     />
