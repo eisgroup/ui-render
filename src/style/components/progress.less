@@ -102,31 +102,6 @@
 }
 
 // =============================================================================
-// CIRCLE
-// =============================================================================
-@progress-circle-thickness: 10;
-
-.app__progress--circle {
-  &.round {
-    .recharts-radial-bar-sector {
-      stroke-linejoin: round;
-    }
-  }
-
-  .recharts-radial-bar-sector {
-    stroke-width: size(@progress-circle-thickness);
-  }
-}
-
-.app__progress--circle__inner {
-  @size: calc(100% - size(@progress-circle-thickness + 20));
-  .circle(@size);
-
-  position: absolute;
-  border: size(1) @border-style;
-}
-
-// =============================================================================
 // STEPS
 // =============================================================================
 @progress-steps-line-height: size(3);

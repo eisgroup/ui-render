@@ -2,49 +2,9 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { ConfigContext, initialConfigState } from '../../../contexts/ConfigContext'
+import PieChart from '../PieChart'
 
-// Mock recharts — jsdom has no ResizeObserver / SVG layout
-jest.mock('recharts', () => {
-    const React = require('react')
-    const MockResponsiveContainer = ({ children, height }) => (
-        <div data-testid="responsive-container" data-height={height}>{children}</div>
-    )
-    const MockPieChart = ({ children }) => (
-        <div data-testid="piechart">{children}</div>
-    )
-    const MockPie = ({ data, dataKey, children, label, innerRadius, outerRadius, strokeWidth }) => (
-        <div
-            data-testid="pie"
-            data-datakey={dataKey}
-            data-inner-radius={innerRadius}
-            data-outer-radius={outerRadius}
-            data-stroke-width={strokeWidth}
-            data-count={data ? data.length : 0}
-        >
-            {children}
-        </div>
-    )
-    const MockCell = ({ fill, stroke, color }) => (
-        <div data-testid="cell" data-fill={fill} data-stroke={stroke} data-color={color} />
-    )
-    const MockTooltip = ({ content }) => (
-        <div data-testid="tooltip" />
-    )
-    return {
-        ResponsiveContainer: MockResponsiveContainer,
-        PieChart: MockPieChart,
-        Pie: MockPie,
-        Cell: MockCell,
-        Tooltip: MockTooltip,
-    }
-})
-
-// Import after mock
-const PieChart = require('../PieChart').default
-
-// Suppress jsdom SVG tag warnings (linearGradient, stop, etc.)
-beforeAll(() => { jest.spyOn(console, 'error').mockImplementation(() => {}) })
-afterAll(() => { console.error.mockRestore() })
+// jsdom has no ResizeObserver — the component falls back to a square chart of `height`.
 
 const renderPieChart = (props) =>
     render(
@@ -66,42 +26,34 @@ describe('PieChart', () => {
             expect(container.firstChild).toBeInTheDocument()
         })
 
-        it('renders recharts components', () => {
-            renderPieChart({ items: sampleItems })
-            expect(screen.getByTestId('responsive-container')).toBeInTheDocument()
-            expect(screen.getByTestId('piechart')).toBeInTheDocument()
-            expect(screen.getByTestId('pie')).toBeInTheDocument()
+        it('renders an SVG donut chart', () => {
+            const { container } = renderPieChart({ items: sampleItems })
+            expect(container.querySelector('svg')).toBeInTheDocument()
         })
 
-        it('renders one Cell per data item', () => {
-            renderPieChart({ items: sampleItems })
-            const cells = screen.getAllByTestId('cell')
-            expect(cells).toHaveLength(sampleItems.length)
+        it('renders one slice path per data item', () => {
+            const { container } = renderPieChart({ items: sampleItems })
+            const slices = container.querySelectorAll('path[data-name]')
+            expect(slices).toHaveLength(sampleItems.length)
         })
 
-        it('passes correct dataKey to Pie', () => {
-            renderPieChart({ items: sampleItems })
-            expect(screen.getByTestId('pie')).toHaveAttribute('data-datakey', 'value')
-        })
-
-        it('passes correct radius props', () => {
-            renderPieChart({ items: sampleItems })
-            const pie = screen.getByTestId('pie')
-            expect(pie).toHaveAttribute('data-inner-radius', '40%')
-            expect(pie).toHaveAttribute('data-outer-radius', '60%')
-            expect(pie).toHaveAttribute('data-stroke-width', '0')
+        it('binds slice data-name to the item label', () => {
+            const { container } = renderPieChart({ items: sampleItems })
+            const names = Array.from(container.querySelectorAll('path[data-name]'))
+                .map((p) => p.getAttribute('data-name'))
+            expect(names).toEqual(['Engineering', 'Design', 'Marketing'])
         })
     })
 
     describe('height prop', () => {
-        it('uses default height of 290', () => {
-            renderPieChart({ items: sampleItems })
-            expect(screen.getByTestId('responsive-container')).toHaveAttribute('data-height', '290')
+        it('uses default height of 290 on the SVG', () => {
+            const { container } = renderPieChart({ items: sampleItems })
+            expect(container.querySelector('svg')).toHaveAttribute('height', '290')
         })
 
         it('respects custom height', () => {
-            renderPieChart({ items: sampleItems, height: 400 })
-            expect(screen.getByTestId('responsive-container')).toHaveAttribute('data-height', '400')
+            const { container } = renderPieChart({ items: sampleItems, height: 400 })
+            expect(container.querySelector('svg')).toHaveAttribute('height', '400')
         })
     })
 
@@ -168,16 +120,16 @@ describe('PieChart', () => {
             expect(gradients).toHaveLength(0)
         })
 
-        it('Cell fill uses gradient URL when gradient=true', () => {
-            renderPieChart({ items: sampleItems })
-            const cells = screen.getAllByTestId('cell')
-            expect(cells[0].getAttribute('data-fill')).toMatch(/^url\(#pc-/)
+        it('slice fill uses gradient URL when gradient=true', () => {
+            const { container } = renderPieChart({ items: sampleItems })
+            const path = container.querySelector('path[data-name]')
+            expect(path.getAttribute('fill')).toMatch(/^url\(#pc-/)
         })
 
-        it('Cell fill uses color directly when gradient=false', () => {
-            renderPieChart({ items: sampleItems, gradient: false })
-            const cells = screen.getAllByTestId('cell')
-            expect(cells[0].getAttribute('data-fill')).toMatch(/^#/)
+        it('slice fill uses color directly when gradient=false', () => {
+            const { container } = renderPieChart({ items: sampleItems, gradient: false })
+            const path = container.querySelector('path[data-name]')
+            expect(path.getAttribute('fill')).toMatch(/^#/)
         })
     })
 
@@ -189,7 +141,6 @@ describe('PieChart', () => {
 
         it('renders legend items when legends=true', () => {
             renderPieChart({ items: sampleItems, legends: true })
-            // Each item label should appear in legends
             expect(screen.getByText('Engineering')).toBeInTheDocument()
             expect(screen.getByText('Design')).toBeInTheDocument()
             expect(screen.getByText('Marketing')).toBeInTheDocument()
@@ -262,27 +213,24 @@ describe('PieChart', () => {
         })
 
         it('assigns colors from palette', () => {
-            renderPieChart({ items: sampleItems })
-            const cells = screen.getAllByTestId('cell')
-            // Each cell should have a color from the palette
-            cells.forEach(cell => {
-                expect(cell.getAttribute('data-color')).toMatch(/^#/)
+            const { container } = renderPieChart({ items: sampleItems })
+            const slices = container.querySelectorAll('path[data-name]')
+            slices.forEach((path) => {
+                expect(path.getAttribute('data-color')).toMatch(/^#/)
             })
         })
 
         it('assigns different colors to each item', () => {
-            renderPieChart({ items: sampleItems })
-            const cells = screen.getAllByTestId('cell')
-            const colors = cells.map(c => c.getAttribute('data-color'))
-            const unique = new Set(colors)
-            expect(unique.size).toBe(sampleItems.length)
+            const { container } = renderPieChart({ items: sampleItems })
+            const slices = container.querySelectorAll('path[data-name]')
+            const colors = Array.from(slices).map((p) => p.getAttribute('data-color'))
+            expect(new Set(colors).size).toBe(sampleItems.length)
         })
     })
 
     describe('sorting', () => {
         it('renders items unsorted by default', () => {
             renderPieChart({ items: sampleItems, legends: true })
-            // With legends, items appear as reference items — check order is preserved
             const legendTexts = screen.getAllByText(/Engineering|Design|Marketing/)
             expect(legendTexts[0]).toHaveTextContent('Engineering')
             expect(legendTexts[1]).toHaveTextContent('Design')
