@@ -1,7 +1,7 @@
 import classNames from '../../../utils/classNames'
 import { ROUTE_HOME, UPLOAD as U } from '../../variables'
 import React, { Fragment, PureComponent } from 'react'
-import Dropzone from 'react-dropzone'
+import Dropzone from '../../../components/Dropzone'
 import { type } from '../../../components'
 import Icon from '../../../components/Icon'
 import Loading from '../../../components/Loading'

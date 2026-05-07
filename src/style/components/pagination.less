@@ -1,40 +1,50 @@
 /* --------------
-   Pagination Semantic UI Addon
+   Pagination
 --------------- */
 
-.ui.pagination.menu {
-  margin: 0;
+.app__pagination {
   display: inline-flex;
+  align-items: center;
   vertical-align: middle;
+  gap: size(2);
 }
 
-.ui.pagination.menu .item:last-child {
-  border-radius: 0 0.28571429rem 0.28571429rem 0;
+.app__pagination__item {
+  min-width: size(36);
+  height: size(36);
+  padding: 0 size(10);
+  border: @border-base;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  border-radius: @radius-base;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(.disabled):not(.active) {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  &.active {
+    background-color: rgba(0, 0, 0, 0.06);
+    color: rgba(0, 0, 0, 0.95);
+    cursor: default;
+  }
+
+  &.disabled,
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 }
 
-.ui.compact.menu .item:last-child {
-  border-radius: 0 0.28571429rem 0.28571429rem 0;
-}
-
-.ui.pagination.menu .item:last-child::before {
-  display: none;
-}
-
-.ui.pagination.menu .item {
-  min-width: 3em;
-  text-align: center;
-  margin: 0;
-}
-
-.ui.pagination.menu .icon.item i.icon {
-  vertical-align: top;
-}
-
-.ui.pagination.menu .active.item {
-  border-top: none;
-  padding-top: 0.92857143em;
-  background-color: rgba(0, 0, 0, 0.05);
-  color: rgba(0, 0, 0, 0.95);
-  box-shadow: none;
-  margin: 0;
+.app__pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: size(20);
+  color: rgba(0, 0, 0, 0.5);
+  user-select: none;
 }

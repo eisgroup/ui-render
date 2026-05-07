@@ -1,0 +1,27 @@
+{
+  "tasks": [
+    { "id": 1, "title": "Refactor the dashboard layout", "owner": "Alice", "priority": "High", "status": "In progress" },
+    { "id": 2, "title": "Add dark theme to the sidebar", "owner": "Bob", "priority": "Medium", "status": "Open" },
+    { "id": 3, "title": "Improve build pipeline cache", "owner": "Carol", "priority": "Low", "status": "Done" },
+    { "id": 4, "title": "Migrate tests to Jest 30", "owner": "Dan", "priority": "Medium", "status": "Done" },
+    { "id": 5, "title": "Investigate flaky CI run", "owner": "Eve", "priority": "High", "status": "Open" },
+    { "id": 6, "title": "Document the export pipeline", "owner": "Frank", "priority": "Low", "status": "Open" },
+    { "id": 7, "title": "Reduce bundle size", "owner": "Grace", "priority": "High", "status": "In progress" },
+    { "id": 8, "title": "Fix tooltip flicker on charts", "owner": "Henry", "priority": "Low", "status": "Done" },
+    { "id": 9, "title": "Add storybook entries for inputs", "owner": "Iris", "priority": "Medium", "status": "Open" },
+    { "id": 10, "title": "Lock dependencies to LTS", "owner": "Jack", "priority": "Medium", "status": "Open" },
+    { "id": 11, "title": "Switch ESLint to flat config", "owner": "Kate", "priority": "Low", "status": "Open" },
+    { "id": 12, "title": "Audit CSS for dead rules", "owner": "Leo", "priority": "Medium", "status": "Done" },
+    { "id": 13, "title": "Wire up keyboard nav in tables", "owner": "Mia", "priority": "High", "status": "Open" },
+    { "id": 14, "title": "Improve error messages on forms", "owner": "Noah", "priority": "Medium", "status": "Open" },
+    { "id": 15, "title": "Add CHANGELOG generation", "owner": "Olive", "priority": "Low", "status": "Open" },
+    { "id": 16, "title": "Profile slow page load on Demo", "owner": "Pat", "priority": "High", "status": "In progress" },
+    { "id": 17, "title": "Update icon set", "owner": "Quinn", "priority": "Low", "status": "Open" },
+    { "id": 18, "title": "Localise demo strings", "owner": "Rita", "priority": "Medium", "status": "Open" },
+    { "id": 19, "title": "Replace deprecated lifecycle hooks", "owner": "Sam", "priority": "Medium", "status": "Done" },
+    { "id": 20, "title": "Add visual regression tests", "owner": "Tina", "priority": "High", "status": "Open" },
+    { "id": 21, "title": "Improve mobile breakpoints", "owner": "Uma", "priority": "Medium", "status": "Open" },
+    { "id": 22, "title": "Switch to esbuild for tests", "owner": "Victor", "priority": "Low", "status": "Open" },
+    { "id": 23, "title": "Cache yalc publishes", "owner": "Wendy", "priority": "Low", "status": "Done" }
+  ]
+}

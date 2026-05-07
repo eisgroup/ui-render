@@ -384,10 +384,19 @@ meta.json (stable-value):
   colGroup: [            // column styles (colgroup HTML element)
     { style: Object, isFixed: Boolean },
   ],
-  usePagination: false,  // enable pagination
-  rowsPerPage: 20,       // rows per page
+  usePagination: false,  // enable pagination (renders nav below the table when totalPages > 1)
+  rowsPerPage: 20,       // rows per page (default 20)
 }
 ```
+
+**Pagination notes**
+
+- Activated only when `usePagination: true` *and* the items count exceeds `rowsPerPage`. With a
+  single page the nav is hidden.
+- The control renders centered under the table with prev/next arrows, page numbers and ellipsis
+  for skipped middle pages. Clicking a page scrolls the table back to its top.
+- Pagination state is internal to the table; switching pages does not modify the bound `data.json`.
+- See the example "Table with Pagination" for a runnable config.
 
 ### Pie Chart Attributes
 
@@ -437,12 +446,54 @@ pointers, sorting and gradient fills.
 
 ### Upload Attributes
 
+Single- or multi-file upload with click + drag&drop. Use through `Input` with `type: 'file'`
+(the renderer maps it to the `Upload` field) or directly as `view: 'Upload'`.
+
 ```js
 {
-  kind: 'Type of file, e.g. "images"',
-  count: Number,         // number of files/inputs
+  view: 'Input',
+  type: 'file',          // route to Upload field
+  name: 'path.in.data',  // bound key in data.json (receives the File or File[])
+  fileType: String,      // optional preset key resolved against UPLOAD.BY_ROUTE for default formats/maxSize
+  formats: [String],     // accepted extensions, e.g. ['csv'] or ['png', 'jpg', 'webp']
+  maxSize: Number,       // max file size in bytes (rejected with a popup if exceeded)
+  multiple: Boolean,     // allow selecting multiple files (default: true)
+  label: String,         // singular noun in the dropzone hint (pluralised when multiple)
+  labelOnHover: String,  // overrides the hover hint text (otherwise "Upload <label> file")
+  title: String,         // native tooltip on the dropzone
+  showTypes: Boolean,    // show the formats hint on hover (default: true)
+  hasHeader: Boolean,    // render an `<h2>Upload <label></h2>` above the dropzone
+  round: Boolean,        // adds the `round` CSS class to the wrapper
+  classWrap: String,     // CSS class on the outer wrapper (e.g. 'left' to align left)
+  className: String,     // CSS class on the dropzone itself (e.g. 'button' for button style)
+  styles: String,        // shorthand for additional CSS classes
+  readonly: Boolean,     // disable interaction without greying out
+  disabled: Boolean,     // disable interaction (greyed out)
+  loading: Boolean,      // show spinner overlay while uploading
+  autoSubmit: Boolean,   // submit the form automatically when a file is picked
+  items: [Field],        // custom dropzone content (icon + text instead of the default hint)
+  onChange: Function,    // (acceptedFiles, name) => void; receives an array of File objects
+  onFocus: Function,     // fires when drag enters the zone or the file dialog opens
+  onBlur: Function,      // fires on drag leave or when the file dialog is cancelled
 }
 ```
+
+**Validation behaviour**
+
+- Files larger than `maxSize` are rejected and a popup appears with the file name and the
+  allowed size.
+- If the user picks a file outside the allowed `formats`, the file dialog filters it out client-
+  side; a manual drop of an unsupported format triggers a "FILE_UPLOAD_FAILED" popup listing
+  the allowed extensions.
+- `multiple: false` makes the field accept exactly one file; `multiple: true` (default) accepts
+  many — the `onChange` callback always receives an array.
+
+**Notes**
+
+- The dropzone toggles an `active` CSS class while a file is being dragged over it.
+- Pressing **Enter** while focused on the dropzone opens the file dialog; cancelling it via
+  the OS picker calls `onBlur` (uses the native `cancel` event with a focus-return fallback).
+- See the examples "Upload" and "Upload: variants" for runnable configs.
 
 ### AutoSubmit Attributes
 

@@ -38,6 +38,9 @@ import tableVerticalMeta from '../examples/table-vertical_meta'
 import * as tableMatrix from '../examples/table_matrix'
 import * as tabs from '../examples/tabs_meta'
 import uploadMeta from '../examples/upload_meta'
+import uploadVariantsMeta from '../examples/upload-variants_meta'
+import tablePaginationData from '../examples/table-pagination_data.json'
+import tablePaginationMeta from '../examples/table-pagination_meta.json'
 import UIRender from '../../core/pages/main/rules'
 
 import selectIndexData from '../examples/select-index_data.json'
@@ -219,6 +222,12 @@ const examples = [
     data: nestedDataKindData,
     meta: nestedDataKindMeta,
   },
+  {
+    title: 'Table with Pagination',
+    id: 'tablePagination',
+    data: tablePaginationData,
+    meta: tablePaginationMeta,
+  },
   // Other
   {
     title: 'Pie Chart',
@@ -255,6 +264,12 @@ const examples = [
     id: 'upload',
     data: {},
     meta: uploadMeta,
+  },
+  {
+    title: 'Upload: variants (single, multiple, image, readonly)',
+    id: 'uploadVariants',
+    data: {},
+    meta: uploadVariantsMeta,
   },
   {
     title: 'Invalid Array Data',

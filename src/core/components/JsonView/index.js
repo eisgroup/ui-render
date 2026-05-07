@@ -57,7 +57,7 @@ export function JsonView ({
         shouldExpandNode={expandPredicate}
         hideKey
         hideRoot={hideRoot}
-        seen={new WeakSet()}
+        ancestors={[]}
       />
     </View>
   )
@@ -73,7 +73,7 @@ export default React.memo(JsonView)
 // NODE RENDERER
 // ---------------------------------------------------------------------------
 
-function Node ({ value, keyPath, level, palette, shouldExpandNode, hideKey, hideRoot, seen }) {
+function Node ({ value, keyPath, level, palette, shouldExpandNode, hideKey, hideRoot, ancestors }) {
   const isArr = Array.isArray(value)
   const isObj = value !== null && typeof value === 'object' && !isArr
 
@@ -85,14 +85,14 @@ function Node ({ value, keyPath, level, palette, shouldExpandNode, hideKey, hide
     )
   }
 
-  if (seen.has(value)) {
+  // Cycle = the value appears in its own ancestor chain. Sibling/repeated references are fine.
+  if (ancestors.indexOf(value) !== -1) {
     return (
       <Row hideKey={hideKey} keyName={keyPath[0]} palette={palette}>
         <span style={{ color: palette.error }}>[Circular]</span>
       </Row>
     )
   }
-  seen.add(value)
 
   return (
     <Collection
@@ -103,13 +103,13 @@ function Node ({ value, keyPath, level, palette, shouldExpandNode, hideKey, hide
       shouldExpandNode={shouldExpandNode}
       hideKey={hideKey}
       hideRoot={hideRoot && level === 0}
-      seen={seen}
+      ancestors={ancestors}
       isArr={isArr}
     />
   )
 }
 
-function Collection ({ value, keyPath, level, palette, shouldExpandNode, hideKey, hideRoot, seen, isArr }) {
+function Collection ({ value, keyPath, level, palette, shouldExpandNode, hideKey, hideRoot, ancestors, isArr }) {
   const initialOpen = hideRoot || shouldExpandNode(keyPath, value, level)
   const [open, setOpen] = useState(initialOpen)
 
@@ -119,6 +119,7 @@ function Collection ({ value, keyPath, level, palette, shouldExpandNode, hideKey
   const count = entries.length
   const open$ = isArr ? '[' : '{'
   const close$ = isArr ? ']' : '}'
+  const childAncestors = [...ancestors, value]
 
   if (hideRoot) {
     return (
@@ -131,7 +132,7 @@ function Collection ({ value, keyPath, level, palette, shouldExpandNode, hideKey
             level={level + 1}
             palette={palette}
             shouldExpandNode={shouldExpandNode}
-            seen={seen}
+            ancestors={childAncestors}
           />
         ))}
       </div>
@@ -170,7 +171,7 @@ function Collection ({ value, keyPath, level, palette, shouldExpandNode, hideKey
               level={level + 1}
               palette={palette}
               shouldExpandNode={shouldExpandNode}
-              seen={seen}
+              ancestors={childAncestors}
             />
           ))}
         </div>
