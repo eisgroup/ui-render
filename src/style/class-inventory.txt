@@ -67,8 +67,13 @@ app__sidebar
 app__sidebar__items
 app__slider
 app__slider--wrap
+app__slider__dot
+app__slider__handle
 app__slider__label
+app__slider__mark
+app__slider__rail
 app__slider__remove
+app__slider__track
 app__slider__values
 app__sort__icon
 app__spinner
@@ -603,12 +608,6 @@ radius-largest
 radius-small
 radius-top
 radius-top-large
-rc-slider-disabled
-rc-slider-dot
-rc-slider-handle
-rc-slider-rail
-rc-slider-step
-rc-slider-track
 readonly
 red
 required

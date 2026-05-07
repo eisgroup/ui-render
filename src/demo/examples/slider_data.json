@@ -1,0 +1,7 @@
+{
+  "volume": 35,
+  "priceRange": [120, 760],
+  "budget": 500,
+  "split": 50,
+  "disabledSlider": 60
+}

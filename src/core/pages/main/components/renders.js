@@ -1,5 +1,5 @@
 import { asField } from '../../../modules/form'
-import { DropdownField, InputField, ToggleField, InputNumberField, InputDateField } from '../../../modules/form/inputs'
+import { DropdownField, InputField, ToggleField, InputNumberField, InputDateField, SliderField } from '../../../modules/form/inputs'
 import Upload from '../../../modules/upload/views/Upload'
 import { FIELD } from '../../../modules/variables'
 import React from 'react'
@@ -23,6 +23,9 @@ export function renderField (fieldDefinition, i) {
       break
     case FIELD.TYPE.UPLOAD:
       Field = UploadField
+      break
+    case FIELD.TYPE.SLIDER:
+      Field = SliderField
       break
     default:
       Field = PlaceholderField.bind(this, {name: view})
