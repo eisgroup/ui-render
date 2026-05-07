@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { capitalize, isString } from 'ui-utils-pack'

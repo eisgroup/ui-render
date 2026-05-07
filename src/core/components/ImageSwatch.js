@@ -1,4 +1,4 @@
-import cn from 'classnames'
+import cn from 'ui-utils-pack/classNames'
 import React from 'react'
 import Image from './Image'
 import { type } from './types'

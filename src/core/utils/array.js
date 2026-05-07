@@ -12,7 +12,7 @@ import {
   unionBy,
   unionWith,
   uniqWith,
-} from 'lodash-es'
+} from './lodash-lite.js'
 import { toLowerCaseAny } from './string.js'
 
 /**

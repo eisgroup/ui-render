@@ -1,4 +1,4 @@
-import { mergeReplaceArrays } from '../object'
+import { fromFlatObj, mergeReplaceArrays, toFlatObj } from '../object'
 
 describe('mergeReplaceArrays', () => {
     it('deep-merges plain objects', () => {
@@ -59,5 +59,40 @@ describe('mergeReplaceArrays', () => {
     it('null source values DO override base', () => {
         const result = mergeReplaceArrays({ flag: true }, { flag: null })
         expect(result.flag).toBe(null)
+    })
+})
+
+describe('toFlatObj / fromFlatObj', () => {
+    it('flattens nested objects with dot keys', () => {
+        const nested = { a: 1, b: { c: 2, d: { e: 3 } } }
+        expect(toFlatObj(nested)).toEqual({
+            a: 1,
+            'b.c': 2,
+            'b.d.e': 3,
+        })
+    })
+
+    it('round-trips nested objects', () => {
+        const original = { x: 1, y: { z: [1, 2] } }
+        const flat = toFlatObj(original)
+        const back = fromFlatObj(flat)
+        expect(back).toEqual(original)
+    })
+
+    it('preserves shallow values', () => {
+        expect(toFlatObj({ only: 'top' })).toEqual({ only: 'top' })
+    })
+
+    it('respects maxDepth when flattening', () => {
+        const input = { a: { b: { c: 1 } } }
+        // depth 1: keys at `a`; depth 2: one more level → `a.b` holds the remainder
+        expect(toFlatObj(input, { maxDepth: 2 })).toEqual({
+            'a.b': { c: 1 },
+        })
+    })
+
+    it('unflatten returns non-objects as-is', () => {
+        expect(fromFlatObj(null)).toBe(null)
+        expect(fromFlatObj('x')).toBe('x')
     })
 })

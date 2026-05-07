@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import React, { useState, useRef } from 'react'
 import { capitalize, isString } from 'ui-utils-pack'
 import Button from './Button'

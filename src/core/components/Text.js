@@ -1,9 +1,9 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import React, { useContext } from 'react'
 import { Active } from 'ui-utils-pack'
 import { ISO_8601_COMPLETE_DATE } from 'ui-modules-pack/variables'
 import { ConfigContext } from '../contexts'
-import dayjs from 'dayjs'
+import moment from 'moment'
 
 /**
  * Text View - Pure Component.
@@ -40,7 +40,7 @@ export function Text ({
         component = children ? 'Yes' : 'No'
     } else if (typeof children === 'string') {
         if (ISO_8601_COMPLETE_DATE.test(children)) {
-            component = dayjs(children).format(dateFormat)
+            component = moment(children).format(dateFormat)
         }
     }
     return (

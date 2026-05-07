@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import React, { useMemo, useContext } from 'react'
 import Row from './Row'
 import Text from './Text'
@@ -61,7 +61,7 @@ const InputDate = ({
 
     const idHelp = useMemo(() => id + '-help', [id])
 
-    const onDateChanged = (date, ...rest) => {
+    const onDateChanged = (date) => {
         onChange && onChange(moment(date, dateFormat).format('YYYY-MM-DD'))
     }
 

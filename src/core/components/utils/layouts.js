@@ -1,5 +1,5 @@
 import React from 'react'
-import { SizeMe } from 'react-sizeme'
+import { SizeMe } from './SizeMe'
 
 /**
  * React Component Responsive Size Decorator that provides available `width` and `height` props
