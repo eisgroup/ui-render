@@ -1,4 +1,4 @@
-import { __DEV__ } from 'ui-utils-pack'
+import { __DEV__ } from '../../core/utils'
 
 const buttonDownloadMeta = {
   view: 'Button',

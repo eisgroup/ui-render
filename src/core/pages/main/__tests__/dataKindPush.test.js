@@ -1,5 +1,5 @@
-import { get } from 'ui-utils-pack'
-import { cloneDeep } from 'ui-utils-pack/object'
+import { get } from '../../../utils'
+import { cloneDeep } from '../../../utils/object'
 import {
     rowObjectForDataKindAppend,
     compactDataKindArrays,

@@ -1,10 +1,10 @@
 import React, { useContext } from 'react'
 import { createPortal } from 'react-dom'
-import Button from 'ui-react-pack/Button'
-import Text from 'ui-react-pack/Text'
-import View from 'ui-react-pack/View'
-import { l, localiseTranslation } from 'ui-utils-pack'
-import { _ } from 'ui-utils-pack/translations'
+import Button from '../../../components/Button'
+import Text from '../../../components/Text'
+import View from '../../../components/View'
+import { l, localiseTranslation } from '../../../utils'
+import { _ } from '../../../utils/translations'
 import { AppContext } from '../../../contexts'
 
 localiseTranslation({

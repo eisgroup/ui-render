@@ -1,6 +1,6 @@
-import classNames from 'ui-utils-pack/classNames'
+import classNames from '../utils/classNames'
 import React from 'react'
-import { isFunction } from 'ui-utils-pack'
+import { isFunction } from '../utils'
 
 /**
  * Row View - Pure Component.

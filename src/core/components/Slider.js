@@ -1,12 +1,12 @@
-import classNames from 'ui-utils-pack/classNames'
+import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import 'rc-slider/assets/index.css'
 import Handle from 'rc-slider/lib/Handle'
 import Range from 'rc-slider/lib/Range'
 import RCSlider from 'rc-slider/lib/Slider' // Slider lib adds 55 KB to bundle size
 import React from 'react'
-import { formatNumber, last, round, toPercent } from 'ui-utils-pack'
-import { formatDuration } from 'ui-utils-pack/time'
+import { formatNumber, last, round, toPercent } from '../utils'
+import { formatDuration } from '../utils/time'
 import Tooltip from './Tooltip'
 
 /**

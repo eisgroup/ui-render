@@ -1,8 +1,8 @@
-import { get, merge, isObject, hasObjectValue } from 'ui-utils-pack/object'
+import { get, merge, isObject, hasObjectValue } from '../../utils/object'
 import { errorsMap } from './rules'
-import { FIELD, ISO_8601_FULL } from 'ui-modules-pack'
-import { cloneDeep } from 'ui-utils-pack'
-import { storedTouched } from 'ui-modules-pack/form'
+import { FIELD, ISO_8601_FULL } from '../../modules'
+import { cloneDeep } from '../../utils'
+import { storedTouched } from '../../modules/form'
 
 export const getFormsData = (forms) => {
   const formDataArray = [];

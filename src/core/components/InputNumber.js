@@ -1,14 +1,14 @@
-import classNames from 'ui-utils-pack/classNames'
+import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { capitalize, isString } from 'ui-utils-pack'
+import { capitalize, isString } from '../utils'
 import Button from './Button'
 import Icon from './Icon'
 import Label from './Label'
 import Row from './Row'
 import Text from './Text'
 import View from './View'
-import { Active } from 'ui-utils-pack'
+import { Active } from '../utils'
 
 // Constants
 const NUMBER_INPUT_REGEX = /^-?\d*[.,]?\d*$/

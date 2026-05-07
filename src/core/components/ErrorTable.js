@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import { get, hasListValue } from 'ui-utils-pack'
+import { get, hasListValue } from '../utils'
 import Table from './Table'
 
 /**

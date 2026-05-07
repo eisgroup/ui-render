@@ -1,6 +1,6 @@
-import { FILE as _FILE } from 'ui-react-pack/files'
-import { _WORK_DIR_, ENV, SIZE_MB_16 } from 'ui-utils-pack'
-import { fileFormatNormalized, fileNameWithoutExt } from 'ui-utils-pack/string'
+import { FILE as _FILE } from '../../components/files'
+import { _WORK_DIR_, ENV, SIZE_MB_16 } from '../../utils'
+import { fileFormatNormalized, fileNameWithoutExt } from '../../utils/string'
 
 /**
  * FILE VARIABLES ==============================================================
@@ -76,7 +76,7 @@ export const UPLOAD = {
 }
 
 // @important: for backend, insert this at the top of _init.js:
-// import 'ui-modules-pack/utils/server/config' // load .env file variables
+// import '../utils/server/config' // load .env file variables
 // Bucket name must be empty string so that backend can set bucket during runtime
 UPLOAD.PATH = `${ENV.CDN_BUCKET_NAME ? '' : (ENV.UPLOAD_PATH || _WORK_DIR_)}${UPLOAD.DIR}` // full upload path
 

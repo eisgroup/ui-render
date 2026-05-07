@@ -1,4 +1,4 @@
-import { l, localiseTranslation } from 'ui-utils-pack'
+import { l, localiseTranslation } from '../../utils'
 
 /**
  * LOCALISED TRANSLATIONS (i18n) ===============================================

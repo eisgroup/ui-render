@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { Active } from 'ui-utils-pack'
+import { Active } from '../../../utils'
 import Data from '../Data'
 
 jest.mock('../components/LocalDraftTableRow', () => function MockLocalDraft (props) {

@@ -1,4 +1,4 @@
-import classNames from 'ui-utils-pack/classNames'
+import classNames from '../utils/classNames'
 import React from 'react'
 
 /**

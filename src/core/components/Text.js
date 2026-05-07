@@ -1,7 +1,7 @@
-import classNames from 'ui-utils-pack/classNames'
+import classNames from '../utils/classNames'
 import React, { useContext } from 'react'
-import { Active } from 'ui-utils-pack'
-import { ISO_8601_COMPLETE_DATE } from 'ui-modules-pack/variables'
+import { Active } from '../utils'
+import { ISO_8601_COMPLETE_DATE } from '../modules/variables'
 import { ConfigContext } from '../contexts'
 import moment from 'moment'
 

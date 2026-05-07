@@ -66,9 +66,6 @@ export default {
     resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
         alias: {
-            'ui-modules-pack': path.resolve(__dirname, './src/core/modules'),
-            'ui-react-pack': path.resolve(__dirname, './src/core/components'),
-            'ui-utils-pack': path.resolve(__dirname, './src/core/utils'),
             '../../theme.config$': path.resolve(__dirname, './src/style/override/theme.config'),
         },
     },

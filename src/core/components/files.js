@@ -1,4 +1,4 @@
-import { ENV } from 'ui-utils-pack'
+import { ENV } from '../utils'
 
 /**
  * FILE VARIABLES ==============================================================

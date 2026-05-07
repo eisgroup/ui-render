@@ -36,7 +36,7 @@ describe('Select', () => {
     })
 
     it('calls onChange with value and name when selection changes', () => {
-        // Note: isFunction from ui-utils-pack doesn't recognize jest.fn() (different constructor),
+        // Note: isFunction doesn't recognize jest.fn() (different constructor),
         // so we wrap in a real function to enable controlled mode.
         const spy = jest.fn()
         const handleChange = (value, name, event) => spy(value, name, event)

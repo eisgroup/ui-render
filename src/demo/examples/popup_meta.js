@@ -1,4 +1,4 @@
-import { cloneDeep } from 'ui-utils-pack'
+import { cloneDeep } from '../../core/utils'
 import content from './table-nested_meta'
 
 const popupMeta = {

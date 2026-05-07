@@ -1,6 +1,6 @@
-import { FIELD } from 'ui-modules-pack/variables/fields'
-import { email, isRequired, maxLength, password, url } from 'ui-react-pack/inputs/validationRules'
-import { _ } from 'ui-utils-pack/translations'
+import { FIELD } from '../variables/fields'
+import { email, isRequired, maxLength, password, url } from '../../components/inputs/validationRules'
+import { _ } from '../../utils/translations'
 
 /**
  * CONSTANT VARIABLES ==========================================================

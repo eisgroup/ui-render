@@ -1,10 +1,10 @@
-import classNames from 'ui-utils-pack/classNames'
+import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React, { Fragment } from 'react'
 import Label from './Label'
 import Row from './Row'
 import View from './View'
-import { Active } from 'ui-utils-pack'
+import { Active } from '../utils'
 
 /**
  * Checkbox - Pure Component

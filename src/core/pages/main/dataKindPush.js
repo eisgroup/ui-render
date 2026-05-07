@@ -1,5 +1,5 @@
-import { get } from 'ui-utils-pack'
-import { cloneDeep, set } from 'ui-utils-pack/object'
+import { get } from '../../utils'
+import { cloneDeep, set } from '../../utils/object'
 
 /**
  * From {@link registeredFieldValues} (nested tree), take the object for one FieldArray row.

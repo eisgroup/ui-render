@@ -1,6 +1,6 @@
 import React from 'react'
-import Row from 'ui-react-pack/Row'
-import View from 'ui-react-pack/View'
+import Row from './core/components/Row'
+import View from './core/components/View'
 import Routes from './demo/routes'
 import { ConfigContext } from './core/contexts'
 

@@ -1,5 +1,5 @@
-import { FILE } from 'ui-react-pack/files'
-import { __PROD__, ENV } from 'ui-utils-pack'
+import { FILE } from '../../components/files'
+import { __PROD__, ENV } from '../../utils'
 /**
  * GLOBAL VARIABLES ============================================================
  * =============================================================================

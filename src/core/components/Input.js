@@ -1,6 +1,6 @@
-import classNames from 'ui-utils-pack/classNames'
+import classNames from '../utils/classNames'
 import React, { useState, useRef } from 'react'
-import { capitalize, isString } from 'ui-utils-pack'
+import { capitalize, isString } from '../utils'
 import Button from './Button'
 import Icon from './Icon'
 import InputNative from './InputNative'
@@ -8,7 +8,7 @@ import Label from './Label'
 import Row from './Row'
 import Text from './Text'
 import View from './View'
-import { Active } from 'ui-utils-pack'
+import { Active } from '../utils'
 
 /**
  * Input Wrapper - Pure Component.

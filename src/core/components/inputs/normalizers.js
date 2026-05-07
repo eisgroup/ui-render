@@ -1,4 +1,4 @@
-import { round } from 'ui-utils-pack'
+import { round } from '../../utils'
 
 export const integer = (value) => {
   if (value === '' || value == null) return value

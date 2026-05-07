@@ -1,4 +1,4 @@
-import { asInputDateField } from 'ui-modules-pack/form'
-import InputDate from 'ui-react-pack/InputDate'
+import { asInputDateField } from '..'
+import InputDate from '../../../components/InputDate'
 
 export default asInputDateField(InputDate)

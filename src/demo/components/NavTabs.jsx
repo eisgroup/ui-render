@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useLocation, useNavigate} from 'react-router-dom'
 import Markdown from 'react-markdown'
-import ScrollView from 'ui-react-pack/ScrollView'
+import ScrollView from '../../core/components/ScrollView'
 import toc from 'remark-toc'
 import gfm from 'remark-gfm'
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'

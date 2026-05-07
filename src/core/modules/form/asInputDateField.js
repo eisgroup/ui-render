@@ -1,9 +1,9 @@
 import { Field } from 'react-final-form'
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { isRequired } from 'ui-react-pack/inputs/validationRules'
-import { storedTouched } from 'ui-modules-pack/form/utils'
-import { Active } from 'ui-utils-pack'
+import { isRequired } from '../../components/inputs/validationRules'
+import { storedTouched } from './utils'
+import { Active } from '../../utils'
 
 export function asInputDateField (InputComponent, {sanitize} = {}) {
     if (!Active.Field) Active.Field = Field

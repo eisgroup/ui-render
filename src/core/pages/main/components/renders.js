@@ -1,10 +1,10 @@
-import { asField } from 'ui-modules-pack/form'
-import { DropdownField, InputField, ToggleField, InputNumberField, InputDateField } from 'ui-modules-pack/form/inputs'
-import Upload from 'ui-modules-pack/upload/views/Upload'
-import { FIELD } from 'ui-modules-pack/variables'
+import { asField } from '../../../modules/form'
+import { DropdownField, InputField, ToggleField, InputNumberField, InputDateField } from '../../../modules/form/inputs'
+import Upload from '../../../modules/upload/views/Upload'
+import { FIELD } from '../../../modules/variables'
 import React from 'react'
-import { PlaceholderField } from 'ui-react-pack/PlaceholderField'
-import { Active } from 'ui-utils-pack'
+import { PlaceholderField } from '../../../components/PlaceholderField'
+import { Active } from '../../../utils'
 
 const UploadField = asField(Upload, {sanitize: (value) => value || undefined})
 

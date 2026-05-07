@@ -1,8 +1,8 @@
-import classNames from 'ui-utils-pack/classNames'
+import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React from 'react'
 import Loading from './Loading'
-import { Active } from 'ui-utils-pack'
+import { Active } from '../utils'
 
 /**
  * Button - Pure Component.

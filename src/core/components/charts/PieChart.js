@@ -1,4 +1,4 @@
-import classNames from 'ui-utils-pack/classNames'
+import classNames from '../../utils/classNames'
 import PropTypes from 'prop-types'
 import React, { Fragment, useMemo, useRef } from 'react'
 import { Cell, Pie, PieChart as Piechart, ResponsiveContainer, Tooltip } from 'recharts'

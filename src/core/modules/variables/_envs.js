@@ -1,4 +1,4 @@
-import { __CLIENT__, Active, ENV } from 'ui-utils-pack'
+import { __CLIENT__, Active, ENV } from '../../utils'
 
 /* Platform Prefixes */
 export const SERVICE = {
