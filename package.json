@@ -59,7 +59,6 @@
     "rc-picker": "4.11.3",
     "rc-slider": "^9.3.1",
     "react-dropzone": "4",
-    "react-json-tree": "^0.11.2",
     "semantic-ui-react": "^3.0.0-beta.2"
   },
   "devDependencies": {
