@@ -8,11 +8,11 @@ import ScrollView from '../../../components/ScrollView'
 import Table from '../../../components/Table'
 import Text from '../../../components/Text'
 import View from '../../../components/View'
-import { by, get, hasListValue, isEqual, isEqualList, isFunction } from '../../../utils'
+import { by, get, hasListValue, isEqual, isEqualList, isFunction, toJSON } from '../../../utils'
 import { getDateStringFromDateObject } from '../utils'
 import TableColGroup from './TableColGroup'
 import { FieldArray } from 'react-final-form-arrays'
-import { Pagination } from 'semantic-ui-react'
+import Pagination from '../../../components/Pagination'
 
 const sortObj = {
   id: PropTypes.string.isRequired, // id of the header, used for grouping columns/rows
@@ -310,7 +310,8 @@ export default class TableView extends PureComponent {
   renderItemData = (item, index, {id, renderCell, classNameCellWrap = '', classNameCell: className, styleCell: style}) => {
     // Conditional rendering logic based on given cell data
     const { additionalCellsStyles } = this.props
-    const cell = get(item, id)
+    // Headers without an `id` are section dividers — they render as empty body cells.
+    const cell = id == null ? undefined : get(item, id)
     const {render: r, data} = cell || {}
     const render = isFunction(cell) ? cell : (r || renderCell)
     const value = data != null ? data : cell
@@ -321,11 +322,17 @@ export default class TableView extends PureComponent {
     }
     const cellStyle = additionalCellsStyles[index+1] || {}
     const cellClassName = this.getStickyCellClassName(cellStyle, classNameCellWrap, additionalCellsStyles[index+2] || {})
+    const isReactNode = content == null
+      || typeof content !== 'object'
+      || Array.isArray(content)
+      || React.isValidElement(content)
     return (
       <Table.Cell key={this.props.vertical ? index : id} className={cellClassName} style={cellStyle}>
-        {typeof content === 'object'
-          ? content
-          : <View className={className} style={style}><Text className="p">{content}</Text></View>
+        {isReactNode
+          ? (typeof content === 'object'
+            ? content
+            : <View className={className} style={style}><Text className="p">{content}</Text></View>)
+          : <View className={className} style={style}><Text className="p">{toJSON(content)}</Text></View>
         }
       </Table.Cell>
     )

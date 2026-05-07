@@ -1,0 +1,13 @@
+{
+  "view": "Table",
+  "name": "tasks",
+  "usePagination": true,
+  "rowsPerPage": 5,
+  "headers": [
+    { "id": "id", "label": "#" },
+    { "id": "title", "label": "Title" },
+    { "id": "owner", "label": "Owner" },
+    { "id": "priority", "label": "Priority" },
+    { "id": "status", "label": "Status" }
+  ]
+}
