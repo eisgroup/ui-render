@@ -1,4 +1,4 @@
-import { isFileSrc } from 'ui-utils-pack/string'
+import { isFileSrc } from '../../utils/string'
 
 /**
  * Compute CSS `background-image` property from given file data

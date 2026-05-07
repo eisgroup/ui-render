@@ -1,7 +1,7 @@
-import { interpolateString, isEmpty, pluralize, toLowerCase } from 'ui-utils-pack'
-import { _ } from 'ui-utils-pack/translations'
-import { isGoodPassword } from 'ui-utils-pack/utility'
-import { isEmail as isEmailValue, isLengthMax, isURLWithProtocol } from 'ui-utils-pack/validators'
+import { interpolateString, isEmpty, pluralize, toLowerCase } from '../../utils'
+import { _ } from '../../utils/translations'
+import { isGoodPassword } from '../../utils/utility'
+import { isEmail as isEmailValue, isLengthMax, isURLWithProtocol } from '../../utils/validators'
 
 export const OK = undefined // Return type when validation passes
 

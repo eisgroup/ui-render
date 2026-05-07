@@ -1,4 +1,4 @@
-import { __PROD__, Active, ONE_HOUR, ONE_MONTH, ONE_WEEK } from 'ui-utils-pack'
+import { __PROD__, Active, ONE_HOUR, ONE_MONTH, ONE_WEEK } from '../../utils'
 import { CURRENCY } from './definitions'
 
 /**

@@ -1,4 +1,4 @@
-import { enumFrom, l, LANGUAGE, LANGUAGE_LEVEL, optionsFrom } from 'ui-utils-pack'
+import { enumFrom, l, LANGUAGE, LANGUAGE_LEVEL, optionsFrom } from '../../utils'
 
 /**
  * PROJECT DEFINITIONS =========================================================

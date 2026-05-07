@@ -1,10 +1,10 @@
-import { l, localiseTranslation } from 'ui-utils-pack'
+import { l, localiseTranslation } from '../../utils'
 
 /**
  * LOCALISED TRANSLATIONS (i18n) ===============================================
  * =============================================================================
  */
-export { _ } from 'ui-utils-pack/translations'
+export { _ } from '../../utils/translations'
 localiseTranslation({
   FILE: {
     [l.ENGLISH]: 'File',

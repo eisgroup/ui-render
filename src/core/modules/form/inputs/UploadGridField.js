@@ -1,5 +1,5 @@
-import { asField } from 'ui-modules-pack/form'
-import UploadGrid from 'ui-modules-pack/upload/views/UploadGrid'
+import { asField } from '..'
+import UploadGrid from '../../upload/views/UploadGrid'
 
 /**
  * Upload Grid Field connected with react-final-form

@@ -1,4 +1,4 @@
-import { cloneDeep } from 'ui-utils-pack'
+import { cloneDeep } from '../../core/utils'
 import exampleData from './example_data.json'
 
 const verify = {

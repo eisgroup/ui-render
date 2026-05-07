@@ -1,4 +1,4 @@
-import { definitionSetup, LANGUAGE_LEVEL } from 'ui-utils-pack'
+import { definitionSetup, LANGUAGE_LEVEL } from '../../utils'
 import { TYPE } from './definitions'
 
 /**

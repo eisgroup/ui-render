@@ -1,4 +1,4 @@
-import { cloneDeep } from 'ui-utils-pack'
+import { cloneDeep } from '../../core/utils'
 import meta from './expand-list_meta'
 
 const nestedTable = cloneDeep(meta.renderItem)

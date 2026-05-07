@@ -1,4 +1,4 @@
-import { isFunction } from 'ui-utils-pack'
+import { isFunction } from '../../utils'
 
 /**
  * REACT.JS HELPERS ============================================================

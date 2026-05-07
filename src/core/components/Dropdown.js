@@ -1,4 +1,4 @@
-import classNames from 'ui-utils-pack/classNames'
+import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React, { useEffect, useRef, useState } from 'react'
 import { Dropdown as DropDown } from 'semantic-ui-react' // adds 27 KB to final js bundle
@@ -14,12 +14,12 @@ import {
   toLowerCaseAny,
   toUniqueListCaseInsensitive,
   trimSpaces
-} from 'ui-utils-pack'
-import { _ } from 'ui-utils-pack/translations'
+} from '../utils'
+import { _ } from '../utils/translations'
 import Icon from './Icon'
 import Text from './Text'
 import View from './View'
-import { Active } from 'ui-utils-pack'
+import { Active } from '../utils'
 
 localiseTranslation({
   ADD_: {

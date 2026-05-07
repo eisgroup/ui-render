@@ -1,9 +1,9 @@
-import { l, localiseTranslation } from 'ui-utils-pack'
+import { l, localiseTranslation } from '../../utils'
 
 /**
  * LOCALISED TRANSLATIONS (i18n) ===============================================
  * @example:
- *    import * as t from 'ui-modules-pack/form/translations'
+ *    import * as t from './translations'
  *    const sideEffects = {t} // prevent webpack tree shaking in prod
  * =============================================================================
  */

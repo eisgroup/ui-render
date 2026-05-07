@@ -4,7 +4,7 @@
  * =============================================================================
  */
 
-export { default as cn } from 'ui-utils-pack/classNames'
+export { default as cn } from '../utils/classNames'
 export { default as PropTypes } from 'prop-types'
 export * from './files'
 export * from './styles'

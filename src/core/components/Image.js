@@ -1,6 +1,6 @@
-import classNames from 'ui-utils-pack/classNames'
+import classNames from '../utils/classNames'
 import React from 'react'
-import { fileNameWithoutExt } from 'ui-utils-pack'
+import { fileNameWithoutExt } from '../utils'
 import { FILE } from './files'
 import { type } from './types'
 

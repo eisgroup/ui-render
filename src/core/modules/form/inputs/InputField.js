@@ -1,5 +1,5 @@
-import { asField } from 'ui-modules-pack/form'
-import { Input } from 'ui-react-pack/Input'
+import { asField } from '..'
+import { Input } from '../../../components/Input'
 
 /**
  * Input Field connected with react-final-form

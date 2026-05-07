@@ -1,14 +1,14 @@
-import classNames from 'ui-utils-pack/classNames'
-import { ROUTE_HOME, UPLOAD as U } from 'ui-modules-pack/variables'
+import classNames from '../../../utils/classNames'
+import { ROUTE_HOME, UPLOAD as U } from '../../variables'
 import React, { Fragment, PureComponent } from 'react'
 import Dropzone from 'react-dropzone'
-import { type } from 'ui-react-pack'
-import Icon from 'ui-react-pack/Icon'
-import Loading from 'ui-react-pack/Loading'
-import Row from 'ui-react-pack/Row'
-import Text from 'ui-react-pack/Text'
-import Tooltip from 'ui-react-pack/Tooltip'
-import View from 'ui-react-pack/View'
+import { type } from '../../../components'
+import Icon from '../../../components/Icon'
+import Loading from '../../../components/Loading'
+import Row from '../../../components/Row'
+import Text from '../../../components/Text'
+import Tooltip from '../../../components/Tooltip'
+import View from '../../../components/View'
 import {
     get,
     hasListValue,
@@ -17,9 +17,9 @@ import {
     pluralize,
     shortNumber,
     SIZE_KB
-} from 'ui-utils-pack'
+} from '../../../utils'
 import { _ } from '../translations'
-import { Active } from 'ui-utils-pack'
+import { Active } from '../../../utils'
 import { AppContext } from '../../../contexts'
 
 export default class Upload extends PureComponent {

@@ -1,4 +1,4 @@
-import { asField } from 'ui-modules-pack/form'
-import InputNumber from 'ui-react-pack/InputNumber'
+import { asField } from '..'
+import InputNumber from '../../../components/InputNumber'
 
 export default asField(InputNumber)

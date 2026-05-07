@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { type } from 'ui-react-pack'
-import { Active } from 'ui-utils-pack'
+import { type } from '../../components'
+import { Active } from '../../utils'
 import UIRenderWithUISetup from './rules'
 import LocalDraftTableRow from './components/LocalDraftTableRow'
 

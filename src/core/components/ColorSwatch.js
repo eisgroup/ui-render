@@ -1,4 +1,4 @@
-import cn from 'ui-utils-pack/classNames'
+import cn from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React from 'react'
 import Text from './Text'

@@ -1,4 +1,4 @@
-import { __CLIENT__, ENV } from 'ui-utils-pack'
+import { __CLIENT__, ENV } from '../../utils'
 
 /* API Endpoints */
 export const URI = {

@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react'
-import Button from 'ui-react-pack/Button'
-import Input from 'ui-react-pack/Input'
-import InputDate from 'ui-react-pack/InputDate'
-import Table from 'ui-react-pack/Table'
-import { Active } from 'ui-utils-pack'
-import { email, isRequired, maxLength, password, url } from 'ui-react-pack/inputs/validationRules'
-import { integer } from 'ui-react-pack/inputs/normalizers'
+import Button from '../../../components/Button'
+import Input from '../../../components/Input'
+import InputDate from '../../../components/InputDate'
+import Table from '../../../components/Table'
+import { Active } from '../../../utils'
+import { email, isRequired, maxLength, password, url } from '../../../components/inputs/validationRules'
+import { integer } from '../../../components/inputs/normalizers'
 import { pushDataKindRow, validateNotWithinRangeDraftRow } from '../dataKindPush'
 
 /**
@@ -22,7 +22,7 @@ function collectInputs (items, out = []) {
   return out
 }
 
-// Same string keys as FIELD.VALIDATE / metaToProps `validate` (see ui-modules-pack/form/constants.js)
+// Same string keys as FIELD.VALIDATE / metaToProps `validate` (see src/core/modules/form/constants.js)
 const VALIDATION_BY_NAME = {
   email,
   required: isRequired,
