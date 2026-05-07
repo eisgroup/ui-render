@@ -391,11 +391,49 @@ meta.json (stable-value):
 
 ### Pie Chart Attributes
 
+Renders a donut chart from an array of `{label, value}` items. Supports optional legends, slice
+pointers, sorting and gradient fills.
+
 ```js
 {
-  mapItems: Object,      // data mapper (ex: {label: 'pieLabelKey', value: 'pieValueKey'})
+  view: 'PieChart',
+  name: 'path.to.array',  // data array bound to slices
+  mapItems: Object,       // data mapper, e.g. {label: 'pieLabelKey', value: 'pieValueKey', order: 'sortKey'}
+  height: Number,         // chart height in px (default: 290; width fills the parent)
+  unit: String,           // unit shown next to value in tooltip (pluralized by value)
+  gradient: Boolean,      // gradient fills for slices (default: true)
+  pointers: Boolean,      // draw external pointers/labels on each slice; default true when no legends, false otherwise
+  legends: Boolean | {    // render reference list of slices
+    background: Boolean,  // background panel behind legend items (default: true)
+    bottom: Boolean,      // place legends below the chart instead of right
+    columns: Number,      // split legend items into N columns
+  },
+  sort: String | [String], // sort key(s) on projected items, prefix with '-' for descending (e.g. 'value', '-order')
+  className: String,       // CSS class on the chart wrapper
+  classNameWrap: String,   // CSS class on the chart+legends container (only when `legends` is set)
+  items: [Field],          // optional fields rendered in the donut center (replaces the default Total)
 }
 ```
+
+**Item shape** — each entry of the bound array (after `mapItems` projection) must have at least:
+
+```js
+{
+  label: String | Number,  // slice label (also used as legend text and slice name)
+  value: Number,           // slice numeric value
+  id: String,              // optional, used as slice name when present (must be unique per chart)
+}
+```
+
+**Notes**
+
+- Slices are drawn clockwise starting from the top (12 o'clock).
+- `pointers: true` draws an outside text label with a pointer line; `pointers: false` keeps the
+  percent label inside the slice.
+- The center of the donut shows the sum of `value` across items by default. To replace it, nest
+  components under `items` — they render inside the center.
+- `mapItems` is a generic Data Mapping pattern (see Pattern 5); fields not used by `PieChart` (such
+  as `order`) are still attached to projected items and can be referenced by `sort`.
 
 ### Upload Attributes
 

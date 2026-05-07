@@ -58,8 +58,6 @@ app__prev-next
 app__prev-next__item
 app__progress--bar
 app__progress--bar__wrapper
-app__progress--circle
-app__progress--circle__inner
 app__progress--steps
 app__progress__bar
 app__progress__bar__tooltip
@@ -612,10 +610,6 @@ rc-slider-rail
 rc-slider-step
 rc-slider-track
 readonly
-recharts-radial-bar-sector
-recharts-responsive-container
-recharts-tooltip-item-list
-recharts-wrapper
 red
 required
 resize
