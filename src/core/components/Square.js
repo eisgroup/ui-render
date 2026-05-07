@@ -1,7 +1,7 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { SizeMe } from 'react-sizeme'
+import { SizeMe } from './utils/SizeMe'
 import Row from './Row'
 import View from './View'
 

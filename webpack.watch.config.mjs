@@ -23,6 +23,7 @@ export default {
         clean: true,
     },
     externals:{
+        moment: 'moment',
         react: 'react',
         'react-dom': 'react-dom',
     },

@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import { isFunction } from 'ui-utils-pack'

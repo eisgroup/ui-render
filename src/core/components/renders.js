@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import React from 'react'
 import { Active, debounce, LANGUAGE, round, shortNumber, SORT_ORDER, toUpperCase } from 'ui-utils-pack'
 import ColorSwatch from './ColorSwatch'

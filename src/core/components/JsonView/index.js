@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import PropTypes from 'prop-types'
 import React from 'react'
 import JsonTree from 'react-json-tree' // do not use react-json-view because it breaks with recursive JSON and in Node.js

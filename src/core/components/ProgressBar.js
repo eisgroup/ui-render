@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import React, { PureComponent } from 'react'
 import { Active, TIME_DURATION_INSTANT } from 'ui-utils-pack'
 import { STYLE } from './styles'

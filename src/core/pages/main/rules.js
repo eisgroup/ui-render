@@ -20,7 +20,7 @@ import {
     errorsProcessing,
     normalizeIncomingData
 } from './utils'
-import deepEqual from 'deep-equal'
+import { isEqual } from 'ui-utils-pack/object'
 import { downloadFile as downloadFileProcessing } from '../../services/downloadFile'
 import { double5, integer, phone, uppercase } from 'ui-react-pack/inputs/normalizers'
 import { AppContext } from '../../contexts'
@@ -291,7 +291,7 @@ export class UIRender extends Component {
         }
 
         if (typeof errorHandlerFunction === 'function'
-            && !deepEqual(errorsMap, this.state.errors)
+            && !isEqual(errorsMap, this.state.errors)
         ) {
             const errors = cloneDeep(errorsMap)
             errorHandlerFunction(mapErrorObjectToUIFormat(errors))

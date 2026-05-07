@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import PropTypes from 'prop-types'
 import 'rc-slider/assets/index.css'
 import Handle from 'rc-slider/lib/Handle'
@@ -8,10 +8,6 @@ import React from 'react'
 import { formatNumber, last, round, toPercent } from 'ui-utils-pack'
 import { formatDuration } from 'ui-utils-pack/time'
 import Tooltip from './Tooltip'
-// import View from './View'
-
-// const RCSlider = View
-// const Range = View
 
 /**
  * Slider - Pure Component

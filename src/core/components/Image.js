@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import React from 'react'
 import { fileNameWithoutExt } from 'ui-utils-pack'
 import { FILE } from './files'

@@ -1,4 +1,4 @@
-import { throttle as _throttle } from 'lodash-es'
+import { throttle as _throttle } from './lodash-lite.js'
 import { __DEV__ } from './_envs.js'
 import { isInListAny } from './array.js'
 import { TIME_DURATION_INSTANT } from './constants.js'

@@ -1,9 +1,7 @@
-import { capitalize, get } from 'lodash-es'
-import pluralizer from 'pluralize'
+import { capitalize, get } from './lodash-lite.js'
 
 export const alphaNumPattern = /[^a-zA-Z0-9]/g
 export const alphaNumIdPattern = /[^a-zA-Z0-9_-]/g
-export const escapeRegExpPattern = /[.*+?^${}()|[\]\\]/g
 export const fileNameWithoutExtPattern = /\.[^.$]+$/
 export const hyphensPattern = /-+/g
 export const hyphensTrimPattern = /^-+|-+$/g
@@ -21,16 +19,6 @@ const upperThresholdAlphaNum = 1 - 26 / 62 // minimum Math.random() result for u
  * STRING FUNCTIONS ===========================================================
  * =============================================================================
  */
-
-/**
- * Escape String for use in Regex Expression
- * @see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping
- * @param {String} string - to be sanitized
- * @returns {String} string - escaped for Regex use
- */
-export function escapeRegExp (string) {
-	return string.replace(escapeRegExpPattern, '\\$&') // $& means the whole matched string
-}
 
 /**
  * Checks to see if the search param exists within the string param.
@@ -309,34 +297,56 @@ export function padStringRight (string, padTemplate) {
 }
 
 /**
- * Converts the given singular word to it's plural version
- *
- * @example
- *  plural('butterfly')
- *  >>> 'butterflies'
- *
- * @uses pluralize
- * @see {@link https://github.com/blakeembrey/pluralize} for further information
- *
- * @param {string} string
- */
-export function plural(string) {
-	return pluralizer.plural(string)
-}
-
-/**
- * Pluralize or singularize a word based on count
- *
- * @uses pluralize
- * @see {@link https://github.com/blakeembrey/pluralize} for further information
+ * Pluralize or singularize an English word based on count.
+ * Handles common suffix rules (-y → -ies, -s/-x/-z/-ch/-sh → -es) plus a small set of irregular forms.
  *
  * @param {string} word - The word to pluralize/singularize
- * @param {number} count - A count
- * @param {boolean} [shouldIncludeCount] - If true will prefix the given count to the word
+ * @param {number} [count] - A count; treated as plural when not provided or != 1
+ * @param {boolean} [shouldIncludeCount] - If true, prefix the result with the count
  * @return {string} - A new string
  */
 export function pluralize(word, count, shouldIncludeCount) {
-	return pluralizer(word, count, shouldIncludeCount)
+	const n = count == null ? 2 : count
+	const result = Math.abs(n) === 1 ? toSingular(word) : toPlural(word)
+	return shouldIncludeCount ? `${n} ${result}` : result
+}
+
+const irregularPluralByForms = {
+	man: 'men', woman: 'women', child: 'children', tooth: 'teeth', foot: 'feet',
+	mouse: 'mice', person: 'people', goose: 'geese', ox: 'oxen',
+}
+const irregularSingularByForms = Object.fromEntries(
+	Object.entries(irregularPluralByForms).map(([s, p]) => [p, s])
+)
+const uncountable = new Set([
+	'sheep', 'fish', 'series', 'species', 'deer', 'information', 'equipment', 'rice', 'money',
+])
+
+function preserveCase(source, target) {
+	if (source === source.toUpperCase()) return target.toUpperCase()
+	if (source[0] === source[0].toUpperCase()) return target[0].toUpperCase() + target.slice(1)
+	return target
+}
+
+function toPlural(word) {
+	const lower = word.toLowerCase()
+	if (uncountable.has(lower)) return word
+	if (irregularPluralByForms[lower]) return preserveCase(word, irregularPluralByForms[lower])
+	if (irregularSingularByForms[lower]) return word // already plural
+	if (/[^aeiou]y$/i.test(word)) return word.slice(0, -1) + 'ies'
+	if (/(s|x|z|ch|sh)$/i.test(word)) return word + 'es'
+	return word + 's'
+}
+
+function toSingular(word) {
+	const lower = word.toLowerCase()
+	if (uncountable.has(lower)) return word
+	if (irregularSingularByForms[lower]) return preserveCase(word, irregularSingularByForms[lower])
+	if (irregularPluralByForms[lower]) return word // already singular
+	if (/ies$/i.test(word)) return word.slice(0, -3) + 'y'
+	if (/(ses|xes|zes|ches|shes)$/i.test(word)) return word.slice(0, -2)
+	if (/s$/i.test(word) && !/ss$/i.test(word)) return word.slice(0, -1)
+	return word
 }
 
 /**

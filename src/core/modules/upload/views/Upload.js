@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import classNames from 'ui-utils-pack/classNames'
 import { ROUTE_HOME, UPLOAD as U } from 'ui-modules-pack/variables'
 import React, { Fragment, PureComponent } from 'react'
 import Dropzone from 'react-dropzone'
