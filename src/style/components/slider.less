@@ -1,11 +1,11 @@
 @slider-color: @color-primary-light;
 @slider-color-handle: @color-primary-light;
 @slider-color-handle-border: @slider-color-handle;
-@slider-color-handle-hover: @color-tertiary-light;
+@slider-color-handle-hover: @color-primary;
 @slider-color-rail: @color-shadow-light;
 @slider-color-disabled: @color-text;
 @slider-track-size: @border-size-thick;
-@slider-handle-size: @slider-track-size * 6; // must be bigger than @slider-track-size
+@slider-handle-size: @slider-track-size * 6;
 @slider-track-padding: (@slider-handle-size - @slider-track-size) / 2;
 
 // Inverted Colors
@@ -15,26 +15,137 @@
 @slider-color-rail-inverted: @color-highlight-lighter;
 
 .app__slider {
-  /* Layout and Sizes */
+  position: relative;
+  width: 100%;
+  user-select: none;
+  touch-action: none;
 
+  // Horizontal
   &:not(.vertical) {
     height: @slider-handle-size;
 
-    .rc-slider-rail,
-    .rc-slider-track,
-    .rc-slider-step {
+    .app__slider__rail,
+    .app__slider__track {
+      position: absolute;
+      top: @slider-track-padding;
+      left: 0;
+      right: 0;
       height: @slider-track-size;
+      border-radius: @slider-track-size / 2;
     }
 
-    .rc-slider-handle {
+    .app__slider__track {
+      right: auto;
+    }
+
+    .app__slider__handle {
       .circle(@slider-handle-size);
 
-      margin-top: -@slider-track-padding; // offset track padding
-      //margin-left: -(@slider-handle-size / 2); // <- this cause bug - Slider fires onChange twice
+      position: absolute;
+      top: 0;
+      transform: translateX(-50%);
+      cursor: pointer;
+      border: @border-size solid @slider-color-handle-border;
+      box-sizing: border-box;
+      transition: left 100ms ease-out;
+    }
+
+    .app__slider__handle.active {
+      transition: none;
+    }
+
+    .app__slider__track {
+      transition: left 100ms ease-out, width 100ms ease-out;
+    }
+
+    .app__slider.dragging .app__slider__track {
+      transition: none;
+    }
+
+    .app__slider__dot {
+      position: absolute;
+      top: @slider-track-padding - 2;
+      width: @slider-track-size + 4;
+      height: @slider-track-size + 4;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .app__slider__mark {
+      position: absolute;
+      top: @slider-handle-size + 4;
+      transform: translateX(-50%);
+      font-size: @size-smaller;
+      pointer-events: none;
     }
   }
 
-  .rc-slider-track {
+  // Vertical
+  &.vertical {
+    width: @slider-handle-size;
+    height: 100%;
+    min-height: size(120);
+
+    .app__slider__rail,
+    .app__slider__track {
+      position: absolute;
+      left: @slider-track-padding;
+      top: 0;
+      bottom: 0;
+      width: @slider-track-size;
+      border-radius: @slider-track-size / 2;
+    }
+
+    .app__slider__track {
+      top: auto;
+    }
+
+    .app__slider__handle {
+      .circle(@slider-handle-size);
+
+      position: absolute;
+      left: 0;
+      transform: translateY(50%);
+      cursor: pointer;
+      border: @border-size solid @slider-color-handle-border;
+      box-sizing: border-box;
+      transition: bottom 100ms ease-out;
+    }
+
+    .app__slider__handle.active {
+      transition: none;
+    }
+
+    .app__slider__track {
+      transition: bottom 100ms ease-out, height 100ms ease-out;
+    }
+
+    .app__slider.dragging .app__slider__track {
+      transition: none;
+    }
+
+    .app__slider__dot {
+      position: absolute;
+      left: @slider-track-padding - 2;
+      width: @slider-track-size + 4;
+      height: @slider-track-size + 4;
+      border-radius: 50%;
+      transform: translateY(50%);
+      pointer-events: none;
+    }
+
+    .app__slider__mark {
+      position: absolute;
+      left: @slider-handle-size + 4;
+      transform: translateY(50%);
+      font-size: @size-smaller;
+      pointer-events: none;
+    }
+  }
+
+  // Colors
+  .app__slider__track {
     background-color: @slider-color;
 
     .inverted & {
@@ -42,9 +153,17 @@
     }
   }
 
-  .rc-slider-handle {
+  .app__slider__rail {
+    background-color: @slider-color-rail;
+    cursor: pointer;
+
+    .inverted & {
+      background-color: @slider-color-rail-inverted;
+    }
+  }
+
+  .app__slider__handle {
     background-color: @slider-color-handle;
-    border-color: @slider-color-handle-border;
 
     .inverted & {
       background-color: @slider-color-handle-inverted;
@@ -52,30 +171,8 @@
     }
   }
 
-  &:not(.readonly, .disabled) {
-    .rc-slider-handle {
-      &:hover, &:focus, &:active {
-        background-color: @slider-color-handle-hover;
-        border-color: @slider-color-handle-border;
-
-        .tooltip {
-          background-color: @slider-color-handle-hover;
-          border-color: @slider-color-handle-hover;
-        }
-      }
-    }
-  }
-
-  .rc-slider-rail {
-    background-color: @slider-color-rail;
-
-    .inverted & {
-      background-color: @slider-color-rail-inverted;
-    }
-  }
-
-  .rc-slider-dot {
-    border-color: @slider-color-rail;
+  .app__slider__dot {
+    border: @border-size solid @slider-color-rail;
     background-color: @slider-color-rail;
 
     .inverted & {
@@ -84,10 +181,31 @@
     }
   }
 
-  .rc-slider-dot:first-child,
-  .rc-slider-dot:last-child {
-    .inverted & {
-      background-color: @color-grey-light;
+  &:not(.readonly):not(.disabled) {
+    .app__slider__handle {
+      &:hover, &:focus, &:active, &.active {
+        background-color: @slider-color-handle-hover;
+        border-color: @slider-color-handle-hover;
+      }
+    }
+  }
+
+  &.disabled,
+  &.readonly {
+    border: 0 !important; // override global `.disabled` dotted border from utilities/effect.less
+
+    .app__slider__rail,
+    .app__slider__handle {
+      cursor: default;
+    }
+
+    .app__slider__track {
+      background-color: @color-grey;
+    }
+
+    .app__slider__handle {
+      background-color: @color-grey;
+      border: 0;
     }
   }
 
@@ -116,19 +234,6 @@
 
   align-self: stretch;
   align-items: center;
-
-  .rc-slider-disabled {
-    background-color: initial;
-
-    .rc-slider-track {
-      background-color: @slider-color-disabled;
-    }
-
-    .rc-slider-handle {
-      cursor: default;
-      border-color: @slider-color-disabled;
-    }
-  }
 }
 
 .app__slider__label {

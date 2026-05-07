@@ -324,12 +324,54 @@ meta.json (stable-value):
 
 ### Slider Attributes
 
+Drag-to-set numeric input with optional marks and tooltip. Use through `Input` with
+`type: 'slider'`. Bind `value` to a number for a single handle, or to an array `[from, to]`
+for a range slider.
+
 ```js
 {
-  step: Number,          // slider increment
-  pushable: Number,      // minimum increments between two handles
+  view: 'Input',
+  type: 'slider',
+  name: 'path.in.data',     // bound value (number or [from, to])
+  min: Number,              // lower bound (default 0)
+  max: Number,              // upper bound (default 100)
+  step: Number | null,      // movement increment; pass null to snap to mark points
+  marks: {                  // explicit marks: { value: { style?, label? } }
+    [Number]: { style: Object, label: String | Number },
+  },
+  range: [Number, ...],     // shorthand: auto-builds marks from a list of numbers
+  rangeLabels: {            // formatting options when paired with `range`
+    isCurrency: Boolean,
+    currency: String,       // default '$'
+    isPercent: Boolean,
+    isTime: Boolean,        // formats milliseconds (`< 1000` → ms; otherwise human-readable)
+    precision: Number,
+    formatLabel: Function,  // (value) => string, overrides everything above
+  },
+  rangeOptions: [Number, ...], // explicit list of mark values (no auto-step computation)
+  vertical: Boolean,        // render vertically
+  disabled: Boolean,
+  readonly: Boolean,
+  tooltipProps: {           // when present, shows a tooltip on each handle
+    render: Function | String, // optional value formatter (string maps to renders.js, e.g. 'Percent')
+  },
+  unit: String,             // appended to the default tooltip label, e.g. '%'
 }
 ```
+
+**Notes**
+
+- Single mode is inferred when `value` is a number; range mode when it's an array of two numbers.
+- In range mode, handles can swap by dragging past each other (the array is normalised on commit).
+- Keyboard: `←/↓` and `→/↑` step by `step`; `Home`/`End` jump to `min`/`max`. With `step: null`
+  arrows snap to the next/previous mark value.
+- **Discrete mode** (when `step: null` *and* marks/`range` are provided): marks are distributed
+  evenly along the track and the handle moves between equal visual segments. Numeric values are
+  preserved on the API (so e.g. `[10, 50, 100, 500, 1000, 5000]` stays as those values), but
+  visually they spread uniformly instead of clumping near the low end of a linear scale.
+- `range: [10, 100, 500]` is a shortcut that becomes `min: 10`, `max: 500`, plus auto marks at
+  the listed values (and intermediate computed steps when length is 2 or starts with 0).
+- See the example "Slider (single, range, marks, percent, disabled)" for runnable variants.
 
 ### Table Attributes
 

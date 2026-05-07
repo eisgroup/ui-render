@@ -41,6 +41,8 @@ import uploadMeta from '../examples/upload_meta'
 import uploadVariantsMeta from '../examples/upload-variants_meta'
 import tablePaginationData from '../examples/table-pagination_data.json'
 import tablePaginationMeta from '../examples/table-pagination_meta.json'
+import sliderMeta from '../examples/slider_meta'
+import sliderData from '../examples/slider_data.json'
 import UIRender from '../../core/pages/main/rules'
 
 import selectIndexData from '../examples/select-index_data.json'
@@ -270,6 +272,12 @@ const examples = [
     id: 'uploadVariants',
     data: {},
     meta: uploadVariantsMeta,
+  },
+  {
+    title: 'Slider (single, range, marks, percent, disabled)',
+    id: 'slider',
+    data: sliderData,
+    meta: sliderMeta,
   },
   {
     title: 'Invalid Array Data',
