@@ -1,5 +1,53 @@
 ### Table of Contents
 
+### v0.34.0
+
+A focused cleanup release: the published bundle is now roughly **half the size**, the library
+ships with far fewer third-party packages, and several built-in components got polish and tests.
+
+#### What's smaller
+
+- The published JavaScript bundle dropped from ~890 KB to ~410 KB. Apps using this library will
+  download less code and start faster.
+- Removed third-party dependencies that previously came bundled or as peers. Their features are
+  preserved — they were rewritten in-house.
+
+#### Installation note
+
+Three packages remain as **peer dependencies**: `react`, `react-dom`, and `moment`. Host
+applications must declare these themselves — see the README "Installation" section for the
+install commands.
+
+#### What's new
+
+- **Pagination** for tables — set `usePagination: true` and `rowsPerPage` to paginate large
+  tables. New demo example: "Table with Pagination".
+- **Slider** improvements — smoother handle motion when clicking the track, tooltip stays a
+  neutral colour during interaction, disabled sliders look grey instead of black, and marks at
+  the start of a slider no longer pile up on each other (when using `step: null` with marks,
+  the marks now spread evenly along the track). New demo example with several variants.
+- **Upload** examples expanded — single CSV, multiple documents, image button, and read-only
+  upload, plus a full attribute reference in the docs.
+- **JsonView** is now a built-in component — collapsible nested object viewer with light/dark
+  themes and proper handling of repeated references.
+- **PieChart** redrawn with native SVG — same visual output, no chart-library dependency.
+
+#### Fixes
+
+- Tables no longer crash when a cell value is a plain object — they fall back to a JSON string.
+- Period validation fix on the form layer (carried over from the previous branch work).
+
+#### Tests
+
+- New test suite for the Slider component.
+- PieChart tests rewritten against the new SVG implementation.
+
+#### Documentation
+
+- New README "Installation (consumer)" section.
+- Configuration docs expanded for Pagination, Upload, Slider and PieChart attributes (with
+  notes on validation, keyboard, discrete-mark mode and runnable examples).
+
 ### v0.33.0
 
 #### New

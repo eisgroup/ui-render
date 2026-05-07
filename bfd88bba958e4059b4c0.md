@@ -7,6 +7,41 @@ To understand and work with the UI Render, basic understanding of HTML and CSS i
 - [What is CSS?](https://www.w3schools.com/whatis/whatis_css.asp)
 
 
+## Peer dependencies
+
+The host application is responsible for installing the following packages — they are declared as
+**peer dependencies** so the library and the application share a single instance of each:
+
+- `react` `^16.14.0`
+- `react-dom` `^16.14.0`
+- `moment` `~2.29.4`
+
+Why this matters:
+
+- **React / React DOM.** Two copies of React in the same tree throw `Invalid hook call` and break
+  every Context provider — forms register fields against one instance while the renderer reads
+  from another. This is a hard runtime failure, not a warning.
+- **Moment.** Date pickers and formatters operate on `moment` objects. When the host application
+  also uses Moment but resolves a different copy, `value instanceof moment` checks return `false`
+  in places where they should be `true`, producing subtle UI bugs (values not updating, dates
+  reset on submit, etc.).
+
+If the project uses **pnpm** with `auto-install-peers=false`, missing peer dependencies are not
+auto-installed and must be added explicitly to the host `package.json`. pnpm in its default
+isolated linker mode does not satisfy a peer through a transitive copy brought in by another
+dependency — only direct declarations count.
+
+Install command for consumers:
+
+```bash
+npm install eis-ui-render react@^16.14.0 react-dom@^16.14.0 moment@~2.29.4
+```
+
+```bash
+pnpm add eis-ui-render react@^16.14.0 react-dom@^16.14.0 moment@~2.29.4
+```
+
+
 ## Overview
 
 The UI Render is a declarative dynamic [React](https://reactjs.org/) component that is capable of rendering almost any user interface, in any platform (web, mobile, desktop, etc.).

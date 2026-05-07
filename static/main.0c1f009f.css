@@ -1,7 +1,7 @@
 @font-face {
   font-family: 'iconsOpenL';
-  src: url('./fonts/iconsOpenL.eot?pn33hl');
-  src: url('./fonts/iconsOpenL.eot?pn33hl#iefix') format('embedded-opentype'), url('./fonts/iconsOpenL.ttf?pn33hl') format('truetype'), url('./fonts/iconsOpenL.woff?pn33hl') format('woff'), url('./fonts/iconsOpenL.svg?pn33hl#iconsOpenL') format('svg');
+  src: url(/ui-render/f34297f2f1495732bbec.eot?pn33hl);
+  src: url(/ui-render/f34297f2f1495732bbec.eot?pn33hl#iefix) format('embedded-opentype'), url(/ui-render/8376bf9fb20052bdd20b.ttf?pn33hl) format('truetype'), url(/ui-render/bbc76660afa5b035606f.woff?pn33hl) format('woff'), url(/ui-render/9b66e238a7639d2e27d3.svg?pn33hl#iconsOpenL) format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -61,7 +61,7 @@
  */
 /* Scale according to screen size */
 /* Scale Padding according to text size */
-/* Google Fonts are loaded via <link> tag in index.html (CSS @import inside <style> is unreliable) */
+/* Google Fonts are loaded via <link> tag in index.html (CSS @import inside \3c style> is unreliable) */
 /* Icons */
 /* @font-face is in a separate font.css file */
 .ui-render [class^="icon-"], .ui-render [class*=" icon-"] {
@@ -1152,13 +1152,6 @@ body {
 .ui-render .inverted .button.vk:hover, .ui-render .inverted .button.vk:focus, .ui-render .inverted .button.vk:active, .ui-render .inverted .input-tag.vk:hover, .ui-render .inverted .input-tag.vk:focus, .ui-render .inverted .input-tag.vk:active, .ui-render .inverted .app__tag.vk:hover, .ui-render .inverted .app__tag.vk:focus, .ui-render .inverted .app__tag.vk:active, .ui-render .inverted .input--wrapper .ui.selection.dropdown.readonly .label.vk:hover, .ui-render .inverted .input--wrapper .ui.selection.dropdown.readonly .label.vk:focus, .ui-render .inverted .input--wrapper .ui.selection.dropdown.readonly .label.vk:active {
   box-shadow: inset 0 0 0 1px #4e92df;
 }
-.ui-render .recharts-wrapper *, .ui-render .recharts-responsive-container * {
-  transition: initial;
-}
-.ui-render .recharts-tooltip-item-list li {
-  padding: 0 !important;
-  margin: 0 !important;
-}
 .ui-render .app__chart__tooltip {
   border: 1px solid #d9d9d9;
   border-radius: 0.25rem;
@@ -1726,7 +1719,7 @@ body {
   -moz-appearance: none;
   appearance: none;
   padding-right: 1em;
-  background: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23333' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right 0.5em bottom 0.25em;
+  background: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 4 5%27%3E%3Cpath fill=%27%23333%27 d=%27M2 0L0 2h4zm0 5L0 3h4z%27/%3E%3C/svg%3E") no-repeat right 0.5em bottom 0.25em;
   background-size: 8px 10px;
 }
 @keyframes autofill {
@@ -2532,37 +2525,47 @@ body {
   padding: 1rem 1.5rem 1.75rem;
 }
 /* --------------
-   Pagination Semantic UI Addon
+   Pagination
 --------------- */
-.ui-render .ui.pagination.menu {
-  margin: 0;
+.ui-render .app__pagination {
   display: inline-flex;
+  align-items: center;
   vertical-align: middle;
+  gap: 0.125rem;
 }
-.ui-render .ui.pagination.menu .item:last-child {
-  border-radius: 0 0.28571429rem 0.28571429rem 0;
+.ui-render .app__pagination__item {
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.625rem;
+  border: 1px solid #d9d9d9;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  border-radius: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-.ui-render .ui.compact.menu .item:last-child {
-  border-radius: 0 0.28571429rem 0.28571429rem 0;
+.ui-render .app__pagination__item:hover:not(.disabled):not(.active) {
+  background-color: rgba(0, 0, 0, 0.04);
 }
-.ui-render .ui.pagination.menu .item:last-child::before {
-  display: none;
-}
-.ui-render .ui.pagination.menu .item {
-  min-width: 3em;
-  text-align: center;
-  margin: 0;
-}
-.ui-render .ui.pagination.menu .icon.item i.icon {
-  vertical-align: top;
-}
-.ui-render .ui.pagination.menu .active.item {
-  border-top: none;
-  padding-top: 0.92857143em;
-  background-color: rgba(0, 0, 0, 0.05);
+.ui-render .app__pagination__item.active {
+  background-color: rgba(0, 0, 0, 0.06);
   color: rgba(0, 0, 0, 0.95);
-  box-shadow: none;
-  margin: 0;
+  cursor: default;
+}
+.ui-render .app__pagination__item.disabled, .ui-render .app__pagination__item:disabled, .ui-render .app__pagination__item.input-disabled, .ui-render .app__pagination__item.input__unit.disabled:not(.readonly), .ui-render .app__pagination__item.ui.selection.dropdown.disabled:not(.readonly), .ui-render .app__pagination__iteminput.disabled:not(.readonly), .ui-render .app__pagination__itemselect.disabled:not(.readonly), .ui-render .app__pagination__itemtextarea.disabled:not(.readonly), .ui-render .app__pagination__item.input__unit:disabled, .ui-render .app__pagination__item.ui.selection.dropdown:disabled, .ui-render .app__pagination__iteminput:disabled, .ui-render .app__pagination__itemselect:disabled, .ui-render .app__pagination__itemtextarea:disabled, .ui-render .app__pagination__iteminput.checkbox.toggle:disabled + label {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.ui-render .app__pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  color: rgba(0, 0, 0, 0.5);
+  user-select: none;
 }
 .ui-render .app__popup.active {
   justify-content: flex-start;
@@ -2650,19 +2653,6 @@ body {
 .ui-render .app__progress__bar__tooltip .app__progress__bar__tooltip__inner i[class^="icon-"], .ui-render .app__progress__bar__tooltip .app__progress__bar__tooltip__inner i[class*=" icon-"] {
   font-size: 0.75rem;
 }
-.ui-render .app__progress--circle.round .recharts-radial-bar-sector, .ui-render .app__progress--circle.input__label .recharts-radial-bar-sector, .ui-render .app__progress--circle.upload__file__add .recharts-radial-bar-sector, .ui-render .app__progress--circle.upload__file__remove .recharts-radial-bar-sector, .ui-render .app__progress--circle.circular .recharts-radial-bar-sector, .ui-render .app__progress--circle.input--wrapper label .recharts-radial-bar-sector, .ui-render .app__progress--circle.input--wrapper.float .input input:placeholder-shown:not(:focus) ~ label .recharts-radial-bar-sector, .ui-render .app__progress--circle.input--wrapper.float .input select:placeholder-shown:not(:focus) ~ label .recharts-radial-bar-sector, .ui-render .app__progress--circle.input--wrapper.float .input textarea:placeholder-shown:not(:focus) ~ label .recharts-radial-bar-sector, .ui-render .app__progress--circle.badge .recharts-radial-bar-sector {
-  stroke-linejoin: round;
-}
-.ui-render .app__progress--circle .recharts-radial-bar-sector {
-  stroke-width: 0.625rem;
-}
-.ui-render .app__progress--circle__inner {
-  width: calc(98.125%);
-  height: calc(98.125%);
-  border-radius: 50%;
-  position: absolute;
-  border: 0.0625rem solid;
-}
 .ui-render .app__progress--steps {
   align-items: center;
 }
@@ -2733,58 +2723,159 @@ body {
   display: none;
 }
 .ui-render .app__slider {
-  /* Layout and Sizes */
+  position: relative;
+  width: 100%;
+  user-select: none;
+  touch-action: none;
 }
 .ui-render .app__slider:not(.vertical) {
   height: 12px;
 }
-.ui-render .app__slider:not(.vertical) .rc-slider-rail, .ui-render .app__slider:not(.vertical) .rc-slider-track, .ui-render .app__slider:not(.vertical) .rc-slider-step {
+.ui-render .app__slider:not(.vertical) .app__slider__rail, .ui-render .app__slider:not(.vertical) .app__slider__track {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  right: 0;
   height: 2px;
+  border-radius: 1px;
 }
-.ui-render .app__slider:not(.vertical) .rc-slider-handle {
+.ui-render .app__slider:not(.vertical) .app__slider__track {
+  right: auto;
+}
+.ui-render .app__slider:not(.vertical) .app__slider__handle {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  margin-top: -5px;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  cursor: pointer;
+  border: 1px solid #4e92df;
+  box-sizing: border-box;
+  transition: left 100ms ease-out;
 }
-.ui-render .app__slider .rc-slider-track {
+.ui-render .app__slider:not(.vertical) .app__slider__handle.active {
+  transition: none;
+}
+.ui-render .app__slider:not(.vertical) .app__slider__track {
+  transition: left 100ms ease-out, width 100ms ease-out;
+}
+.ui-render .app__slider:not(.vertical) .app__slider.dragging .app__slider__track {
+  transition: none;
+}
+.ui-render .app__slider:not(.vertical) .app__slider__dot {
+  position: absolute;
+  top: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.ui-render .app__slider:not(.vertical) .app__slider__mark {
+  position: absolute;
+  top: 16px;
+  transform: translateX(-50%);
+  font-size: 0.6875rem;
+  pointer-events: none;
+}
+.ui-render .app__slider.vertical {
+  width: 12px;
+  height: 100%;
+  min-height: 7.5rem;
+}
+.ui-render .app__slider.vertical .app__slider__rail, .ui-render .app__slider.vertical .app__slider__track {
+  position: absolute;
+  left: 5px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  border-radius: 1px;
+}
+.ui-render .app__slider.vertical .app__slider__track {
+  top: auto;
+}
+.ui-render .app__slider.vertical .app__slider__handle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  position: absolute;
+  left: 0;
+  transform: translateY(50%);
+  cursor: pointer;
+  border: 1px solid #4e92df;
+  box-sizing: border-box;
+  transition: bottom 100ms ease-out;
+}
+.ui-render .app__slider.vertical .app__slider__handle.active {
+  transition: none;
+}
+.ui-render .app__slider.vertical .app__slider__track {
+  transition: bottom 100ms ease-out, height 100ms ease-out;
+}
+.ui-render .app__slider.vertical .app__slider.dragging .app__slider__track {
+  transition: none;
+}
+.ui-render .app__slider.vertical .app__slider__dot {
+  position: absolute;
+  left: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transform: translateY(50%);
+  pointer-events: none;
+}
+.ui-render .app__slider.vertical .app__slider__mark {
+  position: absolute;
+  left: 16px;
+  transform: translateY(50%);
+  font-size: 0.6875rem;
+  pointer-events: none;
+}
+.ui-render .app__slider .app__slider__track {
   background-color: #4e92df;
 }
-.ui-render .inverted .app__slider .rc-slider-track {
+.ui-render .inverted .app__slider .app__slider__track {
   background-color: #1e85a6;
 }
-.ui-render .app__slider .rc-slider-handle {
-  background-color: #4e92df;
-  border-color: #4e92df;
+.ui-render .app__slider .app__slider__rail {
+  background-color: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
-.ui-render .inverted .app__slider .rc-slider-handle {
+.ui-render .inverted .app__slider .app__slider__rail {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+.ui-render .app__slider .app__slider__handle {
+  background-color: #4e92df;
+}
+.ui-render .inverted .app__slider .app__slider__handle {
   background-color: #4e92df;
   border-color: #f7f7f7;
 }
-.ui-render .app__slider:not(.readonly, .disabled) .rc-slider-handle:hover, .ui-render .app__slider:not(.readonly, .disabled) .rc-slider-handle:focus, .ui-render .app__slider:not(.readonly, .disabled) .rc-slider-handle:active {
-  background-color: #ff7dcd;
-  border-color: #4e92df;
-}
-.ui-render .app__slider:not(.readonly, .disabled) .rc-slider-handle:hover .tooltip, .ui-render .app__slider:not(.readonly, .disabled) .rc-slider-handle:focus .tooltip, .ui-render .app__slider:not(.readonly, .disabled) .rc-slider-handle:active .tooltip {
-  background-color: #ff7dcd;
-  border-color: #ff7dcd;
-}
-.ui-render .app__slider .rc-slider-rail {
+.ui-render .app__slider .app__slider__dot {
+  border: 1px solid rgba(0, 0, 0, 0.2);
   background-color: rgba(0, 0, 0, 0.2);
 }
-.ui-render .inverted .app__slider .rc-slider-rail {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-.ui-render .app__slider .rc-slider-dot {
-  border-color: rgba(0, 0, 0, 0.2);
-  background-color: rgba(0, 0, 0, 0.2);
-}
-.ui-render .inverted .app__slider .rc-slider-dot {
+.ui-render .inverted .app__slider .app__slider__dot {
   border-color: rgba(255, 255, 255, 0.3);
   background-color: rgba(255, 255, 255, 0.3);
 }
-.ui-render .inverted .app__slider .rc-slider-dot:first-child, .ui-render .inverted .app__slider .rc-slider-dot:last-child {
-  background-color: #d9d9d6;
+.ui-render .app__slider:not(.readonly):not(.disabled) .app__slider__handle:hover, .ui-render .app__slider:not(.readonly):not(.disabled) .app__slider__handle:focus, .ui-render .app__slider:not(.readonly):not(.disabled) .app__slider__handle:active, .ui-render .app__slider:not(.readonly):not(.disabled) .app__slider__handle.active {
+  background-color: #2e6eb1;
+  border-color: #2e6eb1;
+}
+.ui-render .app__slider.disabled, .ui-render .app__slider.readonly, .ui-render .app__slider.input-disabled, .ui-render .app__slider.input__unit.disabled:not(.readonly), .ui-render .app__slider.ui.selection.dropdown.disabled:not(.readonly), .ui-render .app__sliderinput.disabled:not(.readonly), .ui-render .app__sliderselect.disabled:not(.readonly), .ui-render .app__slidertextarea.disabled:not(.readonly), .ui-render .app__slider.input__unit:disabled, .ui-render .app__slider.ui.selection.dropdown:disabled, .ui-render .app__sliderinput:disabled, .ui-render .app__sliderselect:disabled, .ui-render .app__slidertextarea:disabled, .ui-render .app__sliderinput.checkbox.toggle:disabled + label {
+  border: 0 !important;
+}
+.ui-render .app__slider.disabled .app__slider__rail, .ui-render .app__slider.readonly .app__slider__rail, .ui-render .app__slider.disabled .app__slider__handle, .ui-render .app__slider.readonly .app__slider__handle, .ui-render .app__slider.input-disabled .app__slider__rail, .ui-render .app__slider.input-disabled .app__slider__handle, .ui-render .app__slider.input__unit.disabled:not(.readonly) .app__slider__rail, .ui-render .app__slider.input__unit.disabled:not(.readonly) .app__slider__handle, .ui-render .app__slider.ui.selection.dropdown.disabled:not(.readonly) .app__slider__rail, .ui-render .app__slider.ui.selection.dropdown.disabled:not(.readonly) .app__slider__handle, .ui-render .app__sliderinput.disabled:not(.readonly) .app__slider__rail, .ui-render .app__sliderinput.disabled:not(.readonly) .app__slider__handle, .ui-render .app__sliderselect.disabled:not(.readonly) .app__slider__rail, .ui-render .app__sliderselect.disabled:not(.readonly) .app__slider__handle, .ui-render .app__slidertextarea.disabled:not(.readonly) .app__slider__rail, .ui-render .app__slidertextarea.disabled:not(.readonly) .app__slider__handle, .ui-render .app__slider.input__unit:disabled .app__slider__rail, .ui-render .app__slider.input__unit:disabled .app__slider__handle, .ui-render .app__slider.ui.selection.dropdown:disabled .app__slider__rail, .ui-render .app__slider.ui.selection.dropdown:disabled .app__slider__handle, .ui-render .app__sliderinput:disabled .app__slider__rail, .ui-render .app__sliderinput:disabled .app__slider__handle, .ui-render .app__sliderselect:disabled .app__slider__rail, .ui-render .app__sliderselect:disabled .app__slider__handle, .ui-render .app__slidertextarea:disabled .app__slider__rail, .ui-render .app__slidertextarea:disabled .app__slider__handle, .ui-render .app__sliderinput.checkbox.toggle:disabled + label .app__slider__rail, .ui-render .app__sliderinput.checkbox.toggle:disabled + label .app__slider__handle {
+  cursor: default;
+}
+.ui-render .app__slider.disabled .app__slider__track, .ui-render .app__slider.readonly .app__slider__track, .ui-render .app__slider.input-disabled .app__slider__track, .ui-render .app__slider.input__unit.disabled:not(.readonly) .app__slider__track, .ui-render .app__slider.ui.selection.dropdown.disabled:not(.readonly) .app__slider__track, .ui-render .app__sliderinput.disabled:not(.readonly) .app__slider__track, .ui-render .app__sliderselect.disabled:not(.readonly) .app__slider__track, .ui-render .app__slidertextarea.disabled:not(.readonly) .app__slider__track, .ui-render .app__slider.input__unit:disabled .app__slider__track, .ui-render .app__slider.ui.selection.dropdown:disabled .app__slider__track, .ui-render .app__sliderinput:disabled .app__slider__track, .ui-render .app__sliderselect:disabled .app__slider__track, .ui-render .app__slidertextarea:disabled .app__slider__track, .ui-render .app__sliderinput.checkbox.toggle:disabled + label .app__slider__track {
+  background-color: #7f7f7f;
+}
+.ui-render .app__slider.disabled .app__slider__handle, .ui-render .app__slider.readonly .app__slider__handle, .ui-render .app__slider.input-disabled .app__slider__handle, .ui-render .app__slider.input__unit.disabled:not(.readonly) .app__slider__handle, .ui-render .app__slider.ui.selection.dropdown.disabled:not(.readonly) .app__slider__handle, .ui-render .app__sliderinput.disabled:not(.readonly) .app__slider__handle, .ui-render .app__sliderselect.disabled:not(.readonly) .app__slider__handle, .ui-render .app__slidertextarea.disabled:not(.readonly) .app__slider__handle, .ui-render .app__slider.input__unit:disabled .app__slider__handle, .ui-render .app__slider.ui.selection.dropdown:disabled .app__slider__handle, .ui-render .app__sliderinput:disabled .app__slider__handle, .ui-render .app__sliderselect:disabled .app__slider__handle, .ui-render .app__slidertextarea:disabled .app__slider__handle, .ui-render .app__sliderinput.checkbox.toggle:disabled + label .app__slider__handle {
+  background-color: #7f7f7f;
+  border: 0;
 }
 .ui-render .app__slider .tooltip.top::after {
   top: 100%;
@@ -2795,16 +2886,6 @@ body {
 .ui-render .app__slider--wrap {
   align-self: stretch;
   align-items: center;
-}
-.ui-render .app__slider--wrap .rc-slider-disabled {
-  background-color: initial;
-}
-.ui-render .app__slider--wrap .rc-slider-disabled .rc-slider-track {
-  background-color: #444444;
-}
-.ui-render .app__slider--wrap .rc-slider-disabled .rc-slider-handle {
-  cursor: default;
-  border-color: #444444;
 }
 .ui-render .app__slider__label {
   max-width: 45%;
@@ -14191,4 +14272,4 @@ Floated Menu / Item
 }
 
 
-/*# sourceMappingURL=main.b59bd52c.css.map*/
+/*# sourceMappingURL=main.0c1f009f.css.map*/
