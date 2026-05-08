@@ -1,5 +1,29 @@
 ### Table of Contents
 
+### v0.34.1
+
+#### Fixes
+
+- **InputNumber** now enforces `min` and `outputFormat.decimals: 0` on entry, not
+  only on blur formatting. With `min: 0`, the minus sign cannot be typed or pasted;
+  with `outputFormat.decimals: 0`, the decimal separator (`.` or `,`) is rejected.
+  The value is also clamped to `[min, max]` on blur, so legacy data outside the
+  range is corrected when the field loses focus.
+- **InputNumber** restored the visible gap between the input value and `unit`
+  text (`234 USD` instead of `234USD`). The plain whitespace text node was
+  collapsing as a whitespace-only anonymous flex item inside the unit container.
+
+#### Demo
+
+- New example: **Input: Integer ≥ 0** — demonstrates the `min: 0` +
+  `outputFormat.decimals: 0` combination alongside an unconstrained input for
+  contrast.
+
+#### Tests
+
+- New `InputNumber` test suite covering `min` enforcement, `decimals: 0`
+  enforcement, the combined constraint, and `[min, max]` clamping on blur.
+
 ### v0.34.0
 
 A focused cleanup release: the published bundle is now roughly **half the size**, the library
