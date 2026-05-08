@@ -21,6 +21,8 @@ import exampleData from '../examples/example_data.json'
 import exampleMeta from '../examples/example_meta.json'
 import expandListMeta from '../examples/expand-list_meta'
 import inputMeta from '../examples/input_meta'
+import inputIntegerMeta from '../examples/input-integer_meta.json'
+import inputIntegerData from '../examples/input-integer_data.json'
 import inputToggle from '../examples/input_toggle'
 import invalidArrayData from '../examples/invalid-array_data'
 import invalidArrayMeta from '../examples/invalid-array_meta'
@@ -130,6 +132,12 @@ const examples = [
     id: 'input',
     data: exampleData,
     meta: inputMeta,
+  },
+  {
+    title: 'Input: Integer ≥ 0',
+    id: 'inputIntegerMin0',
+    data: inputIntegerData,
+    meta: inputIntegerMeta,
   },
   {
     title: 'Input Toggle Checkbox',

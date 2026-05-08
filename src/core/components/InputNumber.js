@@ -11,7 +11,6 @@ import View from './View'
 import { Active } from '../utils'
 
 // Constants
-const NUMBER_INPUT_REGEX = /^-?\d*[.,]?\d*$/
 const THOUSANDS_SEPARATOR_REGEX = /\B(?=(\d{3})+(?!\d))/g
 const DECIMAL_PATTERN_TEMPLATE = '^\\d*(\\.\\d{0,{decimals}})?$'
 
@@ -49,8 +48,21 @@ const InputNumber = ({
     onChange,
     value: valueFromParent,
     type: _1,
+    min,
+    max,
     ...props
 }) => {
+    // Build the input regex from min/decimals constraints so that disallowed
+    // characters cannot be entered in the first place. min: 0 forbids the
+    // minus sign; outputFormat.decimals: 0 forbids the decimal separator.
+    const inputRegex = useMemo(() => {
+        const allowMinus = !(typeof min === 'number' && min >= 0)
+        const allowDecimal = !(outputFormat && outputFormat.decimals === 0)
+        const minus = allowMinus ? '-?' : ''
+        const decimal = allowDecimal ? '[.,]?\\d*' : ''
+        return new RegExp(`^${minus}\\d*${decimal}$`)
+    }, [min, outputFormat])
+
     const formatDecimals = (value, isUserTyping = false) => {
         if (value && outputFormat && typeof outputFormat.decimals === 'number' && outputFormat.decimals >= 0) {
             const pattern = DECIMAL_PATTERN_TEMPLATE.replace('{decimals}', outputFormat.decimals)
@@ -164,7 +176,7 @@ const InputNumber = ({
                 )}
                 {unit && hasValue &&
                     <Text className="input__unit truncate">
-                        <Text className="invisible" aria-hidden="true">{value}</Text> {unit}
+                        <Text className="invisible" aria-hidden="true">{value}</Text>{' '}{unit}
                     </Text>
                 }
                 {stickyPlaceholder && placeholder && hasValue &&
@@ -189,14 +201,19 @@ const InputNumber = ({
                     }}
                     onBlur={(...args) => {
                         active && setActive(false)
-                        // Format value on blur
                         if (value && value !== '' && value !== '.') {
-                            const numValue = parseFloat(value)
+                            let numValue = parseFloat(value)
                             if (!isNaN(numValue)) {
+                                if (typeof min === 'number' && numValue < min) numValue = min
+                                if (typeof max === 'number' && numValue > max) numValue = max
                                 const formattedValue = formatDecimals(numValue, false)
-                                if (formattedValue !== value) {
-                                    setValue(formattedValue)
-                                    onChange && onChange(formattedValue, name, args[0])
+                                const nextDisplay = String(formattedValue)
+                                if (nextDisplay !== value) {
+                                    setValue(nextDisplay)
+                                    const nextNumeric = typeof formattedValue === 'number'
+                                        ? formattedValue
+                                        : parseFloat(formattedValue)
+                                    onChange && onChange(nextNumeric, name, args[0])
                                 }
                             }
                         }
@@ -204,13 +221,10 @@ const InputNumber = ({
                     }}
                     onChange={(e) => {
                         const inputValue = e.target.value
-                        // Allow only numbers, decimal point, comma, and minus sign
-                        if (inputValue === '' || NUMBER_INPUT_REGEX.test(inputValue)) {
-                            // Convert comma to dot for internal processing
+                        if (inputValue === '' || inputRegex.test(inputValue)) {
                             const normalizedValue = inputValue.replace(',', '.')
                             onChangeHandler(normalizedValue, name, e)
                         } else {
-                            // Prevent invalid input by not updating the value
                             e.preventDefault()
                         }
                     }}
@@ -269,6 +283,8 @@ InputNumber.propTypes = {
     onChange: PropTypes.func,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     type: PropTypes.string,
+    min: PropTypes.number,
+    max: PropTypes.number,
 }
 
 export default InputNumber
