@@ -305,6 +305,7 @@ function merge(target, ...sources) {
 
 function _mergeInto(dst, src, customizer) {
 	if (!isObjectLike(src)) return
+	// Iterate own indices/keys including sparse arrays via Object.keys (lodash merge skips holes).
 	for (const key of Object.keys(src)) {
 		const srcVal = src[key]
 		// lodash merge/mergeWith skips `undefined` source values
@@ -318,7 +319,11 @@ function _mergeInto(dst, src, customizer) {
 			}
 		}
 		if (Array.isArray(srcVal)) {
-			dst[key] = Array.isArray(dstVal) ? dstVal.concat(srcVal) : srcVal.slice()
+			// Element-wise merge by index (lodash behavior): keeps max length, recurses into objects, skips holes.
+			// Previous concat() broke form-data merge: a sparse [, , , {}] from a child form was appended after
+			// the master array instead of overlaying index 3, producing phantom rows.
+			if (!Array.isArray(dstVal)) dst[key] = []
+			_mergeInto(dst[key], srcVal, customizer)
 		} else if (isPlainObject(srcVal)) {
 			if (!isPlainObject(dstVal)) dst[key] = {}
 			_mergeInto(dst[key], srcVal, customizer)

@@ -302,7 +302,9 @@ export class UIRender extends Component {
     getAllFormsData = () => {
         // TODO: investigate realisation with this.data
         // this.data contains related data but there no all changes
-        return getFormsData(formsStorage)
+        // Strip the renderExtraItem draft slot (empty `{}` at array.length) from `dataKind.*` arrays
+        // before returning — same compaction used after REMOVE_DATA.
+        return compactDataKindArrays(getFormsData(formsStorage))
     }
 
     // Raw form values without Select array reordering — for showIf lookups
