@@ -1,5 +1,14 @@
 ### Table of Contents
 
+### v0.34.2
+
+#### Fixes
+
+- Fixed `merge` helper in `lodash-lite` to overlay arrays by index instead of
+  concatenating them, restoring lodash semantics.
+- `getAllFormsData()` now strips the empty `renderExtraItem` draft row from
+  `dataKind.*` arrays before returning.
+
 ### v0.34.1
 
 #### Fixes
