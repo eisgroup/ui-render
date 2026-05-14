@@ -1,6 +1,18 @@
 import { interpolateString } from '../string'
 
 describe('interpolateString', () => {
+    it('uses formatKey to wrap keys (e.g. add `$` prefix)', () => {
+        expect(
+            interpolateString('key.{id}', { $id: 'user' }, { formatKey: '$key' })
+        ).toBe('key.user')
+    })
+
+    it('uses custom function name in thrown error', () => {
+        expect(() =>
+            interpolateString('{missing}', {}, { name: 'myFn' })
+        ).toThrow(/myFn/)
+    })
+
     it('interpolates a basic placeholder', () => {
         expect(interpolateString('{id}', { id: 42 })).toBe('42')
     })
