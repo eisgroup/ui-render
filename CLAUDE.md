@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `eis-ui-render` is a React component library that generates UI from JSON schemas (meta + data). It takes a `meta.json` (UI structure/layout definition) and a `data.json` (values), and recursively renders a component tree. Published to npm as a UMD library, with a demo app hosted on GitHub Pages.
 
+The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, project structure) lives in `docs/UPGRADE-PLAN.md`.
+
 ## Commands
 
 - `npm start` — Run demo app in dev mode (webpack-dev-server)
@@ -24,8 +26,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Dual build targets
 
-1. **Library** (`src/library/`) — Entry point `src/library/index.js`, built via `webpack.library.config.mjs` to `dist/`. Exports the `UIRender` component as UMD. React is externalized. CSS compiled from LESS and output to `dist/static/ui-render.css`.
-2. **Demo app** (`src/demo/`) — Entry point `src/index.js` → `src/App.jsx`, built via `webpack.demo.config.mjs`. Used for development and GitHub Pages demo.
+1. **Library** (`src/library/`) — Entry point `src/library/index.js`, built via `webpack.library.config.mjs` to `dist/`. Exports the `UIRender` component as UMD. `react`, `react-dom`, and `moment` are externalized (peer dependencies — the host app provides them). CSS is compiled from LESS to `dist/static/all.css` (plus `font.css` and a `semantic.css` stub), mirrored to the root `static/` folder.
+2. **Demo app** (`src/demo/`) — Entry chain `src/index.js` → `src/main.jsx` (ReactDOM.render) → `src/App.jsx`, built via `webpack.demo.config.mjs`. Used for development and GitHub Pages demo.
 
 ### Core rendering engine (`src/core/ui-render/`)
 
@@ -38,17 +40,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `rules.js` — The main UIRender component with form handling (react-final-form), data processing, validation, actions (submit, download, upload, addData, removeData), and lifecycle management.
 - `utils.js` — Data transformation helpers (error mapping, normalization, form data extraction).
 
-### Webpack path aliases
+### Internal layering and imports
 
-These aliases are defined in both `webpack.demo.config.mjs` (dev) and `webpack.library.config.mjs` (library build):
+All internal imports use **relative paths** — there are no `ui-*-pack` webpack aliases (the only resolve aliases are `theme.config` for semantic-ui-less theming and `process`). The historical "pack" names survive as directory layers:
 
-| Alias | Path |
+| Layer (historical name) | Path |
 |---|---|
-| `ui-modules-pack` | `src/core/modules` |
-| `ui-react-pack` | `src/core/components` |
-| `ui-utils-pack` | `src/core/utils` |
+| `ui-react-pack` — presentational | `src/core/components` |
+| `ui-modules-pack` — form/upload/fields | `src/core/modules` |
+| `ui-utils-pack` — pure utils | `src/core/utils` |
 
-All internal imports use these aliases rather than relative paths.
+Dependency direction (keep it one-way): `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine (`pages/main` + `ui-render`) may import anything in core. `semantic-ui-react` may be imported **only** inside `src/core/components`.
 
 ### Key internal packages
 
@@ -73,9 +75,15 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 
 - React 16 (peer dependency), Semantic UI React for base components
 - react-final-form for form state management
-- recharts for charts, dayjs/moment for dates
-- LESS for styling, compiled via webpack (entry: `src/style/index.less`). Semantic UI theme overrides at `src/style/override/`. PostCSS prefixwrap scopes all CSS under `.ui-render`. Requires Less 3.x for `less-plugin-functions` compatibility.
+- moment for dates (peer dependency, externalized); charts are custom SVG (`src/core/components/charts/` — no recharts)
+- LESS for styling, compiled via webpack (entry: `src/style/index.less`). Semantic UI theme overrides at `src/style/override/`. PostCSS prefixwrap scopes all CSS under `.ui-render`. Less is pinned to 3.x (semantic-ui-less inline-JS + `less-plugin-functions` toolchain — see `docs/UPGRADE-PLAN.md` §9.8 before changing).
 - Node.js v24 (see `.nvmrc`)
 - ESLint with `react-app` config (configured in package.json)
 - Jest + @testing-library/react for tests
 - stylelint for LESS linting (config: `.stylelintrc.json`)
+
+## Gotchas
+
+- `npm run build-css` copies `src/style/override/theme.config` into `node_modules/semantic-ui-less/` before compiling (mutates `node_modules`); output goes to `public/static/ui-render.built.css`.
+- Jest has no path-alias mapping (`jest.config.js`) — only relative imports resolve in tests.
+- `isFunction()` from core utils rejects cross-realm functions such as `jest.fn()` — use plain functions in tests.
