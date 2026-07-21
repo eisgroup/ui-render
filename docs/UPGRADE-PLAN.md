@@ -4,6 +4,7 @@
 |---|---|
 | **Status** | Draft for review |
 | **Date** | 2026-07-06 |
+| **Re-verified** | 2026-07-21 — independent re-audit against the working tree, lockfile, build configs, a full test/lint/audit/pack run, and the npm registry; new findings indexed in §2.6 |
 | **Audited version** | 0.34.2 (branch snapshot) |
 | **Scope** | React 17/18 upgrade path, React 19 readiness, a principles-preserving modernization roadmap, the `semantic-ui-react` exit plan (§9.7-F1), the `moment` native-replacement analysis (§9.7-F2), the project-structure analysis (§9.9), the TypeScript migration (§9.6), and the consolidated verification checklist (Appendix C) |
 
@@ -11,11 +12,12 @@
 
 ## 1. Executive summary
 
-The audit shows that **the path to React 18 is almost entirely unblocked**. The build toolchain is already modern (webpack 5, Jest 30, Babel 7.26, Node 24), and every runtime dependency already declares React 17/18 peer support. The lag is concentrated in exactly three places:
+The audit shows that **the path to React 18 is almost entirely unblocked**. The build toolchain is already modern (webpack 5, Jest 30, Babel 7.26, Node 24), and every runtime dependency already declares React 17/18 peer support. The lag is concentrated in four places:
 
 1. **React itself** — pinned to `^16.14.0` (peer + dev).
 2. **`@testing-library/react` 12.1.5** — peer-restricted to `react <18`; the only hard dependency blocker.
 3. **Legacy component patterns** — 22 class components, `UNSAFE_*` lifecycles in 13 files, including deliberate **runtime prototype patching** in `src/core/pages/main/rules.js` and `src/core/modules/form/utils.js`. These are *not* upgrade blockers (prefixed `UNSAFE_*` methods work in React 17, 18, and 19), but they block `StrictMode`, concurrent features, and long-term maintainability.
+4. **The shipped artifact itself** — the published type declarations describe a different, legacy integration shim (`window._mountUIRender`), not the exported component; there is no CI and no publish gate, so the tarball is whatever `dist/` happens to lie on the maintainer's disk (currently 11.6 MB unpacked, with duplicated assets and source maps); and the published CSS leaks unscoped `html`/`body`/`*` rules into host pages. §2.6 carries the evidence; Phase 0 turns these into gates.
 
 **Recommended target: React 18.3, reached in two checkpointed releases (17 → 18), followed by an incremental modernization program.** React 19 is a watch-item, not a target — it stays gated on the §9.7-F1 exit (see the §8 fast path).
 
@@ -24,7 +26,7 @@ Standing decisions:
 1. **`semantic-ui-react` will be exited entirely** (§9.7-F1). The audited dependency surface is far smaller than the package's reputation suggests: exactly **3 wrapper components** (`Table`, `TooltipPop`, `Dropdown`) and **5 curated LESS modules** — the codebase has already been trending out of it (slider lib and react-dropzone removed recently, modal and pagination already in-house). Completing the exit also removes the main external React 19 blocker.
 2. **`moment` stays** as a peer dependency — no dayjs migration. The requested native-replacement feasibility analysis (§9.7-F2) concludes it is possible and well-bounded (~400–600 lines behind an adapter seam), but it is parked behind an explicit decision gate; the only near-term action is funneling usage through a single internal adapter module.
 
-The **project-structure analysis** (§9.9) found: the documented `ui-*-pack` alias system is dead (zero imports in the codebase — CLAUDE.md was stale on this; fixed alongside this plan), the engine lives under an app-boilerplate-era `core/pages/main/` path, and 9 orphan components plus a dead `style/unused/` tree can simply be deleted. The workstream re-homes the engine to `core/engine/` ahead of the §9.3 decomposition, isolates the demo, and locks layer direction in with lint.
+The **project-structure analysis** (§9.9) found: the documented `ui-*-pack` alias system is dead (zero imports in the codebase — CLAUDE.md was stale on this; fixed alongside this plan), the engine lives under an app-boilerplate-era `core/pages/main/` path, and 12 orphan components (9 direct, plus the `ErrorTable`/`Square`/pack-`TabList` cluster reachable only from other orphans) plus a dead `style/unused/` tree can simply be deleted. The workstream re-homes the engine to `core/engine/` ahead of the §9.3 decomposition, isolates the demo, and locks layer direction in with lint.
 
 §9.6 defines a **full TypeScript migration** (infra step → utils/contract → components/modules riding other workstreams → engine last → guarded public-API switchover), which **retires the `prop-types` runtime dependency** as its exit criterion (E5 — React 19 ignores propTypes anyway, and the shapes currently ship in the production bundle). The plan also adds **Appendix C** — a consolidated checklist of every verification it depends on, so no check lives only in review discussions.
 
@@ -42,9 +44,10 @@ Because `react`/`react-dom` are webpack **externals** and npm **peer dependencie
 | Transpiler | Babel 7 (declared `^7.26`), `babel-loader` 10 | ✅ current |
 | Tests | Jest 30 + `jest-environment-jsdom` 30 | ✅ current, React-18-ready |
 | Node | engines `>=22`, `.nvmrc` = 24 | ✅ current |
-| Lint | ESLint 8 + `eslint-config-react-app` 7 | ✅ adequate (supports React 17/18 idioms) |
+| Lint | ESLint 8 + `eslint-config-react-app` 7 | ⚠️ config is fine, but there is **no JS lint script** and `npx eslint src` currently fails (11 errors / 28 warnings) — Phase 0.9 |
 | Styling | LESS 3.13 (pinned for the semantic-ui-less + `less-plugin-functions` toolchain), PostCSS 8, stylelint 16 | ✅ works; LESS pin is a separate watch-item (§9.8) |
-| Types | Hand-written public API types in `src/library/types/`, emitted via `tsconfig.build.json` (declaration-only) | ✅ works |
+| Types | Hand-written public API types in `src/library/types/`, emitted via `tsconfig.build.json` (declaration-only) | ❌ **describes the wrong component** — a legacy `window._mountUIRender` shim, not the shipped export (§2.6-1); replaced in Phase 0.6 |
+| CI / publish gates | — | ❌ none: no CI config in the repo, no `prepack`/`prepublishOnly`; `dist/` and root `static/` are gitignored, so a publish ships whatever was last built locally — Phase 0.4/0.7 |
 
 ### 2.2 Dependency compatibility matrix
 
@@ -63,7 +66,7 @@ Peer ranges verified against `package-lock.json` (resolved versions), not npm me
 | `react-refresh` + webpack plugin | 0.17 / 0.5.17 | — | ✅ | ✅ | Dev only. |
 | **`@testing-library/react`** | **12.1.5** | **`<18.0.0`** | ✅ | ❌ | **The single hard blocker.** Requires upgrade to 16.x together with the React 18 bump (§6). |
 | `@testing-library/jest-dom` | 6.9.1 | — | ✅ | ✅ | |
-| `moment` | ~2.29.4 (peer + external) | — | ✅ | ✅ | In maintenance mode upstream; **decision: keep** (peer unchanged). Optional native replacement analyzed in §9.7-F2. |
+| `moment` | ~2.29.4 (peer + external) | — | ✅ | ✅ | In maintenance mode upstream; **decision: keep** (the peer only *widens* to `^2.29.4` in Phase 1, §3.2). Note: moment IS part of the public API surface (§2.6-12). Optional native replacement analyzed in §9.7-F2. |
 
 ### 2.3 React legacy pattern inventory
 
@@ -110,6 +113,28 @@ Codebase size: 257 JS/JSX files (+2 TS), 76 test files. 22 files contain real cl
 4. **UMD library with `react`, `react-dom`, `moment` externalized** (`webpack.library.config.mjs:27–31`); CSS compiled from LESS and scoped under `.ui-render` via postcss-prefixwrap.
 5. **The demo app is the living documentation and QA stand** (`src/demo/examples/` as executable spec).
 
+### 2.6 Independent re-audit findings (2026-07-21)
+
+A second audit pass — against the working tree, the build configs, a full test/lint/audit/pack run, and the npm registry — added the verified facts below. Each is integrated into the phase or workstream in the last column; this table is the evidence index, not a task list.
+
+| # | Finding (file:line references verified) | Owned by |
+|---|---|---|
+| 1 | **Published types describe a different component.** `src/library/types/UIRender.tsx` is a legacy DOM-proxy class that renders an empty `<div>` and requires a global `window._mountUIRender` — while the shipped `dist/index.js` exports the real component (`src/library/main.js`: `AppProvider → AppWrapper → engine`). Required/optional is inverted vs runtime (types require `onSubmit`/`translate`; runtime requires `data`/`meta` — `rules.js:219–220`); the d.ts promises a named `UIRender` export while the UMD emits **default-only** (`webpack.library.config.mjs` `library.export: 'default'`). | Phase 0.6, §9.6-E4 |
+| 2 | **The public `dateFormat` prop is dead end-to-end.** `rules.js:328/344` passes it into `<Render>`, but `Render.js:45` destructures and discards it; nothing feeds it into `ConfigContext` (`AppProvider` receives no props; the context declares `updateConfig` while the provider exposes `setConfig`); `TextDateValue.js` ignores its own `dateFormat` parameter. Components always see the context default `'MM-DD-YYYY'`. | §9.4 |
+| 3 | **A per-node error boundary already exists** — `RenderClass` has `componentDidCatch` + a `Render.onError` hook (`Render.js:65–67,131`) — but the production override at `mapper.js:680` destructures `{err, errInfo}` while the boundary emits `{error, errorInfo}`, so reports carry `undefined`. | §9.4 (extend + fix, not create) |
+| 4 | **Engine ↔ form-modules import cycle:** `form/utils.js:13–14` imports `errorsProcessing`, `clearErrorsMap`, `formsStorage` from `pages/main/*`, while `rules.js:3` imports `storedTouched`, `withForm` from `modules/form` — in addition to the known `Text.js:4` violation. | §9.3 step 2, §9.9-H5 |
+| 5 | **Module-global mutable state is wider than first catalogued:** besides `FIELD.FUNC`/`Active.translate`/`errorHandlerFunction` — `formsStorage` (`rules.js:199`, module-level `Map`), `errorsMap` (`rules.js:204`), `formInitialValues` + `storedTouched` (`form/utils.js:23–24`); and every instance renders a fixed-id `<div id="render-popup-root">` (`AppWrapper.js:17`) that the modal portal resolves via global `getElementById` (`Popup.js:88`) — first instance in the DOM wins. (`FIELD.METHODS`, named in an earlier review draft, does not exist.) | §9.3 step 3, R14 |
+| 6 | **Form-runtime hazards (StrictMode/longevity-relevant):** `form.subscribe()` runs on **every render** with the unsubscribe discarded (`form/utils.js:382`); `setState` during render in the Dropdown field branch (`form/utils.js:199–208`); a debounced handler lives on the **prototype**, sharing one timer across instances (`form/utils.js:571`); state is mutated in place via the documented-as-mutating `set()` before `setState` (`rules.js:1108/1150/1211/1215`); `AutoSave`'s debounce is never cancelled on unmount; `autoSubmit` creates a fresh `debounce(instance.submit)` on every render pass (`mapper.js:588`). (Checked and clean: `Slider` and `@withTimer` DO clean up — only an unmount-mid-drag edge remains.) | §9.3 step 4, §7 |
+| 7 | **Published CSS leaks global styles.** `postcss.config.js` deliberately exempts `html`, `body`, `*` from prefixwrap; the built `dist/static/all.css` contains 2× `html{`, 2× `body`, 1× `*{` and zero `.ui-render html` — the bundled semantic reset restyles the host page. The standalone `scripts/build-css.js` uses **different** prefixwrap options, and the Jest `css-contract.test.js` checks LESS **before** PostCSS — no pipeline asserts the final CSS. | §9.9-H8, §9.5, F1 step 4 |
+| 8 | **Packaging is unreproducible and oversized.** `npm pack --dry-run`: 579 files, **11.6 MB unpacked**; `dist/static/*` and root `static/*` duplicate every asset (two 407 KB copies of `all.css`); source maps ship (~1 MB incl. `all.css.map` at 928 KB); `static/semantic.css` is 0 bytes; no `prepack`/`prepublishOnly`; both `dist/` and `/static` are gitignored. The library and watch builds also disagree: watch emits `static/ui-render.css` (not the `all.css`/`font.css`/`semantic.css` set) and its `output.clean: true` wipes `dist/index.d.ts`. | Phase 0.7, §9.9-H7 |
+| 9 | **A clean checkout does not build.** `Examples.jsx:24–25` imports `src/demo/examples/input-integer_{meta,data}.json`, which exist only as untracked files in the current working tree (8 more untracked example JSONs are unreferenced). | Phase 0.8 |
+| 10 | **Babel scope correction:** the demo webpack config carries its **own inline presets** (`webpack.demo.config.mjs:37`, no explicit targets → browserslist applies there), so the root `targets: {node:'current'}` problem hits the **library and watch** builds (Jest is already env-split). Fixing the root config alone leaves the demo's duplicated preset setup in place. | Phase 0.5, §9.8 |
+| 11 | **Hybrid dependency model:** everything except `react`/`react-dom`/`moment` is **both** bundled into the UMD **and** declared in `dependencies` — npm hosts install full copies of `semantic-ui-react`, the form stack, `rc-picker` etc. that the bundle never uses, and SUIR's own `react ≤^18` peer caps the host's React until the *dependency entry* (not just the bundled code) is removed. | §9.7-F1 step 3½, §9.7-F3 gate, §8 |
+| 12 | **moment IS on the public API.** `README:12,18` and `docs.md:24–25` document that the library "accepts `moment` instances on its API" (with cross-copy `instanceof` caveats), and rc-picker callbacks leak moment objects outward — `onSelect` ← `onCalendarChange` (`InputDate.js:96`) plus passthrough `disabledDate`/`cellRender`/… via `{...props}` (`InputDate.js:89`). The earlier "moment never crosses the public API" claim was wrong; corrected in §9.7-F2. | §9.7-F2 |
+| 13 | **Quality baselines measured (2026-07-21):** tests 76 suites / 1215 tests green in 8.3 s (zero snapshots); `lint:css` clean; `npx eslint src` fails (11 errors / 28 warnings; no lint script exists); `npm audit --omit=dev` **0** vulnerabilities; full `npm audit` **20** (2 critical, 7 high — dev tooling); **13 devDependencies with zero references** in code/configs: `tsconfig-paths-webpack-plugin`, `backoff`, `history`, `html-loader`, `minimist`, `path-browserify`, `postcss-scss`, `raw-loader`, `remark-loader`, `rimraf`, `sass`, `sass-loader`, `webpack-node-externals` (verify `dot-prop-immutable` too). | Phase 0.9, §9.9-H1 |
+| 14 | **Orphan set is 12, not 9:** the 9 direct orphans re-confirmed, plus `ErrorTable` (imported only by orphan `ErrorContent`), `Square` (only by orphan `Carousel`), and the pack `TabList` (mapper uses the engine copy, `mapper.js:33`). Engine `tester/` fixtures are referenced by nothing. | §9.9-H1, §9.2 |
+| 15 | **Hardcoded version strings** `data-version="0.34.2"` in `AppWrapper.js:10` and `types/UIRender.tsx:76` — drift on every release; should come from `package.json` at build time. | §9.9-H6 |
+
 ---
 
 ## 3. Upgrade strategy
@@ -142,13 +167,15 @@ Widen, never replace:
 
 - **UMD / externals consumers**: React comes from the host — no bundle change at all. The upgrade only widens what hosts are allowed to provide.
 - **npm consumers**: `npm install` peer resolution starts accepting React 17/18 hosts. No breaking change for React 16.14 hosts.
-- **Docs debt**: install instructions currently hardcode `react@^16.14.0` — `src/demo/markdowns/docs.md:16,37,41` and `README.md` (plus a prose peer-deps note at `changelog.md:50`). Each phase must update them.
+- **Docs debt**: install instructions currently hardcode `react@^16.14.0` and `moment@~2.29.4` — `src/demo/markdowns/docs.md:16–17,37,41` and `README.md:18,23,30` (plus a prose peer-deps note at `changelog.md:50`). Each phase must update them.
+- **Hybrid dependency model (§2.6-11):** npm hosts currently install `dependencies` (SUIR, the form stack, rc-picker, …) that are *also* bundled into the UMD — dead weight in host `node_modules` and an extra peer-resolution surface. Resolving this (trim `dependencies`, externalize more, or peerize) is an owners' decision — see the gates in §10.
+- **`engines.node >= 22` ships to consumers** in the published manifest — on `engine-strict` hosts this fails installs even though Node is only a *build* requirement for this browser library. Decision gate in §10.
 
 ---
 
-## 4. Phase 0 — Safety net (prerequisite, do not skip)
+## 4. Phase 0 — Reproducibility, API & security baseline (prerequisite, do not skip)
 
-**Goal:** make regressions *visible* before changing React's behavior underneath the form engine.
+**Goal:** make regressions *visible* and releases *reproducible* before changing React's behavior underneath the form engine. The §2.6 re-audit widened this phase: it now also closes the public-type mismatch, the packaging drift, and the lint/security gaps — everything later phases implicitly assume.
 
 | # | Action | Detail |
 |---|---|---|
@@ -156,17 +183,21 @@ Widen, never replace:
 | 0.2 | Close test gaps around `rules.js` critical flows | Priority order: initial data processing / normalization (`utils.js` error mapping), `showIf` evaluation, validation + error propagation into fields, actions (`submit` payload assembly, `addData` / `removeData`, upload/download), re-render on `data` prop change. These are exactly the paths sensitive to React 18 batching. |
 | 0.3 | Example smoke harness | A Jest suite that mounts **every** meta/data pair from `src/demo/examples/` and asserts render without throwing. This doubles as the seed for contract tests (§9.5). |
 | 0.4 | CI on every PR | lint (`eslint` + `lint:css`) + `npm test` + `npm run build-lib`. Any CI provider; keep steps identical to local scripts. |
-| 0.5 | Babel targets env-split | `babel.config.js` applies `targets: { node: 'current' }` to the published builds today — dist syntax is dictated by the build machine's Node. Split now (test → `node: current`; build → browserslist) so the Phase 1/2 checkpoint releases ship correct syntax and the 0.1 size baselines stay valid (§9.8; closes R6). |
+| 0.5 | Babel targets env-split | `babel.config.js` applies `targets: { node: 'current' }` to the **library and watch** builds (the demo carries its own inline presets and already honors browserslist; Jest is env-split — §2.6-10). Split the root config (test → `node: current`; build → browserslist) and fold the demo's duplicated inline presets into it, so the Phase 1/2 checkpoint releases ship correct syntax and the 0.1 size baselines stay valid (§9.8; closes R6). |
+| 0.6 | Public API & types baseline | Replace the legacy `window._mountUIRender` shim in `src/library/types/` with a minimal d.ts of the component actually shipped (§2.6-1): `data`/`meta` required as at runtime, `translate`/`onSubmit` optional, export shape matching the UMD `export: 'default'` (restoring the named export is a §10 decision gate). Add a TS consumer smoke that compiles `import UIRender from 'eis-ui-render'` against `@types/react` 16, 17 and 18 (+19 at the flip). **This corrected file becomes the golden baseline for §9.6-E4** — never snapshot the legacy shim. Closes R15 (types half). |
+| 0.7 | Packaging gate | Add `prepack` (build-lib incl. `gen-ts`) so a publish can never ship a stale `dist/`; deduplicate `dist/static` vs root `static/`; decide source-map shipping (§10 gate). Today: 579 files / 11.6 MB unpacked, `all.css` twice, ~1 MB of maps, a 0-byte `semantic.css` (§2.6-8). Record budgets (unpacked size, file count, JS/CSS sizes) enforced via `npm pack --dry-run` in CI; add a clean-checkout smoke (`git clean -xdf && npm ci && npm test && build-lib + demo build`) and a packed-tarball consumer smoke (`require('eis-ui-render')` from the tarball). Closes R15 (packaging half). |
+| 0.8 | Repo completeness | Everything imported by tracked code must be tracked: `Examples.jsx:24–25` currently imports two untracked example JSONs (§2.6-9) — commit or drop them; the 0.7 clean-checkout job makes this class of drift fail fast from then on. |
+| 0.9 | Lint & security baseline | Add a `lint` script (none exists) and fix or triage the current 11 ESLint errors; wire `lint` + `lint:css` into CI. Record audit baselines: `npm audit --omit=dev` = 0 (keep at 0); full audit = 20 dev-tooling vulns incl. 2 critical — burn down or explicitly accept each (§9.9-H9 owns the cadence). Remove the 13 zero-reference devDependencies (§2.6-13). |
 
-**Exit criteria:** CI green on the current React 16 baseline; `rules.js` critical flows covered; example smoke harness in place; Babel build targets honor browserslist.
+**Exit criteria:** CI green on the current React 16 baseline **from a clean checkout**; `rules.js` critical flows covered; example smoke harness in place; Babel build targets honor browserslist; published types describe the real component and compile against `@types/react` 16/17/18; `prepack` + pack budgets enforced; `lint` script green; audit baselines recorded.
 
-**Estimated effort:** ~1 week.
+**Estimated effort:** ~1.5–2 weeks (widened from ~1 week by the §2.6 findings).
 
 ---
 
 ## 5. Phase 1 — React 17 (small, checkpointed)
 
-**Goal:** ship a release officially supporting React 17. Expected code delta: near zero.
+**Goal:** officially support React 17. Expected code delta: near zero. *Decision gate (§10): ship 17 as its own public release, or treat it as an internal checkpoint folded into the React 18 release — the plan works either way; bisectability argues for a release, release overhead argues against.*
 
 ### Steps
 
@@ -181,9 +212,9 @@ Widen, never replace:
 
 | Change in React 17 | Exposure here |
 |---|---|
-| Event delegation moves from `document` to the root container | **Low, and net-positive.** No `src/` code attaches React-event-dependent `document` listeners (only native `window` pointer listeners in `Slider.js`, unaffected). For a widget embedded into host pages, root-scoped delegation actually *reduces* interference with host-app handlers. Still: manually QA click-outside behavior of `Popup` (portal-based), `Dropdown`, date picker overlays. |
+| Event delegation moves from `document` to the root container | **Low, and net-positive.** No `src/` code attaches React-event-dependent `document` listeners (only native `window` pointer listeners in `Slider.js`, unaffected). For a widget embedded into host pages, root-scoped delegation actually *reduces* interference with host-app handlers. One caveat: the "no document listeners" statement is **first-party only** — the bundled deps attach their own native document listeners (SUIR via `@semantic-ui-react/event-stack`, rc-picker via `rc-util`), and React 17 changes the *ordering* between root-delegated synthetic events and those native listeners — exactly what click-outside logic is sensitive to. Manually QA click-outside behavior of `Popup` (portal-based), `Dropdown`, and date-picker overlays. |
 | No event pooling (`e.persist()` becomes no-op) | None — `persist()` never used. |
-| `useEffect` cleanup runs asynchronously | Low — only 13 files use hooks; QA unmount-heavy flows (Tabs switching, table pagination). |
+| `useEffect` cleanup runs asynchronously | Low — ~19 files use hooks; QA unmount-heavy flows (Tabs switching, table pagination). |
 | Consistent `undefined`-return errors from components | None expected; the example smoke harness will catch any. |
 | New JSX transform available | Deferred to modernization (§9.8) — not required for the upgrade. |
 
@@ -249,7 +280,7 @@ Widen, never replace:
 
 `<StrictMode>` is **not** part of the upgrade. Today it would drown the console in `UNSAFE_*` deprecation warnings (the prototype-patched lifecycle engine guarantees them) and double-invoke render/effects in dev, which the class engine was never audited for.
 
-Sequencing: StrictMode becomes the *acceptance criterion* of workstream §9.3 (engine decomposition). The definition of "StrictMode-clean" here: demo runs under `<StrictMode>` with zero lifecycle warnings and no behavioral differences. That state is also the bulk of the concurrent-rendering readiness work (the 19 flip itself does not require it — §8).
+Sequencing: StrictMode becomes the *acceptance criterion* of workstream §9.3 (engine decomposition). The definition of "StrictMode-clean" here: demo runs under `<StrictMode>` with zero lifecycle warnings, **no duplicated form subscriptions, no setState-during-render, all timers/listeners cleaned on unmount, and two instances on one page fully isolated** (the §2.6-5/6 hazards) — and no behavioral differences. That state is also the bulk of the concurrent-rendering readiness work (the 19 flip itself does not require it — §8).
 
 ---
 
@@ -264,20 +295,20 @@ Sequencing: StrictMode becomes the *acceptance criterion* of workstream §9.3 (e
 | `defaultProps` on function components (ignored in 19) | 🔶 3 occurrences | `TooltipPop.js:23`, `ImageSwatch.js:27`, `Image.js:27` → convert to default parameters (done in Phase 2 — §6 step 1). `ImageSwatch` is an orphan slated for deletion (§9.9-H1). |
 | `propTypes` (validation removed entirely in 19) | 🔶 40 importing files | No crash — silently ignored. Fully resolved by §9.6-E5: propTypes are deleted per TS conversion and the `prop-types` dependency is removed at the end. |
 | `UNSAFE_*` lifecycles | ✅ still supported in 19 | But StrictMode-hostile; §9.3 is the prerequisite for StrictMode/concurrent adoption on 19, not for the 19 flip itself. |
-| **`semantic-ui-react` React 19 support** | ❌ **external blocker** | npm `latest` is still 2.1.5 (~3 years stale); the 3.x line lives as betas; React 19 compatibility is an open upstream issue ([Semantic-Org/Semantic-UI-React#4510](https://github.com/Semantic-Org/Semantic-UI-React/issues/4510)). **Resolved by the planned exit (§9.7-F1)** — once `Table`, `TooltipPop`, and `Dropdown` are re-implemented in-house, this blocker disappears regardless of upstream. |
+| **`semantic-ui-react` React 19 support** | ❌ **external blocker** | npm `latest` is still 2.1.5 (~3 years stale); the 3.x line lives as betas; React 19 compatibility is an open upstream issue ([Semantic-Org/Semantic-UI-React#4510](https://github.com/Semantic-Org/Semantic-UI-React/issues/4510)). **Resolved by the planned exit (§9.7-F1)** — once `Table`, `TooltipPop`, and `Dropdown` are re-implemented in-house **and the dependency entry is removed (step 3½)**, this blocker disappears regardless of upstream; the entry matters because SUIR's own peers cap host React while it remains (§2.6-11). |
 | **Form-stack peers stop at `^18`** (installed: `react-final-form` 6.5.9, `final-form` 4.20.10, `*-arrays`) | 🔶 **resolved upstream, bump planned** | The 19-ready line exists: `react-final-form` 7.0.1 + `final-form` 5.0.1 + `final-form-arrays` 4.0.1 + `react-final-form-arrays` 5.0.0 declare `react … \|\| ^19` (see [react-final-form#1043](https://github.com/final-form/react-final-form/issues/1043)). Coordinated 4-package major bump — plan in §9.7-F4; best executed while still on React 18. |
 | **React 19 ships no UMD builds** of `react`/`react-dom` | 🔶 verify host consumption mode | Irrelevant for bundler-based hosts (npm CJS/ESM builds remain). Only script-tag/global consumption would be affected — and our UMD externals map to lowercase `react` globals, which never matched React's `window.React` UMD global, so that mode almost certainly was never used. Confirm with host teams; the ESM target (§9.7-F3) is the forward answer. |
 | New JSX transform (19 warns on the classic transform; required going forward) | 🔶 planned | Automatic runtime lands in Phase 4 (§9.8); the 16.14 peer floor makes it safe across the whole range. |
 | `react-dom/test-utils` (removed in 19) | ✅ verified none | No direct imports in src or tests; RTL ≥16 abstracts `act`. |
 | `element.ref` access (ref-as-prop change in 19) | ✅ verified clean | No `element.ref`/`child.ref` reads; the single `cloneElement` site (`Text.js`) passes plain props only. |
-| Render-error handling changed in 19 (errors not re-thrown; `onUncaughtError`/`onCaughtError` root options) | 🔶 note | Affects host-side error reporting expectations; synergizes with the per-node error boundaries planned in §9.4. |
+| Render-error handling changed in 19 (errors not re-thrown; `onUncaughtError`/`onCaughtError` root options) | 🔶 note | Affects host-side error reporting expectations; synergizes with the §9.4 work on the *existing* per-node boundary (whose `onError` reporting is currently broken — §2.6-3). |
 | `@types/react@19` for `gen-ts` | 🔶 at flip time | Pin explicitly alongside the dev-dep bump. |
 
 **Position:** the engine decomposition (§9.3) is **not** a React 19 gate — `UNSAFE_*` lifecycles run unchanged on 19; that workstream is about StrictMode/concurrency readiness.
 
 **Fast path to 19.** The earliest viable point is **right after Phase 5a** (SUIR JS exit), without waiting for Phase 6:
 
-1. Phase 5a complete (removes the only hard blocker);
+1. Phase 5a complete **including the removal of `semantic-ui-react` from `dependencies`** (F1 step 3½ — the npm peer chain, not just the bundled code, is what caps hosts at React ≤18, §2.6-11);
 2. form-stack major bump done (§9.7-F4 — can run in parallel any time after Phase 3);
 3. `defaultProps` sites fixed (Phase 2) and automatic JSX runtime enabled (Phase 4);
 4. bump `@testing-library/react` to ≥16.1 (the first RTL with `react ^19` peers), add `react@19` to the dev/CI matrix, run the full regression (contract suite + example QA), then widen peers **additively**: `^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0` — the floor stays, hosts on older React are unaffected.
@@ -304,7 +335,7 @@ Every workstream below is a series of small, independently shippable, reversible
 
 **Suggested order (dependency- and risk-sorted):**
 
-1. Leaf presentational, mechanical conversions: `Expand`, `Counter`, `ProgressBar`, `ProgressSteps`, `InputNative`, `Tabs` (components pack; gate `Tabs` on the H6 duplicate audit first). `Carousel` and `Collapse` turned out to be orphans (§9.9-H1) — **delete instead of migrating**; `Square` is already a function component.
+1. Leaf presentational, mechanical conversions: `Expand`, `Counter`, `ProgressBar`, `ProgressSteps`, `InputNative`, `Tabs` (components pack; gate `Tabs` on the H6 duplicate audit first). `Carousel` and `Collapse` turned out to be orphans (§9.9-H1) — **delete instead of migrating**; `Square` is already a function component, and the pack `TabList` joined the orphan list (mapper uses the engine copy — §2.6-14).
 2. Function-component `defaultProps` → default parameters: **done in Phase 2** (`TooltipPop`, `Image` — §6 step 1; React 18.3 warns on them); the third site, `ImageSwatch`, is an orphan resolved by deletion (§9.9-H1).
 3. Page-level: `pages/main/components/Tabs`, `TableView`, `LocalDraftTableRow`.
 4. Module-level: `AutoSave`, `ToggleField`, `asInputDateField`, `Upload` views.
@@ -319,11 +350,12 @@ Every workstream below is a series of small, independently shippable, reversible
 **Strategy — characterize, extract, replace (in that order):**
 
 1. **Characterize:** contract tests from §9.5 must cover every documented meta capability before any surgery.
-2. **Extract pure logic:** data processing, error mapping, `showIf` evaluation, payload assembly → pure functions in `ui-utils-pack` with direct unit tests (much of `utils.js` already leans this way).
-3. **De-globalize instance state:** the engine writes instance-bound state into module globals — `Active.translate` (`rules.js:245`), the module-level `errorHandlerFunction` (`rules.js:241–243`), and ~12 action handlers bound to `this` on the shared `FIELD.FUNC` registry (`rules.js:616–1081`, resolved at render time through `transforms.js`). Today two `UIRender` instances on one host page silently hijack each other's actions/translate, and StrictMode's double-invocation exercises exactly these writes — a decomposition that skipped this step would still fail the workstream's own acceptance gate. Inventory all module-global mutable state (`Active.*`, `FIELD.FUNC`, `errorHandlerFunction`, translation registries) and move it to per-instance context; add a two-instances-on-one-page case to the contract suite (R14).
-4. **Replace mutation with composition:** convert prototype patching into explicit HOC/wrapper composition (`withUIRenderLifecycle(Component)`) — same behavior, but visible in the component tree and StrictMode-analyzable.
-5. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired.
-6. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` (§7).
+2. **Extract pure logic and break the import cycle:** data processing, error mapping, `showIf` evaluation, payload assembly → pure functions in `ui-utils-pack` with direct unit tests (much of `utils.js` already leans this way). This is also where the engine↔form-modules cycle dissolves — `errorsProcessing`, `formsStorage`, `clearErrorsMap`, `storedTouched` (§2.6-4) move into a neutral module imported by both sides.
+3. **De-globalize instance state:** the engine writes instance-bound state into module globals — `Active.translate` (`rules.js:245`), the module-level `errorHandlerFunction` (`rules.js:241–243`), and ~12 action handlers bound to `this` on the shared `FIELD.FUNC` registry (`rules.js:616–1081`, resolved at render time through `transforms.js`). Today two `UIRender` instances on one host page silently hijack each other's actions/translate, and StrictMode's double-invocation exercises exactly these writes — a decomposition that skipped this step would still fail the workstream's own acceptance gate. Inventory all module-global mutable state — `Active.*`, `FIELD.FUNC`, `errorHandlerFunction`, translation registries, plus `formsStorage`, `errorsMap`, `formInitialValues`, `storedTouched` (§2.6-5) — and move it to per-instance context; make the modal portal root per-instance too (today every instance renders the same fixed `id="render-popup-root"` and the portal grabs the first one in the DOM). Add a two-instances-on-one-page case to the contract suite (R14).
+4. **Fix the catalogued runtime hazards (§2.6-6):** deduplicate the per-render `form.subscribe()` and keep/call its unsubscribe; move the setState-in-render Dropdown branch into an effect/derivation; make the debounced `handleChangeInput` per-instance instead of prototype-shared; stop mutating state via `set(this.state, …)` (clone or immutable update); cancel `AutoSave`'s debounce on unmount; stop re-creating the `autoSubmit` debounce every render. Each is a small, testable fix — most can ship before the full decomposition.
+5. **Replace mutation with composition:** convert prototype patching into explicit HOC/wrapper composition (`withUIRenderLifecycle(Component)`) — same behavior, but visible in the component tree and StrictMode-analyzable.
+6. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired.
+7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 
 All decomposition outputs are authored in TypeScript from the start (`engine/*.ts`, §9.6-E3) — the old monoliths are never converted in place.
 
@@ -336,14 +368,18 @@ All decomposition outputs are authored in TypeScript from the start (`engine/*.t
 - **JSON Schema** for `meta.json` (draft 2020-12), published with the package (`meta.schema.json`): IDE autocomplete/validation for meta authors — the cheapest DX win available.
 - **Dev-mode runtime validation** (behind a flag): on invalid meta, report the JSON path of the offending node instead of a downstream render crash.
 - **Contract versioning:** an optional `metaVersion` field, so future evolutions can be additive and negotiable rather than breaking.
-- **Error boundaries per render node:** an invalid/broken node renders an inline diagnostic (with meta path) instead of white-screening the whole widget.
-- **Generated view-type reference:** the `view` → component registry in `mapper.js` is machine-readable — generate the supported-views documentation page from it, so docs cannot drift.
+- **Error boundaries per render node — extend, don't create:** `RenderClass` already catches per-node errors (`Render.js:65–67`), but the inline diagnostic is a bare `String(error)` and the production `Render.onError` override destructures the wrong field names (`mapper.js:680` — `{err, errInfo}` vs the emitted `{error, errorInfo}`, §2.6-3), so reports carry `undefined`. Fix the signature, add the meta path to the diagnostic, and expose a documented `onError` report hook.
+- **Repair the public config channel:** the `dateFormat` prop is dead end-to-end (§2.6-2 — `Render.js:45` drops it; nothing feeds `ConfigContext`; the context declares `updateConfig` while the provider exposes `setConfig`; `TextDateValue` ignores its own prop). Wire `UIRender` props (`dateFormat`, and by the same route `currency`/`language`) into `ConfigContext`, align the context API name, and cover the flow with contract tests.
+- **Generated view-type reference:** the resolver is a `switch`, not a data table (`mapper.js:126/:429`) — either derive the supported-views page from the `FIELD.TYPE` constants plus a curated list, or first convert the switch into a registry table and generate from that. Either way, docs stop drifting by construction.
 
 ### 9.5 Workstream D — Testing as the enabler
 
 - **Contract tests in two layers** (built immediately after Phase 2, extending the Phase 0 smoke harness): (1) **full-DOM snapshots** of every `src/demo/examples/` meta+data pair — these gate the *pure refactors* (§9.2/§9.3), where the DOM must stay byte-identical; (2) **markup-independent behavioral assertions** — roles/labels/visible text, form value + submit-payload round-trips, open/close/keyboard behavior — expressing the actual meta contract. The behavioral layer is what gates F1, where the DOM *intentionally* changes and snapshots must be regenerated deliberately rather than rubber-stamped.
 - **CI compatibility matrix:** primary suite runs on React 18. Add a lightweight matrix job for React 16.14 / 17 — a minimal mount harness (plain `react-dom` `render`/`createRoot`, *no RTL*) that mounts the example set. Install mechanics matter: RTL 16's `react ^18 || ^19` peer makes a naive `npm install react@16` fail with `ERESOLVE` on npm ≥7 — run the matrix leg with `overrides`/`--legacy-peer-deps`, or house the harness in an isolated mini-package with its own `package.json`. This makes the wide peer range an enforced guarantee instead of a hope.
-- Optional later: visual regression on the demo (Playwright) — valuable once §9.2 begins touching presentational components.
+- **Canonical example manifest:** today `src/demo/examples/` is a mix of JS and JSON with asymmetric meta/data pairs and an `_meta.js` aggregator; the demo and the test harness must consume **one** manifest (id → meta + data + flags) so "every example" means the same thing everywhere — and 0.8's tracked-files rule gets a single enforcement point.
+- **Suite guards:** fail tests on unexpected `console.error`/`console.warn`; coverage thresholds for the engine files (ratcheted, not aspirational); a public-entry test that `require()`s the packed tarball (0.7) rather than `src/`.
+- **CSS pipeline parity (§2.6-7):** a test that compiles the final CSS through the *webpack* PostCSS config and asserts (a) no unscoped `html`/`body`/`*` selectors escape (or exactly the intentionally-exempt set once the H8 decision lands), and (b) `scripts/build-css.js` output is scoped identically. The existing `css-contract.test.js` checks LESS before PostCSS and cannot see any of this.
+- **Visual/a11y regression is mandatory for F1** (not optional): Playwright over the demo with keyboard-navigation, focus, portal/click-outside and screen-reader-attribute assertions gates every F1 step; it stays optional for pure refactors, where DOM snapshots already gate.
 
 ### 9.6 Workstream E — TypeScript migration
 
@@ -377,7 +413,7 @@ All decomposition outputs are authored in TypeScript from the start (`engine/*.t
 #### E4 — Public API switchover (the risky step)
 
 - Switch `gen-ts` from the hand-written `src/library/types/index.ts` to emitting declarations from the real, now-typed entry chain.
-- **Golden-file check:** commit the current `dist/index.d.ts` as a snapshot before the switch; after it, the diff must contain only intended changes — consumer-facing types must not silently narrow or widen.
+- **Golden-file check:** the golden baseline is the **Phase 0.6 corrected contract** — never the legacy shim d.ts that shipped before it (§2.6-1). After the switch, the diff against that baseline must contain only intended changes — consumer-facing types must not silently narrow or widen.
 - Delete the hand-written types folder once the diff is accepted.
 
 #### E5 — Retire the `prop-types` runtime dependency (runs alongside E2/E3, completes after E3)
@@ -406,7 +442,8 @@ E0/E1 plus the contract types are committed scope. Before green-lighting the lon
 | `isolatedModules` discipline (`export type` in barrels, no `const enum`) | continuous |
 | Decorator semantics unchanged for the legacy-decorator files (Babel `legacy` ↔ TS `experimentalDecorators`) | E0/E2 |
 | Bundle size neutral after each conversion batch (compare `dist/index.js` in CI) | continuous |
-| Golden `dist/index.d.ts` diff shows only intended changes | E4 |
+| Golden `dist/index.d.ts` diff shows only intended changes (baseline = the Phase 0.6 contract) | E4 |
+| Consumer d.ts compile matrix vs `@types/react` 16/17/18 (+19 at the flip) stays green | Phase 0.6 → continuous |
 | No `checkPropTypes()` calls exist (✅ verified — usage is purely declarative, safe to delete) | audit fact |
 | `rg "prop-types" src` empty → dependency removed; bundle-size delta recorded | E5 |
 
@@ -458,19 +495,21 @@ The wrappers' external APIs are the contract; `mapper.js` and meta authors never
 - **Step 3 — `Dropdown` (L, ~2–4 weeks incl. regression).** Two viable paths:
   - **(a) Headless engine + own markup — recommended:** `downshift` (`useSelect`/`useCombobox`/`useMultipleSelection`) provides WAI-ARIA combobox behavior and keyboard navigation; we render semantic-compatible markup (`ui selection dropdown`, `ui label` chips) for CSS continuity. Mature, small, unstyled — consistent with the "own components, scoped CSS" principle.
   - (b) Fully hand-rolled — full control, but the combobox keyboard/a11y matrix is precisely where hand-rolled implementations leak; choose only if zero-dependency is mandatory.
-  The wrapper's own logic (sanitization, dedup, additions handling, cascading reset, `onChange` signature) is **kept as-is** — only the `<DropDown …/>` element at the bottom is replaced. Gate: the behavioral layer of the §9.5 suite + full example QA (full-DOM snapshots are expected to change here — regenerate deliberately); the cascading-Select flows driven from `rules.js`/`mapper.js` are the regression hotspot.
+  The wrapper's own logic (sanitization, dedup, additions handling, cascading reset, `onChange` signature) is **kept as-is** — only the `<DropDown …/>` element at the bottom is replaced. One extra contract discovered by the re-audit: the form adapter special-cases `InputComponent.displayName === 'Dropdown'` (`form/utils.js:193,199`) — the replacement must keep `displayName = 'Dropdown'`, or that adapter branch is refactored in the same PR. Gate: the behavioral layer of the §9.5 suite + the mandatory visual/keyboard/a11y suite + full example QA (full-DOM snapshots are expected to change here — regenerate deliberately); the cascading-Select flows driven from `rules.js`/`mapper.js` are the regression hotspot.
 
-- **Step 4 — CSS exit (M, ~1 week).** Re-home the 5 semantic-ui-less modules as in-house LESS under `src/style` (starting from the *compiled output* of the current build guarantees pixel parity; prefixwrap scoping under `.ui-render` already applies). Delete `semantic-ui-less`, the `theme.config` webpack aliases (`webpack.demo.config.mjs:89`, `webpack.library.config.mjs:69`), `_semantic.less`, and the dead `.variables`/`.overrides` files. Bonus: the LESS `javascriptEnabled` requirement comes from the semantic toolchain — removing it clears the path for §9.8's LESS pipeline modernization.
+- **Step 3½ — exit the dependency (closes 5a).** With steps 1–3 landed the bundle no longer references SUIR — remove `semantic-ui-react` from `dependencies` in the same release. This, not the code swap, is what unblocks React 19 for npm hosts: while the entry remains, SUIR's own `react ^16.8 || ^17 || ^18` peers cap the host's React (§2.6-11). `semantic-ui-less` is a devDependency and stays until Step 4.
 
-- **Step 5 — cleanup + release.** Drop `semantic-ui-react` from `dependencies` (−30 KB+ in consumer bundles per the source's own estimates: 27 KB Dropdown + 4 KB Table + Popup). Changelog + supported-prop documentation. Minor release if Step 0 found no unsupported passthrough props in the wild; otherwise major with migration notes.
+- **Step 4 — CSS exit (M, ~1 week).** Re-home the 5 semantic-ui-less modules as in-house LESS under `src/style` (starting from the *compiled output* of the current build guarantees pixel parity; prefixwrap scoping under `.ui-render` already applies). Delete `semantic-ui-less`, the `theme.config` webpack aliases (`webpack.demo.config.mjs:89`, `webpack.library.config.mjs:69`), `_semantic.less`, and the dead `.variables`/`.overrides` files. Bonus: the LESS `javascriptEnabled` requirement comes from the semantic toolchain — removing it clears the path for §9.8's LESS pipeline modernization. Two obligations ride this step: copying compiled semantic-ui-less CSS requires carrying its **MIT license notice** (attribution header / THIRD-PARTY-NOTICES entry), and the §9.9-H8 decision on the unscoped `html`/`body`/`*` reset (§2.6-7) is implemented in the owned CSS here.
+
+- **Step 5 — cleanup + release.** The `semantic-ui-react` dependency is already gone (Step 3½); this step drops `semantic-ui-less`, finishes changelog + supported-prop documentation, and records the bundle delta (−30 KB+ per the source's own estimates: 27 KB Dropdown + 4 KB Table + Popup). Minor release if Step 0 found no unsupported passthrough props in the wild; otherwise major with migration notes.
 
 ##### F1.3 Sequencing & effort
 
-Run after Phase 2 (React 18) and Phase 3 (contract tests — they are the safety net). Steps 1–2 can proceed in parallel with Workstream A; Step 3 deserves dedicated focus. Total: **~4–7 weeks** spread across independently shippable releases. Completing F1 removes the React 19 external blocker (§8).
+Run after Phase 2 (React 18) and Phase 3 (contract tests — they are the safety net). Steps 1–2 can proceed in parallel with Workstream A; Step 3 deserves dedicated focus. Every step is gated by the §9.5 behavioral layer **plus the mandatory visual/keyboard/a11y suite**. Total: **~4–7 weeks** spread across independently shippable releases. Completing 5a — including Step 3½ — removes the React 19 external blocker (§8).
 
 #### F2 — `moment`: keep it; native-replacement feasibility analysis
 
-**Decision: `moment` stays a peer dependency (`~2.29.4`), unchanged. No dayjs migration.** It is externalized (webpack externals), so it costs the library bundle nothing and hosts already provide it. Below is the requested analysis of replacing it with a *native, zero-dependency* implementation — feasible, but parked behind a decision gate.
+**Decision: `moment` stays a peer dependency — no dayjs migration.** The only peer change is the Phase 1 widening `~2.29.4` → `^2.29.4` (§3.2). It is externalized (webpack externals), so it costs the library bundle nothing and hosts already provide it. Below is the requested analysis of replacing it with a *native, zero-dependency* implementation — feasible, but parked behind a decision gate.
 
 ##### F2.1 Audited usage surface (small and bounded)
 
@@ -482,7 +521,7 @@ Run after Phase 2 (React 18) and Phase 3 (contract tests — they are the safety
 | `InputDate.js:10,88,94` | rc-picker with `generateConfig` from `rc-picker/lib/generate/moment`; input `format={[dateFormat, 'YYYY-MM-DD']}` | custom `GenerateConfig<Date>` |
 | `time.js` (`formatTime`, `toHours`) | `moment(t).format(f)` | **no production callers** (referenced only by `time.test.js`); `formatDuration` there is already moment-free |
 
-**Contract constraints (favorable):** moment objects never cross the public API — values in and out are ISO strings, and the published types contain no moment. What *is* contract: `dateFormat` (ConfigContext default `'MM-DD-YYYY'`; meta/props may supply e.g. `'DD/MM/YYYY'`) uses **moment token syntax**. Any replacement must keep accepting those token strings — the syntax survives even if the library goes.
+**Contract constraints (corrected by the re-audit — less favorable than first assessed, §2.6-12):** moment **does** cross the public API. The project's own docs promise it (`README:12,18` — the API "accepts `moment` instances", with cross-copy `instanceof` caveats; `docs.md:24–25`); `InputDate` feeds any `props.value` into `moment(value)` (instances included); and rc-picker callbacks emit moment objects outward — `onSelect` (wired to `onCalendarChange`, `InputDate.js:96`) and every passthrough such as `disabledDate`/`cellRender` (`{...props}` at `InputDate.js:89`). Also contract: `dateFormat` **tokens** are moment syntax (note the `dateFormat` *prop* is currently dead — §2.6-2 — only the context default applies until §9.4 fixes the wiring). Consequence: a native adapter changes observable callback types and is a **breaking change** for hosts that use those callbacks or pass instances — not the drop-in swap the first draft assumed.
 
 ##### F2.2 What a native implementation requires
 
@@ -490,12 +529,14 @@ Run after Phase 2 (React 18) and Phase 3 (contract tests — they are the safety
 2. **Token parser** (~100–150 lines): the platform has **no parse-by-format facility** (`Intl` only formats) — strict parsing of the same subset must be hand-written.
 3. **The classic pitfall to engineer around:** `new Date('2024-05-10')` parses as **UTC** midnight, `moment('2024-05-10')` as **local** midnight → a naive swap produces off-by-one-day dates in negative-UTC-offset timezones. All date-only strings must be parsed from parts into local time.
 4. **rc-picker date engine — two options:** (a) **use the shipped `rc-picker/lib/generate/dateFns`** — a `GenerateConfig<Date>` operating on **native `Date`**, with `date-fns` as an optional peer (lock-verified); a few tree-shaken KB, and calendar-grid correctness (week starts, month boundaries) stays upstream's problem — recommended. (b) A fully hand-written `GenerateConfig<Date>` (~200 lines: unit get/set/add, `getWeekDay`, week-start via `Intl.Locale` `weekInfo` with fallback, locale format/parse delegating to (1)/(2)) — only if zero-new-dependency is absolute. Either way, the picker config swaps independently of the formatter/parser work.
-5. **Golden parity suite:** adapter output compared against moment across the token subset, DST transitions, leap/month-end dates, and both `InputDate` value flows — a hard gate before any default flip.
-6. **`Temporal` API — rejected for now:** not Baseline across browsers as of mid-2026, and the polyfill outweighs the problem. Revisit when Baseline.
+5. **Consumer surface audit (mandatory, new):** inventory host usage of moment-typed callbacks (`onSelect`, passthrough `disabledDate`/`cellRender`/…), moment-instance `value` inputs, formats, locales and timezone expectations across consumer metas and integration code; update `README`/`docs.md`, which currently document the moment-instance contract. Output = the compatibility spec the adapter must meet, and the semver call (expected: **major**, or a compatibility shim that keeps emitting moment-like objects).
+6. **Golden parity suite:** adapter output compared against moment across the token subset, DST transitions, leap/month-end dates, and both `InputDate` value flows — a hard gate before any default flip.
+7. **`date-fns` policy (if picker option (a) is taken):** decide how `date-fns` enters — bundled dependency vs optional peer vs externalized — and measure the tree-shaken bundle delta; this interacts with the hybrid-model gate (§2.6-11, §10).
+8. **`Temporal` API — rejected for now:** not Baseline across browsers as of mid-2026, and the polyfill outweighs the problem. Revisit when Baseline.
 
 ##### F2.3 Verdict and recommended posture
 
-Feasible and well-bounded (**~400–600 lines + tests; ~1–2 weeks + regression — less with option (a) for the picker**) precisely because usage is already narrow and moment never leaks through the API. But since moment is externalized, the library itself gains nothing — the benefit accrues only to host applications that want moment out of *their* bundles.
+Feasible and well-bounded (**~400–600 lines + tests; ~1–2 weeks + regression — less with option (a) for the picker**) because *internal* usage is narrow — but per §2.6-12 the **external** surface does leak moment, so the flip is expected to be **semver-major** (or shipped behind a compatibility shim). And since moment is externalized, the library itself gains nothing — the benefit accrues only to host applications that want moment out of *their* bundles.
 
 - **Now (non-breaking, cheap):** funnel the three component call-sites through a single internal `dateAdapter` module (an extension of `ui-utils-pack/time.js`), and document the supported `dateFormat` token subset. Also: `formatTime`/`toHours` have no production callers — delete or fold into the adapter.
 - **Later (at a future breaking-change window, or on host demand):** implement the native adapter behind the seam; flip the internal default only when the parity suite is green; demote `moment` to `peerDependenciesMeta.optional` so hosts *may* drop it — hosts that keep it see zero change.
@@ -503,12 +544,14 @@ Feasible and well-bounded (**~400–600 lines + tests; ~1–2 weeks + regression
 
 #### F3 — Distribution: ESM alongside UMD
 
-Goal: an ESM target (`dist/index.mjs`, plus a `"sideEffects"` audit) so modern hosts get tree-shaking, with UMD staying the default. **Two caveats make this NOT a drop-in:**
+Goal: an ESM target (`dist/index.mjs`) with UMD staying the default. Temper the expectation: the package exports a single component today, so tree-shaking wins are modest until the export surface grows — the stronger motivations are React-19-era hosts (no React UMD builds) and shedding the double-install weight of the hybrid model. **Caveats that make this NOT a drop-in:**
 
 - Hosts consume the stylesheet by deep path (`dist/static/all.css` / the root `static/` mirror) — the library entry deliberately does not inject CSS (`src/library/types/index.ts:4–6`, disabled "by team request"). Adding an `"exports"` map seals every unlisted subpath, so it **must** include `"./static/*"` (and any other host-used deep paths), or host builds hard-fail. Audit actual host import specifiers first; treat the map as a breaking change unless the audit proves every used path is covered.
 - Emitting real ESM from webpack requires `experiments.outputModule` + `externalsType: 'module'` — otherwise the `.mjs` ships internal `require('react')` calls.
+- `"sideEffects"` must be a **list**, never `false`: the entry imports CSS and side-effectful modules (`core/common/variables` mutates the `FILE` registry at import time; `mapper.js` populates `Render.*`) — `false` would let bundlers drop them.
+- **Hybrid-model decision first (§2.6-11):** today every runtime dep is both bundled and npm-installed. Before adding a second output format, owners decide: trim `dependencies` to match the bundle, externalize more packages, or peerize — §10.
 
-Spec both points before Phase 7 picks this up.
+Deliverable before Phase 7 picks this up: a **consumer matrix** (UMD script-tag — pending its own §10 gate, CJS `require`, ESM `import`, webpack/Vite hosts, CSS deep imports, font/image assets) with a smoke test per row.
 
 #### F4 — Form stack: coordinated major bump for React 19
 
@@ -525,14 +568,14 @@ The form stack splits into a React-free core and React bindings:
 
 ### 9.8 Workstream G — Build configuration hygiene
 
-- **Babel targets (verify intent — possible silent bug):** `babel.config.js` sets `targets: { node: 'current' }` unconditionally, and it applies to *library and demo builds*, not just Jest. Published `dist/` therefore contains syntax as modern as the build machine's Node, while `package.json` declares a `browserslist` that is never consulted. If any consumer targets browsers older than that syntax level, this ships broken code silently. Fix: env-split config — `test` → `node: current`; `build` → browserslist — **scheduled as Phase 0 step 0.5** so checkpoint releases and size baselines are not invalidated later. (If all hosts are evergreen-only, document that decision instead.)
-- **Automatic JSX runtime:** peer floor 16.14 makes `@babel/preset-react` `runtime: 'automatic'` safe across the whole support range. Removes boilerplate `React` imports; `eslint-config-react-app` already understands it. Do as one mechanical PR after Phase 2.
+- **Babel targets (verified — real, library-side):** `babel.config.js` sets `targets: { node: 'current' }`, which governs the **library and watch** builds; the demo config carries its own inline presets (browserslist applies there) and Jest is env-split (§2.6-10). Published `dist/` therefore contains syntax as modern as the build machine's Node while `package.json`'s `browserslist` is never consulted for it. Fix: env-split the root config (test → `node: current`; build → browserslist) **and** collapse the demo's duplicated inline presets into it — **scheduled as Phase 0 step 0.5**. (If all hosts are evergreen-only, document that decision instead.)
+- **Automatic JSX runtime:** peer floor 16.14 makes `@babel/preset-react` `runtime: 'automatic'` safe across the whole support range. **Prerequisite:** add `react/jsx-runtime` (and `react/jsx-dev-runtime`) to the library/watch `externals` first — the current exact-match externals (`react`, `react-dom`) would NOT catch the new subpath imports, and webpack would silently bundle React's JSX runtime from devDependencies into the UMD. These subpath externals have no meaningful script-tag global — one more input to the §10 UMD script-tag gate. Do as one mechanical PR after Phase 2.
 - **Legacy decorators:** leave as-is; they retire naturally as §9.2/§9.3 convert their host modules. Churn for its own sake is against the ground rules (§9.1).
 - **LESS 3.13 pin**: the pin is anchored to the semantic-ui-less toolchain (inline-JS evaluation via `javascriptEnabled` + `theme.config` machinery) and to `less-plugin-functions`. Two findings: (a) after the SUIR CSS exit (§9.7-F1 step 4) the semantic-side constraints disappear; (b) **no custom `.function-…` definitions were found under `src/style`** — `less-plugin-functions` may be vestigial; verify and, if unused, drop it from all four pipelines (three webpack configs + `scripts/build-css.js`). Together these likely unpin LESS entirely. Re-evaluate right after F1 step 4.
 
 ### 9.9 Workstream H — Project structure & housekeeping
 
-**Context.** The repo layout still carries its app-boilerplate heritage (the library was extracted from an application template), and parts of the documented structure no longer match reality. None of this blocks the upgrade; all of it taxes navigation, onboarding, and the §9.3 decomposition. Everything here is invisible to consumers — only `dist/` is published — so it is pure internal freedom.
+**Context.** The repo layout still carries its app-boilerplate heritage (the library was extracted from an application template), and parts of the documented structure no longer match reality. None of this blocks the upgrade; all of it taxes navigation, onboarding, and the §9.3 decomposition. Everything here is invisible to consumers — only the built artifacts ship (`dist/` plus the root `static/` mirror, per the `files` field) — so source-tree moves are pure internal freedom.
 
 #### H0 — Audited findings
 
@@ -540,20 +583,20 @@ The form stack splits into a React-free core and React bindings:
 |---|---|
 | 1 | **The `ui-*-pack` alias system is dead** — **0 imports** use `ui-react-pack`/`ui-modules-pack`/`ui-utils-pack`; no webpack config defines those aliases (only `theme.config` and `process` are aliased); `tsconfig-paths-webpack-plugin` (devDep) is referenced by no config. CLAUDE.md's alias claim was stale (fixed alongside this plan). Actual convention: relative imports + a small `components` barrel used by the engine for `{ cn, type }`. |
 | 2 | **The engine lives under `core/pages/main/`** — an app-era address for the library's heart (`rules.js`, `mapper.js`, `Data.js`, `dataKindPush.js`, engine-local `utils.js` and `components/`), while the recursive renderer sits separately in `core/ui-render/`. Dev fixtures (`tester/test_meta.js`, `test_data.js`) and images (`static/images`) also live inside it. |
-| 3 | **9 orphan components** in the pack: `Avatar`, `Badge`, `Carousel`, `Collapse`, `ErrorContent`, `FloatNumber`, `ImageSwatch`, `MenuButton`, `Tags` — no imports anywhere, no JSX usage, not registered in `mapper.js` (so no meta can render them). |
+| 3 | **12 orphan components**: 9 direct — `Avatar`, `Badge`, `Carousel`, `Collapse`, `ErrorContent`, `FloatNumber`, `ImageSwatch`, `MenuButton`, `Tags` (no imports, no JSX usage, not registered in `mapper.js`) — plus a cluster reachable only from orphans: `ErrorTable` (imported solely by `ErrorContent`), `Square` (solely by `Carousel`), and the pack `TabList` (mapper uses the engine copy, `mapper.js:33`). |
 | 4 | **Dead style trees:** `src/style/unused/` (10 files incl. `_policy`/`_classic` pairs) imported by nothing; `override/` carries `.variables`/`.overrides` for semantic modules that are commented out (§9.7-F1 step 4 finishes that job); icomoon build artifacts (`fonts/icons/demo.html` + demo files, ~1.2k lines) checked in. |
 | 5 | **Demo entry files sit at `src/` root** (`index.js` → `main.jsx` → `App.jsx`) next to an otherwise self-contained `src/demo/`, blurring the library/demo boundary. |
-| 6 | **One layering violation:** `components/Text.js:4` imports `../modules/variables` (`ISO_8601_COMPLETE_DATE`) — presentation reaching *up* into modules for a constant. Otherwise directions are clean: core never imports demo; utils imports nothing upward. |
+| 6 | **Layering violations:** a genuine engine↔form-modules **import cycle** (`form/utils.js:13–14` ⇄ `rules.js:3`, §2.6-4), plus `components/Text.js:4` importing `../modules/variables` (`ISO_8601_COMPLETE_DATE`). Otherwise directions are clean: core never imports demo; utils imports nothing upward. |
 | 7 | **Duplicate basenames blur navigation:** two `Tabs.js` and two `TabList.js` (components pack vs engine `components/`); three `utils.js` files (engine, form module, `components/charts/`) plus the utility directories `components/utils/` and `core/utils`; generic `constants.js`/`translations.js`/`styles.js` scattered. Naming collision: `pages/main/components/Popup.js` is actually a **modal**, while `TooltipPop` wraps SUIR *Popup*. |
 | 8 | **Build config sprawl:** three near-identical webpack configs (library/watch/demo duplicate externals and loader chains) plus a fourth CSS pipeline in `scripts/build-css.js`. |
-| 9 | **Side-effect magic:** both entries import `./core/common/variables` purely for side effects, and `core/common/` (styles.js, variables, utils) is an unexplained fourth utility location. |
+| 9 | **Side-effect magic:** both entries import `./core/common/variables` purely for side effects; `core/common/` (styles.js, variables, utils) is an unexplained fourth utility location that itself imports from `components` and **mutates the `FILE` registry at import time** — not absorbable into pure utils without untangling first. |
 
 #### H1 — Delete dead weight (cheap, do first)
 
-- The **9 orphan components**. Gate: grep consumer metas for these names as `view` values first — they are not registered in `mapper.js`, so no meta can render them, but verify before deleting. Bonus effects: `Carousel`/`Collapse` drop two `UNSAFE_` migrations from Workstream A; `ImageSwatch` removes one of the three `defaultProps` sites (§8).
-- `src/style/unused/` (10 files); `override/_policy.less` / `_classic.less` (verify unreferenced); icomoon demo artifacts under `fonts/icons/`.
+- The **12 orphan components** (9 direct + the `ErrorTable`/`Square`/pack-`TabList` cluster, §2.6-14). Gate: grep consumer metas for these names as `view` values first — they are not registered in `mapper.js`, so no meta can render them, but verify before deleting. Bonus effects: `Carousel`/`Collapse` drop two `UNSAFE_` migrations from Workstream A; `ImageSwatch` removes one of the three `defaultProps` sites (§8); the pack `TabList` resolves an H6 duplicate.
+- `src/style/unused/` (10 files); `override/_policy.less` / `_classic.less` (verify unreferenced); icomoon demo artifacts under `fonts/icons/`; the unreferenced engine `tester/` fixtures.
 - `formatTime`/`toHours` in `time.js` (no production callers, §9.7-F2).
-- `tsconfig-paths-webpack-plugin` devDependency (referenced by no config).
+- The **13 zero-reference devDependencies** (§2.6-13): `tsconfig-paths-webpack-plugin`, `backoff`, `history`, `html-loader`, `minimist`, `path-browserify`, `postcss-scss`, `raw-loader`, `remark-loader`, `rimraf`, `sass`, `sass-loader`, `webpack-node-externals` (verify `dot-prop-immutable` too). Gate: remove in a branch → all four build pipelines + tests still pass.
 
 #### H2 — Make the docs match reality
 
@@ -570,18 +613,32 @@ Move `src/index.js`, `src/main.jsx`, `src/App.jsx` → `src/demo/`; update the `
 
 #### H5 — Enforce layer direction
 
-Fix the one violation (move `ISO_8601_COMPLETE_DATE` into `core/utils`). Then lock the rules in ESLint (`no-restricted-imports` per directory, same mechanism as the SUIR guard): `utils → nothing`, `components → utils`, `modules → components|utils`, `engine → anything in core`, `demo → library surface only`. The layering is ~clean today — cheap to lock in now, expensive to restore later.
+Fix the direct violation (move `ISO_8601_COMPLETE_DATE` into `core/utils`); the engine↔form-modules cycle is dissolved by §9.3 step 2. Then lock the rules in ESLint (`no-restricted-imports` per directory, same mechanism as the SUIR guard): `utils → nothing`, `components → utils`, `modules → components|utils`, `engine → anything in core`, and the one demo rule enforceable today: **core never imports demo**. ("Demo → library surface only" is aspirational — the demo currently imports core directly across nearly all pages; adopt it only after §9.4 grows the public surface.) Cheap to lock in now, expensive to restore later.
 
 #### H6 — Naming sanity (opportunistic, ride other PRs)
 
 - `pages/main/components/Popup.js` → `Modal.js` (it *is* a modal; frees the name collision with tooltip-Popup).
 - `TooltipPop` → `Tooltip` during its F1 step 2 rewrite.
 - Engine `utils.js` dissolves into named modules during §9.3 (`dataMapping.js`, `errorMapping.js`, …).
-- Reconcile the `Tabs`/`TabList` pairs after confirming which is canonical (mapper uses the engine ones; audit the pack ones for orphan status).
+- `Tabs`/`TabList` pairs: the re-audit confirmed mapper uses the engine copies and the pack `TabList` is an orphan (delete via H1); audit the pack `Tabs` the same way before its §9.2 migration.
+- Replace the hardcoded `data-version="0.34.2"` strings (`AppWrapper.js:10`, `types/UIRender.tsx:76`) with a build-time injection from `package.json` (§2.6-15).
 
 #### H7 — Build config consolidation
 
-Extract a shared `webpack.common.mjs` (loader chains, resolve, externals) consumed by the library/watch/demo configs — the watch config is already a near-copy of the library one and *will* drift. Fold `scripts/build-css.js` into the same source of truth, or explicitly document it as the canonical standalone CSS build.
+Extract a shared, **parameterized** `webpack.common.mjs` (loader chains, resolve; externals only for the library/watch targets — the demo must NOT inherit them) consumed by all three configs. The watch config has already drifted: it emits `static/ui-render.css` instead of the library's `all.css`/`font.css`/`semantic.css` set, and its `output.clean: true` wipes `dist/index.d.ts` on every run (§2.6-8) — unify the artifact sets as part of the extraction. Fold `scripts/build-css.js` into the same source of truth, or explicitly document it as the canonical standalone CSS build.
+
+#### H8 — CSS pipeline integrity (from §2.6-7)
+
+- **Decision gate (owners):** is the unscoped `html`/`body`/`*` reset *intended* to restyle host pages? Today `postcss.config.js` exempts exactly those selectors from prefixwrap, and the published `all.css` carries a global reset. Options: (a) scope everything under `.ui-render` — safest for an embedded widget, needs in-widget visual QA; (b) keep the global reset deliberately and document it loudly for hosts. Criterion: whether any host currently relies on the leak.
+- Whatever the decision: **unify prefixwrap options** across the webpack `postcss.config.js` and `scripts/build-css.js` (they differ today), and add the §9.5 final-CSS gate so the *built artifact* — not the LESS — is what gets asserted.
+- Fold the Jest `css-contract` check into the same pipeline so it stops testing pre-PostCSS output.
+
+#### H9 — Dependency & release governance
+
+- **Automated updates:** Renovate or Dependabot on a weekly cadence; the dev-tooling audit debt (20 vulns incl. 2 critical, §2.6-13) gets an explicit burn-down owner.
+- **Reproducibility:** pin `packageManager` (corepack) and document the npm version; lockfile stays committed; CI installs with `npm ci` only.
+- **Decision gate (owners):** published `engines.node >= 22` — keep (accepting `engine-strict` host failures), relax, or move to docs as a build-only requirement. Criterion: whether any consumer installs with `engine-strict`.
+- **Licensing:** MIT attribution for vendored semantic CSS (F1 step 4); optionally generate a THIRD-PARTY notices file / lightweight SBOM at `prepack`.
 
 #### Target layout
 
@@ -592,7 +649,7 @@ src/
     engine/       # ← pages/main + ui-render merged (Render, transforms, rules→decomposed, mapper)
     components/   # presentational pack (post-H1 cleanup)
     modules/      # form, upload, variables
-    utils/        # pure utils (+ dateAdapter from F2); absorbs core/common
+    utils/        # pure utils (+ dateAdapter from F2); absorbs core/common AFTER untangling (H0-9)
     contexts/  providers/  services/
   demo/           # all demo code incl. entries (H3)
   style/          # minus unused/ and icomoon artifacts
@@ -606,19 +663,32 @@ src/
 
 | Phase | Content | Effort | Gate to next |
 |---|---|---|---|
-| **0** | Safety net: CI, `rules.js` flow tests, example smoke harness, **Babel targets env-split (0.5)** | ~1 week | CI green baseline |
+| **0** | Reproducibility/API/security baseline: CI from a **clean checkout**, `rules.js` flow tests, example smoke harness, **Babel targets env-split (0.5)**, **public-types fix + consumer type matrix (0.6)**, **`prepack` + pack budgets + tarball smoke (0.7)**, tracked-examples fix (0.8), lint + audit baseline + devDep sweep (0.9) | ~1.5–2 weeks | CI green from a clean checkout |
 | **1** | React 17: dev bump, peer widen (react + moment `^2.29.4`), QA; checkpoint release | 1–2 days | QA checklist clean |
 | **2** | React 18: `createRoot` (demo), RTL 12→16, `defaultProps` fixes, batching regression pass, peer widen, docs; checkpoint release | 1–2 weeks | CI green on 18, zero act-warnings |
 | **3** | Contract tests on all examples; JSON Schema + dev validation; error boundaries; React 16/17 CI smoke | 1–2 weeks | Contract suite in CI |
 | **4** | Hooks migration of leaf components; automatic JSX runtime; **SUIR passthrough-prop audit + lint guard (F1 step 0)**; **housekeeping H1–H2 (dead code + docs truth)** | ongoing, per-component PRs | — |
 | **4-S** | **Structure (§9.9): demo isolation (H3); engine re-home `pages/main`+`ui-render` → `core/engine` (H4, pure `git mv` commits); layer-direction lint (H5)** | ~2–4 days, in a quiet window | **H4 before Phase 6** |
 | **TS** | **TypeScript migration track (§9.6): E0 infra after Phase 2 → utils+contract (E1) → components/modules (E2, rides 4/5a) → engine (E3, rides 6) → public-API switchover (E4) → `prop-types` dependency removed (E5); **go/no-go on the E2/E3 tail after E1** | continuous, per-PR | `tsc --noEmit` green throughout; E4 gated by the `dist/index.d.ts` golden diff |
-| **5a** | **SUIR exit, JS side (F1 steps 1–3): `Table` → `TooltipPop` → `Dropdown`**, shipped step by step | ~3–5 weeks | contract suite + example QA per step |
+| **5a** | **SUIR exit, JS side (F1 steps 1–3½): `Table` → `TooltipPop` → `Dropdown`, then `semantic-ui-react` removed from `dependencies`**, shipped step by step | ~3–5 weeks | behavioral + visual/a11y suites per step |
 | **5b** | **SUIR exit, CSS side (F1 steps 4–5): own the 5 LESS modules; drop `semantic-ui-less` + `theme.config`; LESS pipeline re-eval (§9.8)** | ~1–2 weeks | visual parity |
 | **6** | Engine decomposition (`rules.js` / `form/utils.js`): extract → compose → hooks; **StrictMode-clean demo** as acceptance | largest single item; only after 3 | StrictMode clean |
 | **7** | Decision gate: ESM build; `moment` native adapter go/no-go (F2); form-stack major bump if not done earlier (F4); **React 19 go/no-go — earliest right after 5a (§8 fast path)** | decision + scoped work | — |
 
 Phases 3 and 4 can partially overlap. Tracks **5a/5b** (SUIR exit) and **6** (engine) are independent — both require Phase 3, and their relative order is a resourcing choice; 5a steps 1–2 may even run alongside Phase 4. Phase 7 is a decision gate, not a fixed date.
+
+### Open decision gates (owners' calls — the plan does not pre-decide these)
+
+| Gate | Options | Decide by | Criterion |
+|---|---|---|---|
+| React 17: own public release vs internal checkpoint | (a) separate release — best bisectability for hosts; (b) checkpoint folded into the React 18 release — less release overhead | Phase 1 | whether any host wants to *stay* on 17 |
+| UMD script-tag support | (a) declare unsupported (evidence: the lowercase externals never matched `window.React`, so it likely never worked); (b) support properly — fix global names, solve jsx-runtime subpath globals, keep a pre-19 React-UMD story | before Phase 4 (JSX runtime) and F3 | host consumption audit (§8 / Appendix C) |
+| Bundled vs external runtime deps — the hybrid model (§2.6-11) | (a) trim `dependencies` to match the bundle (hosts stop double-installing); (b) externalize more (peer list grows); (c) status quo, documented | with the F3 spec | host installation model + bundle-size goals |
+| `engines.node >= 22` in the published manifest | keep / relax / move to docs as build-only | Phase 0.7 | consumers using `engine-strict` |
+| Source maps in the tarball (~1 MB today) | ship (debuggability) / strip / publish separately | Phase 0.7 | host debugging practice |
+| Named export restoration (`import { UIRender }`) | (a) default-only, types corrected to match; (b) restore the named export (UMD `library.export` change — breaking for globals consumers) | Phase 0.6 | how typed hosts import today |
+| Global `html`/`body`/`*` CSS reset (§2.6-7) | scope everything under `.ui-render` / keep the global reset deliberately + document | H8, before F1 step 4 | whether any host relies on the leak |
+| `moment` optional-peer demotion | only at the F2 flip, gated on the F2.2-5 consumer audit (the Phase 1 `^2.29.4` widening is already decided) | F2 gate | consumer callback audit |
 
 ---
 
@@ -639,7 +709,10 @@ Phases 3 and 4 can partially overlap. Tracks **5a/5b** (SUIR exit) and **6** (en
 | R11 | Structure moves (H3/H4) collide with in-flight feature branches | Medium | Low–Med | Land as pure-move commits (no logic changes) in a quiet window; announce to the team; git follows renames, so history and blame survive |
 | R12 | Form-stack major bump (`final-form` 4→5, `react-final-form` 6→7) changes form-state behavior in the engine | Medium | High (the engine is the product's core) | Changelog audit first; all four packages in one isolated PR on React 18; form-flow + contract suites gate; rollback = revert one PR |
 | R13 | TS migration drifts the public API types (E4 switchover) or breaks a build pipeline (Babel strips types file-by-file) | Medium | Medium | Golden `dist/index.d.ts` diff gate; `isolatedModules` + CI `tsc --noEmit` from E0; probe files verify all four pipelines before any real conversion |
-| R14 | Module-global engine state (`FIELD.FUNC`, `Active.translate`, `errorHandlerFunction`) — two `UIRender` instances on one page interfere **today**, and StrictMode double-invocation trips on the same writes | High (current behavior) | Medium–High | §9.3 step 3 (de-globalization); two-instance case added to the contract suite; until then, document the single-instance assumption for hosts |
+| R14 | Module-global engine state (`FIELD.FUNC`, `Active.translate`, `errorHandlerFunction`, `formsStorage`, `errorsMap`, `storedTouched`, fixed-id popup root) — two `UIRender` instances on one page interfere **today**, and StrictMode double-invocation trips on the same writes | High (current behavior) | Medium–High | §9.3 step 3 (de-globalization incl. per-instance portal root); two-instance case added to the contract suite; until then, document the single-instance assumption for hosts |
+| R15 | Shipped d.ts describes a nonexistent integration (legacy `window._mountUIRender` shim) and packaging has no gate — a routine publish ships stale or oversized artifacts | High (current state) | High | Phase 0.6 (truthful types + consumer compile matrix) and 0.7 (`prepack`, budgets, clean-checkout + tarball smokes) |
+| R16 | Published CSS restyles host pages (unscoped `html`/`body`/`*` reset in `all.css`) | High (current behavior) | Medium–High | H8 decision + unified prefixwrap; §9.5 final-CSS gate; implemented in F1 step 4 |
+| R17 | Form-runtime leaks (per-render subscriptions, prototype-shared debounce, state mutation, uncancelled timers) degrade long-lived host sessions and multi-instance pages | Medium–High | Medium | §9.3 step 4 fixes (shippable before the full decomposition), gated by Phase 0 tests; R14 two-instance coverage |
 
 ---
 
@@ -651,7 +724,8 @@ Phases 3 and 4 can partially overlap. Tracks **5a/5b** (SUIR exit) and **6** (en
 - **SUIR JS surface (3 of 54 pack files):** `Table.js` (subcomponent users: `mapper.js:170`, `TableView.js`, `LocalDraftTableRow.js`, `ErrorTable.js`) · `TooltipPop.js` (`Render.Tooltip`, `mapper.js:44,483`) · `Dropdown.js` (`mapper.js:540–544`).
 - **semantic-ui-less modules actually imported** (`src/style/override/_semantic.less`): `globals/reset`, `elements/label` (chips), `collections/menu` (own Pagination), `modules/dropdown`, `modules/popup`; `transition` already replaced by an in-house `transition.less`.
 - **moment call sites:** `Text.js:43` · `TextDateValue.js:8` · `InputDate.js:58–65` (+ rc-picker moment `generateConfig` at :10/:88) · `time.js` `formatTime`/`toHours` (test-only, no production callers).
-- **Structure facts (§9.9):** `ui-*-pack` alias imports: **0** across `src` · `tsconfig-paths-webpack-plugin`: referenced by no config · orphan components: `Avatar`, `Badge`, `Carousel`, `Collapse`, `ErrorContent`, `FloatNumber`, `ImageSwatch`, `MenuButton`, `Tags` · layering violation: `components/Text.js:4` → `../modules/variables` · demo entries at `src/` root: `index.js`, `main.jsx`, `App.jsx`.
+- **Structure facts (§9.9):** `ui-*-pack` alias imports: **0** across `src` · `tsconfig-paths-webpack-plugin`: referenced by no config · orphan components ×12: `Avatar`, `Badge`, `Carousel`, `Collapse`, `ErrorContent`, `FloatNumber`, `ImageSwatch`, `MenuButton`, `Tags` + cluster `ErrorTable`/`Square`/pack-`TabList` · layering: engine⇄form-modules cycle (`form/utils.js:13–14` ⇄ `rules.js:3`) + `components/Text.js:4` → `../modules/variables` · demo entries at `src/` root: `index.js`, `main.jsx`, `App.jsx`.
+- **Public-surface facts (§2.6):** runtime entry `library/index.js → main.js` (`AppProvider → AppWrapper → engine`) · UMD `library.export: 'default'` (named export dropped) · published types = legacy `window._mountUIRender` shim · `dateFormat` prop dead (`Render.js:45`) · fixed-id portal root (`AppWrapper.js:17`) · tarball 579 files / 11.6 MB with `dist/static` + root `static` duplicated and ~1 MB of source maps.
 
 ## Appendix B — Verification commands
 
@@ -692,6 +766,19 @@ node -e "const l=require('./package-lock.json');for(const k of ['node_modules/se
 
 # Regression contour
 npm test && npm run build-lib && npm run build
+
+# Lint (no script yet — Phase 0.9 adds one)
+npx eslint 'src/**/*.{js,jsx}'
+
+# Packaging reality check (§2.6-8 — budgets, duplication, source maps)
+npm pack --dry-run
+
+# Security baselines (§2.6-13)
+npm audit --omit=dev   # must stay at 0
+npm audit              # dev-tooling debt burn-down
+
+# Final-CSS scoping gate (§9.9-H8 — expect 0 unscoped globals after the fix)
+node -e "const c=require('fs').readFileSync('dist/static/all.css','utf8');console.log((c.match(/(^|\})(html|body|\*)[,{ ]/g)||[]).length)"
 ```
 
 ## Appendix C — Consolidated verification checklist
@@ -704,7 +791,8 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 - ✅ All runtime deps declare React 17/18 peers (lock-verified); `@testing-library/react` 12 is the only `<18` blocker
 - ✅ SUIR surface: imports confined to `src/core/components`; exactly 3 wrappers; 5 semantic LESS modules active
 - ✅ moment surface: 3 components + rc-picker `generateConfig`; `formatTime`/`toHours` have no production callers
-- ✅ Structure: `ui-*-pack` alias imports = 0; `tsconfig-paths-webpack-plugin` referenced by no config; 9 orphan components (no imports / JSX / mapper registration); one layer violation (`Text.js:4`)
+- ✅ Structure: `ui-*-pack` alias imports = 0; `tsconfig-paths-webpack-plugin` referenced by no config; 12 orphan components incl. the `ErrorTable`/`Square`/pack-`TabList` cluster; layering = engine⇄form-modules cycle + `Text.js:4`
+- ✅ Re-audit (2026-07-21): tests 76 suites / 1215 green in 8.3 s; `lint:css` clean; eslint fails (11 errors / 28 warnings); prod `npm audit` 0, full audit 20; tarball 579 files / 11.6 MB with duplicated assets + maps; published types ≠ runtime; `dateFormat` prop dead; built CSS ships unscoped `html`/`body`/`*`; moment crosses the public API (README-documented + picker callbacks)
 - ✅ 19-ready form stack exists upstream (`react-final-form` 7.0.1 / `final-form` 5.0.1 / `final-form-arrays` 4.0.1 / `react-final-form-arrays` 5.0.0 — npm-registry-verified)
 - ✅ Single `cloneElement` site passes plain props only (ref-as-prop safe)
 - ✅ `prop-types` usage is purely declarative: 40 importing files, zero `checkPropTypes()` calls; ~90 call sites via the `type` proxy (`components/types.js`, plus its ~60 definition lines) — safe to retire per §9.6-E5
@@ -715,13 +803,19 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 - ☐ `rules.js` critical-flow tests exist: initial data processing, `showIf`, validation/error mapping, `submit` payload, `addData`/`removeData`, upload/download
 - ☐ Example smoke harness mounts every `src/demo/examples/` meta+data pair
 - ☐ CI runs lint + `lint:css` + test + `build-lib` on every PR
-- ☐ Babel targets env-split landed (test → `node: current`; build → browserslist) — closes R6
+- ☐ Babel targets env-split landed (test → `node: current`; build → browserslist; demo inline presets folded in) — closes R6
+- ☐ 0.6: published types describe the shipped component; consumer d.ts compile matrix green vs `@types/react` 16/17/18; named-export gate decided
+- ☐ 0.7: `prepack` in place; pack budgets enforced in CI; clean-checkout job green; packed-tarball consumer smoke green; `dist/static` vs `static` duplication resolved; source-map gate decided
+- ☐ 0.8: no untracked files imported by tracked code (current offender: `Examples.jsx:24–25`)
+- ☐ 0.9: `lint` script green (11 errors fixed or triaged); audit baselines recorded (prod 0 / dev 20 burn-down owner assigned); 13-package devDep sweep merged
 
 ### Phase 1 — React 17
 
 - ☐ Manual QA checklist (§5) clean on 17 — popups, dropdowns, pickers, tabs, tables, forms, upload
 - ☐ react-refresh dev loop works on 17
 - ☐ yalc smoke into a consuming app (if one is available)
+- ☐ Click-outside/overlay QA re-run with attention to bundled-dep document listeners (event-stack / rc-util ordering vs root delegation, §5)
+- ☐ Decision gate recorded: React 17 as its own public release vs internal checkpoint (§10)
 
 ### Phase 2 — React 18
 
@@ -738,8 +832,16 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 - ☐ **Step 0:** `no-restricted-imports` guard on `semantic-ui-react` active outside the components pack
 - ☐ **Steps 1–3:** per component — behavioral contract layer + example QA green (full-DOM snapshots regenerated deliberately); emitted classNames keep existing LESS working
 - ☐ **Step 3:** Dropdown keyboard/a11y matrix verified (WAI-ARIA combobox pattern), incl. cascading-Select flows from `rules.js`
-- ☐ **Step 4:** pixel parity of extracted CSS vs current compiled output; `javascriptEnabled` no longer required by any build
+- ☐ **Step 3:** replacement keeps `displayName = 'Dropdown'`, or the form-adapter branch (`form/utils.js:193,199`) is refactored in the same PR
+- ☐ **Step 3½:** `semantic-ui-react` absent from `dependencies` (this is the 5a exit and the React 19 unblock)
+- ☐ Visual/keyboard/a11y suite green per step (mandatory, §9.5)
+- ☐ **Step 4:** pixel parity of extracted CSS vs current compiled output; `javascriptEnabled` no longer required by any build; MIT attribution for vendored semantic CSS in place; H8 scoping decision implemented
 - ☐ **Step 5:** Appendix B "SUIR exit progress" greps return nothing
+
+### F2 — moment adapter (only if the gate opens)
+
+- ☐ Consumer surface audit done (moment-typed callbacks, instance `value` inputs, formats/locales/timezones); semver call recorded (§9.7-F2.2-5)
+- ☐ `README`/`docs.md` moment-contract statements updated in the same release
 
 ### H1/H6 — deletions & duplicate reconciliation (gate before each `rm`)
 
@@ -764,13 +866,16 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 
 ### Phase 6 — engine decomposition (§9.3)
 
-- ☐ Module-global mutable state inventoried and moved per-instance (`Active.*`, `FIELD.FUNC`, `errorHandlerFunction`, translation registries) — R14
+- ☐ Module-global mutable state inventoried and moved per-instance (`Active.*`, `FIELD.FUNC`, `errorHandlerFunction`, `formsStorage`, `errorsMap`, `formInitialValues`, `storedTouched`, translation registries) — R14; portal root made per-instance
+- ☐ Runtime hazards fixed (§9.3 step 4): subscribe-per-render + kept unsubscribe, setState-in-render, prototype-shared debounce, `set(this.state)` mutation, AutoSave/autoSubmit timer hygiene
+- ☐ Engine⇄form-modules import cycle dissolved (§9.3 step 2)
 - ☐ Two simultaneous `UIRender` instances on one page covered by the contract suite
-- ☐ Demo runs clean under `<StrictMode>` (zero lifecycle warnings, no behavioral diffs)
+- ☐ Demo runs clean under `<StrictMode>` per the §7 definition (lifecycle warnings, subscriptions, cleanup, two-instance isolation)
 
 ### React 19 flip (§8 fast path — after 5a)
 
-- ☐ **Host consumption mode confirmed with host teams (bundler vs script-tag)** — the only item requiring a human answer; it decides how much F3 (ESM) matters
+- ☐ **Host consumption mode confirmed with host teams (bundler vs script-tag)** — the only item requiring a human answer; it decides how much F3 (ESM) matters and settles the §10 script-tag gate
+- ☐ `semantic-ui-react` absent from `dependencies` (F1 step 3½ / Phase 5a)
 - ☐ `defaultProps` fixed (Phase 2) and automatic JSX runtime enabled (Phase 4)
 - ☐ `@testing-library/react` ≥16.1 in place (the first RTL with `react ^19` peers); `react@19` in the dev/CI matrix; full regression green; peers widened additively (`^16.14 || ^17 || ^18 || ^19`)
 - ☐ `@types/react@19` pinned for `gen-ts`
