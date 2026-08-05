@@ -15,17 +15,17 @@
       "headers": [
         {
           "id": "title",
-          "label": { "name": "Phase" },
+          "label": "Phase",
           "classNameHeader": "padding-left-small border-right"
         },
         {
           "id": "budget",
-          "label": { "name": "Budget" },
+          "label": "Budget",
           "classNameHeader": "padding-left-small border-right"
         },
         {
           "id": "phaseRowActions",
-          "label": { "name": "" },
+          "label": "",
           "classNameHeader": "align-center"
         }
       ],
@@ -77,27 +77,27 @@
             "headers": [
               {
                 "id": "sku",
-                "label": { "name": "SKU" },
+                "label": "SKU",
                 "classNameHeader": "padding-left-small border-right"
               },
               {
                 "id": "description",
-                "label": { "name": "Description" },
+                "label": "Description",
                 "classNameHeader": "padding-left-small border-right"
               },
               {
                 "id": "qty",
-                "label": { "name": "Qty" },
+                "label": "Qty",
                 "classNameHeader": "padding-left-small border-right"
               },
               {
                 "id": "unitPrice",
-                "label": { "name": "Unit Price" },
+                "label": "Unit Price",
                 "classNameHeader": "padding-left-small border-right"
               },
               {
                 "id": "actions",
-                "label": { "name": "" },
+                "label": "",
                 "classNameHeader": "align-center"
               }
             ],
@@ -212,44 +212,50 @@
           "budget": null
         },
         "meta": {
-          "view": "Col",
-          "styles": "padding-small",
+          "view": "TableCells",
+          "colSpan": 3,
           "items": [
             {
-              "view": "Text",
-              "children": "New phase (draft)",
-              "styles": "h5 margin-bottom-small"
-            },
-            {
-              "view": "Text",
-              "children": "Add line items in the expanded section after this phase is created.",
-              "styles": "muted margin-bottom-small font-smaller"
-            },
-            {
-              "view": "Row",
-              "styles": "margin-bottom",
+              "view": "Col",
+              "styles": "padding-small",
               "items": [
                 {
-                  "view": "Input",
-                  "name": "title",
-                  "type": "text",
-                  "label": "Phase title",
-                  "validate": "required",
-                  "className": "margin-right"
+                  "view": "Text",
+                  "children": "New phase (draft)",
+                  "styles": "h5 margin-bottom-small"
                 },
                 {
-                  "view": "Input",
-                  "name": "budget",
-                  "type": "number",
-                  "label": "Budget"
+                  "view": "Text",
+                  "children": "Add line items in the expanded section after this phase is created.",
+                  "styles": "muted margin-bottom-small font-smaller"
+                },
+                {
+                  "view": "Row",
+                  "styles": "margin-bottom",
+                  "items": [
+                    {
+                      "view": "Input",
+                      "name": "title",
+                      "type": "text",
+                      "label": "Phase title",
+                      "validate": "required",
+                      "className": "margin-right"
+                    },
+                    {
+                      "view": "Input",
+                      "name": "budget",
+                      "type": "number",
+                      "label": "Budget"
+                    }
+                  ]
+                },
+                {
+                  "view": "Button",
+                  "className": "primary margin-top",
+                  "onClick": { "name": "addData" },
+                  "children": "Add phase"
                 }
               ]
-            },
-            {
-              "view": "Button",
-              "className": "primary margin-top",
-              "onClick": { "name": "addData" },
-              "children": "Add phase"
             }
           ]
         }

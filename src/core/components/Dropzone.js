@@ -3,7 +3,8 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react
 /**
  * Drag & drop file zone built on the native File API. Replaces the small subset
  * of `react-dropzone` we use: a wrapping element that opens a hidden file input
- * on click, accepts drag&drop, and exposes an imperative `open()` method.
+ * on click, accepts drag&drop, and preserves the imperative API used by Upload:
+ * `open()` plus the underlying `fileInputEl`.
  *
  * @param {String} [accept] - comma-separated list of accepted formats (e.g. `.jpg, .png` or `image/*`)
  * @param {Boolean} [multiple] - allow selecting multiple files
@@ -33,6 +34,9 @@ const Dropzone = forwardRef(function Dropzone ({
   const dragCounter = useRef(0)
 
   useImperativeHandle(ref, () => ({
+    get fileInputEl () {
+      return inputRef.current
+    },
     open: () => {
       if (disabled || !inputRef.current) return
       inputRef.current.click()
@@ -57,7 +61,7 @@ const Dropzone = forwardRef(function Dropzone ({
 
   const handleInputChange = (e) => {
     const files = Array.from(e.target.files || [])
-    if (files.length && onDrop) onDrop(files)
+    if (!disabled && files.length && onDrop) onDrop(filterByAccept(files, accept))
     // Reset so picking the same file again still triggers `change`.
     e.target.value = ''
   }
@@ -65,6 +69,7 @@ const Dropzone = forwardRef(function Dropzone ({
   const handleDragEnter = (e) => {
     e.preventDefault()
     e.stopPropagation()
+    if (disabled) return
     dragCounter.current += 1
     if (dragCounter.current === 1 && onDragEnter) onDragEnter(e)
   }
@@ -72,13 +77,19 @@ const Dropzone = forwardRef(function Dropzone ({
   const handleDragLeave = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    dragCounter.current = Math.max(0, dragCounter.current - 1)
+    if (disabled) {
+      dragCounter.current = 0
+      return
+    }
+    if (dragCounter.current === 0) return
+    dragCounter.current -= 1
     if (dragCounter.current === 0 && onDragLeave) onDragLeave(e)
   }
 
   const handleDragOver = (e) => {
     e.preventDefault()
     e.stopPropagation()
+    if (disabled) return
     if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'
   }
 

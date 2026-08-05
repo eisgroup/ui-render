@@ -1,6 +1,15 @@
 import { Active } from './_envs.js'
 import { LANGUAGE } from './constants.js'
 
+const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key)
+
+const setOwn = (object, key, value) => Object.defineProperty(object, key, {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  value,
+})
+
 /**
  * PROJECT DEFINITIONS =========================================================
  * =============================================================================
@@ -34,15 +43,15 @@ export function definitionSetup (...props) {
       set (def) {
         if (!this[_key]) this[_key] = {}
         const data = this[_key]
-        for (const key in def) {
-          if (data[key] != null)
+        for (const key of Object.keys(def)) {
+          if (hasOwn(data, key))
             throw new Error(`Duplicate ${prop}[${key}] definition ${JSON.stringify(def, null, 2)}`)
           const value = def[key]
-          for (const i in data) {
+          for (const i of Object.keys(data)) {
             if (data[i] === value)
               throw new Error(`Duplicate ${prop}[${key}] definition value "${value}" ${JSON.stringify(def, null, 2)}`)
           }
-          data[key] = value
+          setOwn(data, key, value)
         }
         return data
       },
@@ -70,9 +79,9 @@ export function definitionSetup (...props) {
  */
 export function definitionByValue (DEFINITION) {
   const result = {}
-  for (const index in DEFINITION) {
+  for (const index of Object.keys(DEFINITION)) {
     const def = DEFINITION[index]
-    result[def._] = def
+    setOwn(result, def._, def)
   }
   return result
 }
@@ -89,7 +98,7 @@ export function definitionByValue (DEFINITION) {
  */
 export function enumFrom (DEFINITION) {
   const list = []
-  for (const index in DEFINITION) {
+  for (const index of Object.keys(DEFINITION)) {
     list.push(DEFINITION[index]._)
   }
   return list
@@ -112,12 +121,13 @@ export function optionsFrom (DEFINITION) {
       return this[Active.LANG._] || this[LANGUAGE.ENGLISH._] || []
     }
   }
-  for (const index in DEFINITION) {
+  for (const index of Object.keys(DEFINITION)) {
     const {_: value, ...langs} = DEFINITION[index]
-    for (const lang in langs) {
+    for (const lang of Object.keys(langs)) {
       const text = langs[lang]
       // Dropdown `value` cannot be array because of shallow match
-      options[lang] = (options[lang] || []).concat({text, value: value.constructor === Array ? value.join(',') : value})
+      const languageOptions = hasOwn(options, lang) ? options[lang] : []
+      setOwn(options, lang, languageOptions.concat({text, value: Array.isArray(value) ? value.join(',') : value}))
     }
   }
   return options
@@ -135,7 +145,7 @@ export function optionsFrom (DEFINITION) {
  *    Multiple definitions can be nested unlimited times inside a single object.
  */
 export function localise (DEFINITION) {
-  for (const index in DEFINITION) {
+  for (const index of Object.keys(DEFINITION)) {
     const definition = DEFINITION[index]
     const {_, name} = definition
     if (name == null && _ != null) {
@@ -178,10 +188,10 @@ export function localise (DEFINITION) {
  *  (falls back to English if definition not found for active language, or empty string).
  */
 export function localiseTranslation (TRANSLATION) {
-  for (const KEY in TRANSLATION) {
+  for (const KEY of Object.keys(TRANSLATION)) {
     const _data = TRANSLATION[KEY]
     // Update existing translations
-    if (KEY in localiseTranslation.instance) {
+    if (hasOwn(localiseTranslation.instance, KEY)) {
       localiseTranslation.instance[KEY] = _data
     } else {
       // Define translations for the first time
@@ -194,7 +204,7 @@ export function localiseTranslation (TRANSLATION) {
         },
         set (data) {
           // merge new translations with existing
-          localiseTranslation.instance[_key] = {...localiseTranslation.instance[_key], ...data}
+          localiseTranslation.instance[_key] = {...(localiseTranslation.instance[_key] || _data), ...data}
         }
       })
     }
@@ -204,4 +214,3 @@ export function localiseTranslation (TRANSLATION) {
 
 localiseTranslation.instance = {}
 localiseTranslation.queriedById = {}
-

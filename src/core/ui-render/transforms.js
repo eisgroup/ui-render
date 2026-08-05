@@ -73,7 +73,7 @@ export function metaToProps (meta, config) {
         // Map `onClick` functions by name (if exists)
         // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
         if (isObject(definition)) {
-            metaToFunctions(definition, {...funcConfig, data, relativeIndex, _data, rowValue: _data, instance})
+            metaToFunctions(definition, {...funcConfig, data, relativeIndex, relativePath, _data, rowValue: _data, instance})
             if (definition.name) {
                 definition.name = interpolateString(definition.name, instance, {suppressError: true})
             }

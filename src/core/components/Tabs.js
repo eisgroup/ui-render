@@ -108,7 +108,7 @@ export default class Tabs extends PureComponent {
                     className={classNames('tabs__items no-scrollbar', classNameTabs)} style={styleTabs}>
           {this.tabs.map((tab, i, tabs) => (
             <View key={i} className={classNames('tabs__item', {active: activeIndex === i && tabs.length > 1})}
-                  onClick={activeIndex !== i && (() => this.setTab(i))}>
+                  onClick={activeIndex !== i ? (() => this.setTab(i)) : undefined}>
               {typeof tab === 'object'
                 ? (tab.icon ? <Text><Icon name={tab.icon}/>{tab.text}</Text> : tab)
                 : <Text>{tab}</Text>

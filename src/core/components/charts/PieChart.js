@@ -33,8 +33,13 @@ function PieChart ({
   ...props
 }) {
   const sorts = toList(sort, 'clean')
-  const items = sort ? [..._items].sort(by(...sorts)) : _items
-  const data = useMemo(() => dataNormalized(items, gradient, sorts), [items, gradient, sort]) // eslint-disable-line react-hooks/exhaustive-deps
+  const data = useMemo(() => {
+    const validItems = Array.isArray(_items)
+      ? _items.filter(item => item && typeof item === 'object')
+      : []
+    const items = sort ? [...validItems].sort(by(...sorts)) : validItems
+    return dataNormalized(items, gradient, sorts)
+  }, [_items, gradient, sort]) // eslint-disable-line react-hooks/exhaustive-deps
   const Container = legends ? (legends.bottom ? View : Row) : Fragment
   const showPointers = pointers || (!legends && pointers !== false)
 
@@ -45,7 +50,7 @@ function PieChart ({
         <View className='position-center center fade-in-slow'>
           {children != null
             ? (typeof children === 'object' ? children : <Text className='center'>{children}</Text>)
-            : <PieTotal items={_items} />
+            : <PieTotal items={data} />
           }
         </View>
       </View>
@@ -117,6 +122,15 @@ function DonutChart ({ data, height, gradient, showPointers, unit }) {
   const outerR = baseR * 0.6
 
   const slices = useMemo(() => computeSlices(data), [data])
+
+  useEffect(() => {
+    setHovered(current => {
+      if (!current) return current
+      const slice = slices.find(item => item.name === current.slice.name)
+      if (!slice) return null
+      return slice === current.slice ? current : {...current, slice}
+    })
+  }, [slices])
 
   return (
     <div
@@ -305,7 +319,14 @@ function renderReferenceItem ({ name, color, value }) {
 
 function dataNormalized (items, gradient, sorts) {
   const paletteLen = colorsPalette.length
-  const list = items.map(({ id, label, value }) => ({ name: id || label, gradient, value }))
+  const list = items.map(({ id, label, value }) => {
+    const number = Number(value)
+    return {
+      name: String(id != null ? id : (label != null ? label : '')),
+      gradient,
+      value: Number.isFinite(number) && number >= 0 ? number : 0,
+    }
+  })
   const mapper = (item, i) => {
     item.color = colorsPalette[i % paletteLen]
     return item

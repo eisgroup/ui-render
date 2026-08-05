@@ -10,6 +10,19 @@ import { isEqual, isFunction } from '../../../utils'
 
 type.Node = PropTypes.object
 
+function normalizeTabIndex (value, items) {
+  const index = Math.max(+value || 0, 0)
+  return index < items.length ? index : 0
+}
+
+function renderTab (tab) {
+  if (React.isValidElement(tab)) return tab
+  if (tab && typeof tab === 'object') {
+    return <Text>{tab.icon && <Icon name={tab.icon}/>}{tab.text}</Text>
+  }
+  return <Text>{tab}</Text>
+}
+
 /**
  * Tabs Component with overridable self-managed state and overflow scrollbars.
  */
@@ -60,7 +73,10 @@ export default class Tabs extends PureComponent {
   }
 
   state = {
-    activeIndex: Math.max(+(this.props.activeIndex || this.props.defaultIndex) || 0, 0),
+    activeIndex: normalizeTabIndex(
+      this.props.activeIndex != null ? this.props.activeIndex : this.props.defaultIndex,
+      this.props.items
+    ),
     transition: false
   }
 
@@ -74,14 +90,30 @@ export default class Tabs extends PureComponent {
 
   UNSAFE_componentWillReceiveProps (next) {
     const {activeIndex, items} = next
-    if (!isEqual(items, this.props.items)) this._tabs = this._contents = null
-    if (activeIndex != null && +activeIndex !== this.state.activeIndex) this.setTab(+activeIndex, next.transitionUpdate)
+    const itemsChanged = !isEqual(items, this.props.items)
+    if (itemsChanged) {
+      this._tabs = this._contents = null
+      this.clearTimer()
+    }
 
+    if (activeIndex != null) {
+      const nextIndex = normalizeTabIndex(activeIndex, items)
+      if (nextIndex !== this.state.activeIndex) {
+        const canTransition = next.transitionUpdate === true && this.state.activeIndex < items.length
+        this.setTab(nextIndex, canTransition)
+      } else if (itemsChanged && this.state.transition) {
+        this.setState({transition: false})
+      }
     // Handle use case when parent changes layout and tab has less panels than previously set active index
-    if (this.state.activeIndex >= items.length) this.setState({activeIndex: 0})
+    } else if (this.state.activeIndex >= items.length) {
+      this.setState({activeIndex: 0, transition: false})
+    } else if (itemsChanged && this.state.transition) {
+      this.setState({transition: false})
+    }
   }
 
   setTab = (activeIndex, transition = true) => {
+    this.clearTimer()
     const updateTab = () => {
       this.setState({activeIndex, transition: false})
       if (this.props.onChange) this.props.onChange(activeIndex)
@@ -117,11 +149,8 @@ export default class Tabs extends PureComponent {
           {isFunction(childrenBeforeTabs) ? childrenBeforeTabs(this) : childrenBeforeTabs}
           {this.tabs.map((tab, i, tabs) => (
             <View key={i} className={cn('tabs__item', {active: activeIndex === i && tabs.length > 1})}
-                  onClick={activeIndex !== i && (() => this.setTab(i))}>
-              {typeof tab === 'object'
-                ? (tab.icon ? <Text><Icon name={tab.icon}/>{tab.text}</Text> : tab)
-                : <Text>{tab}</Text>
-              }
+                  onClick={activeIndex !== i ? (() => this.setTab(i)) : undefined}>
+              {renderTab(tab)}
             </View>
           ))}
           {isFunction(childrenAfterTabs) ? childrenAfterTabs(this) : childrenAfterTabs}

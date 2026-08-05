@@ -713,13 +713,13 @@ function Decorator (Class) {
             FIELD.FUNC[FIELD.ACTION.POPUP_OPEN] = (...args) => {
                 // Filter out event objects (React SyntheticEvent or native Event)
                 const filteredArgs = args.filter(arg => {
+                    // React component classes are functions, so check them before the generic primitive branch.
+                    if (arg && arg.prototype && arg.prototype.isReactComponent) {
+                        return false
+                    }
                     if (typeof arg !== 'object' || arg === null) return true
                     // Check if it's an event object
                     if (arg.nativeEvent || arg.target || arg.preventDefault || arg.stopPropagation) {
-                        return false
-                    }
-                    // Check if it's a React component class
-                    if (arg.prototype && arg.prototype.isReactComponent) {
                         return false
                     }
                     return true
@@ -1050,17 +1050,25 @@ function Decorator (Class) {
                     // Fix to get error message from Response object
                     if (error instanceof Response) {
                         const errorText = await error.text()
-                        const errorObject = JSON.parse(errorText.replace(/(\w+:)|(\w+ :)/g, function (s) {
-                            return '"' + s.substring(0, s.length - 1) + '":'
-                        }))
-                        message = errorObject
-                        if (errorObject.message) {
-                            message = errorObject.message
+                        let errorObject
+                        try {
+                            errorObject = JSON.parse(errorText.replace(/(\w+:)|(\w+ :)/g, function (s) {
+                                return '"' + s.substring(0, s.length - 1) + '":'
+                            }))
+                        } catch {
+                            // Some APIs return a plain-text error body instead of JSON.
+                            message = errorText || error
+                        }
+                        if (errorObject) {
+                            message = errorObject
+                            if (errorObject.message) {
+                                message = errorObject.message
 
-                            if (/message=(.*)errors.*/.test(message)) {
-                                const subMessage = message.match(/message=(.*)errors.*/)[1]
-                                if (subMessage) {
-                                    message = subMessage
+                                if (/message=(.*)errors.*/.test(message)) {
+                                    const subMessage = message.match(/message=(.*)errors.*/)[1]
+                                    if (subMessage) {
+                                        message = subMessage
+                                    }
                                 }
                             }
                         }

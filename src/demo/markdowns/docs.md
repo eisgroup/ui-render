@@ -12,19 +12,17 @@ To understand and work with the UI Render, basic understanding of HTML and CSS i
 The host application is responsible for installing the following packages — they are declared as
 **peer dependencies** so the library and the application share a single instance of each:
 
-- `react` `^16.14.0`
-- `react-dom` `^16.14.0`
-- `moment` `~2.29.4`
+- `react` `^16.14.0 || ^17.0.0`
+- `react-dom` `^16.14.0 || ^17.0.0`
+- `moment` `^2.29.4`
 
 Why this matters:
 
 - **React / React DOM.** Two copies of React in the same tree throw `Invalid hook call` and break
   every Context provider — forms register fields against one instance while the renderer reads
   from another. This is a hard runtime failure, not a warning.
-- **Moment.** Date pickers and formatters operate on `moment` objects. When the host application
-  also uses Moment but resolves a different copy, `value instanceof moment` checks return `false`
-  in places where they should be `true`, producing subtle UI bugs (values not updating, dates
-  reset on submit, etc.).
+- **Moment.** The library build externalizes Moment and uses it for date pickers and formatters.
+  The host must therefore provide a compatible 2.x version directly.
 
 If the project uses **pnpm** with `auto-install-peers=false`, missing peer dependencies are not
 auto-installed and must be added explicitly to the host `package.json`. pnpm in its default
@@ -34,12 +32,15 @@ dependency — only direct declarations count.
 Install command for consumers:
 
 ```bash
-npm install eis-ui-render react@^16.14.0 react-dom@^16.14.0 moment@~2.29.4
+npm install eis-ui-render react@^17.0.0 react-dom@^17.0.0 moment@^2.29.4
 ```
 
 ```bash
-pnpm add eis-ui-render react@^16.14.0 react-dom@^16.14.0 moment@~2.29.4
+pnpm add eis-ui-render react@^17.0.0 react-dom@^17.0.0 moment@^2.29.4
 ```
+
+React 16.14 remains supported. Existing hosts may keep matching React and React DOM 16.14
+dependencies until they are ready to upgrade.
 
 
 ## Overview

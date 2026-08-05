@@ -77,7 +77,9 @@ export function Input ({
     props.className = 'readonly'
     props.readOnly = readonly
   } // React fix
-  if (props.type === 'hidden') return <InputNative {...props} />
+  if (props.type === 'hidden') {
+    return <InputNative name={name} id={id} disabled={disabled} {...props} />
+  }
   if (float) {
     if (!label && name) label = capitalize(name)
     if (!placeholder) placeholder = ' ' // required for Float label CSS to work
@@ -86,6 +88,7 @@ export function Input ({
   if (!label && title) props.title = translate(title)
   const idHelp = id + '-help'
   const value = props.value != null ? props.value : props.defaultValue
+  const valueText = value == null ? '' : String(value)
   const hasValue = value || value === 0
   const isCheckbox = props.type === 'checkbox'
   if (done == null) done = !error && hasValue
@@ -115,7 +118,7 @@ export function Input ({
         }
         {stickyPlaceholder && placeholder && hasValue &&
         <Text className='input__unit' aria-hidden='true'>
-          <Text className='invisible no-margin'>{props.value}</Text>{placeholder.substring(props.value.length)}
+          <Text className='invisible no-margin'>{valueText}</Text>{placeholder.substring(valueText.length)}
         </Text>
         }
         <InputNative

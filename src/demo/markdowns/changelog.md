@@ -1,5 +1,120 @@
 ### Table of Contents
 
+### Unreleased
+
+#### Compatibility
+
+- Development and the primary test suite now run on React 17.0.2.
+- The peer range remains additive: host applications may use React 16.14 or React 17.
+- The Moment peer range now accepts all compatible 2.x releases from 2.29.4 onward.
+
+#### Tests and CI
+
+- Added behavior contracts for submit, validation, dynamic `showIf`, data updates,
+  upload/download, popup actions, API error handling, and nested `dataKind` add/remove flows.
+- Added focused contracts for form lifecycle synchronization, meta/action transformation,
+  mapper field orchestration, grouped tables, TableView behavior, Dropdown normalization,
+  date-field lifecycle, Tabs interactions, dynamic row popups, InputNumber and Slider
+  interactions, upload validation, AutoSave sequencing, renderer error isolation, and the
+  public provider/library wrapper. Additional contracts cover InputNative lifecycle, lazy
+  Expand content, native Dropzone events, malformed PieChart data, and defensive nested
+  `dataKind` synchronization. The latest contracts cover local draft preservation, recursive
+  object sanitization, lodash-compatible collection/equality behavior, mapper relative context,
+  immutable table extras, and asynchronous plain-text API failures. Follow-up contracts cover
+  the InputDate/rc-picker boundary, controlled ProgressSteps updates, ScrollView behavior,
+  debounce/throttle timing windows, and browser/backend storage routing. The current contracts
+  cover Counter lifecycle and timing, hidden and sticky Input variants, ToggleField mappings,
+  cyclic/repeated JsonView values, and Render setup/error defaults. The latest batch covers
+  Pagination normalization/accessibility, Checkbox mappings and readonly behavior, ProgressBar
+  timers and edge values, and definition/localisation integrity. Formatting follow-ups cover
+  dropdown language fallbacks, currency/fraction modes, and null Select labels. The next batch
+  covers timeout/interval cleanup, duration and Moment-format parity, numeric boundary behavior,
+  invalid Select indices, and raw/structured form-data isolation. The migration-safety pass now
+  also covers browser/backend environment bootstrapping, string edge contracts, ID collision
+  history, lazy ExpandList content, page-level Tabs transitions, recursive Render failures,
+  mapper defensive factories, Final Form subscription lifecycles, and popup action arguments.
+- Added a smoke contract covering every registered demo example and enforceable coverage
+  thresholds for the renderer's critical files.
+- Added GitHub Actions checks for JavaScript/CSS lint, coverage, library build, and demo build.
+
+#### Fixes
+
+- Restored the upload ref contract after the in-house Dropzone replacement so successful
+  uploads reinitialize the rendered data.
+- Corrected the nested `dataKind` demo table metadata so it renders valid table markup.
+- Preserved nested `relativePath` context when resolving `popupOpen` actions.
+- Stopped both Tabs implementations from passing `onClick={false}` to the DOM.
+- Date fields now forward blur events to Final Form and correctly leave focused state.
+- Dropdown now preserves controlled numeric zeroes, keeps sanitized multi-select values in
+  state, normalizes color values from its live state, and retains the selected value for
+  `onSelect` after rerendering.
+- InputNumber now applies percentage/thousands formatting and parsing, honors uncontrolled
+  defaults, preserves uncontrolled edits, tolerates an omitted `onChange`, and safely renders
+  sticky placeholders and incomplete numeric input.
+- Slider no longer reacts while disabled/readonly, navigates off-mark discrete values correctly,
+  mutates neither frozen nor regular label options, and removes drag listeners on unmount.
+- Readonly uploads are removed from keyboard tab order consistently with their disabled picker.
+- Compact InputNative fields resize correctly for zero/empty controlled values and can enable
+  compact mode after mounting; lazy Expand children now receive their documented component ID.
+- Dropzone applies `accept` filtering to file-dialog selections, keeps disabled drag/input
+  events inert, and balances nested drag enter/leave state after drops.
+- PieChart sanitizes malformed/non-finite/negative data and keeps an open tooltip synchronized
+  with controlled updates or slice removal.
+- Nested `dataKind` append and range validation now tolerate malformed external state, normalize
+  reversed peer ranges, validate the parent form API, and isolate mutable form snapshots.
+- Failed local-draft appends now retain the user's draft instead of clearing unsaved values.
+- Object path extraction now preserves and removes present falsey values; custom response tags
+  are also sanitized recursively without mutating a cloned source.
+- The local lodash-compatible helpers now honor shorthand iteratees, sparse-array semantics,
+  unordered deep Map/Set equality, safe merge behavior, and prototype-pollution guards.
+- Table-cell mapping now retains inherited relative context, table `extraItems` are resolved
+  immutably on every render, and removable inputs tolerate a missing Form API.
+- Plain-text API failures now reach the error popup instead of failing during JSON parsing.
+- InputDate now forwards focus and blur to Final Form, uses rc-picker's readonly contract,
+  respects custom date formats, and safely normalizes empty, invalid, and default values.
+- Controlled ProgressSteps updates no longer call a missing method, explicit index zero wins over
+  defaults, and controlled rerenders or item removal cancel stale delayed clicks.
+- Storage helpers now route through the configured backend adapter outside the browser, preserve
+  `null`, and switch reliably between asynchronous and synchronous adapters.
+- Leading debounce calls correctly start a new window after the previous window expires while
+  retaining the latest trailing call for bursts.
+- Counter animations now retain every frame when timers coincide, finish on the exact target,
+  restart after timing/easing changes, clear stale work, and safely bound invalid timing inputs.
+- Hidden inputs preserve their name, ID, disabled state, and form submission behavior; sticky
+  placeholders now tolerate default, numeric, and zero values.
+- ToggleField now falls back to the active field translator when no explicit translator is passed.
+- Pagination rejects unusable totals, normalizes out-of-range pages and layout counts, keeps the
+  normalized current page inert, and exposes a named navigation landmark.
+- Readonly checkboxes now prevent native checked-state changes while preserving click callbacks.
+- ProgressBar clears stale mount timers on value updates, normalizes missing/invalid progress,
+  preserves numeric-zero labels/tooltips, and no longer leaks component-only props to the DOM.
+- Definition/localisation helpers reject duplicate null-valued keys, ignore inherited entries,
+  preserve object prototypes for reserved keys, and retain initial translations during updates.
+- The timer decorator now implements its documented interval API, clears both timer types, and
+  resets its registries after manual cleanup or unmount.
+- Duration formatting returns a stable zero for non-finite input and, with rounding disabled,
+  chooses the first meaningful unit when the output is limited.
+- Number helpers now tolerate empty ranges, format custom-delimiter negative zero and grouped
+  ordinals correctly, keep non-finite SI values suffix-free, and handle numeric-string zeroes in
+  divisor and percentage calculations.
+- Index-based Select reordering now rejects empty, fractional, negative, out-of-range, and sparse
+  selections without deleting the selection or inserting `undefined`; falsey option labels remain valid.
+- Select controls derive their accessible name from the visible label, then the field name, with a
+  generic fallback when neither is available; null labels still do not create visible placeholders.
+- Equal-length string merging now uses both inputs, and merging with an empty string no longer
+  emits `undefined` fragments.
+- Page-level Tabs now prioritize controlled index zero, normalize indices after item removal,
+  cancel stale transitions, apply opt-in prop transitions consistently, and render text-only
+  object labels safely.
+- Render setup failures now report the missing component or method resolver before React attempts
+  to render an invalid element, while recursive child failures remain isolated to their subtree.
+- Mapper Data nodes preserve explicit falsey local values; nested Text metadata no longer leaks
+  `renderLabel` or `currencyCode` into DOM elements.
+- Final Form wrappers keep one subscription per active form, release it when the form changes,
+  and unsubscribe during unmount.
+- Popup actions filter React component classes before normalizing declarative IDs, avoiding an
+  empty popup when a class is included alongside the click event.
+
 ### v0.34.2
 
 #### Fixes

@@ -1,3 +1,4 @@
+/* global __webpack_public_path__ */
 import React, { useEffect } from 'react'
 import { useLocation, useNavigate} from 'react-router-dom'
 import Markdown from 'react-markdown'
@@ -7,9 +8,6 @@ import gfm from 'remark-gfm'
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
 import {oneLight} from 'react-syntax-highlighter/dist/esm/styles/prism'
 import './markdown.css'
-
-// Use webpack's publicPath: '/ui-render/' in production, '/' in dev
-const basePath = (__webpack_public_path__ || '/').replace(/\/$/, '')
 import changelogMarkdown from '../markdowns/changelog.md'
 import stylesMarkdown from '../markdowns/styles.md'
 import configMarkdown from '../markdowns/config.md'
@@ -19,6 +17,9 @@ import Tabs from '../../core/components/Tabs'
 import Changelog from './Changelog'
 import Demo from '../pages/Demo'
 import Examples from '../pages/Examples'
+
+// Use webpack's publicPath: '/ui-render/' in production, '/' in dev
+const basePath = (__webpack_public_path__ || '/').replace(/\/$/, '')
 
 const mdProps = {
     remarkPlugins: [gfm, toc],
@@ -71,7 +72,7 @@ const NavTabs = (props) => {
         h4: heading('h4'),
         h5: heading('h5'),
         h6: heading('h6'),
-        img: ({src, ...props}) => <img src={src && src.startsWith('http') ? src : `${basePath}/${src}`} {...props} />,
+        img: ({alt = '', src, ...props}) => <img alt={alt} src={src && src.startsWith('http') ? src : `${basePath}/${src}`} {...props} />,
         code: (props) => {
             const {children, className, node, ...rest} = props
             const match = /language-(\w+)/.exec(className || '')

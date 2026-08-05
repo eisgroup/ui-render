@@ -115,14 +115,14 @@ export default class LocalDraftTableRow extends PureComponent {
       return
     }
 
-    pushDataKindRow({
+    const appended = pushDataKindRow({
       parentUIRender: parentInstance,
       meta,
       kind,
       rowObject: row,
       fallbackDataKindPath: ''
     })
-    this.setState({ draft: {}, fieldErrors: {} })
+    if (appended !== false) this.setState({ draft: {}, fieldErrors: {} })
   }
 
   renderInputCell = (def, i) => {

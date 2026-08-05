@@ -62,22 +62,24 @@ export function enumCheck (enums, value, self) {
  */
 export function debounce (func, wait = TIME_DURATION_INSTANT, { leading } = {}) {
 	let timeout
+	let trailingCall = false
 	return function() {
 		const self = this
 		const args = arguments
 
 		function later () {
 			timeout = null
-			func.apply(self, args)
+			if (!leading || trailingCall) func.apply(self, args)
+			trailingCall = false
 		}
 
 		const callNow = leading && !timeout
-		clearTimeout(timeout)
-		timeout = setTimeout(later, wait)
-		if (callNow) {
+		if (timeout) {
 			clearTimeout(timeout)
-			func.apply(self, args)
+			if (leading) trailingCall = true
 		}
+		timeout = setTimeout(later, wait)
+		if (callNow) func.apply(self, args)
 	}
 }
 

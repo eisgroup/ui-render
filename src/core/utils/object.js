@@ -423,9 +423,11 @@ export const fromFlatObj = unflattenObject
  * @return {*}
  */
 export function pop(obj, keyPath, fallback) {
-	const value = get(obj, keyPath) || null
-	if (value) unset(obj, keyPath)
-	return value || fallback
+	const missing = {}
+	const value = get(obj, keyPath, missing)
+	if (value === missing) return fallback
+	unset(obj, keyPath)
+	return value
 }
 
 /**
@@ -540,7 +542,7 @@ export function sanitizeResponse (collection, {tags = ['__typename'], clone = fa
 		} else if (result[key] == null) {
 			delete result[key]
 		} else if (typeof result[key] === 'object') {
-			result[key] = sanitizeResponse(result[key])
+			result[key] = sanitizeResponse(result[key], {tags})
 		}
 	}
 

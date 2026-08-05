@@ -115,6 +115,28 @@ describe('Select', () => {
         expect(label).toHaveTextContent('Select region')
     })
 
+    it('uses name as the accessible fallback for an explicitly null label without restoring the placeholder', () => {
+        const { container } = render(
+            <Select name="region" label={null} options={defaultOptions} />
+        )
+        const label = container.querySelector('label.sr-only')
+
+        expect(label.textContent).toBe('Select region')
+        expect(screen.getByRole('combobox', { name: 'Select region' })).toBeInTheDocument()
+        expect(container.querySelector('option[disabled]')).not.toBeInTheDocument()
+    })
+
+    it('uses a meaningful generic accessible name when label and name are absent', () => {
+        const { container } = render(
+            <Select label={null} options={defaultOptions} />
+        )
+        const label = container.querySelector('label.sr-only')
+
+        expect(label.textContent).toBe('Select option')
+        expect(screen.getByRole('combobox', { name: 'Select option' })).toBeInTheDocument()
+        expect(container.querySelector('option[disabled]')).not.toBeInTheDocument()
+    })
+
     it('sets correct id linking label to select', () => {
         const { container } = render(
             <Select name="region" options={defaultOptions} />

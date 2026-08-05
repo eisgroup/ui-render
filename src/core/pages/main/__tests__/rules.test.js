@@ -1,4 +1,11 @@
-import { toOpenLConfig, initSelectStatesFromData, getDataKindPathFromRelative, withDataKind, parseArrayPrefixAndRowIndexFromFieldName } from '../rules'
+import {
+    toOpenLConfig,
+    initSelectStatesFromData,
+    getDataKindPathFromRelative,
+    withDataKind,
+    parseArrayPrefixAndRowIndexFromFieldName,
+    formsStorage,
+} from '../rules'
 import { getLiveMergedDataKindArray } from '../utils'
 
 describe('parseArrayPrefixAndRowIndexFromFieldName', () => {
@@ -433,6 +440,7 @@ describe('withDataKind', () => {
     }
 
     beforeEach(() => {
+        formsStorage.clear()
         ParentClass = class {}
         withDataKind(ParentClass)
         parent = new ParentClass()
@@ -512,6 +520,67 @@ describe('withDataKind', () => {
     describe('getDataKindPath', () => {
         it('delegates to getDataKindPathFromRelative', () => {
             expect(parent.getDataKindPath('a.dataKind.b', 'b')).toBe('a')
+        })
+    })
+
+    describe('getDataKind', () => {
+        it('reads current values from all mounted forms for an explicit scope', () => {
+            formsStorage.set('master', {
+                form: {
+                    getState: () => ({
+                        values: {
+                            quote: {
+                                dataKind: {
+                                    periods: [
+                                        { startDate: '2024-01-01' },
+                                        { startDate: '2024-02-01' },
+                                    ],
+                                },
+                            },
+                        },
+                    }),
+                },
+                meta: {},
+            })
+
+            expect(parent.getDataKind('periods', 'quote')).toEqual([
+                { startDate: '2024-01-01' },
+                { startDate: '2024-02-01' },
+            ])
+        })
+
+        it('derives the scope from registered child instances', () => {
+            const child = makeChild('quote.dataKind.periods')
+            parent.registerDataKind(child, 'periods', 0)
+            formsStorage.set('master', {
+                form: {
+                    getState: () => ({
+                        values: {
+                            quote: {
+                                dataKind: {
+                                    periods: [{ endDate: '2024-01-31' }],
+                                },
+                            },
+                        },
+                    }),
+                },
+                meta: {},
+            })
+
+            expect(parent.getDataKind('periods')).toEqual([
+                { endDate: '2024-01-31' },
+            ])
+        })
+
+        it('returns an empty list when no form contains the dataKind path', () => {
+            formsStorage.set('master', {
+                form: {
+                    getState: () => ({ values: { unrelated: true } }),
+                },
+                meta: {},
+            })
+
+            expect(parent.getDataKind('periods', 'quote')).toEqual([])
         })
     })
 })

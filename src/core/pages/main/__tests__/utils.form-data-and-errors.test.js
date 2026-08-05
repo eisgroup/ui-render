@@ -6,6 +6,7 @@ import {
     errorsProcessing,
 } from '../utils'
 import { errorsMap, clearErrorsMap } from '../rules'
+import { storedTouched } from '../../../modules/form/utils'
 
 function makeForm(values) {
     return {
@@ -167,6 +168,13 @@ describe('errorsProcessing', () => {
         clearErrorsMap()
         // Clear errorsMap which is the live module reference
         for (const k of Object.keys(errorsMap)) delete errorsMap[k]
+        for (const k of Object.keys(storedTouched)) delete storedTouched[k]
+    })
+
+    afterEach(() => {
+        clearErrorsMap()
+        for (const k of Object.keys(errorsMap)) delete errorsMap[k]
+        for (const k of Object.keys(storedTouched)) delete storedTouched[k]
     })
 
     it('returns early when meta has relativePath but no relativeIndex', () => {
@@ -183,5 +191,69 @@ describe('errorsProcessing', () => {
         const form = makeFormWithErrors({ foo: { name: 'foo', touched: true } })
         errorsProcessing(form, {})
         expect(errorsMap.foo).toBeUndefined()
+    })
+
+    it('records a touched field error', () => {
+        const form = makeFormWithErrors({
+            email: {
+                name: 'email',
+                error: 'Email is invalid',
+                touched: true,
+            },
+        })
+
+        errorsProcessing(form, {})
+
+        expect(errorsMap).toEqual({
+            email: 'Email is invalid',
+        })
+    })
+
+    it('turns a Required error into a field-specific message', () => {
+        const form = makeFormWithErrors({
+            policyHolderName: {
+                name: 'policyHolderName',
+                error: 'Required',
+                touched: true,
+            },
+        })
+
+        errorsProcessing(form, {})
+
+        expect(errorsMap.policyHolderName).toBe('Policy Holder Name is Required')
+    })
+
+    it('records an error for a field remembered as touched', () => {
+        storedTouched.phoneNumber = true
+        const form = makeFormWithErrors({
+            phoneNumber: {
+                name: 'phoneNumber',
+                error: 'Phone is invalid',
+                touched: false,
+            },
+        })
+
+        errorsProcessing(form, {})
+
+        expect(errorsMap.phoneNumber).toBe('Phone is invalid')
+    })
+
+    it('removes a stale error after the field becomes valid', () => {
+        const fieldState = {
+            name: 'rows[1].startDate',
+            error: 'Required',
+            touched: true,
+        }
+        const form = makeFormWithErrors({
+            'rows[1].startDate': fieldState,
+        })
+
+        errorsProcessing(form, { relativePath: 'rows', relativeIndex: 1 })
+        expect(errorsMap['rows[1].startDate']).toBe('Start Date is Required')
+
+        delete fieldState.error
+        errorsProcessing(form, { relativePath: 'rows', relativeIndex: 1 })
+
+        expect(errorsMap['rows[1].startDate']).toBeUndefined()
     })
 })

@@ -12,13 +12,19 @@ import '../../../modules/form/utils' // eslint-disable-line import/first
 import UIRender from '../rules' // eslint-disable-line import/first
 import { ConfigContext, initialConfigState } from '../../../contexts/ConfigContext' // eslint-disable-line import/first
 import { AppContext } from '../../../contexts' // eslint-disable-line import/first
+import { Active } from '../../../utils' // eslint-disable-line import/first
 
 const popup = { setPopupState: () => {}, popup: { setPopupState: () => {} } }
+const originalTranslate = Active.translate
 const wrap = (ui) => (
     <ConfigContext.Provider value={initialConfigState}>
         <AppContext.Provider value={popup}>{ui}</AppContext.Provider>
     </ConfigContext.Provider>
 )
+
+afterEach(() => {
+    Active.translate = originalTranslate
+})
 
 describe('UIRender (smoke)', () => {
     it('renders a simple Text view from meta + data', () => {
@@ -146,6 +152,7 @@ describe('UIRender (smoke)', () => {
             view: 'Dropdown',
             name: 'color',
             options: [{ text: 'Red', value: 'red' }, { text: 'Blue', value: 'blue' }],
+            mapOptions: { text: 'text', value: 'value' },
         }
         const { container } = render(
             wrap(<UIRender meta={meta} data={{ color: 'red' }} form />)

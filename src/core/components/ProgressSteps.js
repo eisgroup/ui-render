@@ -11,6 +11,11 @@ import Text from './Text'
 import { withTimer } from './utils'
 import View from './View'
 
+const normalizeIndex = (value, items) => {
+  const index = +value
+  return Number.isInteger(index) && index >= 0 && index < items.length ? index : 0
+}
+
 /**
  * Progress Steps - Component
  */
@@ -39,21 +44,32 @@ export default class ProgressSteps extends PureComponent {
   }
 
   state = {
-    activeIndex: Math.max(+(this.props.activeIndex || this.props.defaultIndex) || 0, 0),
+    activeIndex: normalizeIndex(
+      this.props.activeIndex != null ? this.props.activeIndex : this.props.defaultIndex,
+      this.props.items
+    ),
     transition: false,
   }
 
   UNSAFE_componentWillReceiveProps (next) {
     const {activeIndex, items} = next
-    if (activeIndex != null && +activeIndex !== this.state.activeIndex) this.handleClickTab(+activeIndex)
-
-    // Handle use case when parent changes layout and tab has less panels than previously set active index
-    if (this.state.activeIndex >= items.length) this.setState({activeIndex: 0})
+    const nextIndex = normalizeIndex(activeIndex != null ? activeIndex : this.state.activeIndex, items)
+    if (activeIndex != null) {
+      this.clearTimer()
+      this.setState({activeIndex: nextIndex, transition: false})
+    } else if (nextIndex !== this.state.activeIndex) {
+      this.setState({activeIndex: nextIndex, transition: false})
+    }
   }
 
   handleClickStep = (index) => {
+    this.clearTimer()
     this.setState({transition: true})
     this.setTimeout(() => {
+      if (index >= this.props.items.length) {
+        this.setState({transition: false})
+        return
+      }
       this.setState({activeIndex: index, transition: false})
       if (this.props.onChange) this.props.onChange(index)
     }, 50) // 50 ms is needed to allow full rendering so css transition can take effect

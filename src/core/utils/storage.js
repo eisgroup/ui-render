@@ -40,10 +40,14 @@ export function performStorage (ACTION, storageKey, value = null, initialValue =
     return performStorage(SET, storageKey, isList(oldData) ? oldData.concat(value) : update(oldData, value))
   }
 
-  /* CLIENT */
   enumCheck([GET, SET, DELETE], ACTION, this)
+
+  /* SERVER (or missing localStorage) */
+  if (!hasLocalStorage) return Active.Storage[performStorage.toServer[ACTION]](storageKey, value)
+
+  /* CLIENT */
   const args = [storageKey]
-  if (value != null) args.push(toJSON(value))
+  if (SET === ACTION) args.push(toJSON(value))
   let result = localStorage[performStorage.toClient[ACTION]](...args)
 
   // Storage Retrieval
@@ -57,7 +61,7 @@ performStorage.toClient = {
   [SET]: 'setItem',
   [DELETE]: 'removeItem'
 }
-performStorage.toServer = {
+const toServerAsync = performStorage.toServer = {
   [GET]: 'getItem',
   [SET]: 'setItem',
   [DELETE]: 'removeItem'
@@ -70,11 +74,12 @@ performStorage.toServerSync = {
 // Setup Asynchronous Local Storage
 performStorage.init = function (...args) {
   performStorage.isAsync = true
+  performStorage.toServer = toServerAsync
   return Active.Storage.init(...args)
 }
 // Setup Synchronous Local Storage (not recommended)
 performStorage.initSync = function (...args) {
+  performStorage.isAsync = false
   performStorage.toServer = performStorage.toServerSync
   return Active.Storage.initSync(...args)
 }
-

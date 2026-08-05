@@ -1,6 +1,6 @@
 import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { capitalize, isString } from '../utils'
 import Button from './Button'
 import Icon from './Icon'
@@ -76,7 +76,10 @@ const InputNumber = ({
     }
 
     const [active, setActive] = useState(false)
-    const [value, setValue] = useState(valueFromParent !== undefined ? valueFromParent.toString().replace(',', '.') : '')
+    const initialValue = valueFromParent !== undefined ? valueFromParent : defaultValue
+    const [value, setValue] = useState(initialValue !== undefined ? initialValue.toString().replace(',', '.') : '')
+    const hasBeenControlled = useRef(valueFromParent !== undefined)
+    if (valueFromParent !== undefined) hasBeenControlled.current = true
 
     if (readonly) {
         props.className = 'readonly'
@@ -102,9 +105,9 @@ const InputNumber = ({
 
     useEffect(() => {
         // Don't update from parent during active editing to preserve user input
-        if (!active && valueFromParent !== value) {
+        if (!active && hasBeenControlled.current) {
             const newValue = valueFromParent !== undefined ? valueFromParent.toString().replace(',', '.') : ''
-            setValue(newValue)
+            if (newValue !== value) setValue(newValue)
         }
     }, [valueFromParent, active])
 
@@ -115,7 +118,7 @@ const InputNumber = ({
         if (value !== '' && value !== '.' && !value.endsWith('.') && !isNaN(parseFloat(value))) {
             nextValue = parseFloat(value)
         }
-        onChange(nextValue, name, event)
+        onChange && onChange(nextValue, name, event)
         setValue(value) // Keep the string representation for display
     }, [onChange])
 
@@ -126,7 +129,8 @@ const InputNumber = ({
         return numberPart.replace(THOUSANDS_SEPARATOR_REGEX, separator) + (decimalPart ? '.' + decimalPart : '')
     }, [])
 
-    const format = useCallback((value, { userTyping, input }) => {
+    const format = useCallback((value) => {
+        if (value === '' || value == null) return ''
         if (outputFormat) {
             if (outputFormat.percentage) {
                 return value + ' %'
@@ -153,6 +157,8 @@ const InputNumber = ({
         }
         return value
     }, [outputFormat])
+
+    const displayValue = active || !hasValue ? value : format(value)
 
     return (
         <View
@@ -182,7 +188,7 @@ const InputNumber = ({
                 {stickyPlaceholder && placeholder && hasValue &&
                     <Text className="input__unit" aria-hidden="true">
                         <Text
-                            className="invisible no-margin">{props.value}</Text>{placeholder.substring(props.value.length)}
+                            className="invisible no-margin">{value}</Text>{placeholder.substring(String(value).length)}
                     </Text>
                 }
                 <input
@@ -220,7 +226,7 @@ const InputNumber = ({
                         onBlur && onBlur(...args)
                     }}
                     onChange={(e) => {
-                        const inputValue = e.target.value
+                        const inputValue = parser(e.target.value)
                         if (inputValue === '' || inputRegex.test(inputValue)) {
                             const normalizedValue = inputValue.replace(',', '.')
                             onChangeHandler(normalizedValue, name, e)
@@ -229,7 +235,7 @@ const InputNumber = ({
                         }
                     }}
                     {...props}
-                    value={value}
+                    value={displayValue}
                 />
                 {icon && !lefty && (isString(icon)
                         ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>

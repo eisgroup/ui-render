@@ -1,11 +1,13 @@
 import classNames from '../utils/classNames'
 import React, { PureComponent } from 'react'
-import { Active, TIME_DURATION_INSTANT } from '../utils'
-import { STYLE } from './styles'
+import { TIME_DURATION_INSTANT } from '../utils'
 import Text from './Text'
 import { type } from './types'
 import { withTimer } from './utils'
 import View from './View'
+
+const hasProgressValue = value => Number.isFinite(value) && value >= 0
+const normalizeProgressValue = value => hasProgressValue(value) ? value : 0
 
 /**
  * Progress Bar Component
@@ -21,7 +23,7 @@ import View from './View'
 export default class ProgressBar extends PureComponent {
   static propTypes = {
     // fraction from 0 to 1
-    value: type.Fraction.isRequired,
+    value: type.Fraction,
     // content to render inside the filled bar
     label: type.Any,
     // default is false
@@ -45,12 +47,12 @@ export default class ProgressBar extends PureComponent {
     const {value} = this.state
     const percentage = Math.round(value * 100)
     const width = percentage + '%'
-    const tooltip = this.props.value >= 0 ? (children || width) : 'No Data'
+    const tooltip = hasProgressValue(this.props.value) ? (children != null ? children : width) : 'No Data'
     const style = {width, ...styleBar}
     if (color) style.backgroundColor = color
     return (
       <View className='app__progress__bar' style={style}>
-        {label && <Text>{label}</Text>}
+        {label != null && <Text>{label}</Text>}
         {hasTooltip &&
         <View className='app__progress__bar__tooltip'>
           <Text className='app__progress__bar__tooltip__inner'
@@ -65,17 +67,30 @@ export default class ProgressBar extends PureComponent {
 
   componentDidMount () {
     const {value} = this.props
-    if (value != null) this.setTimeout(() => {
+    if (hasProgressValue(value)) this.setTimeout(() => {
       this.setState({value})
     }, TIME_DURATION_INSTANT)
   }
 
   UNSAFE_componentWillReceiveProps ({value}) {
-    if (value !== this.props.value) this.setState({value: value || 0})
+    if (value !== this.props.value) {
+      this.clearTimer()
+      this.setState({value: normalizeProgressValue(value)})
+    }
   }
 
   render () {
-    const {className, gradient = true, children: _1, value: _2, styleBar: _3, ...props} = this.props
+    const {
+      className,
+      gradient = true,
+      children: _1,
+      value: _2,
+      styleBar: _3,
+      label: _4,
+      hasTooltip: _5,
+      color: _6,
+      ...props
+    } = this.props
     return (
       <View className={classNames('app__progress--bar', className, {gradient})} {...props}>
         <View className={'app__progress--bar__wrapper'}>

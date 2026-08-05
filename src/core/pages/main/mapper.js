@@ -127,7 +127,7 @@ const RenderComponent = ({
         case FIELD.TYPE.DATA:
             return <Data
                 instance={instance}
-                data={_data || data}
+                data={_data === undefined ? data : _data}
                 {...props}
                 relativeIndex={relativeIndex}
                 relativePath={relativePath}
@@ -163,8 +163,8 @@ const RenderComponent = ({
             return <>{items.map((item, i) => {
                 const merged = {
                     ...item,
-                    ...(item.relativePath == null && rest.relativePath != null && { relativePath: rest.relativePath }),
-                    ...(item.relativeIndex == null && rest.relativeIndex != null && { relativeIndex: rest.relativeIndex }),
+                    ...(item.relativePath == null && relativePath != null && { relativePath }),
+                    ...(item.relativeIndex == null && relativeIndex != null && { relativeIndex }),
                 }
                 return (
                     <Table.Cell key={i} {...rest}>
@@ -355,14 +355,15 @@ const RenderComponent = ({
             }
 
             // Table with custom rows
-            if (extraItems) _data = _data.concat(extraItems.map(item => {
+            if (extraItems) _data = _data.concat(extraItems.map(sourceItem => {
+                const item = { ...sourceItem }
                 for (const id in item) {
                     const definition = item[id]
                     if (isObject(definition)) {
                         if ((definition.name && Object.keys(definition).length === 1)) {
                             item[id] = get(data, definition.name)
                         } else if (definition.name && definition.render) {
-                            item[id].data = get(data, definition.name)
+                            item[id] = { ...definition, data: get(data, definition.name) }
                         } else if (definition.view) {
                             item[id] = (_, index, props) => Render({ debug, ...props, ...definition })
                         }
@@ -456,6 +457,7 @@ const RenderComponent = ({
             }
             if (items.length) {
                 props.children = items.map(Render)
+                delete props.renderLabel
             } else if (props.renderLabel) {
                 props.children = props.renderLabel(props.children)
                 delete props.renderLabel
@@ -463,6 +465,7 @@ const RenderComponent = ({
                 props.children = _data
             }
             if (view === FIELD.TYPE.TITLE) props.className = cn('h3', props.className)
+            delete props.currencyCode
             return <Text {...props} translate={translate}/>
         }
 
@@ -599,7 +602,7 @@ const RenderComponent = ({
                 input.classNameIcon = 'button circle small transparent appear-on-hover'
                 input.onClickIcon = (...args) => {
                     // todo: for some reason Dropdown/Select have `form` undefined
-                    form.change(input.name, null)
+                    form && form.change && form.change(input.name, null)
                     onRemove && onRemove(input.name)
                     autoSubmit && input.onChange(null)
                     onClickIcon && onClickIcon(...args)

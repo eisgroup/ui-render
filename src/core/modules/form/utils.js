@@ -379,7 +379,14 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
           this._formProps = formProps
         }
 
-        form.subscribe(formSubscription(form), {touched: true, initialValues: true, error: true, errors: true})
+        if (this._subscribedForm !== form) {
+          if (this._unsubscribeForm) this._unsubscribeForm()
+          this._subscribedForm = form
+          this._unsubscribeForm = form.subscribe(
+            formSubscription(form),
+            {touched: true, initialValues: true, error: true, errors: true}
+          )
+        }
 
         // Class should use PureComponent to take advantage of caching
         return <Class {...this._props} formProps={this._formProps} initialValues={this._initValues} instance={this}/>
@@ -414,6 +421,9 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       }
 
       componentWillUnmount () {
+        if (this._unsubscribeForm) this._unsubscribeForm()
+        this._unsubscribeForm = null
+        this._subscribedForm = null
         formsStorage.delete(this.prevInitialValues)
       }
 

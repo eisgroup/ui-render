@@ -1,0 +1,31 @@
+{
+  "view": "Col",
+  "items": [
+    {
+      "view": "Text",
+      "label": "Integer ≥ 0 (min: 0, outputFormat.decimals: 0). Try typing '-' or '.' — they should not appear. Paste '-5' — should be rejected. Type '12.5' or '-3' before tabbing out — value is clamped to min on blur."
+    },
+    {
+      "view": "Input",
+      "name": "exposure",
+      "type": "number",
+      "label": "Exposure",
+      "placeholder": "Whole number ≥ 0",
+      "min": 0,
+      "outputFormat": {
+        "decimals": 0
+      }
+    },
+    {
+      "view": "Text",
+      "label": "Unconstrained (no min, no decimals constraint). Negatives and decimals are accepted."
+    },
+    {
+      "view": "Input",
+      "name": "free",
+      "type": "number",
+      "label": "Free Number",
+      "placeholder": "Any number"
+    }
+  ]
+}

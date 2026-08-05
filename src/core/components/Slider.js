@@ -1,6 +1,6 @@
 import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { formatNumber, last, round, toPercent } from '../utils'
 import { formatDuration } from '../utils/time'
 import Tooltip from './Tooltip'
@@ -60,8 +60,13 @@ export function Slider ({
     : null
 
   const trackRef = useRef(null)
+  const dragCleanupRef = useRef(null)
   const [activeIdx, setActiveIdx] = useState(-1)
   const interactive = !disabled && !readonly
+
+  useEffect(() => () => {
+    if (dragCleanupRef.current) dragCleanupRef.current()
+  }, [])
 
   // When marks are the snap points (step:null) we distribute them evenly along the track
   // instead of placing them linearly by numeric value — otherwise dense low-end values
@@ -116,6 +121,7 @@ export function Slider ({
 
   const startDrag = (event, idx) => {
     if (!interactive) return
+    if (dragCleanupRef.current) dragCleanupRef.current()
     // Cache pointer coordinates: React's synthetic event can be reused after
     // setActiveIdx triggers a re-render, leaving clientX/Y null.
     const startX = event.clientX
@@ -126,11 +132,16 @@ export function Slider ({
       const next = positionToValue(e.clientX, e.clientY)
       commit(idx, next)
     }
-    const onUp = () => {
-      setActiveIdx(-1)
+    const cleanup = () => {
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
+      if (dragCleanupRef.current === cleanup) dragCleanupRef.current = null
     }
+    const onUp = () => {
+      setActiveIdx(-1)
+      cleanup()
+    }
+    dragCleanupRef.current = cleanup
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
     // Also respond to the initial click position.
@@ -198,7 +209,9 @@ export function Slider ({
             className={classNames('app__slider__handle', { active: isActive })}
             style={offset(pct)}
             onPointerDown={(e) => startDrag(e, i)}
-            onKeyDown={(e) => onHandleKey(e, h.value, i, { min, max, step, snapValues, commit })}
+            onKeyDown={interactive
+              ? (e) => onHandleKey(e, h.value, i, { min, max, step, snapValues, commit })
+              : undefined}
           >
             {tooltipProps && (
               <Tooltip
@@ -271,7 +284,8 @@ function onHandleKey (event, value, idx, { min, max, step, snapValues, commit })
   event.preventDefault()
   if (snapValues) {
     const sorted = [...snapValues].sort((a, b) => a - b)
-    const i = sorted.indexOf(value)
+    const exactIndex = sorted.indexOf(value)
+    const i = exactIndex >= 0 ? exactIndex : nearestIndex(sorted, value)
     const next = sorted[Math.max(0, Math.min(sorted.length - 1, i + delta))]
     commit(idx, next != null ? next : value)
     return
@@ -289,11 +303,12 @@ function onHandleKey (event, value, idx, { min, max, step, snapValues, commit })
  * @return {Object}
  */
 function sliderRangeMarks (range, options = {}, step = null) {
-  if (range.length === 2 || (range.length === 3 && range[0] === 0)) options.computeSteps = true
+  const computeSteps = range.length === 2 || (range.length === 3 && range[0] === 0)
+  const markOptions = computeSteps ? {...options, computeSteps: true} : options
   return {
     min: range[0],
     max: last(range),
-    marks: sliderIntervals(range, options),
+    marks: sliderIntervals(range, markOptions),
     step,
   }
 }

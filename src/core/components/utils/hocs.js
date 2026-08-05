@@ -20,8 +20,16 @@ export function withTimer (Class) {
     this.timers.push(setTimeout(...arguments))
   }
 
+  Class.prototype.setInterval = function () {
+    if (!this.intervals) this.intervals = []
+    this.intervals.push(setInterval(...arguments))
+  }
+
   Class.prototype.clearTimer = function () {
     if (this.timers) this.timers.forEach(clearTimeout)
+    if (this.intervals) this.intervals.forEach(clearInterval)
+    this.timers = []
+    this.intervals = []
   }
 
   Class.prototype.componentWillUnmount = function () {
