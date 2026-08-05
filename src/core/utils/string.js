@@ -265,8 +265,10 @@ export function matchBetween(string, before, after) {
 export function mergeStrings(str1, str2) {
 	str1 = String(str1)
 	str2 = String(str2)
-	const strLong = (str1.length >= str2.length ? str1 : str2).split('').reverse()
-	const strShort = (str1.length > str2.length ? str2 : str1).split('')
+	const isFirstLong = str1.length >= str2.length
+	const strLong = (isFirstLong ? str1 : str2).split('').reverse()
+	const strShort = (isFirstLong ? str2 : str1).split('')
+	if (!strShort.length) return strLong.join('')
 	return strLong
 		.map((char, index) => {
 			return strShort[index] != null ? char + strShort[index] : char + strShort[index % strShort.length]

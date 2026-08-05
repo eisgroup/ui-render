@@ -21,18 +21,21 @@ function Pagination ({
   boundaryCount = 1,
   className,
 }) {
-  if (!totalPages || totalPages < 2) return null
-  const items = buildItems(activePage, totalPages, siblingCount, boundaryCount)
-  const go = (event, page) => {
-    if (page < 1 || page > totalPages || page === activePage) return
-    onPageChange && onPageChange(event, { activePage: page })
+  if (!Number.isSafeInteger(totalPages) || totalPages < 2) return null
+  const page = normalizePage(activePage, totalPages)
+  const siblings = normalizeCount(siblingCount)
+  const boundary = normalizeCount(boundaryCount)
+  const items = buildItems(page, totalPages, siblings, boundary)
+  const go = (event, nextPage) => {
+    if (nextPage < 1 || nextPage > totalPages || nextPage === page) return
+    onPageChange && onPageChange(event, { activePage: nextPage })
   }
 
   return (
-    <nav className={classNames('app__pagination', className)} role='navigation'>
+    <nav className={classNames('app__pagination', className)} role='navigation' aria-label='Pagination'>
       <PageButton
-        disabled={activePage <= 1}
-        onClick={(e) => go(e, activePage - 1)}
+        disabled={page <= 1}
+        onClick={(e) => go(e, page - 1)}
         ariaLabel='Previous page'
       >
         ‹
@@ -44,7 +47,7 @@ function Pagination ({
         return (
           <PageButton
             key={item}
-            active={item === activePage}
+            active={item === page}
             onClick={(e) => go(e, item)}
             ariaLabel={`Page ${item}`}
           >
@@ -53,8 +56,8 @@ function Pagination ({
         )
       })}
       <PageButton
-        disabled={activePage >= totalPages}
-        onClick={(e) => go(e, activePage + 1)}
+        disabled={page >= totalPages}
+        onClick={(e) => go(e, page + 1)}
         ariaLabel='Next page'
       >
         ›
@@ -69,6 +72,7 @@ Pagination.propTypes = {
   onPageChange: PropTypes.func,
   siblingCount: PropTypes.number,
   boundaryCount: PropTypes.number,
+  className: PropTypes.string,
 }
 
 export default React.memo(Pagination)
@@ -113,6 +117,17 @@ function buildItems (active, total, siblings, boundary) {
 
   result.push(...endPages)
   return dedupeOrdered(result)
+}
+
+function normalizePage (page, total) {
+  if (page === Infinity) return total
+  if (!Number.isFinite(page)) return 1
+  return Math.min(Math.max(Math.trunc(page), 1), total)
+}
+
+function normalizeCount (count) {
+  if (!Number.isFinite(count)) return 1
+  return Math.max(Math.trunc(count), 0)
 }
 
 function range (start, end) {

@@ -4,6 +4,10 @@ import { ONE_SECOND, TIME_DURATION_INSTANT } from '../utils'
 import { renderFloat } from './renders'
 import { withTimer } from './utils'
 
+const DEFAULT_INTERVAL = 17
+const MAX_ANIMATION_STEPS = 10000
+const ANIMATION_PROPS = ['start', 'end', 'duration', 'delay', 'interval', 'easingFn']
+
 /**
  * Animated Number Counter using Localised Render Float function
  */
@@ -35,12 +39,14 @@ export default class Counter extends PureComponent {
   }
 
   animate = () => {
-    const {value, steps} = this.state
     const {end} = this.props
-    if (!steps) return
-    this.setState({
-      value: value + (end - value) / steps,
-      steps: steps - 1,
+    this.setState(({value, steps}) => {
+      if (steps <= 0) return null
+      const nextSteps = steps - 1
+      return {
+        value: nextSteps ? value + (end - value) / steps : end,
+        steps: nextSteps,
+      }
     })
   }
 
@@ -49,18 +55,29 @@ export default class Counter extends PureComponent {
       end, start, easingFn,
       duration = ONE_SECOND,
       delay = TIME_DURATION_INSTANT,
-      interval = 17
+      interval = DEFAULT_INTERVAL
     } = props
-    const steps = end === start ? 0 : Math.ceil(duration / interval)
+    const safeDuration = Number.isFinite(duration) && duration >= 0 ? duration : ONE_SECOND
+    const safeDelay = Number.isFinite(delay) && delay >= 0 ? delay : TIME_DURATION_INSTANT
+    const safeInterval = Number.isFinite(interval) && interval > 0 ? interval : DEFAULT_INTERVAL
+    const steps = end === start || safeDuration === 0
+      ? 0
+      : Math.min(Math.ceil(safeDuration / safeInterval), MAX_ANIMATION_STEPS)
+
+    this.clearTimer()
     if (steps) {
-      this.clearTimer()
       this.setTimeout(() => {
         for (let i = 0; i < steps; i++) {
-          this.setTimeout(this.animate, duration * easingFn((i + 1) / steps))
+          const progress = (i + 1) / steps
+          const easedProgress = easingFn(progress)
+          const frameDelay = Number.isFinite(easedProgress)
+            ? Math.max(0, safeDuration * easedProgress)
+            : safeDuration * progress
+          this.setTimeout(this.animate, frameDelay)
         }
-      }, delay)
+      }, safeDelay)
     }
-    this.setState({steps, value: start})
+    this.setState({steps, value: safeDuration === 0 ? end : start})
   }
 
   componentDidMount () {
@@ -68,7 +85,7 @@ export default class Counter extends PureComponent {
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    if (nextProps.end !== this.props.end) this.setup(nextProps)
+    if (ANIMATION_PROPS.some((prop) => nextProps[prop] !== this.props[prop])) this.setup(nextProps)
   }
 
   render () {

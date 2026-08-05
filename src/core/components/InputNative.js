@@ -36,12 +36,17 @@ export default class InputNative extends PureComponent {
     const {compact, value} = this.props
     if (next.compact != null) {
       let inputValue
+      let shouldResize = false
       if (next.value !== value) {
         inputValue = next.value
+        shouldResize = true
       } else if (next.compact !== compact) {
-        inputValue = this.element.value
+        inputValue = this.element ? this.element.value : next.value
+        shouldResize = true
       }
-      if (inputValue) resizeToContent(inputValue, this.element.style, next.compact)
+      if (shouldResize && this.element) {
+        resizeToContent(inputValue == null ? '' : String(inputValue), this.element.style, next.compact)
+      }
     }
   }
 

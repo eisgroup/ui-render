@@ -142,7 +142,7 @@ export default class Upload extends PureComponent {
                     name={name}
                     title={translate(title)}
                     inputProps={{ tabIndex: -1 }}
-                    tabIndex={disabled ? -1 : 0}
+                    tabIndex={disabled || readonly ? -1 : 0}
                     className={classNames('upload__dropzone', className, { active, round, disabled, readonly })}
                     ref={(node) => { this.dropzone = node }}
                     onDragEnter={this.onDragEnter}

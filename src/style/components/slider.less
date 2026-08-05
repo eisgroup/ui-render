@@ -181,7 +181,7 @@
     }
   }
 
-  &:not(.readonly):not(.disabled) {
+  &:not(.readonly, .disabled) {
     .app__slider__handle {
       &:hover, &:focus, &:active, &.active {
         background-color: @slider-color-handle-hover;

@@ -55,7 +55,7 @@ export default class Expand extends PureComponent {
   get content () {
     if (this._content) return this._content
     const {children} = this.props
-    return (this._content = isFunction(children) ? children() : children)
+    return (this._content = isFunction(children) ? children(this.props.id) : children)
   }
 
   UNSAFE_componentWillReceiveProps (next) {

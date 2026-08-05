@@ -38,15 +38,19 @@ export function formatDuration (milliseconds, {
   spacer = ' ',
   decimal = '.',
 } = {}) {
-  if (milliseconds === 0) return shorten ? `0${spacer}s` : `0${spacer}seconds`
-  let remaining = Math.abs(milliseconds)
+  const duration = Number(milliseconds)
+  if (!Number.isFinite(duration) || duration === 0) {
+    return shorten ? `0${spacer}s` : `0${spacer}seconds`
+  }
+  let remaining = Math.abs(duration)
   const parts = []
   for (let i = 0; i < UNITS.length; i++) {
     const def = UNITS[i]
     const isLast = i === UNITS.length - 1
     let value = remaining / def.ms
     if (isLast || (largest != null && parts.length === largest - 1)) {
-      value = round ? Math.round(value) : value
+      if (round) value = Math.round(value)
+      else if (!isLast && value < 1) value = 0
     } else {
       value = Math.floor(value)
     }
@@ -60,7 +64,7 @@ export function formatDuration (milliseconds, {
     if (remaining <= 0) break
   }
   if (!parts.length) return shorten ? `0${spacer}s` : `0${spacer}seconds`
-  const sign = milliseconds < 0 ? '-' : ''
+  const sign = duration < 0 ? '-' : ''
   return sign + parts.join(delimiter)
 }
 

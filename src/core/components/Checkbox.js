@@ -49,7 +49,14 @@ export function Checkbox ({
   initialValues: _1, // not used
   ...props
 }) {
-  if (readonly) props.readOnly = readonly // React wants `readonly` to be `readOnly`
+  if (readonly) {
+    const onClick = props.onClick
+    props.readOnly = readonly // React wants `readonly` to be `readOnly`
+    props.onClick = event => {
+      event.preventDefault() // checkboxes do not natively enforce readOnly
+      if (onClick) onClick(event)
+    }
+  }
   labelTrue = labelTrue || label || 'ON'
   labelFalse = labelFalse || label || 'OFF'
   if (!id && label) id = 'checkbox-' + label.replace(/ +?/g, '-')

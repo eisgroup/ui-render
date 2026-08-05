@@ -38,7 +38,7 @@ describe('CSS contract', () => {
 
         const missing = baseline.filter(cls => !builtClasses.has(cls));
         if (missing.length > 0) {
-            fail(`Missing ${missing.length} classes: ${missing.slice(0, 20).join(', ')}${missing.length > 20 ? '...' : ''}`);
+            throw new Error(`Missing ${missing.length} classes: ${missing.slice(0, 20).join(', ')}${missing.length > 20 ? '...' : ''}`);
         }
     });
 

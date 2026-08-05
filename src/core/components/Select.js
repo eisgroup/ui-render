@@ -37,8 +37,9 @@ export function Select ({
   if (typeof options[0] === 'string') options = options.map(value => ({text: value, value}))
   if (typeof options[0] === 'number') options = options.map(value => ({text: String(value), value}))
   if (value && !onChange) throw new Error('Select.value is only used when `onChange` or `readOnly` provided')
+  const accessibleLabel = label || name || 'option'
   if (label == null) label = ''
-  const selectLabel = interpolateString(_.SELECT_option, {option: label})
+  const selectLabel = interpolateString(_.SELECT_option, {option: accessibleLabel})
   return (
     <div className={classNames('select', className)} style={style}>
       <Label htmlFor={id} className="sr-only">{selectLabel}</Label>

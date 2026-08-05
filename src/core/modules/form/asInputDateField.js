@@ -91,6 +91,11 @@ export function asInputDateField (InputComponent, {sanitize} = {}) {
             return this.input.onFocus(...args)
         }
 
+        handleBlur = (...args) => {
+            this.hasFocus = false
+            return this.input.onBlur(...args)
+        }
+
 
         handleChange = (value, ...args) => {
             const {onChange, normalize, parse = normalize} = this.props

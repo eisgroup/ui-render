@@ -2,9 +2,10 @@
 
 | | |
 |---|---|
-| **Status** | Draft for review |
+| **Status** | In progress — React 17 automated checkpoint green; Phase 0 partially complete |
 | **Date** | 2026-07-06 |
 | **Re-verified** | 2026-07-21 — independent re-audit against the working tree, lockfile, build configs, a full test/lint/audit/pack run, and the npm registry; new findings indexed in §2.6 |
+| **Checkpoint verified** | 2026-08-05 — 137 suites / 1904 tests; coverage thresholds, JS/CSS lint, library build and demo build green locally |
 | **Audited version** | 0.34.2 (branch snapshot) |
 | **Scope** | React 17/18 upgrade path, React 19 readiness, a principles-preserving modernization roadmap, the `semantic-ui-react` exit plan (§9.7-F1), the `moment` native-replacement analysis (§9.7-F2), the project-structure analysis (§9.9), the TypeScript migration (§9.6), and the consolidated verification checklist (Appendix C) |
 
@@ -14,10 +15,10 @@
 
 The audit shows that **the path to React 18 is almost entirely unblocked**. The build toolchain is already modern (webpack 5, Jest 30, Babel 7.26, Node 24), and every runtime dependency already declares React 17/18 peer support. The lag is concentrated in four places:
 
-1. **React itself** — pinned to `^16.14.0` (peer + dev).
+1. **React itself** — the React 17 checkpoint is implemented in the current change; React 18 is not yet admitted by the peer range.
 2. **`@testing-library/react` 12.1.5** — peer-restricted to `react <18`; the only hard dependency blocker.
 3. **Legacy component patterns** — 22 class components, `UNSAFE_*` lifecycles in 13 files, including deliberate **runtime prototype patching** in `src/core/pages/main/rules.js` and `src/core/modules/form/utils.js`. These are *not* upgrade blockers (prefixed `UNSAFE_*` methods work in React 17, 18, and 19), but they block `StrictMode`, concurrent features, and long-term maintainability.
-4. **The shipped artifact itself** — the published type declarations describe a different, legacy integration shim (`window._mountUIRender`), not the exported component; there is no CI and no publish gate, so the tarball is whatever `dist/` happens to lie on the maintainer's disk (currently 11.6 MB unpacked, with duplicated assets and source maps); and the published CSS leaks unscoped `html`/`body`/`*` rules into host pages. §2.6 carries the evidence; Phase 0 turns these into gates.
+4. **The shipped artifact itself** — the published type declarations describe a different, legacy integration shim (`window._mountUIRender`), not the exported component; a CI workflow is now present but its first hosted run is pending, and there is still no publish gate, so the tarball is whatever `dist/` happens to lie on the maintainer's disk (currently 11.6 MB unpacked, with duplicated assets and source maps); and the published CSS leaks unscoped `html`/`body`/`*` rules into host pages. §2.6 carries the evidence; Phase 0 turns these into gates.
 
 **Recommended target: React 18.3, reached in two checkpointed releases (17 → 18), followed by an incremental modernization program.** React 19 is a watch-item, not a target — it stays gated on the §9.7-F1 exit (see the §8 fast path).
 
@@ -36,7 +37,7 @@ Because `react`/`react-dom` are webpack **externals** and npm **peer dependencie
 
 ## 2. Current state audit
 
-### 2.1 Toolchain (already modern — no work needed)
+### 2.1 Toolchain and release gates
 
 | Area | Current | Verdict |
 |---|---|---|
@@ -44,10 +45,10 @@ Because `react`/`react-dom` are webpack **externals** and npm **peer dependencie
 | Transpiler | Babel 7 (declared `^7.26`), `babel-loader` 10 | ✅ current |
 | Tests | Jest 30 + `jest-environment-jsdom` 30 | ✅ current, React-18-ready |
 | Node | engines `>=22`, `.nvmrc` = 24 | ✅ current |
-| Lint | ESLint 8 + `eslint-config-react-app` 7 | ⚠️ config is fine, but there is **no JS lint script** and `npx eslint src` currently fails (11 errors / 28 warnings) — Phase 0.9 |
+| Lint | ESLint 8 + `eslint-config-react-app` 7 | ⚠️ `npm run lint:js` now exists and exits green (0 errors / 22 warnings) and is wired into CI; warning triage, audit ownership and the zero-reference devDependency sweep remain in Phase 0.9 |
 | Styling | LESS 3.13 (pinned for the semantic-ui-less + `less-plugin-functions` toolchain), PostCSS 8, stylelint 16 | ✅ works; LESS pin is a separate watch-item (§9.8) |
 | Types | Hand-written public API types in `src/library/types/`, emitted via `tsconfig.build.json` (declaration-only) | ❌ **describes the wrong component** — a legacy `window._mountUIRender` shim, not the shipped export (§2.6-1); replaced in Phase 0.6 |
-| CI / publish gates | — | ❌ none: no CI config in the repo, no `prepack`/`prepublishOnly`; `dist/` and root `static/` are gitignored, so a publish ships whatever was last built locally — Phase 0.4/0.7 |
+| CI / publish gates | GitHub Actions workflow for push and pull requests | ⚠️ JS/CSS lint, coverage, library build and demo build are wired; first hosted run pending. No `prepack`, pack budgets or packed-consumer smoke yet — Phase 0.7 |
 
 ### 2.2 Dependency compatibility matrix
 
@@ -66,11 +67,11 @@ Peer ranges verified against `package-lock.json` (resolved versions), not npm me
 | `react-refresh` + webpack plugin | 0.17 / 0.5.17 | — | ✅ | ✅ | Dev only. |
 | **`@testing-library/react`** | **12.1.5** | **`<18.0.0`** | ✅ | ❌ | **The single hard blocker.** Requires upgrade to 16.x together with the React 18 bump (§6). |
 | `@testing-library/jest-dom` | 6.9.1 | — | ✅ | ✅ | |
-| `moment` | ~2.29.4 (peer + external) | — | ✅ | ✅ | In maintenance mode upstream; **decision: keep** (the peer only *widens* to `^2.29.4` in Phase 1, §3.2). Note: moment IS part of the public API surface (§2.6-12). Optional native replacement analyzed in §9.7-F2. |
+| `moment` | 2.29.4 (peer `^2.29.4` + external) | — | ✅ | ✅ | In maintenance mode upstream; **decision: keep**. The compatible peer range was widened for host resolution. Moment remains part of the public API (§2.6-12); optional native replacement is analyzed in §9.7-F2. |
 
 ### 2.3 React legacy pattern inventory
 
-Codebase size: 257 JS/JSX files (+2 TS), 76 test files. 22 files contain real class components (a wider grep also matches 2 test files and 3 doc-comment-only hits); ~19 files use hooks (15 in `src/core`).
+Original audit baseline: 257 JS/JSX files (+2 TS), 76 test files. The safety/React 17 workstream adds 61 contract-test files: 137 suites / 1904 tests at the 2026-08-05 checkpoint. 22 files contain real class components (a wider grep also matches 2 test files and 3 doc-comment-only hits); ~19 files use hooks (15 in `src/core`).
 
 **`UNSAFE_*` lifecycle usage (works on React 17/18/19; hostile to StrictMode):**
 
@@ -135,6 +136,14 @@ A second audit pass — against the working tree, the build configs, a full test
 | 14 | **Orphan set is 12, not 9:** the 9 direct orphans re-confirmed, plus `ErrorTable` (imported only by orphan `ErrorContent`), `Square` (only by orphan `Carousel`), and the pack `TabList` (mapper uses the engine copy, `mapper.js:33`). Engine `tester/` fixtures are referenced by nothing. | §9.9-H1, §9.2 |
 | 15 | **Hardcoded version strings** `data-version="0.34.2"` in `AppWrapper.js:10` and `types/UIRender.tsx:76` — drift on every release; should come from `package.json` at build time. | §9.9-H6 |
 
+**Checkpoint updates (2026-08-05):**
+
+- Finding 6: partially resolved — the Final Form wrapper now keeps one subscription per active form and unsubscribes on replacement or unmount; the remaining runtime hazards stay open.
+- Finding 9: resolved by including both imported `input-integer_{meta,data}.json` fixtures in tracked source; the registry contract covers all 37 registered examples.
+- Finding 10: partially resolved — the root Babel test/build target split landed; folding the demo's duplicated inline presets into the shared config remains open.
+- Finding 13: partially resolved — `lint:js` exists and exits with 0 errors / 22 warnings, and CI wiring exists; audit ownership and the 13-package devDependency sweep remain open.
+- Current automated checkpoint: 137 suites / 1904 tests; configured coverage thresholds pass.
+
 ---
 
 ## 3. Upgrade strategy
@@ -161,13 +170,13 @@ Widen, never replace:
 - The `16.14` floor is kept intentionally: it costs nothing (the code uses only cross-compatible APIs) and lets host applications migrate on their own schedule.
 - `16.14` is also exactly the version where `react/jsx-runtime` was backported, which later allows enabling the automatic JSX transform (§9.8) without dropping React 16 support.
 - `moment` widens from `~2.29.4` to `^2.29.4`: moment 2.30.1 is the final upstream release and what fresh host installs resolve to — the tilde range makes npm ≥7 host installs fail with `ERESOLVE` against this library.
-- Dev dependencies (`react`, `react-dom` in `devDependencies`) track the *highest* supported version — the library is developed and primarily tested against 18, with a compatibility smoke for 16/17 (§9.5).
+- Dev dependencies (`react`, `react-dom` in `devDependencies`) track the highest supported checkpoint: React 17 now, then React 18 in Phase 2, with compatibility smoke coverage for retained lower peer versions (§9.5).
 
 ### 3.3 Consumer impact
 
 - **UMD / externals consumers**: React comes from the host — no bundle change at all. The upgrade only widens what hosts are allowed to provide.
-- **npm consumers**: `npm install` peer resolution starts accepting React 17/18 hosts. No breaking change for React 16.14 hosts.
-- **Docs debt**: install instructions currently hardcode `react@^16.14.0` and `moment@~2.29.4` — `src/demo/markdowns/docs.md:16–17,37,41` and `README.md:18,23,30` (plus a prose peer-deps note at `changelog.md:50`). Each phase must update them.
+- **npm consumers**: Phase 1 peer resolution accepts React 17 hosts; the Phase 2 target adds React 18. No breaking change for React 16.14 hosts.
+- **Install docs**: Phase 1 now recommends React 17 while documenting continued React 16.14 support; Phase 2 must update the recommended install commands again for React 18.
 - **Hybrid dependency model (§2.6-11):** npm hosts currently install `dependencies` (SUIR, the form stack, rc-picker, …) that are *also* bundled into the UMD — dead weight in host `node_modules` and an extra peer-resolution surface. Resolving this (trim `dependencies`, externalize more, or peerize) is an owners' decision — see the gates in §10.
 - **`engines.node >= 22` ships to consumers** in the published manifest — on `engine-strict` hosts this fails installs even though Node is only a *build* requirement for this browser library. Decision gate in §10.
 
@@ -179,15 +188,21 @@ Widen, never replace:
 
 | # | Action | Detail |
 |---|---|---|
-| 0.1 | Record the green baseline | `npm test` (all 76 suites), `npm run build-lib`, `npm run build`; capture suite counts and bundle sizes for later comparison. |
+| 0.1 | Record the green baseline | The original 76-suite baseline is recorded; the current checkpoint runs 137 suites plus both builds, with counts and coverage retained for later comparison. |
 | 0.2 | Close test gaps around `rules.js` critical flows | Priority order: initial data processing / normalization (`utils.js` error mapping), `showIf` evaluation, validation + error propagation into fields, actions (`submit` payload assembly, `addData` / `removeData`, upload/download), re-render on `data` prop change. These are exactly the paths sensitive to React 18 batching. |
 | 0.3 | Example smoke harness | A Jest suite that mounts **every** meta/data pair from `src/demo/examples/` and asserts render without throwing. This doubles as the seed for contract tests (§9.5). |
-| 0.4 | CI on every PR | lint (`eslint` + `lint:css`) + `npm test` + `npm run build-lib`. Any CI provider; keep steps identical to local scripts. |
-| 0.5 | Babel targets env-split | `babel.config.js` applies `targets: { node: 'current' }` to the **library and watch** builds (the demo carries its own inline presets and already honors browserslist; Jest is env-split — §2.6-10). Split the root config (test → `node: current`; build → browserslist) and fold the demo's duplicated inline presets into it, so the Phase 1/2 checkpoint releases ship correct syntax and the 0.1 size baselines stay valid (§9.8; closes R6). |
+| 0.4 | CI on every PR | Run JS/CSS lint, coverage, `build-lib` and the demo build with steps identical to the local scripts. The workflow is added; its first hosted run is pending. |
+| 0.5 | Babel targets env-split | The root config now splits test (`node: current`) from build (browserslist) targets. The demo already honors browserslist through duplicated inline presets; folding those presets into the shared config remains open (§2.6-10, §9.8; closes R6). |
 | 0.6 | Public API & types baseline | Replace the legacy `window._mountUIRender` shim in `src/library/types/` with a minimal d.ts of the component actually shipped (§2.6-1): `data`/`meta` required as at runtime, `translate`/`onSubmit` optional, export shape matching the UMD `export: 'default'` (restoring the named export is a §10 decision gate). Add a TS consumer smoke that compiles `import UIRender from 'eis-ui-render'` against `@types/react` 16, 17 and 18 (+19 at the flip). **This corrected file becomes the golden baseline for §9.6-E4** — never snapshot the legacy shim. Closes R15 (types half). |
 | 0.7 | Packaging gate | Add `prepack` (build-lib incl. `gen-ts`) so a publish can never ship a stale `dist/`; deduplicate `dist/static` vs root `static/`; decide source-map shipping (§10 gate). Today: 579 files / 11.6 MB unpacked, `all.css` twice, ~1 MB of maps, a 0-byte `semantic.css` (§2.6-8). Record budgets (unpacked size, file count, JS/CSS sizes) enforced via `npm pack --dry-run` in CI; add a clean-checkout smoke (`git clean -xdf && npm ci && npm test && build-lib + demo build`) and a packed-tarball consumer smoke (`require('eis-ui-render')` from the tarball). Closes R15 (packaging half). |
-| 0.8 | Repo completeness | Everything imported by tracked code must be tracked: `Examples.jsx:24–25` currently imports two untracked example JSONs (§2.6-9) — commit or drop them; the 0.7 clean-checkout job makes this class of drift fail fast from then on. |
-| 0.9 | Lint & security baseline | Add a `lint` script (none exists) and fix or triage the current 11 ESLint errors; wire `lint` + `lint:css` into CI. Record audit baselines: `npm audit --omit=dev` = 0 (keep at 0); full audit = 20 dev-tooling vulns incl. 2 critical — burn down or explicitly accept each (§9.9-H9 owns the cadence). Remove the 13 zero-reference devDependencies (§2.6-13). |
+| 0.8 | Repo completeness | Everything imported by tracked code must be tracked. The two `input-integer` fixtures imported by `Examples.jsx:24–25` are included in the current checkpoint; the 0.7 clean-checkout job must make future drift fail fast. |
+| 0.9 | Lint & security baseline | `lint:js` now exits with 0 errors / 22 warnings and runs with `lint:css` in CI. Triage the warnings, record audit ownership (`npm audit --omit=dev` baseline 0; full audit baseline 20), and remove the 13 zero-reference devDependencies (§2.6-13, §9.9-H9). |
+
+**Implementation status (2026-08-05):**
+
+- Completed: automated baseline and critical-flow contracts (0.1–0.3); repo completeness for the imported input-integer fixtures (0.8).
+- Partial: CI workflow added, first hosted run pending (0.4); root Babel split landed but demo preset consolidation remains open (0.5); JS lint script and CI wiring are green, while audit ownership and the devDependency sweep remain open (0.9).
+- Open: truthful public types and consumer compile matrix (0.6); `prepack`, pack budgets, clean-checkout/tarball smokes, asset deduplication and source-map decision (0.7).
 
 **Exit criteria:** CI green on the current React 16 baseline **from a clean checkout**; `rules.js` critical flows covered; example smoke harness in place; Babel build targets honor browserslist; published types describe the real component and compile against `@types/react` 16/17/18; `prepack` + pack budgets enforced; `lint` script green; audit baselines recorded.
 
@@ -207,6 +222,8 @@ Widen, never replace:
 4. Update install docs; changelog entry; ship as a checkpoint release.
 
 `@testing-library/react` 12 stays (its `react <18` peer admits 17). `ReactDOM.render` in the demo stays (fully supported in 17).
+
+**Automated checkpoint (2026-08-05):** React/React DOM 17.0.2, additive React 16.14/17 peer ranges and Moment `^2.29.4` are in the current change. 137 suites / 1904 tests, coverage thresholds, JS/CSS lint and both builds are green locally. Manual QA, react-refresh, yalc smoke, overlay-ordering QA and the release decision remain open.
 
 ### React 17 behavioral changes, mapped to this codebase
 
@@ -764,11 +781,12 @@ rg -n '"prop-types"' package.json
 # Peer sanity of resolved deps
 node -e "const l=require('./package-lock.json');for(const k of ['node_modules/semantic-ui-react','node_modules/react-final-form','node_modules/rc-picker','node_modules/@testing-library/react'])console.log(k,JSON.stringify(l.packages[k].peerDependencies))"
 
-# Regression contour
-npm test && npm run build-lib && npm run build
-
-# Lint (no script yet — Phase 0.9 adds one)
-npx eslint 'src/**/*.{js,jsx}'
+# Local CI contour
+npm run lint:js
+npm run lint:css
+npm run test:coverage
+npm run build-lib
+npm run build
 
 # Packaging reality check (§2.6-8 — budgets, duplication, source maps)
 npm pack --dry-run
@@ -799,18 +817,21 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 
 ### Phase 0 — before any dependency bump
 
-- ☐ Green baseline recorded: `npm test`, `npm run build-lib`, `npm run build`, all demo examples render with a clean console
-- ☐ `rules.js` critical-flow tests exist: initial data processing, `showIf`, validation/error mapping, `submit` payload, `addData`/`removeData`, upload/download
-- ☐ Example smoke harness mounts every `src/demo/examples/` meta+data pair
-- ☐ CI runs lint + `lint:css` + test + `build-lib` on every PR
-- ☐ Babel targets env-split landed (test → `node: current`; build → browserslist; demo inline presets folded in) — closes R6
+- ✅ Green automated baseline recorded: 137 suites / 1904 tests, configured coverage thresholds, JS/CSS lint, library build and demo build
+- ✅ `rules.js` critical-flow tests exist: initial data processing, `showIf`, validation/error mapping, `submit` payload, `addData`/`removeData`, upload/download
+- ✅ Example smoke harness mounts all 37 registered `src/demo/examples/` meta+data pairs and rejects renderer failures or unexpected console errors
+- ☐ CI runs JS/CSS lint, coverage, `build-lib` and demo build on every PR — workflow added; first hosted run pending
+- ☐ Babel targets env-split landed — root test/build split is complete; demo inline presets still need to be folded into the shared config
 - ☐ 0.6: published types describe the shipped component; consumer d.ts compile matrix green vs `@types/react` 16/17/18; named-export gate decided
 - ☐ 0.7: `prepack` in place; pack budgets enforced in CI; clean-checkout job green; packed-tarball consumer smoke green; `dist/static` vs `static` duplication resolved; source-map gate decided
-- ☐ 0.8: no untracked files imported by tracked code (current offender: `Examples.jsx:24–25`)
-- ☐ 0.9: `lint` script green (11 errors fixed or triaged); audit baselines recorded (prod 0 / dev 20 burn-down owner assigned); 13-package devDep sweep merged
+- ✅ 0.8: both `input-integer_{meta,data}.json` fixtures imported by `Examples.jsx` are tracked
+- ☐ 0.9: `lint:js` exits with 0 errors / 22 warnings and is wired into CI; warning triage, audit ownership and the 13-package devDependency sweep remain open
 
 ### Phase 1 — React 17
 
+- ✅ Dev runtime updated to React/React DOM 17.0.2; additive React 16.14/17 peer ranges and Moment `^2.29.4` recorded in the lockfile
+- ✅ Automated checkpoint green: 137 suites / 1904 tests; global coverage 94.12% statements / 88.70% branches / 92.69% functions / 94.71% lines; JavaScript/CSS lint, library build and demo build
+- ✅ Install docs and unreleased changelog updated for React 17
 - ☐ Manual QA checklist (§5) clean on 17 — popups, dropdowns, pickers, tabs, tables, forms, upload
 - ☐ react-refresh dev loop works on 17
 - ☐ yalc smoke into a consuming app (if one is available)
@@ -887,4 +908,3 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 - ☐ Alias grep stays zero
 - ☐ After the F2 seam: only the `dateAdapter` module imports `moment`
 - ☐ React 16/17 compatibility mount-smoke stays in the CI matrix while the peer floor includes them
-

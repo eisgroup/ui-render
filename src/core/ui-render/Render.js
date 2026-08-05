@@ -57,11 +57,6 @@ class RenderClass extends Component {
         error: false,
     }
 
-    componentDidMount () {
-        if (!Render.Component) throw new Error(`Please setup Render.Component mapper first`)
-        if (!Render.Method) throw new Error(`Please setup Render.Method mapper first`)
-    }
-
     componentDidCatch (error, errorInfo) {
         this.setState({error}, () => Render.onError({error, errorInfo, props: this.props}))
     }
@@ -72,6 +67,8 @@ class RenderClass extends Component {
      */
     render () {
         if (this.state.error) return String(this.state.error)
+        if (!Render.Component) throw new Error(`Please setup Render.Component mapper first`)
+        if (!Render.Method) throw new Error(`Please setup Render.Method mapper first`)
 
         // Wrap component with Tooltip automatically
         if (this.props.tooltip != null) {

@@ -39,30 +39,46 @@ const InputDate = ({
     translate = Active.translate,
     onChange,
     onSelect,
+    value: valueFromParent,
+    defaultValue,
     ...props
 }) => {
     const config = useContext(ConfigContext)
 
-    const dateFormat = useMemo(() => config.dateFormat || 'DD/MM/YYYY', [config])
+    const dateFormat = useMemo(() => (config && config.dateFormat) || 'DD/MM/YYYY', [config])
 
     if (autofocus) props.autoFocus = autofocus // React fix
     if (readonly) {
         props.className = 'readonly'
         props.readOnly = readonly
+        props.inputReadOnly = readonly
     }
 
     if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
     if (!label && title) props.title = translate(title)
 
-    const value = props.value ?
-        moment(props.value) :
-        props.defaultValue ?
-            moment(props.defaultValue) : null
+    const toMoment = (date) => {
+        if (date == null || date === '') return null
+
+        const parsed = moment.isMoment(date)
+            ? date
+            : typeof date === 'string'
+                ? moment(date, [dateFormat, 'YYYY-MM-DD', moment.ISO_8601], true)
+                : moment(date)
+
+        return parsed.isValid() ? parsed : null
+    }
+
+    const sourceValue = valueFromParent !== undefined ? valueFromParent : defaultValue
+    const value = toMoment(sourceValue)
 
     const idHelp = useMemo(() => id + '-help', [id])
 
     const onDateChanged = (date) => {
-        onChange && onChange(moment(date, dateFormat).format('YYYY-MM-DD'))
+        if (!onChange) return
+
+        const changedDate = toMoment(date)
+        onChange(changedDate ? changedDate.format('YYYY-MM-DD') : null)
     }
 
     return (
@@ -94,6 +110,8 @@ const InputDate = ({
                     format={[dateFormat, 'YYYY-MM-DD']}
                     onChange={onDateChanged}
                     onCalendarChange={onSelect}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                 />
             </Row>
             {(error || info) &&

@@ -5,6 +5,21 @@ function isObjectLike(value) {
 	return value != null && typeof value === 'object'
 }
 
+function isObject(value) {
+	return value != null && (typeof value === 'object' || typeof value === 'function')
+}
+
+function sameValueZero(a, b) {
+	return a === b || (Number.isNaN(a) && Number.isNaN(b))
+}
+
+function enumerableKeys(value) {
+	return Object.keys(value).concat(
+		Object.getOwnPropertySymbols(value)
+			.filter((key) => Object.prototype.propertyIsEnumerable.call(value, key))
+	)
+}
+
 function isPlainObject(value) {
 	if (!isObjectLike(value)) return false
 	const proto = Object.getPrototypeOf(value)
@@ -47,6 +62,17 @@ function get(object, path, defaultValue) {
 	return cur === undefined ? defaultValue : cur
 }
 
+function hasPath(object, path) {
+	const parts = toPath(path)
+	if (parts.length === 0) return false
+	let cur = object
+	for (const key of parts) {
+		if (cur == null || !(key in Object(cur))) return false
+		cur = cur[key]
+	}
+	return true
+}
+
 function setWith(object, path, value, customizer) {
 	if (object == null) return object
 	const parts = toPath(path)
@@ -55,13 +81,14 @@ function setWith(object, path, value, customizer) {
 	let cur = object
 	for (let i = 0; i < parts.length; i++) {
 		const key = parts[i]
+		if (key === '__proto__' || key === 'constructor' || key === 'prototype') return object
 		if (i === parts.length - 1) {
 			cur[key] = value
 			return object
 		}
 
 		let next = cur[key]
-		if (next == null) {
+		if (!isObject(next)) {
 			const nextKey = parts[i + 1]
 			const created = typeof customizer === 'function'
 				? customizer(next, key, cur)
@@ -115,7 +142,7 @@ function cloneDeep(value, seen = new Map()) {
 	if (isPlainObject(value)) {
 		const out = {}
 		seen.set(value, out)
-		for (const k of Object.keys(value)) out[k] = cloneDeep(value[k], seen)
+		for (const k of enumerableKeys(value)) out[k] = cloneDeep(value[k], seen)
 		return out
 	}
 	// For class instances and other objects, keep reference as-is.
@@ -137,24 +164,52 @@ function isEqual(a, b, seen = new Map()) {
 		for (let i = 0; i < a.length; i++) if (!isEqual(a[i], b[i], seen)) return false
 		return true
 	}
-	if (a instanceof Date) return a.getTime() === b.getTime()
+	if (a instanceof Date) return sameValueZero(a.getTime(), b.getTime())
 	if (a instanceof RegExp) return a.source === b.source && a.flags === b.flags
+	if (a instanceof Number || a instanceof String || a instanceof Boolean) {
+		return sameValueZero(a.valueOf(), b.valueOf())
+	}
+	if (a instanceof Error) return a.name === b.name && a.message === b.message
 	if (a instanceof Map) {
 		if (a.size !== b.size) return false
-		for (const [k, v] of a.entries()) {
-			if (!b.has(k)) return false
-			if (!isEqual(v, b.get(k), seen)) return false
+		const remaining = [...b.entries()]
+		for (const [aKey, aValue] of a.entries()) {
+			let match = -1
+			for (let i = 0; i < remaining.length; i++) {
+				const trial = new Map(seen)
+				const [bKey, bValue] = remaining[i]
+				if (isEqual(aKey, bKey, trial) && isEqual(aValue, bValue, trial)) {
+					for (const [key, value] of trial) seen.set(key, value)
+					match = i
+					break
+				}
+			}
+			if (match === -1) return false
+			remaining.splice(match, 1)
 		}
 		return true
 	}
 	if (a instanceof Set) {
 		if (a.size !== b.size) return false
-		for (const v of a.values()) if (!b.has(v)) return false
+		const remaining = [...b.values()]
+		for (const aValue of a.values()) {
+			let match = -1
+			for (let i = 0; i < remaining.length; i++) {
+				const trial = new Map(seen)
+				if (isEqual(aValue, remaining[i], trial)) {
+					for (const [key, value] of trial) seen.set(key, value)
+					match = i
+					break
+				}
+			}
+			if (match === -1) return false
+			remaining.splice(match, 1)
+		}
 		return true
 	}
 	if (isPlainObject(a)) {
-		const aKeys = Object.keys(a)
-		const bKeys = Object.keys(b)
+		const aKeys = enumerableKeys(a)
+		const bKeys = enumerableKeys(b)
 		if (aKeys.length !== bKeys.length) return false
 		for (const k of aKeys) {
 			if (!Object.prototype.hasOwnProperty.call(b, k)) return false
@@ -170,18 +225,54 @@ function property(path) {
 }
 
 function matches(source) {
-	return (object) => isMatch(object, source)
+	const snapshot = cloneDeep(source)
+	return (object) => isMatch(object, snapshot)
+}
+
+function matchesProperty(path, sourceValue) {
+	const snapshot = cloneDeep(sourceValue)
+	return (object) => {
+		const value = get(object, path)
+		if (value === undefined && snapshot === undefined && !hasPath(object, path)) return false
+		return isObjectLike(snapshot) ? isMatch(value, snapshot) : isEqual(value, snapshot)
+	}
+}
+
+function toIteratee(value) {
+	if (typeof value === 'function') return value
+	if (value == null) return (item) => item
+	if (Array.isArray(value)) return matchesProperty(value[0], value[1])
+	if (isObjectLike(value)) return matches(value)
+	return property(value)
 }
 
 function isMatch(object, source) {
-	if (object === source) return true
-	if (!isObjectLike(object) || !isObjectLike(source)) return object === source
-	for (const key of Object.keys(source)) {
+	if (sameValueZero(object, source)) return true
+	if (Array.isArray(source)) {
+		if (!Array.isArray(object) || source.length > object.length) return false
+		const used = new Set()
+		for (const sourceValue of source) {
+			let match = -1
+			for (let i = 0; i < object.length; i++) {
+				if (!used.has(i) && isMatch(object[i], sourceValue)) {
+					match = i
+					break
+				}
+			}
+			if (match === -1) return false
+			used.add(match)
+		}
+		return true
+	}
+	if (!isObject(source) || !isObject(object)) return false
+	if (!isPlainObject(source)) return isEqual(object, source)
+	for (const key of enumerableKeys(source)) {
+		if (!(key in Object(object))) return false
 		const sv = source[key]
 		const ov = object[key]
 		if (isObjectLike(sv)) {
 			if (!isMatch(ov, sv)) return false
-		} else if (ov !== sv) {
+		} else if (!sameValueZero(ov, sv)) {
 			return false
 		}
 	}
@@ -190,10 +281,15 @@ function isMatch(object, source) {
 
 function some(collection, predicate) {
 	if (collection == null) return false
-	const pred = typeof predicate === 'function' ? predicate : matches(predicate)
-	if (Array.isArray(collection)) return collection.some((v) => pred(v))
+	const pred = toIteratee(predicate)
+	if (Array.isArray(collection)) {
+		for (let i = 0; i < collection.length; i++) {
+			if (pred(collection[i], i, collection)) return true
+		}
+		return false
+	}
 	for (const key in collection) {
-		if (Object.prototype.hasOwnProperty.call(collection, key) && pred(collection[key])) return true
+		if (Object.prototype.hasOwnProperty.call(collection, key) && pred(collection[key], key, collection)) return true
 	}
 	return false
 }
@@ -210,29 +306,45 @@ function flatten(array) {
 
 function min(array) {
 	if (!Array.isArray(array) || array.length === 0) return undefined
-	let m = array[0]
-	for (let i = 1; i < array.length; i++) if (array[i] < m) m = array[i]
+	let m
+	for (const value of array) {
+		if (value == null || Number.isNaN(value) || typeof value === 'symbol') continue
+		if (m === undefined || value < m) m = value
+	}
 	return m
 }
 
 function max(array) {
 	if (!Array.isArray(array) || array.length === 0) return undefined
-	let m = array[0]
-	for (let i = 1; i < array.length; i++) if (array[i] > m) m = array[i]
+	let m
+	for (const value of array) {
+		if (value == null || Number.isNaN(value) || typeof value === 'symbol') continue
+		if (m === undefined || value > m) m = value
+	}
 	return m
 }
 
 function difference(array, values) {
 	if (!Array.isArray(array)) return []
 	const remove = new Set(Array.isArray(values) ? values : [])
-	return array.filter((v) => !remove.has(v))
+	const out = []
+	for (const value of array) if (!remove.has(value)) out.push(value)
+	return out
 }
 
 function intersection(...arrays) {
-	const [first, ...rest] = arrays.filter(Array.isArray)
-	if (!first) return []
+	if (arrays.length === 0 || arrays.some((array) => !Array.isArray(array))) return []
+	const [first, ...rest] = arrays
 	const restSets = rest.map((a) => new Set(a))
-	return first.filter((v) => restSets.every((s) => s.has(v)))
+	const out = []
+	const seen = new Set()
+	for (const value of first) {
+		if (!seen.has(value) && restSets.every((set) => set.has(value))) {
+			seen.add(value)
+			out.push(value)
+		}
+	}
+	return out
 }
 
 function union(...arrays) {
@@ -252,6 +364,7 @@ function union(...arrays) {
 
 function uniqWith(array, comparator) {
 	if (!Array.isArray(array)) return []
+	if (typeof comparator !== 'function') return union(array)
 	const out = []
 	for (const v of array) {
 		if (!out.some((o) => comparator(o, v))) out.push(v)
@@ -260,8 +373,10 @@ function uniqWith(array, comparator) {
 }
 
 function unionWith(...args) {
-	const comparator = args[args.length - 1]
-	const arrays = args.slice(0, -1)
+	const lastArg = args[args.length - 1]
+	const comparator = typeof lastArg === 'function' ? lastArg : null
+	const arrays = comparator ? args.slice(0, -1) : args
+	if (!comparator) return union(...arrays)
 	const out = []
 	for (const arr of arrays) {
 		if (!Array.isArray(arr)) continue
@@ -272,11 +387,13 @@ function unionWith(...args) {
 	return out
 }
 
-function unionBy(array, other, iteratee) {
-	const it = typeof iteratee === 'function' ? iteratee : (v) => (v == null ? v : v[iteratee])
+function unionBy(...args) {
+	const lastArg = args[args.length - 1]
+	const iteratee = Array.isArray(lastArg) ? undefined : args.pop()
+	const it = toIteratee(iteratee)
 	const out = []
 	const seen = new Set()
-	for (const arr of [array, other]) {
+	for (const arr of args) {
 		if (!Array.isArray(arr)) continue
 		for (const v of arr) {
 			const key = it(v)
@@ -290,6 +407,7 @@ function unionBy(array, other, iteratee) {
 }
 
 function mergeWith(target, ...rest) {
+	target = target == null ? {} : Object(target)
 	const customizer = rest[rest.length - 1]
 	const sources = typeof customizer === 'function' ? rest.slice(0, -1) : rest
 	const cz = typeof customizer === 'function' ? customizer : null
@@ -305,8 +423,9 @@ function merge(target, ...sources) {
 
 function _mergeInto(dst, src, customizer) {
 	if (!isObjectLike(src)) return
-	// Iterate own indices/keys including sparse arrays via Object.keys (lodash merge skips holes).
-	for (const key of Object.keys(src)) {
+	// Lodash merge includes inherited enumerable string keys and skips sparse-array holes.
+	for (const key in src) {
+		if (key === '__proto__') continue
 		const srcVal = src[key]
 		// lodash merge/mergeWith skips `undefined` source values
 		if (srcVal === undefined) continue
@@ -416,4 +535,3 @@ function capitalize(string) {
 	if (!string) return ''
 	return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
 }
-

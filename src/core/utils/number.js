@@ -51,6 +51,7 @@ export function isNumeric(val) {
  * @returns {{start: Number|Undefined, end: Number|Undefined}}
  */
 export function startEndFromNumberRanges(arrayOfNumberRanges) {
+	if (!hasListValue(arrayOfNumberRanges)) return { start: undefined, end: undefined }
 	const start = (arrayOfNumberRanges.find(({ from }) => from != null) || {}).from
 	let end = ([...arrayOfNumberRanges].reverse().find(({ to }) => to != null) || {}).to
 	if (end <= start) end = undefined
@@ -78,6 +79,7 @@ export function formatNumber(
 
 	/* Set Decimals */
 	let result = decimals != null ? number.toFixed(decimals) : String(number) // toFixed is slow, but can force decimal
+	if (Number(result) === 0) result = result.replace('-', '')
 
 	/* Replace Delimiter */
 	if (decimalDelimiter) result = result.replace('.', decimalDelimiter)
@@ -93,8 +95,7 @@ export function formatNumber(
 	}
 
 	/* Final Output */
-	if (Number(result) === 0) result = result.replace('-', '')
-	return ordinal ? toOrdinal(result) : result
+	return ordinal ? result + getOrdinalSuffix(number) : result
 }
 
 /**
@@ -109,6 +110,7 @@ export function formatNumber(
  */
 export function shortNumber (value, digits = 3, divider = 1000, delimiter, suffixes) {
 	let number = Number(value)
+	if (!Number.isFinite(number)) return String(number)
 	if (number === 0) return '0'
 
 	/* Suffix Required */
@@ -132,6 +134,7 @@ export function shortNumber (value, digits = 3, divider = 1000, delimiter, suffi
  * @return {string} number - with unit suffix if needed
  */
 export function formatSI (number, precision = 3, divider = 1000, delimiter = '', suffixes = formatSI.PREFIXES) {
+	if (!Number.isFinite(Number(number))) return String(number)
 	if (number === 0) return '0'
 
 	let result = Math.abs(number) // significand
@@ -182,11 +185,15 @@ formatSI.PREFIXES = {
  * @return {string} - ordered number (i.e. 1st, 2nd, 3rd, 4th...)
  */
 export function toOrdinal(number) {
-	const v = number % 100
-	return number + (toOrdinal.list[(v - 20) % 10] || toOrdinal.list[v] || toOrdinal.list[0])
+	return number + getOrdinalSuffix(number)
 }
 
 toOrdinal.list = ['th', 'st', 'nd', 'rd']
+
+function getOrdinalSuffix(number) {
+	const v = Math.abs(number) % 100
+	return toOrdinal.list[(v - 20) % 10] || toOrdinal.list[v] || toOrdinal.list[0]
+}
 
 /**
  * Compute Radian Value from given Degree
@@ -324,7 +331,10 @@ export function decimalPlaces (value) {
  * @returns {Number} - the biggest divisible number between `a` and `b`
  */
 export function greatestCommonDivisor(a, b) {
-	return b ? greatestCommonDivisor(b, a % b) : Math.abs(Number(a) || Infinity)
+	const first = Number(a)
+	const second = Number(b)
+	if (!Number.isFinite(first) || !Number.isFinite(second)) return Infinity
+	return second ? greatestCommonDivisor(second, first % second) : Math.abs(first || Infinity)
 }
 
 /**
@@ -351,8 +361,10 @@ export function randomNumberInRange(min, max) {
  */
 export function toPercentage(newNumber, baseNumber) {
 	if (!isNumeric(newNumber) || !isNumeric(baseNumber)) return NaN
-	if (baseNumber === 0) return newNumber === 0 ? 0 : newNumber > 0 ? Infinity : -Infinity
-	return ((newNumber - baseNumber) / baseNumber) * 100
+	const newValue = Number(newNumber)
+	const baseValue = Number(baseNumber)
+	if (baseValue === 0) return newValue === 0 ? 0 : newValue > 0 ? Infinity : -Infinity
+	return ((newValue - baseValue) / baseValue) * 100
 }
 
 /**

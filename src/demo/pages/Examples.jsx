@@ -68,7 +68,7 @@ import {
   uploadHistoricalFile
 } from '../api/gdn-rating-alg'
 
-const examples = [
+export const examples = [
   // Dropdown
   {
     title: 'Dropdown',

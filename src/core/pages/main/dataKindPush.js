@@ -73,14 +73,19 @@ export function validateNotWithinRangeDraftRow (draft, peerRows, startKey, endKe
     }
     if (!_a || !_b) return null
 
-    const ranges = (peerRows || [])
+    const ranges = (Array.isArray(peerRows) ? peerRows : [])
         .filter((r) => r != null && typeof r === 'object')
         .map((r) => [r[startKey], r[endKey]])
         .filter(([a, b]) => a != null && b != null && a !== '' && b !== '')
 
     for (const [a, b] of ranges) {
+        let peerStart = String(a)
+        let peerEnd = String(b)
+        if (peerStart > peerEnd) {
+            [peerStart, peerEnd] = [peerEnd, peerStart]
+        }
         // Inclusive interval overlap on YYYY-MM-DD strings
-        if (!(String(b) < String(_a) || String(_b) < String(a))) {
+        if (!(peerEnd < String(_a) || String(_b) < peerStart)) {
             err[startKey] = 'Periods cannot overlap'
             err[endKey] = 'Periods cannot overlap'
             return err
@@ -144,17 +149,27 @@ export function pushDataKindRow ({ parentUIRender, meta, kind, rowObject, fallba
         : (fallbackDataKindPath || '')
     const dataKindPath = basePath ? `${basePath}.dataKind` : 'dataKind'
     const arrayPath = `${dataKindPath}.${kind}`
-    const parentForm = parentUIRender.props.instance.form
-    if (!parentForm || !parentForm.mutators || typeof parentForm.mutators.push !== 'function') {
-        console.warn('pushDataKindRow: parent form or mutators.push is not available')
+    const parentForm = parentUIRender && parentUIRender.props && parentUIRender.props.instance && parentUIRender.props.instance.form
+    if (
+        !parentUIRender || typeof parentUIRender.setState !== 'function' ||
+        !parentForm || typeof parentForm.getState !== 'function' || typeof parentForm.reset !== 'function' ||
+        !parentForm.mutators || typeof parentForm.mutators.push !== 'function'
+    ) {
+        console.warn('pushDataKindRow: parent UI/form API or mutators.push is not available')
+        return false
+    }
+    const initialFormState = parentForm.getState()
+    const initialFormValues = initialFormState && initialFormState.values
+    if (initialFormValues == null || typeof initialFormValues !== 'object' || Array.isArray(initialFormValues)) {
+        console.warn('pushDataKindRow: form state values are not an object')
         return false
     }
     // Ensure the FieldArray path exists: lodash set creates intermediate objects (e.g. row.dataKind when
     // the parent row only had title/budget). No need to predeclare empty `lineItems` in JSON or add `dataKind: {}` on push.
-    if (get(parentForm.getState().values, arrayPath) === undefined) {
-        const values = cloneDeep(parentForm.getState().values)
+    if (get(initialFormValues, arrayPath) === undefined) {
+        const values = cloneDeep(initialFormValues)
         set(values, arrayPath, [])
-        parentForm.reset(values)
+        parentForm.reset(cloneDeep(values))
         parentUIRender.setState((prev) => ({
             data: {
                 ...prev.data,
@@ -177,7 +192,9 @@ export function pushDataKindRow ({ parentUIRender, meta, kind, rowObject, fallba
             },
         }),
         () => {
-            parentForm.reset(nextJson)
+            // Keep the form snapshot isolated from component state: final-form implementations may retain
+            // the object passed to reset and later mutate its nested values.
+            parentForm.reset(cloneDeep(nextJson))
         }
     )
     return true

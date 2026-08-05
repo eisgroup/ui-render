@@ -101,7 +101,7 @@ export function Dropdown ({
   )
   const [value, setValue] = useState(defaultValue.current)
   const isInitialMount = useRef(true)
-  let tempValue
+  const tempValue = useRef()
 
   useEffect(() => {
     !isEqual(options, opts) && setOptions(opts)
@@ -114,7 +114,7 @@ export function Dropdown ({
       isInitialMount.current = false
       if (typeof valueFromParent === 'undefined') return
     }
-    setValue(valueFromParent || null)
+    setValue(valueFromParent == null || valueFromParent === '' ? null : valueFromParent)
   }, [valueFromParent])
 
   // Reset value when options change and current value is no longer valid (e.g., cascading Select)
@@ -182,13 +182,13 @@ export function Dropdown ({
       // Keep the last entered value for new additions.
       // @Note: the list of values can be a mix of primitive Number and String
       // Store value temporarily for onSelect event.
-      tempValue = (props.multiple && !isObject(last(value))) ? toUniqueListCaseInsensitive(value.reverse()).reverse() : value
-      setValue(value)
-      onChange && onChange(tempValue, props.name, event)
+      tempValue.current = (props.multiple && !isObject(last(value))) ? toUniqueListCaseInsensitive(value.reverse()).reverse() : value
+      setValue(tempValue.current)
+      onChange && onChange(tempValue.current, props.name, event)
     }
   }
 
-  if (onSelect) props.onClose = (event) => onSelect(tempValue, props.name, event)
+  if (onSelect) props.onClose = (event) => onSelect(tempValue.current, props.name, event)
   if (onSearch) props.onSearchChange = (event, data) => onSearch(data.searchQuery, props.name, event)
 
   // Sanitize options from duplicates on addition
@@ -214,9 +214,10 @@ export function Dropdown ({
   }
 
   // Sanitize Value (for Colors)
-  if (props.value && props.value.constructor === Array && props.value.length) {
-    if (!props.multiple) props.value = props.value.join(',')
-    if (props.multiple && props.value[0].constructor === Array) props.value = props.value.map(v => v.join(','))
+  let dropdownValue = value
+  if (Array.isArray(dropdownValue) && dropdownValue.length) {
+    if (!props.multiple) dropdownValue = dropdownValue.join(',')
+    if (props.multiple && Array.isArray(dropdownValue[0])) dropdownValue = dropdownValue.map(v => v.join(','))
   }
 
   /// Error handling
@@ -234,8 +235,8 @@ export function Dropdown ({
         placeholder={translate(placeholder)}
         error={!!error}
         lazyLoad={lazyLoad}
-        noResultsMessage={(hasListValue(props.value) && props.value.length === options.length) ? _.NO_OPTIONS_LEFT : _.NOTHING_FOUND}
-        value={value}
+        noResultsMessage={(hasListValue(dropdownValue) && dropdownValue.length === options.length) ? _.NO_OPTIONS_LEFT : _.NOTHING_FOUND}
+        value={dropdownValue}
         {...props}
       />
       {label && float && <Text className="input__label">{translate(label)}</Text>}

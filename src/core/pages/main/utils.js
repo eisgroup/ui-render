@@ -238,10 +238,22 @@ export const changeOptionOrderForSelectFields = (data, meta) => {
   // find data related to Select and change options order
   const recursiveDataParser = (data, optionName, selectValue) => {
     let isDataOrderChanged = false
+    const optionIndex = Number(selectValue)
+    if (String(selectValue).trim() === '' || !Number.isSafeInteger(optionIndex) || optionIndex < 0) {
+      return isDataOrderChanged
+    }
     if (isObject(data)) {
       Object.keys(data).forEach(key => {
-        if (Array.isArray(data[key]) && data[key][0] && data[key][0][optionName]) {
-          data[key].unshift(data[key].splice(selectValue, 1)[0]);
+        const options = data[key]
+        if (
+          Array.isArray(options) &&
+          options[0] &&
+          Object.prototype.hasOwnProperty.call(options[0], optionName) &&
+          optionIndex < options.length &&
+          optionIndex in options &&
+          options[optionIndex] != null
+        ) {
+          options.unshift(options.splice(optionIndex, 1)[0]);
           isDataOrderChanged = true
         }
       })
