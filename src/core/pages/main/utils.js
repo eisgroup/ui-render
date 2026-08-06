@@ -248,7 +248,10 @@ export const changeOptionOrderForSelectFields = (data, meta) => {
         if (
           Array.isArray(options) &&
           options[0] &&
-          Object.prototype.hasOwnProperty.call(options[0], optionName) &&
+          // @Note: truthiness, not `hasOwnProperty`. This heuristic guesses which array is the
+          // Select's option list; keying off mere key presence also matches unrelated arrays whose
+          // first element carries the key with a falsy value, and reorders them in the payload.
+          options[0][optionName] &&
           optionIndex < options.length &&
           optionIndex in options &&
           options[optionIndex] != null

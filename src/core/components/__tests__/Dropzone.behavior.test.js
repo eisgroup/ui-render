@@ -134,6 +134,37 @@ describe('Dropzone accept and input-selection contracts', () => {
         expect(input).toHaveValue('')
     })
 
+    it('accepts an extension pattern by mime type when the spelling differs', () => {
+        // Upload builds `accept` from `formats`, so `formats: ['jpeg']` becomes `.jpeg` — which by a
+        // pure name check rejects `photo.jpg`, a file the browser itself typed as `image/jpeg`.
+        const onDrop = jest.fn()
+        const jpg = makeFile('photo.jpg', 'image/jpeg')
+        const { container } = render(
+            <Dropzone accept=".jpeg" onDrop={onDrop}>zone</Dropzone>
+        )
+        const input = container.querySelector('input')
+        setInputSelection(input, [jpg])
+
+        fireEvent.change(input)
+
+        expect(onDrop).toHaveBeenLastCalledWith([jpg])
+    })
+
+    it('accepts an extensionless file whose mime type matches the extension pattern', () => {
+        const onDrop = jest.fn()
+        const typed = makeFile('scan', 'application/pdf')
+        const wrong = makeFile('other', 'text/plain')
+        const { container } = render(
+            <Dropzone accept=".pdf" onDrop={onDrop}>zone</Dropzone>
+        )
+        const input = container.querySelector('input')
+        setInputSelection(input, [typed, wrong])
+
+        fireEvent.change(input)
+
+        expect(onDrop).toHaveBeenLastCalledWith([typed])
+    })
+
     it('resets an empty file selection without emitting a drop', () => {
         const onDrop = jest.fn()
         const { container } = render(<Dropzone onDrop={onDrop}>zone</Dropzone>)

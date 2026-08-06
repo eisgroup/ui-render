@@ -73,7 +73,10 @@ export function metaToProps (meta, config) {
         // Map `onClick` functions by name (if exists)
         // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
         if (isObject(definition)) {
-            metaToFunctions(definition, {...funcConfig, data, relativeIndex, relativePath, _data, rowValue: _data, instance})
+            // @Note: `relativePath` is deliberately NOT forwarded here. It reaches `getFunctionFromObject`,
+            // which puts it into the `popupOpen` context, where `rules.js` gives it the highest priority when
+            // resolving popup field names — rebinding a root-level popup template onto the table's path.
+            metaToFunctions(definition, {...funcConfig, data, relativeIndex, _data, rowValue: _data, instance})
             if (definition.name) {
                 definition.name = interpolateString(definition.name, instance, {suppressError: true})
             }
@@ -302,7 +305,7 @@ const composeValidators = (...validators) => (...args) => validators.reduce((err
  */
 function getFunctionFromObject(definition, config) {
     const {name, mapArgs, args = [], onDone} = definition
-    const {data, fieldFunc, fieldMethods, fallback = definition.name, relativeIndex, relativePath, _data, rowValue} = config
+    const {data, fieldFunc, fieldMethods, fallback = definition.name, relativeIndex, _data, rowValue} = config
     const func = fieldFunc[name] || fieldMethods[name]
     if (onDone) metaToFunctions(definition, config)
     
@@ -317,9 +320,9 @@ function getFunctionFromObject(definition, config) {
         })
     }
     
-    // For popupOpen, pass relativePath and relativeIndex through options to ensure popup fields match table row fields
+    // For popupOpen, pass the row index through options so popup fields can address the table row.
+    // @Note: deliberately NOT relativePath — see the metaToFunctions call above.
     const contextOptions = {}
-    if (relativePath != null) contextOptions.relativePath = relativePath
     if (relativeIndex != null) contextOptions.relativeIndex = relativeIndex
     
     if (func) {

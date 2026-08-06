@@ -246,9 +246,10 @@ describe('metaToProps action definition contracts', () => {
         }))
         meta[0].onClick()
 
+        // @Note: `relativeIndex` only. Forwarding `relativePath` too would rebind a root-level popup
+        // template onto the table's path, because it outranks every other source in `rules.js`.
         expect(popupOpen).toHaveBeenCalledWith('details', {
             mode: 'edit',
-            relativePath: 'orders.2.lineItems',
             relativeIndex: 5,
         })
     })
@@ -272,7 +273,6 @@ describe('metaToProps action definition contracts', () => {
         meta[0].onClick()
 
         expect(popupOpen).toHaveBeenCalledWith('details', {
-            relativePath: 'orders.2.lineItems',
             relativeIndex: 5,
         })
     })

@@ -27,7 +27,10 @@ describe('Select data reordering integrity contracts', () => {
     expect(result).not.toHaveProperty('selection')
   })
 
-  it('recognizes an option field even when the first label is falsey', () => {
+  it('leaves an array alone when its first element carries the key with a falsey value', () => {
+    // The options array is only guessed at, by looking for the mapOptions text key on the first
+    // element. Accepting mere key presence also matches unrelated arrays that happen to carry the
+    // key with a falsey value, and silently reorders them in the submitted payload.
     const data = {
       selection: '1',
       options: [{code: ''}, {code: 'B'}],
@@ -35,8 +38,21 @@ describe('Select data reordering integrity contracts', () => {
 
     const result = changeOptionOrderForSelectFields(data, indexMeta())
 
-    expect(result.options.map(option => option.code)).toEqual(['B', ''])
-    expect(result).not.toHaveProperty('selection')
+    expect(result.options.map(option => option.code)).toEqual(['', 'B'])
+    expect(result).toHaveProperty('selection', '1')
+  })
+
+  it('does not reorder an unrelated array that merely has the option key on its first element', () => {
+    const data = {
+      selection: '1',
+      options: [{code: 'A'}, {code: 'B'}],
+      unrelated: [{code: null, id: 1}, {code: 'z', id: 2}],
+    }
+
+    const result = changeOptionOrderForSelectFields(data, indexMeta())
+
+    expect(result.options.map(option => option.code)).toEqual(['B', 'A'])
+    expect(result.unrelated.map(entry => entry.id)).toEqual([1, 2])
   })
 
   it.each(['', 'not-a-number', '-1', '1.5', '99', 'Infinity'])(

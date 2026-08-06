@@ -60,11 +60,17 @@ const InputDate = ({
     const toMoment = (date) => {
         if (date == null || date === '') return null
 
-        const parsed = moment.isMoment(date)
-            ? date
-            : typeof date === 'string'
-                ? moment(date, [dateFormat, 'YYYY-MM-DD', moment.ISO_8601], true)
-                : moment(date)
+        let parsed
+        if (moment.isMoment(date)) parsed = date
+        else if (typeof date !== 'string') parsed = moment(date)
+        else {
+            // Strict pass first, so the configured format wins over Moment's guessing. Then fall
+            // back to a lenient read: a stored value in a shape we do not list (unpadded `2021-1-2`,
+            // `2021/01/02`, `Jan 2, 2021`) must still render. Showing it blank reads as "unset" to
+            // the user, who then overwrites a perfectly good date.
+            parsed = moment(date, [dateFormat, 'YYYY-MM-DD', moment.ISO_8601], true)
+            if (!parsed.isValid()) parsed = moment(date)
+        }
 
         return parsed.isValid() ? parsed : null
     }

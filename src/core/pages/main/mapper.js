@@ -127,7 +127,10 @@ const RenderComponent = ({
         case FIELD.TYPE.DATA:
             return <Data
                 instance={instance}
-                data={_data === undefined ? data : _data}
+                // @Note: falls back to root data for every falsy `_data`, not just `undefined`.
+                // A nested render needs an object to bind against, so passing `null`/`0`/`''`/`false`
+                // through makes the whole block (and its fields) disappear instead of rendering.
+                data={_data || data}
                 {...props}
                 relativeIndex={relativeIndex}
                 relativePath={relativePath}

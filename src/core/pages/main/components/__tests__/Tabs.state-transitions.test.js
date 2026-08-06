@@ -162,10 +162,12 @@ describe('Tabs transition lifecycle', () => {
         expect(instance.timers).toEqual([])
     })
 
-    it('cancels a controlled transition when refreshed items keep the current index', () => {
+    // The mapper hands Tabs a freshly built `items` array on every render, so "items changed" is
+    // permanently true when driven by UI Render. Cancelling a pending transition on that signal
+    // would drop the click of any host that re-renders inside the 50 ms window.
+    it('keeps a controlled transition alive when refreshed items keep the current index', () => {
         const onChange = jest.fn()
-        const tabs = React.createRef()
-        const view = render(wrap(<Tabs ref={tabs} items={items} activeIndex={0} onChange={onChange}/>))
+        const view = render(wrap(<Tabs items={items} activeIndex={0} onChange={onChange}/>))
         const refreshedItems = items.map((item, index) => ({
             tab: `Refreshed ${index}`,
             content: `Refreshed content ${index}`,
@@ -173,31 +175,42 @@ describe('Tabs transition lifecycle', () => {
 
         fireEvent.click(getTabs(view.container)[1])
         view.rerender(wrap(
-            <Tabs ref={tabs} items={refreshedItems} activeIndex={0} onChange={onChange}/>
+            <Tabs items={refreshedItems} activeIndex={0} onChange={onChange}/>
         ))
+        act(() => jest.advanceTimersByTime(100))
 
-        expect(getContent(view.container)).toHaveTextContent('Refreshed content 0')
+        expect(getContent(view.container)).toHaveTextContent('Refreshed content 1')
         expect(getContent(view.container)).toHaveClass('fade-in')
-        expect(tabs.current.timers).toEqual([])
-        expect(onChange).not.toHaveBeenCalled()
+        expect(onChange.mock.calls).toEqual([[1]])
     })
 
-    it('cancels an uncontrolled transition when refreshed items invalidate its cached target', () => {
+    it('keeps an uncontrolled transition alive across a refreshed items array', () => {
         const onChange = jest.fn()
-        const tabs = React.createRef()
-        const view = render(wrap(<Tabs ref={tabs} items={items} onChange={onChange}/>))
+        const view = render(wrap(<Tabs items={items} onChange={onChange}/>))
         const refreshedItems = items.map((item, index) => ({
             tab: `New ${index}`,
             content: `New content ${index}`,
         }))
 
         fireEvent.click(getTabs(view.container)[2])
-        view.rerender(wrap(<Tabs ref={tabs} items={refreshedItems} onChange={onChange}/>))
+        view.rerender(wrap(<Tabs items={refreshedItems} onChange={onChange}/>))
+        act(() => jest.advanceTimersByTime(100))
 
-        expect(getContent(view.container)).toHaveTextContent('New content 0')
+        expect(getContent(view.container)).toHaveTextContent('New content 2')
         expect(getContent(view.container)).toHaveClass('fade-in')
-        expect(tabs.current.timers).toEqual([])
-        expect(onChange).not.toHaveBeenCalled()
+        expect(onChange.mock.calls).toEqual([[2]])
+    })
+
+    it('normalizes a pending target that no longer exists when the timer fires', () => {
+        const onChange = jest.fn()
+        const view = render(wrap(<Tabs items={items} onChange={onChange}/>))
+
+        fireEvent.click(getTabs(view.container)[2])
+        view.rerender(wrap(<Tabs items={items.slice(0, 1)} onChange={onChange}/>))
+        act(() => jest.advanceTimersByTime(100))
+
+        expect(getContent(view.container)).toHaveTextContent('Content A')
+        expect(onChange.mock.calls).toEqual([[0]])
     })
 })
 
