@@ -178,6 +178,30 @@ describe('InputDate rc-picker and form contracts', () => {
         expect(pickerProps().value.format('YYYY-MM-DD')).toBe('2026-11-05')
     })
 
+    // The configured format wins, but a stored value in some other recognizable shape must still
+    // render. Showing it blank reads as "unset" to the user, who then overwrites a good date.
+    it.each([
+        ['unpadded ISO', '2026-1-2', '2026-01-02'],
+        ['slash separated', '2026/01/02', '2026-01-02'],
+        ['long month name', 'Jan 2, 2026', '2026-01-02'],
+    ])('falls back to a lenient parse for a %s value', (_name, value, expected) => {
+        render(withConfig(
+            <InputDate name="effectiveDate" value={value} />,
+            { dateFormat: 'YYYY-MM-DD' }
+        ))
+
+        expect(pickerProps().value.format('YYYY-MM-DD')).toBe(expected)
+    })
+
+    it('still prefers the configured format over a lenient reading', () => {
+        render(withConfig(
+            <InputDate name="effectiveDate" value="03/04/2026" />,
+            { dateFormat: 'DD/MM/YYYY' }
+        ))
+
+        expect(pickerProps().value.format('YYYY-MM-DD')).toBe('2026-04-03')
+    })
+
     it('prefers value over defaultValue and turns invalid external values into null', () => {
         const { rerender } = render(withConfig(
             <InputDate

@@ -42,7 +42,9 @@
 - Restored the upload ref contract after the in-house Dropzone replacement so successful
   uploads reinitialize the rendered data.
 - Corrected the nested `dataKind` demo table metadata so it renders valid table markup.
-- Preserved nested `relativePath` context when resolving `popupOpen` actions.
+- `popupOpen` actions receive the row index as context. `relativePath` is deliberately not
+  forwarded: it outranks every other source when a popup resolves its field names, so a popup
+  template declared outside the table was rebound onto the table's path and discarded its edit.
 - Stopped both Tabs implementations from passing `onClick={false}` to the DOM.
 - Date fields now forward blur events to Final Form and correctly leave focused state.
 - Dropdown now preserves controlled numeric zeroes, keeps sanitized multi-select values in
@@ -70,8 +72,13 @@
 - Table-cell mapping now retains inherited relative context, table `extraItems` are resolved
   immutably on every render, and removable inputs tolerate a missing Form API.
 - Plain-text API failures now reach the error popup instead of failing during JSON parsing.
+- Dropzone accept patterns written as extensions also match on MIME type, so a `.jpeg` filter still
+  accepts `photo.jpg` — or a file with no extension — that the browser typed as `image/jpeg`.
 - InputDate now forwards focus and blur to Final Form, uses rc-picker's readonly contract,
-  respects custom date formats, and safely normalizes empty, invalid, and default values.
+  respects custom date formats, and safely normalizes empty, invalid, and default values. The
+  configured format is tried strictly first, then a lenient reading, so a stored value in an
+  unlisted shape (`2021-1-2`, `2021/01/02`, `Jan 2, 2021`) still renders rather than showing
+  blank — which reads as "unset" and invites overwriting a good date.
 - Controlled ProgressSteps updates no longer call a missing method, explicit index zero wins over
   defaults, and controlled rerenders or item removal cancel stale delayed clicks.
 - Storage helpers now route through the configured backend adapter outside the browser, preserve
@@ -98,18 +105,24 @@
   ordinals correctly, keep non-finite SI values suffix-free, and handle numeric-string zeroes in
   divisor and percentage calculations.
 - Index-based Select reordering now rejects empty, fractional, negative, out-of-range, and sparse
-  selections without deleting the selection or inserting `undefined`; falsey option labels remain valid.
+  selections without deleting the selection or inserting `undefined`. The options array is still
+  identified by a truthy label on its first element: matching on mere key presence also reordered
+  unrelated arrays that happened to carry the key with a falsey value.
 - Select controls derive their accessible name from the visible label, then the field name, with a
   generic fallback when neither is available; null labels still do not create visible placeholders.
 - Equal-length string merging now uses both inputs, and merging with an empty string no longer
   emits `undefined` fragments.
 - Page-level Tabs now prioritize controlled index zero, normalize indices after item removal,
-  cancel stale transitions, apply opt-in prop transitions consistently, and render text-only
-  object labels safely.
+  apply opt-in prop transitions consistently, and render text-only object labels safely. A pending
+  transition is no longer cancelled when the items array is rebuilt — the mapper rebuilds it on
+  every render, so that cancelled the click of any host re-rendering inside the 50 ms window. The
+  target index is revalidated when the timer fires instead.
 - Render setup failures now report the missing component or method resolver before React attempts
   to render an invalid element, while recursive child failures remain isolated to their subtree.
-- Mapper Data nodes preserve explicit falsey local values; nested Text metadata no longer leaks
-  `renderLabel` or `currencyCode` into DOM elements.
+- Mapper Data nodes fall back to root data for every falsey local value. A nested render needs an
+  object to bind against, so passing `null`/`0`/`''`/`false` through made the whole block vanish:
+  its inputs never mounted and their keys never reached the submitted payload.
+- Nested Text metadata no longer leaks `renderLabel` or `currencyCode` into DOM elements.
 - Final Form wrappers keep one subscription per active form, release it when the form changes,
   and unsubscribe during unmount.
 - Popup actions filter React component classes before normalizing declarative IDs, avoiding an

@@ -130,6 +130,16 @@ const Dropzone = forwardRef(function Dropzone ({
 
 export default Dropzone
 
+// Extensions whose spelling differs from the MIME subtype they map to.
+const EXTENSION_TYPE_ALIASES = {jpg: 'jpeg', jpeg: 'jpg', tif: 'tiff', tiff: 'tif', htm: 'html', html: 'htm'}
+
+/** Whether a browser-reported MIME type corresponds to an extension pattern such as `.jpeg` */
+function typeMatchesExtension (type, extension) {
+  const subtype = type.split('/')[1]
+  if (!subtype) return false
+  return subtype === extension || EXTENSION_TYPE_ALIASES[extension] === subtype
+}
+
 function filterByAccept (files, accept) {
   if (!accept) return files
   const patterns = String(accept).split(',').map((s) => s.trim().toLowerCase()).filter(Boolean)
@@ -138,7 +148,9 @@ function filterByAccept (files, accept) {
     const name = (file.name || '').toLowerCase()
     const type = (file.type || '').toLowerCase()
     return patterns.some((p) => {
-      if (p.startsWith('.')) return name.endsWith(p)
+      // An extension pattern also matches on MIME type, so `.jpeg` still accepts `photo.jpg` — or a
+      // file with no extension at all — when the browser typed it as `image/jpeg`.
+      if (p.startsWith('.')) return name.endsWith(p) || typeMatchesExtension(type, p.slice(1))
       if (p.endsWith('/*')) return type.startsWith(p.slice(0, -1))
       return type === p
     })

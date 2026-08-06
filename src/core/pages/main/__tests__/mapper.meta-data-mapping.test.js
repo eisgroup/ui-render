@@ -100,7 +100,10 @@ describe('mapper meta/data mapping contracts', () => {
     ['false', false],
     ['empty string', ''],
     ['null', null],
-  ])('preserves explicit local Data value %s instead of replacing it with root data', (_name, localData) => {
+  ])('falls back to root data when the local Data value is %s', (_name, localData) => {
+    // A nested render needs an object to bind its fields against. Handing a falsey scalar straight
+    // through renders the whole block empty — its inputs never mount, so the user cannot fill them
+    // and their keys never reach the submitted payload.
     const rootData = {fallback: true}
 
     renderMapped({
@@ -110,7 +113,7 @@ describe('mapper meta/data mapping contracts', () => {
       data: rootData,
     })
 
-    expect(lastProps(Data).data).toBe(localData)
+    expect(lastProps(Data).data).toBe(rootData)
   })
 
   it('uses root data only when local Data is absent', () => {

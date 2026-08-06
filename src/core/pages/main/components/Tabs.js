@@ -93,7 +93,10 @@ export default class Tabs extends PureComponent {
     const itemsChanged = !isEqual(items, this.props.items)
     if (itemsChanged) {
       this._tabs = this._contents = null
-      this.clearTimer()
+      // @Note: no `clearTimer()` here. The mapper rebuilds every item with a fresh `Render.bind(...)`
+      // closure on each render, so `itemsChanged` is always true when driven by UI Render — cancelling
+      // would swallow the click of anyone who re-renders inside the 50 ms transition window.
+      // `setTab` re-validates the target index when the timer fires instead.
     }
 
     if (activeIndex != null) {
@@ -115,8 +118,11 @@ export default class Tabs extends PureComponent {
   setTab = (activeIndex, transition = true) => {
     this.clearTimer()
     const updateTab = () => {
-      this.setState({activeIndex, transition: false})
-      if (this.props.onChange) this.props.onChange(activeIndex)
+      // Re-validate against the items current at fire time — they may have shrunk while the
+      // transition was pending, which is what the cancelled `clearTimer()` used to guard against.
+      const index = normalizeTabIndex(activeIndex, this.props.items)
+      this.setState({activeIndex: index, transition: false})
+      if (this.props.onChange) this.props.onChange(index)
     }
     if (transition) {
       this.setState({transition: true})
