@@ -1,7 +1,11 @@
 name: CI
 
 on:
+  # Only the default branch on push. Without the filter a push to a branch with an open PR fires
+  # `push` and `pull_request` (synchronize) at once, and `concurrency` cannot dedupe them because
+  # `github.ref` is `refs/heads/<branch>` for one and `refs/pull/N/merge` for the other.
   push:
+    branches: [master]
   pull_request:
 
 permissions:
