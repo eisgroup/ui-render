@@ -66,6 +66,29 @@ describe('Tabs state contracts', () => {
         expect(onChange.mock.calls).toEqual([[1], [0]])
     })
 
+    it.each([
+        ['by default', undefined],
+        ['when transitionUpdate is false', false],
+    ])('applies a controlled index from newly added items %s', (_, transitionUpdate) => {
+        const onChange = jest.fn()
+        const view = render(wrap(
+            <Tabs items={items.slice(0, 1)} activeIndex={0} onChange={onChange}/>
+        ))
+
+        view.rerender(wrap(
+            <Tabs
+                items={items}
+                activeIndex={2}
+                transitionUpdate={transitionUpdate}
+                onChange={onChange}
+            />
+        ))
+
+        expect(getContent(view.container)).toHaveTextContent('Content C')
+        expect(getTabs(view.container)[2]).toHaveClass('active')
+        expect(onChange.mock.calls).toEqual([[2]])
+    })
+
     it('delays an opted-in controlled update until the transition finishes', () => {
         const onChange = jest.fn()
         const view = render(wrap(
