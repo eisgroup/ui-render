@@ -68,9 +68,16 @@ You will also see any lint errors in the console.
 
 ### How to publish the library
 
-- Run `npm run build-lib`
-- Login to npm `npm login`
-- Publish new version `npm publish`
+- Bump the package version with `npm version patch` (or `minor`, `major`, or an explicit version).
+  This also synchronizes every tracked `data-version` attribute.
+- Inspect the package contents with `npm pack --dry-run`.
+  The `prepack` lifecycle verifies version synchronization and builds the library automatically.
+- Login to npm with `npm login` if needed.
+- Publish the verified version with `npm publish`. The same `prepack` checks and build run again
+  immediately before npm creates the published package.
+
+Do not edit the version in `package.json` manually: use `npm version` so source metadata, the
+release commit, and the Git tag stay in sync.
 
 ### How to publish on GitHub Pages
 

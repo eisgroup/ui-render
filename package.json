@@ -31,6 +31,7 @@
     "test:coverage": "jest --coverage --runInBand",
     "test:watch": "jest --watch",
     "build-css": "node scripts/build-css.js",
+    "prepack": "npm run sync-version -- --check && npm run build-lib",
     "sync-version": "node scripts/sync-version.js",
     "version": "node scripts/sync-version.js && git add src/library/AppWrapper.js src/library/types/UIRender.tsx public/index.html",
     "lint:js": "eslint src --ext .js,.jsx",
