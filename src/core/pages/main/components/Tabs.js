@@ -103,7 +103,7 @@ export default class Tabs extends PureComponent {
       const nextIndex = normalizeTabIndex(activeIndex, items)
       if (nextIndex !== this.state.activeIndex) {
         const canTransition = next.transitionUpdate === true && this.state.activeIndex < items.length
-        this.setTab(nextIndex, canTransition)
+        this.setTab(nextIndex, canTransition, items)
       } else if (itemsChanged && this.state.transition) {
         this.setState({transition: false})
       }
@@ -115,12 +115,12 @@ export default class Tabs extends PureComponent {
     }
   }
 
-  setTab = (activeIndex, transition = true) => {
+  setTab = (activeIndex, transition = true, items = this.props.items) => {
     this.clearTimer()
     const updateTab = () => {
-      // Re-validate against the items current at fire time — they may have shrunk while the
-      // transition was pending, which is what the cancelled `clearTimer()` used to guard against.
-      const index = normalizeTabIndex(activeIndex, this.props.items)
+      // Immediate prop updates run before `this.props` is replaced, so validate them against the
+      // supplied next items. Delayed transitions still use the items current at fire time.
+      const index = normalizeTabIndex(activeIndex, transition ? this.props.items : items)
       this.setState({activeIndex: index, transition: false})
       if (this.props.onChange) this.props.onChange(index)
     }
