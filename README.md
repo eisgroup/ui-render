@@ -13,8 +13,8 @@ must be supplied by the host because the library build externalizes it.
 
 | Package | Required version | Why it must be a peer |
 |---|---|---|
-| `react` | `^16.14.0 || ^17.0.0` | A second copy of React in the tree triggers `Invalid hook call` and breaks Context (forms, providers). pnpm with strict node_modules will not deduplicate copies across non-overlapping ranges. |
-| `react-dom` | `^16.14.0 || ^17.0.0` | Must use the same major version as `react` so the renderer pair matches. |
+| `react` | `^16.14.0 \|\| ^17.0.0` | A second copy of React in the tree triggers `Invalid hook call` and breaks Context (forms, providers). pnpm with strict node_modules will not deduplicate copies across non-overlapping ranges. |
+| `react-dom` | `^16.14.0 \|\| ^17.0.0` | Must use the same major version as `react` so the renderer pair matches. |
 | `moment` | `^2.29.4` | The library externalizes Moment and uses it for date pickers and formatters, so the host must provide a compatible 2.x version. |
 
 Install (npm):
