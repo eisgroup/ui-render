@@ -20,10 +20,12 @@ export function Image ({
   ...props
 }) {
   if (props.src == null) props.src = imageSrc({name, path})
-  if (props.alt == null) props.alt = fileNameWithoutExt(name)
-  // `alt` is always present by the line above; the rule cannot see it arriving through the spread.
-  // eslint-disable-next-line jsx-a11y/alt-text
-  return <img className={classNames('img', className)} {...props}/>
+  // `name` is optional (a caller may pass only `src`), and fileNameWithoutExt has no guard of its own,
+  // so deriving the alt text unconditionally used to throw. An empty alt is the correct value for an
+  // image with nothing to describe.
+  if (props.alt == null) props.alt = name ? fileNameWithoutExt(name) : ''
+  // Restated after the spread so jsx-a11y can see it — same value, set on the line above.
+  return <img className={classNames('img', className)} {...props} alt={props.alt}/>
 }
 
 Image.defaultProps = {

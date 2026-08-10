@@ -59,8 +59,8 @@
   stylesheet `@import` and `url()` target, and server-renders the bundle in a throwaway consumer
   holding only React, React DOM and Moment.
 - JavaScript lint now runs with `--max-warnings 0`. All 22 pre-existing warnings were triaged:
-  most were genuine cleanups, five are suppressions carrying a comment that states why the rule
-  does not apply, and one turned out to be the popup defect listed under Fixes.
+  eighteen were genuine cleanups, four are suppressions carrying a comment that states why the rule
+  does not apply, and three turned out to be the defects listed under Fixes.
 - Removed 14 devDependencies with no references in code, configs, scripts or CI, cutting the
   installed development tree by 14 packages. This does not affect the published package.
 - Build configuration: the demo build no longer duplicates the shared Babel presets. Every
@@ -75,6 +75,9 @@
 - Demo API errors now surface the server's message. When an error string carried no recognizable
   message payload, the demo's response interceptor threw while parsing it and reported that
   failure instead of the original error.
+- An `Image` given a `src` but no `name` no longer crashes the render. The alt text was derived from
+  the file name unconditionally; it now falls back to an empty alt, which is the correct value for
+  an image with nothing to describe.
 - Restored the upload ref contract after the in-house Dropzone replacement so successful
   uploads reinitialize the rendered data.
 - Corrected the nested `dataKind` demo table metadata so it renders valid table markup.
