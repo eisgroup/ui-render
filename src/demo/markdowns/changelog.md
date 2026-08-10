@@ -14,6 +14,16 @@
 - The public `translate` callback retains its string-to-string contract; optional and non-string
   renderer values now bypass it unchanged.
 
+#### Packaging
+
+- Stylesheets, fonts and images are no longer duplicated in the published package. The real files
+  ship once in the root `static/` folder — the payload to copy into a host's web root, since image
+  paths resolve to `<homepage>/static/images/` — and `dist/static/all.css` and `font.css` became
+  one-line `@import` re-exports of it. Both import paths keep working; `semantic.css` remains an
+  empty stub in both places.
+- The tarball dropped from 579 files / 11.6 MB unpacked to 295 files / 7.25 MB (2.53 MB packed).
+  Source maps continue to ship for host debugging.
+
 #### Tests and CI
 
 - Added behavior contracts for submit, validation, dynamic `showIf`, data updates,
@@ -44,6 +54,10 @@
 - Added GitHub Actions checks for JavaScript/CSS lint, coverage, library build, and demo build.
 - Added a public-declaration gate against locked React 16/17/18 types in interop and direct
   CommonJS modes, including a check of the built package's callable runtime export.
+- Added packaging gates: budgets over the published manifest (file count, sizes, required paths,
+  duplicate assets) and a packed-tarball smoke that extracts the artifact, resolves every
+  stylesheet `@import` and `url()` target, and server-renders the bundle in a throwaway consumer
+  holding only React, React DOM and Moment.
 
 #### Fixes
 
