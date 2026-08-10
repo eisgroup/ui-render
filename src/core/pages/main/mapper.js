@@ -65,6 +65,9 @@ Render.Tooltip = TooltipPop
 const RenderComponent = ({
     view, items, data, _data, debug, form, instance,
     showIf, relativeData, relativeIndex, relativePath, version,
+    // Always superseded by `Active.translate` below, and `translate` is a real HTML global attribute:
+    // left in `props` it reaches the DOM via spread (e.g. TableCell -> <td>) and React warns on the function value.
+    translate: _translate,
     ...props
 }) => {
     const { popup } = useContext(AppContext)
