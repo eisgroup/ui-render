@@ -70,6 +70,57 @@ describe('Dropdown parent value and option contracts', () => {
         expect(onChange).toHaveBeenCalledWith('Fallback label')
     })
 
+    // The sanitizer dispatches on `typeof options[0].value`, and `typeof null === 'object'` — so a null value
+    // took the "value is an array" branch and became the string "null", which is not what the cascading-reset
+    // effect above emits for that same option. The two paths have to agree on a valueless option or it can
+    // never be selected.
+    it('gives a null-valued option its text as the value, matching the cascading fallback', () => {
+        renderDropdown({ options: [{ text: 'Fallback label', value: null }] })
+
+        expect(latestSemanticProps().options).toEqual([
+            expect.objectContaining({ text: 'Fallback label', value: 'Fallback label' }),
+        ])
+    })
+
+    it('treats an option with no value key the same way', () => {
+        renderDropdown({ options: [{ text: 'No value here' }] })
+
+        expect(latestSemanticProps().options).toEqual([
+            expect.objectContaining({ text: 'No value here', value: 'No value here' }),
+        ])
+    })
+
+    // The branch is chosen from options[0] but applied to every option, so the text fallback has to be
+    // per-option: a later option that does carry a value must keep it.
+    it('keeps real values on later options when the first one has none', () => {
+        renderDropdown({ options: [{ text: 'No value' }, { text: 'Has value', value: 'x' }] })
+
+        expect(latestSemanticProps().options).toEqual([
+            expect.objectContaining({ text: 'No value', value: 'No value' }),
+            expect.objectContaining({ text: 'Has value', value: 'x' }),
+        ])
+    })
+
+    it('still stringifies a genuinely object-valued option', () => {
+        renderDropdown({ options: [{ text: 'Colour', value: [1, -1] }] })
+
+        expect(latestSemanticProps().options).toEqual([
+            expect.objectContaining({ text: 'Colour', value: '1,-1' }),
+        ])
+    })
+
+    it('reports the fallback value when a null-valued option is selected', () => {
+        const onChange = jest.fn()
+        renderDropdown({ options: [{ text: 'Fallback label', value: null }], onChange })
+
+        const { onChange: semanticOnChange, options } = latestSemanticProps()
+        act(() => {
+            semanticOnChange({}, { value: options[0].value })
+        })
+
+        expect(onChange).toHaveBeenCalledWith('Fallback label', undefined, expect.anything())
+    })
+
     it('preserves explicit selection and autofocus configuration', () => {
         renderDropdown({
             options: objectOptions,

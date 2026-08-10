@@ -149,10 +149,17 @@ export function Dropdown ({
       options = options.map(value => ({text: String(value), value}))
       break
     case 'object':
-      if (typeof options[0].value === 'object') { // value is an array (ex. Color)
+      // `typeof null === 'object'`, so null must be excluded here or it lands in the array branch below and
+      // becomes the string "null".
+      if (options[0].value !== null && typeof options[0].value === 'object') { // value is an array (ex. Color)
         options = options.map(({ value, text, ...option }) => ({ value: String(value), text: translate(text), ...option }))
       } else if (typeof options[0].value === 'string') {
         options = options.map(({ value, text, ...option }) => ({ value: value, text: translate(text), ...option }))
+      } else if (options[0].value == null) {
+        // An option with no value takes its text as the value. The cascading-reset effect above already
+        // treats text as that option's value, and the two must agree — otherwise the value it asks the
+        // parent to select can never equal the value the option carries, and nothing appears selected.
+        options = options.map(({ value, text, ...option }) => ({ value: value != null ? value : text, text: translate(text), ...option }))
       }
       break
     // no default
