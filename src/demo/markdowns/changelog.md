@@ -78,6 +78,10 @@
 - An `Image` given a `src` but no `name` no longer crashes the render. The alt text was derived from
   the file name unconditionally; it now falls back to an empty alt, which is the correct value for
   an image with nothing to describe.
+- A `Dropdown` option declared without a value can now actually be selected. Its value was being
+  rewritten to the string `"null"`, while the cascading reset used the option's text — so the two
+  never agreed and the control showed nothing selected. Such an option now carries its text as its
+  value, which is what the reset already assumed.
 - Restored the upload ref contract after the in-house Dropzone replacement so successful
   uploads reinitialize the rendered data.
 - Corrected the nested `dataKind` demo table metadata so it renders valid table markup.
