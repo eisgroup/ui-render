@@ -23,7 +23,10 @@ export default axiosInstance;
 
 const processErrorMessage = (error) => {
   if (typeof error === 'string' && error.startsWith('Error')) {
-    return error.match(/message=(.*)errors/)[1] || error
+    // `match` is null whenever the string starts with 'Error' but carries no `message=…errors` payload.
+    // Indexing it directly threw a TypeError inside the rejection handler, replacing the server's message.
+    const matched = error.match(/message=(.*)errors/)
+    return (matched && matched[1]) || error
   }
   return error;
 }
