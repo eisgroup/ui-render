@@ -26,7 +26,7 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 
 ### Dual build targets
 
-1. **Library** (`src/library/`) — Entry point `src/library/index.js`, built via `webpack.library.config.mjs` to `dist/`. Exports the `UIRender` component as UMD. `react`, `react-dom`, and `moment` are externalized (peer dependencies — the host app provides them). CSS is compiled from LESS to `dist/static/all.css` (plus `font.css` and a `semantic.css` stub), mirrored to the root `static/` folder.
+1. **Library** (`src/library/`) — Entry point `src/library/index.js`, built via `webpack.library.config.mjs` to `dist/`. Exports the `UIRender` component as UMD. `react`, `react-dom`, and `moment` are externalized (peer dependencies — the host app provides them). CSS is compiled from LESS and the real stylesheets, fonts and images ship **once** in the root `static/` folder — that is the payload hosts copy to their web root, because `FILE.PATH_IMAGES` resolves to `<homepage>/static/images/`. `dist/static/all.css` and `font.css` are one-line `@import` re-exports of it, so bundler imports of the dist path keep working; `semantic.css` is a 0-byte stub in both places. Packaging is gated by `npm run test:pack` (budgets + a packed-tarball server-render smoke) — never re-add an asset copy under `dist/static/`, the duplicate guard fails the build.
 2. **Demo app** (`src/demo/`) — Entry chain `src/index.js` → `src/main.jsx` (ReactDOM.render) → `src/App.jsx`, built via `webpack.demo.config.mjs`. Used for development and GitHub Pages demo.
 
 ### Core rendering engine (`src/core/ui-render/`)

@@ -48,5 +48,11 @@ jobs:
       - name: Check public TypeScript declarations
         run: npm run test:types:consumer
 
+      - name: Check packaging budgets
+        run: npm run test:pack:budget
+
+      - name: Smoke the packed tarball
+        run: npm run test:pack:consumer
+
       - name: Build demo
         run: npm run build

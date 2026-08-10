@@ -41,6 +41,25 @@ Other libraries previously listed as peer dependencies (`final-form`, `final-for
 `react-final-form`, `react-final-form-arrays`, `prop-types`) are now bundled as regular
 dependencies of `eis-ui-render`, so the host project does not need to install them.
 
+## Styles and assets (consumer)
+
+The library entry deliberately does not inject CSS, so the host loads the stylesheet itself. Both
+paths below work and resolve to the same rules — `dist/static/*.css` are one-line `@import`
+re-exports, so the bytes ship only once:
+
+```js
+import 'eis-ui-render/static/all.css'   // or 'eis-ui-render/dist/static/all.css'
+import 'eis-ui-render/static/font.css'  // icon font — only if the host does not provide its own
+```
+
+Some renderers reference images by absolute URL (`<homepage>/static/images/…` — flag icons for the
+language renderer, for example), so those files must also be reachable from the host's web root.
+Copy the package's `static/` folder there as part of the build; it is self-contained:
+
+```bash
+cp -R node_modules/eis-ui-render/static ./public/
+```
+
 ## Development Installation
 
 1. Install [Node.js](https://nodejs.org/), if you haven't already (version v24).
@@ -72,6 +91,9 @@ You will also see any lint errors in the console.
   This also synchronizes every tracked `data-version` attribute.
 - Inspect the package contents with `npm pack --dry-run`.
   The `prepack` lifecycle verifies version synchronization and builds the library automatically.
+- Verify the artifact with `npm run test:pack`. It enforces the packaging budgets and then packs,
+  extracts and server-renders the tarball in a throwaway consumer that has only the three peer
+  dependencies available. CI runs both gates on every pull request.
 - Login to npm with `npm login` if needed.
 - Publish the verified version with `npm publish`. The same `prepack` checks and build run again
   immediately before npm creates the published package.
