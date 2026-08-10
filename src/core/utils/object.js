@@ -197,7 +197,9 @@ export function hasObjMatch(obj, searchObj) {
  *
  * @param {*} obj - the object to check
  * @param {object} keys - key paths and values to match, e.g. { 'properties.id': 7, type: 'DRAFT' }
- * @param {String} match - one of comparison types ['deep', 'shallow', 'include'], default is `shallow`
+ * @param {String} match - one of comparison types ['deep', 'shallow', 'include'], default is `deep`.
+ *  `deep` requires strict equality, so an equal-by-value object does not match; `shallow` matches
+ *  object-like values partially by value and everything else loosely; `include` recurses to find a match.
  * @returns {boolean} - true if a match found.
  */
 export function hasObjKeys(obj, keys = {}, match = 'deep') {
@@ -212,9 +214,14 @@ export function hasObjKeys(obj, keys = {}, match = 'deep') {
 
 		// Shallow comparison
 		else if (match === 'shallow') {
-			// eslint-disable-next-line eqeqeq -- shallow match compares loosely on purpose (1 matches '1')
-			if ((isObjectLike(searchValue) && !matches(value)(searchValue)) || searchValue != value) {
-				return false
+			// Object-like values match by value (partially — extra keys on the target are ignored), everything
+			// else compares loosely. The two must not be OR-ed: doing so let the reference comparison veto an
+			// object match the first clause had already accepted, so no shallow object match ever succeeded.
+			if (isObjectLike(searchValue)) {
+				if (!matches(value)(searchValue)) return false
+			} else {
+				// eslint-disable-next-line eqeqeq -- primitives compare loosely on purpose (1 matches '1')
+				if (searchValue != value) return false
 			}
 		} // eslint-disable-line
 
