@@ -105,6 +105,9 @@ export function Dropdown ({
 
   useEffect(() => {
     !isEqual(options, opts) && setOptions(opts)
+    // `options` is read only as an equality guard against a redundant setState. Listing it as a dependency
+    // would re-run this sync after every options change, including the one it just performed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opts])
 
   // Sync internal value with parent prop.
@@ -137,7 +140,8 @@ export function Dropdown ({
   if (props.search && props.deburr == null) props.deburr = true // Case and diacritics insensitive search
 
   // Sanitize
-  switch (typeof options[0]) {
+  // eslint-disable-next-line default-case
+  switch (typeof options[0]) { // no default: any other type (incl. empty options) passes through unchanged
     case 'string':
       options = options.map(value => ({text: translate(value), value}))
       break

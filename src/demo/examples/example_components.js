@@ -2,7 +2,7 @@
  * DYNAMIC COMPONENTS JSON =====================================================
  * =============================================================================
  */
-export default [
+const EXAMPLE_COMPONENTS = [
   {
     name: 'Rating Details',
     elementConfigs: [
@@ -123,3 +123,5 @@ export default [
     ]
   },
 ]
+
+export default EXAMPLE_COMPONENTS

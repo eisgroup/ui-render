@@ -140,4 +140,40 @@ describe('UIRender popup action argument contracts', () => {
         )
         expect(appContext.setPopupState).not.toHaveBeenCalled()
     })
+
+    // The row-extraction branch reads currentRelativePath, which is declared further down the same block.
+    // With an interpolated template whose local data is the row array, that read is reached and throws
+    // ReferenceError from the temporal dead zone instead of opening the popup.
+    it('opens an interpolated popup template whose local data is the row array', () => {
+        render(withProviders(
+            <UIRender
+                meta={{
+                    view: 'Row',
+                    items: [
+                        {
+                            view: 'Button',
+                            children: 'Open row popup',
+                            onClick: { name: 'popupOpen', args: ['row.0'] },
+                        },
+                        {
+                            view: 'Popup',
+                            id: 'row.{index}',
+                            name: 'rows',
+                            title: 'Row popup',
+                            items: [{ view: 'Text', children: 'Popup content' }],
+                        },
+                    ],
+                }}
+                data={{ rows: [{ label: 'first' }, { label: 'second' }] }}
+            />
+        ))
+
+        fireEvent.click(screen.getByRole('button', { name: 'Open row popup' }))
+
+        expect(appContext.setPopupState).toHaveBeenCalledTimes(1)
+        expect(appContext.setPopupState.mock.calls[0][0]).toEqual(expect.objectContaining({
+            isOpen: true,
+            title: 'Row popup',
+        }))
+    })
 })

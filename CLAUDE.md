@@ -78,7 +78,8 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 - moment for dates (peer dependency, externalized); charts are custom SVG (`src/core/components/charts/` — no recharts)
 - LESS for styling, compiled via webpack (entry: `src/style/index.less`). Semantic UI theme overrides at `src/style/override/`. PostCSS prefixwrap scopes all CSS under `.ui-render`. Less is pinned to 3.x (semantic-ui-less inline-JS + `less-plugin-functions` toolchain — see `docs/UPGRADE-PLAN.md` §9.8 before changing).
 - Node.js v24 (see `.nvmrc`)
-- ESLint with `react-app` config (configured in package.json)
+- ESLint with `react-app` config (configured in package.json). `lint:js` runs with `--max-warnings 0`, so a new warning fails CI — fix it, or suppress it with a comment stating why the rule is wrong. Never blanket-disable: one tolerated warning here turned out to be a real crash (see `docs/UPGRADE-PLAN.md` §11 R18).
+- Babel config lives only in `babel.config.js` and is shared by the library build, the demo build and jest. Do not add `presets` to a `babel-loader` `options` block: a loader-level entry **replaces** the shared one for the same plugin identifier, silently dropping the shared options. Only demo-specific dev transforms (`react-refresh/babel`) belong inline.
 - Jest + @testing-library/react for tests
 - stylelint for LESS linting (config: `.stylelintrc.json`)
 

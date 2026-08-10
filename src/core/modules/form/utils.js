@@ -545,6 +545,8 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
     get () {
       const values = Object.assign({}, this.registeredValues || {}, this.changedValues || {})
       if (hasObjectValue(values)) return values
+      // Callers treat `undefined` as "nothing to submit"; returned explicitly so the getter always returns.
+      return undefined
     }
   })
 

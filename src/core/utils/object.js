@@ -212,8 +212,8 @@ export function hasObjKeys(obj, keys = {}, match = 'deep') {
 
 		// Shallow comparison
 		else if (match === 'shallow') {
+			// eslint-disable-next-line eqeqeq -- shallow match compares loosely on purpose (1 matches '1')
 			if ((isObjectLike(searchValue) && !matches(value)(searchValue)) || searchValue != value) {
-				// eslint-disable-line eqeqeq
 				return false
 			}
 		} // eslint-disable-line

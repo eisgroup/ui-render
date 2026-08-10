@@ -75,12 +75,10 @@ function notWithinRangeValidator (value, { dataKind, args: argsIn } = {}, allVal
     let rowIndexNum = fromName != null && !Number.isNaN(fromName.rowIndex) ? fromName.rowIndex : null
 
     let relativePath = null
-    let propsRelativeIndex = null
     if (instance && instance.props) {
         const propsMeta = instance.props.meta
         relativePath = (propsMeta && propsMeta.relativePath) || instance.props.relativePath
         const ri = (propsMeta && propsMeta.relativeIndex != null) ? propsMeta.relativeIndex : instance.props.relativeIndex
-        propsRelativeIndex = ri
         if (rowIndexNum == null && ri != null && ri !== '' && !Number.isNaN(Number(ri))) {
             rowIndexNum = Number(ri)
         }
@@ -885,28 +883,17 @@ function Decorator (Class) {
                         // Use contextRelativeIndex from options (renderItem context) with highest priority
                         // This ensures popup fields match the exact table row that opened the popup
                         const currentRelativeIndex = contextRelativeIndex != null ? contextRelativeIndex : (relativeIndex != null ? relativeIndex : templateRelativeIndex)
-                        // Use current row data if available (from interpolation), otherwise use template data
-                        // If relativeData is an array, extract the element at currentRelativeIndex
-                        let currentRowData = relativeData != null ? relativeData : templateDataLocal
-                        // If currentRowData is an array and we have an index, extract the specific element
-                        if (Array.isArray(currentRowData) && currentRelativeIndex != null && currentRelativePath) {
-                            // Try to get the specific row from the table
-                            const tableData = get(currentData, currentRelativePath)
-                            if (Array.isArray(tableData) && tableData[currentRelativeIndex] != null) {
-                                currentRowData = tableData[currentRelativeIndex]
-                            } else if (currentRowData[currentRelativeIndex] != null) {
-                                currentRowData = currentRowData[currentRelativeIndex]
-                            }
-                        }
-                        
+
                         // Get correct relativePath for current table row context
                         // Use contextRelativePath from options (renderItem context) with highest priority
                         // This ensures popup fields match the exact table row that opened the popup
-                        // relativePath should be the table name (e.g., "experienceRatingInputs.uwOverridesCoverage")
+                        // relativePath should be the table name, as listed in `possiblePaths` below
+                        // @Note: resolved before the row extraction below, which reads it — declaring it after
+                        // that read threw a temporal-dead-zone ReferenceError and swallowed the popup instead.
                         let currentRelativePath = contextRelativePath != null ? contextRelativePath : (relativePath || this.props.relativePath || templateRelativePath)
-                        
+
                         // If relativePath still not found, try to determine from table structure
-                        // Look for table name in currentData (e.g., experienceRatingInputs.uwOverridesCoverage)
+                        // Look for table name in currentData
                         if (!currentRelativePath && currentData && currentRelativeIndex != null) {
                             // Try common table paths
                             const possiblePaths = [
@@ -921,7 +908,21 @@ function Decorator (Class) {
                                 }
                             }
                         }
-                        
+
+                        // Use current row data if available (from interpolation), otherwise use template data
+                        // If relativeData is an array, extract the element at currentRelativeIndex
+                        let currentRowData = relativeData != null ? relativeData : templateDataLocal
+                        // If currentRowData is an array and we have an index, extract the specific element
+                        if (Array.isArray(currentRowData) && currentRelativeIndex != null && currentRelativePath) {
+                            // Try to get the specific row from the table
+                            const tableData = get(currentData, currentRelativePath)
+                            if (Array.isArray(tableData) && tableData[currentRelativeIndex] != null) {
+                                currentRowData = tableData[currentRelativeIndex]
+                            } else if (currentRowData[currentRelativeIndex] != null) {
+                                currentRowData = currentRowData[currentRelativeIndex]
+                            }
+                        }
+
                         // Check if items exist and are not empty
                         if (!items || !Array.isArray(items) || items.length === 0) {
                             console.error('Popup items are empty or invalid:', items)
@@ -933,7 +934,9 @@ function Decorator (Class) {
                         // Pass context through props to ensure data is available
                         class PopupContent extends PureComponent {
                             render () {
-                                const { items, data, _data, form, instance, relativeIndex, relativePath, relativeData, currencyCode } = this.props
+                                // `relativeData` is deliberately not read: every mapped item below hardcodes
+                                // `relativeData: false` so Render never re-extracts by name.
+                                const { items, data, _data, form, instance, relativeIndex, relativePath, currencyCode } = this.props
                                 
                                 // Map items with current data context, similar to how Render.js does it
                                 // IMPORTANT: Always pass relativePath and relativeIndex to ensure correct field IDs

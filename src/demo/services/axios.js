@@ -23,7 +23,7 @@ export default axiosInstance;
 
 const processErrorMessage = (error) => {
   if (typeof error === 'string' && error.startsWith('Error')) {
-    return error.match(/message\=(.*)errors/)[1] || error
+    return error.match(/message=(.*)errors/)[1] || error
   }
   return error;
 }

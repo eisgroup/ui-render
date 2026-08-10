@@ -34,11 +34,12 @@ export default (env, argv) => {
                     use: {
                         loader: 'babel-loader',
                         options: {
-                            presets: ['@babel/preset-env', '@babel/preset-react'],
-                            plugins: [
-                                ['@babel/plugin-proposal-decorators', { legacy: true }],
-                                ...(!isProduction ? ['react-refresh/babel'] : []),
-                            ],
+                            // Presets and the decorators plugin come from the shared babel.config.js, which is
+                            // also what the library build and jest use — a loader-level preset entry replaces
+                            // the shared one for the same plugin identifier rather than adding to it, so
+                            // duplicating them here silently overrode the config's own options. Only the
+                            // demo-specific dev transform belongs inline.
+                            plugins: isProduction ? [] : ['react-refresh/babel'],
                         },
                     },
                 },

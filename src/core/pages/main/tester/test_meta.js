@@ -1,1 +1,1 @@
-export { default as default } from '../examples/popup_meta'
+export { default } from '../examples/popup_meta'
