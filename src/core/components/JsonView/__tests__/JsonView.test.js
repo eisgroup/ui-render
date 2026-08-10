@@ -63,10 +63,12 @@ describe('JsonView', () => {
         expect(container.textContent).toContain('{')
     })
 
-    it('allows clicking to toggle expansion', () => {
+    // Named for what it asserts: it renders, it does not click. The toggle rows are plain divs with an
+    // onClick and no role, so the selector below could never reach them. Opening and closing a collapsed
+    // collection for real is covered in JsonView.behavior.test.js.
+    it('renders a nested collection without crashing', () => {
         const data = { outer: { inner: 'value' } }
         const { container } = render(<JsonView data={data} />)
-        // Click any clickable element (collapsible toggle) — just ensure no crash
         const clickables = container.querySelectorAll('[role="button"], span')
         expect(clickables.length).toBeGreaterThan(0)
     })

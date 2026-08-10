@@ -72,6 +72,9 @@
 - Popups declared from an interpolated template no longer fail silently when the template's local
   data is the row array. The row-extraction step read a variable declared further down the same
   block, which threw before the popup could open.
+- Demo API errors now surface the server's message. When an error string carried no recognizable
+  message payload, the demo's response interceptor threw while parsing it and reported that
+  failure instead of the original error.
 - Restored the upload ref contract after the in-house Dropzone replacement so successful
   uploads reinitialize the rendered data.
 - Corrected the nested `dataKind` demo table metadata so it renders valid table markup.
