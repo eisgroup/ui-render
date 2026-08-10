@@ -21,6 +21,8 @@ export function Image ({
 }) {
   if (props.src == null) props.src = imageSrc({name, path})
   if (props.alt == null) props.alt = fileNameWithoutExt(name)
+  // `alt` is always present by the line above; the rule cannot see it arriving through the spread.
+  // eslint-disable-next-line jsx-a11y/alt-text
   return <img className={classNames('img', className)} {...props}/>
 }
 

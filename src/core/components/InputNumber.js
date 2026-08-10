@@ -109,6 +109,9 @@ const InputNumber = ({
             const newValue = valueFromParent !== undefined ? valueFromParent.toString().replace(',', '.') : ''
             if (newValue !== value) setValue(newValue)
         }
+        // `value` is read only to skip a redundant setState. Listing it would re-run this sync on every local
+        // edit, overwriting what the user is typing with the parent's stale value.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [valueFromParent, active])
 
     const onChangeHandler = useCallback((value, name, event) => {

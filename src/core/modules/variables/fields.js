@@ -1,5 +1,4 @@
 import { definitionSetup, LANGUAGE_LEVEL } from '../../utils'
-import { TYPE } from './definitions'
 
 /**
  * FIELD DEFINITIONS ===========================================================

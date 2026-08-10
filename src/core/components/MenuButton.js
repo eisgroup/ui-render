@@ -1,7 +1,6 @@
 import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { Active } from '../utils'
 import Button from './Button'
 
 /**

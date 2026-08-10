@@ -101,7 +101,8 @@ export default class TableView extends PureComponent {
     if (this.props.headers) return this.props.headers
     if (this._headers) return this._headers
     const [item] = this.props.items
-    if (!item) return
+    // No items means no inferrable headers; `undefined` is returned explicitly so the getter always returns.
+    if (!item) return undefined
     return (this._headers = Object.keys(item).map(id => ({id})))
   }
 

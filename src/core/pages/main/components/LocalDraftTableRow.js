@@ -74,7 +74,7 @@ export default class LocalDraftTableRow extends PureComponent {
   }
 
   handleAdd = () => {
-    const { meta, kind, parentInstance, translate } = this.props
+    const { meta, kind, parentInstance } = this.props
     const inputs = collectInputs(meta.items)
     const { draft, fieldErrors: prevErr } = this.state
     const fieldErrors = { ...prevErr }

@@ -55,7 +55,6 @@ export function metaToProps (meta, config) {
         relativePath,
         relativeIndex,
         funcConfig,
-        rowValue,
     } = config
     let {data, _data} = config
     // Transform Root attributes
@@ -88,6 +87,12 @@ export function metaToProps (meta, config) {
                 meta[attribute] = Render.Method(meta[attribute])
             }
             // Below transformation only happens during render
+            // @Note: every renderer built in this loop closes over the ONE function-scoped `_data` binding and
+            // reassigns it below, while the transform code further down (the `definition.name` lookup and the
+            // nested-definition `options._data`) reads that same binding. Renderers therefore observe, and can
+            // clobber, each other's scratch value. Behaviour is intact today only because each renderer assigns
+            // before it reads. Scoping this per renderer is engine-decomposition work (§9.3), not a lint fix.
+            // eslint-disable-next-line no-loop-func
             if (isObject(definition)) meta[attribute] = (value, index, props, self) => {
                 if (attribute === 'renderExtraItem') {
                     definition.useForm = true
