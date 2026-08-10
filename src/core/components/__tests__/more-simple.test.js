@@ -30,6 +30,15 @@ describe('Image', () => {
         const { container } = render(<Image name="My Picture.png" path="/cdn/" />)
         expect(container.querySelector('img').getAttribute('src')).toBe('/cdn/my-picture.png')
     })
+
+    // `name` is optional, and a meta node with view IMAGE may carry only `src`. Deriving the alt text from an
+    // absent name threw and took the whole render down with it.
+    it('renders with an empty alt when neither alt nor name is given', () => {
+        const { container } = render(<Image src="/foo.png" />)
+        const img = container.querySelector('img')
+        expect(img).toBeInTheDocument()
+        expect(img.getAttribute('alt')).toBe('')
+    })
 })
 
 describe('imageSrc', () => {

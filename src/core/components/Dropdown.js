@@ -139,9 +139,9 @@ export function Dropdown ({
   if (props.selection == null) props.selection = true
   if (props.search && props.deburr == null) props.deburr = true // Case and diacritics insensitive search
 
-  // Sanitize
-  // eslint-disable-next-line default-case
-  switch (typeof options[0]) { // no default: any other type (incl. empty options) passes through unchanged
+  // Sanitize. Any other typeof — `undefined` for empty options, boolean, function — passes through unchanged;
+  // the bare `no default` comment below is the escape hatch eslint-config-react-app's `default-case` looks for.
+  switch (typeof options[0]) {
     case 'string':
       options = options.map(value => ({text: translate(value), value}))
       break
@@ -155,6 +155,7 @@ export function Dropdown ({
         options = options.map(({ value, text, ...option }) => ({ value: value, text: translate(text), ...option }))
       }
       break
+    // no default
   }
   if (optionsLabel) options = [...options, {key: '', text: '', content: optionsLabel, disabled: true}]
 
