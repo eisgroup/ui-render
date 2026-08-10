@@ -141,6 +141,27 @@ describe('hasObjKeys', () => {
     it('shallow returns false on object mismatch', () => {
         expect(hasObjKeys({ a: { x: 1 } }, { a: { x: 2 } }, 'shallow')).toBe(false)
     })
+    // The loose comparison used to be OR-ed onto the object branch, so a successful object match was then
+    // vetoed by comparing the two objects by reference — every shallow object match returned false.
+    it('shallow matches a nested object by value, not by reference', () => {
+        expect(hasObjKeys({ a: { x: 1 } }, { a: { x: 1 } }, 'shallow')).toBe(true)
+    })
+    it('shallow matches an object partially, ignoring extra keys on the target', () => {
+        expect(hasObjKeys({ a: { x: 1, y: 2 } }, { a: { x: 1 } }, 'shallow')).toBe(true)
+        expect(hasObjKeys({ a: { x: 1 } }, { a: { x: 1, y: 2 } }, 'shallow')).toBe(false)
+    })
+    it('shallow matches arrays by value', () => {
+        expect(hasObjKeys({ coords: [1, -1] }, { coords: [1, -1] }, 'shallow')).toBe(true)
+        expect(hasObjKeys({ coords: [1, -1] }, { coords: [2, -2] }, 'shallow')).toBe(false)
+    })
+    it('shallow keeps comparing primitives loosely', () => {
+        expect(hasObjKeys({ a: 1 }, { a: '1' }, 'shallow')).toBe(true)
+        expect(hasObjKeys({ a: 1 }, { a: 2 }, 'shallow')).toBe(false)
+    })
+    it('deep still requires strict equality, so an equal object does not match by value', () => {
+        expect(hasObjKeys({ a: { x: 1 } }, { a: { x: 1 } }, 'deep')).toBe(false)
+        expect(hasObjKeys({ a: 1 }, { a: '1' }, 'deep')).toBe(false)
+    })
     it('include returns true when value is an object that matches', () => {
         expect(hasObjKeys({ x: { id: 7 } }, { x: { id: 7 } }, 'include')).toBe(true)
     })
