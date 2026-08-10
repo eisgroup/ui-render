@@ -1,17 +1,3 @@
-// import './static/loader.js'
-// import './static/chunk.js'
-// import './static/main.js'
-// Disable temporarily by team request because of their bundling process
-// import './static/semantic.css'
-// import './static/all.css'
-import UIRender from './UIRender'
+import UIRender = require('./UIRender')
 
-/**
- * ROOT APP VIEW ===============================================================
- * =============================================================================
- */
-
-export {UIRender}
-export default UIRender
-
-
+export = UIRender

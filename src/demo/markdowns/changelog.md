@@ -7,6 +7,12 @@
 - Development and the primary test suite now run on React 17.0.2.
 - The peer range remains additive: host applications may use React 16.14 or React 17.
 - The Moment peer range now accepts all compatible 2.x releases from 2.29.4 onward.
+- Public TypeScript declarations now describe the shipped callable component: `data` and `meta`
+  are required, runtime-supported props are optional, and the package supports an interop default
+  import or a direct TypeScript `import = require` without promising nonexistent instance or named
+  value APIs.
+- The public `translate` callback retains its string-to-string contract; optional and non-string
+  renderer values now bypass it unchanged.
 
 #### Tests and CI
 
@@ -36,6 +42,8 @@
 - Added a smoke contract covering every registered demo example and enforceable coverage
   thresholds for the renderer's critical files.
 - Added GitHub Actions checks for JavaScript/CSS lint, coverage, library build, and demo build.
+- Added a public-declaration gate against locked React 16/17/18 types in interop and direct
+  CommonJS modes, including a check of the built package's callable runtime export.
 
 #### Fixes
 
