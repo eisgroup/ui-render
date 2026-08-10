@@ -12,7 +12,6 @@ const { version: PACKAGE_VERSION } = require('../../../package.json')
 // caught in one spot, by name, instead of drifting silently across the tree.
 const VERSION_SITES = [
     'src/library/AppWrapper.js',
-    'src/library/types/UIRender.tsx',
     'public/index.html',
 ]
 
@@ -34,12 +33,11 @@ jest.mock('../../core/pages/main/rules', () => {
 
 import LibraryRender from '../main' // eslint-disable-line import/first
 import AppWrapper from '../AppWrapper' // eslint-disable-line import/first
-import DefaultExport, { UIRender as NamedExport } from '../index' // eslint-disable-line import/first
+import DefaultExport from '../index' // eslint-disable-line import/first
 
 describe('published library contract', () => {
-    it('exports the same renderer as both the default and named API', () => {
+    it('exports the renderer as the default API', () => {
         expect(DefaultExport).toBe(LibraryRender)
-        expect(NamedExport).toBe(LibraryRender)
     })
 
     it('wraps UIRender with initialized contexts and the scoped application shell', () => {

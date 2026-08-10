@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": ["ES2019", "DOM"],
+    "jsx": "react",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": false,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": false,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["react"]
+  },
+  "files": ["public-types-commonjs-consumer.tsx"]
+}

@@ -242,7 +242,8 @@ export class UIRender extends Component {
             errorHandlerFunction = props.getValidationErrors
         }
         if (typeof props.translate === 'function') {
-            Active.translate = props.translate
+            const translate = props.translate
+            Active.translate = value => typeof value === 'string' ? translate(value) : value
         }
 
         this.state = {
@@ -325,7 +326,7 @@ export class UIRender extends Component {
     onDataChanged = undefined
 
     render () {
-        const { childBefore, childAfter, form, embedded, className, style, translate, parent, dateFormat } = this.props
+        const { childBefore, childAfter, form, embedded, className, style, parent, dateFormat } = this.props
         const { key } = this.state
 
         const content = this.hasData && this.hasMeta &&
@@ -338,7 +339,7 @@ export class UIRender extends Component {
                 // Passing parent here made embedded Data / renderExtraItem fields call instance.form.change
                 // on the root form while Field names targeted nested paths — values leaked into the parent object.
                 instance={this}
-                translate={translate}
+                translate={Active.translate}
                 onDataChanged={this.onDataChanged}
                 currencyCode={this.state.currencyCode}
                 dateFormat={dateFormat}

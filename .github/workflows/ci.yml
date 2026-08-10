@@ -45,5 +45,8 @@ jobs:
       - name: Build library
         run: npm run build-lib
 
+      - name: Check public TypeScript declarations
+        run: npm run test:types:consumer
+
       - name: Build demo
         run: npm run build

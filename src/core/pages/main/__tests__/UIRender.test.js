@@ -89,6 +89,35 @@ describe('UIRender (smoke)', () => {
         expect(container.textContent).toContain('tr:Hello')
     })
 
+    it('only passes strings to the public translate callback', () => {
+        const translate = jest.fn(value => value.toUpperCase())
+        const meta = { view: 'Input', name: 'firstName', label: 'First name' }
+        const { container } = render(wrap(<UIRender meta={meta} data={{}} translate={translate} />))
+
+        expect(container.querySelector('label')).toHaveTextContent('FIRST NAME')
+        expect(translate).toHaveBeenCalledTimes(1)
+        expect(translate).toHaveBeenCalledWith('First name')
+    })
+
+    it('preserves non-string translatable values without calling the public callback', () => {
+        const translate = jest.fn(value => value.toUpperCase())
+        const meta = {
+            view: 'Checkbox',
+            id: 'feature',
+            type: 'toggle',
+            value: true,
+            labelTrue: 42,
+            labelFalse: 'Unavailable',
+            onChange: () => {},
+        }
+        const { container } = render(wrap(<UIRender meta={meta} data={{}} translate={translate} />))
+
+        expect(container.querySelector('.checkbox__true')).toHaveTextContent('42')
+        expect(container.querySelector('.checkbox__false')).toHaveTextContent('UNAVAILABLE')
+        expect(translate).toHaveBeenCalledTimes(1)
+        expect(translate).toHaveBeenCalledWith('Unavailable')
+    })
+
     it('renders an Input field bound to a form (with initialValues)', () => {
         const meta = {
             view: 'Input',

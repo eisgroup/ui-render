@@ -1,9 +1,9 @@
 /**
- * Rewrites every hand-written `data-version="..."` in the tree to match package.json.
+ * Rewrites every runtime `data-version="..."` in the tree to match package.json.
  *
- * The version is duplicated across the published wrapper, its type declaration and the demo
- * shell. Wired to the `version` npm lifecycle script, so `npm version` keeps them in step
- * instead of leaving a release commit that fails its own contract test.
+ * The version is duplicated across the published wrapper and the demo shell. Wired to the
+ * `version` npm lifecycle script, so `npm version` keeps them in step instead of leaving a
+ * release commit that fails its own contract test.
  *
  * Run directly to check or repair at any time:
  *   node scripts/sync-version.js          # rewrite files that drifted
@@ -18,7 +18,6 @@ const { version } = require(path.join(ROOT, 'package.json'));
 // Keep in step with VERSION_SITES in src/library/__tests__/library.public-api-and-wrapper.test.js
 const FILES = [
     'src/library/AppWrapper.js',
-    'src/library/types/UIRender.tsx',
     'public/index.html',
 ];
 

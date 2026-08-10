@@ -2,11 +2,12 @@
 
 | | |
 |---|---|
-| **Status** | In progress — React 17 automated checkpoint green; Phase 0 partially complete |
+| **Status** | In progress — React 17 hosted checkpoint green; Phase 0 types/CI baseline complete and packaging partially complete |
 | **Date** | 2026-07-06 |
 | **Re-verified** | 2026-07-21 — independent re-audit against the working tree, lockfile, build configs, a full test/lint/audit/pack run, and the npm registry; new findings indexed in §2.6 |
-| **Checkpoint verified** | 2026-08-05 — 137 suites / 1904 tests; coverage thresholds, JS/CSS lint, library build and demo build green locally |
-| **Audited version** | 0.34.2 (branch snapshot) |
+| **Checkpoint verified** | 2026-08-07 — `master` b0b64d3: 138 suites / 1920 tests; 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JS/CSS lint and library/demo builds green in hosted CI |
+| **Current change verified** | 2026-08-10 — 138 suites / 1921 tests locally (the obsolete type-shim version-site case was removed and two `translate` boundary contracts were added); coverage thresholds, React 16/17/18 declaration matrix, JS/CSS lint and both builds green |
+| **Audited version** | 0.34.2 (master checkpoint) |
 | **Scope** | React 17/18 upgrade path, React 19 readiness, a principles-preserving modernization roadmap, the `semantic-ui-react` exit plan (§9.7-F1), the `moment` native-replacement analysis (§9.7-F2), the project-structure analysis (§9.9), the TypeScript migration (§9.6), and the consolidated verification checklist (Appendix C) |
 
 ---
@@ -15,10 +16,10 @@
 
 The audit shows that **the path to React 18 is almost entirely unblocked**. The build toolchain is already modern (webpack 5, Jest 30, Babel 7.26, Node 24), and every runtime dependency already declares React 17/18 peer support. The lag is concentrated in four places:
 
-1. **React itself** — the React 17 checkpoint is implemented in the current change; React 18 is not yet admitted by the peer range.
+1. **React itself** — the React 17 checkpoint has landed on `master`; React 18 is not yet admitted by the peer range.
 2. **`@testing-library/react` 12.1.5** — peer-restricted to `react <18`; the only hard dependency blocker.
-3. **Legacy component patterns** — 22 class components, `UNSAFE_*` lifecycles in 13 files, including deliberate **runtime prototype patching** in `src/core/pages/main/rules.js` and `src/core/modules/form/utils.js`. These are *not* upgrade blockers (prefixed `UNSAFE_*` methods work in React 17, 18, and 19), but they block `StrictMode`, concurrent features, and long-term maintainability.
-4. **The shipped artifact itself** — the published type declarations describe a different, legacy integration shim (`window._mountUIRender`), not the exported component; a CI workflow is now present but its first hosted run is pending, and there is still no publish gate, so the tarball is whatever `dist/` happens to lie on the maintainer's disk (currently 11.6 MB unpacked, with duplicated assets and source maps); and the published CSS leaks unscoped `html`/`body`/`*` rules into host pages. §2.6 carries the evidence; Phase 0 turns these into gates.
+3. **Legacy component patterns** — 21 source files contain class components, with `UNSAFE_*` lifecycles in 13 files, including deliberate **runtime prototype patching** in `src/core/pages/main/rules.js` and `src/core/modules/form/utils.js`. These are *not* upgrade blockers (prefixed `UNSAFE_*` methods work in React 17, 18, and 19), but they block `StrictMode`, concurrent features, and long-term maintainability.
+4. **The shipped artifact itself** — the public declarations now describe the actual single callable UMD/CommonJS component and are compiled against locked React 16/17/18 type environments in both interop-default and direct-CommonJS modes; hosted CI is green, and `prepack` rejects version drift before rebuilding the library. Packaging budgets, a packed-consumer smoke, asset deduplication and the source-map decision remain open; the current tarball baseline is 11.6 MB unpacked with duplicated assets and source maps. The published CSS also leaks unscoped `html`/`body`/`*` rules into host pages. §2.6 carries the evidence and remaining gates.
 
 **Recommended target: React 18.3, reached in two checkpointed releases (17 → 18), followed by an incremental modernization program.** React 19 is a watch-item, not a target — it stays gated on the §9.7-F1 exit (see the §8 fast path).
 
@@ -26,6 +27,7 @@ Standing decisions:
 
 1. **`semantic-ui-react` will be exited entirely** (§9.7-F1). The audited dependency surface is far smaller than the package's reputation suggests: exactly **3 wrapper components** (`Table`, `TooltipPop`, `Dropdown`) and **5 curated LESS modules** — the codebase has already been trending out of it (slider lib and react-dropzone removed recently, modal and pagination already in-house). Completing the exit also removes the main external React 19 blocker.
 2. **`moment` stays** as a peer dependency — no dayjs migration. The requested native-replacement feasibility analysis (§9.7-F2) concludes it is possible and well-bounded (~400–600 lines behind an adapter seam), but it is parked behind an explicit decision gate; the only near-term action is funneling usage through a single internal adapter module.
+3. **The published JavaScript API stays a single callable value.** `require('eis-ui-render')` returns the function directly (there is no runtime `.default` or `.UIRender` property); TypeScript models this with `export =`, which also supports a default import when module interop is enabled. Named interfaces and type aliases remain available through the merged namespace, but a named `UIRender` value export is not restored. Script-tag/global typing remains tied to the separate UMD-support gate in §10.
 
 The **project-structure analysis** (§9.9) found: the documented `ui-*-pack` alias system is dead (zero imports in the codebase — CLAUDE.md was stale on this; fixed alongside this plan), the engine lives under an app-boilerplate-era `core/pages/main/` path, and 12 orphan components (9 direct, plus the `ErrorTable`/`Square`/pack-`TabList` cluster reachable only from other orphans) plus a dead `style/unused/` tree can simply be deleted. The workstream re-homes the engine to `core/engine/` ahead of the §9.3 decomposition, isolates the demo, and locks layer direction in with lint.
 
@@ -47,8 +49,8 @@ Because `react`/`react-dom` are webpack **externals** and npm **peer dependencie
 | Node | engines `>=22`, `.nvmrc` = 24 | ✅ current |
 | Lint | ESLint 8 + `eslint-config-react-app` 7 | ⚠️ `npm run lint:js` now exists and exits green (0 errors / 22 warnings) and is wired into CI; warning triage, audit ownership and the zero-reference devDependency sweep remain in Phase 0.9 |
 | Styling | LESS 3.13 (pinned for the semantic-ui-less + `less-plugin-functions` toolchain), PostCSS 8, stylelint 16 | ✅ works; LESS pin is a separate watch-item (§9.8) |
-| Types | Hand-written public API types in `src/library/types/`, emitted via `tsconfig.build.json` (declaration-only) | ❌ **describes the wrong component** — a legacy `window._mountUIRender` shim, not the shipped export (§2.6-1); replaced in Phase 0.6 |
-| CI / publish gates | GitHub Actions workflow for push and pull requests | ⚠️ JS/CSS lint, coverage, library build and demo build are wired; first hosted run pending. No `prepack`, pack budgets or packed-consumer smoke yet — Phase 0.7 |
+| Types | Hand-written public API types in `src/library/types/`, emitted via `tsconfig.build.json` (declaration-only) | ✅ describes the direct callable UMD/CommonJS export; emitted declarations compile with `skipLibCheck: false` against locked `@types/react` 16/17/18 consumers using both interop-default and direct `import = require` (§2.6-1, Phase 0.6) |
+| CI / publish gates | GitHub Actions workflow for pull requests and `master` pushes | ⚠️ hosted CI is green for JS/CSS lint, coverage and both builds; `prepack` checks version sync and rebuilds the library. Pack budgets, packed-consumer smoke, asset deduplication and the source-map decision remain — Phase 0.7 |
 
 ### 2.2 Dependency compatibility matrix
 
@@ -71,7 +73,7 @@ Peer ranges verified against `package-lock.json` (resolved versions), not npm me
 
 ### 2.3 React legacy pattern inventory
 
-Original audit baseline: 257 JS/JSX files (+2 TS), 76 test files. The safety/React 17 workstream adds 61 contract-test files: 137 suites / 1904 tests at the 2026-08-05 checkpoint. 22 files contain real class components (a wider grep also matches 2 test files and 3 doc-comment-only hits); ~19 files use hooks (15 in `src/core`).
+Original audit baseline: 257 JS/JSX files (+2 TS), 76 test files. The safety/React 17 workstream adds 62 contract-test files: 138 suites / 1920 tests at the hosted `master` checkpoint. The current type correction runs 138 / 1921: the obsolete type-shim version-site case was removed and two `translate` boundary contracts were added. 21 source files contain real class components (a wider lifecycle/component grep also matches 6 test files and 3 doc-comment-only hits); ~19 files use hooks (15 in `src/core`).
 
 **`UNSAFE_*` lifecycle usage (works on React 17/18/19; hostile to StrictMode):**
 
@@ -120,7 +122,7 @@ A second audit pass — against the working tree, the build configs, a full test
 
 | # | Finding (file:line references verified) | Owned by |
 |---|---|---|
-| 1 | **Published types describe a different component.** `src/library/types/UIRender.tsx` is a legacy DOM-proxy class that renders an empty `<div>` and requires a global `window._mountUIRender` — while the shipped `dist/index.js` exports the real component (`src/library/main.js`: `AppProvider → AppWrapper → engine`). Required/optional is inverted vs runtime (types require `onSubmit`/`translate`; runtime requires `data`/`meta` — `rules.js:219–220`); the d.ts promises a named `UIRender` export while the UMD emits **default-only** (`webpack.library.config.mjs` `library.export: 'default'`). | Phase 0.6, §9.6-E4 |
+| 1 | **Published types describe a different component.** `src/library/types/UIRender.tsx` is a legacy DOM-proxy class that renders an empty `<div>` and requires a global `window._mountUIRender` — while the shipped `dist/index.js` exports the real component (`src/library/main.js`: `AppProvider → AppWrapper → engine`). Required/optional is inverted vs runtime (types require `onSubmit`/`translate`; runtime requires `data`/`meta` — `rules.js:219–220`); the d.ts promises a named `UIRender` export while the UMD exposes the source default as a direct callable value, without runtime `.default` or `.UIRender` properties (`webpack.library.config.mjs` `library.export: 'default'`). | Phase 0.6, §9.6-E4 |
 | 2 | **The public `dateFormat` prop is dead end-to-end.** `rules.js:328/344` passes it into `<Render>`, but `Render.js:45` destructures and discards it; nothing feeds it into `ConfigContext` (`AppProvider` receives no props; the context declares `updateConfig` while the provider exposes `setConfig`); `TextDateValue.js` ignores its own `dateFormat` parameter. Components always see the context default `'MM-DD-YYYY'`. | §9.4 |
 | 3 | **A per-node error boundary already exists** — `RenderClass` has `componentDidCatch` + a `Render.onError` hook (`Render.js:65–67,131`) — but the production override at `mapper.js:680` destructures `{err, errInfo}` while the boundary emits `{error, errorInfo}`, so reports carry `undefined`. | §9.4 (extend + fix, not create) |
 | 4 | **Engine ↔ form-modules import cycle:** `form/utils.js:13–14` imports `errorsProcessing`, `clearErrorsMap`, `formsStorage` from `pages/main/*`, while `rules.js:3` imports `storedTouched`, `withForm` from `modules/form` — in addition to the known `Text.js:4` violation. | §9.3 step 2, §9.9-H5 |
@@ -136,13 +138,16 @@ A second audit pass — against the working tree, the build configs, a full test
 | 14 | **Orphan set is 12, not 9:** the 9 direct orphans re-confirmed, plus `ErrorTable` (imported only by orphan `ErrorContent`), `Square` (only by orphan `Carousel`), and the pack `TabList` (mapper uses the engine copy, `mapper.js:33`). Engine `tester/` fixtures are referenced by nothing. | §9.9-H1, §9.2 |
 | 15 | **Hardcoded version strings** `data-version="0.34.2"` in `AppWrapper.js:10` and `types/UIRender.tsx:76` — drift on every release; should come from `package.json` at build time. | §9.9-H6 |
 
-**Checkpoint updates (2026-08-05):**
+**Checkpoint updates (2026-08-07):**
 
+- Finding 1: resolved — the declaration now models the direct callable UMD/CommonJS function (`export =`), with `data`/`meta` required and the remaining runtime props optional; emitted declarations compile against locked React 16/17/18 type environments in both interop and non-interop consumer modes, and the smoke verifies the actual `require()` shape.
 - Finding 6: partially resolved — the Final Form wrapper now keeps one subscription per active form and unsubscribes on replacement or unmount; the remaining runtime hazards stay open.
+- Finding 8: partially resolved — `prepack` rejects version drift and rebuilds the library, and the hosted CI checkout is green; pack budgets, packed-consumer smoke, duplicated assets and the source-map decision stay open.
 - Finding 9: resolved by including both imported `input-integer_{meta,data}.json` fixtures in tracked source; the registry contract covers all 37 registered examples.
 - Finding 10: partially resolved — the root Babel test/build target split landed; folding the demo's duplicated inline presets into the shared config remains open.
 - Finding 13: partially resolved — `lint:js` exists and exits with 0 errors / 22 warnings, and CI wiring exists; audit ownership and the 13-package devDependency sweep remain open.
-- Current automated checkpoint: 137 suites / 1904 tests; configured coverage thresholds pass.
+- Finding 15: resolved — `npm version` synchronizes the runtime/demo literals, while `prepack` rejects drift before rebuilding; the removed legacy type shim is no longer a version site.
+- Current hosted checkpoint: 138 suites / 1920 tests; coverage is 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JS/CSS lint and both builds are green (Actions run 31175926661).
 
 ---
 
@@ -182,29 +187,29 @@ Widen, never replace:
 
 ---
 
-## 4. Phase 0 — Reproducibility, API & security baseline (prerequisite, do not skip)
+## 4. Phase 0 — Reproducibility, API & security baseline (remaining gates required before React 18)
 
-**Goal:** make regressions *visible* and releases *reproducible* before changing React's behavior underneath the form engine. The §2.6 re-audit widened this phase: it now also closes the public-type mismatch, the packaging drift, and the lint/security gaps — everything later phases implicitly assume.
+**Goal:** keep regressions *visible* and make releases *reproducible*. React 17 landed with the automated baseline; the unresolved Babel, packaging, lint/security and release gates must close before React 18 changes behavior underneath the form engine.
 
 | # | Action | Detail |
 |---|---|---|
-| 0.1 | Record the green baseline | The original 76-suite baseline is recorded; the current checkpoint runs 137 suites plus both builds, with counts and coverage retained for later comparison. |
+| 0.1 | Record the green baseline | The original 76-suite baseline is recorded; the current hosted checkpoint runs 138 suites plus both builds, with counts and coverage retained for later comparison. |
 | 0.2 | Close test gaps around `rules.js` critical flows | Priority order: initial data processing / normalization (`utils.js` error mapping), `showIf` evaluation, validation + error propagation into fields, actions (`submit` payload assembly, `addData` / `removeData`, upload/download), re-render on `data` prop change. These are exactly the paths sensitive to React 18 batching. |
 | 0.3 | Example smoke harness | A Jest suite that mounts **every** meta/data pair from `src/demo/examples/` and asserts render without throwing. This doubles as the seed for contract tests (§9.5). |
-| 0.4 | CI on every PR | Run JS/CSS lint, coverage, `build-lib` and the demo build with steps identical to the local scripts. The workflow is added; its first hosted run is pending. |
+| 0.4 | CI on every PR | JS/CSS lint, coverage, `build-lib` and the demo build run with the same scripts used locally. The hosted `master` run is green. |
 | 0.5 | Babel targets env-split | The root config now splits test (`node: current`) from build (browserslist) targets. The demo already honors browserslist through duplicated inline presets; folding those presets into the shared config remains open (§2.6-10, §9.8; closes R6). |
-| 0.6 | Public API & types baseline | Replace the legacy `window._mountUIRender` shim in `src/library/types/` with a minimal d.ts of the component actually shipped (§2.6-1): `data`/`meta` required as at runtime, `translate`/`onSubmit` optional, export shape matching the UMD `export: 'default'` (restoring the named export is a §10 decision gate). Add a TS consumer smoke that compiles `import UIRender from 'eis-ui-render'` against `@types/react` 16, 17 and 18 (+19 at the flip). **This corrected file becomes the golden baseline for §9.6-E4** — never snapshot the legacy shim. Closes R15 (types half). |
-| 0.7 | Packaging gate | Add `prepack` (build-lib incl. `gen-ts`) so a publish can never ship a stale `dist/`; deduplicate `dist/static` vs root `static/`; decide source-map shipping (§10 gate). Today: 579 files / 11.6 MB unpacked, `all.css` twice, ~1 MB of maps, a 0-byte `semantic.css` (§2.6-8). Record budgets (unpacked size, file count, JS/CSS sizes) enforced via `npm pack --dry-run` in CI; add a clean-checkout smoke (`git clean -xdf && npm ci && npm test && build-lib + demo build`) and a packed-tarball consumer smoke (`require('eis-ui-render')` from the tarball). Closes R15 (packaging half). |
-| 0.8 | Repo completeness | Everything imported by tracked code must be tracked. The two `input-integer` fixtures imported by `Examples.jsx:24–25` are included in the current checkpoint; the 0.7 clean-checkout job must make future drift fail fast. |
+| 0.6 | Public API & types baseline | **Completed.** The legacy `window._mountUIRender` class shim was replaced by declarations for the actual direct callable UMD/CommonJS function (§2.6-1): `data`/`meta` are required, runtime-supported props are optional, `translate` keeps its string-to-string localization contract while non-string renderer values bypass it unchanged, and no nonexistent instance/ref API, `.default` property or named value export is promised. The CI workflow compiles emitted `dist/*.d.ts` with `skipLibCheck: false` in isolated consumers against locked `@types/react` 16, 17 and 18 (+19 at the flip), using both interop-default and direct-CommonJS imports; it also verifies the built runtime export. The matrix is green locally in this change. **This corrected contract is the golden baseline for §9.6-E4.** Closes the types half of R15. |
+| 0.7 | Packaging gate | **Partially completed.** `npm version` synchronizes runtime/demo version literals; `prepack` rejects version drift and runs `build-lib` including `gen-ts`, and the fresh hosted checkout is green. Still required: deduplicate `dist/static` vs root `static/`; decide source-map shipping (§10 gate); enforce budgets (unpacked size, file count, JS/CSS sizes) via `npm pack --dry-run`; add a packed-tarball consumer smoke. Current measured baseline: 579 files / 11.6 MB unpacked, `all.css` twice, ~1 MB of maps and a 0-byte `semantic.css` (§2.6-8). Closes the remaining packaging half of R15 when complete. |
+| 0.8 | Repo completeness | Everything imported by tracked code must be tracked. The two `input-integer` fixtures imported by `Examples.jsx:24–25` are included in the current checkpoint; the fresh hosted checkout now makes future tracked-file drift fail fast. |
 | 0.9 | Lint & security baseline | `lint:js` now exits with 0 errors / 22 warnings and runs with `lint:css` in CI. Triage the warnings, record audit ownership (`npm audit --omit=dev` baseline 0; full audit baseline 20), and remove the 13 zero-reference devDependencies (§2.6-13, §9.9-H9). |
 
-**Implementation status (2026-08-05):**
+**Implementation status (2026-08-07):**
 
-- Completed: automated baseline and critical-flow contracts (0.1–0.3); repo completeness for the imported input-integer fixtures (0.8).
-- Partial: CI workflow added, first hosted run pending (0.4); root Babel split landed but demo preset consolidation remains open (0.5); JS lint script and CI wiring are green, while audit ownership and the devDependency sweep remain open (0.9).
-- Open: truthful public types and consumer compile matrix (0.6); `prepack`, pack budgets, clean-checkout/tarball smokes, asset deduplication and source-map decision (0.7).
+- Completed: automated baseline and critical-flow contracts (0.1–0.4); truthful callable-export public types plus the locked React 16/17/18 interop/CommonJS consumer matrix (0.6); repo completeness for the imported input-integer fixtures (0.8).
+- Partial: root Babel split landed but demo preset consolidation remains open (0.5); the `prepack` version/build guard and fresh hosted checkout landed while pack budgets, packed-consumer smoke, asset deduplication and the source-map decision remain (0.7); JS lint and CI are green while audit ownership and the devDependency sweep remain (0.9).
+- Open: the remaining work within 0.5, 0.7 and 0.9 listed above.
 
-**Exit criteria:** CI green on the current React 16 baseline **from a clean checkout**; `rules.js` critical flows covered; example smoke harness in place; Babel build targets honor browserslist; published types describe the real component and compile against `@types/react` 16/17/18; `prepack` + pack budgets enforced; `lint` script green; audit baselines recorded.
+**Exit criteria:** CI green on the React 17 baseline **from a clean checkout**; `rules.js` critical flows covered; example smoke harness in place; Babel build targets honor browserslist; published types describe the real component and compile against `@types/react` 16/17/18; `prepack` + pack budgets enforced; `lint` script green; audit baselines recorded.
 
 **Estimated effort:** ~1.5–2 weeks (widened from ~1 week by the §2.6 findings).
 
@@ -223,7 +228,7 @@ Widen, never replace:
 
 `@testing-library/react` 12 stays (its `react <18` peer admits 17). `ReactDOM.render` in the demo stays (fully supported in 17).
 
-**Automated checkpoint (2026-08-05):** React/React DOM 17.0.2, additive React 16.14/17 peer ranges and Moment `^2.29.4` are in the current change. 137 suites / 1904 tests, coverage thresholds, JS/CSS lint and both builds are green locally. Manual QA, react-refresh, yalc smoke, overlay-ordering QA and the release decision remain open.
+**Automated checkpoint (2026-08-07):** React/React DOM 17.0.2, additive React 16.14/17 peer ranges and Moment `^2.29.4` are on `master`. Hosted CI is green: 138 suites / 1920 tests; coverage is 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JS/CSS lint and both builds pass. Manual QA, react-refresh, yalc smoke, overlay-ordering QA and the release decision remain open.
 
 ### React 17 behavioral changes, mapped to this codebase
 
@@ -342,7 +347,7 @@ Every workstream below is a series of small, independently shippable, reversible
 
 ### 9.2 Workstream A — Class → hooks migration (leaf-first)
 
-**Motivation:** 22 class components, most carrying `UNSAFE_componentWillReceiveProps` that is a simple props→state derivation. Hooks versions are smaller, StrictMode-safe, and testable.
+**Motivation:** 21 class components, most carrying `UNSAFE_componentWillReceiveProps` that is a simple props→state derivation. Hooks versions are smaller, StrictMode-safe, and testable.
 
 **Rules of engagement:**
 - One component per PR. Refactor only components with existing tests (write them first otherwise).
@@ -400,7 +405,7 @@ All decomposition outputs are authored in TypeScript from the start (`engine/*.t
 
 ### 9.6 Workstream E — TypeScript migration
 
-**Decision: full migration of the library source to TypeScript.** Motivation: the meta/data contract and pack APIs are exactly the implicit knowledge TS makes explicit; `propTypes` are inert for function components on React 19; and the current hand-written `.d.ts` drifts silently from reality.
+**Decision: full migration of the library source to TypeScript.** Motivation: the meta/data contract and pack APIs are exactly the implicit knowledge TS makes explicit; `propTypes` are inert for function components on React 19; and the previous hand-written `.d.ts` had drifted silently from reality. Phase 0.6 corrected that baseline, but a hand-maintained contract remains a future drift risk until the E4 switchover.
 
 **Audited starting point:** 2 TS files (hand-written public types in `src/library/types/`, compiled declaration-only via `tsconfig.build.json`) vs 257 JS/JSX files. Webpack rules (all three configs) and the nodemon watcher already accept `.ts/.tsx`, and `typescript` 5.x + a TS-aware ESLint config are installed — **but `babel.config.js` has no `@babel/preset-typescript`**, so a `.ts` file imported into the bundle today would not compile, and there is no root `tsconfig.json`. Migration is file-by-file rename with strict checking of converted files only — no big-bang.
 
@@ -638,7 +643,7 @@ Fix the direct violation (move `ISO_8601_COMPLETE_DATE` into `core/utils`); the 
 - `TooltipPop` → `Tooltip` during its F1 step 2 rewrite.
 - Engine `utils.js` dissolves into named modules during §9.3 (`dataMapping.js`, `errorMapping.js`, …).
 - `Tabs`/`TabList` pairs: the re-audit confirmed mapper uses the engine copies and the pack `TabList` is an orphan (delete via H1); audit the pack `Tabs` the same way before its §9.2 migration.
-- Replace the hardcoded `data-version="0.34.2"` strings (`AppWrapper.js:10`, `types/UIRender.tsx:76`) with a build-time injection from `package.json` (§2.6-15).
+- **Completed version guard:** `npm version` synchronizes the runtime wrapper and demo-shell literals from `package.json`; `prepack` rejects drift before rebuilding. The removed type shim is no longer a version site (§2.6-15).
 
 #### H7 — Build config consolidation
 
@@ -703,7 +708,6 @@ Phases 3 and 4 can partially overlap. Tracks **5a/5b** (SUIR exit) and **6** (en
 | Bundled vs external runtime deps — the hybrid model (§2.6-11) | (a) trim `dependencies` to match the bundle (hosts stop double-installing); (b) externalize more (peer list grows); (c) status quo, documented | with the F3 spec | host installation model + bundle-size goals |
 | `engines.node >= 22` in the published manifest | keep / relax / move to docs as build-only | Phase 0.7 | consumers using `engine-strict` |
 | Source maps in the tarball (~1 MB today) | ship (debuggability) / strip / publish separately | Phase 0.7 | host debugging practice |
-| Named export restoration (`import { UIRender }`) | (a) default-only, types corrected to match; (b) restore the named export (UMD `library.export` change — breaking for globals consumers) | Phase 0.6 | how typed hosts import today |
 | Global `html`/`body`/`*` CSS reset (§2.6-7) | scope everything under `.ui-render` / keep the global reset deliberately + document | H8, before F1 step 4 | whether any host relies on the leak |
 | `moment` optional-peer demotion | only at the F2 flip, gated on the F2.2-5 consumer audit (the Phase 1 `^2.29.4` widening is already decided) | F2 gate | consumer callback audit |
 
@@ -727,7 +731,7 @@ Phases 3 and 4 can partially overlap. Tracks **5a/5b** (SUIR exit) and **6** (en
 | R12 | Form-stack major bump (`final-form` 4→5, `react-final-form` 6→7) changes form-state behavior in the engine | Medium | High (the engine is the product's core) | Changelog audit first; all four packages in one isolated PR on React 18; form-flow + contract suites gate; rollback = revert one PR |
 | R13 | TS migration drifts the public API types (E4 switchover) or breaks a build pipeline (Babel strips types file-by-file) | Medium | Medium | Golden `dist/index.d.ts` diff gate; `isolatedModules` + CI `tsc --noEmit` from E0; probe files verify all four pipelines before any real conversion |
 | R14 | Module-global engine state (`FIELD.FUNC`, `Active.translate`, `errorHandlerFunction`, `formsStorage`, `errorsMap`, `storedTouched`, fixed-id popup root) — two `UIRender` instances on one page interfere **today**, and StrictMode double-invocation trips on the same writes | High (current behavior) | Medium–High | §9.3 step 3 (de-globalization incl. per-instance portal root); two-instance case added to the contract suite; until then, document the single-instance assumption for hosts |
-| R15 | Shipped d.ts describes a nonexistent integration (legacy `window._mountUIRender` shim) and packaging has no gate — a routine publish ships stale or oversized artifacts | High (current state) | High | Phase 0.6 (truthful types + consumer compile matrix) and 0.7 (`prepack`, budgets, clean-checkout + tarball smokes) |
+| R15 | Public declarations or package contents regress after the corrected baseline; the tarball remains oversized and unbudgeted | Medium | High | Corrected golden d.ts, locked React 16/17/18 consumer matrix, fresh hosted checkout and the `prepack` version/build guard have landed; Phase 0.7 still requires budgets, packed-consumer smoke, asset deduplication and the source-map decision |
 | R16 | Published CSS restyles host pages (unscoped `html`/`body`/`*` reset in `all.css`) | High (current behavior) | Medium–High | H8 decision + unified prefixwrap; §9.5 final-CSS gate; implemented in F1 step 4 |
 | R17 | Form-runtime leaks (per-render subscriptions, prototype-shared debounce, state mutation, uncancelled timers) degrade long-lived host sessions and multi-instance pages | Medium–High | Medium | §9.3 step 4 fixes (shippable before the full decomposition), gated by Phase 0 tests; R14 two-instance coverage |
 
@@ -735,14 +739,14 @@ Phases 3 and 4 can partially overlap. Tracks **5a/5b** (SUIR exit) and **6** (en
 
 ## Appendix A — Inventory quick reference
 
-- **Class components (22 source files; a wider grep also matches 2 test files and 3 doc-comment-only hits):** components pack (`Collapse`, `Tabs`, `Carousel`, `Counter`, `Expand`, `ProgressBar`, `ProgressSteps`, `InputNative`), pages (`rules.js`, `Data.js`, `mapper.js`, `components/Tabs.js`, `TableView.js`, `LocalDraftTableRow.js`), modules (`form/utils.js`, `form/views/AutoSave.js`, `form/inputs/ToggleField.js`, `form/asInputDateField.js`, `upload/views/Upload.js`), core (`ui-render/Render.js`), library types, demo (`Examples.jsx`).
+- **Class components (21 source files; a wider lifecycle/component grep also matches 6 test files and 3 doc-comment-only hits):** components pack (`Collapse`, `Tabs`, `Carousel`, `Counter`, `Expand`, `ProgressBar`, `ProgressSteps`, `InputNative`), pages (`rules.js`, `Data.js`, `mapper.js`, `components/Tabs.js`, `TableView.js`, `LocalDraftTableRow.js`), modules (`form/utils.js`, `form/views/AutoSave.js`, `form/inputs/ToggleField.js`, `form/asInputDateField.js`, `upload/views/Upload.js`), core (`ui-render/Render.js`), demo (`Examples.jsx`).
 - **Key module sizes:** `rules.js` 1244 · `mapper.js` 700 · `form/utils.js` 624 · `transforms.js` 423 · `Render.js` 133.
 - **Docs hardcoding React version:** `src/demo/markdowns/docs.md:16,37,41` · `README.md` (plus a prose peer-deps note at `changelog.md:50`).
 - **SUIR JS surface (3 of 54 pack files):** `Table.js` (subcomponent users: `mapper.js:170`, `TableView.js`, `LocalDraftTableRow.js`, `ErrorTable.js`) · `TooltipPop.js` (`Render.Tooltip`, `mapper.js:44,483`) · `Dropdown.js` (`mapper.js:540–544`).
 - **semantic-ui-less modules actually imported** (`src/style/override/_semantic.less`): `globals/reset`, `elements/label` (chips), `collections/menu` (own Pagination), `modules/dropdown`, `modules/popup`; `transition` already replaced by an in-house `transition.less`.
 - **moment call sites:** `Text.js:43` · `TextDateValue.js:8` · `InputDate.js:58–65` (+ rc-picker moment `generateConfig` at :10/:88) · `time.js` `formatTime`/`toHours` (test-only, no production callers).
 - **Structure facts (§9.9):** `ui-*-pack` alias imports: **0** across `src` · `tsconfig-paths-webpack-plugin`: referenced by no config · orphan components ×12: `Avatar`, `Badge`, `Carousel`, `Collapse`, `ErrorContent`, `FloatNumber`, `ImageSwatch`, `MenuButton`, `Tags` + cluster `ErrorTable`/`Square`/pack-`TabList` · layering: engine⇄form-modules cycle (`form/utils.js:13–14` ⇄ `rules.js:3`) + `components/Text.js:4` → `../modules/variables` · demo entries at `src/` root: `index.js`, `main.jsx`, `App.jsx`.
-- **Public-surface facts (§2.6):** runtime entry `library/index.js → main.js` (`AppProvider → AppWrapper → engine`) · UMD `library.export: 'default'` (named export dropped) · published types = legacy `window._mountUIRender` shim · `dateFormat` prop dead (`Render.js:45`) · fixed-id portal root (`AppWrapper.js:17`) · tarball 579 files / 11.6 MB with `dist/static` + root `static` duplicated and ~1 MB of source maps.
+- **Public-surface facts (§2.6):** runtime entry `library/index.js → main.js` (`AppProvider → AppWrapper → engine`) · `require(dist)` returns one callable function with no `.default`/`.UIRender`; declarations use `export =`, retain named types through a merged namespace, and pass locked React 16/17/18 checks in interop and direct-CommonJS modes · `dateFormat` prop is still dead (`Render.js:45`) · fixed-id portal root (`AppWrapper.js:17`) · `prepack` checks version sync and rebuilds, while the measured tarball remains 579 files / 11.6 MB with duplicated `dist/static` + root `static` assets and ~1 MB of source maps.
 
 ## Appendix B — Verification commands
 
@@ -786,6 +790,7 @@ npm run lint:js
 npm run lint:css
 npm run test:coverage
 npm run build-lib
+npm run test:types:consumer
 npm run build
 
 # Packaging reality check (§2.6-8 — budgets, duplication, source maps)
@@ -815,22 +820,22 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 - ✅ Single `cloneElement` site passes plain props only (ref-as-prop safe)
 - ✅ `prop-types` usage is purely declarative: 40 importing files, zero `checkPropTypes()` calls; ~90 call sites via the `type` proxy (`components/types.js`, plus its ~60 definition lines) — safe to retire per §9.6-E5
 
-### Phase 0 — before any dependency bump
+### Phase 0 — remaining gates to complete before React 18
 
-- ✅ Green automated baseline recorded: 137 suites / 1904 tests, configured coverage thresholds, JS/CSS lint, library build and demo build
+- ✅ Green hosted automated baseline recorded: 138 suites / 1920 tests; global coverage 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JS/CSS lint, library build and demo build
 - ✅ `rules.js` critical-flow tests exist: initial data processing, `showIf`, validation/error mapping, `submit` payload, `addData`/`removeData`, upload/download
 - ✅ Example smoke harness mounts all 37 registered `src/demo/examples/` meta+data pairs and rejects renderer failures or unexpected console errors
-- ☐ CI runs JS/CSS lint, coverage, `build-lib` and demo build on every PR — workflow added; first hosted run pending
+- ✅ CI runs JS/CSS lint, coverage, `build-lib` and demo build; hosted `master` run is green
 - ☐ Babel targets env-split landed — root test/build split is complete; demo inline presets still need to be folded into the shared config
-- ☐ 0.6: published types describe the shipped component; consumer d.ts compile matrix green vs `@types/react` 16/17/18; named-export gate decided
-- ☐ 0.7: `prepack` in place; pack budgets enforced in CI; clean-checkout job green; packed-tarball consumer smoke green; `dist/static` vs `static` duplication resolved; source-map gate decided
+- ✅ 0.6: published types describe the direct callable UMD/CommonJS function; the runtime `require()` shape and emitted consumer d.ts matrix are green vs locked `@types/react` 16/17/18 in interop and non-interop modes; no `.default`/named value export is promised
+- ☐ 0.7 (partial): `npm version` synchronization, `prepack` drift check + rebuild and fresh hosted checkout are green; pack budgets, packed-tarball consumer smoke, `dist/static` vs `static` deduplication and the source-map gate remain
 - ✅ 0.8: both `input-integer_{meta,data}.json` fixtures imported by `Examples.jsx` are tracked
 - ☐ 0.9: `lint:js` exits with 0 errors / 22 warnings and is wired into CI; warning triage, audit ownership and the 13-package devDependency sweep remain open
 
 ### Phase 1 — React 17
 
 - ✅ Dev runtime updated to React/React DOM 17.0.2; additive React 16.14/17 peer ranges and Moment `^2.29.4` recorded in the lockfile
-- ✅ Automated checkpoint green: 137 suites / 1904 tests; global coverage 94.12% statements / 88.70% branches / 92.69% functions / 94.71% lines; JavaScript/CSS lint, library build and demo build
+- ✅ Automated checkpoint green in hosted CI: 138 suites / 1920 tests; global coverage 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JavaScript/CSS lint, library build and demo build
 - ✅ Install docs and unreleased changelog updated for React 17
 - ☐ Manual QA checklist (§5) clean on 17 — popups, dropdowns, pickers, tabs, tables, forms, upload
 - ☐ react-refresh dev loop works on 17
