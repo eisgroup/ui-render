@@ -1,5 +1,30 @@
 ### Table of Contents
 
+### v0.34.3
+
+#### Fixes
+
+- A layout with `relativeData: false` no longer forces that flag onto a child that
+  declares `relativeData` itself. A node such as
+  `{view: 'RowList', name: 'Groups[0].Items', relativeData: true}` nested under such a
+  layout skipped data resolution and rendered empty, while a sibling `Table` bound to
+  the same path kept working, because only `view: 'Table'` was exempt from the
+  inherited flag.
+- Path resolution no longer hands out the whole data object for a path that resolves
+  to nothing. `get(data, '')` returned `data` itself, and an empty path segment was
+  dropped, so `get(data, 'a..b')` returned `data.a.b` and `get(data, 'a.')` returned
+  `data.a`. A value definition such as a blank Table header label (`{name: ''}`) then
+  resolved to the data object, and rendering it threw
+  `Objects are not valid as a React child`.
+
+#### Demo
+
+- New example: **RowList: relativeData false ancestors** — a `RowList` and a `PieChart`
+  nested under layouts that declare `relativeData: false`, alongside a `Table` bound to
+  the same path.
+- Added the missing `Input: Integer ≥ 0` example files, which the registry has imported
+  since v0.34.1 without them being present.
+
 ### v0.34.2
 
 #### Fixes
