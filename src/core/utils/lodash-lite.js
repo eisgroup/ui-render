@@ -39,6 +39,10 @@ function toPath(path) {
 
 function get(object, path, defaultValue) {
 	const parts = toPath(path)
+	// An empty path resolves to nothing, never to `object` itself (matches lodash).
+	// Otherwise `get(data, '')` hands out the whole data object, and a config such as
+	// `label: {name: ''}` renders it as a React child instead of an empty label.
+	if (parts.length === 0) return defaultValue
 	let cur = object
 	for (const key of parts) {
 		if (cur == null) return defaultValue
