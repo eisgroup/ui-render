@@ -31,6 +31,8 @@ import piechartSimpleData from '../examples/piechart-simple_data.json'
 import piechartSimpleMeta from '../examples/piechart-simple_meta.json'
 import popupMeta from '../examples/popup_meta'
 import * as ratingDetails from '../examples/rating_details'
+import rowListRelativeDataMeta from '../examples/rowlist-relative-data_meta.json'
+import rowListRelativeDataData from '../examples/rowlist-relative-data_data.json'
 import showIfCondition from '../examples/showIf'
 import * as summaryBox from '../examples/summary-box'
 import tabListMeta from '../examples/tab-list_meta'
@@ -256,6 +258,12 @@ export const examples = [
     id: 'ratingDetails',
     data: ratingDetails.data,
     meta: ratingDetails.meta,
+  },
+  {
+    title: 'RowList: relativeData false ancestors',
+    id: 'rowListRelativeData',
+    data: rowListRelativeDataData,
+    meta: rowListRelativeDataMeta,
   },
   {
     title: 'Show If Condition',

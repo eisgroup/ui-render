@@ -1,0 +1,90 @@
+{
+  "Groups": [
+    {
+      "Group": "Group 1",
+      "Items": [
+        {
+          "ItemType": "Basic",
+          "NumberOfUnits": 1100,
+          "ManualMonthlyRate": 0.88,
+          "ManualMonthlyAmount": 4443.12,
+          "PayableMonthlyRate": 0.88,
+          "PayableMonthlyAmount": 4443.12,
+          "TotalMonthlyPreExpenseCost": 3314.56,
+          "Fee": 0.027,
+          "Expense": 0.16,
+          "Margin": 0.04
+        },
+        {
+          "ItemType": "Extended",
+          "NumberOfUnits": 4,
+          "ManualMonthlyRate": 1,
+          "ManualMonthlyAmount": 10.86,
+          "PayableMonthlyRate": 1,
+          "PayableMonthlyAmount": 10.86,
+          "TotalMonthlyPreExpenseCost": 40.32,
+          "Fee": 0.027,
+          "Expense": 0.16,
+          "Margin": 0.04,
+          "BreakdownByBand": [
+            {
+              "Band": "< 25",
+              "NumberOfUnits": 4
+            },
+            {
+              "Band": "25 - 39",
+              "NumberOfUnits": 2
+            },
+            {
+              "Band": "40+",
+              "NumberOfUnits": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Group": "Group 2",
+      "Items": [
+        {
+          "ItemType": "Basic",
+          "NumberOfUnits": 200,
+          "ManualMonthlyRate": 1.03,
+          "ManualMonthlyAmount": 1268.96,
+          "PayableMonthlyRate": 1.03,
+          "PayableMonthlyAmount": 1268.96,
+          "TotalMonthlyPreExpenseCost": 942.65,
+          "Fee": 0.027,
+          "Expense": 0.16,
+          "Margin": 0.04
+        },
+        {
+          "ItemType": "Extended",
+          "NumberOfUnits": 40,
+          "ManualMonthlyRate": 1,
+          "ManualMonthlyAmount": 94.48,
+          "PayableMonthlyRate": 1,
+          "PayableMonthlyAmount": 94.48,
+          "TotalMonthlyPreExpenseCost": 350.81,
+          "Fee": 0.027,
+          "Expense": 0.16,
+          "Margin": 0.04,
+          "BreakdownByBand": [
+            {
+              "Band": "< 25",
+              "NumberOfUnits": 40
+            },
+            {
+              "Band": "25 - 39",
+              "NumberOfUnits": 10
+            },
+            {
+              "Band": "40+",
+              "NumberOfUnits": 5
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
