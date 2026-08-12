@@ -83,7 +83,7 @@ describe('registered demo examples contract', () => {
     })
 
     it('keeps the documented example registry stable and unique', () => {
-        expect(examples).toHaveLength(37)
+        expect(examples).toHaveLength(38)
         expect(new Set(examples.map(({ id }) => id)).size).toBe(examples.length)
     })
 

@@ -1,4 +1,4 @@
-import { fromFlatObj, mergeReplaceArrays, toFlatObj } from '../object'
+import { fromFlatObj, get, mergeReplaceArrays, toFlatObj } from '../object'
 
 describe('mergeReplaceArrays', () => {
     it('deep-merges plain objects', () => {
@@ -94,5 +94,42 @@ describe('toFlatObj / fromFlatObj', () => {
     it('unflatten returns non-objects as-is', () => {
         expect(fromFlatObj(null)).toBe(null)
         expect(fromFlatObj('x')).toBe('x')
+    })
+})
+
+describe('get', () => {
+    const obj = { a: { b: [10, 20] }, top: 'value' }
+
+    it('resolves dot and bracket paths', () => {
+        expect(get(obj, 'top')).toBe('value')
+        expect(get(obj, 'a.b[1]')).toBe(20)
+    })
+
+    it('returns the fallback for an empty path instead of the whole object', () => {
+        // `label: {name: ''}` in a meta config must resolve to the fallback, not to the data
+        // object — rendering an object as a React child throws.
+        expect(get(obj, '', '')).toBe('')
+        expect(get(obj, '')).toBeUndefined()
+        expect(get(obj, null, 'fb')).toBe('fb')
+    })
+
+    it('returns the fallback for a missing path', () => {
+        expect(get(obj, 'a.missing', 'fb')).toBe('fb')
+        expect(get(obj, 'nope.deep', 'fb')).toBe('fb')
+    })
+
+    // A path with an empty segment must not silently resolve to an ancestor value: dropping the
+    // empty segment would make `get(data, 'a..b')` return `data.a.b`, and `get(data, 'a.')`
+    // return `data.a` — handing out whole objects for a malformed path.
+    it('returns the fallback for paths with empty segments', () => {
+        expect(get(obj, 'a.', 'fb')).toBe('fb')
+        expect(get(obj, '.a', 'fb')).toBe('fb')
+        expect(get(obj, 'a..b', 'fb')).toBe('fb')
+        expect(get(obj, '.', 'fb')).toBe('fb')
+        expect(get(obj, 'a[]', 'fb')).toBe('fb')
+    })
+
+    it('still resolves brackets written after a dot', () => {
+        expect(get(obj, 'a.b.[1]')).toBe(20)
     })
 })

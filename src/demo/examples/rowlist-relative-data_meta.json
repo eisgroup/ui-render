@@ -1,0 +1,371 @@
+{
+  "_comment": "Regression fixture: RowList/PieChart nested under ancestors that declare `relativeData: false`. The RowList declares `relativeData: true` and must still resolve its own `name` into data.",
+  "view": "VerticalLayout",
+  "styles": "padding-h-largest bg-info-light",
+  "items": [
+    null,
+    {
+      "view": "VerticalLayout",
+      "styles": "margin-v-largest",
+      "relativeData": false,
+      "items": [
+        {
+          "view": "Title",
+          "label": "Summary Details"
+        },
+        {
+          "view": "Tabs",
+          "buttoned": true,
+          "classNameTabs": "padding-largest bg-neutral radius-bottom",
+          "styleTabs": {
+            "overflow": "visible"
+          },
+          "classNameContent": "margin-v-small",
+          "childrenBeforeTabs": {
+            "view": "HorizontalLayout",
+            "styles": "padding-right-largest middle bg-neutral",
+            "relativeData": false,
+            "items": [
+              {
+                "view": "Text",
+                "label": "FILTER BY"
+              },
+              {
+                "view": "Space"
+              },
+              {
+                "view": "Dropdown",
+                "name": "group",
+                "options": {
+                  "name": "Groups"
+                },
+                "mapOptions": "Group",
+                "compact": true
+              }
+            ],
+            "version": "GroupList"
+          },
+          "items": [
+            {
+              "view": "Tab",
+              "tab": "General Summary",
+              "content": {
+                "view": "VerticalLayout",
+                "relativeData": false,
+                "items": [
+                  {
+                    "view": "VerticalLayout",
+                    "items": [
+                      null,
+                      {
+                        "view": "RowList",
+                        "name": "Groups[{state.group,0}].Items",
+                        "styles": "wrap justify margin-v",
+                        "relativeData": true,
+                        "renderItem": {
+                          "view": "VerticalLayout",
+                          "styles": "padding-largest radius bg-neutral",
+                          "items": [
+                            {
+                              "view": "Text",
+                              "children": {
+                                "name": "ItemType",
+                                "relativeData": true
+                              },
+                              "styles": "h3"
+                            },
+                            {
+                              "view": "HorizontalLayout",
+                              "styles": "wrap justify",
+                              "items": [
+                                {
+                                  "view": "VerticalLayout",
+                                  "styles": "padding-largest margin-v align-center radius bg-info-light",
+                                  "items": [
+                                    {
+                                      "view": "Text",
+                                      "children": {
+                                        "name": "NumberOfUnits",
+                                        "relativeData": null
+                                      },
+                                      "styles": "h3"
+                                    },
+                                    {
+                                      "view": "Text",
+                                      "label": "Enrolled Units"
+                                    }
+                                  ],
+                                  "version": "ItemDetailsRow1Column1",
+                                  "style": {
+                                    "minWidth": "45%"
+                                  }
+                                },
+                                {
+                                  "view": "VerticalLayout",
+                                  "styles": "padding-largest margin-v align-center radius bg-info-light",
+                                  "items": [
+                                    {
+                                      "view": "VerticalLayout",
+                                      "styles": "margin-small",
+                                      "items": [
+                                        {
+                                          "view": "Text",
+                                          "renderLabel": {
+                                            "name": "Currency"
+                                          },
+                                          "children": {
+                                            "name": "ManualMonthlyAmount",
+                                            "relativeData": null
+                                          },
+                                          "styles": "h3"
+                                        },
+                                        {
+                                          "view": "Text",
+                                          "label": "Monthly Manual Amount"
+                                        }
+                                      ],
+                                      "version": "ItemDetailsRow1Column2Row1"
+                                    },
+                                    {
+                                      "view": "VerticalLayout",
+                                      "styles": "margin-small",
+                                      "items": [
+                                        {
+                                          "view": "Text",
+                                          "renderLabel": {
+                                            "name": "Currency"
+                                          },
+                                          "children": {
+                                            "name": "PayableMonthlyAmount",
+                                            "relativeData": null
+                                          },
+                                          "styles": "h3"
+                                        },
+                                        {
+                                          "view": "Text",
+                                          "label": "Monthly Payable Amount"
+                                        }
+                                      ],
+                                      "version": "ItemDetailsRow1Column2Row2"
+                                    }
+                                  ],
+                                  "version": "ItemDetailsRow1Column2",
+                                  "style": {
+                                    "minWidth": "45%"
+                                  }
+                                }
+                              ],
+                              "version": "ItemDetailsRow1"
+                            },
+                            {
+                              "view": "HorizontalLayout",
+                              "styles": "wrap spread padding margin-top radius bg-grey-lighter",
+                              "items": [
+                                {
+                                  "view": "VerticalLayout",
+                                  "styles": "margin-small",
+                                  "items": [
+                                    {
+                                      "view": "Text",
+                                      "renderLabel": {
+                                        "name": "Percent"
+                                      },
+                                      "children": {
+                                        "name": "Fee",
+                                        "relativeData": null
+                                      },
+                                      "styles": "h3"
+                                    },
+                                    {
+                                      "view": "Text",
+                                      "label": "Fees"
+                                    }
+                                  ],
+                                  "version": "ItemDetailsRow2Column1"
+                                },
+                                {
+                                  "view": "VerticalLayout",
+                                  "styles": "margin-small",
+                                  "items": [
+                                    {
+                                      "view": "Text",
+                                      "renderLabel": {
+                                        "name": "Percent"
+                                      },
+                                      "children": {
+                                        "name": "Margin",
+                                        "relativeData": null
+                                      },
+                                      "styles": "h3"
+                                    },
+                                    {
+                                      "view": "Text",
+                                      "label": "Margin"
+                                    }
+                                  ],
+                                  "version": "ItemDetailsRow2Column2"
+                                },
+                                {
+                                  "view": "VerticalLayout",
+                                  "styles": "margin-small",
+                                  "items": [
+                                    {
+                                      "view": "Text",
+                                      "renderLabel": {
+                                        "name": "Percent"
+                                      },
+                                      "children": {
+                                        "name": "Expense",
+                                        "relativeData": null
+                                      },
+                                      "styles": "h3"
+                                    },
+                                    {
+                                      "view": "Text",
+                                      "label": "Expenses"
+                                    }
+                                  ],
+                                  "version": "ItemDetailsRow2Column3"
+                                }
+                              ],
+                              "version": "ItemDetailsRow2"
+                            }
+                          ],
+                          "version": "ItemColumn",
+                          "style": {
+                            "minWidth": "48%"
+                          }
+                        }
+                      }
+                    ],
+                    "version": "ItemsBlock"
+                  },
+                  {
+                    "view": "VerticalLayout",
+                    "styles": "padding-largest margin-top-largest radius bg-neutral",
+                    "items": [
+                      {
+                        "view": "Title",
+                        "label": "Cost Summary",
+                        "styles": "padding"
+                      },
+                      {
+                        "view": "Table",
+                        "name": "Groups[{state.group,0}].Items",
+                        "headers": [
+                          {
+                            "id": "ItemType",
+                            "label": "Item"
+                          },
+                          {
+                            "id": "NumberOfUnits",
+                            "label": "Number of Units"
+                          },
+                          {
+                            "id": "TotalMonthlyPreExpenseCost",
+                            "label": "Monthly Pre-Expense Cost",
+                            "renderCell": {
+                              "name": "Currency"
+                            }
+                          },
+                          {
+                            "id": "ManualMonthlyRate",
+                            "label": "Manual Rate",
+                            "renderCell": {
+                              "name": "Currency"
+                            }
+                          },
+                          {
+                            "id": "PayableMonthlyRate",
+                            "label": "Payable Rate",
+                            "renderCell": {
+                              "name": "Currency"
+                            }
+                          }
+                        ],
+                        "itemsExpanded": true,
+                        "vertical": true,
+                        "showIf": {}
+                      }
+                    ],
+                    "version": "CostSummaryTableBlock"
+                  }
+                ],
+                "version": "CostSummaryTabBlock"
+              }
+            },
+            {
+              "view": "Tab",
+              "tab": "Breakdown",
+              "content": {
+                "view": "VerticalLayout",
+                "styles": "margin-top-largest wrap spread",
+                "items": [
+                  {
+                    "view": "HorizontalLayout",
+                    "items": [
+                      {
+                        "view": "RowList",
+                        "name": "Groups[{state.group,0}].Items",
+                        "styles": "wrap justify padding no-margin left",
+                        "relativeData": true,
+                        "renderItem": {
+                          "view": "HorizontalLayout",
+                          "relativeData": true,
+                          "showIf": {
+                            "relativeData": true,
+                            "name": "BreakdownByBand"
+                          },
+                          "items": [
+                            {
+                              "view": "VerticalLayout",
+                              "styles": "padding radius bg-neutral left",
+                              "items": [
+                                {
+                                  "view": "Text",
+                                  "children": {
+                                    "name": "ItemType",
+                                    "relativeData": true
+                                  },
+                                  "styles": "h4 padding-smaller"
+                                },
+                                {
+                                  "view": "PieChart",
+                                  "name": "BreakdownByBand",
+                                  "relativeData": true,
+                                  "mapItems": {
+                                    "label": "Band",
+                                    "value": "NumberOfUnits"
+                                  },
+                                  "legends": {
+                                    "columns": 2
+                                  }
+                                },
+                                {
+                                  "view": "Space"
+                                }
+                              ],
+                              "version": "ItemsBreakdownPieChartColumn"
+                            },
+                            {
+                              "view": "Space"
+                            }
+                          ],
+                          "version": "AddBreakdownSpaces"
+                        }
+                      }
+                    ],
+                    "version": "PieChartRowList"
+                  }
+                ],
+                "version": "BreakdownTabBlock"
+              }
+            }
+          ]
+        }
+      ],
+      "version": "MainLayoutBlock"
+    }
+  ],
+  "version": "0.20.1"
+}
