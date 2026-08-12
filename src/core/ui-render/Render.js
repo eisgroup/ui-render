@@ -112,7 +112,10 @@ class RenderClass extends Component {
             // Only pass relativeData if it's explicitly set to false (for popups)
             // Don't pass it to Table components, as they need to extract data by name
             // This prevents breaking table data display while still allowing popup fields to work correctly
-            if (this.props.relativeData === false && item.view !== 'Table') {
+            // @Note: never override a child that declares its own `relativeData`. A node such as
+            // `{view: 'RowList', name: 'Groups[0].Items', relativeData: true}` opts back in to data
+            // resolution, and inheriting `false` from an ancestor layout would render it empty.
+            if (this.props.relativeData === false && item.relativeData === undefined && item.view !== 'Table') {
                 mappedData.relativeData = false;
             }
 

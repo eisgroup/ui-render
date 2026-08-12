@@ -28,8 +28,16 @@ function toPath(path) {
 	// - dots: a.b.c
 	// - brackets: a[0].b, [1]
 	// - quoted brackets: a["b.c"], a['x']
-	const re = /[^.[\]]+|\[(?:(-?\d+)|(["'])(.*?)\2)\]/g
+	// Empty segments are kept, as lodash does: `a.` -> ['a', ''], `a..b` -> ['a', '', 'b'].
+	// Dropping them would silently resolve a malformed path to an ancestor value — e.g.
+	// `get(data, 'a..b')` handing out `data.a.b` when the caller built a path from an empty
+	// segment. The last alternative is the zero-width match lodash uses for that, and a
+	// leading dot is handled separately (also as in lodash).
+	// @Note: bracket indices become numbers here, unlike lodash which keeps every segment a
+	// string. `toPath` is internal, and `setWith` relies on the number to create arrays.
+	const re = /[^.[\]]+|\[(?:(-?\d+)|(["'])(.*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g
 	const out = []
+	if (str.charCodeAt(0) === 46 /* . */) out.push('')
 	str.replace(re, (_, index, _q, quoted) => {
 		out.push(index !== undefined ? Number(index) : (quoted !== undefined ? quoted : _))
 		return ''
@@ -39,6 +47,13 @@ function toPath(path) {
 
 function get(object, path, defaultValue) {
 	const parts = toPath(path)
+	// An empty path resolves to nothing, never to `object` itself.
+	// Otherwise `get(data, '')` hands out the whole data object, and a config such as
+	// `label: {name: ''}` renders it as a React child instead of an empty label.
+	// @Note: lodash returns `object['']` here when the object happens to have an empty-string
+	// key. We always return the fallback instead, so an empty path can never yield an object.
+	// `setWith` and `unset` treat an empty path as "no path" too.
+	if (parts.length === 0) return defaultValue
 	let cur = object
 	for (const key of parts) {
 		if (cur == null) return defaultValue
