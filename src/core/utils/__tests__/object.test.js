@@ -117,4 +117,19 @@ describe('get', () => {
         expect(get(obj, 'a.missing', 'fb')).toBe('fb')
         expect(get(obj, 'nope.deep', 'fb')).toBe('fb')
     })
+
+    // A path with an empty segment must not silently resolve to an ancestor value: dropping the
+    // empty segment would make `get(data, 'a..b')` return `data.a.b`, and `get(data, 'a.')`
+    // return `data.a` — handing out whole objects for a malformed path.
+    it('returns the fallback for paths with empty segments', () => {
+        expect(get(obj, 'a.', 'fb')).toBe('fb')
+        expect(get(obj, '.a', 'fb')).toBe('fb')
+        expect(get(obj, 'a..b', 'fb')).toBe('fb')
+        expect(get(obj, '.', 'fb')).toBe('fb')
+        expect(get(obj, 'a[]', 'fb')).toBe('fb')
+    })
+
+    it('still resolves brackets written after a dot', () => {
+        expect(get(obj, 'a.b.[1]')).toBe(20)
+    })
 })
