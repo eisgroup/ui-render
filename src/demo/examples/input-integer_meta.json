@@ -1,0 +1,41 @@
+{
+  "view": "VerticalLayout",
+  "styles": "padding-largest",
+  "items": [
+    {
+      "view": "Title",
+      "label": "Integer Input (min 0, no decimals)",
+      "styles": "h3 margin-bottom"
+    },
+    {
+      "view": "Input",
+      "type": "number",
+      "name": "count",
+      "label": "Number of Items",
+      "min": 0,
+      "outputFormat": {
+        "decimals": 0
+      }
+    },
+    {
+      "view": "Input",
+      "type": "number",
+      "name": "amount",
+      "label": "Amount (2 decimals, 0 - 100)",
+      "min": 0,
+      "max": 100,
+      "outputFormat": {
+        "decimals": 2
+      }
+    },
+    {
+      "view": "Input",
+      "type": "number",
+      "name": "offset",
+      "label": "Offset (negatives allowed)",
+      "outputFormat": {
+        "decimals": 2
+      }
+    }
+  ]
+}
