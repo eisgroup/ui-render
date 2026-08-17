@@ -74,7 +74,9 @@ const NavTabs = (props) => {
         h6: heading('h6'),
         img: ({alt = '', src, ...props}) => <img alt={alt} src={src && src.startsWith('http') ? src : `${basePath}/${src}`} {...props} />,
         code: (props) => {
-            const {children, className, node, ...rest} = props
+            // `inline` and `node` are react-markdown's own props: spreading them onto <code> makes React
+            // warn about a non-boolean DOM attribute. The block/inline decision comes from `className`.
+            const {children, className, node, inline, ...rest} = props
             const match = /language-(\w+)/.exec(className || '')
             return match ? (
                 <SyntaxHighlighter

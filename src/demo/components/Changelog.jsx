@@ -5,7 +5,9 @@ import {oneLight} from 'react-syntax-highlighter/dist/esm/styles/prism'
 import './changelog.css'
 
 const codeComponent = (props) => {
-    const {children, className, node, ...rest} = props
+    // `inline` and `node` are react-markdown's own props: spreading them onto <code> makes React warn
+    // about a non-boolean DOM attribute. The block/inline decision comes from `className`.
+    const {children, className, node, inline, ...rest} = props
     const match = /language-(\w+)/.exec(className || '')
     return match ? (
         <SyntaxHighlighter
