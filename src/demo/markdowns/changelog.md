@@ -69,6 +69,14 @@
 
 #### Fixes
 
+- A popup can no longer be bound to the wrong table. When a popup opened from a table row could not
+  determine which table it belonged to, the renderer guessed by looking for two specific field names
+  in the data and adopting whichever it found — so an application that happened to use one of those
+  names could get a popup wired to an unrelated table, and the user's edit was written into that
+  table's row. The guess is gone. A popup declared inside the row is still scoped automatically; a
+  popup declared outside the table states its scope with `{relativePath: '<table name>'}` in the
+  `popupOpen` arguments, and an unresolved scope is now reported in the console instead of guessed.
+  See the Popup section of the configuration docs.
 - Popups declared from an interpolated template no longer fail silently when the template's local
   data is the row array. The row-extraction step read a variable declared further down the same
   block, which threw before the popup could open.

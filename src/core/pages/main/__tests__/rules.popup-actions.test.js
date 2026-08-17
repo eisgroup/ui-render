@@ -17,6 +17,7 @@ const appContext = {
     setPopupState: jest.fn(),
 }
 let consoleError
+let consoleWarn
 
 const withProviders = (ui) => (
     <ConfigContext.Provider value={initialConfigState}>
@@ -51,6 +52,7 @@ function renderPopupButton ({ action, popupId = 'contract-popup', title = 'Contr
 beforeEach(() => {
     // Existing renderer props produce development-only React warnings unrelated to this contract.
     consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+    consoleWarn = jest.spyOn(console, 'warn').mockImplementation(() => {})
 })
 
 afterEach(() => {
@@ -175,5 +177,10 @@ describe('UIRender popup action argument contracts', () => {
             isOpen: true,
             title: 'Row popup',
         }))
+        // This popup carries a row index but no scope, which is exactly the case the engine used to
+        // guess at. It now says so instead, naming the popup that needs the meta fixed.
+        expect(consoleWarn).toHaveBeenCalledWith(
+            expect.stringContaining('POPUP_OPEN: "row.0" opened for row index 0 without a relativePath')
+        )
     })
 })

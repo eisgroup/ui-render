@@ -24,7 +24,7 @@ export const getFormsData = (forms) => {
  * Length is capped to the minimum array length among those forms so a stale longer copy on the
  * master form does not leave ghost rows after FieldArray.remove (lodash merge keeps trailing indices).
  *
- * @param {string} path - e.g. {@code experienceRatingInputs.dataKind.experiencePeriods} or {@code dataKind.period}
+ * @param {string} path - e.g. {@code orders.dataKind.lines} or {@code dataKind.line}
  * @param {Map} forms - {@link formsStorage}
  * @returns {Array<Object>}
  */

@@ -125,6 +125,61 @@ describe('UIRender dynamic action and data-integrity contracts', () => {
         })
     })
 
+    // The documented way to scope a Popup that is declared outside the row: state the table in the args.
+    // Nothing in the data is probed, so it works for any field naming.
+    it('scopes a table-external popup to the clicked row when the args carry a relativePath', async () => {
+        const getFormData = jest.fn()
+        const consoleWarn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+        const meta = {
+            view: 'Col',
+            items: [
+                {
+                    view: 'Popup', id: 'edit.{index}', name: 'orders', title: 'Row note',
+                    items: [{ view: 'Input', name: 'note', label: 'Note' }],
+                },
+                {
+                    view: 'Table', name: 'orders',
+                    headers: [{ id: 'orderNo', label: 'Order' }, { id: 'actions', label: 'Actions' }],
+                    renderItemCells: {
+                        view: 'TableCells',
+                        items: [
+                            { view: 'Text', name: 'orderNo' },
+                            {
+                                view: 'Button', children: 'Edit note',
+                                onClick: { name: 'popupOpen', args: ['edit.{index}', { relativePath: 'orders' }] },
+                            },
+                        ],
+                    },
+                },
+            ],
+        }
+        const data = { orders: [{ orderNo: 'A-1', note: 'first' }, { orderNo: 'A-2', note: 'second' }] }
+
+        render(
+            <AppProvider>
+                <UIRender form meta={meta} data={data} initialValues={data} getFormData={getFormData}/>
+            </AppProvider>
+        )
+
+        fireEvent.click(screen.getAllByRole('button', { name: 'Edit note' })[1])
+
+        const noteInput = await screen.findByLabelText('Note')
+        expect(noteInput).toHaveAttribute('name', 'orders[1].note')
+        expect(noteInput).toHaveValue('second')
+        expect(consoleWarn).not.toHaveBeenCalled()
+
+        fireEvent.focus(noteInput)
+        fireEvent.change(noteInput, { target: { value: 'Amended' } })
+
+        const readFormData = getFormData.mock.calls[0][0]
+        await waitFor(() => {
+            expect(readFormData().orders[1].note).toBe('Amended')
+        })
+        // The sibling row and the root are left alone.
+        expect(readFormData().orders[0].note).toBe('first')
+        expect(readFormData().note).toBeUndefined()
+    })
+
     it('turns an empty dynamic popup template into a visible configuration error', async () => {
         render(
             <AppProvider>
