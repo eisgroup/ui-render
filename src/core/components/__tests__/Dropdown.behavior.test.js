@@ -101,6 +101,23 @@ describe('Dropdown parent value and option contracts', () => {
         ])
     })
 
+    // The engine hands every view `currencyCode` and `onDataChanged`. Semantic's Dropdown spreads
+    // whatever it does not recognise onto its <div>, so these reached the DOM and React warned on the
+    // demo's Dropdown example. Assert at the leak boundary: what we hand to Semantic.
+    it('keeps engine-only props out of the props handed to Semantic', () => {
+        renderDropdown({
+            options: objectOptions,
+            currencyCode: 'EUR',
+            onDataChanged: () => {},
+        })
+
+        const semanticProps = latestSemanticProps()
+        expect(semanticProps).not.toHaveProperty('currencyCode')
+        expect(semanticProps).not.toHaveProperty('onDataChanged')
+        // The options still arrive, so nothing else was stripped by accident.
+        expect(semanticProps.options).toHaveLength(2)
+    })
+
     it('still stringifies a genuinely object-valued option', () => {
         renderDropdown({ options: [{ text: 'Colour', value: [1, -1] }] })
 

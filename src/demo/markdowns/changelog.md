@@ -86,6 +86,9 @@
 - An `Image` given a `src` but no `name` no longer crashes the render. The alt text was derived from
   the file name unconditionally; it now falls back to an empty alt, which is the correct value for
   an image with nothing to describe.
+- `Dropdown` no longer writes `currencyCode` and `onDataChanged` onto the rendered element. The
+  renderer hands those to every view; Semantic forwards anything it does not recognise to the DOM,
+  so React reported an invalid attribute and an unknown event handler on every page with a dropdown.
 - A `Dropdown` option declared without a value can now actually be selected. Its value was being
   rewritten to the string `"null"`, while the cascading reset used the option's text — so the two
   never agreed and the control showed nothing selected. Such an option now carries its text as its
