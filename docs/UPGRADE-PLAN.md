@@ -138,6 +138,7 @@ A second audit pass — against the working tree, the build configs, a full test
 | 14 | **Orphan set is 12, not 9:** the 9 direct orphans re-confirmed, plus `ErrorTable` (imported only by orphan `ErrorContent`), `Square` (only by orphan `Carousel`), and the pack `TabList` (mapper uses the engine copy, `mapper.js:33`). ~~Engine `tester/` fixtures are referenced by nothing.~~ — the `tester/` pair has since been deleted (§9.9-H1). | §9.9-H1, §9.2 |
 | 15 | **Hardcoded version strings** `data-version="0.34.2"` in `AppWrapper.js:10` and `types/UIRender.tsx:76` — drift on every release; should come from `package.json` at build time. | §9.9-H6 |
 | 16 | **One application's field names were compiled into the engine.** *Resolved.* When a popup could not resolve its `relativePath`, `rules.js` probed the consumer's data for two literal paths belonging to a single host app and adopted whichever matched. It never matched in 1928 tests — but for data that *did* carry one of those keys it bound the popup to a table the opener had nothing to do with (the two candidates were tried in order, so a row from the second table got the first), re-creating by data shape the rebinding that commit `89bac56` removed. Deleted; an unresolved scope now warns instead of guessing, and meta states the scope either by declaring the `Popup` inside the row or via `{relativePath}` in the `popupOpen` args. Three comment/JSDoc examples naming the same fields were neutralised. | §9.3 |
+| 17 | **The date field is selected by `type`, and its view constant is dead.** `renders.js:38-40` overrides whatever the view switch chose whenever `type === 'date'`, so a date picker is reachable from meta as `{view: 'Input', type: 'date'}` — any `view` the mapper does not claim works, which is why grepping example metas for `"view": "Date"` finds nothing. Meanwhile `FIELD.TYPE.DATE` (`modules/form/constants.js:16`) has **zero readers** — `view: 'Date'` renders the "field does not exist" placeholder. Note `FIELD.RENDER.DATE` (`variables/fields.js:47`) is a different, live thing: a read-only date formatter. Either give the view constant a branch or delete it; the two-`'Date'` split is a docs-truth trap. The rendered picker is an rc-picker text input plus a JS overlay with no native `type="date"` attribute — the reason the §5 overlay QA item exists. | §9.9-H1, §9.9-H2 |
 
 **Checkpoint updates (2026-08-07):**
 
@@ -229,7 +230,7 @@ Widen, never replace:
 
 `@testing-library/react` 12 stays (its `react <18` peer admits 17). `ReactDOM.render` in the demo stays (fully supported in 17).
 
-**Automated checkpoint (2026-08-07):** React/React DOM 17.0.2, additive React 16.14/17 peer ranges and Moment `^2.29.4` are on `master`. Hosted CI is green: 138 suites / 1920 tests; coverage is 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JS/CSS lint and both builds pass. Manual QA, react-refresh, yalc smoke, overlay-ordering QA and the release decision remain open.
+**Automated checkpoint (2026-08-07):** React/React DOM 17.0.2, additive React 16.14/17 peer ranges and Moment `^2.29.4` are on `master`. Hosted CI is green: 138 suites / 1920 tests; coverage is 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JS/CSS lint and both builds pass. The manual QA checklist below is now worked through in a real browser, including the overlay-ordering items; react-refresh, the yalc smoke and the release decision remain open.
 
 ### React 17 behavioral changes, mapped to this codebase
 
@@ -243,13 +244,41 @@ Widen, never replace:
 
 ### Manual QA checklist (demo, all examples)
 
-- [ ] Popup/Tooltip open + click-outside close
-- [ ] Dropdown open/select/close, multi-select
-- [ ] Date/time pickers (rc-picker overlay behavior)
-- [ ] Tabs (both implementations), Collapse, Expand, Carousel autoplay
-- [ ] Table: sorting, pagination, inline edit rows (`LocalDraftTableRow`)
-- [ ] Form flows: validation errors, submit, addData/removeData, upload
-- [ ] No new console warnings/errors on any example
+Run in a real browser (Chrome) against `npm start` on the React 17 baseline — not jsdom, which does not
+reproduce the ordering this phase is actually about: React 17 delegates synthetic events at the root
+container while the bundled dependencies keep their own native `document` listeners (SUIR via
+`@semantic-ui-react/event-stack`, rc-picker via `rc-util`), and click-outside logic depends on that order.
+
+- [x] **Popup open + click-outside close** — portal-based modal with dimmer opens from `popupContent`,
+      closes on a dimmer click, dimmer removed. *Tooltip hover-open not exercised — small remaining gap.*
+- [x] **Dropdown open/select/close, click-outside close** — selecting changes the value; a click outside
+      closes the menu **without** committing a selection. *Multi-select has no demo example (`multiple: true`
+      appears only in the upload variants), so it stays covered by the jsdom contracts only.*
+- [x] **Date/time picker (rc-picker overlay)** — the picker lives in the `tableForm` example
+      (`src/demo/examples/data_component.js`). Overlay opens on focus, a day click writes the formatted
+      value, and a click outside closes the overlay. Selected by `type: 'date'`, **not** by a `view` string
+      (§2.6-17); the rendered DOM is an rc-picker text input plus a JS overlay with no native `type="date"`
+      attribute, which is precisely why this item mattered for React 17.
+- [x] **Tabs, Collapse, Expand** — tab switch swaps panel content; example rows expand and collapse.
+      *Carousel autoplay is moot: `Carousel` is not registered in `mapper.js` and is one of the §2.6-14
+      orphans slated for deletion under §9.9-H1, so no meta can render it.*
+- [x] **Table: sorting, pagination, inline edit rows** — sorting cycles asc → unsorted → desc on a header
+      whose table declares `sorts` (`TableView.js` gives a header `onClick` only then; the `adminCosts`
+      table inside the `all` example's Admin Expenses section is the one that does), verified by both the
+      indicator class and the row order. Pagination page 3 shows rows 11–15 of 23. Draft-row inline edit
+      commits through `LocalDraftTableRow`.
+- [x] **Form flows: validation errors, submit, addData/removeData** — a touched empty required field shows
+      `Required`; submit exercises both branches (blocked with validation errors, and successful with values
+      delivered to the handler); a filled draft row commits and the draft clears; deleting a row removes the
+      right one, reindexes the rest and leaves sibling groups untouched. *Upload renders and is interactive,
+      but its `autoSubmit: true` posts to `REACT_APP_API_URL`, so a real file round-trip needs a backend or
+      a consuming app — the jsdom contracts cover upload validation and the ref contract.*
+- [x] **No new console warnings/errors** — zero across the whole sweep, after fixing three leaks this QA
+      pass surfaced: `currencyCode`/`onDataChanged` reaching the DOM through SUIR's Dropdown, and
+      react-markdown's `inline` prop reaching `<code>` in two demo components.
+
+**Not closable from the demo, needs an owner:** the yalc smoke in a consuming application, a react-refresh
+check, and the §10 decision on whether React 17 ships as its own release.
 
 **Exit criteria:** CI green, QA checklist clean, `dist/` builds and passes a yalc smoke in a consuming app (if one is available), release published.
 
@@ -625,6 +654,7 @@ The form stack splits into a React-free core and React bindings:
 - `src/style/unused/` (10 files); `override/_policy.less` / `_classic.less` (verify unreferenced); icomoon demo artifacts under `fonts/icons/`.
 - ~~the unreferenced engine `tester/` fixtures~~ — **deleted.** They were worse than merely dead: `test_data.js` and `test_meta.js` re-exported from `../examples/…`, and no `examples/` directory exists under `src/core/pages/main/` (the fixtures live in `src/demo/examples/`), so either file would have failed module resolution the moment anything imported it. Nothing did. `eslint-config-react-app` could not see it because `import/no-unresolved` is off. Removing them also took two permanently-0% files out of the coverage report; global coverage after deletion is 94.29% statements / 89.38% branches / 92.71% functions / 94.9% lines.
 - `formatTime`/`toHours` in `time.js` (no production callers, §9.7-F2).
+- `FIELD.TYPE.DATE` (`modules/form/constants.js:16`) — defined, never read, and `view: 'Date'` therefore renders a placeholder instead of the date field the name implies (§2.6-17). Deleting it is the honest move unless the view spelling is meant to be supported, in which case it needs a branch in `renders.js` rather than a constant.
 - ~~The **13 zero-reference devDependencies**~~ — **done in Phase 0.9:** all 13 plus `dot-prop-immutable` removed, verified by pruning `node_modules` to the lockfile with `npm ci` and re-running every pipeline including `build-css` and the watch build.
 
 #### H2 — Make the docs match reality
@@ -851,7 +881,7 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 - ✅ Dev runtime updated to React/React DOM 17.0.2; additive React 16.14/17 peer ranges and Moment `^2.29.4` recorded in the lockfile
 - ✅ Automated checkpoint green in hosted CI: 138 suites / 1920 tests; global coverage 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JavaScript/CSS lint, library build and demo build
 - ✅ Install docs and unreleased changelog updated for React 17
-- ☐ Manual QA checklist (§5) clean on 17 — popups, dropdowns, pickers, tabs, tables, forms, upload
+- ✅ Manual QA checklist (§5) worked through in a real browser on 17 — popup, dropdown and rc-picker click-outside, tabs/expand, table sorting/pagination/inline edit, validation/submit/add/remove, and a console clean of warnings after three leaks were fixed. Remaining: Tooltip hover, Dropdown multi-select and a real upload round-trip have no demo path; yalc smoke and the release decision need an owner
 - ☐ react-refresh dev loop works on 17
 - ☐ yalc smoke into a consuming app (if one is available)
 - ☐ Click-outside/overlay QA re-run with attention to bundled-dep document listeners (event-stack / rc-util ordering vs root delegation, §5)
