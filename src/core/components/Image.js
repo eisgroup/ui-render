@@ -17,6 +17,10 @@ export function Image ({
   name,
   path,
   className,
+  // Default parameters rather than `Image.defaultProps`: React 18.3 warns on defaultProps for
+  // function components and React 19 removes the support. Forwarded explicitly below.
+  decoding = 'async',
+  loading = 'lazy',
   ...props
 }) {
   if (props.src == null) props.src = imageSrc({name, path})
@@ -25,13 +29,9 @@ export function Image ({
   // image with nothing to describe.
   if (props.alt == null) props.alt = name ? fileNameWithoutExt(name) : ''
   // Restated after the spread so jsx-a11y can see it — same value, set on the line above.
-  return <img className={classNames('img', className)} {...props} alt={props.alt}/>
+  return <img className={classNames('img', className)} {...props} alt={props.alt} decoding={decoding} loading={loading}/>
 }
 
-Image.defaultProps = {
-  decoding: 'async',
-  loading: 'lazy',
-}
 Image.propTypes = {
   // Required if `src` or `alt` not defined
   name: type.String,

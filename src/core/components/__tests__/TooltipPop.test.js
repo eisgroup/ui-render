@@ -1,7 +1,17 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { Popup as SemanticPopup } from 'semantic-ui-react'
 import TooltipPop from '../TooltipPop'
+
+jest.mock('semantic-ui-react', () => ({
+    Popup: jest.fn(({ trigger }) => trigger || null),
+}))
+
+const latestPopupProps = () => {
+    const calls = SemanticPopup.mock.calls
+    return calls[calls.length - 1][0]
+}
 
 describe('TooltipPop', () => {
     it('renders a Semantic UI Popup with the trigger', () => {
@@ -21,7 +31,17 @@ describe('TooltipPop', () => {
         expect(container.firstChild).toBeInTheDocument()
     })
 
-    it('exposes a default delay of 500ms', () => {
-        expect(TooltipPop.defaultProps.delay).toBe(500)
+    // Asserted through what Semantic actually receives, not through `TooltipPop.defaultProps`: the
+    // default is a default parameter now, and the old assertion only ever checked the mechanism.
+    it('applies a 500ms delay when none is given', () => {
+        render(<TooltipPop title="x"><span>y</span></TooltipPop>)
+
+        expect(latestPopupProps().mouseEnterDelay).toBe(500)
+    })
+
+    it('lets a caller override the delay', () => {
+        render(<TooltipPop title="x" delay={0}><span>y</span></TooltipPop>)
+
+        expect(latestPopupProps().mouseEnterDelay).toBe(0)
     })
 })
