@@ -41,6 +41,10 @@ Other libraries previously listed as peer dependencies (`final-form`, `final-for
 `react-final-form`, `react-final-form-arrays`, `prop-types`) are now bundled as regular
 dependencies of `eis-ui-render`, so the host project does not need to install them.
 
+`eis-ui-render` is consumed by a bundler — imported as a React component into a host application. Dropping
+`dist/index.js` into a page with a `<script>` tag is **not supported**: the UMD global lookup never matched
+React's real global name, so it has never worked.
+
 ## Styles and assets (consumer)
 
 The library entry deliberately does not inject CSS, so the host loads the stylesheet itself. Both
