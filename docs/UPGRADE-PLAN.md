@@ -219,7 +219,7 @@ Widen, never replace:
 
 ## 5. Phase 1 — React 17 (small, checkpointed)
 
-**Goal:** officially support React 17. Expected code delta: near zero. *Decision gate (§10): ship 17 as its own public release, or treat it as an internal checkpoint folded into the React 18 release — the plan works either way; bisectability argues for a release, release overhead argues against.*
+**Goal:** officially support React 17. Expected code delta: near zero. *Decided (§10, 2026-08-18): **no separate 17 release** — it is an internal checkpoint folded into the React 18 release. Phase 1 therefore exits without publishing; the version bump and tag happen at React 18.*
 
 ### Steps
 
@@ -280,7 +280,7 @@ container while the bundled dependencies keep their own native `document` listen
 **Not closable from the demo, needs an owner:** the yalc smoke in a consuming application, a react-refresh
 check, and the §10 decision on whether React 17 ships as its own release.
 
-**Exit criteria:** CI green, QA checklist clean, `dist/` builds and passes a yalc smoke in a consuming app (if one is available), release published.
+**Exit criteria:** CI green, QA checklist clean, `dist/` builds and passes a yalc smoke in a consuming app. ~~release published~~ — struck by the §10 decision: 17 ships as part of the React 18 release, so nothing is published at the end of this phase. The yalc smoke is the only criterion still open.
 
 **Estimated effort:** 1–2 days + QA.
 
@@ -740,12 +740,12 @@ Phases 3 and 4 can partially overlap. Tracks **5a/5b** (SUIR exit) and **6** (en
 
 | Gate | Options | Decide by | Criterion |
 |---|---|---|---|
-| React 17: own public release vs internal checkpoint | (a) separate release — best bisectability for hosts; (b) checkpoint folded into the React 18 release — less release overhead | Phase 1 | whether any host wants to *stay* on 17 |
+| ~~React 17: own public release vs internal checkpoint~~ | **Decided (2026-08-18): folded into the React 18 release.** No checkpoint publish for 17, so the Phase 0/1 work — including the consumer-visible fixes and the asset relayout — reaches consumers only with React 18. Consequence to hold in view: `master` accumulates unreleased fixes until then, and a production issue on the 0.34 line is patched from `release/v0.34`, not from `master`. | — | — |
 | UMD script-tag support | (a) declare unsupported (evidence: the lowercase externals never matched `window.React`, so it likely never worked); (b) support properly — fix global names, solve jsx-runtime subpath globals, keep a pre-19 React-UMD story | before Phase 4 (JSX runtime) and F3 | host consumption audit (§8 / Appendix C) |
 | Bundled vs external runtime deps — the hybrid model (§2.6-11) | (a) trim `dependencies` to match the bundle (hosts stop double-installing); (b) externalize more (peer list grows); (c) status quo, documented | with the F3 spec | host installation model + bundle-size goals |
-| `engines.node >= 22` in the published manifest | keep / relax / move to docs as build-only | Phase 0.7 | consumers using `engine-strict` |
+| ~~`engines.node >= 22` in the published manifest~~ | **Decided (2026-08-18): relaxed to `>= 18`.** The floor now describes consuming the prebuilt bundle rather than building the repo: its most modern syntax is optional chaining, and the packed artifact was verified to server-render on Node 22 and 24. Development still uses the `.nvmrc` version, which is what CI installs; the README states both. | — | — |
 | ~~Source maps in the tarball~~ | **Decided (2026-08-10): ship.** Host debuggability outweighs the 3.0 MB; the pack budget caps their growth instead. | — | — |
-| Demo screenshots in `static/images` (~1.1 MB) | keep (consumer meta may name any file in that folder) / drop (only demo markdowns reference them, and those are not published) | with the F3 host-consumption audit | whether any host meta references non-flag images |
+| Demo screenshots in `static/images` (~1.1 MB) | **Deferred (2026-08-18): decide with the host audit, not before.** Dropping them is safe as far as this repository can see — only unpublished demo markdowns reference them and the built `all.css` does not — but a consumer meta can name any file in that folder through `view: 'Image'`, and that is exactly what the audit establishes. Bundled with the UMD and dependency-model calls so one audit answers all three. | with the F3 host-consumption audit | whether any host meta references non-flag images |
 | Dev-tooling audit burn-down (26 findings, 2 critical, prod 0) | name an owner and a cadence / accept and re-baseline each release / take the `npm audit fix --force` majors now | H9 | whether any finding is reachable from the published artifact (today none are — prod audit is 0) |
 | Global `html`/`body`/`*` CSS reset (§2.6-7) | scope everything under `.ui-render` / keep the global reset deliberately + document | H8, before F1 step 4 | whether any host relies on the leak |
 | `moment` optional-peer demotion | only at the F2 flip, gated on the F2.2-5 consumer audit (the Phase 1 `^2.29.4` widening is already decided) | F2 gate | consumer callback audit |

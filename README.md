@@ -62,7 +62,12 @@ cp -R node_modules/eis-ui-render/static ./public/
 
 ## Development Installation
 
-1. Install [Node.js](https://nodejs.org/), if you haven't already (version v24).
+The published package declares `engines.node >= 18`: that is the floor for *consuming* it, and the shipped
+bundle needs nothing newer (its most modern syntax is optional chaining, and the packed artifact is
+verified to server-render on Node 22 and 24). Building this repository is a different matter and uses the
+version in `.nvmrc`, which is what CI installs.
+
+1. Install [Node.js](https://nodejs.org/), if you haven't already — use the version in `.nvmrc` (v24).
 2. Navigate to project root folder and install dependencies by running this command in terminal:
 
 ### `npm install`
