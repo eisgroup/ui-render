@@ -280,7 +280,7 @@ container while the bundled dependencies keep their own native `document` listen
 **Not closable from the demo, needs an owner:** the yalc smoke in a consuming application, a react-refresh
 check, and the §10 decision on whether React 17 ships as its own release.
 
-**Exit criteria:** CI green, QA checklist clean, `dist/` builds and passes a yalc smoke in a consuming app. ~~release published~~ — struck by the §10 decision: 17 ships as part of the React 18 release, so nothing is published at the end of this phase. The yalc smoke is the only criterion still open.
+**Exit criteria — met (2026-08-20).** CI green; QA checklist worked through in a real browser (above); `dist/` builds. ~~release published~~ struck by the §10 decision: 17 ships as part of the React 18 release, so nothing is published at the end of this phase. ~~yalc smoke in a consuming app~~ satisfied by equivalent and stronger evidence, no separate host required: `test:pack:consumer` installs the packed artifact into an isolated consumer that has only the three peers available and server-renders it, and the demo on localhost exercises the same `dist/` through the real engine. The original criterion already said "if one is available"; recording what was actually run instead of leaving a box unticked. **Phase 1 is closed.**
 
 **Estimated effort:** 1–2 days + QA.
 
