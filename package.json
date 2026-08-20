@@ -5,7 +5,7 @@
   "homepage": "https://eisgroup.github.io/ui-render/",
   "license": "Apache 2.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=18"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

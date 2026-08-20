@@ -587,35 +587,35 @@ When opening a popup from a table row (using `renderItem`), the popup fields wil
 ```js
 {
   view: 'Table',
-  name: 'experienceRatingInputs.uwOverridesCoverage',
+  name: 'orders.lines',
   headers: [
-    { id: 'coverageType', label: 'Coverage Type' }
+    { id: 'lineNo', label: 'Line' }
   ],
   renderItem: {
     view: 'VerticalLayout',
     items: [
       {
         view: 'Button',
-        children: 'Override',
+        children: 'Adjust',
         onClick: {
           name: 'popupOpen',
-          args: ['InforceRateOverrideReason.{index}']
+          args: ['LineAdjustment.{index}']
         }
       },
       {
         view: 'Popup',
-        id: 'InforceRateOverrideReason.{index}',
+        id: 'LineAdjustment.{index}',
         items: [
           {
             view: 'Input',
-            name: 'inforceRateOverride',
-            // Becomes: "experienceRatingInputs.uwOverridesCoverage[0].inforceRateOverride"
+            name: 'adjustedAmount',
+            // Becomes: "orders.lines[0].adjustedAmount"
             type: 'number',
-            label: 'Inforce Rate Override'
+            label: 'Adjusted Amount'
           },
           {
             view: 'Input',
-            name: 'inforceRateOverrideReason',
+            name: 'adjustmentReason',
             label: 'Reason'
           }
         ]
@@ -639,6 +639,14 @@ When opening a popup from a table row (using `renderItem`), the popup fields wil
 - Input fields inside popups automatically get the correct path prefix
 - Popup fields receive the current row's data (`_data`) automatically
 - Popups are centered on screen
+- The automatic path prefix comes from **where the `Popup` is declared**. A `Popup` declared *inside*
+  the row (`renderItem` / `renderItemCells`) is scoped automatically. A `Popup` declared *outside* the
+  table must be told its scope explicitly, or its inputs stay root-scoped and the edit lands in a
+  root-level field: pass the table name in the action args —
+  `args: ['LineAdjustment.{index}', { relativePath: 'orders.lines' }]`
+- Opening a row popup whose scope cannot be resolved logs
+  `POPUP_OPEN: "<id>" ... without a relativePath`. The engine does **not** try to infer the table from
+  the data: a guess that picked the wrong table would write the user's edit into another table's row
 
 ## ShowIf Logic
 

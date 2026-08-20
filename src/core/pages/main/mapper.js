@@ -100,7 +100,7 @@ const RenderComponent = ({
                     ? mergeReplaceArrays(data, rawForm)
                     : data
                 // Draft row / renderExtraItem sets relativePath + relativeIndex to the next array slot.
-                // showIf.name may still be a global path (e.g. experienceRatingInputs.allPeriodsAdded).
+                // showIf.name may still be a global path (e.g. `settings.allRowsComplete`).
                 // In that case prefixing with `[index].` is wrong — use showIf.relativeData === false or
                 // component relativeData === false to read `name` from form root.
                 if (

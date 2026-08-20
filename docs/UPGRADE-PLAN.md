@@ -137,6 +137,8 @@ A second audit pass — against the working tree, the build configs, a full test
 | 13 | **Quality baselines measured (2026-07-21):** tests 76 suites / 1215 tests green in 8.3 s (zero snapshots); `lint:css` clean; `npx eslint src` fails (11 errors / 28 warnings; no lint script exists); `npm audit --omit=dev` **0** vulnerabilities; full `npm audit` **20** (2 critical, 7 high — dev tooling); **13 devDependencies with zero references** in code/configs: `tsconfig-paths-webpack-plugin`, `backoff`, `history`, `html-loader`, `minimist`, `path-browserify`, `postcss-scss`, `raw-loader`, `remark-loader`, `rimraf`, `sass`, `sass-loader`, `webpack-node-externals` (verify `dot-prop-immutable` too). | Phase 0.9, §9.9-H1 |
 | 14 | **Orphan set is 12, not 9:** the 9 direct orphans re-confirmed, plus `ErrorTable` (imported only by orphan `ErrorContent`), `Square` (only by orphan `Carousel`), and the pack `TabList` (mapper uses the engine copy, `mapper.js:33`). ~~Engine `tester/` fixtures are referenced by nothing.~~ — the `tester/` pair has since been deleted (§9.9-H1). | §9.9-H1, §9.2 |
 | 15 | **Hardcoded version strings** `data-version="0.34.2"` in `AppWrapper.js:10` and `types/UIRender.tsx:76` — drift on every release; should come from `package.json` at build time. | §9.9-H6 |
+| 16 | **One application's field names were compiled into the engine.** *Resolved.* When a popup could not resolve its `relativePath`, `rules.js` probed the consumer's data for two literal paths belonging to a single host app and adopted whichever matched. It never matched in 1928 tests — but for data that *did* carry one of those keys it bound the popup to a table the opener had nothing to do with (the two candidates were tried in order, so a row from the second table got the first), re-creating by data shape the rebinding that commit `89bac56` removed. Deleted; an unresolved scope now warns instead of guessing, and meta states the scope either by declaring the `Popup` inside the row or via `{relativePath}` in the `popupOpen` args. Three comment/JSDoc examples naming the same fields were neutralised. | §9.3 |
+| 17 | **The date field is selected by `type`, and its view constant is dead.** `renders.js:38-40` overrides whatever the view switch chose whenever `type === 'date'`, so a date picker is reachable from meta as `{view: 'Input', type: 'date'}` — any `view` the mapper does not claim works, which is why grepping example metas for `"view": "Date"` finds nothing. Meanwhile `FIELD.TYPE.DATE` (`modules/form/constants.js:16`) has **zero readers** — `view: 'Date'` renders the "field does not exist" placeholder. Note `FIELD.RENDER.DATE` (`variables/fields.js:47`) is a different, live thing: a read-only date formatter. Either give the view constant a branch or delete it; the two-`'Date'` split is a docs-truth trap. The rendered picker is an rc-picker text input plus a JS overlay with no native `type="date"` attribute — the reason the §5 overlay QA item exists. | §9.9-H1, §9.9-H2 |
 
 **Checkpoint updates (2026-08-07):**
 
@@ -217,7 +219,7 @@ Widen, never replace:
 
 ## 5. Phase 1 — React 17 (small, checkpointed)
 
-**Goal:** officially support React 17. Expected code delta: near zero. *Decision gate (§10): ship 17 as its own public release, or treat it as an internal checkpoint folded into the React 18 release — the plan works either way; bisectability argues for a release, release overhead argues against.*
+**Goal:** officially support React 17. Expected code delta: near zero. *Decided (§10, 2026-08-18): **no separate 17 release** — it is an internal checkpoint folded into the React 18 release. Phase 1 therefore exits without publishing; the version bump and tag happen at React 18.*
 
 ### Steps
 
@@ -228,7 +230,7 @@ Widen, never replace:
 
 `@testing-library/react` 12 stays (its `react <18` peer admits 17). `ReactDOM.render` in the demo stays (fully supported in 17).
 
-**Automated checkpoint (2026-08-07):** React/React DOM 17.0.2, additive React 16.14/17 peer ranges and Moment `^2.29.4` are on `master`. Hosted CI is green: 138 suites / 1920 tests; coverage is 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JS/CSS lint and both builds pass. Manual QA, react-refresh, yalc smoke, overlay-ordering QA and the release decision remain open.
+**Automated checkpoint (2026-08-07):** React/React DOM 17.0.2, additive React 16.14/17 peer ranges and Moment `^2.29.4` are on `master`. Hosted CI is green: 138 suites / 1920 tests; coverage is 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JS/CSS lint and both builds pass. The manual QA checklist below is now worked through in a real browser, including the overlay-ordering items; react-refresh, the yalc smoke and the release decision remain open.
 
 ### React 17 behavioral changes, mapped to this codebase
 
@@ -242,15 +244,43 @@ Widen, never replace:
 
 ### Manual QA checklist (demo, all examples)
 
-- [ ] Popup/Tooltip open + click-outside close
-- [ ] Dropdown open/select/close, multi-select
-- [ ] Date/time pickers (rc-picker overlay behavior)
-- [ ] Tabs (both implementations), Collapse, Expand, Carousel autoplay
-- [ ] Table: sorting, pagination, inline edit rows (`LocalDraftTableRow`)
-- [ ] Form flows: validation errors, submit, addData/removeData, upload
-- [ ] No new console warnings/errors on any example
+Run in a real browser (Chrome) against `npm start` on the React 17 baseline — not jsdom, which does not
+reproduce the ordering this phase is actually about: React 17 delegates synthetic events at the root
+container while the bundled dependencies keep their own native `document` listeners (SUIR via
+`@semantic-ui-react/event-stack`, rc-picker via `rc-util`), and click-outside logic depends on that order.
 
-**Exit criteria:** CI green, QA checklist clean, `dist/` builds and passes a yalc smoke in a consuming app (if one is available), release published.
+- [x] **Popup open + click-outside close** — portal-based modal with dimmer opens from `popupContent`,
+      closes on a dimmer click, dimmer removed. *Tooltip hover-open not exercised — small remaining gap.*
+- [x] **Dropdown open/select/close, click-outside close** — selecting changes the value; a click outside
+      closes the menu **without** committing a selection. *Multi-select has no demo example (`multiple: true`
+      appears only in the upload variants), so it stays covered by the jsdom contracts only.*
+- [x] **Date/time picker (rc-picker overlay)** — the picker lives in the `tableForm` example
+      (`src/demo/examples/data_component.js`). Overlay opens on focus, a day click writes the formatted
+      value, and a click outside closes the overlay. Selected by `type: 'date'`, **not** by a `view` string
+      (§2.6-17); the rendered DOM is an rc-picker text input plus a JS overlay with no native `type="date"`
+      attribute, which is precisely why this item mattered for React 17.
+- [x] **Tabs, Collapse, Expand** — tab switch swaps panel content; example rows expand and collapse.
+      *Carousel autoplay is moot: `Carousel` is not registered in `mapper.js` and is one of the §2.6-14
+      orphans slated for deletion under §9.9-H1, so no meta can render it.*
+- [x] **Table: sorting, pagination, inline edit rows** — sorting cycles asc → unsorted → desc on a header
+      whose table declares `sorts` (`TableView.js` gives a header `onClick` only then; the `adminCosts`
+      table inside the `all` example's Admin Expenses section is the one that does), verified by both the
+      indicator class and the row order. Pagination page 3 shows rows 11–15 of 23. Draft-row inline edit
+      commits through `LocalDraftTableRow`.
+- [x] **Form flows: validation errors, submit, addData/removeData** — a touched empty required field shows
+      `Required`; submit exercises both branches (blocked with validation errors, and successful with values
+      delivered to the handler); a filled draft row commits and the draft clears; deleting a row removes the
+      right one, reindexes the rest and leaves sibling groups untouched. *Upload renders and is interactive,
+      but its `autoSubmit: true` posts to `REACT_APP_API_URL`, so a real file round-trip needs a backend or
+      a consuming app — the jsdom contracts cover upload validation and the ref contract.*
+- [x] **No new console warnings/errors** — zero across the whole sweep, after fixing three leaks this QA
+      pass surfaced: `currencyCode`/`onDataChanged` reaching the DOM through SUIR's Dropdown, and
+      react-markdown's `inline` prop reaching `<code>` in two demo components.
+
+**Not closable from the demo, needs an owner:** the yalc smoke in a consuming application, a react-refresh
+check, and the §10 decision on whether React 17 ships as its own release.
+
+**Exit criteria:** CI green, QA checklist clean, `dist/` builds and passes a yalc smoke in a consuming app. ~~release published~~ — struck by the §10 decision: 17 ships as part of the React 18 release, so nothing is published at the end of this phase. The yalc smoke is the only criterion still open.
 
 **Estimated effort:** 1–2 days + QA.
 
@@ -380,6 +410,11 @@ Every workstream below is a series of small, independently shippable, reversible
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 
 All decomposition outputs are authored in TypeScript from the start (`engine/*.ts`, §9.6-E3) — the old monoliths are never converted in place.
+
+**Catalogued while removing the popup path guess (§2.6-16), left for this workstream rather than patched piecemeal:**
+
+- **The popup scope resolution chain has four dead branches.** `rules.js` tries four numbered sources before falling back; measured over the full suite, branches 1–3 never fire and branch 4 fires without ever matching. Branches 1–3 read `this.props.relativePath` on the `UIRender` instance, which nothing in the tree sets and which is not in `UIRender.propTypes`. Branch 4 scans `Object.keys(form.getState().values)` for a bracketed `name[n]`, but final-form nests bracketed names into real arrays, so a top-level values key can never contain `[` — the intent was `form.getRegisteredFields()`. Only two sources actually resolve a scope: an authored `{relativePath}` in the action args, and the path captured when a `Popup` inside a row registers its template. Deleting the dead branches is a behaviour change (branch 4's `relativeData` assignment feeds the id-interpolation vars) and needs its own diff and tests.
+- **A popup item bound by `name` renders its whole row object.** Because popup content is rendered with `relativeData: false`, an item such as `{view: 'Text', name: 'orderNo'}` inside a popup receives the row object as its child and throws `Objects are not valid as a React child`. Consequently the `config.md` claim that popup fields receive the current row's data automatically holds for inputs only.
 
 **Do not start** until Phase 2 has shipped and §9.5 contract tests exist. This is the deep end.
 
@@ -619,6 +654,7 @@ The form stack splits into a React-free core and React bindings:
 - `src/style/unused/` (10 files); `override/_policy.less` / `_classic.less` (verify unreferenced); icomoon demo artifacts under `fonts/icons/`.
 - ~~the unreferenced engine `tester/` fixtures~~ — **deleted.** They were worse than merely dead: `test_data.js` and `test_meta.js` re-exported from `../examples/…`, and no `examples/` directory exists under `src/core/pages/main/` (the fixtures live in `src/demo/examples/`), so either file would have failed module resolution the moment anything imported it. Nothing did. `eslint-config-react-app` could not see it because `import/no-unresolved` is off. Removing them also took two permanently-0% files out of the coverage report; global coverage after deletion is 94.29% statements / 89.38% branches / 92.71% functions / 94.9% lines.
 - `formatTime`/`toHours` in `time.js` (no production callers, §9.7-F2).
+- `FIELD.TYPE.DATE` (`modules/form/constants.js:16`) — defined, never read, and `view: 'Date'` therefore renders a placeholder instead of the date field the name implies (§2.6-17). Deleting it is the honest move unless the view spelling is meant to be supported, in which case it needs a branch in `renders.js` rather than a constant.
 - ~~The **13 zero-reference devDependencies**~~ — **done in Phase 0.9:** all 13 plus `dot-prop-immutable` removed, verified by pruning `node_modules` to the lockfile with `npm ci` and re-running every pipeline including `build-css` and the watch build.
 
 #### H2 — Make the docs match reality
@@ -704,12 +740,12 @@ Phases 3 and 4 can partially overlap. Tracks **5a/5b** (SUIR exit) and **6** (en
 
 | Gate | Options | Decide by | Criterion |
 |---|---|---|---|
-| React 17: own public release vs internal checkpoint | (a) separate release — best bisectability for hosts; (b) checkpoint folded into the React 18 release — less release overhead | Phase 1 | whether any host wants to *stay* on 17 |
+| ~~React 17: own public release vs internal checkpoint~~ | **Decided (2026-08-18): folded into the React 18 release.** No checkpoint publish for 17, so the Phase 0/1 work — including the consumer-visible fixes and the asset relayout — reaches consumers only with React 18. Consequence to hold in view: `master` accumulates unreleased fixes until then, and a production issue on the 0.34 line is patched from `release/v0.34`, not from `master`. | — | — |
 | UMD script-tag support | (a) declare unsupported (evidence: the lowercase externals never matched `window.React`, so it likely never worked); (b) support properly — fix global names, solve jsx-runtime subpath globals, keep a pre-19 React-UMD story | before Phase 4 (JSX runtime) and F3 | host consumption audit (§8 / Appendix C) |
 | Bundled vs external runtime deps — the hybrid model (§2.6-11) | (a) trim `dependencies` to match the bundle (hosts stop double-installing); (b) externalize more (peer list grows); (c) status quo, documented | with the F3 spec | host installation model + bundle-size goals |
-| `engines.node >= 22` in the published manifest | keep / relax / move to docs as build-only | Phase 0.7 | consumers using `engine-strict` |
+| ~~`engines.node >= 22` in the published manifest~~ | **Decided (2026-08-18): relaxed to `>= 18`.** The floor now describes consuming the prebuilt bundle rather than building the repo: its most modern syntax is optional chaining, and the packed artifact was verified to server-render on Node 22 and 24. Development still uses the `.nvmrc` version, which is what CI installs; the README states both. | — | — |
 | ~~Source maps in the tarball~~ | **Decided (2026-08-10): ship.** Host debuggability outweighs the 3.0 MB; the pack budget caps their growth instead. | — | — |
-| Demo screenshots in `static/images` (~1.1 MB) | keep (consumer meta may name any file in that folder) / drop (only demo markdowns reference them, and those are not published) | with the F3 host-consumption audit | whether any host meta references non-flag images |
+| Demo screenshots in `static/images` (~1.1 MB) | **Deferred (2026-08-18): decide with the host audit, not before.** Dropping them is safe as far as this repository can see — only unpublished demo markdowns reference them and the built `all.css` does not — but a consumer meta can name any file in that folder through `view: 'Image'`, and that is exactly what the audit establishes. Bundled with the UMD and dependency-model calls so one audit answers all three. | with the F3 host-consumption audit | whether any host meta references non-flag images |
 | Dev-tooling audit burn-down (26 findings, 2 critical, prod 0) | name an owner and a cadence / accept and re-baseline each release / take the `npm audit fix --force` majors now | H9 | whether any finding is reachable from the published artifact (today none are — prod audit is 0) |
 | Global `html`/`body`/`*` CSS reset (§2.6-7) | scope everything under `.ui-render` / keep the global reset deliberately + document | H8, before F1 step 4 | whether any host relies on the leak |
 | `moment` optional-peer demotion | only at the F2 flip, gated on the F2.2-5 consumer audit (the Phase 1 `^2.29.4` widening is already decided) | F2 gate | consumer callback audit |
@@ -845,7 +881,7 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 - ✅ Dev runtime updated to React/React DOM 17.0.2; additive React 16.14/17 peer ranges and Moment `^2.29.4` recorded in the lockfile
 - ✅ Automated checkpoint green in hosted CI: 138 suites / 1920 tests; global coverage 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JavaScript/CSS lint, library build and demo build
 - ✅ Install docs and unreleased changelog updated for React 17
-- ☐ Manual QA checklist (§5) clean on 17 — popups, dropdowns, pickers, tabs, tables, forms, upload
+- ✅ Manual QA checklist (§5) worked through in a real browser on 17 — popup, dropdown and rc-picker click-outside, tabs/expand, table sorting/pagination/inline edit, validation/submit/add/remove, and a console clean of warnings after three leaks were fixed. Remaining: Tooltip hover, Dropdown multi-select and a real upload round-trip have no demo path; yalc smoke and the release decision need an owner
 - ☐ react-refresh dev loop works on 17
 - ☐ yalc smoke into a consuming app (if one is available)
 - ☐ Click-outside/overlay QA re-run with attention to bundled-dep document listeners (event-stack / rc-util ordering vs root delegation, §5)

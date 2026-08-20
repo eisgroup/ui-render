@@ -800,7 +800,7 @@ function Decorator (Class) {
                         const pathMatch = this.props.relativePath.match(/\[(\d+)\]/)
                         if (pathMatch) {
                             relativeIndex = parseInt(pathMatch[1], 10)
-                            // Extract base path (e.g., "experienceRatingInputs.uwOverridesCoverage" from "experienceRatingInputs.uwOverridesCoverage[0]")
+                            // Extract base path (e.g. `orders.lines` from `orders.lines[0]`)
                             relativePath = this.props.relativePath.replace(/\[\d+\]$/, '')
                         } else {
                             relativePath = this.props.relativePath
@@ -887,26 +887,26 @@ function Decorator (Class) {
                         // Get correct relativePath for current table row context
                         // Use contextRelativePath from options (renderItem context) with highest priority
                         // This ensures popup fields match the exact table row that opened the popup
-                        // relativePath should be the table name, as listed in `possiblePaths` below
+                        // relativePath is the owning table's array path (e.g. `orders` for a Popup declared
+                        // inside a Table named `orders`), captured when the Popup template registered.
                         // @Note: resolved before the row extraction below, which reads it — declaring it after
                         // that read threw a temporal-dead-zone ReferenceError and swallowed the popup instead.
-                        let currentRelativePath = contextRelativePath != null ? contextRelativePath : (relativePath || this.props.relativePath || templateRelativePath)
+                        const currentRelativePath = contextRelativePath != null ? contextRelativePath : (relativePath || this.props.relativePath || templateRelativePath)
 
-                        // If relativePath still not found, try to determine from table structure
-                        // Look for table name in currentData
-                        if (!currentRelativePath && currentData && currentRelativeIndex != null) {
-                            // Try common table paths
-                            const possiblePaths = [
-                                'experienceRatingInputs.uwOverridesCoverage',
-                                'experienceRatingInputs.uwOverridesCommon'
-                            ]
-                            for (const path of possiblePaths) {
-                                const tableData = get(currentData, path)
-                                if (Array.isArray(tableData) && tableData[currentRelativeIndex] != null) {
-                                    currentRelativePath = path
-                                    break
-                                }
-                            }
+                        // @Note: an unresolved path stays unresolved on purpose. It cannot be derived from the
+                        // data without guessing an application's field names, and a wrong guess binds the popup
+                        // to another table's row and writes the user's edit there. A row-scoped popup states its
+                        // scope in meta: either the Popup is declared inside the row (`renderItem`/`TableCells`,
+                        // which makes the registered `relativePath` the table name), or the caller passes
+                        // `{relativePath: '<table name>'}` in the `popupOpen` args. Warn instead of guessing so
+                        // the misconfiguration is visible rather than silently rebinding fields.
+                        if (!currentRelativePath && currentRelativeIndex != null) {
+                            console.warn(
+                                `POPUP_OPEN: "${id}" opened for row index ${currentRelativeIndex} without a relativePath;`
+                                + ' its inputs bind to root-level field names instead of the table row.'
+                                + ' Declare the Popup inside the table row, or pass'
+                                + ' {relativePath: \'<table name>\'} in the popupOpen args.'
+                            )
                         }
 
                         // Use current row data if available (from interpolation), otherwise use template data

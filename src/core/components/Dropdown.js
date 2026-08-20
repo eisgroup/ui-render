@@ -85,6 +85,10 @@ export function Dropdown ({
   lazyLoad = true,
   optionsLabel,
   initialValues, // not used, removing from DOM
+  // Engine-wide props this view never reads. Semantic's Dropdown spreads whatever it does not
+  // recognise onto its <div>, so leaving them in `props` puts them on the DOM and React warns.
+  currencyCode: _currencyCode,
+  onDataChanged: _onDataChanged,
   readonly,
   autofocus,
   onAddItem,
