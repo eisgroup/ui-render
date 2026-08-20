@@ -343,6 +343,22 @@ check, and the §10 decision on whether React 17 ships as its own release.
 
 `<StrictMode>` is **not** part of the upgrade. Today it would drown the console in `UNSAFE_*` deprecation warnings (the prototype-patched lifecycle engine guarantees them) and double-invoke render/effects in dev, which the class engine was never audited for.
 
+**Measured on React 18.3 (2026-08-20)** — so §9.3 is scoped by counting, not estimating. Method: a recording `console.error`/`console.warn` spy (the suites mock those, so scanning jest output shows nothing), plus the demo temporarily wrapped in `<StrictMode>` with all 38 examples expanded.
+
+*Console volume is small and misleading.* React aggregates per lifecycle kind and dedupes per component, so the demo produced **one** warning (`Expand, Tabs`) and a form-heavy meta produced **three** (one per lifecycle: `UNSAFE_componentWillReceiveProps` naming `Expand, InputNative, TableView, Tabs, UIRender, WithForm`; `UNSAFE_componentWillMount` and `UNSAFE_componentWillUpdate` naming `UIRender`). The count to plan against is the components, not the messages.
+
+*The work item is 29 `UNSAFE_*` call sites across 14 files*, one of which (`Carousel`) is an orphan that cannot warn and is deleted under §9.9-H1:
+
+| Sites | File | Note |
+|---|---|---|
+| 12 | `pages/main/rules.js` | the engine, including the prototype-patching machinery — §9.3 step 5 is exactly this |
+| 4 | `modules/form/utils.js` | `WithForm` plus patched lifecycles |
+| 2 | `components/Collapse.js` | |
+| 1 each | `pages/main/components/{Tabs,TableView}.js`, `modules/form/views/AutoSave.js`, `components/utils/interactions.js`, `components/{Tabs,ProgressSteps,ProgressBar,InputNative,Expand,Counter}.js` | leaf props→state derivations, mechanically convertible (§2.3) |
+| 1 | `components/Carousel.js` | orphan — not registered in `mapper.js`, deleted under H1 |
+
+Six of those components were observed warning in practice (`Expand`, `Tabs`, `InputNative`, `TableView`, `UIRender`, `WithForm`); the rest are live code that simply needs the right prop change to surface. Outside StrictMode, React 18.3 emits **zero** warnings for any of them — the renamed `UNSAFE_*` forms are fully supported, which is why the upgrade did not need this work.
+
 Sequencing: StrictMode becomes the *acceptance criterion* of workstream §9.3 (engine decomposition). The definition of "StrictMode-clean" here: demo runs under `<StrictMode>` with zero lifecycle warnings, **no duplicated form subscriptions, no setState-during-render, all timers/listeners cleaned on unmount, and two instances on one page fully isolated** (the §2.6-5/6 hazards) — and no behavioral differences. That state is also the bulk of the concurrent-rendering readiness work (the 19 flip itself does not require it — §8).
 
 ---
