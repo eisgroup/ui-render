@@ -4,8 +4,12 @@
 
 #### Compatibility
 
-- Development and the primary test suite now run on React 17.0.2.
-- The peer range remains additive: host applications may use React 16.14 or React 17.
+- Development and the primary test suite now run on React 18.3.1, and the demo mounts through the
+  React 18 root API, so it renders with automatic batching exactly as a host on 18 does.
+- The peer range stays additive: host applications may use React 16.14, 17 or 18. Hosts on 16 or 17
+  need change nothing.
+- `TooltipPop` and `Image` no longer use `defaultProps`, which React 18.3 warns about for function
+  components and React 19 removes. Their defaults are unchanged.
 - The Moment peer range now accepts all compatible 2.x releases from 2.29.4 onward.
 - Public TypeScript declarations now describe the shipped callable component: `data` and `meta`
   are required, runtime-supported props are optional, and the package supports an interop default

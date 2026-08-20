@@ -13,25 +13,26 @@ must be supplied by the host because the library build externalizes it.
 
 | Package | Required version | Why it must be a peer |
 |---|---|---|
-| `react` | `^16.14.0 \|\| ^17.0.0` | A second copy of React in the tree triggers `Invalid hook call` and breaks Context (forms, providers). pnpm with strict node_modules will not deduplicate copies across non-overlapping ranges. |
-| `react-dom` | `^16.14.0 \|\| ^17.0.0` | Must use the same major version as `react` so the renderer pair matches. |
+| `react` | `^16.14.0 \|\| ^17.0.0 \|\| ^18.0.0` | A second copy of React in the tree triggers `Invalid hook call` and breaks Context (forms, providers). pnpm with strict node_modules will not deduplicate copies across non-overlapping ranges. |
+| `react-dom` | `^16.14.0 \|\| ^17.0.0 \|\| ^18.0.0` | Must use the same major version as `react` so the renderer pair matches. |
 | `moment` | `^2.29.4` | The library externalizes Moment and uses it for date pickers and formatters, so the host must provide a compatible 2.x version. |
 
 Install (npm):
 
 ```bash
-npm install eis-ui-render react@^17.0.0 react-dom@^17.0.0 moment@^2.29.4
+npm install eis-ui-render react@^18.0.0 react-dom@^18.0.0 moment@^2.29.4
 ```
 
 Install (pnpm) — note that with `auto-install-peers=false` (the strict default in some setups)
 peer dependencies are **not installed automatically**, so they must be listed explicitly:
 
 ```bash
-pnpm add eis-ui-render react@^17.0.0 react-dom@^17.0.0 moment@^2.29.4
+pnpm add eis-ui-render react@^18.0.0 react-dom@^18.0.0 moment@^2.29.4
 ```
 
-React 16.14 hosts remain supported and may keep matching `react@^16.14.0` and
-`react-dom@^16.14.0` dependencies while migrating on their own schedule.
+React 16.14 and 17 hosts remain supported and may keep matching `react@^16.14.0` or `react@^17.0.0`
+dependencies while migrating on their own schedule. The library is developed and tested against
+React 18.3.
 
 If the host project relies on transitive copies of `react`/`react-dom`/`moment` from another
 package instead of declaring them directly, pnpm in isolated mode will not resolve our peer

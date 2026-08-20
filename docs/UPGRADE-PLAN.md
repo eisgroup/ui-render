@@ -322,7 +322,18 @@ check, and the §10 decision on whether React 17 ships as its own release.
 - Any use of concurrent features (`startTransition`, `Suspense` for data) — the engine must be StrictMode-clean first.
 - Class→hooks refactoring — never mix an upgrade with a refactor in one release.
 
-**Exit criteria:** CI green on React 18; RTL 16 migration complete with zero `act` warnings; QA checklist clean; batching pass done; docs updated; release published.
+**Implementation status (2026-08-20):** steps 1-8 done except the release.
+
+- **Steps 1, 3-5 landed together** (they cannot be split — RTL ≥13 requires React ≥18): React and React DOM 18.3.1, RTL 16 with an explicit `@testing-library/dom` 10 peer, `@types/react`/`@types/react-dom` 18, peers widened to `^16.14.0 || ^17.0.0 || ^18.0.0`. The type-consumer matrix was repointed — `@types/react` is 18 now, so the 16 and 17 slots come from locked aliases — and all six interop/CommonJS combinations still pass.
+- **The RTL 12→16 migration cost two test files, not the 1-2 weeks budgeted here.** Both failures shared the predicted cause: under `createRoot` a state update outside `act()` is no longer flushed before the assertion. `ProgressBar` drove its own `setTimeout` via `jest.runAllTimers()`; `Slider` dispatched a raw `MouseEvent` to reach `onPointerDown`. No product code was involved. **140 suites / 1946 tests, zero `act` warnings.**
+- **Step 1's `defaultProps` prediction was right, and scanning jest output would have missed it:** the suites mock `console.error`, so the warnings were swallowed and the output looked clean. A probe with a recording spy showed React 18.3 warns for both `TooltipPop` and `Image`; both moved to default parameters (`Image` now forwards `decoding`/`loading` explicitly). `ImageSwatch` keeps its `defaultProps` — it is an orphan nothing renders, so it cannot warn; deletion is §9.9-H1's job. One test asserted `TooltipPop.defaultProps.delay`, i.e. the mechanism rather than the behaviour, and was rewritten against what Semantic actually receives.
+- **Step 2 done:** `src/main.jsx` mounts via `createRoot`, so the demo renders with automatic batching rather than 17-compat mode.
+- **Step 6, the batching pass, found no regression.** The unit suite now runs under `createRoot` (batching in effect) and is green. In the browser, on the demo: the form flow — date picker overlay, validation clearing, both submit branches, `addData` committing a row while the draft clears, `removeData` taking the right row — all behave as they did on 17; and the cascading Select, the most batching-sensitive path in the library because its reset calls `onChange` from inside an effect, correctly reset Product from `Alpha` to `Delta` when Category changed, with the dependent table following. No console errors. `flushSync` was not needed anywhere.
+- **Step 7:** the risky interactive views (Dropdown, Popup, rc-picker, Tabs, Table sorting/pagination/inline edit) were exercised on 18 through the §5 checklist. The two console warnings the demo does emit are React Router v6 future-flag notices — demo-only, unrelated to React 18.
+- **Step 8:** README, `docs.md` and the changelog carry the `16.14 || 17 || 18` matrix.
+- **Not done:** the release. Per §10 this is where React 17 ships too, folded in.
+
+**Exit criteria:** CI green on React 18 ✅; RTL 16 migration complete with zero `act` warnings ✅; QA checklist clean ✅; batching pass done ✅; docs updated ✅; release published ☐.
 
 **Estimated effort:** 1–2 weeks (dominated by RTL migration + regression QA).
 
