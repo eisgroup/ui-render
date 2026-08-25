@@ -54,5 +54,79 @@ jobs:
       - name: Smoke the packed tarball
         run: npm run test:pack:consumer
 
+      # The step above only ever sees the React the lockfile installs, so the declared 16.14 and 17 ends of
+      # peerDependencies had no runtime coverage at all. This re-runs the same smoke against React installed
+      # into a throwaway directory — the repository's own node_modules is never touched. It checks the
+      # published artifact, which is what a peer range is a claim about; it is not a substitute for running
+      # the suite on those versions (see docs/UPGRADE-PLAN.md §8, "CI coverage of the declared peer range").
+      - name: Smoke the packed tarball across the declared peer range
+        run: npm run test:pack:peers
+
       - name: Build demo
         run: npm run build
+
+  # Gating. `peerDependencies` declares a 16.14 floor, but `npm ci` installs exactly one React, so the
+  # `verify` job above only ever exercises 18; `test:pack:peers` proves the published artifact server-renders
+  # on 16 and 17, which is narrower than running the suite. This runs the whole suite on React 16.14.
+  #
+  # No `--legacy-peer-deps` here, unlike `react-19-advisory` below: React 16.14 comes from an install-only
+  # fixture package (`scripts/fixtures/react16-floor`, linked as the `react-16-floor` devDependency), so npm
+  # nests it instead of competing for the hoisted `node_modules/react` slot and plain `npm ci` installs it.
+  # Aliased devDependencies -- the trick `react-types-16` uses -- cannot work for a runtime package, because
+  # `react-dom@16.14.0` peer-requires `react` and npm resolves that against the hoisted copy React 18 owns.
+  #
+  # Green here means 140 suites / 1946 tests, the same totals as the React 18 leg — there are no exclusions.
+  # jest.react16.config.js and scripts/fixtures/react16/setup.js assert the React that actually loaded, so a
+  # mapping that silently fell back to 18 fails every suite instead of reporting a false green.
+  react-16-floor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test on the React 16.14 peer floor
+        run: npm run test:react16
+
+  # Advisory only — React 19 is NOT declared in peerDependencies (see docs/UPGRADE-PLAN.md §8).
+  # Purpose: make upstream drift visible on every PR without gating it, so the 19 flip is a
+  # measurement rather than a discovery. `continue-on-error: true` keeps a red leg off the merge path.
+  react-19-advisory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # `--legacy-peer-deps` is deliberate, not carelessness: two installed packages still declare
+      # `react ^16.8.0 || ^17.0.0 || ^18.0.0` peers, so npm would abort this install with ERESOLVE.
+      #   1. semantic-ui-react (bundled dependency — removed by §9.7-F1 step 3½)
+      #   2. react-final-form 6.5.9 (19-ready line is 7.0.1 — §9.7-F4)
+      # Both caps are tracked upgrades; the flag overrides the peer check for this throwaway install
+      # only and never touches what we declare to consumers. `--no-save` leaves package.json alone.
+      - name: Install React 19 over the lock
+        run: npm install --no-save --legacy-peer-deps react@19 react-dom@19
+
+      - name: Test on React 19
+        run: npx jest

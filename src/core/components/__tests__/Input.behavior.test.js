@@ -130,8 +130,14 @@ describe('Input sticky placeholder contracts', () => {
 
 describe('Input interaction and presentation contracts', () => {
     it('activates for autofocus and follows focus and blur callbacks', () => {
-        const onFocus = jest.fn()
-        const onBlur = jest.fn()
+        // Record what each callback observed instead of asserting on a retained event: React 16
+        // returns the SyntheticEvent to its pool once the handler returns and nulls every field on
+        // it, so a retained event asserts nothing on the declared peer floor. The event types and
+        // the callback counts below are identical on 16, 17, 18 and 19.
+        const focusEvents = []
+        const blurEvents = []
+        const onFocus = event => { focusEvents.push(event.type) }
+        const onBlur = event => { blurEvents.push(event.type) }
         const { container } = render(wrap(
             <Input name="search" autofocus onFocus={onFocus} onBlur={onBlur} />
         ))
@@ -139,13 +145,14 @@ describe('Input interaction and presentation contracts', () => {
 
         expect(input).toHaveFocus()
         expect(container.querySelector('.input')).toHaveClass('active')
+        expect(focusEvents).toEqual(['focus'])
 
         fireEvent.blur(input)
-        expect(onBlur).toHaveBeenCalledWith(expect.objectContaining({ type: 'blur' }))
+        expect(blurEvents).toEqual(['blur'])
         expect(container.querySelector('.input')).not.toHaveClass('active')
 
         fireEvent.focus(input)
-        expect(onFocus).toHaveBeenCalledWith(expect.objectContaining({ type: 'focus' }))
+        expect(focusEvents).toEqual(['focus', 'focus'])
         expect(container.querySelector('.input')).toHaveClass('active')
     })
 

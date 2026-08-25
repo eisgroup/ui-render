@@ -56,9 +56,10 @@ describe('Render setup and fallback contracts', () => {
 
         expect(indexed.key).toBe('3')
         expect(objectIndex.key).toBeNull()
-        expect(Render.Component).toHaveBeenCalledWith(
-            expect.objectContaining({ items: [] }),
-            expect.anything()
-        )
+        // Assert on the props argument alone: React passes a second argument to function
+        // components whose value is version-specific (the legacy context object on 16-18,
+        // `undefined` on 19), so neither `expect.anything()` nor `undefined` is portable.
+        expect(Render.Component).toHaveBeenCalledTimes(1)
+        expect(Render.Component.mock.calls[0][0]).toEqual(expect.objectContaining({ items: [] }))
     })
 })

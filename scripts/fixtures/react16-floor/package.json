@@ -1,0 +1,10 @@
+{
+  "name": "eis-ui-render-react-16-floor",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Install-only fixture holding the React 16.14 peer floor for jest.react16.config.js. Linked from the root devDependencies as `react-16-floor` (file:scripts/fixtures/react16-floor) so a plain `npm ci` installs it, nested here rather than hoisted, leaving the root react/react-dom on 18. Versions are pinned exactly so the floor cannot drift with a transitive bump. Nothing but this manifest belongs in this directory: the harness code lives one level up in scripts/fixtures/react16/ so that the node_modules npm nests here cannot shadow its module resolution and mask a broken mapping.",
+  "dependencies": {
+    "react": "16.14.0",
+    "react-dom": "16.14.0"
+  }
+}

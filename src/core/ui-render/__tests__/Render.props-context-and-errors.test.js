@@ -52,12 +52,16 @@ describe('Render engine edge contracts', () => {
             tooltip: { inverted: false, position: 'top', title: 'Details' },
         }))
 
-        expect(Render.Tooltip).toHaveBeenCalledWith(expect.objectContaining({
+        // Assert on the props argument alone: the second argument React passes to function
+        // components is version-specific (legacy context object on 16-18, `undefined` on 19).
+        expect(Render.Tooltip).toHaveBeenCalledTimes(1)
+        expect(Render.Tooltip.mock.calls[0][0]).toEqual(expect.objectContaining({
             inverted: false,
             position: 'top',
             title: 'Details',
-        }), expect.anything())
-        expect(component).toHaveBeenCalledWith(expect.not.objectContaining({ tooltip: expect.anything() }), expect.anything())
+        }))
+        expect(component).toHaveBeenCalledTimes(1)
+        expect(component.mock.calls[0][0]).toEqual(expect.not.objectContaining({ tooltip: expect.anything() }))
     })
 
     it('preserves explicit currency and strips the context-only date format', () => {
