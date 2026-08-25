@@ -70,6 +70,12 @@
 - Build configuration: the demo build no longer duplicates the shared Babel presets. Every
   pipeline — library, demo and tests — now reads them from one `babel.config.js`, with only the
   development-time refresh transform declared by the demo. Emitted bundles are unchanged.
+- The declared peer range is now tested, not just asserted. The full suite runs on React 16.14 in
+  its own gating check alongside the React 18 one, the packed artifact is server-rendered against
+  React 16.14 and 17, and a non-gating check runs the suite on React 19 so upstream drift shows up
+  early. Assertions that had been pinned to React version internals — a function component's second
+  argument, and component names appended to development warnings — now assert behaviour instead, so
+  the same suite passes on React 16.14, 17, 18.3 and 19.
 
 #### Fixes
 
