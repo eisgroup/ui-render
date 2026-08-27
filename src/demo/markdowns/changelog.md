@@ -79,6 +79,10 @@
 
 #### Fixes
 
+- Upload no longer hands the host a blanked-out drag event on React 16. Its drag focus/blur callbacks
+  run after the component re-renders, and React 16 recycles event objects once the original handler
+  returns, so an application reading `type` or `target` from the forwarded event saw `null`. The event
+  is now retained explicitly before being forwarded. React 17 and later were never affected.
 - A popup can no longer be bound to the wrong table. When a popup opened from a table row could not
   determine which table it belonged to, the renderer guessed by looking for two specific field names
   in the data and adopting whichever it found — so an application that happened to use one of those

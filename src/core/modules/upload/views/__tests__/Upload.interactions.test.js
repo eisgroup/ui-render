@@ -42,10 +42,15 @@ describe('Upload interaction contracts', () => {
         fireEvent.dragEnter(zone, { dataTransfer: { files: [] } })
         expect(zone).toHaveClass('active')
         expect(onFocus).toHaveBeenCalledTimes(1)
+        // The forwarded event must still be readable by the host. These callbacks fire from a setState
+        // callback, i.e. after the commit -- and React 16 pools synthetic events and nulls their fields
+        // once the handler returns, so without `persist()` the host saw `type: null` on the 16.14 floor.
+        expect(onFocus.mock.calls[0][0]).toEqual(expect.objectContaining({ type: 'dragenter' }))
 
         fireEvent.dragLeave(zone, { dataTransfer: { files: [] } })
         expect(zone).not.toHaveClass('active')
         expect(onBlur).toHaveBeenCalledTimes(1)
+        expect(onBlur.mock.calls[0][0]).toEqual(expect.objectContaining({ type: 'dragleave' }))
     })
 
     it.each(['disabled', 'readonly'])('makes a %s upload unfocusable and inert', mode => {

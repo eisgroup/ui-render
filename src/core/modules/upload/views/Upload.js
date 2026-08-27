@@ -22,6 +22,14 @@ import { _ } from '../translations'
 import { Active } from '../../../utils'
 import { AppContext } from '../../../contexts'
 
+/**
+ * Opt a synthetic event out of React 16's event pool so it survives past the current handler.
+ * No-op on React 17+ (pooling removed) and on React 19 (`persist` no longer exists).
+ */
+function persistEvent (event) {
+    if (event && typeof event.persist === 'function') event.persist()
+}
+
 export default class Upload extends PureComponent {
     static propTypes = {
         // Upload file type, falls back to Route pathname
@@ -80,8 +88,19 @@ export default class Upload extends PureComponent {
         return get(this.props, 'location.pathname', ROUTE_HOME)
     }
 
-    onDragEnter = (...args) => this.setState({ active: true }, () => this.props.onFocus && this.props.onFocus(...args))
-    onDragLeave = (...args) => this.setState({ active: false }, () => this.props.onBlur && this.props.onBlur(...args))
+    // React 16 pools synthetic events and nulls their fields as soon as the handler returns, and these
+    // setState callbacks run after the commit -- so on the declared 16.14 floor the host used to receive an
+    // event whose `type` and `target` read `null`. persist() opts that event out of the pool on 16 and is a
+    // harmless no-op on 17+, which stopped pooling; the guard covers React 19, where it is absent entirely.
+    onDragEnter = (event, ...rest) => {
+        persistEvent(event)
+        this.setState({ active: true }, () => this.props.onFocus && this.props.onFocus(event, ...rest))
+    }
+
+    onDragLeave = (event, ...rest) => {
+        persistEvent(event)
+        this.setState({ active: false }, () => this.props.onBlur && this.props.onBlur(event, ...rest))
+    }
 
     handleUpload = (acceptedFiles) => {
         const { onChange, name } = this.props
