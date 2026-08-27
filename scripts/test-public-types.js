@@ -8,10 +8,12 @@ const FIXTURES = path.join(__dirname, 'fixtures')
 const CACHE = path.join(ROOT, 'node_modules', '.cache', 'public-types-consumer')
 const TSC = require.resolve('typescript/bin/tsc')
 
+// `@types/react` itself is now 18, because RTL 16 peer-requires it. The 16 and 17 slots therefore
+// come from locked aliases; every slot stays pinned so the matrix cannot drift with a transitive bump.
 const REACT_TYPES = [
     ['16', 'react-types-16'],
-    ['17', '@types/react'],
-    ['18', 'react-types-18'],
+    ['17', 'react-types-17'],
+    ['18', '@types/react'],
 ]
 const TYPE_CONFIGS = [
     ['interop default import', 'tsconfig.public-types.json'],

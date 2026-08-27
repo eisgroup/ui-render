@@ -1,5 +1,5 @@
 import React from 'react'
-import { render } from '@testing-library/react'
+import { act, render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import ProgressBar from '../ProgressBar'
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
@@ -19,7 +19,7 @@ describe('ProgressBar', () => {
 
     it('sets the inner bar width based on value after mount', () => {
         const { container } = render(wrap(<ProgressBar value={0.4} />))
-        jest.runAllTimers()
+        act(() => { jest.runAllTimers() })
         const bar = container.querySelector('.app__progress__bar')
         expect(bar.style.width).toBe('40%')
     })
@@ -36,19 +36,19 @@ describe('ProgressBar', () => {
 
     it('renders the label inside the bar', () => {
         const { container } = render(wrap(<ProgressBar value={0.5} label="Loading" />))
-        jest.runAllTimers()
+        act(() => { jest.runAllTimers() })
         expect(container.textContent).toContain('Loading')
     })
 
     it('renders a tooltip when hasTooltip is true', () => {
         const { container } = render(wrap(<ProgressBar value={0.5} hasTooltip />))
-        jest.runAllTimers()
+        act(() => { jest.runAllTimers() })
         expect(container.querySelector('.app__progress__bar__tooltip')).toBeInTheDocument()
     })
 
     it('applies custom backgroundColor when color prop is set', () => {
         const { container } = render(wrap(<ProgressBar value={0.5} color="red" />))
-        jest.runAllTimers()
+        act(() => { jest.runAllTimers() })
         expect(container.querySelector('.app__progress__bar').style.backgroundColor).toBe('red')
     })
 })

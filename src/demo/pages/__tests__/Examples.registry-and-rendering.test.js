@@ -13,16 +13,20 @@ const messageFromConsoleCall = args => args
 
 // React reports a given development warning only once per loaded module. Keep a strict
 // allowlist for every warning we do observe without requiring another example to emit it again.
+// Entries must match on message text only: React 16-18 append a component stack (the source of
+// component names and file paths) while React 19 emits the bare message, so a stack-derived
+// fragment would make an expected warning look unexpected on React 19. Component names that the
+// warning message itself carries (a propTypes owner, a DOM prop name) are fine.
 const EXPECTED_CONSOLE_ERROR_PATTERNS = [
     ['Unknown event handler property', 'onDataChanged'],
     ['React does not recognize', 'currencyCode'],
     ['non-boolean attribute', 'buttoned'],
-    ['Cannot update during an existing state transition', 'DropdownAsField'],
+    ['Cannot update during an existing state transition', 'Render methods should be a pure function'],
     ['Invalid prop `error` of type `boolean`', 'InputNumber'],
     ['Invalid value for prop', 'translate'],
     ['prop `items[0].tab` is marked as required', 'Tabs'],
-    ['prop `formProps` is marked as required', 'UIRender', 'Data'],
-    ['prop `instance` is marked as required', 'UIRender', 'Data'],
+    ['prop `formProps` is marked as required', 'UIRender'],
+    ['prop `instance` is marked as required', 'UIRender'],
     ['Invalid attribute name', '@class'],
 ]
 

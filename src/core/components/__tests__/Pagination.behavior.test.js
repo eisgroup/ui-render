@@ -42,16 +42,23 @@ describe('Pagination interaction and edge contracts', () => {
   })
 
   it('passes the click event and semantic page payload for a numbered page', () => {
-    const onPageChange = jest.fn()
+    // Read the event inside the callback rather than from `mock.calls` afterwards: React 16 returns
+    // the SyntheticEvent to its pool once the handler returns and nulls every field on it, so a
+    // retained event asserts nothing on the declared peer floor. The fields the handler observes are
+    // identical on 16, 17, 18 and 19.
+    const calls = []
+    const onPageChange = (event, payload) => {
+      calls.push({ type: event.type, target: event.target, payload })
+    }
     renderPagination({ activePage: 3, totalPages: 5, onPageChange })
     const page = screen.getByRole('button', { name: 'Page 5' })
 
     fireEvent.click(page)
 
-    expect(onPageChange).toHaveBeenCalledTimes(1)
-    expect(onPageChange.mock.calls[0][0]).toEqual(expect.objectContaining({ type: 'click' }))
-    expect(onPageChange.mock.calls[0][0].target).toBe(page)
-    expect(onPageChange.mock.calls[0][1]).toEqual({ activePage: 5 })
+    expect(calls).toHaveLength(1)
+    expect(calls[0].type).toBe('click')
+    expect(calls[0].target).toBe(page)
+    expect(calls[0].payload).toEqual({ activePage: 5 })
   })
 
   it('moves one page backward and forward through the labelled controls', () => {

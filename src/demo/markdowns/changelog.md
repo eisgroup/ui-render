@@ -4,8 +4,12 @@
 
 #### Compatibility
 
-- Development and the primary test suite now run on React 17.0.2.
-- The peer range remains additive: host applications may use React 16.14 or React 17.
+- Development and the primary test suite now run on React 18.3.1, and the demo mounts through the
+  React 18 root API, so it renders with automatic batching exactly as a host on 18 does.
+- The peer range stays additive: host applications may use React 16.14, 17 or 18. Hosts on 16 or 17
+  need change nothing.
+- `TooltipPop` and `Image` no longer use `defaultProps`, which React 18.3 warns about for function
+  components and React 19 removes. Their defaults are unchanged.
 - The Moment peer range now accepts all compatible 2.x releases from 2.29.4 onward.
 - Public TypeScript declarations now describe the shipped callable component: `data` and `meta`
   are required, runtime-supported props are optional, and the package supports an interop default
@@ -66,9 +70,19 @@
 - Build configuration: the demo build no longer duplicates the shared Babel presets. Every
   pipeline — library, demo and tests — now reads them from one `babel.config.js`, with only the
   development-time refresh transform declared by the demo. Emitted bundles are unchanged.
+- The declared peer range is now tested, not just asserted. The full suite runs on React 16.14 in
+  its own gating check alongside the React 18 one, the packed artifact is server-rendered against
+  React 16.14 and 17, and a non-gating check runs the suite on React 19 so upstream drift shows up
+  early. Assertions that had been pinned to React version internals — a function component's second
+  argument, and component names appended to development warnings — now assert behaviour instead, so
+  the same suite passes on React 16.14, 17, 18.3 and 19.
 
 #### Fixes
 
+- Upload no longer hands the host a blanked-out drag event on React 16. Its drag focus/blur callbacks
+  run after the component re-renders, and React 16 recycles event objects once the original handler
+  returns, so an application reading `type` or `target` from the forwarded event saw `null`. The event
+  is now retained explicitly before being forwarded. React 17 and later were never affected.
 - A popup can no longer be bound to the wrong table. When a popup opened from a table row could not
   determine which table it belonged to, the renderer guessed by looking for two specific field names
   in the data and adopting whichever it found — so an application that happened to use one of those

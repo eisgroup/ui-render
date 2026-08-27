@@ -12,8 +12,8 @@ To understand and work with the UI Render, basic understanding of HTML and CSS i
 The host application is responsible for installing the following packages — they are declared as
 **peer dependencies** so the library and the application share a single instance of each:
 
-- `react` `^16.14.0 || ^17.0.0`
-- `react-dom` `^16.14.0 || ^17.0.0`
+- `react` `^16.14.0 || ^17.0.0 || ^18.0.0`
+- `react-dom` `^16.14.0 || ^17.0.0 || ^18.0.0`
 - `moment` `^2.29.4`
 
 Why this matters:
@@ -32,11 +32,11 @@ dependency — only direct declarations count.
 Install command for consumers:
 
 ```bash
-npm install eis-ui-render react@^17.0.0 react-dom@^17.0.0 moment@^2.29.4
+npm install eis-ui-render react@^18.0.0 react-dom@^18.0.0 moment@^2.29.4
 ```
 
 ```bash
-pnpm add eis-ui-render react@^17.0.0 react-dom@^17.0.0 moment@^2.29.4
+pnpm add eis-ui-render react@^18.0.0 react-dom@^18.0.0 moment@^2.29.4
 ```
 
 React 16.14 remains supported. Existing hosts may keep matching React and React DOM 16.14

@@ -1,7 +1,7 @@
 import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import Upload from '../Upload'
+import Upload, { persistEvent } from '../Upload'
 import { AppContext } from '../../../../contexts'
 import { ConfigContext, initialConfigState } from '../../../../contexts/ConfigContext'
 
@@ -42,10 +42,15 @@ describe('Upload interaction contracts', () => {
         fireEvent.dragEnter(zone, { dataTransfer: { files: [] } })
         expect(zone).toHaveClass('active')
         expect(onFocus).toHaveBeenCalledTimes(1)
+        // The forwarded event must still be readable by the host. These callbacks fire from a setState
+        // callback, i.e. after the commit -- and React 16 pools synthetic events and nulls their fields
+        // once the handler returns, so without `persist()` the host saw `type: null` on the 16.14 floor.
+        expect(onFocus.mock.calls[0][0]).toEqual(expect.objectContaining({ type: 'dragenter' }))
 
         fireEvent.dragLeave(zone, { dataTransfer: { files: [] } })
         expect(zone).not.toHaveClass('active')
         expect(onBlur).toHaveBeenCalledTimes(1)
+        expect(onBlur.mock.calls[0][0]).toEqual(expect.objectContaining({ type: 'dragleave' }))
     })
 
     it.each(['disabled', 'readonly'])('makes a %s upload unfocusable and inert', mode => {
@@ -87,5 +92,21 @@ describe('Upload interaction contracts', () => {
 
         expect(screen.getByText('Drop a report here')).toBeInTheDocument()
         expect(container.querySelector('.dropzone__hover')).toHaveTextContent('csv, json')
+    })
+})
+
+describe('persistEvent', () => {
+    it('retains an event that supports pooling opt-out', () => {
+        let persisted = 0
+        persistEvent({ persist: () => { persisted += 1 } })
+        expect(persisted).toBe(1)
+    })
+
+    it('is a no-op when the event has no persist, as on React 19', () => {
+        expect(() => persistEvent({ type: 'dragenter' })).not.toThrow()
+    })
+
+    it('tolerates a missing event', () => {
+        expect(() => persistEvent(undefined)).not.toThrow()
     })
 })

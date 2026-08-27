@@ -8,7 +8,10 @@ import { isFunction } from '../utils'
 export default function TooltipPop ({
   title,
   children,
-  delay,
+  // Default parameter rather than `TooltipPop.defaultProps`: React 18.3 warns on defaultProps for
+  // function components and React 19 removes the support.
+  // Improves UX by avoiding an accidental popup when the user is already familiar with the UI.
+  delay = 500,
   inverted,
   ...props
 }) {
@@ -19,8 +22,3 @@ export default function TooltipPop ({
   )
 }
 
-// Override `defaultProps` attributes for custom behavior
-TooltipPop.defaultProps = {
-  // improve UX by avoiding accidental popup when user is already familiar with the UI
-  delay: 500,
-}

@@ -323,10 +323,10 @@ describe('mapper edge contracts', () => {
       delay: 25,
       disabled: true,
     })
-    expect(AutoSave).toHaveBeenCalledWith(
-      expect.objectContaining({delay: 25, disabled: true}),
-      expect.anything()
-    )
+    // Assert on the props argument alone: the second argument React passes to function
+    // components is version-specific (legacy context object on 16-18, `undefined` on 19).
+    expect(AutoSave).toHaveBeenCalledTimes(1)
+    expect(AutoSave.mock.calls[0][0]).toEqual(expect.objectContaining({delay: 25, disabled: true}))
   })
 
   it('returns null from numeric render methods for malformed values', () => {

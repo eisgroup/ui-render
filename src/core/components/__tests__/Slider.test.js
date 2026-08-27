@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import { act, render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { Slider } from '../Slider'
 
@@ -365,7 +365,9 @@ describe('Slider', () => {
         // MouseEvent with type 'pointerdown' to cover the React onPointerDown handler.
         const dispatchPointerDown = (el, clientX, clientY = 0) => {
             const ev = new MouseEvent('pointerdown', { clientX, clientY, bubbles: true })
-            el.dispatchEvent(ev)
+            // A raw dispatch bypasses RTL's act() wrapper, and under createRoot the resulting state
+            // update is no longer flushed before the assertion runs.
+            act(() => { el.dispatchEvent(ev) })
         }
 
         it('moves the handle to the clicked position via pointerdown', () => {
@@ -415,7 +417,7 @@ describe('Slider', () => {
             const rail = container.querySelector('.app__slider__rail')
             rail.getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 10 })
             const ev = new MouseEvent('pointerdown', { clientX: 100, clientY: 0, bubbles: true })
-            handle.dispatchEvent(ev)
+            act(() => { handle.dispatchEvent(ev) })
             expect(container.querySelector('.app__slider')).toHaveClass('dragging')
         })
     })

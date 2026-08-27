@@ -125,18 +125,25 @@ describe('nested dataKind demo interaction contract', () => {
         ])
         expect(current.dataKind.phases[1]).toEqual(data.dataKind.phases[1])
         expect(caughtRenderErrors).toEqual([])
-        const expectedWarnings = [
-            ['React does not recognize', 'currencyCode', 'src/core/components/InputNative.js'],
-            ['prop `formProps` is marked as required', 'UIRender', 'Data'],
-            ['prop `instance` is marked as required', 'UIRender', 'Data'],
-        ]
-        expect(consoleError.mock.calls).toHaveLength(expectedWarnings.length)
+        // Match warnings on message text only. React 16-18 prefix `Warning:` and append a
+        // component stack (the source of component names and file paths), React 19 emits the bare
+        // message and dropped propTypes validation entirely. So pin the warning this test exists
+        // for -- the `currencyCode` DOM prop leak -- and allow, rather than require, the propTypes
+        // warnings, instead of pinning a total call count that only holds on one React major.
         const warningMessages = consoleError.mock.calls.map(call => call.map(String).join(' '))
-        expectedWarnings.forEach(requiredParts => {
-            expect(warningMessages.some(message => (
-                requiredParts.every(part => message.includes(part))
-            ))).toBe(true)
-        })
+        const currencyCodeLeaks = warningMessages.filter(message => (
+            message.includes('React does not recognize') && message.includes('currencyCode')
+        ))
+        expect(currencyCodeLeaks).toHaveLength(1)
+        const toleratedWarnings = [
+            ['React does not recognize', 'currencyCode'],
+            ['prop `formProps` is marked as required', 'UIRender'],
+            ['prop `instance` is marked as required', 'UIRender'],
+        ]
+        const unexpectedWarnings = warningMessages.filter(message => !toleratedWarnings.some(
+            requiredParts => requiredParts.every(part => message.includes(part))
+        ))
+        expect(unexpectedWarnings).toEqual([])
 
         unmount()
         expect(formsStorage.size).toBe(0)

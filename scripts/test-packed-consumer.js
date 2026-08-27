@@ -10,10 +10,44 @@ const { spawnSync } = require('child_process')
  * publishes. The consumer lives outside the repository and gets only the three externals (react, react-dom,
  * moment) linked in, so a dependency that is neither bundled nor declared cannot be satisfied by the
  * repository's own node_modules and fails loudly.
+ *
+ * Peer-range matrix: `--react-dir=<node_modules>` (or PACKED_CONSUMER_REACT_DIR) takes the externals from
+ * another install instead of this repository's, so the artifact can be smoked against a React that is not
+ * installed here -- the peer range is a claim about the artifact, not about the checked-in lockfile.
+ * Externals the override does not provide still come from this repository, and with no argument the harness
+ * links exactly what it always did.
  */
 const ROOT = path.resolve(__dirname, '..')
 const FIXTURES = path.join(__dirname, 'fixtures')
 const EXTERNALS = ['react', 'react-dom', 'moment']
+const REACT_DIR_FLAG = '--react-dir='
+
+function parseReactDir () {
+    let raw = process.env.PACKED_CONSUMER_REACT_DIR || ''
+    for (const argument of process.argv.slice(2)) {
+        if (!argument.startsWith(REACT_DIR_FLAG)) {
+            throw new Error(`unknown argument ${argument}; expected ${REACT_DIR_FLAG}<node_modules dir>`)
+        }
+        raw = argument.slice(REACT_DIR_FLAG.length)
+    }
+    if (!raw) return null
+    const resolved = path.resolve(raw)
+    if (!fs.existsSync(path.join(resolved, 'react', 'package.json'))) {
+        throw new Error(`${resolved} holds no react package; point --react-dir at a node_modules directory`)
+    }
+    return resolved
+}
+
+/** The override wins for what it carries; everything else keeps coming from this repository. */
+function externalSource (reactDir, external) {
+    const candidate = reactDir && path.join(reactDir, external)
+    if (candidate && fs.existsSync(path.join(candidate, 'package.json'))) return candidate
+    return path.join(ROOT, 'node_modules', external)
+}
+
+function packageVersion (packageDir) {
+    return JSON.parse(fs.readFileSync(path.join(packageDir, 'package.json'), 'utf8')).version
+}
 
 /**
  * Deep paths hosts consume: the root payload they copy to their web root, and the dist re-export. Each must
@@ -70,6 +104,7 @@ function assertStylesheets (packageDir) {
     }
 }
 
+const reactDir = parseReactDir()
 const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'eis-ui-render-packed-'))
 
 try {
@@ -92,17 +127,37 @@ try {
     // A real copy, not a symlink: Node resolves symlinked packages by realpath, which would let the bundle
     // reach the repository's node_modules and hide a missing dependency.
     fs.cpSync(path.join(extracted, 'package'), path.join(modules, 'eis-ui-render'), { recursive: true })
+    const linked = {}
     for (const external of EXTERNALS) {
-        fs.symlinkSync(path.join(ROOT, 'node_modules', external), path.join(modules, external))
+        const source = externalSource(reactDir, external)
+        // Node resolves a symlinked package by realpath, so each external keeps loading its own transitive
+        // dependencies (react-dom 16 finds react 16 next to it, not this repository's react 18).
+        fs.symlinkSync(source, path.join(modules, external))
+        linked[external] = packageVersion(source)
+        console.log(`packed external: ${external} ${linked[external]} from ${source}`)
+    }
+    // An override that carries react but not react-dom would silently pair mismatched renderers, which fails
+    // later with a React error that says nothing about the harness.
+    if (linked.react.split('.')[0] !== linked['react-dom'].split('.')[0]) {
+        throw new Error(`react ${linked.react} and react-dom ${linked['react-dom']} must share a major version`)
     }
     fs.copyFileSync(path.join(FIXTURES, 'packed-consumer.js'), path.join(consumer, 'index.js'))
 
     const packageDir = path.join(modules, 'eis-ui-render')
     assertStylesheets(packageDir)
 
-    const output = run(process.execPath, ['index.js'], { cwd: consumer })
-    if (output.trim() !== 'ok') throw new Error(`unexpected consumer output: ${output}`)
-    console.log('packed runtime: server-rendered the published bundle with only react, react-dom and moment')
+    const output = run(process.execPath, ['index.js'], {
+        cwd: consumer,
+        // The fixture refuses to render unless the React that actually loaded is the one linked above.
+        env: { ...process.env, PACKED_CONSUMER_EXPECT_REACT: linked.react },
+    })
+    const lines = output.trim().split('\n')
+    if (lines[lines.length - 1] !== 'ok') throw new Error(`unexpected consumer output: ${output}`)
+    for (const line of lines.slice(0, -1)) console.log(`packed consumer: ${line}`)
+    console.log(
+        `packed runtime: server-rendered the published bundle on react ${linked.react}`
+        + ' with only react, react-dom and moment'
+    )
 } finally {
     fs.rmSync(workspace, { recursive: true, force: true })
 }
