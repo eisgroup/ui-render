@@ -24,9 +24,13 @@ import { AppContext } from '../../../contexts'
 
 /**
  * Opt a synthetic event out of React 16's event pool so it survives past the current handler.
- * No-op on React 17+ (pooling removed) and on React 19 (`persist` no longer exists).
+ * No-op on React 17+ (pooling removed) and on React 19, where `persist` no longer exists.
+ *
+ * Exported for its own unit test: the two negative branches are unreachable through the component,
+ * because React always supplies an event and every React in the supported range except 19 carries
+ * `persist`. Testing it directly covers them without a fourth React in the matrix.
  */
-function persistEvent (event) {
+export function persistEvent (event) {
     if (event && typeof event.persist === 'function') event.persist()
 }
 

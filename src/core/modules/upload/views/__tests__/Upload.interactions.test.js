@@ -1,7 +1,7 @@
 import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import Upload from '../Upload'
+import Upload, { persistEvent } from '../Upload'
 import { AppContext } from '../../../../contexts'
 import { ConfigContext, initialConfigState } from '../../../../contexts/ConfigContext'
 
@@ -92,5 +92,21 @@ describe('Upload interaction contracts', () => {
 
         expect(screen.getByText('Drop a report here')).toBeInTheDocument()
         expect(container.querySelector('.dropzone__hover')).toHaveTextContent('csv, json')
+    })
+})
+
+describe('persistEvent', () => {
+    it('retains an event that supports pooling opt-out', () => {
+        let persisted = 0
+        persistEvent({ persist: () => { persisted += 1 } })
+        expect(persisted).toBe(1)
+    })
+
+    it('is a no-op when the event has no persist, as on React 19', () => {
+        expect(() => persistEvent({ type: 'dragenter' })).not.toThrow()
+    })
+
+    it('tolerates a missing event', () => {
+        expect(() => persistEvent(undefined)).not.toThrow()
     })
 })
