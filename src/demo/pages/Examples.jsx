@@ -9,60 +9,8 @@ import ScrollView from '../../core/components/ScrollView'
 import View from '../../core/components/View'
 import { toJSON } from '../../core/utils'
 import { goTo } from '../../core/common/variables'
-import data from '../examples/_data.json'
-import meta from '../examples/_meta'
-import listData from '../examples/array-nested_data.json'
-import download_meta from '../examples/button-download_meta'
-import icon_meta from '../examples/button-icon_meta'
-import * as tableForm from '../examples/data_component'
-import decimalMeta from '../examples/decimal_meta.json'
-import dropdownMeta from '../examples/dropdown_meta.json'
-import exampleData from '../examples/example_data.json'
-import exampleMeta from '../examples/example_meta.json'
-import expandListMeta from '../examples/expand-list_meta'
-import inputMeta from '../examples/input_meta'
-import inputIntegerMeta from '../examples/input-integer_meta.json'
-import inputIntegerData from '../examples/input-integer_data.json'
-import inputToggle from '../examples/input_toggle'
-import invalidArrayData from '../examples/invalid-array_data'
-import invalidArrayMeta from '../examples/invalid-array_meta'
-import listMeta from '../examples/list_meta'
-import piechartSimpleData from '../examples/piechart-simple_data.json'
-import piechartSimpleMeta from '../examples/piechart-simple_meta.json'
-import popupMeta from '../examples/popup_meta'
-import * as ratingDetails from '../examples/rating_details'
-import rowListRelativeDataMeta from '../examples/rowlist-relative-data_meta.json'
-import rowListRelativeDataData from '../examples/rowlist-relative-data_data.json'
-import showIfCondition from '../examples/showIf'
-import * as summaryBox from '../examples/summary-box'
-import tabListMeta from '../examples/tab-list_meta'
-import tableExtraItemsMeta from '../examples/table-extraItems_meta.json'
-import tableNestedMeta from '../examples/table-nested_meta'
-import tableVerticalMeta from '../examples/table-vertical_meta'
-import * as tableMatrix from '../examples/table_matrix'
-import * as tabs from '../examples/tabs_meta'
-import uploadMeta from '../examples/upload_meta'
-import uploadVariantsMeta from '../examples/upload-variants_meta'
-import tablePaginationData from '../examples/table-pagination_data.json'
-import tablePaginationMeta from '../examples/table-pagination_meta.json'
-import sliderMeta from '../examples/slider_meta'
-import sliderData from '../examples/slider_data.json'
+import { EXAMPLES, hasFlag } from '../examples/manifest'
 import UIRender from '../../core/pages/main/rules'
-
-import selectIndexData from '../examples/select-index_data.json'
-import selectIndexMeta from '../examples/select-index_meta.json'
-import selectStableData from '../examples/select-stable_data.json'
-import selectStableMeta from '../examples/select-stable_meta.json'
-import dropdownExperienceData from '../examples/dropdown-experience-data.json'
-import dropdownExperienceMeta from '../examples/dropdown-experience-meta.json'
-import selectCascadingData from '../examples/select-cascading-data.json'
-import selectCascadingMeta from '../examples/select-cascading-meta.json'
-import selectCascadingStableData from '../examples/select-cascading-stable-data.json'
-import selectCascadingStableMeta from '../examples/select-cascading-stable-meta.json'
-import selectReorderData from '../examples/select-reorder-data.json'
-import selectReorderMeta from '../examples/select-reorder-meta.json'
-import nestedDataKindData from '../examples/nested-datakind_data.json'
-import nestedDataKindMeta from '../examples/nested-datakind_meta.json'
 
 import {
   updatePerformanceData,
@@ -70,248 +18,12 @@ import {
   uploadHistoricalFile
 } from '../api/gdn-rating-alg'
 
-export const examples = [
-  // Dropdown
-  {
-    title: 'Dropdown',
-    id: 'dropdown',
-    data: exampleData,
-    meta: dropdownMeta,
-  },
-  {
-    title: 'Dropdown: Cascading (Experience)',
-    id: 'dropdownExperience',
-    data: dropdownExperienceData,
-    meta: dropdownExperienceMeta,
-  },
-  // Select
-  {
-    title: 'Select: Index Value ({index})',
-    id: 'selectIndexValue',
-    data: selectIndexData,
-    meta: selectIndexMeta,
-  },
-  {
-    title: 'Select: Stable Value (id)',
-    id: 'selectStableValue',
-    data: selectStableData,
-    meta: selectStableMeta,
-  },
-  {
-    title: 'Select: Cascading (Category → Product)',
-    id: 'selectCascading',
-    data: selectCascadingData,
-    meta: selectCascadingMeta,
-  },
-  {
-    title: 'Select: Cascading Stable Value (string)',
-    id: 'selectCascadingStable',
-    data: selectCascadingStableData,
-    meta: selectCascadingStableMeta,
-  },
-  {
-    title: 'Select: Index Reorder on Get Data',
-    id: 'selectReorder',
-    data: selectReorderData,
-    meta: selectReorderMeta,
-  },
-  // Button
-  {
-    title: 'Button with Icon',
-    id: 'buttonIcon',
-    data: {},
-    meta: icon_meta,
-  },
-  {
-    title: 'Button for Download File URL',
-    id: 'buttonDownload',
-    data: {},
-    meta: download_meta,
-  },
-  // Input
-  {
-    title: 'Input',
-    id: 'input',
-    data: exampleData,
-    meta: inputMeta,
-  },
-  {
-    title: 'Input: Integer ≥ 0',
-    id: 'inputIntegerMin0',
-    data: inputIntegerData,
-    meta: inputIntegerMeta,
-  },
-  {
-    title: 'Input Toggle Checkbox',
-    id: 'inputToggle',
-    data: exampleData,
-    meta: inputToggle,
-  },
-  {
-    title: 'Decimal Points',
-    id: 'decimal',
-    data: exampleData,
-    meta: decimalMeta,
-  },
-  // Layout
-  {
-    title: 'Dynamic Layout',
-    id: 'layout',
-    data: exampleData,
-    meta: exampleMeta,
-  },
-  {
-    title: 'Dynamic List',
-    id: 'list',
-    data: listData,
-    meta: listMeta,
-  },
-  {
-    title: 'Expand List',
-    id: 'expandList',
-    data: listData,
-    meta: expandListMeta,
-  },
-  // Tabs
-  {
-    title: 'Tab List',
-    id: 'tabList',
-    data: listData,
-    meta: tabListMeta,
-  },
-  {
-    title: 'Tabs',
-    id: 'tabs',
-    data: listData,
-    meta: tabs.meta,
-  },
-  {
-    title: 'Tabs Buttoned',
-    id: 'tabsButtoned',
-    data: listData,
-    meta: tabs.buttoned,
-  },
-  // Table
-  {
-    title: 'Table Nested within Table',
-    id: 'tableNested',
-    data: listData,
-    meta: tableNestedMeta,
-  },
-  {
-    title: 'Table Rows as Columns (Vertical Layout)',
-    id: 'tableVertical',
-    data: listData,
-    meta: tableVerticalMeta,
-  },
-  {
-    title: 'Table with Custom Data',
-    id: 'tableExtraItems',
-    data: exampleData,
-    meta: tableExtraItemsMeta,
-  },
-  {
-    title: 'Table with Matrix Data',
-    id: 'tableMatrix',
-    data: tableMatrix.data,
-    meta: tableMatrix.meta,
-  },
-  {
-    title: 'Table with Matrix Data (minimum required config)',
-    id: 'tableMatrixRequired',
-    data: tableMatrix.data,
-    meta: tableMatrix.metaRequired,
-  },
-  {
-    title: 'Table with Form Inputs',
-    id: 'tableForm',
-    data: tableForm.data,
-    meta: tableForm.meta,
-  },
-  {
-    title: 'Nested dataKind table (add/remove inner rows)',
-    id: 'nestedDataKind',
-    data: nestedDataKindData,
-    meta: nestedDataKindMeta,
-  },
-  {
-    title: 'Table with Pagination',
-    id: 'tablePagination',
-    data: tablePaginationData,
-    meta: tablePaginationMeta,
-  },
-  // Other
-  {
-    title: 'Pie Chart',
-    id: 'pieChart',
-    data: piechartSimpleData,
-    meta: piechartSimpleMeta,
-  },
-  {
-    title: 'Popup Content',
-    id: 'popupContent',
-    data: listData,
-    meta: popupMeta,
-  },
-  {
-    title: 'Rating Details',
-    id: 'ratingDetails',
-    data: ratingDetails.data,
-    meta: ratingDetails.meta,
-  },
-  {
-    title: 'RowList: relativeData false ancestors',
-    id: 'rowListRelativeData',
-    data: rowListRelativeDataData,
-    meta: rowListRelativeDataMeta,
-  },
-  {
-    title: 'Show If Condition',
-    id: 'showIf',
-    data: exampleData,
-    meta: showIfCondition,
-  },
-  {
-    title: 'Summary Box',
-    id: 'summaryBox',
-    data: summaryBox.data,
-    meta: summaryBox.meta,
-  },
-  {
-    title: 'Upload',
-    id: 'upload',
-    data: {},
-    meta: uploadMeta,
-  },
-  {
-    title: 'Upload: variants (single, multiple, image, readonly)',
-    id: 'uploadVariants',
-    data: {},
-    meta: uploadVariantsMeta,
-  },
-  {
-    title: 'Slider (single, range, marks, percent, disabled)',
-    id: 'slider',
-    data: sliderData,
-    meta: sliderMeta,
-  },
-  {
-    title: 'Invalid Array Data',
-    id: 'invalidArray',
-    data: invalidArrayData,
-    meta: invalidArrayMeta,
-  },
-  {
-    title: 'All Possible Configurations',
-    id: 'all',
-    data,
-    meta,
-  },
-]
-
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
  * List of UI Render Documentation Examples Accordion
+ *
+ * The example set itself lives in `src/demo/examples/manifest.js` — the single
+ * manifest shared with the test harness. This file only renders it.
  * -----------------------------------------------------------------------------
  */
 export default class Examples extends Component {
@@ -342,81 +54,84 @@ export default class Examples extends Component {
     const hash = (typeof window !== 'undefined') ? (window.location.hash || '').substr(1) : ''
     return (
       <View className="app__examples bg-white border">
-        {examples.map(({data, meta, title, id}, i) => (
-          <Expand
-            id={id}
-            key={title}
-            index={i}
-            expanded={i === activeIndex || id === hash}
-            title={title}
-            onClick={this.toggleExpand}
-            classNameLabel="inverted bg-inverse"
-            classNameItems="bg-inverse"
-          >
-            {() => (
-              <>
-                { ['experienceRatings', 'tableForm', 'ratingDetails', 'example1', 'example2', 'buttonIcon', 'selectIndexValue', 'selectStableValue', 'selectCascading', 'selectCascadingStable', 'selectReorder', 'nestedDataKind'].includes(id) ? (
-                  <>
+        {EXAMPLES.map((example, i) => {
+          const {data, meta, title, id} = example
+          return (
+            <Expand
+              id={id}
+              key={title}
+              index={i}
+              expanded={i === activeIndex || id === hash}
+              title={title}
+              onClick={this.toggleExpand}
+              classNameLabel="inverted bg-inverse"
+              classNameItems="bg-inverse"
+            >
+              {() => (
+                <>
+                  { hasFlag(example, 'hostApi') ? (
+                    <>
+                      <UIRender
+                        data={data}
+                        meta={meta}
+                        initialValues={data}
+                        form={obj}
+                        getFormData={(f) => this.getFormData = f}
+                        onDataChanged={this.onSomeDataChanged}
+                        onSubmit={console.warn}
+                        getValidationErrors={this.showValidationErrors}
+                        translate={(v) => v}
+                        dateFormat={"MM-DD-YYYY"}
+                        apiCalls={{
+                          updateExperienceData: updatePerformanceData,
+                          downloadFile: downloadHistoricalFileTemplate,
+                          uploadFile: uploadHistoricalFile
+                        }}
+                      />
+                      <View className="app__examples bg-white border">
+                        <Button onClick={this.onGetDataButtonClick}>Get Data (the ability to request data from outside)</Button>
+                      </View>
+                    </>
+                  ) : (
                     <UIRender
                       data={data}
                       meta={meta}
                       initialValues={data}
                       form={obj}
-                      getFormData={(f) => this.getFormData = f}
-                      onDataChanged={this.onSomeDataChanged}
                       onSubmit={console.warn}
-                      getValidationErrors={this.showValidationErrors}
-                      translate={(v) => v}
-                      dateFormat={"MM-DD-YYYY"}
-                      apiCalls={{
-                        updateExperienceData: updatePerformanceData,
-                        downloadFile: downloadHistoricalFileTemplate,
-                        uploadFile: uploadHistoricalFile
-                      }}
                     />
-                    <View className="app__examples bg-white border">
-                      <Button onClick={this.onGetDataButtonClick}>Get Data (the ability to request data from outside)</Button>
-                    </View>
-                  </>
-                ) : (
-                  <UIRender
-                    data={data}
-                    meta={meta}
-                    initialValues={data}
-                    form={obj}
-                    onSubmit={console.warn}
-                  />
-                )}
-                <ScrollView className="padding-smaller bg-neutral inverted">
-                  <Row className="wrap spread">
-                    <View fill className="padding-smaller min-width-320">
-                      <h3>
-                        <LinkOut
-                          to={`data:text/json;charset=utf-8,${encodeURIComponent(toJSON(meta, null, 2))}`}
-                          download={`${id}_meta.json`}
-                        >
-                          {'Meta.json'} <Icon name="file-download" className="large"/>
-                        </LinkOut>
-                      </h3>
-                      <JsonView data={meta} inverted/>
-                    </View>
-                    <View fill className="padding-smaller min-width-320">
-                      <h3>
-                        <LinkOut
-                          to={`data:text/json;charset=utf-8,${encodeURIComponent(toJSON(data, null, 2))}`}
-                          download={`${id}_data.json`}
-                        >
-                          {'Data.json'} <Icon name="file-download" className="large"/>
-                        </LinkOut>
-                      </h3>
-                      <JsonView data={data} inverted/>
-                    </View>
-                  </Row>
-                </ScrollView>
-              </>
-            )}
-          </Expand>
-        ))}
+                  )}
+                  <ScrollView className="padding-smaller bg-neutral inverted">
+                    <Row className="wrap spread">
+                      <View fill className="padding-smaller min-width-320">
+                        <h3>
+                          <LinkOut
+                            to={`data:text/json;charset=utf-8,${encodeURIComponent(toJSON(meta, null, 2))}`}
+                            download={`${id}_meta.json`}
+                          >
+                            {'Meta.json'} <Icon name="file-download" className="large"/>
+                          </LinkOut>
+                        </h3>
+                        <JsonView data={meta} inverted/>
+                      </View>
+                      <View fill className="padding-smaller min-width-320">
+                        <h3>
+                          <LinkOut
+                            to={`data:text/json;charset=utf-8,${encodeURIComponent(toJSON(data, null, 2))}`}
+                            download={`${id}_data.json`}
+                          >
+                            {'Data.json'} <Icon name="file-download" className="large"/>
+                          </LinkOut>
+                        </h3>
+                        <JsonView data={data} inverted/>
+                      </View>
+                    </Row>
+                  </ScrollView>
+                </>
+              )}
+            </Expand>
+          )
+        })}
       </View>
     )
   }

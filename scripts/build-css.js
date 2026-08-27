@@ -26,9 +26,21 @@ async function compileLess(entryFile) {
     return result.css;
 }
 
+/**
+ * prefixwrap options for this standalone build.
+ *
+ * Exported so the CSS pipeline parity gate (`src/style/__tests__/css.pipeline.parity.test.js`) can
+ * assert the real options instead of a copy that could silently drift. These deliberately differ from
+ * the webpack `postcss.config.js` today: that one also exempts `html`, `body` and `*`, so the
+ * published CSS restyles host pages while this build scopes everything. Unifying the two is part of
+ * the open §9.9-H8 / R16 decision -- do not "fix" one side here without updating the gate.
+ */
+const PREFIX = '.ui-render';
+const PREFIXWRAP_OPTIONS = { ignoredSelectors: [/^\.ui-render-(.+)$/] };
+
 async function applyPrefixWrap(css) {
     const result = await postcss([
-        prefixwrap('.ui-render', { ignoredSelectors: [/^\.ui-render-(.+)$/] }),
+        prefixwrap(PREFIX, PREFIXWRAP_OPTIONS),
     ]).process(css, { from: undefined });
     return result.css;
 }
@@ -57,8 +69,13 @@ async function main() {
     console.log('Done.');
 }
 
-main().catch(err => {
-    console.error('Build failed:', err.message);
-    if (err.filename) console.error(`  at ${err.filename}:${err.line}:${err.column}`);
-    process.exit(1);
-});
+module.exports = { PREFIX, PREFIXWRAP_OPTIONS };
+
+// Only build when invoked as a script; `require()`ing this module (the parity gate does) must be inert.
+if (require.main === module) {
+    main().catch(err => {
+        console.error('Build failed:', err.message);
+        if (err.filename) console.error(`  at ${err.filename}:${err.line}:${err.column}`);
+        process.exit(1);
+    });
+}
