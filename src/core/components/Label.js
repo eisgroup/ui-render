@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React from 'react'
+import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /**
  * Label - Pure Component.
@@ -15,7 +16,9 @@ export function Label ({
   ...props
 }) {
   const child = (typeof children === 'string' && typeof translate === 'function') ? translate(children) : children
-  return <label {...props}>{child}</label>
+  // DOM boundary: <label> takes neither `name` nor a `label` attribute, and the mapper's
+  // LABEL view spreads a whole meta node here. See ./domProps.js.
+  return <label {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)}>{child}</label>
 }
 
 Label.propTypes = {

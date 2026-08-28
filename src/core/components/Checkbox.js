@@ -5,6 +5,7 @@ import Label from './Label'
 import Row from './Row'
 import View from './View'
 import { Active } from '../utils'
+import { ENGINE_PROPS, omitProps } from './domProps'
 
 /**
  * Checkbox - Pure Component
@@ -74,7 +75,9 @@ export function Checkbox ({
         className={classNames('checkbox', type)}
         id={id}
         onChange={readonly ? null : (event) => onChange(event.target.checked ? valueTrue : valueFalse, props.name, event)}
-        {...props}
+        // DOM boundary (see ./domProps): the spread lands on the <input type="checkbox">, so ENGINE_PROPS only -- the onChange
+  // above reads `props.name`, and the control needs it on the DOM.
+        {...omitProps(props, ENGINE_PROPS)}
       />
       <Label
         htmlFor={id} title={translate(title)}

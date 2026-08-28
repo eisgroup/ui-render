@@ -8,6 +8,15 @@ const FUNCTION_NAMES = ['onClick', 'onChange', 'onDone']
 const CONTRACT_ATTRIBUTES = ['$schema', 'metaVersion']
 
 /**
+ * Author annotations. Permitted anywhere by the (deliberately open) meta schema, meaningless
+ * to the renderer, and not an HTML attribute. See metaToProps.
+ */
+const COMMENT_ATTRIBUTES = ['_comment']
+
+/** Meta attributes that are never component props, dropped on the way from meta.json to props. */
+const NON_PROP_ATTRIBUTES = [...CONTRACT_ATTRIBUTES, ...COMMENT_ATTRIBUTES]
+
+/**
  * Map Data by given Mapper definition
  *
  * @param {Array|*} data - to map
@@ -62,15 +71,19 @@ export function metaToProps (meta, config) {
     let {data, _data} = config
     // Transform Root attributes
     if (isObject(meta)) {
-        // Contract declarations (UPGRADE-PLAN §9.4), not component props: `$schema` points an
-        // editor at the published meta.schema.json, `metaVersion` records which contract the
-        // file was authored against. Dropped here — the one place every node passes through on
-        // its way from meta.json to props — because every attribute the engine does not consume
-        // is spread onto the resolved component and reaches the DOM: measured, a surviving
+        // Contract declarations (UPGRADE-PLAN §9.4) and author comments, not component props:
+        // `$schema` points an editor at the published meta.schema.json, `metaVersion` records
+        // which contract the file was authored against, `_comment` is a note to the next author.
+        // Dropped here — the one place every node passes through on its way from meta.json to
+        // props, nested nodes included — because every attribute the engine does not consume is
+        // spread onto the resolved component and reaches the DOM: measured, a surviving
         // `metaVersion` renders as `metaversion="1"` and makes React warn about an unrecognised
-        // prop, and `$schema` trips React's invalid-attribute-name warning. Safe to mutate:
-        // `rules.js` hands metaToProps a cloneDeep of the host's meta, never the host's object.
-        CONTRACT_ATTRIBUTES.forEach(attribute => {
+        // prop, `$schema` trips React's invalid-attribute-name warning, and `_comment` rendered
+        // the author's prose into the page as `_comment="…"` (2 occurrences in the example
+        // corpus). Safe to mutate: `rules.js` hands metaToProps a cloneDeep of the host's meta,
+        // never the host's object. `_comment` is also listed in components/domProps.js, which
+        // covers the nodes a component builds from raw meta without passing through here.
+        NON_PROP_ATTRIBUTES.forEach(attribute => {
             if (meta[attribute] !== undefined) delete meta[attribute]
         })
         metaToFunctions(meta, {...funcConfig, data, instance})

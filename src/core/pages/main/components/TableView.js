@@ -8,6 +8,7 @@ import ScrollView from '../../../components/ScrollView'
 import Table from '../../../components/Table'
 import Text from '../../../components/Text'
 import View from '../../../components/View'
+import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from '../../../components/domProps'
 import { by, get, hasListValue, isEqual, isEqualList, isFunction, toJSON } from '../../../utils'
 import { getDateStringFromDateObject } from '../utils'
 import TableColGroup from './TableColGroup'
@@ -371,7 +372,13 @@ export default class TableView extends PureComponent {
     return (
       <div ref={this.tableWrapper}>
         <ScrollView row classNameInner="fill-width" fill={fill}>
-          <Table className={cn('full-width', className, {vertical})} {...props}>
+          <Table
+            className={cn('full-width', className, {vertical})}
+            // DOM boundary: Semantic's Table spreads what it does not recognise onto <table>,
+            // where `name` is not a valid attribute. `this.props.name` is still what decides the
+            // FieldArray below — the strip is at the DOM edge only. See core/components/domProps.js.
+            {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)}
+          >
             {colGroup && <TableColGroup colGroup={colGroup} />}
             <Table.Header className="font-normal">
               {extraHeaders && extraHeaders.map((row, i) => (

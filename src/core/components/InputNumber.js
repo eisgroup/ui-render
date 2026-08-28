@@ -9,6 +9,7 @@ import Row from './Row'
 import Text from './Text'
 import View from './View'
 import { Active } from '../utils'
+import { ENGINE_PROPS, omitProps } from './domProps'
 
 // Constants
 const THOUSANDS_SEPARATOR_REGEX = /\B(?=(\d{3})+(?!\d))/g
@@ -241,7 +242,9 @@ const InputNumber = ({
                             e.preventDefault()
                         }
                     }}
-                    {...props}
+                    // DOM boundary (see ./domProps): the spread lands on the <input>, so ENGINE_PROPS only -- `name` is the field registration
+    // path this control must carry, and the onChange above reads `props.name`.
+                    {...omitProps(props, ENGINE_PROPS)}
                     value={displayValue}
                 />
                 {icon && !lefty && (isString(icon)

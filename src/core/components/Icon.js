@@ -2,6 +2,7 @@ import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { Active } from '../utils'
+import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /**
  * Icon - Pure Component
@@ -25,7 +26,9 @@ export function Icon ({
       small,
       pointer: props.onClick
     })}
-       aria-hidden='true' {...props} />
+       // DOM boundary (see ./domProps): the spread lands on an <i>. `name` is already consumed above
+       // to pick the icon class, so both lists apply.
+       aria-hidden='true' {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)} />
   )
 }
 

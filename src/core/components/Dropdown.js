@@ -20,6 +20,7 @@ import Icon from './Icon'
 import Text from './Text'
 import View from './View'
 import { Active } from '../utils'
+import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 localiseTranslation({
   ADD_: {
@@ -85,10 +86,6 @@ export function Dropdown ({
   lazyLoad = true,
   optionsLabel,
   initialValues, // not used, removing from DOM
-  // Engine-wide props this view never reads. Semantic's Dropdown spreads whatever it does not
-  // recognise onto its <div>, so leaving them in `props` puts them on the DOM and React warns.
-  currencyCode: _currencyCode,
-  onDataChanged: _onDataChanged,
   readonly,
   autofocus,
   onAddItem,
@@ -253,7 +250,12 @@ export function Dropdown ({
         lazyLoad={lazyLoad}
         noResultsMessage={(hasListValue(dropdownValue) && dropdownValue.length === options.length) ? _.NO_OPTIONS_LEFT : _.NOTHING_FOUND}
         value={dropdownValue}
-        {...props}
+        // DOM boundary: Semantic's Dropdown spreads whatever it does not recognise (and it
+        // declares no `name`) onto its <div role="listbox">, so engine props and `name`/`label`
+        // became attributes there. Filtered here, AFTER the props.onClose/onSearchChange/
+        // onAddItem assignments above, and without touching the `props.name` those handlers
+        // report to the host. See ./domProps.js.
+        {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)}
       />
       {label && float && <Text className="input__label">{translate(label)}</Text>}
       {(error || info) &&

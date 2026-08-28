@@ -149,7 +149,7 @@ export default class Upload extends PureComponent {
 
     render () {
         const {
-            loading, children, multiple, disabled, readonly, onBlur, name, labelOnHover, onClose,
+            loading, children, multiple, disabled, readonly, onBlur, labelOnHover, onClose,
             className, classWrap, hasHeader, round, showTypes, title, translate
         } = this.props
         const label = this.props.label || this.fileType || _.FILE
@@ -162,7 +162,10 @@ export default class Upload extends PureComponent {
                 <Dropzone
                     // @note: When tabbing to dropzone with keyboard, input[type="file"] also gets event -> causing open twice.
                     //      => input is hidden by dropzone because it has ugly "Choose File" button
-                    name={name}
+                    // @note: `name` is deliberately NOT passed. It never reached the hidden
+                    //   <input type='file'> (that one takes `inputProps`), so it only landed on the
+                    //   wrapping <div> as an invalid attribute. The field name is reported to the
+                    //   host through onChange(files, name, dropzone) above.
                     title={translate(title)}
                     inputProps={{ tabIndex: -1 }}
                     tabIndex={disabled || readonly ? -1 : 0}

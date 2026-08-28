@@ -144,6 +144,35 @@
   table cells and inputs — 331 occurrences across 33 of the 38 bundled examples — which React
   also reported as an unrecognised DOM prop on every render. It is now stripped where views are
   resolved, and passed explicitly to the two that consume it. Currency formatting is unchanged.
+- **Rendered markup no longer carries the renderer's internal props as HTML attributes.** The
+  same defect as the `currencyCode` entry above, but on the other path — the one taken by value
+  renderers a `render*` attribute selects (`Float`, `Percent`, `Double5`, `Currency`) and by any
+  meta attribute no view consumes. Across the 38 bundled examples the page was emitting `data="[object Object]"`
+  (40), `_data="…"` (40), `symbol="$"` (23), `view="…"` (15), `index="…"` (8), `label="…"` (6) and
+  `_comment="…"` (2 — the meta author's own note, rendered into the page). All are now zero.
+  None of them produced a console warning, because React does not report an unknown *lowercase*
+  attribute; they were only visible in the markup.
+- **`name` is now emitted only on form controls.** It is the field-binding path a form control
+  must carry, but it was also reaching `<table>`, the dropdown's wrapper `<div>`, the upload drop
+  zone and any layout `div`/`span` that happened to carry a data binding — 108 of the 165
+  occurrences in the bundled examples. The 57 that bind a real field are unchanged, and every
+  form value still round-trips into the submit payload exactly as before. **If your application
+  or your tests select these elements with a `[name="…"]` CSS selector, use a class, an id or a
+  role instead:** for form fields nothing changed, but for a table, a dropdown wrapper or a
+  layout element the attribute is gone.
+- Both of the above are enforced at one place — a named list of engine-internal props applied
+  where a component hands props to a DOM element — so adding an internal prop to the engine no
+  longer means auditing a dozen components, which is how this leak returned four times before.
+  Every component that can be reached from a `meta.json` and hands props to an element is
+  covered; components nothing in a meta resolves to are not, and become covered the day they
+  are wired up. Nothing else about the rendered markup changed:
+  measured attribute-for-attribute against the previous DOM baseline of all 38 examples, every
+  element, every `class`, every `id` and every piece of visible text is identical — the diff is
+  the removal of those attributes and nothing else.
+- A `_comment` attribute anywhere in a `meta.json` is now dropped before rendering, the same way
+  `$schema` and `metaVersion` already were, so annotating meta for the next author costs nothing.
+  Unlike those two it is not declared in `meta.schema.json`, so an editor will not suggest it —
+  it is accepted rather than advertised.
 - Upload no longer hands the host a blanked-out drag event on React 16. Its drag focus/blur callbacks
   run after the component re-renders, and React 16 recycles event objects once the original handler
   returns, so an application reading `type` or `target` from the forwarded event saw `null`. The event

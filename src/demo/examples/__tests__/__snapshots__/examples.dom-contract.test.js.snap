@@ -24,7 +24,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
               "Rate Details"
             </span>
             <div class="flex--col input--wrapper fill-width margin-h-smaller">
-              <div aria-expanded="false" class="ui selection dropdown" name="active.option" role="listbox" tabindex="0">
+              <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
                 <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                   "ASO"
                 </div>
@@ -45,7 +45,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
               </div>
             </div>
             <div class="flex--col input--wrapper fill-width margin-h-smaller">
-              <div aria-expanded="false" class="ui selection dropdown" name="active.option" role="listbox" tabindex="0">
+              <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
                 <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                   "ASO"
                 </div>
@@ -66,7 +66,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
               </div>
             </div>
             <div class="flex--col input--wrapper fill-width margin-h-smaller">
-              <div aria-expanded="false" class="ui selection dropdown" name="url" role="listbox" tabindex="0">
+              <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
                 <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                   "IP Address"
                 </div>
@@ -174,7 +174,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                             "By Age"
                           </label>
                           <div class="flex--row app__pie-chart--ref middle center wrap">
-                            <div class="flex--col app__pie-chart min-width-290 center gradient" name="optionCalculations.0.manualRequestDetail.ageBreakdown">
+                            <div class="flex--col app__pie-chart min-width-290 center gradient">
                               <div class="app__pie-chart__svg" style="position: relative; width: 100%; height: 290px;">
                                 <svg height="290" role="img" width="290">
                                   <defs>
@@ -335,7 +335,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                             "By Enrollment"
                           </label>
                           <div class="flex--row app__pie-chart--ref middle center wrap">
-                            <div class="flex--col app__pie-chart min-width-290 center gradient" name="optionCalculations.0.subGroupEnrollmentBreakdown[0].enrollmentBreakdown">
+                            <div class="flex--col app__pie-chart min-width-290 center gradient">
                               <div class="app__pie-chart__svg" style="position: relative; width: 100%; height: 290px;">
                                 <svg height="290" role="img" width="290">
                                   <defs>
@@ -406,7 +406,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                       <div>
                         <div class="overflow-scroll flex--row max-width">
                           <div class="flex--row min-width fill-width">
-                            <table class="ui table full-width" name="optionCalculations.0.manualRequestDetail.enrollmentByState">
+                            <table class="ui table full-width">
                               <thead class="font-normal">
                                 <tr class="">
                                   <th class="left">
@@ -445,7 +445,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                               <tbody class="">
                                 <tr class="">
                                   <td class="-last">
-                                    <div class="flex--col app__expand expanded" id="undefined" index="0" name="NV">
+                                    <div class="flex--col app__expand expanded" id="undefined">
                                       <span class="text pointer row fill-width middle padding-small">
                                         <i aria-hidden="true" class="icon-chevron-down spin-90-deg">
                                         </i>
@@ -479,7 +479,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                     <div>
                                       <div class="overflow-scroll flex--row max-width">
                                         <div class="flex--row min-width fill-width">
-                                          <table class="ui table full-width" name="optionCalculations.0.manualRequestDetail.enrollmentByMSA">
+                                          <table class="ui table full-width">
                                             <thead class="font-normal">
                                               <tr class="">
                                                 <th class="left">
@@ -645,7 +645,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                 </tr>
                                 <tr class="">
                                   <td class="-last">
-                                    <div class="flex--col app__expand expanded" id="undefined" index="1" name="WS">
+                                    <div class="flex--col app__expand expanded" id="undefined">
                                       <span class="text pointer row fill-width middle padding-small">
                                         <i aria-hidden="true" class="icon-chevron-down spin-90-deg">
                                         </i>
@@ -679,7 +679,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                     <div>
                                       <div class="overflow-scroll flex--row max-width">
                                         <div class="flex--row min-width fill-width">
-                                          <table class="ui table full-width" name="optionCalculations.0.manualRequestDetail.enrollmentByMSA">
+                                          <table class="ui table full-width">
                                             <thead class="font-normal">
                                               <tr class="">
                                                 <th class="left">
@@ -841,7 +841,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
     <div class="flex--col padding">
       <div class="flex--row middle">
         <span class="text">
-          <span _data="0.7123456789" class="text" data="[object Object]" name="Float" symbol="$">
+          <span class="text">
             "0"
             <span class="text fade--quarter no-margin">
               ".7123456789"
@@ -858,7 +858,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
             <span class="text margin-right-smallest">
               "$"
             </span>
-            <span _data="0.7123456789" class="text" data="[object Object]" name="Currency">
+            <span class="text">
               "0"
               <span class="text fade--quarter no-margin">
                 ".71234"
@@ -872,7 +872,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
       </div>
       <div class="flex--row middle">
         <span class="text">
-          <span _data="0.7123456789" class="text" data="[object Object]" name="Float" symbol="$">
+          <span class="text">
             "0"
             <span class="text fade--quarter no-margin">
               ".71234"
@@ -885,7 +885,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
       </div>
       <div class="flex--row middle">
         <span class="text">
-          <span _data="0.7123456789" class="text" data="[object Object]" name="Float" symbol="$">
+          <span class="text">
             "0"
             ".71235"
           </span>
@@ -896,7 +896,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
       </div>
       <div class="flex--row middle">
         <span class="text h6">
-          <span _data="0.999999999" class="text" data="[object Object]" name="Float" symbol="$">
+          <span class="text">
             "1"
           </span>
         </span>
@@ -907,7 +907,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
       <div>
         <div class="overflow-scroll flex--row max-width">
           <div class="flex--row min-width fill-width">
-            <table class="ui table full-width" name="categories">
+            <table class="ui table full-width">
               <thead class="font-normal">
                 <tr class="">
                   <th class="left">
@@ -923,7 +923,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
                 <tr class="">
                   <td class="-last">
                     <div class="flex--row">
-                      <span _data="0.7123456789" class="text" data="[object Object]" name="Percent" symbol="$">
+                      <span class="text">
                         "71"
                         <span class="text fade--quarter no-margin">
                           ".23"
@@ -938,7 +938,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
                 <tr class="">
                   <td class="-last">
                     <div class="flex--row">
-                      <span _data="0.999999999" class="text" data="[object Object]" name="Percent" symbol="$">
+                      <span class="text">
                         "100"
                         <span class="text fade--quarter no-margin">
                           ".00"
@@ -958,7 +958,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
       <div class="flex--row middle">
         <span class="text h3">
           <div class="flex--row">
-            <span _data="0.7123456789" class="text" data="[object Object]" name="Percent" symbol="$">
+            <span class="text">
               "71"
               <span class="text fade--quarter no-margin">
                 ".234"
@@ -982,7 +982,7 @@ exports[`demo example full-DOM contract dropdown renders a stable, non-empty DOM
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
     <div class="flex--col input--wrapper fill-width" style="min-height: 120px;">
-      <div aria-expanded="false" class="ui selection dropdown" name="category" role="listbox" tabindex="0">
+      <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
         <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
           "Gold"
         </div>
@@ -1017,7 +1017,7 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
               "Option"
             </span>
             <div class="flex--col input--wrapper middle">
-              <div aria-expanded="false" class="ui compact selection dropdown" name="optionX" role="listbox" tabindex="0">
+              <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
                 <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                   "Plan 1"
                 </div>
@@ -1043,7 +1043,7 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
               "Category"
             </span>
             <div class="flex--col input--wrapper middle">
-              <div aria-expanded="false" class="ui compact selection dropdown" name="categoryX" role="listbox" tabindex="0">
+              <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
                 <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                   "GroupA"
                 </div>
@@ -1074,7 +1074,7 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
               <div>
                 <div class="overflow-scroll flex--row max-width">
                   <div class="flex--row min-width fill-width">
-                    <table class="ui table full-width vertical" name="RecordInputs.OptionInputs.0.CategoryInputs">
+                    <table class="ui table full-width vertical">
                       <thead class="font-normal">
                       </thead>
                       <tbody class="">
@@ -1185,7 +1185,7 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
 exports[`demo example full-DOM contract expandList renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col app__expand" id="undefined" name="categories">
+    <div class="flex--col app__expand" id="undefined">
       <span class="text pointer row fill-width middle padding-small">
         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
         </i>
@@ -1198,7 +1198,7 @@ exports[`demo example full-DOM contract expandList renders a stable, non-empty D
         </div>
       </div>
     </div>
-    <div class="flex--col app__expand" id="undefined" name="categories">
+    <div class="flex--col app__expand" id="undefined">
       <span class="text pointer row fill-width middle padding-small">
         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
         </i>
@@ -1312,13 +1312,13 @@ exports[`demo example full-DOM contract inputToggle renders a stable, non-empty 
 exports[`demo example full-DOM contract invalidArray renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col border radius" label="MainLayout">
-      <div class="flex--row justify padding border-top" label="PlanList">
+    <div class="flex--col border radius">
+      <div class="flex--row justify padding border-top">
         <span class="text">
           "Plans"
         </span>
         <div class="flex--col input--wrapper fill-width">
-          <div aria-expanded="false" class="ui selection dropdown" name="option" role="listbox" tabindex="0">
+          <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
             <div aria-atomic="true" aria-live="polite" class="divider default text" role="alert">
               "Select"
             </div>
@@ -1329,14 +1329,14 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
           </div>
         </div>
       </div>
-      <div class="flex--col border radius" label="Category">
+      <div class="flex--col border radius">
         <span class="text h3 padding">
           "Category Summary"
         </span>
         <div>
           <div class="overflow-scroll flex--row max-width">
             <div class="flex--row min-width fill-width">
-              <table class="ui table full-width" name="categoriesDetails">
+              <table class="ui table full-width">
                 <thead class="font-normal">
                   <tr class="">
                     <th class="left">
@@ -1376,12 +1376,12 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
           </div>
         </div>
       </div>
-      <div class="flex--col border radius" label="CensusSummary">
+      <div class="flex--col border radius">
         <span class="text h3 padding">
           "Census Summary"
         </span>
         <div class="flex--row app__pie-chart--ref middle center wrap">
-          <div class="flex--col app__pie-chart min-width-290 center gradient" name="censusSummary.censusByAgeBand">
+          <div class="flex--col app__pie-chart min-width-290 center gradient">
             <div class="app__pie-chart__svg" style="position: relative; width: 100%; height: 290px;">
               <svg height="290" role="img" width="290">
                 <defs>
@@ -1405,7 +1405,7 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
         <div>
           <div class="overflow-scroll flex--row max-width">
             <div class="flex--row min-width fill-width">
-              <table class="ui table full-width" name="censusSummary.censusByClass">
+              <table class="ui table full-width">
                 <thead class="font-normal">
                   <tr class="">
                     <th class="left">
@@ -1461,9 +1461,9 @@ exports[`demo example full-DOM contract layout renders a stable, non-empty DOM m
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
     <div class="flex--col padding">
-      <div class="flex--col" label="Dynamic Layout">
+      <div class="flex--col">
         <div class="flex--col input--wrapper fill-width">
-          <div aria-expanded="false" class="ui selection dropdown" name="layout" role="listbox" tabindex="0">
+          <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
             <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
               "Layout Alpha"
             </div>
@@ -1522,7 +1522,7 @@ exports[`demo example full-DOM contract layout renders a stable, non-empty DOM m
 exports[`demo example full-DOM contract list renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--row justify wrap" name="categories">
+    <div class="flex--row justify wrap">
       <div class="flex--col">
         <div class="flex--col margin-bottom-small radius">
           <span class="text h3 padding no-margin">
@@ -1606,7 +1606,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
       <div>
         <div class="overflow-scroll flex--row max-width">
           <div class="flex--row min-width fill-width">
-            <table class="ui table full-width outline margin-v" name="dataKind.phases">
+            <table class="ui table full-width outline margin-v">
               <thead class="font-normal">
                 <tr class="">
                   <th class="left padding-left-small border-right">
@@ -1666,7 +1666,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                       <div>
                         <div class="overflow-scroll flex--row max-width">
                           <div class="flex--row min-width fill-width">
-                            <table class="ui table full-width margin-v no-border" name="dataKind.lineItems">
+                            <table class="ui table full-width margin-v no-border">
                               <thead class="font-normal">
                                 <tr class="">
                                   <th class="left padding-left-small border-right">
@@ -1804,7 +1804,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="sku" name="sku" type="text" value="" view="Input" />
+                                        <input id="sku" name="sku" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -1813,7 +1813,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="description" name="description" type="text" value="" view="Input" />
+                                        <input id="description" name="description" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -1822,7 +1822,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="qty" name="qty" type="number" value="" view="Input" />
+                                        <input id="qty" name="qty" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -1831,12 +1831,12 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="unitPrice" name="unitPrice" type="number" value="" view="Input" />
+                                        <input id="unitPrice" name="unitPrice" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
                                   <td class="top aligned">
-                                    <button class="button a transparent" type="button" view="Button">
+                                    <button class="button a transparent" type="button">
                                       "Add line"
                                     </button>
                                   </td>
@@ -1883,7 +1883,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                       <div>
                         <div class="overflow-scroll flex--row max-width">
                           <div class="flex--row min-width fill-width">
-                            <table class="ui table full-width margin-v no-border" name="dataKind.lineItems">
+                            <table class="ui table full-width margin-v no-border">
                               <thead class="font-normal">
                                 <tr class="">
                                   <th class="left padding-left-small border-right">
@@ -2067,7 +2067,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="sku" name="sku" type="text" value="" view="Input" />
+                                        <input id="sku" name="sku" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2076,7 +2076,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="description" name="description" type="text" value="" view="Input" />
+                                        <input id="description" name="description" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2085,7 +2085,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="qty" name="qty" type="number" value="" view="Input" />
+                                        <input id="qty" name="qty" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2094,12 +2094,12 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="unitPrice" name="unitPrice" type="number" value="" view="Input" />
+                                        <input id="unitPrice" name="unitPrice" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
                                   <td class="top aligned">
-                                    <button class="button a transparent" type="button" view="Button">
+                                    <button class="button a transparent" type="button">
                                       "Add line"
                                     </button>
                                   </td>
@@ -2146,7 +2146,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                       <div>
                         <div class="overflow-scroll flex--row max-width">
                           <div class="flex--row min-width fill-width">
-                            <table class="ui table full-width margin-v no-border" name="dataKind.lineItems">
+                            <table class="ui table full-width margin-v no-border">
                               <thead class="font-normal">
                                 <tr class="">
                                   <th class="left padding-left-small border-right">
@@ -2238,7 +2238,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="sku" name="sku" type="text" value="" view="Input" />
+                                        <input id="sku" name="sku" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2247,7 +2247,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="description" name="description" type="text" value="" view="Input" />
+                                        <input id="description" name="description" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2256,7 +2256,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="qty" name="qty" type="number" value="" view="Input" />
+                                        <input id="qty" name="qty" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2265,12 +2265,12 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="unitPrice" name="unitPrice" type="number" value="" view="Input" />
+                                        <input id="unitPrice" name="unitPrice" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
                                   <td class="top aligned">
-                                    <button class="button a transparent" type="button" view="Button">
+                                    <button class="button a transparent" type="button">
                                       "Add line"
                                     </button>
                                   </td>
@@ -2335,7 +2335,7 @@ exports[`demo example full-DOM contract pieChart renders a stable, non-empty DOM
   <div class="flex--col min-height fill">
     <div class="flex--row wrap">
       <div class="flex--row app__pie-chart--ref middle center wrap">
-        <div class="flex--col app__pie-chart min-width-290 center gradient" name="distribution">
+        <div class="flex--col app__pie-chart min-width-290 center gradient">
           <div class="app__pie-chart__svg" style="position: relative; width: 100%; height: 290px;">
             <svg height="290" role="img" width="290">
               <defs>
@@ -2483,7 +2483,7 @@ exports[`demo example full-DOM contract pieChart renders a stable, non-empty DOM
         </div>
       </div>
       <div class="flex--col app__pie-chart--ref middle center wrap">
-        <div class="flex--col app__pie-chart min-width-290 center gradient" name="distribution">
+        <div class="flex--col app__pie-chart min-width-290 center gradient">
           <div class="app__pie-chart__svg" style="position: relative; width: 100%; height: 290px;">
             <svg height="290" role="img" width="290">
               <defs>
@@ -2695,7 +2695,7 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
       <div>
         <div class="overflow-scroll flex--row max-width">
           <div class="flex--row min-width fill-width">
-            <table class="ui table full-width" name="categories">
+            <table class="ui table full-width">
               <thead class="font-normal">
                 <tr class="">
                   <th class="left">
@@ -2748,7 +2748,7 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
               <tbody class="">
                 <tr class="">
                   <td class="-last">
-                    <div class="flex--col app__expand" id="undefined" index="0" name="Gold">
+                    <div class="flex--col app__expand" id="undefined">
                       <span class="text pointer row fill-width middle padding-small">
                         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                         </i>
@@ -2789,7 +2789,7 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
                 </tr>
                 <tr class="">
                   <td class="-last">
-                    <div class="flex--col app__expand" id="undefined" index="1" name="Silver">
+                    <div class="flex--col app__expand" id="undefined">
                       <span class="text pointer row fill-width middle padding-small">
                         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                         </i>
@@ -2841,7 +2841,7 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
 exports[`demo example full-DOM contract ratingDetails renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div _comment="Remove this wrapper component, it is for demo purpose only" class="flex--col padding-h-largest bg-info-light">
+    <div class="flex--col padding-h-largest bg-info-light">
       <div class="flex--col margin-v-largest">
         <span class="text h3 padding-largest no-padding-bottom no-margin bg-neutral radius-top">
           "Rating Details"
@@ -2850,14 +2850,14 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
           <div class="flex--col min-height max-height">
             <div class="overflow-scroll flex--row max-width tabs__items no-scrollbar padding-largest bg-neutral radius-bottom" style="overflow: visible;">
               <div class="flex--row min-width">
-                <div class="flex--row padding-right-largest middle bg-neutral" label="PlanList">
+                <div class="flex--row padding-right-largest middle bg-neutral">
                   <span class="text">
                     "FILTER BY"
                   </span>
                   <div class="flex--col space">
                   </div>
                   <div class="flex--col input--wrapper">
-                    <div aria-expanded="false" class="ui compact selection dropdown" name="option" role="listbox" tabindex="0">
+                    <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
                       <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                         "Gold"
                       </div>
@@ -2898,7 +2898,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
             <div class="overflow-scroll flex--col max-height fill tabs__content fade-in margin-v-small">
               <div class="flex--col min-height fill">
                 <div class="flex--col">
-                  <div class="flex--row wrap justify margin-v" name="Plans[0].Categories">
+                  <div class="flex--row wrap justify margin-v">
                     <div class="flex--col padding-largest radius bg-neutral" style="min-width: 48%;">
                       <span class="text h3">
                         "Core"
@@ -2925,7 +2925,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                         <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
-                              <span _data="0.02" class="text" data="[object Object]" name="Percent" symbol="$">
+                              <span class="text">
                                 "2"
                               </span>
                               <span class="text margin-left-smallest">
@@ -2940,7 +2940,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                         <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
-                              <span _data="0.04" class="text" data="[object Object]" name="Percent" symbol="$">
+                              <span class="text">
                                 "4"
                               </span>
                               <span class="text margin-left-smallest">
@@ -2955,7 +2955,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                         <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
-                              <span _data="0.1875" class="text" data="[object Object]" name="Percent" symbol="$">
+                              <span class="text">
                                 "18"
                               </span>
                               <span class="text margin-left-smallest">
@@ -2995,7 +2995,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                         <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
-                              <span _data="0.02" class="text" data="[object Object]" name="Percent" symbol="$">
+                              <span class="text">
                                 "2"
                               </span>
                               <span class="text margin-left-smallest">
@@ -3010,7 +3010,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                         <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
-                              <span _data="0.04" class="text" data="[object Object]" name="Percent" symbol="$">
+                              <span class="text">
                                 "4"
                               </span>
                               <span class="text margin-left-smallest">
@@ -3025,7 +3025,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                         <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
-                              <span _data="0.1875" class="text" data="[object Object]" name="Percent" symbol="$">
+                              <span class="text">
                                 "18"
                               </span>
                               <span class="text margin-left-smallest">
@@ -3084,14 +3084,14 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                 </td>
                                 <td class="-last">
                                   <span class="text">
-                                    <span _data="6" class="text" data="[object Object]" name="Float" symbol="$">
+                                    <span class="text">
                                       "6"
                                     </span>
                                   </span>
                                 </td>
                                 <td class="-last">
                                   <span class="text">
-                                    <span _data="6" class="text" data="[object Object]" name="Float" symbol="$">
+                                    <span class="text">
                                       "6"
                                     </span>
                                   </span>
@@ -3111,7 +3111,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                       <span class="text margin-right-smallest">
                                         "$"
                                       </span>
-                                      <span _data="82.59" class="text" data="[object Object]" name="Currency">
+                                      <span class="text">
                                         "82"
                                         <span class="text fade--quarter no-margin">
                                           ".59"
@@ -3126,7 +3126,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                       <span class="text margin-right-smallest">
                                         "$"
                                       </span>
-                                      <span _data="47.81" class="text" data="[object Object]" name="Currency">
+                                      <span class="text">
                                         "47"
                                         <span class="text fade--quarter no-margin">
                                           ".81"
@@ -3150,7 +3150,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                       <span class="text margin-right-smallest">
                                         "$"
                                       </span>
-                                      <span _data="86.03" class="text" data="[object Object]" name="Currency">
+                                      <span class="text">
                                         "86"
                                         <span class="text fade--quarter no-margin">
                                           ".03"
@@ -3165,7 +3165,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                       <span class="text margin-right-smallest">
                                         "$"
                                       </span>
-                                      <span _data="49.8" class="text" data="[object Object]" name="Currency">
+                                      <span class="text">
                                         "49"
                                         <span class="text fade--quarter no-margin">
                                           ".80"
@@ -3189,7 +3189,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                       <span class="text margin-right-smallest">
                                         "$"
                                       </span>
-                                      <span _data="2484.5" class="text" data="[object Object]" name="Currency">
+                                      <span class="text">
                                         "2,484"
                                         <span class="text fade--quarter no-margin">
                                           ".50"
@@ -3204,7 +3204,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                       <span class="text margin-right-smallest">
                                         "$"
                                       </span>
-                                      <span _data="2437.5" class="text" data="[object Object]" name="Currency">
+                                      <span class="text">
                                         "2,437"
                                         <span class="text fade--quarter no-margin">
                                           ".50"
@@ -3224,14 +3224,14 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                 </td>
                                 <td class="-last">
                                   <span class="text">
-                                    <span _data="0.46" class="text" data="[object Object]" name="Float" symbol="$">
+                                    <span class="text">
                                       "0"
                                     </span>
                                   </span>
                                 </td>
                                 <td class="-last">
                                   <span class="text">
-                                    <span _data="0.27" class="text" data="[object Object]" name="Float" symbol="$">
+                                    <span class="text">
                                       "0"
                                     </span>
                                   </span>
@@ -3257,7 +3257,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
 exports[`demo example full-DOM contract rowListRelativeData renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div _comment="Regression fixture: RowList/PieChart nested under ancestors that declare \`relativeData: false\`. The RowList declares \`relativeData: true\` and must still resolve its own \`name\` into data." class="flex--col padding-h-largest bg-info-light">
+    <div class="flex--col padding-h-largest bg-info-light">
       <div class="flex--col margin-v-largest">
         <span class="text h3">
           "Summary Details"
@@ -3273,7 +3273,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                   <div class="flex--col space">
                   </div>
                   <div class="flex--col input--wrapper">
-                    <div aria-expanded="false" class="ui compact selection dropdown" name="group" role="listbox" tabindex="0">
+                    <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
                       <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                         "Group 1"
                       </div>
@@ -3310,7 +3310,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
               <div class="flex--col min-height fill">
                 <div class="flex--col">
                   <div class="flex--col">
-                    <div class="flex--row wrap justify margin-v" name="Groups[0].Items">
+                    <div class="flex--row wrap justify margin-v">
                       <div class="flex--col padding-largest radius bg-neutral" style="min-width: 48%;">
                         <span class="text h3">
                           "Basic"
@@ -3331,7 +3331,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                   <span class="text margin-right-smallest">
                                     "$"
                                   </span>
-                                  <span _data="4443.12" class="text" data="[object Object]" name="Currency">
+                                  <span class="text">
                                     "4,443"
                                     <span class="text fade--quarter no-margin">
                                       ".12"
@@ -3349,7 +3349,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                   <span class="text margin-right-smallest">
                                     "$"
                                   </span>
-                                  <span _data="4443.12" class="text" data="[object Object]" name="Currency">
+                                  <span class="text">
                                     "4,443"
                                     <span class="text fade--quarter no-margin">
                                       ".12"
@@ -3367,7 +3367,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                           <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
-                                <span _data="0.027" class="text" data="[object Object]" name="Percent" symbol="$">
+                                <span class="text">
                                   "2"
                                 </span>
                                 <span class="text margin-left-smallest">
@@ -3382,7 +3382,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                           <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
-                                <span _data="0.04" class="text" data="[object Object]" name="Percent" symbol="$">
+                                <span class="text">
                                   "4"
                                 </span>
                                 <span class="text margin-left-smallest">
@@ -3397,7 +3397,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                           <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
-                                <span _data="0.16" class="text" data="[object Object]" name="Percent" symbol="$">
+                                <span class="text">
                                   "16"
                                 </span>
                                 <span class="text margin-left-smallest">
@@ -3431,7 +3431,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                   <span class="text margin-right-smallest">
                                     "$"
                                   </span>
-                                  <span _data="10.86" class="text" data="[object Object]" name="Currency">
+                                  <span class="text">
                                     "10"
                                     <span class="text fade--quarter no-margin">
                                       ".86"
@@ -3449,7 +3449,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                   <span class="text margin-right-smallest">
                                     "$"
                                   </span>
-                                  <span _data="10.86" class="text" data="[object Object]" name="Currency">
+                                  <span class="text">
                                     "10"
                                     <span class="text fade--quarter no-margin">
                                       ".86"
@@ -3467,7 +3467,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                           <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
-                                <span _data="0.027" class="text" data="[object Object]" name="Percent" symbol="$">
+                                <span class="text">
                                   "2"
                                 </span>
                                 <span class="text margin-left-smallest">
@@ -3482,7 +3482,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                           <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
-                                <span _data="0.04" class="text" data="[object Object]" name="Percent" symbol="$">
+                                <span class="text">
                                   "4"
                                 </span>
                                 <span class="text margin-left-smallest">
@@ -3497,7 +3497,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                           <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
-                                <span _data="0.16" class="text" data="[object Object]" name="Percent" symbol="$">
+                                <span class="text">
                                   "16"
                                 </span>
                                 <span class="text margin-left-smallest">
@@ -3520,7 +3520,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                     <div>
                       <div class="overflow-scroll flex--row max-width">
                         <div class="flex--row min-width fill-width">
-                          <table class="ui table full-width vertical" name="Groups[0].Items">
+                          <table class="ui table full-width vertical">
                             <thead class="font-normal">
                             </thead>
                             <tbody class="">
@@ -3583,7 +3583,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     <span class="text margin-right-smallest">
                                       "$"
                                     </span>
-                                    <span _data="3314.56" class="text" data="[object Object]" name="Currency">
+                                    <span class="text">
                                       "3,314"
                                       <span class="text fade--quarter no-margin">
                                         ".56"
@@ -3596,7 +3596,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     <span class="text margin-right-smallest">
                                       "$"
                                     </span>
-                                    <span _data="40.32" class="text" data="[object Object]" name="Currency">
+                                    <span class="text">
                                       "40"
                                       <span class="text fade--quarter no-margin">
                                         ".32"
@@ -3618,7 +3618,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     <span class="text margin-right-smallest">
                                       "$"
                                     </span>
-                                    <span _data="0.88" class="text" data="[object Object]" name="Currency">
+                                    <span class="text">
                                       "0"
                                       <span class="text fade--quarter no-margin">
                                         ".88"
@@ -3631,7 +3631,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     <span class="text margin-right-smallest">
                                       "$"
                                     </span>
-                                    <span _data="1" class="text" data="[object Object]" name="Currency">
+                                    <span class="text">
                                       "1"
                                       <span class="text fade--quarter no-margin">
                                         ".00"
@@ -3653,7 +3653,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     <span class="text margin-right-smallest">
                                       "$"
                                     </span>
-                                    <span _data="0.88" class="text" data="[object Object]" name="Currency">
+                                    <span class="text">
                                       "0"
                                       <span class="text fade--quarter no-margin">
                                         ".88"
@@ -3666,7 +3666,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     <span class="text margin-right-smallest">
                                       "$"
                                     </span>
-                                    <span _data="1" class="text" data="[object Object]" name="Currency">
+                                    <span class="text">
                                       "1"
                                       <span class="text fade--quarter no-margin">
                                         ".00"
@@ -3703,7 +3703,7 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
               "Category"
             </span>
             <div class="flex--col input--wrapper middle">
-              <div aria-expanded="false" class="ui compact selection dropdown" name="categoryX" role="listbox" tabindex="0">
+              <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
                 <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                   "Category 1"
                 </div>
@@ -3719,7 +3719,7 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
               "Product"
             </span>
             <div class="flex--col input--wrapper middle">
-              <div aria-expanded="false" class="ui compact selection dropdown" name="productX" role="listbox" tabindex="0">
+              <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
                 <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                   "Alpha"
                 </div>
@@ -3735,7 +3735,7 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
               <div>
                 <div class="overflow-scroll flex--row max-width">
                   <div class="flex--row min-width fill-width">
-                    <table class="ui table full-width vertical" name="Catalog.Categories.0.Products">
+                    <table class="ui table full-width vertical">
                       <thead class="font-normal">
                       </thead>
                       <tbody class="">
@@ -3853,9 +3853,9 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
             <span class="text h5 padding-right middle">
               "Group"
             </span>
-            <div class="flex--col" name="Settings.Record">
+            <div class="flex--col">
               <div class="flex--col input--wrapper middle">
-                <div aria-expanded="false" class="ui compact selection dropdown" id="Settings.Record.GroupSelection" name="Settings.Record.GroupSelection" role="listbox" tabindex="0">
+                <div aria-expanded="false" class="ui compact selection dropdown" id="Settings.Record.GroupSelection" role="listbox" tabindex="0">
                   <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                     "Group B"
                   </div>
@@ -3871,9 +3871,9 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
             <span class="text h5 padding-right middle">
               "Item"
             </span>
-            <div class="flex--col" name="Settings.Record.GroupList.1">
+            <div class="flex--col">
               <div class="flex--col input--wrapper middle">
-                <div aria-expanded="false" class="ui compact selection dropdown" id="Settings.Record.GroupList.1.ItemSelection" name="Settings.Record.GroupList.1.ItemSelection" role="listbox" tabindex="0">
+                <div aria-expanded="false" class="ui compact selection dropdown" id="Settings.Record.GroupList.1.ItemSelection" role="listbox" tabindex="0">
                   <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                     "Gamma"
                   </div>
@@ -3890,7 +3890,7 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
               <div>
                 <div class="overflow-scroll flex--row max-width">
                   <div class="flex--row min-width fill-width">
-                    <table class="ui table full-width vertical" name="Settings.Record.GroupList.1.ItemList">
+                    <table class="ui table full-width vertical">
                       <thead class="font-normal">
                       </thead>
                       <tbody class="">
@@ -4026,7 +4026,7 @@ exports[`demo example full-DOM contract selectIndexValue renders a stable, non-e
       <span class="text input__label">
         "Select option (index value)"
       </span>
-      <div aria-expanded="false" class="ui selection dropdown" name="selectedOption" role="listbox" tabindex="0">
+      <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
         <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
           "Amount"
         </div>
@@ -4050,7 +4050,7 @@ exports[`demo example full-DOM contract selectReorder renders a stable, non-empt
             "Region"
           </span>
           <div class="flex--col input--wrapper middle">
-            <div aria-expanded="false" class="ui compact selection dropdown" name="RegionSelection" role="listbox" tabindex="0">
+            <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
               <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
                 "South"
               </div>
@@ -4068,7 +4068,7 @@ exports[`demo example full-DOM contract selectReorder renders a stable, non-empt
           <div>
             <div class="overflow-scroll flex--row max-width">
               <div class="flex--row min-width fill-width">
-                <table class="ui table full-width" name="Regions">
+                <table class="ui table full-width">
                   <thead class="font-normal">
                     <tr class="">
                       <th class="left">
@@ -4198,7 +4198,7 @@ exports[`demo example full-DOM contract selectStableValue renders a stable, non-
       <span class="text input__label">
         "Select option (stable id value)"
       </span>
-      <div aria-expanded="false" class="ui selection dropdown" name="selectedOption" role="listbox" tabindex="0">
+      <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
         <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
           "Amount"
         </div>
@@ -4215,7 +4215,7 @@ exports[`demo example full-DOM contract selectStableValue renders a stable, non-
 exports[`demo example full-DOM contract showIf renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col" name="categories">
+    <div class="flex--col">
       <div class="flex--col padding border">
         <span class="text h3">
           "Gold"
@@ -4223,7 +4223,7 @@ exports[`demo example full-DOM contract showIf renders a stable, non-empty DOM m
         <span class="text padding">
           "You see this because <\\"showIf\\": \\"categoryID\\"> resolves to 'data.categories.{index}.categoryID', which is considered 'Truthy'"
         </span>
-        <span class="text padding" name="categoryID">
+        <span class="text padding">
           "Gold"
         </span>
       </div>
@@ -4398,7 +4398,7 @@ exports[`demo example full-DOM contract slider renders a stable, non-empty DOM m
 exports[`demo example full-DOM contract summaryBox renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--row wrap justify padding-v bg-grey-lightest" name="categories">
+    <div class="flex--row wrap justify padding-v bg-grey-lightest">
       <div class="flex--col padding-largest margin-v bg-white" style="min-width: 48%;">
         <span class="text h3">
           "Core Category"
@@ -4604,7 +4604,7 @@ exports[`demo example full-DOM contract tabList renders a stable, non-empty DOM 
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
     <div class="overflow-scroll flex--col max-height tabs fade-in padding">
-      <div class="flex--col min-height max-height" name="categories">
+      <div class="flex--col min-height max-height">
         <div class="overflow-scroll flex--row max-width tabs__items no-scrollbar">
           <div class="flex--row min-width">
             <div class="flex--col tabs__item active">
@@ -4669,7 +4669,7 @@ exports[`demo example full-DOM contract tableExtraItems renders a stable, non-em
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width" name="no_data_exists">
+          <table class="ui table full-width">
             <thead class="font-normal">
               <tr class="">
                 <th class="left">
@@ -4732,7 +4732,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
       <div>
         <div class="overflow-scroll flex--row max-width">
           <div class="flex--row min-width fill-width">
-            <table class="ui table full-width outline margin-v" name="dataKind.period">
+            <table class="ui table full-width outline margin-v">
               <thead class="font-normal">
                 <tr class="">
                   <th class="left bg-success-light" colspan="999">
@@ -4898,7 +4898,7 @@ exports[`demo example full-DOM contract tableMatrix renders a stable, non-empty 
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width margin" name="matrixTable">
+          <table class="ui table full-width margin">
             <thead class="font-normal">
               <tr class="">
                 <th class="left bg-white">
@@ -5108,7 +5108,7 @@ exports[`demo example full-DOM contract tableMatrixRequired renders a stable, no
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width" name="matrixTable">
+          <table class="ui table full-width">
             <thead class="font-normal">
               <tr class="">
                 <th class="left">
@@ -5302,7 +5302,7 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width" name="categories">
+          <table class="ui table full-width">
             <thead class="font-normal">
               <tr class="">
                 <th class="left">
@@ -5355,7 +5355,7 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
             <tbody class="">
               <tr class="">
                 <td class="-last">
-                  <div class="flex--col app__expand" id="undefined" index="0" name="Gold">
+                  <div class="flex--col app__expand" id="undefined">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
@@ -5396,7 +5396,7 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
               </tr>
               <tr class="">
                 <td class="-last">
-                  <div class="flex--col app__expand" id="undefined" index="1" name="Silver">
+                  <div class="flex--col app__expand" id="undefined">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
@@ -5450,7 +5450,7 @@ exports[`demo example full-DOM contract tablePagination renders a stable, non-em
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width" name="tasks">
+          <table class="ui table full-width">
             <thead class="font-normal">
               <tr class="">
                 <th class="left">
@@ -5718,7 +5718,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width vertical" name="categories">
+          <table class="ui table full-width vertical">
             <thead class="font-normal">
             </thead>
             <tbody class="">
@@ -5731,7 +5731,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                   </div>
                 </th>
                 <td class="-last">
-                  <div class="flex--col app__expand" id="undefined" index="0" name="Gold">
+                  <div class="flex--col app__expand" id="undefined">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
@@ -5740,7 +5740,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                   </div>
                 </td>
                 <td class="-last">
-                  <div class="flex--col app__expand" id="undefined" index="1" name="Silver">
+                  <div class="flex--col app__expand" id="undefined">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
@@ -5934,7 +5934,7 @@ exports[`demo example full-DOM contract upload renders a stable, non-empty DOM m
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
     <div class="flex--col app__upload left">
-      <div class="upload__dropzone input--wrapper button margin-largest" name="path.to.file" tabindex="0" title="Upload CSV File">
+      <div class="upload__dropzone input--wrapper button margin-largest" tabindex="0" title="Upload CSV File">
         <input accept=".csv" style="display: none;" tabindex="-1" type="file" />
         <i aria-hidden="true" class="icon-file-upload margin-right-smaller">
         </i>
@@ -5958,7 +5958,7 @@ exports[`demo example full-DOM contract uploadVariants renders a stable, non-emp
         "Click or drop a file. Format hint shows on hover."
       </span>
       <div class="flex--col app__upload">
-        <div class="upload__dropzone input--wrapper" name="singleCsv" tabindex="0" title="Upload CSV file">
+        <div class="upload__dropzone input--wrapper" tabindex="0" title="Upload CSV file">
           <input accept=".csv" style="display: none;" tabindex="-1" type="file" />
           <i aria-hidden="true" class="icon-image text largest no-margin">
           </i>
@@ -5988,7 +5988,7 @@ exports[`demo example full-DOM contract uploadVariants renders a stable, non-emp
         "Supports several formats and accepts up to 5 MB per file."
       </span>
       <div class="flex--col app__upload">
-        <div class="upload__dropzone input--wrapper" name="multipleDocs" tabindex="0" title="Upload documents">
+        <div class="upload__dropzone input--wrapper" tabindex="0" title="Upload documents">
           <input accept=".pdf, .doc, .docx, .txt" multiple="" style="display: none;" tabindex="-1" type="file" />
           <i aria-hidden="true" class="icon-image text largest no-margin">
           </i>
@@ -6015,7 +6015,7 @@ exports[`demo example full-DOM contract uploadVariants renders a stable, non-emp
         "Image upload (button style, no hover hint)"
       </span>
       <div class="flex--col app__upload left">
-        <div class="upload__dropzone input--wrapper button margin-bottom" name="avatar" tabindex="0" title="Upload an image">
+        <div class="upload__dropzone input--wrapper button margin-bottom" tabindex="0" title="Upload an image">
           <input accept=".png, .jpg, .jpeg, .webp" style="display: none;" tabindex="-1" type="file" />
           <i aria-hidden="true" class="icon-image margin-right-smaller">
           </i>

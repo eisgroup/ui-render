@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { formatNumber, last, round, toPercent } from '../utils'
 import { formatDuration } from '../utils/time'
 import Tooltip from './Tooltip'
+import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /**
  * Slider - Pure Component (no third-party slider library).
@@ -180,7 +181,9 @@ export function Slider ({
   return (
     <div
       className={classNames('app__slider', className, { readonly, disabled, vertical, dragging: activeIdx >= 0 })}
-      {...rest}
+      // DOM boundary (see ./domProps): the spread lands on a generic <div>, so both lists -- `label` and `name` are meaningless
+  // there (the review probe caught `label` reaching this div).
+      {...omitProps(rest, ENGINE_PROPS, FIELD_ONLY_PROPS)}
     >
       <div
         className='app__slider__rail'

@@ -362,21 +362,28 @@ describe('every error-severity check predicts a real engine failure', () => {
     })
 
     /**
-     * §9.4 item 3, plus the `$schema` pointer the published schema is consumed through.
-     * These two are only additive-and-negotiable if declaring them changes nothing, and
-     * "nothing" has to include the DOM: every meta attribute the engine does not consume is
-     * spread onto the resolved component, so before metaToProps stripped them `metaVersion`
-     * rendered as `metaversion="1"` with an unrecognised-prop warning and `$schema` tripped
-     * React's invalid-attribute-name warning. All of it is asserted here, because every part
-     * of it would be a silent regression.
+     * §9.4 item 3, plus the `$schema` pointer the published schema is consumed through, plus
+     * `_comment` — an author annotation the (deliberately open) schema permits anywhere.
+     * These are only additive-and-negotiable if declaring them changes nothing, and "nothing"
+     * has to include the DOM: every meta attribute the engine does not consume is spread onto
+     * the resolved component, so before metaToProps stripped them `metaVersion` rendered as
+     * `metaversion="1"` with an unrecognised-prop warning, `$schema` tripped React's
+     * invalid-attribute-name warning, and `_comment` rendered the author's prose into the page
+     * as a `_comment="…"` attribute with no warning at all (React does not warn on a lowercase
+     * unknown attribute, which is why it survived 2 occurrences deep in the example corpus).
+     * All of it is asserted here, because every part of it would be a silent regression.
      */
     describe('the contract declarations are inert at render time', () => {
         const SCHEMA_REF = './node_modules/eis-ui-render/meta.schema.json'
+        const COMMENT = 'layout for the summary block — keep the two columns in sync'
         const withDeclarations = {
             $schema: SCHEMA_REF,
             metaVersion: '1',
+            _comment: COMMENT,
             view: 'Row',
-            items: [{ $schema: SCHEMA_REF, metaVersion: '1', view: 'Text', children: 'ok' }],
+            items: [{
+                $schema: SCHEMA_REF, metaVersion: '1', _comment: COMMENT, view: 'Text', children: 'ok',
+            }],
         }
         const withoutDeclarations = { view: 'Row', items: [{ view: 'Text', children: 'ok' }] }
 
@@ -387,6 +394,8 @@ describe('every error-severity check predicts a real engine failure', () => {
             expect(run.html).toContain('ok')
             expect(run.html.toLowerCase()).not.toContain('metaversion')
             expect(run.html).not.toContain('schema')
+            expect(run.html).not.toContain('_comment')
+            expect(run.html).not.toContain('summary block')
         })
 
         it('render byte-identically to the same document without them', () => {
@@ -398,7 +407,7 @@ describe('every error-severity check predicts a real engine failure', () => {
 
             const warnings = consoleError.mock.calls
                 .map(args => args.map(String).join(' '))
-                .filter(message => /metaVersion|metaversion|\$schema/.test(message))
+                .filter(message => /metaVersion|metaversion|\$schema|_comment/.test(message))
             expect(warnings).toEqual([])
         })
 
@@ -407,6 +416,7 @@ describe('every error-severity check predicts a real engine failure', () => {
             const hostMeta = {
                 $schema: SCHEMA_REF,
                 metaVersion: '1',
+                _comment: COMMENT,
                 view: 'Row',
                 items: [{ view: 'Text', children: 'ok' }],
             }
@@ -414,6 +424,7 @@ describe('every error-severity check predicts a real engine failure', () => {
 
             expect(hostMeta.metaVersion).toBe('1')
             expect(hostMeta.$schema).toBe(SCHEMA_REF)
+            expect(hostMeta._comment).toBe(COMMENT)
         })
     })
 })

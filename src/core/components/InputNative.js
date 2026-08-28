@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import { noSpellCheck, resizeToContent, toTextHeight, toTextHeightFunc } from './renders'
 import Select from './Select'
+import { ENGINE_PROPS, omitProps } from './domProps'
 
 /**
  * Input - Pure Component.
@@ -101,6 +102,12 @@ export default class InputNative extends PureComponent {
       initialValues,
       ...props
     } = this.props
+    // DOM boundary for the whole input family (<input>, <textarea>, and <select> via Select).
+    // ENGINE_PROPS only, and that is the load-bearing half of the split: `name` is the
+    // react-final-form registration path and the second argument of every onChange below,
+    // `label` is what Select renders as its accessible label — stripping FIELD_ONLY_PROPS
+    // here would break every form silently. See ./domProps.js.
+    props = omitProps(props, ENGINE_PROPS)
     if (disabledSpellCheck) props = {...noSpellCheck, ...props}
     if (resize) {
       // Must use onKeyUp because onKeyDown/onKeyPress does not register `Enter` or fire too many times

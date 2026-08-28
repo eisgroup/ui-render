@@ -1,5 +1,6 @@
 import classNames from '../utils/classNames'
 import React from 'react'
+import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /**
  * View - Pure Component.
@@ -25,13 +26,15 @@ export function View ({
     fill,
     reverse,
     rtl,
-    expanded: _, // not used, remove to prevent warnings
-    translate: _2,
-    onDataChanged: _3,
     ...props
 }) {
+    // DOM boundary: this spread lands on a <div>. `Expand`, `PieChart` and the layout views
+    // all funnel their props through here, which is why `index`, `label`, `name` and
+    // `_comment` used to become attributes. `Expand` keeps reading `this.props.index` for its
+    // onClick payload — the strip is at the edge only. See ./domProps.js.
+    const domProps = omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)
     return <div
-        className={classNames('flex--col', { fill, reverse, rtl, pointer: props.onClick }, className)} {...props}/>
+        className={classNames('flex--col', { fill, reverse, rtl, pointer: props.onClick }, className)} {...domProps}/>
 }
 
 export default React.memo(View)

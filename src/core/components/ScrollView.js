@@ -1,6 +1,7 @@
 import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React, { useRef, useState } from 'react'
+import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /**
  * View with Custom Scroll Bar - Pure Component
@@ -41,6 +42,10 @@ const ScrollView = ({
     }
   }
 
+  // DOM boundary: the inner spread below lands on a <div>. This is the shell every example
+  // renders through, so the engine's own props arrive here. See ./domProps.js.
+  const domProps = omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)
+
   return (
     <div
       ref={thisRef}
@@ -57,7 +62,7 @@ const ScrollView = ({
           {fill, reverse, rtl, pointer: props.onClick, 'margin-auto': center}, classNameInner,
         )}
         style={styleInner}
-        {...props}
+        {...domProps}
       />
     </div>
   )

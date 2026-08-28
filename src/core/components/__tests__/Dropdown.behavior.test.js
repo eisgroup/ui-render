@@ -109,13 +109,37 @@ describe('Dropdown parent value and option contracts', () => {
             options: objectOptions,
             currencyCode: 'EUR',
             onDataChanged: () => {},
+            view: 'Dropdown',
+            index: '2',
+            symbol: '$',
+            _comment: 'a note to the next meta author',
         })
 
         const semanticProps = latestSemanticProps()
         expect(semanticProps).not.toHaveProperty('currencyCode')
         expect(semanticProps).not.toHaveProperty('onDataChanged')
+        expect(semanticProps).not.toHaveProperty('view')
+        expect(semanticProps).not.toHaveProperty('index')
+        expect(semanticProps).not.toHaveProperty('symbol')
+        expect(semanticProps).not.toHaveProperty('_comment')
         // The options still arrive, so nothing else was stripped by accident.
         expect(semanticProps.options).toHaveLength(2)
+    })
+
+    // Semantic declares no `name` prop, so it spread ours onto its <div role="listbox"> — 17
+    // occurrences in the DOM baseline. It is still the value every Dropdown callback reports as its
+    // second argument (covered by the onChange/onSelect/onSearch tests in this file), so this must
+    // hold *without* the prop reaching Semantic. `label` is consumed by the wrapper's own <Text>.
+    it('keeps `name` and `label` out of the props handed to Semantic, and still reports the name', () => {
+        const onChange = jest.fn()
+        renderDropdown({ options: objectOptions, name: 'category', label: 'Category', onChange })
+
+        const semanticProps = latestSemanticProps()
+        expect(semanticProps).not.toHaveProperty('name')
+        expect(semanticProps).not.toHaveProperty('label')
+
+        semanticProps.onChange({}, { value: 'b' })
+        expect(onChange).toHaveBeenCalledWith('b', 'category', {})
     })
 
     it('still stringifies a genuinely object-valued option', () => {

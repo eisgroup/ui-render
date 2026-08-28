@@ -43,6 +43,30 @@ describe('TableView', () => {
         expect(container.textContent).toContain('Beta')
     })
 
+    // Semantic's Table spreads what it does not recognise onto <table>, where `name` is not a
+    // valid attribute — 23 occurrences in the DOM baseline. `this.props.name` still decides
+    // whether rows are wrapped in a FieldArray, so the strip is at the DOM edge only.
+    it('keeps engine props and `name` off the <table> while still binding the FieldArray', () => {
+        const { container } = render(wrap(
+            <TableView
+                items={items}
+                headers={headers}
+                name="orders"
+                view="Table"
+                index="1"
+                symbol="$"
+                _comment="a note to the next meta author"
+                {...defaults}
+            />
+        ))
+
+        const table = container.querySelector('table')
+        expect(table.getAttributeNames().sort()).toEqual(['class'])
+        // A FieldArray renders its children only once it has registered against the form, so
+        // visible row content is the proof that `this.props.name` still reached it.
+        expect(container.textContent).toContain('Alpha')
+    })
+
     it('renders no rows when items is empty', () => {
         const { container } = render(wrap(<TableView items={[]} headers={headers} {...defaults} />))
         expect(container.querySelectorAll('tbody tr').length).toBe(0)

@@ -116,17 +116,30 @@ const renderExample = ({ data, meta }) => {
  * inventory of what the baseline encodes. The snapshot diff is the guard for the
  * rest. Counted entries are the ones worth a number: prolific, or with a history of
  * partial fixes. Also present in the baseline, deliberately left uncounted because
- * pinning a number on each buys maintenance burden rather than signal — every one of
- * them is a facet of the same root cause as the `data="[object Object]"` entry, so
- * that entry's count already moves when the leak is addressed:
+ * pinning a number on each buys maintenance burden rather than signal:
  *
- *   - Lowercase engine-internal props reaching DOM elements. Unlike camelCase ones,
- *     React emits no unknown-prop warning for these, so the registry suite's console
- *     allowlist cannot see them either: bare `view=` (15), `index=` (34), bare
- *     `label=` (6), `symbol=` (23), and meta `_comment=` text rendered into HTML (2).
  *   - Duplicate real ids within one document — three sibling table rows repeat the
  *     same field ids, and each `<label for=…>` can therefore only ever resolve to the
  *     first. The pie chart emits each of its six gradient defs twice.
+ *
+ * The engine-internal props that used to head that list — `view`, `index`, `label`,
+ * `symbol`, `_comment`, `data`, `_data` and 108 of the 165 `name` — are FIXED, and are
+ * now counted-at-zero tripwires below (FIXED_PROP_LEAKS) rather than described in
+ * prose. Two claims made here while they were live were wrong, and are recorded so the
+ * numbers are not re-derived from the same mistakes:
+ *   - they were NOT all "a facet of the same root cause as the data=… entry". There
+ *     were four independent causes: the Render.Method options bag (`transforms.js`,
+ *     which is where `data`/`_data`/`symbol` and 40 `name` came from), meta keys no
+ *     view consumes reaching View/Row/Text, a component building DOM props from a raw
+ *     untransformed meta node (`LocalDraftTableRow` → `view`), and components that
+ *     need `name` but spread it onto a non-form element.
+ *   - `index=` was stated as 34. There were 8. The number came from an unprefixed grep,
+ *     which also matches `tabindex=` — but that is 8 + 31 = 39, not 34, so the 34 was
+ *     measured against an earlier snapshot than the one it was written next to, and no
+ *     version in git history yields it. The lesson is the mechanism, not the arithmetic:
+ *     a RAW marker matches substrings (`'index='` hits `tabindex=`, `'label='` hits
+ *     `aria-label=`, `'data='` would hit `data-testid=`). Markers here are therefore
+ *     space-prefixed, and a new entry must be too.
  */
 const KNOWN_DOM_DEFECTS = [
     {
@@ -144,17 +157,42 @@ const KNOWN_DOM_DEFECTS = [
             + ' junk token reaches the DOM through cn("left", classNameHeader) at TableView.js:246;'
             + ' the "-last" suffix is only meaningful on the "sticky" class.',
     },
-    {
-        marker: 'data="[object Object]"',
-        count: 40,
-        cause: 'the Render.Method renderers in src/core/pages/main/mapper.js destructure only the'
-            + ' render-config keys they use and forward `...props` to renderFloat, which spreads them'
-            + ' onto <Text> (src/core/components/renders.js:149) and from there onto a <span>'
-            + ' (src/core/components/Text.js:47). Engine-internal props leak as DOM attributes —'
-            + ' including the whole `data` object, serialised as "[object Object]", plus `_data` and'
-            + ' the renderer selector `name`.',
-    },
 ]
+
+/**
+ * ENGINE-INTERNAL PROPS THAT MAY NEVER REACH THE DOM AGAIN
+ * -----------------------------------------------------------------------------
+ * The inverse of the ledger above: markers whose count must stay at ZERO. Each was a
+ * measured leak in the first baseline (`data` 40 — the deleted `data="[object Object]"`
+ * ledger entry — `_data` 40, `symbol` 23, `view` 15, `index` 8, `label` 6, `_comment` 2)
+ * and each is now filtered at the DOM boundary by src/core/components/domProps.js, with
+ * `_comment` additionally dropped at source by metaToProps.
+ *
+ * Why a corpus-wide tripwire and not just the snapshots: this family came back four
+ * times, one prop at a time, because each fix lived in one component. React emits no
+ * unknown-prop warning for a lowercase attribute, so nothing in the console reports a
+ * relapse and the registry suite's allowlist cannot see it either — only a count can.
+ *
+ * Markers are SPACE-PREFIXED on purpose; see the note in the header above. Attributes
+ * are serialised one element per line with a space before each, so ' view=' matches an
+ * attribute and cannot match `viewBox=`, `tabindex=` or `aria-label=`.
+ */
+const FIXED_PROP_LEAKS = [' view=', ' index=', ' label=', ' symbol=', ' _comment=', ' data=', ' _data=']
+
+/**
+ * `name` cannot go to zero and must not: it is the react-final-form field registration
+ * path that a form control carries on the DOM. 165 of them were rendered in the first
+ * baseline and 108 were leaks, on <table>, on Semantic's dropdown <div>, on the upload
+ * dropzone, and on every View/Row/Text that happened to carry a data binding. What is
+ * pinned is the invariant instead of the absence: every `name` in the corpus sits on a
+ * form control, and there are 57 of them.
+ */
+// `tags` is the set of elements on which a bound `name` is legitimate, not the set the
+// corpus happens to render today: `InputNative` renders <textarea> and (via Select)
+// <select> with a name, and `Button` deliberately keeps it because <button name> is
+// valid. Listing only 'input' would fail the first example that used a textarea while
+// the code was behaving as designed.
+const BOUND_NAME_ATTRIBUTES = { count: 57, tags: ['input', 'textarea', 'select', 'button'] }
 
 describe('demo example full-DOM contract', () => {
     let consoleError
@@ -234,20 +272,58 @@ describe('demo example full-DOM contract', () => {
         expect(dangling).toEqual([])
     })
 
+    const requireWholeCorpus = (what) => {
+        if (renderedDom.size !== snapshotExamples().length) {
+            throw new Error(
+                `${what} needs every example rendered (have ${renderedDom.size} of`
+                + ` ${snapshotExamples().length}). Run this suite whole; a filtered run cannot count`
+                + ' attribute occurrences.'
+            )
+        }
+    }
+
+    const countAcrossCorpus = (marker) => [...renderedDom.values()]
+        .reduce((total, dom) => total + dom.split(marker).length - 1, 0)
+
+    it.each(FIXED_PROP_LEAKS)('never re-emits the fixed prop leak %s', (marker) => {
+        requireWholeCorpus('the fixed-leak tripwire')
+
+        // A rise from zero means an engine-internal prop is reaching DOM elements again.
+        // Do not add a destructure to whichever component surfaced it — put the prop in
+        // ENGINE_PROPS in src/core/components/domProps.js, which is the boundary.
+        expect(countAcrossCorpus(marker)).toBe(0)
+    })
+
+    it('emits `name` only on a form control, and only where a field binds', () => {
+        requireWholeCorpus('the name-attribute invariant')
+
+        const offenders = []
+        let total = 0
+        for (const [id, dom] of renderedDom) {
+            for (const line of dom.split('\n')) {
+                const occurrences = line.split(' name=').length - 1
+                if (!occurrences) continue
+                total += occurrences
+                const tag = (line.match(/<([a-zA-Z][^\s/>]*)/) || [])[1]
+                if (BOUND_NAME_ATTRIBUTES.tags.indexOf(tag) === -1) {
+                    offenders.push(`${id}: <${tag}> ${line.trim()}`)
+                }
+            }
+        }
+
+        // `name` on anything but a form control is the leak, not the binding. Fix it by
+        // applying FIELD_ONLY_PROPS at that component's DOM boundary — never by stripping
+        // `name` upstream, which silently unbinds every form field.
+        expect(offenders).toEqual([])
+        expect(total).toBe(BOUND_NAME_ATTRIBUTES.count)
+    })
+
     it.each(KNOWN_DOM_DEFECTS)('still emits the known defect $marker $count times', ({ marker, count }) => {
         // The ledger counts across the whole example set, so it is only meaningful
         // once every snapshot above has run. Fail with the reason rather than with a
         // mystery count, which is what a filtered (`-t`) run would otherwise produce.
-        if (renderedDom.size !== snapshotExamples().length) {
-            throw new Error(
-                `the defect ledger needs every example rendered (have ${renderedDom.size} of`
-                + ` ${snapshotExamples().length}). Run this suite whole; a filtered run cannot count`
-                + ' defect occurrences.'
-            )
-        }
+        requireWholeCorpus('the defect ledger')
 
-        const occurrences = [...renderedDom.values()]
-            .reduce((total, dom) => total + dom.split(marker).length - 1, 0)
-        expect(occurrences).toBe(count)
+        expect(countAcrossCorpus(marker)).toBe(count)
     })
 })

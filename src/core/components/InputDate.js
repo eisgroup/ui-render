@@ -10,6 +10,7 @@ import enUs from 'rc-picker/lib/locale/en_US'
 import generateConfig from 'rc-picker/lib/generate/moment'
 import moment from 'moment'
 import { ConfigContext } from '../contexts'
+import { ENGINE_PROPS, omitProps } from './domProps'
 
 const InputDate = ({
     name,
@@ -112,7 +113,9 @@ const InputDate = ({
                     aria-describedby={idHelp}
                     placeholder={translate(placeholder)}
                     generateConfig={generateConfig}
-                    {...props}
+                    // DOM boundary (see ./domProps): the spread reaches rc-picker, which forwards unknown props to its own <input>, so this is
+    // a form-control boundary: ENGINE_PROPS only.
+                    {...omitProps(props, ENGINE_PROPS)}
                     value={value}
                     allowClear={false}
                     locale={enUs}
