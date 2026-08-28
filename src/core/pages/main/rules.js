@@ -24,6 +24,7 @@ import { isEqual } from '../../utils/object'
 import { downloadFile as downloadFileProcessing } from '../../services/downloadFile'
 import { double5, integer, phone, uppercase } from '../../components/inputs/normalizers'
 import { AppContext } from '../../contexts'
+import { ConfigOverride } from '../../providers'
 import Popup from './components/Popup'
 import { getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow } from './dataKindPush'
 
@@ -231,7 +232,16 @@ export class UIRender extends Component {
         methods: type.ObjectOf(type.Method),
         translate: type.Method,
         apiCalls: type.ObjectOf(type.Method),
+        // Configuration published to every rendered component through ConfigContext
+        // (UPGRADE-PLAN §9.4). `dateFormat` takes moment format tokens and applies to every
+        // rendered and edited date; `currency` and `language` are the two values the
+        // application shell turns into CSS classes. @Note: `currency` is NOT
+        // `meta.currencyCode`, which selects the currency symbol used by value renderers.
         dateFormat: type.String,
+        currency: type.String,
+        language: type.String,
+        // Called with a report whenever a node's subtree fails to render (§9.4).
+        onError: type.Method,
     }
 
     constructor (props) {
@@ -324,7 +334,10 @@ export class UIRender extends Component {
     onDataChanged = undefined
 
     render () {
-        const { childBefore, childAfter, form, embedded, className, style, parent, dateFormat } = this.props
+        const {
+            childBefore, childAfter, form, embedded, className, style, parent,
+            dateFormat, currency, language,
+        } = this.props
         const { key } = this.state
 
         const content = this.hasData && this.hasMeta &&
@@ -340,7 +353,6 @@ export class UIRender extends Component {
                 translate={Active.translate}
                 onDataChanged={this.onDataChanged}
                 currencyCode={this.state.currencyCode}
-                dateFormat={dateFormat}
             />
         const Container = embedded ? Fragment : ScrollView
         const props = embedded ? undefined : {
@@ -349,22 +361,29 @@ export class UIRender extends Component {
             style,
         }
 
-        if (parent) {
-            return <Container {...props}>
+        const tree = parent
+            ? <Container {...props}>
                 {childBefore}
                 {(form && !embedded) ? <form onSubmit={this.handleSubmit} {...form}>{content}</form> : content}
                 {childAfter}
             </Container>
-        }
-
-        return (
-            <Container {...props}>
+            : <Container {...props}>
                 {childBefore}
                 {(form && !embedded) ? (content ||
                     <form onSubmit={this.handleSubmit} {...form}>{content}</form>) : content}
                 {childAfter}
                 <Popup />
             </Container>
+
+        // The configuration props are published here, around the whole subtree, rather than
+        // threaded down as props: components read them from `ConfigContext`, and a prop on
+        // every node would be spread onto components and leak into the DOM. Wrapping the
+        // engine (not only the library entry point) is what makes the props work for a host
+        // that mounts this component directly — the demo does, and so do the harnesses.
+        return (
+            <ConfigOverride dateFormat={dateFormat} currency={currency} language={language}>
+                {tree}
+            </ConfigOverride>
         )
     }
 }

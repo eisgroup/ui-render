@@ -3,8 +3,8 @@
 exports[`demo example full-DOM contract all renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col border-bottom" currencycode="USD">
-      <div class="flex--col app__expand" currencycode="USD" id="undefined">
+    <div class="flex--col border-bottom">
+      <div class="flex--col app__expand" id="undefined">
         <span class="text pointer row fill-width middle padding-small bg-white">
           <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
           </i>
@@ -15,11 +15,11 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
           </div>
         </div>
       </div>
-      <div class="flex--col app__expand expanded" currencycode="USD" id="undefined">
+      <div class="flex--col app__expand expanded" id="undefined">
         <span class="text pointer row fill-width middle padding-small bg-white">
           <i aria-hidden="true" class="icon-chevron-down spin-90-deg">
           </i>
-          <div class="flex--row wrap middle fill-width" currencycode="USD">
+          <div class="flex--row wrap middle fill-width">
             <span class="text margin-right-small">
               "Rate Details"
             </span>
@@ -80,7 +80,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
         </span>
         <div class="position-relative expand__content padding-h" style="display: grid; grid-template-rows: 1fr; transition: grid-template-rows 500ms ease;">
           <div style="min-height: 0; overflow: hidden;">
-            <div class="flex--row wrap middle padding-h" currencycode="USD">
+            <div class="flex--row wrap middle padding-h">
               <span class="text h3">
                 "Record ID"
               </span>
@@ -164,17 +164,17 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                 </div>
                 <div class="overflow-scroll flex--col max-height fill tabs__content fade-in">
                   <div class="flex--col min-height fill">
-                    <div class="flex--col padding-v" currencycode="USD">
+                    <div class="flex--col padding-v">
                       <span class="text h3">
                         "Summary"
                       </span>
-                      <div class="flex--row wrap" currencycode="USD">
-                        <div class="flex--row fill bg-white border radius center" currencycode="USD">
-                          <label class="position-top-left padding-large bold" currencycode="USD">
+                      <div class="flex--row wrap">
+                        <div class="flex--row fill bg-white border radius center">
+                          <label class="position-top-left padding-large bold">
                             "By Age"
                           </label>
                           <div class="flex--row app__pie-chart--ref middle center wrap">
-                            <div class="flex--col app__pie-chart min-width-290 center gradient" currencycode="USD" name="optionCalculations.0.manualRequestDetail.ageBreakdown">
+                            <div class="flex--col app__pie-chart min-width-290 center gradient" name="optionCalculations.0.manualRequestDetail.ageBreakdown">
                               <div class="app__pie-chart__svg" style="position: relative; width: 100%; height: 290px;">
                                 <svg height="290" role="img" width="290">
                                   <defs>
@@ -262,7 +262,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                 </svg>
                               </div>
                               <div class="flex--col position-center center fade-in-slow">
-                                <div class="flex--col align-center" currencycode="USD">
+                                <div class="flex--col align-center">
                                   <span class="text h3">
                                     "Label"
                                   </span>
@@ -328,14 +328,14 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                             </div>
                           </div>
                         </div>
-                        <div class="flex--col space visible-from-tablet" currencycode="USD">
+                        <div class="flex--col space visible-from-tablet">
                         </div>
-                        <div class="flex--row fill bg-white border radius center" currencycode="USD">
-                          <label class="position-top-left padding-large bold" currencycode="USD">
+                        <div class="flex--row fill bg-white border radius center">
+                          <label class="position-top-left padding-large bold">
                             "By Enrollment"
                           </label>
                           <div class="flex--row app__pie-chart--ref middle center wrap">
-                            <div class="flex--col app__pie-chart min-width-290 center gradient" currencycode="USD" name="optionCalculations.0.subGroupEnrollmentBreakdown[0].enrollmentBreakdown">
+                            <div class="flex--col app__pie-chart min-width-290 center gradient" name="optionCalculations.0.subGroupEnrollmentBreakdown[0].enrollmentBreakdown">
                               <div class="app__pie-chart__svg" style="position: relative; width: 100%; height: 290px;">
                                 <svg height="290" role="img" width="290">
                                   <defs>
@@ -406,7 +406,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                       <div>
                         <div class="overflow-scroll flex--row max-width">
                           <div class="flex--row min-width fill-width">
-                            <table class="ui table full-width" currencycode="USD" name="optionCalculations.0.manualRequestDetail.enrollmentByState">
+                            <table class="ui table full-width" name="optionCalculations.0.manualRequestDetail.enrollmentByState">
                               <thead class="font-normal">
                                 <tr class="">
                                   <th class="left">
@@ -433,7 +433,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                   <th class="left">
                                     <div class="flex--row middle">
                                       <div class="flex--row checkbox--wrapper">
-                                        <input checked="" class="checkbox checkbox" currencycode="USD" id="checkbox-Expand-All" type="checkbox" />
+                                        <input checked="" class="checkbox checkbox" id="checkbox-Expand-All" type="checkbox" />
                                         <label class="flex--row middle justify" for="checkbox-Expand-All">
                                           "Expand All"
                                         </label>
@@ -445,7 +445,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                               <tbody class="">
                                 <tr class="">
                                   <td class="-last">
-                                    <div class="flex--col app__expand expanded" currencycode="USD" id="undefined" index="0" name="NV">
+                                    <div class="flex--col app__expand expanded" id="undefined" index="0" name="NV">
                                       <span class="text pointer row fill-width middle padding-small">
                                         <i aria-hidden="true" class="icon-chevron-down spin-90-deg">
                                         </i>
@@ -479,7 +479,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                     <div>
                                       <div class="overflow-scroll flex--row max-width">
                                         <div class="flex--row min-width fill-width">
-                                          <table class="ui table full-width" currencycode="USD" name="optionCalculations.0.manualRequestDetail.enrollmentByMSA">
+                                          <table class="ui table full-width" name="optionCalculations.0.manualRequestDetail.enrollmentByMSA">
                                             <thead class="font-normal">
                                               <tr class="">
                                                 <th class="left">
@@ -645,7 +645,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                 </tr>
                                 <tr class="">
                                   <td class="-last">
-                                    <div class="flex--col app__expand expanded" currencycode="USD" id="undefined" index="1" name="WS">
+                                    <div class="flex--col app__expand expanded" id="undefined" index="1" name="WS">
                                       <span class="text pointer row fill-width middle padding-small">
                                         <i aria-hidden="true" class="icon-chevron-down spin-90-deg">
                                         </i>
@@ -679,7 +679,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                     <div>
                                       <div class="overflow-scroll flex--row max-width">
                                         <div class="flex--row min-width fill-width">
-                                          <table class="ui table full-width" currencycode="USD" name="optionCalculations.0.manualRequestDetail.enrollmentByMSA">
+                                          <table class="ui table full-width" name="optionCalculations.0.manualRequestDetail.enrollmentByMSA">
                                             <thead class="font-normal">
                                               <tr class="">
                                                 <th class="left">
@@ -813,8 +813,8 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
 exports[`demo example full-DOM contract buttonDownload renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <button class="button" currencycode="USD" type="button">
-      <i aria-hidden="true" class="icon-file-download margin-right-smaller" currencycode="USD">
+    <button class="button" type="button">
+      <i aria-hidden="true" class="icon-file-download margin-right-smaller">
       </i>
       <span class="text">
         "Download File Template"
@@ -827,8 +827,8 @@ exports[`demo example full-DOM contract buttonDownload renders a stable, non-emp
 exports[`demo example full-DOM contract buttonIcon renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <button class="button" currencycode="USD" type="button">
-      <i aria-hidden="true" class="icon-trash" currencycode="USD">
+    <button class="button" type="button">
+      <i aria-hidden="true" class="icon-trash">
       </i>
     </button>
   </div>
@@ -838,8 +838,8 @@ exports[`demo example full-DOM contract buttonIcon renders a stable, non-empty D
 exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col padding" currencycode="USD">
-      <div class="flex--row middle" currencycode="USD">
+    <div class="flex--col padding">
+      <div class="flex--row middle">
         <span class="text">
           <span _data="0.7123456789" class="text" data="[object Object]" name="Float" symbol="$">
             "0"
@@ -852,7 +852,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
           " → Float without truncating"
         </span>
       </div>
-      <div class="flex--row middle" currencycode="USD">
+      <div class="flex--row middle">
         <span class="text">
           <div class="flex--row">
             <span class="text margin-right-smallest">
@@ -870,7 +870,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
           " → Currency with 5 decimals truncated without rounding"
         </span>
       </div>
-      <div class="flex--row middle" currencycode="USD">
+      <div class="flex--row middle">
         <span class="text">
           <span _data="0.7123456789" class="text" data="[object Object]" name="Float" symbol="$">
             "0"
@@ -883,7 +883,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
           " → Float with 5 decimals truncated without rounding"
         </span>
       </div>
-      <div class="flex--row middle" currencycode="USD">
+      <div class="flex--row middle">
         <span class="text">
           <span _data="0.7123456789" class="text" data="[object Object]" name="Float" symbol="$">
             "0"
@@ -894,7 +894,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
           " → Float with 5 decimals rounded, and no fraction fading"
         </span>
       </div>
-      <div class="flex--row middle" currencycode="USD">
+      <div class="flex--row middle">
         <span class="text h6">
           <span _data="0.999999999" class="text" data="[object Object]" name="Float" symbol="$">
             "1"
@@ -907,7 +907,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
       <div>
         <div class="overflow-scroll flex--row max-width">
           <div class="flex--row min-width fill-width">
-            <table class="ui table full-width" currencycode="USD" name="categories">
+            <table class="ui table full-width" name="categories">
               <thead class="font-normal">
                 <tr class="">
                   <th class="left">
@@ -955,7 +955,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
           </div>
         </div>
       </div>
-      <div class="flex--row middle" currencycode="USD">
+      <div class="flex--row middle">
         <span class="text h3">
           <div class="flex--row">
             <span _data="0.7123456789" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -1009,10 +1009,10 @@ exports[`demo example full-DOM contract dropdown renders a stable, non-empty DOM
 exports[`demo example full-DOM contract dropdownExperience renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col bg-white" currencycode="USD">
-      <div class="flex--col margin" currencycode="USD">
-        <div class="flex--col padding-top margin-top" currencycode="USD">
-          <div class="flex--row" currencycode="USD">
+    <div class="flex--col bg-white">
+      <div class="flex--col margin">
+        <div class="flex--col padding-top margin-top">
+          <div class="flex--row">
             <span class="text h5 padding-right middle">
               "Option"
             </span>
@@ -1038,7 +1038,7 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
               </div>
             </div>
           </div>
-          <div class="flex--row" currencycode="USD">
+          <div class="flex--row">
             <span class="text h5 padding-right middle">
               "Category"
             </span>
@@ -1069,12 +1069,12 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
               </div>
             </div>
           </div>
-          <div class="flex--row padding-top" currencycode="USD">
-            <div class="flex--col padding-right width-50p" currencycode="USD">
+          <div class="flex--row padding-top">
+            <div class="flex--col padding-right width-50p">
               <div>
                 <div class="overflow-scroll flex--row max-width">
                   <div class="flex--row min-width fill-width">
-                    <table class="ui table full-width vertical" currencycode="USD" name="RecordInputs.OptionInputs.0.CategoryInputs">
+                    <table class="ui table full-width vertical" name="RecordInputs.OptionInputs.0.CategoryInputs">
                       <thead class="font-normal">
                       </thead>
                       <tbody class="">
@@ -1185,7 +1185,7 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
 exports[`demo example full-DOM contract expandList renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col app__expand" currencycode="USD" id="undefined" name="categories">
+    <div class="flex--col app__expand" id="undefined" name="categories">
       <span class="text pointer row fill-width middle padding-small">
         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
         </i>
@@ -1198,7 +1198,7 @@ exports[`demo example full-DOM contract expandList renders a stable, non-empty D
         </div>
       </div>
     </div>
-    <div class="flex--col app__expand" currencycode="USD" id="undefined" name="categories">
+    <div class="flex--col app__expand" id="undefined" name="categories">
       <span class="text pointer row fill-width middle padding-small">
         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
         </i>
@@ -1227,7 +1227,7 @@ exports[`demo example full-DOM contract input renders a stable, non-empty DOM ma
       <div class="flex--row input icon lefty unit">
         <i aria-hidden="true" class="icon-dollar">
         </i>
-        <input aria-describedby="categories.0.annualAmount-help" aria-invalid="false" aria-required="true" currencycode="USD" id="categories.0.annualAmount" inputmode="decimal" name="categories.0.annualAmount" placeholder="Enter amount..." required="" step="0.1" type="text" value="" />
+        <input aria-invalid="false" aria-required="true" id="categories.0.annualAmount" inputmode="decimal" name="categories.0.annualAmount" placeholder="Enter amount..." required="" step="0.1" type="text" value="" />
       </div>
     </div>
   </div>
@@ -1237,7 +1237,7 @@ exports[`demo example full-DOM contract input renders a stable, non-empty DOM ma
 exports[`demo example full-DOM contract inputIntegerMin0 renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col" currencycode="USD">
+    <div class="flex--col">
       <span class="text">
         "Integer ≥ 0 (min: 0, outputFormat.decimals: 0). Try typing '-' or '.' — they should not appear. Paste '-5' — should be rejected. Type '12.5' or '-3' before tabbing out — value is clamped to min on blur."
       </span>
@@ -1248,7 +1248,7 @@ exports[`demo example full-DOM contract inputIntegerMin0 renders a stable, non-e
           </label>
         </div>
         <div class="flex--row input">
-          <input aria-describedby="exposure-help" aria-invalid="false" currencycode="USD" id="exposure" inputmode="decimal" name="exposure" placeholder="Whole number ≥ 0" type="text" value="12" />
+          <input aria-invalid="false" id="exposure" inputmode="decimal" name="exposure" placeholder="Whole number ≥ 0" type="text" value="12" />
         </div>
       </div>
       <span class="text">
@@ -1261,7 +1261,7 @@ exports[`demo example full-DOM contract inputIntegerMin0 renders a stable, non-e
           </label>
         </div>
         <div class="flex--row input">
-          <input aria-describedby="free-help" aria-invalid="false" currencycode="USD" id="free" inputmode="decimal" name="free" placeholder="Any number" type="text" value="0" />
+          <input aria-invalid="false" id="free" inputmode="decimal" name="free" placeholder="Any number" type="text" value="0" />
         </div>
       </div>
     </div>
@@ -1272,9 +1272,9 @@ exports[`demo example full-DOM contract inputIntegerMin0 renders a stable, non-e
 exports[`demo example full-DOM contract inputToggle renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--row" currencycode="USD">
+    <div class="flex--row">
       <div class="flex--row checkbox--wrapper margin">
-        <input checked="" class="checkbox toggle" currencycode="USD" id="checkbox-Label-(used-if-\`labelTrue\`-or-\`labelFalse\`-undefined)" type="checkbox" />
+        <input checked="" class="checkbox toggle" id="checkbox-Label-(used-if-\`labelTrue\`-or-\`labelFalse\`-undefined)" type="checkbox" />
         <label class="flex--row middle justify" for="checkbox-Label-(used-if-\`labelTrue\`-or-\`labelFalse\`-undefined)">
           <div class="flex--col checkbox__true">
             "True Label"
@@ -1286,9 +1286,9 @@ exports[`demo example full-DOM contract inputToggle renders a stable, non-empty 
           </div>
         </label>
       </div>
-      <div class="flex--row middle" currencycode="USD">
+      <div class="flex--row middle">
         <div class="flex--row checkbox--wrapper margin-right-smaller">
-          <input class="checkbox toggle" currencycode="USD" id="toggleShowExperienceRating" type="checkbox" />
+          <input class="checkbox toggle" id="toggleShowExperienceRating" type="checkbox" />
           <label class="flex--row middle justify" for="toggleShowExperienceRating">
             <div class="flex--col checkbox__true">
               " "
@@ -1300,7 +1300,7 @@ exports[`demo example full-DOM contract inputToggle renders a stable, non-empty 
             </div>
           </label>
         </div>
-        <label class="bold pointer" currencycode="USD" for="toggleShowExperienceRating">
+        <label class="bold pointer" for="toggleShowExperienceRating">
           "Experience Rating"
         </label>
       </div>
@@ -1312,8 +1312,8 @@ exports[`demo example full-DOM contract inputToggle renders a stable, non-empty 
 exports[`demo example full-DOM contract invalidArray renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col border radius" currencycode="USD" label="MainLayout">
-      <div class="flex--row justify padding border-top" currencycode="USD" label="PlanList">
+    <div class="flex--col border radius" label="MainLayout">
+      <div class="flex--row justify padding border-top" label="PlanList">
         <span class="text">
           "Plans"
         </span>
@@ -1329,14 +1329,14 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
           </div>
         </div>
       </div>
-      <div class="flex--col border radius" currencycode="USD" label="Category">
+      <div class="flex--col border radius" label="Category">
         <span class="text h3 padding">
           "Category Summary"
         </span>
         <div>
           <div class="overflow-scroll flex--row max-width">
             <div class="flex--row min-width fill-width">
-              <table class="ui table full-width" currencycode="USD" name="categoriesDetails">
+              <table class="ui table full-width" name="categoriesDetails">
                 <thead class="font-normal">
                   <tr class="">
                     <th class="left">
@@ -1376,12 +1376,12 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
           </div>
         </div>
       </div>
-      <div class="flex--col border radius" currencycode="USD" label="CensusSummary">
+      <div class="flex--col border radius" label="CensusSummary">
         <span class="text h3 padding">
           "Census Summary"
         </span>
         <div class="flex--row app__pie-chart--ref middle center wrap">
-          <div class="flex--col app__pie-chart min-width-290 center gradient" currencycode="USD" name="censusSummary.censusByAgeBand">
+          <div class="flex--col app__pie-chart min-width-290 center gradient" name="censusSummary.censusByAgeBand">
             <div class="app__pie-chart__svg" style="position: relative; width: 100%; height: 290px;">
               <svg height="290" role="img" width="290">
                 <defs>
@@ -1405,7 +1405,7 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
         <div>
           <div class="overflow-scroll flex--row max-width">
             <div class="flex--row min-width fill-width">
-              <table class="ui table full-width" currencycode="USD" name="censusSummary.censusByClass">
+              <table class="ui table full-width" name="censusSummary.censusByClass">
                 <thead class="font-normal">
                   <tr class="">
                     <th class="left">
@@ -1460,8 +1460,8 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
 exports[`demo example full-DOM contract layout renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col padding" currencycode="USD">
-      <div class="flex--col" currencycode="USD" label="Dynamic Layout">
+    <div class="flex--col padding">
+      <div class="flex--col" label="Dynamic Layout">
         <div class="flex--col input--wrapper fill-width">
           <div aria-expanded="false" class="ui selection dropdown" name="layout" role="listbox" tabindex="0">
             <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
@@ -1483,7 +1483,7 @@ exports[`demo example full-DOM contract layout renders a stable, non-empty DOM m
             </div>
           </div>
         </div>
-        <div class="flex--row" currencycode="USD">
+        <div class="flex--row">
           <span class="text h3">
             "Plan chosen:"
           </span>
@@ -1507,7 +1507,7 @@ exports[`demo example full-DOM contract layout renders a stable, non-empty DOM m
             </div>
             <div class="overflow-scroll flex--col max-height fill tabs__content fade-in">
               <div class="flex--col min-height fill">
-                <div class="flex--row bg-primary" currencycode="USD" style="display: block; width: 100px; height: 100px;">
+                <div class="flex--row bg-primary" style="display: block; width: 100px; height: 100px;">
                 </div>
               </div>
             </div>
@@ -1523,8 +1523,8 @@ exports[`demo example full-DOM contract list renders a stable, non-empty DOM mat
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
     <div class="flex--row justify wrap" name="categories">
-      <div class="flex--col" currencycode="USD">
-        <div class="flex--col margin-bottom-small radius" currencycode="USD">
+      <div class="flex--col">
+        <div class="flex--col margin-bottom-small radius">
           <span class="text h3 padding no-margin">
             "Cost Summary"
           </span>
@@ -1535,11 +1535,11 @@ exports[`demo example full-DOM contract list renders a stable, non-empty DOM mat
               </label>
             </div>
             <div class="flex--row input">
-              <input aria-describedby="categories[0].memberAnnualPremium-help" aria-invalid="false" currencycode="USD" id="categories[0].memberAnnualPremium" inputmode="decimal" name="categories[0].memberAnnualPremium" type="text" value="378" />
+              <input aria-invalid="false" id="categories[0].memberAnnualPremium" inputmode="decimal" name="categories[0].memberAnnualPremium" type="text" value="378" />
             </div>
           </div>
-          <div class="flex--col border radius" currencycode="USD">
-            <div class="flex--row justify padding" currencycode="USD">
+          <div class="flex--col border radius">
+            <div class="flex--row justify padding">
               <span class="text">
                 "Annual Rate"
               </span>
@@ -1557,8 +1557,8 @@ exports[`demo example full-DOM contract list renders a stable, non-empty DOM mat
           </div>
         </div>
       </div>
-      <div class="flex--col" currencycode="USD">
-        <div class="flex--col margin-bottom-small radius" currencycode="USD">
+      <div class="flex--col">
+        <div class="flex--col margin-bottom-small radius">
           <span class="text h3 padding no-margin">
             "Cost Summary"
           </span>
@@ -1569,11 +1569,11 @@ exports[`demo example full-DOM contract list renders a stable, non-empty DOM mat
               </label>
             </div>
             <div class="flex--row input">
-              <input aria-describedby="categories[1].memberAnnualPremium-help" aria-invalid="false" currencycode="USD" id="categories[1].memberAnnualPremium" inputmode="decimal" name="categories[1].memberAnnualPremium" type="text" value="478" />
+              <input aria-invalid="false" id="categories[1].memberAnnualPremium" inputmode="decimal" name="categories[1].memberAnnualPremium" type="text" value="478" />
             </div>
           </div>
-          <div class="flex--col border radius" currencycode="USD">
-            <div class="flex--row justify padding" currencycode="USD">
+          <div class="flex--col border radius">
+            <div class="flex--row justify padding">
               <span class="text">
                 "Annual Rate"
               </span>
@@ -1599,14 +1599,14 @@ exports[`demo example full-DOM contract list renders a stable, non-empty DOM mat
 exports[`demo example full-DOM contract nestedDataKind renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col padding left" currencycode="USD">
+    <div class="flex--col padding left">
       <span class="text margin-v-small">
         "Nested dataKind: parent phases add/remove; each phase expands to line items (add/remove there). New phase draft is only title + budget — add lines after the phase row exists (nested form binding does not work inside the parent draft)."
       </span>
       <div>
         <div class="overflow-scroll flex--row max-width">
           <div class="flex--row min-width fill-width">
-            <table class="ui table full-width outline margin-v" currencycode="USD" name="dataKind.phases">
+            <table class="ui table full-width outline margin-v" name="dataKind.phases">
               <thead class="font-normal">
                 <tr class="">
                   <th class="left padding-left-small border-right">
@@ -1633,28 +1633,28 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
               </thead>
               <tbody class="">
                 <tr class="">
-                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                  <td class="no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover border-right done">
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input aria-describedby="dataKind.phases[0].title-help" currencycode="USD" id="dataKind.phases[0].title" name="dataKind.phases[0].title" type="text" value="Design" />
+                        <input id="dataKind.phases[0].title" name="dataKind.phases[0].title" type="text" value="Design" />
                       </div>
                     </div>
                   </td>
-                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                  <td class="no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover border-right done">
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input aria-describedby="dataKind.phases[0].budget-help" aria-invalid="false" currencycode="USD" id="dataKind.phases[0].budget" inputmode="decimal" name="dataKind.phases[0].budget" type="text" value="5000" />
+                        <input aria-invalid="false" id="dataKind.phases[0].budget" inputmode="decimal" name="dataKind.phases[0].budget" type="text" value="5000" />
                       </div>
                     </div>
                   </td>
-                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
-                    <div class="flex--col" currencycode="USD">
-                      <button class="button a transparent" currencycode="USD" type="button">
-                        <i aria-hidden="true" class="icon-trash" currencycode="USD">
+                  <td class="no-border-right-last-item" style="vertical-align: top;">
+                    <div class="flex--col">
+                      <button class="button a transparent" type="button">
+                        <i aria-hidden="true" class="icon-trash">
                         </i>
                       </button>
                     </div>
@@ -1662,11 +1662,11 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                 </tr>
                 <tr class="">
                   <td class="" colspan="3">
-                    <div class="flex--col padding-small padding-top-none" currencycode="USD">
+                    <div class="flex--col padding-small padding-top-none">
                       <div>
                         <div class="overflow-scroll flex--row max-width">
                           <div class="flex--row min-width fill-width">
-                            <table class="ui table full-width margin-v no-border" currencycode="USD" name="dataKind.lineItems">
+                            <table class="ui table full-width margin-v no-border" name="dataKind.lineItems">
                               <thead class="font-normal">
                                 <tr class="">
                                   <th class="left padding-left-small border-right">
@@ -1707,92 +1707,92 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                               </thead>
                               <tbody class="">
                                 <tr class="">
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.0.dataKind.lineItems[0].sku-help" currencycode="USD" id="dataKind.phases.0.dataKind.lineItems[0].sku" name="dataKind.phases.0.dataKind.lineItems[0].sku" type="text" value="DES-001" />
+                                        <input id="dataKind.phases.0.dataKind.lineItems[0].sku" name="dataKind.phases.0.dataKind.lineItems[0].sku" type="text" value="DES-001" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.0.dataKind.lineItems[0].description-help" currencycode="USD" id="dataKind.phases.0.dataKind.lineItems[0].description" name="dataKind.phases.0.dataKind.lineItems[0].description" type="text" value="Wireframes" />
+                                        <input id="dataKind.phases.0.dataKind.lineItems[0].description" name="dataKind.phases.0.dataKind.lineItems[0].description" type="text" value="Wireframes" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.0.dataKind.lineItems[0].qty-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.0.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[0].qty" type="text" value="10" />
+                                        <input aria-invalid="false" id="dataKind.phases.0.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[0].qty" type="text" value="10" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.0.dataKind.lineItems[0].unitPrice-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.0.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[0].unitPrice" type="text" value="150" />
+                                        <input aria-invalid="false" id="dataKind.phases.0.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[0].unitPrice" type="text" value="150" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
-                                    <div class="flex--col" currencycode="USD">
-                                      <button class="button a transparent" currencycode="USD" type="button">
-                                        <i aria-hidden="true" class="icon-trash" currencycode="USD">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
+                                    <div class="flex--col">
+                                      <button class="button a transparent" type="button">
+                                        <i aria-hidden="true" class="icon-trash">
                                         </i>
                                       </button>
                                     </div>
                                   </td>
                                 </tr>
                                 <tr class="">
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.0.dataKind.lineItems[1].sku-help" currencycode="USD" id="dataKind.phases.0.dataKind.lineItems[1].sku" name="dataKind.phases.0.dataKind.lineItems[1].sku" type="text" value="DES-002" />
+                                        <input id="dataKind.phases.0.dataKind.lineItems[1].sku" name="dataKind.phases.0.dataKind.lineItems[1].sku" type="text" value="DES-002" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.0.dataKind.lineItems[1].description-help" currencycode="USD" id="dataKind.phases.0.dataKind.lineItems[1].description" name="dataKind.phases.0.dataKind.lineItems[1].description" type="text" value="Mockups" />
+                                        <input id="dataKind.phases.0.dataKind.lineItems[1].description" name="dataKind.phases.0.dataKind.lineItems[1].description" type="text" value="Mockups" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.0.dataKind.lineItems[1].qty-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.0.dataKind.lineItems[1].qty" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[1].qty" type="text" value="5" />
+                                        <input aria-invalid="false" id="dataKind.phases.0.dataKind.lineItems[1].qty" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[1].qty" type="text" value="5" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.0.dataKind.lineItems[1].unitPrice-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.0.dataKind.lineItems[1].unitPrice" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[1].unitPrice" type="text" value="200" />
+                                        <input aria-invalid="false" id="dataKind.phases.0.dataKind.lineItems[1].unitPrice" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[1].unitPrice" type="text" value="200" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
-                                    <div class="flex--col" currencycode="USD">
-                                      <button class="button a transparent" currencycode="USD" type="button">
-                                        <i aria-hidden="true" class="icon-trash" currencycode="USD">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
+                                    <div class="flex--col">
+                                      <button class="button a transparent" type="button">
+                                        <i aria-hidden="true" class="icon-trash">
                                         </i>
                                       </button>
                                     </div>
@@ -1804,7 +1804,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="sku-help" id="sku" name="sku" type="text" value="" view="Input" />
+                                        <input id="sku" name="sku" type="text" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -1813,7 +1813,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="description-help" id="description" name="description" type="text" value="" view="Input" />
+                                        <input id="description" name="description" type="text" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -1822,7 +1822,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="qty-help" id="qty" name="qty" type="number" value="" view="Input" />
+                                        <input id="qty" name="qty" type="number" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -1831,7 +1831,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="unitPrice-help" id="unitPrice" name="unitPrice" type="number" value="" view="Input" />
+                                        <input id="unitPrice" name="unitPrice" type="number" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -1850,28 +1850,28 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                   </td>
                 </tr>
                 <tr class="">
-                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                  <td class="no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover border-right done">
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input aria-describedby="dataKind.phases[1].title-help" currencycode="USD" id="dataKind.phases[1].title" name="dataKind.phases[1].title" type="text" value="Development" />
+                        <input id="dataKind.phases[1].title" name="dataKind.phases[1].title" type="text" value="Development" />
                       </div>
                     </div>
                   </td>
-                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                  <td class="no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover border-right done">
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input aria-describedby="dataKind.phases[1].budget-help" aria-invalid="false" currencycode="USD" id="dataKind.phases[1].budget" inputmode="decimal" name="dataKind.phases[1].budget" type="text" value="15000" />
+                        <input aria-invalid="false" id="dataKind.phases[1].budget" inputmode="decimal" name="dataKind.phases[1].budget" type="text" value="15000" />
                       </div>
                     </div>
                   </td>
-                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
-                    <div class="flex--col" currencycode="USD">
-                      <button class="button a transparent" currencycode="USD" type="button">
-                        <i aria-hidden="true" class="icon-trash" currencycode="USD">
+                  <td class="no-border-right-last-item" style="vertical-align: top;">
+                    <div class="flex--col">
+                      <button class="button a transparent" type="button">
+                        <i aria-hidden="true" class="icon-trash">
                         </i>
                       </button>
                     </div>
@@ -1879,11 +1879,11 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                 </tr>
                 <tr class="">
                   <td class="" colspan="3">
-                    <div class="flex--col padding-small padding-top-none" currencycode="USD">
+                    <div class="flex--col padding-small padding-top-none">
                       <div>
                         <div class="overflow-scroll flex--row max-width">
                           <div class="flex--row min-width fill-width">
-                            <table class="ui table full-width margin-v no-border" currencycode="USD" name="dataKind.lineItems">
+                            <table class="ui table full-width margin-v no-border" name="dataKind.lineItems">
                               <thead class="font-normal">
                                 <tr class="">
                                   <th class="left padding-left-small border-right">
@@ -1924,138 +1924,138 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                               </thead>
                               <tbody class="">
                                 <tr class="">
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[0].sku-help" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[0].sku" name="dataKind.phases.1.dataKind.lineItems[0].sku" type="text" value="DEV-001" />
+                                        <input id="dataKind.phases.1.dataKind.lineItems[0].sku" name="dataKind.phases.1.dataKind.lineItems[0].sku" type="text" value="DEV-001" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[0].description-help" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[0].description" name="dataKind.phases.1.dataKind.lineItems[0].description" type="text" value="Frontend" />
+                                        <input id="dataKind.phases.1.dataKind.lineItems[0].description" name="dataKind.phases.1.dataKind.lineItems[0].description" type="text" value="Frontend" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[0].qty-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[0].qty" type="text" value="40" />
+                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[0].qty" type="text" value="40" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[0].unitPrice-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[0].unitPrice" type="text" value="175" />
+                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[0].unitPrice" type="text" value="175" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
-                                    <div class="flex--col" currencycode="USD">
-                                      <button class="button a transparent" currencycode="USD" type="button">
-                                        <i aria-hidden="true" class="icon-trash" currencycode="USD">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
+                                    <div class="flex--col">
+                                      <button class="button a transparent" type="button">
+                                        <i aria-hidden="true" class="icon-trash">
                                         </i>
                                       </button>
                                     </div>
                                   </td>
                                 </tr>
                                 <tr class="">
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[1].sku-help" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[1].sku" name="dataKind.phases.1.dataKind.lineItems[1].sku" type="text" value="DEV-002" />
+                                        <input id="dataKind.phases.1.dataKind.lineItems[1].sku" name="dataKind.phases.1.dataKind.lineItems[1].sku" type="text" value="DEV-002" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[1].description-help" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[1].description" name="dataKind.phases.1.dataKind.lineItems[1].description" type="text" value="Backend" />
+                                        <input id="dataKind.phases.1.dataKind.lineItems[1].description" name="dataKind.phases.1.dataKind.lineItems[1].description" type="text" value="Backend" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[1].qty-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[1].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[1].qty" type="text" value="30" />
+                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[1].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[1].qty" type="text" value="30" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[1].unitPrice-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[1].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[1].unitPrice" type="text" value="200" />
+                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[1].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[1].unitPrice" type="text" value="200" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
-                                    <div class="flex--col" currencycode="USD">
-                                      <button class="button a transparent" currencycode="USD" type="button">
-                                        <i aria-hidden="true" class="icon-trash" currencycode="USD">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
+                                    <div class="flex--col">
+                                      <button class="button a transparent" type="button">
+                                        <i aria-hidden="true" class="icon-trash">
                                         </i>
                                       </button>
                                     </div>
                                   </td>
                                 </tr>
                                 <tr class="">
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[2].sku-help" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[2].sku" name="dataKind.phases.1.dataKind.lineItems[2].sku" type="text" value="DEV-003" />
+                                        <input id="dataKind.phases.1.dataKind.lineItems[2].sku" name="dataKind.phases.1.dataKind.lineItems[2].sku" type="text" value="DEV-003" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[2].description-help" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[2].description" name="dataKind.phases.1.dataKind.lineItems[2].description" type="text" value="Database setup" />
+                                        <input id="dataKind.phases.1.dataKind.lineItems[2].description" name="dataKind.phases.1.dataKind.lineItems[2].description" type="text" value="Database setup" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[2].qty-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[2].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[2].qty" type="text" value="15" />
+                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[2].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[2].qty" type="text" value="15" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.1.dataKind.lineItems[2].unitPrice-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.1.dataKind.lineItems[2].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[2].unitPrice" type="text" value="190" />
+                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[2].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[2].unitPrice" type="text" value="190" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
-                                    <div class="flex--col" currencycode="USD">
-                                      <button class="button a transparent" currencycode="USD" type="button">
-                                        <i aria-hidden="true" class="icon-trash" currencycode="USD">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
+                                    <div class="flex--col">
+                                      <button class="button a transparent" type="button">
+                                        <i aria-hidden="true" class="icon-trash">
                                         </i>
                                       </button>
                                     </div>
@@ -2067,7 +2067,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="sku-help" id="sku" name="sku" type="text" value="" view="Input" />
+                                        <input id="sku" name="sku" type="text" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -2076,7 +2076,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="description-help" id="description" name="description" type="text" value="" view="Input" />
+                                        <input id="description" name="description" type="text" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -2085,7 +2085,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="qty-help" id="qty" name="qty" type="number" value="" view="Input" />
+                                        <input id="qty" name="qty" type="number" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -2094,7 +2094,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="unitPrice-help" id="unitPrice" name="unitPrice" type="number" value="" view="Input" />
+                                        <input id="unitPrice" name="unitPrice" type="number" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -2113,28 +2113,28 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                   </td>
                 </tr>
                 <tr class="">
-                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                  <td class="no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover border-right done">
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input aria-describedby="dataKind.phases[2].title-help" currencycode="USD" id="dataKind.phases[2].title" name="dataKind.phases[2].title" type="text" value="Testing" />
+                        <input id="dataKind.phases[2].title" name="dataKind.phases[2].title" type="text" value="Testing" />
                       </div>
                     </div>
                   </td>
-                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                  <td class="no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover border-right done">
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input aria-describedby="dataKind.phases[2].budget-help" aria-invalid="false" currencycode="USD" id="dataKind.phases[2].budget" inputmode="decimal" name="dataKind.phases[2].budget" type="text" value="3000" />
+                        <input aria-invalid="false" id="dataKind.phases[2].budget" inputmode="decimal" name="dataKind.phases[2].budget" type="text" value="3000" />
                       </div>
                     </div>
                   </td>
-                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
-                    <div class="flex--col" currencycode="USD">
-                      <button class="button a transparent" currencycode="USD" type="button">
-                        <i aria-hidden="true" class="icon-trash" currencycode="USD">
+                  <td class="no-border-right-last-item" style="vertical-align: top;">
+                    <div class="flex--col">
+                      <button class="button a transparent" type="button">
+                        <i aria-hidden="true" class="icon-trash">
                         </i>
                       </button>
                     </div>
@@ -2142,11 +2142,11 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                 </tr>
                 <tr class="">
                   <td class="" colspan="3">
-                    <div class="flex--col padding-small padding-top-none" currencycode="USD">
+                    <div class="flex--col padding-small padding-top-none">
                       <div>
                         <div class="overflow-scroll flex--row max-width">
                           <div class="flex--row min-width fill-width">
-                            <table class="ui table full-width margin-v no-border" currencycode="USD" name="dataKind.lineItems">
+                            <table class="ui table full-width margin-v no-border" name="dataKind.lineItems">
                               <thead class="font-normal">
                                 <tr class="">
                                   <th class="left padding-left-small border-right">
@@ -2187,46 +2187,46 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                               </thead>
                               <tbody class="">
                                 <tr class="">
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.2.dataKind.lineItems[0].sku-help" currencycode="USD" id="dataKind.phases.2.dataKind.lineItems[0].sku" name="dataKind.phases.2.dataKind.lineItems[0].sku" type="text" value="QA-001" />
+                                        <input id="dataKind.phases.2.dataKind.lineItems[0].sku" name="dataKind.phases.2.dataKind.lineItems[0].sku" type="text" value="QA-001" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.2.dataKind.lineItems[0].description-help" currencycode="USD" id="dataKind.phases.2.dataKind.lineItems[0].description" name="dataKind.phases.2.dataKind.lineItems[0].description" type="text" value="Unit tests" />
+                                        <input id="dataKind.phases.2.dataKind.lineItems[0].description" name="dataKind.phases.2.dataKind.lineItems[0].description" type="text" value="Unit tests" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.2.dataKind.lineItems[0].qty-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.2.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.2.dataKind.lineItems[0].qty" type="text" value="20" />
+                                        <input aria-invalid="false" id="dataKind.phases.2.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.2.dataKind.lineItems[0].qty" type="text" value="20" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="dataKind.phases.2.dataKind.lineItems[0].unitPrice-help" aria-invalid="false" currencycode="USD" id="dataKind.phases.2.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.2.dataKind.lineItems[0].unitPrice" type="text" value="100" />
+                                        <input aria-invalid="false" id="dataKind.phases.2.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.2.dataKind.lineItems[0].unitPrice" type="text" value="100" />
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
-                                    <div class="flex--col" currencycode="USD">
-                                      <button class="button a transparent" currencycode="USD" type="button">
-                                        <i aria-hidden="true" class="icon-trash" currencycode="USD">
+                                  <td class="no-border-right-last-item" style="vertical-align: top;">
+                                    <div class="flex--col">
+                                      <button class="button a transparent" type="button">
+                                        <i aria-hidden="true" class="icon-trash">
                                         </i>
                                       </button>
                                     </div>
@@ -2238,7 +2238,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="sku-help" id="sku" name="sku" type="text" value="" view="Input" />
+                                        <input id="sku" name="sku" type="text" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -2247,7 +2247,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="description-help" id="description" name="description" type="text" value="" view="Input" />
+                                        <input id="description" name="description" type="text" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -2256,7 +2256,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="qty-help" id="qty" name="qty" type="number" value="" view="Input" />
+                                        <input id="qty" name="qty" type="number" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -2265,7 +2265,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-describedby="unitPrice-help" id="unitPrice" name="unitPrice" type="number" value="" view="Input" />
+                                        <input id="unitPrice" name="unitPrice" type="number" value="" view="Input" />
                                       </div>
                                     </div>
                                   </td>
@@ -2284,15 +2284,15 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                   </td>
                 </tr>
                 <tr class="">
-                  <td class="" colspan="3" currencycode="USD">
-                    <div class="flex--col padding-small" currencycode="USD">
+                  <td class="" colspan="3">
+                    <div class="flex--col padding-small">
                       <span class="text h5 margin-bottom-small">
                         "New phase (draft)"
                       </span>
                       <span class="text muted margin-bottom-small font-smaller">
                         "Add line items in the expanded section after this phase is created."
                       </span>
-                      <div class="flex--row margin-bottom" currencycode="USD">
+                      <div class="flex--row margin-bottom">
                         <div class="flex--col input--wrapper margin-right">
                           <div class="flex--row middle">
                             <label for="dataKind.phases[3].title">
@@ -2300,7 +2300,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                             </label>
                           </div>
                           <div class="flex--row input">
-                            <input aria-describedby="dataKind.phases[3].title-help" currencycode="USD" id="dataKind.phases[3].title" name="dataKind.phases[3].title" type="text" value="" />
+                            <input id="dataKind.phases[3].title" name="dataKind.phases[3].title" type="text" value="" />
                           </div>
                         </div>
                         <div class="flex--col input--wrapper">
@@ -2310,11 +2310,11 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                             </label>
                           </div>
                           <div class="flex--row input">
-                            <input aria-describedby="dataKind.phases[3].budget-help" aria-invalid="false" currencycode="USD" id="dataKind.phases[3].budget" inputmode="decimal" name="dataKind.phases[3].budget" type="text" value="" />
+                            <input aria-invalid="false" id="dataKind.phases[3].budget" inputmode="decimal" name="dataKind.phases[3].budget" type="text" value="" />
                           </div>
                         </div>
                       </div>
-                      <button class="button primary margin-top" currencycode="USD" type="button">
+                      <button class="button primary margin-top" type="button">
                         "Add phase"
                       </button>
                     </div>
@@ -2333,9 +2333,9 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
 exports[`demo example full-DOM contract pieChart renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--row wrap" currencycode="USD">
+    <div class="flex--row wrap">
       <div class="flex--row app__pie-chart--ref middle center wrap">
-        <div class="flex--col app__pie-chart min-width-290 center gradient" currencycode="USD" name="distribution">
+        <div class="flex--col app__pie-chart min-width-290 center gradient" name="distribution">
           <div class="app__pie-chart__svg" style="position: relative; width: 100%; height: 290px;">
             <svg height="290" role="img" width="290">
               <defs>
@@ -2483,7 +2483,7 @@ exports[`demo example full-DOM contract pieChart renders a stable, non-empty DOM
         </div>
       </div>
       <div class="flex--col app__pie-chart--ref middle center wrap">
-        <div class="flex--col app__pie-chart min-width-290 center gradient" currencycode="USD" name="distribution">
+        <div class="flex--col app__pie-chart min-width-290 center gradient" name="distribution">
           <div class="app__pie-chart__svg" style="position: relative; width: 100%; height: 290px;">
             <svg height="290" role="img" width="290">
               <defs>
@@ -2613,7 +2613,7 @@ exports[`demo example full-DOM contract pieChart renders a stable, non-empty DOM
             </svg>
           </div>
           <div class="flex--col position-center center fade-in-slow">
-            <div class="flex--col align-center" currencycode="USD">
+            <div class="flex--col align-center">
               <span class="text h3">
                 "Team Size"
               </span>
@@ -2688,14 +2688,14 @@ exports[`demo example full-DOM contract pieChart renders a stable, non-empty DOM
 exports[`demo example full-DOM contract popupContent renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col fill middle center padding" currencycode="USD">
-      <button class="button margin" currencycode="USD" type="button">
+    <div class="flex--col fill middle center padding">
+      <button class="button margin" type="button">
         "Open Popup 1"
       </button>
       <div>
         <div class="overflow-scroll flex--row max-width">
           <div class="flex--row min-width fill-width">
-            <table class="ui table full-width" currencycode="USD" name="categories">
+            <table class="ui table full-width" name="categories">
               <thead class="font-normal">
                 <tr class="">
                   <th class="left">
@@ -2736,7 +2736,7 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
                   <th class="left">
                     <div class="flex--row middle">
                       <div class="flex--row checkbox--wrapper">
-                        <input class="checkbox checkbox" currencycode="USD" id="checkbox-Expand-All" type="checkbox" />
+                        <input class="checkbox checkbox" id="checkbox-Expand-All" type="checkbox" />
                         <label class="flex--row middle justify" for="checkbox-Expand-All">
                           "Expand All"
                         </label>
@@ -2748,7 +2748,7 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
               <tbody class="">
                 <tr class="">
                   <td class="-last">
-                    <div class="flex--col app__expand" currencycode="USD" id="undefined" index="0" name="Gold">
+                    <div class="flex--col app__expand" id="undefined" index="0" name="Gold">
                       <span class="text pointer row fill-width middle padding-small">
                         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                         </i>
@@ -2789,7 +2789,7 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
                 </tr>
                 <tr class="">
                   <td class="-last">
-                    <div class="flex--col app__expand" currencycode="USD" id="undefined" index="1" name="Silver">
+                    <div class="flex--col app__expand" id="undefined" index="1" name="Silver">
                       <span class="text pointer row fill-width middle padding-small">
                         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                         </i>
@@ -2841,8 +2841,8 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
 exports[`demo example full-DOM contract ratingDetails renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div _comment="Remove this wrapper component, it is for demo purpose only" class="flex--col padding-h-largest bg-info-light" currencycode="USD">
-      <div class="flex--col margin-v-largest" currencycode="USD">
+    <div _comment="Remove this wrapper component, it is for demo purpose only" class="flex--col padding-h-largest bg-info-light">
+      <div class="flex--col margin-v-largest">
         <span class="text h3 padding-largest no-padding-bottom no-margin bg-neutral radius-top">
           "Rating Details"
         </span>
@@ -2850,11 +2850,11 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
           <div class="flex--col min-height max-height">
             <div class="overflow-scroll flex--row max-width tabs__items no-scrollbar padding-largest bg-neutral radius-bottom" style="overflow: visible;">
               <div class="flex--row min-width">
-                <div class="flex--row padding-right-largest middle bg-neutral" currencycode="USD" label="PlanList">
+                <div class="flex--row padding-right-largest middle bg-neutral" label="PlanList">
                   <span class="text">
                     "FILTER BY"
                   </span>
-                  <div class="flex--col space" currencycode="USD">
+                  <div class="flex--col space">
                   </div>
                   <div class="flex--col input--wrapper">
                     <div aria-expanded="false" class="ui compact selection dropdown" name="option" role="listbox" tabindex="0">
@@ -2897,14 +2897,14 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
             </div>
             <div class="overflow-scroll flex--col max-height fill tabs__content fade-in margin-v-small">
               <div class="flex--col min-height fill">
-                <div class="flex--col" currencycode="USD">
+                <div class="flex--col">
                   <div class="flex--row wrap justify margin-v" name="Plans[0].Categories">
-                    <div class="flex--col padding-largest radius bg-neutral" currencycode="USD" style="min-width: 48%;">
+                    <div class="flex--col padding-largest radius bg-neutral" style="min-width: 48%;">
                       <span class="text h3">
                         "Core"
                       </span>
-                      <div class="flex--row wrap justify" currencycode="USD">
-                        <div class="flex--col padding-largest margin-v align-center radius bg-info-light" currencycode="USD" style="min-width: 45%;">
+                      <div class="flex--row wrap justify">
+                        <div class="flex--col padding-largest margin-v align-center radius bg-info-light" style="min-width: 45%;">
                           <span class="text h3">
                             "6"
                           </span>
@@ -2912,7 +2912,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                             "Enrolled Lives"
                           </span>
                         </div>
-                        <div class="flex--col padding-largest margin-v align-center radius bg-info-light" currencycode="USD" style="min-width: 45%;">
+                        <div class="flex--col padding-largest margin-v align-center radius bg-info-light" style="min-width: 45%;">
                           <span class="text h3">
                             "114.29"
                           </span>
@@ -2921,8 +2921,8 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                           </span>
                         </div>
                       </div>
-                      <div class="flex--row wrap spread padding margin-top radius bg-grey-lighter" currencycode="USD">
-                        <div class="flex--col margin-small" currencycode="USD">
+                      <div class="flex--row wrap spread padding margin-top radius bg-grey-lighter">
+                        <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
                               <span _data="0.02" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -2937,7 +2937,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                             "Tax"
                           </span>
                         </div>
-                        <div class="flex--col margin-small" currencycode="USD">
+                        <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
                               <span _data="0.04" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -2952,7 +2952,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                             "Profit"
                           </span>
                         </div>
-                        <div class="flex--col margin-small" currencycode="USD">
+                        <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
                               <span _data="0.1875" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -2969,12 +2969,12 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                         </div>
                       </div>
                     </div>
-                    <div class="flex--col padding-largest radius bg-neutral" currencycode="USD" style="min-width: 48%;">
+                    <div class="flex--col padding-largest radius bg-neutral" style="min-width: 48%;">
                       <span class="text h3">
                         "BuyUp"
                       </span>
-                      <div class="flex--row wrap justify" currencycode="USD">
-                        <div class="flex--col padding-largest margin-v align-center radius bg-info-light" currencycode="USD" style="min-width: 45%;">
+                      <div class="flex--row wrap justify">
+                        <div class="flex--col padding-largest margin-v align-center radius bg-info-light" style="min-width: 45%;">
                           <span class="text h3">
                             "6"
                           </span>
@@ -2982,7 +2982,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                             "Enrolled Lives"
                           </span>
                         </div>
-                        <div class="flex--col padding-largest margin-v align-center radius bg-info-light" currencycode="USD" style="min-width: 45%;">
+                        <div class="flex--col padding-largest margin-v align-center radius bg-info-light" style="min-width: 45%;">
                           <span class="text h3">
                             "65.81"
                           </span>
@@ -2991,8 +2991,8 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                           </span>
                         </div>
                       </div>
-                      <div class="flex--row wrap spread padding margin-top radius bg-grey-lighter" currencycode="USD">
-                        <div class="flex--col margin-small" currencycode="USD">
+                      <div class="flex--row wrap spread padding margin-top radius bg-grey-lighter">
+                        <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
                               <span _data="0.02" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -3007,7 +3007,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                             "Tax"
                           </span>
                         </div>
-                        <div class="flex--col margin-small" currencycode="USD">
+                        <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
                               <span _data="0.04" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -3022,7 +3022,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                             "Profit"
                           </span>
                         </div>
-                        <div class="flex--col margin-small" currencycode="USD">
+                        <div class="flex--col margin-small">
                           <span class="text h3">
                             <div class="flex--row">
                               <span _data="0.1875" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -3040,14 +3040,14 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                       </div>
                     </div>
                   </div>
-                  <div class="flex--col padding-largest margin-top-largest radius bg-neutral" currencycode="USD">
+                  <div class="flex--col padding-largest margin-top-largest radius bg-neutral">
                     <span class="text h4 margin-v-largest">
                       "Cost Summary"
                     </span>
                     <div>
                       <div class="overflow-scroll flex--row max-width">
                         <div class="flex--row min-width fill-width">
-                          <table class="ui table full-width" currencycode="USD">
+                          <table class="ui table full-width">
                             <thead class="font-normal">
                               <tr class="">
                                 <th class="left" style="width: 60%;">
@@ -3257,8 +3257,8 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
 exports[`demo example full-DOM contract rowListRelativeData renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div _comment="Regression fixture: RowList/PieChart nested under ancestors that declare \`relativeData: false\`. The RowList declares \`relativeData: true\` and must still resolve its own \`name\` into data." class="flex--col padding-h-largest bg-info-light" currencycode="USD">
-      <div class="flex--col margin-v-largest" currencycode="USD">
+    <div _comment="Regression fixture: RowList/PieChart nested under ancestors that declare \`relativeData: false\`. The RowList declares \`relativeData: true\` and must still resolve its own \`name\` into data." class="flex--col padding-h-largest bg-info-light">
+      <div class="flex--col margin-v-largest">
         <span class="text h3">
           "Summary Details"
         </span>
@@ -3266,11 +3266,11 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
           <div class="flex--col min-height max-height">
             <div class="overflow-scroll flex--row max-width tabs__items no-scrollbar padding-largest bg-neutral radius-bottom" style="overflow: visible;">
               <div class="flex--row min-width">
-                <div class="flex--row padding-right-largest middle bg-neutral" currencycode="USD">
+                <div class="flex--row padding-right-largest middle bg-neutral">
                   <span class="text">
                     "FILTER BY"
                   </span>
-                  <div class="flex--col space" currencycode="USD">
+                  <div class="flex--col space">
                   </div>
                   <div class="flex--col input--wrapper">
                     <div aria-expanded="false" class="ui compact selection dropdown" name="group" role="listbox" tabindex="0">
@@ -3308,15 +3308,15 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
             </div>
             <div class="overflow-scroll flex--col max-height fill tabs__content fade-in margin-v-small">
               <div class="flex--col min-height fill">
-                <div class="flex--col" currencycode="USD">
-                  <div class="flex--col" currencycode="USD">
+                <div class="flex--col">
+                  <div class="flex--col">
                     <div class="flex--row wrap justify margin-v" name="Groups[0].Items">
-                      <div class="flex--col padding-largest radius bg-neutral" currencycode="USD" style="min-width: 48%;">
+                      <div class="flex--col padding-largest radius bg-neutral" style="min-width: 48%;">
                         <span class="text h3">
                           "Basic"
                         </span>
-                        <div class="flex--row wrap justify" currencycode="USD">
-                          <div class="flex--col padding-largest margin-v align-center radius bg-info-light" currencycode="USD" style="min-width: 45%;">
+                        <div class="flex--row wrap justify">
+                          <div class="flex--col padding-largest margin-v align-center radius bg-info-light" style="min-width: 45%;">
                             <span class="text h3">
                               "1100"
                             </span>
@@ -3324,8 +3324,8 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                               "Enrolled Units"
                             </span>
                           </div>
-                          <div class="flex--col padding-largest margin-v align-center radius bg-info-light" currencycode="USD" style="min-width: 45%;">
-                            <div class="flex--col margin-small" currencycode="USD">
+                          <div class="flex--col padding-largest margin-v align-center radius bg-info-light" style="min-width: 45%;">
+                            <div class="flex--col margin-small">
                               <span class="text h3">
                                 <div class="flex--row">
                                   <span class="text margin-right-smallest">
@@ -3343,7 +3343,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                 "Monthly Manual Amount"
                               </span>
                             </div>
-                            <div class="flex--col margin-small" currencycode="USD">
+                            <div class="flex--col margin-small">
                               <span class="text h3">
                                 <div class="flex--row">
                                   <span class="text margin-right-smallest">
@@ -3363,8 +3363,8 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                             </div>
                           </div>
                         </div>
-                        <div class="flex--row wrap spread padding margin-top radius bg-grey-lighter" currencycode="USD">
-                          <div class="flex--col margin-small" currencycode="USD">
+                        <div class="flex--row wrap spread padding margin-top radius bg-grey-lighter">
+                          <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
                                 <span _data="0.027" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -3379,7 +3379,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                               "Fees"
                             </span>
                           </div>
-                          <div class="flex--col margin-small" currencycode="USD">
+                          <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
                                 <span _data="0.04" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -3394,7 +3394,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                               "Margin"
                             </span>
                           </div>
-                          <div class="flex--col margin-small" currencycode="USD">
+                          <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
                                 <span _data="0.16" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -3411,12 +3411,12 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                           </div>
                         </div>
                       </div>
-                      <div class="flex--col padding-largest radius bg-neutral" currencycode="USD" style="min-width: 48%;">
+                      <div class="flex--col padding-largest radius bg-neutral" style="min-width: 48%;">
                         <span class="text h3">
                           "Extended"
                         </span>
-                        <div class="flex--row wrap justify" currencycode="USD">
-                          <div class="flex--col padding-largest margin-v align-center radius bg-info-light" currencycode="USD" style="min-width: 45%;">
+                        <div class="flex--row wrap justify">
+                          <div class="flex--col padding-largest margin-v align-center radius bg-info-light" style="min-width: 45%;">
                             <span class="text h3">
                               "4"
                             </span>
@@ -3424,8 +3424,8 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                               "Enrolled Units"
                             </span>
                           </div>
-                          <div class="flex--col padding-largest margin-v align-center radius bg-info-light" currencycode="USD" style="min-width: 45%;">
-                            <div class="flex--col margin-small" currencycode="USD">
+                          <div class="flex--col padding-largest margin-v align-center radius bg-info-light" style="min-width: 45%;">
+                            <div class="flex--col margin-small">
                               <span class="text h3">
                                 <div class="flex--row">
                                   <span class="text margin-right-smallest">
@@ -3443,7 +3443,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                 "Monthly Manual Amount"
                               </span>
                             </div>
-                            <div class="flex--col margin-small" currencycode="USD">
+                            <div class="flex--col margin-small">
                               <span class="text h3">
                                 <div class="flex--row">
                                   <span class="text margin-right-smallest">
@@ -3463,8 +3463,8 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                             </div>
                           </div>
                         </div>
-                        <div class="flex--row wrap spread padding margin-top radius bg-grey-lighter" currencycode="USD">
-                          <div class="flex--col margin-small" currencycode="USD">
+                        <div class="flex--row wrap spread padding margin-top radius bg-grey-lighter">
+                          <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
                                 <span _data="0.027" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -3479,7 +3479,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                               "Fees"
                             </span>
                           </div>
-                          <div class="flex--col margin-small" currencycode="USD">
+                          <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
                                 <span _data="0.04" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -3494,7 +3494,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                               "Margin"
                             </span>
                           </div>
-                          <div class="flex--col margin-small" currencycode="USD">
+                          <div class="flex--col margin-small">
                             <span class="text h3">
                               <div class="flex--row">
                                 <span _data="0.16" class="text" data="[object Object]" name="Percent" symbol="$">
@@ -3513,14 +3513,14 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                       </div>
                     </div>
                   </div>
-                  <div class="flex--col padding-largest margin-top-largest radius bg-neutral" currencycode="USD">
+                  <div class="flex--col padding-largest margin-top-largest radius bg-neutral">
                     <span class="text h3 padding">
                       "Cost Summary"
                     </span>
                     <div>
                       <div class="overflow-scroll flex--row max-width">
                         <div class="flex--row min-width fill-width">
-                          <table class="ui table full-width vertical" currencycode="USD" name="Groups[0].Items">
+                          <table class="ui table full-width vertical" name="Groups[0].Items">
                             <thead class="font-normal">
                             </thead>
                             <tbody class="">
@@ -3695,10 +3695,10 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
 exports[`demo example full-DOM contract selectCascading renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col bg-white" currencycode="USD">
-      <div class="flex--col margin" currencycode="USD">
-        <div class="flex--col padding-top margin-top" currencycode="USD">
-          <div class="flex--row" currencycode="USD">
+    <div class="flex--col bg-white">
+      <div class="flex--col margin">
+        <div class="flex--col padding-top margin-top">
+          <div class="flex--row">
             <span class="text h5 padding-right middle">
               "Category"
             </span>
@@ -3714,7 +3714,7 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
               </div>
             </div>
           </div>
-          <div class="flex--row" currencycode="USD">
+          <div class="flex--row">
             <span class="text h5 padding-right middle">
               "Product"
             </span>
@@ -3730,12 +3730,12 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
               </div>
             </div>
           </div>
-          <div class="flex--row padding-top" currencycode="USD">
-            <div class="flex--col padding-right width-50p" currencycode="USD">
+          <div class="flex--row padding-top">
+            <div class="flex--col padding-right width-50p">
               <div>
                 <div class="overflow-scroll flex--row max-width">
                   <div class="flex--row min-width fill-width">
-                    <table class="ui table full-width vertical" currencycode="USD" name="Catalog.Categories.0.Products">
+                    <table class="ui table full-width vertical" name="Catalog.Categories.0.Products">
                       <thead class="font-normal">
                       </thead>
                       <tbody class="">
@@ -3846,14 +3846,14 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
 exports[`demo example full-DOM contract selectCascadingStable renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col bg-white" currencycode="USD">
-      <div class="flex--col margin" currencycode="USD">
-        <div class="flex--col padding-top margin-top" currencycode="USD">
-          <div class="flex--row" currencycode="USD">
+    <div class="flex--col bg-white">
+      <div class="flex--col margin">
+        <div class="flex--col padding-top margin-top">
+          <div class="flex--row">
             <span class="text h5 padding-right middle">
               "Group"
             </span>
-            <div class="flex--col" currencycode="USD" name="Settings.Record">
+            <div class="flex--col" name="Settings.Record">
               <div class="flex--col input--wrapper middle">
                 <div aria-expanded="false" class="ui compact selection dropdown" id="Settings.Record.GroupSelection" name="Settings.Record.GroupSelection" role="listbox" tabindex="0">
                   <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
@@ -3867,11 +3867,11 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
               </div>
             </div>
           </div>
-          <div class="flex--row" currencycode="USD">
+          <div class="flex--row">
             <span class="text h5 padding-right middle">
               "Item"
             </span>
-            <div class="flex--col" currencycode="USD" name="Settings.Record.GroupList.1">
+            <div class="flex--col" name="Settings.Record.GroupList.1">
               <div class="flex--col input--wrapper middle">
                 <div aria-expanded="false" class="ui compact selection dropdown" id="Settings.Record.GroupList.1.ItemSelection" name="Settings.Record.GroupList.1.ItemSelection" role="listbox" tabindex="0">
                   <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
@@ -3885,12 +3885,12 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
               </div>
             </div>
           </div>
-          <div class="flex--row padding-top" currencycode="USD">
-            <div class="flex--col padding-right width-50p" currencycode="USD">
+          <div class="flex--row padding-top">
+            <div class="flex--col padding-right width-50p">
               <div>
                 <div class="overflow-scroll flex--row max-width">
                   <div class="flex--row min-width fill-width">
-                    <table class="ui table full-width vertical" currencycode="USD" name="Settings.Record.GroupList.1.ItemList">
+                    <table class="ui table full-width vertical" name="Settings.Record.GroupList.1.ItemList">
                       <thead class="font-normal">
                       </thead>
                       <tbody class="">
@@ -4043,9 +4043,9 @@ exports[`demo example full-DOM contract selectIndexValue renders a stable, non-e
 exports[`demo example full-DOM contract selectReorder renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col bg-white" currencycode="USD">
-      <div class="flex--col margin" currencycode="USD">
-        <div class="flex--row" currencycode="USD">
+    <div class="flex--col bg-white">
+      <div class="flex--col margin">
+        <div class="flex--row">
           <span class="text h5 padding-right middle">
             "Region"
           </span>
@@ -4061,14 +4061,14 @@ exports[`demo example full-DOM contract selectReorder renders a stable, non-empt
             </div>
           </div>
         </div>
-        <div class="flex--col padding-top width-50p" currencycode="USD">
+        <div class="flex--col padding-top width-50p">
           <span class="text padding-v bold">
             "Data array order (selected item moves to index 0 on Get Data):"
           </span>
           <div>
             <div class="overflow-scroll flex--row max-width">
               <div class="flex--row min-width fill-width">
-                <table class="ui table full-width" currencycode="USD" name="Regions">
+                <table class="ui table full-width" name="Regions">
                   <thead class="font-normal">
                     <tr class="">
                       <th class="left">
@@ -4216,7 +4216,7 @@ exports[`demo example full-DOM contract showIf renders a stable, non-empty DOM m
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
     <div class="flex--col" name="categories">
-      <div class="flex--col padding border" currencycode="USD">
+      <div class="flex--col padding border">
         <span class="text h3">
           "Gold"
         </span>
@@ -4227,7 +4227,7 @@ exports[`demo example full-DOM contract showIf renders a stable, non-empty DOM m
           "Gold"
         </span>
       </div>
-      <div class="flex--col padding border" currencycode="USD">
+      <div class="flex--col padding border">
         <span class="text h3">
           "Silver"
         </span>
@@ -4246,14 +4246,14 @@ exports[`demo example full-DOM contract showIf renders a stable, non-empty DOM m
 exports[`demo example full-DOM contract slider renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col padding-large" currencycode="USD">
+    <div class="flex--col padding-large">
       <span class="text h3 h4 margin-bottom-small">
         "Single value"
       </span>
       <span class="text margin-bottom">
         "Drag the handle or click the track. Keyboard: arrows step by \`step\`, Home/End jump to bounds."
       </span>
-      <div class="app__slider" currencycode="USD" type="slider">
+      <div class="app__slider" type="slider">
         <div class="app__slider__rail">
         </div>
         <div class="app__slider__track" style="left: 0%; width: 35%;">
@@ -4270,7 +4270,7 @@ exports[`demo example full-DOM contract slider renders a stable, non-empty DOM m
       <span class="text margin-bottom">
         "Bind value to an array \`[from, to]\` to enable range mode. Handles can swap by dragging past each other."
       </span>
-      <div class="app__slider" currencycode="USD" type="slider">
+      <div class="app__slider" type="slider">
         <div class="app__slider__rail">
         </div>
         <div class="app__slider__track" style="left: 12%; width: 64%;">
@@ -4292,7 +4292,7 @@ exports[`demo example full-DOM contract slider renders a stable, non-empty DOM m
       <span class="text margin-bottom">
         "Pass \`range\` to auto-build marks; pair with \`step: null\` to snap to mark points."
       </span>
-      <div class="app__slider" currencycode="USD" type="slider">
+      <div class="app__slider" type="slider">
         <div class="app__slider__rail">
         </div>
         <div class="app__slider__track" style="left: 0%; width: 60%;">
@@ -4336,7 +4336,7 @@ exports[`demo example full-DOM contract slider renders a stable, non-empty DOM m
       <span class="text h3 h4 margin-top-large margin-bottom-small">
         "Percent formatting"
       </span>
-      <div class="app__slider" currencycode="USD" type="slider">
+      <div class="app__slider" type="slider">
         <div class="app__slider__rail">
         </div>
         <div class="app__slider__track" style="left: 0%; width: 50%;">
@@ -4382,7 +4382,7 @@ exports[`demo example full-DOM contract slider renders a stable, non-empty DOM m
       <span class="text h3 h4 margin-top-large margin-bottom-small">
         "Disabled"
       </span>
-      <div class="app__slider disabled" currencycode="USD" type="slider">
+      <div class="app__slider disabled" type="slider">
         <div class="app__slider__rail">
         </div>
         <div class="app__slider__track" style="left: 0%; width: 60%;">
@@ -4399,12 +4399,12 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
     <div class="flex--row wrap justify padding-v bg-grey-lightest" name="categories">
-      <div class="flex--col padding-largest margin-v bg-white" currencycode="USD" style="min-width: 48%;">
+      <div class="flex--col padding-largest margin-v bg-white" style="min-width: 48%;">
         <span class="text h3">
           "Core Category"
         </span>
-        <div class="flex--row wrap justify" currencycode="USD">
-          <div class="flex--col padding-largest margin-v align-center bg-info-light" currencycode="USD" style="min-width: 45%;">
+        <div class="flex--row wrap justify">
+          <div class="flex--col padding-largest margin-v align-center bg-info-light" style="min-width: 45%;">
             <span class="text h3">
               "55"
             </span>
@@ -4412,7 +4412,7 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
               "Enrolled Lives"
             </span>
           </div>
-          <div class="flex--col padding-largest margin-v align-center bg-info-light" currencycode="USD" style="min-width: 45%;">
+          <div class="flex--col padding-largest margin-v align-center bg-info-light" style="min-width: 45%;">
             <span class="text h3">
               <div class="flex--row">
                 <span class="text margin-right-smallest">
@@ -4431,8 +4431,8 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
             </span>
           </div>
         </div>
-        <div class="flex--row wrap spread padding margin-top bg-grey-lighter" currencycode="USD">
-          <div class="flex--col margin-small" currencycode="USD">
+        <div class="flex--row wrap spread padding margin-top bg-grey-lighter">
+          <div class="flex--col margin-small">
             <span class="text h3">
               <div class="flex--row">
                 <span class="text margin-right-smallest">
@@ -4450,7 +4450,7 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
               "Commissions"
             </span>
           </div>
-          <div class="flex--col margin-small" currencycode="USD">
+          <div class="flex--col margin-small">
             <span class="text h3">
               <div class="flex--row">
                 <span class="text">
@@ -4465,7 +4465,7 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
               "Tax"
             </span>
           </div>
-          <div class="flex--col margin-small" currencycode="USD">
+          <div class="flex--col margin-small">
             <span class="text h3">
               <div class="flex--row">
                 <span class="text">
@@ -4480,7 +4480,7 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
               "Profit"
             </span>
           </div>
-          <div class="flex--col margin-small" currencycode="USD">
+          <div class="flex--col margin-small">
             <span class="text h3">
               <div class="flex--row">
                 <span class="text">
@@ -4497,12 +4497,12 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
           </div>
         </div>
       </div>
-      <div class="flex--col padding-largest margin-v bg-white" currencycode="USD" style="min-width: 48%;">
+      <div class="flex--col padding-largest margin-v bg-white" style="min-width: 48%;">
         <span class="text h3">
           "Buy-Up Category"
         </span>
-        <div class="flex--row wrap justify" currencycode="USD">
-          <div class="flex--col padding-largest margin-v align-center bg-warning-light" currencycode="USD" style="min-width: 45%;">
+        <div class="flex--row wrap justify">
+          <div class="flex--col padding-largest margin-v align-center bg-warning-light" style="min-width: 45%;">
             <span class="text h3">
               "32"
             </span>
@@ -4510,7 +4510,7 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
               "Enrolled Lives"
             </span>
           </div>
-          <div class="flex--col padding-largest margin-v align-center bg-warning-light" currencycode="USD" style="min-width: 45%;">
+          <div class="flex--col padding-largest margin-v align-center bg-warning-light" style="min-width: 45%;">
             <span class="text h3">
               <div class="flex--row">
                 <span class="text margin-right-smallest">
@@ -4529,8 +4529,8 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
             </span>
           </div>
         </div>
-        <div class="flex--row wrap spread padding margin-top bg-grey-lighter" currencycode="USD">
-          <div class="flex--col margin-small" currencycode="USD">
+        <div class="flex--row wrap spread padding margin-top bg-grey-lighter">
+          <div class="flex--col margin-small">
             <span class="text h3">
               <div class="flex--row">
                 <span class="text margin-right-smallest">
@@ -4548,7 +4548,7 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
               "Commissions"
             </span>
           </div>
-          <div class="flex--col margin-small" currencycode="USD">
+          <div class="flex--col margin-small">
             <span class="text h3">
               <div class="flex--row">
                 <span class="text">
@@ -4563,7 +4563,7 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
               "Tax"
             </span>
           </div>
-          <div class="flex--col margin-small" currencycode="USD">
+          <div class="flex--col margin-small">
             <span class="text h3">
               <div class="flex--row">
                 <span class="text">
@@ -4578,7 +4578,7 @@ exports[`demo example full-DOM contract summaryBox renders a stable, non-empty D
               "Profit"
             </span>
           </div>
-          <div class="flex--col margin-small" currencycode="USD">
+          <div class="flex--col margin-small">
             <span class="text h3">
               <div class="flex--row">
                 <span class="text">
@@ -4621,8 +4621,8 @@ exports[`demo example full-DOM contract tabList renders a stable, non-empty DOM 
         </div>
         <div class="overflow-scroll flex--col max-height fill tabs__content fade-in">
           <div class="flex--col min-height fill">
-            <div class="flex--col" currencycode="USD">
-              <div class="flex--col margin-bottom-small radius" currencycode="USD">
+            <div class="flex--col">
+              <div class="flex--col margin-bottom-small radius">
                 <span class="text h3 padding no-margin">
                   "Cost Summary"
                 </span>
@@ -4633,11 +4633,11 @@ exports[`demo example full-DOM contract tabList renders a stable, non-empty DOM 
                     </label>
                   </div>
                   <div class="flex--row input">
-                    <input aria-describedby="categories[0].memberAnnualPremium-help" aria-invalid="false" currencycode="USD" id="categories[0].memberAnnualPremium" inputmode="decimal" name="categories[0].memberAnnualPremium" type="text" value="378" />
+                    <input aria-invalid="false" id="categories[0].memberAnnualPremium" inputmode="decimal" name="categories[0].memberAnnualPremium" type="text" value="378" />
                   </div>
                 </div>
-                <div class="flex--col border radius" currencycode="USD">
-                  <div class="flex--row justify padding" currencycode="USD">
+                <div class="flex--col border radius">
+                  <div class="flex--row justify padding">
                     <span class="text">
                       "Annual Rate"
                     </span>
@@ -4669,7 +4669,7 @@ exports[`demo example full-DOM contract tableExtraItems renders a stable, non-em
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width" currencycode="USD" name="no_data_exists">
+          <table class="ui table full-width" name="no_data_exists">
             <thead class="font-normal">
               <tr class="">
                 <th class="left">
@@ -4709,7 +4709,7 @@ exports[`demo example full-DOM contract tableExtraItems renders a stable, non-em
                     <div class="flex--row middle">
                     </div>
                     <div class="flex--row input unit">
-                      <input aria-describedby="no_data_exists.categories.0.rate-help" aria-invalid="false" id="no_data_exists.categories.0.rate" inputmode="decimal" name="no_data_exists.categories.0.rate" type="text" value="" />
+                      <input aria-invalid="false" id="no_data_exists.categories.0.rate" inputmode="decimal" name="no_data_exists.categories.0.rate" type="text" value="" />
                     </div>
                   </div>
                 </td>
@@ -4728,11 +4728,11 @@ exports[`demo example full-DOM contract tableExtraItems renders a stable, non-em
 exports[`demo example full-DOM contract tableForm renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col padding left bg-info-light" currencycode="USD">
+    <div class="flex--col padding left bg-info-light">
       <div>
         <div class="overflow-scroll flex--row max-width">
           <div class="flex--row min-width fill-width">
-            <table class="ui table full-width outline margin-v" currencycode="USD" name="dataKind.period">
+            <table class="ui table full-width outline margin-v" name="dataKind.period">
               <thead class="font-normal">
                 <tr class="">
                   <th class="left bg-success-light" colspan="999">
@@ -4769,77 +4769,77 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
               </thead>
               <tbody class="">
                 <tr class="">
-                  <td class="border-right no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                  <td class="border-right no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover">
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
                         <div class="ui-render-picker ui-render-picker">
                           <div class="ui-render-picker-input">
-                            <input aria-describedby="dataKind.period[0].startDate-help" aria-invalid="false" autocomplete="off" id="dataKind.period[0].startDate" name="dataKind.period[0].startDate" size="12" value="01-01-2022" />
+                            <input aria-invalid="false" autocomplete="off" id="dataKind.period[0].startDate" name="dataKind.period[0].startDate" size="12" value="01-01-2022" />
                           </div>
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td class="border-right no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                  <td class="border-right no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover">
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
                         <div class="ui-render-picker ui-render-picker">
                           <div class="ui-render-picker-input">
-                            <input aria-describedby="dataKind.period[0].endDate-help" aria-invalid="false" autocomplete="off" id="dataKind.period[0].endDate" name="dataKind.period[0].endDate" size="12" value="03-31-2022" />
+                            <input aria-invalid="false" autocomplete="off" id="dataKind.period[0].endDate" name="dataKind.period[0].endDate" size="12" value="03-31-2022" />
                           </div>
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td class="border-right no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
-                    <div class="flex--col" currencycode="USD">
-                      <button class="button a transparent" currencycode="USD" type="button">
+                  <td class="border-right no-border-right-last-item" style="vertical-align: top;">
+                    <div class="flex--col">
+                      <button class="button a transparent" type="button">
                         "Remove"
                       </button>
                     </div>
                   </td>
                 </tr>
                 <tr class="">
-                  <td class="border-right no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                  <td class="border-right no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover">
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
                         <div class="ui-render-picker ui-render-picker">
                           <div class="ui-render-picker-input">
-                            <input aria-describedby="dataKind.period[1].startDate-help" aria-invalid="false" autocomplete="off" id="dataKind.period[1].startDate" name="dataKind.period[1].startDate" size="12" value="04-01-2022" />
+                            <input aria-invalid="false" autocomplete="off" id="dataKind.period[1].startDate" name="dataKind.period[1].startDate" size="12" value="04-01-2022" />
                           </div>
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td class="border-right no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
+                  <td class="border-right no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover">
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
                         <div class="ui-render-picker ui-render-picker">
                           <div class="ui-render-picker-input">
-                            <input aria-describedby="dataKind.period[1].endDate-help" aria-invalid="false" autocomplete="off" id="dataKind.period[1].endDate" name="dataKind.period[1].endDate" size="12" value="06-30-2022" />
+                            <input aria-invalid="false" autocomplete="off" id="dataKind.period[1].endDate" name="dataKind.period[1].endDate" size="12" value="06-30-2022" />
                           </div>
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td class="border-right no-border-right-last-item" currencycode="USD" style="vertical-align: top;">
-                    <div class="flex--col" currencycode="USD">
-                      <button class="button a transparent" currencycode="USD" type="button">
+                  <td class="border-right no-border-right-last-item" style="vertical-align: top;">
+                    <div class="flex--col">
+                      <button class="button a transparent" type="button">
                         "Remove"
                       </button>
                     </div>
                   </td>
                 </tr>
                 <tr class="">
-                  <td class="" currencycode="USD" style="vertical-align: top;">
+                  <td class="" style="vertical-align: top;">
                     <div class="flex--col input--wrapper">
                       <div class="flex--row middle">
                         <label for="dataKind.period[2].startDate">
@@ -4849,13 +4849,13 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                       <div class="flex--row input">
                         <div class="ui-render-picker ui-render-picker">
                           <div class="ui-render-picker-input">
-                            <input aria-describedby="dataKind.period[2].startDate-help" aria-invalid="false" autocomplete="off" id="dataKind.period[2].startDate" name="dataKind.period[2].startDate" size="12" value="" />
+                            <input aria-invalid="false" autocomplete="off" id="dataKind.period[2].startDate" name="dataKind.period[2].startDate" size="12" value="" />
                           </div>
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td class="" currencycode="USD" style="vertical-align: top;">
+                  <td class="" style="vertical-align: top;">
                     <div class="flex--col input--wrapper">
                       <div class="flex--row middle">
                         <label for="dataKind.period[2].endDate">
@@ -4865,15 +4865,15 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                       <div class="flex--row input">
                         <div class="ui-render-picker ui-render-picker">
                           <div class="ui-render-picker-input">
-                            <input aria-describedby="dataKind.period[2].endDate-help" aria-invalid="false" autocomplete="off" id="dataKind.period[2].endDate" name="dataKind.period[2].endDate" size="12" value="" />
+                            <input aria-invalid="false" autocomplete="off" id="dataKind.period[2].endDate" name="dataKind.period[2].endDate" size="12" value="" />
                           </div>
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td class="" currencycode="USD" style="vertical-align: top;">
-                    <div class="flex--col" currencycode="USD">
-                      <button class="button a transparent margin-v-small" currencycode="USD" type="button">
+                  <td class="" style="vertical-align: top;">
+                    <div class="flex--col">
+                      <button class="button a transparent margin-v-small" type="button">
                         "Add"
                       </button>
                     </div>
@@ -4884,7 +4884,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
           </div>
         </div>
       </div>
-      <button class="button primary" currencycode="USD" type="button">
+      <button class="button primary" type="button">
         "Submit (open Chrome Console to check changed values)"
       </button>
     </div>
@@ -4898,7 +4898,7 @@ exports[`demo example full-DOM contract tableMatrix renders a stable, non-empty 
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width margin" currencycode="USD" name="matrixTable">
+          <table class="ui table full-width margin" name="matrixTable">
             <thead class="font-normal">
               <tr class="">
                 <th class="left bg-white">
@@ -5108,7 +5108,7 @@ exports[`demo example full-DOM contract tableMatrixRequired renders a stable, no
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width" currencycode="USD" name="matrixTable">
+          <table class="ui table full-width" name="matrixTable">
             <thead class="font-normal">
               <tr class="">
                 <th class="left">
@@ -5302,7 +5302,7 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width" currencycode="USD" name="categories">
+          <table class="ui table full-width" name="categories">
             <thead class="font-normal">
               <tr class="">
                 <th class="left">
@@ -5343,7 +5343,7 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
                 <th class="left">
                   <div class="flex--row middle">
                     <div class="flex--row checkbox--wrapper">
-                      <input class="checkbox checkbox" currencycode="USD" id="checkbox-Expand-All" type="checkbox" />
+                      <input class="checkbox checkbox" id="checkbox-Expand-All" type="checkbox" />
                       <label class="flex--row middle justify" for="checkbox-Expand-All">
                         "Expand All"
                       </label>
@@ -5355,7 +5355,7 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
             <tbody class="">
               <tr class="">
                 <td class="-last">
-                  <div class="flex--col app__expand" currencycode="USD" id="undefined" index="0" name="Gold">
+                  <div class="flex--col app__expand" id="undefined" index="0" name="Gold">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
@@ -5396,7 +5396,7 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
               </tr>
               <tr class="">
                 <td class="-last">
-                  <div class="flex--col app__expand" currencycode="USD" id="undefined" index="1" name="Silver">
+                  <div class="flex--col app__expand" id="undefined" index="1" name="Silver">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
@@ -5450,7 +5450,7 @@ exports[`demo example full-DOM contract tablePagination renders a stable, non-em
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width" currencycode="USD" name="tasks">
+          <table class="ui table full-width" name="tasks">
             <thead class="font-normal">
               <tr class="">
                 <th class="left">
@@ -5718,7 +5718,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
     <div>
       <div class="overflow-scroll flex--row max-width">
         <div class="flex--row min-width fill-width">
-          <table class="ui table full-width vertical" currencycode="USD" name="categories">
+          <table class="ui table full-width vertical" name="categories">
             <thead class="font-normal">
             </thead>
             <tbody class="">
@@ -5731,7 +5731,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                   </div>
                 </th>
                 <td class="-last">
-                  <div class="flex--col app__expand" currencycode="USD" id="undefined" index="0" name="Gold">
+                  <div class="flex--col app__expand" id="undefined" index="0" name="Gold">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
@@ -5740,7 +5740,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                   </div>
                 </td>
                 <td class="-last">
-                  <div class="flex--col app__expand" currencycode="USD" id="undefined" index="1" name="Silver">
+                  <div class="flex--col app__expand" id="undefined" index="1" name="Silver">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
@@ -5837,7 +5837,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                 <th class="left undefined-last">
                   <div class="flex--row middle">
                     <div class="flex--row checkbox--wrapper">
-                      <input class="checkbox checkbox" currencycode="USD" id="checkbox-Expand-All" type="checkbox" />
+                      <input class="checkbox checkbox" id="checkbox-Expand-All" type="checkbox" />
                       <label class="flex--row middle justify" for="checkbox-Expand-All">
                         "Expand All"
                       </label>
@@ -5936,7 +5936,7 @@ exports[`demo example full-DOM contract upload renders a stable, non-empty DOM m
     <div class="flex--col app__upload left">
       <div class="upload__dropzone input--wrapper button margin-largest" name="path.to.file" tabindex="0" title="Upload CSV File">
         <input accept=".csv" style="display: none;" tabindex="-1" type="file" />
-        <i aria-hidden="true" class="icon-file-upload margin-right-smaller" currencycode="USD">
+        <i aria-hidden="true" class="icon-file-upload margin-right-smaller">
         </i>
         <span class="text">
           "Upload File"
@@ -5950,7 +5950,7 @@ exports[`demo example full-DOM contract upload renders a stable, non-empty DOM m
 exports[`demo example full-DOM contract uploadVariants renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col padding-large" currencycode="USD">
+    <div class="flex--col padding-large">
       <span class="text h3 h4 margin-bottom-small">
         "Default dropzone"
       </span>
@@ -6017,7 +6017,7 @@ exports[`demo example full-DOM contract uploadVariants renders a stable, non-emp
       <div class="flex--col app__upload left">
         <div class="upload__dropzone input--wrapper button margin-bottom" name="avatar" tabindex="0" title="Upload an image">
           <input accept=".png, .jpg, .jpeg, .webp" style="display: none;" tabindex="-1" type="file" />
-          <i aria-hidden="true" class="icon-image margin-right-smaller" currencycode="USD">
+          <i aria-hidden="true" class="icon-image margin-right-smaller">
           </i>
           <span class="text">
             "Choose image"

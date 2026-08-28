@@ -20,7 +20,6 @@ const messageFromConsoleCall = args => args
 // warning message itself carries (a propTypes owner, a DOM prop name) are fine.
 const EXPECTED_CONSOLE_ERROR_PATTERNS = [
     ['Unknown event handler property', 'onDataChanged'],
-    ['React does not recognize', 'currencyCode'],
     ['non-boolean attribute', 'buttoned'],
     ['Cannot update during an existing state transition', 'Render methods should be a pure function'],
     ['Invalid prop `error` of type `boolean`', 'InputNumber'],

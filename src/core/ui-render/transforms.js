@@ -4,6 +4,9 @@ import Render from './Render'
 
 const FUNCTION_NAMES = ['onClick', 'onChange', 'onDone']
 
+/** Declarations that describe the meta document rather than a component. See metaToProps. */
+const CONTRACT_ATTRIBUTES = ['$schema', 'metaVersion']
+
 /**
  * Map Data by given Mapper definition
  *
@@ -59,6 +62,17 @@ export function metaToProps (meta, config) {
     let {data, _data} = config
     // Transform Root attributes
     if (isObject(meta)) {
+        // Contract declarations (UPGRADE-PLAN §9.4), not component props: `$schema` points an
+        // editor at the published meta.schema.json, `metaVersion` records which contract the
+        // file was authored against. Dropped here — the one place every node passes through on
+        // its way from meta.json to props — because every attribute the engine does not consume
+        // is spread onto the resolved component and reaches the DOM: measured, a surviving
+        // `metaVersion` renders as `metaversion="1"` and makes React warn about an unrecognised
+        // prop, and `$schema` trips React's invalid-attribute-name warning. Safe to mutate:
+        // `rules.js` hands metaToProps a cloneDeep of the host's meta, never the host's object.
+        CONTRACT_ATTRIBUTES.forEach(attribute => {
+            if (meta[attribute] !== undefined) delete meta[attribute]
+        })
         metaToFunctions(meta, {...funcConfig, data, instance})
         if (meta.name) meta.name = interpolateString(meta.name, instance, {suppressError: true})
     }

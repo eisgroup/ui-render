@@ -130,6 +130,169 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
       }
     ```
 
+## Schema, Validation and Versioning
+
+### JSON Schema
+
+The published package ships the contract as a JSON Schema (draft 2020-12):
+`node_modules/eis-ui-render/meta.schema.json`. Point a `meta.json` at it and the editor supplies
+autocomplete for `view` names, render methods, actions and normalizers, and flags the shapes the
+renderer cannot accept:
+
+```json
+{
+  "$schema": "./node_modules/eis-ui-render/meta.schema.json",
+  "view": "Col",
+  "items": [{ "view": "Text", "name": "customer.name" }]
+}
+```
+
+The `$schema` attribute is stripped before rendering, so it changes no output.
+
+The schema is deliberately **permissive**, because the renderer is: component attributes are
+forwarded to the underlying React component, so a node may carry attributes the schema does not
+list, and an unlisted `view` or render-method name is accepted (the renderer accepts it too —
+see below for what it does with it). The schema is strict only where the renderer genuinely is:
+
+| Attribute | Must be | Why |
+|---|---|---|
+| `items` | array | the renderer maps over it; anything else throws mid-render |
+| `headers`, `extraHeaders`, `extraItems` | array | same, inside `Table` |
+| `name` | string | it is interpolated as a template; a truthy non-string throws |
+| `metaVersion` | `"MAJOR"` or `"MAJOR.MINOR"` string | see below |
+
+A `null` attribute is always safe: the renderer deletes null attributes and drops null array
+entries before rendering.
+
+### Dev-mode validation
+
+The same checks are available at runtime, behind an opt-in prop. They are off by default and walk
+nothing until asked:
+
+```jsx
+<UIRender data={data} meta={meta} validateMeta={process.env.NODE_ENV !== 'production'} />
+```
+
+Every finding names the JSON path of the node it came from, which is the point — `items[3]` beats
+a stack trace:
+
+```text
+[ui-render] meta error at "items[3].items[0].name": name must be a string key path, got number …
+[ui-render] meta warning at "headers[2].renderCell": unknown render method "double5" …
+```
+
+- **error** — the renderer will fail on that node (the four shapes in the table above).
+- **warning** — the node renders, but degraded: an unknown or non-string `view` becomes the
+  "field does not exist" placeholder; an unknown `render*` name falls back to plain text (a real
+  and easy mistake: the value renderers are `Currency`, `Percent`, `Double5`, `Float`, `String`,
+  `Date`, `Title+Input`, while the lower-case `double5`, `integer`, `percent`… names belong to
+  `format` / `normalize` / `parse`); a `showIf` that is neither a key path string nor an object is
+  ignored, so the node always renders.
+
+Handler names (`onClick`, `onChange`, `onDone`) are deliberately **not** checked: they resolve
+against built-in actions, the host's `methods` prop and renderer instance methods, so an
+unknown-name warning could not tell a typo from a valid host method.
+
+Pass a function instead of `true` to handle the findings yourself:
+`validateMeta={problems => myLogger(problems)}`. Each entry is
+`{path, severity, code, message}`. The reporter never throws into the application.
+
+### metaVersion
+
+A `meta.json` may declare an optional, root-level `metaVersion` recording which contract it was
+authored against. The current contract version is **`1`**.
+
+```json
+{
+  "metaVersion": "1",
+  "view": "Col",
+  "items": []
+}
+```
+
+- **Leaving it out means "current"** — the file targets whatever contract the installed
+  library implements. That is the right default when the meta files and the library ship
+  together, and it is why every existing `meta.json` keeps working unchanged.
+- **MAJOR** increases only for a change that would break existing meta; **MINOR** for additive
+  ones. Declaring a version at or below what the library implements is always compatible.
+- The renderer **ignores the value** and strips the field before rendering, so declaring it never
+  changes output. Only dev-mode validation reads it, and only to report a malformed value, a
+  version newer than the installed library, or a `metaVersion` on a nested node, where it means
+  nothing.
+
+Nothing negotiates on this field, by design: it exists so a future contract change can be
+additive and announced, not so a document can request a different renderer.
+
+Do not confuse it with the legacy `version` attribute in older meta files. That one is not a
+contract version — files use it both as a producer version at the root and as a node label deeper
+in the tree — and the renderer discards it.
+
+## Renderer Props
+
+Everything above configures the *document*. These configure the *renderer* — they are props
+of the `UIRender` component, not attributes of a `meta.json` node.
+
+### dateFormat, currency, language
+
+```jsx
+<UIRender data={data} meta={meta} dateFormat="DD/MM/YYYY" currency="EUR" language="fr" />
+```
+
+| Prop | Default | Effect |
+|---|---|---|
+| `dateFormat` | `MM-DD-YYYY` | `moment` format tokens for every date the renderer **displays** (an ISO-8601 value inside a `Text` node, a `render*: "Date"` value) and **edits** (what the date picker shows, and the format it parses typed input with first) |
+| `currency` | `USD` | published as a CSS class on the renderer's shell — `.app.EUR` — for currency-specific styling |
+| `language` | `en` | published as a CSS class on the renderer's shell — `.app.lang--fr` |
+
+They reach every component through `ConfigContext`, so a value inside a nested `Table` cell
+or a `Popup` is formatted the same way as a top-level field. Each key is merged
+independently: passing only `dateFormat` leaves the inherited `currency` and `language`
+alone, so an application can configure some values once around the renderer (through
+`AppProvider`) and others per renderer.
+
+> `currency` is **not** `meta.currencyCode`. `currencyCode` is a meta attribute and selects
+> the currency *symbol* the value renderers print; `currency` is a prop and only labels the
+> shell.
+
+> @Note: these three props were accepted and then ignored for a long time — the renderer
+> dropped `dateFormat` on its way down the tree, nothing fed the context, and every
+> component fell back to `MM-DD-YYYY`. They now take effect, which means a meta document
+> that was authored against the ignored behaviour will start rendering its dates in the
+> format the host asks for.
+
+### onError
+
+A node whose subtree fails to render is replaced by a one-line diagnostic; the rest of the
+document keeps rendering. `onError` hands you the same failure as a report:
+
+```jsx
+<UIRender data={data} meta={meta} onError={report => myLogger.error(report)} />
+```
+
+```js
+{
+  error,      // the thrown value
+  errorInfo,  // React's {componentStack}
+  path,       // JSON path of the node in `meta` — 'items[3].items[0]', '' for the root
+  props,      // that node's resolved props: the meta declaration plus what the engine added
+  message,    // the one-line diagnostic, also rendered in place of the failed node
+}
+```
+
+```text
+[ui-render] render error at "items[1]" (view "Table", name "orders"): TypeError: headers.map is not a function
+```
+
+`path` uses the same notation as the dev-mode validation above, so a `validateMeta` warning
+and a render failure point at a node the same way. It is exact for a failure inside the
+component a node resolved to; for a failure the renderer hits while preparing a node — a
+malformed `items`, for instance — it names the closest enclosing node, which is the most
+precise position available.
+
+The library reports the failure on its own console channel as well, so `onError` is an extra
+channel rather than a way to silence the diagnostic. A reporter that throws is caught: it
+cannot replace the failure it was called to report.
+
 ## Component Attributes
 
 ### Root Level

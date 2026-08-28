@@ -145,16 +145,6 @@ const KNOWN_DOM_DEFECTS = [
             + ' the "-last" suffix is only meaningful on the "sticky" class.',
     },
     {
-        marker: 'currencycode="USD"',
-        count: 331,
-        cause: 'src/core/ui-render/Render.js:126 passes currencyCode to every rendered node, and it'
-            + ' reaches the DOM through the {...props} spread at src/core/components/View.js:34. This is'
-            + ' the most prolific leak in the baseline and the only lowercase one React does warn about,'
-            + ' so it is also allowlisted in Examples.registry-and-rendering.test.js. The changelog'
-            + ' records two earlier partial fixes for it, which is why it gets a counted tripwire:'
-            + ' a central strip is unsafe (List.js and the Tabs branch of mapper.js consume it).',
-    },
-    {
         marker: 'data="[object Object]"',
         count: 40,
         cause: 'the Render.Method renderers in src/core/pages/main/mapper.js destructure only the'
@@ -209,7 +199,7 @@ describe('demo example full-DOM contract', () => {
         }
     )
 
-    it('still emits aria-describedby references that resolve to nothing', () => {
+    it('emits no aria-describedby reference that resolves to nothing', () => {
         if (renderedDom.size !== snapshotExamples().length) {
             throw new Error(
                 `this check needs every example rendered (have ${renderedDom.size} of`
@@ -217,24 +207,31 @@ describe('demo example full-DOM contract', () => {
             )
         }
 
-        // Input.js:125, InputNumber.js:202 and InputDate.js:108 set aria-describedby
-        // unconditionally, but the element carrying the target id is rendered only when there is an
-        // error or info message (Input.js:145, InputNumber.js:250, InputDate.js:124). So every
-        // reference in the baseline points at an id that exists nowhere in its document — an axe
-        // `aria-valid-attr-value` violation, pinned here rather than blessed silently by the
-        // snapshots. Fixing it means making the attribute conditional too, which changes rendered
-        // output for consumers, so it needs its own change: expect this to fail then, and delete it.
-        const referenced = []
-        const declared = new Set()
-        for (const dom of renderedDom.values()) {
-            for (const [, value] of dom.matchAll(/aria-describedby="([^"]*)"/g)) {
-                referenced.push(...value.split(/\s+/).filter(Boolean))
-            }
+        // Input.js, InputNumber.js and InputDate.js used to set aria-describedby
+        // unconditionally while rendering the element that carries the target id only when
+        // there is an error or info message — so all 57 references in the first baseline
+        // pointed at an id that existed nowhere in its document (an axe
+        // `aria-valid-attr-value` violation). The attribute is now conditional on the same
+        // value as the element, and this asserts the invariant across the whole corpus.
+        //
+        // None of the 38 examples mounts with a validation message, so the corpus currently
+        // holds ZERO references — which still catches a regression: restoring the
+        // unconditional attribute puts 57 dangling references back and fails this test. The
+        // positive direction (the attribute appears, and resolves, as soon as there is a
+        // message) is covered per component by
+        // src/core/components/__tests__/inputs.aria-describedby.test.js.
+        const dangling = []
+        for (const [id, dom] of renderedDom) {
+            const declared = new Set()
             for (const [, value] of dom.matchAll(/\sid="([^"]*)"/g)) declared.add(value)
+            for (const [, value] of dom.matchAll(/aria-describedby="([^"]*)"/g)) {
+                value.split(/\s+/).filter(Boolean)
+                    .filter(reference => !declared.has(reference))
+                    .forEach(reference => dangling.push(`${id}: ${reference}`))
+            }
         }
 
-        expect(referenced).toHaveLength(57)
-        expect(referenced.filter(id => declared.has(id))).toEqual([])
+        expect(dangling).toEqual([])
     })
 
     it.each(KNOWN_DOM_DEFECTS)('still emits the known defect $marker $count times', ({ marker, count }) => {

@@ -81,11 +81,15 @@ describe('Render recursive integration contracts', () => {
             ],
         }))
 
-        expect(await screen.findByText('Error: broken child')).toBeInTheDocument()
+        expect(await screen.findByText(
+            '[ui-render] render error at "items[0]" (view "Broken"): Error: broken child'
+        )).toBeInTheDocument()
         expect(screen.getByText('healthy sibling')).toBeInTheDocument()
         await waitFor(() => expect(Render.onError).toHaveBeenCalledTimes(1))
         expect(Render.onError).toHaveBeenCalledWith(expect.objectContaining({
             error: failure,
+            // The failing node is the first child of the root, and the report says so.
+            path: 'items[0]',
             props: expect.objectContaining({ view: 'Broken', marker: 'failed-node' }),
             errorInfo: expect.objectContaining({ componentStack: expect.any(String) }),
         }))

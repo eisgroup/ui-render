@@ -26,7 +26,7 @@ import View from '../../components/View'
 import { Active, debounce, interpolateString, isList, isNumeric, isString, isTruthy, toFlatList, toJSON } from '../../utils'
 import { TIME_DURATION_INSTANT } from '../../utils/constants'
 import { get, hasObjectValue, isEqual, isObject, mergeReplaceArrays } from '../../utils/object'
-import Render, { mapProps } from '../../ui-render'
+import Render, { formatRenderError, mapProps } from '../../ui-render'
 import { relativePathFrom } from '../../ui-render/transforms'
 import { renderField } from './components/renders'
 import TableView from './components/TableView'
@@ -68,6 +68,14 @@ const RenderComponent = ({
     // Always superseded by `Active.translate` below, and `translate` is a real HTML global attribute:
     // left in `props` it reaches the DOM via spread (e.g. TableCell -> <td>) and React warns on the function value.
     translate: _translate,
+    // Engine-internal: `Render.js` hands this to every node so value renderers can pick a currency symbol,
+    // but most views never read it, and left in `props` it reached the DOM as currencycode="USD" on div/span/
+    // td/th/tr/input (331 occurrences across 33 of the 38 examples). Stripping it here rather than in each
+    // presentational component is safe because the propagation *down the tree* is done independently by
+    // `Render.js`; only the leaf spread is cut. The two views that genuinely consume it -- `List`, which
+    // injects it into every rendered item, and the Tabs branch, which injects it into tab/content
+    // definitions -- receive it explicitly below.
+    currencyCode,
     ...props
 }) => {
     const { popup } = useContext(AppContext)
@@ -153,12 +161,12 @@ const RenderComponent = ({
         case FIELD.TYPE.LIST:
         case FIELD.TYPE.COL_LIST:
         case FIELD.TYPE.COL_LIST3: {
-            return <List items={_data} {...props}/>
+            return <List items={_data} {...props} currencyCode={currencyCode}/>
         }
 
         case FIELD.TYPE.ROW_LIST:
         case FIELD.TYPE.ROW_LIST2: {
-            return <List items={_data} {...props} row/>
+            return <List items={_data} {...props} currencyCode={currencyCode} row/>
         }
 
         case FIELD.TYPE.TABLE_CELLS: {
@@ -415,7 +423,7 @@ const RenderComponent = ({
 
         case FIELD.TYPE.TABS:
         case FIELD.TYPE.TAB_LIST: {
-            const { childrenBeforeTabs, childrenAfterTabs, currencyCode } = props
+            const { childrenBeforeTabs, childrenAfterTabs } = props
             if (hasObjectValue(childrenBeforeTabs))
                 props.childrenBeforeTabs = Render.bind(this, {
                     data,
@@ -471,7 +479,6 @@ const RenderComponent = ({
                 props.children = _data
             }
             if (view === FIELD.TYPE.TITLE) props.className = cn('h3', props.className)
-            delete props.currencyCode
             return <Text {...props} translate={translate}/>
         }
 
@@ -684,27 +691,20 @@ Render.Method = function RenderMethod (Name) {
 }
 
 /**
- * Error handling when something breaks because of mis-configured meta.json
+ * The library's own sink for a per-node render failure (UPGRADE-PLAN §9.4, §2.6-3).
+ *
+ * @Note: this used to destructure `{err, errInfo}` while the boundary emits
+ * `{error, errorInfo}`, so it printed `undefined undefined` and a render failure was, in
+ * practice, silent. It also used `console.log`, which is not where a failure belongs.
+ *
+ * The whole report is logged after the formatted line so a developer can open `errorInfo`
+ * (React's component stack) and `props` (the node's resolved props) in the console. A host
+ * that wants to *handle* the failure — report it, show its own message — passes the
+ * documented `onError` prop instead of replacing this function; both run.
+ *
+ * @param {Object} report - {error, errorInfo, props, path, message}
+ * @returns {void}
  */
-Render.onError = ({ err, errInfo, props }) => console.log(err, errInfo, props)
-// Render.onError = ({err, errInfo, props}) => Active.store.dispatch(stateAction(POPUP, ALERT, {
-//   items: [
-//     {
-//       title: `${Render.name} Error!`,
-//       content: <View>
-//         <Text className="h5">{_.ERROR_MESSAGE}</Text>
-//         <Text className="p">{String(err)}</Text>
-//         <Text className="h5 padding-top">{_.DATA_CAUSING_ERROR}</Text>
-//         <View style={{textAlign: 'left'}}>
-//           <Json data={props}/>
-//         </View>
-//         <Text className="h5 padding-top">{_.ERROR_INFO}</Text>
-//         <View style={{textAlign: 'left'}}>
-//           <Json data={errInfo}/>
-//         </View>
-//       </View>
-//     }
-//   ]
-// }))
+Render.onError = (report) => console.error(formatRenderError(report), report)
 
 Render.Component = RenderComponent

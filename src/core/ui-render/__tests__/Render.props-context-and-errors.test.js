@@ -32,10 +32,17 @@ describe('Render engine edge contracts', () => {
 
         render(Render({ view: 'Broken', items: [], data: { id: 7 } }))
 
-        expect(await screen.findByText('Error: renderer failed')).toBeInTheDocument()
+        // The diagnostic rendered in place of the failed subtree names the node, not just the
+        // error: a bare `String(error)` in a page of them says nothing about which declaration
+        // to go and fix. Reported and rendered text are the same string (§9.4).
+        expect(await screen.findByText(
+            '[ui-render] render error at the meta root (view "Broken"): Error: renderer failed'
+        )).toBeInTheDocument()
         await waitFor(() => expect(Render.onError).toHaveBeenCalledTimes(1))
         expect(Render.onError.mock.calls[0][0]).toEqual(expect.objectContaining({
             error: failure,
+            path: '',
+            message: '[ui-render] render error at the meta root (view "Broken"): Error: renderer failed',
             props: expect.objectContaining({ view: 'Broken', data: { id: 7 } }),
             errorInfo: expect.objectContaining({ componentStack: expect.any(String) }),
         }))

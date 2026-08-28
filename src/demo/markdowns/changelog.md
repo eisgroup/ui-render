@@ -2,6 +2,65 @@
 
 ### Unreleased
 
+#### Meta contract
+
+- The `meta.json` contract now ships as a JSON Schema (draft 2020-12) at
+  `eis-ui-render/meta.schema.json`, so meta authors get editor autocomplete and validation.
+  Point a file at it with `"$schema": "./node_modules/eis-ui-render/meta.schema.json"`, or map it
+  once for `**/*_meta.json` in the workspace settings. The schema stays as permissive as the
+  renderer — component attributes it does not list are still accepted, and an unlisted `view`,
+  render-method, action or normalizer name is suggested-but-not-required — and constrains only the
+  shapes the renderer genuinely needs: `items`, `headers`, `extraHeaders` and `extraItems` must be
+  arrays and `name` must be a string. The suggested vocabularies are checked against the
+  renderer's own definitions, so they cannot drift from it.
+- New opt-in `validateMeta` prop runs the same rules at runtime and reports the **JSON path** of
+  the offending node — `items[3].items[0].name` — instead of leaving a stack trace inside a
+  minified bundle. `error` findings are shapes the renderer fails on; `warning` findings are nodes
+  that render but degrade silently, such as an unknown `view` (a "field does not exist"
+  placeholder) or an unknown `render*` method (plain text). It is off by default and walks nothing
+  until enabled, reports to `console.warn`, accepts a function instead of `true` to collect the
+  findings, and never throws into the host application.
+- New optional root-level `metaVersion` field (`"MAJOR"` or `"MAJOR.MINOR"`; current contract
+  version `1`) records which contract a file was authored against, so future contract changes can
+  be additive and announced. **Absence means "current"**, so no existing `meta.json` needs to
+  change. The renderer ignores the value and strips the field before rendering, exactly as it now
+  strips `$schema`, so declaring either changes no output; only dev-mode validation reads it.
+  This is unrelated to the legacy `version` attribute, which the renderer still discards.
+
+#### Renderer configuration and error reporting
+
+- **The `dateFormat`, `currency` and `language` props now work.** They were accepted and then
+  silently dropped: the renderer discarded `dateFormat` on its way down the tree, nothing fed
+  the configuration context, and every component fell back to the built-in `MM-DD-YYYY`
+  regardless of what the host passed. All three are now published to every rendered component
+  — a nested table cell or popup field formats a date exactly like a top-level field — and each
+  key is merged independently, so passing one does not reset the others. `currency` and
+  `language` also reach the shell's CSS classes (`.app.EUR`, `.app.lang--fr`). **This changes
+  rendered output** for any host that passes `dateFormat`: dates start honouring it. It is
+  unrelated to `meta.currencyCode`, which still selects the currency symbol used by the value
+  renderers.
+- `TextDateValue` honours the `dateFormat` prop it declares, instead of always reading the
+  configured format. An explicitly given format wins over the configured one.
+- **New `onError` prop**: a report for every node whose subtree fails to render — `{error,
+  errorInfo, path, props, message}`, where `path` is the JSON path of the failing node in
+  `meta` (`items[3].items[0]`), the same notation dev-mode meta validation uses. Reporting a
+  render failure was previously impossible for a host to observe at all: the library's own sink
+  read the wrong field names off the report and printed `undefined undefined` to
+  `console.log`, so a mis-configured node failed silently. The sink is fixed, reports on the
+  error channel, and now names the failing node; the diagnostic rendered in place of the
+  failed subtree names it too, instead of showing a bare `Error: …`. A host reporter that
+  throws cannot replace the failure it was called to report.
+
+#### Accessibility
+
+- The text, number and date inputs no longer emit an `aria-describedby` pointing at an element
+  that does not exist. The attribute was unconditional while the element carrying the target id
+  renders only when there is an error or info message, so every reference in a form without
+  validation messages was dangling — an axe `aria-valid-attr-value` violation, and nothing for
+  a screen reader to announce. The reference now appears exactly when the message it points at
+  does. In the demo example set this removes 57 dangling references; no other rendered output
+  changes.
+
 #### Compatibility
 
 - Development and the primary test suite now run on React 18.3.1, and the demo mounts through the
@@ -79,6 +138,12 @@
 
 #### Fixes
 
+- Rendered markup no longer carries the internal `currencyCode` value as an HTML attribute.
+  The engine hands it to every node so value renderers can choose a currency symbol, but most
+  views never read it, and it was reaching the page as `currencycode="..."` on `div`, `span`,
+  table cells and inputs — 331 occurrences across 33 of the 38 bundled examples — which React
+  also reported as an unrecognised DOM prop on every render. It is now stripped where views are
+  resolved, and passed explicitly to the two that consume it. Currency formatting is unchanged.
 - Upload no longer hands the host a blanked-out drag event on React 16. Its drag focus/blur callbacks
   run after the component re-renders, and React 16 recycles event objects once the original handler
   returns, so an application reading `type` or `target` from the forwarded event saw `null`. The event

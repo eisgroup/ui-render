@@ -39,6 +39,12 @@ jobs:
       - name: Lint styles
         run: npm run lint:css
 
+      # docs/SUPPORTED-VIEWS.md is generated from the FIELD constants and the resolver source.
+      # The suite checks the same thing (scripts/__tests__/view-reference.contract.test.js, so all
+      # four legs cover it), but this step runs the CLI and names the failure for what it is.
+      - name: Check the generated view reference
+        run: npm run docs:views:check
+
       - name: Test with coverage thresholds
         run: npm run test:coverage
 
@@ -75,9 +81,12 @@ jobs:
   # Aliased devDependencies -- the trick `react-types-16` uses -- cannot work for a runtime package, because
   # `react-dom@16.14.0` peer-requires `react` and npm resolves that against the hoisted copy React 18 owns.
   #
-  # Green here means 143 suites / 2015 tests, the same totals as the React 18 leg — there are no exclusions.
-  # In CI it prints `3 skipped, 2012 passed`: static/ is git-ignored, so the CSS parity suite's
-  # published-artifact block skips on a clean checkout.
+  # Green here means the SAME suite and test totals as the React 18 leg — this job excludes nothing and
+  # skips nothing of its own. Deliberately not pinning the numbers here: they went stale four times in
+  # one change, since every added test invalidates them, and the invariant is what actually matters.
+  # The only skips are the CSS parity suite's published-artifact block, which needs `static/` — that is
+  # git-ignored, so it cannot exist on a clean checkout. Any other skip or a total that differs from the
+  # React 18 leg means this leg silently stopped running something.
   # jest.react16.config.js and scripts/fixtures/react-legacy/harness.js assert the React that actually loaded,
   # so a mapping that silently fell back to 18 fails every suite instead of reporting a false green.
   react-16-floor:
@@ -112,8 +121,8 @@ jobs:
   # existing `react-16-floor` job and silently drop it out of any branch-protection required-check list.
   # Nothing is shared by running them together anyway -- each leg gets its own runner and its own `npm ci`.
   #
-  # Green here means 143 suites / 2015 tests, the same totals as the React 18 and 16.14 legs — no exclusions
-  # (CI prints `3 skipped, 2012 passed`; see the react-16-floor comment above).
+  # Green here means the same suite and test totals as the React 18 and 16.14 legs, with nothing excluded
+  # (see the react-16-floor comment above for why the numbers are not pinned and what may legitimately skip).
   # The same two-level self-check applies (jest.react17.config.js in the parent process,
   # scripts/fixtures/react-legacy/harness.js in every worker), so a mapping that silently fell back to the
   # installed 18 fails every suite with zero tests run instead of reporting a false green.

@@ -1,0 +1,439 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eisgroup.github.io/ui-render/meta.schema.json",
+  "title": "eis-ui-render meta.json",
+  "description": "UI declaration consumed by the eis-ui-render UIRender component. A meta.json file is a single root Field node; every node may nest further nodes under `items`. The schema is deliberately open: nodes accept properties beyond the ones listed here, because component props are forwarded to the underlying React component. Constraints are only declared where the engine genuinely requires them — every one of them corresponds to a verified runtime failure, and the shipped test suite validates all bundled examples against this file.",
+  "$ref": "#/$defs/node",
+  "properties": {
+    "$schema": {
+      "description": "OPTIONAL pointer to this schema, e.g. \"./node_modules/eis-ui-render/meta.schema.json\". Editors pick up validation and autocomplete from it with no workspace configuration. The engine strips the field before rendering, so it costs nothing at runtime.",
+      "type": "string"
+    },
+    "metaVersion": {
+      "$ref": "#/$defs/metaVersion"
+    }
+  },
+  "$defs": {
+    "metaVersion": {
+      "description": "OPTIONAL contract version this file was authored against, as `MAJOR` or `MAJOR.MINOR` (current: \"1\"). Root-level only. Absence means \"current\": the file targets whatever contract the installed eis-ui-render implements, which is the right choice when meta and library ship together. MAJOR changes only for a change that would break existing meta; MINOR for additive ones. The engine ignores the value and strips the field before rendering, so declaring it never changes output.",
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)?$",
+      "examples": [
+        "1",
+        "1.0"
+      ]
+    },
+    "node": {
+      "description": "A Field node. `view` selects the React component; `items` nests children.",
+      "type": "object",
+      "properties": {
+        "view": {
+          "$ref": "#/$defs/view"
+        },
+        "name": {
+          "description": "Dot/bracket key path into data.json (or into the node's inherited relative data). Curly braces interpolate dynamic state, e.g. \"plan.{state.plan,0}.title\". MUST be a string: the engine interpolates it with String.prototype.replace, so any other type throws during render.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "items": {
+          "description": "Nested child nodes. MUST be an array: the engine maps over it, so any other type throws during render.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/nodeEntry"
+          }
+        },
+        "relativeData": {
+          "description": "false makes `name` resolve against the root data.json instead of the inherited local data. Inherited by descendants; a descendant may opt back in with true.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "showIf": {
+          "description": "Conditional rendering. A string is a key path that must be truthy. An object narrows it: {name, equal, relativeData}; an empty object tests the node's own local data.",
+          "$ref": "#/$defs/showIf"
+        },
+        "headers": {
+          "description": "Table column definitions, each a node-shaped object (`id`, `label`, `renderCell`, ...). MUST be an array: the Table component maps over it.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/nodeEntry"
+          }
+        },
+        "extraHeaders": {
+          "description": "Additional Table column definitions appended after `headers`. MUST be an array.",
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "extraItems": {
+          "description": "Additional Table rows appended after the data rows. MUST be an array.",
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "meta": {
+          "description": "Nested UIRender declaration. The engine does not transform this subtree — the nested instance validates and renders it on its own — so it is a complete meta document, including its own optional `metaVersion`.",
+          "$ref": "#"
+        },
+        "onClick": {
+          "$ref": "#/$defs/functionRef"
+        },
+        "onChange": {
+          "$ref": "#/$defs/functionRef"
+        },
+        "onDone": {
+          "$ref": "#/$defs/functionRef"
+        },
+        "type": {
+          "description": "Input variant. `select`, `slider`, `toggle` and `file` re-resolve an Input node to the matching field component; `number` and `date` select the numeric and date field. Any other value is passed through to the underlying input element.",
+          "$ref": "#/$defs/inputType"
+        },
+        "format": {
+          "description": "Name of a value normalizer applied when displaying the field value.",
+          "$ref": "#/$defs/normalizerName"
+        },
+        "normalize": {
+          "description": "Name of a value normalizer applied to the field value on change.",
+          "$ref": "#/$defs/normalizerName"
+        },
+        "parse": {
+          "description": "Name of a value parser (falls back to the normalizer of the same name) applied when reading the field value back.",
+          "$ref": "#/$defs/normalizerName"
+        },
+        "validate": {
+          "description": "Field validation. A string names a built-in validator. Any other shape is forwarded to the form library unchanged."
+        },
+        "verify": {
+          "description": "Cross-field validation, composed ahead of `validate`. `validate` here is one {name, args} definition or a list of them; remaining properties are passed to each validator as options.",
+          "type": "object",
+          "properties": {
+            "validate": {
+              "description": "One cross-field validator definition, or a list of them."
+            }
+          }
+        },
+        "mapOptions": {
+          "description": "Maps raw option objects to the {text, value} shape a Select/Dropdown needs. A string picks that single key path; an object maps target prop -> source key path, where the literal \"{index}\" yields the option's array index as a string.",
+          "$ref": "#/$defs/mapper"
+        },
+        "mapItems": {
+          "description": "Maps raw data rows to the shape a chart needs, in the same form as `mapOptions`.",
+          "$ref": "#/$defs/mapper"
+        },
+        "filterItems": {
+          "description": "Row filter definitions applied to the node's collection.",
+          "type": "array"
+        },
+        "tooltip": {
+          "description": "Wraps the rendered node in a tooltip. A string is the tooltip title; an object is passed to the tooltip component."
+        },
+        "styles": {
+          "description": "CSS class names. Transformed into `className` before rendering; the object form is the single-key value transform.",
+          "$ref": "#/$defs/stringOrValueRef"
+        },
+        "className": {
+          "description": "CSS class names, used as-is.",
+          "$ref": "#/$defs/stringOrValueRef"
+        },
+        "label": {
+          "description": "Visible label. The object form is the single-key value transform."
+        },
+        "children": {
+          "description": "Literal content for text-like views, used when the node declares no `items`."
+        },
+        "tab": {
+          "description": "Tabs item header: a string, or a node rendered as the tab header."
+        },
+        "content": {
+          "description": "Tabs / ProgressSteps item body: a node rendered lazily when the item becomes active."
+        },
+        "metaVersion": {
+          "description": "Only meaningful on the root node. The engine strips it everywhere; on a nested node it is silently ignored.",
+          "$ref": "#/$defs/metaVersion"
+        }
+      },
+      "patternProperties": {
+        "^render": {
+          "$ref": "#/$defs/renderer"
+        }
+      }
+    },
+    "nodeEntry": {
+      "description": "An entry in a node collection. `null` is allowed because the engine deletes null attributes and filters null array entries before rendering, so a null entry is dropped rather than rendered.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/node"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "showIf": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Key path whose value is tested. Supports {state.x} interpolation.",
+              "type": "string"
+            },
+            "equal": {
+              "description": "When present, the value at `name` must deep-equal this. When absent, the value must be truthy."
+            },
+            "relativeData": {
+              "description": "false resolves `name` against the root data instead of the inherited local data.",
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "renderer": {
+      "description": "A `render*` value transform. A string names a built-in render method (unknown names fall back to plain text). An object is either a nested field definition (has `view`), a function definition (has `name`), or a value-match map (has `values`).",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/renderMethodName"
+        },
+        {
+          "$ref": "#/$defs/node"
+        }
+      ]
+    },
+    "functionRef": {
+      "description": "A handler. A string names a built-in action, a host-supplied `methods` entry or a renderer instance method, with comma-separated trailing arguments (e.g. \"setState,active.plan\"). The object form adds arguments and chaining.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Action name.",
+              "$ref": "#/$defs/actionName"
+            },
+            "args": {
+              "description": "Extra arguments appended after the caller's own arguments. Strings containing curly braces are interpolated with the current row index and value.",
+              "type": "array"
+            },
+            "mapArgs": {
+              "description": "Replaces the caller's arguments with values interpolated from them and from data.json.",
+              "type": "array"
+            },
+            "onDone": {
+              "description": "Chained handler invoked with the result (awaited when the result is a Promise).",
+              "$ref": "#/$defs/functionRef"
+            }
+          }
+        }
+      ]
+    },
+    "mapper": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "stringOrValueRef": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/valueRef"
+        },
+        {
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "A class-name value. Passed to `classNames()`, which accepts a string or number, an array of those (recursively), an object whose truthy keys are used, or null."
+    },
+    "valueRef": {
+      "description": "Single-key value transform: replaced by the value found at `name` before rendering.",
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "relativeData": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    },
+    "view": {
+      "description": "Component type. The listed values are the vocabulary the engine declares; an unlisted string is accepted by this schema but renders a \"field does not exist\" placeholder, so the dev-mode validator reports it.",
+      "anyOf": [
+        {
+          "enum": [
+            "AutoSubmit",
+            "Button",
+            "Checkbox",
+            "Col",
+            "ColList",
+            "Column",
+            "Counter",
+            "Data",
+            "Date",
+            "Dates",
+            "Dropdown",
+            "Expand",
+            "ExpandList",
+            "Fields",
+            "FieldsWithLevel",
+            "Group",
+            "HorizontalLayout",
+            "HorizontalList",
+            "Icon",
+            "Image",
+            "Input",
+            "Label",
+            "Link",
+            "List",
+            "PieChart",
+            "Place",
+            "Popup",
+            "ProgressSteps",
+            "Row",
+            "RowList",
+            "Select",
+            "SliderLabel",
+            "Space",
+            "TabList",
+            "Table",
+            "TableCells",
+            "Tabs",
+            "Text",
+            "Title",
+            "Toggle",
+            "Tooltip",
+            "Upload",
+            "UploadGrid",
+            "UploadGrids",
+            "VerticalLayout",
+            "VerticalList"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "renderMethodName": {
+      "description": "Built-in value renderer. An unlisted string is accepted here but falls back to plain text at runtime, so the dev-mode validator reports it.",
+      "anyOf": [
+        {
+          "enum": [
+            "Currency",
+            "Date",
+            "Double5",
+            "Float",
+            "Percent",
+            "String",
+            "Title+Input"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "actionName": {
+      "description": "Built-in action. Host applications extend this set through the `methods` prop, so an unlisted string is valid.",
+      "anyOf": [
+        {
+          "enum": [
+            "addData",
+            "download",
+            "fetch",
+            "onApplyPeriods",
+            "popup",
+            "popupOpen",
+            "removeData",
+            "reset",
+            "setState",
+            "submit",
+            "updateDataOnChange",
+            "upload",
+            "warn"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "normalizerName": {
+      "description": "Built-in value normalizer / parser. An unlisted string leaves the value untouched.",
+      "anyOf": [
+        {
+          "enum": [
+            "currency",
+            "date",
+            "double5",
+            "hh:mm",
+            "integer",
+            "percent",
+            "phone",
+            "uppercase"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "inputType": {
+      "anyOf": [
+        {
+          "enum": [
+            "date",
+            "file",
+            "number",
+            "select",
+            "slider",
+            "text",
+            "textarea",
+            "toggle"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
+  }
+}

@@ -91,7 +91,11 @@ const InputNumber = ({
     }
     if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
     if (!label && title) props.title = translate(title)
-    const idHelp = id + '-help'
+    // An `aria-describedby` naming an id no element carries is worse than none: it is an axe
+    // `aria-valid-attr-value` violation, and a screen reader announces nothing for it. The help
+    // element exists only while there is a message, so the reference is conditional on the same
+    // value — one binding for both, so the two cannot disagree again.
+    const idHelp = (error || info) ? id + '-help' : undefined
 
     const hasValue = useMemo(() => 
         value !== '' && value !== undefined && !isNaN(parseFloat(value)), 
@@ -246,7 +250,7 @@ const InputNumber = ({
                 )}
                 {float && label && <Label htmlFor={id} title={translate(title)}>{translate(label)}</Label>}
             </Row>
-            {(error || info) &&
+            {idHelp &&
                 <View id={idHelp} className="field-help">
                     {error && <Text className="error">{translate(error)}</Text>}
                     {info && <Text className="into">{translate(info)}</Text>}

@@ -12,6 +12,7 @@
   "files": [
     "dist/",
     "static/",
+    "meta.schema.json",
     "package.json",
     "LICENSE",
     "README.md"
@@ -39,7 +40,9 @@
     "test:react17": "jest --config jest.react17.config.js",
     "test:watch": "jest --watch",
     "build-css": "node scripts/build-css.js",
-    "prepack": "npm run sync-version -- --check && npm run build-lib",
+    "docs:views": "node scripts/generate-view-reference.js",
+    "docs:views:check": "node scripts/generate-view-reference.js --check",
+    "prepack": "npm run sync-version -- --check && npm run docs:views:check && npm run build-lib",
     "sync-version": "node scripts/sync-version.js",
     "version": "node scripts/sync-version.js && git add src/library/AppWrapper.js public/index.html",
     "lint:js": "eslint src --ext .js,.jsx --max-warnings 0",
