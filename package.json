@@ -42,7 +42,9 @@
     "build-css": "node scripts/build-css.js",
     "docs:views": "node scripts/generate-view-reference.js",
     "docs:views:check": "node scripts/generate-view-reference.js --check",
-    "prepack": "npm run sync-version -- --check && npm run docs:views:check && npm run build-lib",
+    "docs:props": "node scripts/generate-wrapper-prop-reference.js",
+    "docs:props:check": "node scripts/generate-wrapper-prop-reference.js --check",
+    "prepack": "npm run sync-version -- --check && npm run docs:views:check && npm run docs:props:check && npm run build-lib",
     "sync-version": "node scripts/sync-version.js",
     "version": "node scripts/sync-version.js && git add src/library/AppWrapper.js public/index.html",
     "lint:js": "eslint src --ext .js,.jsx --max-warnings 0",
@@ -54,7 +56,36 @@
       "ecmaFeatures": {
         "legacyDecorators": true
       }
-    }
+    },
+    "overrides": [
+      {
+        "files": [
+          "src/**/*.js",
+          "src/**/*.jsx",
+          "src/**/*.ts",
+          "src/**/*.tsx"
+        ],
+        "excludedFiles": [
+          "src/core/components/**"
+        ],
+        "rules": {
+          "no-restricted-imports": [
+            "error",
+            {
+              "paths": [
+                {
+                  "name": "semantic-ui-react",
+                  "message": "semantic-ui-react may only be imported inside src/core/components (ui-react-pack). See UPGRADE-PLAN 9.7-F1 and docs/SUPPORTED-PROPS.md."
+                }
+              ],
+              "patterns": [
+                "semantic-ui-react/*"
+              ]
+            }
+          ]
+        }
+      }
+    ]
   },
   "browserslist": [
     ">0.2%",

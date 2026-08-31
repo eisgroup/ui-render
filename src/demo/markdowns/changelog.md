@@ -61,6 +61,27 @@
   does. In the demo example set this removes 57 dangling references; no other rendered output
   changes.
 
+#### Documentation
+
+- **New page: the supported props of `Table`, `Tooltip` and `Select` / `Dropdown`** —
+  `docs/SUPPORTED-PROPS.md` in the repository, linked from the README. Those three views are the
+  only ones still implemented by `semantic-ui-react`, and this is the first time their prop surface
+  has been written down. Each prop is listed with two things: what actually happens to it —
+  consumed by our own wrapper, stripped before it reaches the DOM, or forwarded to
+  `semantic-ui-react` — and whether any real meta uses it. Nothing changes at runtime; the page is
+  generated from the component source and checked in CI, so the derived half — which prop reaches where —
+  cannot drift away from the code. The explanatory prose beside it is curated, not machine-checked, and
+  the page says so itself.
+- **Worth reading if you author meta for those views.** 24 of the props these three accept reach
+  `semantic-ui-react` but are used by no meta we can see. About fourteen of them are ones you could
+  actually write in a meta: `search`, `multiple`, `allowAdditions` and `clearable` on a select,
+  `position`, `on`, `hoverable` and `basic` on a tooltip, and `celled`, `textAlign`, `striped`,
+  `inverted` and `as` on a table. The rest are either derived by the component from another prop
+  (so a meta cannot set them) or belong to a table subcomponent rather than the view. All three
+  components are being reimplemented in-house, and whether each of these is rebuilt or dropped is
+  still an open decision. **If your meta uses one of them, please say so** — that list is the
+  evidence the decision will be made from.
+
 #### Compatibility
 
 - Development and the primary test suite now run on React 18.3.1, and the demo mounts through the
