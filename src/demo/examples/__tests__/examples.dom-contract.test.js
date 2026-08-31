@@ -122,11 +122,12 @@ const renderExample = ({ data, meta }) => {
  *     same field ids, and each `<label for=…>` can therefore only ever resolve to the
  *     first. The pie chart emits each of its six gradient defs twice.
  *
- * The engine-internal props that used to head that list — `view`, `index`, `label`,
- * `symbol`, `_comment`, `data`, `_data` and 108 of the 165 `name` — are FIXED, and are
- * now counted-at-zero tripwires below (FIXED_PROP_LEAKS) rather than described in
- * prose. Two claims made here while they were live were wrong, and are recorded so the
- * numbers are not re-derived from the same mistakes:
+ * Everything this ledger once counted is now FIXED and guarded at zero below instead:
+ * the engine-internal props (`view`, `index`, `label`, `symbol`, `_comment`, `data`,
+ * `_data` and 108 of the 165 `name`) in FIXED_PROP_LEAKS, and the two markup defects
+ * (`id="undefined"`, the `-last` junk classes) in FIXED_MARKUP_JUNK. Three claims made
+ * here while they were live were wrong, and are recorded so the numbers are not
+ * re-derived from the same mistakes:
  *   - they were NOT all "a facet of the same root cause as the data=… entry". There
  *     were four independent causes: the Render.Method options bag (`transforms.js`,
  *     which is where `data`/`_data`/`symbol` and 40 `name` came from), meta keys no
@@ -140,24 +141,23 @@ const renderExample = ({ data, meta }) => {
  *     a RAW marker matches substrings (`'index='` hits `tabindex=`, `'label='` hits
  *     `aria-label=`, `'data='` would hit `data-testid=`). Markers here are therefore
  *     space-prefixed, and a new entry must be too.
+ *   - `undefined-last` was counted as 20 and treated as the whole of that defect. The
+ *     real total was 210: TableView appended `-last` to every cell whose neighbour is
+ *     not sticky, so a cell with NO className produced `undefined-last` (20) and one
+ *     with an EMPTY className produced the bare class `-last` (190). Counting one
+ *     spelling of a defect measures the spelling, not the defect — which is the same
+ *     mistake as the `index=` count above, in a different direction.
+ *
+ * A NOTE ON WHAT THIS CORPUS CANNOT SEE, since it misled twice: the 38 examples are a
+ * regression net, not an audit. They contain zero `sticky` classes, so neither the
+ * `-last` bug nor its fix could be judged here — that is covered directly in
+ * `pages/main/components/__tests__/TableView.test.js`. Seven leaking DOM boundaries
+ * were likewise invisible because no example passes an engine prop to a slider or an
+ * icon; see the audit note in `components/domProps.js`.
  */
-const KNOWN_DOM_DEFECTS = [
-    {
-        marker: 'id="undefined"',
-        count: 12,
-        cause: 'src/core/components/Expand.js:135 renders id={String(id)}, so an Expand view with no'
-            + ' `id` in its meta emits the literal attribute id="undefined". Multiple Expands in one'
-            + ' document therefore share a duplicate, meaningless id.',
-    },
-    {
-        marker: 'undefined-last',
-        count: 20,
-        cause: 'src/core/pages/main/components/TableView.js:215 runs `className += "-last"`'
-            + ' unconditionally for a non-sticky neighbour, appending to an undefined className. The'
-            + ' junk token reaches the DOM through cn("left", classNameHeader) at TableView.js:246;'
-            + ' the "-last" suffix is only meaningful on the "sticky" class.',
-    },
-]
+// The ledger is empty: every defect the first baseline encoded has been fixed. Kept as the
+// place a NEW one goes -- record it with a count and a cause rather than letting `-u` bless it.
+const KNOWN_DOM_DEFECTS = []
 
 /**
  * ENGINE-INTERNAL PROPS THAT MAY NEVER REACH THE DOM AGAIN
@@ -178,6 +178,22 @@ const KNOWN_DOM_DEFECTS = [
  * attribute and cannot match `viewBox=`, `tabindex=` or `aria-label=`.
  */
 const FIXED_PROP_LEAKS = [' view=', ' index=', ' label=', ' symbol=', ' _comment=', ' data=', ' _data=']
+
+/**
+ * Junk the engine used to render that was not a prop leak, so it needs its own zero list.
+ *   `id="undefined"`  -- Expand rendered `id={String(id)}` and `id` is optional in meta, so
+ *                       several Expands in one document shared the literal id "undefined";
+ *                       a `<label for>` could then only ever resolve to the first.
+ *   `undefined-last`  -- TableView appended `-last` to EVERY cell whose right-hand neighbour
+ *                       is not sticky. `-last` only means anything on `sticky`
+ *                       (`table.less` draws `td.sticky-last::after`), so on a cell with no
+ *                       className it produced the class `undefined-last`.
+ *   `"-last"`         -- the same bug on a cell whose className was the empty string. The
+ *                       original ledger counted only the `undefined` form and so measured 20
+ *                       where the real total was 210; this marker is why the other 190 are
+ *                       now guarded too.
+ */
+const FIXED_MARKUP_JUNK = ['id="undefined"', 'undefined-last', 'class="-last"']
 
 /**
  * `name` cannot go to zero and must not: it is the react-final-form field registration
@@ -285,6 +301,15 @@ describe('demo example full-DOM contract', () => {
     const countAcrossCorpus = (marker) => [...renderedDom.values()]
         .reduce((total, dom) => total + dom.split(marker).length - 1, 0)
 
+    it.each(FIXED_MARKUP_JUNK)('never re-emits the fixed markup junk %s', (marker) => {
+        requireWholeCorpus('the fixed-junk tripwire')
+
+        // These were never prop leaks, so the domProps boundary cannot catch a regression:
+        // `id="undefined"` is a String(undefined) in Expand, and the `-last` forms are
+        // TableView marking a sticky run on cells that are not in one.
+        expect(countAcrossCorpus(marker)).toBe(0)
+    })
+
     it.each(FIXED_PROP_LEAKS)('never re-emits the fixed prop leak %s', (marker) => {
         requireWholeCorpus('the fixed-leak tripwire')
 
@@ -318,12 +343,18 @@ describe('demo example full-DOM contract', () => {
         expect(total).toBe(BOUND_NAME_ATTRIBUTES.count)
     })
 
-    it.each(KNOWN_DOM_DEFECTS)('still emits the known defect $marker $count times', ({ marker, count }) => {
+    // One test rather than `it.each`, because the ledger is currently empty and `it.each([])`
+    // throws. An empty ledger is the goal state, not a reason to delete the guard.
+    it('still emits every defect the ledger records, at its recorded count', () => {
+        if (!KNOWN_DOM_DEFECTS.length) return
+
         // The ledger counts across the whole example set, so it is only meaningful
         // once every snapshot above has run. Fail with the reason rather than with a
         // mystery count, which is what a filtered (`-t`) run would otherwise produce.
         requireWholeCorpus('the defect ledger')
 
-        expect(countAcrossCorpus(marker)).toBe(count)
+        // Compared as objects so a failure names the marker instead of just two numbers.
+        expect(KNOWN_DOM_DEFECTS.map(({ marker }) => ({ marker, occurrences: countAcrossCorpus(marker) })))
+            .toEqual(KNOWN_DOM_DEFECTS.map(({ marker, count }) => ({ marker, occurrences: count })))
     })
 })

@@ -138,6 +138,12 @@
 
 #### Fixes
 
+- Rendered markup no longer carries three junk artefacts. An `Expand` view without an `id` in its
+  meta emitted the literal attribute `id="undefined"`, repeated on every such view in the
+  document, so a `<label for>` pointing at one could only ever resolve to the first. Table cells
+  were given a `-last` class suffix whether or not they were part of a pinned (sticky) column run
+  — the suffix only means anything on `sticky` — which produced the classes `undefined-last` and
+  a bare `-last` on 210 cells. Pinned-column styling is unchanged; only the junk is gone.
 - Rendered markup no longer carries the internal `currencyCode` value as an HTML attribute.
   The engine hands it to every node so value renderers can choose a currency symbol, but most
   views never read it, and it was reaching the page as `currencycode="..."` on `div`, `span`,

@@ -132,7 +132,11 @@ export default class Expand extends PureComponent {
     const hasContent = children != null
     const content = hasContent && (expanded || changing) && this.content
     return (
-      <View className={classNames('app__expand', className, {expanded, active})} id={String(id)} {...props}>
+      // `id` is optional in meta, and String(undefined) is the string "undefined" -- which used to
+      // be emitted as a real attribute, duplicated across every Expand without an id, so a
+      // `<label for>` could only ever resolve to the first one.
+      <View className={classNames('app__expand', className, {expanded, active})}
+            id={id == null ? undefined : String(id)} {...props}>
         {this.renderLabel()}
         {hasContent &&
         <AnimateHeight expanded={expanded} duration={duration}

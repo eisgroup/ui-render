@@ -203,13 +203,23 @@ export default class TableView extends PureComponent {
     onSort && onSort(sort)
   }
 
+  /**
+   * `sticky` marks a pinned cell; `sticky-last` marks the final cell of a pinned run, which is
+   * what `table.less` draws the separator shadow on (`td.sticky-last::after`).
+   *
+   * @Note: the `-last` suffix used to be appended to EVERY cell whose right-hand neighbour is
+   *  not sticky, not just to pinned ones. On a cell with no className that produced the literal
+   *  class `undefined-last`, and on a cell with a real class it produced `<class>-last` — 20 and
+   *  45 unstyled junk tokens in the example baseline. A non-pinned cell has no run to end, so it
+   *  now returns its className untouched.
+   */
   getStickyCellClassName = (styles, className, nextCellStyles) => {
-    if (styles.position === 'sticky') {
-      if (typeof className === 'string' && className.length && !className.includes('sticky')) {
-        className += ' sticky'
-      } else {
-        className = 'sticky'
-      }
+    if (styles.position !== 'sticky') return className
+
+    if (typeof className === 'string' && className.length && !className.includes('sticky')) {
+      className += ' sticky'
+    } else {
+      className = 'sticky'
     }
 
     if (!(nextCellStyles.position === 'sticky')) {
@@ -329,6 +339,11 @@ export default class TableView extends PureComponent {
       || Array.isArray(content)
       || React.isValidElement(content)
     return (
+      // @Note: an empty `cellClassName` still renders as class="" -- Semantic's Table.Cell runs its
+      // own `cx()` and emits the attribute whatever we pass, so `|| undefined` here would be dead
+      // code (measured). Removing the `-last` junk above therefore trades 190 `class="-last"` for
+      // 190 inert `class=""`, which is a strict improvement -- a junk token can collide with a
+      // future CSS rule, an empty attribute cannot. It disappears when Table goes in-house (F1).
       <Table.Cell key={this.props.vertical ? index : id} className={cellClassName} style={cellStyle}>
         {isReactNode
           ? (typeof content === 'object'
