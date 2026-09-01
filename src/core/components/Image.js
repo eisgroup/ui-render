@@ -3,6 +3,7 @@ import React from 'react'
 import { fileNameWithoutExt } from '../utils'
 import { FILE } from './files'
 import { type } from './types'
+import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /**
  * Image - Pure Component.
@@ -29,7 +30,10 @@ export function Image ({
   // image with nothing to describe.
   if (props.alt == null) props.alt = name ? fileNameWithoutExt(name) : ''
   // Restated after the spread so jsx-a11y can see it — same value, set on the line above.
-  return <img className={classNames('img', className)} {...props} alt={props.alt} decoding={decoding} loading={loading}/>
+  // DOM boundary (see ./domProps): the spread lands on an <img>. `name` was consumed above to
+  // derive `src`/`alt` and is not an HTML5 <img> attribute, so both lists apply.
+  return <img className={classNames('img', className)} {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)}
+              alt={props.alt} decoding={decoding} loading={loading}/>
 }
 
 Image.propTypes = {

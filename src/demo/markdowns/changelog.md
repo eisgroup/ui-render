@@ -2,6 +2,65 @@
 
 ### Unreleased
 
+#### Meta contract
+
+- The `meta.json` contract now ships as a JSON Schema (draft 2020-12) at
+  `eis-ui-render/meta.schema.json`, so meta authors get editor autocomplete and validation.
+  Point a file at it with `"$schema": "./node_modules/eis-ui-render/meta.schema.json"`, or map it
+  once for `**/*_meta.json` in the workspace settings. The schema stays as permissive as the
+  renderer — component attributes it does not list are still accepted, and an unlisted `view`,
+  render-method, action or normalizer name is suggested-but-not-required — and constrains only the
+  shapes the renderer genuinely needs: `items`, `headers`, `extraHeaders` and `extraItems` must be
+  arrays and `name` must be a string. The suggested vocabularies are checked against the
+  renderer's own definitions, so they cannot drift from it.
+- New opt-in `validateMeta` prop runs the same rules at runtime and reports the **JSON path** of
+  the offending node — `items[3].items[0].name` — instead of leaving a stack trace inside a
+  minified bundle. `error` findings are shapes the renderer fails on; `warning` findings are nodes
+  that render but degrade silently, such as an unknown `view` (a "field does not exist"
+  placeholder) or an unknown `render*` method (plain text). It is off by default and walks nothing
+  until enabled, reports to `console.warn`, accepts a function instead of `true` to collect the
+  findings, and never throws into the host application.
+- New optional root-level `metaVersion` field (`"MAJOR"` or `"MAJOR.MINOR"`; current contract
+  version `1`) records which contract a file was authored against, so future contract changes can
+  be additive and announced. **Absence means "current"**, so no existing `meta.json` needs to
+  change. The renderer ignores the value and strips the field before rendering, exactly as it now
+  strips `$schema`, so declaring either changes no output; only dev-mode validation reads it.
+  This is unrelated to the legacy `version` attribute, which the renderer still discards.
+
+#### Renderer configuration and error reporting
+
+- **The `dateFormat`, `currency` and `language` props now work.** They were accepted and then
+  silently dropped: the renderer discarded `dateFormat` on its way down the tree, nothing fed
+  the configuration context, and every component fell back to the built-in `MM-DD-YYYY`
+  regardless of what the host passed. All three are now published to every rendered component
+  — a nested table cell or popup field formats a date exactly like a top-level field — and each
+  key is merged independently, so passing one does not reset the others. `currency` and
+  `language` also reach the shell's CSS classes (`.app.EUR`, `.app.lang--fr`). **This changes
+  rendered output** for any host that passes `dateFormat`: dates start honouring it. It is
+  unrelated to `meta.currencyCode`, which still selects the currency symbol used by the value
+  renderers.
+- `TextDateValue` honours the `dateFormat` prop it declares, instead of always reading the
+  configured format. An explicitly given format wins over the configured one.
+- **New `onError` prop**: a report for every node whose subtree fails to render — `{error,
+  errorInfo, path, props, message}`, where `path` is the JSON path of the failing node in
+  `meta` (`items[3].items[0]`), the same notation dev-mode meta validation uses. Reporting a
+  render failure was previously impossible for a host to observe at all: the library's own sink
+  read the wrong field names off the report and printed `undefined undefined` to
+  `console.log`, so a mis-configured node failed silently. The sink is fixed, reports on the
+  error channel, and now names the failing node; the diagnostic rendered in place of the
+  failed subtree names it too, instead of showing a bare `Error: …`. A host reporter that
+  throws cannot replace the failure it was called to report.
+
+#### Accessibility
+
+- The text, number and date inputs no longer emit an `aria-describedby` pointing at an element
+  that does not exist. The attribute was unconditional while the element carrying the target id
+  renders only when there is an error or info message, so every reference in a form without
+  validation messages was dangling — an axe `aria-valid-attr-value` violation, and nothing for
+  a screen reader to announce. The reference now appears exactly when the message it points at
+  does. In the demo example set this removes 57 dangling references; no other rendered output
+  changes.
+
 #### Compatibility
 
 - Development and the primary test suite now run on React 18.3.1, and the demo mounts through the
@@ -79,6 +138,47 @@
 
 #### Fixes
 
+- Rendered markup no longer carries three junk artefacts. An `Expand` view without an `id` in its
+  meta emitted the literal attribute `id="undefined"`, repeated on every such view in the
+  document, so a `<label for>` pointing at one could only ever resolve to the first. Table cells
+  were given a `-last` class suffix whether or not they were part of a pinned (sticky) column run
+  — the suffix only means anything on `sticky` — which produced the classes `undefined-last` and
+  a bare `-last` on 210 cells. Pinned-column styling is unchanged; only the junk is gone.
+- Rendered markup no longer carries the internal `currencyCode` value as an HTML attribute.
+  The engine hands it to every node so value renderers can choose a currency symbol, but most
+  views never read it, and it was reaching the page as `currencycode="..."` on `div`, `span`,
+  table cells and inputs — 331 occurrences across 33 of the 38 bundled examples — which React
+  also reported as an unrecognised DOM prop on every render. It is now stripped where views are
+  resolved, and passed explicitly to the two that consume it. Currency formatting is unchanged.
+- **Rendered markup no longer carries the renderer's internal props as HTML attributes.** The
+  same defect as the `currencyCode` entry above, but on the other path — the one taken by value
+  renderers a `render*` attribute selects (`Float`, `Percent`, `Double5`, `Currency`) and by any
+  meta attribute no view consumes. Across the 38 bundled examples the page was emitting `data="[object Object]"`
+  (40), `_data="…"` (40), `symbol="$"` (23), `view="…"` (15), `index="…"` (8), `label="…"` (6) and
+  `_comment="…"` (2 — the meta author's own note, rendered into the page). All are now zero.
+  None of them produced a console warning, because React does not report an unknown *lowercase*
+  attribute; they were only visible in the markup.
+- **`name` is now emitted only on form controls.** It is the field-binding path a form control
+  must carry, but it was also reaching `<table>`, the dropdown's wrapper `<div>`, the upload drop
+  zone and any layout `div`/`span` that happened to carry a data binding — 108 of the 165
+  occurrences in the bundled examples. The 57 that bind a real field are unchanged, and every
+  form value still round-trips into the submit payload exactly as before. **If your application
+  or your tests select these elements with a `[name="…"]` CSS selector, use a class, an id or a
+  role instead:** for form fields nothing changed, but for a table, a dropdown wrapper or a
+  layout element the attribute is gone.
+- Both of the above are enforced at one place — a named list of engine-internal props applied
+  where a component hands props to a DOM element — so adding an internal prop to the engine no
+  longer means auditing a dozen components, which is how this leak returned four times before.
+  Every component that can be reached from a `meta.json` and hands props to an element is
+  covered; components nothing in a meta resolves to are not, and become covered the day they
+  are wired up. Nothing else about the rendered markup changed:
+  measured attribute-for-attribute against the previous DOM baseline of all 38 examples, every
+  element, every `class`, every `id` and every piece of visible text is identical — the diff is
+  the removal of those attributes and nothing else.
+- A `_comment` attribute anywhere in a `meta.json` is now dropped before rendering, the same way
+  `$schema` and `metaVersion` already were, so annotating meta for the next author costs nothing.
+  Unlike those two it is not declared in `meta.schema.json`, so an editor will not suggest it —
+  it is accepted rather than advertised.
 - Upload no longer hands the host a blanked-out drag event on React 16. Its drag focus/blur callbacks
   run after the component re-renders, and React 16 recycles event objects once the original handler
   returns, so an application reading `type` or `target` from the forwarded event saw `null`. The event

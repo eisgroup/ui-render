@@ -1,6 +1,7 @@
 import classNames from '../utils/classNames'
 import React from 'react'
 import { isFunction } from '../utils'
+import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /**
  * Row View - Pure Component.
@@ -21,11 +22,13 @@ export function Row ({
   fill,
   reverse,
   rtl,
-  expanded: _, // not used, remove to prevent warnings
   ...props
 }, ref) {
-  if (isFunction(ref)) props.ref = ref
-  return <div className={classNames('flex--row', {fill, reverse, rtl, pointer: props.onClick}, className)} {...props} />
+  // DOM boundary: this spread lands on a <div>. See ./domProps.js — `ref` is attached after
+  // the filter because omitProps may return the (rest) object unchanged.
+  const domProps = omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)
+  if (isFunction(ref)) domProps.ref = ref
+  return <div className={classNames('flex--row', {fill, reverse, rtl, pointer: props.onClick}, className)} {...domProps} />
 }
 
 export const RowRef = React.forwardRef(Row)

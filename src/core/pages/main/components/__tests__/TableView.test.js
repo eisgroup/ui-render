@@ -43,6 +43,30 @@ describe('TableView', () => {
         expect(container.textContent).toContain('Beta')
     })
 
+    // Semantic's Table spreads what it does not recognise onto <table>, where `name` is not a
+    // valid attribute — 23 occurrences in the DOM baseline. `this.props.name` still decides
+    // whether rows are wrapped in a FieldArray, so the strip is at the DOM edge only.
+    it('keeps engine props and `name` off the <table> while still binding the FieldArray', () => {
+        const { container } = render(wrap(
+            <TableView
+                items={items}
+                headers={headers}
+                name="orders"
+                view="Table"
+                index="1"
+                symbol="$"
+                _comment="a note to the next meta author"
+                {...defaults}
+            />
+        ))
+
+        const table = container.querySelector('table')
+        expect(table.getAttributeNames().sort()).toEqual(['class'])
+        // A FieldArray renders its children only once it has registered against the form, so
+        // visible row content is the proof that `this.props.name` still reached it.
+        expect(container.textContent).toContain('Alpha')
+    })
+
     it('renders no rows when items is empty', () => {
         const { container } = render(wrap(<TableView items={[]} headers={headers} {...defaults} />))
         expect(container.querySelectorAll('tbody tr').length).toBe(0)
@@ -272,5 +296,54 @@ describe('TableView', () => {
             )
         )
         expect(container.querySelectorAll('tbody tr').length).toBe(10)
+    })
+})
+
+/**
+ * The sticky-column class builder, tested directly because the 38 demo examples do not
+ * exercise it at all: the DOM baseline contains zero `sticky` classes, so the corpus could
+ * neither catch the bug this fixes nor prove the fix keeps the feature working.
+ *
+ * `sticky` marks a pinned cell; `sticky-last` marks the final cell of a pinned run, which is
+ * what `table.less` draws the separator on (`td.sticky-last::after`). `-last` used to be
+ * appended to EVERY cell whose right-hand neighbour is not pinned, producing the junk classes
+ * `undefined-last` (no className) and `-last` (empty className) — 210 of them in the baseline.
+ */
+describe('TableView sticky cell class', () => {
+    // The method is an instance arrow property, so read it off a rendered instance rather than
+    // the prototype.
+    const build = (() => {
+        let fn
+        return (...args) => {
+            if (!fn) {
+                let instance
+                render(<TableView ref={ref => { instance = ref || instance }} headers={[]} items={[]} />)
+                fn = instance.getStickyCellClassName
+            }
+            return fn(...args)
+        }
+    })()
+
+    const STICKY = { position: 'sticky' }
+    const STATIC = {}
+
+    it('leaves a non-pinned cell alone, whatever its className', () => {
+        // The bug: each of these used to come back with `-last` glued on.
+        expect(build(STATIC, undefined, STATIC)).toBeUndefined()
+        expect(build(STATIC, '', STATIC)).toBe('')
+        expect(build(STATIC, 'no-border-right', STATIC)).toBe('no-border-right')
+        expect(build(STATIC, 'left', STICKY)).toBe('left')
+    })
+
+    it('marks a pinned cell, and only ends the run at the last one', () => {
+        expect(build(STICKY, undefined, STICKY)).toBe('sticky')
+        expect(build(STICKY, undefined, STATIC)).toBe('sticky-last')
+        expect(build(STICKY, 'left', STICKY)).toBe('left sticky')
+        expect(build(STICKY, 'left', STATIC)).toBe('left sticky-last')
+    })
+
+    it('does not re-append sticky to a className that already carries it', () => {
+        expect(build(STICKY, 'sticky', STICKY)).toBe('sticky')
+        expect(build(STICKY, 'sticky', STATIC)).toBe('sticky-last')
     })
 })

@@ -34,7 +34,9 @@ describe('Render setup and fallback contracts', () => {
 
         render(Render({ view: 'Broken', data: { id: 9 } }))
 
-        expect(await screen.findByText('Error: default reporter failure')).toBeInTheDocument()
+        expect(await screen.findByText(
+            '[ui-render] render error at the meta root (view "Broken"): Error: default reporter failure'
+        )).toBeInTheDocument()
         await waitFor(() => expect(consoleWarn).toHaveBeenCalledTimes(1))
         expect(consoleWarn).toHaveBeenCalledWith(
             'Unhandled Render error:',

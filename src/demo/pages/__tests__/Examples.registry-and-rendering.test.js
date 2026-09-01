@@ -5,7 +5,8 @@ import { ConfigContext, initialConfigState, AppContext, initialAppState } from '
 import { storedTouched } from '../../../core/modules/form/utils'
 import { Render } from '../../../core/ui-render'
 import UIRender, { clearErrorsMap, formsStorage } from '../../../core/pages/main/rules'
-import { examples } from '../Examples'
+import { EXAMPLES as examples } from '../../examples/manifest'
+import ExamplesPage from '../Examples'
 
 const messageFromConsoleCall = args => args
     .map(value => value instanceof Error ? value.message : String(value))
@@ -19,7 +20,6 @@ const messageFromConsoleCall = args => args
 // warning message itself carries (a propTypes owner, a DOM prop name) are fine.
 const EXPECTED_CONSOLE_ERROR_PATTERNS = [
     ['Unknown event handler property', 'onDataChanged'],
-    ['React does not recognize', 'currencyCode'],
     ['non-boolean attribute', 'buttoned'],
     ['Cannot update during an existing state transition', 'Render methods should be a pure function'],
     ['Invalid prop `error` of type `boolean`', 'InputNumber'],
@@ -89,6 +89,14 @@ describe('registered demo examples contract', () => {
     it('keeps the documented example registry stable and unique', () => {
         expect(examples).toHaveLength(38)
         expect(new Set(examples.map(({ id }) => id)).size).toBe(examples.length)
+    })
+
+    // The registry moved to src/demo/examples/manifest.js, so this suite no longer
+    // loads the demo page as a side effect of importing the list. Keep it loaded:
+    // evaluating the module is what proves the page still resolves and still reads
+    // the manifest, rather than having drifted back to its own copy of the list.
+    it('loads the demo page that consumes the manifest', () => {
+        expect(typeof ExamplesPage).toBe('function')
     })
 
     const assertExampleMountContract = ({ data, meta }) => {

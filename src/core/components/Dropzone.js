@@ -1,4 +1,5 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /**
  * Drag & drop file zone built on the native File API. Replaces the small subset
@@ -111,7 +112,7 @@ const Dropzone = forwardRef(function Dropzone ({
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      {...props}
+      {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)}
     >
       <input
         type='file'

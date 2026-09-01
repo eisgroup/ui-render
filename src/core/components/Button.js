@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Loading from './Loading'
 import { Active } from '../utils'
+import { ENGINE_PROPS, omitProps } from './domProps'
 
 /**
  * Button - Pure Component.
@@ -34,6 +35,10 @@ export function Button ({
   translate = Active.translate,
   ...props
 }) {
+  // DOM boundary: ENGINE_PROPS only. `name` is a real attribute on <button> (form
+  // submission), so FIELD_ONLY_PROPS is deliberately NOT applied — see ./domProps.js.
+  // This is what keeps a raw meta node's `view` off the button LocalDraftTableRow builds.
+  const domProps = omitProps(props, ENGINE_PROPS)
 
   return (
     <button
@@ -41,7 +46,7 @@ export function Button ({
       disabled={disabled || loading}
       type={type}
       onClick={onClick}
-      {...props}
+      {...domProps}
     >
       {(typeof children === 'string') ? translate(children) : children}
       {loading && <Loading loading/>}

@@ -10,6 +10,7 @@ import enUs from 'rc-picker/lib/locale/en_US'
 import generateConfig from 'rc-picker/lib/generate/moment'
 import moment from 'moment'
 import { ConfigContext } from '../contexts'
+import { ENGINE_PROPS, omitProps } from './domProps'
 
 const InputDate = ({
     name,
@@ -78,7 +79,11 @@ const InputDate = ({
     const sourceValue = valueFromParent !== undefined ? valueFromParent : defaultValue
     const value = toMoment(sourceValue)
 
-    const idHelp = useMemo(() => id + '-help', [id])
+    // An `aria-describedby` naming an id no element carries is worse than none: it is an axe
+    // `aria-valid-attr-value` violation, and a screen reader announces nothing for it. The help
+    // element exists only while there is a message, so the reference is conditional on the same
+    // value — one binding for both, so the two cannot disagree again.
+    const idHelp = useMemo(() => (error || info) ? id + '-help' : undefined, [id, error, info])
 
     const onDateChanged = (date) => {
         if (!onChange) return
@@ -108,7 +113,9 @@ const InputDate = ({
                     aria-describedby={idHelp}
                     placeholder={translate(placeholder)}
                     generateConfig={generateConfig}
-                    {...props}
+                    // DOM boundary (see ./domProps): the spread reaches rc-picker, which forwards unknown props to its own <input>, so this is
+    // a form-control boundary: ENGINE_PROPS only.
+                    {...omitProps(props, ENGINE_PROPS)}
                     value={value}
                     allowClear={false}
                     locale={enUs}
@@ -120,7 +127,7 @@ const InputDate = ({
                     onBlur={onBlur}
                 />
             </Row>
-            {(error || info) &&
+            {idHelp &&
                 <View id={idHelp} className='field-help'>
                     {error && <Text className='error'>{translate(error)}</Text>}
                     {info && <Text className='into'>{translate(info)}</Text>}

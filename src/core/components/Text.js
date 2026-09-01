@@ -1,6 +1,7 @@
 import classNames from '../utils/classNames'
 import React, { useContext } from 'react'
 import { Active } from '../utils'
+import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 import { ISO_8601_COMPLETE_DATE } from '../modules/variables'
 import { ConfigContext } from '../contexts'
 import moment from 'moment'
@@ -22,7 +23,6 @@ export function Text ({
     fill,
     reverse,
     rtl,
-    expanded: _, // not used, remove to prevent warnings
     children,
     translate = Active.translate,
     ...props
@@ -43,8 +43,13 @@ export function Text ({
             component = moment(children).format(dateFormat)
         }
     }
+    // DOM boundary: this spread lands on a <span>, and `Text` is where every value renderer
+    // ends up (renders.js renderFloat -> <Text {...options}>), so the whole render-method
+    // options bag arrives here. Nothing engine-internal and no field-only attribute belongs
+    // on a span — add new engine props to ./domProps.js, not as another `foo: _` above.
+    const domProps = omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)
     return (
-        <span className={classNames('text', { fill, reverse, rtl, pointer: props.onClick }, className)} {...props}>
+        <span className={classNames('text', { fill, reverse, rtl, pointer: props.onClick }, className)} {...domProps}>
             {(typeof children === 'string') ? translate(component) : component}
         </span>
     )

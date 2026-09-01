@@ -62,6 +62,19 @@ describe('published library contract', () => {
         found.forEach(version => expect(version).toBe(PACKAGE_VERSION))
     })
 
+    it('lifts host configuration above the shell, where the wrapper classes are decided', () => {
+        // The engine publishes these too (UIRender.config-channel.test.js), but `AppWrapper` sits
+        // OUTSIDE it and turns `currency`/`language` into CSS classes, so the entry point has to
+        // publish them here as well. The engine is mocked in this suite, which is exactly why the
+        // assertion is about this publish and not the inner one (UPGRADE-PLAN §9.4 / §2.6-2).
+        const { container } = render(
+            <LibraryRender contract="meta-data" currency="PLN" language="pl" dateFormat="DD.MM.YYYY" />
+        )
+
+        expect(screen.getByTestId('ui-render')).toHaveTextContent('meta-data|PLN|pl|false')
+        expect(container.querySelector('.app')).toHaveClass('fade-in', 'lang--pl', 'PLN')
+    })
+
     it('lets AppWrapper react to host configuration values', () => {
         const { container } = render(
             <ConfigContext.Provider value={{ currency: 'PLN', language: 'pl' }}>

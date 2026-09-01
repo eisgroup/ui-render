@@ -27,6 +27,10 @@ const FILE_BUDGETS = {
 const REQUIRED = [
     'dist/index.js',
     'dist/index.d.ts',
+    // The published meta.json JSON Schema (§9.4). Meta authors point their editor at
+    // node_modules/eis-ui-render/meta.schema.json, so a `files` change that drops it
+    // silently removes IDE validation for every consumer.
+    'meta.schema.json',
     'dist/static/all.css',
     'static/all.css',
     'static/font.css',

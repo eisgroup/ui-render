@@ -120,6 +120,24 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
+        './src/core/ui-render/validateMeta.js': {
+            statements: 100,
+            branches: 100,
+            functions: 100,
+            lines: 100,
+        },
+        './src/core/ui-render/metaPath.js': {
+            statements: 100,
+            branches: 100,
+            functions: 100,
+            lines: 100,
+        },
+        './src/core/providers/ConfigOverride.jsx': {
+            statements: 100,
+            branches: 100,
+            functions: 100,
+            lines: 100,
+        },
         './src/core/modules/upload/views/Upload.js': {
             statements: 100,
             branches: 97,

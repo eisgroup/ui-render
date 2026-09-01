@@ -1,6 +1,8 @@
 import * as React from 'react'
 import UIRender, {
     UIRenderApiCalls,
+    UIRenderErrorReport,
+    UIRenderMetaProblem,
     UIRenderProps,
     UIRenderTranslate,
     UIRenderValidationErrors,
@@ -36,11 +38,16 @@ const props: UIRenderProps<QuoteData> = {
     translate,
     apiCalls,
     dateFormat: 'MM-DD-YYYY',
+    currency: 'USD',
+    language: 'en',
+    onError: (report: UIRenderErrorReport) => [report.path, report.message, report.errorInfo.componentStack],
+    validateMeta: (problems: UIRenderMetaProblem[]) => problems.map(problem => problem.path),
     className: 'quote-render',
     style: { display: 'block' },
 }
 
 const minimal = <UIRender data={data} meta={meta}/>
+const validating = <UIRender data={data} meta={meta} validateMeta/>
 const complete = <UIRender {...props}/>
 const inferred: React.ComponentProps<typeof UIRender> = { data, meta }
 
@@ -49,4 +56,4 @@ const missingData = <UIRender meta={meta}/>
 // @ts-expect-error meta is required by the runtime contract
 const missingMeta = <UIRender data={data}/>
 
-void [minimal, complete, inferred, missingData, missingMeta, NamedUIRender]
+void [minimal, validating, complete, inferred, missingData, missingMeta, NamedUIRender]

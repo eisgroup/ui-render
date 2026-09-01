@@ -39,6 +39,12 @@ jobs:
       - name: Lint styles
         run: npm run lint:css
 
+      # docs/SUPPORTED-VIEWS.md is generated from the FIELD constants and the resolver source.
+      # The suite checks the same thing (scripts/__tests__/view-reference.contract.test.js, so all
+      # four legs cover it), but this step runs the CLI and names the failure for what it is.
+      - name: Check the generated view reference
+        run: npm run docs:views:check
+
       - name: Test with coverage thresholds
         run: npm run test:coverage
 
@@ -75,9 +81,14 @@ jobs:
   # Aliased devDependencies -- the trick `react-types-16` uses -- cannot work for a runtime package, because
   # `react-dom@16.14.0` peer-requires `react` and npm resolves that against the hoisted copy React 18 owns.
   #
-  # Green here means 140 suites / 1946 tests, the same totals as the React 18 leg — there are no exclusions.
-  # jest.react16.config.js and scripts/fixtures/react16/setup.js assert the React that actually loaded, so a
-  # mapping that silently fell back to 18 fails every suite instead of reporting a false green.
+  # Green here means the SAME suite and test totals as the React 18 leg — this job excludes nothing and
+  # skips nothing of its own. Deliberately not pinning the numbers here: they went stale four times in
+  # one change, since every added test invalidates them, and the invariant is what actually matters.
+  # The only skips are the CSS parity suite's published-artifact block, which needs `static/` — that is
+  # git-ignored, so it cannot exist on a clean checkout. Any other skip or a total that differs from the
+  # React 18 leg means this leg silently stopped running something.
+  # jest.react16.config.js and scripts/fixtures/react-legacy/harness.js assert the React that actually loaded,
+  # so a mapping that silently fell back to 18 fails every suite instead of reporting a false green.
   react-16-floor:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -97,6 +108,43 @@ jobs:
 
       - name: Test on the React 16.14 peer floor
         run: npm run test:react16
+
+  # Gating, and the other half of the peer matrix: `peerDependencies` declares `^16.14 || ^17 || ^18`, and
+  # with this leg every one of the three ends runs the whole suite (18 in `verify`, 16.14 above, 17 here)
+  # rather than only the packed-artifact smoke `test:pack:peers` gives 17. Same shape as `react-16-floor`:
+  # React 17.0.2 comes from an install-only fixture package (`scripts/fixtures/react17-floor`, linked as the
+  # `react-17-floor` devDependency), so plain `npm ci` installs it and no `--legacy-peer-deps` is needed.
+  # 17 needs the fixture even more than 16 does: react-dom@17.0.2 peer-requires `react` at the EXACT version,
+  # which npm resolves against the hoisted copy React 18 owns.
+  #
+  # Deliberately a second job rather than a matrix over [16, 17] on one job: a matrix would rename the
+  # existing `react-16-floor` job and silently drop it out of any branch-protection required-check list.
+  # Nothing is shared by running them together anyway -- each leg gets its own runner and its own `npm ci`.
+  #
+  # Green here means the same suite and test totals as the React 18 and 16.14 legs, with nothing excluded
+  # (see the react-16-floor comment above for why the numbers are not pinned and what may legitimately skip).
+  # The same two-level self-check applies (jest.react17.config.js in the parent process,
+  # scripts/fixtures/react-legacy/harness.js in every worker), so a mapping that silently fell back to the
+  # installed 18 fails every suite with zero tests run instead of reporting a false green.
+  react-17:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test on React 17.0.2
+        run: npm run test:react17
 
   # Advisory only — React 19 is NOT declared in peerDependencies (see docs/UPGRADE-PLAN.md §8).
   # Purpose: make upstream drift visible on every PR without gating it, so the 19 flip is a

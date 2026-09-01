@@ -1,0 +1,10 @@
+{
+  "name": "eis-ui-render-react-17-floor",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Install-only fixture holding React 17.0.2 for jest.react17.config.js -- the middle of the declared peer range. Linked from the root devDependencies as `react-17-floor` (file:scripts/fixtures/react17-floor) so a plain `npm ci` installs it, nested here rather than hoisted, leaving the root react/react-dom on 18. Versions are pinned exactly so the leg cannot drift with a transitive bump. Nothing but this manifest belongs in this directory: the harness code lives in scripts/fixtures/react-legacy/ so that the node_modules npm nests here cannot shadow its module resolution and mask a broken mapping. Sibling of scripts/fixtures/react16-floor.",
+  "dependencies": {
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
+  }
+}
