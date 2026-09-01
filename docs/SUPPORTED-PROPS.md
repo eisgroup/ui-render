@@ -255,6 +255,7 @@ What each step owes beyond "the props above still work".
 - Decide `verticalAlign` deliberately — SUIR emits `top aligned` and no loaded CSS selects on `aligned`.
 - Decide `inverted`/`striped` together with the §9.9-H1 deletion of `ErrorTable`/`ErrorContent`; they are the only source of both.
 - `jest.config.js` sets a per-file threshold for `TableView.js` and none for `Table.js` — a real in-house `Table.js` wants its own entry.
+- `TableView.js:364` discards `sellStyles` — a typo: no such prop exists, and the list it sits in exists precisely to keep props off the DOM. Inert today (nothing passes `cellStyles` either), but it is a dead entry in a boundary, so resolve it while rewriting rather than carrying it over.
 
 ### Step 2 — `TooltipPop`
 
