@@ -32,7 +32,9 @@
  *   FROM THE IMPORT SCAN     every file importing SUIR. This ALSO closes the eslint guard's
  *                            blind spot: `no-restricted-imports` cannot see
  *                            `jest.mock('semantic-ui-react')` or a `require()`, and this can.
- *   FROM THE CURATION        what a prop means, and whether any real meta uses it. Nothing else.
+ *   FROM THE CURATION        what a prop means, whether any real meta uses it, and — where it has been
+ *                            measured — what the component emits, what opens and closes it, and which of
+ *                            our own CSS rules select on the result. Nothing else.
  *
  * The mapping between the two halves is enforced total in both directions: a prop the component
  * intercepts with no curated line fails, a curated line for a prop it no longer intercepts
@@ -661,6 +663,17 @@ function buildReference () {
         if (!curation.summary || !curation.cssContract) {
             throw new Error(`WRAPPER_CURATION.${wrapper.id}: \`summary\` and \`cssContract\` are both required.`)
         }
+        // `classContract` and `behaviourContract` are rendered when present and NOT required, because
+        // "absent" has to mean "not measured yet" rather than "no contract". §9.7-F1 step 2 part 1
+        // measured both for `TooltipPop`; step 3 owes the same for `Dropdown` before its swap, and that
+        // obligation is carried in STEP_OBLIGATIONS rather than as a throw here — a required field would
+        // only invite a placeholder, which is worse than a visible gap.
+        for (const field of ['classContract', 'behaviourContract']) {
+            const text = curation[field]
+            if (text !== undefined && (typeof text !== 'string' || !text.trim())) {
+                throw new Error(`WRAPPER_CURATION.${wrapper.id}.${field}: omit it, or make it a non-empty string.`)
+            }
+        }
         assertTotal(`WRAPPER_CURATION.${wrapper.id}.props`, wrapper.intercepted.map(({ name }) => name),
             Object.keys(curation.props), 'WRAPPER_CURATION')
         for (const [name, text] of Object.entries(curation.props)) {
@@ -722,6 +735,10 @@ function wrapperSection (wrapper, { domProps }) {
         '',
         curation.summary,
         '',
+        ...(curation.classContract ? [`**What it emits.** ${curation.classContract}`, ''] : []),
+        ...(curation.behaviourContract
+            ? [`**What opens and closes it.** ${curation.behaviourContract}`, '']
+            : []),
         `**Consumed by the wrapper (${wrapper.intercepted.length}).** These never reach`
         + ` semantic-ui-react${rePassed.length ? '' : ' at all'} — we own the behaviour, and the`
         + ' §9.7-F1 swap cannot change it.',
@@ -954,7 +971,8 @@ function renderMarkdown (reference) {
         '',
         `The scan above closes every one of those gaps — dynamic imports, double-quoted specifiers and`,
         `TypeScript files included — which is why both halves run${guardBlind.length
-            ? `; ${guardBlind.length} of the sites above are invisible to the rule`
+            ? `; ${guardBlind.length} of the sites above ${guardBlind.length === 1 ? 'is' : 'are'}`
+              + ' invisible to the rule'
             : ''}. Neither is sufficient alone.`,
         '',
         '## In-house — the exit, so far',

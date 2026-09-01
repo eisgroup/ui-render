@@ -59,8 +59,6 @@ ones that no longer depend on the package at all:
 | --- | --- | --- |
 | `src/core/components/__tests__/Dropdown.behavior.test.js` *(test)* | `import` | `semantic-ui-react` |
 | `src/core/components/__tests__/Dropdown.behavior.test.js` *(test)* | `jest.mock` | `semantic-ui-react` |
-| `src/core/components/__tests__/TooltipPop.test.js` *(test)* | `import` | `semantic-ui-react` |
-| `src/core/components/__tests__/TooltipPop.test.js` *(test)* | `jest.mock` | `semantic-ui-react` |
 | `src/core/components/Dropdown.js` | `import` | `semantic-ui-react` |
 | `src/core/components/TooltipPop.js` | `import` | `semantic-ui-react` |
 
@@ -72,7 +70,7 @@ does not visit `ImportExpression`. Nor does `lint:js` visit `.ts`/`.tsx` today, 
 `--ext .js,.jsx`; the override glob already covers them for when it does.
 
 The scan above closes every one of those gaps — dynamic imports, double-quoted specifiers and
-TypeScript files included — which is why both halves run; 2 of the sites above are invisible to the rule. Neither is sufficient alone.
+TypeScript files included — which is why both halves run; 1 of the sites above is invisible to the rule. Neither is sufficient alone.
 
 ## In-house — the exit, so far
 
@@ -144,24 +142,28 @@ Those four were the *published* ones — they had curated entries on this page w
 
 `src/core/components/TooltipPop.js`, 24 lines.
 
-Hover tooltip over SUIR `Popup`. Reached two ways: a `view: "Tooltip"` node (`mapper.js`, which maps `label` to `content`), and the `tooltip` attribute on ANY node (`Render.js`, which wraps the rendered node and spreads `tooltip` when it is an object — so an object `tooltip` is an unfiltered passthrough into SUIR).
+Hover tooltip over SUIR `Popup`. Reached TWO live ways: a `view: "Tooltip"` node (`mapper.js`, which maps `label` to `content`), the `tooltip` attribute on ANY node (`Render.js`, which wraps the rendered node and spreads `tooltip` when it is an object — so an object `tooltip` is an unfiltered passthrough into SUIR). A third import exists but is NOT a way of reaching the component: `modules/form/utils.js` imports it as the default of `withForm`'s `Tooltip` parameter, which is passed into `withFormSetup`, destructured there and never used — a dead chain across four sites (import, default, pass-through, destructure), all removable together. Not to be confused with the IN-HOUSE `Tooltip` the same file imports as `ToolTip` and does use. §9.7-F1 step 2 part 1 measured the whole surface and built the gate; the replacement itself is still open. THE FORWARDED TABLE BELOW IS A CURATED SUBSET, NOT THE SURFACE: because the rest spread lands last, a caller reaches `Popup.handledProps` ∪ `Portal.handledProps` = 45 names, 16 of them Portal-only and absent from `Popup`'s propTypes entirely (`closeOnPortalMouseLeave`, `closeOnTrigger*`, `openOnTrigger*`, `eventPool`, `triggerRef`, …). Of the 24 passthrough rows listed, 16 have an effect asserted by a test and 8 are documented from the SUIR source without one — two of those (`pinned`, `offset`) are browser-only and say so in their own row, so a jsdom assertion for them is not possible. A replacement that accepts four props narrows the meta contract by 41.
+
+**What it emits.** `ui <resolved placement> [size] [very] [wide] [basic] [flowing] [inverted] popup transition visible <className>`, in that order, caller `className` last. From both engine entry points that is exactly `ui top left inverted popup transition visible`. The placement words are Popper's RESOLVED placement rather than the requested one, so a flip rewrites them — which jsdom cannot observe (§9.5). Body markup is `portal div > popper wrapper div > bubble > .content`, and the `.content` wrapper is NOT invariant: it appears for a string or number body and NOT for an element or a function body. Closed, the component renders the trigger byte-for-byte as it renders without a tooltip and adds nothing to `document.body`, which is why the 38-example DOM baseline is blind to tooltips by construction.
+
+**What opens and closes it.** Opens on hover after 500 ms and ALSO on a single click, instantly; does not open on focus. Closes 70 ms after the pointer leaves, on a second click, on a click anywhere else in the document, and on Escape — but NOT on a click inside the bubble. Leaving before 500 ms cancels the pending open. The pointer moving from the trigger onto the bubble still closes it, because `hoverable` is unset, so the text cannot be hovered or selected. No ARIA anywhere: no `role="tooltip"`, no `aria-describedby`, no `id` on the bubble, no `tabindex` added to the trigger. The trigger must be EXACTLY ONE element (`React.Children.only`), so the `items` form of `view: "Tooltip"` throws and the engine renders its error diagnostic in the node's place. Measured identically on React 16.14, 17.0.2 and 18.3; pinned by `components/__tests__/TooltipPop.behavior.test.js` and `UIRender.overlay-behavior.test.js`.
 
 **Consumed by the wrapper (4).** These never reach semantic-ui-react — we own the behaviour, and the §9.7-F1 swap cannot change it.
 
 | Prop | Meaning |
 | --- | --- |
-| `title` | The tooltip body. Forwarded as SUIR `content`. A function value is wrapped as `{children: fn}` — the workaround for Semantic-Org/Semantic-UI-React#4029. |
-| `children` | The trigger element. Forwarded as SUIR `trigger`. |
-| `delay` <br>*(has a default)* | Milliseconds before the tooltip opens; default 500, deliberately slower than Semantic's own 50 ms. Forwarded as `mouseEnterDelay`. |
-| `inverted` | Dark colour scheme. Intercepted and re-passed under the same name, so it also reaches the emitted className. Always true from both entry points. |
+| `title` | The tooltip body. Forwarded as SUIR `content`, and OVERRIDDEN by a caller-supplied `content` because the rest spread lands last. A function value is wrapped as `{children: fn}` — the workaround for Semantic-Org/Semantic-UI-React#4029 — and is called, with its result rendered directly and no `.content` wrapper. |
+| `children` | The trigger element, forwarded as SUIR `trigger`. Must be exactly one element: two children, a text child, or an ARRAY of one all throw inside SUIR's `Portal`. SUIR clones it with `onBlur/onClick/onFocus/onMouseEnter/onMouseLeave/ref`, and the trigger's own handlers still fire. |
+| `delay` <br>*(has a default)* | Milliseconds before the tooltip opens; default 500, deliberately slower than Semantic's own 50 ms. Forwarded as `mouseEnterDelay`, and it does win — the wrapper's spread lands after `Popup`'s portal defaults. It gates the HOVER path only: a click opens the tooltip with no delay at all. |
+| `inverted` | Dark colour scheme. Intercepted and re-passed under the same name, so it also reaches the emitted className. Always true from both entry points, and it is what selects 6 of the 13 scoped CSS rules (the whole colour scheme plus our own border override). |
 
 `inverted` is also written back onto the semantic-ui-react element under the same name, so the same prop appears in both tables.
 
 **Stripped at the DOM boundary.** `src/core/components/TooltipPop.js` applies no boundary filter. Whatever the caller passes reaches semantic-ui-react, which spreads what it does not recognise onto a DOM element — so this is an unprotected boundary, and the replacement should apply `omitProps` where the current wrapper does not.
 
-**Forwarded to semantic-ui-react (8) — the parity checklist.** The wrapper writes `inverted`, `trigger`, `content`, `mouseEnterDelay` as explicit attributes, and spreads `props` AFTER them — so a caller CAN override what the wrapper wrote.
+**Forwarded to semantic-ui-react (28) — the parity checklist.** The wrapper writes `inverted`, `trigger`, `content`, `mouseEnterDelay` as explicit attributes, and spreads `props` AFTER them — so a caller CAN override what the wrapper wrote.
 
-CSS contract: The loaded `modules/popup` LESS styles `.ui.<placement>.popup.transition.visible` and its inner `.content`; SUIR renders that markup through a `Portal`. The replacement has to emit the same structure until step 4 re-homes the CSS.
+CSS contract: MEASURED, AND IT CONTRADICTS THE STEP-2 INSTRUCTION: **no `.ui.popup` rule applies today.** The loaded `modules/popup` LESS contributes 13 declaration blocks that select this exact class string, plus 6 placement-keyed `:before` rules for the arrow, but prefixwrap scopes every one of them under `.ui-render` — a `<div>` — while SUIR's `PortalInner` mounts the bubble into `document.body`, outside it. The live tooltip is therefore unstyled text positioned by Popper, reached only by the two unscoped `*` rules the §2.6-7 host leak already documents. So "keep emitting `ui popup` classNames until step 4 so the current CSS continues to apply" preserves nothing; what revives those 13 rules is mounting INSIDE the widget, which SUIR's own `mountNode` already does. Pinned both ways — matching under `.ui-render`, matching nothing where the portal lands today — by `src/style/__tests__/css.tooltip-contract.test.js`.
 
 | Prop | Reaches SUIR via | Tier | Seen in | What has to be reproduced |
 | --- | --- | --- | --- | --- |
@@ -169,10 +171,30 @@ CSS contract: The loaded `modules/popup` LESS styles `.ui.<placement>.popup.tran
 | `inverted` | element | 1 | demo | Always set from both entry points. Adds `inverted` to the popup className. |
 | `mouseEnterDelay` | element | 1 | demo | From `delay`. SUIR does not declare it on `Popup`, only on `Portal`, and the wrapper's spread lands after the portal defaults — so the 500 ms does take effect. |
 | `trigger` | element | 1 | demo | The element the tooltip hangs off. Comes from `children`; a caller may override it through the rest spread, which is spread last. |
-| `basic` | caller, via `props` | 2 | — | Borderless style. No occurrences. |
-| `hoverable` | caller, via `props` | 2 | — | Keeps the popup open while the pointer is over it. No occurrences. |
-| `on` | caller, via `props` | 2 | — | Trigger events, SUIR default `['click', 'hover']` — so today's tooltip also opens on CLICK and does NOT open on focus. Reproducing that exactly, or fixing it, is a step-2 decision. |
-| `position` | caller, via `props` | 2 | — | Placement, SUIR default `top left`. No meta in either corpus passes it; the only code that configures it (`components/utils/components.js`) has no non-test importer. |
+| `as` | caller, via `props` | 2 | — | Changes the bubble's element (`div` → `span`, …). No occurrences. |
+| `basic` | caller, via `props` | 2 | — | Borderless style; `.ui.basic.popup:before {display}` removes the arrow. No occurrences. |
+| `className` | caller, via `props` | 2 | — | Appended AFTER `visible`, so a caller can add tokens but never reorder the ones the CSS keys on. No occurrences. |
+| `closeOnDocumentClick` | caller, via `props` | 2 | — | Set true by SUIR's click branch, which is why a click anywhere else dismisses the tooltip. Portal-only. No occurrences. |
+| `closeOnEscape` | caller, via `props` | 2 | — | Default true, delivered through a document-level `keydown` listener — so Escape works with focus on an unrelated element, and it is the only dismissal path that needs no pointer. Portal-only. No occurrences. |
+| `defaultOpen` | caller, via `props` | 2 | — | Open on mount, uncontrolled. Portal-only, same caveat as `open`. No occurrences. |
+| `disabled` | caller, via `props` | 2 | — | Renders the trigger and no portal at all. No occurrences. |
+| `flowing` | caller, via `props` | 2 | — | Drops the 250 px max-width. No occurrences. |
+| `header` | caller, via `props` | 2 | — | Bold heading above the body. The ONLY way the inner `.content` node acquires any style — `.ui.popup > .header + .content {padding-top}` is the single rule that selects it, and it needs this sibling. No occurrences. |
+| `hideOnScroll` | caller, via `props` | 2 | — | Closes on window scroll, and the only prop that makes SUIR render an extra `EventStack` inside the bubble. No occurrences. |
+| `hoverable` | caller, via `props` | 2 | — | Keeps the popup open while the pointer is over it. Unset today, which is why moving onto the bubble closes it and its text cannot be selected. No occurrences. |
+| `mountNode` | caller, via `props` | 2 | — | Redirects the whole portal into a given node — verified. This is the prop that would put the bubble inside `.ui-render` and make the 13 scoped CSS rules apply, so step 2 should read it as the shape of the fix rather than as an unused option. No occurrences. |
+| `mouseLeaveDelay` | caller, via `props` | 2 | — | The close delay, 70 ms by default — the wrapper exposes `delay` for the open side only, so this is the half a meta author cannot reach without an object `tooltip`. Portal-only. No occurrences. |
+| `offset` | caller, via `props` | 2 | — | Offsets the bubble AND is what switches on Popper's `preventOverflow` (`enabled: !!offset`). Nothing sets it, so overflow clamping is OFF today — which means parity for a replacement is flip yes, shift no. Browser-only. |
+| `on` | caller, via `props` | 2 | — | Trigger events, SUIR default `['click', 'hover']` — so today's tooltip also opens on CLICK and does NOT open on focus. Verified that `['hover', 'focus']` fixes the keyboard gap immediately, so step 2's a11y work here is configuration, not new code. |
+| `onClose` | caller, via `props` | 2 | — | Called when it closes, once per close. No occurrences. |
+| `onOpen` | caller, via `props` | 2 | — | Called when the overlay opens. Fires on every path, including the click one. No occurrences. |
+| `open` | caller, via `props` | 2 | — | Fully controlled overlay. A Portal-only prop: it appears in no `Popup` propTypes, so a reader of the Popup documentation would not know it works. No occurrences. |
+| `pinned` | caller, via `props` | 2 | — | Disables Popper's flip, which is ENABLED today (`enabled: !pinned`). Browser-only: jsdom reports 0×0 for every rect, so no jest test can observe a flip — named as a gap in §9.5. |
+| `popper` | caller, via `props` | 2 | — | Props, className or id for the positioning wrapper `<div>` — the element that actually carries the coordinates. No occurrences. |
+| `position` | caller, via `props` | 2 | — | Placement, SUIR default `top left`. Rewrites the placement tokens, so it also decides which arrow rule applies. No meta in either corpus passes it — zero occurrences of `position` on any tooltip node — and the only code that configures it (`components/utils/components.js`) has no non-test importer, so `top left` is the only placement in production. |
+| `size` | caller, via `props` | 2 | — | One of `mini`…`huge`, inserted as a token before `popup`; five scoped rules select on it. No occurrences. |
+| `style` | caller, via `props` | 2 | — | Merged after the `left`/`right`/`position` SUIR writes inline, so a caller can override the positioning reset. No occurrences. |
+| `wide` | caller, via `props` | 2 | — | Widens the box; `wide: 'very'` emits `very wide`. Both tokens are styled. No occurrences. |
 
 ### `Dropdown` — wraps semantic-ui-react `Dropdown`
 
@@ -291,14 +313,20 @@ What each step owes beyond "the props above still work".
 - DONE — `TableView.js`'s `sellStyles` discard is gone (a typo for a prop that does not exist; nothing passes `cellStyles` either), and the `class=""` comment it carried is rewritten, because suppressing that attribute is now the cell's job.
 - EXPECTED AND VERIFIED — 332 changed snapshot lines in four shapes and no others: 24 `<tbody class="">`, 94 `<tr class="">` and 199 `<td class="">` lose an empty attribute, and 15 `<td class="top aligned">` lose a dead class. Nothing else moved: same element counts per tag, same class strings on `<table>`/`<thead>`/`<th>`, same `id`/`style`/`colspan`, same visible text, and the behavioural layer green throughout.
 
-### Step 2 — `TooltipPop`
+### Step 2 — `TooltipPop` — PART 1 (THE GATE) SHIPPED, REPLACEMENT OPEN
 
-**Effort: S–M (unchanged, but the risk moved).**
+**Effort: S–M for the replacement, unchanged. Part 1 was the measurement and the gate..**
 
-- The tracked corpus renders ZERO tooltips: the only `view: "Tooltip"` node and the only `tooltip` attribute both sit in a non-active `Tabs` panel of one example, and the consumer metas contain none at all. Verifiable in the baseline itself — neither trigger label, and no popup markup, appears anywhere in the 38 snapshots. So the 38-snapshot DOM baseline cannot catch a tooltip regression at all; the whole gate is the 5 tooltip cases in `UIRender.overlay-behavior.test.js` plus the SUIR-mocked wrapper unit test.
-- This is an unfiltered DOM boundary: the wrapper spreads its rest bag onto SUIR, which spreads what it does not recognise onto the popup `<div>`. Apply `omitProps` in the replacement.
-- Decide whether to keep SUIR's `on: ['click', 'hover']` default — the tooltip opens on click and does not open on focus — or to fix it to hover+focus.
-- Losing SUIR also loses `@popperjs/core`/`react-popper`, so §9.7-F1.2's zero-dependency option (b) would be a regression against today: no flip, no overflow handling.
+- SHIPPED — the gate. 63 tooltip tests across four files where there were 10, only 5 of which could fail if the tooltip broke (the other 5 asserted the props handed to a mock): `components/__tests__/TooltipPop.test.js` (rewritten against the REAL `semantic-ui-react`, no `jest.mock`), `components/__tests__/TooltipPop.behavior.test.js` (new — the interaction contract), `pages/main/__tests__/UIRender.overlay-behavior.test.js` (extended to all three meta entry points) and `style/__tests__/css.tooltip-contract.test.js` (new — joins the emitted class string to the compiled CSS rules). NOT SHIPPED: the replacement, and the positioning-primitive decision, which is the maintainers' and is deliberately still open.
+- CORRECTION to the step-0 note above: the gate was never "the SUIR-mocked wrapper unit test" alone. `UIRender.overlay-behavior.test.js` already drove the real component through the real engine for 5 clauses (delay boundary, close on leave, delay override, two a11y tripwires). What was genuinely missing was everything markup-shaped: no class pin, no portal-location pin, no click path, no Escape, no click-outside, no close delay, no object-`tooltip` passthrough, no prop-leak boundary. Part 1 extended that file rather than founding it.
+- CORRECTION to "the corpus renders zero tooltips": true of THIS component only. The corpus renders 5 tooltips today, all in the `slider` example and all snapshot-gated — they come from a second, separate `components/Tooltip.js`: 15 lines, CSS-only, an inline `<span>`, no portal and no JS positioning, used by `Slider`, `modules/upload/views/Upload.js` and `withFormSetup`'s validation-error tooltip, and styled by 41 rules in `style/components/tooltip.less`. It is evidence for the positioning decision and a naming trap for the cleanup: `form/utils.js` imports BOTH.
+- CORRECTION — the biggest finding, and it invalidates an instruction this step was given: "keep emitting `ui popup`-compatible classNames so the current CSS continues to apply" rests on a false premise. No `.ui.popup` rule applies today, because the portal mounts outside `.ui-render`. See the CSS contract in the `TooltipPop` section above; measured twice, by selector matching and by real-Chrome computed style.
+- STILL OWED — this is an unfiltered DOM boundary, and it is the one thing part 1 pinned as a DEFECT rather than as a contract: `view`, `index` and `symbol` all reach the bubble as HTML attributes today (`view="Tooltip"` on every `view: "Tooltip"` node, via the `mapper.js` spread). Apply `omitProps` in the replacement and flip that assertion to `toEqual([])`.
+- STILL OWED — decide `on` explicitly. SUIR's default is `['click', 'hover']`, so every tooltip in the product is also a click target and none of them opens on focus. Part 1 verified that `['hover', 'focus']` closes the keyboard gap immediately, so this is a decision, not a workstream.
+- STILL OWED — decide the trigger-shape contract. `React.Children.only` means the `items` form of `view: "Tooltip"` has never worked: the engine catches the throw and renders its error diagnostic in place of the node, so the author loses the trigger too. Pinned as current behaviour; `docs/SUPPORTED-VIEWS.md` is corrected.
+- THE POSITIONING DECISION, with the data it needs. Requirements measured, not assumed: flip is ACTIVE today (`enabled: !pinned`, and the placement class carries Popper's resolved placement, so a flip is observable in the DOM); overflow clamping is OFF (`preventOverflow` is `enabled: !!offset` and nothing sets `offset`); the arrow is CSS `:before`, not a positioned element; and scroll/resize repositioning is on. So parity is **flip yes, shift no** — §9.7-F1.2's claim that the zero-dep option loses "flip AND overflow handling" is half right. Coordinates are unavoidable while the bubble portals out of the tree; an inline tooltip needs none (and the in-house `Tooltip.js` proves the pattern ships) but would be clipped at the corpus's own use sites, which sit inside `Expand` → `AnimateHeight`'s `overflow: hidden`. Neither option is ruled in; "no positioning code" and "inline only" are ruled out.
+- WHAT THE GATE CANNOT SAY, so the replacement is not judged on it: everything positional. jsdom reports 0×0 for every rect, so flip, the resulting placement-class change, shift, the arrow geometry, the 250 px wrap, clipping, stacking, painted style, real pointer travel and screen-reader announcement are all inexpressible. They are named one by one against the §9.5 Playwright item, which now blocks THIS step's completion rather than only F1's.
+- FREE CLEANUP, confirmed: the `TooltipPop` chain in `modules/form/utils.js` is dead at four sites — the import (line 8), `withForm`'s `Tooltip = TooltipPop` default parameter, the pass-through into `withFormSetup({… Tooltip})`, and the destructure that never uses it. Delete all four; do NOT touch line 7, which imports the in-house `Tooltip` as `ToolTip` and IS used by the validation-error tooltip.
 
 ### Step 3 — `Dropdown`
 
@@ -308,6 +336,7 @@ What each step owes beyond "the props above still work".
 - Keep `displayName = 'Dropdown'` AND the named-vs-default export split: `modules/form/utils.js` branches on `InputComponent.displayName`, and only the named export carries it — `React.memo(...)` does not.
 - Reproduce SUIR's aria shape: `role="listbox"` (or `combobox` under `search`), `aria-expanded`, `aria-disabled`, `tabIndex=-1` when disabled. SUIR renders no hidden native input, so the form binding is entirely react-final-form.
 - Decide tier 2 explicitly: reimplement or deprecate. They are published propTypes/JSDoc, so they cannot be dropped silently — but they are not evidence for an L estimate either.
+- Owed to this page before the swap: a measured `classContract` and `behaviourContract`, the way step 2 part 1 produced them for `TooltipPop`. Both fields are optional in the curation only because they have not been measured for `Dropdown` yet — an absent one means unmeasured, not "no contract", and `.ui.selection.dropdown` is known to be load-bearing.
 
 ## What this page does and does not guarantee
 

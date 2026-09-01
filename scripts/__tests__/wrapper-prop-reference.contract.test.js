@@ -61,15 +61,29 @@ const EXPECTED = {
     // 7 before §9.7-F1 step 1 took `Table` in-house. It drops by one per completed step, and the
     // count is the cheapest possible check that a step actually removed the dependency instead of
     // moving it: `Table.js` was one of the three non-test importers.
-    importSites: 6,
+    //
+    // 6 → 4 at step 2 part 1, and the two that went were TESTS, not product code: rewriting
+    // `TooltipPop.test.js` against the real component removed both its
+    // `import {Popup} from 'semantic-ui-react'` and its `jest.mock('semantic-ui-react')`. Worth
+    // reading as part of the surface rather than as noise — a suite that mocks the dependency it is
+    // meant to be replacing is itself a coupling to it, and this counter is what made that visible.
+    // The two remaining test-side sites are `Dropdown.behavior.test.js`'s pair, which step 3 owes.
+    importSites: 4,
     interceptedByWrapper: { TooltipPop: 4, Dropdown: 23 },
     // The in-house side. `Table` root consumes className/inverted/striped; the shared subcomponent
     // implementation consumes className; six subcomponents over six native elements.
     inHouse: { Table: { root: 3, part: 1, subcomponents: 6 } },
     // 37/24 before step 1. The `Table` family was 16 tier-1 + 7 tier-2 of those, and it left the
     // forwarded set entirely — a component that imports nothing forwards nothing.
+    //
+    // Tier 2 went 17 → 37 at step 2 part 1: the tooltip's passthrough was curated as 4 props and
+    // measured at 24 with an observable effect, out of 45 reachable
+    // (`Popup.handledProps` ∪ `Portal.handledProps`, 16 of them Portal-only and absent from
+    // `Popup`'s propTypes). Nothing about the component changed — the count moved because the
+    // audit had understated an open rest spread by an order of magnitude, which is precisely the
+    // number step 2 part 2 needs before it can decide what to drop.
     forwardedTier1: 21,
-    forwardedTier2: 17,
+    forwardedTier2: 37,
     // The three props no tracked example uses but consumer metas do. `upward` and `disabled`
     // reach semantic-ui-react and are both styled, which is why a demo-derived checklist
     // would have been wrong — see UPGRADE-PLAN §9.7-F1 step 0. (`colGroup`, the third, is

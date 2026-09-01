@@ -169,6 +169,152 @@ describe('overlay behavioural contract', () => {
                 expect(screen.queryByText(TOOLTIP_TEXT)).not.toBeInTheDocument()
             })
         })
+
+        /**
+         * THE OTHER TWO ENTRY POINTS. ==========================================
+         *
+         * Added by §9.7-F1 step 2 part 1. The clauses above drive `view: "Tooltip"`
+         * only, which is one of three ways meta reaches `TooltipPop` — and the
+         * least used of them, since ANY node can carry a `tooltip` attribute
+         * instead (`Render.js:107`). A replacement that wired up the `view` and
+         * forgot the attribute would have passed this suite.
+         *
+         * The object form matters twice over: it is the only place a meta author
+         * reaches SUIR's own prop surface, because `Render.js` spreads the object
+         * straight through. That is 45 reachable props (`Popup.handledProps` ∪
+         * `Portal.handledProps`) against the 4 the wrapper itself declares, which is
+         * why step 2 owes an explicit decision about the passthrough rather than a
+         * replacement that happens to accept four props. `docs/SUPPORTED-PROPS.md`
+         * carries the 24 with a measured effect.
+         */
+        describe('the `tooltip` attribute on any node', () => {
+            const attributeMeta = (tooltip) => ({
+                view: 'Row',
+                items: [{ view: 'Button', children: 'Reset', tooltip }],
+            })
+
+            /** Same close-and-unmount discipline as `withTooltip`, different meta. */
+            const withAttribute = (tooltip, assertions) => {
+                const { unmount } = mountMeta(attributeMeta(tooltip))
+                const trigger = screen.getByRole('button', { name: 'Reset' })
+                try {
+                    assertions(trigger)
+                } finally {
+                    fireEvent.mouseLeave(trigger)
+                    fireEvent.blur(trigger)
+                    advance(1000)
+                    unmount()
+                }
+            }
+
+            it('shows a string `tooltip` after the same 500 ms delay, and hides it again', () => {
+                withAttribute(TOOLTIP_TEXT, trigger => {
+                    expect(screen.queryByText(TOOLTIP_TEXT)).not.toBeInTheDocument()
+
+                    fireEvent.mouseEnter(trigger)
+                    advance(499)
+                    expect(screen.queryByText(TOOLTIP_TEXT)).not.toBeInTheDocument()
+
+                    advance(1)
+                    expect(screen.getByText(TOOLTIP_TEXT)).toBeInTheDocument()
+
+                    fireEvent.mouseLeave(trigger)
+                    advance(70)
+                    expect(screen.queryByText(TOOLTIP_TEXT)).not.toBeInTheDocument()
+                })
+            })
+
+            it('reads an object `tooltip`\'s `title` and honours its `delay`', () => {
+                withAttribute({ title: TOOLTIP_TEXT, delay: 0 }, trigger => {
+                    fireEvent.mouseEnter(trigger)
+                    advance(0)
+
+                    expect(screen.getByText(TOOLTIP_TEXT)).toBeInTheDocument()
+                })
+            })
+
+            /**
+             * The passthrough, asserted at the level that proves it is open: `on`
+             * is not a prop the wrapper declares, documents or maps — it rides the
+             * spread into SUIR. Step 2's replacement either reproduces this surface
+             * or narrows the meta contract, and this is the test that will say which.
+             */
+            it('passes an object `tooltip`\'s unmapped props through to the overlay', () => {
+                withAttribute({ title: TOOLTIP_TEXT, on: ['hover', 'focus'] }, trigger => {
+                    fireEvent.focus(trigger)
+
+                    expect(screen.getByText(TOOLTIP_TEXT)).toBeInTheDocument()
+                })
+            })
+
+            it('leaves the tooltipped node itself unchanged while the tooltip is closed', () => {
+                // The wrapper adds no element and no attribute, which is why the
+                // 38-example DOM baseline is silent about tooltips BY CONSTRUCTION
+                // and not merely because the corpus's two declarations sit in an
+                // inactive `Tabs` panel. A rewrite that renders a hidden bubble at
+                // mount would change every snapshot and put invisible text in the
+                // accessibility tree; nothing else in the repo would notice.
+                const plain = mountMeta({ view: 'Row', items: [{ view: 'Button', children: 'Reset' }] })
+                const expected = plain.container.innerHTML
+                plain.unmount()
+
+                const { container, unmount } = mountMeta(attributeMeta(TOOLTIP_TEXT))
+                try {
+                    expect(container.innerHTML).toBe(expected)
+                    expect(screen.queryByText(TOOLTIP_TEXT)).not.toBeInTheDocument()
+                } finally {
+                    unmount()
+                }
+            })
+        })
+
+        /**
+         * SUIR's `on` defaults to `['click', 'hover']`, so every meta-declared
+         * tooltip in the product is ALSO a click target — undocumented, ungated
+         * until now, and the behaviour a hover-only rewrite drops in silence.
+         * Recorded here at the meta level because that is where the promise lives;
+         * `TooltipPop.behavior.test.js` pins the same fact per component.
+         */
+        it('opens on a click of the trigger, with no delay', () => {
+            withTooltip({}, trigger => {
+                fireEvent.click(trigger)
+
+                expect(screen.getByText(TOOLTIP_TEXT)).toBeInTheDocument()
+            })
+        })
+
+        /**
+         * THE `items` FORM DOES NOT WORK, AND THIS PINS WHAT HAPPENS INSTEAD.
+         *
+         * `mapper.js` sets `props.children = items.map(Render)` — an ARRAY — and
+         * SUIR's `Portal` runs `React.Children.only()` on it, which throws even for
+         * a single item. The engine's error boundary catches it and renders the
+         * diagnostic string in the node's place, so the trigger disappears
+         * entirely: a meta author gets no tooltip AND no button.
+         *
+         * `docs/SUPPORTED-VIEWS.md` described `items` as the tooltip's BODY; it is
+         * the trigger, and this shape never rendered. The page is corrected in the
+         * same change as this test. Pinned as current behaviour: step 2 may keep it
+         * (the nested-object `children` form is the one in use) or fix it, but not
+         * by accident.
+         */
+        it('renders the error diagnostic instead of the node when `items` is used as the trigger', () => {
+            const { container, unmount } = mountMeta({
+                view: 'Row',
+                items: [{
+                    view: 'Tooltip',
+                    label: TOOLTIP_TEXT,
+                    items: [{ view: 'Button', children: 'Reset' }],
+                }],
+            })
+            try {
+                expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument()
+                expect(container).toHaveTextContent('[ui-render] render error')
+                expect(container).toHaveTextContent('React.Children.only')
+            } finally {
+                unmount()
+            }
+        })
     })
 
     describe('modal Popup', () => {

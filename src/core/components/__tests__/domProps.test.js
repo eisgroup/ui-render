@@ -206,4 +206,15 @@ describe('DOM boundary: icon, image and tooltip', () => {
         expect(engineMarkers(container.innerHTML)).toEqual([])
         expect(container.querySelector('span')).toHaveTextContent('content')
     })
+
+    /**
+     * THE ONE COMPONENT DELIBERATELY ABSENT FROM THIS FILE. `TooltipPop` — the SUIR
+     * `Popup` wrapper, not the in-house `Tooltip` above, despite the names — applies
+     * NO boundary filter, so `view`, `index` and `symbol` all reach the popup
+     * element as HTML attributes. It is not listed here because there is nothing to
+     * assert green: the leak is pinned at its current value in
+     * `TooltipPop.test.js` ("leaks engine-internal props onto the bubble"), in the
+     * house style of the corpus ledger. §9.7-F1 step 2 part 2 applies `omitProps`,
+     * flips that assertion to `toEqual([])`, and the component joins this list.
+     */
 })

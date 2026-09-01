@@ -69,6 +69,20 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
+        // §9.7-F1 step 2 part 1. Added at 100/100/100/100 because that is what a `--coverage` run
+        // measures, BEFORE the step as well as after — the old SUIR-mocked suite already reached
+        // every line and the single `isFunction(title)` branch of a 24-line passthrough. So read
+        // this entry for exactly what it is: a floor for the in-house tooltip part 2 puts at this
+        // path, not evidence that the tooltip works. The gate for that is behavioural
+        // (`TooltipPop.behavior.test.js`, `UIRender.overlay-behavior.test.js`) and markup-level
+        // (`TooltipPop.test.js`, `style/__tests__/css.tooltip-contract.test.js`); a threshold here
+        // would have stayed green through a wrapper that rendered nothing at all.
+        './src/core/components/TooltipPop.js': {
+            statements: 100,
+            branches: 100,
+            functions: 100,
+            lines: 100,
+        },
         './src/core/modules/form/asInputDateField.js': {
             statements: 100,
             branches: 100,
