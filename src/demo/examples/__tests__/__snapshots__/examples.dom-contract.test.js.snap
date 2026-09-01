@@ -408,7 +408,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                           <div class="flex--row min-width fill-width">
                             <table class="ui table full-width">
                               <thead class="font-normal">
-                                <tr class="">
+                                <tr>
                                   <th class="left">
                                     <div class="flex--row middle">
                                       <span class="text p">
@@ -442,9 +442,9 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                   </th>
                                 </tr>
                               </thead>
-                              <tbody class="">
-                                <tr class="">
-                                  <td class="">
+                              <tbody>
+                                <tr>
+                                  <td>
                                     <div class="flex--col app__expand expanded">
                                       <span class="text pointer row fill-width middle padding-small">
                                         <i aria-hidden="true" class="icon-chevron-down spin-90-deg">
@@ -453,35 +453,35 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                       </span>
                                     </div>
                                   </td>
-                                  <td class="">
+                                  <td>
                                     <div class="flex--col">
                                       <span class="text p">
                                         "18"
                                       </span>
                                     </div>
                                   </td>
-                                  <td class="">
+                                  <td>
                                     <div class="flex--col">
                                       <span class="text p">
                                         "1"
                                       </span>
                                     </div>
                                   </td>
-                                  <td class="">
+                                  <td>
                                     <div class="flex--col">
                                       <span class="text p">
                                       </span>
                                     </div>
                                   </td>
                                 </tr>
-                                <tr class="">
-                                  <td class="" colspan="4">
+                                <tr>
+                                  <td colspan="4">
                                     <div>
                                       <div class="overflow-scroll flex--row max-width">
                                         <div class="flex--row min-width fill-width">
                                           <table class="ui table full-width">
                                             <thead class="font-normal">
-                                              <tr class="">
+                                              <tr>
                                                 <th class="left">
                                                   <div class="flex--row middle">
                                                     <span class="text p">
@@ -533,51 +533,51 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                                 </th>
                                               </tr>
                                             </thead>
-                                            <tbody class="">
-                                              <tr class="">
-                                                <td class="">
+                                            <tbody>
+                                              <tr>
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "NV"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "Space Coast"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "5"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "0.3"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "0.5860272395989157"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "0.5762102325676609"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "0.8410340931266652"
@@ -585,50 +585,50 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                                   </div>
                                                 </td>
                                               </tr>
-                                              <tr class="">
-                                                <td class="">
+                                              <tr>
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "NV"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "Space Coast 2"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "13"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "0.7"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "0.6760272395989158"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "0.5462102325676609"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "0.7810340931266652"
@@ -643,8 +643,8 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                     </div>
                                   </td>
                                 </tr>
-                                <tr class="">
-                                  <td class="">
+                                <tr>
+                                  <td>
                                     <div class="flex--col app__expand expanded">
                                       <span class="text pointer row fill-width middle padding-small">
                                         <i aria-hidden="true" class="icon-chevron-down spin-90-deg">
@@ -653,35 +653,35 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                       </span>
                                     </div>
                                   </td>
-                                  <td class="">
+                                  <td>
                                     <div class="flex--col">
                                       <span class="text p">
                                         "15"
                                       </span>
                                     </div>
                                   </td>
-                                  <td class="">
+                                  <td>
                                     <div class="flex--col">
                                       <span class="text p">
                                         "1"
                                       </span>
                                     </div>
                                   </td>
-                                  <td class="">
+                                  <td>
                                     <div class="flex--col">
                                       <span class="text p">
                                       </span>
                                     </div>
                                   </td>
                                 </tr>
-                                <tr class="">
-                                  <td class="" colspan="4">
+                                <tr>
+                                  <td colspan="4">
                                     <div>
                                       <div class="overflow-scroll flex--row max-width">
                                         <div class="flex--row min-width fill-width">
                                           <table class="ui table full-width">
                                             <thead class="font-normal">
-                                              <tr class="">
+                                              <tr>
                                                 <th class="left">
                                                   <div class="flex--row middle">
                                                     <span class="text p">
@@ -733,51 +733,51 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                                 </th>
                                               </tr>
                                             </thead>
-                                            <tbody class="">
-                                              <tr class="">
-                                                <td class="">
+                                            <tbody>
+                                              <tr>
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "WS"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "Washington"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "15"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "1"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "0.5260272395989157"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "0.7762102325676609"
                                                     </span>
                                                   </div>
                                                 </td>
-                                                <td class="">
+                                                <td>
                                                   <div class="flex--col">
                                                     <span class="text p">
                                                       "0.6410340931266651"
@@ -909,7 +909,7 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
           <div class="flex--row min-width fill-width">
             <table class="ui table full-width">
               <thead class="font-normal">
-                <tr class="">
+                <tr>
                   <th class="left">
                     <div class="flex--row middle">
                       <span class="text p">
@@ -919,9 +919,9 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
                   </th>
                 </tr>
               </thead>
-              <tbody class="">
-                <tr class="">
-                  <td class="">
+              <tbody>
+                <tr>
+                  <td>
                     <div class="flex--row">
                       <span class="text">
                         "71"
@@ -935,8 +935,8 @@ exports[`demo example full-DOM contract decimal renders a stable, non-empty DOM 
                     </div>
                   </td>
                 </tr>
-                <tr class="">
-                  <td class="">
+                <tr>
+                  <td>
                     <div class="flex--row">
                       <span class="text">
                         "100"
@@ -1077,8 +1077,8 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
                     <table class="ui table full-width vertical">
                       <thead class="font-normal">
                       </thead>
-                      <tbody class="">
-                        <tr class="">
+                      <tbody>
+                        <tr>
                           <th class="left">
                             <div class="flex--row middle">
                               <span class="text p">
@@ -1086,21 +1086,21 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
                               </span>
                             </div>
                           </th>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Plan 1"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Plan 1"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Plan 1"
@@ -1108,7 +1108,7 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
                             </div>
                           </td>
                         </tr>
-                        <tr class="">
+                        <tr>
                           <th class="left">
                             <div class="flex--row middle">
                               <span class="text p">
@@ -1116,21 +1116,21 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
                               </span>
                             </div>
                           </th>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "GroupA"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "GroupB"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "DepLife"
@@ -1138,7 +1138,7 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
                             </div>
                           </td>
                         </tr>
-                        <tr class="">
+                        <tr>
                           <th class="left">
                             <div class="flex--row middle">
                               <span class="text p">
@@ -1146,21 +1146,21 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
                               </span>
                             </div>
                           </th>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Value1"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Value2"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Value3"
@@ -1338,7 +1338,7 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
             <div class="flex--row min-width fill-width">
               <table class="ui table full-width">
                 <thead class="font-normal">
-                  <tr class="">
+                  <tr>
                     <th class="left">
                       <div class="flex--row middle">
                         <span class="text p">
@@ -1369,7 +1369,7 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
                     </th>
                   </tr>
                 </thead>
-                <tbody class="">
+                <tbody>
                 </tbody>
               </table>
             </div>
@@ -1407,7 +1407,7 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
             <div class="flex--row min-width fill-width">
               <table class="ui table full-width">
                 <thead class="font-normal">
-                  <tr class="">
+                  <tr>
                     <th class="left">
                       <div class="flex--row middle">
                         <span class="text p">
@@ -1445,7 +1445,7 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
                     </th>
                   </tr>
                 </thead>
-                <tbody class="">
+                <tbody>
                 </tbody>
               </table>
             </div>
@@ -1608,7 +1608,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
           <div class="flex--row min-width fill-width">
             <table class="ui table full-width outline margin-v">
               <thead class="font-normal">
-                <tr class="">
+                <tr>
                   <th class="left padding-left-small border-right">
                     <div class="flex--row middle">
                       <span class="text p">
@@ -1631,8 +1631,8 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                   </th>
                 </tr>
               </thead>
-              <tbody class="">
-                <tr class="">
+              <tbody>
+                <tr>
                   <td class="no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover border-right done">
                       <div class="flex--row middle">
@@ -1660,15 +1660,15 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr class="">
-                  <td class="" colspan="3">
+                <tr>
+                  <td colspan="3">
                     <div class="flex--col padding-small padding-top-none">
                       <div>
                         <div class="overflow-scroll flex--row max-width">
                           <div class="flex--row min-width fill-width">
                             <table class="ui table full-width margin-v no-border">
                               <thead class="font-normal">
-                                <tr class="">
+                                <tr>
                                   <th class="left padding-left-small border-right">
                                     <div class="flex--row middle">
                                       <span class="text p">
@@ -1705,8 +1705,8 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                   </th>
                                 </tr>
                               </thead>
-                              <tbody class="">
-                                <tr class="">
+                              <tbody>
+                                <tr>
                                   <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
@@ -1752,7 +1752,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                     </div>
                                   </td>
                                 </tr>
-                                <tr class="">
+                                <tr>
                                   <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
@@ -1798,8 +1798,8 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                     </div>
                                   </td>
                                 </tr>
-                                <tr class="">
-                                  <td class="top aligned">
+                                <tr>
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -1808,7 +1808,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -1817,7 +1817,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -1826,7 +1826,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -1835,7 +1835,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <button class="button a transparent" type="button">
                                       "Add line"
                                     </button>
@@ -1849,7 +1849,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr class="">
+                <tr>
                   <td class="no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover border-right done">
                       <div class="flex--row middle">
@@ -1877,15 +1877,15 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr class="">
-                  <td class="" colspan="3">
+                <tr>
+                  <td colspan="3">
                     <div class="flex--col padding-small padding-top-none">
                       <div>
                         <div class="overflow-scroll flex--row max-width">
                           <div class="flex--row min-width fill-width">
                             <table class="ui table full-width margin-v no-border">
                               <thead class="font-normal">
-                                <tr class="">
+                                <tr>
                                   <th class="left padding-left-small border-right">
                                     <div class="flex--row middle">
                                       <span class="text p">
@@ -1922,8 +1922,8 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                   </th>
                                 </tr>
                               </thead>
-                              <tbody class="">
-                                <tr class="">
+                              <tbody>
+                                <tr>
                                   <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
@@ -1969,7 +1969,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                     </div>
                                   </td>
                                 </tr>
-                                <tr class="">
+                                <tr>
                                   <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
@@ -2015,7 +2015,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                     </div>
                                   </td>
                                 </tr>
-                                <tr class="">
+                                <tr>
                                   <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
@@ -2061,8 +2061,8 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                     </div>
                                   </td>
                                 </tr>
-                                <tr class="">
-                                  <td class="top aligned">
+                                <tr>
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -2071,7 +2071,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -2080,7 +2080,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -2089,7 +2089,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -2098,7 +2098,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <button class="button a transparent" type="button">
                                       "Add line"
                                     </button>
@@ -2112,7 +2112,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr class="">
+                <tr>
                   <td class="no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover border-right done">
                       <div class="flex--row middle">
@@ -2140,15 +2140,15 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr class="">
-                  <td class="" colspan="3">
+                <tr>
+                  <td colspan="3">
                     <div class="flex--col padding-small padding-top-none">
                       <div>
                         <div class="overflow-scroll flex--row max-width">
                           <div class="flex--row min-width fill-width">
                             <table class="ui table full-width margin-v no-border">
                               <thead class="font-normal">
-                                <tr class="">
+                                <tr>
                                   <th class="left padding-left-small border-right">
                                     <div class="flex--row middle">
                                       <span class="text p">
@@ -2185,8 +2185,8 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                   </th>
                                 </tr>
                               </thead>
-                              <tbody class="">
-                                <tr class="">
+                              <tbody>
+                                <tr>
                                   <td class="no-border-right-last-item" style="vertical-align: top;">
                                     <div class="flex--col input--wrapper border-on-hover border-right done">
                                       <div class="flex--row middle">
@@ -2232,8 +2232,8 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                     </div>
                                   </td>
                                 </tr>
-                                <tr class="">
-                                  <td class="top aligned">
+                                <tr>
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -2242,7 +2242,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -2251,7 +2251,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -2260,7 +2260,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
                                       </div>
@@ -2269,7 +2269,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       </div>
                                     </div>
                                   </td>
-                                  <td class="top aligned">
+                                  <td>
                                     <button class="button a transparent" type="button">
                                       "Add line"
                                     </button>
@@ -2283,8 +2283,8 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr class="">
-                  <td class="" colspan="3">
+                <tr>
+                  <td colspan="3">
                     <div class="flex--col padding-small">
                       <span class="text h5 margin-bottom-small">
                         "New phase (draft)"
@@ -2697,7 +2697,7 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
           <div class="flex--row min-width fill-width">
             <table class="ui table full-width">
               <thead class="font-normal">
-                <tr class="">
+                <tr>
                   <th class="left">
                     <div class="flex--row middle">
                       <span class="text p">
@@ -2745,9 +2745,9 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
                   </th>
                 </tr>
               </thead>
-              <tbody class="">
-                <tr class="">
-                  <td class="">
+              <tbody>
+                <tr>
+                  <td>
                     <div class="flex--col app__expand">
                       <span class="text pointer row fill-width middle padding-small">
                         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
@@ -2756,14 +2756,14 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
                       </span>
                     </div>
                   </td>
-                  <td class="">
+                  <td>
                     <div class="flex--col">
                       <span class="text p">
                         "Non-contributory"
                       </span>
                     </div>
                   </td>
-                  <td class="">
+                  <td>
                     <div class="flex--row">
                       <span class="text">
                         "25"
@@ -2773,22 +2773,22 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
                       </span>
                     </div>
                   </td>
-                  <td class="">
+                  <td>
                     <span class="text">
                       "0.7123456789"
                     </span>
                   </td>
-                  <td class="">
+                  <td>
                   </td>
-                  <td class="">
+                  <td>
                     <div class="flex--col">
                       <span class="text p">
                       </span>
                     </div>
                   </td>
                 </tr>
-                <tr class="">
-                  <td class="">
+                <tr>
+                  <td>
                     <div class="flex--col app__expand">
                       <span class="text pointer row fill-width middle padding-small">
                         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
@@ -2797,14 +2797,14 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
                       </span>
                     </div>
                   </td>
-                  <td class="">
+                  <td>
                     <div class="flex--col">
                       <span class="text p">
                         "Contributory"
                       </span>
                     </div>
                   </td>
-                  <td class="">
+                  <td>
                     <div class="flex--row">
                       <span class="text">
                         "55"
@@ -2814,14 +2814,14 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
                       </span>
                     </div>
                   </td>
-                  <td class="">
+                  <td>
                     <span class="text">
                       "0.65"
                     </span>
                   </td>
-                  <td class="">
+                  <td>
                   </td>
-                  <td class="">
+                  <td>
                     <div class="flex--col">
                       <span class="text p">
                       </span>
@@ -3049,7 +3049,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                         <div class="flex--row min-width fill-width">
                           <table class="ui table full-width">
                             <thead class="font-normal">
-                              <tr class="">
+                              <tr>
                                 <th class="left" style="width: 60%;">
                                   <div class="flex--row middle">
                                     <span class="text p">
@@ -3073,23 +3073,23 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                 </th>
                               </tr>
                             </thead>
-                            <tbody class="">
-                              <tr class="">
-                                <td class="">
+                            <tbody>
+                              <tr>
+                                <td>
                                   <div class="flex--col">
                                     <span class="text p">
                                       "Eligible Lives"
                                     </span>
                                   </div>
                                 </td>
-                                <td class="">
+                                <td>
                                   <span class="text">
                                     <span class="text">
                                       "6"
                                     </span>
                                   </span>
                                 </td>
-                                <td class="">
+                                <td>
                                   <span class="text">
                                     <span class="text">
                                       "6"
@@ -3097,15 +3097,15 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                   </span>
                                 </td>
                               </tr>
-                              <tr class="">
-                                <td class="">
+                              <tr>
+                                <td>
                                   <div class="flex--col">
                                     <span class="text p">
                                       "Monthly Pre-Expense Cost"
                                     </span>
                                   </div>
                                 </td>
-                                <td class="">
+                                <td>
                                   <span class="text">
                                     <div class="flex--row">
                                       <span class="text margin-right-smallest">
@@ -3120,7 +3120,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                     </div>
                                   </span>
                                 </td>
-                                <td class="">
+                                <td>
                                   <span class="text">
                                     <div class="flex--row">
                                       <span class="text margin-right-smallest">
@@ -3136,15 +3136,15 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                   </span>
                                 </td>
                               </tr>
-                              <tr class="">
-                                <td class="">
+                              <tr>
+                                <td>
                                   <div class="flex--col">
                                     <span class="text p">
                                       "Net RequestCost"
                                     </span>
                                   </div>
                                 </td>
-                                <td class="">
+                                <td>
                                   <span class="text">
                                     <div class="flex--row">
                                       <span class="text margin-right-smallest">
@@ -3159,7 +3159,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                     </div>
                                   </span>
                                 </td>
-                                <td class="">
+                                <td>
                                   <span class="text">
                                     <div class="flex--row">
                                       <span class="text margin-right-smallest">
@@ -3175,15 +3175,15 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                   </span>
                                 </td>
                               </tr>
-                              <tr class="">
-                                <td class="">
+                              <tr>
+                                <td>
                                   <div class="flex--col">
                                     <span class="text p">
                                       "Total Weekly Benefit"
                                     </span>
                                   </div>
                                 </td>
-                                <td class="">
+                                <td>
                                   <span class="text">
                                     <div class="flex--row">
                                       <span class="text margin-right-smallest">
@@ -3198,7 +3198,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                     </div>
                                   </span>
                                 </td>
-                                <td class="">
+                                <td>
                                   <span class="text">
                                     <div class="flex--row">
                                       <span class="text margin-right-smallest">
@@ -3214,22 +3214,22 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                                   </span>
                                 </td>
                               </tr>
-                              <tr class="">
-                                <td class="">
+                              <tr>
+                                <td>
                                   <div class="flex--col">
                                     <span class="text p">
                                       "Manual Rate"
                                     </span>
                                   </div>
                                 </td>
-                                <td class="">
+                                <td>
                                   <span class="text">
                                     <span class="text">
                                       "0"
                                     </span>
                                   </span>
                                 </td>
-                                <td class="">
+                                <td>
                                   <span class="text">
                                     <span class="text">
                                       "0"
@@ -3523,8 +3523,8 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                           <table class="ui table full-width vertical">
                             <thead class="font-normal">
                             </thead>
-                            <tbody class="">
-                              <tr class="">
+                            <tbody>
+                              <tr>
                                 <th class="left">
                                   <div class="flex--row middle">
                                     <span class="text p">
@@ -3532,14 +3532,14 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     </span>
                                   </div>
                                 </th>
-                                <td class="">
+                                <td>
                                   <div class="flex--col">
                                     <span class="text p">
                                       "Basic"
                                     </span>
                                   </div>
                                 </td>
-                                <td class="">
+                                <td>
                                   <div class="flex--col">
                                     <span class="text p">
                                       "Extended"
@@ -3547,7 +3547,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                   </div>
                                 </td>
                               </tr>
-                              <tr class="">
+                              <tr>
                                 <th class="left">
                                   <div class="flex--row middle">
                                     <span class="text p">
@@ -3555,14 +3555,14 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     </span>
                                   </div>
                                 </th>
-                                <td class="">
+                                <td>
                                   <div class="flex--col">
                                     <span class="text p">
                                       "1100"
                                     </span>
                                   </div>
                                 </td>
-                                <td class="">
+                                <td>
                                   <div class="flex--col">
                                     <span class="text p">
                                       "4"
@@ -3570,7 +3570,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                   </div>
                                 </td>
                               </tr>
-                              <tr class="">
+                              <tr>
                                 <th class="left">
                                   <div class="flex--row middle">
                                     <span class="text p">
@@ -3578,7 +3578,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     </span>
                                   </div>
                                 </th>
-                                <td class="">
+                                <td>
                                   <div class="flex--row">
                                     <span class="text margin-right-smallest">
                                       "$"
@@ -3591,7 +3591,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     </span>
                                   </div>
                                 </td>
-                                <td class="">
+                                <td>
                                   <div class="flex--row">
                                     <span class="text margin-right-smallest">
                                       "$"
@@ -3605,7 +3605,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                   </div>
                                 </td>
                               </tr>
-                              <tr class="">
+                              <tr>
                                 <th class="left">
                                   <div class="flex--row middle">
                                     <span class="text p">
@@ -3613,7 +3613,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     </span>
                                   </div>
                                 </th>
-                                <td class="">
+                                <td>
                                   <div class="flex--row">
                                     <span class="text margin-right-smallest">
                                       "$"
@@ -3626,7 +3626,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     </span>
                                   </div>
                                 </td>
-                                <td class="">
+                                <td>
                                   <div class="flex--row">
                                     <span class="text margin-right-smallest">
                                       "$"
@@ -3640,7 +3640,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                   </div>
                                 </td>
                               </tr>
-                              <tr class="">
+                              <tr>
                                 <th class="left">
                                   <div class="flex--row middle">
                                     <span class="text p">
@@ -3648,7 +3648,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     </span>
                                   </div>
                                 </th>
-                                <td class="">
+                                <td>
                                   <div class="flex--row">
                                     <span class="text margin-right-smallest">
                                       "$"
@@ -3661,7 +3661,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                                     </span>
                                   </div>
                                 </td>
-                                <td class="">
+                                <td>
                                   <div class="flex--row">
                                     <span class="text margin-right-smallest">
                                       "$"
@@ -3738,8 +3738,8 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
                     <table class="ui table full-width vertical">
                       <thead class="font-normal">
                       </thead>
-                      <tbody class="">
-                        <tr class="">
+                      <tbody>
+                        <tr>
                           <th class="left">
                             <div class="flex--row middle">
                               <span class="text p">
@@ -3747,21 +3747,21 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
                               </span>
                             </div>
                           </th>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Category 1"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Category 1"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Category 1"
@@ -3769,7 +3769,7 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
                             </div>
                           </td>
                         </tr>
-                        <tr class="">
+                        <tr>
                           <th class="left">
                             <div class="flex--row middle">
                               <span class="text p">
@@ -3777,21 +3777,21 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
                               </span>
                             </div>
                           </th>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Alpha"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Beta"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Gamma"
@@ -3799,7 +3799,7 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
                             </div>
                           </td>
                         </tr>
-                        <tr class="">
+                        <tr>
                           <th class="left">
                             <div class="flex--row middle">
                               <span class="text p">
@@ -3807,21 +3807,21 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
                               </span>
                             </div>
                           </th>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Active"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Pending"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Active"
@@ -3893,8 +3893,8 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
                     <table class="ui table full-width vertical">
                       <thead class="font-normal">
                       </thead>
-                      <tbody class="">
-                        <tr class="">
+                      <tbody>
+                        <tr>
                           <th class="left">
                             <div class="flex--row middle">
                               <span class="text p">
@@ -3902,28 +3902,28 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
                               </span>
                             </div>
                           </th>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Gamma"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Delta"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Epsilon"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col bold bg-info-light">
                               <span class="text p">
                                 "Zeta"
@@ -3931,7 +3931,7 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
                             </div>
                           </td>
                         </tr>
-                        <tr class="">
+                        <tr>
                           <th class="left">
                             <div class="flex--row middle">
                               <span class="text p">
@@ -3939,28 +3939,28 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
                               </span>
                             </div>
                           </th>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Active"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Inactive"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Active"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Pending"
@@ -3968,7 +3968,7 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
                             </div>
                           </td>
                         </tr>
-                        <tr class="">
+                        <tr>
                           <th class="left">
                             <div class="flex--row middle">
                               <span class="text p">
@@ -3976,28 +3976,28 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
                               </span>
                             </div>
                           </th>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Low"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "High"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Medium"
                               </span>
                             </div>
                           </td>
-                          <td class="">
+                          <td>
                             <div class="flex--col">
                               <span class="text p">
                                 "Low"
@@ -4070,7 +4070,7 @@ exports[`demo example full-DOM contract selectReorder renders a stable, non-empt
               <div class="flex--row min-width fill-width">
                 <table class="ui table full-width">
                   <thead class="font-normal">
-                    <tr class="">
+                    <tr>
                       <th class="left">
                         <div class="flex--row middle">
                           <span class="text p">
@@ -4094,86 +4094,86 @@ exports[`demo example full-DOM contract selectReorder renders a stable, non-empt
                       </th>
                     </tr>
                   </thead>
-                  <tbody class="">
-                    <tr class="">
-                      <td class="">
+                  <tbody>
+                    <tr>
+                      <td>
                         <div class="flex--col bold bg-info-light">
                           <span class="text p">
                             "North"
                           </span>
                         </div>
                       </td>
-                      <td class="">
+                      <td>
                         <div class="flex--col">
                           <span class="text p">
                             "N"
                           </span>
                         </div>
                       </td>
-                      <td class="">
+                      <td>
                         <span class="text">
                           "1200000"
                         </span>
                       </td>
                     </tr>
-                    <tr class="">
-                      <td class="">
+                    <tr>
+                      <td>
                         <div class="flex--col bold bg-info-light">
                           <span class="text p">
                             "South"
                           </span>
                         </div>
                       </td>
-                      <td class="">
+                      <td>
                         <div class="flex--col">
                           <span class="text p">
                             "S"
                           </span>
                         </div>
                       </td>
-                      <td class="">
+                      <td>
                         <span class="text">
                           "3400000"
                         </span>
                       </td>
                     </tr>
-                    <tr class="">
-                      <td class="">
+                    <tr>
+                      <td>
                         <div class="flex--col bold bg-info-light">
                           <span class="text p">
                             "East"
                           </span>
                         </div>
                       </td>
-                      <td class="">
+                      <td>
                         <div class="flex--col">
                           <span class="text p">
                             "E"
                           </span>
                         </div>
                       </td>
-                      <td class="">
+                      <td>
                         <span class="text">
                           "870000"
                         </span>
                       </td>
                     </tr>
-                    <tr class="">
-                      <td class="">
+                    <tr>
+                      <td>
                         <div class="flex--col bold bg-info-light">
                           <span class="text p">
                             "West"
                           </span>
                         </div>
                       </td>
-                      <td class="">
+                      <td>
                         <div class="flex--col">
                           <span class="text p">
                             "W"
                           </span>
                         </div>
                       </td>
-                      <td class="">
+                      <td>
                         <span class="text">
                           "2100000"
                         </span>
@@ -4671,7 +4671,7 @@ exports[`demo example full-DOM contract tableExtraItems renders a stable, non-em
         <div class="flex--row min-width fill-width">
           <table class="ui table full-width">
             <thead class="font-normal">
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
@@ -4695,16 +4695,16 @@ exports[`demo example full-DOM contract tableExtraItems renders a stable, non-em
                 </th>
               </tr>
             </thead>
-            <tbody class="">
-              <tr class="">
-                <td class="">
+            <tbody>
+              <tr>
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Composite Rate"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col input--wrapper">
                     <div class="flex--row middle">
                     </div>
@@ -4713,7 +4713,7 @@ exports[`demo example full-DOM contract tableExtraItems renders a stable, non-em
                     </div>
                   </div>
                 </td>
-                <td class="">
+                <td>
                 </td>
               </tr>
             </tbody>
@@ -4734,7 +4734,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
           <div class="flex--row min-width fill-width">
             <table class="ui table full-width outline margin-v">
               <thead class="font-normal">
-                <tr class="">
+                <tr>
                   <th class="left bg-success-light" colspan="999">
                     <div class="flex--row middle h5 align-center">
                       <span class="text p">
@@ -4743,7 +4743,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                     </div>
                   </th>
                 </tr>
-                <tr class="">
+                <tr>
                   <th class="left padding-left-small border-right">
                     <div class="flex--row middle">
                       <span class="text p">
@@ -4767,8 +4767,8 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                   </th>
                 </tr>
               </thead>
-              <tbody class="">
-                <tr class="">
+              <tbody>
+                <tr>
                   <td class="border-right no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover">
                       <div class="flex--row middle">
@@ -4803,7 +4803,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                     </div>
                   </td>
                 </tr>
-                <tr class="">
+                <tr>
                   <td class="border-right no-border-right-last-item" style="vertical-align: top;">
                     <div class="flex--col input--wrapper border-on-hover">
                       <div class="flex--row middle">
@@ -4838,8 +4838,8 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                     </div>
                   </td>
                 </tr>
-                <tr class="">
-                  <td class="" style="vertical-align: top;">
+                <tr>
+                  <td style="vertical-align: top;">
                     <div class="flex--col input--wrapper">
                       <div class="flex--row middle">
                         <label for="dataKind.period[2].startDate">
@@ -4855,7 +4855,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                       </div>
                     </div>
                   </td>
-                  <td class="" style="vertical-align: top;">
+                  <td style="vertical-align: top;">
                     <div class="flex--col input--wrapper">
                       <div class="flex--row middle">
                         <label for="dataKind.period[2].endDate">
@@ -4871,7 +4871,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                       </div>
                     </div>
                   </td>
-                  <td class="" style="vertical-align: top;">
+                  <td style="vertical-align: top;">
                     <div class="flex--col">
                       <button class="button a transparent margin-v-small" type="button">
                         "Add"
@@ -4900,7 +4900,7 @@ exports[`demo example full-DOM contract tableMatrix renders a stable, non-empty 
         <div class="flex--row min-width fill-width">
           <table class="ui table full-width margin">
             <thead class="font-normal">
-              <tr class="">
+              <tr>
                 <th class="left bg-white">
                   <div class="flex--row middle">
                     <span class="text p">
@@ -4915,7 +4915,7 @@ exports[`demo example full-DOM contract tableMatrix renders a stable, non-empty 
                   </div>
                 </th>
               </tr>
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle bg-success-light border-right">
                     <span class="text p">
@@ -4938,7 +4938,7 @@ exports[`demo example full-DOM contract tableMatrix renders a stable, non-empty 
                   </div>
                 </th>
               </tr>
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle border-right">
                     <span class="text p">
@@ -4990,51 +4990,51 @@ exports[`demo example full-DOM contract tableMatrix renders a stable, non-empty 
                 </th>
               </tr>
             </thead>
-            <tbody class="">
-              <tr class="">
-                <td class="">
+            <tbody>
+              <tr>
+                <td>
                   <div class="flex--col bold border-right">
                     <span class="text p">
                       "0-19"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-left">
                     <span class="text p">
                       "1.05"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-left">
                     <span class="text p">
                       "1.09"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-h">
                     <span class="text p">
                       "1.04"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-left">
                     <span class="text p">
                       "0.06"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-left">
                     <span class="text p">
                       "0.03"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-h">
                     <span class="text p">
                       "0.07"
@@ -5042,50 +5042,50 @@ exports[`demo example full-DOM contract tableMatrix renders a stable, non-empty 
                   </div>
                 </td>
               </tr>
-              <tr class="">
-                <td class="">
+              <tr>
+                <td>
                   <div class="flex--col bold border-right">
                     <span class="text p">
                       "19-29"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-left">
                     <span class="text p">
                       "1.15"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-left">
                     <span class="text p">
                       "1.19"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-h">
                     <span class="text p">
                       "1.14"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-left">
                     <span class="text p">
                       "0.16"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-left">
                     <span class="text p">
                       "0.13"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col center border-h">
                     <span class="text p">
                       "0.17"
@@ -5110,7 +5110,7 @@ exports[`demo example full-DOM contract tableMatrixRequired renders a stable, no
         <div class="flex--row min-width fill-width">
           <table class="ui table full-width">
             <thead class="font-normal">
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
@@ -5132,7 +5132,7 @@ exports[`demo example full-DOM contract tableMatrixRequired renders a stable, no
                   </div>
                 </th>
               </tr>
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
@@ -5184,51 +5184,51 @@ exports[`demo example full-DOM contract tableMatrixRequired renders a stable, no
                 </th>
               </tr>
             </thead>
-            <tbody class="">
-              <tr class="">
-                <td class="">
+            <tbody>
+              <tr>
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "0-19"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "1.05"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "1.09"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "1.04"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "0.06"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "0.03"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "0.07"
@@ -5236,50 +5236,50 @@ exports[`demo example full-DOM contract tableMatrixRequired renders a stable, no
                   </div>
                 </td>
               </tr>
-              <tr class="">
-                <td class="">
+              <tr>
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "19-29"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "1.15"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "1.19"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "1.14"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "0.16"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "0.13"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "0.17"
@@ -5304,7 +5304,7 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
         <div class="flex--row min-width fill-width">
           <table class="ui table full-width">
             <thead class="font-normal">
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
@@ -5352,9 +5352,9 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
                 </th>
               </tr>
             </thead>
-            <tbody class="">
-              <tr class="">
-                <td class="">
+            <tbody>
+              <tr>
+                <td>
                   <div class="flex--col app__expand">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
@@ -5363,14 +5363,14 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Non-contributory"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--row">
                     <span class="text">
                       "25"
@@ -5380,22 +5380,22 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <span class="text">
                     "0.7123456789"
                   </span>
                 </td>
-                <td class="">
+                <td>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                     </span>
                   </div>
                 </td>
               </tr>
-              <tr class="">
-                <td class="">
+              <tr>
+                <td>
                   <div class="flex--col app__expand">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
@@ -5404,14 +5404,14 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Contributory"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--row">
                     <span class="text">
                       "55"
@@ -5421,14 +5421,14 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <span class="text">
                     "0.65"
                   </span>
                 </td>
-                <td class="">
+                <td>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                     </span>
@@ -5452,7 +5452,7 @@ exports[`demo example full-DOM contract tablePagination renders a stable, non-em
         <div class="flex--row min-width fill-width">
           <table class="ui table full-width">
             <thead class="font-normal">
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
@@ -5490,37 +5490,37 @@ exports[`demo example full-DOM contract tablePagination renders a stable, non-em
                 </th>
               </tr>
             </thead>
-            <tbody class="">
-              <tr class="">
-                <td class="">
+            <tbody>
+              <tr>
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "1"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Refactor the dashboard layout"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Alice"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "High"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "In progress"
@@ -5528,36 +5528,36 @@ exports[`demo example full-DOM contract tablePagination renders a stable, non-em
                   </div>
                 </td>
               </tr>
-              <tr class="">
-                <td class="">
+              <tr>
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "2"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Add dark theme to the sidebar"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Bob"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Medium"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Open"
@@ -5565,36 +5565,36 @@ exports[`demo example full-DOM contract tablePagination renders a stable, non-em
                   </div>
                 </td>
               </tr>
-              <tr class="">
-                <td class="">
+              <tr>
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "3"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Improve build pipeline cache"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Carol"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Low"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Done"
@@ -5602,36 +5602,36 @@ exports[`demo example full-DOM contract tablePagination renders a stable, non-em
                   </div>
                 </td>
               </tr>
-              <tr class="">
-                <td class="">
+              <tr>
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "4"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Migrate tests to Jest 30"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Dan"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Medium"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Done"
@@ -5639,36 +5639,36 @@ exports[`demo example full-DOM contract tablePagination renders a stable, non-em
                   </div>
                 </td>
               </tr>
-              <tr class="">
-                <td class="">
+              <tr>
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "5"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Investigate flaky CI run"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Eve"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "High"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Open"
@@ -5721,8 +5721,8 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
           <table class="ui table full-width vertical">
             <thead class="font-normal">
             </thead>
-            <tbody class="">
-              <tr class="">
+            <tbody>
+              <tr>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
@@ -5730,7 +5730,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                     </span>
                   </div>
                 </th>
-                <td class="">
+                <td>
                   <div class="flex--col app__expand">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
@@ -5739,7 +5739,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col app__expand">
                     <span class="text pointer row fill-width middle padding-small">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
@@ -5749,7 +5749,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                   </div>
                 </td>
               </tr>
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
@@ -5757,14 +5757,14 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                     </span>
                   </div>
                 </th>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Non-contributory"
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                       "Contributory"
@@ -5772,7 +5772,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                   </div>
                 </td>
               </tr>
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
@@ -5780,7 +5780,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                     </span>
                   </div>
                 </th>
-                <td class="">
+                <td>
                   <div class="flex--row">
                     <span class="text">
                       "25"
@@ -5790,7 +5790,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--row">
                     <span class="text">
                       "55"
@@ -5801,7 +5801,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                   </div>
                 </td>
               </tr>
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
@@ -5809,18 +5809,18 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                     </span>
                   </div>
                 </th>
-                <td class="">
+                <td>
                   <span class="text">
                     "0.7123456789"
                   </span>
                 </td>
-                <td class="">
+                <td>
                   <span class="text">
                     "0.65"
                   </span>
                 </td>
               </tr>
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
@@ -5828,12 +5828,12 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                     </span>
                   </div>
                 </th>
-                <td class="">
+                <td>
                 </td>
-                <td class="">
+                <td>
                 </td>
               </tr>
-              <tr class="">
+              <tr>
                 <th class="left">
                   <div class="flex--row middle">
                     <div class="flex--row checkbox--wrapper">
@@ -5844,13 +5844,13 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                     </div>
                   </div>
                 </th>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                     </span>
                   </div>
                 </td>
-                <td class="">
+                <td>
                   <div class="flex--col">
                     <span class="text p">
                     </span>

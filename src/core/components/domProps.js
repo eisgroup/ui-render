@@ -43,7 +43,9 @@
  * -----------------------------------------------------------------------------
  *   ENGINE_PROPS + FIELD_ONLY_PROPS : Text (span), View (div), Row (div), Label (label),
  *                                     ScrollView (inner div), Dropzone (div),
- *                                     TableView (props handed to Semantic's Table -> table),
+ *                                     Table (table), Table.Header/Body/Footer/Row
+ *                                     (thead/tbody/tfoot/tr), Table.HeaderCell (th),
+ *                                     Table.Cell (td), TableView (again, before Table),
  *                                     Dropdown (props handed to Semantic's Dropdown -> div),
  *                                     Slider (div), Icon (i), Image (img), Tooltip (span)
  *   ENGINE_PROPS only               : InputNative (input/textarea, and Select -> select),
@@ -61,6 +63,15 @@
  * baseline simply because no example passes an engine prop to a slider or an icon. Those
  * seven were found by auditing every spread onto a DOM tag and probing each directly, which
  * is the method to repeat rather than re-reading the snapshots.
+ *
+ * `Table.Cell` was the last KNOWN-reachable gap: `mapper.js` spreads a `TableCells` node's whole
+ * rest bag onto it, so the boundary closed with the in-house table family in §9.7-F1 step 1 —
+ * applying both lists there was a zero-diff change on today's corpus (no example puts `name` or
+ * `label` on such a node) and a real net for the first meta that does. Applying FIELD_ONLY_PROPS
+ * across the whole family is safe because no member of it renders a form control: the control is
+ * a CHILD with its own props, and `TableView` reads `this.props.name` for its `FieldArray`
+ * decision before anything reaches a cell. The remaining unfiltered spread on the F1 surface is
+ * `TooltipPop` -> Semantic's `Popup`, which step 2 owns.
  *
  * Still uncovered, and why that is not the same as unsafe: several components spread onto a
  * DOM tag but are unreachable from meta — `mapper.js` resolves no view to them — and most are

@@ -60,6 +60,15 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
+        // In-house since §9.7-F1 step 1. The wrapper it replaced had no entry here because it was
+        // 24 lines of passthrough; the implementation is the table markup contract now, so it gets
+        // the same floor as the other in-house components. Measured, not aspirational.
+        './src/core/components/Table.js': {
+            statements: 100,
+            branches: 100,
+            functions: 100,
+            lines: 100,
+        },
         './src/core/modules/form/asInputDateField.js': {
             statements: 100,
             branches: 100,

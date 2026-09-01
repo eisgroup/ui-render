@@ -1,35 +1,45 @@
 /**
- * Generates `docs/SUPPORTED-PROPS.md` — the supported-prop surface of the three
- * `semantic-ui-react` wrappers, and the parity checklist §9.7-F1 steps 1-3 are judged
- * against — from the wrapper source plus the curated prose in
- * `scripts/wrapper-prop-curation.js`.
+ * Generates `docs/SUPPORTED-PROPS.md` — the prop surface of the views §9.7-F1 replaces, and the
+ * parity checklist its steps are judged against — from the component source plus the curated
+ * prose in `scripts/wrapper-prop-curation.js`.
+ *
+ * TWO SHAPES OF SECTION, BECAUSE STEP 1 LANDED
+ * `Table` is in-house since §9.7-F1 step 1: it renders native elements and imports nothing, so
+ * it has no "forwarded" set at all and its section documents what it EMITS and what it no longer
+ * ACCEPTS. `TooltipPop` and `Dropdown` are still `semantic-ui-react` wrappers and keep the
+ * wrapper shape. Both halves are derived the same way, from the source.
  *
  * WHY THIS EXISTS (UPGRADE-PLAN §9.7-F1 step 0)
  * Step 0 asked for two things: an audit of which props actually reach the wrapped SUIR
  * components, and a published supported-prop list. A hand-written list would be stale by
- * step 3 — the wrappers are about to be rewritten one at a time, and a checklist nobody
+ * step 3 — the wrappers are being rewritten one at a time, and a checklist nobody
  * verifies rots faster than the code it describes. So the enumerable half is derived:
  *
  *   FROM THE WRAPPER SOURCE  which props each wrapper intercepts (its own destructuring),
  *                            which it generates onto the rest bag, which it writes as JSX
  *                            attributes on the SUIR element, and whether the rest spread
  *                            lands before or after those attributes (which decides who wins).
+ *   FROM THE IN-HOUSE SOURCE which props the root and the shared subcomponent destructure
+ *                            consume, which native element each subcomponent renders, and that
+ *                            the file no longer references SUIR by any mechanism.
  *   FROM domProps.js         which props are stripped at the DOM boundary, and by which
- *                            wrapper — `Table.js` applies nothing, `Dropdown.js` applies both
- *                            lists. Derived, so the page cannot claim a strip that is gone.
+ *                            component — `Table.js` applies both lists in all seven components
+ *                            since step 1, `Dropdown.js` applies both, `TooltipPop.js` none.
+ *                            Derived, so the page cannot claim a strip that is gone.
  *   FROM THE CALL SITES      which JSX attributes the codebase actually puts on `Table` and
- *                            its re-exported subcomponents — the step-1 parity surface.
+ *                            its subcomponents — the step-1 parity surface, kept after the step
+ *                            because it is what a future change to the family is measured against.
  *   FROM THE IMPORT SCAN     every file importing SUIR. This ALSO closes the eslint guard's
  *                            blind spot: `no-restricted-imports` cannot see
  *                            `jest.mock('semantic-ui-react')` or a `require()`, and this can.
  *   FROM THE CURATION        what a prop means, and whether any real meta uses it. Nothing else.
  *
- * The mapping between the two halves is enforced total in both directions: a prop the wrapper
- * intercepts with no curated line fails, a curated line for a prop the wrapper no longer
- * intercepts fails, and a curated `via: 'element'`/`'generated'` claim that disagrees with the
- * source fails. `scripts/__tests__/wrapper-prop-reference.contract.test.js` runs the whole
- * check inside the suite, and additionally walks every tracked example meta so the corpus
- * inventory cannot drift either.
+ * The mapping between the two halves is enforced total in both directions: a prop the component
+ * intercepts with no curated line fails, a curated line for a prop it no longer intercepts
+ * fails, a curated `via: 'element'`/`'generated'` claim that disagrees with the source fails, and
+ * a `dropped` entry naming a prop the in-house component still accepts fails.
+ * `scripts/__tests__/wrapper-prop-reference.contract.test.js` runs the whole check inside the
+ * suite, and additionally walks every tracked example meta so the corpus inventory cannot drift.
  *
  * WHAT IT DOES NOT GUARANTEE: which props reach SUIR *at runtime*. A rest spread is open by
  * construction, so the forwarded set is closed only for the names the source writes down; the
@@ -44,6 +54,7 @@ const fs = require('fs')
 const path = require('path')
 
 const {
+    IN_HOUSE_CURATION,
     WRAPPER_CURATION,
     FORWARDED_CURATION,
     META_ATTRIBUTES,
@@ -61,13 +72,22 @@ const DOM_PROPS_FILE = `${PACK}/domProps.js`
 const VIEWS_PAGE = 'docs/SUPPORTED-VIEWS.md'
 
 /**
- * The three wrappers. `suir` and `localName` are asserted against the actual import, so a
- * renamed alias or a fourth wrapper fails here instead of producing a page that omits it.
+ * The wrappers that still exist. `suir` and `localName` are asserted against the actual import,
+ * so a renamed alias or a new wrapper fails here instead of producing a page that omits it.
+ * `Table` left this list when §9.7-F1 step 1 took it in-house — see IN_HOUSE below.
  */
 const WRAPPERS = [
-    { id: 'Table', file: `${PACK}/Table.js`, fn: 'Table', suir: 'Table', localName: 'TableS' },
     { id: 'TooltipPop', file: `${PACK}/TooltipPop.js`, fn: 'TooltipPop', suir: 'Popup', localName: 'Pop' },
     { id: 'Dropdown', file: `${PACK}/Dropdown.js`, fn: 'Dropdown', suir: 'Dropdown', localName: 'DropDown' },
+]
+
+/**
+ * The components a completed F1 step replaced. `root` is the element the top-level component
+ * renders and `factory` the helper its subcomponents are built with — both are asserted against
+ * the source, so the page cannot describe markup the component does not emit.
+ */
+const IN_HOUSE = [
+    { id: 'Table', file: `${PACK}/Table.js`, fn: 'Table', root: 'table', factory: 'tablePart' },
 ]
 
 const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8')
@@ -336,15 +356,96 @@ function readDomPropsLists () {
     return lists
 }
 
-/** The subcomponents `Table.js` re-exports, in source order. */
-function readSubcomponents (source, file) {
-    const names = [...source.matchAll(/^Table\.([A-Za-z]+)\s*=\s*TableS\.([A-Za-z]+)\s*$/gm)]
-    if (!names.length) throw new Error(`${file}: no \`Table.X = TableS.X\` re-exports found.`)
-    for (const [, ours, theirs] of names) {
-        if (ours !== theirs) throw new Error(`${file}: \`Table.${ours}\` is aliased to \`TableS.${theirs}\`.`
-            + ' The page documents the subcomponent API as a straight re-export — check before regenerating.')
+/**
+ * The subcomponents an in-house component defines, with the native element each renders, in
+ * source order. Derived from the factory calls, so the page's element mapping is a fact about
+ * the source rather than a claim about it.
+ */
+function readSubcomponents (source, spec) {
+    const pattern = new RegExp(`^${spec.fn}\\.([A-Za-z]+)\\s*=\\s*${spec.factory}\\('([a-z]+)'`, 'gm')
+    const found = [...source.matchAll(pattern)]
+    if (!found.length) {
+        throw new Error(`${spec.file}: no \`${spec.fn}.X = ${spec.factory}('element', …)\` definitions found.`
+            + ` The subcomponent API is part of the published contract — update ${GENERATOR} deliberately`
+            + ' if the shape changed, do not let a subcomponent go unlisted.')
     }
-    return names.map(([, name]) => name)
+    return found.map(([, name, element]) => ({ name, element }))
+}
+
+/**
+ * The destructuring parameter of the shared subcomponent implementation — `const Part = ({…}) =>`
+ * inside the factory. Six components share it, so its props are consumed by all six, and a prop
+ * added there without a curated line must fail the same way a wrapper prop does.
+ *
+ * @returns {{intercepted: Array<{name, alias, hasDefault}>, restName: String|null}}
+ */
+function readSharedPart (source, spec) {
+    const opening = source.match(new RegExp(`const\\s+Part\\s*=\\s*\\(\\s*\\{`))
+    if (!opening) {
+        throw new Error(`${spec.file}: no \`const Part = ({\` shared subcomponent parameter found.`
+            + ` Update ${GENERATOR} — the page documents what the subcomponents consume.`)
+    }
+    const braceAt = opening.index + opening[0].length - 1
+    const inner = source.slice(braceAt + 1, endOfGroup(source, braceAt, spec.file) - 1)
+    const intercepted = []
+    let restName = null
+    for (const entry of splitTopLevel(inner)) {
+        const rest = entry.match(new RegExp(`^\\.\\.\\.(${NAME})$`))
+        if (rest) { restName = rest[1]; continue }
+        const match = entry.match(new RegExp(`^(${NAME})\\s*(?::\\s*(${NAME}))?\\s*(=\\s*[\\s\\S]+)?$`))
+        if (!match) throw new Error(`${spec.file}: cannot parse \`${entry}\` in the shared Part parameter.`)
+        intercepted.push({ name: match[1], alias: match[2] || null, hasDefault: Boolean(match[3]) })
+    }
+    if (!intercepted.length) throw new Error(`${spec.file}: the shared Part destructures no named props.`)
+    if (!restName) throw new Error(`${spec.file}: the shared Part has no rest element — nothing reaches the element.`)
+    return { intercepted, restName }
+}
+
+/** Every `omitProps(x, LIST, LIST)` list identifier used in `source`, deduped, in source order. */
+function readOmitLists (source, file) {
+    const calls = [...source.matchAll(/omitProps\(([^)]*)\)/g)]
+    if (!calls.length) return []
+    const lists = []
+    for (const [, args] of calls) {
+        const names = [...args.matchAll(/\b([A-Z][A-Z0-9_]*)\b/g)].map(match => match[1])
+        if (!names.length) {
+            throw new Error(`${file}: \`omitProps\` is called with no list identifiers — cannot document the strip.`)
+        }
+        names.forEach(name => { if (!lists.includes(name)) lists.push(name) })
+    }
+    return lists
+}
+
+/**
+ * One in-house component's derived facts. The SUIR check is the point of the whole exercise:
+ * a step is not done while the file still reaches the package by any mechanism, and this catches
+ * `require`/`jest.mock`/dynamic `import` as well as a static one.
+ */
+function readInHouse (spec) {
+    const raw = read(spec.file)
+    const source = stripComments(raw)
+    for (const { kind, pattern } of IMPORT_KINDS) {
+        pattern.lastIndex = 0
+        if (pattern.test(source)) {
+            throw new Error(`${spec.file}: reaches semantic-ui-react by \`${kind}\`, but ${GENERATOR}`
+                + ` lists it as in-house (${spec.id}). Either the step regressed, or move the entry back`
+                + ' to WRAPPERS.')
+        }
+    }
+    const { intercepted, restName } = interceptedProps(source, spec.fn, spec.file)
+    const openings = jsxOpenings(source, spec.root)
+    if (openings.length !== 1) {
+        throw new Error(`${spec.file}: renders <${spec.root}> ${openings.length} times; the page describes one.`)
+    }
+    return {
+        ...spec,
+        lines: raw.replace(/\n$/, '').split('\n').length,
+        intercepted,
+        restName,
+        part: readSharedPart(source, spec),
+        omitLists: readOmitLists(source, spec.file),
+        subcomponents: readSubcomponents(source, spec),
+    }
 }
 
 /** One wrapper's derived facts. */
@@ -366,8 +467,8 @@ function readWrapper (spec) {
     const openings = jsxOpenings(source, spec.localName)
     if (!openings.length) throw new Error(`${spec.file}: SUIR's \`${spec.localName}\` is imported but never rendered.`)
 
-    // Several renders of the same element (Table's fixed-header branch) must agree, or the page
-    // would document one of them and silently drop the other.
+    // Several renders of the same element must agree, or the page would document one of them and
+    // silently drop the other.
     const shape = ({ attributes, spreads }) => JSON.stringify([attributes, spreads])
     const distinct = [...new Set(openings.map(shape))]
     if (distinct.length > 1) {
@@ -404,22 +505,29 @@ function readWrapper (spec) {
         spreadIsLast,
         omitLists,
         generated,
-        subcomponents: spec.id === 'Table' ? readSubcomponents(source, spec.file) : null,
     }
 }
 
 /** JSX attributes the codebase puts on `Table` and its subcomponents, with the files involved. */
-function readCallSites (subcomponents) {
-    const tags = ['Table', ...subcomponents.map(name => `Table.${name}`)]
+function readCallSites (inHouse) {
+    const tags = [inHouse.fn, ...inHouse.subcomponents.map(({ name }) => `${inHouse.fn}.${name}`)]
     const usage = {}
-    tags.forEach(tag => { usage[tag] = { attributes: new Set(), spreads: new Set(), files: new Set() } })
+    // `attributeFiles` maps an attribute name to the files that actually pass it, so a guard
+    // failure can name the offender instead of every file that renders the tag.
+    tags.forEach(tag => {
+        usage[tag] = { attributes: new Set(), spreads: new Set(), files: new Set(), attributeFiles: new Map() }
+    })
     for (const file of sourceFiles('src')) {
         if (/(__tests__|\.test\.)/.test(file)) continue
         if (file === `${PACK}/Table.js`) continue
         const source = stripComments(read(file))
         for (const tag of tags) {
             for (const { attributes, spreads } of jsxOpenings(source, tag)) {
-                attributes.forEach(name => usage[tag].attributes.add(name))
+                attributes.forEach(name => {
+                    usage[tag].attributes.add(name)
+                    if (!usage[tag].attributeFiles.has(name)) usage[tag].attributeFiles.set(name, new Set())
+                    usage[tag].attributeFiles.get(name).add(file)
+                })
                 spreads.forEach(spread => usage[tag].spreads.add(spread))
                 usage[tag].files.add(file)
             }
@@ -431,6 +539,7 @@ function readCallSites (subcomponents) {
             attributes: [...usage[tag].attributes].sort(),
             spreads: [...usage[tag].spreads].sort(),
             files: [...usage[tag].files].sort(),
+            attributeFiles: usage[tag].attributeFiles,
         }
     })
     return out
@@ -483,13 +592,68 @@ function assertForwardedShape (label, entries, derived) {
     }
 }
 
+/** Fails when a curated in-house section and the source have diverged. */
+function assertInHouseCuration (component, callSites) {
+    const label = `IN_HOUSE_CURATION.${component.id}`
+    const curation = IN_HOUSE_CURATION[component.id]
+    if (!curation) throw new Error(`no ${label} entry in ${CURATION}.`)
+    for (const field of ['shipped', 'summary', 'classContract', 'cssContract', 'droppedNote', 'passthrough']) {
+        if (!curation[field]) throw new Error(`${label}: \`${field}\` is required.`)
+    }
+    assertTotal(`${label}.props`, component.intercepted.map(({ name }) => name),
+        Object.keys(curation.props), 'IN_HOUSE_CURATION')
+    assertTotal(`${label}.partProps`, component.part.intercepted.map(({ name }) => name),
+        Object.keys(curation.partProps), 'IN_HOUSE_CURATION')
+    assertTotal(`${label}.elements`, component.subcomponents.map(({ name }) => name),
+        Object.keys(curation.elements), 'IN_HOUSE_CURATION')
+    // A `dropped` entry that names something the component still consumes would tell a reader the
+    // opposite of the truth, so it fails rather than being rendered.
+    const consumed = [
+        ...component.intercepted.map(({ name }) => name),
+        ...component.part.intercepted.map(({ name }) => name),
+    ]
+    const contradictions = Object.keys(curation.dropped).filter(name => consumed.includes(name))
+    if (contradictions.length) {
+        throw new Error(`${label}.dropped: ${contradictions.join(', ')} ${contradictions.length === 1 ? 'is' : 'are'}`
+            + ' still destructured by the component. A prop cannot be both dropped and consumed.')
+    }
+    // A call site passing a dropped prop is the regression this section exists to catch.
+    for (const [tag, usage] of Object.entries(callSites)) {
+        const revived = usage.attributes.filter(attr => attr in curation.dropped)
+        if (revived.length) {
+            const where = revived
+                .map(attr => `${attr} at ${[...(usage.attributeFiles.get(attr) || [])].sort().join(', ')}`)
+                .join('; ')
+            throw new Error(`${label}.dropped: \`${tag}\` is rendered with ${where}, but the page says`
+                + ' the prop was dropped. One of the two is wrong.')
+        }
+    }
+    for (const field of ['props', 'partProps', 'elements', 'dropped']) {
+        for (const [name, text] of Object.entries(curation[field])) {
+            if (!text || text.includes('|') || text.includes('\n')) {
+                throw new Error(`${label}.${field}.${name}: must be a non-empty single line without \`|\`.`)
+            }
+        }
+    }
+}
+
 /** The reference model both the markdown and the contract test read. */
 function buildReference () {
     const importSites = readImportSites()
     const domProps = readDomPropsLists()
     const wrappers = WRAPPERS.map(readWrapper)
-    const table = wrappers.find(wrapper => wrapper.id === 'Table')
-    const callSites = readCallSites(table.subcomponents)
+    const inHouse = IN_HOUSE.map(readInHouse)
+    const table = inHouse.find(component => component.id === 'Table')
+    const callSites = readCallSites(table)
+
+    for (const component of inHouse) {
+        assertInHouseCuration(component, callSites)
+        for (const list of component.omitLists) {
+            if (!domProps[list]) {
+                throw new Error(`${component.file}: applies \`${list}\`, which ${DOM_PROPS_FILE} does not export.`)
+            }
+        }
+    }
 
     for (const wrapper of wrappers) {
         const curation = WRAPPER_CURATION[wrapper.id]
@@ -512,25 +676,12 @@ function buildReference () {
         }
     }
 
-    // Subcomponents are straight re-exports, so they have no `element`/`generated` sets to check
-    // against — everything about them is a passthrough, and the call sites are the evidence.
-    for (const name of table.subcomponents) {
-        const key = `Table.${name}`
-        if (!FORWARDED_CURATION[key]) throw new Error(`no FORWARDED_CURATION entry for ${key} in ${CURATION}.`)
-        assertForwardedShape(`FORWARDED_CURATION.${key}`, FORWARDED_CURATION[key], null)
-        const derivedAttrs = callSites[key].attributes.filter(name => name !== 'key')
-        const undocumented = derivedAttrs.filter(attr => !(attr in FORWARDED_CURATION[key]))
-        if (undocumented.length) {
-            throw new Error(`FORWARDED_CURATION.${key}: a call site passes ${undocumented.join(', ')},`
-                + ` with no curated entry. Add it — it is part of the step-1 parity surface.`)
-        }
-    }
-
     const curatedKeys = Object.keys(FORWARDED_CURATION).sort()
-    const expectedKeys = [...WRAPPERS.map(({ id }) => id), ...table.subcomponents.map(name => `Table.${name}`)].sort()
+    const expectedKeys = WRAPPERS.map(({ id }) => id).sort()
     if (curatedKeys.join(',') !== expectedKeys.join(',')) {
         throw new Error(`FORWARDED_CURATION keys are ${curatedKeys.join(', ')};`
-            + ` the source has ${expectedKeys.join(', ')}. Reconcile ${CURATION}.`)
+            + ` the source has ${expectedKeys.join(', ')}. Reconcile ${CURATION}.`
+            + ' A component that has gone in-house forwards nothing — its section is IN_HOUSE_CURATION.')
     }
 
     const views = Object.keys(META_ATTRIBUTES).sort()
@@ -547,7 +698,7 @@ function buildReference () {
         }
     }
 
-    return { importSites, domProps, wrappers, callSites, table }
+    return { importSites, domProps, wrappers, inHouse, callSites, table }
 }
 
 // ---------------------------------------------------------------------------
@@ -558,7 +709,7 @@ const row = (cells) => `| ${cells.join(' | ')} |`
 const code = (value) => `\`${value}\``
 const codeList = (values) => (values.length ? values.map(code).join(', ') : '—')
 
-function wrapperSection (wrapper, { domProps, callSites }) {
+function wrapperSection (wrapper, { domProps }) {
     const curation = WRAPPER_CURATION[wrapper.id]
     const forwarded = FORWARDED_CURATION[wrapper.id]
     const stripped = wrapper.omitLists.flatMap(list => domProps[list])
@@ -626,66 +777,145 @@ function wrapperSection (wrapper, { domProps, callSites }) {
         '',
     )
 
-    if (wrapper.subcomponents) {
-        lines.push(
-            `**Subcomponents.** ${code('Table.js')} re-exports ${codeList(wrapper.subcomponents)}`
-            + ' unchanged, so they have no wrapper layer at all: every prop is a passthrough, and'
-            + ' the replacement owes the same subcomponent API. What the codebase puts on them,'
-            + ' derived from the call sites:',
-            '',
-            row(['Component', 'Attributes at the call sites', 'Spreads', 'Rendered by']),
-            row(['---', '---', '---', '---']),
-            ...['Table', ...wrapper.subcomponents.map(name => `Table.${name}`)].map(tag => row([
-                code(tag),
-                codeList(callSites[tag].attributes),
-                codeList(callSites[tag].spreads),
-                callSites[tag].files.length ? callSites[tag].files.map(file => code(file.replace(/^src\//, ''))).join(', ') : '*nothing*',
-            ])),
-            '',
-            'Every prop in the table above then rides those spreads or those attributes. The two'
-            + ' unfiltered spreads are the ones to fix while replacing: `mapper.js` spreads a meta'
-            + " node's whole rest bag onto `Table.Cell`, and the tooltip wrapper spreads its own"
-            + ' rest bag onto the popup.',
-            '',
-        )
-    }
-
     return lines
 }
 
+/**
+ * The section for a component a completed F1 step took in-house. Deliberately NOT the wrapper
+ * shape: there is no "forwarded" column because there is nothing to forward to, and the two
+ * questions a reader now has are "what does it emit" and "what does it no longer accept".
+ */
+function inHouseSection (component, { domProps, callSites }) {
+    const curation = IN_HOUSE_CURATION[component.id]
+    const stripped = component.omitLists.flatMap(list => domProps[list])
+    const tags = [component.fn, ...component.subcomponents.map(({ name }) => `${component.fn}.${name}`)]
+
+    return [
+        `### ${code(component.id)} — in-house, no semantic-ui-react`,
+        '',
+        `${code(component.file)}, ${component.lines} lines. Replaced the wrapper in ${curation.shipped}.`,
+        '',
+        curation.summary,
+        '',
+        `**What it emits.** ${curation.classContract}`,
+        '',
+        row(['Component', 'Element', 'Notes']),
+        row(['---', '---', '---']),
+        ...component.subcomponents.map(({ name, element }) => row([
+            code(`${component.fn}.${name}`),
+            code(`<${element}>`),
+            curation.elements[name],
+        ])),
+        '',
+        `CSS contract: ${curation.cssContract}`,
+        '',
+        `**Consumed by the root (${component.intercepted.length}).** Read by ${code(component.fn)}`
+        + ' itself; everything else rides the rest spread onto the element.',
+        '',
+        row(['Prop', 'Meaning']),
+        row(['---', '---']),
+        ...component.intercepted.map(({ name, alias, hasDefault }) => row([
+            code(name)
+            + (alias ? ` <br>*(bound as ${code(alias)})*` : '')
+            + (hasDefault ? ' <br>*(has a default)*' : ''),
+            curation.props[name],
+        ])),
+        '',
+        `**Consumed by every subcomponent (${component.part.intercepted.length}).** All six share one`
+        + ' implementation, so this list applies to each of them identically.',
+        '',
+        row(['Prop', 'Meaning']),
+        row(['---', '---']),
+        ...component.part.intercepted.map(({ name }) => row([code(name), curation.partProps[name]])),
+        '',
+        `**Stripped at the DOM boundary.** ${stripped.length
+            ? `${code(component.file)} applies ${codeList(component.omitLists)} from`
+              + ` ${code(DOM_PROPS_FILE)} in all ${tags.length} components, so these never become`
+              + ` attributes: ${codeList(stripped)}.`
+            : `${code(component.file)} applies no boundary filter, which for a component that spreads`
+              + ' onto a real element is a leak waiting for a caller — see ' + code(DOM_PROPS_FILE) + '.'}`,
+        '',
+        `**Passthrough.** ${curation.passthrough}`,
+        '',
+        `**Dropped (${Object.keys(curation.dropped).length}) — the semver record.** Props`
+        + ' semantic-ui-react handled that this implementation deliberately does not. All of them remain'
+        + ' REACHABLE from a consumer meta — `mapper.js` spreads a `TableCells` node\'s whole rest bag onto'
+        + ' the cell and `TableView` spreads its own rest onto the table — so the component strips them'
+        + ' explicitly and warns once per prop in development. Stripping matters because a string-valued'
+        + ' one would otherwise land as a lowercase DOM attribute (`verticalAlign="top"` rendered'
+        + ' `verticalalign="top"`), which is the junk the DOM contract\'s tripwires exist to keep out;'
+        + ' warning matters because a meta still carrying one would otherwise never learn it stopped'
+        + ' working. React\'s own unknown-prop warning is not relied on: it is silent for a lowercase name.',
+        '',
+        row(['Prop', 'Why it is gone']),
+        row(['---', '---']),
+        ...Object.keys(curation.dropped).map(name => row([code(name), curation.dropped[name]])),
+        '',
+        curation.droppedNote,
+        '',
+        '**Call sites.** What the codebase puts on the family, derived from the source. This was the'
+        + ' step-1 parity surface and it is kept afterwards, because it is what any future change to'
+        + ' the family is measured against:',
+        '',
+        row(['Component', 'Attributes at the call sites', 'Spreads', 'Rendered by']),
+        row(['---', '---', '---', '---']),
+        ...tags.map(tag => row([
+            code(tag),
+            codeList(callSites[tag].attributes),
+            codeList(callSites[tag].spreads),
+            callSites[tag].files.length ? callSites[tag].files.map(file => code(file.replace(/^src\//, ''))).join(', ') : '*nothing*',
+        ])),
+        '',
+        '`mapper.js`\'s spread onto `Table.Cell` is a meta node\'s whole rest bag and is still'
+        + ' unfiltered at the call site — the filter is now inside the cell, which is why it is safe.'
+        + ' The remaining unfiltered boundary on this surface is the tooltip wrapper, and step 2 owns it.',
+        '',
+    ]
+}
+
 function renderMarkdown (reference) {
-    const { importSites, wrappers, table } = reference
+    const { importSites, wrappers, inHouse } = reference
     const guardBlind = importSites.filter(site => !site.lintVisible)
+    const done = inHouse.map(component => component.id)
+    const left = wrappers.map(wrapper => wrapper.id)
 
     const lines = [
         '<!--',
         `  GENERATED FILE — DO NOT EDIT. Run \`${WRITE_COMMAND}\` to regenerate.`,
-        '  Inventories are derived from the wrapper source, `domProps.js` and the call sites;',
+        '  Inventories are derived from the component source, `domProps.js` and the call sites;',
         `  the prose comes from ${CURATION}. Generator: ${GENERATOR}.`,
         '-->',
         '',
         '# Supported props — `Table`, `Tooltip`, `Select` / `Dropdown`',
         '',
         `Companion to \`${VIEWS_PAGE}\`, which lists every \`view\` name a meta may use. This page`,
-        'covers the props of the three views whose implementation still comes from',
-        '`semantic-ui-react`, and it exists because those three are being replaced with in-house',
-        'components (UPGRADE-PLAN §9.7-F1). It is both the **supported-prop list** for meta authors',
-        'and the **parity checklist** the replacements are judged against.',
+        'covers the props of the three views the `semantic-ui-react` exit replaces one at a time',
+        '(UPGRADE-PLAN §9.7-F1). It is both the **supported-prop list** for meta authors and the',
+        '**parity checklist** the replacements are judged against.',
+        '',
+        `**${done.length} of the ${done.length + left.length} done so far.**`,
+        `${codeList(done)} ${done.length === 1 ? 'is' : 'are'} in-house and`,
+        `${done.length === 1 ? 'imports' : 'import'} nothing; ${codeList(left)}`,
+        `${left.length === 1 ? 'still wraps' : 'still wrap'} semantic-ui-react. The two kinds of section answer different`,
+        'questions, so they are shaped differently: a wrapper section ends in the **forwarded** table',
+        'that its replacement owes, while an in-house section says what the component **emits** and',
+        'what it no longer **accepts**.',
         '',
         '**This page is generated.** Editing it by hand is pointless — the contract test regenerates',
-        `it and fails on any difference. Run \`${WRITE_COMMAND}\` after changing a wrapper, and edit`,
-        `prose in \`${CURATION}\`.`,
+        `it and fails on any difference. Run \`${WRITE_COMMAND}\` after changing one of these`,
+        `components, and edit prose in \`${CURATION}\`.`,
         '',
-        '## The three outcomes, and why they are not one list',
+        '## The outcomes, and why they are not one list',
         '',
         '"A prop appears in a meta" is not "a prop reaches semantic-ui-react". Each prop on one of',
-        'these views has exactly one of three fates, and they are three different promises:',
+        'these views has exactly one of these fates, and they are different promises:',
         '',
         '| Outcome | What it means | What the §9.7-F1 swap does to it |',
         '| --- | --- | --- |',
-        '| **consumed** | the wrapper, or its caller in the engine, reads it | nothing — we already own the behaviour |',
+        '| **consumed** | the component, or its caller in the engine, reads it | nothing — we already own the behaviour |',
         '| **stripped** | removed at the DOM boundary by `' + DOM_PROPS_FILE + '` | only the boundary moves |',
         '| **forwarded** | handed to semantic-ui-react, which decides what happens | everything: this is the parity risk |',
+        '| **dropped** | semantic-ui-react handled it; the in-house component deliberately does not | already happened — this is the semver record for that step |',
         '',
         'A checklist that mixed them would be full of props that never mattered. Each section below',
         'is split that way.',
@@ -703,7 +933,9 @@ function renderMarkdown (reference) {
         '## Isolation invariant',
         '',
         `Everything semantic-ui-react does in this library happens inside \`${PACK}\`. Derived by`,
-        'scanning `src` for every import, `require` and `jest.mock` of the package:',
+        'scanning `src` for every import, `require` and `jest.mock` of the package — so this table',
+        'shrinks as the exit proceeds, and the components below that no longer appear in it are the',
+        'ones that no longer depend on the package at all:',
         '',
         row(['File', 'How', 'Specifier']),
         row(['---', '---', '---']),
@@ -725,7 +957,10 @@ function renderMarkdown (reference) {
             ? `; ${guardBlind.length} of the sites above are invisible to the rule`
             : ''}. Neither is sufficient alone.`,
         '',
-        '## Wrappers',
+        '## In-house — the exit, so far',
+        '',
+        ...inHouse.flatMap(component => inHouseSection(component, reference)),
+        '## Wrappers — what is left',
         '',
         ...wrappers.flatMap(wrapper => wrapperSection(wrapper, reference)),
         '## What the meta corpus actually uses',
@@ -767,9 +1002,12 @@ function renderMarkdown (reference) {
         '## What this page does and does not guarantee',
         '',
         'Guaranteed, because it is derived from source and checked in CI: the import inventory; each',
-        "wrapper's consumed set and its line count; which boundary lists each wrapper applies; the",
-        'attributes and spreads written on the semantic-ui-react element and on every `Table`',
-        'subcomponent call site; and that every one of those has a curated description.',
+        "component's consumed set and its line count; which boundary lists each one applies; the",
+        'attributes and spreads written on the semantic-ui-react element; the native element behind',
+        'every in-house subcomponent, and that no in-house file reaches semantic-ui-react by import,',
+        '`require`, `jest.mock` or dynamic `import`; every attribute the codebase puts on the `Table`',
+        'family; that no call site passes a prop the page says was dropped; and that every one of',
+        'those has a curated description.',
         '',
         'Also guaranteed: the tracked-corpus attribute inventory, enforced total by the contract',
         'test against the real `EXAMPLES` manifest.',
@@ -779,6 +1017,13 @@ function renderMarkdown (reference) {
         '- **the forwarded set is open.** A rest spread cannot be closed by static analysis; a meta',
         '  may pass any semantic-ui-react prop. The tier-1 list is what was found, not a proof of',
         '  what is possible.',
+        '- **the emitted className strings.** The generator reads which props a component consumes,',
+        '  not what it composes them into. `ui table` surviving on the root is asserted by',
+        '  `src/core/components/__tests__/Table.test.js` and by the 38-example DOM baseline, not here.',
+        '- **the dropped list is not proof of absence.** It names the props that had a curated entry',
+        '  while the component was a wrapper, plus the wider semantic-ui-react surface recorded in',
+        '  prose. A caller could always pass an undocumented semantic prop; those now land on the',
+        '  element or draw a React warning, and no static check can enumerate them.',
         '- **corpus evidence is initial-render only.** The step-0 instrumented render recorded the',
         '  props reaching semantic-ui-react on first paint, so props that only appear once a',
         '  control is interacted with — opening a dropdown, switching a tab — were never observed.',

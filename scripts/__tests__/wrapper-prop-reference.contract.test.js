@@ -14,7 +14,9 @@
  *      META_ATTRIBUTES — the one part of the page that cannot be derived from source, made
  *      total in both directions against the real `EXAMPLES` manifest;
  *   4. counted tripwires (how many import sites, how many props per wrapper, tier-1 vs
- *      tier-2) — so a behavioural change shows up as a named failure, not a doc rewrite;
+ *      tier-2, and — since §9.7-F1 step 1 — the shape of each in-house component) — so a
+ *      behavioural change shows up as a named failure, not a doc rewrite. The import-site count
+ *      is what makes a completed step visible: it drops by one when a wrapper stops importing;
  *   5. the two contracts the page asserts but the page cannot enforce: the eslint erosion
  *      guard being configured at all, and `Dropdown`'s `displayName` surviving on the export
  *      the form adapter actually receives;
@@ -56,13 +58,22 @@ const ROOT = path.resolve(__dirname, '..', '..')
  * became reachable, is what these catch.
  */
 const EXPECTED = {
-    importSites: 7,
-    interceptedByWrapper: { Table: 1, TooltipPop: 4, Dropdown: 23 },
-    forwardedTier1: 37,
-    forwardedTier2: 24,
+    // 7 before §9.7-F1 step 1 took `Table` in-house. It drops by one per completed step, and the
+    // count is the cheapest possible check that a step actually removed the dependency instead of
+    // moving it: `Table.js` was one of the three non-test importers.
+    importSites: 6,
+    interceptedByWrapper: { TooltipPop: 4, Dropdown: 23 },
+    // The in-house side. `Table` root consumes className/inverted/striped; the shared subcomponent
+    // implementation consumes className; six subcomponents over six native elements.
+    inHouse: { Table: { root: 3, part: 1, subcomponents: 6 } },
+    // 37/24 before step 1. The `Table` family was 16 tier-1 + 7 tier-2 of those, and it left the
+    // forwarded set entirely — a component that imports nothing forwards nothing.
+    forwardedTier1: 21,
+    forwardedTier2: 17,
     // The three props no tracked example uses but consumer metas do. `upward` and `disabled`
     // reach semantic-ui-react and are both styled, which is why a demo-derived checklist
-    // would have been wrong — see UPGRADE-PLAN §9.7-F1 step 0.
+    // would have been wrong — see UPGRADE-PLAN §9.7-F1 step 0. (`colGroup`, the third, is
+    // consumed by `TableView` and never forwarded, so it is not in this list.)
     consumerOnlyForwarded: ['disabled', 'upward'],
 }
 
@@ -133,6 +144,14 @@ describe('generated supported-prop reference', () => {
             interceptedByWrapper: reference.wrappers.reduce((all, wrapper) => (
                 { ...all, [wrapper.id]: wrapper.intercepted.length }
             ), {}),
+            inHouse: reference.inHouse.reduce((all, component) => ({
+                ...all,
+                [component.id]: {
+                    root: component.intercepted.length,
+                    part: component.part.intercepted.length,
+                    subcomponents: component.subcomponents.length,
+                },
+            }), {}),
             forwardedTier1: forwarded.filter(entry => entry.tier === 1).length,
             forwardedTier2: forwarded.filter(entry => entry.tier === 2).length,
             consumerOnlyForwarded: Object.values(FORWARDED_CURATION)
@@ -140,6 +159,19 @@ describe('generated supported-prop reference', () => {
                 .filter(([, entry]) => entry.source === 'consumer')
                 .map(([name]) => name).sort(),
         }).toEqual(EXPECTED)
+    })
+
+    it('pins the native element behind every in-house subcomponent', () => {
+        // The element per subcomponent is the whole contract of the in-house table family: the
+        // role census counts rowgroup/row/columnheader/cell off these, `table.less` selects on the
+        // `table > thead|tbody > tr > th|td` nesting, and a `th` silently becoming a `td` would
+        // pass every className assertion in the repo. Derived from the source, pinned here.
+        expect(reference.inHouse.map(component => [
+            component.id,
+            component.subcomponents.map(({ name, element }) => `${name}:${element}`).join(' '),
+        ])).toEqual([
+            ['Table', 'Header:thead HeaderCell:th Row:tr Cell:td Body:tbody Footer:tfoot'],
+        ])
     })
 
     it('keeps every semantic-ui-react reference inside the components pack', () => {

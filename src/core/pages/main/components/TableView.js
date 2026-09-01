@@ -339,11 +339,12 @@ export default class TableView extends PureComponent {
       || Array.isArray(content)
       || React.isValidElement(content)
     return (
-      // @Note: an empty `cellClassName` still renders as class="" -- Semantic's Table.Cell runs its
-      // own `cx()` and emits the attribute whatever we pass, so `|| undefined` here would be dead
-      // code (measured). Removing the `-last` junk above therefore trades 190 `class="-last"` for
-      // 190 inert `class=""`, which is a strict improvement -- a junk token can collide with a
-      // future CSS rule, an empty attribute cannot. It disappears when Table goes in-house (F1).
+      // @Note: `cellClassName` is the empty string for the common non-pinned cell, and that used
+      // to render as class="" -- Semantic's Table.Cell ran its own `cx()` and emitted the
+      // attribute whatever we passed, so `|| undefined` here was dead code. Since F1 step 1 the
+      // in-house `Table.Cell` omits an empty className itself, so the 199 inert `class=""` the
+      // `-last` fix traded for are gone too. `getStickyCellClassName` still returns '' here --
+      // suppressing the attribute is the cell's job, at the DOM edge, in one place.
       <Table.Cell key={this.props.vertical ? index : id} className={cellClassName} style={cellStyle}>
         {isReactNode
           ? (typeof content === 'object'
@@ -361,8 +362,13 @@ export default class TableView extends PureComponent {
     const {
       fill, className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical, colGroup, usePagination,
       items: _, headers: _2, renderItem: _3, renderItemCells: _4, itemClassNames: _5,
-      itemsExpanded: _6, translate: _7, sellStyles: _8, additionalCellsStyles: _9, rowsPerPage: _10,
-      fieldArrayName: _11,
+      // @Note: a `sellStyles: _8` used to sit here — a typo for a prop that does not exist
+      // (nothing passes `sellStyles`, and nothing passes `cellStyles` either). The real prop is
+      // `additionalCellsStyles`, discarded two entries along. Removed in F1 step 1 rather than
+      // carried over: a dead entry in the list whose whole job is keeping props off the DOM
+      // reads as protection that is not there.
+      itemsExpanded: _6, translate: _7, additionalCellsStyles: _8, rowsPerPage: _9,
+      fieldArrayName: _10,
       ...props
     } = this.props
     const {activePage, rowsPerPage} = this.state
@@ -389,9 +395,12 @@ export default class TableView extends PureComponent {
         <ScrollView row classNameInner="fill-width" fill={fill}>
           <Table
             className={cn('full-width', className, {vertical})}
-            // DOM boundary: Semantic's Table spreads what it does not recognise onto <table>,
-            // where `name` is not a valid attribute. `this.props.name` is still what decides the
-            // FieldArray below — the strip is at the DOM edge only. See core/components/domProps.js.
+            // DOM boundary: `Table` spreads what it does not consume onto <table>, where `name` is
+            // not a valid attribute. Kept even though the in-house `Table` now filters too: this
+            // component's own test pins the root's attribute set to exactly ['class'], and
+            // `omitProps` returns the same object when nothing matched, so the second pass is free.
+            // `this.props.name` is still what decides the FieldArray below — the strip is at the DOM
+            // edge only. See core/components/domProps.js.
             {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)}
           >
             {colGroup && <TableColGroup colGroup={colGroup} />}

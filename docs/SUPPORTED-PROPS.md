@@ -1,31 +1,39 @@
 <!--
   GENERATED FILE — DO NOT EDIT. Run `npm run docs:props` to regenerate.
-  Inventories are derived from the wrapper source, `domProps.js` and the call sites;
+  Inventories are derived from the component source, `domProps.js` and the call sites;
   the prose comes from scripts/wrapper-prop-curation.js. Generator: scripts/generate-wrapper-prop-reference.js.
 -->
 
 # Supported props — `Table`, `Tooltip`, `Select` / `Dropdown`
 
 Companion to `docs/SUPPORTED-VIEWS.md`, which lists every `view` name a meta may use. This page
-covers the props of the three views whose implementation still comes from
-`semantic-ui-react`, and it exists because those three are being replaced with in-house
-components (UPGRADE-PLAN §9.7-F1). It is both the **supported-prop list** for meta authors
-and the **parity checklist** the replacements are judged against.
+covers the props of the three views the `semantic-ui-react` exit replaces one at a time
+(UPGRADE-PLAN §9.7-F1). It is both the **supported-prop list** for meta authors and the
+**parity checklist** the replacements are judged against.
+
+**1 of the 3 done so far.**
+`Table` is in-house and
+imports nothing; `TooltipPop`, `Dropdown`
+still wrap semantic-ui-react. The two kinds of section answer different
+questions, so they are shaped differently: a wrapper section ends in the **forwarded** table
+that its replacement owes, while an in-house section says what the component **emits** and
+what it no longer **accepts**.
 
 **This page is generated.** Editing it by hand is pointless — the contract test regenerates
-it and fails on any difference. Run `npm run docs:props` after changing a wrapper, and edit
-prose in `scripts/wrapper-prop-curation.js`.
+it and fails on any difference. Run `npm run docs:props` after changing one of these
+components, and edit prose in `scripts/wrapper-prop-curation.js`.
 
-## The three outcomes, and why they are not one list
+## The outcomes, and why they are not one list
 
 "A prop appears in a meta" is not "a prop reaches semantic-ui-react". Each prop on one of
-these views has exactly one of three fates, and they are three different promises:
+these views has exactly one of these fates, and they are different promises:
 
 | Outcome | What it means | What the §9.7-F1 swap does to it |
 | --- | --- | --- |
-| **consumed** | the wrapper, or its caller in the engine, reads it | nothing — we already own the behaviour |
+| **consumed** | the component, or its caller in the engine, reads it | nothing — we already own the behaviour |
 | **stripped** | removed at the DOM boundary by `src/core/components/domProps.js` | only the boundary moves |
 | **forwarded** | handed to semantic-ui-react, which decides what happens | everything: this is the parity risk |
+| **dropped** | semantic-ui-react handled it; the in-house component deliberately does not | already happened — this is the semver record for that step |
 
 A checklist that mixed them would be full of props that never mattered. Each section below
 is split that way.
@@ -43,7 +51,9 @@ The forwarded set is tiered, because "supported" and "used" are different facts:
 ## Isolation invariant
 
 Everything semantic-ui-react does in this library happens inside `src/core/components`. Derived by
-scanning `src` for every import, `require` and `jest.mock` of the package:
+scanning `src` for every import, `require` and `jest.mock` of the package — so this table
+shrinks as the exit proceeds, and the components below that no longer appear in it are the
+ones that no longer depend on the package at all:
 
 | File | How | Specifier |
 | --- | --- | --- |
@@ -52,7 +62,6 @@ scanning `src` for every import, `require` and `jest.mock` of the package:
 | `src/core/components/__tests__/TooltipPop.test.js` *(test)* | `import` | `semantic-ui-react` |
 | `src/core/components/__tests__/TooltipPop.test.js` *(test)* | `jest.mock` | `semantic-ui-react` |
 | `src/core/components/Dropdown.js` | `import` | `semantic-ui-react` |
-| `src/core/components/Table.js` | `import` | `semantic-ui-react` |
 | `src/core/components/TooltipPop.js` | `import` | `semantic-ui-react` |
 
 An `eslint` `no-restricted-imports` override (in `package.json`, `eslintConfig.overrides`)
@@ -65,37 +74,57 @@ does not visit `ImportExpression`. Nor does `lint:js` visit `.ts`/`.tsx` today, 
 The scan above closes every one of those gaps — dynamic imports, double-quoted specifiers and
 TypeScript files included — which is why both halves run; 2 of the sites above are invisible to the rule. Neither is sufficient alone.
 
-## Wrappers
+## In-house — the exit, so far
 
-### `Table` — wraps semantic-ui-react `Table`
+### `Table` — in-house, no semantic-ui-react
 
-`src/core/components/Table.js`, 24 lines.
+`src/core/components/Table.js`, 155 lines. Replaced the wrapper in §9.7-F1 step 1.
 
-Markup sugar over a native `<table>`. Semantic's own table CSS is not loaded (`collections/table` is commented out in `src/style/override/_semantic.less`), so every table style in the product is already in-house LESS.
+Seven components over the seven native table elements — markup and className composition, which is all `semantic-ui-react` was contributing here. Semantic's own table CSS is not loaded (`collections/table` is commented out in `src/style/override/_semantic.less`), so every table style in the product was already in-house LESS and the swap changed no styling.
 
-**Consumed by the wrapper (1).** These never reach semantic-ui-react at all — we own the behaviour, and the §9.7-F1 swap cannot change it.
+**What it emits.** The root always emits `ui <modifiers> table <className>` — `ui` first, `table` second-to-last, the caller's `className` last. The six subcomponents emit the caller's `className` and nothing else.
+
+| Component | Element | Notes |
+| --- | --- | --- |
+| `Table.Header` | `<thead>` | Rendered unconditionally by `TableView`, and empty in the five `vertical` tables — an empty `<thead>` must still render, because the behaviour contract counts `rowgroup: 2` per table. |
+| `Table.HeaderCell` | `<th>` | Rendered as `th` wherever it sits. The `vertical` layout puts header cells inside `<tbody>`, which both `table.no-header.vertical > tbody > tr > th` and the role census (`columnheader`) depend on. No `scope` is added: `scope="row"` would reclassify those cells as `rowheader`. |
+| `Table.Row` | `<tr>` | Takes the meta `itemClassNames` result, which is `undefined` for every row in the tracked corpus. |
+| `Table.Cell` | `<td>` | The one boundary that matters: `mapper.js:184` spreads a `TableCells` node's whole rest bag onto it, so this is where `ENGINE_PROPS` and `FIELD_ONLY_PROPS` are applied. |
+| `Table.Body` | `<tbody>` | Also rendered unconditionally, including when the table has no rows. |
+| `Table.Footer` | `<tfoot>` | Part of the API and never used: zero `<tfoot>` in the 38-example baseline and no call site in `src`. |
+
+CSS contract: `src/style/components/table.less` hangs EVERY cell's padding off `.ui.table` (`.ui.table td > :not(.button)` / `th > :not(.button)`), so the root has to keep emitting both tokens even though nothing "semantic" is loaded any more: drop either and every table in the product loses its cell padding. `table:not(.as-layout).inverted` and `table.striped tr:nth-child(2n)` are why `inverted`/`striped` survived as props. The element names and the `table > thead|tbody > tr > th|td` nesting are load-bearing too — the border-radius rules and `table.no-header.vertical > tbody > tr > th` select on structure, not on classes.
+
+**Consumed by the root (3).** Read by `Table` itself; everything else rides the rest spread onto the element.
 
 | Prop | Meaning |
 | --- | --- |
-| `fixedHeader` <br>*(has a default)* | Wraps the table in two scroll containers so the header stays visible. Wrapper-only, and unused: no meta in either corpus sets it and no call site passes it. |
+| `className` | Appended last, after `table`. `TableView` builds it from the meta `styles`/`fill`/`vertical` attributes; consumer metas add `as-layout`, `no-header`, `highlight-N-last` and the sticky-column tokens through the same channel. |
+| `inverted` | Dark table. Emitted as the `inverted` class, which `table.less` and `expand.less` both select on. Reached only from `ErrorTable.js` — a §9.9-H1 orphan, so the prop is kept but its fate is that deletion's to decide, not this step's. |
+| `striped` | Zebra rows, emitted as the `striped` class. Same single call site as `inverted`, and also genuinely styled — which is why neither was dropped with the rest. |
 
-**Stripped at the DOM boundary.** `src/core/components/Table.js` applies no boundary filter. Whatever the caller passes reaches semantic-ui-react, which spreads what it does not recognise onto a DOM element — so this is an unprotected boundary, and the replacement should apply `omitProps` where the current wrapper does not.
+**Consumed by every subcomponent (1).** All six share one implementation, so this list applies to each of them identically.
 
-**Forwarded to semantic-ui-react (7) — the parity checklist.** The wrapper writes no attributes of its own: it spreads `props` and nothing else, so everything below arrives straight from the caller.
+| Prop | Meaning |
+| --- | --- |
+| `className` | Passed through verbatim, or the attribute is omitted entirely when it is absent or empty. Semantic ran its own `cx()` and printed `class=""` regardless: 317 empty class attributes in the 38-example baseline were its, on `tbody` (24), `tr` (94) and `td` (199), and they are gone. |
 
-CSS contract: SUIR's `Table` always emits `ui` and `table` in its className, and `src/style/components/table.less:125` hangs every table cell's padding off `.ui.table`. A native `<table>` that stops emitting `ui table` loses all cell padding — so §9.7-F1.1 is right that visual parity is near-guaranteed, but only because the replacement keeps emitting those two tokens. `src/style/components/expand.less` keys off `.striped` and `.inverted` the same way. The `.ui.dropdown` half of this contract is already pinned by `src/style/__tests__/css.compilation.test.js`.
+**Stripped at the DOM boundary.** `src/core/components/Table.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js` in all 7 components, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
 
-| Prop | Reaches SUIR via | Tier | Seen in | What has to be reproduced |
-| --- | --- | --- | --- | --- |
-| `children` | caller, via `props` | 1 | demo | The row/section tree. Every table in both corpora. |
-| `className` | caller, via `props` | 1 | demo | Composed by SUIR as `ui <modifiers> table <className>`. `TableView` builds it from the meta `styles`/`fill`/`vertical` attributes. |
-| `as` | caller, via `props` | 2 | — | Element override. No occurrences; a replacement may legitimately drop it. |
-| `celled` | caller, via `props` | 2 | — | Not used anywhere in either corpus, and Semantic's table CSS is not loaded, so it would be inert markup even if passed. |
-| `inverted` | caller, via `props` | 2 | — | Dark table. Reached only from `ErrorTable.js`, whose own importer `ErrorContent.js` has no importers — both are §9.9-H1 orphans. Decide `inverted`/`striped` together with that deletion. |
-| `striped` | caller, via `props` | 2 | — | Zebra rows. Same orphan path as `inverted`, but `src/style/components/expand.less` does key off a `.striped` ancestor, so the token is not inert if the component survives. |
-| `textAlign` | caller, via `props` | 2 | — | Same as `celled`: no occurrences, no loaded CSS. |
+**Passthrough.** `style`, `colSpan`, `scope`, `id`, `data-*` and every event handler still reach the element untouched — they always did, because Semantic did not handle them either, so they ride the rest spread exactly as before. There is no `forwardRef`: nothing in `src` passes a ref to a table element, so the parameter would have had no caller.
 
-**Subcomponents.** `Table.js` re-exports `Header`, `HeaderCell`, `Row`, `Cell`, `Body`, `Footer` unchanged, so they have no wrapper layer at all: every prop is a passthrough, and the replacement owes the same subcomponent API. What the codebase puts on them, derived from the call sites:
+**Dropped (4) — the semver record.** Props semantic-ui-react handled that this implementation deliberately does not. All of them remain REACHABLE from a consumer meta — `mapper.js` spreads a `TableCells` node's whole rest bag onto the cell and `TableView` spreads its own rest onto the table — so the component strips them explicitly and warns once per prop in development. Stripping matters because a string-valued one would otherwise land as a lowercase DOM attribute (`verticalAlign="top"` rendered `verticalalign="top"`), which is the junk the DOM contract's tripwires exist to keep out; warning matters because a meta still carrying one would otherwise never learn it stopped working. React's own unknown-prop warning is not relied on: it is silent for a lowercase name.
+
+| Prop | Why it is gone |
+| --- | --- |
+| `verticalAlign` | Was accepted on the cell and turned into the classes `top aligned`. NO loaded CSS selects on `aligned` (0 occurrences in `static/all.css` and in `src/style`), and no `.top` rule can match either — every one of them needs a second class on the same element — so the 15 cells that asked for it rendered at the `<td>` default anyway. Both call sites (`LocalDraftTableRow`) were removed with the prop. A cell that must align does it with `style={{verticalAlign}}`, which is what the metas that actually align already use. |
+| `as` | Element override. No call site, no meta occurrence; the element per component is now fixed, which is what the structural CSS selectors assume anyway. |
+| `celled` | Semantic border modifier. Emitted a class no loaded CSS selects on, so it was inert markup even when passed — and nothing passed it. |
+| `textAlign` | Emitted `<value> aligned`, the same dead token family as `verticalAlign`. Use a `className` or a `style`. |
+
+Those four were the *published* ones — they had curated entries on this page while it was a wrapper. Semantic's `Table` handled 29 props and its `Table.Cell` 17, and the rest of that surface was reachable only by passthrough and never documented here: `collapsing`, `color`, `columns`, `compact`, `definition`, `fixed`, `padded`, `attached`, `basic`, `selectable`, `singleLine`, `size`, `sortable`, `stackable`, `structured`, `unstackable`, `width`, `fullWidth`, `sorted`, the row/cell state modifiers (`active`/`disabled`/`error`/`negative`/`positive`/`warning`), the `content`/`icon` shorthands, `cells`/`cellAs`, and the nil-children shorthand engine (`headerRow`/`headerRows`/`renderBodyRow`/`tableData`/`footerRow`). None occurs in either corpus and none is selected by loaded CSS. Step 5 records the semver call for the whole set; on the evidence here it is minor.
+
+**Call sites.** What the codebase puts on the family, derived from the source. This was the step-1 parity surface and it is kept afterwards, because it is what any future change to the family is measured against:
 
 | Component | Attributes at the call sites | Spreads | Rendered by |
 | --- | --- | --- | --- |
@@ -103,11 +132,13 @@ CSS contract: SUIR's `Table` always emits `ui` and `table` in its className, and
 | `Table.Header` | `className` | — | `core/components/ErrorTable.js`, `core/pages/main/components/TableView.js` |
 | `Table.HeaderCell` | `className`, `colSpan`, `key`, `style` | — | `core/components/ErrorTable.js`, `core/pages/main/components/TableView.js` |
 | `Table.Row` | `className`, `key` | — | `core/components/ErrorTable.js`, `core/pages/main/components/TableView.js` |
-| `Table.Cell` | `className`, `colSpan`, `key`, `scope`, `style`, `verticalAlign` | `...rest` | `core/components/ErrorTable.js`, `core/pages/main/components/LocalDraftTableRow.js`, `core/pages/main/components/TableView.js`, `core/pages/main/mapper.js` |
+| `Table.Cell` | `className`, `colSpan`, `key`, `scope`, `style` | `...rest` | `core/components/ErrorTable.js`, `core/pages/main/components/LocalDraftTableRow.js`, `core/pages/main/components/TableView.js`, `core/pages/main/mapper.js` |
 | `Table.Body` | — | — | `core/components/ErrorTable.js`, `core/pages/main/components/TableView.js` |
 | `Table.Footer` | — | — | *nothing* |
 
-Every prop in the table above then rides those spreads or those attributes. The two unfiltered spreads are the ones to fix while replacing: `mapper.js` spreads a meta node's whole rest bag onto `Table.Cell`, and the tooltip wrapper spreads its own rest bag onto the popup.
+`mapper.js`'s spread onto `Table.Cell` is a meta node's whole rest bag and is still unfiltered at the call site — the filter is now inside the cell, which is why it is safe. The remaining unfiltered boundary on this surface is the tooltip wrapper, and step 2 owns it.
+
+## Wrappers — what is left
 
 ### `TooltipPop` — wraps semantic-ui-react `Popup`
 
@@ -246,16 +277,19 @@ demo corpus alone would be wrong.
 
 What each step owes beyond "the props above still work".
 
-### Step 1 — `Table`
+### Step 1 — `Table` — SHIPPED
 
-**Effort: S (unchanged, arguably smaller).**
+**Effort: S, and it came in at the small end — the audit's estimate held.**
 
-- Keep emitting `ui` and `table` on the root element, or every table cell loses its padding.
-- Apply `omitProps` inside the new `Table.Cell`: `mapper.js` spreads a node's whole rest bag onto it, and that spread is unfiltered today.
-- Decide `verticalAlign` deliberately — SUIR emits `top aligned` and no loaded CSS selects on `aligned`.
-- Decide `inverted`/`striped` together with the §9.9-H1 deletion of `ErrorTable`/`ErrorContent`; they are the only source of both.
-- `jest.config.js` sets a per-file threshold for `TableView.js` and none for `Table.js` — a real in-house `Table.js` wants its own entry.
-- `TableView.js:364` discards `sellStyles` — a typo: no such prop exists, and the list it sits in exists precisely to keep props off the DOM. Inert today (nothing passes `cellStyles` either), but it is a dead entry in a boundary, so resolve it while rewriting rather than carrying it over.
+- SHIPPED: native `<table>/<thead>/<tbody>/<tfoot>/<tr>/<th>/<td>`, seven components, no `semantic-ui-react` import. The subcomponent API is unchanged, so no call site moved.
+- DONE — the root still emits `ui` and `table`, in that position, and all 24 `<table>` class strings in the 38-example baseline are byte-identical. This was the highest-risk detail in the step and it is pinned by a unit test as well as by the snapshots.
+- DONE — `omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)` is applied in all seven components, closing the `mapper.js:184` spread onto `Table.Cell`. Zero-diff on today's corpus (no example puts an engine prop on a `TableCells` node), so it is a latent-boundary net rather than a visible fix; `domProps.js` now names the family.
+- DECIDED — `verticalAlign` DROPPED, and its two call sites in `LocalDraftTableRow` with it. SUIR emitted `top aligned`; no loaded CSS selects on `aligned`, and no `.top` rule can match a `<td class="top aligned">`, so those 15 cells already rendered at the `<td>` default. Pixel-identical, and it leaves one way to align a cell instead of two, one of which never worked.
+- DECIDED — `inverted`/`striped` KEPT. They are the only SUIR modifiers any call site passes and, unlike `celled`, they ARE styled (`table:not(.as-layout).inverted`, `table.striped tr:nth-child(2n)`). §9.9-H1 still owns whether `ErrorTable`/`ErrorContent` survive; this step deliberately did not pre-empt that.
+- DECIDED — `fixedHeader` DELETED with its test. Unused by every call site and every meta, AND non-functional: `app__table__container--fixed-header` and its inner class have zero occurrences in `static/all.css` and in `src/style`, so it rendered two unstyled `<div>`s. Keeping it would have meant reimplementing a feature that never worked.
+- DONE — `jest.config.js` gained a per-file threshold for `Table.js` at 100/100/100/100, measured from a real `--coverage` run, alongside the existing `TableView.js` entry.
+- DONE — `TableView.js`'s `sellStyles` discard is gone (a typo for a prop that does not exist; nothing passes `cellStyles` either), and the `class=""` comment it carried is rewritten, because suppressing that attribute is now the cell's job.
+- EXPECTED AND VERIFIED — 332 changed snapshot lines in four shapes and no others: 24 `<tbody class="">`, 94 `<tr class="">` and 199 `<td class="">` lose an empty attribute, and 15 `<td class="top aligned">` lose a dead class. Nothing else moved: same element counts per tag, same class strings on `<table>`/`<thead>`/`<th>`, same `id`/`style`/`colspan`, same visible text, and the behavioural layer green throughout.
 
 ### Step 2 — `TooltipPop`
 
@@ -278,9 +312,12 @@ What each step owes beyond "the props above still work".
 ## What this page does and does not guarantee
 
 Guaranteed, because it is derived from source and checked in CI: the import inventory; each
-wrapper's consumed set and its line count; which boundary lists each wrapper applies; the
-attributes and spreads written on the semantic-ui-react element and on every `Table`
-subcomponent call site; and that every one of those has a curated description.
+component's consumed set and its line count; which boundary lists each one applies; the
+attributes and spreads written on the semantic-ui-react element; the native element behind
+every in-house subcomponent, and that no in-house file reaches semantic-ui-react by import,
+`require`, `jest.mock` or dynamic `import`; every attribute the codebase puts on the `Table`
+family; that no call site passes a prop the page says was dropped; and that every one of
+those has a curated description.
 
 Also guaranteed: the tracked-corpus attribute inventory, enforced total by the contract
 test against the real `EXAMPLES` manifest.
@@ -290,6 +327,13 @@ Not guaranteed, and deliberately so:
 - **the forwarded set is open.** A rest spread cannot be closed by static analysis; a meta
   may pass any semantic-ui-react prop. The tier-1 list is what was found, not a proof of
   what is possible.
+- **the emitted className strings.** The generator reads which props a component consumes,
+  not what it composes them into. `ui table` surviving on the root is asserted by
+  `src/core/components/__tests__/Table.test.js` and by the 38-example DOM baseline, not here.
+- **the dropped list is not proof of absence.** It names the props that had a curated entry
+  while the component was a wrapper, plus the wider semantic-ui-react surface recorded in
+  prose. A caller could always pass an undocumented semantic prop; those now land on the
+  element or draw a React warning, and no static check can enumerate them.
 - **corpus evidence is initial-render only.** The step-0 instrumented render recorded the
   props reaching semantic-ui-react on first paint, so props that only appear once a
   control is interacted with — opening a dropdown, switching a tab — were never observed.

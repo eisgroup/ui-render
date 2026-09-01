@@ -51,6 +51,57 @@
   failed subtree names it too, instead of showing a bare `Error: …`. A host reporter that
   throws cannot replace the failure it was called to report.
 
+#### Table rendering
+
+- **Tables are now rendered by our own components instead of `semantic-ui-react`.** The
+  `semantic-ui-react` table code path is gone from the bundle (~4 KB), and the library is one
+  component closer to not depending on the package at all. The elements are the same
+  (`table`/`thead`/`tbody`/`tfoot`/`tr`/`th`/`td`), in the same nesting, and the class names on
+  `<table>`, `<thead>` and `<th>` are byte-for-byte what they were — including the `ui table`
+  prefix on the root, which every table style in the package hangs off. Across the 38 bundled
+  examples the rendered markup differs in exactly two ways, both listed below (a third change,
+  `fixedHeader`, is listed too but no bundled example passed it, so it moves nothing); visible text,
+  `id`, `style`, `colspan` and `name` attributes, and the element count of every tag, are
+  unchanged.
+- **Empty `class=""` attributes are gone from `<tbody>`, `<tr>` and `<td>`** — 317 of them across
+  the bundled examples (24 on `tbody`, 94 on `tr`, 199 on `td`). Semantic UI composed the
+  attribute itself and emitted it whether or not there was a class to put in it, which is why the
+  previous release could only trade the junk `-last` classes for empty ones. Cells that carry a
+  real class — the pinned-column classes, for instance — are untouched. No CSS selector can match
+  an empty class attribute, so nothing can look different; a host script that keys off the
+  attribute's *presence* rather than its value can, so check for `td[class]`,
+  `hasAttribute('class')`, `getAttribute('class') !== null` or `element.attributes.length` over
+  table cells if you walk the rendered DOM.
+- **`verticalAlign` is no longer a prop on the table components.** Semantic UI turned it into the
+  class pair `top aligned`, and no stylesheet this package ships selects on `aligned` — nor can
+  any of its `.top` rules match a cell, since each one needs a second class on the same element.
+  The 15 cells in the bundled examples that asked for it were therefore already rendering at the
+  default vertical alignment, and the two internal call sites were removed along with the prop.
+  If your own CSS reached those cells through `.top` or `.aligned`, that hook is gone. To align a
+  cell for real, set `style` on the `TableCells` node — `"style": {"verticalAlign": "top"}` — which
+  is what every bundled example that actually aligns already does, and which keeps working exactly
+  as before. Note `styleCell` is *not* the key for this: it is applied to the wrapper inside the
+  cell, where `vertical-align` has no effect.
+- **`fixedHeader` is gone.** It wrapped the table in `app__table__container--fixed-header` and
+  `app__table__container__inner--fixed-header`, two class names no stylesheet in this package
+  defines, so it produced two unstyled `<div>`s and never actually pinned a header. Nothing in the
+  library or in any audited meta passed it. If a host styled those two wrapper classes itself,
+  the wrapper elements no longer render.
+- **Also dropped, none of them used or styled:** `as` (element override), `celled` and `textAlign`
+  (Semantic class modifiers whose classes this package's CSS does not select on). The wider
+  Semantic UI table surface that was reachable only by passing a prop straight through — `color`,
+  `compact`, `padded`, `sortable`, `selectable`, `width`, `sorted`, the row and cell state
+  modifiers, the `content`/`icon` shorthands and the `headerRow`/`renderBodyRow` shorthand engine
+  — is gone with it; none of it appeared in any meta we audited.
+- **Unchanged and still supported:** `className` on every component, `inverted` and `striped` on
+  the table, and `style`, `colSpan`, `scope`, `id`, `data-*` and every event handler on any of
+  them. The full list, with a reason for each dropped prop, is in `docs/SUPPORTED-PROPS.md` in the
+  repository.
+- Table cells now also strip the renderer's internal props before they can become HTML
+  attributes, the same way every other component has since the previous release. No bundled
+  example put one on a table cell, so no rendered output changes; a meta that names an internal
+  prop on a `TableCells` node no longer leaks it onto the `<td>`.
+
 #### Accessibility
 
 - The text, number and date inputs no longer emit an `aria-describedby` pointing at an element
@@ -65,22 +116,24 @@
 
 - **New page: the supported props of `Table`, `Tooltip` and `Select` / `Dropdown`** —
   `docs/SUPPORTED-PROPS.md` in the repository, linked from the README. Those three views are the
-  only ones still implemented by `semantic-ui-react`, and this is the first time their prop surface
+  ones whose implementation is being brought in-house, and this is the first time their prop surface
   has been written down. Each prop is listed with two things: what actually happens to it —
-  consumed by our own wrapper, stripped before it reaches the DOM, or forwarded to
-  `semantic-ui-react` — and whether any real meta uses it. Nothing changes at runtime; the page is
+  consumed by our own component, stripped before it reaches the DOM, forwarded to
+  `semantic-ui-react`, or (for a view already reimplemented) deliberately dropped — and whether any
+  real meta uses it. Nothing changes at runtime; the page is
   generated from the component source and checked in CI, so the derived half — which prop reaches where —
   cannot drift away from the code. The explanatory prose beside it is curated, not machine-checked, and
-  the page says so itself.
-- **Worth reading if you author meta for those views.** 24 of the props these three accept reach
-  `semantic-ui-react` but are used by no meta we can see. About fourteen of them are ones you could
-  actually write in a meta: `search`, `multiple`, `allowAdditions` and `clearable` on a select,
-  `position`, `on`, `hoverable` and `basic` on a tooltip, and `celled`, `textAlign`, `striped`,
-  `inverted` and `as` on a table. The rest are either derived by the component from another prop
-  (so a meta cannot set them) or belong to a table subcomponent rather than the view. All three
-  components are being reimplemented in-house, and whether each of these is rebuilt or dropped is
-  still an open decision. **If your meta uses one of them, please say so** — that list is the
-  evidence the decision will be made from.
+  the page says so itself. `Table` is the first view to have gone in-house, so its section already
+  reads as a record of what it emits and what it dropped rather than as a checklist.
+- **Worth reading if you author meta for those views.** 17 of the props the two remaining wrapped
+  views accept reach `semantic-ui-react` but are used by no meta we can see. The ones you could
+  actually write in a meta are `search`, `multiple`, `allowAdditions` and `clearable` on a select,
+  and `position`, `on`, `hoverable` and `basic` on a tooltip; the rest are derived by the component
+  from another prop, so a meta cannot set them. Both components are still to be reimplemented
+  in-house, and whether each of these is rebuilt or dropped is still an open decision. **If your
+  meta uses one of them, please say so** — that list is the evidence the decision will be made
+  from. The equivalent list for `Table` is now settled: `celled`, `textAlign` and `as` were dropped
+  (see "Table rendering" above), while `striped` and `inverted` were kept.
 
 #### Compatibility
 
