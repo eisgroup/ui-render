@@ -253,9 +253,9 @@ const VIEW_CURATION = {
         notes: 'Also reached from `view: "Input"` with `type: "toggle"`.',
     },
     TOOLTIP: {
-        summary: 'Hover popup taking `items`, or a nested `children` declaration, as its body.',
+        summary: 'Hover popup whose body comes from `label` and whose trigger is a nested `children` declaration.',
         resolvesTo: 'TooltipPop',
-        notes: 'A `label` is promoted to `content` when no `content` is given. Any node can also carry a `tooltip` attribute instead of using this view.',
+        notes: 'A `label` is promoted to `content` when no `content` is given. Any node can also carry a `tooltip` attribute instead of using this view, and that attribute may be an object, whose properties are spread into the overlay. **Correction (§9.7-F1 step 2 part 1):** this entry previously said `items` supplied the tooltip *body*. Measured, `items` becomes the TRIGGER, and the `items` form does not render at all — the trigger must be exactly one element and `mapper.js` builds an array, which throws inside the overlay and leaves the engine error diagnostic in the node\'s place. Use the nested-object `children` form; pinned by `UIRender.overlay-behavior.test.js`.',
     },
     UPLOAD: {
         summary: 'Form-bound single file upload with drag and drop.',
