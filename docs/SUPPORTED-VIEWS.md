@@ -13,9 +13,10 @@ attribute, and the action names accepted by `onClick`, `onChange` and `onDone`.
 regenerates it and fails on any difference. Run `npm run docs:views` after changing a
 `FIELD` constant or a resolver `case`, and edit prose in `scripts/view-reference-curation.js`.
 
-Props are documented separately: `docs/SUPPORTED-PROPS.md` covers the prop surface of
-the three views still implemented by `semantic-ui-react` (`Table`, `Tooltip`, and
-`Select`/`Dropdown`), which is the only place the supported props are enumerated today.
+Props are documented separately: `docs/SUPPORTED-PROPS.md` covers the prop surface of the
+three views the `semantic-ui-react` exit replaces (`Table`, now in-house; `Tooltip` and
+`Select`/`Dropdown`, still wrapping the package), which is the only place the supported
+props are enumerated today.
 
 ## How a node is resolved
 

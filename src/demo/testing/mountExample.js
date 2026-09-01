@@ -5,7 +5,7 @@
  * has its own private harness in `examples.dom-contract.test.js` because it must
  * stay a single, deliberately dumb code path. Layer (2) is spread over several
  * suites — the manifest-wide census, and the per-view behavioural contracts for
- * the three `semantic-ui-react` wrappers §9.7-F1 replaces — so the mount itself
+ * the `semantic-ui-react` wrappers §9.7-F1 replaces (two left after step 1) — so the mount itself
  * lives here rather than being copied five times.
  *
  * Everything this module exports is markup-agnostic on purpose: it mounts the

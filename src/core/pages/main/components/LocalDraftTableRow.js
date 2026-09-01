@@ -125,6 +125,15 @@ export default class LocalDraftTableRow extends PureComponent {
     if (appended !== false) this.setState({ draft: {}, fieldErrors: {} })
   }
 
+  /**
+   * @Note: these two cells used to pass `verticalAlign="top"`. Semantic's `Table.Cell` turned that
+   *  into the classes `top aligned`, and NO loaded CSS selects on `aligned` (0 occurrences in
+   *  `static/all.css` and in `src/style`) — so the 15 cells that asked for it rendered at the
+   *  `<td>` default anyway. The prop was dropped with the in-house `Table` (§9.7-F1 step 1) rather
+   *  than reproduced as dead markup. If a draft row should really align to the top, say so with
+   *  `style={{verticalAlign: 'top'}}`, which is what the metas that actually align already do —
+   *  and expect a visual change, because that one works.
+   */
   renderInputCell = (def, i) => {
     const { translate } = this.props
     const name = def.name
@@ -142,7 +151,7 @@ export default class LocalDraftTableRow extends PureComponent {
       className
     }
     return (
-      <Table.Cell key={name || i} verticalAlign="top" className={def.classNameCellWrap}>
+      <Table.Cell key={name || i} className={def.classNameCellWrap}>
         {type === 'date'
           ? <InputDate {...common} />
           : <Input {...common} type={type || 'text'} />}
@@ -163,7 +172,7 @@ export default class LocalDraftTableRow extends PureComponent {
       if (!isAdd) return null
       const { onClick: _oc, children, ...btnRest } = item
       return (
-        <Table.Cell key={`btn-${i}`} verticalAlign="top">
+        <Table.Cell key={`btn-${i}`}>
           <Button {...btnRest} type="button" onClick={this.handleAdd} translate={this.props.translate}>
             {children}
           </Button>

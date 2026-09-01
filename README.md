@@ -17,11 +17,13 @@ source disagree.
 ## Supported props on `Table`, `Tooltip` and `Select` / `Dropdown`
 
 [`docs/SUPPORTED-PROPS.md`](docs/SUPPORTED-PROPS.md) documents the prop surface of the three views
-whose implementation still comes from `semantic-ui-react`, split by what actually happens to each
-prop: consumed by our wrapper, stripped before the DOM, or forwarded to `semantic-ui-react`. Those
-three are being reimplemented in-house, so the page doubles as the parity checklist for that work.
-It is generated from the wrapper source and the call sites — run `npm run docs:props` after changing
-one — and a contract test additionally checks it against the example corpus.
+the `semantic-ui-react` exit replaces, split by what actually happens to each prop: consumed by our
+component, stripped before the DOM, forwarded to `semantic-ui-react`, or — once a view has been
+reimplemented — deliberately dropped. `Table` is in-house already and imports nothing; `Tooltip` and
+`Select`/`Dropdown` still wrap the package, so the page doubles as the parity checklist for the
+remaining work. It is generated from the component source and the call sites — run
+`npm run docs:props` after changing one — and a contract test additionally checks it against the
+example corpus.
 
 ## Installation (consumer)
 
