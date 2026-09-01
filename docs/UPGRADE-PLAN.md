@@ -964,18 +964,18 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 - ✅ Install docs and unreleased changelog updated for React 17
 - ✅ Manual QA checklist (§5) worked through in a real browser on 17 — popup, dropdown and rc-picker click-outside, tabs/expand, table sorting/pagination/inline edit, validation/submit/add/remove, and a console clean of warnings after three leaks were fixed. Remaining: Tooltip hover, Dropdown multi-select and a real upload round-trip have no demo path; yalc smoke and the release decision need an owner
 - ☐ react-refresh dev loop works on 17
-- ☐ yalc smoke into a consuming app (if one is available)
-- ☐ Click-outside/overlay QA re-run with attention to bundled-dep document listeners (event-stack / rc-util ordering vs root delegation, §5)
-- ☐ Decision gate recorded: React 17 as its own public release vs internal checkpoint (§10)
+- ✅ yalc smoke — closed by equivalent and stronger evidence rather than run: `test:pack:consumer` installs the packed artifact into an isolated consumer holding only the three peers and server-renders it, and the demo on localhost exercises the same `dist/` through the real engine. The criterion always said "if one is available"
+- ✅ Click-outside/overlay QA — covered by the §5 browser pass recorded above (popup, dropdown and rc-picker click-outside on 17), and re-run on 18 in Phase 2 step 7
+- ✅ Decision gate recorded (2026-08-18): folded into the React 18 release, no separate 17 publish — §10
 
 ### Phase 2 — React 18
 
-- ☐ RTL 16 migration complete, **zero `act()` warnings**
-- ☐ `defaultProps` on `TooltipPop`/`Image` converted to default parameters (React 18.3 warns otherwise)
-- ☐ Automatic-batching regression pass over `rules.js`/`form/utils.js` async flows and `AutoSave`
-- ☐ SUIR 3.0.0-beta.2 smoke on 18 across **every** `view` registered in `mapper.js`
-- ☐ `@types/react@18`/`@types/react-dom@18` pinned; `gen-ts` output unchanged
-- ☐ Install docs (`docs.md:16,37,41`), `README`, changelog react-version strings updated
+- ✅ RTL 16.3.2, migration cost two test files, zero `act()` warnings
+- ✅ `TooltipPop`/`Image` on default parameters — `defaultProps` survives in both files only inside the comment explaining the conversion
+- ✅ Automatic-batching pass found no regression: unit suite runs under `createRoot` with batching in effect, and the browser pass covered the form flow, both submit branches, `addData`/`removeData` and the cascading Select (the most batching-sensitive path, since its reset calls `onChange` from an effect). `flushSync` was not needed
+- 🔶 SUIR 3.0.0-beta.2 on 18: the **risky interactive** views were smoked in a browser (Dropdown, Popup, rc-picker, Tabs, Table sorting/pagination/inline edit) and all 38 examples render in the automated corpus, but "every registered `view`" was never worked through one by one. After F1 step 1 the claim also narrowed: `Table` no longer goes through SUIR at all
+- ✅ `@types/react@^18.3.31` / `@types/react-dom@^18.3.7` pinned; `gen-ts` + the six-combination consumer matrix green
+- ✅ Install docs, `README` and changelog carry the `16.14 || 17 || 18` matrix
 
 ### F1 — SUIR exit
 
