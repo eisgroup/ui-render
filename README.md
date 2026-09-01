@@ -14,6 +14,15 @@ case handles. The page is generated from the `FIELD` constants plus the resolver
 `npm run docs:views` after adding or removing either; a contract test fails while the page and the
 source disagree.
 
+## Supported props on `Table`, `Tooltip` and `Select` / `Dropdown`
+
+[`docs/SUPPORTED-PROPS.md`](docs/SUPPORTED-PROPS.md) documents the prop surface of the three views
+whose implementation still comes from `semantic-ui-react`, split by what actually happens to each
+prop: consumed by our wrapper, stripped before the DOM, or forwarded to `semantic-ui-react`. Those
+three are being reimplemented in-house, so the page doubles as the parity checklist for that work.
+It is generated from the wrapper source and the call sites — run `npm run docs:props` after changing
+one — and a contract test additionally checks it against the example corpus.
+
 ## Installation (consumer)
 
 `eis-ui-render` declares the following **peer dependencies**. The host application must install
