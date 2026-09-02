@@ -250,6 +250,21 @@ Open [http://localhost:3001](http://localhost:3001) to view it in Chrome browser
 The page will reload if you make edits.<br>
 You will also see any lint errors in the console.
 
+### `npm run test:e2e`
+
+Runs the browser leg of the contract suite (Playwright, Chromium) over a production build of the
+demo. It records what the tooltip actually does in a real browser — where the bubble lands relative
+to its trigger, whether it flips at a viewport edge, whether it is clipped, whether our CSS paints
+it — which is the class of fact the jsdom suites cannot express at all.
+
+Run `npm run test:e2e:install` once per machine first: it downloads Chromium into the Playwright
+cache (~570 MB on disk). That download is deliberately **not** wired into `npm install`, so a plain
+`npm ci` costs nothing extra for anyone who never runs this leg.
+
+Specs live in `e2e/`; every expected value is in `e2e/reference.js`, tagged as a reference (current
+behaviour, expected to change), an invariant (must not change), or a pinned defect. Read that file
+before changing an assertion.
+
 ### Live build mode
 
 - Install `yalc` globally ```npm install -g yalc```
