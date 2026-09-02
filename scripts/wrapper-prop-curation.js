@@ -471,9 +471,25 @@ const STEP_OBLIGATIONS = [
         ],
     },
     {
-        step: 'Step 2 — `TooltipPop` — PART 1 (THE GATE) SHIPPED, REPLACEMENT OPEN',
+        step: 'Step 2 — `TooltipPop` — GATE AND BROWSER REFERENCE SHIPPED, REPLACEMENT OPEN',
         effort: 'S–M for the replacement, unchanged. Part 1 was the measurement and the gate.',
         items: [
+            'OBLIGATION 1 of 3 — THE 500 ms OPEN DELAY MUST SURVIVE. The in-house `Tooltip` reveals through '
+                + 'the CSS rule `*:hover > &`, which has no delay, so converging naively drops it. It is a '
+                + 'deliberate UX decision stated in `TooltipPop.js` and pinned to the millisecond in three '
+                + 'places; the simulated convergence fails all of them. Keep the timing in JavaScript, or use '
+                + '`transition-delay` if the reveal stays CSS.',
+            'OBLIGATION 2 of 3 — CLICK-TO-OPEN MUST SURVIVE, or be dropped in the changelog rather than by '
+                + 'omission. SUIR runs `on: [\'click\', \'hover\']`; a CSS hover rule has no click path.',
+            'OBLIGATION 3 of 3 — ESCAPE AND CLICK-OUTSIDE MUST STILL DISMISS. This is accessibility: a '
+                + 'pointer-only dismissal leaves keyboard users unable to close the bubble. Both are pinned in '
+                + 'the browser leg, and the Escape-from-an-unrelated-input case is answerable ONLY in a '
+                + 'browser, since jsdom has no native focus semantics. Both fail under the simulated '
+                + 'convergence, because the inline component has no JavaScript at all.',
+            'HAZARD (necessary, not sufficient) — the bubble must set `pointer-events: none`. Positioned over '
+                + 'its trigger it swallows the pointer, and Playwright reported the trigger as unhoverable. '
+                + '`tooltip.less:12` hints at the same hazard from the other side. Adding it fixed exactly one '
+                + 'of the five simulated failures.',
             'SHIPPED — the gate. 63 tooltip tests across four files where there were 10, only 5 of which '
                 + 'could fail if the tooltip broke (the other 5 asserted the props handed to a mock): '
                 + '`components/__tests__/TooltipPop.test.js` (rewritten against the REAL '
