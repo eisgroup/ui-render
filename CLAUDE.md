@@ -85,6 +85,6 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 
 ## Gotchas
 
-- `npm run build-css` copies `src/style/override/theme.config` into `node_modules/semantic-ui-less/` before compiling (mutates `node_modules`); output goes to `public/static/ui-render.built.css`.
+- `npm run build-css` copies `src/style/override/theme.config` into `node_modules/semantic-ui-less/` before compiling (mutates `node_modules`); output goes to `public/static/ui-render.built.css`. **`src/style/__tests__/setup.js` makes the same copy**, so an ordinary `npx jest` mutates `node_modules` too — which used to matter more than it looks: the webpack builds depended on that copy existing, because `theme.config` is aliased to our own file and its `@import "theme.less"` resolves relative to the importing file, where no `theme.less` exists. `verify` passed only because `test:coverage` runs before `build`; a job going straight from `npm ci` to a build failed. Fixed 2026-09-02 by giving less-loader `paths` in both webpack configs, so a build no longer needs the copy — but the test-time mutation is still there.
 - Jest has no path-alias mapping (`jest.config.js`) — only relative imports resolve in tests.
 - `isFunction()` from core utils rejects cross-realm functions such as `jest.fn()` — use plain functions in tests.

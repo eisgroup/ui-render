@@ -78,6 +78,22 @@ export default (env, argv) => {
                             options: {
                                 lessOptions: {
                                     javascriptEnabled: true,
+                                    // `theme.config` is aliased to our own copy in
+                                    // `src/style/override/`, and that file does
+                                    // `@import (multiple) "theme.less"` — which Less resolves
+                                    // relative to the IMPORTING file, where no `theme.less` exists.
+                                    // It only ever worked because `src/style/__tests__/setup.js`
+                                    // copies `theme.config` into `node_modules/semantic-ui-less/`,
+                                    // next to that package's own `theme.less`. So the build silently
+                                    // depended on the CSS test suite having run first: in CI the
+                                    // `verify` job happens to run `test:coverage` before `build`,
+                                    // and the new browser job — `npm ci` straight to the build —
+                                    // failed on a clean checkout. Giving Less the package directory
+                                    // makes the build self-sufficient instead.
+                                    paths: [
+                                        path.resolve(__dirname, 'node_modules/semantic-ui-less'),
+                                        path.resolve(__dirname, 'node_modules'),
+                                    ],
                                     relativeUrls: false,
                                     plugins: [new LessPluginFunctions()],
                                 },
