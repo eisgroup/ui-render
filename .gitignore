@@ -166,3 +166,10 @@ Temporary Items
 # next.js
 .next
 /out/
+
+# Playwright browser leg (playwright.config.js, e2e/) -- see docs/UPGRADE-PLAN.md 9.5
+/build-e2e
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache

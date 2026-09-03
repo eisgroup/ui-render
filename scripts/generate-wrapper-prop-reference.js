@@ -76,10 +76,10 @@ const VIEWS_PAGE = 'docs/SUPPORTED-VIEWS.md'
 /**
  * The wrappers that still exist. `suir` and `localName` are asserted against the actual import,
  * so a renamed alias or a new wrapper fails here instead of producing a page that omits it.
- * `Table` left this list when §9.7-F1 step 1 took it in-house — see IN_HOUSE below.
+ * `Table` left this list when §9.7-F1 step 1 took it in-house, and `TooltipPop` when step 2 part 3
+ * did — see IN_HOUSE below. Only `Dropdown` is still a wrapper.
  */
 const WRAPPERS = [
-    { id: 'TooltipPop', file: `${PACK}/TooltipPop.js`, fn: 'TooltipPop', suir: 'Popup', localName: 'Pop' },
     { id: 'Dropdown', file: `${PACK}/Dropdown.js`, fn: 'Dropdown', suir: 'Dropdown', localName: 'DropDown' },
 ]
 
@@ -90,6 +90,8 @@ const WRAPPERS = [
  */
 const IN_HOUSE = [
     { id: 'Table', file: `${PACK}/Table.js`, fn: 'Table', root: 'table', factory: 'tablePart' },
+    // One element, no subcomponent family, so no `factory`.
+    { id: 'TooltipPop', file: `${PACK}/TooltipPop.js`, fn: 'TooltipPop', root: 'span' },
 ]
 
 const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8')
@@ -444,9 +446,12 @@ function readInHouse (spec) {
         lines: raw.replace(/\n$/, '').split('\n').length,
         intercepted,
         restName,
-        part: readSharedPart(source, spec),
+        // Gated with `factory`: a single-element component has no shared subcomponent part.
+        part: spec.factory ? readSharedPart(source, spec) : { intercepted: [], restName: null },
         omitLists: readOmitLists(source, spec.file),
-        subcomponents: readSubcomponents(source, spec),
+        // `factory` is absent for a single-element component (TooltipPop). Requiring it would
+        // force a fake factory just to satisfy the reader.
+        subcomponents: spec.factory ? readSubcomponents(source, spec) : [],
     }
 }
 
@@ -510,7 +515,7 @@ function readWrapper (spec) {
     }
 }
 
-/** JSX attributes the codebase puts on `Table` and its subcomponents, with the files involved. */
+/** JSX attributes the codebase puts on an in-house component and its subcomponents, with the files involved. */
 function readCallSites (inHouse) {
     const tags = [inHouse.fn, ...inHouse.subcomponents.map(({ name }) => `${inHouse.fn}.${name}`)]
     const usage = {}
@@ -521,7 +526,7 @@ function readCallSites (inHouse) {
     })
     for (const file of sourceFiles('src')) {
         if (/(__tests__|\.test\.)/.test(file)) continue
-        if (file === `${PACK}/Table.js`) continue
+        if (file === inHouse.file) continue
         const source = stripComments(read(file))
         for (const tag of tags) {
             for (const { attributes, spreads } of jsxOpenings(source, tag)) {
@@ -646,7 +651,9 @@ function buildReference () {
     const wrappers = WRAPPERS.map(readWrapper)
     const inHouse = IN_HOUSE.map(readInHouse)
     const table = inHouse.find(component => component.id === 'Table')
-    const callSites = readCallSites(table)
+    // Per component, then merged: tags are unique across components, but "a component's own file is
+    // not a call site" is only true of ITS own tags.
+    const callSites = Object.assign({}, ...inHouse.map(readCallSites))
 
     for (const component of inHouse) {
         assertInHouseCuration(component, callSites)

@@ -1,4 +1,3 @@
-
 .tooltip {
   @line-height: size(7); // distance between tooltip and origin reference point
   &:extend(.bg-blur all);
@@ -12,6 +11,20 @@
   display: none; // `visibility: hidden` is not enough because it will trigger hover
   opacity: 0;
   z-index: -1;
+
+  /**
+   * A bubble painted over its own trigger swallows the pointer, and the trigger then cannot be
+   * hovered at all — measured in real Chrome while simulating §9.7-F1 step 2's convergence, where
+   * Playwright reported `<span class="tooltip …"> intercepts pointer events` and retried to
+   * timeout. The `display: none` above guards the same hazard from the other side; this guards it
+   * for an OPEN bubble, which is the state `TooltipPop` now creates deliberately.
+   *
+   * Safe for all four consumers: none of them puts anything interactive inside the bubble
+   * (`Slider`'s value, `Upload`'s close hint, `withFormSetup`'s validation text, `TooltipPop`'s
+   * body). It also gives `TooltipPop` its dismissal path back — the pointer can never land ON the
+   * bubble, so travelling towards it leaves the host and fires `mouseleave`.
+   */
+  pointer-events: none;
 
   /* Vertical line */
 
@@ -59,18 +72,47 @@
     }
   }
 
+  /**
+   * THE FOUR CORNER PLACEMENTS RESTATE THEIR AXIS, and that is not redundancy.
+   *
+   * `.tooltip.left` / `.tooltip.right` below set `top: 50%` at the SAME specificity as
+   * `.tooltip.top` / `.tooltip.bottom`, so a corner class string matches both rules and the axis
+   * loses. Measured in real Chrome (§9.7-F1 step 2 part 2, finding 4): `top left` / `top right`
+   * came out over-constrained — `bottom` from `.top` and `top: 50%` from `.left` — so the bubble
+   * stretched down over its own host; `bottom left` / `bottom right` lost on source order and
+   * degraded to plain `left` / `right`.
+   *
+   * `top: auto` is enough for the two `top` corners. The two `bottom` corners need the `top`
+   * offset written again, because `bottom: auto` alone still loses to `.tooltip.left`'s `top: 50%`
+   * (also measured). The two `right` corners additionally restate the ARROW, because
+   * `.tooltip.right::after` is a horizontal pointer and wins on source order over
+   * `.tooltip.top::after` / `.tooltip.bottom::after`.
+   *
+   * All eight placements are gated in a browser by `e2e/harness.tooltip.pw.js`
+   * (`INLINE.PLACEMENT_WORKS`) — jsdom resolves neither the cascade nor over-constrained absolute
+   * positioning, so no jest suite can see any of this.
+   */
+
   &.top.right {
+    top: auto;
     left: auto;
     right: 0;
     transform: none;
 
     &::after {
+      top: calc(100% + @border-size);
+      bottom: auto;
       left: auto;
       right: @radius-base * 3;
+      width: 0;
+      height: @line-height;
+      border-top-width: 0;
+      border-left-width: @border-size;
     }
   }
 
   &.top.left {
+    top: auto;
     left: 0;
     right: auto;
     transform: none;
@@ -94,6 +136,38 @@
       width: 0;
       height: @line-height;
       border-left-width: @border-size;
+    }
+  }
+
+  &.bottom.right {
+    top: calc(100% + @line-height);
+    bottom: auto;
+    left: auto;
+    right: 0;
+    transform: none;
+
+    &::after {
+      top: auto;
+      bottom: calc(100% + @border-size);
+      left: auto;
+      right: @radius-base * 3;
+      width: 0;
+      height: @line-height;
+      border-top-width: 0;
+      border-left-width: @border-size;
+    }
+  }
+
+  &.bottom.left {
+    top: calc(100% + @line-height);
+    bottom: auto;
+    left: 0;
+    right: auto;
+    transform: none;
+
+    &::after {
+      left: @radius-base * 3;
+      right: auto;
     }
   }
 
@@ -133,4 +207,52 @@
       color: @color-text-inverse;
     }
   }
+}
+
+/**
+ * THE ANCHOR `TooltipPop` WRAPS ITS TRIGGER IN — `src/core/components/TooltipPop.js`.
+ * =============================================================================================
+ *
+ * An absolutely positioned bubble resolves against its nearest POSITIONED ANCESTOR, and a sibling
+ * is not one: measured, a bubble rendered next to its trigger with no positioned wrapper landed
+ * against `.app` at `top: -46px; left: 571px`. Injecting the bubble INTO the trigger was measured
+ * too and rejected — the trigger's accessible name became "ResetRemove Changes", because the
+ * bubble text joins name-from-content, and a childless trigger (`Icon` -> `<i>`,
+ * `Image` -> `<img>`, `Checkbox` -> `<input>`) cannot hold one at all. So the wrapper is the one
+ * shape left, and it is a stated cost rather than a discovery.
+ *
+ * `inline-flex` because it is the display that is layout-NEUTRAL for the shape the corpus uses —
+ * a tooltip on a `Button`, measured identical in a flex row and in a `<td>`. It is NOT neutral for
+ * a trigger that grows (`flex: 1 1 auto`) or for a block-level one, and no single display is
+ * neutral for both; `classWrap` is the escape hatch for those, documented in
+ * `docs/SUPPORTED-PROPS.md`.
+ *
+ * The bubble is a SIBLING of the trigger now, not a descendant, so the `.button &` block above
+ * cannot reach it. That is deliberate and it is an improvement: that block existed to UNDO what
+ * the bubble inherited from the button (`text-transform: none` against the button's uppercase, the
+ * base font weight against the button's). Outside the button the bubble simply inherits ordinary
+ * page typography, and `Tooltip.js` emits `no-wrap` itself, so the one declaration that mattered
+ * still applies.
+ */
+.tooltip-host {
+  position: relative;
+  display: inline-flex;
+
+  /*
+   * NOT cosmetic — the bubble's position is measured off THIS box, so the host has to be the
+   * trigger's size and nothing more.
+   *
+   * `inline-flex` alone is not enough: wherever the host lands in a flex container it becomes a
+   * flex item, CSS blockifies it (`inline-flex` -> `flex`, used value, with no rule to blame) and
+   * the container's default `align-items: stretch` then sizes it to the container. Measured in
+   * Chrome on `#buttonIcon`, whose parent is `div.flex--col`: the host came out 1222 px wide
+   * around a 35 px button and the bubble sat 559 px from its trigger — the same class of defect,
+   * a bubble nowhere near its trigger, that taking this component in-house was meant to fix.
+   *
+   * `fit-content` is a definite cross size, so `stretch` no longer applies. `width` only: the
+   * measured defect is horizontal, and `height: fit-content` would ALSO stop the host stretching
+   * vertically in a row container, which is how a wrapped button gets its height today. Pinned by
+   * `css.tooltip-contract.test.js` and measured end-to-end by `e2e/corpus.tooltip.pw.js`.
+   */
+  width: fit-content;
 }

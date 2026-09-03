@@ -827,10 +827,12 @@ exports[`demo example full-DOM contract buttonDownload renders a stable, non-emp
 exports[`demo example full-DOM contract buttonIcon renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <button class="button" type="button">
-      <i aria-hidden="true" class="icon-trash">
-      </i>
-    </button>
+    <span class="tooltip-host">
+      <button class="button" type="button">
+        <i aria-hidden="true" class="icon-trash">
+        </i>
+      </button>
+    </span>
   </div>
 </div>"
 `;

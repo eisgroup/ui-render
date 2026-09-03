@@ -73,7 +73,6 @@ function createSetupInstance ({
         fieldValues,
         registeredFieldValues,
         registeredFieldErrors,
-        Tooltip: ({ children }) => children,
     })
 
     const { form } = createFormApi({ values, registered, fieldStates })
@@ -291,7 +290,6 @@ describe('form data synchronization contracts', () => {
             fieldValues,
             registeredFieldValues,
             registeredFieldErrors,
-            Tooltip: ({ children }) => children,
         })
         const parent = { form: createFormApi().form, handleSubmit: jest.fn() }
         const instance = new NestedFormContent({

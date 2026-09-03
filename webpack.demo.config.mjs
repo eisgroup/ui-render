@@ -14,16 +14,27 @@ export default (env, argv) => {
     const isProduction = argv.mode === 'production';
     const envFile = isProduction ? '.env.production' : '.env.development';
 
+    // Both overrides default to exactly today's values, so `npm start`, `npm run build` and
+    // `npm run deploy` are unchanged. They exist for the Playwright leg (playwright.config.js),
+    // which needs a ROOT-relative production build it can hand to a plain static server:
+    // `/ui-render/` assets 404 unless the server mounts that prefix, which is why
+    // `npm run serve-build` cannot serve the current build either. `REACT_APP_BASE_NAME` (read by
+    // src/main.jsx via dotenv-webpack, where a system var wins over the .env file) is the router's
+    // half of the same switch. OUTPUT_DIR keeps the e2e build out of `build/` so it cannot be
+    // deployed to GitHub Pages by accident.
+    const publicPath = process.env.PUBLIC_PATH || (isProduction ? '/ui-render/' : '/');
+    const outputDir = process.env.OUTPUT_DIR || 'build';
+
     return {
         mode: isProduction ? 'production' : 'development',
         devtool: 'source-map',
         entry: './src/index.js',
         output: {
-            path: path.resolve(__dirname, 'build'),
+            path: path.resolve(__dirname, outputDir),
             filename: isProduction
                 ? 'static/js/[name].[contenthash:8].js'
                 : 'static/js/[name].js',
-            publicPath: isProduction ? '/ui-render/' : '/',
+            publicPath,
             clean: true,
         },
         module: {
@@ -67,6 +78,22 @@ export default (env, argv) => {
                             options: {
                                 lessOptions: {
                                     javascriptEnabled: true,
+                                    // `theme.config` is aliased to our own copy in
+                                    // `src/style/override/`, and that file does
+                                    // `@import (multiple) "theme.less"` — which Less resolves
+                                    // relative to the IMPORTING file, where no `theme.less` exists.
+                                    // It only ever worked because `src/style/__tests__/setup.js`
+                                    // copies `theme.config` into `node_modules/semantic-ui-less/`,
+                                    // next to that package's own `theme.less`. So the build silently
+                                    // depended on the CSS test suite having run first: in CI the
+                                    // `verify` job happens to run `test:coverage` before `build`,
+                                    // and the new browser job — `npm ci` straight to the build —
+                                    // failed on a clean checkout. Giving Less the package directory
+                                    // makes the build self-sufficient instead.
+                                    paths: [
+                                        path.resolve(__dirname, 'node_modules/semantic-ui-less'),
+                                        path.resolve(__dirname, 'node_modules'),
+                                    ],
                                     relativeUrls: false,
                                     plugins: [new LessPluginFunctions()],
                                 },
