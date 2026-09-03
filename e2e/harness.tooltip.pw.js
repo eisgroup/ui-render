@@ -18,7 +18,7 @@
  * Expected values live in e2e/reference.js with [R] / [I] / [R->I] tags. The harness page's own
  * header explains why each section is shaped the way it is.
  */
-const { test, expect, BUBBLE, ANY_BUBBLE, INLINE_BUBBLE, rectOf, adjacency, isWithin, paintOf, topmostAt } = require('./fixtures')
+const { test, expect, BUBBLE, ANY_BUBBLE, INLINE_BUBBLE, rectOf, adjacency, isWithin, paintOf, topmostAt, paintedTopmostAt } = require('./fixtures')
 const { BUBBLE_CLASS, INLINE, TIMING, WIDGET } = require('./reference')
 
 const bubble = (page) => page.locator(BUBBLE).first()
@@ -49,31 +49,84 @@ test.describe('harness: does it position at all', () => {
         const bubbleRect = await rectOf(anyBubble(page))
         const near = adjacency(bubbleRect, triggerRect)
 
-        // `top left`: the bubble sits immediately above the trigger and shares its left edge. Stated
-        // as relations, never as pixel values — the webfonts are blocked, so text metrics come from
+        // `top`: the bubble sits immediately above the trigger and is CENTRED on it. Stated as
+        // relations, never as pixel values — the webfonts are blocked, so text metrics come from
         // whatever fallback face the platform provides and absolute widths are not portable.
         expect(near.gapAbove, `bubble should sit just above the trigger; measured ${JSON.stringify(near)}`)
             .toBeGreaterThanOrEqual(0)
         expect(near.gapAbove).toBeLessThan(8)
         expect(near.overlapX, 'the bubble must overlap the trigger horizontally').toBeGreaterThan(0)
-        expect(bubbleRect.left).toBeCloseTo(triggerRect.left, 0)
+        // CENTRED, where the wrapper shared the trigger's LEFT edge: the wrapper requested
+        // `top left`, which was semantic-ui-react's own default rather than anything a meta asked
+        // for, and `reference.js` finding 4 measured our corner placements as broken — `top left`
+        // lands on top of the host. The replacement asks for `top`, one of the four that work.
+        expect(bubbleRect.left + bubbleRect.width / 2)
+            .toBeCloseTo(triggerRect.left + triggerRect.width / 2, 0)
 
-        expect(pageErrors.filter((error) => error.kind === 'pageerror'), 'popper only throws when the reference element is null').toEqual([])
+        expect(pageErrors.filter((error) => error.kind === 'pageerror'), 'nothing throws: there is no popper and no ref to be null').toEqual([])
     })
 
     /**
-     * Split out of the adjacency test above. That the bubble lands next to its trigger is the
-     * obligation; that a popper WRAPPER received a transform to put it there is Semantic's
-     * mechanism. An inline bubble has no wrapper at all, so asserting both in one body made a
-     * genuine invariant unpassable after the planned convergence.
+     * Split out of the adjacency test above, and now the record of HOW the bubble gets there. Part
+     * 2 asserted a transform on a popper wrapper; there is no wrapper and no transform, because
+     * placement is CSS off the host box. Kept as its own test rather than folded into the
+     * adjacency one for the same reason it was split: "the bubble is next to its trigger" is the
+     * obligation, and the mechanism is not.
      */
-    test('[R] and the coordinates arrive as a transform on a popper wrapper', async ({ page }) => {
+    test('[I] the bubble is a child of the host, placed by CSS, with no wrapper and no transform', async ({ page }) => {
         await section(page, 'plain')
         await open(page, 'plain')
 
-        const transform = await bubble(page).evaluate((element) => getComputedStyle(element.parentElement).transform)
-        expect(transform).not.toBe('none')
+        // The bubble DOES carry a transform, and reading one is why this assertion is shaped the
+        // way it is: `tooltip.less` centres it with `translateX(-50%)`. The difference from the
+        // wrapper is the point — a CSS translation is a constant of the placement, while popper
+        // wrote a computed x AND y onto a wrapper element on every open. So: no wrapper, and no
+        // vertical component in the one transform that remains.
+        expect(await anyBubble(page).evaluate((element) => {
+            const own = new DOMMatrixReadOnly(getComputedStyle(element).transform)
+            return {
+                parentClass: element.parentElement.className,
+                parentTransform: getComputedStyle(element.parentElement).transform,
+                ownTranslatesVertically: own.f !== 0,
+                position: getComputedStyle(element).position,
+            }
+        })).toEqual({
+            parentClass: 'tooltip-host',
+            parentTransform: 'none',
+            ownTranslatesVertically: false,
+            position: 'absolute',
+        })
     })
+    /**
+     * THE ONE POSITIONING CASE THE IN-HOUSE COMPONENT CANNOT SERVE, measured rather than asserted in
+     * prose. The bubble is placed by CSS against `.tooltip-host`, so a trigger taken out of normal
+     * flow leaves the host collapsed at its static position and the bubble goes with the host.
+     * `semantic-ui-react` did not have this constraint, because popper measured the trigger element
+     * itself — and of the step's losses this is the only one a consumer meta could actually produce,
+     * through a `styles` attribute.
+     *
+     * Recorded as a LIMITATION rather than treated as a defect, because no meta in either corpus
+     * produces an out-of-flow trigger. Pinned so a future fix — or a regression in the opposite
+     * direction — is a visible diff rather than a surprise.
+     */
+    test('[R] a trigger taken out of normal flow leaves the bubble behind, with the host', async ({ page }) => {
+        await section(page, 'outOfFlowTrigger')
+        const trigger = page.locator('[data-harness-trigger="outOfFlow"]')
+        await trigger.hover()
+        await anyBubble(page).waitFor({ state: 'visible', timeout: TIMING.OPEN_BY_MS * 4 })
+
+        const near = adjacency(await rectOf(anyBubble(page)), await rectOf(trigger))
+        expect(
+            near.centreDistance,
+            `the bubble follows the collapsed host, not the trigger; measured ${JSON.stringify(near)}`,
+        ).toBeGreaterThan(200)
+        // The host really is collapsed: that is the mechanism, not merely the symptom.
+        expect(await anyBubble(page).evaluate((element) => {
+            const rect = element.parentElement.getBoundingClientRect()
+            return { width: Math.round(rect.width), height: Math.round(rect.height) }
+        })).toEqual({ width: 0, height: 0 })
+    })
+
 
     test('[I] `position: fixed` inside `.ui-render` is viewport-relative and escapes `.app`\'s clip', async ({ page }) => {
         await section(page, 'plain')
@@ -101,60 +154,72 @@ test.describe('harness: does it position at all', () => {
 })
 
 test.describe('harness: collision handling', () => {
-    test('[R] flip: with no room above, `top left` resolves to `bottom left` and the class says so', async ({ page }) => {
+    /**
+     * FLIP IS GONE, and this is where that is stated as a measurement instead of a caveat. Part 2
+     * pinned popper resolving `top left` to `bottom left` here and rewriting the className to say
+     * so. CSS placement cannot flip: it does not measure, so the requested placement is the one
+     * you get even when it does not fit.
+     *
+     * The cost is bounded, which is why the step accepted it: this behaviour was reachable ONLY on
+     * this harness page. Every tooltip a meta can declare had a `null` reference element, so
+     * popper threw before writing a coordinate and nothing ever flipped in the product.
+     */
+    test('[R] no flip: with no room above, the bubble keeps the requested placement and overflows', async ({ page }) => {
         await section(page, 'flip')
-        const trigger = await open(page, 'flip')
+        await open(page, 'flip')
 
-        // THE flip-changes-the-className contract §9.5 names. The class carries popper's RESOLVED
-        // placement, and in jsdom it is always the requested one, so this is the assertion no jest
-        // suite can fake.
-        await expect(bubble(page)).toHaveClass(BUBBLE_CLASS.bottomLeft)
-        const near = adjacency(await rectOf(bubble(page)), await rectOf(trigger))
-        expect(near.gapBelow, `flipped bubble should sit just below the trigger; measured ${JSON.stringify(near)}`)
-            .toBeGreaterThanOrEqual(0)
-        expect(near.gapBelow).toBeLessThan(8)
+        await expect(anyBubble(page)).toHaveClass(BUBBLE_CLASS.top)
+        const rect = await rectOf(anyBubble(page))
+        expect(rect.top, 'no room above, and no flip, so the bubble leaves the viewport').toBeLessThan(0)
     })
 
-    test('[R] horizontal overflow: flip changes the ALIGNMENT and keeps the bubble in the viewport', async ({ page }) => {
+    /**
+     * The horizontal half of the same loss. Part 2 corrected the plan's "flip yes, shift no" by
+     * measuring that flip also flips the VARIATION, so a right-edge trigger resolved `top left` to
+     * `top right` and stayed on screen. Nothing does that now. Same bounded cost: reachable only
+     * here, never from a meta.
+     */
+    test('[R] no shift either: a right-edge trigger\'s bubble leaves the viewport', async ({ page }) => {
         await section(page, 'overflow')
         await open(page, 'overflow')
 
-        // Corrects §9.7-F1 step 2's "flip yes, shift no". `preventOverflow` is indeed off
-        // (`enabled: !!offset`, and nothing sets `offset`), but flip also flips the VARIATION, so a
-        // right-edge trigger resolves `top left` to `top right` and the bubble stays on screen. The
-        // parity bar for part 2 is therefore higher than "no overflow handling at all" — though the
-        // handling comes free with any placement logic that picks a side.
-        await expect(bubble(page)).toHaveClass(BUBBLE_CLASS.topRight)
-        const rect = await rectOf(bubble(page))
-        const viewport = page.viewportSize()
-        expect(rect.right, 'the bubble stays inside the viewport').toBeLessThanOrEqual(viewport.width + 1)
-        expect(rect.left).toBeGreaterThanOrEqual(0)
+        await expect(anyBubble(page)).toHaveClass(BUBBLE_CLASS.top)
+        const rect = await rectOf(anyBubble(page))
+        expect(rect.right, 'centred on a right-edge trigger, so it overflows')
+            .toBeGreaterThan(page.viewportSize().width)
     })
 
-    test('[R->I] clipping: the portal escapes an `overflow: hidden` box, the inline bubble does not', async ({ page }) => {
+    /**
+     * THE ONE REAL COST OF THE STEP, now shipped rather than predicted. Part 2 measured both
+     * shapes side by side in the same box: the portaled bubble painted 9 px ABOVE the box's top
+     * edge and was hit-testable there, while the inline bubble's layout rect left the box but
+     * nothing of it painted outside. Only the second shape exists now, so this test keeps the half
+     * that is still measurable — and it is the half that costs something.
+     */
+    test('[R] clipping: the bubble is confined to an `overflow: hidden` ancestor', async ({ page }) => {
         await section(page, 'clip')
         const box = await rectOf(page.locator('[data-harness="clip"]'))
-        const inlineRect = await rectOf(page.locator(`${INLINE_BUBBLE}.harness-inline-clipped`))
         await open(page, 'clipped')
-        const bubbleRect = await rectOf(bubble(page))
+        const bubbleRect = await rectOf(anyBubble(page))
 
-        // The portaled bubble renders ABOVE the box's own top edge...
-        expect(isWithin(bubbleRect, box), 'the portal is not confined to the box').toBe(false)
-        expect(bubbleRect.top).toBeLessThan(box.top)
-        // ...and is hit-testable there, so it is genuinely painted outside the clip.
-        const outside = await topmostAt(page, (bubbleRect.left + bubbleRect.right) / 2, (bubbleRect.top + bubbleRect.bottom) / 2)
-        expect(outside.inBubble, 'the portaled bubble paints outside the clip box').toBe(true)
-
-        // The inline bubble's LAYOUT rect also leaves the box — `getBoundingClientRect()` ignores
-        // clipping — but nothing of it is painted there. That difference is the single real cost of
-        // going inline, and this is the assertion part 2 has to answer.
-        expect(isWithin(inlineRect, box)).toBe(false)
-        expect(inlineRect.right).toBeGreaterThan(box.right)
-        const beyond = await topmostAt(page, box.right + 20, (inlineRect.top + inlineRect.bottom) / 2)
-        expect(beyond.inBubble, 'the inline bubble is clipped: it does not paint outside its box').toBe(false)
+        // `getBoundingClientRect()` ignores clipping, so the LAYOUT rect leaves the box...
+        expect(isWithin(bubbleRect, box), 'the layout rect is not confined to the box').toBe(false)
+        // ...and nothing of it is painted out there. `paintedTopmostAt`, not `topmostAt`: the
+        // bubble's own `pointer-events: none` would make a plain hit test answer `false` for a
+        // bubble that IS painted, which would pass this assertion for the wrong reason.
+        const beyond = await paintedTopmostAt(page, (bubbleRect.left + bubbleRect.right) / 2, box.top - 6)
+        expect(beyond && beyond.inBubble, 'the bubble is clipped: it does not paint above its box').toBe(false)
     })
 
-    test('[R] any scroll closes the bubble, and it flickers back ~50 ms later', async ({ page }) => {
+    /**
+     * FLIPPED, and it is a fix. Part 2 measured a SYNTHETIC window scroll closing the bubble and
+     * flickering it back ~50 ms later, from a real upstream bug: `Popup.js` never destructures the
+     * `hideOnScroll` prop, so its own local function of that name shadows it and the scroll
+     * listener is mounted unconditionally, with `capture: true`, so even a nested container's
+     * non-bubbling scroll reached it. `hideOnScroll` is dropped and there is no listener: a bubble
+     * that is a child of the thing that moves needs no repositioning and no dismissal.
+     */
+    test('[I] a scroll does not close the bubble any more', async ({ page }) => {
         await section(page, 'plain')
         await open(page, 'plain')
 
@@ -169,8 +234,8 @@ test.describe('harness: collision handling', () => {
         // this product, so the replacement owes nothing for it. An inline bubble gets correct
         // behaviour for free by being a child of the thing that moves.
         await page.evaluate(() => window.dispatchEvent(new Event('scroll')))
-        await expect(page.locator(BUBBLE)).toHaveCount(0, { timeout: TIMING.SCROLL_CLOSES_WITHIN_MS })
-        await expect(page.locator(BUBBLE)).toHaveCount(1, { timeout: TIMING.SCROLL_REOPENS_BY_MS })
+        await page.waitForTimeout(TIMING.SCROLL_CLOSES_WITHIN_MS)
+        await expect(anyBubble(page)).toBeVisible()
     })
 
     test('[R] scrolling the container under the pointer removes the bubble too', async ({ page }) => {
@@ -193,50 +258,70 @@ test.describe('harness: collision handling', () => {
         expect(inlinePaint.zIndex).toBe(INLINE.OPEN_PAINT.zIndex)
         expect(neighbour.bottom, 'the neighbour must overlap the bubble for this to mean anything')
             .toBeGreaterThan(inlineRect.top)
-        const overInline = await topmostAt(page, (inlineRect.left + inlineRect.right) / 2, inlineRect.top + 2)
+        // `paintedTopmostAt`, not `topmostAt`: the bubble's `pointer-events: none` makes a plain
+        // hit test report the neighbour BEHIND it, which read as "the bubble loses" for a bubble
+        // that wins. The instrument was wrong, not the paint order.
+        const overInline = await paintedTopmostAt(page, (inlineRect.left + inlineRect.right) / 2, inlineRect.top + 2)
         expect(overInline.inBubble, 'the inline bubble paints above the z-index 6 neighbour').toBe(true)
     })
 
     /**
-     * Split from the invariant above: the inline bubble winning at `z-index: 9` is the obligation,
-     * while the portal's `auto` and its wrapper's z-index are Semantic's arrangement, which the
-     * convergence deletes. Held together they made the invariant unpassable after the change.
+     * DELETED WITH THE PORTAL, and the deletion is recorded here rather than silently: this test
+     * pinned that Semantic's portal contributed no stacking of its own (`z-index: auto` on the
+     * bubble, a fixed value on the popper wrapper), which was the other half of the invariant
+     * above. There is no portal and no wrapper, so there is nothing left to measure — the bubble's
+     * own `z-index: 9` is now the whole stacking story and the invariant above is the whole test.
      */
-    test('[R] and the portal itself contributes no stacking of its own', async ({ page }) => {
-        await section(page, 'stack')
-
-        await open(page, 'stacked')
-        const portalPaint = await paintOf(bubble(page))
-        expect(portalPaint.zIndex).toBe('auto')
-        const wrapperZ = await bubble(page).evaluate((element) => getComputedStyle(element.parentElement).zIndex)
-        expect(wrapperZ).toBe(WIDGET.PORTAL_WRAPPER_Z_INDEX)
-    })
 })
 
 test.describe('harness: the dismissal contract, on a trigger with no action of its own', () => {
     // The corpus cannot express these cleanly: every tooltipped node there already owns its
     // `onClick`, so a click has two consumers (corpus.tooltip.pw.js records that). A plain
     // `<button>` isolates the component's own behaviour.
-    test('[R] click opens with no delay, a second click closes', async ({ page }) => {
+    /**
+     * OBLIGATION 2 OF THE STEP, discharged as a removal and measured here — the plain `<button>` is
+     * the only place it CAN be measured, because every tooltipped node in the corpus owns its own
+     * `onClick`. Part 2 pinned `click opens with no delay, a second click closes`; the gesture
+     * served the node's action and the tooltip at once, and the tooltip arrived after the action
+     * had run.
+     *
+     * The pointer leaves immediately after the click, because a click cannot avoid hovering first
+     * and a lingering pointer would open the bubble by HOVER 500 ms later — which is what made the
+     * first attempt at this measurement inconclusive.
+     */
+    test('[I] a click does not open it at all — the gesture belongs to the trigger', async ({ page }) => {
         await section(page, 'plain')
         const trigger = page.locator('[data-harness-trigger="plain"]')
-        await trigger.click()
-        await expect(page.locator(BUBBLE)).toHaveCount(1, { timeout: TIMING.CLICK_OPENS_WITHIN_MS })
-        await trigger.click()
-        await expect(page.locator(BUBBLE)).toHaveCount(0)
+        const box = await trigger.boundingBox()
+
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+        await page.mouse.down()
+        await page.mouse.up()
+        await page.mouse.move(4, 4)
+        await expect(anyBubble(page)).not.toBeVisible()
+
+        // And not by the focus the click leaves behind either — `onPointerDown` suppresses that
+        // one focus-open, without which dropping the click gesture changed nothing a user sees.
+        await page.waitForTimeout(TIMING.OPEN_BY_MS * 2)
+        await expect(anyBubble(page)).not.toBeVisible()
+        expect(await trigger.evaluate((element) => element === document.activeElement),
+            'the trigger still takes focus normally; only the tooltip ignores it').toBe(true)
     })
 
     test('[I] a click outside closes it; Escape closes it', async ({ page }) => {
         await section(page, 'plain')
         const trigger = page.locator('[data-harness-trigger="plain"]')
 
-        await trigger.click()
-        await expect(anyBubble(page)).toBeVisible({ timeout: TIMING.CLICK_OPENS_WITHIN_MS })
+        // Opened by HOVER, where part 2 opened by click: the click gesture is gone, and a
+        // dismissal test that opens with it would fail on its setup and read as a dismissal
+        // regression. Both dismissals below are the ones a keyboard user depends on.
+        await trigger.hover()
+        await expect(anyBubble(page)).toBeVisible({ timeout: TIMING.OPEN_BY_MS * 4 })
         await page.mouse.click(40, 700)
         await expect(anyBubble(page)).not.toBeVisible()
 
-        await trigger.click()
-        await expect(anyBubble(page)).toBeVisible({ timeout: TIMING.CLICK_OPENS_WITHIN_MS })
+        await trigger.hover()
+        await expect(anyBubble(page)).toBeVisible({ timeout: TIMING.OPEN_BY_MS * 4 })
         await page.keyboard.press('Escape')
         await expect(anyBubble(page)).not.toBeVisible()
     })
@@ -282,19 +367,20 @@ test.describe('harness: the convergence target — the in-house `Tooltip`', () =
         expect(arrow.beforeContent).toBe('none')
     })
 
-    test('[R->I] only four of the eight placements work, and `top left` is not one of them', async ({ page }) => {
+    test('[I] all eight placements put the bubble clear of its host, on the side it asked for', async ({ page }) => {
         await section(page, 'placements')
 
-        // FINDING 4 in reference.js, and the most consequential thing this leg produced. The plan
-        // credits `tooltip.less` with an eight-placement vocabulary the replacement inherits.
-        // Measured: `top`, `bottom`, `left`, `right` place the bubble clear of its host; the four
-        // CORNER combinations do not, because `.tooltip.left`/`.tooltip.right` set `top: 50%` at the
-        // same specificity as `.tooltip.top`/`.tooltip.bottom`. `top left` — the ONLY placement
-        // `TooltipPop` uses in production — puts the bubble ON its own trigger.
+        // FINDING 4 in reference.js, and the most consequential thing this leg produced — now
+        // CLOSED. Part 2 measured four of the eight working: the corner combinations put the
+        // bubble ON its own trigger, because `.tooltip.left`/`.tooltip.right` set `top: 50%` at the
+        // same specificity as `.tooltip.top`/`.tooltip.bottom`, so a corner class string matched
+        // both and the axis came out over-constrained. Part 3 fixed it in `tooltip.less` by writing
+        // the losing offset back per corner rather than by raising specificity.
+        //
+        // Two of the eight were never broken at all: see `alignedToSide` below.
         //
         // Invisible to jsdom, which resolves neither the cascade nor over-constrained absolute
-        // positioning. Pinned at the broken value so this suite is green today; part 2 owes either a
-        // `tooltip.less` fix or an explicit decision to restrict the vocabulary.
+        // positioning — which is the whole reason this leg exists.
         const measured = {}
         const overlapping = []
         for (const name of Object.keys(INLINE.PLACEMENT_WORKS)) {
@@ -311,10 +397,17 @@ test.describe('harness: the convergence target — the in-house `Tooltip`', () =
                 left: () => rect.right <= host.left + 1,
                 right: () => rect.left >= host.right - 1,
             }
-            // A corner asks for BOTH: `top left` means above the host AND aligned to its left edge,
-            // never merely "to the left of it".
+            // A corner asks for BOTH: `top left` means above the host AND aligned to its left
+            // edge, never merely "to the left of it" — and `top right` means aligned to its RIGHT
+            // edge. Part 2 checked `rect.left === host.left` for all four corners, which a right
+            // corner cannot satisfy by definition, so `top right` and `bottom right` were reported
+            // broken while being placed correctly. That false negative outlived the CSS fix and is
+            // why this map read 6/8 rather than 8/8.
+            const alignedToSide = () => (side === 'right'
+                ? Math.abs(rect.right - host.right) < 2
+                : Math.abs(rect.left - host.left) < 2)
             measured[name] = side
-                ? placedOnRequestedSide[axis]() && Math.abs(rect.left - host.left) < 2
+                ? placedOnRequestedSide[axis]() && alignedToSide()
                 : placedOnRequestedSide[axis]()
         }
         expect(measured).toEqual(INLINE.PLACEMENT_WORKS)

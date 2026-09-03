@@ -64,21 +64,19 @@ describe('overlay behavioural contract', () => {
 
     describe('Tooltip', () => {
         /**
-         * The hover delay is a timer, so these tests need fake ones. Two mechanics of
-         * SUIR's Popup make the teardown load-bearing rather than decoration:
+         * The hover delay is a timer, so these clauses need fake ones.
          *
-         *  - a tooltip that is still OPEN when the tree comes down leaves queued work
-         *    that runs against a detached node, and jsdom then throws "The provided
-         *    value is not of type 'Element'" from outside any test — which aborts the
-         *    whole jest worker instead of failing one assertion;
-         *  - doing the close in `afterEach` is not enough (measured): the close and the
-         *    unmount have to happen inside the test function.
-         *
-         * Hence `withTooltip`: it closes and unmounts in a `finally`, so a FAILING
-         * assertion still reports as a failure. When F1 Step 2 replaces this with a
-         * portal the component owns and tears down itself, this scaffolding can go —
-         * and the assertions inside it stay exactly as they are, which is the point of
-         * the layer.
+         * PART 3 NOTE — the teardown discipline is no longer a workaround. Under
+         * `semantic-ui-react` a tooltip still OPEN when the tree came down left queued
+         * work against a detached node and jsdom threw "The provided value is not of type
+         * 'Element'" from outside any test, aborting the whole jest worker; doing the close
+         * in `afterEach` was measured to be too late. Part 1's note ended "when F1 Step 2
+         * replaces this with a portal the component owns and tears down itself, this
+         * scaffolding can go — and the assertions inside it stay exactly as they are, which
+         * is the point of the layer." Both halves came true: the replacement tears itself
+         * down (`TooltipPop.behavior.test.js` asserts an open unmount directly), and eight
+         * of these eleven clauses needed no edit at all. The helper is kept as hygiene, so
+         * one clause's `document` listeners cannot reach the next.
          */
         const advance = ms => act(() => { jest.advanceTimersByTime(ms) })
 
@@ -93,6 +91,7 @@ describe('overlay behavioural contract', () => {
                 assertions(trigger)
             } finally {
                 fireEvent.mouseLeave(trigger)
+                fireEvent.blur(trigger)
                 advance(1000)
                 unmount()
             }
@@ -110,7 +109,10 @@ describe('overlay behavioural contract', () => {
                 fireEvent.mouseEnter(trigger)
                 advance(499)
                 // The 500 ms default exists so a passing cursor does not flash the
-                // tooltip; TooltipPop.js documents it as the deliberate UX choice.
+                // tooltip; TooltipPop.js documents it as the deliberate UX choice, and
+                // §9.7-F1 step 2's OBLIGATION 1 is that it survived the swap. It did, in
+                // JavaScript — `tooltip.less`'s `*:hover > &` reveal has no delay and
+                // cannot be given one, which is why the bubble is mounted only while open.
                 expect(screen.queryByText(TOOLTIP_TEXT)).not.toBeInTheDocument()
 
                 advance(1)
@@ -138,34 +140,36 @@ describe('overlay behavioural contract', () => {
             })
         })
 
-        it('records that the open tooltip is not yet wired to its trigger for assistive technology', () => {
-            // A TRIPWIRE, NOT AN ENDORSEMENT. F1 Step 2 lists `aria-describedby` as part
-            // of the in-house tooltip's job, and the ARIA pattern also wants
-            // `role="tooltip"` on the bubble. Today neither exists: the text appears in
-            // a portal with no relationship to the control it describes, so a
-            // screen-reader user never hears it, and a keyboard-only user — the trigger
-            // opens on hover, not on focus — never sees it either.
+        it('wires the open tooltip to its trigger for assistive technology', () => {
+            // FLIPPED BY §9.7-F1 step 2 part 3. Part 1 pinned the negative and said so
+            // explicitly: "when Step 2 adds them this test fails, and that failure is the
+            // signal to replace it with the positive assertions (the trigger names the
+            // bubble, the bubble carries role="tooltip", focus opens it) rather than to
+            // delete it." All three are asserted now, here and in the clause below.
             //
-            // When Step 2 adds them this test fails, and that failure is the signal to
-            // replace it with the positive assertions (the trigger names the bubble, the
-            // bubble carries role="tooltip", focus opens it) rather than to delete it.
+            // It is a consequence of dropping click-to-open, not a bonus: click was the
+            // only gesture a keyboard could reach, so without focus-open and the ARIA
+            // relationship the replacement would be LESS accessible than the broken
+            // component it replaced.
             withTooltip({}, trigger => {
                 fireEvent.mouseEnter(trigger)
                 advance(500)
 
                 expect(screen.getByText(TOOLTIP_TEXT)).toBeInTheDocument()
-                expect(trigger).not.toHaveAttribute('aria-describedby')
-                expect(screen.queryAllByRole('tooltip')).toEqual([])
+                const tip = screen.getByRole('tooltip')
+                expect(tip).toHaveTextContent(TOOLTIP_TEXT)
+                expect(trigger.getAttribute('aria-describedby')).toBe(tip.id)
             })
         })
 
-        it('does not open on keyboard focus, only on hover', () => {
-            // The other half of the same gap, kept separate because it is a different
-            // fix: F1 Step 2's "hover/focus triggers with delay". Today focusing the
-            // trigger produces nothing, so the tooltip is pointer-only.
+        it('opens on keyboard focus as well as on hover, and closes on blur', () => {
+            // The other half of the same flip. `docs/UPGRADE-PLAN.md` §9.5 recorded "a
+            // keyboard-only user never sees it"; this is the clause that says they do.
             withTooltip({}, trigger => {
                 fireEvent.focus(trigger)
-                advance(1000)
+                expect(screen.getByText(TOOLTIP_TEXT)).toBeInTheDocument()
+
+                fireEvent.blur(trigger)
                 expect(screen.queryByText(TOOLTIP_TEXT)).not.toBeInTheDocument()
             })
         })
@@ -179,13 +183,13 @@ describe('overlay behavioural contract', () => {
          * instead (`Render.js:107`). A replacement that wired up the `view` and
          * forgot the attribute would have passed this suite.
          *
-         * The object form matters twice over: it is the only place a meta author
-         * reaches SUIR's own prop surface, because `Render.js` spreads the object
-         * straight through. That is 45 reachable props (`Popup.handledProps` ∪
-         * `Portal.handledProps`) against the 4 the wrapper itself declares, which is
-         * why step 2 owes an explicit decision about the passthrough rather than a
-         * replacement that happens to accept four props. `docs/SUPPORTED-PROPS.md`
-         * carries the 24 with a measured effect.
+         * The object form still matters twice over: it is the only place a meta author
+         * reaches the component's own prop surface, because `Render.js` spreads the
+         * object straight through. Part 3 NARROWED that surface deliberately, from
+         * `Popup.handledProps` ∪ `Portal.handledProps` (45 names) to the 13 the
+         * component declares — see `docs/SUPPORTED-PROPS.md` for the dropped list and
+         * `TooltipPop.test.js` for the assertion that each dropped name now warns
+         * instead of half-working.
          */
         describe('the `tooltip` attribute on any node', () => {
             const attributeMeta = (tooltip) => ({
@@ -234,34 +238,57 @@ describe('overlay behavioural contract', () => {
             })
 
             /**
-             * The passthrough, asserted at the level that proves it is open: `on`
-             * is not a prop the wrapper declares, documents or maps — it rides the
-             * spread into SUIR. Step 2's replacement either reproduces this surface
-             * or narrows the meta contract, and this is the test that will say which.
+             * REPLACES `passes an object `tooltip`'s unmapped props through to the
+             * overlay`, which drove `on: ['hover', 'focus']` — a prop that existed only
+             * because the rest bag rode into semantic-ui-react. Part 1 wrote it as the
+             * test "that will say which" of reproduce-the-surface or narrow-the-contract
+             * step 2 chose. It narrowed: `on` is gone, and the behaviour it selected is
+             * the default.
+             *
+             * The passthrough itself is still real and still needs gating, because
+             * `Render.js` spreads the object verbatim — so this drives a prop the
+             * component declares and neither `Render.js` nor `mapper.js` maps.
+             * `position` is the sharpest choice: it decides which of `tooltip.less`'s
+             * eight placement rules paints the bubble, and nothing between the meta and
+             * the component touches it.
              */
-            it('passes an object `tooltip`\'s unmapped props through to the overlay', () => {
-                withAttribute({ title: TOOLTIP_TEXT, on: ['hover', 'focus'] }, trigger => {
-                    fireEvent.focus(trigger)
+            it('passes an object `tooltip`\'s own props through — `position` reaches the bubble', () => {
+                withAttribute({ title: TOOLTIP_TEXT, position: 'bottom right' }, trigger => {
+                    fireEvent.mouseEnter(trigger)
+                    advance(500)
 
-                    expect(screen.getByText(TOOLTIP_TEXT)).toBeInTheDocument()
+                    // `inverted` comes from `Render.TooltipDefaultProps`, so the string
+                    // also records that the engine default and the meta's own props merge.
+                    expect(screen.getByRole('tooltip').getAttribute('class'))
+                        .toBe('tooltip no-wrap bottom right show inverted')
                 })
             })
 
-            it('leaves the tooltipped node itself unchanged while the tooltip is closed', () => {
-                // The wrapper adds no element and no attribute, which is why the
-                // 38-example DOM baseline is silent about tooltips BY CONSTRUCTION
-                // and not merely because the corpus's two declarations sit in an
-                // inactive `Tabs` panel. A rewrite that renders a hidden bubble at
-                // mount would change every snapshot and put invisible text in the
-                // accessibility tree; nothing else in the repo would notice.
+            it('wraps the tooltipped node in one span and changes nothing else while closed', () => {
+                // REWRITTEN, and the rewrite is the cost of going inline stated at the
+                // meta level. Part 1 asserted the node was byte-for-byte identical, which
+                // is why the 38-example DOM baseline was silent about tooltips BY
+                // CONSTRUCTION. It is no longer identical: an absolutely positioned bubble
+                // needs a positioned ancestor, so the trigger gains a wrapper — six lines
+                // in exactly one of the 38 snapshots, regenerated deliberately.
+                //
+                // What still holds, and is what the baseline's other tripwires depend on:
+                // no bubble, no text in the accessibility tree, no `role` (so
+                // `ROLE_CENSUS.buttonIcon` stays `{button: 1}`), and no attribute on the
+                // node itself.
                 const plain = mountMeta({ view: 'Row', items: [{ view: 'Button', children: 'Reset' }] })
                 const expected = plain.container.innerHTML
                 plain.unmount()
 
                 const { container, unmount } = mountMeta(attributeMeta(TOOLTIP_TEXT))
                 try {
-                    expect(container.innerHTML).toBe(expected)
+                    const host = container.querySelector('.tooltip-host')
+                    expect(host.tagName).toBe('SPAN')
+                    expect(host.getAttributeNames()).toEqual(['class'])
+                    expect(container.innerHTML.replace(/<span class="tooltip-host">|<\/span>/g, ''))
+                        .toBe(expected)
                     expect(screen.queryByText(TOOLTIP_TEXT)).not.toBeInTheDocument()
+                    expect(screen.queryAllByRole('tooltip', { hidden: true })).toEqual([])
                 } finally {
                     unmount()
                 }
@@ -269,36 +296,60 @@ describe('overlay behavioural contract', () => {
         })
 
         /**
-         * SUIR's `on` defaults to `['click', 'hover']`, so every meta-declared
-         * tooltip in the product is ALSO a click target — undocumented, ungated
-         * until now, and the behaviour a hover-only rewrite drops in silence.
-         * Recorded here at the meta level because that is where the promise lives;
-         * `TooltipPop.behavior.test.js` pins the same fact per component.
+         * OBLIGATION 2 AT THE META LEVEL: CLICK-TO-OPEN IS REMOVED.
+         *
+         * REPLACES `opens on a click of the trigger, with no delay`. That was
+         * semantic-ui-react's `on` defaulting to `['click', 'hover']`, so every
+         * meta-declared tooltip was ALSO a click target — undocumented, ungated until
+         * part 1, and measured harmful here rather than merely redundant: every
+         * tooltipped node in the corpus already owns its `onClick`, so one gesture fired
+         * the node's action AND the tooltip, and the tooltip arrived after the action had
+         * run. The meta level is where that promise lived, so this is where its removal
+         * is recorded.
          */
-        it('opens on a click of the trigger, with no delay', () => {
-            withTooltip({}, trigger => {
-                fireEvent.click(trigger)
-
-                expect(screen.getByText(TOOLTIP_TEXT)).toBeInTheDocument()
+        it('does not open on a click of the trigger, which the node\'s own action owns', () => {
+            const clicks = []
+            const { unmount } = mountMeta({
+                view: 'Row',
+                items: [{
+                    view: 'Button',
+                    children: 'Reset',
+                    tooltip: TOOLTIP_TEXT,
+                    onClick: () => clicks.push('action'),
+                }],
             })
+            try {
+                fireEvent.click(screen.getByRole('button', { name: 'Reset' }))
+                advance(1000)
+
+                // The node's own action ran, and only that.
+                expect(clicks).toEqual(['action'])
+                expect(screen.queryByText(TOOLTIP_TEXT)).not.toBeInTheDocument()
+            } finally {
+                unmount()
+            }
         })
 
         /**
-         * THE `items` FORM DOES NOT WORK, AND THIS PINS WHAT HAPPENS INSTEAD.
+         * THE `items` FORM WORKS NOW, AND THIS IS THE INVERSION.
          *
-         * `mapper.js` sets `props.children = items.map(Render)` — an ARRAY — and
-         * SUIR's `Portal` runs `React.Children.only()` on it, which throws even for
-         * a single item. The engine's error boundary catches it and renders the
-         * diagnostic string in the node's place, so the trigger disappears
-         * entirely: a meta author gets no tooltip AND no button.
+         * FLIPPED from `renders the error diagnostic instead of the node when `items` is
+         * used as the trigger`. `mapper.js` sets `props.children = items.map(Render)` —
+         * an ARRAY — and semantic-ui-react's `Portal` ran `React.Children.only()` on it,
+         * which threw even for a single item; the engine's error boundary caught the
+         * throw and rendered the diagnostic string in the node's place, so a meta author
+         * got no tooltip AND no button.
          *
-         * `docs/SUPPORTED-VIEWS.md` described `items` as the tooltip's BODY; it is
-         * the trigger, and this shape never rendered. The page is corrected in the
-         * same change as this test. Pinned as current behaviour: step 2 may keep it
-         * (the nested-object `children` form is the one in use) or fix it, but not
-         * by accident.
+         * The replacement clones nothing, so `React.Children.only` is gone and an array
+         * renders. That is a free by-product rather than a feature, and it costs the
+         * correction part 1 had just written onto `docs/SUPPORTED-VIEWS.md`, which is
+         * updated in the same change as this clause.
+         *
+         * The one thing it does NOT get is the ARIA relationship: `aria-describedby`
+         * needs a single element to sit on, and an array is not one. Asserted, so the
+         * limit is on the record.
          */
-        it('renders the error diagnostic instead of the node when `items` is used as the trigger', () => {
+        it('renders the trigger AND the tooltip when `items` is used as the trigger', () => {
             const { container, unmount } = mountMeta({
                 view: 'Row',
                 items: [{
@@ -308,9 +359,13 @@ describe('overlay behavioural contract', () => {
                 }],
             })
             try {
-                expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument()
-                expect(container).toHaveTextContent('[ui-render] render error')
-                expect(container).toHaveTextContent('React.Children.only')
+                const trigger = screen.getByRole('button', { name: 'Reset' })
+                expect(container).not.toHaveTextContent('[ui-render] render error')
+
+                fireEvent.mouseEnter(trigger)
+                advance(500)
+                expect(screen.getByText(TOOLTIP_TEXT)).toBeInTheDocument()
+                expect(trigger).not.toHaveAttribute('aria-describedby')
             } finally {
                 unmount()
             }

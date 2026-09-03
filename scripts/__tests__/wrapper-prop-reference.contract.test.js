@@ -67,12 +67,23 @@ const EXPECTED = {
     // `import {Popup} from 'semantic-ui-react'` and its `jest.mock('semantic-ui-react')`. Worth
     // reading as part of the surface rather than as noise — a suite that mocks the dependency it is
     // meant to be replacing is itself a coupling to it, and this counter is what made that visible.
-    // The two remaining test-side sites are `Dropdown.behavior.test.js`'s pair, which step 3 owes.
-    importSites: 4,
-    interceptedByWrapper: { TooltipPop: 4, Dropdown: 23 },
+    // 4 → 3 at step 2 part 3, which took the tooltip in-house: `TooltipPop.js`'s own import was
+    // the last PRODUCT site other than `Dropdown.js`. The two remaining test-side sites are
+    // `Dropdown.behavior.test.js`'s pair, which step 3 owes — after which this counter reaches 0
+    // and step 3½ can delete the dependency.
+    importSites: 3,
+    interceptedByWrapper: { Dropdown: 23 },
     // The in-house side. `Table` root consumes className/inverted/striped; the shared subcomponent
     // implementation consumes className; six subcomponents over six native elements.
-    inHouse: { Table: { root: 3, part: 1, subcomponents: 6 } },
+    //
+    // `TooltipPop` consumes 13 and has neither a shared part nor subcomponents — one `<span>` host
+    // and one bubble. 13 is also the whole accepted surface now, down from the 45 names SUIR's
+    // open rest spread reached, and the 18 that were reachable AND plausible warn once each in
+    // development rather than being silently ignored.
+    inHouse: {
+        Table: { root: 3, part: 1, subcomponents: 6 },
+        TooltipPop: { root: 13, part: 0, subcomponents: 0 },
+    },
     // 37/24 before step 1. The `Table` family was 16 tier-1 + 7 tier-2 of those, and it left the
     // forwarded set entirely — a component that imports nothing forwards nothing.
     //
@@ -82,8 +93,11 @@ const EXPECTED = {
     // `Popup`'s propTypes). Nothing about the component changed — the count moved because the
     // audit had understated an open rest spread by an order of magnitude, which is precisely the
     // number step 2 part 2 needs before it can decide what to drop.
-    forwardedTier1: 21,
-    forwardedTier2: 37,
+    // 21/37 → 17/13 at step 2 part 3: the tooltip left the forwarded set entirely, taking its 4
+    // curated props and its 24 measured passthrough rows with it. Both deltas are exact
+    // (21−4, 37−24), which is the check that the section moved rather than being rewritten.
+    forwardedTier1: 17,
+    forwardedTier2: 13,
     // The three props no tracked example uses but consumer metas do. `upward` and `disabled`
     // reach semantic-ui-react and are both styled, which is why a demo-derived checklist
     // would have been wrong — see UPGRADE-PLAN §9.7-F1 step 0. (`colGroup`, the third, is
@@ -185,6 +199,9 @@ describe('generated supported-prop reference', () => {
             component.subcomponents.map(({ name, element }) => `${name}:${element}`).join(' '),
         ])).toEqual([
             ['Table', 'Header:thead HeaderCell:th Row:tr Cell:td Body:tbody Footer:tfoot'],
+            // Empty on purpose: the tooltip is one element, not a family. The row is kept so that
+            // a new in-house component has to be added here deliberately.
+            ['TooltipPop', ''],
         ])
     })
 

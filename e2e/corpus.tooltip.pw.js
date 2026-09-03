@@ -56,89 +56,106 @@ async function openByHover (page, trigger) {
 const pageErrorsOf = (errors) => errors.filter((error) => error.kind === 'pageerror')
 
 test.describe('corpus: the string `tooltip` attribute, one step from a fresh load', () => {
-    test('[R->I] opening it writes no coordinates and raises one uncaught popper error', async ({ page, pageErrors }) => {
+    /**
+     * THE DEFECT THIS STEP EXISTED TO FIX, now inverted into the invariant. What part 2 measured
+     * here, at every use site a meta can declare: popper wrote no coordinates at all, stamped no
+     * resolved placement, left the bubble ~730 px from its trigger, and raised one uncaught
+     * `TypeError` per open from its flip modifier's clipping-parent lookup. Cause: SUIR clones the
+     * trigger with a `ref` and nothing reachable from a meta can hold one, so popper's reference
+     * element was `null` and `getClippingParents(null)` threw before a coordinate was written.
+     *
+     * @Note: the old version deliberately avoided string-matching the inline style, because a
+     *  `left: 0px` / `transform: none` assertion is a CSS SERIALIZATION FORM rather than the fact —
+     *  popper emits the equivalent `inset: auto auto 0px 0px; transform: translate(0px, 0px)` under
+     *  the same defect, so the spec would have announced the defect FIXED while it stood. The
+     *  positive form has no such trap: a measured centre-to-centre distance means the same thing
+     *  however the position is spelled.
+     */
+    test('[I] opening it places the bubble beside its trigger and raises nothing', async ({ page, pageErrors }) => {
         await openExample(page, 'buttonIcon')
         const trigger = page.locator('#buttonIcon button.button').first()
 
         expect(pageErrorsOf(pageErrors), 'the page must be error-free before any tooltip opens').toEqual([])
-        expect(await page.locator(BUBBLE).count(), 'a closed tooltip adds nothing to the document').toBe(0)
+        expect(await page.locator(ANY_BUBBLE).count(), 'a closed tooltip adds nothing to the document').toBe(0)
 
         await openByHover(page, trigger)
-        await expect(bubble(page)).toHaveText('Open popup')
+        await expect(anyBubble(page)).toHaveText('Open popup')
 
-        // The defect, in its scroll-independent form: popper never wrote a position.
-        //
-        // @Note: this deliberately does NOT string-match the inline style. An earlier version
-        //  asserted `style` contains `left: 0px` / `top: 0px` and `transform === 'none'`, which is a
-        //  CSS *serialization form*, not the fact. Review measured popper emitting the equivalent
-        //  `inset: auto auto 0px 0px; transform: translate(0px, 0px)` under the same defect — same
-        //  meaning, different spelling — so the spec failed and its message announced the defect was
-        //  FIXED when it was not. A popper or SUIR bump would reproduce that false signal. What
-        //  actually discriminates is the resolved offset plus the absence of a placement attribute.
-        const wrapper = await bubble(page).evaluate((element) => {
-            const parent = element.parentElement
-            const paint = getComputedStyle(parent)
-            const matrix = new DOMMatrixReadOnly(paint.transform === 'none' ? '' : paint.transform)
-            return {
-                // Numeric, so `0px` and `auto`-plus-`inset` reduce to the same answer.
-                offsetX: Math.round((parseFloat(paint.left) || 0) + matrix.m41),
-                offsetY: Math.round((parseFloat(paint.top) || 0) + matrix.m42),
-                placement: parent.getAttribute('data-popper-placement')
-                    || element.getAttribute('data-popper-placement'),
-            }
-        })
-        expect(CORPUS.WRAPPER_HAS_NO_COORDINATES, 'reference.js says coordinates ARE written now — update this spec, not the reference').toBe(true)
-        // Popper never ran to completion, so it never stamped the placement it resolved.
-        expect(wrapper.placement).toBeNull()
-        expect({ offsetX: wrapper.offsetX, offsetY: wrapper.offsetY }).toEqual({ offsetX: 0, offsetY: 0 })
-
-        // ...so the bubble is nowhere near the thing it describes.
-        const triggerRect = await rectOf(trigger)
-        const bubbleRect = await rectOf(bubble(page))
-        const near = adjacency(bubbleRect, triggerRect)
+        const near = adjacency(await rectOf(anyBubble(page)), await rectOf(trigger))
         expect(
             near.centreDistance,
             `the bubble should be adjacent to its trigger; measured ${JSON.stringify(near)}`,
-        ).toBeGreaterThan(CORPUS.MIN_CENTRE_DISTANCE_PX)
+        ).toBeLessThan(CORPUS.MAX_CENTRE_DISTANCE_PX)
+        expect(near.gapAbove, 'and immediately above it').toBeGreaterThanOrEqual(0)
 
-        // One uncaught error per open, from popper's clipping-parent lookup in the flip modifier.
-        const errors = pageErrorsOf(pageErrors)
-        expect(errors).toHaveLength(CORPUS.PAGE_ERRORS_PER_OPEN)
-        expect(errors[0].message).toMatch(CORPUS.PAGE_ERROR_PATTERN)
+        expect(pageErrorsOf(pageErrors)).toHaveLength(CORPUS.PAGE_ERRORS_PER_OPEN)
     })
 
-    test('[R] popper writes no data-popper-* attribute, so the resolved placement is readable only from the className', async ({ page }) => {
+    /**
+     * Kept from part 2 with its reason replaced. Then: popper stamped no `data-popper-*` attribute
+     * even when it positioned correctly, so the resolved placement was readable ONLY from the
+     * className — which is why the flip contract was a class assertion. Now: there is no popper,
+     * so the count is 0 for a stronger reason, and the class carries the REQUESTED placement.
+     * Weak on its own — the count was already 0 — so it is paired with the class string, which did
+     * change (`ui top left inverted popup transition visible` -> `tooltip no-wrap top show
+     * inverted`) and is the assertion that would catch a silent revert.
+     */
+    test('[I] no popper attributes anywhere, and the class carries the requested placement', async ({ page }) => {
         await openExample(page, 'buttonIcon')
         await openByHover(page, page.locator('#buttonIcon button.button').first())
 
-        await expect(bubble(page)).toHaveClass(BUBBLE_CLASS.topLeft)
+        await expect(anyBubble(page)).toHaveClass(BUBBLE_CLASS.top)
         const withPopperAttributes = await page.evaluate(() => Array.from(document.querySelectorAll('*'))
             .filter((element) => Array.from(element.attributes).some((a) => a.name.startsWith('data-popper'))).length)
         expect(withPopperAttributes).toBe(CORPUS.POPPER_DATA_ATTRIBUTE_COUNT)
     })
 
-    test('[R->I] the bubble portals outside `.ui-render`, so our CSS does not paint it', async ({ page }) => {
+    /**
+     * INVERTED, and this is the assertion that proves the CSS reaches the bubble at all. Part 2
+     * measured the bubble portaled into `document.body`, outside `.ui-render` — so prefixwrap,
+     * which scopes every rule under that class, left all 13 `.ui.popup` rules unable to match and
+     * the live tooltip was unstyled text: transparent background, no border, no padding,
+     * `z-index: auto`. The bubble is a sibling of its trigger now, and every one of those values
+     * is a painted one.
+     */
+    test('[I] the bubble is inside `.ui-render`, and our CSS paints it', async ({ page }) => {
         await openExample(page, 'buttonIcon')
         await openByHover(page, page.locator('#buttonIcon button.button').first())
 
         // The join `css.tooltip-contract.test.js` cannot make: `Element.matches()` proves a selector
         // matches, never that anything painted. This is computed style on the node that ships.
-        expect(await isInsideWidget(bubble(page))).toEqual({
+        expect(await isInsideWidget(anyBubble(page))).toEqual({
             insideUiRender: CORPUS.INSIDE_UI_RENDER,
             portalParent: CORPUS.PORTAL_PARENT_TAG,
         })
-        const paint = await paintOf(bubble(page))
-        expect(paint).toMatchObject(CORPUS.PAINT)
+        expect(await paintOf(anyBubble(page))).toMatchObject(CORPUS.PAINT)
+        // The step's hazard, measured on the node that ships rather than in the stylesheet: without
+        // it the bubble sits under the pointer and the tooltip flickers.
+        expect(await anyBubble(page).evaluate((element) => getComputedStyle(element).pointerEvents))
+            .toBe(CORPUS.POINTER_EVENTS)
     })
 
-    test('[R->I] the open bubble has no screen-reader wiring at all', async ({ page }) => {
+    /**
+     * INVERTED. Part 2 measured no `role`, no `id` and no `aria-describedby` anywhere — a defect,
+     * recorded as one rather than as a contract to preserve. The wiring exists BECAUSE
+     * click-to-open was dropped: with click gone and hover unavailable to a keyboard, this and
+     * focus-open are the only path to the content.
+     *
+     * `aria-describedby` is asserted EQUAL to the bubble's own id rather than to a literal — the id
+     * is a per-instance counter, so a literal would pin the counter instead of the wiring.
+     */
+    test('[I] the open bubble is wired to its trigger for assistive technology', async ({ page }) => {
         await openExample(page, 'buttonIcon')
         const trigger = page.locator('#buttonIcon button.button').first()
         await openByHover(page, trigger)
 
-        const wiring = await tooltipA11yWiring(page, trigger)
-        expect(wiring).toMatchObject(CORPUS.A11Y)
-        expect(wiring.wired, 'no role="tooltip" and no aria-describedby — an accessibility defect, not a contract').toBe(false)
+        const bubbleId = await anyBubble(page).getAttribute('id')
+        expect(bubbleId, 'the bubble needs an id for anything to point at it').toBeTruthy()
+        expect({
+            roleTooltipCount: await page.locator('[role="tooltip"]').count(),
+            bubbleRole: await anyBubble(page).getAttribute('role'),
+        }).toEqual(CORPUS.A11Y)
+        expect(await trigger.getAttribute('aria-describedby')).toBe(bubbleId)
     })
 })
 
@@ -165,19 +182,30 @@ test.describe('corpus: the `all` example, at the deep use site', () => {
         await expect(anyBubble(page)).toHaveText('Remove Changes')
     })
 
-    test('[R] and Semantic spells them with a `.content` wrapper and its own class string', async ({ page }) => {
+    /**
+     * REPLACED, not deleted: part 2 pinned Semantic's spelling — a `div.content` wrapper for a
+     * string or number body and NO wrapper for an element or function one, a conditional structure
+     * that `UIRender.overlay-behavior.test.js` had to read through visible text. The replacement
+     * has no wrapper on either path, so the body is the bubble's own children and the structure is
+     * the same whatever the body is.
+     */
+    test('[I] the body is the bubble\'s own children, with no wrapper element on either path', async ({ page }) => {
         await openFactorsTab(page)
 
-        // A string `tooltip` becomes `content`, which Semantic wraps; an element child does not
-        // get the wrapper (measured in part 1) — so only the Apply path carries it.
+        // The Apply path is the STRING one, which is the path that used to get the wrapper.
         await openByHover(page, page.getByRole('button', { name: 'Apply' }))
-        await expect(bubble(page).locator(`div.${CORPUS.CONTENT_CHILD_CLASS}`)).toHaveCount(1)
+        expect(await anyBubble(page).evaluate((element) => element.children.length))
+            .toBe(CORPUS.CHILD_ELEMENT_COUNT)
 
         await page.mouse.move(4, 4)
-        await expect(page.locator(BUBBLE)).toHaveCount(0)
+        await expect(anyBubble(page)).not.toBeVisible()
 
+        // ...and the ELEMENT path, which never had the wrapper, is now identical rather than
+        // merely similar — same child count, same class string.
         await openByHover(page, page.getByRole('button', { name: 'Reset' }))
-        await expect(bubble(page)).toHaveClass(BUBBLE_CLASS.topLeft)
+        expect(await anyBubble(page).evaluate((element) => element.children.length))
+            .toBe(CORPUS.CHILD_ELEMENT_COUNT)
+        await expect(anyBubble(page)).toHaveClass(BUBBLE_CLASS.top)
     })
 
     test('[I] the trigger sits behind a deep stack of clip/scroll ancestors', async ({ page }) => {
@@ -193,14 +221,22 @@ test.describe('corpus: the `all` example, at the deep use site', () => {
         expect(ancestors.map((a) => a.tag)).toContain('body')
     })
 
-    test('[R->I] the same defect at the deep site: no coordinates, one error per open', async ({ page, pageErrors }) => {
+    /**
+     * The same inversion at the DEEP site, and it is the one that matters most: part 2 measured
+     * 2538-3006 px between bubble and trigger here, against ~730 px at `buttonIcon`, because the
+     * distance was really the distance to the document origin and this site sits far down the page.
+     * Measured now: 40 px at both, i.e. the geometry no longer depends on where on the page the
+     * trigger is.
+     */
+    test('[I] the deep site places its bubble just as closely, and raises nothing', async ({ page, pageErrors }) => {
         await openFactorsTab(page)
         const trigger = page.getByRole('button', { name: 'Apply' })
         const before = pageErrorsOf(pageErrors).length
         await openByHover(page, trigger)
 
-        const near = adjacency(await rectOf(bubble(page)), await rectOf(trigger))
-        expect(near.centreDistance).toBeGreaterThan(CORPUS.MIN_CENTRE_DISTANCE_PX)
+        const near = adjacency(await rectOf(anyBubble(page)), await rectOf(trigger))
+        expect(near.centreDistance, `measured ${JSON.stringify(near)}`)
+            .toBeLessThan(CORPUS.MAX_CENTRE_DISTANCE_PX)
         expect(pageErrorsOf(pageErrors).length - before).toBe(CORPUS.PAGE_ERRORS_PER_OPEN)
     })
 })
@@ -236,38 +272,56 @@ test.describe('corpus: interaction, in real time with a real pointer', () => {
         expect(DISMISSAL.pointerLeavesTrigger).toBe('closes')
     })
 
-    test('[R] the pointer travelling onto the bubble closes it — the `hoverable: false` defect', async ({ page }) => {
+    /**
+     * UNCHANGED, and now for a reason rather than by omission. Part 2 recorded this as the
+     * `hoverable: false` defect — SUIR could have made the bubble hoverable and nothing passed the
+     * prop. It still closes, and it cannot do otherwise: the bubble must keep `pointer-events:
+     * none` (the step's hazard — without it the bubble sits under the pointer and the tooltip
+     * flickers), so the pointer over the bubble is really over whatever is behind it, `mouseleave`
+     * fires on the host, and it closes. Hoverable text and a non-interactive bubble are mutually
+     * exclusive; the bubble stays non-interactive.
+     */
+    test('[R] the pointer travelling onto the bubble still closes it', async ({ page }) => {
         await openExample(page, 'buttonIcon')
         await openByHover(page, page.locator('#buttonIcon button.button').first())
-        const rect = await rectOf(bubble(page))
+        const rect = await rectOf(anyBubble(page))
 
         // Geometric, and therefore inexpressible in jsdom: the pointer crosses the gap and lands on
         // the bubble itself. Nothing in the bubble can be read, hovered or selected.
         await page.mouse.move((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2)
-        await expect(page.locator(BUBBLE)).toHaveCount(0)
-        expect(DISMISSAL.pointerMovesOntoBubble).toBe('closes')
+        await expect(anyBubble(page)).not.toBeVisible({ timeout: TIMING.CLOSED_AFTER_LEAVE_BY_MS * 3 })
+        expect(CORPUS.TRAVEL_ONTO_BUBBLE_CLOSES).toBe(true)
     })
 
-    test('[R] on a real meta node the tooltip is a SECOND consumer of the same click', async ({ page }) => {
-        // semantic-ui-react's default `on` is `['click', 'hover']`, so every tooltip is also a click
-        // target. In this corpus every tooltipped node ALREADY has its own action (`onClick: 'popup'`
-        // on `buttonIcon`, `onClick: 'reset'` on this one), so the click path through meta is
-        // confounded by design and does not behave like the component's own toggle: measured here,
-        // the second click does NOT close the bubble, where a plain `<button>` on the harness page
-        // toggles cleanly (harness.tooltip.pw.js). That is the evidence behind part 2's open `on`
-        // decision — dropping `'click'` and adding `'focus'` removes the collision AND the keyboard
-        // gap in one change. The crisp dismissal contract is asserted on the harness for exactly
-        // this reason.
+    /**
+     * OBLIGATION 2, measured where the problem actually was. Part 2 recorded the collision: SUIR's
+     * default `on` is `['click', 'hover']`, and every tooltipped node in this corpus ALREADY owns
+     * its action (`onClick: 'popup'` on `buttonIcon`, `onClick: 'reset'` here), so one gesture
+     * served both and the tooltip arrived after the action had run. Worse, the tooltip did not even
+     * toggle cleanly on that path — the second click did NOT close it, where a plain `<button>` on
+     * the harness page toggled fine.
+     *
+     * The click belongs to the node again. Two routes had to be closed for that, and the second was
+     * found only here: dropping the `click` gesture, and then suppressing the focus-open that a
+     * mouse click produces on a `<button>` — without which the removal changed nothing a user sees.
+     */
+    test('[I] a click on a real meta node no longer opens the tooltip', async ({ page }) => {
         await openFactorsTab(page)
         const trigger = page.getByRole('button', { name: 'Reset' })
+        const box = await trigger.boundingBox()
 
-        await trigger.click()
-        await expect(page.locator(BUBBLE)).toHaveCount(1, { timeout: TIMING.OPEN_BY_MS * 2 })
-        await trigger.click()
-        await page.waitForTimeout(TIMING.CLOSED_AFTER_LEAVE_BY_MS)
+        // By coordinate, then leaving at once: a click cannot avoid hovering first, and a lingering
+        // pointer would open the bubble by HOVER 500 ms later.
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+        await page.mouse.down()
+        await page.mouse.up()
+        await page.mouse.move(4, 4)
+        await expect(anyBubble(page)).not.toBeVisible()
+
+        await page.waitForTimeout(TIMING.OPEN_BY_MS * 2)
         expect(
-            await page.locator(BUBBLE).count(),
-            'a second click on a node that owns its own onClick does not toggle the tooltip shut',
-        ).toBe(1)
+            await page.locator(ANY_BUBBLE).count(),
+            'the gesture belongs to the node\'s own action, by neither the click nor the focus route',
+        ).toBe(0)
     })
 })

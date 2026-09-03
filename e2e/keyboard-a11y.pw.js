@@ -39,42 +39,61 @@ test.describe('tooltip: keyboard', () => {
         expect(stops[1]).toMatchObject({ tag: 'input', harness: 'kbd-after' })
     })
 
-    test('[R->I] focusing the trigger does not open it — there is no keyboard path to the content', async ({ page }) => {
+    /**
+     * INVERTED, and it was ALSO PASSING FOR THE WRONG REASON, which is the more useful half of this
+     * note: the old body counted `BUBBLE` — the semantic-ui-react portal selector — which matches
+     * nothing once the tooltip is in-house. So "focus does not open it" stayed green after focus
+     * started opening it. Any assertion that a bubble is ABSENT has to use `ANY_BUBBLE`, or it
+     * proves only that SUIR is gone.
+     *
+     * No delay on this path: the 500 ms is a hover affordance, so a cursor crossing the control
+     * does not flash a bubble. Arriving by Tab is deliberate and there is nothing to debounce.
+     */
+    test('[I] focusing the trigger opens it immediately — the keyboard path to the content', async ({ page }) => {
         await page.goto('/harness/tooltip?section=keyboard')
         await page.locator('[data-harness-section="keyboard"]').waitFor()
         const trigger = page.locator('[data-harness-trigger="keyboard"]')
 
         await trigger.focus()
         expect(await activeElement(page)).toMatchObject({ tag: 'button', harness: 'keyboard' })
-        // Well past the 500 ms hover delay, so this is "focus does not open it", not "not yet".
-        await page.waitForTimeout(TIMING.OPEN_BY_MS)
-        expect(KEYBOARD.FOCUS_OPENS).toBe(false)
-        expect(await page.locator(BUBBLE).count(), 'an accessibility defect, not a contract to preserve').toBe(0)
+        expect(KEYBOARD.FOCUS_OPENS).toBe(true)
+        // Visible BEFORE the hover delay could have elapsed, which is what makes this the focus
+        // path rather than "the pointer happened to be there".
+        await expect(page.locator(ANY_BUBBLE).first()).toBeVisible({ timeout: TIMING.STILL_CLOSED_AT_MS })
     })
 
-    test('[R->I] the open bubble is invisible to assistive technology', async ({ page }) => {
+    /**
+     * INVERTED. Part 2 measured no `role`, no `id` and no `aria-describedby` anywhere — recorded as
+     * an accessibility defect rather than as a contract to preserve, and the reason `A11Y_WIRED`
+     * existed as a named fact at all.
+     */
+    test('[I] the open bubble is exposed as a tooltip and pointed at by its trigger', async ({ page }) => {
         await page.goto('/harness/tooltip?section=keyboard')
         await page.locator('[data-harness-section="keyboard"]').waitFor()
         const trigger = page.locator('[data-harness-trigger="keyboard"]')
         await trigger.hover()
-        await page.locator(BUBBLE).first().waitFor({ timeout: TIMING.OPEN_BY_MS * 4 })
+        await page.locator(ANY_BUBBLE).first().waitFor({ timeout: TIMING.OPEN_BY_MS * 4 })
 
         const wiring = await tooltipA11yWiring(page, trigger)
-        expect(KEYBOARD.A11Y_WIRED).toBe(false)
-        expect(wiring.wired).toBe(false)
-        expect(wiring.triggerAriaDescribedBy).toBeNull()
-        expect(wiring.roleTooltipCount).toBe(0)
-        // Playwright's own role query is the closest thing to an AT view available here, and it
-        // agrees: nothing about the bubble is exposed as a tooltip.
-        await expect(page.getByRole('tooltip')).toHaveCount(0)
+        expect(KEYBOARD.A11Y_WIRED).toBe(true)
+        expect(wiring.roleTooltipCount).toBe(1)
+        // Equal to the bubble's own id, never to a literal: the id is a per-instance counter, so a
+        // literal would pin the counter instead of the wiring.
+        expect(wiring.triggerAriaDescribedBy).toBe(wiring.bubbleId)
+        expect(wiring.bubbleId, 'the bubble needs an id for anything to point at it').toBeTruthy()
+        // Playwright's own role query is the closest thing to an AT view available here.
+        await expect(page.getByRole('tooltip')).toHaveCount(1)
     })
 
     test('[I] Escape closes an open bubble from an unrelated native input', async ({ page }) => {
         await page.goto('/harness/tooltip?section=keyboard')
         await page.locator('[data-harness-section="keyboard"]').waitFor()
 
-        await page.locator('[data-harness-trigger="keyboard"]').click()
-        await expect(page.locator(ANY_BUBBLE).first()).toBeVisible({ timeout: TIMING.CLICK_OPENS_WITHIN_MS })
+        // Opened by FOCUS, where part 2 opened by click — the click gesture is gone, and a
+        // dismissal test that opens with it would fail on its setup and read as a dismissal
+        // regression. Focus is also the honest setup here: this test is about the keyboard.
+        await page.locator('[data-harness-trigger="keyboard"]').focus()
+        await expect(page.locator(ANY_BUBBLE).first()).toBeVisible({ timeout: TIMING.OPEN_BY_MS })
         // Focus inside a native text input, which consumes most keys itself — jsdom has no native
         // focus semantics, so "does Escape still reach the document handler" is only answerable here.
         await page.locator('[data-harness="kbd-after"]').focus()

@@ -186,6 +186,37 @@ async function topmostAt (page, x, y) {
     }, [Math.round(x), Math.round(y)])
 }
 
+/**
+ * `topmostAt`, but able to see a tooltip bubble.
+ *
+ * WHY THIS EXISTS, because it looks like a workaround and is not: `tooltip.less` gives the bubble
+ * `pointer-events: none` — the step's own hazard fix, without which the bubble sits under the
+ * pointer, `mouseleave` fires on the host and the tooltip flickers. Hit-testing skips such
+ * elements ENTIRELY, so `document.elementFromPoint` over a bubble reports whatever is behind it.
+ * A paint assertion built on plain hit-testing therefore inverts silently: it reads `false` for a
+ * bubble that is painted perfectly, which is exactly how the stacking and clipping invariants
+ * broke when the bubble stopped being a portal.
+ *
+ * Paint order does not depend on `pointer-events`, so this re-enables it for the duration of the
+ * probe and puts the previous inline value back. Anything asserting that a bubble IS or IS NOT
+ * painted at a point must use this; `topmostAt` remains correct for everything else.
+ */
+async function paintedTopmostAt (page, x, y) {
+    const bubbles = page.locator('span.tooltip, div.ui.popup')
+    const restore = await bubbles.evaluateAll((elements) => elements.map((element) => {
+        const previous = element.style.pointerEvents
+        element.style.pointerEvents = 'auto'
+        return previous
+    }))
+    try {
+        return await topmostAt(page, x, y)
+    } finally {
+        await bubbles.evaluateAll((elements, previous) => {
+            elements.forEach((element, index) => { element.style.pointerEvents = previous[index] })
+        }, restore)
+    }
+}
+
 /** A short description of whatever currently has focus. Shared with step 3's matrix. */
 async function activeElement (page) {
     return page.evaluate(() => {
@@ -220,7 +251,10 @@ async function tabThrough (page, steps) {
 async function tooltipA11yWiring (page, trigger) {
     const describedBy = await trigger.getAttribute('aria-describedby')
     const roleTooltipCount = await page.locator('[role="tooltip"]').count()
-    const bubbleId = await page.locator(BUBBLE).first().getAttribute('id')
+    // `ANY_BUBBLE`, not `BUBBLE`: the SUIR selector matches nothing since the tooltip went
+    // in-house, so this helper timed out for every caller — and the `roleTooltipCount: 0`
+    // assertions built on it would have passed for the wrong reason.
+    const bubbleId = await page.locator(ANY_BUBBLE).first().getAttribute('id')
     return {
         triggerAriaDescribedBy: describedBy,
         roleTooltipCount,
@@ -242,6 +276,7 @@ module.exports = {
     paintOf,
     isInsideWidget,
     topmostAt,
+    paintedTopmostAt,
     activeElement,
     tabThrough,
     tooltipA11yWiring,

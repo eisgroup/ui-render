@@ -77,65 +77,122 @@
  *    NOT hit-testable outside it. Both halves measured on the same page, in the same box.
  */
 
-/** The exact class string `TooltipPop` emits, per resolved placement. [R] */
+/**
+ * The exact class string `TooltipPop` emits. [I] since §9.7-F1 step 2 part 3 — one string, because
+ * the placement words are the REQUESTED position now, not popper's resolved one, so there is no
+ * flip to rewrite them.
+ *
+ * WHY `top` AND NOT `top left`, WHICH IS WHAT THE WRAPPER EMITTED: item 4 of the header above
+ * measured `tooltip.less`'s corner placements as broken — `top left` and `top right` land ON TOP OF
+ * the host. `top left` was semantic-ui-react's own default rather than anything a meta asked for,
+ * so the replacement defaults to `top`, which is one of the four that work. That is a deliberate
+ * divergence: a bubble centred above its trigger instead of left-aligned above it, and a working
+ * placement instead of one sitting on its own trigger.
+ */
 const BUBBLE_CLASS = {
-    // The only placement anything in production requests, and the literal already pinned by
-    // `TooltipPop.test.js`. [R]
-    topLeft: 'ui top left inverted popup transition visible',
-    // Popper's RESOLVED placement after a vertical flip. Only reachable with a ref-able trigger. [R]
-    bottomLeft: 'ui bottom left inverted popup transition visible',
-    // ...and after a horizontal one. [R]
-    topRight: 'ui top right inverted popup transition visible',
+    top: 'tooltip no-wrap top show inverted',
 }
 
 /** What the corpus — i.e. everything a meta can declare — actually does. */
 const CORPUS = {
     /**
-     * [R->I] No coordinates are written: popper's wrapper keeps its initial `left: 0px; top: 0px`
-     * and never receives a transform. This is the defect, stated in the most scroll-independent
-     * form available, because the resulting viewport rect depends on how far the page is scrolled.
+     * [I] The bubble is adjacent to its trigger. Measured centre-to-centre: 40 px at `buttonIcon`
+     * and 40 px at the deep `all`/Factors site, against 729 px and 2538-3006 px before the step —
+     * the defect this replaced. A loose ceiling, because the point is "adjacent", not a pixel
+     * value; the bubble is 40 px tall, so a centre 40 px above a 40 px trigger is flush with it.
      */
-    WRAPPER_HAS_NO_COORDINATES: true,
+    MAX_CENTRE_DISTANCE_PX: 120,
     /**
-     * [R->I] ...and therefore the bubble is nowhere near its trigger. A deliberately loose
-     * threshold: the measured distances were 729 px (`buttonIcon`) and 2538-3006 px (`all`), and
-     * the point is "not adjacent", not a pixel value. After part 2 this must be small.
+     * [I] Nothing throws. This was 1 uncaught `TypeError` PER OPEN from popper's clipping-parent
+     * lookup, at every use site a meta can declare, because SUIR cloned the trigger with a `ref`
+     * and nothing a meta can declare can hold one. There is no popper and no ref to fail.
      */
-    MIN_CENTRE_DISTANCE_PX: 500,
-    /** [R->I] Exactly one uncaught error per open, from popper's clipping-parent lookup. */
-    PAGE_ERRORS_PER_OPEN: 1,
-    PAGE_ERROR_PATTERN: /getComputedStyle/,
+    PAGE_ERRORS_PER_OPEN: 0,
     /**
-     * [R] Popper writes no `data-popper-*` attribute at all — not even when it positions correctly
-     * (verified on the harness). Corrects a plausible-sounding assumption: the resolved placement
-     * is readable ONLY from the className, which is why the flip contract is a class assertion.
+     * [I] Still 0, for a new reason: there is no popper at all. Kept because the value is the same
+     * either way, which makes it a poor gate on its own — the placement assertion is the class
+     * string, and the geometry assertion is the distance above.
      */
     POPPER_DATA_ATTRIBUTE_COUNT: 0,
-    /** [R->I] The bubble portals to `document.body`, outside `.ui-render`, so none of the 13 scoped popup rules can reach it. */
-    PORTAL_PARENT_TAG: 'BODY',
-    INSIDE_UI_RENDER: false,
     /**
-     * [R->I] Consequence of the above, measured as computed style rather than selector matching —
-     * the gap `css.tooltip-contract.test.js` explicitly cannot close. Every one of these is what
-     * "unstyled" means concretely.
+     * [I] The bubble is a SIBLING of the trigger inside `.ui-render`, not a portal into
+     * `document.body`. This is what makes our own CSS reach it: prefixwrap scopes every rule under
+     * `.ui-render`, so the 13 popup rules could never paint a bubble that portaled outside it.
+     */
+    PORTAL_PARENT_TAG: null,
+    INSIDE_UI_RENDER: true,
+    /**
+     * [I] Painted, measured as computed style rather than selector matching — the gap
+     * `css.tooltip-contract.test.js` explicitly cannot close. Every value here was the "unstyled"
+     * default before the step: transparent background, no border, no padding, `z-index: auto`.
      */
     PAINT: {
-        backgroundColor: 'rgba(0, 0, 0, 0)',
-        borderTopWidth: '0px',
-        paddingTop: '0px',
+        display: 'flex',
+        position: 'absolute',
+        backgroundColor: 'rgb(41, 38, 56)',
+        borderTopWidth: '1px',
+        paddingTop: '12px',
         boxShadow: 'none',
         maxWidth: 'none',
-        zIndex: 'auto',
+        zIndex: '9',
         beforeContent: 'none',
     },
-    /** [R->I] No screen-reader wiring whatsoever. An accessibility defect, not a contract to preserve. */
+    /**
+     * [I] `pointer-events: none`, and it is load-bearing twice over: without it the bubble sits
+     * under the pointer, Playwright reports the trigger as unhoverable, and `mouseleave` fires on
+     * the host so the tooltip flickers. It is also why the bubble is NOT hoverable — see
+     * TRAVEL_ONTO_BUBBLE_CLOSES.
+     */
+    POINTER_EVENTS: 'none',
+    /**
+     * [I] Full screen-reader wiring, where there was none: no `role`, no `id`, no
+     * `aria-describedby` anywhere. Added BECAUSE click-to-open was dropped — with click gone and
+     * hover unavailable to a keyboard, this and focus-open are the only path to the content.
+     * `triggerAriaDescribedBy` is asserted EQUAL to the bubble's own id rather than to a literal:
+     * the id is a per-instance counter, and a wiring test that hard-codes it pins the counter
+     * instead of the wiring.
+     */
     A11Y: {
-        triggerAriaDescribedBy: null,
-        roleTooltipCount: 0,
-        bubbleId: null,
+        roleTooltipCount: 1,
+        bubbleRole: 'tooltip',
     },
-    /** [I] The bubble's own inner structure — `div.content` — which `UIRender.overlay-behavior` reads through visible text. */
-    CONTENT_CHILD_CLASS: 'content',
+    /**
+     * [I] No wrapper element inside the bubble: the body is the bubble's own children. SUIR added a
+     * `div.content` for a string or number body and NOT for an element or a function one — a
+     * conditional structure `UIRender.overlay-behavior.test.js` had to read through visible text.
+     */
+    CHILD_ELEMENT_COUNT: 0,
+    /**
+     * [I] A click does not open the tooltip, by ANY route — this is the user-visible half of
+     * dropping `on: ['click', 'hover']`. The browser leg is what makes it a real gate: focus-open
+     * was added for keyboard access, clicking a `<button>` focuses it, and so the bubble opened
+     * instantly on click again until `onPointerDown` suppressed that one focus. jsdom cannot find
+     * that, because nothing there focuses on click.
+     */
+    CLICK_OPENS: false,
+    /** [I] A touch tap does not open it either — same route, same guard. Was `[R]` "one tap opens". */
+    TAP_OPENS: false,
+    /**
+     * [I] Keyboard focus DOES open it, with no delay, and Escape closes it. The Escape case is
+     * answerable only in a browser: the listener is on `document`, so it must work with focus in
+     * an unrelated native input, and jsdom has no native focus semantics.
+     */
+    FOCUS_OPENS: true,
+    /**
+     * [R] The pointer travelling from the trigger onto the bubble CLOSES it — unchanged from the
+     * wrapper, which behaved this way because nothing passed `hoverable`. Not a defect that
+     * survived by accident: with `pointer-events: none` the pointer over the bubble is really over
+     * whatever is behind it, `mouseleave` fires on the host, and it closes. Hoverable text and a
+     * non-interactive bubble are mutually exclusive, and the bubble stays non-interactive.
+     */
+    TRAVEL_ONTO_BUBBLE_CLOSES: true,
+    /**
+     * [R] The 500 ms open delay, unchanged and deliberately slower than Semantic's 50 ms.
+     * Obligation 1 of the step. Measured in Chrome: nothing is in the DOM at all until it elapses,
+     * because the bubble is mounted only while open — which is also what makes the delay possible,
+     * since a bubble that IS in the DOM is revealed instantly by `*:hover > .tooltip`.
+     */
+    OPEN_DELAY_MS: 500,
 }
 
 /** Interaction timing, in milliseconds. Windows rather than boundaries, so the leg is not a stopwatch. */
@@ -193,18 +250,26 @@ const INLINE = {
      *          the replacement needs, so part 2 owes a `tooltip.less` fix or an explicit decision
      *          to restrict the vocabulary.
      */
+    /**
+     * [I] EIGHT OF EIGHT since §9.7-F1 step 2 part 3. Two things moved this map, and only one of
+     * them was CSS: the corner rules were genuinely broken and are fixed in `tooltip.less`, while
+     * `top right` and `bottom right` were ALSO reported broken by an assertion that required every
+     * corner to align to its host's LEFT edge — which a right corner cannot do. The right corners
+     * were placing correctly the whole time. Kept as a map rather than collapsed to `true` so a
+     * regression names the placement it broke.
+     */
     PLACEMENT_WORKS: {
         top: true,
         bottom: true,
         left: true,
         right: true,
-        'top-left': false,
-        'top-right': false,
-        'bottom-left': false,
-        'bottom-right': false,
+        'top-left': true,
+        'top-right': true,
+        'bottom-left': true,
+        'bottom-right': true,
     },
-    /** [R->I] The corner placements that overlap their own host instead of sitting beside it. */
-    PLACEMENTS_OVERLAPPING_HOST: ['top-left', 'top-right'],
+    /** [I] No placement overlaps its own host any more. Was `top left` and `top right`. */
+    PLACEMENTS_OVERLAPPING_HOST: [],
     /** [R] The five snapshot-gated bubbles in the `slider` example — the only production use site today. */
     SLIDER_TOOLTIP_COUNT: 5,
     SLIDER_CLASS: 'tooltip no-wrap top show',
@@ -244,24 +309,46 @@ const WIDGET = {
 
 /** Touch, under an emulated `hasTouch` context. */
 const TOUCH = {
-    /** [R] `on: ['click', 'hover']` means one tap fires both paths; the second tap closes. */
-    FIRST_TAP: 'opens',
-    SECOND_TAP: 'closes',
+    /**
+     * [I] A TAP NO LONGER OPENS IT — the touch face of dropping click-to-open. Part 2 measured
+     * `on: ['click', 'hover']` firing both paths on one tap, with a second tap closing; on a touch
+     * device that made every tooltipped node's tooltip a competitor for its own action, with no
+     * hover to fall back on.
+     *
+     * The consequence is stated plainly rather than sold as a win: on a touch-only device there is
+     * now NO way to see a tooltip. That is the same trade desktop makes — the tooltip is
+     * supplementary and the node's action is not — and it is why the content must never be the only
+     * place information lives. Recorded here, in `docs/SUPPORTED-PROPS.md` under `dropped.on`, and
+     * in UPGRADE-PLAN §9.7-F1 step 2.
+     */
+    FIRST_TAP: 'does nothing',
+    SECOND_TAP: 'does nothing',
 }
 
 /**
  * Keyboard and a11y — the bones §9.5 asks for now and step 3's `Dropdown` matrix reuses.
- * Everything about the TOOLTIP here is a defect, recorded as the current state rather than as a
- * contract. Step 2 part 1 verified in jsdom that switching `on` to `['hover', 'focus']` closes the
- * gap immediately, and `tooltip.less:30` already reveals the inline bubble on `*:focus > &`.
+ *
+ * Every tooltip row here was a DEFECT in part 2 and is an invariant now. The two that flipped are
+ * not independent improvements: click-to-open was dropped because it collided with every
+ * tooltipped node's own action, and that removal is what MADE focus-open and the ARIA wiring
+ * mandatory — with click gone and hover unavailable to a keyboard there would otherwise be no path
+ * to the content at all.
  */
 const KEYBOARD = {
     /** [I] The trigger is reachable by Tab and is in DOM order between the two inputs. */
     TRIGGER_IS_TAB_REACHABLE: true,
-    /** [R->I] Focus does not open it: `on` is `['click', 'hover']`, so there is no keyboard path to the content at all. */
-    FOCUS_OPENS: false,
-    /** [R->I] No `role="tooltip"`, no `aria-describedby`, no id to point at. */
-    A11Y_WIRED: false,
+    /**
+     * [I] FOCUS OPENS IT, with no delay — was `false`. The delay is a hover affordance (it exists
+     * so a cursor crossing the control does not flash a bubble); arriving by Tab is deliberate, so
+     * there is nothing to debounce.
+     *
+     * Focus that arrives FROM A POINTER is the exception and does not open it: clicking a
+     * `<button>` focuses it, so without that guard dropping the click gesture would have changed
+     * nothing a user sees. See `CORPUS.CLICK_OPENS`.
+     */
+    FOCUS_OPENS: true,
+    /** [I] `role="tooltip"` on the bubble, an `id` to point at, and `aria-describedby` on the trigger. Was `false`. */
+    A11Y_WIRED: true,
     /** [I] Escape closes an open bubble even when focus sits in an unrelated native input. */
     ESCAPE_CLOSES_FROM_UNRELATED_ELEMENT: true,
 }

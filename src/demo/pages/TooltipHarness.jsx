@@ -74,14 +74,48 @@ const NOTE = { position: 'absolute', left: 16, top: 12, margin: 0, color: '#555'
 
 const BOX = { border: '1px solid #888', background: '#fff' }
 
-// A tooltip whose text is unique per site, so a spec never has to guess which bubble it found.
+/**
+ * A tooltip whose text is unique per site, so a spec never has to guess which bubble it found.
+ *
+ * `style` parks the WHOLE tooltip — the host and the trigger together — rather than the button
+ * inside it. It used to go on the button, which worked while `semantic-ui-react` measured the
+ * trigger's own rect through a ref, and stopped working the moment positioning became CSS off the
+ * host box: an absolutely positioned button is out of flow, so the host collapsed to 0x0 at its
+ * static position and the bubble followed the host instead of the button (measured: 300 px above
+ * the trigger, i.e. exactly the offset the button had been given). That is a real constraint of
+ * the in-house component and it has its own section below — but it is not what THIS site is for,
+ * which is "is the bubble next to its trigger at all, rather than at the document origin".
+ */
 function Pop ({ label, id, style, children }) {
     return (
-        <TooltipPop title={label} inverted>
-            <button type="button" data-harness-trigger={id} style={style}>{children}</button>
-        </TooltipPop>
+        <span style={style}>
+            <TooltipPop title={label} inverted>
+                <button type="button" data-harness-trigger={id}>{children}</button>
+            </TooltipPop>
+        </span>
     )
 }
+
+/**
+ * THE ONE POSITIONING CASE THE IN-HOUSE COMPONENT CANNOT SERVE, kept as its own site so it is
+ * measured rather than asserted in prose. The bubble is placed by CSS against
+ * `.tooltip-host`, so a trigger taken out of normal flow leaves the host collapsed at its static
+ * position and the bubble goes with the host. `semantic-ui-react` did not have this constraint,
+ * because popper measured the trigger element itself. No meta in either corpus produces an
+ * out-of-flow trigger, which is why this is recorded as a limitation and not treated as a defect.
+ */
+const outOfFlowTrigger = (
+    <>
+        <p style={NOTE}>out-of-flow: the trigger is absolutely positioned, the host is not.</p>
+        <TooltipPop title="Out of flow bubble" inverted>
+            <button
+                type="button"
+                data-harness-trigger="outOfFlow"
+                style={{ position: 'absolute', left: 320, top: 300 }}
+            >Out of flow</button>
+        </TooltipPop>
+    </>
+)
 
 /**
  * 1. POSITIONED AT ALL. A ref-able trigger parked 320 px right and 300 px down, so "adjacent to
@@ -344,7 +378,7 @@ const placements = (
     </>
 )
 
-const SECTIONS = { plain, flip, overflow, clip, scroll, stack, inline, placements, keyboard }
+const SECTIONS = { plain, outOfFlowTrigger, flip, overflow, clip, scroll, stack, inline, placements, keyboard }
 
 const TooltipHarness = () => {
     // Every section change is a full page load (the search string changes), so reading `location`
