@@ -387,11 +387,15 @@ export default function TooltipPop ({
     const supported = dropUnsupported(props)
 
     /**
-     * The trigger, rendered as given. Nothing is cloned for a ref — which is what was broken — and
-     * nothing is injected into it: measured, a bubble placed INSIDE the trigger joins its
-     * accessible name ("ResetRemove Changes") and cannot exist at all for a childless trigger.
-     * The one prop added is the ARIA relationship, and only while there is a bubble to point at,
-     * so no `aria-describedby` in this product ever dangles.
+     * The trigger, rendered as given, with EXACTLY ONE prop added: the ARIA relationship, and only
+     * while there is a bubble to point at, so no `aria-describedby` in this product ever dangles.
+     * (An earlier draft of this comment said "nothing is injected into it" two lines before naming
+     * what is.) No ref is cloned onto it — that is what was broken, and what nothing a meta can
+     * declare could satisfy.
+     *
+     * The bubble is a SIBLING of the trigger, not a child of it: measured, a bubble placed inside
+     * the trigger joins its accessible name ("ResetRemove Changes") and cannot exist at all for a
+     * childless trigger.
      *
      * A non-element trigger — the array `mapper.js` builds from `items`, or a text child — renders
      * as-is and gets no relationship. That the `items` form renders at all is new: SUIR ran

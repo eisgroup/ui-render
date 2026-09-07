@@ -134,6 +134,13 @@ const HOST_CLASS = 'tooltip-host';
 const SCOPED_RULES = [
     { selector: '.ui-render .tooltip', props: ['position', 'display', 'opacity', 'z-index', 'pointer-events'] },
     { selector: '.ui-render .tooltip.show', props: ['animation-delay', 'visibility', 'display', 'z-index'] },
+    // A CASCADE LOSER, pinned deliberately. Measured in Chrome: `animationDelay` is `0s` with
+    // AND without `.show`, because `index.less` imports `animations/animation` after
+    // `components/tooltip` and `.fade-in`'s `animation` SHORTHAND resets the delay at equal
+    // specificity. So this declaration sets what is already true and has no observable effect.
+    // It stays in the list because this file pins WHICH RULES MATCH, not which win — the
+    // cascade is out of scope here by design — but a reader must not infer that the
+    // declaration is load-bearing. The class `.show` IS: without it the bubble is `display: none`.
     { selector: '.ui-render .tooltip.show', props: ['animation-delay'] },
     { selector: '.ui-render .tooltip.top', props: ['bottom', 'left', 'transform'] },
     { selector: '.ui-render .tooltip', props: ['padding-top', 'padding-bottom', 'padding-left', 'padding-right'] },
@@ -193,11 +200,25 @@ const ARROW_SELECTORS = [
  * "redundant" fails here, in the file that can explain why it is not.
  */
 const CORNER_AXIS_DECLARATIONS = {
-    '.ui-render .tooltip.top.left': 'top',
-    '.ui-render .tooltip.top.right': 'top',
-    '.ui-render .tooltip.bottom.left': 'top',
-    '.ui-render .tooltip.bottom.right': 'top',
+    '.ui-render .tooltip.top.left': ['top', 'left', 'right', 'transform'],
+    '.ui-render .tooltip.top.right': ['top', 'left', 'right', 'transform'],
+    '.ui-render .tooltip.bottom.left': ['top', 'bottom', 'left', 'right', 'transform'],
+    '.ui-render .tooltip.bottom.right': ['top', 'bottom', 'left', 'right', 'transform'],
 };
+
+/*
+ * WHY THIS MAP GREW FROM ONE PROPERTY TO ALL OF THEM. It pinned `top` alone, while its own comment
+ * promised that "a later tidy-up that deletes one as redundant fails here" — so it did not do what
+ * it said. An adversarial review of the step named the gap, and the mechanics were agreed by every
+ * verifier even where they split on whether it mattered.
+ *
+ * `transform` is the one worth spelling out, because it is the least obviously load-bearing:
+ * the base `.tooltip` rule centres the bubble with `translateX(-50%)`, and `.tooltip.left` /
+ * `.tooltip.right` set their own `transform` at the SAME 0-2-0 specificity while sitting later in
+ * source order. A corner class string matches both, so `transform: none` on the corner is what
+ * stops `.tooltip.left`'s `translate(-100%, -50%)` from winning and shifting the bubble a full
+ * bubble-width left and half its height up. Delete it as "redundant" and all four corners move.
+ */
 
 /**
  * THE ARROW HALF OF THE SAME FIX, and it was unpinned until an adversarial review of the
@@ -415,10 +436,13 @@ describe('the tooltip className contract, against the compiled CSS', () => {
         //  selector visible in the failure output, which is what the message was for.
         const measured = {};
         const expected = {};
-        Object.entries(CORNER_AXIS_DECLARATIONS).forEach(([selector, property]) => {
+        Object.entries(CORNER_AXIS_DECLARATIONS).forEach(([selector, properties]) => {
             const rule = rules.find(one => one.selector === selector);
-            measured[selector] = rule ? rule.props.includes(property) : 'selector missing';
-            expected[selector] = true;
+            // The MISSING ones, so a failure names the declaration that went rather than `false`.
+            measured[selector] = rule
+                ? properties.filter(property => !rule.props.includes(property))
+                : 'selector missing';
+            expected[selector] = [];
         });
         expect(measured).toEqual(expected);
     });

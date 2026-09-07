@@ -823,6 +823,13 @@ function inHouseSection (component, { domProps, callSites }) {
         '',
         `**What it emits.** ${curation.classContract}`,
         '',
+        // `behaviourContract` was stored for in-house components and rendered only for wrappers, so
+        // the tooltip's whole open/close/dismiss contract — the part a consumer most needs, and the
+        // one that carries the WCAG 1.4.13 non-conformance — was missing from this page. Optional,
+        // because `Table` has no behaviour to state.
+        ...(curation.behaviourContract
+            ? [`**What opens and closes it.** ${curation.behaviourContract}`, '']
+            : []),
         row(['Component', 'Element', 'Notes']),
         row(['---', '---', '---']),
         ...component.subcomponents.map(({ name, element }) => row([

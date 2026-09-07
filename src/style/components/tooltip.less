@@ -24,6 +24,20 @@
    * body). It also gives `TooltipPop` its dismissal path back — the pointer can never land ON the
    * bubble, so travelling towards it leaves the host and fires `mouseleave`.
    */
+
+  /*
+   * WCAG 2.1 SC 1.4.13 "Content on Hover or Focus" is NOT fully met, and this declaration is why.
+   * Dismissable (Escape) and Persistent (it stays until dismissed) are satisfied; HOVERABLE is not
+   * — the pointer can never be moved onto the bubble, so its text cannot be hovered or selected.
+   *
+   * Kept anyway, and the reason is measured rather than assumed: the bubble is painted OVER its
+   * own trigger, so without this it swallows the pointer and the trigger stops responding at all
+   * (Playwright reported the trigger as unhoverable). A non-conformance that costs a reader the
+   * ability to hover text beats one that costs every user the control. `Slider` also relies on it:
+   * its handle drags on `pointerdown`, and a press inside the value bubble used to move the
+   * slider. Recorded as a known non-conformance in UPGRADE-PLAN §9.7-F1 step 2 and in
+   * `docs/SUPPORTED-PROPS.md`, not presented as a design choice.
+   */
   pointer-events: none;
 
   /* Vertical line */
