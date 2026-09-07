@@ -377,7 +377,10 @@ test.describe('harness: the convergence target — the in-house `Tooltip`', () =
         // both and the axis came out over-constrained. Part 3 fixed it in `tooltip.less` by writing
         // the losing offset back per corner rather than by raising specificity.
         //
-        // Two of the eight were never broken at all: see `alignedToSide` below.
+        // All four corners were genuinely broken in the CSS. What `alignedToSide` below fixes is a
+        // SECOND, independent defect — a false negative that would have kept `top right` and
+        // `bottom right` red even after the CSS was right, because the verdict demanded every
+        // corner align to its host's LEFT edge.
         //
         // Invisible to jsdom, which resolves neither the cascade nor over-constrained absolute
         // positioning — which is the whole reason this leg exists.

@@ -148,6 +148,7 @@ async function paintOf (locator) {
     return locator.evaluate((element) => {
         const style = getComputedStyle(element)
         const before = getComputedStyle(element, '::before')
+        const after = getComputedStyle(element, '::after')
         return {
             display: style.display,
             position: style.position,
@@ -158,6 +159,12 @@ async function paintOf (locator) {
             maxWidth: style.maxWidth,
             zIndex: style.zIndex,
             beforeContent: before.content,
+            // The ARROW, on the node that actually ships. `beforeContent` alone was the weaker
+            // half of this pair: it says the bubble has no `::before`, which is true and proves
+            // nothing about whether an arrow paints — the arrow is an `::after`, and a corpus
+            // bubble with no arrow at all would have satisfied every paint assertion here.
+            afterContent: after.content,
+            afterBorderWidth: after.borderTopWidth,
         }
     })
 }

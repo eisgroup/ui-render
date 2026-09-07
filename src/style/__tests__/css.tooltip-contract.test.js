@@ -200,6 +200,30 @@ const CORNER_AXIS_DECLARATIONS = {
 };
 
 /**
+ * THE ARROW HALF OF THE SAME FIX, and it was unpinned until an adversarial review of the
+ * step pointed out that reverting these two `::after` blocks restores the exact arrow
+ * defect with every other gate — jsdom, Playwright, coverage — still green. The
+ * `SCOPED_RULES` list above asserts these selectors EXIST; existing with the wrong
+ * declarations is the failure mode it cannot see.
+ *
+ * Why each is load-bearing, since "redundant" is exactly how they would be deleted:
+ *   right       anchors the pointer to the right END of the bubble. Without it the
+ *               arrow keeps the base rule's `left`, i.e. it points at nothing.
+ *   left: auto  UNDOES that base `left`. `right` alone loses to it — both are set and
+ *               the box is over-constrained, so the used value comes from `left`.
+ *   bottom/top  the vertical anchor, rewritten per corner for the same reason the
+ *               bubble's own axis is (see CORNER_AXIS_DECLARATIONS).
+ *
+ * Property names, not values, matching this file's convention: the values are LESS
+ * variables, and whether the result LOOKS right is a browser question (`harness`
+ * measures the arrow's painted border there).
+ */
+const CORNER_ARROW_DECLARATIONS = {
+    '.ui-render .tooltip.top.right::after': ['top', 'bottom', 'left', 'right'],
+    '.ui-render .tooltip.bottom.right::after': ['top', 'bottom', 'left', 'right'],
+};
+
+/**
  * The two properties `.ui.popup` had and `.tooltip` does not. Recorded as ABSENCES so
  * they stay decisions rather than becoming accidents:
  *
@@ -395,6 +419,19 @@ describe('the tooltip className contract, against the compiled CSS', () => {
             const rule = rules.find(one => one.selector === selector);
             measured[selector] = rule ? rule.props.includes(property) : 'selector missing';
             expected[selector] = true;
+        });
+        expect(measured).toEqual(expected);
+    });
+
+    it('keeps every declaration the two rewritten corner arrows depend on', () => {
+        const measured = {};
+        const expected = {};
+        Object.entries(CORNER_ARROW_DECLARATIONS).forEach(([selector, properties]) => {
+            const rule = rules.find(one => one.selector === selector);
+            measured[selector] = rule
+                ? properties.filter(property => !rule.props.includes(property))
+                : 'selector missing';
+            expected[selector] = [];
         });
         expect(measured).toEqual(expected);
     });

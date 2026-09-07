@@ -165,7 +165,7 @@ const IN_HOUSE_CURATION = {
         shipped: '§9.7-F1 step 2 part 3',
         summary: 'The hover tooltip, over the same inline `<span>` `components/Tooltip.js` has '
             + 'shipped for years. Reached two live ways: a `view: "Tooltip"` node (`mapper.js`, which '
-            + 'maps `label` to `title`) and the `tooltip` attribute on ANY node (`Render.js`, which '
+            + 'maps `label` to `content`) and the `tooltip` attribute on ANY node (`Render.js`, which '
             + 'wraps the rendered node and spreads an object `tooltip` — still an unfiltered '
             + 'passthrough, but into 13 accepted names now instead of 45). This was a FIX, not a '
             + 'trade: measured in real Chrome on the production build, the SUIR bubble rendered at the '
@@ -178,9 +178,12 @@ const IN_HOUSE_CURATION = {
             + 'same class string `Tooltip.js` emits, so the two converge on one CSS contract. The '
             + 'placement words are the REQUESTED position, not a resolved one: nothing measures, so '
             + 'there is no flip to rewrite them. Closed, the component renders the trigger '
-            + 'byte-for-byte as it renders without a tooltip and adds nothing to `document.body` — '
-            + 'which is why the 38-example DOM baseline is blind to tooltips by construction, exactly '
-            + 'as it was before.',
+            + 'byte-for-byte as it renders without a tooltip and adds nothing to `document.body`. '
+            + 'It is NOT invisible to the DOM baseline, though — an earlier draft said it was, and '
+            + 'this step\'s own snapshot diff refutes that: the host `<span class="tooltip-host">` is '
+            + 'new markup around the trigger and shows up at the one tooltip site the 38 examples '
+            + 'render at mount. What the baseline still cannot see is the BUBBLE, which exists only '
+            + 'while open, and therefore anything about opening, placement or dismissal.',
         behaviourContract: 'Opens on hover after `delay` (500 ms) and on focus, immediately. Closes '
             + '70 ms after the pointer leaves, on blur, on a click anywhere in the document, and on '
             + 'Escape. Leaving before the delay elapses cancels the pending open, and a pending open '
@@ -216,9 +219,14 @@ const IN_HOUSE_CURATION = {
             content: 'Alias for `title`, and it wins. Was only reachable through the rest spread '
                 + 'before, which is how a caller-supplied `content` used to override `title` by '
                 + 'accident of ordering; now that precedence is explicit.',
-            children: 'The trigger. Rendered inside the host `<span>` untouched — not cloned, so a '
-                + 'trigger\'s own handlers are never wrapped or replaced, and no `ref` is required of '
-                + 'it. That last part is the whole bug fix.',
+            children: 'The trigger, rendered inside the host `<span>`. NO `ref` is required of it, '
+                + 'which is the whole bug fix — `semantic-ui-react` cloned it for one, and nothing a '
+                + 'meta can declare can hold a ref. Its own handlers are never wrapped or replaced '
+                + 'either. It IS cloned, though, and an earlier draft of this row said otherwise: '
+                + 'while the tooltip is open the trigger is cloned once to carry '
+                + '`aria-describedby`, which is APPENDED to whatever the trigger already pointed at '
+                + 'rather than replacing it — a form control keeps the link to its own validation '
+                + 'message. Closed, there is no clone and no attribute.',
             delay: 'Milliseconds before a HOVER opens the tooltip; default 500, deliberately slower '
                 + 'than Semantic\'s 50 ms, and a UX decision pinned to the millisecond in three '
                 + 'suites. Focus ignores it.',
@@ -251,14 +259,28 @@ const IN_HOUSE_CURATION = {
                 + 'Focus-to-open, '
                 + '`role="tooltip"` and `aria-describedby` were added BECAUSE of this removal: with '
                 + 'click gone and hover unavailable to a keyboard there would otherwise be no '
-                + 'keyboard path to the content at all.',
+                + 'keyboard path to the content at all. '
+                + 'AND THAT PATH ONLY EXISTS FOR A FOCUSABLE TRIGGER, which is the part this row '
+                + 'owes a reader and did not say. Focus-open reaches a `<button>`, a link or an '
+                + 'input; it does not reach a `<span>`, a `<div>` or an `<i>`, and no `tabindex` is '
+                + 'added to make it. A tooltip on a non-focusable trigger is therefore HOVER-ONLY '
+                + 'now: reachable with a mouse, unreachable by keyboard, and unreachable by touch. '
+                + 'Every tooltipped node in the tracked corpus is a `<button>`, so the corpus does '
+                + 'not exercise this — but a consumer meta can put `tooltip` on any node at all, '
+                + 'and `Render.js` will wrap it. If that content matters, the node has to be '
+                + 'focusable; the tooltip will not make it so.',
             hoverable: 'Was what let the pointer travel onto the bubble. Now unconditional, so the '
                 + 'prop has nothing left to turn on.',
             closeOnDocumentClick: 'Closing on an outside click is unconditional. Nothing passed this, '
                 + 'and a tooltip that survives a click elsewhere is a popover, which this is not.',
             closeOnEscape: 'Same: Escape always dismisses.',
-            mouseLeaveDelay: 'The 70 ms close delay is fixed. It exists so the pointer can cross the '
-                + 'gap between trigger and bubble, which is a layout constant, not a caller\'s choice.',
+            mouseLeaveDelay: 'The 70 ms close delay is fixed. NOT for the reason an earlier draft of '
+                + 'this row gave — "so the pointer can cross the gap onto the bubble" is impossible '
+                + 'here, because the bubble is `pointer-events: none` and travelling onto it closes '
+                + 'the tooltip anyway. What it actually buys is tolerance for a pointer that clips '
+                + 'the EDGE of the trigger on its way somewhere else, and for the sub-pixel gaps '
+                + 'between a trigger and its own padding: without it a fast diagonal exit flickers '
+                + 'the bubble. That is a layout constant rather than a caller\'s choice.',
             mountNode: 'Portal target. There is no portal — the bubble is a sibling of the trigger, '
                 + 'which is what brings it inside the prefixwrap scope.',
             popper: 'Popper.js configuration. No popper.',
@@ -517,7 +539,8 @@ const STEP_OBLIGATIONS = [
         items: [
             'OBLIGATION 1 of 3 — DISCHARGED, in JavaScript. The 500 ms survives to the millisecond. What made '
                 + 'it possible is that the bubble is MOUNTED ONLY WHILE OPEN: a bubble that is in the DOM is '
-                + 'revealed instantly by `*:hover > .tooltip` and no class can defeat that at equal '
+                + 'revealed instantly by `*:hover > .tooltip`, a rule shared with `Slider`, `Upload` '
+                + 'and the validation tooltip whose reveal has no delay to inherit at all, at equal '
                 + 'specificity, so mount-on-open is what buys the delay, focus-open, Escape and click-outside '
                 + 'all at once. Measured in Chrome, not merely in jsdom: nothing is in the DOM at 0/100/300/450 '
                 + 'ms and the bubble is there after 500. `transition-delay` was rejected — it would have meant '
@@ -564,13 +587,16 @@ const STEP_OBLIGATIONS = [
                 + 'vertically in a ROW container, which is how a wrapped button gets its height today. This is '
                 + 'the clearest case in the step for why a CSS-positioned tooltip needs a browser gate: every '
                 + 'jsdom suite was green while the shipped tooltip was unusable.',
-            'FINDING 4 OF THE REFERENCE — CLOSED, and half of it was never broken. `tooltip.less`\'s four corner '
-                + 'placements did put the bubble on its own trigger (`.tooltip.left`/`.right` set `top: 50%` at '
-                + 'the same specificity as `.top`/`.bottom`, so a corner class string matched both and the axis '
-                + 'came out over-constrained); they are fixed by writing the losing offset back per corner rather '
-                + 'than by raising specificity. But `top right` and `bottom right` were ALSO reported broken by an '
-                + 'assertion that required every corner to align to its host\'s LEFT edge, which a right corner '
-                + 'cannot do — they were placing correctly the whole time. 8 of 8 now. The component still asks '
+            'FINDING 4 OF THE REFERENCE — CLOSED, and it took two independent fixes. `tooltip.less`\'s four '
+                + 'corner placements did put the bubble on its own trigger (`.tooltip.left`/`.right` set '
+                + '`top: 50%` at the same specificity as `.top`/`.bottom`, so a corner class string matched both '
+                + 'and the axis came out over-constrained); all four are fixed by writing the losing offset back '
+                + 'per corner rather than by raising specificity, and the retained measurement '
+                + '(`PLACEMENTS_OVERLAPPING_HOST`) records both TOP corners sitting on their own host. The second '
+                + 'fix was to the VERDICT, which required every corner to align to its host\'s LEFT edge — '
+                + 'something `top right` and `bottom right` cannot do, so those two would have stayed red after '
+                + 'the CSS was right. An earlier draft of this note claimed they had been placing correctly all '
+                + 'along; they had not. 8 of 8 now. The component still asks '
                 + 'for `top` rather than the wrapper\'s `top left`: `top left` was semantic-ui-react\'s own '
                 + 'default, not something a meta requested, so the bubble is centred above its trigger instead of '
                 + 'left-aligned above it.',

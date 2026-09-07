@@ -37,10 +37,15 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
  *
  * THE CRUX: THE BUBBLE IS MOUNTED ONLY WHILE OPEN.
  * A bubble that is in the DOM is revealed by `*:hover > .tooltip` regardless of what this
- * component thinks, instantly, and no class can defeat that at equal specificity. A node that does
- * not exist cannot be matched by any rule — so mount-on-open is what makes the delay, focus-open,
- * Escape and click-outside possible at all, and it is also why a closed tooltip still adds no text
- * to the accessibility tree and no `role` to the corpus role census.
+ * component thinks, and INSTANTLY — that is the part that matters. It is not that no class could
+ * override it: `&.show { animation-delay: 0s }` four lines later in `tooltip.less` is a rule of
+ * equal specificity that wins on source order, so a hiding class could be made to win the same
+ * way. It is that the reveal has no usable delay to inherit (the `.fade-in` block it extends sets
+ * the `animation` SHORTHAND, which resets `animation-delay` to `0s`) and that the rule is shared
+ * with `Slider`, `Upload` and the validation tooltip, so a class fighting it would fight all
+ * three. A node that does not exist needs neither argument — so mount-on-open is what makes the
+ * delay, focus-open, Escape and click-outside possible, and it is also why a closed tooltip still
+ * adds no text to the accessibility tree and no `role` to the corpus role census.
  *
  * WHAT CHANGED FOR A USER
  * -----------------------------------------------------------------------------
@@ -108,9 +113,18 @@ const PLACEMENTS = ['top', 'bottom', 'right', 'left']
 /**
  * Props `semantic-ui-react`'s `Popup` / `Portal` handled that this implementation deliberately
  * does not. `docs/SUPPORTED-PROPS.md` carries the reason per prop; the short version is that not
- * one of them occurs on a tooltip node in the demo corpus or in any audited consumer meta, and the
- * four that DID have an effect describe machinery that is gone (`mountNode` and `popper` are
- * portal plumbing, `pinned` and `offset` configure popper).
+ * one of them occurs on a tooltip node in the demo corpus or in any audited consumer meta.
+ *
+ * The eighteen are not one kind of thing, and an earlier draft of this sentence implied only four
+ * of them did anything, which is wrong by a factor of two. The split: FOUR emitted a class no
+ * loaded rule selects, so they were inert even when passed (`basic`, `size`, `wide`, `flowing`);
+ * FOUR configured machinery that is gone, so their behaviour is irrecoverable here (`mountNode`
+ * and `popper` are portal plumbing, `pinned` and `offset` configure popper); ONE overrode the
+ * bubble's element (`as`); and NINE had real behaviour — `on`, `hoverable`,
+ * `closeOnDocumentClick`, `closeOnEscape`, `mouseLeaveDelay`, `hideOnScroll`, `defaultOpen`,
+ * `trigger`, `header`. Of those nine, `on` is the only one whose behaviour is removed outright;
+ * the rest are now unconditional, fixed, or expressed differently. See "WHAT CHANGED FOR A USER"
+ * above, and `docs/SUPPORTED-PROPS.md` for the per-prop record.
  *
  * Stripped rather than left to ride the rest spread, for the reason step 1 recorded on `Table`:
  * a string-valued one lands on the bubble as a lowercase attribute (`size="mini"`), which is the
@@ -158,6 +172,18 @@ function dropUnsupported (props) {
  * every snapshot in the repo is taken at mount.
  */
 let sequence = 0
+
+/**
+ * The trigger's own `aria-describedby` with the bubble's id appended, de-duplicated.
+ *
+ * A list rather than a replacement because the attribute IS a list, and the trigger's own ids come
+ * first because that is the order assistive technology announces them in: whatever the control
+ * says about itself before the supplementary tooltip.
+ */
+function describedBy (existing, bubbleId) {
+    const ids = String(existing == null ? '' : existing).split(/\s+/).filter(Boolean)
+    return ids.indexOf(bubbleId) === -1 ? [...ids, bubbleId].join(' ') : ids.join(' ')
+}
 
 /** `'top left'` -> `{top: true, bottom: false, right: false, left: true}`. */
 function placementOf (position) {
@@ -252,6 +278,18 @@ export default function TooltipPop ({
     const bubbleId = id == null ? generatedId : id
 
     /**
+     * Keep the callback dedupe in step with the state the component is ACTUALLY in.
+     *
+     * `reported` exists so `onOpen`/`onClose` fire once per transition, and it starts `false` — an
+     * uncontrolled tooltip starts closed, so that was right by construction. A CONTROLLED one need
+     * not: mounted at `open={true}`, the component was open while `reported` said closed, so the
+     * first dismissal — Escape, a click outside, the pointer leaving — took the early return in
+     * `change()` and the caller was never told to close. A controlled host that trusts `onClose`
+     * therefore stayed open for good.
+     */
+    React.useEffect(() => { reported.current = isOpen }, [isOpen])
+
+    /**
      * The two dismissal paths that need no pointer, attached ONLY while open — accessibility, not
      * polish: without them a keyboard user can open the bubble and never close it. Both listen on
      * `document`, which is what makes Escape work with focus in an unrelated native input (the case
@@ -303,7 +341,16 @@ export default function TooltipPop ({
      * trigger, so an author lost the button too.
      */
     const trigger = isOpen && React.isValidElement(children)
-        ? React.cloneElement(children, { 'aria-describedby': bubbleId })
+        // APPENDED, never assigned. A trigger can already point at something of its own — a form
+        // control at its validation message is the case in this product — and replacing that
+        // attribute would silently unlink the error text for exactly as long as the tooltip is
+        // open, which is the worst possible duration for it: present while a sighted user reads
+        // the tooltip, absent from the announcement that matters. `aria-describedby` is a
+        // space-separated ID LIST, so the fix is to add to it and to keep the trigger's own ids
+        // first, since order is announcement order.
+        ? React.cloneElement(children, {
+            'aria-describedby': describedBy(children.props['aria-describedby'], bubbleId),
+        })
         : children
 
     /**
@@ -328,6 +375,12 @@ export default function TooltipPop ({
         onMouseEnter: () => { if (!fromTouch.current) schedule(true, delay) },
         onMouseLeave: () => {
             fromTouch.current = false
+            // The pointer has left, so any focus arriving later is NOT this pointer's doing. Without
+            // this the flag outlives its interaction: a `pointerdown` that moves no focus — a
+            // non-focusable trigger, or a handler that prevents it — left `fromPointer` true for the
+            // component's whole life, and the next KEYBOARD focus was suppressed. That is the
+            // keyboard path this step added, disabled by the guard meant to protect it.
+            fromPointer.current = false
             schedule(false, CLOSE_DELAY)
         },
         // Focus opens it ONLY when focus did not arrive from a pointer. Without this guard the
@@ -340,7 +393,14 @@ export default function TooltipPop ({
         // would express this natively but is not a thing a React handler can ask about portably,
         // and jsdom does not implement it — this way the guard is testable in both legs.
         onPointerDown: () => { fromPointer.current = true },
-        onFocus: () => { if (!fromPointer.current) change(true) },
+        onFocus: () => {
+            // ONE-SHOT: the flag answers "was THIS focus caused by a pointer", so it is consumed
+            // here whether or not it suppressed anything. Left standing it would also suppress the
+            // next focus, which no pointer caused.
+            const causedByPointer = fromPointer.current
+            fromPointer.current = false
+            if (!causedByPointer) change(true)
+        },
         onBlur: () => {
             fromPointer.current = false
             change(false)

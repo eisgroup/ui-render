@@ -462,6 +462,95 @@ describe('the trigger keeps its own behaviour', () => {
     })
 })
 
+describe('the three defects an adversarial review of this step found', () => {
+    /**
+     * Every one of these was in the shipped replacement with all 63 tooltip tests, 39
+     * browser tests and the coverage gate green, which is the point of writing them here:
+     * the gate proved the behaviour it was asked about and nothing more.
+     */
+
+    /**
+     * The trigger can already point at something of its own — in this product a form
+     * control at its validation message — and the injected relationship REPLACED it, so
+     * the error text was unlinked for exactly as long as the tooltip was open. Present
+     * while a sighted user reads the tooltip, absent from the announcement that matters.
+     */
+    it('appends to the trigger\'s own `aria-describedby` instead of replacing it', () => {
+        drive({ title: TITLE }, ({ trigger }) => {
+            fireEvent.focus(trigger)
+            expect(isOpen()).toBe(true)
+
+            const ids = trigger.getAttribute('aria-describedby').split(' ')
+            // The trigger's own id stays FIRST: order is announcement order.
+            expect(ids[0]).toBe('reset-error')
+            expect(ids).toHaveLength(2)
+            expect(screen.getByRole('tooltip').id).toBe(ids[1])
+
+            // ...and it is removed again with the bubble, leaving the original untouched.
+            fireEvent.blur(trigger)
+            expect(trigger.getAttribute('aria-describedby')).toBe('reset-error')
+        }, <button type="button" aria-describedby="reset-error">{TRIGGER}</button>)
+    })
+
+    /**
+     * The other half of appending: a caller-supplied `id` is used verbatim, so it CAN collide
+     * with an id the trigger already points at. `aria-describedby` is a list, and a repeated
+     * entry there is not an error — but it is sloppy output from a library, and the dedupe is
+     * the branch that keeps it clean. Pinned because nothing else reaches it: React clones from
+     * the original element every render, so the bubble's own generated id can never already be
+     * in the list.
+     */
+    it('does not repeat an id the trigger already points at', () => {
+        drive({ title: TITLE, id: 'shared-description' }, ({ trigger }) => {
+            fireEvent.focus(trigger)
+            expect(isOpen()).toBe(true)
+            expect(trigger.getAttribute('aria-describedby')).toBe('shared-description')
+        }, <button type="button" aria-describedby="shared-description">{TRIGGER}</button>)
+    })
+
+    /**
+     * `fromPointer` answers "was THIS focus caused by a pointer". It was cleared only on
+     * blur, so a `pointerdown` that moved no focus — a non-focusable trigger, or a handler
+     * that prevents it — left it standing for the component's whole life and suppressed the
+     * next KEYBOARD focus. The guard that protects the click removal was disabling the
+     * keyboard path the same removal created.
+     */
+    it('does not let a pointer-down that moved no focus suppress a later keyboard focus', () => {
+        drive({ title: TITLE }, ({ trigger }) => {
+            // A press that never focuses anything: no `focus`, so no `blur` to clear the flag.
+            fireEvent.pointerDown(trigger)
+            expect(isOpen()).toBe(false)
+
+            // The pointer leaves, so any focus after this is not its doing.
+            fireEvent.mouseLeave(trigger)
+            advance(1000)
+
+            fireEvent.focus(trigger)
+            // The keyboard path must survive a stray pointer-down.
+            expect(isOpen()).toBe(true)
+        })
+    })
+
+    /**
+     * `reported` starts `false` because an UNCONTROLLED tooltip starts closed. A controlled
+     * one need not: mounted at `open={true}` the component was open while `reported` said
+     * closed, so the first dismissal took the early return in `change()` and the caller was
+     * never told. A host that trusts `onClose` stayed open for good.
+     */
+    it('reports the first close of a tooltip mounted already open', () => {
+        const closes = []
+        // A plain function, not `jest.fn()`: `isFunction()` in this codebase rejects
+        // cross-realm functions, and the component checks before calling.
+        drive({ title: TITLE, open: true, onClose: () => closes.push('closed') }, ({ trigger }) => {
+            expect(isOpen()).toBe(true)
+
+            fireEvent.keyDown(document, { key: 'Escape', keyCode: 27 })
+            // A controlled host learns it should close.
+            expect(closes).toEqual(['closed'])
+        })
+    })
+})
+
 describe('lifecycle', () => {
     it('unmounts cleanly with an open timer still pending, leaving nothing behind', () => {
         const view = render(

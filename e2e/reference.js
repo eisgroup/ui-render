@@ -136,6 +136,9 @@ const CORPUS = {
         maxWidth: 'none',
         zIndex: '9',
         beforeContent: 'none',
+        // The arrow paints. Asserted on the corpus node rather than only on the harness, because
+        // `beforeContent: 'none'` is satisfied just as well by a bubble with no arrow at all.
+        afterContent: '""',
     },
     /**
      * [I] `pointer-events: none`, and it is load-bearing twice over: without it the bubble sits
@@ -251,12 +254,21 @@ const INLINE = {
      *          to restrict the vocabulary.
      */
     /**
-     * [I] EIGHT OF EIGHT since §9.7-F1 step 2 part 3. Two things moved this map, and only one of
-     * them was CSS: the corner rules were genuinely broken and are fixed in `tooltip.less`, while
-     * `top right` and `bottom right` were ALSO reported broken by an assertion that required every
-     * corner to align to its host's LEFT edge — which a right corner cannot do. The right corners
-     * were placing correctly the whole time. Kept as a map rather than collapsed to `true` so a
-     * regression names the placement it broke.
+     * [I] EIGHT OF EIGHT since §9.7-F1 step 2 part 3. Two independent things had to change, and
+     * only one of them was CSS — but BOTH halves of the old verdict were about real problems, and
+     * an earlier draft of this note got that wrong by claiming the right corners "were placing
+     * correctly the whole time". They were not: `PLACEMENTS_OVERLAPPING_HOST` recorded `top left`
+     * AND `top right` sitting on top of their own host, and finding 4 recorded `bottom left` /
+     * `bottom right` degrading to plain `left` / `right`. All four corners were broken in CSS, and
+     * `tooltip.less` fixes all four by writing the losing offset back per corner rather than by
+     * raising specificity.
+     *
+     * What the SECOND change fixed was a false negative that would have kept the two right corners
+     * red even after the CSS was right: the verdict required every corner to align to its host's
+     * LEFT edge, which `top right` and `bottom right` cannot do by definition. So the CSS fix was
+     * necessary for all four, and the assertion fix was necessary for two of them.
+     *
+     * Kept as a map rather than collapsed to `true` so a regression names the placement it broke.
      */
     PLACEMENT_WORKS: {
         top: true,
