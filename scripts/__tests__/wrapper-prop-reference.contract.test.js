@@ -96,7 +96,11 @@ const EXPECTED = {
     // 21/37 → 17/13 at step 2 part 3: the tooltip left the forwarded set entirely, taking its 4
     // curated props and its 24 measured passthrough rows with it. Both deltas are exact
     // (21−4, 37−24), which is the check that the section moved rather than being rewritten.
-    forwardedTier1: 17,
+    // 17 → 18 at §9.7-F1 step 3 part 1, and UP is the unusual direction for this counter: the
+    // dropdown gained `aria-describedby`, pointing at the help block it was rendering and never
+    // announcing. A forwarded name added deliberately, not a leak — the guard that made this fail
+    // is the one refusing an undocumented prop, and it did its job.
+    forwardedTier1: 18,
     forwardedTier2: 13,
     // The three props no tracked example uses but consumer metas do. `upward` and `disabled`
     // reach semantic-ui-react and are both styled, which is why a demo-derived checklist

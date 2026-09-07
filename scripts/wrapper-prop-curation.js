@@ -438,6 +438,7 @@ const WRAPPER_CURATION = {
  */
 const FORWARDED_CURATION = {
     Dropdown: {
+        'aria-describedby': { via: 'element', tier: 1, source: 'demo', summary: 'The id of the wrapper\'s own `field-help` block, and only when there IS help text to point at, so it never dangles. Added at §9.7-F1 step 3 part 1: the error and info text was rendered and never announced, and the caller\'s `id` used to be put on the help block verbatim — while also riding the rest bag onto Semantic\'s listbox, giving two elements one id. The help block now carries `${id}-help`.' },
         className: { via: 'element', tier: 1, source: 'demo', summary: 'Only the wrapper-derived `{info, readonly}` classes; the caller\'s `className` goes to the wrapper element instead.' },
         options: { via: 'element', tier: 1, source: 'demo', summary: 'The sanitised array. Always an array of `{text, value, ...}` objects by the time SUIR sees it.' },
         placeholder: { via: 'element', tier: 1, source: 'demo', summary: 'Translated placeholder.' },

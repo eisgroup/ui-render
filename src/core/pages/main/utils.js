@@ -267,12 +267,18 @@ export const changeOptionOrderForSelectFields = (data, meta) => {
   if (meta && meta.view === FIELD.TYPE.SELECT) {
     const selectName = meta.name;
     if (typeof data[selectName] === 'string') {
+      // @Note: no destructuring of `mapOptions` before its type is known. It used to read
+      //  `const {text, value} = mapOptions` ABOVE these branches, which throws
+      //  `Cannot destructure property 'text' of 'mapOptions' as it is undefined` for any
+      //  `view: 'Select'` node that has a string value and declares no `mapOptions` — i.e.
+      //  `getFormData()` threw, in the SUBMIT path, for the simplest Select a meta can express.
+      //  Every tracked example escaped it only by declaring `mapOptions` in JSON. There is
+      //  nothing to reorder without it, so the branch is simply skipped.
       const { mapOptions } = meta;
-      const { text: optionName, value: optionValue } = mapOptions
       if (typeof mapOptions === 'string') {
         recursiveDataParser(data, mapOptions, data[selectName]) && delete data[selectName]
-      } else if (optionValue === '{index}') {
-        recursiveDataParser(data, optionName, data[selectName]) && delete data[selectName]
+      } else if (isObject(mapOptions) && mapOptions.value === '{index}') {
+        recursiveDataParser(data, mapOptions.text, data[selectName]) && delete data[selectName]
       }
     }
   }

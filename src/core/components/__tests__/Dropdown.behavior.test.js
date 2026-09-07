@@ -67,7 +67,95 @@ describe('Dropdown parent value and option contracts', () => {
             ))
         })
 
-        expect(onChange).toHaveBeenCalledWith('Fallback label')
+        // `name` is not passed in this case, so it arrives as `undefined` — asserted explicitly
+        // rather than omitted, because `toHaveBeenCalledWith` checks ARITY: the reset gained the
+        // `(value, name, event)` signature at §9.7-F1 step 3 part 1, where it used to call with
+        // one stringified argument.
+        expect(onChange).toHaveBeenCalledWith('Fallback label', undefined)
+    })
+
+    /**
+     * TWO CASCADING-RESET DEFECTS, both found by the §9.7-F1 step 3 part 1 audit and both about
+     * what the HOST is told rather than what is displayed — which is why 74 dropdown tests and the
+     * whole corpus were green over them.
+     */
+    it('resets to the option\'s OWN value, not a stringified copy of it', () => {
+        const calls = []
+        // A plain function, not `jest.fn()`: the house rule is that `isFunction()` rejects
+        // cross-realm functions, and keeping to plain functions here means the assertion reads the
+        // same whether or not the product ever guards the callback.
+        const onChange = (...args) => calls.push(args)
+        const { rerender } = render(withConfig(
+            <Dropdown options={[{ text: 'A', value: 1 }, { text: 'B', value: 2 }]} value={2}
+                      name="region" onChange={onChange}/>
+        ))
+
+        act(() => {
+            rerender(withConfig(
+                <Dropdown options={[{ text: 'C', value: 7 }, { text: 'D', value: 8 }]} value={2}
+                          name="region" onChange={onChange}/>
+            ))
+        })
+
+        // `7`, the number the option carries — not `'7'`. A host matching option values with
+        // `===` missed the reset entirely before this.
+        expect(calls).toEqual([[7, 'region']])
+    })
+
+    it('does not invent a selection for a `multiple` dropdown mounted with an empty array', () => {
+        const calls = []
+        const onChange = (...args) => calls.push(args)
+
+        render(withConfig(
+            <Dropdown multiple options={[{ text: 'A', value: 'a' }, { text: 'B', value: 'b' }]}
+                      value={[]} name="region" onChange={onChange}/>
+        ))
+
+        // `String([])` is `''`, which is in no option list, so the reset guard used to fire and
+        // report a selection of the first option before the user had touched anything.
+        expect(calls).toEqual([])
+    })
+
+    it('appends `optionsLabel` once, however many options are added', () => {
+        render(withConfig(
+            <Dropdown allowAdditions search optionsLabel="FOOTER" name="region"
+                      options={[{ text: 'Option A', value: 'a' }]} onChange={() => {}}/>
+        ))
+
+        // NO manual rerender in between, and that is not a shortcut: passing a fresh `options`
+        // array would change its identity, and the wrapper's sync effect
+        // (`!isEqual(options, opts) && setOptions(opts)`) would then wipe the addition — and the
+        // duplicate label with it, so the test would pass against the defect. The `setOptions`
+        // inside `onAddItem` re-renders on its own, which is all this needs.
+        act(() => { latestSemanticProps().onAddItem({}, { value: 'Zed' }) })
+        act(() => { latestSemanticProps().onAddItem({}, { value: 'Yan' }) })
+
+        // `onAddItem` writes the option list back into state, and it used to write back the copy
+        // that ALREADY carried the label — so each addition appended another one.
+        const options = latestSemanticProps().options
+        expect(options.filter(o => o.content === 'FOOTER')).toHaveLength(1)
+        expect(options.map(o => o.text)).toEqual(['Yan', 'Zed', 'Option A', ''])
+    })
+
+    it('gives the help text its own id and points the control at it', () => {
+        const { container } = render(withConfig(
+            <Dropdown id="region" error="Required" name="region"
+                      options={[{ text: 'A', value: 'a' }]} onChange={() => {}}/>
+        ))
+
+        // Note this suite MOCKS semantic-ui-react, so the listbox is not in the document at all —
+        // which is why the "only one element carries the id" half of this contract lives in
+        // `Dropdown.test.js` against the real one. Here: the derived id, and the wiring.
+        expect(container.querySelector('.field-help').id).toBe('region-help')
+        expect(latestSemanticProps()['aria-describedby']).toBe('region-help')
+    })
+
+    it('adds no `aria-describedby` when there is no help text to point at', () => {
+        render(withConfig(
+            <Dropdown id="region" name="region" options={[{ text: 'A', value: 'a' }]} onChange={() => {}}/>
+        ))
+
+        expect(latestSemanticProps()['aria-describedby']).toBeUndefined()
     })
 
     // The sanitizer dispatches on `typeof options[0].value`, and `typeof null === 'object'` — so a null value

@@ -15,6 +15,41 @@ const indexMeta = (mapOptions = {text: 'code', value: '{index}'}) => ({
 })
 
 describe('Select data reordering integrity contracts', () => {
+  /**
+   * FOUND BY THE §9.7-F1 STEP 3 PART 1 AUDIT, and it is in the SUBMIT path: this function is
+   * reached from `getFormsData()`, so the throw reaches whoever presses submit.
+   *
+   * `mapOptions` used to be destructured ABOVE the branches that test its type, so a
+   * `view: 'Select'` node with a string value and no `mapOptions` threw
+   * `Cannot destructure property 'text' of 'mapOptions' as it is undefined`. Every tracked
+   * example escaped it only by declaring `mapOptions` in its JSON — which is why 74 dropdown
+   * tests and the whole corpus were green over it. Nothing to reorder without `mapOptions`, so
+   * the branch is skipped and the data passes through untouched.
+   */
+  it('leaves a Select alone when it declares no mapOptions, instead of throwing', () => {
+    const data = {
+      selection: '1',
+      options: [{code: 'A'}, {code: 'B'}, {code: 'C'}],
+    }
+
+    expect(() => changeOptionOrderForSelectFields(data, {view: 'Select', name: 'selection'}))
+      .not.toThrow()
+    expect(data).toEqual({
+      selection: '1',
+      options: [{code: 'A'}, {code: 'B'}, {code: 'C'}],
+    })
+  })
+
+  it('does not throw from the submit path either', () => {
+    // `getFormsData` takes a LIST of `{form, meta}`, which is the shape `rules.js` builds.
+    const forms = [{
+      form: makeForm({selection: '1', options: [{code: 'A'}, {code: 'B'}]}),
+      meta: {view: 'Select', name: 'selection'},
+    }]
+
+    expect(() => getFormsData(forms)).not.toThrow()
+  })
+
   it('supports the legacy string mapOptions contract', () => {
     const data = {
       selection: '1',

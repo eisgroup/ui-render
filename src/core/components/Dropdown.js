@@ -121,17 +121,30 @@ export function Dropdown ({
     setValue(valueFromParent == null || valueFromParent === '' ? null : valueFromParent)
   }, [valueFromParent])
 
-  // Reset value when options change and current value is no longer valid (e.g., cascading Select)
-  const validOptionValues = (Array.isArray(opts) ? opts : []).map(o => {
-    if (typeof o === 'string' || typeof o === 'number') return String(o)
-    return String(o.value != null ? o.value : o.text)
-  })
+  // Reset value when options change and current value is no longer valid (e.g., cascading Select).
+  //
+  // @Note: TWO defects here, both found by the §9.7-F1 step 3 part 1 audit and both about what the
+  //  HOST is told rather than what is displayed.
+  //  (1) The reset used to emit `String(...)` of the option value, with arity 1 — so a host whose
+  //      options carry numbers was told to select `'7'` where the option is `7`, and a host
+  //      matching with `===` missed it. The values are now kept unstringified (the stringified
+  //      copy remains, but only as the comparison key it always was), and the call carries the
+  //      `(value, name, event)` signature the wrapper documents. There is no event for a
+  //      programmatic reset, so the third argument is genuinely absent rather than faked.
+  //  (2) The guard did not cover an EMPTY ARRAY. `String([])` is `''`, which is never in the
+  //      option keys, so a `multiple` dropdown mounted with `value={[]}` was reset immediately:
+  //      `onChange(firstOption)` before the user touched anything, a selection they never made.
+  const validOptions = (Array.isArray(opts) ? opts : []).map(o => (
+    (typeof o === 'string' || typeof o === 'number') ? o : (o.value != null ? o.value : o.text)
+  ))
+  const validOptionValues = validOptions.map(String)
   const optionValuesKey = validOptionValues.join('\n')
+  const hasNoValue = value => value == null || value === '' || (Array.isArray(value) && !value.length)
   useEffect(() => {
     if (!onChange || !validOptionValues.length) return
-    if (valueFromParent == null || valueFromParent === '') return
+    if (hasNoValue(valueFromParent)) return
     if (!validOptionValues.includes(String(valueFromParent))) {
-      onChange(validOptionValues[0])
+      onChange(validOptions[0], props.name)
     }
   }, [optionValuesKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -140,8 +153,17 @@ export function Dropdown ({
   if (props.selection == null) props.selection = true
   if (props.search && props.deburr == null) props.deburr = true // Case and diacritics insensitive search
 
-  // Sanitize. Any other typeof — `undefined` for empty options, boolean, function — passes through unchanged;
-  // the bare `no default` comment below is the escape hatch eslint-config-react-app's `default-case` looks for.
+  // @Note: the comment below used to claim `undefined` options "pass through unchanged". They did
+  //  not — `options[0]` on an absent or null list THREW, measured:
+  //  `Cannot read properties of undefined (reading '0')` for a bare `{view: 'Dropdown', name: 'x'}`,
+  //  and the same for null (which a `name`-bound data path can produce). Only `options: []` ever
+  //  rendered. An empty select is a legitimate state — options not loaded yet, or a genuinely
+  //  empty list — so absent and null are now that state instead of a thrown error the engine
+  //  replaces the whole node with. Found by the §9.7-F1 step 3 part 1 audit.
+  if (options == null) options = []
+
+  // Sanitize. Any other typeof — boolean, function — passes through unchanged; the bare
+  // `no default` comment below is the escape hatch eslint-config-react-app's `default-case` wants.
   switch (typeof options[0]) {
     case 'string':
       options = options.map(value => ({text: translate(value), value}))
@@ -165,9 +187,17 @@ export function Dropdown ({
       break
     // no default
   }
+  // @Note: kept BEFORE the label is appended, because `onAddItem` writes the option list back into
+  //  state — and it used to write back the label-appended copy, so every addition appended the
+  //  label again. Measured menu after one addition: ['Zed','Option A','Option B','FOOTER','FOOTER'].
+  //  Found by the §9.7-F1 step 3 part 1 audit.
+  const optionsWithoutLabel = options
   if (optionsLabel) options = [...options, {key: '', text: '', content: optionsLabel, disabled: true}]
 
   // Convert Icon to Node because Semantic has no `onClickIcon` callback
+  // Only when there is help text to point at, so no `aria-describedby` in this product ever dangles.
+  const helpId = (props.id && (error || info)) ? `${props.id}-help` : undefined
+
   if (onClickIcon) props.icon = <Icon name={props.icon || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
 
   // On Change gets called before `onAddItem`
@@ -220,7 +250,7 @@ export function Dropdown ({
         // Override only newly added duplicate option to match the last case entered
         if (toLowerCaseAny(duplicate.value) === val) Object.assign(duplicate, newOption)
       } else {
-        setOptions([newOption, ...options])
+        setOptions([newOption, ...optionsWithoutLabel])
         onAddItem && onAddItem(value, props.name, event)
       }
     }
@@ -243,6 +273,7 @@ export function Dropdown ({
     }, className)} style={style}>
       {label && !float && <Text className="input__label">{translate(label)}</Text>}
       <DropDown
+        aria-describedby={helpId}
         className={classNames({info, readonly})}
         options={options}
         placeholder={translate(placeholder)}
@@ -259,7 +290,15 @@ export function Dropdown ({
       />
       {label && float && <Text className="input__label">{translate(label)}</Text>}
       {(error || info) &&
-      <View id={props.id} className="field-help">
+      /*
+       * `${id}-help`, not `id`. The caller's `id` also rides the rest bag onto Semantic's
+       * `<div role="listbox">`, so this View used to give TWO elements the same id — invalid, and
+       * reachable without the caller doing anything, because `mapper.js` assigns `input.id`
+       * automatically for relative paths. The derived id is also what `aria-describedby` on the
+       * control now points at: the error and info text was rendered but never announced.
+       * Found by the §9.7-F1 step 3 part 1 audit.
+       */
+      <View id={helpId} className="field-help">
         {error && <Text className="error">{translate(error)}</Text>}
         {info && <Text className="into">{translate(info)}</Text>}
       </View>
