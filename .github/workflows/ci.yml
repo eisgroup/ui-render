@@ -154,6 +154,93 @@ jobs:
       - name: Test on React 17.0.2
         run: npm run test:react17
 
+  # Gating. The browser leg of the contract suite (docs/UPGRADE-PLAN.md §9.5, §9.7-F1 step 2): the
+  # positional facts about the tooltip that no jsdom suite can express, because every
+  # `getBoundingClientRect()` there is 0x0. It records what semantic-ui-react's `Popup` actually does
+  # in real Chrome so the in-house replacement has a measured reference to be judged against.
+  #
+  # GATING FROM DAY ONE, not advisory, and the distinction matters here. The product is currently
+  # broken at these use sites — the bubble is unpositioned and popper throws on every open — so the
+  # obvious reading is "red for a real reason, keep it off the merge path". That would be the wrong
+  # call: red-because-the-product-is-broken belongs in a PINNED CURRENT VALUE, exactly as
+  # `FIXED_PROP_LEAKS`, `KNOWN_DOM_DEFECTS` and `NAMELESS_CONTROLS` already work in jest. Every such
+  # fact is pinned in e2e/reference.js and tagged [R->I], so the suite is green today, gates today,
+  # and the diff that flips a pin is the reviewable record that part 2 fixed something.
+  # `continue-on-error` would be justified only by observed FLAKE, and the two known flake sources
+  # (network webfonts, animation timing) are removed at the fixture level rather than tolerated.
+  #
+  # A SEPARATE JOB rather than a step inside `verify`: folding it in would add its whole serial cost
+  # to the critical path, while a parallel job adds nothing to developer wait time as long as it
+  # finishes inside `verify`. Deliberately NOT pinning a test count in this comment — that has gone
+  # stale four times in this workstream. The invariant instead: this job asserts the browser-only
+  # facts in e2e/reference.js, and every one of them is tagged as a reference, an invariant, or a
+  # pinned defect. A failure means either a real regression or a value that legitimately moved and
+  # was not re-measured; it never means "the numbers drifted".
+  #
+  # WHY IT SERVES A PRODUCTION BUILD. webpack-dev-server renders an unhandled runtime error as a
+  # full-viewport overlay iframe, and opening a tooltip currently throws — so on the dev server the
+  # overlay intercepts every subsequent interaction. Disabling that overlay would remove a real
+  # debugging affordance from humans to suit a test runner. `playwright.config.js` builds the demo
+  # root-relative (`PUBLIC_PATH=/`, `REACT_APP_BASE_NAME=/`, into `build-e2e/`) and serves it with
+  # `serve --single`; both webpack overrides default to today's values, so `npm run build` and
+  # `npm run deploy` are untouched.
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # `setup-node`'s `cache: npm` does NOT cover the Playwright browser cache, and the key has to
+      # be the resolved Playwright version rather than the lockfile hash: any unrelated dependency
+      # bump would otherwise throw away a perfectly good browser download. Measured locally:
+      # `playwright install chromium` puts 567 MB on disk — 368 MB full Chromium plus a 196 MB
+      # headless shell (the ~95 MiB download the run actually launches) plus 2.5 MB of ffmpeg.
+      # `--only-shell` would cut that to ~196 MB, and is deliberately NOT used: a CI/local browser
+      # split is exactly the kind of difference that makes a browser gate unreproducible, and the
+      # full install is also what `--headed`/`--ui` debugging needs.
+      - name: Resolve the Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      # The cache restores browser BINARIES, never the apt packages they link against, so the
+      # cache-hit path still needs `install-deps`.
+      - name: Install Chromium and its system dependencies
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Chromium system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Run the browser contract suite
+        run: npm run test:e2e
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
   # Advisory only — React 19 is NOT declared in peerDependencies (see docs/UPGRADE-PLAN.md §8).
   # Purpose: make upstream drift visible on every PR without gating it, so the 19 flip is a
   # measurement rather than a discovery. `continue-on-error: true` keeps a red leg off the merge path.

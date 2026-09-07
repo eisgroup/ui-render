@@ -16,10 +16,6 @@ const BareInput = ({ value }) => (
     <input data-testid="field" value={value || ''} readOnly />
 )
 
-const ContractTooltip = ({ children }) => (
-    <aside data-testid="validation-tooltip">{children}</aside>
-)
-
 function makeContractForm ({ values = {}, registered = [], fieldStates = {} } = {}) {
     return {
         change: jest.fn(),
@@ -51,7 +47,6 @@ function makeDecoratedInstance ({
         fieldValues,
         registeredFieldValues,
         registeredFieldErrors,
-        Tooltip: ContractTooltip,
     })
 
     const form = makeContractForm({ values, registered, fieldStates })

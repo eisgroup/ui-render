@@ -156,14 +156,19 @@ const FORM_BINDINGS = {
 
 /**
  * CONTROLS WITH NO ACCESSIBLE NAME — a counted ledger, in the spirit of layer
- * (1)'s KNOWN_DOM_DEFECTS. 82 of the corpus's 117 interactive controls compute an
+ * (1)'s KNOWN_DOM_DEFECTS. 81 of the corpus's 117 interactive controls compute an
  * EMPTY accessible name, so most of what the corpus renders is unusable with a
  * screen reader. Pinned as one aggregate rather than per example because the
  * number is the signal: it may only fall (each fall is a fix worth recording), and
  * a rise means a new nameless control just shipped. Per-view detail belongs in
  * §9.5's mandatory Playwright/a11y suite.
  */
-const NAMELESS_CONTROLS = { total: 117, nameless: 82 }
+// 82 -> 81 at §9.7-F1 step 2 part 3: `button-icon_meta.js`'s icon-only button gained an
+// `aria-label`. Its purpose had lived ONLY in its tooltip, with an `aria-hidden` icon and no
+// accessible name — and since that step a tooltip does not open on tap either, so the control was
+// unlabelled for touch as well as for assistive technology. A fall here is progress and needs this
+// number lowered with it; a rise means a new nameless control just shipped.
+const NAMELESS_CONTROLS = { total: 117, nameless: 81 }
 
 /** Roles that count as an interactive control for the ledger above. */
 const CONTROL_ROLES = ['textbox', 'spinbutton', 'checkbox', 'combobox', 'listbox', 'slider', 'button']

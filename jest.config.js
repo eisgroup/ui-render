@@ -9,7 +9,18 @@ module.exports = {
     ],
     setupFiles: ['<rootDir>/src/style/__tests__/setup.js'],
     modulePathIgnorePatterns: ['<rootDir>/\\.[^/]+/worktrees/'],
-    testPathIgnorePatterns: ['/node_modules/', '<rootDir>/\\.[^/]+/worktrees/', '<rootDir>/src/style/__tests__/setup.js'],
+    // `<rootDir>/e2e/` is the Playwright leg (playwright.config.js). Jest's `roots` is the repo
+    // root and its default testMatch claims `**/__tests__/**`, `**/*.spec.js` and `**/*.test.js`,
+    // so a browser spec named by either convention would be collected here and fail on the first
+    // `@playwright/test` import. The files are named `*.pw.js` as well, so both halves of the fence
+    // stand alone; the legacy React legs inherit this list by spreading this config
+    // (scripts/fixtures/react-legacy/jest-config.js), so one entry covers all three.
+    testPathIgnorePatterns: [
+        '/node_modules/',
+        '<rootDir>/e2e/',
+        '<rootDir>/\\.[^/]+/worktrees/',
+        '<rootDir>/src/style/__tests__/setup.js',
+    ],
     collectCoverageFrom: [
         '<rootDir>/src/core/**/*.{js,jsx}',
         '<rootDir>/src/library/**/*.{js,jsx}',
