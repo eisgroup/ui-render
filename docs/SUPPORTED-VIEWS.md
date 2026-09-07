@@ -14,7 +14,7 @@ regenerates it and fails on any difference. Run `npm run docs:views` after chang
 `FIELD` constant or a resolver `case`, and edit prose in `scripts/view-reference-curation.js`.
 
 Props are documented separately: `docs/SUPPORTED-PROPS.md` covers the prop surface of the
-three views the `semantic-ui-react` exit replaces (`Table`, now in-house; `Tooltip` and
+three views the `semantic-ui-react` exit replaces (`Table` and `Tooltip`, both now in-house;
 `Select`/`Dropdown`, still wrapping the package), which is the only place the supported
 props are enumerated today.
 

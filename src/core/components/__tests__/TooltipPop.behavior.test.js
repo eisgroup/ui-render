@@ -493,6 +493,81 @@ describe('the three defects an adversarial review of this step found', () => {
     })
 
     /**
+     * A bubble opened by FOCUS must not be closed by a pointer that was never involved in
+     * opening it. `onMouseLeave` scheduled a close unconditionally, so a mouse merely
+     * passing over the trigger and off again dismissed a tooltip a keyboard user had
+     * opened — with focus still on the trigger, and nothing to reopen it but Tab out and
+     * Tab back. Anyone using a keyboard on a machine that also has a mouse.
+     */
+    it('does not let a stray mouse-out close a bubble the keyboard opened', () => {
+        drive({ title: TITLE }, ({ trigger }) => {
+            fireEvent.focus(trigger)
+            expect(isOpen()).toBe(true)
+
+            // A mouse crosses the trigger and leaves. Focus never moves.
+            fireEvent.mouseEnter(trigger)
+            fireEvent.mouseLeave(trigger)
+            advance(1000)
+
+            expect(isOpen()).toBe(true)
+
+            // ...and blur still closes it, which is the path that owns a focus-opened bubble.
+            fireEvent.blur(trigger)
+            expect(isOpen()).toBe(false)
+        })
+    })
+
+    /**
+     * The bug the FIX above introduced, and the reason it needs its own test: guarding
+     * `onMouseLeave` with "focus owns this bubble" returned before `schedule()`, whose
+     * first act is cancelling the pending timer. So a hover that armed an open, followed
+     * by a click (which focuses) and the pointer leaving, still opened the bubble 500 ms
+     * later with nothing under the cursor. jsdom missed it in the sibling test because
+     * there the bubble was already open and the late open was a no-op — the browser leg
+     * caught it, and this pins it where it is cheap.
+     */
+    it('cancels a pending hover-open when the pointer leaves a focused trigger', () => {
+        drive({ title: TITLE }, ({ trigger }) => {
+            fireEvent.mouseEnter(trigger)   // arms the 500 ms open
+            fireEvent.pointerDown(trigger)
+            fireEvent.focus(trigger)        // a click: focus-open suppressed, focus now held
+            expect(isOpen()).toBe(false)
+
+            fireEvent.mouseLeave(trigger)
+            advance(1000)
+
+            expect(isOpen()).toBe(false)
+        })
+    })
+
+    /**
+     * The pointer guard, defeated by the event ORDER of an ordinary click that moves focus
+     * WITHIN the host: browsers fire `pointerdown` -> `focusout` -> `focusin`, React
+     * propagates the last two to the wrapper, and `onBlur` cleared the flag before the
+     * incoming `onFocus` could consume it — so the focus read as keyboard-caused and the
+     * bubble opened instantly on a mouse click. Reachable from meta, because `Render.js`
+     * wraps ANY node carrying a `tooltip` attribute, including a container whose `items`
+     * are several fields.
+     */
+    it('stays shut when a click moves focus between two focusables inside the host', () => {
+        drive({ title: TITLE }, ({ host }) => {
+            const [first, second] = host.querySelectorAll('button')
+
+            fireEvent.focus(first)
+            fireEvent.blur(first)
+            expect(isOpen()).toBe(false)
+
+            // The click: pointer down, then focus leaves `first` and arrives at `second`.
+            fireEvent.pointerDown(second)
+            fireEvent.blur(first)
+            fireEvent.focus(second)
+            advance(1000)
+
+            expect(isOpen()).toBe(false)
+        }, <span><button type="button">{TRIGGER}</button><button type="button">Other</button></span>)
+    })
+
+    /**
      * The other half of appending: a caller-supplied `id` is used verbatim, so it CAN collide
      * with an id the trigger already points at. `aria-describedby` is a list, and a repeated
      * entry there is not an error — but it is sloppy output from a library, and the dedupe is
@@ -547,6 +622,98 @@ describe('the three defects an adversarial review of this step found', () => {
             fireEvent.keyDown(document, { key: 'Escape', keyCode: 27 })
             // A controlled host learns it should close.
             expect(closes).toEqual(['closed'])
+        })
+    })
+})
+
+describe('the edge cases the review\'s second pass found', () => {
+    /**
+     * `disabled` wins over every open path, so it must win over the REPORT as well. A
+     * pending open that fired after `disabled` arrived called `onOpen` while nothing was
+     * shown — a callback for a bubble that never appeared — and left `reported` standing,
+     * so the next genuine open was swallowed as a duplicate.
+     */
+    it('does not report an open that `disabled` prevented', () => {
+        const events = []
+        const props = { title: TITLE, onOpen: () => events.push('open'), onClose: () => events.push('close') }
+        const view = render(<TooltipPop {...props}><button type="button">{TRIGGER}</button></TooltipPop>)
+        const trigger = view.container.firstChild.firstChild
+
+        fireEvent.mouseEnter(trigger)          // arms the 500 ms open
+        view.rerender(
+            <TooltipPop {...props} disabled><button type="button">{TRIGGER}</button></TooltipPop>
+        )
+        advance(1000)
+
+        expect(isOpen()).toBe(false)
+        expect(events).toEqual([])
+        view.unmount()
+    })
+
+    /**
+     * A caller-controlled `open` owns what is shown. Advancing internal state underneath it
+     * is invisible until the caller stops passing the prop, at which point the tooltip jumps
+     * to a state nobody asked for. The callbacks still fire — that is how a controlled host
+     * learns what the user did.
+     */
+    it('does not advance internal state while the caller controls `open`', () => {
+        const opens = []
+        const props = { title: TITLE, open: false, onOpen: () => opens.push('open') }
+        const view = render(<TooltipPop {...props}><button type="button">{TRIGGER}</button></TooltipPop>)
+        const trigger = view.container.firstChild.firstChild
+
+        fireEvent.mouseEnter(trigger)
+        advance(500)
+        expect(isOpen()).toBe(false)
+        expect(opens).toEqual(['open'])       // the host was told; it chose not to open
+
+        // The caller stops controlling. The tooltip must not spring open on stale state.
+        view.rerender(<TooltipPop title={TITLE}><button type="button">{TRIGGER}</button></TooltipPop>)
+        expect(isOpen()).toBe(false)
+        view.unmount()
+    })
+
+    /**
+     * A function body is a call into CALLER code. Invoking it on every render of a closed
+     * tooltip runs whatever the caller put there — work, or a side effect — for a bubble
+     * nobody asked for, and the corpus renders these at mount, so it was every page load.
+     */
+    it('calls a function body only while the tooltip is open', () => {
+        let calls = 0
+        drive({ title: () => { calls += 1; return TITLE } }, ({ trigger }) => {
+            expect(calls).toBe(0)
+
+            fireEvent.focus(trigger)
+            expect(isOpen()).toBe(true)
+            expect(calls).toBeGreaterThan(0)
+        })
+    })
+
+    /**
+     * An empty body must not open at all: the bubble would mount with `role="tooltip"`, an
+     * `id`, and an `aria-describedby` pointing at it, with nothing inside — an empty tooltip
+     * announced to a screen reader and a visible empty box for everyone else.
+     */
+    it.each([
+        ['undefined', undefined],
+        ['null', null],
+        ['an empty string', ''],
+    ])('does not open with %s as its body', (_label, value) => {
+        drive({ title: value }, ({ trigger }) => {
+            fireEvent.focus(trigger)
+            fireEvent.mouseEnter(trigger)
+            advance(1000)
+
+            expect(document.querySelectorAll('[role="tooltip"]')).toHaveLength(0)
+            expect(trigger.getAttribute('aria-describedby')).toBeNull()
+        })
+    })
+
+    /** ...but `0` IS a body, and the guard must not treat it as empty. */
+    it('opens with `0` as its body', () => {
+        drive({ title: 0 }, ({ trigger }) => {
+            fireEvent.focus(trigger)
+            expect(document.querySelectorAll('[role="tooltip"]')).toHaveLength(1)
         })
     })
 })

@@ -67,6 +67,14 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
  * contract's FIXED_MARKUP_JUNK tripwires exist to keep out. Stripping them silently would be
  * worse than either, though: a consumer whose meta still carries `celled` would never learn it
  * stopped doing anything. So: strip, and say so once per prop in development.
+ *
+ * AND THE WARNING DOES NOT REACH A CONSUMER, which is worth knowing before trusting it as the
+ * migration path: `webpack.library.config.mjs` builds `dist/` with `mode: 'production'`
+ * unconditionally and inlines `process.env.NODE_ENV` as `'production'`, and there is no
+ * development variant of the library build. So the guarded branch below is dead code in every
+ * published bundle — it fires only when this repo's own demo or jest runs from source. The record
+ * a consumer actually gets is `docs/SUPPORTED-PROPS.md` and the changelog entry; the warning is
+ * for the people working in here.
  */
 const DROPPED_PROPS = ['as', 'href', 'celled', 'textAlign', 'verticalAlign', 'fixedHeader']
 

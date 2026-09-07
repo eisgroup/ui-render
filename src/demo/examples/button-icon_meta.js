@@ -15,6 +15,12 @@ const buttonIconMeta = {
   // unchanged. `META_ATTRIBUTES` in scripts/wrapper-prop-curation.js is keyed by WRAPPED view
   // (Table / Tooltip / Select / Dropdown) and `Button` is not one, so `docs:props` is unaffected
   // too. Putting the same line on a Select or a Table node would NOT have been free.
+  // AND AN ACCESSIBLE NAME, because the tooltip must not be the only place this button's purpose
+  // lives. The icon is `aria-hidden`, so without this the control has no accessible name at all —
+  // and since §9.7-F1 step 2 part 3 a tooltip does not open on tap either, which leaves an
+  // icon-only button unlabelled on a touch device as well. `docs/SUPPORTED-PROPS.md` states that
+  // rule under `dropped.on`; this example was breaking it.
+  'aria-label': 'Open popup',
   tooltip: 'Open popup',
   items: [
     {

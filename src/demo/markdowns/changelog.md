@@ -125,14 +125,24 @@
   cannot drift away from the code. The explanatory prose beside it is curated, not machine-checked, and
   the page says so itself. `Table` is the first view to have gone in-house, so its section already
   reads as a record of what it emits and what it dropped rather than as a checklist.
-- **Worth reading if you author meta for those views.** 17 of the props the two remaining wrapped
-  views accept reach `semantic-ui-react` but are used by no meta we can see. The ones you could
-  actually write in a meta are `search`, `multiple`, `allowAdditions` and `clearable` on a select,
-  and `position`, `on`, `hoverable` and `basic` on a tooltip; the rest are derived by the component
-  from another prop, so a meta cannot set them. Both components are still to be reimplemented
-  in-house, and whether each of these is rebuilt or dropped is still an open decision. **If your
-  meta uses one of them, please say so** — that list is the evidence the decision will be made
-  from. The equivalent list for `Table` is now settled: `celled`, `textAlign` and `as` were dropped
+- **Worth reading if you author meta for a select.** 13 of the props a select accepts reach
+  `semantic-ui-react` but are used by no meta we can see. The ones you could actually write in a
+  meta are `search`, `multiple`, `allowAdditions` and `clearable`; the rest are derived by the
+  component from another prop, so a meta cannot set them. That component is still to be
+  reimplemented in-house, and whether each of these is rebuilt or dropped is still an open
+  decision. **If your meta uses one of them, please say so** — that list is the evidence the
+  decision will be made from.
+- **The tooltip is settled, and one thing you could write in a meta is gone.** `position` is kept.
+  `on` is **dropped**: a tooltip no longer opens on click or on tap, only on hover and on keyboard
+  focus. Every tooltipped node in the examples already has its own click action, so one gesture was
+  firing both and the tooltip arrived after the action had run. Two consequences worth knowing: a
+  touch-only device now has no way to see a tooltip, and focus-open reaches a focusable trigger
+  only — a tooltip on a `<span>` is hover-only. `hoverable` and `basic` are dropped too, and did
+  nothing observable before (`basic` emitted a class no loaded rule selects; the bubble was never
+  hoverable in practice). The tooltip also gained `role="tooltip"` and `aria-describedby`, and it
+  is now positioned next to its trigger — it was rendering at the document origin and throwing on
+  every open. See `docs/SUPPORTED-PROPS.md` for the per-prop record.
+- **The equivalent list for `Table` is settled**: `celled`, `textAlign` and `as` were dropped
   (see "Table rendering" above), while `striped` and `inverted` were kept.
 
 #### Compatibility

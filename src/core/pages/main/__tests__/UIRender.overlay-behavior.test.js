@@ -1,17 +1,20 @@
 /**
  * TOOLTIP AND MODAL-POPUP BEHAVIOURAL CONTRACT ================================
  *
- * UPGRADE-PLAN §9.5, contract-test layer (2) — the gate for §9.7-F1 Step 2, the
- * `TooltipPop` replacement (portal + positioning + hover/focus triggers).
+ * UPGRADE-PLAN §9.5, contract-test layer (2). This was the gate for §9.7-F1 Step 2,
+ * the `TooltipPop` replacement; step 2 has SHIPPED, so it is now the contract the
+ * in-house tooltip is held to — CSS placement off the host box, hover and focus
+ * triggers with a delay, and no portal. Every clause below that measured the
+ * wrapper is annotated with what replaced it.
  *
- * WHAT WAS MISSING
+ * WHAT WAS MISSING WHEN THIS FILE WAS WRITTEN
  * -----------------------------------------------------------------------------
- * Tooltip: `components/__tests__/TooltipPop.test.js` mocks `semantic-ui-react`
- * away and asserts the props handed to SUIR's `Popup` (`mouseEnterDelay`, an
- * `inverted` flag, the function-title workaround). Nothing anywhere opens a
- * tooltip. After F1 Step 2 those prop assertions describe a component that no
- * longer exists, while "hovering shows the text, leaving hides it" — the only part
- * a user can observe — was never gated at all.
+ * Tooltip: `components/__tests__/TooltipPop.test.js` mocked `semantic-ui-react`
+ * away and asserted the props handed to SUIR's `Popup` (`mouseEnterDelay`, an
+ * `inverted` flag, the function-title workaround) — assertions that describe a
+ * component which no longer exists, and that file has since been rewritten
+ * against the real one. Nothing anywhere opened a tooltip, so "hovering shows the
+ * text, leaving hides it" — the only part a user can observe — was never gated.
  *
  * Modal popup: the two halves were tested separately and never joined.
  * `rules.popup-actions` asserts the arguments `popupOpen` computes with

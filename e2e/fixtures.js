@@ -69,9 +69,11 @@ const test = base.extend({
 
     /**
      * Every uncaught page error and console error, in order. Exposed as data rather than enforced
-     * as a rule, because the corpus tooltip currently THROWS on open and this leg's job is to
-     * record that at its measured value, not to fail on it. Specs assert against
-     * `reference.js` instead.
+     * as a rule: while the tooltip wrapped `semantic-ui-react` it THREW on every open, and this
+     * leg's job was to record that at its measured value rather than fail on it. Since §9.7-F1
+     * step 2 part 3 the measured value is ZERO (`CORPUS.PAGE_ERRORS_PER_OPEN`), and the shape is
+     * still right — a spec asserting the count against the reference states the contract, where a
+     * blanket "no errors ever" rule would hide which use site regressed.
      */
     pageErrors: async ({ page }, use) => {
         const errors = []
@@ -198,7 +200,7 @@ async function topmostAt (page, x, y) {
  *
  * WHY THIS EXISTS, because it looks like a workaround and is not: `tooltip.less` gives the bubble
  * `pointer-events: none` — the step's own hazard fix, without which the bubble sits under the
- * pointer, `mouseleave` fires on the host and the tooltip flickers. Hit-testing skips such
+ * pointer over its own trigger, which Playwright reported as an unhoverable trigger. Hit-testing skips such
  * elements ENTIRELY, so `document.elementFromPoint` over a bubble reports whatever is behind it.
  * A paint assertion built on plain hit-testing therefore inverts silently: it reads `false` for a
  * bubble that is painted perfectly, which is exactly how the stacking and clipping invariants

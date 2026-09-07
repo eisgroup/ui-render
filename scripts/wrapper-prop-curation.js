@@ -206,11 +206,15 @@ const IN_HOUSE_CURATION = {
             + 'prefixwrap scope, so not one of the 13 `.ui.popup` rules could paint it and the live '
             + 'tooltip was unstyled text. It shares `src/style/components/tooltip.less` with '
             + '`Tooltip.js`, so `tooltip`, `no-wrap`, the four placement words and `show` are all '
-            + 'load-bearing, and `.show` must keep beating the `*:hover > &` reveal at equal '
-            + 'specificity. THE HAZARD THIS STEP CARRIES: `tooltip.less` sets `pointer-events: none` '
-            + 'on the bubble; without it the bubble would sit under the pointer, `mouseleave` would '
-            + 'fire on the host, and the tooltip would flicker. `css.tooltip-contract.test.js` joins '
-            + 'the emitted markup to the loaded CSS in both directions.',
+            + 'load-bearing, and `.show` must keep beating the `*:hover > &` reveal — which it does on '
+            + 'source order at equal specificity, not by outranking it. THE HAZARD THIS STEP CARRIES: '
+            + '`tooltip.less` sets `pointer-events: none` on the bubble, and without it the bubble '
+            + 'swallows the pointer over its own trigger — Playwright measured the trigger as '
+            + 'unhoverable. That declaration is ALSO what makes the pointer over the bubble land on '
+            + 'whatever is behind it, so `mouseleave` fires on the host and the bubble is not '
+            + 'hoverable; removing it would invert both, giving a hoverable bubble and a broken '
+            + 'trigger. `css.tooltip-contract.test.js` joins the emitted markup to the loaded CSS in '
+            + 'both directions.',
         props: {
             title: 'The tooltip body, rendered as the bubble\'s children. A function value is called '
                 + 'and its result rendered — the SUIR-#4029 workaround is gone, but the calling '
@@ -274,6 +278,12 @@ const IN_HOUSE_CURATION = {
             closeOnDocumentClick: 'Closing on an outside click is unconditional. Nothing passed this, '
                 + 'and a tooltip that survives a click elsewhere is a popover, which this is not.',
             closeOnEscape: 'Same: Escape always dismisses.',
+            mouseEnterDelay: 'THE OLD NAME FOR `delay`, and the one silently-dropped prop with a real '
+                + 'chance of appearing in a consumer meta: it was `Popup`\'s own name for the '
+                + 'hover-open delay, and the wrapper forwarded `delay` to it. Listed here — and '
+                + 'therefore warned about — precisely so it is not ignored without a word. Use '
+                + '`delay`, which means the same thing and is the name the component has always '
+                + 'published.',
             mouseLeaveDelay: 'The 70 ms close delay is fixed. NOT for the reason an earlier draft of '
                 + 'this row gave — "so the pointer can cross the gap onto the bubble" is impossible '
                 + 'here, because the bubble is `pointer-events: none` and travelling onto it closes '
@@ -302,16 +312,27 @@ const IN_HOUSE_CURATION = {
                 + '`tooltip.less`.',
             wide: 'Semantic `wide`/`very wide` width steps. Same — no loaded rule selects them.',
         },
-        droppedNote: 'Those 18 are the names the component actively warns about in development, one '
-            + '`console.warn` per name. They are the ones that were REACHABLE: because SUIR\'s rest '
-            + 'spread landed last, a caller reached `Popup.handledProps` ∪ `Portal.handledProps` = 45 '
-            + 'names, 16 of them Portal-only and absent from `Popup`\'s propTypes entirely '
+        droppedNote: 'THE ARITHMETIC, derived from the installed `semantic-ui-react` rather than '
+            + 'estimated — an earlier version of this note said "the remaining ~14" and did not add '
+            + 'up. Because SUIR\'s rest spread landed last, a caller reached '
+            + '`Popup.handledProps` (29) ∪ `Portal.handledProps` (22) = 45 distinct names, 16 of them '
+            + 'Portal-only and absent from `Popup`\'s own propTypes '
             + '(`closeOnPortalMouseLeave`, `closeOnTrigger*`, `openOnTrigger*`, `eventPool`, '
-            + '`triggerRef`, …). The remaining ~14 are Semantic\'s own internals (`context`, '
-            + '`onMount`/`onUnmount`, `openOnTriggerFocus`, the transition props) and warning on them '
-            + 'would be noise: nothing in the product, in any audited meta or in either corpus passes '
-            + 'one. The narrowing is from 45 accepted names to 13. Step 5 records the semver call for '
-            + 'the whole set; on this evidence it is a minor with a changelog entry for `on`.',
+            + '`triggerRef`, …). Those 45 split exactly three ways: 9 are still accepted under the '
+            + 'same name (`content`, `children`, `inverted`, `position`, `open`, `disabled`, '
+            + '`className`, `onOpen`, `onClose`); 19 are DROPPED and warn once each; and 17 are '
+            + 'dropped SILENTLY. 9 + 19 + 17 = 45. Every one of the 18 warned names really was in '
+            + 'that surface — checked, none is invented. The silent 17 are Semantic\'s own internals '
+            + '(`context`, `onMount`/`onUnmount`, `openOnTrigger*`, `popperModifiers`, '
+            + '`positionFixed`, the transition plumbing) and warning on them would be noise, with '
+            + 'one exception worth naming rather than hiding: `style` still reaches the bubble '
+            + 'through the rest spread, so it was never really dropped. `mouseEnterDelay` used to be '
+            + 'in this silent group and was MOVED into the warned one for the same reason — it was '
+            + 'SUIR\'s name for what this component calls `delay`, so a meta spelling it the old way '
+            + 'was ignored without a word. The component\'s own accepted surface is 13 names, four '
+            + 'of which (`title`, `delay`, `classWrap`, `id`) were never SUIR props at all. Step 5 '
+            + 'records the semver call for the whole set; on this evidence it is a minor with a '
+            + 'changelog entry for `on`.',
         passthrough: '`style`, `data-*`, `aria-*` and every event handler still reach the bubble '
             + 'untouched through `omitProps(…, ENGINE_PROPS, FIELD_ONLY_PROPS)` — the same DOM '
             + 'boundary every other component uses, which is new here: SUIR\'s `Popup` applied no such '
@@ -569,7 +590,11 @@ const STEP_OBLIGATIONS = [
                 + 'no keyboard path to the content at all.',
             'HAZARD — HANDLED, and it turned out to bind one behaviour we would otherwise have claimed. '
                 + '`pointer-events: none` is set and pinned in `css.tooltip-contract.test.js`; without it the '
-                + 'bubble sits under the pointer, `mouseleave` fires on the host and the tooltip flickers. The '
+                + 'bubble swallows the pointer over its own trigger, which Playwright measured as an '
+                + 'unhoverable trigger — and it is that same declaration which makes the pointer over the '
+                + 'bubble land on whatever is BEHIND it, firing `mouseleave` on the host. (Not the reverse: '
+                + 'the bubble is a child of the host, and `mouseleave` ignores descendants, so REMOVING it '
+                + 'would make the bubble hoverable and the trigger unusable.) The '
                 + 'consequence is that the bubble CANNOT be hoverable: the pointer over a '
                 + '`pointer-events: none` bubble is really over whatever is behind it. Hoverable text and a '
                 + 'non-interactive bubble are mutually exclusive, and the bubble stays non-interactive — the same '
@@ -635,21 +660,24 @@ const STEP_OBLIGATIONS = [
                 + 'rests on a false premise. No `.ui.popup` rule applies today, because the portal mounts '
                 + 'outside `.ui-render`. See the CSS contract in the `TooltipPop` section above; measured '
                 + 'twice, by selector matching and by real-Chrome computed style.',
-            'STILL OWED — this is an unfiltered DOM boundary, and it is the one thing part 1 pinned as a '
-                + 'DEFECT rather than as a contract: `view`, `index` and `symbol` all reach the bubble as '
-                + 'HTML attributes today (`view="Tooltip"` on every `view: "Tooltip"` node, via the '
-                + '`mapper.js` spread). Apply `omitProps` in the replacement and flip that assertion to '
-                + '`toEqual([])`.',
-            'STILL OWED — decide `on` explicitly. SUIR\'s default is `[\'click\', \'hover\']`, so every '
-                + 'tooltip in the product is also a click target and none of them opens on focus. Part 1 '
-                + 'verified that `[\'hover\', \'focus\']` closes the keyboard gap immediately, so this is a '
-                + 'decision, not a workstream.',
-            'STILL OWED — decide the trigger-shape contract. `React.Children.only` means the `items` form '
-                + 'of `view: "Tooltip"` has never worked: the engine catches the throw and renders its '
-                + 'error diagnostic in place of the node, so the author loses the trigger too. Pinned as '
-                + 'current behaviour; `docs/SUPPORTED-VIEWS.md` is corrected.',
-            'THE POSITIONING DECISION, with the data it needs. Requirements measured, not assumed: flip is '
-                + 'ACTIVE today (`enabled: !pinned`, and the placement class carries Popper\'s resolved '
+            'DONE (was STILL OWED) — the unfiltered DOM boundary is closed. Part 1 pinned it as a DEFECT '
+                + 'rather than as a contract: `view`, `index` and `symbol` all reached the bubble as HTML '
+                + 'attributes (`view="Tooltip"` on every `view: "Tooltip"` node, via the `mapper.js` '
+                + 'spread). Part 3 applies `omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)` and that '
+                + 'assertion is now `toEqual([])`.',
+            'DECIDED (was STILL OWED) — `on` is DROPPED, on the maintainers\' instruction. SUIR\'s default '
+                + 'was `[\'click\', \'hover\']`, so every tooltip was also a click target and none opened on '
+                + 'focus. Hover and focus are the triggers now; the removal and its two guards are recorded '
+                + 'in OBLIGATION 2 above and per-prop under `dropped.on`.',
+            'DECIDED (was STILL OWED) — the trigger may be anything. `React.Children.only` went with the '
+                + 'portal, so the `items` form of `view: "Tooltip"`, which threw and made the engine draw '
+                + 'its error diagnostic in place of the node (losing the trigger too), now renders the '
+                + 'trigger AND the tooltip. Both the old failure and the new behaviour are pinned in '
+                + '`UIRender.overlay-behavior.test.js`, and `docs/SUPPORTED-VIEWS.md` records the flip.',
+            'THE POSITIONING DECISION — RESOLVED as zero-dep CSS placement off the host box (see the '
+                + 'SHIPPED entry above for the costs). The data it was decided on, kept because it is what '
+                + 'made the decision defensible: flip was '
+                + 'ACTIVE (`enabled: !pinned`, and the placement class carried Popper\'s resolved '
                 + 'placement, so a flip is observable in the DOM); overflow clamping is OFF '
                 + '(`preventOverflow` is `enabled: !!offset` and nothing sets `offset`); the arrow is CSS '
                 + '`:before`, not a positioned element; and scroll/resize repositioning is on. So parity is '

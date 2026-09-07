@@ -130,7 +130,7 @@ test.describe('corpus: the string `tooltip` attribute, one step from a fresh loa
         })
         expect(await paintOf(anyBubble(page))).toMatchObject(CORPUS.PAINT)
         // The step's hazard, measured on the node that ships rather than in the stylesheet: without
-        // it the bubble sits under the pointer and the tooltip flickers.
+        // it the bubble swallows the pointer and its own trigger becomes unhoverable.
         expect(await anyBubble(page).evaluate((element) => getComputedStyle(element).pointerEvents))
             .toBe(CORPUS.POINTER_EVENTS)
     })
@@ -269,7 +269,6 @@ test.describe('corpus: interaction, in real time with a real pointer', () => {
 
         await page.mouse.move(4, 4)
         await expect(anyBubble(page)).not.toBeVisible({ timeout: TIMING.CLOSED_AFTER_LEAVE_BY_MS * 3 })
-        expect(DISMISSAL.pointerLeavesTrigger).toBe('closes')
     })
 
     /**
@@ -277,7 +276,8 @@ test.describe('corpus: interaction, in real time with a real pointer', () => {
      * `hoverable: false` defect — SUIR could have made the bubble hoverable and nothing passed the
      * prop. It still closes, and it cannot do otherwise: the bubble must keep `pointer-events:
      * none` (the step's hazard — without it the bubble sits under the pointer and the tooltip
-     * flickers), so the pointer over the bubble is really over whatever is behind it, `mouseleave`
+     * would swallow the pointer over its own trigger), so the pointer over the bubble is really
+     * over whatever is behind it and `mouseleave`
      * fires on the host, and it closes. Hoverable text and a non-interactive bubble are mutually
      * exclusive; the bubble stays non-interactive.
      */
@@ -290,7 +290,6 @@ test.describe('corpus: interaction, in real time with a real pointer', () => {
         // the bubble itself. Nothing in the bubble can be read, hovered or selected.
         await page.mouse.move((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2)
         await expect(anyBubble(page)).not.toBeVisible({ timeout: TIMING.CLOSED_AFTER_LEAVE_BY_MS * 3 })
-        expect(CORPUS.TRAVEL_ONTO_BUBBLE_CLOSES).toBe(true)
     })
 
     /**

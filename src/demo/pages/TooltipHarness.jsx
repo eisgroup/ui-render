@@ -16,14 +16,20 @@ import TooltipPop from '../../core/components/TooltipPop'
  *   - scroll repositioning needs a scroll container the test owns;
  *   - and all of the above need a trigger that can HOLD A REF.
  *
- * That last one is the reason this page renders `TooltipPop` directly instead of through a meta.
- * semantic-ui-react clones the trigger with a `ref`, and of everything reachable from meta only
- * `Dropzone` and the named `RowRef` export can hold one — `mapper.js` uses the plain `Row`, and
- * `Button` is a `React.memo(function Button)`. So from meta the reference element is always `null`,
- * popper's clipping-parent lookup throws, and NO coordinates are ever written (see
- * e2e/reference.js, CORPUS.PAGE_ERRORS_PER_OPEN). Feeding the same component a plain `<button>` is the only way
- * to observe popper's positioning at all, and the contrast between this page and the corpus page
- * IS the diagnosis rather than a workaround for it.
+ * WHY THIS PAGE RENDERS `TooltipPop` DIRECTLY instead of through a meta — the reason it was built,
+ * and the reason it survives its own diagnosis. While the tooltip wrapped `semantic-ui-react`, that
+ * library cloned the trigger with a `ref`, and of everything reachable from meta only `Dropzone`
+ * and the named `RowRef` export could hold one (`mapper.js` uses the plain `Row`; `Button` is a
+ * `React.memo(function Button)`). So from meta the reference element was always `null`, popper's
+ * clipping-parent lookup threw, and no coordinates were ever written. Feeding the same component a
+ * plain `<button>` was the only way to observe positioning at all, and the contrast between this
+ * page and the corpus page WAS the diagnosis.
+ *
+ * Since §9.7-F1 step 2 part 3 there is no ref and no popper — placement is CSS off the
+ * `.tooltip-host` box, so it behaves identically from meta and from here. What the page is FOR now
+ * is isolation: a trigger at a viewport edge, an `overflow: hidden` box, a stacking neighbour, a
+ * trigger taken out of normal flow. Those are the cases the corpus cannot express, and they are
+ * where the step's losses are measured instead of asserted.
  *
  * WHY IT LIVES HERE, under src/demo/:
  *   - `jest.config.js` `collectCoverageFrom` is `src/core/**` + `src/library/**`, so a file here

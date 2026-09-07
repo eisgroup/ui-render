@@ -828,7 +828,7 @@ exports[`demo example full-DOM contract buttonIcon renders a stable, non-empty D
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
     <span class="tooltip-host">
-      <button class="button" type="button">
+      <button aria-label="Open popup" class="button" type="button">
         <i aria-hidden="true" class="icon-trash">
         </i>
       </button>

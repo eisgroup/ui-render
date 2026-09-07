@@ -77,9 +77,13 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
  *            the clipping are real losses, and `docs/SUPPORTED-PROPS.md` records them.
  *   UNCHANGED  the bubble is still not hoverable — the pointer moving onto it closes the tooltip,
  *            exactly as SUIR behaved without `hoverable`. Not an oversight and not fixable here:
- *            the bubble must keep `pointer-events: none` or it sits under the pointer and the
- *            tooltip flickers, which means the pointer over the bubble is really over whatever is
- *            behind it. Hoverable text and a non-interactive bubble are mutually exclusive.
+ *            the bubble must keep `pointer-events: none` or it swallows the pointer over its own
+ *            trigger, which Playwright measured as an unhoverable trigger — and that declaration
+ *            is precisely what makes the pointer over the bubble land on whatever is BEHIND it,
+ *            firing `mouseleave` on the host. (Note it is not that `mouseleave` would fire
+ *            WITHOUT it: the bubble is a child of the host, and `mouseleave` ignores descendants.
+ *            Removing it would make the bubble hoverable and the trigger unusable.) Hoverable text
+ *            and a working trigger are mutually exclusive here; the trigger wins.
  *
  * WHAT THIS COMPONENT DELIBERATELY DOES NOT DO: position anything. There is no measuring, no
  * portal and no coordinate arithmetic — `src/style/components/tooltip.less` owns all eight
@@ -115,15 +119,16 @@ const PLACEMENTS = ['top', 'bottom', 'right', 'left']
  * does not. `docs/SUPPORTED-PROPS.md` carries the reason per prop; the short version is that not
  * one of them occurs on a tooltip node in the demo corpus or in any audited consumer meta.
  *
- * The eighteen are not one kind of thing, and an earlier draft of this sentence implied only four
+ * The nineteen are not one kind of thing, and an earlier draft of this sentence implied only four
  * of them did anything, which is wrong by a factor of two. The split: FOUR emitted a class no
  * loaded rule selects, so they were inert even when passed (`basic`, `size`, `wide`, `flowing`);
  * FOUR configured machinery that is gone, so their behaviour is irrecoverable here (`mountNode`
  * and `popper` are portal plumbing, `pinned` and `offset` configure popper); ONE overrode the
- * bubble's element (`as`); and NINE had real behaviour — `on`, `hoverable`,
- * `closeOnDocumentClick`, `closeOnEscape`, `mouseLeaveDelay`, `hideOnScroll`, `defaultOpen`,
- * `trigger`, `header`. Of those nine, `on` is the only one whose behaviour is removed outright;
- * the rest are now unconditional, fixed, or expressed differently. See "WHAT CHANGED FOR A USER"
+ * bubble's element (`as`); and TEN had real behaviour — `on`, `hoverable`,
+ * `closeOnDocumentClick`, `closeOnEscape`, `mouseEnterDelay`, `mouseLeaveDelay`, `hideOnScroll`,
+ * `defaultOpen`, `trigger`, `header`. Of those ten, `on` is the only one whose behaviour is
+ * removed outright; `mouseEnterDelay` is simply this component's `delay` under Semantic's name,
+ * and the rest are now unconditional, fixed, or expressed differently. See "WHAT CHANGED FOR A USER"
  * above, and `docs/SUPPORTED-PROPS.md` for the per-prop record.
  *
  * Stripped rather than left to ride the rest spread, for the reason step 1 recorded on `Table`:
@@ -132,11 +137,19 @@ const PLACEMENTS = ['top', 'bottom', 'right', 'left']
  * unknown-prop warning that says nothing useful. Stripping SILENTLY would be worse than either —
  * a consumer whose meta still says `on: ['hover']` would never learn it stopped doing anything.
  * So: strip, and say so once per prop in development.
+ *
+ * AND THE WARNING DOES NOT REACH A CONSUMER, which is worth knowing before trusting it as the
+ * migration path: `webpack.library.config.mjs` builds `dist/` with `mode: 'production'`
+ * unconditionally and inlines `process.env.NODE_ENV` as `'production'`, and there is no
+ * development variant of the library build. So the guarded branch below is dead code in every
+ * published bundle — it fires only when this repo's own demo or jest runs from source. The record
+ * a consumer actually gets is `docs/SUPPORTED-PROPS.md` and the changelog entry; the warning is
+ * for the people working in here.
  */
 const DROPPED_PROPS = [
     'as', 'basic', 'closeOnDocumentClick', 'closeOnEscape', 'defaultOpen', 'flowing', 'header',
-    'hideOnScroll', 'hoverable', 'mountNode', 'mouseLeaveDelay', 'offset', 'on', 'pinned', 'popper',
-    'size', 'trigger', 'wide',
+    'hideOnScroll', 'hoverable', 'mountNode', 'mouseEnterDelay', 'mouseLeaveDelay', 'offset', 'on',
+    'pinned', 'popper', 'size', 'trigger', 'wide',
 ]
 
 const warnedDropped = new Set()
@@ -242,12 +255,33 @@ export default function TooltipPop ({
     // `onPointerEnter`/`onPointerDown` handlers below.
     const fromPointer = React.useRef(false)
     const fromTouch = React.useRef(false)
+    // Whether the host currently holds focus. Derived from the focus events this component
+    // already receives rather than read from `document.activeElement`: the DOM answer is right in
+    // a browser and wrong under `fireEvent.focus`, which dispatches the event without moving
+    // focus — so reading the DOM would have made this untestable in the leg that runs on every
+    // commit, for a guard whose whole purpose is a keyboard user's bubble.
+    const hasFocus = React.useRef(false)
+    /**
+     * `disabled` as it is NOW, not as it was when a handler was created.
+     *
+     * A pending open is a closure from the render that scheduled it, so reading the `disabled`
+     * parameter inside it answers a question about the past — which is precisely the mid-flight
+     * case that matters: the prop arrives while a 500 ms open is armed, and the closure still says
+     * `false`. An effect rather than a write during render, because the timer that reads it always
+     * fires after the effect has run.
+     */
+    const disabledNow = React.useRef(disabled)
+    React.useEffect(() => { disabledNow.current = disabled }, [disabled])
 
     // Only a cleanup, and it reads a ref rather than a closure so `exhaustive-deps` stays quiet
     // with an empty dependency list: a pending open must not fire against a detached tree.
     React.useEffect(() => () => {
         if (timer.current != null) clearTimeout(timer.current)
     }, [])
+
+    // Declared before `change()`, which closes over it: a caller-controlled tooltip must not
+    // advance internal state.
+    const controlled = open !== undefined
 
     const cancel = () => {
         if (timer.current == null) return
@@ -257,9 +291,18 @@ export default function TooltipPop ({
 
     const change = next => {
         cancel()
+        // `disabled` wins over every path, so an open must not be REPORTED either. A pending open
+        // that fired after `disabled` arrived told the host `onOpen` while `isOpen` stayed false —
+        // a callback for a bubble that never appeared, and `reported` left standing so the next
+        // genuine open was swallowed as a duplicate.
+        if (next && (disabled || disabledNow.current)) return
         if (reported.current === next) return
         reported.current = next
-        setVisible(next)
+        // Only when UNCONTROLLED. Advancing internal state under a caller-controlled `open` is
+        // invisible until the caller stops passing it, at which point the tooltip jumps to a state
+        // no one asked for. The callbacks below still fire, which is how a controlled host learns
+        // what the user did.
+        if (!controlled) setVisible(next)
         const report = next ? onOpen : onClose
         // `typeof` rather than the house `isFunction`, which rejects a cross-realm function — a
         // callback handed in by a consuming app is exactly that.
@@ -273,8 +316,22 @@ export default function TooltipPop ({
 
     // `disabled` wins over everything, including a caller-driven `open`, because that is what
     // semantic-ui-react did by not rendering its `Portal` at all.
-    const controlled = open !== undefined
-    const isOpen = !disabled && (controlled ? Boolean(open) : visible)
+    /**
+     * The body, and whether there is one at all.
+     *
+     * `mapper.js` maps a `view: "Tooltip"` node's `label` to `content` while `Render.js` passes
+     * `title`, so both names are live and `content` wins — the precedence the wrapper had, where
+     * the rest spread landed after `content={title}`.
+     *
+     * An EMPTY body must not open: the bubble would mount with `role="tooltip"`, an `id` and an
+     * `aria-describedby` pointing at it, and nothing inside — an empty tooltip announced to a
+     * screen reader, and a visible box for a sighted user. `0` is a body; `undefined`, `null` and
+     * `''` are not. Read from the RAW value so a function body can be judged before it is called.
+     */
+    const rawBody = content === undefined ? title : content
+    const hasBody = rawBody != null && rawBody !== ''
+
+    const isOpen = !disabled && hasBody && (controlled ? Boolean(open) : visible)
     const bubbleId = id == null ? generatedId : id
 
     /**
@@ -317,14 +374,15 @@ export default function TooltipPop ({
         }
     }, [isOpen])
 
-    // `mapper.js` maps a `view: "Tooltip"` node's `label` to `content` while `Render.js` passes
-    // `title`, so both names are live and `content` wins — the precedence the wrapper had, where
-    // the rest spread landed after `content={title}`.
-    let body = content === undefined ? title : content
+    let body = rawBody
     // A FUNCTION body is legal and one meta shape relies on it (the workaround for
     // Semantic-Org/Semantic-UI-React#4029). Call it and render the result; SUIR reached the same
     // output through a shorthand path it had already deprecated.
-    if (typeof body === 'function') body = body()
+    //
+    // ONLY WHEN OPEN, and only because it is a call into caller code: invoking it on every render
+    // of a CLOSED tooltip runs whatever the caller put there — work, or a side effect — for a
+    // bubble nobody asked for. The corpus renders these at mount, so it was every page load.
+    if (typeof body === 'function' && isOpen) body = body()
 
     const supported = dropUnsupported(props)
 
@@ -381,6 +439,20 @@ export default function TooltipPop ({
             // component's whole life, and the next KEYBOARD focus was suppressed. That is the
             // keyboard path this step added, disabled by the guard meant to protect it.
             fromPointer.current = false
+            // A POINTER MUST NOT CLOSE WHAT THE KEYBOARD OPENED. This scheduled a close
+            // unconditionally, so a mouse merely crossing the trigger and leaving dismissed a
+            // bubble a keyboard user had opened — focus still on the trigger, and nothing to
+            // reopen it but Tab out and Tab back. Anyone using a keyboard on a machine that also
+            // has a mouse. Focus owns its own bubble; `onBlur` is the path that closes it.
+            // ...but a PENDING HOVER-OPEN must still be cancelled. `schedule()` cancels the timer
+            // as its first act, so returning before it left the pending open armed: the pointer
+            // left the trigger and the bubble appeared 500 ms later with nothing under the cursor.
+            // Caught by the browser leg, not by jsdom, because there the bubble was already open
+            // and the late `change(true)` was a no-op.
+            if (hasFocus.current) {
+                cancel()
+                return
+            }
             schedule(false, CLOSE_DELAY)
         },
         // Focus opens it ONLY when focus did not arrive from a pointer. Without this guard the
@@ -394,6 +466,7 @@ export default function TooltipPop ({
         // and jsdom does not implement it — this way the guard is testable in both legs.
         onPointerDown: () => { fromPointer.current = true },
         onFocus: () => {
+            hasFocus.current = true
             // ONE-SHOT: the flag answers "was THIS focus caused by a pointer", so it is consumed
             // here whether or not it suppressed anything. Left standing it would also suppress the
             // next focus, which no pointer caused.
@@ -401,8 +474,16 @@ export default function TooltipPop ({
             fromPointer.current = false
             if (!causedByPointer) change(true)
         },
+        // NOTE the flag is NOT cleared here, and that is the fix rather than an omission. A click
+        // that moves focus WITHIN the host fires `pointerdown` -> `focusout` -> `focusin`, React
+        // propagates the last two to this wrapper, and clearing on blur wiped the flag before the
+        // incoming focus could consume it — so a plain mouse click read as keyboard-caused and
+        // opened the bubble instantly, which is exactly what dropping click-to-open was for.
+        // Reachable from meta: `Render.js` wraps ANY node carrying a `tooltip`, containers
+        // included. The flag is consumed by `onFocus` and cleared when the pointer leaves; blur
+        // needs neither.
         onBlur: () => {
-            fromPointer.current = false
+            hasFocus.current = false
             change(false)
         },
     }

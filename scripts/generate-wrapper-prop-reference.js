@@ -892,7 +892,8 @@ function inHouseSection (component, { domProps, callSites }) {
         '',
         '`mapper.js`\'s spread onto `Table.Cell` is a meta node\'s whole rest bag and is still'
         + ' unfiltered at the call site — the filter is now inside the cell, which is why it is safe.'
-        + ' The remaining unfiltered boundary on this surface is the tooltip wrapper, and step 2 owns it.',
+        + ' The tooltip was the other unfiltered boundary on this surface; step 2 part 3 closed it, so'
+        + ' `Dropdown` is the last one left and step 3 owns it.',
         '',
     ]
 }

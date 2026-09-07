@@ -1,12 +1,15 @@
 /**
- * THE MEASURED REFERENCE — what semantic-ui-react's `Popup` and the in-house `Tooltip` actually do
- * in real Chrome, on the production demo build, as of §9.7-F1 step 2 part 2.
+ * THE MEASURED REFERENCE — what the tooltip actually does in real Chrome, on the production demo
+ * build. Re-measured for §9.7-F1 step 2 part 3, which replaced the `semantic-ui-react` wrapper.
  * =============================================================================================
  *
- * This file is the point of the whole browser leg. It runs BEFORE the `TooltipPop` replacement, so
- * every value here is a measurement of the CURRENT product, and the specs assert against these
- * constants rather than against inline literals. When part 2 lands, the diff to THIS FILE is the
- * reviewable record of what the replacement changed and what it left alone.
+ * This file is the point of the whole browser leg: the specs assert against these constants rather
+ * than against inline literals, so the diff to THIS FILE is the reviewable record of what the
+ * replacement changed and what it left alone. Part 2 wrote it against the wrapper; part 3 re-ran
+ * every value against the in-house component, and 23 of the 39 tests moved with it.
+ *
+ * READ THE TAGS, NOT THE PROSE, when the two disagree — and if you find one that does, fix the
+ * prose. Several notes in this file described the wrapper for a while after it was gone.
  *
  * EVERY FACT CARRIES ONE OF THREE TAGS. A suite that failed wholesale on the planned replacement
  * would be a tripwire on the plan, not a gate, so the distinction is structural rather than a
@@ -58,6 +61,12 @@
  *    `eventsEnabled` scroll repositioning is UNREACHABLE in this product, so the replacement owes
  *    nothing there. §9.5's "`eventsEnabled` is on today and its effect is invisible" is right for
  *    the wrong reason.
+ *
+ * HOW TO USE A CONSTANT FROM THIS FILE, because nine assertions got it wrong and an adversarial
+ * review of step 2 part 3 caught them: compare a MEASUREMENT with the constant. Never compare the
+ * constant with a hard-coded copy of its own value — `expect(TOUCH.FIRST_TAP).toBe('does nothing')`
+ * reads like a contract and can only fail if someone edits this file, never if the product changes.
+ * Those nine are deleted; the measurement beside each of them was already doing the real work.
  *
  * 4. THE CONVERGENCE TARGET HAS ITS OWN POSITIONING DEFECT, and it is in the exact placement the
  *    replacement would use. `tooltip.less` carries eight placement class combinations and the plan
@@ -141,10 +150,18 @@ const CORPUS = {
         afterContent: '""',
     },
     /**
-     * [I] `pointer-events: none`, and it is load-bearing twice over: without it the bubble sits
-     * under the pointer, Playwright reports the trigger as unhoverable, and `mouseleave` fires on
-     * the host so the tooltip flickers. It is also why the bubble is NOT hoverable — see
-     * TRAVEL_ONTO_BUBBLE_CLOSES.
+     * [I] `pointer-events: none`, load-bearing for ONE measured reason and responsible for one
+     * consequence — and an earlier draft of this note had the mechanism backwards, claiming that
+     * without it `mouseleave` would fire on the host and the tooltip would flicker. It cannot: the
+     * bubble is a CHILD of the host that owns the mouse handlers, and `mouseleave` does not fire
+     * when the pointer moves onto a descendant.
+     *
+     * The reason: the bubble is painted over its own trigger, so without this declaration it
+     * swallows the pointer and the trigger becomes unhoverable — Playwright reported exactly that.
+     * The consequence: because the pointer over the bubble is really over whatever is BEHIND it,
+     * usually outside the host, `mouseleave` fires and the tooltip closes. So this declaration is
+     * also the reason the bubble is not hoverable (TRAVEL_ONTO_BUBBLE_CLOSES) — remove it and the
+     * bubble would become hoverable while the trigger stopped working.
      */
     POINTER_EVENTS: 'none',
     /**

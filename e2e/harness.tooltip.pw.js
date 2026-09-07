@@ -2,18 +2,22 @@
  * GEOMETRY — everything the corpus cannot express, on /harness/tooltip.
  * =============================================================================================
  *
- * The corpus gives one tooltip location and, crucially, no trigger that can hold a `ref`. Popper's
- * reference element is therefore always `null` there, its clipping-parent lookup throws, and NO
- * coordinates are ever written (corpus.tooltip.pw.js pins that). So flip, overflow, stacking and
- * scroll behaviour are not merely hard to observe from meta — they are unobservable, because the
- * positioning never runs.
+ * WHY THIS PAGE EXISTS, in the form the diagnosis left it. While the tooltip wrapped
+ * `semantic-ui-react`, the corpus gave one tooltip location and no trigger that could hold a
+ * `ref`: popper's reference element was always `null` there, its clipping-parent lookup threw, and
+ * no coordinates were ever written — so flip, overflow, stacking and scroll behaviour were not
+ * merely hard to observe from meta, they were unobservable, because the positioning never ran.
+ * This file drove the same component with a plain `<button>`, the one shape a ref could attach to,
+ * and the contrast between the two files WAS the diagnosis.
  *
- * This file drives the SAME `TooltipPop` with a plain `<button>` trigger, which is the only shape
- * semantic-ui-react can attach a ref to. Everything it records is therefore a fact about the
- * component's positioning as configured, and the contrast with the corpus file is the diagnosis.
+ * Since §9.7-F1 step 2 part 3 there is no ref and no popper: placement is CSS off the host box, so
+ * it runs identically from meta and from here. The page keeps its value for a different reason —
+ * it isolates cases the corpus cannot express (a trigger at a viewport edge, an `overflow: hidden`
+ * box, a stacking neighbour, a trigger taken out of normal flow) and it is where the losses are
+ * measured rather than asserted in prose: no flip, no viewport shift, clipping.
  *
- * It also carries the in-house `Tooltip` reference — the convergence target — because nothing else
- * in the repo gates it in a browser and part 2 is judged against not regressing it.
+ * It also carries the in-house `Tooltip` reference — the shape the replacement converged on —
+ * because nothing else in the repo gates it in a browser.
  *
  * Expected values live in e2e/reference.js with [R] / [I] / [R->I] tags. The harness page's own
  * header explains why each section is shaped the way it is.
@@ -22,6 +26,14 @@ const { test, expect, BUBBLE, ANY_BUBBLE, INLINE_BUBBLE, rectOf, adjacency, isWi
 const { BUBBLE_CLASS, INLINE, TIMING, WIDGET } = require('./reference')
 
 const bubble = (page) => page.locator(BUBBLE).first()
+/**
+ * `TooltipPop`'s OWN bubble, which `anyBubble` cannot express: several harness sections render a
+ * static `<Tooltip show>` as a control, and those are `span.tooltip` too — visible from page load,
+ * so `anyBubble(page).first()` resolves against the control on its first poll and a test meant to
+ * wait out the 500 ms hover delay measures the wrong element instead. Only this component nests
+ * its bubble inside `.tooltip-host`.
+ */
+const popBubble = (page) => page.locator('.tooltip-host > span.tooltip').first()
 /** Either shape. `[I]` tests use this so the planned inline convergence can be judged. */
 const anyBubble = (page) => page.locator(ANY_BUBBLE).first()
 
@@ -147,7 +159,6 @@ test.describe('harness: does it position at all', () => {
 
         const probe = await rectOf(page.locator('[data-harness="fixed-probe"]'))
         const viewport = page.viewportSize()
-        expect(WIDGET.FIXED_ESCAPES_APP_CLIP).toBe(true)
         expect(probe.left).toBeCloseTo(24, 0)
         expect(probe.bottom).toBeCloseTo(viewport.height - 24, 0)
     })
@@ -199,8 +210,12 @@ test.describe('harness: collision handling', () => {
     test('[R] clipping: the bubble is confined to an `overflow: hidden` ancestor', async ({ page }) => {
         await section(page, 'clip')
         const box = await rectOf(page.locator('[data-harness="clip"]'))
-        await open(page, 'clipped')
-        const bubbleRect = await rectOf(anyBubble(page))
+        // `popBubble`, and its own wait: this section renders a static `.harness-inline-clipped`
+        // control that `anyBubble` matches from page load, so `open()` returned on its first poll
+        // and every measurement below described the CONTROL rather than the bubble under test.
+        await page.locator('[data-harness-trigger="clipped"]').hover()
+        await popBubble(page).waitFor({ state: 'visible', timeout: TIMING.OPEN_BY_MS * 4 })
+        const bubbleRect = await rectOf(popBubble(page))
 
         // `getBoundingClientRect()` ignores clipping, so the LAYOUT rect leaves the box...
         expect(isWithin(bubbleRect, box), 'the layout rect is not confined to the box').toBe(false)
@@ -242,7 +257,10 @@ test.describe('harness: collision handling', () => {
         await section(page, 'scroll')
         await open(page, 'scrolled')
         await page.mouse.wheel(0, 30)
-        await expect(page.locator(BUBBLE)).toHaveCount(0, { timeout: TIMING.SCROLL_CLOSES_WITHIN_MS * 3 })
+        // `popBubble`, never `BUBBLE`: the semantic-ui-react portal selector matches nothing since
+        // the tooltip went in-house, so this assertion was vacuously true and the test had stopped
+        // measuring scroll-dismissal at all.
+        await expect(popBubble(page)).not.toBeVisible({ timeout: TIMING.SCROLL_CLOSES_WITHIN_MS * 3 })
     })
 
     test('[I] stacking: the inline bubble\'s `z-index: 9` beats host content at 6; the portal\'s `auto` does not', async ({ page }) => {
@@ -317,9 +335,18 @@ test.describe('harness: the dismissal contract, on a trigger with no action of i
         // regression. Both dismissals below are the ones a keyboard user depends on.
         await trigger.hover()
         await expect(anyBubble(page)).toBeVisible({ timeout: TIMING.OPEN_BY_MS * 4 })
-        await page.mouse.click(40, 700)
+        // DISPATCHED, not `mouse.click(40, 700)`. Playwright moves the pointer before clicking,
+        // which leaves the host and closes the bubble 70 ms later on `mouseleave` — so the
+        // assertion was satisfied by the pointer leaving and would have passed with no document
+        // listener at all. Dispatching leaves the pointer on the trigger, so nothing but the
+        // outside click can account for the close.
+        await page.evaluate(() => document.body.dispatchEvent(new MouseEvent('click', { bubbles: true })))
         await expect(anyBubble(page)).not.toBeVisible()
 
+        // Away and back: the dispatched click above left the pointer ON the trigger, so a second
+        // `hover()` is a no-op — no `mouseenter`, no scheduled open, and the Escape half below
+        // would fail on its setup rather than on Escape.
+        await page.mouse.move(4, 4)
         await trigger.hover()
         await expect(anyBubble(page)).toBeVisible({ timeout: TIMING.OPEN_BY_MS * 4 })
         await page.keyboard.press('Escape')
@@ -340,7 +367,6 @@ test.describe('harness: the convergence target — the in-house `Tooltip`', () =
         await expect
             .poll(async () => (await paintOf(hover)).display, { timeout: TIMING.OPEN_BY_MS * 2 })
             .toBe(INLINE.OPEN_PAINT.display)
-        expect(INLINE.HOVER_REVEALS).toBe(true)
 
         // Deliberately NOT an opacity assertion: `.tooltip` reveals itself with
         // `animation: fade-in 0.5s forwards`, so opacity is a function of wall-clock time and of
@@ -359,7 +385,6 @@ test.describe('harness: the convergence target — the in-house `Tooltip`', () =
             const before = getComputedStyle(element, '::before')
             return { afterContent: after.content, afterBorderLeftWidth: after.borderLeftWidth, beforeContent: before.content }
         })
-        expect(INLINE.ARROW_PSEUDO).toBe('::after')
         expect(arrow.afterContent).not.toBe('none')
         expect(arrow.afterBorderLeftWidth).not.toBe('0px')
         // ...unlike the popup's, which is a `::before`. Naming the difference so part 2 does not

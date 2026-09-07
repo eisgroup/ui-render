@@ -1,16 +1,19 @@
 /**
- * KEYBOARD AND SCREEN-READER WIRING — the tooltip's current state, and the bones step 3 needs.
+ * KEYBOARD AND SCREEN-READER WIRING — the tooltip's contract, and the bones step 3 needs.
  * =============================================================================================
  *
  * TWO JOBS, and they are different in kind.
  *
- * (1) THE TOOLTIP, as it is. §9.5 records that the open tooltip carries neither `role="tooltip"`
- *     nor `aria-describedby` and does not open on focus. That is recorded here as a DEFECT — the
- *     current state — and NOT as a contract to preserve. There is no keyboard path to a tooltip's
- *     content in this product at all: `on` is `['click', 'hover']`, and a click on any real meta
- *     node is already spoken for by that node's own action. Step 2 part 1 verified in jsdom that
- *     `['hover', 'focus']` closes the gap immediately, and `tooltip.less:30` already reveals the
- *     inline bubble on `*:focus > &`, so this is a decision rather than a workstream.
+ * (1) THE TOOLTIP. This file recorded the a11y gap as a DEFECT while it stood: no `role="tooltip"`,
+ *     no `aria-describedby`, no focus-open, and therefore no keyboard path to a tooltip's content
+ *     in the product at all. §9.7-F1 step 2 part 3 CLOSED all of it, and the tests below now
+ *     assert the positive: focus opens the bubble, it carries `role="tooltip"` and an id, and the
+ *     trigger points at it. That happened because click-to-open was dropped — with click gone and
+ *     hover unavailable to a keyboard, the wiring stopped being optional.
+ *
+ *     ONE LIMIT WORTH KNOWING BEFORE READING THE ASSERTIONS: focus-open reaches a focusable
+ *     trigger only. A tooltip on a `<span>` or a `<div>` is hover-only, and nothing here adds a
+ *     `tabindex` to change that.
  *
  * (2) THE `Dropdown` BONES for step 3. §9.5 makes a keyboard/a11y matrix mandatory for step 3,
  *     which is F1's largest step, and the expensive half of such a matrix is the harness plus the
@@ -34,7 +37,6 @@ test.describe('tooltip: keyboard', () => {
         await page.locator('[data-harness="kbd-before"]').focus()
 
         const stops = await tabThrough(page, 2)
-        expect(KEYBOARD.TRIGGER_IS_TAB_REACHABLE).toBe(true)
         expect(stops[0]).toMatchObject({ tag: 'button', harness: 'keyboard' })
         expect(stops[1]).toMatchObject({ tag: 'input', harness: 'kbd-after' })
     })
@@ -56,7 +58,6 @@ test.describe('tooltip: keyboard', () => {
 
         await trigger.focus()
         expect(await activeElement(page)).toMatchObject({ tag: 'button', harness: 'keyboard' })
-        expect(KEYBOARD.FOCUS_OPENS).toBe(true)
         // Visible BEFORE the hover delay could have elapsed, which is what makes this the focus
         // path rather than "the pointer happened to be there".
         await expect(page.locator(ANY_BUBBLE).first()).toBeVisible({ timeout: TIMING.STILL_CLOSED_AT_MS })
@@ -89,16 +90,21 @@ test.describe('tooltip: keyboard', () => {
         await page.goto('/harness/tooltip?section=keyboard')
         await page.locator('[data-harness-section="keyboard"]').waitFor()
 
-        // Opened by FOCUS, where part 2 opened by click — the click gesture is gone, and a
-        // dismissal test that opens with it would fail on its setup and read as a dismissal
-        // regression. Focus is also the honest setup here: this test is about the keyboard.
-        await page.locator('[data-harness-trigger="keyboard"]').focus()
-        await expect(page.locator(ANY_BUBBLE).first()).toBeVisible({ timeout: TIMING.OPEN_BY_MS })
+        // Opened by HOVER, and that choice is the whole integrity of this test. Opening by FOCUS
+        // and then focusing the input blurs the trigger, `onBlur` closes the bubble at that
+        // instant, and `Escape` on the next line acts on an already-closed tooltip — the final
+        // assertion passes on the blur and Escape is never exercised. Hovering leaves the trigger
+        // unfocused, so moving focus into the input costs nothing and the bubble is still open
+        // when the key is pressed.
+        await page.locator('[data-harness-trigger="keyboard"]').hover()
+        await expect(page.locator(ANY_BUBBLE).first()).toBeVisible({ timeout: TIMING.OPEN_BY_MS * 4 })
         // Focus inside a native text input, which consumes most keys itself — jsdom has no native
         // focus semantics, so "does Escape still reach the document handler" is only answerable here.
         await page.locator('[data-harness="kbd-after"]').focus()
+        // Still open with focus elsewhere: without this the test cannot tell Escape from the setup.
+        await expect(page.locator(ANY_BUBBLE).first()).toBeVisible()
+
         await page.keyboard.press('Escape')
-        expect(KEYBOARD.ESCAPE_CLOSES_FROM_UNRELATED_ELEMENT).toBe(true)
         await expect(page.locator(ANY_BUBBLE).first()).not.toBeVisible()
     })
 })

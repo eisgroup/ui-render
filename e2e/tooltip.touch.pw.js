@@ -37,14 +37,12 @@ test('[I] a tap does not open the bubble, so the gesture is the trigger\'s alone
     expect(await page.locator(ANY_BUBBLE).count()).toBe(0)
 
     await trigger.tap()
-    expect(TOUCH.FIRST_TAP).toBe('does nothing')
     // Well past both the click path (instant) and the hover path (500 ms), so this is "a tap does
     // not open it" rather than "not yet".
     await page.waitForTimeout(TIMING.OPEN_BY_MS * 2)
     await expect(page.locator(ANY_BUBBLE)).toHaveCount(0)
 
     await trigger.tap()
-    expect(TOUCH.SECOND_TAP).toBe('does nothing')
     await expect(page.locator(ANY_BUBBLE)).toHaveCount(0)
 })
 
