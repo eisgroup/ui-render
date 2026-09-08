@@ -67,9 +67,6 @@
           "src/**/*.ts",
           "src/**/*.tsx"
         ],
-        "excludedFiles": [
-          "src/core/components/**"
-        ],
         "rules": {
           "no-restricted-imports": [
             "error",
@@ -77,7 +74,7 @@
               "paths": [
                 {
                   "name": "semantic-ui-react",
-                  "message": "semantic-ui-react may only be imported inside src/core/components (ui-react-pack). See UPGRADE-PLAN 9.7-F1 and docs/SUPPORTED-PROPS.md."
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
                 }
               ],
               "patterns": [
@@ -105,8 +102,7 @@
     "prop-types": "^15.8.1",
     "rc-picker": "4.11.3",
     "react-final-form": "^6.5.9",
-    "react-final-form-arrays": "^3.1.4",
-    "semantic-ui-react": "^3.0.0-beta.2"
+    "react-final-form-arrays": "^3.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",

@@ -112,6 +112,28 @@
   does. In the demo example set this removes 57 dangling references; no other rendered output
   changes.
 
+#### Dependencies
+
+- **`semantic-ui-react` is no longer a dependency.** Installing this package used to install
+  Semantic UI React with it — a full copy that the bundle stopped using once `Table`, `Tooltip`
+  and `Select`/`Dropdown` were reimplemented in-house. It is gone from `dependencies`, so it is
+  gone from your `node_modules` too.
+
+  **This is the part that mattered for your React version.** Semantic UI React declares
+  `react ^16.8 || ^17 || ^18` as its own peer, and npm enforces that on *your* install — so while
+  the package was in our dependency list it capped the React you could use, regardless of whether
+  our code called it. That cap is gone.
+
+  We have not widened our own peer range yet: it still reads
+  `^16.14.0 || ^17.0.0 || ^18.0.0`. Removing someone else's cap and claiming React 19 support are
+  two different things, and the second needs our own React 19 test job to stop being advisory.
+  It is green today, which is the first real evidence, but the claim comes with the release that
+  makes it.
+
+  Nothing about the rendered output or the meta contract changes here. The Semantic **styles** are
+  still loaded (that is a separate package, `semantic-ui-less`, and a separate step), which is why
+  components still emit class names like `ui selection dropdown`.
+
 #### Select and Dropdown
 
 - **The select is ours now, and its keyboard behaviour changed on purpose.** `Select` and
