@@ -290,7 +290,11 @@ describe('generated supported-prop reference', () => {
             entry.rules && entry.rules['no-restricted-imports']
         ))
         expect(override).toBeDefined()
-        expect(override.excludedFiles).toEqual(['src/core/components/**'])
+        // It used to carry `excludedFiles: ['src/core/components/**']` — the one place allowed to
+        // import the package. §9.7-F1 step 3½ deleted the package, so there is no exemption left
+        // to grant and the guard covers ALL of `src`: an import anywhere would fail to resolve
+        // anyway, and this is what says so with a message instead of a module-not-found.
+        expect(override.excludedFiles).toBeUndefined()
         const [severity, options] = override.rules['no-restricted-imports']
         expect(severity).toBe('error')
         expect(options.paths.map(entry => entry.name)).toContain('semantic-ui-react')

@@ -262,12 +262,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # `--legacy-peer-deps` is deliberate, not carelessness: two installed packages still declare
-      # `react ^16.8.0 || ^17.0.0 || ^18.0.0` peers, so npm would abort this install with ERESOLVE.
-      #   1. semantic-ui-react (bundled dependency — removed by §9.7-F1 step 3½)
-      #   2. react-final-form 6.5.9 (19-ready line is 7.0.1 — §9.7-F4)
-      # Both caps are tracked upgrades; the flag overrides the peer check for this throwaway install
-      # only and never touches what we declare to consumers. `--no-save` leaves package.json alone.
+      # `--legacy-peer-deps` is deliberate, not carelessness: an installed package still declares a
+      # `react ^16.8.0 || ^17.0.0 || ^18.0.0` peer, so npm would abort this install with ERESOLVE.
+      #   1. react-final-form 6.5.9 (19-ready line is 7.0.1 — §9.7-F4)
+      # There were TWO. `semantic-ui-react` was the other, and §9.7-F1 step 3½ removed it — which is
+      # the whole point of that step: the dependency ENTRY is what caps a host's React, not the
+      # bundled code (§2.6-11). One cap left, and it is a tracked upgrade. The flag overrides the
+      # peer check for this throwaway install only and never touches what we declare to consumers.
+      # `--no-save` leaves package.json alone.
       - name: Install React 19 over the lock
         run: npm install --no-save --legacy-peer-deps react@19 react-dom@19
 
