@@ -14,35 +14,6 @@ const options = [
 ]
 
 describe('Dropdown - allowAdditions', () => {
-    it('renders with allowAdditions enabled', () => {
-        const onAddItem = jest.fn()
-        const { container } = render(wrap(
-            <Dropdown options={options} allowAdditions search onAddItem={onAddItem} onChange={() => {}} />
-        ))
-        expect(container.querySelector('.ui.dropdown')).toBeInTheDocument()
-    })
-
-    /**
-     * REWRITTEN at §9.7-F1 step 3 part 1: this test contained NO `expect` at all, and its comment
-     * said so ("No throw; addition logic is set up internally"). The wrapper sets
-     * `additionPosition = 'bottom'` only when `upward` is unset, and that IS observable — the
-     * addition item's place in the rendered option list. Measured both ways rather than asserted
-     * one way, because "bottom by default" only means something against the alternative.
-     */
-    it('positions the addition last by default, and first when `upward`', () => {
-        const menuFor = extra => {
-            const { container } = render(wrap(
-                <Dropdown options={options} allowAdditions search onChange={() => {}} {...extra} />
-            ))
-            // A query that MATCHES the existing options, so the addition is listed alongside them
-            // rather than being the only item — which is what a non-matching query produces.
-            fireEvent.change(container.querySelector('input.search'), {target: {value: 'Option'}})
-            return Array.from(container.querySelectorAll('[role="option"]')).map(o => o.textContent.trim())
-        }
-
-        expect(menuFor({})).toEqual(['Option A', 'Option B', 'Add Option'])
-        expect(menuFor({upward: true})).toEqual(['Add Option', 'Option A', 'Option B'])
-    })
 })
 
 describe('Dropdown - array value (color-like)', () => {
@@ -53,17 +24,6 @@ describe('Dropdown - array value (color-like)', () => {
         expect(container.querySelector('.ui.dropdown')).toBeInTheDocument()
     })
 
-    it('joins each value in multi-select array', () => {
-        const { container } = render(wrap(
-            <Dropdown
-                options={[{ text: 'Red', value: [255, 0, 0] }, { text: 'Green', value: [0, 255, 0] }]}
-                value={[[255, 0, 0], [0, 255, 0]]}
-                multiple
-                onChange={() => {}}
-            />
-        ))
-        expect(container.querySelector('.ui.dropdown')).toBeInTheDocument()
-    })
 })
 
 describe('Dropdown - additional behaviors', () => {
@@ -100,14 +60,6 @@ describe('Dropdown - additional behaviors', () => {
             <Dropdown options={options} onSelect={onSelect} onChange={() => {}} />
         ))
         expect(container.querySelector('.ui.dropdown')).toBeInTheDocument()
-    })
-
-    it('honors onSearch via onSearchChange', () => {
-        const onSearch = jest.fn()
-        const { container } = render(wrap(
-            <Dropdown options={options} search onSearch={onSearch} />
-        ))
-        expect(container.querySelector('.search.dropdown')).toBeInTheDocument()
     })
 
     it('disables when readonly is true', () => {

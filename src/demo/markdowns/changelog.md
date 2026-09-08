@@ -125,13 +125,24 @@
   cannot drift away from the code. The explanatory prose beside it is curated, not machine-checked, and
   the page says so itself. `Table` is the first view to have gone in-house, so its section already
   reads as a record of what it emits and what it dropped rather than as a checklist.
-- **Worth reading if you author meta for a select.** 13 of the props a select accepts reach
-  `semantic-ui-react` but are used by no meta we can see. The ones you could actually write in a
-  meta are `search`, `multiple`, `allowAdditions` and `clearable`; the rest are derived by the
-  component from another prop, so a meta cannot set them. That component is still to be
-  reimplemented in-house, and whether each of these is rebuilt or dropped is still an open
-  decision. **If your meta uses one of them, please say so** — that list is the evidence the
-  decision will be made from.
+- **The select is narrowing, and this is the breaking part.** An earlier entry listed
+  `search`, `multiple`, `allowAdditions` and `clearable` as the props you could actually write on a
+  select, said the decision to rebuild or drop them was open, and asked you to speak up if your
+  meta used one. **Nobody did, so `search`, `multiple` and `allowAdditions` are now removed**,
+  along with the callbacks that only served them (`onSearch`, `onAddItem`) and `autofocus`, which
+  did nothing without `search` — it only ever set the search input's focus.
+
+  **If your meta declares any of them, it will silently lose that behaviour**: the prop is simply
+  not read any more. Nothing in our own examples declares them, and our record of props that only
+  consumer metas use lists `disabled`, `upward` and `validate` for a select and nothing for a
+  dropdown — which is the evidence the decision rests on. If that record is wrong for you, say so
+  now rather than after the release.
+
+  What is NOT affected, because it shares code with none of this: options as strings, numbers or
+  objects; a colour option whose value is an array like `[r, g, b]`; `optionsLabel`; the cascading
+  reset when a parent select changes the option list; `compact`, `upward`, `disabled`, `readonly`
+  and `placeholder`. `clearable` was never read by the wrapper at all, so it is unaffected by this
+  change and remains as it was.
 - **The tooltip is settled, and one thing you could write in a meta is gone.** `position` is kept.
   `on` is **dropped**: a tooltip no longer opens on click or on tap, only on hover and on keyboard
   focus. Every tooltipped node in the examples already has its own click action, so one gesture was

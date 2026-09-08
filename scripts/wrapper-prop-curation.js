@@ -359,6 +359,38 @@ const IN_HOUSE_CURATION = {
  */
 const WRAPPER_CURATION = {
     Dropdown: {
+        dropped: {
+            search: 'Type-to-filter. Removed at §9.7-F1 step 3 part 2, with `multiple` and '
+                + '`allowAdditions`, on the maintainers\' decision: NO tracked example meta and no '
+                + 'consumer meta declares it. That second half is not an assumption — this repo '
+                + 'records consumer-only attributes separately (`CONSUMER_ONLY_ATTRIBUTES`), and for '
+                + '`Select` the list is `disabled`, `upward`, `validate`; for `Dropdown` it is '
+                + 'empty. The changelog had also invited consumers to report using exactly these '
+                + 'props, and no report came. Removing it is what makes a hand-rolled replacement '
+                + 'tractable — filtering, diacritics-insensitive matching and a search input are '
+                + 'the bulk of what the library was doing.',
+            multiple: 'Multi-selection, with the value as an array. Same decision and same evidence '
+                + 'as `search`. The one `"multiple": false` in the tracked corpus is on a FILE '
+                + 'UPLOAD input, not on a select — checked, not assumed. Note the array-VALUE path '
+                + 'survives untouched: a colour option carries `[r, g, b]` and is still joined to a '
+                + 'string, which is a different feature that happened to share this branch.',
+            allowAdditions: 'Free-text entry of new options, with `additionLabel`, '
+                + '`additionPosition` and `onAddItem`. Same decision and evidence. Its removal also '
+                + 'made a part-1 fix unnecessary: `onAddItem` used to write the option list back '
+                + 'into state including the appended `optionsLabel`, so every addition appended '
+                + 'another label — nothing writes options back now.',
+            onSearch: 'The callback for `search`, gone with it. It had zero occurrences in product '
+                + 'code and in both corpora.',
+            onAddItem: 'The callback for `allowAdditions`, gone with it. Also zero occurrences.',
+            autofocus: 'Went with `search` because it could not outlive it: the wrapper turned it '
+                + 'into `searchInput={{autoFocus: true}}`, which does nothing on a control with no '
+                + 'search input. Removing search left it dead rather than merely unused.',
+        },
+        droppedNote: 'Six names, one decision. The evidence is that nothing declares them: not the '
+            + 'tracked examples, not the consumer-only record, and no answer to the changelog entry '
+            + 'that asked. This is a BREAKING change for anyone who did and did not say so, which '
+            + 'is why it is on this page rather than only in the swap PR — step 5 records the semver '
+            + 'call for the whole exit, and on this evidence this part of it is a major.',
         summary: 'The wrapper already owns the external API: the `onChange(value, name, event)` '
             + 'signature, option sanitisation, case-insensitive dedup on addition, and the cascading '
             + 'reset are all wrapper code and are keepers. Only the `<DropDown/>` element at the bottom '
@@ -384,10 +416,6 @@ const WRAPPER_CURATION = {
                 + 'Semantic\'s `(event, data)`. Also where case-insensitive duplicate collapsing happens.',
             onSelect: 'Called on close with the last committed value, same `(value, name, event)` shape. '
                 + 'Implemented by handing SUIR an `onClose`.',
-            onSearch: 'Called with the typed query, `(query, name, event)`. Implemented by handing SUIR '
-                + 'an `onSearchChange`.',
-            onAddItem: 'Called when a new option is added, `(value, name, event)`. Requires '
-                + '`allowAdditions`; the wrapper dedups against existing options first.',
             label: 'Visible label text, rendered by the wrapper as its own `<Text>` before or after the '
                 + 'control depending on `float`. CONSUMED, not stripped: it is destructured out at the '
                 + 'top of the wrapper, so it can never be in the rest bag that `omitProps` filters.',
@@ -411,8 +439,6 @@ const WRAPPER_CURATION = {
                 + '`initialValues` off the DOM.',
             readonly: 'Translated to SUIR `disabled` plus a `readonly` class, because Semantic\'s '
                 + 'Dropdown has no `readOnly`.',
-            autofocus: 'Translated to SUIR `searchInput={{autoFocus: true}}`, so it only does anything '
-                + 'together with `search`.',
             onClickIcon: 'Replaces the icon with a clickable `<Icon>` node, because Semantic has no '
                 + 'icon-click callback.',
             translate: 'The i18n function. Engine-owned, applied to option text, `label` and '
@@ -444,19 +470,12 @@ const FORWARDED_CURATION = {
         placeholder: { via: 'element', tier: 1, source: 'demo', summary: 'Translated placeholder.' },
         error: { via: 'element', tier: 1, source: 'demo', summary: 'Coerced to boolean; drives the `error` class only.' },
         lazyLoad: { via: 'element', tier: 1, source: 'demo', summary: 'When true and closed, SUIR renders no options at all. Load-bearing for the initial DOM.' },
-        noResultsMessage: { via: 'element', tier: 1, source: 'demo', summary: 'Computed by the wrapper, but SUIR only renders it when `search` is on — so the `NO_OPTIONS_LEFT`/`NOTHING_FOUND` computation is dead in both corpora. Do not port it as a requirement.' },
         value: { via: 'element', tier: 1, source: 'demo', summary: 'Wrapper state, with array values joined to a string. `selectOnNavigation` and `selectOnBlur` both default true in SUIR, which is the commit-as-you-move behaviour the contract suite pins.' },
         selection: { via: 'generated', tier: 1, source: 'demo', summary: 'Defaulted to true by the wrapper unless the caller says otherwise. This is what makes the className `ui selection dropdown`, which is what almost all the loaded dropdown CSS selects on.' },
         disabled: { via: 'generated', tier: 1, source: 'consumer', summary: 'Set by the wrapper from `readonly`, and passed directly by consumer metas (`view: "Select"`). Adds the `disabled` class, which IS styled, and sets `tabIndex=-1`.' },
-        deburr: { via: 'generated', tier: 2, source: null, summary: 'Defaulted to true by the wrapper, but only when `search` is set — which nothing sets.' },
         icon: { via: 'generated', tier: 2, source: null, summary: 'Replaced with a node only when `onClickIcon` is given. No occurrences.' },
-        searchInput: { via: 'generated', tier: 2, source: null, summary: 'Set only from `autofocus`. No occurrences.' },
         onChange: { via: 'generated', tier: 1, source: 'demo', summary: 'The wrapper\'s adapter, which is where the `(value, name, event)` signature and the duplicate collapsing live. SUIR calls it `(event, data)`.' },
         onClose: { via: 'generated', tier: 2, source: null, summary: 'Set only from `onSelect`. No occurrences in either corpus.' },
-        onSearchChange: { via: 'generated', tier: 2, source: null, summary: 'Set only from `onSearch`. No occurrences.' },
-        onAddItem: { via: 'generated', tier: 2, source: null, summary: 'Set only under `allowAdditions`. No occurrences.' },
-        additionLabel: { via: 'generated', tier: 2, source: null, summary: 'Set only under `allowAdditions`.' },
-        additionPosition: { via: 'generated', tier: 2, source: null, summary: 'Set only under `allowAdditions`.' },
         compact: { via: 'rest', tier: 1, source: 'demo', summary: 'Narrow control. Used by both corpora, and also suppresses the wrapper\'s `fill-width`.' },
         upward: { via: 'rest', tier: 1, source: 'consumer', summary: 'Opens the menu upward. Consumer metas only — a demo-derived checklist misses it. It is an autoControlled prop in SUIR: left unset, SUIR measures viewport space and flips by itself, so a replacement owes both the prop AND the auto-flip.' },
         onFocus: { via: 'rest', tier: 1, source: 'demo', summary: 'Arrives from the react-final-form adapter on the `view: "Select"` path.' },

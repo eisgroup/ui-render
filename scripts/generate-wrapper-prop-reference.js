@@ -767,6 +767,22 @@ function wrapperSection (wrapper, { domProps }) {
             + ' the same prop appears in both tables.', '')
     }
 
+    // A REMOVED prop is published the same way an in-house component's is. Optional, because only
+    // a wrapper mid-exit has any: §9.7-F1 step 3 part 2 dropped `search`, `multiple` and
+    // `allowAdditions` from the dropdown before replacing it, and a consumer needs that on the page
+    // that documents the props — prose in the summary is not where anyone looks for a prop.
+    if (curation.dropped && Object.keys(curation.dropped).length) {
+        lines.push(
+            `**Dropped (${Object.keys(curation.dropped).length}).** No longer accepted. `
+            + (curation.droppedNote || ''),
+            '',
+            row(['Prop', 'Why it is gone']),
+            row(['---', '---']),
+            ...Object.keys(curation.dropped).map(name => row([code(name), curation.dropped[name]])),
+            '',
+        )
+    }
+
     lines.push(
         `**Stripped at the DOM boundary.** ${stripped.length
             ? `${code(wrapper.file)} applies ${codeList(wrapper.omitLists)} from ${code(DOM_PROPS_FILE)}`

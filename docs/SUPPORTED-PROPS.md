@@ -215,18 +215,17 @@ THE ARITHMETIC, derived from the installed `semantic-ui-react` rather than estim
 
 ### `Dropdown` — wraps semantic-ui-react `Dropdown`
 
-`src/core/components/Dropdown.js`, 330 lines.
+`src/core/components/Dropdown.js`, 270 lines.
 
 The wrapper already owns the external API: the `onChange(value, name, event)` signature, option sanitisation, case-insensitive dedup on addition, and the cascading reset are all wrapper code and are keepers. Only the `<DropDown/>` element at the bottom is replaced. Two entry points, and they differ: `mapper.js` imports the memoised default export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.js` imports the NAMED export for `view: "Select"` — which is the majority path.
 
-**Consumed by the wrapper (23).** These never reach semantic-ui-react — we own the behaviour, and the §9.7-F1 swap cannot change it.
+**Consumed by the wrapper (20).** These never reach semantic-ui-react — we own the behaviour, and the §9.7-F1 swap cannot change it.
 
 | Prop | Meaning |
 | --- | --- |
 | `options` <br>*(bound as `opts`)* | Option list: strings, numbers, or `{text, value, key, content, disabled}` objects. Sanitised into a fresh array (translation, `value`-from-`text` defaulting, `optionsLabel` appended) and held in wrapper state so additions can extend it. The array SUIR receives is never the array the caller passed. |
 | `onChange` | Called as `onChange(value, name, event)` — the wrapper's own signature, not Semantic's `(event, data)`. Also where case-insensitive duplicate collapsing happens. |
 | `onSelect` | Called on close with the last committed value, same `(value, name, event)` shape. Implemented by handing SUIR an `onClose`. |
-| `onSearch` | Called with the typed query, `(query, name, event)`. Implemented by handing SUIR an `onSearchChange`. |
 | `label` | Visible label text, rendered by the wrapper as its own `<Text>` before or after the control depending on `float`. CONSUMED, not stripped: it is destructured out at the top of the wrapper, so it can never be in the rest bag that `omitProps` filters. |
 | `placeholder` <br>*(has a default)* | Placeholder text, translated by the wrapper and then forwarded to SUIR. |
 | `done` | Adds a `done` class to the wrapper. Defaulted from `props.value` — which is always `undefined`, because `value` was destructured out, so the class is unreachable from a value today. Do not port the defaulting faithfully; fix it or drop it. |
@@ -241,17 +240,26 @@ The wrapper already owns the external API: the `onChange(value, name, event)` si
 | `optionsLabel` | Extra disabled option appended to the bottom of the list. |
 | `initialValues` | Accepted and discarded — it exists only to keep the form stack's `initialValues` off the DOM. |
 | `readonly` | Translated to SUIR `disabled` plus a `readonly` class, because Semantic's Dropdown has no `readOnly`. |
-| `autofocus` | Translated to SUIR `searchInput={{autoFocus: true}}`, so it only does anything together with `search`. |
-| `onAddItem` | Called when a new option is added, `(value, name, event)`. Requires `allowAdditions`; the wrapper dedups against existing options first. |
 | `onClickIcon` | Replaces the icon with a clickable `<Icon>` node, because Semantic has no icon-click callback. |
 | `translate` <br>*(has a default)* | The i18n function. Engine-owned, applied to option text, `label` and `placeholder`. CONSUMED, not stripped — destructured out at the top of the wrapper. It is also in ENGINE_PROPS, which is what catches it at other boundaries. |
 | `value` <br>*(bound as `valueFromParent`)* | Selected value. Held in wrapper state, synced from the prop, and array values are joined before being forwarded — so what SUIR sees is not always what the caller passed. |
 
 `options`, `placeholder`, `error`, `className`, `lazyLoad`, `value` are also written back onto the semantic-ui-react element under the same name, so the same prop appears in both tables.
 
+**Dropped (6).** No longer accepted. Six names, one decision. The evidence is that nothing declares them: not the tracked examples, not the consumer-only record, and no answer to the changelog entry that asked. This is a BREAKING change for anyone who did and did not say so, which is why it is on this page rather than only in the swap PR — step 5 records the semver call for the whole exit, and on this evidence this part of it is a major.
+
+| Prop | Why it is gone |
+| --- | --- |
+| `search` | Type-to-filter. Removed at §9.7-F1 step 3 part 2, with `multiple` and `allowAdditions`, on the maintainers' decision: NO tracked example meta and no consumer meta declares it. That second half is not an assumption — this repo records consumer-only attributes separately (`CONSUMER_ONLY_ATTRIBUTES`), and for `Select` the list is `disabled`, `upward`, `validate`; for `Dropdown` it is empty. The changelog had also invited consumers to report using exactly these props, and no report came. Removing it is what makes a hand-rolled replacement tractable — filtering, diacritics-insensitive matching and a search input are the bulk of what the library was doing. |
+| `multiple` | Multi-selection, with the value as an array. Same decision and same evidence as `search`. The one `"multiple": false` in the tracked corpus is on a FILE UPLOAD input, not on a select — checked, not assumed. Note the array-VALUE path survives untouched: a colour option carries `[r, g, b]` and is still joined to a string, which is a different feature that happened to share this branch. |
+| `allowAdditions` | Free-text entry of new options, with `additionLabel`, `additionPosition` and `onAddItem`. Same decision and evidence. Its removal also made a part-1 fix unnecessary: `onAddItem` used to write the option list back into state including the appended `optionsLabel`, so every addition appended another label — nothing writes options back now. |
+| `onSearch` | The callback for `search`, gone with it. It had zero occurrences in product code and in both corpora. |
+| `onAddItem` | The callback for `allowAdditions`, gone with it. Also zero occurrences. |
+| `autofocus` | Went with `search` because it could not outlive it: the wrapper turned it into `searchInput={{autoFocus: true}}`, which does nothing on a control with no search input. Removing search left it dead rather than merely unused. |
+
 **Stripped at the DOM boundary.** `src/core/components/Dropdown.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js` to the rest bag, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`. `name` is the interesting one: SUIR declares no `name` and renders no hidden native input, so stripping it costs nothing on the DOM — but it is still what `onChange(value, name, event)` reports and what react-final-form registers the field under, and the strip deliberately happens AFTER the handler closures are built.
 
-**Forwarded to semantic-ui-react (31) — the parity checklist.** The wrapper writes `aria-describedby`, `className`, `options`, `placeholder`, `error`, `lazyLoad`, `noResultsMessage`, `value` as explicit attributes, generates `additionLabel`, `additionPosition`, `deburr`, `disabled`, `icon`, `onAddItem`, `onChange`, `onClose`, `onSearchChange`, `searchInput`, `selection` onto the rest bag, and spreads `props` AFTER them — so a caller CAN override what the wrapper wrote.
+**Forwarded to semantic-ui-react (24) — the parity checklist.** The wrapper writes `aria-describedby`, `className`, `options`, `placeholder`, `error`, `lazyLoad`, `value` as explicit attributes, generates `disabled`, `icon`, `onChange`, `onClose`, `selection` onto the rest bag, and spreads `props` AFTER them — so a caller CAN override what the wrapper wrote.
 
 CSS contract: The loaded `modules/dropdown` LESS is the largest single semantic module in the compiled CSS and is keyed almost entirely on `.ui.selection.dropdown`. SUIR builds that className from `ui`, the active/disabled/error/compact/multiple/search/selection/upward modifiers, then `dropdown`, then ours. Steps 3 and 4 are therefore more coupled for this component than the roadmap implies: in-house markup must keep emitting the modifier tokens until the CSS is re-homed.
 
@@ -265,7 +273,6 @@ CSS contract: The loaded `modules/dropdown` LESS is the largest single semantic 
 | `error` | element | 1 | demo | Coerced to boolean; drives the `error` class only. |
 | `id` | caller, via `props` | 1 | demo | Unhandled by SUIR, so it lands on the `<div role="listbox">`. |
 | `lazyLoad` | element | 1 | demo | When true and closed, SUIR renders no options at all. Load-bearing for the initial DOM. |
-| `noResultsMessage` | element | 1 | demo | Computed by the wrapper, but SUIR only renders it when `search` is on — so the `NO_OPTIONS_LEFT`/`NOTHING_FOUND` computation is dead in both corpora. Do not port it as a requirement. |
 | `onBlur` | caller, via `props` | 1 | demo | Also from the form adapter. With SUIR's `selectOnBlur` default this participates in committing a value, so it is not merely a notification. |
 | `onChange` | generated | 1 | demo | The wrapper's adapter, which is where the `(value, name, event)` signature and the duplicate collapsing live. SUIR calls it `(event, data)`. |
 | `onFocus` | caller, via `props` | 1 | demo | Arrives from the react-final-form adapter on the `view: "Select"` path. |
@@ -275,19 +282,13 @@ CSS contract: The loaded `modules/dropdown` LESS is the largest single semantic 
 | `type` | caller, via `props` | 1 | demo | A react-final-form artefact that arrives as `undefined`, so no attribute is emitted. Nothing to reproduce; listed so a replacement is not surprised to receive it. |
 | `upward` | caller, via `props` | 1 | consumer | Opens the menu upward. Consumer metas only — a demo-derived checklist misses it. It is an autoControlled prop in SUIR: left unset, SUIR measures viewport space and flips by itself, so a replacement owes both the prop AND the auto-flip. |
 | `value` | element | 1 | demo | Wrapper state, with array values joined to a string. `selectOnNavigation` and `selectOnBlur` both default true in SUIR, which is the commit-as-you-move behaviour the contract suite pins. |
-| `additionLabel` | generated | 2 | — | Set only under `allowAdditions`. |
-| `additionPosition` | generated | 2 | — | Set only under `allowAdditions`. |
 | `allowAdditions` | caller, via `props` | 2 | — | User-created options. No occurrences; gates a third of the wrapper's own logic. |
 | `clearable` | caller, via `props` | 2 | — | Clear icon. No occurrences. |
-| `deburr` | generated | 2 | — | Defaulted to true by the wrapper, but only when `search` is set — which nothing sets. |
 | `icon` | generated | 2 | — | Replaced with a node only when `onClickIcon` is given. No occurrences. |
 | `multiple` | caller, via `props` | 2 | — | Multi-select, rendered by SUIR as `ui label` chips. No occurrences on any Select/Dropdown node in either corpus. The wrapper has real `multiple` logic — dedup, array handling, `last()` semantics in `onChange` — which becomes unreachable code if the prop is dropped, so this decision is also a wrapper-cleanup decision. |
-| `onAddItem` | generated | 2 | — | Set only under `allowAdditions`. No occurrences. |
 | `onClose` | generated | 2 | — | Set only from `onSelect`. No occurrences in either corpus. |
-| `onSearchChange` | generated | 2 | — | Set only from `onSearch`. No occurrences. |
 | `required` | caller, via `props` | 2 | — | Read by the wrapper for its own `required` class and also forwarded. No occurrences on these views. |
 | `search` | caller, via `props` | 2 | — | Type-to-filter combobox. §9.7-F1.1 called this "the real work" — but ZERO nodes in the 38 tracked examples and ZERO in the consumer metas set it. Same for `multiple`, `allowAdditions` and `clearable`. This is the single biggest scope datum in the step-0 audit. |
-| `searchInput` | generated | 2 | — | Set only from `autofocus`. No occurrences. |
 
 ## What the meta corpus actually uses
 

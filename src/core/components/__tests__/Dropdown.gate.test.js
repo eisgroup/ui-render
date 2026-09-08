@@ -120,28 +120,6 @@ describe('the dropdown a user sees', () => {
         expect(calls[0][1]).toBe('region')
     })
 
-    it('offers a free-text addition, adds it to the list, and tells the caller', () => {
-        const added = []
-        const { container } = render(withConfig(
-            <Dropdown options={OPTIONS} name="region" allowAdditions search
-                      onChange={() => {}} onAddItem={(...args) => added.push(args.slice(0, 2))}/>
-        ))
-
-        fireEvent.change(container.querySelector('input.search'), { target: { value: 'Zed' } })
-        expect(optionTexts(container)).toEqual(['Add Zed'])
-
-        act(() => { fireEvent.click(container.querySelector('[role="option"]')) })
-
-        expect(added).toEqual([['Zed', 'region']])
-        // The addition is committed as the displayed selection...
-        expect(displayed(container)).toBe('Zed')
-
-        // ...and PREPENDED to the list, which is only observable after reopening: choosing an
-        // option closes the control, and with `lazyLoad` the options unmount when it closes.
-        open(container)
-        expect(optionTexts(container)).toEqual(['Zed', 'Option A', 'Option B'])
-    })
-
     it('filters the list as the user searches', () => {
         const { container } = render(withConfig(
             <Dropdown options={OPTIONS} name="region" search onChange={() => {}}/>

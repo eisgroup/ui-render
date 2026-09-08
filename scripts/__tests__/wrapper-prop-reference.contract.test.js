@@ -72,7 +72,9 @@ const EXPECTED = {
     // `Dropdown.behavior.test.js`'s pair, which step 3 owes — after which this counter reaches 0
     // and step 3½ can delete the dependency.
     importSites: 3,
-    interceptedByWrapper: { Dropdown: 23 },
+    // 23 → 20 at §9.7-F1 step 3 part 2: `onSearch`, `onAddItem` and `autofocus` were removed from
+    // the wrapper's own API, alongside the forwarded `search`/`multiple`/`allowAdditions` surface.
+    interceptedByWrapper: { Dropdown: 20 },
     // The in-house side. `Table` root consumes className/inverted/striped; the shared subcomponent
     // implementation consumes className; six subcomponents over six native elements.
     //
@@ -100,8 +102,17 @@ const EXPECTED = {
     // dropdown gained `aria-describedby`, pointing at the help block it was rendering and never
     // announcing. A forwarded name added deliberately, not a leak — the guard that made this fail
     // is the one refusing an undocumented prop, and it did its job.
-    forwardedTier1: 18,
-    forwardedTier2: 13,
+    // 18 → 17: `noResultsMessage` went with `search`, and provably rather than by association —
+    // the library renders it only `if (noResultsMessage !== null && search && isEmpty(options))`,
+    // read out of its own source, so with search gone the wrapper's computation of it could never
+    // render. It was dead code, not merely unused code.
+    forwardedTier1: 17,
+    // 13 → 7: six of the tier-2 forwarded names were the free-text and multi-select machinery
+    // (`deburr`, `searchInput`, `onSearchChange`, `onAddItem`, `additionLabel`,
+    // `additionPosition`) and went with the API they served. A DROP here is the shape to expect
+    // for the rest of F1 — tier 2 is "published but nothing uses it", which is what an exit
+    // should be shrinking.
+    forwardedTier2: 7,
     // The three props no tracked example uses but consumer metas do. `upward` and `disabled`
     // reach semantic-ui-react and are both styled, which is why a demo-derived checklist
     // would have been wrong — see UPGRADE-PLAN §9.7-F1 step 0. (`colGroup`, the third, is

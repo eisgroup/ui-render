@@ -135,25 +135,22 @@ describe('Dropdown parent value and option contracts', () => {
         expect(calls).toEqual([])
     })
 
-    it('appends `optionsLabel` once, however many options are added', () => {
-        render(withConfig(
-            <Dropdown allowAdditions search optionsLabel="FOOTER" name="region"
-                      options={[{ text: 'Option A', value: 'a' }]} onChange={() => {}}/>
-        ))
+    /**
+     * NARROWED at §9.7-F1 step 3 part 2, and the reason is worth keeping: part 1 fixed a
+     * DUPLICATION here — `onAddItem` wrote the label-appended array back into option state, so
+     * every addition appended another label — and part 2 removed `allowAdditions`, which removed
+     * the write-back and with it the only way to reach the bug. The fix is gone from the wrapper
+     * too. What survives is the label itself, which is a separate prop and still used: appended
+     * once, last, disabled, and carried as `content` rather than `text`.
+     */
+    it('appends `optionsLabel` once, as a disabled last option', () => {
+        renderDropdown({ options: objectOptions, optionsLabel: 'FOOTER' })
 
-        // NO manual rerender in between, and that is not a shortcut: passing a fresh `options`
-        // array would change its identity, and the wrapper's sync effect
-        // (`!isEqual(options, opts) && setOptions(opts)`) would then wipe the addition — and the
-        // duplicate label with it, so the test would pass against the defect. The `setOptions`
-        // inside `onAddItem` re-renders on its own, which is all this needs.
-        act(() => { latestSemanticProps().onAddItem({}, { value: 'Zed' }) })
-        act(() => { latestSemanticProps().onAddItem({}, { value: 'Yan' }) })
-
-        // `onAddItem` writes the option list back into state, and it used to write back the copy
-        // that ALREADY carried the label — so each addition appended another one.
         const options = latestSemanticProps().options
         expect(options.filter(o => o.content === 'FOOTER')).toHaveLength(1)
-        expect(options.map(o => o.text)).toEqual(['Yan', 'Zed', 'Option A', ''])
+        expect(options[options.length - 1]).toEqual(
+            expect.objectContaining({ content: 'FOOTER', disabled: true })
+        )
     })
 
     it('gives the help text its own id and points the control at it', () => {
@@ -269,17 +266,17 @@ describe('Dropdown parent value and option contracts', () => {
         expect(onChange).toHaveBeenCalledWith('Fallback label', undefined, expect.anything())
     })
 
-    it('preserves explicit selection and autofocus configuration', () => {
-        renderDropdown({
-            options: objectOptions,
-            selection: false,
-            autofocus: true,
-        })
+    /**
+     * `autofocus` went with `search` at §9.7-F1 step 3 part 2: it only ever became
+     * `searchInput={{autoFocus: true}}`, which does nothing on a control that has no search
+     * input, so removing search left it dead rather than merely unused. `selection` stays, and
+     * stays load-bearing — `css.dropdown-contract.test.js` measures its class token as worth 12
+     * of the control's 13 scoped rules.
+     */
+    it('lets a caller turn `selection` off, though nothing in the corpus does', () => {
+        renderDropdown({ options: objectOptions, selection: false })
 
-        expect(latestSemanticProps()).toEqual(expect.objectContaining({
-            selection: false,
-            searchInput: { autoFocus: true },
-        }))
+        expect(latestSemanticProps()).toEqual(expect.objectContaining({ selection: false }))
     })
 
     it('leaves object options with numeric values intact', () => {
@@ -299,64 +296,11 @@ describe('Dropdown parent value and option contracts', () => {
         expect(latestSemanticProps().value).toBe('255,0,0')
     })
 
-    it('normalizes every selected color-array value in multiple mode', () => {
-        renderDropdown({
-            options: [
-                { text: 'Red', value: [255, 0, 0] },
-                { text: 'Green', value: [0, 255, 0] },
-            ],
-            value: [[255, 0, 0], [0, 255, 0]],
-            multiple: true,
-        })
-
-        expect(latestSemanticProps().value).toEqual(['255,0,0', '0,255,0'])
-        expect(latestSemanticProps().noResultsMessage).toBe('No options left')
-    })
 })
 
 describe('Dropdown interaction callback contracts', () => {
     beforeEach(() => {
         SemanticDropdown.mockClear()
-    })
-
-    it('maps a case-insensitive label back to its stable single-select value', () => {
-        const onChange = jest.fn()
-        const event = { type: 'change' }
-        renderDropdown({
-            options: [{ text: 'United States', value: 'US' }],
-            name: 'country',
-            onChange,
-        })
-
-        act(() => {
-            latestSemanticProps().onChange(event, { value: '  united states  ' })
-        })
-
-        expect(onChange).toHaveBeenCalledWith('US', 'country', event)
-        expect(latestSemanticProps().value).toBe('US')
-    })
-
-    it('deduplicates a multiple selection while keeping the latest choice last', () => {
-        const onChange = jest.fn()
-        const event = { type: 'change' }
-        renderDropdown({
-            options: [
-                { text: 'United States', value: 'US' },
-                { text: 'Canada', value: 'CA' },
-            ],
-            name: 'countries',
-            multiple: true,
-            onChange,
-        })
-
-        act(() => {
-            latestSemanticProps().onChange(event, {
-                value: ['US', 'CA', ' united states '],
-            })
-        })
-
-        expect(onChange).toHaveBeenCalledWith(['CA', 'US'], 'countries', event)
-        expect(latestSemanticProps().value).toEqual(['CA', 'US'])
     })
 
     it('passes numeric values through without string duplicate processing', () => {
@@ -393,77 +337,11 @@ describe('Dropdown interaction callback contracts', () => {
         expect(onSelect).toHaveBeenCalledWith('b', 'option', closeEvent)
     })
 
-    it('forwards search text, field name, and the originating event', () => {
-        const onSearch = jest.fn()
-        const event = { type: 'search' }
-        renderDropdown({ options: objectOptions, name: 'option', onSearch, search: true })
-
-        act(() => {
-            latestSemanticProps().onSearchChange(event, { searchQuery: 'needle' })
-        })
-
-        expect(onSearch).toHaveBeenCalledWith('needle', 'option', event)
-    })
 })
 
 describe('Dropdown additions contracts', () => {
     beforeEach(() => {
         SemanticDropdown.mockClear()
-    })
-
-    it('trims and prepends a new option before notifying the caller', () => {
-        const onAddItem = jest.fn()
-        const event = { type: 'addition' }
-        renderDropdown({
-            options: objectOptions,
-            name: 'option',
-            allowAdditions: true,
-            onAddItem,
-        })
-
-        act(() => {
-            latestSemanticProps().onAddItem(event, { value: '  Option C  ' })
-        })
-
-        expect(onAddItem).toHaveBeenCalledWith('Option C', 'option', event)
-        expect(latestSemanticProps().options[0]).toEqual({
-            text: 'Option C',
-            value: 'Option C',
-        })
-    })
-
-    it('updates the casing of a duplicate free-text option without adding it again', () => {
-        const onAddItem = jest.fn()
-        renderDropdown({
-            options: [{ text: 'Alpha', value: 'alpha' }],
-            allowAdditions: true,
-            onAddItem,
-        })
-        const propsAtAddition = latestSemanticProps()
-
-        act(() => {
-            propsAtAddition.onAddItem({ type: 'addition' }, { value: 'ALPHA' })
-        })
-
-        expect(propsAtAddition.options).toEqual([{ text: 'ALPHA', value: 'ALPHA' }])
-        expect(onAddItem).not.toHaveBeenCalled()
-    })
-
-    it('does not replace a stable id when an added label duplicates existing text', () => {
-        const onAddItem = jest.fn()
-        renderDropdown({
-            options: [{ text: 'Alpha', value: 'alpha-id' }],
-            allowAdditions: true,
-            onAddItem,
-        })
-        const propsAtAddition = latestSemanticProps()
-
-        act(() => {
-            propsAtAddition.onAddItem({ type: 'addition' }, { value: 'ALPHA' })
-        })
-
-        expect(propsAtAddition.options).toEqual([{ text: 'Alpha', value: 'alpha-id' }])
-        expect(onAddItem).not.toHaveBeenCalled()
     })
 
     it('preserves explicit addition labels and upward positioning', () => {
