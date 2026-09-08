@@ -1,3 +1,22 @@
+/**
+ * THE WRAPPER'S MASSAGING LAYER, asserted at the seam — AND THIS FILE IS NOT A GATE.
+ * =============================================================================================
+ *
+ * It mocks `semantic-ui-react` to `() => null` and reads the props object the wrapper hands down.
+ * Measured, on the unmodified repo: every test here passes against an inner control that RENDERS
+ * NOTHING. That is not a flaw to fix by deleting the file — the option sanitiser, the
+ * case-insensitive addition dedup, the value normalisation and the callback signatures are real
+ * wrapper logic that §9.7-F1 step 3 KEEPS, and the props object is the cheapest honest place to
+ * observe them. It is a flaw to MISTAKE for a gate.
+ *
+ * What gates the component is `Dropdown.gate.test.js`, which drives the real library through
+ * roles, text and callbacks — and whose acceptance test is that all of it fails when the inner
+ * control is stubbed to render nothing. Anything observable by a user belongs there, not here.
+ *
+ * The seam this file reads is the one the swap deletes, so when the replacement lands every
+ * assertion here has to be re-aimed at whatever the wrapper hands its own inner control. Keep
+ * the assertions; expect to rewrite how they reach them.
+ */
 import React from 'react'
 import { act, render } from '@testing-library/react'
 import '@testing-library/jest-dom'

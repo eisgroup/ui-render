@@ -431,6 +431,12 @@ const DROPDOWN = {
      * [R->I] The combobox wiring a WAI-ARIA listbox owes and this one does not have. Pinned as a
      * defect inventory: step 3's replacement should shrink this list, and a shrink is the diff that
      * shows it.
+     *
+     * NOT browser-only, which the tag alone implies and the step 3 part 1 audit disproved: both
+     * this list and `ALERT_ANNOUNCES_SELECTED_VALUE` are attribute facts, and attributes are
+     * exactly what jsdom does have. `Dropdown.gate.test.js` now pins both, so a regression fails
+     * on every commit rather than only in the `browser` job. They stay here as well, because only
+     * a browser can say whether the accessibility TREE agrees with the attributes.
      */
     MISSING_ARIA: ['aria-activedescendant', 'aria-controls', 'aria-haspopup', 'aria-labelledby', 'aria-label'],
 }
