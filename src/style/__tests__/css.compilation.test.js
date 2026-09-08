@@ -23,7 +23,13 @@ beforeAll(async () => {
         javascriptEnabled: true,
     });
     compiledCss = result.css;
-}, 30000);
+    // 60s, matching the three sibling CSS suites, and raised from 30s because this one timed out
+    // on CI's React 19 job the moment a FOURTH LESS-compiling suite was added
+    // (`css.dropdown-contract.test.js`): four workers compiling the whole `semantic-ui-less` tree
+    // contend for CPU, and this suite had the tightest budget of the four. A `beforeAll` timeout
+    // reports every test in the file as failed with an EMPTY message, which is why the failure
+    // named no assertion — worth recognising, because it reads like a broken suite and is not.
+}, 60000);
 
 describe('CSS contract', () => {
     it('compiles without errors', () => {
