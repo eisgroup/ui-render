@@ -22,12 +22,26 @@ describe('Dropdown - allowAdditions', () => {
         expect(container.querySelector('.ui.dropdown')).toBeInTheDocument()
     })
 
-    it('positions addition at the bottom by default', () => {
-        const onChange = jest.fn()
-        render(wrap(
-            <Dropdown options={options} allowAdditions search onChange={onChange} />
-        ))
-        // No throw; addition logic is set up internally
+    /**
+     * REWRITTEN at §9.7-F1 step 3 part 1: this test contained NO `expect` at all, and its comment
+     * said so ("No throw; addition logic is set up internally"). The wrapper sets
+     * `additionPosition = 'bottom'` only when `upward` is unset, and that IS observable — the
+     * addition item's place in the rendered option list. Measured both ways rather than asserted
+     * one way, because "bottom by default" only means something against the alternative.
+     */
+    it('positions the addition last by default, and first when `upward`', () => {
+        const menuFor = extra => {
+            const { container } = render(wrap(
+                <Dropdown options={options} allowAdditions search onChange={() => {}} {...extra} />
+            ))
+            // A query that MATCHES the existing options, so the addition is listed alongside them
+            // rather than being the only item — which is what a non-matching query produces.
+            fireEvent.change(container.querySelector('input.search'), {target: {value: 'Option'}})
+            return Array.from(container.querySelectorAll('[role="option"]')).map(o => o.textContent.trim())
+        }
+
+        expect(menuFor({})).toEqual(['Option A', 'Option B', 'Add Option'])
+        expect(menuFor({upward: true})).toEqual(['Add Option', 'Option A', 'Option B'])
     })
 })
 
@@ -60,16 +74,24 @@ describe('Dropdown - additional behaviors', () => {
         expect(container.querySelector('.ui.dropdown')).toBeInTheDocument()
     })
 
+    /**
+     * REWRITTEN at §9.7-F1 step 3 part 1. The old body looked for `.icon.pointer` and wrapped its
+     * only assertion in `if (icon)` — and the rendered class is `icon-dropdown pointer`, so the
+     * selector matched NOTHING and the test passed having asserted nothing, on every run since it
+     * was written. Measured selector, unconditional assertions, and a plain function rather than
+     * `jest.fn()` per the house rule.
+     */
     it('wires onClickIcon by rendering a clickable Icon', () => {
-        const onClickIcon = jest.fn()
+        const clicks = []
         const { container } = render(wrap(
-            <Dropdown options={options} onClickIcon={onClickIcon} />
+            <Dropdown options={options} onClickIcon={() => clicks.push('clicked')} />
         ))
-        const icon = container.querySelector('.icon.pointer')
-        if (icon) {
-            fireEvent.click(icon)
-            expect(onClickIcon).toHaveBeenCalled()
-        }
+
+        const icon = container.querySelector('i.icon-dropdown.pointer')
+        expect(icon).not.toBeNull()
+
+        fireEvent.click(icon)
+        expect(clicks).toEqual(['clicked'])
     })
 
     it('falls through to onSelect via onClose handler', () => {

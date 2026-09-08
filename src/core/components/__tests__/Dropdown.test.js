@@ -19,6 +19,43 @@ const objectOptions = [
 ]
 
 describe('Dropdown', () => {
+
+  /**
+   * FOUND BY THE §9.7-F1 STEP 3 PART 1 AUDIT. The sanitiser's own comment claimed absent options
+   * "pass through unchanged"; measured, `options[0]` THREW on an absent or null list and only
+   * `options: []` rendered. Absent and null are now the empty state, because that is a legitimate
+   * thing for a meta to express — options not loaded yet, or a `name`-bound path that resolved to
+   * null — and a throw makes the engine replace the whole node with its error diagnostic.
+   */
+  /**
+   * THE DUPLICATE-ID HALF of the help-text contract, here rather than in the behaviour suite
+   * because that one mocks `semantic-ui-react` away and the second element carrying the id IS
+   * Semantic's `<div role="listbox">` — the caller's `id` reaches it through the rest bag. Two
+   * elements with one id is invalid, and it was reachable without the caller doing anything:
+   * `mapper.js` assigns `input.id` automatically for relative paths. Found by the §9.7-F1 step 3
+   * part 1 audit.
+   */
+  it('never gives two elements the same id when it renders help text', () => {
+    const {container} = render(
+      <ConfigContext.Provider value={initialConfigState}>
+        <Dropdown id="region" error="Required" name="region" options={objectOptions} onChange={() => {}}/>
+      </ConfigContext.Provider>
+    )
+
+    expect(container.querySelectorAll('#region')).toHaveLength(1)
+    expect(container.querySelectorAll('#region-help')).toHaveLength(1)
+    expect(container.querySelector('[role="listbox"]').getAttribute('aria-describedby')).toBe('region-help')
+  })
+
+  it('renders an empty control when options are absent or null, instead of throwing', () => {
+    [undefined, null].forEach(options => {
+      const {container, unmount} = render(<Dropdown name="x" options={options}/>)
+
+      expect(container.querySelectorAll('[role="listbox"]')).toHaveLength(1)
+      expect(container.querySelectorAll('[role="option"]')).toHaveLength(0)
+      unmount()
+    })
+  })
     describe('rendering', () => {
         it('renders without crashing', () => {
             const { container } = renderDropdown({ options: objectOptions })
@@ -167,8 +204,11 @@ describe('Dropdown', () => {
                 )
             })
 
-            // onChange should be called with first valid option since 'b' is not in new options
-            expect(handleChange).toHaveBeenCalledWith('x')
+            // The first valid option, since 'b' is not in the new options — and with the `name`,
+            // which §9.7-F1 step 3 part 1 added: the reset used to call `onChange` with arity 1
+            // and a `String(...)` of the value, contradicting the wrapper's own
+            // `(value, name, event)` contract. There is no event for a programmatic reset.
+            expect(handleChange).toHaveBeenCalledWith('x', 'test')
         })
 
         it('does NOT reset value when current value is still valid', () => {

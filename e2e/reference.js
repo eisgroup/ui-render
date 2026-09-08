@@ -400,11 +400,23 @@ const DROPDOWN = {
     /** [R] Per rendered dropdown, in the `dropdown` example. */
     ROLES: { listbox: 1, alert: 1, option: 2 },
     /**
-     * [R] The options are in the DOM whether the list is open or closed — "open" is a CSS state, not
-     * presence. Any replacement that mounts options on open changes what a screen reader enumerates,
-     * so this is the single most load-bearing fact for step 3's a11y comparison.
+     * [R] Whether the options are in the DOM while the list is CLOSED — and it depends on the entry
+     * point, which an earlier version of this note did not say. It called the fact "the single most
+     * load-bearing for step 3's a11y comparison" and stated it unconditionally as `true`; measured
+     * in Chrome, that holds for `view: "Dropdown"` and is FALSE for `view: "Select"`, which is the
+     * majority path.
+     *
+     * Cause: `mapper.js` passes `lazyLoad={false}` only inside its `FIELD.TYPE.DROPDOWN` branch,
+     * while the wrapper's own default is `lazyLoad = true` — and with lazy loading on, SUIR mounts
+     * no options at all until the list opens. Measured: `#dropdown` shows 2 options closed;
+     * `#selectCascading` shows 0 on both of its listboxes.
+     *
+     * The asymmetry is what matters for the swap: a replacement that mounts options on open
+     * changes what a screen reader enumerates on the `Dropdown` path and changes nothing on the
+     * `Select` path, so "does it regress the a11y tree" has two different answers and the
+     * comparison has to name which one it means.
      */
-    OPTIONS_PRESENT_WHEN_CLOSED: true,
+    OPTIONS_PRESENT_WHEN_CLOSED: { dropdownView: 2, selectView: 0 },
     /** [I] Reachable by Tab (`tabindex=0`) and `aria-expanded` tracks the open state honestly. */
     TAB_REACHABLE: true,
     ARIA_EXPANDED_CLOSED: 'false',
@@ -419,6 +431,12 @@ const DROPDOWN = {
      * [R->I] The combobox wiring a WAI-ARIA listbox owes and this one does not have. Pinned as a
      * defect inventory: step 3's replacement should shrink this list, and a shrink is the diff that
      * shows it.
+     *
+     * NOT browser-only, which the tag alone implies and the step 3 part 1 audit disproved: both
+     * this list and `ALERT_ANNOUNCES_SELECTED_VALUE` are attribute facts, and attributes are
+     * exactly what jsdom does have. `Dropdown.gate.test.js` now pins both, so a regression fails
+     * on every commit rather than only in the `browser` job. They stay here as well, because only
+     * a browser can say whether the accessibility TREE agrees with the attributes.
      */
     MISSING_ARIA: ['aria-activedescendant', 'aria-controls', 'aria-haspopup', 'aria-labelledby', 'aria-label'],
 }

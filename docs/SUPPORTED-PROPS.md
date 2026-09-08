@@ -215,7 +215,7 @@ THE ARITHMETIC, derived from the installed `semantic-ui-react` rather than estim
 
 ### `Dropdown` — wraps semantic-ui-react `Dropdown`
 
-`src/core/components/Dropdown.js`, 291 lines.
+`src/core/components/Dropdown.js`, 330 lines.
 
 The wrapper already owns the external API: the `onChange(value, name, event)` signature, option sanitisation, case-insensitive dedup on addition, and the cascading reset are all wrapper code and are keepers. Only the `<DropDown/>` element at the bottom is replaced. Two entry points, and they differ: `mapper.js` imports the memoised default export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.js` imports the NAMED export for `view: "Select"` — which is the majority path.
 
@@ -251,12 +251,13 @@ The wrapper already owns the external API: the `onChange(value, name, event)` si
 
 **Stripped at the DOM boundary.** `src/core/components/Dropdown.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js` to the rest bag, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`. `name` is the interesting one: SUIR declares no `name` and renders no hidden native input, so stripping it costs nothing on the DOM — but it is still what `onChange(value, name, event)` reports and what react-final-form registers the field under, and the strip deliberately happens AFTER the handler closures are built.
 
-**Forwarded to semantic-ui-react (30) — the parity checklist.** The wrapper writes `className`, `options`, `placeholder`, `error`, `lazyLoad`, `noResultsMessage`, `value` as explicit attributes, generates `additionLabel`, `additionPosition`, `deburr`, `disabled`, `icon`, `onAddItem`, `onChange`, `onClose`, `onSearchChange`, `searchInput`, `selection` onto the rest bag, and spreads `props` AFTER them — so a caller CAN override what the wrapper wrote.
+**Forwarded to semantic-ui-react (31) — the parity checklist.** The wrapper writes `aria-describedby`, `className`, `options`, `placeholder`, `error`, `lazyLoad`, `noResultsMessage`, `value` as explicit attributes, generates `additionLabel`, `additionPosition`, `deburr`, `disabled`, `icon`, `onAddItem`, `onChange`, `onClose`, `onSearchChange`, `searchInput`, `selection` onto the rest bag, and spreads `props` AFTER them — so a caller CAN override what the wrapper wrote.
 
 CSS contract: The loaded `modules/dropdown` LESS is the largest single semantic module in the compiled CSS and is keyed almost entirely on `.ui.selection.dropdown`. SUIR builds that className from `ui`, the active/disabled/error/compact/multiple/search/selection/upward modifiers, then `dropdown`, then ours. Steps 3 and 4 are therefore more coupled for this component than the roadmap implies: in-house markup must keep emitting the modifier tokens until the CSS is re-homed.
 
 | Prop | Reaches SUIR via | Tier | Seen in | What has to be reproduced |
 | --- | --- | --- | --- | --- |
+| `aria-describedby` | element | 1 | demo | The id of the wrapper's own `field-help` block, and only when there IS help text to point at, so it never dangles. Added at §9.7-F1 step 3 part 1: the error and info text was rendered and never announced, and the caller's `id` used to be put on the help block verbatim — while also riding the rest bag onto Semantic's listbox, giving two elements one id. The help block now carries `${id}-help`. |
 | `checked` | caller, via `props` | 1 | demo | A react-final-form artefact, also always `undefined`. Nothing to reproduce. |
 | `className` | element | 1 | demo | Only the wrapper-derived `{info, readonly}` classes; the caller's `className` goes to the wrapper element instead. |
 | `compact` | caller, via `props` | 1 | demo | Narrow control. Used by both corpora, and also suppresses the wrapper's `fill-width`. |

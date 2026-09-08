@@ -141,8 +141,7 @@ test.describe('dropdown: the step 3 starting state', () => {
 
         await expect(listbox).toHaveClass(DROPDOWN.LISTBOX_CLASS)
         await expect(listbox).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_CLOSED)
-        await expect(options).toHaveCount(DROPDOWN.ROLES.option)
-        expect(DROPDOWN.OPTIONS_PRESENT_WHEN_CLOSED).toBe(true)
+        await expect(options).toHaveCount(DROPDOWN.OPTIONS_PRESENT_WHEN_CLOSED.dropdownView)
 
         await listbox.click()
         await expect(listbox).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_OPEN)
@@ -150,6 +149,28 @@ test.describe('dropdown: the step 3 starting state', () => {
 
         await page.keyboard.press('Escape')
         await expect(listbox).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_CLOSED)
+    })
+
+    /**
+     * THE OTHER HALF OF THE SAME FACT, and the half that was missing. The test above measures
+     * `view: "Dropdown"`, where `mapper.js` passes `lazyLoad={false}`; this measures
+     * `view: "Select"`, the MAJORITY path, where the wrapper's `lazyLoad = true` default means SUIR
+     * mounts no options until the list opens. Without this, "options exist when closed" read as a
+     * property of the component when it is a property of one entry point.
+     */
+    test('[R] ...but a `view: "Select"` mounts none of them until it opens', async ({ page }) => {
+        await page.goto('/examples#selectCascading')
+        await page.locator('#selectCascading.expanded').waitFor()
+        const listbox = page.locator('#selectCascading [role="listbox"]').first()
+
+        await expect(listbox).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_CLOSED)
+        await expect(listbox.locator('[role="option"]'))
+            .toHaveCount(DROPDOWN.OPTIONS_PRESENT_WHEN_CLOSED.selectView)
+
+        await listbox.click()
+        await expect(listbox).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_OPEN)
+        await expect(listbox.locator('[role="option"]').first(),
+            'opening is what mounts them on this path').toBeVisible()
     })
 
     test('[I] the listbox is reachable by Tab and opens from the keyboard', async ({ page }) => {
