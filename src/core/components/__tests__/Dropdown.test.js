@@ -325,12 +325,75 @@ describe('Dropdown', () => {
             expect(container.querySelector('.selection')).toBeInTheDocument()
         })
 
-        it('enables deburr when search is enabled', () => {
-            const { container } = renderDropdown({
-                options: objectOptions,
-                search: true,
+    })
+
+    describe('props semantic-ui-react consumed and the in-house listbox does not', () => {
+        /**
+         * A DEFECT THE SWAP INTRODUCED, not a pre-existing one. SUIR's Dropdown declared
+         * `search`/`multiple`/`allowAdditions`/`clearable` (and the rest of `DROPPED_PROPS`) as
+         * handled props, so passing one was quietly harmless. `Listbox` spreads what it does not
+         * destructure onto its `<div role="listbox">`, so after the swap they became ATTRIBUTES:
+         * measured, `required` rendered as `required=""` on a div and `clearable` produced React's
+         * own "Received `true` for a non-boolean attribute" warning.
+         *
+         * Revert `dropUnsupported` in `Dropdown.js` and both halves of this describe fail.
+         */
+        const withConsole = (method, run) => {
+            const original = console[method]
+            const seen = []
+            console[method] = (...args) => seen.push(String(args[0]))
+            try {
+                run()
+            } finally {
+                console[method] = original
+            }
+            return seen
+        }
+
+        it('keeps them off the DOM instead of emitting invalid attributes', () => {
+            let container
+            const errors = withConsole('error', () => {
+                withConsole('warn', () => {
+                    container = renderDropdown({
+                        options: objectOptions,
+                        search: true,
+                        multiple: true,
+                        allowAdditions: true,
+                        clearable: true,
+                        noResultsMessage: 'nothing',
+                    }).container
+                })
             })
-            expect(container.querySelector('.search')).toBeInTheDocument()
+
+            const listbox = container.querySelector('[role="listbox"]')
+            const attributes = [...listbox.attributes].map(attribute => attribute.name)
+            expect(attributes).toEqual(['role', 'aria-expanded', 'tabindex', 'class'])
+            // React's non-boolean-attribute warning is the specific symptom that is gone.
+            expect(errors).toEqual([])
+        })
+
+        it('says so once per name, actionably, rather than silently', () => {
+            // `additionPosition` because the guard is a MODULE-level Set, deliberately: a select in
+            // a 200-row table must not warn 200 times. That makes "already warned" file-global
+            // state, so this test needs a name no other test in this file passes.
+            const warnings = withConsole('warn', () => {
+                renderDropdown({ options: objectOptions, additionPosition: 'top' })
+                renderDropdown({ options: objectOptions, additionPosition: 'top' })
+            })
+
+            expect(warnings).toHaveLength(1)
+            expect(warnings[0]).toContain('`additionPosition`')
+            // The message has to name the replacement doc, or a consumer cannot act on it.
+            expect(warnings[0]).toContain('docs/SUPPORTED-PROPS.md')
+        })
+
+        it('still consumes `required`, which the wrapper reads for its own class', () => {
+            // `required` is NOT in the dropped list for exactly this reason: it drives the
+            // wrapper's `required` class, and dropping it would have taken a live style with it.
+            const { container } = renderDropdown({ options: objectOptions, required: true })
+
+            expect(container.firstChild).toHaveClass('required')
+            expect(container.querySelector('[role="listbox"]')).not.toHaveAttribute('required')
         })
     })
 })

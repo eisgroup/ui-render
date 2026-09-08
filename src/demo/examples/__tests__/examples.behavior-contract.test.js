@@ -15,7 +15,7 @@
  * point: `jest -u` must not be able to bless a change here. A diff in this file is
  * a diff in the accessibility contract, and it has to be typed out by hand and
  * read in review. When F1 lands, exactly the entries F1 is expected to move (see
- * the note on `alert` and `option`) should move, and nothing else.
+ * the notes below) should move, and nothing else.
  *
  * WHAT THESE ASSERTIONS DELIBERATELY DO NOT TOUCH
  * -----------------------------------------------------------------------------
@@ -51,7 +51,11 @@ const CENSUS_ROLES = [
     'button', 'link', 'navigation', 'heading', 'list', 'listitem', 'separator',
     'textbox', 'spinbutton', 'checkbox', 'radio', 'slider',
     'combobox', 'listbox', 'option', 'menu', 'menuitem',
-    'progressbar', 'img', 'alert', 'dialog', 'tooltip', 'tab', 'tablist',
+    // `alert` is deliberately still SCANNED although no example claims one any more:
+    // that is what makes a re-introduced live-region announcement show up here as a
+    // brand-new entry rather than passing unnoticed. `presentation` was added to the
+    // scanned set in the same commit — see the note above the census.
+    'progressbar', 'img', 'alert', 'dialog', 'tooltip', 'tab', 'tablist', 'presentation',
 ]
 
 /**
@@ -61,21 +65,35 @@ const CENSUS_ROLES = [
  * promises to assistive technology", and treat a diff as a consumer-visible
  * change.
  *
- * TWO GROUPS OF ENTRIES F1 IS EXPECTED TO MOVE, AND ONLY THESE TWO:
- *
- *   `alert` — every count here is a `semantic-ui-react` Dropdown artefact: SUIR
- *     renders the trigger's selected-value text with `role="alert" aria-live`
- *     (`Dropdown.js` renderText), so each rendered dropdown contributes exactly
- *     one. Announcing the current value as an alert is a defect, not a contract:
- *     the F1 Step 3 replacement should emit NO `alert`, and every `alert` entry
- *     below should go to zero in that commit. It is counted rather than filtered
- *     out so that the removal is a visible, reviewed line in the diff.
+ * ONE GROUP OF ENTRIES F1 IS STILL EXPECTED TO MOVE:
  *
  *   `option` — present only where the option list is in the DOM while closed.
  *     `mapper.js` passes `lazyLoad={false}` for `view: "Dropdown"` and leaves the
  *     wrapper default (`true`) for `view: "Select"`, which is why `dropdown` and
  *     `layout` carry options at mount and `selectStableValue` does not. If the
  *     replacement changes when options are mounted, these entries move.
+ *
+ * `presentation` REPLACED `alert`, ONE FOR ONE, and the arithmetic is worth stating because it is
+ * the evidence that nothing else moved: every example that carried `alert: N` now carries
+ * `presentation: N` for the same N, and no example gained or lost one. Both come from the same
+ * node count — one rendered dropdown each. The new role is on the `.menu` div that sits between
+ * the `role="listbox"` and its `role="option"` children: a div with no role there would break the
+ * owned-element relationship the listbox pattern requires, so it is declared as carrying no
+ * semantics of its own. It is CENSUSED rather than filtered out for the same reason `alert` was —
+ * `presentation` on a node that should have kept its semantics is a real defect, and this is the
+ * only place in the corpus that would notice.
+ *
+ * `alert` USED TO BE THE OTHER ONE, AND IT IS NOW GONE FROM EVERY ENTRY. Each count
+ * was a `semantic-ui-react` Dropdown artefact: SUIR rendered the trigger's
+ * selected-value text with `role="alert" aria-live` (its `Dropdown.js` renderText),
+ * so each rendered dropdown contributed exactly one and announced the current value
+ * as an alert. This file predicted "every `alert` entry below should go to zero in
+ * that commit", and §9.7-F1 step 3 part 2 is that commit: `Listbox.js` conveys the
+ * keyboard cursor with `aria-activedescendant` instead, which is what the listbox
+ * pattern asks for. The counts were carried here rather than filtered out precisely
+ * so their removal would be a visible, reviewed line in this diff — and that every
+ * example dropped to zero, with no `alert` surviving anywhere in the corpus, is also
+ * the proof that nothing OTHER than the dropdown was emitting one.
  *
  * Everything else is the durable part: an example with a `Table` must still expose
  * `table`/`rowgroup`/`row`/`columnheader`/`cell`, and a `Select`/`Dropdown` must
@@ -91,20 +109,20 @@ const CENSUS_ROLES = [
  * `summaryBox` are legitimately text-only.
  */
 const ROLE_CENSUS = {
-    dropdown: { listbox: 1, option: 2, alert: 1 },
-    dropdownExperience: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 9, listbox: 2, option: 5, alert: 2 },
-    selectIndexValue: { listbox: 1, alert: 1 },
-    selectStableValue: { listbox: 1, alert: 1 },
-    selectCascading: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 9, listbox: 2, alert: 2 },
-    selectCascadingStable: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 12, listbox: 2, alert: 2 },
-    selectReorder: { table: 1, rowgroup: 2, row: 5, columnheader: 3, cell: 12, listbox: 1, alert: 1 },
+    dropdown: { listbox: 1, option: 2, presentation: 1 },
+    dropdownExperience: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 9, listbox: 2, option: 5, presentation: 2 },
+    selectIndexValue: { listbox: 1, presentation: 1 },
+    selectStableValue: { listbox: 1, presentation: 1 },
+    selectCascading: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 9, listbox: 2, presentation: 2 },
+    selectCascadingStable: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 12, listbox: 2, presentation: 2 },
+    selectReorder: { table: 1, rowgroup: 2, row: 5, columnheader: 3, cell: 12, listbox: 1, presentation: 1 },
     buttonIcon: { button: 1 },
     buttonDownload: { button: 1 },
     input: { textbox: 1 },
     inputIntegerMin0: { textbox: 2 },
     inputToggle: { checkbox: 2 },
     decimal: { table: 1, rowgroup: 2, row: 3, columnheader: 1, cell: 2 },
-    layout: { listbox: 1, option: 2, alert: 1 },
+    layout: { listbox: 1, option: 2, presentation: 1 },
     list: { textbox: 2 },
     expandList: {},
     tabList: { textbox: 1 },
@@ -120,15 +138,15 @@ const ROLE_CENSUS = {
     tablePagination: { table: 1, rowgroup: 2, row: 6, columnheader: 5, cell: 25, button: 7, navigation: 1 },
     pieChart: { img: 2 },
     popupContent: { table: 1, rowgroup: 2, row: 3, columnheader: 6, cell: 12, button: 1, checkbox: 1 },
-    ratingDetails: { table: 1, rowgroup: 2, row: 6, columnheader: 3, cell: 15, listbox: 1, option: 2, alert: 1 },
-    rowListRelativeData: { table: 1, rowgroup: 2, row: 5, columnheader: 5, cell: 10, listbox: 1, option: 2, alert: 1 },
+    ratingDetails: { table: 1, rowgroup: 2, row: 6, columnheader: 3, cell: 15, listbox: 1, option: 2, presentation: 1 },
+    rowListRelativeData: { table: 1, rowgroup: 2, row: 5, columnheader: 5, cell: 10, listbox: 1, option: 2, presentation: 1 },
     showIf: {},
     summaryBox: {},
     upload: {},
     uploadVariants: {},
     slider: { slider: 6 },
-    invalidArray: { table: 2, rowgroup: 4, row: 2, columnheader: 9, listbox: 1, img: 1, alert: 1 },
-    all: { table: 3, rowgroup: 6, row: 10, columnheader: 18, cell: 31, button: 4, checkbox: 1, listbox: 3, option: 4, img: 2, alert: 3 },
+    invalidArray: { table: 2, rowgroup: 4, row: 2, columnheader: 9, listbox: 1, img: 1, presentation: 1 },
+    all: { table: 3, rowgroup: 6, row: 10, columnheader: 18, cell: 31, button: 4, checkbox: 1, listbox: 3, option: 4, img: 2, presentation: 3 },
 }
 
 /**

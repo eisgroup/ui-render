@@ -36,6 +36,7 @@ const path = require('path')
 
 const {
     buildReference,
+    IMPORT_KINDS,
     renderMarkdown,
     readDomPropsLists,
     interceptedProps,
@@ -71,8 +72,18 @@ const EXPECTED = {
     // the last PRODUCT site other than `Dropdown.js`. The two remaining test-side sites are
     // `Dropdown.behavior.test.js`'s pair, which step 3 owes — after which this counter reaches 0
     // and step 3½ can delete the dependency.
-    importSites: 3,
-    interceptedByWrapper: { Dropdown: 23 },
+    //
+    // 3 → 0 at step 3 part 2. `Dropdown.js` now imports `./Listbox`, and re-aiming
+    // `Dropdown.behavior.test.js` at that seam took its `import` and its `jest.mock` with it. The
+    // counter has done its job: this is the number step 3½ needs before `semantic-ui-react` can
+    // leave `dependencies`. It stays pinned at 0 because 0 is now the thing to defend — the next
+    // meaningful change to this line would be it going UP.
+    importSites: 0,
+    // EMPTY since §9.7-F1 step 3 part 2 — `Dropdown` was the last wrapper and its 20 intercepted
+    // props are counted under `inHouse` below instead (21 now: `required` joined them, because
+    // Semantic consumed it as a handled prop and an open `<div role="listbox">` would have
+    // rendered it as an attribute).
+    interceptedByWrapper: {},
     // The in-house side. `Table` root consumes className/inverted/striped; the shared subcomponent
     // implementation consumes className; six subcomponents over six native elements.
     //
@@ -83,6 +94,9 @@ const EXPECTED = {
     inHouse: {
         Table: { root: 3, part: 1, subcomponents: 6 },
         TooltipPop: { root: 13, part: 0, subcomponents: 0 },
+        // `Dropdown` renders a COMPONENT (the in-house `Listbox`) rather than an element, so it
+        // has no subcomponent family either. 21 = the 20 the wrapper intercepted plus `required`.
+        Dropdown: { root: 21, part: 0, subcomponents: 0 },
     },
     // 37/24 before step 1. The `Table` family was 16 tier-1 + 7 tier-2 of those, and it left the
     // forwarded set entirely — a component that imports nothing forwards nothing.
@@ -100,13 +114,26 @@ const EXPECTED = {
     // dropdown gained `aria-describedby`, pointing at the help block it was rendering and never
     // announcing. A forwarded name added deliberately, not a leak — the guard that made this fail
     // is the one refusing an undocumented prop, and it did its job.
-    forwardedTier1: 18,
-    forwardedTier2: 13,
-    // The three props no tracked example uses but consumer metas do. `upward` and `disabled`
-    // reach semantic-ui-react and are both styled, which is why a demo-derived checklist
-    // would have been wrong — see UPGRADE-PLAN §9.7-F1 step 0. (`colGroup`, the third, is
-    // consumed by `TableView` and never forwarded, so it is not in this list.)
-    consumerOnlyForwarded: ['disabled', 'upward'],
+    // 18 → 17: `noResultsMessage` went with `search`, and provably rather than by association —
+    // the library renders it only `if (noResultsMessage !== null && search && isEmpty(options))`,
+    // read out of its own source, so with search gone the wrapper's computation of it could never
+    // render. It was dead code, not merely unused code.
+    // 17 → 0 at step 3 part 2, together with tier 2, and this counter reaching zero is the end of
+    // the whole idea rather than one more decrement. "Forwarded" was defined as "reaches
+    // semantic-ui-react", and the tiers RANKED a parity checklist: tier 1 meant "a node in the
+    // corpus exercises this, so the replacement owes it". There is no second implementation to
+    // owe anything to now. The props themselves did not vanish — they are `IN_HOUSE_CURATION`
+    // rows, either consumed by the wrapper, dropped with the features they served, or covered by
+    // its `passthrough` note — and `FORWARDED_CURATION`'s header records where each went.
+    forwardedTier1: 0,
+    forwardedTier2: 0,
+    // Was `['disabled', 'upward']` — the props no tracked example uses but consumer metas do,
+    // which is why a demo-derived checklist would have been wrong (UPGRADE-PLAN §9.7-F1 step 0).
+    // Empty for the same reason as the tiers: it is derived from the forwarded set. The datum
+    // itself survives where it is still load-bearing — `CONSUMER_ONLY_ATTRIBUTES` is unchanged,
+    // and `upward` is called out in `IN_HOUSE_CURATION.Dropdown` as the one addition-era prop that
+    // was KEPT precisely because consumer metas declare it.
+    consumerOnlyForwarded: [],
 }
 
 /** The four wrapped views, plus the header entries of a `Table` node. */
@@ -203,9 +230,14 @@ describe('generated supported-prop reference', () => {
             component.subcomponents.map(({ name, element }) => `${name}:${element}`).join(' '),
         ])).toEqual([
             ['Table', 'Header:thead HeaderCell:th Row:tr Cell:td Body:tbody Footer:tfoot'],
-            // Empty on purpose: the tooltip is one element, not a family. The row is kept so that
-            // a new in-house component has to be added here deliberately.
+            // Empty on purpose: the tooltip is one element, not a family. The rows are kept so
+            // that a new in-house component has to be added here deliberately — which is exactly
+            // what `Dropdown` did at step 3 part 2.
             ['TooltipPop', ''],
+            // Empty for a different reason worth distinguishing: `Dropdown` renders neither a
+            // family nor an element, but the in-house `Listbox`. The markup, and the four inner
+            // nodes whose class tokens are load-bearing, live one level down there.
+            ['Dropdown', ''],
         ])
     })
 
@@ -213,10 +245,41 @@ describe('generated supported-prop reference', () => {
         // buildReference() throws on a stray, so reaching here already proves it. Asserted
         // explicitly because this is the §9.7-F1 invariant, and because this check sees
         // `require()` and `jest.mock()`, which the eslint rule cannot.
+        //
+        // The loop is a no-op today (see `importSites: 0`), and is kept for the case it exists to
+        // catch: a reference coming back. It would then have to come back INSIDE the pack, where
+        // the wrapper sections below would document it, rather than anywhere in `src`.
         reference.importSites.forEach(({ file }) => {
             expect(file.startsWith('src/core/components/')).toBe(true)
         })
-        expect(reference.importSites.some(site => site.kind === 'jest.mock')).toBe(true)
+    })
+
+    it('proves the scan can still see all four ways to reach the package', () => {
+        // WHY THIS REPLACED A THROW. The generator used to refuse to return an empty list, because
+        // "no references in `src`" and "the regexes rotted" are indistinguishable from inside the
+        // scan — and once the exit completed, the reassuring version would be the one everyone
+        // read. So the proof moved here: the same `IMPORT_KINDS` patterns, run against a source
+        // that reaches the package all four ways, must find all four. With this passing, an empty
+        // result from `src` means empty.
+        const source = [
+            "import {Dropdown} from 'semantic-ui-react'",
+            "const lazy = () => import(\"semantic-ui-react\")",
+            "const {Table} = require('semantic-ui-react/dist/commonjs/collections/Table')",
+            "jest.mock('semantic-ui-react', () => ({}))",
+        ].join('\n')
+
+        const found = IMPORT_KINDS.map(({ kind, pattern }) => {
+            pattern.lastIndex = 0
+            const match = pattern.exec(source)
+            return [kind, match && match[1]]
+        })
+
+        expect(found).toEqual([
+            ['import', 'semantic-ui-react'],
+            ['import()', 'semantic-ui-react'],
+            ['require', 'semantic-ui-react/dist/commonjs/collections/Table'],
+            ['jest.mock', 'semantic-ui-react'],
+        ])
     })
 
     it('keeps the eslint erosion guard configured', () => {
@@ -296,8 +359,14 @@ describe('generated supported-prop reference', () => {
 
     it('would notice a page that lost a section', () => {
         // Vacuity guard for the first test: prove the comparison distinguishes content.
-        const withoutOneWrapper = { ...reference, wrappers: reference.wrappers.slice(1) }
-        expect(renderMarkdown(withoutOneWrapper)).not.toEqual(page)
+        //
+        // It used to drop a WRAPPER, which stopped proving anything the moment `wrappers` became
+        // empty at §9.7-F1 step 3 part 2 — `[].slice(1)` is `[]`, so the two pages were identical
+        // and the guard passed by being vacuous itself. It drops an in-house component now, which
+        // is where every section lives.
+        expect(reference.inHouse.length).toBeGreaterThan(0)
+        const withoutOneSection = { ...reference, inHouse: reference.inHouse.slice(1) }
+        expect(renderMarkdown(withoutOneSection)).not.toEqual(page)
     })
 
     it('passes its own --check from the command line', () => {

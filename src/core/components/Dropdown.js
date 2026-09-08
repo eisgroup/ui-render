@@ -1,20 +1,8 @@
 import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React, { useEffect, useRef, useState } from 'react'
-import { Dropdown as DropDown } from 'semantic-ui-react' // adds 27 KB to final js bundle
-import {
-  hasListValue,
-  isEqual,
-  isObject,
-  isString,
-  l,
-  last,
-  localiseTranslation,
-  toLowerCase,
-  toLowerCaseAny,
-  toUniqueListCaseInsensitive,
-  trimSpaces
-} from '../utils'
+import DropDown from './Listbox'
+import { isEqual, l, localiseTranslation } from '../utils'
 import { _ } from '../utils/translations'
 import Icon from './Icon'
 import Text from './Text'
@@ -35,6 +23,60 @@ localiseTranslation({
 })
 
 /**
+ * NAMES `semantic-ui-react`'s Dropdown CONSUMED AND THIS ONE DOES NOT.
+ *
+ * Removing a feature is not the whole job: SUIR's Dropdown declared every one of these as a
+ * handled prop, so passing one used to be quietly harmless. `Listbox` has an open rest spread onto
+ * its `<div role="listbox">`, so without this strip they would become ATTRIBUTES — measured, not
+ * feared: `required` rendered as `required=""` on a div, and `clearable` produced React's
+ * "Received `true` for a non-boolean attribute" warning. Failing loudly with an actionable message
+ * is better than either.
+ *
+ * `required` is deliberately NOT here: the wrapper reads it for its own `required` class
+ * (see the `input--wrapper` composition), so it is consumed rather than dropped.
+ *
+ * Same mechanism as `TooltipPop`'s list, and for the same reason — see docs/SUPPORTED-PROPS.md.
+ */
+const DROPPED_PROPS = [
+    // §9.7-F1 step 3 part 2 removed these three features, on the evidence that nothing declares
+    // them, and these are all the names that belonged to them.
+    'search', 'searchInput', 'searchQuery', 'onSearch', 'onSearchChange', 'deburr',
+    'multiple',
+    'allowAdditions', 'additionLabel', 'additionPosition', 'onAddItem',
+    // Could not outlive `search`: the wrapper turned it into `searchInput={{autoFocus: true}}`.
+    'autofocus',
+    // Both were only ever shown while filtering.
+    'noResultsMessage',
+    // Never wrapper API, but reachable through the old rest spread and curated as tier 2 on
+    // docs/SUPPORTED-PROPS.md: SUIR's clear-selection icon. Nothing in either corpus sets it.
+    'clearable',
+]
+
+const warnedDropped = new Set()
+
+/** `props` without the dropped names, warning once per name in development. */
+function dropUnsupported (props) {
+    const kept = {}
+    Object.keys(props).forEach(key => {
+        if (DROPPED_PROPS.indexOf(key) === -1) {
+            kept[key] = props[key]
+            return
+        }
+        if (process.env.NODE_ENV !== 'production' && !warnedDropped.has(key)) {
+            warnedDropped.add(key)
+            console.warn(
+                `[ui-render] <Dropdown> ignores the \`${key}\` prop.`
+                + ' semantic-ui-react handled it; the in-house listbox does not, because nothing in'
+                + ' the product or in any audited meta used it and the machinery behind it'
+                + ' (filtering, diacritics-insensitive matching, a search input, multi-value'
+                + ' handling, free-text additions) is gone. See docs/SUPPORTED-PROPS.md.'
+            )
+        }
+    })
+    return kept
+}
+
+/**
  * Drop Down Select - Pure Component.
  *
  * @Note: for docs, check out https://react.semantic-ui.com/modules/dropdown/
@@ -51,8 +93,6 @@ localiseTranslation({
  * @param {Array} options - list of option values, e.g. ['value']
  * @param {Function} [onChange] - callback when user changes input value, receives value as argument
  * @param {Function} [onSelect] - callback when user selects an option, receives value as argument
- * @param {Function} [onSearch] - callback when user types in the input, receives value as argument
- * @param {Function} [onAddItem] - callback when user adds new options, must enable `allowAdditions: true`
  * @param {String} [label] - text to display next to input
  * @param {String} [placeholder] - text
  * @param {Boolean} [done] - whether input is completed
@@ -72,7 +112,6 @@ export function Dropdown ({
   options: opts,
   onChange,
   onSelect,
-  onSearch,
   label,
   placeholder = _.SELECT,
   done,
@@ -87,9 +126,11 @@ export function Dropdown ({
   optionsLabel,
   initialValues, // not used, removing from DOM
   readonly,
-  autofocus,
-  onAddItem,
   onClickIcon,
+  // Read for the wrapper's own `required` class. Destructured rather than read off the rest bag
+  // because it has to be CONSUMED: SUIR declared `required` as a handled prop, and `Listbox`
+  // would put it on the `<div role="listbox">` as `required=""`.
+  required,
   translate = Active.translate,
   value: valueFromParent,
   ...props
@@ -148,10 +189,8 @@ export function Dropdown ({
     }
   }, [optionValuesKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (autofocus) props.searchInput = {autoFocus: true} // better to disable autofocus for usability - why?
-  if (readonly) props.disabled = true // Semantic Dropdown does not accept `readOnly` prop
+  if (readonly) props.disabled = true // the inner control has no `readOnly`
   if (props.selection == null) props.selection = true
-  if (props.search && props.deburr == null) props.deburr = true // Case and diacritics insensitive search
 
   // @Note: the comment below used to claim `undefined` options "pass through unchanged". They did
   //  not — `options[0]` on an absent or null list THREW, measured:
@@ -187,11 +226,11 @@ export function Dropdown ({
       break
     // no default
   }
-  // @Note: kept BEFORE the label is appended, because `onAddItem` writes the option list back into
-  //  state — and it used to write back the label-appended copy, so every addition appended the
-  //  label again. Measured menu after one addition: ['Zed','Option A','Option B','FOOTER','FOOTER'].
-  //  Found by the §9.7-F1 step 3 part 1 audit.
-  const optionsWithoutLabel = options
+  // @Note: part 1 fixed a duplication here — `onAddItem` wrote the label-appended array back into
+  //  option state, so every addition appended the label again — and part 2 made that fix
+  //  unnecessary by removing `allowAdditions`: nothing writes options back any more, so the copy
+  //  the fix needed is gone with it. Recorded rather than deleted silently, because a fix
+  //  disappearing is worth a reader knowing it was ever needed.
   if (optionsLabel) options = [...options, {key: '', text: '', content: optionsLabel, disabled: true}]
 
   // Convert Icon to Node because Semantic has no `onClickIcon` callback
@@ -203,73 +242,40 @@ export function Dropdown ({
   // On Change gets called before `onAddItem`
   if (onChange || onSelect) {
     props.onChange = (event, {value}) => {
-      // Since there is no option to disable addition when search matches existing options (case-insensitive),
-      // => sanitize onChange to have value from existing options.
-      // @note: it's possible to temporarily disable addition, but that logic is more complex,
-      //    and shows 'No options left' message, instead of 'Add value',
-      //    which may be more intuitive, because it simply moves the selected value to the end.
-      let val = props.multiple ? last(value) : value
-      if (val && isString(val)) {
-        val = trimSpaces(val).toLowerCase()
-        const duplicate = options.find(({text}) => typeof text === 'string' && toLowerCase(text) === val)
-        if (duplicate && toLowerCaseAny(duplicate.value) !== val) {
-          if (props.multiple) {
-            value[value.length - 1] = duplicate.value
-          } else {
-            value = duplicate.value
-          }
-        }
-      }
-
-      // Remove duplicates for non-matching cases, or value converted to Id from the operation above.
-      // Keep the last entered value for new additions.
-      // @Note: the list of values can be a mix of primitive Number and String
+      // @Note: this used to map a case-mismatched value back onto an existing option's value, and
+      //  §9.7-F1 step 3 part 2 removed that with the rest of the free-text machinery — NOT because
+      //  it belonged to it, but because measuring showed the branch had become unreachable. It
+      //  only ever fired for a value the user TYPED; a value picked from the list is an option's
+      //  own value, so nothing could differ in case. Keeping it would have been dead code behind a
+      //  comment claiming otherwise, which is worse than either removing or fixing it.
       // Store value temporarily for onSelect event.
-      tempValue.current = (props.multiple && !isObject(last(value))) ? toUniqueListCaseInsensitive(value.reverse()).reverse() : value
-      setValue(tempValue.current)
-      onChange && onChange(tempValue.current, props.name, event)
+      tempValue.current = value
+      setValue(value)
+      onChange && onChange(value, props.name, event)
     }
   }
 
   if (onSelect) props.onClose = (event) => onSelect(tempValue.current, props.name, event)
-  if (onSearch) props.onSearchChange = (event, data) => onSearch(data.searchQuery, props.name, event)
 
-  // Sanitize options from duplicates on addition
-  if (props.allowAdditions) {
-    if (props.additionLabel == null) props.additionLabel = _.ADD_
-    if (!props.upward && props.additionPosition == null) props.additionPosition = 'bottom'
-
-    // This may add duplicate item for non-matching cases
-    props.onAddItem = (event, {value}) => {
-      value = trimSpaces(value)
-      const val = toLowerCase(value)
-      // The duplicate can be exiting options, or a newly added option
-      const duplicate = options.find(({text}) => toLowerCase(text) === val)
-      const newOption = {text: value, value} // `options` is always a list of objects because of sanitization below
-      if (duplicate) {
-        // Override only newly added duplicate option to match the last case entered
-        if (toLowerCaseAny(duplicate.value) === val) Object.assign(duplicate, newOption)
-      } else {
-        setOptions([newOption, ...optionsWithoutLabel])
-        onAddItem && onAddItem(value, props.name, event)
-      }
-    }
-  }
 
   // Sanitize Value (for Colors)
   let dropdownValue = value
-  if (Array.isArray(dropdownValue) && dropdownValue.length) {
-    if (!props.multiple) dropdownValue = dropdownValue.join(',')
-    if (props.multiple && Array.isArray(dropdownValue[0])) dropdownValue = dropdownValue.map(v => v.join(','))
-  }
+  // An array VALUE, not a multi-selection: a colour option carries `[r, g, b]`, and the option
+  // list's own values were stringified by the sanitiser, so the selected value has to match.
+  if (Array.isArray(dropdownValue) && dropdownValue.length) dropdownValue = dropdownValue.join(',')
 
   /// Error handling
   // @Note: below logic only works as DropdownField with controlled value
-  if (done == null) done = !error && (props.multiple ? hasListValue(props.value) : (!!props.value || props.value === 0))
+  if (done == null) done = !error && (!!props.value || props.value === 0)
+
+  // Hoisted rather than nested inside `omitProps(...)`: `scripts/generate-wrapper-prop-reference.js`
+  // reads the strip lists out of the `omitProps` call to document the DOM boundary, and its parser
+  // takes the argument text up to the first `)`.
+  const supported = dropUnsupported(props)
 
   return (
     <View className={classNames('input--wrapper', {
-      float, done, labeled: label, 'fill-width': !props.compact && fill, required: props.required,
+      float, done, labeled: label, 'fill-width': !props.compact && fill, required,
     }, className)} style={style}>
       {label && !float && <Text className="input__label">{translate(label)}</Text>}
       <DropDown
@@ -279,14 +285,15 @@ export function Dropdown ({
         placeholder={translate(placeholder)}
         error={!!error}
         lazyLoad={lazyLoad}
-        noResultsMessage={(hasListValue(dropdownValue) && dropdownValue.length === options.length) ? _.NO_OPTIONS_LEFT : _.NOTHING_FOUND}
         value={dropdownValue}
-        // DOM boundary: Semantic's Dropdown spreads whatever it does not recognise (and it
-        // declares no `name`) onto its <div role="listbox">, so engine props and `name`/`label`
-        // became attributes there. Filtered here, AFTER the props.onClose/onSearchChange/
-        // onAddItem assignments above, and without touching the `props.name` those handlers
-        // report to the host. See ./domProps.js.
-        {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)}
+        // DOM boundary: `Listbox` spreads whatever it does not destructure onto its
+        // <div role="listbox">, exactly as Semantic's Dropdown did (and neither declares a
+        // `name`), so engine props and `name`/`label` would become attributes there. Filtered
+        // here, AFTER the props.onClose assignment above, and without touching the `props.name`
+        // that handler reports to the host. `Listbox` strips again at its own edge because that
+        // is where the element is; this strip is what keeps engine props from reaching it at all.
+        // See ./domProps.js.
+        {...omitProps(supported, ENGINE_PROPS, FIELD_ONLY_PROPS)}
       />
       {label && float && <Text className="input__label">{translate(label)}</Text>}
       {(error || info) &&
@@ -322,8 +329,6 @@ Dropdown.propTypes = {
   ])).isRequired,
   onChange: PropTypes.func,
   onSelect: PropTypes.func,
-  onSearch: PropTypes.func,
-  onAddItem: PropTypes.func,
   placeholder: PropTypes.any
 }
 

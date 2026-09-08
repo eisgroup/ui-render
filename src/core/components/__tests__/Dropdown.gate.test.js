@@ -120,38 +120,6 @@ describe('the dropdown a user sees', () => {
         expect(calls[0][1]).toBe('region')
     })
 
-    it('offers a free-text addition, adds it to the list, and tells the caller', () => {
-        const added = []
-        const { container } = render(withConfig(
-            <Dropdown options={OPTIONS} name="region" allowAdditions search
-                      onChange={() => {}} onAddItem={(...args) => added.push(args.slice(0, 2))}/>
-        ))
-
-        fireEvent.change(container.querySelector('input.search'), { target: { value: 'Zed' } })
-        expect(optionTexts(container)).toEqual(['Add Zed'])
-
-        act(() => { fireEvent.click(container.querySelector('[role="option"]')) })
-
-        expect(added).toEqual([['Zed', 'region']])
-        // The addition is committed as the displayed selection...
-        expect(displayed(container)).toBe('Zed')
-
-        // ...and PREPENDED to the list, which is only observable after reopening: choosing an
-        // option closes the control, and with `lazyLoad` the options unmount when it closes.
-        open(container)
-        expect(optionTexts(container)).toEqual(['Zed', 'Option A', 'Option B'])
-    })
-
-    it('filters the list as the user searches', () => {
-        const { container } = render(withConfig(
-            <Dropdown options={OPTIONS} name="region" search onChange={() => {}}/>
-        ))
-
-        fireEvent.change(container.querySelector('input.search'), { target: { value: 'B' } })
-
-        expect(optionTexts(container)).toEqual(['Option B'])
-    })
-
     it('renders `readonly` as a control a user cannot reach or open', () => {
         const { container } = render(withConfig(
             <Dropdown options={OPTIONS} name="region" readonly onChange={() => {}}/>
@@ -178,18 +146,34 @@ describe('the dropdown a user sees', () => {
      * `aria-activedescendant` and the rest, and this one has none of them. Step 3's replacement
      * should SHRINK the missing list, and the shrink is the diff that shows it.
      */
-    it('announces the selection through `role="alert"`, and lacks the combobox wiring', () => {
+    /**
+     * FLIPPED BY THE SWAP, and it is the outcome §9.5 predicted: it recorded that every `alert` in
+     * the corpus role census is one dropdown and that "all of them should go to ZERO at step 3".
+     * They have. The library announced a selection by writing it into a `role="alert" aria-live`
+     * node — a workaround for a listbox whose cursor was not announceable — and the in-house
+     * control does not need one: `aria-selected` marks the committed option and
+     * `aria-activedescendant` points at the cursor, which is how a listbox is supposed to say both.
+     *
+     * `aria-activedescendant` appears only while open and only once there is a cursor, so a closed
+     * control still carries none of the combobox attributes — which is why the absence list below
+     * keeps four of its five names.
+     */
+    it('drops the `role="alert"` announcer, having made the cursor announceable instead', () => {
         const { container } = render(withConfig(
             <Dropdown options={OPTIONS} name="region" onChange={() => {}}/>
         ))
 
-        // Semantic's way of announcing a selection. Every `alert` in the corpus role census is one
-        // dropdown, and all of them should reach zero when the replacement lands.
-        expect(container.querySelectorAll('[role="alert"]')).toHaveLength(1)
+        expect(container.querySelectorAll('[role="alert"]')).toHaveLength(0)
 
+        // Closed: no cursor, so nothing to point at yet.
         const present = ['aria-activedescendant', 'aria-controls', 'aria-haspopup', 'aria-labelledby', 'aria-label']
             .filter(attribute => listbox(container).hasAttribute(attribute))
         expect(present).toEqual([])
+
+        // Open and move: the cursor is now announceable, which is what replaced the alert.
+        open(container)
+        fireEvent.keyDown(listbox(container), { key: 'ArrowDown' })
+        expect(listbox(container)).toHaveAttribute('aria-activedescendant')
     })
 
     it('follows a cascading parent: new options, and the stale value replaced', () => {

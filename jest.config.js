@@ -66,8 +66,24 @@ module.exports = {
             lines: 100,
         },
         './src/core/components/Dropdown.js': {
+            // Branches 99 → 100 at §9.7-F1 step 3 part 2: what was left uncovered belonged to the
+            // `search`/`multiple`/`allowAdditions` logic the step removed.
             statements: 100,
-            branches: 99,
+            branches: 100,
+            functions: 100,
+            lines: 100,
+        },
+        // §9.7-F1 step 3 part 2, the in-house listbox `Dropdown.js` now renders. Same floor as its
+        // in-house siblings, and measured rather than aspirational — but read the `TooltipPop`
+        // note below for what a floor here does and does not prove. Reaching it was not free: the
+        // gaps `--coverage` named were a dead `option.value` fallback in typeahead and three dead
+        // `cursor === -1 ? selectedIndex : cursor` expressions (both deleted after reading the only
+        // caller), plus real edges nobody had decided about — every option disabled, `onChange`
+        // absent, Escape at a closed control. Those are `Listbox.test.js`'s "edges the coverage
+        // floor found" describe.
+        './src/core/components/Listbox.js': {
+            statements: 100,
+            branches: 100,
             functions: 100,
             lines: 100,
         },

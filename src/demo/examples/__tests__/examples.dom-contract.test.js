@@ -20,6 +20,29 @@
  * NEVER `-u` to make a red pure refactor (§9.2/§9.3) go green: for those commits a
  * diff here is the finding, and the whole reason this layer exists.
  *
+ * THE LAST DELIBERATE REGENERATION, and what the diff was — §9.7-F1 step 3 part 2, the dropdown
+ * swap, across 11 of the 38 examples. Six changes, each accounted for before the `-u`:
+ *   - the `role="alert" aria-live="polite" aria-atomic="true"` on the selected-value node is GONE.
+ *     Semantic announced the current value as an alert; the corpus role census dropped 12 `alert`
+ *     entries to zero in the same commit, and the cursor is conveyed by `aria-activedescendant`.
+ *   - the option text is no longer wrapped in `<span class="text">`. Checked against the compiled
+ *     CSS rather than assumed: the only loaded rules that reach a `.text` inside an item are
+ *     `.ui.dropdown .menu > .item .dropdown.icon + .text` and its `.left` variant, both of which
+ *     require an icon INSIDE the option, which nothing renders.
+ *   - `aria-checked` is gone from every option. Redundant with `aria-selected` in a single-select
+ *     listbox, and no rule selects on it.
+ *   - the inline `style="pointer-events: all"` is gone from every option. It existed to survive
+ *     Semantic's own `pointer-events: none` on a disabled control; ours is unreachable, because a
+ *     disabled or readonly control never opens and a closed `.menu` is `display: none`.
+ *   - `role="presentation"` is ADDED on the `.menu`. It sits between the `role="listbox"` and its
+ *     `role="option"` children, and without a role of its own it would break the owned-element
+ *     relationship the pattern requires.
+ *   - class token ORDER moved (`divider text` → `text divider`, `dropdown icon` → `icon dropdown`,
+ *     `active selected item` → `item active`). Order cannot change what a selector matches. The
+ *     dropped `selected` is the closed-state cursor, which no longer exists: `.selected.item` IS
+ *     styled (`background:#f3f7fc`), and the cursor takes it on open, where it is visible.
+ * Option `id`s are absent from every snapshot on purpose — see `Listbox.test.js`'s `option ids`.
+ *
  * WHAT IS AND IS NOT NORMALISED
  * -----------------------------------------------------------------------------
  * Attribute ORDER is normalised (sorted) by ../../testing/serializeDom — it is a

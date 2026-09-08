@@ -79,9 +79,14 @@ const VIEWS_PAGE = 'docs/SUPPORTED-VIEWS.md'
  * `Table` left this list when §9.7-F1 step 1 took it in-house, and `TooltipPop` when step 2 part 3
  * did — see IN_HOUSE below. Only `Dropdown` is still a wrapper.
  */
-const WRAPPERS = [
-    { id: 'Dropdown', file: `${PACK}/Dropdown.js`, fn: 'Dropdown', suir: 'Dropdown', localName: 'DropDown' },
-]
+/**
+ * EMPTY SINCE §9.7-F1 STEP 3 PART 2, which is the end of the JS exit. `Dropdown` was the last
+ * entry; it now renders the in-house `Listbox` and has moved to `IN_HOUSE` below. The list and
+ * `readWrapper` are kept rather than deleted because they are the shape a regression would need:
+ * a component that starts importing the package again has to be described here, and `readInHouse`
+ * throws if an `IN_HOUSE` entry reaches it, so the two lists check each other.
+ */
+const WRAPPERS = []
 
 /**
  * The components a completed F1 step replaced. `root` is the element the top-level component
@@ -92,6 +97,11 @@ const IN_HOUSE = [
     { id: 'Table', file: `${PACK}/Table.js`, fn: 'Table', root: 'table', factory: 'tablePart' },
     // One element, no subcomponent family, so no `factory`.
     { id: 'TooltipPop', file: `${PACK}/TooltipPop.js`, fn: 'TooltipPop', root: 'span' },
+    // `root` is the node the component renders, which for `Dropdown` is a COMPONENT and not an
+    // element: it is the engine-facing wrapper, and the markup lives one level down in
+    // `Listbox.js` under this import alias. Documenting the pair under one entry is deliberate —
+    // the props a consumer sets are `Dropdown`'s, and `Listbox` is not exported from the library.
+    { id: 'Dropdown', file: `${PACK}/Dropdown.js`, fn: 'Dropdown', root: 'DropDown' },
 ]
 
 const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8')
@@ -307,6 +317,13 @@ const IMPORT_KINDS = [
 /**
  * Every file that reaches `semantic-ui-react` by any mechanism, with the ones the eslint guard
  * cannot see flagged. Fails if any of them is outside the components pack.
+ *
+ * SINCE §9.7-F1 STEP 3 PART 2 THIS RETURNS AN EMPTY LIST, and that is the finish line rather than
+ * a fault. It used to throw on zero, because "nothing found" and "the scan broke" look identical
+ * from here — the regexes could rot silently and the invariant would read as satisfied forever.
+ * That ambiguity is now resolved one layer up instead of by refusing to return: the contract test
+ * runs `IMPORT_KINDS` against a synthetic source carrying all four mechanisms and asserts all four
+ * still match, so an empty result from `src` means genuinely empty.
  */
 function readImportSites () {
     const sites = []
@@ -334,7 +351,6 @@ function readImportSites () {
             + ` this check also covers \`import()\`, \`require\` and \`jest.mock\`, none of which the`
             + ` rule can see (ESLint 8's no-restricted-imports does not visit ImportExpression).`)
     }
-    if (!sites.length) throw new Error('no semantic-ui-react references found at all — the exit is complete, or the scan broke.')
     return sites.sort((a, b) => a.file.localeCompare(b.file) || a.kind.localeCompare(b.kind))
 }
 
@@ -767,6 +783,22 @@ function wrapperSection (wrapper, { domProps }) {
             + ' the same prop appears in both tables.', '')
     }
 
+    // A REMOVED prop is published the same way an in-house component's is. Optional, because only
+    // a wrapper mid-exit has any: §9.7-F1 step 3 part 2 dropped `search`, `multiple` and
+    // `allowAdditions` from the dropdown before replacing it, and a consumer needs that on the page
+    // that documents the props — prose in the summary is not where anyone looks for a prop.
+    if (curation.dropped && Object.keys(curation.dropped).length) {
+        lines.push(
+            `**Dropped (${Object.keys(curation.dropped).length}).** No longer accepted. `
+            + (curation.droppedNote || ''),
+            '',
+            row(['Prop', 'Why it is gone']),
+            row(['---', '---']),
+            ...Object.keys(curation.dropped).map(name => row([code(name), curation.dropped[name]])),
+            '',
+        )
+    }
+
     lines.push(
         `**Stripped at the DOM boundary.** ${stripped.length
             ? `${code(wrapper.file)} applies ${codeList(wrapper.omitLists)} from ${code(DOM_PROPS_FILE)}`
@@ -813,6 +845,10 @@ function inHouseSection (component, { domProps, callSites }) {
     const curation = IN_HOUSE_CURATION[component.id]
     const stripped = component.omitLists.flatMap(list => domProps[list])
     const tags = [component.fn, ...component.subcomponents.map(({ name }) => `${component.fn}.${name}`)]
+    // Which call-site spreads can carry an arbitrary meta attribute into this family. Derived,
+    // because it is the reason the strip has to be explicit — and because it differs per component:
+    // this used to be `Table`'s answer, printed under all three.
+    const spreadsInto = tags.flatMap(tag => (callSites[tag] ? callSites[tag].spreads : []))
 
     return [
         `### ${code(component.id)} — in-house, no semantic-ui-react`,
@@ -830,14 +866,18 @@ function inHouseSection (component, { domProps, callSites }) {
         ...(curation.behaviourContract
             ? [`**What opens and closes it.** ${curation.behaviourContract}`, '']
             : []),
-        row(['Component', 'Element', 'Notes']),
-        row(['---', '---', '---']),
-        ...component.subcomponents.map(({ name, element }) => row([
-            code(`${component.fn}.${name}`),
-            code(`<${element}>`),
-            curation.elements[name],
-        ])),
-        '',
+        // Gated: a single-element component is not a family, and an earlier version of this
+        // renderer printed a table header with no rows under both `TooltipPop` and `Dropdown`.
+        ...(component.subcomponents.length ? [
+            row(['Component', 'Element', 'Notes']),
+            row(['---', '---', '---']),
+            ...component.subcomponents.map(({ name, element }) => row([
+                code(`${component.fn}.${name}`),
+                code(`<${element}>`),
+                curation.elements[name],
+            ])),
+            '',
+        ] : []),
         `CSS contract: ${curation.cssContract}`,
         '',
         `**Consumed by the root (${component.intercepted.length}).** Read by ${code(component.fn)}`
@@ -852,31 +892,41 @@ function inHouseSection (component, { domProps, callSites }) {
             curation.props[name],
         ])),
         '',
-        `**Consumed by every subcomponent (${component.part.intercepted.length}).** All six share one`
-        + ' implementation, so this list applies to each of them identically.',
-        '',
-        row(['Prop', 'Meaning']),
-        row(['---', '---']),
-        ...component.part.intercepted.map(({ name }) => row([code(name), curation.partProps[name]])),
-        '',
+        // Same gate, and the count is derived rather than the hardcoded "All six" this line used to
+        // claim for every component — `TooltipPop` and `Dropdown` have no subcomponents at all.
+        ...(component.part.intercepted.length ? [
+            `**Consumed by every subcomponent (${component.part.intercepted.length}).** All`
+            + ` ${component.subcomponents.length} share one implementation, so this list applies to`
+            + ' each of them identically.',
+            '',
+            row(['Prop', 'Meaning']),
+            row(['---', '---']),
+            ...component.part.intercepted.map(({ name }) => row([code(name), curation.partProps[name]])),
+            '',
+        ] : []),
         `**Stripped at the DOM boundary.** ${stripped.length
             ? `${code(component.file)} applies ${codeList(component.omitLists)} from`
-              + ` ${code(DOM_PROPS_FILE)} in all ${tags.length} components, so these never become`
-              + ` attributes: ${codeList(stripped)}.`
+              + ` ${code(DOM_PROPS_FILE)}${tags.length > 1 ? ` in all ${tags.length} components` : ''},`
+              + ` so these never become attributes: ${codeList(stripped)}.`
             : `${code(component.file)} applies no boundary filter, which for a component that spreads`
               + ' onto a real element is a leak waiting for a caller — see ' + code(DOM_PROPS_FILE) + '.'}`,
         '',
         `**Passthrough.** ${curation.passthrough}`,
         '',
         `**Dropped (${Object.keys(curation.dropped).length}) — the semver record.** Props`
-        + ' semantic-ui-react handled that this implementation deliberately does not. All of them remain'
-        + ' REACHABLE from a consumer meta — `mapper.js` spreads a `TableCells` node\'s whole rest bag onto'
-        + ' the cell and `TableView` spreads its own rest onto the table — so the component strips them'
-        + ' explicitly and warns once per prop in development. Stripping matters because a string-valued'
-        + ' one would otherwise land as a lowercase DOM attribute (`verticalAlign="top"` rendered'
-        + ' `verticalalign="top"`), which is the junk the DOM contract\'s tripwires exist to keep out;'
-        + ' warning matters because a meta still carrying one would otherwise never learn it stopped'
-        + ' working. React\'s own unknown-prop warning is not relied on: it is silent for a lowercase name.',
+        + ' semantic-ui-react handled that this implementation deliberately does not.'
+        + `${spreadsInto.length
+            ? ' All of them remain REACHABLE from a consumer meta: the component is rendered with'
+              + ` open spreads (${codeList(spreadsInto)}), so an attribute nobody anticipated on a`
+              + ' meta node still arrives here as a prop. That is why'
+            : ' A caller can still pass one, so'}`
+        + ' the component strips them explicitly and warns once per prop in development. Stripping'
+        + ' matters because the value would otherwise reach a real element as an attribute — a'
+        + ' string-valued one lands lowercase (`verticalAlign="top"` rendered `verticalalign="top"`)'
+        + ' and a boolean draws React\'s "Received `true` for a non-boolean attribute" warning, both'
+        + ' of them junk the DOM contract\'s tripwires exist to keep out. Warning matters because a'
+        + ' meta still carrying one would otherwise never learn it stopped working, and React\'s own'
+        + ' unknown-prop warning cannot be relied on: it is silent for a lowercase name.',
         '',
         row(['Prop', 'Why it is gone']),
         row(['---', '---']),
@@ -899,8 +949,9 @@ function inHouseSection (component, { domProps, callSites }) {
         '',
         '`mapper.js`\'s spread onto `Table.Cell` is a meta node\'s whole rest bag and is still'
         + ' unfiltered at the call site — the filter is now inside the cell, which is why it is safe.'
-        + ' The tooltip was the other unfiltered boundary on this surface; step 2 part 3 closed it, so'
-        + ' `Dropdown` is the last one left and step 3 owns it.',
+        + ' All three unfiltered boundaries on this surface are now closed inside the component:'
+        + ' the table cell at step 1, the tooltip at step 2 part 3, and the dropdown at step 3'
+        + ' part 2, which strips twice — once in the wrapper and once in `Listbox` at the element.',
         '',
     ]
 }
@@ -923,15 +974,25 @@ function renderMarkdown (reference) {
         `Companion to \`${VIEWS_PAGE}\`, which lists every \`view\` name a meta may use. This page`,
         'covers the props of the three views the `semantic-ui-react` exit replaces one at a time',
         '(UPGRADE-PLAN §9.7-F1). It is both the **supported-prop list** for meta authors and the',
-        '**parity checklist** the replacements are judged against.',
+        '**parity checklist** the replacements were judged against.',
         '',
-        `**${done.length} of the ${done.length + left.length} done so far.**`,
-        `${codeList(done)} ${done.length === 1 ? 'is' : 'are'} in-house and`,
-        `${done.length === 1 ? 'imports' : 'import'} nothing; ${codeList(left)}`,
-        `${left.length === 1 ? 'still wraps' : 'still wrap'} semantic-ui-react. The two kinds of section answer different`,
-        'questions, so they are shaped differently: a wrapper section ends in the **forwarded** table',
-        'that its replacement owes, while an in-house section says what the component **emits** and',
-        'what it no longer **accepts**.',
+        ...(left.length ? [
+            `**${done.length} of the ${done.length + left.length} done so far.**`,
+            `${codeList(done)} ${done.length === 1 ? 'is' : 'are'} in-house and`,
+            `${done.length === 1 ? 'imports' : 'import'} nothing; ${codeList(left)}`,
+            `${left.length === 1 ? 'still wraps' : 'still wrap'} semantic-ui-react. The two kinds of section answer different`,
+            'questions, so they are shaped differently: a wrapper section ends in the **forwarded** table',
+            'that its replacement owes, while an in-house section says what the component **emits** and',
+            'what it no longer **accepts**.',
+        ] : [
+            `**All ${done.length} done.** ${codeList(done)} are in-house, and no file in \`src\``,
+            'reaches `semantic-ui-react` by any mechanism — see *Isolation invariant* below. Every',
+            'section is therefore the in-house shape: what the component **emits**, and what it no',
+            'longer **accepts**. The **forwarded** tables are gone with the dependency, because',
+            '"forwarded" meant "handed to semantic-ui-react"; the props still travel, but now into',
+            'code in this repository, so they are described as what they are rather than ranked by',
+            'how urgently a replacement owed them.',
+        ]),
         '',
         '**This page is generated.** Editing it by hand is pointless — the contract test regenerates',
         `it and fails on any difference. Run \`${WRITE_COMMAND}\` after changing one of these`,
@@ -964,18 +1025,32 @@ function renderMarkdown (reference) {
         '',
         '## Isolation invariant',
         '',
-        `Everything semantic-ui-react does in this library happens inside \`${PACK}\`. Derived by`,
-        'scanning `src` for every import, `require` and `jest.mock` of the package — so this table',
-        'shrinks as the exit proceeds, and the components below that no longer appear in it are the',
-        'ones that no longer depend on the package at all:',
-        '',
-        row(['File', 'How', 'Specifier']),
-        row(['---', '---', '---']),
-        ...importSites.map(site => row([
-            code(site.file) + (site.test ? ' *(test)*' : ''),
-            code(site.kind),
-            code(site.specifier),
-        ])),
+        ...(importSites.length ? [
+            `Everything semantic-ui-react does in this library happens inside \`${PACK}\`. Derived by`,
+            'scanning `src` for every import, `require` and `jest.mock` of the package — so this table',
+            'shrinks as the exit proceeds, and the components below that no longer appear in it are the',
+            'ones that no longer depend on the package at all:',
+            '',
+            row(['File', 'How', 'Specifier']),
+            row(['---', '---', '---']),
+            ...importSites.map(site => row([
+                code(site.file) + (site.test ? ' *(test)*' : ''),
+                code(site.kind),
+                code(site.specifier),
+            ])),
+        ] : [
+            '**The table below is empty, and that is the point.** This scan reads `src` for every',
+            '`import`, `import()`, `require` and `jest.mock` of `semantic-ui-react`; it started at 7',
+            'files and reached zero at §9.7-F1 step 3 part 2, when `Dropdown.js` moved onto the',
+            "in-house `Listbox`. No file in `src` references the package by any mechanism, so the",
+            'isolation invariant ("only inside the components pack") now holds in the stronger form',
+            '"nowhere at all". Every remaining mention in the tree is prose — comments recording what',
+            'the package used to do, and the docs you are reading.',
+            '',
+            'The scan is kept rather than deleted because zero is a value worth defending: it is what',
+            'fails if the dependency comes back. What it can no longer do is tell you the scan itself',
+            'still works, so the contract test proves the four patterns against a synthetic source.',
+        ]),
         '',
         'An `eslint` `no-restricted-imports` override (in `package.json`, `eslintConfig.overrides`)',
         `fails \`npm run lint:js\` on a static \`import\` of the package from anywhere outside \`${PACK}\`,`,
@@ -990,12 +1065,16 @@ function renderMarkdown (reference) {
               + ' invisible to the rule'
             : ''}. Neither is sufficient alone.`,
         '',
-        '## In-house — the exit, so far',
+        wrappers.length ? '## In-house — the exit, so far' : '## In-house — the exit',
         '',
         ...inHouse.flatMap(component => inHouseSection(component, reference)),
         '## Wrappers — what is left',
         '',
-        ...wrappers.flatMap(wrapper => wrapperSection(wrapper, reference)),
+        ...(wrappers.length ? wrappers.flatMap(wrapper => wrapperSection(wrapper, reference)) : [
+            'None. The heading is kept so that a component reacquiring a `semantic-ui-react`',
+            'dependency would appear here rather than blending into the sections above.',
+            '',
+        ]),
         '## What the meta corpus actually uses',
         '',
         'Every attribute name the **tracked** example corpus puts on a node of each of these views.',
@@ -1105,6 +1184,7 @@ function main (argv) {
 
 module.exports = {
     buildReference,
+    IMPORT_KINDS,
     renderMarkdown,
     readImportSites,
     readDomPropsLists,
