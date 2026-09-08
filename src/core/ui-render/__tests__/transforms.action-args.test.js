@@ -3,10 +3,16 @@
  * for any caller whose arity is not fixed.
  * =============================================================================================
  *
- * FOUND BY THE §9.7-F1 STEP 3 PART 1 AUDIT, and pinned here as MEASURED CURRENT BEHAVIOUR rather
- * than fixed, because the fix is not local: `getFunctionFromString` is how every `FIELD.FUNC`
- * action receives its meta-configured arguments, so changing the order changes every action in
- * every meta — including consumer metas this repo cannot read.
+ * FOUND BY THE §9.7-F1 STEP 3 PART 1 AUDIT. This file pins the COMPOSER's half — the appending
+ * itself, which is unchanged and correct. The consequence was fixed where it belongs, in the one
+ * action that suffered it: see `rules.set-state-path.test.js`.
+ *
+ * The composer is deliberately NOT the place for the fix, and the reason is worth keeping. It is
+ * how every `FIELD.FUNC` action receives its configured arguments, so any positional convention
+ * imposed here applies to all of them — and there is no convention that suits all. `setStates`
+ * wants the configured value as its PATH, while `popupAlert(title, content)` configured as
+ * `'popup,SomeTitle'` plainly wants it as the TITLE, i.e. first. Reordering here would fix one
+ * and break the other, in every meta including consumer ones this repo cannot read.
  *
  * The scheme is "caller's arguments first, configured arguments appended":
  *
@@ -74,7 +80,7 @@ describe('a configured action argument against a variable-arity caller', () => {
         expect(calls[0][3]).toBe('categoryX')
     })
 
-    it('so a two-argument reader takes the caller\'s second argument, not the configured one', () => {
+    it('so a POSITIONAL reader takes the caller\'s argument, not the configured one', () => {
         const action = actionFrom({ onChange: 'setState,categoryX' }, fieldFunc)
 
         // What a dropdown does: `onChange(value, name, event)`.
@@ -82,13 +88,16 @@ describe('a configured action argument against a variable-arity caller', () => {
         const [value, keyPathAsRead] = calls[0]
 
         expect(value).toBe('gold')
-        // THE DEFECT, stated as the measurement: a `setStates(value, keyPath)` signature reads
-        // the field's name here. `'categoryX'` — what the meta asked for — is at index 3.
+        // WHY `setStates` CANNOT READ POSITIONALLY, which is the whole reason this file exists: a
+        // `(value, keyPath)` signature would read the field's name here, while `'categoryX'` —
+        // what the meta asked for — sits at index 3. `setStates` reads the last STRING argument
+        // instead, which is correct for all four real call shapes; `rules.set-state-path.test.js`
+        // measures each of them.
         expect(keyPathAsRead).toBe('group.category')
         expect(keyPathAsRead).not.toBe('categoryX')
     })
 
-    it('and a single-argument caller works, which is why the workaround is to strip arguments', () => {
+    it('and a single-argument caller lands the configured value second, which is why `mapper.js` strips arguments', () => {
         const action = actionFrom({ onChange: 'setState,categoryX' }, fieldFunc)
 
         // What `mapper.js` re-wraps stable-value Selects to do.
