@@ -13,20 +13,22 @@
  * roles, text and callbacks — and whose acceptance test is that all of it fails when the inner
  * control is stubbed to render nothing. Anything observable by a user belongs there, not here.
  *
- * The seam this file reads is the one the swap deletes, so when the replacement lands every
- * assertion here has to be re-aimed at whatever the wrapper hands its own inner control. Keep
- * the assertions; expect to rewrite how they reach them.
+ * THAT RE-AIMING HAS HAPPENED. This file used to mock `semantic-ui-react`; step 3 part 2 replaced
+ * that seam with the in-house `Listbox`, and the mock moved with it. Not one assertion changed —
+ * they were always about what the WRAPPER computes, which is what the swap kept.
  */
 import React from 'react'
 import { act, render } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { Dropdown as SemanticDropdown } from 'semantic-ui-react'
+import Listbox from '../Listbox'
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
 import { Dropdown } from '../Dropdown'
 
-jest.mock('semantic-ui-react', () => ({
-    Dropdown: jest.fn(() => null),
-}))
+// RE-AIMED at §9.7-F1 step 3 part 2, exactly as this file's header said it would have to be: the
+// seam it reads is no longer `semantic-ui-react`'s `Dropdown` but the in-house `Listbox` the
+// wrapper now renders. The assertions did not change — they were always about what the WRAPPER
+// computes and hands down, which is the massaging layer the swap keeps.
+jest.mock('../Listbox', () => ({ __esModule: true, default: jest.fn(() => null) }))
 
 const objectOptions = [
     { text: 'Option A', value: 'a' },
@@ -38,7 +40,7 @@ const withConfig = ui => (
 )
 
 const latestSemanticProps = () => {
-    const calls = SemanticDropdown.mock.calls
+    const calls = Listbox.mock.calls
     return calls[calls.length - 1][0]
 }
 
@@ -46,7 +48,7 @@ const renderDropdown = props => render(withConfig(<Dropdown {...props} />))
 
 describe('Dropdown parent value and option contracts', () => {
     beforeEach(() => {
-        SemanticDropdown.mockClear()
+        Listbox.mockClear()
     })
 
     it('keeps numeric zero when the controlled parent value changes', () => {
@@ -300,7 +302,7 @@ describe('Dropdown parent value and option contracts', () => {
 
 describe('Dropdown interaction callback contracts', () => {
     beforeEach(() => {
-        SemanticDropdown.mockClear()
+        Listbox.mockClear()
     })
 
     it('passes numeric values through without string duplicate processing', () => {
@@ -341,10 +343,22 @@ describe('Dropdown interaction callback contracts', () => {
 
 describe('Dropdown additions contracts', () => {
     beforeEach(() => {
-        SemanticDropdown.mockClear()
+        Listbox.mockClear()
     })
 
-    it('preserves explicit addition labels and upward positioning', () => {
+    /**
+     * THIS USED TO ASSERT THE OPPOSITE, and the inversion is the point. Before §9.7-F1 step 3
+     * part 2 it read `expect(latestSemanticProps()).toEqual(expect.objectContaining({
+     * additionLabel, additionPosition, upward }))` — the addition props riding the rest spread
+     * through to the library untouched. The features are gone, so at this seam the correct
+     * assertion is that they no longer arrive; `Dropdown.test.js` covers what a caller who still
+     * passes one now observes (a named warning, and no stray DOM attribute).
+     *
+     * `upward` is kept in the same test on purpose: it went the other way. It is the one prop of
+     * the four that survives, because consumer metas declare it (`CONSUMER_ONLY_ATTRIBUTES`) and
+     * `Listbox` implements it as the `upward` class token.
+     */
+    it('no longer forwards the addition props, and still forwards `upward`', () => {
         renderDropdown({
             options: objectOptions,
             allowAdditions: true,
@@ -353,10 +367,10 @@ describe('Dropdown additions contracts', () => {
             upward: true,
         })
 
-        expect(latestSemanticProps()).toEqual(expect.objectContaining({
-            additionLabel: 'Create ',
-            additionPosition: 'top',
-            upward: true,
-        }))
+        const handed = latestSemanticProps()
+        expect(handed).toEqual(expect.objectContaining({ upward: true }))
+        expect(Object.keys(handed)).not.toContain('allowAdditions')
+        expect(Object.keys(handed)).not.toContain('additionLabel')
+        expect(Object.keys(handed)).not.toContain('additionPosition')
     })
 })

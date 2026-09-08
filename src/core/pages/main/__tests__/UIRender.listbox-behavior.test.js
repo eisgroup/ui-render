@@ -63,6 +63,18 @@ const ariaSelected = listbox => optionsOf(listbox)
 const isExpanded = listbox => listbox.getAttribute('aria-expanded') === 'true'
 
 /**
+ * The KEYBOARD CURSOR, which since §9.7-F1 step 3 part 2 is a different thing from the selection.
+ * The library committed the value as the arrows moved, so `aria-selected` was the cursor; the
+ * in-house control moves a cursor and commits on Enter, and says where the cursor is the way a
+ * listbox is supposed to — `aria-activedescendant` on the control, pointing at an option's id.
+ */
+const cursorOf = listbox => {
+    const id = listbox.getAttribute('aria-activedescendant')
+    const at = id && document.getElementById(id)
+    return at ? at.textContent : null
+}
+
+/**
  * What the control DISPLAYS as its current choice.
  *
  * The option list, when it is mounted at all, is part of the listbox's own text
@@ -249,14 +261,17 @@ describe('Select and Dropdown behavioural contract', () => {
             fireEvent.focus(listboxes()[0])
 
             // ArrowDown on a closed control opens it AND advances the cursor one step,
-            // so the cursor starts on the option after the current value.
+            // so the cursor starts on the option after the current value. Unchanged by the
+            // swap; what changed is that the cursor is read from `aria-activedescendant`
+            // rather than from `aria-selected`, because moving no longer commits.
             press(listboxes()[0], 'ArrowDown', 40)
             expect(isExpanded(listboxes()[0])).toBe(true)
-            expect(ariaSelected(listboxes()[0])).toEqual(['Category 2'])
+            expect(cursorOf(listboxes()[0])).toBe('Category 2')
+            expect(ariaSelected(listboxes()[0])).toEqual(['Category 1'])
 
             // Two options, so the next step wraps back to the first.
             press(listboxes()[0], 'ArrowDown', 40)
-            expect(ariaSelected(listboxes()[0])).toEqual(['Category 1'])
+            expect(cursorOf(listboxes()[0])).toBe('Category 1')
 
             press(listboxes()[0], 'ArrowDown', 40)
             press(listboxes()[0], 'Enter', 13)
@@ -268,30 +283,35 @@ describe('Select and Dropdown behavioural contract', () => {
             expect(displayed(listboxes()[1])).toBe('Delta')
         })
 
-        it('commits as the cursor moves, so Escape closes the list without restoring the old value', () => {
-            // Deliberately pinned as it IS, not as one might expect: SUIR's
-            // `selectOnNavigation` defaults to true and the wrapper does not override
-            // it, so a single ArrowDown already changes the bound value and cascades
-            // the dependent select. Escape then only collapses the list.
-            //
-            // A user who arrows past an option has therefore already changed the form,
-            // and has no keyboard way back to the value they started from. Whether the
-            // F1 Step 3 replacement keeps that is a decision, not an accident: if it
-            // adopts the WAI-ARIA pattern where Escape reverts, this test is the one
-            // that has to be rewritten, and the rewrite is the visible record of the
-            // behaviour change.
+        /**
+         * THE REWRITE IS THE RECORD, and the previous version of this test said so in advance.
+         * It pinned the library's behaviour as it WAS: `selectOnNavigation` defaults to true and
+         * the wrapper did not override it, so a single ArrowDown already changed the bound value
+         * and cascaded the dependent select — a user who arrowed past an option had changed the
+         * form and had no keyboard way back. That comment ended: "if it adopts the WAI-ARIA
+         * pattern where Escape reverts, this test is the one that has to be rewritten, and the
+         * rewrite is the visible record of the behaviour change."
+         *
+         * §9.7-F1 step 3 part 2 adopted it. Arrows move a cursor, Enter commits, and Escape
+         * closes having reported nothing — so there is nothing to revert TO, which is the same
+         * outcome by a cleaner route: the value the user started from was never left.
+         */
+        it('moves the cursor without committing, so Escape leaves the value and the cascade alone', () => {
             mountExample(example('selectCascading'))
             fireEvent.focus(listboxes()[0])
 
             press(listboxes()[0], 'ArrowDown', 40)
-            expect(ariaSelected(listboxes()[0])).toEqual(['Category 2'])
-            expect(displayed(listboxes()[1])).toBe('Delta')
+            expect(cursorOf(listboxes()[0])).toBe('Category 2')
+            // Neither the bound value nor the dependent select has moved.
+            expect(ariaSelected(listboxes()[0])).toEqual(['Category 1'])
+            expect(displayed(listboxes()[0])).toBe('Category 1')
+            expect(displayed(listboxes()[1])).toBe('Alpha')
 
             press(listboxes()[0], 'Escape', 27)
 
             expect(isExpanded(listboxes()[0])).toBe(false)
-            expect(displayed(listboxes()[0])).toBe('Category 2')
-            expect(displayed(listboxes()[1])).toBe('Delta')
+            expect(displayed(listboxes()[0])).toBe('Category 1')
+            expect(displayed(listboxes()[1])).toBe('Alpha')
         })
     })
 

@@ -50,11 +50,13 @@ All internal imports use **relative paths** — there are no `ui-*-pack` webpack
 | `ui-modules-pack` — form/upload/fields | `src/core/modules` |
 | `ui-utils-pack` — pure utils | `src/core/utils` |
 
-Dependency direction (keep it one-way): `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine (`pages/main` + `ui-render`) may import anything in core. `semantic-ui-react` may be imported **only** inside `src/core/components`.
+Dependency direction (keep it one-way): `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine (`pages/main` + `ui-render`) may import anything in core. `semantic-ui-react` is no longer imported anywhere in `src` (the §9.7-F1 exit completed at step 3
+part 2); if it ever comes back, it may be imported **only** inside `src/core/components`, which is
+what the eslint override and `scripts/generate-wrapper-prop-reference.js`'s scan enforce.
 
 ### Key internal packages
 
-- **`ui-react-pack`** (`src/core/components/`) — Presentational components (Button, Dropdown, Table, Row, View, Input, Select, etc.) built on Semantic UI React.
+- **`ui-react-pack`** (`src/core/components/`) — Presentational components (Button, Dropdown, Table, Row, View, Input, Select, etc.). In-house: the `semantic-ui-react` exit finished at §9.7-F1 step 3 part 2, and the LESS still carries Semantic's class vocabulary (`ui selection dropdown`, `ui table`) because the CSS is re-homed separately at step 4.
 - **`ui-utils-pack`** (`src/core/utils/`) — Pure utility functions (array, object, string, number, codec, storage helpers).
 - **`ui-modules-pack`** (`src/core/modules/`) — Higher-level modules: form integration (react-final-form wrappers), upload handling, variable/field definitions (`FIELD.TYPE`, `FIELD.RENDER`, `FIELD.ACTION`).
 
@@ -73,7 +75,7 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 
 ## Tech Stack
 
-- React 16 (peer dependency), Semantic UI React for base components
+- React 16 (peer dependency); no `semantic-ui-react` in `src` — the components are in-house (§9.7-F1). The `semantic-ui-less` STYLES are still loaded until step 4, so components emit Semantic's class tokens on purpose.
 - react-final-form for form state management
 - moment for dates (peer dependency, externalized); charts are custom SVG (`src/core/components/charts/` — no recharts)
 - LESS for styling, compiled via webpack (entry: `src/style/index.less`). Semantic UI theme overrides at `src/style/override/`. PostCSS prefixwrap scopes all CSS under `.ui-render`. Less is pinned to 3.x (semantic-ui-less inline-JS + `less-plugin-functions` toolchain — see `docs/UPGRADE-PLAN.md` §9.8 before changing).

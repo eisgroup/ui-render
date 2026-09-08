@@ -25,54 +25,46 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
             </span>
             <div class="flex--col input--wrapper fill-width margin-h-smaller">
               <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
-                <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+                <div class="text divider">
                   "ASO"
                 </div>
-                <i aria-hidden="true" class="dropdown icon">
+                <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition">
-                  <div aria-checked="true" aria-selected="true" class="active selected item" role="option" style="pointer-events: all;">
-                    <span class="text">
-                      "ASO"
-                    </span>
+                <div class="menu transition" role="presentation">
+                  <div aria-selected="true" class="item active" role="option">
+                    "ASO"
                   </div>
-                  <div aria-checked="false" aria-selected="false" class="item" role="option" style="pointer-events: all;">
-                    <span class="text">
-                      "ASOALC"
-                    </span>
+                  <div aria-selected="false" class="item" role="option">
+                    "ASOALC"
                   </div>
                 </div>
               </div>
             </div>
             <div class="flex--col input--wrapper fill-width margin-h-smaller">
               <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
-                <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+                <div class="text divider">
                   "ASO"
                 </div>
-                <i aria-hidden="true" class="dropdown icon">
+                <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition">
-                  <div aria-checked="true" aria-selected="true" class="active selected item" role="option" style="pointer-events: all;">
-                    <span class="text">
-                      "ASO"
-                    </span>
+                <div class="menu transition" role="presentation">
+                  <div aria-selected="true" class="item active" role="option">
+                    "ASO"
                   </div>
-                  <div aria-checked="false" aria-selected="false" class="item" role="option" style="pointer-events: all;">
-                    <span class="text">
-                      "ASOALC"
-                    </span>
+                  <div aria-selected="false" class="item" role="option">
+                    "ASOALC"
                   </div>
                 </div>
               </div>
             </div>
             <div class="flex--col input--wrapper fill-width margin-h-smaller">
               <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
-                <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+                <div class="text divider">
                   "IP Address"
                 </div>
-                <i aria-hidden="true" class="dropdown icon">
+                <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition">
+                <div class="menu transition" role="presentation">
                 </div>
               </div>
             </div>
@@ -985,21 +977,17 @@ exports[`demo example full-DOM contract dropdown renders a stable, non-empty DOM
   <div class="flex--col min-height fill">
     <div class="flex--col input--wrapper fill-width" style="min-height: 120px;">
       <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
-        <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+        <div class="text divider">
           "Gold"
         </div>
-        <i aria-hidden="true" class="dropdown icon">
+        <i aria-hidden="true" class="icon dropdown">
         </i>
-        <div class="menu transition">
-          <div aria-checked="true" aria-selected="true" class="active selected item" role="option" style="pointer-events: all;">
-            <span class="text">
-              "Gold"
-            </span>
+        <div class="menu transition" role="presentation">
+          <div aria-selected="true" class="item active" role="option">
+            "Gold"
           </div>
-          <div aria-checked="false" aria-selected="false" class="item" role="option" style="pointer-events: all;">
-            <span class="text">
-              "Silver"
-            </span>
+          <div aria-selected="false" class="item" role="option">
+            "Silver"
           </div>
         </div>
       </div>
@@ -1020,21 +1008,17 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
             </span>
             <div class="flex--col input--wrapper middle">
               <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
-                <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+                <div class="text divider">
                   "Plan 1"
                 </div>
-                <i aria-hidden="true" class="dropdown icon">
+                <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition">
-                  <div aria-checked="true" aria-selected="true" class="active selected item" role="option" style="pointer-events: all;">
-                    <span class="text">
-                      "Plan 1"
-                    </span>
+                <div class="menu transition" role="presentation">
+                  <div aria-selected="true" class="item active" role="option">
+                    "Plan 1"
                   </div>
-                  <div aria-checked="false" aria-selected="false" class="item" role="option" style="pointer-events: all;">
-                    <span class="text">
-                      "Plan 2"
-                    </span>
+                  <div aria-selected="false" class="item" role="option">
+                    "Plan 2"
                   </div>
                 </div>
               </div>
@@ -1046,26 +1030,20 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
             </span>
             <div class="flex--col input--wrapper middle">
               <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
-                <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+                <div class="text divider">
                   "GroupA"
                 </div>
-                <i aria-hidden="true" class="dropdown icon">
+                <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition">
-                  <div aria-checked="true" aria-selected="true" class="active selected item" role="option" style="pointer-events: all;">
-                    <span class="text">
-                      "GroupA"
-                    </span>
+                <div class="menu transition" role="presentation">
+                  <div aria-selected="true" class="item active" role="option">
+                    "GroupA"
                   </div>
-                  <div aria-checked="false" aria-selected="false" class="item" role="option" style="pointer-events: all;">
-                    <span class="text">
-                      "GroupB"
-                    </span>
+                  <div aria-selected="false" class="item" role="option">
+                    "GroupB"
                   </div>
-                  <div aria-checked="false" aria-selected="false" class="item" role="option" style="pointer-events: all;">
-                    <span class="text">
-                      "DepLife"
-                    </span>
+                  <div aria-selected="false" class="item" role="option">
+                    "DepLife"
                   </div>
                 </div>
               </div>
@@ -1321,12 +1299,12 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
         </span>
         <div class="flex--col input--wrapper fill-width">
           <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
-            <div aria-atomic="true" aria-live="polite" class="divider default text" role="alert">
+            <div class="text divider default">
               "Select"
             </div>
-            <i aria-hidden="true" class="dropdown icon">
+            <i aria-hidden="true" class="icon dropdown">
             </i>
-            <div class="menu transition">
+            <div class="menu transition" role="presentation">
             </div>
           </div>
         </div>
@@ -1466,21 +1444,17 @@ exports[`demo example full-DOM contract layout renders a stable, non-empty DOM m
       <div class="flex--col">
         <div class="flex--col input--wrapper fill-width">
           <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
-            <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+            <div class="text divider">
               "Layout Alpha"
             </div>
-            <i aria-hidden="true" class="dropdown icon">
+            <i aria-hidden="true" class="icon dropdown">
             </i>
-            <div class="menu transition">
-              <div aria-checked="true" aria-selected="true" class="active selected item" role="option" style="pointer-events: all;">
-                <span class="text">
-                  "Layout Alpha"
-                </span>
+            <div class="menu transition" role="presentation">
+              <div aria-selected="true" class="item active" role="option">
+                "Layout Alpha"
               </div>
-              <div aria-checked="false" aria-selected="false" class="item" role="option" style="pointer-events: all;">
-                <span class="text">
-                  "Layout Beta"
-                </span>
+              <div aria-selected="false" class="item" role="option">
+                "Layout Beta"
               </div>
             </div>
           </div>
@@ -2860,21 +2834,17 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                   </div>
                   <div class="flex--col input--wrapper">
                     <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
-                      <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+                      <div class="text divider">
                         "Gold"
                       </div>
-                      <i aria-hidden="true" class="dropdown icon">
+                      <i aria-hidden="true" class="icon dropdown">
                       </i>
-                      <div class="menu transition">
-                        <div aria-checked="true" aria-selected="true" class="active selected item" role="option" style="pointer-events: all;">
-                          <span class="text">
-                            "Gold"
-                          </span>
+                      <div class="menu transition" role="presentation">
+                        <div aria-selected="true" class="item active" role="option">
+                          "Gold"
                         </div>
-                        <div aria-checked="false" aria-selected="false" class="item" role="option" style="pointer-events: all;">
-                          <span class="text">
-                            "Silver"
-                          </span>
+                        <div aria-selected="false" class="item" role="option">
+                          "Silver"
                         </div>
                       </div>
                     </div>
@@ -3276,21 +3246,17 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                   </div>
                   <div class="flex--col input--wrapper">
                     <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
-                      <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+                      <div class="text divider">
                         "Group 1"
                       </div>
-                      <i aria-hidden="true" class="dropdown icon">
+                      <i aria-hidden="true" class="icon dropdown">
                       </i>
-                      <div class="menu transition">
-                        <div aria-checked="true" aria-selected="true" class="active selected item" role="option" style="pointer-events: all;">
-                          <span class="text">
-                            "Group 1"
-                          </span>
+                      <div class="menu transition" role="presentation">
+                        <div aria-selected="true" class="item active" role="option">
+                          "Group 1"
                         </div>
-                        <div aria-checked="false" aria-selected="false" class="item" role="option" style="pointer-events: all;">
-                          <span class="text">
-                            "Group 2"
-                          </span>
+                        <div aria-selected="false" class="item" role="option">
+                          "Group 2"
                         </div>
                       </div>
                     </div>
@@ -3706,12 +3672,12 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
             </span>
             <div class="flex--col input--wrapper middle">
               <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
-                <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+                <div class="text divider">
                   "Category 1"
                 </div>
-                <i aria-hidden="true" class="dropdown icon">
+                <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition">
+                <div class="menu transition" role="presentation">
                 </div>
               </div>
             </div>
@@ -3722,12 +3688,12 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
             </span>
             <div class="flex--col input--wrapper middle">
               <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
-                <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+                <div class="text divider">
                   "Alpha"
                 </div>
-                <i aria-hidden="true" class="dropdown icon">
+                <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition">
+                <div class="menu transition" role="presentation">
                 </div>
               </div>
             </div>
@@ -3858,12 +3824,12 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
             <div class="flex--col">
               <div class="flex--col input--wrapper middle">
                 <div aria-expanded="false" class="ui compact selection dropdown" id="Settings.Record.GroupSelection" role="listbox" tabindex="0">
-                  <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+                  <div class="text divider">
                     "Group B"
                   </div>
-                  <i aria-hidden="true" class="dropdown icon">
+                  <i aria-hidden="true" class="icon dropdown">
                   </i>
-                  <div class="menu transition">
+                  <div class="menu transition" role="presentation">
                   </div>
                 </div>
               </div>
@@ -3876,12 +3842,12 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
             <div class="flex--col">
               <div class="flex--col input--wrapper middle">
                 <div aria-expanded="false" class="ui compact selection dropdown" id="Settings.Record.GroupList.1.ItemSelection" role="listbox" tabindex="0">
-                  <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+                  <div class="text divider">
                     "Gamma"
                   </div>
-                  <i aria-hidden="true" class="dropdown icon">
+                  <i aria-hidden="true" class="icon dropdown">
                   </i>
-                  <div class="menu transition">
+                  <div class="menu transition" role="presentation">
                   </div>
                 </div>
               </div>
@@ -4029,12 +3995,12 @@ exports[`demo example full-DOM contract selectIndexValue renders a stable, non-e
         "Select option (index value)"
       </span>
       <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
-        <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+        <div class="text divider">
           "Amount"
         </div>
-        <i aria-hidden="true" class="dropdown icon">
+        <i aria-hidden="true" class="icon dropdown">
         </i>
-        <div class="menu transition">
+        <div class="menu transition" role="presentation">
         </div>
       </div>
     </div>
@@ -4053,12 +4019,12 @@ exports[`demo example full-DOM contract selectReorder renders a stable, non-empt
           </span>
           <div class="flex--col input--wrapper middle">
             <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
-              <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+              <div class="text divider">
                 "South"
               </div>
-              <i aria-hidden="true" class="dropdown icon">
+              <i aria-hidden="true" class="icon dropdown">
               </i>
-              <div class="menu transition">
+              <div class="menu transition" role="presentation">
               </div>
             </div>
           </div>
@@ -4201,12 +4167,12 @@ exports[`demo example full-DOM contract selectStableValue renders a stable, non-
         "Select option (stable id value)"
       </span>
       <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
-        <div aria-atomic="true" aria-live="polite" class="divider text" role="alert">
+        <div class="text divider">
           "Amount"
         </div>
-        <i aria-hidden="true" class="dropdown icon">
+        <i aria-hidden="true" class="icon dropdown">
         </i>
-        <div class="menu transition">
+        <div class="menu transition" role="presentation">
         </div>
       </div>
     </div>

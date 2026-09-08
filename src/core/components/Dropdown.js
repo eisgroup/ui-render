@@ -1,7 +1,7 @@
 import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React, { useEffect, useRef, useState } from 'react'
-import { Dropdown as DropDown } from 'semantic-ui-react' // adds 27 KB to final js bundle
+import DropDown from './Listbox'
 import { isEqual, l, localiseTranslation } from '../utils'
 import { _ } from '../utils/translations'
 import Icon from './Icon'
@@ -21,6 +21,60 @@ localiseTranslation({
     [l.ENGLISH]: 'No options left',
   }
 })
+
+/**
+ * NAMES `semantic-ui-react`'s Dropdown CONSUMED AND THIS ONE DOES NOT.
+ *
+ * Removing a feature is not the whole job: SUIR's Dropdown declared every one of these as a
+ * handled prop, so passing one used to be quietly harmless. `Listbox` has an open rest spread onto
+ * its `<div role="listbox">`, so without this strip they would become ATTRIBUTES — measured, not
+ * feared: `required` rendered as `required=""` on a div, and `clearable` produced React's
+ * "Received `true` for a non-boolean attribute" warning. Failing loudly with an actionable message
+ * is better than either.
+ *
+ * `required` is deliberately NOT here: the wrapper reads it for its own `required` class
+ * (see the `input--wrapper` composition), so it is consumed rather than dropped.
+ *
+ * Same mechanism as `TooltipPop`'s list, and for the same reason — see docs/SUPPORTED-PROPS.md.
+ */
+const DROPPED_PROPS = [
+    // §9.7-F1 step 3 part 2 removed these three features, on the evidence that nothing declares
+    // them, and these are all the names that belonged to them.
+    'search', 'searchInput', 'searchQuery', 'onSearch', 'onSearchChange', 'deburr',
+    'multiple',
+    'allowAdditions', 'additionLabel', 'additionPosition', 'onAddItem',
+    // Could not outlive `search`: the wrapper turned it into `searchInput={{autoFocus: true}}`.
+    'autofocus',
+    // Both were only ever shown while filtering.
+    'noResultsMessage',
+    // Never wrapper API, but reachable through the old rest spread and curated as tier 2 on
+    // docs/SUPPORTED-PROPS.md: SUIR's clear-selection icon. Nothing in either corpus sets it.
+    'clearable',
+]
+
+const warnedDropped = new Set()
+
+/** `props` without the dropped names, warning once per name in development. */
+function dropUnsupported (props) {
+    const kept = {}
+    Object.keys(props).forEach(key => {
+        if (DROPPED_PROPS.indexOf(key) === -1) {
+            kept[key] = props[key]
+            return
+        }
+        if (process.env.NODE_ENV !== 'production' && !warnedDropped.has(key)) {
+            warnedDropped.add(key)
+            console.warn(
+                `[ui-render] <Dropdown> ignores the \`${key}\` prop.`
+                + ' semantic-ui-react handled it; the in-house listbox does not, because nothing in'
+                + ' the product or in any audited meta used it and the machinery behind it'
+                + ' (filtering, diacritics-insensitive matching, a search input, multi-value'
+                + ' handling, free-text additions) is gone. See docs/SUPPORTED-PROPS.md.'
+            )
+        }
+    })
+    return kept
+}
 
 /**
  * Drop Down Select - Pure Component.
@@ -73,6 +127,10 @@ export function Dropdown ({
   initialValues, // not used, removing from DOM
   readonly,
   onClickIcon,
+  // Read for the wrapper's own `required` class. Destructured rather than read off the rest bag
+  // because it has to be CONSUMED: SUIR declared `required` as a handled prop, and `Listbox`
+  // would put it on the `<div role="listbox">` as `required=""`.
+  required,
   translate = Active.translate,
   value: valueFromParent,
   ...props
@@ -210,9 +268,14 @@ export function Dropdown ({
   // @Note: below logic only works as DropdownField with controlled value
   if (done == null) done = !error && (!!props.value || props.value === 0)
 
+  // Hoisted rather than nested inside `omitProps(...)`: `scripts/generate-wrapper-prop-reference.js`
+  // reads the strip lists out of the `omitProps` call to document the DOM boundary, and its parser
+  // takes the argument text up to the first `)`.
+  const supported = dropUnsupported(props)
+
   return (
     <View className={classNames('input--wrapper', {
-      float, done, labeled: label, 'fill-width': !props.compact && fill, required: props.required,
+      float, done, labeled: label, 'fill-width': !props.compact && fill, required,
     }, className)} style={style}>
       {label && !float && <Text className="input__label">{translate(label)}</Text>}
       <DropDown
@@ -223,12 +286,14 @@ export function Dropdown ({
         error={!!error}
         lazyLoad={lazyLoad}
         value={dropdownValue}
-        // DOM boundary: Semantic's Dropdown spreads whatever it does not recognise (and it
-        // declares no `name`) onto its <div role="listbox">, so engine props and `name`/`label`
-        // became attributes there. Filtered here, AFTER the props.onClose/onSearchChange/
-        // onAddItem assignments above, and without touching the `props.name` those handlers
-        // report to the host. See ./domProps.js.
-        {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)}
+        // DOM boundary: `Listbox` spreads whatever it does not destructure onto its
+        // <div role="listbox">, exactly as Semantic's Dropdown did (and neither declares a
+        // `name`), so engine props and `name`/`label` would become attributes there. Filtered
+        // here, AFTER the props.onClose assignment above, and without touching the `props.name`
+        // that handler reports to the host. `Listbox` strips again at its own edge because that
+        // is where the element is; this strip is what keeps engine props from reaching it at all.
+        // See ./domProps.js.
+        {...omitProps(supported, ENGINE_PROPS, FIELD_ONLY_PROPS)}
       />
       {label && float && <Text className="input__label">{translate(label)}</Text>}
       {(error || info) &&

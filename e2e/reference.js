@@ -397,8 +397,15 @@ const KEYBOARD = {
 const DROPDOWN = {
     /** [R] The class string step 4's CSS contract is keyed on. */
     LISTBOX_CLASS: 'ui selection dropdown',
-    /** [R] Per rendered dropdown, in the `dropdown` example. */
-    ROLES: { listbox: 1, alert: 1, option: 2 },
+    /**
+     * [R] Per rendered dropdown, in the `dropdown` example. `alert: 1` was here until §9.7-F1 step
+     * 3 part 2 removed it — see `ALERT_ANNOUNCES_SELECTED_VALUE` — and `presentation: 1` arrived in
+     * the same commit: the option list sits in a `.menu` div between the `listbox` and its
+     * `option`s, and a div with no role there would break the owned-element relationship the
+     * pattern requires. This census counts EVERY `[role]`, including the ones that mean "no
+     * semantics", which is why it moved in both directions.
+     */
+    ROLES: { listbox: 1, option: 2, presentation: 1 },
     /**
      * [R] Whether the options are in the DOM while the list is CLOSED — and it depends on the entry
      * point, which an earlier version of this note did not say. It called the fact "the single most
@@ -422,11 +429,17 @@ const DROPDOWN = {
     ARIA_EXPANDED_CLOSED: 'false',
     ARIA_EXPANDED_OPEN: 'true',
     /**
-     * [R->I] `role="alert" aria-live` carrying the selected value — SUIR's way of announcing a
-     * selection. §9.5 records that every `alert` in the corpus role census is one dropdown and that
-     * all of them should go to ZERO at step 3, so this is the number that will prove it.
+     * [I] `role="alert" aria-live` carrying the selected value — SUIR's way of announcing a
+     * selection. §9.5 recorded that every `alert` in the corpus role census was one dropdown and
+     * that all of them should go to ZERO at step 3; this is the number that proved it, and it is
+     * now `false` on the measurement rather than on the plan. The corpus census dropped 12 `alert`
+     * entries in the same commit, and `examples.behavior-contract.test.js` still SCANS for the role
+     * so a re-introduced live region shows up as a new entry.
+     *
+     * Announcing a value as an alert is a defect, not a feature being given up: an alert interrupts,
+     * and the cursor is now conveyed the way the listbox pattern asks — `aria-activedescendant`.
      */
-    ALERT_ANNOUNCES_SELECTED_VALUE: true,
+    ALERT_ANNOUNCES_SELECTED_VALUE: false,
     /**
      * [R->I] The combobox wiring a WAI-ARIA listbox owes and this one does not have. Pinned as a
      * defect inventory: step 3's replacement should shrink this list, and a shrink is the diff that
@@ -437,8 +450,13 @@ const DROPDOWN = {
      * exactly what jsdom does have. `Dropdown.gate.test.js` now pins both, so a regression fails
      * on every commit rather than only in the `browser` job. They stay here as well, because only
      * a browser can say whether the accessibility TREE agrees with the attributes.
+     *
+     * SHRANK BY ONE AT STEP 3 PART 2, and the shrink is the diff that was supposed to show it:
+     * `aria-activedescendant` is now emitted while the list is open, pointing at the cursor option.
+     * The remaining four are `combobox`-pattern wiring, and adopting that pattern is a separate
+     * decision from replacing the implementation — the control is still a `listbox`, as it was.
      */
-    MISSING_ARIA: ['aria-activedescendant', 'aria-controls', 'aria-haspopup', 'aria-labelledby', 'aria-label'],
+    MISSING_ARIA: ['aria-controls', 'aria-haspopup', 'aria-labelledby', 'aria-label'],
 }
 
 module.exports = { BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, INLINE, WIDGET, TOUCH, KEYBOARD, DROPDOWN }

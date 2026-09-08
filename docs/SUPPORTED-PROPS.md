@@ -9,15 +9,15 @@
 Companion to `docs/SUPPORTED-VIEWS.md`, which lists every `view` name a meta may use. This page
 covers the props of the three views the `semantic-ui-react` exit replaces one at a time
 (UPGRADE-PLAN §9.7-F1). It is both the **supported-prop list** for meta authors and the
-**parity checklist** the replacements are judged against.
+**parity checklist** the replacements were judged against.
 
-**2 of the 3 done so far.**
-`Table`, `TooltipPop` are in-house and
-import nothing; `Dropdown`
-still wraps semantic-ui-react. The two kinds of section answer different
-questions, so they are shaped differently: a wrapper section ends in the **forwarded** table
-that its replacement owes, while an in-house section says what the component **emits** and
-what it no longer **accepts**.
+**All 3 done.** `Table`, `TooltipPop`, `Dropdown` are in-house, and no file in `src`
+reaches `semantic-ui-react` by any mechanism — see *Isolation invariant* below. Every
+section is therefore the in-house shape: what the component **emits**, and what it no
+longer **accepts**. The **forwarded** tables are gone with the dependency, because
+"forwarded" meant "handed to semantic-ui-react"; the props still travel, but now into
+code in this repository, so they are described as what they are rather than ranked by
+how urgently a replacement owed them.
 
 **This page is generated.** Editing it by hand is pointless — the contract test regenerates
 it and fails on any difference. Run `npm run docs:props` after changing one of these
@@ -50,16 +50,17 @@ The forwarded set is tiered, because "supported" and "used" are different facts:
 
 ## Isolation invariant
 
-Everything semantic-ui-react does in this library happens inside `src/core/components`. Derived by
-scanning `src` for every import, `require` and `jest.mock` of the package — so this table
-shrinks as the exit proceeds, and the components below that no longer appear in it are the
-ones that no longer depend on the package at all:
+**The table below is empty, and that is the point.** This scan reads `src` for every
+`import`, `import()`, `require` and `jest.mock` of `semantic-ui-react`; it started at 7
+files and reached zero at §9.7-F1 step 3 part 2, when `Dropdown.js` moved onto the
+in-house `Listbox`. No file in `src` references the package by any mechanism, so the
+isolation invariant ("only inside the components pack") now holds in the stronger form
+"nowhere at all". Every remaining mention in the tree is prose — comments recording what
+the package used to do, and the docs you are reading.
 
-| File | How | Specifier |
-| --- | --- | --- |
-| `src/core/components/__tests__/Dropdown.behavior.test.js` *(test)* | `import` | `semantic-ui-react` |
-| `src/core/components/__tests__/Dropdown.behavior.test.js` *(test)* | `jest.mock` | `semantic-ui-react` |
-| `src/core/components/Dropdown.js` | `import` | `semantic-ui-react` |
+The scan is kept rather than deleted because zero is a value worth defending: it is what
+fails if the dependency comes back. What it can no longer do is tell you the scan itself
+still works, so the contract test proves the four patterns against a synthetic source.
 
 An `eslint` `no-restricted-imports` override (in `package.json`, `eslintConfig.overrides`)
 fails `npm run lint:js` on a static `import` of the package from anywhere outside `src/core/components`,
@@ -69,9 +70,9 @@ does not visit `ImportExpression`. Nor does `lint:js` visit `.ts`/`.tsx` today, 
 `--ext .js,.jsx`; the override glob already covers them for when it does.
 
 The scan above closes every one of those gaps — dynamic imports, double-quoted specifiers and
-TypeScript files included — which is why both halves run; 1 of the sites above is invisible to the rule. Neither is sufficient alone.
+TypeScript files included — which is why both halves run. Neither is sufficient alone.
 
-## In-house — the exit, so far
+## In-house — the exit
 
 ### `Table` — in-house, no semantic-ui-react
 
@@ -100,7 +101,7 @@ CSS contract: `src/style/components/table.less` hangs EVERY cell's padding off `
 | `inverted` | Dark table. Emitted as the `inverted` class, which `table.less` and `expand.less` both select on. Reached only from `ErrorTable.js` — a §9.9-H1 orphan, so the prop is kept but its fate is that deletion's to decide, not this step's. |
 | `striped` | Zebra rows, emitted as the `striped` class. Same single call site as `inverted`, and also genuinely styled — which is why neither was dropped with the rest. |
 
-**Consumed by every subcomponent (1).** All six share one implementation, so this list applies to each of them identically.
+**Consumed by every subcomponent (1).** All 6 share one implementation, so this list applies to each of them identically.
 
 | Prop | Meaning |
 | --- | --- |
@@ -110,7 +111,7 @@ CSS contract: `src/style/components/table.less` hangs EVERY cell's padding off `
 
 **Passthrough.** `style`, `colSpan`, `scope`, `id`, `data-*` and every event handler still reach the element untouched — they always did, because Semantic did not handle them either, so they ride the rest spread exactly as before. There is no `forwardRef`: nothing in `src` passes a ref to a table element, so the parameter would have had no caller.
 
-**Dropped (4) — the semver record.** Props semantic-ui-react handled that this implementation deliberately does not. All of them remain REACHABLE from a consumer meta — `mapper.js` spreads a `TableCells` node's whole rest bag onto the cell and `TableView` spreads its own rest onto the table — so the component strips them explicitly and warns once per prop in development. Stripping matters because a string-valued one would otherwise land as a lowercase DOM attribute (`verticalAlign="top"` rendered `verticalalign="top"`), which is the junk the DOM contract's tripwires exist to keep out; warning matters because a meta still carrying one would otherwise never learn it stopped working. React's own unknown-prop warning is not relied on: it is silent for a lowercase name.
+**Dropped (4) — the semver record.** Props semantic-ui-react handled that this implementation deliberately does not. All of them remain REACHABLE from a consumer meta: the component is rendered with open spreads (`...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)`, `...props`, `...rest`), so an attribute nobody anticipated on a meta node still arrives here as a prop. That is why the component strips them explicitly and warns once per prop in development. Stripping matters because the value would otherwise reach a real element as an attribute — a string-valued one lands lowercase (`verticalAlign="top"` rendered `verticalalign="top"`) and a boolean draws React's "Received `true` for a non-boolean attribute" warning, both of them junk the DOM contract's tripwires exist to keep out. Warning matters because a meta still carrying one would otherwise never learn it stopped working, and React's own unknown-prop warning cannot be relied on: it is silent for a lowercase name.
 
 | Prop | Why it is gone |
 | --- | --- |
@@ -133,7 +134,7 @@ Those four were the *published* ones — they had curated entries on this page w
 | `Table.Body` | — | — | `core/components/ErrorTable.js`, `core/pages/main/components/TableView.js` |
 | `Table.Footer` | — | — | *nothing* |
 
-`mapper.js`'s spread onto `Table.Cell` is a meta node's whole rest bag and is still unfiltered at the call site — the filter is now inside the cell, which is why it is safe. The tooltip was the other unfiltered boundary on this surface; step 2 part 3 closed it, so `Dropdown` is the last one left and step 3 owns it.
+`mapper.js`'s spread onto `Table.Cell` is a meta node's whole rest bag and is still unfiltered at the call site — the filter is now inside the cell, which is why it is safe. All three unfiltered boundaries on this surface are now closed inside the component: the table cell at step 1, the tooltip at step 2 part 3, and the dropdown at step 3 part 2, which strips twice — once in the wrapper and once in `Listbox` at the element.
 
 ### `TooltipPop` — in-house, no semantic-ui-react
 
@@ -144,9 +145,6 @@ The hover tooltip, over the same inline `<span>` `components/Tooltip.js` has shi
 **What it emits.** Host: `tooltip-host <classWrap>`, always, open or closed. Bubble, only while open: `tooltip no-wrap <resolved placement words> show [inverted] <className>` — the same class string `Tooltip.js` emits, so the two converge on one CSS contract. The placement words are the REQUESTED position, not a resolved one: nothing measures, so there is no flip to rewrite them. Closed, the component renders the trigger byte-for-byte as it renders without a tooltip, and nothing is added to `document.body`. THE MARKUP IS NOT UNCHANGED, THOUGH, and two earlier drafts of this row implied it was: the trigger is now WRAPPED in `<span class="tooltip-host">`, which is new markup and shows up in this step's own snapshot diff at the one tooltip site the 38 examples render at mount. So: the trigger element itself is untouched when closed; the box around it is new. What the baseline still cannot see is the BUBBLE, which exists only while open, and therefore anything about opening, placement or dismissal.
 
 **What opens and closes it.** Opens on hover after `delay` (500 ms) and on focus, immediately. Closes 70 ms after the pointer leaves, on blur, on a click anywhere in the document, and on Escape. Leaving before the delay elapses cancels the pending open, and a pending open never fires against an unmounted tree. The bubble is NOT hoverable — measured in Chrome, moving the pointer onto it closes the tooltip, exactly as SUIR did without `hoverable`. That is not an oversight and it is not fixable here: the bubble must keep `pointer-events: none` (see cssContract), so the pointer over the bubble is really over whatever is behind it, `mouseleave` fires on the host, and it closes. Hoverable text and a non-interactive bubble are mutually exclusive; the bubble stays non-interactive. THIS IS A KNOWN WCAG NON-CONFORMANCE and is named here rather than left for a reader to derive: SC 1.4.13 "Content on Hover or Focus" requires hovered content to be HOVERABLE, and this bubble is not (Dismissable via Escape and Persistent are met). It is kept because the alternative measured worse — without `pointer-events: none` the bubble swallows the pointer over its own trigger and the control stops responding at all — and because `Slider` depends on it as well: its handle drags on `pointerdown`, so a press inside the value bubble used to move the slider. ARIA: the bubble carries `role="tooltip"` and an `id`, and the trigger points at it with `aria-describedby`; SUIR had none of that. CLICK-TO-OPEN IS GONE — see `dropped.on`. The trigger may be any children, including several or none: `React.Children.only` is gone with the portal, so the `items` form of `view: "Tooltip"` renders instead of throwing the engine's error diagnostic. Pinned on React 16.14/17.0.2/18.3 by `components/__tests__/TooltipPop.behavior.test.js` and `UIRender.overlay-behavior.test.js`, and in real Chrome by `e2e/corpus.tooltip.pw.js`.
-
-| Component | Element | Notes |
-| --- | --- | --- |
 
 CSS contract: The bubble is now mounted INSIDE `.ui-render`, which is what makes our own CSS apply to it at all — the SUIR bubble portaled into `document.body`, outside the prefixwrap scope, so not one of the 13 `.ui.popup` rules could paint it and the live tooltip was unstyled text. It shares `src/style/components/tooltip.less` with `Tooltip.js`, so `tooltip`, `no-wrap`, the four placement words and `show` are all load-bearing, and `.show` must keep beating the `*:hover > &` reveal — which it does on source order at equal specificity, not by outranking it. THE HAZARD THIS STEP CARRIES: `tooltip.less` sets `pointer-events: none` on the bubble, and without it the bubble swallows the pointer over its own trigger — Playwright measured the trigger as unhoverable. That declaration is ALSO what makes the pointer over the bubble land on whatever is behind it, so `mouseleave` fires on the host and the bubble is not hoverable; removing it would invert both, giving a hoverable bubble and a broken trigger. `css.tooltip-contract.test.js` joins the emitted markup to the loaded CSS in both directions.
 
@@ -168,16 +166,11 @@ CSS contract: The bubble is now mounted INSIDE `.ui-render`, which is what makes
 | `onOpen` | Called when the bubble opens, controlled or not. |
 | `onClose` | Called when it closes, controlled or not. |
 
-**Consumed by every subcomponent (0).** All six share one implementation, so this list applies to each of them identically.
-
-| Prop | Meaning |
-| --- | --- |
-
-**Stripped at the DOM boundary.** `src/core/components/TooltipPop.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js` in all 1 components, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
+**Stripped at the DOM boundary.** `src/core/components/TooltipPop.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
 
 **Passthrough.** `style`, `data-*`, `aria-*` and every event handler still reach the bubble untouched through `omitProps(…, ENGINE_PROPS, FIELD_ONLY_PROPS)` — the same DOM boundary every other component uses, which is new here: SUIR's `Popup` applied no such filter, so `§9.7-F1` step 2 also closed the engine-prop leak on this path. There is no `forwardRef`: nothing in `src` passes a ref to a tooltip, and the host `<span>` holds the only ref the component itself needs.
 
-**Dropped (19) — the semver record.** Props semantic-ui-react handled that this implementation deliberately does not. All of them remain REACHABLE from a consumer meta — `mapper.js` spreads a `TableCells` node's whole rest bag onto the cell and `TableView` spreads its own rest onto the table — so the component strips them explicitly and warns once per prop in development. Stripping matters because a string-valued one would otherwise land as a lowercase DOM attribute (`verticalAlign="top"` rendered `verticalalign="top"`), which is the junk the DOM contract's tripwires exist to keep out; warning matters because a meta still carrying one would otherwise never learn it stopped working. React's own unknown-prop warning is not relied on: it is silent for a lowercase name.
+**Dropped (19) — the semver record.** Props semantic-ui-react handled that this implementation deliberately does not. All of them remain REACHABLE from a consumer meta: the component is rendered with open spreads (`...props`), so an attribute nobody anticipated on a meta node still arrives here as a prop. That is why the component strips them explicitly and warns once per prop in development. Stripping matters because the value would otherwise reach a real element as an attribute — a string-valued one lands lowercase (`verticalAlign="top"` rendered `verticalalign="top"`) and a boolean draws React's "Received `true` for a non-boolean attribute" warning, both of them junk the DOM contract's tripwires exist to keep out. Warning matters because a meta still carrying one would otherwise never learn it stopped working, and React's own unknown-prop warning cannot be relied on: it is silent for a lowercase name.
 
 | Prop | Why it is gone |
 | --- | --- |
@@ -209,44 +202,51 @@ THE ARITHMETIC, derived from the installed `semantic-ui-react` rather than estim
 | --- | --- | --- | --- |
 | `TooltipPop` | `inverted`, `title` | `...props` | `core/pages/main/mapper.js`, `demo/pages/TooltipHarness.jsx` |
 
-`mapper.js`'s spread onto `Table.Cell` is a meta node's whole rest bag and is still unfiltered at the call site — the filter is now inside the cell, which is why it is safe. The tooltip was the other unfiltered boundary on this surface; step 2 part 3 closed it, so `Dropdown` is the last one left and step 3 owns it.
+`mapper.js`'s spread onto `Table.Cell` is a meta node's whole rest bag and is still unfiltered at the call site — the filter is now inside the cell, which is why it is safe. All three unfiltered boundaries on this surface are now closed inside the component: the table cell at step 1, the tooltip at step 2 part 3, and the dropdown at step 3 part 2, which strips twice — once in the wrapper and once in `Listbox` at the element.
 
-## Wrappers — what is left
+### `Dropdown` — in-house, no semantic-ui-react
 
-### `Dropdown` — wraps semantic-ui-react `Dropdown`
+`src/core/components/Dropdown.js`, 335 lines. Replaced the wrapper in §9.7-F1 step 3 part 2.
 
-`src/core/components/Dropdown.js`, 270 lines.
+The wrapper already owned the external API: the `onChange(value, name, event)` signature, option sanitisation, case-insensitive dedup on addition, and the cascading reset are all wrapper code, and none of it moved. Only the `<DropDown/>` element at the bottom changed — it is now the in-house `Listbox`, under the same import alias. Two entry points, and they differ: `mapper.js` imports the memoised default export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.js` imports the NAMED export for `view: "Select"` — which is the majority path.
 
-The wrapper already owns the external API: the `onChange(value, name, event)` signature, option sanitisation, case-insensitive dedup on addition, and the cascading reset are all wrapper code and are keepers. Only the `<DropDown/>` element at the bottom is replaced. Two entry points, and they differ: `mapper.js` imports the memoised default export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.js` imports the NAMED export for `view: "Select"` — which is the majority path.
+**What it emits.** THE WRAPPER emits `input--wrapper` plus `{float, done, labeled, fill-width, required, info, readonly}` and the caller's `className`, unchanged by the swap. THE CONTROL, one level down in `Listbox.js`, emits `ui`, then the `{active, visible, error, disabled, compact, upward}` modifiers, then `selection`, then `dropdown`, then the wrapper-derived `{info, readonly}` — the same token SET Semantic built. Order is not the contract (no loaded selector depends on it); PRESENCE is, and `src/style/__tests__/css.dropdown-contract.test.js` pins what each token is worth: `ui` and `dropdown` reach all 13 scoped rules that can match the control, `selection` 12 of them, `active` 4, `visible` 1. The four inner nodes are pinned the same way — `.text.divider[.default]` (6 rules), `<i class="icon dropdown">` (13), `.menu.transition[.visible]` (11), and each option as `.item[.selected][.active]` (6). `selected` is the CURSOR and `active` the committed value, which is Semantic's own split and why both survive.
 
-**Consumed by the wrapper (20).** These never reach semantic-ui-react — we own the behaviour, and the §9.7-F1 swap cannot change it.
+**What opens and closes it.** The WAI-ARIA listbox pattern, which is a deliberate change from what the library did: arrows move a cursor conveyed by `aria-activedescendant`, Enter commits, Escape closes having reported nothing, and the cursor wraps at both ends and skips `disabled` options. Semantic committed as the arrows moved (`selectOnNavigation` defaults true) and on blur (`selectOnBlur`), so a user who arrowed past an option had already changed the form with no keyboard way back; `UIRender.listbox-behavior.test.js` pinned that as it WAS and now pins the replacement, which is the visible record of the change. Home/End jump to the ends, PageUp/PageDown move a page, and typeahead builds a prefix within 700 ms while a REPEATED single character cycles through the options starting with it. Focus does NOT open the list; ArrowDown on a closed control opens it and advances one step. Also gone with Semantic: the `role="alert" aria-live` node it announced the selected value through — the corpus role census dropped 12 `alert` entries to zero in this step.
+
+CSS contract: The loaded `modules/dropdown` LESS is the largest single semantic module in the compiled CSS and is keyed almost entirely on `.ui.selection.dropdown`, so the coupling between steps 3 and 4 is real and this step paid it rather than deferring it: `Listbox` keeps emitting Semantic's token vocabulary verbatim, including the `menu transition visible` node and the per-option `item selected active`, because every one of those is load-bearing until the CSS is re-homed. The token-by-token measurement is in `css.dropdown-contract.test.js`, which is what makes step 4 a bounded change instead of a guess. Two modifiers Semantic emitted are gone with their features (`search`, `multiple`); nothing in the loaded CSS selects on either without also requiring markup the control no longer renders.
+
+**Consumed by the root (21).** Read by `Dropdown` itself; everything else rides the rest spread onto the element.
 
 | Prop | Meaning |
 | --- | --- |
-| `options` <br>*(bound as `opts`)* | Option list: strings, numbers, or `{text, value, key, content, disabled}` objects. Sanitised into a fresh array (translation, `value`-from-`text` defaulting, `optionsLabel` appended) and held in wrapper state so additions can extend it. The array SUIR receives is never the array the caller passed. |
-| `onChange` | Called as `onChange(value, name, event)` — the wrapper's own signature, not Semantic's `(event, data)`. Also where case-insensitive duplicate collapsing happens. |
-| `onSelect` | Called on close with the last committed value, same `(value, name, event)` shape. Implemented by handing SUIR an `onClose`. |
+| `options` <br>*(bound as `opts`)* | Option list: strings, numbers, or `{text, value, key, content, disabled}` objects. Sanitised into a fresh array (translation, `value`-from-`text` defaulting, `optionsLabel` appended) and held in wrapper state. The array the control receives is never the array the caller passed, and a `null` options prop is tolerated as an empty list — it used to reach Semantic and crash. |
+| `onChange` | Called as `onChange(value, name, event)` — the wrapper's own signature, not Semantic's `(event, data)`. The case-insensitive duplicate collapsing that used to live here went with `allowAdditions`: it could only ever fire for a TYPED value. |
+| `onSelect` | Called on close with the last committed value, same `(value, name, event)` shape. Implemented by handing the control an `onClose`. |
 | `label` | Visible label text, rendered by the wrapper as its own `<Text>` before or after the control depending on `float`. CONSUMED, not stripped: it is destructured out at the top of the wrapper, so it can never be in the rest bag that `omitProps` filters. |
-| `placeholder` <br>*(has a default)* | Placeholder text, translated by the wrapper and then forwarded to SUIR. |
+| `placeholder` <br>*(has a default)* | Placeholder text, translated by the wrapper and then forwarded. |
 | `done` | Adds a `done` class to the wrapper. Defaulted from `props.value` — which is always `undefined`, because `value` was destructured out, so the class is unreachable from a value today. Do not port the defaulting faithfully; fix it or drop it. |
-| `error` | Message shown under the control. The wrapper renders the text itself and forwards only `error={!!error}` to SUIR for the class. |
+| `error` | Message shown under the control, in a `${id}-help` block the control points at with `aria-describedby`. The wrapper renders the text itself and forwards only `error={!!error}` for the class. |
 | `info` | Explanatory message under the control. Also adds an `info` class. |
 | `float` | Renders the label after the control (float-label layout). |
-| `className` | Composed by the wrapper onto its own `input--wrapper` element; only the derived `{info, readonly}` classes go to SUIR. |
+| `className` | Composed by the wrapper onto its own `input--wrapper` element; only the derived `{info, readonly}` classes go to the control. |
 | `classNameIcon` | Class for the icon node the wrapper builds when `onClickIcon` is given. |
-| `style` | Inline style, applied to the wrapper element, not to SUIR. |
+| `style` | Inline style, applied to the wrapper element, not to the control. |
 | `fill` <br>*(has a default)* | Adds `fill-width` unless `compact`. Default true. |
-| `lazyLoad` <br>*(has a default)* | Defer rendering options until opened; default true, and `mapper.js` passes false on the `view: "Dropdown"` path. Forwarded to SUIR unchanged. |
+| `lazyLoad` <br>*(has a default)* | Defer rendering options until opened; default true, and `mapper.js` passes false on the `view: "Dropdown"` path. Forwarded unchanged, and `Listbox` implements it the same way — the role census counts `option` only where it is false. |
 | `optionsLabel` | Extra disabled option appended to the bottom of the list. |
 | `initialValues` | Accepted and discarded — it exists only to keep the form stack's `initialValues` off the DOM. |
-| `readonly` | Translated to SUIR `disabled` plus a `readonly` class, because Semantic's Dropdown has no `readOnly`. |
-| `onClickIcon` | Replaces the icon with a clickable `<Icon>` node, because Semantic has no icon-click callback. |
+| `readonly` | Translated to the control's `disabled` plus a `readonly` class, because neither Semantic's Dropdown nor a `role="listbox"` div has a `readOnly`. `disabled` has to be said three ways on a div: `aria-disabled`, `tabIndex={-1}`, and the open guards. |
+| `onClickIcon` | Replaces the icon with a clickable `<Icon>` node. `Listbox` renders a caller's `icon` node in place of its own `<i class="icon dropdown">`. |
+| `required` | Adds the wrapper's `required` class. Newly DESTRUCTURED at step 3 part 2 rather than read off the rest bag: Semantic consumed `required` as a handled prop, so once the control became an open `<div role="listbox">` the same prop rendered as `required=""` on a div. Measured, then fixed. |
 | `translate` <br>*(has a default)* | The i18n function. Engine-owned, applied to option text, `label` and `placeholder`. CONSUMED, not stripped — destructured out at the top of the wrapper. It is also in ENGINE_PROPS, which is what catches it at other boundaries. |
-| `value` <br>*(bound as `valueFromParent`)* | Selected value. Held in wrapper state, synced from the prop, and array values are joined before being forwarded — so what SUIR sees is not always what the caller passed. |
+| `value` <br>*(bound as `valueFromParent`)* | Selected value. Held in wrapper state, synced from the prop, and array values are joined before being forwarded — so what the control sees is not always what the caller passed. |
 
-`options`, `placeholder`, `error`, `className`, `lazyLoad`, `value` are also written back onto the semantic-ui-react element under the same name, so the same prop appears in both tables.
+**Stripped at the DOM boundary.** `src/core/components/Dropdown.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
 
-**Dropped (6).** No longer accepted. Six names, one decision. The evidence is that nothing declares them: not the tracked examples, not the consumer-only record, and no answer to the changelog entry that asked. This is a BREAKING change for anyone who did and did not say so, which is why it is on this page rather than only in the swap PR — step 5 records the semver call for the whole exit, and on this evidence this part of it is a major.
+**Passthrough.** `id`, `aria-*`, `style`, `data-*` and every event handler still reach the `<div role="listbox">` untouched, including the `onFocus`/`onBlur` the react-final-form adapter supplies — and they now reach it as real DOM handlers rather than as Semantic props. `ENGINE_PROPS` and `FIELD_ONLY_PROPS` are stripped twice on the way: once by the wrapper, once by `Listbox` at the element itself.
+
+**Dropped (14) — the semver record.** Props semantic-ui-react handled that this implementation deliberately does not. All of them remain REACHABLE from a consumer meta: the component is rendered with open spreads (`...dropdown`), so an attribute nobody anticipated on a meta node still arrives here as a prop. That is why the component strips them explicitly and warns once per prop in development. Stripping matters because the value would otherwise reach a real element as an attribute — a string-valued one lands lowercase (`verticalAlign="top"` rendered `verticalalign="top"`) and a boolean draws React's "Received `true` for a non-boolean attribute" warning, both of them junk the DOM contract's tripwires exist to keep out. Warning matters because a meta still carrying one would otherwise never learn it stopped working, and React's own unknown-prop warning cannot be relied on: it is silent for a lowercase name.
 
 | Prop | Why it is gone |
 | --- | --- |
@@ -255,40 +255,30 @@ The wrapper already owns the external API: the `onChange(value, name, event)` si
 | `allowAdditions` | Free-text entry of new options, with `additionLabel`, `additionPosition` and `onAddItem`. Same decision and evidence. Its removal also made a part-1 fix unnecessary: `onAddItem` used to write the option list back into state including the appended `optionsLabel`, so every addition appended another label — nothing writes options back now. |
 | `onSearch` | The callback for `search`, gone with it. It had zero occurrences in product code and in both corpora. |
 | `onAddItem` | The callback for `allowAdditions`, gone with it. Also zero occurrences. |
+| `searchInput` | Semantic's prop for the search `<input>`, which the wrapper generated as `{autoFocus: true}` for `autofocus`. There is no such input. |
+| `searchQuery` | The controlled filter text. Nothing to filter. |
+| `onSearchChange` | Semantic's own filter-text callback, generated by the wrapper from `onSearch`. |
+| `deburr` | Diacritics-insensitive matching for the filter. Part of what made a hand-rolled search expensive, and pure cost once there is no search. |
+| `additionLabel` | The prefix on the "add this" option. Belonged to `allowAdditions`. |
+| `additionPosition` | Where that option sat in the list. Also `allowAdditions`. |
+| `noResultsMessage` | Shown when the filter matched nothing. Only reachable while filtering. |
+| `clearable` | Semantic's clear-selection icon. Never wrapper API — reachable only through the old rest spread, and curated on this page as tier 2 with no occurrences in either corpus. Listed rather than forgotten because it is exactly the kind of prop that goes from "quietly handled" to "invalid DOM attribute" at a swap like this: it produced React's "Received `true` for a non-boolean attribute" warning until the strip was added. |
 | `autofocus` | Went with `search` because it could not outlive it: the wrapper turned it into `searchInput={{autoFocus: true}}`, which does nothing on a control with no search input. Removing search left it dead rather than merely unused. |
 
-**Stripped at the DOM boundary.** `src/core/components/Dropdown.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js` to the rest bag, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`. `name` is the interesting one: SUIR declares no `name` and renders no hidden native input, so stripping it costs nothing on the DOM — but it is still what `onChange(value, name, event)` reports and what react-final-form registers the field under, and the strip deliberately happens AFTER the handler closures are built.
+Six names by DECISION and eight more that could not outlive them, which is why this list is longer than the changelog's. The decision half is `search`, `multiple`, `allowAdditions`, `onSearch`, `onAddItem`, `autofocus`; the rest are Semantic's own names for the machinery behind them, plus `clearable`. THE MECHANISM MATTERS AS MUCH AS THE LIST: Semantic DECLARED every one of these, so passing one used to be harmless, while `Listbox` spreads what it does not destructure onto its element — a dropped prop would have become a DOM attribute. `Dropdown.js` strips them and warns once per name in development instead, the same mechanism `TooltipPop` uses. Six names, one decision. The evidence is that nothing declares them: not the tracked examples, not the consumer-only record, and no answer to the changelog entry that asked. This is a BREAKING change for anyone who did and did not say so, which is why it is on this page rather than only in the swap PR — step 5 records the semver call for the whole exit, and on this evidence this part of it is a major.
 
-**Forwarded to semantic-ui-react (24) — the parity checklist.** The wrapper writes `aria-describedby`, `className`, `options`, `placeholder`, `error`, `lazyLoad`, `value` as explicit attributes, generates `disabled`, `icon`, `onChange`, `onClose`, `selection` onto the rest bag, and spreads `props` AFTER them — so a caller CAN override what the wrapper wrote.
+**Call sites.** What the codebase puts on the family, derived from the source. This was the step-1 parity surface and it is kept afterwards, because it is what any future change to the family is measured against:
 
-CSS contract: The loaded `modules/dropdown` LESS is the largest single semantic module in the compiled CSS and is keyed almost entirely on `.ui.selection.dropdown`. SUIR builds that className from `ui`, the active/disabled/error/compact/multiple/search/selection/upward modifiers, then `dropdown`, then ours. Steps 3 and 4 are therefore more coupled for this component than the roadmap implies: in-house markup must keep emitting the modifier tokens until the CSS is re-homed.
+| Component | Attributes at the call sites | Spreads | Rendered by |
+| --- | --- | --- | --- |
+| `Dropdown` | `lazyLoad`, `onChange`, `translate` | `...dropdown` | `core/pages/main/mapper.js` |
 
-| Prop | Reaches SUIR via | Tier | Seen in | What has to be reproduced |
-| --- | --- | --- | --- | --- |
-| `aria-describedby` | element | 1 | demo | The id of the wrapper's own `field-help` block, and only when there IS help text to point at, so it never dangles. Added at §9.7-F1 step 3 part 1: the error and info text was rendered and never announced, and the caller's `id` used to be put on the help block verbatim — while also riding the rest bag onto Semantic's listbox, giving two elements one id. The help block now carries `${id}-help`. |
-| `checked` | caller, via `props` | 1 | demo | A react-final-form artefact, also always `undefined`. Nothing to reproduce. |
-| `className` | element | 1 | demo | Only the wrapper-derived `{info, readonly}` classes; the caller's `className` goes to the wrapper element instead. |
-| `compact` | caller, via `props` | 1 | demo | Narrow control. Used by both corpora, and also suppresses the wrapper's `fill-width`. |
-| `disabled` | generated | 1 | consumer | Set by the wrapper from `readonly`, and passed directly by consumer metas (`view: "Select"`). Adds the `disabled` class, which IS styled, and sets `tabIndex=-1`. |
-| `error` | element | 1 | demo | Coerced to boolean; drives the `error` class only. |
-| `id` | caller, via `props` | 1 | demo | Unhandled by SUIR, so it lands on the `<div role="listbox">`. |
-| `lazyLoad` | element | 1 | demo | When true and closed, SUIR renders no options at all. Load-bearing for the initial DOM. |
-| `onBlur` | caller, via `props` | 1 | demo | Also from the form adapter. With SUIR's `selectOnBlur` default this participates in committing a value, so it is not merely a notification. |
-| `onChange` | generated | 1 | demo | The wrapper's adapter, which is where the `(value, name, event)` signature and the duplicate collapsing live. SUIR calls it `(event, data)`. |
-| `onFocus` | caller, via `props` | 1 | demo | Arrives from the react-final-form adapter on the `view: "Select"` path. |
-| `options` | element | 1 | demo | The sanitised array. Always an array of `{text, value, ...}` objects by the time SUIR sees it. |
-| `placeholder` | element | 1 | demo | Translated placeholder. |
-| `selection` | generated | 1 | demo | Defaulted to true by the wrapper unless the caller says otherwise. This is what makes the className `ui selection dropdown`, which is what almost all the loaded dropdown CSS selects on. |
-| `type` | caller, via `props` | 1 | demo | A react-final-form artefact that arrives as `undefined`, so no attribute is emitted. Nothing to reproduce; listed so a replacement is not surprised to receive it. |
-| `upward` | caller, via `props` | 1 | consumer | Opens the menu upward. Consumer metas only — a demo-derived checklist misses it. It is an autoControlled prop in SUIR: left unset, SUIR measures viewport space and flips by itself, so a replacement owes both the prop AND the auto-flip. |
-| `value` | element | 1 | demo | Wrapper state, with array values joined to a string. `selectOnNavigation` and `selectOnBlur` both default true in SUIR, which is the commit-as-you-move behaviour the contract suite pins. |
-| `allowAdditions` | caller, via `props` | 2 | — | User-created options. No occurrences; gates a third of the wrapper's own logic. |
-| `clearable` | caller, via `props` | 2 | — | Clear icon. No occurrences. |
-| `icon` | generated | 2 | — | Replaced with a node only when `onClickIcon` is given. No occurrences. |
-| `multiple` | caller, via `props` | 2 | — | Multi-select, rendered by SUIR as `ui label` chips. No occurrences on any Select/Dropdown node in either corpus. The wrapper has real `multiple` logic — dedup, array handling, `last()` semantics in `onChange` — which becomes unreachable code if the prop is dropped, so this decision is also a wrapper-cleanup decision. |
-| `onClose` | generated | 2 | — | Set only from `onSelect`. No occurrences in either corpus. |
-| `required` | caller, via `props` | 2 | — | Read by the wrapper for its own `required` class and also forwarded. No occurrences on these views. |
-| `search` | caller, via `props` | 2 | — | Type-to-filter combobox. §9.7-F1.1 called this "the real work" — but ZERO nodes in the 38 tracked examples and ZERO in the consumer metas set it. Same for `multiple`, `allowAdditions` and `clearable`. This is the single biggest scope datum in the step-0 audit. |
+`mapper.js`'s spread onto `Table.Cell` is a meta node's whole rest bag and is still unfiltered at the call site — the filter is now inside the cell, which is why it is safe. All three unfiltered boundaries on this surface are now closed inside the component: the table cell at step 1, the tooltip at step 2 part 3, and the dropdown at step 3 part 2, which strips twice — once in the wrapper and once in `Listbox` at the element.
+
+## Wrappers — what is left
+
+None. The heading is kept so that a component reacquiring a `semantic-ui-react`
+dependency would appear here rather than blending into the sections above.
 
 ## What the meta corpus actually uses
 

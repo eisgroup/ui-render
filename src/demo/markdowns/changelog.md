@@ -112,6 +112,39 @@
   does. In the demo example set this removes 57 dangling references; no other rendered output
   changes.
 
+#### Select and Dropdown
+
+- **The select is ours now, and its keyboard behaviour changed on purpose.** `Select` and
+  `Dropdown` no longer use `semantic-ui-react` — no file in the library does. What you see and the
+  props you write are the same; the keyboard is not, and the change is a fix rather than a
+  side effect:
+
+  **Arrow keys no longer change your data.** They used to. Moving down a list committed each option
+  as you passed it, fired your `onChange`, and cascaded any dependent select — so arrowing past an
+  option changed the form, and `Escape` only closed the list without putting the old value back.
+  There was no keyboard way back to where you started. Now the arrows move a highlight, **Enter**
+  chooses, and **Escape** closes having changed nothing.
+
+  If your meta relies on the old behaviour — an `onChange` firing while a user scrolls a list, or a
+  dependent select refreshing before anything is chosen — that is the one thing here that needs
+  looking at.
+
+  **New keys, none of which worked before:** `Home` and `End` jump to the first and last option,
+  `PageUp`/`PageDown` move a page, and typing letters jumps to the first option starting with them
+  (within 700 ms; pressing the same letter repeatedly cycles through the options starting with it).
+
+  **Two accessibility fixes.** The select used to announce its current value through a
+  `role="alert"` live region — an alert is for interruptions, and a screen-reader user heard one
+  every time the value changed. It now reports the highlighted option the way a listbox is supposed
+  to (`aria-activedescendant`), and a read-only select finally says it is unavailable
+  (`aria-disabled`) instead of only looking it.
+
+  **One thing to know if you pass unusual props.** Props `semantic-ui-react` recognised and we do
+  not — `search`, `multiple`, `allowAdditions` and their companions, plus `clearable` — used to be
+  quietly absorbed by the library. They now warn once in development and are stripped, so they
+  cannot land on the element as invalid HTML attributes. Everything the select documents keeps
+  working, `compact` and `upward` included.
+
 #### Documentation
 
 - **New page: the supported props of `Table`, `Tooltip` and `Select` / `Dropdown`** —
@@ -141,8 +174,13 @@
   What is NOT affected, because it shares code with none of this: options as strings, numbers or
   objects; a colour option whose value is an array like `[r, g, b]`; `optionsLabel`; the cascading
   reset when a parent select changes the option list; `compact`, `upward`, `disabled`, `readonly`
-  and `placeholder`. `clearable` was never read by the wrapper at all, so it is unaffected by this
-  change and remains as it was.
+  and `placeholder`.
+
+  **Correction to the sentence that stood here:** it said `clearable` "was never read by the wrapper
+  at all, so it is unaffected by this change and remains as it was". The first half is true and the
+  conclusion was wrong. It was never read here because `semantic-ui-react` implemented it, and the
+  select no longer uses `semantic-ui-react` — so `clearable` is gone too. Passing it now warns in
+  development and does nothing, like the six above.
 - **The tooltip is settled, and one thing you could write in a meta is gone.** `position` is kept.
   `on` is **dropped**: a tooltip no longer opens on click or on tap, only on hover and on keyboard
   focus. Every tooltipped node in the examples already has its own click action, so one gesture was
