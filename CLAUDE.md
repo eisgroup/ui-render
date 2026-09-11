@@ -50,9 +50,11 @@ All internal imports use **relative paths** — there are no `ui-*-pack` webpack
 | `ui-modules-pack` — form/upload/fields | `src/core/modules` |
 | `ui-utils-pack` — pure utils | `src/core/utils` |
 
-Dependency direction (keep it one-way): `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine (`pages/main` + `ui-render`) may import anything in core. `semantic-ui-react` is no longer imported anywhere in `src` (the §9.7-F1 exit completed at step 3
-part 2); if it ever comes back, it may be imported **only** inside `src/core/components`, which is
-what the eslint override and `scripts/generate-wrapper-prop-reference.js`'s scan enforce.
+Dependency direction (keep it one-way): `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine (`pages/main` + `ui-render`) may import anything in core. `semantic-ui-react` is not a dependency at all: the §9.7-F1 exit completed at step 3 and step 3½
+removed the package, so **nothing in `src` may import it — including `src/core/components`**, which
+used to be the one place that could. The `no-restricted-imports` override in `package.json` lost its
+`excludedFiles` exemption in that commit, and `scripts/generate-wrapper-prop-reference.js`'s scan
+enforces the same thing for `require`/`jest.mock`/dynamic `import`.
 
 ### Key internal packages
 
