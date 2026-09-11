@@ -217,8 +217,12 @@ const IN_HOUSE_CURATION = {
             + 'development instead, the same mechanism `TooltipPop` uses. Six names, one decision. The evidence is that nothing declares them: not the '
             + 'tracked examples, not the consumer-only record, and no answer to the changelog entry '
             + 'that asked. This is a BREAKING change for anyone who did and did not say so, which '
-            + 'is why it is on this page rather than only in the swap PR — step 5 records the semver '
-            + 'call for the whole exit, and on this evidence this part of it is a major.',
+            + 'is why it is on this page rather than only in the swap PR. THE SEMVER CALL IS MADE: the '
+            + 'owners chose to ship the exit as a MINOR (2026-09-11). The analysis here argued for a '
+            + 'major — dropping a published propType is breaking even when nothing observed uses it — '
+            + 'and it is left standing rather than rewritten, because the evidence and the decision '
+            + 'are different things and a reader is entitled to both. What does not change either '
+            + 'way is this table: it is where a consumer finds out a prop stopped working.',
         partProps: {},
         elements: {},
         classContract: 'THE WRAPPER emits `input--wrapper` plus `{float, done, labeled, fill-width, '

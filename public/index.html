@@ -11,6 +11,23 @@
 
   <!-- Styles are compiled from src/style/ via webpack LESS pipeline -->
 
+  <!--
+    DEMO-PAGE RESET, and it lives here on purpose rather than in `src/style/`.
+
+    The §9.9-H8 decision (2026-09-11) is that the published stylesheet must not touch a host page at
+    all, only its own `.ui-render` wrapper — so `postcss.config.js` stopped exempting `html`, `body`
+    and `*` from prefixwrap. Everything those rules used to impose on a host now lands on the
+    wrapper instead, which is what they were always for.
+
+    Two of them were also doing something for THIS page, and only this page: `body { margin: 0 }`
+    and the full-height chain. A demo is a host like any other, so it declares them itself. Adding
+    them back to `src/style/` would re-open the leak for every consumer.
+  -->
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; }
+  </style>
+
   <title>UI-Render Demo</title>
 </head>
   <body>

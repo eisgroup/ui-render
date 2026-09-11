@@ -218,7 +218,14 @@ test.describe('corpus: the `all` example, at the deep use site', () => {
         // `overflow: hidden` wrapper, `ui__render`) and the rest belong to the demo shell.
         expect(ancestors.length).toBeGreaterThanOrEqual(WIDGET.MIN_CORPUS_CLIP_ANCESTORS)
         expect(ancestors.some((a) => a.overflow.includes('hidden')), 'at least one ancestor clips').toBe(true)
-        expect(ancestors.map((a) => a.tag)).toContain('body')
+        // `body` USED TO BE IN THIS LIST, and the assertion here was `toContain('body')`. It was
+        // there for a reason we have since decided against: our own stylesheet set
+        // `overflow-x: hidden` on it, one of the 11 rules that escaped `.ui-render` before the
+        // §9.9-H8 decision (2026-09-11). So the host document's body was part of OUR clip chain
+        // because we put it there. It is not any more, and asserting its absence is the browser-side
+        // proof that the leak is closed — jsdom can read the stylesheet, but only a browser can say
+        // which elements actually clip.
+        expect(ancestors.map((a) => a.tag)).not.toContain('body')
     })
 
     /**

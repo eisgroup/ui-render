@@ -128,10 +128,19 @@ const HOST_CLASS = 'tooltip-host';
  *              rather than becoming a dropped SUIR modifier.
  *
  * Derived from the compiled CSS, not from any documentation. Rules with no
- * declarations are excluded (there are none on this node), as are the two unscoped
- * `*` rules asserted separately below.
+ * declarations are excluded (there are none on this node).
+ *
+ * 14 → 16 AT THE §9.9-H8 DECISION (2026-09-11), and the two that joined are the two `*` rules that
+ * used to escape prefixwrap. Read the change precisely, because it is easy to misread as new
+ * styling: they ALREADY applied to this node — as unscoped `*` they applied to every element on the
+ * page, host included. Scoping them changed nothing about the bubble's computed style; it changed
+ * where they can reach. They appear here now only because this list is the SCOPED inventory, and
+ * they have become scoped. The same +2 lands on every node in `css.dropdown-contract.test.js`.
  */
 const SCOPED_RULES = [
+    // `*` first and `*` last — `index.less` opens with the tap-highlight reset and closes with
+    // `box-sizing: inherit`, and source order is what this array pins.
+    { selector: '.ui-render *', props: ['-webkit-tap-highlight-color', '-moz-tap-highlight-color'] },
     { selector: '.ui-render .tooltip', props: ['position', 'display', 'opacity', 'z-index', 'pointer-events'] },
     { selector: '.ui-render .tooltip.show', props: ['animation-delay', 'visibility', 'display', 'z-index'] },
     // A CASCADE LOSER, pinned deliberately. Measured in Chrome: `animationDelay` is `0s` with
@@ -153,6 +162,7 @@ const SCOPED_RULES = [
     { selector: '.ui-render .tooltip', props: ['border'] },
     { selector: '.ui-render .tooltip', props: ['border-radius'] },
     { selector: '.ui-render .tooltip', props: ['transition'] },
+    { selector: '.ui-render *', props: ['box-sizing'] },
 ];
 
 /** The two rules `inverted` buys, and nothing else — asserted by subtraction below. */
@@ -351,7 +361,7 @@ describe('the tooltip className contract, against the compiled CSS', () => {
         });
     });
 
-    it('matches exactly the pinned 14 scoped rules', () => {
+    it('matches exactly the pinned 16 scoped rules', () => {
         withOpenTooltip({}, ({ bubble }) => {
             expect(scopedMatching(bubble)).toEqual(SCOPED_RULES);
         });
@@ -381,7 +391,7 @@ describe('the tooltip className contract, against the compiled CSS', () => {
         });
     });
 
-    it('selects the wrapper `span` by exactly one rule, which positions it', () => {
+    it('selects the wrapper `span` by exactly one class-keyed rule, which positions it', () => {
         // The wrapper is not decoration: an absolutely positioned bubble resolves
         // against its nearest POSITIONED ancestor, and without this rule every
         // placement resolves against whatever `.app`-level box happens to be
@@ -399,8 +409,15 @@ describe('the tooltip className contract, against the compiled CSS', () => {
         // height today.
         withOpenTooltip({}, ({ host }) => {
             expect(host.getAttribute('class')).toBe(HOST_CLASS);
+            // The two `.ui-render *` rules bracket it since the §9.9-H8 decision scoped them; they
+            // reach every element in the widget and say nothing about this one. Asserted as part of
+            // the total rather than filtered out, so a THIRD universal rule could not appear
+            // unnoticed — but the test's claim is about the middle entry: exactly one class-keyed
+            // rule selects the host, and it is the one that positions it.
             expect(scopedMatching(host)).toEqual([
+                { selector: '.ui-render *', props: ['-webkit-tap-highlight-color', '-moz-tap-highlight-color'] },
                 { selector: '.ui-render .tooltip-host', props: ['position', 'display', 'width'] },
+                { selector: '.ui-render *', props: ['box-sizing'] },
             ]);
         });
     });
@@ -494,7 +511,7 @@ describe('where the bubble mounts now — the live styling defect, fixed', () =>
         });
     });
 
-    it('therefore matches all 14 of the rules written for exactly this markup', () => {
+    it('therefore matches all 16 of the rules written for exactly this markup', () => {
         withOpenTooltip({}, ({ bubble }) => {
             expect(scopedMatching(bubble)).toHaveLength(SCOPED_RULES.length);
             expect(scopedMatching(bubble)).not.toEqual([]);
@@ -502,17 +519,22 @@ describe('where the bubble mounts now — the live styling defect, fixed', () =>
     });
 
     /**
-     * UNCHANGED, and it belongs here rather than being dropped as uninteresting: the
-     * two unscoped `*` rules that §2.6-7 / R16 records as escaping prefixwrap reach
-     * this node too. They reached the portaled bubble as well — where they were the
-     * ONLY thing that reached it. So the leak is not a tooltip problem and the fix did
-     * not touch it; recording that keeps the two facts from being confused.
+     * INVERTED BY THE §9.9-H8 DECISION, and kept rather than deleted because the inversion is the
+     * record. This test used to assert the opposite — that two unscoped `*` rules reached this node,
+     * the same two §2.6-7 / R16 catalogued as escaping prefixwrap. They were noted here because on
+     * the PORTALED bubble they had been the only thing reaching it at all, which is how the styling
+     * defect was found.
+     *
+     * H8 decided that the published stylesheet must not touch the host page, so `postcss.config.js`
+     * stopped exempting `html`, `body` and `*`. Nothing reaches this node unscoped any more — and
+     * nothing reaches a HOST'S node at all, which is the point. The two rules did not disappear;
+     * they are entries 0 and 15 of `SCOPED_RULES` above.
      */
-    it('is still reached by the two unscoped rules the H8 leak already documents', () => {
+    it('is reached by nothing unscoped, since the stylesheet no longer leaves the wrapper', () => {
         withOpenTooltip({}, ({ bubble }) => {
             const unscoped = matching(bubble).filter(rule => !rule.selector.startsWith('.ui-render'));
 
-            expect(unscoped.map(rule => rule.selector)).toEqual(['*', '*']);
+            expect(unscoped).toEqual([]);
         });
     });
 });
