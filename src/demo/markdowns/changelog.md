@@ -136,6 +136,18 @@
 
 #### Styling
 
+- **The stylesheet is 67 KB smaller, and nothing about how anything looks has changed.** Three
+  Semantic UI CSS modules were being compiled into every build for components this library no
+  longer renders: the popup (our tooltip has been in-house for two releases), the label (it styled
+  multi-select chips, and multi-select is gone), and the menu (it was kept "for the Pagination
+  component", which turned out to be untrue — pagination has always been styled by our own CSS).
+
+  `static/all.css` goes from 374,894 to 307,785 bytes. Checked from both directions before removing
+  anything: nothing in the library emits the class names those modules style, and none of the 566
+  removed rules can match markup we render. The paginated table, the dropdowns and the tooltip were
+  all verified in a browser afterwards.
+
+
 - **The stylesheet no longer touches your page — only its own wrapper.** Loading
   `static/all.css` used to restyle the host document: 11 rules escaped the `.ui-render` scope, and
   the two that mattered most set `display: flex; flex-direction: column; position: relative` and

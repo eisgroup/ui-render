@@ -37,6 +37,21 @@ describe('CSS contract', () => {
         expect(compiledCss.length).toBeGreaterThan(0);
     });
 
+    /**
+     * `pagination` LEFT THE INVENTORY AT §9.7-F1 STEP 4 (2026-09-11), and the note lives here
+     * because `class-inventory.txt` is a bare newline-delimited list with no comment syntax.
+     *
+     * It was the ONLY class lost when `collections/menu`, `elements/label` and `modules/popup` were
+     * dropped — one of 1,000-odd entries, which is itself the measurement that those three modules
+     * were unused. It came from Semantic's `.ui.pagination.menu`, and the import carried the comment
+     * "For Pagination Component" to justify keeping the whole module for it. That was false:
+     * `Pagination.js` emits `app__pagination*`, styled by `src/style/components/pagination.less`.
+     * Verified before removing: no component emits a bare `pagination` class and the 38-example DOM
+     * baseline contains zero occurrences.
+     *
+     * `label` and `menu` survive the deletion, which is worth knowing before anyone "tidies" them
+     * out of the list: `modules/dropdown` still styles a `.label` and a `.menu` inside a dropdown.
+     */
     it('contains all baseline classes from class-inventory.txt', () => {
         const baseline = fs.readFileSync(INVENTORY_FILE, 'utf8')
             .trim().split('\n').filter(Boolean);
@@ -61,9 +76,26 @@ describe('CSS contract', () => {
         expect(compiledCss).toContain('iconsOpenL');
     });
 
-    it('includes Semantic UI components', () => {
-        // Semantic UI dropdown and popup should be present
-        expect(compiledCss).toContain('.ui.dropdown');
-        expect(compiledCss).toContain('.ui.popup');
+    it('includes the one Semantic module still loaded, and none of the dropped ones', () => {
+        // `.ui.popup` was asserted here until §9.7-F1 step 4 dropped `modules/popup` — the tooltip
+        // has been in-house since step 2 part 3, so the module was styling markup nothing renders.
+        // The assertion is INVERTED rather than deleted: these three must stay out, or 25% of the
+        // stylesheet comes back silently the next time someone uncomments a line in `_semantic.less`.
+        //
+        // Asserted against the SELECTORS, not the raw text, and that detail is load-bearing: LESS
+        // keeps `/* … */` comments in its output, so `_semantic.less`'s own note explaining which
+        // selectors were dropped contains those very strings. A raw `toContain` on the compiled text
+        // reports them as still present — measured, after this test failed on exactly that.
+        const withoutComments = compiledCss.replace(/\/\*[\s\S]*?\*\//g, '');
+        expect(withoutComments).toContain('.ui.dropdown');
+        expect(withoutComments).not.toContain('.ui.popup');
+        expect(withoutComments).not.toContain('.ui.ribbon.label');
+        // `.ui.secondary.menu`, NOT `.ui.menu`. The bare form is the wrong probe and this test
+        // failed on it: `modules/dropdown` — which stays — carries three rules of its own that
+        // mention `.ui.menu`, styling a dropdown nested inside a Semantic menu. They are
+        // unreachable here (nothing renders `.ui.menu`) but they exist, so only a selector unique
+        // to `collections/menu` can tell the two modules apart.
+        expect(withoutComments).not.toContain('.ui.secondary.menu');
+        expect(withoutComments).not.toContain('.ui.pagination.menu');
     });
 });
