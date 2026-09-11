@@ -17,15 +17,25 @@
  *
  * WHAT THIS PINS, AND WHY IT DOES NOT FIX ANYTHING
  * -----------------------------------------------
- * `postcss.config.js` deliberately exempts `html`, `body` and `*` from prefixwrap, so the published CSS
- * restyles the *host* page (R16). `scripts/build-css.js` does not carry those exemptions and scopes
- * everything. Whether the global reset is intended is an OPEN owners' decision (§9.9-H8: (a) scope
- * everything under `.ui-render`, or (b) keep the reset deliberately and document it loudly for hosts).
+ * §9.9-H8 IS DECIDED (2026-09-11): **option (a) — the published stylesheet must not touch the host page
+ * at all, only its own wrapper.** So `postcss.config.js` stopped exempting `html`, `body` and `*` from
+ * prefixwrap, and the two pipelines are now identical. This file did exactly what it was written to do:
+ * its own header said "when H8 is decided, these constants are meant to be edited deliberately: option (a)
+ * drives every count below to 0 and makes the two pipelines identical". Every count below is 0.
  *
- * Until that decision lands, this suite pins the CURRENT behaviour exactly — including the divergence
- * between the two pipelines — so the leak is documented and cannot silently grow, shrink or move. When H8
- * is decided, these constants are meant to be edited deliberately: option (a) drives every count below to 0
- * and makes the two pipelines identical.
+ * WHAT THE LEAK WAS, kept because deleting it would erase the evidence for the decision. 11 rules escaped
+ * `.ui-render` and applied to any page that merely loaded `static/all.css` — and the worst of them were not
+ * the reset: `display:flex; flex-direction:column; position:relative` and `flex:1; align-self:stretch`
+ * landed on the host's `<body>`, alongside `margin:0`, our background colour, our base font, and
+ * `box-sizing` on its `<html>`. A host with its own layout could be visibly broken by importing our CSS.
+ *
+ * WHERE THOSE DECLARATIONS WENT, measured rather than assumed, because the option that looks right is the
+ * one that breaks: with the exemptions removed, `body { … }` becomes `.ui-render { … }` — the rules land on
+ * our own root box, which is what they were always for. prefixwrap's `prefixRootTags: true` instead produces
+ * `.ui-render .body { … }`, a CLASS selector matching nothing, silently dropping them. Do not turn it on.
+ *
+ * The suite now pins the ABSENCE, which is the durable property: nothing escapes, and the two pipelines
+ * agree. A future rule written against `html`, `body` or a bare `*` fails here rather than shipping.
  */
 const fs = require('fs');
 const path = require('path');
@@ -45,11 +55,14 @@ const PUBLISHED_CSS = path.join(ROOT, 'static', 'all.css');
 
 const WRAP = '.ui-render';
 
-/** R16 / §9.9-H8: the selectors `postcss.config.js` exempts from prefixwrap, so they reach host pages. */
-const H8_EXEMPT_SELECTORS = ['*', 'body', 'html'];
+/**
+ * §9.9-H8, decided: NOTHING is exempt from prefixwrap any more except the `.ui-render-*` rules, which
+ * must stay global because `rc-picker` portals its dropdown outside the wrapper. Empty is the assertion.
+ */
+const H8_EXEMPT_SELECTORS = [];
 
-/** R16 / §9.9-H8: how many unscoped occurrences of each exempt selector survive the webpack pipeline. */
-const H8_LEAK_OCCURRENCES = { '*': 2, body: 6, html: 5 };
+/** §9.9-H8, decided: zero unscoped occurrences. Was `{ '*': 2, body: 6, html: 5 }` — 13 in all. */
+const H8_LEAK_OCCURRENCES = {};
 
 /**
  * R16 / §9.9-H8: the full inventory of rules the published CSS applies to the host page — the selectors and
@@ -60,37 +73,43 @@ const H8_LEAK_OCCURRENCES = { '*': 2, body: 6, html: 5 };
  * afterwards by `css-minimizer-webpack-plugin`, and cssnano legitimately merges/splits declaration blocks —
  * so the published artifact is checked at selector granularity only, further down.
  */
-const H8_LEAK_INVENTORY = [
-    { at: '', global: ['body', 'html'], props: ['display', 'flex-direction', 'position'] },
-    { at: '', global: ['body'], props: ['align-self', 'flex'] },
-    { at: '', global: ['*'], props: ['-moz-tap-highlight-color', '-webkit-tap-highlight-color'] },
-    { at: '', global: ['html'], props: ['box-sizing', 'font-size', 'height'] },
-    {
-        at: '',
-        global: ['body'],
-        props: [
-            '-moz-osx-font-smoothing', '-webkit-font-smoothing', 'background-color', 'color',
-            'min-height', 'overflow-x', 'position',
-        ],
-    },
-    {
-        at: '@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none)',
-        global: ['body', 'html'],
-        props: ['display'],
-    },
-    { at: '', global: ['body'], props: ['font-family', 'font-size', 'font-style', 'font-weight', 'line-height'] },
-    { at: '', global: ['*'], props: ['box-sizing'] },
-    { at: '', global: ['html'], props: ['box-sizing'] },
-    { at: '', global: ['html'], props: ['-ms-text-size-adjust', '-webkit-text-size-adjust', 'line-height'] },
-    { at: '', global: ['body'], props: ['margin'] },
-];
+const H8_LEAK_INVENTORY = [];
 
 /**
- * R16 / §9.9-H8: rules whose selector list the two pipelines disagree about. Every one of them is an
- * `html`/`body`/`*` rule — asserted below, not assumed — and the count is pinned so unifying the two
- * configs (the other half of H8) fails here and forces this file to be updated on purpose.
+ * THE LEAK AS IT SHIPPED, kept verbatim as the record of what §9.9-H8 decided against. Every entry was a
+ * declaration block a host page received merely by loading `static/all.css`. It is a comment now rather
+ * than an assertion because `H8_LEAK_INVENTORY` above is empty and must stay empty:
+ *
+ *     { at: '', global: ['body', 'html'], props: ['display', 'flex-direction', 'position'] },
+ *     { at: '', global: ['body'], props: ['align-self', 'flex'] },
+ *     { at: '', global: ['*'], props: ['-moz-tap-highlight-color', '-webkit-tap-highlight-color'] },
+ *     { at: '', global: ['html'], props: ['box-sizing', 'font-size', 'height'] },
+ *     {
+ *         at: '',
+ *         global: ['body'],
+ *         props: [
+ *             '-moz-osx-font-smoothing', '-webkit-font-smoothing', 'background-color', 'color',
+ *             'min-height', 'overflow-x', 'position',
+ *         ],
+ *     },
+ *     {
+ *         at: '@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none)',
+ *         global: ['body', 'html'],
+ *         props: ['display'],
+ *     },
+ *     { at: '', global: ['body'], props: ['font-family', 'font-size', 'font-style', 'font-weight', 'line-height'] },
+ *     { at: '', global: ['*'], props: ['box-sizing'] },
+ *     { at: '', global: ['html'], props: ['box-sizing'] },
+ *     { at: '', global: ['html'], props: ['-ms-text-size-adjust', '-webkit-text-size-adjust', 'line-height'] },
+ *     { at: '', global: ['body'], props: ['margin'] },
  */
-const H8_DIVERGENT_RULES = 11;
+
+/**
+ * §9.9-H8, decided: the two pipelines no longer disagree about any rule. Was 11 — every one of them an
+ * `html`/`body`/`*` rule, asserted rather than assumed. Pinned at 0 so a future exemption added to either
+ * config fails here and has to be argued for.
+ */
+const H8_DIVERGENT_RULES = 0;
 
 /**
  * Behavioural probe for the prefixwrap configuration difference. Comparing option objects would not work:
@@ -112,9 +131,14 @@ const PROBE_SELECTORS = [
 
 /** What each probe selector becomes. Identical rows = agreement; differing rows = the H8 divergence. */
 const PROBE_EXPECTATIONS = [
-    { selector: 'html', webpack: 'html', standalone: '.ui-render' },
-    { selector: 'body', webpack: 'body', standalone: '.ui-render' },
-    { selector: '*', webpack: '*', standalone: '.ui-render *' },
+    // The first three rows are where the two configs used to disagree, and they are the whole of
+    // §9.9-H8 in miniature. `webpack` read `'html'`, `'body'`, `'*'` — unscoped, reaching the host.
+    // Note what the scoped column actually does, because it is the reason option (a) is safe:
+    // `html` and `body` become `.ui-render` ITSELF, so declarations meant for the root box land on
+    // our root box rather than being dropped or being left on the host's.
+    { selector: 'html', webpack: '.ui-render', standalone: '.ui-render' },
+    { selector: 'body', webpack: '.ui-render', standalone: '.ui-render' },
+    { selector: '*', webpack: '.ui-render *', standalone: '.ui-render *' },
     { selector: '*:before', webpack: '.ui-render *:before', standalone: '.ui-render *:before' },
     { selector: ':root', webpack: '.ui-render', standalone: '.ui-render' },
     { selector: 'button', webpack: '.ui-render button', standalone: '.ui-render button' },
@@ -295,14 +319,14 @@ describe('CSS pipeline parity — final CSS, post-PostCSS (§9.5)', () => {
         });
     });
 
-    describe('prefixwrap configuration divergence (the other half of §9.9-H8)', () => {
+    describe('prefixwrap configuration — no longer divergent (the other half of §9.9-H8)', () => {
         it('wraps under the same .ui-render prefix in both pipelines', () => {
             expect(standaloneBuild.PREFIX).toBe(WRAP);
             expect(webpackCss).toContain(`${WRAP} .flex--col`);
             expect(standaloneCss).toContain(`${WRAP} .flex--col`);
         });
 
-        it('treats html/body/* differently and everything else identically', async () => {
+        it('treats every selector identically, html/body/* included', async () => {
             const probe = PROBE_SELECTORS.map(selector => `${selector}{color:red}`).join('\n');
             const fromWebpack = ruleSelectorList(await runPostcss(webpackPostcssConfig.plugins, probe));
             const fromStandalone = ruleSelectorList(

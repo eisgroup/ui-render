@@ -134,6 +134,24 @@
   still loaded (that is a separate package, `semantic-ui-less`, and a separate step), which is why
   components still emit class names like `ui selection dropdown`.
 
+#### Styling
+
+- **The stylesheet no longer touches your page — only its own wrapper.** Loading
+  `static/all.css` used to restyle the host document: 11 rules escaped the `.ui-render` scope, and
+  the two that mattered most set `display: flex; flex-direction: column; position: relative` and
+  `flex: 1; align-self: stretch` on **your** `<body>`. It also set `margin: 0` and our background
+  colour and base font there, and `box-sizing: border-box` plus our line-height on your `<html>`.
+  An application with its own layout could be visibly rearranged just by importing our CSS.
+
+  Everything those rules were for now applies to the `.ui-render` element itself, which is where it
+  belonged: the widget still lays itself out as a full-height flex column with our font and
+  background. Measured in Chrome before and after — inside the wrapper nothing changed, and outside
+  it nothing applies any more.
+
+  **If your application was relying on it** — most likely on `body { margin: 0 }` or on the
+  full-height `html, body { height: 100% }` chain — declare those yourself. They are one line each,
+  and they were never ours to set. Our own demo page now does exactly that.
+
 #### Select and Dropdown
 
 - **The select is ours now, and its keyboard behaviour changed on purpose.** `Select` and

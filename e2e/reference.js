@@ -315,7 +315,19 @@ const WIDGET = {
      * FOR converging on the inline component, and it is only measurable in a browser.
      */
     UI_RENDER_CREATES_STACKING_CONTEXT: false,
-    UI_RENDER_STYLE: { position: 'static', zIndex: 'auto', isolation: 'auto' },
+    /**
+     * `position` WENT `static` -> `relative` AT THE §9.9-H8 DECISION (2026-09-11), and the change is
+     * benign for the claim this constant serves. `body { position: relative }` was one of the 11
+     * rules escaping the wrapper; scoping moved it onto `.ui-render` itself, which is where it was
+     * always aimed. It does NOT trap a `position: fixed` descendant — only `transform`, `filter`,
+     * `will-change` and `contain` do, and those are what `APP_STYLE` below checks — so
+     * `FIXED_ESCAPES_APP_CLIP` is unaffected and the probe assertions in the same test still hold.
+     *
+     * It is an improvement rather than a side effect: an absolutely positioned descendant of the
+     * widget now resolves against the widget's own box instead of against the HOST's `<body>`,
+     * which was only a containing block because our stylesheet had made it one.
+     */
+    UI_RENDER_STYLE: { position: 'relative', zIndex: 'auto', isolation: 'auto' },
     /** [R] The portaled bubble's wrapper: positioned, but with no z-index of its own. */
     PORTAL_WRAPPER_Z_INDEX: 'auto',
     /** [I] `.app` is `position: relative; overflow: hidden` with no transform/filter/will-change... */

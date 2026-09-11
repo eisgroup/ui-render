@@ -55,15 +55,28 @@ const ENTRY = path.join(STYLE_DIR, 'index.less');
  *   option     `item` is the option itself; `selected` is the keyboard cursor and `active` the
  *              committed value — one rule and two rules respectively, so a replacement that names
  *              them differently loses little, but loses it silently.
+ *
+ * EVERY `total` ROSE BY EXACTLY 2 AT THE §9.9-H8 DECISION (2026-09-11), and no `worth` moved. Both
+ * halves of that matter. The +2 is the pair of `*` rules — the tap-highlight reset and
+ * `box-sizing: inherit` — which used to escape prefixwrap and are now scoped as `.ui-render *`.
+ * They did not start applying to these nodes: as unscoped `*` they applied to every element on the
+ * page. They started being COUNTED here, because this file counts scoped rules. Nothing about how
+ * a dropdown looks changed.
+ *
+ * The `worth` numbers are unmoved because they are deltas — "rules that stop matching when this
+ * token is dropped" — and `.ui-render *` matches with or without any class token. That is the
+ * check worth keeping in mind if these numbers ever move again: a change that shifts `total` and
+ * `worth` together is a change to the STYLING; a change that shifts only `total` is a change to
+ * what is in scope.
  */
 const TOKEN_CONTRACT = {
-    control: { classes: 'ui selection dropdown active visible', total: 13,
+    control: { classes: 'ui selection dropdown active visible', total: 15,
         worth: { ui: 13, dropdown: 13, selection: 12, active: 4, visible: 1 } },
-    text: { classes: 'text divider', total: 6, worth: { text: 6, divider: 2 } },
-    icon: { classes: 'icon dropdown', total: 13, worth: { icon: 13, dropdown: 13 } },
-    menu: { classes: 'menu transition visible', total: 14,
+    text: { classes: 'text divider', total: 8, worth: { text: 6, divider: 2 } },
+    icon: { classes: 'icon dropdown', total: 15, worth: { icon: 13, dropdown: 13 } },
+    menu: { classes: 'menu transition visible', total: 16,
         worth: { menu: 11, transition: 4, visible: 3 } },
-    option: { classes: 'item selected active', total: 7,
+    option: { classes: 'item selected active', total: 9,
         worth: { item: 6, active: 2, selected: 1 } },
 };
 
