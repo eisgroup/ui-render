@@ -565,16 +565,12 @@ input, select, textarea {
   }
 
   .ui.selection.dropdown.readonly {
-    .label {
-      &:extend(.input-tag all);
-
-      box-shadow: none;
-
-      .icon.delete {
-        display: none;
-      }
-    }
-
+    // The `.label` block that stood here was the MULTI-SELECT CHIP, and `.icon.delete` its remove
+    // button: a readonly multi-select showed its values as chips with the X suppressed. Both went
+    // with `multiple`, removed from the API at §9.7-F1 step 3 part 2 — `Listbox` renders a
+    // `.text.divider`, an `<i class="icon dropdown">` and a `.menu` of `.item`s, and no `.label`
+    // anywhere. Removed here at step 4 with `elements/label`, the Semantic module that styled the
+    // chip itself; keeping our override for markup nothing emits would have outlived its subject.
     > .icon.dropdown {
       display: none;
     }

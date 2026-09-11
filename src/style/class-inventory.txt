@@ -579,7 +579,6 @@ padding-v-largest
 padding-v-small
 padding-v-smaller
 padding-v-smallest
-pagination
 passed
 pink
 pointer

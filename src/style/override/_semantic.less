@@ -9,6 +9,35 @@
 
   Import this file into your LESS project to use Semantic UI without build tools
   Uncomment imports to include needed CSS modules
+
+  ---------------------------------------------------------------------------------------------
+  §9.7-F1 STEP 4, FIRST HALF (2026-09-11). Three modules were dropped here, measured rather than
+  guessed: `modules/popup`, `elements/label` and `collections/menu`. Together they were 566 of the
+  1,952 scoped rules and 152,239 of 602,156 compiled bytes -- 25.3% of the stylesheet -- and not
+  one of the removed rules can match markup this library renders.
+
+  The evidence, checked from both ends. From the markup: only `Listbox.js` and `Table.js` emit
+  Semantic `ui` tokens at all, and the 38-example DOM baseline contains `ui popup` 0 times,
+  `ui label` 0 and `ui menu` 0. From the CSS: of the removed rules, the only ones naming a token we
+  still emit are rooted at `.ui.menu` (an ancestor we never render -- `Listbox` puts its `.menu`
+  INSIDE `.ui.selection.dropdown`) or at `.ui.table td > .ui.ribbon.label` (a child we never render).
+
+  WHY EACH WENT:
+    popup  -- was Semantic's tooltip. `TooltipPop` has been in-house since step 2 part 3 and its
+              styling is `src/style/components/tooltip.less`.
+    label  -- was the multi-select chip. `multiple` was removed from the API at step 3 part 2, so
+              nothing renders a chip any more. The `modules/dropdown` import below says it
+              "requires ... label"; that is a MARKUP dependency of Semantic's own multi-select, not
+              a compile-time one. Measured: the five surviving rules pairing a dropdown with
+              `.label` are all inside `modules/dropdown` itself and style a `.label` *within* a
+              dropdown, which we do not render.
+    menu   -- carried the comment "For Pagination Component", which was false. `Pagination.js`
+              emits `app__pagination*` and is styled by `src/style/components/pagination.less`.
+
+  What remains is `globals/reset` and `modules/dropdown`, which are step 4's second half: the
+  dropdown's token vocabulary is still load-bearing (`Listbox.js` emits it deliberately, and
+  `src/style/__tests__/css.dropdown-contract.test.js` measures what each token is worth).
+  ---------------------------------------------------------------------------------------------
 */
 @libPath: "../../../node_modules/semantic-ui-less/";
 
@@ -25,7 +54,7 @@
 // & { @import "@{libPath}definitions/elements/icon"; }
 // & { @import "@{libPath}definitions/elements/image"; }
 // & { @import "@{libPath}definitions/elements/input"; }
- & { @import "@{libPath}definitions/elements/label"; }
+// & { @import "@{libPath}definitions/elements/label"; } // dropped at F1 step 4 -- the multi-select chip, and `multiple` is gone
 // & { @import "@{libPath}definitions/elements/list"; }
 // & { @import "@{libPath}definitions/elements/loader"; }
 // & { @import "@{libPath}definitions/elements/placeholder"; }
@@ -38,7 +67,7 @@
 // & { @import "@{libPath}definitions/collections/breadcrumb"; }
 // & { @import "@{libPath}definitions/collections/form"; }
 // & { @import "@{libPath}definitions/collections/grid"; }
-& { @import "@{libPath}definitions/collections/menu"; } // For Pagination Component
+// & { @import "@{libPath}definitions/collections/menu"; } // dropped at F1 step 4 -- the "For Pagination Component" reason was false
 // & { @import "@{libPath}definitions/collections/message"; }
 // & { @import "@{libPath}definitions/collections/table"; }
 
@@ -54,11 +83,11 @@
 // & { @import "@{libPath}definitions/modules/accordion"; }
 // & { @import "@{libPath}definitions/modules/checkbox"; }
 // & { @import "@{libPath}definitions/modules/dimmer"; }
- & { @import "@{libPath}definitions/modules/dropdown"; }  // requires `transition`, `label`, and optionally `image`
+ & { @import "@{libPath}definitions/modules/dropdown"; }  // step 4's second half. The "requires `label`" note was about Semantic's multi-select MARKUP, not compilation -- measured.
 // & { @import "@{libPath}definitions/modules/embed"; }
 // & { @import "@{libPath}definitions/modules/modal"; }
 // & { @import "@{libPath}definitions/modules/nag"; }
- & { @import "@{libPath}definitions/modules/popup"; }
+// & { @import "@{libPath}definitions/modules/popup"; } // dropped at F1 step 4 -- the tooltip has been in-house since step 2
 // & { @import "@{libPath}definitions/modules/progress"; }
 // & { @import "@{libPath}definitions/modules/rating"; }
 // & { @import "@{libPath}definitions/modules/search"; }
