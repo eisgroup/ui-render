@@ -3,7 +3,7 @@
   "version": "0.34.3",
   "description": "UI generation based on JSON schemas",
   "homepage": "https://eisgroup.github.io/ui-render/",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "engines": {
     "node": ">=18"
   },
@@ -15,6 +15,7 @@
     "meta.schema.json",
     "package.json",
     "LICENSE",
+    "THIRD-PARTY-NOTICES.md",
     "README.md"
   ],
   "scripts": {
