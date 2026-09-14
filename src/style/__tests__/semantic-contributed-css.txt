@@ -1,0 +1,1300 @@
+# GENERATED — run `npm run css:fixture` to regenerate. See scripts/generate-semantic-css-fixture.js.
+# 285 rules contributed by the semantic-ui-less imports in override/_semantic.less.
+# Order is the cascade order and is part of the contract.
+
+*, *:before, *:after
+  box-sizing: inherit
+
+html
+  box-sizing: border-box
+
+input[type="text"], input[type="email"], input[type="search"], input[type="password"]
+  -webkit-appearance: none
+  -moz-appearance: none
+
+html
+  line-height: 1.15
+  -ms-text-size-adjust: 100%
+  -webkit-text-size-adjust: 100%
+
+body
+  margin: 0
+
+article, aside, footer, header, nav, section
+  display: block
+
+h1
+  font-size: 2em
+  margin: 0.67em 0
+
+figcaption, figure, main
+  display: block
+
+figure
+  margin: 1em 40px
+
+hr
+  box-sizing: content-box
+  height: 0
+  overflow: visible
+
+pre
+  font-family: monospace, monospace
+  font-size: 1em
+
+a
+  background-color: transparent
+  -webkit-text-decoration-skip: objects
+
+abbr[title]
+  border-bottom: none
+  text-decoration: underline
+  text-decoration: underline dotted
+
+b, strong
+  font-weight: inherit
+
+b, strong
+  font-weight: bolder
+
+code, kbd, samp
+  font-family: monospace, monospace
+  font-size: 1em
+
+dfn
+  font-style: italic
+
+mark
+  background-color: #ff0
+  color: #000
+
+small
+  font-size: 80%
+
+sub, sup
+  font-size: 75%
+  line-height: 0
+  position: relative
+  vertical-align: baseline
+
+sub
+  bottom: -0.25em
+
+sup
+  top: -0.5em
+
+audio, video
+  display: inline-block
+
+audio:not([controls])
+  display: none
+  height: 0
+
+img
+  border-style: none
+
+svg:not(:root)
+  overflow: hidden
+
+button, input, optgroup, select, textarea
+  font-family: sans-serif
+  font-size: 100%
+  line-height: 1.15
+  margin: 0
+
+button, input
+  overflow: visible
+
+button, select
+  text-transform: none
+
+button, html [type="button"], [type="reset"], [type="submit"]
+  -webkit-appearance: button
+
+button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="reset"]::-moz-focus-inner, [type="submit"]::-moz-focus-inner
+  border-style: none
+  padding: 0
+
+button:-moz-focusring, [type="button"]:-moz-focusring, [type="reset"]:-moz-focusring, [type="submit"]:-moz-focusring
+  outline: 1px dotted ButtonText
+
+fieldset
+  padding: 0.35em 0.75em 0.625em
+
+legend
+  box-sizing: border-box
+  color: inherit
+  display: table
+  max-width: 100%
+  padding: 0
+  white-space: normal
+
+progress
+  display: inline-block
+  vertical-align: baseline
+
+textarea
+  overflow: auto
+
+[type="checkbox"], [type="radio"]
+  box-sizing: border-box
+  padding: 0
+
+[type="number"]::-webkit-inner-spin-button, [type="number"]::-webkit-outer-spin-button
+  height: auto
+
+[type="search"]
+  -webkit-appearance: textfield
+  outline-offset: -2px
+
+[type="search"]::-webkit-search-cancel-button, [type="search"]::-webkit-search-decoration
+  -webkit-appearance: none
+
+::-webkit-file-upload-button
+  -webkit-appearance: button
+  font: inherit
+
+details, menu
+  display: block
+
+summary
+  display: list-item
+
+canvas
+  display: inline-block
+
+template
+  display: none
+
+[hidden]
+  display: none
+
+.ui.icon:not(i)
+  font-size: inherit
+
+.ui.dropdown
+  cursor: pointer
+  position: relative
+  display: inline-block
+  outline: none
+  text-align: left
+  transition: box-shadow 0.1s ease, width 0.1s ease
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
+
+.ui.dropdown .menu
+  cursor: auto
+  position: absolute
+  display: none
+  outline: none
+  top: 100%
+  min-width: max-content
+  margin: 0em
+  padding: 0em 0em
+  background: #FFFFFF
+  font-size: 1em
+  text-shadow: none
+  text-align: left
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15)
+  border: 1px solid rgba(34, 36, 38, 0.15)
+  border-radius: 0.25rem
+  transition: opacity 0.1s ease
+  z-index: 11
+  will-change: transform, opacity
+
+.ui.dropdown .menu > *
+  white-space: nowrap
+
+.ui.dropdown > input:not(.search):first-child, .ui.dropdown > select
+  display: none
+
+.ui.dropdown > .dropdown.icon
+  position: relative
+  width: auto
+  font-size: 0.85714286em
+  margin: 0em 0em 0em 1em
+
+.ui.dropdown .menu > .item .dropdown.icon
+  width: auto
+  float: right
+  margin: 0em 0em 0em 1em
+
+.ui.dropdown .menu > .item .dropdown.icon + .text
+  margin-right: 1em
+
+.ui.dropdown > .text
+  display: inline-block
+  transition: none
+
+.ui.dropdown .menu > .item
+  position: relative
+  cursor: pointer
+  display: block
+  border: none
+  height: auto
+  text-align: left
+  border-top: none
+  line-height: 1em
+  color: rgba(0, 0, 0, 0.87)
+  padding: 0.6875rem 1rem
+  font-size: 0.875rem
+  text-transform: none
+  font-weight: normal
+  box-shadow: none
+  -webkit-touch-callout: none
+
+.ui.dropdown .menu > .item:first-child
+  border-top-width: 0px
+
+.ui.dropdown > .text > [class*="right floated"], .ui.dropdown .menu .item > [class*="right floated"]
+  float: right
+  margin-right: 0em
+  margin-left: 1em
+
+.ui.dropdown > .text > [class*="left floated"], .ui.dropdown .menu .item > [class*="left floated"]
+  float: left
+  margin-left: 0em
+  margin-right: 1em
+
+.ui.dropdown .menu .item > .icon.floated, .ui.dropdown .menu .item > .flag.floated, .ui.dropdown .menu .item > .image.floated, .ui.dropdown .menu .item > img.floated
+  margin-top: 0em
+
+.ui.dropdown .menu > .header
+  margin: 1rem 0rem 0.75rem
+  padding: 0em 1rem
+  color: rgba(0, 0, 0, 0.85)
+  font-size: 0.78571429em
+  font-weight: bold
+  text-transform: uppercase
+
+.ui.dropdown .menu > .divider
+  border-top: 1px solid rgba(34, 36, 38, 0.1)
+  height: 0em
+  margin: 0.5em 0em
+
+.ui.dropdown.dropdown .menu > .input
+  width: auto
+  display: flex
+  margin: 1rem 0.6875rem
+  min-width: 10rem
+
+.ui.dropdown .menu > .header + .input
+  margin-top: 0em
+
+.ui.dropdown .menu > .input:not(.transparent) input
+  padding: 0.5em 1em
+
+.ui.dropdown .menu > .input:not(.transparent) .button, .ui.dropdown .menu > .input:not(.transparent) .icon, .ui.dropdown .menu > .input:not(.transparent) .label, .ui.dropdown .menu > .input:not(.transparent) .input-tag, .ui.dropdown .menu > .input:not(.transparent) .app__tag
+  padding-top: 0.5em
+  padding-bottom: 0.5em
+
+.ui.dropdown > .text > .description, .ui.dropdown .menu > .item > .description
+  float: right
+  margin: 0em 0em 0em 1em
+  color: rgba(0, 0, 0, 0.4)
+
+.ui.dropdown .menu > .message
+  padding: 0.6875rem 1rem
+  font-weight: normal
+
+.ui.dropdown .menu > .message:not(.ui)
+  color: rgba(0, 0, 0, 0.4)
+
+.ui.dropdown .menu .menu
+  top: 0%
+  left: 100%
+  right: auto
+  margin: 0em 0em 0em -0.5em
+  border-radius: 0.25rem
+  z-index: 21
+
+.ui.dropdown .menu .menu:after
+  display: none
+
+.ui.dropdown > .text > .icon, .ui.dropdown > .text > .label, .ui.dropdown > .text > .flag, .ui.dropdown > .text > img, .ui.dropdown > .text > .image
+  margin-top: 0em
+
+.ui.dropdown .menu > .item > .icon, .ui.dropdown .menu > .item > .label, .ui.dropdown .menu > .item > .flag, .ui.dropdown .menu > .item > .image, .ui.dropdown .menu > .item > img
+  margin-top: 0em
+
+.ui.dropdown > .text > .icon, .ui.dropdown > .text > .label, .ui.dropdown > .text > .flag, .ui.dropdown > .text > img, .ui.dropdown > .text > .image, .ui.dropdown .menu > .item > .icon, .ui.dropdown .menu > .item > .label, .ui.dropdown .menu > .item > .flag, .ui.dropdown .menu > .item > .image, .ui.dropdown .menu > .item > img
+  margin-left: 0em
+  float: none
+  margin-right: 0.6875rem
+
+.ui.dropdown > .text > img, .ui.dropdown > .text > .image, .ui.dropdown .menu > .item > .image, .ui.dropdown .menu > .item > img
+  display: inline-block
+  vertical-align: top
+  width: auto
+  margin-top: -0.5em
+  margin-bottom: -0.5em
+  max-height: 2em
+
+.ui.dropdown .ui.menu > .item:before, .ui.menu .ui.dropdown .menu > .item:before
+  display: none
+
+.ui.menu .ui.dropdown .menu .active.item
+  border-left: none
+
+.ui.menu .right.menu .dropdown:last-child > .menu, .ui.menu .right.dropdown.item > .menu, .ui.buttons > .ui.dropdown:last-child > .menu
+  left: auto
+  right: 0em
+
+.ui.label.dropdown .menu
+  min-width: 100%
+
+.ui.dropdown.icon.button > .dropdown.icon, .ui.dropdown.icon.input-tag > .dropdown.icon, .ui.dropdown.icon.app__tag > .dropdown.icon
+  margin: 0em
+
+.ui.button.dropdown .menu, .ui.input-tag.dropdown .menu, .ui.app__tag.dropdown .menu
+  min-width: 100%
+
+.ui.selection.dropdown
+  cursor: pointer
+  word-wrap: break-word
+  line-height: 1em
+  white-space: normal
+  outline: 0
+  transform: rotateZ(0deg)
+  min-width: 14em
+  min-height: 2.71428571em
+  background: #FFFFFF
+  display: inline-block
+  padding: 0.78571429em 2.1em 0.78571429em 1em
+  color: rgba(0, 0, 0, 0.87)
+  box-shadow: none
+  border: 1px solid rgba(34, 36, 38, 0.15)
+  border-radius: 0.25rem
+  transition: box-shadow 0.1s ease, width 0.1s ease
+
+.ui.selection.dropdown.visible, .ui.selection.dropdown.active
+  z-index: 10
+
+select.ui.dropdown
+  height: 38px
+  padding: 0.5em
+  border: 1px solid rgba(34, 36, 38, 0.15)
+  visibility: visible
+
+.ui.selection.dropdown > .search.icon, .ui.selection.dropdown > .delete.icon, .ui.selection.dropdown > .dropdown.icon
+  cursor: pointer
+  position: absolute
+  width: auto
+  height: auto
+  line-height: 1.21428571em
+  top: 0.78571429em
+  right: 1em
+  z-index: 3
+  margin: -0.78571429em
+  padding: 0.91666667em
+  opacity: 0.8
+  transition: opacity 0.1s ease
+
+.ui.compact.selection.dropdown
+  min-width: 0px
+
+.ui.selection.dropdown .menu
+  overflow-x: hidden
+  overflow-y: auto
+  backface-visibility: hidden
+  -webkit-overflow-scrolling: touch
+  border-top-width: 0px
+  width: auto
+  outline: none
+  margin: 0px -1px
+  min-width: calc(100% +  2px )
+  width: calc(100% +  2px )
+  border-radius: 0em 0em 0.25rem 0.25rem
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15)
+  transition: opacity 0.1s ease
+
+.ui.selection.dropdown .menu:after, .ui.selection.dropdown .menu:before
+  display: none
+
+.ui.selection.dropdown .menu > .message
+  padding: 0.6875rem 1rem
+
+@media only screen and (max-width: 767px)
+.ui.selection.dropdown .menu
+  max-height: 7.425rem
+
+@media only screen and (min-width: 768px)
+.ui.selection.dropdown .menu
+  max-height: 9.9rem
+
+@media only screen and (min-width: 992px)
+.ui.selection.dropdown .menu
+  max-height: 14.85rem
+
+@media only screen and (min-width: 1920px)
+.ui.selection.dropdown .menu
+  max-height: 19.8rem
+
+.ui.selection.dropdown .menu > .item
+  border-top: 1px solid #FAFAFA
+  padding: 0.6875rem 1rem
+  white-space: normal
+  word-wrap: normal
+
+.ui.selection.dropdown .menu > .hidden.addition.item
+  display: none
+
+.ui.selection.dropdown:hover
+  border-color: rgba(34, 36, 38, 0.35)
+  box-shadow: none
+
+.ui.selection.active.dropdown
+  border-color: #96C8DA
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15)
+
+.ui.selection.active.dropdown .menu
+  border-color: #96C8DA
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15)
+
+.ui.selection.dropdown:focus
+  border-color: #96C8DA
+  box-shadow: none
+
+.ui.selection.dropdown:focus .menu
+  border-color: #96C8DA
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15)
+
+.ui.selection.visible.dropdown > .text:not(.default)
+  font-weight: normal
+  color: rgba(0, 0, 0, 0.8)
+
+.ui.selection.active.dropdown:hover
+  border-color: #96C8DA
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15)
+
+.ui.selection.active.dropdown:hover .menu
+  border-color: #96C8DA
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15)
+
+.ui.active.selection.dropdown > .dropdown.icon, .ui.visible.selection.dropdown > .dropdown.icon
+  opacity: ''
+  z-index: 3
+
+.ui.active.selection.dropdown
+  border-bottom-left-radius: 0em
+  border-bottom-right-radius: 0em
+
+.ui.active.empty.selection.dropdown
+  border-radius: 0.25rem
+  box-shadow: none
+
+.ui.active.empty.selection.dropdown .menu
+  border: none
+  box-shadow: none
+
+.ui.search.dropdown
+  min-width: ''
+
+.ui.search.dropdown > input.search
+  background: none transparent
+  border: none
+  box-shadow: none
+  cursor: text
+  top: 0em
+  left: 1px
+  width: 100%
+  outline: none
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0)
+  padding: inherit
+
+.ui.search.dropdown > input.search
+  position: absolute
+  z-index: 2
+
+.ui.search.dropdown > .text
+  cursor: text
+  position: relative
+  left: 1px
+  z-index: 3
+
+.ui.search.selection.dropdown > input.search
+  line-height: 1.21428571em
+  padding: 0.67857143em 2.1em 0.67857143em 1em
+
+.ui.search.selection.dropdown > span.sizer
+  line-height: 1.21428571em
+  padding: 0.67857143em 2.1em 0.67857143em 1em
+  display: none
+  white-space: pre
+
+.ui.search.dropdown.active > input.search, .ui.search.dropdown.visible > input.search
+  cursor: auto
+
+.ui.search.dropdown.active > .text, .ui.search.dropdown.visible > .text
+  pointer-events: none
+
+.ui.active.search.dropdown input.search:focus + .text .icon, .ui.active.search.dropdown input.search:focus + .text .flag
+  opacity: 0.45
+
+.ui.active.search.dropdown input.search:focus + .text
+  color: rgba(115, 115, 115, 0.87)
+
+.ui.search.dropdown .menu
+  overflow-x: hidden
+  overflow-y: auto
+  backface-visibility: hidden
+  -webkit-overflow-scrolling: touch
+
+@media only screen and (max-width: 767px)
+.ui.search.dropdown .menu
+  max-height: 7.425rem
+
+@media only screen and (min-width: 768px)
+.ui.search.dropdown .menu
+  max-height: 9.9rem
+
+@media only screen and (min-width: 992px)
+.ui.search.dropdown .menu
+  max-height: 14.85rem
+
+@media only screen and (min-width: 1920px)
+.ui.search.dropdown .menu
+  max-height: 19.8rem
+
+.ui.multiple.dropdown
+  padding: 0.22619048em 2.1em 0.22619048em 0.35714286em
+
+.ui.multiple.dropdown .menu
+  cursor: auto
+
+.ui.multiple.search.dropdown, .ui.multiple.search.dropdown > input.search
+  cursor: text
+
+.ui.multiple.dropdown > .label
+  user-select: none
+  display: inline-block
+  vertical-align: top
+  white-space: normal
+  font-size: 1em
+  padding: 0.35714286em 0.78571429em
+  margin: 0.14285714rem 0.28571429rem 0.14285714rem 0em
+  box-shadow: 0px 0px 0px 1px rgba(34, 36, 38, 0.15) inset
+
+.ui.multiple.dropdown .dropdown.icon
+  margin: ''
+  padding: ''
+
+.ui.multiple.dropdown > .text
+  position: static
+  padding: 0
+  max-width: 100%
+  margin: 0.45238095em 0em 0.45238095em 0.64285714em
+  line-height: 1.21428571em
+
+.ui.multiple.dropdown > .label ~ input.search
+  margin-left: 0.14285714em
+
+.ui.multiple.dropdown > .label ~ .text
+  display: none
+
+.ui.multiple.search.dropdown > .text
+  display: inline-block
+  position: absolute
+  top: 0
+  left: 0
+  padding: inherit
+  margin: 0.45238095em 0em 0.45238095em 0.64285714em
+  line-height: 1.21428571em
+
+.ui.multiple.search.dropdown > .label ~ .text
+  display: none
+
+.ui.multiple.search.dropdown > input.search
+  position: static
+  padding: 0
+  max-width: 100%
+  margin: 0.45238095em 0em 0.45238095em 0.64285714em
+  width: 2.2em
+  line-height: 1.21428571em
+
+.ui.inline.dropdown
+  cursor: pointer
+  display: inline-block
+  color: inherit
+
+.ui.inline.dropdown .dropdown.icon
+  margin: 0em 0.21428571em 0em 0.21428571em
+  vertical-align: baseline
+
+.ui.inline.dropdown > .text
+  font-weight: bold
+
+.ui.inline.dropdown .menu
+  cursor: auto
+  margin-top: 0.21428571em
+  border-radius: 0.25rem
+
+.ui.dropdown .menu .active.item
+  background: transparent
+  font-weight: bold
+  color: rgba(0, 0, 0, 0.95)
+  box-shadow: none
+  z-index: 12
+
+.ui.dropdown .menu > .item:hover
+  background: #edf5ff
+  color: rgba(0, 0, 0, 0.95)
+  z-index: 13
+
+.ui.loading.dropdown > i.icon
+  height: 1em
+
+.ui.loading.selection.dropdown > i.icon
+  padding: 1.5em 1.28571429em
+
+.ui.loading.dropdown > i.icon:before
+  position: absolute
+  content: ''
+  top: 50%
+  left: 50%
+  margin: -0.64285714em 0em 0em -0.64285714em
+  width: 1.28571429em
+  height: 1.28571429em
+  border-radius: 500rem
+  border: 0.2em solid rgba(0, 0, 0, 0.1)
+
+.ui.loading.dropdown > i.icon:after
+  position: absolute
+  content: ''
+  top: 50%
+  left: 50%
+  box-shadow: 0px 0px 0px 1px transparent
+  margin: -0.64285714em 0em 0em -0.64285714em
+  width: 1.28571429em
+  height: 1.28571429em
+  animation: dropdown-spin 0.6s linear
+  animation-iteration-count: infinite
+  border-radius: 500rem
+  border-color: #7f7f7f transparent transparent
+  border-style: solid
+  border-width: 0.2em
+
+.ui.loading.dropdown.button > i.icon:before, .ui.loading.dropdown.button > i.icon:after, .ui.loading.dropdown.input-tag > i.icon:before, .ui.loading.dropdown.input-tag > i.icon:after, .ui.loading.dropdown.app__tag > i.icon:before, .ui.loading.dropdown.app__tag > i.icon:after
+  display: none
+
+@keyframes dropdown-spin
+from
+  transform: rotate(0deg)
+
+@keyframes dropdown-spin
+to
+  transform: rotate(360deg)
+
+.ui.dropdown:not(.button) > .default.text, .ui.default.dropdown:not(.button) > .text
+  color: rgba(191, 191, 191, 0.87)
+
+.ui.dropdown:not(.button) > input:focus ~ .default.text, .ui.default.dropdown:not(.button) > input:focus ~ .text
+  color: rgba(115, 115, 115, 0.87)
+
+.ui.loading.dropdown > .text
+  transition: none
+
+.ui.dropdown .loading.menu
+  display: block
+  visibility: hidden
+  z-index: -1
+
+.ui.dropdown > .loading.menu
+  left: 0px
+  right: auto
+
+.ui.dropdown > .menu .loading.menu
+  left: 100%
+  right: auto
+
+.ui.dropdown.selected, .ui.dropdown .menu .selected.item
+  background: #f3f7fc
+  color: rgba(0, 0, 0, 0.95)
+
+.ui.dropdown > .filtered.text
+  visibility: hidden
+
+.ui.dropdown .filtered.item
+  display: none
+
+.ui.dropdown.error, .ui.dropdown.error > .text, .ui.dropdown.error > .default.text
+  color: #9F3A38
+
+.ui.selection.dropdown.error
+  background: #FFF6F6
+  border-color: #E0B4B4
+
+.ui.selection.dropdown.error:hover
+  border-color: #E0B4B4
+
+.ui.dropdown.error > .menu, .ui.dropdown.error > .menu .menu
+  border-color: #E0B4B4
+
+.ui.dropdown.error > .menu > .item
+  color: #9F3A38
+
+.ui.multiple.selection.error.dropdown > .label
+  border-color: #E0B4B4
+
+.ui.dropdown.error > .menu > .item:hover
+  background-color: #FFF2F2
+
+.ui.dropdown.error > .menu .active.item
+  background-color: #FDCFCF
+
+.ui.dropdown > .clear.dropdown.icon
+  opacity: 0.8
+  transition: opacity 0.1s ease
+
+.ui.dropdown > .clear.dropdown.icon:hover
+  opacity: 1
+
+.ui.disabled.dropdown, .ui.dropdown .menu > .disabled.item, .ui.input-disabled.dropdown, .ui.dropdown .menu > .input-disabled.item, .ui.input__unit.disabled:not(.readonly).dropdown, .ui.dropdown .menu > .input__unit.disabled:not(.readonly).item, .ui.ui.selection.dropdown.disabled:not(.readonly).dropdown, .ui.dropdown .menu > .ui.selection.dropdown.disabled:not(.readonly).item, .uiinput.disabled:not(.readonly).dropdown, .ui.dropdown .menu > input.disabled:not(.readonly).item, .uiselect.disabled:not(.readonly).dropdown, .ui.dropdown .menu > select.disabled:not(.readonly).item, .uitextarea.disabled:not(.readonly).dropdown, .ui.dropdown .menu > textarea.disabled:not(.readonly).item, .ui.input__unit:disabled.dropdown, .ui.dropdown .menu > .input__unit:disabled.item, .ui.ui.selection.dropdown:disabled.dropdown, .ui.dropdown .menu > .ui.selection.dropdown:disabled.item, .uiinput:disabled.dropdown, .ui.dropdown .menu > input:disabled.item, .uiselect:disabled.dropdown, .ui.dropdown .menu > select:disabled.item, .uitextarea:disabled.dropdown, .ui.dropdown .menu > textarea:disabled.item, .uiinput.checkbox.toggle:disabled + label.dropdown, .ui.dropdown .menu > input.checkbox.toggle:disabled + label.item
+  cursor: default
+  pointer-events: none
+  opacity: 0.45
+
+.ui.dropdown .menu
+  left: 0px
+
+.ui.dropdown .right.menu > .menu, .ui.dropdown .menu .right.menu
+  left: 100%
+  right: auto
+  border-radius: 0.25rem
+
+.ui.dropdown > .left.menu
+  left: auto
+  right: 0px
+
+.ui.dropdown > .left.menu .menu, .ui.dropdown .menu .left.menu
+  left: auto
+  right: 100%
+  margin: 0em -0.5em 0em 0em
+  border-radius: 0.25rem
+
+.ui.dropdown .item .left.dropdown.icon, .ui.dropdown .left.menu .item .dropdown.icon
+  width: auto
+  float: left
+  margin: 0em 0em 0em 0em
+
+.ui.dropdown .item .left.dropdown.icon, .ui.dropdown .left.menu .item .dropdown.icon
+  width: auto
+  float: left
+  margin: 0em 0em 0em 0em
+
+.ui.dropdown .item .left.dropdown.icon + .text, .ui.dropdown .left.menu .item .dropdown.icon + .text
+  margin-left: 1em
+  margin-right: 0em
+
+.ui.upward.dropdown > .menu
+  top: auto
+  bottom: 100%
+  box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.08)
+  border-radius: 0.25rem 0.25rem 0em 0em
+
+.ui.dropdown .upward.menu
+  top: auto
+  bottom: 0
+
+.ui.simple.upward.active.dropdown, .ui.simple.upward.dropdown:hover
+  border-radius: 0.25rem 0.25rem 0em 0em
+
+.ui.upward.dropdown.button:not(.pointing):not(.floating).active, .ui.upward.dropdown.input-tag:not(.pointing):not(.floating).active, .ui.upward.dropdown.app__tag:not(.pointing):not(.floating).active
+  border-radius: 0.25rem 0.25rem 0em 0em
+
+.ui.upward.selection.dropdown .menu
+  border-top-width: 1px
+  border-bottom-width: 0px
+  box-shadow: 0px -2px 3px 0px rgba(0, 0, 0, 0.08)
+
+.ui.upward.selection.dropdown:hover
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.05)
+
+.ui.active.upward.selection.dropdown
+  border-radius: 0em 0em 0.25rem 0.25rem
+
+.ui.upward.selection.dropdown.visible
+  box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.08)
+  border-radius: 0em 0em 0.25rem 0.25rem
+
+.ui.upward.active.selection.dropdown:hover
+  box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.05)
+
+.ui.upward.active.selection.dropdown:hover .menu
+  box-shadow: 0px -2px 3px 0px rgba(0, 0, 0, 0.08)
+
+.ui.scrolling.dropdown .menu, .ui.dropdown .scrolling.menu
+  overflow-x: hidden
+  overflow-y: auto
+
+.ui.scrolling.dropdown .menu
+  overflow-x: hidden
+  overflow-y: auto
+  backface-visibility: hidden
+  -webkit-overflow-scrolling: touch
+  min-width: 100%
+  width: auto
+
+.ui.dropdown .scrolling.menu
+  position: static
+  overflow-y: auto
+  border: none
+  box-shadow: none
+  border-radius: 0
+  margin: 0
+  min-width: 100%
+  width: auto
+  border-top: 1px solid rgba(34, 36, 38, 0.15)
+
+.ui.scrolling.dropdown .menu .item.item.item, .ui.dropdown .scrolling.menu > .item.item.item
+  border-top: none
+
+.ui.scrolling.dropdown .menu .item:first-child, .ui.dropdown .scrolling.menu .item:first-child
+  border-top: none
+
+.ui.dropdown > .animating.menu .scrolling.menu, .ui.dropdown > .visible.menu .scrolling.menu
+  display: block
+
+@media all and (-ms-high-contrast: none)
+.ui.scrolling.dropdown .menu, .ui.dropdown .scrolling.menu
+  min-width: calc(83%)
+
+@media only screen and (max-width: 767px)
+.ui.scrolling.dropdown .menu, .ui.dropdown .scrolling.menu
+  max-height: 9.5rem
+
+@media only screen and (min-width: 768px)
+.ui.scrolling.dropdown .menu, .ui.dropdown .scrolling.menu
+  max-height: 14.25rem
+
+@media only screen and (min-width: 992px)
+.ui.scrolling.dropdown .menu, .ui.dropdown .scrolling.menu
+  max-height: 19rem
+
+@media only screen and (min-width: 1920px)
+.ui.scrolling.dropdown .menu, .ui.dropdown .scrolling.menu
+  max-height: 19rem
+
+.ui.simple.dropdown .menu:before, .ui.simple.dropdown .menu:after
+  display: none
+
+.ui.simple.dropdown .menu
+  position: absolute
+  display: block
+  overflow: hidden
+  top: -9999px
+  opacity: 0
+  width: 0
+  height: 0
+  transition: opacity 0.1s ease
+
+.ui.simple.active.dropdown, .ui.simple.dropdown:hover
+  border-bottom-left-radius: 0em
+  border-bottom-right-radius: 0em
+
+.ui.simple.active.dropdown > .menu, .ui.simple.dropdown:hover > .menu
+  overflow: visible
+  width: auto
+  height: auto
+  top: 100%
+  opacity: 1
+
+.ui.simple.dropdown > .menu > .item:active > .menu, .ui.simple.dropdown:hover > .menu > .item:hover > .menu
+  overflow: visible
+  width: auto
+  height: auto
+  top: 0%
+  left: 100%
+  opacity: 1
+
+.ui.simple.disabled.dropdown:hover .menu, .ui.simple.input-disabled.dropdown:hover .menu, .ui.simple.input__unit.disabled:not(.readonly).dropdown:hover .menu, .ui.simple.ui.selection.dropdown.disabled:not(.readonly).dropdown:hover .menu, .ui.simpleinput.disabled:not(.readonly).dropdown:hover .menu, .ui.simpleselect.disabled:not(.readonly).dropdown:hover .menu, .ui.simpletextarea.disabled:not(.readonly).dropdown:hover .menu, .ui.simple.input__unit:disabled.dropdown:hover .menu, .ui.simple.ui.selection.dropdown:disabled.dropdown:hover .menu, .ui.simpleinput:disabled.dropdown:hover .menu, .ui.simpleselect:disabled.dropdown:hover .menu, .ui.simpletextarea:disabled.dropdown:hover .menu, .ui.simpleinput.checkbox.toggle:disabled + label.dropdown:hover .menu
+  display: none
+  height: 0px
+  width: 0px
+  overflow: hidden
+
+.ui.simple.visible.dropdown > .menu
+  display: block
+
+.ui.fluid.dropdown
+  display: block
+  width: 100%
+  min-width: 0em
+
+.ui.fluid.dropdown > .dropdown.icon
+  float: right
+
+.ui.floating.dropdown .menu
+  left: 0
+  right: auto
+  box-shadow: 0px 2px 4px 0px rgba(34, 36, 38, 0.12), 0px 2px 10px 0px rgba(34, 36, 38, 0.15)
+  border-radius: 0.25rem
+
+.ui.floating.dropdown > .menu
+  margin-top: 0.5em
+  border-radius: 0.25rem
+
+.ui.pointing.dropdown > .menu
+  top: 100%
+  margin-top: 0.6875rem
+  border-radius: 0.25rem
+
+.ui.pointing.dropdown > .menu:after
+  display: block
+  position: absolute
+  pointer-events: none
+  content: ''
+  visibility: visible
+  transform: rotate(45deg)
+  width: 0.5em
+  height: 0.5em
+  box-shadow: -1px -1px 0px 0px rgba(34, 36, 38, 0.15)
+  background: #FFFFFF
+  z-index: 2
+
+.ui.pointing.dropdown > .menu:after
+  top: -0.25em
+  left: 50%
+  margin: 0em 0em 0em -0.25em
+
+.ui.top.left.pointing.dropdown > .menu
+  top: 100%
+  bottom: auto
+  left: 0%
+  right: auto
+  margin: 1em 0em 0em
+
+.ui.top.left.pointing.dropdown > .menu
+  top: 100%
+  bottom: auto
+  left: 0%
+  right: auto
+  margin: 1em 0em 0em
+
+.ui.top.left.pointing.dropdown > .menu:after
+  top: -0.25em
+  left: 1em
+  right: auto
+  margin: 0em
+  transform: rotate(45deg)
+
+.ui.top.right.pointing.dropdown > .menu
+  top: 100%
+  bottom: auto
+  right: 0%
+  left: auto
+  margin: 1em 0em 0em
+
+.ui.top.pointing.dropdown > .left.menu:after, .ui.top.right.pointing.dropdown > .menu:after
+  top: -0.25em
+  left: auto
+  right: 1em
+  margin: 0em
+  transform: rotate(45deg)
+
+.ui.left.pointing.dropdown > .menu
+  top: 0%
+  left: 100%
+  right: auto
+  margin: 0em 0em 0em 1em
+
+.ui.left.pointing.dropdown > .menu:after
+  top: 1em
+  left: -0.25em
+  margin: 0em 0em 0em 0em
+  transform: rotate(-45deg)
+
+.ui.left:not(.top):not(.bottom).pointing.dropdown > .left.menu
+  left: auto
+  right: 100%
+  margin: 0em 1em 0em 0em
+
+.ui.left:not(.top):not(.bottom).pointing.dropdown > .left.menu:after
+  top: 1em
+  left: auto
+  right: -0.25em
+  margin: 0em 0em 0em 0em
+  transform: rotate(135deg)
+
+.ui.right.pointing.dropdown > .menu
+  top: 0%
+  left: auto
+  right: 100%
+  margin: 0em 1em 0em 0em
+
+.ui.right.pointing.dropdown > .menu:after
+  top: 1em
+  left: auto
+  right: -0.25em
+  margin: 0em 0em 0em 0em
+  transform: rotate(135deg)
+
+.ui.bottom.pointing.dropdown > .menu
+  top: auto
+  bottom: 100%
+  left: 0%
+  right: auto
+  margin: 0em 0em 1em
+
+.ui.bottom.pointing.dropdown > .menu:after
+  top: auto
+  bottom: -0.25em
+  right: auto
+  margin: 0em
+  transform: rotate(-135deg)
+
+.ui.bottom.pointing.dropdown > .menu .menu
+  top: auto
+  bottom: 0px
+
+.ui.bottom.left.pointing.dropdown > .menu
+  left: 0%
+  right: auto
+
+.ui.bottom.left.pointing.dropdown > .menu:after
+  left: 1em
+  right: auto
+
+.ui.bottom.right.pointing.dropdown > .menu
+  right: 0%
+  left: auto
+
+.ui.bottom.right.pointing.dropdown > .menu:after
+  left: auto
+  right: 1em
+
+.ui.pointing.upward.dropdown .menu, .ui.top.pointing.upward.dropdown .menu
+  top: auto
+  bottom: 100%
+  margin: 0em 0em 0.6875rem
+  border-radius: 0.25rem
+
+.ui.pointing.upward.dropdown .menu:after, .ui.top.pointing.upward.dropdown .menu:after
+  top: 100%
+  bottom: auto
+  box-shadow: 1px 1px 0px 0px rgba(34, 36, 38, 0.15)
+  margin: -0.25em 0em 0em
+
+.ui.right.pointing.upward.dropdown:not(.top):not(.bottom) .menu
+  top: auto
+  bottom: 0
+  margin: 0em 1em 0em 0em
+
+.ui.right.pointing.upward.dropdown:not(.top):not(.bottom) .menu:after
+  top: auto
+  bottom: 0
+  margin: 0em 0em 1em 0em
+  box-shadow: -1px -1px 0px 0px rgba(34, 36, 38, 0.15)
+
+.ui.left.pointing.upward.dropdown:not(.top):not(.bottom) .menu
+  top: auto
+  bottom: 0
+  margin: 0em 0em 0em 1em
+
+.ui.left.pointing.upward.dropdown:not(.top):not(.bottom) .menu:after
+  top: auto
+  bottom: 0
+  margin: 0em 0em 1em 0em
+  box-shadow: -1px -1px 0px 0px rgba(34, 36, 38, 0.15)
+
+.ui.dropdown > .dropdown.icon
+  font-family: 'Dropdown'
+  line-height: 1
+  height: 1em
+  width: 1.23em
+  backface-visibility: hidden
+  font-weight: normal
+  font-style: normal
+  text-align: center
+
+.ui.dropdown > .dropdown.icon
+  width: auto
+
+.ui.dropdown > .dropdown.icon:before
+  content: '\f0d7'
+
+.ui.dropdown .menu .item .dropdown.icon:before
+  content: '\f0da'
+
+.ui.dropdown .item .left.dropdown.icon:before, .ui.dropdown .left.menu .item .dropdown.icon:before
+  content: "\f0d9"
+
+.ui.vertical.menu .dropdown.item > .dropdown.icon:before
+  content: "\f0da"
+
+.ui.dropdown > .clear.icon:before
+  content: "\f00d"
+
+.ui.selection.dropdown.active i.icon.dropdown, .ui.selection.dropdown:hover i.icon.dropdown, .ui.selection.dropdown:focus i.icon.dropdown, .ui.selection.dropdown:active i.icon.dropdown
+  color: #2e6eb1
+
+.inverted .ui.selection.dropdown.active i.icon.dropdown, .inverted .ui.selection.dropdown:hover i.icon.dropdown, .inverted .ui.selection.dropdown:focus i.icon.dropdown, .inverted .ui.selection.dropdown:active i.icon.dropdown
+  color: #4e92df
+
+.inverted .ui.selection.dropdown:focus
+  border-color: #4e92df
+
+.ui.selection.dropdown.active
+  outline: none !important
+  box-shadow: 0 0 0 2px rgb(40 99 169 / 20%)
+  border-radius: 0.25rem
+
+.inverted .ui.selection.dropdown.active
+  box-shadow: inset 0 0 0 1px #4e92df
+
+.inverted .ui.selection.dropdown.active
+  border-color: #4e92df
+
+.inverted .ui.selection.dropdown.active .menu
+  border-color: #4e92df
+
+.ui.selection.dropdown.error
+  border-color: #c83025
+
+.inverted .ui.selection.dropdown.error
+  border-color: #feefef
+
+.inverted .ui.selection.dropdown.error .menu .item:hover
+  background: rgba(0, 0, 0, 0.5)
+
+.ui.selection.dropdown.readonly
+  opacity: initial
+
+.ui.selection.dropdown > .dropdown.icon
+  font-family: 'iconsOpenL'
+  speak: none
+  font-style: normal
+  font-weight: normal
+  font-variant: normal
+  text-transform: none
+  line-height: 1
+  content: ''
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+
+.ui.selection.dropdown > .dropdown.icon:before
+  content: "\e91a"
+
+.ui.selection.dropdown .text
+  color: #444444
+
+.ui.selection.dropdown .text.default
+  color: #7f7f7f
+
+.ui.selection.dropdown > .label
+  outline: none
+  box-shadow: 0 0 0 2px rgb(40 99 169 / 20%)
+  border-radius: 0.25rem
+  display: inline-flex
+  align-items: center
+  white-space: nowrap
+  font-weight: normal
+  color: #444444
+  background-color: #ffffff
+
+.inverted .ui.selection.dropdown > .label
+  box-shadow: inset 0 0 0 1px #4e92df
+
+.inverted .ui.selection.dropdown
+  color: #fafafa
+  background: transparent
+
+.inverted .ui.selection.dropdown input[type="text"]
+  color: #7f7f7f
+
+.inverted .ui.selection.dropdown .text
+  color: #fafafa
+
+.inverted .ui.selection.dropdown .text.default
+  color: #7f7f7f
+
+.inverted .ui.selection.dropdown .selected.item
+  background: rgba(0, 0, 0, 0.5)
+
+.inverted .ui.selection.dropdown .menu
+  background: #333333
+
+.inverted .ui.selection.dropdown .menu .message
+  color: #fafafa
+
+.inverted .ui.selection.dropdown .menu > .item
+  border-top-color: rgba(78, 146, 223, 0.5)
+
+.inverted .ui.selection.dropdown .label
+  color: #fafafa
+  background: transparent
+  box-shadow: none
+  border: 1px solid #7f7f7f
+
+.ui.selection.dropdown .disabled.item, .ui.selection.dropdown .input-disabled.item, .ui.selection.dropdown .input__unit.disabled:not(.readonly).item, .ui.selection.dropdown .ui.selection.dropdown.disabled:not(.readonly).item, .ui.selection.dropdown input.disabled:not(.readonly).item, .ui.selection.dropdown select.disabled:not(.readonly).item, .ui.selection.dropdown textarea.disabled:not(.readonly).item, .ui.selection.dropdown .input__unit:disabled.item, .ui.selection.dropdown .ui.selection.dropdown:disabled.item, .ui.selection.dropdown input:disabled.item, .ui.selection.dropdown select:disabled.item, .ui.selection.dropdown textarea:disabled.item, .ui.selection.dropdown input.checkbox.toggle:disabled + label.item
+  border-style: initial
+
+.ui.selection.dropdown .menu
+  border: none
+  margin-top: 0.25rem
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%)
+
+.ui.selection.dropdown .menu .active.item
+  font-weight: 500
+
+.inverted .ui.selection.dropdown.text.blue .text
+  color: #4e92df
+
+.inverted .ui.selection.dropdown.text.blue .text.default
+  color: #4e92df
+
+.inverted .ui.selection.dropdown.text.emerald .text
+  color: #57cb9e
+
+.inverted .ui.selection.dropdown.text.emerald .text.default
+  color: #57cb9e
+
+.inverted .ui.selection.dropdown.text.green .text
+  color: #24d2bb
+
+.inverted .ui.selection.dropdown.text.green .text.default
+  color: #24d2bb
+
+.inverted .ui.selection.dropdown.text.gold .text
+  color: #f3c858
+
+.inverted .ui.selection.dropdown.text.gold .text.default
+  color: #f3c858
+
+.inverted .ui.selection.dropdown.text.orange .text
+  color: #fe8272
+
+.inverted .ui.selection.dropdown.text.orange .text.default
+  color: #fe8272
+
+.inverted .ui.selection.dropdown.text.red .text
+  color: #f76faa
+
+.inverted .ui.selection.dropdown.text.red .text.default
+  color: #f76faa
+
+.ui.multiple.dropdown > .label
+  padding-right: 0.5rem
+
+.ui.multiple.dropdown > .label > i.icon.delete
+  font-family: 'iconsOpenL'
+  speak: none
+  font-style: normal
+  font-weight: normal
+  font-variant: normal
+  text-transform: none
+  line-height: 1
+  content: ''
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+
+.ui.multiple.dropdown > .label > i.icon.delete:before
+  content: "\e921"
+
+.ui.search.dropdown > input.search:not([value=""])
+  position: static
+  padding: 0
+  max-width: 100%
+  transition: none
+
+.ui.search.dropdown > input.search:not([value=""]) + .filtered.text
+  display: none

@@ -50,7 +50,9 @@
     "sync-version": "node scripts/sync-version.js",
     "version": "node scripts/sync-version.js && git add src/library/AppWrapper.js public/index.html",
     "lint:js": "eslint src --ext .js,.jsx --max-warnings 0",
-    "lint:css": "stylelint 'src/style/**/*.less'"
+    "lint:css": "stylelint 'src/style/**/*.less'",
+    "css:fixture": "node scripts/generate-semantic-css-fixture.js",
+    "css:fixture:check": "node scripts/generate-semantic-css-fixture.js --check"
   },
   "eslintConfig": {
     "extends": "react-app",
