@@ -53,6 +53,14 @@ jobs:
       - name: Check the generated supported-prop reference
         run: npm run docs:props:check
 
+      # `src/style/__tests__/semantic-contributed-css.txt` pins every rule the remaining
+      # `semantic-ui-less` imports contribute -- the "pixel parity of extracted CSS" criterion
+      # UPGRADE-PLAN sets for §9.7-F1 step 4, which had no mechanism until this fixture existed.
+      # `css.semantic-parity.test.js` covers it in all four legs; this step names the failure and,
+      # unlike the suite, tells you the regeneration command.
+      - name: Check the pinned semantic CSS fixture
+        run: npm run css:fixture:check
+
       - name: Test with coverage thresholds
         run: npm run test:coverage
 
