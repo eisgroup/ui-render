@@ -9,11 +9,9 @@ const ROOT = path.resolve(__dirname, '..');
 const STYLE_DIR = path.join(ROOT, 'src/style');
 const OUT_DIR = path.join(ROOT, 'public/static');
 
-function setupSemanticThemeConfig() {
-    const src = path.join(STYLE_DIR, 'override/theme.config');
-    const dest = path.join(ROOT, 'node_modules/semantic-ui-less/theme.config');
-    fs.copyFileSync(src, dest);
-}
+// Was a local `copyFileSync` pair; shared with `src/style/__tests__/setup.js` and the CSS fixture
+// generator since 2026-09-14, which is also where the reasoning lives.
+const { installThemeConfig: setupSemanticThemeConfig } = require('./install-theme-config.js');
 
 async function compileLess(entryFile) {
     const source = fs.readFileSync(entryFile, 'utf8');
