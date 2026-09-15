@@ -68,7 +68,6 @@ export default {
     resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
         alias: {
-            '../../theme.config$': path.resolve(__dirname, './src/style/override/theme.config'),
         },
     },
     plugins: [

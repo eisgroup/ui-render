@@ -292,7 +292,6 @@ const scopedMatching = node => matching(node)
 
 beforeAll(async () => {
     // Same LESS invocation as `css.pipeline.parity.test.js`; `setup.js` (a global
-    // `setupFiles` entry) has already placed `theme.config` for semantic-ui-less.
     const compiled = await less.render(fs.readFileSync(ENTRY, 'utf8'), {
         filename: ENTRY,
         paths: [STYLE_DIR],

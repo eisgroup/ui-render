@@ -114,6 +114,21 @@
 
 #### Dependencies
 
+- **Semantic UI is gone entirely — and nothing about how anything looks has changed.** The last
+  piece was the stylesheet: two Semantic CSS modules were still being compiled from
+  `semantic-ui-less` at build time. Their output now lives in this repository, and the package is
+  removed.
+
+  The evidence that this is invisible to you is the strongest kind available: the published
+  `static/all.css` is **byte-for-byte identical** — same SHA-256 — before and after. Not "looks the
+  same"; the same file.
+
+  What this means in practice: installing this library no longer pulls Semantic UI in any form,
+  and the LESS toolchain no longer writes into your `node_modules` during a build or a test run.
+  Attribution for the vendored CSS is in `THIRD-PARTY-NOTICES.md`, which ships with the package.
+
+
+
 - **`semantic-ui-react` is no longer a dependency.** Installing this package used to install
   Semantic UI React with it — a full copy that the bundle stopped using once `Table`, `Tooltip`
   and `Select`/`Dropdown` were reimplemented in-house. It is gone from `dependencies`, so it is

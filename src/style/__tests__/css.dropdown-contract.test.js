@@ -99,7 +99,6 @@ const scopedRuleCount = node => rules.filter(rule => {
 
 beforeAll(async () => {
     // The same LESS invocation as `css.tooltip-contract.test.js`; `setup.js` (a global
-    // `setupFiles` entry) has already placed `theme.config` for semantic-ui-less.
     const compiled = await less.render(fs.readFileSync(ENTRY, 'utf8'), {
         filename: ENTRY,
         paths: [STYLE_DIR],

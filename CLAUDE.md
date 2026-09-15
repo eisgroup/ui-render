@@ -42,7 +42,7 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 
 ### Internal layering and imports
 
-All internal imports use **relative paths** — there are no `ui-*-pack` webpack aliases (the only resolve aliases are `theme.config` for semantic-ui-less theming and `process`). The historical "pack" names survive as directory layers:
+All internal imports use **relative paths** — there are no `ui-*-pack` webpack aliases (the only resolve alias left is `process`; the three `theme.config` aliases went with `semantic-ui-less` at §9.7-F1 step 4). The historical "pack" names survive as directory layers:
 
 | Layer (historical name) | Path |
 |---|---|
@@ -77,10 +77,10 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 
 ## Tech Stack
 
-- React 16 (peer dependency); no `semantic-ui-react` in `src` — the components are in-house (§9.7-F1). The `semantic-ui-less` STYLES are still loaded until step 4, so components emit Semantic's class tokens on purpose.
+- React 16 (peer dependency). **No Semantic UI at all**: the components went in-house at §9.7-F1 steps 1-3 and the CSS at step 4, where the two modules still in use were compiled into `src/style/vendor/` and the package removed. Components still emit Semantic's class tokens (`ui selection dropdown`, `ui table`) because the vendored CSS selects on them.
 - react-final-form for form state management
 - moment for dates (peer dependency, externalized); charts are custom SVG (`src/core/components/charts/` — no recharts)
-- LESS for styling, compiled via webpack (entry: `src/style/index.less`). Semantic UI theme overrides at `src/style/override/`. PostCSS prefixwrap scopes all CSS under `.ui-render`. Less is pinned to 3.x (semantic-ui-less inline-JS + `less-plugin-functions` toolchain — see `docs/UPGRADE-PLAN.md` §9.8 before changing).
+- LESS for styling, compiled via webpack (entry: `src/style/index.less`). Semantic UI theme overrides at `src/style/override/`. PostCSS prefixwrap scopes all CSS under `.ui-render`. Less is pinned to 3.x, and after step 4 both reasons are OURS rather than Semantic's (measured): `javascriptEnabled` is required by `_variables.less:23`, a `` `Math.random()` `` cache-buster, and `less-plugin-functions` by `round()` at `_variables.less:264`. See `docs/UPGRADE-PLAN.md` §9.8 before changing.
 - Node.js v24 (see `.nvmrc`)
 - ESLint with `react-app` config (configured in package.json). `lint:js` runs with `--max-warnings 0`, so a new warning fails CI — fix it, or suppress it with a comment stating why the rule is wrong. Never blanket-disable: one tolerated warning here turned out to be a real crash (see `docs/UPGRADE-PLAN.md` §11 R18).
 - Babel config lives only in `babel.config.js` and is shared by the library build, the demo build and jest. Do not add `presets` to a `babel-loader` `options` block: a loader-level entry **replaces** the shared one for the same plugin identifier, silently dropping the shared options. Only demo-specific dev transforms (`react-refresh/babel`) belong inline.
@@ -89,6 +89,6 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 
 ## Gotchas
 
-- `npm run build-css` copies `src/style/override/theme.config` into `node_modules/semantic-ui-less/` before compiling (mutates `node_modules`); output goes to `public/static/ui-render.built.css`. **`src/style/__tests__/setup.js` makes the same copy**, so an ordinary `npx jest` mutates `node_modules` too — which used to matter more than it looks: the webpack builds depended on that copy existing, because `theme.config` is aliased to our own file and its `@import "theme.less"` resolves relative to the importing file, where no `theme.less` exists. `verify` passed only because `test:coverage` runs before `build`; a job going straight from `npm ci` to a build failed. Fixed 2026-09-02 by giving less-loader `paths` in both webpack configs, so a build no longer needs the copy — but the test-time mutation is still there.
+- `npm run build-css` compiles `src/style/index.less` to `public/static/ui-render.built.css`. **It no longer mutates `node_modules`,** and neither does `npx jest`: both used to copy `theme.config` into `node_modules/semantic-ui-less/` because Semantic's definitions import it from inside their own package. §9.7-F1 step 4 removed the package, so the copy, the shared helper that made it and the three webpack `theme.config` aliases are all gone. The jest `setupFiles` entry survives as a documented no-op.
 - Jest has no path-alias mapping (`jest.config.js`) — only relative imports resolve in tests.
 - `isFunction()` from core utils rejects cross-realm functions such as `jest.fn()` — use plain functions in tests.

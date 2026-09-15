@@ -232,7 +232,6 @@ let standaloneCss;
 
 beforeAll(async () => {
     // Same LESS invocation `scripts/build-css.js` uses. `src/style/__tests__/setup.js` (a global
-    // `setupFiles` entry) has already placed `theme.config` where semantic-ui-less expects it.
     const result = await less.render(fs.readFileSync(ENTRY, 'utf8'), {
         filename: ENTRY,
         paths: [STYLE_DIR],
