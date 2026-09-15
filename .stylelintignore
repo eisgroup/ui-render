@@ -1,0 +1,10 @@
+# GENERATED, THIRD-PARTY CSS — not ours to style-lint.
+#
+# `src/style/vendor/` holds the compiled output of the semantic-ui-less modules this library took
+# over at §9.7-F1 step 4 (`scripts/vendor-semantic-css.js` writes it; do not hand-edit). Linting it
+# reports 2,295 violations of conventions upstream never followed and we cannot change without
+# breaking the byte-for-byte parity that `css.semantic-parity.test.js` exists to enforce.
+#
+# The point of the exclusion is that these files are not a place where style decisions are made.
+# Ours are, and they stay linted.
+src/style/vendor/

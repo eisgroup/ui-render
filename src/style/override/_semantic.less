@@ -42,7 +42,8 @@
 @libPath: "../../../node_modules/semantic-ui-less/";
 
 /* Global */
- & { @import "@{libPath}definitions/globals/reset"; }
+ & { @import "../vendor/semantic-reset"; }
+ & { @import (multiple) "globals/reset.overrides"; }
 // & { @import "@{libPath}definitions/globals/site"; }
 
 /* Elements */
@@ -83,7 +84,8 @@
 // & { @import "@{libPath}definitions/modules/accordion"; }
 // & { @import "@{libPath}definitions/modules/checkbox"; }
 // & { @import "@{libPath}definitions/modules/dimmer"; }
- & { @import "@{libPath}definitions/modules/dropdown"; }  // step 4's second half. The "requires `label`" note was about Semantic's multi-select MARKUP, not compilation -- measured.
+ & { @import "../vendor/semantic-dropdown"; }
+ & { @import (multiple) "modules/dropdown.overrides"; }
 // & { @import "@{libPath}definitions/modules/embed"; }
 // & { @import "@{libPath}definitions/modules/modal"; }
 // & { @import "@{libPath}definitions/modules/nag"; }

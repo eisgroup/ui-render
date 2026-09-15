@@ -38,8 +38,22 @@ const SEMANTIC = path.join(STYLE_DIR, 'override/_semantic.less');
 const FIXTURE = path.join(STYLE_DIR, '__tests__/semantic-contributed-css.txt');
 const WRITE_COMMAND = 'npm run css:fixture';
 
-/** The live `@import` lines in `_semantic.less` — the ones not commented out. */
-const LIVE_IMPORT = /^\s*&\s*\{\s*@import\s+"@\{libPath\}/;
+/**
+ * The live `@import` lines in `_semantic.less` — the ones not commented out.
+ *
+ * The optional `(...)` group is not decoration: an import written `@import (multiple) "..."` has to
+ * match too, and when it did not, the baseline compile kept our overrides while the full one also
+ * had them — so 47 rules subtracted themselves away and the gate reported them missing from the
+ * OUTPUT when they were only missing from the MEASUREMENT.
+ *
+ * Matches the LINE shape rather than the specifier, which matters since §9.7-F1 step 4's second
+ * half: it used to anchor on `@{libPath}`, the marker for an import reaching into
+ * `node_modules/semantic-ui-less`, and those are gone. Each live line now imports a vendored file
+ * AND the matching `override/**.overrides` beside it, so commenting the line still removes exactly
+ * what `.loadUIOverrides()` used to bring along with the definitions — which is what keeps the
+ * measured contribution comparable to the fixture captured before the swap.
+ */
+const LIVE_IMPORT = /^\s*&\s*\{\s*@import\s+(?:\([^)]*\)\s*)?"/;
 
 async function compile (semanticSource) {
     // REQUIRED, and its absence is what made this script pass locally and fail on CI: Semantic's
