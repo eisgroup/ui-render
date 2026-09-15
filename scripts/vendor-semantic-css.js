@@ -2,6 +2,17 @@
  * ONE-SHOT GENERATOR for §9.7-F1 step 4's second half: writes the CSS this repository takes over
  * from `semantic-ui-less` into `src/style/vendor/`.
  *
+ * IT CANNOT RUN AS THE REPOSITORY STANDS, and that is deliberate rather than an oversight. The
+ * final commit of step 4 removed `semantic-ui-less` from `devDependencies`, so re-deriving the
+ * vendored files means installing it again first:
+ *
+ *     npm i --no-save semantic-ui-less@2.5.0 && node scripts/vendor-semantic-css.js
+ *
+ * It is kept because vendored third-party code without a reproducible derivation is a dead end:
+ * the next person who needs an upstream fix, or who doubts a value in `src/style/vendor/`, can
+ * reproduce the files exactly instead of editing them by hand. The parity gate
+ * (`css.semantic-parity.test.js`) tells them whether what they produced matches what ships.
+ *
  * WHY THE ISOLATED COMPILE, AND NOT A SUBTRACTION FROM THE FULL BUILD. Subtraction is the obvious
  * method and it is wrong here, for a reason worth stating because it is not obvious until it bites.
  * Our own LESS extends Semantic's selectors (`input.less` does `&:extend(.input-tag all)` and
@@ -49,7 +60,24 @@ const fs = require('fs');
 const path = require('path');
 const less = require('less');
 const LessPluginFunctions = require('less-plugin-functions');
-const { installThemeConfig } = require('./install-theme-config.js');
+/**
+ * Puts our `theme.config` where `semantic-ui-less` looks for it. Inlined here when the shared
+ * helper was deleted with the rest of the `node_modules` mutation machinery: this script is now the
+ * ONLY thing that needs it, and only while re-deriving the vendored files against a temporarily
+ * reinstalled package. Nothing in the build or the test run writes to `node_modules` any more.
+ */
+function installThemeConfig () {
+    const source = path.join(__dirname, '../src/style/override/theme.config');
+    const destination = path.join(__dirname, '../node_modules/semantic-ui-less/theme.config');
+    if (!fs.existsSync(source)) return;
+    const wanted = fs.readFileSync(source);
+    let current = null;
+    try { current = fs.readFileSync(destination); } catch (error) { /* absent on a fresh install */ }
+    if (current !== null && current.equals(wanted)) return;
+    const temporary = `${destination}.${process.pid}.tmp`;
+    fs.writeFileSync(temporary, wanted);
+    fs.renameSync(temporary, destination);
+}
 
 const OUR_OVERRIDE_DIR = path.join(__dirname, '../src/style/override');
 

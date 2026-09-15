@@ -29,7 +29,6 @@ const path = require('path');
 const less = require('less');
 const postcss = require('postcss');
 const LessPluginFunctions = require('less-plugin-functions');
-const { installThemeConfig } = require('./install-theme-config.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const STYLE_DIR = path.join(ROOT, 'src/style');
@@ -56,13 +55,6 @@ const WRITE_COMMAND = 'npm run css:fixture';
 const LIVE_IMPORT = /^\s*&\s*\{\s*@import\s+(?:\([^)]*\)\s*)?"/;
 
 async function compile (semanticSource) {
-    // REQUIRED, and its absence is what made this script pass locally and fail on CI: Semantic's
-    // definitions import `'../../theme.config'` from inside their own package, which ships only
-    // `theme.config.example`. Locally a prior `npx jest` had already placed ours through the same
-    // helper; on a clean checkout nothing had, and the compile died with
-    // `'../../theme.config' wasn't found`.
-    installThemeConfig();
-
     const original = fs.readFileSync(SEMANTIC, 'utf8');
     if (semanticSource !== null) fs.writeFileSync(SEMANTIC, semanticSource);
     try {
