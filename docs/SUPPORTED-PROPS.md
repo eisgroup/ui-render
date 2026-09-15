@@ -32,21 +32,18 @@ these views has exactly one of these fates, and they are different promises:
 | --- | --- | --- |
 | **consumed** | the component, or its caller in the engine, reads it | nothing — we already own the behaviour |
 | **stripped** | removed at the DOM boundary by `src/core/components/domProps.js` | only the boundary moves |
-| **forwarded** | handed to semantic-ui-react, which decides what happens | everything: this is the parity risk |
+| ~~**forwarded**~~ | ~~handed to semantic-ui-react, which decides what happens~~ | **no longer a fate.** The exit completed, so nothing is handed anywhere but to code in this repository |
 | **dropped** | semantic-ui-react handled it; the in-house component deliberately does not | already happened — this is the semver record for that step |
 
 A checklist that mixed them would be full of props that never mattered. Each section below
 is split that way.
 
-The forwarded set is tiered, because "supported" and "used" are different facts:
-
-- **tier 1 — exercised.** Used by a node in the tracked example corpus, by one of the
-  consumer metas audited in step 0, or generated unconditionally by the wrapper. A
-  regression here is a live bug.
-- **tier 2 — published but unexercised.** Reachable through the wrapper API or by
-  passthrough, but no meta in either corpus uses it. These cannot be dropped *silently* —
-  they are documented propTypes — but reimplement-vs-deprecate is a decision for the step
-  PR, not an automatic obligation.
+The forwarded set **was** tiered, because "supported" and "used" are different facts: tier 1
+meant a node in the tracked corpus or an audited consumer meta exercised it, tier 2 that it
+was published but unexercised. Both are retired with the set itself — tiers ranked a PARITY
+CHECKLIST, and there is no second implementation left to reach parity with. The distinction
+they encoded did its job: every tier-2 prop on the dropdown was resolved as a deliberate
+removal rather than a silent one, which is what the `Dropped` tables below record.
 
 ## Isolation invariant
 
@@ -343,15 +340,15 @@ What each step owes beyond "the props above still work".
 - WHAT THE GATE CANNOT SAY, so the replacement is not judged on it: everything positional. jsdom reports 0×0 for every rect, so flip, the resulting placement-class change, shift, the arrow geometry, the 250 px wrap, clipping, stacking, painted style, real pointer travel and screen-reader announcement are all inexpressible. They are named one by one against the §9.5 Playwright item, which now blocks THIS step's completion rather than only F1's.
 - FREE CLEANUP, confirmed: the `TooltipPop` chain in `modules/form/utils.js` is dead at four sites — the import (line 8), `withForm`'s `Tooltip = TooltipPop` default parameter, the pass-through into `withFormSetup({… Tooltip})`, and the destructure that never uses it. Delete all four; do NOT touch line 7, which imports the in-house `Tooltip` as `ToolTip` and IS used by the validation-error tooltip.
 
-### Step 3 — `Dropdown`
+### Step 3 — `Dropdown` — SHIPPED
 
-**Effort: L (unchanged size, different location).**
+**Effort: L (came in at the L; the matrix was the cost, as predicted).**
 
-- The L is NOT in `search`/`multiple`/`allowAdditions`/`clearable` — nothing uses them. It is in the keyboard/a11y matrix, the cascading flows, `upward`'s auto-flip, and the `.ui.selection.dropdown` CSS contract.
-- Keep `displayName = 'Dropdown'` AND the named-vs-default export split: `modules/form/utils.js` branches on `InputComponent.displayName`, and only the named export carries it — `React.memo(...)` does not.
-- Reproduce SUIR's aria shape: `role="listbox"` (or `combobox` under `search`), `aria-expanded`, `aria-disabled`, `tabIndex=-1` when disabled. SUIR renders no hidden native input, so the form binding is entirely react-final-form.
-- Decide tier 2 explicitly: reimplement or deprecate. They are published propTypes/JSDoc, so they cannot be dropped silently — but they are not evidence for an L estimate either.
-- Owed to this page before the swap: a measured `classContract` and `behaviourContract`, the way step 2 part 1 produced them for `TooltipPop`. Both fields are optional in the curation only because they have not been measured for `Dropdown` yet — an absent one means unmeasured, not "no contract", and `.ui.selection.dropdown` is known to be load-bearing.
+- The L was NOT in `search`/`multiple`/`allowAdditions`/`clearable` — nothing used them, and they were REMOVED rather than reimplemented. It was in the keyboard/a11y matrix, which had to be built rather than ported: `Home`/`End`, `PageUp`/`PageDown` and typeahead were measured ABSENT from the library, so there was nothing to preserve and everything to write.
+- MET: `displayName = 'Dropdown'` and the named-vs-default export split both survive — `modules/form/utils.js` still branches on `InputComponent.displayName`, and only the named export carries it.
+- MET, and one addition: `role="listbox"`, `aria-expanded`, `aria-disabled` and `tabIndex=-1` when disabled are all emitted. `aria-disabled` was MISSING in the first draft and caught by the behavioural suite — a `role="listbox"` div cannot carry the native attribute, so being unavailable has to be said three ways. Added beyond the library: `aria-activedescendant`, which is how the keyboard cursor is announced now that moving no longer commits.
+- DECIDED: tier 2 was resolved as REMOVAL, on the evidence that nothing in either corpus or the consumer-only record declares any of them. Not silently — the removed names are stripped at the boundary and warn once each in development, and the `Dropped` table below is the record.
+- DELIVERED: both `classContract` and `behaviourContract` are measured and present above. The class contract is pinned token by token in `src/style/__tests__/css.dropdown-contract.test.js` (what each class is worth in scoped rules), and the behaviour contract is the WAI-ARIA listbox model — arrows move a cursor, Enter commits, Escape reports nothing.
 
 ## What this page does and does not guarantee
 
@@ -368,9 +365,11 @@ test against the real `EXAMPLES` manifest.
 
 Not guaranteed, and deliberately so:
 
-- **the forwarded set is open.** A rest spread cannot be closed by static analysis; a meta
-  may pass any semantic-ui-react prop. The tier-1 list is what was found, not a proof of
-  what is possible.
+- **the rest spread is still open.** A rest spread cannot be closed by static analysis, so a
+  meta may pass a name nobody anticipated. What changed with the exit is where it lands: not
+  into semantic-ui-react, but onto a DOM element, or into a component's own dropped-prop
+  list where it is stripped and warned about once. The inventories below are what was found,
+  not a proof of what is possible.
 - **the emitted className strings.** The generator reads which props a component consumes,
   not what it composes them into. `ui table` surviving on the root is asserted by
   `src/core/components/__tests__/Table.test.js` and by the 38-example DOM baseline, not here.

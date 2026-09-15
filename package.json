@@ -3,6 +3,13 @@
   "version": "0.34.3",
   "description": "UI generation based on JSON schemas",
   "homepage": "https://eisgroup.github.io/ui-render/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eisgroup/ui-render.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eisgroup/ui-render/issues"
+  },
   "license": "Apache-2.0",
   "engines": {
     "node": ">=18"
@@ -16,7 +23,9 @@
     "package.json",
     "LICENSE",
     "THIRD-PARTY-NOTICES.md",
-    "README.md"
+    "README.md",
+    "docs/SUPPORTED-PROPS.md",
+    "docs/SUPPORTED-VIEWS.md"
   ],
   "scripts": {
     "start": "webpack serve --mode development --config webpack.demo.config.mjs",

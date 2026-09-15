@@ -112,6 +112,14 @@
   does. In the demo example set this removes 57 dangling references; no other rendered output
   changes.
 
+#### Documentation
+
+- **The prop reference now ships with the package.** `docs/SUPPORTED-PROPS.md` and
+  `docs/SUPPORTED-VIEWS.md` are in the npm tarball, not just on the site. This release removes
+  published props, and the list of what went and why should be reachable from an installed copy
+  rather than only from a URL. The manifest also gained `repository` and `bugs`, so npm links to
+  the source and to somewhere you can tell us the removals hurt.
+
 #### Dependencies
 
 - **Semantic UI is gone entirely — and nothing about how anything looks has changed.** The last
@@ -145,15 +153,17 @@
   It is green today, which is the first real evidence, but the claim comes with the release that
   makes it.
 
-  Nothing about the rendered output or the meta contract changes here. The Semantic **styles** are
-  still loaded (that is a separate package, `semantic-ui-less`, and a separate step), which is why
-  components still emit class names like `ui selection dropdown`.
+  Nothing about the rendered output or the meta contract changes here. The Semantic **styles** were
+  still loaded when this entry was first written — that was a separate package, `semantic-ui-less`,
+  and a separate step. It has since been done too (see *Dependencies* above): the two stylesheets
+  still in use were moved into this repository and that package is gone as well. Components keep
+  emitting class names like `ui selection dropdown` because our own CSS now selects on them.
 
 #### Styling
 
 - **The stylesheet is 67 KB smaller, and nothing about how anything looks has changed.** Three
   Semantic UI CSS modules were being compiled into every build for components this library no
-  longer renders: the popup (our tooltip has been in-house for two releases), the label (it styled
+  longer renders: the popup (our tooltip is in-house as of this same unreleased set), the label (it styled
   multi-select chips, and multi-select is gone), and the menu (it was kept "for the Pagination
   component", which turned out to be untrue — pagination has always been styled by our own CSS).
 
@@ -258,6 +268,20 @@
   hoverable in practice). The tooltip also gained `role="tooltip"` and `aria-describedby`, and it
   is now positioned next to its trigger — it was rendering at the document origin and throwing on
   every open. See `docs/SUPPORTED-PROPS.md` for the per-prop record.
+
+  **If you pass an object `tooltip` attribute, its accepted surface narrowed from 45 names to 13.**
+  Those 45 were never a designed API — they were whatever `semantic-ui-react`'s `Popup` and `Portal`
+  happened to accept, reachable because the attribute was spread straight through. The 13 that
+  remain are the ones with a defined meaning here; of the rest, the 18 that were both reachable and
+  plausible warn once each in development rather than being ignored silently, and the remainder had
+  no observable effect to lose.
+
+  **One accessibility trade, stated rather than buried:** the bubble is not hoverable, which is a
+  known non-conformance with WCAG SC 1.4.13 ("Content on Hover or Focus"). The other two parts of
+  that criterion are met — Escape dismisses it, and it stays while the pointer rests on the trigger.
+  It cannot be made hoverable without `pointer-events` on the bubble, and that was measured to make
+  the trigger itself unusable. The trade is recorded here, in `docs/SUPPORTED-PROPS.md` and in the
+  plan rather than left for you to discover.
 - **The equivalent list for `Table` is settled**: `celled`, `textAlign` and `as` were dropped
   (see "Table rendering" above), while `striped` and `inverted` were kept.
 
@@ -284,7 +308,7 @@
   paths resolve to `<homepage>/static/images/` — and `dist/static/all.css` and `font.css` became
   one-line `@import` re-exports of it. Both import paths keep working; `semantic.css` remains an
   empty stub in both places.
-- The tarball dropped from 579 files / 11.6 MB unpacked to 295 files / 7.25 MB (2.53 MB packed).
+- The tarball dropped from 579 files / 11.6 MB unpacked to **299 files / 6.7 MB (2.5 MB packed)**, remeasured 2026-09-15 after the Semantic exit completed.
   Source maps continue to ship for host debugging.
 
 #### Tests and CI
