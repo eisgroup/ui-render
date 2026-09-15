@@ -120,6 +120,13 @@
   rather than only from a URL. The manifest also gained `repository` and `bugs`, so npm links to
   the source and to somewhere you can tell us the removals hurt.
 
+#### Build
+
+- **The LESS toolchain is on 4.x.** It had been pinned to 3.x for years because of the Semantic UI
+  build; with Semantic gone the pin was re-examined and lifted. The compiled stylesheet is
+  byte-for-byte identical — same SHA-256 before and after — so nothing about how the library looks
+  changes. This only matters if you build the demo or the stylesheet from source.
+
 #### Dependencies
 
 - **Semantic UI is gone entirely — and nothing about how anything looks has changed.** The last

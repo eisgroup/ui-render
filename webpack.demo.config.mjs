@@ -6,7 +6,8 @@ import CopyPlugin from 'copy-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import Dotenv from 'dotenv-webpack';
-import LessPluginFunctions from 'less-plugin-functions';
+import lessOptionsModule from './scripts/less-options.js';
+const { lessOptions } = lessOptionsModule;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -76,15 +77,7 @@ export default (env, argv) => {
                         {
                             loader: 'less-loader',
                             options: {
-                                lessOptions: {
-                                    // `javascriptEnabled` stays: it is required by our OWN
-                                    // `_variables.less:23` (a `` `Math.random()` `` cache-buster),
-                                    // not by Semantic — measured at §9.7-F1 step 4, where the plan
-                                    // claimed the opposite.
-                                    javascriptEnabled: true,
-                                    relativeUrls: false,
-                                    plugins: [new LessPluginFunctions()],
-                                },
+                                lessOptions: lessOptions({ relativeUrls: false }),
                             },
                         },
                     ],

@@ -3,7 +3,8 @@ import CopyPlugin from 'copy-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
-import LessPluginFunctions from 'less-plugin-functions';
+import lessOptionsModule from './scripts/less-options.js';
+const { lessOptions } = lessOptionsModule;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -47,11 +48,7 @@ export default {
                     {
                         loader: 'less-loader',
                         options: {
-                            lessOptions: {
-                                javascriptEnabled: true,
-                                relativeUrls: false,
-                                plugins: [new LessPluginFunctions()],
-                            },
+                            lessOptions: lessOptions({ relativeUrls: false }),
                         },
                     },
                 ],

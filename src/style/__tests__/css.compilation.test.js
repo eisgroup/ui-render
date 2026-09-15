@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const less = require('less');
-const LessPluginFunctions = require('less-plugin-functions');
+
+const { lessOptions, less } = require('../../../scripts/less-options.js');
 
 const STYLE_DIR = path.resolve(__dirname, '..');
 const INVENTORY_FILE = path.join(STYLE_DIR, 'class-inventory.txt');
@@ -19,8 +19,7 @@ beforeAll(async () => {
     const result = await less.render(source, {
         filename: path.join(STYLE_DIR, 'index.less'),
         paths: [STYLE_DIR],
-        plugins: [new LessPluginFunctions()],
-        javascriptEnabled: true,
+        ...lessOptions(),
     });
     compiledCss = result.css;
     // 60s, matching the three sibling CSS suites, and raised from 30s because this one timed out
