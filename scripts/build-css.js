@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const less = require('less');
+
 const postcss = require('postcss');
 const prefixwrap = require('postcss-prefixwrap');
-const LessPluginFunctions = require('less-plugin-functions');
+const { lessOptions, less } = require('./less-options.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const STYLE_DIR = path.join(ROOT, 'src/style');
@@ -13,12 +13,10 @@ const OUT_DIR = path.join(ROOT, 'public/static');
 
 async function compileLess(entryFile) {
     const source = fs.readFileSync(entryFile, 'utf8');
-    const result = await less.render(source, {
+    const result = await less.render(source, lessOptions({
         filename: entryFile,
         paths: [path.dirname(entryFile)],
-        plugins: [new LessPluginFunctions()],
-        javascriptEnabled: true,
-    });
+    }));
     return result.css;
 }
 

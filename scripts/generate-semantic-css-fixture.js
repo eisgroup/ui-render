@@ -26,9 +26,9 @@
  */
 const fs = require('fs');
 const path = require('path');
-const less = require('less');
+
 const postcss = require('postcss');
-const LessPluginFunctions = require('less-plugin-functions');
+const { lessOptions, less } = require('./less-options.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const STYLE_DIR = path.join(ROOT, 'src/style');
@@ -61,8 +61,7 @@ async function compile (semanticSource) {
         const result = await less.render(fs.readFileSync(ENTRY, 'utf8'), {
             filename: ENTRY,
             paths: [STYLE_DIR, path.join(ROOT, 'node_modules')],
-            javascriptEnabled: true,
-            plugins: [new LessPluginFunctions()],
+            ...lessOptions(),
         });
         return result.css;
     } finally {

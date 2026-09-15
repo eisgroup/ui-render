@@ -142,7 +142,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
-    "less": "^3.13.1",
+    "less": "^4.4.2",
     "less-loader": "^12.2.0",
     "less-plugin-functions": "^1.0.0",
     "mini-css-extract-plugin": "^2.9.2",

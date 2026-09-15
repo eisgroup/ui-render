@@ -58,8 +58,8 @@
  */
 const fs = require('fs');
 const path = require('path');
-const less = require('less');
-const LessPluginFunctions = require('less-plugin-functions');
+
+const { lessOptions, plugins, less } = require('./less-options.js');
 /**
  * Puts our `theme.config` where `semantic-ui-less` looks for it. Inlined here when the shared
  * helper was deleted with the rest of the `node_modules` mutation machinery: this script is now the
@@ -146,8 +146,9 @@ async function compileModule (spec) {
     const result = await less.render(source, {
         filename: path.join(DEFINITIONS, `${spec.from}.less`),
         paths: [STYLE_DIR, path.join(ROOT, 'node_modules')],
-        javascriptEnabled: true,
-        plugins: [new LessPluginFunctions(), excludeOurOverrides],
+        // The shared options plus this script's own file manager, which is why the plugin list is
+        // spelled out here rather than taken wholesale.
+        ...lessOptions({ plugins: [...plugins(), excludeOurOverrides] }),
     });
     return result.css;
 }

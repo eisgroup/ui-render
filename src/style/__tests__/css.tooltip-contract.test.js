@@ -78,9 +78,9 @@
  */
 const fs = require('fs');
 const path = require('path');
-const less = require('less');
+
 const postcss = require('postcss');
-const LessPluginFunctions = require('less-plugin-functions');
+const { lessOptions, less } = require('../../../scripts/less-options.js');
 const React = require('react');
 const { act, fireEvent, render } = require('@testing-library/react');
 const webpackPostcssConfig = require('../../../postcss.config.js');
@@ -295,8 +295,7 @@ beforeAll(async () => {
     const compiled = await less.render(fs.readFileSync(ENTRY, 'utf8'), {
         filename: ENTRY,
         paths: [STYLE_DIR],
-        plugins: [new LessPluginFunctions()],
-        javascriptEnabled: true,
+        ...lessOptions(),
     });
     const processed = await postcss(webpackPostcssConfig.plugins)
         .process(compiled.css, { from: undefined });

@@ -5,7 +5,8 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
-import LessPluginFunctions from 'less-plugin-functions';
+import lessOptionsModule from './scripts/less-options.js';
+const { lessOptions } = lessOptionsModule;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -65,15 +66,7 @@ export default {
                     {
                         loader: 'less-loader',
                         options: {
-                            lessOptions: {
-                                // `javascriptEnabled` stays: it is required by our OWN
-                                // `_variables.less:23` (a `` `Math.random()` `` cache-buster), not
-                                // by Semantic — measured at §9.7-F1 step 4, where the plan claimed
-                                // the opposite.
-                                javascriptEnabled: true,
-                                relativeUrls: false,
-                                plugins: [new LessPluginFunctions()],
-                            },
+                            lessOptions: lessOptions({ relativeUrls: false }),
                         },
                     },
                 ],
@@ -124,9 +117,12 @@ export default {
                     const fontLess = fs.readFileSync(path.resolve(__dirname, 'src/style/font.less'), 'utf8');
                     const result = await less.render(fontLess, {
                         filename: path.resolve(__dirname, 'src/style/font.less'),
-                        paths: [path.resolve(__dirname, 'src/style')],
-                        relativeUrls: false,
-                        javascriptEnabled: true,
+                        ...lessOptions({
+                            // `paths` stays local: this compile is `font.less` alone, so it needs
+                            // only our own style directory, not the whole resolution chain.
+                            paths: [path.resolve(__dirname, 'src/style')],
+                            relativeUrls: false,
+                        }),
                     });
                     fs.writeFileSync(path.join(ROOT_STATIC, 'font.css'), result.css);
                     writeReExport('font.css');
