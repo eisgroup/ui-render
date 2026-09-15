@@ -43,7 +43,7 @@
 
 /* Global */
  & { @import "../vendor/semantic-reset"; }
- & { @import "globals/reset.overrides"; }
+ & { @import (multiple) "globals/reset.overrides"; }
 // & { @import "@{libPath}definitions/globals/site"; }
 
 /* Elements */
@@ -85,7 +85,7 @@
 // & { @import "@{libPath}definitions/modules/checkbox"; }
 // & { @import "@{libPath}definitions/modules/dimmer"; }
  & { @import "../vendor/semantic-dropdown"; }
- & { @import "modules/dropdown.overrides"; }
+ & { @import (multiple) "modules/dropdown.overrides"; }
 // & { @import "@{libPath}definitions/modules/embed"; }
 // & { @import "@{libPath}definitions/modules/modal"; }
 // & { @import "@{libPath}definitions/modules/nag"; }
