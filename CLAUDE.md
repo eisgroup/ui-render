@@ -13,7 +13,7 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 - `npm start` — Run demo app in dev mode (webpack-dev-server)
 - `npm run build` — Build the demo app for GitHub Pages deployment
 - `npm run build-lib` — Build the publishable library to `dist/` (webpack + tsc)
-- `npm run watch-lib` — Watch mode for library build
+- `npm run watch-lib` — Watch mode for the library build. Uses the SAME webpack config as `build-lib`, deliberately: it had its own parallel config until 2026-09-15, and it had drifted into emitting the stylesheet under a different name and producing no type declarations
 - `npm run yalc-publish` — Build lib and publish locally via yalc (for testing in consuming apps)
 - `npm run yalc-watch` — Auto-rebuild and yalc-publish on src changes
 - `npm run deploy` — Deploy demo to GitHub Pages (run `build` first)

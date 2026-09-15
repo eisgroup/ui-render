@@ -31,7 +31,7 @@
     "start": "webpack serve --mode development --config webpack.demo.config.mjs",
     "build": "webpack --mode production --config webpack.demo.config.mjs && cp build/index.html build/404.html",
     "build-lib": "webpack --mode production --config webpack.library.config.mjs && npm run gen-ts",
-    "watch-lib": "webpack --watch --mode production --config webpack.watch.config.mjs",
+    "watch-lib": "npm run gen-ts && webpack --watch --mode production --config webpack.library.config.mjs",
     "yalc-publish": "npm run build-lib && yalc publish --push",
     "yalc-watch": "nodemon --watch src --ext js,jsx,ts,tsx --exec 'npm run yalc-publish'",
     "gen-ts": "tsc --project tsconfig.build.json",

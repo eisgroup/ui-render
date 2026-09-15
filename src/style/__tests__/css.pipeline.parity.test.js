@@ -348,15 +348,33 @@ describe('CSS pipeline parity — final CSS, post-PostCSS (§9.5)', () => {
  * Selector granularity only: the published file is minified, and cssnano may merge or split declaration
  * blocks without changing scoping.
  */
-const hasPublishedCss = fs.existsSync(PUBLISHED_CSS);
-const describeIfBuilt = hasPublishedCss ? describe : describe.skip;
+/**
+ * READ AT MODULE LOAD, NOT IN `beforeAll`, and the difference is a real failure this suite produced
+ * repeatedly before it was understood.
+ *
+ * It used to test `existsSync` here and `readFileSync` in a `beforeAll`. Something in a full-suite
+ * run EMPTIES the root `static/` directory between those two moments, so the describe was not
+ * skipped — the file existed when the decision was made — and then three tests died on ENOENT.
+ * Intermittent, invisible in an isolated run, and it reads like a broken assertion rather than a
+ * missing file.
+ *
+ * What is established about the cause, and what is not: the emptying is reliably triggered by the
+ * LESS render in `css.semantic-parity.test.js` (bisected suite by suite, then by disabling that
+ * suite's compile — with it off the directory survives, with it on the directory is emptied every
+ * time). It is NOT done through `fs` in the jest process: probes wrapping `rmSync`, `unlinkSync`,
+ * `rmdirSync`, `renameSync` and their async and `fs.promises` forms, installed both in `setupFiles`
+ * and at the top of the suite itself, never fire. No stray watcher process is running. The
+ * mechanism is unexplained, and is written down here rather than guessed at.
+ *
+ * Reading once, at load, makes this suite correct regardless: it either has the bytes it checked
+ * for, or it skips. CI is unaffected either way — it runs jest before `build-lib`, so these three
+ * always skip there, which is what the describe name says.
+ */
+const publishedCssAtLoad = fs.existsSync(PUBLISHED_CSS) ? fs.readFileSync(PUBLISHED_CSS, 'utf8') : null;
+const describeIfBuilt = publishedCssAtLoad !== null ? describe : describe.skip;
 
 describeIfBuilt('published static/all.css (needs `npm run build-lib` — skipped when absent)', () => {
-    let publishedCss;
-
-    beforeAll(() => {
-        publishedCss = fs.readFileSync(PUBLISHED_CSS, 'utf8');
-    });
+    const publishedCss = publishedCssAtLoad;
 
     it('leaks the same global selectors as the in-process webpack pipeline', () => {
         expect(occurrenceCounts(globalRuleInventory(publishedCss))).toEqual(H8_LEAK_OCCURRENCES);
