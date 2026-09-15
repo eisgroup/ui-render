@@ -797,14 +797,14 @@ const STEP_OBLIGATIONS = [
         ],
     },
     {
-        step: 'Step 3 — `Dropdown`',
-        effort: 'L (unchanged size, different location)',
+        step: 'Step 3 — `Dropdown` — SHIPPED',
+        effort: 'L (came in at the L; the matrix was the cost, as predicted)',
         items: [
-            'The L is NOT in `search`/`multiple`/`allowAdditions`/`clearable` — nothing uses them. It is in the keyboard/a11y matrix, the cascading flows, `upward`\'s auto-flip, and the `.ui.selection.dropdown` CSS contract.',
-            'Keep `displayName = \'Dropdown\'` AND the named-vs-default export split: `modules/form/utils.js` branches on `InputComponent.displayName`, and only the named export carries it — `React.memo(...)` does not.',
-            'Reproduce SUIR\'s aria shape: `role="listbox"` (or `combobox` under `search`), `aria-expanded`, `aria-disabled`, `tabIndex=-1` when disabled. SUIR renders no hidden native input, so the form binding is entirely react-final-form.',
-            'Decide tier 2 explicitly: reimplement or deprecate. They are published propTypes/JSDoc, so they cannot be dropped silently — but they are not evidence for an L estimate either.',
-            'Owed to this page before the swap: a measured `classContract` and `behaviourContract`, the way step 2 part 1 produced them for `TooltipPop`. Both fields are optional in the curation only because they have not been measured for `Dropdown` yet — an absent one means unmeasured, not "no contract", and `.ui.selection.dropdown` is known to be load-bearing.',
+            'The L was NOT in `search`/`multiple`/`allowAdditions`/`clearable` — nothing used them, and they were REMOVED rather than reimplemented. It was in the keyboard/a11y matrix, which had to be built rather than ported: `Home`/`End`, `PageUp`/`PageDown` and typeahead were measured ABSENT from the library, so there was nothing to preserve and everything to write.',
+            'MET: `displayName = \'Dropdown\'` and the named-vs-default export split both survive — `modules/form/utils.js` still branches on `InputComponent.displayName`, and only the named export carries it.',
+            'MET, and one addition: `role="listbox"`, `aria-expanded`, `aria-disabled` and `tabIndex=-1` when disabled are all emitted. `aria-disabled` was MISSING in the first draft and caught by the behavioural suite — a `role="listbox"` div cannot carry the native attribute, so being unavailable has to be said three ways. Added beyond the library: `aria-activedescendant`, which is how the keyboard cursor is announced now that moving no longer commits.',
+            'DECIDED: tier 2 was resolved as REMOVAL, on the evidence that nothing in either corpus or the consumer-only record declares any of them. Not silently — the removed names are stripped at the boundary and warn once each in development, and the `Dropped` table below is the record.',
+            'DELIVERED: both `classContract` and `behaviourContract` are measured and present above. The class contract is pinned token by token in `src/style/__tests__/css.dropdown-contract.test.js` (what each class is worth in scoped rules), and the behaviour contract is the WAI-ARIA listbox model — arrows move a cursor, Enter commits, Escape reports nothing.',
         ],
     },
 ]
