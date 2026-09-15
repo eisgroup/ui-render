@@ -36,7 +36,12 @@ export default {
             export: 'default',
         },
         globalObject: 'this',
-        clean: true,
+        // `keep` rather than a bare `true`, and it is what makes `watch-lib` usable: webpack owns
+        // `dist/index.js`, but `dist/*.d.ts` come from `tsc` in a separate step. A plain clean
+        // wipes them on every rebuild, and in watch mode nothing regenerates them — measured, a
+        // watch session left `dist` with ZERO declaration files after `build-lib` had produced two.
+        // For `build-lib` this changes nothing: `gen-ts` runs immediately after and rewrites them.
+        clean: { keep: /\.d\.ts$/ },
     },
     externals:{
         moment: 'moment',
