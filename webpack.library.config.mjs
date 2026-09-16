@@ -104,8 +104,26 @@ export default {
                     fs.mkdirSync(ROOT_STATIC, { recursive: true });
                     callback();
                 };
+                // ONLY ON A ONE-SHOT BUILD, deliberately not on every watch rebuild.
+                //
+                // `cleanRootStatic` empties the root `static/` payload so a renamed or removed asset
+                // cannot linger; `PostBuildCopy` below refills it. Between those two moments the
+                // directory is EMPTY, which is harmless for `build-lib` — it runs once and nothing
+                // else is looking — and a real hazard under `--watch`, where every source change
+                // reopens that window.
+                //
+                // Measured rather than theorised, after it cost an afternoon: with a watcher running,
+                // `css.semantic-parity.test.js` emptied `static/` on every run (6 files -> 0),
+                // because that suite writes `override/_semantic.less` to measure what the imports
+                // contribute — a source change, so the watcher rebuilt, so the directory was wiped.
+                // Three tests in `css.pipeline.parity.test.js` then failed on a file that had existed
+                // moments earlier. The failure looks nothing like its cause: no `fs` probe inside jest
+                // ever fires, because the deletion is in another process.
+                //
+                // In watch mode the outputs are overwritten on every rebuild anyway, so skipping the
+                // wipe costs only the chance of a stale file from a rename — which one `build-lib`
+                // clears — and buys a `static/` that is never momentarily absent.
                 compiler.hooks.beforeRun.tapAsync('CleanRootStatic', cleanRootStatic);
-                compiler.hooks.watchRun.tapAsync('CleanRootStatic', cleanRootStatic);
 
                 compiler.hooks.afterEmit.tapAsync('PostBuildCopy', async (compilation, callback) => {
                     // Assets ship exactly once, in the root `static/` payload hosts copy to their web root
