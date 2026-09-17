@@ -21,6 +21,10 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 - `npm run test:watch` — Run Jest in watch mode
 - `npm run build-css` — Standalone CSS build (LESS → PostCSS prefixwrap → CSS)
 - `npm run lint:css` — Lint LESS files with stylelint
+- `npm run typecheck` — `tsc --noEmit` over `src` (§9.6-E0). Babel STRIPS TypeScript types without
+  checking them, so this is the only thing that checks them. Unconverted `.js` resolves but is not
+  checked (`checkJs: false`); every `.ts` file is strict. Config: `tsconfig.json` — not
+  `tsconfig.build.json`, which is the separate declaration-emit config used by `gen-ts`.
 
 ## Architecture
 
@@ -80,6 +84,10 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 - React 16 (peer dependency). **No Semantic UI at all**: the components went in-house at §9.7-F1 steps 1-3 and the CSS at step 4, where the two modules still in use were compiled into `src/style/vendor/` and the package removed. Components still emit Semantic's class tokens (`ui selection dropdown`, `ui table`) because the vendored CSS selects on them.
 - react-final-form for form state management
 - moment for dates (peer dependency, externalized); charts are custom SVG (`src/core/components/charts/` — no recharts)
+- TypeScript is wired up but the source is still JavaScript: `@babel/preset-typescript` compiles
+  `.ts`/`.tsx` in all three pipelines (library build, demo build, Jest) and `npm run typecheck`
+  checks them. `src/toolchain/` holds a guard proving that stays true — delete it once real
+  converted modules cover the same ground (`docs/UPGRADE-PLAN.md` §9.6).
 - LESS for styling, compiled via webpack (entry: `src/style/index.less`). Semantic UI theme overrides at `src/style/override/`. PostCSS prefixwrap scopes all CSS under `.ui-render`. LESS is on **4.x** — the 3.x pin was removed at §9.8 with byte-identical output. Every compile takes its options from `scripts/less-options.js`; do not set them locally. Three things there are load-bearing and each has its reason in the file: `math: 'always'` (LESS 4 changed division), `javascriptEnabled` (our own `` `Math.random()` `` font cache-buster at `_variables.less:23`, not Semantic's), and requiring the NODE build explicitly, because LESS 4's `browser` field plus jest's jsdom environment otherwise loads a build that fetches imports over XHR. `less-plugin-functions` makes `size()`/`px()` callable at 186 sites and needs `scripts/less-plugin-compat.js` to run on LESS 4.
 - Node.js v24 (see `.nvmrc`)
 - ESLint with `react-app` config (configured in package.json). `lint:js` runs with `--max-warnings 0`, so a new warning fails CI — fix it, or suppress it with a comment stating why the rule is wrong. Never blanket-disable: one tolerated warning here turned out to be a real crash (see `docs/UPGRADE-PLAN.md` §11 R18).
