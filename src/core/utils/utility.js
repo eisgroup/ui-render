@@ -1,8 +1,8 @@
-import { Active } from './_envs.js'
-import { isInList, isList } from './array.js'
-import { rad } from './number.js'
-import { isObject } from './object.js'
-import { isString, padStringLeft, randomString } from './string.js'
+import { Active } from './_envs'
+import { isInList, isList } from './array'
+import { rad } from './number'
+import { isObject } from './object'
+import { isString, padStringLeft, randomString } from './string'
 
 /**
  * AD HOC FUNCTIONS ============================================================

@@ -1,9 +1,9 @@
-import { Active } from './_envs.js'
-import { isList } from './array.js'
-import { fromJSON, toJSON } from './codec.js'
-import { ADD, DELETE, GET, SET } from './constants.js'
-import { enumCheck } from './function.js'
-import { update } from './object.js'
+import { Active } from './_envs'
+import { isList } from './array'
+import { fromJSON, toJSON } from './codec'
+import { ADD, DELETE, GET, SET } from './constants'
+import { enumCheck } from './function'
+import { update } from './object'
 
 /**
  * STORAGE FUNCTIONS ===========================================================

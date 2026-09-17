@@ -1,4 +1,4 @@
-import { LANGUAGE } from './constants.js'
+import { LANGUAGE } from './constants'
 
 /**
  * Environment Variables

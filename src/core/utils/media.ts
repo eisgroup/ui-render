@@ -1,4 +1,3 @@
-
 /**
  * MEDIA FUNCTIONS =============================================================
  * =============================================================================
@@ -13,11 +12,11 @@
  *        = sqrt(50/200)*10
  *        = 5
  *
- * @param {Number} res - resolution limit to compute width for
- * @param {Number} width - original dimension
- * @param {Number} height - original dimension
- * @returns {Number} width - for given `res`
+ * @param res - resolution limit to compute width for
+ * @param width - original dimension
+ * @param height - original dimension
+ * @returns width - for given `res`
  */
-export function widthScaled (res, width, height) {
+export function widthScaled (res: number, width: number, height: number): number {
   return Math.round(Math.sqrt(res / width / height) * width)
 }

@@ -1,5 +1,5 @@
-import { Active } from './_envs.js'
-import { LANGUAGE } from './constants.js'
+import { Active } from './_envs'
+import { LANGUAGE } from './constants'
 
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key)
 

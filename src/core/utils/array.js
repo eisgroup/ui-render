@@ -12,8 +12,8 @@ import {
   unionBy,
   unionWith,
   uniqWith,
-} from './lodash-lite.js'
-import { toLowerCaseAny } from './string.js'
+} from './lodash-lite'
+import { toLowerCaseAny } from './string'
 
 /**
  * ARRAY FUNCTIONS =============================================================

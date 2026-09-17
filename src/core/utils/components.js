@@ -1,1 +1,1 @@
-export { default as cn } from './classNames.js'
+export { default as cn } from './classNames'

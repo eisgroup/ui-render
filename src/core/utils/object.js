@@ -11,8 +11,8 @@ import {
 	property,
 	setWith,
 	unset,
-} from './lodash-lite.js'
-import { isCollection } from './array.js'
+} from './lodash-lite'
+import { isCollection } from './array'
 
 /**
  * OBJECT FUNCTIONS ============================================================

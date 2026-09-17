@@ -1,4 +1,4 @@
-import { capitalize, get } from './lodash-lite.js'
+import { capitalize, get } from './lodash-lite'
 
 export const alphaNumPattern = /[^a-zA-Z0-9]/g
 export const alphaNumIdPattern = /[^a-zA-Z0-9_-]/g
