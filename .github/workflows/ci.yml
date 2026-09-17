@@ -39,6 +39,13 @@ jobs:
       - name: Lint styles
         run: npm run lint:css
 
+      # `tsc --noEmit` over src. Babel STRIPS TypeScript types without verifying them, so without this
+      # step a `.ts` file would build and ship with its types unchecked. Green from day one and kept
+      # green: unconverted `.js` resolves but is not checked (`checkJs: false`), so this gate only ever
+      # speaks about files someone deliberately converted. See tsconfig.json and §9.6-E0.
+      - name: Typecheck
+        run: npm run typecheck
+
       # docs/SUPPORTED-VIEWS.md is generated from the FIELD constants and the resolver source.
       # The suite checks the same thing (scripts/__tests__/view-reference.contract.test.js, so all
       # four legs cover it), but this step runs the CLI and names the failure for what it is.

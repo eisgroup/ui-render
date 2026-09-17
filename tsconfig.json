@@ -1,0 +1,53 @@
+{
+  // The TYPECHECK config (§9.6-E0). It emits nothing — `tsc --noEmit`, run as `npm run typecheck`.
+  //
+  // Why a checker at all when Babel already compiles TypeScript: Babel STRIPS types, file by file,
+  // and never verifies them. Without this file a `.ts` module would build and ship with its types
+  // unchecked, which is worse than having no types. Babel is the compiler; this is the check.
+  //
+  // The build has a SEPARATE config, `tsconfig.build.json`, which emits the published `.d.ts`. Do not
+  // merge them: that one targets CommonJS declaration output for consumers, this one checks source.
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "jsx": "react",
+
+    "noEmit": true,
+    "strict": true,
+
+    // Unconverted JavaScript RESOLVES but is NOT checked. This is what makes the migration
+    // incremental: a `.ts` file may import any of the ~340 `.js` files without the checker
+    // demanding they be converted first, while every converted file is strict from its first day.
+    "allowJs": true,
+    "checkJs": false,
+
+    // REQUIRED, not a preference. Babel compiles each file alone, with no cross-file knowledge, so
+    // constructs whose meaning depends on the whole program (re-exported types without `export type`,
+    // `const enum`) compile to something subtly wrong instead of failing. This makes tsc reject them,
+    // so the checker and the compiler agree about what the code means.
+    "isolatedModules": true,
+
+    // Matches the legacy `@babel/plugin-proposal-decorators` in babel.config.js. Retires with the
+    // decorator call sites themselves, under §9.2/§9.3.
+    "experimentalDecorators": true,
+
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+
+    // The published declaration SOURCE, not application code. It uses `export =` to give consumers a
+    // callable CommonJS default, which cannot be expressed under `"module": "ESNext"` — checking it
+    // here would report an error about a deliberate, working design. It is not left unchecked: it is
+    // compiled by `tsconfig.build.json` during `gen-ts` on every `build-lib`, and `test:types:consumer`
+    // asserts the emitted `.d.ts` against React 16/17/18 in both interop and direct-CommonJS modes.
+    "src/library/types"
+  ]
+}

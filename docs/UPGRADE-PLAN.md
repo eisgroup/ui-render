@@ -527,12 +527,16 @@ All decomposition outputs are authored in TypeScript from the start (`engine/*.t
 
 **Audited starting point:** 2 TS files (hand-written public types in `src/library/types/`, compiled declaration-only via `tsconfig.build.json`) vs 257 JS/JSX files. Webpack rules (all three configs) and the nodemon watcher already accept `.ts/.tsx`, and `typescript` 5.x + a TS-aware ESLint config are installed — **but `babel.config.js` has no `@babel/preset-typescript`**, so a `.ts` file imported into the bundle today would not compile, and there is no root `tsconfig.json`. Migration is file-by-file rename with strict checking of converted files only — no big-bang.
 
-#### E0 — Infrastructure (small, zero behavior change; land after Phase 2)
+#### E0 — Infrastructure (small, zero behavior change; land after Phase 2) — ✅ **SHIPPED 2026-09-17**
 
-1. Add `@babel/preset-typescript` to `babel.config.js` — webpack (lib/demo/watch) and Jest all consume this one config, so a single change covers all four pipelines.
+1. ~~Add `@babel/preset-typescript` to `babel.config.js`~~ **DONE.** Listed LAST in `presets`, because presets apply in reverse and types must be stripped before `preset-env`/`preset-react` parse the file. Pinned to the **Babel 7 line**: `@babel/preset-typescript@8` peer-requires `@babel/core@^8` and this project is on core 7, so installing the current default needs `--legacy-peer-deps` — papering over a real mismatch rather than resolving it. The claim that one config covers "all four pipelines" needs a correction: there are **three** distinct consumers now, not four — the library build, the demo build and Jest. `watch-lib` stopped being a fourth when `webpack.watch.config.mjs` was deleted (§9.9-H7) and watch began running the library config itself.
 2. Add root `tsconfig.json`: `strict: true`, `noEmit: true`, `allowJs: true` + `checkJs: false` (unconverted JS resolves but is not checked; every converted file must be strict-clean), **`isolatedModules: true`** (required — Babel strips types file-by-file; bans `const enum` and cross-file type tricks), `experimentalDecorators: true` (matches the legacy-decorator files until §9.2/§9.3 retire them), `jsx: react` (flips to `react-jsx` together with the Phase-4 automatic-runtime switch).
-3. CI gate: `npx tsc --noEmit` green from day one.
-4. **Probe check before any real conversion:** one trivial `.ts` module imported by the library entry + one `.test.ts` — verify all four pipelines pass (lib build, demo build, watch build, Jest).
+3. ~~CI gate: `npx tsc --noEmit` green from day one.~~ **DONE** — `npm run typecheck`, a `Typecheck` step in the `verify` job, placed with the linters so it fails early. Measured: **1.6 s** over a program of 375 source files (329 `.js`, 11 `.jsx`, 35 `.json`). Verified non-vacuous rather than assumed: a deliberately mistyped file makes it exit non-zero, and it returns to green when removed.
+
+   **Also done, and not in the original item:** `lint:js` now runs `--ext .js,.jsx,.ts,.tsx`. The ESLint config already listed `src/**/*.ts`/`*.tsx` in its overrides and `eslint-config-react-app` already ships the `@typescript-eslint` parser — only the CLI flag excluded them, so every `.ts` file would have slipped past the zero-warning gate. It also means `src/library/types/index.ts` and `UIRender.tsx` are linted for the first time (0 problems).
+4. ~~**Probe check before any real conversion:**~~ **DONE, and then made permanent.** The throwaway probe ran first, wired into `src/library/index.js`: typecheck, Jest, `build-lib`, `build` (demo) all passed, and the probe's own output string was found in `dist/index.js`, proving TypeScript really compiles into the published bundle rather than being skipped. **It caught one real gap** — `.test.ts` files had no Jest globals typed and failed the typecheck, so `@types/jest` was added, matched to the installed Jest major (types 30 ↔ Jest 30.3.0; npm's default `^29` would have been a major behind).
+
+   The probe was then REPLACED by a permanent guard instead of being deleted: `src/toolchain/typescriptSupport.ts` + its test. Reason: with the probe gone there is no `.ts` under `include`, so the gate would be green over ZERO TypeScript — indistinguishable from green over working TypeScript until someone tries to convert something. The guard is read by both pipelines (tsc proves the checker sees `.ts`; Jest proves Babel strips it), and it was verified to FAIL when `@babel/preset-typescript` is removed. It sits outside `src/core`/`src/library`, so it is outside `collectCoverageFrom` and nothing imports it — confirmed absent from `dist/index.js`. **Delete it once real converted modules cover the same ground (E1 onwards).**
 
 #### E1 — Utils and contract first (highest leverage)
 
@@ -577,7 +581,7 @@ E0/E1 plus the contract types are committed scope. Before green-lighting the lon
 
 | Check | When |
 |---|---|
-| Probe `.ts` + `.test.ts` pass all four pipelines (lib/demo/watch builds + Jest) | E0, before any real conversion |
+| ~~Probe `.ts` + `.test.ts` pass all four pipelines (lib/demo/watch builds + Jest)~~ ✅ **met 2026-09-17** — three pipelines, not four (watch runs the library config since §9.9-H7); kept as a permanent guard, see E0 item 4 | E0, before any real conversion |
 | `tsc --noEmit` in CI, green, coverage grows with every conversion | continuous |
 | `isolatedModules` discipline (`export type` in barrels, no `const enum`) | continuous |
 | Decorator semantics unchanged for the legacy-decorator files (Babel `legacy` ↔ TS `experimentalDecorators`) | E0/E2 |
@@ -1320,8 +1324,9 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 
 ### TS migration (§9.6)
 
-- ☐ E0 probe: one `.ts` module + one `.test.ts` pass all four pipelines (lib/demo/watch builds + Jest)
-- ☐ `tsc --noEmit` gate in CI from E0 onward
+- ☑ E0 probe: one `.ts` module + one `.test.ts` pass every pipeline — typecheck, Jest, `build-lib`, demo `build` (THREE builds, not four: watch runs the library config since §9.9-H7). Promoted to the permanent `src/toolchain/` guard
+- ☑ `tsc --noEmit` gate in CI from E0 onward — `npm run typecheck`, `Typecheck` step in `verify`, 1.6 s over 375 files, proven to fail on a real type error
+- ☑ `.ts`/`.tsx` reach `lint:js` (`--ext` extended; the config's overrides already covered them)
 - ☐ E4: golden `dist/index.d.ts` diff reviewed — only intended changes
 - ☐ E5: semantic `type` proxy recreated as TS aliases (same vocabulary) before the engine converts
 - ☐ E5: `rg "prop-types" src` returns nothing → `prop-types` removed from `dependencies`, bundle-size delta recorded
