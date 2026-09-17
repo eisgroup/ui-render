@@ -538,9 +538,54 @@ All decomposition outputs are authored in TypeScript from the start (`engine/*.t
 
    The probe was then REPLACED by a permanent guard instead of being deleted: `src/toolchain/typescriptSupport.ts` + its test. Reason: with the probe gone there is no `.ts` under `include`, so the gate would be green over ZERO TypeScript — indistinguishable from green over working TypeScript until someone tries to convert something. The guard is read by both pipelines (tsc proves the checker sees `.ts`; Jest proves Babel strips it), and it was verified to FAIL when `@babel/preset-typescript` is removed. It sits outside `src/core`/`src/library`, so it is outside `collectCoverageFrom` and nothing imports it — confirmed absent from `dist/index.js`. **Delete it once real converted modules cover the same ground (E1 onwards).**
 
-#### E1 — Utils and contract first (highest leverage)
+#### E1 — Utils and contract first (highest leverage) — 🔶 **FIRST HALF SHIPPED 2026-09-17**
 
-- `src/core/utils` (~36 files, pure, React-free) — mechanical conversion, immediately types everything downstream.
+- ~~`src/core/utils` (~36 files, pure, React-free) — mechanical conversion~~ ✅ **DONE 2026-09-17. 20 files, not ~36** — the count predates H1 and the earlier deletions; it was 20 files / 4142 lines with 26 test files over them. All 20 are now `.ts`, strict, with the suite and the coverage thresholds unchanged.
+
+  **MEASURED, which is what the go/no-go below needs and never had:**
+
+  | wave | files | lines | agent-minutes | `any` |
+  |---|---|---|---|---|
+  | 1 — leaves | 8 | 1072 → 1160 | 127 | 20 |
+  | 2 — `_envs`, `components`, `string` | 3 | 719 → 806 | 53 | 0 |
+  | 3 — `array`, `definitions` | 2 | 650 → 745 | 57 | 2 |
+  | 4 — `function`, `number`, `object`, `translations` | 4 | 1407 → 1523 | 87 | 2 |
+  | 5 — `storage`, `utility` + barrel | 3 | 294 → 344 | 40 | 0 |
+  | **total** | **20** | **4142 → 4578 (+10.5%)** | **364** | **23** |
+
+  **Cost does not track size, it tracks how polymorphic the signature is.** `lodash-lite` (552 lines,
+  a lodash reimplementation) took 55 minutes and carries **17 of the 23 `any`** on its own. `string`
+  (663 lines — longer) took 35 minutes and needed none. Across the package there are 23 `any` against
+  **199 `unknown`**, so the conversion narrowed honestly rather than reaching for the escape hatch.
+  "mechanical conversion" was right for about 17 of the 20 files and wrong for the polymorphic ones.
+
+  **Three infrastructure holes, none of them predicted here, all of the same shape — a gate keyed on
+  file extension stops watching whatever the migration moves, and says nothing:**
+
+  1. 38 intra-`utils` imports carried an explicit `.js` extension, which Jest and webpack resolve
+     literally, so every rename broke resolution. `tsc` cannot warn: `checkJs` is off. It fails at
+     test and build time instead. A second round found the same thing in `jest.doMock`/`require`
+     forms and inside `__tests__`, which the first sweep's `from '…'` pattern had missed.
+  2. `lint:js` was extended to `.ts` in E0 — and immediately caught that
+     `eslint-config-react-app` turns `no-use-before-define` OFF for `.js` but ON for `.ts`, so a
+     pre-existing pattern started failing the zero-warning gate purely because of an extension.
+  3. `collectCoverageFrom` listed `{js,jsx}`, so converted files dropped out of coverage entirely.
+     Because `utils` is among the best-covered code here, losing it pushed the GLOBAL numbers DOWN
+     and the thresholds red — while plain `jest` stayed green. Three per-file thresholds also still
+     named `./src/core/utils/*.js`, which jest reports as "coverage data not found", not as an error.
+
+  **Behaviour was held still, deliberately, and the record of where that cost something is in the
+  commits:** `definitions.localise` gained an unused optional parameter so an existing recursive call
+  would typecheck without editing that line; `utility` uses a non-null assertion on
+  `Active.passwordCheck` because it being undefined and throwing IS the backend behaviour;
+  `function.debounce` keeps `arguments` rather than rest parameters, at the cost of two inert
+  `as unknown as` casts, so the emitted JavaScript stays byte-identical.
+
+  **One real contract question surfaced and is left for whoever converts the caller:**
+  `src/core/components/renders.js:139` calls `round(value, decimals)` where `value` can be a numeric
+  string from `data.json`, while the six rounding helpers are typed `number` per their JSDoc. Nothing
+  breaks today because `renders.js` is unchecked JavaScript. Widening the helpers or casting at the
+  call site is a decision about what the contract is.
 - **Contract types for meta/data**, authored together with the JSON Schema (§9.4). Pick one source of truth (types→schema or schema→types) and add a round-trip check so they cannot diverge.
 
 #### E2 — Components and modules (rides other workstreams)
@@ -571,7 +616,22 @@ All decomposition outputs are authored in TypeScript from the start (`engine/*.t
 
 #### Governance — go/no-go after E1
 
-E0/E1 plus the contract types are committed scope. Before green-lighting the long E2/E3 tail (~250 files riding two large workstreams), hold an explicit go/no-go on measured E1 conversion velocity. Until E4 lands, hedge the hand-written `dist/index.d.ts` cheaply with type-level tests (`tsd`/`expectTypeOf`) asserting the public types against the example metas.
+E0/E1 plus the contract types are committed scope. Before green-lighting the long E2/E3 tail (~250 files riding two large workstreams), hold an explicit go/no-go on measured E1 conversion velocity.
+
+**The measurement now exists (2026-09-17), so the gate can actually be held.** From the E1 table
+above: **364 agent-minutes for 4142 lines**, ≈11 lines/minute, over 20 files. Extrapolating to the
+~155 `.js`/`.jsx` files still in `src` is NOT a straight multiplication, and the E1 data is the
+reason to say so rather than a caveat added for safety:
+
+  - `utils` is **pure and React-free**. E2's components carry JSX, hooks, prop types and the DOM
+    boundary, none of which this measurement covers.
+  - Cost concentrated in polymorphic signatures, and E2 has its own version of that problem in the
+    engine's open prop spreads.
+  - Three of E1's five blockers were INFRASTRUCTURE, not typing, and those are now paid for once —
+    the next waves should not re-pay them.
+
+So the honest reading is: the mechanical half is cheap and now has a number; the go/no-go should
+still turn on a **pilot of two or three real components**, not on extrapolating utils. Until E4 lands, hedge the hand-written `dist/index.d.ts` cheaply with type-level tests (`tsd`/`expectTypeOf`) asserting the public types against the example metas.
 
 #### Definition of done
 
@@ -1330,7 +1390,7 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 - ☐ E4: golden `dist/index.d.ts` diff reviewed — only intended changes
 - ☐ E5: semantic `type` proxy recreated as TS aliases (same vocabulary) before the engine converts
 - ☐ E5: `rg "prop-types" src` returns nothing → `prop-types` removed from `dependencies`, bundle-size delta recorded
-- ☐ Go/no-go on the E2/E3 tail held after E1 (measured conversion velocity); hand-written d.ts hedged with type-level tests until E4
+- ☐ Go/no-go on the E2/E3 tail held after E1 — **the velocity measurement now exists** (§9.6-E1: 20 files, 4142 lines, 364 agent-minutes, 23 `any` against 199 `unknown`); the DECISION is still outstanding, and §9.6's governance note argues it should turn on a 2–3 component pilot rather than on extrapolating pure utils; hand-written d.ts hedged with type-level tests until E4
 
 ### Phase 6 — engine decomposition (§9.3)
 
