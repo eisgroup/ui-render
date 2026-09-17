@@ -21,12 +21,42 @@ import { toLowerCaseAny } from './string'
  */
 
 /**
+ * @Note on the types (§9.6-E1): these helpers are deliberately polymorphic, exactly like the
+ * lodash-lite subset they build on. The types stay LOOSE on purpose — `unknown` for values that are
+ * only inspected, element generics where the runtime passes a value through, and no tightening of
+ * what any function accepts at runtime.
+ */
+
+/** Anything walked with a computed string key once the value is known to be object-like. */
+type Obj = Record<string, unknown>
+
+/**
+ * Anything `isEqualList` compares: it reads `.length` and enumerable index keys off both arguments,
+ * which is what an array, an array-like or a string gives it at runtime.
+ */
+type MaybeIndexed = { length?: unknown, [key: string]: unknown }
+
+/**
+ * A user supplied compare function, as taken by {@link by}.
+ * @Note: the parameters are `any` on purpose — `unknown` there would reject every caller that
+ *    annotates its own comparator, e.g. `by((a: Row, b: Row) => …)`.
+ */
+type CompareFn = (a: any, b: any) => number
+
+/**
+ * The shorthands {@link isInCollection} forwards to lodash-lite's `some()`: a predicate function or
+ * a source object to match (both are `object`), a property path, or any other primitive — the same
+ * surface `some()` accepts at runtime.
+ */
+type CollectionMatch = object | PropertyKey | boolean | bigint | null | undefined
+
+/**
  * Check if the data passed is an array and has values.
  *
  * @param {*} data - The variable to check
  * @return {boolean}
  */
-export function hasListValue (data) {
+export function hasListValue (data: unknown): boolean {
   return (isList(data) && data.length > 0)
 }
 
@@ -36,8 +66,8 @@ export function hasListValue (data) {
  * @param {*} data - The variable to check
  * @return {boolean}
  */
-export function isCollection (data) {
-  return (!!data && (data.constructor === Array || isPlainObject(data)))
+export function isCollection (data: unknown): boolean {
+  return (!!data && ((data as { constructor?: unknown }).constructor === Array || isPlainObject(data)))
 }
 
 /**
@@ -47,12 +77,12 @@ export function isCollection (data) {
  * @param {Array|*} b
  * @returns {Boolean} true - if all elements of `a` are equal to all elements of `b` using exact equality match
  */
-export function isEqualList (a, b) {
+export function isEqualList (a: unknown, b: unknown): boolean {
   if (a === b) return true
-  if (a && b && a.length !== b.length) return false
+  if (a && b && (a as MaybeIndexed).length !== (b as MaybeIndexed).length) return false
   if (!a || !b) return false
-  for (const i in a) {
-    if (a[i] !== b[i]) return false
+  for (const i in (a as MaybeIndexed)) {
+    if ((a as MaybeIndexed)[i] !== (b as MaybeIndexed)[i]) return false
   }
   return true
 }
@@ -63,8 +93,8 @@ export function isEqualList (a, b) {
  * @param {*} data - The variable to check
  * @return {boolean}
  */
-export function isList (data) {
-  return (!!data && data.constructor === Array)
+export function isList (data: unknown): data is unknown[] {
+  return (!!data && (data as { constructor?: unknown }).constructor === Array)
 }
 
 /**
@@ -74,7 +104,7 @@ export function isList (data) {
  * @param {*} value - needle
  * @return {boolean}
  */
-export function isInList (array, value) {
+export function isInList (array: readonly unknown[], value: unknown): boolean {
   return array.indexOf(value) >= 0
 }
 
@@ -84,7 +114,7 @@ export function isInList (array, value) {
  * @param {Array} array - the array to search for the values
  * @param {*} args - the values to search for
  */
-export function isInListAny (array, ...args) {
+export function isInListAny (array: readonly unknown[], ...args: unknown[]): boolean {
   for (const value of args) {
     if (array.indexOf(value) >= 0) {
       return true
@@ -100,7 +130,7 @@ export function isInListAny (array, ...args) {
  * @see {@link https://lodash.com/docs/4.17.2#some} for further information.
  * @return {Boolean} true - if element found in given collection with shallow include match
  */
-export function isInCollection (collection, element) {
+export function isInCollection (collection: unknown, element: CollectionMatch): boolean {
   return some(collection, element)
 }
 
@@ -111,9 +141,10 @@ export function isInCollection (collection, element) {
  * @param {*} [clean] - if truthy, remove falsey values: false, null, 0, "", undefined, and NaN
  * @return {Array}
  */
-export function toList (value, clean) { // eslint-disable-line no-shadow
+export function toList<T> (value: T | T[], clean?: unknown): T[]
+export function toList (value: unknown, clean?: unknown): unknown[] { // eslint-disable-line no-shadow
   if (!isList(value)) value = [value]
-  return clean ? value.filter(v => v) : value
+  return clean ? (value as unknown[]).filter(v => v) : (value as unknown[])
 }
 
 /**
@@ -128,10 +159,11 @@ export function toList (value, clean) { // eslint-disable-line no-shadow
  * @param {Number} [fallback] - default value to use when not a number encountered
  * @returns {Number} total - of all element values
  */
-export function toListValuesTotal (array = [], key = 'value', fallback = 0) {
+export function toListValuesTotal (array: ReadonlyArray<Obj> = [], key: string = 'value', fallback: number = 0): number {
   let sum = 0
   for (const obj of array) {
-    sum += obj[key] || fallback
+    // the cast mirrors the runtime: non-numeric and missing values fall back to `fallback`
+    sum += (obj[key] as number) || fallback
   }
   return sum
 }
@@ -147,7 +179,8 @@ export function toListValuesTotal (array = [], key = 'value', fallback = 0) {
  * @param {Array} array - the array to enforce unique values for
  * @return {Array}
  */
-export function toUniqueList (array) {
+export function toUniqueList<T> (array: T | T[]): T[]
+export function toUniqueList (array: unknown) {
   return uniqWith(toList(array), isEqual)
 }
 
@@ -157,7 +190,7 @@ export function toUniqueList (array) {
  * @param {Array} array - the array to enforce unique primitive values for
  * @return {Array} - new array
  */
-export function toUniqueListFast (array) {
+export function toUniqueListFast<T> (array: readonly T[]): T[] {
   return array.filter((value, index, self) => self.indexOf(value) === index)
 }
 
@@ -167,7 +200,7 @@ export function toUniqueListFast (array) {
  * @param {Array<*>} array - the array to enforce unique values for (can be mix of value types)
  * @return {Array<*>} list - new array containing only unique values, case insensitive
  */
-export function toUniqueListCaseInsensitive (array) {
+export function toUniqueListCaseInsensitive<T> (array: readonly T[]): T[] {
   const listLower = array.map(toLowerCaseAny)
   return array.filter((v, i) => listLower.indexOf(toLowerCaseAny(v)) === i)
 }
@@ -182,8 +215,8 @@ export function toUniqueListCaseInsensitive (array) {
  * @param {string} key - objects's key that needs to be unique
  * @returns {Array} list - of unique objects
  */
-export function toUniqueListByKey (newList, oldList, key) {
-  return unionBy(newList, oldList, key)
+export function toUniqueListByKey<T> (newList: readonly T[], oldList: readonly T[], key: string): T[] {
+  return unionBy(newList, oldList, key) as T[]
 }
 
 /**
@@ -193,7 +226,7 @@ export function toUniqueListByKey (newList, oldList, key) {
  * @param {*} value - to prepend to `array`
  * @param {number} [limit] - optionally trim array to this length
  */
-export function prependToList (array, value, limit) {
+export function prependToList<T> (array: readonly T[], value: T, limit?: number): T[] {
   const result = [value, ...array]
   if (limit && result.length > limit) result.length = limit
   return result
@@ -205,7 +238,7 @@ export function prependToList (array, value, limit) {
  * @param {Array} arrays - lists to combine (if not array given, it will be ignored without error)
  * @returns {Array} - merged list with unique values
  */
-export function mergeLists (...arrays) {
+export function mergeLists<T> (...arrays: Array<readonly T[] | null | undefined>): T[] {
   return union(...arrays)
 }
 
@@ -216,13 +249,13 @@ export function mergeLists (...arrays) {
  * @param {String|Number|Array} valueToRemove - to remove
  * @return {Array} - new array with value removed
  */
-export function removeFromList (listToKeep, valueToRemove) {
+export function removeFromList<T> (listToKeep: readonly T[], valueToRemove: T | readonly T[]): T[] {
   // Value is Array
   if (isList(valueToRemove)) return difference(listToKeep, valueToRemove)
 
   // Value is of primitive type
   const result = [...listToKeep]
-  const index = listToKeep.indexOf(valueToRemove)
+  const index = listToKeep.indexOf(valueToRemove as T)
   if (index > -1) result.splice(index, 1)
   return result
 }
@@ -233,7 +266,9 @@ export function removeFromList (listToKeep, valueToRemove) {
  * @param {Array|*} array - The array to query
  * @returns {*} - The first element of the array
  */
-export function firstListValue (array) {
+export function firstListValue<T> (array: readonly T[]): T
+export function firstListValue<T> (array: T): T
+export function firstListValue (array: unknown) {
   return isList(array) ? array[0] : array
 }
 
@@ -243,7 +278,7 @@ export function firstListValue (array) {
  * @param {Array} array - The array to query
  * @return {*} - The last element of the given array
  */
-export function first (array) {
+export function first<T> (array: readonly T[]): T {
   return array[0]
 }
 
@@ -253,14 +288,14 @@ export function first (array) {
  * @param {Array} array - The array to query
  * @return {*} - The last element of the given array
  */
-export function last (array) {
+export function last<T> (array: readonly T[]): T {
   return array[array.length - 1]
 }
 
 /**
  * Get a random value from provided list
  */
-export function randomFromList (array) {
+export function randomFromList<T> (array: readonly T[]): T {
   return array[Math.floor(Math.random() * array.length)]
 }
 
@@ -272,7 +307,7 @@ export function randomFromList (array) {
  *
  * @returns {Object} object with element.id being keys, and elements of original array being values
  */
-export function listToMap (obj, data) {
+export function listToMap<T extends { id: PropertyKey }> (obj: Record<PropertyKey, T>, data: T): Record<PropertyKey, T> {
   obj[data.id] = data
   return obj
 }
@@ -287,10 +322,12 @@ export function listToMap (obj, data) {
  * @param {*} a - first value in the iteration
  * @param {*} b - second value in the iteration
  * @return {number} - whether values should be re-arranged
+ * @Note: the casts below stand for JS's own relational ordering, which applies to any pair of
+ *    values (numbers, strings, dates, mixed) and which the type system cannot express.
  */
-export function sortAscending (a, b) {
-  if (a < b) return -1
-  if (a > b) return 1
+export function sortAscending (a: unknown, b: unknown): number {
+  if ((a as number) < (b as number)) return -1
+  if ((a as number) > (b as number)) return 1
   return 0
 }
 
@@ -305,9 +342,9 @@ export function sortAscending (a, b) {
  * @param {*} b - second value in the iteration
  * @return {number} - whether values should be re-arranged
  */
-export function sortDescending (a, b) {
-  if (a < b) return 1
-  if (a > b) return -1
+export function sortDescending (a: unknown, b: unknown): number {
+  if ((a as number) < (b as number)) return 1
+  if ((a as number) > (b as number)) return -1
   return 0
 }
 
@@ -322,9 +359,9 @@ export function sortDescending (a, b) {
  * @param {String} [order] - enum ['asc', 'desc']
  * @return {Function} - to be used as argument for native Array.sort()
  */
-export function sort (key, order = 'asc') {
+export function sort (key?: string, order: string = 'asc'): (a: unknown, b: unknown) => number {
   const sortFunc = order === 'asc' ? sortAscending : sortDescending
-  return (a, b) => sortFunc(a[key], b[key])
+  return (a, b) => sortFunc((a as Obj)[key as string], (b as Obj)[key as string])
 }
 
 /**
@@ -338,25 +375,25 @@ export function sort (key, order = 'asc') {
  *
  * @param {String|Function} args - compare function, object Key, or Path (prepend string with '-' for descending)
  */
-export function by (...args) {
+export function by (...args: Array<string | CompareFn>): (a: unknown, b: unknown) => number {
   return (a, b) => {
     let result = 0
 
     // Loop through given sort arguments
     for (let key of args) {
       if (key.constructor === String) {
-        if (key.indexOf('-') === 0) {
-          key = key.substring(1)
+        if ((key as string).indexOf('-') === 0) {
+          key = (key as string).substring(1)
           if (key.indexOf('.') > 0) {
             result = sortDescending(get(a, key), get(b, key))
           } else {
-            result = sortDescending(a[key], b[key])
+            result = sortDescending((a as Obj)[key], (b as Obj)[key])
           }
         } else {
-          if (key.indexOf('.') > 0) {
+          if ((key as string).indexOf('.') > 0) {
             result = sortAscending(get(a, key), get(b, key))
           } else {
-            result = sortAscending(a[key], b[key])
+            result = sortAscending((a as Obj)[key as string], (b as Obj)[key as string])
           }
         }
 
@@ -364,7 +401,7 @@ export function by (...args) {
         // else keep looping to the next sort argument
         if (result) return result
       } else if (key.constructor === Function) {
-        result = key(a, b)
+        result = (key as CompareFn)(a, b)
 
         // exit function when has sorting to perform,
         // else keep looping to the next sort argument
@@ -382,7 +419,7 @@ export function by (...args) {
  * @param {Array} list - to shuffle values for
  * @return {Array} list - mutated with shuffled values
  */
-export function shuffle (list) {
+export function shuffle<T> (list: T[]): T[] {
   for (let i = list.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
     [list[i], list[j]] = [list[j], list[i]]
