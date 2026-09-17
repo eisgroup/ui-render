@@ -1,4 +1,4 @@
-import { formatDuration, formatTime, toHours } from '../time'
+import { formatDuration } from '../time'
 
 describe('formatDuration', () => {
     it('returns "0 seconds" for zero milliseconds', () => {
@@ -41,26 +41,5 @@ describe('formatDuration', () => {
 describe('formatDuration.shortEnglish', () => {
     it('is equivalent to formatDuration with shorten=true', () => {
         expect(formatDuration.shortEnglish(60000)).toBe('1 m')
-    })
-})
-
-describe('formatTime', () => {
-    it('formats a Date with the default format', () => {
-        // 2024-06-15 14:30:00 local
-        const t = new Date(2024, 5, 15, 14, 30, 0)
-        const out = formatTime(t)
-        expect(out).toMatch(/Sat, 15 Jun - \d{2}:\d{2} (a|p)m/)
-    })
-
-    it('honors a custom format', () => {
-        const t = new Date(2024, 5, 15)
-        expect(formatTime(t, 'YYYY-MM-DD')).toBe('2024-06-15')
-    })
-})
-
-describe('toHours', () => {
-    it('renders short hour-meridian form', () => {
-        const t = new Date(2024, 5, 15, 9, 30, 0)
-        expect(toHours(t)).toBe('9 am')
     })
 })

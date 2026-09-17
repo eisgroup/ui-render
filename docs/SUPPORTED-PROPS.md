@@ -95,8 +95,8 @@ CSS contract: `src/style/components/table.less` hangs EVERY cell's padding off `
 | Prop | Meaning |
 | --- | --- |
 | `className` | Appended last, after `table`. `TableView` builds it from the meta `styles`/`fill`/`vertical` attributes; consumer metas add `as-layout`, `no-header`, `highlight-N-last` and the sticky-column tokens through the same channel. |
-| `inverted` | Dark table. Emitted as the `inverted` class, which `table.less` and `expand.less` both select on. Reached only from `ErrorTable.js` — a §9.9-H1 orphan, so the prop is kept but its fate is that deletion's to decide, not this step's. |
-| `striped` | Zebra rows, emitted as the `striped` class. Same single call site as `inverted`, and also genuinely styled — which is why neither was dropped with the rest. |
+| `inverted` | Dark table. Emitted as the `inverted` class, which `table.less` and `expand.less` both select on. **KEPT — decided at §9.9-H1 (2026-09-17), which is where step 1 left the call.** Its one in-repo caller was `ErrorTable.js`, and H1 deleted it, so the "Attributes at the call sites" table above no longer lists this prop — that table reports what the CODEBASE passes, not what the component accepts. The prop itself is untouched: `Table.js` still destructures it and still emits the class, the CSS still selects on it, and a consumer meta can still set it. Dropping it because our own last caller went away would have been a breaking change bought for nothing. |
+| `striped` | Zebra rows, emitted as the `striped` class. Same story as `inverted` exactly: genuinely styled (`table.striped tr:nth-child(2n)`), which is why neither was dropped with the rest, and still accepted after H1 removed their shared call site. |
 
 **Consumed by every subcomponent (1).** All 6 share one implementation, so this list applies to each of them identically.
 
@@ -108,7 +108,7 @@ CSS contract: `src/style/components/table.less` hangs EVERY cell's padding off `
 
 **Passthrough.** `style`, `colSpan`, `scope`, `id`, `data-*` and every event handler still reach the element untouched — they always did, because Semantic did not handle them either, so they ride the rest spread exactly as before. There is no `forwardRef`: nothing in `src` passes a ref to a table element, so the parameter would have had no caller.
 
-**Dropped (4) — the semver record.** Props semantic-ui-react handled that this implementation deliberately does not. All of them remain REACHABLE from a consumer meta: the component is rendered with open spreads (`...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)`, `...props`, `...rest`), so an attribute nobody anticipated on a meta node still arrives here as a prop. That is why the component strips them explicitly and warns once per prop in development. Stripping matters because the value would otherwise reach a real element as an attribute — a string-valued one lands lowercase (`verticalAlign="top"` rendered `verticalalign="top"`) and a boolean draws React's "Received `true` for a non-boolean attribute" warning, both of them junk the DOM contract's tripwires exist to keep out. Warning matters because a meta still carrying one would otherwise never learn it stopped working, and React's own unknown-prop warning cannot be relied on: it is silent for a lowercase name.
+**Dropped (4) — the semver record.** Props semantic-ui-react handled that this implementation deliberately does not. All of them remain REACHABLE from a consumer meta: the component is rendered with open spreads (`...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)`, `...rest`), so an attribute nobody anticipated on a meta node still arrives here as a prop. That is why the component strips them explicitly and warns once per prop in development. Stripping matters because the value would otherwise reach a real element as an attribute — a string-valued one lands lowercase (`verticalAlign="top"` rendered `verticalalign="top"`) and a boolean draws React's "Received `true` for a non-boolean attribute" warning, both of them junk the DOM contract's tripwires exist to keep out. Warning matters because a meta still carrying one would otherwise never learn it stopped working, and React's own unknown-prop warning cannot be relied on: it is silent for a lowercase name.
 
 | Prop | Why it is gone |
 | --- | --- |
@@ -123,12 +123,12 @@ Those four were the *published* ones — they had curated entries on this page w
 
 | Component | Attributes at the call sites | Spreads | Rendered by |
 | --- | --- | --- | --- |
-| `Table` | `className`, `inverted`, `striped` | `...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)`, `...props` | `core/components/ErrorTable.js`, `core/pages/main/components/TableView.js` |
-| `Table.Header` | `className` | — | `core/components/ErrorTable.js`, `core/pages/main/components/TableView.js` |
-| `Table.HeaderCell` | `className`, `colSpan`, `key`, `style` | — | `core/components/ErrorTable.js`, `core/pages/main/components/TableView.js` |
-| `Table.Row` | `className`, `key` | — | `core/components/ErrorTable.js`, `core/pages/main/components/TableView.js` |
-| `Table.Cell` | `className`, `colSpan`, `key`, `scope`, `style` | `...rest` | `core/components/ErrorTable.js`, `core/pages/main/components/LocalDraftTableRow.js`, `core/pages/main/components/TableView.js`, `core/pages/main/mapper.js` |
-| `Table.Body` | — | — | `core/components/ErrorTable.js`, `core/pages/main/components/TableView.js` |
+| `Table` | `className` | `...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)` | `core/pages/main/components/TableView.js` |
+| `Table.Header` | `className` | — | `core/pages/main/components/TableView.js` |
+| `Table.HeaderCell` | `className`, `colSpan`, `key`, `style` | — | `core/pages/main/components/TableView.js` |
+| `Table.Row` | `className`, `key` | — | `core/pages/main/components/TableView.js` |
+| `Table.Cell` | `className`, `colSpan`, `key`, `style` | `...rest` | `core/pages/main/components/LocalDraftTableRow.js`, `core/pages/main/components/TableView.js`, `core/pages/main/mapper.js` |
+| `Table.Body` | — | — | `core/pages/main/components/TableView.js` |
 | `Table.Footer` | — | — | *nothing* |
 
 `mapper.js`'s spread onto `Table.Cell` is a meta node's whole rest bag and is still unfiltered at the call site — the filter is now inside the cell, which is why it is safe. All three unfiltered boundaries on this surface are now closed inside the component: the table cell at step 1, the tooltip at step 2 part 3, and the dropdown at step 3 part 2, which strips twice — once in the wrapper and once in `Listbox` at the element.
