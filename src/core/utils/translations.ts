@@ -1,10 +1,14 @@
 import { l } from './constants'
 import { localiseTranslation } from './definitions'
+import type { Translation } from './definitions'
 
 /**
  * LOCALISED TRANSLATIONS (i18n) ===============================================
  * =============================================================================
  */
+
+/** Every phrase reads back as a localised `string`; an unknown phrase reads back as 'Untranslated' */
+export type LocalisedStrings = Record<string, string>
 
 /**
  * Localised String Object (can be extended by adding new terms or languages)
@@ -22,13 +26,15 @@ import { localiseTranslation } from './definitions'
  *    >>> 'New Phrase'
  *    console.log(_.THANK_YOU)
  *    >>> 'Thank You!'
- * @returns {Object} localised string - that returns localised 'Untranslated' string if no translation found
+ * @returns localised string - that returns localised 'Untranslated' string if no translation found
  */
 export const _ = new Proxy(localiseTranslation.instance, {
   get (target, prop) {
-    return localiseTranslation.queriedById[prop] = (target[prop] || target.UNTRANSLATED)
+    // @Note: a symbol `prop`, or one with no translation, reads back as `undefined` and falls back
+    const slots = target as Record<PropertyKey, string | Translation | undefined>
+    return localiseTranslation.queriedById[prop] = (slots[prop] || target.UNTRANSLATED)
   }
-})
+}) as LocalisedStrings
 localiseTranslation({
   // Default messaged for undefined strings
   UNTRANSLATED: {

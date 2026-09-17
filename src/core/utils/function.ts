@@ -9,17 +9,32 @@ import { TIME_DURATION_INSTANT } from './constants'
  */
 
 /**
+ * Any callable, used ONLY as the constraint of the `debounce`/`throttle` generics.
+ *
+ * `never[]` is what makes it accept every concrete function type a caller already has, without
+ * this module dictating what that function may take; `Parameters<F>`/`ReturnType<F>` then recover
+ * the caller's real signature for the wrapper it gets back.
+ */
+type AnyFn = (...args: never[]) => unknown
+
+/** The option bag `debounce` reads — only `leading`, exactly as at runtime. */
+type DebounceOptions = { leading?: boolean }
+
+/** The option bag `throttle` forwards verbatim to the lodash-lite implementation. */
+type ThrottleOptions = { leading?: boolean, trailing?: boolean }
+
+/**
  * Checks if passed argument is of type function.
  *
  * @param {*} func - the thing we are checking for being a function
  * @return {boolean}
  */
-export function isFunction (func) {
+export function isFunction (func: unknown): func is Function {
 	// When 'GeneratorFunction' is defined globally, use it instead of isFunction.Generator
 	return !!func && (
-		func.constructor === Function ||
-		func.constructor === isFunction.Async ||
-		func.constructor === isFunction.Generator
+		(func as { constructor?: unknown }).constructor === Function ||
+		(func as { constructor?: unknown }).constructor === isFunction.Async ||
+		(func as { constructor?: unknown }).constructor === isFunction.Generator
 	)
 }
 
@@ -32,8 +47,8 @@ isFunction.Async = (async () => {}).constructor
  * @param {Function} func - to check
  * @returns {Boolean} true - if it is
  */
-export function isAsync (func) {
-	return func.constructor.name === 'AsyncFunction'
+export function isAsync (func: unknown): boolean {
+	return (func as { constructor: { name: string } }).constructor.name === 'AsyncFunction'
 }
 
 /**
@@ -43,7 +58,7 @@ export function isAsync (func) {
  * @param {*} value - variable to check against enum
  * @param {Function} [self] - optional, the caller function's ${this} context
  */
-export function enumCheck (enums, value, self) {
+export function enumCheck (enums: readonly unknown[], value: unknown, self?: unknown): void {
 	if (!__DEV__) return
 
 	if (!isInListAny(enums, value)) {
@@ -60,16 +75,19 @@ export function enumCheck (enums, value, self) {
  * @param {Boolean} [leading] - whether to execute the Function immediately first
  * @returns {function(...[*]=)} - debounced
  */
-export function debounce (func, wait = TIME_DURATION_INSTANT, { leading } = {}) {
-	let timeout
+export function debounce<F extends AnyFn> (
+	func: F, wait: number = TIME_DURATION_INSTANT, { leading }: DebounceOptions = {},
+): (this: unknown, ...args: Parameters<F>) => void {
+	let timeout: ReturnType<typeof setTimeout> | null | undefined
 	let trailingCall = false
-	return function() {
+	return function(this: unknown) {
 		const self = this
 		const args = arguments
 
 		function later () {
 			timeout = null
-			if (!leading || trailingCall) func.apply(self, args)
+			if (!leading || trailingCall) (func as unknown as (this: unknown, ...a: unknown[]) => unknown)
+				.apply(self, args as unknown as unknown[])
 			trailingCall = false
 		}
 
@@ -79,7 +97,8 @@ export function debounce (func, wait = TIME_DURATION_INSTANT, { leading } = {}) 
 			if (leading) trailingCall = true
 		}
 		timeout = setTimeout(later, wait)
-		if (callNow) func.apply(self, args)
+		if (callNow) (func as unknown as (this: unknown, ...a: unknown[]) => unknown)
+			.apply(self, args as unknown as unknown[])
 	}
 }
 
@@ -96,6 +115,8 @@ export function debounce (func, wait = TIME_DURATION_INSTANT, { leading } = {}) 
  * @param {Object} [options]
  * @returns {function(...[*]=)} - throttled
  */
-export function throttle (func, wait = TIME_DURATION_INSTANT, options = {}) {
+export function throttle<F extends AnyFn> (
+	func: F, wait: number = TIME_DURATION_INSTANT, options: ThrottleOptions = {},
+): (this: unknown, ...args: Parameters<F>) => ReturnType<F> | undefined {
 	return _throttle(func, wait, options)
 }

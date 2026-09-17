@@ -20,12 +20,51 @@ import { isCollection } from './array'
  */
 
 /**
+ * @Note on the types (§9.6-E1): these helpers walk arbitrary shapes by computed key — meta/data
+ * JSON, GraphQL responses, React state — so the types stay LOOSE on purpose. Values that are only
+ * inspected are `unknown`, a container that is handed back unchanged keeps its caller's type through
+ * a pass-through generic, and nothing accepts less at compile time than it accepts at runtime.
+ * The casts below are all of the same kind: telling the checker that a value already guarded (or
+ * simply walked) at runtime may be indexed with a computed key. They narrow nothing the runtime
+ * does not already allow.
+ */
+
+/** Anything walked with a computed key once the value is treated as object-like. */
+type Dict = Record<PropertyKey, unknown>
+
+/** The comparison modes {@link hasObjKeys} understands: 'deep', 'shallow' or 'include'. Kept a
+ *  plain `string` because an unrecognised mode is not an error at runtime — it matches everything. */
+type MatchType = string
+
+/**
+ * `setWith`'s customizer, as forwarded by {@link set}: it returns the container to create for a
+ * missing path segment.
+ * @Note: the parameters are `any` on purpose — `unknown` there would reject every caller that
+ *    annotates its own customizer, e.g. `set(obj, path, value, (v: Row) => …)`.
+ */
+type SetWithCustomizer = (nsValue: any, key: PropertyKey, nsObject: any) => unknown
+
+/** Options accepted by {@link toFlatObj}, a subset of the `flat` package's API. */
+type FlattenOpts = {
+	delimiter?: string,
+	maxDepth?: number,
+	safe?: boolean,
+}
+
+/** Options accepted by {@link fromFlatObj}, a subset of the `flat` package's API. */
+type UnflattenOpts = {
+	delimiter?: string,
+	overwrite?: boolean,
+	object?: boolean,
+}
+
+/**
  * Check if value provided is an Object with at least one attribute
  *
  * @param {*} obj - value to check
  * @returns {boolean} - true if value is an Object with value
  */
-export function hasObjectValue (obj) {
+export function hasObjectValue (obj: unknown): obj is Dict {
 	return isObject(obj) && Object.keys(obj).length > 0
 }
 
@@ -38,7 +77,7 @@ export function hasObjectValue (obj) {
  * @param {*} newVal - to compare
  * @returns {Boolean} true - if JSON string of given values are the same
  */
-export function isEqualJSON (oldVal, newVal) {
+export function isEqualJSON (oldVal: unknown, newVal: unknown): boolean {
 	return JSON.stringify(oldVal) === JSON.stringify(newVal)
 }
 
@@ -51,7 +90,7 @@ export function isEqualJSON (oldVal, newVal) {
  * @param {*} value - any value to check
  * @return {boolean}
  */
-export function isObject (value) {
+export function isObject (value: unknown): value is Dict {
 	return isPlainObject(value)
 }
 
@@ -63,7 +102,7 @@ export function isObject (value) {
  * @param {Array|Object} objects - Objects to merge
  * @return {Object} - A new object
  */
-export function merge (...objects) {
+export function merge (...objects: unknown[]): Dict {
 	return _merge({}, ...objects)
 }
 
@@ -71,8 +110,8 @@ export function merge (...objects) {
  * Like merge(), but replaces arrays wholesale instead of merging them element-by-element.
  * Prevents deleted array items from being resurrected by the base object.
  */
-export function mergeReplaceArrays (...objects) {
-	return _mergeWith({}, ...objects, (objValue, srcValue) => {
+export function mergeReplaceArrays (...objects: unknown[]): Dict {
+	return _mergeWith({}, ...objects, (objValue: unknown, srcValue: unknown) => {
 		if (Array.isArray(srcValue)) return srcValue
 	})
 }
@@ -85,7 +124,7 @@ export function mergeReplaceArrays (...objects) {
  * @param {Object|Undefined|Null} changed - object to keep changes
  * @returns {Object|Undefined|Null} changedOnly - new object with only changed values kept, or undefined if no changes
  */
-export function objChanges (original, changed) {
+export function objChanges (original?: Dict | null, changed?: Dict | null): Dict | undefined {
 	// clone so we can delete keys while iterating
 	original = {...original}
 	changed = {...changed}
@@ -95,7 +134,7 @@ export function objChanges (original, changed) {
 		} else {
 			// Recursively check for nested field changes
 			if (hasObjectValue(original[field]) && hasObjectValue(changed[field]))
-				changed[field] = objChanges(original[field], changed[field])
+				changed[field] = objChanges(original[field] as Dict, changed[field] as Dict)
 		}
 		delete original[field]
 	}
@@ -121,7 +160,7 @@ export function objChanges (original, changed) {
  * @param {Function} [customizer] - An optional function that specifies how to fill in a missing path
  * @returns {Object}
  */
-export function set(object, path, value, customizer) {
+export function set<T>(object: T, path: unknown, value: unknown, customizer?: SetWithCustomizer): T {
 	return setWith(object, path, value, customizer)
 }
 
@@ -138,17 +177,21 @@ export function set(object, path, value, customizer) {
  * @param {Boolean} [deleteNull] - whether to remove `null` props instead of updating them
  * @return {Object|Array} - mutated/cloned Object with nested update
  */
-export function update (state, payload, shouldCloneDeep = false, deleteNull = false) {
+export function update<T> (state: T, payload?: unknown, shouldCloneDeep = false, deleteNull = false): T {
 	if (shouldCloneDeep) state = cloneDeep(state)
 
-	for (const key in payload) {
-		const value = payload[key]
+	// `state` and `payload` are walked by computed key; a nullish `payload` yields no iterations,
+	// exactly as before.
+	const target = state as Dict
+	const source = payload as Dict
+	for (const key in source) {
+		const value = source[key]
 		if (value === null && deleteNull) {
-			delete state[key]
+			delete target[key]
 		} else if (isObject(value)) {
-			state[key] = state[key] ? update(state[key], value) : value
+			target[key] = target[key] ? update(target[key], value) : value
 		} else {
-			state[key] = value
+			target[key] = value
 		}
 	}
 	return state
@@ -164,11 +207,13 @@ export function update (state, payload, shouldCloneDeep = false, deleteNull = fa
  * @param {*} obj - the collection to search for matching object
  * @param {*} searchObj - the matching object to find
  * @returns {boolean} - true if a match found.
+ * @Note: the bare `return` on a non-own property yields `undefined`, not `false` — hence the
+ *    `| undefined` in the return type. Callers only ever test it for truthiness.
  */
-export function hasObjMatch(obj, searchObj) {
-	for (const key in obj) {
+export function hasObjMatch(obj: unknown, searchObj: unknown): boolean | undefined {
+	for (const key in obj as Dict) {
 		if (!{}.hasOwnProperty.call(obj, key)) return
-		const value = obj[key]
+		const value = (obj as Dict)[key]
 
 		if (matches(searchObj)(value)) {
 			return true
@@ -202,7 +247,7 @@ export function hasObjMatch(obj, searchObj) {
  *  object-like values partially by value and everything else loosely; `include` recurses to find a match.
  * @returns {boolean} - true if a match found.
  */
-export function hasObjKeys(obj, keys = {}, match = 'deep') {
+export function hasObjKeys(obj: unknown, keys: Dict = {}, match: MatchType = 'deep'): boolean | undefined {
 	for (const key in keys) {
 		const value = keys[key]
 		const searchValue = get(obj, key)
@@ -275,10 +320,10 @@ export function hasObjKeys(obj, keys = {}, match = 'deep') {
  * @param {String} match - one of comparison types ['deep', 'shallow', 'include']
  * @returns {Object} - the matching object.
  */
-export function findObjByKeys(obj, keys = {}, match = 'deep') {
-	for (const key in obj) {
+export function findObjByKeys(obj: unknown, keys: Dict = {}, match: MatchType = 'deep'): object | undefined {
+	for (const key in obj as Dict) {
 		if (!{}.hasOwnProperty.call(obj, key)) return
-		const value = obj[key]
+		const value = (obj as Dict)[key]
 
 		if (!isObjectLike(value)) continue
 
@@ -297,8 +342,8 @@ export function findObjByKeys(obj, keys = {}, match = 'deep') {
  * @param match
  * @returns {Array}
  */
-export function findAllObjsByKeys(obj, keys = {}, match = 'deep') {
-	const result = []
+export function findAllObjsByKeys(obj: unknown, keys: Dict = {}, match: MatchType = 'deep'): object[] {
+	const result: object[] = []
 	_findAllObjsByKeys(result, obj, keys, match)
 	return result
 }
@@ -314,10 +359,10 @@ export function findAllObjsByKeys(obj, keys = {}, match = 'deep') {
  * @param {Object} keys - object with key paths and values to match, e.g. { 'properties.id': 7, type: 'DRAFT' }
  * @param {String} match - one of comparison types ['deep', 'shallow', 'include']
  */
-function _findAllObjsByKeys(result, obj, keys = {}, match = 'deep') {
-	for (const key in obj) {
+function _findAllObjsByKeys(result: object[], obj: unknown, keys: Dict = {}, match: MatchType = 'deep'): void {
+	for (const key in obj as Dict) {
 		if (!{}.hasOwnProperty.call(obj, key)) return
-		const value = obj[key]
+		const value = (obj as Dict)[key]
 
 		if (!isObjectLike(value)) continue
 
@@ -330,16 +375,16 @@ function _findAllObjsByKeys(result, obj, keys = {}, match = 'deep') {
 /**
  * Flatten/Unflatten nested object keys (dot-separated). Subset of the `flat` package API.
  */
-function flattenObject (target, opts) {
+function flattenObject (target: unknown, opts?: FlattenOpts): Dict {
 	opts = opts || {}
 	const delimiter = opts.delimiter || '.'
 	const maxDepth = opts.maxDepth
-	const output = {}
-	function step (object, prev, currentDepth) {
+	const output: Dict = {}
+	function step (object: Dict, prev?: string, currentDepth?: number) {
 		currentDepth = currentDepth || 1
 		Object.keys(object).forEach(function (key) {
 			const value = object[key]
-			const isarray = opts.safe && Array.isArray(value)
+			const isarray = opts!.safe && Array.isArray(value)
 			const type = Object.prototype.toString.call(value)
 			const isbuffer = typeof Buffer !== 'undefined' && Buffer.isBuffer && Buffer.isBuffer(value)
 			const isobject = (
@@ -349,36 +394,38 @@ function flattenObject (target, opts) {
 			const newKey = prev
 				? prev + delimiter + key
 				: key
-			if (!isarray && !isbuffer && isobject && Object.keys(value).length &&
-				(!opts.maxDepth || currentDepth < maxDepth)) {
-				return step(value, newKey, currentDepth + 1)
+			if (!isarray && !isbuffer && isobject && Object.keys(value as Dict).length &&
+				(!opts!.maxDepth || currentDepth! < maxDepth!)) {
+				return step(value as Dict, newKey, currentDepth! + 1)
 			}
 			output[newKey] = value
 		})
 	}
-	step(target)
+	step(target as Dict)
 	return output
 }
 
-function unflattenObject (target, opts) {
+function unflattenObject (target: unknown, opts?: UnflattenOpts): unknown {
 	opts = opts || {}
 	const delimiter = opts.delimiter || '.'
 	const overwrite = opts.overwrite || false
-	const result = {}
+	const result: Dict = {}
 	const isbuffer = typeof Buffer !== 'undefined' && Buffer.isBuffer && Buffer.isBuffer(target)
 	if (isbuffer || Object.prototype.toString.call(target) !== '[object Object]') {
 		return target
 	}
-	function getkey (key) {
+	// `key` is `undefined` once the path is exhausted; `Number(undefined)` is NaN, so the first
+	// clause short-circuits before `.indexOf` is reached — as it always has.
+	function getkey (key: string | undefined): string | number | undefined {
 		const parsedKey = Number(key)
 		return (
 			isNaN(parsedKey) ||
-			key.indexOf('.') !== -1 ||
-			opts.object
+			key!.indexOf('.') !== -1 ||
+			opts!.object
 		) ? key
 			: parsedKey
 	}
-	const sortedKeys = Object.keys(target).sort(function (keyA, keyB) {
+	const sortedKeys = Object.keys(target as Dict).sort(function (keyA, keyB) {
 		return keyA.length - keyB.length
 	})
 	sortedKeys.forEach(function (key) {
@@ -390,27 +437,27 @@ function unflattenObject (target, opts) {
 			if (key1 === '__proto__') {
 				return
 			}
-			const type = Object.prototype.toString.call(recipient[key1])
+			const type = Object.prototype.toString.call(recipient[key1!])
 			const isobject = (
 				type === '[object Object]' ||
 				type === '[object Array]'
 			)
-			if (!overwrite && !isobject && typeof recipient[key1] !== 'undefined') {
+			if (!overwrite && !isobject && typeof recipient[key1!] !== 'undefined') {
 				return
 			}
-			if ((overwrite && !isobject) || (!overwrite && recipient[key1] == null)) {
-				recipient[key1] = (
+			if ((overwrite && !isobject) || (!overwrite && recipient[key1!] == null)) {
+				recipient[key1!] = (
 					typeof key2 === 'number' &&
-					!opts.object ? [] : {}
+					!opts!.object ? [] : {}
 				)
 			}
-			recipient = recipient[key1]
+			recipient = recipient[key1!] as Dict
 			if (split.length > 0) {
 				key1 = getkey(split.shift())
 				key2 = getkey(split[0])
 			}
 		}
-		recipient[key1] = unflattenObject(target[key], opts)
+		recipient[key1!] = unflattenObject((target as Dict)[key], opts)
 	})
 	return result
 }
@@ -429,7 +476,7 @@ export const fromFlatObj = unflattenObject
  * @param {*} [fallback] - optional fallback value to return
  * @return {*}
  */
-export function pop(obj, keyPath, fallback) {
+export function pop(obj: unknown, keyPath: unknown, fallback?: unknown): unknown {
 	const missing = {}
 	const value = get(obj, keyPath, missing)
 	if (value === missing) return fallback
@@ -444,7 +491,7 @@ export function pop(obj, keyPath, fallback) {
  * @param {string} key - Object property to delete
  * @return {Object} - without the deleted key property
  */
-export function removeKey (obj, key) {
+export function removeKey (obj: Dict, key: string): Dict {
 	const {[key]: _, ...rest} = obj // eslint-disable-line
 	return rest
 }
@@ -456,8 +503,8 @@ export function removeKey (obj, key) {
  * @param {Boolean} [clone] - whether to return new object, defaults to mutating existing
  * @param {Boolean} [recursive] - whether to parse given obj recursively
  */
-export function removeKeys (obj, keys, {clone = false, recursive = false} = {}) {
-	const data = clone ? cloneDeep(obj) : obj
+export function removeKeys<T> (obj: T, keys: readonly string[], {clone = false, recursive = false}: {clone?: boolean, recursive?: boolean} = {}): T {
+	const data = (clone ? cloneDeep(obj) : obj) as Dict
 	for (const key in data) {
 		if (keys.indexOf(key) >= 0) {
 			delete data[key]
@@ -465,7 +512,7 @@ export function removeKeys (obj, keys, {clone = false, recursive = false} = {}) 
 			data[key] = removeKeys(data[key], keys, {recursive})
 		}
 	}
-	return data
+	return data as T
 }
 
 /**
@@ -476,16 +523,17 @@ export function removeKeys (obj, keys, {clone = false, recursive = false} = {}) 
  * @param {Boolean} [recursive] - whether to remove empty values recursively
  * @return {Object|Array} - without empty strings
  */
-export function removeEmptyValues (collection, {recursive = true} = {}) {
-	for (const key in collection) {
-		if (collection[key] === '') {
-			delete collection[key]
-		} else if (recursive && typeof (collection[key] || '') === 'object') {
-			collection[key] = removeEmptyValues(collection[key], { recursive })
+export function removeEmptyValues<T> (collection: T, {recursive = true}: {recursive?: boolean} = {}): T {
+	const data = collection as Dict
+	for (const key in data) {
+		if (data[key] === '') {
+			delete data[key]
+		} else if (recursive && typeof (data[key] || '') === 'object') {
+			data[key] = removeEmptyValues(data[key], { recursive })
 		}
 	}
 
-	return collection.constructor === Array ? collection.filter(v => v) : collection
+	return (data.constructor === Array ? (data as unknown as unknown[]).filter(v => v) : data) as T
 }
 
 /**
@@ -496,16 +544,17 @@ export function removeEmptyValues (collection, {recursive = true} = {}) {
  * @param {Boolean} [recursive] - whether to remove nil values recursively
  * @return {Object|Array} - without null or undefined keys
  */
-export function removeNilValues (collection, {recursive = true} = {}) {
-	for (const key in collection) {
-		if (collection[key] == null) {
-			delete collection[key]
-		} else if (recursive && typeof collection[key] === 'object') {
-			collection[key] = removeNilValues(collection[key], {recursive})
+export function removeNilValues<T> (collection: T, {recursive = true}: {recursive?: boolean} = {}): T {
+	const data = collection as Dict
+	for (const key in data) {
+		if (data[key] == null) {
+			delete data[key]
+		} else if (recursive && typeof data[key] === 'object') {
+			data[key] = removeNilValues(data[key], {recursive})
 		}
 	}
 
-	return collection.constructor === Array ? collection.filter(v => v) : collection
+	return (data.constructor === Array ? (data as unknown as unknown[]).filter(v => v) : data) as T
 }
 
 /**
@@ -515,19 +564,20 @@ export function removeNilValues (collection, {recursive = true} = {}) {
  * @param {Object|Array} collection - to remove deleted items from
  * @return {Object|Array} - without items with .delete keys
  */
-export function removeDeletedItems(collection) {
-	for (const key in collection) {
+export function removeDeletedItems<T>(collection: T): T {
+	const data = collection as Dict
+	for (const key in data) {
 		// Null is of type 'object' according to stupid JS specs
-		if (typeof (collection[key] || '') !== 'object') continue
+		if (typeof (data[key] || '') !== 'object') continue
 
-		if (collection[key].delete) {
-			delete collection[key]
+		if ((data[key] as Dict).delete) {
+			delete data[key]
 		} else {
-			collection[key] = removeDeletedItems(collection[key])
+			data[key] = removeDeletedItems(data[key])
 		}
 	}
 
-	return collection.constructor === Array ? collection.filter(v => v) : collection
+	return (data.constructor === Array ? (data as unknown as unknown[]).filter(v => v) : data) as T
 }
 
 /**
@@ -540,8 +590,8 @@ export function removeDeletedItems(collection) {
  * @param {Boolean} [clone] - whether to clone the object before mutating
  * @return {Object|Array} - without graphql tags
  */
-export function sanitizeResponse (collection, {tags = ['__typename'], clone = false} = {}) {
-	const result = clone ? cloneDeep(collection) : collection
+export function sanitizeResponse<T> (collection: T, {tags = ['__typename'], clone = false}: {tags?: readonly string[], clone?: boolean} = {}): T {
+	const result = (clone ? cloneDeep(collection) : collection) as Dict
 
 	for (const key in result) {
 		if (tags.includes(key)) {
@@ -553,7 +603,7 @@ export function sanitizeResponse (collection, {tags = ['__typename'], clone = fa
 		}
 	}
 
-	return result.constructor === Array ? result.filter(v => v != null) : result
+	return (result.constructor === Array ? (result as unknown as unknown[]).filter(v => v != null) : result) as T
 }
 
 /**
@@ -563,8 +613,8 @@ export function sanitizeResponse (collection, {tags = ['__typename'], clone = fa
  * @param {String} order - enum, one of ['asc', 'desc']
  * @return {Object} - sorted by key attributes
  */
-export function sortObjKeys(obj, order = 'asc') {
-	const result = {}
+export function sortObjKeys(obj: Dict, order: string = 'asc'): Dict {
+	const result: Dict = {}
 	Object.keys(obj)
 		.sort(order === 'desc' ? sortObjKeys.descending : undefined)
 		.forEach(key => {
@@ -573,7 +623,7 @@ export function sortObjKeys(obj, order = 'asc') {
 	return result
 }
 
-sortObjKeys.descending = (a, b) => {
+sortObjKeys.descending = (a: string, b: string): number => {
 	if (a < b) return 1
 	if (a > b) return -1
 	return 0
@@ -589,10 +639,11 @@ sortObjKeys.descending = (a, b) => {
  * @param {Object} obj - to swap keys with values
  * @returns {Object} - with key and values swapped
  */
-export function swapKeyWithValue(obj) {
-	const result = {}
+export function swapKeyWithValue(obj: Dict): Dict {
+	const result: Dict = {}
 	for (const key in obj) {
-		result[obj[key]] = key
+		// the value becomes a key: at runtime JS coerces whatever it is to a property key
+		result[obj[key] as PropertyKey] = key
 	}
 	return result
 }
@@ -606,10 +657,10 @@ export function swapKeyWithValue(obj) {
  * @param {Object} obj - with nested values to calculate total for
  * @returns {number} total - value of object values
  */
-export function toObjValuesTotal(obj) {
+export function toObjValuesTotal(obj: Dict): number {
 	let sum = 0
 	for (const key in obj) {
-		sum += obj[key]
+		sum += obj[key] as number
 	}
 	return sum
 }
