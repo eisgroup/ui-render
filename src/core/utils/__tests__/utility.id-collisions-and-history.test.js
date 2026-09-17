@@ -1,6 +1,6 @@
 describe('Id collision and history contracts', () => {
     afterEach(() => {
-        jest.dontMock('../string.js')
+        jest.dontMock('../string')
         jest.resetModules()
     })
 
@@ -8,14 +8,14 @@ describe('Id collision and history contracts', () => {
         jest.resetModules()
         const randomString = jest.fn()
         values.forEach(value => randomString.mockReturnValueOnce(value))
-        jest.doMock('../string.js', () => ({
-            ...jest.requireActual('../string.js'),
+        jest.doMock('../string', () => ({
+            ...jest.requireActual('../string'),
             randomString,
         }))
 
         let utility
         jest.isolateModules(() => {
-            utility = require('../utility.js')
+            utility = require('../utility')
         })
 
         return { ...utility, randomString }
