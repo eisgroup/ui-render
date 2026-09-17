@@ -1,10 +1,40 @@
-import { hasListValue } from './array.js'
-import { isInString } from './string.js'
+import { hasListValue } from './array'
+import { isInString } from './string'
 
 /**
  * NUMBER FUNCTIONS ============================================================
  * =============================================================================
  */
+
+/**
+ * @Note on the types (§9.6-E1): these helpers are deliberately forgiving about their inputs —
+ * callers pass numeric strings, `null` and non-finite values, and every function guards at runtime
+ * instead of rejecting them. The types stay LOOSE on purpose: `unknown` where a value is only
+ * inspected behind a runtime guard, `number | string` where the runtime coerces, and no tightening
+ * of what any function accepts.
+ */
+
+/** One entry of the list {@link startEndFromNumberRanges} scans; both bounds are optional and nullable. */
+type NumberRange = { from?: number | null, to?: number | null }
+
+/** The boundaries {@link startEndFromNumberRanges} returns; either side is missing when unresolved. */
+type NumberRangeBounds = { start: number | undefined, end: number | undefined }
+
+/** Options of {@link formatNumber} — every one is optional, like the runtime defaults below. */
+type FormatNumberOptions = {
+	decimals?: number | null,
+	delimits?: number,
+	sectionDelimiter?: string,
+	decimalDelimiter?: string,
+	ordinal?: boolean,
+}
+
+/**
+ * Exponent (as a key) to unit suffix, as used by {@link formatSI}.
+ * @Note: a caller may pass a PARTIAL map (see the `{0: 'B', 3: 'KiB'}` usage in tests) — a missing
+ *    exponent resolves to `undefined` at runtime and is stringified into the result, unchanged.
+ */
+type SiSuffixes = Record<string, string>
 
 /**
  * Checks if value is classified as a Number primitive or object.
@@ -25,7 +55,7 @@ import { isInString } from './string.js'
  * @param {*} val - The value to check.
  * @returns {boolean} - Returns true if value is a number, else false.
  */
-export { isNumber } from './lodash-lite.js'
+export { isNumber } from './lodash-lite'
 
 /**
  * Returns true if the given variable is a number,
@@ -40,8 +70,9 @@ export { isNumber } from './lodash-lite.js'
  * @param {*} val
  * @returns {boolean}
  */
-export function isNumeric(val) {
-	return !isNaN(parseFloat(val)) && isFinite(val) // must use parseFloat, cannot use the faster Number()
+export function isNumeric(val: unknown): boolean {
+	// Note: the casts keep the JS coercion the two globals do on non-string/non-number input
+	return !isNaN(parseFloat(val as string)) && isFinite(val as number) // must use parseFloat, cannot use the faster Number()
 }
 
 /**
@@ -50,11 +81,13 @@ export function isNumeric(val) {
  * @param {Array<{from: Number, to: Number}>} arrayOfNumberRanges - to check for values
  * @returns {{start: Number|Undefined, end: Number|Undefined}}
  */
-export function startEndFromNumberRanges(arrayOfNumberRanges) {
+export function startEndFromNumberRanges(arrayOfNumberRanges?: readonly NumberRange[] | null): NumberRangeBounds {
 	if (!hasListValue(arrayOfNumberRanges)) return { start: undefined, end: undefined }
-	const start = (arrayOfNumberRanges.find(({ from }) => from != null) || {}).from
-	let end = ([...arrayOfNumberRanges].reverse().find(({ to }) => to != null) || {}).to
-	if (end <= start) end = undefined
+	const ranges = arrayOfNumberRanges as readonly NumberRange[]
+	const start = (ranges.find(({ from }) => from != null) || ({} as NumberRange)).from as number | undefined
+	let end = ([...ranges].reverse().find(({ to }) => to != null) || ({} as NumberRange)).to as number | undefined
+	// Note: the comparison is left as is — with either side missing it is `false` at runtime
+	if ((end as number) <= (start as number)) end = undefined
 	return { start, end }
 }
 
@@ -71,9 +104,9 @@ export function startEndFromNumberRanges(arrayOfNumberRanges) {
  * @return {string} - delimited number with specified decimals
  */
 export function formatNumber(
-	value,
-	{ decimals, delimits = 3, sectionDelimiter = ',', decimalDelimiter, ordinal } = {}
-) {
+	value: number | string,
+	{ decimals, delimits = 3, sectionDelimiter = ',', decimalDelimiter, ordinal }: FormatNumberOptions = {}
+): string | number {
 	if (!isNumeric(value)) return value
 	const number = Number(value)
 
@@ -108,8 +141,11 @@ export function formatNumber(
  * @param {Object} [suffixes] - list of suffixes to use for each exponent
  * @return {String} number - shorten to digits length with suffix if needed
  */
-export function shortNumber (value, digits = 3, divider = 1000, delimiter, suffixes) {
-	let number = Number(value)
+export function shortNumber (
+	value: number | string, digits = 3, divider = 1000, delimiter?: string, suffixes?: SiSuffixes
+): string {
+	// Note: `number` holds the numeric value first, then the formatted string — as it did in JS
+	let number: number | string = Number(value)
 	if (!Number.isFinite(number)) return String(number)
 	if (number === 0) return '0'
 
@@ -133,7 +169,9 @@ export function shortNumber (value, digits = 3, divider = 1000, delimiter, suffi
  * @param {Object} [suffixes] - list of suffixes to use for each exponent
  * @return {string} number - with unit suffix if needed
  */
-export function formatSI (number, precision = 3, divider = 1000, delimiter = '', suffixes = formatSI.PREFIXES) {
+export function formatSI (
+	number: number, precision = 3, divider = 1000, delimiter = '', suffixes: SiSuffixes = formatSI.PREFIXES
+): string {
 	if (!Number.isFinite(Number(number))) return String(number)
 	if (number === 0) return '0'
 
@@ -176,7 +214,7 @@ formatSI.PREFIXES = {
 	'-18': 'a',
 	'-21': 'z',
 	'-24': 'y',
-}
+} as SiSuffixes
 
 /**
  * Format Number to Ordinal Numeric String
@@ -184,14 +222,14 @@ formatSI.PREFIXES = {
  * @param {number|string} number - to format
  * @return {string} - ordered number (i.e. 1st, 2nd, 3rd, 4th...)
  */
-export function toOrdinal(number) {
-	return number + getOrdinalSuffix(number)
+export function toOrdinal(number: number | string): string {
+	return (number as string) + getOrdinalSuffix(number)
 }
 
 toOrdinal.list = ['th', 'st', 'nd', 'rd']
 
-function getOrdinalSuffix(number) {
-	const v = Math.abs(number) % 100
+function getOrdinalSuffix(number: number | string): string {
+	const v = Math.abs(number as number) % 100
 	return toOrdinal.list[(v - 20) % 10] || toOrdinal.list[v] || toOrdinal.list[0]
 }
 
@@ -201,7 +239,7 @@ function getOrdinalSuffix(number) {
  * @param {Number} degree - to ompute
  * @returns {Number} radian
  */
-export function rad(degree) {
+export function rad(degree: number): number {
 	return (degree * Math.PI) / 180
 }
 
@@ -216,7 +254,7 @@ export function rad(degree) {
  * @param {number} [precision] - decimal places to keep
  * @returns {number} - with rounded values
  */
-export function round(number, precision = 0) {
+export function round(number: number, precision = 0): number {
 	const factor = Math.pow(10, precision)
 	return Math.round(number * factor) / factor
 }
@@ -232,7 +270,7 @@ export function round(number, precision = 0) {
  * @param {number} [precision] - decimal places to keep
  * @returns {number} - with rounded values
  */
-export function roundUp(number, precision = 0) {
+export function roundUp(number: number, precision = 0): number {
 	const factor = Math.pow(10, precision)
 	return Math.ceil(number * factor) / factor
 }
@@ -248,7 +286,7 @@ export function roundUp(number, precision = 0) {
  * @param {number} [precision] - decimal places to keep
  * @returns {number} - with rounded values
  */
-export function roundDown (number, precision = 0) {
+export function roundDown (number: number, precision = 0): number {
 	const factor = Math.pow(10, precision)
 	return Math.floor(number * factor) / factor
 }
@@ -267,7 +305,7 @@ export function roundDown (number, precision = 0) {
  * @param {number} [multiple] - value, the multiple of which to round to
  * @returns {number} - rounded to given multiple of value
  */
-export function roundTo (number, multiple = 1) {
+export function roundTo (number: number, multiple = 1): number {
 	return +(Math.round(number / multiple) * multiple).toPrecision(15)
 }
 
@@ -285,7 +323,7 @@ export function roundTo (number, multiple = 1) {
  * @param {number} [multiple] - value, the multiple of which to round to
  * @returns {number} - rounded to given multiple of value
  */
-export function roundDownTo (number, multiple = 1) {
+export function roundDownTo (number: number, multiple = 1): number {
 	return +(Math.floor(+(number / multiple).toPrecision(15)) * multiple).toPrecision(15)
 }
 
@@ -301,7 +339,7 @@ export function roundDownTo (number, multiple = 1) {
  * @param {number} [multiple] - value, the multiple of which to round to
  * @returns {number} - rounded to given multiple of value
  */
-export function roundUpTo (number, multiple = 1) {
+export function roundUpTo (number: number, multiple = 1): number {
 	return +(Math.ceil(+(number / multiple).toPrecision(15)) * multiple).toPrecision(15)
 }
 
@@ -311,7 +349,7 @@ export function roundUpTo (number, multiple = 1) {
  * @param {number|string} value - number to get precision for
  * @return {number} precision - decimal places
  */
-export function decimalPlaces (value) {
+export function decimalPlaces (value: unknown): number {
 	const match = String(Number(value)).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/)
 	if (!match) return 0
 	return Math.max(
@@ -330,7 +368,7 @@ export function decimalPlaces (value) {
  * @param {Number|String} b - second number
  * @returns {Number} - the biggest divisible number between `a` and `b`
  */
-export function greatestCommonDivisor(a, b) {
+export function greatestCommonDivisor(a: number | string, b: number | string): number {
 	const first = Number(a)
 	const second = Number(b)
 	if (!Number.isFinite(first) || !Number.isFinite(second)) return Infinity
@@ -348,7 +386,7 @@ export function greatestCommonDivisor(a, b) {
  * @param {number} max - maximum number
  * @returns {number} - random value between min and max, inclusive
  */
-export function randomNumberInRange(min, max) {
+export function randomNumberInRange(min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
@@ -359,7 +397,7 @@ export function randomNumberInRange(min, max) {
  * @param {number} baseNumber - the number to calculate percentage from
  * @return {number|NaN} diff - percentage difference, or not a number
  */
-export function toPercentage(newNumber, baseNumber) {
+export function toPercentage(newNumber: unknown, baseNumber: unknown): number {
 	if (!isNumeric(newNumber) || !isNumeric(baseNumber)) return NaN
 	const newValue = Number(newNumber)
 	const baseValue = Number(baseNumber)
@@ -374,7 +412,7 @@ export function toPercentage(newNumber, baseNumber) {
  * @param {Number} [decimals] - number of digits to show after the dot
  * @returns {String} percentage - formatted string with set decimal places and '%', or empty string
  */
-export function toPercent (number, decimals = 0) {
+export function toPercent (number: unknown, decimals = 0): string {
 	if (!isNumeric(number)) return ''
 	return (Number(number) * 100).toFixed(decimals).toLocaleString() + '%'
 }

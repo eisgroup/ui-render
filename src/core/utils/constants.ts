@@ -158,7 +158,7 @@ export const KEY = {
   X: 88,
   Y: 89,
   Z: 90,
-}
+} as const
 
 /* Distance */
 export const ONE_MM = 1
@@ -263,16 +263,19 @@ export const LANGUAGE = {
 	YIDDISH:    {_: 'yi', lang: 'ייִדיש',         'en': 'Yiddish'},
 	ARABIC:     {_: 'ar', lang: 'العَرَبِيَّة‎',    'en': 'Arabic'},
 	AFRIKAANS:  {_: 'af', lang: 'Afrikaans',     'en': 'Afrikaans'},
-}
+} as const
 
 /**
  * Object mapping of language to their code
+ * @note: every value is replaced with its `_` code by the loop below; the spread of `LANGUAGE`
+ *    exists only so IDEs suggest the keys, and is never observable with its object values.
  */
+type LanguageCode = {[K in keyof typeof LANGUAGE]: (typeof LANGUAGE)[K]['_']}
 export const l = {
 	...LANGUAGE // enable IDE suggestion
-}
+} as unknown as LanguageCode
 for (const key in LANGUAGE) {
-	l[key] = LANGUAGE[key]._
+	(l as unknown as Record<string, string>)[key] = LANGUAGE[key as keyof typeof LANGUAGE]._
 }
 
 /**
@@ -303,11 +306,11 @@ export const LANGUAGE_LEVEL = {
 		_: 5,
 		[l.ENGLISH]: 'Native',
 	},
-}
+} as const
 
 /* Mappings */
 export const SORT_ORDER = {
 	0: 'sort',
 	1: 'asc',
 	[-1]: 'desc',
-}
+} as const

@@ -1,14 +1,29 @@
-import { Active } from './_envs.js'
-import { isList } from './array.js'
-import { fromJSON, toJSON } from './codec.js'
-import { ADD, DELETE, GET, SET } from './constants.js'
-import { enumCheck } from './function.js'
-import { update } from './object.js'
+import { Active } from './_envs'
+import { isList } from './array'
+import { fromJSON, toJSON } from './codec'
+import { ADD, DELETE, GET, SET } from './constants'
+import { enumCheck } from './function'
+import { update } from './object'
 
 /**
  * STORAGE FUNCTIONS ===========================================================
  * =============================================================================
  */
+
+/** Every action `performStorage` understands */
+export type StorageAction = typeof GET | typeof SET | typeof DELETE | typeof ADD
+
+/** Actions dispatched straight to a storage backend (`ADD` is an abstraction over `GET` + `SET`) */
+export type StorageActionDirect = typeof GET | typeof SET | typeof DELETE
+
+/** Mapping of a direct action to the backend method name that performs it */
+export type StorageMethods = Record<StorageActionDirect, string>
+
+/**
+ * Backend storage adapter injected as `Active.Storage` (async or sync implementation).
+ * @note: methods are looked up by name at runtime, hence the index signature.
+ */
+export type StorageAdapter = Record<string, (...args: unknown[]) => unknown>
 
 const hasLocalStorage = typeof localStorage !== 'undefined'  // eslint-disable-line
 
@@ -28,11 +43,13 @@ const hasLocalStorage = typeof localStorage !== 'undefined'  // eslint-disable-l
  * @param {Array|Object} initialValue - used for ADD ACTION when saving the first time
  * @return {*} - Synchronous/Asynchronous promise result of Local Storage (or stored value for GET action)
  */
-export function performStorage (ACTION, storageKey, value = null, initialValue = []) {
+export function performStorage (
+  this: unknown, ACTION: StorageAction, storageKey: string, value: unknown = null, initialValue: unknown = [],
+): unknown {
   /* ADD action abstraction */
   if (ACTION === ADD) {
     if (performStorage.isAsync) {
-      return performStorage(GET, storageKey)
+      return (performStorage(GET, storageKey) as Promise<unknown>)
         .then(value => value || initialValue)
         .then(oldData => performStorage(SET, storageKey, isList(oldData) ? oldData.concat(value) : update(oldData, value)))
     }
@@ -43,17 +60,28 @@ export function performStorage (ACTION, storageKey, value = null, initialValue =
   enumCheck([GET, SET, DELETE], ACTION, this)
 
   /* SERVER (or missing localStorage) */
-  if (!hasLocalStorage) return Active.Storage[performStorage.toServer[ACTION]](storageKey, value)
+  if (!hasLocalStorage) return (Active.Storage as StorageAdapter)[performStorage.toServer[ACTION]](storageKey, value)
 
   /* CLIENT */
-  const args = [storageKey]
+  const args: unknown[] = [storageKey]
   if (SET === ACTION) args.push(toJSON(value))
-  let result = localStorage[performStorage.toClient[ACTION]](...args)
+  let result: unknown = localStorage[performStorage.toClient[ACTION]](...args)
 
   // Storage Retrieval
   if (GET === ACTION && result) result = fromJSON(result)  // Deserialize data
 
   return result
+}
+
+export declare namespace performStorage {
+  /** `true` once an asynchronous backend was wired up with `performStorage.init()` */
+  let isAsync: boolean | undefined
+  /** Browser `localStorage` method names */
+  let toClient: StorageMethods
+  /** Currently active `Active.Storage` method names (asynchronous by default) */
+  let toServer: StorageMethods
+  /** Synchronous `Active.Storage` method names */
+  let toServerSync: StorageMethods
 }
 
 performStorage.toClient = {
@@ -72,14 +100,14 @@ performStorage.toServerSync = {
   [DELETE]: 'removeItemSync'
 }
 // Setup Asynchronous Local Storage
-performStorage.init = function (...args) {
+performStorage.init = function (...args: unknown[]): unknown {
   performStorage.isAsync = true
   performStorage.toServer = toServerAsync
-  return Active.Storage.init(...args)
+  return (Active.Storage as StorageAdapter).init(...args)
 }
 // Setup Synchronous Local Storage (not recommended)
-performStorage.initSync = function (...args) {
+performStorage.initSync = function (...args: unknown[]): unknown {
   performStorage.isAsync = false
   performStorage.toServer = performStorage.toServerSync
-  return Active.Storage.initSync(...args)
+  return (Active.Storage as StorageAdapter).initSync(...args)
 }

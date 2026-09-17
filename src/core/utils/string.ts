@@ -1,4 +1,4 @@
-import { capitalize, get } from './lodash-lite.js'
+import { capitalize, get } from './lodash-lite'
 
 export const alphaNumPattern = /[^a-zA-Z0-9]/g
 export const alphaNumIdPattern = /[^a-zA-Z0-9_-]/g
@@ -16,6 +16,26 @@ const upperThreshold = 1 - 26 / (62 + symbols.length) // minimum Math.random() r
 const upperThresholdAlphaNum = 1 - 26 / 62 // minimum Math.random() result for upper case
 
 /**
+ * Options accepted by {@link interpolateString}.
+ */
+export type InterpolateStringOptions = {
+	/** key format to match in given 'variables' (e.g. format = '$key') */
+	formatKey?: string,
+	/** function name to use in case error is thrown */
+	name?: string,
+	/** whether to ignore error when replacement string not found, and leave as is */
+	suppressError?: boolean,
+}
+
+/** Options accepted by {@link randomString}. */
+export type RandomStringOptions = {
+	/** whether to create alphanumeric string only */
+	alphaNum?: boolean,
+	/** whether to create hex string only */
+	hex?: boolean,
+}
+
+/**
  * STRING FUNCTIONS ===========================================================
  * =============================================================================
  */
@@ -27,18 +47,20 @@ const upperThresholdAlphaNum = 1 - 26 / 62 // minimum Math.random() result for u
  * @param {string} search - needle
  * @return {boolean}
  */
-export function isInString(string, search) {
+export function isInString(string: string, search: string): boolean {
 	return string.indexOf(search) > -1
 }
 
 /**
  * Checks to see if any of the searches params exist within the string param.
  *
+ * @note: the haystack is deliberately `unknown` - callers pass null/undefined/numbers,
+ *        which the runtime guard below rejects with `false`.
  * @param {string} string - haystack
  * @param searches - needles
  * @return {boolean}
  */
-export function isInStringAny(string, ...searches) {
+export function isInStringAny(string: unknown, ...searches: string[]): boolean {
 	if (typeof string !== 'string') return false
 
 	for (const value of searches) {
@@ -56,7 +78,7 @@ export function isInStringAny(string, ...searches) {
  * @param {string|number} value - the string to insert
  * @returns {string}
  */
-export function insertToString (string, index, value) {
+export function insertToString (string: string, index: number, value: string | number): string {
 	if (index > 0) return string.substring(0, index) + value + string.substring(index, string.length)
 	return value + string
 }
@@ -67,17 +89,19 @@ export function insertToString (string, index, value) {
  * @param {String} string - value to check
  * @returns {Boolean} true - if it is a valid Base64 encoded string
  */
-export function isBase64 (string) {
+export function isBase64 (string: string): boolean {
 	return isBase64Pattern.test(string)
 }
 
 /**
  * Check if given string is a File URL or Path.
  * Helps to determine if File.src is URL or Path string vs. base64 encoded string.
+ * @note: boxed `String` objects reach this function in practice (see components/utils/img.js),
+ *        hence the wider parameter type.
  * @param {String} string - to check
  * @returns {Boolean} true - if string contains a dot '.', because a file always needs extension
  */
-export function isFileSrc (string) {
+export function isFileSrc (string: string | String | null | undefined): boolean {
 	return !!string && string.indexOf('.') > -1
 }
 
@@ -86,7 +110,7 @@ export function isFileSrc (string) {
  * @param {*} value - to check
  * @returns {Boolean} true - if it's a string
  */
-export function isString(value) {
+export function isString(value: unknown): value is string {
 	return typeof value === 'string'
 }
 
@@ -112,19 +136,26 @@ export function isString(value) {
  * @param {Boolean} [suppressError] - whether to ignore error when replacement string not found, and leave as is
  * @return {String} output - with interpolated variables
  */
-export function interpolateString (string, variables = {}, {formatKey, name, suppressError} = {}) {
-	return string.replace(interpolateStringPattern, (__, match) => {
+export function interpolateString (
+	string: string,
+	variables: Record<string, unknown> = {},
+	{formatKey, name, suppressError}: InterpolateStringOptions = {},
+): string {
+	return string.replace(interpolateStringPattern, (__: string, match: string) => {
 		let key = match
 		if (formatKey) key = formatKey.replace('key', key)
 		// noinspection JSCheckFunctionSignatures
-		const result = get(variables, ...key.split(','))
+		// @Note: `get` takes (object, path, defaultValue) - the split yields the path, plus an
+		// optional fallback. Extra comma separated parts are ignored by `get`, as before.
+		const result = get(variables, ...(key.split(',') as [string, string?]))
 		if (result === void 0) {
 			if (!suppressError && !variables.hasOwnProperty(key.split(',')[0])) {
 				throw new Error(`${name || interpolateString.name + '()'} expects variable '${key}', got '${variables[key]}'`)
 			}
 			return `{${match}}`
 		}
-		return result
+		// @Note: non-string values (numbers, booleans) are returned as is and coerced by `replace`
+		return result as string
 	})
 }
 
@@ -139,9 +170,11 @@ export const interpolateStringPattern = /{([^{}]+)}/g
  *
  * @param {string} keyPath - the path string to format
  */
-export function formatKeyPath(keyPath) {
+export function formatKeyPath(keyPath: string): string {
 	return keyPath.replace(
-		formatKeyPathPattern, (match, match1, match2, match3, offset) => (offset > 0 ? '.' : '') + String(match2)
+		formatKeyPathPattern,
+		(match: string, match1: string, match2: string, match3: string, offset: number) =>
+			(offset > 0 ? '.' : '') + String(match2),
 	)
 }
 
@@ -153,9 +186,9 @@ export const formatKeyPathPattern = /(\[)(.*?)(\])/g
  * @param {string} fileName - full file name with format extension (ex. 'image.png')
  * @returns {string} extension - file format if exists (ex. 'png') or empty string if it does not
  */
-export function fileFormat (fileName) {
+export function fileFormat (fileName: string): string {
 	const array = fileName.split('.')
-	return array.length > 1 ? array.pop() : ''
+	return array.length > 1 ? array.pop() as string : ''
 }
 
 /**
@@ -164,7 +197,7 @@ export function fileFormat (fileName) {
  * @param {String|Null|Undefined} fileName - to extract extension
  * @returns {String|Undefined} file format extension, or empty string, or undefined
  */
-export function fileFormatNormalized (fileName) {
+export function fileFormatNormalized (fileName: string | null | undefined): string | undefined {
 	if (!fileName) return
 	const ext = fileFormat(toLowerCase(fileName))
 	switch (ext) {
@@ -181,7 +214,7 @@ export function fileFormatNormalized (fileName) {
  *
  * @param {string} fileName - full file name with extension
  */
-export function fileNameWithoutExt (fileName) {
+export function fileNameWithoutExt (fileName: string): string {
 	return fileName.replace(fileNameWithoutExtPattern, '')
 }
 
@@ -191,9 +224,9 @@ export function fileNameWithoutExt (fileName) {
  * @param {String} filename
  * @returns {File} file - object
  */
-export function fileFromDataUrl (dataUrl, filename) {
+export function fileFromDataUrl (dataUrl: string, filename: string): File {
 	const arr = dataUrl.split(',')
-	const mime = arr[0].match(/:(.*?);/)[1]
+	const mime = (arr[0].match(/:(.*?);/) as RegExpMatchArray)[1]
 	const str = atob(arr[1])
 	let n = str.length
 	const u8arr = new Uint8Array(n)
@@ -210,8 +243,8 @@ export function fileFromDataUrl (dataUrl, filename) {
  * @param {String} dataUrl - see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
  * @returns {String|undefined} mime type
  */
-export function mimeTypeFromDataUrl (dataUrl) {
-	return dataUrl.split(',')[0].match(/:(.*?);/)[1]
+export function mimeTypeFromDataUrl (dataUrl: string): string {
+	return (dataUrl.split(',')[0].match(/:(.*?);/) as RegExpMatchArray)[1]
 }
 
 /**
@@ -220,8 +253,8 @@ export function mimeTypeFromDataUrl (dataUrl) {
  * @param {string} url - to extract hostname
  * @return {string} - hostname
  */
-export function hostname (url) {
-	let hostname
+export function hostname (url: string): string {
+	let hostname: string
 
 	// find & remove protocol (http, ftp, etc.) and get hostname
 	if (url.indexOf('://') > -1) {
@@ -251,8 +284,8 @@ export function hostname (url) {
  * @param {string} after - string succeeding the match
  * @returns {string} - matching string between `before` and `after` strings if found, or an empty string if not
  */
-export function matchBetween(string, before, after) {
-	return get(string.match(`${before}(.*)${after}`), '[1]') || ''
+export function matchBetween(string: string, before: string, after: string): string {
+	return (get(string.match(`${before}(.*)${after}`), '[1]') as string | undefined) || ''
 }
 
 /**
@@ -262,7 +295,7 @@ export function matchBetween(string, before, after) {
  * @param {string|number} str2
  * @returns {string} - scrambled characters from provided values
  */
-export function mergeStrings(str1, str2) {
+export function mergeStrings(str1: string | number, str2: string | number): string {
 	str1 = String(str1)
 	str2 = String(str2)
 	const isFirstLong = str1.length >= str2.length
@@ -283,7 +316,7 @@ export function mergeStrings(str1, str2) {
  * @param {String} padTemplate - example: '000'
  * @return {String} padded with template - example: '007'
  */
-export function padStringLeft (string, padTemplate) {
+export function padStringLeft (string: string, padTemplate: string): string {
 	return `${padTemplate}${string}`.slice(-(Math.max(string.length, padTemplate.length)))
 }
 
@@ -294,7 +327,7 @@ export function padStringLeft (string, padTemplate) {
  * @param {String} padTemplate - example: '000'
  * @return {String} padded with template - example: '700'
  */
-export function padStringRight (string, padTemplate) {
+export function padStringRight (string: string, padTemplate: string): string {
 	return `${string}${padTemplate}`.substr(0, Math.max(string.length, padTemplate.length))
 }
 
@@ -307,30 +340,30 @@ export function padStringRight (string, padTemplate) {
  * @param {boolean} [shouldIncludeCount] - If true, prefix the result with the count
  * @return {string} - A new string
  */
-export function pluralize(word, count, shouldIncludeCount) {
+export function pluralize(word: string, count?: number | null, shouldIncludeCount?: boolean): string {
 	const n = count == null ? 2 : count
 	const result = Math.abs(n) === 1 ? toSingular(word) : toPlural(word)
 	return shouldIncludeCount ? `${n} ${result}` : result
 }
 
-const irregularPluralByForms = {
+const irregularPluralByForms: Record<string, string> = {
 	man: 'men', woman: 'women', child: 'children', tooth: 'teeth', foot: 'feet',
 	mouse: 'mice', person: 'people', goose: 'geese', ox: 'oxen',
 }
-const irregularSingularByForms = Object.fromEntries(
+const irregularSingularByForms: Record<string, string> = Object.fromEntries(
 	Object.entries(irregularPluralByForms).map(([s, p]) => [p, s])
 )
 const uncountable = new Set([
 	'sheep', 'fish', 'series', 'species', 'deer', 'information', 'equipment', 'rice', 'money',
 ])
 
-function preserveCase(source, target) {
+function preserveCase(source: string, target: string): string {
 	if (source === source.toUpperCase()) return target.toUpperCase()
 	if (source[0] === source[0].toUpperCase()) return target[0].toUpperCase() + target.slice(1)
 	return target
 }
 
-function toPlural(word) {
+function toPlural(word: string): string {
 	const lower = word.toLowerCase()
 	if (uncountable.has(lower)) return word
 	if (irregularPluralByForms[lower]) return preserveCase(word, irregularPluralByForms[lower])
@@ -340,7 +373,7 @@ function toPlural(word) {
 	return word + 's'
 }
 
-function toSingular(word) {
+function toSingular(word: string): string {
 	const lower = word.toLowerCase()
 	if (uncountable.has(lower)) return word
 	if (irregularSingularByForms[lower]) return preserveCase(word, irregularSingularByForms[lower])
@@ -357,7 +390,7 @@ function toSingular(word) {
  * @param {String} string
  * @returns {String} character
  */
-export function randomFromString(string) {
+export function randomFromString(string: string): string {
 	return string.charAt(Math.floor(Math.random() * string.length))
 }
 
@@ -370,7 +403,7 @@ export function randomFromString(string) {
  * @param {Boolean} [hex] - whether to create hex string only
  * @returns {String} random - ASCII compliant string
  */
-export function randomString (min = 32, max = 64, {alphaNum = false, hex = false} = {}) {
+export function randomString (min = 32, max = 64, {alphaNum = false, hex = false}: RandomStringOptions = {}): string {
 	const searchSpace = hex ? 16 : 36
 	const uppercase = alphaNum ? upperThresholdAlphaNum : upperThreshold
 	return [...Array(randomNumberInRange(min, max))]
@@ -383,7 +416,10 @@ export function randomString (min = 32, max = 64, {alphaNum = false, hex = false
 		.join('')
 }
 
-randomString.history = []
+randomString.history = [] as unknown[]
+
+/** Memoised round constants and initial hash values, cached on the `sha256` function itself. */
+type Sha256Cache = {h?: number[], k?: number[]}
 
 /**
  * Hash ASCII String using SHA256
@@ -391,33 +427,37 @@ randomString.history = []
  * @param {String} ascii - compliant
  * @returns {String} digest - hashed to 64 characters long
  */
-export function sha256(ascii) {
-	function rightRotate(value, amount) {
+export function sha256(ascii: string): string | undefined {
+	function rightRotate(value: number, amount: number): number {
 		return (value >>> amount) | (value << (32 - amount))
 	}
 
 	const mathPow = Math.pow
 	const maxWord = mathPow(2, 32)
 	const lengthProperty = 'length'
-	let i, j // Used as a counter across the whole file
+	let i: number, j: number // Used as a counter across the whole file
 	let result = ''
 
-	const words = []
+	const words: number[] = []
 	const asciiBitLength = ascii[lengthProperty] * 8
+
+	// @Note: the cache below lives on the function object itself, exactly as before - the alias
+	// only gives the expando properties a type.
+	const cache = sha256 as typeof sha256 & Sha256Cache
 
 	//* caching results is optional - remove/add slash from front of this line to toggle
 	// Initial hash value: first 32 bits of the fractional parts of the square roots of the first 8 primes
 	// (we actually calculate the first 64, but extra values are just ignored)
-	let hash = (sha256.h = sha256.h || [])
+	let hash: number[] = (cache.h = cache.h || [])
 	// Round constants: first 32 bits of the fractional parts of the cube roots of the first 64 primes
-	const k = (sha256.k = sha256.k || [])
+	const k: number[] = (cache.k = cache.k || [])
 	let primeCounter = k[lengthProperty]
 	/*/
   const hash = [], k = [];
   const primeCounter = 0;
   //*/
 
-	const isComposite = {}
+	const isComposite: Record<number, number> = {}
 	for (let candidate = 2; primeCounter < 64; candidate++) {
 		if (!isComposite[candidate]) {
 			for (i = 0; i < 313; i += candidate) {
@@ -498,8 +538,8 @@ export function sha256(ascii) {
  * @param {String} string - to encode
  * @returns {String} hex - encoded string
  */
-export function toHex(string) {
-	let hex
+export function toHex(string: string): string {
+	let hex: string
 	let result = ''
 	for (let i = 0; i < string.length; i++) {
 		hex = string.charCodeAt(i).toString(16)
@@ -514,7 +554,7 @@ export function toHex(string) {
  * @param {String} string - to convert
  * @returns {String} - with alpha numeric characters only
  */
-export function toAlphaNum(string) {
+export function toAlphaNum(string: string): string {
 	return string.replace(alphaNumPattern, '')
 }
 
@@ -524,7 +564,7 @@ export function toAlphaNum(string) {
  * @param {String} string - to convert
  * @returns {String} - with alpha numeric characters, dash and underscore only
  */
-export function toAlphaNumId(string) {
+export function toAlphaNumId(string: string): string {
 	return string.replace(alphaNumIdPattern, '')
 }
 
@@ -533,7 +573,7 @@ export function toAlphaNumId(string) {
  * @param {String} string - to sanitize, can contain any characters
  * @returns {String} URI - sanitized for browser URL, without encoding/decoding
  */
-export function toURI (string) {
+export function toURI (string: string): string {
 	return string && string.replace(spacesPattern, '-') // remove spaces/newlines before stripping special characters
 		.replace(alphaNumIdPattern, '-') // convert all invalid characters to hyphen
 		.replace(hyphensPattern, '-') // may have hyphen at the start or end
@@ -549,7 +589,7 @@ export function toURI (string) {
  * @param {Number} [lastChars] - number of characters to keep at the end
  * @returns {String} string - truncated to given total length
  */
-export function truncate(string, length = 15, lastChars = 3) {
+export function truncate(string: string, length = 15, lastChars = 3): string {
 	if (string.length <= length) return string
 	const firstChars = length - lastChars - 3
 	if (firstChars < 1) return string
@@ -558,11 +598,14 @@ export function truncate(string, length = 15, lastChars = 3) {
 
 /**
  * Convert All Characters to lower case
+ * @note: falsy values (null, undefined, '', 0, false) are returned untouched, as at runtime.
  * @param {String|*} string - value to make lower case
  * @returns {String|*} - in lower case
  */
-export function toLowerCase (string) {
-	return string && string.toLowerCase()
+export function toLowerCase (string: string): string
+export function toLowerCase <T>(string: T): T
+export function toLowerCase (string: unknown): unknown {
+	return (string as string) && (string as string).toLowerCase()
 }
 
 /**
@@ -570,17 +613,20 @@ export function toLowerCase (string) {
  * @param {*} value - make lower case
  * @returns {String} value - in lower case
  */
-export function toLowerCaseAny (value) {
+export function toLowerCaseAny (value: unknown): string {
 	return String(value).toLowerCase()
 }
 
 /**
  * Convert All Characters to UPPER CASE
+ * @note: falsy values (null, undefined, '', 0, false) are returned untouched, as at runtime.
  * @param {String|*} string - value to make upper case
  * @returns {String|*} - in upper case
  */
-export function toUpperCase (string) {
-	return string && string.toUpperCase()
+export function toUpperCase (string: string): string
+export function toUpperCase <T>(string: T): T
+export function toUpperCase (string: unknown): unknown {
+	return (string as string) && (string as string).toUpperCase()
 }
 
 /**
@@ -588,18 +634,21 @@ export function toUpperCase (string) {
  * @param {*} value - make UPPER CASE
  * @returns {String} value - in UPPER CASE
  */
-export function toUpperCaseAny (value) {
+export function toUpperCaseAny (value: unknown): string {
 	return String(value).toUpperCase()
 }
 
 /**
  * Trim spaces at the start and end of String, and convert multiples spaces,
  * including tabs, newline, etc. in between to a single space.
+ * @note: falsy values (null, undefined, '', 0, false) are returned untouched, as at runtime.
  * @param {String|*} string - to trim
  * @returns {String|*} string - trimmed
  */
-export function trimSpaces (string) {
-	return string && string.replace(spacesPattern, ' ').trim()
+export function trimSpaces (string: string): string
+export function trimSpaces <T>(string: T): T
+export function trimSpaces (string: unknown): unknown {
+	return (string as string) && (string as string).replace(spacesPattern, ' ').trim()
 }
 
 /**
@@ -608,7 +657,7 @@ export function trimSpaces (string) {
  * @see: https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
  * @returns {String} uuid - in this format 'xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx'
  */
-export function uuid () {
+export function uuid (): string {
 	const d0 = (Math.random() * 0xffffffff) | 0
 	const d1 = (Math.random() * 0xffffffff) | 0
 	const d2 = (Math.random() * 0xffffffff) | 0
@@ -637,7 +686,7 @@ export function uuid () {
 	)
 }
 
-const lut = []
+const lut: string[] = []
 for (let i = 0; i < 256; i++) {
 	lut[i] = (i < 16 ? '0' : '') + i.toString(16)
 }
@@ -658,6 +707,6 @@ export {
 		capitalize,
 }
 
-function randomNumberInRange (min, max) {
+function randomNumberInRange (min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min + 1)) + min
 }

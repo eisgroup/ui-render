@@ -209,7 +209,7 @@ describe('Table', () => {
             // a re-introduction would otherwise only surface in a generated-page diff.
             // Matched as a module reference, not as the bare string: the file's own header
             // explains what it replaced, and a substring check would fail on the prose.
-            const source = require('fs').readFileSync(require.resolve('../Table.js'), 'utf8')
+            const source = require('fs').readFileSync(require.resolve('../Table'), 'utf8')
             expect(source).not.toMatch(/(?:from|require\(|import\(|jest\.mock\()\s*['"]semantic-ui-react/)
         })
 

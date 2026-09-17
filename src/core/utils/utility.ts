@@ -1,13 +1,22 @@
-import { Active } from './_envs.js'
-import { isInList, isList } from './array.js'
-import { rad } from './number.js'
-import { isObject } from './object.js'
-import { isString, padStringLeft, randomString } from './string.js'
+import { Active } from './_envs'
+import { isInList, isList } from './array'
+import { rad } from './number'
+import { isObject } from './object'
+import { isString, padStringLeft, randomString } from './string'
 
 /**
  * AD HOC FUNCTIONS ============================================================
  * =============================================================================
  */
+
+/** Options accepted by the `Id()` generator (all optional, see `Id` for defaults) */
+export interface IdOptions {
+  timestamp?: number
+  caseSensitive?: boolean
+  alphabet?: string
+  padCount?: number
+  suffix?: string
+}
 
 /**
  * Create Case-Sensitive Short Auto Incrementing ID string derived from Timestamp in milliseconds
@@ -34,12 +43,12 @@ import { isString, padStringLeft, randomString } from './string.js'
  *    - Collision from the same user is prevented by checking for suffix duplicates within each millisecond.
  *    - This function is purposely slow with de-optimization to prevent generating too many Ids within one millisecond.
  *
- * @param {Number|String} [timestamp] - custom timestamp to generate ID for, defaults to Date.now()
- * @param {String} [alphabet] - custom characters to use for Id generation, default to alphaNumeric characters
- * @param {Boolean} [caseSensitive] - whether to use case-sensitive characters
- * @param {Number} [padCount] - if generated ID length is less than this, it's padded with the first character in the `alphabet`
- * @param {String} [suffix] - string to append to ID timestamp, default is random alphanumeric 3 characters string
- * @return {String} ID - example: 'MJ8FU-RVRo'
+ * @param [timestamp] - custom timestamp to generate ID for, defaults to Date.now()
+ * @param [alphabet] - custom characters to use for Id generation, default to alphaNumeric characters
+ * @param [caseSensitive] - whether to use case-sensitive characters
+ * @param [padCount] - if generated ID length is less than this, it's padded with the first character in the `alphabet`
+ * @param [suffix] - string to append to ID timestamp, default is random alphanumeric 3 characters string
+ * @return ID - example: 'MJ8FU-RVRo'
  */
 export function Id ({
   timestamp = Date.now(),
@@ -47,7 +56,7 @@ export function Id ({
   alphabet = caseSensitive ? Id.alphabet : Id.alphabetLower,
   padCount = caseSensitive ? 7 : 9,
   suffix = randomString(3, 3, {alphaNum: true}),
-} = {}) {
+}: IdOptions = {}): string {
   if (!caseSensitive) suffix = suffix.toLowerCase()
 
   // Ensure unique suffix for each millisecond
@@ -64,36 +73,37 @@ export function Id ({
 
   // Garbage clean Id history
   for (const time in Id.history) {
-    if (time < timestamp) delete Id.history[time]
+    // @Note: `time` is a string key compared against a number, exactly as in the original JS
+    if ((time as unknown as number) < timestamp) delete Id.history[time]
   }
 
   // Create hashed Id from Timestamp
   const charsCount = alphabet.length
-  let time = []
+  const timeChars: string[] = []
   let remainder = 0
   while (timestamp >= charsCount) {
     remainder = timestamp % charsCount // can be zero
     timestamp = Math.floor(timestamp / charsCount)
-    time.unshift(alphabet[remainder])
+    timeChars.unshift(alphabet[remainder])
   }
-  time.unshift(alphabet[timestamp])
-  time = time.join('')
-  return padStringLeft(time, Array(padCount).fill(alphabet[0]).join('')) + suffix
+  timeChars.unshift(alphabet[timestamp])
+  const time = timeChars.join('')
+  return padStringLeft(time, Array<string>(padCount).fill(alphabet[0]).join('')) + suffix
 }
 
 // !Important: changing values below may break existing database implementations
-Id.alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-Id.alphabetLower = '0123456789abcdefghijklmnopqrstuvwxyz'
-Id.minLength = 10 // minimum case-sensitive ID length, including suffix
+Id.alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' as string
+Id.alphabetLower = '0123456789abcdefghijklmnopqrstuvwxyz' as string
+Id.minLength = 10 as number // minimum case-sensitive ID length, including suffix
 Id.pattern = new RegExp(`^[${Id.alphabet}]+$`)
-Id.history = {} // log of previously generated Ids by timestamp
+Id.history = {} as Record<string, string[]> // log of previously generated Ids by timestamp
 
 /**
  * Check if given string is a valid Short Auto Incrementing ID derived from Timestamp in milliseconds
- * @param {*} value - to check
- * @return {Boolean} true - if valid, else false
+ * @param value - to check
+ * @return true - if valid, else false
  */
-export function isId (value) {
+export function isId (value: unknown): boolean {
   return isString(value) && value.length >= Id.minLength && Id.pattern.test(value)
 }
 
@@ -102,10 +112,9 @@ export function isId (value) {
  * A value is considered to be falsy, if it's one of these:
  *    false, undefined, null, NaN, 0, 0.0, -0, +0, -0.0, +0.0, '', {}, [],
  *
- * @param {*} val - to evaluate for truthiness
- * @returns {boolean}
+ * @param val - to evaluate for truthiness
  */
-export function isTruthy (val) {
+export function isTruthy (val: unknown): boolean {
   if (!val) return false
   if (isList(val) && val.length === 0) return false
   return !(isObject(val) && Object.keys(val).length === 0)
@@ -113,10 +122,10 @@ export function isTruthy (val) {
 
 /**
  * Get Timestamp in Milliseconds from Id string
- * @param {String} string - Id generated by the Id() function
- * @return {Number|Error} Timestamp - in Milliseconds, or throws error of Id is invalid
+ * @param string - Id generated by the Id() function
+ * @return Timestamp - in Milliseconds, or throws error of Id is invalid
  */
-export function timestampFromId (string) {
+export function timestampFromId (string: string): number {
   const alphabet = Id.alphabet
   const radix = alphabet.length
   const id = string.replace(timestampFromId.padPattern, '') // remove time padding
@@ -124,8 +133,9 @@ export function timestampFromId (string) {
   let result = 0
   chars.reverse()
   for (const index in chars) {
-    const multiple = alphabet.indexOf(chars[index])
-    if (multiple === -1) throw new Error(`${timestampFromId.name}() found invalid Id character '${chars[index]}'`)
+    const char = chars[+index]
+    const multiple = alphabet.indexOf(char)
+    if (multiple === -1) throw new Error(`${timestampFromId.name}() found invalid Id character '${char}'`)
     result += multiple * Math.pow(radix, +index)
   }
   return result
@@ -133,18 +143,27 @@ export function timestampFromId (string) {
 
 timestampFromId.padPattern = new RegExp(`^(${Id.alphabet[0]})+`)
 
+/** Geometry Point with latitude and longitude */
+export interface GeoPoint {
+  lat: number
+  lng: number
+}
+
+/** Unit of measurement accepted by `distanceBetween()` */
+export type DistanceUnit = 'km' | 'm' | 'mm'
+
 /**
  * Calculate Distance between two Geometry Points (with latitude and longitude)
  *
  * @note: this method is fast, but inaccurate (using Haversine formula);
  *  for precise calculation - use https://www.npmjs.com/package/geolib
  *
- * @param {Object<lat, lng>} point1
- * @param {Object<lat, lng>} point2
- * @param {String<'km'|'m'|'mm'>} [unit] - of measurements, default is millimeter (length unit saved in database)
- * @returns {Number} distance - between given points in chosen unit
+ * @param point1
+ * @param point2
+ * @param [unit] - of measurements, default is millimeter (length unit saved in database)
+ * @returns distance - between given points in chosen unit
  */
-export function distanceBetween (point1, point2, unit = 'mm') {
+export function distanceBetween (point1: GeoPoint, point2: GeoPoint, unit: DistanceUnit = 'mm'): number {
   const dLat = rad(point2.lat - point1.lat)
   const dLong = rad(point2.lng - point1.lng)
   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -167,21 +186,21 @@ export function distanceBetween (point1, point2, unit = 'mm') {
  * @see: https://lowe.github.io/tryzxcvbn/
  *    minimum score of 3 is for safe password in security sensitive applications, 2 is usually enough
  *
- * @param {String} value - to check
- * @param {Number} strength - minimum strength
- * @returns {Boolean} true - if it is
+ * @param value - to check
+ * @param strength - minimum strength
+ * @returns true - if it is
  */
-export function isGoodPassword (value, strength = 2) {
+export function isGoodPassword (value: string, strength: number = 2): boolean {
   return passStrength(value) >= strength
 }
 
 /**
  * Create standardized constant for namespacing modules
- * @param {String} constant - to be used as unique module name
- * @param {String} service - usually from ENV.SERVICE (example: "WEB", "SERVER", "API")
- * @returns {String} namespace - prefixed with service name (example: "~WEB USER_LOGIN")
+ * @param constant - to be used as unique module name
+ * @param service - usually from ENV.SERVICE (example: "WEB", "SERVER", "API")
+ * @returns namespace - prefixed with service name (example: "~WEB USER_LOGIN")
  */
-export function namespace (constant, service) {
+export function namespace (constant: string, service: string): string {
   return `~${service} ${constant}`
 }
 
@@ -190,9 +209,11 @@ export function namespace (constant, service) {
  *
  * @See: https://github.com/dropbox/zxcvbn
  *
- * @param {String} password - to check
- * @return {Object} strength - result
+ * @param password - to check
+ * @return strength - result score
  */
-export function passStrength (password) {
-  return Active.passwordCheck(password).score
+export function passStrength (password: string): number {
+  // @Note: `passwordCheck` is typed as possibly undefined; the original JS called it unconditionally,
+  //    so the non-null assertion preserves the existing throw-on-missing behaviour.
+  return Active.passwordCheck!(password).score
 }

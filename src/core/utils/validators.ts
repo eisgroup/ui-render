@@ -5,11 +5,11 @@
 // Pragmatic email check (aligned with common HTML5-style patterns)
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-export function isEmail (value) {
+export function isEmail (value: unknown): boolean {
     return typeof value === 'string' && value.length > 0 && EMAIL_RE.test(value)
 }
 
-export function isLengthMax (value, max) {
+export function isLengthMax (value: unknown, max: number): boolean {
     const s = value == null ? '' : String(value)
     return s.length <= max
 }
@@ -17,6 +17,6 @@ export function isLengthMax (value, max) {
 // require_protocol: true — http:// or https://, non-whitespace remainder
 const URL_WITH_PROTOCOL_RE = /^https?:\/\/\S+$/i
 
-export function isURLWithProtocol (value) {
+export function isURLWithProtocol (value: unknown): boolean {
     return typeof value === 'string' && value.length > 0 && URL_WITH_PROTOCOL_RE.test(value)
 }
