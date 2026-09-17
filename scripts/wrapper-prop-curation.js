@@ -103,10 +103,17 @@ const IN_HOUSE_CURATION = {
                 + '`styles`/`fill`/`vertical` attributes; consumer metas add `as-layout`, `no-header`, '
                 + '`highlight-N-last` and the sticky-column tokens through the same channel.',
             inverted: 'Dark table. Emitted as the `inverted` class, which `table.less` and '
-                + '`expand.less` both select on. Reached only from `ErrorTable.js` — a §9.9-H1 orphan, '
-                + 'so the prop is kept but its fate is that deletion\'s to decide, not this step\'s.',
-            striped: 'Zebra rows, emitted as the `striped` class. Same single call site as `inverted`, '
-                + 'and also genuinely styled — which is why neither was dropped with the rest.',
+                + '`expand.less` both select on. **KEPT — decided at §9.9-H1 (2026-09-17), which is '
+                + 'where step 1 left the call.** Its one in-repo caller was `ErrorTable.js`, and H1 '
+                + 'deleted it, so the "Attributes at the call sites" table above no longer lists this '
+                + 'prop — that table reports what the CODEBASE passes, not what the component accepts. '
+                + 'The prop itself is untouched: `Table.js` still destructures it and still emits the '
+                + 'class, the CSS still selects on it, and a consumer meta can still set it. Dropping '
+                + 'it because our own last caller went away would have been a breaking change bought '
+                + 'for nothing.',
+            striped: 'Zebra rows, emitted as the `striped` class. Same story as `inverted` exactly: '
+                + 'genuinely styled (`table.striped tr:nth-child(2n)`), which is why neither was '
+                + 'dropped with the rest, and still accepted after H1 removed their shared call site.',
         },
         partProps: {
             className: 'Passed through verbatim, or the attribute is omitted entirely when it is '

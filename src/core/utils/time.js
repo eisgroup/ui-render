@@ -1,6 +1,3 @@
-import moment from 'moment'
-import { FORMAT_TIME_FOR_HUMAN } from './constants.js'
-
 /**
  * TIME FUNCTIONS ==============================================================
  * =============================================================================
@@ -70,25 +67,4 @@ export function formatDuration (milliseconds, {
 
 formatDuration.shortEnglish = function (milliseconds, options = {}) {
   return formatDuration(milliseconds, { ...options, shorten: true })
-}
-
-/**
- * Convert time to human readable date and time
- *
- * @param {String|Number|Date} time - date string, Unix timestamp, Date object, etc.
- * @param {String} [format] - to render date time as
- * @returns {String} - date time in given format
- */
-export function formatTime (time, format = FORMAT_TIME_FOR_HUMAN) {
-  return moment(time).format(format)
-}
-
-/**
- * Convert time to full hour string
- *
- * @param {String|Number|Date} time - date string, Unix timestamp, Date object, etc.
- * @return {String} - hours and minutes
- */
-export function toHours (time) {
-  return formatTime(time, 'h a')
 }

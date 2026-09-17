@@ -1,4 +1,4 @@
-import { formatDuration, formatTime, toHours } from '../time'
+import { formatDuration } from '../time'
 
 describe('formatDuration migration contract', () => {
     const units = [
@@ -95,48 +95,5 @@ describe('formatDuration.shortEnglish migration contract', () => {
 
     it('accepts an explicit null options value', () => {
         expect(formatDuration.shortEnglish(1000, null)).toBe('1 s')
-    })
-})
-
-describe('formatTime migration contract', () => {
-    it('uses the full documented default format', () => {
-        const time = new Date(2024, 5, 15, 14, 30)
-
-        expect(formatTime(time)).toBe('Sat, 15 Jun - 02:30 pm')
-    })
-
-    it('supports deterministic custom Moment format tokens', () => {
-        const time = new Date(2024, 5, 15, 14, 30, 45, 123)
-
-        expect(formatTime(time, 'YYYY-MM-DD HH:mm:ss.SSS')).toBe('2024-06-15 14:30:45.123')
-        expect(formatTime(time, '[quarter:]Q [day:]DD')).toBe('quarter:2 day:15')
-    })
-
-    it('accepts millisecond timestamps without interpreting them as Unix seconds', () => {
-        expect(formatTime(0, 'x')).toBe('0')
-        expect(formatTime(1718451045123, 'x')).toBe('1718451045123')
-    })
-
-    it('returns the Moment invalid-date sentinel for invalid values', () => {
-        expect(formatTime(Number.NaN, 'YYYY-MM-DD')).toBe('Invalid date')
-        expect(formatTime(null, 'YYYY-MM-DD')).toBe('Invalid date')
-    })
-})
-
-describe('toHours migration contract', () => {
-    it.each([
-        [0, '12 am'],
-        [9, '9 am'],
-        [12, '12 pm'],
-        [23, '11 pm'],
-    ])('formats local hour %i using the 12-hour clock', (hour, expected) => {
-        expect(toHours(new Date(2024, 5, 15, hour, 59))).toBe(expected)
-    })
-
-    it('accepts a numeric timestamp and returns invalid values unchanged by the wrapper', () => {
-        const timestamp = new Date(2024, 5, 15, 22, 30).getTime()
-
-        expect(toHours(timestamp)).toBe('10 pm')
-        expect(toHours(Number.NaN)).toBe('Invalid date')
     })
 })
