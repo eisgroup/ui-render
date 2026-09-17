@@ -21,11 +21,16 @@ module.exports = {
         '<rootDir>/\\.[^/]+/worktrees/',
         '<rootDir>/src/style/__tests__/setup.js',
     ],
+    // `ts,tsx` added at §9.6-E1: converting a file to TypeScript must not remove it from the coverage
+    // denominator. It silently did — the whole of src/core/utils dropped out of measurement on
+    // conversion, and because those files are among the best covered in the repo, losing them pushed
+    // the GLOBAL numbers DOWN and the thresholds red. A coverage config that tracks file extensions
+    // has to be widened in step with any migration, or the gate quietly stops watching what it moved.
     collectCoverageFrom: [
-        '<rootDir>/src/core/**/*.{js,jsx}',
-        '<rootDir>/src/library/**/*.{js,jsx}',
+        '<rootDir>/src/core/**/*.{js,jsx,ts,tsx}',
+        '<rootDir>/src/library/**/*.{js,jsx,ts,tsx}',
         '!<rootDir>/src/**/__tests__/**',
-        '!<rootDir>/src/**/*.test.{js,jsx}',
+        '!<rootDir>/src/**/*.test.{js,jsx,ts,tsx}',
         '!<rootDir>/src/**/__mocks__/**',
     ],
     coverageThreshold: {
@@ -242,13 +247,13 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/utils/storage.js': {
+        './src/core/utils/storage.ts': {
             statements: 100,
             branches: 100,
             functions: 100,
             lines: 100,
         },
-        './src/core/utils/function.js': {
+        './src/core/utils/function.ts': {
             statements: 100,
             branches: 96,
             functions: 77,
@@ -296,7 +301,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/utils/definitions.js': {
+        './src/core/utils/definitions.ts': {
             statements: 100,
             branches: 100,
             functions: 100,
