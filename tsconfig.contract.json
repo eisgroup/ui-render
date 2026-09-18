@@ -1,0 +1,26 @@
+{
+  // The TYPE half of the §9.4 contract agreement (§9.6-E1). Emits nothing.
+  //
+  // It needs its own config because the published surface uses `export =` — the shape that gives a
+  // CommonJS consumer a callable default — and `export =` is illegal under `"module": "ESNext"`,
+  // which is why the main `tsconfig.json` EXCLUDES `src/library/types` outright. Without this file
+  // the contract types would ship unchecked by CI: `gen-ts` compiles them during `build-lib`, but
+  // nothing would assert what they ACCEPT and REJECT.
+  //
+  // Run by `npm run typecheck:contract`.
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "jsx": "react",
+    "noEmit": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "files": [
+    "src/library/types/contract-agreement.ts"
+  ]
+}
