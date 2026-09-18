@@ -586,7 +586,50 @@ All decomposition outputs are authored in TypeScript from the start (`engine/*.t
   string from `data.json`, while the six rounding helpers are typed `number` per their JSDoc. Nothing
   breaks today because `renders.js` is unchecked JavaScript. Widening the helpers or casting at the
   call site is a decision about what the contract is.
-- **Contract types for meta/data**, authored together with the JSON Schema (§9.4). Pick one source of truth (types→schema or schema→types) and add a round-trip check so they cannot diverge.
+- ~~**Contract types for meta/data**, authored together with the JSON Schema (§9.4). Pick one source of truth (types→schema or schema→types)~~ ✅ **DONE 2026-09-18 — and the choice this item offers is a FALSE DICHOTOMY. Both directions were measured and both destroy something.**
+
+  **`schema → types` generates a decorative artifact.** `'Row' | 'Col' | string` **IS** `string` —
+  TypeScript collapses it, proven with a type-equality probe. All 82 enum members across the five
+  vocabulary `$defs` collapse, so a generated `.d.ts` lists 46 view names, reads as if autocomplete
+  works, and accepts `view: 'Roww'` silently. The collapse is invisible in review. On top of that,
+  17 of `node`'s 29 properties generate to `unknown`/index signatures, and
+  `json-schema-to-typescript@16` **silently drops a root `$ref` that has siblings** — which is
+  exactly `meta.schema.json:6-15` — exit 0, no warning.
+
+  **`types → schema` guts the published artifact.** TypeScript cannot express
+  `metaVersion`'s `^[0-9]+(\.[0-9]+)?$` at all, and round-tripping `'Row' | (string & {})` back
+  through any TS→JSON-Schema generator yields `{"type":"string"}`, deleting the 82 suggested names
+  that are the schema's whole value to a host. `ts-json-schema-generator` also emits
+  `additionalProperties: false` by default — a schema stricter than the engine, the precise failure
+  this section calls "worse than a loose one".
+
+  **What shipped instead: both artifacts hand-authored, and the link is a CHECK.** The types live in
+  the published namespace (`src/library/types/UIRender.tsx` — `export =` forces namespace
+  membership) and are **opt-in**: `UIRenderProps.meta` is still `object`, because narrowing it is a
+  measured breaking change for consumers that build meta at runtime. Three things keep the three
+  parties honest:
+
+  1. **Vocabulary identity, three ways.** `examples.meta-contract.test.js`'s `VOCABULARIES` table
+     grew a column: the engine's live `FIELD` groups, the schema's enums, and the literals parsed
+     out of the published `.d.ts` with the TypeScript compiler API (already a devDependency) must
+     all be the same list. `inputType` has no `FIELD` group, so it is listed separately rather than
+     left silently uncovered, and a completeness guard fails if a sixth union is added and not
+     listed.
+  2. **The type arm of the agreement**, `src/library/types/contract-agreement.ts`, compiled by
+     `npm run typecheck:contract` (its own config, because `export =` is illegal under the main
+     `tsconfig.json`'s ESNext modules — which is why that config excludes the folder). It mirrors
+     `AGREEMENT_TABLE` row for row: accepted shapes are plain assignments, rejected shapes carry
+     `@ts-expect-error`. **Verified to fail in both directions** — a type that is too loose fails
+     with "unused `@ts-expect-error`", a type that is too strict fails on a real corpus shape.
+  3. **The collapse probe**, in the same file: `Eq<MetaView, string>` must be `false`. If anyone
+     "simplifies" `(string & {})` to `| string`, everything still compiles, autocomplete dies
+     silently, and only this fails.
+
+  **What these types do NOT buy, stated because it would be easy to oversell:** typo detection. A
+  node must carry `[key: string]: unknown` — 65 of the 95 keys the tracked examples use are
+  undeclared — and an index signature switches off excess-property checking. `{ view: 'Row', itms: [] }`
+  compiles. What they do buy is editor suggestions for five vocabularies that survive the compiler,
+  structure on 29 properties, and a non-vacuous `render*` contract via a template-literal key.
 
 #### E2 — Components and modules (rides other workstreams)
 

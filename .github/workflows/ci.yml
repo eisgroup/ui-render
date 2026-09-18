@@ -46,6 +46,13 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      # The meta/data contract types (§9.4, §9.6-E1). A SEPARATE compilation on purpose: the
+      # published surface uses `export =`, which is illegal under the main config's ESNext modules,
+      # so `tsconfig.json` excludes src/library/types and this is the only thing that checks what
+      # those types accept and reject. Jest cannot do it — Babel strips types before Jest sees them.
+      - name: Typecheck the meta contract
+        run: npm run typecheck:contract
+
       # docs/SUPPORTED-VIEWS.md is generated from the FIELD constants and the resolver source.
       # The suite checks the same thing (scripts/__tests__/view-reference.contract.test.js, so all
       # four legs cover it), but this step runs the CLI and names the failure for what it is.

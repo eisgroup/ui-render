@@ -47,6 +47,7 @@ import {
     validateMeta,
 } from '../../../core/ui-render/validateMeta'
 import { assertSupported, validateAgainstSchema } from '../../testing/jsonSchema'
+import { readVocabularyUnions } from '../../testing/contractTypes'
 import { EXAMPLES } from '../manifest'
 
 const SCHEMA_PATH = path.resolve(__dirname, '../../../../meta.schema.json')
@@ -54,10 +55,27 @@ const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'))
 
 /** The `$defs` whose first `anyOf` branch is an enum mirroring a FIELD definition group. */
 const VOCABULARIES = [
-    ['view', () => FIELD.TYPE, 'FIELD.TYPE'],
-    ['renderMethodName', () => FIELD.RENDER, 'FIELD.RENDER'],
-    ['actionName', () => FIELD.ACTION, 'FIELD.ACTION'],
-    ['normalizerName', () => FIELD.NORMALIZE, 'FIELD.NORMALIZE'],
+    ['view', () => FIELD.TYPE, 'FIELD.TYPE', 'MetaView'],
+    ['renderMethodName', () => FIELD.RENDER, 'FIELD.RENDER', 'MetaRenderMethod'],
+    ['actionName', () => FIELD.ACTION, 'FIELD.ACTION', 'MetaActionName'],
+    ['normalizerName', () => FIELD.NORMALIZE, 'FIELD.NORMALIZE', 'MetaNormalizerName'],
+]
+
+/**
+ * The published TypeScript surface, read straight out of `src/library/types/UIRender.tsx` (§9.6-E1).
+ * This is the third party to the agreement: the engine's live FIELD groups, the schema's enums, and
+ * the types a consumer gets must all name the same things, or one of them is lying to somebody.
+ */
+const publishedUnions = readVocabularyUnions()
+
+/**
+ * `inputType` has no FIELD group behind it — it is the HTML input `type` vocabulary, measured from
+ * the examples rather than declared by the engine. So it gets the two-way check (schema <-> types)
+ * plus the openness pin, and is listed separately rather than left silently uncovered: a four-row
+ * VOCABULARIES table over five published unions is exactly the kind of gap that reads as coverage.
+ */
+const SCHEMA_ONLY_VOCABULARIES = [
+    ['inputType', 'MetaInputType'],
 ]
 
 const sortedValues = (group) => Object.keys(group).map(key => group[key]).sort()
@@ -138,6 +156,46 @@ describe('published meta.json schema', () => {
         // from the host `methods` prop). The schema must not be stricter than that.
         expect(schema.$defs[name].anyOf[1]).toEqual({ type: 'string' })
         expect(validateAgainstSchema(schema, { view: 'SomeHostSpecificView' })).toEqual([])
+    })
+
+    // §9.6-E1 — the third party to the agreement. Before this, the schema and the engine were
+    // pinned to each other and the PUBLISHED TYPES were pinned to nothing: `meta` was `object`.
+    it.each(VOCABULARIES)('publishes %s to TypeScript consumers as the same list', (name, group, label, typeName) => {
+        const union = publishedUnions[typeName]
+
+        expect(union).toBeDefined()
+        // All three, stated separately so a failure says WHICH pair drifted.
+        expect(union.literals).toEqual(sortedValues(group()))
+        expect(union.literals).toEqual(suggestedEnum(name))
+        expect(label).toBeTruthy()
+    })
+
+    it.each(VOCABULARIES)('keeps the %s TYPE open the way the schema is open', (name, group, label, typeName) => {
+        // The one mistake here that reading cannot catch. `'Row' | 'Col' | string` IS `string` —
+        // TypeScript collapses it, and the union still READS as a list of names, so a reviewer sees
+        // 46 views and concludes autocomplete works. It does not. `(string & {})` is what keeps the
+        // literals alive while still accepting any string, which is what the permissive schema
+        // promises. If someone "simplifies" that branch to `| string`, this is what fails.
+        expect(publishedUnions[typeName].isOpen).toBe(true)
+    })
+
+    it.each(SCHEMA_ONLY_VOCABULARIES)('publishes %s to TypeScript consumers as the same list', (name, typeName) => {
+        const union = publishedUnions[typeName]
+
+        expect(union).toBeDefined()
+        expect(union.literals).toEqual(suggestedEnum(name))
+        expect(union.isOpen).toBe(true)
+    })
+
+    it('pins every published vocabulary union to one of the two tables above', () => {
+        // Without this, adding a sixth union to the type surface and forgetting to list it here
+        // would leave it unchecked while the suite stayed green.
+        const checked = [
+            ...VOCABULARIES.map(([, , , typeName]) => typeName),
+            ...SCHEMA_ONLY_VOCABULARIES.map(([, typeName]) => typeName),
+        ].sort()
+
+        expect(Object.keys(publishedUnions).sort()).toEqual(checked)
     })
 
     it('accepts the inline $schema pointer editors resolve validation through', () => {

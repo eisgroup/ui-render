@@ -36,6 +36,7 @@
     "yalc-watch": "nodemon --watch src --ext js,jsx,ts,tsx --exec 'npm run yalc-publish'",
     "gen-ts": "tsc --project tsconfig.build.json",
     "typecheck": "tsc --noEmit",
+    "typecheck:contract": "tsc --project tsconfig.contract.json",
     "serve-dist": "serve dist -p 3102",
     "serve-build": "serve build -p 3103",
     "deploy": "gh-pages -d build",
