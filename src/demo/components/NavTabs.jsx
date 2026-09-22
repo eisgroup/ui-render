@@ -13,7 +13,7 @@ import stylesMarkdown from '../markdowns/styles.md'
 import configMarkdown from '../markdowns/config.md'
 import docsMarkdown from '../markdowns/docs.md'
 import faqMarkdown from '../markdowns/faq.md'
-import Tabs from '../../core/components/Tabs'
+import StandaloneTabs from '../../core/components/StandaloneTabs'
 import Changelog from './Changelog'
 import Demo from '../pages/Demo'
 import Examples from '../pages/Examples'
@@ -134,7 +134,7 @@ const NavTabs = (props) => {
 
     return (
         <ScrollView fill className={'app-docs padding-large no-padding-top'}>
-            <Tabs
+            <StandaloneTabs
                 activeIndex={tabIndex >= 0 ? tabIndex : 0}
                 defaultIndex={tabIndex >= 0 ? tabIndex : 0}
                 onChange={onClickTab}
