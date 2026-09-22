@@ -160,7 +160,19 @@ export default {
                 { from: 'src/style/semantic-stub.css', to: './static/semantic.css' },
                 { from: 'src/style/semantic-stub.css', to: '../static/semantic.css' },
                 { from: 'src/style/fonts/icons/fonts', to: '../static/fonts/icons/fonts', noErrorOnMissing: true },
-                { from: 'public/static/images', to: '../static/images', noErrorOnMissing: true },
+                // ONLY `flags/`, not the whole folder. The rest of public/static/images is
+                // documentation for the GitHub Pages demo — four screenshots referenced from
+                // src/demo/markdowns/*.md, plus `home.jpg`/`diamonds-dimmed.png` whose only mentions
+                // are COMMENTED-OUT LESS rules, and `logo.svg`, which is merely the default argument
+                // of the `.background-image()` mixin that every live call overrides. None of it is
+                // reachable from the library, and shipping it put 1,042 KB of docs in every host's
+                // node_modules.
+                //
+                // `flags/` IS library code's business and must stay: src/core/components/renders.js
+                // renders country flags from `${FILE.PATH_IMAGES}flags/` at runtime. It is referenced
+                // from JS, never from CSS, so no build step would have caught its removal — a missing
+                // flag 404s in the host's browser, not here.
+                { from: 'public/static/images/flags', to: '../static/images/flags', noErrorOnMissing: true },
             ],
         }),
     ]
