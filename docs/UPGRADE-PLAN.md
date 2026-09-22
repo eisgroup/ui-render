@@ -1106,7 +1106,28 @@ Fix the direct violation (move `ISO_8601_COMPLETE_DATE` into `core/utils`); the 
 - `pages/main/components/Popup.js` → `Modal.js` (it *is* a modal; frees the name collision with tooltip-Popup).
 - `TooltipPop` → `Tooltip` during its F1 step 2 rewrite.
 - Engine `utils.js` dissolves into named modules during §9.3 (`dataMapping.js`, `errorMapping.js`, …).
-- `Tabs`/`TabList` pairs: the re-audit confirmed mapper uses the engine copies and the pack `TabList` is an orphan ~~(delete via H1)~~ — **deleted 2026-09-17 under H1**, so the `TabList` duplicate is gone and `pages/main/components/TabList.js` is the only one left. **Half of this item remains open:** the pack `Tabs` (`src/core/components/Tabs.js`) still sits alongside the engine `Tabs`, so audit it the same way before its §9.2 migration — do not read the `TabList` deletion as closing H6's duplicate-basename item.
+- ~~`Tabs`/`TabList` pairs~~ — **CLOSED 2026-09-22.** `TabList`'s pack copy went with §9.9-H1 as an
+  orphan. `Tabs` could not: it is not an orphan — `src/demo/components/NavTabs.jsx` imports it — so it
+  was RENAMED to `StandaloneTabs` rather than deleted or merged.
+
+  **Renamed, not reconciled, and the reason is that they are not interchangeable.** The engine copy is
+  the OLDER of the two (its history reaches v0.25.3; the pack copy appeared later at `ae72179b`) and it
+  kept evolving: `normalizeTabIndex`, `renderTab`, `currencyCode` injection, a third argument to
+  `setTab`, the clearTimer rework — about 99 lines of difference. Merging them is a behaviour question,
+  not a naming one, and nothing here needed it answered.
+
+  **What the rename actually fixes:** two files called `Tabs.js` with no way to tell from a grep which
+  one ships. The engine copy is what `mapper.js` registers for `view: 'Tabs'`; the pack copy reaches
+  nothing from the library entry, proven by walking the import graph from `src/library/index.js`
+  (130 modules; the pack copy is not among them).
+
+  **A premise correction worth recording, because it nearly produced a worse name.** This was first
+  written up as "rename it `NavTabs`, it is demo chrome". Reading the component disproved that: by its
+  props — `items` of `{tab, content}`, controlled and uncontrolled index, vertical, centred, scroll
+  overflow — it is a perfectly general tabs component that the demo merely happens to be its only
+  current caller. `StandaloneTabs` names what distinguishes it (no engine coupling) rather than where
+  it is used.
+
 - **Completed version guard:** `npm version` synchronizes the runtime wrapper and demo-shell literals from `package.json`; `prepack` rejects drift before rebuilding. The removed type shim is no longer a version site (§2.6-15).
 
 #### H7 — Build config consolidation

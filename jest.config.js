@@ -64,7 +64,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/Tabs.js': {
+        './src/core/components/StandaloneTabs.js': {
             statements: 100,
             branches: 94,
             functions: 100,

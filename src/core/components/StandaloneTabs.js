@@ -10,10 +10,20 @@ import { withTimer } from './utils'
 import View from './View'
 
 /**
- * Tabs Component with overridable self-managed state and overflow scrollbars.
+ * Tabs with overridable self-managed state and overflow scrollbars, with NO engine coupling.
+ *
+ * Renamed from `Tabs` on 2026-09-22 (§9.9-H6). There were two files called `Tabs.js` and no way to
+ * tell from a grep which one ships: this one, and `pages/main/components/Tabs.js`. They are not
+ * interchangeable — the engine's copy is the older of the two and has kept evolving, adding
+ * `normalizeTabIndex`, `renderTab`, `currencyCode` injection and a third argument to `setTab`, about
+ * 99 lines of difference. It is the one `mapper.js` registers for `view: 'Tabs'`.
+ *
+ * THIS file reaches nothing from the library entry. Its only importer is the demo's `NavTabs.jsx`.
+ * The name says what distinguishes it — no engine coupling — rather than where it happens to be
+ * used, because by its props it is a perfectly general tabs component and could be used anywhere.
  */
 @withTimer
-export default class Tabs extends PureComponent {
+export default class StandaloneTabs extends PureComponent {
   static propTypes = {
     items: type.ListOf(type.Of({
       // Tab Title - clickable buttons

@@ -1,7 +1,7 @@
 import React from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import Tabs from '../Tabs'
+import StandaloneTabs from '../StandaloneTabs'
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
 
 const withConfig = ui => (
@@ -14,7 +14,7 @@ const items = [
     { tab: 'History', content: 'History content' },
 ]
 
-describe('core Tabs interaction contract', () => {
+describe('core StandaloneTabs interaction contract', () => {
     beforeEach(() => {
         jest.useFakeTimers()
     })
@@ -26,7 +26,7 @@ describe('core Tabs interaction contract', () => {
 
     it('renders labels and respects an uncontrolled default index', () => {
         const { container } = render(withConfig(
-            <Tabs items={items} defaultIndex="1" buttoned centerTabs />
+            <StandaloneTabs items={items} defaultIndex="1" buttoned centerTabs />
         ))
 
         expect(screen.getByText('Overview')).toBeInTheDocument()
@@ -39,7 +39,7 @@ describe('core Tabs interaction contract', () => {
     it('switches after the transition delay and reports the selected index', () => {
         const onChange = jest.fn()
         const { container } = render(withConfig(
-            <Tabs items={items} onChange={onChange} />
+            <StandaloneTabs items={items} onChange={onChange} />
         ))
 
         fireEvent.click(container.querySelectorAll('.tabs__item')[2])
@@ -57,11 +57,11 @@ describe('core Tabs interaction contract', () => {
     it('applies controlled activeIndex changes immediately when transitions are disabled', () => {
         const onChange = jest.fn()
         const { rerender } = render(withConfig(
-            <Tabs items={items} activeIndex={0} transitionUpdate={false} onChange={onChange} />
+            <StandaloneTabs items={items} activeIndex={0} transitionUpdate={false} onChange={onChange} />
         ))
 
         rerender(withConfig(
-            <Tabs items={items} activeIndex="1" transitionUpdate={false} onChange={onChange} />
+            <StandaloneTabs items={items} activeIndex="1" transitionUpdate={false} onChange={onChange} />
         ))
 
         expect(screen.getByText('Details content')).toBeInTheDocument()
@@ -70,12 +70,12 @@ describe('core Tabs interaction contract', () => {
 
     it('resets to the first panel when a changed item list becomes shorter', () => {
         const { rerender } = render(withConfig(
-            <Tabs items={items} defaultIndex={2} />
+            <StandaloneTabs items={items} defaultIndex={2} />
         ))
         expect(screen.getByText('History content')).toBeInTheDocument()
 
         const shortened = [{ tab: 'Only tab', content: 'Only content' }]
-        rerender(withConfig(<Tabs items={shortened} />))
+        rerender(withConfig(<StandaloneTabs items={shortened} />))
 
         expect(screen.getByText('Only content')).toBeInTheDocument()
         expect(screen.queryByText('History content')).not.toBeInTheDocument()
@@ -104,7 +104,7 @@ describe('core Tabs interaction contract', () => {
         ]
 
         const { container } = render(withConfig(
-            <Tabs items={customItems}>{children}</Tabs>
+            <StandaloneTabs items={customItems}>{children}</StandaloneTabs>
         ))
 
         expect(screen.getByText('Settings')).toBeInTheDocument()
@@ -119,7 +119,7 @@ describe('core Tabs interaction contract', () => {
     it('cancels a pending tab transition when unmounted', () => {
         const onChange = jest.fn()
         const { container, unmount } = render(withConfig(
-            <Tabs items={items} onChange={onChange} />
+            <StandaloneTabs items={items} onChange={onChange} />
         ))
 
         fireEvent.click(container.querySelectorAll('.tabs__item')[1])
