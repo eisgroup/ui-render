@@ -244,19 +244,39 @@ export function rad(degree: number): number {
 }
 
 /**
+ * What the rounding helpers below actually accept.
+ *
+ * Their JSDoc has always said `{number}` and their bodies have always coerced: every one of them
+ * reaches the argument through `*` or `/`, so JavaScript converts a numeric string on the way in.
+ * That is not an accident to "fix" — `src/core/components/renders.js` calls `round(value, decimals)`
+ * with values straight out of `data.json`, where a number is routinely a string. Typing the
+ * parameter `number` made the signature stricter than the function: the kind of lie that compiles
+ * for years and then rejects working code the day its caller is converted.
+ *
+ * MEASURED, so this is a statement of fact rather than a hope:
+ *   round('3.14159', 2) -> 3.14        round('1e3', 2) -> 1000
+ *   round('abc', 2)     -> NaN         round('', 2)    -> 0
+ *
+ * It stops at `number | string` DELIBERATELY. `null` coerces to 0 and `undefined` to NaN, but
+ * neither is a supported input — they merely fail to throw. Admitting them would document an
+ * accident as a contract.
+ */
+type Numeric = number | string
+
+/**
  * Round Number to given Precision decimal point
  *
  * @example:
  *    roundNumber(123.4567, 3)
  *    >>> 123.457
  *
- * @param {number} number - value to round
+ * @param {number|string} number - value to round; a numeric string is coerced, see `Numeric`
  * @param {number} [precision] - decimal places to keep
  * @returns {number} - with rounded values
  */
-export function round(number: number, precision = 0): number {
+export function round(number: Numeric, precision = 0): number {
 	const factor = Math.pow(10, precision)
-	return Math.round(number * factor) / factor
+	return Math.round((number as number) * factor) / factor
 }
 
 /**
@@ -266,13 +286,13 @@ export function round(number: number, precision = 0): number {
  *    roundUp(123.4564, 3)
  *    >>> 123.457
  *
- * @param {number} number - value to round
+ * @param {number|string} number - value to round; a numeric string is coerced, see `Numeric`
  * @param {number} [precision] - decimal places to keep
  * @returns {number} - with rounded values
  */
-export function roundUp(number: number, precision = 0): number {
+export function roundUp(number: Numeric, precision = 0): number {
 	const factor = Math.pow(10, precision)
-	return Math.ceil(number * factor) / factor
+	return Math.ceil((number as number) * factor) / factor
 }
 
 /**
@@ -282,13 +302,13 @@ export function roundUp(number: number, precision = 0): number {
  *    roundDown(123.4567, 3)
  *    >>> 123.456
  *
- * @param {number} number - value to round
+ * @param {number|string} number - value to round; a numeric string is coerced, see `Numeric`
  * @param {number} [precision] - decimal places to keep
  * @returns {number} - with rounded values
  */
-export function roundDown (number: number, precision = 0): number {
+export function roundDown (number: Numeric, precision = 0): number {
 	const factor = Math.pow(10, precision)
-	return Math.floor(number * factor) / factor
+	return Math.floor((number as number) * factor) / factor
 }
 
 /**
@@ -301,12 +321,12 @@ export function roundDown (number: number, precision = 0): number {
  *    roundTo(123.4567, 10)
  *    >>> 120
  *
- * @param {number} number - value to round
+ * @param {number|string} number - value to round; a numeric string is coerced, see `Numeric`
  * @param {number} [multiple] - value, the multiple of which to round to
  * @returns {number} - rounded to given multiple of value
  */
-export function roundTo (number: number, multiple = 1): number {
-	return +(Math.round(number / multiple) * multiple).toPrecision(15)
+export function roundTo (number: Numeric, multiple = 1): number {
+	return +(Math.round((number as number) / multiple) * multiple).toPrecision(15)
 }
 
 /**
@@ -319,12 +339,12 @@ export function roundTo (number: number, multiple = 1): number {
  *    roundTo(123.4567, 10)
  *    >>> 120
  *
- * @param {number} number - value to round
+ * @param {number|string} number - value to round; a numeric string is coerced, see `Numeric`
  * @param {number} [multiple] - value, the multiple of which to round to
  * @returns {number} - rounded to given multiple of value
  */
-export function roundDownTo (number: number, multiple = 1): number {
-	return +(Math.floor(+(number / multiple).toPrecision(15)) * multiple).toPrecision(15)
+export function roundDownTo (number: Numeric, multiple = 1): number {
+	return +(Math.floor(+((number as number) / multiple).toPrecision(15)) * multiple).toPrecision(15)
 }
 
 /**
@@ -335,12 +355,12 @@ export function roundDownTo (number: number, multiple = 1): number {
  *    roundTo(123.4567, 10)
  *    >>> 130
  *
- * @param {number} number - value to round
+ * @param {number|string} number - value to round; a numeric string is coerced, see `Numeric`
  * @param {number} [multiple] - value, the multiple of which to round to
  * @returns {number} - rounded to given multiple of value
  */
-export function roundUpTo (number: number, multiple = 1): number {
-	return +(Math.ceil(+(number / multiple).toPrecision(15)) * multiple).toPrecision(15)
+export function roundUpTo (number: Numeric, multiple = 1): number {
+	return +(Math.ceil(+((number as number) / multiple).toPrecision(15)) * multiple).toPrecision(15)
 }
 
 /**
