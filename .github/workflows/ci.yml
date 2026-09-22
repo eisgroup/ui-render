@@ -291,10 +291,16 @@ jobs:
       # There were THREE. `semantic-ui-react` was the third, and §9.7-F1 step 3½ removed it — which
       # is the whole point of that step: the dependency ENTRY is what caps a host's React, not the
       # bundled code (§2.6-11). Corrected 2026-09-17: this comment used to say "One cap left" and
-      # list only react-final-form. It was wrong — `react-final-form-arrays` is a direct dependency
-      # carrying the identical cap, so the flag is needed for it too, and the §9.7-F4 bump has to
-      # move both packages together. The flag overrides the peer check for this throwaway install
-      # only and never touches what we declare to consumers.
+      # list only react-final-form. It was wrong — react-final-form-arrays carries the identical cap,
+      # so the flag is needed for it too, and the §9.7-F4 bump has to move both packages together.
+      #
+      # Updated 2026-09-22: both are now devDependencies, not dependencies (§2.6-11 — they are
+      # bundled, so a consumer was installing copies it never loaded). THE FLAG IS STILL NEEDED HERE,
+      # because this job installs React 19 over the DEV tree, where they are still present. What
+      # changed is who else sees the cap: nobody. A consumer no longer inherits it, and the only
+      # React ceiling they meet is the one we declare ourselves in peerDependencies — which still
+      # says ^18, so nothing about React 19 support moved. The flag overrides the peer check for this
+      # throwaway install only and never touches what we declare to consumers.
       # `--no-save` leaves package.json alone.
       - name: Install React 19 over the lock
         run: npm install --no-save --legacy-peer-deps react@19 react-dom@19
