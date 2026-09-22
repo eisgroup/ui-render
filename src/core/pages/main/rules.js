@@ -45,7 +45,6 @@ FIELD.TYPE = {
     DATA: 'Data',
     ICON: 'Icon',
     IMAGE: 'Image',
-    LINK: 'Link',
     POPUP: 'Popup',
     TABLE_CELLS: 'TableCells',
 }

@@ -47,33 +47,30 @@ const ROOT = path.resolve(__dirname, '..', '..')
  * vocabulary. Changing one is fine; changing one WITHOUT regenerating the page, or
  * without noticing that a `view` just became reachable, is what these catch.
  */
-const EXPECTED_COUNTS = { views: 46, resolved: 37, unresolved: 9, renderers: 7, actions: 13 }
+const EXPECTED_COUNTS = { views: 37, resolved: 37, unresolved: 0, renderers: 7, actions: 13 }
 
 /**
  * `view` strings that are declared as constants but that no resolver case handles: a node
- * using one renders the "field does not exist!" placeholder. §9.4 recorded `FIELD.TYPE.DATE`
- * as unused; this is the full list, taken from the source rather than from that note.
- * Implementing one of these should delete its entry here in the same change.
+ * using one renders the "field does not exist!" placeholder.
+ *
+ * EMPTY SINCE 2026-09-22, and it should stay that way. The nine that used to be here — Date,
+ * Dates, Fields, FieldsWithLevel, Group, Link, Place, UploadGrid, UploadGrids — were deleted
+ * rather than implemented: the vocabulary should not advertise a view the engine cannot render.
+ * A new entry appearing here means someone declared a `FIELD.TYPE` constant without a resolver,
+ * which is the state this list exists to make visible.
  */
-const UNRESOLVED_VIEWS = [
-    'Date',
-    'Dates',
-    'Fields',
-    'FieldsWithLevel',
-    'Group',
-    'Link',
-    'Place',
-    'UploadGrid',
-    'UploadGrids',
-]
+const UNRESOLVED_VIEWS = []
 
 /**
- * `FIELD.TYPE` and `FIELD.RENDER` are separate namespaces, so one string can legally be
- * both — and exactly one is. That collision is the reason the page has to say that
- * `"Date"` works as a `render*` value while being dead as a `view`; pinning it keeps the
- * note from outliving the situation it describes.
+ * `FIELD.TYPE` and `FIELD.RENDER` are separate namespaces, so one string can legally be both.
+ *
+ * EMPTY SINCE 2026-09-22. Exactly one string used to collide — `"Date"`, which was a dead `view`
+ * and a working `render*` value at the same time — and deleting the dead `FIELD.TYPE.DATE` ended
+ * the collision. `FIELD.RENDER.DATE` is untouched and still works. The comment that used to sit
+ * here said pinning the collision "keeps the note from outliving the situation it describes";
+ * the situation is over, so the note went with it.
  */
-const VIEW_RENDERER_COLLISIONS = ['Date']
+const VIEW_RENDERER_COLLISIONS = []
 
 const byKey = (entries) => entries.reduce((all, { key, value }) => ({ ...all, [key]: value }), {})
 

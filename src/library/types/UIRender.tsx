@@ -102,12 +102,10 @@ declare namespace UIRender {
      */
     export type MetaView =
         'AutoSubmit' | 'Button' | 'Checkbox' | 'Col' | 'ColList' | 'Column' | 'Counter' | 'Data' |
-        'Date' | 'Dates' | 'Dropdown' | 'Expand' | 'ExpandList' | 'Fields' | 'FieldsWithLevel' |
-        'Group' | 'HorizontalLayout' | 'HorizontalList' | 'Icon' | 'Image' | 'Input' | 'Label' |
-        'Link' | 'List' | 'PieChart' | 'Place' | 'Popup' | 'ProgressSteps' | 'Row' | 'RowList' |
-        'Select' | 'SliderLabel' | 'Space' | 'TabList' | 'Table' | 'TableCells' | 'Tabs' | 'Text' |
-        'Title' | 'Toggle' | 'Tooltip' | 'Upload' | 'UploadGrid' | 'UploadGrids' | 'VerticalLayout' |
-        'VerticalList' |
+        'Dropdown' | 'Expand' | 'ExpandList' | 'HorizontalLayout' | 'HorizontalList' | 'Icon' |
+        'Image' | 'Input' | 'Label' | 'List' | 'PieChart' | 'Popup' | 'ProgressSteps' | 'Row' |
+        'RowList' | 'Select' | 'SliderLabel' | 'Space' | 'TabList' | 'Table' | 'TableCells' | 'Tabs' |
+        'Text' | 'Title' | 'Toggle' | 'Tooltip' | 'Upload' | 'VerticalLayout' | 'VerticalList' |
         (string & {})
 
     export type MetaRenderMethod =

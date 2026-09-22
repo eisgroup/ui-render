@@ -35,7 +35,7 @@ Two consequences worth knowing before authoring meta:
   back to rendering the value as plain text, so a misspelled renderer name looks
   like a deliberately unformatted value.
 
-## Views — `view` (46)
+## Views — `view` (37)
 
 ### Resolved (37)
 
@@ -79,7 +79,7 @@ Two consequences worth knowing before authoring meta:
 | `VerticalLayout` | `FIELD.TYPE.COL3` | `View` | `mapper.js` switch | Alias of `Col`. |
 | `VerticalList` | `FIELD.TYPE.COL_LIST3` | `List` | `mapper.js` switch | Alias of `List`. |
 
-### Declared, but no resolver case (9)
+### Declared, but no resolver case (0)
 
 A node using one of these renders the "field does not exist!" placeholder.
 They are listed because the constants are exported and reachable, so meta
@@ -87,15 +87,6 @@ authors and IDE tooling do see them.
 
 | `view` | Constant | Declared in | Description |
 | --- | --- | --- | --- |
-| `Date` | `FIELD.TYPE.DATE` | `form/constants.js` | Declared for a standalone date field, but no resolver case handles it — author a date input as `view: "Input"` with `type: "date"`. The same `"Date"` string is also `FIELD.RENDER.DATE`, which does work as a `render*` value; only the `view` is unreachable. |
-| `Dates` | `FIELD.TYPE.DATES` | `form/constants.js` | Declared for multiple date ranges with `from` and `to` times, but no resolver case handles it. |
-| `Fields` | `FIELD.TYPE.MULTIPLE` | `form/constants.js` | Declared for several fields of the same type side by side, but no resolver case handles it. |
-| `FieldsWithLevel` | `FIELD.TYPE.MULTIPLE_LEVEL` | `form/constants.js` | Declared for several fields of the same type each carrying a value on a predefined scale, but no resolver case handles it. |
-| `Group` | `FIELD.TYPE.GROUP` | `form/constants.js` | Declared for a group of semantically related fields, but no resolver case handles it. |
-| `Link` | `FIELD.TYPE.LINK` | `main/rules.js` | No resolver case handles it, and the constant carries no intent comment — the declaration is the only trace of it in the codebase. Documented as unverifiable rather than guessed at; there is nothing in the source that says what it was meant to render. |
-| `Place` | `FIELD.TYPE.PLACE` | `form/constants.js` | Declared for a Google Places autocomplete field, but no resolver case handles it. |
-| `UploadGrid` | `FIELD.TYPE.UPLOAD_GRID` | `form/constants.js` | Declared for multiple uploads in a grid layout, but no resolver case handles it. |
-| `UploadGrids` | `FIELD.TYPE.UPLOAD_GRIDS` | `form/constants.js` | Declared for several upload grids of different kinds as separate tabs, but no resolver case handles it. |
 
 ## Value renderers — `render*` (7)
 
