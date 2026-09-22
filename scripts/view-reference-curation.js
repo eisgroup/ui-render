@@ -92,16 +92,6 @@ const VIEW_CURATION = {
         resolvesTo: 'Data',
         notes: 'Any falsy local value falls back to the root `data`, so the nested block still has an object to bind against.',
     },
-    DATE: {
-        summary: 'Declared for a standalone date field, but no resolver case handles it — author a date input as `view: "Input"` with `type: "date"`.',
-        resolvesTo: null,
-        notes: 'The same `"Date"` string is also `FIELD.RENDER.DATE`, which does work as a `render*` value; only the `view` is unreachable.',
-    },
-    DATES: {
-        summary: 'Declared for multiple date ranges with `from` and `to` times, but no resolver case handles it.',
-        resolvesTo: null,
-        notes: null,
-    },
     DROPDOWN: {
         summary: 'Option list that deliberately does not write a form value; its `onChange` is proxied so the handler receives the selected value alone.',
         resolvesTo: 'Dropdown',
@@ -115,11 +105,6 @@ const VIEW_CURATION = {
     EXPAND_LIST: {
         summary: 'One `Expand` per entry of the node data, titled by `renderLabel` and filled by `renderItem`.',
         resolvesTo: 'ExpandList',
-        notes: null,
-    },
-    GROUP: {
-        summary: 'Declared for a group of semantically related fields, but no resolver case handles it.',
-        resolvesTo: null,
         notes: null,
     },
     ICON: {
@@ -142,35 +127,15 @@ const VIEW_CURATION = {
         resolvesTo: 'Label',
         notes: null,
     },
-    LINK: {
-        summary: 'No resolver case handles it, and the constant carries no intent comment — the declaration is the only trace of it in the codebase.',
-        resolvesTo: null,
-        notes: 'Documented as unverifiable rather than guessed at; there is nothing in the source that says what it was meant to render.',
-    },
     LIST: {
         summary: 'Renders the node data array through `renderItem` inside a vertical container.',
         resolvesTo: 'List',
         notes: 'Aliases: `ColList`, `VerticalList`. `RowList` and `HorizontalList` are the horizontal form.',
     },
-    MULTIPLE: {
-        summary: 'Declared for several fields of the same type side by side, but no resolver case handles it.',
-        resolvesTo: null,
-        notes: null,
-    },
-    MULTIPLE_LEVEL: {
-        summary: 'Declared for several fields of the same type each carrying a value on a predefined scale, but no resolver case handles it.',
-        resolvesTo: null,
-        notes: null,
-    },
     PIE_CHART: {
         summary: 'Pie or donut chart drawn as inline SVG from the node data.',
         resolvesTo: 'PieChart',
         notes: '`mapItems` maps each datum onto the chart shape; `legends`, `pointers` and `sort` control labelling and order.',
-    },
-    PLACE: {
-        summary: 'Declared for a Google Places autocomplete field, but no resolver case handles it.',
-        resolvesTo: null,
-        notes: null,
     },
     POPUP: {
         summary: 'Registers its `items` on the render instance under `id` and renders nothing in place; the content is mounted only when the `popupOpen` action opens it.',
@@ -261,16 +226,6 @@ const VIEW_CURATION = {
         summary: 'Form-bound single file upload with drag and drop.',
         resolvesTo: 'UploadField',
         notes: 'Also reached from `view: "Input"` with `type: "file"`. Uploading is wired to the host `uploadFile` API call through the `upload` action.',
-    },
-    UPLOAD_GRID: {
-        summary: 'Declared for multiple uploads in a grid layout, but no resolver case handles it.',
-        resolvesTo: null,
-        notes: null,
-    },
-    UPLOAD_GRIDS: {
-        summary: 'Declared for several upload grids of different kinds as separate tabs, but no resolver case handles it.',
-        resolvesTo: null,
-        notes: null,
     },
 }
 

@@ -130,7 +130,9 @@ export function asField (InputComponent, {sanitize} = {}) {
       this._value = v
     }
 
-    // Handle onRemove field in FIELD.TYPE.MULTIPLE*
+    // Handle onRemove field in the repeated-field views (what FIELD.TYPE.MULTIPLE/MULTIPLE_LEVEL
+    // used to name — those constants were deleted 2026-09-22 as unreachable, but this unmount
+    // path is live and is reached by any field the host removes from a repeated group)
     componentWillUnmount () {
       // warn('-------componentWillUnmount', this.constructor.name)
       // Call onChange for the deleted input, setting it to `null`:
@@ -141,7 +143,7 @@ export function asField (InputComponent, {sanitize} = {}) {
       //      because changedValues does not depend on registered values.
       // Use setTimeout to avoid triggering `valid: false` for required fields
       // @scenario:
-      //  - onChange(null) triggers `valid: false` for FIELD.TYPE.MULTIPLE with `required`, thus canSave gets disabled
+      //  - onChange(null) triggers `valid: false` for a required field in a repeated group, thus canSave gets disabled
       //    => to fix it, need to call onChange(null) after input unmounts, or disable validation temporarily
       //        => both cases do not update `pristine`, so cannot rely on this for `canSave` state.
       // @Note:

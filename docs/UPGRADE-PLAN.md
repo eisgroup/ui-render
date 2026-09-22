@@ -1081,7 +1081,27 @@ The form stack splits into a React-free core and React bindings:
 - ~~`src/style/unused/` (10 files)~~ — **CLOSED 2026-09-17:** the directory and all 10 files are deleted on `h1-dead-weight`. ~~`override/_policy.less` / `_classic.less` (verify unreferenced)~~ — **CLOSED 2026-09-17 (same item as AppC-H1-2, which already recorded it done; this backlog line was simply not updated).** Both files are gone from `src/style/override/`, removed by 9f393959 "F1 step 4: delete semantic-ui-less and the theme.config machinery (#46)" along with the rest of the override tree. Not to be confused with `src/style/unused/_policy.less` / `_classic.less`, which still exist and are covered by the `src/style/unused/` item at the head of this bullet. ~~Still open: icomoon demo artifacts under `fonts/icons/`.~~ **CLOSED 2026-09-17:** `demo.html`, `demo-files/` (`demo.css`, `demo.js`) and `Read Me.txt` are deleted. `style.less`, `variables.less`, `fonts/`, `style.css` and `selection.json` were kept deliberately — see H0-4 for which and why, including the loose end that `style.css` is now referenced by nothing.
 - ~~the unreferenced engine `tester/` fixtures~~ — **deleted.** They were worse than merely dead: `test_data.js` and `test_meta.js` re-exported from `../examples/…`, and no `examples/` directory exists under `src/core/pages/main/` (the fixtures live in `src/demo/examples/`), so either file would have failed module resolution the moment anything imported it. Nothing did. `eslint-config-react-app` could not see it because `import/no-unresolved` is off. Removing them also took two permanently-0% files out of the coverage report; global coverage after deletion is 94.29% statements / 89.38% branches / 92.71% functions / 94.9% lines.
 - ~~`formatTime`/`toHours` in `time.js` (no production callers, §9.7-F2).~~ — **CLOSED 2026-09-17:** both are deleted from `src/core/utils/time.js`, along with the file's now-unused `import moment` and `import { FORMAT_TIME_FOR_HUMAN }`; their test blocks went too (12 tests, the whole 2540 → 2528 delta). `formatDuration` (and `.shortEnglish`) stay, and were already moment-free. **Consequence for §9.7-F2:** `moment` is now imported **nowhere** under `src/core/utils/` — the only remaining internal importers are the three component call sites (`Text.js`, `TextDateValue.js`, `InputDate.js`), which is exactly the set the F2 `dateAdapter` funnel has to cover.
-- `FIELD.TYPE.DATE` (`modules/form/constants.js:16`) — defined, never read, and `view: 'Date'` therefore renders a placeholder instead of the date field the name implies (§2.6-17). Deleting it is the honest move unless the view spelling is meant to be supported, in which case it needs a branch in `renders.js` rather than a constant.
+- ~~`FIELD.TYPE.DATE` (`modules/form/constants.js:16`) — defined, never read~~ — **DONE 2026-09-22, and the
+  item was narrower than the problem. It was NINE, not one.** `Date`, `Dates`, `Fields`, `FieldsWithLevel`,
+  `Group`, `Link`, `Place`, `UploadGrid`, `UploadGrids` were all declared in `FIELD.TYPE` with no resolver
+  case, so a node using any of them rendered the "field does not exist!" placeholder. All nine deleted:
+  eight from `modules/form/constants.js`, `LINK` from `pages/main/rules.js`.
+
+  **Zero runtime change and zero compile break, both verified rather than assumed.** At runtime those views
+  already rendered the placeholder, before and after. At the type level a consumer whose meta still says
+  `view: 'Date'` STILL COMPILES — `MetaView` ends in `(string & {})`, so the union stayed open and only the
+  editor suggestions changed. That is the §9.6-E1 permissiveness decision paying for itself: had the type
+  been a closed union, deleting a name would have been a breaking change.
+
+  **The §9.6-E1 three-way check did its job on the first run**, going red the moment `FIELD` lost the nine
+  and the schema and the published type had not: that is precisely the drift it was built to catch. Both
+  followed, and `view`'s enum went 46 → 37 in `meta.schema.json` and in `UIRender.MetaView`.
+
+  **A trap worth recording: `"Date"` is TWO constants.** `FIELD.TYPE.DATE` (dead as a `view`) and
+  `FIELD.RENDER.DATE` (alive, and still works as a `render*` value). A grep by name hits the renderer first.
+  The view-reference contract test used to pin exactly one string as "both a view and a value renderer";
+  that list is now empty, and its comment — which promised to keep the note from outliving the situation it
+  described — is the reason the change did not silently leave a stale note behind.
 - ~~The **13 zero-reference devDependencies**~~ — **done in Phase 0.9:** all 13 plus `dot-prop-immutable` removed, verified by pruning `node_modules` to the lockfile with `npm ci` and re-running every pipeline including `build-css` and the watch build.
 
 #### H2 — Make the docs match reality
