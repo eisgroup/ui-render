@@ -109,7 +109,7 @@ module.exports = {
         // (`TooltipPop.behavior.test.js`, `UIRender.overlay-behavior.test.js`) and markup-level
         // (`TooltipPop.test.js`, `style/__tests__/css.tooltip-contract.test.js`); a threshold here
         // would have stayed green through a wrapper that rendered nothing at all.
-        './src/core/components/TooltipPop.js': {
+        './src/core/components/TooltipPop.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,
@@ -133,7 +133,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/InputNumber.js': {
+        './src/core/components/InputNumber.tsx': {
             statements: 98,
             branches: 94,
             functions: 100,
@@ -199,7 +199,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/InputNative.js': {
+        './src/core/components/InputNative.tsx': {
             statements: 98,
             branches: 94,
             functions: 100,

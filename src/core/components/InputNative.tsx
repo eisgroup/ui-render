@@ -5,10 +5,74 @@ import Select from './Select'
 import { ENGINE_PROPS, omitProps } from './domProps'
 
 /**
+ * The native elements this component can mount: `type` decides which one, and both the
+ * compact-resize and the color-swatch code paths read `.value`/`.style` off whichever it is.
+ * (`type='select'` renders `Select`, which owns its own `<select>` — never `this.element`.)
+ */
+export type InputNativeElement = HTMLInputElement | HTMLTextAreaElement
+
+/**
+ * What is left after the DOM boundary filter and gets spread onto the rendered element.
+ *
+ * It has to be stated separately from `InputNativeProps` because the two disagree on purpose:
+ * `InputNativeProps.onChange` is the ENGINE callback `(value, name, event)`, while the bag spread
+ * onto `<input>`/`<textarea>` always carries a DOM handler instead — `render()` overwrites the key
+ * on every branch before spreading. The cast at the `omitProps` call is where that swap happens.
+ */
+type ForwardedProps =
+  Omit<
+    React.InputHTMLAttributes<InputNativeElement> & React.TextareaHTMLAttributes<InputNativeElement>,
+    'value' | 'checked'
+  > & {
+    // `value`/`checked` stay open on purpose: callers pass booleans, numbers and objects here
+    // (`type='checkbox'` even copies `value` into `checked`), and the DOM's own narrower types
+    // would reject usage the tests pin down.
+    value?: any
+    checked?: any
+    [prop: string]: any
+  }
+
+/**
+ * Props of `InputNative`.
+ *
+ * The index signature is not laziness: this component is the DOM boundary for the whole input
+ * family, and `Input` spreads its own rest bag straight into it, so the accepted set is "every
+ * attribute of `<input>`/`<textarea>`/`<select>`, plus whatever the engine did not consume".
+ * The named entries below are the ones this component READS; everything else is forwarded.
+ */
+export type InputNativeProps = {
+  /* Controlled value */
+  value?: any
+  defaultValue?: any
+  /* Input type */
+  type?: string
+  /* Textarea rows */
+  rows?: number
+  /* Callback(value) when input value changes */
+  onChange?: (value: any, name: any, event: any) => void
+  /* Whether to resize input width to match content length */
+  compact?: boolean | number
+  /* Whether to adjust input height to match typed in text */
+  resize?: boolean
+  /* Whether to have no spell check or correction */
+  disabledSpellCheck?: boolean
+  /* Callback(element) on mount */
+  onMount?: (element: InputNativeElement) => void
+  /* Form field registration path, and the second argument of every onChange below */
+  name?: string
+  /* Checkbox state; falls back to `value` when not given */
+  checked?: boolean
+  /* Forwarded, and wrapped by this component when `resize` is set */
+  onKeyUp?: (event: any) => void
+  /* Anything else is passed through to the rendered element */
+  [prop: string]: any
+}
+
+/**
  * Input - Pure Component.
  * Abstraction layer for React Web
  */
-export default class InputNative extends PureComponent {
+export default class InputNative extends PureComponent<InputNativeProps> {
   static propTypes = {
     /* Controlled value */
     value: PropTypes.any,
@@ -33,10 +97,13 @@ export default class InputNative extends PureComponent {
     onMount: PropTypes.func,
   }
 
-  UNSAFE_componentWillReceiveProps (next, nextContext) {
+  /* Set by the `ref` callbacks below; absent until the element mounts */
+  element?: InputNativeElement | null
+
+  UNSAFE_componentWillReceiveProps (next: Readonly<InputNativeProps>, nextContext: any) {
     const {compact, value} = this.props
     if (next.compact != null) {
-      let inputValue
+      let inputValue: unknown
       let shouldResize = false
       if (next.value !== value) {
         inputValue = next.value
@@ -51,34 +118,34 @@ export default class InputNative extends PureComponent {
     }
   }
 
-  onChange = (event) => {
+  onChange = (event: React.ChangeEvent<InputNativeElement>) => {
     const {target: {value, style}} = event
     const {onChange, compact, name} = this.props
     if (compact != null) resizeToContent(value, style, compact)
     onChange && onChange(value, name, event)
   }
 
-  onChangeCheckbox = (event) => {
+  onChangeCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {target: {checked}} = event
     const {onChange, name} = this.props
     onChange && onChange(checked, name, event)
   }
 
   // @see: https://stackoverflow.com/questions/11167281/webkit-css-to-control-the-box-around-the-color-in-an-inputtype-color
-  onChangeColor = (event) => {
+  onChangeColor = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {target} = event
     const {onChange, name} = this.props
     target.style.backgroundColor = target.value
     onChange && onChange(target.value, name, event)
   }
 
-  onMountColor = (element) => {
+  onMountColor = (element: InputNativeElement | null) => {
     if (!element) return
     this.element = element
     element.style.backgroundColor = element.value
   }
 
-  onMountResize = (element) => {
+  onMountResize = (element: InputNativeElement | null) => {
     if (!element) return
     const {compact, onMount} = this.props
     this.element = element
@@ -86,7 +153,7 @@ export default class InputNative extends PureComponent {
     onMount && onMount(element)
   }
 
-  onKeyUp = (event) => {
+  onKeyUp = (event: React.KeyboardEvent<InputNativeElement>) => {
     const {onKeyUp} = this.props
     const textHeightFunc = (event.key === 'Enter') ? toTextHeightFunc : toTextHeight // resize instantly for Enter
     textHeightFunc(event)
@@ -94,20 +161,20 @@ export default class InputNative extends PureComponent {
   }
 
   render () {
-    let {
+    const {
       disabledSpellCheck,
       resize,
       compact,
       onMount,
       initialValues,
-      ...props
-    } = this.props
+      ...rest
+    }: InputNativeProps = this.props
     // DOM boundary for the whole input family (<input>, <textarea>, and <select> via Select).
     // ENGINE_PROPS only, and that is the load-bearing half of the split: `name` is the
     // react-final-form registration path and the second argument of every onChange below,
     // `label` is what Select renders as its accessible label — stripping FIELD_ONLY_PROPS
     // here would break every form silently. See ./domProps.js.
-    props = omitProps(props, ENGINE_PROPS)
+    let props: ForwardedProps = omitProps(rest, ENGINE_PROPS) as ForwardedProps
     if (disabledSpellCheck) props = {...noSpellCheck, ...props}
     if (resize) {
       // Must use onKeyUp because onKeyDown/onKeyPress does not register `Enter` or fire too many times

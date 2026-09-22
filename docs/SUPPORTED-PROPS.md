@@ -135,7 +135,7 @@ Those four were the *published* ones — they had curated entries on this page w
 
 ### `TooltipPop` — in-house, no semantic-ui-react
 
-`src/core/components/TooltipPop.js`, 516 lines. Replaced the wrapper in §9.7-F1 step 2 part 3.
+`src/core/components/TooltipPop.tsx`, 561 lines. Replaced the wrapper in §9.7-F1 step 2 part 3.
 
 The hover tooltip, over the same inline `<span>` `components/Tooltip.js` has shipped for years. Reached two live ways: a `view: "Tooltip"` node (`mapper.js`, which maps `label` to `content`) and the `tooltip` attribute on ANY node (`Render.js`, which wraps the rendered node and spreads an object `tooltip` — still an unfiltered passthrough, but into 13 accepted names now instead of 45). This was a FIX, not a trade: measured in real Chrome on the production build, the SUIR bubble rendered at the document origin at every use site a meta can declare (~730 px from its trigger on `buttonIcon`, 2538-3006 px on `all`) and every open raised an uncaught `TypeError` from popper's flip modifier, because SUIR clones the trigger with a `ref` and nothing a meta can declare can hold one. There was no working positioning to lose.
 
@@ -163,7 +163,7 @@ CSS contract: The bubble is now mounted INSIDE `.ui-render`, which is what makes
 | `onOpen` | Called when the bubble opens, controlled or not. |
 | `onClose` | Called when it closes, controlled or not. |
 
-**Stripped at the DOM boundary.** `src/core/components/TooltipPop.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
+**Stripped at the DOM boundary.** `src/core/components/TooltipPop.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
 
 **Passthrough.** `style`, `data-*`, `aria-*` and every event handler still reach the bubble untouched through `omitProps(…, ENGINE_PROPS, FIELD_ONLY_PROPS)` — the same DOM boundary every other component uses, which is new here: SUIR's `Popup` applied no such filter, so `§9.7-F1` step 2 also closed the engine-prop leak on this path. There is no `forwardRef`: nothing in `src` passes a ref to a tooltip, and the host `<span>` holds the only ref the component itself needs.
 
