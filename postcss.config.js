@@ -17,8 +17,10 @@
  * `.ui-render-*` stays exempt: `rc-picker` renders its dropdown into a portal outside the wrapper,
  * so those rules have to be global to reach it.
  */
+const { PREFIX, PREFIXWRAP_OPTIONS } = require('./scripts/prefixwrap-options.js')
+
 module.exports = {
     plugins: [
-        require('postcss-prefixwrap')('.ui-render', {ignoredSelectors: [/^\.ui-render-(.+)$/]})
+        require('postcss-prefixwrap')(PREFIX, PREFIXWRAP_OPTIONS)
     ]
 }

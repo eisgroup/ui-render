@@ -7,6 +7,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import Dotenv from 'dotenv-webpack';
 import lessOptionsModule from './scripts/less-options.js';
+import { sourceRules } from './webpack.common.mjs'
 const { lessOptions } = lessOptionsModule;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -39,49 +40,15 @@ export default (env, argv) => {
             clean: true,
         },
         module: {
+            // §9.9-H7: the three source rules live in webpack.common.mjs. The demo's half of the
+            // differences: `style-loader` in dev so styles hot-reload, `cssUrl: true` so @font-face
+            // files are emitted and resolve under style-loader, and the one dev-only babel plugin.
             rules: [
-                {
-                    test: /\.(js|jsx|ts|tsx)$/,
-                    exclude: /node_modules/,
-                    use: {
-                        loader: 'babel-loader',
-                        options: {
-                            // Presets and the decorators plugin come from the shared babel.config.js, which is
-                            // also what the library build and jest use — a loader-level preset entry replaces
-                            // the shared one for the same plugin identifier rather than adding to it, so
-                            // duplicating them here silently overrode the config's own options. Only the
-                            // demo-specific dev transform belongs inline.
-                            plugins: isProduction ? [] : ['react-refresh/babel'],
-                        },
-                    },
-                },
-                {
-                    test: /\.css$/,
-                    use: [
-                        isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
-                        'css-loader',
-                    ],
-                },
-                {
-                    test: /\.less$/,
-                    use: [
-                        isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
-                        {
-                            loader: 'css-loader',
-                            options: {
-                                // Resolve url() so @font-face font files are emitted and work with style-loader (dev)
-                                url: true,
-                            },
-                        },
-                        'postcss-loader',
-                        {
-                            loader: 'less-loader',
-                            options: {
-                                lessOptions: lessOptions({ relativeUrls: false }),
-                            },
-                        },
-                    ],
-                },
+                ...sourceRules({
+                    styleLoader: isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
+                    cssUrl: true,
+                    babelPlugins: isProduction ? [] : ['react-refresh/babel'],
+                }, lessOptions),
                 {
                     test: /\.md$/,
                     type: 'asset/resource',
