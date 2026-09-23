@@ -8,7 +8,6 @@ import * as definitions from './definitions'
 
 export * from './_envs'
 export * from './configs'
-export * from './date'
 export * from './defaults'
 export * from './definitions'
 export * from './fields'

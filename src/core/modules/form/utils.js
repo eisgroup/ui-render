@@ -9,7 +9,14 @@ import View from '../../components/View'
 import { Active, debounce, isEqualJSON, toJSON } from '../../utils'
 import { hasObjectValue, objChanges, set } from '../../utils/object'
 import { _ } from '../../utils/translations'
+// THE ONE LAYERING EXCEPTION IN THE CODEBASE (§9.9-H5). `modules` must not import `engine`, and
+// these two are the cycle the plan says §9.3 step 2 dissolves: the form module reaches back into the
+// engine for error processing and the forms registry. They are disabled individually rather than by
+// weakening the rule, so the rule still fails on a THIRD one — and so that removing them is a visible
+// two-line deletion when Phase 6 breaks the cycle rather than a search for what was allowed and why.
+// eslint-disable-next-line no-restricted-imports -- §9.3 step 2 removes this; see docs/UPGRADE-PLAN.md §9.9-H5
 import { errorsProcessing } from '../../engine/utils'
+// eslint-disable-next-line no-restricted-imports -- §9.3 step 2 removes this; see docs/UPGRADE-PLAN.md §9.9-H5
 import { clearErrorsMap, formsStorage } from '../../engine/rules'
 import arrayMutators from 'final-form-arrays'
 

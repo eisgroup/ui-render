@@ -1,6 +1,7 @@
 import { get, merge, isObject, hasObjectValue } from '../utils/object'
 import { errorsMap } from './rules'
-import { FIELD, ISO_8601_FULL } from '../modules'
+import { FIELD } from '../modules'
+import { ISO_8601_FULL } from '../utils'
 import { cloneDeep } from '../utils'
 import { storedTouched } from '../modules/form'
 
