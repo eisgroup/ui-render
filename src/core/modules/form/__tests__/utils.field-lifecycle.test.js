@@ -34,6 +34,7 @@ function makeDecoratedInstance ({
     handleChangeInput,
     componentWillReceiveProps,
     componentWillUnmount,
+    processErrors,
 } = {}) {
     class FormHarness extends Component {}
 
@@ -47,6 +48,7 @@ function makeDecoratedInstance ({
         fieldValues,
         registeredFieldValues,
         registeredFieldErrors,
+        processErrors,
     })
 
     const form = makeContractForm({ values, registered, fieldStates })
@@ -365,12 +367,18 @@ describe('withFormSetup public instance contracts', () => {
 
     it('recomputes against incoming props, refreshes meta errors, and preserves the original lifecycle', () => {
         const originalLifecycle = jest.fn()
+        // Error processing is handed in by the engine since §9.3 step 2, rather than imported here.
+        // This used to be asserted indirectly, through the second `getRegisteredFields()` call the
+        // real `errorsProcessing` happened to make — which counted a side effect of the collaborator
+        // instead of naming the collaboration.
+        const processErrorsCalls = []
         const { instance, form } = makeDecoratedInstance({
             initialValues: { name: 'before' },
             values: { name: 'after' },
             registered: [],
             props: { formProps: { pristine: true } },
             componentWillReceiveProps: originalLifecycle,
+            processErrors: (...args) => processErrorsCalls.push(args),
         })
         instance._meta = {}
         const nextProps = {
@@ -383,7 +391,8 @@ describe('withFormSetup public instance contracts', () => {
 
         expect(instance._props).toBeNull()
         expect(instance.state.canSave).toBe(true)
-        expect(form.getRegisteredFields).toHaveBeenCalledTimes(2)
+        expect(form.getRegisteredFields).toHaveBeenCalledTimes(1)
+        expect(processErrorsCalls).toEqual([[form, instance._meta]])
         expect(originalLifecycle).toHaveBeenCalledWith(nextProps, 'next-context')
     })
 

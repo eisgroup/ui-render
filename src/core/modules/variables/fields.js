@@ -33,6 +33,18 @@ FIELD.TYPE = {
   TEXT: 'Text',
   TITLE: 'Title', // A customised `Text` view with certain styling for consistent look and feel
   TOOLTIP: 'Tooltip', // A hint components that pops up when element is being hovered
+  // Declared here rather than in `engine/rules.js`, which used to register them (§9.3 step 2).
+  // `engine/mapper.js` dispatches on all six, and `rules.js` imports `mapper.js` — so the resolver
+  // depended on a constant its own importer installed. With the `engine` <-> `modules/form` cycle
+  // gone, anything that loaded the mapper without also loading `rules.js` got a resolver whose
+  // `case` for each of these compared against `undefined`, silently making six documented views
+  // unreachable. Two mapper tests found it immediately; a consumer would have found it later.
+  AUTO_SUBMIT: 'AutoSubmit',
+  DATA: 'Data',
+  ICON: 'Icon',
+  IMAGE: 'Image',
+  POPUP: 'Popup',
+  TABLE_CELLS: 'TableCells',
   // ...to be populated by modules
 }
 

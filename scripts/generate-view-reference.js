@@ -55,7 +55,10 @@ const WRITE_COMMAND = 'npm run docs:views'
 const DECLARATION_SITES = [
     { file: 'src/core/modules/variables/fields.js', props: ['TYPE', 'RENDER', 'ACTION'] },
     { file: 'src/core/modules/form/constants.js', props: ['TYPE'] },
-    { file: 'src/core/engine/rules.js', props: ['TYPE', 'ACTION'] },
+    // `TYPE` left this file at §9.3 step 2: `mapper.js` dispatches on those six names while
+    // `rules.js` imports `mapper.js`, so the resolver depended on a constant its own importer
+    // registered. They now sit with the rest in `variables/fields.js`.
+    { file: 'src/core/engine/rules.js', props: ['ACTION'] },
 ]
 
 /** Files whose references to the constants decide whether a name is live. */

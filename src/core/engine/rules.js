@@ -16,6 +16,7 @@ import { cloneDeep, hasObjectValue, isObject, set, setIn } from '../utils/object
 import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
+import { clearErrorsMap, errorsMap, formsStorage } from '../state/formRegistry'
 import { _ } from './translations'
 import {
     replaceDeep,
@@ -46,14 +47,6 @@ FIELD.ACTION = {
     SUBMIT: 'submit',
     UPDATE_DATA_ON_CHANGE: 'updateDataOnChange',
     ON_APPLY_PERIODS: 'onApplyPeriods',
-}
-FIELD.TYPE = {
-    AUTO_SUBMIT: 'AutoSubmit',
-    DATA: 'Data',
-    ICON: 'Icon',
-    IMAGE: 'Image',
-    POPUP: 'Popup',
-    TABLE_CELLS: 'TableCells',
 }
 FIELD.CROSS_VALIDATE = {
     NOT_WITHIN_RANGE: 'notWithinRange',
@@ -197,22 +190,14 @@ FIELD.PARSER = {
     },
 }
 
-/*
-  FormStorage is used for storing all active forms.
-  This solution provides ability to get data from all forms
- */
-export const formsStorage = new Map()
-
-/*
-  Accumulate validation errors from all Form instances
- */
-export let errorsMap = {}
+// `formsStorage` and `errorsMap` used to be DECLARED here, which is what made `modules/form` reach
+// back into the engine for them (§2.6-4). They now live in `state/formRegistry`, a layer both sides
+// may import, and are re-exported from here so every existing import of them keeps working — the
+// move is meant to dissolve the cycle, not to churn twenty call sites. §9.3 step 3 makes them
+// per-instance, and that will be a change inside `formRegistry` rather than a search.
+export { formsStorage, errorsMap, clearErrorsMap }
 
 let errorHandlerFunction = undefined
-
-export const clearErrorsMap = () => {
-    errorsMap = {}
-}
 
 /**
  * UI Render Instance Component
@@ -1309,7 +1294,9 @@ function Decorator (Class) {
             valid: true,
             values: true,
             touched: true
-        }
+        },
+        // Handed in rather than imported by the form module: see the note on `withForm`.
+        processErrors: errorsProcessing,
     })(Class)
 }
 

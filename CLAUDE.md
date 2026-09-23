@@ -53,8 +53,9 @@ All internal imports use **relative paths** — there are no `ui-*-pack` webpack
 | `ui-react-pack` — presentational | `src/core/components` |
 | `ui-modules-pack` — form/upload/fields | `src/core/modules` |
 | `ui-utils-pack` — pure utils | `src/core/utils` |
+| _(no historical name)_ — shared mutable registries | `src/core/state` |
 
-Dependency direction (keep it one-way): `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine (`core/engine`, which was `pages/main` + `ui-render` until §9.9-H4 merged them) may import anything in core. `semantic-ui-react` is not a dependency at all: the §9.7-F1 exit completed at step 3 and step 3½
+Dependency direction (keep it one-way): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine (`core/engine`, which was `pages/main` + `ui-render` until §9.9-H4 merged them) may import anything in core. `src/core/state/` is the newest and smallest layer (§9.3 step 2): it holds ONLY the registries the engine and `modules/form` both write to — `formsStorage`, `errorsMap`, `storedTouched` — which used to live one on each side of that boundary and made the two import each other. Nothing else belongs there; §9.3 step 3 makes those registries per-instance, and this layer is what makes that a change in one file. `semantic-ui-react` is not a dependency at all: the §9.7-F1 exit completed at step 3 and step 3½
 removed the package, so **nothing in `src` may import it — including `src/core/components`**, which
 used to be the one place that could. The `no-restricted-imports` override in `package.json` lost its
 `excludedFiles` exemption in that commit, and `scripts/generate-wrapper-prop-reference.js`'s scan

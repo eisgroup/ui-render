@@ -266,6 +266,67 @@
                     "**/engine/**"
                   ],
                   "message": "core/utils must not import core/engine. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                },
+                {
+                  "group": [
+                    "**/state",
+                    "**/state/**"
+                  ],
+                  "message": "`utils` imports nothing above it, and `state` is above it (§9.3 step 2). `state` holds the registries the layers above share (§9.3 step 2) and sits just above `utils`: it may import `utils` and nothing else. Putting a component, a module or the engine below it would recreate the `engine` <-> `modules/form` cycle this layer exists to remove."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "files": [
+          "src/core/state/**"
+        ],
+        "rules": {
+          "no-restricted-imports": [
+            "error",
+            {
+              "paths": [
+                {
+                  "name": "semantic-ui-react",
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                }
+              ],
+              "patterns": [
+                {
+                  "group": [
+                    "semantic-ui-react/*"
+                  ],
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "group": [
+                    "**/demo",
+                    "**/demo/**"
+                  ],
+                  "message": "core must never import the demo — the dependency runs the other way. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                },
+                {
+                  "group": [
+                    "**/components",
+                    "**/components/**"
+                  ],
+                  "message": "core/utils must not import core/components. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                },
+                {
+                  "group": [
+                    "**/modules",
+                    "**/modules/**"
+                  ],
+                  "message": "core/utils must not import core/modules. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                },
+                {
+                  "group": [
+                    "**/engine",
+                    "**/engine/**"
+                  ],
+                  "message": "core/utils must not import core/engine. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 }
               ]
             }
