@@ -1,0 +1,2445 @@
+{
+  "isExperienceAvailable" : true,
+  "isExperienceHidden" : false,
+  "isExperienceApplicableToBasicLife" : true,
+  "isExperienceApplicableToSuppLife" : false,
+  "isExperienceApplicableToDependentLife" : true,
+  "experienceRatingInputs" : {
+    "policyInputs" : {
+      "eligibleLives" : 1050.0,
+      "participatingLives" : null,
+      "producedByAONList" : [ {
+        "producedByAON" : "No"
+      }, {
+        "producedByAON" : "Yes"
+      } ],
+      "producedByAONSelection" : "No",
+      "eisNotificationList" : [ {
+        "eisNotification" : "Yes"
+      }, {
+        "eisNotification" : "No"
+      } ],
+      "eisNotificationSelection" : "Yes",
+      "originalEffectiveDate" : "2025-12-01T00:00:00.000Z",
+      "valuationDate" : "2025-11-30T00:00:00.000Z",
+      "planForExperienceRatingList" : [ {
+        "planName" : "GL Plan 1"
+      } ],
+      "planForExperienceRatingSelection" : "GL Plan 1",
+      "coverageForExperienceRatingList" : [ {
+        "coverageType" : "BasicLife"
+      } ],
+      "coverageForExperienceRatingSelection" : "BasicLife",
+      "planProvisions" : [ {
+        "planName" : "GL Plan 1",
+        "coverageProvisions" : [ ]
+      } ],
+      "rateBasisList" : null,
+      "scaleBasisList" : [ {
+        "scaleBasis" : "Inforce"
+      }, {
+        "scaleBasis" : "Manual"
+      }, {
+        "scaleBasis" : "Preset Slope"
+      } ],
+      "scaleBasisSelection" : "Manual",
+      "popRxScore" : null,
+      "trlScore" : null,
+      "claims" : null,
+      "netBenefitOverrideReason" : null,
+      "noOpenClaims" : false,
+      "experienceBasisList" : null,
+      "experienceBasisSelection" : null,
+      "paidBasisPriorCarrierEffDate" : null,
+      "finalReserveToUseList" : null,
+      "finalReserveToUseSelection" : null,
+      "weightToUWModelReserves" : null,
+      "COVIDAdjustmentList" : [ {
+        "covidAdjustment" : "Claims Known"
+      }, {
+        "covidAdjustment" : "Claims Unknown"
+      }, {
+        "covidAdjustment" : "Override"
+      } ],
+      "COVIDAdjustmentSelection" : "Claims Known",
+      "policyInputsCoverage" : [ {
+        "coverageType" : "BasicLife",
+        "highQualityExperienceExhibitsList" : [ {
+          "highQualityExperienceExhibits" : "No"
+        }, {
+          "highQualityExperienceExhibits" : "Yes"
+        } ],
+        "highQualityExperienceExhibitsSelection" : "Yes",
+        "renewalsAtSameOrLowerRate" : 0,
+        "priorCarrrierPortabilityOptionList" : [ {
+          "priorCarrrierPortabilityOption" : "None"
+        }, {
+          "priorCarrrierPortabilityOption" : "L2-YCT"
+        }, {
+          "priorCarrrierPortabilityOption" : "L65-CT"
+        }, {
+          "priorCarrrierPortabilityOption" : "AGE65"
+        }, {
+          "priorCarrrierPortabilityOption" : "Other"
+        } ],
+        "priorCarrrierPortabilityOptionSelection" : "None"
+      }, {
+        "coverageType" : "SuppDependent",
+        "highQualityExperienceExhibitsList" : [ {
+          "highQualityExperienceExhibits" : "No"
+        }, {
+          "highQualityExperienceExhibits" : "Yes"
+        } ],
+        "highQualityExperienceExhibitsSelection" : "Yes",
+        "renewalsAtSameOrLowerRate" : 0,
+        "priorCarrrierPortabilityOptionList" : [ {
+          "priorCarrrierPortabilityOption" : "None"
+        }, {
+          "priorCarrrierPortabilityOption" : "L2-YCT"
+        }, {
+          "priorCarrrierPortabilityOption" : "L65-CT"
+        }, {
+          "priorCarrrierPortabilityOption" : "AGE65"
+        }, {
+          "priorCarrrierPortabilityOption" : "Other"
+        } ],
+        "priorCarrrierPortabilityOptionSelection" : "None"
+      } ],
+      "priorCarrierWaiverOptionList" : [ {
+        "priorCarrierWaiverOption" : "face"
+      }, {
+        "priorCarrierWaiverOption" : "reserve-known"
+      }, {
+        "priorCarrierWaiverOption" : "reserve-unknown"
+      }, {
+        "priorCarrierWaiverOption" : "estimate"
+      }, {
+        "priorCarrierWaiverOption" : "no waiver"
+      } ],
+      "priorCarrierWaiverOptionSelection" : "face",
+      "priorCarrierWaiverReservePct" : null,
+      "priorCarrierWaiverEPList" : [ {
+        "priorCarrierWaiverEP" : "no waiver"
+      }, {
+        "priorCarrierWaiverEP" : "6"
+      }, {
+        "priorCarrierWaiverEP" : "9"
+      }, {
+        "priorCarrierWaiverEP" : "other"
+      } ],
+      "priorCarrierWaiverEPSelection" : "no waiver",
+      "areConversionsInExperienceList" : [ {
+        "areConversionsInExperiences" : "No"
+      }, {
+        "areConversionsInExperiences" : "Yes"
+      } ],
+      "areConversionsInExperienceSelection" : "No",
+      "isCriticalIllnessExperienceAvailableList" : [ {
+        "isCriticalIllnessExperienceAvailable" : "No"
+      }, {
+        "isCriticalIllnessExperienceAvailable" : "Yes"
+      } ],
+      "isCriticalIllnessExperienceAvailableSelection" : "No"
+    },
+    "dataKind" : {
+      "experiencePeriods" : [ {
+        "periodName" : "Incurral Period 1 (IBNR)",
+        "isCurrentPeriod" : true,
+        "startDate" : "1906-06-01T00:00:00.000Z",
+        "endDate" : "1906-07-29T00:00:00.000Z",
+        "numberOfMonths" : 2,
+        "weight" : 0.0,
+        "weightOverride" : null,
+        "isWeightOverridden" : false,
+        "periodCoverageData" : [ {
+          "coverageType" : "BasicLife",
+          "averageLives" : 33,
+          "averageLivesImported" : null,
+          "isAverageLivesOverridden" : true,
+          "paidPremium" : 132333234,
+          "paidPremiumImported" : null,
+          "isPaidPremiumOverridden" : true,
+          "paidClaims" : 2343.0,
+          "paidClaimsImported" : null,
+          "isPaidClaimsOverridden" : true,
+          "covidClaims" : null,
+          "covidClaimsImported" : null,
+          "covidClaimsOverride" : null,
+          "isCovidClaimsOverridden" : false,
+          "claimCount" : null,
+          "claimCountOverride" : null,
+          "isClaimCountOverridden" : false,
+          "priorCarrierWaiverOfPremium" : null
+        }, {
+          "coverageType" : "SuppDependent",
+          "averageLives" : 33232131,
+          "averageLivesImported" : null,
+          "isAverageLivesOverridden" : true,
+          "paidPremium" : 24323,
+          "paidPremiumImported" : null,
+          "isPaidPremiumOverridden" : true,
+          "paidClaims" : 24333.0,
+          "paidClaimsImported" : null,
+          "isPaidClaimsOverridden" : true,
+          "covidClaims" : null,
+          "covidClaimsImported" : null,
+          "covidClaimsOverride" : null,
+          "isCovidClaimsOverridden" : false,
+          "claimCount" : null,
+          "claimCountOverride" : null,
+          "isClaimCountOverridden" : false,
+          "priorCarrierWaiverOfPremium" : null
+        } ]
+      }, {
+        "periodName" : "Incurral Period 2",
+        "isCurrentPeriod" : false,
+        "startDate" : "1904-12-01T00:00:00.000Z",
+        "endDate" : "1906-05-31T00:00:00.000Z",
+        "numberOfMonths" : 18,
+        "weight" : 1.0,
+        "weightOverride" : null,
+        "isWeightOverridden" : false,
+        "periodCoverageData" : [ {
+          "coverageType" : "BasicLife",
+          "averageLives" : 2333,
+          "averageLivesImported" : null,
+          "isAverageLivesOverridden" : true,
+          "paidPremium" : 333,
+          "paidPremiumImported" : null,
+          "isPaidPremiumOverridden" : true,
+          "paidClaims" : 33334.0,
+          "paidClaimsImported" : null,
+          "isPaidClaimsOverridden" : true,
+          "covidClaims" : null,
+          "covidClaimsImported" : null,
+          "covidClaimsOverride" : null,
+          "isCovidClaimsOverridden" : false,
+          "claimCount" : null,
+          "claimCountOverride" : null,
+          "isClaimCountOverridden" : false,
+          "priorCarrierWaiverOfPremium" : null
+        }, {
+          "coverageType" : "SuppDependent",
+          "averageLives" : 233,
+          "averageLivesImported" : null,
+          "isAverageLivesOverridden" : true,
+          "paidPremium" : 333,
+          "paidPremiumImported" : null,
+          "isPaidPremiumOverridden" : true,
+          "paidClaims" : 444.0,
+          "paidClaimsImported" : null,
+          "isPaidClaimsOverridden" : true,
+          "covidClaims" : null,
+          "covidClaimsImported" : null,
+          "covidClaimsOverride" : null,
+          "isCovidClaimsOverridden" : false,
+          "claimCount" : null,
+          "claimCountOverride" : null,
+          "isClaimCountOverridden" : false,
+          "priorCarrierWaiverOfPremium" : null
+        } ]
+      }, {
+        "periodName" : "Incurral Period 3",
+        "isCurrentPeriod" : false,
+        "startDate" : "1903-12-01T00:00:00.000Z",
+        "endDate" : "1904-11-30T00:00:00.000Z",
+        "numberOfMonths" : 12,
+        "weight" : 1.0,
+        "weightOverride" : null,
+        "isWeightOverridden" : false,
+        "periodCoverageData" : [ {
+          "coverageType" : "BasicLife",
+          "averageLives" : 444,
+          "averageLivesImported" : null,
+          "isAverageLivesOverridden" : true,
+          "paidPremium" : 44,
+          "paidPremiumImported" : null,
+          "isPaidPremiumOverridden" : true,
+          "paidClaims" : 44.0,
+          "paidClaimsImported" : null,
+          "isPaidClaimsOverridden" : true,
+          "covidClaims" : null,
+          "covidClaimsImported" : null,
+          "covidClaimsOverride" : null,
+          "isCovidClaimsOverridden" : false,
+          "claimCount" : null,
+          "claimCountOverride" : null,
+          "isClaimCountOverridden" : false,
+          "priorCarrierWaiverOfPremium" : null
+        }, {
+          "coverageType" : "SuppDependent",
+          "averageLives" : 4444,
+          "averageLivesImported" : null,
+          "isAverageLivesOverridden" : true,
+          "paidPremium" : 44,
+          "paidPremiumImported" : null,
+          "isPaidPremiumOverridden" : true,
+          "paidClaims" : 44.0,
+          "paidClaimsImported" : null,
+          "isPaidClaimsOverridden" : true,
+          "covidClaims" : null,
+          "covidClaimsImported" : null,
+          "covidClaimsOverride" : null,
+          "isCovidClaimsOverridden" : false,
+          "claimCount" : null,
+          "claimCountOverride" : null,
+          "isClaimCountOverridden" : false,
+          "priorCarrierWaiverOfPremium" : null
+        } ]
+      } ],
+      "weightOverrideReason" : "3432ds",
+      "averageLivesOverrideReason" : "sвавыа",
+      "paidPremiumOverrideReason" : "чсача",
+      "paidClaimsOverrideReason" : "счачвавыа",
+      "covidClaimsOverrideReason" : "вfsdfsdf",
+      "claimsCountOverrideReason" : null,
+      "planChangeAdjustmentOverrideReason" : null,
+      "numberOfHistoricalPlans" : 1,
+      "numberOfHistoricalCoverages" : 3
+    },
+    "historicalRates" : [ {
+      "periodName" : "Incurral Period 1 (IBNR)",
+      "singleRatePerCoverageList" : [ {
+        "coverageType" : "BasicLife",
+        "useSingleRateList" : [ {
+          "useSingleRate" : "Yes"
+        }, {
+          "useSingleRate" : "No"
+        } ],
+        "useSingleRateSelection" : "Yes",
+        "compositeRate" : 44.0
+      }, {
+        "coverageType" : "SuppDependent",
+        "useSingleRateList" : [ {
+          "useSingleRate" : "Yes"
+        }, {
+          "useSingleRate" : "No"
+        } ],
+        "useSingleRateSelection" : "Yes",
+        "compositeRate" : 4.0
+      } ],
+      "historicalPlanRates" : [ {
+        "planName" : "Plan 1",
+        "isApplicableList" : [ {
+          "isApplicable" : "No"
+        }, {
+          "isApplicable" : "Yes"
+        } ],
+        "isApplicableSelection" : "No",
+        "historicalCoverageRates" : [ {
+          "coverageType" : "BasicLife",
+          "coverageTypeDependent" : null,
+          "isApplicableList" : [ {
+            "isApplicable" : "No"
+          }, {
+            "isApplicable" : "Yes"
+          } ],
+          "isApplicableSelection" : "No",
+          "payableRateTypeList" : [ {
+            "payableRateType" : "Step"
+          }, {
+            "payableRateType" : "Composite"
+          } ],
+          "payableRateTypeSelection" : "Step",
+          "compositeRate" : [ {
+            "rate" : null,
+            "volume" : 54065000
+          } ],
+          "historicalAgeBandedRates" : [ {
+            "ageBand" : "18 - 24",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "25 - 29",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "30 - 34",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "35 - 39",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "40 - 44",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "45 - 49",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "50 - 54",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "55 - 59",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "60 - 64",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "65 - 69",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "70 - 74",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "75 - 79",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "80 - 84",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "85 - 89",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "90 - 94",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "95+",
+            "rate" : null,
+            "volume" : 0.0
+          } ],
+          "bundleRates" : null,
+          "volumeBundle" : null
+        }, {
+          "coverageType" : "SuppDependent",
+          "coverageTypeDependent" : null,
+          "isApplicableList" : [ {
+            "isApplicable" : "No"
+          }, {
+            "isApplicable" : "Yes"
+          } ],
+          "isApplicableSelection" : "No",
+          "payableRateTypeList" : [ {
+            "payableRateType" : "Step"
+          }, {
+            "payableRateType" : "Composite"
+          } ],
+          "payableRateTypeSelection" : "Step",
+          "compositeRate" : [ {
+            "rate" : null,
+            "volume" : 0.0
+          } ],
+          "historicalAgeBandedRates" : [ {
+            "ageBand" : "18 - 24",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "25 - 29",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "30 - 34",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "35 - 39",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "40 - 44",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "45 - 49",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "50 - 54",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "55 - 59",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "60 - 64",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "65 - 69",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "70 - 74",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "75 - 79",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "80 - 84",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "85 - 89",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "90 - 94",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "95+",
+            "rate" : null,
+            "volume" : 0.0
+          } ],
+          "bundleRates" : null,
+          "volumeBundle" : null
+        } ]
+      } ]
+    }, {
+      "periodName" : "Incurral Period 2",
+      "singleRatePerCoverageList" : [ {
+        "coverageType" : "BasicLife",
+        "useSingleRateList" : [ {
+          "useSingleRate" : "Yes"
+        }, {
+          "useSingleRate" : "No"
+        } ],
+        "useSingleRateSelection" : "Yes",
+        "compositeRate" : 4.0
+      }, {
+        "coverageType" : "SuppDependent",
+        "useSingleRateList" : [ {
+          "useSingleRate" : "Yes"
+        }, {
+          "useSingleRate" : "No"
+        } ],
+        "useSingleRateSelection" : "Yes",
+        "compositeRate" : 4.0
+      } ],
+      "historicalPlanRates" : [ {
+        "planName" : "Plan 1",
+        "isApplicableList" : [ {
+          "isApplicable" : "No"
+        }, {
+          "isApplicable" : "Yes"
+        } ],
+        "isApplicableSelection" : "No",
+        "historicalCoverageRates" : [ {
+          "coverageType" : "BasicLife",
+          "coverageTypeDependent" : null,
+          "isApplicableList" : [ {
+            "isApplicable" : "No"
+          }, {
+            "isApplicable" : "Yes"
+          } ],
+          "isApplicableSelection" : "No",
+          "payableRateTypeList" : [ {
+            "payableRateType" : "Step"
+          }, {
+            "payableRateType" : "Composite"
+          } ],
+          "payableRateTypeSelection" : "Step",
+          "compositeRate" : [ {
+            "rate" : null,
+            "volume" : 54065000
+          } ],
+          "historicalAgeBandedRates" : [ {
+            "ageBand" : "18 - 24",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "25 - 29",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "30 - 34",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "35 - 39",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "40 - 44",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "45 - 49",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "50 - 54",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "55 - 59",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "60 - 64",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "65 - 69",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "70 - 74",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "75 - 79",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "80 - 84",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "85 - 89",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "90 - 94",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "95+",
+            "rate" : null,
+            "volume" : 0.0
+          } ],
+          "bundleRates" : null,
+          "volumeBundle" : null
+        }, {
+          "coverageType" : "SuppDependent",
+          "coverageTypeDependent" : null,
+          "isApplicableList" : [ {
+            "isApplicable" : "No"
+          }, {
+            "isApplicable" : "Yes"
+          } ],
+          "isApplicableSelection" : "No",
+          "payableRateTypeList" : [ {
+            "payableRateType" : "Step"
+          }, {
+            "payableRateType" : "Composite"
+          } ],
+          "payableRateTypeSelection" : "Step",
+          "compositeRate" : [ {
+            "rate" : null,
+            "volume" : 0.0
+          } ],
+          "historicalAgeBandedRates" : [ {
+            "ageBand" : "18 - 24",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "25 - 29",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "30 - 34",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "35 - 39",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "40 - 44",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "45 - 49",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "50 - 54",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "55 - 59",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "60 - 64",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "65 - 69",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "70 - 74",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "75 - 79",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "80 - 84",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "85 - 89",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "90 - 94",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "95+",
+            "rate" : null,
+            "volume" : 0.0
+          } ],
+          "bundleRates" : null,
+          "volumeBundle" : null
+        } ]
+      } ]
+    }, {
+      "periodName" : "Incurral Period 3",
+      "singleRatePerCoverageList" : [ {
+        "coverageType" : "BasicLife",
+        "useSingleRateList" : [ {
+          "useSingleRate" : "Yes"
+        }, {
+          "useSingleRate" : "No"
+        } ],
+        "useSingleRateSelection" : "Yes",
+        "compositeRate" : 4.0
+      }, {
+        "coverageType" : "SuppDependent",
+        "useSingleRateList" : [ {
+          "useSingleRate" : "Yes"
+        }, {
+          "useSingleRate" : "No"
+        } ],
+        "useSingleRateSelection" : "Yes",
+        "compositeRate" : 4.0
+      } ],
+      "historicalPlanRates" : [ {
+        "planName" : "Plan 1",
+        "isApplicableList" : [ {
+          "isApplicable" : "No"
+        }, {
+          "isApplicable" : "Yes"
+        } ],
+        "isApplicableSelection" : "No",
+        "historicalCoverageRates" : [ {
+          "coverageType" : "BasicLife",
+          "coverageTypeDependent" : null,
+          "isApplicableList" : [ {
+            "isApplicable" : "No"
+          }, {
+            "isApplicable" : "Yes"
+          } ],
+          "isApplicableSelection" : "No",
+          "payableRateTypeList" : [ {
+            "payableRateType" : "Step"
+          }, {
+            "payableRateType" : "Composite"
+          } ],
+          "payableRateTypeSelection" : "Step",
+          "compositeRate" : [ {
+            "rate" : null,
+            "volume" : 54065000
+          } ],
+          "historicalAgeBandedRates" : [ {
+            "ageBand" : "18 - 24",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "25 - 29",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "30 - 34",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "35 - 39",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "40 - 44",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "45 - 49",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "50 - 54",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "55 - 59",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "60 - 64",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "65 - 69",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "70 - 74",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "75 - 79",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "80 - 84",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "85 - 89",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "90 - 94",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "95+",
+            "rate" : null,
+            "volume" : 0.0
+          } ],
+          "bundleRates" : null,
+          "volumeBundle" : null
+        }, {
+          "coverageType" : "SuppDependent",
+          "coverageTypeDependent" : null,
+          "isApplicableList" : [ {
+            "isApplicable" : "No"
+          }, {
+            "isApplicable" : "Yes"
+          } ],
+          "isApplicableSelection" : "No",
+          "payableRateTypeList" : [ {
+            "payableRateType" : "Step"
+          }, {
+            "payableRateType" : "Composite"
+          } ],
+          "payableRateTypeSelection" : "Step",
+          "compositeRate" : [ {
+            "rate" : null,
+            "volume" : 0.0
+          } ],
+          "historicalAgeBandedRates" : [ {
+            "ageBand" : "18 - 24",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "25 - 29",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "30 - 34",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "35 - 39",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "40 - 44",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "45 - 49",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "50 - 54",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "55 - 59",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "60 - 64",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "65 - 69",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "70 - 74",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "75 - 79",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "80 - 84",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "85 - 89",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "90 - 94",
+            "rate" : null,
+            "volume" : 0.0
+          }, {
+            "ageBand" : "95+",
+            "rate" : null,
+            "volume" : 0.0
+          } ],
+          "bundleRates" : null,
+          "volumeBundle" : null
+        } ]
+      } ]
+    } ],
+    "uwOverridesCoverage" : [ {
+      "coverageType" : "BasicLife",
+      "inforceRate" : null,
+      "inforceRateOverride" : null,
+      "inforceRateOverrideReason" : null,
+      "totalVolume" : 54065000,
+      "totalVolumeOverride" : null,
+      "totalVolumeOverrideReason" : null,
+      "plrOverride" : null,
+      "plrOverrideReason" : null,
+      "ignoreFloorAndCeilingList" : [ {
+        "ignoreFloorAndCeiling" : "No"
+      }, {
+        "ignoreFloorAndCeiling" : "Yes"
+      } ],
+      "ignoreFloorAndCeilingSelection" : "No",
+      "ignoreFloorAndCeilingOverrideReason" : null,
+      "manualRatingSubsidyAdjustment" : null,
+      "riskBasedUWAdjustment" : 0.0,
+      "riskBasedUWAdjustmentOverrideReason" : null,
+      "reportedFormulaRateOverride" : null,
+      "reportedFormulaRateOverrideReason" : null,
+      "conversionFactor" : null,
+      "conversionFactorOverride" : null,
+      "conversionFactorOverrideReason" : null,
+      "isConversionFactorOverridden" : false,
+      "agingFactorOverride" : null,
+      "agingFactorOverrideReason" : null,
+      "manualRateList" : [ {
+        "manualRateDeterminationMethod" : "As Is"
+      }, {
+        "manualRateDeterminationMethod" : "Points"
+      }, {
+        "manualRateDeterminationMethod" : "Override"
+      } ],
+      "manualRateSelection" : "As Is",
+      "manualRateOverride" : null,
+      "manualRateOverrideReason" : null,
+      "credibilityList" : [ {
+        "credibilityDeterminationMethod" : "As Is"
+      }, {
+        "credibilityDeterminationMethod" : "Points"
+      }, {
+        "credibilityDeterminationMethod" : "Override"
+      } ],
+      "credibilitySelection" : "As Is",
+      "credibilityOverride" : null,
+      "credibilityOverrideReason" : null,
+      "poolingList" : [ {
+        "poolingAdjustmentSelection" : "As Is"
+      }, {
+        "poolingAdjustmentSelection" : "Manual Rate Points"
+      }, {
+        "poolingAdjustmentSelection" : "Override"
+      }, {
+        "poolingAdjustmentSelection" : "Ignore"
+      } ],
+      "poolingSelection" : "As Is",
+      "poolingChargeOverride" : null,
+      "poolingChargeOverrideReason" : null,
+      "poolingLimit" : null,
+      "poolingLimitOverride" : null,
+      "poolingLimitOverrideReason" : null,
+      "comments" : null
+    }, {
+      "coverageType" : "SuppDependent",
+      "inforceRate" : null,
+      "inforceRateOverride" : null,
+      "inforceRateOverrideReason" : null,
+      "totalVolume" : 36083867,
+      "totalVolumeOverride" : null,
+      "totalVolumeOverrideReason" : null,
+      "plrOverride" : null,
+      "plrOverrideReason" : null,
+      "ignoreFloorAndCeilingList" : [ {
+        "ignoreFloorAndCeiling" : "No"
+      }, {
+        "ignoreFloorAndCeiling" : "Yes"
+      } ],
+      "ignoreFloorAndCeilingSelection" : "No",
+      "ignoreFloorAndCeilingOverrideReason" : null,
+      "manualRatingSubsidyAdjustment" : null,
+      "riskBasedUWAdjustment" : 0.0,
+      "riskBasedUWAdjustmentOverrideReason" : null,
+      "reportedFormulaRateOverride" : null,
+      "reportedFormulaRateOverrideReason" : null,
+      "conversionFactor" : null,
+      "conversionFactorOverride" : null,
+      "conversionFactorOverrideReason" : null,
+      "isConversionFactorOverridden" : false,
+      "agingFactorOverride" : null,
+      "agingFactorOverrideReason" : null,
+      "manualRateList" : [ {
+        "manualRateDeterminationMethod" : "As Is"
+      }, {
+        "manualRateDeterminationMethod" : "Points"
+      }, {
+        "manualRateDeterminationMethod" : "Override"
+      } ],
+      "manualRateSelection" : "As Is",
+      "manualRateOverride" : null,
+      "manualRateOverrideReason" : null,
+      "credibilityList" : [ {
+        "credibilityDeterminationMethod" : "As Is"
+      }, {
+        "credibilityDeterminationMethod" : "Points"
+      }, {
+        "credibilityDeterminationMethod" : "Override"
+      } ],
+      "credibilitySelection" : "As Is",
+      "credibilityOverride" : null,
+      "credibilityOverrideReason" : null,
+      "poolingList" : [ {
+        "poolingAdjustmentSelection" : "As Is"
+      }, {
+        "poolingAdjustmentSelection" : "Manual Rate Points"
+      }, {
+        "poolingAdjustmentSelection" : "Override"
+      }, {
+        "poolingAdjustmentSelection" : "Ignore"
+      } ],
+      "poolingSelection" : "As Is",
+      "poolingChargeOverride" : null,
+      "poolingChargeOverrideReason" : null,
+      "poolingLimit" : null,
+      "poolingLimitOverride" : null,
+      "poolingLimitOverrideReason" : null,
+      "comments" : null
+    } ],
+    "uwOverridesCommon" : null,
+    "periodNameList" : [ {
+      "periodName" : "Incurral Period 1 (IBNR)"
+    }, {
+      "periodName" : "Incurral Period 2"
+    }, {
+      "periodName" : "Incurral Period 3"
+    }, {
+      "periodName" : "Incurral Period 4"
+    }, {
+      "periodName" : "Incurral Period 5"
+    }, {
+      "periodName" : "Incurral Period 6"
+    } ],
+    "allPeriodsAdded" : false,
+    "poolingApplied" : null,
+    "isRenewalOrAmendment" : true
+  },
+  "experienceRatingOutputs" : {
+    "calculatedClaims" : [ ],
+    "experienceRatingOutputsPerCoverage" : [ {
+      "outputType" : "BasicLife",
+      "experienceExhibitHeader" : {
+        "header" : "BasicLife  SUMMARY",
+        "subHeader" : null,
+        "underwritingCompany" : null,
+        "policyHolder" : "qprAmerican Medical Group, Inc.",
+        "policyNumber" : "GL0000859138",
+        "experienceRatebookName" : null,
+        "valuationDate" : null,
+        "effectiveDate" : "2026-12-01T00:00:00.000Z",
+        "volume" : 54065000,
+        "experienceBasis" : null,
+        "rateBasis" : "Per $1000 Gross Monthly Benefit",
+        "currentRate" : 44.0,
+        "adjustedManualRate" : 0.14941693808870798,
+        "reportedFormulaRate" : 0.20624103740301364,
+        "commissions" : "11% Standard Graded",
+        "adminFee" : null,
+        "overrideFee" : null,
+        "benAdminFee" : null
+      },
+      "experienceByPeriod" : [ {
+        "periodName" : "Incurral Period 1 (IBNR)",
+        "startDate" : "1906-06-01T00:00:00.000Z",
+        "endDate" : "1906-07-29T00:00:00.000Z",
+        "numberOfMonths" : 2.0,
+        "numberOfMonthsAdj" : null,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 33.0,
+        "averageAnnualizedLivesAdj" : null,
+        "exposedLifeYears" : 5.5,
+        "exposedLifeYearsAdj" : null,
+        "unadjustedWeights" : 1.0,
+        "adjustedWeights" : 1.0,
+        "unadjustedWeightedAverageLives" : 5.5,
+        "adjustedWeightedAverageLives" : 5.5,
+        "unadjustedSimpleWeighting" : 1.0,
+        "adjustedSimpleWeighting" : 1.0,
+        "lifeYearsForIncidence" : 5.5,
+        "inforceRate" : 44.0,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 132333234,
+        "paidPremiumAdj" : null,
+        "constantRate" : 44.0,
+        "constantRateAdj" : null,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 132333234,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 793999404,
+        "unadjustedLifeYearsForCredibility" : 5.5,
+        "adjustedLifeYearsForCredibility" : 5.5,
+        "unadjustedYearsForCredibility" : 0.16666666666666666,
+        "adjustedYearsForCredibility" : 0.16666666666666666,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : 0.0,
+        "adjustedCovidClaims" : 0.0,
+        "unadjustedIBNRPaidBasis" : null,
+        "adjustedIBNRPaidBasis" : 79399696.19999999,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 13233323.399999999,
+        "unadjustedIBNR" : null,
+        "adjustedIBNR" : 79399696.19999999,
+        "unadjustedWaiverOfPremiumReserves" : 0.0,
+        "adjustedWaiverOfPremiumReserves" : 0.0,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : 0.0,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 79399696.19999999,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.5999981546585643,
+        "ibnrIncurredMonths" : 2.0,
+        "unadjustedClaimCount" : 0,
+        "adjustedClaimCount" : 0,
+        "incidencePer1000" : 0.0
+      }, {
+        "periodName" : "Incurral Period 2",
+        "startDate" : "1904-12-01T00:00:00.000Z",
+        "endDate" : "1906-05-31T00:00:00.000Z",
+        "numberOfMonths" : 18.0,
+        "numberOfMonthsAdj" : null,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 2333.0,
+        "averageAnnualizedLivesAdj" : null,
+        "exposedLifeYears" : 3499.5,
+        "exposedLifeYearsAdj" : null,
+        "unadjustedWeights" : 1.0,
+        "adjustedWeights" : 1.0,
+        "unadjustedWeightedAverageLives" : 3499.5,
+        "adjustedWeightedAverageLives" : 3499.5,
+        "unadjustedSimpleWeighting" : 1.0,
+        "adjustedSimpleWeighting" : 1.0,
+        "lifeYearsForIncidence" : 3499.5,
+        "inforceRate" : 4.0,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 333.0,
+        "paidPremiumAdj" : null,
+        "constantRate" : 44.0,
+        "constantRateAdj" : null,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 3663.0,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 2442.0,
+        "unadjustedLifeYearsForCredibility" : 3499.5,
+        "adjustedLifeYearsForCredibility" : 3499.5,
+        "unadjustedYearsForCredibility" : 1.5,
+        "adjustedYearsForCredibility" : 1.5,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : 0.0,
+        "adjustedCovidClaims" : 0.0,
+        "unadjustedIBNRPaidBasis" : null,
+        "adjustedIBNRPaidBasis" : 195.79999999999998,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 203.49999999999997,
+        "unadjustedIBNR" : null,
+        "adjustedIBNR" : 195.79999999999998,
+        "unadjustedWaiverOfPremiumReserves" : 0.0,
+        "adjustedWaiverOfPremiumReserves" : 0.0,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : 0.0,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 195.79999999999998,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.053453453453453446,
+        "ibnrIncurredMonths" : 10.0,
+        "unadjustedClaimCount" : 0,
+        "adjustedClaimCount" : 0,
+        "incidencePer1000" : 0.0
+      }, {
+        "periodName" : "Incurral Period 3",
+        "startDate" : "1903-12-01T00:00:00.000Z",
+        "endDate" : "1904-11-30T00:00:00.000Z",
+        "numberOfMonths" : 12.0,
+        "numberOfMonthsAdj" : null,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 444.0,
+        "averageAnnualizedLivesAdj" : null,
+        "exposedLifeYears" : 444.0,
+        "exposedLifeYearsAdj" : null,
+        "unadjustedWeights" : 1.0,
+        "adjustedWeights" : 1.0,
+        "unadjustedWeightedAverageLives" : 444.0,
+        "adjustedWeightedAverageLives" : 444.0,
+        "unadjustedSimpleWeighting" : 1.0,
+        "adjustedSimpleWeighting" : 1.0,
+        "lifeYearsForIncidence" : 444.0,
+        "inforceRate" : 4.0,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 44.0,
+        "paidPremiumAdj" : null,
+        "constantRate" : 44.0,
+        "constantRateAdj" : null,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 484.0,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 484.0,
+        "unadjustedLifeYearsForCredibility" : 444.0,
+        "adjustedLifeYearsForCredibility" : 444.0,
+        "unadjustedYearsForCredibility" : 1.0,
+        "adjustedYearsForCredibility" : 1.0,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : 0.0,
+        "adjustedCovidClaims" : 0.0,
+        "unadjustedIBNRPaidBasis" : 0.0,
+        "adjustedIBNRPaidBasis" : 0.0,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 0.0,
+        "unadjustedIBNR" : 0.0,
+        "adjustedIBNR" : 0.0,
+        "unadjustedWaiverOfPremiumReserves" : 0.0,
+        "adjustedWaiverOfPremiumReserves" : 0.0,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : 0.0,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 0.0,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.0,
+        "ibnrIncurredMonths" : 0.0,
+        "unadjustedClaimCount" : 0,
+        "adjustedClaimCount" : 0,
+        "incidencePer1000" : 0.0
+      }, {
+        "periodName" : "Total",
+        "startDate" : null,
+        "endDate" : null,
+        "numberOfMonths" : 32.0,
+        "numberOfMonthsAdj" : 32.0,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 2810.0,
+        "averageAnnualizedLivesAdj" : 2810.0,
+        "exposedLifeYears" : 3949.0,
+        "exposedLifeYearsAdj" : 3949.0,
+        "unadjustedWeights" : null,
+        "adjustedWeights" : null,
+        "unadjustedWeightedAverageLives" : null,
+        "adjustedWeightedAverageLives" : null,
+        "unadjustedSimpleWeighting" : null,
+        "adjustedSimpleWeighting" : null,
+        "lifeYearsForIncidence" : null,
+        "inforceRate" : null,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 132333611,
+        "paidPremiumAdj" : null,
+        "constantRate" : 44.0,
+        "constantRateAdj" : 44.0,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 132337381,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 794002330,
+        "unadjustedLifeYearsForCredibility" : 3949.0,
+        "adjustedLifeYearsForCredibility" : 3949.0,
+        "unadjustedYearsForCredibility" : 2.666666666666667,
+        "adjustedYearsForCredibility" : 2.666666666666667,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : null,
+        "adjustedCovidClaims" : null,
+        "unadjustedIBNRPaidBasis" : 0.0,
+        "adjustedIBNRPaidBasis" : 79399891.99999999,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 13233526.899999999,
+        "unadjustedIBNR" : 0.0,
+        "adjustedIBNR" : 79399891.99999999,
+        "unadjustedWaiverOfPremiumReserves" : 0.0,
+        "adjustedWaiverOfPremiumReserves" : 0.0,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : 0.0,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 79399891.99999999,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.599980832324315,
+        "ibnrIncurredMonths" : null,
+        "unadjustedClaimCount" : null,
+        "adjustedClaimCount" : null,
+        "incidencePer1000" : null
+      } ],
+      "experienceSummary" : [ {
+        "summaryType" : "Unadjusted",
+        "outputType" : "BasicLife",
+        "poolingLimit" : null,
+        "poolingCredit" : null,
+        "poolingCharge" : null,
+        "eapExpenseIncludedInPLR" : 0.0,
+        "conversionPortabilityNotification" : 0.005,
+        "idTheftIncludedInPLR" : 0.0,
+        "permissibleLossRatio" : 0.7475707767645645,
+        "rawInforceRate" : null,
+        "netExperienceRate" : null,
+        "rateGuaranteeLoad" : 1.0,
+        "conversionLoad" : 1.01,
+        "agingLoad" : 2.145410870943608,
+        "criticalIllness" : 0.99,
+        "waiverEPAdjustment" : 1.06,
+        "tva" : 1.0,
+        "mortalityImprovement" : 0.2731773050165864,
+        "futureCOVIDMortalityAdjustment" : 1.0273972602739727,
+        "grossExperienceRate" : null,
+        "grossExperienceRateBounded" : 0.07470846904435399,
+        "adjustedInforceRate" : null,
+        "boundedAdjustedInforceRate" : null,
+        "manualRatePreliminary" : 0.14941693808870798,
+        "predictiveAnalyticsAdjustment" : 1.0,
+        "adjustedManualRateFinal" : 0.14941693808870798,
+        "credibility" : 0.3803056068554257,
+        "basicLifeCredibility" : null,
+        "suppLifeCredibility" : null,
+        "dependentLifeCredibility" : null,
+        "initialFormulaRate" : 0.12100488843155516,
+        "riskBasedUWAdjustment" : 0.0,
+        "basicLifeUWAdjustment" : null,
+        "suppLifeUWAdjustment" : null,
+        "dependentUWAdjustment" : null,
+        "subsidyAdjustment" : 0.0,
+        "basicLifeSubsidyAdjustment" : null,
+        "suppLifeSubsidyAdjustment" : null,
+        "dependentSubsidyAdjustment" : null,
+        "finalFormulaRate" : 0.12100488843155516,
+        "traditionalFormulaRate" : null,
+        "formulaRateWithCostShifting" : 0.12100488843155516
+      }, {
+        "summaryType" : "Adjusted",
+        "outputType" : "BasicLife",
+        "poolingLimit" : null,
+        "poolingCredit" : null,
+        "poolingCharge" : 0.0,
+        "eapExpenseIncludedInPLR" : 0.0,
+        "conversionPortabilityNotification" : 0.005,
+        "idTheftIncludedInPLR" : 0.0,
+        "permissibleLossRatio" : 0.7475707767645645,
+        "rawInforceRate" : 44.0,
+        "netExperienceRate" : 26.39915662226986,
+        "rateGuaranteeLoad" : 1.0,
+        "conversionLoad" : 1.01,
+        "agingLoad" : 2.145410870943608,
+        "criticalIllness" : 0.99,
+        "waiverEPAdjustment" : 1.06,
+        "tva" : 1.0,
+        "mortalityImprovement" : 0.2731773050165864,
+        "futureCOVIDMortalityAdjustment" : 1.0273972602739727,
+        "grossExperienceRate" : 22.536873480621146,
+        "grossExperienceRateBounded" : 0.29883387617741597,
+        "adjustedInforceRate" : null,
+        "boundedAdjustedInforceRate" : null,
+        "manualRatePreliminary" : 0.14941693808870798,
+        "predictiveAnalyticsAdjustment" : 1.0,
+        "adjustedManualRateFinal" : 0.14941693808870798,
+        "credibility" : 0.3803056068554257,
+        "basicLifeCredibility" : null,
+        "suppLifeCredibility" : null,
+        "dependentLifeCredibility" : null,
+        "initialFormulaRate" : 0.20624103740301364,
+        "riskBasedUWAdjustment" : 0.0,
+        "basicLifeUWAdjustment" : null,
+        "suppLifeUWAdjustment" : null,
+        "dependentUWAdjustment" : null,
+        "subsidyAdjustment" : 0.0,
+        "basicLifeSubsidyAdjustment" : null,
+        "suppLifeSubsidyAdjustment" : null,
+        "dependentSubsidyAdjustment" : null,
+        "finalFormulaRate" : 0.20624103740301364,
+        "traditionalFormulaRate" : null,
+        "formulaRateWithCostShifting" : 0.20624103740301364
+      } ],
+      "unadjustedRateSummary" : null,
+      "rateSummary" : {
+        "adjustmentToCurrentRate" : 0.0046872963046139466,
+        "adjustmentToManualRate" : 1.3803056068554256
+      },
+      "premiumSummary" : null,
+      "unadjustedAnnualExpNetClaimCost" : null,
+      "adjustedAnnualExpNetClaimCost" : null,
+      "manualRateAfterProfitMidmarketPortability" : 0.17066469227722214,
+      "finalPAAdjustment" : 1.0,
+      "adjustedManualRateByLoadToBlendBTMAndPA" : 0.14941693808870798,
+      "reservesUsed" : null,
+      "reservesByPeriod" : [ {
+        "outputType" : "BasicLife",
+        "periodName" : "Incurral Period 1 (IBNR)",
+        "startDate" : "1906-06-01T00:00:00.000Z",
+        "endDate" : "1906-07-29T00:00:00.000Z",
+        "userEnteredWaiverReserve" : null,
+        "unadjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedEstimatePriorCarrierWaiverReserve" : 4631663.19,
+        "unadjustedPoolingCredit" : null,
+        "unadjustedWaiverReserve" : 0.0,
+        "adjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedEstimatePriorCarrierWaiverReserve" : 4631663.19,
+        "adjustedPoolingCredit" : null,
+        "adjustedWaiverReserve" : 0.0,
+        "totalPaidAmount" : 0.0,
+        "totalCovidClaimsAmount" : 0.0,
+        "totalClaimsCount" : 0,
+        "openClaimsCount" : null
+      }, {
+        "outputType" : "BasicLife",
+        "periodName" : "Incurral Period 2",
+        "startDate" : "1904-12-01T00:00:00.000Z",
+        "endDate" : "1906-05-31T00:00:00.000Z",
+        "userEnteredWaiverReserve" : null,
+        "unadjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedEstimatePriorCarrierWaiverReserve" : 11.655000000000001,
+        "unadjustedPoolingCredit" : null,
+        "unadjustedWaiverReserve" : 0.0,
+        "adjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedEstimatePriorCarrierWaiverReserve" : 11.655000000000001,
+        "adjustedPoolingCredit" : null,
+        "adjustedWaiverReserve" : 0.0,
+        "totalPaidAmount" : 0.0,
+        "totalCovidClaimsAmount" : 0.0,
+        "totalClaimsCount" : 0,
+        "openClaimsCount" : null
+      }, {
+        "outputType" : "BasicLife",
+        "periodName" : "Incurral Period 3",
+        "startDate" : "1903-12-01T00:00:00.000Z",
+        "endDate" : "1904-11-30T00:00:00.000Z",
+        "userEnteredWaiverReserve" : null,
+        "unadjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedEstimatePriorCarrierWaiverReserve" : 1.54,
+        "unadjustedPoolingCredit" : null,
+        "unadjustedWaiverReserve" : 0.0,
+        "adjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedEstimatePriorCarrierWaiverReserve" : 1.54,
+        "adjustedPoolingCredit" : null,
+        "adjustedWaiverReserve" : 0.0,
+        "totalPaidAmount" : 0.0,
+        "totalCovidClaimsAmount" : 0.0,
+        "totalClaimsCount" : 0,
+        "openClaimsCount" : null
+      }, {
+        "outputType" : "Total",
+        "periodName" : "Total",
+        "startDate" : null,
+        "endDate" : null,
+        "userEnteredWaiverReserve" : null,
+        "unadjustedFacePriorCarrierWaiverReserve" : null,
+        "unadjustedReserveKnownPriorCarrierWaiverReserve" : null,
+        "unadjustedReserveUnknownPriorCarrierWaiverReserve" : null,
+        "unadjustedEstimatePriorCarrierWaiverReserve" : null,
+        "unadjustedPoolingCredit" : null,
+        "unadjustedWaiverReserve" : 0.0,
+        "adjustedFacePriorCarrierWaiverReserve" : null,
+        "adjustedReserveKnownPriorCarrierWaiverReserve" : null,
+        "adjustedReserveUnknownPriorCarrierWaiverReserve" : null,
+        "adjustedEstimatePriorCarrierWaiverReserve" : null,
+        "adjustedPoolingCredit" : null,
+        "adjustedWaiverReserve" : 0.0,
+        "totalPaidAmount" : 0.0,
+        "totalCovidClaimsAmount" : 0.0,
+        "totalClaimsCount" : 0,
+        "openClaimsCount" : null
+      } ],
+      "manualRatePointsCalculator" : {
+        "manualRatingRawManualRate" : 0.17100009248127257,
+        "inforceRateBTMDiscountingBasis" : 51.76470588235294,
+        "unadjustedPureExperienceRate" : 0.0,
+        "experienceRatingProfitAdjustmentFactor" : 0.9980385963587292,
+        "experienceRatingProfitAdjustmentRate" : null,
+        "predictiveAnalyticsFactor" : 1.0,
+        "predictiveAnalyticsRate" : null,
+        "midMarketFactor" : 1.0,
+        "midMarketRate" : null,
+        "portabilityAdjustmentFactor" : 1.0,
+        "interestRateChangeFactor" : null,
+        "interestRateChange" : null,
+        "stdIntegrationFactor" : null,
+        "stdIntegrationRate" : null,
+        "totalPointsEligibleFor" : 0.0,
+        "weightGivenToInforceRate" : 0.0,
+        "pointBasedManualRateBTMDiscountingBasis" : 0.17066469227722214,
+        "pointBasedManualRateBTFDiscountingBasis" : 0.14941693808870798,
+        "overriddenManualRateBTFDiscountingBasis" : null,
+        "finalManualRateValueUsed" : 0.14941693808870798
+      },
+      "poolingPointsCalculator" : {
+        "сalculatedPoolingCharge" : 0.0,
+        "сalculatedPoolingCredit" : null,
+        "profitAdjustedManualRate" : 0.17066469227722214,
+        "fullyAdjustedManualRate" : 0.17066469227722214,
+        "adjustmentPercentage" : 0.0,
+        "adjustmentDirection" : "No change",
+        "poolingChargePct" : 0.0,
+        "finalPoolingValueUsed" : 0.0
+      },
+      "credibilityPointsCalculator" : {
+        "calculatedStartingCredibility" : 0.3803056068554257,
+        "weightedMonthsExperienceNumber" : 32.0,
+        "experiencePeriodsNumber" : 3,
+        "coefficientOfVariationByNumberOfLives" : 1.3095342215489576,
+        "manualLossRatio" : 0.002464689683776661,
+        "overAllExpPeriodsSum" : 0.6485222287444644,
+        "numberOfExpPeriodsMLRCLR" : 0,
+        "maxPctOfTotalMLRCLR" : 0.0,
+        "averageConstantLossRatio" : 0.21781720270400592,
+        "largestDifferenceBetweenExpPeriodCLRs" : 0.5999981546585643,
+        "coefficientOfVariationOfCLR" : 1.52446985903319,
+        "absoluteValueOfMLR" : 131.56265330545168,
+        "qualityExperienceData" : true,
+        "sufficientYearsMonthsOfExperience" : false,
+        "livesStabilityOverTime" : false,
+        "manualDifference" : true,
+        "lossRatioStability" : true,
+        "averageDifference" : false,
+        "allCriteriaSatisfied" : false,
+        "totalYearsExperience" : null,
+        "credibilityMultiplier" : 1.0,
+        "pointsBasedCredibility" : 0.3803056068554257,
+        "finalCredibilityValueUsed" : 0.3803056068554257
+      },
+      "agingFactor" : 2.145410870943608,
+      "plr" : 0.7475707767645645,
+      "reinsuranceCharge" : null,
+      "uwOverrideReasons" : null,
+      "comments" : null
+    }, {
+      "outputType" : "DependentLife",
+      "experienceExhibitHeader" : {
+        "header" : "DependentLife  SUMMARY",
+        "subHeader" : null,
+        "underwritingCompany" : null,
+        "policyHolder" : "qprAmerican Medical Group, Inc.",
+        "policyNumber" : "GL0000859138",
+        "experienceRatebookName" : null,
+        "valuationDate" : null,
+        "effectiveDate" : "2026-12-01T00:00:00.000Z",
+        "volume" : 36083867.1875,
+        "experienceBasis" : null,
+        "rateBasis" : "Per $1000 Gross Monthly Benefit",
+        "currentRate" : 4.0,
+        "adjustedManualRate" : 0.1902552554958797,
+        "reportedFormulaRate" : 0.3805105109917594,
+        "commissions" : "11% Standard Graded",
+        "adminFee" : null,
+        "overrideFee" : null,
+        "benAdminFee" : null
+      },
+      "experienceByPeriod" : [ {
+        "periodName" : "Incurral Period 1 (IBNR)",
+        "startDate" : "1906-06-01T00:00:00.000Z",
+        "endDate" : "1906-07-29T00:00:00.000Z",
+        "numberOfMonths" : 2.0,
+        "numberOfMonthsAdj" : null,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 33232131,
+        "averageAnnualizedLivesAdj" : null,
+        "exposedLifeYears" : 5538688.5,
+        "exposedLifeYearsAdj" : null,
+        "unadjustedWeights" : 1.0,
+        "adjustedWeights" : 1.0,
+        "unadjustedWeightedAverageLives" : 5538688.5,
+        "adjustedWeightedAverageLives" : 5538688.5,
+        "unadjustedSimpleWeighting" : 1.0,
+        "adjustedSimpleWeighting" : 1.0,
+        "lifeYearsForIncidence" : 5538688.5,
+        "inforceRate" : 4.0,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 24323.0,
+        "paidPremiumAdj" : null,
+        "constantRate" : 4.0,
+        "constantRateAdj" : null,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 24323.0,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 145938.0,
+        "unadjustedLifeYearsForCredibility" : 5538688.5,
+        "adjustedLifeYearsForCredibility" : 5538688.5,
+        "unadjustedYearsForCredibility" : 0.16666666666666666,
+        "adjustedYearsForCredibility" : 0.16666666666666666,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : 0.0,
+        "adjustedCovidClaims" : 0.0,
+        "unadjustedIBNRPaidBasis" : null,
+        "adjustedIBNRPaidBasis" : 14571.599999999999,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 2432.2999999999997,
+        "unadjustedIBNR" : null,
+        "adjustedIBNR" : 14571.599999999999,
+        "unadjustedWaiverOfPremiumReserves" : null,
+        "adjustedWaiverOfPremiumReserves" : null,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : null,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 14571.599999999999,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.5990872836409982,
+        "ibnrIncurredMonths" : 2.0,
+        "unadjustedClaimCount" : 0,
+        "adjustedClaimCount" : 0,
+        "incidencePer1000" : 0.0
+      }, {
+        "periodName" : "Incurral Period 2",
+        "startDate" : "1904-12-01T00:00:00.000Z",
+        "endDate" : "1906-05-31T00:00:00.000Z",
+        "numberOfMonths" : 18.0,
+        "numberOfMonthsAdj" : null,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 233.0,
+        "averageAnnualizedLivesAdj" : null,
+        "exposedLifeYears" : 349.5,
+        "exposedLifeYearsAdj" : null,
+        "unadjustedWeights" : 1.0,
+        "adjustedWeights" : 1.0,
+        "unadjustedWeightedAverageLives" : 349.5,
+        "adjustedWeightedAverageLives" : 349.5,
+        "unadjustedSimpleWeighting" : 1.0,
+        "adjustedSimpleWeighting" : 1.0,
+        "lifeYearsForIncidence" : 349.5,
+        "inforceRate" : 4.0,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 333.0,
+        "paidPremiumAdj" : null,
+        "constantRate" : 4.0,
+        "constantRateAdj" : null,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 333.0,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 222.0,
+        "unadjustedLifeYearsForCredibility" : 349.5,
+        "adjustedLifeYearsForCredibility" : 349.5,
+        "unadjustedYearsForCredibility" : 1.5,
+        "adjustedYearsForCredibility" : 1.5,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : 0.0,
+        "adjustedCovidClaims" : 0.0,
+        "unadjustedIBNRPaidBasis" : null,
+        "adjustedIBNRPaidBasis" : 17.799999999999997,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 18.5,
+        "unadjustedIBNR" : null,
+        "adjustedIBNR" : 17.799999999999997,
+        "unadjustedWaiverOfPremiumReserves" : null,
+        "adjustedWaiverOfPremiumReserves" : null,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : null,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 17.799999999999997,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.053453453453453446,
+        "ibnrIncurredMonths" : 10.0,
+        "unadjustedClaimCount" : 0,
+        "adjustedClaimCount" : 0,
+        "incidencePer1000" : 0.0
+      }, {
+        "periodName" : "Incurral Period 3",
+        "startDate" : "1903-12-01T00:00:00.000Z",
+        "endDate" : "1904-11-30T00:00:00.000Z",
+        "numberOfMonths" : 12.0,
+        "numberOfMonthsAdj" : null,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 4444.0,
+        "averageAnnualizedLivesAdj" : null,
+        "exposedLifeYears" : 4444.0,
+        "exposedLifeYearsAdj" : null,
+        "unadjustedWeights" : 1.0,
+        "adjustedWeights" : 1.0,
+        "unadjustedWeightedAverageLives" : 4444.0,
+        "adjustedWeightedAverageLives" : 4444.0,
+        "unadjustedSimpleWeighting" : 1.0,
+        "adjustedSimpleWeighting" : 1.0,
+        "lifeYearsForIncidence" : 4444.0,
+        "inforceRate" : 4.0,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 44.0,
+        "paidPremiumAdj" : null,
+        "constantRate" : 4.0,
+        "constantRateAdj" : null,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 44.0,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 44.0,
+        "unadjustedLifeYearsForCredibility" : 4444.0,
+        "adjustedLifeYearsForCredibility" : 4444.0,
+        "unadjustedYearsForCredibility" : 1.0,
+        "adjustedYearsForCredibility" : 1.0,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : 0.0,
+        "adjustedCovidClaims" : 0.0,
+        "unadjustedIBNRPaidBasis" : 0.0,
+        "adjustedIBNRPaidBasis" : 0.0,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 0.0,
+        "unadjustedIBNR" : 0.0,
+        "adjustedIBNR" : 0.0,
+        "unadjustedWaiverOfPremiumReserves" : null,
+        "adjustedWaiverOfPremiumReserves" : null,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : null,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 0.0,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.0,
+        "ibnrIncurredMonths" : 0.0,
+        "unadjustedClaimCount" : 0,
+        "adjustedClaimCount" : 0,
+        "incidencePer1000" : 0.0
+      }, {
+        "periodName" : "Total",
+        "startDate" : null,
+        "endDate" : null,
+        "numberOfMonths" : 32.0,
+        "numberOfMonthsAdj" : 32.0,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 33236808,
+        "averageAnnualizedLivesAdj" : 33236808,
+        "exposedLifeYears" : 5543482.0,
+        "exposedLifeYearsAdj" : 5543482.0,
+        "unadjustedWeights" : null,
+        "adjustedWeights" : null,
+        "unadjustedWeightedAverageLives" : null,
+        "adjustedWeightedAverageLives" : null,
+        "unadjustedSimpleWeighting" : null,
+        "adjustedSimpleWeighting" : null,
+        "lifeYearsForIncidence" : null,
+        "inforceRate" : null,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 24700.0,
+        "paidPremiumAdj" : null,
+        "constantRate" : 4.0,
+        "constantRateAdj" : 4.0,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 24700.0,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 146204.0,
+        "unadjustedLifeYearsForCredibility" : 5543482.0,
+        "adjustedLifeYearsForCredibility" : 5543482.0,
+        "unadjustedYearsForCredibility" : 2.666666666666667,
+        "adjustedYearsForCredibility" : 2.666666666666667,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : null,
+        "adjustedCovidClaims" : null,
+        "unadjustedIBNRPaidBasis" : 0.0,
+        "adjustedIBNRPaidBasis" : 14589.399999999998,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 2450.7999999999997,
+        "unadjustedIBNR" : 0.0,
+        "adjustedIBNR" : 14589.399999999998,
+        "unadjustedWaiverOfPremiumReserves" : null,
+        "adjustedWaiverOfPremiumReserves" : null,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : null,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 14589.399999999998,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.590663967611336,
+        "ibnrIncurredMonths" : null,
+        "unadjustedClaimCount" : null,
+        "adjustedClaimCount" : null,
+        "incidencePer1000" : null
+      } ],
+      "experienceSummary" : [ {
+        "summaryType" : "Unadjusted",
+        "outputType" : "DependentLife",
+        "poolingLimit" : null,
+        "poolingCredit" : null,
+        "poolingCharge" : null,
+        "eapExpenseIncludedInPLR" : 0.0,
+        "conversionPortabilityNotification" : 0.005,
+        "idTheftIncludedInPLR" : 0.0,
+        "permissibleLossRatio" : 0.7475707767645645,
+        "rawInforceRate" : null,
+        "netExperienceRate" : null,
+        "rateGuaranteeLoad" : 1.0,
+        "conversionLoad" : null,
+        "agingLoad" : 1.0600421388115202,
+        "criticalIllness" : 0.99,
+        "waiverEPAdjustment" : 1.06,
+        "tva" : 0.98,
+        "mortalityImprovement" : 1.0,
+        "futureCOVIDMortalityAdjustment" : 1.0273972602739727,
+        "grossExperienceRate" : null,
+        "grossExperienceRateBounded" : 0.09512762774793986,
+        "adjustedInforceRate" : null,
+        "boundedAdjustedInforceRate" : null,
+        "manualRatePreliminary" : 0.1902552554958797,
+        "predictiveAnalyticsAdjustment" : 1.0,
+        "adjustedManualRateFinal" : 0.1902552554958797,
+        "credibility" : 1.0,
+        "basicLifeCredibility" : null,
+        "suppLifeCredibility" : null,
+        "dependentLifeCredibility" : null,
+        "initialFormulaRate" : 0.09512762774793986,
+        "riskBasedUWAdjustment" : 0.0,
+        "basicLifeUWAdjustment" : null,
+        "suppLifeUWAdjustment" : null,
+        "dependentUWAdjustment" : null,
+        "subsidyAdjustment" : 0.0,
+        "basicLifeSubsidyAdjustment" : null,
+        "suppLifeSubsidyAdjustment" : null,
+        "dependentSubsidyAdjustment" : null,
+        "finalFormulaRate" : 0.09512762774793986,
+        "traditionalFormulaRate" : null,
+        "formulaRateWithCostShifting" : 0.09512762774793986
+      }, {
+        "summaryType" : "Adjusted",
+        "outputType" : "DependentLife",
+        "poolingLimit" : null,
+        "poolingCredit" : null,
+        "poolingCharge" : null,
+        "eapExpenseIncludedInPLR" : 0.0,
+        "conversionPortabilityNotification" : 0.005,
+        "idTheftIncludedInPLR" : 0.0,
+        "permissibleLossRatio" : 0.7475707767645645,
+        "rawInforceRate" : 4.0,
+        "netExperienceRate" : 2.362655870445344,
+        "rateGuaranteeLoad" : 1.0,
+        "conversionLoad" : null,
+        "agingLoad" : 1.0600421388115202,
+        "criticalIllness" : 0.99,
+        "waiverEPAdjustment" : 1.06,
+        "tva" : 0.98,
+        "mortalityImprovement" : 1.0,
+        "futureCOVIDMortalityAdjustment" : 1.0273972602739727,
+        "grossExperienceRate" : 3.539784490676914,
+        "grossExperienceRateBounded" : 0.3805105109917594,
+        "adjustedInforceRate" : null,
+        "boundedAdjustedInforceRate" : null,
+        "manualRatePreliminary" : 0.1902552554958797,
+        "predictiveAnalyticsAdjustment" : 1.0,
+        "adjustedManualRateFinal" : 0.1902552554958797,
+        "credibility" : 1.0,
+        "basicLifeCredibility" : null,
+        "suppLifeCredibility" : null,
+        "dependentLifeCredibility" : null,
+        "initialFormulaRate" : 0.3805105109917594,
+        "riskBasedUWAdjustment" : 0.0,
+        "basicLifeUWAdjustment" : null,
+        "suppLifeUWAdjustment" : null,
+        "dependentUWAdjustment" : null,
+        "subsidyAdjustment" : 0.0,
+        "basicLifeSubsidyAdjustment" : null,
+        "suppLifeSubsidyAdjustment" : null,
+        "dependentSubsidyAdjustment" : null,
+        "finalFormulaRate" : 0.3805105109917594,
+        "traditionalFormulaRate" : null,
+        "formulaRateWithCostShifting" : 0.3805105109917594
+      } ],
+      "unadjustedRateSummary" : null,
+      "rateSummary" : {
+        "adjustmentToCurrentRate" : 0.09512762774793986,
+        "adjustmentToManualRate" : 2.0
+      },
+      "premiumSummary" : null,
+      "unadjustedAnnualExpNetClaimCost" : null,
+      "adjustedAnnualExpNetClaimCost" : null,
+      "manualRateAfterProfitMidmarketPortability" : 0.21731040033795512,
+      "finalPAAdjustment" : null,
+      "adjustedManualRateByLoadToBlendBTMAndPA" : 0.1902552554958797,
+      "reservesUsed" : null,
+      "reservesByPeriod" : [ {
+        "outputType" : "DependentLife",
+        "periodName" : "Incurral Period 1 (IBNR)",
+        "startDate" : "1906-06-01T00:00:00.000Z",
+        "endDate" : "1906-07-29T00:00:00.000Z",
+        "userEnteredWaiverReserve" : null,
+        "unadjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedEstimatePriorCarrierWaiverReserve" : 608.075,
+        "unadjustedPoolingCredit" : null,
+        "unadjustedWaiverReserve" : 0.0,
+        "adjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedEstimatePriorCarrierWaiverReserve" : 608.075,
+        "adjustedPoolingCredit" : null,
+        "adjustedWaiverReserve" : 0.0,
+        "totalPaidAmount" : 0.0,
+        "totalCovidClaimsAmount" : 0.0,
+        "totalClaimsCount" : 0,
+        "openClaimsCount" : null
+      }, {
+        "outputType" : "DependentLife",
+        "periodName" : "Incurral Period 2",
+        "startDate" : "1904-12-01T00:00:00.000Z",
+        "endDate" : "1906-05-31T00:00:00.000Z",
+        "userEnteredWaiverReserve" : null,
+        "unadjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedEstimatePriorCarrierWaiverReserve" : 8.325000000000001,
+        "unadjustedPoolingCredit" : null,
+        "unadjustedWaiverReserve" : 0.0,
+        "adjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedEstimatePriorCarrierWaiverReserve" : 8.325000000000001,
+        "adjustedPoolingCredit" : null,
+        "adjustedWaiverReserve" : 0.0,
+        "totalPaidAmount" : 0.0,
+        "totalCovidClaimsAmount" : 0.0,
+        "totalClaimsCount" : 0,
+        "openClaimsCount" : null
+      }, {
+        "outputType" : "DependentLife",
+        "periodName" : "Incurral Period 3",
+        "startDate" : "1903-12-01T00:00:00.000Z",
+        "endDate" : "1904-11-30T00:00:00.000Z",
+        "userEnteredWaiverReserve" : null,
+        "unadjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "unadjustedEstimatePriorCarrierWaiverReserve" : 1.1,
+        "unadjustedPoolingCredit" : null,
+        "unadjustedWaiverReserve" : 0.0,
+        "adjustedFacePriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveKnownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedReserveUnknownPriorCarrierWaiverReserve" : 0.0,
+        "adjustedEstimatePriorCarrierWaiverReserve" : 1.1,
+        "adjustedPoolingCredit" : null,
+        "adjustedWaiverReserve" : 0.0,
+        "totalPaidAmount" : 0.0,
+        "totalCovidClaimsAmount" : 0.0,
+        "totalClaimsCount" : 0,
+        "openClaimsCount" : null
+      }, {
+        "outputType" : "Total",
+        "periodName" : "Total",
+        "startDate" : null,
+        "endDate" : null,
+        "userEnteredWaiverReserve" : null,
+        "unadjustedFacePriorCarrierWaiverReserve" : null,
+        "unadjustedReserveKnownPriorCarrierWaiverReserve" : null,
+        "unadjustedReserveUnknownPriorCarrierWaiverReserve" : null,
+        "unadjustedEstimatePriorCarrierWaiverReserve" : null,
+        "unadjustedPoolingCredit" : null,
+        "unadjustedWaiverReserve" : 0.0,
+        "adjustedFacePriorCarrierWaiverReserve" : null,
+        "adjustedReserveKnownPriorCarrierWaiverReserve" : null,
+        "adjustedReserveUnknownPriorCarrierWaiverReserve" : null,
+        "adjustedEstimatePriorCarrierWaiverReserve" : null,
+        "adjustedPoolingCredit" : null,
+        "adjustedWaiverReserve" : 0.0,
+        "totalPaidAmount" : 0.0,
+        "totalCovidClaimsAmount" : 0.0,
+        "totalClaimsCount" : 0,
+        "openClaimsCount" : null
+      } ],
+      "manualRatePointsCalculator" : {
+        "manualRatingRawManualRate" : 0.21773747140721433,
+        "inforceRateBTMDiscountingBasis" : 4.705882352941177,
+        "unadjustedPureExperienceRate" : 0.0,
+        "experienceRatingProfitAdjustmentFactor" : 0.9980385963587292,
+        "experienceRatingProfitAdjustmentRate" : null,
+        "predictiveAnalyticsFactor" : null,
+        "predictiveAnalyticsRate" : null,
+        "midMarketFactor" : 1.0,
+        "midMarketRate" : null,
+        "portabilityAdjustmentFactor" : null,
+        "interestRateChangeFactor" : null,
+        "interestRateChange" : null,
+        "stdIntegrationFactor" : null,
+        "stdIntegrationRate" : null,
+        "totalPointsEligibleFor" : 0.0,
+        "weightGivenToInforceRate" : 0.0,
+        "pointBasedManualRateBTMDiscountingBasis" : 0.21731040033795512,
+        "pointBasedManualRateBTFDiscountingBasis" : 0.1902552554958797,
+        "overriddenManualRateBTFDiscountingBasis" : null,
+        "finalManualRateValueUsed" : 0.1902552554958797
+      },
+      "poolingPointsCalculator" : null,
+      "credibilityPointsCalculator" : {
+        "calculatedStartingCredibility" : 1.0,
+        "weightedMonthsExperienceNumber" : 32.0,
+        "experiencePeriodsNumber" : 3,
+        "coefficientOfVariationByNumberOfLives" : 1.7316852232493614,
+        "manualLossRatio" : 0.03452166726567851,
+        "overAllExpPeriodsSum" : 0.5834974025630946,
+        "numberOfExpPeriodsMLRCLR" : 0,
+        "maxPctOfTotalMLRCLR" : 0.0,
+        "averageConstantLossRatio" : 0.21751357903148386,
+        "largestDifferenceBetweenExpPeriodCLRs" : 0.5990872836409982,
+        "coefficientOfVariationOfCLR" : 1.524187956886562,
+        "absoluteValueOfMLR" : 8.451176446266379,
+        "qualityExperienceData" : true,
+        "sufficientYearsMonthsOfExperience" : false,
+        "livesStabilityOverTime" : false,
+        "manualDifference" : true,
+        "lossRatioStability" : true,
+        "averageDifference" : false,
+        "allCriteriaSatisfied" : false,
+        "totalYearsExperience" : null,
+        "credibilityMultiplier" : 1.0,
+        "pointsBasedCredibility" : 1.0,
+        "finalCredibilityValueUsed" : 1.0
+      },
+      "agingFactor" : 1.0600421388115202,
+      "plr" : 0.7475707767645645,
+      "reinsuranceCharge" : null,
+      "uwOverrideReasons" : null,
+      "comments" : null
+    }, {
+      "outputType" : "Combined",
+      "experienceExhibitHeader" : {
+        "header" : "Combined  SUMMARY",
+        "subHeader" : null,
+        "underwritingCompany" : null,
+        "policyHolder" : "qprAmerican Medical Group, Inc.",
+        "policyNumber" : "GL0000859138",
+        "experienceRatebookName" : null,
+        "valuationDate" : null,
+        "effectiveDate" : "2026-12-01T00:00:00.000Z",
+        "volume" : 90148867.1875,
+        "experienceBasis" : null,
+        "rateBasis" : null,
+        "currentRate" : null,
+        "adjustedManualRate" : null,
+        "reportedFormulaRate" : 0.2759958411625863,
+        "commissions" : null,
+        "adminFee" : null,
+        "overrideFee" : null,
+        "benAdminFee" : null
+      },
+      "experienceByPeriod" : [ {
+        "periodName" : "Incurral Period 1 (IBNR)",
+        "startDate" : "1906-06-01T00:00:00.000Z",
+        "endDate" : "1906-07-29T00:00:00.000Z",
+        "numberOfMonths" : 2.0,
+        "numberOfMonthsAdj" : null,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 33232164,
+        "averageAnnualizedLivesAdj" : null,
+        "exposedLifeYears" : 5538694.0,
+        "exposedLifeYearsAdj" : null,
+        "unadjustedWeights" : 1.0,
+        "adjustedWeights" : 1.0,
+        "unadjustedWeightedAverageLives" : 5538694.0,
+        "adjustedWeightedAverageLives" : 5538694.0,
+        "unadjustedSimpleWeighting" : 1.0,
+        "adjustedSimpleWeighting" : 1.0,
+        "lifeYearsForIncidence" : 5538694.0,
+        "inforceRate" : null,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 132357557,
+        "paidPremiumAdj" : null,
+        "constantRate" : null,
+        "constantRateAdj" : null,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 132357557,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 794145342,
+        "unadjustedLifeYearsForCredibility" : 5538694.0,
+        "adjustedLifeYearsForCredibility" : 5538694.0,
+        "unadjustedYearsForCredibility" : 0.3333333333333333,
+        "adjustedYearsForCredibility" : 0.3333333333333333,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : null,
+        "adjustedCovidClaims" : null,
+        "unadjustedIBNRPaidBasis" : null,
+        "adjustedIBNRPaidBasis" : 79414267.79999998,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 13235755.7,
+        "unadjustedIBNR" : null,
+        "adjustedIBNR" : 79414267.79999998,
+        "unadjustedWaiverOfPremiumReserves" : 0.0,
+        "adjustedWaiverOfPremiumReserves" : 0.0,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : 0.0,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 79414267.79999998,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.599997987270194,
+        "ibnrIncurredMonths" : null,
+        "unadjustedClaimCount" : null,
+        "adjustedClaimCount" : null,
+        "incidencePer1000" : null
+      }, {
+        "periodName" : "Incurral Period 2",
+        "startDate" : "1904-12-01T00:00:00.000Z",
+        "endDate" : "1906-05-31T00:00:00.000Z",
+        "numberOfMonths" : 18.0,
+        "numberOfMonthsAdj" : null,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 2566.0,
+        "averageAnnualizedLivesAdj" : null,
+        "exposedLifeYears" : 3849.0,
+        "exposedLifeYearsAdj" : null,
+        "unadjustedWeights" : 1.0,
+        "adjustedWeights" : 1.0,
+        "unadjustedWeightedAverageLives" : 3849.0,
+        "adjustedWeightedAverageLives" : 3849.0,
+        "unadjustedSimpleWeighting" : 1.0,
+        "adjustedSimpleWeighting" : 1.0,
+        "lifeYearsForIncidence" : 3849.0,
+        "inforceRate" : null,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 666.0,
+        "paidPremiumAdj" : null,
+        "constantRate" : null,
+        "constantRateAdj" : null,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 3996.0,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 2664.0,
+        "unadjustedLifeYearsForCredibility" : 3849.0,
+        "adjustedLifeYearsForCredibility" : 3849.0,
+        "unadjustedYearsForCredibility" : 3.0,
+        "adjustedYearsForCredibility" : 3.0,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : null,
+        "adjustedCovidClaims" : null,
+        "unadjustedIBNRPaidBasis" : null,
+        "adjustedIBNRPaidBasis" : 213.59999999999997,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 221.99999999999997,
+        "unadjustedIBNR" : null,
+        "adjustedIBNR" : 213.59999999999997,
+        "unadjustedWaiverOfPremiumReserves" : 0.0,
+        "adjustedWaiverOfPremiumReserves" : 0.0,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : 0.0,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 213.59999999999997,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.053453453453453446,
+        "ibnrIncurredMonths" : null,
+        "unadjustedClaimCount" : null,
+        "adjustedClaimCount" : null,
+        "incidencePer1000" : null
+      }, {
+        "periodName" : "Incurral Period 3",
+        "startDate" : "1903-12-01T00:00:00.000Z",
+        "endDate" : "1904-11-30T00:00:00.000Z",
+        "numberOfMonths" : 12.0,
+        "numberOfMonthsAdj" : null,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 4888.0,
+        "averageAnnualizedLivesAdj" : null,
+        "exposedLifeYears" : 4888.0,
+        "exposedLifeYearsAdj" : null,
+        "unadjustedWeights" : 1.0,
+        "adjustedWeights" : 1.0,
+        "unadjustedWeightedAverageLives" : 4888.0,
+        "adjustedWeightedAverageLives" : 4888.0,
+        "unadjustedSimpleWeighting" : 1.0,
+        "adjustedSimpleWeighting" : 1.0,
+        "lifeYearsForIncidence" : 4888.0,
+        "inforceRate" : null,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 88.0,
+        "paidPremiumAdj" : null,
+        "constantRate" : null,
+        "constantRateAdj" : null,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 528.0,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 528.0,
+        "unadjustedLifeYearsForCredibility" : 4888.0,
+        "adjustedLifeYearsForCredibility" : 4888.0,
+        "unadjustedYearsForCredibility" : 2.0,
+        "adjustedYearsForCredibility" : 2.0,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : null,
+        "adjustedCovidClaims" : null,
+        "unadjustedIBNRPaidBasis" : 0.0,
+        "adjustedIBNRPaidBasis" : 0.0,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 0.0,
+        "unadjustedIBNR" : 0.0,
+        "adjustedIBNR" : 0.0,
+        "unadjustedWaiverOfPremiumReserves" : 0.0,
+        "adjustedWaiverOfPremiumReserves" : 0.0,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : 0.0,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 0.0,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.0,
+        "ibnrIncurredMonths" : null,
+        "unadjustedClaimCount" : null,
+        "adjustedClaimCount" : null,
+        "incidencePer1000" : null
+      }, {
+        "periodName" : "Total",
+        "startDate" : null,
+        "endDate" : null,
+        "numberOfMonths" : 32.0,
+        "numberOfMonthsAdj" : 32.0,
+        "allPreviousPeriodsMonthsSum" : null,
+        "averageAnnualizedLives" : 33239618,
+        "averageAnnualizedLivesAdj" : 33239618,
+        "exposedLifeYears" : 5547431.0,
+        "exposedLifeYearsAdj" : 5547431.0,
+        "unadjustedWeights" : null,
+        "adjustedWeights" : null,
+        "unadjustedWeightedAverageLives" : null,
+        "adjustedWeightedAverageLives" : null,
+        "unadjustedSimpleWeighting" : null,
+        "adjustedSimpleWeighting" : null,
+        "lifeYearsForIncidence" : null,
+        "inforceRate" : null,
+        "unadjustedPaidPremium" : null,
+        "adjustedPaidPremium" : 132358311,
+        "paidPremiumAdj" : null,
+        "constantRate" : null,
+        "constantRateAdj" : null,
+        "unadjustedConstantPremium" : null,
+        "adjustedConstantPremium" : 132362081,
+        "constantPremiumAdj" : null,
+        "unadjustedConstantAnnualizedPremium" : null,
+        "adjustedConstantAnnualizedPremium" : 794148534,
+        "unadjustedLifeYearsForCredibility" : 5547431.0,
+        "adjustedLifeYearsForCredibility" : 5547431.0,
+        "unadjustedYearsForCredibility" : 5.333333333333334,
+        "adjustedYearsForCredibility" : 5.333333333333334,
+        "unadjustedPaidClaims" : null,
+        "adjustedPaidClaims" : null,
+        "unadjustedCovidClaims" : null,
+        "adjustedCovidClaims" : null,
+        "unadjustedIBNRPaidBasis" : 0.0,
+        "adjustedIBNRPaidBasis" : 79414481.39999998,
+        "unadjustedIBNRIncurredBasis" : null,
+        "adjustedIBNRIncurredBasis" : 13235977.7,
+        "unadjustedIBNR" : 0.0,
+        "adjustedIBNR" : 79414481.39999998,
+        "unadjustedWaiverOfPremiumReserves" : 0.0,
+        "adjustedWaiverOfPremiumReserves" : 0.0,
+        "unadjustedPoolingCharge" : null,
+        "adjustedPoolingCharge" : 0.0,
+        "unadjustedPoolingCredit" : null,
+        "adjustedPoolingCredit" : null,
+        "unadjustedEstimatedCovidClaims" : 0.0,
+        "adjustedEstimatedCovidClaims" : 0.0,
+        "unadjustedIncurredClaims" : 0.0,
+        "adjustedIncurredClaims" : 79414481.39999998,
+        "unadjustedConstantLossRatio" : null,
+        "adjustedConstantLossRatio" : 0.5999790937103805,
+        "ibnrIncurredMonths" : null,
+        "unadjustedClaimCount" : null,
+        "adjustedClaimCount" : null,
+        "incidencePer1000" : null
+      } ],
+      "experienceSummary" : [ {
+        "summaryType" : "Unadjusted",
+        "outputType" : "Combined",
+        "poolingLimit" : null,
+        "poolingCredit" : null,
+        "poolingCharge" : null,
+        "eapExpenseIncludedInPLR" : null,
+        "conversionPortabilityNotification" : null,
+        "idTheftIncludedInPLR" : null,
+        "permissibleLossRatio" : 0.7475707767645645,
+        "rawInforceRate" : null,
+        "netExperienceRate" : null,
+        "rateGuaranteeLoad" : null,
+        "conversionLoad" : null,
+        "agingLoad" : null,
+        "criticalIllness" : null,
+        "waiverEPAdjustment" : null,
+        "tva" : null,
+        "mortalityImprovement" : null,
+        "futureCOVIDMortalityAdjustment" : null,
+        "grossExperienceRate" : null,
+        "grossExperienceRateBounded" : 0.0828816411953496,
+        "adjustedInforceRate" : null,
+        "boundedAdjustedInforceRate" : null,
+        "manualRatePreliminary" : null,
+        "predictiveAnalyticsAdjustment" : null,
+        "adjustedManualRateFinal" : 0.1657632823906992,
+        "credibility" : null,
+        "basicLifeCredibility" : 0.3803056068554257,
+        "suppLifeCredibility" : null,
+        "dependentLifeCredibility" : 1.0,
+        "initialFormulaRate" : 0.11064700300475565,
+        "riskBasedUWAdjustment" : null,
+        "basicLifeUWAdjustment" : 0.0,
+        "suppLifeUWAdjustment" : null,
+        "dependentUWAdjustment" : 0.0,
+        "subsidyAdjustment" : null,
+        "basicLifeSubsidyAdjustment" : 0.0,
+        "suppLifeSubsidyAdjustment" : null,
+        "dependentSubsidyAdjustment" : 0.0,
+        "finalFormulaRate" : 0.11064700300475565,
+        "traditionalFormulaRate" : null,
+        "formulaRateWithCostShifting" : 0.11064700300475565
+      }, {
+        "summaryType" : "Adjusted",
+        "outputType" : "Combined",
+        "poolingLimit" : null,
+        "poolingCredit" : null,
+        "poolingCharge" : null,
+        "eapExpenseIncludedInPLR" : null,
+        "conversionPortabilityNotification" : null,
+        "idTheftIncludedInPLR" : null,
+        "permissibleLossRatio" : 0.7475707767645645,
+        "rawInforceRate" : null,
+        "netExperienceRate" : 16.778071767402785,
+        "rateGuaranteeLoad" : null,
+        "conversionLoad" : null,
+        "agingLoad" : null,
+        "criticalIllness" : null,
+        "waiverEPAdjustment" : null,
+        "tva" : null,
+        "mortalityImprovement" : null,
+        "futureCOVIDMortalityAdjustment" : null,
+        "grossExperienceRate" : 14.932912860278313,
+        "grossExperienceRateBounded" : 0.3315265647813984,
+        "adjustedInforceRate" : null,
+        "boundedAdjustedInforceRate" : null,
+        "manualRatePreliminary" : null,
+        "predictiveAnalyticsAdjustment" : null,
+        "adjustedManualRateFinal" : 0.1657632823906992,
+        "credibility" : null,
+        "basicLifeCredibility" : 0.3803056068554257,
+        "suppLifeCredibility" : null,
+        "dependentLifeCredibility" : 1.0,
+        "initialFormulaRate" : 0.2759958411625863,
+        "riskBasedUWAdjustment" : null,
+        "basicLifeUWAdjustment" : 0.0,
+        "suppLifeUWAdjustment" : null,
+        "dependentUWAdjustment" : 0.0,
+        "subsidyAdjustment" : null,
+        "basicLifeSubsidyAdjustment" : 0.0,
+        "suppLifeSubsidyAdjustment" : null,
+        "dependentSubsidyAdjustment" : 0.0,
+        "finalFormulaRate" : 0.2759958411625863,
+        "traditionalFormulaRate" : null,
+        "formulaRateWithCostShifting" : 0.2759958411625863
+      } ],
+      "unadjustedRateSummary" : {
+        "adjustmentToCurrentRate" : 0.003953202239821766,
+        "adjustmentToManualRate" : 0.5843963134268806
+      },
+      "rateSummary" : {
+        "adjustmentToCurrentRate" : 0.009860794669861362,
+        "adjustmentToManualRate" : 1.4577073731462387
+      },
+      "premiumSummary" : {
+        "annualFormulaPremium" : 153112.08000000002,
+        "annualPayablePremium" : 14922.0,
+        "estimatedBTF" : 0.09745801898844296
+      },
+      "unadjustedAnnualExpNetClaimCost" : null,
+      "adjustedAnnualExpNetClaimCost" : null,
+      "manualRateAfterProfitMidmarketPortability" : null,
+      "finalPAAdjustment" : null,
+      "adjustedManualRateByLoadToBlendBTMAndPA" : null,
+      "reservesUsed" : null,
+      "reservesByPeriod" : null,
+      "manualRatePointsCalculator" : null,
+      "poolingPointsCalculator" : null,
+      "credibilityPointsCalculator" : null,
+      "agingFactor" : null,
+      "plr" : null,
+      "reinsuranceCharge" : null,
+      "uwOverrideReasons" : null,
+      "comments" : null
+    } ]
+  },
+  "_type" : "JsonType"
+}

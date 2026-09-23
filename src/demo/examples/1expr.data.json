@@ -1,0 +1,362 @@
+{
+    "_type" : "JsonType",
+    "showExperienceRating" : false,
+    "periodBasis" : [ {
+        "periodBasisType" : "Month"
+    }, {
+        "periodBasisType" : "Year"
+    } ],
+    "trendAssumption" : 1.03,
+    "credibility" : 1.0,
+    "dataKind" : {
+        "experiencePeriods" : [ {
+        "periodName" : "Current Period",
+        "startDate" : "2025-01-01",
+        "endDate" : "2025-12-31",
+        "weight" : 0.5,
+        "numberOfMonths" : 12
+        }, {
+        "periodName" : "1st Period",
+        "startDate" : "2024-01-01",
+        "endDate" : "2024-12-31",
+        "weight" : 0.3,
+        "numberOfMonths" : 12
+        }, {
+        "periodName" : "2nd Period",
+        "startDate" : "2023-01-01",
+        "endDate" : "2023-12-31",
+        "weight" : 0.2,
+        "numberOfMonths" : 12
+        } ]
+    },
+    "ratesAndHistoricalInfo" : [ {
+        "planName" : "High",
+        "historicalInformation" : [ {
+        "periodName" : "Current Period",
+        "historicalInfoEntries" : [ {
+            "planName" : "High",
+            "periodDate" : "2025-01-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2025-02-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2025-03-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2025-04-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2025-05-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2025-06-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2025-07-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2025-08-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2025-09-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2025-10-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2025-11-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2025-12-01"
+        } ]
+        }, {
+        "periodName" : "1st Period",
+        "historicalInfoEntries" : [ {
+            "planName" : "High",
+            "periodDate" : "2024-01-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2024-02-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2024-03-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2024-04-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2024-05-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2024-06-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2024-07-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2024-08-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2024-09-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2024-10-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2024-11-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2024-12-01"
+        } ]
+        }, {
+        "periodName" : "2nd Period",
+        "historicalInfoEntries" : [ {
+            "planName" : "High",
+            "periodDate" : "2023-01-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2023-02-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2023-03-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2023-04-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2023-05-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2023-06-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2023-07-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2023-08-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2023-09-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2023-10-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2023-11-01"
+        }, {
+            "planName" : "High",
+            "periodDate" : "2023-12-01"
+        } ]
+        } ],
+        "rates" : [ {
+        "tier" : "Individual",
+        "tierName" : "Individual",
+        "tierRates" : [ {
+            "periodName" : "Current Period"
+        }, {
+            "periodName" : "1st Period"
+        }, {
+            "periodName" : "2nd Period"
+        } ]
+        }, {
+        "tier" : "IndividualAndSpouse",
+        "tierName" : "Individual + Spouse",
+        "tierRates" : [ {
+            "periodName" : "Current Period"
+        }, {
+            "periodName" : "1st Period"
+        }, {
+            "periodName" : "2nd Period"
+        } ]
+        }, {
+        "tier" : "IndividualAndChildren",
+        "tierName" : "Individual + Child(ren)",
+        "tierRates" : [ {
+            "periodName" : "Current Period"
+        }, {
+            "periodName" : "1st Period"
+        }, {
+            "periodName" : "2nd Period"
+        } ]
+        }, {
+        "tier" : "Family",
+        "tierName" : "Family",
+        "tierRates" : [ {
+            "periodName" : "Current Period"
+        }, {
+            "periodName" : "1st Period"
+        }, {
+            "periodName" : "2nd Period"
+        } ]
+        } ]
+    }, {
+        "planName" : "Low",
+        "historicalInformation" : [ {
+        "periodName" : "Current Period",
+        "historicalInfoEntries" : [ {
+            "planName" : "Low",
+            "periodDate" : "2025-01-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2025-02-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2025-03-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2025-04-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2025-05-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2025-06-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2025-07-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2025-08-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2025-09-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2025-10-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2025-11-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2025-12-01"
+        } ]
+        }, {
+        "periodName" : "1st Period",
+        "historicalInfoEntries" : [ {
+            "planName" : "Low",
+            "periodDate" : "2024-01-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2024-02-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2024-03-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2024-04-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2024-05-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2024-06-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2024-07-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2024-08-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2024-09-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2024-10-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2024-11-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2024-12-01"
+        } ]
+        }, {
+        "periodName" : "2nd Period",
+        "historicalInfoEntries" : [ {
+            "planName" : "Low",
+            "periodDate" : "2023-01-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2023-02-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2023-03-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2023-04-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2023-05-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2023-06-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2023-07-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2023-08-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2023-09-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2023-10-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2023-11-01"
+        }, {
+            "planName" : "Low",
+            "periodDate" : "2023-12-01"
+        } ]
+        } ],
+        "rates" : [ {
+        "tier" : "Individual",
+        "tierName" : "Individual",
+        "tierRates" : [ {
+            "periodName" : "Current Period"
+        }, {
+            "periodName" : "1st Period"
+        }, {
+            "periodName" : "2nd Period"
+        } ]
+        }, {
+        "tier" : "IndividualAndSpouse",
+        "tierName" : "Individual + Spouse",
+        "tierRates" : [ {
+            "periodName" : "Current Period"
+        }, {
+            "periodName" : "1st Period"
+        }, {
+            "periodName" : "2nd Period"
+        } ]
+        }, {
+        "tier" : "IndividualAndChildren",
+        "tierName" : "Individual + Child(ren)",
+        "tierRates" : [ {
+            "periodName" : "Current Period"
+        }, {
+            "periodName" : "1st Period"
+        }, {
+            "periodName" : "2nd Period"
+        } ]
+        }, {
+        "tier" : "Family",
+        "tierName" : "Family",
+        "tierRates" : [ {
+            "periodName" : "Current Period"
+        }, {
+            "periodName" : "1st Period"
+        }, {
+            "periodName" : "2nd Period"
+        } ]
+        } ]
+    } ],
+    "_key" : {
+        "id" : "4cece9e8-01ac-373e-9616-b1b794b028cb",
+        "rootId" : "2cc48dff-0fa6-45a6-995b-5732ef59b8a2",
+        "revisionNo" : 1,
+        "parentId" : "8bc5b3c0-8f99-3c6b-94cb-6f9bf55d803c"
+    }
+    
+}

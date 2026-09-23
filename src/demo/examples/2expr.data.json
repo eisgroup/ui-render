@@ -1,0 +1,225 @@
+{
+  "_type": "JsonType",
+  "showExperienceRating": true,
+  "periodBasis": [
+    { "periodBasisType": "Month" },
+    { "periodBasisType": "Year" }
+  ],
+  "trendAssumption": 1.03,
+  "credibility": 1,
+  "dataKind": {
+    "experiencePeriods": [
+      {
+        "periodName": "Current Period",
+        "startDate": "2025-01-01",
+        "endDate": "2025-12-31",
+        "weight": 0.5,
+        "numberOfMonths": 12
+      },
+      {
+        "periodName": "1st Period",
+        "startDate": "2024-01-01",
+        "endDate": "2024-12-31",
+        "weight": 0.3,
+        "numberOfMonths": 12
+      },
+      {
+        "periodName": "2nd Period",
+        "startDate": "2023-01-01",
+        "endDate": "2023-12-31",
+        "weight": 0.2,
+        "numberOfMonths": 12
+      }
+    ]
+  },
+  "ratesAndHistoricalInfo": [
+    {
+      "planName": "High",
+      "historicalInformation": [
+        {
+          "periodName": "Current Period",
+          "historicalInfoEntries": [
+            { "planName": "High", "periodDate": "2025-01-01" },
+            { "planName": "High", "periodDate": "2025-02-01" },
+            { "planName": "High", "periodDate": "2025-03-01" },
+            { "planName": "High", "periodDate": "2025-04-01" },
+            { "planName": "High", "periodDate": "2025-05-01" },
+            { "planName": "High", "periodDate": "2025-06-01" },
+            { "planName": "High", "periodDate": "2025-07-01" },
+            { "planName": "High", "periodDate": "2025-08-01" },
+            { "planName": "High", "periodDate": "2025-09-01" },
+            { "planName": "High", "periodDate": "2025-10-01" },
+            { "planName": "High", "periodDate": "2025-11-01" },
+            { "planName": "High", "periodDate": "2025-12-01" }
+          ]
+        },
+        {
+          "periodName": "1st Period",
+          "historicalInfoEntries": [
+            { "planName": "High", "periodDate": "2024-01-01" },
+            { "planName": "High", "periodDate": "2024-02-01" },
+            { "planName": "High", "periodDate": "2024-03-01" },
+            { "planName": "High", "periodDate": "2024-04-01" },
+            { "planName": "High", "periodDate": "2024-05-01" },
+            { "planName": "High", "periodDate": "2024-06-01" },
+            { "planName": "High", "periodDate": "2024-07-01" },
+            { "planName": "High", "periodDate": "2024-08-01" },
+            { "planName": "High", "periodDate": "2024-09-01" },
+            { "planName": "High", "periodDate": "2024-10-01" },
+            { "planName": "High", "periodDate": "2024-11-01" },
+            { "planName": "High", "periodDate": "2024-12-01" }
+          ]
+        },
+        {
+          "periodName": "2nd Period",
+          "historicalInfoEntries": [
+            { "planName": "High", "periodDate": "2023-01-01" },
+            { "planName": "High", "periodDate": "2023-02-01" },
+            { "planName": "High", "periodDate": "2023-03-01" },
+            { "planName": "High", "periodDate": "2023-04-01" },
+            { "planName": "High", "periodDate": "2023-05-01" },
+            { "planName": "High", "periodDate": "2023-06-01" },
+            { "planName": "High", "periodDate": "2023-07-01" },
+            { "planName": "High", "periodDate": "2023-08-01" },
+            { "planName": "High", "periodDate": "2023-09-01" },
+            { "planName": "High", "periodDate": "2023-10-01" },
+            { "planName": "High", "periodDate": "2023-11-01" },
+            { "planName": "High", "periodDate": "2023-12-01" }
+          ]
+        }
+      ],
+      "rates": [
+        {
+          "tier": "Individual",
+          "tierName": "Individual",
+          "tierRates": [
+            { "periodName": "Current Period", "rateValue": 1 },
+            { "periodName": "1st Period", "rateValue": 1 },
+            { "periodName": "2nd Period", "rateValue": 1 }
+          ]
+        },
+        {
+          "tier": "IndividualAndSpouse",
+          "tierName": "Individual + Spouse",
+          "tierRates": [
+            { "periodName": "Current Period", "rateValue": 1 },
+            { "periodName": "1st Period", "rateValue": 1 },
+            { "periodName": "2nd Period", "rateValue": 1 }
+          ]
+        },
+        {
+          "tier": "IndividualAndChildren",
+          "tierName": "Individual + Child(ren)",
+          "tierRates": [
+            { "periodName": "Current Period", "rateValue": 1 },
+            { "periodName": "1st Period", "rateValue": 1 },
+            { "periodName": "2nd Period", "rateValue": 1 }
+          ]
+        },
+        {
+          "tier": "Family",
+          "tierName": "Family",
+          "tierRates": [
+            { "periodName": "Current Period", "rateValue": 1 },
+            { "periodName": "1st Period", "rateValue": 1 },
+            { "periodName": "2nd Period", "rateValue": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "planName": "Low",
+      "historicalInformation": [
+        {
+          "periodName": "Current Period",
+          "historicalInfoEntries": [
+            { "planName": "Low", "periodDate": "2025-01-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2025-02-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2025-03-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2025-04-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2025-05-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2025-06-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2025-07-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2025-08-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2025-09-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2025-10-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2025-11-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2025-12-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 }
+          ]
+        },
+        {
+          "periodName": "1st Period",
+          "historicalInfoEntries": [
+            { "planName": "Low", "periodDate": "2024-01-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2024-02-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2024-03-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2024-04-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2024-05-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2024-06-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2024-07-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2024-08-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2024-09-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2024-10-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2024-11-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2024-12-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 }
+          ]
+        },
+        {
+          "periodName": "2nd Period",
+          "historicalInfoEntries": [
+            { "planName": "Low", "periodDate": "2023-01-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2023-02-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2023-03-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2023-04-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2023-05-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2023-06-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2023-07-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2023-08-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2023-09-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2023-10-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2023-11-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 },
+            { "planName": "Low", "periodDate": "2023-12-01", "billedPremium": 1, "exposure": 1, "paidClaims": 1 }
+          ]
+        }
+      ],
+      "rates": [
+        {
+          "tier": "Individual",
+          "tierName": "Individual",
+          "tierRates": [
+            { "periodName": "Current Period", "rateValue": 1 },
+            { "periodName": "1st Period", "rateValue": 1 },
+            { "periodName": "2nd Period", "rateValue": 1 }
+          ]
+        },
+        {
+          "tier": "IndividualAndSpouse",
+          "tierName": "Individual + Spouse",
+          "tierRates": [
+            { "periodName": "Current Period", "rateValue": 1 },
+            { "periodName": "1st Period", "rateValue": 1 },
+            { "periodName": "2nd Period", "rateValue": 1 }
+          ]
+        },
+        {
+          "tier": "IndividualAndChildren",
+          "tierName": "Individual + Child(ren)",
+          "tierRates": [
+            { "periodName": "Current Period", "rateValue": 1 },
+            { "periodName": "1st Period", "rateValue": 11 },
+            { "periodName": "2nd Period", "rateValue": 1 }
+          ]
+        },
+        {
+          "tier": "Family",
+          "tierName": "Family",
+          "tierRates": [
+            { "periodName": "Current Period", "rateValue": 1 },
+            { "periodName": "1st Period", "rateValue": 1 },
+            { "periodName": "2nd Period", "rateValue": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

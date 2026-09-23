@@ -103,3 +103,51 @@ describe('throttle', () => {
         expect(fn.mock.calls.length).toBeLessThanOrEqual(2)
     })
 })
+
+describe('debounce cancellation (§9.3 step 4)', () => {
+    beforeEach(() => jest.useFakeTimers())
+    afterEach(() => jest.useRealTimers())
+
+    it('exposes cancel(), which drops a pending trailing call', () => {
+        let calls = 0
+        const debounced = debounce(() => { calls++ }, 100)
+
+        debounced()
+        debounced.cancel()
+        jest.advanceTimersByTime(500)
+
+        expect(calls).toBe(0)
+    })
+
+    it('leaves the debounced function reusable after a cancel', () => {
+        let calls = 0
+        const debounced = debounce(() => { calls++ }, 100)
+
+        debounced()
+        debounced.cancel()
+        debounced()
+        jest.advanceTimersByTime(500)
+
+        expect(calls).toBe(1)
+    })
+
+    it('is harmless when nothing is pending', () => {
+        const debounced = debounce(() => {}, 100)
+
+        expect(() => { debounced.cancel(); debounced.cancel() }).not.toThrow()
+    })
+
+    it('does not fire a leading call that already ran, nor its trailing twin', () => {
+        // `leading: true` runs immediately AND schedules a trailing call when invoked again.
+        // Cancelling must drop the trailing one without pretending the leading never happened.
+        const seen = []
+        const debounced = debounce((n) => seen.push(n), 100, { leading: true })
+
+        debounced(1)
+        debounced(2)
+        debounced.cancel()
+        jest.advanceTimersByTime(500)
+
+        expect(seen).toEqual([1])
+    })
+})

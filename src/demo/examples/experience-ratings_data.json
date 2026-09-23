@@ -1,0 +1,932 @@
+{
+  "showExperienceRating": true,
+  "periodBasis": [
+    {
+      "periodBasisType": "Month"
+    },
+    {
+      "periodBasisType": "Year"
+    }
+  ],
+  "trendAssumption": 1.03,
+  "credibility": 1,
+  "dataKind": {
+    "experiencePeriods": [
+      {
+        "periodName": "Current Period2028",
+        "startDate": "2026-04-01",
+        "endDate": "2028-03-31",
+        "weight": 0.5,
+        "numberOfMonths": 24
+      },
+      {
+        "periodName": "Current Period",
+        "startDate": "2025-01-01",
+        "endDate": "2025-12-31",
+        "weight": 0.5,
+        "numberOfMonths": 12
+      },
+      {
+        "periodName": "1st Period",
+        "startDate": "2024-01-01",
+        "endDate": "2024-12-31",
+        "weight": 0,
+        "numberOfMonths": 12
+      },
+      {
+        "periodName": "2nd Period",
+        "startDate": "2023-01-01",
+        "endDate": "2023-12-31",
+        "weight": 0,
+        "numberOfMonths": 12
+      }
+    ]
+  },
+  "ratesAndHistoricalInfo": [
+    {
+      "planName": "Low",
+      "historicalInformation": [
+        {
+          "periodName": "Current Period2028",
+          "billedPremium": 120104.40000000002,
+          "exposure": 7136,
+          "paidClaims": 82642,
+          "fullyIncurredClaims": 84894.67440264509,
+          "historicalInfoEntries": [
+            {
+              "planName": "Low",
+              "periodDate": "2028-01-08",
+              "billedPremium": 4567,
+              "exposure": 289,
+              "paidClaims": 3565,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3565
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2028-02-08",
+              "billedPremium": 4989,
+              "exposure": 293,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2028-03-08",
+              "billedPremium": 5322,
+              "exposure": 305,
+              "paidClaims": 3678,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3678
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-01-08",
+              "billedPremium": 4567,
+              "exposure": 289,
+              "paidClaims": 3565,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3565
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-02-08",
+              "billedPremium": 4989,
+              "exposure": 293,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-03-08",
+              "billedPremium": 5322,
+              "exposure": 305,
+              "paidClaims": 3678,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3678
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-04-08",
+              "billedPremium": 4857,
+              "exposure": 297,
+              "paidClaims": 3211,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3211
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-05-08",
+              "billedPremium": 4989,
+              "exposure": 301,
+              "paidClaims": 4321,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 4321
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-07-08",
+              "billedPremium": 5193,
+              "exposure": 305,
+              "paidClaims": 3432,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3432
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-08-08",
+              "billedPremium": 4989,
+              "exposure": 289,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-08-08",
+              "billedPremium": 5322,
+              "exposure": 293,
+              "paidClaims": 3678,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3678
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-09-08",
+              "billedPremium": 4857,
+              "exposure": 305,
+              "paidClaims": 3211,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3211
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-10-08",
+              "billedPremium": 4989,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-11-08",
+              "billedPremium": 4989.1,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2027-12-08",
+              "billedPremium": 4989.1,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2026-04-08",
+              "billedPremium": 4857,
+              "exposure": 297,
+              "paidClaims": 3211,
+              "completionFactor": 0.5876997352634119,
+              "fullyIncurredClaims": 5463.674402645091
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2026-05-08",
+              "billedPremium": 4989,
+              "exposure": 301,
+              "paidClaims": 4321,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 4321
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2026-07-08",
+              "billedPremium": 5193,
+              "exposure": 305,
+              "paidClaims": 3432,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3432
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2026-08-08",
+              "billedPremium": 4989,
+              "exposure": 289,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2026-08-08",
+              "billedPremium": 5322,
+              "exposure": 293,
+              "paidClaims": 3678,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3678
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2026-09-08",
+              "billedPremium": 4857,
+              "exposure": 305,
+              "paidClaims": 3211,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3211
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2026-10-08",
+              "billedPremium": 4989,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2026-11-08",
+              "billedPremium": 4989.1,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2026-12-08",
+              "billedPremium": 4989.1,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            }
+          ]
+        },
+        {
+          "periodName": "Current Period",
+          "billedPremium": 60052.2,
+          "exposure": 3568,
+          "paidClaims": 41321,
+          "fullyIncurredClaims": 43822.02281078472,
+          "historicalInfoEntries": [
+            {
+              "planName": "Low",
+              "periodDate": "2025-01-08",
+              "billedPremium": 4567,
+              "exposure": 289,
+              "paidClaims": 3565,
+              "completionFactor": 0.5876997352634119,
+              "fullyIncurredClaims": 6066.022810784724
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2025-02-08",
+              "billedPremium": 4989,
+              "exposure": 293,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2025-03-08",
+              "billedPremium": 5322,
+              "exposure": 305,
+              "paidClaims": 3678,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3678
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2025-04-08",
+              "billedPremium": 4857,
+              "exposure": 297,
+              "paidClaims": 3211,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3211
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2025-05-08",
+              "billedPremium": 4989,
+              "exposure": 301,
+              "paidClaims": 4321,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 4321
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2025-07-08",
+              "billedPremium": 5193,
+              "exposure": 305,
+              "paidClaims": 3432,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3432
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2025-08-08",
+              "billedPremium": 4989,
+              "exposure": 289,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2025-08-08",
+              "billedPremium": 5322,
+              "exposure": 293,
+              "paidClaims": 3678,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3678
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2025-09-08",
+              "billedPremium": 4857,
+              "exposure": 305,
+              "paidClaims": 3211,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3211
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2025-10-08",
+              "billedPremium": 4989,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2025-11-08",
+              "billedPremium": 4989.1,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2025-12-08",
+              "billedPremium": 4989.1,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            }
+          ]
+        },
+        {
+          "periodName": "1st Period",
+          "billedPremium": 60052.2,
+          "exposure": 3568,
+          "paidClaims": 41321,
+          "fullyIncurredClaims": 43822.02281078472,
+          "historicalInfoEntries": [
+            {
+              "planName": "Low",
+              "periodDate": "2024-01-08",
+              "billedPremium": 4567,
+              "exposure": 289,
+              "paidClaims": 3565,
+              "completionFactor": 0.5876997352634119,
+              "fullyIncurredClaims": 6066.022810784724
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2024-02-08",
+              "billedPremium": 4989,
+              "exposure": 293,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2024-03-08",
+              "billedPremium": 5322,
+              "exposure": 305,
+              "paidClaims": 3678,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3678
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2024-04-08",
+              "billedPremium": 4857,
+              "exposure": 297,
+              "paidClaims": 3211,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3211
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2024-05-08",
+              "billedPremium": 4989,
+              "exposure": 301,
+              "paidClaims": 4321,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 4321
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2024-07-08",
+              "billedPremium": 5193,
+              "exposure": 305,
+              "paidClaims": 3432,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3432
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2024-08-08",
+              "billedPremium": 4989,
+              "exposure": 289,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2024-08-08",
+              "billedPremium": 5322,
+              "exposure": 293,
+              "paidClaims": 3678,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3678
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2024-09-08",
+              "billedPremium": 4857,
+              "exposure": 305,
+              "paidClaims": 3211,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3211
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2024-10-08",
+              "billedPremium": 4989,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2024-11-08",
+              "billedPremium": 4989.1,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2024-12-08",
+              "billedPremium": 4989.1,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            }
+          ]
+        },
+        {
+          "periodName": "2nd Period",
+          "billedPremium": 60052.2,
+          "exposure": 3568,
+          "paidClaims": 41321,
+          "fullyIncurredClaims": 43822.02281078472,
+          "historicalInfoEntries": [
+            {
+              "planName": "Low",
+              "periodDate": "2023-01-08",
+              "billedPremium": 4567,
+              "exposure": 289,
+              "paidClaims": 3565,
+              "completionFactor": 0.5876997352634119,
+              "fullyIncurredClaims": 6066.022810784724
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2023-02-08",
+              "billedPremium": 4989,
+              "exposure": 293,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2023-03-08",
+              "billedPremium": 5322,
+              "exposure": 305,
+              "paidClaims": 3678,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3678
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2023-04-08",
+              "billedPremium": 4857,
+              "exposure": 297,
+              "paidClaims": 3211,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3211
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2023-05-08",
+              "billedPremium": 4989,
+              "exposure": 301,
+              "paidClaims": 4321,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 4321
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2023-07-08",
+              "billedPremium": 5193,
+              "exposure": 305,
+              "paidClaims": 3432,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3432
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2023-08-08",
+              "billedPremium": 4989,
+              "exposure": 289,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2023-08-08",
+              "billedPremium": 5322,
+              "exposure": 293,
+              "paidClaims": 3678,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3678
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2023-09-08",
+              "billedPremium": 4857,
+              "exposure": 305,
+              "paidClaims": 3211,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3211
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2023-10-08",
+              "billedPremium": 4989,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2023-11-08",
+              "billedPremium": 4989.1,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            },
+            {
+              "planName": "Low",
+              "periodDate": "2023-12-08",
+              "billedPremium": 4989.1,
+              "exposure": 297,
+              "paidClaims": 3245,
+              "completionFactor": 1,
+              "fullyIncurredClaims": 3245
+            }
+          ]
+        }
+      ],
+      "rates": [
+        {
+          "tier": "Individual",
+          "tierName": "Individual",
+          "tierRates": [
+            {
+              "periodName": "Current Period2028",
+              "rateValue": 3.08
+            },
+            {
+              "periodName": "Current Period",
+              "rateValue": 2
+            },
+            {
+              "periodName": "1st Period",
+              "rateValue": 2
+            },
+            {
+              "periodName": "2nd Period",
+              "rateValue": 2
+            }
+          ]
+        },
+        {
+          "tier": "IndividualAndSpouse",
+          "tierName": "Individual + Spouse",
+          "tierRates": [
+            {
+              "periodName": "Current Period2028",
+              "rateValue": 3.08
+            },
+            {
+              "periodName": "Current Period",
+              "rateValue": 2
+            },
+            {
+              "periodName": "1st Period",
+              "rateValue": 2
+            },
+            {
+              "periodName": "2nd Period",
+              "rateValue": 2
+            }
+          ]
+        },
+        {
+          "tier": "IndividualAndChildren",
+          "tierName": "Individual + Child(ren)",
+          "tierRates": [
+            {
+              "periodName": "Current Period2028",
+              "rateValue": 3.08
+            },
+            {
+              "periodName": "Current Period",
+              "rateValue": 2
+            },
+            {
+              "periodName": "1st Period",
+              "rateValue": 2
+            },
+            {
+              "periodName": "2nd Period",
+              "rateValue": 2
+            }
+          ]
+        },
+        {
+          "tier": "Family",
+          "tierName": "Family",
+          "tierRates": [
+            {
+              "periodName": "Current Period2028",
+              "rateValue": 3.08
+            },
+            {
+              "periodName": "Current Period",
+              "rateValue": 2
+            },
+            {
+              "periodName": "1st Period",
+              "rateValue": 2
+            },
+            {
+              "periodName": "2nd Period",
+              "rateValue": 2
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "experienceResults": [
+    {
+      "planName": "Low",
+      "coverages": [
+        {
+          "coverageCode": "DENTAL",
+          "experienceDetailsPerPeriod": [
+            {
+              "periodName": "Current Period2028",
+              "startDate": "2026-04-01",
+              "endDate": "2028-03-31",
+              "numberOfMonths": 24,
+              "coveredLives": 7136,
+              "billedPremium": 120104.40000000002,
+              "paidClaims": 82642,
+              "paidLossRatio": 0.6880846996446424,
+              "fullyIncurredClaims": 84894.67440264509,
+              "incurredLossRatio": 0.7068406686403252,
+              "trendFactor": 1.0453358312044987,
+              "trendedIncurredClaims": 88743.44503152429,
+              "trendedIncurredLossRatio": 0.738885877882278,
+              "targetLossRatio": 0.755,
+              "experienceModificationFactor": 0.9786567918970569
+            },
+            {
+              "periodName": "Current Period",
+              "startDate": "2025-01-01",
+              "endDate": "2025-12-31",
+              "numberOfMonths": 12,
+              "coveredLives": 3568,
+              "billedPremium": 60052.2,
+              "paidClaims": 41321,
+              "paidLossRatio": 0.6880846996446425,
+              "fullyIncurredClaims": 43822.02281078472,
+              "incurredLossRatio": 0.7297321798499427,
+              "trendFactor": 1.1008318345924668,
+              "trendedIncurredClaims": 48240.67776634907,
+              "trendedIncurredLossRatio": 0.8033124143053723,
+              "targetLossRatio": 0.755,
+              "experienceModificationFactor": 1.0639899527223473
+            },
+            {
+              "periodName": "1st Period",
+              "startDate": "2024-01-01",
+              "endDate": "2024-12-31",
+              "numberOfMonths": 12,
+              "coveredLives": 3568,
+              "billedPremium": 60052.2,
+              "paidClaims": 41321,
+              "paidLossRatio": 0.6880846996446425,
+              "fullyIncurredClaims": 43822.02281078472,
+              "incurredLossRatio": 0.7297321798499427,
+              "trendFactor": 1.1366531863566272,
+              "trendedIncurredClaims": 49810.441860471255,
+              "trendedIncurredLossRatio": 0.8294524074134046,
+              "targetLossRatio": 0.755,
+              "experienceModificationFactor": 1.0986124601502048
+            },
+            {
+              "periodName": "2nd Period",
+              "startDate": "2023-01-01",
+              "endDate": "2023-12-31",
+              "numberOfMonths": 12,
+              "coveredLives": 3568,
+              "billedPremium": 60052.2,
+              "paidClaims": 41321,
+              "paidLossRatio": 0.6880846996446425,
+              "fullyIncurredClaims": 43822.02281078472,
+              "incurredLossRatio": 0.7297321798499427,
+              "trendFactor": 1.170752781947326,
+              "trendedIncurredClaims": 51304.75511628539,
+              "trendedIncurredLossRatio": 0.8543359796358068,
+              "targetLossRatio": 0.755,
+              "experienceModificationFactor": 1.131570833954711
+            }
+          ],
+          "experienceRatesPerTier": [
+            {
+              "tier": "Individual",
+              "tierName": "Individual",
+              "currentChargedRate": 3.08,
+              "formulaRate": 2.57,
+              "experienceAdjustmentPercent": 0.8344,
+              "experienceRatesPerPeriod": [
+                {
+                  "periodName": "Current Period2028",
+                  "experienceRate": 3.0142629190429355,
+                  "credibilityRate": 3.0142629190429355,
+                  "formulaRate": 1.5071314595214678
+                },
+                {
+                  "periodName": "Current Period",
+                  "experienceRate": 2.1279799054446946,
+                  "credibilityRate": 2.1279799054446946,
+                  "formulaRate": 1.0639899527223473
+                },
+                {
+                  "periodName": "1st Period",
+                  "experienceRate": 2.1972249203004095,
+                  "credibilityRate": 2.1972249203004095,
+                  "formulaRate": 0
+                },
+                {
+                  "periodName": "2nd Period",
+                  "experienceRate": 2.263141667909422,
+                  "credibilityRate": 2.263141667909422,
+                  "formulaRate": 0
+                }
+              ]
+            },
+            {
+              "tier": "IndividualAndSpouse",
+              "tierName": "Individual + Spouse",
+              "currentChargedRate": 3.08,
+              "formulaRate": 2.57,
+              "experienceAdjustmentPercent": 0.8344,
+              "experienceRatesPerPeriod": [
+                {
+                  "periodName": "Current Period2028",
+                  "experienceRate": 3.0142629190429355,
+                  "credibilityRate": 3.0142629190429355,
+                  "formulaRate": 1.5071314595214678
+                },
+                {
+                  "periodName": "Current Period",
+                  "experienceRate": 2.1279799054446946,
+                  "credibilityRate": 2.1279799054446946,
+                  "formulaRate": 1.0639899527223473
+                },
+                {
+                  "periodName": "1st Period",
+                  "experienceRate": 2.1972249203004095,
+                  "credibilityRate": 2.1972249203004095,
+                  "formulaRate": 0
+                },
+                {
+                  "periodName": "2nd Period",
+                  "experienceRate": 2.263141667909422,
+                  "credibilityRate": 2.263141667909422,
+                  "formulaRate": 0
+                }
+              ]
+            },
+            {
+              "tier": "Family",
+              "tierName": "Family",
+              "currentChargedRate": 3.08,
+              "formulaRate": 2.57,
+              "experienceAdjustmentPercent": 0.8344,
+              "experienceRatesPerPeriod": [
+                {
+                  "periodName": "Current Period2028",
+                  "experienceRate": 3.0142629190429355,
+                  "credibilityRate": 3.0142629190429355,
+                  "formulaRate": 1.5071314595214678
+                },
+                {
+                  "periodName": "Current Period",
+                  "experienceRate": 2.1279799054446946,
+                  "credibilityRate": 2.1279799054446946,
+                  "formulaRate": 1.0639899527223473
+                },
+                {
+                  "periodName": "1st Period",
+                  "experienceRate": 2.1972249203004095,
+                  "credibilityRate": 2.1972249203004095,
+                  "formulaRate": 0
+                },
+                {
+                  "periodName": "2nd Period",
+                  "experienceRate": 2.263141667909422,
+                  "credibilityRate": 2.263141667909422,
+                  "formulaRate": 0
+                }
+              ]
+            },
+            {
+              "tier": "IndividualAndChildren",
+              "tierName": "Individual + Child(ren)",
+              "currentChargedRate": 3.08,
+              "formulaRate": 2.57,
+              "experienceAdjustmentPercent": 0.8344,
+              "experienceRatesPerPeriod": [
+                {
+                  "periodName": "Current Period2028",
+                  "experienceRate": 3.0142629190429355,
+                  "credibilityRate": 3.0142629190429355,
+                  "formulaRate": 1.5071314595214678
+                },
+                {
+                  "periodName": "Current Period",
+                  "experienceRate": 2.1279799054446946,
+                  "credibilityRate": 2.1279799054446946,
+                  "formulaRate": 1.0639899527223473
+                },
+                {
+                  "periodName": "1st Period",
+                  "experienceRate": 2.1972249203004095,
+                  "credibilityRate": 2.1972249203004095,
+                  "formulaRate": 0
+                },
+                {
+                  "periodName": "2nd Period",
+                  "experienceRate": 2.263141667909422,
+                  "credibilityRate": 2.263141667909422,
+                  "formulaRate": 0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
