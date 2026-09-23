@@ -97,6 +97,206 @@
             }
           ]
         }
+      },
+      {
+        "files": [
+          "src/core/**"
+        ],
+        "rules": {
+          "no-restricted-imports": [
+            "error",
+            {
+              "paths": [
+                {
+                  "name": "semantic-ui-react",
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                }
+              ],
+              "patterns": [
+                {
+                  "group": [
+                    "semantic-ui-react/*"
+                  ],
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "group": [
+                    "**/demo",
+                    "**/demo/**"
+                  ],
+                  "message": "core must never import the demo — the dependency runs the other way. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "files": [
+          "src/core/modules/**"
+        ],
+        "rules": {
+          "no-restricted-imports": [
+            "error",
+            {
+              "paths": [
+                {
+                  "name": "semantic-ui-react",
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                }
+              ],
+              "patterns": [
+                {
+                  "group": [
+                    "semantic-ui-react/*"
+                  ],
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "group": [
+                    "**/demo",
+                    "**/demo/**"
+                  ],
+                  "message": "core must never import the demo — the dependency runs the other way. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                },
+                {
+                  "group": [
+                    "**/engine",
+                    "**/engine/**"
+                  ],
+                  "message": "core/modules must not import core/engine. Two sites in modules/form/utils.js predate this rule and carry an eslint-disable naming §9.3 step 2, which dissolves the cycle; do not add a third. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "files": [
+          "src/core/components/**"
+        ],
+        "rules": {
+          "no-restricted-imports": [
+            "error",
+            {
+              "paths": [
+                {
+                  "name": "semantic-ui-react",
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                }
+              ],
+              "patterns": [
+                {
+                  "group": [
+                    "semantic-ui-react/*"
+                  ],
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "group": [
+                    "**/demo",
+                    "**/demo/**"
+                  ],
+                  "message": "core must never import the demo — the dependency runs the other way. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                },
+                {
+                  "group": [
+                    "**/modules",
+                    "**/modules/**"
+                  ],
+                  "message": "core/components must not import core/modules — put the shared value in core/utils instead, which is how the ISO_8601 regexes were resolved at H5. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                },
+                {
+                  "group": [
+                    "**/engine",
+                    "**/engine/**"
+                  ],
+                  "message": "core/components must not import core/engine. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "files": [
+          "src/core/utils/**"
+        ],
+        "rules": {
+          "no-restricted-imports": [
+            "error",
+            {
+              "paths": [
+                {
+                  "name": "semantic-ui-react",
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                }
+              ],
+              "patterns": [
+                {
+                  "group": [
+                    "semantic-ui-react/*"
+                  ],
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "group": [
+                    "**/demo",
+                    "**/demo/**"
+                  ],
+                  "message": "core must never import the demo — the dependency runs the other way. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                },
+                {
+                  "group": [
+                    "**/components",
+                    "**/components/**"
+                  ],
+                  "message": "core/utils must not import core/components. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                },
+                {
+                  "group": [
+                    "**/modules",
+                    "**/modules/**"
+                  ],
+                  "message": "core/utils must not import core/modules. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                },
+                {
+                  "group": [
+                    "**/engine",
+                    "**/engine/**"
+                  ],
+                  "message": "core/utils must not import core/engine. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "files": [
+          "src/**/__tests__/**"
+        ],
+        "rules": {
+          "no-restricted-imports": [
+            "error",
+            {
+              "paths": [
+                {
+                  "name": "semantic-ui-react",
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                }
+              ],
+              "patterns": [
+                {
+                  "group": [
+                    "semantic-ui-react/*"
+                  ],
+                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                }
+              ]
+            }
+          ]
+        }
       }
     ]
   },

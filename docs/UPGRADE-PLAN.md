@@ -1188,7 +1188,46 @@ this ticket.
 
 #### H5 — Enforce layer direction
 
-Fix the direct violation (move `ISO_8601_COMPLETE_DATE` into `core/utils`); the engine↔form-modules cycle is dissolved by §9.3 step 2. Then lock the rules in ESLint (`no-restricted-imports` per directory, same mechanism as the SUIR guard): `utils → nothing`, `components → utils`, `modules → components|utils`, `engine → anything in core`, and the one demo rule enforceable today: **core never imports demo**. ("Demo → library surface only" is aspirational — the demo currently imports core directly across nearly all pages; adopt it only after §9.4 grows the public surface.) Cheap to lock in now, expensive to restore later.
+~~Fix the direct violation (move `ISO_8601_COMPLETE_DATE` into `core/utils`); then lock the rules in ESLint.~~
+✅ **DONE 2026-09-23.**
+
+**The violation, and one more than the item named.** `core/components/Text.js` reached into
+`core/modules/variables` for `ISO_8601_COMPLETE_DATE`. The whole of `modules/variables/date.js` moved to
+`core/utils/date.ts` instead of just that one constant — the three regexes are pure and belong together,
+and splitting them across layers to satisfy a rule would have been the letter over the intent.
+`ISO_8601_FULL` goes to the engine (allowed) and **our own `ISO_8601` has no callers at all** — the
+`InputDate` hit a grep finds is `moment.ISO_8601`. It was moved rather than deleted: removing dead code
+inside a layering change would hide it.
+
+**Measured before writing any rule.** Every cross-layer import in `src`, classified: 73
+`components → utils`, 56 `engine → components`, 24 each `modules → components`/`utils`, and exactly TWO
+production violations — the `Text.js` one above, and `modules/form/utils.js` reaching into the engine,
+which is the cycle §9.3 step 2 dissolves. The latter now carries two individual `eslint-disable` lines
+naming that step, so the rule still fails on a THIRD and removing them later is a visible two-line
+deletion.
+
+**Two traps in the ESLint mechanism itself, both hit and both worth recording.**
+
+1. **An override REPLACES a rule's config, it does not merge.** A catch-all `src/core/**` placed LAST
+   silently killed the three layer rules — only the demo ban survived, and the tree still linted clean, so
+   nothing said so. The catch-all now comes FIRST and every layer entry restates both the demo ban and the
+   `semantic-ui-react` guard. Without that restatement H5 would have quietly removed the SUIR guard from
+   most of `src/core`.
+2. **`patterns` must be homogeneous** in ESLint 8 — all strings or all objects. Mixing the existing
+   `'semantic-ui-react/*'` string with object entries makes the whole config invalid, and the error names
+   the value rather than the cause.
+
+**Tests are exempt from the layer patterns** (a final `src/**/__tests__/**` override restores just the
+SUIR guard). The layering rule describes the architecture of SHIPPED code; engine tests legitimately
+import the 38-example corpus from `demo/`, and the form-module test exercises the very cycle above. Five
+such imports exist and are deliberate, not accidents to be worked around.
+
+**Every rule was proved to fail on a planted violation** — `utils → components`, `utils → engine`,
+`components → modules`, `components → engine`, a third `modules → engine`, `core → demo`, and the SUIR
+guard itself, to confirm trap 1 had not re-emerged. A rule that cannot fail is decoration.
+
+**Not adopted, and the plan already said why:** "demo → library surface only". The demo imports core
+directly across nearly all pages; that rule waits on §9.4 growing the public surface.
 
 #### H6 — Naming sanity (opportunistic, ride other PRs)
 

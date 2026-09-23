@@ -2,7 +2,7 @@ import classNames from '../utils/classNames'
 import React, { useContext } from 'react'
 import { Active } from '../utils'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
-import { ISO_8601_COMPLETE_DATE } from '../modules/variables'
+import { ISO_8601_COMPLETE_DATE } from '../utils'
 import { ConfigContext } from '../contexts'
 import moment from 'moment'
 
