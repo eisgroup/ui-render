@@ -66,7 +66,7 @@ Render.Tooltip = TooltipPop
 const RenderComponent = ({
     view, items, data, _data, debug, form, instance,
     showIf, relativeData, relativeIndex, relativePath, version,
-    // Always superseded by `Active.translate` below, and `translate` is a real HTML global attribute:
+    // Superseded by the INSTANCE's translator below, and `translate` is a real HTML global attribute:
     // left in `props` it reaches the DOM via spread (e.g. TableCell -> <td>) and React warns on the function value.
     translate: _translate,
     // Engine-internal: `Render.js` hands this to every node so value renderers can pick a currency symbol,
@@ -80,7 +80,11 @@ const RenderComponent = ({
     ...props
 }) => {
     const { popup } = useContext(AppContext)
-    const translate = Active.translate
+    // The instance's own translator, not the module global: `Active.translate` is owned by whichever
+    // UIRender was constructed LAST, so reading it here made a re-rendering instance translate with a
+    // sibling's function. The fallback covers nodes rendered without an instance (tests, and the
+    // components that read `Active.translate` as a prop default).
+    const translate = (instance && instance.translate) || Active.translate
     /* General showIf logic */
     if (showIf != null) {
         // UI Render should not 'Value Transform' `showIf` attribute

@@ -240,9 +240,20 @@ export class UIRender extends Component {
         if (typeof props.getValidationErrors === 'function') {
             errorHandlerFunction = props.getValidationErrors
         }
+        // The instance's OWN translator, built once so its identity is stable across renders.
+        // `Active.translate` is still assigned because seven components read it as a prop default and
+        // `modules/upload` reads it directly, but it must not be what the engine renders with: it is
+        // module-level, so the LAST instance constructed owns it, and a first instance that re-renders
+        // afterwards translates with the second one's function for the rest of its life. Measured, not
+        // assumed — see `rules.two-instances.test.js`, which fails on the previous code.
         if (typeof props.translate === 'function') {
             const translate = props.translate
-            Active.translate = value => typeof value === 'string' ? translate(value) : value
+            this.translate = value => typeof value === 'string' ? translate(value) : value
+            Active.translate = this.translate
+        } else if (props.parent && typeof props.parent.translate === 'function') {
+            // An embedded instance is not given the prop; it inherits the one its owner was built with
+            // rather than falling through to whatever the module global happens to hold.
+            this.translate = props.parent.translate
         }
 
         this.state = {
@@ -341,7 +352,7 @@ export class UIRender extends Component {
                 // Passing parent here made embedded Data / renderExtraItem fields call instance.form.change
                 // on the root form while Field names targeted nested paths — values leaked into the parent object.
                 instance={this}
-                translate={Active.translate}
+                translate={this.translate || Active.translate}
                 onDataChanged={this.onDataChanged}
                 currencyCode={this.state.currencyCode}
             />
