@@ -31,7 +31,10 @@ const callSetState = (...args) => {
     const recorded = []
     const instance = {
         state: { existing: 'kept' },
-        setState (next) { recorded.push(next) },
+        // `setStates` passes an UPDATER, so that two writes in one React batch cannot undo each
+        // other (`rules.state-immutability.test.js`). Resolving it here keeps this file about the
+        // one thing it is about: which argument became the path.
+        setState (next) { recorded.push(typeof next === 'function' ? next(this.state) : next) },
         _meta: { cached: true },
     }
     UIRender.prototype.setStates.apply(instance, args)

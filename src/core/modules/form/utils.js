@@ -122,9 +122,11 @@ export function asField (InputComponent, {sanitize} = {}) {
       translate: PropTypes.func,
     }
 
-    state = {
-      selectPreviousValue: null
-    }
+    // The last value seen before an empty one normalized to `undefined`, kept only to make that
+    // transition a one-shot. NOT React state: nothing renders from it, so holding it in state only
+    // scheduled an update from inside `Input` — a second render pass per Dropdown field and React's
+    // "Cannot update during an existing state transition" warning.
+    selectPreviousValue = null
 
     get value () {
       if (this._value !== void 0) {
@@ -206,14 +208,10 @@ export function asField (InputComponent, {sanitize} = {}) {
 
       if ((InputComponent.displayName) === 'Dropdown') {
         if (nextValue === value) {
-          this.setState({
-            selectPreviousValue: nextValue
-          })
-        } else if (nextValue !== value && this.state.selectPreviousValue !== null) {
+          this.selectPreviousValue = nextValue
+        } else if (nextValue !== value && this.selectPreviousValue !== null) {
           props.value = nextValue
-          this.setState({
-            selectPreviousValue: null
-          })
+          this.selectPreviousValue = null
         }
 
       }

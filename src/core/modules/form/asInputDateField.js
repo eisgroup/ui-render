@@ -31,10 +31,6 @@ export function asInputDateField (InputComponent, {sanitize} = {}) {
             translate: PropTypes.func,
         }
 
-        state = {
-            selectPreviousValue: null
-        }
-
         get value () {
             if (this._value !== void 0) {
                 return this._value

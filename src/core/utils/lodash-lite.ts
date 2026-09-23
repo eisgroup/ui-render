@@ -157,6 +157,43 @@ function setWith<T>(object: T, path: unknown, value: unknown, customizer?: SetWi
 	return object
 }
 
+/**
+ * The immutable counterpart of {@link setWith}: returns a copy with `value` at `path` instead of
+ * writing into `object`.
+ *
+ * Only the containers ALONG the path are copied — every untouched branch keeps its identity, so a
+ * consumer comparing by reference still sees "unchanged" for everything the write did not reach.
+ * Deliberately adjacent to `setWith`: the two share `toPath` and the same rules for an empty path,
+ * for the keys they refuse, and for which container a missing segment creates, and a divergence
+ * between them would be invisible at the call sites that pick one over the other.
+ *
+ * No customizer: nothing needs one, and the parameters `setWith` hands it (`value`, `key`,
+ * PARENT object) have no honest equivalent while rebuilding a level that does not exist yet.
+ */
+function setIn<T>(object: T, path: unknown, value: unknown): T {
+	if (object == null) return object
+	const parts = toPath(path)
+	// An empty path is "no path", exactly as in `setWith` — the object comes back untouched, and
+	// by identity, so a `setState` built on it stays the no-op it has always been.
+	if (parts.length === 0) return object
+	for (const key of parts) {
+		if (key === '__proto__' || key === 'constructor' || key === 'prototype') return object
+	}
+	return copyOnPath(object, parts, 0, value) as T
+}
+
+function copyOnPath(node: unknown, parts: PropertyKey[], index: number, value: unknown): unknown {
+	if (index === parts.length) return value
+	const key = parts[index]
+	// A number here came from a bracket index, so a missing container becomes an array — the same
+	// rule `setWith` applies, read off the key being written rather than the one after it.
+	const clone: Dict = Array.isArray(node)
+		? (node.slice() as unknown as Dict)
+		: isObject(node) ? {...(node as Dict)} : (typeof key === 'number' ? [] : {}) as unknown as Dict
+	clone[key] = copyOnPath(isObject(node) || Array.isArray(node) ? (node as Dict)[key] : undefined, parts, index + 1, value)
+	return clone
+}
+
 function unset(object: unknown, path: unknown): boolean {
 	if (object == null) return false
 	const parts = toPath(path)
@@ -576,6 +613,7 @@ export {
 	// core
 	get,
 	setWith,
+	setIn,
 	unset,
 	cloneDeep,
 	isEqual,
