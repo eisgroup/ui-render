@@ -1,8 +1,7 @@
 import { Component } from 'react'
 import { Form } from 'react-final-form'
 import { Active } from '../../../utils'
-import { errorsProcessing } from '../../../engine/utils'
-import { clearErrorsMap, formsStorage } from '../../../engine/rules'
+import { clearErrorsMap, formsStorage } from '../../../state/formRegistry'
 import {
     asField,
     fieldValues,
@@ -13,14 +12,25 @@ import {
     withFormSetup,
 } from '../utils'
 
-jest.mock('../../../engine/rules', () => ({
-    clearErrorsMap: jest.fn(),
-    formsStorage: new Map(),
-}))
+// The registries moved out of the engine at §9.3 step 2, so this mocks where they live now. The
+// two `let` bindings are exposed through getters on purpose: their owners REPLACE them rather than
+// emptying them, and a plain property would hand this file the object from before the replacement.
+jest.mock('../../../state/formRegistry', () => {
+    let storedTouched = {}
+    let errorsMap = {}
+    return {
+        formsStorage: new Map(),
+        get storedTouched () { return storedTouched },
+        clearStoredTouched: () => { storedTouched = {} },
+        get errorsMap () { return errorsMap },
+        clearErrorsMap: jest.fn(() => { errorsMap = {} }),
+    }
+})
 
-jest.mock('../../../engine/utils', () => ({
-    errorsProcessing: jest.fn(),
-}))
+// `errorsProcessing` is no longer imported by the form module — the engine hands it in. This
+// records the calls the decorator makes, which is the contract that replaced the import.
+const processErrorsCalls = []
+const processErrors = (...args) => { processErrorsCalls.push(args) }
 
 function createFormApi ({ values = {}, registered = [], fieldStates = {} } = {}) {
     const listeners = []
@@ -73,6 +83,7 @@ function createSetupInstance ({
         fieldValues,
         registeredFieldValues,
         registeredFieldErrors,
+        processErrors,
     })
 
     const { form } = createFormApi({ values, registered, fieldStates })
@@ -108,7 +119,7 @@ describe('withForm subscription and lifecycle contracts', () => {
     beforeEach(() => {
         formsStorage.clear()
         clearErrorsMap.mockClear()
-        errorsProcessing.mockClear()
+        processErrorsCalls.length = 0
         Object.keys(storedTouched).forEach(key => delete storedTouched[key])
     })
 
@@ -343,7 +354,7 @@ describe('form data synchronization contracts', () => {
             initialValues: { name: 'before' },
             formProps: { pristine: true },
         })
-        expect(errorsProcessing).not.toHaveBeenCalled()
+        expect(processErrorsCalls).toHaveLength(0)
 
         instance.UNSAFE_componentWillReceiveProps({
             ...instance.props,
@@ -351,8 +362,8 @@ describe('form data synchronization contracts', () => {
             formProps: { pristine: false },
         })
 
-        expect(errorsProcessing).toHaveBeenCalledTimes(1)
-        expect(errorsProcessing).toHaveBeenCalledWith(form, instance._meta)
+        expect(processErrorsCalls).toHaveLength(1)
+        expect(processErrorsCalls[0]).toEqual([form, instance._meta])
         expect(instance._props).toBeNull()
     })
 })

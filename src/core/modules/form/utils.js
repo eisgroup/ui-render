@@ -9,15 +9,7 @@ import View from '../../components/View'
 import { Active, debounce, isEqualJSON, toJSON } from '../../utils'
 import { hasObjectValue, objChanges, set } from '../../utils/object'
 import { _ } from '../../utils/translations'
-// THE ONE LAYERING EXCEPTION IN THE CODEBASE (§9.9-H5). `modules` must not import `engine`, and
-// these two are the cycle the plan says §9.3 step 2 dissolves: the form module reaches back into the
-// engine for error processing and the forms registry. They are disabled individually rather than by
-// weakening the rule, so the rule still fails on a THIRD one — and so that removing them is a visible
-// two-line deletion when Phase 6 breaks the cycle rather than a search for what was allowed and why.
-// eslint-disable-next-line no-restricted-imports -- §9.3 step 2 removes this; see docs/UPGRADE-PLAN.md §9.9-H5
-import { errorsProcessing } from '../../engine/utils'
-// eslint-disable-next-line no-restricted-imports -- §9.3 step 2 removes this; see docs/UPGRADE-PLAN.md §9.9-H5
-import { clearErrorsMap, formsStorage } from '../../engine/rules'
+import { clearErrorsMap, clearStoredTouched, formsStorage, storedTouched } from '../../state/formRegistry'
 import arrayMutators from 'final-form-arrays'
 
 /**
@@ -27,7 +19,10 @@ import arrayMutators from 'final-form-arrays'
  */
 
 let formInitialValues = null;
-export let storedTouched = {};
+// Declared in `state/formRegistry` since §9.3 step 2 — the engine used to import it from here while
+// this file imported the engine's registries, which was the cycle. Re-exported so the name resolves
+// where it always did.
+export { storedTouched }
 
 /**
  * Get Form's Field Values
@@ -329,12 +324,18 @@ export function asField (InputComponent, {sanitize} = {}) {
  * @returns {Function} decorator - HOC wrapper function for given React component
  */
 export function withForm (options = {subscription: {pristine: true, valid: true}}) {
+  // The engine's error processing arrives as a CALLBACK rather than an import (§9.3 step 2). It reads
+  // a meta node and writes the shared error map, which is engine business; importing it from here was
+  // half of the `engine` <-> `modules/form` cycle, and moving it down would have put engine logic
+  // below the layer that uses it. The registries both sides write to did move — to `state/formRegistry`.
+  // It is optional: `withFormSetup` is exported and called directly by tests that never process errors.
+  const {processErrors} = options
   return function Decorator (Class) {
     // @Note: form field re-renders because of constantly changing formProps reference
     //        => convert it to instance getter, so `asField` does not depend on formProps.
     //        => cannot use context, because it triggers re-render of all child components.
     // Define withFormSetup here to load it only once on App init
-    withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors})
+    withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors, processErrors})
 
     const formSubscription = (form) => ({touched, initialValues}) => {
       if (formInitialValues === null) {
@@ -346,7 +347,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         for(const field of Object.keys(storedTouched)){
           form.mutators.setFieldTouched(field, false)
         }
-        storedTouched = {}
+        clearStoredTouched()
         clearErrorsMap()
       } else {
         for(const field of Object.keys(touched)) {
@@ -475,7 +476,7 @@ const setFieldTouched = (args, state) => {
  * @param {Function} registeredFieldErrors - callback to get form registered errors
  * @returns {Object} Class - mutated with form properties
  */
-export function withFormSetup (Class, {fieldValues, registeredFieldValues, registeredFieldErrors}) {
+export function withFormSetup (Class, {fieldValues, registeredFieldValues, registeredFieldErrors, processErrors}) {
   if (!Active.renderField) throw new Error(`${withFormSetup.name} requires Active.renderField to be registered`)
   const UNSAFE_componentWillReceiveProps = Class.prototype.UNSAFE_componentWillReceiveProps
   const componentWillUnmount = Class.prototype.componentWillUnmount
@@ -650,7 +651,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
       this.syncInputChanges()
       this._props = null
       if (this._meta) {
-        errorsProcessing(this.form, this._meta);
+        if (processErrors) processErrors(this.form, this._meta);
       }
     }
     if (UNSAFE_componentWillReceiveProps) UNSAFE_componentWillReceiveProps.apply(this, arguments)
