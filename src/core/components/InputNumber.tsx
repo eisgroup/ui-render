@@ -2,18 +2,104 @@ import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { capitalize, isString } from '../utils'
-import Button from './Button'
-import Icon from './Icon'
+import ButtonJs from './Button'
+import IconJs from './Icon'
 import Label from './Label'
-import Row from './Row'
-import Text from './Text'
-import View from './View'
+import RowJs from './Row'
+import TextJs from './Text'
+import ViewJs from './View'
 import { Active } from '../utils'
+import type { Translate } from '../utils/_envs'
 import { ENGINE_PROPS, omitProps } from './domProps'
+
+/**
+ * The presentational children below are still JavaScript, and most are exported through
+ * `React.memo()`. TypeScript has nothing to infer their props from (an untyped destructured
+ * parameter), so `memo` falls back to its bare `object` constraint and JSX against them rejects
+ * every single attribute — `<View className=…>` included. Until those files are converted they are
+ * re-typed here as open prop bags: exactly the permissiveness their `.js` call sites already have,
+ * stated once instead of an `any` at each use. Delete a cast when its component becomes `.tsx`.
+ */
+type UnconvertedComponent = React.ComponentType<Record<string, unknown>>
+const Button = ButtonJs as UnconvertedComponent
+const Icon = IconJs as UnconvertedComponent
+const Row = RowJs as UnconvertedComponent
+const Text = TextJs as UnconvertedComponent
+const View = ViewJs as UnconvertedComponent
 
 // Constants
 const THOUSANDS_SEPARATOR_REGEX = /\B(?=(\d{3})+(?!\d))/g
 const DECIMAL_PATTERN_TEMPLATE = '^\\d*(\\.\\d{0,{decimals}})?$'
+
+/** Anything this control accepts as, or reports as, a numeric value. The display state is a
+ * string (the raw text the user is typing); a completed number is reported as a `number`. */
+export type InputNumberValue = string | number
+
+/** `outputFormat` — how the idle (unfocused) value is decorated, and to how many decimals a
+ * blurred value is rounded. Every flag is optional; an absent flag means "do not apply". */
+export interface InputNumberOutputFormat {
+    percentage?: boolean
+    separateThousands?: boolean
+    decimals?: number
+}
+
+/**
+ * Reported on every accepted keystroke and on a blur that rewrites the value.
+ * @param value - the parsed number, or the raw string while the token is still incomplete ('-', '1.', '')
+ * @param name - the field registration path, i.e. `props.name` (undefined when the caller passed none)
+ * @param event - the change event, or the blur event when the rewrite came from blur
+ */
+export type InputNumberChangeHandler = (
+    value: InputNumberValue,
+    name?: string,
+    event?: React.SyntheticEvent<HTMLInputElement>,
+) => void
+
+export interface InputNumberProps {
+    /**
+     * The engine spreads a whole meta declaration onto every rendered node (see ./domProps), so
+     * arbitrary extra keys really do arrive here and are forwarded to the `<input>`. The index
+     * signature states that instead of pretending the declared list is closed; anything read off
+     * the rest bag must be narrowed, or declared above like `required`.
+     */
+    [key: string]: unknown
+
+    name?: string
+    id?: string
+    icon?: string | React.ReactNode
+    lefty?: boolean
+    onClickIcon?: React.MouseEventHandler<HTMLElement>
+    unit?: string
+    label?: string
+    disabled?: boolean
+    done?: boolean
+    className?: string
+    classNameIcon?: string
+    children?: React.ReactNode
+    /** only works with controlled component when `props.value` is provided */
+    stickyPlaceholder?: boolean
+    resize?: boolean
+    readonly?: boolean
+    float?: boolean
+    error?: string
+    info?: string
+    style?: React.CSSProperties
+    onFocus?: React.FocusEventHandler<HTMLInputElement>
+    onBlur?: React.FocusEventHandler<HTMLInputElement>
+    onRemove?: (name?: string) => void
+    title?: string
+    defaultValue?: InputNumberValue
+    placeholder?: string
+    translate?: Translate
+    outputFormat?: InputNumberOutputFormat
+    onChange?: InputNumberChangeHandler
+    value?: InputNumberValue
+    type?: string
+    min?: number
+    max?: number
+    /** forwarded to the `<input>` as `aria-required`, and to the wrapper as a `required` class */
+    required?: boolean
+}
 
 const InputNumber = ({
     name,
@@ -52,7 +138,7 @@ const InputNumber = ({
     min,
     max,
     ...props
-}) => {
+}: InputNumberProps) => {
     // Build the input regex from min/decimals constraints so that disallowed
     // characters cannot be entered in the first place. min: 0 forbids the
     // minus sign; outputFormat.decimals: 0 forbids the decimal separator.
@@ -64,9 +150,9 @@ const InputNumber = ({
         return new RegExp(`^${minus}\\d*${decimal}$`)
     }, [min, outputFormat])
 
-    const formatDecimals = (value, isUserTyping = false) => {
+    const formatDecimals = (value: InputNumberValue, isUserTyping = false): InputNumberValue => {
         if (value && outputFormat && typeof outputFormat.decimals === 'number' && outputFormat.decimals >= 0) {
-            const pattern = DECIMAL_PATTERN_TEMPLATE.replace('{decimals}', outputFormat.decimals)
+            const pattern = DECIMAL_PATTERN_TEMPLATE.replace('{decimals}', String(outputFormat.decimals))
             const re = new RegExp(pattern, 'g')
             // Don't format during active user editing
             if (!isUserTyping && !(re.test(value.toString()))) {
@@ -119,9 +205,13 @@ const InputNumber = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [valueFromParent, active])
 
-    const onChangeHandler = useCallback((value, name, event) => {
+    const onChangeHandler = useCallback((
+        value: string,
+        name?: string,
+        event?: React.SyntheticEvent<HTMLInputElement>,
+    ) => {
         // Preserve string representation during user input to keep decimal separator
-        let nextValue = value
+        let nextValue: InputNumberValue = value
         // Only convert to number if it's a complete valid number (not ending with decimal point)
         if (value !== '' && value !== '.' && !value.endsWith('.') && !isNaN(parseFloat(value))) {
             nextValue = parseFloat(value)
@@ -130,14 +220,14 @@ const InputNumber = ({
         setValue(value) // Keep the string representation for display
     }, [onChange])
 
-    const commify = useCallback((n, separator = ' ') => {
+    const commify = useCallback((n: InputNumberValue, separator = ' ') => {
         var parts = n.toString().split('.')
         const numberPart = parts[0]
         const decimalPart = parts[1]
         return numberPart.replace(THOUSANDS_SEPARATOR_REGEX, separator) + (decimalPart ? '.' + decimalPart : '')
     }, [])
 
-    const format = useCallback((value) => {
+    const format = useCallback((value: InputNumberValue | null | undefined): InputNumberValue => {
         if (value === '' || value == null) return ''
         if (outputFormat) {
             if (outputFormat.percentage) {
@@ -151,7 +241,7 @@ const InputNumber = ({
         return value
     }, [outputFormat, commify])
 
-    const parser = useCallback((value) => {
+    const parser = useCallback((value: string): string => {
         if (outputFormat) {
             if (outputFormat.percentage) {
                 return value.replace(' %', '')

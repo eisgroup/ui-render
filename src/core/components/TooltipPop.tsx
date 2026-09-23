@@ -1,7 +1,16 @@
 import React from 'react'
 import Tooltip from './Tooltip'
 import classNames from '../utils/classNames'
+import type { ClassValue } from '../utils/classNames'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
+
+/**
+ * The open rest bag. `Render.js` spreads a meta node's `tooltip` object straight into this
+ * component, so ANY key can arrive — that is the documented passthrough (`style`, `data-*`,
+ * `aria-*`, handlers) and the reason the dropped names below have to be stripped explicitly.
+ * `unknown` rather than `any`: what rides through is not inspected here, only forwarded.
+ */
+type PropsBag = { [key: string]: unknown }
 
 /**
  * THE HOVER TOOLTIP — in-house since §9.7-F1 step 2 part 3, no `semantic-ui-react`.
@@ -112,7 +121,10 @@ const CLOSE_DELAY = 70
  * sides with a second word (`top center`, `left center`), and those extra words map onto nothing
  * here, so they are ignored instead of rejected.
  */
-const PLACEMENTS = ['top', 'bottom', 'right', 'left']
+const PLACEMENTS = ['top', 'bottom', 'right', 'left'] as const
+
+/** One of the four placement words `tooltip.less` understands. */
+type Placement = (typeof PLACEMENTS)[number]
 
 /**
  * Props `semantic-ui-react`'s `Popup` / `Portal` handled that this implementation deliberately
@@ -152,11 +164,11 @@ const DROPPED_PROPS = [
     'pinned', 'popper', 'size', 'trigger', 'wide',
 ]
 
-const warnedDropped = new Set()
+const warnedDropped = new Set<string>()
 
 /** `props` without the dropped names, warning once per name in development. */
-function dropUnsupported (props) {
-    const kept = {}
+function dropUnsupported (props: PropsBag): PropsBag {
+    const kept: PropsBag = {}
     Object.keys(props).forEach(key => {
         if (DROPPED_PROPS.indexOf(key) === -1) {
             kept[key] = props[key]
@@ -193,17 +205,48 @@ let sequence = 0
  * first because that is the order assistive technology announces them in: whatever the control
  * says about itself before the supplementary tooltip.
  */
-function describedBy (existing, bubbleId) {
+function describedBy (existing: unknown, bubbleId: string): string {
     const ids = String(existing == null ? '' : existing).split(/\s+/).filter(Boolean)
     return ids.indexOf(bubbleId) === -1 ? [...ids, bubbleId].join(' ') : ids.join(' ')
 }
 
 /** `'top left'` -> `{top: true, bottom: false, right: false, left: true}`. */
-function placementOf (position) {
+function placementOf (position: string): Record<Placement, boolean> {
     const words = String(position).split(/\s+/)
-    const flags = {}
+    // Asserted rather than spelled out because the loop below fills every key on the next line;
+    // writing the four literals instead would be a different program.
+    const flags = {} as Record<Placement, boolean>
     PLACEMENTS.forEach(word => { flags[word] = words.indexOf(word) !== -1 })
     return flags
+}
+
+/**
+ * The bubble's body. A FUNCTION is legal and called while open (the SUIR-#4029 calling
+ * convention two metas rely on), which is why it is spelled out beside `ReactNode` rather
+ * than folded into it — `ReactNode` does not include functions.
+ */
+export type TooltipBody = React.ReactNode | (() => React.ReactNode)
+
+/**
+ * The 13 names this component reads, plus the open rest bag every caller really has: both engine
+ * entry points spread a meta node into it (`mapper.js` for `view: "Tooltip"`, `Render.js` for the
+ * `tooltip` attribute), so an index signature is the contract, not laziness. See
+ * `docs/SUPPORTED-PROPS.md` for the per-prop record, including the 19 dropped names.
+ */
+export interface TooltipPopProps extends PropsBag {
+    title?: TooltipBody
+    children?: React.ReactNode
+    delay?: number
+    inverted?: boolean
+    content?: TooltipBody
+    position?: string
+    open?: boolean
+    disabled?: boolean
+    className?: ClassValue
+    classWrap?: ClassValue
+    id?: string
+    onOpen?: () => void
+    onClose?: () => void
 }
 
 /**
@@ -242,12 +285,12 @@ export default function TooltipPop ({
     onOpen,
     onClose,
     ...props
-}) {
+}: TooltipPopProps) {
     const [visible, setVisible] = React.useState(false)
     // Lazy initialiser, so the counter advances once per mounted instance rather than per render.
     const [generatedId] = React.useState(() => `ui-render-tooltip-${sequence += 1}`)
-    const host = React.useRef(null)
-    const timer = React.useRef(null)
+    const host = React.useRef<HTMLSpanElement>(null)
+    const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
     // The state the callbacks have been told about. `visible` cannot answer that question inside an
     // event handler, because a handler closes over the value from ITS render.
     const reported = React.useRef(false)
@@ -283,13 +326,13 @@ export default function TooltipPop ({
     // advance internal state.
     const controlled = open !== undefined
 
-    const cancel = () => {
+    const cancel = (): void => {
         if (timer.current == null) return
         clearTimeout(timer.current)
         timer.current = null
     }
 
-    const change = next => {
+    const change = (next: boolean): void => {
         cancel()
         // `disabled` wins over every path, so an open must not be REPORTED either. A pending open
         // that fired after `disabled` arrived told the host `onOpen` while `isOpen` stayed false —
@@ -309,7 +352,7 @@ export default function TooltipPop ({
         if (typeof report === 'function') report()
     }
 
-    const schedule = (next, ms) => {
+    const schedule = (next: boolean, ms: number): void => {
         cancel()
         timer.current = setTimeout(() => change(next), ms)
     }
@@ -355,16 +398,18 @@ export default function TooltipPop ({
      * The dismiss callback is reached through a ref so this effect depends on `isOpen` alone and
      * does not re-subscribe on every render.
      */
-    const dismissRef = React.useRef(null)
+    const dismissRef = React.useRef<(() => void) | null>(null)
     dismissRef.current = () => change(false)
     React.useEffect(() => {
         if (!isOpen) return undefined
-        const dismiss = event => {
-            if (event.type === 'keydown' && event.key !== 'Escape') return
+        const dismiss = (event: Event): void => {
+            // Two assertions and no runtime guard: the listener is registered for exactly these
+            // two event types, so the narrowing the compiler cannot see is already true here.
+            if (event.type === 'keydown' && (event as KeyboardEvent).key !== 'Escape') return
             // A click INSIDE the host is not "outside" — including one on the bubble, which lives
             // in the host. Semantic behaved the same way and `TooltipPop.behavior.test.js` pins it.
-            if (event.type === 'click' && host.current != null && host.current.contains(event.target)) return
-            dismissRef.current()
+            if (event.type === 'click' && host.current != null && host.current.contains(event.target as Node)) return
+            dismissRef.current!()
         }
         document.addEventListener('keydown', dismiss)
         document.addEventListener('click', dismiss)
@@ -374,7 +419,7 @@ export default function TooltipPop ({
         }
     }, [isOpen])
 
-    let body = rawBody
+    let body: TooltipBody = rawBody
     // A FUNCTION body is legal and one meta shape relies on it (the workaround for
     // Semantic-Org/Semantic-UI-React#4029). Call it and render the result; SUIR reached the same
     // output through a shorthand path it had already deprecated.
@@ -433,7 +478,7 @@ export default function TooltipPop ({
         // Pointer events precede their compatibility mouse events, so the type is always known by
         // the time `onMouseEnter` runs. jsdom fires `mouseEnter` with no `pointerenter` before it,
         // which leaves the flag false and keeps every existing hover test meaningful.
-        onPointerEnter: event => { fromTouch.current = event.pointerType === 'touch' },
+        onPointerEnter: (event: React.PointerEvent<HTMLSpanElement>) => { fromTouch.current = event.pointerType === 'touch' },
         onMouseEnter: () => { if (!fromTouch.current) schedule(true, delay) },
         onMouseLeave: () => {
             fromTouch.current = false

@@ -70,7 +70,7 @@ const GENERATOR = 'scripts/generate-wrapper-prop-reference.js'
 const CURATION = 'scripts/wrapper-prop-curation.js'
 const WRITE_COMMAND = 'npm run docs:props'
 const PACK = 'src/core/components'
-const DOM_PROPS_FILE = `${PACK}/domProps.js`
+const DOM_PROPS_FILE = pack('domProps')
 const VIEWS_PAGE = 'docs/SUPPORTED-VIEWS.md'
 
 /**
@@ -89,19 +89,35 @@ const VIEWS_PAGE = 'docs/SUPPORTED-VIEWS.md'
 const WRAPPERS = []
 
 /**
+ * Resolve a pack component to whichever extension it currently has.
+ *
+ * These paths used to be written `${PACK}/Name.js`, which broke the moment §9.6-E2 renamed a
+ * component to `.tsx`: the generator threw ENOENT and its contract test failed to run at all, while
+ * `npx jest` on the component itself stayed green. The recursive scan below already accepted
+ * `.ts`/`.tsx`; this explicit map did not, so the file was half-prepared for the migration — the
+ * worse half, because the failure surfaces in an unrelated suite.
+ */
+function pack (name) {
+    for (const ext of ['js', 'jsx', 'tsx', 'ts']) {
+        if (fs.existsSync(path.join(ROOT, `${PACK}/${name}.${ext}`))) return `${PACK}/${name}.${ext}`
+    }
+    throw new Error(`${GENERATOR}: no source file for ${PACK}/${name} in .js/.jsx/.ts/.tsx`)
+}
+
+/**
  * The components a completed F1 step replaced. `root` is the element the top-level component
  * renders and `factory` the helper its subcomponents are built with — both are asserted against
  * the source, so the page cannot describe markup the component does not emit.
  */
 const IN_HOUSE = [
-    { id: 'Table', file: `${PACK}/Table.js`, fn: 'Table', root: 'table', factory: 'tablePart' },
+    { id: 'Table', file: pack('Table'), fn: 'Table', root: 'table', factory: 'tablePart' },
     // One element, no subcomponent family, so no `factory`.
-    { id: 'TooltipPop', file: `${PACK}/TooltipPop.js`, fn: 'TooltipPop', root: 'span' },
+    { id: 'TooltipPop', file: pack('TooltipPop'), fn: 'TooltipPop', root: 'span' },
     // `root` is the node the component renders, which for `Dropdown` is a COMPONENT and not an
     // element: it is the engine-facing wrapper, and the markup lives one level down in
     // `Listbox.js` under this import alias. Documenting the pair under one entry is deliberate —
     // the props a consumer sets are `Dropdown`'s, and `Listbox` is not exported from the library.
-    { id: 'Dropdown', file: `${PACK}/Dropdown.js`, fn: 'Dropdown', root: 'DropDown' },
+    { id: 'Dropdown', file: pack('Dropdown'), fn: 'Dropdown', root: 'DropDown' },
 ]
 
 const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8')

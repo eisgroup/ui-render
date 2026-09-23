@@ -657,7 +657,54 @@ All decomposition outputs are authored in TypeScript from the start (`engine/*.t
 3. **Final PR:** when `rg "prop-types" src` returns nothing — remove `prop-types` from `dependencies`, record the bundle-size delta (a small drop is expected).
 4. *Optional interim, independent of TS:* `babel-plugin-transform-react-remove-prop-types` in production builds strips the shapes from `dist` immediately — worth adding only if the E2/E3 tail runs long.
 
-#### Governance — go/no-go after E1
+#### Governance — go/no-go after E1 — **PILOT RUN 2026-09-22**
+
+**Three components converted as a pilot, chosen as WORST CASES rather than averages**, so the numbers
+are an upper bound: `InputNumber` (307 lines, 35 propTypes, 11 hooks — the heaviest props/state
+combination), `TooltipPop` (516 lines, 14 hooks, 4 open spreads — the largest component), `InputNative`
+(141 lines, a class with an `UNSAFE_` lifecycle and 6 spreads — the legacy case). 964 → 1,165 lines
+(+21%), 11 explicit `any`, all of them in the class.
+
+**THE PILOT DOES NOT PRODUCE A TRUSTWORTHY VELOCITY NUMBER, and pretending otherwise would be the
+worst outcome here.** Self-reported effort came out at 45 / 8 / 6 minutes for 307 / 516 / 141 lines —
+a twentyfold spread per line, which says the figures measure the reporter more than the work. What the
+pilot does establish is far more useful than a rate:
+
+**1. ORDERING DOMINATES EFFORT, and it is not what E1 would have predicted.** `React.memo()` over an
+unconverted `.js` component infers the bare `object` constraint, so the FIRST `tsc` run on
+`InputNumber` produced 14 errors — every JSX attribute on `View`, `Row`, `Text`, `Button` and `Icon`,
+including `className`. None were in the file's own logic. Until the presentational LEAVES are
+converted, every consumer must carry a cast and the JSX it writes against them is unchecked. **Convert
+`View`, `Row`, `Text`, `Button`, `Icon` and `domProps.js` first; that single decision is worth more
+than the per-file typing effort.**
+
+**2. THE TYPES BUY LESS THAN THE LINE COUNT SUGGESTS.** The engine spreads whole meta nodes into these
+components, so each props type needs `[key: string]: unknown` — which switches off excess-property
+checking. A misspelled prop compiles. This is the same trade §9.6-E1 recorded for the meta contract,
+and it is not avoidable without knowing everything the engine can spread, which nobody does.
+
+**3. A HAZARD NO GATE CATCHES.** A non-breaking space in `InputNumber`'s JSX was silently normalised to
+a plain space during the rewrite. `tsc`, `eslint` and all 717 component tests passed WITH the
+corruption; only a byte-level diff against the original found it. Verified after the fact: the file
+carries exactly one U+00A0, before and after. **JSX carries literal text, so a bulk rewrite across 113
+files can change rendered output invisibly.** Any rollout needs a byte-diff step that ignores
+annotations, not just green gates.
+
+**4. PROP-TYPES DUPLICATION IS CHEAP TO WRITE AND UNCHECKED.** `InputNumber` now carries 35 runtime
+propTypes beside 33 interface fields, restating each other almost line for line. Authoring cost was
+minor; the problem is that **nothing verifies the two agree** — typing `min?: string` would leave every
+gate green. At ~113 files that is a silent drift surface per component. Either generate one side from
+the other, or bring §9.6-E5 forward rather than carrying two hand-written contracts.
+
+**5. EXTENSION-KEYED GATES BROKE FOR THE FIFTH TIME IN THIS TICKET.** The wrapper-prop generator held a
+hardcoded `${PACK}/TooltipPop.js` map — while its own directory scan already accepted `.ts`/`.tsx`
+"for §9.6-E2", so the file was prepared for the migration in the half that did not matter. Its contract
+suite failed to RUN, in an unrelated file, while `jest` on the component stayed green. The per-file
+coverage thresholds broke too, again. Fixed by resolving the extension. **This pattern — a gate keyed
+on a path or extension quietly stopping watching what the migration moved — has now cost time in E1
+(twice), H6, and here (twice). It should be swept for BEFORE E2 starts, not discovered per wave.**
+
+
 
 E0/E1 plus the contract types are committed scope. Before green-lighting the long E2/E3 tail (~250 files riding two large workstreams), hold an explicit go/no-go on measured E1 conversion velocity.
 
