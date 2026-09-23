@@ -40,13 +40,13 @@ module.exports = {
             functions: 85,
             lines: 90,
         },
-        './src/core/pages/main/rules.js': {
+        './src/core/engine/rules.js': {
             statements: 89,
             branches: 76,
             functions: 98,
             lines: 91,
         },
-        './src/core/pages/main/mapper.js': {
+        './src/core/engine/mapper.js': {
             statements: 98,
             branches: 93,
             functions: 100,
@@ -58,7 +58,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/ui-render/transforms.js': {
+        './src/core/engine/transforms.js': {
             statements: 100,
             branches: 100,
             functions: 100,
@@ -121,13 +121,13 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/pages/main/components/TableView.js': {
+        './src/core/engine/components/TableView.js': {
             statements: 100,
             branches: 97,
             functions: 100,
             lines: 100,
         },
-        './src/core/pages/main/components/Tabs.js': {
+        './src/core/engine/components/Tabs.js': {
             statements: 100,
             branches: 98,
             functions: 100,
@@ -169,19 +169,19 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/ui-render/Render.js': {
+        './src/core/engine/Render.js': {
             statements: 100,
             branches: 100,
             functions: 100,
             lines: 100,
         },
-        './src/core/ui-render/validateMeta.js': {
+        './src/core/engine/validateMeta.js': {
             statements: 100,
             branches: 100,
             functions: 100,
             lines: 100,
         },
-        './src/core/ui-render/metaPath.js': {
+        './src/core/engine/metaPath.js': {
             statements: 100,
             branches: 100,
             functions: 100,
@@ -217,13 +217,13 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/pages/main/dataKindPush.js': {
+        './src/core/engine/dataKindPush.js': {
             statements: 100,
             branches: 100,
             functions: 100,
             lines: 100,
         },
-        './src/core/pages/main/components/LocalDraftTableRow.js': {
+        './src/core/engine/components/LocalDraftTableRow.js': {
             statements: 99,
             branches: 93,
             functions: 100,

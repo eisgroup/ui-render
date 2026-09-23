@@ -15,7 +15,7 @@ const VERSION_SITES = [
     'public/index.html',
 ]
 
-jest.mock('../../core/pages/main/rules', () => {
+jest.mock('../../core/engine/rules', () => {
     const ReactModule = require('react')
     const contexts = require('../../core/contexts')
 
@@ -33,7 +33,7 @@ jest.mock('../../core/pages/main/rules', () => {
 
 import LibraryRender from '../main' // eslint-disable-line import/first
 import AppWrapper from '../AppWrapper' // eslint-disable-line import/first
-import DefaultExport from '../index' // eslint-disable-line import/first
+import DefaultExport from '..' // eslint-disable-line import/first
 
 describe('published library contract', () => {
     it('exports the renderer as the default API', () => {

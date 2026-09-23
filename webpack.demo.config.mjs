@@ -29,7 +29,7 @@ export default (env, argv) => {
     return {
         mode: isProduction ? 'production' : 'development',
         devtool: 'source-map',
-        entry: './src/index.js',
+        entry: './src/demo/index.js',
         output: {
             path: path.resolve(__dirname, outputDir),
             filename: isProduction

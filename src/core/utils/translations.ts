@@ -14,7 +14,7 @@ export type LocalisedStrings = Record<string, string>
  * Localised String Object (can be extended by adding new terms or languages)
  * @note: follow the example to ensure only one instance of translation exists.
  * @example:
- *    import { l, localiseTranslation } from './'
+ *    import { l, localiseTranslation } from './index'
  *    export { _ } from './translations'
  *    localiseTranslation({
  *      NEW_PHRASE: {

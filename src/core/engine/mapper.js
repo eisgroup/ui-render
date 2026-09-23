@@ -1,0 +1,710 @@
+import React, { PureComponent, useContext } from 'react'
+import AutoSave from '../modules/form/views/AutoSave'
+import { FIELD } from '../modules/variables'
+import { cn } from '../components'
+import Button from '../components/Button'
+import PieChart from '../components/charts/PieChart'
+import { Checkbox } from '../components/Checkbox'
+import Counter from '../components/Counter'
+import Dropdown from '../components/Dropdown'
+import Expand from '../components/Expand'
+import ExpandList from '../components/ExpandList'
+import Icon from '../components/Icon'
+import Image from '../components/Image'
+import { OK } from '../components/inputs/validationRules'
+import Label from '../components/Label'
+import List from '../components/List'
+import TextDateValue from '../components/TextDateValue'
+import ProgressSteps from '../components/ProgressSteps'
+import { renderFloat } from '../components/renders'
+import Row from '../components/Row'
+import Space from '../components/Space'
+import Table from '../components/Table'
+import Text from '../components/Text'
+import TooltipPop from '../components/TooltipPop'
+import View from '../components/View'
+import { Active, debounce, interpolateString, isList, isNumeric, isString, isTruthy, toFlatList, toJSON } from '../utils'
+import { TIME_DURATION_INSTANT } from '../utils/constants'
+import { get, hasObjectValue, isEqual, isObject, mergeReplaceArrays } from '../utils/object'
+import Render, { formatRenderError, mapProps } from './index'
+import { relativePathFrom } from './transforms'
+import { renderField } from './components/renders'
+import TableView from './components/TableView'
+import TabList from './components/TabList'
+import Tabs from './components/Tabs'
+import Data from './Data'
+import { AppContext } from '../contexts'
+
+/**
+ * UI RENDERER COMPONENTS SETUP ================================================
+ * Map Component props and Methods for recursive rendering
+ * =============================================================================
+ */
+
+Render.Tooltip = TooltipPop
+
+/**
+ * Map UI Render props to final Rendering Component/s
+ *
+ * @param {String} view - component type (one of FIELD.TYPE values)
+ * @param {Array} items - nested child component props
+ * @param {Object|Array} data - global data object to be passed down to child components
+ * @param {*} _data - local data object to be consumed by the component for rendering
+ * @param {Boolean} debug - whether to use debug mode
+ * @param {Class} instance - UI Render instance
+ * @param {Boolean} relativeData - whether to retrieve values from local `_data`, defaults to global `data`
+ * @param {Number|String} relativeIndex - used when component is rendered in array
+ * @param {String} relativePath - path used to compute form input "name" attribute
+ * @param {Object} form - react-final-form FormApi instance
+ * @param {String|Object} [showIf] - whether to not render the component if it evaluates to truthy value
+ * @param {Function} [Render] - the recursive renderer
+ * @param {String} [version] - of the config
+ * @param {*} [props] - other component props
+ * @returns {JSX.Element|*} React component
+ */
+const RenderComponent = ({
+    view, items, data, _data, debug, form, instance,
+    showIf, relativeData, relativeIndex, relativePath, version,
+    // Always superseded by `Active.translate` below, and `translate` is a real HTML global attribute:
+    // left in `props` it reaches the DOM via spread (e.g. TableCell -> <td>) and React warns on the function value.
+    translate: _translate,
+    // Engine-internal: `Render.js` hands this to every node so value renderers can pick a currency symbol,
+    // but most views never read it, and left in `props` it reached the DOM as currencycode="USD" on div/span/
+    // td/th/tr/input (331 occurrences across 33 of the 38 examples). Stripping it here rather than in each
+    // presentational component is safe because the propagation *down the tree* is done independently by
+    // `Render.js`; only the leaf spread is cut. The two views that genuinely consume it -- `List`, which
+    // injects it into every rendered item, and the Tabs branch, which injects it into tab/content
+    // definitions -- receive it explicitly below.
+    currencyCode,
+    ...props
+}) => {
+    const { popup } = useContext(AppContext)
+    const translate = Active.translate
+    /* General showIf logic */
+    if (showIf != null) {
+        // UI Render should not 'Value Transform' `showIf` attribute
+        if (isString(showIf)) {
+            const __data = get((relativeData !== false && _data) || data, showIf)
+            if (!isTruthy(__data)) return null
+        } else if (hasObjectValue(showIf)) {
+            const { name: rawName, relativeData: showIfRelativeData, equal } = showIf
+            // Interpolate {state.xxx} templates in showIf.name
+            const name = rawName && rawName.includes('{')
+                ? interpolateString(rawName, instance, { suppressError: true })
+                : rawName
+            let __data
+            // if (relativePath && typeof relativeIndex !== undefined && name) {
+            if (name) {
+                // Use raw form data (without Select array reordering) for showIf lookups.
+                // getAllFormsData() applies changeOptionOrderForSelectFields which reorders arrays,
+                // but {state.xxx} stores indices relative to the original array order.
+                // Merge with `data` so an empty or partial `{}` from the form does not hide nodes whose
+                // showIf keys exist only on initialValues (e.g. root layout gated by isExperienceHidden).
+                // Note: lodash mergeWith skips undefined source values, so a form field explicitly
+                // cleared to undefined will still show the initial data value. This is acceptable
+                // because showIf targets are typically layout flags from data, not editable form fields.
+                const rawForm = instance.getRawFormsData && instance.getRawFormsData()
+                const formData = (rawForm != null && typeof rawForm === 'object')
+                    ? mergeReplaceArrays(data, rawForm)
+                    : data
+                // Draft row / renderExtraItem sets relativePath + relativeIndex to the next array slot.
+                // showIf.name may still be a global path (e.g. `settings.allRowsComplete`).
+                // In that case prefixing with `[index].` is wrong — use showIf.relativeData === false or
+                // component relativeData === false to read `name` from form root.
+                if (
+                    relativePath && typeof relativeIndex !== 'undefined' &&
+                    showIfRelativeData !== false && relativeData !== false
+                ) {
+                    __data = get(formData, `${relativePath}[${relativeIndex}].${name}`, undefined)
+                } else {
+                    __data = get(formData, name, undefined)
+                }
+            } else {
+                // Get from initial data.
+                // TODO: review this logic. It might be better to get from form instead of initial data
+                __data = (showIfRelativeData !== false && !name && _data) || get((showIfRelativeData !== false && _data) || data, name)
+            }
+            if (equal !== undefined) {
+                if (!isEqual(__data, equal)) return null
+            } else {
+                if (!isTruthy(__data)) return null
+            }
+        } else if (isObject(showIf)) {
+            if (!isTruthy(_data)) return null
+        }
+    }
+
+    switch (view) {
+        case FIELD.TYPE.DATA:
+            return <Data
+                instance={instance}
+                // @Note: falls back to root data for every falsy `_data`, not just `undefined`.
+                // A nested render needs an object to bind against, so passing `null`/`0`/`''`/`false`
+                // through makes the whole block (and its fields) disappear instead of rendering.
+                data={_data || data}
+                {...props}
+                relativeIndex={relativeIndex}
+                relativePath={relativePath}
+            />
+
+        case FIELD.TYPE.COL:
+        case FIELD.TYPE.COL2:
+        case FIELD.TYPE.COL3: {
+            return <View {...props}>{items.map(Render)}</View>
+        }
+
+        case FIELD.TYPE.ROW:
+        case FIELD.TYPE.ROW2: {
+            return <Row {...props}>{items.map(Render)}</Row>
+        }
+
+        case FIELD.TYPE.LIST:
+        case FIELD.TYPE.COL_LIST:
+        case FIELD.TYPE.COL_LIST3: {
+            return <List items={_data} {...props} currencyCode={currencyCode}/>
+        }
+
+        case FIELD.TYPE.ROW_LIST:
+        case FIELD.TYPE.ROW_LIST2: {
+            return <List items={_data} {...props} currencyCode={currencyCode} row/>
+        }
+
+        case FIELD.TYPE.TABLE_CELLS: {
+            const { onDataChanged: _1, ...rest } = props
+            // Each cell `item` must receive the parent row's relativePath/relativeIndex so Input names
+            // become e.g. `path[0].field`, not `path.field` (final-form throws on the latter when `path` is an array).
+            // metaToProps usually stamps these on each cell, but merge from `rest` when missing.
+            return <>{items.map((item, i) => {
+                const merged = {
+                    ...item,
+                    ...(item.relativePath == null && relativePath != null && { relativePath }),
+                    ...(item.relativeIndex == null && relativeIndex != null && { relativeIndex }),
+                }
+                return (
+                    <Table.Cell key={i} {...rest}>
+                        {Render(merged, i)}
+                    </Table.Cell>
+                )
+            })}</>
+        }
+
+        case FIELD.TYPE.AUTO_SUBMIT: {
+            return <AutoSave {...props}/>
+        }
+
+        case FIELD.TYPE.CHECKBOX: {
+            return <Checkbox {...props} translate={translate}/>
+        }
+
+        case FIELD.TYPE.EXPAND: {
+            if (props.label != null && props.title == null) {
+                props.title = props.label
+                delete props.label
+            }
+            if (props.name != null && props.title == null) props.title = props.name
+            if (items.length) props.children = () => items.map(Render)
+            return <Expand {...props}/>
+        }
+
+        case FIELD.TYPE.EXPAND_LIST: {
+            return <ExpandList items={_data} {...props}/>
+        }
+
+        case FIELD.TYPE.BUTTON: {
+            if (items.length) props.children = items.map(Render)
+            if (props.label != null && props.children == null) {
+                props.children = props.label
+                delete props.label
+            }
+            return <Button {...props} translate={translate}/>
+        }
+
+        case FIELD.TYPE.COUNTER: {
+            return <Counter {...props}/>
+        }
+
+        case FIELD.TYPE.ICON: {
+            if (items.length) props.children = items.map(Render)
+            return <Icon {...props}/>
+        }
+
+        case FIELD.TYPE.IMAGE: {
+            if (items.length) props.children = items.map(Render)
+            return <Image {...props}/>
+        }
+
+        case FIELD.TYPE.LABEL: {
+            if (items.length) props.children = items.map(Render)
+            return <Label {...props} translate={translate}/>
+        }
+
+        case FIELD.TYPE.PIE_CHART: {
+            const { mapItems, ...prop } = props
+            if (mapItems) _data = mapProps(_data, mapItems, { debug })
+            if (items.length) prop.children = items.map(Render)
+            return <PieChart items={_data} {...prop}/>
+        }
+
+        case FIELD.TYPE.PROGRESS_STEPS: {
+            const steps = items.map(({ step, label, content, data, _data, ...info }, i) => {
+                return {
+                    ...info,
+                    step: isObject(step) ? Render.call(this, { data, _data, debug, form, instance, ...step }, i) : step,
+                    label: isObject(label) ? Render.call(this, {
+                        data,
+                        _data,
+                        debug,
+                        form,
+                        instance, ...label
+                    }, i) : label,
+                    content: isObject(content) ? Render.bind(this, {
+                        data,
+                        _data,
+                        debug,
+                        form,
+                        instance, ...content
+                    }, i) : content
+                }
+            })
+            return <ProgressSteps items={steps} {...props}/>
+        }
+
+        case FIELD.TYPE.SPACE: {
+            return <Space {...props}/>
+        }
+
+        case FIELD.TYPE.TABLE: {
+            const { extraItems, filterItems, parentItem, group, ...table } = props
+            const additionalCellsStyles = []
+            if (!isList(_data)) _data = []
+
+            // Matrix table headers and data transform
+            if (group) {
+                // `header` must exist as a single object, otherwise there is no way to group tables
+                let {
+                    by: { id, label, renderLabel, ...groupByProps } = {},
+                    header,
+                    extraHeader = { label: '' }
+                } = group
+                const errorTitle = `Incorrect config for ${view} with {name: "${props.name}"}!`
+                if (id == null) {
+                    popup.setPopupState({
+                        title: errorTitle,
+                        content: `${view}.group.by must have 'id', got '${toJSON(group.by, null, 2)}'`
+
+                    })
+                }
+                if (!header || header.id == null) {
+                    popup.setPopupState({
+                        title: errorTitle,
+                        content: `${view}.group.header must have 'id', got '${toJSON(header, null, 2)}'`
+
+                    })
+                    header = {} // prevent breaking code
+                }
+
+                // First, check data to determine headers
+                const groupsByValue = {}
+                const rowsByCommonValue = {}
+                for (const row of _data) {
+                    const { [id]: groupId, [header.id]: commonValue } = row
+                    if (groupId != null) groupsByValue[groupId] = groupId
+                    if (commonValue != null) rowsByCommonValue[commonValue] = [...(rowsByCommonValue[commonValue] || []), row]
+                }
+                const groupIds = Object.values(groupsByValue)
+                if (groupIds.length) {
+
+                    // Transform headers
+                    const _headers = (props.headers || [])
+                    const newHeaders = toFlatList(groupIds.map(_id => _headers.map(({
+                        id,
+                        ...h
+                    }) => ({ id: `${id}_${_id}`, ...h }))))
+                    table.headers = [header].concat(newHeaders)
+
+                    // Label grouped tables
+                    if (label != null && !hasObjectValue(label)) {
+                        popup.setPopupState({
+                            title: errorTitle,
+                            content: `${view}.group.by.label must resolve to object of labels by ${id} 'value', got '${toJSON(label, null, 2)}'`
+
+                        })
+                    }
+                    const groupHeaders = groupIds.map(id => ({
+                        colSpan: _headers.length,
+                        label: label ? (renderLabel ? renderLabel(label[id]) : label[id]) : id,
+                        ...groupByProps,
+                    }))
+                    const newExtraHeaders = [
+                        [extraHeader].concat(groupHeaders)
+                    ]
+                    table.extraHeaders = (props.extraHeaders || []).concat(newExtraHeaders)
+
+                    // Transform data by grouping them with `commonValue`
+                    _data = Object.values(rowsByCommonValue).map(rows => {
+                        const item = {}
+                        rows.forEach(row => {
+                            const { [id]: groupId, [header.id]: commonValue, ..._item } = row
+                            item[header.id] = commonValue
+                            for (const key in _item) {
+                                item[`${key}_${groupId}`] = _item[key]
+                            }
+                        })
+                        return item
+                    })
+                }
+            }
+
+            // Mixed array nested table data filtering
+            if (filterItems && parentItem) {
+                _data = _data.filter(item => {
+                    return !filterItems.find(filter => {
+                        for (const key in filter) {
+                            // If mismatch in value found, filter out given item
+                            if (get(item, key) !== get(parentItem, filter[key])) return true
+                        }
+                        return false
+                    })
+                })
+            }
+
+            // Table with custom rows
+            if (extraItems) _data = _data.concat(extraItems.map(sourceItem => {
+                const item = { ...sourceItem }
+                for (const id in item) {
+                    const definition = item[id]
+                    if (isObject(definition)) {
+                        if ((definition.name && Object.keys(definition).length === 1)) {
+                            item[id] = get(data, definition.name)
+                        } else if (definition.name && definition.render) {
+                            item[id] = { ...definition, data: get(data, definition.name) }
+                        } else if (definition.view) {
+                            item[id] = (_, index, props) => Render({ debug, ...props, ...definition })
+                        }
+                    }
+                }
+                return item
+            }))
+
+            if (table.colGroup) {
+                let accumulatedWidth = 0
+                table.colGroup.forEach(col => {
+                    if (col.isFixed && col.style) {
+                        additionalCellsStyles.push({
+                            left: `${accumulatedWidth}px`,
+                            position: 'sticky',
+                            zIndex: 1,
+                        })
+                        accumulatedWidth += parseInt(col.style.minWidth) || 0
+                    }
+                })
+            }
+
+            // FieldArray must register the same dot-path as row Inputs (relativePathFrom), not the short `name`
+            // (e.g. `dataKind.lineItems`). Otherwise subscriptions drift and values can clear on blur while form.values
+            // still holds data under the full path.
+            let fieldArrayName = table.name
+            if (table.name != null) {
+                fieldArrayName = relativePathFrom(
+                    { name: table.name, relativeData: table.relativeData !== false },
+                    relativePath,
+                    relativeIndex
+                )
+            }
+
+            return <TableView
+                items={_data}
+                additionalCellsStyles={additionalCellsStyles}
+                fieldArrayName={fieldArrayName}
+                {...table}
+                translate={translate}
+            />
+        }
+
+        case FIELD.TYPE.TABS:
+        case FIELD.TYPE.TAB_LIST: {
+            const { childrenBeforeTabs, childrenAfterTabs } = props
+            if (hasObjectValue(childrenBeforeTabs))
+                props.childrenBeforeTabs = Render.bind(this, {
+                    data,
+                    _data,
+                    debug,
+                    form,
+                    instance, ...childrenBeforeTabs
+                })
+            if (hasObjectValue(childrenAfterTabs))
+                props.childrenAfterTabs = Render.bind(this, {
+                    data,
+                    _data,
+                    debug,
+                    form,
+                    instance, ...childrenAfterTabs
+                })
+
+            switch (view) {
+                case FIELD.TYPE.TAB_LIST:
+                    return <TabList items={_data} {...props}/>
+
+                case FIELD.TYPE.TABS:
+                default:
+                    return <Tabs items={items.map(({ tab, content, _data, data }, i) => ({
+                        tab: isObject(tab) ? Render.call(this, {
+                            data,
+                            _data,
+                            debug,
+                            form,
+                            instance,
+                            currencyCode, ...tab
+                        }, i) : tab,
+                        content: isObject(content) ? Render.bind(this, {
+                            data, _data, debug, form, instance, currencyCode, ...content
+                        }, i) : content,
+                    }))} {...props}/>
+            }
+        }
+
+        case FIELD.TYPE.TEXT:
+        case FIELD.TYPE.TITLE: {
+            if (props.label != null && props.children == null) {
+                props.children = props.label
+                delete props.label
+            }
+            if (items.length) {
+                props.children = items.map(Render)
+                delete props.renderLabel
+            } else if (props.renderLabel) {
+                props.children = props.renderLabel(props.children)
+                delete props.renderLabel
+            } else if (props.name) {
+                props.children = _data
+            }
+            if (view === FIELD.TYPE.TITLE) props.className = cn('h3', props.className)
+            return <Text {...props} translate={translate}/>
+        }
+
+        case FIELD.TYPE.TOOLTIP: {
+            if (props.label != null && props.content == null) {
+                props.content = props.label
+                delete props.label
+            }
+            if (props.renderLabel) {
+                props.content = props.renderLabel(props.content)
+                delete props.renderLabel
+            }
+            if (items.length) {
+                props.children = items.map(Render)
+            } else if (isObject(props.children)) {
+                props.children = Render({ debug, ...props.children })
+            }
+            return <TooltipPop inverted {...props}/>
+        }
+
+        case FIELD.TYPE.POPUP: {
+            if (!instance.popupById) instance.popupById = {}
+            const { id, ...popup } = props
+
+            /**
+             * Popup is a special case, it does not render content to the DOM immediately, only as VirtualDOM.
+             * When user clicks on a button that opens popup, the VirtualDOM is inserted to Popup component for rendering.
+             * @withForm needs to wrap the entire content to provide Form field instance using existing form.
+             */
+            class PopupContent extends PureComponent {
+                render () {
+                    return items.map(Render)
+                }
+            }
+
+            // Store popup with template ID if it contains variables
+            // The ID will be interpolated when popup is opened
+            if (id && id.includes('{')) {
+                // Store template with items and context for later content creation
+                if (!instance.popupTemplates) instance.popupTemplates = {}
+                instance.popupTemplates[id] = { 
+                    ...popup, 
+                    // Store items and context to create new content when popup opens
+                    items,
+                    data,
+                    _data,
+                    form,
+                    instance,
+                    relativeIndex,
+                    relativePath,
+                    relativeData
+                }
+            } else {
+                // Static ID - store directly with content
+                instance.popupById[id] = { ...popup, content: <PopupContent/> }
+            }
+            return null
+        }
+
+        default: {
+            if (items.length) props.children = items.map(Render)
+            const { mapOptions, removable, autoSubmit, expanded: _1, ...input } = props
+            const { readonly, disabled } = data || {}
+            if (mapOptions) input.options = mapProps(input.options || [], mapOptions, { debug })
+
+            // Resolve Input name dynamic path
+            // relativePath should be used to form input name even when relativeData === false (e.g., in popups)
+            // relativeData === false only prevents automatic data extraction, but doesn't affect name generation
+            if (relativePath != null && input.name) {
+                const uniqueIdentificator = `${relativePath}${relativeIndex != null ? `[${relativeIndex}]` : ''}.${input.name}`
+                input.id = uniqueIdentificator
+                input.name = uniqueIdentificator
+            }
+
+            // Render Dropdown separately, to avoid triggering form value changes
+            if (view === FIELD.TYPE.DROPDOWN) {
+                // proxy onChange to prevent event sent as second argument
+                const { onChange, ...dropdown } = input
+                return <Dropdown
+                    lazyLoad={false}
+                    onChange={onChange ? (value => onChange(value)) : undefined}
+                    {...dropdown}
+                    translate={translate}
+                />
+            }
+
+            // Form value changing fields should have 'Input' as view
+            if (view === FIELD.TYPE.INPUT) {
+                // eslint-disable-next-line default-case
+                switch (input.type) {
+                    case 'select':
+                        view = FIELD.TYPE.SELECT
+                        break
+                    case 'slider':
+                        view = FIELD.TYPE.SLIDER
+                        break
+                    case 'toggle':
+                        view = FIELD.TYPE.TOGGLE
+                        break
+                    case 'file':
+                        view = FIELD.TYPE.UPLOAD
+                        input.className = cn('input--wrapper', input.className)
+                        break
+                }
+                if (input.icon && input.icon.view) input.icon = Render({ debug, ...input.icon })
+            }
+
+            // For stable-value Selects, convert value to index for setState (supports {state.xxx} in cascading)
+            // Only pass the converted value (not name/event) so setStates uses the config keyPath,
+            // not the modified input.name which includes relativePath prefix
+            if (view === FIELD.TYPE.SELECT && isObject(mapOptions) && mapOptions.value && mapOptions.value !== '{index}' && input.onChange) {
+                const stableOnChange = input.onChange
+                const mappedOptions = input.options || []
+                input.onChange = (value) => {
+                    const idx = mappedOptions.findIndex(o => String(o.value) === String(value))
+                    return stableOnChange(idx >= 0 ? String(idx) : value)
+                }
+            }
+
+            // Auto submit on changes
+            if (autoSubmit) {
+                const { onChange } = input
+                const submit = debounce(instance.submit, autoSubmit.delay >= 0 ? autoSubmit.delay : TIME_DURATION_INSTANT)
+                input.onChange = (value) => {
+                    onChange && onChange(value)
+                    submit()
+                }
+            }
+
+            // Input clearing
+            if (removable) {
+                const { onRemove, onClickIcon } = input
+                input.icon = 'delete'
+                input.classNameIcon = 'button circle small transparent appear-on-hover'
+                input.onClickIcon = (...args) => {
+                    // todo: for some reason Dropdown/Select have `form` undefined
+                    form && form.change && form.change(input.name, null)
+                    onRemove && onRemove(input.name)
+                    autoSubmit && input.onChange(null)
+                    onClickIcon && onClickIcon(...args)
+                }
+            }
+
+            // Validate type="number" with min/max
+            if (input.type === 'number') {
+                const { validate, min, max } = input
+                if (min != null || max != null) input.validate = (value) => {
+                    if (min != null && value < min) return `Must be minimum ${min}`
+                    if (max != null && value > max) return `Must be maximum ${max}`
+                    return (validate && validate(value)) || OK
+                }
+            }
+
+            return renderField({ view, ...input, instance, ...readonly && { readonly }, ...disabled && { disabled }, translate })
+        }
+    }
+}
+
+/**
+ * Render Value Function Getter
+ *
+ * @param {String} Name - one of FIELD.TYPE definitions
+ * @returns {Function} renderer - that takes value as the first argument, and renders value in desired format
+ */
+Render.Method = function RenderMethod (Name) {
+    switch (Name) {
+        case FIELD.RENDER.CURRENCY:
+            return (val, index, { id, decimals = 2, symbol = '$', className, style, ...props } = {}) => {
+                return (isNumeric(val)
+                        ? <Row className={className} style={style}>
+                            <Text className="margin-right-smallest">{symbol}</Text>
+                            {renderFloat(val, decimals, props)}
+                        </Row>
+                        : null
+                )
+            }
+        case FIELD.RENDER.DOUBLE5:
+            return (val, index, { id, decimals, ...props } = {}) => isNumeric(val) ? renderFloat(val, 5, props) : null
+        case FIELD.RENDER.FLOAT:
+            return (val, index, {
+                id,
+                decimals,
+                ...props
+            } = {}) => isNumeric(val) ? renderFloat(val, decimals, props) : null
+        case FIELD.RENDER.PERCENT:
+            return (val, index, { id, decimals, className, style, ...props } = {}) => (isNumeric(val)
+                    ? <Row className={className} style={style}>
+                        {renderFloat(Number(val) * 100, decimals, props)}
+                        <Text className="margin-left-smallest">%</Text>
+                    </Row>
+                    : null
+            )
+        case FIELD.RENDER.TITLE_n_INPUT:
+            return (val, index, { id, ...props } = {}) => <Row {...props}><Text>{val}</Text></Row>
+        case FIELD.RENDER.STRING:
+            return (val) => {
+                return <Text>{val}</Text>
+            }
+        case FIELD.RENDER.DATE: {
+            return (val) => {
+                if (val) {
+                    return <TextDateValue value={val}/>
+                }
+                return null
+            }
+        }
+        default:
+            return (val) => <Text>{val}</Text>
+    }
+}
+
+/**
+ * The library's own sink for a per-node render failure (UPGRADE-PLAN §9.4, §2.6-3).
+ *
+ * @Note: this used to destructure `{err, errInfo}` while the boundary emits
+ * `{error, errorInfo}`, so it printed `undefined undefined` and a render failure was, in
+ * practice, silent. It also used `console.log`, which is not where a failure belongs.
+ *
+ * The whole report is logged after the formatted line so a developer can open `errorInfo`
+ * (React's component stack) and `props` (the node's resolved props) in the console. A host
+ * that wants to *handle* the failure — report it, show its own message — passes the
+ * documented `onError` prop instead of replacing this function; both run.
+ *
+ * @param {Object} report - {error, errorInfo, props, path, message}
+ * @returns {void}
+ */
+Render.onError = (report) => console.error(formatRenderError(report), report)
+
+Render.Component = RenderComponent

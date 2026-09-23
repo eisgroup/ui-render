@@ -88,7 +88,7 @@ Original audit baseline: 257 JS/JSX files (+2 TS), 76 test files. The safety/Rea
 
 **Other findings:**
 
-- ~~`ReactDOM.render`~~ — **CLOSED 2026-09-17:** re-grepped, `src/` contains no `ReactDOM.render` *call* at all; the sole occurrence of the string is a comment at `src/main.jsx:9` explaining why the demo uses the React 18 root API instead (`import { createRoot } from 'react-dom/client'` at `src/main.jsx:4`, `createRoot(...).render(...)` at `:12`). Nothing in the published library calls either. The finding as it stood: "`ReactDOM.render` — **demo entry point only** (`src/main.jsx:9`). Nothing in the published library calls it."
+- ~~`ReactDOM.render`~~ — **CLOSED 2026-09-17:** re-grepped, `src/` contains no `ReactDOM.render` *call* at all; the sole occurrence of the string is a comment at `src/demo/main.jsx:9` explaining why the demo uses the React 18 root API instead (`import { createRoot } from 'react-dom/client'` at `src/demo/main.jsx:4`, `createRoot(...).render(...)` at `:12`). Nothing in the published library calls either. The finding as it stood: "`ReactDOM.render` — **demo entry point only** (`src/demo/main.jsx:9`). Nothing in the published library calls it."
 - `createPortal` — `src/core/pages/main/components/Popup.js` (fully supported in 17/18/19).
 - `defaultProps` on **function components** (removed in React 19): exactly **3 occurrences** — `src/core/components/TooltipPop.js:23`, `ImageSwatch.js:27`, `Image.js:27`.
 - `.propTypes` assigned in 33 files; `prop-types` imported by 40 (fine in 17/18; validation removed entirely in React 19 — no crash; retirement: §9.6-E5).
@@ -229,7 +229,7 @@ Widen, never replace:
 3. Full test run + example smoke + manual demo QA.
 4. ~~Update install docs; changelog entry; ship as a checkpoint release.~~ **CLOSED 2026-09-17.** Install docs updated (`README.md:43,50,53`; `src/demo/markdowns/docs.md:35,39,42`); the changelog entry landed in `src/demo/markdowns/changelog.md` under "#### Compatibility" (line 295 onward: "host applications may use React 16.14, 17 or 18. Hosts on 16 or 17 need change nothing") — there is deliberately no root `CHANGELOG.md`, per the §10 gate; and ~~ship as a checkpoint release~~ is struck by the §10 decision of 2026-08-18, under which 17 ships as part of the React 18 release (see the exit criteria below).
 
-~~`@testing-library/react` 12 stays (its `react <18` peer admits 17). `ReactDOM.render` in the demo stays (fully supported in 17).~~ **Superseded by Phase 2 (§6), recorded 2026-09-17.** Both were the right Phase 1 calls and have since been executed past: `package.json` now carries `@testing-library/react` `^16.3.2`, and `src/main.jsx:4,12` mounts through `createRoot` rather than `ReactDOM.render`.
+~~`@testing-library/react` 12 stays (its `react <18` peer admits 17). `ReactDOM.render` in the demo stays (fully supported in 17).~~ **Superseded by Phase 2 (§6), recorded 2026-09-17.** Both were the right Phase 1 calls and have since been executed past: `package.json` now carries `@testing-library/react` `^16.3.2`, and `src/demo/main.jsx:4,12` mounts through `createRoot` rather than `ReactDOM.render`.
 
 **Automated checkpoint (2026-08-07):** React/React DOM 17.0.2, additive React 16.14/17 peer ranges and Moment `^2.29.4` are on `master`. Hosted CI is green: 138 suites / 1920 tests; coverage is 94.21% statements / 89.25% branches / 92.70% functions / 94.81% lines; JS/CSS lint and both builds pass. The manual QA checklist below is now worked through in a real browser, including the overlay-ordering items; ~~react-refresh, the yalc smoke and the release decision remain open.~~ **Corrected 2026-09-17:** only the react-refresh check is still open (Appendix C still shows it ☐). The yalc smoke is satisfied by `test:pack:consumer`, which packs the tarball, copies it into an isolated consumer under the OS temp directory with only react, react-dom and moment linked in, and server-renders it; it gates CI as "Smoke the packed tarball" — the same substitution the exit criteria below already record. The release decision was taken on 2026-08-18 (§10): 17 is folded into the React 18 release, so no separate 17 publish was ever due.
 
@@ -298,7 +298,7 @@ check, ~~and the §10 decision on whether React 17 ships as its own release~~. *
 ### Steps
 
 1. **Bump runtime dev deps:** `npm i -D react@18.3.1 react-dom@18.3.1`. React 18.3 immediately warns on function-component `defaultProps` — convert the two live sites (`TooltipPop`, `Image`) to default parameters in the same PR (minutes of work; keeps this phase's "no new warnings" exit gate honest; the third site, `ImageSwatch`, is deleted via §9.9-H1).
-2. **Migrate the demo entry** `src/main.jsx` to the new root API (mandatory — with legacy `ReactDOM.render`, React 18 runs in 17-compat mode and the demo would stop being representative of what hosts on 18 actually get):
+2. **Migrate the demo entry** `src/main.jsx` (now `src/demo/main.jsx`, §9.9-H3) to the new root API (mandatory — with legacy `ReactDOM.render`, React 18 runs in 17-compat mode and the demo would stop being representative of what hosts on 18 actually get):
 
    ```jsx
    // before
@@ -332,7 +332,7 @@ check, ~~and the §10 decision on whether React 17 ships as its own release~~. *
 - **Steps 1, 3-5 landed together** (they cannot be split — RTL ≥13 requires React ≥18): React and React DOM 18.3.1, RTL 16 with an explicit `@testing-library/dom` 10 peer, `@types/react`/`@types/react-dom` 18, peers widened to `^16.14.0 || ^17.0.0 || ^18.0.0`. The type-consumer matrix was repointed — `@types/react` is 18 now, so the 16 and 17 slots come from locked aliases — and all six interop/CommonJS combinations still pass.
 - **The RTL 12→16 migration cost two test files, not the 1-2 weeks budgeted here.** Both failures shared the predicted cause: under `createRoot` a state update outside `act()` is no longer flushed before the assertion. `ProgressBar` drove its own `setTimeout` via `jest.runAllTimers()`; `Slider` dispatched a raw `MouseEvent` to reach `onPointerDown`. No product code was involved. **140 suites / 1946 tests, zero `act` warnings.**
 - **Step 1's `defaultProps` prediction was right, and scanning jest output would have missed it:** the suites mock `console.error`, so the warnings were swallowed and the output looked clean. A probe with a recording spy showed React 18.3 warns for both `TooltipPop` and `Image`; both moved to default parameters (`Image` now forwards `decoding`/`loading` explicitly). ~~`ImageSwatch` keeps its `defaultProps` — it is an orphan nothing renders, so it cannot warn; deletion is §9.9-H1's job.~~ **CLOSED 2026-09-17.** §9.9-H1 deleted `src/core/components/ImageSwatch.js`, so that third `defaultProps` site was resolved by deletion rather than conversion; the sentence as it stood on 2026-08-20 is struck through. One test asserted `TooltipPop.defaultProps.delay`, i.e. the mechanism rather than the behaviour, and was rewritten against what Semantic actually receives.
-- **Step 2 done:** `src/main.jsx` mounts via `createRoot`, so the demo renders with automatic batching rather than 17-compat mode.
+- **Step 2 done:** `src/demo/main.jsx` mounts via `createRoot`, so the demo renders with automatic batching rather than 17-compat mode.
 - **Step 6, the batching pass, found no regression.** The unit suite now runs under `createRoot` (batching in effect) and is green. In the browser, on the demo: the form flow — date picker overlay, validation clearing, both submit branches, `addData` committing a row while the draft clears, `removeData` taking the right row — all behave as they did on 17; and the cascading Select, the most batching-sensitive path in the library because its reset calls `onChange` from inside an effect, correctly reset Product from `Alpha` to `Delta` when Category changed, with the dependent table following. No console errors. `flushSync` was not needed anywhere.
 - **Step 7:** the risky interactive views (Dropdown, Popup, rc-picker, Tabs, Table sorting/pagination/inline edit) were exercised on 18 through the §5 checklist. The two console warnings the demo does emit are React Router v6 future-flag notices — demo-only, unrelated to React 18.
 - **Step 8:** README, `docs.md` and the changelog carry the `16.14 || 17 || 18` matrix.
@@ -1158,11 +1158,33 @@ The form stack splits into a React-free core and React bindings:
 
 #### H3 — Isolate the demo
 
-Move `src/index.js`, `src/main.jsx`, `src/App.jsx` → `src/demo/`; update the `webpack.demo.config.mjs` entry. Result: `src/` top level reads `core/ | demo/ | library/ | style/` and the library/demo boundary becomes self-documenting.
+~~Move `src/index.js`, `src/main.jsx`, `src/App.jsx` → `src/demo/`; update the `webpack.demo.config.mjs` entry.~~ ✅ **DONE 2026-09-23.** Three `git mv`s plus eight relative-import fixes inside the moved files and one webpack `entry` line. `src/` top level now reads `core/ | demo/ | library/ | style/` — plus `toolchain/` (the §9.6-E0 guard) and `__mocks__/` (jest infrastructure), neither of which existed when this item was written. Every pointer to the old paths in `CLAUDE.md` and in this document was repointed in the same change: a historical note citing a path that no longer resolves is not a record, it is a dead link.
 
 #### H4 — Re-home the engine (must precede Phase 6)
 
-`core/pages/main/` + `core/ui-render/` → **`core/engine/`** (Render, transforms, rules, mapper, Data, dataKindPush + engine-local components). Move `static/images` out of core. Land as **pure `git mv` commits** — no logic edits — so review is trivial and history follows renames; imports are relative, so an IDE move/codemod fixes paths mechanically. Doing this *before* §9.3 gives the decomposition a sane address space (`engine/lifecycle.js`, `engine/dataMapping.js`, …) instead of scattering new files under `pages/main/`.
+~~`core/pages/main/` + `core/ui-render/` → **`core/engine/`**~~ ✅ **DONE 2026-09-23.** 72 files, recorded
+by git as 72 renames so history follows. `core/` now reads `common | components | contexts | engine |
+modules | providers | services | utils`; `pages/` is gone entirely, because `main` was its only child.
+
+**`static/images` was not moved out of core — it was DELETED.** The item assumed it needed a new home.
+Measurement says otherwise: `src/core/pages/main/static/images/ui-architecture.png` was **byte-identical**
+(same sha256) to `public/static/images/ui-architecture.png`, nothing imported it, no webpack config copied
+it, and both of the references that name it — `demo/examples/button-download_meta.js` and
+`demo/markdowns/docs.md` — resolve to the URL the demo serves from `public/`. A dead duplicate, not a
+misplaced asset.
+
+**Imports were rewritten by RESOLUTION, not by text substitution**, and that mattered: the two trees sat at
+different depths (`pages/main` one level deeper than `ui-render`), so a blanket find-and-replace would have
+produced silently wrong `../` counts in one of them. Each specifier was resolved to an absolute target in
+the pre-move tree, mapped, and re-expressed relative to the new location — 221 specifiers across 69 files.
+It also caught, for free, ten per-file coverage thresholds in `jest.config.js`, which are `./`-relative
+paths that an import-targeted rewrite would have missed.
+
+**Six other places held hardcoded paths into the moved trees** and had to be repointed by hand: four in
+`scripts/generate-view-reference.js`, one in `wrapper-prop-curation.js`, and four comment cross-references
+in tests. Both doc generators then needed regenerating — they had been reporting the old paths correctly.
+This is the same extension/path-keyed-gate hazard the §9.6-E2 pilot recorded, now at seven occurrences in
+this ticket.
 
 #### H5 — Enforce layer direction
 
@@ -1240,7 +1262,7 @@ src/
 |---|---|---|---|
 | **0** | ✅ **Done.** Reproducibility/API/security baseline: CI from a **clean checkout**, `rules.js` flow tests, example smoke harness, Babel targets env-split + demo consolidation (0.5), public-types fix + consumer type matrix (0.6), `prepack` + pack budgets + tarball smoke (0.7), tracked-examples fix (0.8), zero-warning lint gate + audit baselines + 14-package devDep sweep (0.9) | ~1.5–2 weeks | CI green from a clean checkout |
 | **1** | ✅ **DONE (2026-08-20).** ~~React 17: dev bump, peer widen (react + moment `^2.29.4`), QA; checkpoint release~~ — the bump and the widening landed (`peerDependencies`: react/react-dom `^16.14.0 || ^17.0.0 || ^18.0.0`, moment `^2.29.4`), and 17 has its own full-suite CI leg (`react-17` / `jest.react17.config.js`). The **checkpoint release** was cancelled by the §10 decision gate of 2026-08-18 — 17 folds into the React 18 release — so nothing publishes at the end of this phase. §5 records "Phase 1 is closed". | 1–2 days | QA checklist clean |
-| **2** | ✅ **DONE except the release (re-checked 2026-09-17).** ~~React 18: `createRoot` (demo), RTL 12→16, `defaultProps` fixes, batching regression pass, peer widen, docs; checkpoint release~~ — `createRoot` at `src/main.jsx:12`, `@testing-library/react` `^16.3.2` (+ `@testing-library/dom` `^10.4.1`), peers widened to include `^18.0.0`, no `flushSync` needed; §6 records "steps 1-8 done except the release". The manual publish + Pages deploy still ahead is the release itself, which stays deferred. | 1–2 weeks | CI green on 18, zero act-warnings |
+| **2** | ✅ **DONE except the release (re-checked 2026-09-17).** ~~React 18: `createRoot` (demo), RTL 12→16, `defaultProps` fixes, batching regression pass, peer widen, docs; checkpoint release~~ — `createRoot` at `src/demo/main.jsx:12`, `@testing-library/react` `^16.3.2` (+ `@testing-library/dom` `^10.4.1`), peers widened to include `^18.0.0`, no `flushSync` needed; §6 records "steps 1-8 done except the release". The manual publish + Pages deploy still ahead is the release itself, which stays deferred. | 1–2 weeks | CI green on 18, zero act-warnings |
 | **3** | ✅ **DONE (re-verified 2026-09-17).** ~~Contract tests on all examples; JSON Schema + dev validation; error boundaries; React 16/17 CI smoke~~ — contract suites over all 38 examples (`examples.dom-contract.test.js`, `examples.behavior-contract.test.js`, `examples.meta-contract.test.js`), `meta.schema.json` at the repo root with dev validation at `src/core/ui-render/validateMeta.js`, the error boundary at `src/core/ui-render/Render.js:92` (`componentDidCatch`, with `Render.error-reporting.test.js` and `UIRender.error-hook.test.js`), and CI jobs `react-16-floor` / `react-17` running the whole suite. Appendix C's Phase 3 bullets are all ✅/☑. | 1–2 weeks | Contract suite in CI |
 | **4** | Hooks migration of leaf components; automatic JSX runtime; ~~SUIR passthrough-prop audit + lint guard (F1 step 0)~~ **shipped** (`docs/SUPPORTED-PROPS.md` + the `no-restricted-imports` guard); **housekeeping H1–H2 (dead code + docs truth)** | ongoing, per-component PRs | — |
 | **4-S** | **Structure (§9.9): demo isolation (H3); engine re-home `pages/main`+`ui-render` → `core/engine` (H4, pure `git mv` commits); layer-direction lint (H5)** | ~2–4 days, in a quiet window | **H4 before Phase 6** |

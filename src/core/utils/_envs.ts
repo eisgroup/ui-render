@@ -42,7 +42,7 @@ export interface ActiveEnv {
  * Environment Variables
  * @note: for Next.js, explicitly set variable on initialisation like so:
  *   import config from 'next/config'
- *   import { ENV } from './'
+ *   import { ENV } from './index'
  *
  *   Object.assign(ENV, config().publicRuntimeConfig)
  */

@@ -1,7 +1,7 @@
 import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { JsonView } from '../index'
+import { JsonView } from '..'
 
 describe('JsonView data-integrity contracts', () => {
     it('marks an ancestor cycle without treating repeated sibling references as circular', () => {

@@ -1,7 +1,7 @@
 import React from 'react'
-import UIRender from '../core/pages/main/rules'
+import UIRender from '../core/engine/rules'
 import { AppProvider, ConfigOverride } from '../core/providers'
-import { reportMetaProblems } from '../core/ui-render/validateMeta'
+import { reportMetaProblems } from '../core/engine/validateMeta'
 import AppWrapper from './AppWrapper'
 
 /**

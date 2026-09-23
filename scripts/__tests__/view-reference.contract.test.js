@@ -37,7 +37,7 @@ const {
 // Importing the engine runs all three modules that assign to FIELD (variables/fields.js,
 // form/constants.js, pages/main/rules.js), so `FIELD` below is the vocabulary the renderer
 // really dispatches on — not a subset that happens to be loaded.
-require('../../src/core/pages/main/rules')
+require('../../src/core/engine/rules')
 const { FIELD } = require('../../src/core/modules/variables')
 
 const ROOT = path.resolve(__dirname, '..', '..')

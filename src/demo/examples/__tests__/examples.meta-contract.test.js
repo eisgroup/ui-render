@@ -38,14 +38,14 @@ import path from 'path'
 import { FIELD } from '../../../core/modules/variables/fields'
 // Side-effect import: registers the Input/Select/Data/Popup/... half of FIELD.TYPE
 // and every FIELD.ACTION. Without it the vocabulary assertions below are partial.
-import '../../../core/pages/main/rules'
+import '../../../core/engine/rules'
 import {
     CURRENT_META_VERSION,
     META_SEVERITY,
     META_PROBLEM,
     META_VERSION_PATTERN,
     validateMeta,
-} from '../../../core/ui-render/validateMeta'
+} from '../../../core/engine/validateMeta'
 import { assertSupported, validateAgainstSchema } from '../../testing/jsonSchema'
 import { readVocabularyUnions } from '../../testing/contractTypes'
 import { EXAMPLES } from '../manifest'

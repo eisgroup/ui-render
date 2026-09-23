@@ -9,8 +9,8 @@ import View from '../../components/View'
 import { Active, debounce, isEqualJSON, toJSON } from '../../utils'
 import { hasObjectValue, objChanges, set } from '../../utils/object'
 import { _ } from '../../utils/translations'
-import { errorsProcessing } from '../../pages/main/utils'
-import { clearErrorsMap, formsStorage } from '../../pages/main/rules'
+import { errorsProcessing } from '../../engine/utils'
+import { clearErrorsMap, formsStorage } from '../../engine/rules'
 import arrayMutators from 'final-form-arrays'
 
 /**
