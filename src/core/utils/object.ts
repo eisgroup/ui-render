@@ -9,6 +9,7 @@ import {
 	merge as _merge,
 	mergeWith as _mergeWith,
 	property,
+	setIn as _setIn,
 	setWith,
 	unset,
 } from './lodash-lite'
@@ -162,6 +163,29 @@ export function objChanges (original?: Dict | null, changed?: Dict | null): Dict
  */
 export function set<T>(object: T, path: unknown, value: unknown, customizer?: SetWithCustomizer): T {
 	return setWith(object, path, value, customizer)
+}
+
+/**
+ * Returns a COPY of the given object with the provided value at the given path, leaving the
+ * original untouched — the immutable counterpart of {@link set}.
+ *
+ * Only the containers along the path are copied, so every branch the write did not reach keeps its
+ * identity and a reference comparison on it still reports "unchanged".
+ *
+ * Use this wherever the object may already have been handed to someone else — React state above
+ * all, where mutating in place rewrites the `prevState` that lifecycle hooks and
+ * `shouldComponentUpdate` were given.
+ *
+ * An empty or absent path returns the SAME object, as {@link set} does; unlike {@link set} it
+ * takes no customizer.
+ *
+ * @param {Object} object - The object to copy
+ * @param {String|String[]|Number|Number[]} path - The path to set the provided value at
+ * @param {*} value - The value to set
+ * @returns {Object} a new object, or the original when the path is empty
+ */
+export function setIn<T>(object: T, path: unknown, value: unknown): T {
+	return _setIn(object, path, value)
 }
 
 /**

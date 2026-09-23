@@ -6,9 +6,16 @@ import { cn, type } from '../components'
 import Json from '../components/JsonView'
 import ScrollView from '../components/ScrollView'
 import { Active, get, interpolateString, isEmpty, isList, isString, round, sanitizeResponse } from '../utils'
-import { cloneDeep, hasObjectValue, isObject, set } from '../utils/object'
+// `set` mutates and `setIn` copies: `set` is for objects this file has just built (the local
+// `update` below), `setIn` for anything React has already been handed, i.e. `this.state`.
+// Every `setIn` on state goes through the UPDATER form: an immutable copy built from `this.state`
+// would be built from the state as it was before any other update in the same batch, so two
+// writes into one container would undo each other. The mutating version had no such problem,
+// which is why this is not a detail of the rewrite but the point of it.
+import { cloneDeep, hasObjectValue, isObject, set, setIn } from '../utils/object'
 import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
+import { cancelAutoSubmit } from './autoSubmit'
 import { _ } from './translations'
 import {
     replaceDeep,
@@ -1135,7 +1142,7 @@ function Decorator (Class) {
             return get(this.state, 'data.json')
         },
         set (value) {
-            return this.setState(set(this.state, 'data.json', value))
+            return this.setState(state => setIn(state, 'data.json', value))
         }
     })
 
@@ -1210,7 +1217,7 @@ function Decorator (Class) {
         // Clear cached meta so {state.xxx} templates re-resolve on next render
         // (showIf, container names, option paths all depend on current state)
         this._meta = null
-        return this.setState(set(this.state, keyPath, value))
+        return this.setState(state => setIn(state, keyPath, value))
     }
 
     // Define instance method
@@ -1239,6 +1246,8 @@ function Decorator (Class) {
     Class.prototype.componentWillUnmount = function (nextProps, nextState) {
         const { parent, form, index } = this.props
         if (parent && index != null) parent.unregisterDataKind(this, form.kind, index)
+        // A change typed just before unmount must not submit a form the user has left.
+        cancelAutoSubmit(this)
         if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
     }
 
@@ -1271,11 +1280,11 @@ function Decorator (Class) {
         const { data, meta } = this.props
         // external API changes
         if (next.data != null && next.data !== data) {
-            this.setState(set(this.state, 'data.json', normalizeIncomingData(next.data)))
+            this.setState(state => setIn(state, 'data.json', normalizeIncomingData(next.data)))
         }
         // external API changes
         if (next.meta != null && next.meta !== meta) {
-            this.setState(set(this.state, 'meta.json', next.meta))
+            this.setState(state => setIn(state, 'meta.json', next.meta))
         }
         if (UNSAFE_componentWillReceiveProps) {
             UNSAFE_componentWillReceiveProps.apply(this, arguments)

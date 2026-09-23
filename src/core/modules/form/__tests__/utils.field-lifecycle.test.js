@@ -171,14 +171,43 @@ describe('asField lifecycle contracts', () => {
         expect(onChange).not.toHaveBeenCalled()
     })
 
+    it('renders a Dropdown field without scheduling an update from inside render', () => {
+        // The previous-value bookkeeping below is write-only — nothing renders from it — so holding
+        // it in React state bought nothing and cost a second render pass plus React's
+        // "Cannot update during an existing state transition" warning on every Dropdown field.
+        const messages = []
+        const consoleError = jest.spyOn(console, 'error').mockImplementation((...args) => {
+            messages.push(String(args[0]))
+        })
+
+        let renders = 0
+        const Dropdown = ({ value }) => {
+            renders += 1
+            return <input data-testid="dd" value={value || ''} readOnly/>
+        }
+        Dropdown.displayName = 'Dropdown'
+        const DropdownField = asField(Dropdown)
+
+        render(
+            <Form
+                onSubmit={() => {}}
+                initialValues={{ selection: 'stable' }}
+                render={() => <DropdownField name="selection"/>}
+            />
+        )
+
+        consoleError.mockRestore()
+
+        expect(messages.filter(m => m.includes('Cannot update during an existing state transition')))
+            .toEqual([])
+        expect(renders).toBe(1)
+    })
+
     it('resets Dropdown previous-value state when an empty value normalizes to undefined', () => {
         const Dropdown = () => null
         Dropdown.displayName = 'Dropdown'
         const DropdownField = asField(Dropdown)
         const field = new DropdownField({ name: 'selection' })
-        field.setState = update => {
-            field.state = { ...field.state, ...update }
-        }
         const input = {
             name: 'selection',
             onBlur: jest.fn(),
@@ -187,7 +216,7 @@ describe('asField lifecycle contracts', () => {
         }
 
         field.Input({ input: { ...input, value: 'stable' }, meta: { pristine: true } })
-        expect(field.state.selectPreviousValue).toBe('stable')
+        expect(field.selectPreviousValue).toBe('stable')
 
         const normalized = field.Input({
             input: { ...input, value: '' },
@@ -195,7 +224,7 @@ describe('asField lifecycle contracts', () => {
         })
 
         expect(normalized.props.value).toBeUndefined()
-        expect(field.state.selectPreviousValue).toBeNull()
+        expect(field.selectPreviousValue).toBeNull()
     })
 })
 

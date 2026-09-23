@@ -122,9 +122,11 @@ export function asField (InputComponent, {sanitize} = {}) {
       translate: PropTypes.func,
     }
 
-    state = {
-      selectPreviousValue: null
-    }
+    // The last value seen before an empty one normalized to `undefined`, kept only to make that
+    // transition a one-shot. NOT React state: nothing renders from it, so holding it in state only
+    // scheduled an update from inside `Input` — a second render pass per Dropdown field and React's
+    // "Cannot update during an existing state transition" warning.
+    selectPreviousValue = null
 
     get value () {
       if (this._value !== void 0) {
@@ -206,14 +208,10 @@ export function asField (InputComponent, {sanitize} = {}) {
 
       if ((InputComponent.displayName) === 'Dropdown') {
         if (nextValue === value) {
-          this.setState({
-            selectPreviousValue: nextValue
-          })
-        } else if (nextValue !== value && this.state.selectPreviousValue !== null) {
+          this.selectPreviousValue = nextValue
+        } else if (nextValue !== value && this.selectPreviousValue !== null) {
           props.value = nextValue
-          this.setState({
-            selectPreviousValue: null
-          })
+          this.selectPreviousValue = null
         }
 
       }
@@ -585,14 +583,39 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
     }
   })
 
-  // Define instance method
-  Class.prototype.handleChangeInput = debounce(function () {
-    // To handle use case when all fields in a group are removed, and no registered values are sent to backend,
-    // use placeholder parent field that reserves as registered null value field for the entire group.
-    // See <Fields> component for example.
-    this.syncInputChanges()
-    if (handleChangeInput) handleChangeInput.apply(this, arguments)
-  }, UI.TYPING_DELAY)
+  /**
+   * PER INSTANCE, and the comment that used to sit here ("Define instance method") described the
+   * intent rather than the code (§9.3 step 4).
+   *
+   * `Class.prototype.handleChangeInput = debounce(…)` called `debounce` ONCE, so every instance of
+   * the decorated class shared a single timer. Two forms typing in the same tick meant the first
+   * one's `syncInputChanges` was cancelled by the second and never ran — and the survivor executed
+   * against the LAST instance's `this`. Silent, and invisible with one form on the page, which is
+   * why it survived: the demo never renders two.
+   *
+   * The getter builds the debounced function on FIRST ACCESS and caches it as an own property, so
+   * the prototype stays the single definition while each instance gets its own timer. It also
+   * registers the instance for teardown — `componentWillUnmount` below cancels it, which is what
+   * stops a scheduled sync firing into an unmounted component.
+   */
+  Object.defineProperty(Class.prototype, 'handleChangeInput', {
+    configurable: true,
+    get () {
+      const own = debounce(function () {
+        // To handle use case when all fields in a group are removed, and no registered values are sent to backend,
+        // use placeholder parent field that reserves as registered null value field for the entire group.
+        // See <Fields> component for example.
+        this.syncInputChanges()
+        if (handleChangeInput) handleChangeInput.apply(this, arguments)
+      }, UI.TYPING_DELAY)
+      Object.defineProperty(this, 'handleChangeInput', {value: own, configurable: true, writable: true})
+      return own
+    },
+    set (value) {
+      // Someone assigning over it (a test double, a subclass) must still win.
+      Object.defineProperty(this, 'handleChangeInput', {value, configurable: true, writable: true})
+    },
+  })
 
   // Define instance method
   Class.prototype.syncInputChanges = function () {
@@ -635,6 +658,10 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   Class.prototype.componentWillUnmount = function () {
     this.isUnmounting = true
+    // Drop a scheduled input sync rather than letting it fire into an unmounted component
+    // (§9.3 step 4). Read through `hasOwnProperty` on purpose: touching the accessor would CREATE
+    // the debounced function for an instance that never used it, just to cancel nothing.
+    if (Object.prototype.hasOwnProperty.call(this, 'handleChangeInput')) this.handleChangeInput.cancel()
     if (this.props.onChangeState) this.props.onChangeState({})
     if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
   }

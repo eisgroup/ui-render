@@ -1,6 +1,7 @@
 import {
     get,
     setWith,
+    setIn,
     unset,
     cloneDeep,
     isEqual,
@@ -254,6 +255,71 @@ describe('capitalize', () => {
     it('returns empty for null/undefined', () => {
         expect(capitalize(null)).toBe('')
         expect(capitalize(undefined)).toBe('')
+    })
+})
+
+describe('setIn', () => {
+    it('returns a copy and leaves the original alone', () => {
+        const original = { a: { b: 1 }, untouched: { kept: true } }
+
+        const next = setIn(original, 'a.b', 2)
+
+        expect(original).toEqual({ a: { b: 1 }, untouched: { kept: true } })
+        expect(next).toEqual({ a: { b: 2 }, untouched: { kept: true } })
+        expect(next).not.toBe(original)
+    })
+    it('copies only the containers along the path', () => {
+        const original = { a: { b: 1 }, untouched: { kept: true } }
+
+        const next = setIn(original, 'a.b', 2)
+
+        // The branch the write never reached keeps its identity, so a reference comparison on it
+        // still reports "unchanged".
+        expect(next.untouched).toBe(original.untouched)
+        expect(next.a).not.toBe(original.a)
+    })
+    it('creates the containers a missing path needs, arrays for numeric segments', () => {
+        const next = setIn({}, 'a[0].b', 'x')
+
+        expect(Array.isArray(next.a)).toBe(true)
+        expect(next.a[0]).toEqual({ b: 'x' })
+    })
+    it('copies an array level instead of turning it into an object', () => {
+        const original = { rows: [{ id: 1 }, { id: 2 }] }
+
+        const next = setIn(original, 'rows[1].id', 3)
+
+        expect(Array.isArray(next.rows)).toBe(true)
+        expect(next.rows.map(r => r.id)).toEqual([1, 3])
+        expect(original.rows[1].id).toBe(2)
+        expect(next.rows[0]).toBe(original.rows[0])
+    })
+    it('returns the same object for an absent or empty path, as setWith does', () => {
+        const original = { a: 1 }
+
+        expect(setIn(original, undefined, 'x')).toBe(original)
+        expect(setIn(original, '', 'x')).toBe(original)
+        expect(original).toEqual({ a: 1 })
+    })
+    it('refuses the keys that would reach a prototype', () => {
+        const original = { a: 1 }
+
+        expect(setIn(original, '__proto__.polluted', true)).toBe(original)
+        expect(setIn(original, 'a.constructor', true)).toBe(original)
+        expect(setIn(original, 'a.prototype.x', true)).toBe(original)
+        expect({}.polluted).toBeUndefined()
+    })
+    it('passes a null or undefined object straight back', () => {
+        expect(setIn(null, 'a', 1)).toBeNull()
+        expect(setIn(undefined, 'a', 1)).toBeUndefined()
+    })
+    it('replaces a primitive standing where a container is needed', () => {
+        const original = { a: 'scalar' }
+
+        const next = setIn(original, 'a.b', 1)
+
+        expect(next.a).toEqual({ b: 1 })
+        expect(original.a).toBe('scalar')
     })
 })
 

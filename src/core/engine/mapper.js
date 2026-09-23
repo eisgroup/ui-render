@@ -23,9 +23,10 @@ import Table from '../components/Table'
 import Text from '../components/Text'
 import TooltipPop from '../components/TooltipPop'
 import View from '../components/View'
-import { Active, debounce, interpolateString, isList, isNumeric, isString, isTruthy, toFlatList, toJSON } from '../utils'
+import { Active, interpolateString, isList, isNumeric, isString, isTruthy, toFlatList, toJSON } from '../utils'
 import { TIME_DURATION_INSTANT } from '../utils/constants'
 import { get, hasObjectValue, isEqual, isObject, mergeReplaceArrays } from '../utils/object'
+import { autoSubmitter } from './autoSubmit'
 import Render, { formatRenderError, mapProps } from './index'
 import { relativePathFrom } from './transforms'
 import { renderField } from './components/renders'
@@ -601,7 +602,7 @@ const RenderComponent = ({
             // Auto submit on changes
             if (autoSubmit) {
                 const { onChange } = input
-                const submit = debounce(instance.submit, autoSubmit.delay >= 0 ? autoSubmit.delay : TIME_DURATION_INSTANT)
+                const submit = autoSubmitter(instance, autoSubmit.delay >= 0 ? autoSubmit.delay : TIME_DURATION_INSTANT)
                 input.onChange = (value) => {
                     onChange && onChange(value)
                     submit()

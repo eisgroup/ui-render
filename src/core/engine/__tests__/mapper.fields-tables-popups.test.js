@@ -152,6 +152,38 @@ describe('mapper behavior contracts', () => {
         expect(instance.submit).toHaveBeenCalledTimes(2)
     })
 
+    it('debounces auto-submit across renders, not within a single render pass', () => {
+        // The mapper runs on every render, so building the debounced submit inline gave each pass
+        // its own timer: two changes with a render between them used to submit twice, which is the
+        // opposite of what a debounce is for.
+        jest.useFakeTimers()
+        const instance = baseInstance()
+        const element = label => withProviders(
+            <Render.Component
+                view={FIELD.TYPE.INPUT}
+                name="comment"
+                label={label}
+                autoSubmit={{ delay: 300 }}
+                items={[]}
+                data={{}}
+                instance={instance}
+                form={{ change: jest.fn() }}
+            />
+        )
+
+        const { rerender } = render(element('Comment'))
+        const mappedOnce = renderField.mock.calls.length
+        lastFieldProps().onChange('first')
+
+        // A different prop, so this is a real second mapping pass rather than a bail-out.
+        rerender(element('Comment (optional)'))
+        expect(renderField.mock.calls.length).toBeGreaterThan(mappedOnce)
+        lastFieldProps().onChange('second')
+
+        jest.runOnlyPendingTimers()
+        expect(instance.submit).toHaveBeenCalledTimes(1)
+    })
+
     it('adds number bounds without losing the existing validator or readonly state', () => {
         const validate = jest.fn(value => value === 5 ? 'Reserved value' : undefined)
         renderMapped({
