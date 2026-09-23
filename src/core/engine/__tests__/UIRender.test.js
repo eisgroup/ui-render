@@ -13,6 +13,7 @@ import UIRender from '../rules' // eslint-disable-line import/first
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext' // eslint-disable-line import/first
 import { AppContext } from '../../contexts' // eslint-disable-line import/first
 import { Active } from '../../utils' // eslint-disable-line import/first
+import { FIELD } from '../../modules/variables' // eslint-disable-line import/first
 
 const popup = { setPopupState: () => {}, popup: { setPopupState: () => {} } }
 const originalTranslate = Active.translate
@@ -32,6 +33,20 @@ describe('UIRender (smoke)', () => {
         const data = { foo: 'bar' }
         const { container } = render(wrap(<UIRender meta={meta} data={data} />))
         expect(container.textContent).toContain('Hello')
+    })
+
+    it('registers the documented action names on the shared FIELD.FUNC registry', () => {
+        // §9.3 step 1: `fetch` was the one documented action with no behavioural cover — it appeared
+        // in a tracked example, which the DOM snapshot renders without asserting anything about it.
+        // It is also the only action that is not a bound instance method, so it is the one a
+        // decomposition could drop without any `this` breaking to show for it.
+        render(wrap(<UIRender meta={{ view: 'Text', children: 'X' }} data={{}} />))
+
+        // eslint-disable-next-line no-undef
+        expect(FIELD.FUNC[FIELD.ACTION.FETCH]).toBe(global.fetch)
+        for (const action of [FIELD.ACTION.RESET, FIELD.ACTION.SET_STATE, FIELD.ACTION.SUBMIT, FIELD.ACTION.POPUP]) {
+            expect(typeof FIELD.FUNC[action]).toBe('function')
+        }
     })
 
     it('renders a Row with nested Text items', () => {
