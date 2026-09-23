@@ -197,7 +197,6 @@ FIELD.PARSER = {
 // per-instance, and that will be a change inside `formRegistry` rather than a search.
 export { formsStorage, errorsMap, clearErrorsMap }
 
-let errorHandlerFunction = undefined
 
 /**
  * UI Render Instance Component
@@ -237,8 +236,14 @@ export class UIRender extends Component {
 
     constructor (props) {
         super(props)
+        // The instance's OWN error callback. It used to be a module-level `let`, so the LAST instance
+        // constructed owned it for everybody: measured on two documents, the first one's validation
+        // error was delivered to the SECOND one's callback and the first one's callback was never
+        // called at all. Nothing else read that global, so it is gone rather than shadowed.
+        // An instance reports only if it was given a callback; it does not inherit its owner's,
+        // because the error map is still shared and the owner already reports those errors itself.
         if (typeof props.getValidationErrors === 'function') {
-            errorHandlerFunction = props.getValidationErrors
+            this.errorHandler = props.getValidationErrors
         }
         // The instance's OWN translator, built once so its identity is stable across renders.
         // `Active.translate` is still assigned because seven components read it as a prop default and
@@ -301,11 +306,11 @@ export class UIRender extends Component {
             errorsProcessing(this.form, this.props.meta)
         }
 
-        if (typeof errorHandlerFunction === 'function'
+        if (typeof this.errorHandler === 'function'
             && !isEqual(errorsMap, this.state.errors)
         ) {
             const errors = cloneDeep(errorsMap)
-            errorHandlerFunction(mapErrorObjectToUIFormat(errors))
+            this.errorHandler(mapErrorObjectToUIFormat(errors))
             this.setState({ errors })
         }
     }
