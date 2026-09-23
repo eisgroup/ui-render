@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { JsonView } from '../index'
+import { JsonView } from '..'
 
 describe('JsonView', () => {
     it('renders a json-tree wrapper for an empty object', () => {

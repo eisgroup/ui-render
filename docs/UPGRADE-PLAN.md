@@ -1162,7 +1162,29 @@ The form stack splits into a React-free core and React bindings:
 
 #### H4 — Re-home the engine (must precede Phase 6)
 
-`core/pages/main/` + `core/ui-render/` → **`core/engine/`** (Render, transforms, rules, mapper, Data, dataKindPush + engine-local components). Move `static/images` out of core. Land as **pure `git mv` commits** — no logic edits — so review is trivial and history follows renames; imports are relative, so an IDE move/codemod fixes paths mechanically. Doing this *before* §9.3 gives the decomposition a sane address space (`engine/lifecycle.js`, `engine/dataMapping.js`, …) instead of scattering new files under `pages/main/`.
+~~`core/pages/main/` + `core/ui-render/` → **`core/engine/`**~~ ✅ **DONE 2026-09-23.** 72 files, recorded
+by git as 72 renames so history follows. `core/` now reads `common | components | contexts | engine |
+modules | providers | services | utils`; `pages/` is gone entirely, because `main` was its only child.
+
+**`static/images` was not moved out of core — it was DELETED.** The item assumed it needed a new home.
+Measurement says otherwise: `src/core/pages/main/static/images/ui-architecture.png` was **byte-identical**
+(same sha256) to `public/static/images/ui-architecture.png`, nothing imported it, no webpack config copied
+it, and both of the references that name it — `demo/examples/button-download_meta.js` and
+`demo/markdowns/docs.md` — resolve to the URL the demo serves from `public/`. A dead duplicate, not a
+misplaced asset.
+
+**Imports were rewritten by RESOLUTION, not by text substitution**, and that mattered: the two trees sat at
+different depths (`pages/main` one level deeper than `ui-render`), so a blanket find-and-replace would have
+produced silently wrong `../` counts in one of them. Each specifier was resolved to an absolute target in
+the pre-move tree, mapped, and re-expressed relative to the new location — 221 specifiers across 69 files.
+It also caught, for free, ten per-file coverage thresholds in `jest.config.js`, which are `./`-relative
+paths that an import-targeted rewrite would have missed.
+
+**Six other places held hardcoded paths into the moved trees** and had to be repointed by hand: four in
+`scripts/generate-view-reference.js`, one in `wrapper-prop-curation.js`, and four comment cross-references
+in tests. Both doc generators then needed regenerating — they had been reporting the old paths correctly.
+This is the same extension/path-keyed-gate hazard the §9.6-E2 pilot recorded, now at seven occurrences in
+this ticket.
 
 #### H5 — Enforce layer direction
 

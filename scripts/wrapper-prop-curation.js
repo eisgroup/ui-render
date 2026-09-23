@@ -733,7 +733,7 @@ const STEP_OBLIGATIONS = [
                 + 'could fail if the tooltip broke (the other 5 asserted the props handed to a mock): '
                 + '`components/__tests__/TooltipPop.test.js` (rewritten against the REAL '
                 + '`semantic-ui-react`, no `jest.mock`), `components/__tests__/TooltipPop.behavior.test.js` '
-                + '(new — the interaction contract), `pages/main/__tests__/UIRender.overlay-behavior.test.js` '
+                + '(new — the interaction contract), `engine/__tests__/UIRender.overlay-behavior.test.js` '
                 + '(extended to all three meta entry points) and '
                 + '`style/__tests__/css.tooltip-contract.test.js` (new — joins the emitted class string to '
                 + 'the compiled CSS rules), plus the browser leg — 39 Playwright tests, of which 23 were '

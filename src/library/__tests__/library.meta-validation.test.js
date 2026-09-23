@@ -2,7 +2,7 @@
  * PUBLIC ENTRY WIRING FOR DEV-MODE META VALIDATION ============================
  *
  * UPGRADE-PLAN §9.4 item 2. The validator itself is covered by
- * src/core/ui-render/__tests__/validateMeta.contract.test.js; this suite covers
+ * src/core/engine/__tests__/validateMeta.contract.test.js; this suite covers
  * the only thing that turns it on — the `validateMeta` prop on the published
  * entry — and the three properties a host is entitled to rely on:
  *
@@ -23,7 +23,7 @@ import { render } from '@testing-library/react'
 
 const uiRenderCalls = []
 
-jest.mock('../../core/pages/main/rules', () => {
+jest.mock('../../core/engine/rules', () => {
     const ReactModule = require('react')
 
     return function MockUIRender (props) {

@@ -33,12 +33,12 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 1. **Library** (`src/library/`) — Entry point `src/library/index.js`, built via `webpack.library.config.mjs` to `dist/`. Exports the `UIRender` component as UMD. `react`, `react-dom`, and `moment` are externalized (peer dependencies — the host app provides them). CSS is compiled from LESS and the real stylesheets, fonts and images ship **once** in the root `static/` folder — that is the payload hosts copy to their web root, because `FILE.PATH_IMAGES` resolves to `<homepage>/static/images/`. `dist/static/all.css` and `font.css` are one-line `@import` re-exports of it, so bundler imports of the dist path keep working; `semantic.css` is a 0-byte stub in both places. Packaging is gated by `npm run test:pack` (budgets + a packed-tarball server-render smoke) — never re-add an asset copy under `dist/static/`, the duplicate guard fails the build.
 2. **Demo app** (`src/demo/`) — Entry chain `src/demo/index.js` → `src/demo/main.jsx` (`createRoot`) → `src/demo/App.jsx`, built via `webpack.demo.config.mjs`. Used for development and GitHub Pages demo. The three entry files moved out of the `src/` root at §9.9-H3 so the top level reads `core/ | demo/ | library/ | style/` and the library/demo boundary is visible from the directory listing alone. Note it says `createRoot`, not `ReactDOM.render` — the demo mounts through the React 18 root API.
 
-### Core rendering engine (`src/core/ui-render/`)
+### Core rendering engine (`src/core/engine/`)
 
 - `Render.js` — The recursive renderer. Takes props from meta definitions and renders components via `Render.Component` (component resolver) and `Render.Method` (render function resolver). These are set up in `mapper.js`.
 - `transforms.js` — `metaToProps()` recursively converts meta.json declarations into React props. `mapProps()` maps data arrays using mapper definitions.
 
-### Component/method mapping (`src/core/pages/main/`)
+### Component/method mapping (`src/core/engine/`)
 
 - `mapper.js` — Configures `Render.Component` and `Render.Method`. Maps `view` strings (e.g., `"Row"`, `"Table"`, `"Dropdown"`) to actual React components, and `render*` strings to value formatting functions.
 - `rules.js` — The main UIRender component with form handling (react-final-form), data processing, validation, actions (submit, download, upload, addData, removeData), and lifecycle management.
@@ -54,7 +54,7 @@ All internal imports use **relative paths** — there are no `ui-*-pack` webpack
 | `ui-modules-pack` — form/upload/fields | `src/core/modules` |
 | `ui-utils-pack` — pure utils | `src/core/utils` |
 
-Dependency direction (keep it one-way): `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine (`pages/main` + `ui-render`) may import anything in core. `semantic-ui-react` is not a dependency at all: the §9.7-F1 exit completed at step 3 and step 3½
+Dependency direction (keep it one-way): `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine (`core/engine`, which was `pages/main` + `ui-render` until §9.9-H4 merged them) may import anything in core. `semantic-ui-react` is not a dependency at all: the §9.7-F1 exit completed at step 3 and step 3½
 removed the package, so **nothing in `src` may import it — including `src/core/components`**, which
 used to be the one place that could. The `no-restricted-imports` override in `package.json` lost its
 `excludedFiles` exemption in that commit, and `scripts/generate-wrapper-prop-reference.js`'s scan

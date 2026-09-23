@@ -8,7 +8,7 @@ import Text from '../../core/components/Text'
 import View from '../../core/components/View'
 import { GET, isEmpty, l, localiseTranslation, performStorage, SET } from '../../core/utils'
 import { _ } from '../../core/utils/translations'
-import UIRender from '../../core/pages/main/rules'
+import UIRender from '../../core/engine/rules'
 import { Button } from '../../core/components/Button'
 import { AppContext } from '../../core/contexts'
 

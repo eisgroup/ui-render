@@ -21,9 +21,9 @@ place the supported props are enumerated today.
 ## How a node is resolved
 
 A node's `view` is dispatched by `Render.Component` in
-`src/core/pages/main/mapper.js`: a `switch` handles the layout and display
+`src/core/engine/mapper.js`: a `switch` handles the layout and display
 views directly, and its `default` branch hands form fields to `renderField` in
-`src/core/pages/main/components/renders.js`.
+`src/core/engine/components/renders.js`.
 
 Two consequences worth knowing before authoring meta:
 
@@ -112,18 +112,18 @@ A name that is not below stays an unresolved string rather than raising.
 
 | Action | Constant | Registered in | Description |
 | --- | --- | --- | --- |
-| `addData` | `FIELD.ACTION.ADD_DATA` | `main/rules.js` | Validates the nested form and appends its values as a new row of the parent instance `dataKind` array. Warns and does nothing when the node has no parent instance and form. |
-| `download` | `FIELD.ACTION.DOWNLOAD` | `main/rules.js` | Calls the host `downloadFile` API call with the file name and saves the response as a file. Does nothing when the host supplies no `downloadFile`; failures open an error popup. |
-| `fetch` | `FIELD.ACTION.FETCH` | `main/rules.js` | The global `fetch`. |
-| `onApplyPeriods` | `FIELD.ACTION.ON_APPLY_PERIODS` | `main/rules.js` | Sends all form data to the host `updateExperienceData` API call and restarts the form with the normalized response. Does nothing when the host supplies no `updateExperienceData`; failures open an error popup. |
-| `popup` | `FIELD.ACTION.POPUP` | `main/rules.js` | Opens an alert popup with the given title and content. |
-| `popupOpen` | `FIELD.ACTION.POPUP_OPEN` | `main/rules.js` | Opens the content registered by a `Popup` node with the given `id`. Event arguments are filtered out, and the row index is forwarded so fields inside the popup address the row that opened it. |
-| `removeData` | `FIELD.ACTION.REMOVE_DATA` | `main/rules.js` | Removes the current row from the parent instance `dataKind` array through the parent form array mutator. Warns and does nothing when the node has no parent instance and form. |
-| `reset` | `FIELD.ACTION.RESET` | `main/rules.js` | Resets the form to its initial values. |
-| `setState` | `FIELD.ACTION.SET_STATE` | `main/rules.js` | Writes the incoming value into the render instance state at the path given as the argument, for example `setState,active.tab`. This is the channel `{state.…}` templates and `showIf` read; a `Dropdown` or `Select` with a `name` and no `onChange` gets `setState,<name>` installed automatically. |
-| `submit` | `FIELD.ACTION.SUBMIT` | `main/rules.js` | Submits the form, first merging the values of every nested `dataKind` instance into the payload. |
-| `updateDataOnChange` | `FIELD.ACTION.UPDATE_DATA_ON_CHANGE` | `main/rules.js` | Writes a changed primitive value back into the instance data at the field `name`. Marked in the source as a temporary solution; it ignores object values. |
-| `upload` | `FIELD.ACTION.UPLOAD` | `main/rules.js` | Sends the picked file together with the current form data to the host `uploadFile` API call and restarts the form with the normalized response. Does nothing when the host supplies no `uploadFile`. |
+| `addData` | `FIELD.ACTION.ADD_DATA` | `engine/rules.js` | Validates the nested form and appends its values as a new row of the parent instance `dataKind` array. Warns and does nothing when the node has no parent instance and form. |
+| `download` | `FIELD.ACTION.DOWNLOAD` | `engine/rules.js` | Calls the host `downloadFile` API call with the file name and saves the response as a file. Does nothing when the host supplies no `downloadFile`; failures open an error popup. |
+| `fetch` | `FIELD.ACTION.FETCH` | `engine/rules.js` | The global `fetch`. |
+| `onApplyPeriods` | `FIELD.ACTION.ON_APPLY_PERIODS` | `engine/rules.js` | Sends all form data to the host `updateExperienceData` API call and restarts the form with the normalized response. Does nothing when the host supplies no `updateExperienceData`; failures open an error popup. |
+| `popup` | `FIELD.ACTION.POPUP` | `engine/rules.js` | Opens an alert popup with the given title and content. |
+| `popupOpen` | `FIELD.ACTION.POPUP_OPEN` | `engine/rules.js` | Opens the content registered by a `Popup` node with the given `id`. Event arguments are filtered out, and the row index is forwarded so fields inside the popup address the row that opened it. |
+| `removeData` | `FIELD.ACTION.REMOVE_DATA` | `engine/rules.js` | Removes the current row from the parent instance `dataKind` array through the parent form array mutator. Warns and does nothing when the node has no parent instance and form. |
+| `reset` | `FIELD.ACTION.RESET` | `engine/rules.js` | Resets the form to its initial values. |
+| `setState` | `FIELD.ACTION.SET_STATE` | `engine/rules.js` | Writes the incoming value into the render instance state at the path given as the argument, for example `setState,active.tab`. This is the channel `{state.…}` templates and `showIf` read; a `Dropdown` or `Select` with a `name` and no `onChange` gets `setState,<name>` installed automatically. |
+| `submit` | `FIELD.ACTION.SUBMIT` | `engine/rules.js` | Submits the form, first merging the values of every nested `dataKind` instance into the payload. |
+| `updateDataOnChange` | `FIELD.ACTION.UPDATE_DATA_ON_CHANGE` | `engine/rules.js` | Writes a changed primitive value back into the instance data at the field `name`. Marked in the source as a temporary solution; it ignores object values. |
+| `upload` | `FIELD.ACTION.UPLOAD` | `engine/rules.js` | Sends the picked file together with the current form data to the host `uploadFile` API call and restarts the form with the normalized response. Does nothing when the host supplies no `uploadFile`. |
 | `warn` | `FIELD.ACTION.WARN` | `variables/fields.js` | Logs the arguments with `console.warn`. |
 
 ## What this page does and does not guarantee

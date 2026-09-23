@@ -10,7 +10,7 @@ import View from '../../core/components/View'
 import { toJSON } from '../../core/utils'
 import { goTo } from '../../core/common/variables'
 import { EXAMPLES, hasFlag } from '../examples/manifest'
-import UIRender from '../../core/pages/main/rules'
+import UIRender from '../../core/engine/rules'
 
 import {
   updatePerformanceData,

@@ -20,7 +20,7 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../core/contexts'
 import { storedTouched } from '../../core/modules/form/utils'
-import UIRender, { clearErrorsMap, formsStorage } from '../../core/pages/main/rules'
+import UIRender, { clearErrorsMap, formsStorage } from '../../core/engine/rules'
 import { AppProvider } from '../../core/providers/AppProvider'
 
 /**

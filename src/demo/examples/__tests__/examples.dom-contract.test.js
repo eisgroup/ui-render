@@ -70,7 +70,7 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import { ConfigContext, initialConfigState, AppContext, initialAppState } from '../../../core/contexts'
 import { storedTouched } from '../../../core/modules/form/utils'
-import UIRender, { clearErrorsMap, formsStorage } from '../../../core/pages/main/rules'
+import UIRender, { clearErrorsMap, formsStorage } from '../../../core/engine/rules'
 import { serializeDom } from '../../testing/serializeDom'
 import { snapshotExamples } from '../manifest'
 

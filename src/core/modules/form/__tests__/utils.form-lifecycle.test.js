@@ -1,8 +1,8 @@
 import { Component } from 'react'
 import { Form } from 'react-final-form'
 import { Active } from '../../../utils'
-import { errorsProcessing } from '../../../pages/main/utils'
-import { clearErrorsMap, formsStorage } from '../../../pages/main/rules'
+import { errorsProcessing } from '../../../engine/utils'
+import { clearErrorsMap, formsStorage } from '../../../engine/rules'
 import {
     asField,
     fieldValues,
@@ -13,12 +13,12 @@ import {
     withFormSetup,
 } from '../utils'
 
-jest.mock('../../../pages/main/rules', () => ({
+jest.mock('../../../engine/rules', () => ({
     clearErrorsMap: jest.fn(),
     formsStorage: new Map(),
 }))
 
-jest.mock('../../../pages/main/utils', () => ({
+jest.mock('../../../engine/utils', () => ({
     errorsProcessing: jest.fn(),
 }))
 

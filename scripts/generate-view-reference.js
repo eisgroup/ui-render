@@ -55,18 +55,18 @@ const WRITE_COMMAND = 'npm run docs:views'
 const DECLARATION_SITES = [
     { file: 'src/core/modules/variables/fields.js', props: ['TYPE', 'RENDER', 'ACTION'] },
     { file: 'src/core/modules/form/constants.js', props: ['TYPE'] },
-    { file: 'src/core/pages/main/rules.js', props: ['TYPE', 'ACTION'] },
+    { file: 'src/core/engine/rules.js', props: ['TYPE', 'ACTION'] },
 ]
 
 /** Files whose references to the constants decide whether a name is live. */
 const RESOLVER_FILES = {
     // Render.Component — the `view` switch, plus the `default` branch that handles
     // Dropdown inline and re-dispatches Input by `type`. Also Render.Method's `render*` switch.
-    mapper: 'src/core/pages/main/mapper.js',
+    mapper: 'src/core/engine/mapper.js',
     // renderField — the form-field leg of the `default` branch.
-    renderField: 'src/core/pages/main/components/renders.js',
+    renderField: 'src/core/engine/components/renders.js',
     // FIELD.FUNC registrations for the action names.
-    rules: 'src/core/pages/main/rules.js',
+    rules: 'src/core/engine/rules.js',
     fields: 'src/core/modules/variables/fields.js',
 }
 
