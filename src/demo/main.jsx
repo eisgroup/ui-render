@@ -2,7 +2,7 @@ import App from './App'
 import {BrowserRouter} from 'react-router-dom'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { AppProvider } from './core/providers'
+import { AppProvider } from '../core/providers'
 
 const baseName = process.env.REACT_APP_BASE_NAME || '/'
 

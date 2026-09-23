@@ -1,8 +1,8 @@
 import React from 'react'
-import Row from './core/components/Row'
-import View from './core/components/View'
-import Routes from './demo/routes'
-import { ConfigContext } from './core/contexts'
+import Row from '../core/components/Row'
+import View from '../core/components/View'
+import Routes from './routes'
+import { ConfigContext } from '../core/contexts'
 
 const App = () => {
     const { currency, language } = React.useContext(ConfigContext)
