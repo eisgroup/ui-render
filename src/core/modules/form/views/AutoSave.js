@@ -43,7 +43,20 @@ export default class AutoSave extends PureComponent {
   }
 
   UNSAFE_componentWillReceiveProps (next, _) {
-    if (next.delay !== this.props.delay) this.handleChange = debounce(this.onChange, next.delay)
+    if (next.delay !== this.props.delay) {
+      // Cancel BEFORE replacing (§9.3 step 4). Reassigning alone left the previous debounce holding a
+      // live timer with nothing pointing at it, so a change scheduled under the old delay still fired
+      // — at the old delay, after the caller had asked for a new one.
+      this.handleChange.cancel()
+      this.handleChange = debounce(this.onChange, next.delay)
+    }
+  }
+
+  componentWillUnmount () {
+    // There was no unmount handler here at all (§9.3 step 4). A change typed just before this
+    // component went away still ran its `onChange` afterwards: a save the user had navigated away
+    // from, and a setState on an unmounted component behind it.
+    this.handleChange.cancel()
   }
 
   onChange = async ({values}) => {

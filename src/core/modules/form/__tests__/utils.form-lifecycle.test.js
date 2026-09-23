@@ -356,3 +356,89 @@ describe('form data synchronization contracts', () => {
         expect(instance._props).toBeNull()
     })
 })
+
+describe('handleChangeInput is per instance, not per class (§9.3 step 4)', () => {
+    let originalRenderField
+
+    beforeAll(() => {
+        originalRenderField = Active.renderField
+        Active.renderField = () => null
+    })
+    afterAll(() => { Active.renderField = originalRenderField })
+    beforeEach(() => jest.useFakeTimers())
+    afterEach(() => jest.useRealTimers())
+
+    /** Two instances of the SAME decorated class — which is the case the shared prototype broke. */
+    function twoInstancesOfOneClass () {
+        class SharedFormContent extends Component {}
+        withFormSetup(SharedFormContent, { fieldValues, registeredFieldValues, registeredFieldErrors })
+
+        const make = () => {
+            const { form } = createFormApi({})
+            const instance = new SharedFormContent({
+                initialValues: {},
+                formProps: { pristine: true },
+                instance: { form, handleSubmit: jest.fn() },
+            })
+            instance.synced = 0
+            // Own property shadows the prototype method, so each instance records only its own calls.
+            instance.syncInputChanges = function () { this.synced++ }
+            return instance
+        }
+        return [make(), make()]
+    }
+
+    it('does not let one instance cancel the other instance pending change', () => {
+        // THE BUG: `debounce()` was called once and assigned to the prototype, so every instance
+        // shared a single timer. Two forms typing in the same tick meant the first one's sync was
+        // cancelled by the second and never ran — and the survivor ran against the LAST `this`.
+        const [a, b] = twoInstancesOfOneClass()
+
+        a.handleChangeInput()
+        b.handleChangeInput()
+        jest.advanceTimersByTime(1000)
+
+        expect(a.synced).toBe(1)
+        expect(b.synced).toBe(1)
+    })
+
+    it('gives each instance its own debounced function', () => {
+        const [a, b] = twoInstancesOfOneClass()
+
+        expect(typeof a.handleChangeInput).toBe('function')
+        expect(a.handleChangeInput).not.toBe(b.handleChangeInput)
+    })
+
+    it('still lets an instance be assigned over — a test double or subclass must win', () => {
+        // The accessor has a setter for this reason: a getter alone would make assignment throw in
+        // strict mode, which is a confusing failure for anyone stubbing the method.
+        const [a] = twoInstancesOfOneClass()
+        const stub = () => {}
+
+        a.handleChangeInput = stub
+
+        expect(a.handleChangeInput).toBe(stub)
+    })
+
+    it('unmounting without ever typing does not create a debounce just to cancel it', () => {
+        const [a] = twoInstancesOfOneClass()
+        a.props = { ...a.props }
+
+        a.componentWillUnmount()
+
+        // The getter was never touched, so no own property exists — the unmount guard read through
+        // hasOwnProperty precisely to avoid instantiating one here.
+        expect(Object.prototype.hasOwnProperty.call(a, 'handleChangeInput')).toBe(false)
+    })
+
+    it('cancels a pending change when the component unmounts', () => {
+        const [a] = twoInstancesOfOneClass()
+        a.props = { ...a.props }
+
+        a.handleChangeInput()
+        a.componentWillUnmount()
+        jest.advanceTimersByTime(1000)
+
+        expect(a.synced).toBe(0)
+    })
+})

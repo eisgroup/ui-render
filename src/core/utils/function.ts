@@ -17,6 +17,10 @@ import { TIME_DURATION_INSTANT } from './constants'
  */
 type AnyFn = (...args: never[]) => unknown
 
+/** What `debounce` returns: the wrapper, plus the `cancel` added at §9.3 step 4. */
+export type Debounced<F extends AnyFn> =
+	((this: unknown, ...args: Parameters<F>) => void) & { cancel: () => void }
+
 /** The option bag `debounce` reads — only `leading`, exactly as at runtime. */
 type DebounceOptions = { leading?: boolean }
 
@@ -77,10 +81,10 @@ export function enumCheck (enums: readonly unknown[], value: unknown, self?: unk
  */
 export function debounce<F extends AnyFn> (
 	func: F, wait: number = TIME_DURATION_INSTANT, { leading }: DebounceOptions = {},
-): (this: unknown, ...args: Parameters<F>) => void {
+): Debounced<F> {
 	let timeout: ReturnType<typeof setTimeout> | null | undefined
 	let trailingCall = false
-	return function(this: unknown) {
+	const debounced = function(this: unknown) {
 		const self = this
 		const args = arguments
 
@@ -99,7 +103,23 @@ export function debounce<F extends AnyFn> (
 		timeout = setTimeout(later, wait)
 		if (callNow) (func as unknown as (this: unknown, ...a: unknown[]) => unknown)
 			.apply(self, args as unknown as unknown[])
+	} as Debounced<F>
+
+	/**
+	 * Drop a pending trailing call. Added at §9.3 step 4, because two catalogued hazards — AutoSave's
+	 * debounce outliving its component, and the shared-prototype `handleChangeInput` — cannot be fixed
+	 * without it: there was no way to stop a scheduled call, only to let it fire into a dead instance.
+	 *
+	 * It does NOT undo a `leading` call that already ran; that one is history by the time anyone can
+	 * cancel. It clears the timer and the trailing flag, and the function stays reusable afterwards.
+	 */
+	debounced.cancel = function () {
+		if (timeout) clearTimeout(timeout)
+		timeout = null
+		trailingCall = false
 	}
+
+	return debounced
 }
 
 /**
