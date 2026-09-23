@@ -21,16 +21,17 @@ async function compileLess(entryFile) {
 }
 
 /**
- * prefixwrap options for this standalone build.
+ * prefixwrap options for this standalone build — now READ FROM the shared source, not copied.
  *
- * Exported so the CSS pipeline parity gate (`src/style/__tests__/css.pipeline.parity.test.js`) can
- * assert the real options instead of a copy that could silently drift. These deliberately differ from
- * the webpack `postcss.config.js` today: that one also exempts `html`, `body` and `*`, so the
- * published CSS restyles host pages while this build scopes everything. Unifying the two is part of
- * the open §9.9-H8 / R16 decision -- do not "fix" one side here without updating the gate.
+ * The comment that stood here said these "deliberately differ from the webpack `postcss.config.js`
+ * today: that one also exempts `html`, `body` and `*`", and called unifying them part of the OPEN
+ * §9.9-H8 decision. That decision closed on 2026-09-11 and the exemptions went with it, so the two
+ * had been identical for weeks while this file still described them as divergent. §9.9-H7 removed
+ * the second copy rather than correcting its description a second time.
+ *
+ * Still re-exported, because the parity gate imports `PREFIX`/`PREFIXWRAP_OPTIONS` from this module.
  */
-const PREFIX = '.ui-render';
-const PREFIXWRAP_OPTIONS = { ignoredSelectors: [/^\.ui-render-(.+)$/] };
+const { PREFIX, PREFIXWRAP_OPTIONS } = require('./prefixwrap-options.js');
 
 async function applyPrefixWrap(css) {
     const result = await postcss([

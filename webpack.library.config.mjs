@@ -6,6 +6,7 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 import lessOptionsModule from './scripts/less-options.js';
+import { sourceRules } from './webpack.common.mjs'
 const { lessOptions } = lessOptionsModule;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -49,34 +50,10 @@ export default {
         'react-dom': 'react-dom',
     },
     module: {
-        rules: [
-            {
-                test: /\.(ts|tsx|js|jsx)$/,
-                loader: 'babel-loader',
-                exclude: /node_modules/,
-            },
-            {
-                test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader'],
-            },
-            {
-                test: /\.less$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    {
-                        loader: 'css-loader',
-                        options: { url: false },
-                    },
-                    'postcss-loader',
-                    {
-                        loader: 'less-loader',
-                        options: {
-                            lessOptions: lessOptions({ relativeUrls: false }),
-                        },
-                    },
-                ],
-            },
-        ],
+        // §9.9-H7: the three source rules live in webpack.common.mjs. `cssUrl: false` is the
+        // library's half of the one difference that matters — its fonts and images ship once in the
+        // root `static/` payload, so css-loader must NOT resolve url() and re-emit them into dist/.
+        rules: sourceRules({ styleLoader: MiniCssExtractPlugin.loader, cssUrl: false }, lessOptions),
     },
     resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],

@@ -1260,7 +1260,38 @@ directly across nearly all pages; that rule waits on §9.4 growing the public su
 
 #### H7 — Build config consolidation
 
-Extract a shared, **parameterized** `webpack.common.mjs` (loader chains, resolve; externals only for the library target — the demo must NOT inherit them) consumed by both configs. **Scope reduced 2026-09-15:** there are now **two** configs, not three. The third was `webpack.watch.config.mjs`, and it had drifted (emitting `dist/static/ui-render.css` instead of the `all.css`/`font.css`/`semantic.css` set, and no `.d.ts` at all, §2.6-8); rather than unify it, it was deleted — `watch-lib` runs `webpack --watch` against the library config, which is the only way the two cannot diverge again. Fold `scripts/build-css.js` into the same source of truth, or explicitly document it as the canonical standalone CSS build.
+~~Extract a shared, **parameterized** `webpack.common.mjs`; fold `scripts/build-css.js` into the same
+source of truth, or explicitly document it as the canonical standalone CSS build.~~ ✅ **DONE 2026-09-23.**
+
+**`webpack.common.mjs` holds the three source rules** — babel, css, less — taking the three parameters
+the two builds actually differ on. Configs went 130 + 179 → 97 + 156 lines plus a 54-line shared module.
+Each difference is now stated once, with its reason, instead of living as two copies that happen to agree:
+
+  - `styleLoader` — extract to a file, or inject in dev. The demo swaps by mode; the library always extracts.
+  - `cssUrl` — **load-bearing and OPPOSITE.** The demo needs `true` so `@font-face` files are emitted and
+    resolve under `style-loader`; the library needs `false`, because its fonts and images ship once in the
+    root `static/` payload and a resolved `url()` would re-emit them into `dist/`, breaking the
+    "assets ship once" guarantee the packaging budget enforces.
+  - `babelPlugins` — only `react-refresh/babel`, and only in dev. Never presets: a loader-level entry
+    REPLACES the shared `babel.config.js` one for the same identifier rather than adding to it.
+
+**What was deliberately NOT shared:** entry, output, externals, plugins, devServer, optimization, and the
+demo's `.md`/asset rules. Sharing those is what produced `webpack.watch.config.mjs` — the third config that
+drifted into the wrong stylesheet name and no type declarations, and whose fix was DELETION. A shared core
+plus two explicit targets is the shape that cannot drift; a shared everything is the shape that already did.
+
+**`scripts/build-css.js` was folded, and the fold found a stale claim.** Its prefixwrap options carried a
+comment saying they *"deliberately differ from the webpack `postcss.config.js` today: that one also exempts
+`html`, `body` and `*`"*, and called unifying them part of the OPEN §9.9-H8 decision. **H8 closed on
+2026-09-11 and took those exemptions with it** — so the two had been byte-identical for weeks while this
+file still described them as divergent. `scripts/prefixwrap-options.js` is now the single definition and
+both pipelines read it. The parity gate still compares the two by RUNNING both over a probe rather than by
+comparing values: sharing makes them equal by construction, but only execution proves both pipelines apply
+them the same way.
+
+**Verified the way this change has to be:** `static/all.css` is **byte-identical** before and after
+(`cmp`, not just the same hash), and the demo build, `test:pack:budget` and `test:pack:consumer` all pass —
+the last two being what would catch a `cssUrl` mistake re-emitting assets into `dist/`.
 
 #### H8 — CSS pipeline integrity (from §2.6-7)
 
