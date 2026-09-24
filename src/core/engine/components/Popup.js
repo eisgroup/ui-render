@@ -85,7 +85,9 @@ const Popup = () => {
                     </View>
                 </View>
             </View>,
-            document.getElementById('render-popup-root')
+            // This document's own root when a shell published one; otherwise the id, which is
+            // how the demo and the test harnesses provide it.
+            popup.popupRoot || document.getElementById('render-popup-root')
         )
 }
 
