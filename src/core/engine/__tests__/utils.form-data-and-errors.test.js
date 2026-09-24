@@ -211,8 +211,8 @@ describe('errorsProcessing', () => {
 
     it('turns a Required error into a field-specific message', () => {
         const form = makeFormWithErrors({
-            policyHolderName: {
-                name: 'policyHolderName',
+            ownerName: {
+                name: 'ownerName',
                 error: 'Required',
                 touched: true,
             },
@@ -220,7 +220,7 @@ describe('errorsProcessing', () => {
 
         errorsProcessing(form, {})
 
-        expect(errorsMap.policyHolderName).toBe('Policy Holder Name is Required')
+        expect(errorsMap.ownerName).toBe('Owner Name is Required')
     })
 
     it('records an error for a field remembered as touched', () => {

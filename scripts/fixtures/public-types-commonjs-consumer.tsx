@@ -2,11 +2,11 @@ import * as React from 'react'
 import UIRender = require('eis-ui-render')
 
 interface QuoteData {
-    premium: number
+    cost: number
 }
 
-const data: QuoteData = { premium: 120 }
-const meta = { view: 'Text', children: 'Premium' }
+const data: QuoteData = { cost: 120 }
+const meta = { view: 'Text', children: 'Cost' }
 
 const translate: UIRender.UIRenderTranslate = (value: string): string => value.toUpperCase()
 

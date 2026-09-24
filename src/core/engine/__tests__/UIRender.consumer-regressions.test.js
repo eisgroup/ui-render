@@ -107,7 +107,7 @@ describe('UI Render consumer-level regression guards', () => {
         const data = {
             rows: [{a: 'x', note: 'n0'}, {a: 'y', note: 'n1'}],
             experienceRatingInputs: {
-                uwOverridesCoverage: [{note: 'other0'}, {note: 'other1'}],
+                overrideOptions: [{note: 'other0'}, {note: 'other1'}],
                 uwOverridesCommon: [{note: 'more0'}, {note: 'more1'}],
             },
         }

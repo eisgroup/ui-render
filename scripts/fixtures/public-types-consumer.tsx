@@ -11,11 +11,11 @@ import UIRender, {
 import { UIRender as NamedUIRender } from 'eis-ui-render'
 
 interface QuoteData {
-    premium: number
+    cost: number
 }
 
-const data: QuoteData = { premium: 120 }
-const meta = { view: 'Text', children: 'Premium' }
+const data: QuoteData = { cost: 120 }
+const meta = { view: 'Text', children: 'Cost' }
 
 const apiCalls: UIRenderApiCalls<QuoteData> = {
     updateExperienceData: async values => values,
@@ -30,11 +30,11 @@ const props: UIRenderProps<QuoteData> = {
     meta,
     initialValues: data,
     form: { kind: 'quote', className: 'quote-form' },
-    onSubmit: values => values.premium,
-    getFormData: getData => getData().premium,
+    onSubmit: values => values.cost,
+    getFormData: getData => getData().cost,
     onDataChanged: () => undefined,
     getValidationErrors: (errors: UIRenderValidationErrors) => errors,
-    methods: { formatPremium: value => String(value) },
+    methods: { formatCost: value => String(value) },
     translate,
     apiCalls,
     dateFormat: 'MM-DD-YYYY',

@@ -28,14 +28,14 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
   - You can create new or update existing state using `functions` (see point 8):
     Example of setting active plan using `onChange` function: `"onChange": "setState,plan"`
   - To read the state, define `name` attribute with key path like this:
-    `"name": "plan.{state.plan,0}"` (next point explains how this works)
+    `"name": "group.{state.group,0}"` (next point explains how this works)
   - For advanced config, see the [example](#component-attributes) of Dropdown `onChange` attribute
 
 3. **Curly Brace Transform**
   - The curly brace surrounding a key path will replace it with value found in `data.json` or in `state`
-    Example: `"name": "plan.{state.plan}.title"` -> becomes `"name": "plan.undefined.title"`
+    Example: `"name": "group.{state.group}.title"` -> becomes `"name": "group.undefined.title"`
   - Fallback value can be defined after a comma, to avoid `undefined` value on initialization
-    Example: `"name": "plan.{state.plan,0}.title"` -> falls back to `"name": "plan.0.title"`
+    Example: `"name": "group.{state.group,0}.title"` -> falls back to `"name": "group.0.title"`
 
 4. **Value Transform (for objects with a single attribute "name" and optional "relativeData")**
   - Example: `"title": { "name": "{key}" }` -> becomes `"title": "relative value"`
@@ -67,7 +67,7 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
       items: [
         {
           view: "Parent",
-          name: "plan.0", // => this will resolve to "root.path.to.item.0.plan.0"
+          name: "group.0", // => this will resolve to "root.path.to.item.0.plan.0"
           items: [
             {
               view: "Child",

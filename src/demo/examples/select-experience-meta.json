@@ -49,7 +49,7 @@
           "items": [
             {
               "view": "Text",
-              "label": "Plans Provisions"
+              "label": "Plans Notes"
             }
           ]
         },
@@ -87,7 +87,7 @@
           "items": [
             {
               "view": "Text",
-              "label": "Category Provisions",
+              "label": "Category Notes",
               "styles": "padding-v bold"
             }
           ]

@@ -169,7 +169,7 @@ describe('pushDataKindRow', () => {
 
     it('pushes via final-form mutator, syncs state from form values, and resets', () => {
         const json = {
-            policy: 'P1',
+            group: 'P1',
             dataKind: {
                 experiencePeriods: [{ periodName: 'Existing' }],
             },
@@ -286,7 +286,7 @@ describe('pushDataKindRow', () => {
 
     it('returns false when dataKind branch is missing', () => {
         const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
-        const json = { policy: 'P1' }
+        const json = { group: 'P1' }
         const { parentUIRender, form } = makeParent(json)
         expect(
             pushDataKindRow({
@@ -347,7 +347,7 @@ describe('getDataKindPathFromRelative (re-export contract)', () => {
 describe('compactDataKindArrays', () => {
     it('removes empty objects and null from dataKind arrays', () => {
         const input = {
-            policyNumber: 'X',
+            recordNumber: 'X',
             dataKind: {
                 experiencePeriods: [
                     { periodName: 'A', weight: 1 },

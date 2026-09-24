@@ -54,14 +54,14 @@ describe('Expand lifecycle contracts', () => {
             return <span>Loaded for {id}</span>
         }
         const { container } = render(wrap(
-            <Expand id="policy-7" title="Policy">{renderContent}</Expand>
+            <Expand id="group-7" title="Group">{renderContent}</Expand>
         ))
 
         expect(calls).toEqual([])
         fireEvent.click(labelOf(container))
 
-        expect(calls).toEqual(['policy-7'])
-        expect(screen.getByText('Loaded for policy-7')).toBeInTheDocument()
+        expect(calls).toEqual(['group-7'])
+        expect(screen.getByText('Loaded for group-7')).toBeInTheDocument()
     })
 
     it('invalidates cached lazy content only when the children function changes', () => {
