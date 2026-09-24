@@ -20,7 +20,11 @@
  * The composer's half of this — that configured arguments are appended at all — is pinned in
  * `src/core/engine/__tests__/transforms.action-args.test.js`.
  */
-import { UIRender } from '../rules'
+import '../rules'
+// The lifecycle layer, not the bare class: since §9.3 step 5 the engine installs it on a subclass
+// of its own instead of mutating the class it is handed, and `Active.UIRender` is the channel
+// `engine/Data.js` already reads it from to render nested documents.
+import { Active } from '../../utils'
 
 /**
  * `setStates` lives on the prototype and only needs `state` and `setState` from its instance, so
@@ -37,7 +41,7 @@ const callSetState = (...args) => {
         setState (next) { recorded.push(typeof next === 'function' ? next(this.state) : next) },
         _meta: { cached: true },
     }
-    UIRender.prototype.setStates.apply(instance, args)
+    Active.UIRender.prototype.setStates.apply(instance, args)
     return { state: recorded[recorded.length - 1], metaCleared: instance._meta === null }
 }
 

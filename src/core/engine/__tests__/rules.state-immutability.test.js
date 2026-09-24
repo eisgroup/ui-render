@@ -13,7 +13,11 @@
  * the same reason: driving this through a rendered engine would exercise the same lines behind a
  * form and a click without saying which object was written.
  */
-import { UIRender } from '../rules'
+import '../rules'
+// The lifecycle layer, not the bare class: since §9.3 step 5 the engine installs it on a subclass
+// of its own instead of mutating the class it is handed, and `Active.UIRender` is the channel
+// `engine/Data.js` already reads it from to render nested documents.
+import { Active } from '../../utils'
 
 /**
  * `setState` BATCHES, and the fake has to as well.
@@ -25,7 +29,7 @@ import { UIRender } from '../rules'
  */
 const makeInstance = state => {
     const pending = []
-    const instance = Object.create(UIRender.prototype)
+    const instance = Object.create(Active.UIRender.prototype)
     instance.state = state
     instance.props = {}
     instance.setState = function (next) {

@@ -9,7 +9,11 @@ import React from 'react' // eslint-disable-line import/first
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
 // Load form registration before rules.js follows the mapper/renders cycle.
-import UIRender, { UIRender as RawUIRender, formsStorage } from '../rules' // eslint-disable-line import/first
+import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
+// The lifecycle layer, not the bare class: since §9.3 step 5 the engine installs it on a subclass
+// of its own instead of mutating the class it is handed, and `Active.UIRender` is the channel
+// `engine/Data.js` already reads it from to render nested documents.
+import { Active } from '../../utils' // eslint-disable-line import/first
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
 
 const appContext = {
@@ -29,6 +33,10 @@ afterEach(() => {
     appContext.setPopupState.mockClear()
     jest.restoreAllMocks()
 })
+
+// Rendered directly, the way `engine/Data.js` renders a nested document: the lifecycle layer
+// without the form wrapper around it.
+const NestedUIRender = Active.UIRender
 
 describe('UIRender lifecycle and form orchestration contracts', () => {
     it('notifies onDataChanged after a user makes the form dirty', async () => {
@@ -214,7 +222,7 @@ describe('UIRender lifecycle and form orchestration contracts', () => {
             initialValues: values,
         }
         const { rerender, unmount } = render(withProviders(
-            <RawUIRender {...commonProps} index={0} />
+            <NestedUIRender {...commonProps} index={0} />
         ))
 
         expect(parent.registerDataKind).toHaveBeenCalledTimes(1)
@@ -222,7 +230,7 @@ describe('UIRender lifecycle and form orchestration contracts', () => {
         expect(parent.registerDataKind).toHaveBeenLastCalledWith(child, 'periods', 0)
 
         rerender(withProviders(
-            <RawUIRender {...commonProps} index={1} />
+            <NestedUIRender {...commonProps} index={1} />
         ))
 
         expect(parent.unregisterDataKind).toHaveBeenLastCalledWith(child, 'periods', 0)
