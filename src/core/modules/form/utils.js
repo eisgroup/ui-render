@@ -9,7 +9,7 @@ import View from '../../components/View'
 import { Active, debounce, isEqualJSON, toJSON } from '../../utils'
 import { hasObjectValue, objChanges, set } from '../../utils/object'
 import { _ } from '../../utils/translations'
-import { clearErrorsMap, clearStoredTouched, formsStorage, storedTouched } from '../../state/formRegistry'
+import { clearErrorsFor, clearStoredTouched, formsStorage, storedTouched } from '../../state/formRegistry'
 import arrayMutators from 'final-form-arrays'
 
 /**
@@ -348,7 +348,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
           form.mutators.setFieldTouched(field, false)
         }
         clearStoredTouched()
-        clearErrorsMap()
+        clearErrorsFor(form)
       } else {
         for(const field of Object.keys(touched)) {
           if(touched[field]) {

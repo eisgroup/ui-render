@@ -16,7 +16,7 @@ import { cloneDeep, hasObjectValue, isObject, set, setIn } from '../utils/object
 import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
-import { clearErrorsMap, errorsMap, formsStorage } from '../state/formRegistry'
+import { errorsFor, formsStorage } from '../state/formRegistry'
 import { _ } from './translations'
 import {
     replaceDeep,
@@ -195,7 +195,7 @@ FIELD.PARSER = {
 // may import, and are re-exported from here so every existing import of them keeps working — the
 // move is meant to dissolve the cycle, not to churn twenty call sites. §9.3 step 3 makes them
 // per-instance, and that will be a change inside `formRegistry` rather than a search.
-export { formsStorage, errorsMap, clearErrorsMap }
+export { formsStorage }
 
 
 /**
@@ -306,10 +306,13 @@ export class UIRender extends Component {
             errorsProcessing(this.form, this.props.meta)
         }
 
+        // This instance's errors. Until §9.3 step 3 split the map, every instance compared against
+        // the same one, so a second document repeated the first one's errors to its own callback.
+        const ownErrors = this.form ? errorsFor(this.form) : {}
         if (typeof this.errorHandler === 'function'
-            && !isEqual(errorsMap, this.state.errors)
+            && !isEqual(ownErrors, this.state.errors)
         ) {
-            const errors = cloneDeep(errorsMap)
+            const errors = cloneDeep(ownErrors)
             this.errorHandler(mapErrorObjectToUIFormat(errors))
             this.setState({ errors })
         }

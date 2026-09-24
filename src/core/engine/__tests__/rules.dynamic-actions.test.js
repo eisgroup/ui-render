@@ -10,7 +10,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import '@testing-library/jest-dom' // eslint-disable-line import/first
 // Load form registration before rules.js follows the mapper/renders cycle.
 import { storedTouched } from '../../modules/form/utils' // eslint-disable-line import/first
-import UIRender, { clearErrorsMap, formsStorage } from '../rules' // eslint-disable-line import/first
+import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
 import { AppProvider } from '../../providers' // eslint-disable-line import/first
 
 const popupTableMeta = (popupItems, title = 'Row override') => ({
@@ -74,7 +74,6 @@ afterEach(() => {
     cleanup()
     popupRoot.remove()
     formsStorage.clear()
-    clearErrorsMap()
     Object.keys(storedTouched).forEach(key => delete storedTouched[key])
     jest.restoreAllMocks()
 })

@@ -20,7 +20,7 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../core/contexts'
 import { storedTouched } from '../../core/modules/form/utils'
-import UIRender, { clearErrorsMap, formsStorage } from '../../core/engine/rules'
+import UIRender, { formsStorage } from '../../core/engine/rules'
 import { AppProvider } from '../../core/providers/AppProvider'
 
 /**
@@ -44,7 +44,6 @@ const apiCalls = {
  */
 export const clearEngineGlobals = () => {
     formsStorage.clear()
-    clearErrorsMap()
     Object.keys(storedTouched).forEach(key => delete storedTouched[key])
 }
 

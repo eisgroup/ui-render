@@ -21,7 +21,7 @@ import { render } from '@testing-library/react'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 import { FIELD } from '../../modules/variables/fields'
 import { storedTouched } from '../../modules/form/utils'
-import UIRender, { clearErrorsMap, formsStorage } from '../rules'
+import UIRender, { formsStorage } from '../rules'
 import { Render } from '..'
 import {
     CURRENT_META_VERSION,
@@ -266,7 +266,6 @@ describe('every error-severity check predicts a real engine failure', () => {
 
     const clearGlobalRegistries = () => {
         formsStorage.clear()
-        clearErrorsMap()
         Object.keys(storedTouched).forEach(key => delete storedTouched[key])
     }
 

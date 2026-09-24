@@ -1,5 +1,5 @@
 import { get, merge, isObject, hasObjectValue } from '../utils/object'
-import { errorsMap } from '../state/formRegistry'
+import { errorsFor } from '../state/formRegistry'
 import { FIELD } from '../modules'
 import { ISO_8601_FULL } from '../utils'
 import { cloneDeep } from '../utils'
@@ -180,6 +180,10 @@ export function errorsProcessing(form, meta) {
   if (!registeredFieldNames.length) {
     return;
   }
+
+  // This form's errors, not everyone's: the map used to be shared, so a second document on the
+  // same page reported the first one's errors as its own.
+  const errorsMap = errorsFor(form)
 
   registeredFieldNames.forEach(field => {
     const { name, error, touched } = form.getFieldState(field);

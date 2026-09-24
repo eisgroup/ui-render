@@ -5,7 +5,7 @@ import {
     replaceDeep,
     errorsProcessing,
 } from '../utils'
-import { errorsMap, clearErrorsMap } from '../rules'
+import { errorsFor } from '../../state/formRegistry'
 import { storedTouched } from '../../modules/form/utils'
 
 function makeForm(values) {
@@ -164,16 +164,13 @@ describe('errorsProcessing', () => {
         }
     }
 
+    // No error reset here any more: since §9.3 step 3 the errors belong to the FORM, each test
+    // builds its own, and the map dies with it. `storedTouched` is still shared and still needs it.
     beforeEach(() => {
-        clearErrorsMap()
-        // Clear errorsMap which is the live module reference
-        for (const k of Object.keys(errorsMap)) delete errorsMap[k]
         for (const k of Object.keys(storedTouched)) delete storedTouched[k]
     })
 
     afterEach(() => {
-        clearErrorsMap()
-        for (const k of Object.keys(errorsMap)) delete errorsMap[k]
         for (const k of Object.keys(storedTouched)) delete storedTouched[k]
     })
 
@@ -190,7 +187,7 @@ describe('errorsProcessing', () => {
     it('does nothing when fields have no error', () => {
         const form = makeFormWithErrors({ foo: { name: 'foo', touched: true } })
         errorsProcessing(form, {})
-        expect(errorsMap.foo).toBeUndefined()
+        expect(errorsFor(form).foo).toBeUndefined()
     })
 
     it('records a touched field error', () => {
@@ -204,7 +201,7 @@ describe('errorsProcessing', () => {
 
         errorsProcessing(form, {})
 
-        expect(errorsMap).toEqual({
+        expect(errorsFor(form)).toEqual({
             email: 'Email is invalid',
         })
     })
@@ -220,7 +217,7 @@ describe('errorsProcessing', () => {
 
         errorsProcessing(form, {})
 
-        expect(errorsMap.ownerName).toBe('Owner Name is Required')
+        expect(errorsFor(form).ownerName).toBe('Owner Name is Required')
     })
 
     it('records an error for a field remembered as touched', () => {
@@ -235,7 +232,7 @@ describe('errorsProcessing', () => {
 
         errorsProcessing(form, {})
 
-        expect(errorsMap.phoneNumber).toBe('Phone is invalid')
+        expect(errorsFor(form).phoneNumber).toBe('Phone is invalid')
     })
 
     it('removes a stale error after the field becomes valid', () => {
@@ -249,11 +246,11 @@ describe('errorsProcessing', () => {
         })
 
         errorsProcessing(form, { relativePath: 'rows', relativeIndex: 1 })
-        expect(errorsMap['rows[1].startDate']).toBe('Start Date is Required')
+        expect(errorsFor(form)['rows[1].startDate']).toBe('Start Date is Required')
 
         delete fieldState.error
         errorsProcessing(form, { relativePath: 'rows', relativeIndex: 1 })
 
-        expect(errorsMap['rows[1].startDate']).toBeUndefined()
+        expect(errorsFor(form)['rows[1].startDate']).toBeUndefined()
     })
 })

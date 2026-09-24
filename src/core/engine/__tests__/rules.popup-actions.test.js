@@ -9,7 +9,7 @@ import React from 'react' // eslint-disable-line import/first
 import { cleanup, fireEvent, render, screen } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
 import { storedTouched } from '../../modules/form/utils' // eslint-disable-line import/first
-import UIRender, { clearErrorsMap, formsStorage } from '../rules' // eslint-disable-line import/first
+import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
 
 const appContext = {
@@ -58,7 +58,6 @@ beforeEach(() => {
 afterEach(() => {
     cleanup()
     formsStorage.clear()
-    clearErrorsMap()
     Object.keys(storedTouched).forEach(key => delete storedTouched[key])
     appContext.setPopupState.mockClear()
     jest.restoreAllMocks()
