@@ -1506,12 +1506,12 @@ exports[`demo example full-DOM contract list renders a stable, non-empty DOM mat
           </span>
           <div class="flex--col input--wrapper padding no-margin done">
             <div class="flex--row middle">
-              <label for="categories[0].memberAnnualPremium">
+              <label for="categories[0].memberAnnualCost">
                 "Input inside Relative Data"
               </label>
             </div>
             <div class="flex--row input">
-              <input aria-invalid="false" id="categories[0].memberAnnualPremium" inputmode="decimal" name="categories[0].memberAnnualPremium" type="text" value="378" />
+              <input aria-invalid="false" id="categories[0].memberAnnualCost" inputmode="decimal" name="categories[0].memberAnnualCost" type="text" value="378" />
             </div>
           </div>
           <div class="flex--col border radius">
@@ -1540,12 +1540,12 @@ exports[`demo example full-DOM contract list renders a stable, non-empty DOM mat
           </span>
           <div class="flex--col input--wrapper padding no-margin done">
             <div class="flex--row middle">
-              <label for="categories[1].memberAnnualPremium">
+              <label for="categories[1].memberAnnualCost">
                 "Input inside Relative Data"
               </label>
             </div>
             <div class="flex--row input">
-              <input aria-invalid="false" id="categories[1].memberAnnualPremium" inputmode="decimal" name="categories[1].memberAnnualPremium" type="text" value="478" />
+              <input aria-invalid="false" id="categories[1].memberAnnualCost" inputmode="decimal" name="categories[1].memberAnnualCost" type="text" value="478" />
             </div>
           </div>
           <div class="flex--col border radius">
@@ -4596,12 +4596,12 @@ exports[`demo example full-DOM contract tabList renders a stable, non-empty DOM 
                 </span>
                 <div class="flex--col input--wrapper padding no-margin done">
                   <div class="flex--row middle">
-                    <label for="categories[0].memberAnnualPremium">
+                    <label for="categories[0].memberAnnualCost">
                       "Input inside Relative Data"
                     </label>
                   </div>
                   <div class="flex--row input">
-                    <input aria-invalid="false" id="categories[0].memberAnnualPremium" inputmode="decimal" name="categories[0].memberAnnualPremium" type="text" value="378" />
+                    <input aria-invalid="false" id="categories[0].memberAnnualCost" inputmode="decimal" name="categories[0].memberAnnualCost" type="text" value="378" />
                   </div>
                 </div>
                 <div class="flex--col border radius">

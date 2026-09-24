@@ -25,7 +25,7 @@ const expandListMeta = {
           {
             view: 'Input',
             label: 'Input inside Relative Data',
-            name: 'memberAnnualPremium', // relative path
+            name: 'memberAnnualCost', // relative path
             relativeData: true,
             type: 'number',
             styles: 'padding no-margin',

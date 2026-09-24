@@ -130,21 +130,21 @@ describe('UIRender additional action and error contracts', () => {
                             children: 'Open details',
                             onClick: {
                                 name: 'popupOpen',
-                                args: ['policy-details'],
+                                args: ['group-details'],
                             },
                         },
                         {
                             view: 'Popup',
-                            id: 'policy-details',
-                            title: 'Policy details',
+                            id: 'group-details',
+                            title: 'Group details',
                             items: [
                                 { view: 'Text', children: 'Popup body' },
                             ],
                         },
                     ],
                 }}
-                data={{ policyNumber: 'P-100' }}
-                initialValues={{ policyNumber: 'P-100' }}
+                data={{ recordNumber: 'P-100' }}
+                initialValues={{ recordNumber: 'P-100' }}
             />
         ))
 
@@ -152,7 +152,7 @@ describe('UIRender additional action and error contracts', () => {
 
         expect(popup.setPopupState).toHaveBeenCalledTimes(1)
         const popupState = popup.setPopupState.mock.calls[0][0]
-        expect(popupState.title).toBe('Policy details')
+        expect(popupState.title).toBe('Group details')
         expect(React.isValidElement(popupState.content)).toBe(true)
 
         render(withProviders(popupState.content))

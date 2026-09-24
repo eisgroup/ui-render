@@ -15,15 +15,15 @@ import { AppProvider } from '../../providers' // eslint-disable-line import/firs
 
 const popupTableMeta = (popupItems, title = 'Row override') => ({
     view: 'Table',
-    name: 'experienceRatingInputs.uwOverridesCoverage',
+    name: 'experienceRatingInputs.overrideOptions',
     headers: [
-        { id: 'coverageType', label: 'Coverage' },
+        { id: 'optionType', label: 'Option' },
         { id: 'actions', label: 'Actions' },
     ],
     renderItemCells: {
         view: 'TableCells',
         items: [
-            { view: 'Text', name: 'coverageType' },
+            { view: 'Text', name: 'optionType' },
             {
                 view: 'Col',
                 items: [
@@ -49,9 +49,9 @@ const popupTableMeta = (popupItems, title = 'Row override') => ({
 
 const popupData = {
     experienceRatingInputs: {
-        uwOverridesCoverage: [
+        overrideOptions: [
             {
-                coverageType: 'Dental',
+                optionType: 'Dental',
                 inforceRateOverrideReason: 'Original reason',
             },
         ],
@@ -108,7 +108,7 @@ describe('UIRender dynamic action and data-integrity contracts', () => {
         expect(screen.getByText('Row override')).toBeInTheDocument()
         expect(reasonInput).toHaveAttribute(
             'name',
-            'experienceRatingInputs.uwOverridesCoverage[0].inforceRateOverrideReason'
+            'experienceRatingInputs.overrideOptions[0].inforceRateOverrideReason'
         )
         expect(reasonInput).toHaveValue('Original reason')
 
@@ -117,9 +117,9 @@ describe('UIRender dynamic action and data-integrity contracts', () => {
 
         const readFormData = getFormData.mock.calls[0][0]
         await waitFor(() => {
-            expect(readFormData().experienceRatingInputs.uwOverridesCoverage[0])
+            expect(readFormData().experienceRatingInputs.overrideOptions[0])
                 .toEqual(expect.objectContaining({
-                    coverageType: 'Dental',
+                    optionType: 'Dental',
                     inforceRateOverrideReason: 'Actuarial review',
                 }))
         })

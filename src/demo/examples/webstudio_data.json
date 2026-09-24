@@ -4,7 +4,7 @@
       "optionID": "Golden",
       "categoryID": "STD Core",
       "inputType": "Contributory",
-      "annualPremium": 1000,
+      "annualCost": 1000,
       "totalNetClaimCost": 703.96,
       "numberOfLives": 10,
       "totalWeeklyBenefit": 15000,
@@ -28,17 +28,17 @@
       "expense": 0.1875,
       "profit": 0.04,
       "rate": 1.03,
-      "ratesAndPremiumByClass": [
+      "ratesAndCostByClass": [
         {
           "classID": "Executives",
           "rate": 1.03,
-          "annualPremium": 1000,
+          "annualCost": 1000,
           "numberOfLives":12
         },
         {
           "classID": "Directors",
           "rate": 1.03,
-          "annualPremium": 1000,
+          "annualCost": 1000,
           "numberOfLives":15
         }
       ]

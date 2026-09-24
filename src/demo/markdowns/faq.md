@@ -71,7 +71,7 @@ If no value is provided for label at all, use `{"renderLabel": "String"}`
       "Core": {
         "view": "Text",
         "label": {
-          "name": "Plans.{state.plan,0}.Coverages[0].NumberOfEligible",
+          "name": "Groups.{state.group,0}.Options[0].NumberOfEligible",
           "relativeData": false
         },
         "renderLabel": {
@@ -80,7 +80,7 @@ If no value is provided for label at all, use `{"renderLabel": "String"}`
         }
       },
       "BuyUp": {
-        "name": "Plans.{state.plan,0}.Coverages[1].NumberOfEligible",
+        "name": "Groups.{state.group,0}.Options[1].NumberOfEligible",
         "relativeData": false
       }
     }

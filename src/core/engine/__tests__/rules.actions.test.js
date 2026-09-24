@@ -120,7 +120,7 @@ describe('UIRender action orchestration', () => {
         // from response-driven form reinitialization.
         const uploadFile = jest.fn(() => new Promise(() => {}))
         const data = {
-            policyNumber: 'P-100',
+            recordNumber: 'P-100',
             nested: { enabled: true },
             file: 'stale-file-value',
         }
@@ -150,7 +150,7 @@ describe('UIRender action orchestration', () => {
         await waitFor(() => expect(uploadFile).toHaveBeenCalledTimes(1))
         expect(uploadFile).toHaveBeenCalledWith(
             JSON.stringify({
-                policyNumber: 'P-100',
+                recordNumber: 'P-100',
                 nested: { enabled: true },
             }),
             file

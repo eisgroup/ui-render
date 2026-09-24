@@ -38,20 +38,20 @@ describe('UIRender lifecycle and form orchestration contracts', () => {
         // The current renderer forwards this callback to the native input and React warns about it.
         jest.spyOn(console, 'error').mockImplementation(() => {})
         const onDataChanged = jest.fn()
-        const values = { policyName: 'Before edit' }
+        const values = { groupName: 'Before edit' }
 
         render(withProviders(
             <UIRender
                 form
-                meta={{ view: 'Input', name: 'policyName', label: 'Policy name' }}
+                meta={{ view: 'Input', name: 'groupName', label: 'Group name' }}
                 data={values}
                 initialValues={values}
                 onDataChanged={onDataChanged}
             />
         ))
 
-        fireEvent.focus(screen.getByLabelText('Policy name'))
-        fireEvent.change(screen.getByLabelText('Policy name'), {
+        fireEvent.focus(screen.getByLabelText('Group name'))
+        fireEvent.change(screen.getByLabelText('Group name'), {
             target: { value: 'After edit' },
         })
 

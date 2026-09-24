@@ -286,16 +286,16 @@ describe('withFormSetup public instance contracts', () => {
 
     it('builds validation content using group label, field label, and field-name fallbacks', () => {
         const { instance } = makeDecoratedInstance({
-            registered: ['email', 'policy.number', 'plain'],
+            registered: ['email', 'group.number', 'plain'],
             fieldStates: {
                 email: { error: 'Required' },
-                'policy.number': { error: { code: 'invalid' } },
+                'group.number': { error: { code: 'invalid' } },
                 plain: { error: 'Incorrect' },
             },
         })
         instance._fields = [
             { name: 'email', label: 'Email address' },
-            { name: 'policy.number', label: 'Policy number', labelGroup: 'Policy' },
+            { name: 'group.number', label: 'Group number', labelGroup: 'Group' },
         ]
 
         const { container } = render(
@@ -306,7 +306,7 @@ describe('withFormSetup public instance contracts', () => {
 
         expect(container.querySelector('.tooltip')).toBeInTheDocument()
         expect(screen.getByText('• Email address: Required')).toBeInTheDocument()
-        expect(screen.getByText('• Policy: {"code":"invalid"}')).toBeInTheDocument()
+        expect(screen.getByText('• Group: {"code":"invalid"}')).toBeInTheDocument()
         expect(screen.getByText('• plain: Incorrect')).toBeInTheDocument()
     })
 
