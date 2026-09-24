@@ -9,6 +9,17 @@
  * A function of its arguments. The instance reaches it as `props` and `form` rather than `this`,
  * because everything it reads is a value.
  *
+ * THERE WERE FOUR SOURCES; ONE IS GONE. A source keyed on `props.relativePath` sat between 2 and 3
+ * below, and nothing ever set that prop on an engine instance — `Data.js` passes `index` and
+ * `relativeIndex` to a nested UIRender but puts the path in `meta`, and the only other
+ * `relativePath=` in the engine goes to a `Render`, not to a UIRender. Its condition could not be
+ * true, so cases fell past it to the last source, and removing it changes nothing.
+ *
+ * The other three were measured over the whole suite and NOT removed, which is the opposite of
+ * what §9.3 predicted: sources 1 and 2 never fire in any test, but `Data.js` does set the props
+ * they read, so they are reachable in a nested document and merely uncovered. Deleting them on the
+ * strength of "no test hits this" would have been a live behaviour change.
+ *
  * @param {String} id - the popup id, possibly already interpolated (`edit.1`)
  * @param {Object} [form] - the form whose state the later sources read
  * @param {Object} [props] - the UIRender instance's props
@@ -43,19 +54,6 @@ export function resolvePopupScope ({ id, form, props = {} }) {
         relativeIndex = props.index
         relativeData = form.getState().values
         relativePath = props.relativePath
-    }
-    // 3. Try to extract from form path (e.g., "name[0]" -> 0 and "name")
-    // Only if relativeIndex not already set
-    else if (relativeIndex == null && hasFormState && props.relativePath) {
-        const pathMatch = props.relativePath.match(/\[(\d+)\]/)
-        if (pathMatch) {
-            relativeIndex = parseInt(pathMatch[1], 10)
-            // Extract base path (e.g. `orders.lines` from `orders.lines[0]`)
-            relativePath = props.relativePath.replace(/\[\d+\]$/, '')
-        } else {
-            relativePath = props.relativePath
-        }
-        relativeData = form.getState().values
     }
     // 4. Try to extract index and path from form field names
     // Only if relativeIndex not already set
