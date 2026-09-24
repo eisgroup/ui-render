@@ -23,10 +23,11 @@ import Table from '../components/Table'
 import Text from '../components/Text'
 import TooltipPop from '../components/TooltipPop'
 import View from '../components/View'
-import { Active, interpolateString, isList, isNumeric, isString, isTruthy, toFlatList, toJSON } from '../utils'
+import { Active, isList, isNumeric, toFlatList, toJSON } from '../utils'
 import { TIME_DURATION_INSTANT } from '../utils/constants'
-import { get, hasObjectValue, isEqual, isObject, mergeReplaceArrays } from '../utils/object'
+import { get, hasObjectValue, isObject } from '../utils/object'
 import { autoSubmitter } from './autoSubmit'
+import { shouldRender } from './showIf'
 import Render, { formatRenderError, mapProps } from './index'
 import { relativePathFrom } from './transforms'
 import { renderField } from './components/renders'
@@ -85,59 +86,8 @@ const RenderComponent = ({
     // sibling's function. The fallback covers nodes rendered without an instance (tests, and the
     // components that read `Active.translate` as a prop default).
     const translate = (instance && instance.translate) || Active.translate
-    /* General showIf logic */
-    if (showIf != null) {
-        // UI Render should not 'Value Transform' `showIf` attribute
-        if (isString(showIf)) {
-            const __data = get((relativeData !== false && _data) || data, showIf)
-            if (!isTruthy(__data)) return null
-        } else if (hasObjectValue(showIf)) {
-            const { name: rawName, relativeData: showIfRelativeData, equal } = showIf
-            // Interpolate {state.xxx} templates in showIf.name
-            const name = rawName && rawName.includes('{')
-                ? interpolateString(rawName, instance, { suppressError: true })
-                : rawName
-            let __data
-            // if (relativePath && typeof relativeIndex !== undefined && name) {
-            if (name) {
-                // Use raw form data (without Select array reordering) for showIf lookups.
-                // getAllFormsData() applies changeOptionOrderForSelectFields which reorders arrays,
-                // but {state.xxx} stores indices relative to the original array order.
-                // Merge with `data` so an empty or partial `{}` from the form does not hide nodes whose
-                // showIf keys exist only on initialValues (e.g. root layout gated by isExperienceHidden).
-                // Note: lodash mergeWith skips undefined source values, so a form field explicitly
-                // cleared to undefined will still show the initial data value. This is acceptable
-                // because showIf targets are typically layout flags from data, not editable form fields.
-                const rawForm = instance.getRawFormsData && instance.getRawFormsData()
-                const formData = (rawForm != null && typeof rawForm === 'object')
-                    ? mergeReplaceArrays(data, rawForm)
-                    : data
-                // Draft row / renderExtraItem sets relativePath + relativeIndex to the next array slot.
-                // showIf.name may still be a global path (e.g. `settings.allRowsComplete`).
-                // In that case prefixing with `[index].` is wrong — use showIf.relativeData === false or
-                // component relativeData === false to read `name` from form root.
-                if (
-                    relativePath && typeof relativeIndex !== 'undefined' &&
-                    showIfRelativeData !== false && relativeData !== false
-                ) {
-                    __data = get(formData, `${relativePath}[${relativeIndex}].${name}`, undefined)
-                } else {
-                    __data = get(formData, name, undefined)
-                }
-            } else {
-                // Get from initial data.
-                // TODO: review this logic. It might be better to get from form instead of initial data
-                __data = (showIfRelativeData !== false && !name && _data) || get((showIfRelativeData !== false && _data) || data, name)
-            }
-            if (equal !== undefined) {
-                if (!isEqual(__data, equal)) return null
-            } else {
-                if (!isTruthy(__data)) return null
-            }
-        } else if (isObject(showIf)) {
-            if (!isTruthy(_data)) return null
-        }
-    }
+    /* General showIf logic — the whole decision lives in `showIf.js`, testable on its own. */
+    if (!shouldRender({ showIf, data, _data, relativeData, relativePath, relativeIndex, instance })) return null
 
     switch (view) {
         case FIELD.TYPE.DATA:
