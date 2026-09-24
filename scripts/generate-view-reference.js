@@ -54,7 +54,9 @@ const WRITE_COMMAND = 'npm run docs:views'
  */
 const DECLARATION_SITES = [
     { file: 'src/core/modules/variables/fields.js', props: ['TYPE', 'RENDER', 'ACTION'] },
-    { file: 'src/core/modules/form/constants.js', props: ['TYPE'] },
+    // `TYPE` left this file at §9.3 step 3, for the same reason it left `engine/rules.js` at step 2:
+    // `engine/utils.js` compares against `FIELD.TYPE.SELECT`, so the comparison depended on whether
+    // anything had imported the form module yet. The names are in `variables/fields.js` now.
     // `TYPE` left this file at §9.3 step 2: `mapper.js` dispatches on those six names while
     // `rules.js` imports `mapper.js`, so the resolver depended on a constant its own importer
     // registered. They now sit with the rest in `variables/fields.js`.

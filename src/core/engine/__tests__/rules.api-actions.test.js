@@ -9,7 +9,6 @@ import React from 'react' // eslint-disable-line import/first
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
 // Load form registration before rules.js follows the mapper/renders cycle.
-import { storedTouched } from '../../modules/form/utils' // eslint-disable-line import/first
 import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
 
@@ -29,7 +28,6 @@ const originalResponse = global.Response
 afterEach(() => {
     cleanup()
     formsStorage.clear()
-    Object.keys(storedTouched).forEach(key => delete storedTouched[key])
     popup.setPopupState.mockClear()
     jest.restoreAllMocks()
     if (originalResponse === undefined) {

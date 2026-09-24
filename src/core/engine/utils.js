@@ -1,9 +1,8 @@
 import { get, merge, isObject, hasObjectValue } from '../utils/object'
-import { errorsFor } from '../state/formRegistry'
+import { errorsFor, touchedFor } from '../state/formRegistry'
 import { FIELD } from '../modules'
 import { ISO_8601_FULL } from '../utils'
 import { cloneDeep } from '../utils'
-import { storedTouched } from '../modules/form'
 
 export const getFormsData = (forms) => {
   const formDataArray = [];
@@ -184,11 +183,12 @@ export function errorsProcessing(form, meta) {
   // This form's errors, not everyone's: the map used to be shared, so a second document on the
   // same page reported the first one's errors as its own.
   const errorsMap = errorsFor(form)
+  const rememberedTouched = touchedFor(form)
 
   registeredFieldNames.forEach(field => {
     const { name, error, touched } = form.getFieldState(field);
 
-    if (error && (touched || storedTouched[name])) {
+    if (error && (touched || rememberedTouched[name])) {
       let errorText = error;
       if (errorText === 'Required') {
         errorText = convertFieldNameToTitleCaseText(name) + ' is Required'

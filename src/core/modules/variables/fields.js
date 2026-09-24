@@ -39,6 +39,14 @@ FIELD.TYPE = {
   // gone, anything that loaded the mapper without also loading `rules.js` got a resolver whose
   // `case` for each of these compared against `undefined`, silently making six documented views
   // unreachable. Two mapper tests found it immediately; a consumer would have found it later.
+  // Declared here rather than in `modules/form/constants.js`, which used to register them
+  // (§9.3 step 3): `engine/utils.js` compares a meta node against `FIELD.TYPE.SELECT`, so that
+  // comparison depended on whether anything had imported the form module yet.
+  INPUT: 'Input', // generic input of different types (i.e. type='text', 'textarea', etc.)
+  SELECT: 'Select', // dropdown / listbox field
+  SLIDER: 'SliderLabel', // slider field with label
+  TOGGLE: 'Toggle', // checkbox rendered as toggle button
+  UPLOAD: 'Upload',  // single file upload with drag & drop
   AUTO_SUBMIT: 'AutoSubmit',
   DATA: 'Data',
   ICON: 'Icon',

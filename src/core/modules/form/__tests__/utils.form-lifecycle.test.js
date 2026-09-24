@@ -1,39 +1,20 @@
 import { Component } from 'react'
 import { Form } from 'react-final-form'
 import { Active } from '../../../utils'
-import { clearErrorsFor, formsStorage } from '../../../state/formRegistry'
+import { errorsFor, formsStorage, touchedFor } from '../../../state/formRegistry'
 import {
     asField,
     fieldValues,
     registeredFieldErrors,
     registeredFieldValues,
-    storedTouched,
     withForm,
     withFormSetup,
 } from '../utils'
 
-// The registries moved out of the engine at §9.3 step 2, so this mocks where they live now.
-// `storedTouched` is exposed through a getter on purpose: its owner REPLACES it rather than
-// emptying it, and a plain property would hand this file the object from before the replacement.
-// The errors are per FORM since step 3, so the mock keys them the same way the real module does.
-jest.mock('../../../state/formRegistry', () => {
-    let storedTouched = {}
-    const errorsByForm = new WeakMap()
-    const errorsFor = form => {
-        if (!errorsByForm.has(form)) errorsByForm.set(form, {})
-        return errorsByForm.get(form)
-    }
-    return {
-        formsStorage: new Map(),
-        get storedTouched () { return storedTouched },
-        clearStoredTouched: () => { storedTouched = {} },
-        errorsFor,
-        clearErrorsFor: jest.fn(form => {
-            const errors = errorsFor(form)
-            for (const key of Object.keys(errors)) delete errors[key]
-        }),
-    }
-})
+// NOT mocked. It used to be, to spy on a `clearErrorsMap` that cleared one shared object; the mock
+// then had to be kept in step with the real module through two conversions and fell behind twice.
+// Since §9.3 step 3 both registries are keyed by the form, so the real module can simply be asked
+// what a given form holds — which is also what the code under test does.
 
 // `errorsProcessing` is no longer imported by the form module — the engine hands it in. This
 // records the calls the decorator makes, which is the contract that replaced the import.
@@ -126,9 +107,36 @@ describe('withForm subscription and lifecycle contracts', () => {
 
     beforeEach(() => {
         formsStorage.clear()
-        clearErrorsFor.mockClear()
         processErrorsCalls.length = 0
-        Object.keys(storedTouched).forEach(key => delete storedTouched[key])
+    })
+
+    it('does not let a second form reset the first one when it initialises', () => {
+        // THE DEFECT THIS SLICE FIXED, and the only one of its family with a demonstrable symptom.
+        // `storedTouched` and the baseline it was compared against were both module-level, so the
+        // FIRST form to arrive owned the comparison for every form after it: a second document
+        // mounting with its own `initialValues` looked like a re-initialisation and wiped the first
+        // document's touched fields and errors. Sharing the registry itself produced nothing
+        // observable — four scenarios were probed — but this did.
+        const firstValues = { name: 'first' }
+        const secondValues = { other: 'second' }
+
+        const { instance: first } = createWithFormInstance({ initialValues: firstValues })
+        const { form: formA, listeners: listenersA } = createFormApi()
+        first.renderForm({ form: formA, handleSubmit: jest.fn(), pristine: true })
+        listenersA[0].listener({ initialValues: firstValues, touched: { name: true } })
+        errorsFor(formA).name = 'Name is Required'
+
+        expect(touchedFor(formA)).toEqual({ name: true })
+
+        // A second document appears, with a baseline of its own.
+        const { instance: second } = createWithFormInstance({ initialValues: secondValues })
+        const { form: formB, listeners: listenersB } = createFormApi()
+        second.renderForm({ form: formB, handleSubmit: jest.fn(), pristine: true })
+        listenersB[0].listener({ initialValues: secondValues, touched: {} })
+
+        expect(touchedFor(formA)).toEqual({ name: true })
+        expect(errorsFor(formA)).toEqual({ name: 'Name is Required' })
+        expect(formA.mutators.setFieldTouched).not.toHaveBeenCalled()
     })
 
     it('tracks touched fields and clears them when a new non-empty baseline arrives', () => {
@@ -142,17 +150,17 @@ describe('withForm subscription and lifecycle contracts', () => {
         subscription.listener({ initialValues: firstValues, touched: { name: true, ignored: false } })
         subscription.listener({ initialValues: firstValues, touched: { email: true } })
 
-        expect(storedTouched).toEqual({ name: true, email: true })
+        expect(touchedFor(form)).toEqual({ name: true, email: true })
+        errorsFor(form).name = 'stale'
         subscription.listener({ initialValues: nextValues, touched: {} })
 
         expect(form.mutators.setFieldTouched.mock.calls).toEqual([
             ['name', false],
             ['email', false],
         ])
-        expect(storedTouched).toEqual({})
         // Cleared for THIS form, not for everybody: that is the whole of the step 3 change here.
-        expect(clearErrorsFor).toHaveBeenCalledTimes(1)
-        expect(clearErrorsFor).toHaveBeenCalledWith(form)
+        expect(touchedFor(form)).toEqual({})
+        expect(errorsFor(form)).toEqual({})
         expect(subscription.subscription).toEqual({
             touched: true,
             initialValues: true,

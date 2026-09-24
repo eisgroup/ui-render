@@ -2,7 +2,6 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { ConfigContext, initialConfigState, AppContext, initialAppState } from '../../../core/contexts'
-import { storedTouched } from '../../../core/modules/form/utils'
 import { Render } from '../../../core/engine'
 import UIRender, { formsStorage } from '../../../core/engine/rules'
 import { EXAMPLES as examples } from '../../examples/manifest'
@@ -42,7 +41,6 @@ const originalFetch = global.fetch
 
 const clearGlobalRegistries = () => {
     formsStorage.clear()
-    Object.keys(storedTouched).forEach(key => delete storedTouched[key])
 }
 
 const withProviders = ui => (

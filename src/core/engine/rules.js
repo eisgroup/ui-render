@@ -1,6 +1,6 @@
 import React, { Component, Fragment, PureComponent, isValidElement } from 'react'
 import '../modules/form/constants'
-import { storedTouched, withForm } from '../modules/form'
+import { withForm } from '../modules/form'
 import { FIELD } from '../modules/variables'
 import { cn, type } from '../components'
 import Json from '../components/JsonView'
@@ -16,7 +16,7 @@ import { cloneDeep, hasObjectValue, isObject, set, setIn } from '../utils/object
 import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
-import { errorsFor, formsStorage } from '../state/formRegistry'
+import { errorsFor, formsStorage, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
 import {
     replaceDeep,
@@ -699,8 +699,9 @@ function Decorator (Class) {
                         fallbackDataKindPath: this.dataKindPath || ''
                     })
                     this.form.restart()
+                    const rememberedTouched = touchedFor(this.form)
                     this.form.getRegisteredFields().forEach(field => {
-                        delete storedTouched[field]
+                        delete rememberedTouched[field]
                     })
                 }
                 : dataActionWarning

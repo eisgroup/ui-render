@@ -69,7 +69,6 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import { ConfigContext, initialConfigState, AppContext, initialAppState } from '../../../core/contexts'
-import { storedTouched } from '../../../core/modules/form/utils'
 import UIRender, { formsStorage } from '../../../core/engine/rules'
 import { serializeDom } from '../../testing/serializeDom'
 import { snapshotExamples } from '../manifest'
@@ -86,7 +85,6 @@ const apiCalls = {
 
 const clearGlobalRegistries = () => {
     formsStorage.clear()
-    Object.keys(storedTouched).forEach(key => delete storedTouched[key])
 }
 
 /**

@@ -20,7 +20,6 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 import { FIELD } from '../../modules/variables/fields'
-import { storedTouched } from '../../modules/form/utils'
 import UIRender, { formsStorage } from '../rules'
 import { Render } from '..'
 import {
@@ -266,7 +265,6 @@ describe('every error-severity check predicts a real engine failure', () => {
 
     const clearGlobalRegistries = () => {
         formsStorage.clear()
-        Object.keys(storedTouched).forEach(key => delete storedTouched[key])
     }
 
     beforeEach(() => {
