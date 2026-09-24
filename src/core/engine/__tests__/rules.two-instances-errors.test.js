@@ -25,7 +25,6 @@ if (typeof global.fetch === 'undefined') {
 import React from 'react' // eslint-disable-line import/first
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
-import { storedTouched } from '../../modules/form/utils' // eslint-disable-line import/first
 import UIRender from '../rules' // eslint-disable-line import/first
 import { formsStorage } from '../../state/formRegistry' // eslint-disable-line import/first
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
@@ -40,7 +39,6 @@ const withProviders = ui => (
 afterEach(() => {
     cleanup()
     formsStorage.clear()
-    Object.keys(storedTouched).forEach(key => delete storedTouched[key])
 })
 
 const docMeta = (name, label) => ({

@@ -9,7 +9,7 @@ import View from '../../components/View'
 import { Active, debounce, isEqualJSON, toJSON } from '../../utils'
 import { hasObjectValue, objChanges, set } from '../../utils/object'
 import { _ } from '../../utils/translations'
-import { clearErrorsFor, clearStoredTouched, formsStorage, storedTouched } from '../../state/formRegistry'
+import { baselineOf, clearErrorsFor, clearTouchedFor, formsStorage, hasBaseline, setBaseline, touchedFor } from '../../state/formRegistry'
 import arrayMutators from 'final-form-arrays'
 
 /**
@@ -18,11 +18,9 @@ import arrayMutators from 'final-form-arrays'
  * =============================================================================
  */
 
-let formInitialValues = null;
-// Declared in `state/formRegistry` since §9.3 step 2 — the engine used to import it from here while
-// this file imported the engine's registries, which was the cycle. Re-exported so the name resolves
-// where it always did.
-export { storedTouched }
+// `formInitialValues` and `storedTouched` used to be module-level here. Both are per FORM since
+// §9.3 step 3 and live in `state/formRegistry`, which the engine imports too — see the note there
+// for why they had to move together.
 
 /**
  * Get Form's Field Values
@@ -211,7 +209,11 @@ export function asField (InputComponent, {sanitize} = {}) {
 
       }
 
-      const errorText = error && (storedTouched[input.name] || touched || !pristine) && (err || error)
+      // A field reaches its form through the instance the engine gives every field
+      // (`mapper.js` passes `instance` on every `renderField` call). A field rendered without one
+      // is not part of a document and has no remembered touches to consult.
+      const rememberedTouched = instance && instance.form ? touchedFor(instance.form) : {}
+      const errorText = error && (rememberedTouched[input.name] || touched || !pristine) && (err || error)
 
       return (
         <InputComponent
@@ -338,21 +340,23 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
     withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors, processErrors})
 
     const formSubscription = (form) => ({touched, initialValues}) => {
-      if (formInitialValues === null) {
-        formInitialValues = initialValues;
+      // Everything below is about THIS form. It used to compare against one module-level baseline,
+      // so a second document mounting reset the first one's touched fields and errors.
+      if (!hasBaseline(form)) {
+        setBaseline(form, initialValues);
       }
 
-      if (formInitialValues !== initialValues && initialValues && Object.keys(initialValues).length) {
-        formInitialValues = initialValues;
-        for(const field of Object.keys(storedTouched)){
+      if (baselineOf(form) !== initialValues && initialValues && Object.keys(initialValues).length) {
+        setBaseline(form, initialValues);
+        for(const field of Object.keys(touchedFor(form))){
           form.mutators.setFieldTouched(field, false)
         }
-        clearStoredTouched()
+        clearTouchedFor(form)
         clearErrorsFor(form)
       } else {
         for(const field of Object.keys(touched)) {
           if(touched[field]) {
-            storedTouched[field] = true;
+            touchedFor(form)[field] = true;
           }
         }
       }

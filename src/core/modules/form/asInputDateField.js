@@ -2,7 +2,7 @@ import { Field } from 'react-final-form'
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { isRequired } from '../../components/inputs/validationRules'
-import { storedTouched } from './utils'
+import { touchedFor } from '../../state/formRegistry'
 import { Active } from '../../utils'
 
 export function asInputDateField (InputComponent, {sanitize} = {}) {
@@ -67,7 +67,9 @@ export function asInputDateField (InputComponent, {sanitize} = {}) {
 
             const nextValue = this.value
 
-            const errorText = error && (storedTouched[input.name] || touched || !pristine) && (err || error)
+            // Reaches its form through the instance every engine-rendered field is given.
+            const rememberedTouched = instance && instance.form ? touchedFor(instance.form) : {}
+            const errorText = error && (rememberedTouched[input.name] || touched || !pristine) && (err || error)
 
             return (
                 <InputComponent

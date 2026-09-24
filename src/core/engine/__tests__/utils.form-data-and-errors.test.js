@@ -5,8 +5,7 @@ import {
     replaceDeep,
     errorsProcessing,
 } from '../utils'
-import { errorsFor } from '../../state/formRegistry'
-import { storedTouched } from '../../modules/form/utils'
+import { errorsFor, touchedFor } from '../../state/formRegistry'
 
 function makeForm(values) {
     return {
@@ -164,16 +163,6 @@ describe('errorsProcessing', () => {
         }
     }
 
-    // No error reset here any more: since §9.3 step 3 the errors belong to the FORM, each test
-    // builds its own, and the map dies with it. `storedTouched` is still shared and still needs it.
-    beforeEach(() => {
-        for (const k of Object.keys(storedTouched)) delete storedTouched[k]
-    })
-
-    afterEach(() => {
-        for (const k of Object.keys(storedTouched)) delete storedTouched[k]
-    })
-
     it('returns early when meta has relativePath but no relativeIndex', () => {
         const form = makeFormWithErrors({})
         expect(() => errorsProcessing(form, { relativePath: 'x' })).not.toThrow()
@@ -221,7 +210,6 @@ describe('errorsProcessing', () => {
     })
 
     it('records an error for a field remembered as touched', () => {
-        storedTouched.phoneNumber = true
         const form = makeFormWithErrors({
             phoneNumber: {
                 name: 'phoneNumber',
@@ -229,6 +217,9 @@ describe('errorsProcessing', () => {
                 touched: false,
             },
         })
+        // Remembered against THIS form since §9.3 step 3 — final-form reports it as untouched, and
+        // the remembered touch is the whole reason the error is still recorded.
+        touchedFor(form).phoneNumber = true
 
         errorsProcessing(form, {})
 

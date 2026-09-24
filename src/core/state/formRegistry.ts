@@ -11,10 +11,10 @@
  * It sits below `components` and `modules` and above `utils`: both layers may import it, it may
  * import nothing but `utils`, and the ESLint layer rules in `package.json` enforce that.
  *
- * `storedTouched` is a `let` because its owner REPLACES it rather than clearing it key by key. A
- * binding can only be reassigned by the module that declares it, so it has a clearing function
- * here; the alternative — exporting a setter, or re-exporting a `let` through three modules — is
- * how a live binding quietly becomes a stale copy.
+ * Everything here is keyed by the final-form `form` object: the key BOTH sides of the boundary
+ * already hold, so neither the engine nor the form module needs a reference to the other. The maps
+ * are weak, so an unmounted form's entries are collected with it and nothing has to be reset
+ * between tests.
  */
 
 /** What a form registers about itself, keyed by the `initialValues` snapshot it was mounted with. */
@@ -65,12 +65,57 @@ export function clearErrorsFor (form: object): void {
 }
 
 /**
- * Fields the user has touched, kept beyond what final-form reports: a field blurred in a row that
- * has since re-rendered still counts as touched for the purpose of showing its error.
+ * Fields the user has touched, PER FORM, kept beyond what final-form reports: a field blurred in a
+ * row that has since re-rendered still counts as touched for the purpose of showing its error.
+ *
+ * One shared object until §9.3 step 3. Sharing it produced no symptom anyone could observe — four
+ * scenarios were probed and the display condition `touchedFor(form)[name] || touched || !pristine`
+ * is dominated by final-form's own `touched` while the field is mounted — but it did make mounting
+ * a SECOND document empty the first one's registry, because the baseline check below belonged to
+ * whichever form initialised last. That is the case this registry exists for, so the two were
+ * converted together rather than one at a time.
  */
-export let storedTouched: Record<string, boolean> = {}
+const touchedByForm = new WeakMap<object, Record<string, boolean>>()
 
-/** Forget every touched field. Called when a form is re-initialised with different values. */
-export function clearStoredTouched (): void {
-	storedTouched = {}
+/** The touched-field registry belonging to one form, created on first use. */
+export function touchedFor (form: object): Record<string, boolean> {
+	let touched = touchedByForm.get(form)
+	if (!touched) {
+		touched = {}
+		touchedByForm.set(form, touched)
+	}
+	return touched
+}
+
+/**
+ * Forget one form's touched fields. Deletes the keys rather than replacing the object, so a caller
+ * holding the registry from `touchedFor()` sees the clearing instead of a stale copy.
+ */
+export function clearTouchedFor (form: object): void {
+	const touched = touchedFor(form)
+	for (const key of Object.keys(touched)) delete touched[key]
+}
+
+/**
+ * The `initialValues` a form was last seen with — the baseline a later one is compared against to
+ * decide whether the form has been re-initialised and its touched fields and errors should go.
+ *
+ * Was a single module-level `let`, which is what made one document's mount reset another's: the
+ * first form to arrive owned the comparison for every form after it.
+ */
+const baselineByForm = new WeakMap<object, unknown>()
+
+/** Whether this form has a baseline yet. Distinguishes "never seen" from "seen as undefined". */
+export function hasBaseline (form: object): boolean {
+	return baselineByForm.has(form)
+}
+
+/** The `initialValues` this form was last seen with. */
+export function baselineOf (form: object): unknown {
+	return baselineByForm.get(form)
+}
+
+/** Record the `initialValues` this form is now working from. */
+export function setBaseline (form: object, initialValues: unknown): void {
+	baselineByForm.set(form, initialValues)
 }

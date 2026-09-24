@@ -11,14 +11,11 @@ export const NAME = 'FORM'  // Namespace this module
 export const FORM_ASYNC_VALIDATE = 'FORM_ASYNC_VALIDATE'
 export const API_VALIDATE_FAIL_CODE = 422
 
-// Field Type Definitions
-FIELD.TYPE = {
-  INPUT: 'Input', // generic input of different types (i.e. type='text', 'textarea', etc.)
-  SELECT: 'Select', // Semantic UI Dropdown
-  SLIDER: 'SliderLabel', // slider field with label
-  TOGGLE: 'Toggle', // checkbox rendered as toggle button
-  UPLOAD: 'Upload',  // single file upload with drag & drop
-}
+// The five field views this module used to declare live in `variables/fields.js` with the rest of
+// the vocabulary (§9.3 step 3). They were registered here, while `engine/utils.js` compares against
+// `FIELD.TYPE.SELECT` — so that comparison worked only because something on the engine's import
+// chain happened to pull this file in. Removing one unrelated import broke Select reordering, in a
+// suite that never mentions this module. Same defect as the six engine views moved at step 2.
 
 // Validation Definitions
 FIELD.VALIDATE = {

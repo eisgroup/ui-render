@@ -1,7 +1,7 @@
 import '../utils'
 import { Field } from 'react-final-form'
 import { asInputDateField } from '../asInputDateField'
-import { storedTouched } from '../utils'
+import { touchedFor } from '../../../state/formRegistry'
 import { Active } from '../../../utils'
 
 const DateInput = () => null
@@ -16,10 +16,6 @@ const inputApi = (overrides = {}) => ({
 })
 
 describe('asInputDateField edge contracts', () => {
-    afterEach(() => {
-        Object.keys(storedTouched).forEach(key => delete storedTouched[key])
-    })
-
     it('registers react-final-form Field when the shared registry is empty', () => {
         const registered = Active.Field
         try {
@@ -84,10 +80,16 @@ describe('asInputDateField edge contracts', () => {
 
     it('prefers an explicit error after interaction and otherwise exposes the form error', () => {
         const input = inputApi()
-        storedTouched.effectiveDate = true
+        // A remembered touch belongs to a FORM since §9.3 step 3, and a field reaches its form
+        // through the `instance` the engine gives it. A field built without one has no remembered
+        // touches to consult, which is what the second half of this test now exercises.
+        const form = {}
+        const instance = { form, props: {} }
+        touchedFor(form).effectiveDate = true
         const explicit = new DateField({
             name: 'effectiveDate',
             error: 'Configured error',
+            instance,
         })
         const explicitView = explicit.Input({
             input: { ...input, value: 'invalid' },
@@ -95,8 +97,8 @@ describe('asInputDateField edge contracts', () => {
         })
         expect(explicitView.props.error).toBe('Configured error')
 
-        delete storedTouched.effectiveDate
-        const formOwned = new DateField({ name: 'effectiveDate' })
+        delete touchedFor(form).effectiveDate
+        const formOwned = new DateField({ name: 'effectiveDate', instance })
         const formView = formOwned.Input({
             input: { ...input, value: 'invalid' },
             meta: { error: 'Form error', pristine: false, touched: false },

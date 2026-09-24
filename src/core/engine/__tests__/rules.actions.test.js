@@ -9,7 +9,6 @@ import React from 'react' // eslint-disable-line import/first
 import { fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
 // Load the form module before rules.js follows the mapper/renders circular dependency.
-import { storedTouched } from '../../modules/form/utils' // eslint-disable-line import/first
 import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
 import { AppContext } from '../../contexts' // eslint-disable-line import/first
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext' // eslint-disable-line import/first
@@ -63,7 +62,6 @@ describe('UIRender action orchestration', () => {
 
     beforeEach(() => {
         formsStorage.clear()
-        Object.keys(storedTouched).forEach(key => delete storedTouched[key])
         popup.setPopupState.mockClear()
         popup.popup.setPopupState.mockClear()
         originalCreateObjectURL = URL.createObjectURL
@@ -76,7 +74,6 @@ describe('UIRender action orchestration', () => {
         URL.createObjectURL = originalCreateObjectURL
         URL.revokeObjectURL = originalRevokeObjectURL
         formsStorage.clear()
-        Object.keys(storedTouched).forEach(key => delete storedTouched[key])
     })
 
     it('downloads the requested API response using the configured file name', async () => {

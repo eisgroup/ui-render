@@ -2,7 +2,6 @@ import React from 'react'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../../core/contexts'
-import { storedTouched } from '../../../core/modules/form/utils'
 import { cloneDeep } from '../../../core/utils'
 import { Render } from '../../../core/engine'
 import UIRender, { formsStorage } from '../../../core/engine/rules'
@@ -23,7 +22,6 @@ const withProviders = ui => (
 
 const clearGlobalRegistries = () => {
     formsStorage.clear()
-    Object.keys(storedTouched).forEach(key => delete storedTouched[key])
 }
 
 describe('nested dataKind demo interaction contract', () => {
