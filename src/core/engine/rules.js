@@ -16,6 +16,7 @@ import { cloneDeep, hasObjectValue, isObject, set, setIn } from '../utils/object
 import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
+import { resolvePopupScope } from './popupScope'
 import { errorsFor, formsStorage, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
 import {
@@ -809,65 +810,13 @@ function Decorator (Class) {
                 
                 // If ID contains template variables or not found, try to find template
                 if (id && (id.includes('{') || this.popupTemplates)) {
-                    // Try to get index and path from multiple sources
-                    let relativeIndex = null
-                    let relativeData = null
-                    let relativePath = null
-                    
-                    // First, try to extract index from already interpolated ID (e.g., "InforceRateOverrideReason.0" -> 0)
-                    if (/\.\d+$/.test(id)) {
-                        const idMatch = id.match(/\.(\d+)$/)
-                        if (idMatch) {
-                            relativeIndex = parseInt(idMatch[1], 10)
-                        }
-                    }
-                    
-                    // Get form from instance (this.form) or props
+                    // The whole four-source chain lives in `popupScope.js`, testable on its own.
                     const currentForm = this.form || this.props.form || form
-                    
-                    // 1. Try from props (only if not already set from options)
-                    if (relativeIndex == null && this.props.relativeIndex != null) {
-                        relativeIndex = this.props.relativeIndex
-                        relativeData = this.props._data
-                        if (relativePath == null) {
-                            relativePath = this.props.relativePath
-                        }
-                    }
-                    // 2. Try from form context (only if relativeIndex not already set)
-                    else if (relativeIndex == null && currentForm && typeof currentForm.getState === 'function' && this.props.index != null) {
-                        relativeIndex = this.props.index
-                        relativeData = currentForm.getState().values
-                        relativePath = this.props.relativePath
-                    }
-                    // 3. Try to extract from form path (e.g., "name[0]" -> 0 and "name")
-                    // Only if relativeIndex not already set
-                    else if (relativeIndex == null && currentForm && typeof currentForm.getState === 'function' && this.props.relativePath) {
-                        const pathMatch = this.props.relativePath.match(/\[(\d+)\]/)
-                        if (pathMatch) {
-                            relativeIndex = parseInt(pathMatch[1], 10)
-                            // Extract base path (e.g. `orders.lines` from `orders.lines[0]`)
-                            relativePath = this.props.relativePath.replace(/\[\d+\]$/, '')
-                        } else {
-                            relativePath = this.props.relativePath
-                        }
-                        relativeData = currentForm.getState().values
-                    }
-                    // 4. Try to extract index and path from form field names
-                    // Only if relativeIndex not already set
-                    else if (relativeIndex == null && currentForm && typeof currentForm.getState === 'function') {
-                        const formState = currentForm.getState()
-                        const registeredFields = Object.keys(formState.values || {})
-                        // Look for field names that contain array indices
-                        for (const fieldName of registeredFields) {
-                            const match = fieldName.match(/^(.+)\[(\d+)\]/)
-                            if (match) {
-                                relativePath = match[1]
-                                relativeIndex = parseInt(match[2], 10)
-                                break
-                            }
-                        }
-                        relativeData = formState.values
-                    }
+                    const { relativeIndex, relativeData, relativePath } = resolvePopupScope({
+                        id,
+                        form: currentForm,
+                        props: this.props,
+                    })
                     
                     // Now create interpolationVars with the determined values
                     const interpolationVars = {
