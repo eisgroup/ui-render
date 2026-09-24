@@ -403,7 +403,6 @@ UIRender.contextType = AppContext
 const UIRenderWithUISetup = Decorator(UIRender)
 export default UIRenderWithUISetup
 
-Active.UIRender = UIRender
 
 /**
  * Transform *_meta.json API response into custom rules applied by the team
@@ -616,15 +615,31 @@ export function withDataKind (Class) {
  */
 
 function Decorator (Class) {
+    /**
+     * THE LIFECYCLE LAYER, AS ITS OWN CLASS (§9.3 step 5).
+     *
+     * Everything below used to be written onto `UIRenderLifecycle.prototype` — the caller's class, mutated in
+     * place at module load. That is what made the engine invisible to anything reasoning about the
+     * component tree, and it meant the exported `UIRender` was a different object before and after
+     * this module was imported. The layer now lives on a subclass of its own, so the class handed
+     * in is left exactly as it was written and the captures below read genuine parent methods.
+     *
+     * Not yet class syntax: the bodies are installed on the prototype as they were, because moving
+     * seven hundred lines into member position is a separate change with its own risks. What this
+     * buys is that the mutation no longer escapes to someone else's class.
+     */
+    class UIRenderLifecycle extends Class {}
+
     // const popup = useContext(PopupContext)
+    // These are the PARENT's methods now, which is what "the original" always meant.
     const componentWillUnmount = Class.prototype.componentWillUnmount
     const UNSAFE_componentWillMount = Class.prototype.UNSAFE_componentWillMount
     const UNSAFE_componentWillUpdate = Class.prototype.UNSAFE_componentWillUpdate
     const UNSAFE_componentWillReceiveProps = Class.prototype.UNSAFE_componentWillReceiveProps
-    withDataKind(Class)
+    withDataKind(UIRenderLifecycle)
 
     // @Note: the state shape is used for reference only, it is not instantiated
-    Class.prototype.state = {
+    UIRenderLifecycle.prototype.state = {
         data: {
             json: undefined, // data object
             name: undefined, // file name
@@ -636,7 +651,7 @@ function Decorator (Class) {
     }
 
     // Define instance getter
-    Object.defineProperty(Class.prototype, 'config', {
+    Object.defineProperty(UIRenderLifecycle.prototype, 'config', {
         get () {
             const data = this.data
             const { form, parent } = this.props
@@ -1142,7 +1157,7 @@ function Decorator (Class) {
     })
 
     // Define instance getter
-    Object.defineProperty(Class.prototype, 'data', {
+    Object.defineProperty(UIRenderLifecycle.prototype, 'data', {
         get () {
             return get(this.state, 'data.json')
         },
@@ -1152,7 +1167,7 @@ function Decorator (Class) {
     })
 
     // Define instance getter
-    Object.defineProperty(Class.prototype, 'meta', {
+    Object.defineProperty(UIRenderLifecycle.prototype, 'meta', {
         get () {
             if (this._meta != null) return this._meta
             const transformedMeta = transformConfig(cloneDeep(get(this.state, 'meta.json')))
@@ -1167,14 +1182,14 @@ function Decorator (Class) {
     })
 
     // Define instance getter
-    Object.defineProperty(Class.prototype, 'hasData', {
+    Object.defineProperty(UIRenderLifecycle.prototype, 'hasData', {
         get () {
             return this.data != null
         },
     })
 
     // Define instance getter
-    Object.defineProperty(Class.prototype, 'hasMeta', {
+    Object.defineProperty(UIRenderLifecycle.prototype, 'hasMeta', {
         get () {
             return !isEmpty(this.meta)
         },
@@ -1185,7 +1200,7 @@ function Decorator (Class) {
     // followed by optional arguments.
     // Positional arguments was chosen instead of keyword arguments because
     // it provides more flexibility and separation of concerns between different configs.
-    Class.prototype.setStates = function (value, ...rest) {
+    UIRenderLifecycle.prototype.setStates = function (value, ...rest) {
         /**
          * The state path is the LAST STRING argument, not the second positional one.
          *
@@ -1226,12 +1241,12 @@ function Decorator (Class) {
     }
 
     // Define instance method
-    Class.prototype.resetForm = function () {
+    UIRenderLifecycle.prototype.resetForm = function () {
         this.form.reset()
     }
 
     // Define instance method
-    Class.prototype.popupAlert = function (title, content) {
+    UIRenderLifecycle.prototype.popupAlert = function (title, content) {
         if (isValidElement(content)) {
             this.context.setPopupState({
                 isOpen: true,
@@ -1248,7 +1263,7 @@ function Decorator (Class) {
 
     }
 
-    Class.prototype.componentWillUnmount = function (nextProps, nextState) {
+    UIRenderLifecycle.prototype.componentWillUnmount = function (nextProps, nextState) {
         const { parent, form, index } = this.props
         if (parent && index != null) parent.unregisterDataKind(this, form.kind, index)
         // A change typed just before unmount must not submit a form the user has left.
@@ -1256,7 +1271,7 @@ function Decorator (Class) {
         if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
     }
 
-    Class.prototype.UNSAFE_componentWillMount = function (nextProps, nextState) {
+    UIRenderLifecycle.prototype.UNSAFE_componentWillMount = function (nextProps, nextState) {
         // Wrap form.submit with HOC to extract nested form values before submission
         this.submit = (...args) => {
             const { dataKind } = this.formValues
@@ -1276,12 +1291,12 @@ function Decorator (Class) {
         }
     }
 
-    Class.prototype.UNSAFE_componentWillUpdate = function (nextProps, nextState) {
+    UIRenderLifecycle.prototype.UNSAFE_componentWillUpdate = function (nextProps, nextState) {
         if (this.state !== nextState) this.meta = null // update changes by UI interactions (i.e. Dropdown onChange)
         if (UNSAFE_componentWillUpdate) UNSAFE_componentWillUpdate.apply(this, arguments)
     }
 
-    Class.prototype.UNSAFE_componentWillReceiveProps = function (next, _) {
+    UIRenderLifecycle.prototype.UNSAFE_componentWillReceiveProps = function (next, _) {
         const { data, meta } = this.props
         // external API changes
         if (next.data != null && next.data !== data) {
@@ -1297,7 +1312,7 @@ function Decorator (Class) {
     }
 
     const componentDidUpdate = Class.prototype.componentDidUpdate
-    Class.prototype.componentDidUpdate = function (prevProps, prevState) {
+    UIRenderLifecycle.prototype.componentDidUpdate = function (prevProps, prevState) {
         const { parent, form, index } = this.props
         if (parent && form && index != null && prevProps.index !== index) {
             if (prevProps.index != null) {
@@ -1308,6 +1323,10 @@ function Decorator (Class) {
         if (componentDidUpdate) componentDidUpdate.apply(this, arguments)
     }
 
+    // Nested documents render this class directly — `engine/Data.js` reads it from `Active` to
+    // avoid a circular import — so it has to be the layer, not the bare class the caller wrote.
+    Active.UIRender = UIRenderLifecycle
+
     return withForm({
         subscription: {
             pristine: true,
@@ -1317,7 +1336,7 @@ function Decorator (Class) {
         },
         // Handed in rather than imported by the form module: see the note on `withForm`.
         processErrors: errorsProcessing,
-    })(Class)
+    })(UIRenderLifecycle)
 }
 
 const dataActionWarning = (e) => console.warn('Missing parent UI Render instance to modify form values!', e)
