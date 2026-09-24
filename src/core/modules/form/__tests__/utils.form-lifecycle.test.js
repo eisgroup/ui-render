@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { Form } from 'react-final-form'
 import { Active } from '../../../utils'
-import { clearErrorsMap, formsStorage } from '../../../state/formRegistry'
+import { clearErrorsFor, formsStorage } from '../../../state/formRegistry'
 import {
     asField,
     fieldValues,
@@ -12,18 +12,26 @@ import {
     withFormSetup,
 } from '../utils'
 
-// The registries moved out of the engine at §9.3 step 2, so this mocks where they live now. The
-// two `let` bindings are exposed through getters on purpose: their owners REPLACE them rather than
-// emptying them, and a plain property would hand this file the object from before the replacement.
+// The registries moved out of the engine at §9.3 step 2, so this mocks where they live now.
+// `storedTouched` is exposed through a getter on purpose: its owner REPLACES it rather than
+// emptying it, and a plain property would hand this file the object from before the replacement.
+// The errors are per FORM since step 3, so the mock keys them the same way the real module does.
 jest.mock('../../../state/formRegistry', () => {
     let storedTouched = {}
-    let errorsMap = {}
+    const errorsByForm = new WeakMap()
+    const errorsFor = form => {
+        if (!errorsByForm.has(form)) errorsByForm.set(form, {})
+        return errorsByForm.get(form)
+    }
     return {
         formsStorage: new Map(),
         get storedTouched () { return storedTouched },
         clearStoredTouched: () => { storedTouched = {} },
-        get errorsMap () { return errorsMap },
-        clearErrorsMap: jest.fn(() => { errorsMap = {} }),
+        errorsFor,
+        clearErrorsFor: jest.fn(form => {
+            const errors = errorsFor(form)
+            for (const key of Object.keys(errors)) delete errors[key]
+        }),
     }
 })
 
@@ -118,7 +126,7 @@ describe('withForm subscription and lifecycle contracts', () => {
 
     beforeEach(() => {
         formsStorage.clear()
-        clearErrorsMap.mockClear()
+        clearErrorsFor.mockClear()
         processErrorsCalls.length = 0
         Object.keys(storedTouched).forEach(key => delete storedTouched[key])
     })
@@ -142,7 +150,9 @@ describe('withForm subscription and lifecycle contracts', () => {
             ['email', false],
         ])
         expect(storedTouched).toEqual({})
-        expect(clearErrorsMap).toHaveBeenCalledTimes(1)
+        // Cleared for THIS form, not for everybody: that is the whole of the step 3 change here.
+        expect(clearErrorsFor).toHaveBeenCalledTimes(1)
+        expect(clearErrorsFor).toHaveBeenCalledWith(form)
         expect(subscription.subscription).toEqual({
             touched: true,
             initialValues: true,

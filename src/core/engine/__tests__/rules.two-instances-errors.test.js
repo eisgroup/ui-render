@@ -10,10 +10,12 @@
  *   field delivered its error to the SECOND document's callback, and the first document's own
  *   callback was never called at all. Each instance now keeps its own.
  *
- *   STILL OPEN, pinned below. `errorsMap` is shared by every instance, so once the second document
- *   re-renders for any reason, its `componentDidUpdate` finds the first document's errors in that
- *   map and reports them as its own. Splitting the map is the next slice of step 3; until then the
- *   assertion at the bottom records what a host actually receives.
+ *   ALSO FIXED, and this file is where it was pinned first. `errorsMap` used to be shared by every
+ *   instance, so once the second document re-rendered for any reason its `componentDidUpdate` found
+ *   the first document's errors in that map and reported them as its own. The map is now keyed by
+ *   the final-form `form` object, and the assertion at the bottom — which USED to record the wrong
+ *   behaviour deliberately — now records the right one. That flip is the whole point of pinning a
+ *   defect rather than describing it in a comment.
  */
 // eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
@@ -25,7 +27,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import '@testing-library/jest-dom' // eslint-disable-line import/first
 import { storedTouched } from '../../modules/form/utils' // eslint-disable-line import/first
 import UIRender from '../rules' // eslint-disable-line import/first
-import { clearErrorsMap, formsStorage } from '../../state/formRegistry' // eslint-disable-line import/first
+import { formsStorage } from '../../state/formRegistry' // eslint-disable-line import/first
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
 
 const appContext = { ...initialAppState, setPopupState: () => {} }
@@ -38,7 +40,6 @@ const withProviders = ui => (
 afterEach(() => {
     cleanup()
     formsStorage.clear()
-    clearErrorsMap()
     Object.keys(storedTouched).forEach(key => delete storedTouched[key])
 })
 
@@ -85,9 +86,10 @@ describe('each document reports its validation errors to its own callback', () =
         expect(calls).toEqual([['B', ['beta.name']]])
     })
 
-    it('PINNED DEFECT: the other document repeats those errors once it re-renders', async () => {
-        // Not what anyone wants — it is what the shared `errorsMap` produces, and it is recorded so
-        // the slice that splits the map has to change this expectation to land.
+    it('the other document stays silent about them, even after it re-renders', async () => {
+        // The shared map used to make this `[['B', ['alpha.name']]]`: the second document repeating
+        // the first one's error as its own. Re-rendering is what exposed it, because that is what
+        // runs `componentDidUpdate` against the shared map.
         const calls = []
         const view = render(twoDocuments(calls))
 
@@ -95,8 +97,8 @@ describe('each document reports its validation errors to its own callback', () =
         calls.length = 0
 
         view.rerender(twoDocuments(calls, { embedded: true }))
-        await waitFor(() => expect(calls.length).toBeGreaterThan(0))
+        await new Promise(resolve => setTimeout(resolve, 0))
 
-        expect(calls).toEqual([['B', ['alpha.name']]])
+        expect(calls).toEqual([])
     })
 })

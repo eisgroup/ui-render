@@ -10,7 +10,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react' // e
 import '@testing-library/jest-dom' // eslint-disable-line import/first
 // Load the form module before rules.js follows the mapper/renders circular dependency.
 import { storedTouched } from '../../modules/form/utils' // eslint-disable-line import/first
-import UIRender, { clearErrorsMap, formsStorage } from '../rules' // eslint-disable-line import/first
+import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
 import { AppContext } from '../../contexts' // eslint-disable-line import/first
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext' // eslint-disable-line import/first
 
@@ -63,7 +63,6 @@ describe('UIRender action orchestration', () => {
 
     beforeEach(() => {
         formsStorage.clear()
-        clearErrorsMap()
         Object.keys(storedTouched).forEach(key => delete storedTouched[key])
         popup.setPopupState.mockClear()
         popup.popup.setPopupState.mockClear()
@@ -77,7 +76,6 @@ describe('UIRender action orchestration', () => {
         URL.createObjectURL = originalCreateObjectURL
         URL.revokeObjectURL = originalRevokeObjectURL
         formsStorage.clear()
-        clearErrorsMap()
         Object.keys(storedTouched).forEach(key => delete storedTouched[key])
     })
 

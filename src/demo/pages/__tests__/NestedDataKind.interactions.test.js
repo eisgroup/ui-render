@@ -5,7 +5,7 @@ import { AppContext, ConfigContext, initialAppState, initialConfigState } from '
 import { storedTouched } from '../../../core/modules/form/utils'
 import { cloneDeep } from '../../../core/utils'
 import { Render } from '../../../core/engine'
-import UIRender, { clearErrorsMap, formsStorage } from '../../../core/engine/rules'
+import UIRender, { formsStorage } from '../../../core/engine/rules'
 import data from '../../examples/nested-datakind_data.json'
 import meta from '../../examples/nested-datakind_meta.json'
 
@@ -23,7 +23,6 @@ const withProviders = ui => (
 
 const clearGlobalRegistries = () => {
     formsStorage.clear()
-    clearErrorsMap()
     Object.keys(storedTouched).forEach(key => delete storedTouched[key])
 }
 
