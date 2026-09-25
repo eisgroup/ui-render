@@ -133,6 +133,23 @@ describe('a failure', () => {
     })
 })
 
+describe('the file field', () => {
+    it('is excluded by path, so a dotted name leaves the rest of its object alone', async () => {
+        // Until this was fixed the exclusion was `delete data[path]`, which removed a top-level key
+        // called `attachment.file` that does not exist, and the field went to the host as `[{}]`
+        // (see the end-to-end case in `rules.actions.test.js`).
+        const { uploadFile, calls } = hostAnswering({})
+
+        await upload([[csv('a.csv')], 'attachment.file', dropzone().handle], {
+            uploadFile,
+            readFormsData: () => ({ recordNumber: 'R-1', attachment: { file: 'stale', note: 'kept' } }),
+            onUploaded: () => {},
+        })
+
+        expect(calls[0].payload).toEqual({ recordNumber: 'R-1', attachment: { note: 'kept' } })
+    })
+})
+
 describe('an empty answer', () => {
     it.each([['undefined', undefined], ['null', null], ['an empty string', ''], ['zero', 0]])(
         'of %s is ignored: the data is kept, and the input still cleared',
@@ -159,21 +176,6 @@ describe('an empty answer', () => {
 })
 
 describe('pinned, not fixed', () => {
-    it('PINNED DEFECT: a dotted field name is not excluded from the payload', async () => {
-        // `delete data[path]` removes a top-level key called `attachment.file`, which does not
-        // exist. In a rendered form the field's value is a file list, so the host receives `[{}]`
-        // (see the end-to-end case in `rules.actions.test.js`).
-        const { uploadFile, calls } = hostAnswering({})
-
-        await upload([[csv('a.csv')], 'attachment.file', dropzone().handle], {
-            uploadFile,
-            readFormsData: () => ({ attachment: { file: 'stale', note: 'kept' } }),
-            onUploaded: () => {},
-        })
-
-        expect(calls[0].payload).toEqual({ attachment: { file: 'stale', note: 'kept' } })
-    })
-
     it('PINNED: only the first of several files is sent', async () => {
         const { uploadFile, calls } = hostAnswering({})
         const first = csv('first.csv')
@@ -187,5 +189,4 @@ describe('pinned, not fixed', () => {
         expect(calls).toHaveLength(1)
         expect(calls[0].file).toBe(first)
     })
-
 })

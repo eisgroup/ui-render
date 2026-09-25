@@ -245,10 +245,10 @@ describe('UIRender action orchestration', () => {
         await waitFor(() => expect(screen.getByLabelText('Status')).toHaveValue('After upload'))
     })
 
-    it('PINNED DEFECT: sends a nested file field in the payload, as a list of empty objects', async () => {
-        // `upload.js` excludes the file field with `delete data[path]`, which only reaches a
-        // top-level key. For `attachment.file` the field's value — the picked file list — stays,
-        // and `JSON.stringify` writes each File as `{}`.
+    it('leaves a nested file field out of the payload', async () => {
+        // Until this was fixed `upload.js` excluded the field with `delete data[path]`, which only
+        // reaches a top-level key: for `attachment.file` the picked file list stayed in, and
+        // `JSON.stringify` wrote each File as `{}`.
         const uploadFile = jest.fn(() => new Promise(() => {}))
         const data = { recordNumber: 'R-1', attachment: { file: 'stale', note: 'kept' } }
 
@@ -275,7 +275,7 @@ describe('UIRender action orchestration', () => {
         await waitFor(() => expect(uploadFile).toHaveBeenCalledTimes(1))
         expect(JSON.parse(uploadFile.mock.calls[0][0])).toEqual({
             recordNumber: 'R-1',
-            attachment: { file: [{}], note: 'kept' },
+            attachment: { note: 'kept' },
         })
     })
 

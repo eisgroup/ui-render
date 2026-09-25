@@ -1,3 +1,4 @@
+import { unset } from '../utils/object'
 import { normalizeIncomingData } from './utils'
 
 /**
@@ -14,12 +15,12 @@ import { normalizeIncomingData } from './utils'
  * `undefined` or `null` the engine had no data and rendered an empty container, the upload control
  * included, so the user could not try again; with `''` or `0` every form value was wiped.
  *
- * Two things this does are pinned by `upload.test.js` and `rules.actions.test.js` rather than
- * changed, because changing either changes what the host receives:
- *   - the file field is excluded by `delete data[path]`, a TOP-LEVEL key, so a dotted name such as
- *     `attachment.file` stays in the payload — as the field's value, a file list, which
- *     `JSON.stringify` writes as `[{}]`
- *   - only the first of several files is sent, even when the field allows `multiple`
+ * THE FILE FIELD IS EXCLUDED BY PATH, so a dotted name such as `attachment.file` is taken out of
+ * the nested object. Until that was fixed it was `delete data[path]`, a TOP-LEVEL key, and the field
+ * stayed in the payload as its value — the picked file list, which `JSON.stringify` writes as `[{}]`.
+ *
+ * Only the first of several files is sent, even when the field allows `multiple`; pinned by
+ * `upload.test.js` rather than changed, because the host's `uploadFile` takes one file.
  *
  * A failure is logged and nothing else: no popup, and the data is left as it was. Clearing the file
  * input on success is kept although the in-house `Dropzone` already clears it after every pick,
@@ -36,7 +37,7 @@ export async function upload ([files, path, dropzone], { uploadFile, readFormsDa
     if (!file || typeof uploadFile !== 'function') return
 
     const data = readFormsData()
-    delete data[path]
+    unset(data, path)
     try {
         const response = await uploadFile(JSON.stringify(data), file)
         dropzone.fileInputEl.value = null
