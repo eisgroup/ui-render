@@ -16,7 +16,7 @@ import { cloneDeep, hasObjectValue, isObject, set, setIn } from '../utils/object
 import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
-import { download } from './download'
+import { describeFailure, download } from './download'
 import { upload } from './upload'
 import { applyPeriods } from './applyPeriods'
 import { parsePopupArgs } from './popupArgs'
@@ -820,7 +820,7 @@ function Decorator (Class) {
             // call is read at click time, as it always was.
             FIELD.FUNC[FIELD.ACTION.DOWNLOAD] = (...args) => download(args, {
                 downloadFile: this.getAPICalls().downloadFile,
-                onFailure: err => this.popupAlert(err, _.DOWNLOAD_FAILED_),
+                onFailure: err => this.popupAlert(describeFailure(err), _.DOWNLOAD_FAILED_),
             })
             // Send the forms' values and a file through the host's `uploadFile`, and make its answer
             // the data (see `upload.js`). The remount key and the form restart wait for the new data

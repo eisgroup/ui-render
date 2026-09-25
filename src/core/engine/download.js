@@ -39,3 +39,24 @@ export function download (args, { downloadFile, onFailure }) {
         .then(saveBlob(typeof saveAs === 'string' && saveAs ? saveAs : fileName))
         .catch(onFailure)
 }
+
+/**
+ * What the "Download Failed" popup puts in its TITLE for whatever the download rejected with.
+ *
+ * The popup renders its title as it is, and the rejection used to go there unchanged: an `Error` —
+ * what `fetch` rejects with when the network fails — or a `Response` is an object, which React
+ * cannot render, so the whole UI was replaced by "Objects are not valid as a React child". Measured
+ * in the running demo, for both. The existing test never saw it because it mocks the popup state.
+ *
+ * @param {*} error - what the download rejected with
+ * @returns {String} text a title can show; empty when there is nothing to say
+ */
+export function describeFailure (error) {
+    if (error == null) return ''
+    if (typeof error === 'string') return error
+    if (error instanceof Error) return error.message || error.name
+    if (typeof Response !== 'undefined' && error instanceof Response) {
+        return `${error.status} ${error.statusText}`.trim()
+    }
+    return String(error)
+}
