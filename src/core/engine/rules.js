@@ -20,6 +20,7 @@ import { download } from './download'
 import { upload } from './upload'
 import { applyPeriods } from './applyPeriods'
 import { parsePopupArgs } from './popupArgs'
+import { findPopupTemplate } from './popupTemplate'
 import { resolvePopupScope } from './popupScope'
 import { errorsFor, formsStorage, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
@@ -909,38 +910,12 @@ function Decorator (Class) {
                         value: relativeData
                     }
                     
-                    // Try to find popup by template ID
-                    // If ID already interpolated (e.g., "InforceRateOverrideReason.0"), 
-                    // try to find template by pattern (e.g., "InforceRateOverrideReason.{index}")
-                    let popupTemplate = null
-                    let templateId = id
-                    
-                    if (this.popupTemplates) {
-                        // First try exact match
-                        popupTemplate = this.popupTemplates[id]
-                        
-                        // If not found and ID looks interpolated (contains number at the end), try to find template
-                        if (!popupTemplate && /\.\d+$/.test(id)) {
-                            // Extract base name and try to find template with {index}
-                            const baseName = id.replace(/\.\d+$/, '')
-                            templateId = `${baseName}.${this.props.index}`
-                            popupTemplate = this.popupTemplates[templateId]
-                            
-                            // If still not found, try to find any template that matches the pattern
-                            if (!popupTemplate) {
-                                const templateKeys = Object.keys(this.popupTemplates)
-                                const matchingTemplate = templateKeys.find(key => {
-                                    const templatePattern = key.replace(/\{index\}/g, '\\d+')
-                                    const regex = new RegExp(`^${templatePattern}$`)
-                                    return regex.test(id)
-                                })
-                                if (matchingTemplate) {
-                                    templateId = matchingTemplate
-                                    popupTemplate = this.popupTemplates[matchingTemplate]
-                                }
-                            }
-                        }
-                    }
+                    // Which registered template the id means, and the key it was found by —
+                    // `popupTemplate.js`, testable on its own.
+                    const found = findPopupTemplate(this.popupTemplates, id, this.props.index)
+                    const popupTemplate = found && found.popupTemplate
+                    const templateId = found ? found.templateId : id
+
                     if (popupTemplate) {
                         // Interpolate ID if needed (if template ID contains {index})
                         // If ID already interpolated, use it as-is
