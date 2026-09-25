@@ -1,4 +1,4 @@
-import React, { Component, Fragment, PureComponent, isValidElement } from 'react'
+import React, { Component, Fragment, isValidElement } from 'react'
 import '../modules/form/constants'
 import { withForm } from '../modules/form'
 import { FIELD } from '../modules/variables'
@@ -39,6 +39,7 @@ import { double5, integer, phone, uppercase } from '../components/inputs/normali
 import { AppContext } from '../contexts'
 import { ConfigOverride } from '../providers'
 import Popup from './components/Popup'
+import { createPopupContent } from './components/PopupContent'
 import { dataKindPathFor, getDataKindPathFromRelative, pushDataKindRow, removeDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow } from './dataKindPush'
 
 export { getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow }
@@ -948,62 +949,9 @@ function Decorator (Class) {
                             return
                         }
                         
-                        // Create PopupContent component - use the same pattern as mapper.js
-                        // Pass context through props to ensure data is available
-                        class PopupContent extends PureComponent {
-                            render () {
-                                // `relativeData` is deliberately not read: every mapped item below hardcodes
-                                // `relativeData: false` so Render never re-extracts by name.
-                                const { items, data, _data, form, instance, relativeIndex, relativePath, currencyCode } = this.props
-                                
-                                // Map items with current data context, similar to how Render.js does it
-                                // IMPORTANT: Always pass relativePath and relativeIndex to ensure correct field IDs
-                                // Set relativeData to false to prevent Render.js from automatically extracting data by name
-                                // This ensures _data remains the single row element, not the entire array
-                                const mappedItems = items.map((item) => {
-                                    const mappedItem = {
-                                        ...item,
-                                        data,
-                                        _data,
-                                        form,
-                                        instance,
-                                        relativeIndex,
-                                        relativePath,
-                                        relativeData: false, // Prevent automatic data extraction by name in Render.js
-                                        currencyCode
-                                    }
-                                    // Ensure relativePath and relativeIndex are always set (not just for TableCells)
-                                    // These are critical for generating correct field IDs in forms
-                                    // Also set them in meta.relativePath and meta.relativeIndex so they are passed through metaToProps
-                                    if (relativePath != null) {
-                                        mappedItem.relativePath = relativePath
-                                        // Set in meta object so metaToProps can access it
-                                        if (!mappedItem.meta) mappedItem.meta = {}
-                                        mappedItem.meta.relativePath = relativePath
-                                    }
-                                    if (relativeIndex != null) {
-                                        mappedItem.relativeIndex = relativeIndex
-                                        // Set in meta object so metaToProps can access it
-                                        if (!mappedItem.meta) mappedItem.meta = {}
-                                        mappedItem.meta.relativeIndex = relativeIndex
-                                    }
-                                    return mappedItem
-                                })
-                                // Pass relativePath and relativeIndex to Render component itself
-                                // This ensures they are available in Render.props and passed down correctly
-                                // Set relativeData to false to prevent Render.js from automatically extracting data by name
-                                // This ensures _data remains the single row element throughout the render tree
-                                // Add key prop to avoid React warning about missing keys
-                                return mappedItems.map((item, idx) => Render({
-                                    ...item,
-                                    relativePath,
-                                    relativeIndex,
-                                    relativeData: false, // Prevent automatic data extraction by name in Render.js
-                                    key: item.id || item.name || `popup-item-${idx}`
-                                }))
-                            }
-                        }
-                        
+                        // A FRESH component type per template popup, on purpose — see `PopupContent.js`.
+                        const PopupContent = createPopupContent()
+
                         const content = <PopupContent 
                             items={items}
                             data={currentData}
