@@ -109,10 +109,12 @@ describe('UIRender additional action and error contracts', () => {
         })
 
         await waitFor(() => expect(consoleError).toHaveBeenCalledWith(failure))
-        expect(uploadFile).toHaveBeenCalledWith(
-            JSON.stringify({ status: 'Before upload' }),
-            file
-        )
+        const [serialized, sentFile, sentFiles] = uploadFile.mock.calls[0]
+        expect(serialized).toBe(JSON.stringify({ status: 'Before upload' }))
+        // By identity: `toHaveBeenCalledWith` compares Files structurally, and any two are equal.
+        expect(sentFile).toBe(file)
+        expect(sentFiles).toEqual([file])
+        expect(sentFiles[0]).toBe(file)
         expect(screen.getByText('Before upload')).toBeInTheDocument()
         expect(popup.setPopupState).not.toHaveBeenCalled()
     })

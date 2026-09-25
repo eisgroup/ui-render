@@ -150,6 +150,28 @@ describe('the file field', () => {
     })
 })
 
+describe('several files', () => {
+    it('reach the host as a third argument, the first still second, in one call', async () => {
+        // Until this was added only the first file reached the host, even for a `multiple` field.
+        const files = [csv('first.csv'), csv('second.csv')]
+        const received = []
+        const uploadFile = (serialized, file, all) => {
+            received.push({ file, all })
+            return Promise.resolve({})
+        }
+
+        await upload([files, 'file', dropzone().handle], {
+            uploadFile,
+            readFormsData: () => ({}),
+            onUploaded: () => {},
+        })
+
+        expect(received).toHaveLength(1)
+        expect(received[0].file).toBe(files[0])
+        expect(received[0].all).toBe(files)
+    })
+})
+
 describe('an empty answer', () => {
     it.each([['undefined', undefined], ['null', null], ['an empty string', ''], ['zero', 0]])(
         'of %s is ignored: the data is kept, and the input still cleared',
@@ -175,18 +197,3 @@ describe('an empty answer', () => {
     )
 })
 
-describe('pinned, not fixed', () => {
-    it('PINNED: only the first of several files is sent', async () => {
-        const { uploadFile, calls } = hostAnswering({})
-        const first = csv('first.csv')
-
-        await upload([[first, csv('second.csv')], 'file', dropzone().handle], {
-            uploadFile,
-            readFormsData: () => ({}),
-            onUploaded: () => {},
-        })
-
-        expect(calls).toHaveLength(1)
-        expect(calls[0].file).toBe(first)
-    })
-})
