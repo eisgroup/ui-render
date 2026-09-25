@@ -21,7 +21,7 @@ import { upload } from './upload'
 import { applyPeriods } from './applyPeriods'
 import { parsePopupArgs } from './popupArgs'
 import { findPopupTemplate } from './popupTemplate'
-import { resolvePopupScope } from './popupScope'
+import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
 import { errorsFor, formsStorage, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
 import {
@@ -881,11 +881,6 @@ function Decorator (Class) {
                 if (!parsed) return
                 const { id, options } = parsed
                 
-                // Extract relativePath and relativeIndex from options if provided
-                // These come from renderItem context and ensure popup fields match table row fields
-                const contextRelativePath = options.relativePath
-                const contextRelativeIndex = options.relativeIndex
-                
                 // First, try to find popup by exact ID (may be already interpolated)
                 let popup = this.popupById && this.popupById[id]
                 if (popup) {
@@ -927,55 +922,24 @@ function Decorator (Class) {
                         // Use the index from interpolation for relativeIndex
                         const { items, data: templateData, _data: templateDataLocal, form: templateForm, instance: templateInstance, relativeIndex: templateRelativeIndex, relativePath: templateRelativePath, relativeData: templateRelativeData, title = '', ...popupProps } = popupTemplate
                         
-                        // Get current data and form context from UIRender instance
-                        // Use relativeData (current row data) if available, otherwise fall back to template data
-                        const currentData = templateData || this.data
-                        // Get form from instance (this.form) or props, fallback to template form
+                        // Row index, array path, row data and document — `popupScope.js`, testable
+                        // on its own, including the warning for a row popup with no path.
+                        const {
+                            data: currentData,
+                            relativeIndex: currentRelativeIndex,
+                            relativePath: currentRelativePath,
+                            rowData: currentRowData,
+                        } = resolvePopupRowContext({
+                            id,
+                            options,
+                            scope: { relativeIndex, relativeData, relativePath },
+                            template: popupTemplate,
+                            props: this.props,
+                            data: this.data,
+                        })
                         const instanceForm = this.form || this.props.form
                         const currentForm = templateForm || instanceForm
                         const currentInstance = templateInstance || this
-                        // Use contextRelativeIndex from options (renderItem context) with highest priority
-                        // This ensures popup fields match the exact table row that opened the popup
-                        const currentRelativeIndex = contextRelativeIndex != null ? contextRelativeIndex : (relativeIndex != null ? relativeIndex : templateRelativeIndex)
-
-                        // Get correct relativePath for current table row context
-                        // Use contextRelativePath from options (renderItem context) with highest priority
-                        // This ensures popup fields match the exact table row that opened the popup
-                        // relativePath is the owning table's array path (e.g. `orders` for a Popup declared
-                        // inside a Table named `orders`), captured when the Popup template registered.
-                        // @Note: resolved before the row extraction below, which reads it — declaring it after
-                        // that read threw a temporal-dead-zone ReferenceError and swallowed the popup instead.
-                        const currentRelativePath = contextRelativePath != null ? contextRelativePath : (relativePath || this.props.relativePath || templateRelativePath)
-
-                        // @Note: an unresolved path stays unresolved on purpose. It cannot be derived from the
-                        // data without guessing an application's field names, and a wrong guess binds the popup
-                        // to another table's row and writes the user's edit there. A row-scoped popup states its
-                        // scope in meta: either the Popup is declared inside the row (`renderItem`/`TableCells`,
-                        // which makes the registered `relativePath` the table name), or the caller passes
-                        // `{relativePath: '<table name>'}` in the `popupOpen` args. Warn instead of guessing so
-                        // the misconfiguration is visible rather than silently rebinding fields.
-                        if (!currentRelativePath && currentRelativeIndex != null) {
-                            console.warn(
-                                `POPUP_OPEN: "${id}" opened for row index ${currentRelativeIndex} without a relativePath;`
-                                + ' its inputs bind to root-level field names instead of the table row.'
-                                + ' Declare the Popup inside the table row, or pass'
-                                + ' {relativePath: \'<table name>\'} in the popupOpen args.'
-                            )
-                        }
-
-                        // Use current row data if available (from interpolation), otherwise use template data
-                        // If relativeData is an array, extract the element at currentRelativeIndex
-                        let currentRowData = relativeData != null ? relativeData : templateDataLocal
-                        // If currentRowData is an array and we have an index, extract the specific element
-                        if (Array.isArray(currentRowData) && currentRelativeIndex != null && currentRelativePath) {
-                            // Try to get the specific row from the table
-                            const tableData = get(currentData, currentRelativePath)
-                            if (Array.isArray(tableData) && tableData[currentRelativeIndex] != null) {
-                                currentRowData = tableData[currentRelativeIndex]
-                            } else if (currentRowData[currentRelativeIndex] != null) {
-                                currentRowData = currentRowData[currentRelativeIndex]
-                            }
-                        }
 
                         // Check if items exist and are not empty
                         if (!items || !Array.isArray(items) || items.length === 0) {

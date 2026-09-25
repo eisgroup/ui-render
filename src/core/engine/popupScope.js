@@ -1,3 +1,5 @@
+import { get } from '../utils'
+
 /**
  * WHICH ROW A POPUP BELONGS TO — the scope a `popupOpen` action resolves before it interpolates.
  * =============================================================================================
@@ -73,4 +75,70 @@ export function resolvePopupScope ({ id, form, props = {} }) {
     }
 
     return { relativeIndex, relativeData, relativePath }
+}
+
+/**
+ * WHAT A POPUP OPENED FROM A TEMPLATE IS BOUND TO — the row index, the array path its fields are
+ * named against, the row data they show, and the document that row lives in.
+ * =============================================================================================
+ *
+ * The second half of the scope, lifted out of `POPUP_OPEN` at §9.3 step 2 after `resolvePopupScope`
+ * above. Each value has a precedence, highest first:
+ *
+ *   index — the caller's `options.relativeIndex`, the resolved scope's, the template's own
+ *   path  — the caller's `options.relativePath`, the resolved scope's, the INSTANCE's
+ *           `props.relativePath`, the template's own. Nothing in the engine sets that prop: `Data.js`
+ *           gives a nested instance `index` and `relativeIndex` only. It is reachable through the
+ *           host's props, which `library/main.js` spreads onto the top-level instance, though the
+ *           public types do not declare it; kept for that reason.
+ *   rows  — the resolved scope's data, else the template's `_data`; when that is an array and both
+ *           an index and a path are known, the row itself: from the document at the path first, else
+ *           from the array. The second of those never ran in the suite.
+ *
+ * AN UNRESOLVED PATH STAYS UNRESOLVED ON PURPOSE. It cannot be derived from the data without guessing
+ * an application's field names, and a wrong guess binds the popup to another table's row and writes
+ * the user's edit there. A row-scoped popup states its scope in meta: either the Popup is declared
+ * inside the row (`renderItem`/`TableCells`, which makes the registered `relativePath` the table
+ * name), or the caller passes `{relativePath: '<table name>'}` in the `popupOpen` args. This warns
+ * instead of guessing, so the misconfiguration is visible rather than silently rebinding fields.
+ *
+ * @param {Object} params
+ * @param {String} params.id - the popup id, for the warning
+ * @param {Object} [params.options] - the `popupOpen` options, possibly carrying the caller's scope
+ * @param {{relativeIndex: ?Number, relativeData: *, relativePath: ?String}} params.scope - what
+ *   `resolvePopupScope` resolved
+ * @param {Object} params.template - the registered template
+ * @param {Object} [params.props] - the UIRender instance's props
+ * @param {*} [params.data] - the instance's data, used when the template carries none
+ * @returns {{data: *, relativeIndex: ?Number, relativePath: ?String, rowData: *}}
+ */
+export function resolvePopupRowContext ({ id, options = {}, scope, template, props = {}, data }) {
+    const currentData = template.data || data
+    const relativeIndex = options.relativeIndex != null
+        ? options.relativeIndex
+        : (scope.relativeIndex != null ? scope.relativeIndex : template.relativeIndex)
+    const relativePath = options.relativePath != null
+        ? options.relativePath
+        : (scope.relativePath || props.relativePath || template.relativePath)
+
+    if (!relativePath && relativeIndex != null) {
+        console.warn(
+            `POPUP_OPEN: "${id}" opened for row index ${relativeIndex} without a relativePath;`
+            + ' its inputs bind to root-level field names instead of the table row.'
+            + ' Declare the Popup inside the table row, or pass'
+            + ' {relativePath: \'<table name>\'} in the popupOpen args.'
+        )
+    }
+
+    let rowData = scope.relativeData != null ? scope.relativeData : template._data
+    if (Array.isArray(rowData) && relativeIndex != null && relativePath) {
+        const tableData = get(currentData, relativePath)
+        if (Array.isArray(tableData) && tableData[relativeIndex] != null) {
+            rowData = tableData[relativeIndex]
+        } else if (rowData[relativeIndex] != null) {
+            rowData = rowData[relativeIndex]
+        }
+    }
+
+    return { data: currentData, relativeIndex, relativePath, rowData }
 }
