@@ -67,6 +67,12 @@ describe('a Response body', () => {
         expect(message).toEqual({ code: 42, detail: 'nope' })
     })
 
+    it('gives up its `message` when only its keys are bare, through the quoting fallback', async () => {
+        const message = await messageFromError(responseWith('{message: "Row is locked"}'))
+
+        expect(message).toBe('Row is locked')
+    })
+
     it('is shown raw when only its KEYS are unquoted — quoting them is not enough', async () => {
         // The quoting pass turns `{message: Row is locked}` into `{"message": Row is locked}`, which
         // is still not JSON because the VALUE is bare. Measured, not assumed: the pass only rescues
@@ -74,6 +80,14 @@ describe('a Response body', () => {
         const message = await messageFromError(responseWith('{message: Row is locked}'))
 
         expect(message).toBe('{message: Row is locked}')
+    })
+
+    it('is parsed as it is when it is valid JSON with a URL in a value', async () => {
+        // A URL's `http:` looked like a bare key to the quoting pass, which used to run first and
+        // break this body — so the user was shown the raw JSON instead of its message.
+        const message = await messageFromError(responseWith(JSON.stringify({ message: 'See http://status.example for details' })))
+
+        expect(message).toBe('See http://status.example for details')
     })
 
     it('is used as plain text when it is not JSON at all', async () => {
@@ -112,16 +126,16 @@ describe('the embedded message= … errors= shape', () => {
         expect(message).toBe('message=errors=[]')
     })
 
-    it('PINNED DEFECT: a `key:value` anywhere in the body defeats the whole thing', async () => {
-        // The quoting pass runs over the ENTIRE text, including inside string values. A message that
-        // embeds `errors=[{code:12}]` — the very shape the branch above exists for — becomes
-        // `errors=[{"code":12}]`, whose quotes break the JSON string containing them. Parsing then
-        // fails and the user is shown the raw body instead of the clean message.
+    it('survives a `key:value` inside the message it is cleaning up', async () => {
+        // Until this was fixed the key-quoting pass ran over EVERY body, string values included: a
+        // message embedding `errors=[{code:12}]` — the very shape this branch exists for — became
+        // `errors=[{"code":12}]`, whose quotes broke the JSON around it, and the user saw the raw
+        // body. Valid JSON is now parsed as it is, and quoting is only the fallback.
         const body = JSON.stringify({ message: 'message=Period overlaps errors=[{code:12}]' })
 
         const message = await messageFromError(responseWith(body))
 
-        expect(message).toBe(body)
+        expect(message).toBe('Period overlaps ')
     })
 
     it('leaves a message without that shape alone', async () => {
