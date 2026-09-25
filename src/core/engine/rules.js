@@ -18,7 +18,7 @@ import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
 import { download } from './download'
 import { upload } from './upload'
-import { messageFromError } from './apiError'
+import { applyPeriods } from './applyPeriods'
 import { parsePopupArgs } from './popupArgs'
 import { resolvePopupScope } from './popupScope'
 import { errorsFor, formsStorage, touchedFor } from '../state/formRegistry'
@@ -1109,41 +1109,27 @@ function Decorator (Class) {
             }
 
 
-            FIELD.FUNC[FIELD.ACTION.ON_APPLY_PERIODS] = async () => {
-                const { updateExperienceData } = this.getAPICalls()
-                if (typeof updateExperienceData !== 'function') {
-                    return false
-                }
-                const data = this.getAllFormsData()
-
-                try {
-                    const response = await updateExperienceData(data)
-
-                    if (!response) {
-                        return
+            // Send every form's values to the host and make its answer the data (see
+            // `applyPeriods.js`); a failure shows the host's message in a popup.
+            FIELD.FUNC[FIELD.ACTION.ON_APPLY_PERIODS] = () => applyPeriods({
+                updateExperienceData: this.getAPICalls().updateExperienceData,
+                readFormsData: this.getAllFormsData,
+                onUpdated: normalizedResponse => this.setState({
+                    data: {
+                        json: normalizedResponse
                     }
-
-                    const normalizedResponse = normalizeIncomingData(response)
-                    this.setState({
-                        data: {
-                            json: normalizedResponse
-                        }
-                    }, () => {
-                        this.form.restart(normalizedResponse)
-                    })
-                } catch (error) {
-                    // Reading a failure into something showable is the one calculation in this
-                    // handler, and it lives in `apiError.js` with tests over the body shapes.
-                    const message = await messageFromError(error)
-
+                }, () => {
+                    this.form.restart(normalizedResponse)
+                }),
+                onFailure: (message, error) => {
                     this.context.setPopupState({
                         isOpen: true,
                         title: 'Error',
                         content: <Json data={{ message }}/>
                     })
                     console.error(error)
-                }
-            }
+                },
+            })
 
             FIELD.METHODS = this.getCalledMethod()
 
