@@ -16,6 +16,7 @@ import { cloneDeep, hasObjectValue, isObject, set, setIn } from '../utils/object
 import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
+import { messageFromError } from './apiError'
 import { resolvePopupScope } from './popupScope'
 import { errorsFor, formsStorage, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
@@ -1044,33 +1045,9 @@ function Decorator (Class) {
                         this.form.restart(normalizedResponse)
                     })
                 } catch (error) {
-                    let message = error
-                    // Fix to get error message from Response object
-                    if (error instanceof Response) {
-                        const errorText = await error.text()
-                        let errorObject
-                        try {
-                            errorObject = JSON.parse(errorText.replace(/(\w+:)|(\w+ :)/g, function (s) {
-                                return '"' + s.substring(0, s.length - 1) + '":'
-                            }))
-                        } catch {
-                            // Some APIs return a plain-text error body instead of JSON.
-                            message = errorText || error
-                        }
-                        if (errorObject) {
-                            message = errorObject
-                            if (errorObject.message) {
-                                message = errorObject.message
-
-                                if (/message=(.*)errors.*/.test(message)) {
-                                    const subMessage = message.match(/message=(.*)errors.*/)[1]
-                                    if (subMessage) {
-                                        message = subMessage
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    // Reading a failure into something showable is the one calculation in this
+                    // handler, and it lives in `apiError.js` with tests over the body shapes.
+                    const message = await messageFromError(error)
 
                     this.context.setPopupState({
                         isOpen: true,
