@@ -151,6 +151,40 @@ export const replaceDeep = (object, key, value) => {
   }
 };
 
+/**
+ * `replaceDeep`, returning a copy instead of writing into its argument.
+ *
+ * Same semantics, which are unusual enough to state: `key` is a bare property NAME, not a path, and
+ * EVERY property of that name anywhere in the tree is replaced — at the root, in nested objects and
+ * in every array element. `rules.dynamic-actions.test.js` pins that behaviour through the
+ * `updateDataOnChange` action, which is its only caller.
+ *
+ * It exists because that action ran `replaceDeep(this.data, …)` on the object `this.data` returns,
+ * which is the live React state, and only then assigned a clone — so the state React had already
+ * handed out was rewritten in place first, the defect class §9.3 step 4 closed everywhere else and
+ * this one site escaped. Copying every container matches what the old code paid for its
+ * `cloneDeep` afterwards, and the value is recursed into after replacing, exactly as the original's
+ * second loop did.
+ *
+ * @param {*} object - the tree to read; never written
+ * @param {String} key - the property name to replace wherever it occurs
+ * @param {*} value - the replacement
+ * @returns {*} a new tree
+ */
+export const replaceDeepCopy = (object, key, value) => {
+  if (Array.isArray(object)) {
+    return object.map(item => replaceDeepCopy(item, key, value))
+  }
+  if (isObject(object)) {
+    const copy = {}
+    Object.keys(object).forEach(k => {
+      copy[k] = replaceDeepCopy(k === key ? value : object[k], key, value)
+    })
+    return copy
+  }
+  return object
+}
+
 function getKeyAndPathFromMetaData(meta) {
   const { relativeIndex, relativePath } = meta;
   let path = '';

@@ -237,6 +237,29 @@ describe('UIRender dynamic action and data-integrity contracts', () => {
         expect(screen.queryByText('Row before')).not.toBeInTheDocument()
     })
 
+    it('does nothing, rather than throwing, when updateDataOnChange gets no field object', () => {
+        // `onChange` on a field passes `(value, {name})`, which is the shape the action reads. A
+        // button that names the action with only a value used to die on click with
+        // "Cannot destructure property 'name' of 'params[0]'" — uncaught, in an event handler.
+        const data = { status: 'untouched' }
+        const meta = {
+            view: 'Row',
+            items: [
+                { view: 'Text', name: 'status' },
+                { view: 'Button', children: 'Bare update', onClick: { name: 'updateDataOnChange', mapArgs: ['ignored'] } },
+            ],
+        }
+
+        render(
+            <AppProvider>
+                <UIRender meta={meta} data={data} initialValues={data} />
+            </AppProvider>
+        )
+
+        expect(() => fireEvent.click(screen.getByRole('button', { name: 'Bare update' }))).not.toThrow()
+        expect(screen.getByText('untouched')).toBeInTheDocument()
+    })
+
     it('rebuilds currency rendering when meta.currencyCode changes', async () => {
         const data = { amount: 12.5 }
         const meta = (currencyCode) => ({
