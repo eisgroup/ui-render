@@ -1,6 +1,7 @@
 import {
     changeOptionOrderForSelectFields,
     replaceDeep,
+    replaceDeepCopy,
     mapErrorObjectToUIFormat,
     convertFieldNameToTitleCaseText,
     getDateStringFromDateObject,
@@ -153,6 +154,62 @@ describe('replaceDeep', () => {
         replaceDeep(obj, 'flag', 'updated')
         expect(obj.items[0].nested.flag).toBe('updated')
         expect(obj.items[1].flag).toBe('updated')
+    })
+})
+
+describe('replaceDeepCopy', () => {
+    // The same cases as `replaceDeep` above, asserted on the RETURNED tree — plus the one property
+    // that is the reason it exists: the argument comes back exactly as it went in.
+    it('replaces every matching key, at any depth and in every array element', () => {
+        const input = {
+            status: 'root',
+            nested: { status: 'nested', other: 1 },
+            items: [{ status: 'a' }, { nested: { status: 'deep' } }],
+        }
+
+        expect(replaceDeepCopy(input, 'status', 'unified')).toEqual({
+            status: 'unified',
+            nested: { status: 'unified', other: 1 },
+            items: [{ status: 'unified' }, { nested: { status: 'unified' } }],
+        })
+    })
+
+    it('leaves the tree it was given untouched', () => {
+        const nested = { status: 'nested' }
+        const items = [{ status: 'a' }]
+        const input = { status: 'root', nested, items }
+        const snapshot = JSON.parse(JSON.stringify(input))
+
+        replaceDeepCopy(input, 'status', 'unified')
+
+        expect(input).toEqual(snapshot)
+        expect(input.nested).toBe(nested)
+        expect(input.items).toBe(items)
+    })
+
+    it('returns new containers, so nothing holding the old tree sees the change', () => {
+        const input = { nested: { status: 'x' }, items: [{ status: 'y' }] }
+
+        const result = replaceDeepCopy(input, 'status', 'z')
+
+        expect(result).not.toBe(input)
+        expect(result.nested).not.toBe(input.nested)
+        expect(result.items).not.toBe(input.items)
+        expect(result.items[0]).not.toBe(input.items[0])
+    })
+
+    it('treats the key as a NAME, not a path — a dotted name matches nothing', () => {
+        // Which is why a form field named `rows[0].status` cannot use this action: no property is
+        // literally called that.
+        const input = { rows: [{ status: 'a' }] }
+
+        expect(replaceDeepCopy(input, 'rows[0].status', 'b')).toEqual(input)
+    })
+
+    it('hands primitives back unchanged', () => {
+        expect(replaceDeepCopy('text', 'status', 'x')).toBe('text')
+        expect(replaceDeepCopy(null, 'status', 'x')).toBeNull()
+        expect(replaceDeepCopy(undefined, 'status', 'x')).toBeUndefined()
     })
 })
 

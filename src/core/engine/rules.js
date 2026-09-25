@@ -22,7 +22,7 @@ import { resolvePopupScope } from './popupScope'
 import { errorsFor, formsStorage, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
 import {
-    replaceDeep,
+    replaceDeepCopy,
     getFormsData,
     getLiveMergedDataKindArray,
     getRawFormsData,
@@ -1133,13 +1133,16 @@ function Decorator (Class) {
 
             // this.data is not updated dynamically at the moment
             // Implemented as temporary solution
+            // Writes a changed primitive into EVERY data property with the field's name (see
+            // `replaceDeepCopy`). Three things changed here, none of them in what a working call does:
+            // the state is no longer rewritten in place before `setState`; a call with no field object
+            // — `onClick: {name: 'updateDataOnChange', mapArgs: ['x']}` — is a no-op instead of an
+            // uncaught TypeError from destructuring `undefined`; and `Array.isArray(params)` is gone,
+            // since a rest parameter is always an array and that test could not fail.
             FIELD.FUNC[FIELD.ACTION.UPDATE_DATA_ON_CHANGE] = (value, ...params) => {
-                if (typeof value !== 'object' && Array.isArray(params)) {
-                    const { name } = params[0]
-                    if (name) {
-                        replaceDeep(this.data, name, value)
-                        this.data = cloneDeep(this.data)
-                    }
+                const name = params[0] && params[0].name
+                if (typeof value !== 'object' && name) {
+                    this.data = replaceDeepCopy(this.data, name, value)
                 }
             }
 
