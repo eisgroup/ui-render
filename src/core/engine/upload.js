@@ -9,15 +9,17 @@ import { normalizeIncomingData } from './utils'
  * `apiCalls.uploadFile` receives every form's current values as JSON, minus the file field, plus
  * the file; whatever it resolves with becomes the UI's data.
  *
- * Three things this does are pinned by `upload.test.js` and `rules.actions.test.js` rather than
- * changed here, because changing any of them changes what the host receives or what the user sees:
+ * AN EMPTY ANSWER IS IGNORED — `undefined`, `null`, `''`, `0` — and the data is left as it was, as
+ * `onApplyPeriods` always did. Until this was fixed the answer replaced the data wholesale: with
+ * `undefined` or `null` the engine had no data and rendered an empty container, the upload control
+ * included, so the user could not try again; with `''` or `0` every form value was wiped.
+ *
+ * Two things this does are pinned by `upload.test.js` and `rules.actions.test.js` rather than
+ * changed, because changing either changes what the host receives:
  *   - the file field is excluded by `delete data[path]`, a TOP-LEVEL key, so a dotted name such as
  *     `attachment.file` stays in the payload — as the field's value, a file list, which
  *     `JSON.stringify` writes as `[{}]`
  *   - only the first of several files is sent, even when the field allows `multiple`
- *   - the answer replaces the data wholesale, so a host that resolves with `undefined` or `null`
- *     leaves the engine with no data, and it renders an empty container — the upload control
- *     included, so the user cannot try again
  *
  * A failure is logged and nothing else: no popup, and the data is left as it was. Clearing the file
  * input on success is kept although the in-house `Dropzone` already clears it after every pick,
@@ -27,7 +29,7 @@ import { normalizeIncomingData } from './utils'
  * @param {{uploadFile: Function, readFormsData: Function, onUploaded: Function}} options - the
  *   host's API call; a reader for every form's current values, which must return a copy; and what to
  *   do with the normalised answer
- * @returns {Promise<void>} settles once the answer is handed over or the failure is logged
+ * @returns {Promise<void>} settles once the answer is handed over or ignored, or the failure logged
  */
 export async function upload ([files, path, dropzone], { uploadFile, readFormsData, onUploaded }) {
     const [file] = files
@@ -37,9 +39,9 @@ export async function upload ([files, path, dropzone], { uploadFile, readFormsDa
     delete data[path]
     try {
         const response = await uploadFile(JSON.stringify(data), file)
-        const normalizedResponse = normalizeIncomingData(response)
         dropzone.fileInputEl.value = null
-        onUploaded(normalizedResponse)
+        if (!response) return
+        onUploaded(normalizeIncomingData(response))
     } catch (error) {
         console.error(error)
     }

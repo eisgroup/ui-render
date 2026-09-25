@@ -52,7 +52,9 @@ describe('a working call', () => {
                 onFailure: failNever,
             })
 
-            expect(applied).toEqual([])
+            // `toHaveLength`, not `toEqual([])`: toEqual ignores undefined array items, so an
+            // answer of `undefined` handed over would still pass.
+            expect(applied).toHaveLength(0)
         }
     )
 })

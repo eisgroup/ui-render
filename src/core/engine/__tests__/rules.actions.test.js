@@ -6,7 +6,7 @@ if (typeof global.fetch === 'undefined') {
 }
 
 import React from 'react' // eslint-disable-line import/first
-import { fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
 // Load the form module before rules.js follows the mapper/renders circular dependency.
 import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
@@ -279,10 +279,12 @@ describe('UIRender action orchestration', () => {
         })
     })
 
-    it('PINNED DEFECT: renders nothing at all once an upload answers with no data', async () => {
-        // The answer replaces the data wholesale, and with no data the engine renders an empty
-        // container — the upload control included, so the user cannot try again. A host whose
-        // `uploadFile` resolves with nothing (a `.then(() => {})`, say) gets exactly this.
+    it('keeps the UI and its data when an upload answers with nothing', async () => {
+        // Until this was fixed the answer replaced the data wholesale, and with no data the engine
+        // rendered an empty container — the upload control included, so the user could not try
+        // again. A host whose `uploadFile` resolves with nothing (a `.then(() => {})`, say) got that.
+        const uploadFile = jest.fn(() => Promise.resolve(undefined))
+        let readFormData
         const data = { status: 'Before upload' }
         const { container } = render(wrap(
             <UIRender
@@ -302,17 +304,20 @@ describe('UIRender action orchestration', () => {
                 }}
                 data={data}
                 initialValues={data}
-                apiCalls={{ uploadFile: () => Promise.resolve(undefined) }}
+                getFormData={getter => { readFormData = getter }}
+                apiCalls={{ uploadFile }}
             />
         ))
-        expect(screen.getByText('Before upload')).toBeInTheDocument()
 
         fireEvent.change(container.querySelector('input[type="file"]'), {
             target: { files: [new File(['a'], 'a.csv', { type: 'text/csv' })] },
         })
+        await waitFor(() => expect(uploadFile).toHaveBeenCalledTimes(1))
+        await act(async () => {})
 
-        await waitFor(() => expect(container.querySelector('input[type="file"]')).toBeNull())
-        expect(container).toHaveTextContent(/^$/)
+        expect(screen.getByText('Before upload')).toBeInTheDocument()
+        expect(container.querySelector('input[type="file"]')).not.toBeNull()
+        expect(readFormData()).toEqual(expect.objectContaining({ status: 'Before upload' }))
     })
 
     it('submits the latest form values through a meta-defined submit action', async () => {
