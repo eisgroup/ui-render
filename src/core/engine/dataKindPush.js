@@ -138,16 +138,38 @@ export function getDataKindPathFromRelative (relativePath, kind) {
 }
 
 /**
+ * Where one `Data` block's `dataKind` map lives in the parent form's values — `dataKind` at the
+ * root, `orders.0.dataKind` inside a parent row; the rows are at `.{kind}` under it. Adding a row,
+ * removing one and `pushDataKindRow` each spelled this out in full until §9.3 step 2 gave it one
+ * home.
+ *
+ * `fallbackDataKindPath` is what `registerDataKind` recorded on the instance, and is read ONLY
+ * when the block's current `relativePath` is empty. It is computed from that same `relativePath`,
+ * so it can differ from `''` only if the path went from non-empty to empty without the instance
+ * re-registering, which happens only on an `index` or `kind` change. No test and no example in the
+ * corpus does that; the fallback is kept because the three copies all had it.
+ *
+ * @param {Object} [meta] - the `Data` block's meta, read for `relativePath`
+ * @param {string} kind - Data `kind` / key under `dataKind`
+ * @param {string} [fallbackDataKindPath] - the instance's registered `dataKindPath`
+ * @returns {string} dot-path of the `dataKind` map in the parent form's values
+ */
+export function dataKindPathFor (meta, kind, fallbackDataKindPath = '') {
+    const rel = meta && meta.relativePath
+    const basePath = (rel != null && rel !== '')
+        ? getDataKindPathFromRelative(rel, kind)
+        : (fallbackDataKindPath || '')
+    return basePath ? `${basePath}.dataKind` : 'dataKind'
+}
+
+/**
  * Append one plain row object via the parent final-form array mutator, then sync `instance.state.data.json`
  * from form values (same pattern as REMOVE_DATA). Do not also splice `data.json` manually — when that array
  * shares a reference with `form.values`, manual spread + `mutators.push` can duplicate the new row.
  */
 export function pushDataKindRow ({ parentUIRender, meta, kind, rowObject, fallbackDataKindPath = '' }) {
     const rel = meta && meta.relativePath
-    const basePath = (rel != null && rel !== '')
-        ? getDataKindPathFromRelative(rel, kind)
-        : (fallbackDataKindPath || '')
-    const dataKindPath = basePath ? `${basePath}.dataKind` : 'dataKind'
+    const dataKindPath = dataKindPathFor(meta, kind, fallbackDataKindPath)
     const arrayPath = `${dataKindPath}.${kind}`
     const parentForm = parentUIRender && parentUIRender.props && parentUIRender.props.instance && parentUIRender.props.instance.form
     if (
