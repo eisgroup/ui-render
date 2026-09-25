@@ -478,7 +478,11 @@ Every workstream below is a series of small, independently shippable, reversible
 
   **Also measured: three of the five "call the original" guards were dead.** Instrumenting `Decorator` at decoration time showed `componentWillUnmount`, `UNSAFE_componentWillMount` and `UNSAFE_componentWillUpdate` were all `undefined` on the class being decorated; only `UNSAFE_componentWillReceiveProps` and `componentDidUpdate` have a real original. With a subclass those captures read genuine parent methods, which is what "the original" always meant.
 
-  **Still open in this step:** the bodies are installed on the subclass's prototype rather than written as class members, so the file still reads as assignment rather than declaration. Moving seven hundred lines into member position is a separate change with its own risks; what this one removes is the mutation escaping to someone else's class. Pinned by `rules.lifecycle-layer.test.js`, which fails on the previous code.
+  **The members moved into member position 2026-09-25 — all but `config` and `state`.** Four getters, a setter and seven methods are written as class members now, and the four captured originals are gone: `if (componentWillUnmount) componentWillUnmount.apply(this, arguments)` reads `if (super.componentWillUnmount) super.componentWillUnmount(...arguments)`, which is what those captures always meant. Both surviving parent calls are covered — deleting either one reddens the suite.
+
+  **`state` stays a prototype assignment, and that is load-bearing rather than tidy.** `withFormSetup` MERGES onto it — `Class.prototype.state = {…, ...Class.prototype.state}` — so a class FIELD, which initialises per instance AFTER `super()` returns, would leave that merge reading `undefined` and silently drop the engine's state shape. Two test harnesses read `prototype.state` directly for the same reason. Measured before the edit, not discovered by it.
+
+  **Still open in this step:** `config`, the four-hundred-line getter that builds the action handlers, is still installed by `defineProperty`. Moving it is its own change with its own diff to read. Pinned by `rules.lifecycle-layer.test.js`, which fails on the code before the subclass.
 6. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired.
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 
