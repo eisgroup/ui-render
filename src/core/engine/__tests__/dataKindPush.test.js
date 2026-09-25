@@ -7,6 +7,7 @@ import {
     validateNotWithinRangeDraftRow,
     pushDataKindRow,
     getDataKindPathFromRelative,
+    dataKindPathFor,
 } from '../dataKindPush'
 
 describe('rowObjectForDataKindAppend', () => {
@@ -341,6 +342,39 @@ describe('getDataKindPathFromRelative (re-export contract)', () => {
         expect(getDataKindPathFromRelative('experienceRatingInputs.dataKind.experiencePeriods', 'experiencePeriods')).toBe(
             'experienceRatingInputs'
         )
+    })
+})
+
+describe('dataKindPathFor', () => {
+    it('puts a root block under the top-level dataKind', () => {
+        expect(dataKindPathFor({ relativePath: 'dataKind.lines' }, 'lines')).toBe('dataKind')
+    })
+
+    it('puts a block inside a parent row under that row', () => {
+        expect(dataKindPathFor({ relativePath: 'orders.0.dataKind.lines' }, 'lines')).toBe('orders.0.dataKind')
+    })
+
+    it('uses the LAST dataKind segment when blocks nest two deep', () => {
+        expect(dataKindPathFor({ relativePath: 'dataKind.orders.0.dataKind.lines' }, 'lines'))
+            .toBe('dataKind.orders.0.dataKind')
+    })
+
+    it('falls back to the root when the path does not name this kind', () => {
+        expect(dataKindPathFor({ relativePath: 'orders.0.dataKind.other' }, 'lines')).toBe('dataKind')
+    })
+
+    it.each([
+        ['no meta', undefined],
+        ['no relativePath', {}],
+        ['an empty relativePath', { relativePath: '' }],
+    ])('reads the registered path only with %s', (_label, meta) => {
+        expect(dataKindPathFor(meta, 'lines', 'orders.3')).toBe('orders.3.dataKind')
+        expect(dataKindPathFor(meta, 'lines')).toBe('dataKind')
+    })
+
+    it('ignores the registered path whenever relativePath is set', () => {
+        expect(dataKindPathFor({ relativePath: 'orders.0.dataKind.lines' }, 'lines', 'orders.3'))
+            .toBe('orders.0.dataKind')
     })
 })
 

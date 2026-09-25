@@ -38,7 +38,7 @@ import { double5, integer, phone, uppercase } from '../components/inputs/normali
 import { AppContext } from '../contexts'
 import { ConfigOverride } from '../providers'
 import Popup from './components/Popup'
-import { getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow } from './dataKindPush'
+import { dataKindPathFor, getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow } from './dataKindPush'
 
 export { getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow }
 
@@ -842,10 +842,7 @@ function Decorator (Class) {
                     if (!this.canSave) return this.handleSubmit()
                     const registeredValues = this.registeredValues
                     const rel = this.props.meta && this.props.meta.relativePath
-                    const basePath = (rel != null && rel !== '')
-                        ? this.getDataKindPath(rel, form.kind)
-                        : (this.dataKindPath || '')
-                    const dataKindPath = basePath ? `${basePath}.dataKind` : 'dataKind'
+                    const dataKindPath = dataKindPathFor(this.props.meta, form.kind, this.dataKindPath)
                     const existingLen = get(parent.state.data.json, `${dataKindPath}.${form.kind}`, []).length
                     const rowObject = rowObjectForDataKindAppend(registeredValues, rel, existingLen)
                     pushDataKindRow({
