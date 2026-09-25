@@ -8,6 +8,7 @@ import {
     pushDataKindRow,
     getDataKindPathFromRelative,
     dataKindPathFor,
+    removeDataKindRow,
 } from '../dataKindPush'
 
 describe('rowObjectForDataKindAppend', () => {
@@ -438,5 +439,104 @@ describe('compactDataKindArrays', () => {
     it('leaves dataKind intact when it is not an object', () => {
         const input = { dataKind: null }
         expect(compactDataKindArrays(input).dataKind).toBeNull()
+    })
+})
+
+describe('removeDataKindRow', () => {
+    /** A parent form whose `remove` mutator really splices, and an instance whose setState applies. */
+    const setup = (values, formOverrides = {}) => {
+        let formValues = cloneDeep(values)
+        const removed = []
+        const resets = []
+        const form = {
+            mutators: {
+                remove: (path, index) => {
+                    removed.push([path, index])
+                    const next = cloneDeep(formValues)
+                    get(next, path).splice(index, 1)
+                    formValues = next
+                },
+            },
+            getState: () => ({ values: formValues }),
+            reset: next => resets.push(next),
+            ...formOverrides,
+        }
+        const parentUIRender = {
+            state: { data: { json: cloneDeep(values), other: 'kept' } },
+            setState (updater, callback) {
+                this.state = { ...this.state, ...updater(this.state) }
+                if (callback) callback()
+            },
+        }
+        return { form, parentUIRender, removed, resets }
+    }
+
+    it('removes the row through the mutator and syncs state and form from the result', () => {
+        const { form, parentUIRender, removed, resets } = setup({ dataKind: { lines: [{ sku: 'A' }, { sku: 'B' }] } })
+
+        expect(removeDataKindRow({ parentUIRender, parentForm: form, meta: { relativePath: 'dataKind.lines' }, kind: 'lines', index: 0 }))
+            .toBe(true)
+
+        expect(removed).toEqual([['dataKind.lines', 0]])
+        expect(parentUIRender.state.data).toEqual({ json: { dataKind: { lines: [{ sku: 'B' }] } }, other: 'kept' })
+        expect(resets).toEqual([{ dataKind: { lines: [{ sku: 'B' }] } }])
+    })
+
+    it('removes from the parent row the block sits in', () => {
+        const { form, parentUIRender, removed } = setup({
+            orders: [{ dataKind: { lines: [{ sku: 'A' }] } }, { dataKind: { lines: [{ sku: 'B' }, { sku: 'C' }] } }],
+        })
+
+        removeDataKindRow({ parentUIRender, parentForm: form, meta: { relativePath: 'orders.1.dataKind.lines' }, kind: 'lines', index: 1 })
+
+        expect(removed).toEqual([['orders.1.dataKind.lines', 1]])
+        expect(parentUIRender.state.data.json.orders.map(o => o.dataKind.lines.map(l => l.sku))).toEqual([['A'], ['B']])
+    })
+
+    it('takes the index as the string a prop may carry', () => {
+        const { form, parentUIRender, removed } = setup({ dataKind: { lines: [{ sku: 'A' }, { sku: 'B' }] } })
+
+        removeDataKindRow({ parentUIRender, parentForm: form, kind: 'lines', index: '1' })
+
+        expect(removed).toEqual([['dataKind.lines', 1]])
+    })
+
+    it('compacts what it syncs: an empty draft slot is dropped', () => {
+        const { form, parentUIRender } = setup({ dataKind: { lines: [{ sku: 'A' }, { sku: 'B' }, {}] } })
+
+        removeDataKindRow({ parentUIRender, parentForm: form, kind: 'lines', index: 0 })
+
+        expect(parentUIRender.state.data.json).toEqual({ dataKind: { lines: [{ sku: 'B' }] } })
+    })
+
+    it('resets the form with the very object it put into state', () => {
+        // Measured harmless with the real final-form, which updates immutably; pinned so that adding
+        // the clone `pushDataKindRow` makes is a decision, not an accident.
+        const { form, parentUIRender, resets } = setup({ dataKind: { lines: [{ sku: 'A' }] } })
+
+        removeDataKindRow({ parentUIRender, parentForm: form, kind: 'lines', index: 0 })
+
+        expect(resets[0]).toBe(parentUIRender.state.data.json)
+    })
+
+    describe('when the parent form cannot remove rows', () => {
+        let warn
+        beforeEach(() => { warn = jest.spyOn(console, 'warn').mockImplementation(() => {}) })
+        afterEach(() => { warn.mockRestore() })
+
+        it.each([
+            ['no form', () => undefined],
+            ['no mutators', form => ({ ...form, mutators: undefined })],
+            ['no remove mutator', form => ({ ...form, mutators: {} })],
+        ])('says so and changes nothing with %s', (_label, degrade) => {
+            const { form, parentUIRender, resets } = setup({ dataKind: { lines: [{ sku: 'A' }] } })
+            const before = parentUIRender.state
+
+            expect(removeDataKindRow({ parentUIRender, parentForm: degrade(form), kind: 'lines', index: 0 })).toBe(false)
+
+            expect(warn).toHaveBeenCalledWith('REMOVE_DATA: parent form or mutators.remove is not available')
+            expect(parentUIRender.state).toBe(before)
+            expect(resets).toEqual([])
+        })
     })
 })

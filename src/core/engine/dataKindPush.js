@@ -221,3 +221,49 @@ export function pushDataKindRow ({ parentUIRender, meta, kind, rowObject, fallba
     )
     return true
 }
+
+/**
+ * Remove one row via the parent final-form array mutator, then sync `instance.state.data.json` from
+ * the form values — the counterpart of `pushDataKindRow`, lifted out of the `removeData` action at
+ * §9.3 step 2. Only final-form-arrays `remove` touches the rows: when `state.data.json` and the form
+ * values share references, a manual splice as well would delete two rows or leave `{}`.
+ *
+ * The parent INSTANCE and the parent FORM arrive separately because the action reads them at
+ * different times, and that is kept: the form, the meta and the index are read at click time, while
+ * the instance whose state is set is the one captured when `config` was first read. The action's
+ * comment said an index captured then would remove the wrong slot once siblings re-index; that was
+ * NOT reproducible while extracting this — rows are keyed by position, so a captured index stays
+ * right — and reading it at click time is kept because it is right either way.
+ *
+ * Unlike `pushDataKindRow`, the object handed to `reset` is the same one put into state. Measured
+ * with the real final-form while extracting this: the two share a reference after a removal, and a
+ * later edit does NOT write through it — final-form updates immutably — so the shared reference has
+ * no observable effect, and the clone `pushDataKindRow` makes defensively was not added here.
+ *
+ * @param {Object} options
+ * @param {Object} options.parentUIRender - the parent engine instance whose state is synced
+ * @param {Object} options.parentForm - the parent's final-form instance
+ * @param {Object} [options.meta] - the `Data` block's meta, read for `relativePath`
+ * @param {string} options.kind - Data `kind` / key under `dataKind`
+ * @param {number|string} options.index - the row to remove
+ * @param {string} [options.fallbackDataKindPath] - the instance's registered `dataKindPath`
+ * @returns {boolean} false when the parent form cannot remove rows
+ */
+export function removeDataKindRow ({ parentUIRender, parentForm, meta, kind, index, fallbackDataKindPath = '' }) {
+    const arrayPath = `${dataKindPathFor(meta, kind, fallbackDataKindPath)}.${kind}`
+    if (!parentForm || !parentForm.mutators || typeof parentForm.mutators.remove !== 'function') {
+        console.warn('REMOVE_DATA: parent form or mutators.remove is not available')
+        return false
+    }
+    parentForm.mutators.remove(arrayPath, Number(index))
+    const nextJson = compactDataKindArrays(cloneDeep(parentForm.getState().values))
+    parentUIRender.setState((prev) => ({
+        data: {
+            ...prev.data,
+            json: nextJson,
+        },
+    }), () => {
+        parentForm.reset(nextJson)
+    })
+    return true
+}

@@ -38,7 +38,7 @@ import { double5, integer, phone, uppercase } from '../components/inputs/normali
 import { AppContext } from '../contexts'
 import { ConfigOverride } from '../providers'
 import Popup from './components/Popup'
-import { dataKindPathFor, getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow } from './dataKindPush'
+import { dataKindPathFor, getDataKindPathFromRelative, pushDataKindRow, removeDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow } from './dataKindPush'
 
 export { getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow }
 
@@ -861,35 +861,16 @@ function Decorator (Class) {
                 : dataActionWarning
             // Remove current Form values from parent UI Render instance.state
             FIELD.FUNC[FIELD.ACTION.REMOVE_DATA] = (parent && form)
-                ? () => {
-                    const rel = this.props.meta && this.props.meta.relativePath
-                    const basePath = (rel != null && rel !== '')
-                        ? this.getDataKindPath(rel, form.kind)
-                        : (this.dataKindPath || '')
-                    const dataKindPath = basePath ? `${basePath}.dataKind` : 'dataKind'
-                    const arrayPath = `${dataKindPath}.${form.kind}`
-                    const parentForm = this.props.parent.props.instance.form
-                    if (!parentForm || !parentForm.mutators || typeof parentForm.mutators.remove !== 'function') {
-                        console.warn('REMOVE_DATA: parent form or mutators.remove is not available')
-                        return
-                    }
-                    // Only final-form-arrays `remove` — do not splice `data.json` here: when `state.data.json`
-                    // and form values share references, a manual splice + remove would delete two rows or leave `{}`.
-                    // Use `this.props.index` at click time — not `index` from the `config` getter closure (frozen
-                    // on first `this.meta` build). After a row is deleted, sibling rows re-index; stale index
-                    // removes the wrong slot and leaves a ghost `{}` in the array.
-                    const idx = Number(this.props.index)
-                    parentForm.mutators.remove(arrayPath, idx)
-                    let nextJson = compactDataKindArrays(cloneDeep(parentForm.getState().values))
-                    parent.setState((prev) => ({
-                        data: {
-                            ...prev.data,
-                            json: nextJson,
-                        },
-                    }), () => {
-                        parentForm.reset(nextJson)
-                    })
-                }
+                // The form, meta and index are read at click time and the instance is the one
+                // captured here, exactly as before (see `removeDataKindRow`).
+                ? () => removeDataKindRow({
+                    parentUIRender: parent,
+                    parentForm: this.props.parent.props.instance.form,
+                    meta: this.props.meta,
+                    kind: form.kind,
+                    index: this.props.index,
+                    fallbackDataKindPath: this.dataKindPath,
+                })
                 : dataActionWarning
 
             // Popup Content Opening
