@@ -17,6 +17,7 @@ import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
 import { messageFromError } from './apiError'
+import { parsePopupArgs } from './popupArgs'
 import { resolvePopupScope } from './popupScope'
 import { errorsFor, formsStorage, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
@@ -757,44 +758,10 @@ function Decorator (Class) {
 
             // Popup Content Opening
             FIELD.FUNC[FIELD.ACTION.POPUP_OPEN] = (...args) => {
-                // Filter out event objects (React SyntheticEvent or native Event)
-                const filteredArgs = args.filter(arg => {
-                    // React component classes are functions, so check them before the generic primitive branch.
-                    if (arg && arg.prototype && arg.prototype.isReactComponent) {
-                        return false
-                    }
-                    if (typeof arg !== 'object' || arg === null) return true
-                    // Check if it's an event object
-                    if (arg.nativeEvent || arg.target || arg.preventDefault || arg.stopPropagation) {
-                        return false
-                    }
-                    return true
-                })
-                
-                // noinspection JSCheckFunctionSignatures
-                // Handle different argument formats: [id, options] or [id] or [options with id]
-                let id, options = {}
-                if (filteredArgs.length === 0) {
-                    console.error('Popup Open: no arguments provided after filtering')
-                    return
-                }
-                if (typeof filteredArgs[0] === 'string') {
-                    id = filteredArgs[0]
-                    options = filteredArgs[1] || {}
-                } else if (typeof filteredArgs[0] === 'object' && filteredArgs[0] !== null) {
-                    // If first arg is object, it might be options with id, or just options
-                    options = filteredArgs[0]
-                    id = filteredArgs[1] || options.id
-                } else {
-                    id = String(filteredArgs[0])
-                    options = filteredArgs[1] || {}
-                }
-                
-                // Ensure id is a string
-                if (typeof id !== 'string' || !id) {
-                    console.error('Popup Open: id must be a non-empty string, got:', typeof id, id)
-                    return
-                }
+                // Which popup, and with what — `popupArgs.js`, testable on its own.
+                const parsed = parsePopupArgs(args)
+                if (!parsed) return
+                const { id, options } = parsed
                 
                 // Extract relativePath and relativeIndex from options if provided
                 // These come from renderItem context and ensure popup fields match table row fields
