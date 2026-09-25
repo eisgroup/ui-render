@@ -13,9 +13,9 @@
  *   - valid JSON with a `message` — the message is used
  *   - valid JSON without one — the whole object is used, and `Json` renders it
  *   - a message that embeds `message=…errors…` — only the part before `errors` is meaningful
- *   - bare-KEY pseudo-JSON — the keys are quoted before parsing, which rescues a body whose
- *     values are already quoted and nothing else: `{message: Row is locked}` still fails and is
- *     shown as text
+ *   - bare-KEY pseudo-JSON — only when the body does not parse as it is, the keys are quoted and
+ *     parsing tried again, which rescues a body whose values are already quoted and nothing else:
+ *     `{message: Row is locked}` still fails and is shown as text
  *   - plain text — used as-is
  *   - a body that parses to something falsy — the error itself, as before
  *
@@ -32,20 +32,20 @@ export async function messageFromError (error) {
 
     let errorObject
     try {
-        // Quote bare keys first: some APIs return `{message: ...}` rather than JSON.
-        //
-        // KNOWN DEFECT, pinned by `apiError.test.js` rather than fixed here: this runs over the
-        // WHOLE text, string values included. A message embedding `errors=[{code:12}]` — the shape
-        // the `message=…errors…` branch below exists for — becomes `errors=[{"code":12}]`, whose
-        // quotes break the JSON string that contains them. Parsing then fails and the raw body is
-        // shown. Fixing it means parsing first and quoting only as a fallback, which changes what
-        // users see and belongs in its own change.
-        errorObject = JSON.parse(errorText.replace(/(\w+:)|(\w+ :)/g, function (s) {
-            return '"' + s.substring(0, s.length - 1) + '":'
-        }))
+        errorObject = JSON.parse(errorText)
     } catch {
-        // Some APIs return a plain-text error body instead of JSON.
-        return errorText || error
+        try {
+            // Some APIs return `{message: ...}` rather than JSON, so quote bare keys and try again.
+            // Only as a fallback: run over a body that WAS valid JSON, the pass also quoted every
+            // `word:` inside its string values — a URL's `http:`, an embedded `{code:12}` — broke the
+            // JSON that contained them, and the user was shown the raw body. Fixed 2026-09-25.
+            errorObject = JSON.parse(errorText.replace(/(\w+:)|(\w+ :)/g, function (s) {
+                return '"' + s.substring(0, s.length - 1) + '":'
+            }))
+        } catch {
+            // Some APIs return a plain-text error body instead of JSON.
+            return errorText || error
+        }
     }
 
     // A body that parses to something falsy (`null`, `0`, `""`) leaves the error itself as the
