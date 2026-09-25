@@ -276,8 +276,8 @@ const ACTION_CURATION = {
         notes: 'Warns and does nothing when the node has no parent instance and form.',
     },
     DOWNLOAD: {
-        summary: 'Calls the host `downloadFile` API call with the file name and saves the response as a file.',
-        notes: 'Does nothing when the host supplies no `downloadFile`; failures open an error popup.',
+        summary: 'Calls the host `downloadFile` API call with the first argument and saves the response as a file, named by the second argument when that is a non-empty string and by the first otherwise.',
+        notes: 'Does nothing when the host supplies no `downloadFile`. With no name at all the browser names the saved file. A failure opens an error popup titled with the error message.',
     },
     FETCH: {
         summary: 'The global `fetch`.',
@@ -312,12 +312,12 @@ const ACTION_CURATION = {
         notes: null,
     },
     UPDATE_DATA_ON_CHANGE: {
-        summary: 'Writes a changed primitive value back into the instance data at the field `name`.',
-        notes: 'Marked in the source as a temporary solution; it ignores object values.',
+        summary: 'Writes a changed primitive value into every property of the instance data whose key is the field `name`, at any depth.',
+        notes: 'Marked in the source as a temporary solution; it ignores object values, and does nothing when called without a field object.',
     },
     UPLOAD: {
-        summary: 'Sends the picked file together with the current form data to the host `uploadFile` API call and restarts the form with the normalized response.',
-        notes: 'Does nothing when the host supplies no `uploadFile`.',
+        summary: 'Sends the current form data without the file field, the first picked file and every picked file to the host `uploadFile` API call as `(serializedData, file, files)`, and restarts the form with the normalized response.',
+        notes: 'Does nothing when the host supplies no `uploadFile`. An empty response (`undefined`, `null`, `\'\'`, `0`) leaves the data as it was; a failure is logged, with no popup.',
     },
     WARN: {
         summary: 'Logs the arguments with `console.warn`.',
