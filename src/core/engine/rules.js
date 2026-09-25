@@ -17,6 +17,7 @@ import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
 import { download } from './download'
+import { upload } from './upload'
 import { messageFromError } from './apiError'
 import { parsePopupArgs } from './popupArgs'
 import { resolvePopupScope } from './popupScope'
@@ -819,30 +820,21 @@ function Decorator (Class) {
                 downloadFile: this.getAPICalls().downloadFile,
                 onFailure: err => this.popupAlert(err, _.DOWNLOAD_FAILED_),
             })
-            // File upload
-            FIELD.FUNC[FIELD.ACTION.UPLOAD] = async (files, path, dropzoneRef) => {
-                const { uploadFile } = this.getAPICalls()
-                const [file] = files
-                if (file && typeof uploadFile === 'function') {
-                    const data = this.getAllFormsData()
-                    delete data[path]
-                    try {
-                        const response = await uploadFile(JSON.stringify(data), file)
-                        const normalizedResponse = normalizeIncomingData(response)
-                        dropzoneRef.fileInputEl.value = null
-                        this.setState({
-                            data: {
-                                json: normalizedResponse
-                            }
-                        }, () => {
-                            this.setState({ key: new Date() })
-                            this.form.restart(normalizedResponse)
-                        })
-                    } catch (error) {
-                        console.error(error)
+            // Send the forms' values and a file through the host's `uploadFile`, and make its answer
+            // the data (see `upload.js`). The remount key and the form restart wait for the new data
+            // to be committed, as they always did.
+            FIELD.FUNC[FIELD.ACTION.UPLOAD] = (...args) => upload(args, {
+                uploadFile: this.getAPICalls().uploadFile,
+                readFormsData: this.getAllFormsData,
+                onUploaded: normalizedResponse => this.setState({
+                    data: {
+                        json: normalizedResponse
                     }
-                }
-            }
+                }, () => {
+                    this.setState({ key: new Date() })
+                    this.form.restart(normalizedResponse)
+                }),
+            })
             // Add current Form values to parent UI Render instance.state
             FIELD.FUNC[FIELD.ACTION.ADD_DATA] = (parent && form)
                 ? () => {

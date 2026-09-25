@@ -211,6 +211,110 @@ describe('UIRender action orchestration', () => {
         }
     })
 
+    it('restarts the form with the upload answer, so inputs show it', async () => {
+        // The `Text` in the test above reads the DATA; an input reads the FORM, which only follows
+        // the answer because the upload restarts it.
+        const data = { status: 'Before upload' }
+        const { container } = render(wrap(
+            <UIRender
+                meta={{
+                    view: 'Row',
+                    items: [
+                        { view: 'Input', name: 'status', type: 'text', label: 'Status' },
+                        {
+                            view: 'Input',
+                            name: 'file',
+                            type: 'file',
+                            title: 'Upload replacement',
+                            formats: ['csv'],
+                            onChange: 'upload',
+                        },
+                    ],
+                }}
+                data={data}
+                initialValues={data}
+                apiCalls={{ uploadFile: () => Promise.resolve({ status: 'After upload' }) }}
+            />
+        ))
+        expect(screen.getByLabelText('Status')).toHaveValue('Before upload')
+
+        fireEvent.change(container.querySelector('input[type="file"]'), {
+            target: { files: [new File(['a'], 'a.csv', { type: 'text/csv' })] },
+        })
+
+        await waitFor(() => expect(screen.getByLabelText('Status')).toHaveValue('After upload'))
+    })
+
+    it('PINNED DEFECT: sends a nested file field in the payload, as a list of empty objects', async () => {
+        // `upload.js` excludes the file field with `delete data[path]`, which only reaches a
+        // top-level key. For `attachment.file` the field's value — the picked file list — stays,
+        // and `JSON.stringify` writes each File as `{}`.
+        const uploadFile = jest.fn(() => new Promise(() => {}))
+        const data = { recordNumber: 'R-1', attachment: { file: 'stale', note: 'kept' } }
+
+        const { container } = render(wrap(
+            <UIRender
+                meta={{
+                    view: 'Input',
+                    name: 'attachment.file',
+                    type: 'file',
+                    title: 'Upload CSV',
+                    formats: ['csv'],
+                    onChange: 'upload',
+                }}
+                data={data}
+                initialValues={data}
+                apiCalls={{ uploadFile }}
+            />
+        ))
+
+        fireEvent.change(container.querySelector('input[type="file"]'), {
+            target: { files: [new File(['a'], 'a.csv', { type: 'text/csv' })] },
+        })
+
+        await waitFor(() => expect(uploadFile).toHaveBeenCalledTimes(1))
+        expect(JSON.parse(uploadFile.mock.calls[0][0])).toEqual({
+            recordNumber: 'R-1',
+            attachment: { file: [{}], note: 'kept' },
+        })
+    })
+
+    it('PINNED DEFECT: renders nothing at all once an upload answers with no data', async () => {
+        // The answer replaces the data wholesale, and with no data the engine renders an empty
+        // container — the upload control included, so the user cannot try again. A host whose
+        // `uploadFile` resolves with nothing (a `.then(() => {})`, say) gets exactly this.
+        const data = { status: 'Before upload' }
+        const { container } = render(wrap(
+            <UIRender
+                meta={{
+                    view: 'Row',
+                    items: [
+                        { view: 'Text', children: { name: 'status' } },
+                        {
+                            view: 'Input',
+                            name: 'file',
+                            type: 'file',
+                            title: 'Upload replacement',
+                            formats: ['csv'],
+                            onChange: 'upload',
+                        },
+                    ],
+                }}
+                data={data}
+                initialValues={data}
+                apiCalls={{ uploadFile: () => Promise.resolve(undefined) }}
+            />
+        ))
+        expect(screen.getByText('Before upload')).toBeInTheDocument()
+
+        fireEvent.change(container.querySelector('input[type="file"]'), {
+            target: { files: [new File(['a'], 'a.csv', { type: 'text/csv' })] },
+        })
+
+        await waitFor(() => expect(container.querySelector('input[type="file"]')).toBeNull())
+        expect(container).toHaveTextContent(/^$/)
+    })
+
     it('submits the latest form values through a meta-defined submit action', async () => {
         const onSubmit = jest.fn()
         const data = { customerName: 'Before edit' }
