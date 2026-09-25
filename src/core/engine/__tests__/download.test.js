@@ -10,7 +10,7 @@
  * The save is the real `services/downloadFile`, observed at the one place a browser would show it:
  * the `download` attribute of the link it clicks.
  */
-import { download } from '../download'
+import { describeFailure, download } from '../download'
 
 let saved
 let anchorClick
@@ -167,5 +167,47 @@ describe('without a usable host call', () => {
         expect(() => download(['a.csv'], { downloadFile: () => undefined, onFailure: e => failures.push(e) }))
             .toThrow(TypeError)
         expect(failures).toEqual([])
+    })
+})
+
+describe('describeFailure, the text the failure popup can title itself with', () => {
+    it.each([
+        ['a string', 'quota exceeded', 'quota exceeded'],
+        ['an Error, by its message', new TypeError('Failed to fetch'), 'Failed to fetch'],
+        ['an Error with no message, by its name', new RangeError(), 'RangeError'],
+        ['nothing', undefined, ''],
+        ['null', null, ''],
+        ['anything else, as a string', 42, '42'],
+    ])('describes %s', (_label, error, expected) => {
+        expect(describeFailure(error)).toBe(expected)
+    })
+
+    describe('a Response', () => {
+        // jsdom defines no `Response`; see `apiError.test.js`.
+        class TestResponse {
+            constructor (status, statusText) {
+                this.status = status
+                this.statusText = statusText
+            }
+        }
+
+        let originalResponse
+        beforeAll(() => {
+            // eslint-disable-next-line no-undef
+            originalResponse = global.Response
+            // eslint-disable-next-line no-undef
+            global.Response = TestResponse
+        })
+        afterAll(() => {
+            // eslint-disable-next-line no-undef
+            if (originalResponse === undefined) delete global.Response
+            // eslint-disable-next-line no-undef
+            else global.Response = originalResponse
+        })
+
+        it('is described by its status', () => {
+            expect(describeFailure(new TestResponse(404, 'Not Found'))).toBe('404 Not Found')
+            expect(describeFailure(new TestResponse(502, ''))).toBe('502')
+        })
     })
 })
