@@ -19,8 +19,10 @@ import { normalizeIncomingData } from './utils'
  * the nested object. Until that was fixed it was `delete data[path]`, a TOP-LEVEL key, and the field
  * stayed in the payload as its value — the picked file list, which `JSON.stringify` writes as `[{}]`.
  *
- * Only the first of several files is sent, even when the field allows `multiple`; pinned by
- * `upload.test.js` rather than changed, because the host's `uploadFile` takes one file.
+ * THE HOST GETS EVERY PICKED FILE AS A THIRD ARGUMENT, `uploadFile(serialized, file, files)`, and
+ * the first as the second, as before. Until that was added only the first of several reached the
+ * host even when the field allowed `multiple`; the third argument is additive, so a host written
+ * for `(serialized, file)` sees no difference.
  *
  * A failure is logged and nothing else: no popup, and the data is left as it was. Clearing the file
  * input on success is kept although the in-house `Dropzone` already clears it after every pick,
@@ -39,7 +41,7 @@ export async function upload ([files, path, dropzone], { uploadFile, readFormsDa
     const data = readFormsData()
     unset(data, path)
     try {
-        const response = await uploadFile(JSON.stringify(data), file)
+        const response = await uploadFile(JSON.stringify(data), file, files)
         dropzone.fileInputEl.value = null
         if (!response) return
         onUploaded(normalizeIncomingData(response))

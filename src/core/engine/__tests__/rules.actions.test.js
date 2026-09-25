@@ -143,13 +143,15 @@ describe('UIRender action orchestration', () => {
         })
 
         await waitFor(() => expect(uploadFile).toHaveBeenCalledTimes(1))
-        expect(uploadFile).toHaveBeenCalledWith(
-            JSON.stringify({
-                recordNumber: 'P-100',
-                nested: { enabled: true },
-            }),
-            file
-        )
+        const [serialized, sentFile, sentFiles] = uploadFile.mock.calls[0]
+        expect(serialized).toBe(JSON.stringify({
+            recordNumber: 'P-100',
+            nested: { enabled: true },
+        }))
+        // By identity: `toHaveBeenCalledWith` compares Files structurally, and any two are equal.
+        expect(sentFile).toBe(file)
+        expect(sentFiles).toHaveLength(1)
+        expect(sentFiles[0]).toBe(file)
     })
 
     it('reinitializes the UI with a successful upload response', async () => {

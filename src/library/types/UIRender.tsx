@@ -61,7 +61,11 @@ declare namespace UIRender {
     export interface UIRenderApiCalls<Data = unknown> {
         updateExperienceData?(data: Data): Promise<unknown>
         downloadFile?(fileName: string): Promise<UIRenderDownloadResponse>
-        uploadFile?(serializedData: string, file: File): Promise<unknown>
+        /**
+         * `file` is the first picked file; `files` is every file picked, for a field that allows
+         * `multiple`. A host that takes only the first two arguments is unaffected.
+         */
+        uploadFile?(serializedData: string, file: File, files: File[]): Promise<unknown>
     }
 
     export interface UIRenderFormOptions extends React.FormHTMLAttributes<HTMLFormElement> {
