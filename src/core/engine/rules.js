@@ -16,6 +16,7 @@ import { cloneDeep, hasObjectValue, isObject, set, setIn } from '../utils/object
 import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
+import { download } from './download'
 import { messageFromError } from './apiError'
 import { parsePopupArgs } from './popupArgs'
 import { resolvePopupScope } from './popupScope'
@@ -32,7 +33,6 @@ import {
     normalizeIncomingData
 } from './utils'
 import { isEqual } from '../utils/object'
-import { downloadFile as downloadFileProcessing } from '../services/downloadFile'
 import { double5, integer, phone, uppercase } from '../components/inputs/normalizers'
 import { AppContext } from '../contexts'
 import { ConfigOverride } from '../providers'
@@ -813,20 +813,12 @@ function Decorator (Class) {
         get () {
             const data = this.data
             const { form, parent } = this.props
-            // Download file from URL
-            FIELD.FUNC[FIELD.ACTION.DOWNLOAD] = (...args) => {
-                // The first argument can be Button Event
-                if (typeof args[0] === 'object') args.shift()
-                const [fileName] = args
-                const { downloadFile } = this.getAPICalls()
-                if (typeof downloadFile !== 'function') {
-                    return false
-                }
-                downloadFile(fileName)
-                    .then(response => response.blob())
-                    .then(downloadFileProcessing(fileName))
-                    .catch(err => this.popupAlert(err, _.DOWNLOAD_FAILED_))
-            }
+            // Fetch a file through the host's `downloadFile` and save it (see `download.js`). The API
+            // call is read at click time, as it always was.
+            FIELD.FUNC[FIELD.ACTION.DOWNLOAD] = (...args) => download(args, {
+                downloadFile: this.getAPICalls().downloadFile,
+                onFailure: err => this.popupAlert(err, _.DOWNLOAD_FAILED_),
+            })
             // File upload
             FIELD.FUNC[FIELD.ACTION.UPLOAD] = async (files, path, dropzoneRef) => {
                 const { uploadFile } = this.getAPICalls()
