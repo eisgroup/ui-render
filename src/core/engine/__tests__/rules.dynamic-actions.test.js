@@ -50,8 +50,8 @@ const popupData = {
     experienceRatingInputs: {
         overrideOptions: [
             {
-                optionType: 'Dental',
-                inforceRateOverrideReason: 'Original reason',
+                optionType: 'Standard',
+                rateOverrideReason: 'Original reason',
             },
         ],
     },
@@ -82,7 +82,7 @@ describe('UIRender dynamic action and data-integrity contracts', () => {
         const meta = popupTableMeta([
             {
                 view: 'Input',
-                name: 'inforceRateOverrideReason',
+                name: 'rateOverrideReason',
                 label: 'Override reason',
             },
         ])
@@ -105,19 +105,19 @@ describe('UIRender dynamic action and data-integrity contracts', () => {
         expect(screen.getByText('Row override')).toBeInTheDocument()
         expect(reasonInput).toHaveAttribute(
             'name',
-            'experienceRatingInputs.overrideOptions[0].inforceRateOverrideReason'
+            'experienceRatingInputs.overrideOptions[0].rateOverrideReason'
         )
         expect(reasonInput).toHaveValue('Original reason')
 
         fireEvent.focus(reasonInput)
-        fireEvent.change(reasonInput, { target: { value: 'Actuarial review' } })
+        fireEvent.change(reasonInput, { target: { value: 'Manual review' } })
 
         const readFormData = getFormData.mock.calls[0][0]
         await waitFor(() => {
             expect(readFormData().experienceRatingInputs.overrideOptions[0])
                 .toEqual(expect.objectContaining({
-                    optionType: 'Dental',
-                    inforceRateOverrideReason: 'Actuarial review',
+                    optionType: 'Standard',
+                    rateOverrideReason: 'Manual review',
                 }))
         })
     })
