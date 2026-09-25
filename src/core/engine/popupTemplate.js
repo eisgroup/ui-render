@@ -15,10 +15,10 @@
  *      is kept because it is not provably unreachable.
  *   3. for such an id: the first key whose `{index}`, read as digits, matches the whole id
  *
- * TWO DEFECTS IN STEP 3, pinned by `popupTemplate.test.js` rather than fixed here: the key is turned
- * into a regular expression WITHOUT ESCAPING, so its `.` matches any character — `a.b.{index}` also
- * claims `aXb.3` — and a key whose characters do not form a valid expression, an unbalanced `[` say,
- * throws a SyntaxError. Since every key is tried, that one template breaks step 3 for every id.
+ * Step 3 ESCAPES the key around each `{index}`, so everything else in it matches literally. Until
+ * that was fixed the key went into the expression raw: its `.` matched any character, so
+ * `a.b.{index}` also claimed `aXb.3`; and a key that was not a valid expression — an unbalanced `[`
+ * say — threw a SyntaxError, which, since every key is tried, broke step 3 for every id.
  *
  * @param {Object} [popupTemplates] - the instance's registered templates, keyed by raw id
  * @param {string} id - the id `popupOpen` was asked for
@@ -26,6 +26,9 @@
  * @returns {?{popupTemplate: Object, templateId: string}} the template and the key it was found by
  *   (step 2's candidate for that step), or null when there is none
  */
+/** Escape every character that means something in a regular expression. */
+const escapeRegExp = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 export function findPopupTemplate (popupTemplates, id, index) {
     if (!popupTemplates) return null
 
@@ -38,7 +41,7 @@ export function findPopupTemplate (popupTemplates, id, index) {
     }
 
     const matchingTemplate = Object.keys(popupTemplates).find(key => {
-        const templatePattern = key.replace(/\{index\}/g, '\\d+')
+        const templatePattern = key.split('{index}').map(escapeRegExp).join('\\d+')
         return new RegExp(`^${templatePattern}$`).test(id)
     })
     return matchingTemplate

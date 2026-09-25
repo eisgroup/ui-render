@@ -60,18 +60,23 @@ describe('finding the template', () => {
     })
 })
 
-describe('pinned, not fixed', () => {
-    it('PINNED DEFECT: a key is not escaped, so its `.` matches any character', () => {
+describe('the rest of a key matches literally', () => {
+    // Until this was fixed the key went into the expression unescaped. Both cases below were
+    // pinned as defects first; each fails on the old code.
+    it('so its `.` is a dot, not any character', () => {
         const nested = template('nested')
+        const templates = { 'a.b.{index}': nested }
 
-        expect(findPopupTemplate({ 'a.b.{index}': nested }, 'aXb.3', 0))
-            .toEqual({ popupTemplate: nested, templateId: 'a.b.{index}' })
+        expect(findPopupTemplate(templates, 'aXb.3', 0)).toBeNull()
+        expect(findPopupTemplate(templates, 'a.b.3', 0)).toEqual({ popupTemplate: nested, templateId: 'a.b.{index}' })
     })
 
-    it('PINNED DEFECT: one key that is not a valid expression breaks the lookup for every id', () => {
-        // `edit.3` has a template of its own; the `[` in an unrelated key throws first.
-        const templates = { 'list[.{index}': template('broken'), 'edit.{index}': template('edit') }
+    it('so a key with expression characters neither throws nor breaks the lookup for other ids', () => {
+        const broken = template('broken')
+        const edit = template('edit')
+        const templates = { 'list[.{index}': broken, 'edit.{index}': edit }
 
-        expect(() => findPopupTemplate(templates, 'edit.3', 0)).toThrow(SyntaxError)
+        expect(findPopupTemplate(templates, 'edit.3', 0)).toEqual({ popupTemplate: edit, templateId: 'edit.{index}' })
+        expect(findPopupTemplate(templates, 'list[.3', 0)).toEqual({ popupTemplate: broken, templateId: 'list[.{index}' })
     })
 })
