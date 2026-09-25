@@ -106,15 +106,16 @@ describe('what is not read', () => {
         expect(saved).toEqual(['/static/images/ui-architecture.png'])
     })
 
-    it('PINNED DEFECT: with no file name the host is asked for undefined and the file is saved as "undefined"', async () => {
-        // Asking the host is defensible, since a host may have a default. Saving under the string
-        // "undefined" is not, and is what a user would see.
+    it('with no file name asks the host for undefined and leaves the saved name to the browser', async () => {
+        // Asking the host is defensible, since a host may have a default. Until this was fixed the
+        // file was saved under the string "undefined"; the attribute is now empty, which still
+        // downloads and lets the browser name the file.
         const { downloadFile, requested } = hostReturning(new Blob(['x']))
 
         await download([{ nativeEvent: {} }], { downloadFile, onFailure: failNever })
 
         expect(requested).toEqual([undefined])
-        expect(saved).toEqual(['undefined'])
+        expect(saved).toEqual([''])
     })
 })
 
