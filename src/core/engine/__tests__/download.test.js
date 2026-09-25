@@ -90,11 +90,10 @@ describe('which leading argument counts as the event', () => {
     })
 })
 
-describe('what is not read', () => {
-    it('PINNED: a second argument, the name to save as, is ignored', async () => {
-        // The shape `button-download_meta.js` still writes. It meant something until 2022-11, when
-        // this action stopped downloading URLs itself; since then the file is saved under the name
-        // it was requested by, path and all.
+describe('what the arguments mean beyond the first', () => {
+    it('saves under a second argument, while the host is asked for the first', async () => {
+        // The shape `button-download_meta.js` writes. It meant this until 2022-11, when the switch
+        // to the host's `downloadFile` silently dropped the second argument; restored since.
         const { downloadFile, requested } = hostReturning(new Blob(['x']))
 
         await download(
@@ -103,8 +102,19 @@ describe('what is not read', () => {
         )
 
         expect(requested).toEqual(['/static/images/ui-architecture.png'])
-        expect(saved).toEqual(['/static/images/ui-architecture.png'])
+        expect(saved).toEqual(['optional-file-name-to-save-as.png'])
     })
+
+    it.each([['an empty string', ''], ['a non-string', 42]])(
+        'falls back to the requested name when the second argument is %s',
+        async (_label, saveAs) => {
+            const { downloadFile } = hostReturning(new Blob(['x']))
+
+            await download(['report.csv', saveAs], { downloadFile, onFailure: failNever })
+
+            expect(saved).toEqual(['report.csv'])
+        }
+    )
 
     it('with no file name asks the host for undefined and leaves the saved name to the browser', async () => {
         // Asking the host is defensible, since a host may have a default. Until this was fixed the

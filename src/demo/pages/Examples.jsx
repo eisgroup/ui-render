@@ -17,6 +17,7 @@ import {
   downloadHistoricalFileTemplate,
   uploadHistoricalFile
 } from '../api/gdn-rating-alg'
+import { downloadFromUrl } from '../api/staticFiles'
 
 /**
  * VIEW TEMPLATE ---------------------------------------------------------------
@@ -99,6 +100,7 @@ export default class Examples extends Component {
                       initialValues={data}
                       form={obj}
                       onSubmit={console.warn}
+                      apiCalls={{ downloadFile: downloadFromUrl }}
                     />
                   )}
                   <ScrollView className="padding-smaller bg-neutral inverted">

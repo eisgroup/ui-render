@@ -1,5 +1,3 @@
-import { __DEV__ } from '../../core/utils'
-
 const buttonDownloadMeta = {
   view: 'Button',
   items: [
@@ -16,8 +14,11 @@ const buttonDownloadMeta = {
   onClick: {
     name: 'download',
     args: [
-      // Using path relative to the URL the page is on
-      (__DEV__ ? '' : '/ui-render') + '/static/images/ui-architecture.png',
+      // Relative to the page, so it resolves under the demo's base both in the dev server
+      // (`/examples` → `/static/…`) and on GitHub Pages (`/ui-render/examples` → `/ui-render/static/…`).
+      // It used to choose the prefix by `__DEV__`, which is false in the demo's browser bundle, so
+      // the dev server asked for `/ui-render/static/…` and got a 404.
+      'static/images/ui-architecture.png',
       'optional-file-name-to-save-as.png'
     ]
   }
