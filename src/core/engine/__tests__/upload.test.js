@@ -115,7 +115,7 @@ describe('a failure', () => {
         })
 
         expect(consoleError).toHaveBeenCalledWith(failure)
-        expect(applied).toEqual([])
+        expect(applied).toHaveLength(0)
         expect(zone.writes).toEqual([])
     })
 
@@ -131,6 +131,31 @@ describe('a failure', () => {
 
         expect(consoleError).toHaveBeenCalledWith(failure)
     })
+})
+
+describe('an empty answer', () => {
+    it.each([['undefined', undefined], ['null', null], ['an empty string', ''], ['zero', 0]])(
+        'of %s is ignored: the data is kept, and the input still cleared',
+        async (_label, answer) => {
+            // Until this was fixed it was handed over as the new data. With `undefined` or `null` the
+            // engine then rendered an empty container, the upload control included (see
+            // `rules.actions.test.js`); with `''` or `0` every form value was wiped.
+            const { uploadFile } = hostAnswering(answer)
+            const zone = dropzone()
+            const applied = []
+
+            await upload([[csv('a.csv')], 'file', zone.handle], {
+                uploadFile,
+                readFormsData: () => ({}),
+                onUploaded: data => applied.push(data),
+            })
+
+            // `toHaveLength`, not `toEqual([])`: toEqual ignores undefined array items, so an
+            // answer of `undefined` handed over would still pass.
+            expect(applied).toHaveLength(0)
+            expect(zone.writes).toEqual([null])
+        }
+    )
 })
 
 describe('pinned, not fixed', () => {
@@ -163,20 +188,4 @@ describe('pinned, not fixed', () => {
         expect(calls[0].file).toBe(first)
     })
 
-    it.each([['undefined', undefined], ['null', null]])(
-        'PINNED DEFECT: an answer of %s is handed over as the new data',
-        async (_label, answer) => {
-            // Which the engine renders as an empty container: see `rules.actions.test.js`.
-            const { uploadFile } = hostAnswering(answer)
-            const applied = []
-
-            await upload([[csv('a.csv')], 'file', dropzone().handle], {
-                uploadFile,
-                readFormsData: () => ({}),
-                onUploaded: data => applied.push(data),
-            })
-
-            expect(applied).toEqual([answer])
-        }
-    )
 })

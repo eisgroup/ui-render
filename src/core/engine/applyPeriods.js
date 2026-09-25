@@ -10,8 +10,7 @@ import { normalizeIncomingData } from './utils'
  * with becomes the UI's data. A failure is read into a message by `messageFromError` and handed on.
  *
  * AN EMPTY ANSWER IS IGNORED — `undefined`, `null`, `''`, `0` — and the data is left as it was.
- * `upload.js` does the same job without this guard, which is why an empty upload answer empties the
- * UI there (pinned in `upload.test.js`); the difference is recorded, not resolved, here.
+ * `upload.js` has the same guard now; before it did, an empty upload answer emptied the UI.
  *
  * @param {{updateExperienceData: Function, readFormsData: Function, onUpdated: Function,
  *   onFailure: Function}} options - the host's API call; a reader for every form's current values;
