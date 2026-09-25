@@ -14,11 +14,11 @@ import { downloadFile as saveBlob } from '../services/downloadFile'
  * dropped. `parsePopupArgs` recognises events properly; making this match would change which
  * calls reach the host, which is not what an extraction is for.
  *
- * Only the first remaining argument is read. Until 2022-11 this action downloaded a URL itself and
- * took a second argument, the name to save as; the switch to the host's `downloadFile` dropped it.
- * The demo's `button-download_meta.js` still passes one, and it is still ignored — pinned by
- * `download.test.js` rather than restored here, since restoring it changes the saved file's name
- * for every meta that copied the demo.
+ * THE FIRST REMAINING ARGUMENT IS WHAT THE HOST IS ASKED FOR, AND A SECOND ONE, WHEN IT IS A
+ * NON-EMPTY STRING, IS THE NAME TO SAVE AS; without it the file is saved under the name it was
+ * requested by. That second argument is what this action took until 2022-11, when it stopped
+ * downloading URLs itself and began calling the host's `downloadFile`, and the switch silently
+ * dropped it — the demo's `button-download_meta.js` kept passing one. Restored 2026-09-25.
  *
  * `downloadFile` is called exactly as before, with no `this`, so a host that throws synchronously
  * or returns something other than a promise still fails loudly instead of reaching `onFailure`.
@@ -31,11 +31,11 @@ import { downloadFile as saveBlob } from '../services/downloadFile'
  *   nothing here, and no caller reads the value: a `Button` hands `onClick` straight to the DOM.
  */
 export function download (args, { downloadFile, onFailure }) {
-    const [fileName] = typeof args[0] === 'object' ? args.slice(1) : args
+    const [fileName, saveAs] = typeof args[0] === 'object' ? args.slice(1) : args
     if (typeof downloadFile !== 'function') return false
 
     return downloadFile(fileName)
         .then(response => response.blob())
-        .then(saveBlob(fileName))
+        .then(saveBlob(typeof saveAs === 'string' && saveAs ? saveAs : fileName))
         .catch(onFailure)
 }
