@@ -10,13 +10,18 @@
  * reason about the class as written; and the lifecycle layer had no identity of its own, which is
  * what §9.3 step 5 means by "visible in the component tree".
  *
- * The layer is now a subclass. The class handed to `Decorator` is left exactly as written, and the
- * layer is what nested documents render — `engine/Data.js` reads it from `Active.UIRender` to avoid
- * a circular import, so that registry is the layer's published name.
+ * The layer is now a subclass. The class handed to `Decorator` is left exactly as written.
  *
- * The layer's bodies are written as class members, `config` included, which was the last of them.
- * Only `state` is still assigned to the prototype, because `withFormSetup` merges onto it (see
- * `Decorator` in `rules.js`).
+ * The layer's own bodies are written as class members, `config` included. Two things are still
+ * assigned to its prototype: the four data-kind registry methods `withDataKind` adds, and `state`,
+ * because the form layer builds its own from it (see `Decorator` in `rules.js`).
+ *
+ * THE FORM MODULE STOPPED PATCHING IT IN TURN. `withFormSetup` used to write the form members onto
+ * this layer's prototype and replace its `UNSAFE_componentWillReceiveProps` and
+ * `componentWillUnmount`; it now builds a subclass of its own over it. That subclass is what the
+ * form wrapper renders and what nested documents render — `engine/Data.js` reads it from
+ * `Active.UIRender` to avoid a circular import — so the chain is the declared class, this layer,
+ * then the form layer.
  */
 // eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
@@ -39,34 +44,93 @@ const INSTALLED_METHODS = [
 ]
 const INSTALLED_GETTERS = ['config', 'data', 'meta', 'hasData', 'hasMeta']
 
+/** Everything `withFormSetup` installs. It used to land on the engine layer's own prototype. */
+const FORM_MEMBERS = [
+    'form',
+    'handleSubmit',
+    'canSave',
+    'formValues',
+    'registeredValues',
+    'changedValues',
+    'changedAndRegisteredValues',
+    'validationErrors',
+    'validationErrorsTooltip',
+    'handleChangeInput',
+    'syncInputChanges',
+]
+/** The engine layer's own lifecycle methods that `withFormSetup` used to replace with wrappers. */
+const WRAPPED_LIFECYCLE = ['UNSAFE_componentWillReceiveProps', 'componentWillUnmount']
+
+// What nested documents render, and the class it is built on.
+const FormLayer = Active.UIRender
+const EngineLayer = Object.getPrototypeOf(FormLayer)
+
 describe('the lifecycle layer is a class of its own', () => {
     it('leaves the declared class untouched', () => {
         for (const name of INSTALLED_METHODS) {
             expect(UIRender.prototype[name]).toBeUndefined()
         }
-        for (const name of INSTALLED_GETTERS) {
+        for (const name of [...INSTALLED_GETTERS, ...FORM_MEMBERS]) {
             expect(Object.getOwnPropertyDescriptor(UIRender.prototype, name)).toBeUndefined()
         }
     })
 
     it('installs everything on the layer instead', () => {
         for (const name of INSTALLED_METHODS) {
-            expect(typeof Active.UIRender.prototype[name]).toBe('function')
+            expect(typeof EngineLayer.prototype[name]).toBe('function')
         }
         for (const name of INSTALLED_GETTERS) {
-            expect(Object.getOwnPropertyDescriptor(Active.UIRender.prototype, name)).toBeDefined()
+            expect(Object.getOwnPropertyDescriptor(EngineLayer.prototype, name)).toBeDefined()
         }
     })
 
     it('makes the layer a subclass of the declared class, not a replacement', () => {
-        expect(Object.getPrototypeOf(Active.UIRender)).toBe(UIRender)
-        expect(Active.UIRender.prototype).toBeInstanceOf(UIRender)
+        expect(EngineLayer.name).toBe('UIRenderLifecycle')
+        expect(Object.getPrototypeOf(EngineLayer)).toBe(UIRender)
+        expect(EngineLayer.prototype).toBeInstanceOf(UIRender)
     })
 
     it('keeps the default export wrapping the layer', () => {
-        // The default export is the layer inside the form wrapper; the layer on its own is what a
-        // nested document renders, which is why `Data.js` needs it separately.
+        // The default export is the layers inside the form wrapper; what the wrapper renders is also
+        // what a nested document renders on its own, which is why `Data.js` needs it separately.
         expect(typeof UIRenderDefault).toBe('function')
         expect(UIRenderDefault).not.toBe(Active.UIRender)
+        expect(UIRenderDefault.WrappedComponent).toBe(Active.UIRender)
+    })
+})
+
+describe('the form layer is a class of its own over it', () => {
+    it('is what nested documents render, built on the engine layer', () => {
+        expect(FormLayer.name).toBe('UIRenderLifecycleWithFormSetup')
+        expect(Object.getPrototypeOf(FormLayer)).toBe(EngineLayer)
+    })
+
+    it('carries the form members itself, leaving the engine layer without them', () => {
+        for (const name of FORM_MEMBERS) {
+            expect(Object.getOwnPropertyDescriptor(FormLayer.prototype, name)).toBeDefined()
+            expect(Object.getOwnPropertyDescriptor(EngineLayer.prototype, name)).toBeUndefined()
+        }
+    })
+
+    it('wraps the engine layer\'s lifecycle through `super` instead of replacing it', () => {
+        for (const name of WRAPPED_LIFECYCLE) {
+            expect(Object.prototype.hasOwnProperty.call(FormLayer.prototype, name)).toBe(true)
+            expect(Object.prototype.hasOwnProperty.call(EngineLayer.prototype, name)).toBe(true)
+            expect(FormLayer.prototype[name]).not.toBe(EngineLayer.prototype[name])
+        }
+    })
+
+    it('builds its state shape and prop types from the engine layer\'s, leaving those as they were', () => {
+        expect(EngineLayer.prototype.state).not.toHaveProperty('canSave')
+        expect(FormLayer.prototype.state).toEqual({ canSave: false, ...EngineLayer.prototype.state })
+
+        // The rule guards code that ships, where a production build may strip propTypes. This reads
+        // the declarations themselves, under jest, because how the layers compose them is the subject.
+        // eslint-disable-next-line react/forbid-foreign-prop-types
+        const [declared, engine, form] = [UIRender.propTypes, EngineLayer.propTypes, FormLayer.propTypes]
+        expect(engine).toBe(declared)
+        expect(form).toEqual(expect.objectContaining(declared))
+        expect(form).toHaveProperty('formProps')
+        expect(form).toHaveProperty('instance')
     })
 })

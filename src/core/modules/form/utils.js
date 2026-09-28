@@ -336,8 +336,9 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
     // @Note: form field re-renders because of constantly changing formProps reference
     //        => convert it to instance getter, so `asField` does not depend on formProps.
     //        => cannot use context, because it triggers re-render of all child components.
-    // Define withFormSetup here to load it only once on App init
-    withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors, processErrors})
+    // Built here, once per decorated class, and it is what the wrapper below renders: `Class` with the
+    // form layer over it, since `withFormSetup` no longer writes onto `Class` itself.
+    const FormClass = withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors, processErrors})
 
     const formSubscription = (form) => ({touched, initialValues}) => {
       // Everything below is about THIS form. It used to compare against one module-level baseline,
@@ -367,6 +368,11 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
     // Use PureComponent to avoid double checking large payloads.
     // noinspection JSPotentiallyInvalidUsageOfThis
     return class WithForm extends PureComponent {
+      // The class this wrapper renders, for a caller that renders it WITHOUT the wrapper: the
+      // engine's nested documents share their parent's form rather than making one of their own
+      // (`engine/Data.js`), so they must render this class and not the one handed to the decorator.
+      static WrappedComponent = FormClass
+
       get initValues () {
         return this._initValues || (this._initValues = this.props.initialValues)
       }
@@ -399,7 +405,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         }
 
         // Class should use PureComponent to take advantage of caching
-        return <Class {...this._props} formProps={this._formProps} initialValues={this._initValues} instance={this}/>
+        return <FormClass {...this._props} formProps={this._formProps} initialValues={this._initValues} instance={this}/>
       }
 
       componentDidMount () {
@@ -474,94 +480,71 @@ const setFieldTouched = (args, state) => {
  * Mixin to add Class Attributes and Methods commonly used with forms
  * @note: works with react-final-form
  *
- * @param {Object} Class - React Component or PureComponent to decorate
+ * THE FORM LAYER, AS ITS OWN CLASS (§9.3 step 5). This used to write its members straight onto
+ * `Class.prototype` and REPLACE the class's own `UNSAFE_componentWillReceiveProps` and
+ * `componentWillUnmount` with wrappers that called captured copies, so the class handed in was a
+ * different object before and after: the mutation the engine layer in `rules.js` had already
+ * stopped making to the class IT is handed. It now returns a subclass and leaves `Class` as written; the
+ * originals are reached through `super`, which is what the captures always meant. A caller must
+ * render what it RETURNS: `withForm` does, and publishes it as `WrappedComponent`.
+ *
+ * @param {Object} Class - React Component or PureComponent to build on; it is left as written
  * @param {Function} fieldValues - callback to get form values
  * @param {Function} registeredFieldValues - callback to get form registered values
  * @param {Function} registeredFieldErrors - callback to get form registered errors
- * @returns {Object} Class - mutated with form properties
+ * @returns {Object} a subclass of `Class` with the form properties
  */
 export function withFormSetup (Class, {fieldValues, registeredFieldValues, registeredFieldErrors, processErrors}) {
   if (!Active.renderField) throw new Error(`${withFormSetup.name} requires Active.renderField to be registered`)
-  const UNSAFE_componentWillReceiveProps = Class.prototype.UNSAFE_componentWillReceiveProps
-  const componentWillUnmount = Class.prototype.componentWillUnmount
-  const handleChangeInput = Class.prototype.handleChangeInput
 
   // Class.contextType = StateContext
 
-  Class.propTypes = {
-    formProps: PropTypes.object.isRequired, // form props, without `form` and `handleSubmit`
-    instance: PropTypes.object.isRequired, // {Class<form, handleSubmit>} WithForm instance for getting the form
-    initialValues: PropTypes.object, // form initial values
-    onChangeState: PropTypes.func, // onChangeState(this: Class)
-    ...Class.propTypes
-  }
+  class FormSetup extends Class {
+    static propTypes = {
+      formProps: PropTypes.object.isRequired, // form props, without `form` and `handleSubmit`
+      instance: PropTypes.object.isRequired, // {Class<form, handleSubmit>} WithForm instance for getting the form
+      initialValues: PropTypes.object, // form initial values
+      onChangeState: PropTypes.func, // onChangeState(this: Class)
+      ...Class.propTypes
+    }
 
-  Class.prototype.state = {
-    // This state only updates on input changes, for changes in parent props, use this.changedValues
-    canSave: false, // used to compare changes for re-rendering, like 'Save' button
-    ...Class.prototype.state
-  }
-
-  // Define instance getter
-  Object.defineProperty(Class.prototype, 'form', {
-    get () {
+    get form () {
       return this.props.instance ? this.props.instance.form : this.props.parent.form
     }
-  })
 
-  // Define instance getter
-  Object.defineProperty(Class.prototype, 'handleSubmit', {
-    get () {
+    get handleSubmit () {
       return this.props.instance ? this.props.instance.handleSubmit : this.props.parent.handleSubmit
     }
-  })
 
-  // Define instance getter
-  Object.defineProperty(Class.prototype, 'canSave', {
-    get () {
+    get canSave () {
       // @note: do not use `pristine` because it only reflects visible (i.e. registered inputs)
       //        do not use `valid` because it does not compute correctly on tab changes in FieldsInGroup
       const {loading} = this._props || this.props
       return !loading && !registeredFieldErrors(this.form) && !!this.changedValues
     }
-  })
 
-  // Define instance getter
-  Object.defineProperty(Class.prototype, 'formValues', {
-    get () {
+    get formValues () {
       return fieldValues(this.form)
     }
-  })
 
-  // Define instance getter
-  Object.defineProperty(Class.prototype, 'registeredValues', {
-    get () {
+    get registeredValues () {
       return registeredFieldValues(this.form)
     }
-  })
 
-  // Define instance getter
-  Object.defineProperty(Class.prototype, 'changedValues', {
-    get () {
+    get changedValues () {
       // Have to select all form values, because registered values may not include all input values
       const {initialValues} = this._props || this.props
       return objChanges(initialValues, this.formValues)
     }
-  })
 
-  // Define instance getter
-  Object.defineProperty(Class.prototype, 'changedAndRegisteredValues', {
-    get () {
+    get changedAndRegisteredValues () {
       const values = Object.assign({}, this.registeredValues || {}, this.changedValues || {})
       if (hasObjectValue(values)) return values
       // Callers treat `undefined` as "nothing to submit"; returned explicitly so the getter always returns.
       return undefined
     }
-  })
 
-  // Define instance getter
-  Object.defineProperty(Class.prototype, 'validationErrors', {
-    get () {
+    get validationErrors () {
       const errors = registeredFieldErrors(this.form)
       if (!errors) return null
       const messages = []
@@ -579,97 +562,109 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
         </View>
       )
     }
-  })
 
-  Object.defineProperty(Class.prototype, 'validationErrorsTooltip', {
-    get () {
+    get validationErrorsTooltip () {
       const errors = this.validationErrors
       return errors ? <ToolTip top>{errors}</ToolTip> : null
     }
-  })
 
-  /**
-   * PER INSTANCE, and the comment that used to sit here ("Define instance method") described the
-   * intent rather than the code (§9.3 step 4).
-   *
-   * `Class.prototype.handleChangeInput = debounce(…)` called `debounce` ONCE, so every instance of
-   * the decorated class shared a single timer. Two forms typing in the same tick meant the first
-   * one's `syncInputChanges` was cancelled by the second and never ran — and the survivor executed
-   * against the LAST instance's `this`. Silent, and invisible with one form on the page, which is
-   * why it survived: the demo never renders two.
-   *
-   * The getter builds the debounced function on FIRST ACCESS and caches it as an own property, so
-   * the prototype stays the single definition while each instance gets its own timer. It also
-   * registers the instance for teardown — `componentWillUnmount` below cancels it, which is what
-   * stops a scheduled sync firing into an unmounted component.
-   */
-  Object.defineProperty(Class.prototype, 'handleChangeInput', {
-    configurable: true,
-    get () {
+    /**
+     * PER INSTANCE, and the comment that used to sit here ("Define instance method") described the
+     * intent rather than the code (§9.3 step 4).
+     *
+     * `Class.prototype.handleChangeInput = debounce(…)` called `debounce` ONCE, so every instance of
+     * the decorated class shared a single timer. Two forms typing in the same tick meant the first
+     * one's `syncInputChanges` was cancelled by the second and never ran — and the survivor executed
+     * against the LAST instance's `this`. Silent, and invisible with one form on the page, which is
+     * why it survived: the demo never renders two.
+     *
+     * The getter builds the debounced function on FIRST ACCESS and caches it as an own property, so
+     * the prototype stays the single definition while each instance gets its own timer. It also
+     * registers the instance for teardown — `componentWillUnmount` below cancels it, which is what
+     * stops a scheduled sync firing into an unmounted component.
+     */
+    get handleChangeInput () {
+      // The handler of the class this builds on, if it has one, runs after the sync. Read through
+      // `super` rather than captured when the class was decorated, which is what the capture meant.
+      const inherited = super.handleChangeInput
       const own = debounce(function () {
         // To handle use case when all fields in a group are removed, and no registered values are sent to backend,
         // use placeholder parent field that reserves as registered null value field for the entire group.
         // See <Fields> component for example.
         this.syncInputChanges()
-        if (handleChangeInput) handleChangeInput.apply(this, arguments)
+        if (inherited) inherited.apply(this, arguments)
       }, UI.TYPING_DELAY)
       Object.defineProperty(this, 'handleChangeInput', {value: own, configurable: true, writable: true})
       return own
-    },
-    set (value) {
+    }
+
+    set handleChangeInput (value) {
       // Someone assigning over it (a test double, a subclass) must still win.
       Object.defineProperty(this, 'handleChangeInput', {value, configurable: true, writable: true})
-    },
-  })
+    }
 
-  // Define instance method
-  Class.prototype.syncInputChanges = function () {
-    const { formProps, onDataChanged, parent = {} } = this._props || this.props;
-    if (formProps && (!formProps.pristine)) {
-      if (typeof onDataChanged === 'function') {
-        onDataChanged()
-      } else if (parent && typeof parent.onDataChanged === 'function') {
-        parent.onDataChanged();
+    syncInputChanges () {
+      const { formProps, onDataChanged, parent = {} } = this._props || this.props;
+      if (formProps && (!formProps.pristine)) {
+        if (typeof onDataChanged === 'function') {
+          onDataChanged()
+        } else if (parent && typeof parent.onDataChanged === 'function') {
+          parent.onDataChanged();
+        }
+      }
+
+      const canSave = this.canSave
+      if (canSave !== this.state.canSave) {
+        this.setState({canSave})
+        const {onChangeState} = this._props || this.props
+        if (onChangeState) onChangeState(this)
       }
     }
 
-    const canSave = this.canSave
-    if (canSave !== this.state.canSave) {
-      this.setState({canSave})
-      const {onChangeState} = this._props || this.props
-      if (onChangeState) onChangeState(this)
-    }
-  }
-
-  Class.prototype.UNSAFE_componentWillReceiveProps = function (next) {
-    // @Note: using componentDidUpdate comparison logic is not reliable,
-    // because on the last re-render, Form may trigger `pristine` update without changing initialValues,
-    // which will make .canSave false, but this.syncInputChanges() only updated in the previous render, which was true.
-    // => thus need to take formProps into consideration
-    if (
-      !isEqualJSON(next.initialValues, this.props.initialValues) ||
-      !isEqualJSON(next.formProps, this.props.formProps)
-    ) {
-      // temporarily set to next props for state computation
-      this._props = next
-      this.syncInputChanges()
-      this._props = null
-      if (this._meta) {
-        if (processErrors) processErrors(this.form, this._meta);
+    UNSAFE_componentWillReceiveProps (next) {
+      // @Note: using componentDidUpdate comparison logic is not reliable,
+      // because on the last re-render, Form may trigger `pristine` update without changing initialValues,
+      // which will make .canSave false, but this.syncInputChanges() only updated in the previous render, which was true.
+      // => thus need to take formProps into consideration
+      if (
+        !isEqualJSON(next.initialValues, this.props.initialValues) ||
+        !isEqualJSON(next.formProps, this.props.formProps)
+      ) {
+        // temporarily set to next props for state computation
+        this._props = next
+        this.syncInputChanges()
+        this._props = null
+        if (this._meta) {
+          if (processErrors) processErrors(this.form, this._meta);
+        }
       }
+      if (super.UNSAFE_componentWillReceiveProps) super.UNSAFE_componentWillReceiveProps(...arguments)
     }
-    if (UNSAFE_componentWillReceiveProps) UNSAFE_componentWillReceiveProps.apply(this, arguments)
+
+    componentWillUnmount () {
+      this.isUnmounting = true
+      // Drop a scheduled input sync rather than letting it fire into an unmounted component
+      // (§9.3 step 4). Read through `hasOwnProperty` on purpose: touching the accessor would CREATE
+      // the debounced function for an instance that never used it, just to cancel nothing.
+      if (Object.prototype.hasOwnProperty.call(this, 'handleChangeInput')) this.handleChangeInput.cancel()
+      if (this.props.onChangeState) this.props.onChangeState({})
+      if (super.componentWillUnmount) super.componentWillUnmount(...arguments)
+    }
   }
 
-  Class.prototype.componentWillUnmount = function () {
-    this.isUnmounting = true
-    // Drop a scheduled input sync rather than letting it fire into an unmounted component
-    // (§9.3 step 4). Read through `hasOwnProperty` on purpose: touching the accessor would CREATE
-    // the debounced function for an instance that never used it, just to cancel nothing.
-    if (Object.prototype.hasOwnProperty.call(this, 'handleChangeInput')) this.handleChangeInput.cancel()
-    if (this.props.onChangeState) this.props.onChangeState({})
-    if (componentWillUnmount) componentWillUnmount.apply(this, arguments)
+  // Named after the class it builds on, as `asField` names its own, so a propTypes warning or a
+  // component stack still says which component it is: `UIRenderLifecycleWithFormSetup` for the engine.
+  Object.defineProperty(FormSetup, 'name', {value: Class.name + 'WithFormSetup'})
+
+  // A prototype assignment, NOT a class field, for two reasons. It is a reference shape built from the
+  // one the class below keeps on its own prototype, which is why the engine keeps one there. And a
+  // field would initialise per instance after the parent constructor returns, overwriting the state
+  // `UIRender`'s constructor builds.
+  FormSetup.prototype.state = {
+    // This state only updates on input changes, for changes in parent props, use this.changedValues
+    canSave: false, // used to compare changes for re-rendering, like 'Save' button
+    ...Class.prototype.state
   }
 
-  return Class
+  return FormSetup
 }

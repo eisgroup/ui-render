@@ -44,7 +44,8 @@ function makeDecoratedInstance ({
     }
     if (componentWillUnmount) FormHarness.prototype.componentWillUnmount = componentWillUnmount
 
-    withFormSetup(FormHarness, {
+    // The subclass it returns, since §9.3 step 5: `FormHarness` itself is left as written.
+    const FormLayer = withFormSetup(FormHarness, {
         fieldValues,
         registeredFieldValues,
         registeredFieldErrors,
@@ -53,13 +54,13 @@ function makeDecoratedInstance ({
 
     const form = makeContractForm({ values, registered, fieldStates })
     const owner = { form, handleSubmit: jest.fn() }
-    const instance = new FormHarness({
+    const instance = new FormLayer({
         initialValues,
         formProps: { pristine: true },
         instance: owner,
         ...props,
     })
-    instance.state = { ...FormHarness.prototype.state }
+    instance.state = { ...FormLayer.prototype.state }
     instance.setState = jest.fn(update => {
         const next = typeof update === 'function' ? update(instance.state, instance.props) : update
         instance.state = { ...instance.state, ...next }
