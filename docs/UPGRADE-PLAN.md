@@ -574,6 +574,22 @@ Every workstream below is a series of small, independently shippable, reversible
 
   **Checked under `<StrictMode>` for step 7:** the simulated remount does not lose the first save, in the class or in the function. FormSpy's second subscription delivers the form state again, so the baseline is recorded after the remount.
 
+  **`StandaloneTabs` converted 2026-09-28**, the fifth leaf and the third on `useTimers`. It reaches only the demo.
+  - **Parent renders.** Its lifecycle ran on every parent render, like ProgressSteps', so it detects a parent render by the new props object and is not memoised.
+  - **Controlled `activeIndex`.** The lifecycle also did two things beyond setting state: it started the 50 ms transition timer for a controlled `activeIndex`, or reported an immediate change. Those now happen in an effect, a commit later. The state itself is still set during render.
+  - **The handle.** Function content and children still receive `props`, `state`, `tabs`, `contents` and `setTab`, in one object for the component's lifetime, as `this` was.
+
+  **One behaviour changed, measured first and pinned.** The lifecycle compared a controlled `activeIndex` with the committed active tab. The demo's `NavTabs` follows a click by navigating, which passes that tab back as its `activeIndex` in the same batch. The class then started a second transition and reported the click twice: `[2, 2]` under test on React 16, 17 and 18. In the demo that meant two history entries per tab click, measured with a `pushState` counter. Compared with the current state, the click is reported once. A new test pins that, and it fails on the previous class. Five more new tests pin behaviour the old suite left open, and all five pass against the previous class:
+  - a controlled change with no `transitionUpdate` still waits for the transition;
+  - a finished transition reports through the latest `onChange`;
+  - the handle is the same object on every render;
+  - a parent render brings back a tab the parent did not adopt;
+  - function children switch tabs at once through the handle's `setTab(index, false)`. The lifecycle used to reach that path, which covered it for free. Now only a caller of the handle does, and `test:coverage` caught the uncovered line.
+
+  Eight mutations each fail at least one test.
+
+  **Found while measuring, and left for its own change.** The demo's `NavTabs` navigates on every report, including the report of a change that came from the URL itself. So a Back that changes the tab pushes a new entry and discards the Forward history: once now, twice with the class. With the class, the first Back only landed on the duplicate entry, so the tab did not change. The fix belongs in `NavTabs`, which should navigate only when the path differs.
+
   **A trap for the next five `@withTimer` leaves: `jest.getTimerCount()` is not a count of a component's timers.** The first version of these tests used it, and it passed on React 18 but failed on the React 16 and 17 legs: 2 where 1 was expected. The older scheduler keeps a fake timer of its own, pending or not depending on which test ran first, so the other count assertions had passed only because of test order.
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 

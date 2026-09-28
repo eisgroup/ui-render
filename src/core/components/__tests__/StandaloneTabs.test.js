@@ -116,6 +116,102 @@ describe('core StandaloneTabs interaction contract', () => {
         expect(childrenCall).toHaveBeenCalledWith(expect.objectContaining({ setTab: expect.any(Function) }))
     })
 
+    it('reports a click once when the parent follows it with a controlled activeIndex', () => {
+        // THE ONE BEHAVIOUR CHANGE of §9.3 step 6 here, and the reason for it. The class compared a
+        // controlled `activeIndex` with its COMMITTED active tab, which a parent updating in the same
+        // batch had not reached yet, so it started a second transition and reported the click twice:
+        // `[2, 2]` on React 16, 17 and 18. The demo's NavTabs is such a parent, and pushed every tab's
+        // URL onto the history twice.
+        const reports = []
+        const Parent = () => {
+            const [index, setIndex] = React.useState(0)
+            return <StandaloneTabs items={items} activeIndex={index} onChange={i => { reports.push(i); setIndex(i) }}/>
+        }
+        const { container } = render(withConfig(<Parent/>))
+
+        fireEvent.click(container.querySelectorAll('.tabs__item')[2])
+        act(() => { jest.advanceTimersByTime(50) })
+        act(() => { jest.advanceTimersByTime(50) })
+
+        expect(screen.getByText('History content')).toBeInTheDocument()
+        expect(reports).toEqual([2])
+    })
+
+    it('applies a controlled activeIndex change after the transition when transitionUpdate is not set', () => {
+        // `setTab`'s `transition = true` default applies to an undefined `transitionUpdate`.
+        const onChange = jest.fn()
+        const { rerender } = render(withConfig(
+            <StandaloneTabs items={items} activeIndex={0} onChange={onChange} />
+        ))
+
+        rerender(withConfig(<StandaloneTabs items={items} activeIndex={2} onChange={onChange} />))
+        expect(screen.getByText('Overview content')).toBeInTheDocument()
+        expect(onChange).not.toHaveBeenCalled()
+
+        act(() => { jest.advanceTimersByTime(50) })
+        expect(screen.getByText('History content')).toBeInTheDocument()
+        expect(onChange).toHaveBeenCalledTimes(1)
+        expect(onChange).toHaveBeenCalledWith(2)
+    })
+
+    it('returns to a controlled activeIndex on any parent render, even with the value unchanged', () => {
+        // The lifecycle ran on every parent render, not only when `activeIndex` changed, so a tab the
+        // parent did not adopt goes back as soon as the parent renders again. The function component
+        // detects a parent render by its new props object for this reason (§9.3 step 6).
+        const view = render(withConfig(<StandaloneTabs items={items} activeIndex={0} transitionUpdate={false} />))
+        fireEvent.click(view.container.querySelectorAll('.tabs__item')[2])
+        act(() => { jest.advanceTimersByTime(50) })
+        expect(screen.getByText('History content')).toBeInTheDocument()
+
+        view.rerender(withConfig(<StandaloneTabs items={items} activeIndex={0} transitionUpdate={false} />))
+
+        expect(screen.getByText('Overview content')).toBeInTheDocument()
+    })
+
+    it('reports through the onChange of the latest render when a transition finishes', () => {
+        const first = jest.fn()
+        const second = jest.fn()
+        const { container, rerender } = render(withConfig(<StandaloneTabs items={items} onChange={first} />))
+
+        fireEvent.click(container.querySelectorAll('.tabs__item')[1])
+        rerender(withConfig(<StandaloneTabs items={items} onChange={second} />))
+        act(() => { jest.advanceTimersByTime(50) })
+
+        expect(first).not.toHaveBeenCalled()
+        expect(second).toHaveBeenCalledWith(1)
+    })
+
+    it('lets function children switch tabs at once through the handle', () => {
+        // `setTab(index, false)` on the handle: no transition, and the change is reported. The class's
+        // lifecycle used to reach this path too; since §9.3 step 6 only a caller of the handle does.
+        const onChange = jest.fn()
+        render(withConfig(
+            <StandaloneTabs items={items} onChange={onChange}>
+                {instance => <button onClick={() => instance.setTab(2, false)}>Jump</button>}
+            </StandaloneTabs>
+        ))
+
+        fireEvent.click(screen.getByText('Jump'))
+
+        expect(screen.getByText('History content')).toBeInTheDocument()
+        expect(onChange).toHaveBeenCalledTimes(1)
+        expect(onChange).toHaveBeenCalledWith(2)
+    })
+
+    it('passes function content and children the same object on every render', () => {
+        // What the class passed was `this`, one object for its lifetime.
+        const seen = []
+        const content = instance => {
+            seen.push(instance)
+            return <div>content</div>
+        }
+        const { rerender } = render(withConfig(<StandaloneTabs items={[{ tab: 'Only', content }]} />))
+        rerender(withConfig(<StandaloneTabs items={[{ tab: 'Only', content }]} className="again" />))
+
+        expect(seen.length).toBeGreaterThanOrEqual(2)
+        expect(new Set(seen).size).toBe(1)
+    })
+
     it('cancels a pending tab transition when unmounted', () => {
         const onChange = jest.fn()
         const { container, unmount } = render(withConfig(
