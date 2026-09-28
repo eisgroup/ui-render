@@ -14,9 +14,9 @@
  * layer is what nested documents render — `engine/Data.js` reads it from `Active.UIRender` to avoid
  * a circular import, so that registry is the layer's published name.
  *
- * NOT yet class syntax: the bodies are still installed on the subclass's prototype rather than
- * written as members. That is a separate change; what this one removes is the mutation escaping to
- * somebody else's class.
+ * The layer's bodies are written as class members, `config` included, which was the last of them.
+ * Only `state` is still assigned to the prototype, because `withFormSetup` merges onto it (see
+ * `Decorator` in `rules.js`).
  */
 // eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
