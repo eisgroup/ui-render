@@ -68,7 +68,8 @@ function createSetupInstance ({
 } = {}) {
     class FormContent extends Component {}
 
-    withFormSetup(FormContent, {
+    // The subclass it returns, since §9.3 step 5: `FormContent` itself is left as written.
+    const FormLayer = withFormSetup(FormContent, {
         fieldValues,
         registeredFieldValues,
         registeredFieldErrors,
@@ -83,8 +84,8 @@ function createSetupInstance ({
         instance: owner,
         ...props,
     }
-    const instance = new FormContent(componentProps)
-    instance.state = { ...FormContent.prototype.state }
+    const instance = new FormLayer(componentProps)
+    instance.state = { ...FormLayer.prototype.state }
     instance.setState = jest.fn(update => {
         const next = typeof update === 'function' ? update(instance.state, instance.props) : update
         instance.state = { ...instance.state, ...next }
@@ -315,13 +316,13 @@ describe('form data synchronization contracts', () => {
 
     it('uses parent form controls when a nested setup instance has no direct owner', () => {
         class NestedFormContent extends Component {}
-        withFormSetup(NestedFormContent, {
+        const NestedFormLayer = withFormSetup(NestedFormContent, {
             fieldValues,
             registeredFieldValues,
             registeredFieldErrors,
         })
         const parent = { form: createFormApi().form, handleSubmit: jest.fn() }
-        const instance = new NestedFormContent({
+        const instance = new NestedFormLayer({
             parent,
             initialValues: {},
             formProps: { pristine: true },
@@ -400,11 +401,11 @@ describe('handleChangeInput is per instance, not per class (§9.3 step 4)', () =
     /** Two instances of the SAME decorated class — which is the case the shared prototype broke. */
     function twoInstancesOfOneClass () {
         class SharedFormContent extends Component {}
-        withFormSetup(SharedFormContent, { fieldValues, registeredFieldValues, registeredFieldErrors })
+        const SharedFormLayer = withFormSetup(SharedFormContent, { fieldValues, registeredFieldValues, registeredFieldErrors })
 
         const make = () => {
             const { form } = createFormApi({})
-            const instance = new SharedFormContent({
+            const instance = new SharedFormLayer({
                 initialValues: {},
                 formProps: { pristine: true },
                 instance: { form, handleSubmit: jest.fn() },

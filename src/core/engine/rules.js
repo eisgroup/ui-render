@@ -628,20 +628,27 @@ function Decorator (Class) {
      * place at module load. That is what made the engine invisible to anything reasoning about the
      * component tree, and it meant the exported `UIRender` was a different object before and after
      * this module was imported. The layer now lives on a subclass of its own, so the class handed
-     * in is left exactly as it was written and the captures below read genuine parent methods.
+     * in is left exactly as it was written and `super` reaches genuine parent methods.
      *
-     * The members below are written as members, `config` included. One thing deliberately is NOT:
+     * It is not the class that renders, though: `withForm` renders a subclass of it in turn, the form
+     * layer that `withFormSetup` builds, and that is what `Active.UIRender` names (the end of this
+     * function). The chain is the class the caller wrote, this layer, then the form layer.
      *
-     * `state` stays a prototype assignment because `withFormSetup` MERGES onto it —
-     * `Class.prototype.state = {…, ...Class.prototype.state}` — so a class FIELD, which initialises
-     * per instance after `super()` returns, would leave that merge reading `undefined` and drop the
-     * engine's state shape. Two test harnesses read `prototype.state` directly for the same reason.
+     * The members below are written as members, `config` included. Two things are NOT: the four
+     * data-kind registry methods, which `withDataKind` still assigns onto this prototype after the
+     * class (the last mixin that patches one, and a change of its own), and, deliberately, `state`:
+     *
+     * `state` stays a prototype assignment because the form layer builds its own from it —
+     * `FormSetup.prototype.state = {…, ...Class.prototype.state}` in `withFormSetup` — so a class
+     * FIELD, which initialises per instance after `super()` returns, would leave that merge reading
+     * `undefined` and drop the engine's state shape. Two test harnesses read `prototype.state`
+     * directly for the same reason.
      *
      * `config` was installed by `Object.defineProperty` until §9.3 step 2 had lifted most of its
      * action handlers into modules of their own. Writing it as a member changed one thing, the
      * descriptor's `configurable` (false → true), and nothing depends on that: `get meta` is its only
-     * reader, nothing in `src` enumerates prototype members, and `form/utils.js`, which does install
-     * members on this prototype with `defineProperty`, never touches `config`.
+     * reader, nothing in `src` enumerates prototype members, and the form layer over this one
+     * defines no `config` of its own.
      */
     class UIRenderLifecycle extends Class {
         get data () {
@@ -1039,11 +1046,7 @@ function Decorator (Class) {
         },
     }
 
-    // Nested documents render this class directly — `engine/Data.js` reads it from `Active` to
-    // avoid a circular import — so it has to be the layer, not the bare class the caller wrote.
-    Active.UIRender = UIRenderLifecycle
-
-    return withForm({
+    const UIRenderWithForm = withForm({
         subscription: {
             pristine: true,
             valid: true,
@@ -1053,6 +1056,13 @@ function Decorator (Class) {
         // Handed in rather than imported by the form module: see the note on `withForm`.
         processErrors: errorsProcessing,
     })(UIRenderLifecycle)
+
+    // Nested documents render the class inside the form wrapper directly — `engine/Data.js` reads it
+    // from `Active` to avoid a circular import — so it has to be the class the wrapper renders: this
+    // layer with the form layer over it, not the bare class the caller wrote.
+    Active.UIRender = UIRenderWithForm.WrappedComponent
+
+    return UIRenderWithForm
 }
 
 const dataActionWarning = (e) => console.warn('Missing parent UI Render instance to modify form values!', e)
