@@ -522,7 +522,29 @@ Every workstream below is a series of small, independently shippable, reversible
   The two suites that applied the mixin to bare classes now run the same assertions on the engine layer's prototype; `withDataKind.test.js` became `rules.data-kind-registry.test.js`. The same probe as for `withFormSetup` found the chain, every level's own members and every body unchanged. The one difference is that the four methods are no longer enumerable, so a `for…in` over an instance no longer lists them, only `setState`, `forceUpdate`, `isReactComponent` and `state`. Nothing in `src` enumerates an instance or a prototype. `rules.lifecycle-layer.test.js` now pins that every member of both layers is written in its class body, `state` excepted; it fails on the previous code and names the four.
 
   **What is left of the pattern in `src`** is outside the engine. `@withTimer` (`components/utils/hocs.js`), on seven components, still assigns three methods onto the class it decorates and replaces its `componentWillUnmount` with a wrapper that calls a captured copy. It is the genuine shared HOC the shape note above names, and it cleans up correctly.
-6. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired.
+6. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired. **STARTED 2026-09-28, leaf components first.**
+
+  **Measured before starting.** There are 21 `UNSAFE_*` lines in 11 files. §7's table said 26 in 12 on 2026-09-17; step 5 moved the engine's into class members but did not remove them.
+  - **Engine:** six real definitions: `UIRender`'s `componentWillReceiveProps`; the engine layer's `componentWillMount`, `componentWillUpdate` and `componentWillReceiveProps`; and `componentWillReceiveProps` in both `WithForm` and the form layer. The remaining engine lines are their `super` calls.
+  - **Leaves:** one each in nine components: `ProgressBar`, `ProgressSteps`, `Counter`, `Expand`, `StandaloneTabs`, the engine's `Tabs`, `TableView`, `InputNative` and `AutoSave`. Six of the nine are `@withTimer` classes.
+
+  §2.3 calls every leaf "a props→state derivation, mechanically convertible". Two come close: `ProgressBar` and `ProgressSteps` mirror a value into state and cancel a pending timer. The others also do one of these:
+  - drive transition timers (both `Tabs`, `Expand`);
+  - restart an animation (`Counter`);
+  - resize a DOM node before paint (`InputNative`);
+  - swap a debounce (`AutoSave`);
+  - keep render caches (`TableView`, both `Tabs`, `Expand`).
+
+  **The order.** The leaves go one at a time, smallest first, each becoming a function component. When the last `@withTimer` class goes, `withTimer` goes with it, and with it the last prototype-patching decorator in `src`. The engine comes last, after a design pass of its own: the mapper, every field, nested documents and popup templates all read its `instance`, so the hooks form has to keep that contract. One class stays whatever happens: `Render.js` is the error boundary, and React has no hook for `componentDidCatch`.
+
+  **`ProgressBar` converted 2026-09-28, the first leaf.** It was a `@withTimer` `PureComponent` and is now `React.memo` of a function.
+  - **A changed `value`** is applied during render. That is React's documented replacement for deriving state from props, and the same point at which the lifecycle applied it.
+  - **The mount fill-in** is an effect. Its cleanup cancels the fill-in when the value changes or the component unmounts, which is what `clearTimer()` did.
+  - **The comparison is `Object.is`.** `NaN` is documented input, and with `!==` the render-time derivation never settles; React stops it with "Too many re-renders".
+
+  Nine behaviour tests read `@withTimer`'s `timers` array through a ref. They now spy on `setTimeout` and `clearTimeout` and read only the timers scheduled with the component's own delay, and they pass unchanged against the previous class. Six mutations of the new component each fail at least one of them: the cleanup, the render-time derivation, `Object.is`, the effect's dependencies, the mount-value guard, and the empty first render.
+
+  **A trap for the next five `@withTimer` leaves: `jest.getTimerCount()` is not a count of a component's timers.** The first version of these tests used it, and it passed on React 18 but failed on the React 16 and 17 legs: 2 where 1 was expected. The older scheduler keeps a fake timer of its own, pending or not depending on which test ran first, so the other count assertions had passed only because of test order.
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 
 All decomposition outputs are authored in TypeScript from the start (`engine/*.ts`, §9.6-E3) — the old monoliths are never converted in place.
