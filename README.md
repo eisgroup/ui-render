@@ -77,13 +77,18 @@ import 'eis-ui-render/static/all.css'   // or 'eis-ui-render/dist/static/all.css
 import 'eis-ui-render/static/font.css'  // icon font — only if the host does not provide its own
 ```
 
-Some renderers reference images by absolute URL (`<homepage>/static/images/…` — flag icons for the
-language renderer, for example), so those files must also be reachable from the host's web root.
-Copy the package's `static/` folder there as part of the build; it is self-contained:
+An `Image` given only a `name` loads it from `/static/images/<name>`, relative to the host's web
+root, so those files must be reachable there. Copy the package's `static/` folder into the web root
+as part of the build; it is self-contained:
 
 ```bash
 cp -R node_modules/eis-ui-render/static ./public/
 ```
+
+A host that serves `static/` under a sub-path or a CDN sets `path` (or `src`) on the `Image` in its
+meta; the library build fixes its environment at build time, so no host environment variable reaches
+it. Releases 0.32.4 to 0.34.3 resolved a name-only `Image` to a page-relative
+`undefined/static/images/<name>` instead, which 404s.
 
 ## The meta.json contract (consumer)
 
