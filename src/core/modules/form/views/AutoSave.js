@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { FormSpy } from 'react-final-form'
 import { PropTypes } from '../../../components'
 import { Loading } from '../../../components/Loading'
@@ -11,94 +11,92 @@ localiseTranslation({
   },
 })
 
+// One object, as the class's `defaultProps` held one: FormSpy is handed the same subscription on
+// every render rather than a new default each time.
+const VALUES_ONLY = {values: true}
+
 /**
  * Final Form Auto Save on Input Value Changes
  * @example:
  *   <AutoSave onChange={console.warn} partial showLoader />
+ *
+ * A FUNCTION COMPONENT since §9.3 step 6. It was a PureComponent whose
+ * `UNSAFE_componentWillReceiveProps` rebuilt the debounce when `delay` changed, cancelling the old
+ * one first (§9.3 step 4). It still does:
+ *  - the debounce is built once per `delay`, and an effect cancels the one it replaces, and the
+ *    last one at unmount. The class cancelled in the lifecycle, before the render; the effect
+ *    cancels a commit later, so a save coming due in between would still run;
+ *  - a save reads the props of the latest render and the latest baseline when it runs, after any
+ *    save still in flight, as the class read `this.props` and `this.state`.
+ * The baseline values and the save in flight are refs, since nothing renders them; the class kept
+ * the values in state and the promise on the instance. Only `submitting` is state.
  */
-export default class AutoSave extends PureComponent {
-  static propTypes = {
-    // Async Function(values) to call on input changes
-    onChange: PropTypes.func.isRequired,
-    // Whether to save only changed values, default is all Form values
-    partial: PropTypes.bool,
-    // Whether to overlay parent container with Loading spinner component
-    showLoader: PropTypes.bool,
-    // FormSpy subscription
-    subscription: PropTypes.object,
-    // Milliseconds to delay form `onChange`
-    delay: PropTypes.number,
-    // Loading message
-    loadContent: PropTypes.any,
-  }
+function AutoSave ({
+  onChange,
+  partial,
+  showLoader,
+  subscription = VALUES_ONLY,
+  delay = TIME_DURATION_INSTANT,
+  loadContent,
+}) {
+  const [submitting, setSubmitting] = useState(false)
+  const baseline = useRef(undefined)
+  const inFlight = useRef(null)
+  const latest = useRef(null)
+  latest.current = {onChange, partial}
 
-  static defaultProps = {
-    delay: TIME_DURATION_INSTANT,
-    subscription: {values: true},
-  }
-
-  state = {
-    values: undefined,
-    submitting: false
-  }
-
-  UNSAFE_componentWillReceiveProps (next, _) {
-    if (next.delay !== this.props.delay) {
-      // Cancel BEFORE replacing (§9.3 step 4). Reassigning alone left the previous debounce holding a
-      // live timer with nothing pointing at it, so a change scheduled under the old delay still fired
-      // — at the old delay, after the caller had asked for a new one.
-      this.handleChange.cancel()
-      this.handleChange = debounce(this.onChange, next.delay)
+  const handleChange = useMemo(() => debounce(async ({values}) => {
+    if (baseline.current == null) {
+      baseline.current = values
+      return
     }
-  }
 
-  componentWillUnmount () {
-    // There was no unmount handler here at all (§9.3 step 4). A change typed just before this
-    // component went away still ran its `onChange` afterwards: a save the user had navigated away
-    // from, and a setState on an unmounted component behind it.
-    this.handleChange.cancel()
-  }
-
-  onChange = async ({values}) => {
-    if (this.state.values == null) return this.setState({values})
-
-    if (this.promise) await this.promise
-    const {onChange, partial} = this.props
+    if (inFlight.current) await inFlight.current
+    const {onChange: save, partial: onlyChanges} = latest.current
 
     // This diff step is totally optional
-    const changes = objChanges(this.state.values, values)
+    const changes = objChanges(baseline.current, values)
     if (changes) {
       // values have changed
-      this.setState({submitting: true, values})
-      this.promise = onChange(partial ? changes : values)
-      await this.promise
-      delete this.promise
-      this.setState({submitting: false})
+      baseline.current = values
+      setSubmitting(true)
+      inFlight.current = save(onlyChanges ? changes : values)
+      await inFlight.current
+      inFlight.current = null
+      setSubmitting(false)
     }
-  }
+  }, delay), [delay])
 
-  handleChange = debounce(this.onChange, this.props.delay)
+  useEffect(() => () => handleChange.cancel(), [handleChange])
 
-  renderLoading = () => {
-    const {showLoader, loadContent} = this.props
-    const {submitting} = this.state
-    if (!showLoader || !submitting) return null
-    return <Loading loading>{loadContent || _.SYNCING___}</Loading>
-  }
-
-  // Make a HOC
   // This is not the only way to accomplish auto-save, but it does let us:
   // - Use built-in React lifecycle methods to listen for changes
   // - Maintain state of when we are submitting
   // - Render a message when submitting
   // - Pass in delay and save props nicely
   // This component doesn't have to render anything, but it can render submitting state.
-  render () {
-    const {subscription} = this.props
-    return <>
-      {/* FormSpy onChange will be called once on component mount */}
-      <FormSpy subscription={subscription} onChange={this.handleChange}/>
-      {this.renderLoading()}
-    </>
-  }
+  return <>
+    {/* FormSpy onChange will be called once on component mount */}
+    <FormSpy subscription={subscription} onChange={handleChange}/>
+    {showLoader && submitting ? <Loading loading>{loadContent || _.SYNCING___}</Loading> : null}
+  </>
 }
+
+AutoSave.propTypes = {
+  // Async Function(values) to call on input changes
+  onChange: PropTypes.func.isRequired,
+  // Whether to save only changed values, default is all Form values
+  partial: PropTypes.bool,
+  // Whether to overlay parent container with Loading spinner component
+  showLoader: PropTypes.bool,
+  // FormSpy subscription
+  subscription: PropTypes.object,
+  // Milliseconds to delay form `onChange`
+  delay: PropTypes.number,
+  // Loading message
+  loadContent: PropTypes.any,
+}
+
+// Memoised because the class was a PureComponent. Its lifecycle compared `delay` by value, so a
+// parent render with equal props had nothing to rebuild.
+export default React.memo(AutoSave)
