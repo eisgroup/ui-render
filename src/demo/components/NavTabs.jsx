@@ -128,8 +128,11 @@ const NavTabs = (props) => {
     const tabIndex = tabs.findIndex(v => v.path === location.pathname)
 
     const onClickTab = (index) => {
-        const path = tabs[index].path
-        navigate(`${path}` || '/')
+        const path = tabs[index].path || '/'
+        // StandaloneTabs also reports a tab the URL itself selected (Back, Forward, a link), since that
+        // arrives as a controlled `activeIndex` change. Navigating then would push the page already
+        // showing and discard the Forward history, so only a different path is navigated to.
+        if (path !== location.pathname) navigate(path)
     }
 
     return (
