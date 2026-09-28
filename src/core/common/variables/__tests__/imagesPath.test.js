@@ -17,7 +17,7 @@ const pathImagesFor = ({ prod, homepage }) => {
         jest.doMock('../../../utils', () => ({
             ...jest.requireActual('../../../utils'),
             __PROD__: prod,
-            ENV: homepage === undefined ? {} : { REACT_APP_HOMEPAGE: homepage },
+            HOMEPAGE: homepage,
         }))
         // The object `Image` reads — `modules/variables/files.js` holds a COPY taken earlier.
         FILE = require('../../../components/files').FILE

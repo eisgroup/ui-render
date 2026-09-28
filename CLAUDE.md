@@ -20,6 +20,7 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 - `npm test` — Run Jest tests
 - `npm run test:watch` — Run Jest in watch mode
 - `npm run build-css` — Standalone CSS build (LESS → PostCSS prefixwrap → CSS)
+- `npm run test:env-flags` — Compiles the source with each real webpack config (library, demo dev/prod, the e2e shape) and checks the env flags and `FILE.PATH_IMAGES` each ships, in a realm with no `process`. jest cannot see these: it runs the source against Node's real `process.env`. `_envs.ts` reads `process.env.NODE_ENV`/`REACT_APP_HOMEPAGE` as literals on purpose — never reintroduce `ENV.NODE_ENV` or a `typeof process` guard in front of them
 - `npm run lint:css` — Lint LESS files with stylelint
 - `npm run typecheck` — `tsc --noEmit` over `src` (§9.6-E0). Babel STRIPS TypeScript types without
   checking them, so this is the only thing that checks them. Unconverted `.js` resolves but is not

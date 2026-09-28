@@ -26,6 +26,14 @@ export default (env, argv) => {
     // deployed to GitHub Pages by accident.
     const publicPath = process.env.PUBLIC_PATH || (isProduction ? '/ui-render/' : '/');
     const outputDir = process.env.OUTPUT_DIR || 'build';
+    // The base the demo's assets are served under IS its homepage, so it is derived here rather than
+    // configured a second time: `/ui-render/` -> `/ui-render`, `/` -> ''. src/core/utils/_envs.ts reads it
+    // as the literal `process.env.REACT_APP_HOMEPAGE`, which is what lets this define reach it at all, and
+    // FILE.PATH_IMAGES and ROUTE_BASE follow it — the GitHub Pages build then asks for its images under
+    // /ui-render/static/images/, where CopyPlugin puts them. Registered BEFORE Dotenv on purpose: webpack
+    // keeps the first define of a key and only warns, so a REACT_APP_HOMEPAGE exported in the build shell
+    // cannot silently move the demo's images (measured both orders).
+    const homepage = publicPath.replace(/\/$/, '');
 
     return {
         mode: isProduction ? 'production' : 'development',
@@ -66,6 +74,7 @@ export default (env, argv) => {
             },
         },
         plugins: [
+            new webpack.DefinePlugin({ 'process.env.REACT_APP_HOMEPAGE': JSON.stringify(homepage) }),
             new Dotenv({ path: envFile, systemvars: true }),
             new HtmlWebpackPlugin({
                 template: './public/index.html',

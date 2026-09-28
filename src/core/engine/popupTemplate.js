@@ -1,3 +1,6 @@
+/** Escape every character that means something in a regular expression. */
+const escapeRegExp = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 /**
  * WHICH REGISTERED POPUP TEMPLATE A `popupOpen` ID MEANS.
  * =============================================================================================
@@ -26,9 +29,6 @@
  * @returns {?{popupTemplate: Object, templateId: string}} the template and the key it was found by
  *   (step 2's candidate for that step), or null when there is none
  */
-/** Escape every character that means something in a regular expression. */
-const escapeRegExp = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
 export function findPopupTemplate (popupTemplates, id, index) {
     if (!popupTemplates) return null
 
