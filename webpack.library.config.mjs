@@ -62,6 +62,14 @@ export default {
         minimizer: ['...', new CssMinimizerPlugin()],
     },
     plugins: [
+        // DELIBERATE: the library's environment is fixed when it is built. `process.env` becomes the
+        // literal {NODE_ENV: 'production'} and `process` the bundled process/browser shim, so
+        // src/core/utils/_envs.ts sees __PROD__ true and nothing else in every host — a host's own
+        // define, EnvironmentPlugin, shell variable or runtime `process` cannot reach it (measured
+        // through webpack, esbuild and Vite hosts and a Node server render). Releases whose output
+        // still read a live `process.env` (0.30.23–0.32.3) behaved differently per host, and crashed
+        // on a minimal `process` shim with no cwd(). Anything that must vary per host needs a runtime
+        // option, not an env variable: see the homepage guard in src/core/common/variables/index.js.
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('production'),
             'process.env': JSON.stringify({ NODE_ENV: 'production' }),
@@ -104,7 +112,7 @@ export default {
 
                 compiler.hooks.afterEmit.tapAsync('PostBuildCopy', async (compilation, callback) => {
                     // Assets ship exactly once, in the root `static/` payload hosts copy to their web root
-                    // (FILE.PATH_IMAGES resolves to `<homepage>/static/images/`), and `dist/static/` re-exports
+                    // (a name-only Image loads from `/static/images/<name>`), and `dist/static/` re-exports
                     // the stylesheets so bundler imports of the dist path keep resolving.
                     for (const name of ['all.css', 'all.css.map']) {
                         const emitted = path.join(DIST_STATIC, name);
@@ -145,10 +153,11 @@ export default {
                 // reachable from the library, and shipping it put 1,042 KB of docs in every host's
                 // node_modules.
                 //
-                // `flags/` IS library code's business and must stay: src/core/components/renders.js
-                // renders country flags from `${FILE.PATH_IMAGES}flags/` at runtime. It is referenced
-                // from JS, never from CSS, so no build step would have caught its removal — a missing
-                // flag 404s in the host's browser, not here.
+                // `flags/` is kept for src/core/components/renders.js, which renders country flags from
+                // `${FILE.PATH_IMAGES}flags/`. It is referenced from JS, never from CSS, so no build step
+                // would catch its removal. Measured: that renderer is currently tree-shaken out
+                // of dist ('flags/' occurs 0 times), so no host requests these today; they stay until a
+                // decision is made about the renderer, not about the files.
                 { from: 'public/static/images/flags', to: '../static/images/flags', noErrorOnMissing: true },
             ],
         }),

@@ -7,7 +7,12 @@ import { __PROD__, ENV } from '../../utils'
 
 export * from './routes'
 
-if (__PROD__) FILE.PATH_IMAGES = `${ENV.REACT_APP_HOMEPAGE}/static/images/`
+// A name-only `Image` loads from here. The homepage prefix applies only when a homepage is actually
+// set: in the published library build `process.env` is baked to `{NODE_ENV: 'production'}`
+// (webpack.library.config.mjs), so __PROD__ is always true there and REACT_APP_HOMEPAGE never is —
+// and without this guard every release from 0.32.4 wrote "undefined/static/images/", a page-relative
+// URL that 404s in every host. Measured through webpack, esbuild and Vite hosts and a Node render.
+if (__PROD__ && ENV.REACT_APP_HOMEPAGE) FILE.PATH_IMAGES = `${ENV.REACT_APP_HOMEPAGE}/static/images/`
 
 /* Platform Prefixes */
 export const SERVER = 'SERVER'

@@ -91,5 +91,23 @@ assertMarkup('composed', render(deepMeta, deepData), [
     'Submit',
 ])
 
+/**
+ * An `Image` given only a `name` takes its directory from FILE.PATH_IMAGES, which src/core/common/variables
+ * sets from the env flags at load time. jest cannot see what it becomes here: jest runs the source
+ * against Node's real process.env, while this bundle carries whatever the library build baked in. From
+ * 0.32.4 that was "undefined/static/images/", a page-relative URL that 404s in every host, and nothing
+ * above rendered an Image, so this smoke passed over it.
+ */
+const imageHtml = render({ view: 'Image', name: 'logo.png' }, {})
+const imageSrcMatch = imageHtml.match(/<img\b[^>]*\bsrc="([^"]*)"/)
+if (!imageSrcMatch) throw new Error(`Image markup from the packed bundle has no <img src>: ${imageHtml}`)
+if (imageSrcMatch[1] !== '/static/images/logo.png') {
+    throw new Error(
+        `Image src from the packed bundle is ${JSON.stringify(imageSrcMatch[1])}; expected "/static/images/logo.png",`
+        + ' the root static/ payload hosts copy to their web root'
+    )
+}
+process.stdout.write(`image src ${imageSrcMatch[1]}\n`)
+
 process.stdout.write(`loaded react ${React.version} / react-dom ${ReactDOM.version}\n`)
 process.stdout.write('ok\n')
