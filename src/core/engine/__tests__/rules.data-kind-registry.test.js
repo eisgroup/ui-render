@@ -1,10 +1,15 @@
 // Force form module to load before rules.js cycle
 import '../../modules/form/utils'
-import { withDataKind } from '../rules'
+import '../rules'
+import { Active } from '../../utils'
 
-describe('withDataKind decorator', () => {
-    class MockClass {}
-    withDataKind(MockClass)
+// The nested-Data registry: four members of the engine layer since §9.3 step 5, until then the
+// `withDataKind` mixin applied to that one class. `Active.UIRender` is the form layer over it.
+const EngineLayer = Object.getPrototypeOf(Active.UIRender)
+
+describe('the nested-Data registry', () => {
+    /** A bare object on the engine layer's prototype: the registry touches nothing else. */
+    const newParent = () => Object.create(EngineLayer.prototype)
 
     function makeInstance (meta = {}, dataKindPath) {
         const inst = { props: { meta } }
@@ -12,15 +17,15 @@ describe('withDataKind decorator', () => {
         return inst
     }
 
-    it('exposes getDataKindPath / register / unregister / getDataKind on the class prototype', () => {
-        expect(typeof MockClass.prototype.getDataKindPath).toBe('function')
-        expect(typeof MockClass.prototype.registerDataKind).toBe('function')
-        expect(typeof MockClass.prototype.unregisterDataKind).toBe('function')
-        expect(typeof MockClass.prototype.getDataKind).toBe('function')
+    it('exposes getDataKindPath / register / unregister / getDataKind on the engine layer', () => {
+        expect(typeof EngineLayer.prototype.getDataKindPath).toBe('function')
+        expect(typeof EngineLayer.prototype.registerDataKind).toBe('function')
+        expect(typeof EngineLayer.prototype.unregisterDataKind).toBe('function')
+        expect(typeof EngineLayer.prototype.getDataKind).toBe('function')
     })
 
     it('registerDataKind stores instance under {kind, scope, index}', () => {
-        const parent = new MockClass()
+        const parent = newParent()
         const child = makeInstance({ relativePath: 'foo.bar' })
         parent.registerDataKind(child, 'period', 0)
         expect(parent.dataKind.period).toBeDefined()
@@ -32,7 +37,7 @@ describe('withDataKind decorator', () => {
     })
 
     it('unregisterDataKind removes the entry', () => {
-        const parent = new MockClass()
+        const parent = newParent()
         const child = makeInstance({})
         parent.registerDataKind(child, 'period', 0)
         parent.unregisterDataKind(child, 'period', 0)
@@ -44,19 +49,19 @@ describe('withDataKind decorator', () => {
     })
 
     it('unregisterDataKind is a no-op when instance is null/undefined', () => {
-        const parent = new MockClass()
+        const parent = newParent()
         expect(() => parent.unregisterDataKind(null, 'k', 0)).not.toThrow()
     })
 
     it('unregisterDataKind is a no-op when dataKind registry has not been initialized', () => {
-        const parent = new MockClass()
+        const parent = newParent()
         const child = makeInstance({})
         // parent.dataKind not yet set
         expect(() => parent.unregisterDataKind(child, 'k', 0)).not.toThrow()
     })
 
     it('getDataKind without scope falls back to the first registered scope', () => {
-        const parent = new MockClass()
+        const parent = newParent()
         const child = makeInstance({})
         parent.registerDataKind(child, 'period', 0)
         // Even without form data, getDataKind returns [] (empty) rather than throwing
@@ -64,12 +69,12 @@ describe('withDataKind decorator', () => {
     })
 
     it('getDataKind with an explicit scope uses it', () => {
-        const parent = new MockClass()
+        const parent = newParent()
         expect(Array.isArray(parent.getDataKind('period', 'explicit-scope'))).toBe(true)
     })
 
     it('getDataKind returns empty array for unknown kind', () => {
-        const parent = new MockClass()
+        const parent = newParent()
         expect(parent.getDataKind('unknownKind')).toEqual([])
     })
 })

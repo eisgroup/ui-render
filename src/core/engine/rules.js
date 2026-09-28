@@ -541,75 +541,6 @@ export function initSelectStatesFromData (meta, data, instance, contextPath) {
 }
 
 /**
- * Decorator to extend UI Render instance with nested Data component interface
- */
-export function withDataKind (Class) {
-    Class.prototype.getDataKindPath = function (relativePath, kind) {
-        return getDataKindPathFromRelative(relativePath, kind)
-    }
-
-    // Register child instance from parent instance.
-    // Registry is scoped by dataKindPath so that children with the same kind+index
-    // from different parent rows (2-level nesting) do not overwrite each other.
-    // Structure: this.dataKind[kind][scope][index] = instance
-    Class.prototype.registerDataKind = function (instance, kind, index) {
-        if (!this.dataKind) this.dataKind = {}
-        if (!this.dataKind[kind]) this.dataKind[kind] = {}
-        const relativePath = instance.props.meta && instance.props.meta.relativePath
-        const basePath = this.getDataKindPath(relativePath, kind)
-        instance.dataKindPath = basePath
-        const scope = basePath || ''
-        if (!this.dataKind[kind][scope]) this.dataKind[kind][scope] = {}
-        this.dataKind[kind][scope][index] = instance
-    }
-
-    // Unregister child instance from parent instance
-    Class.prototype.unregisterDataKind = function (instance, kind, index) {
-        if (!instance) return
-        if (!this.dataKind) return
-        // Read scope before clearing it on the instance
-        const scope = instance.dataKindPath != null ? instance.dataKindPath : ''
-        if (this.dataKind[kind] && this.dataKind[kind][scope]) {
-            delete this.dataKind[kind][scope][index]
-        }
-        delete instance.dataKindPath
-    }
-
-    /**
-     * Retrieve current forms' values for given data kind.
-     * @param {String} kind - Data component kind
-     * @param {String} [scope] - dataKindPath scope to limit lookup to a specific parent context
-     *   (e.g., for cross-validation within a single parent row in 2-level nesting).
-     *   When omitted, derives the path from the first registered scope (backward-compatible).
-     * @returns {Array} forms values array, or empty array
-     */
-    Class.prototype.getDataKind = function (kind, scope) {
-        let base
-        if (scope != null) {
-            base = scope
-        } else {
-            const byKind = this.dataKind && this.dataKind[kind]
-            if (byKind) {
-                const firstScope = Object.keys(byKind)[0]
-                if (firstScope != null) {
-                    base = firstScope
-                }
-            }
-        }
-        const pathToDataKindArray = base ? `${base}.dataKind.${kind}` : `dataKind.${kind}`
-
-        const live = getLiveMergedDataKindArray(pathToDataKindArray, formsStorage)
-        if (live.length > 0) {
-            return live
-        }
-        const dataJson = getFormsData(formsStorage)
-        return get(dataJson, pathToDataKindArray, [])
-    }
-
-    return Class
-}
-
-/**
  * React Class Decorator to setup UI with necessary variables and function definitions
  * @usage:
  *    - this.data -> *_data.json from state, ready for <Render> component consumption
@@ -634,9 +565,8 @@ function Decorator (Class) {
      * layer that `withFormSetup` builds, and that is what `Active.UIRender` names (the end of this
      * function). The chain is the class the caller wrote, this layer, then the form layer.
      *
-     * The members below are written as members, `config` included. Two things are NOT: the four
-     * data-kind registry methods, which `withDataKind` still assigns onto this prototype after the
-     * class (the last mixin that patches one, and a change of its own), and, deliberately, `state`:
+     * Every member below is written as a member, `config` and the nested-Data registry included.
+     * One thing deliberately is NOT:
      *
      * `state` stays a prototype assignment because the form layer builds its own from it —
      * `FormSetup.prototype.state = {…, ...Class.prototype.state}` in `withFormSetup` — so a class
@@ -649,6 +579,11 @@ function Decorator (Class) {
      * descriptor's `configurable` (false → true), and nothing depends on that: `get meta` is its only
      * reader, nothing in `src` enumerates prototype members, and the form layer over this one
      * defines no `config` of its own.
+     *
+     * The registry — `getDataKindPath`, `registerDataKind`, `unregisterDataKind`, `getDataKind` —
+     * was the `withDataKind` mixin until it was written into this class (see the end of it). The
+     * methods stopped being enumerable, which is the one thing that changed; nothing in `src`
+     * enumerates an instance or a prototype.
      */
     class UIRenderLifecycle extends Class {
         get data () {
@@ -1029,10 +964,74 @@ function Decorator (Class) {
             }
             if (super.componentDidUpdate) super.componentDidUpdate(...arguments)
         }
+
+        // THE NESTED-DATA REGISTRY. These four were the `withDataKind` mixin, assigned onto this
+        // prototype after the class; it had no other consumer, so they are members like the rest.
+
+        getDataKindPath (relativePath, kind) {
+            return getDataKindPathFromRelative(relativePath, kind)
+        }
+
+        // Register child instance from parent instance.
+        // Registry is scoped by dataKindPath so that children with the same kind+index
+        // from different parent rows (2-level nesting) do not overwrite each other.
+        // Structure: this.dataKind[kind][scope][index] = instance
+        registerDataKind (instance, kind, index) {
+            if (!this.dataKind) this.dataKind = {}
+            if (!this.dataKind[kind]) this.dataKind[kind] = {}
+            const relativePath = instance.props.meta && instance.props.meta.relativePath
+            const basePath = this.getDataKindPath(relativePath, kind)
+            instance.dataKindPath = basePath
+            const scope = basePath || ''
+            if (!this.dataKind[kind][scope]) this.dataKind[kind][scope] = {}
+            this.dataKind[kind][scope][index] = instance
+        }
+
+        // Unregister child instance from parent instance
+        unregisterDataKind (instance, kind, index) {
+            if (!instance) return
+            if (!this.dataKind) return
+            // Read scope before clearing it on the instance
+            const scope = instance.dataKindPath != null ? instance.dataKindPath : ''
+            if (this.dataKind[kind] && this.dataKind[kind][scope]) {
+                delete this.dataKind[kind][scope][index]
+            }
+            delete instance.dataKindPath
+        }
+
+        /**
+         * Retrieve current forms' values for given data kind.
+         * @param {String} kind - Data component kind
+         * @param {String} [scope] - dataKindPath scope to limit lookup to a specific parent context
+         *   (e.g., for cross-validation within a single parent row in 2-level nesting).
+         *   When omitted, derives the path from the first registered scope (backward-compatible).
+         * @returns {Array} forms values array, or empty array
+         */
+        getDataKind (kind, scope) {
+            let base
+            if (scope != null) {
+                base = scope
+            } else {
+                const byKind = this.dataKind && this.dataKind[kind]
+                if (byKind) {
+                    const firstScope = Object.keys(byKind)[0]
+                    if (firstScope != null) {
+                        base = firstScope
+                    }
+                }
+            }
+            const pathToDataKindArray = base ? `${base}.dataKind.${kind}` : `dataKind.${kind}`
+
+            const live = getLiveMergedDataKindArray(pathToDataKindArray, formsStorage)
+            if (live.length > 0) {
+                return live
+            }
+            const dataJson = getFormsData(formsStorage)
+            return get(dataJson, pathToDataKindArray, [])
+        }
     }
 
     // const popup = useContext(PopupContext)
-    withDataKind(UIRenderLifecycle)
 
     // @Note: the state shape is used for reference only, it is not instantiated
     UIRenderLifecycle.prototype.state = {
