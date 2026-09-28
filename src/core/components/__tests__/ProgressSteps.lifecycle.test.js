@@ -67,6 +67,56 @@ describe('ProgressSteps additional contracts', () => {
     expect(onChange).not.toHaveBeenCalled()
   })
 
+  it('lets any controlled parent render supersede a pending click, even with an unchanged activeIndex', () => {
+    // How the class behaved, pinned because the function component had to reproduce it on purpose:
+    // `UNSAFE_componentWillReceiveProps` ran on EVERY parent render and, controlled, cleared the
+    // pending click. So the component compares the props object, not the value (§9.3 step 6).
+    const onChange = jest.fn()
+    const view = render(wrap(
+      <ProgressSteps items={items} activeIndex={0} onChange={onChange}/>
+    ))
+
+    fireEvent.click(getStepButtons(view.container)[1])
+    view.rerender(wrap(
+      <ProgressSteps items={items} activeIndex={0} onChange={onChange}/>
+    ))
+    act(() => jest.advanceTimersByTime(50))
+
+    expect(view.queryByText('First content')).toBeInTheDocument()
+    expect(view.container.querySelector('.tabs__content')).toHaveClass('fade-in')
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('keeps a pending click through an uncontrolled parent render', () => {
+    const onChange = jest.fn()
+    const view = render(wrap(<ProgressSteps items={items} onChange={onChange}/>))
+
+    fireEvent.click(getStepButtons(view.container)[1])
+    view.rerender(wrap(<ProgressSteps items={items} onChange={onChange}/>))
+    act(() => jest.advanceTimersByTime(50))
+
+    expect(view.queryByText('Second content')).toBeInTheDocument()
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledWith(1)
+  })
+
+  it('lets a second click within the transition replace the first', () => {
+    const onChange = jest.fn()
+    const view = render(wrap(<ProgressSteps items={items} onChange={onChange}/>))
+
+    fireEvent.click(getStepButtons(view.container)[1])
+    act(() => jest.advanceTimersByTime(30))
+    fireEvent.click(getStepButtons(view.container)[2])
+    act(() => jest.advanceTimersByTime(30))
+
+    expect(onChange).not.toHaveBeenCalled()
+
+    act(() => jest.advanceTimersByTime(20))
+    expect(view.queryByText('Third content')).toBeInTheDocument()
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledWith(2)
+  })
+
   it('returns to the first step when the item list shrinks below the active index', () => {
     const view = render(wrap(<ProgressSteps items={items} defaultIndex={3}/>))
 
