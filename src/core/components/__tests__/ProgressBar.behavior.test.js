@@ -18,21 +18,49 @@ const getRoot = container => container.querySelector('.app__progress--bar')
 const getTooltip = container => container.querySelector('.app__progress__bar__tooltip__inner')
 const CustomTooltip = () => <strong>Half complete</strong>
 
+/**
+ * The fill-in timers ProgressBar schedules — those with its `TIME_DURATION_INSTANT` delay — and which
+ * of them were cleared, read through spies. These tests used to read `ref.current.timers`, the array
+ * `@withTimer` kept on the class instance; the component is a function since §9.3 step 6, so there is
+ * no instance and no array. Not `jest.getTimerCount()` either: on React 16 and 17 it also counts the
+ * scheduler's own timer, which is pending or not depending on which test ran first.
+ */
+const watchTimers = () => {
+  const scheduled = jest.spyOn(global, 'setTimeout')
+  const cleared = jest.spyOn(global, 'clearTimeout')
+  return {
+    fillIns: () => scheduled.mock.calls
+      .map((call, i) => (call[1] === TIME_DURATION_INSTANT ? [scheduled.mock.results[i].value] : []))
+      .flat(),
+    wasCleared: id => cleared.mock.calls.some(([clearedId]) => clearedId === id),
+    restore: () => {
+      scheduled.mockRestore()
+      cleared.mockRestore()
+    },
+  }
+}
+
 describe('ProgressBar lifecycle contracts', () => {
-  beforeEach(() => jest.useFakeTimers())
+  let timers
+
+  beforeEach(() => {
+    jest.useFakeTimers()
+    timers = watchTimers()
+  })
 
   afterEach(() => {
+    // The spies wrap the fake timers, so they come off before the real timers go back.
+    timers.restore()
     jest.clearAllTimers()
     jest.useRealTimers()
   })
 
   it('applies the initial value only after the mount delay', () => {
-    const progress = React.createRef()
-    const view = renderProgressBar({value: 0.42, hasTooltip: true, ref: progress})
+    const view = renderProgressBar({value: 0.42, hasTooltip: true})
 
     expect(getBar(view.container)).toHaveStyle({width: '0%'})
     expect(getTooltip(view.container)).toHaveTextContent('0%')
-    expect(progress.current.timers).toHaveLength(1)
+    expect(timers.fillIns()).toHaveLength(1)
 
     act(() => jest.advanceTimersByTime(TIME_DURATION_INSTANT - 1))
     expect(getBar(view.container)).toHaveStyle({width: '0%'})
@@ -43,23 +71,23 @@ describe('ProgressBar lifecycle contracts', () => {
   })
 
   it('cleans up the delayed mount update on unmount', () => {
-    const progress = React.createRef()
-    const view = renderProgressBar({value: 0.8, ref: progress})
-    const instance = progress.current
+    const view = renderProgressBar({value: 0.8})
+    const [fillIn] = timers.fillIns()
 
-    expect(instance.timers).toHaveLength(1)
+    expect(timers.wasCleared(fillIn)).toBe(false)
     view.unmount()
 
-    expect(instance.timers).toEqual([])
+    expect(timers.wasCleared(fillIn)).toBe(true)
   })
 
   it('does not let the delayed mount value overwrite a newer prop', () => {
-    const progress = React.createRef()
-    const view = renderProgressBar({value: 0.2, ref: progress})
+    const view = renderProgressBar({value: 0.2})
+    const [fillIn] = timers.fillIns()
 
-    view.rerender(wrap(<ProgressBar ref={progress} value={0.75}/>))
+    view.rerender(wrap(<ProgressBar value={0.75}/>))
     expect(getBar(view.container)).toHaveStyle({width: '75%'})
-    expect(progress.current.timers).toEqual([])
+    expect(timers.wasCleared(fillIn)).toBe(true)
+    expect(timers.fillIns()).toEqual([fillIn])
 
     act(() => jest.runAllTimers())
     expect(getBar(view.container)).toHaveStyle({width: '75%'})
@@ -78,14 +106,14 @@ describe('ProgressBar lifecycle contracts', () => {
   })
 
   it('keeps the pending mount update when an unrelated prop changes', () => {
-    const progress = React.createRef()
-    const view = renderProgressBar({value: 0.6, className: 'before', ref: progress})
+    const view = renderProgressBar({value: 0.6, className: 'before'})
 
-    view.rerender(wrap(<ProgressBar ref={progress} value={0.6} className='after'/>))
+    view.rerender(wrap(<ProgressBar value={0.6} className='after'/>))
 
     expect(getRoot(view.container)).toHaveClass('after')
     expect(getBar(view.container)).toHaveStyle({width: '0%'})
-    expect(progress.current.timers).toHaveLength(1)
+    expect(timers.fillIns()).toHaveLength(1)
+    expect(timers.wasCleared(timers.fillIns()[0])).toBe(false)
 
     act(() => jest.runAllTimers())
     expect(getBar(view.container)).toHaveStyle({width: '60%'})
@@ -106,12 +134,11 @@ describe('ProgressBar lifecycle contracts', () => {
     ['NaN', Number.NaN],
     ['a negative number', -0.25],
   ])('renders %s as empty progress with a no-data tooltip', (_name, value) => {
-    const progress = React.createRef()
-    const view = renderProgressBar({value, hasTooltip: true, ref: progress})
+    const view = renderProgressBar({value, hasTooltip: true})
 
     expect(getBar(view.container)).toHaveStyle({width: '0%'})
     expect(getTooltip(view.container)).toHaveTextContent('No Data')
-    expect(progress.current.timers || []).toEqual([])
+    expect(timers.fillIns()).toEqual([])
   })
 
   it('renders the documented upper fraction boundary as complete', () => {
@@ -124,14 +151,15 @@ describe('ProgressBar lifecycle contracts', () => {
   })
 
   it('normalizes an invalid prop update and cancels pending mount work', () => {
-    const progress = React.createRef()
-    const view = renderProgressBar({value: 0.4, hasTooltip: true, ref: progress})
+    const view = renderProgressBar({value: 0.4, hasTooltip: true})
+    const [fillIn] = timers.fillIns()
 
-    view.rerender(wrap(<ProgressBar ref={progress} value={Number.NaN} hasTooltip/>))
+    view.rerender(wrap(<ProgressBar value={Number.NaN} hasTooltip/>))
 
     expect(getBar(view.container)).toHaveStyle({width: '0%'})
     expect(getTooltip(view.container)).toHaveTextContent('No Data')
-    expect(progress.current.timers).toEqual([])
+    expect(timers.wasCleared(fillIn)).toBe(true)
+    expect(timers.fillIns()).toEqual([fillIn])
   })
 })
 
