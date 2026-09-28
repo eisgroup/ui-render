@@ -12,9 +12,10 @@
  *
  * The layer is now a subclass. The class handed to `Decorator` is left exactly as written.
  *
- * The layer's own bodies are written as class members, `config` included. Two things are still
- * assigned to its prototype: the four data-kind registry methods `withDataKind` adds, and `state`,
- * because the form layer builds its own from it (see `Decorator` in `rules.js`).
+ * The layer's own bodies are written as class members, `config` and the four nested-Data registry
+ * methods included; those were the `withDataKind` mixin, assigned onto the prototype after the
+ * class. Only `state` is still assigned there, because the form layer builds its own from it (see
+ * `Decorator` in `rules.js`).
  *
  * THE FORM MODULE STOPPED PATCHING IT IN TURN. `withFormSetup` used to write the form members onto
  * this layer's prototype and replace its `UNSAFE_componentWillReceiveProps` and
@@ -81,6 +82,17 @@ describe('the lifecycle layer is a class of its own', () => {
         }
         for (const name of INSTALLED_GETTERS) {
             expect(Object.getOwnPropertyDescriptor(EngineLayer.prototype, name)).toBeDefined()
+        }
+    })
+
+    it('writes every member of either layer in its class body, leaving only `state` assigned', () => {
+        // A class member is not enumerable and an assignment is, so this is what tells the two apart.
+        // The nested-Data registry was the last thing assigned onto the engine layer after its class,
+        // by the `withDataKind` mixin; `state` is assigned on purpose (see `Decorator` in `rules.js`).
+        for (const Layer of [EngineLayer, FormLayer]) {
+            const assigned = Object.getOwnPropertyNames(Layer.prototype)
+                .filter(name => Object.getOwnPropertyDescriptor(Layer.prototype, name).enumerable)
+            expect({ layer: Layer.name, assigned }).toEqual({ layer: Layer.name, assigned: ['state'] })
         }
     })
 

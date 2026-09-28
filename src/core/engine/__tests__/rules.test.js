@@ -2,11 +2,11 @@ import {
     toOpenLConfig,
     initSelectStatesFromData,
     getDataKindPathFromRelative,
-    withDataKind,
     parseArrayPrefixAndRowIndexFromFieldName,
     formsStorage,
 } from '../rules'
 import { getLiveMergedDataKindArray } from '../utils'
+import { Active } from '../../utils'
 
 describe('parseArrayPrefixAndRowIndexFromFieldName', () => {
     it('parses final-form array field names for table rows', () => {
@@ -432,8 +432,10 @@ describe('initSelectStatesFromData', () => {
     })
 })
 
-describe('withDataKind', () => {
-    let ParentClass, parent
+// The engine layer's own members since §9.3 step 5; until then they were the `withDataKind` mixin.
+// They touch nothing but the registry, so a bare object on the layer's prototype is instance enough.
+describe('the nested-Data registry', () => {
+    let parent
 
     function makeChild (relativePath) {
         return { props: { meta: { relativePath } } }
@@ -441,9 +443,7 @@ describe('withDataKind', () => {
 
     beforeEach(() => {
         formsStorage.clear()
-        ParentClass = class {}
-        withDataKind(ParentClass)
-        parent = new ParentClass()
+        parent = Object.create(Object.getPrototypeOf(Active.UIRender).prototype)
     })
 
     describe('registerDataKind', () => {
