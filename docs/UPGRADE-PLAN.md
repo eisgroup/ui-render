@@ -544,6 +544,18 @@ Every workstream below is a series of small, independently shippable, reversible
 
   Nine behaviour tests read `@withTimer`'s `timers` array through a ref. They now spy on `setTimeout` and `clearTimeout` and read only the timers scheduled with the component's own delay, and they pass unchanged against the previous class. Six mutations of the new component each fail at least one of them: the cleanup, the render-time derivation, `Object.is`, the effect's dependencies, the mount-value guard, and the empty first render.
 
+  **`ProgressSteps` converted 2026-09-28, with `useTimers`.** `useTimers` (`components/utils/timers.js`) is what replaces `@withTimer` for the four leaves still on it: the timers a function component starts outside an effect, from a click handler for instance, all cleared at unmount.
+
+  ProgressSteps' lifecycle re-derived the active step on every parent render, and in controlled mode it cleared a pending click. The trigger of `UNSAFE_componentWillReceiveProps` is a new props object, not a changed value, and the conversion keeps that:
+  - The render-time derivation compares the props object, which a re-render for the component's own state leaves unchanged.
+  - A pending click is superseded through a counter that the timer checks when it fires, rather than cleared from render.
+  - The active step and the transition are one state object, merged like `setState`, so the unbatched timer updates of React 16 and 17 commit as often as before.
+  - It is not memoised. `React.memo` would skip a parent render with equal props, which the lifecycle did not. Under UI Render the mapper rebuilds `items` on every render, so the class never bailed out there anyway.
+
+  Three new tests pin behaviour the old suite left open: a controlled parent render with an unchanged `activeIndex` still supersedes a click, an uncontrolled one does not, and a second click replaces the first. All three pass against the previous class. Six mutations of the component and three of the hook each fail at least one test.
+
+  **A candidate defect, pinned rather than fixed.** In controlled mode, any parent render within the 50 ms transition swallows the click, because the class cancelled it on every parent render, not only when `activeIndex` changed. The engine's own `Tabs` stopped doing the equivalent for exactly that reason (its note on `itemsChanged`). Under UI Render the parent re-renders often; whether that swallows real clicks has not been measured.
+
   **A trap for the next five `@withTimer` leaves: `jest.getTimerCount()` is not a count of a component's timers.** The first version of these tests used it, and it passed on React 18 but failed on the React 16 and 17 legs: 2 where 1 was expected. The older scheduler keeps a fake timer of its own, pending or not depending on which test ran first, so the other count assertions had passed only because of test order.
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 
