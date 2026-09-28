@@ -630,15 +630,18 @@ function Decorator (Class) {
      * this module was imported. The layer now lives on a subclass of its own, so the class handed
      * in is left exactly as it was written and the captures below read genuine parent methods.
      *
-     * The members below are written as members. Two things deliberately are NOT:
+     * The members below are written as members, `config` included. One thing deliberately is NOT:
      *
      * `state` stays a prototype assignment because `withFormSetup` MERGES onto it —
      * `Class.prototype.state = {…, ...Class.prototype.state}` — so a class FIELD, which initialises
      * per instance after `super()` returns, would leave that merge reading `undefined` and drop the
      * engine's state shape. Two test harnesses read `prototype.state` directly for the same reason.
      *
-     * `config` is still installed by `defineProperty` below: it is four hundred lines of action
-     * handlers and moving it is its own change, with its own diff to read.
+     * `config` was installed by `Object.defineProperty` until §9.3 step 2 had lifted most of its
+     * action handlers into modules of their own. Writing it as a member changed one thing, the
+     * descriptor's `configurable` (false → true), and nothing depends on that: `get meta` is its only
+     * reader, nothing in `src` enumerates prototype members, and `form/utils.js`, which does install
+     * members on this prototype with `defineProperty`, never touches `config`.
      */
     class UIRenderLifecycle extends Class {
         get data () {
@@ -660,160 +663,7 @@ function Decorator (Class) {
             return this._meta = value
         }
 
-        get hasData () {
-            return this.data != null
-        }
-
-        get hasMeta () {
-            return !isEmpty(this.meta)
-        }
-
-        // @Note: functions should have consistent pattern of receiving important arguments first,
-        // followed by optional arguments.
-        // Positional arguments was chosen instead of keyword arguments because
-        // it provides more flexibility and separation of concerns between different configs.
-        setStates (value, ...rest) {
-            /**
-             * The state path is the LAST STRING argument, not the second positional one.
-             *
-             * WHY, because "second positional" looks obviously right and is wrong: a meta's configured
-             * action arguments are APPENDED to the caller's by `getFunctionFromString`
-             * (`'setState,categoryX'` becomes `(...caller) => setStates(...caller, 'categoryX')`), so
-             * the path's position depends on how many arguments the caller passes. A `Button` passes
-             * one and the path lands second; a `Dropdown` passes three — `(value, name, event)` — and
-             * the path lands FOURTH while the field's own `name` sits second. Reading the second
-             * argument therefore wrote to the path named by the field instead of the one the meta
-             * asked for, for every `view: 'Select'` whose two differ. `mapper.js` works around it for
-             * stable-value Selects by stripping the extra arguments, with a comment saying exactly
-             * this; nothing covered the rest.
-             *
-             * Measured across all four real call shapes, this rule is the only one that is right in
-             * all of them — "last argument" is wrong when no path is configured and the caller's last
-             * argument is the DOM event, and "second argument" is wrong for any caller passing more
-             * than one:
-             *   (value, 'categoryX')                      -> 'categoryX'      configured, one-arg caller
-             *   (value, name, event, 'categoryX')          -> 'categoryX'      configured, dropdown
-             *   (value, name, event)                       -> name            not configured, dropdown
-             *   (value)                                    -> undefined       not configured, one-arg
-             * The last row keeps today's behaviour deliberately: `set(state, undefined, value)`
-             * returns the state unchanged, so the action is a no-op rather than an error, and making
-             * it one is a separate decision from fixing the path.
-             *
-             * Found by the §9.7-F1 step 3 part 1 audit. `transforms.action-args.test.js` pins the
-             * composer's half of this and `rules.set-state-path.test.js` this half.
-             */
-            let keyPath
-            for (let i = rest.length - 1; i >= 0; i -= 1) {
-                if (typeof rest[i] === 'string') { keyPath = rest[i]; break }
-            }
-            // Clear cached meta so {state.xxx} templates re-resolve on next render
-            // (showIf, container names, option paths all depend on current state)
-            this._meta = null
-            return this.setState(state => setIn(state, keyPath, value))
-        }
-
-        resetForm () {
-            this.form.reset()
-        }
-
-        popupAlert (title, content) {
-            if (isValidElement(content)) {
-                this.context.setPopupState({
-                    isOpen: true,
-                    title: title,
-                    content: content
-                })
-            } else {
-                this.context.setPopupState({
-                    isOpen: true,
-                    title: title,
-                    content: <Json data={content}/>
-                })
-            }
-
-        }
-
-        componentWillUnmount (nextProps, nextState) {
-            const { parent, form, index } = this.props
-            if (parent && index != null) parent.unregisterDataKind(this, form.kind, index)
-            // A change typed just before unmount must not submit a form the user has left.
-            cancelAutoSubmit(this)
-            if (super.componentWillUnmount) super.componentWillUnmount(...arguments)
-        }
-
-        UNSAFE_componentWillMount (nextProps, nextState) {
-            // Wrap form.submit with HOC to extract nested form values before submission
-            this.submit = (...args) => {
-                const { dataKind } = this.formValues
-                for (const kind in dataKind) {
-                    dataKind[kind] = this.getDataKind(kind).map((v, index) => isEmpty(v) ? dataKind[kind][index] : v)
-                }
-                return this.form.submit(...args)
-            }
-
-            const { parent, form, index } = this.props
-
-            if (parent && index != null) {
-                parent.registerDataKind(this, form.kind, index)
-            }
-            if (super.UNSAFE_componentWillMount) {
-                super.UNSAFE_componentWillMount(...arguments)
-            }
-        }
-
-        UNSAFE_componentWillUpdate (nextProps, nextState) {
-            if (this.state !== nextState) this.meta = null // update changes by UI interactions (i.e. Dropdown onChange)
-            if (super.UNSAFE_componentWillUpdate) super.UNSAFE_componentWillUpdate(...arguments)
-        }
-
-        UNSAFE_componentWillReceiveProps (next, _) {
-            const { data, meta } = this.props
-            // external API changes
-            if (next.data != null && next.data !== data) {
-                this.setState(state => setIn(state, 'data.json', normalizeIncomingData(next.data)))
-            }
-            // external API changes
-            if (next.meta != null && next.meta !== meta) {
-                this.setState(state => setIn(state, 'meta.json', next.meta))
-            }
-            if (super.UNSAFE_componentWillReceiveProps) {
-                super.UNSAFE_componentWillReceiveProps(...arguments)
-            }
-        }
-
-        componentDidUpdate (prevProps, prevState) {
-            const { parent, form, index } = this.props
-            if (parent && form && index != null && prevProps.index !== index) {
-                if (prevProps.index != null) {
-                    parent.unregisterDataKind(this, form.kind, prevProps.index)
-                }
-                parent.registerDataKind(this, form.kind, index)
-            }
-            if (super.componentDidUpdate) super.componentDidUpdate(...arguments)
-        }
-
-        // Nested documents render this class directly — `engine/Data.js` reads it from `Active` to
-        // avoid a circular import — so it has to be the layer, not the bare class the caller wrote.
-    }
-
-    // const popup = useContext(PopupContext)
-    // These are the PARENT's methods now, which is what "the original" always meant.
-    withDataKind(UIRenderLifecycle)
-
-    // @Note: the state shape is used for reference only, it is not instantiated
-    UIRenderLifecycle.prototype.state = {
-        data: {
-            json: undefined, // data object
-            name: undefined, // file name
-        },
-        meta: {
-            json: undefined, // data object
-            name: undefined, // file name
-        },
-    }
-
-    Object.defineProperty(UIRenderLifecycle.prototype, 'config', {
-        get () {
+        get config () {
             const data = this.data
             const { form, parent } = this.props
             // Fetch a file through the host's `downloadFile` and save it (see `download.js`). The API
@@ -1040,8 +890,157 @@ function Decorator (Class) {
                 }
             }
         }
-    })
 
+        get hasData () {
+            return this.data != null
+        }
+
+        get hasMeta () {
+            return !isEmpty(this.meta)
+        }
+
+        // @Note: functions should have consistent pattern of receiving important arguments first,
+        // followed by optional arguments.
+        // Positional arguments was chosen instead of keyword arguments because
+        // it provides more flexibility and separation of concerns between different configs.
+        setStates (value, ...rest) {
+            /**
+             * The state path is the LAST STRING argument, not the second positional one.
+             *
+             * WHY, because "second positional" looks obviously right and is wrong: a meta's configured
+             * action arguments are APPENDED to the caller's by `getFunctionFromString`
+             * (`'setState,categoryX'` becomes `(...caller) => setStates(...caller, 'categoryX')`), so
+             * the path's position depends on how many arguments the caller passes. A `Button` passes
+             * one and the path lands second; a `Dropdown` passes three — `(value, name, event)` — and
+             * the path lands FOURTH while the field's own `name` sits second. Reading the second
+             * argument therefore wrote to the path named by the field instead of the one the meta
+             * asked for, for every `view: 'Select'` whose two differ. `mapper.js` works around it for
+             * stable-value Selects by stripping the extra arguments, with a comment saying exactly
+             * this; nothing covered the rest.
+             *
+             * Measured across all four real call shapes, this rule is the only one that is right in
+             * all of them — "last argument" is wrong when no path is configured and the caller's last
+             * argument is the DOM event, and "second argument" is wrong for any caller passing more
+             * than one:
+             *   (value, 'categoryX')                      -> 'categoryX'      configured, one-arg caller
+             *   (value, name, event, 'categoryX')          -> 'categoryX'      configured, dropdown
+             *   (value, name, event)                       -> name            not configured, dropdown
+             *   (value)                                    -> undefined       not configured, one-arg
+             * The last row keeps today's behaviour deliberately: `set(state, undefined, value)`
+             * returns the state unchanged, so the action is a no-op rather than an error, and making
+             * it one is a separate decision from fixing the path.
+             *
+             * Found by the §9.7-F1 step 3 part 1 audit. `transforms.action-args.test.js` pins the
+             * composer's half of this and `rules.set-state-path.test.js` this half.
+             */
+            let keyPath
+            for (let i = rest.length - 1; i >= 0; i -= 1) {
+                if (typeof rest[i] === 'string') { keyPath = rest[i]; break }
+            }
+            // Clear cached meta so {state.xxx} templates re-resolve on next render
+            // (showIf, container names, option paths all depend on current state)
+            this._meta = null
+            return this.setState(state => setIn(state, keyPath, value))
+        }
+
+        resetForm () {
+            this.form.reset()
+        }
+
+        popupAlert (title, content) {
+            if (isValidElement(content)) {
+                this.context.setPopupState({
+                    isOpen: true,
+                    title: title,
+                    content: content
+                })
+            } else {
+                this.context.setPopupState({
+                    isOpen: true,
+                    title: title,
+                    content: <Json data={content}/>
+                })
+            }
+
+        }
+
+        componentWillUnmount (nextProps, nextState) {
+            const { parent, form, index } = this.props
+            if (parent && index != null) parent.unregisterDataKind(this, form.kind, index)
+            // A change typed just before unmount must not submit a form the user has left.
+            cancelAutoSubmit(this)
+            if (super.componentWillUnmount) super.componentWillUnmount(...arguments)
+        }
+
+        UNSAFE_componentWillMount (nextProps, nextState) {
+            // Wrap form.submit with HOC to extract nested form values before submission
+            this.submit = (...args) => {
+                const { dataKind } = this.formValues
+                for (const kind in dataKind) {
+                    dataKind[kind] = this.getDataKind(kind).map((v, index) => isEmpty(v) ? dataKind[kind][index] : v)
+                }
+                return this.form.submit(...args)
+            }
+
+            const { parent, form, index } = this.props
+
+            if (parent && index != null) {
+                parent.registerDataKind(this, form.kind, index)
+            }
+            if (super.UNSAFE_componentWillMount) {
+                super.UNSAFE_componentWillMount(...arguments)
+            }
+        }
+
+        UNSAFE_componentWillUpdate (nextProps, nextState) {
+            if (this.state !== nextState) this.meta = null // update changes by UI interactions (i.e. Dropdown onChange)
+            if (super.UNSAFE_componentWillUpdate) super.UNSAFE_componentWillUpdate(...arguments)
+        }
+
+        UNSAFE_componentWillReceiveProps (next, _) {
+            const { data, meta } = this.props
+            // external API changes
+            if (next.data != null && next.data !== data) {
+                this.setState(state => setIn(state, 'data.json', normalizeIncomingData(next.data)))
+            }
+            // external API changes
+            if (next.meta != null && next.meta !== meta) {
+                this.setState(state => setIn(state, 'meta.json', next.meta))
+            }
+            if (super.UNSAFE_componentWillReceiveProps) {
+                super.UNSAFE_componentWillReceiveProps(...arguments)
+            }
+        }
+
+        componentDidUpdate (prevProps, prevState) {
+            const { parent, form, index } = this.props
+            if (parent && form && index != null && prevProps.index !== index) {
+                if (prevProps.index != null) {
+                    parent.unregisterDataKind(this, form.kind, prevProps.index)
+                }
+                parent.registerDataKind(this, form.kind, index)
+            }
+            if (super.componentDidUpdate) super.componentDidUpdate(...arguments)
+        }
+    }
+
+    // const popup = useContext(PopupContext)
+    withDataKind(UIRenderLifecycle)
+
+    // @Note: the state shape is used for reference only, it is not instantiated
+    UIRenderLifecycle.prototype.state = {
+        data: {
+            json: undefined, // data object
+            name: undefined, // file name
+        },
+        meta: {
+            json: undefined, // data object
+            name: undefined, // file name
+        },
+    }
+
+    // Nested documents render this class directly — `engine/Data.js` reads it from `Active` to
+    // avoid a circular import — so it has to be the layer, not the bare class the caller wrote.
     Active.UIRender = UIRenderLifecycle
 
     return withForm({
