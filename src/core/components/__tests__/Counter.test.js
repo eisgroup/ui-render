@@ -17,6 +17,13 @@ describe('Counter', () => {
         expect(container.textContent).toBe('0')
     })
 
+    it('starts from zero when no start is given', () => {
+        // The documented default. It was `defaultProps` on the class and is a default parameter since
+        // §9.3 step 6, which makes it a branch of its own: nothing rendered a counter without `start`.
+        const { container } = render(wrap(<Counter end={100} />))
+        expect(container.textContent).toBe('0')
+    })
+
     it('animates by changing the displayed value when timers run', () => {
         const { container } = render(wrap(<Counter start={0} end={100} duration={170} interval={17} />))
         act(() => {

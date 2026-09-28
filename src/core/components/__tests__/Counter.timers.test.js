@@ -1,7 +1,7 @@
 import React from 'react'
 import {act, render} from '@testing-library/react'
 import '@testing-library/jest-dom'
-import Counter from '../Counter'
+import Counter, {nextFrame} from '../Counter'
 
 const renderValue = (value) => String(value)
 const renderValueWithDecimals = (value, decimals) => `${value}:${decimals}`
@@ -20,10 +20,38 @@ const renderCounter = (props) => render(
   />
 )
 
+/**
+ * The timers the counter scheduled with a given delay, and which were cleared, read through spies.
+ * These tests used to read `ref.current.timers`, the array `@withTimer` kept on the class instance;
+ * the component is a function since §9.3 step 6, so there is no instance and no array. Not
+ * `jest.getTimerCount()` either: on React 16 and 17 it also counts the scheduler's own timer.
+ */
+const watchTimers = () => {
+  const scheduled = jest.spyOn(global, 'setTimeout')
+  const cleared = jest.spyOn(global, 'clearTimeout')
+  return {
+    scheduledWith: delay => scheduled.mock.calls
+      .map((call, i) => (call[1] === delay ? [scheduled.mock.results[i].value] : []))
+      .flat(),
+    wasCleared: id => cleared.mock.calls.some(([clearedId]) => clearedId === id),
+    restore: () => {
+      scheduled.mockRestore()
+      cleared.mockRestore()
+    },
+  }
+}
+
 describe('Counter lifecycle contracts', () => {
-  beforeEach(() => jest.useFakeTimers())
+  let timers
+
+  beforeEach(() => {
+    jest.useFakeTimers()
+    timers = watchTimers()
+  })
 
   afterEach(() => {
+    // The spies wrap the fake timers, so they come off before the real timers go back.
+    timers.restore()
     jest.clearAllTimers()
     jest.useRealTimers()
   })
@@ -158,25 +186,24 @@ describe('Counter lifecycle contracts', () => {
   })
 
   it('ignores a late frame after an animation has already completed', () => {
-    const counter = React.createRef()
-    const view = renderCounter({start: 3, end: 3, ref: counter})
+    // The frame step is a pure function since §9.3 step 6; this used to call the class's `animate`
+    // through a ref. With no steps left it keeps the state object, so React skips the update.
+    const done = {value: 3, steps: 0}
 
-    act(() => counter.current.animate())
-
-    expect(view.container).toHaveTextContent('3')
-    expect(counter.current.timers).toEqual([])
+    expect(nextFrame(done, 3)).toBe(done)
+    expect(nextFrame({value: 0, steps: 4}, 10)).toEqual({value: 2.5, steps: 3})
+    expect(nextFrame({value: 7.5, steps: 1}, 10)).toEqual({value: 10, steps: 0})
   })
 
   it('cancels pending animation when props become a static value', () => {
-    const counter = React.createRef()
-    const view = renderCounter({delay: 100, ref: counter})
+    const view = renderCounter({delay: 100})
+    const [pending] = timers.scheduledWith(100)
 
     view.rerender(
       <Counter
-        ref={counter}
         start={7}
         end={7}
-        delay={0}
+        delay={60}
         duration={100}
         interval={25}
         easingFn={linear}
@@ -185,15 +212,15 @@ describe('Counter lifecycle contracts', () => {
     )
 
     expect(view.container).toHaveTextContent('7')
-    expect(counter.current.timers).toEqual([])
+    expect(timers.wasCleared(pending)).toBe(true)
+    expect(timers.scheduledWith(60)).toEqual([])
   })
 
   it('completes immediately when duration is zero', () => {
-    const counter = React.createRef()
-    const view = renderCounter({duration: 0, ref: counter})
+    const view = renderCounter({duration: 0, delay: 40})
 
     expect(view.container).toHaveTextContent('10')
-    expect(counter.current.timers).toEqual([])
+    expect(timers.scheduledWith(40)).toEqual([])
   })
 
   it.each([
@@ -227,13 +254,12 @@ describe('Counter lifecycle contracts', () => {
   })
 
   it('cleans up a delayed animation on unmount', () => {
-    const counter = React.createRef()
-    const view = renderCounter({delay: 100, ref: counter})
-    const instance = counter.current
+    const view = renderCounter({delay: 100})
+    const [pending] = timers.scheduledWith(100)
 
-    expect(instance.timers).toHaveLength(1)
+    expect(timers.wasCleared(pending)).toBe(false)
     view.unmount()
 
-    expect(instance.timers).toEqual([])
+    expect(timers.wasCleared(pending)).toBe(true)
   })
 })

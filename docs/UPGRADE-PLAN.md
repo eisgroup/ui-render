@@ -556,6 +556,16 @@ Every workstream below is a series of small, independently shippable, reversible
 
   **A candidate defect, pinned rather than fixed.** In controlled mode, any parent render within the 50 ms transition swallows the click, because the class cancelled it on every parent render, not only when `activeIndex` changed. The engine's own `Tabs` stopped doing the equivalent for exactly that reason (its note on `itemsChanged`). Under UI Render the parent re-renders often; whether that swallows real clicks has not been measured.
 
+  **`Counter` converted 2026-09-28**, the third leaf and the second on `useTimers`. Its lifecycle compared the values of six animation props, not the props object as ProgressSteps' did. So it is memoised, like the `PureComponent` it was: a parent render with equal props had nothing to restart.
+  - A changed animation prop resets the displayed value during render.
+  - The delay and the frames run in one effect per animation, and its cleanup cancels them all.
+  - The default `easingFn` is a module constant. An inline default would be a new function on every render and would restart the animation every time; a mutation doing exactly that fails with React's "Too many re-renders".
+  - A `NaN` prop compares equal to itself. The class's `!==` restarted a `NaN` animation on every parent render, and compared during render that would never settle. This is the one behaviour that changed.
+
+  The frame step is now a pure, exported `nextFrame`, so the test that called the class's `animate` through a ref calls it instead. The three tests that read `@withTimer`'s `timers` array use the same spies as ProgressBar's and pass against the previous class. Six mutations each fail at least one test.
+
+  **A second trap, found by `test:coverage` and not by any test: `defaultProps` turned into default parameters become branches.** `Counter.js` has a 100% branch threshold. No test rendered a counter without `start`, which cost nothing while the default was `defaultProps` data, and failed the threshold once it was a default parameter. The remedy is a test for the documented default, not a lower threshold. Expand and StandaloneTabs carry per-file thresholds too.
+
   **A trap for the next five `@withTimer` leaves: `jest.getTimerCount()` is not a count of a component's timers.** The first version of these tests used it, and it passed on React 18 but failed on the React 16 and 17 legs: 2 where 1 was expected. The older scheduler keeps a fake timer of its own, pending or not depending on which test ran first, so the other count assertions had passed only because of test order.
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 
