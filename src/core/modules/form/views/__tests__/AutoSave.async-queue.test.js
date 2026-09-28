@@ -99,6 +99,48 @@ describe('AutoSave asynchronous contracts', () => {
         expect(screen.queryByText('Saving now')).not.toBeInTheDocument()
     })
 
+    it('saves through the onChange and partial of the latest render', async () => {
+        // The class read `this.props` when a save ran. The function component reads the latest
+        // render's props the same way (§9.3 step 6), rather than the ones its debounce was built with.
+        const first = jest.fn().mockResolvedValue(undefined)
+        const second = jest.fn().mockResolvedValue(undefined)
+        let form
+        const captureForm = value => { form = value }
+        const { rerender } = render(
+            <AutoSaveForm autoSaveProps={{ onChange: first, delay: 20 }} captureForm={captureForm}/>
+        )
+        await advance(20)
+
+        rerender(
+            <AutoSaveForm autoSaveProps={{ onChange: second, partial: true, delay: 20 }} captureForm={captureForm}/>
+        )
+        act(() => form.change('note', 'x'))
+        await advance(20)
+
+        expect(first).not.toHaveBeenCalled()
+        expect(second).toHaveBeenCalledTimes(1)
+        expect(second).toHaveBeenCalledWith({ note: 'x' })
+    })
+
+    it('diffs a partial save against the values it last saved', async () => {
+        const onChange = jest.fn().mockResolvedValue(undefined)
+        let form
+        render(
+            <AutoSaveForm
+                autoSaveProps={{ onChange, partial: true, delay: 20 }}
+                captureForm={value => { form = value }}
+            />
+        )
+        await advance(20)
+
+        act(() => form.change('amount', 2))
+        await advance(20)
+        act(() => form.change('note', 'x'))
+        await advance(20)
+
+        expect(onChange.mock.calls.map(([saved]) => saved)).toEqual([{ amount: 2 }, { note: 'x' }])
+    })
+
     it('rebuilds the debounce handler when the delay prop changes', async () => {
         const onChange = jest.fn().mockResolvedValue(undefined)
         let form

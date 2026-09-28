@@ -566,6 +566,14 @@ Every workstream below is a series of small, independently shippable, reversible
 
   **A second trap, found by `test:coverage` and not by any test: `defaultProps` turned into default parameters become branches.** `Counter.js` has a 100% branch threshold. No test rendered a counter without `start`, which cost nothing while the default was `defaultProps` data, and failed the threshold once it was a default parameter. The remedy is a test for the documented default, not a lower threshold. Expand and StandaloneTabs carry per-file thresholds too.
 
+  **`AutoSave` converted 2026-09-28**, the fourth leaf and the first not on `@withTimer`. Its lifecycle rebuilt the debounce when `delay` changed, cancelling the old one first (§9.3 step 4). The debounce is now memoised per `delay`, and an effect cancels the one it replaces, and the last one at unmount.
+  - **That cancel happens one commit later than the class's.** The class cancelled in the lifecycle, before the render, so a save coming due between the render and the effect would now still run. No test can see that moment, because the tests flush effects synchronously. A check that would have closed it was left out for that reason: it would have been an untested branch.
+  - **The baseline values and the save in flight are refs,** since nothing renders them. The class kept the values in state and the promise on the instance.
+
+  Two new tests pin what the old suite left open, and both pass against the previous class: a save goes through the latest render's `onChange` and `partial`, and a partial save is diffed against the values last saved. Seven mutations each fail at least one test. An eighth, dropping the `return` after the baseline is first recorded, is equivalent: the baseline diffed against itself is empty.
+
+  **Checked under `<StrictMode>` for step 7:** the simulated remount does not lose the first save, in the class or in the function. FormSpy's second subscription delivers the form state again, so the baseline is recorded after the remount.
+
   **A trap for the next five `@withTimer` leaves: `jest.getTimerCount()` is not a count of a component's timers.** The first version of these tests used it, and it passed on React 18 but failed on the React 16 and 17 legs: 2 where 1 was expected. The older scheduler keeps a fake timer of its own, pending or not depending on which test ran first, so the other count assertions had passed only because of test order.
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 
