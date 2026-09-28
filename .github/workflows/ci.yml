@@ -98,6 +98,15 @@ jobs:
       - name: Smoke the packed tarball across the declared peer range
         run: npm run test:pack:peers
 
+      # _envs.ts derives the mode flags from what a bundler leaves of `process.env`, and FILE.PATH_IMAGES from
+      # those flags. jest runs the source against Node's real process.env, so no suite can see what a build
+      # makes of it; this compiles the source with each real webpack config (library, demo dev/prod, the e2e
+      # shape) and evaluates it in a realm with no `process`, as a browser has. It fails on the code before
+      # these fixes: the name-only Image that resolved to "undefined/static/images/" in every release from
+      # 0.32.4, and every flag being false in the demo's browser bundles.
+      - name: Check the env flags each build ships
+        run: npm run test:env-flags
+
       - name: Build demo
         run: npm run build
 
