@@ -457,6 +457,21 @@ describe('Tabs render contracts', () => {
         }))
     })
 
+    it('accepts items without a tab, as hidden tabs driven by activeIndex use them', () => {
+        // The demo's Dynamic Layout example does exactly this, and meta.schema.json places no
+        // constraint on `tab`. While the prop type required one, every such Tabs drew a warning.
+        const errors = jest.spyOn(console, 'error').mockImplementation(() => {})
+        try {
+            const headless = [{ content: 'First layout' }, { content: 'Second layout' }]
+            const view = render(wrap(<Tabs items={headless} activeIndex={1} classNameTabs="hide"/>))
+
+            expect(getContent(view.container)).toHaveTextContent('Second layout')
+            expect(errors).not.toHaveBeenCalled()
+        } finally {
+            errors.mockRestore()
+        }
+    })
+
     it('renders object labels with and without icons as well as React element labels', () => {
         const objectItems = [
             { tab: { text: 'Plain object' }, content: 'Plain content' },
