@@ -750,7 +750,7 @@ Every workstream below is a series of small, independently shippable, reversible
   1. **Tests first.** An instance-contract test pins the members above, against the current classes, with no change in `src`. **DONE 2026-09-29**, with one refinement of this item, described below it.
   2. **Definition 3** becomes the `meta` cache keyed on the state object. **DONE 2026-09-29.**
   3. **Definition 2** moves to the constructor and `componentDidMount`. **DONE 2026-09-29.**
-  4. **Definitions 1 and 4 merge into one**, which is what they already are in effect.
+  4. **Definitions 1 and 4 merge into one**, which is what they already are in effect. **DONE 2026-09-29.**
   5. **`WithForm` becomes a function component**, taking definition 6.
   6. **The document becomes a function component**, taking 1 with 4 and 5, and the instance object with them.
   7. **§9.3 step 7's acceptance:** the demo under `<StrictMode>`.
@@ -802,6 +802,16 @@ Every workstream below is a series of small, independently shippable, reversible
   - **Measured unchanged.**
     - A probe recorded every example's registry through mount and unmount: the order of registrations and unregistrations, each document's registry and scope, and `getDataKind` for each kind. The two examples with nested documents, `nestedDataKind` and `tableForm`, are identical before and after, and both registries are empty after unmount.
     - In the running demo, adding, removing and editing rows in the nested table behave identically, with the same console output.
+
+  **Slice 4: one props sync, DONE 2026-09-29.** Definition 4, the engine layer's `UNSAFE_componentWillReceiveProps`, is gone. Definition 1, the declared class's, is now the document's only sync of `data` and `meta` from its props. Three definitions are left, in 4 `UNSAFE_*` lines, and all three are `componentWillReceiveProps`: this one, the form layer's and `WithForm`'s.
+  - **Why definition 1 stays.** Definition 4 set the same two paths with updaters and then called definition 1 through `super`. React applied definition 1's object update last, so the state always ended up as definition 1 left it.
+    - Measured: removing definition 4 passed all 2839 tests, while removing definition 1 failed the currency-code test.
+    - Definition 1 also takes a `data` prop that became null as no data, where definition 4 skipped it. A new instance-contract test pins that, and it fails without definition 1.
+  - **The structural test changed.** In `rules.lifecycle-layer`, "wraps the engine layer's lifecycle through `super`" required the engine layer to have a `componentWillReceiveProps` of its own. It now requires the one the engine layer inherits to be the declared class's. What the call through `super` carries is pinned by behaviour: when the form layer drops the call, 8 tests fail, among them `UIRender.smoke`'s prop-change tests and the instance contract's.
+  - **Measured unchanged.**
+    - For every example in the corpus, a host render with new `data` and `meta` objects renders the document once, before and after, and leaves identical state.
+    - A null `data` prop leaves `{json: null}`, both before and after.
+    - In the running demo, the same script as in slices 2 and 3 gives the same result and console output.
 
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 

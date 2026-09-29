@@ -283,6 +283,11 @@ export class UIRender extends Component {
         }
     }
 
+    // The document's one sync of `data` and `meta` from its props. Until §9.3 step 6 the engine
+    // layer had a second one over it, which set the same two paths with updaters just before this
+    // ran; this one's update was applied last, so what the state ended up with was always this
+    // one's, and that is what stays. It takes a `data` prop that became null as no data, which the
+    // other one skipped (`rules.instance-contract.test.js`).
     UNSAFE_componentWillReceiveProps (next, nextContext) {
         const update = {}
         const { data, meta } = this.props
@@ -943,21 +948,6 @@ function Decorator (Class) {
                 parent.registerDataKind(this, form.kind, index)
             }
             if (super.componentDidMount) super.componentDidMount(...arguments)
-        }
-
-        UNSAFE_componentWillReceiveProps (next, _) {
-            const { data, meta } = this.props
-            // external API changes
-            if (next.data != null && next.data !== data) {
-                this.setState(state => setIn(state, 'data.json', normalizeIncomingData(next.data)))
-            }
-            // external API changes
-            if (next.meta != null && next.meta !== meta) {
-                this.setState(state => setIn(state, 'meta.json', next.meta))
-            }
-            if (super.UNSAFE_componentWillReceiveProps) {
-                super.UNSAFE_componentWillReceiveProps(...arguments)
-            }
         }
 
         componentDidUpdate (prevProps, prevState) {

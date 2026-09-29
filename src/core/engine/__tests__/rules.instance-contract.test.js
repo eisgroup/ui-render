@@ -152,6 +152,16 @@ describe('the instance every node of a document is handed', () => {
         expect(before.meta.json).toBe(inputMeta)
     })
 
+    it('takes a data prop that became null as no data, and a new currency code from its meta', () => {
+        const view = mountDocument({ meta: inputMeta, data: { amount: 5 }, initialValues: { amount: 5 } })
+        const instance = rootOf()
+
+        view.rerender({ meta: { ...inputMeta, currencyCode: 'EUR' }, data: null, initialValues: { amount: 5 } })
+
+        expect(instance.state.data.json).toBeNull()
+        expect(instance.state.currencyCode).toBe('EUR')
+    })
+
     it('registers the popups it renders, by static id and by template', () => {
         mountMeta({
             view: 'Col',
