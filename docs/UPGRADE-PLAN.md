@@ -748,7 +748,7 @@ Every workstream below is a series of small, independently shippable, reversible
 
   **The order.** Each slice ships and is measured like a leaf:
   1. **Tests first.** An instance-contract test pins the members above, against the current classes, with no change in `src`. **DONE 2026-09-29**, with one refinement of this item, described below it.
-  2. **Definition 3** becomes the `meta` cache keyed on the state object.
+  2. **Definition 3** becomes the `meta` cache keyed on the state object. **DONE 2026-09-29.**
   3. **Definition 2** moves to the constructor and `componentDidMount`.
   4. **Definitions 1 and 4 merge into one**, which is what they already are in effect.
   5. **`WithForm` becomes a function component**, taking definition 6.
@@ -776,6 +776,19 @@ Every workstream below is a series of small, independently shippable, reversible
   - Each structural test goes in the slice that removes what it pins.
   - The behaviour tests replacing it come first in that slice, verified against the classes before the change: `WithForm`'s in slice 5, the form layer's and the engine layer's in slice 6.
   - `rules.set-state-path` is about argument positions, not about rendering. Slice 6 re-aims it at the path rule, extracted as a pure function.
+
+  **Slice 2: the `meta` cache, DONE 2026-09-29.** The engine layer's `get meta` keeps its build together with the state object it was built from, and builds again when `this.state` is another object. Definition 3 did the same from outside: it dropped the cache whenever an update brought a new state. The `meta` setter went with it, because definition 3 was the only thing that assigned `meta`. The engine has 10 `UNSAFE_*` lines left, down from 12.
+  - **What the suite covered, measured first.** Removing definition 3 and keeping the old cache failed 5 tests: the two prop-change smoke tests, the two tests that apply an upload or API response, and a nested form's edits reaching the root's callback. Building on every read passed all 2833, so nothing pinned that a render without a new state keeps the build.
+  - **`rules.meta-cache.test.js` adds three tests:**
+    - a `{state.x}` name resolves again after the instance's own `setState`;
+    - a parent's render and a keystroke that bring no new state hand every node the same handlers, and a new state brings new ones;
+    - under StrictMode, React reports no `componentWillUpdate`.
+
+    The first two pass against the class. Without the invalidation both fail, and without the cache the second one does. The third fails against the class, on React 16, 17 and 18.
+  - **Measured unchanged.**
+    - A probe counted `metaToProps` calls for every example in the corpus, through four steps: mount, a parent's render, two keystrokes, and a click on the first button. The counts are identical before and after: 91, 13, 21 and 28 in total.
+    - In the running demo, three things behave identically, with the same console output: the cascading Select, adding and removing lines in the nested table, and editing a phase title.
+  - **Left as it is: `setStates` still clears the cache before its update.** With the key, that is redundant for the next render. But `rules.set-state-path` pins it, and the form layer's `componentWillReceiveProps` reads `_meta` directly for its error pass. It goes in slice 6, with the structural half of that file.
 
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 
