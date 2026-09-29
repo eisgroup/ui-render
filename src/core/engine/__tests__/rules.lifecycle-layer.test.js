@@ -111,7 +111,7 @@ describe('the lifecycle layer is a class of its own', () => {
     it('keeps the default export wrapping the layer', () => {
         // The default export is the layers inside the form wrapper; what the wrapper renders is also
         // what a nested document renders on its own, which is why `Data.js` needs it separately.
-        expect(typeof UIRenderDefault).toBe('function')
+        // The wrapper is a memoised function since §9.3 step 6, so it is not a function itself.
         expect(UIRenderDefault).not.toBe(Active.UIRender)
         expect(UIRenderDefault.WrappedComponent).toBe(Active.UIRender)
     })

@@ -1,20 +1,16 @@
 import { Component } from 'react'
-import { Form } from 'react-final-form'
 import { Active } from '../../../utils'
-import { errorsFor, formsStorage, touchedFor } from '../../../state/formRegistry'
 import {
     asField,
     fieldValues,
     registeredFieldErrors,
     registeredFieldValues,
-    withForm,
     withFormSetup,
 } from '../utils'
 
-// NOT mocked. It used to be, to spy on a `clearErrorsMap` that cleared one shared object; the mock
-// then had to be kept in step with the real module through two conversions and fell behind twice.
-// Since §9.3 step 3 both registries are keyed by the form, so the real module can simply be asked
-// what a given form holds — which is also what the code under test does.
+// What the form wrapper does, touched fields and storage included, is pinned on real documents in
+// `utils.with-form.test.js`. The tests that constructed the wrapper class went when it became a
+// function (§9.3 step 6, slice 5).
 
 // `errorsProcessing` is no longer imported by the form module — the engine hands it in. This
 // records the calls the decorator makes, which is the contract that replaced the import.
@@ -36,27 +32,6 @@ function createFormApi ({ values = {}, registered = [], fieldStates = {} } = {})
         }),
     }
     return { form, listeners, unsubscribe }
-}
-
-function createWithFormInstance ({ initialValues = {}, meta = {}, options, props = {} } = {}) {
-    class FormContent extends Component {
-        render () {
-            return null
-        }
-    }
-
-    const Decorated = options === undefined
-        ? withForm()(FormContent)
-        : withForm(options)(FormContent)
-    const componentProps = {
-        initialValues,
-        meta,
-        onSubmit: jest.fn(),
-        ...props,
-    }
-    const instance = new Decorated(componentProps)
-
-    return { Decorated, FormContent, componentProps, instance }
 }
 
 function createSetupInstance ({
@@ -93,185 +68,6 @@ function createSetupInstance ({
 
     return { form, instance, owner }
 }
-
-describe('withForm subscription and lifecycle contracts', () => {
-    let originalRenderField
-
-    beforeAll(() => {
-        originalRenderField = Active.renderField
-        Active.renderField = Active.renderField || (() => null)
-    })
-
-    afterAll(() => {
-        Active.renderField = originalRenderField
-    })
-
-    beforeEach(() => {
-        formsStorage.clear()
-        processErrorsCalls.length = 0
-    })
-
-    it('does not let a second form reset the first one when it initialises', () => {
-        // THE DEFECT THIS SLICE FIXED, and the only one of its family with a demonstrable symptom.
-        // `storedTouched` and the baseline it was compared against were both module-level, so the
-        // FIRST form to arrive owned the comparison for every form after it: a second document
-        // mounting with its own `initialValues` looked like a re-initialisation and wiped the first
-        // document's touched fields and errors. Sharing the registry itself produced nothing
-        // observable — four scenarios were probed — but this did.
-        const firstValues = { name: 'first' }
-        const secondValues = { other: 'second' }
-
-        const { instance: first } = createWithFormInstance({ initialValues: firstValues })
-        const { form: formA, listeners: listenersA } = createFormApi()
-        first.renderForm({ form: formA, handleSubmit: jest.fn(), pristine: true })
-        listenersA[0].listener({ initialValues: firstValues, touched: { name: true } })
-        errorsFor(formA).name = 'Name is Required'
-
-        expect(touchedFor(formA)).toEqual({ name: true })
-
-        // A second document appears, with a baseline of its own.
-        const { instance: second } = createWithFormInstance({ initialValues: secondValues })
-        const { form: formB, listeners: listenersB } = createFormApi()
-        second.renderForm({ form: formB, handleSubmit: jest.fn(), pristine: true })
-        listenersB[0].listener({ initialValues: secondValues, touched: {} })
-
-        expect(touchedFor(formA)).toEqual({ name: true })
-        expect(errorsFor(formA)).toEqual({ name: 'Name is Required' })
-        expect(formA.mutators.setFieldTouched).not.toHaveBeenCalled()
-    })
-
-    it('tracks touched fields and clears them when a new non-empty baseline arrives', () => {
-        const firstValues = { name: 'first' }
-        const nextValues = { name: 'next' }
-        const { instance } = createWithFormInstance({ initialValues: firstValues })
-        const { form, listeners } = createFormApi()
-
-        instance.renderForm({ form, handleSubmit: jest.fn(), pristine: true })
-        const subscription = listeners[0]
-        subscription.listener({ initialValues: firstValues, touched: { name: true, ignored: false } })
-        subscription.listener({ initialValues: firstValues, touched: { email: true } })
-
-        expect(touchedFor(form)).toEqual({ name: true, email: true })
-        errorsFor(form).name = 'stale'
-        subscription.listener({ initialValues: nextValues, touched: {} })
-
-        expect(form.mutators.setFieldTouched.mock.calls).toEqual([
-            ['name', false],
-            ['email', false],
-        ])
-        // Cleared for THIS form, not for everybody: that is the whole of the step 3 change here.
-        expect(touchedFor(form)).toEqual({})
-        expect(errorsFor(form)).toEqual({})
-        expect(subscription.subscription).toEqual({
-            touched: true,
-            initialValues: true,
-            error: true,
-            errors: true,
-        })
-    })
-
-    it('keeps one subscription per form and disposes it when the form API changes', () => {
-        const { instance } = createWithFormInstance({ initialValues: { name: 'first' } })
-        const first = createFormApi()
-        const second = createFormApi()
-        const handleSubmit = jest.fn()
-
-        const firstRender = instance.renderForm({
-            form: first.form,
-            handleSubmit,
-            pristine: true,
-            valid: true,
-        })
-        const cachedFormProps = firstRender.props.formProps
-        const repeatedRender = instance.renderForm({
-            form: first.form,
-            handleSubmit,
-            pristine: true,
-            valid: true,
-        })
-
-        expect(first.form.subscribe).toHaveBeenCalledTimes(1)
-        expect(repeatedRender.props.formProps).toBe(cachedFormProps)
-
-        instance.renderForm({ form: second.form, handleSubmit, pristine: false, valid: true })
-
-        expect(first.unsubscribe).toHaveBeenCalledTimes(1)
-        expect(second.form.subscribe).toHaveBeenCalledTimes(1)
-        expect(instance.form).toBe(second.form)
-        expect(instance.handleSubmit).toBe(handleSubmit)
-    })
-
-    it('unsubscribes and removes the mounted form from storage on unmount', () => {
-        const initialValues = { id: 7 }
-        const meta = { view: 'Form' }
-        const { instance } = createWithFormInstance({ initialValues, meta })
-        const { form, unsubscribe } = createFormApi()
-
-        instance.renderForm({ form, handleSubmit: jest.fn(), pristine: true })
-        instance.componentDidMount()
-        const storageKey = instance.prevInitialValues
-
-        expect(formsStorage.get(storageKey)).toEqual({ meta, form })
-        instance.componentWillUnmount()
-
-        expect(unsubscribe).toHaveBeenCalledTimes(1)
-        expect(formsStorage.has(storageKey)).toBe(false)
-    })
-
-    it('resets and re-registers only genuinely changed initial values', () => {
-        const initialValues = { customer: { id: 1 } }
-        const { instance, componentProps } = createWithFormInstance({
-            initialValues,
-            meta: { version: 1 },
-        })
-        const { form } = createFormApi()
-        instance.form = form
-        instance._initValues = initialValues
-        instance.componentDidMount()
-        const originalStorageKey = instance.prevInitialValues
-
-        const equalValues = { customer: { id: 1 } }
-        instance.UNSAFE_componentWillReceiveProps({
-            ...componentProps,
-            initialValues: equalValues,
-            meta: { version: 2 },
-        })
-        expect(form.reset).not.toHaveBeenCalled()
-        expect(formsStorage.has(originalStorageKey)).toBe(true)
-
-        const changedValues = { customer: { id: 2 } }
-        const changedMeta = { version: 3 }
-        instance.UNSAFE_componentWillReceiveProps({
-            ...componentProps,
-            initialValues: changedValues,
-            meta: changedMeta,
-        })
-
-        expect(form.reset).toHaveBeenCalledWith(changedValues)
-        expect(formsStorage.has(originalStorageKey)).toBe(false)
-        expect(formsStorage.get(instance.prevInitialValues)).toEqual({ meta: changedMeta, form })
-    })
-
-    it('exposes default Form options and safely ignores a touched mutator for a missing field', () => {
-        const initialValues = { name: 'initial' }
-        const onSubmit = jest.fn()
-        const { instance } = createWithFormInstance({ initialValues, props: { onSubmit } })
-
-        const formElement = instance.render()
-        const touchedField = { touched: false }
-        const state = { fields: { name: touchedField } }
-
-        expect(formElement.type).toBe(Form)
-        expect(formElement.props.subscription).toEqual({ pristine: true, valid: true })
-        expect(formElement.props.initialValues).toBe(initialValues)
-        expect(formElement.props.onSubmit).toBe(onSubmit)
-        expect(formElement.props.mutators.remove).toEqual(expect.any(Function))
-
-        formElement.props.mutators.setFieldTouched(['name', true], state)
-        expect(touchedField.touched).toBe(true)
-        expect(() => formElement.props.mutators.setFieldTouched(['missing', true], state)).not.toThrow()
-    })
-})
 
 describe('form data synchronization contracts', () => {
     let originalRenderField

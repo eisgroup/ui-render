@@ -751,7 +751,7 @@ Every workstream below is a series of small, independently shippable, reversible
   2. **Definition 3** becomes the `meta` cache keyed on the state object. **DONE 2026-09-29.**
   3. **Definition 2** moves to the constructor and `componentDidMount`. **DONE 2026-09-29.**
   4. **Definitions 1 and 4 merge into one**, which is what they already are in effect. **DONE 2026-09-29.**
-  5. **`WithForm` becomes a function component**, taking definition 6.
+  5. **`WithForm` becomes a function component**, taking definition 6. **DONE 2026-09-29.**
   6. **The document becomes a function component**, taking 1 with 4 and 5, and the instance object with them.
   7. **§9.3 step 7's acceptance:** the demo under `<StrictMode>`.
 
@@ -812,6 +812,24 @@ Every workstream below is a series of small, independently shippable, reversible
     - For every example in the corpus, a host render with new `data` and `meta` objects renders the document once, before and after, and leaves identical state.
     - A null `data` prop leaves `{json: null}`, both before and after.
     - In the running demo, the same script as in slices 2 and 3 gives the same result and console output.
+
+  **Slice 5: `WithForm` as a function, DONE 2026-09-29.** Definition 6 is gone. The form wrapper is `React.memo` of a function, which skips a parent's render with shallow-equal props as the `PureComponent` did. Two definitions are left, in 3 `UNSAFE_*` lines: the document's props sync and the form layer's.
+  - **What it does is unchanged:**
+    - it hands the document one object for its lifetime, as `this` was, carrying the form and its submit handler;
+    - it keeps the form in `formsStorage` under a copy of the values it started with;
+    - it adopts new initial values only when they differ by value, and resets the form to them.
+  - **One timing moved: the reset.** `componentWillReceiveProps` reset the form before the render. A function can only do it after the commit, so it is a layout effect, which still runs before the paint. The document is told the new initial values only once the form has been reset to them. Without that, it compared them with the old form state and published a `canSave` it took back one render later.
+  - **Measured, class against function, for every example, on React 16, 17 and 18.** The steps were mount, a parent's render, keystrokes, initial values equal by value, initial values changed, and new data with new values.
+    - The final state is identical on every version, and so are `onChangeState` and `getValidationErrors`. For new initial values, `onChangeState` comes one render later, after the reset.
+    - The renders are identical on React 18.
+    - On React 16 and 17 the document renders twice for new initial values instead of once: 38 → 76 across the corpus. That is the cost of resetting after the commit, and a class with `componentDidUpdate` would pay it too. The choice was put to the owner, who accepted it on 2026-09-29, for the same behaviour on every React version and a wrapper that StrictMode does not warn about.
+  - **One behaviour changed, on React 18 only, and it is a fix.** A host that reset an edited form to new initial values, say by passing back the values it had just saved, got one more `onDataChanged`: the document compared the new values with the form state from before the reset. On React 16 and 17 it got none. Now no version gets one, and a test that fails on the class under React 18 pins that.
+  - **The tests.** The 6 tests that constructed the wrapper class and called its lifecycle by name are gone. `utils.with-form.test.js` replaced them first: 9 tests on real documents, run against the class before the change. On the class, only the StrictMode test fails on all three legs, and the `onDataChanged` test fails on React 18. `utils.form-layer`'s `WrappedComponent` test now renders the wrapper for real. `utils.with-form.server.test.js` renders a document on the server, and fails on React 16, 17 and 18 if the wrapper uses a layout effect there.
+  - **Found while measuring, left for its own change: the per-form registries last one render.**
+    - react-final-form 6.5.9 hands its render prop a new `{...form, reset}` on every render. All of them share the underlying form's methods.
+    - The wrapper subscribes once per `form` object, so it subscribes again on every render of the form.
+    - The registries of §9.3 step 3 (touched fields, errors, baseline) are keyed by that object, which lasts one render. So nothing they record outlives a render. That defeats what the touched registry is for: a field blurred in a row that has since re-rendered still counting as touched.
+    - The function keeps the class's behaviour exactly. A stable key is a behaviour change of its own.
 
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 

@@ -1,6 +1,6 @@
 import { UI } from '../variables'
 import PropTypes from 'prop-types'
-import React, { PureComponent } from 'react'
+import React, { PureComponent, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Field, Form } from 'react-final-form'
 import { isRequired } from '../../components/inputs/validationRules'
 import Text from '../../components/Text'
@@ -363,21 +363,31 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       }
     }
 
-    // @Note: to avoid several WithForm instances sharing the same closure props,
-    //        this decorator must return a class component that stores its internal state between re-renders.
-    // Use PureComponent to avoid double checking large payloads.
-    // noinspection JSPotentiallyInvalidUsageOfThis
-    return class WithForm extends PureComponent {
-      // The class this wrapper renders, for a caller that renders it WITHOUT the wrapper: the
-      // engine's nested documents share their parent's form rather than making one of their own
-      // (`engine/Data.js`), so they must render this class and not the one handed to the decorator.
-      static WrappedComponent = FormClass
+    /**
+     * THE WRAPPER, A FUNCTION SINCE §9.3 STEP 6 (slice 5). It was a `PureComponent`; `React.memo`
+     * skips a parent's render with shallow-equal props the same way.
+     *
+     * The document is handed `instance`, one object for the wrapper's lifetime, and reads `form` and
+     * `handleSubmit` off it. Both are written as the form renders, as the class wrote them on `this`.
+     * `form` is a new object on every render of the form: react-final-form hands its render prop
+     * `{...form, reset}`. Every one of them shares the underlying form's methods.
+     */
+    function WithForm (props) {
+      const {initialValues, onSubmit = console.warn, ...restProps} = props
+      const self = useRef(null)
+      if (self.current === null) self.current = {handle: {form: undefined, handleSubmit: undefined}}
+      const own = self.current
+      const {handle} = own
 
-      get initValues () {
-        return this._initValues || (this._initValues = this.props.initialValues)
-      }
-
-      prevInitialValues = null;
+      // The initial values the form works from: the first ones, then any that differ BY VALUE. A new
+      // object with the same entries changes nothing; otherwise a host computing its values afresh
+      // would reset the user's edits. Adopted during render, where `componentWillReceiveProps` did it.
+      const [adopted, setAdopted] = useState(initialValues)
+      if (adopted !== initialValues && !isEqualJSON(adopted, initialValues)) setAdopted(initialValues)
+      // What the document is told the form started from: the adopted values once the form has been
+      // reset to them, below. Told any earlier, it would compare them with the old form state and
+      // publish a `canSave` it takes back one render later.
+      const [applied, setApplied] = useState(adopted)
 
       // @see: https://final-form.org/docs/react-final-form/types/FormProps
       // Form only calls `render` function when `subscription` changes, or itself rerenders.
@@ -386,86 +396,91 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       // `formProps` does not pass through `initialValues` (it's undefined).
       // => better to let `render` function always run, and memoize at the highest <WithForm> level.
       // => this way, rerender is minimized to only when props changed, or form state changed.
-      renderForm = ({form, handleSubmit, ...formProps}) => {
-        // formProps `form` and `handleSubmit` props always change, possibly due to inline fat arrow function.
-        this.form = form
-        this.handleSubmit = handleSubmit
+      const renderForm = ({form, handleSubmit, ...formProps}) => {
+        handle.form = form
+        handle.handleSubmit = handleSubmit
 
-        if (!isEqualJSON(this._formProps, formProps)) {
-          this._formProps = formProps
+        if (!isEqualJSON(own.formProps, formProps)) {
+          own.formProps = formProps
         }
 
-        if (this._subscribedForm !== form) {
-          if (this._unsubscribeForm) this._unsubscribeForm()
-          this._subscribedForm = form
-          this._unsubscribeForm = form.subscribe(
+        if (own.subscribedForm !== form) {
+          if (own.unsubscribe) own.unsubscribe()
+          own.subscribedForm = form
+          own.unsubscribe = form.subscribe(
             formSubscription(form),
             {touched: true, initialValues: true, error: true, errors: true}
           )
         }
 
         // Class should use PureComponent to take advantage of caching
-        return <FormClass {...this._props} formProps={this._formProps} initialValues={this._initValues} instance={this}/>
+        return <FormClass {...restProps} formProps={own.formProps} initialValues={applied} instance={handle}/>
       }
 
-      componentDidMount () {
-        const { meta, initialValues } = this.props
-        this.prevInitialValues = {...initialValues}
-        formsStorage.set(this.prevInitialValues, {
-          meta: meta,
-          form: this.form
+      // In the shared storage under a copy of the values it started with, from the commit it mounts in
+      // until it unmounts.
+      useBeforePaintEffect(() => {
+        own.stored = {...initialValues}
+        formsStorage.set(own.stored, {
+          meta: props.meta,
+          form: handle.form
         });
-      }
-
-      UNSAFE_componentWillReceiveProps (next, nextContext) {
-        const {initialValues, meta} = next
-        // Only assign `initialValues` when it truly changes
-        if (this._initValues !== initialValues && !isEqualJSON(this._initValues, initialValues)) {
-          formsStorage.delete(this.prevInitialValues)
-          this._initValues = initialValues
-          this.prevInitialValues = {...initialValues}
-          // explicitly reset to new values when entries change,
-          // because final-form only resets to the very first initialValues.
-          if (this.form) {
-            this.form.reset(this._initValues)
-            formsStorage.set(this.prevInitialValues, {
-              meta: meta,
-              form: this.form
-            });
-          }
+        return () => {
+          if (own.unsubscribe) own.unsubscribe()
+          own.unsubscribe = null
+          own.subscribedForm = null
+          formsStorage.delete(own.stored)
         }
-      }
+      }, []) // eslint-disable-line react-hooks/exhaustive-deps -- the mount's values, as `componentDidMount` read them
 
-      componentWillUnmount () {
-        if (this._unsubscribeForm) this._unsubscribeForm()
-        this._unsubscribeForm = null
-        this._subscribedForm = null
-        formsStorage.delete(this.prevInitialValues)
-      }
+      // New initial values: reset the form to them, because final-form only resets to the very first
+      // ones, move the storage entry, and tell the document. `componentWillReceiveProps` reset before
+      // the render; this is after the commit, and before the paint. So the document renders twice for
+      // new initial values, once for the props and once for the reset, where the class rendered it
+      // once on React 16 and 17 (on 18 it rendered twice as well). Accepted 2026-09-29.
+      useBeforePaintEffect(() => {
+        if (applied === adopted) return
+        formsStorage.delete(own.stored)
+        own.stored = {...adopted}
+        if (handle.form) {
+          handle.form.reset(adopted)
+          formsStorage.set(own.stored, {
+            meta: props.meta,
+            form: handle.form
+          });
+        }
+        setApplied(adopted)
+      }, [adopted]) // eslint-disable-line react-hooks/exhaustive-deps -- the meta of the render that adopted them
 
-      render () {
-        const {initialValues, onSubmit = console.warn, ...restProps} = this.props
-        this._props = restProps
-
-        // @Note: when form is submitted, it triggers loading true, and receives old initialValues.
-        // If the `initialValues` is computed on the fly and changes reference each time,
-        // <Form/> reinitialises while loading, causing the flickering.
-        // => either cache `initialValues`, or better, stop <Form/> from reinitializing while loading.
-        //    because final-form always re-initializes
-        return <Form
-          onSubmit={onSubmit}
-          {...options}
-          mutators={{
-            ...arrayMutators,
-            setFieldTouched
-          }}
-          initialValues={this.initValues}
-          render={this.renderForm}
-        />
-      }
+      // @Note: when form is submitted, it triggers loading true, and receives old initialValues.
+      // If the `initialValues` is computed on the fly and changes reference each time,
+      // <Form/> reinitialises while loading, causing the flickering.
+      // => either cache `initialValues`, or better, stop <Form/> from reinitializing while loading.
+      //    because final-form always re-initializes
+      return <Form
+        onSubmit={onSubmit}
+        {...options}
+        mutators={{
+          ...arrayMutators,
+          setFieldTouched
+        }}
+        initialValues={adopted}
+        render={renderForm}
+      />
     }
+
+    const Wrapper = React.memo(WithForm)
+    // The class this wrapper renders, for a caller that renders it WITHOUT the wrapper: the engine's
+    // nested documents share their parent's form rather than making one of their own
+    // (`engine/Data.js`), so they must render this class and not the one handed to the decorator.
+    Wrapper.WrappedComponent = FormClass
+    return Wrapper
   }
 }
+
+// Before the browser paints, as `componentDidMount` and `componentDidUpdate` ran. On the server it
+// is a plain effect: a layout effect there only warns, once per wrapper (see `InputNative`).
+const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 const setFieldTouched = (args, state) => {
   const [name, touched] = args

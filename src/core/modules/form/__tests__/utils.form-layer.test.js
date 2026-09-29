@@ -12,7 +12,9 @@
  * publishes it as `WrappedComponent` for the engine, whose nested documents render it without the
  * wrapper. `rules.lifecycle-layer.test.js` pins the same facts on the engine's real chain.
  */
-import { Component } from 'react'
+import React, { Component } from 'react'
+import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import { fieldValues, registeredFieldErrors, registeredFieldValues, withForm, withFormSetup } from '../utils'
 import { Active } from '../../../utils'
 
@@ -80,9 +82,11 @@ describe('withFormSetup', () => {
 
 describe('withForm', () => {
     it('renders the subclass, and publishes it as WrappedComponent', () => {
+        // Rendered for real, with the default options: the wrapper is a function since §9.3 step 6,
+        // so there is no instance to call `render` on.
         class Declared extends Component {
             render () {
-                return null
+                return <span data-testid='declared'>{this.constructor.name}:{String(this.props.formProps.pristine)}</span>
             }
         }
 
@@ -91,9 +95,7 @@ describe('withForm', () => {
 
         expect(Object.getPrototypeOf(Layer)).toBe(Declared)
 
-        const wrapper = new WithForm({ initialValues: {} })
-        wrapper.render()
-        const element = wrapper.renderForm({ form: { subscribe: () => () => {} }, handleSubmit: () => {} })
-        expect(element.type).toBe(Layer)
+        render(<WithForm initialValues={{}} />)
+        expect(screen.getByTestId('declared')).toHaveTextContent(`${Layer.name}:true`)
     })
 })
