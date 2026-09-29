@@ -11,7 +11,7 @@
  * arguments to whatever the caller passes — the same mechanism that makes the state path "the last
  * string argument" in `setStates`.
  */
-import { parsePopupArgs } from '../popupArgs'
+import { parsePopupAlertArgs, parsePopupArgs } from '../popupArgs'
 
 /** A React SyntheticEvent is recognised by any one of these, so each is worth its own case. */
 const eventLike = [
@@ -103,5 +103,53 @@ describe('a call it cannot use', () => {
         expect(consoleError).toHaveBeenCalledWith(
             'Popup Open: id must be a non-empty string, got:', 'string', ''
         )
+    })
+})
+
+/**
+ * THE `popup` ACTION'S HALF: the title and the content it shows. Every real call shape, including
+ * the two the corpus writes: a `Button` with nothing configured, and a `fetch` chain ending in
+ * `onDone: {name: 'popup', args: ['…']}`, as `config.md` documents it.
+ */
+describe('what a `popup` action shows', () => {
+    const click = { nativeEvent: {}, target: {}, preventDefault: () => {}, stopPropagation: () => {} }
+
+    it('nothing, for a Button with nothing configured: the click event is not something to show', () => {
+        expect(parsePopupAlertArgs([click])).toEqual({ title: undefined, content: undefined })
+    })
+
+    it('a configured text as the title', () => {
+        expect(parsePopupAlertArgs([click, 'Saved'])).toEqual({ title: 'Saved', content: undefined })
+    })
+
+    it('a second configured text as the content, in the order the meta writes them', () => {
+        expect(parsePopupAlertArgs([click, 'Saved', 'All changes are stored']))
+            .toEqual({ title: 'Saved', content: 'All changes are stored' })
+    })
+
+    it('a chain step\'s result as the content, under the text the chain configures', () => {
+        expect(parsePopupAlertArgs([{ city: 'Oslo' }, 'Lookup result']))
+            .toEqual({ title: 'Lookup result', content: { city: 'Oslo' } })
+    })
+
+    it('only the title, for a chain step that resolved with nothing', () => {
+        expect(parsePopupAlertArgs([undefined, 'Lookup result'])).toEqual({ title: 'Lookup result', content: undefined })
+    })
+
+    it('a caller\'s number as the content', () => {
+        expect(parsePopupAlertArgs([42, 'Count'])).toEqual({ title: 'Count', content: 42 })
+    })
+
+    it('never a value that is not text as the title, even with no text to take its place', () => {
+        expect(parsePopupAlertArgs([{ city: 'Oslo' }])).toEqual({ title: undefined, content: { city: 'Oslo' } })
+    })
+
+    it('drops a component class too, in the order a click delivers it', () => {
+        class Caller {
+            render () { return null }
+        }
+        Caller.prototype.isReactComponent = {}
+
+        expect(parsePopupAlertArgs([Caller, click, 'Saved'])).toEqual({ title: 'Saved', content: undefined })
     })
 })

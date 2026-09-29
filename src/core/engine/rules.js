@@ -19,7 +19,7 @@ import { cancelAutoSubmit } from './autoSubmit'
 import { describeFailure, download } from './download'
 import { upload } from './upload'
 import { applyPeriods } from './applyPeriods'
-import { parsePopupArgs } from './popupArgs'
+import { parsePopupAlertArgs, parsePopupArgs } from './popupArgs'
 import { findPopupTemplate } from './popupTemplate'
 import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
 import { errorsFor, formsStorage, touchedFor } from '../state/formRegistry'
@@ -828,7 +828,14 @@ function Decorator (Class) {
             FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
             FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
             FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
-            FIELD.FUNC[FIELD.ACTION.POPUP] = this.popupAlert
+            // Bound to this document, and given the title and content that `popupArgs.js` reads from
+            // the caller's arguments and the meta's. It used to be `popupAlert` itself, unbound, so
+            // from 2025-04-17, when the alert moved onto the context, every call threw on
+            // `this.context`. Fixed 2026-09-29.
+            FIELD.FUNC[FIELD.ACTION.POPUP] = (...args) => {
+                const { title, content } = parsePopupAlertArgs(args)
+                this.popupAlert(title, content)
+            }
             FIELD.FUNC[FIELD.ACTION.SUBMIT] = this.submit
 
             return {
@@ -903,20 +910,14 @@ function Decorator (Class) {
         }
 
         popupAlert (title, content) {
-            if (isValidElement(content)) {
-                this.context.setPopupState({
-                    isOpen: true,
-                    title: title,
-                    content: content
-                })
-            } else {
-                this.context.setPopupState({
-                    isOpen: true,
-                    title: title,
-                    content: <Json data={content}/>
-                })
-            }
-
+            // An element is shown as it is, and a value as a JSON tree. No content means no body:
+            // `Json` requires its `data`, and warned whenever there was nothing to show, for a `popup`
+            // action with nothing configured and for a `popupOpen` of an id nothing registered.
+            this.context.setPopupState({
+                isOpen: true,
+                title: title,
+                content: content === undefined || isValidElement(content) ? content : <Json data={content}/>
+            })
         }
 
         componentWillUnmount (nextProps, nextState) {
