@@ -630,7 +630,27 @@ Every workstream below is a series of small, independently shippable, reversible
   - a tab the parent did not adopt goes back on the parent's next render;
   - `setTab(index, false)` from function content switches at once and drops a pending click.
 
-  Eighteen mutations each fail at least one test. In the demo, clicks on Tabs, Tabs Buttoned and Tab List, and the controlled hidden tabs of Dynamic Layout, behave as they did with the class, with the same console output: one prop-type warning that predates this change, because Dynamic Layout's items have no `tab`.
+  Eighteen mutations each fail at least one test. In the demo, clicks on Tabs, Tabs Buttoned and Tab List, and the controlled hidden tabs of Dynamic Layout, behave as they did with the class, with the same console output: one prop-type warning that predates this change, because Dynamic Layout's items have no `tab`. It was the prop type that was too strict, and #114 made `tab` optional, as `meta.schema.json` already had it.
+
+  **`TableView` converted 2026-09-29**, the eighth leaf. It is `React.memo` of a function, like the `PureComponent` it was: its lifecycle compared the new props with the previous ones, so a parent render with equal props had nothing to do.
+  - **`sorts` that change by value** replace the sort state during render. Only the previous `sorts` are kept for that, not the props object, so a parent render runs the body once, as the class rendered once. Only a change of `sorts` runs it twice, for the state update during render; measured with a counting cell renderer.
+  - **The class's two cached getters are two caches with the same keys.** The sorted rows are kept until the items change element by element (`isEqualList`) or the sort state changes. A test pins that the same elements in a new array keep their order, as they did. The headers derived from the first item are kept until an item with other keys arrives, and an empty list keeps them.
+  - **What renderers receive.** Cell and header renderers were handed `this`, and the engine uses it: `transforms.js` reads `props.name` off it for nested paths, and looks handlers up on it by the name the meta gives, `onClick: 'handleItemExpand'` and `onChange: 'handleToggleExpandAll'`. They now get one object for the component's lifetime, with `props`, `state` and every member the class had, and each handler keeps one identity. Five tests reached the class instance: four through a ref, three of them through one shared helper, and one with `expect.any(TableView)`. They now read that object, and pass against the class as well.
+  - **`handleSort`** still computes the new sort from the last render's state, as it read `this.state`, because it reports that sort before returning.
+
+  **One behaviour changed, measured first and pinned.** The expansion handlers wrote a copy of `this.state` back. Inside one batch `this.state` does not move, so of two `handleItemExpand` calls only the last survived, and a `handleToggleExpandAll` batched before an expansion was lost: `["C"]` where `["A", "C"]` was asked for, on React 16, 17 and 18. They now update from the current state. The demo never showed the difference: its tables behave the same with either version, for sorting in "All Possible Configurations", row expansion and Expand All in "Table: Nested", and paging in "Table Pagination". Under `<StrictMode>` the class's `UNSAFE_componentWillReceiveProps` warning is gone too.
+
+  Eight tests are new. Two fail against the previous class, on the batch and the StrictMode warning, and six pass against it:
+  - a parent render with equal props does not render again;
+  - renderers get one object with the current props and handlers, and a handler finds a row by key in the current items;
+  - a clicked sort survives parent renders that pass equal `sorts`;
+  - the sort cache is keyed by element;
+  - derived headers survive an empty list;
+  - a page past the end, after the items shrink, renders no rows.
+
+  That last one is **a candidate defect, pinned rather than fixed**: `activePage` is never brought back into range. Fourteen mutations each fail at least one test.
+
+  **Found while measuring, and left for their own changes.** Every header without a sort passes `onClick={false}` to its `Row`, which React reports as a listener that is not a function: six warnings in "All Possible Configurations", with the class and the function alike. The same example also warns that `InputNumber` receives a boolean `error` where it expects a string.
 
   **A trap for the next five `@withTimer` leaves: `jest.getTimerCount()` is not a count of a component's timers.** The first version of these tests used it, and it passed on React 18 but failed on the React 16 and 17 legs: 2 where 1 was expected. The older scheduler keeps a fake timer of its own, pending or not depending on which test ran first, so the other count assertions had passed only because of test order.
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).

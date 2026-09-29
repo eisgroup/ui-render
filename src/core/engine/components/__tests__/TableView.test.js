@@ -310,15 +310,14 @@ describe('TableView', () => {
  * `undefined-last` (no className) and `-last` (empty className) — 210 of them in the baseline.
  */
 describe('TableView sticky cell class', () => {
-    // The method is an instance arrow property, so read it off a rendered instance rather than
-    // the prototype.
+    // Read off the object renderers receive, which carries the class's members. It was an instance
+    // arrow property, read through a ref.
     const build = (() => {
         let fn
         return (...args) => {
             if (!fn) {
-                let instance
-                render(<TableView ref={ref => { instance = ref || instance }} headers={[]} items={[]} />)
-                fn = instance.getStickyCellClassName
+                const headers = [{ id: 'name', renderCell: (value, index, props, self) => { fn = self.getStickyCellClassName; return value } }]
+                render(wrap(<TableView headers={headers} items={[{ name: 'Only' }]} {...defaults} />))
             }
             return fn(...args)
         }

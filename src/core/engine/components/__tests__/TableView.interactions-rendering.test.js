@@ -117,30 +117,31 @@ describe('TableView additional contracts', () => {
   })
 
   it('finds an expansion target by key and toggles all rows with explicit and implicit state', () => {
-    const tableRef = React.createRef()
+    // The handlers are read off the object renderers receive, which is how the engine reaches them
+    // (`onClick: 'handleItemExpand'` in meta). This used to take the class instance through a ref.
+    let table
     const renderItem = item => <span data-testid='expanded'>{item.code}</span>
     const {queryAllByTestId} = render(withForm(
       <TableView
-        ref={tableRef}
         items={[{code: 'Alpha'}, {code: 'Beta'}]}
-        headers={[{id: 'code'}]}
+        headers={[{id: 'code', renderCell: (value, index, props, self) => { table = self; return value }}]}
         renderItem={renderItem}
         {...defaults}
       />
     ))
 
     act(() => {
-      tableRef.current.handleItemExpand({key: 'code', value: 'BETA', expanded: true})
+      table.handleItemExpand({key: 'code', value: 'BETA', expanded: true})
     })
     expect(queryAllByTestId('expanded').map(node => node.textContent)).toEqual(['Beta'])
 
     act(() => {
-      tableRef.current.handleToggleExpandAll(true)
+      table.handleToggleExpandAll(true)
     })
     expect(queryAllByTestId('expanded').map(node => node.textContent)).toEqual(['Alpha', 'Beta'])
 
     act(() => {
-      tableRef.current.handleToggleExpandAll()
+      table.handleToggleExpandAll()
     })
     expect(queryAllByTestId('expanded')).toHaveLength(0)
   })
@@ -254,11 +255,16 @@ describe('TableView additional contracts', () => {
     expect(getByText('07-31-2026')).toBeInTheDocument()
     expect(getByText('{"a":1}')).toBeInTheDocument()
     expect(getByText('seen:raw')).toBeInTheDocument()
+    // The fourth argument is what the class passed as `this`: the engine reads `props` off it and
+    // looks handlers up on it by name.
     expect(wrappedRender).toHaveBeenCalledWith(
       'raw',
       0,
       expect.objectContaining({expanded: undefined}),
-      expect.any(TableView)
+      expect.objectContaining({
+        props: expect.objectContaining({headers: expect.any(Array)}),
+        handleItemExpand: expect.any(Function),
+      })
     )
   })
 
@@ -310,5 +316,138 @@ describe('TableView additional contracts', () => {
     ))
 
     expect(getByTestId('functional-header')).toHaveTextContent('Heading:name')
+  })
+})
+
+describe('TableView state, caches and renderers', () => {
+  const expandedTexts = container => Array.from(container.querySelectorAll('[data-testid="expanded"]'), node => node.textContent)
+  const capture = () => {
+    const received = []
+    const headers = [{id: 'name', renderCell: (value, index, props, self) => { received.push(self); return value }}]
+    return {received, headers, latest: () => received[received.length - 1]}
+  }
+  const renderExpanded = item => <span data-testid='expanded'>{item.name}</span>
+
+  it('applies every expansion handler call made in one batch', () => {
+    // THE ONE BEHAVIOUR CHANGE of §9.3 step 6 here. The class wrote a copy of `this.state` back, and
+    // `this.state` does not move inside a batch, so of two expansions only the last survived, and a
+    // toggle of every row was lost to an expansion batched after it. Measured on React 16, 17 and 18.
+    const {headers, latest} = capture()
+    const {container} = render(withForm(
+      <TableView items={[{name: 'A'}, {name: 'B'}, {name: 'C'}]} headers={headers} renderItem={renderExpanded} {...defaults}/>
+    ))
+
+    act(() => {
+      latest().handleItemExpand({index: 0, expanded: true})
+      latest().handleItemExpand({index: 2, expanded: true})
+    })
+    expect(expandedTexts(container)).toEqual(['A', 'C'])
+
+    act(() => {
+      latest().handleToggleExpandAll(false)
+      latest().handleItemExpand({index: 1, expanded: true})
+    })
+    expect(expandedTexts(container)).toEqual(['B'])
+  })
+
+  it('passes renderers one object for its lifetime, with the current props and the handlers', () => {
+    // The engine reads `props.name` off it and looks handlers up on it by the name meta gives.
+    const {received, headers, latest} = capture()
+    const {container, rerender} = render(withForm(
+      <TableView name="rows" items={[{name: 'A'}, {name: 'B'}]} headers={headers} renderItem={renderExpanded} {...defaults}/>
+    ))
+    rerender(withForm(
+      <TableView name="rows" items={[{name: 'B'}, {name: 'A'}]} headers={headers} renderItem={renderExpanded} {...defaults}/>
+    ))
+
+    expect(new Set(received).size).toBe(1)
+    expect(latest().props.items.map(item => item.name)).toEqual(['B', 'A'])
+    act(() => latest().handleItemExpand({key: 'name', value: 'a', expanded: true}))
+    // Found in the items the table has now, where `A` is the second row.
+    expect(expandedTexts(container)).toEqual(['A'])
+  })
+
+  it('does not render again for a parent render with equal props', () => {
+    let cells = 0
+    const headers = [{id: 'name', renderCell: value => { cells += 1; return value }}]
+    const items = [{name: 'A'}]
+    let rerenderParent
+    const Parent = () => {
+      const [, setCount] = React.useState(0)
+      rerenderParent = () => setCount(count => count + 1)
+      return <TableView items={items} headers={headers} {...defaults}/>
+    }
+    render(withForm(<Parent/>))
+    const mounted = cells
+
+    act(() => rerenderParent())
+    expect(cells).toBe(mounted)
+  })
+
+  it('keeps a clicked sort across parent renders that pass equal sorts', () => {
+    // The mapper builds a new `sorts` array on every render; only a change by value resets the sort.
+    const items = [{name: 'B'}, {name: 'A'}, {name: 'C'}]
+    const tableWith = sorts => <TableView items={items} headers={[{id: 'name', label: 'Name'}]} sorts={sorts} {...defaults}/>
+    const {container, getByText, rerender} = render(withForm(tableWith([{id: 'name', order: 1}])))
+
+    fireEvent.click(getByText('Name').closest('.sort'))
+    expect(bodyRowTexts(container)).toEqual(['B', 'A', 'C'])
+
+    rerender(withForm(tableWith([{id: 'name', order: 1}])))
+    expect(bodyRowTexts(container)).toEqual(['B', 'A', 'C'])
+  })
+
+  it('sorts again only when the items change element by element, as the class cached them', () => {
+    const b = {name: 'B'}
+    const c = {name: 'C'}
+    const tableWith = rows => <TableView items={rows} headers={[{id: 'name'}]} sorts={[{id: 'name', order: 1}]} {...defaults}/>
+    const {container, rerender} = render(withForm(tableWith([b, c])))
+
+    // The same elements in a new array keep the rows as they were sorted, even though `b` changed.
+    b.name = 'Z'
+    rerender(withForm(tableWith([b, c])))
+    expect(bodyRowTexts(container)).toEqual(['Z', 'C'])
+
+    rerender(withForm(tableWith([b, {name: 'D'}])))
+    expect(bodyRowTexts(container)).toEqual(['D', 'Z'])
+  })
+
+  it('keeps the headers it derived when the items become empty', () => {
+    const {container, rerender} = render(withForm(<TableView items={[{a: 1, b: 2}]} {...defaults}/>))
+
+    rerender(withForm(<TableView items={[]} {...defaults}/>))
+
+    expect(Array.from(container.querySelectorAll('thead th'), cell => cell.textContent)).toEqual(['a', 'b'])
+    expect(container).not.toHaveTextContent('Table has no data!')
+  })
+
+  it('keeps the chosen page when the items shrink below it, and then renders no rows', () => {
+    // A CANDIDATE DEFECT, pinned rather than fixed: the page is never brought back into range.
+    const scrollIntoView = Element.prototype.scrollIntoView
+    Element.prototype.scrollIntoView = () => {}
+    try {
+      const items = Array.from({length: 25}, (_, index) => ({name: `R${index}`}))
+      const tableWith = rows => <TableView items={rows} headers={[{id: 'name'}]} usePagination rowsPerPage={10} {...defaults}/>
+      const {container, getByLabelText, rerender} = render(withForm(tableWith(items)))
+
+      fireEvent.click(getByLabelText('Page 3'))
+      expect(bodyRowTexts(container)).toEqual(['R20', 'R21', 'R22', 'R23', 'R24'])
+
+      rerender(withForm(tableWith(items.slice(0, 12))))
+      expect(bodyRowTexts(container)).toEqual([])
+    } finally {
+      Element.prototype.scrollIntoView = scrollIntoView
+    }
+  })
+
+  it('renders under StrictMode without a warning', () => {
+    // The class drew React's StrictMode warning about `UNSAFE_componentWillReceiveProps`.
+    const errors = jest.spyOn(console, 'error').mockImplementation(() => {})
+    try {
+      render(<React.StrictMode>{withForm(<TableView items={[{name: 'A'}]} headers={[{id: 'name'}]} {...defaults}/>)}</React.StrictMode>)
+      expect(errors).not.toHaveBeenCalled()
+    } finally {
+      errors.mockRestore()
+    }
   })
 })
