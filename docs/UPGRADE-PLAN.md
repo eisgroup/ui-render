@@ -694,6 +694,8 @@ Every workstream below is a series of small, independently shippable, reversible
 
   **The instance is internal.** No host can reach it. The published entry is a function component (`declare function UIRender(props)` in the public types), so there is no ref to hold. Everything that reads the instance is in `src`, which makes its contract a design choice rather than a compatibility constraint.
 
+  One undocumented channel exists, found in slice 1. The form layer calls `onChangeState(instance)` whenever `canSave` changes, and `onChangeState({})` when it unmounts. The prop is declared only in the form layer's propTypes and its code comment: it is in neither the public types nor `docs/`. Nothing in `src` passes it, but an untyped host could. The conversion keeps both calls, the first with the instance object.
+
   **What reads it, measured.** Outside the instance's own layers there are 14 members: 12 reached by the suite, and 2 more found by a static scan of `src` (`isUnmounting` and `formValues`). By member:
   - `translate`: the mapper, 9,296 reads.
   - `state`: `Render.js` and `transforms.js`, for `currencyCode`. Templates too: `{state.x}` resolves against the instance itself (`interpolateString(template, instance)`), so `state` is a free-form bag that meta's `setState` actions write by path and meta's templates read.
@@ -745,7 +747,7 @@ Every workstream below is a series of small, independently shippable, reversible
   The classes-or-hooks question is not left open. Syncs 5 and 6 read the final-form object, which `getDerivedStateFromProps` cannot see. So inside the classes they could only move after render, at the cost above.
 
   **The order.** Each slice ships and is measured like a leaf:
-  1. **Tests first.** The structural tests become behaviour tests that render documents: the lifecycle-by-name calls and prototype reads in `rules.lifecycle-layer`, `rules.state-immutability`, `rules.set-state-path`, `rules.data-kind-registry`, `utils.form-layer` and `utils.form-lifecycle`. An instance-contract test pins the members above. All of this runs against the current classes, with no change in `src`.
+  1. **Tests first.** An instance-contract test pins the members above, against the current classes, with no change in `src`. **DONE 2026-09-29**, with one refinement of this item, described below it.
   2. **Definition 3** becomes the `meta` cache keyed on the state object.
   3. **Definition 2** moves to the constructor and `componentDidMount`.
   4. **Definitions 1 and 4 merge into one**, which is what they already are in effect.
@@ -754,6 +756,26 @@ Every workstream below is a series of small, independently shippable, reversible
   7. **§9.3 step 7's acceptance:** the demo under `<StrictMode>`.
 
   After slice 4, three definitions are left. Slices 5 and 6 are where the instance contract changes hands. If their measurements say otherwise, the classes can stay, with those three.
+
+  **Slice 1: the instance contract, DONE 2026-09-29.** `rules.instance-contract.test.js` collects instances from `Render.Component`, the resolver every node passes through with its `instance`, and renders real documents: inline ones, and the corpus's `nestedDataKind`, two levels deep. It pins:
+  - the members consumers read;
+  - `setState` merging, with its callback after the commit and two batched updaters both landing;
+  - changed `data` and `meta` props taken into state without rewriting the state object already handed out;
+  - the popup registries, `submit` working unbound, and room for `_autoSubmit`;
+  - `isUnmounting`;
+  - for nested documents: registration, scopes, `getDataKind` per scope, unregistration at unmount, and the parent's translator, state, `setState`, submit handler and `props.instance`.
+
+  It passes on React 16, 17 and 18, and each of seven mutations of the engine fails it: the translator, the registration, the unregistration, the scope, the unmounting mark, the popup registry, and a `submit` that needs `this`.
+
+  **Three facts the test found, all pinned now:**
+  - **A nested document's own `onDataChanged` stays unset.** It mounts before its parent has copied the prop, so what reaches the host is the form layer reading the parent's `onDataChanged` when a field changes. The pinned contract is the parent's copy, plus an edit in a nested row reaching the host.
+  - **Line items name the root as their parent, not the phase.** They are rendered by the root's table inside the phase's expanded row. Two-level nesting is carried by the registry scope, `dataKindPath`, and the root answers for each scope separately.
+  - **Not every nested document shares its parent's form.** The table's draft row (`renderExtraItem`) has a form wrapper of its own, because `transforms.js` gives that renderer `useForm`.
+
+  **The refinement.** Rewriting the structural tests now, while the classes they describe still ship, would drop protection those classes need. For example, §9.3 step 5's guarantee that the declared class is left untouched. So:
+  - Each structural test goes in the slice that removes what it pins.
+  - The behaviour tests replacing it come first in that slice, verified against the classes before the change: `WithForm`'s in slice 5, the form layer's and the engine layer's in slice 6.
+  - `rules.set-state-path` is about argument positions, not about rendering. Slice 6 re-aims it at the path rule, extracted as a pure function.
 
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 
