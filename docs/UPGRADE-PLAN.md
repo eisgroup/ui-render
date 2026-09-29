@@ -522,7 +522,7 @@ Every workstream below is a series of small, independently shippable, reversible
   The two suites that applied the mixin to bare classes now run the same assertions on the engine layer's prototype; `withDataKind.test.js` became `rules.data-kind-registry.test.js`. The same probe as for `withFormSetup` found the chain, every level's own members and every body unchanged. The one difference is that the four methods are no longer enumerable, so a `for…in` over an instance no longer lists them, only `setState`, `forceUpdate`, `isReactComponent` and `state`. Nothing in `src` enumerates an instance or a prototype. `rules.lifecycle-layer.test.js` now pins that every member of both layers is written in its class body, `state` excepted; it fails on the previous code and names the four.
 
   **What is left of the pattern in `src`** is outside the engine. `@withTimer` (`components/utils/hocs.js`), on seven components, still assigns three methods onto the class it decorates and replaces its `componentWillUnmount` with a wrapper that calls a captured copy. It is the genuine shared HOC the shape note above names, and it cleans up correctly. It went in step 6, with the last class it decorated.
-6. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired. **STARTED 2026-09-28, leaf components first. All nine leaves converted by 2026-09-29.** The engine's six definitions are what is left: 12 `UNSAFE_*` lines, their `super` calls included, in `rules.js` and `form/utils.js`, measured after the last leaf.
+6. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired. **STARTED 2026-09-28, leaf components first. All nine leaves converted by 2026-09-29.** The engine's six definitions are what is left: 12 `UNSAFE_*` lines, their `super` calls included, in `rules.js` and `form/utils.js`, measured after the last leaf. **The engine's design pass: 2026-09-29, at the end of this step.**
 
   **Measured before starting.** There are 21 `UNSAFE_*` lines in 11 files. §7's table said 26 in 12 on 2026-09-17; step 5 moved the engine's into class members but did not remove them.
   - **Engine:** six real definitions: `UIRender`'s `componentWillReceiveProps`; the engine layer's `componentWillMount`, `componentWillUpdate` and `componentWillReceiveProps`; and `componentWillReceiveProps` in both `WithForm` and the form layer. The remaining engine lines are their `super` calls.
@@ -669,6 +669,92 @@ Every workstream below is a series of small, independently shippable, reversible
   **That was the last leaf.** No component outside the engine has an `UNSAFE_*` lifecycle left, and the next item is the engine's design pass (the order above).
 
   **A trap for the next five `@withTimer` leaves: `jest.getTimerCount()` is not a count of a component's timers.** The first version of these tests used it, and it passed on React 18 but failed on the React 16 and 17 legs: 2 where 1 was expected. The older scheduler keeps a fake timer of its own, pending or not depending on which test ran first, so the other count assertions had passed only because of test order.
+  **THE ENGINE: DESIGN PASS, 2026-09-29.** Measured before anything was decided, and nothing in `src` changed. There were two instruments:
+  - a `Proxy` returned from the `UIRender` constructor, which recorded every read and write on an instance for the whole suite: 2816 tests, 534 instances in 29 files, each access attributed to the file that made it;
+  - each of the six `UNSAFE_*` definitions swapped for its naive safe replacement, the suite run each time, and the change reverted.
+
+  **What renders a document.** Four classes, three of which are one component at runtime:
+  - **`WithForm`** (`modules/form/utils.js`) renders react-final-form's `<Form>`. It owns the form object, its subscription and the document's `formsStorage` entry, and its render prop renders the rest with `instance={this}`.
+  - **The form layer (`withFormSetup`) over the engine layer (`UIRenderLifecycle`, `rules.js`) over the declared `UIRender`.** This combined class is `Active.UIRender`, and its instance is what the engine hands every node as `instance`.
+  - **A nested document** (`engine/Data.js`) renders the combined class directly, sharing its parent's form through `parent`. With a form of its own (`useForm`) it renders the whole wrapper instead.
+  - **`Render.js`** is the error boundary, and it stays a class whatever else happens: React has no hook for `componentDidCatch`.
+
+  **The six `UNSAFE_*` definitions, and what each one does before a render:**
+
+  | | where | what it does |
+  |---|---|---|
+  | 1 | `UIRender`, `componentWillReceiveProps` | copies changed `data`, `meta` and `meta.currencyCode` props into state |
+  | 2 | engine layer, `componentWillMount` | builds `submit`, which merges the nested documents' values before submitting, and registers a nested document with its parent |
+  | 3 | engine layer, `componentWillUpdate` | drops the cached `meta` when the state object changed |
+  | 4 | engine layer, `componentWillReceiveProps` | copies changed `data` and `meta` into state again, through updaters, then calls 1 |
+  | 5 | form layer, `componentWillReceiveProps` | recomputes `canSave` against the incoming props, by swapping them into `this._props`, and reprocesses the errors |
+  | 6 | `WithForm`, `componentWillReceiveProps` | when `initialValues` changed by value, resets the form to them and re-registers the document in `formsStorage` |
+
+  Numbers 1 and 4 write the same two keys. 1 runs second, and its plain `setState({data: {json}})` is the write that lands.
+
+  **The instance is internal.** No host can reach it. The published entry is a function component (`declare function UIRender(props)` in the public types), so there is no ref to hold. Everything that reads the instance is in `src`, which makes its contract a design choice rather than a compatibility constraint.
+
+  **What reads it, measured.** Outside the instance's own layers there are 14 members: 12 reached by the suite, and 2 more found by a static scan of `src` (`isUnmounting` and `formValues`). By member:
+  - `translate`: the mapper, 9,296 reads.
+  - `state`: `Render.js` and `transforms.js`, for `currencyCode`. Templates too: `{state.x}` resolves against the instance itself (`interpolateString(template, instance)`), so `state` is a free-form bag that meta's `setState` actions write by path and meta's templates read.
+  - `props`: fields, the period validator, `dataKindPush`, templates, and the error report (`props.onError`).
+  - `form`: `asField` and `asInputDateField`.
+  - `formValues`: the period validator.
+  - `setState`: `dataKindPush`, on the parent.
+  - `getRawFormsData`: `showIf`.
+  - `popupById` and `popupTemplates`: the mapper writes them while rendering a `Popup` node, and `popupOpen` reads them at click time.
+  - `_autoSubmit` and `submit`: `autoSubmit.js` keeps its timer on the instance.
+  - `dataKindPath` and `getDataKind`: the period validator.
+  - `isUnmounting`: a field's removal path.
+
+  A nested document reads its **parent's** `form`, `handleSubmit`, `onDataChanged`, `translate`, `state`, `setState` and the three registry methods, and the parent's `props.instance`, which is the parent's `WithForm`, for its form. `WithForm` itself offers `form` and `handleSubmit`, to the form layer through `props.instance`.
+
+  **Three things write to the instance during render**, and a hooks form has to give each a home:
+  - `initSelectStatesFromData` assigns straight into `instance.state` from inside the `meta` getter. It seeds each Select's state, so that the first render already resolves `{state.x}`.
+  - The mapper registers every `Popup` node on the instance, in the two registries above.
+  - `config` rewrites the shared `FIELD.FUNC` registry on every render and snapshots it. §9.3 step 3 measured that not to leak.
+
+  **One timing is load-bearing, and no test pins it.** A nested document registers with its parent in `componentWillMount`, before it renders. Across the whole suite the registry was read 24 times during a mount. Every one of those reads came from react-final-form's *passive* mount effects: a field registers, its field-level validation runs, and the period validator calls `getDataKind`. Every time, the child was already registered.
+
+  So the registration has to land before the document's own fields' passive effects. `componentDidMount` or a layout effect does, since React runs every layout effect of a commit before any passive one. A passive effect would not. When registration was deferred past the passive effects, the one test that failed did so on a synchronous check, not on validation.
+
+  **Each definition against its naive safe replacement:**
+
+  | | replacement | suite |
+  |---|---|---|
+  | 3 | a `meta` cache keyed on the state object | 2816 of 2816 pass |
+  | 2 | `submit` built in the constructor, registration in `componentDidMount` | 2816 of 2816 pass |
+  | 1 with 4 | `componentDidUpdate` | 2 fail |
+  | 5 | `componentDidUpdate` | 3 fail |
+  | 6 | `componentDidUpdate` | 1 fails |
+
+  Every failure is structural: a test that calls a lifecycle by name, reads the `_props` swap, or lists the methods a layer wraps. No behaviour test pins the before-render timing of 1, 4, 5 or 6. Moving them after render still has a cost: one extra render with the stale data, the stale `canSave` or the old form values, before the update lands.
+
+  **One React rule shapes the order.** A class that defines `getDerivedStateFromProps` gets none of its `UNSAFE_*` lifecycles called, and that is decided for the whole chain at runtime. I measured this on React 16, 17 and 18: a subclass's `getDerivedStateFromProps` switched off its base's `UNSAFE_componentWillMount` and `UNSAFE_componentWillReceiveProps`, with React's "Unsafe legacy lifecycles will not be called" warning. So inside the classes, the three props-driven syncs (1 with 4, then 5, then 6) cannot move to it one at a time. They leave together, or they leave with the classes.
+
+  **The decision.** Each document becomes a function component, and `WithForm` becomes another. `Render.js` stays a class.
+  - **The instance becomes one object per document**, as the leaves' `this` became their handles. It carries:
+    - the members above, as getters over the latest props and state;
+    - the two popup registries and the nested-data registry, as plain objects;
+    - handlers with one identity each;
+    - `setState` with its two semantics: a merge, and a callback after the commit, which `upload` and `applyPeriods` use.
+  - **The props-driven syncs become render-phase derivations**, as in the leaves, so there is no extra render. What they also did (`form.reset`, the `formsStorage` entry, `onChangeState`, reprocessing the errors) moves into layout effects, which still land before paint.
+  - **The registration becomes a layout effect**, which keeps its lead over the fields' passive effects.
+  - **The Select seeding moves into the state initializer and the data/meta derivation**, so nothing assigns into state.
+
+  The classes-or-hooks question is not left open. Syncs 5 and 6 read the final-form object, which `getDerivedStateFromProps` cannot see. So inside the classes they could only move after render, at the cost above.
+
+  **The order.** Each slice ships and is measured like a leaf:
+  1. **Tests first.** The structural tests become behaviour tests that render documents: the lifecycle-by-name calls and prototype reads in `rules.lifecycle-layer`, `rules.state-immutability`, `rules.set-state-path`, `rules.data-kind-registry`, `utils.form-layer` and `utils.form-lifecycle`. An instance-contract test pins the members above. All of this runs against the current classes, with no change in `src`.
+  2. **Definition 3** becomes the `meta` cache keyed on the state object.
+  3. **Definition 2** moves to the constructor and `componentDidMount`.
+  4. **Definitions 1 and 4 merge into one**, which is what they already are in effect.
+  5. **`WithForm` becomes a function component**, taking definition 6.
+  6. **The document becomes a function component**, taking 1 with 4 and 5, and the instance object with them.
+  7. **§9.3 step 7's acceptance:** the demo under `<StrictMode>`.
+
+  After slice 4, three definitions are left. Slices 5 and 6 are where the instance contract changes hands. If their measurements say otherwise, the classes can stay, with those three.
+
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 
 All decomposition outputs are authored in TypeScript from the start (`engine/*.ts`, §9.6-E3) — the old monoliths are never converted in place.
