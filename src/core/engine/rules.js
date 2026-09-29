@@ -922,24 +922,27 @@ function Decorator (Class) {
             if (super.componentWillUnmount) super.componentWillUnmount(...arguments)
         }
 
-        UNSAFE_componentWillMount (nextProps, nextState) {
-            // Wrap form.submit with HOC to extract nested form values before submission
-            this.submit = (...args) => {
-                const { dataKind } = this.formValues
-                for (const kind in dataKind) {
-                    dataKind[kind] = this.getDataKind(kind).map((v, index) => isEmpty(v) ? dataKind[kind][index] : v)
-                }
-                return this.form.submit(...args)
+        // Wrap form.submit with HOC to extract nested form values before submission. A member from
+        // the constructor on, because the meta's `submit` action is built from it when the first
+        // render builds the meta (`rules.mount-order.test.js`).
+        submit = (...args) => {
+            const { dataKind } = this.formValues
+            for (const kind in dataKind) {
+                dataKind[kind] = this.getDataKind(kind).map((v, index) => isEmpty(v) ? dataKind[kind][index] : v)
             }
+            return this.form.submit(...args)
+        }
 
+        componentDidMount () {
+            // A nested document registers with its parent in the commit, before any mount effect
+            // runs: its fields validate in theirs, and a cross-row validator reads the scope this
+            // sets (`rules.mount-order.test.js`). Until §9.3 step 6 it registered in
+            // `UNSAFE_componentWillMount`, before render.
             const { parent, form, index } = this.props
-
             if (parent && index != null) {
                 parent.registerDataKind(this, form.kind, index)
             }
-            if (super.UNSAFE_componentWillMount) {
-                super.UNSAFE_componentWillMount(...arguments)
-            }
+            if (super.componentDidMount) super.componentDidMount(...arguments)
         }
 
         UNSAFE_componentWillReceiveProps (next, _) {
