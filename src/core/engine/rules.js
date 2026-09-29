@@ -1,4 +1,4 @@
-import React, { Component, Fragment, isValidElement } from 'react'
+import React, { Fragment, isValidElement } from 'react'
 import '../modules/form/constants'
 import { withForm } from '../modules/form'
 import { FIELD } from '../modules/variables'
@@ -16,6 +16,8 @@ import { cloneDeep, hasObjectValue, isObject, set, setIn } from '../utils/object
 import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
+import { DocumentInstance, hostDocument } from './documentHost'
+import { statePathOf } from './statePath'
 import { describeFailure, download } from './download'
 import { upload } from './upload'
 import { applyPeriods } from './applyPeriods'
@@ -208,8 +210,12 @@ export { formsStorage }
  * UI Render Instance Component
  * @example:
  *    <UIRender data={data} meta={meta} initialValues={data} onSubmit={this.submit}/>
+ *
+ * A document's instance, not a React component, since §9.3 step 6: a function component hosts it,
+ * `documentHost.ts`, which gives it what React gave a class. That is why it extends
+ * `DocumentInstance`, and why its props sync is `deriveFromProps`.
  */
-export class UIRender extends Component {
+export class UIRender extends DocumentInstance {
     static propTypes = {
         data: type.Any.isRequired,
         meta: type.Object.isRequired,
@@ -288,7 +294,10 @@ export class UIRender extends Component {
     // ran; this one's update was applied last, so what the state ended up with was always this
     // one's, and that is what stays. It takes a `data` prop that became null as no data, which the
     // other one skipped (`rules.instance-contract.test.js`).
-    UNSAFE_componentWillReceiveProps (next, nextContext) {
+    //
+    // It was `UNSAFE_componentWillReceiveProps`. The host calls it at the same point, during the
+    // render, and it still sets nothing but this document's state (`documentHost.ts`).
+    deriveFromProps (next) {
         const update = {}
         const { data, meta } = this.props
 
@@ -866,42 +875,11 @@ function Decorator (Class) {
         // Positional arguments was chosen instead of keyword arguments because
         // it provides more flexibility and separation of concerns between different configs.
         setStates (value, ...rest) {
-            /**
-             * The state path is the LAST STRING argument, not the second positional one.
-             *
-             * WHY, because "second positional" looks obviously right and is wrong: a meta's configured
-             * action arguments are APPENDED to the caller's by `getFunctionFromString`
-             * (`'setState,categoryX'` becomes `(...caller) => setStates(...caller, 'categoryX')`), so
-             * the path's position depends on how many arguments the caller passes. A `Button` passes
-             * one and the path lands second; a `Dropdown` passes three — `(value, name, event)` — and
-             * the path lands FOURTH while the field's own `name` sits second. Reading the second
-             * argument therefore wrote to the path named by the field instead of the one the meta
-             * asked for, for every `view: 'Select'` whose two differ. `mapper.js` works around it for
-             * stable-value Selects by stripping the extra arguments, with a comment saying exactly
-             * this; nothing covered the rest.
-             *
-             * Measured across all four real call shapes, this rule is the only one that is right in
-             * all of them — "last argument" is wrong when no path is configured and the caller's last
-             * argument is the DOM event, and "second argument" is wrong for any caller passing more
-             * than one:
-             *   (value, 'categoryX')                      -> 'categoryX'      configured, one-arg caller
-             *   (value, name, event, 'categoryX')          -> 'categoryX'      configured, dropdown
-             *   (value, name, event)                       -> name            not configured, dropdown
-             *   (value)                                    -> undefined       not configured, one-arg
-             * The last row keeps today's behaviour deliberately: `set(state, undefined, value)`
-             * returns the state unchanged, so the action is a no-op rather than an error, and making
-             * it one is a separate decision from fixing the path.
-             *
-             * Found by the §9.7-F1 step 3 part 1 audit. `transforms.action-args.test.js` pins the
-             * composer's half of this and `rules.set-state-path.test.js` this half.
-             */
-            let keyPath
-            for (let i = rest.length - 1; i >= 0; i -= 1) {
-                if (typeof rest[i] === 'string') { keyPath = rest[i]; break }
-            }
-            // Clear cached meta so {state.xxx} templates re-resolve on next render
-            // (showIf, container names, option paths all depend on current state)
-            this._meta = null
+            // The state path is the LAST STRING argument, not the second positional one: see
+            // `statePath.ts` for why. The `{state.x}` templates re-resolve on the render this
+            // schedules, because the meta cache is keyed on the state object (`get meta`). Until
+            // §9.3 step 6 this also cleared the cache, which that key had made redundant.
+            const keyPath = statePathOf(rest)
             return this.setState(state => setIn(state, keyPath, value))
         }
 
@@ -1051,11 +1029,14 @@ function Decorator (Class) {
         },
         // Handed in rather than imported by the form module: see the note on `withForm`.
         processErrors: errorsProcessing,
+        // The document is an instance of the layers, hosted by a function component (§9.3 step 6).
+        host: hostDocument,
     })(UIRenderLifecycle)
 
-    // Nested documents render the class inside the form wrapper directly — `engine/Data.js` reads it
-    // from `Active` to avoid a circular import — so it has to be the class the wrapper renders: this
-    // layer with the form layer over it, not the bare class the caller wrote.
+    // Nested documents render the wrapper's own component directly — `engine/Data.js` reads it from
+    // `Active` to avoid a circular import — so it has to be what the wrapper renders: the host of this
+    // layer with the form layer over it, not the bare class the caller wrote. The host carries the
+    // class it hosts as `InstanceClass`.
     Active.UIRender = UIRenderWithForm.WrappedComponent
 
     return UIRenderWithForm

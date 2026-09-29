@@ -156,7 +156,9 @@ describe('form data synchronization contracts', () => {
         instance._props = null
     })
 
-    it('refreshes validation metadata only when synchronized props actually change', () => {
+    it('refreshes validation metadata only when synchronized props actually change, once the commit is in', () => {
+        // The props hook runs during the render and the error pass after the commit, which is what
+        // `UNSAFE_componentWillReceiveProps` did in one go until §9.3 step 6.
         const { instance, form } = createSetupInstance({
             initialValues: { name: 'before' },
             values: { name: 'after' },
@@ -164,18 +166,21 @@ describe('form data synchronization contracts', () => {
         })
         instance._meta = { fields: [] }
 
-        instance.UNSAFE_componentWillReceiveProps({
+        instance.deriveFromProps({
             ...instance.props,
             initialValues: { name: 'before' },
             formProps: { pristine: true },
         })
+        instance.componentDidUpdate()
         expect(processErrorsCalls).toHaveLength(0)
 
-        instance.UNSAFE_componentWillReceiveProps({
+        instance.deriveFromProps({
             ...instance.props,
             initialValues: { name: 'next' },
             formProps: { pristine: false },
         })
+        expect(processErrorsCalls).toHaveLength(0)
+        instance.componentDidUpdate()
 
         expect(processErrorsCalls).toHaveLength(1)
         expect(processErrorsCalls[0]).toEqual([form, instance._meta])

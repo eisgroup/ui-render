@@ -16,7 +16,8 @@
 import '../rules'
 // The lifecycle layer, not the bare class: since §9.3 step 5 the engine installs it on a subclass
 // of its own instead of mutating the class it is handed, and `Active.UIRender` is the channel
-// `engine/Data.js` already reads it from to render nested documents.
+// `engine/Data.js` already reads it from to render nested documents. Since §9.3 step 6 that is the
+// document's host, which carries the class as `InstanceClass`.
 import { Active } from '../../utils'
 
 /**
@@ -29,7 +30,7 @@ import { Active } from '../../utils'
  */
 const makeInstance = state => {
     const pending = []
-    const instance = Object.create(Active.UIRender.prototype)
+    const instance = Object.create(Active.UIRender.InstanceClass.prototype)
     instance.state = state
     instance.props = {}
     instance.setState = function (next) {
@@ -88,7 +89,8 @@ describe('engine state updates leave the previous state object intact', () => {
         const instance = makeInstance(observed)
         instance.props = { data: { label: 'first' }, meta: { view: 'Row' } }
 
-        instance.UNSAFE_componentWillReceiveProps({
+        // The props sync, called where React called `UNSAFE_componentWillReceiveProps` (§9.3 step 6).
+        instance.deriveFromProps({
             data: { label: 'second' },
             meta: { view: 'Col' },
         })

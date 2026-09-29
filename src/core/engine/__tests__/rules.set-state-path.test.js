@@ -20,70 +20,38 @@
  * The composer's half of this — that configured arguments are appended at all — is pinned in
  * `src/core/engine/__tests__/transforms.action-args.test.js`.
  */
-import '../rules'
-// The lifecycle layer, not the bare class: since §9.3 step 5 the engine installs it on a subclass
-// of its own instead of mutating the class it is handed, and `Active.UIRender` is the channel
-// `engine/Data.js` already reads it from to render nested documents.
-import { Active } from '../../utils'
+import { statePathOf } from '../statePath'
 
 /**
- * `setStates` lives on the prototype and only needs `state` and `setState` from its instance, so
- * it is called against a minimal one. Driving it through a rendered engine would exercise the
- * SAME two lines behind a form, a meta and a click, and would not say which argument was read.
+ * `setStates(value, ...rest)` hands the rule everything after the value. The rule was lifted out of
+ * `setStates` at §9.3 step 6, so this file calls it rather than a method on an instance's prototype;
+ * what `setStates` does with the path, and that it leaves the previous state object alone, is pinned
+ * in `rules.state-immutability.test.js`.
  */
-const callSetState = (...args) => {
-    const recorded = []
-    const instance = {
-        state: { existing: 'kept' },
-        // `setStates` passes an UPDATER, so that two writes in one React batch cannot undo each
-        // other (`rules.state-immutability.test.js`). Resolving it here keeps this file about the
-        // one thing it is about: which argument became the path.
-        setState (next) { recorded.push(typeof next === 'function' ? next(this.state) : next) },
-        _meta: { cached: true },
-    }
-    Active.UIRender.prototype.setStates.apply(instance, args)
-    return { state: recorded[recorded.length - 1], metaCleared: instance._meta === null }
-}
+const pathOf = (value, ...rest) => statePathOf(rest)
 
 describe('the state path is the last string argument', () => {
     it('a configured path with a one-argument caller — the `mapper.js` workaround shape', () => {
-        const { state } = callSetState('gold', 'categoryX')
-
-        expect(state).toEqual({ existing: 'kept', categoryX: 'gold' })
+        expect(pathOf('gold', 'categoryX')).toBe('categoryX')
     })
 
     it('a configured path with a dropdown caller — the shape that was broken', () => {
-        // `onChange(value, name, event)` first, then the meta's `'categoryX'`.
-        const { state } = callSetState('gold', 'group.category', { type: 'click' }, 'categoryX')
-
-        // The meta's path, not the field's name. Reading the second argument wrote
-        // `{group: {category: 'gold'}}` here.
-        expect(state).toEqual({ existing: 'kept', categoryX: 'gold' })
-        expect(state.group).toBeUndefined()
+        // `onChange(value, name, event)` first, then the meta's `'categoryX'`. The meta's path, not
+        // the field's name: reading the second argument wrote to `group.category` here.
+        expect(pathOf('gold', 'group.category', { type: 'click' }, 'categoryX')).toBe('categoryX')
     })
 
     it('NO configured path with a dropdown caller — the field name is the path, as before', () => {
-        const { state } = callSetState('gold', 'group.category', { type: 'click' })
-
         // This shape worked before and must keep working: with nothing configured, the field's
         // own name IS the path. It is also why "read the last argument" is not the fix — the last
         // argument here is the DOM event.
-        expect(state).toEqual({ existing: 'kept', group: { category: 'gold' } })
+        expect(pathOf('gold', 'group.category', { type: 'click' })).toBe('group.category')
     })
 
-    it('NO configured path and a one-argument caller — a no-op, as before', () => {
-        const { state, metaCleared } = callSetState('gold')
-
+    it('NO configured path and a one-argument caller — no path, as before', () => {
         // `set(state, undefined, value)` returns the state unchanged. Preserved deliberately:
         // making an unresolvable path an ERROR is a separate decision from fixing the path, and
         // this file is about the path.
-        expect(state).toEqual({ existing: 'kept' })
-        expect(metaCleared).toBe(true)
-    })
-
-    it('clears the cached meta, so `{state.xxx}` templates re-resolve', () => {
-        const { metaCleared } = callSetState('gold', 'categoryX')
-
-        expect(metaCleared).toBe(true)
+        expect(pathOf('gold')).toBeUndefined()
     })
 })

@@ -331,7 +331,13 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
   // half of the `engine` <-> `modules/form` cycle, and moving it down would have put engine logic
   // below the layer that uses it. The registries both sides write to did move — to `state/formRegistry`.
   // It is optional: `withFormSetup` is exported and called directly by tests that never process errors.
-  const {processErrors} = options
+  //
+  // `host`, also optional, is what turns the class with the form layer over it into the component the
+  // wrapper renders. The engine passes its document host (§9.3 step 6): its layers are the classes of
+  // an instance, not React components. Without one, the class is rendered as the component it is.
+  // It is not a `<Form>` option, so it is kept out of the ones the wrapper hands the form.
+  const {host, ...formOptions} = options
+  const {processErrors} = formOptions
   return function Decorator (Class) {
     // @Note: form field re-renders because of constantly changing formProps reference
     //        => convert it to instance getter, so `asField` does not depend on formProps.
@@ -339,6 +345,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
     // Built here, once per decorated class, and it is what the wrapper below renders: `Class` with the
     // form layer over it, since `withFormSetup` no longer writes onto `Class` itself.
     const FormClass = withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors, processErrors})
+    const FormComponent = host ? host(FormClass) : FormClass
 
     const formSubscription = (form) => ({touched, initialValues}) => {
       // Everything below is about THIS form. It used to compare against one module-level baseline,
@@ -414,7 +421,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         }
 
         // Class should use PureComponent to take advantage of caching
-        return <FormClass {...restProps} formProps={own.formProps} initialValues={applied} instance={handle}/>
+        return <FormComponent {...restProps} formProps={own.formProps} initialValues={applied} instance={handle}/>
       }
 
       // In the shared storage under a copy of the values it started with, from the commit it mounts in
@@ -459,7 +466,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       //    because final-form always re-initializes
       return <Form
         onSubmit={onSubmit}
-        {...options}
+        {...formOptions}
         mutators={{
           ...arrayMutators,
           setFieldTouched
@@ -470,11 +477,20 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
     }
 
     const Wrapper = React.memo(WithForm)
-    // The class this wrapper renders, for a caller that renders it WITHOUT the wrapper: the engine's
+    // What this wrapper renders, for a caller that renders it WITHOUT the wrapper: the engine's
     // nested documents share their parent's form rather than making one of their own
-    // (`engine/Data.js`), so they must render this class and not the one handed to the decorator.
-    Wrapper.WrappedComponent = FormClass
+    // (`engine/Data.js`), so they must render this and not the class handed to the decorator.
+    Wrapper.WrappedComponent = FormComponent
     return Wrapper
+  }
+}
+
+/** The user's edits are in: tell the host, or the document this one is nested in. */
+function reportDataChanged ({onDataChanged, parent}) {
+  if (typeof onDataChanged === 'function') {
+    onDataChanged()
+  } else if (parent && typeof parent.onDataChanged === 'function') {
+    parent.onDataChanged();
   }
 }
 
@@ -619,41 +635,61 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
     }
 
     syncInputChanges () {
-      const { formProps, onDataChanged, parent = {} } = this._props || this.props;
-      if (formProps && (!formProps.pristine)) {
-        if (typeof onDataChanged === 'function') {
-          onDataChanged()
-        } else if (parent && typeof parent.onDataChanged === 'function') {
-          parent.onDataChanged();
-        }
-      }
+      const props = this._props || this.props
+      if (props.formProps && (!props.formProps.pristine)) reportDataChanged(props)
 
       const canSave = this.canSave
       if (canSave !== this.state.canSave) {
         this.setState({canSave})
-        const {onChangeState} = this._props || this.props
+        const {onChangeState} = props
         if (onChangeState) onChangeState(this)
       }
     }
 
-    UNSAFE_componentWillReceiveProps (next) {
-      // @Note: using componentDidUpdate comparison logic is not reliable,
-      // because on the last re-render, Form may trigger `pristine` update without changing initialValues,
-      // which will make .canSave false, but this.syncInputChanges() only updated in the previous render, which was true.
-      // => thus need to take formProps into consideration
+    /**
+     * NEW PROPS, IN TWO HALVES (§9.3 step 6). This was `UNSAFE_componentWillReceiveProps`, which did
+     * `syncInputChanges` and the error pass before the render. The document host calls this at the
+     * same point, during the render, where only this document's own state may change. So here the
+     * layer works out whether the document can be saved with the props it is about to render with,
+     * and keeps that in its state. What that owes the host, `onDataChanged` and `onChangeState`, and
+     * the error pass, wait for the commit, in `componentDidUpdate` below. A render may run twice, so
+     * what is owed is a set of flags, which are the same the second time.
+     *
+     * @Note: using componentDidUpdate comparison logic is not reliable,
+     * because on the last re-render, Form may trigger `pristine` update without changing initialValues,
+     * which will make .canSave false, but this.syncInputChanges() only updated in the previous render, which was true.
+     * => thus need to take formProps into consideration
+     */
+    deriveFromProps (next) {
       if (
         !isEqualJSON(next.initialValues, this.props.initialValues) ||
         !isEqualJSON(next.formProps, this.props.formProps)
       ) {
+        const owed = this._owed || (this._owed = {})
+        if (next.formProps && (!next.formProps.pristine)) owed.dataChanged = true
         // temporarily set to next props for state computation
         this._props = next
-        this.syncInputChanges()
+        const canSave = this.canSave
         this._props = null
-        if (this._meta) {
-          if (processErrors) processErrors(this.form, this._meta);
+        if (canSave !== this.state.canSave) {
+          this.setState({canSave})
+          owed.changeState = true
         }
+        if (this._meta) owed.errors = true
       }
-      if (super.UNSAFE_componentWillReceiveProps) super.UNSAFE_componentWillReceiveProps(...arguments)
+      if (super.deriveFromProps) super.deriveFromProps(...arguments)
+    }
+
+    componentDidUpdate () {
+      // In the order `syncInputChanges` and the lifecycle had them: data, save state, errors.
+      const owed = this._owed
+      this._owed = null
+      if (owed) {
+        if (owed.dataChanged) reportDataChanged(this.props)
+        if (owed.changeState && this.props.onChangeState) this.props.onChangeState(this)
+        if (owed.errors && this._meta && processErrors) processErrors(this.form, this._meta)
+      }
+      if (super.componentDidUpdate) super.componentDidUpdate(...arguments)
     }
 
     componentWillUnmount () {

@@ -32,16 +32,14 @@ function makeDecoratedInstance ({
     fieldStates = {},
     props = {},
     handleChangeInput,
-    componentWillReceiveProps,
+    deriveFromProps,
     componentWillUnmount,
     processErrors,
 } = {}) {
     class FormHarness extends Component {}
 
     if (handleChangeInput) FormHarness.prototype.handleChangeInput = handleChangeInput
-    if (componentWillReceiveProps) {
-        FormHarness.prototype.UNSAFE_componentWillReceiveProps = componentWillReceiveProps
-    }
+    if (deriveFromProps) FormHarness.prototype.deriveFromProps = deriveFromProps
     if (componentWillUnmount) FormHarness.prototype.componentWillUnmount = componentWillUnmount
 
     // The subclass it returns, since §9.3 step 5: `FormHarness` itself is left as written.
@@ -378,7 +376,7 @@ describe('withFormSetup public instance contracts', () => {
             values: { name: 'after' },
             registered: [],
             props: { formProps: { pristine: true } },
-            componentWillReceiveProps: originalLifecycle,
+            deriveFromProps: originalLifecycle,
             processErrors: (...args) => processErrorsCalls.push(args),
         })
         instance._meta = {}
@@ -388,13 +386,19 @@ describe('withFormSetup public instance contracts', () => {
             formProps: { pristine: false },
         }
 
-        instance.UNSAFE_componentWillReceiveProps(nextProps, 'next-context')
+        // During the render, the props hook works out the state; the error pass waits for the
+        // commit. Both were `UNSAFE_componentWillReceiveProps` until §9.3 step 6.
+        instance.deriveFromProps(nextProps)
 
         expect(instance._props).toBeNull()
         expect(instance.state.canSave).toBe(true)
         expect(form.getRegisteredFields).toHaveBeenCalledTimes(1)
+        expect(processErrorsCalls).toEqual([])
+        expect(originalLifecycle).toHaveBeenCalledWith(nextProps)
+
+        instance.componentDidUpdate()
+
         expect(processErrorsCalls).toEqual([[form, instance._meta]])
-        expect(originalLifecycle).toHaveBeenCalledWith(nextProps, 'next-context')
     })
 
     it('marks the form as unmounting and clears the published instance', () => {

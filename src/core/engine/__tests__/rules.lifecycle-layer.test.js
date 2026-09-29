@@ -60,16 +60,18 @@ const FORM_MEMBERS = [
     'syncInputChanges',
 ]
 /**
- * The lifecycle methods `withFormSetup` used to replace with wrappers. The engine layer still has a
- * `componentWillUnmount` of its own. Since §9.3 step 6 its `UNSAFE_componentWillReceiveProps` is the
- * declared class's, which the form layer reaches through `super` all the same. What that call
- * carries is pinned by behaviour: the prop-change tests in `UIRender.smoke` and
- * `rules.instance-contract` fail when the form layer drops it.
+ * The lifecycle methods the form layer has over the engine layer's, reached through `super`. The
+ * engine layer has a `componentWillUnmount` and a `componentDidUpdate` of its own. Its
+ * `deriveFromProps` is the declared class's: the props sync that was `UNSAFE_componentWillReceiveProps`
+ * until §9.3 step 6, which the form layer reaches all the same. What that call carries is pinned by
+ * behaviour: the prop-change tests in `UIRender.smoke` and `rules.instance-contract` fail when the form
+ * layer drops it.
  */
-const WRAPPED_LIFECYCLE = ['UNSAFE_componentWillReceiveProps', 'componentWillUnmount']
+const WRAPPED_LIFECYCLE = ['deriveFromProps', 'componentDidUpdate', 'componentWillUnmount']
 
-// What nested documents render, and the class it is built on.
-const FormLayer = Active.UIRender
+// The class of what nested documents render, and the class it is built on. Since §9.3 step 6 what
+// they render is the document's host, which carries the class it hosts as `InstanceClass`.
+const FormLayer = Active.UIRender.InstanceClass
 const EngineLayer = Object.getPrototypeOf(FormLayer)
 
 describe('the lifecycle layer is a class of its own', () => {
@@ -114,6 +116,7 @@ describe('the lifecycle layer is a class of its own', () => {
         // The wrapper is a memoised function since §9.3 step 6, so it is not a function itself.
         expect(UIRenderDefault).not.toBe(Active.UIRender)
         expect(UIRenderDefault.WrappedComponent).toBe(Active.UIRender)
+        expect(Active.UIRender.InstanceClass).toBe(FormLayer)
     })
 })
 
@@ -137,7 +140,8 @@ describe('the form layer is a class of its own over it', () => {
             expect(FormLayer.prototype[name]).not.toBe(EngineLayer.prototype[name])
         }
         expect(Object.prototype.hasOwnProperty.call(EngineLayer.prototype, 'componentWillUnmount')).toBe(true)
-        expect(EngineLayer.prototype.UNSAFE_componentWillReceiveProps).toBe(UIRender.prototype.UNSAFE_componentWillReceiveProps)
+        expect(Object.prototype.hasOwnProperty.call(EngineLayer.prototype, 'componentDidUpdate')).toBe(true)
+        expect(EngineLayer.prototype.deriveFromProps).toBe(UIRender.prototype.deriveFromProps)
     })
 
     it('builds its state shape and prop types from the engine layer\'s, leaving those as they were', () => {
