@@ -106,7 +106,7 @@ Original audit baseline: 257 JS/JSX files (+2 TS), 76 test files. The safety/Rea
 | `findDOMNode` in `src/` | ❌ none |
 | Event pooling reliance (`e.persist()`) | ✅ one deliberate call site (`Upload.js`) — see §2.6 note |
 | `unstable_*` React APIs | ❌ none |
-| `StrictMode` | not enabled anywhere (intentional for now, see §7) |
+| `StrictMode` | ~~not enabled anywhere (intentional for now, see §7)~~ the demo runs under it since 2026-09-29 (§9.3 step 7) |
 
 ### 2.5 Architectural invariants (observed, and to be preserved)
 
@@ -348,6 +348,8 @@ check, ~~and the §10 decision on whether React 17 ships as its own release~~. *
 
 `<StrictMode>` is **not** part of the upgrade. Today it would drown the console in `UNSAFE_*` deprecation warnings (the prototype-patched lifecycle engine guarantees them) and double-invoke render/effects in dev, which the class engine was never audited for.
 
+**UPDATED 2026-09-29: the demo runs under `<StrictMode>`.** §9.3 removed every `UNSAFE_*` lifecycle and its step 7 met the definition below; `examples.strict-mode.test.js` pins it on the corpus. A host is still free to choose; the library renders the same either way.
+
 **Measured on React 18.3 (2026-08-20)** — so §9.3 is scoped by counting, not estimating. Method: a recording `console.error`/`console.warn` spy (the suites mock those, so scanning jest output shows nothing), plus the demo temporarily wrapped in `<StrictMode>` with all 38 examples expanded.
 
 *Console volume is small and misleading.* React aggregates per lifecycle kind and dedupes per component, so the demo produced **one** warning (`Expand, Tabs`) and a form-heavy meta produced **three** (one per lifecycle: `UNSAFE_componentWillReceiveProps` naming `Expand, InputNative, TableView, Tabs, UIRender, WithForm`; `UNSAFE_componentWillMount` and `UNSAFE_componentWillUpdate` naming `UIRender`). The count to plan against is the components, not the messages.
@@ -522,7 +524,7 @@ Every workstream below is a series of small, independently shippable, reversible
   The two suites that applied the mixin to bare classes now run the same assertions on the engine layer's prototype; `withDataKind.test.js` became `rules.data-kind-registry.test.js`. The same probe as for `withFormSetup` found the chain, every level's own members and every body unchanged. The one difference is that the four methods are no longer enumerable, so a `for…in` over an instance no longer lists them, only `setState`, `forceUpdate`, `isReactComponent` and `state`. Nothing in `src` enumerates an instance or a prototype. `rules.lifecycle-layer.test.js` now pins that every member of both layers is written in its class body, `state` excepted; it fails on the previous code and names the four.
 
   **What is left of the pattern in `src`** is outside the engine. `@withTimer` (`components/utils/hocs.js`), on seven components, still assigns three methods onto the class it decorates and replaces its `componentWillUnmount` with a wrapper that calls a captured copy. It is the genuine shared HOC the shape note above names, and it cleans up correctly. It went in step 6, with the last class it decorated.
-6. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired. **STARTED 2026-09-28, leaf components first. All nine leaves converted by 2026-09-29.** The engine's six definitions are what is left: 12 `UNSAFE_*` lines, their `super` calls included, in `rules.js` and `form/utils.js`, measured after the last leaf. **The engine's design pass: 2026-09-29, at the end of this step.**
+6. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired. **STARTED 2026-09-28, leaf components first. All nine leaves converted by 2026-09-29.** The engine's six definitions are what is left: 12 `UNSAFE_*` lines, their `super` calls included, in `rules.js` and `form/utils.js`, measured after the last leaf. **The engine's design pass: 2026-09-29, at the end of this step.** **The engine: DONE 2026-09-29, in the seven slices at the end of this step.** No `UNSAFE_*` lifecycle is left in `src`. The document's classes were kept rather than retired: they are the classes of the instance that a function component hosts (slice 6).
 
   **Measured before starting.** There are 21 `UNSAFE_*` lines in 11 files. §7's table said 26 in 12 on 2026-09-17; step 5 moved the engine's into class members but did not remove them.
   - **Engine:** six real definitions: `UIRender`'s `componentWillReceiveProps`; the engine layer's `componentWillMount`, `componentWillUpdate` and `componentWillReceiveProps`; and `componentWillReceiveProps` in both `WithForm` and the form layer. The remaining engine lines are their `super` calls.
@@ -753,7 +755,7 @@ Every workstream below is a series of small, independently shippable, reversible
   4. **Definitions 1 and 4 merge into one**, which is what they already are in effect. **DONE 2026-09-29.**
   5. **`WithForm` becomes a function component**, taking definition 6. **DONE 2026-09-29.**
   6. **The document becomes a function component**, taking 1 with 4 and 5, and the instance object with them. **DONE 2026-09-29.**
-  7. **§9.3 step 7's acceptance:** the demo under `<StrictMode>`.
+  7. **§9.3 step 7's acceptance:** the demo under `<StrictMode>`. **DONE 2026-09-29.**
 
   After slice 4, three definitions are left. Slices 5 and 6 are where the instance contract changes hands. If their measurements say otherwise, the classes can stay, with those three.
 
@@ -854,7 +856,24 @@ Every workstream below is a series of small, independently shippable, reversible
     - Two form-layer tests cover the derive and commit halves.
     - Two upload tests and a row removal now await their asynchronous update inside `act`. React 16 and 17 report a hook's update outside `act` where they did not report a class's, so a host on 16 or 17 whose tests drive such flows outside `act` will see that warning too. It appears only in tests.
 
-7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
+  **Slice 7: §9.3 step 7's acceptance, DONE 2026-09-29.** The demo runs under `<StrictMode>`, and `examples.strict-mode.test.js` pins §7's definition on the corpus, through the published entry:
+  - **Rendering.** Every example renders the same DOM with and without StrictMode, after its mount and after an edit, and reports nothing under StrictMode that it does not report without it.
+  - **Subscriptions and cleanup.** A document keeps as many live form subscriptions and field registrations as without StrictMode, and leaves none, and no document or window listener, once it unmounts.
+  - **Isolation.** Two documents on one page keep their own translator after one renders again, and their own submit.
+  - **The remount.** A document is not left marked as unmounting by the remount StrictMode makes.
+
+  It passes on React 16, 17 and 18, in about 9 seconds a leg.
+
+  **Measured before any fix: three differences, all on React 18, where StrictMode also mounts, unmounts and mounts again.** Each is fixed, and reverting a fix fails the test:
+  - **Seven examples showed their dropdowns with the placeholder instead of a selection.** `Dropdown` synced its value from the parent in an effect that skipped its first run through a mount flag in a ref. On the second run the flag was cleared, so the effect replaced the default selection with none. The effect now does nothing when the parent gave it nothing new. `Dropdown.strict-mode.test.js` fails on the old code on React 18.
+  - **The form wrapper lost its subscription until its form rendered again.** It subscribes during the render, and the simulated unmount unsubscribed it. The mount effect now subscribes again when the cleanup has unsubscribed. Eleven examples fail without that.
+  - **The form layer stayed marked as unmounting.** Everything that checks the mark, a removed field's timer and auto-submit among them, would have stood down for good. `componentDidMount` takes the mark back.
+
+    The host is still told `onChangeState({})` by the simulated unmount. That is what the documented usage starts from (`state = {company: {}}`), and it is handed the instance on the first change of `canSave`, as without StrictMode.
+
+  **The console, measured in the running demo with all 38 examples expanded under StrictMode:** five error-level messages, each also reported without StrictMode and none about a lifecycle. They are `buttoned={false}` reaching the DOM, `InputNumber`'s boolean `error`, a nested row's `formProps` and `instance` prop types, and an `@class` attribute. The demo's script behaves the same under StrictMode: the cascading Select from its first render, the nested table's add, remove and rename, and the popup. The Demo tab's prop-type warnings about `data` and `meta` before any upload are reported without StrictMode too. On 2026-08-20 the same pass drew React's warnings about the `UNSAFE_*` lifecycles of six components.
+
+7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation). **DONE 2026-09-29**, as step 6's slice 7 above: the demo runs under StrictMode, and `examples.strict-mode.test.js` pins each part of the definition on the corpus.
 
 All decomposition outputs are authored in TypeScript from the start (`engine/*.ts`, §9.6-E3) — the old monoliths are never converted in place.
 

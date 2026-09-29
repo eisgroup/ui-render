@@ -142,7 +142,8 @@ export function Dropdown ({
     : ((Array.isArray(opts) && opts[0] && opts[0].value) || undefined)
   )
   const [value, setValue] = useState(defaultValue.current)
-  const isInitialMount = useRef(true)
+  // What the effect below last took from the parent: `null` until it first runs.
+  const synced = useRef(null)
   const tempValue = useRef()
 
   useEffect(() => {
@@ -154,11 +155,14 @@ export function Dropdown ({
 
   // Sync internal value with parent prop.
   // Skip on initial mount when valueFromParent is undefined to preserve defaultValue (first option).
+  // A run with nothing new from the parent does nothing either: StrictMode runs a mount's effects
+  // twice, and a mount flag cleared by the first run let the second replace the default with no
+  // selection (§9.3 step 7, `Dropdown.strict-mode.test.js`).
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false
-      if (typeof valueFromParent === 'undefined') return
-    }
+    const mounting = synced.current === null
+    if (!mounting && synced.current.value === valueFromParent) return
+    synced.current = {value: valueFromParent}
+    if (mounting && typeof valueFromParent === 'undefined') return
     setValue(valueFromParent == null || valueFromParent === '' ? null : valueFromParent)
   }, [valueFromParent])
 
