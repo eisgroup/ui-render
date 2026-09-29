@@ -92,7 +92,7 @@ Original audit baseline: 257 JS/JSX files (+2 TS), 76 test files. The safety/Rea
 - `createPortal` — `src/core/pages/main/components/Popup.js` (fully supported in 17/18/19).
 - `defaultProps` on **function components** (removed in React 19): exactly **3 occurrences** — `src/core/components/TooltipPop.js:23`, `ImageSwatch.js:27`, `Image.js:27`.
 - `.propTypes` assigned in 33 files; `prop-types` imported by 40 (fine in 17/18; validation removed entirely in React 19 — no crash; retirement: §9.6-E5).
-- Legacy Babel decorators (`@babel/plugin-proposal-decorators`, `legacy: true`) used in 7 files — a single `@withTimer` decorator (`Carousel`, `Counter`, `Expand`, `ProgressBar`, `ProgressSteps`, both `Tabs`).
+- Legacy Babel decorators (`@babel/plugin-proposal-decorators`, `legacy: true`) used in 7 files — a single `@withTimer` decorator (`Carousel`, `Counter`, `Expand`, `ProgressBar`, `ProgressSteps`, both `Tabs`). **No decorator is left in `src` since 2026-09-29:** the last `@withTimer` class, the engine's `Tabs`, became a function component in §9.3 step 6, and `withTimer` was deleted with it. The plugin is still configured in `babel.config.js`; removing it is a change of its own.
 - Direct `moment` imports in **4 files only**: `src/core/utils/time.js:1`, `src/core/components/Text.js:6`, `InputDate.js:11`, `TextDateValue.js:2`.
 - Global listeners: **inventory corrected 2026-09-17.** The earlier "only `window.addEventListener('pointermove'/'pointerup')` in `src/core/components/Slider.js:134–135`" was true when audited, but the §9.7-F1 exit added two document-level click-outside listeners that did not exist then. A re-grep of `src/core` (non-test) now returns five registrations in three files: `Slider.js:146–147` (`pointermove`/`pointerup`, same native drag handling, line numbers drifted from the recorded 134–135), `Listbox.js:206` (`mousedown`, bddf7935) and `TooltipPop.js:369–370` (`keydown`/`click`, bbf7d607). The verdict is unchanged: each registers inside a `useEffect` guarded on open state and returns a `removeEventListener` cleanup (`Listbox.js:207`, `TooltipPop.js:371–374`), and document-level click-outside still works under React 17, whose events bubble out of the root container to `document` as before.
 
@@ -521,7 +521,7 @@ Every workstream below is a series of small, independently shippable, reversible
 
   The two suites that applied the mixin to bare classes now run the same assertions on the engine layer's prototype; `withDataKind.test.js` became `rules.data-kind-registry.test.js`. The same probe as for `withFormSetup` found the chain, every level's own members and every body unchanged. The one difference is that the four methods are no longer enumerable, so a `for…in` over an instance no longer lists them, only `setState`, `forceUpdate`, `isReactComponent` and `state`. Nothing in `src` enumerates an instance or a prototype. `rules.lifecycle-layer.test.js` now pins that every member of both layers is written in its class body, `state` excepted; it fails on the previous code and names the four.
 
-  **What is left of the pattern in `src`** is outside the engine. `@withTimer` (`components/utils/hocs.js`), on seven components, still assigns three methods onto the class it decorates and replaces its `componentWillUnmount` with a wrapper that calls a captured copy. It is the genuine shared HOC the shape note above names, and it cleans up correctly.
+  **What is left of the pattern in `src`** is outside the engine. `@withTimer` (`components/utils/hocs.js`), on seven components, still assigns three methods onto the class it decorates and replaces its `componentWillUnmount` with a wrapper that calls a captured copy. It is the genuine shared HOC the shape note above names, and it cleans up correctly. It went in step 6, with the last class it decorated.
 6. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired. **STARTED 2026-09-28, leaf components first.**
 
   **Measured before starting.** There are 21 `UNSAFE_*` lines in 11 files. §7's table said 26 in 12 on 2026-09-17; step 5 moved the engine's into class members but did not remove them.
@@ -610,6 +610,27 @@ Every workstream below is a series of small, independently shippable, reversible
   - a parent render with equal props does not render it again.
 
   Twelve mutations each fail at least one test. The last test exists because of one of them: dropping `React.memo` failed nothing until it was written.
+
+  **The engine's `Tabs` converted 2026-09-29**, the seventh leaf and the last `@withTimer` class. `withTimer` is deleted with it, along with `hocs.js`, the one file it lived in, and its contract test, so no decorator is left in `src`. It is converted the way StandaloneTabs was, the other of the two copies (§9.9-H6):
+  - **Parent renders.** Its lifecycle ran on every parent render and compared a controlled `activeIndex` with the state, so it detects a parent render by the new props object and is not memoised. A test pins that a parent render with equal props still brings back a tab the parent did not adopt; it is the only test that fails when the component is wrapped in `React.memo`.
+  - **A controlled `activeIndex`** that differs from the active tab sets its state during render. Starting the transition's timer, or reporting an immediate change, happens in an effect, a commit later. The class did both in the lifecycle.
+  - **A click still in its transition** loses to a controlled change. The class cleared its timer. Here the click finds out when it fires, through the counter ProgressSteps uses, so it drops itself even if it fires between that commit and the effect.
+  - **Items that changed by value**, still compared with `isEqual`, refresh the cached tabs and contents and end a transition's faded state, without cancelling its click.
+  - **The handle.** Function slots, content and children still receive one object for the component's lifetime, with `props`, `state`, `tabs`, `contents` and `setTab`, as `this` was. Nothing under UI Render reads it: the mapper's content and slots are bound `Render` calls, and `Render` ignores an object where its index goes.
+  - **A cost, measured.** A parent render now runs the body twice, because the state update that records the new props re-renders at once, as the documented pattern does. So function content and slots are called twice per parent render, where the class called them once. Under UI Render each call only creates an element.
+
+  **One behaviour changed, measured first and pinned.** A parent that followed a click by passing the tab back as `activeIndex` was told about it twice: `[1, 1]` under test on React 16, 17 and 18, with the items rebuilt as the mapper builds them. The class compared with the committed tab, which the timer's update had not reached when the parent's arrived in the same batch. Compared with the current state, the click is reported once. Under `<StrictMode>` the class also drew React's warning about `UNSAFE_componentWillReceiveProps`, and a test pins that there is none now.
+
+  Two tests read the class instance through a ref: `@withTimer`'s `timers` array, and `this` as the argument the slots receive. They now use the timer spies and the handle's identity, and both pass against the previous class. Ten tests are new. Two fail against the previous class, on the double report and the StrictMode warning, and eight pass against it:
+  - the last of two clicks wins;
+  - a controlled change with `transitionUpdate` drops a pending click and waits its own 50 ms;
+  - a controlled change applies at once, `transitionUpdate` or not, when the active tab is gone;
+  - resetting an uncontrolled index is not reported;
+  - a change of items during a click ends the faded state and keeps the click, controlled and uncontrolled;
+  - a tab the parent did not adopt goes back on the parent's next render;
+  - `setTab(index, false)` from function content switches at once and drops a pending click.
+
+  Eighteen mutations each fail at least one test. In the demo, clicks on Tabs, Tabs Buttoned and Tab List, and the controlled hidden tabs of Dynamic Layout, behave as they did with the class, with the same console output: one prop-type warning that predates this change, because Dynamic Layout's items have no `tab`.
 
   **A trap for the next five `@withTimer` leaves: `jest.getTimerCount()` is not a count of a component's timers.** The first version of these tests used it, and it passed on React 18 but failed on the React 16 and 17 legs: 2 where 1 was expected. The older scheduler keeps a fake timer of its own, pending or not depending on which test ran first, so the other count assertions had passed only because of test order.
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).

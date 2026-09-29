@@ -1,8 +1,9 @@
 /**
  * `useTimers`: the timers a function component owns, cleared when it unmounts (§9.3 step 6). It
- * replaces `@withTimer` component by component, so what that decorator guaranteed a class is what
- * these pin for the hook: timeouts run at their delay with their arguments, `clear()` cancels all of
- * them, and unmounting cancels whatever is still pending.
+ * replaced `@withTimer` component by component, until the decorator went with its last class, so
+ * what the decorator guaranteed a class is what these pin for the hook: timeouts run at their delay
+ * with their arguments, `clear()` cancels all of them, and unmounting cancels whatever is still
+ * pending.
  */
 import React from 'react'
 import { act, render } from '@testing-library/react'
