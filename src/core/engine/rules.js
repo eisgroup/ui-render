@@ -593,16 +593,24 @@ function Decorator (Class) {
             return this.setState(state => setIn(state, 'data.json', value))
         }
 
+        /**
+         * Built once for each state object, from that state. `{state.x}` names resolve and the
+         * handlers are composed when it is built, so a new state needs a new one. A render that
+         * brings no new state, such as a parent's render, reuses it: every node keeps its handlers,
+         * and a memoised component can skip its render. `rules.meta-cache.test.js` pins both. Until
+         * §9.3 step 6 an `UNSAFE_componentWillUpdate` dropped the cache whenever an update brought
+         * a new state; keying the cache on the state does the same without a lifecycle.
+         */
         get meta () {
-            if (this._meta != null) return this._meta
-            const transformedMeta = transformConfig(cloneDeep(get(this.state, 'meta.json')))
+            if (this._meta != null && this._metaState === this.state) return this._meta
+            const state = this.state
+            const transformedMeta = transformConfig(cloneDeep(get(state, 'meta.json')))
             // Pre-initialize state from data for Select/Dropdown fields,
             // so {state.xxx} interpolation resolves correctly on the first render
             initSelectStatesFromData(transformedMeta, this.data, this)
-            return this._meta = metaToProps(transformedMeta, this.config)
-        }
-        set meta (value) {
-            return this._meta = value
+            this._meta = metaToProps(transformedMeta, this.config)
+            this._metaState = state
+            return this._meta
         }
 
         get config () {
@@ -932,11 +940,6 @@ function Decorator (Class) {
             if (super.UNSAFE_componentWillMount) {
                 super.UNSAFE_componentWillMount(...arguments)
             }
-        }
-
-        UNSAFE_componentWillUpdate (nextProps, nextState) {
-            if (this.state !== nextState) this.meta = null // update changes by UI interactions (i.e. Dropdown onChange)
-            if (super.UNSAFE_componentWillUpdate) super.UNSAFE_componentWillUpdate(...arguments)
         }
 
         UNSAFE_componentWillReceiveProps (next, _) {
