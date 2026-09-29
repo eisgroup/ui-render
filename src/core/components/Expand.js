@@ -1,150 +1,165 @@
 import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
-import React, { PureComponent } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { isFunction } from '../utils'
 import AnimateHeight from './AnimateHeight'
 import Icon from './Icon'
 import { STYLE } from './styles'
 import Text from './Text'
-import { withTimer } from './utils'
 import View from './View'
 
 /**
- * Expandable Row - Pure Component.
+ * The state a change to `expand` moves to. Expanding shows the content at once; collapsing keeps it
+ * mounted (`changing`) until the animation is over. Each change is a new `change` object, which is
+ * what the effect reporting it runs on.
  */
-@withTimer
-export default class Expand extends PureComponent {
-  static propTypes = {
-    title: PropTypes.any, // string or component to always show
-    children: PropTypes.oneOfType([
-      PropTypes.func,  // function to render content when expanded, receives `id` if given
-      PropTypes.any,  // pre-rendered content (not recommended for performance reasons)
-    ]),
-    renderLabel: PropTypes.func, // function to render title
-    expanded: PropTypes.bool, // whether should render as expanded
-    active: PropTypes.bool, // whether to add `active` css class
-    justify: PropTypes.bool, // whether should render expand icon spread out from `title`
-    iconOpened: PropTypes.string, // name of icon for expanded state
-    iconClosed: PropTypes.string, // name of icon for collapsed state
-    onClick: PropTypes.func, // callback({expanded, key, value}) on click or Enter press (if `onKeyPress` not given)
-    id: PropTypes.oneOfType([  // argument to pass to 'onClick' callback as `key`
-      PropTypes.string,
-      PropTypes.number,
-    ]),
-    index: PropTypes.oneOfType([ // argument to pass to 'onClick' callback as `index`
-      PropTypes.string,
-      PropTypes.number,
-    ]),
-    duration: PropTypes.number, // milliseconds for the animation
-    className: PropTypes.string,
-    classNameLabel: PropTypes.string,
-    classNameItems: PropTypes.string,
-  }
+function toggled (state, expand) {
+  if (expand === state.expanded) return state
+  const change = {expanded: !!expand}
+  return expand
+    ? {...state, expanded: true, changing: false, change}
+    : {...state, expanded: false, changing: true, change}
+}
 
-  static defaultProps = {
-    duration: STYLE.ANIMATION_DURATION,
-    iconOpened: 'chevron-down',
-    iconClosed: 'chevron-right',
-  }
-
-  state = {
-    expanded: this.props.expanded,
+/**
+ * Expandable Row.
+ *
+ * A FUNCTION COMPONENT since §9.3 step 6, memoised like the `@withTimer` PureComponent it was. Its
+ * `UNSAFE_componentWillReceiveProps` compared two values, `children` and `expanded`, so a parent
+ * render with equal props had nothing to do.
+ *  - A changed `expanded` prop moves the state to it during render, where the lifecycle moved it.
+ *    `undefined` toggles, as the default argument of the class's `update()` did.
+ *  - What a change also does — report to `onClick`, and end a collapse after `duration` — happens in
+ *    an effect, a commit later, since render must not. The class did it in a `setState` callback.
+ *  - Function children are called once per `children`, with `id`, on the first render that shows
+ *    them, as the class's `content` getter cached them. StrictMode's development double render of
+ *    a mount calls them twice.
+ * Two things changed, and tests pin both:
+ *  - The lifecycle compared a changed `expanded` with the COMMITTED state. A parent that follows a
+ *    report by passing the new state back as `expanded`, as TableView's `handleItemExpand` and the
+ *    demo's Examples page do, was told about every expansion twice, and the demo pushed its URL onto
+ *    the history twice. Compared with the current state, it is told once.
+ *  - The next change cancels a pending collapse's timer. The class kept it, so collapsing, expanding
+ *    and collapsing again within `duration` unmounted the content before the second animation was
+ *    over.
+ */
+export function Expand (props) {
+  const {
+    id,
+    title,
+    onClick,
+    active,
+    duration = STYLE.ANIMATION_DURATION,
+    className,
+    classNameLabel,
+    classNameItems,
+    children,
+    expanded: expandedProp,
+    justify,
+    iconClosed = 'chevron-right',
+    iconOpened = 'chevron-down',
+    renderLabel,
+    ...rest
+  } = props
+  const [state, setState] = useState(() => ({
+    expanded: expandedProp,
     changing: false,
+    change: null,
+    seen: expandedProp,
+  }))
+  if (!Object.is(expandedProp, state.seen)) {
+    setState(current => ({
+      ...toggled(current, expandedProp === undefined ? !current.expanded : expandedProp),
+      seen: expandedProp,
+    }))
   }
 
-  get content () {
-    if (this._content) return this._content
-    const {children} = this.props
-    return (this._content = isFunction(children) ? children(this.props.id) : children)
+  // The effect below runs once per change, and reads what it reports, and the collapse's
+  // `duration`, from the latest render, as the class read `this.props`.
+  const latest = useRef(null)
+  latest.current = {
+    report: expanded => onClick && onClick({expanded, index: props.index, key: id, value: String(title)}),
+    duration,
   }
+  const {change} = state
+  useEffect(() => {
+    if (!change) return
+    latest.current.report(change.expanded)
+    if (change.expanded) return
+    const timer = setTimeout(() => setState(current => ({...current, changing: false})), latest.current.duration)
+    return () => clearTimeout(timer)
+  }, [change])
 
-  UNSAFE_componentWillReceiveProps (next) {
-    if (next.children !== this.props.children) this._content = null
-    if (next.expanded !== this.props.expanded) this.update(next.expanded)
-  }
+  const handleToggleExpand = useCallback(() => {
+    setState(current => toggled(current, !current.expanded))
+  }, [])
 
-  handleToggleExpand = () => {
-    this.update(!this.state.expanded)
-  }
+  const cache = useRef(null)
+  if (cache.current === null || cache.current.children !== children) cache.current = {children, content: null}
+  const {expanded, changing} = state
+  const hasContent = children != null
+  const content = hasContent && (expanded || changing) && (cache.current.content ||
+    (cache.current.content = isFunction(children) ? children(id) : children))
 
-  update = (expand = !this.state.expanded) => {
-    // New prop may match with current state
-    if (expand === this.state.expanded) return
-
-    // Expanding should be fast
-    if (expand) {
-      this.setState({expanded: false, changing: true}, () => {
-        this.handleClick(true)
-        this.setState({expanded: true, changing: false})
-      })
-    } else {
-      // Collapsing has to wait for Animation
-      this.setState({expanded: false, changing: true}, () => {
-        this.handleClick(false)
-        this.setTimeout(() => this.setState({changing: false}), this.props.duration)
-      })
-    }
-  }
-
-  handleClick = (expanded) => {
-    const {onClick, id, title, index} = this.props
-    onClick && onClick({expanded, index, key: id, value: String(title)})
-  }
-
-  renderLabel = () => {
-    const {title, renderLabel, justify = false, iconOpened, iconClosed, classNameLabel} = this.props
-    if (title == null && !renderLabel) return null
-    const {expanded} = this.state
-    const hasContent = true // children != null // allow expanding remote children
+  let label = null
+  if (title != null || renderLabel) {
     const Title = renderLabel ? renderLabel(title) : title
-    return (
+    label = (
+      // The label toggles with no children too: the content can be rendered elsewhere, as
+      // TableView renders a row's.
       <Text
         className={classNames('row fill-width middle padding-small', {justify}, classNameLabel)}
-        onClick={hasContent && this.handleToggleExpand}
+        onClick={handleToggleExpand}
       >
         {justify && Title}
-        {hasContent && iconOpened && iconClosed &&
+        {iconOpened && iconClosed &&
         <Icon name={(expanded ? iconOpened : iconClosed) + ' spin-90-deg' + (expanded ? '' : '-')}/>}
         {!justify && Title}
       </Text>
     )
   }
-
-  render () {
-    const {
-      id,
-      title,
-      onClick,
-      active,
-      duration,
-      className,
-      classNameLabel,
-      classNameItems,
-      children,
-      expanded: _,
-      justify: __,
-      iconClosed: ___,
-      iconOpened: ____,
-      renderLabel: _____,
-      ...props
-    } = this.props
-    const {expanded, changing} = this.state
-    const hasContent = children != null
-    const content = hasContent && (expanded || changing) && this.content
-    return (
-      // `id` is optional in meta, and String(undefined) is the string "undefined" -- which used to
-      // be emitted as a real attribute, duplicated across every Expand without an id, so a
-      // `<label for>` could only ever resolve to the first one.
-      <View className={classNames('app__expand', className, {expanded, active})}
-            id={id == null ? undefined : String(id)} {...props}>
-        {this.renderLabel()}
-        {hasContent &&
-        <AnimateHeight expanded={expanded} duration={duration}
-                       className={classNames('expand__content', classNameItems)}>
-          {content}
-        </AnimateHeight>
-        }
-      </View>
-    )
-  }
+  return (
+    // `id` is optional in meta, and String(undefined) is the string "undefined" -- which used to
+    // be emitted as a real attribute, duplicated across every Expand without an id, so a
+    // `<label for>` could only ever resolve to the first one.
+    <View className={classNames('app__expand', className, {expanded, active})}
+          id={id == null ? undefined : String(id)} {...rest}>
+      {label}
+      {hasContent &&
+      <AnimateHeight expanded={expanded} duration={duration}
+                     className={classNames('expand__content', classNameItems)}>
+        {content}
+      </AnimateHeight>
+      }
+    </View>
+  )
 }
+
+Expand.propTypes = {
+  title: PropTypes.any, // string or component to always show
+  children: PropTypes.oneOfType([
+    PropTypes.func,  // function to render content when expanded, receives `id` if given
+    PropTypes.any,  // pre-rendered content (not recommended for performance reasons)
+  ]),
+  renderLabel: PropTypes.func, // function to render title
+  expanded: PropTypes.bool, // whether should render as expanded
+  active: PropTypes.bool, // whether to add `active` css class
+  justify: PropTypes.bool, // whether should render expand icon spread out from `title`
+  iconOpened: PropTypes.string, // name of icon for expanded state
+  iconClosed: PropTypes.string, // name of icon for collapsed state
+  onClick: PropTypes.func, // callback({expanded, key, value}) on click or Enter press (if `onKeyPress` not given)
+  id: PropTypes.oneOfType([  // argument to pass to 'onClick' callback as `key`
+    PropTypes.string,
+    PropTypes.number,
+  ]),
+  index: PropTypes.oneOfType([ // argument to pass to 'onClick' callback as `index`
+    PropTypes.string,
+    PropTypes.number,
+  ]),
+  duration: PropTypes.number, // milliseconds for the animation
+  className: PropTypes.string,
+  classNameLabel: PropTypes.string,
+  classNameItems: PropTypes.string,
+}
+
+export default React.memo(Expand)

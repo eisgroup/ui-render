@@ -588,7 +588,28 @@ Every workstream below is a series of small, independently shippable, reversible
 
   Eight mutations each fail at least one test.
 
-  **Found while measuring, and left for its own change.** The demo's `NavTabs` navigates on every report, including the report of a change that came from the URL itself. So a Back that changes the tab pushes a new entry and discards the Forward history: once now, twice with the class. With the class, the first Back only landed on the duplicate entry, so the tab did not change. The fix belongs in `NavTabs`, which should navigate only when the path differs.
+  **Found while measuring, and fixed in its own change (#111).** The demo's `NavTabs` navigated on every report, including the report of a change that came from the URL itself. So a Back that changed the tab pushed a new entry and discarded the Forward history: once with the function, twice with the class. With the class, the first Back only landed on the duplicate entry, so the tab did not change. `NavTabs` now navigates only when the path differs, and `NavTabs.history.test.js` counts the pushes.
+
+  **`Expand` converted 2026-09-28**, the sixth leaf and the fifth of the six `@withTimer` classes. Only the engine's `Tabs` is still on the decorator.
+  - **Memoised,** like the `PureComponent` it was. Its lifecycle compared two values, `children` and `expanded`, so a parent render with equal props had nothing to do.
+  - **A changed `expanded`** moves the state during render. `undefined` toggles, as the default argument of the class's `update()` did. `undefined` and `false` stay different values, so a first `expanded={false}` is a collapse.
+  - **The report to `onClick`, and the timer that ends a collapse,** run in an effect keyed on the change, a commit later. The class ran them in a `setState` callback. The effect's cleanup cancels the timer when the next change comes or the component unmounts. It is the component's only timer and belongs to that effect, so, like ProgressBar, it needs no `useTimers`.
+  - **Expanding is one commit, not two.** The class first committed the content collapsed and then expanded it from the `setState` callback, in the same task, so the browser never painted the first commit. Measured in the demo: both of the class's commits reach one `MutationObserver` callback, before the next animation frame, with the same five DOM mutations as the function's single commit.
+  - **Lazy children** are called once per `children`, on the first render that shows them, as the class's `content` getter cached them. One exception, measured on all three legs: under `<StrictMode>` in development, an `Expand` that mounts expanded calls them twice. React renders a function component's mount twice with fresh hooks, while the class's second render reused the instance and its cache. That matters only to a `children` function with side effects, which is what StrictMode is there to expose.
+
+  **Two behaviours changed, both measured first and pinned.**
+  - **A parent that follows the report.** The lifecycle compared a changed `expanded` with the committed state. So when a parent followed a report by passing the new state back as `expanded`, the class expanded a second time and reported again: `[true, true]` under test on React 16, 17 and 18, the real TableView's `handleItemExpand` included. The demo's Examples page is such a parent. In the running demo, every example opened pushed its URL onto the history twice: four entries for two examples, against two now. Compared with the current state, an expansion is reported once.
+  - **The next change cancels a pending collapse.** The class kept every collapse's timer, so collapsing, expanding and collapsing again within `duration` unmounted the content when the first timer fired. In the demo that was about 200 ms into the second collapse's 500 ms animation. The content now stays until the second animation is over.
+
+  The 14 suites that render an `Expand`, 203 tests, pass unchanged on all three legs. Two new tests pin the two changes and fail against the previous class. Six more pin behaviour the old suite left open, and all six pass against the previous class:
+  - a controlled `expanded` going back to `undefined` toggles;
+  - a first `expanded={false}` is a collapse;
+  - lazy children are called once across collapsing and expanding again;
+  - each change is reported once under `<StrictMode>`;
+  - only a collapse starts a timer, and unmounting cancels it;
+  - a parent render with equal props does not render it again.
+
+  Twelve mutations each fail at least one test. The last test exists because of one of them: dropping `React.memo` failed nothing until it was written.
 
   **A trap for the next five `@withTimer` leaves: `jest.getTimerCount()` is not a count of a component's timers.** The first version of these tests used it, and it passed on React 18 but failed on the React 16 and 17 legs: 2 where 1 was expected. The older scheduler keeps a fake timer of its own, pending or not depending on which test ran first, so the other count assertions had passed only because of test order.
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
