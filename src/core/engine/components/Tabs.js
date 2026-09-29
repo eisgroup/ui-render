@@ -171,7 +171,8 @@ export default function Tabs (props) {
 
 Tabs.propTypes = {
   items: type.ListOf(type.Of({
-    // Tab Title - clickable buttons
+    // Tab Title - clickable buttons. Optional: tabs hidden with `classNameTabs` and driven by
+    // `activeIndex` need none (the demo's Dynamic Layout), and meta.schema.json does not require one.
     tab: type.OneOf(
       type.String,
       type.Number,
@@ -180,7 +181,7 @@ Tabs.propTypes = {
         text: PropTypes.string.isRequired,
         icon: PropTypes.string,
       })
-    ).isRequired,
+    ),
     // Tab Content
     content: type.Any.isRequired,
   })).isRequired,
