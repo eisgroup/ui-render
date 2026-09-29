@@ -1,7 +1,8 @@
 import React from 'react'
-import { fireEvent, render } from '@testing-library/react'
+import { act, fireEvent, render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import InputNative from '../InputNative'
+import * as domProps from '../domProps'
 
 describe('InputNative lifecycle contracts', () => {
     it('sizes a compact input on mount and exposes the mounted element', () => {
@@ -90,6 +91,98 @@ describe('InputNative lifecycle contracts', () => {
         expect(textarea).toHaveAttribute('rows', '4')
         fireEvent.keyUp(textarea, { key: 'a', code: 'KeyA' })
         expect(onKeyUp).toHaveBeenCalledTimes(1)
+    })
+
+    it('calls onMount once, however often the input renders', () => {
+        // The ref callbacks keep one identity; a new one on every render would run on every render.
+        const onMount = jest.fn()
+        const { rerender } = render(<InputNative name="a" compact value="AB" onMount={onMount} onChange={() => {}} />)
+        rerender(<InputNative name="a" compact value="ABC" onMount={onMount} onChange={() => {}} />)
+        rerender(<InputNative name="a" compact={3} value="ABC" onMount={onMount} onChange={() => {}} />)
+
+        expect(onMount).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not render again for a parent render with equal props', () => {
+        // Counted through the DOM boundary filter, which every render of it runs once.
+        const onChange = () => {}
+        let rerenderParent
+        const Parent = () => {
+            const [, setCount] = React.useState(0)
+            rerenderParent = () => setCount(count => count + 1)
+            return <InputNative name="e" value="x" onChange={onChange} />
+        }
+        const filter = jest.spyOn(domProps, 'omitProps')
+        try {
+            render(<Parent />)
+            const renders = filter.mock.calls.length
+            act(() => rerenderParent())
+            expect(filter.mock.calls.length).toBe(renders)
+        } finally {
+            filter.mockRestore()
+        }
+    })
+
+    it('resizes a compact input as it is typed into and its parent echoes the value', () => {
+        const Parent = () => {
+            const [value, setValue] = React.useState('A')
+            return <InputNative name="typed" compact value={value} onChange={next => setValue(next)} />
+        }
+        const { container } = render(<Parent />)
+        const input = container.querySelector('input')
+        expect(input).toHaveStyle({ width: '2ch' })
+
+        fireEvent.change(input, { target: { value: 'ABCDE' } })
+        expect(input).toHaveStyle({ width: '6ch' })
+    })
+
+    it('sizes an uncontrolled compact input to what was typed when only the offset changes', () => {
+        const { container, rerender } = render(<InputNative name="free" compact={1} defaultValue="AB" />)
+        const input = container.querySelector('input')
+        fireEvent.change(input, { target: { value: 'ABCDE' } })
+
+        rerender(<InputNative name="free" compact={3} defaultValue="AB" />)
+        expect(input).toHaveStyle({ width: '8ch' })
+    })
+
+    it('keeps the picked background of an uncontrolled color input across renders', () => {
+        const { container, rerender } = render(
+            <InputNative name="picked" type="color" defaultValue="#123456" onChange={() => {}} />
+        )
+        const input = container.querySelector('input')
+        fireEvent.change(input, { target: { value: '#654321' } })
+
+        rerender(<InputNative name="picked" type="color" defaultValue="#123456" onChange={() => {}} className="again" />)
+        expect(input).toHaveStyle({ backgroundColor: '#654321' })
+    })
+
+    it('colors an input that becomes a color input after it mounted', () => {
+        const { container, rerender } = render(<InputNative name="later" value="#0000ff" onChange={() => {}} />)
+
+        rerender(<InputNative name="later" type="color" value="#0000ff" onChange={() => {}} />)
+        expect(container.querySelector('input')).toHaveStyle({ backgroundColor: '#0000ff' })
+    })
+
+    it('reports a change through the onChange of the latest render', () => {
+        const first = jest.fn()
+        const second = jest.fn()
+        const { container, rerender } = render(<InputNative name="latest" onChange={first} />)
+        rerender(<InputNative name="latest" onChange={second} />)
+
+        fireEvent.change(container.querySelector('input'), { target: { value: 'typed' } })
+        expect(first).not.toHaveBeenCalled()
+        expect(second).toHaveBeenCalledWith('typed', 'latest', expect.anything())
+    })
+
+    it('renders under StrictMode without a warning', () => {
+        // The class drew React's StrictMode warning about `UNSAFE_componentWillReceiveProps`.
+        const errors = jest.spyOn(console, 'error').mockImplementation(() => {})
+        try {
+            render(<React.StrictMode><InputNative name="strict" compact value="AB" onChange={() => {}} /></React.StrictMode>)
+            expect(errors).not.toHaveBeenCalled()
+        } finally {
+            errors.mockRestore()
+        }
     })
 
     it('does not forward form-only initialValues to the native element', () => {
