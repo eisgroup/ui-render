@@ -749,7 +749,7 @@ Every workstream below is a series of small, independently shippable, reversible
   **The order.** Each slice ships and is measured like a leaf:
   1. **Tests first.** An instance-contract test pins the members above, against the current classes, with no change in `src`. **DONE 2026-09-29**, with one refinement of this item, described below it.
   2. **Definition 3** becomes the `meta` cache keyed on the state object. **DONE 2026-09-29.**
-  3. **Definition 2** moves to the constructor and `componentDidMount`.
+  3. **Definition 2** moves to the constructor and `componentDidMount`. **DONE 2026-09-29.**
   4. **Definitions 1 and 4 merge into one**, which is what they already are in effect.
   5. **`WithForm` becomes a function component**, taking definition 6.
   6. **The document becomes a function component**, taking 1 with 4 and 5, and the instance object with them.
@@ -789,6 +789,19 @@ Every workstream below is a series of small, independently shippable, reversible
     - A probe counted `metaToProps` calls for every example in the corpus, through four steps: mount, a parent's render, two keystrokes, and a click on the first button. The counts are identical before and after: 91, 13, 21 and 28 in total.
     - In the running demo, three things behave identically, with the same console output: the cascading Select, adding and removing lines in the nested table, and editing a phase title.
   - **Left as it is: `setStates` still clears the cache before its update.** With the key, that is redundant for the next render. But `rules.set-state-path` pins it, and the form layer's `componentWillReceiveProps` reads `_meta` directly for its error pass. It goes in slice 6, with the structural half of that file.
+
+  **Slice 3: the mount, DONE 2026-09-29.** Definition 2, the engine layer's `UNSAFE_componentWillMount`, did two things before the first render. Both moved, and the engine has 7 `UNSAFE_*` lines left.
+  - **`submit` is a class field**, so it exists from the constructor on. The first render builds the meta, and the meta's `submit` action is built from `submit` then. Assigning `submit` after the mount instead leaves that handler as the string `'submit'`, which React rejects as an `onClick` listener.
+  - **The registration with the parent is in `componentDidMount`.** That is still in the commit, before any mount effect runs. A nested document's fields validate in react-final-form's mount effects, and a cross-row validator reads the scope the registration sets. Deferring the registration past those effects leaves the fields validating with no scope.
+  - **`rules.mount-order.test.js` adds three tests:**
+    - the registration is in place when the fields validate on mount, checked through a validator reached by `verify`, as `notWithinRange` is;
+    - a meta `submit` action works from the first render;
+    - under StrictMode, React reports no `componentWillMount`.
+
+    The first two pass against the class, and each fails under the mutation above it is for. The third fails against the class, on React 16, 17 and 18.
+  - **Measured unchanged.**
+    - A probe recorded every example's registry through mount and unmount: the order of registrations and unregistrations, each document's registry and scope, and `getDataKind` for each kind. The two examples with nested documents, `nestedDataKind` and `tableForm`, are identical before and after, and both registries are empty after unmount.
+    - In the running demo, adding, removing and editing rows in the nested table behave identically, with the same console output.
 
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 
