@@ -16,23 +16,14 @@
  * call, not engine state, and splitting them from the decision that produces them would leave two
  * places to keep in step.
  *
+ * The `popup` action's arguments arrive the same way, so what it shows is decided here too, by
+ * `parsePopupAlertArgs` at the end of the module.
+ *
  * @param {Array} args - everything the action was called with, caller's arguments first
  * @returns {?{id: String, options: Object}} the popup to open, or null when the call is unusable
  */
 export function parsePopupArgs (args) {
-    // Filter out event objects (React SyntheticEvent or native Event)
-    const filteredArgs = args.filter(arg => {
-        // React component classes are functions, so check them before the generic primitive branch.
-        if (arg && arg.prototype && arg.prototype.isReactComponent) {
-            return false
-        }
-        if (typeof arg !== 'object' || arg === null) return true
-        // Check if it's an event object
-        if (arg.nativeEvent || arg.target || arg.preventDefault || arg.stopPropagation) {
-            return false
-        }
-        return true
-    })
+    const filteredArgs = args.filter(arg => !isCallerArgument(arg))
 
     // Handle different argument formats: [id, options] or [id] or [options with id]
     let id
@@ -61,4 +52,40 @@ export function parsePopupArgs (args) {
     }
 
     return { id, options }
+}
+
+/**
+ * Whether an argument is one a CALLER prepends, never one a meta author writes: an event (React's
+ * SyntheticEvent or a native one), or a React component class. Both popup actions drop them.
+ *
+ * @param {*} arg - one argument an action was called with
+ * @returns {Boolean} true for an event or a component class
+ */
+export function isCallerArgument (arg) {
+    // React component classes are functions, so check them before the generic primitive branch.
+    if (arg && arg.prototype && arg.prototype.isReactComponent) return true
+    if (typeof arg !== 'object' || arg === null) return false
+    return Boolean(arg.nativeEvent || arg.target || arg.preventDefault || arg.stopPropagation)
+}
+
+/**
+ * WHAT A `popup` ACTION SHOWS: the title and the content it hands `popupAlert`.
+ *
+ * Its arguments arrive as `popupOpen`'s do, the caller's first. For a `Button` that is its click
+ * event, which is dropped here: an event is not something to show, and as a title it is not even a
+ * valid React child. In an action chain it is the previous step's result, as in the `fetch` chain
+ * that `src/demo/markdowns/config.md` documents: `onDone: {name: 'popup', args: ['…']}`.
+ *
+ * Of what is left, a first argument that is text is the title and the second is the content, so
+ * `'popup,Saved,All changes are stored'` reads as it is written. A first argument that is not
+ * text cannot be a title, so it is the content, a chain step's result, and the text after it, if
+ * any, is the title.
+ *
+ * @param {Array} args - everything the action was called with, caller's arguments first
+ * @returns {{title: *, content: *}} the title and the content to show
+ */
+export function parsePopupAlertArgs (args) {
+    const [first, second] = args.filter(arg => !isCallerArgument(arg))
+    if (typeof first === 'string') return { title: first, content: second }
+    return { title: typeof second === 'string' ? second : undefined, content: first }
 }
