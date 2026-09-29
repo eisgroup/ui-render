@@ -522,7 +522,7 @@ Every workstream below is a series of small, independently shippable, reversible
   The two suites that applied the mixin to bare classes now run the same assertions on the engine layer's prototype; `withDataKind.test.js` became `rules.data-kind-registry.test.js`. The same probe as for `withFormSetup` found the chain, every level's own members and every body unchanged. The one difference is that the four methods are no longer enumerable, so a `for…in` over an instance no longer lists them, only `setState`, `forceUpdate`, `isReactComponent` and `state`. Nothing in `src` enumerates an instance or a prototype. `rules.lifecycle-layer.test.js` now pins that every member of both layers is written in its class body, `state` excepted; it fails on the previous code and names the four.
 
   **What is left of the pattern in `src`** is outside the engine. `@withTimer` (`components/utils/hocs.js`), on seven components, still assigns three methods onto the class it decorates and replaces its `componentWillUnmount` with a wrapper that calls a captured copy. It is the genuine shared HOC the shape note above names, and it cleans up correctly. It went in step 6, with the last class it decorated.
-6. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired. **STARTED 2026-09-28, leaf components first.**
+6. **Hooks form (final state):** lifecycle logic as hooks (`useUIRenderData`, `useFormIntegration`), classes retired. **STARTED 2026-09-28, leaf components first. All nine leaves converted by 2026-09-29.** The engine's six definitions are what is left: 12 `UNSAFE_*` lines, their `super` calls included, in `rules.js` and `form/utils.js`, measured after the last leaf.
 
   **Measured before starting.** There are 21 `UNSAFE_*` lines in 11 files. §7's table said 26 in 12 on 2026-09-17; step 5 moved the engine's into class members but did not remove them.
   - **Engine:** six real definitions: `UIRender`'s `componentWillReceiveProps`; the engine layer's `componentWillMount`, `componentWillUpdate` and `componentWillReceiveProps`; and `componentWillReceiveProps` in both `WithForm` and the form layer. The remaining engine lines are their `super` calls.
@@ -651,6 +651,22 @@ Every workstream below is a series of small, independently shippable, reversible
   That last one is **a candidate defect, pinned rather than fixed**: `activePage` is never brought back into range. Fourteen mutations each fail at least one test.
 
   **Found while measuring, and left for their own changes.** Every header without a sort passes `onClick={false}` to its `Row`, which React reports as a listener that is not a function: six warnings in "All Possible Configurations", with the class and the function alike. The same example also warns that `InputNumber` receives a boolean `error` where it expects a string.
+
+  **`InputNative` converted 2026-09-29**, the ninth and last leaf, and the only one in TypeScript. It is `React.memo` of a function, like the `PureComponent` it was: its lifecycle compared `value` and `compact` with the previous props.
+  - **The resize moved from before the render to after the commit.** The lifecycle resized a compact input during the render phase: to a changed value, or to what the input held when only `compact` changed. That now happens in a layout effect, which React runs after the DOM is updated and before the browser paints. The same effect takes over what render itself did to the DOM, where a controlled color input took a changed value as its background.
+  - **On the server it is a plain effect,** chosen once, when the module loads, by whether there is a `window`. With a layout effect there, a server render warns "useLayoutEffect does nothing on the server" once for every input, on React 16, 17 and 18.3 alike (measured by a mutation that used it). A host that server-renders a form would get that for every field. A test renders on the server, in a Node environment, and asserts no console error.
+  - **The ref callbacks keep one identity**, as the class's instance fields did. A new callback on every render would be called on every render, resizing again and calling `onMount` again.
+
+  **Nothing else changed.** It was measured against the class on React 16, 17 and 18, and is the same in all of these:
+  - the widths and backgrounds across value, offset and type changes;
+  - one `onMount`;
+  - no render for a parent render with equal props.
+
+  The class's StrictMode warning about `UNSAFE_componentWillReceiveProps` is gone. In the demo, typing into the Input and Integer examples and toggling the checkboxes behave the same with either version, with the same console output. No example renders a compact or a color input.
+
+  Eight lifecycle tests and the server test are new. Only the StrictMode test fails against the previous class; the others pass against it. Of nine mutations, eight each fail at least one test. The ninth, a plain effect in the browser as well, passes everything, because jsdom does not paint. The before-paint timing rests on React's contract for layout effects, not on a test.
+
+  **That was the last leaf.** No component outside the engine has an `UNSAFE_*` lifecycle left, and the next item is the engine's design pass (the order above).
 
   **A trap for the next five `@withTimer` leaves: `jest.getTimerCount()` is not a count of a component's timers.** The first version of these tests used it, and it passed on React 18 but failed on the React 16 and 17 legs: 2 where 1 was expected. The older scheduler keeps a fake timer of its own, pending or not depending on which test ran first, so the other count assertions had passed only because of test order.
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
