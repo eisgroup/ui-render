@@ -108,7 +108,7 @@ CSS contract: `src/style/components/table.less` hangs EVERY cell's padding off `
 
 **Passthrough.** `style`, `colSpan`, `scope`, `id`, `data-*` and every event handler still reach the element untouched — they always did, because Semantic did not handle them either, so they ride the rest spread exactly as before. There is no `forwardRef`: nothing in `src` passes a ref to a table element, so the parameter would have had no caller.
 
-**Dropped (4) — the semver record.** Props semantic-ui-react handled that this implementation deliberately does not. All of them remain REACHABLE from a consumer meta: the component is rendered with open spreads (`...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)`, `...rest`), so an attribute nobody anticipated on a meta node still arrives here as a prop. That is why the component strips them explicitly and warns once per prop in development. Stripping matters because the value would otherwise reach a real element as an attribute — a string-valued one lands lowercase (`verticalAlign="top"` rendered `verticalalign="top"`) and a boolean draws React's "Received `true` for a non-boolean attribute" warning, both of them junk the DOM contract's tripwires exist to keep out. Warning matters because a meta still carrying one would otherwise never learn it stopped working, and React's own unknown-prop warning cannot be relied on: it is silent for a lowercase name.
+**Dropped (4) — the semver record.** Props semantic-ui-react handled that this implementation deliberately does not. All of them remain REACHABLE from a consumer meta: the component is rendered with open spreads (`...omitProps(rest, ENGINE_PROPS, FIELD_ONLY_PROPS)`, `...rest`), so an attribute nobody anticipated on a meta node still arrives here as a prop. That is why the component strips them explicitly and warns once per prop in development. Stripping matters because the value would otherwise reach a real element as an attribute — a string-valued one lands lowercase (`verticalAlign="top"` rendered `verticalalign="top"`) and a boolean draws React's "Received `true` for a non-boolean attribute" warning, both of them junk the DOM contract's tripwires exist to keep out. Warning matters because a meta still carrying one would otherwise never learn it stopped working, and React's own unknown-prop warning cannot be relied on: it is silent for a lowercase name.
 
 | Prop | Why it is gone |
 | --- | --- |
@@ -123,7 +123,7 @@ Those four were the *published* ones — they had curated entries on this page w
 
 | Component | Attributes at the call sites | Spreads | Rendered by |
 | --- | --- | --- | --- |
-| `Table` | `className` | `...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)` | `core/engine/components/TableView.js` |
+| `Table` | `className` | `...omitProps(rest, ENGINE_PROPS, FIELD_ONLY_PROPS)` | `core/engine/components/TableView.js` |
 | `Table.Header` | `className` | — | `core/engine/components/TableView.js` |
 | `Table.HeaderCell` | `className`, `colSpan`, `key`, `style` | — | `core/engine/components/TableView.js` |
 | `Table.Row` | `className`, `key` | — | `core/engine/components/TableView.js` |
