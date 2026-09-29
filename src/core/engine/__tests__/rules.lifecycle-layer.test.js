@@ -59,7 +59,13 @@ const FORM_MEMBERS = [
     'handleChangeInput',
     'syncInputChanges',
 ]
-/** The engine layer's own lifecycle methods that `withFormSetup` used to replace with wrappers. */
+/**
+ * The lifecycle methods `withFormSetup` used to replace with wrappers. The engine layer still has a
+ * `componentWillUnmount` of its own. Since §9.3 step 6 its `UNSAFE_componentWillReceiveProps` is the
+ * declared class's, which the form layer reaches through `super` all the same. What that call
+ * carries is pinned by behaviour: the prop-change tests in `UIRender.smoke` and
+ * `rules.instance-contract` fail when the form layer drops it.
+ */
 const WRAPPED_LIFECYCLE = ['UNSAFE_componentWillReceiveProps', 'componentWillUnmount']
 
 // What nested documents render, and the class it is built on.
@@ -127,9 +133,11 @@ describe('the form layer is a class of its own over it', () => {
     it('wraps the engine layer\'s lifecycle through `super` instead of replacing it', () => {
         for (const name of WRAPPED_LIFECYCLE) {
             expect(Object.prototype.hasOwnProperty.call(FormLayer.prototype, name)).toBe(true)
-            expect(Object.prototype.hasOwnProperty.call(EngineLayer.prototype, name)).toBe(true)
+            expect(typeof EngineLayer.prototype[name]).toBe('function')
             expect(FormLayer.prototype[name]).not.toBe(EngineLayer.prototype[name])
         }
+        expect(Object.prototype.hasOwnProperty.call(EngineLayer.prototype, 'componentWillUnmount')).toBe(true)
+        expect(EngineLayer.prototype.UNSAFE_componentWillReceiveProps).toBe(UIRender.prototype.UNSAFE_componentWillReceiveProps)
     })
 
     it('builds its state shape and prop types from the engine layer\'s, leaving those as they were', () => {
