@@ -29,10 +29,6 @@
     // so the checker and the compiler agree about what the code means.
     "isolatedModules": true,
 
-    // Matches the legacy `@babel/plugin-proposal-decorators` in babel.config.js. Retires with the
-    // decorator call sites themselves, under §9.2/§9.3.
-    "experimentalDecorators": true,
-
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true

@@ -18,6 +18,5 @@ module.exports = {
         // which would be papering over a real mismatch, not resolving it.
         "@babel/preset-typescript",
     ],
-    plugins: [["@babel/plugin-proposal-decorators", { "legacy": true }]],
     ...(isTest ? {} : { include: ['src'] }),
 };
