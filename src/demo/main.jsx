@@ -14,10 +14,16 @@ const baseName = process.env.REACT_APP_BASE_NAME || '/'
 // unmounts and mounts again, which is what surfaces a lifecycle that is not safe for concurrent
 // rendering. `examples.strict-mode.test.js` pins that the corpus renders and behaves the same with
 // it and without it.
+//
+// `useTransitions={false}` keeps the location update synchronous, as it was on React Router 6.
+// Version 7 wraps it in `startTransition` by default, so after a click the tabs were still given the
+// previous location's tab for a render. `StandaloneTabs` reported that tab as a change, and by then
+// the location had moved, so `NavTabs` navigated back to it: `NavTabs.history.test.js` counts the
+// extra history entry.
 createRoot(document.getElementById('ui-render')).render(
     <React.StrictMode>
         <AppProvider>
-            <BrowserRouter basename={baseName}>
+            <BrowserRouter basename={baseName} useTransitions={false}>
                 <App />
             </BrowserRouter>
         </AppProvider>

@@ -15,7 +15,7 @@
 import React from 'react'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { BrowserRouter } from 'react-router-dom'
+import { TextDecoder, TextEncoder } from 'util'
 import { ConfigContext, initialConfigState } from '../../../core/contexts/ConfigContext'
 
 jest.mock('../../markdowns/changelog.md', () => 'changelog.md')
@@ -32,6 +32,7 @@ jest.mock('remark-gfm', () => () => undefined)
 jest.mock('react-syntax-highlighter', () => ({ Prism: () => null }))
 jest.mock('react-syntax-highlighter/dist/esm/styles/prism', () => ({ oneLight: {} }))
 
+let BrowserRouter
 let NavTabs
 let pushState
 let originalFetch
@@ -39,6 +40,10 @@ let originalFetch
 beforeAll(() => {
     // NavTabs reads webpack's public path at module scope, so it is required once the global exists.
     global.__webpack_public_path__ = '/'
+    // React Router 7 reads `TextEncoder` when its module loads, and jsdom provides none. Node's pair
+    // is installed here, for the one suite that loads the router, rather than for every suite.
+    if (typeof global.TextEncoder === 'undefined') Object.assign(global, { TextDecoder, TextEncoder })
+    BrowserRouter = require('react-router-dom').BrowserRouter
     NavTabs = require('../NavTabs').default
 })
 
@@ -68,10 +73,11 @@ const settle = async () => {
     await act(() => wait(100))
     await act(() => wait(100))
 }
-// The demo's AppProvider supplies the config the rendered components read.
+// The demo's AppProvider supplies the config the rendered components read. The router is mounted
+// as `src/demo/main.jsx` mounts it, without transitions: that entry says why.
 const renderNavTabs = () => render(
     <ConfigContext.Provider value={initialConfigState}>
-        <BrowserRouter><NavTabs/></BrowserRouter>
+        <BrowserRouter useTransitions={false}><NavTabs/></BrowserRouter>
     </ConfigContext.Provider>
 )
 

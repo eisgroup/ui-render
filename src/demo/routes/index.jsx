@@ -10,7 +10,7 @@ const Routes = () => {
               Unlisted on purpose — deliberately absent from `NavTabs`'s tab list, so the published
               demo does not grow a page that only makes sense next to a spec file. It exists for
               e2e/harness.tooltip.pw.js (docs/UPGRADE-PLAN.md §9.5); the file header explains why the
-              corpus cannot produce the geometry it captures. React Router v6 ranks routes by
+              corpus cannot produce the geometry it captures. React Router (6 and 7) ranks routes by
               specificity rather than by order, so the `*` fallback below still catches everything
               else regardless of where this sits.
             */}
