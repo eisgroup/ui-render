@@ -99,8 +99,9 @@ export default {
                 //
                 // Measured rather than theorised, after it cost an afternoon: with a watcher running,
                 // `css.semantic-parity.test.js` emptied `static/` on every run (6 files -> 0),
-                // because that suite writes `override/_semantic.less` to measure what the imports
+                // because that suite wrote `override/_semantic.less` to measure what the imports
                 // contribute — a source change, so the watcher rebuilt, so the directory was wiped.
+                // (It measures in memory since 2026-09-30; any source edit still reopens the window.)
                 // Three tests in `css.pipeline.parity.test.js` then failed on a file that had existed
                 // moments earlier. The failure looks nothing like its cause: no `fs` probe inside jest
                 // ever fires, because the deletion is in another process.

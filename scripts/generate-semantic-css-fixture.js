@@ -14,6 +14,7 @@
  *
  * HOW THE SET IS DERIVED. Not by listing selectors by hand — by compiling the stylesheet twice,
  * once as it is and once with `_semantic.less`'s imports commented out, and taking the difference.
+ * The commenting out happens in memory, for that one compile (`substituting` below says why).
  * That is the same technique the first half of step 4 used to prove three modules were unused, and
  * it means the fixture cannot drift from what the imports actually contribute.
  *
@@ -28,7 +29,7 @@ const fs = require('fs');
 const path = require('path');
 
 const postcss = require('postcss');
-const { lessOptions, less } = require('./less-options.js');
+const { lessOptions, plugins, less } = require('./less-options.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const STYLE_DIR = path.join(ROOT, 'src/style');
@@ -54,19 +55,47 @@ const WRITE_COMMAND = 'npm run css:fixture';
  */
 const LIVE_IMPORT = /^\s*&\s*\{\s*@import\s+(?:\([^)]*\)\s*)?"/;
 
+/**
+ * A LESS plugin that gives ONE compile `source` as the text of `filename`, which stays untouched.
+ *
+ * WHY IN MEMORY. The edited `_semantic.less` used to be written over the real file for the length
+ * of the compile, and the original put back in a `finally`. The content always came back, but the
+ * window was visible to every other process. Jest runs the CSS suites in parallel workers, and a
+ * sibling that compiled `index.less` inside the window read the edited file and lost everything the
+ * imports bring: `css.compilation.test.js` failed with "Missing 1 classes: item" in 4 of 40 full
+ * runs, and passed on every rerun and on its own. The same write made a `webpack --watch`
+ * rebuild (`css.pipeline.parity.test.js` tells that half), and a run killed inside the window would
+ * have left the source edited. A preprocessor sees each file's text as LESS parses it, so the edit
+ * reaches this compile and nothing else.
+ */
+function substituting (filename, source) {
+    const substitution = { applied: false };
+    substitution.plugin = {
+        install (_less, pluginManager) {
+            pluginManager.addPreProcessor({
+                process (contents, { fileInfo }) {
+                    if (path.resolve(fileInfo.filename) !== filename) return contents;
+                    substitution.applied = true;
+                    return source;
+                },
+            }, 1);
+        },
+    };
+    return substitution;
+}
+
 async function compile (semanticSource) {
-    const original = fs.readFileSync(SEMANTIC, 'utf8');
-    if (semanticSource !== null) fs.writeFileSync(SEMANTIC, semanticSource);
-    try {
-        const result = await less.render(fs.readFileSync(ENTRY, 'utf8'), {
-            filename: ENTRY,
-            paths: [STYLE_DIR, path.join(ROOT, 'node_modules')],
-            ...lessOptions(),
-        });
-        return result.css;
-    } finally {
-        if (semanticSource !== null) fs.writeFileSync(SEMANTIC, original);
+    const substitution = semanticSource === null ? null : substituting(SEMANTIC, semanticSource);
+    const result = await less.render(fs.readFileSync(ENTRY, 'utf8'), {
+        filename: ENTRY,
+        paths: [STYLE_DIR, path.join(ROOT, 'node_modules')],
+        ...lessOptions(substitution ? { plugins: [...plugins(), substitution.plugin] } : {}),
+    });
+    // Without this, a path that stopped matching would measure the full stylesheet against itself.
+    if (substitution && !substitution.applied) {
+        throw new Error(`${path.relative(ROOT, SEMANTIC)} was not part of the compile, so editing it measured nothing.`);
     }
+    return result.css;
 }
 
 /** Ordered `selector\n  prop: value` blocks, at-rule context included. */
