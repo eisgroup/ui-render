@@ -47,6 +47,10 @@ export default {
     externals:{
         moment: 'moment',
         react: 'react',
+        // What the automatic JSX runtime compiles to (babel.config.js). External for the same reason
+        // `react` is: bundled, it would be this repository's React 18 copy, creating elements through
+        // internals that belong to a different React than the host renders them with.
+        'react/jsx-runtime': 'react/jsx-runtime',
         'react-dom': 'react-dom',
     },
     module: {

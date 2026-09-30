@@ -3,7 +3,11 @@ const isTest = process.env.NODE_ENV === 'test';
 module.exports = {
     presets: [
         ["@babel/preset-env", isTest ? { targets: { node: "current" } } : {}],
-        "@babel/preset-react",
+        // The automatic runtime: JSX compiles to calls into `react/jsx-runtime` instead of
+        // `React.createElement`. React 19 expects it, and every React the library supports ships
+        // the runtime, from the 16.14 floor up. The library build lists `react/jsx-runtime` as an
+        // external beside `react`, so a host's own React supplies it (webpack.library.config.mjs).
+        ["@babel/preset-react", { runtime: "automatic" }],
         // Presets apply in REVERSE order, so listing TypeScript last makes it run FIRST: types are
         // stripped before preset-env and preset-react ever see the file. Any other position and they
         // would be handed syntax they cannot parse.
