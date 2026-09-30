@@ -44,7 +44,7 @@ describe('CSS contract', () => {
      * dropped — one of 1,000-odd entries, which is itself the measurement that those three modules
      * were unused. It came from Semantic's `.ui.pagination.menu`, and the import carried the comment
      * "For Pagination Component" to justify keeping the whole module for it. That was false:
-     * `Pagination.js` emits `app__pagination*`, styled by `src/style/components/pagination.less`.
+     * `Pagination.tsx` emits `app__pagination*`, styled by `src/style/components/pagination.less`.
      * Verified before removing: no component emits a bare `pagination` class and the 38-example DOM
      * baseline contains zero occurrences.
      *

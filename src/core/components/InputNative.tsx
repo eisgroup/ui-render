@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { noSpellCheck, resizeToContent, toTextHeight, toTextHeightFunc } from './renders'
 import Select from './Select'
+import type { SelectProps } from './Select'
 import { ENGINE_PROPS, omitProps } from './domProps'
 
 /**
@@ -17,7 +18,9 @@ export type InputNativeElement = HTMLInputElement | HTMLTextAreaElement
  * It has to be stated separately from `InputNativeProps` because the two disagree on purpose:
  * `InputNativeProps.onChange` is the ENGINE callback `(value, name, event)`, while the bag spread
  * onto `<input>`/`<textarea>` always carries a DOM handler instead — the render overwrites the key
- * on every branch before spreading. The cast at the `omitProps` call is where that swap happens.
+ * on every branch that spreads onto an element. The cast at the `omitProps` call is where that swap
+ * happens. The `select` branch is the exception: it hands the bag to `Select` with the engine
+ * callback still in it, which is the signature `Select` reports with.
  */
 type ForwardedProps =
   Omit<
@@ -181,7 +184,9 @@ function InputNative (props: InputNativeProps) {
   if (compact != null) forwarded.ref = onMountResize
   switch (forwarded.type) {
     case 'select':
-      return <Select {...forwarded} />
+      // A cast: the engine `onChange` is still in the bag here, as `Select` wants it (see
+      // `ForwardedProps`), and `options` rides in with the rest of the field's props.
+      return <Select {...(forwarded as unknown as SelectProps)} />
     case 'checkbox':
       forwarded.onChange = onChangeCheckbox
       if (forwarded.checked == null && forwarded.value != null) forwarded.checked = forwarded.value

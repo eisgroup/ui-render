@@ -64,7 +64,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/StandaloneTabs.js': {
+        './src/core/components/StandaloneTabs.tsx': {
             statements: 100,
             branches: 94,
             functions: 100,
@@ -211,7 +211,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/Dropzone.js': {
+        './src/core/components/Dropzone.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,
@@ -235,7 +235,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/ProgressSteps.js': {
+        './src/core/components/ProgressSteps.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,
@@ -259,7 +259,7 @@ module.exports = {
             functions: 77,
             lines: 100,
         },
-        './src/core/components/Counter.js': {
+        './src/core/components/Counter.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,
@@ -283,7 +283,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/Pagination.js': {
+        './src/core/components/Pagination.tsx': {
             statements: 100,
             branches: 94,
             functions: 100,
@@ -295,7 +295,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/ProgressBar.js': {
+        './src/core/components/ProgressBar.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,

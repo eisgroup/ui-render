@@ -6,18 +6,56 @@ import { useTimers } from './utils'
 
 const DEFAULT_INTERVAL = 17
 const MAX_ANIMATION_STEPS = 10000
-const ANIMATION_PROPS = ['start', 'end', 'duration', 'delay', 'interval', 'easingFn']
+
+/** What the animation runs from: the props that restart it when their value changes. */
+type Animation = {
+  start: number
+  end: number
+  duration?: number
+  delay?: number
+  interval?: number
+  easingFn: (progress: number) => number
+}
+const ANIMATION_PROPS: Array<keyof Animation> = ['start', 'end', 'duration', 'delay', 'interval', 'easingFn']
+
+/** The displayed value and the steps left. */
+export type CounterFrame = { value: number, steps: number }
+
+/** How a value is shown: `renderFloat` by default. */
+export type CounterRender = (value: number, decimals: number) => React.ReactNode
+
+export type CounterProps = {
+  /** Default is 0 */
+  start?: number
+  end: number
+  /** Number formatting function */
+  render?: CounterRender
+  /** Default is 0 */
+  decimals?: number
+  /** Animation delay, default is TIME_DURATION_INSTANT */
+  delay?: number
+  /** Animation duration */
+  duration?: number
+  /** Animation interval, default is 17 ms, which translates to ~60 frames per second */
+  interval?: number
+  /** Animation easing function, see https://gist.github.com/gre/1650294 */
+  easingFn?: (progress: number) => number
+  /** Declared by `propTypes`, and not read */
+  className?: string
+  /** Declared by `propTypes`, and not read */
+  style?: React.CSSProperties
+}
 
 // A module constant, not an inline default: the animation restarts whenever `easingFn` changes, so a
 // default created per render would restart it on every render. The class's `defaultProps` held one.
-const cubicEasing = (t) => t * t * t
+const cubicEasing = (t: number) => t * t * t
 
 // `===`, except that NaN equals NaN. The class compared with `!==` inside a lifecycle, so a NaN prop
 // restarted the animation on every parent render; compared during render, it would never settle.
-const sameValue = (a, b) => a === b || (Number.isNaN(a) && Number.isNaN(b))
+const sameValue = (a: unknown, b: unknown) => a === b || (Number.isNaN(a) && Number.isNaN(b))
 
 /** How an animation runs, from its props: what the class's `setup()` computed. */
-const planOf = ({end, start, duration = ONE_SECOND, delay = TIME_DURATION_INSTANT, interval = DEFAULT_INTERVAL}) => {
+const planOf = ({end, start, duration = ONE_SECOND, delay = TIME_DURATION_INSTANT, interval = DEFAULT_INTERVAL}: Animation) => {
   const safeDuration = Number.isFinite(duration) && duration >= 0 ? duration : ONE_SECOND
   const safeDelay = Number.isFinite(delay) && delay >= 0 ? delay : TIME_DURATION_INSTANT
   const safeInterval = Number.isFinite(interval) && interval > 0 ? interval : DEFAULT_INTERVAL
@@ -28,7 +66,7 @@ const planOf = ({end, start, duration = ONE_SECOND, delay = TIME_DURATION_INSTAN
 }
 
 /** The displayed value and the steps left, as an animation starts. */
-const initialState = (animation) => {
+const initialState = (animation: Animation): CounterFrame => {
   const {steps, safeDuration} = planOf(animation)
   return {steps, value: safeDuration === 0 ? animation.end : animation.start}
 }
@@ -42,7 +80,7 @@ const initialState = (animation) => {
  * @param {Number} end - the value the animation finishes on
  * @returns {{value: Number, steps: Number}} the next state
  */
-export const nextFrame = (state, end) => {
+export const nextFrame = (state: CounterFrame, end: number): CounterFrame => {
   const {value, steps} = state
   if (steps <= 0) return state
   const nextSteps = steps - 1
@@ -69,14 +107,15 @@ export const nextFrame = (state, end) => {
 function Counter ({
   start = 0,
   end,
-  render = renderFloat,
+  // A cast: `renderFloat` is still JavaScript, and its JSDoc types the element it returns as `Object`.
+  render = renderFloat as CounterRender,
   decimals = 0,
   delay,
   duration,
   interval,
   easingFn = cubicEasing,
-}) {
-  const animation = {start, end, duration, delay, interval, easingFn}
+}: CounterProps) {
+  const animation: Animation = {start, end, duration, delay, interval, easingFn}
   const [running, setRunning] = useState(animation)
   const [state, setState] = useState(() => initialState(animation))
   if (ANIMATION_PROPS.some((prop) => !sameValue(running[prop], animation[prop]))) {

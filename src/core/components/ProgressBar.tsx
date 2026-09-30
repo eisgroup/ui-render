@@ -5,8 +5,33 @@ import Text from './Text'
 import { type } from './types'
 import View from './View'
 
-const hasProgressValue = value => Number.isFinite(value) && value >= 0
-const normalizeProgressValue = value => hasProgressValue(value) ? value : 0
+/** A fraction from 0 to 1; NaN, undefined and null are documented input too, and show 'No Data'. */
+type ProgressValue = number | null | undefined
+
+// The cast is what `Number.isFinite` has established by the time the comparison runs.
+const hasProgressValue = (value: ProgressValue): value is number => Number.isFinite(value) && (value as number) >= 0
+const normalizeProgressValue = (value: ProgressValue) => hasProgressValue(value) ? value : 0
+
+/** The named props are read here; the rest is passed to the outer `View`. */
+export type ProgressBarProps = {
+  /** Fraction from 0 to 1, renders placeholder tooltip by default */
+  value?: ProgressValue
+  /** Optional css class names to add */
+  className?: string
+  /** Whether to separate bar color into two gradients, true by default */
+  gradient?: boolean
+  /** Text or React component to render as progress indicator */
+  children?: React.ReactNode
+  /** Style the percentage bar itself */
+  styleBar?: React.CSSProperties
+  /** Content to render inside the filled bar */
+  label?: React.ReactNode
+  /** Whether to render the tooltip, false by default */
+  hasTooltip?: boolean
+  /** CSS bar color */
+  color?: string
+  [key: string]: unknown
+}
 
 /**
  * Progress Bar Component
@@ -22,11 +47,6 @@ const normalizeProgressValue = value => hasProgressValue(value) ? value : 0
  * Compared with `Object.is`, not `!==`: a `NaN` value is documented input, and `NaN !== NaN` would
  * re-derive on every render and never settle.
  *
- * @param {Number|NaN|Undefined|Null} [value] - fraction from 0 to 1, renders placeholder tooltip by default
- * @param {String} [className] - optional css class names to add
- * @param {Boolean} [gradient] - whether to separate bar color into two gradients
- * @param {*} [children] - text or React component to render as progress indicator
- * @param {*} [props] - other attributes to pass to component
  * @returns {Object} - React Component
  */
 export function ProgressBar ({
@@ -39,7 +59,7 @@ export function ProgressBar ({
   hasTooltip = false,
   color,
   ...props
-}) {
+}: ProgressBarProps) {
   const [value, setValue] = useState(0)
   const [derivedFrom, setDerivedFrom] = useState(valueProp)
   if (!Object.is(valueProp, derivedFrom)) {

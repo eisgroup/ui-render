@@ -5,6 +5,28 @@ import { interpolateString, isFunction, l, localiseTranslation } from '../utils'
 import { _ } from '../utils/translations'
 import Label from './Label'
 
+/** An option as `Select` renders it; a plain string or number is an option whose text is its value. */
+export type SelectOptionObject = { text: React.ReactNode, value?: unknown, key?: React.Key }
+export type SelectOption = string | number | SelectOptionObject
+
+/** The props documented on `Select` below; the rest is spread onto the `<select>`. */
+export type SelectProps = {
+  value?: unknown
+  options: SelectOption[]
+  onChange?: (value: string, name: string | undefined, event: React.ChangeEvent<HTMLSelectElement>) => void
+  name?: string
+  label?: string
+  id?: string
+  placeholder?: React.ReactNode
+  defaultValue?: string
+  className?: string
+  style?: React.CSSProperties
+  [key: string]: unknown
+}
+
+/** What the DOM accepts as a `<select>` or `<option>` value. */
+type DomValue = React.SelectHTMLAttributes<HTMLSelectElement>['value']
+
 /**
  * Select - Pure Component.
  *
@@ -33,9 +55,10 @@ export function Select ({
   className,
   style,
   ...props
-}) {
-  if (typeof options[0] === 'string') options = options.map(value => ({text: value, value}))
-  if (typeof options[0] === 'number') options = options.map(value => ({text: String(value), value}))
+}: SelectProps) {
+  // Casts: the first option's type is taken as every option's, as it was.
+  if (typeof options[0] === 'string') options = (options as string[]).map(value => ({text: value, value}))
+  if (typeof options[0] === 'number') options = (options as number[]).map(value => ({text: String(value), value}))
   if (value && !onChange) throw new Error('Select.value is only used when `onChange` or `readOnly` provided')
   const accessibleLabel = label || name || 'option'
   if (label == null) label = ''
@@ -47,14 +70,15 @@ export function Select ({
         id={id}
         name={name}
         {...isFunction(onChange) ? {
-          value, onChange: (event) => onChange(event.target.value, name, event)
+          value: value as DomValue,
+          onChange: (event: React.ChangeEvent<HTMLSelectElement>) => onChange(event.target.value, name, event)
         } : {defaultValue}}
         {...props}
       >
         {(value == null || !!label) &&
         <option value="" disabled>{placeholder || selectLabel}</option>}
-        {options.map(({text, value, key}, index) => (
-          <option key={key || index} value={value != null ? value : text}>{text}</option>
+        {(options as SelectOptionObject[]).map(({text, value, key}, index) => (
+          <option key={key || index} value={(value != null ? value : text) as DomValue}>{text}</option>
         ))}
       </select>
     </div>
