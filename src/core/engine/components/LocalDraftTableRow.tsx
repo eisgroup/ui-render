@@ -1,5 +1,5 @@
 import React, { memo, useState } from 'react'
-import ButtonJs from '../../components/Button'
+import Button from '../../components/Button'
 import InputJs from '../../components/Input'
 import InputDateJs from '../../components/InputDate'
 import TableJs from '../../components/Table'
@@ -12,10 +12,9 @@ import { pushDataKindRow, validateNotWithinRangeDraftRow } from '../dataKindPush
 /**
  * The presentational components below are still JavaScript, so TypeScript has nothing to infer
  * their props from. They are re-typed as open prop bags, the permissiveness their `.js` call sites
- * already have (the convention of InputNumber.tsx). Delete a cast when its component is converted.
+ * already have. Delete a cast when its component is converted.
  */
 type UnconvertedComponent = React.ComponentType<Record<string, unknown>>
-const Button = ButtonJs as UnconvertedComponent
 const Input = InputJs as UnconvertedComponent
 const InputDate = InputDateJs as UnconvertedComponent
 const Table = TableJs as unknown as { Cell: UnconvertedComponent }

@@ -3,23 +3,37 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Loading from './Loading'
 import { Active } from '../utils'
+import type { Translate } from '../utils/_envs'
 import { ENGINE_PROPS, omitProps } from './domProps'
+
+/** The named props are read here; the rest is spread onto the `<button>` through ./domProps (see `ViewProps`). */
+export type ButtonProps = {
+  /** Button click callback */
+  onClick?: React.MouseEventHandler<HTMLButtonElement>
+  /** Button size, one of ['small', 'base', 'large'] */
+  size?: string
+  /** Button type, `button` by default */
+  type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type']
+  /** Optional, will be prepended with `button ` */
+  className?: string
+  /** Optional, whether the button is disabled */
+  disabled?: boolean
+  /** Optional, show spinner instead of children; also disables the button */
+  loading?: boolean
+  /** Whether to add `active` css class */
+  active?: boolean
+  /** Whether to add `circle` css class with even padding */
+  circle?: boolean
+  /** Whether to add `square` css class with even padding */
+  square?: boolean
+  /** Optional, content to be wrapped inside button `<button>{children}</button>`; a string is translated */
+  children?: React.ReactNode
+  translate?: Translate
+  [key: string]: unknown
+}
 
 /**
  * Button - Pure Component.
- *
- * @param {Function} [onClick] - button click callback
- * @param {String} [size] - button size, one of ['small', 'base', 'large']
- * @param {String} [type=button] - button type eg. button, submit
- * @param {String} [className] - optional, will be prepended with `button `
- * @param {Boolean} [disabled] - optional, whether the button is disabled
- * @param {Boolean} [loading] - optional, show spinner instead of children
- * @param {Boolean} [active] - whether to add `active` css class=
- * @param {Boolean} [circle] - whether to add `circle` css class with even padding
- * @param {Boolean} [square] - whether to add `square` css class with even padding
- * @param {*} [children] - optional, content to be wrapped inside button `<button>{children}</button>`
- * @param {*} [props] - other attributes to pass
- * @returns {Object} - React component
  */
 export function Button ({
   onClick,
@@ -34,7 +48,7 @@ export function Button ({
   className,
   translate = Active.translate,
   ...props
-}) {
+}: ButtonProps) {
   // DOM boundary: ENGINE_PROPS only. `name` is a real attribute on <button> (form
   // submission), so FIELD_ONLY_PROPS is deliberately NOT applied — see ./domProps.js.
   // This is what keeps a raw meta node's `view` off the button LocalDraftTableRow builds.

@@ -2,30 +2,15 @@ import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { capitalize, isString } from '../utils'
-import ButtonJs from './Button'
-import IconJs from './Icon'
+import Button from './Button'
+import Icon from './Icon'
 import Label from './Label'
-import RowJs from './Row'
-import TextJs from './Text'
-import ViewJs from './View'
+import Row from './Row'
+import Text from './Text'
+import View from './View'
 import { Active } from '../utils'
 import type { Translate } from '../utils/_envs'
 import { ENGINE_PROPS, omitProps } from './domProps'
-
-/**
- * The presentational children below are still JavaScript, and most are exported through
- * `React.memo()`. TypeScript has nothing to infer their props from (an untyped destructured
- * parameter), so `memo` falls back to its bare `object` constraint and JSX against them rejects
- * every single attribute — `<View className=…>` included. Until those files are converted they are
- * re-typed here as open prop bags: exactly the permissiveness their `.js` call sites already have,
- * stated once instead of an `any` at each use. Delete a cast when its component becomes `.tsx`.
- */
-type UnconvertedComponent = React.ComponentType<Record<string, unknown>>
-const Button = ButtonJs as UnconvertedComponent
-const Icon = IconJs as UnconvertedComponent
-const Row = RowJs as UnconvertedComponent
-const Text = TextJs as UnconvertedComponent
-const View = ViewJs as UnconvertedComponent
 
 // Constants
 const THOUSANDS_SEPARATOR_REGEX = /\B(?=(\d{3})+(?!\d))/g

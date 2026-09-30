@@ -3,12 +3,12 @@ import { ROUTE_HOME, UPLOAD as U } from '../../variables'
 import React, { Fragment, memo, useContext, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 import DropzoneJs from '../../../components/Dropzone'
 import { type } from '../../../components'
-import IconJs from '../../../components/Icon'
-import LoadingJs from '../../../components/Loading'
-import RowJs from '../../../components/Row'
-import TextJs from '../../../components/Text'
+import Icon from '../../../components/Icon'
+import Loading from '../../../components/Loading'
+import Row from '../../../components/Row'
+import Text from '../../../components/Text'
 import TooltipJs from '../../../components/Tooltip'
-import ViewJs from '../../../components/View'
+import View from '../../../components/View'
 import {
     get,
     hasListValue,
@@ -24,17 +24,12 @@ import type { Translate } from '../../../utils/_envs'
 import { AppContext } from '../../../contexts'
 
 /**
- * The presentational components below are still JavaScript, so TypeScript has nothing to infer
- * their props from. They are re-typed as open prop bags, the permissiveness their `.js` call sites
- * already have (the convention of InputNumber.tsx). Delete a cast when its component is converted.
+ * `Tooltip` is still JavaScript, so TypeScript has nothing to infer its props from. It is re-typed as
+ * an open prop bag, the permissiveness its `.js` call sites already have. Delete the cast when it is
+ * converted.
  */
 type UnconvertedComponent = React.ComponentType<Record<string, unknown>>
-const Icon = IconJs as UnconvertedComponent
-const Loading = LoadingJs as UnconvertedComponent
-const Row = RowJs as UnconvertedComponent
-const Text = TextJs as UnconvertedComponent
 const Tooltip = TooltipJs as unknown as UnconvertedComponent
-const View = ViewJs as UnconvertedComponent
 
 /** What `Dropzone` exposes through its ref (`useImperativeHandle` in Dropzone.js). */
 export type DropzoneHandle = { open: () => void }

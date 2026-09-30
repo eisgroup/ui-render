@@ -4,14 +4,21 @@ import React from 'react'
 import { Active } from '../utils'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
+/** The named props are read here; the rest is spread onto the `<i>` through ./domProps (see `ViewProps`). */
+export type IconProps = {
+  /** Icon class name, appended to `Active.iconClassPrefix` */
+  name: string
+  /** Optional, will be appended with the `pointer` class when `onClick` is given */
+  className?: string
+  large?: boolean
+  small?: boolean
+  /** Forwarded to the `<i>` */
+  onClick?: React.MouseEventHandler<HTMLElement>
+  [key: string]: unknown
+}
+
 /**
  * Icon - Pure Component
- *
- * @param {String} name - icon class name
- * @param {String} [className] - optional, will be appended with 'pointer' class when `onClick` given
- * @param {Function} [onClick] - callback to fire on click or Enter press (if `onKeyPress` not given)
- * @param {*} props - other attributes to pass to Icon
- * @returns {Object} - React Component
  */
 export function Icon ({
   name,
@@ -19,7 +26,7 @@ export function Icon ({
   large,
   small,
   ...props
-}) {
+}: IconProps) {
   return (
     <i className={classNames(Active.iconClass, Active.iconClassPrefix + name, className, {
       large,

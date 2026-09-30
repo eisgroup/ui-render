@@ -43,6 +43,13 @@ describe('Row', () => {
         render(<RowRef ref={(el) => { captured = el }} />)
         expect(captured).not.toBeNull()
     })
+    it('RowRef attaches a callback ref only: an object ref is dropped', () => {
+        // What `RowCallbackRef` in Row.tsx states. `Row` cannot tell an object ref from the legacy
+        // context `React.memo` passes in the same position, so it attaches functions only.
+        const ref = React.createRef()
+        render(<RowRef ref={ref} />)
+        expect(ref.current).toBeNull()
+    })
 })
 
 describe('Loading', () => {
