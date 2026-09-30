@@ -755,7 +755,7 @@ const STEP_OBLIGATIONS = [
             'CORRECTION to "the corpus renders zero tooltips": true of THIS component only. The corpus '
                 + 'renders 5 tooltips today, all in the `slider` example and all snapshot-gated — they come '
                 + 'from a second, separate `components/Tooltip.js`: 15 lines, CSS-only, an inline `<span>`, '
-                + 'no portal and no JS positioning, used by `Slider`, `modules/upload/views/Upload.js` and '
+                + 'no portal and no JS positioning, used by `Slider`, `modules/upload/views/Upload.tsx` and '
                 + '`withFormSetup`\'s validation-error tooltip, and styled by 41 rules in '
                 + '`style/components/tooltip.less`. It is evidence for the positioning decision and a '
                 + 'naming trap for the cleanup: `form/utils.js` imports BOTH.',

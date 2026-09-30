@@ -486,7 +486,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
     const Wrapper = React.memo(WithForm)
     // What this wrapper renders, for a caller that renders it WITHOUT the wrapper: the engine's
     // nested documents share their parent's form rather than making one of their own
-    // (`engine/Data.js`), so they must render this and not the class handed to the decorator.
+    // (`engine/Data.tsx`), so they must render this and not the class handed to the decorator.
     Wrapper.WrappedComponent = FormComponent
     return Wrapper
   }

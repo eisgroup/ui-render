@@ -4,7 +4,7 @@
  *
  * The gap this closes was found by measuring, not by reading. §9.3 called the popup scope chain
  * "four dead branches" because none of its sources fire anywhere in the suite. Three of them are
- * reachable all the same: `engine/Data.js` passes `index` AND `relativeIndex` to every nested
+ * reachable all the same: `engine/Data.tsx` passes `index` AND `relativeIndex` to every nested
  * `UIRender` it renders, so the first source resolves a real scope in a document nobody had a test
  * for. Deleting it on the strength of "no test hits this" would have been a live regression, and
  * this file is what makes that no longer a matter of argument.

@@ -763,7 +763,7 @@ function Decorator (Class) {
                             return
                         }
                         
-                        // A FRESH component type per template popup, on purpose — see `PopupContent.js`.
+                        // A FRESH component type per template popup, on purpose — see `PopupContent.tsx`.
                         const PopupContent = createPopupContent()
 
                         const content = <PopupContent 
@@ -1033,7 +1033,7 @@ function Decorator (Class) {
         host: hostDocument,
     })(UIRenderLifecycle)
 
-    // Nested documents render the wrapper's own component directly — `engine/Data.js` reads it from
+    // Nested documents render the wrapper's own component directly — `engine/Data.tsx` reads it from
     // `Active` to avoid a circular import — so it has to be what the wrapper renders: the host of this
     // layer with the form layer over it, not the bare class the caller wrote. The host carries the
     // class it hosts as `InstanceClass`.

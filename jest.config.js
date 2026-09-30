@@ -193,7 +193,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/modules/upload/views/Upload.js': {
+        './src/core/modules/upload/views/Upload.tsx': {
             statements: 100,
             branches: 97,
             functions: 100,
@@ -223,7 +223,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/engine/components/LocalDraftTableRow.js': {
+        './src/core/engine/components/LocalDraftTableRow.tsx': {
             statements: 99,
             branches: 93,
             functions: 100,
@@ -271,7 +271,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/modules/form/inputs/ToggleField.js': {
+        './src/core/modules/form/inputs/ToggleField.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,

@@ -1,14 +1,55 @@
 import React from 'react'
 import { type } from '../components'
 import { Active } from '../utils'
-import UIRenderWithUISetup from './rules'
+import UIRenderWithUISetupJs from './rules'
 import LocalDraftTableRow from './components/LocalDraftTableRow'
+import type { LocalDraftTableRowProps } from './components/LocalDraftTableRow'
+
+/**
+ * The document is still JavaScript (§9.6-E3 types the engine as it is decomposed), and `Active.UIRender` is
+ * an `unknown` slot of the runtime registry. Both are re-typed as open prop bags: exactly the permissiveness
+ * their `.js` call sites have. Delete the casts when the engine is converted.
+ *
+ * The casts happen AT RENDER, not in a module-level constant, and that is load-bearing. `rules.js` imports
+ * `mapper.js`, which imports this file, which imports `rules.js` back: while this module is evaluated, that
+ * default export is still undefined. A constant would keep the undefined for good (measured: every nested
+ * form-backed document rendered nothing), where reading the import inside the render sees the live binding.
+ */
+type UnconvertedComponent = React.ComponentType<Record<string, unknown>>
+
+/** A meta node as `Data` reads it: only its `view`, and a nested `meta`, are looked at here. */
+export type DataMeta = { view?: string, meta?: DataMeta, [key: string]: unknown }
+
+export type DataProps = {
+  /** Data of the same `kind` are grouped into an array, and validated together as a group. */
+  kind: string
+  /** The UI Render instance containing this Data component; a draft row reads its data kinds */
+  instance: NonNullable<LocalDraftTableRowProps['parentInstance']>
+  /** The index of this Data component in the array of rendered data, for removing itself */
+  index?: number | string
+  /** Data.json to use */
+  data?: unknown
+  /** Meta.json to use */
+  meta?: DataMeta
+  /** Data.json to initialize with, `data` by default */
+  initialValues?: unknown
+  /** Whether `name` should use data relative to the root UI Render instance, defaults to this instance */
+  rootData?: boolean
+  relativePath?: string
+  relativeIndex?: number
+  /** When true, a TableCells draft row keeps its values in local state until Add */
+  localDraft?: boolean
+  className?: string
+  style?: React.CSSProperties
+  embedded?: boolean
+  useForm?: boolean
+}
 
 // The class's `defaultProps` were two shared objects, and their identity is part of what they meant: `data`
 // reaches the nested document, which compares what it is given by reference. A default parameter would be a
 // new object on every render.
 const NO_DATA = {}
-const NO_META = {}
+const NO_META: DataMeta = {}
 
 /**
  * Component to hold independent UI Render Instance Data
@@ -32,9 +73,10 @@ const NO_META = {}
 export default function Data ({
   kind, instance, index, relativeIndex, relativePath, data = NO_DATA, meta: metaIn = NO_META, initialValues = data,
   className, style, embedded, useForm, localDraft,
-}) {
+}: DataProps) {
   // Use Active.UIRender to avoid circular import
-  const UIRender = Active.UIRender
+  const UIRender = Active.UIRender as UnconvertedComponent
+  const UIRenderWithUISetup = UIRenderWithUISetupJs as unknown as UnconvertedComponent
 
   // Never mutate shared meta from config: nested tables (e.g. one Data/TableCells per outer row) reuse the
   // same meta object reference — writing relativePath/relativeIndex on it would leave every row with the
