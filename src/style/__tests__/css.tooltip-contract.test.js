@@ -113,7 +113,7 @@ const HOST_CLASS = 'tooltip-host';
  *              which is a rule of its own. Between them: position/display/opacity/
  *              z-index/pointer-events, padding, background, backdrop-filter, border,
  *              border-radius, transition.
- *   no-wrap    `.no-wrap {white-space: nowrap}`. Emitted by `Tooltip.js` itself, and
+ *   no-wrap    `.no-wrap {white-space: nowrap}`. Emitted by `Tooltip.tsx` itself, and
  *              it is why the bubble does not wrap — there is no `max-width` any more.
  *   top        `.tooltip.top {bottom, left, transform}`. THE PLACEMENT IS THE
  *              REQUESTED ONE, not a resolved one: there is no flip, so nothing

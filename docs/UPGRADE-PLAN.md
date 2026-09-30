@@ -1088,6 +1088,10 @@ Measured: the corpus, over the 38 examples through the published entry, is ident
 
 Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on an edit, the DOM unchanged after both), and so is the ref probe on every leg. `src/core` + `src/library` are 43 TS files, 8,090 lines, against 114 JS files, 11,628 lines: 41.0% of the lines, was 38.6%. `dist/index.js` is 327,475 → 327,405 bytes.
 
+**Third batch, 2026-09-30: seven more leaves** — `Label`, `Space`, `List`, `TextDateValue` and `Image`, which the mapper renders directly, and `Tooltip` and `ScrollView`, which it reaches through `TooltipPop`, `Slider`, the form fields and the document shell (`rules.js`, `TableView`, `Tabs`). `Upload`'s last component cast, `Tooltip`'s, is deleted. Typing `Tooltip`'s children as `ReactNode` made the checker reject `TooltipPop`'s `{body}`, which is typed as a node or a function. At runtime it is never a function there — only an open tooltip renders the bubble, and an open tooltip's function body has been called by then — but the checker cannot follow that across the two conditions, so the fix is a commented cast with the expression unchanged. `Expand`, `AnimateHeight` and `ExpandList` are left for a batch of their own: `ExpandList` alone would have needed a cast of `Expand`. Every mention of `Tooltip.js` in comments, the prop reference's curation and the e2e fixtures names `Tooltip.tsx`; the one in `tooltip.less` survives compilation, so `public/static/ui-render.built.css` is rebuilt with it.
+
+Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on an edit, the DOM unchanged after both). `src/core` + `src/library` are 50 TS files, 8,399 lines, against 107 JS files, 11,389 lines: 42.4% of the lines, was 41.0%. `dist/index.js` is 327,405 → 327,399 bytes.
+
 #### E3 — Engine last
 
 `rules.js` / `form/utils.js` are typed **as they are decomposed** (§9.3) — decomposition outputs are born as `engine/*.ts`. Typing the prototype-patching machinery as-is is wasted effort; don't.

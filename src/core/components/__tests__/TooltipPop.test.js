@@ -167,7 +167,7 @@ describe('TooltipPop — the open DOM', () => {
      *   tooltip    `.tooltip` ×7 — the box: position/display/opacity/z-index/
      *              pointer-events, then padding, background, backdrop-filter, border,
      *              border-radius and transition. Plus `.tooltip::after`, the arrow.
-     *   no-wrap    `.no-wrap {white-space: nowrap}`. Emitted by `Tooltip.js` itself, and
+     *   no-wrap    `.no-wrap {white-space: nowrap}`. Emitted by `Tooltip.tsx` itself, and
      *              it is why the bubble does not wrap — there is no `max-width` any
      *              more, which is a deliberate loss recorded in SUPPORTED-PROPS.
      *   top        `.tooltip.top {bottom, left, transform}` and `.tooltip.top::after`,
@@ -182,7 +182,7 @@ describe('TooltipPop — the open DOM', () => {
      *              prop rather than becoming a dropped SUIR modifier.
      *
      * A replacement that drops any token silently loses the rules listed against it.
-     * Emission ORDER is `Tooltip.js`'s (`tooltip no-wrap`, then
+     * Emission ORDER is `Tooltip.tsx`'s (`tooltip no-wrap`, then
      * top/bottom/right/left/show, then the caller's className) and is pinned as one
      * string so a reordering is visible in the diff too.
      *
@@ -407,7 +407,7 @@ describe('TooltipPop — the passthrough surface, deliberately narrowed', () => 
      *   `inserts the size/wide/basic/flowing tokens the CSS selects on` — those rules
      *       are `.ui.popup`-keyed and never reached the bubble.
      *   `lets `as` change the element the bubble renders` — the bubble is a `<span>`
-     *       from `Tooltip.js` and there is no element override.
+     *       from `Tooltip.tsx` and there is no element override.
      *   `redirects the whole portal with `mountNode`` — there is no portal to redirect;
      *       that prop was the *shape of the fix*, and the fix is now that the bubble is
      *       simply inside the tree.

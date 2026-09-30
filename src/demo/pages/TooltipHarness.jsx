@@ -287,7 +287,7 @@ const stack = (
 )
 
 /**
- * 7. THE CONVERGENCE TARGET. `components/Tooltip.js` — inline `<span>`, no portal, no positioning
+ * 7. THE CONVERGENCE TARGET. `components/Tooltip.tsx` — inline `<span>`, no portal, no positioning
  * JS — is what part 2 converges on, and today it is exercised only by the `slider` example. Three
  * shapes: forced open, hover-revealed (`*:hover > &` in tooltip.less), and inside a `.button`
  * (which tooltip.less restyles). Recorded as the INVARIANT part 2 must not regress; nothing else

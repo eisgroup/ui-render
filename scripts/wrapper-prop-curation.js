@@ -335,7 +335,7 @@ const IN_HOUSE_CURATION = {
     },
     TooltipPop: {
         shipped: '§9.7-F1 step 2 part 3',
-        summary: 'The hover tooltip, over the same inline `<span>` `components/Tooltip.js` has '
+        summary: 'The hover tooltip, over the same inline `<span>` `components/Tooltip.tsx` has '
             + 'shipped for years. Reached two live ways: a `view: "Tooltip"` node (`mapper.js`, which '
             + 'maps `label` to `content`) and the `tooltip` attribute on ANY node (`Render.js`, which '
             + 'wraps the rendered node and spreads an object `tooltip` — still an unfiltered '
@@ -347,7 +347,7 @@ const IN_HOUSE_CURATION = {
             + 'meta can declare can hold one. There was no working positioning to lose.',
         classContract: 'Host: `tooltip-host <classWrap>`, always, open or closed. Bubble, only while '
             + 'open: `tooltip no-wrap <resolved placement words> show [inverted] <className>` — the '
-            + 'same class string `Tooltip.js` emits, so the two converge on one CSS contract. The '
+            + 'same class string `Tooltip.tsx` emits, so the two converge on one CSS contract. The '
             + 'placement words are the REQUESTED position, not a resolved one: nothing measures, so '
             + 'there is no flip to rewrite them. Closed, the component renders the trigger '
             + 'byte-for-byte as it renders without a tooltip, and nothing is added to `document.body`. '
@@ -385,7 +385,7 @@ const IN_HOUSE_CURATION = {
             + 'apply to it at all — the SUIR bubble portaled into `document.body`, outside the '
             + 'prefixwrap scope, so not one of the 13 `.ui.popup` rules could paint it and the live '
             + 'tooltip was unstyled text. It shares `src/style/components/tooltip.less` with '
-            + '`Tooltip.js`, so `tooltip`, `no-wrap`, the four placement words and `show` are all '
+            + '`Tooltip.tsx`, so `tooltip`, `no-wrap`, the four placement words and `show` are all '
             + 'load-bearing, and `.show` must keep beating the `*:hover > &` reveal — which it does on '
             + 'source order at equal specificity, not by outranking it. THE HAZARD THIS STEP CARRIES: '
             + '`tooltip.less` sets `pointer-events: none` on the bubble, and without it the bubble '
@@ -754,7 +754,7 @@ const STEP_OBLIGATIONS = [
                 + 'than founding it.',
             'CORRECTION to "the corpus renders zero tooltips": true of THIS component only. The corpus '
                 + 'renders 5 tooltips today, all in the `slider` example and all snapshot-gated — they come '
-                + 'from a second, separate `components/Tooltip.js`: 15 lines, CSS-only, an inline `<span>`, '
+                + 'from a second, separate `components/Tooltip.tsx`: a few lines, CSS-only, an inline `<span>`, '
                 + 'no portal and no JS positioning, used by `Slider`, `modules/upload/views/Upload.tsx` and '
                 + '`withFormSetup`\'s validation-error tooltip, and styled by 41 rules in '
                 + '`style/components/tooltip.less`. It is evidence for the positioning decision and a '
@@ -787,7 +787,7 @@ const STEP_OBLIGATIONS = [
                 + '`:before`, not a positioned element; and scroll/resize repositioning is on. So parity is '
                 + '**flip yes, shift no** — §9.7-F1.2\'s claim that the zero-dep option loses "flip AND '
                 + 'overflow handling" is half right. Coordinates are unavoidable while the bubble portals '
-                + 'out of the tree; an inline tooltip needs none (and the in-house `Tooltip.js` proves the '
+                + 'out of the tree; an inline tooltip needs none (and the in-house `Tooltip.tsx` proves the '
                 + 'pattern ships) but would be clipped at the corpus\'s own use sites, which sit inside '
                 + '`Expand` → `AnimateHeight`\'s `overflow: hidden`. Neither option is ruled in; '
                 + '"no positioning code" and "inline only" are ruled out.',

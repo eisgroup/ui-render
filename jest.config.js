@@ -241,7 +241,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/ScrollView.js': {
+        './src/core/components/ScrollView.tsx': {
             statements: 100,
             branches: 90,
             functions: 100,

@@ -248,7 +248,7 @@ const DISMISSAL = {
     anyScroll: 'closes',
 }
 
-/** The in-house `Tooltip` — `src/core/components/Tooltip.js`, what part 2 converges on. */
+/** The in-house `Tooltip` — `src/core/components/Tooltip.tsx`, what part 2 converges on. */
 const INLINE = {
     /** [I] Closed: removed from layout entirely, and parked behind everything. */
     CLOSED_PAINT: { display: 'none', zIndex: '-1' },
