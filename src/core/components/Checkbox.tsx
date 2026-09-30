@@ -5,30 +5,61 @@ import Label from './Label'
 import Row from './Row'
 import View from './View'
 import { Active } from '../utils'
+import type { Translate } from '../utils/_envs'
 import { ENGINE_PROPS, omitProps } from './domProps'
+
+/** Called with `valueTrue` or `valueFalse`, the `name` prop, and the change event. */
+export type CheckboxChangeHandler = (
+  value: unknown,
+  name: string | undefined,
+  event: React.ChangeEvent<HTMLInputElement>,
+) => void
+
+/** The named props are read here; the rest is spread onto the `<input>` through ./domProps, `name` included. */
+export type CheckboxProps = {
+  /** Text to use for identification, uses `id` if not given */
+  label?: string
+  /** Will be derived from `label` if not given */
+  id?: string
+  /** Callback on value change */
+  onChange?: CheckboxChangeHandler
+  /**
+   * Checked or unchecked state: `valueTrue` checks and `valueFalse` unchecks, any other value by its
+   * truthiness, and a `null`/absent one leaves the input uncontrolled
+   */
+  value?: unknown
+  /** One of ['toggle'], or else the `<input>` type */
+  type?: string
+  /** Tooltip */
+  title?: string
+  /** Checked or unchecked state, when `value` is absent */
+  defaultValue?: boolean
+  /** Text to show for checked state */
+  labelTrue?: React.ReactNode
+  /** Text to show for unchecked state */
+  labelFalse?: React.ReactNode
+  /** Value to assign to true case */
+  valueTrue?: unknown
+  /** Value to assign to false case */
+  valueFalse?: unknown
+  /** Input attribute */
+  readonly?: boolean
+  /** If true, then unchecked will have red background */
+  danger?: boolean
+  /** Css class to apply */
+  className?: string
+  translate?: Translate
+  /** Forwarded to the `<input>`, and the second argument of `onChange` */
+  name?: string
+  /** Forwarded to the `<input>`; when `readonly`, it is still called after the change is prevented */
+  onClick?: React.MouseEventHandler<HTMLInputElement>
+  [key: string]: unknown
+}
 
 /**
  * Checkbox - Pure Component
  *
  * @Note: either `id` or `label` must be given
- *
- * @param {String} [label] - text to use for identification, uses `id` if not given
- * @param {String} [id] - will be derived from `label` if not given
- * @param {Function} onChange - callback on value change
- * @param {Boolean|*} value - checked or unchecked state
- * @param {String} [type] - one of ['toggle']
- * @param {String} [title] - tooltip
- * @param {Boolean} [defaultValue] - checked or unchecked state
- * @param {String|Object} [labelTrue] - text to show for checked state
- * @param {String|Object} [labelFalse] - text to show for unchecked state
- * @param {*} [valueTrue] - value to assign to true case
- * @param {*} [valueFalse] - value to assign to false case
- * @param {Boolean} [readonly] - input attribute
- * @param {Boolean} [danger] - if true, then unchecked will have red background
- * @param {String} [className] - css class to apply
- * @param {Object} [props] - other props to pass
- * @return {*}
- * @constructor
  */
 export function Checkbox ({
   value,
@@ -49,7 +80,7 @@ export function Checkbox ({
   float: _0, // not used
   initialValues: _1, // not used
   ...props
-}) {
+}: CheckboxProps) {
   if (readonly) {
     const onClick = props.onClick
     props.readOnly = readonly // React wants `readonly` to be `readOnly`
@@ -74,9 +105,11 @@ export function Checkbox ({
         type={type === 'toggle' ? 'checkbox' : type}
         className={classNames('checkbox', type)}
         id={id}
-        onChange={readonly ? null : (event) => onChange(event.target.checked ? valueTrue : valueFalse, props.name, event)}
+        // `undefined` where the JavaScript passed `null`: the DOM typings reject `null`, and React attaches no
+        // listener for either. The cast is not a guard: without `onChange` a change throws, as it did before.
+        onChange={readonly ? undefined : (event) => (onChange as CheckboxChangeHandler)(event.target.checked ? valueTrue : valueFalse, props.name, event)}
         // DOM boundary (see ./domProps): the spread lands on the <input type="checkbox">, so ENGINE_PROPS only -- the onChange
-  // above reads `props.name`, and the control needs it on the DOM.
+        // above reads `props.name`, and the control needs it on the DOM.
         {...omitProps(props, ENGINE_PROPS)}
       />
       <Label

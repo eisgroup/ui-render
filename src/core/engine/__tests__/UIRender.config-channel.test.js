@@ -27,7 +27,7 @@ import UIRender from '../rules'
 
 // An ISO date in the data plus a `Text` node is the shortest path to an
 // observable format: Text formats any complete ISO-8601 date it renders with
-// the configured format (src/core/components/Text.js).
+// the configured format (src/core/components/Text.tsx).
 const data = { issued: '2024-01-15' }
 const meta = { view: 'Col', items: [{ view: 'Text', name: 'issued' }] }
 

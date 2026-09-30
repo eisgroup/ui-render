@@ -1,22 +1,40 @@
 import classNames from '../utils/classNames'
 import React, { useContext } from 'react'
 import { Active } from '../utils'
+import type { Translate } from '../utils/_envs'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 import { ISO_8601_COMPLETE_DATE } from '../utils'
 import { ConfigContext } from '../contexts'
 import moment from 'moment'
 
+/** The named props are read here; the rest is spread onto the `<span>` through ./domProps (see `ViewProps`). */
+export type TextProps = {
+    /** Optional css class name */
+    className?: string
+    /** Forwarded to the `<span>`; its presence adds the `pointer` class */
+    onClick?: React.MouseEventHandler<HTMLSpanElement>
+    /** Whether to make the view fill up available height and width */
+    fill?: boolean
+    /** Whether to reverse order of rendering */
+    reverse?: boolean
+    /** Whether to use right to left direction */
+    rtl?: boolean
+    /**
+     * A string is translated, and an ISO 8601 date string is first formatted with the configured
+     * `dateFormat`. A number renders as its string, a boolean as 'Yes'/'No', and an element is
+     * cloned with `translate`.
+     */
+    children?: React.ReactNode
+    translate?: Translate
+    [key: string]: unknown
+}
+
+/** The part of ConfigContext this component reads. */
+type DateConfig = { dateFormat?: string }
+
 /**
  * Text View - Pure Component.
  * (to be used as replacement for `<span></span>` for cross platform integration)
- *
- * @param {string} [className] - optional css class name
- * @param {Function} [onClick] - callback to fire on click or Enter press (if `onKeyPress` not given)
- * @param {Boolean} [fill] - whether to make the view fill up available height and width
- * @param {Boolean} [reverse] - whether to reverse order of rendering
- * @param {Boolean} [rtl] - whether to use right to left direction
- * @param {*} props - other attributes to pass to `<div></div>`
- * @returns {Object} - React Component
  */
 export function Text ({
     className,
@@ -26,11 +44,13 @@ export function Text ({
     children,
     translate = Active.translate,
     ...props
-}) {
-    const { dateFormat } = useContext(ConfigContext)
+}: TextProps) {
+    // A cast, not a guard: `ConfigContext` has no default value, so outside a provider this destructure
+    // throws, as it did in JavaScript. The library root (`AppProvider`) always renders one.
+    const { dateFormat } = useContext(ConfigContext) as DateConfig
 
-    let component = children
-    if (React.isValidElement(children)) {
+    let component: React.ReactNode = children
+    if (React.isValidElement<{ translate?: Translate }>(children)) {
         component = React.cloneElement(children, { translate })
     } else if (typeof children === 'object') {
         component = children

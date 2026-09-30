@@ -3,21 +3,26 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import View from './View'
 
+/** The named props are read here; the rest is passed to the `View` it renders. */
+export type SpinnerProps = {
+  /** Spinner size */
+  size?: 'largest' | 'larger' | 'large' | 'base' | 'small' | 'smaller' | 'smallest'
+  /** Spinner color */
+  color?: 'primary' | 'secondary' | 'text' | 'inverse' | 'white' | 'black'
+  /** Optional, will be prepended with spinner classes */
+  className?: string
+  [key: string]: unknown
+}
+
 /**
  * Spinner - Pure Component
- *
- * @param {string} size - spinner size
- * @param {string} color - spinner color
- * @param {string} className - optional, will be prepended with spinner classes
- * @param {*} props - other attributes to pass to spinner
- * @returns {object} - React Component
  */
 export function Spinner ({
   size = 'base',  // Enum
   color = 'primary',  // Enum
   className,
   ...props
-}) {
+}: SpinnerProps) {
   return <View className={classNames('app__spinner', size, color, className)} {...props} />
 }
 

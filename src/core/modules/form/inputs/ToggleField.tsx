@@ -1,18 +1,16 @@
 import PropTypes from 'prop-types'
 import React, { createContext, memo, useContext } from 'react'
 import { Field } from 'react-final-form'
-import { Checkbox as CheckboxJs } from '../../../components/Checkbox'
+import { Checkbox } from '../../../components/Checkbox'
 import { isRequired } from '../../../components/inputs/validationRules'
 import { Active, isFunction } from '../../../utils'
 import type { Translate } from '../../../utils/_envs'
 
 /**
- * `Checkbox` is still JavaScript, and `Active.Field` is an `unknown` slot of the runtime registry. Both
- * are re-typed as open prop bags, the permissiveness their `.js` call sites already have (the
- * convention of InputNumber.tsx). Delete the cast when Checkbox is converted.
+ * `Active.Field` is an `unknown` slot of the runtime registry, so it is re-typed below as an open prop
+ * bag, the permissiveness its `.js` call sites already have.
  */
 type UnconvertedComponent = React.ComponentType<Record<string, unknown>>
-const Checkbox = CheckboxJs as unknown as UnconvertedComponent
 
 export type ToggleFieldProps = {
   // @Note: this component should not have parse/format/normalize,
