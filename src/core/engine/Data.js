@@ -1,8 +1,14 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { type } from '../components'
 import { Active } from '../utils'
 import UIRenderWithUISetup from './rules'
 import LocalDraftTableRow from './components/LocalDraftTableRow'
+
+// The class's `defaultProps` were two shared objects, and their identity is part of what they meant: `data`
+// reaches the nested document, which compares what it is given by reference. A default parameter would be a
+// new object on every render.
+const NO_DATA = {}
+const NO_META = {}
 
 /**
  * Component to hold independent UI Render Instance Data
@@ -23,84 +29,44 @@ import LocalDraftTableRow from './components/LocalDraftTableRow'
  *    }
  *
  */
-export default class Data extends Component {
-  static propTypes = {
-    // Identifier for this type of data.
-    // Data of the same `kind` are grouped into array as list, and used for complex validation (together as group).
-    kind: type.Id.isRequired,
-    // The UI Render Instance containing this Data component
-    instance: type.Object.isRequired,
-    // The Index of this Data component in the array of rendered data for removing itself
-    index: type.NumberOrString,
-    // Data.json to use
-    data: type.Any,
-    // Meta.json to use
-    meta: type.Object,
-    // Data.json to initialize with
-    initialValues: type.Any,
-    // Whether the `name` attribute should use data relative to root UI Render instance, defaults to this instance.
-    rootData: type.Boolean,
+export default function Data ({
+  kind, instance, index, relativeIndex, relativePath, data = NO_DATA, meta: metaIn = NO_META, initialValues = data,
+  className, style, embedded, useForm, localDraft,
+}) {
+  // Use Active.UIRender to avoid circular import
+  const UIRender = Active.UIRender
 
-    relativePath: type.String,
-    relativeIndex: type.Number,
-    /** When true, TableCells draft row uses local state only until Add (no nested form / no parent values leakage). */
-    localDraft: type.Boolean,
+  // Never mutate shared meta from config: nested tables (e.g. one Data/TableCells per outer row) reuse the
+  // same meta object reference — writing relativePath/relativeIndex on it would leave every row with the
+  // last-rendered row's paths (mixed data, inputs not updating / wrong targets).
+  const meta = (metaIn.view === 'TableCells' || metaIn.view === 'Data')
+    ? {...metaIn, relativePath, relativeIndex}
+    : metaIn
+
+  // TableCells only, or Data wrapping TableCells (e.g. renderExtraItem). Draft values stay in React state
+  // until Add — no final-form fields at dataKind.*[nextIndex], so an empty `{}` is not materialized for the draft row.
+  if (localDraft) {
+    const rel = { relativePath, relativeIndex }
+    const draftMeta = metaIn.view === 'TableCells'
+      ? meta
+      : (metaIn.meta && metaIn.meta.view === 'TableCells' ? { ...metaIn.meta, ...rel } : null)
+    if (draftMeta) {
+      return (
+        <LocalDraftTableRow
+          meta={draftMeta}
+          kind={kind}
+          parentInstance={instance}
+        />
+      )
+    }
   }
 
-  static defaultProps = {
-    data: {},
-    meta: {},
-  }
+  // Table row contexts set `relativeIndex` (field array index); `index` is often unset.
+  // Prefer relativeIndex over index so row identity stays correct after FieldArray reindex (e.g. remove row).
+  const rowIndex = relativeIndex != null ? relativeIndex : index
 
-  render () {
-    const {kind, instance, index, relativeIndex, data, meta: metaIn, initialValues = data, className, style, embedded, useForm, localDraft} = this.props
-    // Use Active.UIRender to avoid circular import
-    const UIRender = Active.UIRender
-
-    // Never mutate shared meta from config: nested tables (e.g. one Data/TableCells per outer row) reuse the
-    // same meta object reference — writing relativePath/relativeIndex on it would leave every row with the
-    // last-rendered row's paths (mixed data, inputs not updating / wrong targets).
-    const meta = (metaIn.view === 'TableCells' || metaIn.view === 'Data')
-      ? {...metaIn, relativePath: this.props.relativePath, relativeIndex: this.props.relativeIndex}
-      : metaIn
-
-    // TableCells only, or Data wrapping TableCells (e.g. renderExtraItem). Draft values stay in React state
-    // until Add — no final-form fields at dataKind.*[nextIndex], so an empty `{}` is not materialized for the draft row.
-    if (localDraft) {
-      const rel = { relativePath: this.props.relativePath, relativeIndex: this.props.relativeIndex }
-      const draftMeta = metaIn.view === 'TableCells'
-        ? meta
-        : (metaIn.meta && metaIn.meta.view === 'TableCells' ? { ...metaIn.meta, ...rel } : null)
-      if (draftMeta) {
-        return (
-          <LocalDraftTableRow
-            meta={draftMeta}
-            kind={kind}
-            parentInstance={instance}
-          />
-        )
-      }
-    }
-
-    // Table row contexts set `relativeIndex` (field array index); `index` is often unset.
-    // Prefer relativeIndex over index so row identity stays correct after FieldArray reindex (e.g. remove row).
-    const rowIndex = relativeIndex != null ? relativeIndex : index
-
-    if (useForm) {
-      return <UIRenderWithUISetup
-        data={data}
-        meta={meta}
-        initialValues={initialValues}
-        form={{kind}}
-        parent={instance}
-        index={rowIndex}
-        relativeIndex={relativeIndex}
-        embedded={embedded}
-        {...{className, style}}
-      />
-    }
-
-    return <UIRender
+  if (useForm) {
+    return <UIRenderWithUISetup
       data={data}
       meta={meta}
       initialValues={initialValues}
@@ -112,6 +78,41 @@ export default class Data extends Component {
       {...{className, style}}
     />
   }
+
+  return <UIRender
+    data={data}
+    meta={meta}
+    initialValues={initialValues}
+    form={{kind}}
+    parent={instance}
+    index={rowIndex}
+    relativeIndex={relativeIndex}
+    embedded={embedded}
+    {...{className, style}}
+  />
+}
+
+Data.propTypes = {
+  // Identifier for this type of data.
+  // Data of the same `kind` are grouped into array as list, and used for complex validation (together as group).
+  kind: type.Id.isRequired,
+  // The UI Render Instance containing this Data component
+  instance: type.Object.isRequired,
+  // The Index of this Data component in the array of rendered data for removing itself
+  index: type.NumberOrString,
+  // Data.json to use
+  data: type.Any,
+  // Meta.json to use
+  meta: type.Object,
+  // Data.json to initialize with
+  initialValues: type.Any,
+  // Whether the `name` attribute should use data relative to root UI Render instance, defaults to this instance.
+  rootData: type.Boolean,
+
+  relativePath: type.String,
+  relativeIndex: type.Number,
+  /** When true, TableCells draft row uses local state only until Add (no nested form / no parent values leakage). */
+  localDraft: type.Boolean,
 }
 
 // =============================================================================

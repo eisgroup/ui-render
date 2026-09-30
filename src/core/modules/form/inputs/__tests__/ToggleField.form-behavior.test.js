@@ -100,20 +100,20 @@ describe('ToggleField contracts', () => {
     })
 
     it('updates the form input before invoking the external callback', () => {
-        const order = []
-        const formChange = jest.fn(value => order.push(['form', value]))
+        // Through the rendered field rather than an instance method, since the component is a function:
+        // the callback records what the form holds when it runs, which is the new value only if the form
+        // input was updated first.
+        const calls = []
+        let formApi
         const onChange = function (value, details) {
-            order.push(['callback', value, details])
+            calls.push({ value, details, formValue: formApi.getState().values.enabled })
         }
-        const field = new ToggleField({ name: 'enabled', label: 'Enable', onChange })
-        const checkbox = field.input({ input: { value: false, onChange: formChange } })
+        const view = renderField(<ToggleField name="enabled" label="Enable" onChange={onChange} />, { enabled: false })
+        formApi = view.formApi
 
-        checkbox.props.onChange(true)
+        fireEvent.click(view.container.querySelector('input[type="checkbox"]'))
 
-        expect(order).toEqual([
-            ['form', true],
-            ['callback', true, { name: 'enabled' }],
-        ])
+        expect(calls).toEqual([{ value: true, details: { name: 'enabled' }, formValue: true }])
     })
 
     it('rerenders labels when labelTrue and labelFalse props change', () => {
