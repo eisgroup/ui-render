@@ -12,9 +12,17 @@ localiseTranslation({
 })
 
 /**
- * Placeholder Field - Pure Component.
+ * The named props are read here; the rest goes to the `View`. `renders.js` binds them as the first
+ * argument, so the props React passes arrive second and go unread.
  */
-export function PlaceholderField ({name, ...props} = {}) {
+export type PlaceholderFieldProps = { name?: React.ReactNode, children?: React.ReactNode, [key: string]: unknown }
+
+/**
+ * Placeholder Field - Pure Component.
+ * (The overload is what callers see: with `= {}` the props would be optional, and JSX checked too loosely.)
+ */
+export function PlaceholderField (props: PlaceholderFieldProps): React.ReactElement
+export function PlaceholderField ({name, ...props}: PlaceholderFieldProps = {}) {
   if (props.children == null)
     props.children = <Text className="p error padding border">
       <Text className="bold">{name}</Text>{toLowerCase(_.FIELD_DOES_NOT_EXIST_)}

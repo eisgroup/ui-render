@@ -8,12 +8,54 @@ import { STYLE } from './styles'
 import Text from './Text'
 import View from './View'
 
+/** What `onClick` is told on every change: the new state, and which `Expand` it was. */
+export type ExpandChange = { expanded: boolean, index?: string | number, key?: string | number, value: string }
+
+/** The named props are read here; the rest is passed to the `View` it renders. */
+export type ExpandProps = {
+  /** Argument to pass to 'onClick' callback as `key`, and the element's `id` */
+  id?: string | number
+  /** String or component to always show */
+  title?: React.ReactNode
+  /** Callback on every change, a commit after it */
+  onClick?: (change: ExpandChange) => void
+  /** Whether to add `active` css class */
+  active?: boolean
+  /** Milliseconds for the animation */
+  duration?: number
+  className?: string
+  classNameLabel?: string
+  classNameItems?: string
+  /** A function to render content when expanded, receiving `id`; or pre-rendered content (not recommended) */
+  children?: React.ReactNode | ((id?: string | number) => React.ReactNode)
+  /** Whether should render as expanded; a changed value moves the state to it, and `undefined` toggles */
+  expanded?: boolean
+  /** Whether should render expand icon spread out from `title` */
+  justify?: boolean
+  /** Name of icon for collapsed state */
+  iconClosed?: string
+  /** Name of icon for expanded state */
+  iconOpened?: string
+  /** Function to render title */
+  renderLabel?: (title: React.ReactNode) => React.ReactNode
+  /** Argument to pass to 'onClick' callback as `index` */
+  index?: string | number
+  [key: string]: unknown
+}
+
+type ExpandState = {
+  expanded: boolean | undefined
+  changing: boolean
+  change: { expanded: boolean } | null
+  seen: boolean | undefined
+}
+
 /**
  * The state a change to `expand` moves to. Expanding shows the content at once; collapsing keeps it
  * mounted (`changing`) until the animation is over. Each change is a new `change` object, which is
  * what the effect reporting it runs on.
  */
-function toggled (state, expand) {
+function toggled (state: ExpandState, expand: boolean): ExpandState {
   if (expand === state.expanded) return state
   const change = {expanded: !!expand}
   return expand
@@ -43,7 +85,7 @@ function toggled (state, expand) {
  *    and collapsing again within `duration` unmounted the content before the second animation was
  *    over.
  */
-export function Expand (props) {
+export function Expand (props: ExpandProps) {
   const {
     id,
     title,
@@ -61,7 +103,7 @@ export function Expand (props) {
     renderLabel,
     ...rest
   } = props
-  const [state, setState] = useState(() => ({
+  const [state, setState] = useState<ExpandState>(() => ({
     expanded: expandedProp,
     changing: false,
     change: null,
@@ -76,7 +118,7 @@ export function Expand (props) {
 
   // The effect below runs once per change, and reads what it reports, and the collapse's
   // `duration`, from the latest render, as the class read `this.props`.
-  const latest = useRef(null)
+  const latest = useRef<{ report: (expanded: boolean) => void, duration: number } | null>(null)
   latest.current = {
     report: expanded => onClick && onClick({expanded, index: props.index, key: id, value: String(title)}),
     duration,
@@ -84,9 +126,10 @@ export function Expand (props) {
   const {change} = state
   useEffect(() => {
     if (!change) return
-    latest.current.report(change.expanded)
+    // Assertions, not guards: every render assigns `latest` above, before any effect of it runs.
+    latest.current!.report(change.expanded)
     if (change.expanded) return
-    const timer = setTimeout(() => setState(current => ({...current, changing: false})), latest.current.duration)
+    const timer = setTimeout(() => setState(current => ({...current, changing: false})), latest.current!.duration)
     return () => clearTimeout(timer)
   }, [change])
 
@@ -94,14 +137,14 @@ export function Expand (props) {
     setState(current => toggled(current, !current.expanded))
   }, [])
 
-  const cache = useRef(null)
+  const cache = useRef<{ children: ExpandProps['children'], content: React.ReactNode } | null>(null)
   if (cache.current === null || cache.current.children !== children) cache.current = {children, content: null}
   const {expanded, changing} = state
   const hasContent = children != null
   const content = hasContent && (expanded || changing) && (cache.current.content ||
     (cache.current.content = isFunction(children) ? children(id) : children))
 
-  let label = null
+  let label: React.ReactNode = null
   if (title != null || renderLabel) {
     const Title = renderLabel ? renderLabel(title) : title
     label = (
