@@ -54,10 +54,10 @@
  *   - stable across two renders in one process (asserted on every run below);
  *   - identical under TZ=UTC, Pacific/Kiritimati (+14) and Pacific/Honolulu (-10);
  *   - identical with the system clock moved to 2031 — no example formats "now";
- *   - byte-identical on React 16.14.0, 17.0.2, 18.3.1 and 19.2.8 once attribute
- *     order is canonical, so ONE snapshot file serves every leg of the matrix
- *     (`npx jest`, `npm run test:react16`, `npm run test:react17`, and the
- *     react-19-advisory CI job).
+ *   - byte-identical on React 16.14.0, 17.0.2, 18.3.1 and 19 (measured on 19.2.8;
+ *     the 19.3.0 leg shares the snapshot) once attribute order is canonical, so ONE
+ *     snapshot file serves every leg of the matrix (`npx jest`, `npm run test:react16`,
+ *     `npm run test:react17` and `npm run test:react19`).
  * If a future example needs masking, prefer excluding it via the manifest's
  * `noSnapshot` flag with a reason over loosening the serialiser for all 38.
  *

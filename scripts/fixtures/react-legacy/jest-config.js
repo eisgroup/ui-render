@@ -3,15 +3,16 @@ const path = require('path')
 const base = require('../../../jest.config')
 
 /**
- * Jest config factory for the legacy-React legs -- `jest.react16.config.js` (16.14, the declared floor) and
- * `jest.react17.config.js` (17.0.2, the middle of the range). Both are two-liners over this; the per-leg
- * facts live in ./floors.js. See docs/UPGRADE-PLAN.md §8, "CI coverage of the declared peer range".
+ * Jest config factory for the per-React legs -- `jest.react16.config.js` (16.14, the declared floor),
+ * `jest.react17.config.js` (17.0.2) and `jest.react19.config.js` (19.3.0, the top of the range). All three are
+ * two-liners over this; the per-leg facts live in ./floors.js. See docs/UPGRADE-PLAN.md §8, "CI coverage of
+ * the declared peer range".
  *
- * `peerDependencies` declares `^16.14.0 || ^17.0.0 || ^18.0.0`, but `npm ci` installs exactly one React, so
- * the default suite only ever exercises 18. Each leg runs the same suite against one older React without
- * touching the installed react/react-dom: the version lives in an install-only fixture package
- * (scripts/fixtures/react16-floor, scripts/fixtures/react17-floor) linked from the root devDependencies so
- * a plain `npm ci` installs it, and is mapped in here at resolve time.
+ * `peerDependencies` declares `^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0`, but `npm ci` installs exactly one
+ * React, so the default suite only ever exercises 18. Each leg runs the same suite against one other React
+ * without touching the installed react/react-dom: the version lives in an install-only fixture package
+ * (scripts/fixtures/react16-floor, scripts/fixtures/react17-floor, scripts/fixtures/react19) linked from the
+ * root devDependencies so a plain `npm ci` installs it, and is mapped in here at resolve time.
  *
  * The harness code -- this file, ./harness.js, ./react-dom-client.js, the setup entry points -- deliberately
  * sits OUTSIDE those fixture packages, because Node resolves `require('react')` from the requiring file's
@@ -26,8 +27,9 @@ const base = require('../../../jest.config')
  * `react`), so `npm install` aborts with ERESOLVE and no `overrides` entry can fix it, because the peer must
  * be satisfied at the same level. @types/react has no peers, which is the only reason the type matrix gets
  * away with plain aliases. The fixture sidesteps it: npm nests react/react-dom/scheduler inside the fixture
- * directory, so nothing competes for the hoisted slot and no --legacy-peer-deps is needed (unlike
- * react-19-advisory).
+ * directory, so nothing competes for the hoisted slot and no --legacy-peer-deps is needed. The React 19
+ * leg used to be a CI-only job that installed 19 over the lock with that flag; as a fixture it needs none,
+ * and runs locally like the other two.
  *
  * Run these legs through their npm scripts, never with bare `jest`: bare `jest` silently uses the installed
  * React 18 and reports green. ./harness.js asserts the loaded version inside every worker for that reason.
@@ -94,8 +96,9 @@ function legacyReactJestConfig (floor) {
     const react = floorPackage(floor, 'react', floor.react, fixture)
     const reactDom = floorPackage(floor, 'react-dom', floor.react, fixture)
     // react-dom 16 and 17 require both `scheduler` and `scheduler/tracing`, on different scheduler lines
-    // (0.19 and 0.20); scheduler 0.23 (react-dom 18's copy) dropped tracing. Resolving this from react-dom's
-    // own directory rather than the repository root is what keeps the legs from sharing a scheduler.
+    // (0.19 and 0.20); scheduler 0.23 (react-dom 18's copy) dropped tracing, and react-dom 19 is on 0.28.
+    // Resolving this from react-dom's own directory rather than the repository root is what keeps the legs
+    // from sharing a scheduler.
     const scheduler = floorPackage(floor, 'scheduler', floor.schedulerLine, reactDom)
 
     return {
@@ -107,8 +110,9 @@ function legacyReactJestConfig (floor) {
             ...base.moduleNameMapper,
             // Neither React 16.14 nor 17.0.2 ships `react-dom/client`, yet @testing-library/react 16.3.2
             // requires it eagerly (dist/pure.js:45) even though these legs never call it. MUST precede the
-            // `react-dom/*` rule below -- moduleNameMapper is first-match-wins in declaration order.
-            '^react-dom/client$': `<rootDir>/${HARNESS_RELATIVE}/react-dom-client.js`,
+            // `react-dom/*` rule below -- moduleNameMapper is first-match-wins in declaration order. React 19
+            // ships the real one, and its leg renders through it.
+            ...(floor.legacyRoot && { '^react-dom/client$': `<rootDir>/${HARNESS_RELATIVE}/react-dom-client.js` }),
             '^react$': react,
             '^react/(.*)$': `${react}/$1`,
             '^react-dom$': reactDom,

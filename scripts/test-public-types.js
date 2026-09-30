@@ -8,12 +8,14 @@ const FIXTURES = path.join(__dirname, 'fixtures')
 const CACHE = path.join(ROOT, 'node_modules', '.cache', 'public-types-consumer')
 const TSC = require.resolve('typescript/bin/tsc')
 
-// `@types/react` itself is now 18, because RTL 16 peer-requires it. The 16 and 17 slots therefore
+// `@types/react` itself is now 18, because RTL 16 peer-requires it. The 16, 17 and 19 slots therefore
 // come from locked aliases; every slot stays pinned so the matrix cannot drift with a transitive bump.
+// 19 is the one that can fail differently: @types/react 19 removed the global `JSX` namespace.
 const REACT_TYPES = [
     ['16', 'react-types-16'],
     ['17', 'react-types-17'],
     ['18', '@types/react'],
+    ['19', 'react-types-19'],
 ]
 const TYPE_CONFIGS = [
     ['interop default import', 'tsconfig.public-types.json'],

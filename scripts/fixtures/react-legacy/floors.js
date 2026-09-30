@@ -1,6 +1,8 @@
 /**
- * The pinned facts of the legacy-React Jest legs (docs/UPGRADE-PLAN.md §8, "CI coverage of the declared
- * peer range"): one record per end of `peerDependencies` below the installed 18.
+ * The pinned facts of the per-React Jest legs (docs/UPGRADE-PLAN.md §8, "CI coverage of the declared
+ * peer range"): one record per React in `peerDependencies` that the default suite does not run on -- the
+ * 16.14 floor and 17 below the installed 18, and 19 above it. The directory is still called react-legacy,
+ * after the first two.
  *
  * Everything a leg claims about its React lives here and nowhere else. That matters because the claim is
  * asserted twice on purpose -- once in the parent process by ./jest-config.js, once inside every worker by
@@ -25,6 +27,9 @@ module.exports = {
         schedulerLine: '0.19.',
         cacheDirectory: '<rootDir>/node_modules/.cache/jest-react-16',
         script: 'npm run test:react16',
+        // React 16 and 17 have no `react-dom/client` and no concurrent root, so these legs render through
+        // the legacy root: ./harness.js patches RTL into it and ./jest-config.js stubs the missing entry.
+        legacyRoot: true,
     },
     react17: {
         name: 'React 17.0.2',
@@ -37,5 +42,21 @@ module.exports = {
         schedulerLine: '0.20.',
         cacheDirectory: '<rootDir>/node_modules/.cache/jest-react-17',
         script: 'npm run test:react17',
+        legacyRoot: true,
+    },
+    react19: {
+        name: 'React 19.3.0',
+        fixturePackage: 'react-19',
+        fixtureDir: 'scripts/fixtures/react19',
+        setupFile: 'setup-react19.js',
+        react: '19.3.0',
+        // react-dom 19.3.0 depends on `scheduler@^0.28.0`.
+        schedulerLine: '0.28.',
+        cacheDirectory: '<rootDir>/node_modules/.cache/jest-react-19',
+        script: 'npm run test:react19',
+        // The other way round from 16 and 17: React 19 removed the legacy root (`ReactDOM.render` is gone)
+        // and ships `react-dom/client`, so this leg renders as the default suite does, through createRoot,
+        // with neither the RTL patch nor the stub.
+        legacyRoot: false,
     },
 }

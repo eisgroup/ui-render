@@ -17,7 +17,8 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 - `npm run yalc-publish` — Build lib and publish locally via yalc (for testing in consuming apps)
 - `npm run yalc-watch` — Auto-rebuild and yalc-publish on src changes
 - `npm run deploy` — Deploy demo to GitHub Pages (run `build` first)
-- `npm test` — Run Jest tests
+- `npm test` — Run Jest tests (on the installed React 18)
+- `npm run test:react16` / `test:react17` / `test:react19` — The same suite on React 16.14, 17.0.2 and 19.3.0, each from an install-only fixture package (`scripts/fixtures/react16-floor`, `react17-floor`, `react19`). Never run these configs with bare `jest`; the harness asserts the React it loaded.
 - `npm run test:watch` — Run Jest in watch mode
 - `npm run build-css` — Standalone CSS build (LESS → PostCSS prefixwrap → CSS)
 - `npm run test:env-flags` — Compiles the source with each real webpack config (library, demo dev/prod, the e2e shape) and checks the env flags and `FILE.PATH_IMAGES` each ships, in a realm with no `process`. jest cannot see these: it runs the source against Node's real `process.env`. `_envs.ts` reads `process.env.NODE_ENV`/`REACT_APP_HOMEPAGE` as literals on purpose — never reintroduce `ENV.NODE_ENV` or a `typeof process` guard in front of them
@@ -84,7 +85,7 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 
 ## Tech Stack
 
-- React 16 (peer dependency). **No Semantic UI at all**: the components went in-house at §9.7-F1 steps 1-3 and the CSS at step 4, where the two modules still in use were compiled into `src/style/vendor/` and the package removed. Components still emit Semantic's class tokens (`ui selection dropdown`, `ui table`) because the vendored CSS selects on them.
+- React `^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0` (peer dependency); development and the default suite run on 18.3, and each of the other three has its own gating CI leg. **No Semantic UI at all**: the components went in-house at §9.7-F1 steps 1-3 and the CSS at step 4, where the two modules still in use were compiled into `src/style/vendor/` and the package removed. Components still emit Semantic's class tokens (`ui selection dropdown`, `ui table`) because the vendored CSS selects on them.
 - react-final-form for form state management
 - moment for dates (peer dependency, externalized); charts are custom SVG (`src/core/components/charts/` — no recharts)
 - TypeScript is wired up but the source is still JavaScript: `@babel/preset-typescript` compiles
