@@ -90,7 +90,7 @@ jobs:
       - name: Smoke the packed tarball
         run: npm run test:pack:consumer
 
-      # The step above only ever sees the React the lockfile installs, so the declared 16.14 and 17 ends of
+      # The step above only ever sees the React the lockfile installs, so the declared 16.14, 17 and 19 ends of
       # peerDependencies had no runtime coverage at all. This re-runs the same smoke against React installed
       # into a throwaway directory — the repository's own node_modules is never touched. It checks the
       # published artifact, which is what a peer range is a claim about; it is not a substitute for running
@@ -114,9 +114,10 @@ jobs:
   # `verify` job above only ever exercises 18; `test:pack:peers` proves the published artifact server-renders
   # on 16 and 17, which is narrower than running the suite. This runs the whole suite on React 16.14.
   #
-  # No `--legacy-peer-deps` here, unlike `react-19-advisory` below: React 16.14 comes from an install-only
-  # fixture package (`scripts/fixtures/react16-floor`, linked as the `react-16-floor` devDependency), so npm
-  # nests it instead of competing for the hoisted `node_modules/react` slot and plain `npm ci` installs it.
+  # No `--legacy-peer-deps` here, as in the other fixture legs (the React 19 one used to need it): React
+  # 16.14 comes from an install-only fixture package (`scripts/fixtures/react16-floor`, linked as the
+  # `react-16-floor` devDependency), so npm nests it instead of competing for the hoisted
+  # `node_modules/react` slot and plain `npm ci` installs it.
   # Aliased devDependencies -- the trick `react-types-16` uses -- cannot work for a runtime package, because
   # `react-dom@16.14.0` peer-requires `react` and npm resolves that against the hoisted copy React 18 owns.
   #
@@ -148,9 +149,9 @@ jobs:
       - name: Test on the React 16.14 peer floor
         run: npm run test:react16
 
-  # Gating, and the other half of the peer matrix: `peerDependencies` declares `^16.14 || ^17 || ^18`, and
-  # with this leg every one of the three ends runs the whole suite (18 in `verify`, 16.14 above, 17 here)
-  # rather than only the packed-artifact smoke `test:pack:peers` gives 17. Same shape as `react-16-floor`:
+  # Gating, and the other half of the peer matrix: `peerDependencies` declares `^16.14 || ^17 || ^18 || ^19`,
+  # and with this leg and `react-19` every one of the four runs the whole suite (18 in `verify`, 16.14 above,
+  # 17 here, 19 below) rather than only the packed-artifact smoke `test:pack:peers` gives 17. Same shape as `react-16-floor`:
   # React 17.0.2 comes from an install-only fixture package (`scripts/fixtures/react17-floor`, linked as the
   # `react-17-floor` devDependency), so plain `npm ci` installs it and no `--legacy-peer-deps` is needed.
   # 17 needs the fixture even more than 16 does: react-dom@17.0.2 peer-requires `react` at the EXACT version,
@@ -272,13 +273,17 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
-  # Advisory only — React 19 is NOT declared in peerDependencies (see docs/UPGRADE-PLAN.md §8).
-  # Purpose: make upstream drift visible on every PR without gating it, so the 19 flip is a
-  # measurement rather than a discovery. `continue-on-error: true` keeps a red leg off the merge path.
-  react-19-advisory:
+  # Gating since 2026-09-30, when React 19 joined `peerDependencies` (docs/UPGRADE-PLAN.md §8), and the top of
+  # the peer matrix: 16.14 and 17 below the installed 18, 19 above it. Until then this was
+  # `react-19-advisory`, a `continue-on-error` job that installed React 19 over the lock with
+  # `--legacy-peer-deps`. It is now a fixture leg like `react-16-floor` and `react-17`: React 19.3.0 comes from
+  # `scripts/fixtures/react19` (the `react-19` devDependency), so plain `npm ci` installs it, no flag is
+  # needed, and `npm run test:react19` runs the same leg locally. The same two-level self-check applies.
+  # Unlike the older two, this leg renders through createRoot, not the legacy root: React 19 removed it
+  # (scripts/fixtures/react-legacy/floors.js). Its own job, like `react-17`, for the reason given there.
+  react-19:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    continue-on-error: true
 
     steps:
       - name: Checkout repository
@@ -293,26 +298,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # `--legacy-peer-deps` is deliberate, not carelessness: installed packages still declare a
-      # `react ^16.8.0 || ^17.0.0 || ^18.0.0` peer, so npm would abort this install with ERESOLVE.
-      #   1. react-final-form       6.5.9 (19-ready line is 7.0.1 — §9.7-F4)
-      #   2. react-final-form-arrays 3.1.4 (19-ready line is 5.0.0 — same §9.7-F4 bump)
-      # There were THREE. `semantic-ui-react` was the third, and §9.7-F1 step 3½ removed it — which
-      # is the whole point of that step: the dependency ENTRY is what caps a host's React, not the
-      # bundled code (§2.6-11). Corrected 2026-09-17: this comment used to say "One cap left" and
-      # list only react-final-form. It was wrong — react-final-form-arrays carries the identical cap,
-      # so the flag is needed for it too, and the §9.7-F4 bump has to move both packages together.
-      #
-      # Updated 2026-09-22: both are now devDependencies, not dependencies (§2.6-11 — they are
-      # bundled, so a consumer was installing copies it never loaded). THE FLAG IS STILL NEEDED HERE,
-      # because this job installs React 19 over the DEV tree, where they are still present. What
-      # changed is who else sees the cap: nobody. A consumer no longer inherits it, and the only
-      # React ceiling they meet is the one we declare ourselves in peerDependencies — which still
-      # says ^18, so nothing about React 19 support moved. The flag overrides the peer check for this
-      # throwaway install only and never touches what we declare to consumers.
-      # `--no-save` leaves package.json alone.
-      - name: Install React 19 over the lock
-        run: npm install --no-save --legacy-peer-deps react@19 react-dom@19
-
-      - name: Test on React 19
-        run: npx jest
+      - name: Test on React 19.3.0
+        run: npm run test:react19

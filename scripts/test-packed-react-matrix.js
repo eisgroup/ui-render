@@ -6,23 +6,24 @@ const { spawnSync } = require('child_process')
 /**
  * Peer-range matrix (§0.7).
  *
- * `peerDependencies` claims React 16.14 through 18, but `npm ci` installs exactly one React, so until now
+ * `peerDependencies` claims React 16.14 through 19, but `npm ci` installs exactly one React, so until now
  * the claim was only ever exercised at that one version. This installs the other ends of the declared range
  * into a throwaway directory -- never this repository's node_modules -- and re-runs the packed-consumer
  * smoke against each.
  *
  * This checks the published artifact rather than the suite, because a peer range is a claim about what we
  * publish. Server rendering exercises module resolution, the render path and the CSS payload -- not events,
- * effect timing or anything else needing a DOM. Running the Jest suite on React 16 is a separate, gating
- * leg -- `npm run test:react16` -- so the two are complementary, not alternatives.
+ * effect timing or anything else needing a DOM. Running the Jest suite on those Reacts is a separate, gating
+ * leg per version -- `npm run test:react16`, `test:react17`, `test:react19` -- so the two are complementary,
+ * not alternatives.
  *
  * Usage: `node scripts/test-packed-react-matrix.js [version ...]`. With no arguments it covers the declared
- * range below; pass versions (e.g. `19.2.0`) to probe headroom outside it.
+ * range below; pass versions (e.g. `20.0.0`) to probe headroom outside it.
  */
 const ROOT = path.resolve(__dirname, '..')
 
 /** The installed version is covered by `npm run test:pack:consumer`; these are the ends it never sees. */
-const DECLARED_RANGE = ['16.14.0', '17.0.2']
+const DECLARED_RANGE = ['16.14.0', '17.0.2', '19.3.0']
 
 function installedReactVersion () {
     return require(path.join(ROOT, 'node_modules', 'react', 'package.json')).version

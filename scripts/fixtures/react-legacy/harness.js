@@ -1,7 +1,9 @@
 /**
- * Worker-side setup shared by the legacy-React legs (`jest.react16.config.js`, `jest.react17.config.js`).
- * Called once per worker, for every suite, from the thin per-leg entry points beside this file; the version
- * a leg expects comes from ./floors.js.
+ * Worker-side setup shared by the per-React legs (`jest.react16.config.js`, `jest.react17.config.js`,
+ * `jest.react19.config.js`). Called once per worker, for every suite, from the thin per-leg entry points
+ * beside this file; the version a leg expects comes from ./floors.js. Section 1 applies to every leg;
+ * section 2 only to the legs whose record says `legacyRoot: true`, 16 and 17 -- React 19 has no legacy root
+ * to patch RTL into, and renders through createRoot as the default suite does.
  *
  * 1. VERSION SELF-CHECK. Without it these legs have a failure mode that looks exactly like success: if the
  *    moduleNameMapper stops applying -- a rule dropped, a pattern edited, the fixture install gone -- the
@@ -55,7 +57,7 @@ function installLegacyReactHarness (floor) {
     // deep inside a component. Fail here instead, naming the actual cause.
     if (ReactDOM.version !== floor.react) throw wrongVersion('react-dom', ReactDOM.version)
 
-    if (typeof ReactDOM.render !== 'function' || typeof ReactDOM.unmountComponentAtNode !== 'function') {
+    if (floor.legacyRoot && (typeof ReactDOM.render !== 'function' || typeof ReactDOM.unmountComponentAtNode !== 'function')) {
         throw new Error(
             `react-dom resolved without the legacy render API; the ${floor.name} mapping is wrong`
         )
@@ -70,6 +72,8 @@ function installLegacyReactHarness (floor) {
             + ` expected ${floor.schedulerLine}x`
         )
     }
+
+    if (!floor.legacyRoot) return
 
     const pure = require('@testing-library/react/dist/pure.js')
 

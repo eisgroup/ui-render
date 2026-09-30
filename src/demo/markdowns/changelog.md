@@ -154,11 +154,9 @@
   the package was in our dependency list it capped the React you could use, regardless of whether
   our code called it. That cap is gone.
 
-  We have not widened our own peer range yet: it still reads
-  `^16.14.0 || ^17.0.0 || ^18.0.0`. Removing someone else's cap and claiming React 19 support are
-  two different things, and the second needs our own React 19 test job to stop being advisory.
-  It is green today, which is the first real evidence, but the claim comes with the release that
-  makes it.
+  Removing someone else's cap and claiming React 19 support were two different things, and the
+  second needed our own React 19 test job to stop being advisory. It now gates, and the peer range
+  includes React 19 (see *Compatibility*).
 
   Nothing about the rendered output or the meta contract changes here. The Semantic **styles** were
   still loaded when this entry was first written — that was a separate package, `semantic-ui-less`,
@@ -294,6 +292,14 @@
 
 #### Compatibility
 
+- **React 19 is supported.** The `react` and `react-dom` peer ranges now read
+  `^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0`. The range was added to, not replaced, so hosts on
+  16.14, 17 and 18 need change nothing. The whole test suite runs on React 19.3 in its own gating
+  check beside 16.14, 17 and 18, the packed package is server-rendered against each of them, and
+  the TypeScript declarations are compiled against `@types/react` 16, 17, 18 and 19.
+- The bundle's JSX now compiles to React's automatic runtime, so the bundle imports
+  `react/jsx-runtime` from your React next to `react` itself. Every React in the peer range ships
+  it. If your build aliases `react` to one particular copy, alias `react/jsx-runtime` the same way.
 - Development and the primary test suite now run on React 18.3.1, and the demo mounts through the
   React 18 root API, so it renders with automatic batching exactly as a host on 18 does.
 - The peer range stays additive: host applications may use React 16.14, 17 or 18. Hosts on 16 or 17
@@ -360,12 +366,12 @@
 - Build configuration: the demo build no longer duplicates the shared Babel presets. Every
   pipeline — library, demo and tests — now reads them from one `babel.config.js`, with only the
   development-time refresh transform declared by the demo. Emitted bundles are unchanged.
-- The declared peer range is now tested, not just asserted. The full suite runs on React 16.14 in
-  its own gating check alongside the React 18 one, the packed artifact is server-rendered against
-  React 16.14 and 17, and a non-gating check runs the suite on React 19 so upstream drift shows up
-  early. Assertions that had been pinned to React version internals — a function component's second
-  argument, and component names appended to development warnings — now assert behaviour instead, so
-  the same suite passes on React 16.14, 17, 18.3 and 19.
+- The declared peer range is now tested, not just asserted. The full suite runs on React 16.14, 17
+  and 19 in gating checks of their own alongside the React 18 one, and the packed artifact is
+  server-rendered against each of them. The React 19 check began as a non-gating one, so that
+  upstream drift showed up early. Assertions that had been pinned to React version internals — a
+  function component's second argument, and component names appended to development warnings — now
+  assert behaviour instead, so the same suite passes on React 16.14, 17, 18.3 and 19.
 
 #### Fixes
 

@@ -53,6 +53,7 @@
     "test:env-flags": "node scripts/test-env-flags.js",
     "test:react16": "jest --config jest.react16.config.js",
     "test:react17": "jest --config jest.react17.config.js",
+    "test:react19": "jest --config jest.react19.config.js",
     "test:watch": "jest --watch",
     "build-css": "node scripts/build-css.js",
     "docs:views": "node scripts/generate-view-reference.js",
@@ -364,8 +365,8 @@
   ],
   "peerDependencies": {
     "moment": "^2.29.4",
-    "react": "^16.14.0 || ^17.0.0 || ^18.0.0",
-    "react-dom": "^16.14.0 || ^17.0.0 || ^18.0.0"
+    "react": "^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "dependencies": {},
   "devDependencies": {
@@ -413,6 +414,7 @@
     "react": "^18.3.1",
     "react-16-floor": "file:scripts/fixtures/react16-floor",
     "react-17-floor": "file:scripts/fixtures/react17-floor",
+    "react-19": "file:scripts/fixtures/react19",
     "react-dom": "^18.3.1",
     "react-final-form": "^6.5.9",
     "react-final-form-arrays": "^3.1.4",
@@ -423,6 +425,7 @@
     "react-syntax-highlighter": "^16.1.1",
     "react-types-16": "npm:@types/react@16.14.70",
     "react-types-17": "npm:@types/react@17.0.93",
+    "react-types-19": "npm:@types/react@19.3.0",
     "remark-gfm": "^3.0.1",
     "remark-toc": "^9.0.0",
     "serve": "^14.2.4",

@@ -1,0 +1,10 @@
+{
+  "name": "eis-ui-render-react-19",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Install-only fixture holding React 19.3.0 for jest.react19.config.js -- the top of the declared peer range, above the installed 18. Linked from the root devDependencies as `react-19` (file:scripts/fixtures/react19) so a plain `npm ci` installs it, nested here rather than hoisted, leaving the root react/react-dom on 18. Versions are pinned exactly so the leg cannot drift with a transitive bump. Nothing but this manifest belongs in this directory: the harness code lives in scripts/fixtures/react-legacy/ so that the node_modules npm nests here cannot shadow its module resolution and mask a broken mapping. Sibling of scripts/fixtures/react16-floor and scripts/fixtures/react17-floor.",
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  }
+}
