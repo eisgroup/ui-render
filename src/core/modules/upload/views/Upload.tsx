@@ -7,7 +7,7 @@ import Icon from '../../../components/Icon'
 import Loading from '../../../components/Loading'
 import Row from '../../../components/Row'
 import Text from '../../../components/Text'
-import TooltipJs from '../../../components/Tooltip'
+import Tooltip from '../../../components/Tooltip'
 import View from '../../../components/View'
 import {
     get,
@@ -22,14 +22,6 @@ import { _ } from '../translations'
 import { Active } from '../../../utils'
 import type { Translate } from '../../../utils/_envs'
 import { AppContext } from '../../../contexts'
-
-/**
- * `Tooltip` is still JavaScript, so TypeScript has nothing to infer its props from. It is re-typed as
- * an open prop bag, the permissiveness its `.js` call sites already have. Delete the cast when it is
- * converted.
- */
-type UnconvertedComponent = React.ComponentType<Record<string, unknown>>
-const Tooltip = TooltipJs as unknown as UnconvertedComponent
 
 /** What `Dropzone` exposes through its ref (`useImperativeHandle` in Dropzone.js). */
 export type DropzoneHandle = { open: () => void }

@@ -29,7 +29,7 @@ const FONT_ORIGINS = ['https://fonts.googleapis.com', 'https://fonts.gstatic.com
 
 /** The portaled semantic-ui-react bubble, wherever it lands. Use in `[R]` tests only. */
 const BUBBLE = 'div[data-suir-portal="true"] div.ui.popup'
-/** The in-house inline bubble (`src/core/components/Tooltip.js`). */
+/** The in-house inline bubble (`src/core/components/Tooltip.tsx`). */
 const INLINE_BUBBLE = 'span.tooltip'
 /**
  * Either shape. **Every `[I]` test must use this, not `BUBBLE`.**

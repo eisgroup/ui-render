@@ -5,14 +5,28 @@ import { FILE } from './files'
 import { type } from './types'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
+/** The named props are read here; the rest is spread onto the `<img>` through ./domProps (see `ViewProps`). */
+export type ImageProps = {
+  /** File name; required if `src` or `alt` not given */
+  name?: string
+  /** File directory path to use if `src` not given */
+  path?: string
+  /** Optional css class */
+  className?: string
+  decoding?: 'auto' | 'async' | 'sync'
+  loading?: 'eager' | 'lazy'
+  /** Derived from `name` and `path` when not given */
+  src?: string
+  /** Derived from `name` when not given */
+  alt?: string
+  [key: string]: unknown
+}
+
+/** Where `imageSrc` finds an image: `avatar`, else `src`, else `name` under `path`. */
+export type ImageSource = { avatar?: string, src?: string, name?: string, path?: string }
+
 /**
  * Image - Pure Component.
- *
- * @param {String} name - file name
- * @param {String} [path] - file directory path to use if `src` not given
- * @param {String} [className] - optional css class
- * @param {*} [props] - other attributes to pass to `<img>`
- * @returns {Object} - React component
  */
 export function Image ({
   name,
@@ -23,7 +37,7 @@ export function Image ({
   decoding = 'async',
   loading = 'lazy',
   ...props
-}) {
+}: ImageProps) {
   if (props.src == null) props.src = imageSrc({name, path})
   // `name` is optional (a caller may pass only `src`), and fileNameWithoutExt has no guard of its own,
   // so deriving the alt text unconditionally used to throw. An empty alt is the correct value for an
@@ -45,7 +59,7 @@ Image.propTypes = {
   loading: type.Enum(['eager', 'lazy']),
 }
 
-export function imageSrc ({avatar, src, name = '', path = FILE.PATH_IMAGES}) {
+export function imageSrc ({avatar, src, name = '', path = FILE.PATH_IMAGES}: ImageSource) {
   return avatar || src || (path + name.replace(/\s/g, '-').toLowerCase())
 }
 

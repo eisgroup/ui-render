@@ -30,7 +30,7 @@ type PropsBag = { [key: string]: unknown }
  * `.ui-render`, so not one of the 13 scoped `.ui.popup` rules could paint it.
  *
  * So there was no working positioning to lose. This is the same inline `<span>` the product has
- * shipped for years through `components/Tooltip.js` (`Slider`, `modules/upload/views/Upload.tsx`,
+ * shipped for years through `components/Tooltip.tsx` (`Slider`, `modules/upload/views/Upload.tsx`,
  * `withFormSetup`'s validation tooltip — 5 snapshot-gated bubbles in the corpus), plus the
  * JavaScript the CSS cannot express.
  *
@@ -116,7 +116,7 @@ type PropsBag = { [key: string]: unknown }
 const CLOSE_DELAY = 70
 
 /**
- * The placement words `tooltip.less` understands, in the order `Tooltip.js` composes them.
+ * The placement words `tooltip.less` understands, in the order `Tooltip.tsx` composes them.
  * `position` is parsed rather than validated: semantic-ui-react's vocabulary spelled the four
  * sides with a second word (`top center`, `left center`), and those extra words map onto nothing
  * here, so they are ignored instead of rejected.
@@ -543,18 +543,20 @@ export default function TooltipPop ({
             {isOpen && (
                 <Tooltip
                     // DOM boundary (see ./domProps): the rest bag reaches a generic `<span>`, so both
-                    // lists apply. `Tooltip.js` filters again on its own spread; applying it here as
+                    // lists apply. `Tooltip.tsx` filters again on its own spread; applying it here as
                     // well is what makes this component's boundary derivable from its own source.
                     {...omitProps(supported, ENGINE_PROPS, FIELD_ONLY_PROPS)}
                     {...placementOf(position)}
                     show
-                    // On the BUBBLE, never as a default inside `Tooltip.js`: that file is shared with
+                    // On the BUBBLE, never as a default inside `Tooltip.tsx`: that file is shared with
                     // `Slider`'s five always-mounted bubbles, `Upload` and the validation tooltip, and
                     // a default `role` there would put five `tooltip` roles into the corpus census.
                     role="tooltip"
                     id={bubbleId}
                     className={classNames({ inverted }, className)}
-                >{body}</Tooltip>
+                    // A cast, not a guard: only an open tooltip renders this, and an open tooltip's function
+                    // body was called above. TypeScript cannot follow that from the two conditions.
+                >{body as React.ReactNode}</Tooltip>
             )}
         </span>
     )

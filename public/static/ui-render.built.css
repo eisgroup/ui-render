@@ -3236,7 +3236,7 @@
  * cannot reach it. That is deliberate and it is an improvement: that block existed to UNDO what
  * the bubble inherited from the button (`text-transform: none` against the button's uppercase, the
  * base font weight against the button's). Outside the button the bubble simply inherits ordinary
- * page typography, and `Tooltip.js` emits `no-wrap` itself, so the one declaration that mattered
+ * page typography, and `Tooltip.tsx` emits `no-wrap` itself, so the one declaration that mattered
  * still applies.
  */
 .ui-render .tooltip-host {

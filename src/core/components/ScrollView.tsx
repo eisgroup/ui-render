@@ -3,21 +3,36 @@ import PropTypes from 'prop-types'
 import React, { useRef, useState } from 'react'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
+/** The named props are read here; the rest is spread onto the inner `<div>` through ./domProps (see `ViewProps`). */
+export type ScrollViewProps = {
+  /** CSS classes to apply */
+  className?: string
+  /** CSS classes to apply to inner wrapper */
+  classNameInner?: string
+  /** CSS to apply */
+  style?: React.CSSProperties
+  /** CSS to apply to inner wrapper */
+  styleInner?: React.CSSProperties
+  /** Whether to render children as <Row /> */
+  row?: boolean
+  /** Whether to make the view fill up available height and width */
+  fill?: boolean
+  /** Whether to reverse order of rendering */
+  reverse?: boolean
+  /** Whether to use right to left direction */
+  rtl?: boolean
+  /** Whether to center align content */
+  center?: boolean
+  /** Dropped, never forwarded */
+  tab?: unknown
+  /** Forwarded to the inner `<div>`; its presence adds the `pointer` class */
+  onClick?: React.MouseEventHandler<HTMLDivElement>
+  children: React.ReactNode
+  [key: string]: unknown
+}
+
 /**
  * View with Custom Scroll Bar - Pure Component
- *
- * @param {String} [className] - CSS classes to apply
- * @param {String} [classNameInner] - CSS classes to apply to inner wrapper
- * @param {Object} [style] - CSS to apply
- * @param {Object} [styleInner] - CSS to apply to inner wrapper
- * @param {Boolean} [row] - whether to render children as <Row />
- * @param {Boolean} [fill] - whether to make the view fill up available height and width
- * @param {Boolean} [reverse] - whether to reverse order of rendering
- * @param {Boolean} [rtl] - whether to use right to left direction
- * @param {Boolean} [center] - whether to center align content
- * @param {*} [tab]
- * @param {*} props - other props
- * @returns {Object} - React component
  */
 const ScrollView = ({
   className,
@@ -32,13 +47,14 @@ const ScrollView = ({
   // Remove tab to prevent Error
   tab,
   ...props
-}) => {
-  const thisRef = useRef(null)
+}: ScrollViewProps) => {
+  const thisRef = useRef<HTMLDivElement>(null)
   const [scrollYPosition, setScrollYPosition] = useState(0)
 
-  const handleScroll = (e) => {
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     if (e.target === thisRef.current) {
-      setScrollYPosition(e.target.scrollLeft)
+      // The cast is what the comparison above established: the target is this component's own <div>.
+      setScrollYPosition((e.target as HTMLDivElement).scrollLeft)
     }
   }
 
