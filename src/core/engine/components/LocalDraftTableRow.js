@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { memo, useState } from 'react'
 import Button from '../../components/Button'
 import Input from '../../components/Input'
 import InputDate from '../../components/InputDate'
@@ -51,32 +51,33 @@ function parseRowValue (def, raw) {
   return raw
 }
 
+// Read once, when this module loads, as the class's `defaultProps` were. `Active.translate` is reassigned by
+// every document the engine constructs (rules.js), so reading it at render would hand a draft row whichever
+// document was built last.
+const DEFAULT_TRANSLATE = Active.translate
+
+const EMPTY_DRAFT = { draft: {}, fieldErrors: {} }
+
 /**
  * Table "add row" draft: values live only in React state until the user commits (Add).
  * No react-final-form Field registration — avoids leaking draft into parent `values`.
  */
-export default class LocalDraftTableRow extends PureComponent {
-  static defaultProps = {
-    translate: Active.translate
-  }
+function LocalDraftTableRow ({ meta, kind, parentInstance, translate = DEFAULT_TRANSLATE }) {
+  const [state, setState] = useState(EMPTY_DRAFT)
+  // `this.setState` merged into the state it was given; this keeps that shape, and the updater form.
+  const update = (partial) => setState((s) => ({ ...s, ...(typeof partial === 'function' ? partial(s) : partial) }))
 
-  state = {
-    draft: {},
-    fieldErrors: {}
-  }
-
-  handleChange = (name, def) => (e) => {
+  const handleChange = (name) => (e) => {
     const v = e && e.target ? e.target.value : e
-    this.setState((s) => ({
+    update((s) => ({
       draft: { ...s.draft, [name]: v },
       fieldErrors: { ...s.fieldErrors, [name]: undefined }
     }))
   }
 
-  handleAdd = () => {
-    const { meta, kind, parentInstance } = this.props
+  const handleAdd = () => {
     const inputs = collectInputs(meta.items)
-    const { draft, fieldErrors: prevErr } = this.state
+    const { draft, fieldErrors: prevErr } = state
     const fieldErrors = { ...prevErr }
     let hasErr = false
 
@@ -111,7 +112,7 @@ export default class LocalDraftTableRow extends PureComponent {
     }
 
     if (hasErr) {
-      this.setState({ fieldErrors })
+      update({ fieldErrors })
       return
     }
 
@@ -122,7 +123,7 @@ export default class LocalDraftTableRow extends PureComponent {
       rowObject: row,
       fallbackDataKindPath: ''
     })
-    if (appended !== false) this.setState({ draft: {}, fieldErrors: {} })
+    if (appended !== false) update({ draft: {}, fieldErrors: {} })
   }
 
   /**
@@ -134,10 +135,9 @@ export default class LocalDraftTableRow extends PureComponent {
    *  `style={{verticalAlign: 'top'}}`, which is what the metas that actually align already do —
    *  and expect a visual change, because that one works.
    */
-  renderInputCell = (def, i) => {
-    const { translate } = this.props
+  const renderInputCell = (def, i) => {
     const name = def.name
-    const { draft, fieldErrors } = this.state
+    const { draft, fieldErrors } = state
     const value = draft[name]
     const error = fieldErrors[name]
     const { className, type, format: _f, validate: _v, ...rest } = def
@@ -145,7 +145,7 @@ export default class LocalDraftTableRow extends PureComponent {
       ...rest,
       name,
       value: value === undefined || value === null ? '' : value,
-      onChange: this.handleChange(name, def),
+      onChange: handleChange(name),
       error,
       translate,
       className
@@ -159,12 +159,12 @@ export default class LocalDraftTableRow extends PureComponent {
     )
   }
 
-  renderBranch = (item, i) => {
+  const renderBranch = (item, i) => {
     if (item.view === 'Input' && item.name) {
-      return this.renderInputCell(item, i)
+      return renderInputCell(item, i)
     }
     if (item.view === 'VerticalLayout' || item.view === 'Col3') {
-      return (item.items || []).flatMap((sub, j) => this.renderBranch(sub, `${i}-${j}`))
+      return (item.items || []).flatMap((sub, j) => renderBranch(sub, `${i}-${j}`))
     }
     if (item.view === 'Button') {
       const oc = item.onClick
@@ -173,7 +173,7 @@ export default class LocalDraftTableRow extends PureComponent {
       const { onClick: _oc, children, ...btnRest } = item
       return (
         <Table.Cell key={`btn-${i}`}>
-          <Button {...btnRest} type="button" onClick={this.handleAdd} translate={this.props.translate}>
+          <Button {...btnRest} type="button" onClick={handleAdd} translate={translate}>
             {children}
           </Button>
         </Table.Cell>
@@ -182,14 +182,14 @@ export default class LocalDraftTableRow extends PureComponent {
     return null
   }
 
-  render () {
-    const { meta } = this.props
-    if (!meta || !meta.items) return null
-    const cells = meta.items.flatMap((item, i) => {
-      const node = this.renderBranch(item, i)
-      if (node == null) return []
-      return Array.isArray(node) ? node : [node]
-    })
-    return <>{cells}</>
-  }
+  if (!meta || !meta.items) return null
+  const cells = meta.items.flatMap((item, i) => {
+    const node = renderBranch(item, i)
+    if (node == null) return []
+    return Array.isArray(node) ? node : [node]
+  })
+  return <>{cells}</>
 }
+
+// `memo` skips a render with shallow-equal props, as `PureComponent` did.
+export default memo(LocalDraftTableRow)

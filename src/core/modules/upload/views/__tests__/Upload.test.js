@@ -1,4 +1,4 @@
-import React, { createRef } from 'react'
+import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import Upload from '../Upload'
@@ -96,15 +96,7 @@ describe('Upload', () => {
     })
 
     it('handleKeyPress opens dropzone on Enter', () => {
-        const ref = createRef()
-        // Render with ref to grab the Upload instance via a wrapper class
-        class Wrapper extends React.Component {
-            ref = createRef()
-            render () {
-                return <Upload ref={this.ref} fileType="image" name="img" />
-            }
-        }
-        const wrapper = render(wrap(<Wrapper ref={ref} />))
+        const wrapper = render(wrap(<Upload fileType="image" name="img" />))
         const div = wrapper.container.querySelector('.upload__dropzone')
         const input = wrapper.container.querySelector('input[type="file"]')
         const spy = jest.spyOn(input, 'click')

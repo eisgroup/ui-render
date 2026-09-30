@@ -1,4 +1,4 @@
-import React, { PureComponent, useContext } from 'react'
+import React, { memo, useContext } from 'react'
 import AutoSave from '../modules/form/views/AutoSave'
 import { FIELD } from '../modules/variables'
 import { cn } from '../components'
@@ -463,11 +463,9 @@ const RenderComponent = ({
              * When user clicks on a button that opens popup, the VirtualDOM is inserted to Popup component for rendering.
              * @withForm needs to wrap the entire content to provide Form field instance using existing form.
              */
-            class PopupContent extends PureComponent {
-                render () {
-                    return items.map(Render)
-                }
-            }
+            const PopupContent = memo(function PopupContent () {
+                return items.map(Render)
+            })
 
             // Store popup with template ID if it contains variables
             // The ID will be interpolated when popup is opened
