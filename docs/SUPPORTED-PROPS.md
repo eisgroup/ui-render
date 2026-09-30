@@ -203,7 +203,7 @@ THE ARITHMETIC, derived from the installed `semantic-ui-react` rather than estim
 
 ### `Dropdown` — in-house, no semantic-ui-react
 
-`src/core/components/Dropdown.js`, 335 lines. Replaced the wrapper in §9.7-F1 step 3 part 2.
+`src/core/components/Dropdown.js`, 339 lines. Replaced the wrapper in §9.7-F1 step 3 part 2.
 
 The wrapper already owned the external API: the `onChange(value, name, event)` signature, option sanitisation, case-insensitive dedup on addition, and the cascading reset are all wrapper code, and none of it moved. Only the `<DropDown/>` element at the bottom changed — it is now the in-house `Listbox`, under the same import alias. Two entry points, and they differ: `mapper.js` imports the memoised default export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.js` imports the NAMED export for `view: "Select"` — which is the majority path.
 

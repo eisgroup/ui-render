@@ -396,6 +396,16 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       // publish a `canSave` it takes back one render later.
       const [applied, setApplied] = useState(adopted)
 
+      // One subscription at a time, to the latest `form`, which is a new object on every render.
+      const subscribeTo = form => {
+        if (own.unsubscribe) own.unsubscribe()
+        own.subscribedForm = form
+        own.unsubscribe = form.subscribe(
+          formSubscription(form),
+          {touched: true, initialValues: true, error: true, errors: true}
+        )
+      }
+
       // @see: https://final-form.org/docs/react-final-form/types/FormProps
       // Form only calls `render` function when `subscription` changes, or itself rerenders.
       // `formState` can remain unchanged, even if `initialValues` changed.
@@ -411,14 +421,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
           own.formProps = formProps
         }
 
-        if (own.subscribedForm !== form) {
-          if (own.unsubscribe) own.unsubscribe()
-          own.subscribedForm = form
-          own.unsubscribe = form.subscribe(
-            formSubscription(form),
-            {touched: true, initialValues: true, error: true, errors: true}
-          )
-        }
+        if (own.subscribedForm !== form) subscribeTo(form)
 
         // Class should use PureComponent to take advantage of caching
         return <FormComponent {...restProps} formProps={own.formProps} initialValues={applied} instance={handle}/>
@@ -427,6 +430,10 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       // In the shared storage under a copy of the values it started with, from the commit it mounts in
       // until it unmounts.
       useBeforePaintEffect(() => {
+        // StrictMode runs a mount's effects twice, and the cleanup below has just unsubscribed: subscribe
+        // again, to the form the last render subscribed to. On a mount, that render's subscription is
+        // still there (§9.3 step 7).
+        if (!own.subscribedForm && handle.form) subscribeTo(handle.form)
         own.stored = {...initialValues}
         formsStorage.set(own.stored, {
           meta: props.meta,
@@ -690,6 +697,16 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
         if (owed.errors && this._meta && processErrors) processErrors(this.form, this._meta)
       }
       if (super.componentDidUpdate) super.componentDidUpdate(...arguments)
+    }
+
+    componentDidMount () {
+      // StrictMode mounts a component, unmounts it and mounts it again, so `componentWillUnmount`
+      // below may have just marked the document as unmounting. It is back: take the mark back, or
+      // everything that checks it (a removed field's timer, auto-submit) would stand down for good
+      // (§9.3 step 7). The host was told `{}`, which is what it starts from in the usage above, and
+      // it is handed the instance on the first change of `canSave`, as without StrictMode.
+      if (this.isUnmounting) this.isUnmounting = false
+      if (super.componentDidMount) super.componentDidMount(...arguments)
     }
 
     componentWillUnmount () {
