@@ -4,8 +4,9 @@ import '../rules'
 import { Active } from '../../utils'
 
 // The nested-Data registry: four members of the engine layer since §9.3 step 5, until then the
-// `withDataKind` mixin applied to that one class. `Active.UIRender` is the form layer over it.
-const EngineLayer = Object.getPrototypeOf(Active.UIRender)
+// `withDataKind` mixin applied to that one class. `Active.UIRender` hosts the form layer over it, and
+// carries that class as `InstanceClass` (§9.3 step 6).
+const EngineLayer = Object.getPrototypeOf(Active.UIRender.InstanceClass)
 
 describe('the nested-Data registry', () => {
     /** A bare object on the engine layer's prototype: the registry touches nothing else. */

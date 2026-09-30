@@ -752,7 +752,7 @@ Every workstream below is a series of small, independently shippable, reversible
   3. **Definition 2** moves to the constructor and `componentDidMount`. **DONE 2026-09-29.**
   4. **Definitions 1 and 4 merge into one**, which is what they already are in effect. **DONE 2026-09-29.**
   5. **`WithForm` becomes a function component**, taking definition 6. **DONE 2026-09-29.**
-  6. **The document becomes a function component**, taking 1 with 4 and 5, and the instance object with them.
+  6. **The document becomes a function component**, taking 1 with 4 and 5, and the instance object with them. **DONE 2026-09-29.**
   7. **§9.3 step 7's acceptance:** the demo under `<StrictMode>`.
 
   After slice 4, three definitions are left. Slices 5 and 6 are where the instance contract changes hands. If their measurements say otherwise, the classes can stay, with those three.
@@ -830,6 +830,29 @@ Every workstream below is a series of small, independently shippable, reversible
     - The wrapper subscribes once per `form` object, so it subscribes again on every render of the form.
     - The registries of §9.3 step 3 (touched fields, errors, baseline) are keyed by that object, which lasts one render. So nothing they record outlives a render. That defeats what the touched registry is for: a field blurred in a row that has since re-rendered still counting as touched.
     - The function keeps the class's behaviour exactly. A stable key is a behaviour change of its own.
+
+  **Slice 6: the document as a function, DONE 2026-09-29.** The last two definitions are gone, and with them every `UNSAFE_*` lifecycle in `src`. React is handed a function component, `documentHost.ts`, which hosts one instance of the document's classes for the document's lifetime. The declared class, the engine layer and the form layer stay, as the classes of that instance: it is the one object per document that the decision above called for.
+  - **The host gives the instance what React gave the class:**
+    - `props`, `state` and `context` before every render;
+    - `setState` with its merge, updaters called with the state and props of the render that applies them, and callbacks after that render's commit;
+    - `forceUpdate`;
+    - `componentDidMount`, `componentDidUpdate` and `componentWillUnmount` from layout effects;
+    - and `render`.
+
+    It adds one method, `deriveFromProps(nextProps)`, called during the render when the props or the context changed, with the props, state and context the last render had: where React called `UNSAFE_componentWillReceiveProps`. Both syncs are that now: the document's `data`, `meta` and currency code, and the form layer's `canSave`. The component keeps the class's name, for React's messages and its component stacks alike, and its prop types.
+  - **The form layer's other half waits for the commit.** `onDataChanged`, `onChangeState` and the error pass ran before the render. They run in `componentDidUpdate` now, so a host can set its own state from them without React's "Cannot update a component while rendering a different component", which a call from the render would draw.
+  - **Measured, class against function, for every example, on React 16, 17 and 18.** Renders, host callbacks and the final state are identical. The one difference is the order: the callbacks come after the render that shows the new `canSave`, where they came before it.
+  - **Measured against React itself.** `documentHost.test.js` runs one script through a React class and through the host: mount, a batched click with callbacks, new props, equal props in a new object, a new context alone, a state update batched with new props, `forceUpdate`, a timer update outside a batch, and unmount. The logs are identical on React 16, 17 and 18.
+    - Under StrictMode the lifecycle is identical, but the props hook runs twice where `UNSAFE_componentWillReceiveProps` ran once. It is render-phase code, and StrictMode runs all of that twice. That is why it may set nothing but the document's own state. How often render-phase work repeats depends on the version: React 19, in the advisory job, reuses a function component's hooks for StrictMode's second render of a mount, so it constructs the host once where it constructs the class twice.
+    - One difference is deliberate: an update that changes nothing renders again, where React skipped the render and still called back. The engine issues none.
+    - Nine mutations of the host and the form layer each fail at least one test.
+  - **StrictMode.** `rules.strict-mode.test.js` renders a document with nested documents through an edit, under StrictMode, and asserts that nothing is reported about an unsafe lifecycle. It failed on the classes on all three legs.
+  - **The tests.**
+    - The behaviour tests came first and were run against the classes: what the form layer tells the host, a host setting its state from those callbacks, and StrictMode.
+    - The structural tests read the classes from `Active.UIRender.InstanceClass` now.
+    - `rules.set-state-path` tests `statePathOf` (`statePath.ts`), the rule lifted out of `setStates`, which no longer clears the meta cache: slice 2's leftover.
+    - Two form-layer tests cover the derive and commit halves.
+    - Two upload tests and a row removal now await their asynchronous update inside `act`. React 16 and 17 report a hook's update outside `act` where they did not report a class's, so a host on 16 or 17 whose tests drive such flows outside `act` will see that warning too. It appears only in tests.
 
 7. **Acceptance for the whole workstream:** demo runs clean under `<StrictMode>` per the §7 definition (subscriptions, cleanup, no setState-in-render, two-instance isolation).
 

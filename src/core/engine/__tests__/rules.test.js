@@ -443,7 +443,7 @@ describe('the nested-Data registry', () => {
 
     beforeEach(() => {
         formsStorage.clear()
-        parent = Object.create(Object.getPrototypeOf(Active.UIRender).prototype)
+        parent = Object.create(Object.getPrototypeOf(Active.UIRender.InstanceClass).prototype)
     })
 
     describe('registerDataKind', () => {

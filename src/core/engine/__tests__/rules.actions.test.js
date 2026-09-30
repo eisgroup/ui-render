@@ -197,8 +197,13 @@ describe('UIRender action orchestration', () => {
                 set: setInputValue,
             })
             const file = new File(['replacement'], 'replacement.csv', { type: 'text/csv' })
-            fireEvent.change(fileInput, {
-                target: { files: [file] },
+            // The upload's answer arrives in a promise, and the document applies it as a state update.
+            // Since §9.3 step 6 that is a hook's update, which React 16 and 17 report outside `act`
+            // where they did not report a class's; so the answer is awaited inside it.
+            await act(async () => {
+                fireEvent.change(fileInput, {
+                    target: { files: [file] },
+                })
             })
 
             await waitFor(() => expect(uploadFile).toHaveBeenCalledTimes(1))
@@ -240,8 +245,11 @@ describe('UIRender action orchestration', () => {
         ))
         expect(screen.getByLabelText('Status')).toHaveValue('Before upload')
 
-        fireEvent.change(container.querySelector('input[type="file"]'), {
-            target: { files: [new File(['a'], 'a.csv', { type: 'text/csv' })] },
+        // Inside `act`, for the reason the test above gives.
+        await act(async () => {
+            fireEvent.change(container.querySelector('input[type="file"]'), {
+                target: { files: [new File(['a'], 'a.csv', { type: 'text/csv' })] },
+            })
         })
 
         await waitFor(() => expect(screen.getByLabelText('Status')).toHaveValue('After upload'))
@@ -468,7 +476,13 @@ describe('UIRender action orchestration', () => {
 
         const buttons = screen.getAllByRole('button', { name: 'Remove row' })
         expect(buttons).toHaveLength(2)
-        fireEvent.click(buttons[1])
+        // The removed row's field lets the form go on a timer (`asField`), and the document hears of
+        // it as a state update. Since §9.3 step 6 that is a hook's update, which React 16 and 17
+        // report outside `act`, so the timer runs inside it.
+        await act(async () => {
+            fireEvent.click(buttons[1])
+            await new Promise(resolve => setTimeout(resolve, 0))
+        })
 
         await waitFor(() => {
             expect(screen.getAllByRole('button', { name: 'Remove row' })).toHaveLength(1)
