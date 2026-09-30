@@ -73,13 +73,13 @@
  * decision before anything reaches a cell. The remaining unfiltered spread on the F1 surface is
  * `TooltipPop` -> Semantic's `Popup`, which step 2 owns.
  *
- * Still uncovered, and why that is not the same as unsafe: several components spread onto a
- * DOM tag but are unreachable from meta — `mapper.js` resolves no view to them — and most are
- * the orphans §9.9-H1 slates for deletion (`AnimateHeight`, `ColorSwatch`, `LinkOut`,
- * `Placeholder`, `SizeMe`, `Badge`, `ImageSwatch`, `Tags`, `MenuButton`, `ErrorContent`,
- * `ErrorTable`, `Square`). Others spread onto a component in this list rather than onto an
- * element, so they are filtered downstream. If one of those is ever wired into `mapper.js`,
- * it becomes a boundary that day.
+ * Still uncovered, and why that is not the same as unsafe: three components spread onto a DOM
+ * tag unfiltered, and no meta props bag reaches any of them. `AnimateHeight` gets only what
+ * `Expand` passes it, `LinkOut` renders only in the demo, and `utils/SizeMe` only inside
+ * `utils/layouts.js`, which nothing imports. (This paragraph also named seven orphans, since
+ * deleted by §9.9-H1.) `ColorSwatch` and `Placeholder` spread onto a component in this list
+ * rather than onto an element, so they are filtered downstream. If one of the three is ever
+ * wired into `mapper.js`, it becomes a boundary that day.
  */
 
 /**

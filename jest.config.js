@@ -205,7 +205,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/Expand.js': {
+        './src/core/components/Expand.tsx': {
             statements: 97,
             branches: 95,
             functions: 100,

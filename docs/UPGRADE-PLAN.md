@@ -1092,6 +1092,10 @@ Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on a
 
 Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on an edit, the DOM unchanged after both). `src/core` + `src/library` are 50 TS files, 8,399 lines, against 107 JS files, 11,389 lines: 42.4% of the lines, was 41.0%. `dist/index.js` is 327,405 → 327,399 bytes.
 
+**Fourth batch, 2026-09-30: `Expand` and its family, and four small ones** — `Expand`, `AnimateHeight`, `ExpandList`, `Placeholder`, `PlaceholderField`, `ColorSwatch` and `LinkOut`. This batch's lesson is about the checker itself: `PlaceholderField` keeps its runtime `= {}` default, and a default makes a parameter optional, so TypeScript checked its JSX against `PlaceholderFieldProps | undefined` and let an object through as `name`. An overload is the signature callers see now, with the default kept; the probe that caught it fails on both the plain and the memoised export. The engine calls it through `PlaceholderField.bind(this, {name: view})`, so the named export stays a plain function, and the props React passes arrive second and are not read. `domProps.js`'s list of unfiltered spreads is corrected: the surviving three — `AnimateHeight`, `LinkOut` and `utils/SizeMe` — are reached by no meta props bag, and the seven orphans it also named were deleted by §9.9-H1. Found on the way, and left for a change of its own: `utils/layouts.js` is imported by nothing, and `utils/SizeMe.js` only by it.
+
+Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on an edit, the DOM unchanged after both), and `dist/index.js` is byte-for-byte the same size, 327,399. `src/core` + `src/library` are 57 TS files, 8,830 lines, against 100 JS files, 11,051 lines: 44.4% of the lines, was 42.4%.
+
 #### E3 — Engine last
 
 `rules.js` / `form/utils.js` are typed **as they are decomposed** (§9.3) — decomposition outputs are born as `engine/*.ts`. Typing the prototype-patching machinery as-is is wasted effort; don't.
