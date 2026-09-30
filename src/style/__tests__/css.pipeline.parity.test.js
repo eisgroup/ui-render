@@ -359,8 +359,8 @@ describe('CSS pipeline parity — final CSS, post-PostCSS (§9.5)', () => {
  * missing file.
  *
  * THE CAUSE, since found: a `webpack --watch` running alongside the tests. `css.semantic-parity`
- * writes `override/_semantic.less` to measure what the imports contribute; that is a SOURCE change,
- * so the watcher rebuilds, and the library config's `CleanRootStatic` hook used to empty the root
+ * wrote `override/_semantic.less` to measure what the imports contribute; that is a SOURCE change,
+ * so the watcher rebuilt, and the library config's `CleanRootStatic` hook used to empty the root
  * `static/` payload at the start of every rebuild before refilling it. Three tests here then died
  * on a file that had existed moments earlier.
  *
@@ -369,9 +369,10 @@ describe('CSS pipeline parity — final CSS, post-PostCSS (§9.5)', () => {
  * because the wipe uses `force: true`. And it vanishes the moment the watcher exits, which is what
  * made it look intermittent: it reproduced 3/3 with a watcher up and 0/3 without one.
  *
- * `webpack.library.config.mjs` no longer wipes on `watchRun`, so the window is gone. This read is
- * kept at load anyway: it is correct regardless of what any concurrent process does, which is the
- * property worth having.
+ * `webpack.library.config.mjs` no longer wipes on `watchRun`, so the window is gone, and since
+ * 2026-09-30 the suite measures in memory and writes nothing: the same write was also what broke
+ * `css.compilation.test.js` in a parallel worker. This read is kept at load anyway: it is correct
+ * regardless of what any concurrent process does, which is the property worth having.
  *
  * Reading once, at load, makes this suite correct regardless: it either has the bytes it checked
  * for, or it skips. CI is unaffected either way — it runs jest before `build-lib`, so these three

@@ -48,10 +48,22 @@ const parse = (text) => text
     .map(block => block.replace(/^\n+|\n+$/g, ''))
     .filter(Boolean);
 
+const STYLE_DIR = path.resolve(__dirname, '..');
+
+/** When each file under `src/style` was last written, by path. */
+const writeTimes = () => Object.fromEntries(fs.readdirSync(STYLE_DIR, { recursive: true })
+    .map(file => [file, fs.statSync(path.join(STYLE_DIR, file))])
+    .filter(([, stat]) => stat.isFile())
+    .map(([file, stat]) => [file, stat.mtimeMs]));
+
 let actual;
+let rewritten;
 
 beforeAll(async () => {
+    const before = writeTimes();
     actual = await contributedRules();
+    const after = writeTimes();
+    rewritten = Object.keys(after).filter(file => after[file] !== before[file]);
     // 60s, matching the four sibling CSS suites: this one compiles the whole tree TWICE, and those
     // suites already showed that a tighter budget is the first thing to break when several
     // LESS-compiling workers contend for CPU on CI.
@@ -81,5 +93,14 @@ describe('the CSS semantic-ui-less still contributes', () => {
         expect(selectors.some(selector => selector.includes('.ui.selection.dropdown'))).toBe(true);
         expect(selectors.some(selector => selector === 'html')).toBe(true);
         expect(actual.length).toBeGreaterThan(200);
+    });
+
+    it('is measured without writing to the source tree, which other workers compile from', () => {
+        // The measurement used to write the edited `_semantic.less` over the real file for the
+        // length of its compile, which a sibling worker compiling `index.less` could read:
+        // `css.compilation.test.js` then failed on "Missing 1 classes: item" (`substituting` in the
+        // generator has the whole story). The content was always put back, so only the write
+        // itself can be checked for.
+        expect(rewritten).toEqual([]);
     });
 });
