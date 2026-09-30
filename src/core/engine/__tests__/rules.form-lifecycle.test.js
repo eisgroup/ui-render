@@ -12,7 +12,7 @@ import '@testing-library/jest-dom' // eslint-disable-line import/first
 import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
 // The lifecycle layer, not the bare class: since §9.3 step 5 the engine installs it on a subclass
 // of its own instead of mutating the class it is handed, and `Active.UIRender` is the channel
-// `engine/Data.js` already reads it from to render nested documents.
+// `engine/Data.tsx` already reads it from to render nested documents.
 import { Active } from '../../utils' // eslint-disable-line import/first
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
 
@@ -34,7 +34,7 @@ afterEach(() => {
     jest.restoreAllMocks()
 })
 
-// Rendered directly, the way `engine/Data.js` renders a nested document: the lifecycle layer
+// Rendered directly, the way `engine/Data.tsx` renders a nested document: the lifecycle layer
 // without the form wrapper around it.
 const NestedUIRender = Active.UIRender
 

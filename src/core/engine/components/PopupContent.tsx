@@ -1,5 +1,28 @@
-import { memo } from 'react'
-import Render from '../index'
+import React, { memo } from 'react'
+import RenderJs from '../index'
+
+/**
+ * The renderer is still JavaScript (§9.6-E3), re-typed as what this file calls it with. Cast where it is
+ * called, not in a module-level constant: the engine's modules import each other in a cycle, and only a
+ * read at render is guaranteed to see the import's live binding (Data.tsx measured the difference).
+ */
+type RenderFunction = (props: Record<string, unknown>) => React.ReactNode
+
+/** A meta item as this component forwards it: only its identity and its `meta` are touched here. */
+type PopupItem = { id?: string, name?: string, meta?: Record<string, unknown>, [key: string]: unknown }
+
+export type PopupContentProps = {
+    items: PopupItem[]
+    data?: unknown
+    _data?: unknown
+    form?: unknown
+    instance?: unknown
+    relativeIndex?: number
+    relativePath?: string
+    /** Accepted and deliberately not read, see below */
+    relativeData?: boolean
+    currencyCode?: string
+}
 
 /**
  * THE CONTENT OF A POPUP OPENED FROM A TEMPLATE — its items rendered against one row.
@@ -27,17 +50,18 @@ import Render from '../index'
  * @returns {Function} a new memoized component that renders `items` with the given row context
  */
 export function createPopupContent () {
-    return memo(function PopupContent (props) {
+    return memo(function PopupContent (props: PopupContentProps) {
         // `relativeData` is deliberately not read: every mapped item below hardcodes
         // `relativeData: false` so Render never re-extracts by name.
         const { items, data, _data, form, instance, relativeIndex, relativePath, currencyCode } = props
+        const Render = RenderJs as unknown as RenderFunction
 
         // Map items with current data context, similar to how Render.js does it
         // IMPORTANT: Always pass relativePath and relativeIndex to ensure correct field IDs
         // Set relativeData to false to prevent Render.js from automatically extracting data by name
         // This ensures _data remains the single row element, not the entire array
         const mappedItems = items.map((item) => {
-            const mappedItem = {
+            const mappedItem: PopupItem = {
                 ...item,
                 data,
                 _data,

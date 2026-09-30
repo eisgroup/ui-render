@@ -367,7 +367,7 @@ describe('TooltipPop — the passthrough surface, deliberately narrowed', () => 
         // The escape hatch the wrapper needs. `inline-flex` is layout-neutral for a
         // `Button` trigger (measured) but not for a growing or block-level one, so a
         // meta author has to be able to reach the wrapper's own classes — the same
-        // `classWrap` name `modules/upload/views/Upload.js` already uses.
+        // `classWrap` name `modules/upload/views/Upload.tsx` already uses.
         whileOpen({ title: TITLE, className: 'app__hint', classWrap: 'fill' }, ({ host }) => {
             expect(host.getAttribute('class')).toBe('tooltip-host fill')
             expect(bubble().getAttribute('class')).toBe('tooltip no-wrap top show app__hint')

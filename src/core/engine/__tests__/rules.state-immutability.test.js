@@ -16,7 +16,7 @@
 import '../rules'
 // The lifecycle layer, not the bare class: since §9.3 step 5 the engine installs it on a subclass
 // of its own instead of mutating the class it is handed, and `Active.UIRender` is the channel
-// `engine/Data.js` already reads it from to render nested documents. Since §9.3 step 6 that is the
+// `engine/Data.tsx` already reads it from to render nested documents. Since §9.3 step 6 that is the
 // document's host, which carries the class as `InstanceClass`.
 import { Active } from '../../utils'
 

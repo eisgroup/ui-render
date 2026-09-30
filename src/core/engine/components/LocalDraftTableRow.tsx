@@ -1,17 +1,58 @@
 import React, { memo, useState } from 'react'
-import Button from '../../components/Button'
-import Input from '../../components/Input'
-import InputDate from '../../components/InputDate'
-import Table from '../../components/Table'
+import ButtonJs from '../../components/Button'
+import InputJs from '../../components/Input'
+import InputDateJs from '../../components/InputDate'
+import TableJs from '../../components/Table'
 import { Active } from '../../utils'
+import type { Translate } from '../../utils/_envs'
 import { email, isRequired, maxLength, password, url } from '../../components/inputs/validationRules'
 import { integer } from '../../components/inputs/normalizers'
 import { pushDataKindRow, validateNotWithinRangeDraftRow } from '../dataKindPush'
 
 /**
+ * The presentational components below are still JavaScript, so TypeScript has nothing to infer
+ * their props from. They are re-typed as open prop bags, the permissiveness their `.js` call sites
+ * already have (the convention of InputNumber.tsx). Delete a cast when its component is converted.
+ */
+type UnconvertedComponent = React.ComponentType<Record<string, unknown>>
+const Button = ButtonJs as UnconvertedComponent
+const Input = InputJs as UnconvertedComponent
+const InputDate = InputDateJs as UnconvertedComponent
+const Table = TableJs as unknown as { Cell: UnconvertedComponent }
+
+type Validator = (value: unknown) => unknown
+
+/** A meta node of the draft row, as this file reads it. */
+export type DraftItem = {
+  view?: string
+  name?: string
+  items?: DraftItem[]
+  type?: string
+  format?: string
+  validate?: unknown
+  verify?: { dataKind?: string, validate?: Array<{ name?: string, args?: string[] }> }
+  className?: string
+  classNameCellWrap?: string
+  /** An action name, or the resolved action itself: a function whose `name` is the action's */
+  onClick?: string | { name?: string } | ((...args: unknown[]) => unknown)
+  children?: React.ReactNode
+  [key: string]: unknown
+}
+
+export type LocalDraftTableRowProps = {
+  meta?: { items?: DraftItem[], [key: string]: unknown }
+  kind?: string
+  parentInstance?: { getDataKind?: (kind?: string) => object[], [key: string]: unknown }
+  translate?: Translate
+}
+
+type DraftState = { draft: Record<string, unknown>, fieldErrors: Record<string, unknown> }
+type ChangeEventLike = { target?: { value?: unknown } }
+
+/**
  * Collect Input definitions from TableCells meta (including nested VerticalLayout).
  */
-function collectInputs (items, out = []) {
+function collectInputs (items: DraftItem[] | undefined, out: DraftItem[] = []): DraftItem[] {
   if (!items) return out
   for (const item of items) {
     if (item.view === 'Input' && item.name) out.push(item)
@@ -23,29 +64,33 @@ function collectInputs (items, out = []) {
 }
 
 // Same string keys as FIELD.VALIDATE / metaToProps `validate` (see src/core/modules/form/constants.js)
-const VALIDATION_BY_NAME = {
+const VALIDATION_BY_NAME: Record<string, Validator | undefined> = {
   email,
   required: isRequired,
-  maxLength,
+  // Found while typing this file and kept as it was: `maxLength` is a FACTORY, `maxLength(length)` returns
+  // the validator. Called here with the value, it returns that validator, a function, which the draft
+  // row then records as the field's error, so a draft whose meta says `validate: 'maxLength'` can never
+  // be added. The cast states the mismatch rather than hiding it.
+  maxLength: maxLength as unknown as Validator,
   password,
   url
 }
 
-function resolveValidator (validate) {
+function resolveValidator (validate: unknown): Validator | null | undefined {
   if (validate == null) return null
-  if (typeof validate === 'function') return validate
+  if (typeof validate === 'function') return validate as Validator
   if (typeof validate === 'string') {
     return VALIDATION_BY_NAME[validate] || VALIDATION_BY_NAME[validate.toLowerCase()]
   }
   return null
 }
 
-function parseRowValue (def, raw) {
+function parseRowValue (def: DraftItem, raw: unknown) {
   const { type, format } = def
   if (raw === '' || raw == null) return type === 'number' ? undefined : raw
   if (type === 'number') {
     if (format === 'integer') return integer(raw)
-    const n = parseFloat(raw)
+    const n = parseFloat(raw as string)
     return Number.isNaN(n) ? raw : n
   }
   return raw
@@ -56,19 +101,22 @@ function parseRowValue (def, raw) {
 // document was built last.
 const DEFAULT_TRANSLATE = Active.translate
 
-const EMPTY_DRAFT = { draft: {}, fieldErrors: {} }
+const EMPTY_DRAFT: DraftState = { draft: {}, fieldErrors: {} }
 
 /**
  * Table "add row" draft: values live only in React state until the user commits (Add).
  * No react-final-form Field registration — avoids leaking draft into parent `values`.
  */
-function LocalDraftTableRow ({ meta, kind, parentInstance, translate = DEFAULT_TRANSLATE }) {
-  const [state, setState] = useState(EMPTY_DRAFT)
+function LocalDraftTableRow ({ meta, kind, parentInstance, translate = DEFAULT_TRANSLATE }: LocalDraftTableRowProps) {
+  const [state, setState] = useState<DraftState>(EMPTY_DRAFT)
   // `this.setState` merged into the state it was given; this keeps that shape, and the updater form.
-  const update = (partial) => setState((s) => ({ ...s, ...(typeof partial === 'function' ? partial(s) : partial) }))
+  const update = (partial: Partial<DraftState> | ((s: DraftState) => Partial<DraftState>)) =>
+    setState((s) => ({ ...s, ...(typeof partial === 'function' ? partial(s) : partial) }))
 
-  const handleChange = (name) => (e) => {
-    const v = e && e.target ? e.target.value : e
+  const handleChange = (name: string) => (e: unknown) => {
+    // The JavaScript expression as it was, cast rather than restructured: an event carries its value on
+    // `target`, and a date input hands the value itself.
+    const v = e && (e as ChangeEventLike).target ? (e as ChangeEventLike).target!.value : e
     update((s) => ({
       draft: { ...s.draft, [name]: v },
       fieldErrors: { ...s.fieldErrors, [name]: undefined }
@@ -76,14 +124,14 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate = DEFAULT_T
   }
 
   const handleAdd = () => {
-    const inputs = collectInputs(meta.items)
+    const inputs = collectInputs(meta!.items)
     const { draft, fieldErrors: prevErr } = state
     const fieldErrors = { ...prevErr }
     let hasErr = false
 
-    const row = {}
+    const row: Record<string, unknown> = {}
     for (const def of inputs) {
-      const name = def.name
+      const name = def.name as string
       const raw = draft[name]
       const validator = resolveValidator(def.validate)
       const parsed = parseRowValue(def, raw)
@@ -135,8 +183,8 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate = DEFAULT_T
    *  `style={{verticalAlign: 'top'}}`, which is what the metas that actually align already do —
    *  and expect a visual change, because that one works.
    */
-  const renderInputCell = (def, i) => {
-    const name = def.name
+  const renderInputCell = (def: DraftItem, i: number | string) => {
+    const name = def.name as string
     const { draft, fieldErrors } = state
     const value = draft[name]
     const error = fieldErrors[name]
@@ -159,7 +207,7 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate = DEFAULT_T
     )
   }
 
-  const renderBranch = (item, i) => {
+  const renderBranch = (item: DraftItem, i: number | string): React.ReactNode => {
     if (item.view === 'Input' && item.name) {
       return renderInputCell(item, i)
     }
@@ -168,7 +216,9 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate = DEFAULT_T
     }
     if (item.view === 'Button') {
       const oc = item.onClick
-      const isAdd = oc && (oc === 'addData' || oc.name === 'addData')
+      // `.name` is read off whatever `onClick` is, a function included: the engine resolves the action
+      // to a function named after it.
+      const isAdd = oc && (oc === 'addData' || (oc as { name?: unknown }).name === 'addData')
       if (!isAdd) return null
       const { onClick: _oc, children, ...btnRest } = item
       return (

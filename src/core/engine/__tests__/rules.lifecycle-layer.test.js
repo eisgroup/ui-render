@@ -20,7 +20,7 @@
  * THE FORM MODULE STOPPED PATCHING IT IN TURN. `withFormSetup` used to write the form members onto
  * this layer's prototype and replace its `UNSAFE_componentWillReceiveProps` and
  * `componentWillUnmount`; it now builds a subclass of its own over it. That subclass is what the
- * form wrapper renders and what nested documents render — `engine/Data.js` reads it from
+ * form wrapper renders and what nested documents render — `engine/Data.tsx` reads it from
  * `Active.UIRender` to avoid a circular import — so the chain is the declared class, this layer,
  * then the form layer.
  */

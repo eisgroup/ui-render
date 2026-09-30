@@ -30,7 +30,7 @@ type PropsBag = { [key: string]: unknown }
  * `.ui-render`, so not one of the 13 scoped `.ui.popup` rules could paint it.
  *
  * So there was no working positioning to lose. This is the same inline `<span>` the product has
- * shipped for years through `components/Tooltip.js` (`Slider`, `modules/upload/views/Upload.js`,
+ * shipped for years through `components/Tooltip.js` (`Slider`, `modules/upload/views/Upload.tsx`,
  * `withFormSetup`'s validation tooltip — 5 snapshot-gated bubbles in the corpus), plus the
  * JavaScript the CSS cannot express.
  *
