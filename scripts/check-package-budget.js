@@ -27,6 +27,9 @@ const FILE_BUDGETS = {
 const REQUIRED = [
     'dist/index.js',
     'dist/index.d.ts',
+    // What `dist/index.d.ts` re-exports every published type from (§9.6-E4): without it, the entry
+    // resolves and every `UIRender.*` type does not.
+    'dist/contract.d.ts',
     // The published meta.json JSON Schema (§9.4). Meta authors point their editor at
     // node_modules/eis-ui-render/meta.schema.json, so a `files` change that drops it
     // silently removes IDE validation for every consumer.

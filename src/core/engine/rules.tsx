@@ -231,7 +231,7 @@ export { formsStorage }
  */
 /**
  * A document's props: the meta and data it renders, and the host's callbacks. Each is documented
- * where a host reads it, in the published `UIRender.UIRenderProps` (`src/library/types/UIRender.tsx`);
+ * where a host reads it, in the published `UIRender.UIRenderProps` (`src/library/contract.ts`);
  * open here, because the engine reads them by key and rewrites meta and data as JSON.
  */
 export type UIRenderProps = Record<string, any>

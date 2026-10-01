@@ -49,7 +49,7 @@ Because `react`/`react-dom` are webpack **externals** and npm **peer dependencie
 | Node | engines `>=18` (relaxed 2026-08-18, see §10), `.nvmrc` = 24 | ✅ current |
 | Lint | ESLint 8 + `eslint-config-react-app` 7 | ✅ `npm run lint:js` exits 0 errors / 0 warnings with `--max-warnings 0` and runs in CI; the 22 warnings were triaged in Phase 0.9 (one was a real defect, R18) and the 14 zero-reference devDependencies are gone |
 | Styling | LESS 4 (declared `^4.4.2`, resolved 4.9.1), `less-plugin-functions` 1.0 kept deliberately via `scripts/less-plugin-compat.js`, PostCSS 8, stylelint 16 | ✅ works; ~~LESS pin is a separate watch-item (§9.8)~~ **CLOSED 2026-09-15** — unpinned in be02e239 "§9.8: unpin LESS — 3.13 → 4.x, output byte-identical (#48)". The row as it stood: "LESS 3.13 (pinned for the semantic-ui-less + `less-plugin-functions` toolchain)" — and that stated reason was itself wrong, as R8 records: the anchors were ours (`javascriptEnabled` at `_variables.less:23`, `round()` at `_variables.less:264`), not semantic's. |
-| Types | Hand-written public API types in `src/library/types/`, emitted via `tsconfig.build.json` (declaration-only) | ✅ describes the direct callable UMD/CommonJS export; emitted declarations compile with `skipLibCheck: false` against locked `@types/react` 16/17/18 consumers using both interop-default and direct `import = require` (§2.6-1, Phase 0.6) |
+| Types | ~~Hand-written public API types in `src/library/types/`, emitted via `tsconfig.build.json` (declaration-only)~~ **Generated from the source since §9.6-E4 (2026-10-01):** `scripts/gen-ts.js` publishes `src/library/main.tsx`'s declaration and `src/library/contract.ts`'s | ✅ describes the direct callable UMD/CommonJS export; emitted declarations compile with `skipLibCheck: false` against locked `@types/react` 16/17/18 consumers using both interop-default and direct `import = require` (§2.6-1, Phase 0.6) |
 | CI / publish gates | GitHub Actions workflow for pull requests and `master` pushes | ✅ hosted CI is green for JS/CSS lint, coverage and both builds; `prepack` checks version sync and rebuilds the library. ~~Pack budgets, packed-consumer smoke, asset deduplication and the source-map decision remain — Phase 0.7~~ **CLOSED 2026-09-17** (this verdict carried ⚠️ until then): `ci.yml` runs `test:pack:budget`, `test:pack:consumer` and `test:pack:peers` as gating steps; `scripts/check-package-budget.js` caps the `dist/static` re-export stubs (`RE_EXPORT_MAX_BYTES`) and fails on a duplicated asset; and §10 records the source-map call as "Decided (2026-08-10): ship". |
 
 ### 2.2 Dependency compatibility matrix
@@ -1212,6 +1212,28 @@ Measured: the corpus is identical to master's (107 / 1012 at mount, 27 / 64 on a
 - **Golden-file check:** the golden baseline is the **Phase 0.6 corrected contract** — never the legacy shim d.ts that shipped before it (§2.6-1). After the switch, the diff against that baseline must contain only intended changes — consumer-facing types must not silently narrow or widen.
 - Delete the hand-written types folder once the diff is accepted.
 
+**DONE 2026-10-01.** ✅ The package's declarations are generated from the source, and the hand-written `src/library/types` folder is gone.
+- **The contract is an ordinary module, `src/library/contract.ts`.** It holds every published type as an export. They were moved with `git mv` from the folder's `UIRender.tsx`, where they were members of a `declare namespace`. The text of each is unchanged apart from `export` and the indentation, JSDoc included.
+- **The component is typed with it.** `main.tsx`'s `Render` takes `UIRenderProps<Data>` and returns `React.ReactElement | null`, written out. Before, its props were a separate and looser type (`RenderProps`, every key `unknown`), so nothing tied the published props to the component.
+- **`npm run gen-ts` is now `scripts/gen-ts.js`.** tsc emits the declarations of the program rooted at `main.tsx` into a staging directory (`tsconfig.build.json`, which now extends the typecheck config). The script publishes two of them. It writes the second itself, because `export =` cannot be in the source: Babel rejects it.
+  - `dist/contract.d.ts`, the contract's, as tsc wrote it;
+  - `dist/index.d.ts`, written from `main.tsx`'s: the component renamed `UIRender`, a namespace re-exporting each contract type with `export import`, and `export =`.
+- **The script refuses what must not be published:** an import other than `react` and the contract, a value in the contract, a default export that is not a function, and anything else in `main.tsx`'s declaration. A namespace of types merges with a function and not with a `const`: measured, TS2451. `scripts/__tests__/gen-ts.contract.test.js` pins each refusal on a declaration written in the test, and counts the real contract's 27 types.
+- **The checker now holds the engine to the contract where the two meet.** The validator's `MetaProblem.severity` was `string`. It is now the two values the validator produces, and loosening it back fails `main.tsx`. The props reach the engine through one documented cast: the contract keeps a host's `Data` open, while the form layer types `initialValues` as a record.
+- **The golden diff, against master's declarations: the Phase 0.6 contract and the changes accepted since.**
+  - The same 27 names.
+  - Every type is identical, by the `Eq` identity check and by mutual assignability, the two generics both at their default and at a sample type. So are the callable and its `React.ComponentProps`.
+  - Controls: widening one prop failed 7 of the checks, and narrowing the return type failed 2.
+  - Textually, each declaration is the same apart from `export`. The one intended change is the component's JSDoc, which now describes the component.
+- **What else moved:**
+  - The agreement table is now `src/library/contract.agreement.ts` and imports the contract as a module, so `npm run typecheck` covers it. `typecheck:contract` runs it alone and extends the same config.
+  - The contract suite reads the vocabularies from `contract.ts`.
+  - `dist/contract.d.ts` is a required file of the tarball.
+  - The coverage log no longer reports two failures on every run: jest could not collect coverage from `UIRender.tsx` or `index.ts`, because Babel rejected `export =`.
+- **Probes on the real source:** a prop added to `Render`'s signature reached `dist/index.d.ts`; a loosened `items` failed `typecheck:contract` (TS2578); a value exported from the contract stopped `gen-ts`.
+
+Measured: consumers compile on `@types/react` 16, 17, 18 and 19, with both the interop and the CommonJS import (`test:types`). The corpus is identical to master's (107 / 1012 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 311,527 → 311,539 bytes, from `main.tsx`'s restructuring.
+
 #### E5 — Retire the `prop-types` runtime dependency (runs alongside E2/E3, completes after E3)
 
 **Audited usage:** 40 files import `prop-types`; **all usage is declarative** (`.propTypes =` statics — zero manual `checkPropTypes()` calls anywhere), and ~90 call sites (plus the proxy's own ~60 definition lines) go through the semantic proxy `src/core/components/types.js` (`type.Id`, `type.Px`, `type.Milliseconds`, …), which the engine also consumes (`rules.js:219`, `Data.js:30`). Two extra reasons beyond TS redundancy: React 19 removes propTypes validation entirely (on 19 the package is pure dead weight), and no strip-plugin is configured today — the shapes **ship in the production bundle**.
@@ -1315,7 +1337,7 @@ still turn on a **pilot of two or three real components**, not on extrapolating 
 | `isolatedModules` discipline (`export type` in barrels, no `const enum`) | continuous |
 | ~~Decorator semantics unchanged for the legacy-decorator files (Babel `legacy` ↔ TS `experimentalDecorators`)~~ **moot since 2026-09-29:** no decorator is left in `src` (§2.3) | E0/E2 |
 | Bundle size neutral after each conversion batch (compare `dist/index.js` in CI) | continuous |
-| Golden `dist/index.d.ts` diff shows only intended changes (baseline = the Phase 0.6 contract) | E4 |
+| ~~Golden `dist/index.d.ts` diff shows only intended changes (baseline = the Phase 0.6 contract)~~ ✅ **met 2026-10-01:** 27 names, every type identical, the callable identical; the only change is the component's JSDoc | E4 |
 | Consumer d.ts compile matrix vs `@types/react` 16/17/18 (+19 at the flip) stays green — ✅ **BUILT AND GATING 2026-09-17** for the 16/17/18 half: `scripts/test-public-types.js:13–17` declares the three slots (`react-types-16`, `react-types-17`, `@types/react`) and `:26–32` throws when a slot's installed major drifts; `package.json` pins them via the aliases `react-types-16: npm:@types/react@16.14.70` and `react-types-17: npm:@types/react@17.0.93`; CI runs `npm run test:types:consumer` (`.github/workflows/ci.yml:71`) and `npm run test:pack:peers` (`:85`) on every PR. Only the `+19 at the flip` half is still future work, gated on the React 19 flip. | Phase 0.6 → continuous |
 | No `checkPropTypes()` calls exist (✅ verified — usage is purely declarative, safe to delete) | audit fact |
 | ~~`rg "prop-types" src` empty → dependency removed; bundle-size delta recorded~~ ✅ **met 2026-10-01:** empty, removed from `devDependencies`, and `dist/index.js` 322,915 → 311,527 bytes | E5 |
@@ -2196,7 +2218,7 @@ Every check this plan depends on, in one place. ✅ = already verified during th
 - ☑ E0 probe: one `.ts` module + one `.test.ts` pass every pipeline — typecheck, Jest, `build-lib`, demo `build` (THREE builds, not four: watch runs the library config since §9.9-H7). Promoted to the permanent `src/toolchain/` guard
 - ☑ `tsc --noEmit` gate in CI from E0 onward — `npm run typecheck`, `Typecheck` step in `verify`, 1.6 s over 375 files, proven to fail on a real type error
 - ☑ `.ts`/`.tsx` reach `lint:js` (`--ext` extended; the config's overrides already covered them)
-- ☐ E4: golden `dist/index.d.ts` diff reviewed — only intended changes
+- ☑ E4: golden `dist/index.d.ts` diff reviewed — only intended changes — **2026-10-01**: identical types, checked by `Eq` and mutual assignability, with two controls (§9.6-E4 record)
 - ☑ E5: semantic `type` proxy ~~recreated as TS aliases (same vocabulary) before the engine converts~~ **deleted instead, 2026-10-01:** 4 of its 41 names carried a meaning beyond PropTypes', and the props' JSDoc carries it (§9.6-E5 record)
 - ☑ E5: `rg "prop-types" src` returns nothing → `prop-types` removed from `dependencies`, bundle-size delta recorded — **2026-10-01**: removed from `devDependencies`, the list it was in; `dist/index.js` −11,388 bytes
 - ☐ Go/no-go on the E2/E3 tail held after E1 — **the velocity measurement now exists** (§9.6-E1: 20 files, 4142 lines, 364 agent-minutes, 23 `any` against 199 `unknown`); the DECISION is still outstanding, and §9.6's governance note argues it should turn on a 2–3 component pilot rather than on extrapolating pure utils; hand-written d.ts hedged with type-level tests until E4

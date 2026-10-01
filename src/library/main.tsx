@@ -1,43 +1,34 @@
-import React from 'react'
+import * as React from 'react'
 import UIRender from '../core/engine/rules'
 import { AppProvider, ConfigOverride } from '../core/providers'
 import { reportMetaProblems } from '../core/engine/validateMeta'
-import type { MetaProblem } from '../core/engine/validateMeta'
 import AppWrapper from './AppWrapper'
+import type { UIRenderProps } from './contract'
 
-/** What `Render` reads; everything is also handed to the engine, `validateMeta` excepted. */
-export type RenderProps = {
-    meta?: unknown
-    validateMeta?: boolean | ((problems: MetaProblem[]) => void)
-    dateFormat?: string
-    currency?: string
-    language?: string
-    [key: string]: unknown
-}
-
+// THIS DECLARATION IS THE PACKAGE'S (§9.6-E4): `npm run gen-ts` publishes it as `UIRender`, through
+// `scripts/gen-ts.js`, with the JSDoc below and without these line comments, which declaration emit
+// drops. So it is a function, because a namespace of types merges with a function and not with a
+// `const`, and its return type is written out, so the published signature stays the contract's own
+// `React.ReactElement | null` rather than whatever the checker infers. All the props reach the
+// engine except `validateMeta`, which is read here.
 /**
- * @param {Object} props - UIRender props
- * @param {Boolean|Function} [props.validateMeta] - dev-mode meta contract check (UPGRADE-PLAN §9.4).
- *    Falsy (the default) walks nothing at all. `true` reports every problem to `console.warn`,
- *    each line naming the JSON path of the offending node (e.g. `items[3].items[0].name`).
- *    A function receives the problems array instead of the console being written to; pass a
- *    stable reference (the check is memoised on the meta identity and this value together).
- * @param {String} [props.dateFormat] - moment format tokens applied to every rendered and
- *    edited date. Defaults to `MM-DD-YYYY`.
- * @param {String} [props.currency] - currency name; the shell renders it as a CSS class.
- *    @Note: not `meta.currencyCode`, which selects the symbol used by value renderers.
- * @param {String} [props.language] - language code; the shell renders it as a CSS class.
- * @param {Function} [props.onError] - called with a report — `{error, errorInfo, path, props,
- *    message}` — whenever a node's subtree fails to render, where `path` is the JSON path of
- *    the node in `meta`. The library logs the same report itself, so this is an extra channel
- *    (send it to your error reporting), not a way to silence the console diagnostic.
- * @returns {JSX.Element} the renderer, wrapped in the library's providers and scoped shell
+ * Renders `meta` with `data`, inside the library's providers and its scoped shell. Each prop is
+ * documented on `UIRender.UIRenderProps`.
+ *
+ * The published UMD/CommonJS entry is this function itself, not an object with `.default`.
  */
-const Render = ({validateMeta, ...props}: RenderProps) => {
+function Render<Data = unknown> (props: UIRenderProps<Data>): React.ReactElement | null {
+    const {validateMeta, ...hostProps} = props
+    // A cast, not a guard: the contract keeps a host's `Data` open (`unknown` unless the host says
+    // otherwise), while the engine's form layer types `initialValues` as a record and `onSubmit` as
+    // final-form's handler. The engine is handed the host's props exactly as before; the cast says
+    // so to the checker, and only here, at the one place the two meet.
+    const engineProps = hostProps as React.ComponentProps<typeof UIRender>
+
     // During render, deliberately: the failures worth naming (a non-array `items`, a non-string
     // `name`) throw inside UIRender's own render, so an effect would report after the crash it
     // was meant to explain. Keyed on the meta identity so a re-render costs nothing.
-    React.useMemo(() => reportMetaProblems(props.meta, validateMeta), [props.meta, validateMeta])
+    React.useMemo(() => reportMetaProblems(hostProps.meta, validateMeta), [hostProps.meta, validateMeta])
 
     return (
         <AppProvider>
@@ -49,12 +40,12 @@ const Render = ({validateMeta, ...props}: RenderProps) => {
               * sees exactly the same values.
               */}
             <ConfigOverride
-                dateFormat={props.dateFormat}
-                currency={props.currency}
-                language={props.language}
+                dateFormat={hostProps.dateFormat}
+                currency={hostProps.currency}
+                language={hostProps.language}
             >
                 <AppWrapper>
-                    <UIRender {...props} />
+                    <UIRender {...engineProps} />
                 </AppWrapper>
             </ConfigOverride>
         </AppProvider>

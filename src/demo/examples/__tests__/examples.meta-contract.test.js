@@ -62,7 +62,8 @@ const VOCABULARIES = [
 ]
 
 /**
- * The published TypeScript surface, read straight out of `src/library/types/UIRender.tsx` (§9.6-E1).
+ * The published TypeScript surface, read straight out of `src/library/contract.ts` (§9.6-E1), the
+ * module `dist/index.d.ts` publishes as it is (§9.6-E4).
  * This is the third party to the agreement: the engine's live FIELD groups, the schema's enums, and
  * the types a consumer gets must all name the same things, or one of them is lying to somebody.
  */

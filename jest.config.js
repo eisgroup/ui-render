@@ -32,6 +32,8 @@ module.exports = {
         '!<rootDir>/src/**/__tests__/**',
         '!<rootDir>/src/**/*.test.{js,jsx,ts,tsx}',
         '!<rootDir>/src/**/__mocks__/**',
+        // A compile-time test (`npm run typecheck`), never run: counted, it is 0% of nothing that ships.
+        '!<rootDir>/src/library/contract.agreement.ts',
     ],
     coverageThreshold: {
         global: {

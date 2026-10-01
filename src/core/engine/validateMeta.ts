@@ -64,16 +64,24 @@ export const META_PROBLEM = {
 export const META_SEVERITY = {
     ERROR: 'error',
     WARNING: 'warning',
-}
+} as const
 
-/** One problem found: where, how bad, which kind, and a message that says it. */
-export type MetaProblem = { path: string, severity: string, code: string, message: string }
+/** How bad a problem is: one of the two `META_SEVERITY` values, as the published contract says. */
+export type MetaSeverity = typeof META_SEVERITY[keyof typeof META_SEVERITY]
+
+/**
+ * One problem found: where, how bad, which kind, and a message that says it. What a host's
+ * `validateMeta` callback receives, so `src/library/main.tsx` holds it to the published
+ * `UIRenderMetaProblem`: a problem this walk produced that the contract does not describe would not
+ * compile there.
+ */
+export type MetaProblem = { path: string, severity: MetaSeverity, code: string, message: string }
 
 /** A meta node, as the walk reads it. */
 type MetaNode = Record<string, unknown>
 
 /** Reports a problem at `key` under the node being walked. */
-type Report = (key: string, severity: string, code: string, message: string) => void
+type Report = (key: string, severity: MetaSeverity, code: string, message: string) => void
 
 /** What the walk carries: the problems so far, the declared vocabularies, and the nodes already seen. */
 type WalkContext = { problems: MetaProblem[], views: string[], renderMethods: string[], visited: Set<unknown> }
