@@ -12,7 +12,11 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 
 - `npm start` — Run demo app in dev mode (webpack-dev-server)
 - `npm run build` — Build the demo app for GitHub Pages deployment
-- `npm run build-lib` — Build the publishable library to `dist/` (webpack + tsc)
+- `npm run build-lib` — Build the publishable library to `dist/` (webpack + `gen-ts`)
+- `npm run gen-ts` — Write the package's declarations from the source (§9.6-E4): `scripts/gen-ts.js` publishes
+  `src/library/main.tsx`'s declaration as `dist/index.d.ts` (`export =`, with every type of `src/library/contract.ts`
+  in a `UIRender` namespace) and the contract's as `dist/contract.d.ts`. There is no hand-written declaration: a
+  public type is an export of `contract.ts`, and the generator refuses an import other than `react`, or a value.
 - `npm run watch-lib` — Watch mode for the library build. Uses the SAME webpack config as `build-lib`, deliberately: it had its own parallel config until 2026-09-15, and it had drifted into emitting the stylesheet under a different name and producing no type declarations
 - `npm run yalc-publish` — Build lib and publish locally via yalc (for testing in consuming apps)
 - `npm run yalc-watch` — Auto-rebuild and yalc-publish on src changes
@@ -25,8 +29,8 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 - `npm run lint:css` — Lint LESS files with stylelint
 - `npm run typecheck` — `tsc --noEmit` over `src` (§9.6-E0). Babel STRIPS TypeScript types without
   checking them, so this is the only thing that checks them. Unconverted `.js` resolves but is not
-  checked (`checkJs: false`); every `.ts` file is strict. Config: `tsconfig.json` — not
-  `tsconfig.build.json`, which is the separate declaration-emit config used by `gen-ts`.
+  checked (`checkJs: false`); every `.ts` file is strict. Config: `tsconfig.json`. `tsconfig.build.json` EXTENDS
+  it, for `gen-ts`'s declaration emit, so keep every checking rule in `tsconfig.json`.
 
 ## Architecture
 
@@ -91,7 +95,7 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 - `src/core` and `src/library` are TypeScript throughout, tests aside (§9.6-E3, 2026-10-01); the
   demo and the test suites are JavaScript. Meta nodes are typed as open JSON (`any` where the engine
   reads and rewrites them by key): `validateMeta` checks them at runtime, and the published types in
-  `src/library/types` describe them. `@babel/preset-typescript` compiles `.ts`/`.tsx` in all three
+  `src/library/contract.ts` describe them. `@babel/preset-typescript` compiles `.ts`/`.tsx` in all three
   pipelines (library build, demo build, Jest) and `npm run typecheck` checks them. `src/toolchain/`
   holds a guard proving that stays true — delete it once real converted modules cover the same
   ground (`docs/UPGRADE-PLAN.md` §9.6).

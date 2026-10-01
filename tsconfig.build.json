@@ -1,15 +1,27 @@
 {
+  // The DECLARATION EMIT behind `npm run gen-ts` (§9.6-E4). It emits nothing into dist/ itself.
+  //
+  // It is the typecheck config (`tsconfig.json`) with declarations switched on, over ONE root: the
+  // component the package exports. tsc writes the declarations of that whole program — every module
+  // the component imports — into a staging directory, and `scripts/gen-ts.js` publishes two of them:
+  // the component's own, as `dist/index.d.ts`, and the contract's, as `dist/contract.d.ts`. Read that
+  // script before changing anything here: it reads `outDir` from this file, and it expects the
+  // staging layout that `rootDir` gives.
+  //
+  // Extending the typecheck config, rather than restating it, is what keeps the published types
+  // checked exactly as the source is: a setting that differed here would let the package's
+  // declarations be checked under rules the source never was.
+  "extends": "./tsconfig.json",
   "compilerOptions": {
+    "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "outDir": "dist",
-    "module": "CommonJS",
-    "target": "ESNext",
-    "jsx": "react",
-    "strict": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    // Everything the component imports is TypeScript (§9.6-E3). Off, so that a JavaScript module
+    // reaching this program fails here instead of publishing a declaration inferred from JavaScript.
+    "allowJs": false,
+    "rootDir": "src",
+    "outDir": "node_modules/.cache/gen-ts"
   },
-  "files": ["src/library/types/index.ts"]
+  "include": [],
+  "files": ["src/library/main.tsx"]
 }

@@ -18,7 +18,7 @@ const fs = require('fs')
 const path = require('path')
 const ts = require('typescript')
 
-const TYPES_PATH = path.resolve(__dirname, '../../library/types/UIRender.tsx')
+const TYPES_PATH = path.resolve(__dirname, '../../library/contract.ts')
 
 /** `(string & {})` — the branch that keeps a union open without collapsing its literals. */
 const isOpenBranch = (node) => {
@@ -42,7 +42,7 @@ function readVocabularyUnions (filePath = TYPES_PATH) {
         fs.readFileSync(filePath, 'utf8'),
         ts.ScriptTarget.Latest,
         true,
-        ts.ScriptKind.TSX,
+        ts.ScriptKind.TS,
     )
 
     const found = {}

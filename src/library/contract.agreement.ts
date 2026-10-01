@@ -1,14 +1,16 @@
 /**
- * THE TYPE ARM OF THE CONTRACT AGREEMENT (§9.4, §9.6-E1). Compiled, never imported, never shipped —
- * it is excluded from the package by `files` in package.json and lives here only because the types
- * it checks cannot be reached from anywhere else (`export =` forces namespace membership).
+ * THE TYPE ARM OF THE CONTRACT AGREEMENT (§9.4, §9.6-E1). Compiled, never imported, never shipped:
+ * `files` in package.json publishes no source, and `scripts/gen-ts.js` publishes the declarations of
+ * the component and the contract only. It lives beside the contract it checks, and reads the types
+ * by the names a host reads them by, `UIRender.Meta` and the rest, which `dist/index.d.ts` re-exports
+ * from `contract.ts` as they are.
  *
  * WHY THIS FILE EXISTS AT ALL. `src/demo/examples/__tests__/examples.meta-contract.test.js` pins a
  * biconditional over a fixed table: the published schema rejects a shape exactly when the dev-mode
  * validator calls it an error. Jest can hold two of the three parties to that agreement, but it can
  * never hold the third — Babel strips types file by file, so a wrong annotation in a `.test.ts`
- * passes silently. Types can only be asserted by a compiler. So the same table is mirrored here and
- * `npm run typecheck:contract` is the assertion.
+ * passes silently. Types can only be asserted by a compiler. So the same table is mirrored here, and
+ * `npm run typecheck` is the assertion, with `npm run typecheck:contract` running this file alone.
  *
  * HOW TO READ IT. Each row of AGREEMENT_TABLE appears once:
  *   - `engineAccepts: true`  -> a plain assignment. It must COMPILE.
@@ -19,7 +21,7 @@
  * unchecked for that shape while the Jest suite stays green. There is no automatic link between the
  * two lists, and pretending otherwise would be worse than saying so: this comment is the link.
  */
-import UIRender = require('./UIRender')
+import type * as UIRender from './contract'
 
 type Meta = UIRender.Meta
 

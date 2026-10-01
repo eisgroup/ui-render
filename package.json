@@ -34,7 +34,7 @@
     "watch-lib": "npm run gen-ts && webpack --watch --mode production --config webpack.library.config.mjs",
     "yalc-publish": "npm run build-lib && yalc publish --push",
     "yalc-watch": "nodemon --watch src --ext js,jsx,ts,tsx --exec 'npm run yalc-publish'",
-    "gen-ts": "tsc --project tsconfig.build.json",
+    "gen-ts": "node scripts/gen-ts.js",
     "typecheck": "tsc --noEmit",
     "typecheck:contract": "tsc --project tsconfig.contract.json",
     "serve-dist": "serve dist -p 3102",
