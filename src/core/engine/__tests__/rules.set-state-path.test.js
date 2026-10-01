@@ -9,7 +9,7 @@
  * arguments the caller passes. A `Button` passes one and the path lands second; a `Dropdown`
  * passes `(value, name, event)` and the path lands fourth, while the field's own `name` sits
  * second. `setStates(value, keyPath)` therefore wrote to the path named by the FIELD instead of
- * the one the meta asked for, for every `view: 'Select'` whose two differ. `mapper.js` worked
+ * the one the meta asked for, for every `view: 'Select'` whose two differ. `mapper.tsx` worked
  * around it for stable-value Selects by stripping the extra arguments; nothing covered the rest.
  *
  * The four rows below are every real call shape, and they are why the rule is "the last STRING
@@ -31,7 +31,7 @@ import { statePathOf } from '../statePath'
 const pathOf = (value, ...rest) => statePathOf(rest)
 
 describe('the state path is the last string argument', () => {
-    it('a configured path with a one-argument caller — the `mapper.js` workaround shape', () => {
+    it('a configured path with a one-argument caller — the `mapper.tsx` workaround shape', () => {
         expect(pathOf('gold', 'categoryX')).toBe('categoryX')
     })
 

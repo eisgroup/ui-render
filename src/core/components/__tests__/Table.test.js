@@ -16,7 +16,7 @@
  *      role census counts those as `columnheader`.
  *   4. an absent `className` emits NO attribute. Semantic printed `class=""` from its own
  *      `cx()`; 317 of those in the baseline were its, and they go away here.
- *   5. the DOM boundary. `mapper.js` spreads a meta node's whole rest bag onto `Table.Cell`, so
+ *   5. the DOM boundary. `mapper.tsx` spreads a meta node's whole rest bag onto `Table.Cell`, so
  *      the cell is where `ENGINE_PROPS`/`FIELD_ONLY_PROPS` earn their keep. The corpus tripwires
  *      hold these at zero only because no example happens to use them — this is the direct test.
  *   6. `style`/`colSpan`/`scope` still reach the element. They always did (Semantic did not

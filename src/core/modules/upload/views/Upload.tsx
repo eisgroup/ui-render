@@ -76,7 +76,7 @@ export function persistEvent (event: unknown) {
 }
 
 // Read once, when this module loads, as the class's `defaultProps` were: `Active.translate` is reassigned by
-// every document the engine constructs (rules.js), so a read at render would be a different default.
+// every document the engine constructs (rules.tsx), so a read at render would be a different default.
 const DEFAULT_TRANSLATE = Active.translate
 
 // The server runs no layout effect and React 16 and 17 warn when one is declared there; nothing below needs

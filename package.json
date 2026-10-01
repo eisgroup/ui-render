@@ -161,7 +161,7 @@
                     "**/engine",
                     "**/engine/**"
                   ],
-                  "message": "core/modules must not import core/engine. Two sites in modules/form/utils.js predate this rule and carry an eslint-disable naming §9.3 step 2, which dissolves the cycle; do not add a third. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core/modules must not import core/engine. Two sites in modules/form/utils.tsx predate this rule and carry an eslint-disable naming §9.3 step 2, which dissolves the cycle; do not add a third. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 }
               ]
             }

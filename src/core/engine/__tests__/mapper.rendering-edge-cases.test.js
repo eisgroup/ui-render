@@ -42,13 +42,9 @@ jest.mock('../../modules/form/views/AutoSave', () => ({
   default: jest.fn(() => null),
 }))
 
-const popup = {
-  setPopupState: jest.fn(),
-}
-
 const withProviders = ui => (
   <ConfigContext.Provider value={initialConfigState}>
-    <AppContext.Provider value={{...initialAppState, popup}}>
+    <AppContext.Provider value={initialAppState}>
       {ui}
     </AppContext.Provider>
   </ConfigContext.Provider>
@@ -208,23 +204,24 @@ describe('mapper edge contracts', () => {
     expect(extraItems).toEqual(originalDefinition)
   })
 
-  it('reports a non-object grouped-table label map through the error popup', () => {
-    renderMapped({
-      view: FIELD.TYPE.TABLE,
-      name: 'rows',
-      _data: [{period: 'Jan', region: 'EU', amount: 10}],
-      headers: [{id: 'amount'}],
-      group: {
-        by: {id: 'region', label: 'not-a-label-map'},
-        header: {id: 'period'},
-      },
-    })
-
-    expect(popup.setPopupState).toHaveBeenCalledTimes(1)
-    expect(popup.setPopupState).toHaveBeenCalledWith(expect.objectContaining({
-      title: 'Incorrect config for Table with {name: "rows"}!',
-      content: expect.stringContaining('group.by.label must resolve to object'),
-    }))
+  // Reported through `popup.setPopupState` until it was found that the real context has no `popup`
+  // (only this suite's provider did); thrown now, for the document's error boundary to render.
+  it('reports a non-object grouped-table label map in the error it throws', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+    try {
+      expect(() => renderMapped({
+        view: FIELD.TYPE.TABLE,
+        name: 'rows',
+        _data: [{period: 'Jan', region: 'EU', amount: 10}],
+        headers: [{id: 'amount'}],
+        group: {
+          by: {id: 'region', label: 'not-a-label-map'},
+          header: {id: 'period'},
+        },
+      })).toThrow('Incorrect config for Table with {name: "rows"}! Table.group.by.label must resolve to object')
+    } finally {
+      error.mockRestore()
+    }
   })
 
   it('maps PieChart data and nested center content from meta', () => {

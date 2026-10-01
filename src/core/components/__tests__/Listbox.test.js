@@ -547,7 +547,7 @@ describe('the keyboard matrix, which had no predecessor', () => {
         /**
          * FOUND BY THE 38-EXAMPLE DOM BASELINE, not here, and worth recording as the reason this
          * describe exists. `aria-activedescendant` has to name an option by `id`, and the prefix is
-         * a per-mount counter; `mapper.js` passes `lazyLoad={false}` for `view: "Dropdown"`, so the
+         * a per-mount counter; `mapper.tsx` passes `lazyLoad={false}` for `view: "Dropdown"`, so the
          * options are in the CLOSED DOM. The baseline renders every example twice and compares the
          * two renders, and that comparison failed with `ui-render-listbox-1-0` against
          * `ui-render-listbox-2-0` — a snapshot that would have churned on every unrelated change

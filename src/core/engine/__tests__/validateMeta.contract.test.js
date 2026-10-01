@@ -409,7 +409,7 @@ describe('every error-severity check predicts a real engine failure', () => {
         })
 
         it('leave the host application\'s own meta object untouched', () => {
-            // rules.js hands metaToProps a cloneDeep, so the strip is invisible to the caller.
+            // rules.tsx hands metaToProps a cloneDeep, so the strip is invisible to the caller.
             const hostMeta = {
                 $schema: SCHEMA_REF,
                 metaVersion: '1',

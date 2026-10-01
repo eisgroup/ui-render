@@ -1,7 +1,7 @@
 /**
  * THE PRODUCTION ERROR SINK ===================================================
  *
- * UPGRADE-PLAN §9.4 / §2.6-3. `mapper.js` installs the `Render.onError` sink the
+ * UPGRADE-PLAN §9.4 / §2.6-3. `mapper.tsx` installs the `Render.onError` sink the
  * shipped library actually runs with. It used to destructure `{err, errInfo}`
  * from a report the boundary emits as `{error, errorInfo}` and `console.log` the
  * three values, so the one channel a consumer could observe printed
@@ -15,7 +15,7 @@
  */
 // `rules` is imported (not `mapper` directly) because the engine's module graph is
 // circular — importing the mapper first leaves `modules/form` half-initialised. Importing
-// the engine entry point installs the same sink, through `rules.js`'s own `import './mapper'`.
+// the engine entry point installs the same sink, through `rules.tsx`'s own `import './mapper'`.
 import '../rules'
 import Render from '../Render'
 

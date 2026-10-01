@@ -128,7 +128,7 @@ describe('nested dataKind demo interaction contract', () => {
         // propTypes warnings instead of pinning a total call count that holds on one React major.
         const warningMessages = consoleError.mock.calls.map(call => call.map(String).join(' '))
         // This test used to pin the `currencyCode` DOM-prop leak as expected. It is fixed: the
-        // engine-internal prop is stripped in mapper.js's RenderComponent, so it never reaches a
+        // engine-internal prop is stripped in mapper.tsx's RenderComponent, so it never reaches a
         // DOM element. Kept inverted as a regression guard -- no unknown-prop warning may return.
         const unknownPropWarnings = warningMessages.filter(message => (
             message.includes('React does not recognize')

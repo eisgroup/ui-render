@@ -41,7 +41,7 @@ describe('Select data reordering integrity contracts', () => {
   })
 
   it('does not throw from the submit path either', () => {
-    // `getFormsData` takes a LIST of `{form, meta}`, which is the shape `rules.js` builds.
+    // `getFormsData` takes a LIST of `{form, meta}`, which is the shape `rules.tsx` builds.
     const forms = [{
       form: makeForm({selection: '1', options: [{code: 'A'}, {code: 'B'}]}),
       meta: {view: 'Select', name: 'selection'},

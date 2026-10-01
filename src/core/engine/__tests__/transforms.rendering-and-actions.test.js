@@ -247,7 +247,7 @@ describe('metaToProps action definition contracts', () => {
         meta[0].onClick()
 
         // @Note: `relativeIndex` only. Forwarding `relativePath` too would rebind a root-level popup
-        // template onto the table's path, because it outranks every other source in `rules.js`.
+        // template onto the table's path, because it outranks every other source in `rules.tsx`.
         expect(popupOpen).toHaveBeenCalledWith('details', {
             mode: 'edit',
             relativeIndex: 5,

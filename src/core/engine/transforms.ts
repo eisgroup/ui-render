@@ -1,6 +1,54 @@
 import { interpolateString, isCollection, isFunction, isList, isString, removeNilValues, toList } from '../utils'
-import { cloneDeep, get, hasObjectValue, isObject } from '../utils/object'
+import { cloneDeep, get, hasObjectValue as hasPlainObjectValue, isObject as isPlainObject } from '../utils/object'
 import Render from './Render'
+
+// Non-narrowing, on purpose: a meta node checked with these stays `Meta`, open JSON, instead of
+// becoming the `Record<string, unknown>` the util's type guard narrows it to.
+const isObject: (value: unknown) => boolean = isPlainObject
+const hasObjectValue: (value: unknown) => boolean = hasPlainObjectValue
+
+/**
+ * A meta node: open JSON, read and rewritten in place by key. `any`, deliberately: what a node may
+ * hold is the contract `validateMeta` checks at runtime and the published types describe, not
+ * something this transform can know ahead of reading it.
+ */
+type Meta = Record<string, any>
+
+/** A handler a meta names: called with the caller's arguments first, then the meta's. */
+type Handler = (...args: any[]) => any
+
+/** The handler and value-transform registries `rules.tsx` builds for one document. */
+export type FuncConfig = {
+    data?: unknown
+    fieldFunc: Record<string, Handler>
+    fieldNormalizer: Record<string, Handler>
+    fieldParser: Record<string, Handler>
+    fieldValidation: Record<string, Handler>
+    fieldMethods: Record<string, Handler>
+    [key: string]: unknown
+}
+
+/** What resolving a meta's handlers is given: the registries, and where the node sits. */
+type FunctionConfig = FuncConfig & {
+    instance?: any
+    funcNames?: string[]
+    fallback?: unknown
+    relativeIndex?: unknown
+    _data?: unknown
+    rowValue?: unknown
+}
+
+/** What `metaToProps` is given: the document, the data it renders against, and where a node sits. */
+export type TransformConfig = {
+    data?: unknown
+    _data?: unknown
+    form?: unknown
+    instance?: any
+    relativePath?: string
+    relativeIndex?: number | string
+    funcConfig: FuncConfig
+    [key: string]: unknown
+}
 
 const FUNCTION_NAMES = ['onClick', 'onChange', 'onDone']
 
@@ -24,9 +72,9 @@ const NON_PROP_ATTRIBUTES = [...CONTRACT_ATTRIBUTES, ...COMMENT_ATTRIBUTES]
  * @param {Boolean} [debug] - whether to raise silenced error if data is missing or of incorrect type
  * @returns {Array} list - mapped from given data
  */
-export function mapProps (data, mapper, {debug} = {}) {
-    const mapData = typeof mapper === 'string' ? (item) => get(item, mapper, item) : (item, index) => {
-        const result = {}
+export function mapProps (data: unknown, mapper: string | Record<string, string>, {debug}: { debug?: boolean } = {}) {
+    const mapData = typeof mapper === 'string' ? (item: unknown) => get(item, mapper, item) : (item: unknown, index: number) => {
+        const result: Record<string, unknown> = {}
         for (const key in mapper) {
             // `index` must be converted to string to match fallback value defined in config (which can only be string)
             // fallback to item if key not found
@@ -34,10 +82,11 @@ export function mapProps (data, mapper, {debug} = {}) {
         }
         return result
     }
-    return (debug ? data : toList(data, true)).map(mapData)
+    // A cast, not a guard: in debug mode the data is used as it is, and a non-list throws, as it did.
+    return ((debug ? data : toList(data, true)) as unknown[]).map(mapData)
 }
 
-export function getCurrencySymbol(currencyCode) {
+export function getCurrencySymbol(currencyCode: unknown) {
     if (!currencyCode) return null
     switch (currencyCode) {
         case 'USD':
@@ -60,7 +109,7 @@ export function getCurrencySymbol(currencyCode) {
  * @param {*} config
  * @returns {Object} props - mutated meta
  */
-export function metaToProps (meta, config) {
+export function metaToProps (this: unknown, meta: Meta, config: TransformConfig): Meta {
     const {
         form,
         instance, // contains dynamic `state` to hydrate meta data
@@ -80,7 +129,7 @@ export function metaToProps (meta, config) {
         // `metaVersion` renders as `metaversion="1"` and makes React warn about an unrecognised
         // prop, `$schema` trips React's invalid-attribute-name warning, and `_comment` rendered
         // the author's prose into the page as `_comment="…"` (2 occurrences in the example
-        // corpus). Safe to mutate: `rules.js` hands metaToProps a cloneDeep of the host's meta,
+        // corpus). Safe to mutate: `rules.tsx` hands metaToProps a cloneDeep of the host's meta,
         // never the host's object. `_comment` is also listed in components/domProps.ts, which
         // covers the nodes a component builds from raw meta without passing through here.
         NON_PROP_ATTRIBUTES.forEach(attribute => {
@@ -100,7 +149,7 @@ export function metaToProps (meta, config) {
         // @Note: high priority, because onClick string will be bound to `self` class inside `render` functions
         if (isObject(definition)) {
             // @Note: `relativePath` is deliberately NOT forwarded here. It reaches `getFunctionFromObject`,
-            // which puts it into the `popupOpen` context, where `rules.js` gives it the highest priority when
+            // which puts it into the `popupOpen` context, where `rules.tsx` gives it the highest priority when
             // resolving popup field names — rebinding a root-level popup template onto the table's path.
             metaToFunctions(definition, {...funcConfig, data, relativeIndex, _data, rowValue: _data, instance})
             if (definition.name) {
@@ -110,8 +159,9 @@ export function metaToProps (meta, config) {
 
         // Map Value Renderer Names/Objects to Actual Render Functions
         if (attribute.indexOf('render') === 0) {
-            if (typeof definition === 'string') { // @ts-ignore
-                meta[attribute] = Render.Method(meta[attribute])
+            if (typeof definition === 'string') {
+                // Not undefined: the mapper installs `Render.Method` when the engine loads.
+                meta[attribute] = Render.Method!(meta[attribute])
             }
             // Below transformation only happens during render
             // @Note: every renderer built in this loop closes over the ONE function-scoped `_data` binding and
@@ -120,7 +170,7 @@ export function metaToProps (meta, config) {
             // clobber, each other's scratch value. Behaviour is intact today only because each renderer assigns
             // before it reads. Scoping this per renderer is engine-decomposition work (§9.3), not a lint fix.
             // eslint-disable-next-line no-loop-func
-            if (isObject(definition)) meta[attribute] = (value, index, props, self) => {
+            if (isObject(definition)) meta[attribute] = (value: any, index: any, props: Meta, self: any) => {
                 if (attribute === 'renderExtraItem') {
                     definition.useForm = true
                 }
@@ -140,7 +190,7 @@ export function metaToProps (meta, config) {
                     if (attribute === 'renderExtraItem' && rowIndex == null && isCollection(value)) {
                         rowIndex = value.length
                     }
-                    const revPath = {
+                    const revPath: { relativeIndex: unknown, relativePath?: string } = {
                         relativeIndex: rowIndex
                     }
                     // `meta.name` is undefined when Table.headers.renderCell is defined,
@@ -190,7 +240,7 @@ export function metaToProps (meta, config) {
                             rowValue: value
                           }) &&
                           {[func]: self[definition[func]]}
-                        )).reduce((obj, item) => ({...obj, ...item}), {}),
+                        )).reduce((obj: Meta, item: Meta) => ({...obj, ...item}), {}),
                         ...definition.view.indexOf('Data') === 0 && {index: rowIndex},
                         data, _data, form, instance,
                     }, rowIndex)
@@ -212,10 +262,12 @@ export function metaToProps (meta, config) {
                     return (isObject(valueDefinition))
                       ? (valueDefinition.view
                           ? Render({...props, ...valueDefinition, data, _data}, index)
-                          : getFunctionFromObject(valueDefinition, {...funcConfig, data}) // @ts-ignore
+                          : getFunctionFromObject(valueDefinition, {...funcConfig, data})
                             .apply(this, [value, index, {...props, ...valueDefinition, data, _data}])
                       )
-                      : Render.Method(valueDefinition).apply(this, [value, index, {...props, data, _data}])
+                      // Not undefined: the mapper installs `Render.Method`, which resolves every
+                      // built-in renderer name.
+                      : Render.Method!(valueDefinition)!.apply(this, [value, index, {...props, data, _data}])
                 }
             }
         }
@@ -245,7 +297,7 @@ export function metaToProps (meta, config) {
             } else {
                 // Recursively process the rest of definitions
                 // Relative path must always be passed down, because nested Inputs inside List require absolute path for `name`
-                const options = {
+                const options: Partial<TransformConfig> = {
                     data, _data, instance,
                     relativePath: relativePathFrom(meta, relativePath, relativeIndex), relativeIndex,
                     relativeData: meta.relativeData // Pass relativeData down to prevent automatic data extraction
@@ -280,7 +332,7 @@ export function metaToProps (meta, config) {
  * @param {Object} config
  * @returns {void} definition - with names replaced by functions (by mutation)
  */
-function metaToFunctions(definition, config) {
+function metaToFunctions(definition: Meta, config: FunctionConfig) {
     const {
         fieldValidation,
         fieldNormalizer,
@@ -300,7 +352,7 @@ function metaToFunctions(definition, config) {
         const {validate, ...opt} = definition.verify
         const { instance } = config
         // final-form passes (value, allValues, meta) to field validate — forward for cross-field rules (e.g. notWithinRange)
-        const validators = toList(validate).map(({name, ...args}) => (...validateArgs) => {
+        const validators = toList(validate).map(({name, ...args}: Meta) => (...validateArgs: unknown[]) => {
             const fn = fieldValidation[name]
             return fn ? fn(validateArgs[0], {...opt, ...args}, validateArgs[1], validateArgs[2], instance) : undefined
         })
@@ -317,7 +369,7 @@ function metaToFunctions(definition, config) {
     })
 }
 
-const composeValidators = (...validators) => (...args) => validators.reduce((error, validator) => error || validator(...args), undefined)
+const composeValidators = (...validators: Handler[]) => (...args: unknown[]) => validators.reduce((error, validator) => error || validator(...args), undefined)
 
 /**
  * Get Function/s from Definition Object Recursively
@@ -335,7 +387,7 @@ const composeValidators = (...validators) => (...args) => validators.reduce((err
  * @returns {Function|String} method - that receives caller arguments as its first arguments,
  *    and will chain function calls `onDone` recursively
  */
-function getFunctionFromObject(definition, config) {
+function getFunctionFromObject(definition: Meta, config: FunctionConfig): any {
     const {name, mapArgs, args = [], onDone} = definition
     const {data, fieldFunc, fieldMethods, fallback = definition.name, relativeIndex, _data, rowValue} = config
     const func = fieldFunc[name] || fieldMethods[name]
@@ -344,7 +396,7 @@ function getFunctionFromObject(definition, config) {
     // Interpolate args if they contain template variables and we have index/value context
     let interpolatedArgs = args
     if (args.length > 0 && (relativeIndex != null || rowValue != null || _data != null)) {
-        interpolatedArgs = args.map(arg => {
+        interpolatedArgs = args.map((arg: unknown) => {
             if (isString(arg) && arg.includes('{')) {
                 return interpolateString(arg, { index: relativeIndex, value: rowValue || _data }, { suppressError: true })
             }
@@ -354,7 +406,7 @@ function getFunctionFromObject(definition, config) {
     
     // For popupOpen, pass the row index through options so popup fields can address the table row.
     // @Note: deliberately NOT relativePath — see the metaToFunctions call above.
-    const contextOptions = {}
+    const contextOptions: { relativeIndex?: unknown } = {}
     if (relativeIndex != null) contextOptions.relativeIndex = relativeIndex
     
     if (func) {
@@ -373,9 +425,9 @@ function getFunctionFromObject(definition, config) {
         }
         
         if (isFunction(definition.onDone)) {
-            return (...values) => {
+            return (...values: unknown[]) => {
                 if (hasMapArgs) {
-                    values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
+                    values = mapArgs.map((val: unknown) => mapFunctionArgs(val, {data, args: values}))
                 }
                 const result = func(...values, ...finalArgs)
                 if (result instanceof Promise) {
@@ -384,16 +436,16 @@ function getFunctionFromObject(definition, config) {
                 return definition.onDone(result)
             }
         } else {
-            return (...values) => {
+            return (...values: unknown[]) => {
                 if (hasMapArgs) {
-                    values = mapArgs.map((val) => mapFunctionArgs(val, {data, args: values}))
+                    values = mapArgs.map((val: unknown) => mapFunctionArgs(val, {data, args: values}))
                 }
                 return func(...values, ...finalArgs)
             }
         }
     }
-    // @ts-ignore
-    return func || Render.Method(name) || fallback
+    // Not undefined: the mapper installs `Render.Method` when the engine loads.
+    return func || Render.Method!(name) || fallback
 }
 
 /**
@@ -407,10 +459,10 @@ function getFunctionFromObject(definition, config) {
  * @returns {Function|String|*} method - that receives caller arguments as its first arguments,
  *    along with optionally defined arguments in the config string
  */
-function getFunctionFromString (string, {fieldFunc, fallback = string}) {
+function getFunctionFromString (string: string, {fieldFunc, fallback = string}: { fieldFunc: Record<string, Handler>, fallback?: unknown, [key: string]: unknown }) {
     const [name, ...args] = string.split(',')
     const func = fieldFunc[name]
-    return ((args.length && func) ? ((...arg) => func(...arg, ...args)) : func) || fallback
+    return ((args.length && func) ? ((...arg: unknown[]) => func(...arg, ...args)) : func) || fallback
 }
 
 /**
@@ -419,9 +471,10 @@ function getFunctionFromString (string, {fieldFunc, fallback = string}) {
  * @param {*} options
  * @returns {*} argument transformed with given options
  */
-function mapFunctionArgs (template, {data, args}) {
+function mapFunctionArgs (template: any, {data, args}: { data?: unknown, args: unknown[] }): unknown {
     if (isString(template))
-        return interpolateString(interpolateString(template, args, {suppressError: true}), data, {suppressError: true})
+        // Casts, not guards: `{0}` reads the first argument, and the data is the document's object.
+        return interpolateString(interpolateString(template, args as unknown as Record<string, unknown>, {suppressError: true}), data as Record<string, unknown> | undefined, {suppressError: true})
     if (isCollection(template)) {
         for (const key in template) {
             template[key] = mapFunctionArgs(template[key], {data, args})
@@ -437,7 +490,7 @@ function mapFunctionArgs (template, {data, args}) {
  * @param {String|Number} relativeIndex - inherited from parent node
  * @returns {String} relativePath - calculated from root path for current config
  */
-export function relativePathFrom (meta, relativePath, relativeIndex) {
+export function relativePathFrom (meta: Meta, relativePath?: string, relativeIndex?: number | string): string {
     let result = relativePath || meta.name
     // If `meta.name` is relative, concatenate it with inherited `relativePath` for absolute relative path,
     // to pass down to nested configs (ex. Expand inside Table.headers = [{id, renderCell: {...}}] )

@@ -35,7 +35,7 @@ const {
 } = require('../generate-view-reference')
 
 // Importing the engine runs all three modules that assign to FIELD (variables/fields.ts,
-// form/constants.ts, engine/rules.js), so `FIELD` below is the vocabulary the renderer
+// form/constants.ts, engine/rules.tsx), so `FIELD` below is the vocabulary the renderer
 // really dispatches on — not a subset that happens to be loaded.
 require('../../src/core/engine/rules')
 const { FIELD } = require('../../src/core/modules/variables')

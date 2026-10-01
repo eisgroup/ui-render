@@ -4,7 +4,7 @@
  * UPGRADE-PLAN §9.4 / §2.6-3. The boundary itself is old (`RenderClass` has had
  * `componentDidCatch` for years); what was broken is everything downstream of
  * it — the report was unreadable (`String(error)` with no idea WHICH node), and
- * the production sink in `mapper.js` destructured `{err, errInfo}` while the
+ * the production sink in `mapper.tsx` destructured `{err, errInfo}` while the
  * boundary emitted `{error, errorInfo}`, so every report carried `undefined`.
  *
  * These tests pin the repaired contract:

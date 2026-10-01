@@ -177,7 +177,7 @@ describe('DOM boundary: the form-control and slider family', () => {
 
 /**
  * Three more boundaries found by auditing every spread onto a DOM tag rather than trusting
- * the corpus. All three are reachable from meta (`mapper.js` resolves them), all three leaked,
+ * the corpus. All three are reachable from meta (`mapper.tsx` resolves them), all three leaked,
  * and none of it showed in the 38-example baseline because no example passes an engine prop
  * to an icon, an image or a bare tooltip.
  */

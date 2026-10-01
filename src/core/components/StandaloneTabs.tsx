@@ -64,7 +64,7 @@ type TabsState = { activeIndex: number, transition: boolean }
  * tell from a grep which one ships: this one, and `pages/main/components/Tabs.js`. They are not
  * interchangeable — the engine's copy is the older of the two and has kept evolving, adding
  * `normalizeTabIndex`, `renderTab`, `currencyCode` injection and a third argument to `setTab`, about
- * 99 lines of difference. It is the one `mapper.js` registers for `view: 'Tabs'`.
+ * 99 lines of difference. It is the one `mapper.tsx` registers for `view: 'Tabs'`.
  *
  * THIS file reaches nothing from the library entry. Its only importer is the demo's `NavTabs.jsx`.
  * The name says what distinguishes it — no engine coupling — rather than where it happens to be

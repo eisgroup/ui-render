@@ -54,24 +54,24 @@ const WRITE_COMMAND = 'npm run docs:views'
  */
 const DECLARATION_SITES = [
     { file: 'src/core/modules/variables/fields.ts', props: ['TYPE', 'RENDER', 'ACTION'] },
-    // `TYPE` left this file at §9.3 step 3, for the same reason it left `engine/rules.js` at step 2:
+    // `TYPE` left this file at §9.3 step 3, for the same reason it left `engine/rules.tsx` at step 2:
     // `engine/utils.ts` compares against `FIELD.TYPE.SELECT`, so the comparison depended on whether
     // anything had imported the form module yet. The names are in `variables/fields.ts` now.
-    // `TYPE` left this file at §9.3 step 2: `mapper.js` dispatches on those six names while
-    // `rules.js` imports `mapper.js`, so the resolver depended on a constant its own importer
+    // `TYPE` left this file at §9.3 step 2: `mapper.tsx` dispatches on those six names while
+    // `rules.tsx` imports `mapper.tsx`, so the resolver depended on a constant its own importer
     // registered. They now sit with the rest in `variables/fields.ts`.
-    { file: 'src/core/engine/rules.js', props: ['ACTION'] },
+    { file: 'src/core/engine/rules.tsx', props: ['ACTION'] },
 ]
 
 /** Files whose references to the constants decide whether a name is live. */
 const RESOLVER_FILES = {
     // Render.Component — the `view` switch, plus the `default` branch that handles
     // Dropdown inline and re-dispatches Input by `type`. Also Render.Method's `render*` switch.
-    mapper: 'src/core/engine/mapper.js',
+    mapper: 'src/core/engine/mapper.tsx',
     // renderField — the form-field leg of the `default` branch.
     renderField: 'src/core/engine/components/renders.tsx',
     // FIELD.FUNC registrations for the action names.
-    rules: 'src/core/engine/rules.js',
+    rules: 'src/core/engine/rules.tsx',
     fields: 'src/core/modules/variables/fields.ts',
 }
 
@@ -228,7 +228,7 @@ function resolverFacts ({ mapper, renderField, rules, fields }) {
 
 /**
  * Short label for a source file: parent directory plus filename. A bare filename would be
- * ambiguous here — `fields.js`, `constants.js` and `rules.js` each say very little alone,
+ * ambiguous here — `fields.js`, `constants.js` and `rules.tsx` each say very little alone,
  * and two of them sit under `src/core/modules/`.
  */
 const shortPath = (file) => file.split('/').slice(-2).join('/')
@@ -291,8 +291,8 @@ function buildReference () {
         // Reachable from a node's own `view`. `typeAliases` is deliberately excluded:
         // it means "Input with this `type` becomes this view", not "this `view` resolves".
         const resolvedIn = []
-        if (resolver.switchCases.has(entry.key)) resolvedIn.push('`mapper.js` switch')
-        if (resolver.defaultBranch.has(entry.key)) resolvedIn.push('`mapper.js` default branch')
+        if (resolver.switchCases.has(entry.key)) resolvedIn.push('`mapper.tsx` switch')
+        if (resolver.defaultBranch.has(entry.key)) resolvedIn.push('`mapper.tsx` default branch')
         if (resolver.fieldCases.has(entry.key)) resolvedIn.push('`renderField`')
         const view = {
             ...entry,

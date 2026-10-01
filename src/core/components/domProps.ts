@@ -2,8 +2,8 @@
  * THE DOM BOUNDARY
  * =============================================================================
  * The engine hands every rendered node the whole meta declaration *plus* its own
- * bookkeeping: `mapper.js`'s `RenderComponent` spreads what it does not consume onto
- * the resolved component, and `transforms.js` builds the render-method options bag as
+ * bookkeeping: `mapper.tsx`'s `RenderComponent` spreads what it does not consume onto
+ * the resolved component, and `transforms.ts` builds the render-method options bag as
  * `{...props, ...definition, symbol, data, _data}` — the node's props plus the meta node
  * itself. Every presentational component then spreads what *it* does not destructure
  * onto a real DOM element, so any leftover key becomes an HTML attribute.
@@ -26,7 +26,7 @@
  * TWO LISTS, AND THE SPLIT IS THE WHOLE POINT
  * -----------------------------------------------------------------------------
  * `name` is BOTH an engine-internal renderer selector AND the react-final-form field
- * registration path that a form control must carry on the DOM: `modules/form/utils.js`
+ * registration path that a form control must carry on the DOM: `modules/form/utils.tsx`
  * registers `<Active.Field name=…>`, `InputNative` reports `onChange(value, name, event)`,
  * `Select` does the same, and `TableView` decides on `this.props.name` whether rows are
  * a `FieldArray` at all. `label` is what a field renders as its visible `<label>`
@@ -64,7 +64,7 @@
  * seven were found by auditing every spread onto a DOM tag and probing each directly, which
  * is the method to repeat rather than re-reading the snapshots.
  *
- * `Table.Cell` was the last KNOWN-reachable gap: `mapper.js` spreads a `TableCells` node's whole
+ * `Table.Cell` was the last KNOWN-reachable gap: `mapper.tsx` spreads a `TableCells` node's whole
  * rest bag onto it, so the boundary closed with the in-house table family in §9.7-F1 step 1 —
  * applying both lists there was a zero-diff change on today's corpus (no example puts `name` or
  * `label` on such a node) and a real net for the first meta that does. Applying FIELD_ONLY_PROPS
@@ -79,18 +79,18 @@
  * since deleted by §9.9-H1, and `utils/SizeMe`, deleted with the `utils/layouts.js` nothing
  * imported.) `Placeholder` spreads onto a component in this list rather than onto an element, so
  * it is filtered downstream; so did `ColorSwatch`, deleted with the dead renderers that drew it.
- * If `Placeholder` is ever wired into `mapper.js`, it becomes a boundary that day.
+ * If `Placeholder` is ever wired into `mapper.tsx`, it becomes a boundary that day.
  */
 
 /**
  * Engine-internal props. Not an HTML attribute on any element this library renders, so
  * they are stripped at every boundary. Several are still load-bearing as *props* — the
  * strip is at the DOM edge only:
- *   `view`         component selector, consumed by mapper.js's dispatch
+ *   `view`         component selector, consumed by mapper.tsx's dispatch
  *   `index`        row index; `Expand.handleClick` and `Data` read it off their props
  *   `data`/`_data` the engine's global/local data bags
  *   `symbol`       currency symbol for the value renderers (`FIELD.RENDER.CURRENCY` reads it)
- *   `_comment`     author annotation; also dropped at source by `transforms.js`
+ *   `_comment`     author annotation; also dropped at source by `transforms.ts`
  *   `expanded`     `Expand` state hint
  *   `translate`    the i18n FUNCTION, not the HTML global attribute — the engine owns this
  *                  key (RenderComponent already strips it), and React warns on a function value

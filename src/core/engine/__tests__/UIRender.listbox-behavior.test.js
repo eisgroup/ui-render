@@ -78,7 +78,7 @@ const cursorOf = listbox => {
  * What the control DISPLAYS as its current choice.
  *
  * The option list, when it is mounted at all, is part of the listbox's own text
- * (mapper.js passes `lazyLoad={false}` for `view: "Dropdown"` and leaves the
+ * (mapper.tsx passes `lazyLoad={false}` for `view: "Dropdown"` and leaves the
  * wrapper default for `view: "Select"`), so strip it. Written this way the
  * assertion survives either option-mounting strategy.
  */
@@ -215,7 +215,7 @@ describe('Select and Dropdown behavioural contract', () => {
     describe('cascading selects', () => {
         it('narrows and resets the dependent select when the parent choice changes', () => {
             // The §9.7-F1 Step 3 regression hotspot: Category -> Product, driven by
-            // `rules.js` setState and re-read through the child's options definition.
+            // `rules.tsx` setState and re-read through the child's options definition.
             // Category 1 has three products, Category 2 exactly one, so the reset is
             // visible in both the option list and the displayed value.
             mountExample(example('selectCascading'))

@@ -199,7 +199,7 @@ describe('TooltipPop — the open DOM', () => {
 
     it('drops the `inverted` token when the caller does not ask for it', () => {
         // Both engine entry points DO ask for it (`Render.TooltipDefaultProps`, and
-        // `mapper.js` writes `inverted` literally), so this is the shape a direct
+        // `mapper.tsx` writes `inverted` literally), so this is the shape a direct
         // caller gets — and the proof that the token is `inverted`'s doing.
         whileOpen({ title: TITLE }, () => {
             expect(bubble().getAttribute('class')).toBe('tooltip no-wrap top show')
@@ -354,8 +354,8 @@ describe('TooltipPop — the passthrough surface, deliberately narrowed', () => 
      * handlers riding the rest spread, and the narrowing is asserted rather than
      * assumed.
      */
-    it('reads a caller `content` in preference to `title` — the `mapper.js` path', () => {
-        // Load-bearing, not decorative: `mapper.js` maps a `view: "Tooltip"` node's
+    it('reads a caller `content` in preference to `title` — the `mapper.tsx` path', () => {
+        // Load-bearing, not decorative: `mapper.tsx` maps a `view: "Tooltip"` node's
         // `label` to `content`, so this is how every `view: "Tooltip"` body arrives.
         whileOpen({ title: TITLE, content: 'from content' }, () => {
             expect(screen.getByText('from content')).toBeInTheDocument()
@@ -542,7 +542,7 @@ describe('TooltipPop — the tripwires part 1 left, now flipped', () => {
      * Part 1 pinned this at its CURRENT value in the house style of the corpus ledger:
      * `TooltipPop` was the only component in the pack applying no `omitProps` filter,
      * and SUIR spread what it did not recognise onto the bubble, so `view`, `index` and
-     * `symbol` became HTML attributes — reachable from meta today, because `mapper.js`
+     * `symbol` became HTML attributes — reachable from meta today, because `mapper.tsx`
      * spreads a `view: "Tooltip"` node's whole rest bag and `view` is still in it.
      *
      * The filter is applied now, and this is the last unfiltered DOM boundary on the F1
@@ -564,7 +564,7 @@ describe('TooltipPop — the trigger contract, inverted by the rewrite', () => {
      * by-product of not cloning the trigger.
      *
      * SUIR's `Portal` ran `React.Children.only(trigger)`, so two children, a text child
-     * and an ARRAY OF ONE all threw. The last of those is not academic: `mapper.js`
+     * and an ARRAY OF ONE all threw. The last of those is not academic: `mapper.tsx`
      * builds `props.children = items.map(Render)` for a `view: "Tooltip"` node with
      * `items`, which is an array — the engine caught the throw and rendered its error
      * diagnostic IN PLACE OF THE NODE, so a meta author lost the tooltip AND the
@@ -583,7 +583,7 @@ describe('TooltipPop — the trigger contract, inverted by the rewrite', () => {
         }, [<button type="button" key="a">a</button>, <button type="button" key="b">b</button>])
     })
 
-    it('renders an array of exactly one child — the shape `mapper.js` builds from `items`', () => {
+    it('renders an array of exactly one child — the shape `mapper.tsx` builds from `items`', () => {
         whileOpen({ title: TITLE }, ({ host }) => {
             expect(screen.getByRole('button', { name: 'a' })).toBeInTheDocument()
             expect(screen.getByText(TITLE)).toBeInTheDocument()

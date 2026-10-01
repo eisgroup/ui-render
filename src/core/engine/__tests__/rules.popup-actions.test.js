@@ -1,4 +1,4 @@
-// rules.js registers fetch while building the action map.
+// rules.tsx registers fetch while building the action map.
 // eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
     // eslint-disable-next-line no-undef

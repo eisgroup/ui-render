@@ -40,25 +40,25 @@ module.exports = {
             functions: 85,
             lines: 90,
         },
-        './src/core/engine/rules.js': {
+        './src/core/engine/rules.tsx': {
             statements: 89,
             branches: 76,
             functions: 98,
             lines: 91,
         },
-        './src/core/engine/mapper.js': {
+        './src/core/engine/mapper.tsx': {
             statements: 98,
             branches: 93,
             functions: 100,
             lines: 99,
         },
-        './src/core/modules/form/utils.js': {
+        './src/core/modules/form/utils.tsx': {
             statements: 100,
             branches: 93,
             functions: 100,
             lines: 100,
         },
-        './src/core/engine/transforms.js': {
+        './src/core/engine/transforms.ts': {
             statements: 100,
             branches: 100,
             functions: 100,

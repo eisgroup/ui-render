@@ -20,7 +20,7 @@ type ValuesSource = { getState?: () => { values?: unknown } }
  * =============================================================================================
  *
  * Lifted out of the `POPUP_OPEN` handler at §9.3 step 2. That handler is three hundred lines, the
- * largest single thing in `rules.js`, and this was sixty of them: a four-source chain deciding the
+ * largest single thing in `rules.tsx`, and this was sixty of them: a four-source chain deciding the
  * row index, the row data and the array path a popup's fields should be named against.
  *
  * A function of its arguments. The instance reaches it as `props` and `form` rather than `this`,

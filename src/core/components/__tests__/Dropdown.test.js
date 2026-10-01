@@ -32,7 +32,7 @@ describe('Dropdown', () => {
    * because that one mocks `semantic-ui-react` away and the second element carrying the id IS
    * Semantic's `<div role="listbox">` — the caller's `id` reaches it through the rest bag. Two
    * elements with one id is invalid, and it was reachable without the caller doing anything:
-   * `mapper.js` assigns `input.id` automatically for relative paths. Found by the §9.7-F1 step 3
+   * `mapper.tsx` assigns `input.id` automatically for relative paths. Found by the §9.7-F1 step 3
    * part 1 audit.
    */
   it('never gives two elements the same id when it renders help text', () => {

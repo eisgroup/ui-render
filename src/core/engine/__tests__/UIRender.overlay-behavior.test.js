@@ -250,7 +250,7 @@ describe('overlay behavioural contract', () => {
              *
              * The passthrough itself is still real and still needs gating, because
              * `Render.tsx` spreads the object verbatim — so this drives a prop the
-             * component declares and neither `Render.tsx` nor `mapper.js` maps.
+             * component declares and neither `Render.tsx` nor `mapper.tsx` maps.
              * `position` is the sharpest choice: it decides which of `tooltip.less`'s
              * eight placement rules paints the bubble, and nothing between the meta and
              * the component touches it.
@@ -337,7 +337,7 @@ describe('overlay behavioural contract', () => {
          * THE `items` FORM WORKS NOW, AND THIS IS THE INVERSION.
          *
          * FLIPPED from `renders the error diagnostic instead of the node when `items` is
-         * used as the trigger`. `mapper.js` sets `props.children = items.map(Render)` —
+         * used as the trigger`. `mapper.tsx` sets `props.children = items.map(Render)` —
          * an ARRAY — and semantic-ui-react's `Portal` ran `React.Children.only()` on it,
          * which threw even for a single item; the engine's error boundary caught the
          * throw and rendered the diagnostic string in the node's place, so a meta author

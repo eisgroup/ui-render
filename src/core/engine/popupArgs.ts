@@ -22,8 +22,11 @@
  * @param {Array} args - everything the action was called with, caller's arguments first
  * @returns {?{id: String, options: Object}} the popup to open, or null when the call is unusable
  */
-/** A popup's options, as a meta writes them; `id` names the popup when the first argument does not. */
-export type PopupOptions = { id?: unknown, [key: string]: unknown }
+/**
+ * A popup's options, as a meta writes them: `id` names the popup when the first argument does not, and
+ * a caller's `relativeIndex`/`relativePath` scope it to a row (see `popupScope.ts`).
+ */
+export type PopupOptions = { id?: unknown, relativeIndex?: number | null, relativePath?: string | null, [key: string]: unknown }
 
 export function parsePopupArgs (args: unknown[]): { id: string, options: PopupOptions } | null {
     const filteredArgs = args.filter(arg => !isCallerArgument(arg))

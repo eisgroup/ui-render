@@ -36,6 +36,19 @@ import TabList from './components/TabList'
 import Tabs from './components/Tabs'
 import Data from './Data'
 import { AppContext } from '../contexts'
+import type { RenderErrorReport } from './Render'
+
+/**
+ * A meta node's attributes, as the mapper receives them from `Render`. `any`, deliberately: they are
+ * open JSON, which `validateMeta` checks at runtime and the published contract types describe, and
+ * each case below hands them on, unchecked, to the view the node names. What a view requires (a
+ * `Data` block's `kind`, a `List`'s `renderItem`) is the meta's to supply, so a narrower type here
+ * would be a claim the compiler cannot check, about data it never sees.
+ */
+type MetaAttributes = any
+
+/** What a value renderer is handed after the value and its index: the node's own options. */
+type RenderMethodOptions = Record<string, any>
 
 /**
  * UI RENDERER COMPONENTS SETUP ================================================
@@ -79,8 +92,10 @@ const RenderComponent = ({
     // definitions -- receive it explicitly below.
     currencyCode,
     ...props
-}) => {
-    const { popup } = useContext(AppContext)
+}: MetaAttributes) => {
+    // Subscribed, as it always was, so a node renders again when the popup opens or closes. It read a
+    // `popup` key off the context until the checker found the context has none: see `Table.group` below.
+    useContext(AppContext)
     // The instance's own translator, not the module global: `Active.translate` is owned by whichever
     // UIRender was constructed LAST, so reading it here made a re-rendering instance translate with a
     // sibling's function. The fallback covers nodes rendered without an instance (tests, and the
@@ -129,7 +144,7 @@ const RenderComponent = ({
             // Each cell `item` must receive the parent row's relativePath/relativeIndex so Input names
             // become e.g. `path[0].field`, not `path.field` (final-form throws on the latter when `path` is an array).
             // metaToProps usually stamps these on each cell, but merge from `rest` when missing.
-            return <>{items.map((item, i) => {
+            return <>{items.map((item: any, i: number) => {
                 const merged = {
                     ...item,
                     ...(item.relativePath == null && relativePath != null && { relativePath }),
@@ -201,7 +216,7 @@ const RenderComponent = ({
         }
 
         case FIELD.TYPE.PROGRESS_STEPS: {
-            const steps = items.map(({ step, label, content, data, _data, ...info }, i) => {
+            const steps = items.map(({ step, label, content, data, _data, ...info }: any, i: number) => {
                 return {
                     ...info,
                     step: isObject(step) ? Render.call(this, { data, _data, debug, form, instance, ...step }, i) : step,
@@ -230,7 +245,7 @@ const RenderComponent = ({
 
         case FIELD.TYPE.TABLE: {
             const { extraItems, filterItems, parentItem, group, ...table } = props
-            const additionalCellsStyles = []
+            const additionalCellsStyles: React.CSSProperties[] = []
             if (!isList(_data)) _data = []
 
             // Matrix table headers and data transform
@@ -242,25 +257,20 @@ const RenderComponent = ({
                     extraHeader = { label: '' }
                 } = group
                 const errorTitle = `Incorrect config for ${view} with {name: "${props.name}"}!`
-                if (id == null) {
-                    popup.setPopupState({
-                        title: errorTitle,
-                        content: `${view}.group.by must have 'id', got '${toJSON(group.by, null, 2)}'`
-
-                    })
-                }
-                if (!header || header.id == null) {
-                    popup.setPopupState({
-                        title: errorTitle,
-                        content: `${view}.group.header must have 'id', got '${toJSON(header, null, 2)}'`
-
-                    })
-                    header = {} // prevent breaking code
-                }
+                // A misconfiguration is THROWN, and the node's error boundary renders it. These three
+                // used to open a popup through `popup.setPopupState`, read off a context key that does
+                // not exist, so each threw a TypeError instead (found by the checker): the node failed
+                // the same way, with a diagnostic that named the TypeError, not the misconfiguration.
+                // The two required ids are reported together, as the two popups reported them.
+                const misconfigured = (content: string): never => { throw new Error(`${errorTitle} ${content}`) }
+                const missing: string[] = []
+                if (id == null) missing.push(`${view}.group.by must have 'id', got '${toJSON(group.by, null, 2)}'`)
+                if (!header || header.id == null) missing.push(`${view}.group.header must have 'id', got '${toJSON(header, null, 2)}'`)
+                if (missing.length) misconfigured(missing.join(' '))
 
                 // First, check data to determine headers
-                const groupsByValue = {}
-                const rowsByCommonValue = {}
+                const groupsByValue: Record<string, any> = {}
+                const rowsByCommonValue: Record<string, any[]> = {}
                 for (const row of _data) {
                     const { [id]: groupId, [header.id]: commonValue } = row
                     if (groupId != null) groupsByValue[groupId] = groupId
@@ -274,16 +284,12 @@ const RenderComponent = ({
                     const newHeaders = toFlatList(groupIds.map(_id => _headers.map(({
                         id,
                         ...h
-                    }) => ({ id: `${id}_${_id}`, ...h }))))
+                    }: any) => ({ id: `${id}_${_id}`, ...h }))))
                     table.headers = [header].concat(newHeaders)
 
                     // Label grouped tables
                     if (label != null && !hasObjectValue(label)) {
-                        popup.setPopupState({
-                            title: errorTitle,
-                            content: `${view}.group.by.label must resolve to object of labels by ${id} 'value', got '${toJSON(label, null, 2)}'`
-
-                        })
+                        misconfigured(`${view}.group.by.label must resolve to object of labels by ${id} 'value', got '${toJSON(label, null, 2)}'`)
                     }
                     const groupHeaders = groupIds.map(id => ({
                         colSpan: _headers.length,
@@ -297,7 +303,7 @@ const RenderComponent = ({
 
                     // Transform data by grouping them with `commonValue`
                     _data = Object.values(rowsByCommonValue).map(rows => {
-                        const item = {}
+                        const item: Record<string, any> = {}
                         rows.forEach(row => {
                             const { [id]: groupId, [header.id]: commonValue, ..._item } = row
                             item[header.id] = commonValue
@@ -312,8 +318,8 @@ const RenderComponent = ({
 
             // Mixed array nested table data filtering
             if (filterItems && parentItem) {
-                _data = _data.filter(item => {
-                    return !filterItems.find(filter => {
+                _data = _data.filter((item: any) => {
+                    return !filterItems.find((filter: any) => {
                         for (const key in filter) {
                             // If mismatch in value found, filter out given item
                             if (get(item, key) !== get(parentItem, filter[key])) return true
@@ -324,7 +330,7 @@ const RenderComponent = ({
             }
 
             // Table with custom rows
-            if (extraItems) _data = _data.concat(extraItems.map(sourceItem => {
+            if (extraItems) _data = _data.concat(extraItems.map((sourceItem: any) => {
                 const item = { ...sourceItem }
                 for (const id in item) {
                     const definition = item[id]
@@ -334,7 +340,7 @@ const RenderComponent = ({
                         } else if (definition.name && definition.render) {
                             item[id] = { ...definition, data: get(data, definition.name) }
                         } else if (definition.view) {
-                            item[id] = (_, index, props) => Render({ debug, ...props, ...definition })
+                            item[id] = (_: unknown, index: unknown, props: any) => Render({ debug, ...props, ...definition })
                         }
                     }
                 }
@@ -343,7 +349,7 @@ const RenderComponent = ({
 
             if (table.colGroup) {
                 let accumulatedWidth = 0
-                table.colGroup.forEach(col => {
+                table.colGroup.forEach((col: any) => {
                     if (col.isFixed && col.style) {
                         additionalCellsStyles.push({
                             left: `${accumulatedWidth}px`,
@@ -402,7 +408,7 @@ const RenderComponent = ({
 
                 case FIELD.TYPE.TABS:
                 default:
-                    return <Tabs items={items.map(({ tab, content, _data, data }, i) => ({
+                    return <Tabs items={items.map(({ tab, content, _data, data }: any, i: number) => ({
                         tab: isObject(tab) ? Render.call(this, {
                             data,
                             _data,
@@ -552,8 +558,8 @@ const RenderComponent = ({
             if (view === FIELD.TYPE.SELECT && isObject(mapOptions) && mapOptions.value && mapOptions.value !== '{index}' && input.onChange) {
                 const stableOnChange = input.onChange
                 const mappedOptions = input.options || []
-                input.onChange = (value) => {
-                    const idx = mappedOptions.findIndex(o => String(o.value) === String(value))
+                input.onChange = (value: unknown) => {
+                    const idx = mappedOptions.findIndex((o: any) => String(o.value) === String(value))
                     return stableOnChange(idx >= 0 ? String(idx) : value)
                 }
             }
@@ -562,7 +568,7 @@ const RenderComponent = ({
             if (autoSubmit) {
                 const { onChange } = input
                 const submit = autoSubmitter(instance, autoSubmit.delay >= 0 ? autoSubmit.delay : TIME_DURATION_INSTANT)
-                input.onChange = (value) => {
+                input.onChange = (value: unknown) => {
                     onChange && onChange(value)
                     submit()
                 }
@@ -573,7 +579,7 @@ const RenderComponent = ({
                 const { onRemove, onClickIcon } = input
                 input.icon = 'delete'
                 input.classNameIcon = 'button circle small transparent appear-on-hover'
-                input.onClickIcon = (...args) => {
+                input.onClickIcon = (...args: unknown[]) => {
                     // todo: for some reason Dropdown/Select have `form` undefined
                     form && form.change && form.change(input.name, null)
                     onRemove && onRemove(input.name)
@@ -585,7 +591,7 @@ const RenderComponent = ({
             // Validate type="number" with min/max
             if (input.type === 'number') {
                 const { validate, min, max } = input
-                if (min != null || max != null) input.validate = (value) => {
+                if (min != null || max != null) input.validate = (value: any) => {
                     if (min != null && value < min) return `Must be minimum ${min}`
                     if (max != null && value > max) return `Must be maximum ${max}`
                     return (validate && validate(value)) || OK
@@ -603,10 +609,10 @@ const RenderComponent = ({
  * @param {String} Name - one of FIELD.TYPE definitions
  * @returns {Function} renderer - that takes value as the first argument, and renders value in desired format
  */
-Render.Method = function RenderMethod (Name) {
+Render.Method = function RenderMethod (Name: string) {
     switch (Name) {
         case FIELD.RENDER.CURRENCY:
-            return (val, index, { id, decimals = 2, symbol = '$', className, style, ...props } = {}) => {
+            return (val: any, index?: unknown, { id, decimals = 2, symbol = '$', className, style, ...props }: RenderMethodOptions = {}) => {
                 return (isNumeric(val)
                         ? <Row className={className} style={style}>
                             <Text className="margin-right-smallest">{symbol}</Text>
@@ -616,15 +622,15 @@ Render.Method = function RenderMethod (Name) {
                 )
             }
         case FIELD.RENDER.DOUBLE5:
-            return (val, index, { id, decimals, ...props } = {}) => isNumeric(val) ? renderFloat(val, 5, props) : null
+            return (val: any, index?: unknown, { id, decimals, ...props }: RenderMethodOptions = {}) => isNumeric(val) ? renderFloat(val, 5, props) : null
         case FIELD.RENDER.FLOAT:
-            return (val, index, {
+            return (val: any, index?: unknown, {
                 id,
                 decimals,
                 ...props
-            } = {}) => isNumeric(val) ? renderFloat(val, decimals, props) : null
+            }: RenderMethodOptions = {}) => isNumeric(val) ? renderFloat(val, decimals, props) : null
         case FIELD.RENDER.PERCENT:
-            return (val, index, { id, decimals, className, style, ...props } = {}) => (isNumeric(val)
+            return (val: unknown, index?: unknown, { id, decimals, className, style, ...props }: RenderMethodOptions = {}) => (isNumeric(val)
                     ? <Row className={className} style={style}>
                         {renderFloat(Number(val) * 100, decimals, props)}
                         <Text className="margin-left-smallest">%</Text>
@@ -632,13 +638,13 @@ Render.Method = function RenderMethod (Name) {
                     : null
             )
         case FIELD.RENDER.TITLE_n_INPUT:
-            return (val, index, { id, ...props } = {}) => <Row {...props}><Text>{val}</Text></Row>
+            return (val: React.ReactNode, index?: unknown, { id, ...props }: RenderMethodOptions = {}) => <Row {...props}><Text>{val}</Text></Row>
         case FIELD.RENDER.STRING:
-            return (val) => {
+            return (val: React.ReactNode) => {
                 return <Text>{val}</Text>
             }
         case FIELD.RENDER.DATE: {
-            return (val) => {
+            return (val: unknown) => {
                 if (val) {
                     return <TextDateValue value={val}/>
                 }
@@ -646,7 +652,7 @@ Render.Method = function RenderMethod (Name) {
             }
         }
         default:
-            return (val) => <Text>{val}</Text>
+            return (val: React.ReactNode) => <Text>{val}</Text>
     }
 }
 
@@ -665,6 +671,6 @@ Render.Method = function RenderMethod (Name) {
  * @param {Object} report - {error, errorInfo, props, path, message}
  * @returns {void}
  */
-Render.onError = (report) => console.error(formatRenderError(report), report)
+Render.onError = (report: RenderErrorReport) => console.error(formatRenderError(report), report)
 
 Render.Component = RenderComponent

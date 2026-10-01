@@ -118,7 +118,7 @@ const KNOWN_META_WARNINGS = [
         count: 7,
         cause: 'rating_details.js, rowlist-relative-data_meta.json and invalid-array_meta.json use'
             + ' `view: "Tab"` inside a Tabs `items` entry. There is no Tab view: the Tabs branch of'
-            + ' mapper.js renders the entry\'s `tab` and `content` itself, and the surplus `view`'
+            + ' mapper.tsx renders the entry\'s `tab` and `content` itself, and the surplus `view`'
             + ' resolves to the "field does not exist" placeholder. The examples still look right'
             + ' because the placeholder is what the tab header slot receives.',
     },

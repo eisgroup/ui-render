@@ -963,7 +963,7 @@ function inHouseSection (component, { domProps, callSites }) {
             callSites[tag].files.length ? callSites[tag].files.map(file => code(file.replace(/^src\//, ''))).join(', ') : '*nothing*',
         ])),
         '',
-        '`mapper.js`\'s spread onto `Table.Cell` is a meta node\'s whole rest bag and is still'
+        '`mapper.tsx`\'s spread onto `Table.Cell` is a meta node\'s whole rest bag and is still'
         + ' unfiltered at the call site — the filter is now inside the cell, which is why it is safe.'
         + ' All three unfiltered boundaries on this surface are now closed inside the component:'
         + ' the table cell at step 1, the tooltip at step 2 part 3, and the dropdown at step 3'
@@ -1096,7 +1096,7 @@ function renderMarkdown (reference) {
         'that uses a new attribute, and the test names it.',
         '',
         'Read it as an inventory, not a forwarding claim — most of these are consumed by',
-        '`mapper.js` / `TableView.tsx` and never reach semantic-ui-react. Cross-reference the',
+        '`mapper.tsx` / `TableView.tsx` and never reach semantic-ui-react. Cross-reference the',
         'per-wrapper tables above for the fate of each.',
         '',
         row(['View', 'Attributes in the tracked corpus', 'Found only in consumer metas']),

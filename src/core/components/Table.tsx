@@ -107,11 +107,11 @@ function dropUnsupported (props: Record<string, unknown>, displayName: string) {
  * Six of the seven are exactly this, so they share one implementation rather than six copies.
  *
  * DOM boundary: the spread lands on a real element, so `ENGINE_PROPS` and `FIELD_ONLY_PROPS`
- * both apply (see ./domProps.ts). `Table.Cell` is the one that matters — `mapper.js` spreads a
+ * both apply (see ./domProps.ts). `Table.Cell` is the one that matters — `mapper.tsx` spreads a
  * meta node's whole rest bag onto it, unfiltered, which is a leak waiting for the first meta to
  * put `name` or `symbol` on a `TableCells` node. `FIELD_ONLY_PROPS` is safe to strip on ALL of
  * them because no member of this family renders a form control: the control is a CHILD with its
- * own props (`mapper.js` builds them from the merged node, `LocalDraftTableRow` from `common`),
+ * own props (`mapper.tsx` builds them from the merged node, `LocalDraftTableRow` from `common`),
  * and `TableView` reads `this.props.name` for its `FieldArray` decision before anything reaches
  * here.
  *

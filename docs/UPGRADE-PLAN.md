@@ -1188,6 +1188,24 @@ Measured: the corpus is identical to master's (107 / 1012 at mount, 27 / 64 on a
 
 Measured: the corpus is identical to master's (107 / 1012 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 322,898 → 322,926 bytes. `src/core` + `src/library` are 135 TS files, 17,075 lines, against 4 JS files, 2,925 lines: 85.4% of the lines, was 80.3%.
 
+**Third batch, 2026-10-01: `transforms`, `mapper`, `rules` and `form/utils`.** ✅ **E3 is DONE, and with it E2: `src/core` and `src/library` hold no JavaScript outside their tests.**
+- **A meta node is typed as open JSON: `any` where the engine reads and rewrites it by key.** `transforms`, `mapper` and `rules` take meta from the host and mutate it in place. What a node may hold is the contract `validateMeta` checks at runtime and the published types describe. A narrower type here would claim something the compiler cannot check, about data it never sees. Each `any` says so where it is declared.
+- **The util's `isObject` type guard is aliased, so it does not narrow, in `transforms` and `rules`.** It narrowed an `any` node to `Record<string, unknown>` and lost every key. The alias is captured at module level, which is safe: `utils` is outside the engine's import cycle.
+- **The two layered classes extend an untyped base, as written.** `Decorator` and `withFormSetup` each subclass a class they are handed. `UIRender` declares what the layers give its instance by interface merging, as `DocumentInstance` does, so no instance gets an own field in front of a layer's getter.
+- **`FIELD`'s type now lists every registry the engine writes:** `CROSS_VALIDATE`, `NORMALIZE`, `NORMALIZER`, `PARSER` and `METHODS`, besides `FUNC`, `VALIDATE` and `VALIDATION`.
+- **Three small honesty edits.** `UIRender.contextType` is a static field rather than an assignment after the class. The `data` setter no longer returns the `setState` result a setter drops. `popupAlert` declares the options its callers pass and nothing reads, as a finding below.
+- **The checker found a real bug, and it is fixed: a misconfigured `Table.group` never said what was wrong.**
+  - The mapper read a `popup` key off `AppContext`, and the context has none. Only the two suites that rendered the mapper by hand supplied one.
+  - So all three checks threw `TypeError: Cannot read properties of undefined (reading 'setPopupState')`, and the error boundary rendered that. Measured on master.
+  - They now throw their own message, the two required ids together, and the boundary renders it. A new suite fails on the previous code, three cases out of three. The two suites that faked the key are moved onto the real context.
+  - Opening the popup instead was considered and not done. The call omits `isOpen`, so the popup would not show, and a state update made during render can loop. The node failed before and still fails; only what it says changed.
+- **Found, and left for a change of its own: `popupOpen`'s options, and a popup's own props, reach `popupAlert` and nothing reads them.** The popup shows a title and content only.
+- **The path-keyed-gate hazard, a tenth time:** `scripts/generate-view-reference.js` and the prop-reference contract read `rules`, `mapper` and `form/utils` by path. Both references were regenerated, and changed only in those paths. The curation's line references, `mapper.js:184` and `:486`, were already stale and now name the current lines.
+- **A cast-necessity pass removed each new cast in turn.** Two were unneeded and are gone.
+- **A probe of 11 wrong call sites failed on all 11.** A control line of correct calls compiled.
+
+Measured: the corpus is identical to master's (107 / 1012 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 322,926 → 322,919 bytes. `src/core` + `src/library` are 139 TS files, 20,203 lines, and no JavaScript.
+
 #### E4 — Public API switchover (the risky step)
 
 - Switch `gen-ts` from the hand-written `src/library/types/index.ts` to emitting declarations from the real, now-typed entry chain.

@@ -6,7 +6,7 @@ const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&
  * =============================================================================================
  *
  * Lifted out of the `POPUP_OPEN` handler at §9.3 step 2. A `Popup` whose id contains a placeholder —
- * `edit.{index}` — is registered by `mapper.js` as a TEMPLATE, keyed by that raw id; a static id is
+ * `edit.{index}` — is registered by `mapper.tsx` as a TEMPLATE, keyed by that raw id; a static id is
  * stored ready-made in `popupById` instead and never reaches this. The caller may ask for the raw id
  * or, far more often, for one already interpolated — `edit.3` — and this finds the template meant:
  *
@@ -29,7 +29,10 @@ const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&
  * @returns {?{popupTemplate: Object, templateId: string}} the template and the key it was found by
  *   (step 2's candidate for that step), or null when there is none
  */
-export function findPopupTemplate (popupTemplates: Record<string, object> | null | undefined, id: string, index: unknown): { popupTemplate: object, templateId: string } | null {
+/** A registered popup template: the popup's meta node and the context it was declared in, open JSON. */
+export type PopupTemplateNode = Record<string, any>
+
+export function findPopupTemplate (popupTemplates: Record<string, PopupTemplateNode> | null | undefined, id: string, index: unknown): { popupTemplate: PopupTemplateNode, templateId: string } | null {
     if (!popupTemplates) return null
 
     if (popupTemplates[id]) return { popupTemplate: popupTemplates[id], templateId: id }

@@ -1,4 +1,4 @@
-// Force form module to load before rules.js cycle
+// Force form module to load before rules.tsx cycle
 import '../../modules/form/utils'
 import '../rules'
 import { Active } from '../../utils'

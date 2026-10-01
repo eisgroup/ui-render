@@ -25,13 +25,9 @@ jest.mock('../components/TableView', () => ({
     default: jest.fn(() => null),
 }))
 
-const popup = {
-    setPopupState: jest.fn(),
-}
-
 const withProviders = ui => (
     <ConfigContext.Provider value={initialConfigState}>
-        <AppContext.Provider value={{ ...initialAppState, popup }}>
+        <AppContext.Provider value={initialAppState}>
             {ui}
         </AppContext.Provider>
     </ConfigContext.Provider>
@@ -238,17 +234,22 @@ describe('mapper behavior contracts', () => {
         ])
     })
 
+    // These were reported through `popup.setPopupState`, read off a `popup` key the real context never
+    // had: only this suite's provider supplied one, so in a document they threw a TypeError instead.
+    // They are thrown now, both in one message, which a document's error boundary renders
+    // (`mapper.table-group-misconfig.test.js`).
     it('reports both required grouped-table configuration errors', () => {
-        renderMapped({
-            view: FIELD.TYPE.TABLE,
-            name: 'rows',
-            _data: [],
-            group: { by: {}, header: null },
-        })
-
-        expect(popup.setPopupState).toHaveBeenCalledTimes(2)
-        expect(popup.setPopupState.mock.calls[0][0].content).toContain("group.by must have 'id'")
-        expect(popup.setPopupState.mock.calls[1][0].content).toContain("group.header must have 'id'")
+        const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+        try {
+            expect(() => renderMapped({
+                view: FIELD.TYPE.TABLE,
+                name: 'rows',
+                _data: [],
+                group: { by: {}, header: null },
+            })).toThrow(/group\.by must have 'id'.*group\.header must have 'id'/s)
+        } finally {
+            error.mockRestore()
+        }
     })
 
     it('filters nested rows, resolves extra items, and computes sticky column offsets', () => {

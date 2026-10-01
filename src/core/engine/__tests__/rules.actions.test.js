@@ -1,4 +1,4 @@
-// rules.js registers `fetch` in the action map while building meta.
+// rules.tsx registers `fetch` in the action map while building meta.
 // eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
     // eslint-disable-next-line no-undef
@@ -8,7 +8,7 @@ if (typeof global.fetch === 'undefined') {
 import React from 'react' // eslint-disable-line import/first
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
-// Load the form module before rules.js follows the mapper/renders circular dependency.
+// Load the form module before rules.tsx follows the mapper/renders circular dependency.
 import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
 import { AppContext } from '../../contexts' // eslint-disable-line import/first
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext' // eslint-disable-line import/first

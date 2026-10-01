@@ -2,7 +2,7 @@ import { debounce } from '../utils'
 import type { Debounced } from '../utils/function'
 
 // Where the debounced submits are parked on the UI instance. Private to this module: the mapper
-// creates them and `rules.js` cancels them at unmount, and nothing else should know the name.
+// creates them and `rules.tsx` cancels them at unmount, and nothing else should know the name.
 const CACHE = '_autoSubmit'
 
 type Submit = (...args: any[]) => unknown
