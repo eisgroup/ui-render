@@ -309,6 +309,24 @@ describe('withFormSetup public instance contracts', () => {
         expect(screen.getByText('• plain: Incorrect')).toBeInTheDocument()
     })
 
+    it('heads the list with "Please complete:", not the fallback for a phrase nobody registered', () => {
+        // The phrase lived in `form/translations.js`, which nothing imported, so for as long as this
+        // getter existed its header read 'Untranslated'.
+        const { instance } = makeDecoratedInstance({
+            registered: ['email'],
+            fieldStates: { email: { error: 'Required' } },
+        })
+
+        render(
+            <ConfigContext.Provider value={initialConfigState}>
+                {instance.validationErrors}
+            </ConfigContext.Provider>
+        )
+
+        expect(screen.getByText('Please complete:')).toBeInTheDocument()
+        expect(screen.queryByText('Untranslated')).not.toBeInTheDocument()
+    })
+
     it('returns no validation UI when registered fields have no errors', () => {
         const { instance } = makeDecoratedInstance({
             registered: ['email'],

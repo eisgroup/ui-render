@@ -6,8 +6,9 @@ export type TableColGroupProps = { colGroup: Array<{ style?: React.CSSProperties
 const TableColGroup = ({ colGroup }: TableColGroupProps) => {
   return (
     <colgroup>
-      {colGroup.map(column => {
-        return <col style={column.style}/>
+      {/* By position: the columns are the meta's, in its order, and never reordered. */}
+      {colGroup.map((column, index) => {
+        return <col key={index} style={column.style}/>
       })}
     </colgroup>
   )

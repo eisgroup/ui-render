@@ -78,13 +78,17 @@ import 'eis-ui-render/static/all.css'   // or 'eis-ui-render/dist/static/all.css
 import 'eis-ui-render/static/font.css'  // icon font — only if the host does not provide its own
 ```
 
-An `Image` given only a `name` loads it from `/static/images/<name>`, relative to the host's web
-root, so those files must be reachable there. Copy the package's `static/` folder into the web root
-as part of the build; it is self-contained:
+Copy the package's `static/` folder into the web root as part of the build. It holds the
+stylesheets and the icon font, and is self-contained:
 
 ```bash
 cp -R node_modules/eis-ui-render/static ./public/
 ```
+
+An `Image` given only a `name` loads it from `/static/images/<name>`, relative to the host's web
+root. The package ships no images, so those files are the host's own. Earlier releases also
+carried `static/images/flags/`, 266 country-flag SVGs that nothing in the library used; a host that
+links them now ships its own copy.
 
 A host that serves `static/` under a sub-path or a CDN sets `path` (or `src`) on the `Image` in its
 meta; the library build fixes its environment at build time, so no host environment variable reaches

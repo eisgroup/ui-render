@@ -7,12 +7,21 @@ import { isRequired } from '../../components/inputs/validationRules'
 import Text from '../../components/Text'
 import ToolTip from '../../components/Tooltip'
 import View from '../../components/View'
-import { Active, debounce, isEqualJSON, toJSON } from '../../utils'
+import { Active, debounce, isEqualJSON, l, localiseTranslation, toJSON } from '../../utils'
 import type { Debounced } from '../../utils/function'
 import { hasObjectValue, objChanges, set } from '../../utils/object'
 import { _ } from '../../utils/translations'
 import { baselineOf, clearErrorsFor, clearTouchedFor, formsStorage, hasBaseline, setBaseline, touchedFor } from '../../state/formRegistry'
 import arrayMutators from 'final-form-arrays'
+
+// The header of `validationErrors`, registered beside its one reader, as the components register
+// theirs. It used to live in `form/translations.js`, which nothing imported, so the header read
+// 'Untranslated' for as long as the getter existed.
+localiseTranslation({
+  PLEASE_COMPLETE_: {
+    [l.ENGLISH]: 'Please complete:',
+  },
+})
 
 /** A form's values, as final-form holds them. */
 type Values = Record<string, any>

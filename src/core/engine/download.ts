@@ -32,7 +32,12 @@ import { downloadFile as saveBlob } from '../services/downloadFile'
  */
 /** What `download` is given: see the parameter above. */
 export type DownloadOptions = {
-    downloadFile?: (fileName: string) => Promise<Response>
+    /**
+     * Answers with anything that has `blob()`, the one thing read of it: the published
+     * `UIRender.UIRenderDownloadResponse`. It said `Response`, a fetch response's whole surface,
+     * which a host written to the contract does not have to return (`contract.agreement.ts`).
+     */
+    downloadFile?: (fileName: string) => Promise<{ blob (): Promise<Blob> }>
     onFailure: (error: unknown) => void
 }
 

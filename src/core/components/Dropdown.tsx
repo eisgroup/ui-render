@@ -309,7 +309,12 @@ export function Dropdown ({
 
   /// Error handling
   // @Note: below logic only works as DropdownField with controlled value
-  if (done == null) done = !error && (!!props.value || props.value === 0)
+  // From the value the parent controls. This read `props.value`, which never holds it — `value` is
+  // taken out of the rest bag above — so `done` was always false, and the stylesheet's
+  // `.input--wrapper.done` never applied: a `float` label sat over the selection it named
+  // (`Dropdown.done-state.test.js`). `hasNoValue` is the effect's own test, so an empty multiple
+  // selection is not complete either, as the original `multiple` branch meant.
+  if (done == null) done = !error && !hasNoValue(valueFromParent)
 
   // Hoisted rather than nested inside `omitProps(...)`: `scripts/generate-wrapper-prop-reference.js`
   // reads the strip lists out of the `omitProps` call to document the DOM boundary, and its parser

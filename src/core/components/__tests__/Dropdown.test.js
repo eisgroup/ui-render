@@ -277,9 +277,10 @@ describe('Dropdown', () => {
     })
 
     describe('done state', () => {
-        // Note: auto-calculated `done` relies on `props.value` from DropdownField wrapper (form integration).
-        // When using Dropdown directly, `value` is destructured to `valueFromParent` and not in rest-props,
-        // so done must be passed explicitly for standalone usage.
+        // `done` comes from the value the parent controls, standalone and inside a form alike
+        // (`Dropdown.done-state.test.js` has the cases). It used to read `props.value`, which `value`
+        // never reaches, in a form either: measured across the demo corpus, no dropdown wrapper was
+        // `done` until it was fixed. The test that pinned "not set without a form wrapper" pinned that.
 
         it('applies done class when explicitly set to true', () => {
             const { container } = renderDropdown({
@@ -299,13 +300,12 @@ describe('Dropdown', () => {
             expect(container.firstChild).not.toHaveClass('done')
         })
 
-        it('does NOT auto-set done class in standalone mode (without form wrapper)', () => {
+        it('sets the done class from the value, without a form wrapper too', () => {
             const { container } = renderDropdown({
                 options: objectOptions,
                 value: 'a',
             })
-            // In standalone mode, props.value is undefined so done auto-calculates to false
-            expect(container.firstChild).not.toHaveClass('done')
+            expect(container.firstChild).toHaveClass('done')
         })
 
         it('does NOT set done class when error is present even if done=true', () => {

@@ -140,7 +140,7 @@ const VIEW_CURATION = {
     POPUP: {
         summary: 'Registers its `items` on the render instance under `id` and renders nothing in place; the content is mounted only when the `popupOpen` action opens it.',
         resolvesTo: 'PopupContent',
-        notes: 'An `id` containing `{...}` is kept as a template and interpolated at open time, so one declaration can serve many rows.',
+        notes: 'An `id` containing `{...}` is kept as a template and interpolated at open time, so one declaration can serve many rows. The popup shows the node\'s `title` above its `items`; no other key of the node has an effect.',
     },
     PROGRESS_STEPS: {
         summary: 'Step indicator whose items each carry `step`, `label` and `content`, any of which may itself be a view declaration.',
@@ -293,7 +293,7 @@ const ACTION_CURATION = {
     },
     POPUP_OPEN: {
         summary: 'Opens the content registered by a `Popup` node with the given `id`.',
-        notes: 'Event arguments are filtered out, and the row index is forwarded so fields inside the popup address the row that opened it.',
+        notes: 'Event arguments are filtered out, and the row index is forwarded so fields inside the popup address the row that opened it. Of an options object after the `id`, only `relativeIndex` and `relativePath` are read, for a template popup\'s row.',
     },
     REMOVE_DATA: {
         summary: 'Removes the current row from the parent instance `dataKind` array through the parent form array mutator.',

@@ -180,24 +180,6 @@ export function fileFormat (fileName: string): string {
 }
 
 /**
- * Get File Extension used in Backend from User submitted file name
- *
- * @param {String|Null|Undefined} fileName - to extract extension
- * @returns {String|Undefined} file format extension, or empty string, or undefined
- */
-export function fileFormatNormalized (fileName: string | null | undefined): string | undefined {
-	if (!fileName) return
-	const ext = fileFormat(toLowerCase(fileName))
-	switch (ext) {
-		case 'jpeg':
-		case 'jpg':
-			return 'jpg'
-		default:
-			return ext
-	}
-}
-
-/**
  * Get File Name without Extension String
  *
  * @param {string} fileName - full file name with extension

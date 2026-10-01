@@ -20,8 +20,14 @@
  * NEVER `-u` to make a red pure refactor (§9.2/§9.3) go green: for those commits a
  * diff here is the finding, and the whole reason this layer exists.
  *
- * THE LAST DELIBERATE REGENERATION, and what the diff was — §9.7-F1 step 3 part 2, the dropdown
- * swap, across 11 of the 38 examples. Six changes, each accounted for before the `-u`:
+ * THE LAST DELIBERATE REGENERATION, and what the diff was — 2026-10-01, the `done` Dropdown fix,
+ * across 5 of the 38 examples. One change, 6 lines: each dropdown wrapper with a value gained `done`
+ * (`class="flex--col input--wrapper done ..."`). The wrapper had read `done` from a `props.value`
+ * that `value` never reaches, so no dropdown wrapper was ever `done`; see `Dropdown.done-state.test.js`.
+ * Nothing else in the corpus moved: the commits, the `translate` calls and every other line agree.
+ *
+ * THE ONE BEFORE IT, and what its diff was — §9.7-F1 step 3 part 2, the dropdown swap, across 11 of
+ * the 38 examples. Six changes, each accounted for before the `-u`:
  *   - the `role="alert" aria-live="polite" aria-atomic="true"` on the selected-value node is GONE.
  *     Semantic announced the current value as an alert; the corpus role census dropped 12 `alert`
  *     entries to zero in the same commit, and the cursor is conveyed by `aria-activedescendant`.

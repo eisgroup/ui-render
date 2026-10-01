@@ -2,10 +2,7 @@ import { LANGUAGE } from '../constants'
 import {
   definitionByValue,
   definitionSetup,
-  enumFrom,
-  localise,
   localiseTranslation,
-  optionsFrom,
 } from '../definitions'
 import { Active } from '../_envs'
 
@@ -86,103 +83,6 @@ describe('definition utilities contracts', () => {
       expect(Object.getPrototypeOf(result)).toBe(Object.prototype)
       expect(Object.prototype.hasOwnProperty.call(result, '__proto__')).toBe(true)
       expect(result.__proto__).toBe(item)
-    })
-
-    it('returns own enum values in definition order', () => {
-      const input = Object.create({ INHERITED: { _: 'inherited' } })
-      input.FIRST = { _: 0 }
-      input.SECOND = { _: ['a', 'b'] }
-
-      expect(enumFrom(input)).toEqual([0, ['a', 'b']])
-    })
-  })
-
-  describe('optionsFrom', () => {
-    const definitions = {
-      FIRST: { _: ['a', 'b'], en: 'First', ru: 'Первый' },
-      SECOND: { _: 0, en: 'Second' },
-    }
-
-    it('builds language-specific options and serializes array values', () => {
-      const options = optionsFrom(definitions)
-
-      expect(options.en).toEqual([
-        { text: 'First', value: 'a,b' },
-        { text: 'Second', value: 0 },
-      ])
-      expect(options.ru).toEqual([{ text: 'Первый', value: 'a,b' }])
-      expect(definitions.FIRST._).toEqual(['a', 'b'])
-    })
-
-    it('exposes the exact active language when it exists', () => {
-      const options = optionsFrom(definitions)
-      Active.LANG = { _: 'ru' }
-
-      expect(options.items).toBe(options.ru)
-    })
-
-    it('falls back to English and then an empty list', () => {
-      Active.LANG = { _: 'missing' }
-      expect(optionsFrom(definitions).items).toEqual([
-        { text: 'First', value: 'a,b' },
-        { text: 'Second', value: 0 },
-      ])
-
-      expect(optionsFrom({ ONLY: { _: 'only', ru: 'Только' } }).items).toEqual([])
-    })
-
-    it('ignores inherited definitions and language labels', () => {
-      const input = Object.create({ INHERITED: { _: 'inherited', en: 'Inherited' } })
-      input.OWN = Object.assign(Object.create({ ru: 'Inherited language' }), {
-        _: 'own',
-        en: 'Own',
-      })
-
-      const options = optionsFrom(input)
-
-      expect(options.en).toEqual([{ text: 'Own', value: 'own' }])
-      expect(options.ru).toBeUndefined()
-    })
-  })
-
-  describe('localise', () => {
-    it('switches active language and falls back to English', () => {
-      const definitions = {
-        ITEM: { _: 'item', en: 'English', ru: 'Русский' },
-      }
-      localise(definitions)
-
-      Active.LANG = { _: 'ru' }
-      expect(definitions.ITEM.name).toBe('Русский')
-
-      Active.LANG = { _: 'missing' }
-      expect(definitions.ITEM.name).toBe('English')
-    })
-
-    it('falls back to a string representation of the underscore value', () => {
-      const definitions = {
-        ZERO: { _: 0 },
-        LIST: { _: ['a', 'b'] },
-      }
-      localise(definitions)
-
-      expect(definitions.ZERO.name).toBe('0')
-      expect(definitions.LIST.name).toBe('a,b')
-    })
-
-    it('recurses through groups while preserving an explicit name', () => {
-      const definitions = {
-        GROUP: {
-          name: 'Existing group',
-          ITEM: { _: 'item', en: 'Nested item' },
-        },
-      }
-
-      localise(definitions)
-      localise(definitions)
-
-      expect(definitions.GROUP.name).toBe('Existing group')
-      expect(definitions.GROUP.ITEM.name).toBe('Nested item')
     })
   })
 

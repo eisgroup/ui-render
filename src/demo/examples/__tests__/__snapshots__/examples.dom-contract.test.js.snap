@@ -40,7 +40,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                 </div>
               </div>
             </div>
-            <div class="flex--col input--wrapper fill-width margin-h-smaller">
+            <div class="flex--col input--wrapper done fill-width margin-h-smaller">
               <div aria-expanded="false" class="ui selection dropdown" role="listbox" tabindex="0">
                 <div class="text divider">
                   "ASO"
@@ -3822,7 +3822,7 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
               "Group"
             </span>
             <div class="flex--col">
-              <div class="flex--col input--wrapper middle">
+              <div class="flex--col input--wrapper done middle">
                 <div aria-expanded="false" class="ui compact selection dropdown" id="Settings.Record.GroupSelection" role="listbox" tabindex="0">
                   <div class="text divider">
                     "Group B"
@@ -3840,7 +3840,7 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
               "Item"
             </span>
             <div class="flex--col">
-              <div class="flex--col input--wrapper middle">
+              <div class="flex--col input--wrapper done middle">
                 <div aria-expanded="false" class="ui compact selection dropdown" id="Settings.Record.GroupList.1.ItemSelection" role="listbox" tabindex="0">
                   <div class="text divider">
                     "Gamma"
@@ -3990,7 +3990,7 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
 exports[`demo example full-DOM contract selectIndexValue renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col input--wrapper labeled fill-width">
+    <div class="flex--col input--wrapper done labeled fill-width">
       <span class="text input__label">
         "Select option (index value)"
       </span>
@@ -4017,7 +4017,7 @@ exports[`demo example full-DOM contract selectReorder renders a stable, non-empt
           <span class="text h5 padding-right middle">
             "Region"
           </span>
-          <div class="flex--col input--wrapper middle">
+          <div class="flex--col input--wrapper done middle">
             <div aria-expanded="false" class="ui compact selection dropdown" role="listbox" tabindex="0">
               <div class="text divider">
                 "South"
@@ -4162,7 +4162,7 @@ exports[`demo example full-DOM contract selectReorder renders a stable, non-empt
 exports[`demo example full-DOM contract selectStableValue renders a stable, non-empty DOM matching its snapshot 1`] = `
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
-    <div class="flex--col input--wrapper labeled fill-width">
+    <div class="flex--col input--wrapper done labeled fill-width">
       <span class="text input__label">
         "Select option (stable id value)"
       </span>

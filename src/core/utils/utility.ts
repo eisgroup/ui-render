@@ -213,7 +213,10 @@ export function namespace (constant: string, service: string): string {
  * @return strength - result score
  */
 export function passStrength (password: string): number {
-  // @Note: `passwordCheck` is typed as possibly undefined; the original JS called it unconditionally,
-  //    so the non-null assertion preserves the existing throw-on-missing behaviour.
-  return Active.passwordCheck!(password).score
+  // No checker configured skips the check, on the server as in the browser, whose getter falls back
+  // to `() => ({score: Infinity})` until zxcvbn loads. On the server the getter returns `undefined`
+  // until the host assigns one, and this called it anyway: every `validate: 'password'` threw
+  // `TypeError: Active.passwordCheck is not a function` (`validationRules.server.test.js`).
+  const check = Active.passwordCheck
+  return check ? check(password).score : Infinity
 }

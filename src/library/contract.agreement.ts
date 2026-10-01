@@ -22,6 +22,11 @@
  * two lists, and pretending otherwise would be worse than saying so: this comment is the link.
  */
 import type * as UIRender from './contract'
+import type { ApplyPeriodsOptions } from '../core/engine/applyPeriods'
+import type { DownloadOptions } from '../core/engine/download'
+import type { DeliveredRenderErrorReport } from '../core/engine/Render'
+import type { UploadOptions } from '../core/engine/upload'
+import type { MetaProblem } from '../core/engine/validateMeta'
 
 type Meta = UIRender.Meta
 
@@ -99,6 +104,26 @@ const inputTypeIsNotJustString: Eq<UIRender.MetaInputType, string> = false
 /** …while still accepting any string, which is what "open" means. */
 const openView: UIRender.MetaView = 'NotADeclaredView'
 
+/* ---------------------------------------------------------------------------------------------
+ * THE ENGINE AGAINST THE PUBLISHED HOST INTERFACE. A second agreement, and the reason it is here:
+ * the host's props reach the engine through ONE cast (`main.tsx`), so nothing else checks that what
+ * the engine CALLS a host with, and what it DELIVERS to a host, is what `contract.ts` publishes.
+ * Each line fails to compile if the two drift apart:
+ *   - a host callback written to the contract must be one the engine accepts. `downloadFile` was
+ *     not: the engine asked for a whole fetch `Response`, where the contract promises `blob()`;
+ *   - a value the engine hands a host must be the one the contract describes.
+ * ------------------------------------------------------------------------------------------- */
+
+/** `true` when every `From` is a `To`: assignability, the relation a host's compiler applies. */
+type Assignable<From, To> = [From] extends [To] ? true : false
+type HostCalls = Required<UIRender.UIRenderApiCalls>
+
+const downloadIsAccepted: Assignable<HostCalls['downloadFile'], NonNullable<DownloadOptions['downloadFile']>> = true
+const uploadIsAccepted: Assignable<HostCalls['uploadFile'], NonNullable<UploadOptions['uploadFile']>> = true
+const updateIsAccepted: Assignable<HostCalls['updateExperienceData'], NonNullable<ApplyPeriodsOptions['updateExperienceData']>> = true
+const errorReportIsPublished: Assignable<DeliveredRenderErrorReport, UIRender.UIRenderErrorReport> = true
+const metaProblemIsPublished: Assignable<MetaProblem, UIRender.UIRenderMetaProblem> = true
+
 /* Reference every binding so `noUnusedLocals` stays available to whoever turns it on. */
 void itemsNull; void headersNull; void extraHeadersNull; void extraItemsNull; void nameNull
 void showIfNull; void classNameArray; void stylesArray; void itemsString; void headersNumber
@@ -106,3 +131,5 @@ void undeclaredKeys; void hostSpecificView; void rootKeys; void nested
 void rendererByName; void rendererByObject; void rendererBad
 void viewIsNotJustString; void renderIsNotJustString; void actionIsNotJustString
 void normalizerIsNotJustString; void inputTypeIsNotJustString; void openView
+void downloadIsAccepted; void uploadIsAccepted; void updateIsAccepted
+void errorReportIsPublished; void metaProblemIsPublished
