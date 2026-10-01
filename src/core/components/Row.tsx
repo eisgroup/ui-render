@@ -27,9 +27,9 @@ export function Row ({
   rtl,
   ...props
 }: RowProps, ref?: unknown) {
-  // DOM boundary: this spread lands on a <div>. See ./domProps.js — `ref` is attached after
+  // DOM boundary: this spread lands on a <div>. See ./domProps.ts — `ref` is attached after
   // the filter because omitProps may return the (rest) object unchanged.
-  const domProps = omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS) as Record<string, unknown> // typed `Object` by its JSDoc
+  const domProps = omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)
   if (isFunction(ref)) domProps.ref = ref
   return <div className={classNames('flex--row', {fill, reverse, rtl, pointer: props.onClick}, className)} {...domProps} />
 }

@@ -173,7 +173,7 @@ const renderExample = ({ data, meta }) => {
  * `-last` bug nor its fix could be judged here — that is covered directly in
  * `pages/main/components/__tests__/TableView.test.js`. Seven leaking DOM boundaries
  * were likewise invisible because no example passes an engine prop to a slider or an
- * icon; see the audit note in `components/domProps.js`.
+ * icon; see the audit note in `components/domProps.ts`.
  */
 // The ledger is empty: every defect the first baseline encoded has been fixed. Kept as the
 // place a NEW one goes -- record it with a count and a cause rather than letting `-u` bless it.
@@ -185,7 +185,7 @@ const KNOWN_DOM_DEFECTS = []
  * The inverse of the ledger above: markers whose count must stay at ZERO. Each was a
  * measured leak in the first baseline (`data` 40 — the deleted `data="[object Object]"`
  * ledger entry — `_data` 40, `symbol` 23, `view` 15, `index` 8, `label` 6, `_comment` 2)
- * and each is now filtered at the DOM boundary by src/core/components/domProps.js, with
+ * and each is now filtered at the DOM boundary by src/core/components/domProps.ts, with
  * `_comment` additionally dropped at source by metaToProps.
  *
  * Why a corpus-wide tripwire and not just the snapshots: this family came back four
@@ -281,7 +281,7 @@ describe('demo example full-DOM contract', () => {
             )
         }
 
-        // Input.js, InputNumber.js and InputDate.js used to set aria-describedby
+        // Input, InputNumber and InputDate used to set aria-describedby
         // unconditionally while rendering the element that carries the target id only when
         // there is an error or info message — so all 57 references in the first baseline
         // pointed at an id that existed nowhere in its document (an axe
@@ -335,7 +335,7 @@ describe('demo example full-DOM contract', () => {
 
         // A rise from zero means an engine-internal prop is reaching DOM elements again.
         // Do not add a destructure to whichever component surfaced it — put the prop in
-        // ENGINE_PROPS in src/core/components/domProps.js, which is the boundary.
+        // ENGINE_PROPS in src/core/components/domProps.ts, which is the boundary.
         expect(countAcrossCorpus(marker)).toBe(0)
     })
 

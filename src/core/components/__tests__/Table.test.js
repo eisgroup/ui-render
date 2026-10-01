@@ -1,7 +1,7 @@
 /**
  * THE IN-HOUSE TABLE FAMILY (UPGRADE-PLAN §9.7-F1 step 1)
  * =============================================================================
- * `Table.js` used to be a 24-line wrapper around `semantic-ui-react`, thin enough that three
+ * `Table` used to be a 24-line wrapper around `semantic-ui-react`, thin enough that three
  * smoke assertions were a fair trade. It is now the implementation, so what used to be
  * Semantic's contract is ours and has to be pinned here:
  *
@@ -214,7 +214,7 @@ describe('Table', () => {
         })
 
         it('applies both boundary lists, not a hand-rolled subset', () => {
-            // Guards against the failure domProps.js was written to prevent: a component that
+            // Guards against the failure domProps.ts was written to prevent: a component that
             // filters "the props we saw leak" instead of the named list. Every key in both lists
             // must be stripped by the cell, whatever the lists grow to contain.
             const bag = {}

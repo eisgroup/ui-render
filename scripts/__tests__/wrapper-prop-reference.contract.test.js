@@ -8,7 +8,7 @@
  *
  * Six layers, weakest to strongest:
  *   1. the page equals `renderMarkdown(buildReference())` — the drift gate;
- *   2. the statically parsed `domProps.js` lists equal the REAL exported arrays, so the
+ *   2. the statically parsed `domProps.ts` lists equal the REAL exported arrays, so the
  *      generator's parsing cannot quietly lie about what is stripped;
  *   3. the TRACKED example corpus is walked here and its attribute inventory compared to
  *      META_ATTRIBUTES — the one part of the page that cannot be derived from source, made
@@ -61,14 +61,14 @@ const ROOT = path.resolve(__dirname, '..', '..')
 const EXPECTED = {
     // 7 before §9.7-F1 step 1 took `Table` in-house. It drops by one per completed step, and the
     // count is the cheapest possible check that a step actually removed the dependency instead of
-    // moving it: `Table.js` was one of the three non-test importers.
+    // moving it: `Table.tsx` was one of the three non-test importers.
     //
     // 6 → 4 at step 2 part 1, and the two that went were TESTS, not product code: rewriting
     // `TooltipPop.test.js` against the real component removed both its
     // `import {Popup} from 'semantic-ui-react'` and its `jest.mock('semantic-ui-react')`. Worth
     // reading as part of the surface rather than as noise — a suite that mocks the dependency it is
     // meant to be replacing is itself a coupling to it, and this counter is what made that visible.
-    // 4 → 3 at step 2 part 3, which took the tooltip in-house: `TooltipPop.js`'s own import was
+    // 4 → 3 at step 2 part 3, which took the tooltip in-house: `TooltipPop.tsx`'s own import was
     // the last PRODUCT site other than `Dropdown.js`. The two remaining test-side sites are
     // `Dropdown.behavior.test.js`'s pair, which step 3 owes — after which this counter reaches 0
     // and step 3½ can delete the dependency.

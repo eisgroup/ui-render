@@ -12,13 +12,13 @@ import { get } from '../utils'
  * because everything it reads is a value.
  *
  * THERE WERE FOUR SOURCES; ONE IS GONE. A source keyed on `props.relativePath` sat between 2 and 3
- * below, and nothing ever set that prop on an engine instance — `Data.js` passes `index` and
+ * below, and nothing ever set that prop on an engine instance — `Data.tsx` passes `index` and
  * `relativeIndex` to a nested UIRender but puts the path in `meta`, and the only other
  * `relativePath=` in the engine goes to a `Render`, not to a UIRender. Its condition could not be
  * true, so cases fell past it to the last source, and removing it changes nothing.
  *
  * The other three were measured over the whole suite and NOT removed, which is the opposite of
- * what §9.3 predicted: sources 1 and 2 never fire in any test, but `Data.js` does set the props
+ * what §9.3 predicted: sources 1 and 2 never fire in any test, but `Data.tsx` does set the props
  * they read, so they are reachable in a nested document and merely uncovered. Deleting them on the
  * strength of "no test hits this" would have been a live behaviour change.
  *
@@ -87,7 +87,7 @@ export function resolvePopupScope ({ id, form, props = {} }) {
  *
  *   index — the caller's `options.relativeIndex`, the resolved scope's, the template's own
  *   path  — the caller's `options.relativePath`, the resolved scope's, the INSTANCE's
- *           `props.relativePath`, the template's own. Nothing in the engine sets that prop: `Data.js`
+ *           `props.relativePath`, the template's own. Nothing in the engine sets that prop: `Data.tsx`
  *           gives a nested instance `index` and `relativeIndex` only. It is reachable through the
  *           host's props, which `library/main.js` spreads onto the top-level instance, though the
  *           public types do not declare it; kept for that reason.

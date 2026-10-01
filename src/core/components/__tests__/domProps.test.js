@@ -21,13 +21,13 @@ import Tooltip from '../Tooltip'
 /**
  * THE DOM BOUNDARY, ENFORCED
  * -----------------------------------------------------------------------------
- * `domProps.js` only works if every component that spreads a props bag onto a DOM
+ * `domProps.ts` only works if every component that spreads a props bag onto a DOM
  * element actually applies it, so this asserts the boundary per primitive rather
  * than trusting the module in isolation. The corpus-wide counterpart is the
  * counted-zero tripwire in examples.dom-contract.test.js; this is the unit-level
  * one, and it fails for a NEW component that forgets the filter only if that
  * component is added here — which is what the "keep this list current" note in
- * domProps.js is asking for.
+ * domProps.ts is asking for.
  *
  * The `name`/`label` half is the part worth care: it must NOT be stripped on the
  * form-control family. `keeps `name` on a form control` below is the guard, and the

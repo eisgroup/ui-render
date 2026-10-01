@@ -1,6 +1,6 @@
 <!--
   GENERATED FILE — DO NOT EDIT. Run `npm run docs:props` to regenerate.
-  Inventories are derived from the component source, `domProps.js` and the call sites;
+  Inventories are derived from the component source, `domProps.ts` and the call sites;
   the prose comes from scripts/wrapper-prop-curation.js. Generator: scripts/generate-wrapper-prop-reference.js.
 -->
 
@@ -31,7 +31,7 @@ these views has exactly one of these fates, and they are different promises:
 | Outcome | What it means | What the §9.7-F1 swap does to it |
 | --- | --- | --- |
 | **consumed** | the component, or its caller in the engine, reads it | nothing — we already own the behaviour |
-| **stripped** | removed at the DOM boundary by `src/core/components/domProps.js` | only the boundary moves |
+| **stripped** | removed at the DOM boundary by `src/core/components/domProps.ts` | only the boundary moves |
 | ~~**forwarded**~~ | ~~handed to semantic-ui-react, which decides what happens~~ | **no longer a fate.** The exit completed, so nothing is handed anywhere but to code in this repository |
 | **dropped** | semantic-ui-react handled it; the in-house component deliberately does not | already happened — this is the semver record for that step |
 
@@ -73,7 +73,7 @@ TypeScript files included — which is why both halves run. Neither is sufficien
 
 ### `Table` — in-house, no semantic-ui-react
 
-`src/core/components/Table.js`, 163 lines. Replaced the wrapper in §9.7-F1 step 1.
+`src/core/components/Table.tsx`, 175 lines. Replaced the wrapper in §9.7-F1 step 1.
 
 Seven components over the seven native table elements — markup and className composition, which is all `semantic-ui-react` was contributing here. Semantic's own table CSS is not loaded (`collections/table` is commented out in `src/style/override/_semantic.less`), so every table style in the product was already in-house LESS and the swap changed no styling.
 
@@ -95,7 +95,7 @@ CSS contract: `src/style/components/table.less` hangs EVERY cell's padding off `
 | Prop | Meaning |
 | --- | --- |
 | `className` | Appended last, after `table`. `TableView` builds it from the meta `styles`/`fill`/`vertical` attributes; consumer metas add `as-layout`, `no-header`, `highlight-N-last` and the sticky-column tokens through the same channel. |
-| `inverted` | Dark table. Emitted as the `inverted` class, which `table.less` and `expand.less` both select on. **KEPT — decided at §9.9-H1 (2026-09-17), which is where step 1 left the call.** Its one in-repo caller was `ErrorTable.js`, and H1 deleted it, so the "Attributes at the call sites" table above no longer lists this prop — that table reports what the CODEBASE passes, not what the component accepts. The prop itself is untouched: `Table.js` still destructures it and still emits the class, the CSS still selects on it, and a consumer meta can still set it. Dropping it because our own last caller went away would have been a breaking change bought for nothing. |
+| `inverted` | Dark table. Emitted as the `inverted` class, which `table.less` and `expand.less` both select on. **KEPT — decided at §9.9-H1 (2026-09-17), which is where step 1 left the call.** Its one in-repo caller was `ErrorTable.js`, and H1 deleted it, so the "Attributes at the call sites" table above no longer lists this prop — that table reports what the CODEBASE passes, not what the component accepts. The prop itself is untouched: `Table.tsx` still destructures it and still emits the class, the CSS still selects on it, and a consumer meta can still set it. Dropping it because our own last caller went away would have been a breaking change bought for nothing. |
 | `striped` | Zebra rows, emitted as the `striped` class. Same story as `inverted` exactly: genuinely styled (`table.striped tr:nth-child(2n)`), which is why neither was dropped with the rest, and still accepted after H1 removed their shared call site. |
 
 **Consumed by every subcomponent (1).** All 6 share one implementation, so this list applies to each of them identically.
@@ -104,7 +104,7 @@ CSS contract: `src/style/components/table.less` hangs EVERY cell's padding off `
 | --- | --- |
 | `className` | Passed through verbatim, or the attribute is omitted entirely when it is absent or empty. Semantic ran its own `cx()` and printed `class=""` regardless: 317 empty class attributes in the 38-example baseline were its, on `tbody` (24), `tr` (94) and `td` (199), and they are gone. |
 
-**Stripped at the DOM boundary.** `src/core/components/Table.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js` in all 7 components, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
+**Stripped at the DOM boundary.** `src/core/components/Table.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts` in all 7 components, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
 
 **Passthrough.** `style`, `colSpan`, `scope`, `id`, `data-*` and every event handler still reach the element untouched — they always did, because Semantic did not handle them either, so they ride the rest spread exactly as before. There is no `forwardRef`: nothing in `src` passes a ref to a table element, so the parameter would have had no caller.
 
@@ -163,7 +163,7 @@ CSS contract: The bubble is now mounted INSIDE `.ui-render`, which is what makes
 | `onOpen` | Called when the bubble opens, controlled or not. |
 | `onClose` | Called when it closes, controlled or not. |
 
-**Stripped at the DOM boundary.** `src/core/components/TooltipPop.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
+**Stripped at the DOM boundary.** `src/core/components/TooltipPop.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
 
 **Passthrough.** `style`, `data-*`, `aria-*` and every event handler still reach the bubble untouched through `omitProps(…, ENGINE_PROPS, FIELD_ONLY_PROPS)` — the same DOM boundary every other component uses, which is new here: SUIR's `Popup` applied no such filter, so `§9.7-F1` step 2 also closed the engine-prop leak on this path. There is no `forwardRef`: nothing in `src` passes a ref to a tooltip, and the host `<span>` holds the only ref the component itself needs.
 
@@ -239,7 +239,7 @@ CSS contract: The loaded `modules/dropdown` LESS is the largest single semantic 
 | `translate` <br>*(has a default)* | The i18n function. Engine-owned, applied to option text, `label` and `placeholder`. CONSUMED, not stripped — destructured out at the top of the wrapper. It is also in ENGINE_PROPS, which is what catches it at other boundaries. |
 | `value` <br>*(bound as `valueFromParent`)* | Selected value. Held in wrapper state, synced from the prop, and array values are joined before being forwarded — so what the control sees is not always what the caller passed. |
 
-**Stripped at the DOM boundary.** `src/core/components/Dropdown.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.js`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
+**Stripped at the DOM boundary.** `src/core/components/Dropdown.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
 
 **Passthrough.** `id`, `aria-*`, `style`, `data-*` and every event handler still reach the `<div role="listbox">` untouched, including the `onFocus`/`onBlur` the react-final-form adapter supplies — and they now reach it as real DOM handlers rather than as Semantic props. `ENGINE_PROPS` and `FIELD_ONLY_PROPS` are stripped twice on the way: once by the wrapper, once by `Listbox` at the element itself.
 
@@ -311,11 +311,11 @@ What each step owes beyond "the props above still work".
 
 - SHIPPED: native `<table>/<thead>/<tbody>/<tfoot>/<tr>/<th>/<td>`, seven components, no `semantic-ui-react` import. The subcomponent API is unchanged, so no call site moved.
 - DONE — the root still emits `ui` and `table`, in that position, and all 24 `<table>` class strings in the 38-example baseline are byte-identical. This was the highest-risk detail in the step and it is pinned by a unit test as well as by the snapshots.
-- DONE — `omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)` is applied in all seven components, closing the `mapper.js:184` spread onto `Table.Cell`. Zero-diff on today's corpus (no example puts an engine prop on a `TableCells` node), so it is a latent-boundary net rather than a visible fix; `domProps.js` now names the family.
+- DONE — `omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)` is applied in all seven components, closing the `mapper.js:184` spread onto `Table.Cell`. Zero-diff on today's corpus (no example puts an engine prop on a `TableCells` node), so it is a latent-boundary net rather than a visible fix; `domProps.ts` now names the family.
 - DECIDED — `verticalAlign` DROPPED, and its two call sites in `LocalDraftTableRow` with it. SUIR emitted `top aligned`; no loaded CSS selects on `aligned`, and no `.top` rule can match a `<td class="top aligned">`, so those 15 cells already rendered at the `<td>` default. Pixel-identical, and it leaves one way to align a cell instead of two, one of which never worked.
 - DECIDED — `inverted`/`striped` KEPT. They are the only SUIR modifiers any call site passes and, unlike `celled`, they ARE styled (`table:not(.as-layout).inverted`, `table.striped tr:nth-child(2n)`). §9.9-H1 still owns whether `ErrorTable`/`ErrorContent` survive; this step deliberately did not pre-empt that.
 - DECIDED — `fixedHeader` DELETED with its test. Unused by every call site and every meta, AND non-functional: `app__table__container--fixed-header` and its inner class have zero occurrences in `static/all.css` and in `src/style`, so it rendered two unstyled `<div>`s. Keeping it would have meant reimplementing a feature that never worked.
-- DONE — `jest.config.js` gained a per-file threshold for `Table.js` at 100/100/100/100, measured from a real `--coverage` run, alongside the existing `TableView.js` entry.
+- DONE — `jest.config.js` gained a per-file threshold for `Table.tsx` at 100/100/100/100, measured from a real `--coverage` run, alongside the existing `TableView.js` entry.
 - DONE — `TableView.js`'s `sellStyles` discard is gone (a typo for a prop that does not exist; nothing passes `cellStyles` either), and the `class=""` comment it carried is rewritten, because suppressing that attribute is now the cell's job.
 - EXPECTED AND VERIFIED — 332 changed snapshot lines in four shapes and no others: 24 `<tbody class="">`, 94 `<tr class="">` and 199 `<td class="">` lose an empty attribute, and 15 `<td class="top aligned">` lose a dead class. Nothing else moved: same element counts per tag, same class strings on `<table>`/`<thead>`/`<th>`, same `id`/`style`/`colspan`, same visible text, and the behavioural layer green throughout.
 

@@ -172,7 +172,7 @@ function InputNative (props: InputNativeProps) {
   // ENGINE_PROPS only, and that is the load-bearing half of the split: `name` is the
   // react-final-form registration path and the second argument of every onChange below,
   // `label` is what Select renders as its accessible label — stripping FIELD_ONLY_PROPS
-  // here would break every form silently. See ./domProps.js.
+  // here would break every form silently. See ./domProps.ts.
   let forwarded: ForwardedProps = omitProps(rest, ENGINE_PROPS) as ForwardedProps
   if (disabledSpellCheck) forwarded = {...noSpellCheck, ...forwarded}
   if (resize) {

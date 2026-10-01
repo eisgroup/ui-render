@@ -1,5 +1,13 @@
 import { useEffect, useRef } from 'react'
 
+/** The timers `useTimers` hands out: the same object on every render. */
+export type Timers = {
+  /** Schedules `callback(...args)` after `delay` ms, and returns the timer's id */
+  setTimeout <Args extends unknown[]> (callback: (...args: Args) => void, delay?: number, ...args: Args): ReturnType<typeof setTimeout>
+  /** Cancels every timer still pending */
+  clear (): void
+}
+
 /**
  * TIMERS A FUNCTION COMPONENT OWNS, all cleared when it unmounts: what `@withTimer` gave a class,
  * until §9.3 step 6 converted the last of them and deleted it. It is for timers started outside an
@@ -12,13 +20,13 @@ import { useEffect, useRef } from 'react'
  *   timer and returns its id, forwarding `args` to the callback as `setTimeout` does; `clear()` cancels
  *   every timer still pending
  */
-export function useTimers () {
-  const timers = useRef(null)
+export function useTimers (): Timers {
+  const timers = useRef<Timers | null>(null)
   if (timers.current === null) {
-    const pending = new Set()
+    const pending = new Set<ReturnType<typeof setTimeout>>()
     timers.current = {
       setTimeout (callback, delay, ...args) {
-        const id = setTimeout((...params) => {
+        const id = setTimeout((...params: typeof args) => {
           pending.delete(id)
           callback(...params)
         }, delay, ...args)
@@ -33,7 +41,8 @@ export function useTimers () {
     }
   }
   useEffect(() => {
-    const own = timers.current
+    // Assigned above, during the first render, before any effect of it runs.
+    const own = timers.current!
     return () => own.clear()
   }, [])
   return timers.current

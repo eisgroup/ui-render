@@ -1105,6 +1105,15 @@ Also: `renderFloat` is still JavaScript, and its JSDoc types the element it retu
 
 Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 327,399 → 327,387 bytes, because `Upload`'s `const Dropzone = DropzoneJs` alias is gone. `src/core` + `src/library` are 64 TS files, 9,989 lines, against 93 JS files, 10,111 lines: 49.7% of the lines, was 44.4%.
 
+**Sixth batch, 2026-10-01: the field components, and the helpers the TypeScript already leaned on** — `Input`, `InputDate` and `Table`, and four modules: `domProps` (a typed `omitProps`), `inputs/validationRules`, `inputs/normalizers` and `utils/timers` (`useTimers`). With them `LocalDraftTableRow`'s last three component casts go, and no `.tsx` file casts a component any more: what is left of `UnconvertedComponent` types registry slots (`Active.Field`, `Active.UIRender`) and the engine's import cycle. The checker's findings:
+- **`LocalDraftTableRow` hands its fields `fieldErrors[name]`, typed `unknown`, as `error`.** That is a message, or under `validate: 'maxLength'` the function the factory returns (the first batch's finding), which React does not render. The fix is a commented cast where it is read.
+- **`InputDate` passes rc-picker a `resize` it does not declare, and rc-picker drops it.** No element it renders carries the attribute, the open panel included (measured). It is typed rather than removed, so the runtime is unchanged.
+- **`password` keeps the last value on itself for `password.confirm`.** TypeScript recognises a function's own properties only when they are assigned at the top level, so the assignment inside it is a cast.
+
+`omitProps` now returns `Record<string, unknown>` instead of the `Object` its JSDoc said, which retired `Row`'s cast. The prop-reference generator still parses `domProps`: `pack()` already looked for `.ts`, and it matches `export const ENGINE_PROPS = [` literally, so the two lists stay unannotated.
+
+Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 327,387 → 327,369 bytes (three cast aliases gone, one added). `src/core` + `src/library` are 71 TS files, 10,806 lines, against 86 JS files, 9,396 lines: 53.5% of the lines, was 49.7%. TypeScript is now the larger half.
+
 #### E3 — Engine last
 
 `rules.js` / `form/utils.js` are typed **as they are decomposed** (§9.3) — decomposition outputs are born as `engine/*.ts`. Typing the prototype-patching machinery as-is is wasted effort; don't.

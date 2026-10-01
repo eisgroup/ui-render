@@ -26,7 +26,7 @@
  *   consumed   the wrapper (or its engine caller) reads it and it never reaches SUIR.
  *              WE own the behaviour. §9.7-F1 steps 2-3 must keep it working, and the swap
  *              cannot change it — there is nothing on the other side of the swap to change.
- *   stripped   removed at the DOM boundary by `components/domProps.js`. Load-bearing as a
+ *   stripped   removed at the DOM boundary by `components/domProps.ts`. Load-bearing as a
  *              prop, never an HTML attribute. Only the boundary changes at the swap.
  *   forwarded  handed to semantic-ui-react, whose own code decides what happens. THIS is
  *              the parity checklist: a replacement has to reproduce SUIR's behaviour for
@@ -107,7 +107,7 @@ const IN_HOUSE_CURATION = {
                 + 'where step 1 left the call.** Its one in-repo caller was `ErrorTable.js`, and H1 '
                 + 'deleted it, so the "Attributes at the call sites" table above no longer lists this '
                 + 'prop — that table reports what the CODEBASE passes, not what the component accepts. '
-                + 'The prop itself is untouched: `Table.js` still destructures it and still emits the '
+                + 'The prop itself is untouched: `Table.tsx` still destructures it and still emits the '
                 + 'class, the CSS still selects on it, and a consumer meta can still set it. Dropping '
                 + 'it because our own last caller went away would have been a breaking change bought '
                 + 'for nothing.',
@@ -629,7 +629,7 @@ const STEP_OBLIGATIONS = [
             'DONE — `omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)` is applied in all seven '
                 + 'components, closing the `mapper.js:184` spread onto `Table.Cell`. Zero-diff on '
                 + 'today\'s corpus (no example puts an engine prop on a `TableCells` node), so it is a '
-                + 'latent-boundary net rather than a visible fix; `domProps.js` now names the family.',
+                + 'latent-boundary net rather than a visible fix; `domProps.ts` now names the family.',
             'DECIDED — `verticalAlign` DROPPED, and its two call sites in `LocalDraftTableRow` with it. '
                 + 'SUIR emitted `top aligned`; no loaded CSS selects on `aligned`, and no `.top` rule '
                 + 'can match a `<td class="top aligned">`, so those 15 cells already rendered at the '
@@ -643,7 +643,7 @@ const STEP_OBLIGATIONS = [
                 + 'AND non-functional: `app__table__container--fixed-header` and its inner class have '
                 + 'zero occurrences in `static/all.css` and in `src/style`, so it rendered two unstyled '
                 + '`<div>`s. Keeping it would have meant reimplementing a feature that never worked.',
-            'DONE — `jest.config.js` gained a per-file threshold for `Table.js` at 100/100/100/100, '
+            'DONE — `jest.config.js` gained a per-file threshold for `Table.tsx` at 100/100/100/100, '
                 + 'measured from a real `--coverage` run, alongside the existing `TableView.js` entry.',
             'DONE — `TableView.js`\'s `sellStyles` discard is gone (a typo for a prop that does not '
                 + 'exist; nothing passes `cellStyles` either), and the `class=""` comment it carried is '

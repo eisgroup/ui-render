@@ -7,7 +7,7 @@
  * only by clicking a button in a rendered table.
  *
  * Every source is written down here for what it does, including the two that a measurement over the
- * whole suite found never fire. They were kept: `Data.js` sets the props they read, so they are
+ * whole suite found never fire. They were kept: `Data.tsx` sets the props they read, so they are
  * reachable in a nested document and merely uncovered — see the note on the last case.
  */
 import { resolvePopupRowContext, resolvePopupScope } from '../popupScope'
@@ -55,7 +55,7 @@ describe('the sources, in the order they are tried', () => {
     })
 
     it('a relativePath prop is not a source — nothing sets that prop on an engine instance', () => {
-        // There used to be a source keyed on it, between 2 and the last. `Data.js` passes `index` and
+        // There used to be a source keyed on it, between 2 and the last. `Data.tsx` passes `index` and
         // `relativeIndex` to a nested UIRender and puts the path in `meta`; no `relativePath` prop
         // ever arrives, so the source could not fire and cases fell past it to the last one.
         const values = { orders: {} }

@@ -95,7 +95,7 @@ module.exports = {
         // In-house since §9.7-F1 step 1. The wrapper it replaced had no entry here because it was
         // 24 lines of passthrough; the implementation is the table markup contract now, so it gets
         // the same floor as the other in-house components. Measured, not aspirational.
-        './src/core/components/Table.js': {
+        './src/core/components/Table.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,
@@ -229,7 +229,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/InputDate.js': {
+        './src/core/components/InputDate.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,
@@ -265,7 +265,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/Input.js': {
+        './src/core/components/Input.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,

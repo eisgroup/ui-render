@@ -112,7 +112,7 @@ describe('overlay behavioural contract', () => {
                 fireEvent.mouseEnter(trigger)
                 advance(499)
                 // The 500 ms default exists so a passing cursor does not flash the
-                // tooltip; TooltipPop.js documents it as the deliberate UX choice, and
+                // tooltip; TooltipPop.tsx documents it as the deliberate UX choice, and
                 // §9.7-F1 step 2's OBLIGATION 1 is that it survived the swap. It did, in
                 // JavaScript — `tooltip.less`'s `*:hover > &` reveal has no delay and
                 // cannot be given one, which is why the bubble is mounted only while open.

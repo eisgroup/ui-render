@@ -22,7 +22,7 @@
   1,952 scoped rules and 152,239 of 602,156 compiled bytes -- 25.3% of the stylesheet -- and not
   one of the removed rules can match markup this library renders.
 
-  The evidence, checked from both ends. From the markup: only `Listbox.js` and `Table.js` emit
+  The evidence, checked from both ends. From the markup: only `Listbox.js` and `Table.tsx` emit
   Semantic `ui` tokens at all, and the 38-example DOM baseline contains `ui popup` 0 times,
   `ui label` 0 and `ui menu` 0. From the CSS: of the removed rules, the only ones naming a token we
   still emit are rooted at `.ui.menu` (an ancestor we never render -- `Listbox` puts its `.menu`

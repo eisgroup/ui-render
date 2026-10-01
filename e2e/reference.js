@@ -217,7 +217,7 @@ const CORPUS = {
 
 /** Interaction timing, in milliseconds. Windows rather than boundaries, so the leg is not a stopwatch. */
 const TIMING = {
-    /** [I] Ours, over semantic-ui-react's 50 ms default (`TooltipPop.js`, `delay = 500`). Closed at 300 ms, open by 1200 ms. */
+    /** [I] Ours, over semantic-ui-react's 50 ms default (`TooltipPop.tsx`, `delay = 500`). Closed at 300 ms, open by 1200 ms. */
     OPEN_DELAY_MS: 500,
     STILL_CLOSED_AT_MS: 300,
     OPEN_BY_MS: 1200,

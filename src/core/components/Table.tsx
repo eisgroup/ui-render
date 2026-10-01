@@ -80,8 +80,8 @@ const DROPPED_PROPS = ['as', 'href', 'celled', 'textAlign', 'verticalAlign', 'fi
 
 const warnedDropped = new Set()
 
-function dropUnsupported (props, displayName) {
-    const kept = {}
+function dropUnsupported (props: Record<string, unknown>, displayName: string) {
+    const kept: Record<string, unknown> = {}
     Object.keys(props).forEach(key => {
         if (DROPPED_PROPS.indexOf(key) === -1) {
             kept[key] = props[key]
@@ -107,7 +107,7 @@ function dropUnsupported (props, displayName) {
  * Six of the seven are exactly this, so they share one implementation rather than six copies.
  *
  * DOM boundary: the spread lands on a real element, so `ENGINE_PROPS` and `FIELD_ONLY_PROPS`
- * both apply (see ./domProps.js). `Table.Cell` is the one that matters — `mapper.js` spreads a
+ * both apply (see ./domProps.ts). `Table.Cell` is the one that matters — `mapper.js` spreads a
  * meta node's whole rest bag onto it, unfiltered, which is a leak waiting for the first meta to
  * put `name` or `symbol` on a `TableCells` node. `FIELD_ONLY_PROPS` is safe to strip on ALL of
  * them because no member of this family renders a form control: the control is a CHILD with its
@@ -119,14 +119,26 @@ function dropUnsupported (props, displayName) {
  * @param {String} displayName - React display name, for devtools and warning messages
  * @returns {Function} React Component
  */
-function tablePart (Element, displayName) {
-    const Part = ({ className, ...props }) => (
+function tablePart (Element: 'thead' | 'tbody' | 'tfoot' | 'tr' | 'th' | 'td', displayName: string) {
+    const Part = ({ className, ...props }: TablePartProps) => (
         // `|| undefined` omits the attribute rather than rendering class="" — see the note above.
         <Element className={className || undefined}
                  {...dropUnsupported(omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS), displayName)}/>
     )
     Part.displayName = displayName
     return Part
+}
+
+/** A member of the table family: its `className`, and the rest spread onto its element (see above). */
+export type TablePartProps = { className?: string, children?: React.ReactNode, [key: string]: unknown }
+
+/** The named props are read here; the rest is spread onto the `<table>` through ./domProps. */
+export type TableProps = {
+    className?: string
+    inverted?: boolean
+    striped?: boolean
+    children?: React.ReactNode
+    [key: string]: unknown
 }
 
 /**
@@ -144,7 +156,7 @@ export default function Table ({
     inverted,
     striped,
     ...props
-}) {
+}: TableProps) {
     // DOM boundary: this spread lands on a <table>, where `name` is not a valid attribute.
     // `TableView` filters too, and deliberately keeps doing so — its own test pins the root's
     // attribute set — but a second caller (`ErrorTable`) does not, so the filter belongs here.

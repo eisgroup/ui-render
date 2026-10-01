@@ -296,7 +296,7 @@ export function Dropdown ({
         // here, AFTER the props.onClose assignment above, and without touching the `props.name`
         // that handler reports to the host. `Listbox` strips again at its own edge because that
         // is where the element is; this strip is what keeps engine props from reaching it at all.
-        // See ./domProps.js.
+        // See ./domProps.ts.
         {...omitProps(supported, ENGINE_PROPS, FIELD_ONLY_PROPS)}
       />
       {label && float && <Text className="input__label">{translate(label)}</Text>}

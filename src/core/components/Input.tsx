@@ -9,6 +9,38 @@ import Row from './Row'
 import Text from './Text'
 import View from './View'
 import { Active } from '../utils'
+import type { Translate } from '../utils/_envs'
+
+/** The props documented on `Input` below; the rest is passed to `InputNative`. */
+export type InputProps = {
+  name?: string
+  id?: string
+  icon?: React.ReactNode
+  lefty?: boolean
+  onClickIcon?: React.MouseEventHandler<HTMLElement>
+  unit?: string
+  label?: string
+  disabled?: boolean
+  done?: boolean
+  className?: string
+  classNameIcon?: string
+  children?: React.ReactNode
+  stickyPlaceholder?: boolean
+  resize?: boolean
+  readonly?: boolean
+  autofocus?: boolean
+  float?: boolean
+  error?: React.ReactNode
+  info?: React.ReactNode
+  style?: React.CSSProperties
+  onFocus?: (...args: unknown[]) => void
+  onBlur?: (...args: unknown[]) => void
+  onRemove?: (nameOrId: string | undefined) => void
+  title?: string
+  placeholder?: string
+  translate?: Translate
+  [key: string]: unknown
+}
 
 /**
  * Input Wrapper - Pure Component.
@@ -69,7 +101,7 @@ export function Input ({
   placeholder,
   translate = Active.translate,
   ...props
-}) {
+}: InputProps) {
   const [active, setState] = useState(props.autoFocus)
   const max = useRef(props.type === 'date' ? '9999-01-01' : null);
   if (autofocus) props.autoFocus = autofocus // React fix
@@ -95,7 +127,7 @@ export function Input ({
   const valueText = value == null ? '' : String(value)
   const hasValue = value || value === 0
   const isCheckbox = props.type === 'checkbox'
-  if (done == null) done = !error && hasValue
+  if (done == null) done = (!error && hasValue) as boolean // a cast: `classNames` reads only its truthiness
   return (
     <View
       className={classNames('input--wrapper', className, {
@@ -117,7 +149,7 @@ export function Input ({
         )}
         {unit && hasValue &&
         <Text className='input__unit truncate'>
-          <Text className='invisible' aria-hidden='true'>{value}</Text> {unit}
+          <Text className='invisible' aria-hidden='true'>{value as React.ReactNode}</Text> {unit}
         </Text>
         }
         {stickyPlaceholder && placeholder && hasValue &&
@@ -127,11 +159,11 @@ export function Input ({
         }
         <InputNative
           name={name} id={id} disabled={disabled} resize={resize} aria-describedby={idHelp}
-          onFocus={(...args) => {
+          onFocus={(...args: unknown[]) => {
             !active && setState(true)
             onFocus && onFocus(...args)
           }}
-          onBlur={(...args) => {
+          onBlur={(...args: unknown[]) => {
             active && setState(false)
             onBlur && onBlur(...args)
           }}
