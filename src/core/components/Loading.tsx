@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React from 'react'
 import Spinner from './Spinner'
 import type { SpinnerProps } from './Spinner'
@@ -41,13 +40,6 @@ export function Loading ({
       {children && <Text className='h4 blink'>{children}</Text>}
     </View>
   )
-}
-
-Loading.propTypes = {
-  loading: PropTypes.bool,
-  size: PropTypes.any,
-  className: PropTypes.string,
-  iconClassName: PropTypes.string
 }
 
 export default React.memo(Loading)

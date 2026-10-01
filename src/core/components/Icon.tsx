@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React from 'react'
 import { Active } from '../utils'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
@@ -37,13 +36,6 @@ export function Icon ({
        // to pick the icon class, so both lists apply.
        aria-hidden='true' {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)} />
   )
-}
-
-Icon.propTypes = {
-  name: PropTypes.string.isRequired,
-  large: PropTypes.bool,
-  small: PropTypes.bool,
-  className: PropTypes.string,
 }
 
 export default React.memo(Icon)

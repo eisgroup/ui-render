@@ -1,7 +1,6 @@
 import { Field } from 'react-final-form'
 import type { FieldRenderProps } from 'react-final-form'
 import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
 import { isRequired } from '../../components/inputs/validationRules'
 import { touchedFor } from '../../state/formRegistry'
 import { Active } from '../../utils'
@@ -12,13 +11,18 @@ type ValueTransform = (value: unknown) => unknown
 
 /** The props the field reads; the rest are passed to the input it renders. */
 export type DateFieldProps = {
+    /** Input `name` attribute */
     name: string
-    /** The document the field is rendered by: its form, and the values it started with */
+    /**
+     * The document the field is rendered by, the class decorated withFormSetup (i.e withForm): its
+     * form, and the values it started with
+     */
     instance?: { form?: object, props: { initialValues?: unknown } }
     defaultValue?: unknown
     value?: unknown
     readonly?: boolean
     disabled?: boolean
+    /** Help text or component to show on invalid input */
     error?: React.ReactNode
     onChange?: (value: unknown, ...args: unknown[]) => void
     format?: ValueTransform
@@ -26,6 +30,10 @@ export type DateFieldProps = {
     parse?: ValueTransform
     validate?: (value: unknown, allValues: object) => unknown
     options?: unknown
+    /**
+     * Everything else reaches the input: `label`, `id`, `type` (the HTML attribute), `placeholder`,
+     * `info` (help text or component to show on focus), `translate`
+     */
     [key: string]: unknown
 }
 
@@ -36,29 +44,6 @@ export type DateFieldProps = {
 export function asInputDateField (InputComponent: React.ComponentType<any>, {sanitize}: { sanitize?: (value: unknown, props: object) => unknown } = {}) {
     if (!Active.Field) Active.Field = Field
     const Class = class extends PureComponent<DateFieldProps> {
-        static propTypes = {
-            // Input `name` attribute
-            name: PropTypes.string.isRequired,
-            // Instance of the Class component decorated withFormSetup (i.e withForm)
-            instance: PropTypes.object,
-            label: PropTypes.any,
-            id: PropTypes.string,
-            // HTML Input type attribute
-            type: PropTypes.string,
-            // Input placeholder
-            placeholder: PropTypes.any,
-            // help text or component to show on focus
-            info: PropTypes.any,
-            // help text or component to show on invalid input
-            error: PropTypes.any,
-            value: PropTypes.any,
-            onChange: PropTypes.func,
-            format: PropTypes.func,
-            normalize: PropTypes.func,
-            parse: PropTypes.func,
-            translate: PropTypes.func,
-        }
-
         _value: unknown
         hasFocus?: boolean
         input!: FieldInput

@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { formatNumber, last, round, toPercent } from '../utils'
 import { formatDuration } from '../utils/time'
@@ -301,15 +300,6 @@ export function Slider ({
       {render && render(value)}
     </div>
   )
-}
-
-Slider.propTypes = {
-  min: PropTypes.number,
-  max: PropTypes.number,
-  value: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.number),
-    PropTypes.number,
-  ]),
 }
 
 export default React.memo(Slider)

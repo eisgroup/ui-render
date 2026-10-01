@@ -2,7 +2,7 @@ import React, { Fragment, isValidElement } from 'react'
 import '../modules/form/constants'
 import { withForm } from '../modules/form'
 import { FIELD } from '../modules/variables'
-import { cn, type } from '../components'
+import { cn } from '../components'
 import Json from '../components/JsonView'
 import ScrollView from '../components/ScrollView'
 import { Active, get, interpolateString, isEmpty, isList, isString, round, sanitizeResponse } from '../utils'
@@ -229,7 +229,11 @@ export { formsStorage }
  * `documentHost.ts`, which gives it what React gave a class. That is why it extends
  * `DocumentInstance`, and why its props sync is `deriveFromProps`.
  */
-/** A document's props: the meta and data it renders, and the host's callbacks. */
+/**
+ * A document's props: the meta and data it renders, and the host's callbacks. Each is documented
+ * where a host reads it, in the published `UIRender.UIRenderProps` (`src/library/types/UIRender.tsx`);
+ * open here, because the engine reads them by key and rewrites meta and data as JSON.
+ */
 export type UIRenderProps = Record<string, any>
 
 /**
@@ -252,36 +256,6 @@ export class UIRender extends DocumentInstance {
     // Type-only: the constructor sets each when the host gives it one, and Babel emits no field.
     errorHandler?: (errors: object) => void
     translate?: Translate
-
-    static propTypes = {
-        data: type.Any.isRequired,
-        meta: type.Object.isRequired,
-        initialValues: type.Any, // should be the same as `data` initially
-        childBefore: type.Any,
-        childAfter: type.Any,
-        // If given, will render <form onSubmit {...form} />
-        form: type.OneOf(type.Boolean, type.Of({
-            kind: type.Id,
-        })),
-        // Whether to disable rendering of wrapper scroll view and html form
-        embedded: type.Boolean,
-        getFormData: type.Method,
-        onDataChanged: type.Method,
-        getValidationErrors: type.Method,
-        methods: type.ObjectOf(type.Method),
-        translate: type.Method,
-        apiCalls: type.ObjectOf(type.Method),
-        // Configuration published to every rendered component through ConfigContext
-        // (UPGRADE-PLAN §9.4). `dateFormat` takes moment format tokens and applies to every
-        // rendered and edited date; `currency` and `language` are the two values the
-        // application shell turns into CSS classes. @Note: `currency` is NOT
-        // `meta.currencyCode`, which selects the currency symbol used by value renderers.
-        dateFormat: type.String,
-        currency: type.String,
-        language: type.String,
-        // Called with a report whenever a node's subtree fails to render (§9.4).
-        onError: type.Method,
-    }
 
     constructor (props: UIRenderProps) {
         super(props)

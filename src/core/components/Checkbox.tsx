@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React, { Fragment } from 'react'
 import Label from './Label'
 import Row from './Row'
@@ -127,19 +126,6 @@ export function Checkbox ({
       </Label>
     </Row>
   )
-}
-
-Checkbox.propTypes = {
-  id: PropTypes.string,
-  label: PropTypes.string,
-  labelTrue: PropTypes.any,
-  labelFalse: PropTypes.any,
-  onChange: PropTypes.func,
-  value: PropTypes.any,
-  valueTrue: PropTypes.any,
-  valueFalse: PropTypes.any,
-  defaultValue: PropTypes.bool,
-  className: PropTypes.string,
 }
 
 export default React.memo(Checkbox)

@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React, { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { noSpellCheck, resizeToContent, toTextHeight, toTextHeightFunc } from './renders'
 import type { TextFieldEvent } from './renders'
@@ -205,30 +204,6 @@ function InputNative (props: InputNativeProps) {
       forwarded.onChange = onChange
       return <input {...forwarded} />
   }
-}
-
-InputNative.propTypes = {
-  /* Controlled value */
-  value: PropTypes.any,
-  defaultValue: PropTypes.any,
-  /* Input type */
-  type: PropTypes.string,
-  /* Textarea rows */
-  rows: PropTypes.number,
-  /* Callback(value) when input value changes */
-  onChange: PropTypes.func,
-  /* Whether to resize input width to match content length */
-  compact: PropTypes.oneOfType([
-    PropTypes.bool,
-    // Width offset
-    PropTypes.number,
-  ]),
-  /* Whether to adjust input height to match typed in text */
-  resize: PropTypes.bool,
-  /* Whether to have no spell check or correction */
-  disabledSpellCheck: PropTypes.bool,
-  /* Callback(element) on mount */
-  onMount: PropTypes.func,
 }
 
 export default React.memo(InputNative)

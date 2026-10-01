@@ -202,10 +202,13 @@ declare namespace UIRender {
     export interface UIRenderProps<Data = unknown> {
         data: Data
         meta: object
+        /** Should be the same as `data` initially. */
         initialValues?: Data
         childBefore?: React.ReactNode
         childAfter?: React.ReactNode
+        /** If given, the document renders inside `<form onSubmit {...form}>`. */
         form?: boolean | UIRenderFormOptions
+        /** Whether to disable rendering of the wrapper scroll view and the html form. */
         embedded?: boolean
         onSubmit?(values: Data, ...args: any[]): unknown
         getFormData?(getData: () => Data): void

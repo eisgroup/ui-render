@@ -1,11 +1,9 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { isFunction } from '../utils'
 import Icon from './Icon'
 import ScrollView from './ScrollView'
 import Text from './Text'
-import { type } from './types'
 import { useTimers } from './utils'
 import View from './View'
 
@@ -173,7 +171,7 @@ export default function StandaloneTabs (props: StandaloneTabsProps) {
                 onClick={activeIndex !== i ? (() => setTab(i)) : undefined}>
             {typeof tab === 'object'
               // Without an icon, a JSX element renders as it is and `{text}` as its text: rendered as the
-              // object itself, `{text}` was rejected by React, although `propTypes` accept it.
+              // object itself, `{text}` was rejected by React, although the props allow it.
               ? (tab.icon
                   ? <Text><Icon name={tab.icon}/>{tab.text}</Text>
                   : (React.isValidElement(tab) ? tab : <Text>{tab.text}</Text>))
@@ -189,42 +187,4 @@ export default function StandaloneTabs (props: StandaloneTabsProps) {
       {isFunction(children) ? children(handle.current) : children}
     </ScrollView>
   )
-}
-
-StandaloneTabs.propTypes = {
-  items: type.ListOf(type.Of({
-    // Tab Title - clickable buttons
-    tab: type.OneOf(
-      type.String,
-      type.Number,
-      type.Node, // JSX
-      type.Of({
-        text: PropTypes.string.isRequired,
-        icon: PropTypes.string,
-      })
-    ).isRequired,
-    // Tab Content
-    content: type.Any.isRequired,
-  })).isRequired,
-  // Opened tab index (controlled)
-  activeIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  // Opened tab index initially (uncontrolled)
-  defaultIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  // Callback when tab's activeIndex changes, receives new `activeIndex` as argument
-  onChange: PropTypes.func,
-  // Render tabs as vertical layout
-  vertical: PropTypes.bool,
-  // Align tabs to center
-  centerTabs: PropTypes.bool,
-  // Style tabs as buttons
-  buttoned: PropTypes.bool,
-  // Whether to enable transition during force update via props
-  transitionUpdate: PropTypes.bool,
-  // Extra content to render inside Tabs
-  children: PropTypes.any,
-  className: PropTypes.string,
-  classNameTabs: PropTypes.string,
-  classNameContent: PropTypes.string,
-  styleTabs: PropTypes.object,
-  styleContent: PropTypes.object,
 }

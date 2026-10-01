@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { cn, PropTypes } from '../../components'
+import { cn } from '../../components'
 import Icon from '../../components/Icon'
 import ScrollView from '../../components/ScrollView'
 import Text from '../../components/Text'
-import { type } from '../../components/types'
 import { useTimers } from '../../components/utils'
 import View from '../../components/View'
 import { isEqual, isFunction } from '../../utils'
@@ -29,26 +28,44 @@ export type TabContent = React.ReactNode | ((handle: TabsHandle) => React.ReactN
 /** Content around the tabs; a function is called with the handle. */
 type TabsSlot = React.ReactNode | ((handle: TabsHandle) => React.ReactNode)
 
-export type TabItem = { tab?: TabTitle, content: TabContent }
+export type TabItem = {
+  /**
+   * The clickable title. Optional: tabs hidden with `classNameTabs` and driven by `activeIndex`
+   * need none (the demo's Dynamic Layout), and meta.schema.json does not require one.
+   */
+  tab?: TabTitle
+  content: TabContent
+}
 
 /** The named props are read here; the rest is passed to the outer `ScrollView`. */
 export type TabsProps = {
   items: TabItem[]
+  /** Opened tab index (controlled) */
   activeIndex?: number | string
+  /** Opened tab index initially (uncontrolled) */
   defaultIndex?: number | string
+  /** Callback when tab's activeIndex changes, receives new `activeIndex` as argument */
   onChange?: (activeIndex: number) => void
+  /** Render tabs as vertical layout */
   vertical?: boolean
+  /** Align tabs to center */
   centerTabs?: boolean
+  /** Style tabs as buttons */
   buttoned?: boolean
+  /** Whether to enable transition during force update via props */
   transitionUpdate?: boolean
+  /** Extra content to render after Tabs content */
   children?: TabsSlot
+  /** UI Render specific: extra content to render inside the tabs bar, before the tabs */
   childrenBeforeTabs?: TabsSlot
+  /** UI Render specific: extra content to render inside the tabs bar, after the tabs */
   childrenAfterTabs?: TabsSlot
   className?: string
   classNameTabs?: string
   classNameContent?: string
   styleTabs?: React.CSSProperties
   styleContent?: React.CSSProperties
+  /** Not read: kept out of the props the outer `ScrollView` receives */
   currencyCode?: string
   [key: string]: unknown
 }
@@ -217,49 +234,4 @@ export default function Tabs (props: TabsProps) {
       {isFunction(children) ? children(handle.current) : children}
     </ScrollView>
   )
-}
-
-Tabs.propTypes = {
-  items: type.ListOf(type.Of({
-    // Tab Title - clickable buttons. Optional: tabs hidden with `classNameTabs` and driven by
-    // `activeIndex` need none (the demo's Dynamic Layout), and meta.schema.json does not require one.
-    tab: type.OneOf(
-      type.String,
-      type.Number,
-      type.Node, // JSX
-      type.Of({
-        text: PropTypes.string.isRequired,
-        icon: PropTypes.string,
-      })
-    ),
-    // Tab Content
-    content: type.Any.isRequired,
-  })).isRequired,
-  // Opened tab index (controlled)
-  activeIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  // Opened tab index initially (uncontrolled)
-  defaultIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  // Callback when tab's activeIndex changes, receives new `activeIndex` as argument
-  onChange: PropTypes.func,
-  // Render tabs as vertical layout
-  vertical: PropTypes.bool,
-  // Align tabs to center
-  centerTabs: PropTypes.bool,
-  // Style tabs as buttons
-  buttoned: PropTypes.bool,
-  // Whether to enable transition during force update via props
-  transitionUpdate: PropTypes.bool,
-  // Extra content to render after Tabs content
-  children: PropTypes.any,
-  className: PropTypes.string,
-  classNameTabs: PropTypes.string,
-  classNameContent: PropTypes.string,
-  styleTabs: PropTypes.object,
-  styleContent: PropTypes.object,
-  currencyCode: PropTypes.string,
-
-  // UI Render specific
-  // Extra content to render inside Tabs
-  childrenBeforeTabs: PropTypes.any,
-  childrenAfterTabs: PropTypes.any,
 }

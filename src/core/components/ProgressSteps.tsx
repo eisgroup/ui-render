@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React, { Fragment, useRef, useState } from 'react'
 import { get, isFunction } from '../utils'
 import Button from './Button'
@@ -35,11 +34,17 @@ export type ProgressStepsProps = {
   onChange?: (index: number) => void
   /** Whether to render the vertical line below each step */
   hasConnector?: boolean
+  /** CSS class names to add */
   className?: string
+  /** CSS styles to add */
   style?: React.CSSProperties
+  /** CSS class names to add to the steps */
   classNameSteps?: string
+  /** CSS styles to add to the steps */
   styleSteps?: React.CSSProperties
+  /** CSS class names to add to the content */
   classNameContent?: string
+  /** CSS styles to add to the content */
   styleContent?: React.CSSProperties
 }
 
@@ -157,26 +162,4 @@ export default function ProgressSteps (props: ProgressStepsProps) {
       }
     </View>
   )
-}
-
-ProgressSteps.propTypes = {
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      step: PropTypes.string, // step text to display, default is incremental step number
-      label: PropTypes.string, // text to display under step
-      done: PropTypes.bool, // whether the step is completed
-      error: PropTypes.bool, // whether the step has error
-      content: PropTypes.any, // content to render under the step
-    })
-  ).isRequired,
-  activeIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]), // index of active item (starts at 0)
-  defaultIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  onChange: PropTypes.func, // callback when step is clicked, receives clicked step index
-  hasConnector: PropTypes.bool, // whether to render the vertical line below each step
-  className: PropTypes.string, // css class names to add
-  style: PropTypes.object, // css styles to add
-  classNameSteps: PropTypes.string, // css class names to add
-  styleSteps: PropTypes.object, // css styles to add
-  classNameContent: PropTypes.string, // css class names to add
-  styleContent: PropTypes.object, // css styles to add
 }

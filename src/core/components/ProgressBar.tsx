@@ -2,7 +2,6 @@ import classNames from '../utils/classNames'
 import React, { useEffect, useRef, useState } from 'react'
 import { TIME_DURATION_INSTANT } from '../utils'
 import Text from './Text'
-import { type } from './types'
 import View from './View'
 
 /** A fraction from 0 to 1; NaN, undefined and null are documented input too, and show 'No Data'. */
@@ -98,23 +97,6 @@ export function ProgressBar ({
       </View>
     </View>
   )
-}
-
-ProgressBar.propTypes = {
-  // fraction from 0 to 1
-  value: type.Fraction,
-  // content to render inside the filled bar
-  label: type.Any,
-  // default is false
-  hasTooltip: type.Boolean,
-  className: type.String,
-  // CSS bar color
-  color: type.String,
-  children: type.Any,
-  // default is true
-  gradient: type.Boolean,
-  // style the percentage bar itself
-  styleBar: type.Object,
 }
 
 // Memoised because the class was a PureComponent: it re-rendered only when a prop changed.

@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React, { createContext, memo, useContext } from 'react'
 import { Field } from 'react-final-form'
 import { Checkbox } from '../../../components/Checkbox'
@@ -31,7 +30,7 @@ export type ToggleFieldProps = {
   readonly?: boolean
   /** The engine's instance: read here, never handed to Field */
   instance?: unknown
-  /** Everything else reaches Field and the Checkbox, as in JavaScript */
+  /** Everything else reaches Field and the Checkbox, as in JavaScript: see `Checkbox` for its props */
   [prop: string]: unknown
 }
 
@@ -92,23 +91,6 @@ function ToggleField (props: ToggleFieldProps) {
       <Field {...fieldProps} component={ToggleFieldInput}/>
     </ToggleProps.Provider>
   )
-}
-
-ToggleField.propTypes = {
-  // @Note: this component should not have parse/format/normalize,
-  //        because you can map values explicitly with `valueTrue/False`
-  name: PropTypes.string.isRequired,
-  label: PropTypes.string,
-  labelTrue: PropTypes.string,
-  labelFalse: PropTypes.string,
-  value: PropTypes.bool,
-  valueTrue: PropTypes.any,
-  valueFalse: PropTypes.any,
-  onChange: PropTypes.func,
-  id: PropTypes.string,
-  danger: PropTypes.bool,
-  translate: PropTypes.func,
-  // @Note: see <Checkbox> component for docs
 }
 
 // `memo` skips a render with shallow-equal props, as `PureComponent` did.

@@ -4,7 +4,6 @@ import type { UploadRouteDefaults } from '../../variables/files'
 import React, { Fragment, memo, useContext, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 import Dropzone from '../../../components/Dropzone'
 import type { DropzoneHandle } from '../../../components/Dropzone'
-import { type } from '../../../components'
 import Icon from '../../../components/Icon'
 import Loading from '../../../components/Loading'
 import Row from '../../../components/Row'
@@ -45,13 +44,21 @@ export type UploadProps = {
     /** Callback on choosing a file or drag enter */
     onFocus?: (...args: unknown[]) => void
     loading?: boolean
+    /** Whether to disable upload */
     disabled?: boolean
+    /** Whether to make upload viewable only */
     readonly?: boolean
+    /** Whether to allow multiple file uploads, true by default */
     multiple?: boolean
+    /** Whether to show title above the upload */
     hasHeader?: boolean
+    /** Whether to show file types tooltip, true by default */
     showTypes?: boolean
+    /** Whether to add `round` css class */
     round?: boolean
+    /** Optional label to show in the title */
     label?: string
+    /** Optional label to show on Dropzone hover */
     labelOnHover?: string
     children?: React.ReactNode
     translate?: Translate
@@ -218,35 +225,6 @@ function Upload (props: UploadProps) {
             <Loading loading={loading}/>
         </View>
     )
-}
-
-Upload.propTypes = {
-    // Upload file type, falls back to Route pathname
-    // If given, will render as embedded component, instead of Modal route
-    fileType: type.OneOf(type.String, type.Number),
-    /* Allowed file formats, example: ['jpg', 'png'] */
-    formats: type.ListOf(type.String),
-    /* Maximum File size in bytes */
-    maxSize: type.Number,
-    /* Callback(acceptedFiles, name) onDrop files */
-    onChange: type.Method,
-    /* Callback when close button is clicked (ex. history.goBack()) */
-    onClose: type.Method,
-    /* Callback when cancel upload or on drag leave */
-    onBlur: type.Method,
-    /* Callback when choose file or on drag enter */
-    onFocus: type.Method,
-    loading: type.Boolean,
-    disabled: type.Boolean, // whether to disable upload
-    readonly: type.Boolean, // whether to make upload viewable only
-    multiple: type.Boolean, // whether to allow multiple file uploads, true by default
-    hasHeader: type.Boolean, // whether to show title above the upload
-    showTypes: type.Boolean, // whether to show file types tooltip
-    round: type.Boolean, // whether to add `round` css class
-    label: type.String, // optional label to show in the title
-    labelOnHover: type.String, // optional label to show on Dropzone hover
-    children: type.Any,
-    translate: type.Method,
 }
 
 // `memo` skips a render with shallow-equal props, as `PureComponent` did.

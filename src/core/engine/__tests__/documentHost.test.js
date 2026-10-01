@@ -196,18 +196,14 @@ describe('a document instance hosted by a function component', () => {
         ])
     })
 
-    it('carries the class\'s name and prop types, and the class itself', () => {
+    it('carries the class\'s name, and the class itself', () => {
         class Named extends DocumentInstance {
             render () { return null }
         }
-        Named.propTypes = { value: () => null }
 
         const Hosted = hostDocument(Named)
 
         expect(Hosted.displayName).toBe('Named')
-        // The host is meant to carry the class's prop types, so reading them is the check itself.
-        // eslint-disable-next-line react/forbid-foreign-prop-types
-        expect(Hosted.propTypes).toBe(Named.propTypes)
         expect(Hosted.name).toBe('Named')
         expect(Hosted.InstanceClass).toBe(Named)
     })

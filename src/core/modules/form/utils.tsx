@@ -1,5 +1,4 @@
 import { UI } from '../variables'
-import PropTypes from 'prop-types'
 import React, { PureComponent, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Field, Form } from 'react-final-form'
 import type { FieldRenderProps, FormProps, FormRenderProps } from 'react-final-form'
@@ -109,14 +108,20 @@ export function registeredFieldErrors (form: FormApi): Record<string, unknown> |
  */
 /** The props a field reads; the rest are passed to the input it renders. */
 export type AsFieldProps = {
+  /** Input `name` attribute */
   name: string
-  /** The document the field belongs to: its form, its initial values, and whether it is unmounting */
+  /**
+   * The document the field belongs to, the class decorated withFormSetup (i.e withForm): its form,
+   * its initial values, and whether it is unmounting
+   */
   instance?: DocumentInstance
+  /** Whether to fire Field.onChange(null) when its component unmounts */
   onRemoveChange?: boolean
   defaultValue?: unknown
   value?: unknown
   readonly?: boolean
   disabled?: boolean
+  /** Help text or component to show on invalid input */
   error?: React.ReactNode
   onChange?: (value: unknown, ...args: unknown[]) => void
   format?: ValueTransform
@@ -124,6 +129,10 @@ export type AsFieldProps = {
   parse?: ValueTransform
   validate?: (value: unknown, allValues: object) => unknown
   options?: unknown
+  /**
+   * Everything else reaches the input: `label`, `id`, `type` (the HTML attribute), `placeholder`,
+   * `info` (help text or component to show on focus), `translate`
+   */
   [key: string]: unknown
 }
 
@@ -135,31 +144,6 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
   if (!Active.Field) Active.Field = Field
   // noinspection JSPotentiallyInvalidUsageOfThis
   const Class = class extends PureComponent<AsFieldProps> {
-    static propTypes = {
-      // Input `name` attribute
-      name: PropTypes.string.isRequired,
-      // Instance of the Class component decorated withFormSetup (i.e withForm)
-      instance: PropTypes.object,
-      // Whether to fire Field.onChange(null) when its component unmounts
-      onRemoveChange: PropTypes.bool,
-      label: PropTypes.any,
-      id: PropTypes.string,
-      // HTML Input type attribute
-      type: PropTypes.string,
-      // Input placeholder
-      placeholder: PropTypes.any,
-      // help text or component to show on focus
-      info: PropTypes.any,
-      // help text or component to show on invalid input
-      error: PropTypes.any,
-      value: PropTypes.any,
-      onChange: PropTypes.func,
-      format: PropTypes.func,
-      normalize: PropTypes.func,
-      parse: PropTypes.func,
-      translate: PropTypes.func,
-    }
-
     // The last value seen before an empty one normalized to `undefined`, kept only to make that
     // transition a one-shot. NOT React state: nothing renders from it, so holding it in state only
     // scheduled an update from inside `Input` — a second render pass per Dropdown field and React's
@@ -634,17 +618,13 @@ export function withFormSetup (Class: any, {fieldValues, registeredFieldValues, 
 
   // Class.contextType = StateContext
 
+  // The props this layer reads: `formProps` (the form's render props, without `form` and
+  // `handleSubmit`) and `instance` (the WithForm handle that holds the form), both given by `WithForm`;
+  // `initialValues`; and `onChangeState`, called with the instance, or with `{}` on unmount.
+  // `formProps` and `instance` are both absent for a NESTED document, which shares its parent's form
+  // (`engine/Data.tsx` renders this class without `WithForm`): `form` and `handleSubmit` below then
+  // come from `parent`.
   class FormSetup extends Class {
-    static propTypes = {
-      // Both absent for a NESTED document, which shares its parent's form (`engine/Data.tsx` renders this
-      // class without `WithForm`): `form` and `handleSubmit` below then come from `parent`.
-      formProps: PropTypes.object, // form props, without `form` and `handleSubmit`
-      instance: PropTypes.object, // {Class<form, handleSubmit>} WithForm instance for getting the form
-      initialValues: PropTypes.object, // form initial values
-      onChangeState: PropTypes.func, // onChangeState(this: Class)
-      ...Class.propTypes
-    }
-
     get form () {
       return this.props.instance ? this.props.instance.form : this.props.parent.form
     }
@@ -819,8 +799,8 @@ export function withFormSetup (Class: any, {fieldValues, registeredFieldValues, 
     }
   }
 
-  // Named after the class it builds on, as `asField` names its own, so a propTypes warning or a
-  // component stack still says which component it is: `UIRenderLifecycleWithFormSetup` for the engine.
+  // Named after the class it builds on, as `asField` names its own, so a warning or a component stack
+  // still says which component it is: `UIRenderLifecycleWithFormSetup` for the engine.
   Object.defineProperty(FormSetup, 'name', {value: Class.name + 'WithFormSetup'})
 
   // A prototype assignment, NOT a class field, for two reasons. It is a reference shape built from the

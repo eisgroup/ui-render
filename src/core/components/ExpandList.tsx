@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import Expand from './Expand'
 
@@ -22,10 +21,5 @@ export function ExpandList ({renderLabel, renderItem, items, ...props}: ExpandLi
       <Expand key={item.id || i} {...props} title={renderLabel(item, i)}>{() => renderItem(item, i)}</Expand>
     ))
   )
-}
-ExpandList.propTypes = {
-  items: PropTypes.array.isRequired,
-  renderLabel: PropTypes.func.isRequired,
-  renderItem: PropTypes.func.isRequired,
 }
 export default React.memo(ExpandList)

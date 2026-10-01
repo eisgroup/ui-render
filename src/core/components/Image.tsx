@@ -2,7 +2,6 @@ import classNames from '../utils/classNames'
 import React from 'react'
 import { fileNameWithoutExt } from '../utils'
 import { FILE } from './files'
-import { type } from './types'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /** The named props are read here; the rest is spread onto the `<img>` through ./domProps (see `ViewProps`). */
@@ -48,15 +47,6 @@ export function Image ({
   // derive `src`/`alt` and is not an HTML5 <img> attribute, so both lists apply.
   return <img className={classNames('img', className)} {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)}
               alt={props.alt} decoding={decoding} loading={loading}/>
-}
-
-Image.propTypes = {
-  // Required if `src` or `alt` not defined
-  name: type.String,
-  path: type.String,
-  className: type.String,
-  decoding: type.Enum(['auto', 'async', 'sync']),
-  loading: type.Enum(['eager', 'lazy']),
 }
 
 export function imageSrc ({avatar, src, name = '', path = FILE.PATH_IMAGES}: ImageSource) {

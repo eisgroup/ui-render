@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React, { Fragment, useRef, useState } from 'react'
 import { cn } from '../../components'
 import Placeholder from '../../components/Placeholder'
@@ -21,7 +20,13 @@ import type { Translate } from '../../utils/_envs'
 export type TableItem = Record<string, any>
 
 /** A sort: the header it is for, its order (ascending 1, descending -1, none 0), and what it sorts by. */
-export type TableSort = { id: string, order?: -1 | 0 | 1, sortKey?: string }
+export type TableSort = {
+  /** Id of the header, used for grouping columns/rows */
+  id: string
+  order?: -1 | 0 | 1
+  /** Path to the item's value used for sorting objects */
+  sortKey?: string
+}
 
 /** A header or cell renderer: the value, where it is, the cell's own props, and the table's handle. */
 export type TableRenderer = (value: unknown, position: unknown, props: Record<string, unknown>, handle: TableViewHandle) => React.ReactNode
@@ -29,36 +34,60 @@ export type TableRenderer = (value: unknown, position: unknown, props: Record<st
 /** A header: a column in the default layout, a row in the vertical one. */
 export type TableHeader = {
   id?: string
+  /** Header title, falls back to `id` if not given, and `children` not defined */
   label?: string
-  /** Custom header content, or a function that renders it */
+  /** Custom header content to render, overrides `label`; or a function that renders it */
   children?: React.ReactNode | TableRenderer
   data?: unknown
+  /** CSS class name */
   className?: string
+  /** CSS inline styles */
   style?: React.CSSProperties
+  /** In `extraHeaders`: count of `headers` columns to span, default is 1 */
   colSpan?: number
   classNameHeader?: string
   styleHeader?: React.CSSProperties
   renderHeader?: TableRenderer
+  /** Cell render function for the items under the header */
   renderCell?: TableRenderer
+  /** CSS class name for the items under the header */
   classNameCell?: string
+  /** CSS class name for the `<td>` wrapper of the items under the header */
   classNameCellWrap?: string
+  /** CSS inline styles for the items under the header */
   styleCell?: React.CSSProperties
   [key: string]: unknown
 }
 
-/** The props documented below. `translate` and `additionalCellsStyles` are always passed by the mapper. */
+/** `translate` and `additionalCellsStyles` are always passed by the mapper. The rest go to the `Table`. */
 export type TableViewProps = {
+  /** In the default layout, items are rows: objects keyed by the `id`s of `headers` */
   items: TableItem[]
+  /** In the default layout, headers are columns. Derived from `items`, if not defined */
   headers?: TableHeader[]
+  /**
+   * Additional header layers, rendered above `headers` in the order they are defined: the first
+   * layer is the first level header
+   */
   extraHeaders?: TableHeader[][]
+  /** When the cell is empty (i.e. falsey value), render it as given value */
   showEmptyAs?: React.ReactNode
   sorts?: TableSort[]
+  /** Receives the clicked sort object `{id, order, sortKey}` */
   onSort?: (sort: TableSort | undefined) => void
+  /** Renders the extra row below an expanded row, in the default layout */
   renderItem?: (item: TableItem, index: number) => React.ReactNode
+  /** Custom renderer for the cells of each row, in the default layout */
   renderItemCells?: (item: TableItem, index: number) => React.ReactNode
+  /** Custom renderer for an extra row at the end, in the default layout */
   renderExtraItem?: (items: TableItem[], index: number) => React.ReactNode
   itemsExpanded?: boolean
+  /**
+   * Conditional class names for the rows of the default layout: a row whose value at `id` is a
+   * key of `values` gets that key's class name
+   */
   itemClassNames?: Array<{ id: string, values: Record<string, string> }>
+  /** Whether to render rows as columns (first column as Header) */
   vertical?: boolean
   translate: Translate
   colGroup?: TableColGroupProps['colGroup']
@@ -96,12 +125,6 @@ export type TableViewHandle = {
   headers?: TableHeader[]
   itemsSorted?: TableItem[]
   [key: string]: unknown
-}
-
-const sortObj = {
-  id: PropTypes.string.isRequired, // id of the header, used for grouping columns/rows
-  order: PropTypes.oneOf([-1, 0, 1, undefined]),
-  sortKey: PropTypes.string, // path to item's value used for sorting objects
 }
 
 /**
@@ -478,63 +501,6 @@ function TableView (props: TableViewProps) {
       )}
     </div>
   )
-}
-
-TableView.propTypes = {
-  items: PropTypes.arrayOf( // in default layout, items are rows
-    PropTypes.object.isRequired, // nested object by key matching `id` in `headers` prop
-  ).isRequired,
-  // Header will be derived from items, if not defined
-  headers: PropTypes.arrayOf( // in default layout, headers are columns
-    PropTypes.shape({
-      ...sortObj,
-      renderCell: PropTypes.func, // cell render function(value, index, props) for items under the header
-      label: PropTypes.string, // header title, falls back to `id` if not given, and `children` not defined
-      children: PropTypes.any, // custom header content to render, overrides `label`
-      className: PropTypes.string, // css class name
-      classNameCell: PropTypes.string, // css class name for items under the header
-      classNameCellWrap: PropTypes.string, // css class name for items <td> wrapper under the header
-      style: PropTypes.object, // css inline styles
-      styleCell: PropTypes.object, // css inline styles for items under the header
-    })
-  ),
-  extraHeaders: PropTypes.arrayOf( // additional header layers to be rendered above/before `headers`
-    PropTypes.arrayOf( // layers will be rendered in the order they are defined -> this is the first level header
-      PropTypes.shape({
-        colSpan: PropTypes.number, // count of `headers` columns to span, default is 1
-        label: PropTypes.string, // header title, falls back to `id` if not given, and `children` not defined
-        children: PropTypes.any, // custom header content to render, overrides `label`
-        className: PropTypes.string, // css class name
-        style: PropTypes.object, // css inline styles
-      })
-    )
-  ),
-  // When the cell is empty (i.e. falsey value), render it as given value
-  showEmptyAs: PropTypes.any,
-  sorts: PropTypes.arrayOf(PropTypes.shape({...sortObj})),
-  onSort: PropTypes.func, // receives clicked sort object {id, order, sortKey} as argument
-  renderItem: PropTypes.func, // callback to render extra table rows in default layout
-  renderItemCells: PropTypes.func, // callback to use custom renderer for each table rows in default layout
-  renderExtraItem: PropTypes.func, // callback to use custom renderer for extra row (default layout) at the end
-  itemsExpanded: PropTypes.bool,
-  itemClassNames: PropTypes.arrayOf( // conditional class names for table items (rows in default layout)
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      values: PropTypes.object.isRequired,
-    })
-  ),
-  vertical: PropTypes.bool, // whether to render rows as columns (first column as Header)
-  // ...other Table props
-  translate: PropTypes.func,
-  colGroup: PropTypes.arrayOf(
-    PropTypes.shape({
-      styles: PropTypes.object
-    })
-  ),
-  additionalCellsStyles: PropTypes.array,
-  // Pagination props
-  usePagination: PropTypes.bool,
-  rowsPerPage: PropTypes.number,
 }
 
 export default React.memo(TableView)
