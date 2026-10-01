@@ -12,8 +12,91 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from '../../components/domP
 import { by, get, hasListValue, isEqual, isEqualList, isFunction, toJSON } from '../../utils'
 import { getDateStringFromDateObject } from '../utils'
 import TableColGroup from './TableColGroup'
+import type { TableColGroupProps } from './TableColGroup'
 import { FieldArray } from 'react-final-form-arrays'
 import Pagination from '../../components/Pagination'
+import type { Translate } from '../../utils/_envs'
+
+/** A row in the default layout, a column in the vertical one: values by header id. */
+export type TableItem = Record<string, any>
+
+/** A sort: the header it is for, its order (ascending 1, descending -1, none 0), and what it sorts by. */
+export type TableSort = { id: string, order?: -1 | 0 | 1, sortKey?: string }
+
+/** A header or cell renderer: the value, where it is, the cell's own props, and the table's handle. */
+export type TableRenderer = (value: unknown, position: unknown, props: Record<string, unknown>, handle: TableViewHandle) => React.ReactNode
+
+/** A header: a column in the default layout, a row in the vertical one. */
+export type TableHeader = {
+  id?: string
+  label?: string
+  /** Custom header content, or a function that renders it */
+  children?: React.ReactNode | TableRenderer
+  data?: unknown
+  className?: string
+  style?: React.CSSProperties
+  colSpan?: number
+  classNameHeader?: string
+  styleHeader?: React.CSSProperties
+  renderHeader?: TableRenderer
+  renderCell?: TableRenderer
+  classNameCell?: string
+  classNameCellWrap?: string
+  styleCell?: React.CSSProperties
+  [key: string]: unknown
+}
+
+/** The props documented below. `translate` and `additionalCellsStyles` are always passed by the mapper. */
+export type TableViewProps = {
+  items: TableItem[]
+  headers?: TableHeader[]
+  extraHeaders?: TableHeader[][]
+  showEmptyAs?: React.ReactNode
+  sorts?: TableSort[]
+  onSort?: (sort: TableSort | undefined) => void
+  renderItem?: (item: TableItem, index: number) => React.ReactNode
+  renderItemCells?: (item: TableItem, index: number) => React.ReactNode
+  renderExtraItem?: (items: TableItem[], index: number) => React.ReactNode
+  itemsExpanded?: boolean
+  itemClassNames?: Array<{ id: string, values: Record<string, string> }>
+  vertical?: boolean
+  translate: Translate
+  colGroup?: TableColGroupProps['colGroup']
+  additionalCellsStyles: Array<React.CSSProperties | undefined>
+  usePagination?: boolean
+  rowsPerPage?: number
+  fill?: boolean
+  className?: string
+  name?: string
+  fieldArrayName?: string
+  [key: string]: unknown
+}
+
+type TableViewState = {
+  items: { expanded?: boolean, expandedByIndex: Record<string, boolean | undefined> }
+  sorts?: TableSort[]
+  activePage: number
+  rowsPerPage: number
+}
+
+/**
+ * What renderers receive, and what a meta's handler names are looked up on: one object for the
+ * component's lifetime, kept current.
+ */
+export type TableViewHandle = {
+  tableWrapper: React.RefObject<HTMLDivElement>
+  getStickyCellClassName: typeof getStickyCellClassName
+  expandedByRow: (index: number) => boolean | undefined
+  handleToggleExpandAll: (expanded?: boolean | null) => void
+  handleItemExpand: (target: { key?: string, value?: unknown, index?: number, expanded?: boolean }) => void
+  handleSort: (id: string) => void
+  handlePaginationChange: (event: unknown, data: { activePage: number }) => void
+  props?: TableViewProps
+  state?: TableViewState
+  headers?: TableHeader[]
+  itemsSorted?: TableItem[]
+  [key: string]: unknown
+}
 
 const sortObj = {
   id: PropTypes.string.isRequired, // id of the header, used for grouping columns/rows
@@ -31,7 +114,7 @@ const sortObj = {
  *  45 unstyled junk tokens in the example baseline. A non-pinned cell has no run to end, so it
  *  now returns its className untouched.
  */
-function getStickyCellClassName (styles, className, nextCellStyles) {
+function getStickyCellClassName (styles: React.CSSProperties, className: string | undefined, nextCellStyles: React.CSSProperties) {
   if (styles.position !== 'sticky') return className
 
   if (typeof className === 'string' && className.length && !className.includes('sticky')) {
@@ -49,10 +132,11 @@ function getStickyCellClassName (styles, className, nextCellStyles) {
 
 
 /** The class's `itemsSorted`: a new list sorted by every active sort, in the order they are given. */
-function sortRows (items, sorts) {
+function sortRows (items: TableItem[], sorts: TableSort[] | undefined) {
   if (!hasListValue(sorts)) return items
-  const sortKeys = []
-  sorts.forEach(({id, order, sortKey}) => {
+  const sortKeys: string[] = []
+  // Not undefined: `hasListValue` has just found a list.
+  sorts!.forEach(({id, order, sortKey}) => {
     if (order) sortKeys.push((order < 0 ? '-' : '') + (sortKey ? `${id}.${sortKey}` : id))
   })
   // Create new list to avoid mutating original data
@@ -79,9 +163,9 @@ function sortRows (items, sorts) {
  * so of two calls in one batch only the last survived, and a toggle of every row lost to an
  * expansion batched after it. They now update from the current state, so every call applies.
  */
-function TableView (props) {
+function TableView (props: TableViewProps) {
   const {items, headers: headersProp, sorts: sortsProp} = props
-  const [state, setState] = useState(() => ({
+  const [state, setState] = useState<TableViewState>(() => ({
     items: {
       expanded: props.itemsExpanded,
       expandedByIndex: {},
@@ -99,14 +183,14 @@ function TableView (props) {
   }
 
   // The sorted rows, kept while the items are the same elements and the sort state is the same.
-  const sorted = useRef(null)
+  const sorted = useRef<{ items: TableItem[], sorts?: TableSort[], rows: TableItem[] } | null>(null)
   if (sorted.current === null || sorted.current.sorts !== state.sorts || !isEqualList(items, sorted.current.items)) {
     sorted.current = {items, sorts: state.sorts, rows: sortRows(items, state.sorts)}
   }
   const itemsSorted = sorted.current.rows
 
   // Compute header based on items if not defined
-  const derived = useRef(null)
+  const derived = useRef<{ keys: string[], headers: TableHeader[] } | null>(null)
   let headers = headersProp
   if (!headers) {
     const [item] = items
@@ -121,26 +205,27 @@ function TableView (props) {
   }
 
   // What the handlers read when they are called: the latest props and state, as `this` held them.
-  const latest = useRef(null)
+  // Read through non-null assertions: every render assigns it before any handler runs.
+  const latest = useRef<{ props: TableViewProps, state: TableViewState } | null>(null)
   latest.current = {props, state}
-  const tableWrapper = useRef(null)
+  const tableWrapper = useRef<HTMLDivElement>(null)
 
   // HANDLERS ------------------------------------------------------------------
-  const handle = useRef(null)
+  const handle = useRef<TableViewHandle | null>(null)
   if (handle.current === null) {
     handle.current = {
       tableWrapper,
       getStickyCellClassName,
 
       expandedByRow: (index) => {
-        const {items: {expanded, expandedByIndex}} = latest.current.state
+        const {items: {expanded, expandedByIndex}} = latest.current!.state
         return expandedByIndex[index] != null ? expandedByIndex[index] : expanded
       },
 
       handleToggleExpandAll: (expanded) => {
         setState(current => {
           const next = expanded == null ? !current.items.expanded : expanded
-          const expandedByIndex = {}
+          const expandedByIndex: Record<string, boolean> = {}
           for (const i in current.items.expandedByIndex) {
             expandedByIndex[i] = next
           }
@@ -156,9 +241,10 @@ function TableView (props) {
        * @param {Boolean} expanded - whether item should be expanded
        */
       handleItemExpand: ({key, value, index, expanded}) => {
-        const {items} = latest.current.props
+        const {items} = latest.current!.props
         value = String(value).toLowerCase()
-        const target = index != null ? index : items.findIndex(i => String(i[key]).toLowerCase() === value)
+        // A cast, not a guard: without an index, the caller names the key to find the item by.
+        const target = index != null ? index : items.findIndex(i => String(i[key as string]).toLowerCase() === value)
         setState(current => ({
           ...current,
           items: {...current.items, expandedByIndex: {...current.items.expandedByIndex, [target]: expanded}},
@@ -168,9 +254,10 @@ function TableView (props) {
       // Reports the clicked sort as it leaves this call, so it is computed from the last render's
       // state, as `this.state` was, rather than inside an updater.
       handleSort: (id) => {
-        const {props: {onSort}, state: {sorts}} = latest.current
-        let sort
-        const next = sorts.map(s => {
+        const {props: {onSort}, state: {sorts}} = latest.current!
+        let sort: TableSort | undefined
+        // Not undefined: only a header with a sort calls this.
+        const next = sorts!.map(s => {
           if (s.id === id) {
             sort = {...s, order: s.order ? (s.order < 0 ? 1 : 0) : -1}
             return sort
@@ -182,7 +269,8 @@ function TableView (props) {
       },
 
       handlePaginationChange: (e, { activePage }) => {
-        tableWrapper.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        // Not null: the wrapper is mounted whenever its pagination is.
+        tableWrapper.current!.scrollIntoView({ behavior: 'smooth', block: 'start' })
         setState(current => ({...current, activePage}))
       },
     }
@@ -202,7 +290,7 @@ function TableView (props) {
     classNameHeader,
     styleHeader,
     renderHeader: renderHeaderContent
-  }, i) => {
+  }: TableHeader, i: number) => {
     const { translate } = props
     const { sorts } = state
     const hasSort = sorts && !!sorts.find(s => s.id === id)
@@ -211,10 +299,12 @@ function TableView (props) {
     return (
       <Table.HeaderCell key={id || i} colSpan={colSpan} className={cn('left', classNameHeader)} style={styleHeader}>
         <Row className={cn('middle', className, {sort: hasSort})} style={style}
-             onClick={hasSort && (() => self.handleSort(id))}>
+             // Not undefined: a header with a sort has an id.
+             onClick={hasSort ? (() => self.handleSort(id!)) : undefined}>
           {render
             ? render(value, id, {className, style}, self)
-            : (typeof cell === 'object' ? cell : <Text className="p">{cell || (label != null ? translate(label) : id)}</Text>)
+            // A cast, not a guard: `cell` is no function here, or it would be the renderer.
+            : (typeof cell === 'object' ? cell : <Text className="p">{(cell as React.ReactNode) || (label != null ? translate(label) : id)}</Text>)
           }
           {hasSort && renderSort(sorts.find(item => item.id === id) || {})}
         </Row>
@@ -223,12 +313,13 @@ function TableView (props) {
   }
 
   // Render Row Cells (in default layout)
-  const renderItemData = (item, index, {id, renderCell, classNameCellWrap = '', classNameCell: className, styleCell: style}) => {
+  const renderItemData = (item: TableItem, index: number, {id, renderCell, classNameCellWrap = '', classNameCell: className, styleCell: style}: TableHeader) => {
     // Conditional rendering logic based on given cell data
     const { additionalCellsStyles } = props
     // Headers without an `id` are section dividers — they render as empty body cells.
     const cell = id == null ? undefined : get(item, id)
-    const {render: r, data} = cell || {}
+    // A cast, not a guard: a cell may be an object carrying its own renderer and data.
+    const {render: r, data} = (cell || {}) as { render?: TableRenderer, data?: unknown }
     const render = isFunction(cell) ? cell : (r || renderCell)
     const value = data != null ? data : cell
     let content = render ? render(value, index, {className, style, expanded: expandedByRow(index)}, self) : cell
@@ -261,9 +352,9 @@ function TableView (props) {
   }
 
   // Render Rows (in default layout)
-  const renderItem = (item, index) => {
+  const renderItem = (item: TableItem, index: number) => {
     const {renderItem, renderItemCells, itemClassNames} = props
-    let className
+    let className: string | string[] | undefined
     if (itemClassNames) {
       className = []
       itemClassNames.forEach(({id, values}) => {
@@ -271,7 +362,7 @@ function TableView (props) {
         if (value == null) return
         for (const match in values) {
           if (match === String(value)) {
-            className.push(values[match])
+            (className as string[]).push(values[match]) // a cast, not a guard: an array until the join below
             break
           }
         }
@@ -281,12 +372,13 @@ function TableView (props) {
 
     return (
       <Fragment key={index}>
-        <Table.Row className={className}>
-          {renderItemCells ? renderItemCells(item, index) : headers.map(header => renderItemData(item, index, header))}
+        {/* Casts, not guards: a string by now, and `headers` is set whenever rows render (see below). */}
+        <Table.Row className={className as string | undefined}>
+          {renderItemCells ? renderItemCells(item, index) : headers!.map(header => renderItemData(item, index, header))}
         </Table.Row>
         {renderItem && expandedByRow(index) &&
           <Table.Row>
-            <Table.Cell colSpan={headers.length}>
+            <Table.Cell colSpan={headers!.length}>
               {renderItem(item, index)}
             </Table.Cell>
           </Table.Row>
@@ -297,7 +389,7 @@ function TableView (props) {
 
   // Render Rows (in Vertical layout)
   // @Note: in Vertical layout, the first column in each item is a header
-  const renderItemsVertical = (header, index) => {
+  const renderItemsVertical = (header: TableHeader, index: number) => {
     const { additionalCellsStyles } = props
     header.styleHeader = additionalCellsStyles[0] || {}
     header.classNameHeader = getStickyCellClassName(header.styleHeader, header.classNameHeader, additionalCellsStyles[1] || {})

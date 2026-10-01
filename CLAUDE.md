@@ -37,7 +37,7 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 
 ### Core rendering engine (`src/core/engine/`)
 
-- `Render.js` — The recursive renderer. Takes props from meta definitions and renders components via `Render.Component` (component resolver) and `Render.Method` (render function resolver). These are set up in `mapper.js`.
+- `Render.tsx` — The recursive renderer. Takes props from meta definitions and renders components via `Render.Component` (component resolver) and `Render.Method` (render function resolver). These are set up in `mapper.js`.
 - `transforms.js` — `metaToProps()` recursively converts meta.json declarations into React props. `mapProps()` maps data arrays using mapper definitions.
 
 ### Component/method mapping (`src/core/engine/`)

@@ -123,12 +123,12 @@ Those four were the *published* ones — they had curated entries on this page w
 
 | Component | Attributes at the call sites | Spreads | Rendered by |
 | --- | --- | --- | --- |
-| `Table` | `className` | `...omitProps(rest, ENGINE_PROPS, FIELD_ONLY_PROPS)` | `core/engine/components/TableView.js` |
-| `Table.Header` | `className` | — | `core/engine/components/TableView.js` |
-| `Table.HeaderCell` | `className`, `colSpan`, `key`, `style` | — | `core/engine/components/TableView.js` |
-| `Table.Row` | `className`, `key` | — | `core/engine/components/TableView.js` |
-| `Table.Cell` | `className`, `colSpan`, `key`, `style` | `...rest` | `core/engine/components/LocalDraftTableRow.tsx`, `core/engine/components/TableView.js`, `core/engine/mapper.js` |
-| `Table.Body` | — | — | `core/engine/components/TableView.js` |
+| `Table` | `className` | `...omitProps(rest, ENGINE_PROPS, FIELD_ONLY_PROPS)` | `core/engine/components/TableView.tsx` |
+| `Table.Header` | `className` | — | `core/engine/components/TableView.tsx` |
+| `Table.HeaderCell` | `className`, `colSpan`, `key`, `style` | — | `core/engine/components/TableView.tsx` |
+| `Table.Row` | `className`, `key` | — | `core/engine/components/TableView.tsx` |
+| `Table.Cell` | `className`, `colSpan`, `key`, `style` | `...rest` | `core/engine/components/LocalDraftTableRow.tsx`, `core/engine/components/TableView.tsx`, `core/engine/mapper.js` |
+| `Table.Body` | — | — | `core/engine/components/TableView.tsx` |
 | `Table.Footer` | — | — | *nothing* |
 
 `mapper.js`'s spread onto `Table.Cell` is a meta node's whole rest bag and is still unfiltered at the call site — the filter is now inside the cell, which is why it is safe. All three unfiltered boundaries on this surface are now closed inside the component: the table cell at step 1, the tooltip at step 2 part 3, and the dropdown at step 3 part 2, which strips twice — once in the wrapper and once in `Listbox` at the element.
@@ -137,7 +137,7 @@ Those four were the *published* ones — they had curated entries on this page w
 
 `src/core/components/TooltipPop.tsx`, 565 lines. Replaced the wrapper in §9.7-F1 step 2 part 3.
 
-The hover tooltip, over the same inline `<span>` `components/Tooltip.tsx` has shipped for years. Reached two live ways: a `view: "Tooltip"` node (`mapper.js`, which maps `label` to `content`) and the `tooltip` attribute on ANY node (`Render.js`, which wraps the rendered node and spreads an object `tooltip` — still an unfiltered passthrough, but into 13 accepted names now instead of 45). This was a FIX, not a trade: measured in real Chrome on the production build, the SUIR bubble rendered at the document origin at every use site a meta can declare (~730 px from its trigger on `buttonIcon`, 2538-3006 px on `all`) and every open raised an uncaught `TypeError` from popper's flip modifier, because SUIR clones the trigger with a `ref` and nothing a meta can declare can hold one. There was no working positioning to lose.
+The hover tooltip, over the same inline `<span>` `components/Tooltip.tsx` has shipped for years. Reached two live ways: a `view: "Tooltip"` node (`mapper.js`, which maps `label` to `content`) and the `tooltip` attribute on ANY node (`Render.tsx`, which wraps the rendered node and spreads an object `tooltip` — still an unfiltered passthrough, but into 13 accepted names now instead of 45). This was a FIX, not a trade: measured in real Chrome on the production build, the SUIR bubble rendered at the document origin at every use site a meta can declare (~730 px from its trigger on `buttonIcon`, 2538-3006 px on `all`) and every open raised an uncaught `TypeError` from popper's flip modifier, because SUIR clones the trigger with a `ref` and nothing a meta can declare can hold one. There was no working positioning to lose.
 
 **What it emits.** Host: `tooltip-host <classWrap>`, always, open or closed. Bubble, only while open: `tooltip no-wrap <resolved placement words> show [inverted] <className>` — the same class string `Tooltip.tsx` emits, so the two converge on one CSS contract. The placement words are the REQUESTED position, not a resolved one: nothing measures, so there is no flip to rewrite them. Closed, the component renders the trigger byte-for-byte as it renders without a tooltip, and nothing is added to `document.body`. THE MARKUP IS NOT UNCHANGED, THOUGH, and two earlier drafts of this row implied it was: the trigger is now WRAPPED in `<span class="tooltip-host">`, which is new markup and shows up in this step's own snapshot diff at the one tooltip site the 38 examples render at mount. So: the trigger element itself is untouched when closed; the box around it is new. What the baseline still cannot see is the BUBBLE, which exists only while open, and therefore anything about opening, placement or dismissal.
 
@@ -171,7 +171,7 @@ CSS contract: The bubble is now mounted INSIDE `.ui-render`, which is what makes
 
 | Prop | Why it is gone |
 | --- | --- |
-| `on` | CLICK-TO-OPEN. SUIR ran `on: ['click', 'hover']`; every tooltipped node in the corpus already owns its `onClick`, so one gesture fired both the action and the tooltip and the tooltip arrived after the action had run. Dropped deliberately and recorded — on this page, in the step PR and in UPGRADE-PLAN §9.7-F1 step 2, which is where the project keeps removal decisions until step 5 writes the CHANGELOG it owes. This row IS the record; it is not a pointer to one elsewhere. Focus-to-open, `role="tooltip"` and `aria-describedby` were added BECAUSE of this removal: with click gone and hover unavailable to a keyboard there would otherwise be no keyboard path to the content at all. AND THAT PATH ONLY EXISTS FOR A FOCUSABLE TRIGGER, which is the part this row owes a reader and did not say. Focus-open reaches a `<button>`, a link or an input; it does not reach a `<span>`, a `<div>` or an `<i>`, and no `tabindex` is added to make it. A tooltip on a non-focusable trigger is therefore HOVER-ONLY now: reachable with a mouse, unreachable by keyboard, and unreachable by touch. Every tooltipped node in the tracked corpus is a `<button>`, so the corpus does not exercise this — but a consumer meta can put `tooltip` on any node at all, and `Render.js` will wrap it. If that content matters, the node has to be focusable; the tooltip will not make it so. |
+| `on` | CLICK-TO-OPEN. SUIR ran `on: ['click', 'hover']`; every tooltipped node in the corpus already owns its `onClick`, so one gesture fired both the action and the tooltip and the tooltip arrived after the action had run. Dropped deliberately and recorded — on this page, in the step PR and in UPGRADE-PLAN §9.7-F1 step 2, which is where the project keeps removal decisions until step 5 writes the CHANGELOG it owes. This row IS the record; it is not a pointer to one elsewhere. Focus-to-open, `role="tooltip"` and `aria-describedby` were added BECAUSE of this removal: with click gone and hover unavailable to a keyboard there would otherwise be no keyboard path to the content at all. AND THAT PATH ONLY EXISTS FOR A FOCUSABLE TRIGGER, which is the part this row owes a reader and did not say. Focus-open reaches a `<button>`, a link or an input; it does not reach a `<span>`, a `<div>` or an `<i>`, and no `tabindex` is added to make it. A tooltip on a non-focusable trigger is therefore HOVER-ONLY now: reachable with a mouse, unreachable by keyboard, and unreachable by touch. Every tooltipped node in the tracked corpus is a `<button>`, so the corpus does not exercise this — but a consumer meta can put `tooltip` on any node at all, and `Render.tsx` will wrap it. If that content matters, the node has to be focusable; the tooltip will not make it so. |
 | `hoverable` | Was what let the pointer travel onto the bubble. Now unconditional, so the prop has nothing left to turn on. |
 | `closeOnDocumentClick` | Closing on an outside click is unconditional. Nothing passed this, and a tooltip that survives a click elsewhere is a popover, which this is not. |
 | `closeOnEscape` | Same: Escape always dismisses. |
@@ -285,7 +285,7 @@ directions by `scripts/__tests__/wrapper-prop-reference.contract.test.js`: add a
 that uses a new attribute, and the test names it.
 
 Read it as an inventory, not a forwarding claim — most of these are consumed by
-`mapper.js` / `TableView.js` and never reach semantic-ui-react. Cross-reference the
+`mapper.js` / `TableView.tsx` and never reach semantic-ui-react. Cross-reference the
 per-wrapper tables above for the fate of each.
 
 | View | Attributes in the tracked corpus | Found only in consumer metas |
@@ -315,8 +315,8 @@ What each step owes beyond "the props above still work".
 - DECIDED — `verticalAlign` DROPPED, and its two call sites in `LocalDraftTableRow` with it. SUIR emitted `top aligned`; no loaded CSS selects on `aligned`, and no `.top` rule can match a `<td class="top aligned">`, so those 15 cells already rendered at the `<td>` default. Pixel-identical, and it leaves one way to align a cell instead of two, one of which never worked.
 - DECIDED — `inverted`/`striped` KEPT. They are the only SUIR modifiers any call site passes and, unlike `celled`, they ARE styled (`table:not(.as-layout).inverted`, `table.striped tr:nth-child(2n)`). §9.9-H1 still owns whether `ErrorTable`/`ErrorContent` survive; this step deliberately did not pre-empt that.
 - DECIDED — `fixedHeader` DELETED with its test. Unused by every call site and every meta, AND non-functional: `app__table__container--fixed-header` and its inner class have zero occurrences in `static/all.css` and in `src/style`, so it rendered two unstyled `<div>`s. Keeping it would have meant reimplementing a feature that never worked.
-- DONE — `jest.config.js` gained a per-file threshold for `Table.tsx` at 100/100/100/100, measured from a real `--coverage` run, alongside the existing `TableView.js` entry.
-- DONE — `TableView.js`'s `sellStyles` discard is gone (a typo for a prop that does not exist; nothing passes `cellStyles` either), and the `class=""` comment it carried is rewritten, because suppressing that attribute is now the cell's job.
+- DONE — `jest.config.js` gained a per-file threshold for `Table.tsx` at 100/100/100/100, measured from a real `--coverage` run, alongside the existing `TableView.tsx` entry.
+- DONE — `TableView.tsx`'s `sellStyles` discard is gone (a typo for a prop that does not exist; nothing passes `cellStyles` either), and the `class=""` comment it carried is rewritten, because suppressing that attribute is now the cell's job.
 - EXPECTED AND VERIFIED — 332 changed snapshot lines in four shapes and no others: 24 `<tbody class="">`, 94 `<tr class="">` and 199 `<td class="">` lose an empty attribute, and 15 `<td class="top aligned">` lose a dead class. Nothing else moved: same element counts per tag, same class strings on `<table>`/`<thead>`/`<th>`, same `id`/`style`/`colspan`, same visible text, and the behavioural layer green throughout.
 
 ### Step 2 — `TooltipPop` — SHIPPED

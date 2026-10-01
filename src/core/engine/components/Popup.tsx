@@ -86,8 +86,9 @@ const Popup = () => {
                 </View>
             </View>,
             // This document's own root when a shell published one; otherwise the id, which is
-            // how the demo and the test harnesses provide it.
-            popup.popupRoot || document.getElementById('render-popup-root')
+            // how the demo and the test harnesses provide it. Not null: one of the two is always
+            // there, and without either `createPortal` throws, as it did.
+            (popup.popupRoot || document.getElementById('render-popup-root'))!
         )
 }
 

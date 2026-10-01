@@ -545,7 +545,7 @@ describe('the three defects an adversarial review of this step found', () => {
      * WITHIN the host: browsers fire `pointerdown` -> `focusout` -> `focusin`, React
      * propagates the last two to the wrapper, and `onBlur` cleared the flag before the
      * incoming `onFocus` could consume it — so the focus read as keyboard-caused and the
-     * bubble opened instantly on a mouse click. Reachable from meta, because `Render.js`
+     * bubble opened instantly on a mouse click. Reachable from meta, because `Render.tsx`
      * wraps ANY node carrying a `tooltip` attribute, including a container whose `items`
      * are several fields.
      */

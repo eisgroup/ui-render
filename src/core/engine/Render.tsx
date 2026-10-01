@@ -11,6 +11,37 @@ import { childItemPath, formatMetaPath } from './metaPath'
  */
 const MetaPathContext = createContext('')
 
+/** A meta node's props, as the renderer reads them; everything is handed on to `Render.Component`. */
+export type RenderProps = {
+    view?: string
+    /** Filled with `[]` by the class's `defaultProps` when absent */
+    items?: RenderProps[]
+    data?: unknown
+    _data?: unknown
+    debug?: unknown
+    form?: unknown
+    instance?: { state: { currencyCode?: string }, props?: { onError?: unknown } }
+    relativeData?: boolean
+    relativeIndex?: number
+    relativePath?: string
+    name?: string
+    currencyCode?: string
+    tooltip?: unknown
+    /** This node's position in its parent's `items`, set by `Render` and stripped before the resolver */
+    metaIndex?: number | string
+    dateFormat?: unknown
+    [key: string]: unknown
+}
+
+/** What a subtree that failed to render is reported as, to the host's `onError` and to `Render.onError`. */
+export type RenderErrorReport = {
+    error: unknown
+    errorInfo?: React.ErrorInfo
+    props?: Partial<RenderProps>
+    path?: string
+    message?: string
+}
+
 /**
  * Recursive Field Renderer
  * @setup:
@@ -51,7 +82,7 @@ const MetaPathContext = createContext('')
  * @param {Number|String} [index] - index of field in the list
  * @returns {*} Node - React component/s
  */
-export default function Render (props, index) {
+function Render (props: RenderProps, index?: number | string | object) {
     // `dateFormat` is deliberately dropped rather than forwarded: the date format is
     // configuration, and it travels to the components that need it through
     // `ConfigContext` (fed from the `UIRender` props — §9.4). Leaving it in props would
@@ -70,7 +101,19 @@ export default function Render (props, index) {
     )
 }
 
-class RenderClass extends Component {
+// A separate statement because the registry below merges with the function, and a merged declaration
+// cannot be a default export.
+export default Render
+
+// The registry `mapper.js` fills at load (see `@setup` above). The two hooks set at the end of this
+// file are declared by those assignments.
+declare namespace Render {
+    let Component: React.ComponentType<any> | undefined
+    let Method: ((name: string) => unknown) | undefined
+    let Tooltip: React.ComponentType<any>
+}
+
+class RenderClass extends Component<RenderProps, { error: unknown, diagnostic: string }> {
     static contextType = MetaPathContext
 
     static defaultProps = {
@@ -86,11 +129,12 @@ class RenderClass extends Component {
      * @returns {String} JSON path of this node inside the meta document, '' at the root
      */
     get metaPath () {
-        return childItemPath(this.context, this.props.metaIndex)
+        // A cast, not a guard: the context is `MetaPathContext`'s, a string.
+        return childItemPath(this.context as string, this.props.metaIndex)
     }
 
-    componentDidCatch (error, errorInfo) {
-        const report = {error, errorInfo, props: this.props, path: this.metaPath}
+    componentDidCatch (error: Error, errorInfo: React.ErrorInfo) {
+        const report: RenderErrorReport = {error, errorInfo, props: this.props, path: this.metaPath}
         report.message = formatRenderError(report)
         this.setState({error, diagnostic: report.message}, () => reportRenderError(report))
     }
@@ -129,7 +173,8 @@ class RenderClass extends Component {
 
         // Pass down data to child renderers
         // allow `data` and `_data` to be overridden by config
-        items = items.map((item) => {
+        // Not undefined: the class's `defaultProps` fill it.
+        items = items!.map((item) => {
             const mappedData = {data, _data, debug, form, instance, currencyCode, ...item};
             // Always pass relativePath and relativeIndex to child items when available
             // This is critical for popup fields to have correct input names matching table row fields
@@ -185,7 +230,7 @@ class RenderClass extends Component {
  * @param {Object} [report.props] - props of that node
  * @returns {String} single-line diagnostic
  */
-export function formatRenderError ({error, path, props = {}}) {
+export function formatRenderError ({error, path = '', props = {}}: RenderErrorReport): string {
     const {view, name} = props
     const node = []
     if (view) node.push(`view "${view}"`)
@@ -202,7 +247,7 @@ export function formatRenderError ({error, path, props = {}}) {
  * @param {Object} report - {error, errorInfo, props, path, message}
  * @returns {void}
  */
-function reportRenderError (report) {
+function reportRenderError (report: RenderErrorReport): void {
     // Every rendered node carries the UIRender instance that owns it, which is how a
     // per-instance host hook is reachable from here without threading another prop
     // through the tree (and without a module global, which two UIRenders would share).
@@ -218,6 +263,6 @@ function reportRenderError (report) {
     Render.onError(report)
 }
 
-Render.onError = (report) => console.warn(`Unhandled ${Render.name} error:`, report)
+Render.onError = (report: RenderErrorReport) => console.warn(`Unhandled ${Render.name} error:`, report)
 
 Render.TooltipDefaultProps = {inverted: true}

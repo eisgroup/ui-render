@@ -265,7 +265,7 @@ function interceptedProps (rawSource, fn, file) {
  * Every JSX opening tag for `tag` in `source`, as `{attributes, spreads}`.
  *
  * Written as a small tokenizer rather than a regex because the tags in question span lines,
- * carry `//` comments between attributes (`TableView.js`), and hold arrow functions and object
+ * carry `//` comments between attributes (`TableView.tsx`), and hold arrow functions and object
  * literals whose `>` and `}` must not be mistaken for the end of the tag.
  */
 function jsxOpenings (source, tag) {
@@ -1096,7 +1096,7 @@ function renderMarkdown (reference) {
         'that uses a new attribute, and the test names it.',
         '',
         'Read it as an inventory, not a forwarding claim — most of these are consumed by',
-        '`mapper.js` / `TableView.js` and never reach semantic-ui-react. Cross-reference the',
+        '`mapper.js` / `TableView.tsx` and never reach semantic-ui-react. Cross-reference the',
         'per-wrapper tables above for the fate of each.',
         '',
         row(['View', 'Attributes in the tracked corpus', 'Found only in consumer metas']),

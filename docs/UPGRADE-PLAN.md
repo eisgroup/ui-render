@@ -1176,6 +1176,18 @@ Measured: the corpus is identical to the seventh batch's (107 / 1012 at mount, 2
 
 Measured: the corpus is identical to master's (107 / 1012 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 322,888 → 322,898 bytes. `isCallerArgument` reads its argument through one local, typed for the probe. `src/core` + `src/library` are 131 TS files, 15,908 lines, against 8 JS files, 3,904 lines: 80.3% of the lines, was 71.2%.
 
+**Second batch, 2026-10-01: `Render`, `Popup`, `Tabs` and `TableView`.** **Left in JavaScript: `transforms`, `mapper`, `rules` and `form/utils`**, 4 files and 2,925 lines.
+- **`Render`'s registry is declared, and is still assigned where it was.** `mapper.js` assigns `Render.Component`, `Render.Method` and `Render.Tooltip` at load, so a `declare namespace Render` gives them types and emits nothing. The two hooks `Render.tsx` sets itself, `onError` and `TooltipDefaultProps`, are declared by those assignments. A merged declaration cannot be a default export, so `export default Render` became a statement of its own. The compiled output was checked to carry no namespace.
+- **`Tabs` and `TableView` take the types `StandaloneTabs` set out at E2.** Their props, their state, and the handle their renderers receive (one object for the component's lifetime) are each exported types.
+- **`TableView` types `translate` and `additionalCellsStyles` as required.** It reads both unguarded, and its only caller, the mapper, always passes them.
+- **`Tabs` no longer reassigns `type.Node`.** It wrote `PropTypes.object` into the shared proxy, which `types.ts` already holds. The line was dead.
+- **The checker found a console warning, and it is fixed.** A sortable header's `onClick` was `hasSort && handler`. A header without a sort, in a table with any sort at all, got `onClick={false}`. TypeScript rejects `false` as a handler, and so does React, which warns: `Expected onClick listener to be a function, instead got false`. That was measured on master for a table sorted by one of two columns. It is `undefined` now, which React treats the same at runtime, and a test that fails on the previous code pins that nothing is logged.
+- **Found, and left for a change of its own: `TableView`'s `propTypes` describe `colGroup` entries as `{styles}`, while `TableColGroup` reads `style`.** Its own test passes `style`. The propType is wrong, and harmless, since a shape does not reject extra keys. E5 deletes it.
+- **A cast-necessity pass removed each new cast in turn.** One was unneeded and is gone.
+- **A probe of 11 wrong call sites failed on all 11.**
+
+Measured: the corpus is identical to master's (107 / 1012 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 322,898 → 322,926 bytes. `src/core` + `src/library` are 135 TS files, 17,075 lines, against 4 JS files, 2,925 lines: 85.4% of the lines, was 80.3%.
+
 #### E4 — Public API switchover (the risky step)
 
 - Switch `gen-ts` from the hand-written `src/library/types/index.ts` to emitting declarations from the real, now-typed entry chain.

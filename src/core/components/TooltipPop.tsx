@@ -5,7 +5,7 @@ import type { ClassValue } from '../utils/classNames'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /**
- * The open rest bag. `Render.js` spreads a meta node's `tooltip` object straight into this
+ * The open rest bag. `Render.tsx` spreads a meta node's `tooltip` object straight into this
  * component, so ANY key can arrive — that is the documented passthrough (`style`, `data-*`,
  * `aria-*`, handlers) and the reason the dropped names below have to be stripped explicitly.
  * `unknown` rather than `any`: what rides through is not inspected here, only forwarded.
@@ -231,7 +231,7 @@ export type TooltipBody = React.ReactNode | (() => React.ReactNode)
 
 /**
  * The 13 names this component reads, plus the open rest bag every caller really has: both engine
- * entry points spread a meta node into it (`mapper.js` for `view: "Tooltip"`, `Render.js` for the
+ * entry points spread a meta node into it (`mapper.js` for `view: "Tooltip"`, `Render.tsx` for the
  * `tooltip` attribute), so an index signature is the contract, not laziness. See
  * `docs/SUPPORTED-PROPS.md` for the per-prop record, including the 19 dropped names.
  */
@@ -364,7 +364,7 @@ export default function TooltipPop ({
     /**
      * The body, and whether there is one at all.
      *
-     * `mapper.js` maps a `view: "Tooltip"` node's `label` to `content` while `Render.js` passes
+     * `mapper.js` maps a `view: "Tooltip"` node's `label` to `content` while `Render.tsx` passes
      * `title`, so both names are live and `content` wins — the precedence the wrapper had, where
      * the rest spread landed after `content={title}`.
      *
@@ -530,7 +530,7 @@ export default function TooltipPop ({
         // propagates the last two to this wrapper, and clearing on blur wiped the flag before the
         // incoming focus could consume it — so a plain mouse click read as keyboard-caused and
         // opened the bubble instantly, which is exactly what dropping click-to-open was for.
-        // Reachable from meta: `Render.js` wraps ANY node carrying a `tooltip`, containers
+        // Reachable from meta: `Render.tsx` wraps ANY node carrying a `tooltip`, containers
         // included. The flag is consumed by `onFocus` and cleared when the pointer leaves; blur
         // needs neither.
         onBlur: () => {

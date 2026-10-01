@@ -121,13 +121,13 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/engine/components/TableView.js': {
+        './src/core/engine/components/TableView.tsx': {
             statements: 100,
             branches: 97,
             functions: 100,
             lines: 100,
         },
-        './src/core/engine/components/Tabs.js': {
+        './src/core/engine/components/Tabs.tsx': {
             statements: 100,
             branches: 98,
             functions: 100,
@@ -169,7 +169,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/engine/Render.js': {
+        './src/core/engine/Render.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,

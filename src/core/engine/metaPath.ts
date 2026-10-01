@@ -3,7 +3,7 @@
  *
  * One implementation of the JSON path notation both halves of the §9.4 contract
  * work speak: the dev-mode validator (`validateMeta.ts`), which reports where a
- * meta document is wrong, and the render boundary (`Render.js`), which reports
+ * meta document is wrong, and the render boundary (`Render.tsx`), which reports
  * where a document failed while rendering. Somebody who has learned to read
  * `items[3].items[0].name` in one message can read it in the other, and there is
  * one place to change if the notation ever has to change.

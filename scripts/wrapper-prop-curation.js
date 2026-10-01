@@ -337,7 +337,7 @@ const IN_HOUSE_CURATION = {
         shipped: '§9.7-F1 step 2 part 3',
         summary: 'The hover tooltip, over the same inline `<span>` `components/Tooltip.tsx` has '
             + 'shipped for years. Reached two live ways: a `view: "Tooltip"` node (`mapper.js`, which '
-            + 'maps `label` to `content`) and the `tooltip` attribute on ANY node (`Render.js`, which '
+            + 'maps `label` to `content`) and the `tooltip` attribute on ANY node (`Render.tsx`, which '
             + 'wraps the rendered node and spreads an object `tooltip` — still an unfiltered '
             + 'passthrough, but into 13 accepted names now instead of 45). This was a FIX, not a '
             + 'trade: measured in real Chrome on the production build, the SUIR bubble rendered at the '
@@ -451,7 +451,7 @@ const IN_HOUSE_CURATION = {
                 + 'now: reachable with a mouse, unreachable by keyboard, and unreachable by touch. '
                 + 'Every tooltipped node in the tracked corpus is a `<button>`, so the corpus does '
                 + 'not exercise this — but a consumer meta can put `tooltip` on any node at all, '
-                + 'and `Render.js` will wrap it. If that content matters, the node has to be '
+                + 'and `Render.tsx` will wrap it. If that content matters, the node has to be '
                 + 'focusable; the tooltip will not make it so.',
             hoverable: 'Was what let the pointer travel onto the bubble. Now unconditional, so the '
                 + 'prop has nothing left to turn on.',
@@ -573,7 +573,7 @@ const FORWARDED_CURATION = {}
  * attribute and the test names it.
  *
  * This is the "discovered set" §9.7-F1 step 0 asked for. Read it as an inventory, not as a
- * forwarding claim: most of these are consumed by `mapper.js`/`TableView.js` and never reach
+ * forwarding claim: most of these are consumed by `mapper.js`/`TableView.tsx` and never reach
  * semantic-ui-react at all. The `outcome` column on the page says which is which.
  */
 const META_ATTRIBUTES = {
@@ -644,8 +644,8 @@ const STEP_OBLIGATIONS = [
                 + 'zero occurrences in `static/all.css` and in `src/style`, so it rendered two unstyled '
                 + '`<div>`s. Keeping it would have meant reimplementing a feature that never worked.',
             'DONE — `jest.config.js` gained a per-file threshold for `Table.tsx` at 100/100/100/100, '
-                + 'measured from a real `--coverage` run, alongside the existing `TableView.js` entry.',
-            'DONE — `TableView.js`\'s `sellStyles` discard is gone (a typo for a prop that does not '
+                + 'measured from a real `--coverage` run, alongside the existing `TableView.tsx` entry.',
+            'DONE — `TableView.tsx`\'s `sellStyles` discard is gone (a typo for a prop that does not '
                 + 'exist; nothing passes `cellStyles` either), and the `class=""` comment it carried is '
                 + 'rewritten, because suppressing that attribute is now the cell\'s job.',
             'EXPECTED AND VERIFIED — 332 changed snapshot lines in four shapes and no others: '

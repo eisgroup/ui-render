@@ -8,22 +8,70 @@ import { useTimers } from '../../components/utils'
 import View from '../../components/View'
 import { isEqual, isFunction } from '../../utils'
 
-type.Node = PropTypes.object
+/** A tab's title, `{text, icon}` as an object; a JSX element renders as it is. */
+type TitleObject = { text?: React.ReactNode, icon?: string }
 
-function normalizeTabIndex (value, items) {
-  const index = Math.max(+value || 0, 0)
+/** A tab title: anything React renders, or `{text, icon}`. */
+export type TabTitle = React.ReactNode | TitleObject
+
+/** What function slots, content and children receive: one object for the component's lifetime, kept current. */
+export type TabsHandle = {
+  props: TabsProps
+  state: TabsState
+  tabs: TabTitle[]
+  contents: TabContent[]
+  setTab: (activeIndex: number, transition?: boolean, items?: TabItem[]) => void
+}
+
+/** A tab's content; a function is called with the handle. */
+export type TabContent = React.ReactNode | ((handle: TabsHandle) => React.ReactNode)
+
+/** Content around the tabs; a function is called with the handle. */
+type TabsSlot = React.ReactNode | ((handle: TabsHandle) => React.ReactNode)
+
+export type TabItem = { tab?: TabTitle, content: TabContent }
+
+/** The named props are read here; the rest is passed to the outer `ScrollView`. */
+export type TabsProps = {
+  items: TabItem[]
+  activeIndex?: number | string
+  defaultIndex?: number | string
+  onChange?: (activeIndex: number) => void
+  vertical?: boolean
+  centerTabs?: boolean
+  buttoned?: boolean
+  transitionUpdate?: boolean
+  children?: TabsSlot
+  childrenBeforeTabs?: TabsSlot
+  childrenAfterTabs?: TabsSlot
+  className?: string
+  classNameTabs?: string
+  classNameContent?: string
+  styleTabs?: React.CSSProperties
+  styleContent?: React.CSSProperties
+  currencyCode?: string
+  [key: string]: unknown
+}
+
+type TabsState = { activeIndex: number, transition: boolean }
+
+function normalizeTabIndex (value: number | string | undefined, items: unknown[]) {
+  // A cast: an absent index is `+undefined`, NaN, which `|| 0` turns into 0, as it did.
+  const index = Math.max(+(value as number | string) || 0, 0)
   return index < items.length ? index : 0
 }
 
-function renderTab (tab) {
+function renderTab (tab: TabTitle | undefined) {
   if (React.isValidElement(tab)) return tab
   if (tab && typeof tab === 'object') {
-    return <Text>{tab.icon && <Icon name={tab.icon}/>}{tab.text}</Text>
+    // A cast, not a guard: an object that is not an element is read as `{text, icon}`, as it was.
+    const titled = tab as TitleObject
+    return <Text>{titled.icon && <Icon name={titled.icon}/>}{titled.text}</Text>
   }
   return <Text>{tab}</Text>
 }
 
-const split = items => ({tabs: items.map(({tab}) => tab), contents: items.map(({content}) => content)})
+const split = (items: TabItem[]) => ({tabs: items.map(({tab}) => tab), contents: items.map(({content}) => content)})
 
 /**
  * Tabs Component with overridable self-managed state and overflow scrollbars.
@@ -50,22 +98,22 @@ const split = items => ({tabs: items.map(({tab}) => tab), contents: items.map(({
  * Not memoised, although the class was a PureComponent: `React.memo` would skip a parent render with
  * equal props, and the lifecycle ran even then.
  */
-export default function Tabs (props) {
+export default function Tabs (props: TabsProps) {
   const {
     vertical, buttoned, items, children, childrenBeforeTabs, childrenAfterTabs, centerTabs,
     className, classNameTabs, classNameContent, styleTabs, styleContent, currencyCode,
     activeIndex: activeIndexProp, defaultIndex, onChange: _, transitionUpdate,
     ...rest
   } = props
-  const [state, setState] = useState(() => ({
+  const [state, setState] = useState<TabsState>(() => ({
     activeIndex: normalizeTabIndex(activeIndexProp != null ? activeIndexProp : defaultIndex, items),
     transition: false,
   }))
-  const update = patch => setState(current => ({...current, ...patch}))
+  const update = (patch: Partial<TabsState>) => setState(current => ({...current, ...patch}))
   const timers = useTimers()
 
   // The tabs and contents, rebuilt only when the items change by value, as the class's getters were.
-  const cache = useRef(null)
+  const cache = useRef<ReturnType<typeof split> | null>(null)
   if (cache.current === null) cache.current = split(items)
 
   // What a controlled `activeIndex` still owes once the render below has applied it: the
@@ -73,7 +121,7 @@ export default function Tabs (props) {
   // taken precedence, which is how a click in its transition finds out that it lost.
   const [propsSeen, setPropsSeen] = useState(props)
   const [overrides, setOverrides] = useState(0)
-  const [owed, setOwed] = useState(null)
+  const [owed, setOwed] = useState<{ target: number, transition: boolean } | null>(null)
   if (props !== propsSeen) {
     setPropsSeen(props)
     const itemsChanged = !isEqual(items, propsSeen.items)
@@ -97,26 +145,27 @@ export default function Tabs (props) {
   }
 
   // What a timer reads when it fires: the latest props, as `this.props` was, and the overrides so far.
-  const latest = useRef(null)
+  // Read through non-null assertions: every render assigns it before any handler or timer runs.
+  const latest = useRef<{ props: TabsProps, overrides: number } | null>(null)
   latest.current = {props, overrides}
-  const report = (activeIndex) => {
-    const {onChange} = latest.current.props
+  const report = (activeIndex: number) => {
+    const {onChange} = latest.current!.props
     if (onChange) onChange(activeIndex)
   }
-  const updateTab = (activeIndex) => {
+  const updateTab = (activeIndex: number) => {
     update({activeIndex, transition: false})
     report(activeIndex)
   }
   // The tab changes after the transition, normalised against the items current at fire time.
-  const scheduleTab = (activeIndex) => {
+  const scheduleTab = (activeIndex: number) => {
     timers.clear()
-    const overridesAtStart = latest.current.overrides
+    const overridesAtStart = latest.current!.overrides
     timers.setTimeout(() => {
-      const {props: {items: currentItems}, overrides: currentOverrides} = latest.current
+      const {props: {items: currentItems}, overrides: currentOverrides} = latest.current!
       if (currentOverrides === overridesAtStart) updateTab(normalizeTabIndex(activeIndex, currentItems))
     }, 50) // 50 ms is needed to allow full rendering so css transition can take effect
   }
-  const setTab = (activeIndex, transition = true, items = latest.current.props.items) => {
+  const setTab = (activeIndex: number, transition = true, items = latest.current!.props.items) => {
     if (transition) {
       update({transition: true})
       scheduleTab(activeIndex)
@@ -135,8 +184,9 @@ export default function Tabs (props) {
   }, [owed])
 
   const {tabs, contents} = cache.current
-  const handle = useRef(null)
-  if (handle.current === null) handle.current = {}
+  const handle = useRef<TabsHandle | null>(null)
+  // A cast, not a guard: the `Object.assign` below fills it, before anything reads it.
+  if (handle.current === null) handle.current = {} as TabsHandle
   Object.assign(handle.current, {props, state, tabs, contents, setTab})
 
   const {activeIndex, transition} = state
