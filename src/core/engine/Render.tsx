@@ -22,8 +22,8 @@ export type RenderProps = {
     form?: unknown
     instance?: { state: { currencyCode?: string }, props?: { onError?: unknown } }
     relativeData?: boolean
-    relativeIndex?: number
-    relativePath?: string
+    relativeIndex?: number | null
+    relativePath?: string | null
     name?: string
     currencyCode?: string
     tooltip?: unknown

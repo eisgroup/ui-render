@@ -1,12 +1,9 @@
-import React, { memo } from 'react'
-import RenderJs from '../index'
+import { memo } from 'react'
+import Render from '../index'
 
-/**
- * The renderer is still JavaScript (§9.6-E3), re-typed as what this file calls it with. Cast where it is
- * called, not in a module-level constant: the engine's modules import each other in a cycle, and only a
- * read at render is guaranteed to see the import's live binding (Data.tsx measured the difference).
- */
-type RenderFunction = (props: Record<string, unknown>) => React.ReactNode
+// `Render` is read where it is called, inside the component, and never captured in a module-level
+// constant: the engine's modules import each other in a cycle, and only a read at render is guaranteed
+// to see the import's live binding (Data.tsx measured the difference).
 
 /** A meta item as this component forwards it: only its identity and its `meta` are touched here. */
 type PopupItem = { id?: string, name?: string, meta?: Record<string, unknown>, [key: string]: unknown }
@@ -54,7 +51,6 @@ export function createPopupContent () {
         // `relativeData` is deliberately not read: every mapped item below hardcodes
         // `relativeData: false` so Render never re-extracts by name.
         const { items, data, _data, form, instance, relativeIndex, relativePath, currencyCode } = props
-        const Render = RenderJs as unknown as RenderFunction
 
         // Map items with current data context, similar to how Render.tsx does it
         // IMPORTANT: Always pass relativePath and relativeIndex to ensure correct field IDs

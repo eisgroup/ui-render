@@ -1,20 +1,22 @@
 import React from 'react'
 import { Active } from '../utils'
-import UIRenderWithUISetupJs from './rules'
+import DocumentWithOwnForm from './rules'
 import LocalDraftTableRow from './components/LocalDraftTableRow'
 import type { LocalDraftTableRowProps } from './components/LocalDraftTableRow'
 
 /**
- * The document is still JavaScript (§9.6-E3 types the engine as it is decomposed), and `Active.UIRender` is
- * an `unknown` slot of the runtime registry. Both are re-typed as open prop bags: exactly the permissiveness
- * their `.js` call sites have. Delete the casts when the engine is converted.
+ * Both nested documents are re-typed as open prop bags where they are read, for reasons of their own,
+ * not the migration's. `Active.UIRender`, the document that shares its parent's form, is a slot of the
+ * runtime registry, which `utils` types `unknown` because it sits below the engine. `rules.tsx`'s default
+ * export, the document with a form of its own, types `initialValues` as a record, and this component
+ * hands it a row's data, which it types `unknown`.
  *
  * The casts happen AT RENDER, not in a module-level constant, and that is load-bearing. `rules.tsx` imports
  * `mapper.tsx`, which imports this file, which imports `rules.tsx` back: while this module is evaluated, that
  * default export is still undefined. A constant would keep the undefined for good (measured: every nested
  * form-backed document rendered nothing), where reading the import inside the render sees the live binding.
  */
-type UnconvertedComponent = React.ComponentType<Record<string, unknown>>
+type OpenComponent = React.ComponentType<Record<string, unknown>>
 
 /** A meta node as `Data` reads it: only its `view`, and a nested `meta`, are looked at here. */
 export type DataMeta = { view?: string, meta?: DataMeta, [key: string]: unknown }
@@ -74,8 +76,8 @@ export default function Data ({
   className, style, embedded, useForm, localDraft,
 }: DataProps) {
   // Use Active.UIRender to avoid circular import
-  const UIRender = Active.UIRender as UnconvertedComponent
-  const UIRenderWithUISetup = UIRenderWithUISetupJs as unknown as UnconvertedComponent
+  const UIRender = Active.UIRender as OpenComponent
+  const UIRenderWithUISetup = DocumentWithOwnForm as OpenComponent
 
   // Never mutate shared meta from config: nested tables (e.g. one Data/TableCells per outer row) reuse the
   // same meta object reference — writing relativePath/relativeIndex on it would leave every row with the

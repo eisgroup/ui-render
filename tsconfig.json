@@ -18,11 +18,12 @@
     "noEmit": true,
     "strict": true,
 
-    // Unconverted JavaScript RESOLVES but is NOT checked. This is what makes the migration
-    // incremental: a `.ts` file may import any of the ~340 `.js` files without the checker
-    // demanding they be converted first, while every converted file is strict from its first day.
-    "allowJs": true,
-    "checkJs": false,
+    // JavaScript is not part of the program (§9.6, the migration's last step). `src/core` and
+    // `src/library` are TypeScript throughout; the demo and the test suites stay JavaScript, which
+    // this config does not check, and a `.ts` file importing a `.js` module fails here instead of
+    // trusting it. During the migration this was `allowJs: true` with `checkJs: false`, so that a
+    // converted file could import an unconverted one.
+    "allowJs": false,
 
     // REQUIRED, not a preference. Babel compiles each file alone, with no cross-file knowledge, so
     // constructs whose meaning depends on the whole program (re-exported types without `export type`,
