@@ -6,10 +6,10 @@ import { Active, isFunction } from '../../../utils'
 import type { Translate } from '../../../utils/_envs'
 
 /**
- * `Active.Field` is an `unknown` slot of the runtime registry, so it is re-typed below as an open prop
- * bag, the permissiveness its `.js` call sites already have.
+ * `Active.Field` is a slot of the runtime registry, which `utils` types `unknown` because it sits below
+ * the form layer that fills it. It is re-typed below, where it is read, as an open prop bag.
  */
-type UnconvertedComponent = React.ComponentType<Record<string, unknown>>
+type OpenComponent = React.ComponentType<Record<string, unknown>>
 
 export type ToggleFieldProps = {
   // @Note: this component should not have parse/format/normalize,
@@ -85,7 +85,7 @@ function ToggleField (props: ToggleFieldProps) {
   // do not pass 'onChange' to Field because it fires event as argument
   const {onChange: _, instance, ...fieldProps} = props
   // Read at render, as `<Active.Field>` was: a test, or a host, may swap the registered Field.
-  const Field = Active.Field as UnconvertedComponent
+  const Field = Active.Field as OpenComponent
   return (
     <ToggleProps.Provider value={props}>
       <Field {...fieldProps} component={ToggleFieldInput}/>

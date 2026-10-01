@@ -16,9 +16,6 @@
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
-    // Everything the component imports is TypeScript (§9.6-E3). Off, so that a JavaScript module
-    // reaching this program fails here instead of publishing a declaration inferred from JavaScript.
-    "allowJs": false,
     "rootDir": "src",
     "outDir": "node_modules/.cache/gen-ts"
   },

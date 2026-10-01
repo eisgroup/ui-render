@@ -28,8 +28,9 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 - `npm run test:env-flags` — Compiles the source with each real webpack config (library, demo dev/prod, the e2e shape) and checks the env flags and `FILE.PATH_IMAGES` each ships, in a realm with no `process`. jest cannot see these: it runs the source against Node's real `process.env`. `_envs.ts` reads `process.env.NODE_ENV`/`REACT_APP_HOMEPAGE` as literals on purpose — never reintroduce `ENV.NODE_ENV` or a `typeof process` guard in front of them
 - `npm run lint:css` — Lint LESS files with stylelint
 - `npm run typecheck` — `tsc --noEmit` over `src` (§9.6-E0). Babel STRIPS TypeScript types without
-  checking them, so this is the only thing that checks them. Unconverted `.js` resolves but is not
-  checked (`checkJs: false`); every `.ts` file is strict. Config: `tsconfig.json`. `tsconfig.build.json` EXTENDS
+  checking them, so this is the only thing that checks them. JavaScript is not part of the program
+  (`allowJs: false`): the demo and the tests stay JavaScript and are not checked, and a `.ts` file that
+  imports a `.js` module fails (TS7016). Every `.ts` file is strict. Config: `tsconfig.json`. `tsconfig.build.json` EXTENDS
   it, for `gen-ts`'s declaration emit, so keep every checking rule in `tsconfig.json`.
 
 ## Architecture
@@ -96,9 +97,10 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
   demo and the test suites are JavaScript. Meta nodes are typed as open JSON (`any` where the engine
   reads and rewrites them by key): `validateMeta` checks them at runtime, and the published types in
   `src/library/contract.ts` describe them. `@babel/preset-typescript` compiles `.ts`/`.tsx` in all three
-  pipelines (library build, demo build, Jest) and `npm run typecheck` checks them. `src/toolchain/`
-  holds a guard proving that stays true — delete it once real converted modules cover the same
-  ground (`docs/UPGRADE-PLAN.md` §9.6).
+  pipelines (library build, demo build, Jest) and `npm run typecheck` checks them. The migration is
+  complete (`docs/UPGRADE-PLAN.md` §9.6): `allowJs` is off, the declarations are generated from the
+  source (E4) and the propTypes are gone (E5). The E0 guard, `src/toolchain/`, was deleted with it: the
+  product's own TypeScript, which every pipeline builds and every suite imports, now proves the same.
 - No `propTypes` and no `prop-types` (§9.6-E5): a component's props are its exported TypeScript props
   type, and a prop's description is that type's JSDoc. Do not add a `propTypes` block. `prop-types` is
   still installed, as a dependency of development packages, so an import would resolve and bundle it
