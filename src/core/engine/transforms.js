@@ -81,7 +81,7 @@ export function metaToProps (meta, config) {
         // prop, `$schema` trips React's invalid-attribute-name warning, and `_comment` rendered
         // the author's prose into the page as `_comment="…"` (2 occurrences in the example
         // corpus). Safe to mutate: `rules.js` hands metaToProps a cloneDeep of the host's meta,
-        // never the host's object. `_comment` is also listed in components/domProps.js, which
+        // never the host's object. `_comment` is also listed in components/domProps.ts, which
         // covers the nodes a component builds from raw meta without passing through here.
         NON_PROP_ATTRIBUTES.forEach(attribute => {
             if (meta[attribute] !== undefined) delete meta[attribute]

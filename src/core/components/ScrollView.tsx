@@ -59,7 +59,7 @@ const ScrollView = ({
   }
 
   // DOM boundary: the inner spread below lands on a <div>. This is the shell every example
-  // renders through, so the engine's own props arrive here. See ./domProps.js.
+  // renders through, so the engine's own props arrive here. See ./domProps.ts.
   const domProps = omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)
 
   return (

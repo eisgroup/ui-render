@@ -50,7 +50,7 @@ export function Button ({
   ...props
 }: ButtonProps) {
   // DOM boundary: ENGINE_PROPS only. `name` is a real attribute on <button> (form
-  // submission), so FIELD_ONLY_PROPS is deliberately NOT applied — see ./domProps.js.
+  // submission), so FIELD_ONLY_PROPS is deliberately NOT applied — see ./domProps.ts.
   // This is what keeps a raw meta node's `view` off the button LocalDraftTableRow builds.
   const domProps = omitProps(props, ENGINE_PROPS)
 

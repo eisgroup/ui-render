@@ -5,19 +5,21 @@ import { isEmail as isEmailValue, isLengthMax, isURLWithProtocol } from '../../u
 
 export const OK = undefined // Return type when validation passes
 
-export function isRequired (value) {
+export type ValidationResult = string | undefined // an error message, or OK
+
+export function isRequired (value: unknown): ValidationResult {
   return (value == null || value === '' || Number.isNaN(value) || (typeof value === 'object' && isEmpty(value))) ? _.REQUIRED : OK
 }
 
-export function url (value) {
+export function url (value: unknown): ValidationResult {
   return (value && !isURLWithProtocol(String(value))) ? _.INVALID_URL : OK
 }
 
-export function email (value) {
+export function email (value: unknown): unknown { // `unknown`: a falsy value is returned as it is
   return value && (isEmailValue(String(value)) ? OK : _.INVALID_EMAIL_ADDRESS)
 }
 
-export function maxLength (length = 100) {
+export function maxLength (length = 100): (value: unknown) => ValidationResult {
   return (value) => (
     isLengthMax(String(value), length)
       ? OK
@@ -25,13 +27,15 @@ export function maxLength (length = 100) {
   )
 }
 
-export function password (value) {
-  password.value = value
-  return (!value || isGoodPassword(value)) ? OK : _.PASSWORD_IS_TOO_WEAK
+type PasswordRule = typeof password & { value?: unknown } // a cast: `value` is assigned inside the function
+
+export function password (value: unknown): ValidationResult {
+  (password as PasswordRule).value = value
+  return (!value || isGoodPassword(value as string)) ? OK : _.PASSWORD_IS_TOO_WEAK
 }
 
 // @Note: must be called after `password` validator, because it depends on value set by that function
-password.confirm = (value) => {
-  return (value === password.value) ? OK : _.PASSWORD_MISMATCH
+password.confirm = (value: unknown): ValidationResult => {
+  return (value === (password as PasswordRule).value) ? OK : _.PASSWORD_MISMATCH
 }
 

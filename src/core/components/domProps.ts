@@ -130,14 +130,16 @@ export const FIELD_ONLY_PROPS = ['name', 'label']
  *  cloneDeep, which on a props bag would deep-clone style objects, event handlers and
  *  React elements, and its default path mutates, which is illegal on props.
  *
+ * The result is an open bag, `unknown` per key: it is forwarded to an element, never inspected.
+ *
  * @param {Object} props - to filter, must not be nil
  * @param {...Array<String>} lists - key lists to remove (see ENGINE_PROPS, FIELD_ONLY_PROPS)
  * @returns {Object} props - without the listed keys, or the input object when none matched
  */
-export function omitProps (props, ...lists) {
-    const denied = lists.length === 1 ? lists[0] : [].concat(...lists)
+export function omitProps (props: Record<string, unknown>, ...lists: string[][]): Record<string, unknown> {
+    const denied = lists.length === 1 ? lists[0] : ([] as string[]).concat(...lists)
     if (!denied.some(key => key in props)) return props
-    const kept = {}
+    const kept: Record<string, unknown> = {}
     Object.keys(props).forEach(key => {
         if (denied.indexOf(key) === -1) kept[key] = props[key]
     })

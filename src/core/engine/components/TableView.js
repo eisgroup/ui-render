@@ -355,7 +355,7 @@ function TableView (props) {
           // component's own test pins the root's attribute set to exactly ['class'], and
           // `omitProps` returns the same object when nothing matched, so the second pass is free.
           // `props.name` is still what decides the FieldArray below — the strip is at the DOM
-          // edge only. See core/components/domProps.js.
+          // edge only. See core/components/domProps.ts.
           {...omitProps(rest, ENGINE_PROPS, FIELD_ONLY_PROPS)}
         >
           {colGroup && <TableColGroup colGroup={colGroup} />}

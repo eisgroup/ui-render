@@ -5,12 +5,62 @@ import Text from './Text'
 import View from './View'
 import Label from './Label'
 import { Active } from '../utils'
-import Picker from 'rc-picker'
+import PickerJs from 'rc-picker'
 import enUs from 'rc-picker/lib/locale/en_US'
 import generateConfig from 'rc-picker/lib/generate/moment'
 import moment from 'moment'
 import { ConfigContext } from '../contexts'
 import { ENGINE_PROPS, omitProps } from './domProps'
+import type { PickerProps } from 'rc-picker'
+import type { Moment } from 'moment'
+import type { Translate } from '../utils/_envs'
+
+type DatePickerProps = PickerProps<Moment>
+
+/**
+ * rc-picker, typed to accept `resize`, which this has always passed it and which it drops: no element
+ * it renders carries the attribute, the open panel included (measured). Typed rather than removed, so
+ * that converting this file changes nothing at runtime.
+ */
+const Picker = PickerJs as React.ComponentType<DatePickerProps & { resize?: boolean }>
+
+/** The named props are read here; the rest is passed to rc-picker through ./domProps. */
+export type InputDateProps = {
+    name?: string
+    id?: string
+    /** Read for its css class only, as `Input` adds it */
+    icon?: unknown
+    lefty?: boolean
+    unit?: unknown
+    label?: string
+    disabled?: boolean
+    className?: string
+    children?: React.ReactNode
+    resize?: boolean
+    readonly?: boolean
+    autofocus?: boolean
+    error?: React.ReactNode
+    info?: React.ReactNode
+    style?: React.CSSProperties
+    onFocus?: DatePickerProps['onFocus']
+    onBlur?: DatePickerProps['onBlur']
+    title?: string
+    placeholder?: string
+    translate?: Translate
+    /** Called with the picked date as `YYYY-MM-DD`, or null when there is none */
+    onChange?: (value: string | null) => void
+    onSelect?: DatePickerProps['onCalendarChange']
+    /** A moment, a Date, a timestamp, or a string in the configured format, `YYYY-MM-DD` or ISO 8601 */
+    value?: unknown
+    defaultValue?: unknown
+    /** `Input`'s, taken only to keep them off the picker */
+    onClickIcon?: unknown
+    done?: unknown
+    classNameIcon?: unknown
+    stickyPlaceholder?: unknown
+    onRemove?: unknown
+    [key: string]: unknown
+}
 
 const InputDate = ({
     name,
@@ -43,7 +93,7 @@ const InputDate = ({
     value: valueFromParent,
     defaultValue,
     ...props
-}) => {
+}: InputDateProps) => {
     const config = useContext(ConfigContext)
 
     const dateFormat = useMemo(() => (config && config.dateFormat) || 'DD/MM/YYYY', [config])
@@ -58,12 +108,12 @@ const InputDate = ({
     if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
     if (!label && title) props.title = translate(title)
 
-    const toMoment = (date) => {
+    const toMoment = (date: unknown): Moment | null => {
         if (date == null || date === '') return null
 
-        let parsed
+        let parsed: Moment
         if (moment.isMoment(date)) parsed = date
-        else if (typeof date !== 'string') parsed = moment(date)
+        else if (typeof date !== 'string') parsed = moment(date as moment.MomentInput)
         else {
             // Strict pass first, so the configured format wins over Moment's guessing. Then fall
             // back to a lenient read: a stored value in a shape we do not list (unpadded `2021-1-2`,
@@ -85,7 +135,8 @@ const InputDate = ({
     // value — one binding for both, so the two cannot disagree again.
     const idHelp = useMemo(() => (error || info) ? id + '-help' : undefined, [id, error, info])
 
-    const onDateChanged = (date) => {
+    // `unknown`: rc-picker's type also covers its multiple mode, and `toMoment` reads whatever arrives.
+    const onDateChanged = (date: unknown) => {
         if (!onChange) return
 
         const changedDate = toMoment(date)

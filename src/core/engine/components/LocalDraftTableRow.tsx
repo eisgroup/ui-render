@@ -1,23 +1,13 @@
 import React, { memo, useState } from 'react'
 import Button from '../../components/Button'
-import InputJs from '../../components/Input'
-import InputDateJs from '../../components/InputDate'
-import TableJs from '../../components/Table'
+import Input from '../../components/Input'
+import InputDate from '../../components/InputDate'
+import Table from '../../components/Table'
 import { Active } from '../../utils'
 import type { Translate } from '../../utils/_envs'
 import { email, isRequired, maxLength, password, url } from '../../components/inputs/validationRules'
 import { integer } from '../../components/inputs/normalizers'
 import { pushDataKindRow, validateNotWithinRangeDraftRow } from '../dataKindPush'
-
-/**
- * The presentational components below are still JavaScript, so TypeScript has nothing to infer
- * their props from. They are re-typed as open prop bags, the permissiveness their `.js` call sites
- * already have. Delete a cast when its component is converted.
- */
-type UnconvertedComponent = React.ComponentType<Record<string, unknown>>
-const Input = InputJs as UnconvertedComponent
-const InputDate = InputDateJs as UnconvertedComponent
-const Table = TableJs as unknown as { Cell: UnconvertedComponent }
 
 type Validator = (value: unknown) => unknown
 
@@ -186,7 +176,9 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate = DEFAULT_T
     const name = def.name as string
     const { draft, fieldErrors } = state
     const value = draft[name]
-    const error = fieldErrors[name]
+    // A cast: a validator's message. Under `validate: 'maxLength'` it is the function the factory returns
+    // (see the note on `maxLength` above), which React does not render.
+    const error = fieldErrors[name] as React.ReactNode
     const { className, type, format: _f, validate: _v, ...rest } = def
     const common = {
       ...rest,

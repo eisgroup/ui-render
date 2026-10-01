@@ -23,7 +23,7 @@ export function Label ({
 }: LabelProps) {
   const child = (typeof children === 'string' && typeof translate === 'function') ? translate(children) : children
   // DOM boundary: <label> takes neither `name` nor a `label` attribute, and the mapper's
-  // LABEL view spreads a whole meta node here. See ./domProps.js.
+  // LABEL view spreads a whole meta node here. See ./domProps.ts.
   return <label {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)}>{child}</label>
 }
 

@@ -22,9 +22,9 @@
  *   FROM THE IN-HOUSE SOURCE which props the root and the shared subcomponent destructure
  *                            consume, which native element each subcomponent renders, and that
  *                            the file no longer references SUIR by any mechanism.
- *   FROM domProps.js         which props are stripped at the DOM boundary, and by which
- *                            component — `Table.js` applies both lists in all seven components
- *                            since step 1, `Dropdown.js` applies both, `TooltipPop.js` none.
+ *   FROM domProps.ts         which props are stripped at the DOM boundary, and by which
+ *                            component — `Table.tsx` applies both lists in all seven components
+ *                            since step 1, `Dropdown.js` applies both, `TooltipPop.tsx` none.
  *                            Derived, so the page cannot claim a strip that is gone.
  *   FROM THE CALL SITES      which JSX attributes the codebase actually puts on `Table` and
  *                            its subcomponents — the step-1 parity surface, kept after the step
@@ -981,7 +981,7 @@ function renderMarkdown (reference) {
     const lines = [
         '<!--',
         `  GENERATED FILE — DO NOT EDIT. Run \`${WRITE_COMMAND}\` to regenerate.`,
-        '  Inventories are derived from the component source, `domProps.js` and the call sites;',
+        '  Inventories are derived from the component source, `domProps.ts` and the call sites;',
         `  the prose comes from ${CURATION}. Generator: ${GENERATOR}.`,
         '-->',
         '',
