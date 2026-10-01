@@ -2,9 +2,11 @@ import React from 'react'
 import Row from '../core/components/Row'
 import View from '../core/components/View'
 import { AppContext, ConfigContext } from '../core/contexts'
+import type { ConfigState } from '../core/contexts'
 
-const AppWrapper = ({ children }) => {
-    const { currency, language } = React.useContext(ConfigContext)
+const AppWrapper = ({ children }: { children?: React.ReactNode }) => {
+    // A cast, not a guard: `main` renders this inside `ConfigOverride`, which always publishes a value.
+    const { currency, language } = React.useContext(ConfigContext) as ConfigState
     const app = React.useContext(AppContext)
 
     // Published as a NODE on the context rather than found by id. Two documents on one page each
@@ -12,7 +14,7 @@ const AppWrapper = ({ children }) => {
     // first one in the DOM — putting the second document's popup under the FIRST document's shell,
     // and therefore under its language and currency classes. Held in state because a ref is null on
     // the render that creates it, and the portal needs the element itself.
-    const [popupRoot, setPopupRoot] = React.useState(null)
+    const [popupRoot, setPopupRoot] = React.useState<HTMLElement | null>(null)
     const appWithRoot = React.useMemo(() => ({ ...app, popupRoot }), [app, popupRoot])
 
     return (

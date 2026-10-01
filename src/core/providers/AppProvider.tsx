@@ -5,12 +5,13 @@ import {
     AppContext,
     initialAppState,
 } from '../contexts'
+import type { ConfigState, PopupState } from '../contexts'
 
-export const AppProvider = ({ children }) => {
+export const AppProvider = ({ children }: { children?: React.ReactNode }) => {
     const [configState, setConfigState] = React.useState(initialConfigState)
     const [appState, setAppState] = React.useState(initialAppState)
 
-    const setConfig = (newConfig) => {
+    const setConfig: ConfigState['setConfig'] = (newConfig) => {
         setConfigState((prevConfig) => ({
             ...prevConfig,
             ...newConfig,
@@ -24,7 +25,7 @@ export const AppProvider = ({ children }) => {
         }))
     }
 
-    const setPopupState = (newState) => {
+    const setPopupState = (newState: PopupState) => {
         const { title, content, isOpen } = newState
         setAppState((prevState) => ({
             ...prevState,

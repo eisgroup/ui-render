@@ -92,7 +92,7 @@ export const mountMeta = (meta, data = {}, overrides = {}) =>
 /**
  * Mount an inline meta with the REAL `AppProvider`, so the modal-popup round trip
  * runs through the provider's own state instead of a stubbed `setPopupState`.
- * The portal root is a host-page obligation (`AppWrapper.js` renders it for the
+ * The portal root is a host-page obligation (`AppWrapper.tsx` renders it for the
  * library, `App.jsx` for the demo) and `Popup.js` resolves it by a global id, so
  * the caller must create it — see `withPopupRoot`.
  */

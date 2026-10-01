@@ -10,11 +10,20 @@ import { createContext } from 'react';
  * supplied `setConfig`, so anything trusting this declaration called a function that did
  * not exist (UPGRADE-PLAN §2.6-2).
  */
-export const initialConfigState = {
+/** The formatting a document renders with, and the call that changes it. */
+export type ConfigState = {
+    dateFormat: string
+    currency: string
+    language: string
+    setConfig: (config: Partial<Omit<ConfigState, 'setConfig'>>) => void
+}
+
+export const initialConfigState: ConfigState = {
     dateFormat: 'MM-DD-YYYY',
     currency: 'USD',
     language: 'en',
     setConfig: () => {},
 }
 
-export const ConfigContext = createContext();
+// No default value: outside a provider the context is `undefined`, which `ConfigOverride` falls back from.
+export const ConfigContext = createContext<ConfigState | undefined>(undefined);

@@ -1,6 +1,19 @@
 import React from 'react'
 
-export const initialAppState = {
+/** What a popup is opened with; `isOpen` left out keeps the popup as it is. */
+export type PopupState = { title?: React.ReactNode, content?: React.ReactNode, isOpen?: boolean }
+
+/** The popup a document shows, the calls that change it, and where it portals to. */
+export type AppState = {
+    isOpen: boolean
+    togglePopupState: () => void
+    title: React.ReactNode
+    content: React.ReactNode
+    setPopupState: (popup: PopupState) => void
+    popupRoot: HTMLElement | null
+}
+
+export const initialAppState: AppState = {
     // Global popup state
     isOpen: false,
     togglePopupState: () => {},

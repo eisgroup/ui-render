@@ -1134,6 +1134,29 @@ What the conversion found:
 
 Measured: the corpus is identical to #139's (107 / 1012 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 327,359 → 327,232 bytes: `ColorSwatch`'s `propTypes` calls had survived tree-shaking. `src/core` + `src/library` are 84 TS files, 13,078 lines, against 65 JS files, 6,977 lines: 65.2% of the lines, was 53.7%.
 
+**Eighth batch, 2026-10-01: everything outside the engine** — `src/core/modules` (but `form/utils.js`), `contexts`, `providers`, `common`, `services` and `src/library`. **What is left in JavaScript is the engine and the form layer it shares a cycle with**: 25 files in `src/core/engine` and `modules/form/utils.js`. Most of `modules/variables` was project boilerplate the upstream starter kit shipped, and it was deleted, not typed. Each name was checked for importers, barrels followed:
+- `_envs.js`. Its `SERVICE`, `Active.SERVICE`, `Active.state` and `Active.usersById` were read by nothing. Its `Active.passwordCheck = () => {}` is the one assignment that did anything: on a server the getter returns it, so `validate: 'password'` read `.score` of `undefined`. **Measured, before and after: a server-side `password` check throws a TypeError either way**, `Cannot read properties of undefined (reading 'score')` then and `Active.passwordCheck is not a function` now. In a browser the getter never returns it. **So a server-side `validate: 'password'` has always thrown, and still does**, a finding for a change of its own.
+- `configs.js` but `UI`, which `form/utils.js` reads: seven network and contact constants, `CONFIG` and `SERVER`.
+- `defaults.js`, `definitions.js` (which `variables/index` localised at load), `urls.js` and `validations.js` entirely.
+- `routes.js` but `ROUTE_HOME`. `ROUTE` and `ROUTES` were assigned into by `common/variables/routes.js` and read by no one. `ROUTE_BASE` and `goTo`, which the env-flags gate and the demo read, stay.
+- `files.js` keeps `FILE.EXT`, `FILE.TYPE`, `IMAGE.EXTENSIONS` and `UPLOAD.BY_ROUTE`. It loses five file-name helpers that only its test called, the MIME tables, `UPLOAD.PATH` and the copy of `components/files`' `FILE` it spread in.
+- `FIELD` loses its four groups no one read: `ID`, `DEF`, `MIN_MAX` and `FOR`. `form/constants` loses with them its nine `= true` prop shorthands, `NAME`, `FORM_ASYNC_VALIDATE`, `API_VALIDATE_FAIL_CODE`, `toSlider` and the `email` field definition.
+- `form/translations.js` was imported by nothing, so the three phrases that definition read, and the `PLEASE_COMPLETE_` header of `validationErrors`, have always rendered "Untranslated". Only tests read `validationErrors`. Its phrases go with the file.
+- `form/inputs/UploadGridField.js` and `UploadGridsField.js` imported views that do not exist. They were never imported, so nothing failed.
+- `common/styles.js` and `common/utils/tests.js`, with no importers at all.
+
+Five `src/core/utils` exports lose their last caller: `optionsFrom`, `enumFrom`, `localise` (which now only calls itself), `fileFormatNormalized` and `LANGUAGE_LEVEL`. They are left for a sweep of `utils` of its own, which would find more.
+
+What the conversion found:
+- **The view-reference generator's guard walked `.js`/`.jsx` only.** It failed the moment `fields.ts` existed, which is the better half of the extension-keyed-gate hazard: H4 counted seven occurrences, and this eighth announced itself. It walks TypeScript now.
+- `asField`'s JSDoc described its options bag as a `Function` parameter, which the checker believed. It is corrected in the still-JavaScript `form/utils.js`, and `DropdownField` annotates its sanitiser.
+- `Upload` loses both of its casts. `AppContext` is typed now, and `UPLOAD.BY_ROUTE` is typed with `| undefined` for an unknown `fileType`.
+- `ConfigContext` is created with an explicit `undefined`, as before.
+- The casts that remain were each proven necessary by removing them alone: `FIELD`'s registries, `Active.Field` read at render, `AppWrapper`'s config, and `AutoSave`'s latest props.
+- A probe of 13 wrong call sites failed on all 13.
+
+Measured: the corpus is identical to the seventh batch's (107 / 1012 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 327,232 → 322,888 bytes. The deleted variables modules shipped, because the barrel that loaded them ran code: `localise(definitions)` and the `Active` assignments. `src/core` + `src/library` are 113 TS files, 13,982 lines, against 26 JS files, 5,647 lines: 71.2% of the lines, was 65.2%.
+
 #### E3 — Engine last
 
 `rules.js` / `form/utils.js` are typed **as they are decomposed** (§9.3) — decomposition outputs are born as `engine/*.ts`. Typing the prototype-patching machinery as-is is wasted effort; don't.

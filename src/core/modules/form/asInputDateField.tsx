@@ -1,13 +1,41 @@
 import { Field } from 'react-final-form'
+import type { FieldRenderProps } from 'react-final-form'
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { isRequired } from '../../components/inputs/validationRules'
 import { touchedFor } from '../../state/formRegistry'
 import { Active } from '../../utils'
 
-export function asInputDateField (InputComponent, {sanitize} = {}) {
+/** What final-form hands the input: its `input` props, without `value`, which the field caches. */
+type FieldInput = Omit<FieldRenderProps<unknown>['input'], 'value'>
+type ValueTransform = (value: unknown) => unknown
+
+/** The props the field reads; the rest are passed to the input it renders. */
+export type DateFieldProps = {
+    name: string
+    /** The document the field is rendered by: its form, and the values it started with */
+    instance?: { form?: object, props: { initialValues?: unknown } }
+    defaultValue?: unknown
+    value?: unknown
+    readonly?: boolean
+    disabled?: boolean
+    error?: React.ReactNode
+    onChange?: (value: unknown, ...args: unknown[]) => void
+    format?: ValueTransform
+    normalize?: ValueTransform
+    parse?: ValueTransform
+    validate?: (value: unknown, allValues: object) => unknown
+    options?: unknown
+    [key: string]: unknown
+}
+
+/**
+ * @param InputComponent - `any` props: the field spreads final-form's input and its own props onto it,
+ *    which only the input's own type describes.
+ */
+export function asInputDateField (InputComponent: React.ComponentType<any>, {sanitize}: { sanitize?: (value: unknown, props: object) => unknown } = {}) {
     if (!Active.Field) Active.Field = Field
-    const Class = class extends PureComponent {
+    const Class = class extends PureComponent<DateFieldProps> {
         static propTypes = {
             // Input `name` attribute
             name: PropTypes.string.isRequired,
@@ -31,6 +59,11 @@ export function asInputDateField (InputComponent, {sanitize} = {}) {
             translate: PropTypes.func,
         }
 
+        _value: unknown
+        hasFocus?: boolean
+        input!: FieldInput
+        initValues: unknown
+
         get value () {
             if (this._value !== void 0) {
                 return this._value
@@ -38,13 +71,13 @@ export function asInputDateField (InputComponent, {sanitize} = {}) {
             return null
         }
 
-        set value (v) {
+        set value (v: unknown) {
             this._value = v
         }
 
         // do not use ...props from input, because it is shared by <Active.Field> instances
         // @Note: react-final-form fires `format()` when `input.value` getter is called
-        Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}) => {
+        Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}: FieldRenderProps<unknown>) => {
             const {
                 onChange, error: err, defaultValue, normalize, format, parse, validate,
                 instance, onRemoveChange, ...props
@@ -84,18 +117,18 @@ export function asInputDateField (InputComponent, {sanitize} = {}) {
             )
         }
 
-        handleFocus = (...args) => {
+        handleFocus = (...args: Parameters<FieldInput['onFocus']>) => {
             this.hasFocus = true
             return this.input.onFocus(...args)
         }
 
-        handleBlur = (...args) => {
+        handleBlur = (...args: Parameters<FieldInput['onBlur']>) => {
             this.hasFocus = false
             return this.input.onBlur(...args)
         }
 
 
-        handleChange = (value, ...args) => {
+        handleChange = (value: unknown, ...args: unknown[]) => {
             const {onChange, normalize, parse = normalize} = this.props
 
             if (this.hasFocus) {
@@ -111,7 +144,9 @@ export function asInputDateField (InputComponent, {sanitize} = {}) {
             const {
                 name, disabled, normalize, format, parse = normalize, validate, options
             } = this.props
-            return <Active.Field {...{name, disabled, normalize, format, parse, validate, options}}
+            // A cast, not a guard, read at render: final-form's `Field`, unless something replaced it.
+            const ActiveField = Active.Field as typeof Field
+            return <ActiveField {...{name, disabled, normalize, format, parse, validate, options}}
                                  component={this.Input}/>
         }
     }

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { FormSpy } from 'react-final-form'
+import type { FormState, FormSubscription } from 'final-form'
 import { PropTypes } from '../../../components'
 import { Loading } from '../../../components/Loading'
 import { debounce, l, localiseTranslation, objChanges, TIME_DURATION_INSTANT } from '../../../utils'
@@ -13,7 +14,19 @@ localiseTranslation({
 
 // One object, as the class's `defaultProps` held one: FormSpy is handed the same subscription on
 // every render rather than a new default each time.
-const VALUES_ONLY = {values: true}
+const VALUES_ONLY: FormSubscription = {values: true}
+
+type Values = Record<string, any>
+
+export type AutoSaveProps = {
+  /** Saves the values, or only the changed ones with `partial`; a returned promise is awaited */
+  onChange: (values: Values) => unknown
+  partial?: boolean
+  showLoader?: boolean
+  subscription?: FormSubscription
+  delay?: number
+  loadContent?: React.ReactNode
+}
 
 /**
  * Final Form Auto Save on Input Value Changes
@@ -38,21 +51,22 @@ function AutoSave ({
   subscription = VALUES_ONLY,
   delay = TIME_DURATION_INSTANT,
   loadContent,
-}) {
+}: AutoSaveProps) {
   const [submitting, setSubmitting] = useState(false)
-  const baseline = useRef(undefined)
-  const inFlight = useRef(null)
-  const latest = useRef(null)
+  const baseline = useRef<Values | undefined>(undefined)
+  const inFlight = useRef<unknown>(null)
+  const latest = useRef<Pick<AutoSaveProps, 'onChange' | 'partial'> | null>(null)
   latest.current = {onChange, partial}
 
-  const handleChange = useMemo(() => debounce(async ({values}) => {
+  const handleChange = useMemo(() => debounce(async ({values}: FormState<Values>) => {
     if (baseline.current == null) {
       baseline.current = values
       return
     }
 
     if (inFlight.current) await inFlight.current
-    const {onChange: save, partial: onlyChanges} = latest.current
+    // Not null: every render sets it, and the first save comes due after a render.
+    const {onChange: save, partial: onlyChanges} = latest.current!
 
     // This diff step is totally optional
     const changes = objChanges(baseline.current, values)

@@ -115,7 +115,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/modules/form/asInputDateField.js': {
+        './src/core/modules/form/asInputDateField.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,
@@ -145,25 +145,25 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/providers/AppProvider.jsx': {
+        './src/core/providers/AppProvider.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,
             lines: 100,
         },
-        './src/library/AppWrapper.js': {
+        './src/library/AppWrapper.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,
             lines: 100,
         },
-        './src/library/main.js': {
+        './src/library/main.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,
             lines: 100,
         },
-        './src/core/modules/form/views/AutoSave.js': {
+        './src/core/modules/form/views/AutoSave.tsx': {
             statements: 100,
             branches: 93,
             functions: 100,
@@ -187,7 +187,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/providers/ConfigOverride.jsx': {
+        './src/core/providers/ConfigOverride.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,

@@ -11,7 +11,7 @@ const { version: PACKAGE_VERSION } = require('../../../package.json')
 // Every place the version is written by hand. Keeping the list here means a release bump is
 // caught in one spot, by name, instead of drifting silently across the tree.
 const VERSION_SITES = [
-    'src/library/AppWrapper.js',
+    'src/library/AppWrapper.tsx',
     'public/index.html',
 ]
 

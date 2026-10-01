@@ -13,6 +13,3 @@ export * from './routes'
 // and without this guard every release from 0.32.4 wrote "undefined/static/images/", a page-relative
 // URL that 404s in every host. Measured through webpack, esbuild and Vite hosts and a Node render.
 if (__PROD__ && HOMEPAGE) FILE.PATH_IMAGES = `${HOMEPAGE}/static/images/`
-
-/* Platform Prefixes */
-export const SERVER = 'SERVER'

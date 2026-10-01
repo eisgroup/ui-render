@@ -17,7 +17,7 @@ const { version } = require(path.join(ROOT, 'package.json'));
 
 // Keep in step with VERSION_SITES in src/library/__tests__/library.public-api-and-wrapper.test.js
 const FILES = [
-    'src/library/AppWrapper.js',
+    'src/library/AppWrapper.tsx',
     'public/index.html',
 ];
 

@@ -4,6 +4,16 @@ import { AppProvider, ConfigOverride } from '../core/providers'
 import { reportMetaProblems } from '../core/engine/validateMeta'
 import AppWrapper from './AppWrapper'
 
+/** What `Render` reads; everything is also handed to the engine, `validateMeta` excepted. */
+export type RenderProps = {
+    meta?: unknown
+    validateMeta?: boolean | ((problems: object[]) => void)
+    dateFormat?: string
+    currency?: string
+    language?: string
+    [key: string]: unknown
+}
+
 /**
  * @param {Object} props - UIRender props
  * @param {Boolean|Function} [props.validateMeta] - dev-mode meta contract check (UPGRADE-PLAN §9.4).
@@ -22,7 +32,7 @@ import AppWrapper from './AppWrapper'
  *    (send it to your error reporting), not a way to silence the console diagnostic.
  * @returns {JSX.Element} the renderer, wrapped in the library's providers and scoped shell
  */
-const Render = ({validateMeta, ...props}) => {
+const Render = ({validateMeta, ...props}: RenderProps) => {
     // During render, deliberately: the failures worth naming (a non-array `items`, a non-string
     // `name`) throw inside UIRender's own render, so an effect would report after the crash it
     // was meant to explain. Keyed on the meta identity so a re-render costs nothing.

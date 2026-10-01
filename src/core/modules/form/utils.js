@@ -83,7 +83,8 @@ export function registeredFieldErrors (form) {
  *    - must use Class to prevent input from loosing focus on input 'onChange'
  *
  * @param InputComponent - React component to use for input
- * @param {Function} sanitize(value, props) - callback to parse (formatted) value from input Field to InputComponent
+ * @param {Object} [options]
+ * @param {function(*, *): *} [options.sanitize] - `(value, props)`: parses the (formatted) value from input Field to InputComponent
  * @returns {Class} React InputComponentField - connected to react-final-form
  */
 export function asField (InputComponent, {sanitize} = {}) {

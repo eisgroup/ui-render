@@ -62,7 +62,7 @@
     "docs:props:check": "node scripts/generate-wrapper-prop-reference.js --check",
     "prepack": "npm run sync-version -- --check && npm run docs:views:check && npm run docs:props:check && npm run build-lib",
     "sync-version": "node scripts/sync-version.js",
-    "version": "node scripts/sync-version.js && git add src/library/AppWrapper.js public/index.html",
+    "version": "node scripts/sync-version.js && git add src/library/AppWrapper.tsx public/index.html",
     "lint:js": "eslint src --ext .js,.jsx,.ts,.tsx --max-warnings 0",
     "lint:css": "stylelint 'src/style/**/*.less'",
     "css:fixture": "node scripts/generate-semantic-css-fixture.js",

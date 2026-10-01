@@ -1,23 +1,8 @@
-import { ROUTE, ROUTES } from '../../modules/variables'
 import { __PROD__, HOMEPAGE } from '../../utils'
 
 export const ROUTE_BASE = __PROD__ ? `${HOMEPAGE || ''}/` : '/'
-const _ROUTE = {
-  HOME: ROUTE_BASE,
-  DOCS: __PROD__ ? ROUTE_BASE : `${ROUTE_BASE}docs`,
-  TEST: `${ROUTE_BASE}test`
-}
-Object.assign(ROUTE, _ROUTE)
 
-const _ROUTES = {
-  FOR_NAV: [],
-  WITHOUT_NAV: []
-}
-
-Object.assign(ROUTES, _ROUTES)
-export { ROUTE, ROUTES }
-
-export function goTo (uri, title = uri, page = uri) {
+export function goTo (uri: string, title: string = uri, page: string = uri) {
   if (typeof window === 'undefined') return
 // eslint-disable-next-line no-restricted-globals
   if (typeof history === 'undefined') return

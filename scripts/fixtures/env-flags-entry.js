@@ -6,7 +6,7 @@
 // webpack parses the imports itself. The `src/` modules it reaches go through the real babel-loader rule.
 import '../../src/core/common/variables' // the side-effect import both real entries make before anything else
 import { ENV, HOMEPAGE, NODE_ENV, __DEV__, __PROD__, __TEST__ } from '../../src/core/utils/_envs'
-import { FILE } from '../../src/core/components/files' // the object Image.tsx reads, NOT the copy in modules/variables
+import { FILE } from '../../src/core/components/files' // the object Image.tsx reads
 import { ROUTE_BASE } from '../../src/core/common/variables'
 
 globalThis.__probe = {

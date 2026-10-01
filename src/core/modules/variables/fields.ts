@@ -1,9 +1,23 @@
-import { definitionSetup, LANGUAGE_LEVEL } from '../../utils'
+import { definitionSetup } from '../../utils'
+
+/** A vocabulary: names, and the strings a meta uses for them. */
+type Vocabulary = Record<string, string>
+
+/** What is registered on `FIELD` besides the three vocabularies `definitionSetup` makes. */
+type FieldRegistries = {
+  /** Action handlers by `FIELD.ACTION` name; each document registers its own */
+  FUNC: Record<string, (...args: any[]) => unknown>
+  /** Validator names, and the validators they select: `modules/form/constants` registers both */
+  VALIDATE: Record<string, string>
+  VALIDATION: Record<string, (value: unknown) => unknown>
+}
 
 /**
  * FIELD DEFINITIONS ===========================================================
  */
-export const FIELD = definitionSetup('TYPE', 'RENDER', 'ACTION', 'ID', 'DEF', 'MIN_MAX', 'FOR')
+// A cast, not a guard: every vocabulary below holds strings, and the registries are plain
+// properties, assigned while the modules load.
+export const FIELD = definitionSetup('TYPE', 'RENDER', 'ACTION') as Record<'TYPE' | 'RENDER' | 'ACTION', Vocabulary> & FieldRegistries
 
 // Field Type Definitions
 FIELD.TYPE = {
@@ -39,7 +53,7 @@ FIELD.TYPE = {
   // gone, anything that loaded the mapper without also loading `rules.js` got a resolver whose
   // `case` for each of these compared against `undefined`, silently making six documented views
   // unreachable. Two mapper tests found it immediately; a consumer would have found it later.
-  // Declared here rather than in `modules/form/constants.js`, which used to register them
+  // Declared here rather than in `modules/form/constants.ts`, which used to register them
   // (§9.3 step 3): `engine/utils.js` compares a meta node against `FIELD.TYPE.SELECT`, so that
   // comparison depended on whether anything had imported the form module yet.
   INPUT: 'Input', // generic input of different types (i.e. type='text', 'textarea', etc.)
@@ -79,32 +93,4 @@ FIELD.ACTION = {
 // Action Methods by Action Type Definitions
 FIELD.FUNC = {
   [FIELD.ACTION.WARN]: console.warn,
-}
-
-// Field IDs for uniquely identifying field definitions
-FIELD.ID = {
-  // Common Inputs
-  ID: 'id', // use lower case value so it can be used as input.name by default
-  ID_HIDDEN: 'id_hidden', // input `name` should be set to `id`, defining with underscore to avoid potential conflict
-  NAME: 'name',
-  EMAIL: 'email',
-  ABOUT: 'about',
-  ADDRESS: 'address',
-  LANGUAGE: 'language',
-  PHONE: 'phone',
-  WEBSITE: 'website',
-
-  // ...to be populated by modules
-}
-
-// Field Min/Max Value Definitions by ID (used for extending base definitions from FIELD.DEF)
-FIELD.MIN_MAX = {
-  // Common
-  [FIELD.ID.LANGUAGE]: [LANGUAGE_LEVEL.BASIC._, LANGUAGE_LEVEL.NATIVE._],
-  // ...to be populated by modules
-}
-
-// Field Definitions by ID
-FIELD.DEF = {
-  // ...to be populated by modules (see form/constants for reference)
 }
