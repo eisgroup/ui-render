@@ -8,7 +8,6 @@ import { Spinner } from '../Spinner'
 import { Icon } from '../Icon'
 import { Label } from '../Label'
 import TextDateValue from '../TextDateValue'
-import { ColorSwatch } from '../ColorSwatch'
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
 
 function withConfig (ui) {
@@ -143,33 +142,5 @@ describe('TextDateValue', () => {
         )
         // Default fallback inside TextDateValue is DD/MM/YYYY
         expect(container.textContent).toContain('15/01/2024')
-    })
-})
-
-describe('ColorSwatch', () => {
-    it('renders an element with the colour applied', () => {
-        const { container } = render(withConfig(<ColorSwatch value="255,0,0" />))
-        const span = container.querySelector('.color__swatch')
-        expect(span).toBeInTheDocument()
-        expect(span.style.backgroundColor).toMatch(/rgb\(255, 0, 0\)/)
-    })
-    it('adds white class for white rgb', () => {
-        const { container } = render(withConfig(<ColorSwatch value="255,255,255" />))
-        expect(container.querySelector('.color__swatch').className).toContain('white')
-    })
-    it('adds black class for black rgb', () => {
-        const { container } = render(withConfig(<ColorSwatch value="0,0,0" />))
-        expect(container.querySelector('.color__swatch').className).toContain('black')
-    })
-    it('omits backgroundColor when value is empty', () => {
-        const { container } = render(withConfig(<ColorSwatch value="" />))
-        const span = container.querySelector('.color__swatch')
-        expect(span.style.backgroundColor).toBe('')
-    })
-    it('respects small/large modifiers', () => {
-        const { container, rerender } = render(withConfig(<ColorSwatch value="255,0,0" small />))
-        expect(container.querySelector('.color__swatch').className).toContain('small')
-        rerender(withConfig(<ColorSwatch value="255,0,0" large />))
-        expect(container.querySelector('.color__swatch').className).toContain('large')
     })
 })

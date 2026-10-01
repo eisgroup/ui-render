@@ -2,6 +2,7 @@ import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React, { useEffect, useRef, useState } from 'react'
 import DropDown from './Listbox'
+import type { ListboxCloseEvent, ListboxOption } from './Listbox'
 import { isEqual, l, localiseTranslation } from '../utils'
 import { _ } from '../utils/translations'
 import Icon from './Icon'
@@ -9,6 +10,42 @@ import Text from './Text'
 import View from './View'
 import { Active } from '../utils'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
+import type { Translate } from '../utils/_envs'
+
+/** An option as a caller gives it: a string (translated), a number, or an object with `text`. */
+export type DropdownOption = string | number | ListboxOption
+
+/** What `onChange` and `onSelect` are called with. A reset by the cascading effect has no event. */
+export type DropdownCallback = (value: unknown, name: string | undefined, event?: ListboxCloseEvent) => void
+
+/** The named props are read here; the rest is passed to the `Listbox` it renders. */
+export type DropdownProps = {
+  value?: unknown
+  /** An absent or null list renders an empty select */
+  options?: DropdownOption[] | null
+  onChange?: DropdownCallback
+  onSelect?: DropdownCallback
+  label?: string
+  placeholder?: string
+  done?: boolean
+  error?: React.ReactNode
+  info?: React.ReactNode
+  float?: boolean
+  className?: string
+  classNameIcon?: string
+  style?: React.CSSProperties
+  fill?: boolean
+  lazyLoad?: boolean
+  optionsLabel?: React.ReactNode
+  initialValues?: unknown
+  readonly?: boolean
+  onClickIcon?: React.MouseEventHandler<HTMLElement>
+  required?: boolean
+  translate?: Translate
+  /** Not read here: it rides the rest bag, and is what the callbacks report */
+  name?: string
+  [key: string]: unknown
+}
 
 localiseTranslation({
   ADD_: {
@@ -52,11 +89,11 @@ const DROPPED_PROPS = [
     'clearable',
 ]
 
-const warnedDropped = new Set()
+const warnedDropped = new Set<string>()
 
 /** `props` without the dropped names, warning once per name in development. */
-function dropUnsupported (props) {
-    const kept = {}
+function dropUnsupported (props: Record<string, unknown>) {
+    const kept: Record<string, unknown> = {}
     Object.keys(props).forEach(key => {
         if (DROPPED_PROPS.indexOf(key) === -1) {
             kept[key] = props[key]
@@ -134,17 +171,18 @@ export function Dropdown ({
   translate = Active.translate,
   value: valueFromParent,
   ...props
-}) {
+}: DropdownProps) {
   // Store options as state to allow additions
   let [options, setOptions] = useState(opts)
   const defaultValue = useRef(typeof valueFromParent !== 'undefined'
     ? valueFromParent
-    : ((Array.isArray(opts) && opts[0] && opts[0].value) || undefined)
+    // A cast, not a guard: a string or a number has no `value`, and reads `undefined`, as it did.
+    : ((Array.isArray(opts) && opts[0] && (opts[0] as ListboxOption).value) || undefined)
   )
   const [value, setValue] = useState(defaultValue.current)
   // What the effect below last took from the parent: `null` until it first runs.
-  const synced = useRef(null)
-  const tempValue = useRef()
+  const synced = useRef<{ value: unknown } | null>(null)
+  const tempValue = useRef<unknown>()
 
   useEffect(() => {
     !isEqual(options, opts) && setOptions(opts)
@@ -160,7 +198,7 @@ export function Dropdown ({
   // selection (§9.3 step 7, `Dropdown.strict-mode.test.js`).
   useEffect(() => {
     const mounting = synced.current === null
-    if (!mounting && synced.current.value === valueFromParent) return
+    if (!mounting && synced.current!.value === valueFromParent) return
     synced.current = {value: valueFromParent}
     if (mounting && typeof valueFromParent === 'undefined') return
     setValue(valueFromParent == null || valueFromParent === '' ? null : valueFromParent)
@@ -184,7 +222,7 @@ export function Dropdown ({
   ))
   const validOptionValues = validOptions.map(String)
   const optionValuesKey = validOptionValues.join('\n')
-  const hasNoValue = value => value == null || value === '' || (Array.isArray(value) && !value.length)
+  const hasNoValue = (value: unknown) => value == null || value === '' || (Array.isArray(value) && !value.length)
   useEffect(() => {
     if (!onChange || !validOptionValues.length) return
     if (hasNoValue(valueFromParent)) return
@@ -207,9 +245,10 @@ export function Dropdown ({
 
   // Sanitize. Any other typeof — boolean, function — passes through unchanged; the bare
   // `no default` comment below is the escape hatch eslint-config-react-app's `default-case` wants.
+  // Casts: the first option's type is taken as every option's, as it was.
   switch (typeof options[0]) {
     case 'string':
-      options = options.map(value => ({text: translate(value), value}))
+      options = (options as string[]).map(value => ({text: translate(value), value}))
       break
     case 'number':
       options = options.map(value => ({text: String(value), value}))
@@ -218,14 +257,14 @@ export function Dropdown ({
       // `typeof null === 'object'`, so null must be excluded here or it lands in the array branch below and
       // becomes the string "null".
       if (options[0].value !== null && typeof options[0].value === 'object') { // value is an array (ex. Color)
-        options = options.map(({ value, text, ...option }) => ({ value: String(value), text: translate(text), ...option }))
+        options = (options as ListboxOption[]).map(({ value, text, ...option }) => ({ value: String(value), text: translate(text), ...option }))
       } else if (typeof options[0].value === 'string') {
-        options = options.map(({ value, text, ...option }) => ({ value: value, text: translate(text), ...option }))
+        options = (options as ListboxOption[]).map(({ value, text, ...option }) => ({ value: value, text: translate(text), ...option }))
       } else if (options[0].value == null) {
         // An option with no value takes its text as the value. The cascading-reset effect above already
         // treats text as that option's value, and the two must agree — otherwise the value it asks the
         // parent to select can never equal the value the option carries, and nothing appears selected.
-        options = options.map(({ value, text, ...option }) => ({ value: value != null ? value : text, text: translate(text), ...option }))
+        options = (options as ListboxOption[]).map(({ value, text, ...option }) => ({ value: value != null ? value : text, text: translate(text), ...option }))
       }
       break
     // no default
@@ -241,11 +280,12 @@ export function Dropdown ({
   // Only when there is help text to point at, so no `aria-describedby` in this product ever dangles.
   const helpId = (props.id && (error || info)) ? `${props.id}-help` : undefined
 
-  if (onClickIcon) props.icon = <Icon name={props.icon || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
+  // A cast, not a guard: with `onClickIcon`, `icon` is the name of the icon to render.
+  if (onClickIcon) props.icon = <Icon name={(props.icon as string | undefined) || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
 
   // On Change gets called before `onAddItem`
   if (onChange || onSelect) {
-    props.onChange = (event, {value}) => {
+    props.onChange = (event: React.SyntheticEvent, {value}: { value: unknown }) => {
       // @Note: this used to map a case-mismatched value back onto an existing option's value, and
       //  §9.7-F1 step 3 part 2 removed that with the rest of the free-text machinery — NOT because
       //  it belonged to it, but because measuring showed the branch had become unreachable. It
@@ -259,7 +299,7 @@ export function Dropdown ({
     }
   }
 
-  if (onSelect) props.onClose = (event) => onSelect(tempValue.current, props.name, event)
+  if (onSelect) props.onClose = (event: ListboxCloseEvent) => onSelect(tempValue.current, props.name, event)
 
 
   // Sanitize Value (for Colors)
@@ -285,7 +325,9 @@ export function Dropdown ({
       <DropDown
         aria-describedby={helpId}
         className={classNames({info, readonly})}
-        options={options}
+        // A cast, not a guard: the sanitiser made objects of strings and numbers, and anything
+        // else passes through as it always did.
+        options={options as ListboxOption[]}
         placeholder={translate(placeholder)}
         error={!!error}
         lazyLoad={lazyLoad}

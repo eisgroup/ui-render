@@ -70,7 +70,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/Dropdown.js': {
+        './src/core/components/Dropdown.tsx': {
             // Branches 99 → 100 at §9.7-F1 step 3 part 2: what was left uncovered belonged to the
             // `search`/`multiple`/`allowAdditions` logic the step removed.
             statements: 100,
@@ -78,7 +78,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        // §9.7-F1 step 3 part 2, the in-house listbox `Dropdown.js` now renders. Same floor as its
+        // §9.7-F1 step 3 part 2, the in-house listbox `Dropdown.tsx` now renders. Same floor as its
         // in-house siblings, and measured rather than aspirational — but read the `TooltipPop`
         // note below for what a floor here does and does not prove. Reaching it was not free: the
         // gaps `--coverage` named were a dead `option.value` fallback in typeahead and three dead
@@ -86,7 +86,7 @@ module.exports = {
         // caller), plus real edges nobody had decided about — every option disabled, `onChange`
         // absent, Escape at a closed control. Those are `Listbox.test.js`'s "edges the coverage
         // floor found" describe.
-        './src/core/components/Listbox.js': {
+        './src/core/components/Listbox.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,
@@ -139,7 +139,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/Slider.js': {
+        './src/core/components/Slider.tsx': {
             statements: 99,
             branches: 96,
             functions: 100,
@@ -277,7 +277,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/components/JsonView/index.js': {
+        './src/core/components/JsonView/index.tsx': {
             statements: 100,
             branches: 93,
             functions: 100,

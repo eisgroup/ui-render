@@ -69,11 +69,11 @@ const EXPECTED = {
     // reading as part of the surface rather than as noise — a suite that mocks the dependency it is
     // meant to be replacing is itself a coupling to it, and this counter is what made that visible.
     // 4 → 3 at step 2 part 3, which took the tooltip in-house: `TooltipPop.tsx`'s own import was
-    // the last PRODUCT site other than `Dropdown.js`. The two remaining test-side sites are
+    // the last PRODUCT site other than `Dropdown`'s. The two remaining test-side sites are
     // `Dropdown.behavior.test.js`'s pair, which step 3 owes — after which this counter reaches 0
     // and step 3½ can delete the dependency.
     //
-    // 3 → 0 at step 3 part 2. `Dropdown.js` now imports `./Listbox`, and re-aiming
+    // 3 → 0 at step 3 part 2. `Dropdown.tsx` now imports `./Listbox`, and re-aiming
     // `Dropdown.behavior.test.js` at that seam took its `import` and its `jest.mock` with it. The
     // counter has done its job: this is the number step 3½ needs before `semantic-ui-react` can
     // leave `dependencies`. It stays pinned at 0 because 0 is now the thing to defend — the next
@@ -356,7 +356,7 @@ describe('generated supported-prop reference', () => {
         // `<TableView>` must not be read as a `<Table>`, or the call-site table would be wrong.
         expect(jsxOpenings('<TableView foo="1"/><Table.Cell bar="2"/>', 'Table')).toEqual([])
 
-        // Prose is not code: `Dropdown.js` mentions `props.onClose` in a comment.
+        // Prose is not code: `Dropdown.tsx` mentions `props.onClose` in a comment.
         expect(stripComments("a // props.x = 1\nb /* props.y = 2 */ c\nconst d = 'http://k'"))
             .toBe("a \nb  c\nconst d = 'http://k'")
     })

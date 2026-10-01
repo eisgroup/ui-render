@@ -107,8 +107,7 @@ export const nextFrame = (state: CounterFrame, end: number): CounterFrame => {
 function Counter ({
   start = 0,
   end,
-  // A cast: `renderFloat` is still JavaScript, and its JSDoc types the element it returns as `Object`.
-  render = renderFloat as CounterRender,
+  render = renderFloat,
   decimals = 0,
   delay,
   duration,

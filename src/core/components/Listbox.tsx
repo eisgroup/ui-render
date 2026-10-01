@@ -7,7 +7,7 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
  * THE LISTBOX — in-house since §9.7-F1 step 3 part 2, no `semantic-ui-react`.
  * =============================================================================================
  *
- * WHAT THIS IS AND IS NOT. It is the inner control `components/Dropdown.js` renders: the part that
+ * WHAT THIS IS AND IS NOT. It is the inner control `components/Dropdown.tsx` renders: the part that
  * shows a selection, opens a list, and reports what a user picked. It is NOT the wrapper — option
  * sanitisation, the cascading reset, translation, the `(value, name, event)` callback signatures
  * and the form plumbing all stay where they are, untouched, because the swap was only ever about
@@ -51,8 +51,40 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
  * names are Semantic's.
  */
 
+/** An option as the listbox renders it: `content` if set, else `text`, which typeahead matches. */
+export type ListboxOption = {
+    text?: React.ReactNode
+    value?: unknown
+    key?: React.Key | null
+    content?: React.ReactNode
+    disabled?: boolean
+    [key: string]: unknown
+}
+
+/** What closes the list: an option's click or key, a click outside, or none, from the trigger. */
+export type ListboxCloseEvent = React.SyntheticEvent | MouseEvent | undefined
+
+/** The named props are read here; the rest is spread onto the `<div role="listbox">`. */
+export type ListboxProps = {
+    options?: ListboxOption[]
+    value?: unknown
+    placeholder?: React.ReactNode
+    error?: boolean
+    disabled?: boolean
+    selection?: boolean
+    compact?: boolean
+    upward?: boolean
+    lazyLoad?: boolean
+    className?: string
+    icon?: React.ReactNode
+    onChange?: (event: React.SyntheticEvent, data: { value: unknown }) => void
+    onClose?: (event: ListboxCloseEvent) => void
+    onOpen?: () => void
+    [key: string]: unknown
+}
+
 /** Keys that move the cursor, and by how much. `null` means "compute from the option count". */
-const CURSOR_KEYS = {
+const CURSOR_KEYS: Partial<Record<string, number | null>> = {
     ArrowDown: 1,
     ArrowUp: -1,
     Home: null,
@@ -64,13 +96,13 @@ const CURSOR_KEYS = {
 /** How long a typed prefix stays open for the next keystroke to extend it. */
 const TYPEAHEAD_RESET_MS = 700
 
-const isSelectable = option => option && !option.disabled
+const isSelectable = (option: ListboxOption | undefined) => option && !option.disabled
 
 /** Per-instance option-id source. See `idPrefix`. */
 let sequence = 0
 
 /** The index the cursor should land on for a key, or -1 when the key does not move it. */
-function cursorFor (key, current, options) {
+function cursorFor (key: string, current: number, options: ListboxOption[]): number {
     const step = CURSOR_KEYS[key]
     if (step === undefined) return -1
     const last = options.length - 1
@@ -86,11 +118,12 @@ function cursorFor (key, current, options) {
     // swap's job is to keep it where there is no defect to fix.
     const count = options.length
     let next = current
-    for (let moved = 0; moved < Math.abs(step); moved += 1) {
+    // Casts, not guards: the two `null` steps are Home's and End's, which returned above.
+    for (let moved = 0; moved < Math.abs(step as number); moved += 1) {
         let candidate = next
         let guard = 0
         do {
-            candidate = (candidate + (step > 0 ? 1 : -1) + count) % count
+            candidate = (candidate + ((step as number) > 0 ? 1 : -1) + count) % count
             guard += 1
         } while (!isSelectable(options[candidate]) && guard <= count)
         if (guard > count) return -1
@@ -109,10 +142,10 @@ function cursorFor (key, current, options) {
  * The second is what a user does when they cannot remember the rest of the word, and without it a
  * repeated letter looks broken.
  */
-function typeaheadFor (prefix, current, options) {
+function typeaheadFor (prefix: string, current: number, options: ListboxOption[]): number {
     const repeated = prefix.length > 1 && /^(.)\1*$/.test(prefix)
     const needle = (repeated ? prefix[0] : prefix).toLowerCase()
-    const order = []
+    const order: number[] = []
     for (let i = 1; i <= options.length; i += 1) order.push((current + i) % options.length)
     if (prefix.length > 1 && !repeated) order.unshift(current)
     // Only a GROWING prefix may stay where it is: typing "al" after "a" must not jump off "Alpha"
@@ -123,7 +156,7 @@ function typeaheadFor (prefix, current, options) {
         const option = options[i]
         if (!isSelectable(option)) return false
         // `text` and nothing else. An earlier draft fell back to `option.value` when `text` was
-        // absent, which cannot happen from the only caller: `Dropdown.js` declares
+        // absent, which cannot happen from the only caller: `Dropdown.tsx` declares
         // `text: PropTypes.any.isRequired` and every branch of its option sanitiser produces one
         // (`optionsLabel` produces `{text: '', content}`). `Listbox` is not exported from the
         // library, so that caller is the whole world — and the fallback disagreed with the trigger,
@@ -149,7 +182,7 @@ export default function Listbox ({
     onClose,
     onOpen,
     ...props
-}) {
+}: ListboxProps) {
     const [open, setOpen] = React.useState(false)
     /**
      * Per-instance id prefix for the options, so the control can point at the cursor with
@@ -166,13 +199,13 @@ export default function Listbox ({
     // The keyboard cursor, which is NOT the selection: it moves with the arrows and commits only on
     // Enter. -1 means "no cursor yet", so opening puts it on the selected option.
     const [cursor, setCursor] = React.useState(-1)
-    const host = React.useRef(null)
+    const host = React.useRef<HTMLDivElement>(null)
     const typed = React.useRef({ prefix: '', at: 0 })
 
     const selectedIndex = options.findIndex(option => String(option.value) === String(value))
     const selected = selectedIndex === -1 ? undefined : options[selectedIndex]
 
-    const close = event => {
+    const close = (event?: ListboxCloseEvent) => {
         setOpen(false)
         setCursor(-1)
         if (typeof onClose === 'function') onClose(event)
@@ -185,7 +218,7 @@ export default function Listbox ({
         if (typeof onOpen === 'function') onOpen()
     }
 
-    const commit = (event, index) => {
+    const commit = (event: React.SyntheticEvent, index: number) => {
         const option = options[index]
         if (!isSelectable(option)) return
         if (typeof onChange === 'function') onChange(event, { value: option.value })
@@ -199,8 +232,9 @@ export default function Listbox ({
      */
     React.useEffect(() => {
         if (!open) return undefined
-        const dismiss = event => {
-            if (host.current && host.current.contains(event.target)) return
+        const dismiss = (event: MouseEvent) => {
+            // A cast, not a guard: a mousedown's target is a node.
+            if (host.current && host.current.contains(event.target as Node)) return
             close(event)
         }
         document.addEventListener('mousedown', dismiss)
@@ -208,7 +242,7 @@ export default function Listbox ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
-    const onKeyDown = event => {
+    const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (disabled) return
         const { key } = event
 

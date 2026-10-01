@@ -4,7 +4,7 @@ import '@testing-library/jest-dom'
 import { ConfigContext, initialConfigState } from '../../../contexts/ConfigContext'
 import LocalDraftTableRow from '../LocalDraftTableRow'
 // The input rules' messages, which a document loads with the engine and this row alone does not.
-import '../../../components/inputs/translations'
+import '../../translations'
 
 const mockPush = jest.fn()
 

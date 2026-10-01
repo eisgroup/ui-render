@@ -94,18 +94,6 @@ export function isBase64 (string: string): boolean {
 }
 
 /**
- * Check if given string is a File URL or Path.
- * Helps to determine if File.src is URL or Path string vs. base64 encoded string.
- * @note: boxed `String` objects reach this function in practice (see components/utils/img.js),
- *        hence the wider parameter type.
- * @param {String} string - to check
- * @returns {Boolean} true - if string contains a dot '.', because a file always needs extension
- */
-export function isFileSrc (string: string | String | null | undefined): boolean {
-	return !!string && string.indexOf('.') > -1
-}
-
-/**
  * Check if given value is a String
  * @param {*} value - to check
  * @returns {Boolean} true - if it's a string

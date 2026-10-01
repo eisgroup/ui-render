@@ -77,9 +77,9 @@
  * tag unfiltered, and no meta props bag reaches either. `AnimateHeight` gets only what `Expand`
  * passes it, and `LinkOut` renders only in the demo. (This paragraph also named seven orphans,
  * since deleted by §9.9-H1, and `utils/SizeMe`, deleted with the `utils/layouts.js` nothing
- * imported.) `ColorSwatch` and `Placeholder` spread onto a component in this list rather than
- * onto an element, so they are filtered downstream. If either of the two is ever wired into
- * `mapper.js`, it becomes a boundary that day.
+ * imported.) `Placeholder` spreads onto a component in this list rather than onto an element, so
+ * it is filtered downstream; so did `ColorSwatch`, deleted with the dead renderers that drew it.
+ * If `Placeholder` is ever wired into `mapper.js`, it becomes a boundary that day.
  */
 
 /**

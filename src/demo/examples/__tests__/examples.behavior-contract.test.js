@@ -88,7 +88,7 @@ const CENSUS_ROLES = [
  * selected-value text with `role="alert" aria-live` (its `Dropdown.js` renderText),
  * so each rendered dropdown contributed exactly one and announced the current value
  * as an alert. This file predicted "every `alert` entry below should go to zero in
- * that commit", and §9.7-F1 step 3 part 2 is that commit: `Listbox.js` conveys the
+ * that commit", and §9.7-F1 step 3 part 2 is that commit: `Listbox.tsx` conveys the
  * keyboard cursor with `aria-activedescendant` instead, which is what the listbox
  * pattern asks for. The counts were carried here rather than filtered out precisely
  * so their removal would be a visible, reviewed line in this diff — and that every

@@ -1,4 +1,14 @@
-export const nicinabox = {
+/** A base16 color scheme: sixteen slots, `base00`-`base07` from background to foreground, then hues. */
+export type Base16Theme = {
+  scheme?: string
+  author?: string
+  base00: string, base01: string, base02: string, base03: string,
+  base04: string, base05: string, base06: string, base07: string,
+  base08: string, base09: string, base0A: string, base0B: string,
+  base0C: string, base0D: string, base0E: string, base0F: string,
+}
+
+export const nicinabox: Base16Theme = {
   scheme: 'nicinabox',
   author: 'nicinabox (http://github.com/nicinabox)',
   base00: 'rgba(0, 0, 0, 0)', // modified to match site's background

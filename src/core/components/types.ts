@@ -6,7 +6,12 @@ import PropTypes from 'prop-types'
  * =============================================================================
  */
 
-export const type = {}
+/**
+ * `any`, deliberately. The proxy hands out validators and validator FACTORIES (`Enum`, `Of`, `ListOf`,
+ * `OneOf`) side by side, and its callers read `.isRequired` off one and call the other. §9.6-E5
+ * retires this file together with `prop-types`, so a precise type would be written to be deleted.
+ */
+export const type: Record<string, any> = {}
 
 /* Common types */
 type.Any = PropTypes.any
@@ -31,7 +36,7 @@ type.NumberOrString = PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 type.Object = PropTypes.object
 type.ObjectOf = PropTypes.objectOf
 type.Of = PropTypes.shape
-type.OneOf = (...types) => PropTypes.oneOfType(types)
+type.OneOf = (...types: PropTypes.Validator<unknown>[]) => PropTypes.oneOfType(types)
 type.Promise = PropTypes.shape({
   then: PropTypes.func.isRequired,
   catch: PropTypes.func.isRequired

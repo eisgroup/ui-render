@@ -220,7 +220,7 @@ const IN_HOUSE_CURATION = {
             + 'names for the machinery behind them, plus `clearable`. THE MECHANISM MATTERS AS MUCH AS '
             + 'THE LIST: Semantic DECLARED every one of these, so passing one used to be harmless, '
             + 'while `Listbox` spreads what it does not destructure onto its element — a dropped prop '
-            + 'would have become a DOM attribute. `Dropdown.js` strips them and warns once per name in '
+            + 'would have become a DOM attribute. `Dropdown.tsx` strips them and warns once per name in '
             + 'development instead, the same mechanism `TooltipPop` uses. Six names, one decision. The evidence is that nothing declares them: not the '
             + 'tracked examples, not the consumer-only record, and no answer to the changelog entry '
             + 'that asked. This is a BREAKING change for anyone who did and did not say so, which '
@@ -234,7 +234,7 @@ const IN_HOUSE_CURATION = {
         elements: {},
         classContract: 'THE WRAPPER emits `input--wrapper` plus `{float, done, labeled, fill-width, '
             + 'required, info, readonly}` and the caller\'s `className`, unchanged by the swap. THE '
-            + 'CONTROL, one level down in `Listbox.js`, emits `ui`, then the '
+            + 'CONTROL, one level down in `Listbox.tsx`, emits `ui`, then the '
             + '`{active, visible, error, disabled, compact, upward}` modifiers, then `selection`, then '
             + '`dropdown`, then the wrapper-derived `{info, readonly}` — the same token SET Semantic '
             + 'built. Order is not the contract (no loaded selector depends on it); PRESENCE is, and '

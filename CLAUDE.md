@@ -89,7 +89,8 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 - react-final-form for form state management
 - moment for dates (peer dependency, externalized); charts are custom SVG (`src/core/components/charts/` — no recharts)
 - The source is mixed JavaScript and TypeScript, converted file by file (§9.6-E2/E3; the engine
-  converts as it is decomposed): `@babel/preset-typescript` compiles `.ts`/`.tsx` in all three
+  converts as it is decomposed). `src/core/utils` and `src/core/components` are TypeScript
+  throughout, tests aside. `@babel/preset-typescript` compiles `.ts`/`.tsx` in all three
   pipelines (library build, demo build, Jest) and `npm run typecheck` checks them. `src/toolchain/`
   holds a guard proving that stays true — delete it once real converted modules cover the same
   ground (`docs/UPGRADE-PLAN.md` §9.6).
