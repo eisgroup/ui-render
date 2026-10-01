@@ -183,11 +183,11 @@ describe('overlay behavioural contract', () => {
          * Added by §9.7-F1 step 2 part 1. The clauses above drive `view: "Tooltip"`
          * only, which is one of three ways meta reaches `TooltipPop` — and the
          * least used of them, since ANY node can carry a `tooltip` attribute
-         * instead (`Render.js:107`). A replacement that wired up the `view` and
+         * instead (`Render.tsx:152`). A replacement that wired up the `view` and
          * forgot the attribute would have passed this suite.
          *
          * The object form still matters twice over: it is the only place a meta author
-         * reaches the component's own prop surface, because `Render.js` spreads the
+         * reaches the component's own prop surface, because `Render.tsx` spreads the
          * object straight through. Part 3 NARROWED that surface deliberately, from
          * `Popup.handledProps` ∪ `Portal.handledProps` (45 names) to the 13 the
          * component declares — see `docs/SUPPORTED-PROPS.md` for the dropped list and
@@ -249,8 +249,8 @@ describe('overlay behavioural contract', () => {
              * the default.
              *
              * The passthrough itself is still real and still needs gating, because
-             * `Render.js` spreads the object verbatim — so this drives a prop the
-             * component declares and neither `Render.js` nor `mapper.js` maps.
+             * `Render.tsx` spreads the object verbatim — so this drives a prop the
+             * component declares and neither `Render.tsx` nor `mapper.js` maps.
              * `position` is the sharpest choice: it decides which of `tooltip.less`'s
              * eight placement rules paints the bubble, and nothing between the meta and
              * the component touches it.

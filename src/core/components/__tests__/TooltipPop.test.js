@@ -347,7 +347,7 @@ describe('TooltipPop — what `title` accepts, and what each shape emits', () =>
 
 describe('TooltipPop — the passthrough surface, deliberately narrowed', () => {
     /**
-     * `Render.js` spreads an object `tooltip` straight into this component, so whatever
+     * `Render.tsx` spreads an object `tooltip` straight into this component, so whatever
      * it accepts is reachable from a meta. Under SUIR that was `Popup.handledProps` ∪
      * `Portal.handledProps` — 45 names, 16 of them undocumented Portal-only props.
      * Part 3 narrowed it to the 13 the component declares plus `style`/`data-*`/

@@ -56,9 +56,9 @@ export function createPopupContent () {
         const { items, data, _data, form, instance, relativeIndex, relativePath, currencyCode } = props
         const Render = RenderJs as unknown as RenderFunction
 
-        // Map items with current data context, similar to how Render.js does it
+        // Map items with current data context, similar to how Render.tsx does it
         // IMPORTANT: Always pass relativePath and relativeIndex to ensure correct field IDs
-        // Set relativeData to false to prevent Render.js from automatically extracting data by name
+        // Set relativeData to false to prevent Render.tsx from automatically extracting data by name
         // This ensures _data remains the single row element, not the entire array
         const mappedItems = items.map((item) => {
             const mappedItem: PopupItem = {
@@ -69,7 +69,7 @@ export function createPopupContent () {
                 instance,
                 relativeIndex,
                 relativePath,
-                relativeData: false, // Prevent automatic data extraction by name in Render.js
+                relativeData: false, // Prevent automatic data extraction by name in Render.tsx
                 currencyCode
             }
             // Ensure relativePath and relativeIndex are always set (not just for TableCells)
@@ -91,14 +91,14 @@ export function createPopupContent () {
         })
         // Pass relativePath and relativeIndex to Render component itself
         // This ensures they are available in Render.props and passed down correctly
-        // Set relativeData to false to prevent Render.js from automatically extracting data by name
+        // Set relativeData to false to prevent Render.tsx from automatically extracting data by name
         // This ensures _data remains the single row element throughout the render tree
         // Add key prop to avoid React warning about missing keys
         return mappedItems.map((item, idx) => Render({
             ...item,
             relativePath,
             relativeIndex,
-            relativeData: false, // Prevent automatic data extraction by name in Render.js
+            relativeData: false, // Prevent automatic data extraction by name in Render.tsx
             key: item.id || item.name || `popup-item-${idx}`
         }))
     })

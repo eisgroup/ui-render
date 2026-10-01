@@ -70,11 +70,11 @@ const RenderComponent = ({
     // Superseded by the INSTANCE's translator below, and `translate` is a real HTML global attribute:
     // left in `props` it reaches the DOM via spread (e.g. TableCell -> <td>) and React warns on the function value.
     translate: _translate,
-    // Engine-internal: `Render.js` hands this to every node so value renderers can pick a currency symbol,
+    // Engine-internal: `Render.tsx` hands this to every node so value renderers can pick a currency symbol,
     // but most views never read it, and left in `props` it reached the DOM as currencycode="USD" on div/span/
     // td/th/tr/input (331 occurrences across 33 of the 38 examples). Stripping it here rather than in each
     // presentational component is safe because the propagation *down the tree* is done independently by
-    // `Render.js`; only the leaf spread is cut. The two views that genuinely consume it -- `List`, which
+    // `Render.tsx`; only the leaf spread is cut. The two views that genuinely consume it -- `List`, which
     // injects it into every rendered item, and the Tabs branch, which injects it into tab/content
     // definitions -- receive it explicitly below.
     currencyCode,
@@ -431,7 +431,7 @@ const RenderComponent = ({
                 props.children = props.renderLabel(props.children)
                 delete props.renderLabel
             } else if (props.name) {
-                // With `relativeData: false` Render.js did not resolve the data by `name`. Popup content renders
+                // With `relativeData: false` Render.tsx did not resolve the data by `name`. Popup content renders
                 // its items that way, against one row: in `_data` when the popup resolved it, else in `data`,
                 // which is the row for a popup declared inside a nested row document. Rendered as the text,
                 // that context was a crash for an object (React rejects objects as children) and nothing for

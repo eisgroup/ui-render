@@ -113,7 +113,7 @@ describe('the content of a template popup', () => {
 /**
  * A POPUP ITEM BOUND BY `name` SHOWS ITS ROW'S FIELD.
  *
- * Popup content is rendered with `relativeData: false`, so Render.js does not resolve an item's data
+ * Popup content is rendered with `relativeData: false`, so Render.tsx does not resolve an item's data
  * by `name`, and `_data` stays the whole row. A `Text` bound by `name` rendered that object as its
  * child, which React rejects — `config.md`'s "popup fields receive the current row's data" held for
  * inputs only. The mapper now reads the field from the row.

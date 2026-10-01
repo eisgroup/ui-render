@@ -80,6 +80,22 @@ describe('TableView', () => {
         expect(container.textContent).toContain('Group A')
     })
 
+    // A header without a sort used to get `onClick={false}`, from `hasSort && handler`, and React
+    // warns about a `false` listener once the table has any sort at all. Found by the checker, which
+    // rejects `false` as a click handler for the same reason React does.
+    it('gives a header without a sort no click handler, and logs nothing', () => {
+        const errors = []
+        const spy = jest.spyOn(console, 'error').mockImplementation((...args) => errors.push(String(args[0])))
+        try {
+            const sorts = [{ id: 'name', order: 1 }]
+            const { container } = render(wrap(<TableView items={items} headers={headers} sorts={sorts} {...defaults} />))
+            expect(container.querySelectorAll('th').length).toBe(2)
+        } finally {
+            spy.mockRestore()
+        }
+        expect(errors).toEqual([])
+    })
+
     it('renders sort icons when sorts are configured', () => {
         const onSort = jest.fn()
         const sorts = [{ id: 'name', order: 1 }]
