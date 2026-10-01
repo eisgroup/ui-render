@@ -63,6 +63,26 @@ const flush = (ms = 0) => act(async () => { await new Promise(resolve => setTime
 // Long enough for the debounced input sync and the date picker's blur to settle: compared before
 // either has, an edit shows a transient state that differs between runs for reasons of timing only.
 const SETTLE_AFTER_EDIT = 400
+
+/**
+ * VIRTUAL TIME FOR THE TWO RUNS BEING COMPARED. On real time a read lands wherever the machine's speed
+ * puts it, and a slow CI runner put one: `ProgressBar` fills its bar 200 ms after it mounts, and on
+ * React 16 under StrictMode the `all` example took longer than that to mount and settle, so the strict
+ * run read `width: 100%` against the plain run's `width: 0%` (CI run 36870778501). Measured across the
+ * corpus, that fill is the one thing still changing after the read; nothing else moves after it.
+ *
+ * Only the timers are faked, so the two runs read the DOM at the same moment of their own clock, as
+ * slow as the machine may be. `Date`, the microtask queues, `setImmediate` and the animation frames
+ * stay real: nothing in the corpus needs them faked, and React's act and its scheduler use them.
+ * `advanceTimersByTimeAsync` lets promises settle between timers, as real time does.
+ */
+const VIRTUAL_TIMERS = {
+    doNotFake: [
+        'Date', 'hrtime', 'performance', 'nextTick', 'queueMicrotask', 'setImmediate', 'clearImmediate',
+        'requestAnimationFrame', 'cancelAnimationFrame', 'requestIdleCallback', 'cancelIdleCallback',
+    ],
+}
+const advance = (ms = 0) => act(async () => { await jest.advanceTimersByTimeAsync(ms) })
 const strip = message => message.split('\n')[0]
 
 /** One example, mounted, edited and unmounted, with what it reported and what it left. */
@@ -75,13 +95,14 @@ async function exercise (example, { strict }) {
     const warnings = jest.spyOn(console, 'warn').mockImplementation((...args) => { reported.push(strip(args.join(' '))) })
     const Wrapper = strict ? React.StrictMode : React.Fragment
     const result = {}
+    jest.useFakeTimers(VIRTUAL_TIMERS)
     try {
         const view = render(
             <Wrapper>
                 <PublishedUIRender meta={example.meta} data={example.data} initialValues={example.data} onSubmit={() => {}} />
             </Wrapper>
         )
-        await flush()
+        await advance()
         result.mounted = document.body.innerHTML
         result.liveMounted = { ...live }
         const box = screen.queryAllByRole('textbox')[0]
@@ -89,16 +110,17 @@ async function exercise (example, { strict }) {
             fireEvent.focus(box)
             fireEvent.change(box, { target: { value: 'an edit' } })
             fireEvent.blur(box)
-            await flush(SETTLE_AFTER_EDIT)
+            await advance(SETTLE_AFTER_EDIT)
         }
         result.edited = document.body.innerHTML
         view.unmount()
-        await flush()
+        await advance()
         result.liveUnmounted = { ...live }
     } finally {
         errors.mockRestore()
         warnings.mockRestore()
         cleanup()
+        jest.useRealTimers()
     }
     result.reported = reported
     return result
