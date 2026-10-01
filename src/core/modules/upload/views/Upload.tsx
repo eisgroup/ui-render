@@ -1,5 +1,6 @@
 import classNames from '../../../utils/classNames'
 import { ROUTE_HOME, UPLOAD as U } from '../../variables'
+import type { UploadRouteDefaults } from '../../variables/files'
 import React, { Fragment, memo, useContext, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 import Dropzone from '../../../components/Dropzone'
 import type { DropzoneHandle } from '../../../components/Dropzone'
@@ -27,10 +28,6 @@ import { AppContext } from '../../../contexts'
 // Re-exported: `UploadProps.onChange` hands the handle to the host.
 export type { DropzoneHandle }
 
-/** What an upload route contributes when its props do not say (U.BY_ROUTE in modules/variables). */
-type RouteDefaults = { fileTypes?: string, maxSize?: number }
-/** The part of AppContext this view calls. */
-type PopupContext = { setPopupState: (popup: { title: string, content: React.ReactNode }) => void }
 
 export type UploadProps = {
     /** Upload file type, falls back to the route pathname; if given, renders embedded instead of as a modal route */
@@ -91,7 +88,7 @@ function Upload (props: UploadProps) {
         loading = false, children, multiple = true, disabled, readonly, onBlur, labelOnHover, onClose,
         className, classWrap, hasHeader, round, showTypes = true, title, translate = DEFAULT_TRANSLATE,
     } = props
-    const context = useContext(AppContext) as unknown as PopupContext
+    const context = useContext(AppContext)
     const [active, setActive] = useState(false)
     const dropzone = useRef<DropzoneHandle | null>(null)
 
@@ -114,7 +111,8 @@ function Upload (props: UploadProps) {
 
     const uri = get(props, 'location.pathname', ROUTE_HOME) as string
     const fileType = props.fileType || (uri.split(/\//).pop() as string).toLowerCase()
-    const byRoute = (U.BY_ROUTE as unknown as Record<string, RouteDefaults | undefined>)[fileType]
+    // What an upload route contributes when its props do not say; an unknown `fileType` has none.
+    const byRoute: UploadRouteDefaults | undefined = U.BY_ROUTE[fileType]
     const formats = props.formats ? `.${props.formats.join(', .')}` : (byRoute || {}).fileTypes
     const maxSize = props.maxSize || (byRoute || {}).maxSize
 

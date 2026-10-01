@@ -19,7 +19,7 @@
  * Step 4 so the current CSS continues to apply". Part 1 measured that premise false:
  * **no `.ui.popup` rule applied at all.** Every popup rule in the compiled CSS is
  * `.ui-render`-scoped by prefixwrap, `.ui-render` is a `<div>`
- * (`src/library/AppWrapper.js` for the library, `public/index.html` for the demo),
+ * (`src/library/AppWrapper.tsx` for the library, `public/index.html` for the demo),
  * and SUIR's `PortalInner` mounted into `document.body` — outside it. The bubble
  * matched nothing but the two unscoped `*` rules, so the tooltip in the product was
  * unstyled text, positioned by nothing (see `e2e/reference.js` finding 1).

@@ -267,7 +267,7 @@ const IN_HOUSE_CURATION = {
             + 'signature, option sanitisation, case-insensitive dedup on addition, and the cascading '
             + 'reset are all wrapper code, and none of it moved. Only the `<DropDown/>` element at the '
             + 'bottom changed — it is now the in-house `Listbox`, under the same import alias. Two entry points, and they differ: `mapper.js` imports the memoised default '
-            + 'export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.js` imports the '
+            + 'export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.ts` imports the '
             + 'NAMED export for `view: "Select"` — which is the majority path.',
         cssContract: 'The loaded `modules/dropdown` LESS is the largest single semantic module in the '
             + 'compiled CSS and is keyed almost entirely on `.ui.selection.dropdown`, so the coupling '

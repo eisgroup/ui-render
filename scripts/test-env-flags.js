@@ -8,7 +8,7 @@ const { pathToFileURL } = require('url')
  * Build-level env-flag harness.
  *
  * WHAT IT CATCHES. `src/core/utils/_envs.ts` derives NODE_ENV / __PROD__ / __DEV__ from whatever `process.env`
- * becomes AFTER a bundler has rewritten it, and `src/core/common/variables/index.js` builds FILE.PATH_IMAGES from
+ * becomes AFTER a bundler has rewritten it, and `src/core/common/variables/index.ts` builds FILE.PATH_IMAGES from
  * those flags. No jest suite can see that: jest runs the source against Node's real `process.env`. This compiles
  * the SOURCE with each REAL webpack config and evaluates the output in a realm that, like a browser, has no
  * `process` global -- so it measures what ships, not what jest sees.

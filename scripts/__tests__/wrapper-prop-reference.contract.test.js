@@ -312,7 +312,7 @@ describe('generated supported-prop reference', () => {
         expect(NamedDropdown.displayName).toBe('Dropdown')
         expect(MemoDropdown.displayName).toBeUndefined()
 
-        const field = fs.readFileSync(path.join(ROOT, 'src/core/modules/form/inputs/DropdownField.js'), 'utf8')
+        const field = fs.readFileSync(path.join(ROOT, 'src/core/modules/form/inputs/DropdownField.ts'), 'utf8')
         expect(field).toMatch(/import\s*\{\s*Dropdown\s*\}\s*from\s*'\.\.\/\.\.\/\.\.\/components\/Dropdown'/)
         const adapter = fs.readFileSync(path.join(ROOT, 'src/core/modules/form/utils.js'), 'utf8')
         expect(adapter).toContain("displayName) === 'Dropdown'")

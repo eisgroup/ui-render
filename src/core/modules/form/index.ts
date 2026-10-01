@@ -1,16 +1,9 @@
-import { NAME } from './constants'
-
 /**
  * EXPORTS =====================================================================
  * Modules' Exposing API - to enable consistent and maintainable app integration
  * =============================================================================
  */
-export * from './constants'
+// For what it registers: `FIELD.VALIDATE` and `FIELD.VALIDATION`, which the engine reads.
+import './constants'
 export * from './utils'
 export * from './asInputDateField'
-
-const form = {
-  NAME,
-}
-
-export default form

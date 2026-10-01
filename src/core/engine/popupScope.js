@@ -82,7 +82,7 @@ export function resolvePopupScope ({ id, form, props = {} }) {
  *   path  — the caller's `options.relativePath`, the resolved scope's, the INSTANCE's
  *           `props.relativePath`, the template's own. Nothing in the engine sets that prop: `Data.tsx`
  *           gives a nested instance `index` and `relativeIndex` only. It is reachable through the
- *           host's props, which `library/main.js` spreads onto the top-level instance, though the
+ *           host's props, which `library/main.tsx` spreads onto the top-level instance, though the
  *           public types do not declare it; kept for that reason.
  *   rows  — the resolved scope's data, else the template's `_data`; when that is an array and both
  *           an index and a path are known, the row itself: from the document at the path first, else

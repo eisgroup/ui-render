@@ -1,4 +1,4 @@
-export const downloadFile = (fileName) => (response) => {
+export const downloadFile = (fileName?: string | null) => (response: Blob) => {
   // create file link in browser's memory
   const href = URL.createObjectURL(response);
 

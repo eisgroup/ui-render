@@ -27,7 +27,7 @@ function writeReExport (name) {
 export default {
     mode: 'production',
     devtool: 'source-map',
-    entry: './src/library/index.js',
+    entry: './src/library/index.ts',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'index.js',
@@ -73,7 +73,7 @@ export default {
         // through webpack, esbuild and Vite hosts and a Node server render). Releases whose output
         // still read a live `process.env` (0.30.23–0.32.3) behaved differently per host, and crashed
         // on a minimal `process` shim with no cwd(). Anything that must vary per host needs a runtime
-        // option, not an env variable: see the homepage guard in src/core/common/variables/index.js.
+        // option, not an env variable: see the homepage guard in src/core/common/variables/index.ts.
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('production'),
             'process.env': JSON.stringify({ NODE_ENV: 'production' }),

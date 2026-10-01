@@ -16,7 +16,7 @@ import { joinPath } from './metaPath'
  * checks below are worth.
  *
  * INERT UNLESS ASKED. `validateMeta()` walks nothing until it is called, and the
- * only caller (`src/library/main.js`) calls it only when the host opts in with
+ * only caller (`src/library/main.tsx`) calls it only when the host opts in with
  * the `validateMeta` prop. Nothing here runs in a default host or in the test
  * suite, which matters: several suites assert an exact `console.error` allowlist.
  *

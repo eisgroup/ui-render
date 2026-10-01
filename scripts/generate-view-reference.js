@@ -53,13 +53,13 @@ const WRITE_COMMAND = 'npm run docs:views'
  * assertDeclarationSites() fails if a fourth module starts assigning.
  */
 const DECLARATION_SITES = [
-    { file: 'src/core/modules/variables/fields.js', props: ['TYPE', 'RENDER', 'ACTION'] },
+    { file: 'src/core/modules/variables/fields.ts', props: ['TYPE', 'RENDER', 'ACTION'] },
     // `TYPE` left this file at §9.3 step 3, for the same reason it left `engine/rules.js` at step 2:
     // `engine/utils.js` compares against `FIELD.TYPE.SELECT`, so the comparison depended on whether
-    // anything had imported the form module yet. The names are in `variables/fields.js` now.
+    // anything had imported the form module yet. The names are in `variables/fields.ts` now.
     // `TYPE` left this file at §9.3 step 2: `mapper.js` dispatches on those six names while
     // `rules.js` imports `mapper.js`, so the resolver depended on a constant its own importer
-    // registered. They now sit with the rest in `variables/fields.js`.
+    // registered. They now sit with the rest in `variables/fields.ts`.
     { file: 'src/core/engine/rules.js', props: ['ACTION'] },
 ]
 
@@ -72,7 +72,7 @@ const RESOLVER_FILES = {
     renderField: 'src/core/engine/components/renders.js',
     // FIELD.FUNC registrations for the action names.
     rules: 'src/core/engine/rules.js',
-    fields: 'src/core/modules/variables/fields.js',
+    fields: 'src/core/modules/variables/fields.ts',
 }
 
 const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8')
@@ -129,7 +129,7 @@ function assertDeclarationSites () {
             if (entry.isDirectory()) {
                 if (entry.name === '__tests__' || entry.name === '__mocks__' || entry.name === '__snapshots__') continue
                 walk(relative)
-            } else if (/\.jsx?$/.test(entry.name)) {
+            } else if (/\.[jt]sx?$/.test(entry.name)) { // TypeScript too: the vocabulary moved to `fields.ts`
                 const source = fs.readFileSync(path.join(ROOT, relative), 'utf8')
                 if (!pattern.test(source)) continue
                 found.set(relative, props.filter(prop => new RegExp(`^FIELD\\.${prop}\\s*=\\s*\\{`, 'm').test(source)))

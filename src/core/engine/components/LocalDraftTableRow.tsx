@@ -52,7 +52,7 @@ function collectInputs (items: DraftItem[] | undefined, out: DraftItem[] = []): 
   return out
 }
 
-// Same string keys as FIELD.VALIDATE / metaToProps `validate` (see src/core/modules/form/constants.js)
+// Same string keys as FIELD.VALIDATE / metaToProps `validate` (see src/core/modules/form/constants.ts)
 const VALIDATION_BY_NAME: Record<string, Validator | undefined> = {
   email,
   required: isRequired,

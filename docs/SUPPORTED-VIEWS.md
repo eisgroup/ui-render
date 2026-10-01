@@ -124,7 +124,7 @@ A name that is not below stays an unresolved string rather than raising.
 | `submit` | `FIELD.ACTION.SUBMIT` | `engine/rules.js` | Submits the form, first merging the values of every nested `dataKind` instance into the payload. |
 | `updateDataOnChange` | `FIELD.ACTION.UPDATE_DATA_ON_CHANGE` | `engine/rules.js` | Writes a changed primitive value into every property of the instance data whose key is the field `name`, at any depth. Marked in the source as a temporary solution; it ignores object values, and does nothing when called without a field object. |
 | `upload` | `FIELD.ACTION.UPLOAD` | `engine/rules.js` | Sends the current form data without the file field, the first picked file and every picked file to the host `uploadFile` API call as `(serializedData, file, files)`, and restarts the form with the normalized response. Does nothing when the host supplies no `uploadFile`. An empty response (`undefined`, `null`, `''`, `0`) leaves the data as it was; a failure is logged, with no popup. |
-| `warn` | `FIELD.ACTION.WARN` | `variables/fields.js` | Logs the arguments with `console.warn`. |
+| `warn` | `FIELD.ACTION.WARN` | `variables/fields.ts` | Logs the arguments with `console.warn`. |
 
 ## What this page does and does not guarantee
 

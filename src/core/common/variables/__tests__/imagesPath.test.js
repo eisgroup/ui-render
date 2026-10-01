@@ -2,7 +2,7 @@
  * WHERE A NAME-ONLY `Image` LOADS FROM.
  * =============================================================================================
  *
- * `common/variables/index.js` sets FILE.PATH_IMAGES at load time from the env flags. Under jest the
+ * `common/variables/index.ts` sets FILE.PATH_IMAGES at load time from the env flags. Under jest the
  * flags follow Node's real process.env (NODE_ENV 'test'), so the production branch never runs here on
  * its own — yet it is the branch the PUBLISHED library always takes: its build bakes `process.env` to
  * `{NODE_ENV: 'production'}`, so __PROD__ is true and no homepage is ever set. From 0.32.4 that wrote
@@ -19,7 +19,7 @@ const pathImagesFor = ({ prod, homepage }) => {
             __PROD__: prod,
             HOMEPAGE: homepage,
         }))
-        // The object `Image` reads — `modules/variables/files.js` holds a COPY taken earlier.
+        // The object `Image` reads.
         FILE = require('../../../components/files').FILE
         require('..')
     })

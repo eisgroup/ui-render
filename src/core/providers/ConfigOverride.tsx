@@ -1,5 +1,6 @@
 import React from 'react'
 import { ConfigContext, initialConfigState } from '../contexts'
+import type { ConfigState } from '../contexts'
 
 /**
  * CONFIGURATION PUBLISHED BY A HOST ===========================================
@@ -27,13 +28,20 @@ import { ConfigContext, initialConfigState } from '../contexts'
  * @param {*} children - subtree the configuration applies to
  * @returns {JSX.Element} ConfigContext provider
  */
-export const ConfigOverride = ({dateFormat, currency, language, children}) => {
+export type ConfigOverrideProps = {
+    dateFormat?: string
+    currency?: string
+    language?: string
+    children?: React.ReactNode
+}
+
+export const ConfigOverride = ({dateFormat, currency, language, children}: ConfigOverrideProps) => {
     // `initialConfigState` is the fallback because `ConfigContext` is created without a
     // default value, so a renderer mounted outside `AppProvider` — which is how the demo
     // and the test harnesses mount it — would otherwise publish `undefined` for everything.
     const inherited = React.useContext(ConfigContext) || initialConfigState
     const value = React.useMemo(() => {
-        const given = {}
+        const given: Partial<ConfigState> = {}
         if (dateFormat !== undefined) given.dateFormat = dateFormat
         if (currency !== undefined) given.currency = currency
         if (language !== undefined) given.language = language
