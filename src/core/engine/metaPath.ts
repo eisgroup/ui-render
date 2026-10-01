@@ -2,7 +2,7 @@
  * META PATH GRAMMAR ===========================================================
  *
  * One implementation of the JSON path notation both halves of the §9.4 contract
- * work speak: the dev-mode validator (`validateMeta.js`), which reports where a
+ * work speak: the dev-mode validator (`validateMeta.ts`), which reports where a
  * meta document is wrong, and the render boundary (`Render.js`), which reports
  * where a document failed while rendering. Somebody who has learned to read
  * `items[3].items[0].name` in one message can read it in the other, and there is
@@ -23,7 +23,7 @@
  * @param {Boolean} [index] - whether `key` is an array index
  * @returns {String} path
  */
-export function joinPath (path, key, index) {
+export function joinPath (path: string, key: string | number, index?: boolean): string {
     if (index) return `${path}[${key}]`
     return path ? `${path}.${key}` : String(key)
 }
@@ -47,7 +47,7 @@ export function joinPath (path, key, index) {
  * @param {Number|String} [index] - position of the child in the parent's `items`
  * @returns {String} path of the child, or `path` itself when the position is unknown
  */
-export function childItemPath (path, index) {
+export function childItemPath (path: string, index?: number | string | null): string {
     if (index == null) return path
     return joinPath(joinPath(path, 'items'), index, true)
 }
@@ -56,6 +56,6 @@ export function childItemPath (path, index) {
  * @param {String} path - meta path, '' for the document root
  * @returns {String} the path as it should appear inside a diagnostic message
  */
-export function formatMetaPath (path) {
+export function formatMetaPath (path: string): string {
     return path ? `"${path}"` : 'the meta root'
 }

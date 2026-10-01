@@ -2,12 +2,13 @@ import React from 'react'
 import UIRender from '../core/engine/rules'
 import { AppProvider, ConfigOverride } from '../core/providers'
 import { reportMetaProblems } from '../core/engine/validateMeta'
+import type { MetaProblem } from '../core/engine/validateMeta'
 import AppWrapper from './AppWrapper'
 
 /** What `Render` reads; everything is also handed to the engine, `validateMeta` excepted. */
 export type RenderProps = {
     meta?: unknown
-    validateMeta?: boolean | ((problems: object[]) => void)
+    validateMeta?: boolean | ((problems: MetaProblem[]) => void)
     dateFormat?: string
     currency?: string
     language?: string

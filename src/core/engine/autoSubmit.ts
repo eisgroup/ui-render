@@ -1,8 +1,17 @@
 import { debounce } from '../utils'
+import type { Debounced } from '../utils/function'
 
 // Where the debounced submits are parked on the UI instance. Private to this module: the mapper
 // creates them and `rules.js` cancels them at unmount, and nothing else should know the name.
 const CACHE = '_autoSubmit'
+
+type Submit = (...args: any[]) => unknown
+
+/** The UI instance, as far as auto-submit reads and writes it. */
+export type AutoSubmitHost = {
+    submit: Submit
+    [CACHE]?: Map<number | undefined, Debounced<Submit>>
+}
 
 /**
  * The debounced `instance.submit` for a meta node that declares `autoSubmit`, created once per UI
@@ -20,7 +29,7 @@ const CACHE = '_autoSubmit'
  * `instance.submit` is read once, at creation, exactly as the inline `debounce(instance.submit, …)`
  * it replaces did.
  */
-export function autoSubmitter (instance, delay) {
+export function autoSubmitter (instance: AutoSubmitHost, delay?: number) {
     let byDelay = instance[CACHE]
     if (!byDelay) {
         byDelay = new Map()
@@ -39,7 +48,7 @@ export function autoSubmitter (instance, delay) {
  * Drop every pending auto-submit. Called from the instance's `componentWillUnmount`, so a change
  * typed just before unmount cannot submit a form the user has navigated away from.
  */
-export function cancelAutoSubmit (instance) {
+export function cancelAutoSubmit (instance: AutoSubmitHost) {
     const byDelay = instance[CACHE]
     if (byDelay) byDelay.forEach(submit => submit.cancel())
 }

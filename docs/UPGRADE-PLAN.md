@@ -1161,6 +1161,21 @@ Measured: the corpus is identical to the seventh batch's (107 / 1012 at mount, 2
 
 `rules.js` / `form/utils.js` are typed **as they are decomposed** (§9.3) — decomposition outputs are born as `engine/*.ts`. Typing the prototype-patching machinery as-is is wasted effort; don't.
 
+**The precondition holds now, 2026-10-01: there is no prototype-patching machinery left to type.** §9.3 step 5 replaced the patching with subclasses, and step 6 moved the document onto `documentHost`, so the classes that remain are ordinary class bodies. The engine converts as it is.
+
+**First batch, 2026-10-01: the engine's pure modules and three small components.** That is `apiError`, `applyPeriods`, `autoSubmit`, `dataKindPush`, `download`, `metaPath`, `popupArgs`, `popupScope`, `popupTemplate`, `showIf`, `upload`, `utils`, `validateMeta`, `translations` and `index`, plus `TableColGroup`, `TabList` and the engine's `components/renders`. **Left in JavaScript: `Render`, `Popup`, `Tabs`, `TableView`, `transforms`, `mapper`, `rules` and `form/utils`**, 8 files and 3,904 lines.
+- **Most of these modules were lifted out of `rules.js` at §9.3 step 2 with JSDoc describing their arguments.** So typing them was largely writing that JSDoc down. Each gets an exported options type where it takes an options bag.
+- **`formsStorage`'s entry now types its `form` as final-form's `FormApi`.** Its `meta` stays `unknown`, because the state layer cannot import the engine's meta type. `engine/utils.ts` casts it where it reads it, with the reason beside the cast.
+- **`asField`'s JSDoc said it returns a `Class`.** The checker took that as a type named `Class`, which nothing is assignable to. It now says `import('react').ComponentClass<*>`. The JSDoc is still in the JavaScript `form/utils.js`.
+- **`LocalDraftTableRow` now passes its parent and meta to a typed `pushDataKindRow`.** Its props say so: `parentInstance` is a `DataKindParent`, and `meta` carries the `relativePath` the push reads.
+- **`replaceDeep` is deleted.** `replaceDeepCopy` replaced its only caller at §9.3 step 4, and only its tests called it. They went with it.
+- **The view-reference generator read `engine/components/renders.js` by path**, and its suite failed with ENOENT the moment the file was renamed. That is the ninth occurrence of the path-keyed-gate hazard, and it too announced itself.
+- **A cast-necessity pass removed each new cast in turn.** One was unneeded and was dropped.
+- **A probe of 25 wrong call sites failed on all 25.**
+- **Found, and left for a change of its own: `TableColGroup` renders its `<col>`s without a `key`.** So a meta that sets `colGroup` gets React's "unique key" warning in development. Its own test renders two and prints it. No tracked meta sets `colGroup`, which is why the console-clean contract does not see it.
+
+Measured: the corpus is identical to master's (107 / 1012 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 322,888 → 322,898 bytes. `isCallerArgument` reads its argument through one local, typed for the probe. `src/core` + `src/library` are 131 TS files, 15,908 lines, against 8 JS files, 3,904 lines: 80.3% of the lines, was 71.2%.
+
 #### E4 — Public API switchover (the risky step)
 
 - Switch `gen-ts` from the hand-written `src/library/types/index.ts` to emitting declarations from the real, now-typed entry chain.

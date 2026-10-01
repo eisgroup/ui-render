@@ -1,6 +1,5 @@
 import {
     changeOptionOrderForSelectFields,
-    replaceDeep,
     replaceDeepCopy,
     mapErrorObjectToUIFormat,
     convertFieldNameToTitleCaseText,
@@ -118,48 +117,10 @@ describe('changeOptionOrderForSelectFields', () => {
     })
 })
 
-describe('replaceDeep', () => {
-    it('replaces a key in a flat object', () => {
-        const obj = { status: 'draft', name: 'Test' }
-        replaceDeep(obj, 'status', 'published')
-        expect(obj.status).toBe('published')
-    })
-
-    it('replaces a key in nested objects', () => {
-        const obj = { a: { b: { status: 'old' } } }
-        replaceDeep(obj, 'status', 'new')
-        expect(obj.a.b.status).toBe('new')
-    })
-
-    it('replaces a key in arrays of objects', () => {
-        const arr = [{ status: 'a' }, { status: 'b' }]
-        replaceDeep(arr, 'status', 'replaced')
-        expect(arr[0].status).toBe('replaced')
-        expect(arr[1].status).toBe('replaced')
-    })
-
-    it('does nothing when key is not present', () => {
-        const obj = { name: 'Test' }
-        replaceDeep(obj, 'missing', 'value')
-        expect(obj).toEqual({ name: 'Test' })
-    })
-
-    it('handles mixed nested arrays and objects', () => {
-        const obj = {
-            items: [
-                { nested: { flag: true } },
-                { flag: false },
-            ],
-        }
-        replaceDeep(obj, 'flag', 'updated')
-        expect(obj.items[0].nested.flag).toBe('updated')
-        expect(obj.items[1].flag).toBe('updated')
-    })
-})
-
 describe('replaceDeepCopy', () => {
-    // The same cases as `replaceDeep` above, asserted on the RETURNED tree — plus the one property
-    // that is the reason it exists: the argument comes back exactly as it went in.
+    // The cases the in-place `replaceDeep` it replaced was tested with, asserted on the RETURNED
+    // tree — plus the one property that is the reason it exists: the argument comes back exactly as
+    // it went in.
     it('replaces every matching key, at any depth and in every array element', () => {
         const input = {
             status: 'root',

@@ -54,7 +54,7 @@ FIELD.TYPE = {
   // `case` for each of these compared against `undefined`, silently making six documented views
   // unreachable. Two mapper tests found it immediately; a consumer would have found it later.
   // Declared here rather than in `modules/form/constants.ts`, which used to register them
-  // (§9.3 step 3): `engine/utils.js` compares a meta node against `FIELD.TYPE.SELECT`, so that
+  // (§9.3 step 3): `engine/utils.ts` compares a meta node against `FIELD.TYPE.SELECT`, so that
   // comparison depended on whether anything had imported the form module yet.
   INPUT: 'Input', // generic input of different types (i.e. type='text', 'textarea', etc.)
   SELECT: 'Select', // dropdown / listbox field

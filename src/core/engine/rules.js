@@ -691,7 +691,7 @@ function Decorator (Class) {
 
             // Popup Content Opening
             FIELD.FUNC[FIELD.ACTION.POPUP_OPEN] = (...args) => {
-                // Which popup, and with what — `popupArgs.js`, testable on its own.
+                // Which popup, and with what — `popupArgs.ts`, testable on its own.
                 const parsed = parsePopupArgs(args)
                 if (!parsed) return
                 const { id, options } = parsed
@@ -706,7 +706,7 @@ function Decorator (Class) {
                 
                 // If ID contains template variables or not found, try to find template
                 if (id && (id.includes('{') || this.popupTemplates)) {
-                    // The whole four-source chain lives in `popupScope.js`, testable on its own.
+                    // The whole four-source chain lives in `popupScope.ts`, testable on its own.
                     const currentForm = this.form || this.props.form || form
                     const { relativeIndex, relativeData, relativePath } = resolvePopupScope({
                         id,
@@ -721,7 +721,7 @@ function Decorator (Class) {
                     }
                     
                     // Which registered template the id means, and the key it was found by —
-                    // `popupTemplate.js`, testable on its own.
+                    // `popupTemplate.ts`, testable on its own.
                     const found = findPopupTemplate(this.popupTemplates, id, this.props.index)
                     const popupTemplate = found && found.popupTemplate
                     const templateId = found ? found.templateId : id
@@ -737,7 +737,7 @@ function Decorator (Class) {
                         // Use the index from interpolation for relativeIndex
                         const { items, data: templateData, _data: templateDataLocal, form: templateForm, instance: templateInstance, relativeIndex: templateRelativeIndex, relativePath: templateRelativePath, relativeData: templateRelativeData, title = '', ...popupProps } = popupTemplate
                         
-                        // Row index, array path, row data and document — `popupScope.js`, testable
+                        // Row index, array path, row data and document — `popupScope.ts`, testable
                         // on its own, including the warning for a row popup with no path.
                         const {
                             data: currentData,
@@ -811,7 +811,7 @@ function Decorator (Class) {
 
 
             // Send every form's values to the host and make its answer the data (see
-            // `applyPeriods.js`); a failure shows the host's message in a popup.
+            // `applyPeriods.ts`); a failure shows the host's message in a popup.
             FIELD.FUNC[FIELD.ACTION.ON_APPLY_PERIODS] = () => applyPeriods({
                 updateExperienceData: this.getAPICalls().updateExperienceData,
                 readFormsData: this.getAllFormsData,
@@ -837,7 +837,7 @@ function Decorator (Class) {
             FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
             FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
             FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
-            // Bound to this document, and given the title and content that `popupArgs.js` reads from
+            // Bound to this document, and given the title and content that `popupArgs.ts` reads from
             // the caller's arguments and the meta's. It used to be `popupAlert` itself, unbound, so
             // from 2025-04-17, when the alert moved onto the context, every call threw on
             // `this.context`. Fixed 2026-09-29.

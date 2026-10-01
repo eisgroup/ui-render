@@ -1,6 +1,28 @@
 import { get } from '../utils'
 import { cloneDeep, set } from '../utils/object'
 
+/** A row, or a tree of rows, as final-form holds them. */
+type Values = Record<string, unknown>
+
+/** The parent document's final-form instance, as far as rows are pushed and removed through it. */
+export type DataKindForm = {
+    getState: () => { values?: unknown }
+    reset: (values?: unknown) => void
+    mutators?: {
+        push?: (path: string, value: unknown) => void
+        remove?: (path: string, index: number) => unknown
+    }
+}
+
+/** The parent engine instance, as far as its data is synced from the form. */
+export type DataKindParent = {
+    props?: { instance?: { form?: DataKindForm } }
+    setState?: (update: (prev: { data?: object }) => object, callback?: () => void) => void
+}
+
+/** A `Data` block's meta, as far as its rows are located. */
+type DataKindMeta = { relativePath?: string | null } | null | undefined
+
 /**
  * From {@link registeredFieldValues} (nested tree), take the object for one FieldArray row.
  * addData previously pushed the whole tree so new rows looked empty (cells read `row.periodName`).
@@ -9,7 +31,7 @@ import { cloneDeep, set } from '../utils/object'
  * @param {number} rowIndex - target row index (draft row uses `array.length` as next slot)
  * @returns {*} row object or `registeredValues` if nothing to extract
  */
-export function rowObjectForDataKindAppend (registeredValues, relativePath, rowIndex) {
+export function rowObjectForDataKindAppend (registeredValues: unknown, relativePath: string | null | undefined, rowIndex: number | string | null | undefined): unknown {
     if (registeredValues == null || relativePath == null || relativePath === '') {
         return registeredValues
     }
@@ -27,12 +49,12 @@ export function rowObjectForDataKindAppend (registeredValues, relativePath, rowI
  * Whether a table row object should be kept: not all-null / not only `{}`.
  * Final-form often leaves `{ periodName: undefined, ... }`; DevTools shows that as `{}`.
  */
-export function dataKindRowHasContent (row) {
+export function dataKindRowHasContent (row: unknown): boolean {
     if (row == null) return false
     if (typeof row !== 'object') return true
     if (Array.isArray(row)) return row.length > 0
     for (const key of Object.keys(row)) {
-        const v = row[key]
+        const v = (row as Values)[key] // a cast, not a guard: an object that is not an array
         if (v == null || v === '') continue
         if (typeof v === 'number') {
             if (!Number.isNaN(v)) return true
@@ -55,10 +77,10 @@ export function dataKindRowHasContent (row) {
  * @param {string} endKey
  * @returns {Object|null} map of field name → error message, or null if valid
  */
-export function validateNotWithinRangeDraftRow (draft, peerRows, startKey, endKey) {
+export function validateNotWithinRangeDraftRow (draft: Values, peerRows: unknown, startKey: string, endKey: string): Record<string, string> | null {
     const _a = draft[startKey]
     const _b = draft[endKey]
-    const err = {}
+    const err: Record<string, string> = {}
     if (_a !== undefined && _b !== undefined && _a !== '' && _b !== '') {
         if (_a === _b) {
             err[startKey] = 'Start date and end date cannot be the same'
@@ -100,12 +122,13 @@ export function validateNotWithinRangeDraftRow (draft, peerRows, startKey, endKe
  * @param {*} values - full form values (e.g. root data object)
  * @returns {*} deep clone with compacted `dataKind.*` arrays
  */
-export function compactDataKindArrays (values) {
+export function compactDataKindArrays<T> (values: T): T {
     if (values == null || typeof values !== 'object') {
         return values
     }
     const out = cloneDeep(values)
-    const dk = out.dataKind
+    // A cast, not a guard: what the form values hold under `dataKind`, checked just below.
+    const dk = (out as Values).dataKind as Record<string, unknown> | null | undefined
     if (dk == null || typeof dk !== 'object') {
         return out
     }
@@ -125,7 +148,7 @@ export function compactDataKindArrays (values) {
  * @param {string} kind - Data `kind` / key under `dataKind`
  * @returns {string} dot-path prefix, or '' when the block is the root `data` object's `dataKind`
  */
-export function getDataKindPathFromRelative (relativePath, kind) {
+export function getDataKindPathFromRelative (relativePath: string | null | undefined, kind: string | null | undefined): string {
     if (!relativePath || kind == null || kind === '') {
         return ''
     }
@@ -154,7 +177,7 @@ export function getDataKindPathFromRelative (relativePath, kind) {
  * @param {string} [fallbackDataKindPath] - the instance's registered `dataKindPath`
  * @returns {string} dot-path of the `dataKind` map in the parent form's values
  */
-export function dataKindPathFor (meta, kind, fallbackDataKindPath = '') {
+export function dataKindPathFor (meta: DataKindMeta, kind: string | undefined, fallbackDataKindPath: string = ''): string {
     const rel = meta && meta.relativePath
     const basePath = (rel != null && rel !== '')
         ? getDataKindPathFromRelative(rel, kind)
@@ -167,7 +190,16 @@ export function dataKindPathFor (meta, kind, fallbackDataKindPath = '') {
  * from form values (same pattern as REMOVE_DATA). Do not also splice `data.json` manually — when that array
  * shares a reference with `form.values`, manual spread + `mutators.push` can duplicate the new row.
  */
-export function pushDataKindRow ({ parentUIRender, meta, kind, rowObject, fallbackDataKindPath = '' }) {
+/** What `pushDataKindRow` is given. */
+export type PushDataKindRowArgs = {
+    parentUIRender?: DataKindParent | null
+    meta?: DataKindMeta
+    kind?: string
+    rowObject: unknown
+    fallbackDataKindPath?: string
+}
+
+export function pushDataKindRow ({ parentUIRender, meta, kind, rowObject, fallbackDataKindPath = '' }: PushDataKindRowArgs): boolean {
     const rel = meta && meta.relativePath
     const dataKindPath = dataKindPathFor(meta, kind, fallbackDataKindPath)
     const arrayPath = `${dataKindPath}.${kind}`
@@ -249,7 +281,17 @@ export function pushDataKindRow ({ parentUIRender, meta, kind, rowObject, fallba
  * @param {string} [options.fallbackDataKindPath] - the instance's registered `dataKindPath`
  * @returns {boolean} false when the parent form cannot remove rows
  */
-export function removeDataKindRow ({ parentUIRender, parentForm, meta, kind, index, fallbackDataKindPath = '' }) {
+/** What `removeDataKindRow` is given: see the parameters above. */
+export type RemoveDataKindRowArgs = {
+    parentUIRender: Required<Pick<DataKindParent, 'setState'>>
+    parentForm?: DataKindForm | null
+    meta?: DataKindMeta
+    kind: string
+    index: number | string
+    fallbackDataKindPath?: string
+}
+
+export function removeDataKindRow ({ parentUIRender, parentForm, meta, kind, index, fallbackDataKindPath = '' }: RemoveDataKindRowArgs): boolean {
     const arrayPath = `${dataKindPathFor(meta, kind, fallbackDataKindPath)}.${kind}`
     if (!parentForm || !parentForm.mutators || typeof parentForm.mutators.remove !== 'function') {
         console.warn('REMOVE_DATA: parent form or mutators.remove is not available')

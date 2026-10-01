@@ -7,7 +7,7 @@ import { email, isRequired, maxLength, password, url } from '../../components/in
  */
 
 // The five field views this module used to declare live in `variables/fields.ts` with the rest of
-// the vocabulary (§9.3 step 3). They were registered here, while `engine/utils.js` compares against
+// the vocabulary (§9.3 step 3). They were registered here, while `engine/utils.ts` compares against
 // `FIELD.TYPE.SELECT` — so that comparison worked only because something on the engine's import
 // chain happened to pull this file in. Removing one unrelated import broke Select reordering, in a
 // suite that never mentions this module. Same defect as the six engine views moved at step 2.
