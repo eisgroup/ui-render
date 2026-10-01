@@ -4321,14 +4321,7 @@ exports[`demo example full-DOM contract slider renders a stable, non-empty DOM m
         </span>
         <div aria-orientation="horizontal" aria-valuemax="100" aria-valuemin="0" aria-valuenow="50" class="app__slider__handle" role="slider" style="left: 50%;" tabindex="0">
           <span class="tooltip no-wrap top show">
-            <div class="flex--row">
-              <span class="text">
-                "5,000"
-              </span>
-              <span class="text margin-left-smallest">
-                "%"
-              </span>
-            </div>
+            "50%"
           </span>
         </div>
         <span class="app__slider__mark" style="left: 0%; white-space: nowrap;">

@@ -11,7 +11,8 @@ import View from './View'
 
 /**
  * A tab title: text, a number, a JSX element, or `{text, icon}`. Every object is read for an `icon`
- * first, a JSX element included (where it is undefined), and one without an icon renders as it is.
+ * first, a JSX element included (where it is undefined); without one, a JSX element renders as it is
+ * and `{text}` as its text.
  */
 export type StandaloneTab = string | number | (Partial<React.ReactElement> & { text?: React.ReactNode, icon?: string })
 
@@ -171,9 +172,11 @@ export default function StandaloneTabs (props: StandaloneTabsProps) {
           <View key={i} className={classNames('tabs__item', {active: activeIndex === i && allTabs.length > 1})}
                 onClick={activeIndex !== i ? (() => setTab(i)) : undefined}>
             {typeof tab === 'object'
-              // The cast is the JavaScript's assumption: an object without an `icon` is a JSX element. One
-              // that is not, `{text}` alone, renders as a raw object, which React rejects; no caller passes one.
-              ? (tab.icon ? <Text><Icon name={tab.icon}/>{tab.text}</Text> : tab as React.ReactElement)
+              // Without an icon, a JSX element renders as it is and `{text}` as its text: rendered as the
+              // object itself, `{text}` was rejected by React, although `propTypes` accept it.
+              ? (tab.icon
+                  ? <Text><Icon name={tab.icon}/>{tab.text}</Text>
+                  : (React.isValidElement(tab) ? tab : <Text>{tab.text}</Text>))
               : <Text>{tab}</Text>
             }
           </View>

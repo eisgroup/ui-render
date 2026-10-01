@@ -56,11 +56,9 @@ function collectInputs (items: DraftItem[] | undefined, out: DraftItem[] = []): 
 const VALIDATION_BY_NAME: Record<string, Validator | undefined> = {
   email,
   required: isRequired,
-  // Found while typing this file and kept as it was: `maxLength` is a FACTORY, `maxLength(length)` returns
-  // the validator. Called here with the value, it returns that validator, a function, which the draft
-  // row then records as the field's error, so a draft whose meta says `validate: 'maxLength'` can never
-  // be added. The cast states the mismatch rather than hiding it.
-  maxLength: maxLength as unknown as Validator,
+  // The validator at the factory's default of 100 characters, as `FIELD.VALIDATION` has it: `maxLength`
+  // itself is the factory, and registered here it made every draft with `validate: 'maxLength'` fail.
+  maxLength: maxLength(),
   password,
   url
 }
@@ -176,8 +174,7 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate = DEFAULT_T
     const name = def.name as string
     const { draft, fieldErrors } = state
     const value = draft[name]
-    // A cast: a validator's message. Under `validate: 'maxLength'` it is the function the factory returns
-    // (see the note on `maxLength` above), which React does not render.
+    // A cast: a validator returns its message, or `email`'s falsy value, and the state holds it untyped.
     const error = fieldErrors[name] as React.ReactNode
     const { className, type, format: _f, validate: _v, ...rest } = def
     const common = {

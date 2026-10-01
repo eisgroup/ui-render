@@ -66,7 +66,8 @@ export interface InputNumberProps {
     resize?: boolean
     readonly?: boolean
     float?: boolean
-    error?: string
+    /** The message to show, or `false` while it is not to be shown yet: the form's field wrapper passes that */
+    error?: string | false
     info?: string
     style?: React.CSSProperties
     onFocus?: React.FocusEventHandler<HTMLInputElement>
@@ -356,7 +357,7 @@ InputNumber.propTypes = {
     resize: PropTypes.bool,
     readonly: PropTypes.bool,
     float: PropTypes.bool,
-    error: PropTypes.string,
+    error: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
     info: PropTypes.string,
     style: PropTypes.object,
     onFocus: PropTypes.func,

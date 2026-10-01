@@ -73,13 +73,13 @@
  * decision before anything reaches a cell. The remaining unfiltered spread on the F1 surface is
  * `TooltipPop` -> Semantic's `Popup`, which step 2 owns.
  *
- * Still uncovered, and why that is not the same as unsafe: three components spread onto a DOM
- * tag unfiltered, and no meta props bag reaches any of them. `AnimateHeight` gets only what
- * `Expand` passes it, `LinkOut` renders only in the demo, and `utils/SizeMe` only inside
- * `utils/layouts.js`, which nothing imports. (This paragraph also named seven orphans, since
- * deleted by §9.9-H1.) `ColorSwatch` and `Placeholder` spread onto a component in this list
- * rather than onto an element, so they are filtered downstream. If one of the three is ever
- * wired into `mapper.js`, it becomes a boundary that day.
+ * Still uncovered, and why that is not the same as unsafe: two components spread onto a DOM
+ * tag unfiltered, and no meta props bag reaches either. `AnimateHeight` gets only what `Expand`
+ * passes it, and `LinkOut` renders only in the demo. (This paragraph also named seven orphans,
+ * since deleted by §9.9-H1, and `utils/SizeMe`, deleted with the `utils/layouts.js` nothing
+ * imported.) `ColorSwatch` and `Placeholder` spread onto a component in this list rather than
+ * onto an element, so they are filtered downstream. If either of the two is ever wired into
+ * `mapper.js`, it becomes a boundary that day.
  */
 
 /**
@@ -95,6 +95,12 @@
  *   `translate`    the i18n FUNCTION, not the HTML global attribute — the engine owns this
  *                  key (RenderComponent already strips it), and React warns on a function value
  *   `onDataChanged`/`currencyCode` engine callbacks/config
+ *   `meta`         a node's own meta document, which `Data` and the draft row read; `PopupContent`
+ *                  puts `{relativePath, relativeIndex}` on every popup item, so it reached the
+ *                  popup's spans and inputs as `meta="[object Object]"`
+ *   `@class`       producer metadata: OpenL's serializer tags every meta node with its bean class
+ *                  (`'@class': 'org.openl.generated.beans.Text'`), and React rejects the name with
+ *                  an "Invalid attribute name" warning on every node that carries it
  * @type {Array<String>}
  */
 export const ENGINE_PROPS = [
@@ -108,6 +114,8 @@ export const ENGINE_PROPS = [
     'translate',
     'onDataChanged',
     'currencyCode',
+    'meta',
+    '@class',
 ]
 
 /**

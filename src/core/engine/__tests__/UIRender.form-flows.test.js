@@ -280,4 +280,59 @@ describe('UIRender public form contracts', () => {
         })
         expect(screen.queryByText(secondValues.effectiveAt)).not.toBeInTheDocument()
     })
+
+    it('keeps the error of a field the user touched when its tab is switched away and back', async () => {
+        // final-form forgets a field's `touched` when the field unmounts, which is what a tab switch does,
+        // and the form is still pristine, so only the remembered touch can show the error again. It was
+        // forgotten too while that registry was keyed by react-final-form's per-render form object.
+        const meta = {
+            view: 'Tabs',
+            items: [
+                { tab: 'One', content: { view: 'Input', name: 'first', label: 'First', validate: 'required', required: true } },
+                { tab: 'Two', content: { view: 'Text', label: 'Second tab' } },
+            ],
+        }
+        const values = { first: '' }
+        render(withProviders(<UIRender form meta={meta} data={values} initialValues={values} onSubmit={() => {}} />))
+
+        const input = screen.getByLabelText('First')
+        fireEvent.focus(input)
+        fireEvent.blur(input)
+        await waitFor(() => expect(screen.getByText('Required')).toBeInTheDocument())
+
+        fireEvent.click(screen.getByText('Two'))
+        await waitFor(() => expect(screen.getByText('Second tab')).toBeInTheDocument())
+        fireEvent.click(screen.getByText('One'))
+
+        await waitFor(() => expect(screen.getByLabelText('First')).toBeInTheDocument())
+        expect(screen.getByText('Required')).toBeInTheDocument()
+    })
+
+    it('validates `validate: \'maxLength\'` as at most 100 characters, rather than failing every value', async () => {
+        // `FIELD.VALIDATION.maxLength` was the FACTORY, so the field's validator returned a function, an
+        // error, for every value: the form could never be submitted.
+        const submitted = []
+        const meta = formMeta(
+            { view: 'Input', name: 'note', label: 'Note', validate: 'maxLength' },
+            { view: 'Button', children: 'Send', onClick: 'submit' },
+        )
+        const values = { note: '' }
+        render(withProviders(<UIRender form meta={meta} data={values} initialValues={values} onSubmit={(data) => { submitted.push(data) }} />))
+
+        const input = screen.getByLabelText('Note')
+        fireEvent.focus(input)
+        fireEvent.change(input, { target: { value: 'x'.repeat(101) } })
+        fireEvent.blur(input)
+        await waitFor(() => expect(screen.getByText('Must be less than 100 characters')).toBeInTheDocument())
+        fireEvent.click(screen.getByRole('button', { name: 'Send' }))
+        expect(submitted).toHaveLength(0)
+
+        fireEvent.focus(input)
+        fireEvent.change(input, { target: { value: 'short enough' } })
+        fireEvent.blur(input)
+        await waitFor(() => expect(screen.queryByText('Must be less than 100 characters')).not.toBeInTheDocument())
+        fireEvent.click(screen.getByRole('button', { name: 'Send' }))
+        await waitFor(() => expect(submitted).toHaveLength(1))
+        expect(submitted[0]).toEqual(expect.objectContaining({ note: 'short enough' }))
+    })
 })

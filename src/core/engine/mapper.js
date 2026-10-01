@@ -431,7 +431,14 @@ const RenderComponent = ({
                 props.children = props.renderLabel(props.children)
                 delete props.renderLabel
             } else if (props.name) {
-                props.children = _data
+                // With `relativeData: false` Render.js did not resolve the data by `name`. Popup content renders
+                // its items that way, against one row: in `_data` when the popup resolved it, else in `data`,
+                // which is the row for a popup declared inside a nested row document. Rendered as the text,
+                // that context was a crash for an object (React rejects objects as children) and nothing for
+                // none. The field the item names is in it; a primitive context is left as it was.
+                props.children = relativeData === false && (_data == null || isObject(_data))
+                    ? get(_data == null ? data : _data, props.name)
+                    : _data
             }
             if (view === FIELD.TYPE.TITLE) props.className = cn('h3', props.className)
             return <Text {...props} translate={translate}/>

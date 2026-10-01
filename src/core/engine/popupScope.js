@@ -20,7 +20,8 @@ import { get } from '../utils'
  * The other three were measured over the whole suite and NOT removed, which is the opposite of
  * what §9.3 predicted: sources 1 and 2 never fire in any test, but `Data.tsx` does set the props
  * they read, so they are reachable in a nested document and merely uncovered. Deleting them on the
- * strength of "no test hits this" would have been a live behaviour change.
+ * strength of "no test hits this" would have been a live behaviour change. Source 4 keeps its live
+ * half, the form's values; its search for a row in their keys could never succeed and is gone.
  *
  * @param {String} id - the popup id, possibly already interpolated (`edit.1`)
  * @param {Object} [form] - the form whose state the later sources read
@@ -57,21 +58,13 @@ export function resolvePopupScope ({ id, form, props = {} }) {
         relativeData = form.getState().values
         relativePath = props.relativePath
     }
-    // 4. Try to extract index and path from form field names
-    // Only if relativeIndex not already set
+    // 4. The form's values, which the id interpolation reads. This source also looked for a row in
+    // the keys of those values, `name[index]`, and could not find one: final-form nests a bracketed
+    // name into a real array, so a top-level key never contains `[`. Reading the registered fields
+    // instead, as was meant, would be the very guess `resolvePopupRowContext` refuses below — a row
+    // inferred from field names binds the popup to whichever table comes first — so it is gone.
     else if (relativeIndex == null && hasFormState) {
-        const formState = form.getState()
-        const registeredFields = Object.keys(formState.values || {})
-        // Look for field names that contain array indices
-        for (const fieldName of registeredFields) {
-            const match = fieldName.match(/^(.+)\[(\d+)\]/)
-            if (match) {
-                relativePath = match[1]
-                relativeIndex = parseInt(match[2], 10)
-                break
-            }
-        }
-        relativeData = formState.values
+        relativeData = form.getState().values
     }
 
     return { relativeIndex, relativeData, relativePath }

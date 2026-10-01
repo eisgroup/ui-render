@@ -375,6 +375,22 @@
 
 #### Fixes
 
+- **`validate: 'maxLength'` validates.** The name was registered as the length *factory* rather
+  than a validator, so every value failed: a form field declaring it could never be submitted, and
+  a table draft row could never be added. It now means at most 100 characters, the factory's
+  default.
+- **A popup field bound by `name` shows the row the popup was opened from**, as the Popup
+  documentation says. A `Text` named after a row field rendered nothing in a popup declared inside
+  the row, and the whole row object — which React rejects — in one opened with a row scope.
+- **A touched field keeps its error when its tab is switched away and back.** final-form forgets
+  a field's touched state when the field unmounts, and the renderer's own memory of it lasted a
+  single render, so on a form nobody had edited yet an error the user had already seen vanished.
+- **Two more internal keys stay off the DOM:** `meta`, which every popup item carried as
+  `meta="[object Object]"`, and the `@class` tag OpenL's serializer puts on every meta node, which
+  React reported as an invalid attribute name on each one.
+- **Three development warnings are gone:** `InputNumber` no longer rejects the `error={false}`
+  every field is handed before the user interacts with it, and a nested `Data` document no longer
+  reports its `formProps` and `instance` as missing — it shares its parent's form, by design.
 - Rendered markup no longer carries three junk artefacts. An `Expand` view without an `id` in its
   meta emitted the literal attribute `id="undefined"`, repeated on every such view in the
   document, so a `<label for>` pointing at one could only ever resolve to the first. Table cells

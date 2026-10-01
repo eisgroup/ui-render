@@ -109,3 +109,52 @@ describe('the content of a template popup', () => {
         expect(popupInputs()).toEqual([['dataKind.rows[0].note', 'edited0']])
     })
 })
+
+/**
+ * A POPUP ITEM BOUND BY `name` SHOWS ITS ROW'S FIELD.
+ *
+ * Popup content is rendered with `relativeData: false`, so Render.js does not resolve an item's data
+ * by `name`, and `_data` stays the whole row. A `Text` bound by `name` rendered that object as its
+ * child, which React rejects — `config.md`'s "popup fields receive the current row's data" held for
+ * inputs only. The mapper now reads the field from the row.
+ */
+describe('a template popup item bound by name', () => {
+    let popupRoot
+
+    beforeEach(() => {
+        formsStorage.clear()
+        popupRoot = document.createElement('div')
+        popupRoot.id = 'render-popup-root'
+        document.body.appendChild(popupRoot)
+    })
+
+    afterEach(() => {
+        popupRoot.remove()
+    })
+
+    it('shows the row it was opened from', () => {
+        const textMeta = JSON.parse(JSON.stringify(meta))
+        const cells = textMeta.items[0].renderItemCells.meta.items
+        cells[1].items = [{ view: 'Text', name: 'label' }, { view: 'Input', name: 'note' }]
+        const errors = []
+        const spy = jest.spyOn(console, 'error').mockImplementation((...args) => { errors.push(String(args[0])) })
+        try {
+            const { container } = render(
+                <AppProvider>
+                    <UIRender form meta={textMeta} data={data} initialValues={data} onSubmit={() => {}}/>
+                </AppProvider>
+            )
+            const editButtons = Array.from(container.querySelectorAll('button'))
+                .filter(button => button.textContent.includes('Edit'))
+
+            act(() => { fireEvent.click(editButtons[1]) })
+        } finally {
+            spy.mockRestore()
+        }
+
+        expect(popupRoot.querySelector('.app__popup__box__body span.text')).toHaveTextContent('second')
+        // And the `{relativePath, relativeIndex}` the content adds to each item stays off the DOM.
+        expect(popupRoot.querySelectorAll('[meta]')).toHaveLength(0)
+        expect(errors.filter(message => /Objects are not valid as a React child/.test(message))).toEqual([])
+    })
+})

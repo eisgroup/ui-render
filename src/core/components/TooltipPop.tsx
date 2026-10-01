@@ -24,8 +24,10 @@ type PropsBag = { [key: string]: unknown }
  * on `all` — with no `data-popper-placement` anywhere, and every open raised an uncaught
  * `TypeError` from popper's flip modifier. Cause: SUIR clones the trigger with a `ref`, and of
  * everything a meta can declare NOTHING can hold one (`mapper.js` uses the plain `Row`, `Button`
- * is a `React.memo(function Button)`; only `Dropzone` and the unused `RowRef` export are ref-able),
- * so popper's reference element was `null` and `getClippingParents(null)` threw before a single
+ * is a `React.memo(function Button)`; only `Dropzone` and the unused `RowRef` export are ref-able —
+ * on the React 16-18 of the time: React 19 hands a `ref` to a function component as an ordinary prop,
+ * so `View`, `Row`, `Button` and `Icon` do forward it), so popper's reference element was `null` and
+ * `getClippingParents(null)` threw before a single
  * coordinate was written. On top of that the bubble portaled into `document.body`, outside
  * `.ui-render`, so not one of the 13 scoped `.ui.popup` rules could paint it.
  *
