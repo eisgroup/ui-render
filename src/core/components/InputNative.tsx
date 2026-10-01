@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { noSpellCheck, resizeToContent, toTextHeight, toTextHeightFunc } from './renders'
+import type { TextFieldEvent } from './renders'
 import Select from './Select'
 import type { SelectProps } from './Select'
 import { ENGINE_PROPS, omitProps } from './domProps'
@@ -164,7 +165,9 @@ function InputNative (props: InputNativeProps) {
   const onKeyUp = (event: React.KeyboardEvent<InputNativeElement>) => {
     const {onKeyUp} = latest.current
     const textHeightFunc = (event.key === 'Enter') ? toTextHeightFunc : toTextHeight // resize instantly for Enter
-    textHeightFunc(event)
+    // A cast, not a guard: React types `target` as any EventTarget, and a keyup's target is the
+    // focused field itself, which has no children to be the target instead.
+    textHeightFunc(event as unknown as TextFieldEvent)
     onKeyUp && onKeyUp(event)
   }
 

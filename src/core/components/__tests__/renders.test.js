@@ -3,12 +3,7 @@ import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import {
     noSpellCheck,
-    colorDropdownOptions,
-    languageDropdownOptions,
-    colorDropdownChoice,
-    renderCurrency,
     renderFloat,
-    renderFloatShort,
     renderSort,
     resizeToContent,
     toTextHeightFunc,
@@ -26,53 +21,10 @@ describe('noSpellCheck', () => {
     })
 })
 
-describe('colorDropdownOptions', () => {
-    it('returns options indexed by language code', () => {
-        const ACTIVE = { LANG: { _: 'en' } }
-        const opts = colorDropdownOptions(
-            { RED: { _: '255,0,0', en: 'Red' } },
-            ACTIVE,
-        )
-        expect(opts.en[0].text).toBe('Red')
-        expect(opts.en[0].value).toBe('255,0,0')
-        expect(opts.items).toBe(opts.en)
-    })
-})
-
-describe('languageDropdownOptions', () => {
-    it('returns searchable text by default', () => {
-        const langDef = { ENGLISH: { _: 'en', lang: 'English', en: 'English' } }
-        const opts = languageDropdownOptions(langDef)
-        expect(opts.en[0].text).toContain('English')
-        expect(opts.en[0].value).toBe('en')
-    })
-    it('returns selection-style label when requested', () => {
-        const langDef = { ENGLISH: { _: 'en', lang: 'English', en: 'English' } }
-        const opts = languageDropdownOptions(langDef, { selection: true })
-        // selection mode replaces text with a React element
-        expect(React.isValidElement(opts.en[0].text)).toBe(true)
-    })
-})
-
-describe('colorDropdownChoice', () => {
-    it('wraps the option content in a React element', () => {
-        const out = colorDropdownChoice({ value: '255,0,0', text: 'Red' })
-        expect(React.isValidElement(out.content)).toBe(true)
-    })
-})
-
-describe('renderCurrency / renderFloat / renderFloatShort', () => {
-    it('renderCurrency renders an element', () => {
-        const { container } = render(wrap(renderCurrency(1234.5, 2)))
-        expect(container.textContent).toContain('1,234')
-    })
+describe('renderFloat', () => {
     it('renderFloat with decimals prints a faded fraction part', () => {
         const { container } = render(wrap(renderFloat(1.23, 2)))
         expect(container.textContent).toContain('1')
-    })
-    it('renderFloatShort returns a Text element', () => {
-        const out = renderFloatShort(1500)
-        expect(React.isValidElement(out)).toBe(true)
     })
 })
 

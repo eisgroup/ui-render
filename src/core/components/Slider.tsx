@@ -6,6 +6,60 @@ import { formatDuration } from '../utils/time'
 import Tooltip from './Tooltip'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
+/** A number for a single handle, `[from, to]` for a range. */
+export type SliderValue = number | number[]
+
+/** A mark on the track: its label, and styles merged over its position. */
+export type SliderMark = { style?: React.CSSProperties, label?: React.ReactNode }
+
+/** Marks by the value they sit at. */
+export type SliderMarks = Record<string, SliderMark>
+
+/** How the marks made from `range` or `rangeOptions` are labelled. */
+export type SliderRangeLabels = {
+  formatLabel?: (value: number) => React.ReactNode
+  isTime?: boolean
+  isCurrency?: boolean
+  currency?: string
+  isPercent?: boolean
+  precision?: number
+  computeSteps?: boolean
+}
+
+/** Props for each handle's `Tooltip`; `render(value)`, if set, renders its content. */
+export type SliderTooltipProps = { render?: (value: number) => React.ReactNode, [key: string]: unknown }
+
+/** The named props are read here; the rest is spread onto the slider's `<div>`. */
+export type SliderProps = {
+  value?: SliderValue | null
+  min?: number
+  max?: number
+  step?: number | null
+  marks?: SliderMarks
+  vertical?: boolean
+  disabled?: boolean
+  readonly?: boolean
+  onChange?: (value: SliderValue, name: string | undefined) => void
+  className?: string
+  range?: number[]
+  rangeOptions?: number[]
+  rangeLabels?: SliderRangeLabels
+  tooltipProps?: SliderTooltipProps
+  unit?: string
+  render?: (value: SliderValue | null | undefined) => React.ReactNode
+  name?: string
+  [key: string]: unknown
+}
+
+/** What `onHandleKey` needs from the slider. */
+type HandleKeyContext = {
+  min: number
+  max: number
+  step: number | null | undefined
+  snapValues: number[] | null
+  commit: (idx: number, next: number) => void
+}
+
 /**
  * Slider - Pure Component (no third-party slider library).
  *
@@ -20,7 +74,7 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
  * @param {Function} [onChange] - (newValue) => void; newValue matches the shape of `value`
  * @param {String} [className]
  * @param {Array} [range] - list of min and max (and intermediate) values; expands into min/max/marks/step
- * @param {Object} [rangeOptions] - explicit list of min, max and all possible steps in between
+ * @param {Array} [rangeOptions] - explicit list of min, max and all possible steps in between
  * @param {Object} [rangeLabels] - mark formatting options when paired with `range`
  * @param {Object} [tooltipProps] - if set, renders a tooltip on each handle; supports `render(value)`
  * @param {String} [unit] - unit suffix shown in the default tooltip label
@@ -45,12 +99,13 @@ export function Slider ({
   onChange,
   name,
   ...rest
-}) {
+}: SliderProps) {
   const isRange = Array.isArray(value)
 
   // Resolve range/marks/step from helper props if provided.
+  // A cast, not a guard: the condition has just tested the same expression.
   const expanded = (range || rangeOptions)
-    ? sliderRangeMarks(range || rangeOptions, rangeLabels, stepProp)
+    ? sliderRangeMarks((range || rangeOptions) as number[], rangeLabels, stepProp)
     : null
   const min = expanded ? expanded.min : minProp
   const max = expanded ? expanded.max : maxProp
@@ -60,8 +115,8 @@ export function Slider ({
     ? Object.keys(marks).map(Number).sort((a, b) => a - b)
     : null
 
-  const trackRef = useRef(null)
-  const dragCleanupRef = useRef(null)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const dragCleanupRef = useRef<(() => void) | null>(null)
   const [activeIdx, setActiveIdx] = useState(-1)
   const interactive = !disabled && !readonly
 
@@ -74,7 +129,7 @@ export function Slider ({
   // (e.g. [10, 50, 100, 500, 1000, 5000]) collide near the left edge.
   const isDiscrete = snapValues != null && snapValues.length > 1
 
-  const valueToPct = useCallback((v) => {
+  const valueToPct = useCallback((v: number) => {
     if (isDiscrete) {
       const idx = nearestIndex(snapValues, v)
       return (idx / (snapValues.length - 1)) * 100
@@ -84,7 +139,7 @@ export function Slider ({
     return Math.max(0, Math.min(100, pct))
   }, [min, max, isDiscrete, snapValues])
 
-  const positionToValue = useCallback((clientX, clientY) => {
+  const positionToValue = useCallback((clientX: number, clientY: number) => {
     const rect = trackRef.current && trackRef.current.getBoundingClientRect()
     if (!rect) return min
     let pct
@@ -107,7 +162,7 @@ export function Slider ({
     return Math.max(min, Math.min(max, raw))
   }, [min, max, step, isDiscrete, snapValues, vertical])
 
-  const commit = (idx, next) => {
+  const commit = (idx: number, next: number) => {
     if (!onChange) return
     if (isRange) {
       const updated = [...value]
@@ -120,7 +175,7 @@ export function Slider ({
     }
   }
 
-  const startDrag = (event, idx) => {
+  const startDrag = (event: React.PointerEvent, idx: number) => {
     if (!interactive) return
     if (dragCleanupRef.current) dragCleanupRef.current()
     // Cache pointer coordinates: React's synthetic event can be reused after
@@ -129,7 +184,7 @@ export function Slider ({
     const startY = event.clientY
     event.preventDefault()
     setActiveIdx(idx)
-    const onMove = (e) => {
+    const onMove = (e: PointerEvent) => {
       const next = positionToValue(e.clientX, e.clientY)
       commit(idx, next)
     }
@@ -149,7 +204,7 @@ export function Slider ({
     commit(idx, positionToValue(startX, startY))
   }
 
-  const onTrackPointerDown = (e) => {
+  const onTrackPointerDown = (e: React.PointerEvent) => {
     if (!interactive) return
     const target = positionToValue(e.clientX, e.clientY)
     if (isRange) {
@@ -176,7 +231,7 @@ export function Slider ({
     ? { bottom: trackStart + '%', height: (trackEnd - trackStart) + '%' }
     : { left: trackStart + '%', width: (trackEnd - trackStart) + '%' }
 
-  const offset = (pct) => vertical ? { bottom: pct + '%' } : { left: pct + '%' }
+  const offset = (pct: number) => vertical ? { bottom: pct + '%' } : { left: pct + '%' }
 
   return (
     <div
@@ -263,11 +318,11 @@ export default React.memo(Slider)
 // Helpers
 // ---------------------------------------------------------------------------
 
-function omitRender ({ render, ...rest }) {
+function omitRender ({ render, ...rest }: SliderTooltipProps) {
   return rest
 }
 
-function nearestIndex (values, v) {
+function nearestIndex (values: number[], v: number): number {
   let idx = 0
   let best = Math.abs(v - values[0])
   for (let i = 1; i < values.length; i++) {
@@ -277,7 +332,7 @@ function nearestIndex (values, v) {
   return idx
 }
 
-function onHandleKey (event, value, idx, { min, max, step, snapValues, commit }) {
+function onHandleKey (event: React.KeyboardEvent, value: number, idx: number, { min, max, step, snapValues, commit }: HandleKeyContext) {
   let delta = 0
   if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') delta = -1
   else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') delta = 1
@@ -305,7 +360,7 @@ function onHandleKey (event, value, idx, { min, max, step, snapValues, commit })
  * @param {Number|Null} [step] - slider movement interval
  * @return {Object}
  */
-function sliderRangeMarks (range, options = {}, step = null) {
+function sliderRangeMarks (range: number[], options: SliderRangeLabels = {}, step: number | null = null) {
   const computeSteps = range.length === 2 || (range.length === 3 && range[0] === 0)
   const markOptions = computeSteps ? {...options, computeSteps: true} : options
   return {
@@ -316,11 +371,11 @@ function sliderRangeMarks (range, options = {}, step = null) {
   }
 }
 
-function sliderIntervals (range, { formatLabel, isTime, isCurrency, currency, isPercent, precision, computeSteps = false } = {}) {
+function sliderIntervals (range: number[], { formatLabel, isTime, isCurrency, currency, isPercent, precision, computeSteps = false }: SliderRangeLabels = {}) {
   const min = range[0] || range[1]
   const max = last(range)
   const steps = Math.floor(max / min)
-  const intervalSteps = {}
+  const intervalSteps: SliderMarks = {}
 
   if (!formatLabel) {
     formatLabel = formatNumber

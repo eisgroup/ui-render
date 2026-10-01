@@ -1025,7 +1025,9 @@ All decomposition outputs are authored in TypeScript from the start (`engine/*.t
   `src/core/components/renders.js:139` calls `round(value, decimals)` where `value` can be a numeric
   string from `data.json`, while the six rounding helpers are typed `number` per their JSDoc. Nothing
   breaks today because `renders.js` is unchecked JavaScript. Widening the helpers or casting at the
-  call site is a decision about what the contract is.
+  call site is a decision about what the contract is. **RESOLVED 2026-09-22 (#61): the helpers were
+  widened to `number | string`**, the type their bodies always had, so when E2's seventh batch
+  converted the caller, `round(value, decimals)` needed nothing.
 - ~~**Contract types for meta/data**, authored together with the JSON Schema (§9.4). Pick one source of truth (types→schema or schema→types)~~ ✅ **DONE 2026-09-18 — and the choice this item offers is a FALSE DICHOTOMY. Both directions were measured and both destroy something.**
 
   **`schema → types` generates a decorative artifact.** `'Row' | 'Col' | string` **IS** `string` —
@@ -1113,6 +1115,24 @@ Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on a
 `omitProps` now returns `Record<string, unknown>` instead of the `Object` its JSDoc said, which retired `Row`'s cast. The prop-reference generator still parses `domProps`: `pack()` already looked for `.ts`, and it matches `export const ENGINE_PROPS = [` literally, so the two lists stay unannotated.
 
 Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 327,387 → 327,369 bytes (three cast aliases gone, one added). `src/core` + `src/library` are 71 TS files, 10,806 lines, against 86 JS files, 9,396 lines: 53.5% of the lines, was 49.7%. TypeScript is now the larger half.
+
+**Seventh batch, 2026-10-01: the rest of `src/core/components`** — `Dropdown`, `Listbox`, `Slider`, `PieChart` and `JsonView`, the modules they share (`renders`, `types`, `styles`, `files`, `charts/utils`, `charts/constants`, `JsonView/themes`) and the two barrels. **`src/core/components` has no JavaScript left outside its tests.** Dead code was deleted rather than typed, each piece checked for importers first, `jest.mock` and `require` included:
+- `utils/img`, `utils/react`, `utils/components` and `utils/interactions` — ten helpers, one of them a `syncState` written for `UNSAFE_componentWillReceiveProps` — were imported by nothing but their tests, and `utils/index` now re-exports `timers` alone. `isFileSrc` in `src/core/utils/string.ts` went with them: its only caller was `cssBgImageFrom`.
+- Five of `renders`' exports had no caller: `colorDropdownOptions`, `languageDropdownOptions`, `colorDropdownChoice`, `renderCurrency` and `renderFloatShort`. `ColorSwatch`, which only they rendered, went with them. Their CSS (`.color__swatch`, `.input--dropdown__option*`) is left for the stylesheet's own cleanup.
+- `languageDropdownOptions` was the only reader of `static/images/flags/`, which still ships; that is now an open decision about the package (§10, "Open decision gates").
+- `charts/utils`' `chartTooltip` was a recharts leftover.
+- `inputs/translations.js` was imported by nothing in the library. All twelve of its phrases are registered, verbatim, by `engine/translations.js`, which every document loads. The one test that loaded it loads the engine's now.
+
+What the conversion found:
+- `types.ts` is `Record<string, any>`, on purpose. It hands out validators and validator factories side by side, and E5 deletes it.
+- `styles.ts` types the four role aliases it assigns after the palette with one commented cast.
+- `Counter`'s cast of `renderFloat` is deleted.
+- `InputNative` casts the keyup event it hands `toTextHeight`: React types `target` as any `EventTarget`, and a keyup's target is the field itself.
+- A cast-necessity pass removed each new cast in turn and re-ran the checker. Two casts turned out to be unnecessary and were dropped, and one more became a parameter annotation.
+- A probe of 14 wrong call sites across the new types failed on all 14.
+- **Found, and left for a change of its own: a `Dropdown` is never `done`.** Since May 2023 the wrapper destructures `value` as `valueFromParent`, so the fallback `done = !error && (!!props.value || props.value === 0)` reads a `props.value` that is always `undefined`. `Input` and `InputNumber` compute the same class from their value. The visible effect is narrow: `.input--wrapper.done` is what floats a `float` dropdown's label, so with a value and no focus that label stays at rest. No tracked meta puts `float` on a dropdown. The fix would add `done` to every dropdown wrapper that has a value, which is a DOM change, so it does not belong in a type-only PR.
+
+Measured: the corpus is identical to #139's (107 / 1012 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 327,359 → 327,232 bytes: `ColorSwatch`'s `propTypes` calls had survived tree-shaking. `src/core` + `src/library` are 84 TS files, 13,078 lines, against 65 JS files, 6,977 lines: 65.2% of the lines, was 53.7%.
 
 #### E3 — Engine last
 
@@ -1842,6 +1862,7 @@ Phases 3 and 4 can partially overlap. Tracks **5a/5b** (SUIR exit) and **6** (en
 | ~~Dev-tooling audit burn-down (26 findings, 2 critical, prod 0)~~ | **DECIDED 2026-09-30: burned down now, 28 findings → 0; prod stays 0.** `npm audit fix` moved 45 lock entries inside their declared ranges and closed 21, both criticals among them. Three majors closed the other 7: `webpack-dev-server` 5 → 6 (Express 5, which also lifts `qs` to 6.16, and no SockJS), `react-router`/`react-router-dom` 6 → 7 (demo only; 8 needs React ≥ 19.2.7), and the dev copy of `moment` `~2.29.4` → `~2.31.0` (GHSA-4p3w-j4w9-5jqw). **Measured: all 282 files `build-lib` publishes are byte-identical before and after**, so the published package did not change. The `moment` peer range stays `^2.29.4`: the library never calls `moment.locale`, so the advisory is not reachable through it, and raising a host's floor is a consumer-facing decision this burn-down does not take. React Router 7 wraps location updates in `startTransition` by default, which brought back the demo's extra history entry (`NavTabs.history.test.js` caught it), so the demo mounts `BrowserRouter` with `useTransitions={false}`. | — | — |
 | ~~Global `html`/`body`/`*` CSS reset (§2.6-7)~~ | **Decided (2026-09-11): scope everything under `.ui-render`.** The maintainers' rule is that the published stylesheet must not touch or affect the parent application at all — only its own wrapper. `postcss.config.js` stopped exempting `html`, `body` and `*`, so the two prefixwrap pipelines are identical and `css.pipeline.parity.test.js`'s H8 counters are all 0. **What was escaping was worse than a reset**, measured on the compiled output: 11 rules, and the two that mattered most put `display:flex; flex-direction:column; position:relative` and `flex:1; align-self:stretch` on the HOST's `<body>`, alongside `margin:0`, our background colour, our base font and `box-sizing` on its `<html>`. A host with its own layout could be visibly broken by importing our CSS. Verified in Chrome before and after: the host `<body>` now computes browser defaults (`display:block`, `margin:8px`, transparent, Times, `content-box`) and `.ui-render` carries what those rules were always for (`display:flex`, `min-height:100%`, white, `14px`, `border-box`). **A trap recorded for the next reader:** prefixwrap's `prefixRootTags: true` looks like the option for this and is wrong — it turns `body { … }` into `.ui-render .body { … }`, a class selector matching nothing, silently dropping the declarations. The default (no exemptions) maps `html`/`body` onto `.ui-render` itself, which is correct. The demo page declares its own `body { margin: 0 }` in `public/index.html`, because a demo is a host like any other. | — | — |
 | `moment` optional-peer demotion | only at the F2 flip, gated on the F2.2-5 consumer audit (the Phase 1 `^2.29.4` widening is already decided) | F2 gate | consumer callback audit |
+| `static/images/flags/` in the package (3.0 MB unpacked, 266 files) | keep shipping it, or stop. Its only reader, `languageDropdownOptions`, was dead code and was deleted in §9.6-E2's seventh batch (2026-10-01), so nothing in the library references it. It was tree-shaken out of `dist` before that, too. Kept for now, because a host that copies `static/` may link a flag from its own markup. | the next release | whether any host references `/static/images/flags/` |
 
 ---
 

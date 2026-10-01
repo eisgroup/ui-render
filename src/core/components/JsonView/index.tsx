@@ -3,6 +3,28 @@ import PropTypes from 'prop-types'
 import React, { useMemo, useState } from 'react'
 import View from '../View'
 import defaultTheme from './themes'
+import type { Base16Theme } from './themes'
+
+/** A node's path from itself up to the root: its own key first. */
+type KeyPath = Array<string | number>
+/** Whether a node starts expanded. */
+export type JsonViewExpandPredicate = (keyPath: KeyPath, value: unknown, level: number) => boolean
+/** The colors a tree is drawn in, picked from a base16 theme. */
+type Palette = Record<'background' | 'text' | 'muted' | 'key' | 'bracket' | 'string' | 'number' | 'boolean' | 'null' | 'error', string>
+
+/** The named props are read here; the rest is passed to the `View` it renders. */
+export type JsonViewProps = {
+  data: unknown
+  inverted?: boolean
+  expanded?: boolean
+  hideRoot?: boolean
+  theme?: Base16Theme
+  shouldExpandNode?: JsonViewExpandPredicate
+  className?: string
+  style?: React.CSSProperties
+  fill?: boolean
+  [key: string]: unknown
+}
 
 /**
  * Json nested Object Renderer (collapsible tree).
@@ -28,12 +50,12 @@ export function JsonView ({
   style,
   fill,
   ...props
-}) {
+}: JsonViewProps) {
   const palette = useMemo(() => buildPalette(theme, !inverted), [theme, inverted])
   const expandPredicate = useMemo(() => {
     if (typeof shouldExpandNode === 'function') return shouldExpandNode
     if (expanded) return () => true
-    return (_keyPath, _value, level) => level === 0
+    return (_keyPath: KeyPath, _value: unknown, level: number) => level === 0
   }, [expanded, shouldExpandNode])
 
   return (
@@ -73,7 +95,18 @@ export default React.memo(JsonView)
 // NODE RENDERER
 // ---------------------------------------------------------------------------
 
-function Node ({ value, keyPath, level, palette, shouldExpandNode, hideKey, hideRoot, ancestors }) {
+type NodeProps = {
+  value: unknown
+  keyPath: KeyPath
+  level: number
+  palette: Palette
+  shouldExpandNode: JsonViewExpandPredicate
+  hideKey?: boolean
+  hideRoot?: boolean
+  ancestors: unknown[]
+}
+
+function Node ({ value, keyPath, level, palette, shouldExpandNode, hideKey, hideRoot, ancestors }: NodeProps) {
   const isArr = Array.isArray(value)
   const isObj = value !== null && typeof value === 'object' && !isArr
 
@@ -109,13 +142,14 @@ function Node ({ value, keyPath, level, palette, shouldExpandNode, hideKey, hide
   )
 }
 
-function Collection ({ value, keyPath, level, palette, shouldExpandNode, hideKey, hideRoot, ancestors, isArr }) {
+function Collection ({ value, keyPath, level, palette, shouldExpandNode, hideKey, hideRoot, ancestors, isArr }: NodeProps & { isArr: boolean }) {
   const initialOpen = hideRoot || shouldExpandNode(keyPath, value, level)
   const [open, setOpen] = useState(initialOpen)
 
-  const entries = isArr
-    ? value.map((v, i) => [i, v])
-    : Object.keys(value).map((k) => [k, value[k]])
+  // Casts: `isArr` is what `Node` measured the value to be.
+  const entries: Array<[string | number, unknown]> = isArr
+    ? (value as unknown[]).map((v, i) => [i, v])
+    : Object.keys(value as object).map((k) => [k, (value as Record<string, unknown>)[k]])
   const count = entries.length
   const open$ = isArr ? '[' : '{'
   const close$ = isArr ? ']' : '}'
@@ -185,7 +219,16 @@ function Collection ({ value, keyPath, level, palette, shouldExpandNode, hideKey
   )
 }
 
-function Row ({ hideKey, keyName, palette, clickable, onClick, children }) {
+type RowProps = {
+  hideKey?: boolean
+  keyName?: string | number
+  palette: Palette
+  clickable?: boolean
+  onClick?: () => void
+  children?: React.ReactNode
+}
+
+function Row ({ hideKey, keyName, palette, clickable, onClick, children }: RowProps) {
   return (
     <div
       onClick={onClick}
@@ -209,7 +252,7 @@ function Row ({ hideKey, keyName, palette, clickable, onClick, children }) {
   )
 }
 
-function Triangle ({ open, color }) {
+function Triangle ({ open, color }: { open: boolean, color: string }) {
   return (
     <span
       style={{
@@ -226,7 +269,7 @@ function Triangle ({ open, color }) {
   )
 }
 
-function Primitive ({ value, palette }) {
+function Primitive ({ value, palette }: { value: unknown, palette: Palette }) {
   if (value === null) return <span style={{ color: palette.null }}>null</span>
   if (value === undefined) return <span style={{ color: palette.null }}>undefined</span>
   switch (typeof value) {
@@ -247,10 +290,10 @@ function Primitive ({ value, palette }) {
 // PALETTE
 // ---------------------------------------------------------------------------
 
-// Base16 keys (matches existing themes.js shape):
+// Base16 keys (matches existing themes.ts shape):
 //   base00 background, base03 muted, base05 text,
 //   base09 numbers/booleans, base0B strings, base0D bracket/key, base08 errors
-function buildPalette (theme, invert) {
+function buildPalette (theme: Base16Theme, invert: boolean): Palette {
   const t = invert ? invertTheme(theme) : theme
   return {
     background: t.base00,
@@ -266,7 +309,7 @@ function buildPalette (theme, invert) {
   }
 }
 
-function invertTheme (theme) {
+function invertTheme (theme: Base16Theme): Base16Theme {
   // Swap light/dark slots: base00↔base07, base01↔base06, base02↔base05, base03↔base04.
   // Hue slots (base08..base0F) are kept; this matches react-json-tree's invertTheme.
   return {

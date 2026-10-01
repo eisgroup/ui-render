@@ -248,7 +248,7 @@ export function rad(degree: number): number {
  *
  * Their JSDoc has always said `{number}` and their bodies have always coerced: every one of them
  * reaches the argument through `*` or `/`, so JavaScript converts a numeric string on the way in.
- * That is not an accident to "fix" — `src/core/components/renders.js` calls `round(value, decimals)`
+ * That is not an accident to "fix" — `src/core/components/renders.tsx` calls `round(value, decimals)`
  * with values straight out of `data.json`, where a number is routinely a string. Typing the
  * parameter `number` made the signature stricter than the function: the kind of lie that compiles
  * for years and then rejects working code the day its caller is converted.

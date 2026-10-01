@@ -24,7 +24,7 @@
  *                            the file no longer references SUIR by any mechanism.
  *   FROM domProps.ts         which props are stripped at the DOM boundary, and by which
  *                            component — `Table.tsx` applies both lists in all seven components
- *                            since step 1, `Dropdown.js` applies both, `TooltipPop.tsx` none.
+ *                            since step 1, `Dropdown.tsx` applies both, `TooltipPop.tsx` none.
  *                            Derived, so the page cannot claim a strip that is gone.
  *   FROM THE CALL SITES      which JSX attributes the codebase actually puts on `Table` and
  *                            its subcomponents — the step-1 parity surface, kept after the step
@@ -115,7 +115,7 @@ const IN_HOUSE = [
     { id: 'TooltipPop', file: pack('TooltipPop'), fn: 'TooltipPop', root: 'span' },
     // `root` is the node the component renders, which for `Dropdown` is a COMPONENT and not an
     // element: it is the engine-facing wrapper, and the markup lives one level down in
-    // `Listbox.js` under this import alias. Documenting the pair under one entry is deliberate —
+    // `Listbox.tsx` under this import alias. Documenting the pair under one entry is deliberate —
     // the props a consumer sets are `Dropdown`'s, and `Listbox` is not exported from the library.
     { id: 'Dropdown', file: pack('Dropdown'), fn: 'Dropdown', root: 'DropDown' },
 ]
@@ -138,7 +138,7 @@ function sourceFiles (dir, out = []) {
 
 /**
  * Removes comments, keeping string and template literals intact. Every derivation below runs
- * on the stripped text: `Dropdown.js` mentions `props.onClose` in prose, and a regex that
+ * on the stripped text: `Dropdown.tsx` mentions `props.onClose` in prose, and a regex that
  * counted prose as code would report a prop the wrapper does not set.
  */
 function stripComments (source) {
@@ -232,7 +232,7 @@ const NAME = '[A-Za-z_$][A-Za-z0-9_$]*'
  */
 function interceptedProps (rawSource, fn, file) {
     // Stripped again here, not only by the caller, so the exported helper is correct on its own:
-    // `Dropdown.js` carries a trailing `// not used, removing from DOM` inside the pattern.
+    // `Dropdown.tsx` carries a trailing `// not used, removing from DOM` inside the pattern.
     const source = stripComments(rawSource)
     const opening = source.match(new RegExp(`export\\s+(?:default\\s+)?function\\s+${fn}\\s*\\(\\s*\\{`))
     if (!opening) {
@@ -1054,7 +1054,7 @@ function renderMarkdown (reference) {
         ] : [
             '**The table below is empty, and that is the point.** This scan reads `src` for every',
             '`import`, `import()`, `require` and `jest.mock` of `semantic-ui-react`; it started at 7',
-            'files and reached zero at §9.7-F1 step 3 part 2, when `Dropdown.js` moved onto the',
+            'files and reached zero at §9.7-F1 step 3 part 2, when `Dropdown` moved onto the',
             "in-house `Listbox`. No file in `src` references the package by any mechanism, so the",
             'isolation invariant ("only inside the components pack") now holds in the stronger form',
             '"nowhere at all". Every remaining mention in the tree is prose — comments recording what',

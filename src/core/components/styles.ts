@@ -4,8 +4,11 @@
  * =============================================================================
  */
 
+/** The roles below the palette, assigned to its colors after it is built. */
+type StyleRoles = Record<'PRIMARY' | 'PRIMARY_LIGHT' | 'SECONDARY' | 'SECONDARY_LIGHT', string>
+
 /* Colors */
-export const STYLE = {
+const palette = {
   ANIMATION_DURATION: 500,
   SIZE_SCALE: 62.5, // match percentage of font-size defined in <html> root element
   GREY: 'rgb(55, 145, 70)',
@@ -32,6 +35,8 @@ export const STYLE = {
   BORDER: 'rgba(124, 124, 153, 0.3)',
   TRANSPARENT: 'rgba(0, 0, 0, 0)',
 }
+// A cast, not a guard: the four roles are assigned on the next lines, before anything can read them.
+export const STYLE = palette as typeof palette & StyleRoles
 STYLE.PRIMARY = STYLE.TEAL
 STYLE.PRIMARY_LIGHT = STYLE.TEAL_LIGHT
 STYLE.SECONDARY = STYLE.VIOLET

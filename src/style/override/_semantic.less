@@ -22,7 +22,7 @@
   1,952 scoped rules and 152,239 of 602,156 compiled bytes -- 25.3% of the stylesheet -- and not
   one of the removed rules can match markup this library renders.
 
-  The evidence, checked from both ends. From the markup: only `Listbox.js` and `Table.tsx` emit
+  The evidence, checked from both ends. From the markup: only `Listbox.tsx` and `Table.tsx` emit
   Semantic `ui` tokens at all, and the 38-example DOM baseline contains `ui popup` 0 times,
   `ui label` 0 and `ui menu` 0. From the CSS: of the removed rules, the only ones naming a token we
   still emit are rooted at `.ui.menu` (an ancestor we never render -- `Listbox` puts its `.menu`
@@ -41,7 +41,7 @@
               emits `app__pagination*` and is styled by `src/style/components/pagination.less`.
 
   What remains is `globals/reset` and `modules/dropdown`, which are step 4's second half: the
-  dropdown's token vocabulary is still load-bearing (`Listbox.js` emits it deliberately, and
+  dropdown's token vocabulary is still load-bearing (`Listbox.tsx` emits it deliberately, and
   `src/style/__tests__/css.dropdown-contract.test.js` measures what each token is worth).
   ---------------------------------------------------------------------------------------------
 */

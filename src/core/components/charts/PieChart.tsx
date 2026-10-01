@@ -16,6 +16,47 @@ const id = 'pc'
 const renderGradient = renderGradients({ id, startOpacity: 0.67, stopOpacity: 1 })
 const textColor = '#444'
 
+/** A slice as a caller gives it: `id`, or else `label`, names it, and `value` sizes it. */
+export type PieChartItem = { id?: string | number, label?: React.ReactNode, value: number | string, [key: string]: unknown }
+
+/** How the legend is laid out; `true` takes the defaults. */
+export type PieChartLegendOptions = { background?: boolean, bottom?: boolean, columns?: number }
+export type PieChartLegends = boolean | PieChartLegendOptions
+
+/** The named props are read here; the rest is passed to the chart's `View`. */
+export type PieChartProps = {
+  items: PieChartItem[]
+  height?: number
+  unit?: string
+  classNameWrap?: string
+  className?: string
+  children?: React.ReactNode
+  gradient?: boolean
+  legends?: PieChartLegends
+  pointers?: boolean
+  sort?: string | string[]
+  [key: string]: unknown
+}
+
+/** A slice's data, as `dataNormalized` makes it of an item. */
+type PieDatum = { name: string, gradient: boolean, value: number, color: string }
+
+/** A slice's data and its angles: what the donut draws. */
+type PieSlice = PieDatum & { startAngle: number, endAngle: number, midAngle: number, percent: number }
+
+/** Where a slice's label goes, and what it says. */
+type LabelProps = {
+  cx: number
+  cy: number
+  midAngle: number
+  innerRadius: number
+  outerRadius: number
+  percent: number
+  fill: string
+  color: string
+  name: string
+}
+
 /**
  * Pie Chart Component (custom SVG donut, no recharts dependency).
  */
@@ -31,8 +72,9 @@ function PieChart ({
   pointers,
   sort,
   ...props
-}) {
-  const sorts = toList(sort, 'clean')
+}: PieChartProps) {
+  // A cast, not a guard: `'clean'` drops the `undefined` that an absent `sort` becomes.
+  const sorts = toList(sort, 'clean') as string[]
   const data = useMemo(() => {
     const validItems = Array.isArray(_items)
       ? _items.filter(item => item && typeof item === 'object')
@@ -40,7 +82,8 @@ function PieChart ({
     const items = sort ? [...validItems].sort(by(...sorts)) : validItems
     return dataNormalized(items, gradient, sorts)
   }, [_items, gradient, sort]) // eslint-disable-line react-hooks/exhaustive-deps
-  const Container = legends ? (legends.bottom ? View : Row) : Fragment
+  // A cast, not a guard: `true` has no options, and reads `bottom` as `undefined`, as it did.
+  const Container = legends ? ((legends as PieChartLegendOptions).bottom ? View : Row) : Fragment
   const showPointers = pointers || (!legends && pointers !== false)
 
   return (
@@ -93,10 +136,10 @@ export default React.memo(PieChart)
 // SVG DONUT
 // ---------------------------------------------------------------------------
 
-function DonutChart ({ data, height, gradient, showPointers, unit }) {
-  const wrapRef = useRef(null)
+function DonutChart ({ data, height, gradient, showPointers, unit }: { data: PieDatum[], height: number, gradient: boolean, showPointers?: boolean, unit?: string }) {
+  const wrapRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
-  const [hovered, setHovered] = useState(null) // {slice, x, y} | null
+  const [hovered, setHovered] = useState<{ slice: PieSlice, x: number, y: number } | null>(null)
 
   useEffect(() => {
     const node = wrapRef.current
@@ -183,7 +226,7 @@ function DonutChart ({ data, height, gradient, showPointers, unit }) {
   )
 }
 
-function PieTooltip ({ x, y, slice, unit }) {
+function PieTooltip ({ x, y, slice, unit }: { x: number, y: number, slice: PieSlice, unit?: string }) {
   const { name, value } = slice
   const decimals = Math.max(6 - (Math.round(value) || 0).toString().length, 0)
   return (
@@ -213,7 +256,7 @@ function PieTooltip ({ x, y, slice, unit }) {
 
 // Recharts-compatible angle convention: 0° = right (3 o'clock), 90° = top (12 o'clock),
 // counter-clockwise positive. Slices fill clockwise on screen, i.e. angles decrease.
-function polarToCartesian (cx, cy, radius, angleDeg) {
+function polarToCartesian (cx: number, cy: number, radius: number, angleDeg: number) {
   const rad = -angleDeg * RADIAN
   return {
     x: cx + radius * Math.cos(rad),
@@ -221,7 +264,7 @@ function polarToCartesian (cx, cy, radius, angleDeg) {
   }
 }
 
-function computeSlices (data) {
+function computeSlices (data: PieDatum[]): PieSlice[] {
   const total = data.reduce((sum, d) => sum + d.value, 0) || 1
   let startAngle = 90 // top
   return data.map((d) => {
@@ -239,7 +282,7 @@ function computeSlices (data) {
   })
 }
 
-function arcPath (cx, cy, innerR, outerR, startAngle, endAngle) {
+function arcPath (cx: number, cy: number, innerR: number, outerR: number, startAngle: number, endAngle: number): string {
   const sweep = startAngle - endAngle
   // Full circle: SVG can't draw a 360° arc in one segment — use two semicircles.
   if (sweep >= 360 - 1e-6) {
@@ -271,7 +314,7 @@ function arcPath (cx, cy, innerR, outerR, startAngle, endAngle) {
 // SUB-COMPONENTS
 // ---------------------------------------------------------------------------
 
-function PieTotal ({ items }) {
+function PieTotal ({ items }: { items: PieDatum[] }) {
   return (
     <>
       <Text className='h2 no-margin padding-bottom-smaller'>{shortNumber(toListValuesTotal(items))}</Text>
@@ -280,8 +323,10 @@ function PieTotal ({ items }) {
   )
 }
 
-function PieReference ({ data, legends, height }) {
-  const { bottom, columns, background = true } = legends || {}
+function PieReference ({ data, legends, height }: { data: PieDatum[], legends: PieChartLegends, height: number }) {
+  // A cast, not a guard: `true` has no options, and reads every one as `undefined`, as it did.
+  // `columns = 0` gives the checker a number: an absent count compared `> 0` as false already.
+  const { bottom, columns = 0, background = true } = (legends || {}) as PieChartLegendOptions
   const classes = classNames('app__pie-chart__ref__items padding-small', { background, wrap: columns > 0 })
   const offsetTop = bottom ? { marginTop: height * -0.1 } : undefined
 
@@ -304,7 +349,7 @@ function PieReference ({ data, legends, height }) {
   return <View className={classes} style={offsetTop}>{data.map(renderReferenceItem)}</View>
 }
 
-function renderReferenceItem ({ name, color, value }) {
+function renderReferenceItem ({ name, color, value }: PieDatum) {
   return (
     <Row key={name} className='app__pie-chart__ref__item justify'>
       <Text className='truncate padding-right'>{name}</Text>
@@ -317,17 +362,18 @@ function renderReferenceItem ({ name, color, value }) {
 // DATA HELPERS
 // ---------------------------------------------------------------------------
 
-function dataNormalized (items, gradient, sorts) {
+function dataNormalized (items: PieChartItem[], gradient: boolean, sorts: string[]): PieDatum[] {
   const paletteLen = colorsPalette.length
   const list = items.map(({ id, label, value }) => {
     const number = Number(value)
+    // A cast, not a guard: `color` is assigned by `mapper` below, before anything reads it.
     return {
       name: String(id != null ? id : (label != null ? label : '')),
       gradient,
       value: Number.isFinite(number) && number >= 0 ? number : 0,
-    }
+    } as PieDatum
   })
-  const mapper = (item, i) => {
+  const mapper = (item: PieDatum, i: number) => {
     item.color = colorsPalette[i % paletteLen]
     return item
   }
@@ -341,14 +387,14 @@ function dataNormalized (items, gradient, sorts) {
 // LABEL RENDERERS (pure functions, shared across instances)
 // ---------------------------------------------------------------------------
 
-function donutPieCenterCoords ({ cx, cy, midAngle, innerRadius, outerRadius }) {
+function donutPieCenterCoords ({ cx, cy, midAngle, innerRadius, outerRadius }: Pick<LabelProps, 'cx' | 'cy' | 'midAngle' | 'innerRadius' | 'outerRadius'>) {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5
   const x = cx + radius * Math.cos(-midAngle * RADIAN)
   const y = cy + radius * Math.sin(-midAngle * RADIAN)
   return { x, y }
 }
 
-function renderPercent ({ cx, cy, midAngle, innerRadius, outerRadius, percent, fill, color }) {
+function renderPercent ({ cx, cy, midAngle, innerRadius, outerRadius, percent, fill, color }: LabelProps) {
   const pct = percent * 100
   if (pct < 1) return null
   const fontScale = Math.min(pct + 5, fontSize)
@@ -364,7 +410,7 @@ function renderPercent ({ cx, cy, midAngle, innerRadius, outerRadius, percent, f
   )
 }
 
-function renderPercentPointer ({ cx, cy, midAngle, innerRadius, outerRadius, name, percent, fill, color }) {
+function renderPercentPointer ({ cx, cy, midAngle, innerRadius, outerRadius, name, percent, fill, color }: LabelProps) {
   const pct = percent * 100
   name = truncate(name, 9, 2)
   if (pct < 1) return null

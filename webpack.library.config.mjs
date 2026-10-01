@@ -158,11 +158,12 @@ export default {
                 // reachable from the library, and shipping it put 1,042 KB of docs in every host's
                 // node_modules.
                 //
-                // `flags/` is kept for src/core/components/renders.js, which renders country flags from
-                // `${FILE.PATH_IMAGES}flags/`. It is referenced from JS, never from CSS, so no build step
-                // would catch its removal. Measured: that renderer is currently tree-shaken out
-                // of dist ('flags/' occurs 0 times), so no host requests these today; they stay until a
-                // decision is made about the renderer, not about the files.
+                // `flags/` was kept for `languageDropdownOptions` in src/core/components/renders, which
+                // rendered country flags from `${FILE.PATH_IMAGES}flags/` and was tree-shaken out of
+                // dist ('flags/' occurs 0 times). That renderer was dead code and is deleted (§9.6-E2,
+                // seventh batch), so nothing in the library references these files now. They still
+                // ship: no longer shipping a folder that hosts may copy is a decision about the
+                // package, and it is recorded as open in docs/UPGRADE-PLAN.md rather than taken here.
                 { from: 'public/static/images/flags', to: '../static/images/flags', noErrorOnMissing: true },
             ],
         }),

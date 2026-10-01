@@ -3,7 +3,6 @@ import {
     isInStringAny,
     insertToString,
     isBase64,
-    isFileSrc,
     isString,
     formatKeyPath,
     fileFormat,
@@ -73,21 +72,6 @@ describe('isBase64', () => {
     })
     it('returns false for invalid base64', () => {
         expect(isBase64('not base 64!')).toBe(false)
-    })
-})
-
-describe('isFileSrc', () => {
-    it('returns true if string contains a dot', () => {
-        expect(isFileSrc('image.png')).toBe(true)
-        expect(isFileSrc('https://x.com/y.jpg')).toBe(true)
-    })
-    it('returns false for strings without a dot', () => {
-        expect(isFileSrc('abc')).toBe(false)
-    })
-    it('returns false for falsy input', () => {
-        expect(isFileSrc('')).toBe(false)
-        expect(isFileSrc(null)).toBeFalsy()
-        expect(isFileSrc(undefined)).toBeFalsy()
     })
 })
 

@@ -336,7 +336,7 @@ describe('Dropdown', () => {
          * measured, `required` rendered as `required=""` on a div and `clearable` produced React's
          * own "Received `true` for a non-boolean attribute" warning.
          *
-         * Revert `dropUnsupported` in `Dropdown.js` and both halves of this describe fail.
+         * Revert `dropUnsupported` in `Dropdown.tsx` and both halves of this describe fail.
          */
         const withConsole = (method, run) => {
             const original = console[method]

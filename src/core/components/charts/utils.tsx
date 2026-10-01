@@ -1,11 +1,15 @@
 import React from 'react'
 import { toAlphaNumId } from '../../utils'
-import { STYLE } from '../styles'
 
-export const chartTooltip = {
-  animationEasing: 'ease-out',
-  animationDuration: STYLE.ANIMATION_DURATION,
-  wrapperStyle: { zIndex: 1 }
+/** What `renderGradients` is given: the chart's id prefix, and the gradient's opacity and direction. */
+export type GradientOptions = {
+  id: string
+  startOpacity?: number
+  stopOpacity?: number
+  x1?: string
+  y1?: string
+  x2?: string
+  y2?: string
 }
 
 /**
@@ -20,8 +24,8 @@ export const chartTooltip = {
  * @param {String} [y2] - gradient end position
  * @returns {function({name: *, color: *}): *}
  */
-export function renderGradients ({ id, startOpacity = 0.67, stopOpacity = 1, x1 = '0', y1 = '0', x2 = '1', y2 = '1' }) {
-  return function ({ name: n, color }) {
+export function renderGradients ({ id, startOpacity = 0.67, stopOpacity = 1, x1 = '0', y1 = '0', x2 = '1', y2 = '1' }: GradientOptions) {
+  return function ({ name: n, color }: { name: string, color: string }) {
     const name = toAlphaNumId(n)
     return (
       <linearGradient key={name} id={`${id}-${name}`} x1={x1} y1={y1} x2={x2} y2={y2}>
