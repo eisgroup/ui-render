@@ -6,7 +6,7 @@
  * straight onto the class it was handed, and to REPLACE that class's own
  * `UNSAFE_componentWillReceiveProps` and `componentWillUnmount` with wrappers calling captured
  * copies. The class was a different object before and after, which is what the engine layer in
- * `rules.js` had already stopped doing to the class IT is handed.
+ * `rules.tsx` had already stopped doing to the class IT is handed.
  *
  * It now returns a subclass, and a caller must render what it returns: `withForm` does, and
  * publishes it as `WrappedComponent` for the engine, whose nested documents render it without the

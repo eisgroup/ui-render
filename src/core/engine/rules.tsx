@@ -12,7 +12,7 @@ import { Active, get, interpolateString, isEmpty, isList, isString, round, sanit
 // would be built from the state as it was before any other update in the same batch, so two
 // writes into one container would undo each other. The mutating version had no such problem,
 // which is why this is not a detail of the rewrite but the point of it.
-import { cloneDeep, hasObjectValue, isObject, set, setIn } from '../utils/object'
+import { cloneDeep, hasObjectValue, isObject as isPlainObject, set, setIn } from '../utils/object'
 import Render, { metaToProps } from './index'
 import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
@@ -42,7 +42,14 @@ import { AppContext } from '../contexts'
 import { ConfigOverride } from '../providers'
 import Popup from './components/Popup'
 import { createPopupContent } from './components/PopupContent'
+import type { FormApi } from 'final-form'
+import type { UploadArgs } from './upload'
+import type { Translate } from '../utils/_envs'
 import { dataKindPathFor, getDataKindPathFromRelative, pushDataKindRow, removeDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow } from './dataKindPush'
+
+// Non-narrowing, on purpose: a meta node checked with it stays open JSON, instead of becoming the
+// `Record<string, unknown>` the util's type guard narrows it to.
+const isObject: (value: unknown) => boolean = isPlainObject
 
 export { getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow }
 
@@ -63,7 +70,7 @@ FIELD.CROSS_VALIDATE = {
 /**
  * Parse `dataKind.experiencePeriods[0].startDate`-style field names for stable row index (see notWithinRangeValidator).
  */
-export function parseArrayPrefixAndRowIndexFromFieldName (fieldName) {
+export function parseArrayPrefixAndRowIndexFromFieldName (fieldName: unknown): { arrayPrefix: string, rowIndex: number } | null {
     if (!fieldName || typeof fieldName !== 'string') return null
     const m = fieldName.match(/^(.*)\[(\d+)\]\.[^.[]+$/)
     if (!m) return null
@@ -74,7 +81,13 @@ export function parseArrayPrefixAndRowIndexFromFieldName (fieldName) {
  * Cross-row period overlap validation. Uses final-form (allValues, meta.name) + per-field `instance` closure
  * so row index stays correct after FieldArray.remove (global FIELD.VALIDATION reassignment from `config` was not safe).
  */
-function notWithinRangeValidator (value, { dataKind, args: argsIn } = {}, allValues, meta, instance) {
+/**
+ * A document instance, as the validator and the registry read it. `any`: it is the engine's class with
+ * both layers over it, whose members each layer adds in its own class body.
+ */
+type DocumentInstanceLike = any
+
+function notWithinRangeValidator (value: unknown, { dataKind, args: argsIn }: { dataKind?: string, args?: string[] } = {}, allValues?: Record<string, any>, meta?: { name?: string }, instance?: DocumentInstanceLike) {
     const args = argsIn || []
     const [start, end] = args
     if (!start || !end || !dataKind) return undefined
@@ -82,7 +95,7 @@ function notWithinRangeValidator (value, { dataKind, args: argsIn } = {}, allVal
     const fromName = meta && meta.name ? parseArrayPrefixAndRowIndexFromFieldName(meta.name) : null
     let rowIndexNum = fromName != null && !Number.isNaN(fromName.rowIndex) ? fromName.rowIndex : null
 
-    let relativePath = null
+    let relativePath: string | null = null
     if (instance && instance.props) {
         const propsMeta = instance.props.meta
         relativePath = (propsMeta && propsMeta.relativePath) || instance.props.relativePath
@@ -93,8 +106,8 @@ function notWithinRangeValidator (value, { dataKind, args: argsIn } = {}, allVal
     }
 
     const valuesRoot = allValues || (instance && instance.formValues)
-    let _a
-    let _b
+    let _a: unknown
+    let _b: unknown
     const arrayPrefix = fromName ? fromName.arrayPrefix : relativePath
 
     if (arrayPrefix && rowIndexNum != null && valuesRoot) {
@@ -123,7 +136,7 @@ function notWithinRangeValidator (value, { dataKind, args: argsIn } = {}, allVal
     const form = instance && instance.props && instance.props.form
     const validationScope = form && form.kind === dataKind ? instance.dataKindPath : undefined
     const valuesBy = parentUi.getDataKind(dataKind, validationScope)
-    const ranges = []
+    const ranges: Array<[unknown, unknown]> = []
     const thisIndex = form && form.kind === dataKind && rowIndexNum != null && !Number.isNaN(rowIndexNum)
         ? String(rowIndexNum)
         : null
@@ -132,8 +145,9 @@ function notWithinRangeValidator (value, { dataKind, args: argsIn } = {}, allVal
             if (thisIndex != null && String(i) === thisIndex) continue
             const row = valuesBy[i]
             if (row == null || typeof row !== 'object') continue
-            const a = row[start]
-            const b = row[end]
+            // Casts, not guards: an object, a row of a data kind.
+            const a = (row as Record<string, unknown>)[start]
+            const b = (row as Record<string, unknown>)[end]
             if (a == null || b == null || a === '' || b === '') continue
             ranges.push([a, b])
         }
@@ -180,20 +194,20 @@ FIELD.NORMALIZER = {
     [FIELD.NORMALIZE.INTEGER]: integer,
     [FIELD.NORMALIZE.PHONE]: phone,
     [FIELD.NORMALIZE.UPPERCASE]: uppercase,
-    [FIELD.NORMALIZE.DATE]: (val) => {
+    [FIELD.NORMALIZE.DATE]: (val: any) => {
         if (val) {
             const date = new Date(val)
             return getDateStringFromDateObject(date)
         }
     },
-    [FIELD.NORMALIZE.CURRENCY]: (v) => v == null ? v : Number((v || 0) || 0).toFixed(2),
-    [FIELD.NORMALIZE.PERCENT]: (v) => {
+    [FIELD.NORMALIZE.CURRENCY]: (v: any) => v == null ? v : Number((v || 0) || 0).toFixed(2),
+    [FIELD.NORMALIZE.PERCENT]: (v: any) => {
         return v == null ? v : (Number((v || 0) || 0) * 100).toLocaleString()
     },
 }
 FIELD.PARSER = {
     ...FIELD.PARSER,
-    [FIELD.NORMALIZE.PERCENT]: function fromPercent (v) {
+    [FIELD.NORMALIZE.PERCENT]: function fromPercent (v: any) {
         return v && round(v / 100, 5)
     },
 }
@@ -215,7 +229,30 @@ export { formsStorage }
  * `documentHost.ts`, which gives it what React gave a class. That is why it extends
  * `DocumentInstance`, and why its props sync is `deriveFromProps`.
  */
+/** A document's props: the meta and data it renders, and the host's callbacks. */
+export type UIRenderProps = Record<string, any>
+
+/**
+ * What the layers over this class give its instance: the engine layer (`Decorator`, below), then the
+ * form layer (`withFormSetup`, in `modules/form`). Declared by merging rather than as fields, so no
+ * instance gets an own property in front of the getters those layers define on their prototypes.
+ */
+export interface UIRender {
+    readonly data: any
+    readonly meta: any
+    readonly hasData: boolean
+    readonly hasMeta: boolean
+    readonly form: FormApi
+    readonly handleSubmit: (event?: React.SyntheticEvent) => unknown
+}
+
 export class UIRender extends DocumentInstance {
+    static contextType = AppContext
+
+    // Type-only: the constructor sets each when the host gives it one, and Babel emits no field.
+    errorHandler?: (errors: object) => void
+    translate?: Translate
+
     static propTypes = {
         data: type.Any.isRequired,
         meta: type.Object.isRequired,
@@ -246,7 +283,7 @@ export class UIRender extends DocumentInstance {
         onError: type.Method,
     }
 
-    constructor (props) {
+    constructor (props: UIRenderProps) {
         super(props)
         // The instance's OWN error callback. It used to be a module-level `let`, so the LAST instance
         // constructed owned it for everybody: measured on two documents, the first one's validation
@@ -265,7 +302,7 @@ export class UIRender extends DocumentInstance {
         // assumed — see `rules.two-instances.test.js`, which fails on the previous code.
         if (typeof props.translate === 'function') {
             const translate = props.translate
-            this.translate = value => typeof value === 'string' ? translate(value) : value
+            this.translate = (value: unknown) => typeof value === 'string' ? translate(value) : value
             Active.translate = this.translate
         } else if (props.parent && typeof props.parent.translate === 'function') {
             // An embedded instance is not given the prop; it inherits the one its owner was built with
@@ -297,8 +334,8 @@ export class UIRender extends DocumentInstance {
     //
     // It was `UNSAFE_componentWillReceiveProps`. The host calls it at the same point, during the
     // render, and it still sets nothing but this document's state (`documentHost.ts`).
-    deriveFromProps (next) {
-        const update = {}
+    deriveFromProps (next: UIRenderProps) {
+        const update: Record<string, any> = {}
         const { data, meta } = this.props
 
         if (next.data !== data) set(update, 'data.json', normalizeIncomingData(next.data))
@@ -361,7 +398,7 @@ export class UIRender extends DocumentInstance {
         return apiCalls
     }
 
-    onDataChanged = undefined
+    onDataChanged: (() => void) | undefined = undefined
 
     render () {
         const {
@@ -418,8 +455,6 @@ export class UIRender extends DocumentInstance {
     }
 }
 
-UIRender.contextType = AppContext
-
 const UIRenderWithUISetup = Decorator(UIRender)
 export default UIRenderWithUISetup
 
@@ -427,11 +462,11 @@ export default UIRenderWithUISetup
 /**
  * Transform *_meta.json API response into custom rules applied by the team
  */
-export function transformConfig (meta) {
+export function transformConfig (meta: any) {
     return toOpenLConfig(sanitizeResponse(meta || {}, { tags: [] }))
 }
 
-export function toOpenLConfig (meta) {
+export function toOpenLConfig (meta: any): any {
     if (isObject(meta)) {
         const { view } = meta
 
@@ -454,7 +489,8 @@ export function toOpenLConfig (meta) {
 
         // Add Table Expand to first column if `renderItem` defined, but `renderCell` is undefined
         else if (view === FIELD.TYPE.TABLE && meta.renderItem != null) {
-            const firstHeader = get(meta.headers, '[0]')
+            // A cast, not a guard: the first header, open JSON like the rest of the meta.
+            const firstHeader = get(meta.headers, '[0]') as Record<string, any>
             if (isObject(firstHeader) && firstHeader.renderCell == null) {
                 firstHeader.renderCell = {
                     view: FIELD.TYPE.EXPAND,
@@ -492,7 +528,7 @@ export function toOpenLConfig (meta) {
  * @param {Object} instance - UIRender instance (state will be mutated)
  * @param {String} [contextPath] - current data context path from parent containers
  */
-export function initSelectStatesFromData (meta, data, instance, contextPath) {
+export function initSelectStatesFromData (meta: any, data: unknown, instance: DocumentInstanceLike, contextPath?: string): void {
     if (!meta) return
     if (Array.isArray(meta)) {
         for (const item of meta) {
@@ -520,7 +556,7 @@ export function initSelectStatesFromData (meta, data, instance, contextPath) {
                         const optionsPath = contextPath ? `${contextPath}.${optionsName}` : optionsName
                         const optionsList = get(data, optionsPath)
                         if (Array.isArray(optionsList)) {
-                            const idx = optionsList.findIndex(o => String(get(o, mapValue)) === String(value))
+                            const idx = optionsList.findIndex((o: unknown) => String(get(o, mapValue)) === String(value))
                             if (idx >= 0) instance.state[name] = String(idx)
                         }
                     }
@@ -565,7 +601,7 @@ export function initSelectStatesFromData (meta, data, instance, contextPath) {
  *    - Initialize with data by overriding initial state
  */
 
-function Decorator (Class) {
+function Decorator (Class: any) {
     /**
      * THE LIFECYCLE LAYER, AS ITS OWN CLASS (§9.3 step 5).
      *
@@ -603,8 +639,9 @@ function Decorator (Class) {
         get data () {
             return get(this.state, 'data.json')
         }
-        set data (value) {
-            return this.setState(state => setIn(state, 'data.json', value))
+        // A setter returns nothing: what `setState` returned was always dropped.
+        set data (value: unknown) {
+            this.setState((state: object) => setIn(state, 'data.json', value))
         }
 
         /**
@@ -639,7 +676,8 @@ function Decorator (Class) {
             // Send the forms' values and a file through the host's `uploadFile`, and make its answer
             // the data (see `upload.js`). The remount key and the form restart wait for the new data
             // to be committed, as they always did.
-            FIELD.FUNC[FIELD.ACTION.UPLOAD] = (...args) => upload(args, {
+            // A cast, not a guard: what `Upload` calls the action with.
+            FIELD.FUNC[FIELD.ACTION.UPLOAD] = (...args) => upload(args as UploadArgs, {
                 uploadFile: this.getAPICalls().uploadFile,
                 readFormsData: this.getAllFormsData,
                 onUploaded: normalizedResponse => this.setState({
@@ -659,7 +697,8 @@ function Decorator (Class) {
                     const registeredValues = this.registeredValues
                     const rel = this.props.meta && this.props.meta.relativePath
                     const dataKindPath = dataKindPathFor(this.props.meta, form.kind, this.dataKindPath)
-                    const existingLen = get(parent.state.data.json, `${dataKindPath}.${form.kind}`, []).length
+                    // A cast, not a guard: the rows there, or the `[]` fallback.
+                    const existingLen = (get(parent.state.data.json, `${dataKindPath}.${form.kind}`, []) as unknown[]).length
                     const rowObject = rowObjectForDataKindAppend(registeredValues, rel, existingLen)
                     pushDataKindRow({
                         parentUIRender: parent,
@@ -670,7 +709,7 @@ function Decorator (Class) {
                     })
                     this.form.restart()
                     const rememberedTouched = touchedFor(this.form)
-                    this.form.getRegisteredFields().forEach(field => {
+                    this.form.getRegisteredFields().forEach((field: string) => {
                         delete rememberedTouched[field]
                     })
                 }
@@ -874,20 +913,22 @@ function Decorator (Class) {
         // followed by optional arguments.
         // Positional arguments was chosen instead of keyword arguments because
         // it provides more flexibility and separation of concerns between different configs.
-        setStates (value, ...rest) {
+        setStates (value: unknown, ...rest: unknown[]) {
             // The state path is the LAST STRING argument, not the second positional one: see
             // `statePath.ts` for why. The `{state.x}` templates re-resolve on the render this
             // schedules, because the meta cache is keyed on the state object (`get meta`). Until
             // §9.3 step 6 this also cleared the cache, which that key had made redundant.
             const keyPath = statePathOf(rest)
-            return this.setState(state => setIn(state, keyPath, value))
+            return this.setState((state: object) => setIn(state, keyPath, value))
         }
 
         resetForm () {
             this.form.reset()
         }
 
-        popupAlert (title, content) {
+        // `_options`: what a popup's own props and the `popupOpen` options are handed in as. The
+        // popup shows a title and content, and nothing reads them.
+        popupAlert (title: unknown, content?: unknown, _options?: unknown) {
             // An element is shown as it is, and a value as a JSON tree. No content means no body:
             // `Json` requires its `data`, and warned whenever there was nothing to show, for a `popup`
             // action with nothing configured and for a `popupOpen` of an id nothing registered.
@@ -898,7 +939,7 @@ function Decorator (Class) {
             })
         }
 
-        componentWillUnmount (nextProps, nextState) {
+        componentWillUnmount (nextProps?: unknown, nextState?: unknown) {
             const { parent, form, index } = this.props
             if (parent && index != null) parent.unregisterDataKind(this, form.kind, index)
             // A change typed just before unmount must not submit a form the user has left.
@@ -909,10 +950,10 @@ function Decorator (Class) {
         // Wrap form.submit with HOC to extract nested form values before submission. A member from
         // the constructor on, because the meta's `submit` action is built from it when the first
         // render builds the meta (`rules.mount-order.test.js`).
-        submit = (...args) => {
+        submit = (...args: unknown[]) => {
             const { dataKind } = this.formValues
             for (const kind in dataKind) {
-                dataKind[kind] = this.getDataKind(kind).map((v, index) => isEmpty(v) ? dataKind[kind][index] : v)
+                dataKind[kind] = this.getDataKind(kind).map((v: unknown, index: number) => isEmpty(v) ? dataKind[kind][index] : v)
             }
             return this.form.submit(...args)
         }
@@ -929,7 +970,7 @@ function Decorator (Class) {
             if (super.componentDidMount) super.componentDidMount(...arguments)
         }
 
-        componentDidUpdate (prevProps, prevState) {
+        componentDidUpdate (prevProps: UIRenderProps, prevState: unknown) {
             const { parent, form, index } = this.props
             if (parent && form && index != null && prevProps.index !== index) {
                 if (prevProps.index != null) {
@@ -943,7 +984,7 @@ function Decorator (Class) {
         // THE NESTED-DATA REGISTRY. These four were the `withDataKind` mixin, assigned onto this
         // prototype after the class; it had no other consumer, so they are members like the rest.
 
-        getDataKindPath (relativePath, kind) {
+        getDataKindPath (relativePath: string | null | undefined, kind: string) {
             return getDataKindPathFromRelative(relativePath, kind)
         }
 
@@ -951,7 +992,7 @@ function Decorator (Class) {
         // Registry is scoped by dataKindPath so that children with the same kind+index
         // from different parent rows (2-level nesting) do not overwrite each other.
         // Structure: this.dataKind[kind][scope][index] = instance
-        registerDataKind (instance, kind, index) {
+        registerDataKind (instance: DocumentInstanceLike, kind: string, index: number | string) {
             if (!this.dataKind) this.dataKind = {}
             if (!this.dataKind[kind]) this.dataKind[kind] = {}
             const relativePath = instance.props.meta && instance.props.meta.relativePath
@@ -963,7 +1004,7 @@ function Decorator (Class) {
         }
 
         // Unregister child instance from parent instance
-        unregisterDataKind (instance, kind, index) {
+        unregisterDataKind (instance: DocumentInstanceLike, kind: string, index: number | string) {
             if (!instance) return
             if (!this.dataKind) return
             // Read scope before clearing it on the instance
@@ -982,8 +1023,8 @@ function Decorator (Class) {
          *   When omitted, derives the path from the first registered scope (backward-compatible).
          * @returns {Array} forms values array, or empty array
          */
-        getDataKind (kind, scope) {
-            let base
+        getDataKind (kind: string, scope?: string): any[] {
+            let base: string | undefined
             if (scope != null) {
                 base = scope
             } else {
@@ -1002,7 +1043,7 @@ function Decorator (Class) {
                 return live
             }
             const dataJson = getFormsData(formsStorage)
-            return get(dataJson, pathToDataKindArray, [])
+            return get(dataJson, pathToDataKindArray, []) as any[] // a cast, not a guard: the rows, or `[]`
         }
     }
 
@@ -1042,4 +1083,4 @@ function Decorator (Class) {
     return UIRenderWithForm
 }
 
-const dataActionWarning = (e) => console.warn('Missing parent UI Render instance to modify form values!', e)
+const dataActionWarning = (e: unknown) => console.warn('Missing parent UI Render instance to modify form values!', e)

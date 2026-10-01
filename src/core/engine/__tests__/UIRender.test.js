@@ -1,4 +1,4 @@
-// fetch is referenced in rules.js (FIELD.FUNC[FETCH] = fetch); stub it for jsdom before any import.
+// fetch is referenced in rules.tsx (FIELD.FUNC[FETCH] = fetch); stub it for jsdom before any import.
 // eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
     // eslint-disable-next-line no-undef
@@ -7,7 +7,7 @@ if (typeof global.fetch === 'undefined') {
 import React from 'react' // eslint-disable-line import/first
 import { render } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
-// Force form module to load before rules.js triggers the cycle via mapper → renders.js
+// Force form module to load before rules.tsx triggers the cycle via mapper → renders.js
 import '../../modules/form/utils' // eslint-disable-line import/first
 import UIRender from '../rules' // eslint-disable-line import/first
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext' // eslint-disable-line import/first

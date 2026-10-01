@@ -34,7 +34,7 @@
  *    exactly one uncaught `TypeError: Failed to execute 'getComputedStyle' on 'Window'` per open,
  *    from popper's clipping-parent lookup inside the flip modifier.
  *    Mechanism: semantic-ui-react clones the trigger with a `ref`, and of everything a meta can
- *    declare, NOTHING can hold one — `mapper.js` uses the plain `Row`, `Button` is a
+ *    declare, NOTHING can hold one — `mapper.tsx` uses the plain `Row`, `Button` is a
  *    `React.memo(function Button)`, and the only ref-able components in `src/core` are `Dropzone`
  *    and the named `RowRef` export, which no `view` maps to. So popper's reference element is
  *    `null`. Feeding the same component a plain `<button>` (the harness) positions correctly and
@@ -425,7 +425,7 @@ const DROPDOWN = {
      * in Chrome, that holds for `view: "Dropdown"` and is FALSE for `view: "Select"`, which is the
      * majority path.
      *
-     * Cause: `mapper.js` passes `lazyLoad={false}` only inside its `FIELD.TYPE.DROPDOWN` branch,
+     * Cause: `mapper.tsx` passes `lazyLoad={false}` only inside its `FIELD.TYPE.DROPDOWN` branch,
      * while the wrapper's own default is `lazyLoad = true` — and with lazy loading on, SUIR mounts
      * no options at all until the list opens. Measured: `#dropdown` shows 2 options closed;
      * `#selectCascading` shows 0 on both of its listboxes.

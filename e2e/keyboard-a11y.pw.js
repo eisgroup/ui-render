@@ -154,7 +154,7 @@ test.describe('dropdown: the step 3 starting state', () => {
 
     /**
      * THE OTHER HALF OF THE SAME FACT, and the half that was missing. The test above measures
-     * `view: "Dropdown"`, where `mapper.js` passes `lazyLoad={false}`; this measures
+     * `view: "Dropdown"`, where `mapper.tsx` passes `lazyLoad={false}`; this measures
      * `view: "Select"`, the MAJORITY path, where the wrapper's `lazyLoad = true` default means SUIR
      * mounts no options until the list opens. Without this, "options exist when closed" read as a
      * property of the component when it is a property of one entry point.

@@ -17,8 +17,8 @@ export type PopupContentProps = {
     _data?: unknown
     form?: unknown
     instance?: unknown
-    relativeIndex?: number
-    relativePath?: string
+    relativeIndex?: number | null
+    relativePath?: string | null
     /** Accepted and deliberately not read, see below */
     relativeData?: boolean
     currencyCode?: string

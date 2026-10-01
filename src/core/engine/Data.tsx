@@ -10,8 +10,8 @@ import type { LocalDraftTableRowProps } from './components/LocalDraftTableRow'
  * an `unknown` slot of the runtime registry. Both are re-typed as open prop bags: exactly the permissiveness
  * their `.js` call sites have. Delete the casts when the engine is converted.
  *
- * The casts happen AT RENDER, not in a module-level constant, and that is load-bearing. `rules.js` imports
- * `mapper.js`, which imports this file, which imports `rules.js` back: while this module is evaluated, that
+ * The casts happen AT RENDER, not in a module-level constant, and that is load-bearing. `rules.tsx` imports
+ * `mapper.tsx`, which imports this file, which imports `rules.tsx` back: while this module is evaluated, that
  * default export is still undefined. A constant would keep the undefined for good (measured: every nested
  * form-backed document rendered nothing), where reading the import inside the render sees the live binding.
  */

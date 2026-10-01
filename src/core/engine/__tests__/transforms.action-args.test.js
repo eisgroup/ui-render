@@ -26,7 +26,7 @@
  * and `setStates(value, keyPath)` reads its second POSITIONAL argument — the field's `name` — as
  * the state path, while the path the meta configured arrives fourth and is ignored.
  *
- * The codebase already knows, and works around it in exactly one place: `mapper.js` re-wraps
+ * The codebase already knows, and works around it in exactly one place: `mapper.tsx` re-wraps
  * `onChange` for stable-value Selects to pass the value alone, with the comment "Only pass the
  * converted value (not name/event) so setStates uses the config keyPath, not the modified
  * input.name". Every other `view: 'Select'` with a `setState` action whose configured path differs
@@ -49,7 +49,7 @@ import { metaToProps } from '../transforms'
  * component is handed, so this drives the same code by the same route a meta does.
  */
 const actionFrom = (declaration, fieldFunc) => {
-    // `funcConfig` is the key `metaToProps` reads the resolvers from — the same shape `rules.js`
+    // `funcConfig` is the key `metaToProps` reads the resolvers from — the same shape `rules.tsx`
     // builds when it wires `FIELD.FUNC` to the instance.
     const props = metaToProps({ view: 'Select', ...declaration }, {
         data: {},
@@ -97,10 +97,10 @@ describe('a configured action argument against a variable-arity caller', () => {
         expect(keyPathAsRead).not.toBe('categoryX')
     })
 
-    it('and a single-argument caller lands the configured value second, which is why `mapper.js` strips arguments', () => {
+    it('and a single-argument caller lands the configured value second, which is why `mapper.tsx` strips arguments', () => {
         const action = actionFrom({ onChange: 'setState,categoryX' }, fieldFunc)
 
-        // What `mapper.js` re-wraps stable-value Selects to do.
+        // What `mapper.tsx` re-wraps stable-value Selects to do.
         action('gold')
 
         expect(calls[0]).toEqual(['gold', 'categoryX'])

@@ -12,7 +12,7 @@
  * arguments the caller passes. A `Button` passes one and the path lands second; a `Dropdown` passes
  * three — `(value, name, event)` — and the path lands FOURTH while the field's own `name` sits
  * second. Reading the second argument therefore wrote to the path named by the field instead of the
- * one the meta asked for, for every `view: 'Select'` whose two differ. `mapper.js` works around it
+ * one the meta asked for, for every `view: 'Select'` whose two differ. `mapper.tsx` works around it
  * for stable-value Selects by stripping the extra arguments, with a comment saying exactly this;
  * nothing covered the rest.
  *

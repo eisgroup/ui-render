@@ -1,4 +1,4 @@
-// rules.js registers fetch while building the action map.
+// rules.tsx registers fetch while building the action map.
 // eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
     // eslint-disable-next-line no-undef
@@ -8,7 +8,7 @@ if (typeof global.fetch === 'undefined') {
 import React from 'react' // eslint-disable-line import/first
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
-// Load form registration before rules.js follows the mapper/renders cycle.
+// Load form registration before rules.tsx follows the mapper/renders cycle.
 import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
 import { AppProvider } from '../../providers' // eslint-disable-line import/first
 

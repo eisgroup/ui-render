@@ -346,7 +346,7 @@ export function Dropdown ({
       /*
        * `${id}-help`, not `id`. The caller's `id` also rides the rest bag onto Semantic's
        * `<div role="listbox">`, so this View used to give TWO elements the same id — invalid, and
-       * reachable without the caller doing anything, because `mapper.js` assigns `input.id`
+       * reachable without the caller doing anything, because `mapper.tsx` assigns `input.id`
        * automatically for relative paths. The derived id is also what `aria-describedby` on the
        * control now points at: the error and info text was rendered but never announced.
        * Found by the §9.7-F1 step 3 part 1 audit.

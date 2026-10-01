@@ -45,7 +45,7 @@ export type RenderErrorReport = {
 /**
  * Recursive Field Renderer
  * @setup:
- *      // mapper.js
+ *      // mapper.tsx
  *      import { Render } from 'ui-render'
  *      import TooltipPop from '../components/TooltipPop'
  *
@@ -105,11 +105,12 @@ function Render (props: RenderProps, index?: number | string | object) {
 // cannot be a default export.
 export default Render
 
-// The registry `mapper.js` fills at load (see `@setup` above). The two hooks set at the end of this
+// The registry `mapper.tsx` fills at load (see `@setup` above). The two hooks set at the end of this
 // file are declared by those assignments.
 declare namespace Render {
     let Component: React.ComponentType<any> | undefined
-    let Method: ((name: string) => unknown) | undefined
+    /** A value renderer by its meta name, `(value, index, props) => node`; `undefined` for an unknown name */
+    let Method: ((name: string) => ((...args: any[]) => any) | undefined) | undefined
     let Tooltip: React.ComponentType<any>
 }
 
@@ -241,7 +242,7 @@ export function formatRenderError ({error, path = '', props = {}}: RenderErrorRe
 
 /**
  * Send one report to both channels: the host's `onError` prop, when it passed one, and
- * the library's own sink (`Render.onError`, which `mapper.js` installs). Both run — a
+ * the library's own sink (`Render.onError`, which `mapper.tsx` installs). Both run — a
  * host hook is an extra channel for reporting, not a way to silence the diagnostic.
  *
  * @param {Object} report - {error, errorInfo, props, path, message}

@@ -149,7 +149,7 @@ const renderExample = ({ data, meta }) => {
  * here while they were live were wrong, and are recorded so the numbers are not
  * re-derived from the same mistakes:
  *   - they were NOT all "a facet of the same root cause as the data=… entry". There
- *     were four independent causes: the Render.Method options bag (`transforms.js`,
+ *     were four independent causes: the Render.Method options bag (`transforms.ts`,
  *     which is where `data`/`_data`/`symbol` and 40 `name` came from), meta keys no
  *     view consumes reaching View/Row/Text, a component building DOM props from a raw
  *     untransformed meta node (`LocalDraftTableRow` → `view`), and components that

@@ -4,7 +4,7 @@
  *
  * The lookup `POPUP_OPEN` did inline until §9.3 step 2. Measured before it moved: in the whole suite
  * the second step never found anything and the third always did — every template key contains `{`,
- * since that is what makes `mapper.js` register a template at all, so the second step's candidate
+ * since that is what makes `mapper.tsx` register a template at all, so the second step's candidate
  * matches only an id that still carries a placeholder. `rules.popup-actions.test.js` and
  * `popupScope.nested-data.test.js` open real popups and are what proves the wiring.
  */

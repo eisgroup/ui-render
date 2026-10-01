@@ -19,7 +19,7 @@ import TooltipPop from '../../core/components/TooltipPop'
  * WHY THIS PAGE RENDERS `TooltipPop` DIRECTLY instead of through a meta — the reason it was built,
  * and the reason it survives its own diagnosis. While the tooltip wrapped `semantic-ui-react`, that
  * library cloned the trigger with a `ref`, and of everything reachable from meta only `Dropzone`
- * and the named `RowRef` export could hold one (`mapper.js` uses the plain `Row`; `Button` is a
+ * and the named `RowRef` export could hold one (`mapper.tsx` uses the plain `Row`; `Button` is a
  * `React.memo(function Button)`). So from meta the reference element was always `null`, popper's
  * clipping-parent lookup threw, and no coordinates were ever written. Feeding the same component a
  * plain `<button>` was the only way to observe positioning at all, and the contrast between this

@@ -2,15 +2,33 @@ import { UI } from '../variables'
 import PropTypes from 'prop-types'
 import React, { PureComponent, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Field, Form } from 'react-final-form'
+import type { FieldRenderProps, FormProps, FormRenderProps } from 'react-final-form'
+import type { FormApi, FormState, MutableState } from 'final-form'
 import { isRequired } from '../../components/inputs/validationRules'
 import Text from '../../components/Text'
 import ToolTip from '../../components/Tooltip'
 import View from '../../components/View'
 import { Active, debounce, isEqualJSON, toJSON } from '../../utils'
+import type { Debounced } from '../../utils/function'
 import { hasObjectValue, objChanges, set } from '../../utils/object'
 import { _ } from '../../utils/translations'
 import { baselineOf, clearErrorsFor, clearTouchedFor, formsStorage, hasBaseline, setBaseline, touchedFor } from '../../state/formRegistry'
 import arrayMutators from 'final-form-arrays'
+
+/** A form's values, as final-form holds them. */
+type Values = Record<string, any>
+
+/** What final-form hands a field's input: its `input` props, without `value`, which the field caches. */
+type FieldInput = Omit<FieldRenderProps<unknown>['input'], 'value'>
+
+/** A value transform a field hands final-form. */
+type ValueTransform = (value: unknown) => unknown
+
+/**
+ * The document a field or form belongs to. `any`, deliberately: it is the engine's class with the form
+ * layer over it, whose members are added by the classes in `rules` and here rather than declared once.
+ */
+type DocumentInstance = any
 
 /**
  * STATE SELECTORS =============================================================
@@ -27,7 +45,7 @@ import arrayMutators from 'final-form-arrays'
  * @param {Object} form - instance from react-final-form
  * @return {Object} formValues - key values of field names and values
  */
-export function fieldValues (form) {
+export function fieldValues (form: FormApi): Values {
   return form.getState().values
 }
 
@@ -37,15 +55,16 @@ export function fieldValues (form) {
  * @param {FormApi} form - instance from react-final-form
  * @returns {Object|Undefined} values - nested mapping of field values by their name, or `false` if no field values found
  */
-export function registeredFieldValues (form) {
+export function registeredFieldValues (form: FormApi): Values | undefined {
   const registeredFieldNames = form.getRegisteredFields()
   if (!registeredFieldNames.length) return
 
   // Return object mapping of registered values,
   // unfilled fields are considered as non-registered.
-  const values = {}
+  const values: Values = {}
   registeredFieldNames.forEach(field => {
-    const {value} = form.getFieldState(field)
+    // Not undefined: the field was just listed as registered.
+    const {value} = form.getFieldState(field)!
     if (value != null) set(values, field, value) // use set() to convert nested paths to objects
   })
   if (hasObjectValue(values)) return values
@@ -57,15 +76,16 @@ export function registeredFieldValues (form) {
  * @param {FormApi} form - instance from react-final-form
  * @returns {Object|Undefined} errors - key values of field names and error messages
  */
-export function registeredFieldErrors (form) {
+export function registeredFieldErrors (form: FormApi): Record<string, unknown> | undefined {
   const registeredFieldNames = form.getRegisteredFields()
   if (!registeredFieldNames.length) return
 
   // Return object mapping of registered field errors,
   // unfilled fields are considered as non-registered.
-  const errors = {}
+  const errors: Record<string, unknown> = {}
   registeredFieldNames.forEach(field => {
-    const {error} = form.getFieldState(field)
+    // Not undefined: the field was just listed as registered.
+    const {error} = form.getFieldState(field)!
     if (error != null) errors[field] = error
   })
   if (hasObjectValue(errors)) return errors
@@ -87,10 +107,34 @@ export function registeredFieldErrors (form) {
  * @param {function(*, *): *} [options.sanitize] - `(value, props)`: parses the (formatted) value from input Field to InputComponent
  * @returns {import('react').ComponentClass<*>} React InputComponentField - connected to react-final-form
  */
-export function asField (InputComponent, {sanitize} = {}) {
+/** The props a field reads; the rest are passed to the input it renders. */
+export type AsFieldProps = {
+  name: string
+  /** The document the field belongs to: its form, its initial values, and whether it is unmounting */
+  instance?: DocumentInstance
+  onRemoveChange?: boolean
+  defaultValue?: unknown
+  value?: unknown
+  readonly?: boolean
+  disabled?: boolean
+  error?: React.ReactNode
+  onChange?: (value: unknown, ...args: unknown[]) => void
+  format?: ValueTransform
+  normalize?: ValueTransform
+  parse?: ValueTransform
+  validate?: (value: unknown, allValues: object) => unknown
+  options?: unknown
+  [key: string]: unknown
+}
+
+/**
+ * @param InputComponent - `any` props: the field spreads final-form's input and its own props onto it,
+ *    which only the input's own type describes.
+ */
+export function asField (InputComponent: React.ComponentType<any>, {sanitize}: { sanitize?: (value: unknown, props: AsFieldProps) => unknown } = {}) {
   if (!Active.Field) Active.Field = Field
   // noinspection JSPotentiallyInvalidUsageOfThis
-  const Class = class extends PureComponent {
+  const Class = class extends PureComponent<AsFieldProps> {
     static propTypes = {
       // Input `name` attribute
       name: PropTypes.string.isRequired,
@@ -120,7 +164,12 @@ export function asField (InputComponent, {sanitize} = {}) {
     // transition a one-shot. NOT React state: nothing renders from it, so holding it in state only
     // scheduled an update from inside `Input` — a second render pass per Dropdown field and React's
     // "Cannot update during an existing state transition" warning.
-    selectPreviousValue = null
+    selectPreviousValue: unknown = null
+
+    _value: unknown
+    hasFocus?: boolean
+    input!: FieldInput
+    initValues: unknown
 
     get value () {
       if (this._value !== void 0) {
@@ -129,7 +178,7 @@ export function asField (InputComponent, {sanitize} = {}) {
       return ''
     }
 
-    set value (v) {
+    set value (v: unknown) {
       this._value = v
     }
 
@@ -173,11 +222,11 @@ export function asField (InputComponent, {sanitize} = {}) {
 
     // do not use ...props from input, because it is shared by <Active.Field> instances
     // @Note: react-final-form fires `format()` when `input.value` getter is called
-    Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}) => {
+    Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}: FieldRenderProps<unknown>) => {
       const {
         onChange, error: err, defaultValue, normalize, format, parse, validate,
         instance, onRemoveChange, ...props
-      } = this.props
+      }: AsFieldProps = this.props
 
       if (!this.hasFocus) { // use cached `value` while editing to prevent format/parse bugs and rerender
         // @Note: defaultValue is only used for UI, internal value is still undefined
@@ -211,7 +260,7 @@ export function asField (InputComponent, {sanitize} = {}) {
       }
 
       // A field reaches its form through the instance the engine gives every field
-      // (`mapper.js` passes `instance` on every `renderField` call). A field rendered without one
+      // (`mapper.tsx` passes `instance` on every `renderField` call). A field rendered without one
       // is not part of a document and has no remembered touches to consult.
       const rememberedTouched = instance && instance.form ? touchedFor(instance.form) : {}
       const errorText = error && (rememberedTouched[input.name] || touched || !pristine) && (err || error)
@@ -229,7 +278,7 @@ export function asField (InputComponent, {sanitize} = {}) {
       )
     }
 
-    handleFocus = (...args) => {
+    handleFocus = (...args: Parameters<FieldInput['onFocus']>) => {
       this.hasFocus = true
       return this.input.onFocus(...args)
     }
@@ -239,7 +288,7 @@ export function asField (InputComponent, {sanitize} = {}) {
       return this.input.onBlur()
     }
 
-    handleChange = (value, ...args) => {
+    handleChange = (value: unknown, ...args: unknown[]) => {
       const {onChange, normalize, parse = normalize, instance} = this.props
       /**
        * @Note:
@@ -273,7 +322,9 @@ export function asField (InputComponent, {sanitize} = {}) {
       const {
         name, disabled, normalize, format, parse = normalize, validate, options
       } = this.props
-      return <Active.Field {...{name, disabled, normalize, format, parse, validate, options}}
+      // A cast, not a guard, read at render: final-form's `Field`, unless something replaced it.
+      const ActiveField = Active.Field as typeof Field
+      return <ActiveField {...{name, disabled, normalize, format, parse, validate, options}}
                            component={this.Input}/>
     }
   }
@@ -326,7 +377,18 @@ export function asField (InputComponent, {sanitize} = {}) {
  * @param {FormProps|Object} [options] - for <Form/> see: https://final-form.org/docs/react-final-form/types/FormProps
  * @returns {Function} decorator - HOC wrapper function for given React component
  */
-export function withForm (options = {subscription: {pristine: true, valid: true}}) {
+/** The `<Form>` options a document is wrapped with, and the two the wrapper reads itself. */
+export type WithFormOptions = Partial<FormProps<Values>> & {
+  /** Turns the class with the form layer over it into the component the wrapper renders */
+  host?: (Class: any) => React.ComponentType<any>
+  /** The engine's error pass, handed in rather than imported (see below); `meta` is the engine's node */
+  processErrors?: (form: FormApi, meta: any) => void
+}
+
+/** What the document is handed as `instance`: the form, and its submit handler, as the form renders. */
+type FormHandle = { form?: FormApi, handleSubmit?: FormRenderProps<Values>['handleSubmit'] }
+
+export function withForm (options: WithFormOptions = {subscription: {pristine: true, valid: true}}) {
   // The engine's error processing arrives as a CALLBACK rather than an import (§9.3 step 2). It reads
   // a meta node and writes the shared error map, which is engine business; importing it from here was
   // half of the `engine` <-> `modules/form` cycle, and moving it down would have put engine logic
@@ -339,16 +401,18 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
   // It is not a `<Form>` option, so it is kept out of the ones the wrapper hands the form.
   const {host, ...formOptions} = options
   const {processErrors} = formOptions
-  return function Decorator (Class) {
+  return function Decorator (Class: any) {
     // @Note: form field re-renders because of constantly changing formProps reference
     //        => convert it to instance getter, so `asField` does not depend on formProps.
     //        => cannot use context, because it triggers re-render of all child components.
     // Built here, once per decorated class, and it is what the wrapper below renders: `Class` with the
     // form layer over it, since `withFormSetup` no longer writes onto `Class` itself.
     const FormClass = withFormSetup(Class, {fieldValues, registeredFieldValues, registeredFieldErrors, processErrors})
-    const FormComponent = host ? host(FormClass) : FormClass
+    // A cast, not a guard: without a host, the class is the React component the class it builds on
+    // is. It is declared over an untyped base, so the checker cannot see that for itself.
+    const FormComponent = host ? host(FormClass) : (FormClass as unknown as React.ComponentType<any>)
 
-    const formSubscription = (form) => ({touched, initialValues}) => {
+    const formSubscription = (form: FormApi) => ({touched, initialValues}: FormState<Values>) => {
       // Everything below is about THIS form. It used to compare against one module-level baseline,
       // so a second document mounting reset the first one's touched fields and errors.
       if (!hasBaseline(form)) {
@@ -363,8 +427,9 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         clearTouchedFor(form)
         clearErrorsFor(form)
       } else {
-        for(const field of Object.keys(touched)) {
-          if(touched[field]) {
+        // Not undefined: the subscription below asks for `touched`.
+        for(const field of Object.keys(touched!)) {
+          if(touched![field]) {
             touchedFor(form)[field] = true;
           }
         }
@@ -381,9 +446,16 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
      * renders: it hands a new `{...form, reset}` on every render, and every one of them shares the
      * instance's methods (see `renderForm`).
      */
-    function WithForm (props) {
+    function WithForm (props: { initialValues?: Values, onSubmit?: FormProps<Values>['onSubmit'], [key: string]: unknown }) {
       const {initialValues, onSubmit = console.warn, ...restProps} = props
-      const self = useRef(null)
+      const self = useRef<{
+        handle: FormHandle
+        form?: FormApi
+        formProps?: unknown
+        subscribedForm?: FormApi | null
+        unsubscribe?: (() => void) | null
+        stored?: object
+      } | null>(null)
       if (self.current === null) self.current = {handle: {form: undefined, handleSubmit: undefined}}
       const own = self.current
       const {handle} = own
@@ -399,7 +471,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       const [applied, setApplied] = useState(adopted)
 
       // One subscription at a time, to the form the wrapper keeps (`renderForm`).
-      const subscribeTo = form => {
+      const subscribeTo = (form: FormApi) => {
         if (own.unsubscribe) own.unsubscribe()
         own.subscribedForm = form
         own.unsubscribe = form.subscribe(
@@ -415,7 +487,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       // `formProps` does not pass through `initialValues` (it's undefined).
       // => better to let `render` function always run, and memoize at the highest <WithForm> level.
       // => this way, rerender is minimized to only when props changed, or form state changed.
-      const renderForm = ({form: rendered, handleSubmit, ...formProps}) => {
+      const renderForm = ({form: rendered, handleSubmit, ...formProps}: FormRenderProps<Values>) => {
         // ONE form object per final-form instance: the first one react-final-form hands over. It hands a
         // NEW `{...form, reset}` on every render, and the registries in `state/formRegistry` are keyed by
         // the object. Keyed per render, each render started them empty: a field's remembered touch, the
@@ -449,13 +521,14 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
         own.stored = {...initialValues}
         formsStorage.set(own.stored, {
           meta: props.meta,
-          form: handle.form
+          // Not undefined: the form rendered, and handed it over, before any effect runs.
+          form: handle.form!
         });
         return () => {
           if (own.unsubscribe) own.unsubscribe()
           own.unsubscribe = null
           own.subscribedForm = null
-          formsStorage.delete(own.stored)
+          formsStorage.delete(own.stored!) // not undefined: the mount above stored it
         }
       }, []) // eslint-disable-line react-hooks/exhaustive-deps -- the mount's values, as `componentDidMount` read them
 
@@ -466,7 +539,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       // once on React 16 and 17 (on 18 it rendered twice as well). Accepted 2026-09-29.
       useBeforePaintEffect(() => {
         if (applied === adopted) return
-        formsStorage.delete(own.stored)
+        formsStorage.delete(own.stored!) // not undefined: the mount stored it before any update
         own.stored = {...adopted}
         if (handle.form) {
           handle.form.reset(adopted)
@@ -495,7 +568,8 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       />
     }
 
-    const Wrapper = React.memo(WithForm)
+    // A cast, not a guard: the property is assigned on the next line.
+    const Wrapper = React.memo(WithForm) as React.MemoExoticComponent<typeof WithForm> & { WrappedComponent: React.ComponentType<any> }
     // What this wrapper renders, for a caller that renders it WITHOUT the wrapper: the engine's
     // nested documents share their parent's form rather than making one of their own
     // (`engine/Data.tsx`), so they must render this and not the class handed to the decorator.
@@ -505,7 +579,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
 }
 
 /** The user's edits are in: tell the host, or the document this one is nested in. */
-function reportDataChanged ({onDataChanged, parent}) {
+function reportDataChanged ({onDataChanged, parent}: { onDataChanged?: unknown, parent?: { onDataChanged?: unknown } }) {
   if (typeof onDataChanged === 'function') {
     onDataChanged()
   } else if (parent && typeof parent.onDataChanged === 'function') {
@@ -517,7 +591,7 @@ function reportDataChanged ({onDataChanged, parent}) {
 // is a plain effect: a layout effect there only warns, once per wrapper (see `InputNative`).
 const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-const setFieldTouched = (args, state) => {
+const setFieldTouched = (args: [string, boolean], state: MutableState<Values>) => {
   const [name, touched] = args
   const field = state.fields[name]
 
@@ -533,7 +607,7 @@ const setFieldTouched = (args, state) => {
  * THE FORM LAYER, AS ITS OWN CLASS (§9.3 step 5). This used to write its members straight onto
  * `Class.prototype` and REPLACE the class's own `UNSAFE_componentWillReceiveProps` and
  * `componentWillUnmount` with wrappers that called captured copies, so the class handed in was a
- * different object before and after: the mutation the engine layer in `rules.js` had already
+ * different object before and after: the mutation the engine layer in `rules.tsx` had already
  * stopped making to the class IT is handed. It now returns a subclass and leaves `Class` as written; the
  * originals are reached through `super`, which is what the captures always meant. A caller must
  * render what it RETURNS: `withForm` does, and publishes it as `WrappedComponent`.
@@ -544,7 +618,18 @@ const setFieldTouched = (args, state) => {
  * @param {Function} registeredFieldErrors - callback to get form registered errors
  * @returns {Object} a subclass of `Class` with the form properties
  */
-export function withFormSetup (Class, {fieldValues, registeredFieldValues, registeredFieldErrors, processErrors}) {
+/** The readers the form layer is built with, and the engine's error pass. */
+export type FormSetupHelpers = {
+  fieldValues: (form: FormApi) => Values
+  registeredFieldValues: (form: FormApi) => Values | undefined
+  registeredFieldErrors: (form: FormApi) => Record<string, unknown> | undefined
+  processErrors?: (form: FormApi, meta: any) => void
+}
+
+/**
+ * @param Class - `any`: the engine's class, whose members the layers add in their class bodies
+ */
+export function withFormSetup (Class: any, {fieldValues, registeredFieldValues, registeredFieldErrors, processErrors}: FormSetupHelpers) {
   if (!Active.renderField) throw new Error(`${withFormSetup.name} requires Active.renderField to be registered`)
 
   // Class.contextType = StateContext
@@ -603,7 +688,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
       // Use label if defined, for more intuitive error messages
       const fields = this._fields || []
       for (const k in errors) {
-        let {label, labelGroup} = fields.find(({name}) => name === k) || {}
+        let {label, labelGroup} = fields.find(({name}: { name: string }) => name === k) || {}
         label = labelGroup || label || k
         messages.push(<Text key={k} className="margin-bottom-smaller">{`• ${label}: ${toJSON(errors[k])}`}</Text>)
       }
@@ -635,11 +720,11 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
      * registers the instance for teardown — `componentWillUnmount` below cancels it, which is what
      * stops a scheduled sync firing into an unmounted component.
      */
-    get handleChangeInput () {
+    get handleChangeInput (): Debounced<(this: any, ...args: unknown[]) => void> {
       // The handler of the class this builds on, if it has one, runs after the sync. Read through
       // `super` rather than captured when the class was decorated, which is what the capture meant.
       const inherited = super.handleChangeInput
-      const own = debounce(function () {
+      const own = debounce(function (this: any) {
         // To handle use case when all fields in a group are removed, and no registered values are sent to backend,
         // use placeholder parent field that reserves as registered null value field for the entire group.
         // See <Fields> component for example.
@@ -650,7 +735,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
       return own
     }
 
-    set handleChangeInput (value) {
+    set handleChangeInput (value: unknown) {
       // Someone assigning over it (a test double, a subclass) must still win.
       Object.defineProperty(this, 'handleChangeInput', {value, configurable: true, writable: true})
     }
@@ -681,7 +766,7 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
      * which will make .canSave false, but this.syncInputChanges() only updated in the previous render, which was true.
      * => thus need to take formProps into consideration
      */
-    deriveFromProps (next) {
+    deriveFromProps (next: any) {
       if (
         !isEqualJSON(next.initialValues, this.props.initialValues) ||
         !isEqualJSON(next.formProps, this.props.formProps)

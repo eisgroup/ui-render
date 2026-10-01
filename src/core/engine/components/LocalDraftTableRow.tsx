@@ -86,7 +86,7 @@ function parseRowValue (def: DraftItem, raw: unknown) {
 }
 
 // Read once, when this module loads, as the class's `defaultProps` were. `Active.translate` is reassigned by
-// every document the engine constructs (rules.js), so reading it at render would hand a draft row whichever
+// every document the engine constructs (rules.tsx), so reading it at render would hand a draft row whichever
 // document was built last.
 const DEFAULT_TRANSLATE = Active.translate
 

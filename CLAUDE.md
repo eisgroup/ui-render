@@ -37,15 +37,15 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 
 ### Core rendering engine (`src/core/engine/`)
 
-- `Render.tsx` — The recursive renderer. Takes props from meta definitions and renders components via `Render.Component` (component resolver) and `Render.Method` (render function resolver). These are set up in `mapper.js`.
-- `transforms.js` — `metaToProps()` recursively converts meta.json declarations into React props. `mapProps()` maps data arrays using mapper definitions.
+- `Render.tsx` — The recursive renderer. Takes props from meta definitions and renders components via `Render.Component` (component resolver) and `Render.Method` (render function resolver). These are set up in `mapper.tsx`.
+- `transforms.ts` — `metaToProps()` recursively converts meta.json declarations into React props. `mapProps()` maps data arrays using mapper definitions.
 
 ### Component/method mapping (`src/core/engine/`)
 
-- `mapper.js` — Configures `Render.Component` and `Render.Method`. Maps `view` strings (e.g., `"Row"`, `"Table"`, `"Dropdown"`) to actual React components, and `render*` strings to value formatting functions.
-- `rules.js` — The main UIRender component with form handling (react-final-form), data processing, validation, actions (submit, download, upload, addData, removeData), and lifecycle management.
+- `mapper.tsx` — Configures `Render.Component` and `Render.Method`. Maps `view` strings (e.g., `"Row"`, `"Table"`, `"Dropdown"`) to actual React components, and `render*` strings to value formatting functions.
+- `rules.tsx` — The main UIRender component with form handling (react-final-form), data processing, validation, actions (submit, download, upload, addData, removeData), and lifecycle management.
 - `documentHost.ts` — Since §9.3 step 6 a document is not a React class component: its three classes (the declared `UIRender`, the engine layer, the form layer) are the classes of an INSTANCE, which the function component `hostDocument` builds hosts for its lifetime. They extend `DocumentInstance`, not `React.Component`. The host gives them `props`/`state`/`context`, `setState` with its callbacks, and the lifecycles, from layout effects. A props-driven sync goes in `deriveFromProps(nextProps)`, which is called during the render and may set nothing but the document's own state. Anything that reaches outside the document goes in `componentDidUpdate`. No `UNSAFE_*` lifecycle is left in `src`; do not add one. `Active.UIRender` is the host, and `Active.UIRender.InstanceClass` the class.
-- `utils.js` — Data transformation helpers (error mapping, normalization, form data extraction).
+- `utils.ts` — Data transformation helpers (error mapping, normalization, form data extraction).
 
 ### Internal layering and imports
 
@@ -88,9 +88,10 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 - React `^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0` (peer dependency); development and the default suite run on 18.3, and each of the other three has its own gating CI leg. **No Semantic UI at all**: the components went in-house at §9.7-F1 steps 1-3 and the CSS at step 4, where the two modules still in use were compiled into `src/style/vendor/` and the package removed. Components still emit Semantic's class tokens (`ui selection dropdown`, `ui table`) because the vendored CSS selects on them.
 - react-final-form for form state management
 - moment for dates (peer dependency, externalized); charts are custom SVG (`src/core/components/charts/` — no recharts)
-- The source is mixed JavaScript and TypeScript, converted file by file (§9.6-E2/E3; the engine
-  converts as it is decomposed). `src/core/utils` and `src/core/components` are TypeScript
-  throughout, tests aside. `@babel/preset-typescript` compiles `.ts`/`.tsx` in all three
+- `src/core` and `src/library` are TypeScript throughout, tests aside (§9.6-E3, 2026-10-01); the
+  demo and the test suites are JavaScript. Meta nodes are typed as open JSON (`any` where the engine
+  reads and rewrites them by key): `validateMeta` checks them at runtime, and the published types in
+  `src/library/types` describe them. `@babel/preset-typescript` compiles `.ts`/`.tsx` in all three
   pipelines (library build, demo build, Jest) and `npm run typecheck` checks them. `src/toolchain/`
   holds a guard proving that stays true — delete it once real converted modules cover the same
   ground (`docs/UPGRADE-PLAN.md` §9.6).
@@ -106,4 +107,4 @@ Examples live in `src/demo/examples/` (e.g., `example_meta.json` / `example_data
 - `npm run build-css` compiles `src/style/index.less` to `public/static/ui-render.built.css`. **It no longer mutates `node_modules`,** and neither does `npx jest`: both used to copy `theme.config` into `node_modules/semantic-ui-less/` because Semantic's definitions import it from inside their own package. §9.7-F1 step 4 removed the package, so the copy, the shared helper that made it and the three webpack `theme.config` aliases are all gone. The jest `setupFiles` entry survives as a documented no-op.
 - Jest has no path-alias mapping (`jest.config.js`) — only relative imports resolve in tests.
 - `isFunction()` from core utils rejects cross-realm functions such as `jest.fn()` — use plain functions in tests.
-- When converting an engine module to TypeScript, cast a JavaScript import where it is USED, not in a module-level `const`: `rules.js` → `mapper.js` → `Data` → `rules.js` is an import cycle, and a top-level `const X = Imported as …` captures the still-undefined export for good (every nested form-backed document then renders nothing). A read inside the render sees the live binding. Components may be cast at the top: none imports the engine.
+- Never capture an engine import in a module-level `const`: `rules.tsx` → `mapper.tsx` → `Data` → `rules.tsx` is an import cycle, and a top-level `const X = Imported as …` captures the still-undefined export for good (every nested form-backed document then renders nothing). Cast or read it where it is USED, inside the render, which sees the live binding. Capturing a `utils` import is safe: `utils` imports nothing above it.

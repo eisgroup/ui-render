@@ -23,7 +23,7 @@ type PropsBag = { [key: string]: unknown }
  * bubble rendered at the document origin — ~730 px from its trigger on `buttonIcon`, 2538-3006 px
  * on `all` — with no `data-popper-placement` anywhere, and every open raised an uncaught
  * `TypeError` from popper's flip modifier. Cause: SUIR clones the trigger with a `ref`, and of
- * everything a meta can declare NOTHING can hold one (`mapper.js` uses the plain `Row`, `Button`
+ * everything a meta can declare NOTHING can hold one (`mapper.tsx` uses the plain `Row`, `Button`
  * is a `React.memo(function Button)`; only `Dropzone` and the unused `RowRef` export are ref-able —
  * on the React 16-18 of the time: React 19 hands a `ref` to a function component as an ordinary prop,
  * so `View`, `Row`, `Button` and `Icon` do forward it), so popper's reference element was `null` and
@@ -231,7 +231,7 @@ export type TooltipBody = React.ReactNode | (() => React.ReactNode)
 
 /**
  * The 13 names this component reads, plus the open rest bag every caller really has: both engine
- * entry points spread a meta node into it (`mapper.js` for `view: "Tooltip"`, `Render.tsx` for the
+ * entry points spread a meta node into it (`mapper.tsx` for `view: "Tooltip"`, `Render.tsx` for the
  * `tooltip` attribute), so an index signature is the contract, not laziness. See
  * `docs/SUPPORTED-PROPS.md` for the per-prop record, including the 19 dropped names.
  */
@@ -258,7 +258,7 @@ export interface TooltipPopProps extends PropsBag {
  * @param {*} [children] - the trigger, rendered untouched apart from `aria-describedby`
  * @param {Number} [delay] - milliseconds before a hover opens it
  * @param {Boolean} [inverted] - dark colour scheme
- * @param {*} [content] - tooltip body, winning over `title` (`mapper.js` maps `label` to this)
+ * @param {*} [content] - tooltip body, winning over `title` (`mapper.tsx` maps `label` to this)
  * @param {String} [position] - any of `top`/`bottom`/`left`/`right`, or a corner pair
  * @param {Boolean} [open] - controlled open state; the component's own triggers stop deciding
  * @param {Boolean} [disabled] - render the trigger and never a bubble
@@ -364,7 +364,7 @@ export default function TooltipPop ({
     /**
      * The body, and whether there is one at all.
      *
-     * `mapper.js` maps a `view: "Tooltip"` node's `label` to `content` while `Render.tsx` passes
+     * `mapper.tsx` maps a `view: "Tooltip"` node's `label` to `content` while `Render.tsx` passes
      * `title`, so both names are live and `content` wins — the precedence the wrapper had, where
      * the rest spread landed after `content={title}`.
      *
@@ -444,7 +444,7 @@ export default function TooltipPop ({
      * the trigger joins its accessible name ("ResetRemove Changes") and cannot exist at all for a
      * childless trigger.
      *
-     * A non-element trigger — the array `mapper.js` builds from `items`, or a text child — renders
+     * A non-element trigger — the array `mapper.tsx` builds from `items`, or a text child — renders
      * as-is and gets no relationship. That the `items` form renders at all is new: SUIR ran
      * `React.Children.only` on it, threw, and the engine drew its error diagnostic INSTEAD of the
      * trigger, so an author lost the button too.

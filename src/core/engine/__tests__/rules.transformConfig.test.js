@@ -1,4 +1,4 @@
-// Force form module to load before rules.js cycle
+// Force form module to load before rules.tsx cycle
 import '../../modules/form/utils'
 import { transformConfig, toOpenLConfig, initSelectStatesFromData } from '../rules'
 import { FIELD } from '../../modules/variables'

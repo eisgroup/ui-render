@@ -23,7 +23,7 @@
  *
  * Values here are MEASURED, not chosen: each was read out of the rendered DOM first. In
  * particular a CLOSED dropdown mounts zero options, because the wrapper defaults to
- * `lazyLoad = true` — `mapper.js` passes `lazyLoad={false}` only for `view: "Dropdown"`, so the
+ * `lazyLoad = true` — `mapper.tsx` passes `lazyLoad={false}` only for `view: "Dropdown"`, so the
  * two engine entry points differ here and `e2e/reference.js` records both.
  */
 import React from 'react'
@@ -192,7 +192,7 @@ describe('the dropdown a user sees', () => {
         })
 
         // The host is TOLD to move to the surviving option — it is not moved silently, because the
-        // form layer owns the value. That instruction is the cascading contract `rules.js` relies on.
+        // form layer owns the value. That instruction is the cascading contract `rules.tsx` relies on.
         expect(calls).toEqual([['x', 'region']])
         open(container)
         expect(optionTexts(container)).toEqual(['Option X'])

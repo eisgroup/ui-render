@@ -3,7 +3,7 @@
  * =============================================================================================
  *
  * `Decorator` used to write thirteen methods, five getters and a state shape straight onto
- * `Class.prototype` — the class `rules.js` had just declared, patched in place as a side effect of
+ * `Class.prototype` — the class `rules.tsx` had just declared, patched in place as a side effect of
  * importing the module. Two things follow from that, and this file pins both of them shut.
  *
  * The exported `UIRender` was a different object before and after the import, so nothing could
@@ -15,7 +15,7 @@
  * The layer's own bodies are written as class members, `config` and the four nested-Data registry
  * methods included; those were the `withDataKind` mixin, assigned onto the prototype after the
  * class. Only `state` is still assigned there, because the form layer builds its own from it (see
- * `Decorator` in `rules.js`).
+ * `Decorator` in `rules.tsx`).
  *
  * THE FORM MODULE STOPPED PATCHING IT IN TURN. `withFormSetup` used to write the form members onto
  * this layer's prototype and replace its `UNSAFE_componentWillReceiveProps` and
@@ -96,7 +96,7 @@ describe('the lifecycle layer is a class of its own', () => {
     it('writes every member of either layer in its class body, leaving only `state` assigned', () => {
         // A class member is not enumerable and an assignment is, so this is what tells the two apart.
         // The nested-Data registry was the last thing assigned onto the engine layer after its class,
-        // by the `withDataKind` mixin; `state` is assigned on purpose (see `Decorator` in `rules.js`).
+        // by the `withDataKind` mixin; `state` is assigned on purpose (see `Decorator` in `rules.tsx`).
         for (const Layer of [EngineLayer, FormLayer]) {
             const assigned = Object.getOwnPropertyNames(Layer.prototype)
                 .filter(name => Object.getOwnPropertyDescriptor(Layer.prototype, name).enumerable)

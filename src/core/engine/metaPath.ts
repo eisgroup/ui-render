@@ -39,7 +39,7 @@ export function joinPath (path: string, key: string | number, index?: boolean): 
  *
  * @Note: the segment is the position the CALLER supplied. That is the `items` index for
  * the recursive backbone and for table cells, where nearly every node comes from; a
- * value-definition renderer (`transforms.js`) supplies the row index of the value it is
+ * value-definition renderer (`transforms.ts`) supplies the row index of the value it is
  * rendering instead, so under one of those the last segment names a row rather than an
  * `items` slot. Everything left of it still locates the declaration.
  *

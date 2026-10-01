@@ -3,13 +3,23 @@ import { definitionSetup } from '../../utils'
 /** A vocabulary: names, and the strings a meta uses for them. */
 type Vocabulary = Record<string, string>
 
+/** A handler, validator or value transform a meta names: called with whatever its caller passes. */
+type Registered = (...args: any[]) => any
+
 /** What is registered on `FIELD` besides the three vocabularies `definitionSetup` makes. */
 type FieldRegistries = {
   /** Action handlers by `FIELD.ACTION` name; each document registers its own */
-  FUNC: Record<string, (...args: any[]) => unknown>
+  FUNC: Record<string, Registered>
   /** Validator names, and the validators they select: `modules/form/constants` registers both */
   VALIDATE: Record<string, string>
-  VALIDATION: Record<string, (value: unknown) => unknown>
+  VALIDATION: Record<string, Registered>
+  /** The engine's own registries, from `engine/rules`: a cross-row validator's name, and value transforms */
+  CROSS_VALIDATE: Record<string, string>
+  NORMALIZE: Record<string, string>
+  NORMALIZER: Record<string, Registered>
+  PARSER: Record<string, Registered>
+  /** The host's `methods`, by name: each document registers its own */
+  METHODS: Record<string, Registered>
 }
 
 /**
@@ -47,10 +57,10 @@ FIELD.TYPE = {
   TEXT: 'Text',
   TITLE: 'Title', // A customised `Text` view with certain styling for consistent look and feel
   TOOLTIP: 'Tooltip', // A hint components that pops up when element is being hovered
-  // Declared here rather than in `engine/rules.js`, which used to register them (§9.3 step 2).
-  // `engine/mapper.js` dispatches on all six, and `rules.js` imports `mapper.js` — so the resolver
+  // Declared here rather than in `engine/rules.tsx`, which used to register them (§9.3 step 2).
+  // `engine/mapper.tsx` dispatches on all six, and `rules.tsx` imports `mapper.tsx` — so the resolver
   // depended on a constant its own importer installed. With the `engine` <-> `modules/form` cycle
-  // gone, anything that loaded the mapper without also loading `rules.js` got a resolver whose
+  // gone, anything that loaded the mapper without also loading `rules.tsx` got a resolver whose
   // `case` for each of these compared against `undefined`, silently making six documented views
   // unreachable. Two mapper tests found it immediately; a consumer would have found it later.
   // Declared here rather than in `modules/form/constants.ts`, which used to register them

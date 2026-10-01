@@ -340,7 +340,7 @@ export default function Listbox ({
                 {showOptions && options.map((option, index) => (
                     <div
                         key={option.key != null ? option.key : String(option.value)}
-                        // ONLY WHILE OPEN, and this is not a micro-optimisation: `mapper.js` passes
+                        // ONLY WHILE OPEN, and this is not a micro-optimisation: `mapper.tsx` passes
                         // `lazyLoad={false}` for `view: "Dropdown"`, so these options sit in the
                         // CLOSED DOM, and the prefix is a per-mount counter. The 38-example DOM
                         // baseline renders every example twice and compares the two, which is what

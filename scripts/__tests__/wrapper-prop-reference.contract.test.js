@@ -303,7 +303,7 @@ describe('generated supported-prop reference', () => {
     })
 
     it('keeps `displayName` on the export the form adapter receives', () => {
-        // `modules/form/utils.js` branches on `InputComponent.displayName === 'Dropdown'`, and
+        // `modules/form/utils.tsx` branches on `InputComponent.displayName === 'Dropdown'`, and
         // that works only because `DropdownField` imports the NAMED export: React.memo does not
         // copy displayName, so the default export has none. §9.7-F1 step 3 has to preserve BOTH
         // facts — the string and the named-vs-default split — or refactor the adapter branch
@@ -314,7 +314,7 @@ describe('generated supported-prop reference', () => {
 
         const field = fs.readFileSync(path.join(ROOT, 'src/core/modules/form/inputs/DropdownField.ts'), 'utf8')
         expect(field).toMatch(/import\s*\{\s*Dropdown\s*\}\s*from\s*'\.\.\/\.\.\/\.\.\/components\/Dropdown'/)
-        const adapter = fs.readFileSync(path.join(ROOT, 'src/core/modules/form/utils.js'), 'utf8')
+        const adapter = fs.readFileSync(path.join(ROOT, 'src/core/modules/form/utils.tsx'), 'utf8')
         expect(adapter).toContain("displayName) === 'Dropdown'")
     })
 

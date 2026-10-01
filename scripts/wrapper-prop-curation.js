@@ -131,7 +131,7 @@ const IN_HOUSE_CURATION = {
                 + 'reclassify those cells as `rowheader`.',
             Row: 'Takes the meta `itemClassNames` result, which is `undefined` for every row '
                 + 'in the tracked corpus.',
-            Cell: 'The one boundary that matters: `mapper.js:184` spreads a `TableCells` '
+            Cell: 'The one boundary that matters: `mapper.tsx:154` spreads a `TableCells` '
                 + 'node\'s whole rest bag onto it, so this is where `ENGINE_PROPS` and '
                 + '`FIELD_ONLY_PROPS` are applied.',
             Body: 'Also rendered unconditionally, including when the table has no rows.',
@@ -266,7 +266,7 @@ const IN_HOUSE_CURATION = {
         summary: 'The wrapper already owned the external API: the `onChange(value, name, event)` '
             + 'signature, option sanitisation, case-insensitive dedup on addition, and the cascading '
             + 'reset are all wrapper code, and none of it moved. Only the `<DropDown/>` element at the '
-            + 'bottom changed — it is now the in-house `Listbox`, under the same import alias. Two entry points, and they differ: `mapper.js` imports the memoised default '
+            + 'bottom changed — it is now the in-house `Listbox`, under the same import alias. Two entry points, and they differ: `mapper.tsx` imports the memoised default '
             + 'export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.ts` imports the '
             + 'NAMED export for `view: "Select"` — which is the majority path.',
         cssContract: 'The loaded `modules/dropdown` LESS is the largest single semantic module in the '
@@ -311,7 +311,7 @@ const IN_HOUSE_CURATION = {
             classNameIcon: 'Class for the icon node the wrapper builds when `onClickIcon` is given.',
             style: 'Inline style, applied to the wrapper element, not to the control.',
             fill: 'Adds `fill-width` unless `compact`. Default true.',
-            lazyLoad: 'Defer rendering options until opened; default true, and `mapper.js` passes false '
+            lazyLoad: 'Defer rendering options until opened; default true, and `mapper.tsx` passes false '
                 + 'on the `view: "Dropdown"` path. Forwarded unchanged, and `Listbox` implements it the same way '
                 + '— the role census counts `option` only where it is false.',
             optionsLabel: 'Extra disabled option appended to the bottom of the list.',
@@ -336,7 +336,7 @@ const IN_HOUSE_CURATION = {
     TooltipPop: {
         shipped: '§9.7-F1 step 2 part 3',
         summary: 'The hover tooltip, over the same inline `<span>` `components/Tooltip.tsx` has '
-            + 'shipped for years. Reached two live ways: a `view: "Tooltip"` node (`mapper.js`, which '
+            + 'shipped for years. Reached two live ways: a `view: "Tooltip"` node (`mapper.tsx`, which '
             + 'maps `label` to `content`) and the `tooltip` attribute on ANY node (`Render.tsx`, which '
             + 'wraps the rendered node and spreads an object `tooltip` — still an unfiltered '
             + 'passthrough, but into 13 accepted names now instead of 45). This was a FIX, not a '
@@ -573,7 +573,7 @@ const FORWARDED_CURATION = {}
  * attribute and the test names it.
  *
  * This is the "discovered set" §9.7-F1 step 0 asked for. Read it as an inventory, not as a
- * forwarding claim: most of these are consumed by `mapper.js`/`TableView.tsx` and never reach
+ * forwarding claim: most of these are consumed by `mapper.tsx`/`TableView.tsx` and never reach
  * semantic-ui-react at all. The `outcome` column on the page says which is which.
  */
 const META_ATTRIBUTES = {
@@ -627,7 +627,7 @@ const STEP_OBLIGATIONS = [
                 + 'strings in the 38-example baseline are byte-identical. This was the highest-risk '
                 + 'detail in the step and it is pinned by a unit test as well as by the snapshots.',
             'DONE — `omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)` is applied in all seven '
-                + 'components, closing the `mapper.js:184` spread onto `Table.Cell`. Zero-diff on '
+                + 'components, closing the `mapper.tsx:154` spread onto `Table.Cell`. Zero-diff on '
                 + 'today\'s corpus (no example puts an engine prop on a `TableCells` node), so it is a '
                 + 'latent-boundary net rather than a visible fix; `domProps.ts` now names the family.',
             'DECIDED — `verticalAlign` DROPPED, and its two call sites in `LocalDraftTableRow` with it. '
@@ -758,7 +758,7 @@ const STEP_OBLIGATIONS = [
                 + 'no portal and no JS positioning, used by `Slider`, `modules/upload/views/Upload.tsx` and '
                 + '`withFormSetup`\'s validation-error tooltip, and styled by 41 rules in '
                 + '`style/components/tooltip.less`. It is evidence for the positioning decision and a '
-                + 'naming trap for the cleanup: `form/utils.js` imports BOTH.',
+                + 'naming trap for the cleanup: `form/utils.tsx` imports BOTH.',
             'CORRECTION — the biggest finding, and it invalidates an instruction this step was given: '
                 + '"keep emitting `ui popup`-compatible classNames so the current CSS continues to apply" '
                 + 'rests on a false premise. No `.ui.popup` rule applies today, because the portal mounts '
@@ -766,7 +766,7 @@ const STEP_OBLIGATIONS = [
                 + 'twice, by selector matching and by real-Chrome computed style.',
             'DONE (was STILL OWED) — the unfiltered DOM boundary is closed. Part 1 pinned it as a DEFECT '
                 + 'rather than as a contract: `view`, `index` and `symbol` all reached the bubble as HTML '
-                + 'attributes (`view="Tooltip"` on every `view: "Tooltip"` node, via the `mapper.js` '
+                + 'attributes (`view="Tooltip"` on every `view: "Tooltip"` node, via the `mapper.tsx` '
                 + 'spread). Part 3 applies `omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)` and that '
                 + 'assertion is now `toEqual([])`.',
             'DECIDED (was STILL OWED) — `on` is DROPPED, on the maintainers\' instruction. SUIR\'s default '
@@ -796,7 +796,7 @@ const STEP_OBLIGATIONS = [
                 + 'arrow geometry, the 250 px wrap, clipping, stacking, painted style, real pointer travel '
                 + 'and screen-reader announcement are all inexpressible. They are named one by one against '
                 + 'the §9.5 Playwright item, which now blocks THIS step\'s completion rather than only F1\'s.',
-            'FREE CLEANUP, confirmed: the `TooltipPop` chain in `modules/form/utils.js` is dead at four '
+            'FREE CLEANUP, confirmed: the `TooltipPop` chain in `modules/form/utils.tsx` is dead at four '
                 + 'sites — the import (line 8), `withForm`\'s `Tooltip = TooltipPop` default parameter, the '
                 + 'pass-through into `withFormSetup({… Tooltip})`, and the destructure that never uses it. '
                 + 'Delete all four; do NOT touch line 7, which imports the in-house `Tooltip` as `ToolTip` '
@@ -808,7 +808,7 @@ const STEP_OBLIGATIONS = [
         effort: 'L (came in at the L; the matrix was the cost, as predicted)',
         items: [
             'The L was NOT in `search`/`multiple`/`allowAdditions`/`clearable` — nothing used them, and they were REMOVED rather than reimplemented. It was in the keyboard/a11y matrix, which had to be built rather than ported: `Home`/`End`, `PageUp`/`PageDown` and typeahead were measured ABSENT from the library, so there was nothing to preserve and everything to write.',
-            'MET: `displayName = \'Dropdown\'` and the named-vs-default export split both survive — `modules/form/utils.js` still branches on `InputComponent.displayName`, and only the named export carries it.',
+            'MET: `displayName = \'Dropdown\'` and the named-vs-default export split both survive — `modules/form/utils.tsx` still branches on `InputComponent.displayName`, and only the named export carries it.',
             'MET, and one addition: `role="listbox"`, `aria-expanded`, `aria-disabled` and `tabIndex=-1` when disabled are all emitted. `aria-disabled` was MISSING in the first draft and caught by the behavioural suite — a `role="listbox"` div cannot carry the native attribute, so being unavailable has to be said three ways. Added beyond the library: `aria-activedescendant`, which is how the keyboard cursor is announced now that moving no longer commits.',
             'DECIDED: tier 2 was resolved as REMOVAL, on the evidence that nothing in either corpus or the consumer-only record declares any of them. Not silently — the removed names are stripped at the boundary and warn once each in development, and the `Dropped` table below is the record.',
             'DELIVERED: both `classContract` and `behaviourContract` are measured and present above. The class contract is pinned token by token in `src/style/__tests__/css.dropdown-contract.test.js` (what each class is worth in scoped rules), and the behaviour contract is the WAI-ARIA listbox model — arrows move a cursor, Enter commits, Escape reports nothing.',

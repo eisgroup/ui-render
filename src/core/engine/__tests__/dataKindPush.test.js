@@ -339,7 +339,7 @@ describe('pushDataKindRow', () => {
 })
 
 describe('getDataKindPathFromRelative (re-export contract)', () => {
-    it('matches rules.js expectations for nested path', () => {
+    it('matches rules.tsx expectations for nested path', () => {
         expect(getDataKindPathFromRelative('experienceRatingInputs.dataKind.experiencePeriods', 'experiencePeriods')).toBe(
             'experienceRatingInputs'
         )

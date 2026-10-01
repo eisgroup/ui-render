@@ -118,7 +118,7 @@ describe('engine state updates leave the previous state object intact', () => {
 
     it('keeps the no-op shape when no state path was configured', () => {
         // `setStates` with no string argument has always been a no-op rather than an error, and
-        // `mapper.js` relies on that for callers that pass only a value.
+        // `mapper.tsx` relies on that for callers that pass only a value.
         const observed = { existing: 'kept' }
         const instance = makeInstance(observed)
 

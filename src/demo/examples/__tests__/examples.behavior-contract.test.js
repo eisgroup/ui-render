@@ -68,7 +68,7 @@ const CENSUS_ROLES = [
  * ONE GROUP OF ENTRIES F1 IS STILL EXPECTED TO MOVE:
  *
  *   `option` — present only where the option list is in the DOM while closed.
- *     `mapper.js` passes `lazyLoad={false}` for `view: "Dropdown"` and leaves the
+ *     `mapper.tsx` passes `lazyLoad={false}` for `view: "Dropdown"` and leaves the
  *     wrapper default (`true`) for `view: "Select"`, which is why `dropdown` and
  *     `layout` carry options at mount and `selectStableValue` does not. If the
  *     replacement changes when options are mounted, these entries move.

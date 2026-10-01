@@ -44,7 +44,7 @@ const ENTRY = path.join(STYLE_DIR, 'index.less');
  *
  * Read the `worth` numbers as "rules that stop matching if the replacement drops this token".
  *   control    `ui` and `dropdown` are worth EVERYTHING — every rule that reaches the control
- *              names both. `selection` is worth all but one, which is why `mapper.js` defaulting
+ *              names both. `selection` is worth all but one, which is why `mapper.tsx` defaulting
  *              it to true is load-bearing rather than cosmetic. `active`/`visible` are the open
  *              state and only exist while open.
  *   text       the placeholder box. `divider` is Semantic's name for "nothing selected yet".
