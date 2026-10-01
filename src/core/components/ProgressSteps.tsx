@@ -11,8 +11,43 @@ import Text from './Text'
 import { useTimers } from './utils'
 import View from './View'
 
-const normalizeIndex = (value, items) => {
-  const index = +value
+/** One step of `items`. */
+export type ProgressStep = {
+  /** Step text to display, default is incremental step number */
+  step?: string
+  /** Text to display under step */
+  label?: string
+  /** Whether the step is completed */
+  done?: boolean
+  /** Whether the step has error */
+  error?: boolean
+  /** Content to render under the step; a function is called for it */
+  content?: React.ReactNode | (() => React.ReactNode)
+}
+
+/** Everything this component reads; it forwards nothing. */
+export type ProgressStepsProps = {
+  items: ProgressStep[]
+  /** Index of active item (starts at 0), controlled */
+  activeIndex?: number | string
+  defaultIndex?: number | string
+  /** Callback when step is clicked, receives clicked step index */
+  onChange?: (index: number) => void
+  /** Whether to render the vertical line below each step */
+  hasConnector?: boolean
+  className?: string
+  style?: React.CSSProperties
+  classNameSteps?: string
+  styleSteps?: React.CSSProperties
+  classNameContent?: string
+  styleContent?: React.CSSProperties
+}
+
+type StepsState = { activeIndex: number, transition: boolean }
+
+const normalizeIndex = (value: number | string | undefined, items: ProgressStep[]) => {
+  // A cast: an absent index is `+undefined`, NaN, which the check below turns into 0, as it did.
+  const index = +(value as number | string)
   return Number.isInteger(index) && index >= 0 && index < items.length ? index : 0
 }
 
@@ -36,16 +71,16 @@ const normalizeIndex = (value, items) => {
  * equal props, and the lifecycle ran even then. Under UI Render it never saw equal props anyway, since
  * the mapper rebuilds `items` on every render.
  */
-export default function ProgressSteps (props) {
+export default function ProgressSteps (props: ProgressStepsProps) {
   const {
     items, activeIndex: activeIndexProp, defaultIndex, hasConnector, className, style,
     classNameSteps, styleSteps, classNameContent, styleContent,
   } = props
-  const [state, setState] = useState(() => ({
+  const [state, setState] = useState<StepsState>(() => ({
     activeIndex: normalizeIndex(activeIndexProp != null ? activeIndexProp : defaultIndex, items),
     transition: false,
   }))
-  const update = patch => setState(current => ({...current, ...patch}))
+  const update = (patch: Partial<StepsState>) => setState(current => ({...current, ...patch}))
   const timers = useTimers()
 
   const [propsSeen, setPropsSeen] = useState(props)
@@ -63,15 +98,16 @@ export default function ProgressSteps (props) {
 
   // What a click's timer reads when it fires: the latest props, as `this.props` was, and how many
   // times a controlled `activeIndex` has taken precedence since.
-  const latest = useRef(null)
+  // Read through non-null assertions below: every render assigns it before any handler of it runs.
+  const latest = useRef<{ props: ProgressStepsProps, overrides: number } | null>(null)
   latest.current = {props, overrides}
 
-  const handleClickStep = (index) => {
+  const handleClickStep = (index: number) => {
     timers.clear()
     update({transition: true})
-    const overridesAtClick = latest.current.overrides
+    const overridesAtClick = latest.current!.overrides
     timers.setTimeout(() => {
-      const {props: {items: currentItems, onChange}, overrides: currentOverrides} = latest.current
+      const {props: {items: currentItems, onChange}, overrides: currentOverrides} = latest.current!
       if (currentOverrides !== overridesAtClick) return
       if (index >= currentItems.length) {
         update({transition: false})
@@ -83,7 +119,7 @@ export default function ProgressSteps (props) {
   }
 
   const {activeIndex, transition} = state
-  const content = get(items[activeIndex], 'content')
+  const content = get(items[activeIndex], 'content') as ProgressStep['content'] // `get` is typed `unknown`
   return (
     <View
       className={classNames('app__progress-steps max-size', className)}

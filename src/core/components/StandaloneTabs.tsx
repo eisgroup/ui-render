@@ -10,6 +10,53 @@ import { useTimers } from './utils'
 import View from './View'
 
 /**
+ * A tab title: text, a number, a JSX element, or `{text, icon}`. Every object is read for an `icon`
+ * first, a JSX element included (where it is undefined), and one without an icon renders as it is.
+ */
+export type StandaloneTab = string | number | (Partial<React.ReactElement> & { text?: React.ReactNode, icon?: string })
+
+/** What function content and children receive: one object for the component's lifetime, kept current. */
+export type StandaloneTabsHandle = {
+  props: StandaloneTabsProps
+  state: TabsState
+  tabs: StandaloneTab[]
+  contents: StandaloneTabContent[]
+  setTab: (activeIndex: number, transition?: boolean) => void
+}
+
+/** A tab's content; a function is called with the handle. */
+export type StandaloneTabContent = React.ReactNode | ((handle: StandaloneTabsHandle) => React.ReactNode)
+
+/** The named props are read here; the rest is passed to the outer `ScrollView`. */
+export type StandaloneTabsProps = {
+  items: Array<{ tab: StandaloneTab, content: StandaloneTabContent }>
+  /** Opened tab index (controlled) */
+  activeIndex?: number | string
+  /** Opened tab index initially (uncontrolled) */
+  defaultIndex?: number | string
+  /** Callback when tab's activeIndex changes, receives new `activeIndex` as argument */
+  onChange?: (activeIndex: number) => void
+  /** Render tabs as vertical layout */
+  vertical?: boolean
+  /** Align tabs to center */
+  centerTabs?: boolean
+  /** Style tabs as buttons */
+  buttoned?: boolean
+  /** Whether to enable transition during force update via props */
+  transitionUpdate?: boolean
+  /** Extra content to render inside Tabs; a function is called with the handle */
+  children?: React.ReactNode | ((handle: StandaloneTabsHandle) => React.ReactNode)
+  className?: string
+  classNameTabs?: string
+  classNameContent?: string
+  styleTabs?: React.CSSProperties
+  styleContent?: React.CSSProperties
+  [key: string]: unknown
+}
+
+type TabsState = { activeIndex: number, transition: boolean }
+
+/**
  * Tabs with overridable self-managed state and overflow scrollbars, with NO engine coupling.
  *
  * Renamed from `Tabs` on 2026-09-22 (§9.9-H6). There were two files called `Tabs.js` and no way to
@@ -40,32 +87,34 @@ import View from './View'
  * Not memoised, although the class was a PureComponent: `React.memo` would skip a parent render with
  * equal props, and the lifecycle ran even then.
  */
-export default function StandaloneTabs (props) {
+export default function StandaloneTabs (props: StandaloneTabsProps) {
   const {
     vertical, buttoned, items, children, centerTabs,
     className, classNameTabs, classNameContent, styleTabs, styleContent,
     activeIndex: activeIndexProp, defaultIndex, onChange: _, transitionUpdate,
     ...rest
   } = props
-  const [state, setState] = useState(() => ({
-    activeIndex: Math.max(+(activeIndexProp || defaultIndex) || 0, 0),
+  const [state, setState] = useState<TabsState>(() => ({
+    // A cast: an absent index is `+undefined`, NaN, which `|| 0` turns into 0, as it did.
+    activeIndex: Math.max(+((activeIndexProp || defaultIndex) as number | string) || 0, 0),
     transition: false,
   }))
-  const update = patch => setState(current => ({...current, ...patch}))
+  const update = (patch: Partial<TabsState>) => setState(current => ({...current, ...patch}))
   const timers = useTimers()
 
   // What a transition's timer reads when it fires: the latest props, as `this.props` was.
-  const latest = useRef(null)
+  // Read through a non-null assertion: every render assigns it before any handler or timer runs.
+  const latest = useRef<StandaloneTabsProps | null>(null)
   latest.current = props
-  const report = (activeIndex) => {
-    const {onChange} = latest.current
+  const report = (activeIndex: number) => {
+    const {onChange} = latest.current!
     if (onChange) onChange(activeIndex)
   }
-  const updateTab = (activeIndex) => {
+  const updateTab = (activeIndex: number) => {
     update({activeIndex, transition: false})
     report(activeIndex)
   }
-  const setTab = (activeIndex, transition = true) => {
+  const setTab = (activeIndex: number, transition = true) => {
     if (transition) {
       update({transition: true})
       timers.setTimeout(() => updateTab(activeIndex), 50) // 50 ms is needed to allow full rendering so css transition can take effect
@@ -77,7 +126,7 @@ export default function StandaloneTabs (props) {
   // A controlled `activeIndex` the render below applied, and what is still owed for it: the
   // transition's timer, or the report of an immediate change.
   const [propsSeen, setPropsSeen] = useState(props)
-  const [owed, setOwed] = useState(null)
+  const [owed, setOwed] = useState<{ target: number, transition: boolean } | null>(null)
   if (props !== propsSeen) {
     setPropsSeen(props)
     if (activeIndexProp != null && +activeIndexProp !== state.activeIndex) {
@@ -102,8 +151,8 @@ export default function StandaloneTabs (props) {
   const tabs = useMemo(() => items.map(({tab}) => tab), [items])
   const contents = useMemo(() => items.map(({content}) => content), [items])
 
-  const handle = useRef(null)
-  if (handle.current === null) handle.current = {}
+  const handle = useRef<StandaloneTabsHandle | null>(null)
+  if (handle.current === null) handle.current = {} as StandaloneTabsHandle // filled on the next line
   Object.assign(handle.current, {props, state, tabs, contents, setTab})
 
   const {activeIndex, transition} = state
@@ -122,7 +171,9 @@ export default function StandaloneTabs (props) {
           <View key={i} className={classNames('tabs__item', {active: activeIndex === i && allTabs.length > 1})}
                 onClick={activeIndex !== i ? (() => setTab(i)) : undefined}>
             {typeof tab === 'object'
-              ? (tab.icon ? <Text><Icon name={tab.icon}/>{tab.text}</Text> : tab)
+              // The cast is the JavaScript's assumption: an object without an `icon` is a JSX element. One
+              // that is not, `{text}` alone, renders as a raw object, which React rejects; no caller passes one.
+              ? (tab.icon ? <Text><Icon name={tab.icon}/>{tab.text}</Text> : tab as React.ReactElement)
               : <Text>{tab}</Text>
             }
           </View>

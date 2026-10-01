@@ -1096,6 +1096,15 @@ Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on a
 
 Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on an edit, the DOM unchanged after both), and `dist/index.js` is byte-for-byte the same size, 327,399. `src/core` + `src/library` are 57 TS files, 8,830 lines, against 100 JS files, 11,051 lines: 44.4% of the lines, was 42.4%.
 
+**Fifth batch, 2026-09-30: seven stateful components** — `ProgressBar`, `ProgressSteps`, `Counter`, `Pagination`, `Select`, `Dropzone` and `StandaloneTabs`. The §9.3 step 6 hooks conversions among them are typed as they are: their state objects get types, the refs their timers read go through non-null assertions, and the `props !== propsSeen` derivations are untouched. `Upload`'s last component cast, `Dropzone`'s, is deleted, and its `DropzoneHandle` is now the real handle, `fileInputEl` included. Three things the checker surfaced:
+- **`forwardRef`'s own type erases named props.** It runs them through `Omit<…, 'ref'>`, which keeps nothing but the index signature of a type that has one — the trap `RowRef` hit in the second batch. `Dropzone` is therefore cast to the same component with its props kept.
+- **`InputNative`'s `select` branch hands `Select` the ENGINE `onChange`, `(value, name, event)`.** `ForwardedProps` said every branch overwrote it. The comment is corrected, and the call is a commented cast.
+- **`StandaloneTabs` renders an object tab without an `icon` as it is.** Its `propTypes` accept `{text}` alone, and React rejects rendering one. It is demo-only and `NavTabs` passes strings, so it is recorded, not fixed; the cast that keeps the JavaScript's assumption says so.
+
+Also: `renderFloat` is still JavaScript, and its JSDoc types the element it returns as `Object`, so `Counter`'s default `render` is cast. `Counter`'s `className` and `style` are declared by its `propTypes` and read by nothing, and the type says so.
+
+Measured: the corpus is identical to master's (107 / 1013 at mount, 27 / 64 on an edit, the DOM unchanged after both). `dist/index.js` is 327,399 → 327,387 bytes, because `Upload`'s `const Dropzone = DropzoneJs` alias is gone. `src/core` + `src/library` are 64 TS files, 9,989 lines, against 93 JS files, 10,111 lines: 49.7% of the lines, was 44.4%.
+
 #### E3 — Engine last
 
 `rules.js` / `form/utils.js` are typed **as they are decomposed** (§9.3) — decomposition outputs are born as `engine/*.ts`. Typing the prototype-patching machinery as-is is wasted effort; don't.

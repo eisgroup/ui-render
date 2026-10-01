@@ -1,7 +1,8 @@
 import classNames from '../../../utils/classNames'
 import { ROUTE_HOME, UPLOAD as U } from '../../variables'
 import React, { Fragment, memo, useContext, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
-import DropzoneJs from '../../../components/Dropzone'
+import Dropzone from '../../../components/Dropzone'
+import type { DropzoneHandle } from '../../../components/Dropzone'
 import { type } from '../../../components'
 import Icon from '../../../components/Icon'
 import Loading from '../../../components/Loading'
@@ -23,11 +24,8 @@ import { Active } from '../../../utils'
 import type { Translate } from '../../../utils/_envs'
 import { AppContext } from '../../../contexts'
 
-/** What `Dropzone` exposes through its ref (`useImperativeHandle` in Dropzone.js). */
-export type DropzoneHandle = { open: () => void }
-const Dropzone = DropzoneJs as unknown as React.ForwardRefExoticComponent<
-    Record<string, unknown> & React.RefAttributes<DropzoneHandle>
->
+// Re-exported: `UploadProps.onChange` hands the handle to the host.
+export type { DropzoneHandle }
 
 /** What an upload route contributes when its props do not say (U.BY_ROUTE in modules/variables). */
 type RouteDefaults = { fileTypes?: string, maxSize?: number }

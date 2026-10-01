@@ -2,16 +2,29 @@ import classNames from '../utils/classNames'
 import PropTypes from 'prop-types'
 import React from 'react'
 
+/** What `onPageChange` is told: the new 1-indexed page. */
+export type PageChange = { activePage: number }
+
+/** Everything this component reads; it forwards nothing. */
+export type PaginationProps = {
+  /** 1-indexed current page */
+  activePage: number
+  /** Total number of pages */
+  totalPages: number
+  onPageChange?: (event: React.MouseEvent<HTMLButtonElement>, data: PageChange) => void
+  /** Page links shown on each side of the current page, 1 by default */
+  siblingCount?: number
+  /** Page links shown at the start and end, 1 by default */
+  boundaryCount?: number
+  className?: string
+}
+
+/** A page number, or where a run of them is left out. */
+type PageItem = number | 'ellipsis'
+
 /**
  * Pagination control. API matches the semantic-ui-react `Pagination` subset we use:
  *   onPageChange(event, { activePage }) is invoked with the new 1-indexed page.
- *
- * @param {Number} activePage - 1-indexed current page
- * @param {Number} totalPages - total number of pages
- * @param {Function} onPageChange - (event, { activePage }) => void
- * @param {Number} [siblingCount=1] - page links shown on each side of the current page
- * @param {Number} [boundaryCount=1] - page links shown at the start and end
- * @param {String} [className]
  */
 function Pagination ({
   activePage,
@@ -20,13 +33,13 @@ function Pagination ({
   siblingCount = 1,
   boundaryCount = 1,
   className,
-}) {
+}: PaginationProps) {
   if (!Number.isSafeInteger(totalPages) || totalPages < 2) return null
   const page = normalizePage(activePage, totalPages)
   const siblings = normalizeCount(siblingCount)
   const boundary = normalizeCount(boundaryCount)
   const items = buildItems(page, totalPages, siblings, boundary)
-  const go = (event, nextPage) => {
+  const go = (event: React.MouseEvent<HTMLButtonElement>, nextPage: number) => {
     if (nextPage < 1 || nextPage > totalPages || nextPage === page) return
     onPageChange && onPageChange(event, { activePage: nextPage })
   }
@@ -77,7 +90,15 @@ Pagination.propTypes = {
 
 export default React.memo(Pagination)
 
-function PageButton ({ active, disabled, onClick, ariaLabel, children }) {
+type PageButtonProps = {
+  active?: boolean
+  disabled?: boolean
+  onClick: React.MouseEventHandler<HTMLButtonElement>
+  ariaLabel: string
+  children: React.ReactNode
+}
+
+function PageButton ({ active, disabled, onClick, ariaLabel, children }: PageButtonProps) {
   return (
     <button
       type='button'
@@ -92,8 +113,8 @@ function PageButton ({ active, disabled, onClick, ariaLabel, children }) {
   )
 }
 
-function buildItems (active, total, siblings, boundary) {
-  const result = []
+function buildItems (active: number, total: number, siblings: number, boundary: number) {
+  const result: PageItem[] = []
   const startPages = range(1, Math.min(boundary, total))
   const endPages = range(Math.max(total - boundary + 1, boundary + 1), total)
 
@@ -119,26 +140,26 @@ function buildItems (active, total, siblings, boundary) {
   return dedupeOrdered(result)
 }
 
-function normalizePage (page, total) {
+function normalizePage (page: number, total: number) {
   if (page === Infinity) return total
   if (!Number.isFinite(page)) return 1
   return Math.min(Math.max(Math.trunc(page), 1), total)
 }
 
-function normalizeCount (count) {
+function normalizeCount (count: number) {
   if (!Number.isFinite(count)) return 1
   return Math.max(Math.trunc(count), 0)
 }
 
-function range (start, end) {
-  const out = []
+function range (start: number, end: number) {
+  const out: number[] = []
   for (let i = start; i <= end; i++) out.push(i)
   return out
 }
 
-function dedupeOrdered (items) {
-  const seen = new Set()
-  const out = []
+function dedupeOrdered (items: PageItem[]) {
+  const seen = new Set<number>()
+  const out: PageItem[] = []
   for (const item of items) {
     if (item === 'ellipsis') {
       if (out[out.length - 1] !== 'ellipsis') out.push(item)
