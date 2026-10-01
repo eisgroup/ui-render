@@ -123,6 +123,26 @@ describe('Render error reporting', () => {
         await waitFor(() => expect(reports).toHaveLength(1))
     })
 
+    it('passes the component stack on as a string, even should React give none', () => {
+        // React always has, in practice; `@types/react` 18 and 19 say it may not, and the published
+        // `UIRenderErrorReport` promises a string. No render makes React leave it out, so the
+        // boundary is called directly: `Render` returns an element of it.
+        const Boundary = Render({ view: 'Broken' }).type
+        const boundary = new Boundary({ view: 'Broken' })
+        // What React would give it at the document root: the path context's default, and a setState.
+        boundary.context = ''
+        boundary.setState = (state, callback) => callback()
+
+        boundary.componentDidCatch(new Error('boom'), {})
+
+        expect(reports).toHaveLength(1)
+        expect(reports[0].errorInfo.componentStack).toBe('')
+        expect(reports[0]).toEqual(expect.objectContaining({
+            path: '',
+            message: '[ui-render] render error at the meta root (view "Broken"): Error: boom',
+        }))
+    })
+
     describe('formatRenderError', () => {
         it('names the path, the view and the data binding when meta declares them', () => {
             expect(formatRenderError({

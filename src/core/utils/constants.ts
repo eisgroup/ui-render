@@ -278,36 +278,6 @@ for (const key in LANGUAGE) {
 	(l as unknown as Record<string, string>)[key] = LANGUAGE[key as keyof typeof LANGUAGE]._
 }
 
-/**
- * Spoken Language Fluency Definition
- */
-export const LANGUAGE_LEVEL = {
-	UNKNOWN: {
-		_: 0,
-		[l.ENGLISH]: 'Unknown',
-	},
-	BASIC: {
-		_: 1,
-		[l.ENGLISH]: 'Beginner',
-	},
-	WORKING: {
-		_: 2,
-		[l.ENGLISH]: 'Working',
-	},
-	PROFICIENT: {
-		_: 3,
-		[l.ENGLISH]: 'Proficient',
-	},
-	FLUENT: {
-		_: 4,
-		[l.ENGLISH]: 'Fluent',
-	},
-	NATIVE: {
-		_: 5,
-		[l.ENGLISH]: 'Native',
-	},
-} as const
-
 /* Mappings */
 export const SORT_ORDER = {
 	0: 'sort',

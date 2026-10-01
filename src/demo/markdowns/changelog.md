@@ -323,6 +323,11 @@
   empty stub in both places.
 - The tarball dropped from 579 files / 11.6 MB unpacked to **299 files / 6.7 MB (2.5 MB packed)**, remeasured 2026-09-15 after the Semantic exit completed.
   Source maps continue to ship for host debugging.
+- **The package no longer ships `static/images/flags/`.** These were 266 country-flag SVGs, 41% of
+  the unpacked package, and nothing in the library used them: their one reader was a dropdown
+  renderer that never reached the bundle, and it is deleted. A host that links
+  `/static/images/flags/<code>.svg`, from its own markup or from a meta `Image`, ships its own copy
+  now. The tarball is **23 files / 3.3 MB unpacked (0.85 MB packed)**, from 289 / 5.6 MB / 1.4 MB.
 
 #### Tests and CI
 
@@ -375,6 +380,17 @@
 
 #### Fixes
 
+- **A `float` Dropdown keeps its label above the selected value.** The wrapper never marked a
+  dropdown with a value as completed, so the stylesheet's completed state did not apply: the
+  label of a `float` dropdown fell back over the selection it named, and a multiple selection kept
+  its border. An empty selection and a field with an error are still not completed.
+- **`validate: 'password'` no longer throws on a server without a strength checker.** In a
+  browser, the check is skipped until zxcvbn loads. On the server it threw
+  `TypeError: Active.passwordCheck is not a function` unless the host had assigned one; it is now
+  skipped there too, and a checker the host assigns is used as before.
+- **The validation-errors summary is headed "Please complete:".** `validationErrorsTooltip`
+  rendered "Untranslated" above the list, because the phrase was defined in a file nothing loaded.
+- **A Table with `colGroup` no longer logs React's missing-`key` warning** for each column.
 - **`validate: 'maxLength'` validates.** The name was registered as the length *factory* rather
   than a validator, so every value failed: a form field declaring it could never be submitted, and
   a table draft row could never be added. It now means at most 100 characters, the factory's

@@ -712,8 +712,8 @@ function Decorator (Class: any) {
                 // First, try to find popup by exact ID (may be already interpolated)
                 let popup = this.popupById && this.popupById[id]
                 if (popup) {
-                    const { content, title = '', ...props } = popup
-                    this.popupAlert(title, content, { ...props, ...options })
+                    const { content, title = '' } = popup
+                    this.popupAlert(title, content)
                     return
                 }
                 
@@ -772,7 +772,7 @@ function Decorator (Class: any) {
                         // Check if items exist and are not empty
                         if (!items || !Array.isArray(items) || items.length === 0) {
                             console.error('Popup items are empty or invalid:', items)
-                            this.popupAlert(title || 'Error', 'Popup content is empty', { ...popupProps, ...options })
+                            this.popupAlert(title || 'Error', 'Popup content is empty')
                             return
                         }
                         
@@ -797,14 +797,14 @@ function Decorator (Class: any) {
                             this.popupById[interpolatedId] = { ...popupTemplate, content, title, ...popupProps }
                         }
                         
-                        this.popupAlert(title, content, { ...popupProps, ...options })
+                        this.popupAlert(title, content)
                         return
                     }
                 }
                 
                 // Fallback to original behavior - try to find by static ID
-                const { content, title = '', ...props } = (this.popupById && this.popupById[id]) || {}
-                this.popupAlert(title, content, { ...props, ...options })
+                const { content, title = '' } = (this.popupById && this.popupById[id]) || {}
+                this.popupAlert(title, content)
             }
 
             // this.data is not updated dynamically at the moment
@@ -900,9 +900,12 @@ function Decorator (Class: any) {
             this.form.reset()
         }
 
-        // `_options`: what a popup's own props and the `popupOpen` options are handed in as. The
-        // popup shows a title and content, and nothing reads them.
-        popupAlert (title: unknown, content?: unknown, _options?: unknown) {
+        // A title and a content, and nothing else: that is all the popup shows. Every `popupOpen` path
+        // used to hand a third argument too, a popup's own props merged with the options it was
+        // opened with. No version of this method ever read it; the first, in 2020, took
+        // `(title, content)` as this one does. The row context in those options is read where it is
+        // used, by `resolvePopupRowContext`.
+        popupAlert (title: unknown, content?: unknown) {
             // An element is shown as it is, and a value as a JSON tree. No content means no body:
             // `Json` requires its `data`, and warned whenever there was nothing to show, for a `popup`
             // action with nothing configured and for a `popupOpen` of an id nothing registered.

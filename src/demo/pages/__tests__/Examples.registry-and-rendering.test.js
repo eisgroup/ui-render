@@ -11,21 +11,12 @@ const messageFromConsoleCall = args => args
     .map(value => value instanceof Error ? value.message : String(value))
     .join(' ')
 
-// React reports a given development warning only once per loaded module. Keep a strict
-// allowlist for every warning we do observe without requiring another example to emit it again.
-// Entries must match on message text only: React 16-18 append a component stack (the source of
-// component names and file paths) while React 19 emits the bare message, so a stack-derived
-// fragment would make an expected warning look unexpected on React 19. Names that the warning
-// message itself carries (a DOM prop name, say) are fine.
-// The four prop-type warnings this list allowed went with the prop types at §9.6-E5. None of the
-// four still fired by then: measured on React 18, just before the deletion.
-const EXPECTED_CONSOLE_ERROR_PATTERNS = [
-    ['Unknown event handler property', 'onDataChanged'],
-    ['non-boolean attribute', 'buttoned'],
-    ['Cannot update during an existing state transition', 'Render methods should be a pure function'],
-    ['Invalid value for prop', 'translate'],
-    ['Invalid attribute name', '@class'],
-]
+// No example may log an error, on any React major. This used to be an allowlist, and it emptied
+// itself: four prop-type entries went with the prop types at §9.6-E5, and the other five were
+// measured matching nothing on React 16.14, 17.0.2, 18.3.1 and 19.3.0 before they were removed. An
+// allowlist that matches nothing hides the next real warning of the same shape, so the rule is now
+// the plain one. A failure prints each message whole: React 16-18 append a component stack, which
+// React 19 leaves out.
 
 const apiCalls = {
     updateExperienceData: jest.fn(() => Promise.resolve({})),
@@ -115,12 +106,7 @@ describe('registered demo examples contract', () => {
         expect(formsStorage.size).toBe(0)
         expect(caughtMessages).toEqual([])
 
-        const unexpectedWarnings = consoleError.mock.calls
-            .map(messageFromConsoleCall)
-            .filter(message => !EXPECTED_CONSOLE_ERROR_PATTERNS.some(requiredParts => (
-                requiredParts.every(part => message.includes(part))
-            )))
-        expect(unexpectedWarnings).toEqual([])
+        expect(consoleError.mock.calls.map(messageFromConsoleCall)).toEqual([])
     }
 
     test.each(examples)('$id mounts without renderer failures', assertExampleMountContract)

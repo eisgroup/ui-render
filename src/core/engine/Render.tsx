@@ -43,6 +43,16 @@ export type RenderErrorReport = {
 }
 
 /**
+ * A report as the boundary delivers it: every field set, and `errorInfo.componentStack` a string. That
+ * is the published `UIRender.UIRenderErrorReport`, and `src/library/contract.agreement.ts` holds this
+ * type to it. `@types/react` 18 and 19 type `componentStack` as possibly missing, so it is passed on as a
+ * string, `''` should React give none.
+ */
+export type DeliveredRenderErrorReport = Required<Omit<RenderErrorReport, 'errorInfo'>> & {
+    errorInfo: React.ErrorInfo & { componentStack: string }
+}
+
+/**
  * Recursive Field Renderer
  * @setup:
  *      // mapper.tsx
@@ -135,8 +145,15 @@ class RenderClass extends Component<RenderProps, { error: unknown, diagnostic: s
     }
 
     componentDidCatch (error: Error, errorInfo: React.ErrorInfo) {
-        const report: RenderErrorReport = {error, errorInfo, props: this.props, path: this.metaPath}
-        report.message = formatRenderError(report)
+        const props = this.props
+        const path = this.metaPath
+        const report: DeliveredRenderErrorReport = {
+            error,
+            errorInfo: {...errorInfo, componentStack: errorInfo.componentStack ?? ''},
+            props,
+            path,
+            message: formatRenderError({error, path, props}),
+        }
         this.setState({error, diagnostic: report.message}, () => reportRenderError(report))
     }
 
@@ -248,7 +265,7 @@ export function formatRenderError ({error, path = '', props = {}}: RenderErrorRe
  * @param {Object} report - {error, errorInfo, props, path, message}
  * @returns {void}
  */
-function reportRenderError (report: RenderErrorReport): void {
+function reportRenderError (report: DeliveredRenderErrorReport): void {
     // Every rendered node carries the UIRender instance that owns it, which is how a
     // per-instance host hook is reachable from here without threading another prop
     // through the tree (and without a module global, which two UIRenders would share).

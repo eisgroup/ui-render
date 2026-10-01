@@ -6,7 +6,6 @@ import {
     isString,
     formatKeyPath,
     fileFormat,
-    fileFormatNormalized,
     fileNameWithoutExt,
     fileFromDataUrl,
     mimeTypeFromDataUrl,
@@ -108,20 +107,6 @@ describe('fileFormat', () => {
     })
     it('returns empty string when there is no extension', () => {
         expect(fileFormat('noext')).toBe('')
-    })
-})
-
-describe('fileFormatNormalized', () => {
-    it('normalizes jpeg/jpg to jpg', () => {
-        expect(fileFormatNormalized('photo.jpeg')).toBe('jpg')
-        expect(fileFormatNormalized('photo.JPG')).toBe('jpg')
-    })
-    it('returns the extension as-is for other types', () => {
-        expect(fileFormatNormalized('doc.PDF')).toBe('pdf')
-    })
-    it('returns undefined for falsy input', () => {
-        expect(fileFormatNormalized('')).toBeUndefined()
-        expect(fileFormatNormalized(null)).toBeUndefined()
     })
 })
 

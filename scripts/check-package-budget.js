@@ -10,9 +10,11 @@ const { spawnSync } = require('child_process')
  * limit only together with the reason the artifact legitimately grew.
  */
 const BUDGETS = {
-    files: 330,
-    unpackedBytes: 8 * 1024 * 1024,
-    packedBytes: 3 * 1024 * 1024,
+    // Lowered 2026-10-01 with the flags (§10): 289 files / 5.57 MB / 1.44 MB packed became
+    // 23 files / 3.29 MB / 0.85 MB, and the old limits would no longer have noticed them coming back.
+    files: 28,
+    unpackedBytes: 4 * 1024 * 1024,
+    packedBytes: 1 * 1024 * 1024,
 }
 
 /** Individual files large enough that a size jump matters on its own. */
@@ -38,7 +40,13 @@ const REQUIRED = [
     'static/all.css',
     'static/font.css',
     'static/fonts/icons/fonts/iconsOpenL.woff',
-    'static/images/flags/pl.svg',
+]
+
+/** Decided NOT to ship (UPGRADE-PLAN §10). A copy rule that brings one back fails here, by name. */
+const MUST_NOT_SHIP = [
+    // 266 country-flag SVGs, 41% of the unpacked package, read by nothing in the library since
+    // §9.6-E2. Stopped 2026-10-01; a host that links them ships its own copy.
+    'static/images/flags/',
 ]
 
 /** `dist/static/` stylesheets re-export the root payload; real bytes there mean the mirror is back. */
@@ -105,6 +113,11 @@ for (const [path, limit] of Object.entries(FILE_BUDGETS)) {
 
 for (const path of REQUIRED) {
     if (!sizes.has(path)) failures.push(`${path}: missing from the tarball`)
+}
+
+for (const prefix of MUST_NOT_SHIP) {
+    const shipped = manifest.files.filter(file => file.path.startsWith(prefix))
+    if (shipped.length) failures.push(`${prefix}: ${shipped.length} files in the tarball, which no longer ships them (UPGRADE-PLAN §10)`)
 }
 
 for (const path of RE_EXPORTS) {

@@ -150,21 +150,17 @@ export default {
                 { from: 'src/style/semantic-stub.css', to: './static/semantic.css' },
                 { from: 'src/style/semantic-stub.css', to: '../static/semantic.css' },
                 { from: 'src/style/fonts/icons/fonts', to: '../static/fonts/icons/fonts', noErrorOnMissing: true },
-                // ONLY `flags/`, not the whole folder. The rest of public/static/images is
-                // documentation for the GitHub Pages demo — four screenshots referenced from
-                // src/demo/markdowns/*.md, plus `home.jpg`/`diamonds-dimmed.png` whose only mentions
-                // are COMMENTED-OUT LESS rules, and `logo.svg`, which is merely the default argument
-                // of the `.background-image()` mixin that every live call overrides. None of it is
-                // reachable from the library, and shipping it put 1,042 KB of docs in every host's
-                // node_modules.
-                //
-                // `flags/` was kept for `languageDropdownOptions` in src/core/components/renders, which
-                // rendered country flags from `${FILE.PATH_IMAGES}flags/` and was tree-shaken out of
-                // dist ('flags/' occurs 0 times). That renderer was dead code and is deleted (§9.6-E2,
-                // seventh batch), so nothing in the library references these files now. They still
-                // ship: no longer shipping a folder that hosts may copy is a decision about the
-                // package, and it is recorded as open in docs/UPGRADE-PLAN.md rather than taken here.
-                { from: 'public/static/images/flags', to: '../static/images/flags', noErrorOnMissing: true },
+                // NOTHING from public/static/images ships. It is the GitHub Pages demo's:
+                //  - four screenshots referenced from src/demo/markdowns/*.md;
+                //  - `home.jpg` and `diamonds-dimmed.png`, whose only mentions are COMMENTED-OUT LESS
+                //    rules, and `logo.svg`, merely the default argument of the `.background-image()`
+                //    mixin that every live call overrides — together 1,042 KB of docs in every host's
+                //    node_modules until 2026-09-22;
+                //  - `flags/`, 266 country-flag SVGs and 41% of the unpacked package, shipped until
+                //    2026-10-01. Their one reader, `languageDropdownOptions`, was dead code, tree-shaken
+                //    out of dist and deleted at §9.6-E2. A host that links them ships its own copy
+                //    (docs/UPGRADE-PLAN.md §10). `scripts/check-package-budget.js` fails a tarball
+                //    that carries them again.
             ],
         }),
     ]

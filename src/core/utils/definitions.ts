@@ -1,5 +1,4 @@
 import { Active } from './_envs'
-import { LANGUAGE } from './constants'
 
 /**
  * @Note on the types (§9.6-E1): the values inside a definition are whatever the platform puts
@@ -23,23 +22,6 @@ export type DefinitionSource = Record<string, DefinitionEntry> | readonly Defini
 
 /** A group of definitions assigned to one `definitionSetup` prop (e.g. `FIELD.TYPE`) */
 export type Definition = Record<string, unknown>
-
-/** One `<Dropdown options>` entry produced by {@link optionsFrom} */
-export interface DefinitionOption {
-  /** localised label of the definition in the language this list belongs to */
-  text: unknown
-
-  /** the definition `_` value, with list values joined by `,` (Dropdown matches shallowly) */
-  value: unknown
-}
-
-/** Dropdown options grouped by language code, with `items` pointing at the active language */
-export interface DefinitionOptions {
-  /** options of the currently active language, falling back to English and then to `[]` */
-  readonly items: DefinitionOption[]
-
-  [lang: string]: DefinitionOption[]
-}
 
 /** Localised values of a single phrase, keyed by language code */
 export type Translation = Record<string, string>
@@ -139,84 +121,6 @@ export function definitionByValue (DEFINITION: DefinitionSource): Record<string,
     setOwn(result, def._, def)
   }
   return result
-}
-
-/**
- * Generate Enumerable List of Values from given Object Definition
- *
- * @example:
- *  enumFrom(LANGUAGE)
- *  >>> ['en', 'fr'...]
- *
- * @param DEFINITION - key/value pairs of variable name with its underscore value
- * @returns enums - list of enumerable values (whatever `_` holds: codes, numbers, or lists)
- */
-export function enumFrom (DEFINITION: DefinitionSource): unknown[] {
-  const list: unknown[] = []
-  for (const index of Object.keys(DEFINITION)) {
-    list.push((DEFINITION as Record<string, DefinitionEntry>)[index]._)
-  }
-  return list
-}
-
-/*
- * Extract Dropdown Options by Language for Given Object Definition
- *
- * @example:
- *    const options = optionsFrom(LANGUAGE)
- *    <Dropdown options={options.items} .../> // options for currently active language can be accessed via `items`,
- *    <Dropdown options={options[LANGUAGE.ENGLISH._]} .../> // or directly via language _
- *
- * @param DEFINITION - key/value pairs of variable name with its underscore value
- * @return options - grouped by language underscore value, with .items pointing to active lang
- */
-export function optionsFrom (DEFINITION: DefinitionSource): DefinitionOptions {
-  const options: DefinitionOptions = {
-    get items () {
-      // @Note: `this` is the options object itself, indexed by language code
-      return (this as DefinitionOptions)[Active.LANG._] || (this as DefinitionOptions)[LANGUAGE.ENGLISH._] || []
-    }
-  }
-  for (const index of Object.keys(DEFINITION)) {
-    const {_: value, ...langs} = (DEFINITION as Record<string, DefinitionEntry>)[index]
-    for (const lang of Object.keys(langs)) {
-      const text = langs[lang]
-      // Dropdown `value` cannot be array because of shallow match
-      const languageOptions = hasOwn(options, lang) ? options[lang] : []
-      setOwn(options, lang, languageOptions.concat({text, value: Array.isArray(value) ? value.join(',') : value}))
-    }
-  }
-  return options
-}
-
-/**
- * Prepare definitions for localisation, so they can be accessed via .name property without needing active language _
- *
- * @example:
- *    localise(LANGUAGE)
- *    console.log(LANGUAGE.ENGLISH.name)
- *    >>> English
- *
- * @param DEFINITION - key/value pairs of variable name with its _ value
- *    Multiple definitions can be nested unlimited times inside a single object.
- * @param _Active - vestigial: passed by the recursive call below and never read
- */
-export function localise (DEFINITION: Record<string, unknown>, _Active?: unknown): void {
-  for (const index of Object.keys(DEFINITION)) {
-    const definition = DEFINITION[index] as DefinitionEntry
-    const {_, name} = definition
-    if (name == null && _ != null) {
-      Object.defineProperty(DEFINITION[index], 'name', {
-        get (this: DefinitionEntry) {
-          return this[Active.LANG._] != null
-            ? this[Active.LANG._]
-            : (this[LANGUAGE.ENGLISH._] != null ? this[LANGUAGE.ENGLISH._] : String(_))
-        }
-      })
-    } else {
-      if (definition.constructor === Object) localise(definition, Active) // recursively process nested definitions
-    }
-  }
 }
 
 /**
