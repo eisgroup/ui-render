@@ -1,5 +1,20 @@
 import { get } from '../utils'
 
+/** What a popup's scope resolves to: the row index, the row's data, and the array path of its fields. */
+export type PopupScope = { relativeIndex: number | null, relativeData: unknown, relativePath: string | null | undefined }
+
+/** The UIRender instance's props, as far as a popup's scope reads them. */
+export type ScopeProps = {
+    relativeIndex?: number | null
+    relativePath?: string | null
+    index?: number | null
+    _data?: unknown
+    [key: string]: unknown
+}
+
+/** A form, as far as its values are read. */
+type ValuesSource = { getState?: () => { values?: unknown } }
+
 /**
  * WHICH ROW A POPUP BELONGS TO — the scope a `popupOpen` action resolves before it interpolates.
  * =============================================================================================
@@ -28,11 +43,11 @@ import { get } from '../utils'
  * @param {Object} [props] - the UIRender instance's props
  * @returns {{relativeIndex: ?Number, relativeData: *, relativePath: ?String}} the resolved scope
  */
-export function resolvePopupScope ({ id, form, props = {} }) {
+export function resolvePopupScope ({ id, form, props = {} }: { id: string, form?: ValuesSource | null, props?: ScopeProps }): PopupScope {
     // Try to get index and path from multiple sources
-    let relativeIndex = null
-    let relativeData = null
-    let relativePath = null
+    let relativeIndex: number | null = null
+    let relativeData: unknown = null
+    let relativePath: string | null | undefined = null
 
     // First, try to extract index from already interpolated ID (e.g., "SomeReason.0" -> 0)
     if (/\.\d+$/.test(id)) {
@@ -53,9 +68,10 @@ export function resolvePopupScope ({ id, form, props = {} }) {
         }
     }
     // 2. Try from form context (only if relativeIndex not already set)
+    // Not undefined below: `hasFormState` has checked both the form and its `getState`.
     else if (relativeIndex == null && hasFormState && props.index != null) {
         relativeIndex = props.index
-        relativeData = form.getState().values
+        relativeData = form!.getState!().values
         relativePath = props.relativePath
     }
     // 4. The form's values, which the id interpolation reads. This source also looked for a row in
@@ -64,7 +80,7 @@ export function resolvePopupScope ({ id, form, props = {} }) {
     // instead, as was meant, would be the very guess `resolvePopupRowContext` refuses below — a row
     // inferred from field names binds the popup to whichever table comes first — so it is gone.
     else if (relativeIndex == null && hasFormState) {
-        relativeData = form.getState().values
+        relativeData = form!.getState!().values
     }
 
     return { relativeIndex, relativeData, relativePath }
@@ -105,7 +121,20 @@ export function resolvePopupScope ({ id, form, props = {} }) {
  * @param {*} [params.data] - the instance's data, used when the template carries none
  * @returns {{data: *, relativeIndex: ?Number, relativePath: ?String, rowData: *}}
  */
-export function resolvePopupRowContext ({ id, options = {}, scope, template, props = {}, data }) {
+/** A registered popup template, as far as its scope is read. */
+export type PopupTemplateScope = { data?: unknown, _data?: unknown, relativeIndex?: number | null, relativePath?: string | null }
+
+/** What `resolvePopupRowContext` is given: see the parameters above. */
+export type PopupRowContextArgs = {
+    id: string
+    options?: { relativeIndex?: number | null, relativePath?: string | null }
+    scope: PopupScope
+    template: PopupTemplateScope
+    props?: ScopeProps
+    data?: unknown
+}
+
+export function resolvePopupRowContext ({ id, options = {}, scope, template, props = {}, data }: PopupRowContextArgs) {
     const currentData = template.data || data
     const relativeIndex = options.relativeIndex != null
         ? options.relativeIndex
@@ -123,7 +152,7 @@ export function resolvePopupRowContext ({ id, options = {}, scope, template, pro
         )
     }
 
-    let rowData = scope.relativeData != null ? scope.relativeData : template._data
+    let rowData: unknown = scope.relativeData != null ? scope.relativeData : template._data
     if (Array.isArray(rowData) && relativeIndex != null && relativePath) {
         const tableData = get(currentData, relativePath)
         if (Array.isArray(tableData) && tableData[relativeIndex] != null) {

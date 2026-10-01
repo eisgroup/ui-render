@@ -23,7 +23,7 @@ place the supported props are enumerated today.
 A node's `view` is dispatched by `Render.Component` in
 `src/core/engine/mapper.js`: a `switch` handles the layout and display
 views directly, and its `default` branch hands form fields to `renderField` in
-`src/core/engine/components/renders.js`.
+`src/core/engine/components/renders.tsx`.
 
 Two consequences worth knowing before authoring meta:
 

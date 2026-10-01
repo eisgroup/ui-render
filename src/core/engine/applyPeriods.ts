@@ -5,7 +5,7 @@ import { normalizeIncomingData } from './utils'
  * WHAT AN `onApplyPeriods` ACTION DOES.
  * =============================================================================================
  *
- * Lifted out of the `config` getter at §9.3 step 2, the rest of what `apiError.js` started: every
+ * Lifted out of the `config` getter at §9.3 step 2, the rest of what `apiError.ts` started: every
  * form's current values go to the host's `apiCalls.updateExperienceData`, and whatever it resolves
  * with becomes the UI's data. A failure is read into a message by `messageFromError` and handed on.
  *
@@ -18,7 +18,15 @@ import { normalizeIncomingData } from './utils'
  *   and the original error
  * @returns {Promise<false|undefined>} false when the host provides no `updateExperienceData`
  */
-export async function applyPeriods ({ updateExperienceData, readFormsData, onUpdated, onFailure }) {
+/** What `applyPeriods` is given: see the parameter above. */
+export type ApplyPeriodsOptions = {
+    updateExperienceData?: (data: unknown) => unknown
+    readFormsData: () => unknown
+    onUpdated: (data: unknown) => void
+    onFailure: (message: unknown, error: unknown) => void
+}
+
+export async function applyPeriods ({ updateExperienceData, readFormsData, onUpdated, onFailure }: ApplyPeriodsOptions): Promise<false | undefined> {
     if (typeof updateExperienceData !== 'function') {
         return false
     }
@@ -32,7 +40,7 @@ export async function applyPeriods ({ updateExperienceData, readFormsData, onUpd
         onUpdated(normalizeIncomingData(response))
     } catch (error) {
         // Not guarded, as before: a body that cannot be read rejects here, and the failure then
-        // reaches neither the popup nor the console (see `apiError.js`).
+        // reaches neither the popup nor the console (see `apiError.ts`).
         onFailure(await messageFromError(error), error)
     }
 }

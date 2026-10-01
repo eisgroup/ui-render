@@ -8,6 +8,7 @@ import type { Translate } from '../../utils/_envs'
 import { email, isRequired, maxLength, password, url } from '../../components/inputs/validationRules'
 import { integer } from '../../components/inputs/normalizers'
 import { pushDataKindRow, validateNotWithinRangeDraftRow } from '../dataKindPush'
+import type { DataKindParent } from '../dataKindPush'
 
 type Validator = (value: unknown) => unknown
 
@@ -29,9 +30,10 @@ export type DraftItem = {
 }
 
 export type LocalDraftTableRowProps = {
-  meta?: { items?: DraftItem[], [key: string]: unknown }
+  /** The `Data` block's meta: its cells, and the path of the rows a draft is added to */
+  meta?: { items?: DraftItem[], relativePath?: string | null, [key: string]: unknown }
   kind?: string
-  parentInstance?: { getDataKind?: (kind?: string) => object[], [key: string]: unknown }
+  parentInstance?: DataKindParent & { getDataKind?: (kind?: string) => object[], [key: string]: unknown }
   translate?: Translate
 }
 

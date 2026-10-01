@@ -8,8 +8,14 @@ import { Active } from '../../utils'
 
 const UploadField = asField(Upload, {sanitize: (value) => value || undefined})
 
-export function renderField (fieldDefinition, i) {
-  let Field
+/** A field's meta, as `renderField` reads it: its view, its input type, and the props for the field. */
+export type FieldDefinition = { view?: string, type?: string, [key: string]: unknown }
+
+/** What a field resolves to: the engine's fields are still typed as they are in `modules/form`. */
+type FieldComponent = React.ComponentType<any>
+
+export function renderField (this: unknown, fieldDefinition: FieldDefinition, i?: number) {
+  let Field: FieldComponent
   const {view, type, ...props} = fieldDefinition
   switch (view) {
     case FIELD.TYPE.INPUT:

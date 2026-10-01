@@ -235,7 +235,7 @@ describe('dev-mode meta validation over the real example set', () => {
 
     it.each(EXAMPLES.map(example => [example.id]))('reports no error-severity problem for %s', (id) => {
         const errors = problemsById.get(id).filter(problem => problem.severity === META_SEVERITY.ERROR)
-        // Every error check corresponds to a measured engine crash (see validateMeta.js),
+        // Every error check corresponds to a measured engine crash (see validateMeta.ts),
         // so an error here means the example is broken, not that the validator is noisy.
         expect(errors.map(problem => `${problem.path}: ${problem.message}`)).toEqual([])
     })

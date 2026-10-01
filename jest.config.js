@@ -175,13 +175,13 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/engine/validateMeta.js': {
+        './src/core/engine/validateMeta.ts': {
             statements: 100,
             branches: 100,
             functions: 100,
             lines: 100,
         },
-        './src/core/engine/metaPath.js': {
+        './src/core/engine/metaPath.ts': {
             statements: 100,
             branches: 100,
             functions: 100,
@@ -217,7 +217,7 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
-        './src/core/engine/dataKindPush.js': {
+        './src/core/engine/dataKindPush.ts': {
             statements: 100,
             branches: 100,
             functions: 100,

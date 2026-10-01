@@ -34,7 +34,17 @@ import { normalizeIncomingData } from './utils'
  *   do with the normalised answer
  * @returns {Promise<void>} settles once the answer is handed over or ignored, or the failure logged
  */
-export async function upload ([files, path, dropzone], { uploadFile, readFormsData, onUploaded }) {
+/** What `Upload` calls the action with: the picked files, the field's path, and its dropzone. */
+export type UploadArgs = [File[], string, { fileInputEl: { value: string | null } }]
+
+/** What `upload` is given: see the parameter above. */
+export type UploadOptions = {
+    uploadFile?: (serialized: string, file: File, files: File[]) => unknown
+    readFormsData: () => object
+    onUploaded: (data: unknown) => void
+}
+
+export async function upload ([files, path, dropzone]: UploadArgs, { uploadFile, readFormsData, onUploaded }: UploadOptions): Promise<void> {
     const [file] = files
     if (!file || typeof uploadFile !== 'function') return
 

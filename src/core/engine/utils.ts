@@ -1,15 +1,36 @@
+import type { FormApi } from 'final-form'
 import { get, merge, isObject, hasObjectValue } from '../utils/object'
 import { errorsFor, touchedFor } from '../state/formRegistry'
+import type { RegisteredForm } from '../state/formRegistry'
 import { FIELD } from '../modules'
 import { ISO_8601_FULL } from '../utils'
 import { cloneDeep } from '../utils'
 
-export const getFormsData = (forms) => {
-  const formDataArray = [];
+/** A meta node, as far as these helpers read it. */
+export type MetaNode = {
+  view?: unknown
+  name?: string
+  relativePath?: string
+  relativeIndex?: number
+  mapOptions?: string | { text: string, value?: unknown }
+  items?: MetaNode[]
+  renderItem?: { items?: MetaNode[] }
+  [key: string]: unknown
+}
+
+/** A form's values, or a merge of several. */
+type Values = Record<string, any>
+
+/** Every active form on the page, as `formsStorage` holds them. */
+type Forms = ReadonlyMap<object, RegisteredForm>
+
+export const getFormsData = (forms: Forms) => {
+  const formDataArray: Values[] = [];
 
   forms.forEach(value => {
     const { form, meta } = value;
-    const formData = getStructuredDataFromFormObject(form, meta);
+    // A cast, not a guard: what a form registers as its meta is its document's meta.
+    const formData = getStructuredDataFromFormObject(form, meta as MetaNode | undefined);
     if (formData) {
       formDataArray.push(formData);
     }
@@ -28,8 +49,8 @@ export const getFormsData = (forms) => {
  * @param {Map} forms - {@link formsStorage}
  * @returns {Array<Object>}
  */
-export function getLiveMergedDataKindArray (path, forms) {
-  const arrays = []
+export function getLiveMergedDataKindArray (path: string, forms: Forms): object[] {
+  const arrays: unknown[][] = []
   forms.forEach(({ form }) => {
     if (!form || typeof form.getState !== 'function') return
     const arr = get(form.getState().values, path)
@@ -41,9 +62,9 @@ export function getLiveMergedDataKindArray (path, forms) {
     return []
   }
   const cap = Math.min(...arrays.map(a => a.length))
-  const out = []
+  const out: object[] = []
   for (let i = 0; i < cap; i++) {
-    let row = {}
+    let row: object = {}
     for (const arr of arrays) {
       const piece = arr[i]
       if (piece != null && typeof piece === 'object' && !Array.isArray(piece)) {
@@ -59,12 +80,13 @@ export function getLiveMergedDataKindArray (path, forms) {
  * Get raw form values without Select reordering.
  * Used for showIf lookups where array indices must match the original data order.
  */
-export const getRawFormsData = (forms) => {
-  const formDataArray = [];
+export const getRawFormsData = (forms: Forms) => {
+  const formDataArray: Values[] = [];
 
   forms.forEach(value => {
     const { form, meta } = value;
-    const { relativePath, relativeIndex } = meta || {};
+    // A cast, not a guard: as in `getFormsData`.
+    const { relativePath, relativeIndex } = (meta || {}) as MetaNode;
     if (relativePath && typeof relativeIndex === 'undefined') return;
 
     const formValues = cloneDeep(form.getState().values);
@@ -72,14 +94,15 @@ export const getRawFormsData = (forms) => {
     if (!relativePath) {
       formDataArray.push(formValues);
     } else {
-      formDataArray.push(createObjectStructure(formValues, relativePath, relativeIndex));
+      // Not undefined: a relative path without an index returned above.
+      formDataArray.push(createObjectStructure(formValues, relativePath, relativeIndex!));
     }
   })
 
   return mergeData([...formDataArray]);
 }
 
-const getStructuredDataFromFormObject = (form, meta) => {
+const getStructuredDataFromFormObject = (form: FormApi, meta: MetaNode | undefined) => {
   const { relativePath, relativeIndex } = meta || {};
 
   if (relativePath && typeof relativeIndex === 'undefined') {
@@ -93,14 +116,15 @@ const getStructuredDataFromFormObject = (form, meta) => {
     return formState;
   }
 
-  return createObjectStructure(formState, relativePath, relativeIndex);
+  // Not undefined: a relative path without an index returned above.
+  return createObjectStructure(formState, relativePath, relativeIndex!);
 }
 
-const createObjectStructure = (value, relativePath, relativeIndex) => {
-  return relativePath.split('.').reverse().reduce((acc, item, index) => {
-    const result = {};
+const createObjectStructure = (value: unknown, relativePath: string, relativeIndex: number): Values => {
+  return relativePath.split('.').reverse().reduce((acc: Values, item, index) => {
+    const result: Values = {};
     if (index === 0) {
-      const tmpArray = [];
+      const tmpArray: unknown[] = [];
       tmpArray[relativeIndex] = value;
       result[item] = tmpArray;
     } else {
@@ -111,7 +135,7 @@ const createObjectStructure = (value, relativePath, relativeIndex) => {
   }, {})
 }
 
-const mergeData = (formData) => {
+const mergeData = (formData: Values[]) => {
   let masterDataIndex = -1;
   // Find Master object which contains all data structure
   // It should be one object in array
@@ -135,24 +159,9 @@ const mergeData = (formData) => {
   return result;
 }
 
-export const replaceDeep = (object, key, value) => {
-  if (Array.isArray(object)) {
-    object.forEach(item => {
-      replaceDeep(item, key, value)
-    })
-  } else if (isObject(object)) {
-    if (object.hasOwnProperty(key)) {
-      object[key] = value;
-    }
-
-    Object.keys(object).forEach(k => {
-      replaceDeep(object[k], key, value)
-    })
-  }
-};
-
 /**
- * `replaceDeep`, returning a copy instead of writing into its argument.
+ * The in-place `replaceDeep` it replaced, returning a copy instead of writing into its argument
+ * (`replaceDeep` itself was deleted at §9.6-E3 once nothing called it).
  *
  * Same semantics, which are unusual enough to state: `key` is a bare property NAME, not a path, and
  * EVERY property of that name anywhere in the tree is replaced — at the root, in nested objects and
@@ -171,12 +180,12 @@ export const replaceDeep = (object, key, value) => {
  * @param {*} value - the replacement
  * @returns {*} a new tree
  */
-export const replaceDeepCopy = (object, key, value) => {
+export const replaceDeepCopy = (object: unknown, key: string, value: unknown): unknown => {
   if (Array.isArray(object)) {
     return object.map(item => replaceDeepCopy(item, key, value))
   }
   if (isObject(object)) {
-    const copy = {}
+    const copy: Values = {}
     Object.keys(object).forEach(k => {
       copy[k] = replaceDeepCopy(k === key ? value : object[k], key, value)
     })
@@ -185,7 +194,7 @@ export const replaceDeepCopy = (object, key, value) => {
   return object
 }
 
-function getKeyAndPathFromMetaData(meta) {
+function getKeyAndPathFromMetaData(meta: MetaNode): { key?: string, path?: string } {
   const { relativeIndex, relativePath } = meta;
   let path = '';
   let key = 'master';
@@ -202,7 +211,7 @@ function getKeyAndPathFromMetaData(meta) {
   return { key, path }
 }
 
-export function errorsProcessing(form, meta) {
+export function errorsProcessing(form: FormApi, meta: MetaNode) {
   const { key } = getKeyAndPathFromMetaData(meta);
 
   if (!key) {
@@ -220,7 +229,8 @@ export function errorsProcessing(form, meta) {
   const rememberedTouched = touchedFor(form)
 
   registeredFieldNames.forEach(field => {
-    const { name, error, touched } = form.getFieldState(field);
+    // Not undefined: the field was just listed as registered.
+    const { name, error, touched } = form.getFieldState(field)!;
 
     if (error && (touched || rememberedTouched[name])) {
       let errorText = error;
@@ -246,8 +256,8 @@ export function errorsProcessing(form, meta) {
     }
 }
  */
-export const mapErrorObjectToUIFormat = (errors) => {
-  const result = {};
+export const mapErrorObjectToUIFormat = (errors: Record<string, unknown>) => {
+  const result: Record<string, { messages: Array<{ text: unknown }> }> = {};
 
   Object.keys(errors).forEach(fieldName => {
     result[fieldName] = {
@@ -262,10 +272,10 @@ export const mapErrorObjectToUIFormat = (errors) => {
   return result;
 }
 
-export const convertFieldNameToTitleCaseText = (str) => {
+export const convertFieldNameToTitleCaseText = (str: string) => {
   let fieldName = str;
   if (fieldName.includes('.')) {
-    fieldName = fieldName.split('.').pop();
+    fieldName = fieldName.split('.').pop()!; // not undefined: a split has at least one part
   }
   const result = fieldName.replace(/([A-Z])/g, " $1").trim();
 
@@ -273,9 +283,9 @@ export const convertFieldNameToTitleCaseText = (str) => {
 }
 
 // Find Select fields and change options order in case select was changed
-export const changeOptionOrderForSelectFields = (data, meta) => {
+export const changeOptionOrderForSelectFields = (data: Values, meta: MetaNode | undefined) => {
   // find data related to Select and change options order
-  const recursiveDataParser = (data, optionName, selectValue) => {
+  const recursiveDataParser = (data: unknown, optionName: string, selectValue: unknown) => {
     let isDataOrderChanged = false
     const optionIndex = Number(selectValue)
     if (String(selectValue).trim() === '' || !Number.isSafeInteger(optionIndex) || optionIndex < 0) {
@@ -304,7 +314,7 @@ export const changeOptionOrderForSelectFields = (data, meta) => {
   }
 
   if (meta && meta.view === FIELD.TYPE.SELECT) {
-    const selectName = meta.name;
+    const selectName = meta.name as string; // a cast, not a guard: a Select names its field
     if (typeof data[selectName] === 'string') {
       // @Note: no destructuring of `mapOptions` before its type is known. It used to read
       //  `const {text, value} = mapOptions` ABOVE these branches, which throws
@@ -338,14 +348,14 @@ export const changeOptionOrderForSelectFields = (data, meta) => {
 /*
   Return date in format 'YYYY-MM-DD'
  */
-export const getDateStringFromDateObject = (date) => {
+export const getDateStringFromDateObject = (date: Date) => {
   const year = String(date.getUTCFullYear()).padStart(4, '0')
   const month = String(date.getUTCMonth() + 1).padStart(2, '0')
   const day = String(date.getUTCDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
 
-export const normalizeIncomingData = (data) => {
+export const normalizeIncomingData = (data: unknown): unknown => {
   if (!data) {
     return data
   }
@@ -372,9 +382,10 @@ export const normalizeIncomingData = (data) => {
   }
 
   if (Object.keys(data).length) {
-    const nextData = {};
+    const nextData: Values = {};
     Object.keys(data).forEach(key => {
-      nextData[key] = normalizeIncomingData(data[key])
+      // A cast, not a guard: anything left is an object, or `true`, which has no keys.
+      nextData[key] = normalizeIncomingData((data as Values)[key])
     })
     return nextData;
   }

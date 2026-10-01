@@ -27,7 +27,21 @@ import { interpolateString, isString, isTruthy } from '../utils'
  * @param {Object} [instance] - the UIRender instance, for `{state.xxx}` and live form values
  * @returns {Boolean} whether the node should render
  */
-export function shouldRender ({ showIf, data, _data, relativeData, relativePath, relativeIndex, instance }) {
+/** A `showIf` object: the data path to test, where to read it from, and the value it must equal. */
+export type ShowIfCondition = { name?: string, relativeData?: boolean, equal?: unknown }
+
+/** What `shouldRender` is given: see the parameters above. */
+export type ShouldRenderArgs = {
+    showIf: unknown
+    data: object
+    _data?: unknown
+    relativeData?: boolean
+    relativePath?: string
+    relativeIndex?: number | string
+    instance?: { getRawFormsData?: () => unknown, [key: string]: unknown }
+}
+
+export function shouldRender ({ showIf, data, _data, relativeData, relativePath, relativeIndex, instance }: ShouldRenderArgs): boolean {
     if (showIf == null) return true
 
     // UI Render should not 'Value Transform' `showIf` attribute
@@ -36,12 +50,13 @@ export function shouldRender ({ showIf, data, _data, relativeData, relativePath,
     }
 
     if (hasObjectValue(showIf)) {
-        const { name: rawName, relativeData: showIfRelativeData, equal } = showIf
+        // A cast, not a guard: an object `showIf` is read as this shape, as it always was.
+        const { name: rawName, relativeData: showIfRelativeData, equal } = showIf as ShowIfCondition
         // Interpolate {state.xxx} templates in showIf.name
         const name = rawName && rawName.includes('{')
             ? interpolateString(rawName, instance, { suppressError: true })
             : rawName
-        let __data
+        let __data: unknown
         if (name) {
             // Use raw form data (without Select array reordering) for showIf lookups.
             // getAllFormsData() applies changeOptionOrderForSelectFields which reorders arrays,

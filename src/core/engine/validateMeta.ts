@@ -66,10 +66,22 @@ export const META_SEVERITY = {
     WARNING: 'warning',
 }
 
+/** One problem found: where, how bad, which kind, and a message that says it. */
+export type MetaProblem = { path: string, severity: string, code: string, message: string }
+
+/** A meta node, as the walk reads it. */
+type MetaNode = Record<string, unknown>
+
+/** Reports a problem at `key` under the node being walked. */
+type Report = (key: string, severity: string, code: string, message: string) => void
+
+/** What the walk carries: the problems so far, the declared vocabularies, and the nodes already seen. */
+type WalkContext = { problems: MetaProblem[], views: string[], renderMethods: string[], visited: Set<unknown> }
+
 /** Attributes the engine maps over, so a non-array value throws during render. */
 const ARRAY_ATTRIBUTES = ['items', 'headers', 'extraHeaders', 'extraItems']
 
-const isPlainObject = (value) => !!value && typeof value === 'object' && !Array.isArray(value)
+const isPlainObject = (value: unknown): value is MetaNode => !!value && typeof value === 'object' && !Array.isArray(value)
 
 /**
  * View names and render-method names are read at call time, never at module load:
@@ -79,7 +91,7 @@ const isPlainObject = (value) => !!value && typeof value === 'object' && !Array.
  *
  * @returns {Array<String>} declared values of the given FIELD definition group
  */
-const declaredValues = (group) => Object.keys(group).map(key => group[key])
+const declaredValues = (group: Record<string, string>) => Object.keys(group).map(key => group[key])
 
 /** @returns {Array<String>} every `view` value the engine declares */
 export const declaredViews = () => declaredValues(FIELD.TYPE)
@@ -96,8 +108,8 @@ export const declaredRenderMethods = () => declaredValues(FIELD.RENDER)
  *    depth first, parents before children; `path` is relative to the meta root
  *    ('' for the root itself)
  */
-export function validateMeta (meta) {
-    const problems = []
+export function validateMeta (meta: unknown): MetaProblem[] {
+    const problems: MetaProblem[] = []
     if (!isPlainObject(meta)) {
         problems.push({
             path: '',
@@ -107,7 +119,7 @@ export function validateMeta (meta) {
         })
         return problems
     }
-    const context = {
+    const context: WalkContext = {
         problems,
         views: declaredViews(),
         renderMethods: declaredRenderMethods(),
@@ -120,7 +132,7 @@ export function validateMeta (meta) {
 }
 
 /** @returns {String} human readable type of an unexpected value */
-function describe (value) {
+function describe (value: unknown): string {
     if (value === null) return 'null'
     if (Array.isArray(value)) return 'an array'
     return `${typeof value}`
@@ -134,9 +146,9 @@ function describe (value) {
  *    `meta` declaration for an embedded UIRender, which is a complete document of its own)
  * @returns {void}
  */
-function walkNode (node, path, context, isRoot) {
+function walkNode (node: MetaNode, path: string, context: WalkContext, isRoot: boolean): void {
     const { problems } = context
-    const report = (key, severity, code, message) => problems.push({
+    const report: Report = (key, severity, code, message) => problems.push({
         path: joinPath(path, key),
         severity,
         code,
@@ -201,7 +213,7 @@ function walkNode (node, path, context, isRoot) {
  * @param {Boolean} isRoot - see walkNode
  * @returns {void}
  */
-function walkChild (value, path, context, isRoot) {
+function walkChild (value: unknown, path: string, context: WalkContext, isRoot: boolean): void {
     if (!value || typeof value !== 'object') return
     if (context.visited.has(value)) return
     context.visited.add(value)
@@ -209,7 +221,7 @@ function walkChild (value, path, context, isRoot) {
         value.forEach((item, index) => walkChild(item, joinPath(path, index, true), context, false))
         return
     }
-    walkNode(value, path, context, isRoot)
+    walkNode(value as MetaNode, path, context, isRoot) // a cast, not a guard: an object, not an array
 }
 
 /**
@@ -218,7 +230,7 @@ function walkChild (value, path, context, isRoot) {
  * @param {Function} report - (key, severity, code, message) => void
  * @returns {void}
  */
-function checkMetaVersion (value, isRoot, report) {
+function checkMetaVersion (value: unknown, isRoot: boolean, report: Report): void {
     if (!isRoot) {
         report('metaVersion', META_SEVERITY.WARNING, META_PROBLEM.META_VERSION_NOT_ROOT,
             'metaVersion is a root-level declaration — on a nested node it is ignored')
@@ -239,7 +251,7 @@ function checkMetaVersion (value, isRoot, report) {
  * @param {Object} problem - as returned by validateMeta()
  * @returns {String} single line, path first, suitable for a console warning
  */
-export function formatMetaProblem ({ path, severity, message }) {
+export function formatMetaProblem ({ path, severity, message }: MetaProblem): string {
     return `[ui-render] meta ${severity} at ${path ? `"${path}"` : '(root)'}: ${message}`
 }
 
@@ -259,7 +271,7 @@ export function formatMetaProblem ({ path, severity, message }) {
  *    `true` reports to console.warn; a function receives the problems array instead
  * @returns {Array<Object>|null} problems, or null when disabled or when reporting failed
  */
-export function reportMetaProblems (meta, flag) {
+export function reportMetaProblems (meta: unknown, flag?: boolean | ((problems: MetaProblem[]) => void)): MetaProblem[] | null {
     if (!flag) return null
     try {
         const problems = validateMeta(meta)

@@ -22,27 +22,31 @@
  * @param {Array} args - everything the action was called with, caller's arguments first
  * @returns {?{id: String, options: Object}} the popup to open, or null when the call is unusable
  */
-export function parsePopupArgs (args) {
+/** A popup's options, as a meta writes them; `id` names the popup when the first argument does not. */
+export type PopupOptions = { id?: unknown, [key: string]: unknown }
+
+export function parsePopupArgs (args: unknown[]): { id: string, options: PopupOptions } | null {
     const filteredArgs = args.filter(arg => !isCallerArgument(arg))
 
     // Handle different argument formats: [id, options] or [id] or [options with id]
-    let id
-    let options = {}
+    // Casts below, not guards: an argument after the id is the options object a meta writes.
+    let id: unknown
+    let options: PopupOptions = {}
     if (filteredArgs.length === 0) {
         console.error('Popup Open: no arguments provided after filtering')
         return null
     }
     if (typeof filteredArgs[0] === 'string') {
         id = filteredArgs[0]
-        options = filteredArgs[1] || {}
+        options = (filteredArgs[1] || {}) as PopupOptions
     } else if (typeof filteredArgs[0] === 'object' && filteredArgs[0] !== null) {
         // If first arg is object, it might be options with id, or just options
-        options = filteredArgs[0]
+        options = filteredArgs[0] as PopupOptions
         id = filteredArgs[1] || options.id
     } else {
         // A number, a boolean: `popupOpen,7` is a legal thing for a meta to write.
         id = String(filteredArgs[0])
-        options = filteredArgs[1] || {}
+        options = (filteredArgs[1] || {}) as PopupOptions
     }
 
     // Ensure id is a string
@@ -61,7 +65,18 @@ export function parsePopupArgs (args) {
  * @param {*} arg - one argument an action was called with
  * @returns {Boolean} true for an event or a component class
  */
-export function isCallerArgument (arg) {
+/** What `isCallerArgument` looks for: an event's marks, or a component class's prototype flag. */
+type CallerProbe = {
+    prototype?: { isReactComponent?: unknown }
+    nativeEvent?: unknown
+    target?: unknown
+    preventDefault?: unknown
+    stopPropagation?: unknown
+}
+
+export function isCallerArgument (value: unknown): boolean {
+    // A cast, not a guard: the argument is only probed for those marks.
+    const arg = value as CallerProbe | null | undefined
     // React component classes are functions, so check them before the generic primitive branch.
     if (arg && arg.prototype && arg.prototype.isReactComponent) return true
     if (typeof arg !== 'object' || arg === null) return false
@@ -84,7 +99,7 @@ export function isCallerArgument (arg) {
  * @param {Array} args - everything the action was called with, caller's arguments first
  * @returns {{title: *, content: *}} the title and the content to show
  */
-export function parsePopupAlertArgs (args) {
+export function parsePopupAlertArgs (args: unknown[]): { title: unknown, content: unknown } {
     const [first, second] = args.filter(arg => !isCallerArgument(arg))
     if (typeof first === 'string') return { title: first, content: second }
     return { title: typeof second === 'string' ? second : undefined, content: first }

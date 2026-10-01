@@ -85,7 +85,7 @@ export function registeredFieldErrors (form) {
  * @param InputComponent - React component to use for input
  * @param {Object} [options]
  * @param {function(*, *): *} [options.sanitize] - `(value, props)`: parses the (formatted) value from input Field to InputComponent
- * @returns {Class} React InputComponentField - connected to react-final-form
+ * @returns {import('react').ComponentClass<*>} React InputComponentField - connected to react-final-form
  */
 export function asField (InputComponent, {sanitize} = {}) {
   if (!Active.Field) Active.Field = Field

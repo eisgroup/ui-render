@@ -22,7 +22,7 @@
  * @param {*} error - what the call rejected with
  * @returns {Promise<*>} the message to display: a string, a parsed object, or the error itself
  */
-export async function messageFromError (error) {
+export async function messageFromError (error: unknown): Promise<unknown> {
     // Anything that is not a Response speaks for itself.
     if (typeof Response === 'undefined' || !(error instanceof Response)) return error
 
@@ -30,7 +30,8 @@ export async function messageFromError (error) {
     // and turning that into a displayed message would be a behaviour change, not an extraction.
     const errorText = await error.text()
 
-    let errorObject
+    // What an API's error body is taken to be: an object with a `message` string, if anything.
+    let errorObject: { message?: string } | null
     try {
         errorObject = JSON.parse(errorText)
     } catch {
@@ -56,7 +57,8 @@ export async function messageFromError (error) {
     const message = errorObject.message
     // `message=<what went wrong>errors=[…]` — only the first half is worth showing.
     if (/message=(.*)errors.*/.test(message)) {
-        const subMessage = message.match(/message=(.*)errors.*/)[1]
+        // Not null: the `test` above has just matched the same expression.
+        const subMessage = message.match(/message=(.*)errors.*/)![1]
         if (subMessage) return subMessage
     }
     return message

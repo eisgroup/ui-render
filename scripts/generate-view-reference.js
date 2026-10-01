@@ -55,7 +55,7 @@ const WRITE_COMMAND = 'npm run docs:views'
 const DECLARATION_SITES = [
     { file: 'src/core/modules/variables/fields.ts', props: ['TYPE', 'RENDER', 'ACTION'] },
     // `TYPE` left this file at §9.3 step 3, for the same reason it left `engine/rules.js` at step 2:
-    // `engine/utils.js` compares against `FIELD.TYPE.SELECT`, so the comparison depended on whether
+    // `engine/utils.ts` compares against `FIELD.TYPE.SELECT`, so the comparison depended on whether
     // anything had imported the form module yet. The names are in `variables/fields.ts` now.
     // `TYPE` left this file at §9.3 step 2: `mapper.js` dispatches on those six names while
     // `rules.js` imports `mapper.js`, so the resolver depended on a constant its own importer
@@ -69,7 +69,7 @@ const RESOLVER_FILES = {
     // Dropdown inline and re-dispatches Input by `type`. Also Render.Method's `render*` switch.
     mapper: 'src/core/engine/mapper.js',
     // renderField — the form-field leg of the `default` branch.
-    renderField: 'src/core/engine/components/renders.js',
+    renderField: 'src/core/engine/components/renders.tsx',
     // FIELD.FUNC registrations for the action names.
     rules: 'src/core/engine/rules.js',
     fields: 'src/core/modules/variables/fields.ts',

@@ -2,7 +2,6 @@ import {
     getFormsData,
     getRawFormsData,
     getLiveMergedDataKindArray,
-    replaceDeep,
     errorsProcessing,
 } from '../utils'
 import { errorsFor, touchedFor } from '../../state/formRegistry'
@@ -123,35 +122,6 @@ describe('getRawFormsData', () => {
         ])
         const out = getRawFormsData(forms)
         expect(out.rows[2]).toEqual({ value: 42 })
-    })
-})
-
-describe('replaceDeep', () => {
-    it('replaces matching keys at the top level', () => {
-        const obj = { name: 'old', other: 1 }
-        replaceDeep(obj, 'name', 'new')
-        expect(obj.name).toBe('new')
-        expect(obj.other).toBe(1)
-    })
-
-    it('recurses into nested objects', () => {
-        const obj = { a: { name: 'x', deep: { name: 'y' } } }
-        replaceDeep(obj, 'name', 'replaced')
-        expect(obj.a.name).toBe('replaced')
-        expect(obj.a.deep.name).toBe('replaced')
-    })
-
-    it('recurses into arrays', () => {
-        const obj = { items: [{ name: 'a' }, { name: 'b' }] }
-        replaceDeep(obj, 'name', 'X')
-        expect(obj.items[0].name).toBe('X')
-        expect(obj.items[1].name).toBe('X')
-    })
-
-    it('ignores non-collection values', () => {
-        expect(() => replaceDeep('plain', 'name', 'x')).not.toThrow()
-        expect(() => replaceDeep(null, 'name', 'x')).not.toThrow()
-        expect(() => replaceDeep(42, 'name', 'x')).not.toThrow()
     })
 })
 

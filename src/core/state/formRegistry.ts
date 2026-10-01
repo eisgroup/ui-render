@@ -17,10 +17,13 @@
  * between tests.
  */
 
+import type { FormApi } from 'final-form'
+
 /** What a form registers about itself, keyed by the `initialValues` snapshot it was mounted with. */
-type RegisteredForm = {
+export type RegisteredForm = {
+	/** The document's meta: a nested document's says where its rows sit */
 	meta: unknown,
-	form: unknown,
+	form: FormApi,
 }
 
 /**

@@ -30,8 +30,15 @@ import { downloadFile as saveBlob } from '../services/downloadFile'
  *   that settles once the file is saved or the failure is handed over. The original returned
  *   nothing here, and no caller reads the value: a `Button` hands `onClick` straight to the DOM.
  */
-export function download (args, { downloadFile, onFailure }) {
-    const [fileName, saveAs] = typeof args[0] === 'object' ? args.slice(1) : args
+/** What `download` is given: see the parameter above. */
+export type DownloadOptions = {
+    downloadFile?: (fileName: string) => Promise<Response>
+    onFailure: (error: unknown) => void
+}
+
+export function download (args: unknown[], { downloadFile, onFailure }: DownloadOptions): false | Promise<void> {
+    // A cast, not a guard: what a meta writes there is the file name, and the name to save as.
+    const [fileName, saveAs] = (typeof args[0] === 'object' ? args.slice(1) : args) as [string, unknown?]
     if (typeof downloadFile !== 'function') return false
 
     return downloadFile(fileName)
@@ -51,7 +58,7 @@ export function download (args, { downloadFile, onFailure }) {
  * @param {*} error - what the download rejected with
  * @returns {String} text a title can show; empty when there is nothing to say
  */
-export function describeFailure (error) {
+export function describeFailure (error: unknown): string {
     if (error == null) return ''
     if (typeof error === 'string') return error
     if (error instanceof Error) return error.message || error.name

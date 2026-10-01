@@ -3,7 +3,7 @@ import { get, isObject } from '../utils'
 import { childItemPath, formatMetaPath } from './metaPath'
 
 /**
- * Meta path of the closest enclosing rendered node — see `metaPath.js` for the
+ * Meta path of the closest enclosing rendered node — see `metaPath.ts` for the
  * notation. Ambient tree position is exactly what context is for, and using it
  * keeps the path out of props: every prop a node carries is spread onto the
  * resolved component and can end up as a DOM attribute (that is how

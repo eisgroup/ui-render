@@ -86,7 +86,7 @@ const RenderComponent = ({
     // sibling's function. The fallback covers nodes rendered without an instance (tests, and the
     // components that read `Active.translate` as a prop default).
     const translate = (instance && instance.translate) || Active.translate
-    /* General showIf logic — the whole decision lives in `showIf.js`, testable on its own. */
+    /* General showIf logic — the whole decision lives in `showIf.ts`, testable on its own. */
     if (!shouldRender({ showIf, data, _data, relativeData, relativePath, relativeIndex, instance })) return null
 
     switch (view) {
