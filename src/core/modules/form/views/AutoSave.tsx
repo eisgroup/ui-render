@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { FormSpy } from 'react-final-form'
 import type { FormState, FormSubscription } from 'final-form'
-import { PropTypes } from '../../../components'
 import { Loading } from '../../../components/Loading'
 import { debounce, l, localiseTranslation, objChanges, TIME_DURATION_INSTANT } from '../../../utils'
 import { _ } from '../../../utils/translations'
@@ -21,10 +20,15 @@ type Values = Record<string, any>
 export type AutoSaveProps = {
   /** Saves the values, or only the changed ones with `partial`; a returned promise is awaited */
   onChange: (values: Values) => unknown
+  /** Whether to save only changed values, default is all Form values */
   partial?: boolean
+  /** Whether to overlay parent container with Loading spinner component */
   showLoader?: boolean
+  /** FormSpy subscription */
   subscription?: FormSubscription
+  /** Milliseconds to delay form `onChange` */
   delay?: number
+  /** Loading message */
   loadContent?: React.ReactNode
 }
 
@@ -94,21 +98,6 @@ function AutoSave ({
     <FormSpy subscription={subscription} onChange={handleChange}/>
     {showLoader && submitting ? <Loading loading>{loadContent || _.SYNCING___}</Loading> : null}
   </>
-}
-
-AutoSave.propTypes = {
-  // Async Function(values) to call on input changes
-  onChange: PropTypes.func.isRequired,
-  // Whether to save only changed values, default is all Form values
-  partial: PropTypes.bool,
-  // Whether to overlay parent container with Loading spinner component
-  showLoader: PropTypes.bool,
-  // FormSpy subscription
-  subscription: PropTypes.object,
-  // Milliseconds to delay form `onChange`
-  delay: PropTypes.number,
-  // Loading message
-  loadContent: PropTypes.any,
 }
 
 // Memoised because the class was a PureComponent. Its lifecycle compared `delay` by value, so a

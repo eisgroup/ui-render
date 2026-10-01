@@ -459,8 +459,8 @@ describe('the keyboard matrix, which had no predecessor', () => {
         it('reads the label from `text` alone, in the trigger and in typeahead alike', () => {
             // Pinned because the two used to disagree: `typeaheadFor` fell back to `option.value`
             // when `text` was absent and the trigger did not, so a caller in that state would have
-            // seen an empty trigger and a control that matched on the value. `Dropdown.tsx`
-            // guarantees `text` (required propType, and every sanitiser branch emits one), so the
+            // seen an empty trigger and a control that matched on the value. `Dropdown.tsx` takes
+            // an object option as one with `text`, and every sanitiser branch emits one, so the
             // fallback was unreachable as well as inconsistent — one rule now.
             const { control, options, text, press, cursor } = drive({
                 options: [{ text: 'zeta', value: 'z' }, { text: '', value: 'blank' }],

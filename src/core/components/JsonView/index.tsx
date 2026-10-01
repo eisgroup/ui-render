@@ -1,5 +1,4 @@
 import classNames from '../../utils/classNames'
-import PropTypes from 'prop-types'
 import React, { useMemo, useState } from 'react'
 import View from '../View'
 import defaultTheme from './themes'
@@ -83,10 +82,6 @@ export function JsonView ({
       />
     </View>
   )
-}
-
-JsonView.propTypes = {
-  data: PropTypes.any.isRequired,
 }
 
 export default React.memo(JsonView)

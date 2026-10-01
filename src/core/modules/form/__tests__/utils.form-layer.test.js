@@ -29,26 +29,20 @@ afterAll(() => {
     Active.renderField = originalRenderField
 })
 
-/** A class with its own lifecycle, state shape and prop types — everything the layer used to overwrite. */
+/** A class with its own lifecycle and state shape, both of which the layer used to overwrite. */
 function declareClass () {
     const willReceiveProps = function () {}
     const willUnmount = function () {}
-    const declaredPropTypes = { declared: () => null }
     class Declared extends Component {}
     Declared.prototype.UNSAFE_componentWillReceiveProps = willReceiveProps
     Declared.prototype.componentWillUnmount = willUnmount
     Declared.prototype.state = { declared: true }
-    Declared.propTypes = declaredPropTypes
-    return { Declared, willReceiveProps, willUnmount, declaredPropTypes }
+    return { Declared, willReceiveProps, willUnmount }
 }
-
-// The rule the two suppressions below silence guards code that ships, where a production build may
-// strip propTypes. These read the declarations themselves, under jest, because what the layer does
-// to them is the subject.
 
 describe('withFormSetup', () => {
     it('leaves the class it is handed exactly as written', () => {
-        const { Declared, willReceiveProps, willUnmount, declaredPropTypes } = declareClass()
+        const { Declared, willReceiveProps, willUnmount } = declareClass()
         const ownBefore = Object.getOwnPropertyNames(Declared.prototype).sort()
         const { state } = Declared.prototype
 
@@ -58,12 +52,10 @@ describe('withFormSetup', () => {
         expect(Declared.prototype.UNSAFE_componentWillReceiveProps).toBe(willReceiveProps)
         expect(Declared.prototype.componentWillUnmount).toBe(willUnmount)
         expect(Declared.prototype.state).toBe(state)
-        // eslint-disable-next-line react/forbid-foreign-prop-types
-        expect(Declared.propTypes).toBe(declaredPropTypes)
     })
 
     it('returns a subclass carrying the form layer instead, named after the class it builds on', () => {
-        const { Declared, declaredPropTypes } = declareClass()
+        const { Declared } = declareClass()
 
         const Layer = withFormSetup(Declared, setup)
 
@@ -73,10 +65,6 @@ describe('withFormSetup', () => {
         expect(typeof Object.getOwnPropertyDescriptor(Layer.prototype, 'canSave').get).toBe('function')
         expect(typeof Object.getOwnPropertyDescriptor(Layer.prototype, 'syncInputChanges').value).toBe('function')
         expect(Layer.prototype.state).toEqual({ canSave: false, declared: true })
-        // eslint-disable-next-line react/forbid-foreign-prop-types
-        const layerPropTypes = Layer.propTypes
-        expect(layerPropTypes).toEqual(expect.objectContaining(declaredPropTypes))
-        expect(layerPropTypes).toHaveProperty('formProps')
     })
 })
 

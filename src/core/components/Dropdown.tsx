@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React, { useEffect, useRef, useState } from 'react'
 import DropDown from './Listbox'
 import type { ListboxCloseEvent, ListboxOption } from './Listbox'
@@ -361,21 +360,5 @@ export function Dropdown ({
 }
 
 Dropdown.displayName = 'Dropdown'
-
-Dropdown.propTypes = {
-  value: PropTypes.any,
-  options: PropTypes.arrayOf(PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-    PropTypes.shape({
-      text: PropTypes.any.isRequired,
-      value: PropTypes.any,
-      key: PropTypes.any
-    })
-  ])).isRequired,
-  onChange: PropTypes.func,
-  onSelect: PropTypes.func,
-  placeholder: PropTypes.any
-}
 
 export default React.memo(Dropdown)

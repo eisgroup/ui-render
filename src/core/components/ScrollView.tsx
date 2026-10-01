@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React, { useRef, useState } from 'react'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
@@ -82,14 +81,6 @@ const ScrollView = ({
       />
     </div>
   )
-}
-
-ScrollView.propTypes = {
-  className: PropTypes.string,
-  classNameInner: PropTypes.string,
-  style: PropTypes.object,
-  styleInner: PropTypes.object,
-  children: PropTypes.any.isRequired
 }
 
 export default ScrollView

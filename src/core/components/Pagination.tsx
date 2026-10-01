@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React from 'react'
 
 /** What `onPageChange` is told: the new 1-indexed page. */
@@ -77,15 +76,6 @@ function Pagination ({
       </PageButton>
     </nav>
   )
-}
-
-Pagination.propTypes = {
-  activePage: PropTypes.number.isRequired,
-  totalPages: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func,
-  siblingCount: PropTypes.number,
-  boundaryCount: PropTypes.number,
-  className: PropTypes.string,
 }
 
 export default React.memo(Pagination)

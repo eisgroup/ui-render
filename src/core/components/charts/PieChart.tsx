@@ -1,5 +1,4 @@
 import classNames from '../../utils/classNames'
-import PropTypes from 'prop-types'
 import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { by, pluralize, shortNumber, toAlphaNumId, toList, toListValuesTotal, truncate } from '../../utils'
 import { renderFloat } from '../renders'
@@ -100,34 +99,6 @@ function PieChart ({
       {legends && <PieReference data={data} legends={legends} height={height} />}
     </Container>
   )
-}
-
-PieChart.propTypes = {
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.any.isRequired,
-      value: PropTypes.number.isRequired,
-    })
-  ).isRequired,
-  height: PropTypes.number,
-  unit: PropTypes.string,
-  className: PropTypes.string,
-  classNameWrap: PropTypes.string,
-  children: PropTypes.any,
-  gradient: PropTypes.bool,
-  legends: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.shape({
-      background: PropTypes.bool,
-      bottom: PropTypes.bool,
-      columns: PropTypes.number,
-    })
-  ]),
-  pointers: PropTypes.bool,
-  sort: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string),
-  ]),
 }
 
 export default React.memo(PieChart)

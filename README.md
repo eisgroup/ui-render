@@ -59,8 +59,9 @@ package instead of declaring them directly, pnpm in isolated mode will not resol
 through them — the application must declare these three packages itself.
 
 Other libraries previously listed as peer dependencies (`final-form`, `final-form-arrays`,
-`react-final-form`, `react-final-form-arrays`, `prop-types`) are now bundled as regular
+`react-final-form`, `react-final-form-arrays`) are now bundled as regular
 dependencies of `eis-ui-render`, so the host project does not need to install them.
+`prop-types`, also listed once, is not used at all any more: the props are TypeScript types.
 
 `eis-ui-render` is consumed by a bundler — imported as a React component into a host application. Dropping
 `dist/index.js` into a page with a `<script>` tag is **not supported**: the UMD global lookup never matched

@@ -96,7 +96,6 @@ export interface HostedClass<P> {
     new (props: P): Hosted<P>
     readonly name: string
     contextType?: Context<any>
-    propTypes?: any
 }
 
 /** The function component `hostDocument` returns, with the class it hosts. */
@@ -149,7 +148,7 @@ const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayo
 
 /**
  * The function component that hosts one instance of `InstanceClass` per mounted document. It carries
- * the class's name and prop types, so React's warnings and component stacks name the same component.
+ * the class's name, so React's warnings and component stacks name the same component.
  */
 export function hostDocument<P extends object> (InstanceClass: HostedClass<P>): HostComponent<P> {
     const contextType = InstanceClass.contextType || NoContext
@@ -225,7 +224,6 @@ export function hostDocument<P extends object> (InstanceClass: HostedClass<P>): 
     Object.defineProperty(Document, 'name', { value: InstanceClass.name })
     const component = Document as HostComponent<P>
     component.displayName = InstanceClass.name
-    component.propTypes = InstanceClass.propTypes
     component.InstanceClass = InstanceClass
     return component
 }

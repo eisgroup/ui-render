@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React from 'react'
 import Loading from './Loading'
 import { Active } from '../utils'
@@ -66,12 +65,6 @@ export function Button ({
       {loading && <Loading loading/>}
     </button>
   )
-}
-
-Button.propTypes = {
-  type: PropTypes.string,
-  className: PropTypes.string,
-  children: PropTypes.any
 }
 
 export default React.memo(Button)

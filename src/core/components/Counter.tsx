@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import { ONE_SECOND, TIME_DURATION_INSTANT } from '../utils'
 import { renderFloat } from './renders'
@@ -40,9 +39,9 @@ export type CounterProps = {
   interval?: number
   /** Animation easing function, see https://gist.github.com/gre/1650294 */
   easingFn?: (progress: number) => number
-  /** Declared by `propTypes`, and not read */
+  /** Accepted, and not read: the counter renders `render`'s output, with no element of its own */
   className?: string
-  /** Declared by `propTypes`, and not read */
+  /** Accepted, and not read, as `className` */
   style?: React.CSSProperties
 }
 
@@ -140,19 +139,6 @@ function Counter ({
   }, [running, timers])
 
   return render(state.value, decimals)
-}
-
-Counter.propTypes = {
-  start: PropTypes.number, // default is 0
-  end: PropTypes.number.isRequired,
-  render: PropTypes.func, // number formatting function
-  decimals: PropTypes.number, // default is 0
-  delay: PropTypes.number, // animation delay, default is TIME_DURATION_INSTANT
-  duration: PropTypes.number, // animation duration
-  interval: PropTypes.number, // animation interval, default is 17 ms, which translates to ~60 frames per second
-  easingFn: PropTypes.func, // animation easing function, see https://gist.github.com/gre/1650294
-  className: PropTypes.string,
-  style: PropTypes.object,
 }
 
 export default React.memo(Counter)

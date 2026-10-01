@@ -117,7 +117,7 @@ describe('core StandaloneTabs interaction contract', () => {
     })
 
     it('renders a `{text}` tab without an icon as its text', () => {
-        // `propTypes` accept `{text}` alone, and it was rendered as the object itself, which React rejects.
+        // The props allow `{text}` alone, and it was rendered as the object itself, which React rejects.
         render(withConfig(
             <StandaloneTabs items={[{ tab: { text: 'Plain' }, content: 'plain content' }, { tab: 'Other', content: 'x' }]}/>
         ))

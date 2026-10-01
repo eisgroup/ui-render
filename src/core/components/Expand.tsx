@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { isFunction } from '../utils'
 import AnimateHeight from './AnimateHeight'
@@ -176,33 +175,6 @@ export function Expand (props: ExpandProps) {
       }
     </View>
   )
-}
-
-Expand.propTypes = {
-  title: PropTypes.any, // string or component to always show
-  children: PropTypes.oneOfType([
-    PropTypes.func,  // function to render content when expanded, receives `id` if given
-    PropTypes.any,  // pre-rendered content (not recommended for performance reasons)
-  ]),
-  renderLabel: PropTypes.func, // function to render title
-  expanded: PropTypes.bool, // whether should render as expanded
-  active: PropTypes.bool, // whether to add `active` css class
-  justify: PropTypes.bool, // whether should render expand icon spread out from `title`
-  iconOpened: PropTypes.string, // name of icon for expanded state
-  iconClosed: PropTypes.string, // name of icon for collapsed state
-  onClick: PropTypes.func, // callback({expanded, key, value}) on click or Enter press (if `onKeyPress` not given)
-  id: PropTypes.oneOfType([  // argument to pass to 'onClick' callback as `key`
-    PropTypes.string,
-    PropTypes.number,
-  ]),
-  index: PropTypes.oneOfType([ // argument to pass to 'onClick' callback as `index`
-    PropTypes.string,
-    PropTypes.number,
-  ]),
-  duration: PropTypes.number, // milliseconds for the animation
-  className: PropTypes.string,
-  classNameLabel: PropTypes.string,
-  classNameItems: PropTypes.string,
 }
 
 export default React.memo(Expand)

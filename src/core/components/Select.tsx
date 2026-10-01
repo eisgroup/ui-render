@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React from 'react'
 import { interpolateString, isFunction, l, localiseTranslation } from '../utils'
 import { _ } from '../utils/translations'
@@ -83,21 +82,6 @@ export function Select ({
       </select>
     </div>
   )
-}
-
-Select.propTypes = {
-  value: PropTypes.any,
-  options: PropTypes.arrayOf(PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-    PropTypes.shape({
-      text: PropTypes.any.isRequired,
-      value: PropTypes.any,
-      key: PropTypes.any,
-    })
-  ])).isRequired,
-  onChange: PropTypes.func,
-  placeholder: PropTypes.any
 }
 
 export default React.memo(Select)

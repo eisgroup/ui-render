@@ -124,8 +124,7 @@ describe('nested dataKind demo interaction contract', () => {
         expect(caughtRenderErrors).toEqual([])
         // Match warnings on message text only. React 16-18 prefix `Warning:` and append a
         // component stack (the source of component names and file paths), React 19 emits the bare
-        // message and dropped propTypes validation entirely -- so allow, rather than require, the
-        // propTypes warnings instead of pinning a total call count that holds on one React major.
+        // message.
         const warningMessages = consoleError.mock.calls.map(call => call.map(String).join(' '))
         // This test used to pin the `currencyCode` DOM-prop leak as expected. It is fixed: the
         // engine-internal prop is stripped in mapper.tsx's RenderComponent, so it never reaches a
@@ -134,14 +133,10 @@ describe('nested dataKind demo interaction contract', () => {
             message.includes('React does not recognize')
         ))
         expect(unknownPropWarnings).toEqual([])
-        const toleratedWarnings = [
-            ['prop `formProps` is marked as required', 'UIRender'],
-            ['prop `instance` is marked as required', 'UIRender'],
-        ]
-        const unexpectedWarnings = warningMessages.filter(message => !toleratedWarnings.some(
-            requiredParts => requiredParts.every(part => message.includes(part))
-        ))
-        expect(unexpectedWarnings).toEqual([])
+        // Nor any other warning. This used to tolerate two, `formProps` and `instance` marked as
+        // required on the nested row's document, which shares its parent's form and is rendered
+        // without either. The prop types went at §9.6-E5, so on no React major can either return.
+        expect(warningMessages).toEqual([])
 
         unmount()
         expect(formsStorage.size).toBe(0)

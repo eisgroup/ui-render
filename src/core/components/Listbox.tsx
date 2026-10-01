@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import classNames from '../utils/classNames'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
@@ -156,8 +155,8 @@ function typeaheadFor (prefix: string, current: number, options: ListboxOption[]
         const option = options[i]
         if (!isSelectable(option)) return false
         // `text` and nothing else. An earlier draft fell back to `option.value` when `text` was
-        // absent, which cannot happen from the only caller: `Dropdown.tsx` declares
-        // `text: PropTypes.any.isRequired` and every branch of its option sanitiser produces one
+        // absent, which the only caller does not produce: `Dropdown.tsx` takes an object option as
+        // one with `text`, and every branch of its option sanitiser produces one
         // (`optionsLabel` produces `{text: '', content}`). `Listbox` is not exported from the
         // library, so that caller is the whole world — and the fallback disagreed with the trigger,
         // which renders `text` alone, so the two would have matched on different strings.
@@ -372,20 +371,3 @@ export default function Listbox ({
 }
 
 Listbox.displayName = 'Listbox'
-
-Listbox.propTypes = {
-    options: PropTypes.arrayOf(PropTypes.object),
-    value: PropTypes.any,
-    placeholder: PropTypes.string,
-    error: PropTypes.bool,
-    disabled: PropTypes.bool,
-    selection: PropTypes.bool,
-    compact: PropTypes.bool,
-    upward: PropTypes.bool,
-    lazyLoad: PropTypes.bool,
-    className: PropTypes.string,
-    icon: PropTypes.node,
-    onChange: PropTypes.func,
-    onClose: PropTypes.func,
-    onOpen: PropTypes.func,
-}

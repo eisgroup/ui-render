@@ -144,17 +144,8 @@ describe('the form layer is a class of its own over it', () => {
         expect(EngineLayer.prototype.deriveFromProps).toBe(UIRender.prototype.deriveFromProps)
     })
 
-    it('builds its state shape and prop types from the engine layer\'s, leaving those as they were', () => {
+    it('builds its state shape from the engine layer\'s, leaving that as it was', () => {
         expect(EngineLayer.prototype.state).not.toHaveProperty('canSave')
         expect(FormLayer.prototype.state).toEqual({ canSave: false, ...EngineLayer.prototype.state })
-
-        // The rule guards code that ships, where a production build may strip propTypes. This reads
-        // the declarations themselves, under jest, because how the layers compose them is the subject.
-        // eslint-disable-next-line react/forbid-foreign-prop-types
-        const [declared, engine, form] = [UIRender.propTypes, EngineLayer.propTypes, FormLayer.propTypes]
-        expect(engine).toBe(declared)
-        expect(form).toEqual(expect.objectContaining(declared))
-        expect(form).toHaveProperty('formProps')
-        expect(form).toHaveProperty('instance')
     })
 })

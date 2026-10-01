@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React from 'react'
 import { l, localiseTranslation, toLowerCase } from '../utils'
 import { _ } from '../utils/translations'
@@ -28,10 +27,6 @@ export function PlaceholderField ({name, ...props}: PlaceholderFieldProps = {}) 
       <Text className="bold">{name}</Text>{toLowerCase(_.FIELD_DOES_NOT_EXIST_)}
     </Text>
   return <View {...props}/>
-}
-
-PlaceholderField.propTypes = {
-  name: PropTypes.any
 }
 
 export default React.memo(PlaceholderField)

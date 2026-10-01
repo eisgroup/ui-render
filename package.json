@@ -86,6 +86,10 @@
                 {
                   "name": "semantic-ui-react",
                   "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "name": "prop-types",
+                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
                 }
               ],
               "patterns": [
@@ -107,6 +111,10 @@
                 {
                   "name": "semantic-ui-react",
                   "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "name": "prop-types",
+                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
                 }
               ],
               "patterns": [
@@ -140,6 +148,10 @@
                 {
                   "name": "semantic-ui-react",
                   "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "name": "prop-types",
+                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
                 }
               ],
               "patterns": [
@@ -180,6 +192,10 @@
                 {
                   "name": "semantic-ui-react",
                   "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "name": "prop-types",
+                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
                 }
               ],
               "patterns": [
@@ -227,6 +243,10 @@
                 {
                   "name": "semantic-ui-react",
                   "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "name": "prop-types",
+                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
                 }
               ],
               "patterns": [
@@ -288,6 +308,10 @@
                 {
                   "name": "semantic-ui-react",
                   "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "name": "prop-types",
+                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
                 }
               ],
               "patterns": [
@@ -342,6 +366,10 @@
                 {
                   "name": "semantic-ui-react",
                   "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
+                },
+                {
+                  "name": "prop-types",
+                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
                 }
               ],
               "patterns": [
@@ -409,7 +437,6 @@
     "postcss-loader": "^8.2.1",
     "postcss-prefixwrap": "^1.55.0",
     "process": "^0.11.10",
-    "prop-types": "^15.8.1",
     "rc-picker": "4.11.3",
     "react": "^18.3.1",
     "react-16-floor": "file:scripts/fixtures/react16-floor",

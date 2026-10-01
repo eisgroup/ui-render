@@ -1,5 +1,4 @@
 import classNames from '../utils/classNames'
-import PropTypes from 'prop-types'
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { capitalize, isString } from '../utils'
 import Button from './Button'
@@ -338,45 +337,6 @@ const InputNumber = ({
             {children}
         </View>
     )
-}
-
-InputNumber.propTypes = {
-    name: PropTypes.string,
-    id: PropTypes.string,
-    icon: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    lefty: PropTypes.bool,
-    onClickIcon: PropTypes.func,
-    unit: PropTypes.string,
-    label: PropTypes.string,
-    disabled: PropTypes.bool,
-    done: PropTypes.bool,
-    className: PropTypes.string,
-    classNameIcon: PropTypes.string,
-    children: PropTypes.node,
-    stickyPlaceholder: PropTypes.bool,
-    resize: PropTypes.bool,
-    readonly: PropTypes.bool,
-    float: PropTypes.bool,
-    error: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-    info: PropTypes.string,
-    style: PropTypes.object,
-    onFocus: PropTypes.func,
-    onBlur: PropTypes.func,
-    onRemove: PropTypes.func,
-    title: PropTypes.string,
-    defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    placeholder: PropTypes.string,
-    translate: PropTypes.func,
-    outputFormat: PropTypes.shape({
-        percentage: PropTypes.bool,
-        separateThousands: PropTypes.bool,
-        decimals: PropTypes.number,
-    }),
-    onChange: PropTypes.func,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    type: PropTypes.string,
-    min: PropTypes.number,
-    max: PropTypes.number,
 }
 
 export default InputNumber

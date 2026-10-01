@@ -1,5 +1,4 @@
 import React from 'react'
-import { type } from '../components'
 import { Active } from '../utils'
 import UIRenderWithUISetupJs from './rules'
 import LocalDraftTableRow from './components/LocalDraftTableRow'
@@ -132,29 +131,6 @@ export default function Data ({
     embedded={embedded}
     {...{className, style}}
   />
-}
-
-Data.propTypes = {
-  // Identifier for this type of data.
-  // Data of the same `kind` are grouped into array as list, and used for complex validation (together as group).
-  kind: type.Id.isRequired,
-  // The UI Render Instance containing this Data component
-  instance: type.Object.isRequired,
-  // The Index of this Data component in the array of rendered data for removing itself
-  index: type.NumberOrString,
-  // Data.json to use
-  data: type.Any,
-  // Meta.json to use
-  meta: type.Object,
-  // Data.json to initialize with
-  initialValues: type.Any,
-  // Whether the `name` attribute should use data relative to root UI Render instance, defaults to this instance.
-  rootData: type.Boolean,
-
-  relativePath: type.String,
-  relativeIndex: type.Number,
-  /** When true, TableCells draft row uses local state only until Add (no nested form / no parent values leakage). */
-  localDraft: type.Boolean,
 }
 
 // =============================================================================

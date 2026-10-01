@@ -15,17 +15,15 @@ const messageFromConsoleCall = args => args
 // allowlist for every warning we do observe without requiring another example to emit it again.
 // Entries must match on message text only: React 16-18 append a component stack (the source of
 // component names and file paths) while React 19 emits the bare message, so a stack-derived
-// fragment would make an expected warning look unexpected on React 19. Component names that the
-// warning message itself carries (a propTypes owner, a DOM prop name) are fine.
+// fragment would make an expected warning look unexpected on React 19. Names that the warning
+// message itself carries (a DOM prop name, say) are fine.
+// The four prop-type warnings this list allowed went with the prop types at §9.6-E5. None of the
+// four still fired by then: measured on React 18, just before the deletion.
 const EXPECTED_CONSOLE_ERROR_PATTERNS = [
     ['Unknown event handler property', 'onDataChanged'],
     ['non-boolean attribute', 'buttoned'],
     ['Cannot update during an existing state transition', 'Render methods should be a pure function'],
-    ['Invalid prop `error` of type `boolean`', 'InputNumber'],
     ['Invalid value for prop', 'translate'],
-    ['prop `items[0].tab` is marked as required', 'Tabs'],
-    ['prop `formProps` is marked as required', 'UIRender'],
-    ['prop `instance` is marked as required', 'UIRender'],
     ['Invalid attribute name', '@class'],
 ]
 
