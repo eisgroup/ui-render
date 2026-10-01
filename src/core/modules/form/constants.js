@@ -27,7 +27,10 @@ FIELD.VALIDATE = {
 }
 FIELD.VALIDATION = {
   [FIELD.VALIDATE.EMAIL]: email,
-  [FIELD.VALIDATE.MAX_LENGTH]: maxLength,
+  // The VALIDATOR, at the factory's default of 100 characters: a meta names it as `validate: 'maxLength'`,
+  // and every name here is called with the field's value. The factory itself was registered, so the
+  // validator returned a function, an error, for every value, and such a form could never be submitted.
+  [FIELD.VALIDATE.MAX_LENGTH]: maxLength(),
   [FIELD.VALIDATE.PASSWORD]: password,
   [FIELD.VALIDATE.REQUIRED]: isRequired,
   [FIELD.VALIDATE.URL]: url,

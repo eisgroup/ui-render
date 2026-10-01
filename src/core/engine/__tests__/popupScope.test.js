@@ -68,11 +68,14 @@ describe('the sources, in the order they are tried', () => {
         expect(scope).toEqual({ relativeIndex: null, relativeData: values, relativePath: null })
     })
 
-    it('last — the first form field name that carries a bracketed index', () => {
+    it('last — a bracketed values key is not read as a row', () => {
+        // This source searched the keys for `name[index]` and took the first as the popup's row. Only a
+        // hand-made form like this one has such a key, and reading a row from names is the guess the
+        // row context refuses; the search is gone, and the values still come back.
         const values = { plain: 1, 'rows[2]': {}, 'later[9]': {} }
         const scope = resolvePopupScope({ id: 'edit', form: formWith(values), props: {} })
 
-        expect(scope).toEqual({ relativeIndex: 2, relativeData: values, relativePath: 'rows' })
+        expect(scope).toEqual({ relativeIndex: null, relativeData: values, relativePath: null })
     })
 
     it('last — with nothing bracketed to find, only the form values come back', () => {

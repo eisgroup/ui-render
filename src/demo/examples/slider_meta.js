@@ -76,7 +76,10 @@ const sliderMeta = {
       range: [0, 25, 50, 75, 100],
       rangeLabels: { isPercent: true, precision: 0 },
       step: null,
-      tooltipProps: { render: 'Percent' },
+      // `%` as a unit, as the marks read the value: in percent. The `Percent` renderer takes a FRACTION
+      // and multiplies it by 100, so it showed 50 as "5,000 %".
+      tooltipProps: {},
+      unit: '%',
     },
 
     {

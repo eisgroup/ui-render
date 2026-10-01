@@ -104,7 +104,7 @@ CSS contract: `src/style/components/table.less` hangs EVERY cell's padding off `
 | --- | --- |
 | `className` | Passed through verbatim, or the attribute is omitted entirely when it is absent or empty. Semantic ran its own `cx()` and printed `class=""` regardless: 317 empty class attributes in the 38-example baseline were its, on `tbody` (24), `tr` (94) and `td` (199), and they are gone. |
 
-**Stripped at the DOM boundary.** `src/core/components/Table.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts` in all 7 components, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
+**Stripped at the DOM boundary.** `src/core/components/Table.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts` in all 7 components, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `meta`, `@class`, `name`, `label`.
 
 **Passthrough.** `style`, `colSpan`, `scope`, `id`, `data-*` and every event handler still reach the element untouched — they always did, because Semantic did not handle them either, so they ride the rest spread exactly as before. There is no `forwardRef`: nothing in `src` passes a ref to a table element, so the parameter would have had no caller.
 
@@ -135,7 +135,7 @@ Those four were the *published* ones — they had curated entries on this page w
 
 ### `TooltipPop` — in-house, no semantic-ui-react
 
-`src/core/components/TooltipPop.tsx`, 563 lines. Replaced the wrapper in §9.7-F1 step 2 part 3.
+`src/core/components/TooltipPop.tsx`, 565 lines. Replaced the wrapper in §9.7-F1 step 2 part 3.
 
 The hover tooltip, over the same inline `<span>` `components/Tooltip.tsx` has shipped for years. Reached two live ways: a `view: "Tooltip"` node (`mapper.js`, which maps `label` to `content`) and the `tooltip` attribute on ANY node (`Render.js`, which wraps the rendered node and spreads an object `tooltip` — still an unfiltered passthrough, but into 13 accepted names now instead of 45). This was a FIX, not a trade: measured in real Chrome on the production build, the SUIR bubble rendered at the document origin at every use site a meta can declare (~730 px from its trigger on `buttonIcon`, 2538-3006 px on `all`) and every open raised an uncaught `TypeError` from popper's flip modifier, because SUIR clones the trigger with a `ref` and nothing a meta can declare can hold one. There was no working positioning to lose.
 
@@ -163,7 +163,7 @@ CSS contract: The bubble is now mounted INSIDE `.ui-render`, which is what makes
 | `onOpen` | Called when the bubble opens, controlled or not. |
 | `onClose` | Called when it closes, controlled or not. |
 
-**Stripped at the DOM boundary.** `src/core/components/TooltipPop.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
+**Stripped at the DOM boundary.** `src/core/components/TooltipPop.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `meta`, `@class`, `name`, `label`.
 
 **Passthrough.** `style`, `data-*`, `aria-*` and every event handler still reach the bubble untouched through `omitProps(…, ENGINE_PROPS, FIELD_ONLY_PROPS)` — the same DOM boundary every other component uses, which is new here: SUIR's `Popup` applied no such filter, so `§9.7-F1` step 2 also closed the engine-prop leak on this path. There is no `forwardRef`: nothing in `src` passes a ref to a tooltip, and the host `<span>` holds the only ref the component itself needs.
 
@@ -239,7 +239,7 @@ CSS contract: The loaded `modules/dropdown` LESS is the largest single semantic 
 | `translate` <br>*(has a default)* | The i18n function. Engine-owned, applied to option text, `label` and `placeholder`. CONSUMED, not stripped — destructured out at the top of the wrapper. It is also in ENGINE_PROPS, which is what catches it at other boundaries. |
 | `value` <br>*(bound as `valueFromParent`)* | Selected value. Held in wrapper state, synced from the prop, and array values are joined before being forwarded — so what the control sees is not always what the caller passed. |
 
-**Stripped at the DOM boundary.** `src/core/components/Dropdown.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `name`, `label`.
+**Stripped at the DOM boundary.** `src/core/components/Dropdown.js` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `meta`, `@class`, `name`, `label`.
 
 **Passthrough.** `id`, `aria-*`, `style`, `data-*` and every event handler still reach the `<div role="listbox">` untouched, including the `onFocus`/`onBlur` the react-final-form adapter supplies — and they now reach it as real DOM handlers rather than as Semantic props. `ENGINE_PROPS` and `FIELD_ONLY_PROPS` are stripped twice on the way: once by the wrapper, once by `Listbox` at the element itself.
 

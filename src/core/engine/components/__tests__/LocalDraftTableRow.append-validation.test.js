@@ -3,6 +3,8 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { ConfigContext, initialConfigState } from '../../../contexts/ConfigContext'
 import LocalDraftTableRow from '../LocalDraftTableRow'
+// The input rules' messages, which a document loads with the engine and this row alone does not.
+import '../../../components/inputs/translations'
 
 const mockPush = jest.fn()
 
@@ -52,6 +54,26 @@ describe('LocalDraftTableRow edge contracts', () => {
 
         expect(mockPush).toHaveBeenCalledTimes(1)
         expect(input).toHaveValue('Unsaved draft')
+    })
+
+    it('validates `validate: \'maxLength\'` as at most 100 characters, so a short draft can be added', () => {
+        // The row registered the `maxLength` FACTORY as the validator, and the function it returned was
+        // recorded as the field's error for every value: such a draft could never be added.
+        renderDraft({
+            meta: inputMeta({ view: 'Input', name: 'label', validate: 'maxLength' }),
+            kind: 'rows',
+            parentInstance: {},
+        })
+        const input = document.querySelector('input[name="label"]')
+
+        fireEvent.change(input, { target: { value: 'x'.repeat(101) } })
+        fireEvent.click(screen.getByRole('button', { name: 'Add draft' }))
+        expect(mockPush).not.toHaveBeenCalled()
+        expect(screen.getByText('Must be less than 100 characters')).toBeInTheDocument()
+
+        fireEvent.change(input, { target: { value: 'short' } })
+        fireEvent.click(screen.getByRole('button', { name: 'Add draft' }))
+        expect(mockPush).toHaveBeenCalledWith(expect.objectContaining({ rowObject: { label: 'short' } }))
     })
 
     it('clears the draft only after a successful append', () => {

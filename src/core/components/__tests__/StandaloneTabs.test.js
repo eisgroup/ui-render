@@ -116,6 +116,16 @@ describe('core StandaloneTabs interaction contract', () => {
         expect(childrenCall).toHaveBeenCalledWith(expect.objectContaining({ setTab: expect.any(Function) }))
     })
 
+    it('renders a `{text}` tab without an icon as its text', () => {
+        // `propTypes` accept `{text}` alone, and it was rendered as the object itself, which React rejects.
+        render(withConfig(
+            <StandaloneTabs items={[{ tab: { text: 'Plain' }, content: 'plain content' }, { tab: 'Other', content: 'x' }]}/>
+        ))
+
+        expect(screen.getByText('Plain')).toBeInTheDocument()
+        expect(screen.getByText('plain content')).toBeInTheDocument()
+    })
+
     it('reports a click once when the parent follows it with a controlled activeIndex', () => {
         // THE ONE BEHAVIOUR CHANGE of §9.3 step 6 here, and the reason for it. The class compared a
         // controlled `activeIndex` with its COMMITTED active tab, which a parent updating in the same

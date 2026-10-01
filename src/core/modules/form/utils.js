@@ -376,8 +376,9 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
      *
      * The document is handed `instance`, one object for the wrapper's lifetime, and reads `form` and
      * `handleSubmit` off it. Both are written as the form renders, as the class wrote them on `this`.
-     * `form` is a new object on every render of the form: react-final-form hands its render prop
-     * `{...form, reset}`. Every one of them shares the underlying form's methods.
+     * `form` is the first object react-final-form handed its render prop for the final-form instance it
+     * renders: it hands a new `{...form, reset}` on every render, and every one of them shares the
+     * instance's methods (see `renderForm`).
      */
     function WithForm (props) {
       const {initialValues, onSubmit = console.warn, ...restProps} = props
@@ -396,7 +397,7 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       // publish a `canSave` it takes back one render later.
       const [applied, setApplied] = useState(adopted)
 
-      // One subscription at a time, to the latest `form`, which is a new object on every render.
+      // One subscription at a time, to the form the wrapper keeps (`renderForm`).
       const subscribeTo = form => {
         if (own.unsubscribe) own.unsubscribe()
         own.subscribedForm = form
@@ -413,7 +414,17 @@ export function withForm (options = {subscription: {pristine: true, valid: true}
       // `formProps` does not pass through `initialValues` (it's undefined).
       // => better to let `render` function always run, and memoize at the highest <WithForm> level.
       // => this way, rerender is minimized to only when props changed, or form state changed.
-      const renderForm = ({form, handleSubmit, ...formProps}) => {
+      const renderForm = ({form: rendered, handleSubmit, ...formProps}) => {
+        // ONE form object per final-form instance: the first one react-final-form hands over. It hands a
+        // NEW `{...form, reset}` on every render, and the registries in `state/formRegistry` are keyed by
+        // the object. Keyed per render, each render started them empty: a field's remembered touch, the
+        // reason that registry exists, was gone by the next render, so a touched field remounted by a tab
+        // switch lost its error. Every one of those objects shares the instance's methods, and the `reset`
+        // each adds resets that same instance. The instance is told apart by those methods, not kept as
+        // the first object seen: StrictMode's discarded first render builds an instance of its own, and
+        // the committed instance's object must replace it.
+        if (!own.form || own.form.getState !== rendered.getState) own.form = rendered
+        const form = own.form
         handle.form = form
         handle.handleSubmit = handleSubmit
 
@@ -539,8 +550,10 @@ export function withFormSetup (Class, {fieldValues, registeredFieldValues, regis
 
   class FormSetup extends Class {
     static propTypes = {
-      formProps: PropTypes.object.isRequired, // form props, without `form` and `handleSubmit`
-      instance: PropTypes.object.isRequired, // {Class<form, handleSubmit>} WithForm instance for getting the form
+      // Both absent for a NESTED document, which shares its parent's form (`engine/Data.tsx` renders this
+      // class without `WithForm`): `form` and `handleSubmit` below then come from `parent`.
+      formProps: PropTypes.object, // form props, without `form` and `handleSubmit`
+      instance: PropTypes.object, // {Class<form, handleSubmit>} WithForm instance for getting the form
       initialValues: PropTypes.object, // form initial values
       onChangeState: PropTypes.func, // onChangeState(this: Class)
       ...Class.propTypes
