@@ -68,18 +68,21 @@ const SETTLE_AFTER_EDIT = 400
  * VIRTUAL TIME FOR THE TWO RUNS BEING COMPARED. On real time a read lands wherever the machine's speed
  * puts it, and a slow CI runner put one: `ProgressBar` fills its bar 200 ms after it mounts, and on
  * React 16 under StrictMode the `all` example took longer than that to mount and settle, so the strict
- * run read `width: 100%` against the plain run's `width: 0%` (CI run 36870778501). Measured across the
- * corpus, that fill is the one thing still changing after the read; nothing else moves after it.
+ * run read `width: 100%` against the plain run's `width: 0%` (CI run 36870778501).
  *
- * Only the timers are faked, so the two runs read the DOM at the same moment of their own clock, as
- * slow as the machine may be. `Date`, the microtask queues, `setImmediate` and the animation frames
- * stay real: nothing in the corpus needs them faked, and React's act and its scheduler use them.
- * `advanceTimersByTimeAsync` lets promises settle between timers, as real time does.
+ * The timers and the animation frames are faked, so the two runs read the DOM at the same moment of
+ * their own clock, as slow as the machine may be. A faked frame runs every 16 ms of that clock.
+ * The frames were left real at first, and that was a second race of the same kind. The date picker
+ * opens, aligns and closes on frames (`rc-util/raf`), and the 400 ms after an edit pass in 1-3 ms of
+ * real time, so whether `tableForm` read its picker closed depended on a real frame landing in them.
+ * `Date`, the microtask queues and `setImmediate` stay real: React's act and its scheduler use them,
+ * and nothing in the corpus needs them faked. `advanceTimersByTimeAsync` lets promises settle between
+ * timers, as real time does.
  */
 const VIRTUAL_TIMERS = {
     doNotFake: [
         'Date', 'hrtime', 'performance', 'nextTick', 'queueMicrotask', 'setImmediate', 'clearImmediate',
-        'requestAnimationFrame', 'cancelAnimationFrame', 'requestIdleCallback', 'cancelIdleCallback',
+        'requestIdleCallback', 'cancelIdleCallback',
     ],
 }
 const advance = (ms = 0) => act(async () => { await jest.advanceTimersByTimeAsync(ms) })
