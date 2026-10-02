@@ -70,8 +70,8 @@
  * `label` on such a node) and a real net for the first meta that does. Applying FIELD_ONLY_PROPS
  * across the whole family is safe because no member of it renders a form control: the control is
  * a CHILD with its own props, and `TableView` reads `this.props.name` for its `FieldArray`
- * decision before anything reaches a cell. The remaining unfiltered spread on the F1 surface is
- * `TooltipPop` -> Semantic's `Popup`, which step 2 owns.
+ * decision before anything reaches a cell. The last unfiltered spread on the F1 surface was the
+ * tooltip's, onto Semantic's `Popup`, and step 2 closed it: `Tooltip` applies both lists.
  *
  * Still uncovered, and why that is not the same as unsafe: two components spread onto a DOM
  * tag unfiltered, and no meta props bag reaches either. `AnimateHeight` gets only what `Expand`

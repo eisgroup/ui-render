@@ -76,7 +76,7 @@
  *    silently degrade to plain `left` / `right`. Cause: `.tooltip.left` and `.tooltip.right` set
  *    `top: 50%` at the same specificity as `.tooltip.top`/`.tooltip.bottom`, so a corner class
  *    string matches both and the axis rule loses — either over-constrained (`top left`) or on
- *    source order (`bottom left`). `top left` is the ONLY placement `TooltipPop` uses in
+ *    source order (`bottom left`). `top left` is the ONLY placement `Tooltip` uses in
  *    production, so converging on `Tooltip` without touching `tooltip.less` would ship a bubble
  *    sitting on its own trigger. Invisible to jsdom, which resolves no cascade and no layout.
  *
@@ -87,7 +87,7 @@
  */
 
 /**
- * The exact class string `TooltipPop` emits. [I] since §9.7-F1 step 2 part 3 — one string, because
+ * The exact class string `Tooltip` emits. [I] since §9.7-F1 step 2 part 3 — one string, because
  * the placement words are the REQUESTED position now, not popper's resolved one, so there is no
  * flip to rewrite them.
  *
@@ -217,11 +217,11 @@ const CORPUS = {
 
 /** Interaction timing, in milliseconds. Windows rather than boundaries, so the leg is not a stopwatch. */
 const TIMING = {
-    /** [I] Ours, over semantic-ui-react's 50 ms default (`TooltipPop.tsx`, `delay = 500`). Closed at 300 ms, open by 1200 ms. */
+    /** [I] Ours, over semantic-ui-react's 50 ms default (`Tooltip.tsx`, `delay = 500`). Closed at 300 ms, open by 1200 ms. */
     OPEN_DELAY_MS: 500,
     STILL_CLOSED_AT_MS: 300,
     OPEN_BY_MS: 1200,
-    /** [I] `TooltipPop.behavior.test.js` pins 70 ms with fake timers; 400 ms of real time is comfortably past it. */
+    /** [I] `Tooltip.behavior.test.js` pins 70 ms with fake timers; 400 ms of real time is comfortably past it. */
     CLOSED_AFTER_LEAVE_BY_MS: 400,
     /** [I] Leaving before the open delay elapses cancels the pending open. */
     CANCEL_AFTER_MS: 200,
@@ -259,7 +259,7 @@ const INLINE = {
     OPEN_PAINT: { display: 'flex', position: 'absolute', backgroundColor: 'rgb(255, 255, 255)', zIndex: '9' },
     /** [I] The arrow is a `::after` pseudo-element with a real border, not `::before` as the popup's is. */
     ARROW_PSEUDO: '::after',
-    /** [I] Revealed by hover through CSS alone (`*:hover > &`), with the same 0.5 s delay as `TooltipPop`'s 500 ms. */
+    /** [I] Revealed by hover through CSS alone (`*:hover > &`), with the same 0.5 s delay as `Tooltip`'s 500 ms. */
     HOVER_REVEALS: true,
     /**
      * Finding 4 — the placement vocabulary, measured. `true` means the bubble is placed clear of its

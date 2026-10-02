@@ -6,7 +6,7 @@
  *
  * WHY A STYLE TEST RENDERS A REACT COMPONENT
  * -----------------------------------------------------------------------------
- * `TooltipPop.test.js` pins the class string the component emits. `css.compilation`
+ * `Tooltip.test.js` pins the class string the component emits. `css.compilation`
  * and `css.pipeline.parity` pin the CSS the build produces. Neither can see the
  * JOIN — whether any rule in the stylesheet actually selects the node the component
  * renders — and the join is where the interesting defect lived. So this suite
@@ -47,7 +47,7 @@
  * (`.ui.popup > .header + .content`) and it needs a sibling `.header`, so in the
  * live header-less shape the wrapper carried no style whatsoever. The wrapper is
  * gone and there is no node left to ask about; what it protected (the body text
- * renders) is asserted in `TooltipPop.test.js` for all four `title` shapes.
+ * renders) is asserted in `Tooltip.test.js` for all four `title` shapes.
  *
  * WHAT THIS FILE GAINED, because part 3 introduced facts only a stylesheet can hold:
  *   - `pointer-events: none` on the base rule. Obligation 4 of the step, and the
@@ -84,7 +84,7 @@ const { lessOptions, less } = require('../../../scripts/less-options.js');
 const React = require('react');
 const { act, fireEvent, render } = require('@testing-library/react');
 const webpackPostcssConfig = require('../../../postcss.config.js');
-const TooltipPop = require('../../core/components/TooltipPop').default;
+const Tooltip = require('../../core/components/Tooltip').default;
 
 const STYLE_DIR = path.resolve(__dirname, '..');
 const ENTRY = path.join(STYLE_DIR, 'index.less');
@@ -92,14 +92,14 @@ const ENTRY = path.join(STYLE_DIR, 'index.less');
 const TITLE = 'Discards every unsaved change';
 
 /**
- * The class string `TooltipPop` emits from both engine entry points, pinned as a
- * literal in `TooltipPop.test.js` too. Repeated rather than imported so that a
+ * The class string `Tooltip` emits from both engine entry points, pinned as a
+ * literal in `Tooltip.test.js` too. Repeated rather than imported so that a
  * change to the component fails BOTH files — one of them tells you the markup
  * moved, the other tells you which CSS rules went with it.
  */
 const EMITTED_CLASS = 'tooltip no-wrap top show inverted';
 
-/** The wrapper `TooltipPop` puts round its trigger, which is the positioned ancestor. */
+/** The wrapper `Tooltip` puts round its trigger, which is the positioned ancestor. */
 const HOST_CLASS = 'tooltip-host';
 
 /**
@@ -113,7 +113,7 @@ const HOST_CLASS = 'tooltip-host';
  *              which is a rule of its own. Between them: position/display/opacity/
  *              z-index/pointer-events, padding, background, backdrop-filter, border,
  *              border-radius, transition.
- *   no-wrap    `.no-wrap {white-space: nowrap}`. Emitted by `Tooltip.tsx` itself, and
+ *   no-wrap    `.no-wrap {white-space: nowrap}`. Emitted by `TooltipBubble.tsx` itself, and
  *              it is why the bubble does not wrap — there is no `max-width` any more.
  *   top        `.tooltip.top {bottom, left, transform}`. THE PLACEMENT IS THE
  *              REQUESTED ONE, not a resolved one: there is no flip, so nothing
@@ -321,7 +321,7 @@ function withOpenTooltip (props, assertions) {
     document.body.appendChild(widget);
     const view = render(
         React.createElement(
-            TooltipPop,
+            Tooltip,
             { title: TITLE, inverted: true, ...props },
             React.createElement('button', { type: 'button' }, 'Reset'),
         ),

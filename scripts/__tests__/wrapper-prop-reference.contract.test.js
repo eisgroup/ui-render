@@ -64,11 +64,11 @@ const EXPECTED = {
     // moving it: `Table.tsx` was one of the three non-test importers.
     //
     // 6 → 4 at step 2 part 1, and the two that went were TESTS, not product code: rewriting
-    // `TooltipPop.test.js` against the real component removed both its
+    // `TooltipPop.test.js` (now `Tooltip.test.js`) against the real component removed both its
     // `import {Popup} from 'semantic-ui-react'` and its `jest.mock('semantic-ui-react')`. Worth
     // reading as part of the surface rather than as noise — a suite that mocks the dependency it is
     // meant to be replacing is itself a coupling to it, and this counter is what made that visible.
-    // 4 → 3 at step 2 part 3, which took the tooltip in-house: `TooltipPop.tsx`'s own import was
+    // 4 → 3 at step 2 part 3, which took the tooltip in-house: `TooltipPop.tsx`'s (now `Tooltip.tsx`) own import was
     // the last PRODUCT site other than `Dropdown`'s. The two remaining test-side sites are
     // `Dropdown.behavior.test.js`'s pair, which step 3 owes — after which this counter reaches 0
     // and step 3½ can delete the dependency.
@@ -87,13 +87,13 @@ const EXPECTED = {
     // The in-house side. `Table` root consumes className/inverted/striped; the shared subcomponent
     // implementation consumes className; six subcomponents over six native elements.
     //
-    // `TooltipPop` consumes 13 and has neither a shared part nor subcomponents — one `<span>` host
+    // `Tooltip` consumes 13 and has neither a shared part nor subcomponents — one `<span>` host
     // and one bubble. 13 is also the whole accepted surface now, down from the 45 names SUIR's
     // open rest spread reached, and the 18 that were reachable AND plausible warn once each in
     // development rather than being silently ignored.
     inHouse: {
         Table: { root: 3, part: 1, subcomponents: 6 },
-        TooltipPop: { root: 13, part: 0, subcomponents: 0 },
+        Tooltip: { root: 13, part: 0, subcomponents: 0 },
         // `Dropdown` renders a COMPONENT (the in-house `Listbox`) rather than an element, so it
         // has no subcomponent family either. 21 = the 20 the wrapper intercepted plus `required`.
         Dropdown: { root: 21, part: 0, subcomponents: 0 },
@@ -233,7 +233,7 @@ describe('generated supported-prop reference', () => {
             // Empty on purpose: the tooltip is one element, not a family. The rows are kept so
             // that a new in-house component has to be added here deliberately — which is exactly
             // what `Dropdown` did at step 3 part 2.
-            ['TooltipPop', ''],
+            ['Tooltip', ''],
             // Empty for a different reason worth distinguishing: `Dropdown` renders neither a
             // family nor an element, but the in-house `Listbox`. The markup, and the four inner
             // nodes whose class tokens are load-bearing, live one level down there.

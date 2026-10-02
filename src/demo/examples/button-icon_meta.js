@@ -1,6 +1,6 @@
 const buttonIconMeta = {
   view: 'Button',
-  // The `tooltip` attribute is one of the three meta entry points into `TooltipPop`, and until now
+  // The `tooltip` attribute is one of the three meta entry points into `Tooltip`, and until now
   // NO tracked example rendered any of them: the corpus's only `tooltip:` and only
   // `view: 'Tooltip'` both sit in the `Factors` tab of `_meta.js`, which is an inactive `Tabs`
   // panel. So the browser leg (e2e/, docs/UPGRADE-PLAN.md §9.5) had nothing to point at on a
@@ -9,7 +9,7 @@ const buttonIconMeta = {
   // has is still driven, by e2e/corpus.tooltip.pw.js, because clipping is measurable only there.
   //
   // It moves no pinned count, and that is a measured claim rather than a hope: a CLOSED tooltip
-  // adds nothing whatsoever to the document — `TooltipPop.test.js` pins the trigger as
+  // adds nothing whatsoever to the document — `Tooltip.test.js` pins the trigger as
   // byte-for-byte identical, no node in `document.body` and no attribute on the trigger — so the
   // DOM baseline, the role census, the bound-name count and the nameless-control count are all
   // unchanged. `META_ATTRIBUTES` in scripts/wrapper-prop-curation.js is keyed by WRAPPED view

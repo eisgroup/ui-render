@@ -6,8 +6,8 @@
  * TWO SHAPES OF SECTION, BECAUSE STEP 1 LANDED
  * `Table` is in-house since §9.7-F1 step 1: it renders native elements and imports nothing, so
  * it has no "forwarded" set at all and its section documents what it EMITS and what it no longer
- * ACCEPTS. `TooltipPop` and `Dropdown` are still `semantic-ui-react` wrappers and keep the
- * wrapper shape. Both halves are derived the same way, from the source.
+ * ACCEPTS. `Tooltip` (step 2 part 3) and `Dropdown` (step 3 part 2) went in-house after it, so the
+ * wrapper shape has no section left. Both halves are derived the same way, from the source.
  *
  * WHY THIS EXISTS (UPGRADE-PLAN §9.7-F1 step 0)
  * Step 0 asked for two things: an audit of which props actually reach the wrapped SUIR
@@ -24,7 +24,7 @@
  *                            the file no longer references SUIR by any mechanism.
  *   FROM domProps.ts         which props are stripped at the DOM boundary, and by which
  *                            component — `Table.tsx` applies both lists in all seven components
- *                            since step 1, `Dropdown.tsx` applies both, `TooltipPop.tsx` none.
+ *                            since step 1, and `Dropdown.tsx` and `Tooltip.tsx` apply both.
  *                            Derived, so the page cannot claim a strip that is gone.
  *   FROM THE CALL SITES      which JSX attributes the codebase actually puts on `Table` and
  *                            its subcomponents — the step-1 parity surface, kept after the step
@@ -76,8 +76,8 @@ const VIEWS_PAGE = 'docs/SUPPORTED-VIEWS.md'
 /**
  * The wrappers that still exist. `suir` and `localName` are asserted against the actual import,
  * so a renamed alias or a new wrapper fails here instead of producing a page that omits it.
- * `Table` left this list when §9.7-F1 step 1 took it in-house, and `TooltipPop` when step 2 part 3
- * did — see IN_HOUSE below. Only `Dropdown` is still a wrapper.
+ * `Table` left this list when §9.7-F1 step 1 took it in-house, and the tooltip (`TooltipPop` then,
+ * `Tooltip` now) when step 2 part 3 did — see IN_HOUSE below.
  */
 /**
  * EMPTY SINCE §9.7-F1 STEP 3 PART 2, which is the end of the JS exit. `Dropdown` was the last
@@ -112,7 +112,7 @@ function pack (name) {
 const IN_HOUSE = [
     { id: 'Table', file: pack('Table'), fn: 'Table', root: 'table', factory: 'tablePart' },
     // One element, no subcomponent family, so no `factory`.
-    { id: 'TooltipPop', file: pack('TooltipPop'), fn: 'TooltipPop', root: 'span' },
+    { id: 'Tooltip', file: pack('Tooltip'), fn: 'Tooltip', root: 'span' },
     // `root` is the node the component renders, which for `Dropdown` is a COMPONENT and not an
     // element: it is the engine-facing wrapper, and the markup lives one level down in
     // `Listbox.tsx` under this import alias. Documenting the pair under one entry is deliberate —
@@ -481,7 +481,7 @@ function readInHouse (spec) {
         // Gated with `factory`: a single-element component has no shared subcomponent part.
         part: spec.factory ? readSharedPart(source, spec) : { intercepted: [], restName: null },
         omitLists: readOmitLists(source, spec.file),
-        // `factory` is absent for a single-element component (TooltipPop). Requiring it would
+        // `factory` is absent for a single-element component (Tooltip). Requiring it would
         // force a fake factory just to satisfy the reader.
         subcomponents: spec.factory ? readSubcomponents(source, spec) : [],
     }
@@ -704,7 +704,7 @@ function buildReference () {
         }
         // `classContract` and `behaviourContract` are rendered when present and NOT required, because
         // "absent" has to mean "not measured yet" rather than "no contract". §9.7-F1 step 2 part 1
-        // measured both for `TooltipPop`; step 3 owes the same for `Dropdown` before its swap, and that
+        // measured both for `Tooltip`; step 3 owes the same for `Dropdown` before its swap, and that
         // obligation is carried in STEP_OBLIGATIONS rather than as a throw here — a required field would
         // only invite a placeholder, which is worse than a visible gap.
         for (const field of ['classContract', 'behaviourContract']) {
@@ -883,7 +883,7 @@ function inHouseSection (component, { domProps, callSites }) {
             ? [`**What opens and closes it.** ${curation.behaviourContract}`, '']
             : []),
         // Gated: a single-element component is not a family, and an earlier version of this
-        // renderer printed a table header with no rows under both `TooltipPop` and `Dropdown`.
+        // renderer printed a table header with no rows under both `Tooltip` and `Dropdown`.
         ...(component.subcomponents.length ? [
             row(['Component', 'Element', 'Notes']),
             row(['---', '---', '---']),
@@ -909,7 +909,7 @@ function inHouseSection (component, { domProps, callSites }) {
         ])),
         '',
         // Same gate, and the count is derived rather than the hardcoded "All six" this line used to
-        // claim for every component — `TooltipPop` and `Dropdown` have no subcomponents at all.
+        // claim for every component — `Tooltip` and `Dropdown` have no subcomponents at all.
         ...(component.part.intercepted.length ? [
             `**Consumed by every subcomponent (${component.part.intercepted.length}).** All`
             + ` ${component.subcomponents.length} share one implementation, so this list applies to`

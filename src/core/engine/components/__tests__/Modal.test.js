@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import Popup from '../Popup'
+import Modal from '../Modal'
 import { AppContext } from '../../../contexts'
 import { ConfigContext, initialConfigState } from '../../../contexts/ConfigContext'
 
@@ -23,10 +23,10 @@ afterEach(() => {
     if (root) document.body.removeChild(root)
 })
 
-describe('Popup', () => {
+describe('Modal', () => {
     it('renders nothing when isOpen is false', () => {
         const { container } = render(
-            wrap(<Popup />, { isOpen: false, togglePopupState: () => {} })
+            wrap(<Modal />, { isOpen: false, togglePopupState: () => {} })
         )
         expect(container.firstChild).toBeNull()
         const root = document.getElementById('render-popup-root')
@@ -35,7 +35,7 @@ describe('Popup', () => {
 
     it('renders title and string content into the portal when open', () => {
         const ctx = { isOpen: true, title: 'Hello', content: 'world', togglePopupState: () => {} }
-        render(wrap(<Popup />, ctx))
+        render(wrap(<Modal />, ctx))
         const root = document.getElementById('render-popup-root')
         expect(root.textContent).toContain('Hello')
         expect(root.textContent).toContain('world')
@@ -48,14 +48,14 @@ describe('Popup', () => {
             content: <span data-testid="custom">custom</span>,
             togglePopupState: () => {},
         }
-        render(wrap(<Popup />, ctx))
+        render(wrap(<Modal />, ctx))
         expect(document.querySelector('[data-testid="custom"]')).toBeInTheDocument()
     })
 
     it('calls togglePopupState when the backdrop is clicked', () => {
         const togglePopupState = jest.fn()
         const ctx = { isOpen: true, title: 'X', content: 'y', togglePopupState }
-        render(wrap(<Popup />, ctx))
+        render(wrap(<Modal />, ctx))
         const backdrop = document.querySelector('.app__popup__backdrop')
         fireEvent.click(backdrop)
         expect(togglePopupState).toHaveBeenCalled()
@@ -64,7 +64,7 @@ describe('Popup', () => {
     it('calls togglePopupState when the OK button is clicked', () => {
         const togglePopupState = jest.fn()
         const ctx = { isOpen: true, title: 'X', content: 'y', togglePopupState }
-        render(wrap(<Popup />, ctx))
+        render(wrap(<Modal />, ctx))
         const button = document.querySelector('.app__popup__box__footer button')
         fireEvent.click(button)
         expect(togglePopupState).toHaveBeenCalled()

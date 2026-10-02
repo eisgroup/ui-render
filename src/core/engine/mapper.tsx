@@ -21,7 +21,7 @@ import Row from '../components/Row'
 import Space from '../components/Space'
 import Table from '../components/Table'
 import Text from '../components/Text'
-import TooltipPop from '../components/TooltipPop'
+import Tooltip from '../components/Tooltip'
 import View from '../components/View'
 import { Active, isList, isNumeric, toFlatList, toJSON } from '../utils'
 import { TIME_DURATION_INSTANT } from '../utils/constants'
@@ -56,7 +56,7 @@ type RenderMethodOptions = Record<string, any>
  * =============================================================================
  */
 
-Render.Tooltip = TooltipPop
+Render.Tooltip = Tooltip
 
 /**
  * Map UI Render props to final Rendering Component/s
@@ -464,7 +464,7 @@ const RenderComponent = ({
             } else if (isObject(props.children)) {
                 props.children = Render({ debug, ...props.children })
             }
-            return <TooltipPop inverted {...props}/>
+            return <Tooltip inverted {...props}/>
         }
 
         case FIELD.TYPE.POPUP: {

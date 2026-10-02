@@ -29,8 +29,9 @@
   INSIDE `.ui.selection.dropdown`) or at `.ui.table td > .ui.ribbon.label` (a child we never render).
 
   WHY EACH WENT:
-    popup  -- was Semantic's tooltip. `TooltipPop` has been in-house since step 2 part 3 and its
-              styling is `src/style/components/tooltip.less`.
+    popup  -- was Semantic's tooltip. The tooltip has been in-house since step 2 part 3 (as
+              `TooltipPop`, `Tooltip` since §9.9-H6), and its styling is
+              `src/style/components/tooltip.less`.
     label  -- was the multi-select chip. `multiple` was removed from the API at step 3 part 2, so
               nothing renders a chip any more. The `modules/dropdown` import below says it
               "requires ... label"; that is a MARKUP dependency of Semantic's own multi-select, not

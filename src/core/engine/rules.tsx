@@ -40,7 +40,7 @@ import { isEqual } from '../utils/object'
 import { double5, integer, phone, uppercase } from '../components/inputs/normalizers'
 import { AppContext } from '../contexts'
 import { ConfigOverride } from '../providers'
-import Popup from './components/Popup'
+import Modal from './components/Modal'
 import { createPopupContent } from './components/PopupContent'
 import type { FormApi } from 'final-form'
 import type { UploadArgs } from './upload'
@@ -413,7 +413,7 @@ export class UIRender extends DocumentInstance {
                 {(form && !embedded) ? (content ||
                     <form onSubmit={this.handleSubmit} {...form}>{content}</form>) : content}
                 {childAfter}
-                <Popup />
+                <Modal />
             </Container>
 
         // The configuration props are published here, around the whole subtree, rather than

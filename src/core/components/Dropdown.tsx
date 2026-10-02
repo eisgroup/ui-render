@@ -71,7 +71,7 @@ localiseTranslation({
  * `required` is deliberately NOT here: the wrapper reads it for its own `required` class
  * (see the `input--wrapper` composition), so it is consumed rather than dropped.
  *
- * Same mechanism as `TooltipPop`'s list, and for the same reason — see docs/SUPPORTED-PROPS.md.
+ * Same mechanism as `Tooltip`'s list, and for the same reason — see docs/SUPPORTED-PROPS.md.
  */
 const DROPPED_PROPS = [
     // §9.7-F1 step 3 part 2 removed these three features, on the evidence that nothing declares

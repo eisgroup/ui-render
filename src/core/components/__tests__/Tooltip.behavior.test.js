@@ -1,7 +1,7 @@
 /**
  * TOOLTIP INTERACTION CONTRACT ================================================
  *
- * UPGRADE-PLAN §9.7-F1 step 2. The companion to `TooltipPop.test.js`: that file pins
+ * UPGRADE-PLAN §9.7-F1 step 2. The companion to `Tooltip.test.js`: that file pins
  * the markup, this one pins WHAT OPENS AND CLOSES THE TOOLTIP, expressed as behaviour
  * so it survives a deliberate DOM change the way the layer-(2) suites survived step 1.
  *
@@ -37,7 +37,7 @@
 import React from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import TooltipPop from '../TooltipPop'
+import Tooltip from '../Tooltip'
 
 const TITLE = 'Discards every unsaved change'
 const TRIGGER = 'Reset'
@@ -56,7 +56,7 @@ const bubble = () => document.querySelector('.tooltip')
  * clean between clauses. `finally` means a FAILING assertion still reports as a failure.
  */
 const drive = (props, assertions, children = <button type="button">{TRIGGER}</button>) => {
-    const view = render(<TooltipPop {...props}>{children}</TooltipPop>)
+    const view = render(<Tooltip {...props}>{children}</Tooltip>)
     const host = view.container.firstChild
     const trigger = host.firstChild
     try {
@@ -255,13 +255,13 @@ describe('what opens the tooltip', () => {
 
     it('can be driven open by the caller with `open`', () => {
         const view = render(
-            <TooltipPop title={TITLE} open><button type="button">{TRIGGER}</button></TooltipPop>
+            <Tooltip title={TITLE} open><button type="button">{TRIGGER}</button></Tooltip>
         )
         try {
             expect(isOpen()).toBe(true)
         } finally {
             view.rerender(
-                <TooltipPop title={TITLE} open={false}><button type="button">{TRIGGER}</button></TooltipPop>
+                <Tooltip title={TITLE} open={false}><button type="button">{TRIGGER}</button></Tooltip>
             )
             view.unmount()
         }
@@ -434,7 +434,7 @@ describe('the trigger keeps its own behaviour', () => {
      * Now trivially true, and kept anyway because "trivially true" is a property of the
      * implementation, not of the contract: nothing is cloned for behaviour, so the
      * handlers are the trigger's own. The one prop the component does add is
-     * `aria-describedby`, and only while open — asserted in `TooltipPop.test.js`.
+     * `aria-describedby`, and only while open — asserted in `Tooltip.test.js`.
      */
     it('still fires the trigger\'s own handlers, in DOM order', () => {
         const calls = []
@@ -636,12 +636,12 @@ describe('the edge cases the review\'s second pass found', () => {
     it('does not report an open that `disabled` prevented', () => {
         const events = []
         const props = { title: TITLE, onOpen: () => events.push('open'), onClose: () => events.push('close') }
-        const view = render(<TooltipPop {...props}><button type="button">{TRIGGER}</button></TooltipPop>)
+        const view = render(<Tooltip {...props}><button type="button">{TRIGGER}</button></Tooltip>)
         const trigger = view.container.firstChild.firstChild
 
         fireEvent.mouseEnter(trigger)          // arms the 500 ms open
         view.rerender(
-            <TooltipPop {...props} disabled><button type="button">{TRIGGER}</button></TooltipPop>
+            <Tooltip {...props} disabled><button type="button">{TRIGGER}</button></Tooltip>
         )
         advance(1000)
 
@@ -659,7 +659,7 @@ describe('the edge cases the review\'s second pass found', () => {
     it('does not advance internal state while the caller controls `open`', () => {
         const opens = []
         const props = { title: TITLE, open: false, onOpen: () => opens.push('open') }
-        const view = render(<TooltipPop {...props}><button type="button">{TRIGGER}</button></TooltipPop>)
+        const view = render(<Tooltip {...props}><button type="button">{TRIGGER}</button></Tooltip>)
         const trigger = view.container.firstChild.firstChild
 
         fireEvent.mouseEnter(trigger)
@@ -668,7 +668,7 @@ describe('the edge cases the review\'s second pass found', () => {
         expect(opens).toEqual(['open'])       // the host was told; it chose not to open
 
         // The caller stops controlling. The tooltip must not spring open on stale state.
-        view.rerender(<TooltipPop title={TITLE}><button type="button">{TRIGGER}</button></TooltipPop>)
+        view.rerender(<Tooltip title={TITLE}><button type="button">{TRIGGER}</button></Tooltip>)
         expect(isOpen()).toBe(false)
         view.unmount()
     })
@@ -721,7 +721,7 @@ describe('the edge cases the review\'s second pass found', () => {
 describe('lifecycle', () => {
     it('unmounts cleanly with an open timer still pending, leaving nothing behind', () => {
         const view = render(
-            <TooltipPop title={TITLE}><button type="button">{TRIGGER}</button></TooltipPop>
+            <Tooltip title={TITLE}><button type="button">{TRIGGER}</button></Tooltip>
         )
         fireEvent.mouseEnter(view.container.firstChild.firstChild)
         advance(100)
@@ -742,7 +742,7 @@ describe('lifecycle', () => {
         // test, which aborted the whole worker instead of failing one assertion. Every
         // helper in these four suites exists because of it.
         const view = render(
-            <TooltipPop title={TITLE}><button type="button">{TRIGGER}</button></TooltipPop>
+            <Tooltip title={TITLE}><button type="button">{TRIGGER}</button></Tooltip>
         )
         fireEvent.mouseEnter(view.container.firstChild.firstChild)
         advance(500)

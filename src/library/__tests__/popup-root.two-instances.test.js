@@ -2,7 +2,7 @@
  * EACH MOUNTED DOCUMENT PORTALS ITS POPUP INTO ITS OWN SHELL (§9.3 step 3, risk R14).
  * =============================================================================================
  *
- * `AppWrapper` renders the popup root, and `Popup` used to find it with
+ * `AppWrapper` renders the popup root, and the modal used to find it with
  * `document.getElementById('render-popup-root')` — a document-wide lookup that returns the FIRST
  * match. Two mounted documents therefore put every popup inside the first one's subtree.
  *
@@ -17,7 +17,7 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import AppWrapper from '../AppWrapper'
-import Popup from '../../core/engine/components/Popup'
+import Modal from '../../core/engine/components/Modal'
 import { AppProvider } from '../../core/providers'
 import { AppContext } from '../../core/contexts'
 
@@ -34,7 +34,7 @@ const OpenPopup = ({ label }) => {
     React.useEffect(() => {
         open.current({ isOpen: true, title: label, content: label })
     }, [label])
-    return <Popup/>
+    return <Modal/>
 }
 
 const documentNamed = label => (

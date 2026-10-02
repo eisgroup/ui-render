@@ -8,7 +8,7 @@ import {AppContext, ConfigContext, initialAppState, initialConfigState} from '..
 import Data from '../Data'
 import Expand from '../../components/Expand'
 import ProgressSteps from '../../components/ProgressSteps'
-import TooltipPop from '../../components/TooltipPop'
+import Tooltip from '../../components/Tooltip'
 import {renderField} from '../components/renders'
 import TableView from '../components/TableView'
 import '../mapper'
@@ -28,7 +28,7 @@ jest.mock('../../components/ProgressSteps', () => ({
   default: jest.fn(() => null),
 }))
 
-jest.mock('../../components/TooltipPop', () => ({
+jest.mock('../../components/Tooltip', () => ({
   __esModule: true,
   default: jest.fn(() => null),
 }))
@@ -267,7 +267,7 @@ describe('mapper meta/data mapping contracts', () => {
       children: {view: FIELD.TYPE.TEXT, children: 'Object trigger'},
     })
 
-    const tooltip = lastProps(TooltipPop)
+    const tooltip = lastProps(Tooltip)
     expect(tooltip.content).toBe('Formatted hint')
     expect(tooltip.label).toBeUndefined()
     expect(tooltip.renderLabel).toBeUndefined()

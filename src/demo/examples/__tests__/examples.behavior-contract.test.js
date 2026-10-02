@@ -5,7 +5,7 @@
  * (`examples.dom-contract.test.js`) pins the rendered bytes of all 38 examples and
  * gates the *pure* refactors. This file pins what those bytes MEAN — the roles a
  * screen reader and a keyboard see, and the values the form holds — and gates
- * §9.7-F1, where `Table`, `TooltipPop` and `Dropdown` are reimplemented in-house,
+ * §9.7-F1, where `Table`, `Tooltip` and `Dropdown` are reimplemented in-house,
  * the DOM changes by design, and the layer-(1) snapshots are regenerated and can
  * therefore no longer be the guard.
  *

@@ -57,10 +57,10 @@ export type DeliveredRenderErrorReport = Required<Omit<RenderErrorReport, 'error
  * @setup:
  *      // mapper.tsx
  *      import { Render } from 'ui-render'
- *      import TooltipPop from '../components/TooltipPop'
+ *      import Tooltip from '../components/Tooltip'
  *
  *      // Setup common components/callbacks
- *      Render.Tooltip = TooltipPop
+ *      Render.Tooltip = Tooltip
  *      Render.TooltipDefaultProps = {inverted: true}
  *      Render.onError = handleErrorCallback // usually, open a Popup to show error message
  *

@@ -27,7 +27,7 @@ const { BUBBLE_CLASS, INLINE, TIMING, WIDGET } = require('./reference')
 
 const bubble = (page) => page.locator(BUBBLE).first()
 /**
- * `TooltipPop`'s OWN bubble, which `anyBubble` cannot express: several harness sections render a
+ * `Tooltip`'s OWN bubble, which `anyBubble` cannot express: several harness sections render a
  * static `<Tooltip show>` as a control, and those are `span.tooltip` too — visible from page load,
  * so `anyBubble(page).first()` resolves against the control on its first poll and a test meant to
  * wait out the 500 ms hover delay measures the wrong element instead. Only this component nests
@@ -362,7 +362,7 @@ test.describe('harness: the convergence target — the in-house `Tooltip`', () =
         expect(await paintOf(hover)).toMatchObject(INLINE.CLOSED_PAINT)
 
         // Revealed by CSS alone (`*:hover > &` in tooltip.less), with the same 0.5 s delay
-        // `TooltipPop` implements in JavaScript — so the open delay carries over for free.
+        // `Tooltip` implements in JavaScript — so the open delay carries over for free.
         await page.locator('[data-harness="inline-hover-host"]').hover()
         await expect
             .poll(async () => (await paintOf(hover)).display, { timeout: TIMING.OPEN_BY_MS * 2 })
