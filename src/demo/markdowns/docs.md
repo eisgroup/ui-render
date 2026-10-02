@@ -39,8 +39,9 @@ npm install eis-ui-render react@^18.0.0 react-dom@^18.0.0 moment@^2.29.4
 pnpm add eis-ui-render react@^18.0.0 react-dom@^18.0.0 moment@^2.29.4
 ```
 
-React 16.14 remains supported. Existing hosts may keep matching React and React DOM 16.14
-dependencies until they are ready to upgrade.
+React 16.14, 17 and 19 hosts are supported as well, and may keep matching `react@^16.14.0`,
+`react@^17.0.0` or `react@^19.0.0` dependencies. The library is developed against React 18.3, and the
+whole test suite runs on 16.14, 17, 18 and 19 in CI.
 
 
 ## Overview
