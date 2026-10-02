@@ -872,12 +872,17 @@ Every workstream below is a series of small, independently shippable, reversible
 
   It passes on React 16, 17 and 18, in about 9 seconds a leg.
 
-  **On virtual time since 2026-10-01.** A CI run on React 16 read the `all` example at two different moments of the wall clock. `ProgressBar` fills its bar 200 ms after it mounts; the strict run had taken longer than that, and read `width: 100%` against `width: 0%`. Measured across the corpus, that fill is the one thing still changing after the read. `exercise()` now fakes the timers, and only the timers, so both runs read at the same moment of their own clock. Three checks back it:
+  **On virtual time since 2026-10-01.** A CI run on React 16 read the `all` example at two different moments of the wall clock. `ProgressBar` fills its bar 200 ms after it mounts; the strict run had taken longer than that, and read `width: 100%` against `width: 0%`. Measured across the corpus, that fill is the one thing still changing after the read. `exercise()` now fakes the timers, ~~and only the timers,~~ **and since 2026-10-02 the animation frames too (below),** so both runs read at the same moment of their own clock. Three checks back it:
   - reads on virtual and on real time are identical for all 76 runs, on every leg;
   - a 250 ms hold after the strict mount fails the old test on React 16 and 18, and passes the new one;
   - putting the dropdown's mount flag back fails 7 examples, as before.
 
   A leg now takes about 1.6 seconds.
+
+  **The animation frames are on virtual time too, since 2026-10-02.** The timers alone were not enough. A local coverage run failed on `tableForm`: the plain run read its date picker open, with the typed text, and the strict run read it closed, with the value reverted. The picker opens, aligns and closes on animation frames (`rc-util/raf`), which `exercise()` had left real. The 400 ms after an edit pass in 1–3 ms of real time, so a real frame landed in them only by chance. `exercise()` now fakes the frames as well. Three checks back it, on React 16, 17, 18 and 19:
+  - for all 76 runs, the new reads equal the old ones taken after a 40 ms real hold, when the frames have run; a hold no longer changes them, and they use no real frame;
+  - withholding real frames from the plain run and holding the strict run for 40 ms fails the old test on `tableForm`, on React 16 and 18, and passes the new one;
+  - putting the dropdown's mount flag back still fails 7 examples.
 
   **Measured before any fix: three differences, all on React 18, where StrictMode also mounts, unmounts and mounts again.** Each is fixed, and reverting a fix fails the test:
   - **Seven examples showed their dropdowns with the placeholder instead of a selection.** `Dropdown` synced its value from the parent in an effect that skipped its first run through a mount flag in a ref. On the second run the flag was cleared, so the effect replaced the default selection with none. The effect now does nothing when the parent gave it nothing new. `Dropdown.strict-mode.test.js` fails on the old code on React 18.
