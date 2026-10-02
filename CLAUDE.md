@@ -50,7 +50,9 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 - `mapper.tsx` — Configures `Render.Component` and `Render.Method`. Maps `view` strings (e.g., `"Row"`, `"Table"`, `"Dropdown"`) to actual React components, and `render*` strings to value formatting functions.
 - `rules.tsx` — The main UIRender component with form handling (react-final-form), data processing, validation, actions (submit, download, upload, addData, removeData), and lifecycle management.
 - `documentHost.ts` — Since §9.3 step 6 a document is not a React class component: its three classes (the declared `UIRender`, the engine layer, the form layer) are the classes of an INSTANCE, which the function component `hostDocument` builds hosts for its lifetime. They extend `DocumentInstance`, not `React.Component`. The host gives them `props`/`state`/`context`, `setState` with its callbacks, and the lifecycles, from layout effects. A props-driven sync goes in `deriveFromProps(nextProps)`, which is called during the render and may set nothing but the document's own state. Anything that reaches outside the document goes in `componentDidUpdate`. No `UNSAFE_*` lifecycle is left in `src`; do not add one. `Active.UIRender` is the host, and `Active.UIRender.InstanceClass` the class.
-- `utils.ts` — Data transformation helpers (error mapping, normalization, form data extraction).
+- `formData.ts`, `errorMapping.ts`, `dataMapping.ts` — what the engine reads out of its forms (and the Select
+  reordering), which validation errors it shows and the shape a host is handed, and how incoming data is
+  normalized. They were one `utils.ts` until §9.9-H6.
 
 ### Internal layering and imports
 

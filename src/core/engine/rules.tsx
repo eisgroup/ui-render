@@ -26,16 +26,9 @@ import { findPopupTemplate } from './popupTemplate'
 import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
 import { errorsFor, formsStorage, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
-import {
-    replaceDeepCopy,
-    getFormsData,
-    getLiveMergedDataKindArray,
-    getRawFormsData,
-    mapErrorObjectToUIFormat,
-    getDateStringFromDateObject,
-    errorsProcessing,
-    normalizeIncomingData
-} from './utils'
+import { getFormsData, getLiveMergedDataKindArray, getRawFormsData } from './formData'
+import { errorsProcessing, mapErrorObjectToUIFormat } from './errorMapping'
+import { getDateStringFromDateObject, normalizeIncomingData, replaceDeepCopy } from './dataMapping'
 import { isEqual } from '../utils/object'
 import { double5, integer, phone, uppercase } from '../components/inputs/normalizers'
 import { AppContext } from '../contexts'

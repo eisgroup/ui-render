@@ -1,5 +1,5 @@
 import { messageFromError } from './apiError'
-import { normalizeIncomingData } from './utils'
+import { normalizeIncomingData } from './dataMapping'
 
 /**
  * WHAT AN `onApplyPeriods` ACTION DOES.

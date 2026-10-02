@@ -2,7 +2,7 @@ import {
   changeOptionOrderForSelectFields,
   getFormsData,
   getRawFormsData,
-} from '../utils'
+} from '../formData'
 
 const makeForm = values => ({
   getState: () => ({values}),
