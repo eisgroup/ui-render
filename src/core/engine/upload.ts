@@ -1,5 +1,5 @@
 import { unset } from '../utils/object'
-import { normalizeIncomingData } from './utils'
+import { normalizeIncomingData } from './dataMapping'
 
 /**
  * WHAT AN `upload` ACTION SENDS, AND WHAT IT DOES WITH THE ANSWER.

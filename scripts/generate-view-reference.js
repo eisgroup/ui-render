@@ -55,7 +55,7 @@ const WRITE_COMMAND = 'npm run docs:views'
 const DECLARATION_SITES = [
     { file: 'src/core/modules/variables/fields.ts', props: ['TYPE', 'RENDER', 'ACTION'] },
     // `TYPE` left this file at §9.3 step 3, for the same reason it left `engine/rules.tsx` at step 2:
-    // `engine/utils.ts` compares against `FIELD.TYPE.SELECT`, so the comparison depended on whether
+    // `engine/formData.ts` compares against `FIELD.TYPE.SELECT`, so the comparison depended on whether
     // anything had imported the form module yet. The names are in `variables/fields.ts` now.
     // `TYPE` left this file at §9.3 step 2: `mapper.tsx` dispatches on those six names while
     // `rules.tsx` imports `mapper.tsx`, so the resolver depended on a constant its own importer
