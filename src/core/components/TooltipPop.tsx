@@ -65,8 +65,8 @@ type PropsBag = { [key: string]: unknown }
  *   REMOVED  click-to-open, and A TAP DOES NOT OPEN IT EITHER. SUIR ran `on: ['click', 'hover']`;
  *            every tooltipped node in the corpus already owns its `onClick`, so one gesture fired
  *            both the action and the tooltip, and the tooltip arrived after the action had run.
- *            Dropped deliberately, and recorded in `docs/SUPPORTED-PROPS.md` under `dropped.on` —
- *            the CHANGELOG itself is step 5's debt, so that row IS the record.
+ *            Dropped deliberately, and recorded in `docs/SUPPORTED-PROPS.md` under `dropped.on`,
+ *            which the changelog's entry points to.
  *
  *            REMOVING THE GESTURE WAS NOT ENOUGH, and both remaining routes were found in a real
  *            browser rather than by reasoning. Clicking a `<button>` FOCUSES it, and focus-open
