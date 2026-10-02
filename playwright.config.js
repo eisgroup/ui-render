@@ -8,7 +8,8 @@
  * vacuous there. §9.5 enumerates ten such gaps and §9.7-F1 step 2 promotes them from debt to a
  * blocker for the tooltip replacement. This leg is what closes them.
  *
- * WHAT IT IS FOR, PRECISELY. It runs BEFORE the `TooltipPop` -> in-house-`Tooltip` swap, so its job
+ * WHAT IT IS FOR, PRECISELY. It was built BEFORE the tooltip swap (semantic-ui-react's `Popup` -> the
+ * in-house `Tooltip`), so its job
  * is to RECORD what semantic-ui-react's `Popup` does in real Chrome, not to demand that the
  * replacement reproduce it. Every assertion in e2e/ is tagged in `e2e/reference.js`:
  *

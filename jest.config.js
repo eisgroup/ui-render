@@ -81,7 +81,7 @@ module.exports = {
             lines: 100,
         },
         // §9.7-F1 step 3 part 2, the in-house listbox `Dropdown.tsx` now renders. Same floor as its
-        // in-house siblings, and measured rather than aspirational — but read the `TooltipPop`
+        // in-house siblings, and measured rather than aspirational — but read the `Tooltip`
         // note below for what a floor here does and does not prove. Reaching it was not free: the
         // gaps `--coverage` named were a dead `option.value` fallback in typeahead and three dead
         // `cursor === -1 ? selectedIndex : cursor` expressions (both deleted after reading the only
@@ -108,10 +108,10 @@ module.exports = {
         // every line and the single `isFunction(title)` branch of a 24-line passthrough. So read
         // this entry for exactly what it is: a floor for the in-house tooltip part 2 puts at this
         // path, not evidence that the tooltip works. The gate for that is behavioural
-        // (`TooltipPop.behavior.test.js`, `UIRender.overlay-behavior.test.js`) and markup-level
-        // (`TooltipPop.test.js`, `style/__tests__/css.tooltip-contract.test.js`); a threshold here
+        // (`Tooltip.behavior.test.js`, `UIRender.overlay-behavior.test.js`) and markup-level
+        // (`Tooltip.test.js`, `style/__tests__/css.tooltip-contract.test.js`); a threshold here
         // would have stayed green through a wrapper that rendered nothing at all.
-        './src/core/components/TooltipPop.tsx': {
+        './src/core/components/Tooltip.tsx': {
             statements: 100,
             branches: 100,
             functions: 100,

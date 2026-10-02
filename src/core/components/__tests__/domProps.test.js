@@ -16,7 +16,7 @@ import Checkbox from '../Checkbox'
 import Slider from '../Slider'
 import Icon from '../Icon'
 import Image from '../Image'
-import Tooltip from '../Tooltip'
+import TooltipBubble from '../TooltipBubble'
 
 /**
  * THE DOM BOUNDARY, ENFORCED
@@ -201,20 +201,17 @@ describe('DOM boundary: icon, image and tooltip', () => {
         expect(img).toHaveAttribute('alt', 'photo')
     })
 
-    it('Tooltip renders a <span> with no engine props', () => {
-        const { container } = render(<Tooltip {...ENGINE}>content</Tooltip>)
+    it('TooltipBubble renders a <span> with no engine props', () => {
+        const { container } = render(<TooltipBubble {...ENGINE}>content</TooltipBubble>)
         expect(engineMarkers(container.innerHTML)).toEqual([])
         expect(container.querySelector('span')).toHaveTextContent('content')
     })
 
     /**
-     * THE ONE COMPONENT DELIBERATELY ABSENT FROM THIS FILE. `TooltipPop` — the SUIR
-     * `Popup` wrapper, not the in-house `Tooltip` above, despite the names — applies
-     * NO boundary filter, so `view`, `index` and `symbol` all reach the popup
-     * element as HTML attributes. It is not listed here because there is nothing to
-     * assert green: the leak is pinned at its current value in
-     * `TooltipPop.test.js` ("leaks engine-internal props onto the bubble"), in the
-     * house style of the corpus ledger. §9.7-F1 step 2 part 2 applies `omitProps`,
-     * flips that assertion to `toEqual([])`, and the component joins this list.
+     * THE ONE COMPONENT PINNED ELSEWHERE. `Tooltip` (named `TooltipPop` until §9.9-H6, and a
+     * semantic-ui-react `Popup` wrapper when this note was first written) applied NO boundary
+     * filter, so `view`, `index` and `symbol` reached the bubble as HTML attributes. §9.7-F1
+     * step 2 applied `omitProps`, and `Tooltip.test.js` ("leaks no engine-internal prop onto
+     * the bubble") pins it, beside the rest of the tooltip's DOM contract.
      */
 })

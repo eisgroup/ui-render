@@ -93,8 +93,9 @@ export const mountMeta = (meta, data = {}, overrides = {}) =>
  * Mount an inline meta with the REAL `AppProvider`, so the modal-popup round trip
  * runs through the provider's own state instead of a stubbed `setPopupState`.
  * The portal root is a host-page obligation (`AppWrapper.tsx` renders it for the
- * library, `App.jsx` for the demo) and `Popup.tsx` resolves it by a global id, so
- * the caller must create it — see `withPopupRoot`.
+ * library, `App.jsx` for the demo), and with no shell to publish one `Modal.tsx`
+ * falls back to finding it by a global id, so the caller must create it — see
+ * `withPopupRoot`.
  */
 export const mountMetaWithAppState = (meta, data = {}, overrides = {}) => {
     clearEngineGlobals()
@@ -113,9 +114,10 @@ export const mountMetaWithAppState = (meta, data = {}, overrides = {}) => {
 }
 
 /**
- * Create and remove the fixed-id node `Popup.tsx` portals into. Without it the
- * first popup open throws "Target container is not a DOM element" — the same
- * single-global-root limit UPGRADE-PLAN §2.6-5 / R14 records.
+ * Create and remove the fixed-id node `Modal.tsx` falls back to. Without it the
+ * first popup open throws "Target container is not a DOM element" — the
+ * single-global-root limit UPGRADE-PLAN §2.6-5 / R14 recorded, which a document
+ * rendered through the shell no longer has (§9.3 step 3).
  *
  * @returns {Function} teardown
  */

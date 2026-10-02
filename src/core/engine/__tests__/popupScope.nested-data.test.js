@@ -61,8 +61,8 @@ describe('a popup opened from a nested Data row', () => {
     let popupRoot
 
     beforeEach(() => {
-        // The engine renders `Popup` itself and portals it; without the shell publishing a root on
-        // the context, `Popup` falls back to this id, which is how the demo supplies one too.
+        // The engine renders `Modal` itself and portals it; without the shell publishing a root on
+        // the context, `Modal` falls back to this id, which is how the demo supplies one too.
         popupRoot = document.createElement('div')
         popupRoot.id = 'render-popup-root'
         document.body.appendChild(popupRoot)

@@ -13,7 +13,7 @@
  * `semantic-ui-react` on the other side of it, and `IN_HOUSE_CURATION` one that had been replaced;
  * the page kept both shapes because the promise a reader needs is different — for a wrapper it is
  * "what has to be reproduced when this is replaced", for an in-house component "what this emits
- * and what it no longer accepts". `Table` moved at step 1, `TooltipPop` at step 2 part 3, and
+ * and what it no longer accepts". `Table` moved at step 1, the tooltip (`TooltipPop` then, `Tooltip` now) at step 2 part 3, and
  * `Dropdown` at step 3 part 2, which empties the wrapper shape entirely. It is kept rather than
  * deleted because it is the shape a regression would need.
  *
@@ -221,7 +221,7 @@ const IN_HOUSE_CURATION = {
             + 'THE LIST: Semantic DECLARED every one of these, so passing one used to be harmless, '
             + 'while `Listbox` spreads what it does not destructure onto its element — a dropped prop '
             + 'would have become a DOM attribute. `Dropdown.tsx` strips them and warns once per name in '
-            + 'development instead, the same mechanism `TooltipPop` uses. Six names, one decision. The evidence is that nothing declares them: not the '
+            + 'development instead, the same mechanism `Tooltip` uses. Six names, one decision. The evidence is that nothing declares them: not the '
             + 'tracked examples, not the consumer-only record, and no answer to the changelog entry '
             + 'that asked. This is a BREAKING change for anyone who did and did not say so, which '
             + 'is why it is on this page rather than only in the swap PR. THE SEMVER CALL IS MADE: the '
@@ -333,7 +333,7 @@ const IN_HOUSE_CURATION = {
                 + 'joined before being forwarded — so what the control sees is not always what the caller passed.',
         },
     },
-    TooltipPop: {
+    Tooltip: {
         shipped: '§9.7-F1 step 2 part 3',
         summary: 'The hover tooltip, over the same inline `<span>` `components/Tooltip.tsx` has '
             + 'shipped for years. Reached two live ways: a `view: "Tooltip"` node (`mapper.tsx`, which '
@@ -379,7 +379,7 @@ const IN_HOUSE_CURATION = {
             + 'any children, including several or none: `React.Children.only` is gone with the '
             + 'portal, so the `items` form of `view: "Tooltip"` renders instead of throwing the '
             + 'engine\'s error diagnostic. Pinned on React 16.14/17.0.2/18.3 by '
-            + '`components/__tests__/TooltipPop.behavior.test.js` and '
+            + '`components/__tests__/Tooltip.behavior.test.js` and '
             + '`UIRender.overlay-behavior.test.js`, and in real Chrome by `e2e/corpus.tooltip.pw.js`.',
         cssContract: 'The bubble is now mounted INSIDE `.ui-render`, which is what makes our own CSS '
             + 'apply to it at all — the SUIR bubble portaled into `document.body`, outside the '
@@ -656,7 +656,7 @@ const STEP_OBLIGATIONS = [
         ],
     },
     {
-        step: 'Step 2 — `TooltipPop` — SHIPPED',
+        step: 'Step 2 — the tooltip (`TooltipPop`, `Tooltip` since §9.9-H6) — SHIPPED',
         effort: 'S–M as estimated, and the estimate held for the component. The specs cost more than '
             + 'the component did: 23 of the 38 browser tests were reference facts about the wrapper and '
             + 'had to be re-measured and rewritten, which is the price of having pinned the old '
@@ -731,8 +731,8 @@ const STEP_OBLIGATIONS = [
                 + 'left-aligned above it.',
             'SHIPPED — the gate. 63 tooltip tests across four files where there were 10, only 5 of which '
                 + 'could fail if the tooltip broke (the other 5 asserted the props handed to a mock): '
-                + '`components/__tests__/TooltipPop.test.js` (rewritten against the REAL '
-                + '`semantic-ui-react`, no `jest.mock`), `components/__tests__/TooltipPop.behavior.test.js` '
+                + '`components/__tests__/Tooltip.test.js` (rewritten against the REAL '
+                + '`semantic-ui-react`, no `jest.mock`), `components/__tests__/Tooltip.behavior.test.js` '
                 + '(new — the interaction contract), `engine/__tests__/UIRender.overlay-behavior.test.js` '
                 + '(extended to all three meta entry points) and '
                 + '`style/__tests__/css.tooltip-contract.test.js` (new — joins the emitted class string to '
@@ -762,7 +762,7 @@ const STEP_OBLIGATIONS = [
             'CORRECTION — the biggest finding, and it invalidates an instruction this step was given: '
                 + '"keep emitting `ui popup`-compatible classNames so the current CSS continues to apply" '
                 + 'rests on a false premise. No `.ui.popup` rule applies today, because the portal mounts '
-                + 'outside `.ui-render`. See the CSS contract in the `TooltipPop` section above; measured '
+                + 'outside `.ui-render`. See the CSS contract in the `Tooltip` section above; measured '
                 + 'twice, by selector matching and by real-Chrome computed style.',
             'DONE (was STILL OWED) — the unfiltered DOM boundary is closed. Part 1 pinned it as a DEFECT '
                 + 'rather than as a contract: `view`, `index` and `symbol` all reached the bubble as HTML '

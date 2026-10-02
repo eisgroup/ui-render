@@ -346,7 +346,7 @@ describe('the keyboard matrix, which had no predecessor', () => {
         /**
          * Every test here exists because `jest --coverage` named a line this suite never reached.
          * They are kept as behaviour, not as coverage padding: each one states an outcome a
-         * consumer could hit, and the file's siblings (`Table.tsx`, `TooltipPop.tsx`) hold the same
+         * consumer could hit, and the file's siblings (`Table.tsx`, `Tooltip.tsx`) hold the same
          * 100% floor for the same reason — a fresh in-house component with unexercised branches is
          * a component whose edges nobody has decided about.
          */

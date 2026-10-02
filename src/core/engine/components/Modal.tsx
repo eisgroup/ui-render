@@ -22,7 +22,12 @@ localiseTranslation({
     },
 })
 
-const Popup = () => {
+/**
+ * The document's modal. It shows what a `popupOpen` action opened: the content a `view: 'Popup'`
+ * node registered, or a message. Named `Popup` until §9.9-H6; the meta, the actions and the
+ * classes keep that name.
+ */
+const Modal = () => {
     const popup = useContext(AppContext)
     const { isOpen, title, content, togglePopupState } = popup
     const activeClass = isOpen ? ' active' : ''
@@ -92,4 +97,4 @@ const Popup = () => {
         )
 }
 
-    export default Popup
+    export default Modal

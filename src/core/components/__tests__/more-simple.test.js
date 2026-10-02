@@ -5,7 +5,7 @@ import { Image, imageSrc } from '../Image'
 import { Placeholder } from '../Placeholder'
 import { PlaceholderField } from '../PlaceholderField'
 import { Space } from '../Space'
-import { Tooltip } from '../Tooltip'
+import { TooltipBubble } from '../TooltipBubble'
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
 
 const wrap = (ui) => (
@@ -91,9 +91,9 @@ describe('Space', () => {
     })
 })
 
-describe('Tooltip', () => {
+describe('TooltipBubble', () => {
     it('renders a tooltip span with position classes', () => {
-        const { container } = render(<Tooltip top show>Hi</Tooltip>)
+        const { container } = render(<TooltipBubble top show>Hi</TooltipBubble>)
         const cls = container.querySelector('span').className
         expect(cls).toContain('tooltip')
         expect(cls).toContain('top')

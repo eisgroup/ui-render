@@ -5,7 +5,7 @@ import type { FieldRenderProps, FormProps, FormRenderProps } from 'react-final-f
 import type { FormApi, FormState, MutableState } from 'final-form'
 import { isRequired } from '../../components/inputs/validationRules'
 import Text from '../../components/Text'
-import ToolTip from '../../components/Tooltip'
+import TooltipBubble from '../../components/TooltipBubble'
 import View from '../../components/View'
 import { Active, debounce, isEqualJSON, l, localiseTranslation, toJSON } from '../../utils'
 import type { Debounced } from '../../utils/function'
@@ -691,7 +691,7 @@ export function withFormSetup (Class: any, {fieldValues, registeredFieldValues, 
 
     get validationErrorsTooltip () {
       const errors = this.validationErrors
-      return errors ? <ToolTip top>{errors}</ToolTip> : null
+      return errors ? <TooltipBubble top>{errors}</TooltipBubble> : null
     }
 
     /**

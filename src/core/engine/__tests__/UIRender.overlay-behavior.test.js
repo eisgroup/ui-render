@@ -2,14 +2,14 @@
  * TOOLTIP AND MODAL-POPUP BEHAVIOURAL CONTRACT ================================
  *
  * UPGRADE-PLAN §9.5, contract-test layer (2). This was the gate for §9.7-F1 Step 2,
- * the `TooltipPop` replacement; step 2 has SHIPPED, so it is now the contract the
+ * the tooltip's replacement; step 2 has SHIPPED, so it is now the contract the
  * in-house tooltip is held to — CSS placement off the host box, hover and focus
  * triggers with a delay, and no portal. Every clause below that measured the
  * wrapper is annotated with what replaced it.
  *
  * WHAT WAS MISSING WHEN THIS FILE WAS WRITTEN
  * -----------------------------------------------------------------------------
- * Tooltip: `components/__tests__/TooltipPop.test.js` mocked `semantic-ui-react`
+ * Tooltip: `components/__tests__/Tooltip.test.js` (`TooltipPop.test.js` then) mocked `semantic-ui-react`
  * away and asserted the props handed to SUIR's `Popup` (`mouseEnterDelay`, an
  * `inverted` flag, the function-title workaround) — assertions that describe a
  * component which no longer exists, and that file has since been rewritten
@@ -18,7 +18,7 @@
  *
  * Modal popup: the two halves were tested separately and never joined.
  * `rules.popup-actions` asserts the arguments `popupOpen` computes with
- * `setPopupState` stubbed; `components/__tests__/Popup.test.js` drives `isOpen`
+ * `setPopupState` stubbed; `engine/components/__tests__/Modal.test.js` drives `isOpen`
  * directly; `providers/__tests__/AppProvider.context-state` tests the state
  * transitions. Nobody clicked a meta-declared button and looked for the content.
  *
@@ -77,7 +77,7 @@ describe('overlay behavioural contract', () => {
          * replaces this with a portal the component owns and tears down itself, this
          * scaffolding can go — and the assertions inside it stay exactly as they are, which
          * is the point of the layer." Both halves came true: the replacement tears itself
-         * down (`TooltipPop.behavior.test.js` asserts an open unmount directly), and eight
+         * down (`Tooltip.behavior.test.js` asserts an open unmount directly), and eight
          * of these eleven clauses needed no edit at all. The helper is kept as hygiene, so
          * one clause's `document` listeners cannot reach the next.
          */
@@ -112,7 +112,7 @@ describe('overlay behavioural contract', () => {
                 fireEvent.mouseEnter(trigger)
                 advance(499)
                 // The 500 ms default exists so a passing cursor does not flash the
-                // tooltip; TooltipPop.tsx documents it as the deliberate UX choice, and
+                // tooltip; Tooltip.tsx documents it as the deliberate UX choice, and
                 // §9.7-F1 step 2's OBLIGATION 1 is that it survived the swap. It did, in
                 // JavaScript — `tooltip.less`'s `*:hover > &` reveal has no delay and
                 // cannot be given one, which is why the bubble is mounted only while open.
@@ -181,7 +181,7 @@ describe('overlay behavioural contract', () => {
          * THE OTHER TWO ENTRY POINTS. ==========================================
          *
          * Added by §9.7-F1 step 2 part 1. The clauses above drive `view: "Tooltip"`
-         * only, which is one of three ways meta reaches `TooltipPop` — and the
+         * only, which is one of three ways meta reaches `Tooltip` — and the
          * least used of them, since ANY node can carry a `tooltip` attribute
          * instead (`Render.tsx:152`). A replacement that wired up the `view` and
          * forgot the attribute would have passed this suite.
@@ -191,7 +191,7 @@ describe('overlay behavioural contract', () => {
          * object straight through. Part 3 NARROWED that surface deliberately, from
          * `Popup.handledProps` ∪ `Portal.handledProps` (45 names) to the 13 the
          * component declares — see `docs/SUPPORTED-PROPS.md` for the dropped list and
-         * `TooltipPop.test.js` for the assertion that each dropped name now warns
+         * `Tooltip.test.js` for the assertion that each dropped name now warns
          * instead of half-working.
          */
         describe('the `tooltip` attribute on any node', () => {

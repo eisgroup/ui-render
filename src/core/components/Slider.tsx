@@ -2,7 +2,7 @@ import classNames from '../utils/classNames'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { formatNumber, last, round, toPercent } from '../utils'
 import { formatDuration } from '../utils/time'
-import Tooltip from './Tooltip'
+import TooltipBubble from './TooltipBubble'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /** A number for a single handle, `[from, to]` for a range. */
@@ -25,7 +25,7 @@ export type SliderRangeLabels = {
   computeSteps?: boolean
 }
 
-/** Props for each handle's `Tooltip`; `render(value)`, if set, renders its content. */
+/** Props for each handle's `TooltipBubble`; `render(value)`, if set, renders its content. */
 export type SliderTooltipProps = { render?: (value: number) => React.ReactNode, [key: string]: unknown }
 
 /** The named props are read here; the rest is spread onto the slider's `<div>`. */
@@ -271,14 +271,14 @@ export function Slider ({
               : undefined}
           >
             {tooltipProps && (
-              <Tooltip
+              <TooltipBubble
                 show
                 top={!vertical}
                 right={vertical}
                 {...omitRender(tooltipProps)}
               >
                 {tooltipProps.render ? tooltipProps.render(h.value) : `${h.value}${unit || ''}`}
-              </Tooltip>
+              </TooltipBubble>
             )}
           </div>
         )

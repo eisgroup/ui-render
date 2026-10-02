@@ -17,11 +17,11 @@
    * hovered at all — measured in real Chrome while simulating §9.7-F1 step 2's convergence, where
    * Playwright reported `<span class="tooltip …"> intercepts pointer events` and retried to
    * timeout. The `display: none` above guards the same hazard from the other side; this guards it
-   * for an OPEN bubble, which is the state `TooltipPop` now creates deliberately.
+   * for an OPEN bubble, which is the state `Tooltip` now creates deliberately.
    *
    * Safe for all four consumers: none of them puts anything interactive inside the bubble
-   * (`Slider`'s value, `Upload`'s close hint, `withFormSetup`'s validation text, `TooltipPop`'s
-   * body). It also gives `TooltipPop` its dismissal path back — the pointer can never land ON the
+   * (`Slider`'s value, `Upload`'s close hint, `withFormSetup`'s validation text, `Tooltip`'s
+   * body). It also gives `Tooltip` its dismissal path back — the pointer can never land ON the
    * bubble, so travelling towards it leaves the host and fires `mouseleave`.
    */
 
@@ -224,7 +224,7 @@
 }
 
 /**
- * THE ANCHOR `TooltipPop` WRAPS ITS TRIGGER IN — `src/core/components/TooltipPop.tsx`.
+ * THE ANCHOR `Tooltip` WRAPS ITS TRIGGER IN — `src/core/components/Tooltip.tsx`.
  * =============================================================================================
  *
  * An absolutely positioned bubble resolves against its nearest POSITIONED ANCESTOR, and a sibling
@@ -245,7 +245,7 @@
  * cannot reach it. That is deliberate and it is an improvement: that block existed to UNDO what
  * the bubble inherited from the button (`text-transform: none` against the button's uppercase, the
  * base font weight against the button's). Outside the button the bubble simply inherits ordinary
- * page typography, and `Tooltip.tsx` emits `no-wrap` itself, so the one declaration that mattered
+ * page typography, and `TooltipBubble.tsx` emits `no-wrap` itself, so the one declaration that mattered
  * still applies.
  */
 .tooltip-host {

@@ -1,8 +1,9 @@
 /**
  * TOOLTIP MARKUP AND CLASS CONTRACT ===========================================
  *
- * UPGRADE-PLAN §9.7-F1 step 2 — the gate part 1 built before `TooltipPop` could be
- * replaced, rewritten in part 3 against the in-house component that replaced it.
+ * UPGRADE-PLAN §9.7-F1 step 2 — the gate part 1 built before the tooltip (`TooltipPop` then) could
+ * be replaced, rewritten in part 3 against the in-house component that replaced it, `Tooltip`
+ * since §9.9-H6.
  *
  * WHAT PART 3 CHANGED IN THIS FILE, AND WHAT IT REFUSED TO CHANGE
  * -----------------------------------------------------------------------------
@@ -35,7 +36,7 @@
  *   this file                          the emitted DOM, the className contract, the
  *                                      wrapper, the passthrough surface, the a11y and
  *                                      prop-leak tripwires.
- *   `TooltipPop.behavior.test.js`      what opens and closes it, and when.
+ *   `Tooltip.behavior.test.js`      what opens and closes it, and when.
  *   `UIRender.overlay-behavior.test.js`  the same behaviour from meta, through the
  *                                      engine, on all three entry points.
  *   `style/__tests__/css.tooltip-contract.test.js`  joins the className strings
@@ -55,7 +56,7 @@
 import React from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import TooltipPop from '../TooltipPop'
+import Tooltip from '../Tooltip'
 
 const TITLE = 'Discards every unsaved change'
 const TRIGGER = 'Reset'
@@ -65,7 +66,7 @@ const bubble = () => document.querySelector('.tooltip')
 const advance = ms => act(() => { jest.advanceTimersByTime(ms) })
 
 /**
- * Render `TooltipPop`, hand the caller the wrapper and the trigger, and ALWAYS close
+ * Render `Tooltip`, hand the caller the wrapper and the trigger, and ALWAYS close
  * and unmount before returning.
  *
  * PART 3 NOTE — the scaffolding is no longer load-bearing, and that is a result.
@@ -74,12 +75,12 @@ const advance = ms => act(() => { jest.advanceTimersByTime(ms) })
  * aborting the whole jest worker. The replacement owns its own teardown (one
  * `useEffect` cleanup for the timer, one for the document listeners), so an open
  * unmount is now merely a state change — asserted directly in
- * `TooltipPop.behavior.test.js`'s lifecycle clause. The helper is kept because it also
+ * `Tooltip.behavior.test.js`'s lifecycle clause. The helper is kept because it also
  * keeps `document`'s listener set and the fake-timer queue clean between tests, and
  * `finally` means a FAILING assertion still reports as a failure.
  */
 const drive = (props, assertions, children = <button type="button">{TRIGGER}</button>) => {
-    const view = render(<TooltipPop {...props}>{children}</TooltipPop>)
+    const view = render(<Tooltip {...props}>{children}</Tooltip>)
     const host = view.container.firstChild
     const trigger = host && host.firstChild
     try {
@@ -104,7 +105,7 @@ const whileOpen = (props, assertions, children) => drive(props, view => {
 beforeEach(() => jest.useFakeTimers())
 afterEach(() => jest.useRealTimers())
 
-describe('TooltipPop — closed, the component adds one wrapper and nothing else', () => {
+describe('Tooltip — closed, the component adds one wrapper and nothing else', () => {
     /**
      * THE ASSERTION THAT MAKES THE 38 SNAPSHOTS' NEAR-SILENCE CORRECT rather than
      * lucky, and the one part 3 had to rewrite rather than keep.
@@ -154,7 +155,7 @@ describe('TooltipPop — closed, the component adds one wrapper and nothing else
     })
 })
 
-describe('TooltipPop — the open DOM', () => {
+describe('Tooltip — the open DOM', () => {
     /**
      * THE CLASSNAME CONTRACT, AND THE RULE EACH TOKEN FEEDS.
      *
@@ -278,7 +279,7 @@ describe('TooltipPop — the open DOM', () => {
     })
 })
 
-describe('TooltipPop — what `title` accepts, and what each shape emits', () => {
+describe('Tooltip — what `title` accepts, and what each shape emits', () => {
     /**
      * DELETED as a pair of assertions rather than as facts: `wraps a string in a
      * `.content` div` and `wraps a number the same way`. The `.content` wrapper was
@@ -345,7 +346,7 @@ describe('TooltipPop — what `title` accepts, and what each shape emits', () =>
      */
 })
 
-describe('TooltipPop — the passthrough surface, deliberately narrowed', () => {
+describe('Tooltip — the passthrough surface, deliberately narrowed', () => {
     /**
      * `Render.tsx` spreads an object `tooltip` straight into this component, so whatever
      * it accepts is reachable from a meta. Under SUIR that was `Popup.handledProps` ∪
@@ -467,7 +468,7 @@ describe('TooltipPop — the passthrough surface, deliberately narrowed', () => 
     })
 })
 
-describe('TooltipPop — the tripwires part 1 left, now flipped', () => {
+describe('Tooltip — the tripwires part 1 left, now flipped', () => {
     /**
      * ACCESSIBILITY, FLIPPED. Part 1 pinned "no role, no aria-*, no id" and said in so
      * many words: "when step 2 adds them these assertions fail, and that failure is the
@@ -540,7 +541,7 @@ describe('TooltipPop — the tripwires part 1 left, now flipped', () => {
      * THE DOM BOUNDARY, FLIPPED TO ZERO.
      *
      * Part 1 pinned this at its CURRENT value in the house style of the corpus ledger:
-     * `TooltipPop` was the only component in the pack applying no `omitProps` filter,
+     * the tooltip was the only component in the pack applying no `omitProps` filter,
      * and SUIR spread what it did not recognise onto the bubble, so `view`, `index` and
      * `symbol` became HTML attributes — reachable from meta today, because `mapper.tsx`
      * spreads a `view: "Tooltip"` node's whole rest bag and `view` is still in it.
@@ -558,7 +559,7 @@ describe('TooltipPop — the tripwires part 1 left, now flipped', () => {
     })
 })
 
-describe('TooltipPop — the trigger contract, inverted by the rewrite', () => {
+describe('Tooltip — the trigger contract, inverted by the rewrite', () => {
     /**
      * ALL THREE OF THESE USED TO ASSERT A THROW, and their inversion is a free
      * by-product of not cloning the trigger.

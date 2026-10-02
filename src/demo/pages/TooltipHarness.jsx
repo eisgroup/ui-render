@@ -1,6 +1,6 @@
 import React from 'react'
+import TooltipBubble from '../../core/components/TooltipBubble'
 import Tooltip from '../../core/components/Tooltip'
-import TooltipPop from '../../core/components/TooltipPop'
 
 /**
  * TOOLTIP HARNESS — unlisted demo route, driven only by e2e/harness.tooltip.pw.js
@@ -16,7 +16,7 @@ import TooltipPop from '../../core/components/TooltipPop'
  *   - scroll repositioning needs a scroll container the test owns;
  *   - and all of the above need a trigger that can HOLD A REF.
  *
- * WHY THIS PAGE RENDERS `TooltipPop` DIRECTLY instead of through a meta — the reason it was built,
+ * WHY THIS PAGE RENDERS `Tooltip` DIRECTLY instead of through a meta — the reason it was built,
  * and the reason it survives its own diagnosis. While the tooltip wrapped `semantic-ui-react`, that
  * library cloned the trigger with a `ref`, and of everything reachable from meta only `Dropzone`
  * and the named `RowRef` export could hold one (`mapper.tsx` uses the plain `Row`; `Button` is a
@@ -95,9 +95,9 @@ const BOX = { border: '1px solid #888', background: '#fff' }
 function Pop ({ label, id, style, children }) {
     return (
         <span style={style}>
-            <TooltipPop title={label} inverted>
+            <Tooltip title={label} inverted>
                 <button type="button" data-harness-trigger={id}>{children}</button>
-            </TooltipPop>
+            </Tooltip>
         </span>
     )
 }
@@ -113,13 +113,13 @@ function Pop ({ label, id, style, children }) {
 const outOfFlowTrigger = (
     <>
         <p style={NOTE}>out-of-flow: the trigger is absolutely positioned, the host is not.</p>
-        <TooltipPop title="Out of flow bubble" inverted>
+        <Tooltip title="Out of flow bubble" inverted>
             <button
                 type="button"
                 data-harness-trigger="outOfFlow"
                 style={{ position: 'absolute', left: 320, top: 300 }}
             >Out of flow</button>
-        </TooltipPop>
+        </Tooltip>
     </>
 )
 
@@ -202,7 +202,7 @@ const clip = (
                 style={{ position: 'absolute', left: 150, top: 34, width: 40, display: 'block' }}
                 data-harness="clip-inline-host"
             >
-                <Tooltip top show className="harness-inline-clipped">Inline clipped bubble</Tooltip>
+                <TooltipBubble top show className="harness-inline-clipped">Inline clipped bubble</TooltipBubble>
             </span>
         </div>
     </>
@@ -266,7 +266,7 @@ const stack = (
             style={{ position: 'absolute', left: 760, top: 330, width: 90, display: 'block' }}
         >
             inline anchor
-            <Tooltip top show className="harness-inline-stacked">Inline stacked bubble</Tooltip>
+            <TooltipBubble top show className="harness-inline-stacked">Inline stacked bubble</TooltipBubble>
         </span>
         <div
             data-harness="stack-inline-neighbour"
@@ -298,11 +298,11 @@ const inline = (
         <p style={NOTE}>inline: the in-house `Tooltip`, which part 2 converges on.</p>
         <span data-harness="inline-shown-host" style={{ position: 'absolute', left: 320, top: 300 }}>
             anchor (forced open)
-            <Tooltip top left show className="harness-inline-shown">Inline shown bubble</Tooltip>
+            <TooltipBubble top left show className="harness-inline-shown">Inline shown bubble</TooltipBubble>
         </span>
         <span data-harness="inline-hover-host" style={{ position: 'absolute', left: 700, top: 300 }}>
             anchor (hover)
-            <Tooltip top left className="harness-inline-hover">Inline hover bubble</Tooltip>
+            <TooltipBubble top left className="harness-inline-hover">Inline hover bubble</TooltipBubble>
         </span>
         <button
             type="button"
@@ -311,7 +311,7 @@ const inline = (
             style={{ position: 'absolute', left: 320, top: 450 }}
         >
             button anchor
-            <Tooltip bottom show className="harness-inline-button">Inline button bubble</Tooltip>
+            <TooltipBubble bottom show className="harness-inline-button">Inline button bubble</TooltipBubble>
         </button>
     </>
 )
@@ -378,7 +378,7 @@ const placements = (
                 }}
             >
                 {name}
-                <Tooltip {...flags} show className={`harness-place-${name}`}>{`${name} bubble`}</Tooltip>
+                <TooltipBubble {...flags} show className={`harness-place-${name}`}>{`${name} bubble`}</TooltipBubble>
             </span>
         ))}
     </>

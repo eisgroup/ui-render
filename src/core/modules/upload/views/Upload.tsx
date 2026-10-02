@@ -8,7 +8,7 @@ import Icon from '../../../components/Icon'
 import Loading from '../../../components/Loading'
 import Row from '../../../components/Row'
 import Text from '../../../components/Text'
-import Tooltip from '../../../components/Tooltip'
+import TooltipBubble from '../../../components/TooltipBubble'
 import View from '../../../components/View'
 import {
     get,
@@ -177,7 +177,7 @@ function Upload (props: UploadProps) {
             {onClose && (
                 <View className="app__view--close" onClick={onClose}>
                     <Text className="app__view--close__icon">{'✕'}</Text>
-                    <Tooltip top>{_.CLOSE}</Tooltip>
+                    <TooltipBubble top>{_.CLOSE}</TooltipBubble>
                 </View>
             )}
             {hasHeader && <h2>{parseString(_.UPLOAD_file, { file: label })}</h2>}
