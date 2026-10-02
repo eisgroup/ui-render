@@ -129,7 +129,7 @@
                     "**/demo",
                     "**/demo/**"
                   ],
-                  "message": "core must never import the demo — the dependency runs the other way. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core must never import the demo — the dependency runs the other way. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 }
               ]
             }
@@ -166,14 +166,14 @@
                     "**/demo",
                     "**/demo/**"
                   ],
-                  "message": "core must never import the demo — the dependency runs the other way. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core must never import the demo — the dependency runs the other way. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 },
                 {
                   "group": [
                     "**/engine",
                     "**/engine/**"
                   ],
-                  "message": "core/modules must not import core/engine. Two sites in modules/form/utils.tsx predate this rule and carry an eslint-disable naming §9.3 step 2, which dissolves the cycle; do not add a third. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core/modules must not import core/engine. §9.3 step 2 removed the last two such imports, from modules/form/utils, by moving the registries both sides share into core/state: put a shared registry there. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 }
               ]
             }
@@ -210,21 +210,21 @@
                     "**/demo",
                     "**/demo/**"
                   ],
-                  "message": "core must never import the demo — the dependency runs the other way. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core must never import the demo — the dependency runs the other way. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 },
                 {
                   "group": [
                     "**/modules",
                     "**/modules/**"
                   ],
-                  "message": "core/components must not import core/modules — put the shared value in core/utils instead, which is how the ISO_8601 regexes were resolved at H5. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core/components must not import core/modules — put the shared value in core/utils instead, which is how the ISO_8601 regexes were resolved at H5. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 },
                 {
                   "group": [
                     "**/engine",
                     "**/engine/**"
                   ],
-                  "message": "core/components must not import core/engine. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core/components must not import core/engine. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 }
               ]
             }
@@ -261,28 +261,28 @@
                     "**/demo",
                     "**/demo/**"
                   ],
-                  "message": "core must never import the demo — the dependency runs the other way. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core must never import the demo — the dependency runs the other way. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 },
                 {
                   "group": [
                     "**/components",
                     "**/components/**"
                   ],
-                  "message": "core/utils must not import core/components. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core/utils must not import core/components. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 },
                 {
                   "group": [
                     "**/modules",
                     "**/modules/**"
                   ],
-                  "message": "core/utils must not import core/modules. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core/utils must not import core/modules. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 },
                 {
                   "group": [
                     "**/engine",
                     "**/engine/**"
                   ],
-                  "message": "core/utils must not import core/engine. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core/utils must not import core/engine. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 },
                 {
                   "group": [
@@ -326,28 +326,28 @@
                     "**/demo",
                     "**/demo/**"
                   ],
-                  "message": "core must never import the demo — the dependency runs the other way. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core must never import the demo — the dependency runs the other way. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 },
                 {
                   "group": [
                     "**/components",
                     "**/components/**"
                   ],
-                  "message": "core/utils must not import core/components. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core/state must not import core/components. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 },
                 {
                   "group": [
                     "**/modules",
                     "**/modules/**"
                   ],
-                  "message": "core/utils must not import core/modules. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core/state must not import core/modules. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 },
                 {
                   "group": [
                     "**/engine",
                     "**/engine/**"
                   ],
-                  "message": "core/utils must not import core/engine. §9.9-H5 layer direction: `utils` imports nothing above it; `components` may import `utils`; `modules` may import `components`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
+                  "message": "core/state must not import core/engine. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
                 }
               ]
             }
