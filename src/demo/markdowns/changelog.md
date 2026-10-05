@@ -340,6 +340,7 @@
   renderer that never reached the bundle, and it is deleted. A host that links
   `/static/images/flags/<code>.svg`, from its own markup or from a meta `Image`, ships its own copy
   now. The tarball is **23 files / 3.3 MB unpacked (0.85 MB packed)**, from 289 / 5.6 MB / 1.4 MB.
+  The demo site stops serving them as well, so a link to the demo's copy stops resolving.
 
 #### Tests and CI
 
