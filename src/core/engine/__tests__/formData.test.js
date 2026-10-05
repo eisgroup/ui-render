@@ -1,10 +1,9 @@
 import {
+    changeOptionOrderForSelectFields,
     getFormsData,
     getRawFormsData,
     getLiveMergedDataKindArray,
-    errorsProcessing,
-} from '../utils'
-import { errorsFor, touchedFor } from '../../state/formRegistry'
+} from '../formData'
 
 function makeForm(values) {
     return {
@@ -125,93 +124,112 @@ describe('getRawFormsData', () => {
     })
 })
 
-describe('errorsProcessing', () => {
-    function makeFormWithErrors (fieldStates, registered = Object.keys(fieldStates)) {
-        return {
-            getRegisteredFields: () => registered,
-            getFieldState: (name) => fieldStates[name] || {},
+describe('changeOptionOrderForSelectFields', () => {
+    it('reorders data for index-based Select', () => {
+        const data = {
+            optionSelection: '1',
+            options: [
+                { optionName: 'Option A' },
+                { optionName: 'Option B' },
+                { optionName: 'Option C' },
+            ],
         }
-    }
-
-    it('returns early when meta has relativePath but no relativeIndex', () => {
-        const form = makeFormWithErrors({})
-        expect(() => errorsProcessing(form, { relativePath: 'x' })).not.toThrow()
-    })
-
-    it('returns early when no fields are registered', () => {
-        const form = makeFormWithErrors({}, [])
-        expect(() => errorsProcessing(form, {})).not.toThrow()
-    })
-
-    it('does nothing when fields have no error', () => {
-        const form = makeFormWithErrors({ foo: { name: 'foo', touched: true } })
-        errorsProcessing(form, {})
-        expect(errorsFor(form).foo).toBeUndefined()
-    })
-
-    it('records a touched field error', () => {
-        const form = makeFormWithErrors({
-            email: {
-                name: 'email',
-                error: 'Email is invalid',
-                touched: true,
-            },
-        })
-
-        errorsProcessing(form, {})
-
-        expect(errorsFor(form)).toEqual({
-            email: 'Email is invalid',
-        })
-    })
-
-    it('turns a Required error into a field-specific message', () => {
-        const form = makeFormWithErrors({
-            ownerName: {
-                name: 'ownerName',
-                error: 'Required',
-                touched: true,
-            },
-        })
-
-        errorsProcessing(form, {})
-
-        expect(errorsFor(form).ownerName).toBe('Owner Name is Required')
-    })
-
-    it('records an error for a field remembered as touched', () => {
-        const form = makeFormWithErrors({
-            phoneNumber: {
-                name: 'phoneNumber',
-                error: 'Phone is invalid',
-                touched: false,
-            },
-        })
-        // Remembered against THIS form since §9.3 step 3 — final-form reports it as untouched, and
-        // the remembered touch is the whole reason the error is still recorded.
-        touchedFor(form).phoneNumber = true
-
-        errorsProcessing(form, {})
-
-        expect(errorsFor(form).phoneNumber).toBe('Phone is invalid')
-    })
-
-    it('removes a stale error after the field becomes valid', () => {
-        const fieldState = {
-            name: 'rows[1].startDate',
-            error: 'Required',
-            touched: true,
+        const meta = {
+            view: 'Select',
+            name: 'optionSelection',
+            mapOptions: { text: 'optionName', value: '{index}' },
         }
-        const form = makeFormWithErrors({
-            'rows[1].startDate': fieldState,
-        })
+        const result = changeOptionOrderForSelectFields(data, meta)
+        expect(result.options[0].optionName).toBe('Option B')
+        expect(result.optionSelection).toBeUndefined()
+    })
 
-        errorsProcessing(form, { relativePath: 'rows', relativeIndex: 1 })
-        expect(errorsFor(form)['rows[1].startDate']).toBe('Start Date is Required')
+    it('does NOT reorder for non-index Select (stable value)', () => {
+        const data = {
+            optionSelection: 'Option B',
+            options: [
+                { optionName: 'Option A' },
+                { optionName: 'Option B' },
+                { optionName: 'Option C' },
+            ],
+        }
+        const meta = {
+            view: 'Select',
+            name: 'optionSelection',
+            mapOptions: { text: 'optionName', value: 'optionName' },
+        }
+        const result = changeOptionOrderForSelectFields(data, meta)
+        expect(result.options[0].optionName).toBe('Option A')
+        expect(result.optionSelection).toBe('Option B')
+    })
 
-        delete fieldState.error
-        errorsProcessing(form, { relativePath: 'rows', relativeIndex: 1 })
+    it('processes nested items recursively', () => {
+        const data = {
+            categorySelection: '1',
+            categories: [
+                { categoryName: 'Basic' },
+                { categoryName: 'Standard' },
+            ],
+        }
+        const meta = {
+            view: 'VerticalLayout',
+            items: [
+                {
+                    view: 'Select',
+                    name: 'categorySelection',
+                    mapOptions: { text: 'categoryName', value: '{index}' },
+                },
+            ],
+        }
+        const result = changeOptionOrderForSelectFields(data, meta)
+        expect(result.categories[0].categoryName).toBe('Standard')
+        expect(result.categorySelection).toBeUndefined()
+    })
 
-        expect(errorsFor(form)['rows[1].startDate']).toBeUndefined()
+    it('processes renderItem.items recursively', () => {
+        const data = {
+            selection: '0',
+            items: [
+                { name: 'A' },
+                { name: 'B' },
+            ],
+        }
+        const meta = {
+            view: 'Table',
+            renderItem: {
+                items: [
+                    {
+                        view: 'Select',
+                        name: 'selection',
+                        mapOptions: { text: 'name', value: '{index}' },
+                    },
+                ],
+            },
+        }
+        const result = changeOptionOrderForSelectFields(data, meta)
+        // selection '0' means first item, moving it to front is a no-op
+        expect(result.items[0].name).toBe('A')
+    })
+
+    it('returns data unchanged when meta is null', () => {
+        const data = { foo: 'bar' }
+        const result = changeOptionOrderForSelectFields(data, null)
+        expect(result).toEqual({ foo: 'bar' })
+    })
+
+    it('handles non-string select value (number)', () => {
+        const data = {
+            optionSelection: 1,
+            options: [{ optionName: 'A' }, { optionName: 'B' }],
+        }
+        const meta = {
+            view: 'Select',
+            name: 'optionSelection',
+            mapOptions: { text: 'optionName', value: '{index}' },
+        }
+        const result = changeOptionOrderForSelectFields(data, meta)
+        // non-string value should not trigger reorder
+        expect(result.options[0].optionName).toBe('A')
+        expect(result.optionSelection).toBe(1)
     })
 })

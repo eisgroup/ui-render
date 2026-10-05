@@ -5,7 +5,7 @@ import {
     parseArrayPrefixAndRowIndexFromFieldName,
     formsStorage,
 } from '../rules'
-import { getLiveMergedDataKindArray } from '../utils'
+import { getLiveMergedDataKindArray } from '../formData'
 import { Active } from '../../utils'
 
 describe('parseArrayPrefixAndRowIndexFromFieldName', () => {

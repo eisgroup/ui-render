@@ -1,9 +1,14 @@
+/**
+ * WHAT THE ENGINE READS OUT OF ITS FORMS: every active form's values, merged into one document,
+ * with a Select's options reordered the way the submit payload carries them.
+ *
+ * It was part of `engine/utils.ts` until §9.9-H6, which dissolved that file into `formData.ts`,
+ * `errorMapping.ts` and `dataMapping.ts`.
+ */
 import type { FormApi } from 'final-form'
 import { get, merge, isObject, hasObjectValue } from '../utils/object'
-import { errorsFor, touchedFor } from '../state/formRegistry'
 import type { RegisteredForm } from '../state/formRegistry'
 import { FIELD } from '../modules'
-import { ISO_8601_FULL } from '../utils'
 import { cloneDeep } from '../utils'
 
 /** A meta node, as far as these helpers read it. */
@@ -159,129 +164,6 @@ const mergeData = (formData: Values[]) => {
   return result;
 }
 
-/**
- * The in-place `replaceDeep` it replaced, returning a copy instead of writing into its argument
- * (`replaceDeep` itself was deleted at §9.6-E3 once nothing called it).
- *
- * Same semantics, which are unusual enough to state: `key` is a bare property NAME, not a path, and
- * EVERY property of that name anywhere in the tree is replaced — at the root, in nested objects and
- * in every array element. `rules.dynamic-actions.test.js` pins that behaviour through the
- * `updateDataOnChange` action, which is its only caller.
- *
- * It exists because that action ran `replaceDeep(this.data, …)` on the object `this.data` returns,
- * which is the live React state, and only then assigned a clone — so the state React had already
- * handed out was rewritten in place first, the defect class §9.3 step 4 closed everywhere else and
- * this one site escaped. Copying every container matches what the old code paid for its
- * `cloneDeep` afterwards, and the value is recursed into after replacing, exactly as the original's
- * second loop did.
- *
- * @param {*} object - the tree to read; never written
- * @param {String} key - the property name to replace wherever it occurs
- * @param {*} value - the replacement
- * @returns {*} a new tree
- */
-export const replaceDeepCopy = (object: unknown, key: string, value: unknown): unknown => {
-  if (Array.isArray(object)) {
-    return object.map(item => replaceDeepCopy(item, key, value))
-  }
-  if (isObject(object)) {
-    const copy: Values = {}
-    Object.keys(object).forEach(k => {
-      copy[k] = replaceDeepCopy(k === key ? value : object[k], key, value)
-    })
-    return copy
-  }
-  return object
-}
-
-function getKeyAndPathFromMetaData(meta: MetaNode): { key?: string, path?: string } {
-  const { relativeIndex, relativePath } = meta;
-  let path = '';
-  let key = 'master';
-
-  if (relativePath && typeof relativeIndex === 'undefined') {
-    return {};
-  }
-
-  if (relativePath) {
-    path = `${relativePath}[${relativeIndex}].`;
-    key = path;
-  }
-
-  return { key, path }
-}
-
-export function errorsProcessing(form: FormApi, meta: MetaNode) {
-  const { key } = getKeyAndPathFromMetaData(meta);
-
-  if (!key) {
-    return;
-  }
-
-  const registeredFieldNames = form.getRegisteredFields()
-  if (!registeredFieldNames.length) {
-    return;
-  }
-
-  // This form's errors, not everyone's: the map used to be shared, so a second document on the
-  // same page reported the first one's errors as its own.
-  const errorsMap = errorsFor(form)
-  const rememberedTouched = touchedFor(form)
-
-  registeredFieldNames.forEach(field => {
-    // Not undefined: the field was just listed as registered.
-    const { name, error, touched } = form.getFieldState(field)!;
-
-    if (error && (touched || rememberedTouched[name])) {
-      let errorText = error;
-      if (errorText === 'Required') {
-        errorText = convertFieldNameToTitleCaseText(name) + ' is Required'
-      }
-      errorsMap[name] = errorText;
-    } else {
-      delete errorsMap[name];
-    }
-  })
-}
-
-/*
- Expected format of field validation object
- {
-    "quote.termDetails[0].termEffectiveDate": {
-        "messages": [
-            {
-                "text": "Record should be effective on the 1st day of month."
-            }
-        ],
-    }
-}
- */
-export const mapErrorObjectToUIFormat = (errors: Record<string, unknown>) => {
-  const result: Record<string, { messages: Array<{ text: unknown }> }> = {};
-
-  Object.keys(errors).forEach(fieldName => {
-    result[fieldName] = {
-      messages: [
-        {
-          text: errors[fieldName]
-        }
-      ]
-    }
-  })
-
-  return result;
-}
-
-export const convertFieldNameToTitleCaseText = (str: string) => {
-  let fieldName = str;
-  if (fieldName.includes('.')) {
-    fieldName = fieldName.split('.').pop()!; // not undefined: a split has at least one part
-  }
-  const result = fieldName.replace(/([A-Z])/g, " $1").trim();
-
-  return result.charAt(0).toUpperCase() + result.slice(1);
-}
-
 // Find Select fields and change options order in case select was changed
 export const changeOptionOrderForSelectFields = (data: Values, meta: MetaNode | undefined) => {
   // find data related to Select and change options order
@@ -340,54 +222,6 @@ export const changeOptionOrderForSelectFields = (data: Values, meta: MetaNode | 
     meta.renderItem.items.forEach(item => {
       changeOptionOrderForSelectFields(data, item)
     })
-  }
-
-  return data;
-}
-
-/*
-  Return date in format 'YYYY-MM-DD'
- */
-export const getDateStringFromDateObject = (date: Date) => {
-  const year = String(date.getUTCFullYear()).padStart(4, '0')
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-  const day = String(date.getUTCDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-export const normalizeIncomingData = (data: unknown): unknown => {
-  if (!data) {
-    return data
-  }
-
-  if (typeof data === 'string') {
-    if (ISO_8601_FULL.test(data)) {
-      // based on previous solution from Normalize function
-      return data.split('T')[0]
-    }
-
-    return data
-  }
-
-  if (typeof data === 'number') {
-    return data
-  }
-
-  if (data instanceof Date) {
-    return getDateStringFromDateObject(data);
-  }
-
-  if (Array.isArray(data)) {
-    return data.map(item => normalizeIncomingData(item))
-  }
-
-  if (Object.keys(data).length) {
-    const nextData: Values = {};
-    Object.keys(data).forEach(key => {
-      // A cast, not a guard: anything left is an object, or `true`, which has no keys.
-      nextData[key] = normalizeIncomingData((data as Values)[key])
-    })
-    return nextData;
   }
 
   return data;
