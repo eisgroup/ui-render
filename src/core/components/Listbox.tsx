@@ -82,6 +82,7 @@ export type ListboxProps = {
     disabled?: boolean
     selection?: boolean
     compact?: boolean
+    /** Opens the list upward. Unset, the list opens upward when it does not fit below and there is more room above */
     upward?: boolean
     lazyLoad?: boolean
     className?: string
@@ -109,6 +110,10 @@ const isSelectable = (option: ListboxOption | undefined) => option && !option.di
 
 /** Per-instance option-id source. See `idPrefix`. */
 let sequence = 0
+
+// The server runs no layout effect, and React 16 and 17 warn when one is declared there. Nothing is
+// measured on the server, where no list opens.
+const useCommitEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect
 
 /** The index the cursor should land on for a key, or -1 when the key does not move it. */
 function cursorFor (key: string, current: number, options: ListboxOption[]): number {
@@ -210,6 +215,7 @@ export default function Listbox ({
     const [cursor, setCursor] = React.useState(-1)
     const host = React.useRef<HTMLDivElement>(null)
     const control = React.useRef<HTMLDivElement>(null)
+    const menu = React.useRef<HTMLDivElement>(null)
     const typed = React.useRef({ prefix: '', at: 0 })
 
     const selectedIndex = options.findIndex(option => String(option.value) === String(value))
@@ -318,6 +324,24 @@ export default function Listbox ({
         }
     }
 
+    /**
+     * WHICH WAY THE LIST OPENS, when `upward` does not say: up, if it does not fit below the dropdown
+     * and there is more room above. Measured as it opens, in a layout effect, so the browser never
+     * paints it the other way first. The measurement does not depend on the direction: the menu is
+     * positioned absolutely, so where it goes moves neither the dropdown nor its own height.
+     * `semantic-ui-react` did this for an unset `upward` too, but measured in Chrome at §9.7-F1 step 3
+     * it never flipped, at any tested overflow, and the in-house control did not flip at all.
+     */
+    const [flipped, setFlipped] = React.useState(false)
+    useCommitEffect(() => {
+        if (!open || upward != null || !host.current || !menu.current) return
+        const dropdown = host.current.getBoundingClientRect()
+        const viewport = document.documentElement.clientHeight || window.innerHeight
+        const below = viewport - dropdown.bottom
+        const above = dropdown.top
+        setFlipped(menu.current.getBoundingClientRect().height > below && above > below)
+    }, [open, upward])
+
     const showOptions = open || !lazyLoad
 
     // `aria-*` describes the control, so it goes where focus is; everything else stays on the dropdown,
@@ -334,8 +358,10 @@ export default function Listbox ({
             ref={host}
             // `ui` and `dropdown` are worth every scoped rule that reaches this element, and
             // `selection` all but one — see the file header and `css.dropdown-contract.test.js`.
-            className={classNames('ui', { active: open, visible: open, error, disabled, compact, upward },
-                { selection }, 'dropdown', className)}
+            className={classNames('ui', {
+                active: open, visible: open, error, disabled, compact,
+                upward: upward != null ? upward : open && flipped,
+            }, { selection }, 'dropdown', className)}
             // A click anywhere on the dropdown, its icon and its padding included, focuses the control
             // as it did when the dropdown was the control: the keyboard must work after a click.
             onClick={() => {
@@ -368,6 +394,7 @@ export default function Listbox ({
             {icon != null ? icon : <i aria-hidden="true" className="icon dropdown"/>}
             {/* The id exists only while open, as the options' do, so `aria-controls` never dangles. */}
             <div
+                ref={menu}
                 id={open ? idPrefix : undefined}
                 role="listbox"
                 aria-label={ariaProps['aria-label'] as string | undefined}
