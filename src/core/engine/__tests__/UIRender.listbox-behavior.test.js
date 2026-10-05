@@ -209,6 +209,47 @@ describe('Select and Dropdown behavioural contract', () => {
         })
     })
 
+    describe('an option list the meta declares', () => {
+        // `config.md` documents `options: [{ text, value }]`. Declared that way on `view: "Select"` or
+        // `view: "Dropdown"`, with a `name` and no `onChange`, the node failed to render: every option
+        // became its own text, an object React cannot render. Each option now keeps its own value.
+        const options = [{ text: 'Apple', value: 'a' }, { text: 'Pear', value: 'p' }]
+
+        it('renders a Select, and the field takes the chosen option own value', () => {
+            const { getFormData } = mountMeta({ view: 'Select', name: 'fruit', label: 'Fruit', options }, {}, { form: true })
+            const control = screen.getByRole('combobox')
+
+            fireEvent.click(control)
+            expect(optionTexts(control)).toEqual(['Apple', 'Pear'])
+            fireEvent.click(optionsOf(control)[1])
+
+            expect(displayed(screen.getByRole('combobox'))).toBe('Pear')
+            expect(getFormData().fruit).toBe('p')
+        })
+
+        it('renders a Dropdown on its first option, and its state follows the chosen option own value', () => {
+            // The state is read the way metas read it, through a data path: `labels.{state.fruit,none}`.
+            const meta = {
+                view: 'Col',
+                items: [
+                    { view: 'Dropdown', name: 'fruit', options },
+                    { view: 'Text', name: 'labels.{state.fruit,none}' },
+                ],
+            }
+            const labels = { a: 'state is a', p: 'state is p', none: 'state is unset', 0: 'state is 0' }
+            mountMeta(meta, { labels })
+            const control = screen.getByRole('combobox')
+            expect(displayed(control)).toBe('Apple')
+            expect(screen.getByText('state is a')).toBeInTheDocument()
+
+            fireEvent.click(control)
+            fireEvent.click(optionsOf(control)[1])
+
+            expect(displayed(screen.getByRole('combobox'))).toBe('Pear')
+            expect(screen.getByText('state is p')).toBeInTheDocument()
+        })
+    })
+
     describe('cascading selects', () => {
         it('narrows and resets the dependent select when the parent choice changes', () => {
             // The §9.7-F1 Step 3 regression hotspot: Category -> Product, driven by

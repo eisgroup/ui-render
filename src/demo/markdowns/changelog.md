@@ -413,6 +413,10 @@
 
 #### Fixes
 
+- **A `Select` or `Dropdown` with its options written in the meta renders.** Declared as the
+  configuration docs show, `options: [{ text, value }]` with a `name` and no `onChange`, it failed
+  to render: each option was mapped to itself as its text. Such a list is now used as declared, as
+  `Input` with `type: 'select'` uses it, so each option keeps its own `value`.
 - **A click on a controlled `ProgressSteps` is no longer lost.** With `activeIndex` bound to
   state, any render of the document within 50 ms of the click, new `data` from the host for
   example, dropped it. Only a change of `activeIndex` itself supersedes a click now.

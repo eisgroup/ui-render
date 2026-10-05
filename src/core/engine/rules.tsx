@@ -44,6 +44,15 @@ import { dataKindPathFor, getDataKindPathFromRelative, pushDataKindRow, removeDa
 // `Record<string, unknown>` the util's type guard narrows it to.
 const isObject: (value: unknown) => boolean = isPlainObject
 
+/**
+ * Whether a Select's or Dropdown's `options` is a list the meta declares, `[{ text, value }]` as
+ * `config.md` documents it, rather than a list bound from the data or a list of plain values. Such a
+ * list is used as declared, as `view: "Input"` with `type: "select"` uses it: each option keeps its own
+ * `value`, which is what the field and the state receive.
+ */
+const isDeclaredOptionList = (options: unknown): options is Array<{ value?: unknown }> =>
+    Array.isArray(options) && options.length > 0 && options.every(isObject)
+
 export { getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow }
 
 FIELD.ACTION = {
@@ -445,12 +454,14 @@ export function toOpenLConfig (meta: any): any {
                 if (isString(meta.options)) meta.options = { name: meta.options }
                 if (isObject(meta.mapOptions)) {
                     if (meta.mapOptions.value == null) meta.mapOptions.value = '{index}'
-                } else {
+                } else if (meta.mapOptions != null || !isDeclaredOptionList(meta.options)) {
                     meta.mapOptions = {
                         text: meta.mapOptions, // if not defined, will default to given option value
                         value: '{index}', // always enforce using index
                     }
                 }
+                // A declared option list is left unmapped. Mapped like the others, with no `text`, every
+                // option became its own text, an object React cannot render, and the node failed.
             }
         }
 
@@ -532,8 +543,10 @@ export function initSelectStatesFromData (meta: any, data: unknown, instance: Do
                     instance.state[name] = String(value)
                 }
             } else if (!mapOptions || !mapOptions.value || mapOptions.value === '{index}') {
-                // No value in data for index-based Select — default to first option
-                instance.state[name] = '0'
+                // No value in data — default to the first option: its index, or, in a list the meta
+                // declares, its own value, since such a list is not mapped by index.
+                const first = isDeclaredOptionList(options) ? options[0].value : '0'
+                if (first != null) instance.state[name] = String(first)
             }
         }
     }
