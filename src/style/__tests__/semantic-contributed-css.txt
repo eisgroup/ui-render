@@ -1,5 +1,5 @@
 # GENERATED — run `npm run css:fixture` to regenerate. See scripts/generate-semantic-css-fixture.js.
-# 285 rules contributed by the semantic-ui-less imports in override/_semantic.less.
+# 288 rules contributed by the semantic-ui-less imports in override/_semantic.less.
 # Order is the cascade order and is part of the contract.
 
 *, *:before, *:after
@@ -1124,14 +1124,27 @@ to
 .ui.dropdown > .clear.icon:before
   content: "\f00d"
 
-.ui.selection.dropdown.active i.icon.dropdown, .ui.selection.dropdown:hover i.icon.dropdown, .ui.selection.dropdown:focus i.icon.dropdown, .ui.selection.dropdown:active i.icon.dropdown
+.ui.selection.dropdown.active i.icon.dropdown, .ui.selection.dropdown:hover i.icon.dropdown, .ui.selection.dropdown:focus i.icon.dropdown, .ui.selection.dropdown:active i.icon.dropdown, .ui.selection.dropdown:focus-within i.icon.dropdown
   color: #2e6eb1
 
-.inverted .ui.selection.dropdown.active i.icon.dropdown, .inverted .ui.selection.dropdown:hover i.icon.dropdown, .inverted .ui.selection.dropdown:focus i.icon.dropdown, .inverted .ui.selection.dropdown:active i.icon.dropdown
+.inverted .ui.selection.dropdown.active i.icon.dropdown, .inverted .ui.selection.dropdown:hover i.icon.dropdown, .inverted .ui.selection.dropdown:focus i.icon.dropdown, .inverted .ui.selection.dropdown:active i.icon.dropdown, .inverted .ui.selection.dropdown:focus-within i.icon.dropdown
   color: #4e92df
 
-.inverted .ui.selection.dropdown:focus
+.inverted .ui.selection.dropdown:focus, .inverted .ui.selection.dropdown:focus-within
   border-color: #4e92df
+
+.ui.selection.dropdown:focus-within
+  border-color: #96C8DA
+  box-shadow: none
+
+.ui.selection.dropdown:focus-within .menu
+  border-color: #96C8DA
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15)
+
+.ui.selection.dropdown > .text[role="combobox"]:focus
+  outline: none
+  box-shadow: none
+  border-radius: 0
 
 .ui.selection.dropdown.active
   outline: none !important

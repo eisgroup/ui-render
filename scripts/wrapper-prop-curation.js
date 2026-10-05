@@ -258,11 +258,12 @@ const IN_HOUSE_CURATION = {
             + 'and advances one step. Also gone with Semantic: the `role="alert" aria-live` node it '
             + 'announced the selected value through — the corpus role census dropped 12 `alert` '
             + 'entries to zero in this step.',
-        passthrough: '`id`, `aria-*`, `style`, `data-*` and every event handler still reach the '
-            + '`<div role="listbox">` untouched, including the `onFocus`/`onBlur` the react-final-form '
-            + 'adapter supplies — and they now reach it as real DOM handlers rather than as Semantic '
-            + 'props. `ENGINE_PROPS` and `FIELD_ONLY_PROPS` are stripped twice on the way: once by the '
-            + 'wrapper, once by `Listbox` at the element itself.',
+        passthrough: '`id`, `style`, `data-*` and every event handler still reach the dropdown '
+            + 'element untouched, including the `onFocus`/`onBlur` the react-final-form adapter '
+            + 'supplies — as real DOM handlers rather than as Semantic props, and they fire for the '
+            + 'combobox inside it, because React\'s focus events bubble. `aria-*` reaches the combobox, '
+            + 'the element that takes focus. `ENGINE_PROPS` and `FIELD_ONLY_PROPS` are stripped twice on '
+            + 'the way: once by the wrapper, once by `Listbox` at the element itself.',
         summary: 'The wrapper already owned the external API: the `onChange(value, name, event)` '
             + 'signature, option sanitisation, case-insensitive dedup on addition, and the cascading '
             + 'reset are all wrapper code, and none of it moved. Only the `<DropDown/>` element at the '
@@ -318,7 +319,7 @@ const IN_HOUSE_CURATION = {
             initialValues: 'Accepted and discarded — it exists only to keep the form stack\'s '
                 + '`initialValues` off the DOM.',
             readonly: 'Translated to the control\'s `disabled` plus a `readonly` class, because neither Semantic\'s '
-                + 'Dropdown nor a `role="listbox"` div has a `readOnly`. `disabled` has to be said three '
+                + 'Dropdown nor the `role="combobox"` div has a `readOnly`. `disabled` has to be said three '
                 + 'ways on a div: `aria-disabled`, `tabIndex={-1}`, and the open guards.',
             onClickIcon: 'Replaces the icon with a clickable `<Icon>` node. `Listbox` renders a caller\'s `icon` node in '
                 + 'place of its own `<i class="icon dropdown">`.',

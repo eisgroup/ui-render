@@ -1455,6 +1455,20 @@
   padding-right: 2.25rem;
   min-width: min-content;
 }
+.ui-render .ui.selection.dropdown:focus-within {
+  opacity: 1;
+  outline: 0;
+  box-shadow: none;
+  background-color: transparent;
+  border-color: #2e6eb1;
+}
+.ui-render .inverted .ui.selection.dropdown:focus-within {
+  border-color: #4e92df;
+}
+.ui-render .ui.selection.dropdown.readonly:focus-within, .ui-render .ui.selection.dropdown[readonly]:focus-within, .ui-render .ui.selection.dropdown.disabled:focus-within, .ui-render .ui.selection.dropdown:disabled:focus-within, .ui-render .ui.selection.dropdown.input-disabled:focus-within, .ui-render .ui.selection.dropdown.input__unit.disabled:not(.readonly):focus-within, .ui-render .ui.selection.dropdown.ui.selection.dropdown.disabled:not(.readonly):focus-within, .ui-render .ui.selection.dropdowninput.disabled:not(.readonly):focus-within, .ui-render .ui.selection.dropdownselect.disabled:not(.readonly):focus-within, .ui-render .ui.selection.dropdowntextarea.disabled:not(.readonly):focus-within, .ui-render .ui.selection.dropdown.input__unit:disabled:focus-within, .ui-render .ui.selection.dropdown.ui.selection.dropdown:disabled:focus-within, .ui-render .ui.selection.dropdowninput:disabled:focus-within, .ui-render .ui.selection.dropdownselect:disabled:focus-within, .ui-render .ui.selection.dropdowntextarea:disabled:focus-within, .ui-render .ui.selection.dropdowninput.checkbox.toggle:disabled + label:focus-within {
+  box-shadow: none;
+  border-color: initial;
+}
 .ui-render .ui.selection.dropdown:not(.multiple) > .text.default {
   left: 0;
   line-height: normal;
@@ -8216,14 +8230,27 @@
  */
 /* Scale according to screen size */
 /* Scale Padding according to text size */
-.ui-render .ui.selection.dropdown.active i.icon.dropdown, .ui-render .ui.selection.dropdown:hover i.icon.dropdown, .ui-render .ui.selection.dropdown:focus i.icon.dropdown, .ui-render .ui.selection.dropdown:active i.icon.dropdown {
+.ui-render .ui.selection.dropdown.active i.icon.dropdown, .ui-render .ui.selection.dropdown:hover i.icon.dropdown, .ui-render .ui.selection.dropdown:focus i.icon.dropdown, .ui-render .ui.selection.dropdown:active i.icon.dropdown, .ui-render .ui.selection.dropdown:focus-within i.icon.dropdown {
   color: #2e6eb1;
 }
-.ui-render .inverted .ui.selection.dropdown.active i.icon.dropdown, .ui-render .inverted .ui.selection.dropdown:hover i.icon.dropdown, .ui-render .inverted .ui.selection.dropdown:focus i.icon.dropdown, .ui-render .inverted .ui.selection.dropdown:active i.icon.dropdown {
+.ui-render .inverted .ui.selection.dropdown.active i.icon.dropdown, .ui-render .inverted .ui.selection.dropdown:hover i.icon.dropdown, .ui-render .inverted .ui.selection.dropdown:focus i.icon.dropdown, .ui-render .inverted .ui.selection.dropdown:active i.icon.dropdown, .ui-render .inverted .ui.selection.dropdown:focus-within i.icon.dropdown {
   color: #4e92df;
 }
-.ui-render .inverted .ui.selection.dropdown:focus {
+.ui-render .inverted .ui.selection.dropdown:focus, .ui-render .inverted .ui.selection.dropdown:focus-within {
   border-color: #4e92df !important;
+}
+.ui-render .ui.selection.dropdown:focus-within {
+  border-color: #96C8DA;
+  box-shadow: none;
+}
+.ui-render .ui.selection.dropdown:focus-within .menu {
+  border-color: #96C8DA;
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15);
+}
+.ui-render .ui.selection.dropdown > .text[role="combobox"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0;
 }
 .ui-render .ui.selection.dropdown.active {
   outline: none !important !important;

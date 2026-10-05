@@ -8,7 +8,7 @@ const uploadMeta = {
   classWrap: 'left', // move button to the left, instead of centered by default
   styles: 'button margin-largest', // style dropzone as button
   // label: 'Report', // only used in dropzone style when `showTypes = true`
-  formats: ['csv'], // required
+  formats: ['csv'], // accepted extensions; with neither these nor a known `fileType`, any file is accepted
   maxSize: SIZE_MB_16, // maximum allowed file size in bytes
   multiple: false, // only allow single file upload
   showTypes: false, // disable on hover hint for dropzone

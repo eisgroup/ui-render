@@ -690,6 +690,8 @@ Single- or multi-file upload with click + drag&drop. Use through `Input` with `t
 - If the user picks a file outside the allowed `formats`, the file dialog filters it out client-
   side; a manual drop of an unsupported format triggers a "FILE_UPLOAD_FAILED" popup listing
   the allowed extensions.
+- With neither `formats` nor a `fileType` that names a known preset, any file is accepted and the
+  hover hint names no formats.
 - `multiple: false` makes the field accept exactly one file; `multiple: true` (default) accepts
   many — the `onChange` callback always receives an array.
 

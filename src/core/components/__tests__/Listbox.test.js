@@ -15,7 +15,7 @@
  * restore).
  */
 import React from 'react'
-import { fireEvent, render } from '@testing-library/react'
+import { act, fireEvent, render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import Listbox from '../Listbox'
 
@@ -37,20 +37,22 @@ const drive = (props = {}) => {
             {...props}
         />
     )
-    const control = view.container.querySelector('[role="listbox"]')
+    // The control is the combobox; the dropdown around it holds the class string, the icon and the
+    // listbox, so every query for those starts from `control.parentElement` (see `Listbox.tsx`).
+    const control = view.container.querySelector('[role="combobox"]')
     return {
         ...view,
         control,
         changes,
         closes,
-        text: () => control.querySelector('.text').textContent,
-        options: () => Array.from(control.querySelectorAll('[role="option"]')).map(o => o.textContent),
+        text: () => control.textContent,
+        options: () => Array.from(control.parentElement.querySelectorAll('[role="option"]')).map(o => o.textContent),
         cursor: () => {
-            const at = control.querySelector('[role="option"].selected')
+            const at = control.parentElement.querySelector('[role="option"].selected')
             return at ? at.textContent : null
         },
         committed: () => {
-            const at = control.querySelector('[role="option"][aria-selected="true"]')
+            const at = control.parentElement.querySelector('[role="option"][aria-selected="true"]')
             return at ? at.textContent : null
         },
         press: key => fireEvent.keyDown(control, { key }),
@@ -61,14 +63,14 @@ describe('what the listbox renders', () => {
     it('emits the class tokens the CSS contract measures, closed and open', () => {
         const { control } = drive()
 
-        expect(control.className.split(' ').sort().join(' ')).toBe('dropdown selection ui')
+        expect(control.parentElement.className.split(' ').sort().join(' ')).toBe('dropdown selection ui')
 
         fireEvent.click(control)
 
-        expect(control.className.split(' ').sort().join(' ')).toBe('active dropdown selection ui visible')
-        expect(control.querySelector('.menu').className.split(' ').sort().join(' '))
+        expect(control.parentElement.className.split(' ').sort().join(' ')).toBe('active dropdown selection ui visible')
+        expect(control.parentElement.querySelector('.menu').className.split(' ').sort().join(' '))
             .toBe('menu transition visible')
-        expect(control.querySelector('i').className).toBe('icon dropdown')
+        expect(control.parentElement.querySelector('i').className).toBe('icon dropdown')
     })
 
     it('shows the placeholder until something is selected, then the option', () => {
@@ -94,7 +96,7 @@ describe('what the listbox renders', () => {
         fireEvent.click(control)
 
         expect(committed()).toBe('Beta')
-        expect(control.querySelector('[role="option"].active').textContent).toBe('Beta')
+        expect(control.parentElement.querySelector('[role="option"].active').textContent).toBe('Beta')
     })
 })
 
@@ -237,7 +239,7 @@ describe('the keyboard matrix, which had no predecessor', () => {
         expect(document.getElementById(at).textContent).toBe('Beta')
         // `aria-selected` still marks the COMMITTED value, which is the whole reason the cursor
         // needs an attribute of its own now that navigating no longer commits.
-        expect(control.querySelector('[aria-selected="true"]').textContent).toBe('Alpha')
+        expect(control.parentElement.querySelector('[aria-selected="true"]').textContent).toBe('Alpha')
     })
 
     it('moves by a page with PageDown and PageUp, clamped to the ends', () => {
@@ -337,7 +339,7 @@ describe('the keyboard matrix, which had no predecessor', () => {
         })
 
         fireEvent.click(control)
-        fireEvent.click(control.querySelector('[role="option"]'))
+        fireEvent.click(control.parentElement.querySelector('[role="option"]'))
 
         expect(changes).toEqual([])
     })
@@ -410,7 +412,7 @@ describe('the keyboard matrix, which had no predecessor', () => {
             const view = render(
                 <Listbox options={OPTIONS} onOpen={() => opens.push('opened')}/>
             )
-            const control = view.container.querySelector('[role="listbox"]')
+            const control = view.container.querySelector('[role="combobox"]')
 
             fireEvent.click(control)
             expect(opens).toEqual(['opened'])
@@ -434,7 +436,7 @@ describe('the keyboard matrix, which had no predecessor', () => {
             const { control } = drive()
             fireEvent.click(control)
 
-            const option = control.querySelector('[role="option"]')
+            const option = control.parentElement.querySelector('[role="option"]')
             const prevented = !fireEvent.mouseDown(option)
 
             expect(prevented).toBe(true)
@@ -500,14 +502,14 @@ describe('the keyboard matrix, which had no predecessor', () => {
             expect(options()).toEqual(['Alpha', 'Beta'])
             rerender(<Listbox options={[keyed[1], keyed[0]]} lazyLoad={false}/>)
             expect(options()).toEqual(['Beta', 'Alpha'])
-            expect(control.querySelectorAll('[role="option"]')).toHaveLength(2)
+            expect(control.parentElement.querySelectorAll('[role="option"]')).toHaveLength(2)
         })
 
         it('commits without an `onChange`, and does not throw doing it', () => {
             // The prop is optional, and every call site in the product supplies one — but a
             // component that crashes when an optional callback is absent is a trap for the next one.
             const view = render(<Listbox options={OPTIONS} value="a"/>)
-            const control = view.container.querySelector('[role="listbox"]')
+            const control = view.container.querySelector('[role="combobox"]')
 
             fireEvent.click(control)
             fireEvent.keyDown(control, { key: 'ArrowDown' })
@@ -534,12 +536,12 @@ describe('the keyboard matrix, which had no predecessor', () => {
 
         it('renders with no options prop at all', () => {
             const view = render(<Listbox/>)
-            const control = view.container.querySelector('[role="listbox"]')
+            const control = view.container.querySelector('[role="combobox"]')
 
             fireEvent.click(control)
 
             expect(control).toHaveAttribute('aria-expanded', 'true')
-            expect(control.querySelectorAll('[role="option"]')).toHaveLength(0)
+            expect(control.parentElement.querySelectorAll('[role="option"]')).toHaveLength(0)
         })
     })
 
@@ -556,8 +558,8 @@ describe('the keyboard matrix, which had no predecessor', () => {
         it('emits none while closed, even with the options mounted', () => {
             const { control } = drive({ lazyLoad: false })
 
-            expect(control.querySelectorAll('[role="option"]')).toHaveLength(3)
-            expect([...control.querySelectorAll('[role="option"]')].map(option => option.id))
+            expect(control.parentElement.querySelectorAll('[role="option"]')).toHaveLength(3)
+            expect([...control.parentElement.querySelectorAll('[role="option"]')].map(option => option.id))
                 .toEqual(['', '', ''])
             expect(control).not.toHaveAttribute('aria-activedescendant')
         })
@@ -578,5 +580,76 @@ describe('the keyboard matrix, which had no predecessor', () => {
             expect(cursorId).toBeTruthy()
             expect(document.getElementById(cursorId)).toHaveAttribute('role', 'option')
         })
+    })
+})
+
+/**
+ * WAI-ARIA'S SELECT-ONLY COMBOBOX: the `.text` is the `combobox` that takes focus, and the `.menu` the
+ * `listbox` BESIDE it. Beside rather than inside, which is the measured reason for the structure:
+ * with the dropdown itself as the combobox, Chromium folded the open list into the control's value.
+ */
+describe('the combobox pattern', () => {
+    it('makes the selection display the combobox, and the menu the listbox beside it', () => {
+        const { control, press } = drive()
+        const list = control.parentElement.querySelector('[role="listbox"]')
+
+        expect(control).toHaveClass('text')
+        expect(control).toHaveAttribute('aria-haspopup', 'listbox')
+        expect(control.contains(list)).toBe(false)
+        expect(list).toHaveClass('menu')
+
+        // Closed, nothing points anywhere: the list's id, like its options', exists only while open.
+        expect(control).not.toHaveAttribute('aria-controls')
+        expect(list).not.toHaveAttribute('id')
+
+        press('Enter')
+        expect(control).toHaveAttribute('aria-expanded', 'true')
+        expect(document.getElementById(control.getAttribute('aria-controls'))).toBe(list)
+    })
+
+    it('puts `aria-*` on the combobox, the rest on the dropdown, and names the list after the control', () => {
+        const { control } = drive({
+            'aria-label': 'Region', 'aria-describedby': 'region-help', id: 'region', 'data-x': 'y', style: { width: 10 },
+        })
+        const dropdown = control.parentElement
+
+        expect(control).toHaveAttribute('aria-label', 'Region')
+        expect(control).toHaveAttribute('aria-describedby', 'region-help')
+        expect(dropdown).not.toHaveAttribute('aria-label')
+        expect(dropdown).toHaveAttribute('id', 'region')
+        expect(dropdown).toHaveAttribute('data-x', 'y')
+        expect(dropdown).toHaveStyle({ width: '10px' })
+        expect(dropdown.querySelector('[role="listbox"]')).toHaveAttribute('aria-label', 'Region')
+    })
+
+    // The keyboard must work after a click anywhere on the dropdown, as it did when that was the control.
+    it('focuses the combobox from a click on the icon, and opens', () => {
+        const { control } = drive()
+
+        fireEvent.click(control.parentElement.querySelector('i.icon.dropdown'))
+
+        expect(control).toHaveFocus()
+        expect(control).toHaveAttribute('aria-expanded', 'true')
+    })
+
+    it('neither focuses nor opens a disabled control from a click', () => {
+        const { control } = drive({ disabled: true })
+
+        fireEvent.click(control.parentElement.querySelector('i.icon.dropdown'))
+
+        expect(control).not.toHaveFocus()
+        expect(control).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    // What keeps a form field's `touched` working: the form adapter's `onFocus`/`onBlur` ride the rest
+    // bag onto the dropdown, and fire for the combobox inside it because React's focus events bubble.
+    it('fires the dropdown\'s `onFocus` and `onBlur` for the combobox inside it', () => {
+        const seen = []
+        const { control } = drive({ onFocus: () => seen.push('focus'), onBlur: () => seen.push('blur') })
+
+        act(() => { control.focus() })
+        act(() => { control.blur() })
+
+        expect(seen).toEqual(['focus', 'blur'])
     })
 })

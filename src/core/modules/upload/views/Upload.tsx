@@ -31,7 +31,7 @@ export type { DropzoneHandle }
 export type UploadProps = {
     /** Upload file type, falls back to the route pathname; if given, renders embedded instead of as a modal route */
     fileType?: string | number
-    /** Allowed file formats, e.g. ['jpg', 'png'] */
+    /** Allowed file formats, e.g. ['jpg', 'png']; with neither these nor a known `fileType`, any file is accepted */
     formats?: string[]
     /** Maximum file size in bytes */
     maxSize?: number
@@ -217,7 +217,8 @@ function Upload (props: UploadProps) {
                             <Text className="margin-bottom-smaller">
                                 {labelOnHover || parseString(_.UPLOAD_file_FILE, { file: label })}
                             </Text>
-                            <Text className="bold p">{(formats as string).replace(/\./g, '')}</Text>
+                            {/* Without `formats` or a known `fileType` any file is accepted: no types to list. */}
+                            {formats && <Text className="bold p">{formats.replace(/\./g, '')}</Text>}
                         </View>
                     </View>
                 }

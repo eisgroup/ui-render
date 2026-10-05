@@ -50,6 +50,10 @@
   error channel, and now names the failing node; the diagnostic rendered in place of the
   failed subtree names it too, instead of showing a bare `Error: …`. A host reporter that
   throws cannot replace the failure it was called to report.
+- **`getValidationErrors` reports a string as each message's `text`, as its type always said.**
+  An array field could be reported with the array of its items' errors as its `text`. That entry
+  is left out now; each item's error is still reported, under the item's own field name. Every
+  other report is unchanged: every validator a meta can name returns a string.
 
 #### Table rendering
 
@@ -111,6 +115,14 @@
   a screen reader to announce. The reference now appears exactly when the message it points at
   does. In the demo example set this removes 57 dangling references; no other rendered output
   changes.
+- **The dropdown follows WAI-ARIA's select-only combobox pattern.** The part that shows the
+  selection is now the `combobox`, and takes focus. The option list beside it is the `listbox`.
+  The combobox says it has a list (`aria-haspopup`), points at it while it is open
+  (`aria-controls`), and carries the field's `label` as its name (`aria-label`). **This changes the
+  markup:** a host that finds the dropdown by `[role="listbox"]` now finds its option list, so
+  find the control by `[role="combobox"]`. `aria-*` attributes from a meta move with focus to the
+  combobox. Everything else, including `id`, `style`, `data-*` and event handlers, still lands on
+  the dropdown element, as does the class string. The dropdown looks the same in every state.
 
 #### Documentation
 
@@ -126,6 +138,8 @@
   build; with Semantic gone the pin was re-examined and lifted. The compiled stylesheet is
   byte-for-byte identical — same SHA-256 before and after — so nothing about how the library looks
   changes. This only matters if you build the demo or the stylesheet from source.
+- `package.json` pins npm 11.9.0, the npm that comes with Node 24.14.0, in `packageManager`. npm
+  ignores the field. Corepack, once enabled for npm, runs that version.
 
 #### Dependencies
 
@@ -328,6 +342,13 @@
   renderer that never reached the bundle, and it is deleted. A host that links
   `/static/images/flags/<code>.svg`, from its own markup or from a meta `Image`, ships its own copy
   now. The tarball is **23 files / 3.3 MB unpacked (0.85 MB packed)**, from 289 / 5.6 MB / 1.4 MB.
+  The demo site stops serving them as well, so a link to the demo's copy stops resolving.
+- **The package records the third-party code it bundles.** `dist/index.js` carries 16 packages,
+  all MIT, that `package.json` cannot declare, because they are bundled rather than installed:
+  `npm sbom` reports none of them. Only two of their licence notices survived minification. The
+  build now writes the licence file of each one into `dist/THIRD-PARTY-LICENSES.txt`, and lists
+  them, with the vendored CSS, in a CycloneDX SBOM, `dist/sbom.cdx.json`, for scanners that read
+  one. The tarball is 25 files, 3.33 MB unpacked (0.86 MB packed).
 
 #### Tests and CI
 
@@ -356,6 +377,11 @@
   mapper defensive factories, Final Form subscription lifecycles, and popup action arguments.
 - Added a smoke contract covering every registered demo example and enforceable coverage
   thresholds for the renderer's critical files.
+- Every registered `view` is now rendered by a test, through the published entry and under
+  StrictMode, with no console output. The demo examples render 27 of the 37 when they first
+  paint. Each of the other ten gets a small declaration of its own, and the check fails when a
+  registered view is covered by neither. A browser pass found the `Upload` failure listed under
+  Fixes.
 - Added GitHub Actions checks for JavaScript/CSS lint, coverage, library build, and demo build.
 - Added a public-declaration gate against locked React 16/17/18 types in interop and direct
   CommonJS modes, including a check of the built package's callable runtime export.
@@ -380,6 +406,10 @@
 
 #### Fixes
 
+- **An upload that names no file formats renders.** A `view: "Upload"`, or an `Input` with
+  `type: "file"`, declared with neither `formats` nor a `fileType` that names a known preset threw
+  while rendering, so the node showed the render-error diagnostic instead of a drop zone. It now
+  renders and accepts any file, and its hover hint names no formats.
 - **A `float` Dropdown keeps its label above the selected value.** The wrapper never marked a
   dropdown with a value as completed, so the stylesheet's completed state did not apply: the
   label of a `float` dropdown fell back over the selection it named, and a multiple selection kept

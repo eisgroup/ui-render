@@ -36,6 +36,11 @@ const REQUIRED = [
     // node_modules/eis-ui-render/meta.schema.json, so a `files` change that drops it
     // silently removes IDE validation for every consumer.
     'meta.schema.json',
+    // What the bundle carries from other packages (scripts/third-party-inventory.js). MIT requires each
+    // licence notice to travel with every copy, and `dependencies` is empty, so the SBOM is the only
+    // record of them a consumer's scanner can read.
+    'dist/THIRD-PARTY-LICENSES.txt',
+    'dist/sbom.cdx.json',
     'dist/static/all.css',
     'static/all.css',
     'static/font.css',

@@ -306,6 +306,31 @@ input, select, textarea {
 }
 
 .ui.selection.dropdown {
+  // THE CONTROL IS INSIDE: the combobox is `> .text` (see `Listbox.tsx`), so the dropdown has focus
+  // WITHIN it rather than ON it. The interaction styles the shared block above gives `:focus`,
+  // repeated for `:focus-within`, here so that the rules below still follow them.
+  &:focus-within {
+    opacity: 1;
+    outline: 0;
+    box-shadow: none;
+    background-color: @input-background-color-interaction;
+    border-color: @input-color-active;
+
+    .inverted & {
+      border-color: @input-color-active-inverse;
+    }
+  }
+
+  &.readonly,
+  &[readonly],
+  &.disabled,
+  &:disabled {
+    &:focus-within {
+      box-shadow: none;
+      border-color: initial;
+    }
+  }
+
   &:extend(.flex--row.wrap all);
   &:extend(.min-height all);
 

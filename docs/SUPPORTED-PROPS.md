@@ -203,7 +203,7 @@ THE ARITHMETIC, derived from the installed `semantic-ui-react` rather than estim
 
 ### `Dropdown` — in-house, no semantic-ui-react
 
-`src/core/components/Dropdown.tsx`, 369 lines. Replaced the wrapper in §9.7-F1 step 3 part 2.
+`src/core/components/Dropdown.tsx`, 371 lines. Replaced the wrapper in §9.7-F1 step 3 part 2.
 
 The wrapper already owned the external API: the `onChange(value, name, event)` signature, option sanitisation, case-insensitive dedup on addition, and the cascading reset are all wrapper code, and none of it moved. Only the `<DropDown/>` element at the bottom changed — it is now the in-house `Listbox`, under the same import alias. Two entry points, and they differ: `mapper.tsx` imports the memoised default export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.ts` imports the NAMED export for `view: "Select"` — which is the majority path.
 
@@ -233,7 +233,7 @@ CSS contract: The loaded `modules/dropdown` LESS is the largest single semantic 
 | `lazyLoad` <br>*(has a default)* | Defer rendering options until opened; default true, and `mapper.tsx` passes false on the `view: "Dropdown"` path. Forwarded unchanged, and `Listbox` implements it the same way — the role census counts `option` only where it is false. |
 | `optionsLabel` | Extra disabled option appended to the bottom of the list. |
 | `initialValues` | Accepted and discarded — it exists only to keep the form stack's `initialValues` off the DOM. |
-| `readonly` | Translated to the control's `disabled` plus a `readonly` class, because neither Semantic's Dropdown nor a `role="listbox"` div has a `readOnly`. `disabled` has to be said three ways on a div: `aria-disabled`, `tabIndex={-1}`, and the open guards. |
+| `readonly` | Translated to the control's `disabled` plus a `readonly` class, because neither Semantic's Dropdown nor the `role="combobox"` div has a `readOnly`. `disabled` has to be said three ways on a div: `aria-disabled`, `tabIndex={-1}`, and the open guards. |
 | `onClickIcon` | Replaces the icon with a clickable `<Icon>` node. `Listbox` renders a caller's `icon` node in place of its own `<i class="icon dropdown">`. |
 | `required` | Adds the wrapper's `required` class. Newly DESTRUCTURED at step 3 part 2 rather than read off the rest bag: Semantic consumed `required` as a handled prop, so once the control became an open `<div role="listbox">` the same prop rendered as `required=""` on a div. Measured, then fixed. |
 | `translate` <br>*(has a default)* | The i18n function. Engine-owned, applied to option text, `label` and `placeholder`. CONSUMED, not stripped — destructured out at the top of the wrapper. It is also in ENGINE_PROPS, which is what catches it at other boundaries. |
@@ -241,7 +241,7 @@ CSS contract: The loaded `modules/dropdown` LESS is the largest single semantic 
 
 **Stripped at the DOM boundary.** `src/core/components/Dropdown.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `meta`, `@class`, `name`, `label`.
 
-**Passthrough.** `id`, `aria-*`, `style`, `data-*` and every event handler still reach the `<div role="listbox">` untouched, including the `onFocus`/`onBlur` the react-final-form adapter supplies — and they now reach it as real DOM handlers rather than as Semantic props. `ENGINE_PROPS` and `FIELD_ONLY_PROPS` are stripped twice on the way: once by the wrapper, once by `Listbox` at the element itself.
+**Passthrough.** `id`, `style`, `data-*` and every event handler still reach the dropdown element untouched, including the `onFocus`/`onBlur` the react-final-form adapter supplies — as real DOM handlers rather than as Semantic props, and they fire for the combobox inside it, because React's focus events bubble. `aria-*` reaches the combobox, the element that takes focus. `ENGINE_PROPS` and `FIELD_ONLY_PROPS` are stripped twice on the way: once by the wrapper, once by `Listbox` at the element itself.
 
 **Dropped (14) — the semver record.** Props semantic-ui-react handled that this implementation deliberately does not. All of them remain REACHABLE from a consumer meta: the component is rendered with open spreads (`...dropdown`), so an attribute nobody anticipated on a meta node still arrives here as a prop. That is why the component strips them explicitly and warns once per prop in development. Stripping matters because the value would otherwise reach a real element as an attribute — a string-valued one lands lowercase (`verticalAlign="top"` rendered `verticalalign="top"`) and a boolean draws React's "Received `true` for a non-boolean attribute" warning, both of them junk the DOM contract's tripwires exist to keep out. Warning matters because a meta still carrying one would otherwise never learn it stopped working, and React's own unknown-prop warning cannot be relied on: it is silent for a lowercase name.
 

@@ -40,6 +40,15 @@ describe('Upload', () => {
         expect(container.querySelector('.dropzone__hover')).toBeInTheDocument()
     })
 
+    it('accepts any file when neither formats nor a known fileType name one, and lists no types', () => {
+        // Rendering this used to throw: the hint read the formats as a string, and there were none.
+        const { container } = render(wrap(<Upload name="attachment" label="Attachment" />))
+        const hint = container.querySelector('.dropzone__hover')
+        expect(hint).toHaveTextContent('Upload Attachment File')
+        expect(hint.querySelector('.bold')).toBeNull()
+        expect(container.querySelector('input[type="file"]')).not.toHaveAttribute('accept')
+    })
+
     it('hides types hint when showTypes=false', () => {
         const { container } = render(
             wrap(<Upload fileType="image" name="img" showTypes={false} />)

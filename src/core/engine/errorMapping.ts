@@ -71,14 +71,25 @@ export function errorsProcessing(form: FormApi, meta: MetaNode) {
     }
 }
  */
+/**
+ * The report a host's `getValidationErrors` is handed: each field's error, as one message.
+ *
+ * Only a string is a message. The published contract promises one (`UIRenderValidationMessage.text`),
+ * and every validator a meta can name returns one. The one other thing that can reach here is a
+ * container field's error: final-form gives an array field the array of its items' errors, and each
+ * of those items is reported under its own field name already. Such an entry is left out, rather than
+ * handed on as an array that a host reading `text` as a string could not show.
+ */
 export const mapErrorObjectToUIFormat = (errors: Record<string, unknown>) => {
-  const result: Record<string, { messages: Array<{ text: unknown }> }> = {};
+  const result: Record<string, { messages: Array<{ text: string }> }> = {};
 
   Object.keys(errors).forEach(fieldName => {
+    const text = errors[fieldName]
+    if (typeof text !== 'string') return
     result[fieldName] = {
       messages: [
         {
-          text: errors[fieldName]
+          text
         }
       ]
     }

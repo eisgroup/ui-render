@@ -51,45 +51,42 @@ const example = id => {
     return found
 }
 
-const listboxes = () => screen.queryAllByRole('listbox')
-const optionsOf = listbox => within(listbox).queryAllByRole('option')
-const optionTexts = listbox => optionsOf(listbox).map(option => option.textContent)
+// The control is the combobox, and its options live in the listbox BESIDE it: WAI-ARIA's select-only
+// combobox (see `components/Listbox.tsx`). Every helper takes the control and finds its list from it.
+const controls = () => screen.queryAllByRole('combobox')
+const listOf = control => control.parentElement.querySelector('[role="listbox"]')
+const optionsOf = control => within(listOf(control)).queryAllByRole('option')
+const optionTexts = control => optionsOf(control).map(option => option.textContent)
 
 /** The option the control currently marks as chosen, through ARIA rather than a class. */
-const ariaSelected = listbox => optionsOf(listbox)
+const ariaSelected = control => optionsOf(control)
     .filter(option => option.getAttribute('aria-selected') === 'true')
     .map(option => option.textContent)
 
-const isExpanded = listbox => listbox.getAttribute('aria-expanded') === 'true'
+const isExpanded = control => control.getAttribute('aria-expanded') === 'true'
 
 /**
  * The KEYBOARD CURSOR, which since §9.7-F1 step 3 part 2 is a different thing from the selection.
  * The library committed the value as the arrows moved, so `aria-selected` was the cursor; the
- * in-house control moves a cursor and commits on Enter, and says where the cursor is the way a
- * listbox is supposed to — `aria-activedescendant` on the control, pointing at an option's id.
+ * in-house control moves a cursor and commits on Enter, and says where the cursor is the way the
+ * pattern asks — `aria-activedescendant` on the control, pointing at an option's id.
  */
-const cursorOf = listbox => {
-    const id = listbox.getAttribute('aria-activedescendant')
+const cursorOf = control => {
+    const id = control.getAttribute('aria-activedescendant')
     const at = id && document.getElementById(id)
     return at ? at.textContent : null
 }
 
 /**
- * What the control DISPLAYS as its current choice.
- *
- * The option list, when it is mounted at all, is part of the listbox's own text
- * (mapper.tsx passes `lazyLoad={false}` for `view: "Dropdown"` and leaves the
- * wrapper default for `view: "Select"`), so strip it. Written this way the
- * assertion survives either option-mounting strategy.
+ * What the control DISPLAYS as its current choice: its own text, now that the option list sits
+ * beside it rather than inside it. When the listbox was the control, the list (mounted when
+ * `mapper.tsx` passes `lazyLoad={false}` for `view: "Dropdown"`) was part of that text and had to
+ * be stripped off.
  */
-const displayed = listbox => {
-    const options = optionTexts(listbox).join('')
-    const text = listbox.textContent
-    return options && text.endsWith(options) ? text.slice(0, text.length - options.length) : text
-}
+const displayed = control => control.textContent
 
 /** A keystroke on the focused control, the way a user produces one: it bubbles. */
-const press = (listbox, key, keyCode) => fireEvent.keyDown(listbox, { key, keyCode })
+const press = (control, key, keyCode) => fireEvent.keyDown(control, { key, keyCode })
 
 describe('Select and Dropdown behavioural contract', () => {
     let consoleError
@@ -112,27 +109,27 @@ describe('Select and Dropdown behavioural contract', () => {
             // `dropdown_meta.json`: view Dropdown, options "categories", mapOptions
             // "categoryID" — so the visible option text is each row's categoryID.
             mountExample(example('dropdown'))
-            const listbox = screen.getByRole('listbox')
+            const control = screen.getByRole('combobox')
 
-            expect(isExpanded(listbox)).toBe(false)
-            expect(displayed(listbox)).toBe('Gold')
+            expect(isExpanded(control)).toBe(false)
+            expect(displayed(control)).toBe('Gold')
 
-            fireEvent.click(listbox)
+            fireEvent.click(control)
 
-            expect(isExpanded(listbox)).toBe(true)
-            expect(optionTexts(listbox)).toEqual(['Gold', 'Silver'])
-            expect(ariaSelected(listbox)).toEqual(['Gold'])
+            expect(isExpanded(control)).toBe(true)
+            expect(optionTexts(control)).toEqual(['Gold', 'Silver'])
+            expect(ariaSelected(control)).toEqual(['Gold'])
         })
 
         it('moves the chosen option and the displayed text when an option is clicked', () => {
             mountExample(example('dropdown'))
-            const listbox = screen.getByRole('listbox')
-            fireEvent.click(listbox)
+            const control = screen.getByRole('combobox')
+            fireEvent.click(control)
 
-            fireEvent.click(optionsOf(listbox)[1])
+            fireEvent.click(optionsOf(control)[1])
 
-            expect(displayed(screen.getByRole('listbox'))).toBe('Silver')
-            expect(ariaSelected(screen.getByRole('listbox'))).toEqual(['Silver'])
+            expect(displayed(screen.getByRole('combobox'))).toBe('Silver')
+            expect(ariaSelected(screen.getByRole('combobox'))).toEqual(['Silver'])
         })
 
         it('resolves a stable id binding to the option label it names', () => {
@@ -140,16 +137,16 @@ describe('Select and Dropdown behavioural contract', () => {
             // mapOptions {text: label, value: id}, so the control must display the
             // LABEL of the row whose id is P, not the id.
             mountExample(example('selectStableValue'))
-            const listbox = screen.getByRole('listbox')
+            const control = screen.getByRole('combobox')
 
-            expect(displayed(listbox)).toBe('Amount')
+            expect(displayed(control)).toBe('Amount')
 
-            fireEvent.click(listbox)
-            expect(optionTexts(listbox)).toEqual(['Basic', 'Standard', 'Amount'])
-            expect(ariaSelected(listbox)).toEqual(['Amount'])
+            fireEvent.click(control)
+            expect(optionTexts(control)).toEqual(['Basic', 'Standard', 'Amount'])
+            expect(ariaSelected(control)).toEqual(['Amount'])
 
-            fireEvent.click(optionsOf(listbox)[0])
-            expect(displayed(screen.getByRole('listbox'))).toBe('Basic')
+            fireEvent.click(optionsOf(control)[0])
+            expect(displayed(screen.getByRole('combobox'))).toBe('Basic')
         })
     })
 
@@ -179,15 +176,15 @@ describe('Select and Dropdown behavioural contract', () => {
             expect(sourceOrder).toEqual(['North', 'South', 'East', 'West'])
             expect(payloadOrder()).toEqual(['South', 'North', 'East', 'West'])
 
-            const listbox = screen.getByRole('listbox')
-            fireEvent.click(listbox)
+            const control = screen.getByRole('combobox')
+            fireEvent.click(control)
             // The options keep the SOURCE order regardless of the reordered payload —
             // otherwise the list would appear to shuffle itself under the user.
-            expect(optionTexts(listbox)).toEqual(sourceOrder)
+            expect(optionTexts(control)).toEqual(sourceOrder)
 
-            fireEvent.click(optionsOf(listbox)[2])
+            fireEvent.click(optionsOf(control)[2])
 
-            expect(displayed(screen.getByRole('listbox'))).toBe('East')
+            expect(displayed(screen.getByRole('combobox'))).toBe('East')
             expect(payloadOrder()).toEqual(['East', 'North', 'South', 'West'])
             // The index field is not part of the payload for this contract: order is.
             expect(getFormData().RegionSelection).toBeUndefined()
@@ -203,9 +200,9 @@ describe('Select and Dropdown behavioural contract', () => {
 
             expect(getFormData().selectedOption).toBe('P')
 
-            const listbox = screen.getByRole('listbox')
-            fireEvent.click(listbox)
-            fireEvent.click(optionsOf(listbox)[0])
+            const control = screen.getByRole('combobox')
+            fireEvent.click(control)
+            fireEvent.click(optionsOf(control)[0])
 
             expect(getFormData().selectedOption).toBe('B')
             expect(getFormData().categories.map(category => category.label)).toEqual(sourceOrder)
@@ -219,7 +216,7 @@ describe('Select and Dropdown behavioural contract', () => {
             // Category 1 has three products, Category 2 exactly one, so the reset is
             // visible in both the option list and the displayed value.
             mountExample(example('selectCascading'))
-            const [category, product] = listboxes()
+            const [category, product] = controls()
 
             expect(displayed(category)).toBe('Category 1')
             expect(displayed(product)).toBe('Alpha')
@@ -228,17 +225,17 @@ describe('Select and Dropdown behavioural contract', () => {
             expect(optionTexts(category)).toEqual(['Category 1', 'Category 2'])
             fireEvent.click(optionsOf(category)[1])
 
-            const [nextCategory, nextProduct] = listboxes()
+            const [nextCategory, nextProduct] = controls()
             expect(displayed(nextCategory)).toBe('Category 2')
             expect(displayed(nextProduct)).toBe('Delta')
 
             fireEvent.click(nextProduct)
-            expect(optionTexts(listboxes()[1])).toEqual(['Delta'])
+            expect(optionTexts(controls()[1])).toEqual(['Delta'])
         })
 
         it('cascades a stable string-valued select to the first option of the new parent', () => {
             mountExample(example('selectCascadingStable'))
-            const [group, item] = listboxes()
+            const [group, item] = controls()
 
             expect(displayed(group)).toBe('Group B')
             expect(displayed(item)).toBe('Gamma')
@@ -247,40 +244,40 @@ describe('Select and Dropdown behavioural contract', () => {
             expect(optionTexts(group)).toEqual(['Group A', 'Group B', 'Group C'])
             fireEvent.click(optionsOf(group)[2])
 
-            expect(displayed(listboxes()[0])).toBe('Group C')
-            expect(displayed(listboxes()[1])).toBe('Eta')
+            expect(displayed(controls()[0])).toBe('Group C')
+            expect(displayed(controls()[1])).toBe('Eta')
 
-            fireEvent.click(listboxes()[1])
-            expect(optionTexts(listboxes()[1])).toEqual(['Eta', 'Theta', 'Iota'])
+            fireEvent.click(controls()[1])
+            expect(optionTexts(controls()[1])).toEqual(['Eta', 'Theta', 'Iota'])
         })
     })
 
     describe('keyboard operation', () => {
         it('opens with ArrowDown, wraps the cursor, and closes on the cursor with Enter', () => {
             mountExample(example('selectCascading'))
-            fireEvent.focus(listboxes()[0])
+            fireEvent.focus(controls()[0])
 
             // ArrowDown on a closed control opens it AND advances the cursor one step,
             // so the cursor starts on the option after the current value. Unchanged by the
             // swap; what changed is that the cursor is read from `aria-activedescendant`
             // rather than from `aria-selected`, because moving no longer commits.
-            press(listboxes()[0], 'ArrowDown', 40)
-            expect(isExpanded(listboxes()[0])).toBe(true)
-            expect(cursorOf(listboxes()[0])).toBe('Category 2')
-            expect(ariaSelected(listboxes()[0])).toEqual(['Category 1'])
+            press(controls()[0], 'ArrowDown', 40)
+            expect(isExpanded(controls()[0])).toBe(true)
+            expect(cursorOf(controls()[0])).toBe('Category 2')
+            expect(ariaSelected(controls()[0])).toEqual(['Category 1'])
 
             // Two options, so the next step wraps back to the first.
-            press(listboxes()[0], 'ArrowDown', 40)
-            expect(cursorOf(listboxes()[0])).toBe('Category 1')
+            press(controls()[0], 'ArrowDown', 40)
+            expect(cursorOf(controls()[0])).toBe('Category 1')
 
-            press(listboxes()[0], 'ArrowDown', 40)
-            press(listboxes()[0], 'Enter', 13)
+            press(controls()[0], 'ArrowDown', 40)
+            press(controls()[0], 'Enter', 13)
 
             // Enter closes the list on whatever the cursor holds, through the same
             // engine path a click uses — so the dependent select cascades identically.
-            expect(isExpanded(listboxes()[0])).toBe(false)
-            expect(displayed(listboxes()[0])).toBe('Category 2')
-            expect(displayed(listboxes()[1])).toBe('Delta')
+            expect(isExpanded(controls()[0])).toBe(false)
+            expect(displayed(controls()[0])).toBe('Category 2')
+            expect(displayed(controls()[1])).toBe('Delta')
         })
 
         /**
@@ -298,20 +295,20 @@ describe('Select and Dropdown behavioural contract', () => {
          */
         it('moves the cursor without committing, so Escape leaves the value and the cascade alone', () => {
             mountExample(example('selectCascading'))
-            fireEvent.focus(listboxes()[0])
+            fireEvent.focus(controls()[0])
 
-            press(listboxes()[0], 'ArrowDown', 40)
-            expect(cursorOf(listboxes()[0])).toBe('Category 2')
+            press(controls()[0], 'ArrowDown', 40)
+            expect(cursorOf(controls()[0])).toBe('Category 2')
             // Neither the bound value nor the dependent select has moved.
-            expect(ariaSelected(listboxes()[0])).toEqual(['Category 1'])
-            expect(displayed(listboxes()[0])).toBe('Category 1')
-            expect(displayed(listboxes()[1])).toBe('Alpha')
+            expect(ariaSelected(controls()[0])).toEqual(['Category 1'])
+            expect(displayed(controls()[0])).toBe('Category 1')
+            expect(displayed(controls()[1])).toBe('Alpha')
 
-            press(listboxes()[0], 'Escape', 27)
+            press(controls()[0], 'Escape', 27)
 
-            expect(isExpanded(listboxes()[0])).toBe(false)
-            expect(displayed(listboxes()[0])).toBe('Category 1')
-            expect(displayed(listboxes()[1])).toBe('Alpha')
+            expect(isExpanded(controls()[0])).toBe(false)
+            expect(displayed(controls()[0])).toBe('Category 1')
+            expect(displayed(controls()[1])).toBe('Alpha')
         })
     })
 
@@ -334,15 +331,15 @@ describe('Select and Dropdown behavioural contract', () => {
 
         it('marks a readonly select disabled, takes it out of the tab order, and will not open it', () => {
             mountMeta(readonlyMeta, data, { form: true, initialValues: data })
-            const listbox = screen.getByRole('listbox')
+            const control = screen.getByRole('combobox')
 
-            expect(listbox).toHaveAttribute('aria-disabled', 'true')
-            expect(listbox).toHaveAttribute('tabindex', '-1')
+            expect(control).toHaveAttribute('aria-disabled', 'true')
+            expect(control).toHaveAttribute('tabindex', '-1')
 
-            fireEvent.click(listbox)
+            fireEvent.click(control)
 
-            expect(isExpanded(screen.getByRole('listbox'))).toBe(false)
-            expect(optionsOf(screen.getByRole('listbox'))).toEqual([])
+            expect(isExpanded(screen.getByRole('combobox'))).toBe(false)
+            expect(optionsOf(screen.getByRole('combobox'))).toEqual([])
         })
     })
 })

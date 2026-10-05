@@ -3,6 +3,11 @@
 `eis-ui-render` is licensed under Apache-2.0 (see `LICENSE`). It also distributes CSS derived from
 the third-party works below, in `static/all.css` and in the sources under `src/style/`.
 
+The JavaScript bundle, `dist/index.js`, carries third-party packages as well. Their licence files are
+not transcribed here: the build writes them into `dist/THIRD-PARTY-LICENSES.txt`, from the packages
+webpack actually bundles. It also lists every third-party component, the CSS below included, in the
+CycloneDX SBOM `dist/sbom.cdx.json` (`scripts/third-party-inventory.js`).
+
 This file exists because §9.7-F1 step 4 copies compiled `semantic-ui-less` CSS into this repository
 rather than importing it from `node_modules`. While the CSS was imported, each module carried its
 own `/*!` banner into the build and the banners survived minification. Once the CSS is vendored,

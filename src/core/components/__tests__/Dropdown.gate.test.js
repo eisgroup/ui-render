@@ -41,14 +41,17 @@ const withConfig = ui => (
     <ConfigContext.Provider value={initialConfigState}>{ui}</ConfigContext.Provider>
 )
 
-/** The control, by role — the one handle a listbox replacement cannot drop. */
-const listbox = container => container.querySelector('[role="listbox"]')
+/**
+ * The control, by role — the one handle a replacement cannot drop. A `combobox` since the control
+ * took WAI-ARIA's select-only combobox pattern; its options sit in the `listbox` beside it.
+ */
+const control = container => container.querySelector('[role="combobox"]')
 const optionTexts = container => Array.from(container.querySelectorAll('[role="option"]'))
     .map(option => option.textContent.trim())
 /** What the control shows as its current selection. */
 const displayed = container => container.querySelector('.text').textContent.trim()
 
-const open = container => { fireEvent.click(listbox(container)) }
+const open = container => { fireEvent.click(control(container)) }
 
 describe('the dropdown a user sees', () => {
     it('renders one listbox, closed, showing the first option', () => {
@@ -56,9 +59,10 @@ describe('the dropdown a user sees', () => {
             <Dropdown options={OPTIONS} name="region" onChange={() => {}}/>
         ))
 
+        expect(container.querySelectorAll('[role="combobox"]')).toHaveLength(1)
         expect(container.querySelectorAll('[role="listbox"]')).toHaveLength(1)
-        expect(listbox(container)).toHaveAttribute('aria-expanded', 'false')
-        expect(listbox(container)).toHaveAttribute('tabindex', '0')
+        expect(control(container)).toHaveAttribute('aria-expanded', 'false')
+        expect(control(container)).toHaveAttribute('tabindex', '0')
         // The first option is the wrapper's default selection, so it is what the control shows
         // before anyone touches it.
         expect(displayed(container)).toBe('Option A')
@@ -78,7 +82,7 @@ describe('the dropdown a user sees', () => {
         open(container)
 
         expect(optionTexts(container)).toEqual(['Option A', 'Option B'])
-        expect(listbox(container)).toHaveAttribute('aria-expanded', 'true')
+        expect(control(container)).toHaveAttribute('aria-expanded', 'true')
     })
 
     it('commits the option a user clicks, and reports it as (value, name, event)', () => {
@@ -106,7 +110,8 @@ describe('the dropdown a user sees', () => {
                       onChange={(...args) => calls.push(args)}/>
         ))
 
-        const attributes = Array.from(listbox(container).attributes).map(a => a.name)
+        // Both elements a spread can reach: the combobox takes `aria-*`, the dropdown the rest.
+        const attributes = [...control(container).attributes, ...control(container).parentElement.attributes].map(a => a.name)
         expect(attributes).not.toContain('view')
         expect(attributes).not.toContain('index')
         expect(attributes).not.toContain('name')
@@ -125,8 +130,8 @@ describe('the dropdown a user sees', () => {
             <Dropdown options={OPTIONS} name="region" readonly onChange={() => {}}/>
         ))
 
-        expect(listbox(container)).toHaveAttribute('tabindex', '-1')
-        expect(listbox(container).className).toContain('disabled')
+        expect(control(container)).toHaveAttribute('tabindex', '-1')
+        expect(control(container).parentElement.className).toContain('disabled')
 
         open(container)
 
@@ -135,45 +140,45 @@ describe('the dropdown a user sees', () => {
     })
 
     /**
-     * THE A11Y DEFECT INVENTORY, moved here from the browser leg's exclusive keeping. Both facts
-     * were tagged `[R->I]` in `e2e/reference.js` as though only a browser could see them; the
-     * step 3 part 1 audit measured both in jsdom, so they can be gated on every commit instead of
-     * only in the `browser` CI job. The browser leg keeps them too — it is what proves the
-     * accessibility TREE Chromium builds agrees with the attributes — but a replacement that
-     * regresses them now fails much earlier.
+     * THE A11Y DEFECT INVENTORY, EMPTIED. It was moved here from the browser leg's exclusive
+     * keeping: both facts were tagged `[R->I]` in `e2e/reference.js` as though only a browser could
+     * see them, and the step 3 part 1 audit measured both in jsdom, so they are gated on every
+     * commit. The browser leg keeps them too — it is what proves the accessibility TREE Chromium
+     * builds agrees with the attributes.
      *
-     * Pinned as CURRENT BEHAVIOUR, not as a contract to preserve: a WAI-ARIA listbox owes
-     * `aria-activedescendant` and the rest, and this one has none of them. Step 3's replacement
-     * should SHRINK the missing list, and the shrink is the diff that shows it.
+     * The swap dropped the `role="alert"` announcer, as §9.5 predicted ("all of them should go to
+     * ZERO at step 3"): the library wrote each selection into it, a workaround for a cursor that
+     * was not announceable. The swap made the cursor announceable (`aria-activedescendant`), and
+     * the combobox pattern then wired the rest, which is what the missing list was waiting for:
+     * `aria-haspopup` always, the label as the control's name, and `aria-controls` while the list
+     * it points at exists, which is while it is open.
      */
-    /**
-     * FLIPPED BY THE SWAP, and it is the outcome §9.5 predicted: it recorded that every `alert` in
-     * the corpus role census is one dropdown and that "all of them should go to ZERO at step 3".
-     * They have. The library announced a selection by writing it into a `role="alert" aria-live`
-     * node — a workaround for a listbox whose cursor was not announceable — and the in-house
-     * control does not need one: `aria-selected` marks the committed option and
-     * `aria-activedescendant` points at the cursor, which is how a listbox is supposed to say both.
-     *
-     * `aria-activedescendant` appears only while open and only once there is a cursor, so a closed
-     * control still carries none of the combobox attributes — which is why the absence list below
-     * keeps four of its five names.
-     */
-    it('drops the `role="alert"` announcer, having made the cursor announceable instead', () => {
+    it('drops the `role="alert"` announcer, and wires the combobox pattern instead', () => {
         const { container } = render(withConfig(
-            <Dropdown options={OPTIONS} name="region" onChange={() => {}}/>
+            <Dropdown options={OPTIONS} name="region" label="Region" onChange={() => {}}/>
         ))
 
         expect(container.querySelectorAll('[role="alert"]')).toHaveLength(0)
 
-        // Closed: no cursor, so nothing to point at yet.
-        const present = ['aria-activedescendant', 'aria-controls', 'aria-haspopup', 'aria-labelledby', 'aria-label']
-            .filter(attribute => listbox(container).hasAttribute(attribute))
-        expect(present).toEqual([])
+        const present = () => ['aria-activedescendant', 'aria-controls', 'aria-haspopup', 'aria-labelledby', 'aria-label']
+            .filter(attribute => control(container).hasAttribute(attribute))
 
-        // Open and move: the cursor is now announceable, which is what replaced the alert.
+        // Closed: it says it has a list and is named after its label. No cursor yet, and the
+        // list's id exists only while open, so nothing else points anywhere.
+        expect(present()).toEqual(['aria-haspopup', 'aria-label'])
+        expect(control(container)).toHaveAttribute('aria-haspopup', 'listbox')
+        expect(control(container)).toHaveAttribute('aria-label', 'Region')
+
+        // Open and move: the cursor is announceable, which is what replaced the alert, and the
+        // control points at its list, which carries the same name.
         open(container)
-        fireEvent.keyDown(listbox(container), { key: 'ArrowDown' })
-        expect(listbox(container)).toHaveAttribute('aria-activedescendant')
+        fireEvent.keyDown(control(container), { key: 'ArrowDown' })
+        expect(present()).toEqual(['aria-activedescendant', 'aria-controls', 'aria-haspopup', 'aria-label'])
+        const list = document.getElementById(control(container).getAttribute('aria-controls'))
+        expect(list).toHaveAttribute('role', 'listbox')
+        expect(list).toHaveAttribute('aria-label', 'Region')
+        expect(document.getElementById(control(container).getAttribute('aria-activedescendant')))
+            .toHaveAttribute('role', 'option')
     })
 
     it('follows a cascading parent: new options, and the stale value replaced', () => {

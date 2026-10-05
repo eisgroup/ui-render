@@ -407,8 +407,8 @@ const KEYBOARD = {
  * replacement is SUPPOSED to change most of these.
  */
 const DROPDOWN = {
-    /** [R] The class string step 4's CSS contract is keyed on. */
-    LISTBOX_CLASS: 'ui selection dropdown',
+    /** [R] The class string step 4's CSS contract is keyed on: the dropdown element, around the combobox. */
+    DROPDOWN_CLASS: 'ui selection dropdown',
     /**
      * [R] Per rendered dropdown, in the `dropdown` example. `alert: 1` was here until §9.7-F1 step
      * 3 part 2 removed it — see `ALERT_ANNOUNCES_SELECTED_VALUE` — and `presentation: 1` arrived in
@@ -416,8 +416,13 @@ const DROPDOWN = {
      * `option`s, and a div with no role there would break the owned-element relationship the
      * pattern requires. This census counts EVERY `[role]`, including the ones that mean "no
      * semantics", which is why it moved in both directions.
+     *
+     * AND THEN `combobox: 1` REPLACED `presentation: 1` (2026-10-05), with WAI-ARIA's select-only
+     * combobox pattern: the `.menu` is the `listbox` now, which owns the options, and the `.text`
+     * beside it is the `combobox` that takes focus. Beside rather than inside, measured in this
+     * browser: with the dropdown itself as the combobox, the open list folded into its value.
      */
-    ROLES: { listbox: 1, option: 2, presentation: 1 },
+    ROLES: { combobox: 1, listbox: 1, option: 2 },
     /**
      * [R] Whether the options are in the DOM while the list is CLOSED — and it depends on the entry
      * point, which an earlier version of this note did not say. It called the fact "the single most
@@ -436,7 +441,7 @@ const DROPDOWN = {
      * comparison has to name which one it means.
      */
     OPTIONS_PRESENT_WHEN_CLOSED: { dropdownView: 2, selectView: 0 },
-    /** [I] Reachable by Tab (`tabindex=0`) and `aria-expanded` tracks the open state honestly. */
+    /** [I] The combobox is reachable by Tab (`tabindex=0`), and `aria-expanded` tracks the open state honestly. */
     TAB_REACHABLE: true,
     ARIA_EXPANDED_CLOSED: 'false',
     ARIA_EXPANDED_OPEN: 'true',
@@ -453,9 +458,12 @@ const DROPDOWN = {
      */
     ALERT_ANNOUNCES_SELECTED_VALUE: false,
     /**
-     * [R->I] The combobox wiring a WAI-ARIA listbox owes and this one does not have. Pinned as a
-     * defect inventory: step 3's replacement should shrink this list, and a shrink is the diff that
-     * shows it.
+     * [I] The combobox wiring, which this entry inventoried as MISSING until 2026-10-05, when the
+     * control adopted the pattern: `aria-haspopup` always, and while the list is open `aria-controls`,
+     * pointing at the listbox beside the control, and `aria-activedescendant`, pointing at the cursor.
+     *
+     * THE INVENTORY IT REPLACED, kept as history. It pinned the wiring a WAI-ARIA listbox lacked, so
+     * that step 3's replacement would shrink the list, and a shrink would be the diff that shows it.
      *
      * NOT browser-only, which the tag alone implies and the step 3 part 1 audit disproved: both
      * this list and `ALERT_ANNOUNCES_SELECTED_VALUE` are attribute facts, and attributes are
@@ -465,10 +473,16 @@ const DROPDOWN = {
      *
      * SHRANK BY ONE AT STEP 3 PART 2, and the shrink is the diff that was supposed to show it:
      * `aria-activedescendant` is now emitted while the list is open, pointing at the cursor option.
-     * The remaining four are `combobox`-pattern wiring, and adopting that pattern is a separate
-     * decision from replacing the implementation — the control is still a `listbox`, as it was.
+     * The remaining four were `combobox`-pattern wiring, and adopting that pattern was a separate
+     * decision from replacing the implementation. It was taken on 2026-10-05.
      */
-    MISSING_ARIA: ['aria-controls', 'aria-haspopup', 'aria-labelledby', 'aria-label'],
+    WIRED_ARIA: { always: ['aria-haspopup'], whileOpen: ['aria-controls', 'aria-activedescendant'] },
+    /**
+     * [R] What is still absent here, and why it is not the control's to supply: the `dropdown`
+     * example's meta declares no `label`, so the control has no name to carry. A dropdown that
+     * declares one carries it as `aria-label`, on the combobox and its list (`Dropdown.gate.test.js`).
+     */
+    UNNAMED_IN_THIS_EXAMPLE: ['aria-labelledby', 'aria-label'],
 }
 
 module.exports = { BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, INLINE, WIDGET, TOUCH, KEYBOARD, DROPDOWN }

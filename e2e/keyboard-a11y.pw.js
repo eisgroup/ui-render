@@ -137,19 +137,19 @@ test.describe('dropdown: the step 3 starting state', () => {
 
     test('[R] options exist in the DOM whether the list is open or closed', async ({ page }) => {
         await openExample(page)
-        const listbox = page.locator('#dropdown [role="listbox"]').first()
+        const control = page.locator('#dropdown [role="combobox"]').first()
         const options = page.locator('#dropdown [role="option"]')
 
-        await expect(listbox).toHaveClass(DROPDOWN.LISTBOX_CLASS)
-        await expect(listbox).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_CLOSED)
+        await expect(control.locator('xpath=..')).toHaveClass(DROPDOWN.DROPDOWN_CLASS)
+        await expect(control).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_CLOSED)
         await expect(options).toHaveCount(DROPDOWN.OPTIONS_PRESENT_WHEN_CLOSED.dropdownView)
 
-        await listbox.click()
-        await expect(listbox).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_OPEN)
+        await control.click()
+        await expect(control).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_OPEN)
         await expect(options, '"open" is a CSS state here, not presence').toHaveCount(DROPDOWN.ROLES.option)
 
         await page.keyboard.press('Escape')
-        await expect(listbox).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_CLOSED)
+        await expect(control).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_CLOSED)
     })
 
     /**
@@ -162,70 +162,84 @@ test.describe('dropdown: the step 3 starting state', () => {
     test('[R] ...but a `view: "Select"` mounts none of them until it opens', async ({ page }) => {
         await page.goto('/examples#selectCascading')
         await page.locator('#selectCascading.expanded').waitFor()
-        const listbox = page.locator('#selectCascading [role="listbox"]').first()
+        const control = page.locator('#selectCascading [role="combobox"]').first()
+        // Its options live in the listbox beside it, inside the same dropdown element.
+        const options = control.locator('xpath=..').locator('[role="option"]')
 
-        await expect(listbox).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_CLOSED)
-        await expect(listbox.locator('[role="option"]'))
-            .toHaveCount(DROPDOWN.OPTIONS_PRESENT_WHEN_CLOSED.selectView)
+        await expect(control).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_CLOSED)
+        await expect(options).toHaveCount(DROPDOWN.OPTIONS_PRESENT_WHEN_CLOSED.selectView)
 
-        await listbox.click()
-        await expect(listbox).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_OPEN)
-        await expect(listbox.locator('[role="option"]').first(),
-            'opening is what mounts them on this path').toBeVisible()
+        await control.click()
+        await expect(control).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_OPEN)
+        await expect(options.first(), 'opening is what mounts them on this path').toBeVisible()
     })
 
-    test('[I] the listbox is reachable by Tab and opens from the keyboard', async ({ page }) => {
+    test('[I] the combobox is reachable by Tab and opens from the keyboard', async ({ page }) => {
         await openExample(page)
-        const listbox = page.locator('#dropdown [role="listbox"]').first()
-        await expect(listbox).toHaveAttribute('tabindex', '0')
+        const control = page.locator('#dropdown [role="combobox"]').first()
+        await expect(control).toHaveAttribute('tabindex', '0')
         expect(DROPDOWN.TAB_REACHABLE).toBe(true)
 
-        await listbox.focus()
-        expect(await activeElement(page)).toMatchObject({ role: 'listbox' })
+        await control.focus()
+        expect(await activeElement(page)).toMatchObject({ role: 'combobox' })
         await page.keyboard.press('ArrowDown')
-        await expect(listbox).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_OPEN)
+        await expect(control).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_OPEN)
     })
 
-    test('[R->I] the combobox wiring it does not have', async ({ page }) => {
+    test('[I] the combobox wiring, and the name this example does not give it', async ({ page }) => {
         await openExample(page)
-        const listbox = page.locator('#dropdown [role="listbox"]').first()
-        await listbox.click()
-
-        // A defect inventory, so step 3's replacement can be judged by how much of it disappears.
-        const present = []
-        for (const attribute of DROPDOWN.MISSING_ARIA) {
-            if (await listbox.getAttribute(attribute) !== null) present.push(attribute)
+        const control = page.locator('#dropdown [role="combobox"]').first()
+        const has = async attributes => {
+            const present = []
+            for (const attribute of attributes) {
+                if (await control.getAttribute(attribute) !== null) present.push(attribute)
+            }
+            return present
         }
-        expect(present, 'reference.js lists these as ABSENT; if one appeared, update the reference').toEqual([])
+
+        expect(await has(DROPDOWN.WIRED_ARIA.always)).toEqual(DROPDOWN.WIRED_ARIA.always)
+        await control.focus()
+        await page.keyboard.press('ArrowDown')
+        expect(await has(DROPDOWN.WIRED_ARIA.whileOpen)).toEqual(DROPDOWN.WIRED_ARIA.whileOpen)
+
+        // The list it points at is the listbox beside it, not one inside it.
+        const listId = await control.getAttribute('aria-controls')
+        await expect(page.locator(`#${listId}`)).toHaveAttribute('role', 'listbox')
+        expect(await control.evaluate((node, id) => {
+            const list = document.getElementById(id)
+            return node.parentElement === list.parentElement && !node.contains(list)
+        }, listId)).toBe(true)
+
+        expect(await has(DROPDOWN.UNNAMED_IN_THIS_EXAMPLE), 'the example declares no label').toEqual([])
     })
 
     /**
-     * THE ONE THAT LEFT THE LIST, asserted positively here rather than only by its absence above.
-     * `aria-activedescendant` is how a listbox says where its keyboard cursor is, and it is what
+     * THE ONE THAT LEFT THE LIST FIRST, asserted on its own because it moves. `aria-activedescendant`
+     * is how the control says where its keyboard cursor is, and it is what
      * replaced the `role="alert"` announcement. jsdom pins the attribute; only a browser can say
      * that the accessibility tree agrees — that the id resolves to a node the tree exposes as an
      * option, and that the cursor MOVES rather than being emitted once.
      */
-    test('[I] the open listbox names its cursor with `aria-activedescendant`', async ({ page }) => {
+    test('[I] the open combobox names its cursor with `aria-activedescendant`', async ({ page }) => {
         await openExample(page)
-        const listbox = page.locator('#dropdown [role="listbox"]').first()
+        const control = page.locator('#dropdown [role="combobox"]').first()
 
-        await listbox.focus()
-        await expect(listbox).not.toHaveAttribute('aria-activedescendant', /./)
+        await control.focus()
+        await expect(control).not.toHaveAttribute('aria-activedescendant', /./)
 
         await page.keyboard.press('ArrowDown')
-        const first = await listbox.getAttribute('aria-activedescendant')
+        const first = await control.getAttribute('aria-activedescendant')
         expect(first).toBeTruthy()
         await expect(page.locator(`#${first}`)).toHaveAttribute('role', 'option')
         expect(await page.locator(`#${first}`).evaluate(node => node.textContent)).toBeTruthy()
 
         await page.keyboard.press('ArrowDown')
-        const second = await listbox.getAttribute('aria-activedescendant')
+        const second = await control.getAttribute('aria-activedescendant')
         expect(second, 'the cursor has to move, not just exist').not.toBe(first)
         await expect(page.locator(`#${second}`)).toHaveAttribute('role', 'option')
 
         // Closing takes the cursor with it: there is no cursor when there is no open list.
         await page.keyboard.press('Escape')
-        await expect(listbox).not.toHaveAttribute('aria-activedescendant', /./)
+        await expect(control).not.toHaveAttribute('aria-activedescendant', /./)
     })
 })

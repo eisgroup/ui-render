@@ -111,6 +111,36 @@ describe('mapErrorObjectToUIFormat', () => {
         expect(result.email.messages).toHaveLength(1)
         expect(result.email.messages[0].text).toBe('Invalid email')
     })
+
+    // The contract publishes `text: string`, and a host is entitled to read it as one.
+    it('leaves out an entry whose error is not a string', () => {
+        const result = mapErrorObjectToUIFormat({
+            'items': [{ name: 'Name is Required' }],
+            'items[0].name': 'Name is Required',
+            'group': { child: 'Invalid value' },
+            'count': 3,
+        })
+        expect(result).toEqual({ 'items[0].name': { messages: [{ text: 'Name is Required' }] } })
+    })
+
+    // The one non-string that reaches the report: an array field's error, which final-form builds
+    // from its items' errors. The item is reported under its own name, so nothing is lost.
+    it('reports an array field through its items, not as the array of their errors', () => {
+        const fieldStates = {
+            'items': { name: 'items', error: [{ name: 'Required' }], touched: true },
+            'items[0].name': { name: 'items[0].name', error: 'Required', touched: true },
+        }
+        const form = {
+            getRegisteredFields: () => Object.keys(fieldStates),
+            getFieldState: name => fieldStates[name],
+        }
+        errorsProcessing(form, {})
+
+        expect(Object.keys(errorsFor(form))).toEqual(['items', 'items[0].name'])
+        expect(mapErrorObjectToUIFormat(errorsFor(form))).toEqual({
+            'items[0].name': { messages: [{ text: 'Name is Required' }] },
+        })
+    })
 })
 
 describe('convertFieldNameToTitleCaseText', () => {

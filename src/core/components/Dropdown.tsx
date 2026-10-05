@@ -63,7 +63,7 @@ localiseTranslation({
  *
  * Removing a feature is not the whole job: SUIR's Dropdown declared every one of these as a
  * handled prop, so passing one used to be quietly harmless. `Listbox` has an open rest spread onto
- * its `<div role="listbox">`, so without this strip they would become ATTRIBUTES — measured, not
+ * its dropdown element, so without this strip they would become ATTRIBUTES — measured, not
  * feared: `required` rendered as `required=""` on a div, and `clearable` produced React's
  * "Received `true` for a non-boolean attribute" warning. Failing loudly with an actionable message
  * is better than either.
@@ -165,7 +165,7 @@ export function Dropdown ({
   onClickIcon,
   // Read for the wrapper's own `required` class. Destructured rather than read off the rest bag
   // because it has to be CONSUMED: SUIR declared `required` as a handled prop, and `Listbox`
-  // would put it on the `<div role="listbox">` as `required=""`.
+  // would put it on its dropdown element as `required=""`.
   required,
   translate = Active.translate,
   value: valueFromParent,
@@ -327,6 +327,8 @@ export function Dropdown ({
     }, className)} style={style}>
       {label && !float && <Text className="input__label">{translate(label)}</Text>}
       <DropDown
+        // The control's name. A meta's own `aria-label` or `aria-labelledby` rides the spread below and wins.
+        aria-label={label ? translate(label) : undefined}
         aria-describedby={helpId}
         className={classNames({info, readonly})}
         // A cast, not a guard: the sanitiser made objects of strings and numbers, and anything
@@ -336,8 +338,8 @@ export function Dropdown ({
         error={!!error}
         lazyLoad={lazyLoad}
         value={dropdownValue}
-        // DOM boundary: `Listbox` spreads whatever it does not destructure onto its
-        // <div role="listbox">, exactly as Semantic's Dropdown did (and neither declares a
+        // DOM boundary: `Listbox` spreads whatever it does not destructure onto its dropdown
+        // element (and `aria-*` onto the combobox inside it), as Semantic's Dropdown did (and neither declares a
         // `name`), so engine props and `name`/`label` would become attributes there. Filtered
         // here, AFTER the props.onClose assignment above, and without touching the `props.name`
         // that handler reports to the host. `Listbox` strips again at its own edge because that
@@ -348,8 +350,8 @@ export function Dropdown ({
       {label && float && <Text className="input__label">{translate(label)}</Text>}
       {(error || info) &&
       /*
-       * `${id}-help`, not `id`. The caller's `id` also rides the rest bag onto Semantic's
-       * `<div role="listbox">`, so this View used to give TWO elements the same id — invalid, and
+       * `${id}-help`, not `id`. The caller's `id` also rides the rest bag onto the dropdown
+       * element, so this View used to give TWO elements the same id — invalid, and
        * reachable without the caller doing anything, because `mapper.tsx` assigns `input.id`
        * automatically for relative paths. The derived id is also what `aria-describedby` on the
        * control now points at: the error and info text was rendered but never announced.

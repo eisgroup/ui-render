@@ -42,6 +42,16 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
  *   they are here — this is the half of the keyboard matrix that had to be BUILT rather than
  *   ported, and the half no previous test covered.
  *
+ * THE COMBOBOX PATTERN, AND WHY IT IS THE `.text` THAT TAKES FOCUS. The control follows WAI-ARIA's
+ * select-only combobox: the element that takes focus is a `combobox` (`aria-haspopup`, `aria-expanded`,
+ * `aria-controls` and `aria-activedescendant` on it, the field's label as its name), and the options sit
+ * in a `listbox` BESIDE it. Beside, not inside, and this was measured: with the dropdown itself as the
+ * combobox, Chromium folded the open list into its value, which read "Gold Gold" for a selected "Gold".
+ * So the combobox is `> .text`, the part that shows the selection, and the dropdown is only the box that
+ * holds it, its icon and its list: it keeps the class string, the handlers and every prop except
+ * `aria-*`, which belongs where focus is. It has focus WITHIN it now rather than ON it, which is why
+ * `dropdown.overrides` and `input.less` repeat each of its focus styles for `:focus-within`.
+ *
  * THE CLASS STRING IS A CONTRACT, NOT DECORATION. `css.dropdown-contract.test.js` measures what
  * each token is worth in scoped CSS rules: `ui` and `dropdown` are worth all 13 rules that reach
  * the control and `selection` 12; the icon needs BOTH `icon` and `dropdown` on the same element;
@@ -63,7 +73,7 @@ export type ListboxOption = {
 /** What closes the list: an option's click or key, a click outside, or none, from the trigger. */
 export type ListboxCloseEvent = React.SyntheticEvent | MouseEvent | undefined
 
-/** The named props are read here; the rest is spread onto the `<div role="listbox">`. */
+/** The named props are read here. `aria-*` goes to the combobox, and the rest onto the dropdown. */
 export type ListboxProps = {
     options?: ListboxOption[]
     value?: unknown
@@ -199,6 +209,7 @@ export default function Listbox ({
     // Enter. -1 means "no cursor yet", so opening puts it on the selected option.
     const [cursor, setCursor] = React.useState(-1)
     const host = React.useRef<HTMLDivElement>(null)
+    const control = React.useRef<HTMLDivElement>(null)
     const typed = React.useRef({ prefix: '', at: 0 })
 
     const selectedIndex = options.findIndex(option => String(option.value) === String(value))
@@ -309,33 +320,60 @@ export default function Listbox ({
 
     const showOptions = open || !lazyLoad
 
+    // `aria-*` describes the control, so it goes where focus is; everything else stays on the dropdown,
+    // where it always landed. The list is named after the control, as the pattern asks.
+    const passthrough = omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)
+    const ariaProps: Record<string, unknown> = {}
+    const dropdownProps: Record<string, unknown> = {}
+    Object.keys(passthrough).forEach(key => {
+        (key.startsWith('aria-') ? ariaProps : dropdownProps)[key] = passthrough[key]
+    })
+
     return (
         <div
             ref={host}
-            role="listbox"
-            aria-expanded={open ? 'true' : 'false'}
-            aria-activedescendant={open && cursor !== -1 ? `${idPrefix}-${cursor}` : undefined}
-            // A `role="listbox"` div cannot carry the native `disabled` attribute, so being
-            // unavailable has to be SAID: `aria-disabled` for assistive technology, `tabIndex={-1}`
-            // for the tab order, and the guards in `openWith`/`onKeyDown` for the behaviour. The
-            // library said all three, and `readonly` fields in the corpus rely on it.
-            aria-disabled={disabled ? 'true' : undefined}
-            tabIndex={disabled ? -1 : 0}
             // `ui` and `dropdown` are worth every scoped rule that reaches this element, and
             // `selection` all but one — see the file header and `css.dropdown-contract.test.js`.
             className={classNames('ui', { active: open, visible: open, error, disabled, compact, upward },
                 { selection }, 'dropdown', className)}
-            onClick={() => (open ? close() : openWith())}
+            // A click anywhere on the dropdown, its icon and its padding included, focuses the control
+            // as it did when the dropdown was the control: the keyboard must work after a click.
+            onClick={() => {
+                if (!disabled && control.current) control.current.focus()
+                return open ? close() : openWith()
+            }}
             onKeyDown={onKeyDown}
-            {...omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)}
+            {...dropdownProps}
         >
             {/* `divider` is Semantic's name for "this is the selection display", and it is worth
-                two of this node's six rules. */}
-            <div className={classNames('text', 'divider', { default: !selected })}>
+                two of this node's six rules. It is the combobox too: see the file header. */}
+            <div
+                ref={control}
+                role="combobox"
+                aria-haspopup="listbox"
+                aria-expanded={open ? 'true' : 'false'}
+                aria-controls={open ? idPrefix : undefined}
+                aria-activedescendant={open && cursor !== -1 ? `${idPrefix}-${cursor}` : undefined}
+                // A `role="combobox"` div cannot carry the native `disabled` attribute, so being
+                // unavailable has to be SAID: `aria-disabled` for assistive technology, `tabIndex={-1}`
+                // for the tab order, and the guards in `openWith`/`onKeyDown` for the behaviour. The
+                // library said all three, and `readonly` fields in the corpus rely on it.
+                aria-disabled={disabled ? 'true' : undefined}
+                tabIndex={disabled ? -1 : 0}
+                className={classNames('text', 'divider', { default: !selected })}
+                {...ariaProps}
+            >
                 {selected ? (selected.content != null ? selected.content : selected.text) : placeholder}
             </div>
             {icon != null ? icon : <i aria-hidden="true" className="icon dropdown"/>}
-            <div className={classNames('menu', 'transition', { visible: open })} role="presentation">
+            {/* The id exists only while open, as the options' do, so `aria-controls` never dangles. */}
+            <div
+                id={open ? idPrefix : undefined}
+                role="listbox"
+                aria-label={ariaProps['aria-label'] as string | undefined}
+                aria-labelledby={ariaProps['aria-labelledby'] as string | undefined}
+                className={classNames('menu', 'transition', { visible: open })}
+            >
                 {showOptions && options.map((option, index) => (
                     <div
                         key={option.key != null ? option.key : String(option.value)}

@@ -20,13 +20,24 @@
  * NEVER `-u` to make a red pure refactor (§9.2/§9.3) go green: for those commits a
  * diff here is the finding, and the whole reason this layer exists.
  *
- * THE LAST DELIBERATE REGENERATION, and what the diff was — 2026-10-01, the `done` Dropdown fix,
+ * THE LAST DELIBERATE REGENERATION, and what the diff was — 2026-10-05, the combobox pattern
+ * (`components/Listbox.tsx`), across 12 of the 38 examples: 17 dropdowns, three lines each, and
+ * nothing else.
+ *   - the dropdown element loses `role="listbox"`, `aria-expanded` and `tabindex`. It keeps its
+ *     class string, and the two that carry an `id` keep that;
+ *   - its `.text` gains them as the `combobox`, with `aria-haspopup="listbox"`;
+ *   - its `.menu` is the `listbox`, where it was `presentation`.
+ * The two dropdowns that declare a `label` carry it as `aria-label`, on the combobox and on its list.
+ * Measured in Chromium before the `-u`: the combobox's value is the selection alone ("Gold", where
+ * a listbox inside it read "Gold Gold"), and every focus style computes as it did.
+ *
+ * THE ONE BEFORE IT, and what its diff was — 2026-10-01, the `done` Dropdown fix,
  * across 5 of the 38 examples. One change, 6 lines: each dropdown wrapper with a value gained `done`
  * (`class="flex--col input--wrapper done ..."`). The wrapper had read `done` from a `props.value`
  * that `value` never reaches, so no dropdown wrapper was ever `done`; see `Dropdown.done-state.test.js`.
  * Nothing else in the corpus moved: the commits, the `translate` calls and every other line agree.
  *
- * THE ONE BEFORE IT, and what its diff was — §9.7-F1 step 3 part 2, the dropdown swap, across 11 of
+ * AND THE ONE BEFORE THAT — §9.7-F1 step 3 part 2, the dropdown swap, across 11 of
  * the 38 examples. Six changes, each accounted for before the `-u`:
  *   - the `role="alert" aria-live="polite" aria-atomic="true"` on the selected-value node is GONE.
  *     Semantic announced the current value as an alert; the corpus role census dropped 12 `alert`
