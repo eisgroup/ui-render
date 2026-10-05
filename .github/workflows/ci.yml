@@ -82,6 +82,12 @@ jobs:
       - name: Build library
         run: npm run build-lib
 
+      # The coverage run above comes before the build, so the parity suite's checks of the published
+      # stylesheet always skip there. This runs the suite again on the built `static/all.css`; under
+      # jest.built-css.config.js a missing file fails instead of skipping.
+      - name: Check the built stylesheet
+        run: npm run test:css:built
+
       - name: Check public TypeScript declarations
         run: npm run test:types:consumer
 
