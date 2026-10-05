@@ -369,6 +369,11 @@
   mapper defensive factories, Final Form subscription lifecycles, and popup action arguments.
 - Added a smoke contract covering every registered demo example and enforceable coverage
   thresholds for the renderer's critical files.
+- Every registered `view` is now rendered by a test, through the published entry and under
+  StrictMode, with no console output. The demo examples render 27 of the 37 when they first
+  paint. Each of the other ten gets a small declaration of its own, and the check fails when a
+  registered view is covered by neither. A browser pass found the `Upload` failure listed under
+  Fixes.
 - Added GitHub Actions checks for JavaScript/CSS lint, coverage, library build, and demo build.
 - Added a public-declaration gate against locked React 16/17/18 types in interop and direct
   CommonJS modes, including a check of the built package's callable runtime export.
@@ -393,6 +398,10 @@
 
 #### Fixes
 
+- **An upload that names no file formats renders.** A `view: "Upload"`, or an `Input` with
+  `type: "file"`, declared with neither `formats` nor a `fileType` that names a known preset threw
+  while rendering, so the node showed the render-error diagnostic instead of a drop zone. It now
+  renders and accepts any file, and its hover hint names no formats.
 - **A `float` Dropdown keeps its label above the selected value.** The wrapper never marked a
   dropdown with a value as completed, so the stylesheet's completed state did not apply: the
   label of a `float` dropdown fell back over the selection it named, and a multiple selection kept
