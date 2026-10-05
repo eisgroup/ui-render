@@ -210,6 +210,9 @@
 
 #### Select and Dropdown
 
+- **A dropdown near the bottom of the window opens upward.** Without an `upward` prop, the list is
+  measured as it opens, and goes up when it does not fit below and there is more room above. A
+  given `upward` still decides.
 - **The select is ours now, and its keyboard behaviour changed on purpose.** `Select` and
   `Dropdown` no longer use `semantic-ui-react` — no file in the library does. What you see and the
   props you write are the same; the keyboard is not, and the change is a fix rather than a
@@ -410,6 +413,9 @@
 
 #### Fixes
 
+- **A click on a controlled `ProgressSteps` is no longer lost.** With `activeIndex` bound to
+  state, any render of the document within 50 ms of the click, new `data` from the host for
+  example, dropped it. Only a change of `activeIndex` itself supersedes a click now.
 - **A paginated table follows its rows when they shrink.** When fewer rows arrived than the chosen
   page needed, for example 12 rows with page 3 of 25 open, the table showed no rows while its
   pagination marked the last page as current. It now shows that last page.
