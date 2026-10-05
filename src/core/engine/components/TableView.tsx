@@ -185,6 +185,10 @@ function sortRows (items: TableItem[], sorts: TableSort[] | undefined) {
  * One thing changed, and a test pins it. The expansion handlers wrote a copy of `this.state` back,
  * so of two calls in one batch only the last survived, and a toggle of every row lost to an
  * expansion batched after it. They now update from the current state, so every call applies.
+ *
+ * When the items shrink below the chosen page, the page moves back to the last one, corrected during
+ * render as the sort state is. It used to stay: the body rendered no rows, while `Pagination`, which
+ * clamps the page it shows, marked the last page as current.
  */
 function TableView (props: TableViewProps) {
   const {items, headers: headersProp, sorts: sortsProp} = props
@@ -445,9 +449,12 @@ function TableView (props: TableViewProps) {
   const allRows = itemsSorted
   let rows = allRows
   const totalPages = Math.ceil(rows.length / rowsPerPage)
+  // A page past the end, once the items shrink, is the last page: the one `Pagination` shows.
+  const page = Math.min(activePage, Math.max(totalPages, 1))
+  if (page !== activePage) setState(current => ({...current, activePage: page}))
 
   if (usePagination && totalPages > 1) {
-    rows = rows.slice((activePage - 1) * rowsPerPage, activePage * rowsPerPage)
+    rows = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage)
   }
 
   // Extra "add row" must use the next index in the full data array (allRows.length), not the paginated slice length.
@@ -493,7 +500,7 @@ function TableView (props: TableViewProps) {
       {usePagination && totalPages > 1 && (
         <ScrollView row styleInner={{ justifyContent: 'center', marginTop: 20 }} classNameInner="fill-width" fill={fill}>
           <Pagination
-            activePage={activePage}
+            activePage={page}
             totalPages={totalPages}
             onPageChange={self.handlePaginationChange}
           />
