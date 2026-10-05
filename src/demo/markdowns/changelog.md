@@ -377,6 +377,10 @@
   mapper defensive factories, Final Form subscription lifecycles, and popup action arguments.
 - Added a smoke contract covering every registered demo example and enforceable coverage
   thresholds for the renderer's critical files.
+- CI now checks the stylesheet it ships. The checks that `static/all.css` lets nothing escape
+  `.ui-render` ran only when a build happened to be present, and CI runs the suite before it builds,
+  so they never ran there. A step after the library build runs them on the built file, and fails if
+  it is missing.
 - Every registered `view` is now rendered by a test, through the published entry and under
   StrictMode, with no console output. The demo examples render 27 of the 37 when they first
   paint. Each of the other ten gets a small declaration of its own, and the check fails when a
@@ -406,6 +410,9 @@
 
 #### Fixes
 
+- **A paginated table follows its rows when they shrink.** When fewer rows arrived than the chosen
+  page needed, for example 12 rows with page 3 of 25 open, the table showed no rows while its
+  pagination marked the last page as current. It now shows that last page.
 - **An upload that names no file formats renders.** A `view: "Upload"`, or an `Input` with
   `type: "file"`, declared with neither `formats` nor a `fileType` that names a known preset threw
   while rendering, so the node showed the render-error diagnostic instead of a drop zone. It now

@@ -12,8 +12,8 @@
  *
  * Cost: the LESS compile is ~0.7 s and each PostCSS pass ~30 ms, so running the real pipeline in Jest is
  * cheap enough to gate on every run — no built artifact required. The published artifact is cross-checked
- * as well when it happens to be present (see the last describe block), which is what proves this in-process
- * reproduction matches what `npm run build-lib` emits.
+ * as well when it is present (see the last describe block), which is what proves this in-process
+ * reproduction matches what `npm run build-lib` emits. CI requires it, after the build: `npm run test:css:built`.
  *
  * WHAT THIS PINS, AND WHY IT DOES NOT FIX ANYTHING
  * -----------------------------------------------
@@ -375,14 +375,23 @@ describe('CSS pipeline parity — final CSS, post-PostCSS (§9.5)', () => {
  * regardless of what any concurrent process does, which is the property worth having.
  *
  * Reading once, at load, makes this suite correct regardless: it either has the bytes it checked
- * for, or it skips. CI is unaffected either way — it runs jest before `build-lib`, so these three
- * always skip there, which is what the describe name says.
+ * for, or it skips.
+ *
+ * WHY CI RUNS THIS FILE TWICE. CI runs jest before `build-lib`, so in the coverage run these checks
+ * always skip, and until 2026-10-05 nothing in CI ever read the stylesheet it ships. The verify job now
+ * runs this file again after the build, under `jest.built-css.config.js`. That config sets
+ * `REQUIRE_BUILT_CSS`, and then a missing `static/all.css` fails rather than skips.
  */
+const REQUIRE_BUILT = global.REQUIRE_BUILT_CSS === true;
 const publishedCssAtLoad = fs.existsSync(PUBLISHED_CSS) ? fs.readFileSync(PUBLISHED_CSS, 'utf8') : null;
-const describeIfBuilt = publishedCssAtLoad !== null ? describe : describe.skip;
+const describeIfBuilt = publishedCssAtLoad !== null || REQUIRE_BUILT ? describe : describe.skip;
 
-describeIfBuilt('published static/all.css (needs `npm run build-lib` — skipped when absent)', () => {
+describeIfBuilt('published static/all.css (after `npm run build-lib`; skipped when absent, unless required)', () => {
     const publishedCss = publishedCssAtLoad;
+
+    it('is there to check', () => {
+        if (publishedCss === null) throw new Error(`${PUBLISHED_CSS} is missing: run \`npm run build-lib\` first`);
+    });
 
     it('leaks the same global selectors as the in-process webpack pipeline', () => {
         expect(occurrenceCounts(globalRuleInventory(publishedCss))).toEqual(H8_LEAK_OCCURRENCES);

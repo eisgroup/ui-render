@@ -48,6 +48,7 @@
     "test:types": "npm run build-lib && npm run test:types:consumer",
     "test:types:consumer": "node scripts/test-public-types.js",
     "test:pack": "npm run build-lib && npm run test:pack:budget && npm run test:pack:consumer",
+    "test:css:built": "jest --config jest.built-css.config.js",
     "test:pack:budget": "node scripts/check-package-budget.js",
     "test:pack:consumer": "node scripts/test-packed-consumer.js",
     "test:pack:peers": "node scripts/test-packed-react-matrix.js",

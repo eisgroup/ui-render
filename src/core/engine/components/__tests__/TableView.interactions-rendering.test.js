@@ -421,23 +421,43 @@ describe('TableView state, caches and renderers', () => {
     expect(container).not.toHaveTextContent('Table has no data!')
   })
 
-  it('keeps the chosen page when the items shrink below it, and then renders no rows', () => {
-    // A CANDIDATE DEFECT, pinned rather than fixed: the page is never brought back into range.
-    const scrollIntoView = Element.prototype.scrollIntoView
-    Element.prototype.scrollIntoView = () => {}
-    try {
-      const items = Array.from({length: 25}, (_, index) => ({name: `R${index}`}))
-      const tableWith = rows => <TableView items={rows} headers={[{id: 'name'}]} usePagination rowsPerPage={10} {...defaults}/>
-      const {container, getByLabelText, rerender} = render(withForm(tableWith(items)))
+  describe('when the items shrink below the chosen page', () => {
+    // The page used to stay, and a page past the end rendered no rows, while `Pagination`, which clamps
+    // the page it shows, marked the last one as current.
+    const items = Array.from({length: 25}, (_, index) => ({name: `R${index}`}))
+    const tableWith = rows => <TableView items={rows} headers={[{id: 'name'}]} usePagination rowsPerPage={10} {...defaults}/>
+    let scrollIntoView
+    beforeEach(() => {
+      scrollIntoView = Element.prototype.scrollIntoView
+      Element.prototype.scrollIntoView = () => {}
+    })
+    afterEach(() => {
+      Element.prototype.scrollIntoView = scrollIntoView
+    })
 
+    it('moves to the last page, the one the pagination shows', () => {
+      const {container, getByLabelText, rerender} = render(withForm(tableWith(items)))
       fireEvent.click(getByLabelText('Page 3'))
       expect(bodyRowTexts(container)).toEqual(['R20', 'R21', 'R22', 'R23', 'R24'])
 
       rerender(withForm(tableWith(items.slice(0, 12))))
-      expect(bodyRowTexts(container)).toEqual([])
-    } finally {
-      Element.prototype.scrollIntoView = scrollIntoView
-    }
+
+      expect(bodyRowTexts(container)).toEqual(['R10', 'R11'])
+      expect(getByLabelText('Page 2')).toHaveAttribute('aria-current', 'page')
+    })
+
+    it('keeps the corrected page when they grow again', () => {
+      const {container, getByLabelText, rerender} = render(withForm(tableWith(items)))
+      fireEvent.click(getByLabelText('Page 3'))
+
+      // One page needs no pagination, and the page it corrects to is the first.
+      rerender(withForm(tableWith(items.slice(0, 5))))
+      expect(bodyRowTexts(container)).toEqual(['R0', 'R1', 'R2', 'R3', 'R4'])
+
+      rerender(withForm(tableWith(items)))
+      expect(bodyRowTexts(container)).toEqual(['R0', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9'])
+      expect(getByLabelText('Page 1')).toHaveAttribute('aria-current', 'page')
+    })
   })
 
   it('renders under StrictMode without a warning', () => {
