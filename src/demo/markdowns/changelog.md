@@ -138,6 +138,8 @@
   build; with Semantic gone the pin was re-examined and lifted. The compiled stylesheet is
   byte-for-byte identical — same SHA-256 before and after — so nothing about how the library looks
   changes. This only matters if you build the demo or the stylesheet from source.
+- `package.json` pins npm 11.9.0, the npm that comes with Node 24.14.0, in `packageManager`. npm
+  ignores the field. Corepack, once enabled for npm, runs that version.
 
 #### Dependencies
 
@@ -341,6 +343,12 @@
   `/static/images/flags/<code>.svg`, from its own markup or from a meta `Image`, ships its own copy
   now. The tarball is **23 files / 3.3 MB unpacked (0.85 MB packed)**, from 289 / 5.6 MB / 1.4 MB.
   The demo site stops serving them as well, so a link to the demo's copy stops resolving.
+- **The package records the third-party code it bundles.** `dist/index.js` carries 16 packages,
+  all MIT, that `package.json` cannot declare, because they are bundled rather than installed:
+  `npm sbom` reports none of them. Only two of their licence notices survived minification. The
+  build now writes the licence file of each one into `dist/THIRD-PARTY-LICENSES.txt`, and lists
+  them, with the vendored CSS, in a CycloneDX SBOM, `dist/sbom.cdx.json`, for scanners that read
+  one. The tarball is 25 files, 3.33 MB unpacked (0.86 MB packed).
 
 #### Tests and CI
 

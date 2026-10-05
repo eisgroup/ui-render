@@ -6,12 +6,15 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 import lessOptionsModule from './scripts/less-options.js';
+import thirdPartyInventory from './scripts/third-party-inventory.js';
 import { sourceRules } from './webpack.common.mjs'
 const { lessOptions } = lessOptionsModule;
+const { ThirdPartyInventoryPlugin, VENDORED_CSS } = thirdPartyInventory;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const ROOT_STATIC = path.resolve(__dirname, 'static');
+const MANIFEST = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf8'));
 const DIST_STATIC = path.resolve(__dirname, 'dist/static');
 
 /** Point a `dist/static/` stylesheet at the single real copy in the root `static/` payload. */
@@ -84,6 +87,10 @@ export default {
         new MiniCssExtractPlugin({
             filename: 'static/all.css',
         }),
+        // What the bundle carries from other packages, read from the chunks webpack emits:
+        // dist/THIRD-PARTY-LICENSES.txt and the CycloneDX SBOM dist/sbom.cdx.json
+        // (scripts/third-party-inventory.js). `dependencies` is empty, so nothing else names them.
+        new ThirdPartyInventoryPlugin({ root: MANIFEST, vendored: VENDORED_CSS }),
         {
             apply(compiler) {
                 // `output.clean` only covers dist/. The root `static/` payload lives outside it, so wipe it here

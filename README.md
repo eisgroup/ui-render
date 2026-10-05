@@ -244,6 +244,9 @@ verified to server-render on Node 22 and 24). Building this repository is a diff
 version in `.nvmrc`, which is what CI installs.
 
 1. Install [Node.js](https://nodejs.org/), if you haven't already — use the version in `.nvmrc` (v24).
+   Node 24.14.0 comes with npm 11.9.0, the version `package.json` pins in `packageManager`. npm itself
+   ignores that field. Corepack reads it once it is enabled for npm (`corepack enable npm`), and then
+   runs exactly that version. CI does neither: it runs the npm that comes with its Node 24.
 2. Navigate to project root folder and install dependencies by running this command in terminal:
 
 ### `npm install`
@@ -287,6 +290,9 @@ before changing an assertion.
   This also synchronizes every tracked `data-version` attribute.
 - Inspect the package contents with `npm pack --dry-run`.
   The `prepack` lifecycle verifies version synchronization and builds the library automatically.
+- The build writes what the bundle carries from other packages into `dist/`: the licence file of
+  each one in `THIRD-PARTY-LICENSES.txt`, and a CycloneDX SBOM in `sbom.cdx.json`. A bundled package
+  with no licence file fails the build.
 - Verify the artifact with `npm run test:pack`. It enforces the packaging budgets and then packs,
   extracts and server-renders the tarball in a throwaway consumer that has only the three peer
   dependencies available. CI runs both gates on every pull request.
