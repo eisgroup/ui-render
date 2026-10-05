@@ -246,7 +246,7 @@ version in `.nvmrc`, which is what CI installs.
 1. Install [Node.js](https://nodejs.org/), if you haven't already — use the version in `.nvmrc` (v24).
    Node 24.14.0 comes with npm 11.9.0, the version `package.json` pins in `packageManager`. npm itself
    ignores that field. Corepack reads it once it is enabled for npm (`corepack enable npm`), and then
-   runs exactly that version. CI does neither: it runs the npm that comes with its Node 24.
+   runs exactly that version. CI does not enable corepack: it runs the npm that comes with its Node 24.
 2. Navigate to project root folder and install dependencies by running this command in terminal:
 
 ### `npm install`
