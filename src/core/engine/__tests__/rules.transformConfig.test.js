@@ -32,6 +32,26 @@ describe('toOpenLConfig', () => {
         expect(out.onChange).toBe('doIt')
     })
 
+    it('leaves an option list the meta declares as it is, so each option keeps its own value', () => {
+        // Mapped like a bound list, every option became its own text, and the node failed to render.
+        const options = [{ text: 'Apple', value: 'a' }, { text: 'Pear', value: 'p' }]
+        for (const view of [FIELD.TYPE.SELECT, FIELD.TYPE.DROPDOWN]) {
+            const out = toOpenLConfig({ view, name: 'fruit', options })
+            expect(out.onChange).toBe('setState,fruit')
+            expect(out.options).toEqual(options)
+            expect(out).not.toHaveProperty('mapOptions')
+        }
+    })
+
+    it('still maps plain values, a bound list, and a declared list given mapOptions, by index', () => {
+        const mapped = meta => toOpenLConfig({ view: FIELD.TYPE.SELECT, name: 'x', ...meta }).mapOptions
+        expect(mapped({ options: ['Apple', 'Pear'] })).toEqual({ text: undefined, value: '{index}' })
+        expect(mapped({ options: 'fruitList' })).toEqual({ text: undefined, value: '{index}' })
+        expect(mapped({ options: [{ label: 'Apple' }], mapOptions: 'label' })).toEqual({ text: 'label', value: '{index}' })
+        expect(mapped({ options: [{ label: 'Apple', id: 'a' }], mapOptions: { text: 'label', value: 'id' } }))
+            .toEqual({ text: 'label', value: 'id' })
+    })
+
     it('defaults Table.headers[0].renderCell to Expand when renderItem is present', () => {
         const meta = {
             view: FIELD.TYPE.TABLE,
@@ -74,6 +94,21 @@ describe('initSelectStatesFromData', () => {
         const instance = { state: {} }
         initSelectStatesFromData(meta, { fruit: 2 }, instance)
         expect(instance.state.fruit).toBe('2')
+    })
+
+    it('seeds a declared option list from its first option own value when the data has none', () => {
+        const meta = toOpenLConfig({
+            view: FIELD.TYPE.DROPDOWN,
+            name: 'fruit',
+            options: [{ text: 'Apple', value: 'a' }, { text: 'Pear', value: 'p' }],
+        })
+        const empty = { state: {} }
+        initSelectStatesFromData(meta, {}, empty)
+        expect(empty.state.fruit).toBe('a')
+
+        const given = { state: {} }
+        initSelectStatesFromData(meta, { fruit: 'p' }, given)
+        expect(given.state.fruit).toBe('p')
     })
 
     it('seeds instance.state from stable-value mapping', () => {

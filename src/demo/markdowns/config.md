@@ -373,9 +373,7 @@ so dependent fields using `{state.fieldName,fallback}` in their paths will re-re
 ```js
 {
   compact: Boolean,
-  multiple: Boolean,
-  search: Boolean,       // searchable options
-  options: [{ text: 'Label', value: 'internal value' }],
+  options: [{ text: 'Label', value: 'internal value' }], // used as declared, see below
   mapOptions: Object,    // data mapper (ex: {value: "{index}", text: "planName"})
   // Note: mapOptions.value = "{index}" stores selected value as String index.
   // Use a persistent key (e.g. mapOptions.value = "id") to keep value stable.
@@ -386,6 +384,16 @@ so dependent fields using `{state.fieldName,fallback}` in their paths will re-re
   },
 }
 ```
+
+An `options` list written in the meta is used as declared, as `Input` with `type: 'select'` uses it:
+each option keeps its own `value`, and that is what the field and `state` receive. Without a value in
+the data, `state` starts at the first option's value. `mapOptions` applies to options bound from the
+data and to a list of plain values, which are mapped by index.
+
+A `value` bound to `state`, as above, shows the selection only while `state` holds a number, such as
+an option's index: the engine clears a binding that resolves to a string it cannot find in the data.
+So bind `value` to `state` with index values (`mapOptions.value = "{index}"`). With a declared list,
+leave `value` unbound, and the control keeps its own selection.
 
 #### Select with Dynamic State (Cascading Selects)
 

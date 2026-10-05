@@ -150,4 +150,29 @@ describe('UI Render consumer-level regression guards', () => {
         expect(view.container.querySelector('.tabs__content')).toHaveTextContent('C3')
         jest.useRealTimers()
     })
+
+    it('applies a click on a controlled ProgressSteps even when data re-renders inside the transition', () => {
+        jest.useFakeTimers()
+        const meta = {
+            view: 'ProgressSteps',
+            activeIndex: {name: '{state.step,0}'},
+            onChange: {name: 'setState', args: ['step']},
+            items: [
+                {label: 'One', content: {view: 'Text', children: 'S1'}},
+                {label: 'Two', content: {view: 'Text', children: 'S2'}},
+                {label: 'Three', content: {view: 'Text', children: 'S3'}},
+            ],
+        }
+        const view = render(<UIRender meta={meta} data={{n: 1}}/>)
+
+        fireEvent.click(view.container.querySelectorAll('.app__progress__step button')[2])
+        act(() => { jest.advanceTimersByTime(10) })
+        // Controlled, every parent render used to supersede the pending click, even with the
+        // index unchanged, so the host's new data dropped it; the step never reached the state.
+        view.rerender(<UIRender meta={meta} data={{n: 2}}/>)
+        act(() => { jest.advanceTimersByTime(200) })
+
+        expect(view.container.querySelector('.tabs__content')).toHaveTextContent('S3')
+        jest.useRealTimers()
+    })
 })

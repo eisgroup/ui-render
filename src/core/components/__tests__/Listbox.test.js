@@ -653,3 +653,64 @@ describe('the combobox pattern', () => {
         expect(seen).toEqual(['focus', 'blur'])
     })
 })
+
+describe('which way the list opens', () => {
+    // jsdom lays nothing out, so every box is measured as 0 and nothing flips there. These place the
+    // dropdown in jsdom's 768 px viewport and give the list 200 px.
+    const VIEWPORT = window.innerHeight
+    const placed = top => function rect () {
+        if (this.getAttribute('role') === 'listbox') return { top: 0, bottom: 0, height: 200 }
+        if (this.classList.contains('dropdown')) return { top, bottom: top + 30, height: 30 }
+        return { top: 0, bottom: 0, height: 0 }
+    }
+    const upwardOf = control => control.parentElement.classList.contains('upward')
+    let measure
+    afterEach(() => measure && measure.mockRestore())
+
+    it('opens upward when the list does not fit below and there is more room above', () => {
+        measure = jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(placed(VIEWPORT - 60))
+        const { control } = drive()
+
+        fireEvent.click(control)
+        expect(upwardOf(control)).toBe(true)
+
+        fireEvent.click(control)
+        expect(upwardOf(control)).toBe(false)
+    })
+
+    it('opens downward when the list fits below', () => {
+        measure = jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(placed(100))
+        const { control } = drive()
+
+        fireEvent.click(control)
+
+        expect(upwardOf(control)).toBe(false)
+    })
+
+    it('measures again each time it opens', () => {
+        measure = jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(placed(VIEWPORT - 60))
+        const { control } = drive()
+        fireEvent.click(control)
+        expect(upwardOf(control)).toBe(true)
+        fireEvent.click(control)
+
+        measure.mockImplementation(placed(100))
+        fireEvent.click(control)
+
+        expect(upwardOf(control)).toBe(false)
+    })
+
+    it('leaves the direction to an `upward` prop that is given', () => {
+        measure = jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(placed(VIEWPORT - 60))
+        const down = drive({ upward: false })
+        fireEvent.click(down.control)
+        expect(upwardOf(down.control)).toBe(false)
+        down.unmount()
+
+        measure.mockImplementation(placed(100))
+        const up = drive({ upward: true })
+        expect(upwardOf(up.control)).toBe(true)
+        fireEvent.click(up.control)
+        expect(upwardOf(up.control)).toBe(true)
+    })
+})

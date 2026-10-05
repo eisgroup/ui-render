@@ -63,9 +63,13 @@ const normalizeIndex = (value: number | string | undefined, items: ProgressStep[
  * `UNSAFE_componentWillReceiveProps` re-derived the active step whenever the parent rendered. That
  * lifecycle's trigger is a new props object, not a changed value, so the derivation below compares
  * the props object: a re-render for this component's own state keeps the same one.
- *  - A controlled `activeIndex` wins on every parent render, and a click still in its transition
- *    loses to it: the class cleared that timer outright; here the click is marked superseded and
- *    drops itself when it fires, which keeps render free of side effects.
+ *  - A controlled `activeIndex` that differs from the active step wins, and a click still in its
+ *    transition loses to it: the class cleared that timer outright; here the click is marked
+ *    superseded and drops itself when it fires, which keeps render free of side effects.
+ *  - A parent render that leaves `activeIndex` where it is does not drop the click. The class did,
+ *    on every parent render, so a document that re-rendered within the 50 ms (a host passing new
+ *    `data`, an AutoSubmit, a popup) swallowed the click. The engine's `Tabs` stopped doing the same
+ *    for the same reason (its note on `itemsChanged`).
  *  - Uncontrolled, only an index the items no longer have is reset, to the first step.
  *  - A click shows the new step after a 50 ms transition, and the timer reads the items and
  *    `onChange` as they are when it fires, as it read `this.props`.
@@ -93,10 +97,8 @@ export default function ProgressSteps (props: ProgressStepsProps) {
   if (props !== propsSeen) {
     setPropsSeen(props)
     const nextIndex = normalizeIndex(activeIndexProp != null ? activeIndexProp : state.activeIndex, items)
-    if (activeIndexProp != null) {
-      setOverrides(overrides + 1)
-      update({activeIndex: nextIndex, transition: false})
-    } else if (nextIndex !== state.activeIndex) {
+    if (nextIndex !== state.activeIndex) {
+      if (activeIndexProp != null) setOverrides(overrides + 1)
       update({activeIndex: nextIndex, transition: false})
     }
   }
