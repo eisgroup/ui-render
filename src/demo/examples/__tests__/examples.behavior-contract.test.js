@@ -73,6 +73,12 @@ const CENSUS_ROLES = [
  *     `layout` carry options at mount and `selectStableValue` does not. If the
  *     replacement changes when options are mounted, these entries move.
  *
+ * `combobox` REPLACED `presentation`, ONE FOR ONE, when the control took WAI-ARIA's select-only
+ * combobox pattern (`components/Listbox.tsx`). The `.menu` div is the `listbox` now, the options'
+ * owner, and the `.text` beside it is the `combobox` that takes focus. So every example that carried
+ * `listbox: N, presentation: N` carries `combobox: N, listbox: N`: the same N, one per dropdown, and
+ * no other role moved. The note below is the step before that one.
+ *
  * `presentation` REPLACED `alert`, ONE FOR ONE, and the arithmetic is worth stating because it is
  * the evidence that nothing else moved: every example that carried `alert: N` now carries
  * `presentation: N` for the same N, and no example gained or lost one. Both come from the same
@@ -97,8 +103,9 @@ const CENSUS_ROLES = [
  *
  * Everything else is the durable part: an example with a `Table` must still expose
  * `table`/`rowgroup`/`row`/`columnheader`/`cell`, and a `Select`/`Dropdown` must
- * still expose a `listbox` (or, if the rewrite adopts the WAI-ARIA combobox
- * pattern, `combobox` — a deliberate, reviewable change of this literal).
+ * still expose a `combobox` and its `listbox`. (It exposed a `listbox` alone until it
+ * adopted the combobox pattern, the deliberate, reviewable change of this literal that
+ * this note foresaw.)
  *
  * Examples with an EMPTY entry are a finding, not an oversight: `expandList`,
  * `tabs`, `tabsButtoned`, `upload` and `uploadVariants` render no interactive role
@@ -109,20 +116,20 @@ const CENSUS_ROLES = [
  * `summaryBox` are legitimately text-only.
  */
 const ROLE_CENSUS = {
-    dropdown: { listbox: 1, option: 2, presentation: 1 },
-    dropdownExperience: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 9, listbox: 2, option: 5, presentation: 2 },
-    selectIndexValue: { listbox: 1, presentation: 1 },
-    selectStableValue: { listbox: 1, presentation: 1 },
-    selectCascading: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 9, listbox: 2, presentation: 2 },
-    selectCascadingStable: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 12, listbox: 2, presentation: 2 },
-    selectReorder: { table: 1, rowgroup: 2, row: 5, columnheader: 3, cell: 12, listbox: 1, presentation: 1 },
+    dropdown: { listbox: 1, option: 2, combobox: 1 },
+    dropdownExperience: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 9, listbox: 2, option: 5, combobox: 2 },
+    selectIndexValue: { listbox: 1, combobox: 1 },
+    selectStableValue: { listbox: 1, combobox: 1 },
+    selectCascading: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 9, listbox: 2, combobox: 2 },
+    selectCascadingStable: { table: 1, rowgroup: 2, row: 3, columnheader: 3, cell: 12, listbox: 2, combobox: 2 },
+    selectReorder: { table: 1, rowgroup: 2, row: 5, columnheader: 3, cell: 12, listbox: 1, combobox: 1 },
     buttonIcon: { button: 1 },
     buttonDownload: { button: 1 },
     input: { textbox: 1 },
     inputIntegerMin0: { textbox: 2 },
     inputToggle: { checkbox: 2 },
     decimal: { table: 1, rowgroup: 2, row: 3, columnheader: 1, cell: 2 },
-    layout: { listbox: 1, option: 2, presentation: 1 },
+    layout: { listbox: 1, option: 2, combobox: 1 },
     list: { textbox: 2 },
     expandList: {},
     tabList: { textbox: 1 },
@@ -138,15 +145,15 @@ const ROLE_CENSUS = {
     tablePagination: { table: 1, rowgroup: 2, row: 6, columnheader: 5, cell: 25, button: 7, navigation: 1 },
     pieChart: { img: 2 },
     popupContent: { table: 1, rowgroup: 2, row: 3, columnheader: 6, cell: 12, button: 1, checkbox: 1 },
-    ratingDetails: { table: 1, rowgroup: 2, row: 6, columnheader: 3, cell: 15, listbox: 1, option: 2, presentation: 1 },
-    rowListRelativeData: { table: 1, rowgroup: 2, row: 5, columnheader: 5, cell: 10, listbox: 1, option: 2, presentation: 1 },
+    ratingDetails: { table: 1, rowgroup: 2, row: 6, columnheader: 3, cell: 15, listbox: 1, option: 2, combobox: 1 },
+    rowListRelativeData: { table: 1, rowgroup: 2, row: 5, columnheader: 5, cell: 10, listbox: 1, option: 2, combobox: 1 },
     showIf: {},
     summaryBox: {},
     upload: {},
     uploadVariants: {},
     slider: { slider: 6 },
-    invalidArray: { table: 2, rowgroup: 4, row: 2, columnheader: 9, listbox: 1, img: 1, presentation: 1 },
-    all: { table: 3, rowgroup: 6, row: 10, columnheader: 18, cell: 31, button: 4, checkbox: 1, listbox: 3, option: 4, img: 2, presentation: 3 },
+    invalidArray: { table: 2, rowgroup: 4, row: 2, columnheader: 9, listbox: 1, img: 1, combobox: 1 },
+    all: { table: 3, rowgroup: 6, row: 10, columnheader: 18, cell: 31, button: 4, checkbox: 1, listbox: 3, option: 4, img: 2, combobox: 3 },
 }
 
 /**
@@ -186,10 +193,23 @@ const FORM_BINDINGS = {
 // accessible name — and since that step a tooltip does not open on tap either, so the control was
 // unlabelled for touch as well as for assistive technology. A fall here is progress and needs this
 // number lowered with it; a rise means a new nameless control just shipped.
-const NAMELESS_CONTROLS = { total: 117, nameless: 81 }
+// 81 -> 79 with the combobox pattern: a dropdown that declares a `label` is now named by it
+// (`aria-label` on the combobox), and two in the corpus do. The total stays 117: the combobox took
+// the listbox's place as the control, and the listbox it drives is its popup, not a control.
+const NAMELESS_CONTROLS = { total: 117, nameless: 79 }
 
 /** Roles that count as an interactive control for the ledger above. */
 const CONTROL_ROLES = ['textbox', 'spinbutton', 'checkbox', 'combobox', 'listbox', 'slider', 'button']
+
+/**
+ * A listbox a combobox drives is that control's popup, not a control of its own: focus never lands on
+ * it, and the combobox carries the name assistive technology announces (`components/Listbox.tsx`).
+ * Counting it would count every dropdown twice. A listbox that stands alone still counts.
+ */
+const isComboboxPopup = element => element.getAttribute('role') === 'listbox' && !!element.parentElement
+    // Its siblings, not `:scope >`: jsdom builds that selector from the parent's id, and a field id
+    // such as `Settings.Record.GroupList,,,.ItemSelection.ui` is not a valid one.
+    && Array.from(element.parentElement.children).some(sibling => sibling.getAttribute('role') === 'combobox')
 
 const censusOf = () => CENSUS_ROLES.reduce((census, role) => {
     const count = screen.queryAllByRole(role, { hidden: true }).length
@@ -280,11 +300,12 @@ describe('demo example behavioural contract', () => {
         for (const example of EXAMPLES) {
             const { unmount } = mountExample(example)
             for (const role of CONTROL_ROLES) {
-                const all = screen.queryAllByRole(role, { hidden: true }).length
+                const all = screen.queryAllByRole(role, { hidden: true }).filter(element => !isComboboxPopup(element)).length
                 // The `name` option runs dom-testing-library's accessible-name
                 // computation (label/aria-label/aria-labelledby/content), so this is the
                 // same name assistive technology would announce.
-                const named = screen.queryAllByRole(role, { hidden: true, name: /\S/ }).length
+                const named = screen.queryAllByRole(role, { hidden: true, name: /\S/ })
+                    .filter(element => !isComboboxPopup(element)).length
                 total += all
                 nameless += all - named
             }

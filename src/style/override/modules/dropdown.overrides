@@ -8,7 +8,8 @@
 // For styles affecting layout, edit inside `input.less`
 .ui.selection.dropdown {
   &.active,
-  @{select-interaction} {
+  @{select-interaction},
+  &:focus-within {
     i.icon.dropdown {
       color: @color-primary;
 
@@ -18,10 +19,29 @@
     }
   }
 
-  &:focus {
+  &:focus,
+  &:focus-within {
     .inverted & {
       border-color: @color-primary-light !important;
     }
+  }
+
+  // THE CONTROL IS INSIDE: the combobox is `> .text` (see `Listbox.tsx`), so the dropdown has focus
+  // WITHIN it rather than ON it. Semantic's two focus rules, repeated for `:focus-within`…
+  &:focus-within {
+    border-color: #96C8DA;
+    box-shadow: none;
+
+    .menu {
+      border-color: #96C8DA;
+      box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15);
+    }
+  }
+
+  // …and the combobox draws no ring of its own: the dropdown's border shows focus, as it always did.
+  > .text[role="combobox"]:focus {
+    .no-outline();
+    border-radius: 0;
   }
 
   // Focus state

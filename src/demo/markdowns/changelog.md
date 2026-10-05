@@ -115,6 +115,14 @@
   a screen reader to announce. The reference now appears exactly when the message it points at
   does. In the demo example set this removes 57 dangling references; no other rendered output
   changes.
+- **The dropdown follows WAI-ARIA's select-only combobox pattern.** The part that shows the
+  selection is now the `combobox`, and takes focus. The option list beside it is the `listbox`.
+  The combobox says it has a list (`aria-haspopup`), points at it while it is open
+  (`aria-controls`), and carries the field's `label` as its name (`aria-label`). **This changes the
+  markup:** a host that finds the dropdown by `[role="listbox"]` now finds its option list, so
+  find the control by `[role="combobox"]`. `aria-*` attributes from a meta move with focus to the
+  combobox. Everything else, including `id`, `style`, `data-*` and event handlers, still lands on
+  the dropdown element, as does the class string. The dropdown looks the same in every state.
 
 #### Documentation
 

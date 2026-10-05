@@ -30,7 +30,7 @@ describe('Dropdown', () => {
   /**
    * THE DUPLICATE-ID HALF of the help-text contract, here rather than in the behaviour suite
    * because that one mocks `semantic-ui-react` away and the second element carrying the id IS
-   * Semantic's `<div role="listbox">` — the caller's `id` reaches it through the rest bag. Two
+   * the dropdown element — the caller's `id` reaches it through the rest bag. Two
    * elements with one id is invalid, and it was reachable without the caller doing anything:
    * `mapper.tsx` assigns `input.id` automatically for relative paths. Found by the §9.7-F1 step 3
    * part 1 audit.
@@ -44,7 +44,8 @@ describe('Dropdown', () => {
 
     expect(container.querySelectorAll('#region')).toHaveLength(1)
     expect(container.querySelectorAll('#region-help')).toHaveLength(1)
-    expect(container.querySelector('[role="listbox"]').getAttribute('aria-describedby')).toBe('region-help')
+    // On the combobox, the element that takes focus, so the help text is announced with it.
+    expect(container.querySelector('[role="combobox"]').getAttribute('aria-describedby')).toBe('region-help')
   })
 
   it('renders an empty control when options are absent or null, instead of throwing', () => {
@@ -332,7 +333,7 @@ describe('Dropdown', () => {
          * A DEFECT THE SWAP INTRODUCED, not a pre-existing one. SUIR's Dropdown declared
          * `search`/`multiple`/`allowAdditions`/`clearable` (and the rest of `DROPPED_PROPS`) as
          * handled props, so passing one was quietly harmless. `Listbox` spreads what it does not
-         * destructure onto its `<div role="listbox">`, so after the swap they became ATTRIBUTES:
+         * destructure onto its dropdown element, so after the swap they became ATTRIBUTES:
          * measured, `required` rendered as `required=""` on a div and `clearable` produced React's
          * own "Received `true` for a non-boolean attribute" warning.
          *
@@ -365,9 +366,11 @@ describe('Dropdown', () => {
                 })
             })
 
-            const listbox = container.querySelector('[role="listbox"]')
-            const attributes = [...listbox.attributes].map(attribute => attribute.name)
-            expect(attributes).toEqual(['role', 'aria-expanded', 'tabindex', 'class'])
+            // Both elements a spread reaches: the combobox takes `aria-*`, the dropdown the rest.
+            const control = container.querySelector('[role="combobox"]')
+            const attributesOf = element => [...element.attributes].map(attribute => attribute.name)
+            expect(attributesOf(control.parentElement)).toEqual(['class'])
+            expect(attributesOf(control)).toEqual(['role', 'aria-haspopup', 'aria-expanded', 'tabindex', 'class'])
             // React's non-boolean-attribute warning is the specific symptom that is gone.
             expect(errors).toEqual([])
         })
@@ -393,7 +396,9 @@ describe('Dropdown', () => {
             const { container } = renderDropdown({ options: objectOptions, required: true })
 
             expect(container.firstChild).toHaveClass('required')
-            expect(container.querySelector('[role="listbox"]')).not.toHaveAttribute('required')
+            const control = container.querySelector('[role="combobox"]')
+            expect(control).not.toHaveAttribute('required')
+            expect(control.parentElement).not.toHaveAttribute('required')
         })
     })
 })

@@ -68,11 +68,19 @@ const ENTRY = path.join(STYLE_DIR, 'index.less');
  * check worth keeping in mind if these numbers ever move again: a change that shifts `total` and
  * `worth` together is a change to the STYLING; a change that shifts only `total` is a change to
  * what is in scope.
+ *
+ * `text` 8 → 10 AND ITS `text` TOKEN 6 → 7, with the combobox pattern (`Listbox.tsx`). The `.text`
+ * is the control now and a click focuses it, so in this OPEN render it matches two focus rules it
+ * never matched: the global `.ui-render *:focus:not(a, .a)` ring, and `> .text[role="combobox"]:focus`,
+ * which cancels that ring and is the one rule the token is worth. Styling, by the rule above, and
+ * measured in Chromium: every state of the dropdown computes the same border, shadow, background
+ * and radius as before, because `dropdown.overrides` and `input.less` repeat each focus style for
+ * `:focus-within`.
  */
 const TOKEN_CONTRACT = {
     control: { classes: 'ui selection dropdown active visible', total: 15,
         worth: { ui: 13, dropdown: 13, selection: 12, active: 4, visible: 1 } },
-    text: { classes: 'text divider', total: 8, worth: { text: 6, divider: 2 } },
+    text: { classes: 'text divider', total: 10, worth: { text: 7, divider: 2 } },
     icon: { classes: 'icon dropdown', total: 15, worth: { icon: 13, dropdown: 13 } },
     menu: { classes: 'menu transition visible', total: 16,
         worth: { menu: 11, transition: 4, visible: 3 } },
@@ -121,7 +129,10 @@ const withOpenDropdown = assertions => {
                 })))
     );
     try {
-        const control = container.querySelector('[role="listbox"]');
+        // The dropdown element, which the class string is on: the box around the combobox (`.text`),
+        // its icon and its listbox. Found by role, so a broken class string fails the assertions
+        // below rather than the lookup.
+        const control = container.querySelector('[role="combobox"]').parentElement;
         fireEvent.click(control);
         assertions({
             control,
