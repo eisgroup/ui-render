@@ -50,6 +50,10 @@
   error channel, and now names the failing node; the diagnostic rendered in place of the
   failed subtree names it too, instead of showing a bare `Error: …`. A host reporter that
   throws cannot replace the failure it was called to report.
+- **`getValidationErrors` reports a string as each message's `text`, as its type always said.**
+  An array field could be reported with the array of its items' errors as its `text`. That entry
+  is left out now; each item's error is still reported, under the item's own field name. Every
+  other report is unchanged: every validator a meta can name returns a string.
 
 #### Table rendering
 

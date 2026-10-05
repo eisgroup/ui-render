@@ -25,6 +25,7 @@ import type * as UIRender from './contract'
 import type { ApplyPeriodsOptions } from '../core/engine/applyPeriods'
 import type { DownloadOptions } from '../core/engine/download'
 import type { DeliveredRenderErrorReport } from '../core/engine/Render'
+import type { mapErrorObjectToUIFormat } from '../core/engine/errorMapping'
 import type { UploadOptions } from '../core/engine/upload'
 import type { MetaProblem } from '../core/engine/validateMeta'
 
@@ -123,6 +124,7 @@ const uploadIsAccepted: Assignable<HostCalls['uploadFile'], NonNullable<UploadOp
 const updateIsAccepted: Assignable<HostCalls['updateExperienceData'], NonNullable<ApplyPeriodsOptions['updateExperienceData']>> = true
 const errorReportIsPublished: Assignable<DeliveredRenderErrorReport, UIRender.UIRenderErrorReport> = true
 const metaProblemIsPublished: Assignable<MetaProblem, UIRender.UIRenderMetaProblem> = true
+const validationReportIsPublished: Assignable<ReturnType<typeof mapErrorObjectToUIFormat>, UIRender.UIRenderValidationErrors> = true
 
 /* Reference every binding so `noUnusedLocals` stays available to whoever turns it on. */
 void itemsNull; void headersNull; void extraHeadersNull; void extraItemsNull; void nameNull
@@ -132,4 +134,4 @@ void rendererByName; void rendererByObject; void rendererBad
 void viewIsNotJustString; void renderIsNotJustString; void actionIsNotJustString
 void normalizerIsNotJustString; void inputTypeIsNotJustString; void openView
 void downloadIsAccepted; void uploadIsAccepted; void updateIsAccepted
-void errorReportIsPublished; void metaProblemIsPublished
+void errorReportIsPublished; void metaProblemIsPublished; void validationReportIsPublished
