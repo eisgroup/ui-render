@@ -67,10 +67,10 @@ describe('ProgressSteps additional contracts', () => {
     expect(onChange).not.toHaveBeenCalled()
   })
 
-  it('lets any controlled parent render supersede a pending click, even with an unchanged activeIndex', () => {
-    // How the class behaved, pinned because the function component had to reproduce it on purpose:
-    // `UNSAFE_componentWillReceiveProps` ran on EVERY parent render and, controlled, cleared the
-    // pending click. So the component compares the props object, not the value (§9.3 step 6).
+  it('keeps a pending click through a controlled parent render that leaves activeIndex where it is', () => {
+    // The class dropped it: `UNSAFE_componentWillReceiveProps` ran on EVERY parent render and,
+    // controlled, cleared the pending click, so a document that re-rendered within the 50 ms
+    // swallowed it. Only a controlled index that differs from the active step supersedes it now.
     const onChange = jest.fn()
     const view = render(wrap(
       <ProgressSteps items={items} activeIndex={0} onChange={onChange}/>
@@ -82,9 +82,25 @@ describe('ProgressSteps additional contracts', () => {
     ))
     act(() => jest.advanceTimersByTime(50))
 
+    expect(view.queryByText('Second content')).toBeInTheDocument()
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledWith(1)
+  })
+
+  it('still returns to its controlled activeIndex when the parent does not take the click', () => {
+    const onChange = jest.fn()
+    const view = render(wrap(
+      <ProgressSteps items={items} activeIndex={0} onChange={onChange}/>
+    ))
+    fireEvent.click(getStepButtons(view.container)[1])
+    act(() => jest.advanceTimersByTime(50))
+    expect(view.queryByText('Second content')).toBeInTheDocument()
+
+    view.rerender(wrap(
+      <ProgressSteps items={items} activeIndex={0} onChange={onChange}/>
+    ))
+
     expect(view.queryByText('First content')).toBeInTheDocument()
-    expect(view.container.querySelector('.tabs__content')).toHaveClass('fade-in')
-    expect(onChange).not.toHaveBeenCalled()
   })
 
   it('keeps a pending click through an uncontrolled parent render', () => {
