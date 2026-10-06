@@ -29,8 +29,8 @@
  *   - mounting every example without a caught render error or an unexpected
  *     console warning — `demo/pages/__tests__/Examples.registry-and-rendering`;
  *   - edit -> submit payload, `showIf` re-evaluation, validation surfacing,
- *     data-prop reinitialisation — `pages/main/__tests__/UIRender.form-flows`;
- *   - `addData`/`removeData` row operations — `pages/main/__tests__/rules.actions`
+ *     data-prop reinitialisation — `engine/__tests__/UIRender.form-flows`;
+ *   - `addData`/`removeData` row operations — `engine/__tests__/rules.actions`
  *     and `demo/pages/__tests__/NestedDataKind.interactions`.
  * -----------------------------------------------------------------------------
  */

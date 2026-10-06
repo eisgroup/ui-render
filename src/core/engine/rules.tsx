@@ -657,14 +657,14 @@ function Decorator (Class: any) {
         get config () {
             const data = this.data
             const { form, parent } = this.props
-            // Fetch a file through the host's `downloadFile` and save it (see `download.js`). The API
+            // Fetch a file through the host's `downloadFile` and save it (see `download.ts`). The API
             // call is read at click time, as it always was.
             FIELD.FUNC[FIELD.ACTION.DOWNLOAD] = (...args) => download(args, {
                 downloadFile: this.getAPICalls().downloadFile,
                 onFailure: err => this.popupAlert(describeFailure(err), _.DOWNLOAD_FAILED_),
             })
             // Send the forms' values and a file through the host's `uploadFile`, and make its answer
-            // the data (see `upload.js`). The remount key and the form restart wait for the new data
+            // the data (see `upload.ts`). The remount key and the form restart wait for the new data
             // to be committed, as they always did.
             // A cast, not a guard: what `Upload` calls the action with.
             FIELD.FUNC[FIELD.ACTION.UPLOAD] = (...args) => upload(args as UploadArgs, {

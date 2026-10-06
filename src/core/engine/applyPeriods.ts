@@ -10,7 +10,7 @@ import { normalizeIncomingData } from './dataMapping'
  * with becomes the UI's data. A failure is read into a message by `messageFromError` and handed on.
  *
  * AN EMPTY ANSWER IS IGNORED — `undefined`, `null`, `''`, `0` — and the data is left as it was.
- * `upload.js` has the same guard now; before it did, an empty upload answer emptied the UI.
+ * `upload.ts` has the same guard now; before it did, an empty upload answer emptied the UI.
  *
  * @param {{updateExperienceData: Function, readFormsData: Function, onUpdated: Function,
  *   onFailure: Function}} options - the host's API call; a reader for every form's current values;

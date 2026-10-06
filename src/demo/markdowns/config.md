@@ -26,7 +26,7 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
 2. **Dynamic State**
   - Besides `data.json`, you can use dynamic `state` when configuring `meta.json`
   - You can create new or update existing state using `functions` (see point 8):
-    Example of setting active plan using `onChange` function: `"onChange": "setState,plan"`
+    Example of setting the active group using `onChange` function: `"onChange": "setState,group"`
   - To read the state, define `name` attribute with key path like this:
     `"name": "group.{state.group,0}"` (next point explains how this works)
   - For advanced config, see the [example](#component-attributes) of Dropdown `onChange` attribute
@@ -47,7 +47,7 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
   - Use this to link attributes within `data.json` or `state` to attributes required by the component
   - You can define data mappers as object or string:
     a) `Object` example: `"mapOptions": {"component.attribute": "data.or.state.key.path"}`
-    b) `String` example: `"mapOptions": "planName"` -> use `planName` attribute as options value
+    b) `String` example: `"mapOptions": "title"` -> use `title` attribute as options value
   - See the [example](#component-attributes) of `mapItems` and `mapOptions`
 
 6. **Custom Rendering (by matching values)**
@@ -67,15 +67,15 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
       items: [
         {
           view: "Parent",
-          name: "group.0", // => this will resolve to "root.path.to.item.0.plan.0"
+          name: "group.0", // => this will resolve to "root.path.to.item.0.group.0"
           items: [
             {
               view: "Child",
-              name: "id", // => this will resolve to "root.path.to.item.0.plan.0.id"
+              name: "id", // => this will resolve to "root.path.to.item.0.group.0.id"
             },
             {
               view: "Child",
-              name: "id", // => this will resolve to "root.path.to.item.0.plan.0.id"
+              name: "id", // => this will resolve to "root.path.to.item.0.group.0.id"
               relativeData: true,
             },
             {
@@ -94,7 +94,7 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
   - A Function can be defined using `['onClick', 'onChange', 'onDone']` attributes, or starting with the word `render`
     Example: `renderLabel`, `renderCell`...
   - Function can be defined as `String`, with arguments separated by comma/s
-    Example: `"setState,plan"` -> use `setSate` function with `plan` as argument
+    Example: `"setState,group"` -> use `setState` function with `group` as argument
   - Function can be defined as `Object`
     Example:
     ```js
@@ -313,10 +313,10 @@ Available in all UI components:
   view: 'Col',           // (required) name of the React Component used to display this field
   items: [],             // recursively nested fields
   children: 'Any',       // nested content to render inside field
-  onClick: Function,     // ex: {onClick: 'setState,active.plan'}
+  onClick: Function,     // ex: {onClick: 'setState,active.group'}
   style: Object,         // CSS style to apply
   className: 'string',   // CSS class name to apply
-  debug: Boolean,        // suppress certain errors related to incorrect data type
+  debug: Boolean,        // raise the errors a missing or wrongly typed data list otherwise silences
   showIf: "path.to.data.that.exists",  // render only if path resolves to truthy value
   showIf: {              // object notation
     name: "path.to.data.that.exists",
@@ -349,7 +349,6 @@ Available in all UI components:
   onChange: String,       // callback function name for input value changes
   min: Number,
   max: Number,
-  hint: 'Title text above input',
   info: 'Content rendered when input is in focus',
   error: 'Content rendered when input is invalid',
   autoSubmit: Boolean,   // submit form on changes
@@ -374,13 +373,13 @@ so dependent fields using `{state.fieldName,fallback}` in their paths will re-re
 {
   compact: Boolean,
   options: [{ text: 'Label', value: 'internal value' }], // used as declared, see below
-  mapOptions: Object,    // data mapper (ex: {value: "{index}", text: "planName"})
+  mapOptions: Object,    // data mapper (ex: {value: "{index}", text: "title"})
   // Note: mapOptions.value = "{index}" stores selected value as String index.
   // Use a persistent key (e.g. mapOptions.value = "id") to keep value stable.
-  value: { name: '{state.active.plan,0}' }, // dynamic config using state
+  value: { name: '{state.active.group,0}' }, // dynamic config using state
   onChange: {
     name: 'setState',
-    args: ['active.plan'],
+    args: ['active.group'],
   },
 }
 ```
@@ -424,7 +423,7 @@ Dependent Product Select uses `{state.categoryX,0}` to resolve the active catego
 }
 ```
 
-See the [Select: Cascading](#selectCascading) example for a working demo.
+See the [Select: Cascading](examples#selectCascading) example for a working demo.
 
 #### mapOptions — How Select Values Are Stored
 
@@ -524,7 +523,7 @@ for a range slider.
   disabled: Boolean,
   readonly: Boolean,
   tooltipProps: {           // when present, shows a tooltip on each handle
-    render: Function | String, // optional value formatter (string maps to renders.js, e.g. 'Percent')
+    render: Function | String, // optional value formatter (a string names a value renderer, e.g. 'Percent')
   },
   unit: String,             // appended to the default tooltip label, e.g. '%'
 }
@@ -719,9 +718,8 @@ Single- or multi-file upload with click + drag&drop. Use through `Input` with `t
 }
 ```
 
-For a full list of values to use for `view` and formatting functions,
-check [Field Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/variables/fields.js)
-and [Form Input Definitions](https://github.com/ecoinomist/modules-pack/blob/master/src/form/constants.js).
+For a full list of values to use for `view`, the `render*` value renderers and the actions,
+see `docs/SUPPORTED-VIEWS.md`, which is generated from the source and ships with the package.
 
 ## Popup Component
 

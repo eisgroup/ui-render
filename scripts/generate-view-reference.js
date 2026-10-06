@@ -228,7 +228,7 @@ function resolverFacts ({ mapper, renderField, rules, fields }) {
 
 /**
  * Short label for a source file: parent directory plus filename. A bare filename would be
- * ambiguous here — `fields.js`, `constants.js` and `rules.tsx` each say very little alone,
+ * ambiguous here — `fields.ts`, `constants.ts` and `rules.tsx` each say very little alone,
  * and two of them sit under `src/core/modules/`.
  */
 const shortPath = (file) => file.split('/').slice(-2).join('/')
@@ -379,8 +379,9 @@ function renderMarkdown ({ views, renderers, actions }) {
         '',
         'Props are documented separately: `docs/SUPPORTED-PROPS.md` covers the prop surface of the',
         'three views the `semantic-ui-react` exit replaced — all three are in-house since §9.7-F1',
-        'step 3 part 2, and no file in `src` references the package any more — which is the only',
-        'place the supported props are enumerated today.',
+        'step 3 part 2, and no file in `src` references the package any more. Every component\'s',
+        'props are also its exported TypeScript props type, and the meta contract the package',
+        'publishes is typed in `dist/contract.d.ts`.',
         '',
         '## How a node is resolved',
         '',

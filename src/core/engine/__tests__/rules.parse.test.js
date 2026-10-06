@@ -1,4 +1,4 @@
-// Force form module to load before rules.tsx reaches renders.js
+// Force form module to load before rules.tsx reaches renders.tsx
 import '../../modules/form/utils'
 import {
     parseArrayPrefixAndRowIndexFromFieldName,

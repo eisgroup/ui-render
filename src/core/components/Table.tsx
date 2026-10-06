@@ -8,9 +8,10 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
  * Seven components over the seven native table elements. This file used to wrap
  * `semantic-ui-react`'s `Table` and re-export its six subcomponents; §9.7-F1 step 1 replaced
  * that with the markup SUIR was producing, because that is all it was producing here —
- * Semantic's own table CSS is not loaded (`collections/table` is commented out in
- * `src/style/override/_semantic.less`), so every table style in the product is in-house LESS
- * and the only thing the dependency contributed was className composition.
+ * Semantic's own table CSS was never loaded (its `collections/table` import in
+ * `src/style/override/_semantic.less` was commented out, and went at step 4), so every table
+ * style in the product is in-house LESS and the only thing the dependency contributed was
+ * className composition.
  *
  * THE ONE CLASS CONTRACT THAT IS LOAD-BEARING: `ui` AND `table` ON THE ROOT
  * -----------------------------------------------------------------------------

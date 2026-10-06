@@ -11,7 +11,7 @@ localiseTranslation({
 })
 
 /**
- * The named props are read here; the rest goes to the `View`. `renders.js` binds them as the first
+ * The named props are read here; the rest goes to the `View`. `renders.tsx` binds them as the first
  * argument, so the props React passes arrive second and go unread.
  */
 export type PlaceholderFieldProps = { name?: React.ReactNode, children?: React.ReactNode, [key: string]: unknown }

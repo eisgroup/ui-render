@@ -37,12 +37,14 @@
  *   npm run test:e2e -- --ui   interactive.
  *
  * WHY IT SERVES A PRODUCTION BUILD, NOT `npm start`.
- * The corpus tooltip THROWS on every open (see reference.js, CORPUS.PAGE_ERRORS_PER_OPEN). webpack-dev-server
- * turns an unhandled error into `iframe#webpack-dev-server-client-overlay`, which is
- * `position: fixed; inset: 0; z-index: 2147483647` — it covers the app, `elementFromPoint` returns
- * the iframe and every subsequent interaction is intercepted. Disabling that overlay would take a
- * real debugging affordance away from humans to suit a test runner. A production build has no
- * overlay, is closer to what ships, and costs one `webpack --mode production`.
+ * The corpus tooltip THREW on every open until §9.7-F1 step 2 part 3 (reference.js,
+ * CORPUS.PAGE_ERRORS_PER_OPEN, now 0). webpack-dev-server turns an unhandled error into
+ * `iframe#webpack-dev-server-client-overlay`, which is `position: fixed; inset: 0;
+ * z-index: 2147483647` — it covers the app, `elementFromPoint` returns the iframe and every
+ * subsequent interaction is intercepted. Disabling that overlay would take a real debugging
+ * affordance away from humans to suit a test runner. A production build has no overlay, so a page
+ * error fails the test that counts it instead of blocking every click after it; it is also closer to
+ * what ships, and costs one `webpack --mode production`.
  *
  * The build is root-relative (`PUBLIC_PATH=/`, `REACT_APP_BASE_NAME=/`) and lands in `build-e2e/`
  * so it neither collides with the `/ui-render/`-prefixed GitHub Pages build in `build/` nor needs

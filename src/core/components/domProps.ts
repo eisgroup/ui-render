@@ -46,7 +46,7 @@
  *                                     Table (table), Table.Header/Body/Footer/Row
  *                                     (thead/tbody/tfoot/tr), Table.HeaderCell (th),
  *                                     Table.Cell (td), TableView (again, before Table),
- *                                     Dropdown (props handed to Semantic's Dropdown -> div),
+ *                                     Dropdown (props handed to `Listbox` -> div),
  *                                     Slider (div), Icon (i), Image (img), Tooltip (span)
  *   ENGINE_PROPS only               : InputNative (input/textarea, and Select -> select),
  *                                     Button (button), InputNumber (input), Checkbox (input),

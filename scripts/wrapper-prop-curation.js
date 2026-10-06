@@ -84,9 +84,9 @@ const IN_HOUSE_CURATION = {
         shipped: '§9.7-F1 step 1',
         summary: 'Seven components over the seven native table elements — markup and className '
             + 'composition, which is all `semantic-ui-react` was contributing here. Semantic\'s own '
-            + 'table CSS is not loaded (`collections/table` is commented out in '
-            + '`src/style/override/_semantic.less`), so every table style in the product was already '
-            + 'in-house LESS and the swap changed no styling.',
+            + 'table CSS was never loaded (its `collections/table` import in '
+            + '`src/style/override/_semantic.less` was commented out, and went at step 4), so every '
+            + 'table style in the product was already in-house LESS and the swap changed no styling.',
         classContract: 'The root always emits `ui <modifiers> table <className>` — `ui` first, '
             + '`table` second-to-last, the caller\'s `className` last. The six subcomponents emit '
             + 'the caller\'s `className` and nothing else.',
@@ -267,9 +267,9 @@ const IN_HOUSE_CURATION = {
             + 'the element that takes focus. `ENGINE_PROPS` and `FIELD_ONLY_PROPS` are stripped twice on '
             + 'the way: once by the wrapper, once by `Listbox` at the element itself.',
         summary: 'The wrapper already owned the external API: the `onChange(value, name, event)` '
-            + 'signature, option sanitisation, case-insensitive dedup on addition, and the cascading '
-            + 'reset are all wrapper code, and none of it moved. Only the `<DropDown/>` element at the '
-            + 'bottom changed — it is now the in-house `Listbox`, under the same import alias. Two entry points, and they differ: `mapper.tsx` imports the memoised default '
+            + 'signature, option sanitisation and the cascading reset are all wrapper code, and none of '
+            + 'it moved (the case-insensitive dedup on addition went with `allowAdditions` at part 2). '
+            + 'Only the `<DropDown/>` element at the bottom changed — it is now the in-house `Listbox`, under the same import alias. Two entry points, and they differ: `mapper.tsx` imports the memoised default '
             + 'export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.ts` imports the '
             + 'NAMED export for `view: "Select"` — which is the majority path.',
         cssContract: 'The loaded `modules/dropdown` LESS is the largest single semantic module in the '
@@ -301,9 +301,10 @@ const IN_HOUSE_CURATION = {
                 + 'control depending on `float`. CONSUMED, not stripped: it is destructured out at the '
                 + 'top of the wrapper, so it can never be in the rest bag that `omitProps` filters.',
             placeholder: 'Placeholder text, translated by the wrapper and then forwarded.',
-            done: 'Adds a `done` class to the wrapper. Defaulted from `props.value` — which is always '
-                + '`undefined`, because `value` was destructured out, so the class is unreachable from a '
-                + 'value today. Do not port the defaulting faithfully; fix it or drop it.',
+            done: 'Adds a `done` class to the wrapper, the completed state the stylesheet selects on. '
+                + 'Unless given, it is true for a value and no error. Until 2026-10-01 the default read '
+                + '`props.value`, always `undefined` once `value` was destructured out, so a `float` label '
+                + 'sat over the selection it named (`Dropdown.done-state.test.js`).',
             error: 'Message shown under the control, in a `${id}-help` block the control points at with '
                 + '`aria-describedby`. The wrapper renders the text itself and forwards only '
                 + '`error={!!error}` for the class.',
@@ -338,8 +339,9 @@ const IN_HOUSE_CURATION = {
     },
     Tooltip: {
         shipped: '§9.7-F1 step 2 part 3',
-        summary: 'The hover tooltip, over the same inline `<span>` `components/Tooltip.tsx` has '
-            + 'shipped for years. Reached two live ways: a `view: "Tooltip"` node (`mapper.tsx`, which '
+        summary: 'The hover tooltip, over the same inline `<span>` `components/TooltipBubble.tsx` has '
+            + 'shipped for years (as `components/Tooltip.tsx` until §9.9-H6, when this component, '
+            + '`TooltipPop`, took that name). Reached two live ways: a `view: "Tooltip"` node (`mapper.tsx`, which '
             + 'maps `label` to `content`) and the `tooltip` attribute on ANY node (`Render.tsx`, which '
             + 'wraps the rendered node and spreads an object `tooltip` — still an unfiltered '
             + 'passthrough, but into 13 accepted names now instead of 45). This was a FIX, not a '
@@ -350,7 +352,7 @@ const IN_HOUSE_CURATION = {
             + 'meta can declare can hold one. There was no working positioning to lose.',
         classContract: 'Host: `tooltip-host <classWrap>`, always, open or closed. Bubble, only while '
             + 'open: `tooltip no-wrap <resolved placement words> show [inverted] <className>` — the '
-            + 'same class string `Tooltip.tsx` emits, so the two converge on one CSS contract. The '
+            + 'same class string `TooltipBubble.tsx` emits, so the two converge on one CSS contract. The '
             + 'placement words are the REQUESTED position, not a resolved one: nothing measures, so '
             + 'there is no flip to rewrite them. Closed, the component renders the trigger '
             + 'byte-for-byte as it renders without a tooltip, and nothing is added to `document.body`. '
@@ -504,7 +506,7 @@ const IN_HOUSE_CURATION = {
             + '`triggerRef`, …). Those 45 split exactly three ways: 9 are still accepted under the '
             + 'same name (`content`, `children`, `inverted`, `position`, `open`, `disabled`, '
             + '`className`, `onOpen`, `onClose`); 19 are DROPPED and warn once each; and 17 are '
-            + 'dropped SILENTLY. 9 + 19 + 17 = 45. Every one of the 18 warned names really was in '
+            + 'dropped SILENTLY. 9 + 19 + 17 = 45. Every one of the 19 warned names really was in '
             + 'that surface — checked, none is invented. The silent 17 are Semantic\'s own internals '
             + '(`context`, `onMount`/`onUnmount`, `openOnTrigger*`, `popperModifiers`, '
             + '`positionFixed`, the transition plumbing) and warning on them would be noise, with '
@@ -757,11 +759,12 @@ const STEP_OBLIGATIONS = [
                 + 'than founding it.',
             'CORRECTION to "the corpus renders zero tooltips": true of THIS component only. The corpus '
                 + 'renders 5 tooltips today, all in the `slider` example and all snapshot-gated — they come '
-                + 'from a second, separate `components/Tooltip.tsx`: a few lines, CSS-only, an inline `<span>`, '
+                + 'from a second, separate component, `components/TooltipBubble.tsx` (`components/Tooltip.tsx` '
+                + 'until §9.9-H6): a few lines, CSS-only, an inline `<span>`, '
                 + 'no portal and no JS positioning, used by `Slider`, `modules/upload/views/Upload.tsx` and '
                 + '`withFormSetup`\'s validation-error tooltip, and styled by 41 rules in '
-                + '`style/components/tooltip.less`. It is evidence for the positioning decision and a '
-                + 'naming trap for the cleanup: `form/utils.tsx` imports BOTH.',
+                + '`style/components/tooltip.less`. It is evidence for the positioning decision, and it was a '
+                + 'naming trap until §9.9-H6 renamed both: `form/utils.tsx` imported BOTH.',
             'CORRECTION — the biggest finding, and it invalidates an instruction this step was given: '
                 + '"keep emitting `ui popup`-compatible classNames so the current CSS continues to apply" '
                 + 'rests on a false premise. No `.ui.popup` rule applies today, because the portal mounts '

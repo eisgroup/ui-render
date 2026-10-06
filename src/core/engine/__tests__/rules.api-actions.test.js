@@ -63,7 +63,7 @@ describe('UIRender additional action and error contracts', () => {
         expect(downloadFile).toHaveBeenCalledWith('rates.csv')
         const popupState = popup.setPopupState.mock.calls[0][0]
         // The title is the error's MESSAGE, not the Error: the popup renders its title as it is,
-        // and an object there replaced the whole UI with a React error (see `download.js`).
+        // and an object there replaced the whole UI with a React error (see `download.ts`).
         expect(popupState).toEqual(expect.objectContaining({
             isOpen: true,
             title: 'network unavailable',

@@ -154,7 +154,7 @@ describe('Select and Dropdown behavioural contract', () => {
         /**
          * The four `select*` examples exist to demonstrate two DIFFERENT payload
          * contracts, and until now nothing drove either one from the UI.
-         * `pages/main/__tests__/utils.select-form-data` unit-tests the reordering helper
+         * `engine/__tests__/formData.select-order` unit-tests the reordering helper
          * on synthetic input, and `mapper.fields-tables-popups` asserts the index the
          * mapper computes — but no test picked an option and looked at what a host
          * would receive. That is the half F1 Step 3 can break silently.

@@ -32,7 +32,7 @@ export type JsonViewProps = {
  * @param {Boolean} [inverted] - whether to use the dark theme; when false (default), the theme is inverted to light
  * @param {Boolean} [expanded] - whether to expand all nested nodes by default
  * @param {Boolean} [hideRoot] - whether to hide the root brackets and render children directly
- * @param {Object} [theme] - base16 color definitions (see themes.js)
+ * @param {Object} [theme] - base16 color definitions (see themes.ts)
  * @param {Function} [shouldExpandNode] - (keyPath, value, level) => boolean; default opens 1st level
  * @param {String} [className] - css class name
  * @param {Object} [style] - css styles

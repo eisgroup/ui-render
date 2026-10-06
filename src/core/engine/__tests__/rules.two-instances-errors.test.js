@@ -2,8 +2,8 @@
  * TWO DOCUMENTS AND THE VALIDATION-ERROR CHANNEL (§9.3 step 3, risk R14).
  * =============================================================================================
  *
- * The channel has TWO module-level pieces and this file pins the state of both — the one that is
- * fixed, and the one that is not, so the diff that fixes the second is visible rather than silent.
+ * The channel had TWO module-level pieces, and this file pins both fixes. The second was pinned here
+ * while it was still broken, so the diff that fixed it is visible rather than silent.
  *
  *   FIXED. `errorHandlerFunction` was a module-level `let` assigned in the constructor, so the LAST
  *   instance constructed owned it. Measured before the fix: touching the FIRST document's required

@@ -64,7 +64,7 @@ export function Text ({
         }
     }
     // DOM boundary: this spread lands on a <span>, and `Text` is where every value renderer
-    // ends up (renders.js renderFloat -> <Text {...options}>), so the whole render-method
+    // ends up (renders.tsx renderFloat -> <Text {...options}>), so the whole render-method
     // options bag arrives here. Nothing engine-internal and no field-only attribute belongs
     // on a span — add new engine props to ./domProps.ts, not as another `foo: _` above.
     const domProps = omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)

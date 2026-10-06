@@ -31,7 +31,7 @@
           "$ref": "#/$defs/view"
         },
         "name": {
-          "description": "Dot/bracket key path into data.json (or into the node's inherited relative data). Curly braces interpolate dynamic state, e.g. \"plan.{state.plan,0}.title\". MUST be a string: the engine interpolates it with String.prototype.replace, so any other type throws during render.",
+          "description": "Dot/bracket key path into data.json (or into the node's inherited relative data). Curly braces interpolate dynamic state, e.g. \"group.{state.group,0}.title\". MUST be a string: the engine interpolates it with String.prototype.replace, so any other type throws during render.",
           "type": [
             "string",
             "null"
@@ -221,7 +221,7 @@
       ]
     },
     "functionRef": {
-      "description": "A handler. A string names a built-in action, a host-supplied `methods` entry or a renderer instance method, with comma-separated trailing arguments (e.g. \"setState,active.plan\"). The object form adds arguments and chaining.",
+      "description": "A handler. A string names a built-in action, a host-supplied `methods` entry or a renderer instance method, with comma-separated trailing arguments (e.g. \"setState,active.group\"). The object form adds arguments and chaining.",
       "anyOf": [
         {
           "type": "string"

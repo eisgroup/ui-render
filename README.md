@@ -59,8 +59,8 @@ package instead of declaring them directly, pnpm in isolated mode will not resol
 through them — the application must declare these three packages itself.
 
 Other libraries previously listed as peer dependencies (`final-form`, `final-form-arrays`,
-`react-final-form`, `react-final-form-arrays`) are now bundled as regular
-dependencies of `eis-ui-render`, so the host project does not need to install them.
+`react-final-form`, `react-final-form-arrays`) are bundled into `dist/index.js`, and the package
+declares no dependencies of its own, so the host project installs nothing beside the three peers.
 `prop-types`, also listed once, is not used at all any more: the props are TypeScript types.
 
 `eis-ui-render` is consumed by a bundler — imported as a React component into a host application. Dropping
@@ -257,11 +257,10 @@ In the project directory, you can run:
 
 ### `npm run start`
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3001](http://localhost:3001) to view it in Chrome browser, then activate LiveReload extension.
+Runs the demo in development mode on [http://localhost:3001](http://localhost:3001).
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+Edits apply in place through React Fast Refresh, without a reload. Compile errors show in the
+terminal and over the page; lint does not run here, so run `npm run lint:js` for it.
 
 ### `npm run test:e2e`
 

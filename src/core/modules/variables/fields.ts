@@ -41,7 +41,7 @@ FIELD.TYPE = {
   COL_LIST: 'ColList', // alias for List
   COL_LIST3: 'VerticalList', // alias for List
   COUNTER: 'Counter', // Animated number changing from `start` to `end` values
-  DROPDOWN: 'Dropdown', // Semantic UI Dropdown
+  DROPDOWN: 'Dropdown', // in-house, `components/Dropdown.tsx`
   LABEL: 'Label',
   LIST: 'List', // list of Col components with dynamic `renderItem` attributes
   PIE_CHART: 'PieChart', // Pie chat (can be in shape of donut) with optional legends
@@ -77,7 +77,6 @@ FIELD.TYPE = {
   IMAGE: 'Image',
   POPUP: 'Popup',
   TABLE_CELLS: 'TableCells',
-  // ...to be populated by modules
 }
 
 // Value Renderer Definitions

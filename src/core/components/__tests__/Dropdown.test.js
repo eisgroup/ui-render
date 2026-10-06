@@ -160,7 +160,7 @@ describe('Dropdown', () => {
                 value: 'a',
             })
 
-            // Simulate Semantic UI dropdown change by finding and clicking an option
+            // Simulate a dropdown change by finding and clicking an option
             const dropdown = container.querySelector('.ui.dropdown')
             fireEvent.click(dropdown)
 

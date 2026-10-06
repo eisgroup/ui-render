@@ -113,9 +113,7 @@ function dropUnsupported (props: Record<string, unknown>) {
 }
 
 /**
- * Drop Down Select - Pure Component.
- *
- * @Note: for docs, check out https://react.semantic-ui.com/modules/dropdown/
+ * Drop Down Select - Pure Component. `docs/SUPPORTED-PROPS.md` records what each prop does.
  *
  * @example:
  *  <Dropdown
@@ -141,7 +139,7 @@ function dropUnsupported (props: Record<string, unknown>) {
  * @param {Boolean} [fill] - whether to fill available width
  * @param {Boolean} [lazyLoad] - whether to defer rendering options until opened, default is true
  * @param {*} [optionsLabel] - extra label for dropdown options on the bottom
- * @param {*} [props] - other attributes to pass to `<select>`
+ * @param {*} [props] - other attributes, passed to the `Listbox` dropdown element
  * @returns {Object}
  */
 export function Dropdown ({
@@ -171,7 +169,7 @@ export function Dropdown ({
   value: valueFromParent,
   ...props
 }: DropdownProps) {
-  // Store options as state to allow additions
+  // The options, synced from the prop by value below. Additions wrote to them until §9.7-F1 step 3 part 2.
   let [options, setOptions] = useState(opts)
   const defaultValue = useRef(typeof valueFromParent !== 'undefined'
     ? valueFromParent
@@ -275,14 +273,13 @@ export function Dropdown ({
   //  disappearing is worth a reader knowing it was ever needed.
   if (optionsLabel) options = [...options, {key: '', text: '', content: optionsLabel, disabled: true}]
 
-  // Convert Icon to Node because Semantic has no `onClickIcon` callback
   // Only when there is help text to point at, so no `aria-describedby` in this product ever dangles.
   const helpId = (props.id && (error || info)) ? `${props.id}-help` : undefined
 
-  // A cast, not a guard: with `onClickIcon`, `icon` is the name of the icon to render.
+  // With `onClickIcon`, the icon is rendered here as a node that takes the click: the control has no
+  // click callback for its icon. A cast, not a guard: `icon` is then the name of the icon to render.
   if (onClickIcon) props.icon = <Icon name={(props.icon as string | undefined) || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
 
-  // On Change gets called before `onAddItem`
   if (onChange || onSelect) {
     props.onChange = (event: React.SyntheticEvent, {value}: { value: unknown }) => {
       // @Note: this used to map a case-mismatched value back onto an existing option's value, and

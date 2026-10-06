@@ -41,7 +41,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-Author, per `node_modules/semantic-ui-less/package.json`: Jack Lukic <jack@semantic-ui.com>.
+Author, per the `package.json` of `semantic-ui-less` 2.5.0, which is no longer installed here: Jack Lukic <jack@semantic-ui.com>.
 Source: https://github.com/Semantic-Org/Semantic-UI-LESS — licence text from
 https://github.com/Semantic-Org/Semantic-UI/blob/master/LICENSE
 

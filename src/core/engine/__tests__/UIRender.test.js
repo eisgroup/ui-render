@@ -7,7 +7,7 @@ if (typeof global.fetch === 'undefined') {
 import React from 'react' // eslint-disable-line import/first
 import { render } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
-// Force form module to load before rules.tsx triggers the cycle via mapper → renders.js
+// Force form module to load before rules.tsx triggers the cycle via mapper → renders.tsx
 import '../../modules/form/utils' // eslint-disable-line import/first
 import UIRender from '../rules' // eslint-disable-line import/first
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext' // eslint-disable-line import/first

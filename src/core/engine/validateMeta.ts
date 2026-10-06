@@ -92,10 +92,11 @@ const ARRAY_ATTRIBUTES = ['items', 'headers', 'extraHeaders', 'extraItems']
 const isPlainObject = (value: unknown): value is MetaNode => !!value && typeof value === 'object' && !Array.isArray(value)
 
 /**
- * View names and render-method names are read at call time, never at module load:
- * `FIELD.TYPE` is populated in several passes (`variables/fields`, then
- * `modules/form/constants`, then `pages/main/rules`), so a set captured at import
- * time would be missing Input, Select, Data, Popup and the rest.
+ * View names and render-method names are read at call time, never at module load.
+ * `FIELD.TYPE` was populated in several passes (`variables/fields`, then
+ * `modules/form/constants`, then `engine/rules`) until §9.3 steps 2 and 3 moved it
+ * into `variables/fields`, and a set captured at import time missed Input, Select,
+ * Data, Popup and the rest.
  *
  * @returns {Array<String>} declared values of the given FIELD definition group
  */

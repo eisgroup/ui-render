@@ -1,6 +1,6 @@
 /**
- * Captures the CSS the remaining `semantic-ui-less` imports contribute, as the fixture
- * `src/style/__tests__/semantic-contributed-css.txt`.
+ * Captures the CSS the two vendored Semantic modules contribute (`src/style/vendor/`, imported by
+ * `override/_semantic.less`), as the fixture `src/style/__tests__/semantic-contributed-css.txt`.
  *
  * WHY THIS EXISTS. §9.7-F1 step 4's stated criterion is "pixel parity of extracted CSS vs current
  * compiled output", and until now there was no mechanism for it — `grep` over `e2e/` finds no
@@ -138,7 +138,7 @@ async function main (argv) {
             + ' and this fixture should be retired, or the import detection broke.');
     }
     const generated = `# GENERATED — run \`${WRITE_COMMAND}\` to regenerate. See ${path.relative(ROOT, __filename)}.\n`
-        + `# ${rules.length} rules contributed by the semantic-ui-less imports in override/_semantic.less.\n`
+        + `# ${rules.length} rules contributed by the vendored Semantic imports in override/_semantic.less.\n`
         + `# Order is the cascade order and is part of the contract.\n\n`
         + rules.join('\n\n') + '\n';
 

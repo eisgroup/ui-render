@@ -5,7 +5,7 @@
  * *after* LESS, in PostCSS. This suite runs the two real PostCSS stages the project actually ships:
  *
  *   1. the webpack stage — the plugin list from the root `postcss.config.js`, which `postcss-loader` feeds
- *      in all three webpack configs (library, demo, watch). This is what produces the published
+ *      in both webpack configs (library and demo; `watch-lib` runs the library's). This is what produces the published
  *      `static/all.css`.
  *   2. the standalone stage — the prefixwrap options exported by `scripts/build-css.js`, which produces
  *      `public/static/ui-render.built.css`.

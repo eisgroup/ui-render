@@ -23,22 +23,21 @@
  *
  *     setStates(value, name, event, 'categoryX')
  *
- * and `setStates(value, keyPath)` reads its second POSITIONAL argument — the field's `name` — as
- * the state path, while the path the meta configured arrives fourth and is ignored.
+ * and `setStates(value, keyPath)` read its second POSITIONAL argument — the field's `name` — as
+ * the state path, while the path the meta configured arrived fourth and was ignored.
  *
- * The codebase already knows, and works around it in exactly one place: `mapper.tsx` re-wraps
- * `onChange` for stable-value Selects to pass the value alone, with the comment "Only pass the
- * converted value (not name/event) so setStates uses the config keyPath, not the modified
- * input.name". Every other `view: 'Select'` with a `setState` action whose configured path differs
- * from the field's resolved name writes to the wrong state path.
+ * `mapper.tsx` worked around it in exactly one place, and still does: it re-wraps `onChange` for
+ * stable-value Selects to pass the value alone, with the comment "Only pass the converted value
+ * (not name/event) so setStates uses the config keyPath, not the modified input.name". Every other
+ * `view: 'Select'` with a `setState` action whose configured path differed from the field's
+ * resolved name wrote to the wrong state path.
  *
- * WHY IT IS NOT FIXED HERE. Three options were considered. Making `setStates` read its LAST
- * argument as the path fixes the dropdown and keeps two-argument callers working, but breaks a
- * `setState` configured with NO path at all. Generalising the mapper's workaround to every Select
- * changes what the second and third `onChange` arguments are for. Reordering the plumbing so
- * configured arguments come first changes every action. All three need the consumer-meta audit
- * that §9.7-F1 step 3's swap PR owes anyway — so this file states the behaviour precisely enough
- * that whoever takes that decision does not have to re-derive it.
+ * WHY IT WAS NOT FIXED HERE. Reading the LAST argument as the path breaks a `setState` configured
+ * with NO path, where the last argument is the event; generalising the mapper's workaround to every
+ * Select changes what the second and third `onChange` arguments are for; reordering the plumbing so
+ * configured arguments come first changes every action. `setStates` reads the last STRING argument
+ * instead, which is right for every call shape (`statePath.ts` lists them), and this composer is
+ * unchanged.
  */
 import { metaToProps } from '../transforms'
 
