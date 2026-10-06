@@ -1,9 +1,10 @@
 import { Field } from 'react-final-form'
 import type { FieldRenderProps } from 'react-final-form'
-import React, { PureComponent } from 'react'
+import React, { useRef } from 'react'
 import { isRequired } from '../../components/inputs/validationRules'
 import { touchedFor } from '../../state/formRegistry'
 import { Active } from '../../utils'
+import { namedField } from './utils'
 
 /** What final-form hands the input: its `input` props, without `value`, which the field caches. */
 type FieldInput = Omit<FieldRenderProps<unknown>['input'], 'value'>
@@ -43,7 +44,17 @@ export type DateFieldProps = {
  */
 export function asInputDateField (InputComponent: React.ComponentType<any>, {sanitize}: { sanitize?: (value: unknown, props: object) => unknown } = {}) {
     if (!Active.Field) Active.Field = Field
-    const Class = class extends PureComponent<DateFieldProps> {
+    /**
+     * What a mounted date field holds, one object for its lifetime: the class this was until 2026-10-06,
+     * a `PureComponent`, is now a plain class the function component below hosts (`asField` says how).
+     */
+    class FieldInstance {
+        props: DateFieldProps
+
+        constructor (props: DateFieldProps) {
+            this.props = props
+        }
+
         _value: unknown
         hasFocus?: boolean
         input!: FieldInput
@@ -125,17 +136,19 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
         }
 
 
-        render () {
-            const {
-                name, disabled, normalize, format, parse = normalize, validate, options
-            } = this.props
-            // A cast, not a guard, read at render: final-form's `Field`, unless something replaced it.
-            const ActiveField = Active.Field as typeof Field
-            return <ActiveField {...{name, disabled, normalize, format, parse, validate, options}}
-                                 component={this.Input}/>
-        }
     }
 
-    Object.defineProperty(Class, 'name', {value: (InputComponent.name || InputComponent.constructor.name) + 'AsField'})
-    return Class
+    function AsInputDateField (props: DateFieldProps) {
+        const own = useRef<FieldInstance | null>(null)
+        if (own.current === null) own.current = new FieldInstance(props)
+        const field = own.current
+        field.props = props
+        const {name, disabled, normalize, format, parse = normalize, validate, options} = props
+        // A cast, not a guard, read at render: final-form's `Field`, unless something replaced it.
+        const ActiveField = Active.Field as typeof Field
+        return <ActiveField {...{name, disabled, normalize, format, parse, validate, options}}
+                             component={field.Input}/>
+    }
+
+    return namedField(AsInputDateField, InputComponent, FieldInstance)
 }

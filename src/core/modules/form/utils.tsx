@@ -1,5 +1,5 @@
 import { UI } from '../variables'
-import React, { PureComponent, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { memo, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Field, Form } from 'react-final-form'
 import type { FieldRenderProps, FormProps, FormRenderProps } from 'react-final-form'
 import type { FormApi, FormState, MutableState } from 'final-form'
@@ -104,16 +104,35 @@ export function registeredFieldErrors (form: FormApi): Record<string, unknown> |
  * =============================================================================
  */
 
+// Before the browser paints, as `componentDidMount` and `componentDidUpdate` ran. On the server it
+// is a plain effect: a layout effect there only warns, once per wrapper (see `InputNative`).
+export const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
+
+/**
+ * A field host as the decorators return it: memoised, as the `PureComponent` it was skipped a render with
+ * shallow-equal props, named `<Input>AsField` as the class was, and carrying the instance class it hosts.
+ */
+export function namedField<Host extends (props: any) => React.ReactElement | null, Instance> (
+  host: Host, InputComponent: React.ComponentType<any>, InstanceClass: Instance
+) {
+  const name = (InputComponent.name || InputComponent.constructor.name) + 'AsField'
+  Object.defineProperty(host, 'name', {value: name})
+  const Memo = Object.assign(memo(host), {InstanceClass})
+  Object.defineProperty(Memo, 'name', {value: name})
+  return Memo
+}
+
 /**
  * Wrapper Proxy for react-final-form Field with unified API.
  * @Note:
  *    - `normalize` does not exist in react-final-form, only `format` and `parse`
- *    - must use Class to prevent input from loosing focus on input 'onChange'
+ *    - the render prop handed to `Field` must be one function for the field's lifetime, or the input
+ *      remounts and loses focus on 'onChange': the instance below holds it
  *
  * @param InputComponent - React component to use for input
  * @param {Object} [options]
  * @param {function(*, *): *} [options.sanitize] - `(value, props)`: parses the (formatted) value from input Field to InputComponent
- * @returns {import('react').ComponentClass<*>} React InputComponentField - connected to react-final-form
+ * @returns a memoised function component connected to react-final-form, with its `InstanceClass`
  */
 /** The props a field reads; the rest are passed to the input it renders. */
 export type AsFieldProps = {
@@ -151,8 +170,21 @@ export type AsFieldProps = {
  */
 export function asField (InputComponent: React.ComponentType<any>, {sanitize}: { sanitize?: (value: unknown, props: AsFieldProps) => unknown } = {}) {
   if (!Active.Field) Active.Field = Field
-  // noinspection JSPotentiallyInvalidUsageOfThis
-  const Class = class extends PureComponent<AsFieldProps> {
+  /**
+   * What a mounted field holds, one object for its lifetime. Until 2026-10-06 this was the field: a
+   * `PureComponent` with this state on `this`. It is a plain class now, which the function component
+   * below hosts, as `engine/documentHost.ts` hosts a document: the host keeps one per mounted field,
+   * hands it the props of each render, and calls `unmount` when the field leaves. Nothing in it
+   * changed, and the render prop is still one function for the field's lifetime, which is what keeps
+   * final-form from remounting the input on every change (the note above).
+   */
+  class FieldInstance {
+    props: AsFieldProps
+
+    constructor (props: AsFieldProps) {
+      this.props = props
+    }
+
     // The last value seen before an empty one normalized to `undefined`, kept only to make that
     // transition a one-shot. NOT React state: nothing renders from it, so holding it in state only
     // scheduled an update from inside `Input` — a second render pass per Dropdown field and React's
@@ -177,9 +209,10 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
 
     // Handle onRemove field in the repeated-field views (what FIELD.TYPE.MULTIPLE/MULTIPLE_LEVEL
     // used to name — those constants were deleted 2026-09-22 as unreachable, but this unmount
-    // path is live and is reached by any field the host removes from a repeated group)
-    componentWillUnmount () {
-      // warn('-------componentWillUnmount', this.constructor.name)
+    // path is live and is reached by any field the host removes from a repeated group).
+    // What `componentWillUnmount` did, and called when the class's was: the host's layout effect
+    // cleanup runs in the commit that removes the field.
+    unmount () {
       // Call onChange for the deleted input, setting it to `null`:
       // - if input is not registered, its value will not pass to backend
       //   => this should be fine, because if registeredValues are used,
@@ -309,21 +342,27 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
       onChange && onChange(parsedValue, ...args)
     }
 
-    // Do not pass 'onChange' to Field because it fires event as argument
-    // final-form does not take controlled `value`
-    render () {
-      const {
-        name, disabled, normalize, format, parse = normalize, validate, options
-      } = this.props
-      // A cast, not a guard, read at render: final-form's `Field`, unless something replaced it.
-      const ActiveField = Active.Field as typeof Field
-      return <ActiveField {...{name, disabled, normalize, format, parse, validate, options}}
-                           component={this.Input}/>
-    }
   }
 
-  Object.defineProperty(Class, 'name', {value: (InputComponent.name || InputComponent.constructor.name) + 'AsField'})
-  return Class
+  // Do not pass 'onChange' to Field because it fires event as argument
+  // final-form does not take controlled `value`
+  function AsField (props: AsFieldProps) {
+    const own = useRef<FieldInstance | null>(null)
+    if (own.current === null) own.current = new FieldInstance(props)
+    const field = own.current
+    field.props = props
+    useBeforePaintEffect(() => {
+      const mounted = own.current! // not null: the render set it
+      return () => mounted.unmount()
+    }, [])
+    const {name, disabled, normalize, format, parse = normalize, validate, options} = props
+    // A cast, not a guard, read at render: final-form's `Field`, unless something replaced it.
+    const ActiveField = Active.Field as typeof Field
+    return <ActiveField {...{name, disabled, normalize, format, parse, validate, options}}
+                         component={field.Input}/>
+  }
+
+  return namedField(AsField, InputComponent, FieldInstance)
 }
 
 /** The `<Form>` options a document is wrapped with, and the two the wrapper reads itself. */
@@ -568,9 +607,6 @@ function reportDataChanged ({onDataChanged, parent}: { onDataChanged?: unknown, 
   }
 }
 
-// Before the browser paints, as `componentDidMount` and `componentDidUpdate` ran. On the server it
-// is a plain effect: a layout effect there only warns, once per wrapper (see `InputNative`).
-const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 const setFieldTouched = (args: [string, boolean], state: MutableState<Values>) => {
   const [name, touched] = args

@@ -151,4 +151,20 @@ describe('asField', () => {
         fireEvent.blur(input)
         expect(container.querySelector('[data-testid="err"]')).toBeInTheDocument()
     })
+
+    it('keeps one field across renders, so what is typed while focused survives new props', () => {
+        // One instance for the field's lifetime (FieldInstance). Rebuilt on a render, it would forget
+        // the focus and show final-form's formatted value in place of the one being typed.
+        const format = value => (value ? `F:${value}` : value)
+        const { getByTestId, rerender } = render(
+            <RFForm initialValues={{ x: '' }}><Wrapped name="x" format={format} placeholder="first"/></RFForm>
+        )
+        fireEvent.focus(getByTestId('ti'))
+        fireEvent.change(getByTestId('ti'), { target: { value: '1.0' } })
+
+        rerender(<RFForm initialValues={{ x: '' }}><Wrapped name="x" format={format} placeholder="second"/></RFForm>)
+
+        expect(getByTestId('ti')).toHaveAttribute('placeholder', 'second')
+        expect(getByTestId('ti').value).toBe('1.0')
+    })
 })
