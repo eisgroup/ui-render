@@ -26,9 +26,10 @@
  * - One sentence, no `|` (it would break the markdown table), no newlines.
  * - Describe the meta.json contract, not the React internals.
  * - Say only what the source says. "No resolver case handles it" is a fact;
- *   "deprecated" or "planned" would be a guess. Several constants below are
- *   declared with an intent comment and no implementation — that comment is the
- *   only record of intent there is, and it is reported as exactly that.
+ *   "deprecated" or "planned" would be a guess. A constant declared with an
+ *   intent comment and no implementation (none is today: every view resolves)
+ *   is reported as exactly that, because the comment is the only record of
+ *   intent there is.
  */
 
 /**
@@ -43,7 +44,7 @@
  */
 const VIEW_CURATION = {
     AUTO_SUBMIT: {
-        summary: 'Renders no markup of its own and submits the form whenever the values it watches change.',
+        summary: 'Renders no markup of its own and calls its `onChange` with the form values whenever they change, so `"onChange": "submit"` submits the form.',
         resolvesTo: 'AutoSave',
         notes: '`onChange` is required; `delay` debounces it, `partial` sends only changed values and `showLoader` overlays a spinner while saving.',
     },
@@ -85,17 +86,17 @@ const VIEW_CURATION = {
     COUNTER: {
         summary: 'Number that animates from `start` to `end` when it mounts.',
         resolvesTo: 'Counter',
-        notes: null,
+        notes: 'A change of `start`, `end`, `duration`, `delay` or `interval` runs the animation again.',
     },
     DATA: {
-        summary: 'Nested, independent render instance with its own form: `meta` carries the nested declaration, `data` or `name` selects its values, and `kind` groups sibling instances into one array for validation.',
+        summary: 'Nested render instance: `meta` carries the nested declaration, `data` or `name` selects its values, and `kind` groups sibling instances into one array for validation.',
         resolvesTo: 'Data',
-        notes: 'Any falsy local value falls back to the root `data`, so the nested block still has an object to bind against.',
+        notes: 'Its fields belong to the parent\'s form, unless `useForm` gives it a form of its own; a `renderExtraItem` declaration sets `useForm`. With `localDraft` and a `TableCells` declaration it renders a draft row that keeps its values in local state until the row is added. Any falsy local value falls back to the root `data`, so the nested block still has an object to bind against.',
     },
     DROPDOWN: {
         summary: 'Option list that deliberately does not write a form value; its `onChange` is proxied so the handler receives the selected value alone.',
         resolvesTo: 'Dropdown',
-        notes: '`mapOptions` builds `options` out of the node data. Use `Select` for the form-bound equivalent.',
+        notes: '`mapOptions` maps each entry of `options`, usually bound to the data with `{name}`, onto an option. Use `Select` for the form-bound equivalent.',
     },
     EXPAND: {
         summary: 'Expanding and collapsing section with a clickable title, taking `items` as the collapsed content.',
@@ -115,7 +116,7 @@ const VIEW_CURATION = {
     IMAGE: {
         summary: 'Image addressed by `name` plus optional `path`, or by a direct `src`.',
         resolvesTo: 'Image',
-        notes: null,
+        notes: 'Without `src`, the `name` is lower-cased, with spaces turned into dashes, and read from `path`, which defaults to the host\'s `/static/images/`: the package ships no images. `alt` defaults to the `name` without its extension.',
     },
     INPUT: {
         summary: 'Form-bound input whose `type` picks the widget.',
@@ -133,7 +134,7 @@ const VIEW_CURATION = {
         notes: 'Aliases: `ColList`, `VerticalList`. `RowList` and `HorizontalList` are the horizontal form.',
     },
     PIE_CHART: {
-        summary: 'Pie or donut chart drawn as inline SVG from the node data.',
+        summary: 'Pie chart drawn as an inline SVG donut from the node data.',
         resolvesTo: 'PieChart',
         notes: '`mapItems` maps each datum onto the chart shape; `legends`, `pointers` and `sort` control labelling and order.',
     },
@@ -220,12 +221,12 @@ const VIEW_CURATION = {
     TOOLTIP: {
         summary: 'Tooltip whose body comes from `label` and whose trigger is a nested `children` or `items` declaration.',
         resolvesTo: 'Tooltip',
-        notes: 'A `label` is promoted to `content` when no `content` is given (`mapper.tsx`), and `content` is what the tooltip renders — it is an explicit alias for `title` that wins over it. Any node can also carry a `tooltip` attribute instead of using this view, and that attribute may be an object, whose properties are spread into the tooltip — narrowed at §9.7-F1 step 2 part 3 from the 45 names `semantic-ui-react` accepted to 13, with the 19 reachable-and-plausible ones warning once each in development. **Correction (step 2 part 1):** this entry once said `items` supplied the tooltip *body*; measured, `items` becomes the TRIGGER. **And a correction to that correction (step 2 part 3):** part 1 measured the `items` form as not rendering at all, because `semantic-ui-react` required the trigger to be exactly one element (`React.Children.only`) while `mapper.tsx` builds an array, so it threw and left the engine error diagnostic in the node\'s place. The in-house tooltip has no such restriction — the trigger is rendered as children, so `items` renders the trigger AND the tooltip. Both the old failure and the new behaviour are pinned in `UIRender.overlay-behavior.test.js`. **Opens on hover (after 500 ms) and on keyboard focus, NOT on click or tap** — the click gesture was dropped at step 2 part 3 because every tooltipped node owns its own `onClick`; see `docs/SUPPORTED-PROPS.md` under `dropped.on`.',
+        notes: 'A `label` is promoted to `content` when no `content` is given (`mapper.tsx`), and `content` is what the tooltip renders — it is an explicit alias for `title` that wins over it. Any node can also carry a `tooltip` attribute instead of using this view, and that attribute may be an object, whose properties are spread into the tooltip — narrowed at §9.7-F1 step 2 part 3 from the 45 names `semantic-ui-react` accepted to 13, with the 19 reachable-and-plausible ones warning once each in development. **Correction (step 2 part 1):** this entry once said `items` supplied the tooltip *body*; measured, `items` becomes the TRIGGER. **And a correction to that correction (step 2 part 3):** part 1 measured the `items` form as not rendering at all, because `semantic-ui-react` required the trigger to be exactly one element (`React.Children.only`) while `mapper.tsx` builds an array, so it threw and left the engine error diagnostic in the node\'s place. The in-house tooltip has no such restriction — the trigger is rendered as children, so `items` renders the trigger AND the tooltip. `UIRender.overlay-behavior.test.js` pins the new behaviour, in the test that pinned the old failure until it was flipped. **Opens on hover (after 500 ms) and on keyboard focus, NOT on click or tap** — the click gesture was dropped at step 2 part 3 because every tooltipped node owns its own `onClick`; see `docs/SUPPORTED-PROPS.md` under `dropped.on`.',
     },
     UPLOAD: {
-        summary: 'Form-bound single file upload with drag and drop.',
+        summary: 'Form-bound file upload with drag and drop, taking several files unless `multiple` is false.',
         resolvesTo: 'UploadField',
-        notes: 'Also reached from `view: "Input"` with `type: "file"`. Uploading is wired to the host `uploadFile` API call through the `upload` action.',
+        notes: 'Also reached from `view: "Input"` with `type: "file"`. `formats` lists the accepted extensions; with neither `formats` nor a known `fileType`, any file is accepted. Uploading is wired to the host `uploadFile` API call through the `upload` action.',
     },
 }
 
@@ -237,7 +238,7 @@ const VIEW_CURATION = {
 const RENDERER_CURATION = {
     CURRENCY: {
         summary: 'Number prefixed with a currency symbol, where `decimals` defaults to 2 and `symbol` to `$`.',
-        notes: 'A non-numeric value renders nothing.',
+        notes: 'A non-numeric value renders nothing. Written as an object, `{"name": "Currency"}`, it takes the symbol from a `currencyCode` of its own, or else the root meta\'s, and ignores a `symbol`: `$` for `USD`, the default, `€` for `EUR`, `£` for `GBP`, and none for any other code.',
     },
     DATE: {
         summary: 'Value formatted as a date.',
@@ -249,11 +250,11 @@ const RENDERER_CURATION = {
     },
     FLOAT: {
         summary: 'Number with `decimals` decimal places.',
-        notes: 'A non-numeric value renders nothing.',
+        notes: 'Without `decimals` it shows the integer part only, truncated rather than rounded. A non-numeric value renders nothing.',
     },
     PERCENT: {
-        summary: 'Number multiplied by 100 and suffixed with a percent sign.',
-        notes: 'A non-numeric value renders nothing.',
+        summary: 'Number multiplied by 100 and suffixed with a percent sign, with `decimals` decimal places.',
+        notes: 'Without `decimals` it shows the integer part only, truncated rather than rounded. A non-numeric value renders nothing.',
     },
     STRING: {
         summary: 'Value as plain text.',
@@ -285,7 +286,7 @@ const ACTION_CURATION = {
     },
     ON_APPLY_PERIODS: {
         summary: 'Sends all form data to the host `updateExperienceData` API call and restarts the form with the normalized response.',
-        notes: 'Does nothing when the host supplies no `updateExperienceData`; failures open an error popup.',
+        notes: 'Does nothing when the host supplies no `updateExperienceData`. An empty response (`undefined`, `null`, `\'\'`, `0`) leaves the data as it was; failures open an error popup.',
     },
     POPUP: {
         summary: 'Opens an alert popup with the given title and content.',

@@ -21,7 +21,7 @@ page.
 Field attributes starting with the word `render...` are used as function or field definition for displaying certain
 parts of a UI component. For example, in `Table` view, there is `renderCell` attribute used for customizing how value in
 each cell should be displayed (e.x. `renderCell: "Currency"` will render float numbers as currency with dollar sign,
-keeping a maximum of two decimal points).
+with two decimal places).
 
 ## What is `children`?
 
@@ -39,6 +39,8 @@ UI components.
 
 It is called `className`, instead of `class`, because the UI is written in JavaScript, which reserves the word `class`
 as a language keyword.
+
+A meta may also write it as `styles`: the renderer turns a `styles` string into `className`.
 
 ## What style is responsible for `$` or `%` display in table cells?
 

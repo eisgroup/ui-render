@@ -73,6 +73,8 @@ The illustration below demonstrates the structure of UI components, and their sh
 
 It must start with a single `Root` Field object. Within each Field object, you can define nested Fields, under the attribute `items` - an array of nested child objects.
 
+The package ships a JSON Schema for it, `meta.schema.json`, which gives an editor autocomplete and validation; see [configuration](configuration).
+
 ## React Component
 
 A React component is a predefined component that the UI has available to display given data. 

@@ -19,9 +19,9 @@
  *
  * THE THREE OUTCOMES, AND WHY THE SPLIT IS THE POINT
  * -----------------------------------------------------------------------------
- * "A prop appears in a meta" is not "a prop reaches semantic-ui-react". Every prop on one
- * of the two still-wrapped views has exactly one of three fates, and they are three different
- * promises to a consumer:
+ * "A prop appears in a meta" is not "a prop reaches semantic-ui-react". Every prop on a
+ * wrapped view had exactly one of three fates (no view is wrapped since step 3 part 2), and
+ * they were three different promises to a consumer:
  *
  *   consumed   the wrapper (or its engine caller) reads it and it never reaches SUIR.
  *              WE own the behaviour. §9.7-F1 steps 2-3 must keep it working, and the swap
@@ -67,7 +67,8 @@
  */
 
 /**
- * Per in-house component (one so far: `Table`, shipped by §9.7-F1 step 1).
+ * Per in-house component: `Table` (§9.7-F1 step 1), `Tooltip` (step 2 part 3) and `Dropdown`
+ * (step 3 part 2), which is all three.
  *
  * `props` covers the root's own destructured props, `partProps` the shared destructure every
  * subcomponent uses, and `elements` names each subcomponent — all three are enforced total
@@ -92,20 +93,21 @@ const IN_HOUSE_CURATION = {
             + 'the caller\'s `className` and nothing else.',
         cssContract: '`src/style/components/table.less` hangs EVERY cell\'s padding off `.ui.table` '
             + '(`.ui.table td > :not(.button)` / `th > :not(.button)`), so the root has to keep '
-            + 'emitting both tokens even though nothing "semantic" is loaded any more: drop either '
+            + 'emitting both tokens even though no Semantic table CSS is loaded: drop either '
             + 'and every table in the product loses its cell padding. `table:not(.as-layout).inverted` '
             + 'and `table.striped tr:nth-child(2n)` are why `inverted`/`striped` survived as props. '
             + 'The element names and the `table > thead|tbody > tr > th|td` nesting are load-bearing '
             + 'too — the border-radius rules and `table.no-header.vertical > tbody > tr > th` select '
             + 'on structure, not on classes.',
         props: {
-            className: 'Appended last, after `table`. `TableView` builds it from the meta '
-                + '`styles`/`fill`/`vertical` attributes; consumer metas add `as-layout`, `no-header`, '
+            className: 'Appended last, after `table`. `TableView` builds it from `full-width`, the meta '
+                + '`styles` (which arrive as `className`) and `vertical`; `fill` goes to the scroll container '
+                + 'around the table instead. Consumer metas add `as-layout`, `no-header`, '
                 + '`highlight-N-last` and the sticky-column tokens through the same channel.',
             inverted: 'Dark table. Emitted as the `inverted` class, which `table.less` and '
                 + '`expand.less` both select on. **KEPT — decided at §9.9-H1 (2026-09-17), which is '
                 + 'where step 1 left the call.** Its one in-repo caller was `ErrorTable.js`, and H1 '
-                + 'deleted it, so the "Attributes at the call sites" table above no longer lists this '
+                + 'deleted it, so the "Attributes at the call sites" table below no longer lists this '
                 + 'prop — that table reports what the CODEBASE passes, not what the component accepts. '
                 + 'The prop itself is untouched: `Table.tsx` still destructures it and still emits the '
                 + 'class, the CSS still selects on it, and a consumer meta can still set it. Dropping '
@@ -182,7 +184,7 @@ const IN_HOUSE_CURATION = {
                 + 'tractable — filtering, diacritics-insensitive matching and a search input are '
                 + 'the bulk of what the library was doing.',
             multiple: 'Multi-selection, with the value as an array. Same decision and same evidence '
-                + 'as `search`. The one `"multiple": false` in the tracked corpus is on a FILE '
+                + 'as `search`. Every `multiple` in the tracked corpus is on a FILE '
                 + 'UPLOAD input, not on a select — checked, not assumed. Note the array-VALUE path '
                 + 'survives untouched: a colour option carries `[r, g, b]` and is still joined to a '
                 + 'string, which is a different feature that happened to share this branch.',
@@ -233,7 +235,7 @@ const IN_HOUSE_CURATION = {
         partProps: {},
         elements: {},
         classContract: 'THE WRAPPER emits `input--wrapper` plus `{float, done, labeled, fill-width, '
-            + 'required, info, readonly}` and the caller\'s `className`, unchanged by the swap. THE '
+            + 'required}` and the caller\'s `className`, unchanged by the swap. THE '
             + 'CONTROL, one level down in `Listbox.tsx`, emits `ui`, then the '
             + '`{active, visible, error, disabled, compact, upward}` modifiers, then `selection`, then '
             + '`dropdown`, then the wrapper-derived `{info, readonly}` — the same token SET Semantic '
@@ -243,12 +245,13 @@ const IN_HOUSE_CURATION = {
             + '`src/style/__tests__/css.dropdown-contract.test.js` pins what each token is worth: `ui` '
             + 'and `dropdown` reach all 13 scoped rules that can match the control, `selection` 12 of '
             + 'them, `active` 4, `visible` 1. The four inner nodes are pinned the same way — '
-            + '`.text.divider[.default]` (6 rules), `<i class="icon dropdown">` (13), '
+            + '`.text.divider[.default]` (7 rules), `<i class="icon dropdown">` (13), '
             + '`.menu.transition[.visible]` (11), and each option as `.item[.selected][.active]` (6). '
             + '`selected` is the CURSOR and `active` the committed value, which is Semantic\'s own '
             + 'split and why both survive.',
-        behaviourContract: 'The WAI-ARIA listbox pattern, which is a deliberate change from what the '
-            + 'library did: arrows move a cursor conveyed by `aria-activedescendant`, Enter commits, '
+        behaviourContract: 'The WAI-ARIA select-only combobox pattern — the `combobox` takes focus and '
+            + 'its options sit in a `listbox` beside it — which is a deliberate change from what the '
+            + 'library did: arrows move a cursor conveyed by `aria-activedescendant`, Enter or Space commits, '
             + 'Escape closes having reported nothing, and the cursor wraps at both ends and skips '
             + '`disabled` options. Semantic committed as the arrows moved (`selectOnNavigation` '
             + 'defaults true) and on blur (`selectOnBlur`), so a user who arrowed past an option had '
@@ -272,13 +275,14 @@ const IN_HOUSE_CURATION = {
             + 'Only the `<DropDown/>` element at the bottom changed — it is now the in-house `Listbox`, under the same import alias. Two entry points, and they differ: `mapper.tsx` imports the memoised default '
             + 'export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.ts` imports the '
             + 'NAMED export for `view: "Select"` — which is the majority path.',
-        cssContract: 'The loaded `modules/dropdown` LESS is the largest single semantic module in the '
+        cssContract: 'Semantic\'s `modules/dropdown` CSS, vendored at step 4 as '
+            + '`src/style/vendor/semantic-dropdown.less`, is the largest single semantic module in the '
             + 'compiled CSS and is keyed almost entirely on `.ui.selection.dropdown`, so the coupling '
-            + 'between steps 3 and 4 is real and this step paid it rather than deferring it: `Listbox` '
+            + 'between steps 3 and 4 is real and step 3 paid it rather than deferring it: `Listbox` '
             + 'keeps emitting Semantic\'s token vocabulary verbatim, including the `menu transition '
-            + 'visible` node and the per-option `item selected active`, because every one of those is '
-            + 'load-bearing until the CSS is re-homed. The token-by-token measurement is in '
-            + '`css.dropdown-contract.test.js`, which is what makes step 4 a bounded change instead of '
+            + 'visible` node and the per-option `item selected active`, because the vendored CSS and our '
+            + 'own LESS beside it still select on every one of those. The token-by-token measurement is in '
+            + '`css.dropdown-contract.test.js`, which is what made step 4 a bounded change instead of '
             + 'a guess. Two modifiers Semantic emitted are gone with their features (`search`, '
             + '`multiple`); nothing in the loaded CSS selects on either without also requiring markup '
             + 'the control no longer renders.',
@@ -288,18 +292,20 @@ const IN_HOUSE_CURATION = {
             + 'under, and the strip deliberately happens AFTER the handler closures are built.',
         props: {
             options: 'Option list: strings, numbers, or `{text, value, key, content, disabled}` objects. '
-                + 'Sanitised into a fresh array (translation, `value`-from-`text` defaulting, `optionsLabel` '
-                + 'appended) and held in wrapper state. The array the control receives is never the array the '
-                + 'caller passed, and a `null` options prop is tolerated as an empty list — it used to '
-                + 'reach Semantic and crash.',
+                + 'Held in wrapper state and sanitised into a fresh array (translation, `value`-from-`text` '
+                + 'defaulting, `optionsLabel` appended) whenever there is something to change: an empty list, '
+                + 'or objects with numeric values and no `optionsLabel`, reach the control as given. A `null` '
+                + 'options prop is tolerated as an empty list — it used to reach Semantic and crash.',
             onChange: 'Called as `onChange(value, name, event)` — the wrapper\'s own signature, not '
                 + 'Semantic\'s `(event, data)`. The case-insensitive duplicate collapsing that used to live here '
                 + 'went with `allowAdditions`: it could only ever fire for a TYPED value.',
             onSelect: 'Called on close with the last committed value, same `(value, name, event)` shape. '
                 + 'Implemented by handing the control an `onClose`.',
             label: 'Visible label text, rendered by the wrapper as its own `<Text>` before or after the '
-                + 'control depending on `float`. CONSUMED, not stripped: it is destructured out at the '
-                + 'top of the wrapper, so it can never be in the rest bag that `omitProps` filters.',
+                + 'control depending on `float`, and handed to the combobox as its `aria-label`, which a '
+                + 'meta\'s own `aria-label` or `aria-labelledby` overrides. CONSUMED, not stripped: it is '
+                + 'destructured out at the top of the wrapper, so it can never be in the rest bag that '
+                + '`omitProps` filters.',
             placeholder: 'Placeholder text, translated by the wrapper and then forwarded.',
             done: 'Adds a `done` class to the wrapper, the completed state the stylesheet selects on. '
                 + 'Unless given, it is true for a value and no error. Until 2026-10-01 the default read '
@@ -363,7 +369,8 @@ const IN_HOUSE_CURATION = {
             + 'around it is new. What the baseline still cannot see is the BUBBLE, which exists only '
             + 'while open, and therefore anything about opening, placement or dismissal.',
         behaviourContract: 'Opens on hover after `delay` (500 ms) and on focus, immediately. Closes '
-            + '70 ms after the pointer leaves, on blur, on a click anywhere in the document, and on '
+            + '70 ms after the pointer leaves (unless the trigger has focus, which keeps it open until '
+            + 'blur), on blur, on a click anywhere outside it, and on '
             + 'Escape. Leaving before the delay elapses cancels the pending open, and a pending open '
             + 'never fires against an unmounted tree. The bubble is NOT hoverable — measured in '
             + 'Chrome, moving the pointer onto it closes the tooltip, exactly as SUIR did without '
@@ -383,14 +390,15 @@ const IN_HOUSE_CURATION = {
             + 'SUIR had none of that. CLICK-TO-OPEN IS GONE — see `dropped.on`. The trigger may be '
             + 'any children, including several or none: `React.Children.only` is gone with the '
             + 'portal, so the `items` form of `view: "Tooltip"` renders instead of throwing the '
-            + 'engine\'s error diagnostic. Pinned on React 16.14/17.0.2/18.3 by '
+            + 'engine\'s error diagnostic. Pinned on React 16.14/17.0.2/18.3/19.3.0 by '
             + '`components/__tests__/Tooltip.behavior.test.js` and '
             + '`UIRender.overlay-behavior.test.js`, and in real Chrome by `e2e/corpus.tooltip.pw.js`.',
         cssContract: 'The bubble is now mounted INSIDE `.ui-render`, which is what makes our own CSS '
             + 'apply to it at all — the SUIR bubble portaled into `document.body`, outside the '
             + 'prefixwrap scope, so not one of the 13 `.ui.popup` rules could paint it and the live '
-            + 'tooltip was unstyled text. It shares `src/style/components/tooltip.less` with '
-            + '`Tooltip.tsx`, so `tooltip`, `no-wrap`, the four placement words and `show` are all '
+            + 'tooltip was unstyled text. It draws its bubble with `TooltipBubble.tsx`, sharing '
+            + '`src/style/components/tooltip.less` with `Slider`, `Upload` and the validation tooltip, '
+            + 'so `tooltip`, `no-wrap`, the four placement words and `show` are all '
             + 'load-bearing, and `.show` must keep beating the `*:hover > &` reveal — which it does on '
             + 'source order at equal specificity, not by outranking it. THE HAZARD THIS STEP CARRIES: '
             + '`tooltip.less` sets `pointer-events: none` on the bubble, and without it the bubble '
@@ -579,7 +587,7 @@ const FORWARDED_CURATION = {}
  *
  * This is the "discovered set" §9.7-F1 step 0 asked for. Read it as an inventory, not as a
  * forwarding claim: most of these are consumed by `mapper.tsx`/`TableView.tsx` and never reach
- * semantic-ui-react at all. The `outcome` column on the page says which is which.
+ * semantic-ui-react at all. The per-component tables on the page say what becomes of each.
  */
 const META_ATTRIBUTES = {
     Table: [
@@ -606,8 +614,8 @@ const META_ATTRIBUTES = {
  *
  * Kept separate and NOT machine-checked on purpose: those files are untracked working files
  * (§0.8) and CI never sees them. They are recorded because two of them (`upward`, `disabled`)
- * reach semantic-ui-react and are styled, so a checklist derived from the demo corpus alone
- * would be wrong. Only semantic-ui-react / meta API prop names appear here.
+ * reached semantic-ui-react and are styled, so a checklist derived from the demo corpus alone
+ * would have been wrong. Only semantic-ui-react / meta API prop names appear here.
  */
 const CONSUMER_ONLY_ATTRIBUTES = {
     Table: ['colGroup'],
@@ -726,7 +734,8 @@ const STEP_OBLIGATIONS = [
                 + '`top: 50%` at the same specificity as `.top`/`.bottom`, so a corner class string matched both '
                 + 'and the axis came out over-constrained); all four are fixed by writing the losing offset back '
                 + 'per corner rather than by raising specificity, and the retained measurement '
-                + '(`PLACEMENTS_OVERLAPPING_HOST`) records both TOP corners sitting on their own host. The second '
+                + '(`PLACEMENTS_OVERLAPPING_HOST`), which recorded both TOP corners sitting on their own host, '
+                + 'is empty now. The second '
                 + 'fix was to the VERDICT, which required every corner to align to its host\'s LEFT edge — '
                 + 'something `top right` and `bottom right` cannot do, so those two would have stayed red after '
                 + 'the CSS was right. An earlier draft of this note claimed they had been placing correctly all '
@@ -736,8 +745,9 @@ const STEP_OBLIGATIONS = [
                 + 'left-aligned above it.',
             'SHIPPED — the gate. 63 tooltip tests across four files where there were 10, only 5 of which '
                 + 'could fail if the tooltip broke (the other 5 asserted the props handed to a mock): '
-                + '`components/__tests__/Tooltip.test.js` (rewritten against the REAL '
-                + '`semantic-ui-react`, no `jest.mock`), `components/__tests__/Tooltip.behavior.test.js` '
+                + '`components/__tests__/Tooltip.test.js` (written in part 1 against the REAL '
+                + '`semantic-ui-react`, no `jest.mock`, and rewritten in part 3 against the in-house '
+                + 'component), `components/__tests__/Tooltip.behavior.test.js` '
                 + '(new — the interaction contract), `engine/__tests__/UIRender.overlay-behavior.test.js` '
                 + '(extended to all three meta entry points) and '
                 + '`style/__tests__/css.tooltip-contract.test.js` (new — joins the emitted class string to '
@@ -782,8 +792,9 @@ const STEP_OBLIGATIONS = [
             'DECIDED (was STILL OWED) — the trigger may be anything. `React.Children.only` went with the '
                 + 'portal, so the `items` form of `view: "Tooltip"`, which threw and made the engine draw '
                 + 'its error diagnostic in place of the node (losing the trigger too), now renders the '
-                + 'trigger AND the tooltip. Both the old failure and the new behaviour are pinned in '
-                + '`UIRender.overlay-behavior.test.js`, and `docs/SUPPORTED-VIEWS.md` records the flip.',
+                + 'trigger AND the tooltip. `UIRender.overlay-behavior.test.js` pins the new behaviour, in the '
+                + 'test that pinned the old failure until it was flipped, and `docs/SUPPORTED-VIEWS.md` '
+                + 'records the flip.',
             'THE POSITIONING DECISION — RESOLVED as zero-dep CSS placement off the host box (see the '
                 + 'SHIPPED entry above for the costs). The data it was decided on, kept because it is what '
                 + 'made the decision defensible: flip was '
@@ -793,8 +804,9 @@ const STEP_OBLIGATIONS = [
                 + '`:before`, not a positioned element; and scroll/resize repositioning is on. So parity is '
                 + '**flip yes, shift no** — §9.7-F1.2\'s claim that the zero-dep option loses "flip AND '
                 + 'overflow handling" is half right. Coordinates are unavoidable while the bubble portals '
-                + 'out of the tree; an inline tooltip needs none (and the in-house `Tooltip.tsx` proves the '
-                + 'pattern ships) but would be clipped at the corpus\'s own use sites, which sit inside '
+                + 'out of the tree; an inline tooltip needs none (and the in-house `TooltipBubble.tsx`, '
+                + '`Tooltip.tsx` until §9.9-H6, proves the pattern ships) but would be clipped at the '
+                + 'corpus\'s own use sites, which sit inside '
                 + '`Expand` → `AnimateHeight`\'s `overflow: hidden`. Neither option is ruled in; '
                 + '"no positioning code" and "inline only" are ruled out.',
             'WHAT THE GATE CANNOT SAY, so the replacement is not judged on it: everything positional. jsdom '
@@ -802,11 +814,11 @@ const STEP_OBLIGATIONS = [
                 + 'arrow geometry, the 250 px wrap, clipping, stacking, painted style, real pointer travel '
                 + 'and screen-reader announcement are all inexpressible. They are named one by one against '
                 + 'the §9.5 Playwright item, which now blocks THIS step\'s completion rather than only F1\'s.',
-            'FREE CLEANUP, confirmed: the `TooltipPop` chain in `modules/form/utils.tsx` is dead at four '
-                + 'sites — the import (line 8), `withForm`\'s `Tooltip = TooltipPop` default parameter, the '
-                + 'pass-through into `withFormSetup({… Tooltip})`, and the destructure that never uses it. '
-                + 'Delete all four; do NOT touch line 7, which imports the in-house `Tooltip` as `ToolTip` '
-                + 'and IS used by the validation-error tooltip.',
+            'DONE (was FREE CLEANUP) — the `TooltipPop` chain in `modules/form/utils.tsx` was dead at four '
+                + 'sites — the import, `withForm`\'s `Tooltip = TooltipPop` default parameter, the '
+                + 'pass-through into `withFormSetup({… Tooltip})`, and the destructure that never used it — '
+                + 'and all four are gone. The import beside it, which the validation-error tooltip uses, '
+                + 'stays: it is `TooltipBubble` since §9.9-H6.',
         ],
     },
     {
@@ -817,7 +829,7 @@ const STEP_OBLIGATIONS = [
             'MET: `displayName = \'Dropdown\'` and the named-vs-default export split both survive — `modules/form/utils.tsx` still branches on `InputComponent.displayName`, and only the named export carries it.',
             'MET, and one addition: `role="listbox"`, `aria-expanded`, `aria-disabled` and `tabIndex=-1` when disabled are all emitted. `aria-disabled` was MISSING in the first draft and caught by the behavioural suite — a `role="listbox"` div cannot carry the native attribute, so being unavailable has to be said three ways. Added beyond the library: `aria-activedescendant`, which is how the keyboard cursor is announced now that moving no longer commits.',
             'DECIDED: tier 2 was resolved as REMOVAL, on the evidence that nothing in either corpus or the consumer-only record declares any of them. Not silently — the removed names are stripped at the boundary and warn once each in development, and the `Dropped` table below is the record.',
-            'DELIVERED: both `classContract` and `behaviourContract` are measured and present above. The class contract is pinned token by token in `src/style/__tests__/css.dropdown-contract.test.js` (what each class is worth in scoped rules), and the behaviour contract is the WAI-ARIA listbox model — arrows move a cursor, Enter commits, Escape reports nothing.',
+            'DELIVERED: both `classContract` and `behaviourContract` are measured and present above. The class contract is pinned token by token in `src/style/__tests__/css.dropdown-contract.test.js` (what each class is worth in scoped rules), and the behaviour contract is the WAI-ARIA listbox model — arrows move a cursor, Enter commits, Escape reports nothing. The same keys work in the select-only combobox pattern the control follows now.',
         ],
     },
 ]
