@@ -21,7 +21,7 @@ describe('asInputDateField edge contracts', () => {
         try {
             Active.Field = null
             const RegisteredDateField = asInputDateField(DateInput)
-            expect(RegisteredDateField).toEqual(expect.any(Function))
+            expect(RegisteredDateField.InstanceClass).toEqual(expect.any(Function))
             expect(Active.Field).toBe(Field)
         } finally {
             Active.Field = registered
@@ -29,7 +29,7 @@ describe('asInputDateField edge contracts', () => {
     })
 
     it('exposes a null cached value until one is assigned', () => {
-        const field = new DateField({ name: 'effectiveDate' })
+        const field = new DateField.InstanceClass({ name: 'effectiveDate' })
         expect(field.value).toBeNull()
 
         field.value = '2026-07-31'
@@ -38,7 +38,7 @@ describe('asInputDateField edge contracts', () => {
 
     it('formats a pristine default value but leaves a non-pristine empty value undefined', () => {
         const format = jest.fn(value => `formatted:${value}`)
-        const field = new DateField({
+        const field = new DateField.InstanceClass({
             name: 'effectiveDate',
             defaultValue: '2026-01-01',
             format,
@@ -60,7 +60,7 @@ describe('asInputDateField edge contracts', () => {
     })
 
     it('uses an unformatted default and supports omitted meta state', () => {
-        const field = new DateField({
+        const field = new DateField.InstanceClass({
             name: 'effectiveDate',
             defaultValue: '2026-02-02',
         })
@@ -86,7 +86,7 @@ describe('asInputDateField edge contracts', () => {
         const form = {}
         const instance = { form, props: {} }
         touchedFor(form).effectiveDate = true
-        const explicit = new DateField({
+        const explicit = new DateField.InstanceClass({
             name: 'effectiveDate',
             error: 'Configured error',
             instance,
@@ -98,7 +98,7 @@ describe('asInputDateField edge contracts', () => {
         expect(explicitView.props.error).toBe('Configured error')
 
         delete touchedFor(form).effectiveDate
-        const formOwned = new DateField({ name: 'effectiveDate', instance })
+        const formOwned = new DateField.InstanceClass({ name: 'effectiveDate', instance })
         const formView = formOwned.Input({
             input: { ...input, value: 'invalid' },
             meta: { error: 'Form error', pristine: false, touched: false },
@@ -108,7 +108,7 @@ describe('asInputDateField edge contracts', () => {
 
     it('keeps a readonly forced value visible and wires focus/blur handlers', () => {
         const input = inputApi()
-        const field = new DateField({
+        const field = new DateField.InstanceClass({
             name: 'effectiveDate',
             readonly: true,
             value: 'forced-value',
@@ -134,7 +134,7 @@ describe('asInputDateField edge contracts', () => {
 
     it('passes raw changes to final-form without caching when unfocused', () => {
         const onChange = jest.fn()
-        const field = new DateField({ name: 'effectiveDate', onChange })
+        const field = new DateField.InstanceClass({ name: 'effectiveDate', onChange })
         field.input = inputApi()
 
         field.handleChange('2026-04-04', 'extra')

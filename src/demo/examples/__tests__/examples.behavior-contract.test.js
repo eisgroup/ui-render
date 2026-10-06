@@ -111,8 +111,7 @@ const CENSUS_ROLES = [
  * `tabsButtoned` had one until 2026-10-06, when tabs took the WAI-ARIA Tabs pattern and an
  * Expand's title, like a sortable column's header, became a button: they gained `tab`,
  * `tablist` and `button`, and so did every example that renders tabs, an Expand or a sort.
- * `upload` and `uploadVariants` still render no interactive role, so their controls are
- * invisible to assistive technology, and layer (2) has nothing role-shaped to drive there.
+ * `upload` and `uploadVariants` had one too, until their drop zones became buttons the same day.
  * `showIf` and `summaryBox` are legitimately text-only.
  */
 const ROLE_CENSUS = {
@@ -149,8 +148,8 @@ const ROLE_CENSUS = {
     rowListRelativeData: { table: 1, rowgroup: 2, row: 5, columnheader: 5, cell: 10, listbox: 1, option: 2, combobox: 1, tab: 2, tablist: 1 },
     showIf: {},
     summaryBox: {},
-    upload: {},
-    uploadVariants: {},
+    upload: { button: 1 },
+    uploadVariants: { button: 3 },
     slider: { slider: 6 },
     invalidArray: { table: 2, rowgroup: 4, row: 2, columnheader: 9, listbox: 1, img: 1, combobox: 1 },
     all: { table: 3, rowgroup: 6, row: 10, columnheader: 18, cell: 31, button: 8, checkbox: 1, listbox: 3, option: 4, img: 2, combobox: 3, tab: 3, tablist: 1 },
@@ -201,7 +200,9 @@ const FORM_BINDINGS = {
 // two are the `layout` example's tabs, which have no title in a bar its meta hides with
 // `classNameTabs: 'hide'`. jsdom applies no CSS; in a browser that bar is not displayed, so they are
 // neither seen nor announced.
-const NAMELESS_CONTROLS = { total: 145, nameless: 81 }
+// 145 -> 149 the same day, when the four drop zones of the upload examples became buttons, each named
+// by the text it shows.
+const NAMELESS_CONTROLS = { total: 149, nameless: 81 }
 
 /** Roles that count as an interactive control for the ledger above. */
 const CONTROL_ROLES = ['textbox', 'spinbutton', 'checkbox', 'combobox', 'listbox', 'slider', 'button', 'tab']

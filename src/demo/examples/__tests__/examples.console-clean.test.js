@@ -11,9 +11,7 @@
  * This holds the corpus at zero. React prints each kind of warning once per run, so a NEW one shows
  * up here even when another suite has already triggered it elsewhere.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import util from 'util' // eslint-disable-line import/first

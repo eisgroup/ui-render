@@ -11,9 +11,7 @@
  * pinned here by what the host receives, not by when, so it holds for whatever the layer is.
  */
 // The engine hands the `fetch` action the global one whenever it builds a meta.
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

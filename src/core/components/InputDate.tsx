@@ -120,7 +120,12 @@ const InputDate = ({
             // `2021/01/02`, `Jan 2, 2021`) must still render. Showing it blank reads as "unset" to
             // the user, who then overwrites a perfectly good date.
             parsed = moment(date, [dateFormat, 'YYYY-MM-DD', moment.ISO_8601], true)
-            if (!parsed.isValid()) parsed = moment(date)
+            // The lenient read is `moment(date)`'s own, step by step: ISO 8601, RFC 2822, then the
+            // `Date` parse Moment falls back to. Called as `moment(date)`, that last step printed
+            // Moment's deprecation warning to the host's console, until 2026-10-06.
+            if (!parsed.isValid()) parsed = moment(date, moment.ISO_8601)
+            if (!parsed.isValid()) parsed = moment(date, moment.RFC_2822)
+            if (!parsed.isValid()) parsed = moment(new Date(date))
         }
 
         return parsed.isValid() ? parsed : null

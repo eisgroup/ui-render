@@ -127,4 +127,20 @@ describe('asInputDateField', () => {
         )
         expect(container.querySelector('[data-testid="dt"]')).toBeInTheDocument()
     })
+
+    it('keeps one field across renders, so what is typed while focused survives new props', () => {
+        // One instance for the field's lifetime (FieldInstance). Rebuilt on a render, it would forget
+        // the focus and show final-form's formatted value in place of the one being typed.
+        const format = value => (value ? `F:${value}` : value)
+        const { getByTestId, rerender } = render(
+            <RFForm initialValues={{ d: '' }}><WrappedDate name="d" format={format} placeholder="first"/></RFForm>
+        )
+        fireEvent.focus(getByTestId('dt'))
+        fireEvent.change(getByTestId('dt'), { target: { value: '2024-0' } })
+
+        rerender(<RFForm initialValues={{ d: '' }}><WrappedDate name="d" format={format} placeholder="second"/></RFForm>)
+
+        expect(getByTestId('dt')).toHaveAttribute('placeholder', 'second')
+        expect(getByTestId('dt').value).toBe('2024-0')
+    })
 })

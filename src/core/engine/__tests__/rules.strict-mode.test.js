@@ -7,9 +7,7 @@
  * documents, rendered through the published entry. It is the engine's half of §9.3 step 7.
  */
 // The engine hands the `fetch` action the global one whenever it builds a meta.
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

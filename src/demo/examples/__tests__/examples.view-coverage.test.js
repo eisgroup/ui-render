@@ -13,9 +13,7 @@
  * the list honest: it renders the examples, records the `view` of every node the mapper resolves, and fails
  * when a registered view is rendered by neither an example nor a declaration below.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import util from 'util' // eslint-disable-line import/first

@@ -88,7 +88,7 @@ describe('form data synchronization contracts', () => {
         const staleOnChange = jest.fn()
         const onChange = jest.fn()
         const parse = jest.fn(value => value.trim())
-        const instance = new FieldComponent({
+        const instance = new FieldComponent.InstanceClass({
             name: 'rows[0].amount',
             instance: owner,
             onChange,

@@ -65,328 +65,10 @@
     "prepack": "npm run sync-version -- --check && npm run docs:views:check && npm run docs:props:check && npm run build-lib",
     "sync-version": "node scripts/sync-version.js",
     "version": "node scripts/sync-version.js && git add src/library/AppWrapper.tsx public/index.html",
-    "lint:js": "eslint src --ext .js,.jsx,.ts,.tsx --max-warnings 0",
+    "lint:js": "eslint src --max-warnings 0",
     "lint:css": "stylelint 'src/style/**/*.less'",
     "css:fixture": "node scripts/generate-semantic-css-fixture.js",
     "css:fixture:check": "node scripts/generate-semantic-css-fixture.js --check"
-  },
-  "eslintConfig": {
-    "extends": "react-app",
-    "overrides": [
-      {
-        "files": [
-          "src/**/*.js",
-          "src/**/*.jsx",
-          "src/**/*.ts",
-          "src/**/*.tsx"
-        ],
-        "rules": {
-          "no-restricted-imports": [
-            "error",
-            {
-              "paths": [
-                {
-                  "name": "semantic-ui-react",
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "name": "prop-types",
-                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
-                }
-              ],
-              "patterns": [
-                "semantic-ui-react/*"
-              ]
-            }
-          ]
-        }
-      },
-      {
-        "files": [
-          "src/core/**"
-        ],
-        "rules": {
-          "no-restricted-imports": [
-            "error",
-            {
-              "paths": [
-                {
-                  "name": "semantic-ui-react",
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "name": "prop-types",
-                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
-                }
-              ],
-              "patterns": [
-                {
-                  "group": [
-                    "semantic-ui-react/*"
-                  ],
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "group": [
-                    "**/demo",
-                    "**/demo/**"
-                  ],
-                  "message": "core must never import the demo — the dependency runs the other way. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                }
-              ]
-            }
-          ]
-        }
-      },
-      {
-        "files": [
-          "src/core/modules/**"
-        ],
-        "rules": {
-          "no-restricted-imports": [
-            "error",
-            {
-              "paths": [
-                {
-                  "name": "semantic-ui-react",
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "name": "prop-types",
-                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
-                }
-              ],
-              "patterns": [
-                {
-                  "group": [
-                    "semantic-ui-react/*"
-                  ],
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "group": [
-                    "**/demo",
-                    "**/demo/**"
-                  ],
-                  "message": "core must never import the demo — the dependency runs the other way. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                },
-                {
-                  "group": [
-                    "**/engine",
-                    "**/engine/**"
-                  ],
-                  "message": "core/modules must not import core/engine. §9.3 step 2 removed the last two such imports, from modules/form/utils, by moving the registries both sides share into core/state: put a shared registry there. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                }
-              ]
-            }
-          ]
-        }
-      },
-      {
-        "files": [
-          "src/core/components/**"
-        ],
-        "rules": {
-          "no-restricted-imports": [
-            "error",
-            {
-              "paths": [
-                {
-                  "name": "semantic-ui-react",
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "name": "prop-types",
-                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
-                }
-              ],
-              "patterns": [
-                {
-                  "group": [
-                    "semantic-ui-react/*"
-                  ],
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "group": [
-                    "**/demo",
-                    "**/demo/**"
-                  ],
-                  "message": "core must never import the demo — the dependency runs the other way. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                },
-                {
-                  "group": [
-                    "**/modules",
-                    "**/modules/**"
-                  ],
-                  "message": "core/components must not import core/modules — put the shared value in core/utils instead, which is how the ISO_8601 regexes were resolved at H5. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                },
-                {
-                  "group": [
-                    "**/engine",
-                    "**/engine/**"
-                  ],
-                  "message": "core/components must not import core/engine. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                }
-              ]
-            }
-          ]
-        }
-      },
-      {
-        "files": [
-          "src/core/utils/**"
-        ],
-        "rules": {
-          "no-restricted-imports": [
-            "error",
-            {
-              "paths": [
-                {
-                  "name": "semantic-ui-react",
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "name": "prop-types",
-                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
-                }
-              ],
-              "patterns": [
-                {
-                  "group": [
-                    "semantic-ui-react/*"
-                  ],
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "group": [
-                    "**/demo",
-                    "**/demo/**"
-                  ],
-                  "message": "core must never import the demo — the dependency runs the other way. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                },
-                {
-                  "group": [
-                    "**/components",
-                    "**/components/**"
-                  ],
-                  "message": "core/utils must not import core/components. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                },
-                {
-                  "group": [
-                    "**/modules",
-                    "**/modules/**"
-                  ],
-                  "message": "core/utils must not import core/modules. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                },
-                {
-                  "group": [
-                    "**/engine",
-                    "**/engine/**"
-                  ],
-                  "message": "core/utils must not import core/engine. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                },
-                {
-                  "group": [
-                    "**/state",
-                    "**/state/**"
-                  ],
-                  "message": "`utils` imports nothing above it, and `state` is above it (§9.3 step 2). `state` holds the registries the layers above share (§9.3 step 2) and sits just above `utils`: it may import `utils` and nothing else. Putting a component, a module or the engine below it would recreate the `engine` <-> `modules/form` cycle this layer exists to remove."
-                }
-              ]
-            }
-          ]
-        }
-      },
-      {
-        "files": [
-          "src/core/state/**"
-        ],
-        "rules": {
-          "no-restricted-imports": [
-            "error",
-            {
-              "paths": [
-                {
-                  "name": "semantic-ui-react",
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "name": "prop-types",
-                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
-                }
-              ],
-              "patterns": [
-                {
-                  "group": [
-                    "semantic-ui-react/*"
-                  ],
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "group": [
-                    "**/demo",
-                    "**/demo/**"
-                  ],
-                  "message": "core must never import the demo — the dependency runs the other way. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                },
-                {
-                  "group": [
-                    "**/components",
-                    "**/components/**"
-                  ],
-                  "message": "core/state must not import core/components. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                },
-                {
-                  "group": [
-                    "**/modules",
-                    "**/modules/**"
-                  ],
-                  "message": "core/state must not import core/modules. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                },
-                {
-                  "group": [
-                    "**/engine",
-                    "**/engine/**"
-                  ],
-                  "message": "core/state must not import core/engine. Layer direction (§9.9-H5; `state` since §9.3 step 2): `utils` imports nothing above it; `state` may import `utils`; `components` may import `state`/`utils`; `modules` may import `components`/`state`/`utils`; the engine may import anything in core; core never imports the demo. See docs/UPGRADE-PLAN.md §9.9-H5."
-                }
-              ]
-            }
-          ]
-        }
-      },
-      {
-        "files": [
-          "src/**/__tests__/**"
-        ],
-        "rules": {
-          "no-restricted-imports": [
-            "error",
-            {
-              "paths": [
-                {
-                  "name": "semantic-ui-react",
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                },
-                {
-                  "name": "prop-types",
-                  "message": "prop-types is not a dependency of this project: UPGRADE-PLAN 9.6-E5 deleted every propTypes declaration and removed the package, and the TypeScript props types document what they declared. It is still installed, as a dependency of development packages, so an import would resolve and bundle it again."
-                }
-              ],
-              "patterns": [
-                {
-                  "group": [
-                    "semantic-ui-react/*"
-                  ],
-                  "message": "semantic-ui-react is not a dependency of this project: the exit completed at UPGRADE-PLAN 9.7-F1 step 3, and step 3 1/2 removed the package. Nothing in src may import it, including src/core/components, which used to be the one place that could. See docs/SUPPORTED-PROPS.md."
-                }
-              ]
-            }
-          ]
-        }
-      }
-    ]
   },
   "browserslist": [
     ">0.2%",
@@ -414,15 +96,20 @@
     "@types/react-dom": "^18.3.7",
     "axios": "^1.8.4",
     "babel-loader": "^10.0.0",
+    "confusing-browser-globals": "^1.0.11",
     "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^6.10.0",
     "css-minimizer-webpack-plugin": "^8.0.0",
     "dotenv-webpack": "^8.0.1",
-    "eslint": "^8.56.0",
-    "eslint-config-react-app": "^7.0.1",
+    "eslint": "^9.39.5",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "final-form": "^4.20.9",
     "final-form-arrays": "^3.1.0",
     "gh-pages": "^6.3.0",
+    "globals": "^17.13.0",
     "html-webpack-plugin": "5.6.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^30.3.0",
@@ -460,6 +147,7 @@
     "stylelint": "^16.2.1",
     "stylelint-config-standard": "^36.0.0",
     "typescript": "^5.0.0",
+    "typescript-eslint": "^8.71.1",
     "webpack": "^5.99.0",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^6.0.0"

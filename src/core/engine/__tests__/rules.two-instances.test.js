@@ -16,9 +16,7 @@
  * Measured on the code this replaced: mount gave "A:hello" + "B:hello", and the re-render turned the
  * first into "B:hello".
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

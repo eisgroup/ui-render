@@ -283,4 +283,29 @@ test.describe('tabs and disclosures: the keyboard', () => {
 
         await expect(title).toHaveAttribute('aria-expanded', before === 'true' ? 'false' : 'true')
     })
+
+    test('[I] an upload drop zone is a button that Space opens, and keyboard focus shows the formats it takes', async ({ page }) => {
+        // Added 2026-10-06: the zone took focus with no role, only Enter opened it (`keypress`), and its
+        // hint, which names the accepted formats, appeared on hover alone.
+        // `uploadVariants`, because `upload` itself turns the hint off (`showTypes: false`).
+        await page.goto('/examples#uploadVariants')
+        await page.locator('#uploadVariants.expanded').waitFor()
+        const zone = page.locator('#uploadVariants .upload__dropzone[role="button"]:has(.dropzone__hover)').first()
+        await expect(zone).toHaveAttribute('tabindex', '0')
+        const hint = zone.locator('.dropzone__hover')
+        await expect(hint).toHaveCSS('opacity', '0')
+        const multiple = await zone.locator('input[type="file"]').evaluate(input => input.multiple)
+
+        // Reached by Tab from the example's own title, so the focus is a keyboard focus.
+        await page.locator('#uploadVariants [role="button"][aria-expanded]').first().focus()
+        for (let step = 0; step < 10 && !(await zone.evaluate(element => element === document.activeElement)); step += 1) {
+            await page.keyboard.press('Tab')
+        }
+        expect(await activeElement(page)).toMatchObject({ role: 'button', tabIndex: 0 })
+        await expect(hint).toHaveCSS('opacity', '1')
+
+        const chooser = page.waitForEvent('filechooser')
+        await page.keyboard.press('Space')
+        expect((await chooser).isMultiple()).toBe(multiple)
+    })
 })

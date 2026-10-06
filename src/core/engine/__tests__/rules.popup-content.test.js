@@ -8,9 +8,7 @@
  * renamed for row 1 but keeps its DOM value, so it shows row 0's edit. The form data stays right,
  * which is exactly why nothing else in the suite noticed.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

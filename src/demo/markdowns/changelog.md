@@ -118,6 +118,11 @@
     its order in `aria-sort`.
   - **This changes the markup**: these elements gain `role`, `tabindex` and `aria-*` attributes.
     A click focuses them now, and the focus ring shows for the keyboard only.
+- **The upload drop zone is a button.** It took keyboard focus with no role, and only Enter opened
+  the file dialog. Now it is a `button`, named by the text it shows: Enter and Space open the dialog,
+  a disabled or read-only zone says so with `aria-disabled`, and the hint naming the accepted
+  formats appears on keyboard focus as it does on hover. **This changes the markup**: the zone
+  gains `role="button"`.
 - The text, number and date inputs no longer emit an `aria-describedby` pointing at an element
   that does not exist. The attribute was unconditional while the element carrying the target id
   renders only when there is an error or info message, so every reference in a form without
@@ -342,7 +347,7 @@
   once in the root `static/` folder — the payload to copy into a host's web root — and
   `dist/static/all.css` and `font.css` became one-line `@import` re-exports of it. Both import paths keep working; `semantic.css` remains an
   empty stub in both places.
-- The tarball dropped from 579 files / 11.6 MB unpacked to **25 files / 3.35 MB (0.87 MB packed)**. Source maps continue
+- The tarball dropped from 579 files / 11.6 MB unpacked to **25 files / 3.34 MB (0.87 MB packed)**. Source maps continue
   to ship for host debugging.
 - **The package no longer ships `static/images/flags/`.** These were 266 country-flag SVGs, 41% of
   the unpacked package, and nothing in the library used them: their one reader was a dropdown
@@ -403,9 +408,8 @@
   eighteen were genuine cleanups, four are suppressions carrying a comment that states why the rule
   does not apply, and three turned out to be the defects listed under Fixes.
 - Removed 14 devDependencies with no references in code, configs, scripts or CI, cutting the
-  installed development tree by 14 packages. Two more went later, `react-router` and
-  `eslint-plugin-react-hooks`, which `react-router-dom` and `eslint-config-react-app` install anyway.
-  This does not affect the published package.
+  installed development tree by 14 packages. One more went later, `react-router`, which
+  `react-router-dom` installs anyway. This does not affect the published package.
 - Build configuration: the demo build no longer duplicates the shared Babel presets. Every
   pipeline — library, demo and tests — now reads them from one `babel.config.js`, with only the
   development-time refresh transform declared by the demo. Emitted bundles are unchanged.
@@ -422,9 +426,21 @@
   expects a warning now says so and asserts it.
 - TypeScript checks JSX the way Babel compiles it, through `react/jsx-runtime`, so a file no longer
   needs `React` in scope for its JSX. The published declarations are unchanged.
+- Linting is on ESLint 9, configured in `eslint.config.js`. `eslint-config-react-app` never supported
+  it, so its rules are carried over as they were, and `react-hooks/exhaustive-deps` also checks the
+  effects of the code's own layout-effect hooks now. 81 `eslint-disable` comments that suppressed
+  nothing are gone. The development tree lost 158 packages to the move and gained 142, and
+  `npm audit` reports 35 findings in it, from 43.
+- Dependabot proposes updates every week, of the development dependencies and of the GitHub Actions
+  CI runs: a week's minor and patch updates in one pull request, each major in its own. Major
+  versions of React and ESLint are held back, with the reason beside each in `.github/dependabot.yml`.
 
 #### Fixes
 
+- **A date the field reads leniently no longer prints Moment's deprecation warning.** A stored date
+  in a shape the configured format does not cover, such as `2026-1-2`, still renders, read the way
+  Moment read it; the first one printed Moment's deprecation warning to the host's console. The
+  same steps run one by one now, without it.
 - **A template popup, a table with a section divider, and a `Text` around a DOM element no longer
   log React warnings in development.** The popup's items and the divider's cells had no `key`, and
   `Text` handed its translator to an element such as a `<span>`, where `translate` is an HTML

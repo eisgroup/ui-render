@@ -1,0 +1,42 @@
+# Automated dependency updates (docs/UPGRADE-PLAN.md §9.9-H9, "Automated updates"), weekly.
+#
+# Every package here is a devDependency: the published package declares none, so these PRs change what
+# builds and tests the library, and a bundled one what `dist/index.js` carries. CI gates each of them as it
+# gates any PR, on every React of the peer range.
+#
+# A week's minor and patch updates arrive as one PR; each major is a PR of its own, because it is a
+# migration to review, not a bump.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Development and the default suite run on React 18.3 by decision. 16.14, 17 and 19 have fixture legs of
+      # their own (scripts/fixtures/, pinned in scripts/fixtures/react-legacy/floors.js), which this does not
+      # update: a React in the peer range is added there, deliberately, not bumped here.
+      - dependency-name: react
+        update-types: [version-update:semver-major]
+      - dependency-name: react-dom
+        update-types: [version-update:semver-major]
+      - dependency-name: '@types/react'
+        update-types: [version-update:semver-major]
+      - dependency-name: '@types/react-dom'
+        update-types: [version-update:semver-major]
+      # eslint-plugin-react, -import and -jsx-a11y declare peers only up to ESLint 9 (eslint.config.js says
+      # why it is on 9). Drop this when they declare 10.
+      - dependency-name: eslint
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']

@@ -184,17 +184,25 @@ describe('InputDate rc-picker and form contracts', () => {
         ['unpadded ISO', '2026-1-2', '2026-01-02'],
         ['slash separated', '2026/01/02', '2026-01-02'],
         ['long month name', 'Jan 2, 2026', '2026-01-02'],
+        // One for each step before the `Date` parse: lenient ISO 8601, then RFC 2822.
+        ['space-led ISO', ' 2026-01-02', '2026-01-02'],
+        ['RFC 2822', '02 Jan 2026 12:00:00 +0000', '2026-01-02'],
     ])('falls back to a lenient parse for a %s value', (_name, value, expected) => {
-        // The lenient parse is moment's own, and moment prints a deprecation warning for a string it
-        // reads that way, once per process. Expected here, so it is kept off the console.
+        // `moment(date)` read these, and printed Moment's deprecation warning for the first, once per
+        // process; the steps it takes are taken one by one now, without it.
         const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
-        render(withConfig(
-            <InputDate name="effectiveDate" value={value} />,
-            { dateFormat: 'YYYY-MM-DD' }
-        ))
+        try {
+            render(withConfig(
+                <InputDate name="effectiveDate" value={value} />,
+                { dateFormat: 'YYYY-MM-DD' }
+            ))
 
-        expect(pickerProps().value.format('YYYY-MM-DD')).toBe(expected)
-        warn.mockRestore()
+            expect(pickerProps().value.format('YYYY-MM-DD')).toBe(expected)
+            expect(warn).not.toHaveBeenCalled()
+        } finally {
+            // Even when an assertion fails: a spy left in place hands the next case its calls.
+            warn.mockRestore()
+        }
     })
 
     it('still prefers the configured format over a lenient reading', () => {

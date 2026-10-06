@@ -1,7 +1,5 @@
 // fetch is referenced in rules.tsx (FIELD.FUNC[FETCH] = fetch); stub it for jsdom before any import.
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first
@@ -42,7 +40,6 @@ describe('UIRender (smoke)', () => {
         // decomposition could drop without any `this` breaking to show for it.
         render(wrap(<UIRender meta={{ view: 'Text', children: 'X' }} data={{}} />))
 
-        // eslint-disable-next-line no-undef
         expect(FIELD.FUNC[FIELD.ACTION.FETCH]).toBe(global.fetch)
         for (const action of [FIELD.ACTION.RESET, FIELD.ACTION.SET_STATE, FIELD.ACTION.SUBMIT, FIELD.ACTION.POPUP]) {
             expect(typeof FIELD.FUNC[action]).toBe('function')

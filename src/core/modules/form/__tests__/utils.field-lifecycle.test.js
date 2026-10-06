@@ -208,7 +208,7 @@ describe('asField lifecycle contracts', () => {
         const Dropdown = () => null
         Dropdown.displayName = 'Dropdown'
         const DropdownField = asField(Dropdown)
-        const field = new DropdownField({ name: 'selection' })
+        const field = new DropdownField.InstanceClass({ name: 'selection' })
         const input = {
             name: 'selection',
             onBlur: jest.fn(),

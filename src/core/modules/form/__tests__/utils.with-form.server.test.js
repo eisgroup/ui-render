@@ -6,9 +6,7 @@
  * server-renders a document would get that warning for every form on the page.
  */
 // The engine hands the `fetch` action the global one whenever it builds a meta.
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

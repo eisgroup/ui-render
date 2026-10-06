@@ -14,9 +14,7 @@
  * instead was tried while measuring this, and the add does not work there at all — which is not
  * the pattern the corpus uses, and not what this file claims anything about.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import { fireEvent, waitFor } from '@testing-library/react' // eslint-disable-line import/first

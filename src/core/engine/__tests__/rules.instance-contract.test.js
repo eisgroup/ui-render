@@ -12,9 +12,7 @@
  * The instances are collected from `Render.Component`, the engine's resolver hook, which every
  * node passes through with its `instance`.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

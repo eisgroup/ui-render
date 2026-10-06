@@ -319,9 +319,9 @@ function jsxOpenings (source, tag) {
 // ---------------------------------------------------------------------------
 
 // Quotes are matched as a character class, not a literal `'`: a double-quoted specifier reaches
-// the same module and must not slip past the scan. `import(...)` is here because ESLint 8's
-// `no-restricted-imports` does not visit `ImportExpression`, so a dynamic import is invisible to
-// the lint half of the guard — this scan is the only thing that can see it.
+// the same module and must not slip past the scan. `import(...)` is here because ESLint's
+// `no-restricted-imports` does not visit `ImportExpression` (measured on 9.39), so a dynamic import
+// is invisible to the lint half of the guard — this scan is the only thing that can see it.
 const SPECIFIER = String.raw`["'](semantic-ui-react(?:\/[^"']*)?)["']`
 const IMPORT_KINDS = [
     { kind: 'import', pattern: new RegExp(String.raw`from\s+` + SPECIFIER, 'g') },
@@ -365,7 +365,7 @@ function readImportSites () {
             + strays.map(({ file, kind }) => `${file} (${kind})`).join('\n  ')
             + `\nThat is the §9.7-F1 isolation invariant. The eslint guard fails on a static \`import\`;`
             + ` this check also covers \`import()\`, \`require\` and \`jest.mock\`, none of which the`
-            + ` rule can see (ESLint 8's no-restricted-imports does not visit ImportExpression).`)
+            + ` rule can see (ESLint's no-restricted-imports does not visit ImportExpression).`)
     }
     return sites.sort((a, b) => a.file.localeCompare(b.file) || a.kind.localeCompare(b.kind))
 }
@@ -1065,12 +1065,12 @@ function renderMarkdown (reference) {
             'still works, so the contract test proves the four patterns against a synthetic source.',
         ]),
         '',
-        'An `eslint` `no-restricted-imports` override (in `package.json`, `eslintConfig.overrides`)',
-        `fails \`npm run lint:js\` on a static \`import\` of the package from anywhere outside \`${PACK}\`,`,
+        'An `eslint` `no-restricted-imports` entry (in `eslint.config.js`) fails `npm run lint:js` on a',
+        `static \`import\` or \`export … from\` of the package from anywhere outside \`${PACK}\`,`,
         'including deep imports such as `semantic-ui-react/dist/...`. A static import is *all* it sees:',
-        'it cannot see `require()`, `jest.mock()`, or a dynamic `import(\'semantic-ui-react\')` — ESLint 8',
-        'does not visit `ImportExpression`. It does cover TypeScript: `lint:js` runs with',
-        '`--ext .js,.jsx,.ts,.tsx`.',
+        'it cannot see `require()`, `jest.mock()`, or a dynamic `import(\'semantic-ui-react\')` — measured',
+        'on ESLint 9.39, the rule does not visit `ImportExpression`. It does cover TypeScript: `lint:js`',
+        'lints every `.js`, `.jsx`, `.ts` and `.tsx` file under `src`.',
         '',
         `The scan above closes every one of those gaps — dynamic imports, double-quoted specifiers and`,
         `TypeScript files included — which is why both halves run${guardBlind.length

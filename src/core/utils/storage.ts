@@ -25,7 +25,7 @@ export type StorageMethods = Record<StorageActionDirect, string>
  */
 export type StorageAdapter = Record<string, (...args: unknown[]) => unknown>
 
-const hasLocalStorage = typeof localStorage !== 'undefined'  // eslint-disable-line
+const hasLocalStorage = typeof localStorage !== 'undefined'
 
 /**
  * Perform localStorage (for the Web)

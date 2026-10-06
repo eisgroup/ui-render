@@ -16,6 +16,12 @@
   }
 }
 
+// The hint names the accepted formats, and appeared on hover only: a keyboard reaches the zone by
+// focus, so it appears then too (2026-10-06).
+.upload__dropzone:focus-visible > .dropzone__hover {
+  &:extend(.appear all);
+}
+
 .upload__dropzone:not(.button) {
   &:extend(.flex--fill);
   &:extend(.align-center);

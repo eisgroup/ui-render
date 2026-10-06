@@ -533,7 +533,6 @@ const RenderComponent = ({
 
             // Form value changing fields should have 'Input' as view
             if (view === FIELD.TYPE.INPUT) {
-                // eslint-disable-next-line default-case
                 switch (input.type) {
                     case 'select':
                         view = FIELD.TYPE.SELECT

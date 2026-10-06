@@ -15,9 +15,7 @@
  * popup declared on the ROOT document is invisible to the nested one, measured while building this:
  * the click resolves a scope, finds no template, and silently does nothing.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

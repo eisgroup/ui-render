@@ -59,12 +59,12 @@ The scan is kept rather than deleted because zero is a value worth defending: it
 fails if the dependency comes back. What it can no longer do is tell you the scan itself
 still works, so the contract test proves the four patterns against a synthetic source.
 
-An `eslint` `no-restricted-imports` override (in `package.json`, `eslintConfig.overrides`)
-fails `npm run lint:js` on a static `import` of the package from anywhere outside `src/core/components`,
+An `eslint` `no-restricted-imports` entry (in `eslint.config.js`) fails `npm run lint:js` on a
+static `import` or `export … from` of the package from anywhere outside `src/core/components`,
 including deep imports such as `semantic-ui-react/dist/...`. A static import is *all* it sees:
-it cannot see `require()`, `jest.mock()`, or a dynamic `import('semantic-ui-react')` — ESLint 8
-does not visit `ImportExpression`. It does cover TypeScript: `lint:js` runs with
-`--ext .js,.jsx,.ts,.tsx`.
+it cannot see `require()`, `jest.mock()`, or a dynamic `import('semantic-ui-react')` — measured
+on ESLint 9.39, the rule does not visit `ImportExpression`. It does cover TypeScript: `lint:js`
+lints every `.js`, `.jsx`, `.ts` and `.tsx` file under `src`.
 
 The scan above closes every one of those gaps — dynamic imports, double-quoted specifiers and
 TypeScript files included — which is why both halves run. Neither is sufficient alone.

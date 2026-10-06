@@ -3931,7 +3931,7 @@
     opacity: 1;
   }
 }
-.ui-render .appear, .ui-render .input--wrapper:hover .input__delete, .ui-render .input--wrapper:focus .input__delete, .ui-render .input--wrapper:active .input__delete, .ui-render .appear-on-hover:hover, .ui-render .appear-on-hover:focus, .ui-render .appear-on-hover:active, .ui-render *:hover > .appear-on-hover, .ui-render .input__delete:hover, .ui-render .input__delete:focus, .ui-render .input__delete:active, .ui-render *:hover > .input__delete, .ui-render .app__slider__remove:hover, .ui-render .app__slider__remove:focus, .ui-render .app__slider__remove:active, .ui-render *:hover > .app__slider__remove {
+.ui-render .appear, .ui-render .input--wrapper:hover .input__delete, .ui-render .input--wrapper:focus .input__delete, .ui-render .input--wrapper:active .input__delete, .ui-render .upload__dropzone:focus-visible > .dropzone__hover, .ui-render .appear-on-hover:hover, .ui-render .appear-on-hover:focus, .ui-render .appear-on-hover:active, .ui-render *:hover > .appear-on-hover, .ui-render .input__delete:hover, .ui-render .input__delete:focus, .ui-render .input__delete:active, .ui-render *:hover > .input__delete, .ui-render .app__slider__remove:hover, .ui-render .app__slider__remove:focus, .ui-render .app__slider__remove:active, .ui-render *:hover > .app__slider__remove {
   animation: appear 0.5s forwards;
 }
 /* Disappear visually (will be accessible with keyboard) */
