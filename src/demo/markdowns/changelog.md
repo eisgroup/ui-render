@@ -456,6 +456,12 @@
 
 #### Fixes
 
+- **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
+  with no `id` takes one from its label, so two with one label in a document had the same id, and a
+  `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the
+  popup checked the box behind the popup. The first box in the document keeps the id it always had;
+  another takes the next free one, `checkbox-Expand-All-2`, once it is in the document. An `id` the
+  meta gives is used as given.
 - **A date the field reads leniently no longer prints Moment's deprecation warning.** A stored date
   in a shape the configured format does not cover, such as `2026-1-2`, still renders, read the way
   Moment read it; the first one printed Moment's deprecation warning to the host's console. The

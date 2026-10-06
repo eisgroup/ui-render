@@ -561,15 +561,25 @@ const CHECKBOX = {
     /** [I] What it opens and closes in `tableNested`: the two top rows. */
     ROW_TITLES: ['Gold', 'Silver'],
     /**
-     * [R->I] DEFECT. With no `id`, `Checkbox` derives one from its label (`checkbox-` + the label,
-     * spaces as dashes). `popupContent` renders the same table twice, once in the popup and once
-     * behind it, so the document holds two inputs with that id, and a `<label for>` resolves to the
-     * first: a click on the label inside the popup checks the box behind it, whose rows open, and
-     * leaves its own box and rows as they were. A unique id per instance flips this.
+     * [I] since 2026-10-06; until then a DEFECT pinned here. With no `id`, `Checkbox` derives one from
+     * its label (`checkbox-` + the label, spaces as dashes). `popupContent` renders the same table
+     * twice, once in the popup and once behind it, so the document held two inputs with that id, and
+     * a `<label for>` resolves to the first: a click on the label inside the popup checked the box
+     * behind it, whose rows opened, and left its own box and rows as they were. Now the first box in
+     * the document keeps the derived id, as every box did, and the popup's, mounted beside it, takes
+     * the next free one.
      */
     DERIVED_ID: 'checkbox-Expand-All',
-    INSTANCES_SHARING_THE_ID: 2,
-    AFTER_CLICK_IN_POPUP: [{ inPopup: false, checked: true }, { inPopup: true, checked: false }],
+    IN_POPUP_DOCUMENT: {
+        before: [
+            { id: 'checkbox-Expand-All', inPopup: false, checked: false },
+            { id: 'checkbox-Expand-All-2', inPopup: true, checked: false },
+        ],
+        afterClickInPopup: [
+            { id: 'checkbox-Expand-All', inPopup: false, checked: false },
+            { id: 'checkbox-Expand-All-2', inPopup: true, checked: true },
+        ],
+    },
 }
 
 /** `view: 'Dropdown'` driven by the pointer, in the `dropdown` example. */

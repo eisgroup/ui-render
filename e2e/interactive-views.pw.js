@@ -12,8 +12,8 @@
  * draws on focus.
  *
  * The values live in e2e/reference.js and carry its tags. This file found two defects and pinned
- * them `[R->I]`: what the popup offered a keyboard and a screen reader, flipped to `[I]` by its fix
- * on 2026-10-06, and a checkbox id two instances share.
+ * them `[R->I]`: what the popup offered a keyboard and a screen reader, and a checkbox id two
+ * instances shared. Both were fixed on 2026-10-06, and their tests flipped to `[I]`.
  */
 const { test, expect, rectOf, isWithin, topmostAt, activeElement } = require('./fixtures')
 const { DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, PROGRESS_STEPS } = require('./reference')
@@ -254,19 +254,21 @@ test.describe('checkbox: a native control and its label', () => {
         await expect.poll(() => rowsExpanded(page, '#tableNested')).toEqual(['false', 'false'])
     })
 
-    test('[R->I] with the same table twice in a document, the label inside the popup toggles its namesake behind it', async ({ page }) => {
+    test('[I] with the same table twice in a document, the label inside the popup checks its own box', async ({ page }) => {
         await openExample(page, 'popupContent')
         await page.locator('#popupContent').getByRole('button', { name: 'Open Popup 1' }).click()
         await expect(page.locator('.app__popup')).toBeVisible()
-        const checkboxes = page.locator(`[id="${CHECKBOX.DERIVED_ID}"]`)
-        await expect(checkboxes).toHaveCount(CHECKBOX.INSTANCES_SHARING_THE_ID)
+        const boxes = page.locator(`input[id^="${CHECKBOX.DERIVED_ID}"]`)
+        const states = () => boxes.evaluateAll(inputs => inputs.map(input => ({
+            id: input.id, inPopup: Boolean(input.closest('.app__popup')), checked: input.checked,
+        })))
+        await expect.poll(states).toEqual(CHECKBOX.IN_POPUP_DOCUMENT.before)
 
         await page.locator('.app__popup label', { hasText: CHECKBOX.LABEL }).click()
 
-        const states = () => checkboxes.evaluateAll(inputs => inputs.map(input => ({
-            inPopup: Boolean(input.closest('.app__popup')), checked: input.checked,
-        })))
-        await expect.poll(states).toEqual(CHECKBOX.AFTER_CLICK_IN_POPUP)
+        await expect.poll(states).toEqual(CHECKBOX.IN_POPUP_DOCUMENT.afterClickInPopup)
+        await expect.poll(() => rowsExpanded(page, '.app__popup')).toEqual(['true', 'true'])
+        expect(await rowsExpanded(page, '#popupContent')).toEqual(['false', 'false'])
     })
 })
 

@@ -35,7 +35,7 @@ const VIEW_COVERAGE = {
         kind: 'interactive',
         browser: [
             t(IV, '[I] the Expand All checkbox in a table header opens every row, and closes them again'),
-            t(IV, '[R->I] with the same table twice in a document, the label inside the popup toggles its namesake behind it'),
+            t(IV, '[I] with the same table twice in a document, the label inside the popup checks its own box'),
         ],
     },
     Col: { kind: 'passive', why: 'a flex container' },
