@@ -38,7 +38,8 @@ export type RenderFloatProps = {
 export function renderFloat (value: number | string, decimals?: number, props?: RenderFloatProps) {
   const {truncated, faded = true, ...options} = props || {}
   let fraction = String(value).split('.')[1] || '0' // extract fraction before rounding, because we need fixed length
-  if (!truncated && decimals != null) value = round(value, decimals)
+  // Without `decimals`, to an integer: until 2026-10-06 it was trimmed there, `truncated` or not.
+  if (!truncated) value = round(value, decimals == null ? 0 : decimals)
   // A cast, not a guard: without `decimals`, `undefined > 0` is false, and there is no fraction.
   const showFraction = (decimals as number) > 0
   if (showFraction) {

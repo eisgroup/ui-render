@@ -250,11 +250,11 @@ const RENDERER_CURATION = {
     },
     FLOAT: {
         summary: 'Number with `decimals` decimal places.',
-        notes: 'Without `decimals` it shows the integer part only, truncated rather than rounded. A non-numeric value renders nothing.',
+        notes: 'Without `decimals` it shows an integer, rounded. A non-numeric value renders nothing.',
     },
     PERCENT: {
         summary: 'Number multiplied by 100 and suffixed with a percent sign, with `decimals` decimal places.',
-        notes: 'Without `decimals` it shows the integer part only, truncated rather than rounded. A non-numeric value renders nothing.',
+        notes: 'Without `decimals` it shows an integer, rounded. A non-numeric value renders nothing.',
     },
     STRING: {
         summary: 'Value as plain text.',

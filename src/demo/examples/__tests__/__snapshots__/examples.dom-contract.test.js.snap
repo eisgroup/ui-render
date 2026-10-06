@@ -2928,7 +2928,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                           <span class="text h3">
                             <div class="flex--row">
                               <span class="text">
-                                "18"
+                                "19"
                               </span>
                               <span class="text margin-left-smallest">
                                 "%"
@@ -2998,7 +2998,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                           <span class="text h3">
                             <div class="flex--row">
                               <span class="text">
-                                "18"
+                                "19"
                               </span>
                               <span class="text margin-left-smallest">
                                 "%"
@@ -3336,7 +3336,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                             <span class="text h3">
                               <div class="flex--row">
                                 <span class="text">
-                                  "2"
+                                  "3"
                                 </span>
                                 <span class="text margin-left-smallest">
                                   "%"
@@ -3436,7 +3436,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                             <span class="text h3">
                               <div class="flex--row">
                                 <span class="text">
-                                  "2"
+                                  "3"
                                 </span>
                                 <span class="text margin-left-smallest">
                                   "%"

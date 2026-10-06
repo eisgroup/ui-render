@@ -100,8 +100,8 @@ Used as the value of any attribute whose name starts with `render`
 | `Currency` | `FIELD.RENDER.CURRENCY` | Number prefixed with a currency symbol, where `decimals` defaults to 2 and `symbol` to `$`. A non-numeric value renders nothing. In every form, the name or `{"name": "Currency"}`, at the top of a `render*` attribute or inside its `values`, it takes the symbol from the root meta's `currencyCode`, or from one an object form gives: `$` for `USD`, the default, `€` for `EUR`, `£` for `GBP`, and the code itself for any other. A `symbol` the object form gives wins over both. |
 | `Date` | `FIELD.RENDER.DATE` | Value formatted as a date. An empty value renders nothing. |
 | `Double5` | `FIELD.RENDER.DOUBLE5` | Number with exactly five decimal places, ignoring any `decimals` given. A non-numeric value renders nothing. |
-| `Float` | `FIELD.RENDER.FLOAT` | Number with `decimals` decimal places. Without `decimals` it shows the integer part only, truncated rather than rounded. A non-numeric value renders nothing. |
-| `Percent` | `FIELD.RENDER.PERCENT` | Number multiplied by 100 and suffixed with a percent sign, with `decimals` decimal places. Without `decimals` it shows the integer part only, truncated rather than rounded. A non-numeric value renders nothing. |
+| `Float` | `FIELD.RENDER.FLOAT` | Number with `decimals` decimal places. Without `decimals` it shows an integer, rounded. A non-numeric value renders nothing. |
+| `Percent` | `FIELD.RENDER.PERCENT` | Number multiplied by 100 and suffixed with a percent sign, with `decimals` decimal places. Without `decimals` it shows an integer, rounded. A non-numeric value renders nothing. |
 | `String` | `FIELD.RENDER.STRING` | Value as plain text. |
 | `Title+Input` | `FIELD.RENDER.TITLE_n_INPUT` | Value as text inside a row. The name is historical: there is no input in the implementation, only the value as text. |
 

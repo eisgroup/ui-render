@@ -493,6 +493,10 @@
   `GBP` printed no symbol at all, and prints itself now (`JPY` before the amount). A `symbol` the object
   form gives is printed rather than replaced. **This changes rendered output** for a document whose
   `currencyCode` is not `USD` and that uses those forms: `$` becomes its currency's symbol.
+- **`Float` and `Percent` without `decimals` round to an integer.** They trimmed the value to its
+  integer part, which only `truncated` is meant to do: 18.75 % printed `18%`, where `decimals: 0` printed
+  `19%`. **This changes rendered output** wherever such a value's fraction is a half or more; in the
+  bundled examples, two cells of `ratingDetails` (18 → 19) and two of `rowListRelativeData` (2 → 3).
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the
