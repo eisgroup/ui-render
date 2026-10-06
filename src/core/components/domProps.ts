@@ -131,12 +131,7 @@ export const FIELD_ONLY_PROPS = ['name', 'label']
  *
  * Returns the SAME object when no listed key is present, so a clean render — the common
  * case — allocates nothing. Callers may therefore only mutate the result when they own
- * the input (a destructuring rest object, which is fresh per render); `Row` does exactly
- * that to attach its forwarded `ref`.
- *
- * @Note: deliberately NOT `removeKeys` from `../utils/object` — its `clone` path runs
- *  cloneDeep, which on a props bag would deep-clone style objects, event handlers and
- *  React elements, and its default path mutates, which is illegal on props.
+ * the input (a destructuring rest object, which is fresh per render).
  *
  * The result is an open bag, `unknown` per key: it is forwarded to an element, never inspected.
  *

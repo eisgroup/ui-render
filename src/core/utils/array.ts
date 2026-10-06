@@ -1,19 +1,4 @@
-import {
-  difference,
-  flatten,
-  get,
-  intersection,
-  isEqual,
-  isPlainObject,
-  max,
-  min,
-  some,
-  union,
-  unionBy,
-  unionWith,
-  uniqWith,
-} from './lodash-lite'
-import { toLowerCaseAny } from './string'
+import { flatten, get, isPlainObject } from './lodash-lite'
 
 /**
  * ARRAY FUNCTIONS =============================================================
@@ -42,13 +27,6 @@ type MaybeIndexed = { length?: unknown, [key: string]: unknown }
  *    annotates its own comparator, e.g. `by((a: Row, b: Row) => …)`.
  */
 type CompareFn = (a: any, b: any) => number
-
-/**
- * The shorthands {@link isInCollection} forwards to lodash-lite's `some()`: a predicate function or
- * a source object to match (both are `object`), a property path, or any other primitive — the same
- * surface `some()` accepts at runtime.
- */
-type CollectionMatch = object | PropertyKey | boolean | bigint | null | undefined
 
 /**
  * Check if the data passed is an array and has values.
@@ -98,17 +76,6 @@ export function isList (data: unknown): data is unknown[] {
 }
 
 /**
- * Check if the value passed exists within the array passed.
- *
- * @param {Array} array - haystack
- * @param {*} value - needle
- * @return {boolean}
- */
-export function isInList (array: readonly unknown[], value: unknown): boolean {
-  return array.indexOf(value) >= 0
-}
-
-/**
  * Check if any of the values passed in via ...args exists within the array passed.
  *
  * @param {Array} array - the array to search for the values
@@ -121,17 +88,6 @@ export function isInListAny (array: readonly unknown[], ...args: unknown[]): boo
     }
   }
   return false
-}
-
-/**
- * Check if a given Element exists in the Collection, with shallow include match
- *
- * @uses lodash
- * @see {@link https://lodash.com/docs/4.17.2#some} for further information.
- * @return {Boolean} true - if element found in given collection with shallow include match
- */
-export function isInCollection (collection: unknown, element: CollectionMatch): boolean {
-  return some(collection, element)
 }
 
 /**
@@ -169,120 +125,6 @@ export function toListValuesTotal (array: ReadonlyArray<Obj> = [], key: string =
 }
 
 /**
- * Ensures the array has unique values, including nested objects.
- *
- * @uses lodash
- * @see https://lodash.com/docs/#uniqWith
- * @example
- before [1, 2, 2, {a: 5, b: {c: 6}}, {a: 5, b: {c: 6}}];
- after [1, 2, {a: 5, b: {c: 6}}];
- * @param {Array} array - the array to enforce unique values for
- * @return {Array}
- */
-export function toUniqueList<T> (array: T | T[]): T[]
-export function toUniqueList (array: unknown) {
-  return uniqWith(toList(array), isEqual)
-}
-
-/**
- * Ensure array has only unique primitive values.
- *
- * @param {Array} array - the array to enforce unique primitive values for
- * @return {Array} - new array
- */
-export function toUniqueListFast<T> (array: readonly T[]): T[] {
-  return array.filter((value, index, self) => self.indexOf(value) === index)
-}
-
-/**
- * Ensure array has only unique values case insensitive keeping the first occurrence of duplicates.
- *
- * @param {Array<*>} array - the array to enforce unique values for (can be mix of value types)
- * @return {Array<*>} list - new array containing only unique values, case insensitive
- */
-export function toUniqueListCaseInsensitive<T> (array: readonly T[]): T[] {
-  const listLower = array.map(toLowerCaseAny)
-  return array.filter((v, i) => listLower.indexOf(toLowerCaseAny(v)) === i)
-}
-
-/**
- * Merge two arrays into one, with objects containing only unique key, keeping the value from the first array
- * @Note: this method is faster than `array.filter((val, _, self) => self.find(i => i[key] === val[key]) === val)`
- *    by about x5 times
- *
- * @param {Array} newList - list of new objects to keep
- * @param {Array} oldList - list of old objects to be updated
- * @param {string} key - objects's key that needs to be unique
- * @returns {Array} list - of unique objects
- */
-export function toUniqueListByKey<T> (newList: readonly T[], oldList: readonly T[], key: string): T[] {
-  return unionBy(newList, oldList, key) as T[]
-}
-
-/**
- * Add value to the beginning of Array, optionally trimming its length to provided limit
- *
- * @param {Array} array - to prepend to
- * @param {*} value - to prepend to `array`
- * @param {number} [limit] - optionally trim array to this length
- */
-export function prependToList<T> (array: readonly T[], value: T, limit?: number): T[] {
-  const result = [value, ...array]
-  if (limit && result.length > limit) result.length = limit
-  return result
-}
-
-/**
- * Merge Arrays into a single List with unique values keeping orders given (using SameValueZero comparison)
- *
- * @param {Array} arrays - lists to combine (if not array given, it will be ignored without error)
- * @returns {Array} - merged list with unique values
- */
-export function mergeLists<T> (...arrays: Array<readonly T[] | null | undefined>): T[] {
-  return union(...arrays)
-}
-
-/**
- * Remove Value from Array if found, without mutation
- *
- * @param {Array } listToKeep - list of values to search from
- * @param {String|Number|Array} valueToRemove - to remove
- * @return {Array} - new array with value removed
- */
-export function removeFromList<T> (listToKeep: readonly T[], valueToRemove: T | readonly T[]): T[] {
-  // Value is Array
-  if (isList(valueToRemove)) return difference(listToKeep, valueToRemove)
-
-  // Value is of primitive type
-  const result = [...listToKeep]
-  const index = listToKeep.indexOf(valueToRemove as T)
-  if (index > -1) result.splice(index, 1)
-  return result
-}
-
-/**
- * Get the first element of an array, or return the value if it's not array
- *
- * @param {Array|*} array - The array to query
- * @returns {*} - The first element of the array
- */
-export function firstListValue<T> (array: readonly T[]): T
-export function firstListValue<T> (array: T): T
-export function firstListValue (array: unknown) {
-  return isList(array) ? array[0] : array
-}
-
-/**
- * Gets the first value of array
- *
- * @param {Array} array - The array to query
- * @return {*} - The last element of the given array
- */
-export function first<T> (array: readonly T[]): T {
-  return array[0]
-}
-
-/**
  * Gets the last value of array
  *
  * @param {Array} array - The array to query
@@ -290,26 +132,6 @@ export function first<T> (array: readonly T[]): T {
  */
 export function last<T> (array: readonly T[]): T {
   return array[array.length - 1]
-}
-
-/**
- * Get a random value from provided list
- */
-export function randomFromList<T> (array: readonly T[]): T {
-  return array[Math.floor(Math.random() * array.length)]
-}
-
-/**
- * Array.reduce callback to convert list of objects with .id attributes to a key-value hashmap object
- * @example:
- *    [{id: "unique", name: "test"}].reduce(listToMap, {})
- *    >>> {"unique": {id: "unique", name: "test"}}
- *
- * @returns {Object} object with element.id being keys, and elements of original array being values
- */
-export function listToMap<T extends { id: PropertyKey }> (obj: Record<PropertyKey, T>, data: T): Record<PropertyKey, T> {
-  obj[data.id] = data
-  return obj
 }
 
 /**
@@ -346,22 +168,6 @@ export function sortDescending (a: unknown, b: unknown): number {
   if ((a as number) < (b as number)) return 1
   if ((a as number) > (b as number)) return -1
   return 0
-}
-
-/**
- * Sort List by Object Property
- * (Fastest)
- *
- * @example:
- *  array.sort(sort('name', 'asc'))
- *
- * @param {String} [key] - property value used to compare for sorting
- * @param {String} [order] - enum ['asc', 'desc']
- * @return {Function} - to be used as argument for native Array.sort()
- */
-export function sort (key?: string, order: string = 'asc'): (a: unknown, b: unknown) => number {
-  const sortFunc = order === 'asc' ? sortAscending : sortDescending
-  return (a, b) => sortFunc((a as Obj)[key as string], (b as Obj)[key as string])
 }
 
 /**
@@ -413,54 +219,8 @@ export function by (...args: Array<string | CompareFn>): (a: unknown, b: unknown
   }
 }
 
-/**
- * Randomize List Value Orders by mutation
- *
- * @param {Array} list - to shuffle values for
- * @return {Array} list - mutated with shuffled values
- */
-export function shuffle<T> (list: T[]): T[] {
-  for (let i = list.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [list[i], list[j]] = [list[j], list[i]]
-  }
-  return list
-}
-
 // LODASH CLONES
 // -----------------------------------------------------------------------------
-
-export {
-  min,
-  max,
-
-  /**
-   * Creates an array of array values not included in the other given arrays
-   */
-    difference,
-
-  /**
-   * Create a new list of values that exist in all given lists using SameValueZero equality check.
-   * The order and references of result values are determined by the first array.
-   *
-   * @param {Array} args - lists to check for intersection
-   * @return {Array} list - of common values
-   */
-    intersection,
-
-  /**
-   * Creates an array of unique values from all given arrays using the provided 'comparator' function
-   * to determine value equality
-   *
-   * @uses lodash
-   * @see {@link https://lodash.com/docs/4.17.4#unionWith} for further information.
-   *
-   * @param {...Array} arrays - The arrays to inspect
-   * @param {Function} comparator - The comparator invoked per element
-   * @return {Array} - The new array of combined values
-   */
-    unionWith,
-}
 
 /**
  * Flatten an Array a single level deep

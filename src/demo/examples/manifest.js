@@ -354,12 +354,6 @@ export const EXAMPLES = [
  * @type {Object<String, String>} filename -> reason
  */
 export const UNREGISTERED_EXAMPLE_FILES = {
-  'example_components.js': 'dynamic-component catalogue for a demo that was never wired up; no importer',
-  'experience_data.json': 'orphaned pair, superseded by dropdown-experience-*; no importer',
-  'experience_meta.json': 'orphaned pair, superseded by dropdown-experience-*; no importer',
-  'piechart_meta.json': 'orphaned meta with no data pair, superseded by piechart-simple_meta; no importer',
-  'select-experience-data.json': 'orphaned pair, superseded by select-cascading-*; no importer',
-  'select-experience-meta.json': 'orphaned pair, superseded by select-cascading-*; no importer',
   'webstudio_data.json': 'orphaned pair kept as an external-producer meta sample; no importer',
   'webstudio_meta.json': 'orphaned pair kept as an external-producer meta sample; no importer',
 }

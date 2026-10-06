@@ -1,4 +1,3 @@
-import { hasListValue } from './array'
 import { isInString } from './string'
 
 /**
@@ -13,12 +12,6 @@ import { isInString } from './string'
  * inspected behind a runtime guard, `number | string` where the runtime coerces, and no tightening
  * of what any function accepts.
  */
-
-/** One entry of the list {@link startEndFromNumberRanges} scans; both bounds are optional and nullable. */
-type NumberRange = { from?: number | null, to?: number | null }
-
-/** The boundaries {@link startEndFromNumberRanges} returns; either side is missing when unresolved. */
-type NumberRangeBounds = { start: number | undefined, end: number | undefined }
 
 /** Options of {@link formatNumber} — every one is optional, like the runtime defaults below. */
 type FormatNumberOptions = {
@@ -37,32 +30,11 @@ type FormatNumberOptions = {
 type SiSuffixes = Record<string, string>
 
 /**
- * Checks if value is classified as a Number primitive or object.
- *
- * Note: To exclude Infinity, -Infinity, and NaN,
- * which are classified as numbers, use the isFinite method.
- *
- * @example
- *  isNumber(3)
- *  >>> true
- *  isNumber(Number.MIN_VALUE)
- *  >>> true
- *  isNumber(Infinity)
- *  >>> true
- *  isNumber('3')
- *  >>> false
- *
- * @param {*} val - The value to check.
- * @returns {boolean} - Returns true if value is a number, else false.
- */
-export { isNumber } from './lodash-lite'
-
-/**
  * Returns true if the given variable is a number,
  * including if it's data type is not a number eg. '1'
  *
  * @example
- isNumeric('1')  // NOTE: isNumber('1') would return false
+ isNumeric('1')
  >>> true
  isNumeric('a')
  >>> false
@@ -73,22 +45,6 @@ export { isNumber } from './lodash-lite'
 export function isNumeric(val: unknown): boolean {
 	// Note: the casts keep the JS coercion the two globals do on non-string/non-number input
 	return !isNaN(parseFloat(val as string)) && isFinite(val as number) // must use parseFloat, cannot use the faster Number()
-}
-
-/**
- * Extract the Starting and Ending Number in given list of continuously incrementing number ranges
- *
- * @param {Array<{from: Number, to: Number}>} arrayOfNumberRanges - to check for values
- * @returns {{start: Number|Undefined, end: Number|Undefined}}
- */
-export function startEndFromNumberRanges(arrayOfNumberRanges?: readonly NumberRange[] | null): NumberRangeBounds {
-	if (!hasListValue(arrayOfNumberRanges)) return { start: undefined, end: undefined }
-	const ranges = arrayOfNumberRanges as readonly NumberRange[]
-	const start = (ranges.find(({ from }) => from != null) || ({} as NumberRange)).from as number | undefined
-	let end = ([...ranges].reverse().find(({ to }) => to != null) || ({} as NumberRange)).to as number | undefined
-	// Note: the comparison is left as is — with either side missing it is `false` at runtime
-	if ((end as number) <= (start as number)) end = undefined
-	return { start, end }
 }
 
 /**
@@ -234,16 +190,6 @@ function getOrdinalSuffix(number: number | string): string {
 }
 
 /**
- * Compute Radian Value from given Degree
- *
- * @param {Number} degree - to ompute
- * @returns {Number} radian
- */
-export function rad(degree: number): number {
-	return (degree * Math.PI) / 180
-}
-
-/**
  * What the rounding helpers below actually accept.
  *
  * Their JSDoc has always said `{number}` and their bodies have always coerced: every one of them
@@ -277,152 +223,6 @@ type Numeric = number | string
 export function round(number: Numeric, precision = 0): number {
 	const factor = Math.pow(10, precision)
 	return Math.round((number as number) * factor) / factor
-}
-
-/**
- * Round Number up to given Precision decimal point
- *
- * @example:
- *    roundUp(123.4564, 3)
- *    >>> 123.457
- *
- * @param {number|string} number - value to round; a numeric string is coerced, see `Numeric`
- * @param {number} [precision] - decimal places to keep
- * @returns {number} - with rounded values
- */
-export function roundUp(number: Numeric, precision = 0): number {
-	const factor = Math.pow(10, precision)
-	return Math.ceil((number as number) * factor) / factor
-}
-
-/**
- * Round Number down to given Precision decimal point
- *
- * @example:
- *    roundDown(123.4567, 3)
- *    >>> 123.456
- *
- * @param {number|string} number - value to round; a numeric string is coerced, see `Numeric`
- * @param {number} [precision] - decimal places to keep
- * @returns {number} - with rounded values
- */
-export function roundDown (number: Numeric, precision = 0): number {
-	const factor = Math.pow(10, precision)
-	return Math.floor((number as number) * factor) / factor
-}
-
-/**
- * Round Number to the closest Multiple of value
- * @Note: this function need precision rounding because of floating point issues, as the last operation is multiply
- *    => example: roundTo(1.2, 0.1)
- *    >>> 1.2000000000000002 -> this is the output without precision rounding
- *
- * @example:
- *    roundTo(123.4567, 10)
- *    >>> 120
- *
- * @param {number|string} number - value to round; a numeric string is coerced, see `Numeric`
- * @param {number} [multiple] - value, the multiple of which to round to
- * @returns {number} - rounded to given multiple of value
- */
-export function roundTo (number: Numeric, multiple = 1): number {
-	return +(Math.round((number as number) / multiple) * multiple).toPrecision(15)
-}
-
-/**
- * Round Down Number to the closest Multiple of value
- * @Note: this function needs rounding twice, because
- *    => example: 1.2 / 0.1
- *    >>> 11.999999999999998 -> rounds down to 11
- *
- * @example:
- *    roundTo(123.4567, 10)
- *    >>> 120
- *
- * @param {number|string} number - value to round; a numeric string is coerced, see `Numeric`
- * @param {number} [multiple] - value, the multiple of which to round to
- * @returns {number} - rounded to given multiple of value
- */
-export function roundDownTo (number: Numeric, multiple = 1): number {
-	return +(Math.floor(+((number as number) / multiple).toPrecision(15)) * multiple).toPrecision(15)
-}
-
-/**
- * Round Up Number to the closest Multiple of value
- * @Note: this function needs rounding twice, like roundDownTo
- *
- * @example:
- *    roundTo(123.4567, 10)
- *    >>> 130
- *
- * @param {number|string} number - value to round; a numeric string is coerced, see `Numeric`
- * @param {number} [multiple] - value, the multiple of which to round to
- * @returns {number} - rounded to given multiple of value
- */
-export function roundUpTo (number: Numeric, multiple = 1): number {
-	return +(Math.ceil(+((number as number) / multiple).toPrecision(15)) * multiple).toPrecision(15)
-}
-
-/**
- * Get decimal places of given Numeric value
- *
- * @param {number|string} value - number to get precision for
- * @return {number} precision - decimal places
- */
-export function decimalPlaces (value: unknown): number {
-	const match = String(Number(value)).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/)
-	if (!match) return 0
-	return Math.max(
-		// Number of digits right of decimal point.
-		(match[1] ? match[1].length : 0) -
-			// Adjust for scientific notation.
-			(match[2] ? +match[2] : 0),
-		0
-	)
-}
-
-/**
- * Calculates the Greatest Common Divisor Between Two Numbers
- *
- * @param {Number|String} a - first number
- * @param {Number|String} b - second number
- * @returns {Number} - the biggest divisible number between `a` and `b`
- */
-export function greatestCommonDivisor(a: number | string, b: number | string): number {
-	const first = Number(a)
-	const second = Number(b)
-	if (!Number.isFinite(first) || !Number.isFinite(second)) return Infinity
-	return second ? greatestCommonDivisor(second, first % second) : Math.abs(first || Infinity)
-}
-
-/**
- * Returns a random integer/float between min (inclusive) and max (inclusive),
- * if given numbers are whole integers, then returned value will also be a whole number,
- * if given numbers are floats, then returned value can also be a float.
- *
- * Note: Using Math.round() will give you a non-uniform distribution!
- *
- * @param {number} min - minimum number
- * @param {number} max - maximum number
- * @returns {number} - random value between min and max, inclusive
- */
-export function randomNumberInRange(min: number, max: number): number {
-	return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
-/**
- * Compute the Difference between two numbers in Percents
- *
- * @param {number} newNumber - new value to calculate percent change
- * @param {number} baseNumber - the number to calculate percentage from
- * @return {number|NaN} diff - percentage difference, or not a number
- */
-export function toPercentage(newNumber: unknown, baseNumber: unknown): number {
-	if (!isNumeric(newNumber) || !isNumeric(baseNumber)) return NaN
-	const newValue = Number(newNumber)
-	const baseValue = Number(baseNumber)
-	if (baseValue === 0) return newValue === 0 ? 0 : newValue > 0 ? Infinity : -Infinity
-	return ((newValue - baseValue) / baseValue) * 100
 }
 
 /**

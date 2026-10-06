@@ -1,4 +1,4 @@
-import { isFunction, isAsync, debounce, throttle } from '../function'
+import { isFunction, debounce } from '../function'
 
 describe('isFunction', () => {
     it('returns true for plain functions', () => {
@@ -17,15 +17,6 @@ describe('isFunction', () => {
         expect(isFunction(42)).toBe(false)
         expect(isFunction('fn')).toBe(false)
         expect(isFunction({})).toBe(false)
-    })
-})
-
-describe('isAsync', () => {
-    it('returns true for async functions', () => {
-        expect(isAsync(async () => {})).toBe(true)
-    })
-    it('returns false for sync functions', () => {
-        expect(isAsync(() => {})).toBe(false)
     })
 })
 
@@ -79,28 +70,6 @@ describe('debounce', () => {
         debounced('arg')
         jest.runAllTimers()
         expect(fn).toHaveBeenCalledWith('arg')
-    })
-})
-
-describe('throttle', () => {
-    beforeEach(() => {
-        jest.useFakeTimers()
-    })
-    afterEach(() => {
-        jest.useRealTimers()
-    })
-
-    it('throttles repeated calls within the wait period', () => {
-        const fn = jest.fn()
-        const throttled = throttle(fn, 100)
-        throttled()
-        throttled()
-        throttled()
-        // leading edge: one call should fire immediately
-        expect(fn).toHaveBeenCalledTimes(1)
-        jest.advanceTimersByTime(100)
-        // trailing edge: should call at most one more time
-        expect(fn.mock.calls.length).toBeLessThanOrEqual(2)
     })
 })
 

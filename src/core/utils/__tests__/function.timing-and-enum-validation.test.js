@@ -1,4 +1,4 @@
-import { debounce, throttle } from '../function'
+import { debounce } from '../function'
 
 describe('function timing contracts', () => {
     beforeEach(() => {
@@ -53,52 +53,6 @@ describe('function timing contracts', () => {
         jest.advanceTimersByTime(50)
 
         expect(callback).toHaveBeenCalledTimes(1)
-    })
-
-    it('forwards the latest arguments and context for a trailing-only throttle', () => {
-        const calls = []
-        const context = {
-            id: 'context',
-            run: throttle(function (value) {
-                calls.push([this.id, value])
-            }, 100, { leading: false }),
-        }
-
-        context.run('first')
-        context.run('latest')
-        expect(calls).toEqual([])
-
-        jest.advanceTimersByTime(100)
-        expect(calls).toEqual([['context', 'latest']])
-    })
-
-    it('suppresses trailing throttle work when trailing is disabled', () => {
-        const callback = jest.fn()
-        const throttled = throttle(callback, 100, { trailing: false })
-
-        throttled('first')
-        throttled('ignored')
-        expect(callback).toHaveBeenCalledTimes(1)
-
-        jest.advanceTimersByTime(100)
-        throttled('next-window')
-        expect(callback).toHaveBeenCalledTimes(2)
-        expect(callback).toHaveBeenLastCalledWith('next-window')
-    })
-
-    it('cancels a pending trailing throttle when a later call starts a new window', () => {
-        const callback = jest.fn()
-        const throttled = throttle(callback, 100)
-
-        throttled('leading')
-        throttled('pending')
-        jest.setSystemTime(new Date('2026-07-31T12:00:00.200Z'))
-        throttled('new-window')
-
-        expect(callback).toHaveBeenCalledTimes(2)
-        expect(callback).toHaveBeenLastCalledWith('new-window')
-        jest.runOnlyPendingTimers()
-        expect(callback).toHaveBeenCalledTimes(2)
     })
 })
 

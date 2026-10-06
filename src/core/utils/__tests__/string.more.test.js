@@ -1,35 +1,12 @@
 import {
-    isInString,
-    isInStringAny,
-    insertToString,
-    isBase64,
-    isString,
-    formatKeyPath,
-    fileFormat,
-    fileNameWithoutExt,
-    fileFromDataUrl,
-    mimeTypeFromDataUrl,
-    hostname,
-    matchBetween,
-    mergeStrings,
-    padStringLeft,
-    padStringRight,
-    pluralize,
-    toHex,
-    toAlphaNum,
-    toAlphaNumId,
-    toURI,
-    truncate,
-    toLowerCase,
-    toLowerCaseAny,
-    toUpperCase,
-    toUpperCaseAny,
-    trimSpaces,
-    uuid,
-    randomFromString,
-    randomString,
-    sha256,
-    capitalize,
+  isInString,
+  isString,
+  fileNameWithoutExt,
+  pluralize,
+  toAlphaNumId,
+  truncate,
+  toLowerCase,
+  capitalize,
 } from '../string'
 
 describe('isInString', () => {
@@ -38,39 +15,6 @@ describe('isInString', () => {
     })
     it('returns false when needle is absent', () => {
         expect(isInString('hello', 'xyz')).toBe(false)
-    })
-})
-
-describe('isInStringAny', () => {
-    it('returns true if any needle matches', () => {
-        expect(isInStringAny('hello world', 'foo', 'world')).toBe(true)
-    })
-    it('returns false if none match', () => {
-        expect(isInStringAny('hello', 'x', 'y')).toBe(false)
-    })
-    it('returns false if first arg is not a string', () => {
-        expect(isInStringAny(null, 'x')).toBe(false)
-        expect(isInStringAny(undefined, 'x')).toBe(false)
-        expect(isInStringAny(42, 'x')).toBe(false)
-    })
-})
-
-describe('insertToString', () => {
-    it('inserts at a positive index', () => {
-        expect(insertToString('hello', 2, 'XX')).toBe('heXXllo')
-    })
-    it('prepends at index 0', () => {
-        expect(insertToString('hello', 0, '>')).toBe('>hello')
-    })
-})
-
-describe('isBase64', () => {
-    it('returns true for valid base64 strings', () => {
-        expect(isBase64('aGVsbG8=')).toBe(true)
-        expect(isBase64('YWJjZA==')).toBe(true)
-    })
-    it('returns false for invalid base64', () => {
-        expect(isBase64('not base 64!')).toBe(false)
     })
 })
 
@@ -86,110 +30,12 @@ describe('isString', () => {
     })
 })
 
-describe('formatKeyPath', () => {
-    it('converts bracket notation to dot notation', () => {
-        expect(formatKeyPath('object[string]')).toBe('object.string')
-    })
-    it('does not add a dot when bracket starts the string', () => {
-        expect(formatKeyPath('[0]')).toBe('0')
-    })
-    it('handles multiple bracket segments', () => {
-        expect(formatKeyPath('a[b][c]')).toBe('a.b.c')
-    })
-})
-
-describe('fileFormat', () => {
-    it('returns the extension', () => {
-        expect(fileFormat('image.png')).toBe('png')
-    })
-    it('returns the last extension for multi-dot names', () => {
-        expect(fileFormat('archive.tar.gz')).toBe('gz')
-    })
-    it('returns empty string when there is no extension', () => {
-        expect(fileFormat('noext')).toBe('')
-    })
-})
-
 describe('fileNameWithoutExt', () => {
     it('strips the extension', () => {
         expect(fileNameWithoutExt('photo.jpg')).toBe('photo')
     })
     it('leaves names without extension unchanged', () => {
         expect(fileNameWithoutExt('photo')).toBe('photo')
-    })
-})
-
-describe('mimeTypeFromDataUrl', () => {
-    it('extracts mime type', () => {
-        expect(mimeTypeFromDataUrl('data:image/png;base64,iVBOR...')).toBe('image/png')
-    })
-})
-
-describe('fileFromDataUrl', () => {
-    it('decodes a base64 data URL to a File', () => {
-        // "Hi!" → "SGkh"
-        const dataUrl = 'data:text/plain;base64,SGkh'
-        const file = fileFromDataUrl(dataUrl, 'note.txt')
-        expect(file.name).toBe('note.txt')
-        expect(file.type).toBe('text/plain')
-        expect(file.size).toBe(3)
-    })
-})
-
-describe('hostname', () => {
-    it('extracts hostname with protocol', () => {
-        expect(hostname('https://example.com/path')).toBe('example.com')
-    })
-    it('extracts hostname without protocol', () => {
-        expect(hostname('example.com/path')).toBe('example.com')
-    })
-    it('strips port', () => {
-        expect(hostname('https://example.com:8080/x')).toBe('example.com')
-    })
-    it('strips query', () => {
-        expect(hostname('example.com?q=1')).toBe('example.com')
-    })
-})
-
-describe('matchBetween', () => {
-    it('finds the substring between markers', () => {
-        expect(matchBetween('cool_black__hat', '_', '__')).toBe('black')
-    })
-    it('returns empty string when no match', () => {
-        expect(matchBetween('abcdef', 'X', 'Y')).toBe('')
-    })
-})
-
-describe('mergeStrings', () => {
-    it('produces a deterministic scrambled result', () => {
-        const out = mergeStrings('ab', 'xyz')
-        expect(typeof out).toBe('string')
-        expect(out.length).toBeGreaterThan(0)
-        expect(mergeStrings('ab', 'xyz')).toBe(out)
-    })
-    it('handles numeric inputs', () => {
-        expect(typeof mergeStrings(12, 34)).toBe('string')
-    })
-    it('handles strings of equal length', () => {
-        const out = mergeStrings('ab', 'cd')
-        expect(typeof out).toBe('string')
-        expect(out.length).toBe(4)
-    })
-    it('handles when first is shorter than second', () => {
-        const out = mergeStrings('a', 'xyz')
-        expect(typeof out).toBe('string')
-    })
-})
-
-describe('padStringLeft / padStringRight', () => {
-    it('pads left with the template', () => {
-        expect(padStringLeft('7', '000')).toBe('007')
-    })
-    it('pads right with the template', () => {
-        expect(padStringRight('7', '000')).toBe('700')
-    })
-    it('returns longer input untouched (left)', () => {
-        expect(padStringLeft('1234', '00')).toBe('1234')
     })
 })
 
@@ -244,18 +90,9 @@ describe('pluralize', () => {
     })
 })
 
-describe('toHex / toAlphaNum / toAlphaNumId / toURI', () => {
-    it('encodes a simple string to hex', () => {
-        expect(toHex('A')).toMatch(/^[0-9a-f]+$/)
-    })
-    it('strips non-alphanumeric characters', () => {
-        expect(toAlphaNum('a-b_c.d!')).toBe('abcd')
-    })
+describe('toAlphaNumId', () => {
     it('keeps dash and underscore in toAlphaNumId', () => {
         expect(toAlphaNumId('a-b_c.d!')).toBe('a-b_cd')
-    })
-    it('sanitizes string to URI form', () => {
-        expect(toURI('Hello World! Foo  Bar')).toBe('hello-world-foo-bar')
     })
 })
 
@@ -274,66 +111,12 @@ describe('truncate', () => {
 })
 
 describe('case conversion', () => {
-    it('toLowerCase / toUpperCase preserve falsy', () => {
+    it('toLowerCase preserves falsy', () => {
         expect(toLowerCase('')).toBe('')
-        expect(toUpperCase('')).toBe('')
         expect(toLowerCase(null)).toBe(null)
     })
-    it('toLowerCase / toUpperCase work on strings', () => {
+    it('toLowerCase works on strings', () => {
         expect(toLowerCase('ABc')).toBe('abc')
-        expect(toUpperCase('aBc')).toBe('ABC')
-    })
-    it('toLowerCaseAny / toUpperCaseAny coerce', () => {
-        expect(toLowerCaseAny(123)).toBe('123')
-        expect(toUpperCaseAny(true)).toBe('TRUE')
-    })
-})
-
-describe('trimSpaces', () => {
-    it('trims and collapses multiple-whitespace runs', () => {
-        expect(trimSpaces('  a   b  c  ')).toBe('a b c')
-    })
-    it('returns falsy input as-is', () => {
-        expect(trimSpaces('')).toBe('')
-        expect(trimSpaces(null)).toBe(null)
-    })
-})
-
-describe('uuid', () => {
-    it('returns a v4 uuid', () => {
-        const id = uuid()
-        expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/)
-    })
-    it('returns unique values', () => {
-        const a = uuid()
-        const b = uuid()
-        expect(a).not.toBe(b)
-    })
-})
-
-describe('randomFromString / randomString', () => {
-    it('randomFromString returns a single char from input', () => {
-        const out = randomFromString('abc')
-        expect('abc').toContain(out)
-    })
-    it('randomString respects length range with alphaNum', () => {
-        const out = randomString(8, 8, { alphaNum: true })
-        expect(out).toHaveLength(8)
-        expect(/^[0-9a-zA-Z]+$/.test(out)).toBe(true)
-    })
-    it('randomString respects length range with hex', () => {
-        const out = randomString(16, 16, { hex: true })
-        expect(out).toHaveLength(16)
-        expect(/^[0-9a-f]+$/.test(out)).toBe(true)
-    })
-})
-
-describe('sha256', () => {
-    it('hashes the empty string to a known digest', () => {
-        expect(sha256('')).toBe('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')
-    })
-    it('hashes "abc" to a known digest', () => {
-        expect(sha256('abc')).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad')
     })
 })
 

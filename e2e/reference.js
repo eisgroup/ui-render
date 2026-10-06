@@ -36,7 +36,7 @@
  *    Mechanism: semantic-ui-react clones the trigger with a `ref`, and of everything a meta can
  *    declare, NOTHING can hold one — `mapper.tsx` uses the plain `Row`, `Button` is a
  *    `React.memo(function Button)`, and the only ref-able components in `src/core` are `Dropzone`
- *    and the named `RowRef` export, which no `view` maps to. So popper's reference element is
+ *    and the named `RowRef` export (deleted since), which no `view` maps to. So popper's reference element is
  *    `null`. Feeding the same component a plain `<button>` (the harness) positions correctly and
  *    raises nothing, which is what makes this a diagnosis rather than a guess.
  *    §9.5 says jsdom is useless here because "Popper computes `left: 0px; top: 0px` in every case".
@@ -489,4 +489,119 @@ const DROPDOWN = {
     UNNAMED_IN_THIS_EXAMPLE: ['aria-labelledby', 'aria-label'],
 }
 
-module.exports = { BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, INLINE, WIDGET, TOUCH, KEYBOARD, DROPDOWN }
+// ---------------------------------------------------------------------------------------------
+// THE VIEWS ADDED ON 2026-10-06 — e2e/interactive-views.pw.js, measured on the production demo
+// build in Chromium at 1280x800, as everything above.
+// ---------------------------------------------------------------------------------------------
+
+/** `type: 'date'`: rc-picker's calendar, on the first start date of the `tableForm` example. */
+const DATE_INPUT = {
+    /** [I] The calendar sits against its input, on the side rc-picker chose. Measured 4 px; 8 allowed. */
+    MAX_GAP_PX: 8,
+    /** [I] Below when there is room, above when there is not: rc-picker's placement, in the class. */
+    PLACEMENT_CLASS: { roomBelow: /-placement-bottomLeft\b/, noRoomBelow: /-placement-topLeft\b/ },
+    /**
+     * [R] rc-picker portals the calendar into `<body>`, outside the widget. The scoped stylesheet
+     * reaches it anyway, because postcss.config.js leaves the `.ui-render-*` rules unscoped for
+     * exactly this portal; `PANEL_PAINT` is that exemption working in a real build.
+     */
+    INSIDE_UI_RENDER: false,
+    /** [I] The panel paints: its background and border come from `inputDate.less`. */
+    PANEL_PAINT: { backgroundColor: 'rgb(240, 245, 255)', borderTopWidth: '1px' },
+    /** [I] The example's stored date, shown in the display format, and a day picked from January. */
+    INITIAL_VALUE: '01-01-2022',
+    PICKED_DAY: '2022-01-15',
+    PICKED_VALUE: '01-15-2022',
+}
+
+/**
+ * The modal a `popupOpen` action opens (`engine/components/Modal.tsx`), in the `popupContent`
+ * example. Pointer behaviour is [I]. What a keyboard or a screen reader meets is not, yet:
+ */
+const POPUP = {
+    /**
+     * [R->I] DEFECTS, all four. Nothing carries `role="dialog"` or `aria-modal`, so a screen reader
+     * is not told a dialog opened. Focus stays where it was, on the trigger behind the backdrop. Tab
+     * walks on through the page under the backdrop, and Escape does nothing: the backdrop and the Ok
+     * button are the only ways out. A fix (the WAI-ARIA dialog pattern) flips each value.
+     */
+    DIALOG_ROLE_COUNT: 0,
+    FOCUS_MOVES_IN: false,
+    TAB_STAYS_IN: false,
+    ESCAPE_CLOSES: false,
+}
+
+/** The first slider of the `slider` example: `volume`, 0 to 100, step 1, starting at 35. */
+const SLIDER = {
+    MIN: 0,
+    MAX: 100,
+    STEP: 1,
+    /** [I] A drag to three quarters of the rail sets three quarters of the range. */
+    DRAG_TO_FRACTION: 0.75,
+    DRAGGED_VALUE: 75,
+    /**
+     * [I] And the handle's centre lands where the value says, within a pixel: the pointer is read
+     * against `.app__slider__rail` and the handle is placed by a percentage of `.app__slider`, so
+     * the two boxes must agree. They do (measured: the same left and width).
+     */
+    HANDLE_OFF_POSITION_MAX_PX: 1,
+}
+
+/** `type: 'toggle'`, the first of the `inputToggle` example, which starts checked. */
+const TOGGLE = {
+    /** [I] The switch's fill: the checked colour, and none when unchecked. */
+    BACKGROUND: { checked: 'rgb(46, 110, 177)', unchecked: 'rgba(0, 0, 0, 0)' },
+}
+
+/** `view: 'Checkbox'`: the Expand All box a table header declares, in `tableNested` and `popupContent`. */
+const CHECKBOX = {
+    LABEL: 'Expand All',
+    /** [I] What it opens and closes in `tableNested`: the two top rows. */
+    ROW_TITLES: ['Gold', 'Silver'],
+    /**
+     * [R->I] DEFECT. With no `id`, `Checkbox` derives one from its label (`checkbox-` + the label,
+     * spaces as dashes). `popupContent` renders the same table twice, once in the popup and once
+     * behind it, so the document holds two inputs with that id, and a `<label for>` resolves to the
+     * first: a click on the label inside the popup checks the box behind it, whose rows open, and
+     * leaves its own box and rows as they were. A unique id per instance flips this.
+     */
+    DERIVED_ID: 'checkbox-Expand-All',
+    INSTANCES_SHARING_THE_ID: 2,
+    AFTER_CLICK_IN_POPUP: [{ inPopup: false, checked: true }, { inPopup: true, checked: false }],
+}
+
+/** `view: 'Dropdown'` driven by the pointer, in the `dropdown` example. */
+const POINTER_DROPDOWN = {
+    INITIAL: 'Gold',
+    PICKED: 'Silver',
+}
+
+const TABLE = {
+    /**
+     * [I] The `all` example's Admin Expenses table declares sorts. From unsorted, a click on a
+     * sortable header sorts descending, then ascending, then not at all: the cycle §5 described
+     * from its other end. The unsorted order of this column is already ascending, so the rows
+     * alone cannot tell those two apart; `aria-sort` can.
+     */
+    SORT_SECTION: 'Admin Expenses',
+    SORT_COLUMN: 'Annual Amount',
+    SORT_CYCLE: ['descending', 'ascending', 'none'],
+    /** [I] `tablePagination`: 23 rows, five to a page. */
+    PAGE_COUNT: 5,
+    PAGE_3_ROWS: ['11', '12', '13', '14', '15'],
+    LAST_PAGE_ROWS: ['21', '22', '23'],
+}
+
+/** The `all` example's progress steps: four, the second current. */
+const PROGRESS_STEPS = {
+    /** [I] A click on the third step makes it current and shows its content after the 50 ms swap. */
+    CLICKED: 2,
+    CLICKED_CONTENT: 'Step 3 with missing content',
+    /** [I] The bars up to the current step fill; the one after it stays empty. */
+    BARS_FILLED_AFTER_CLICK: [true, true, false],
+}
+
+module.exports = {
+    BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, INLINE, WIDGET, TOUCH, KEYBOARD, DROPDOWN,
+    DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, PROGRESS_STEPS,
+}

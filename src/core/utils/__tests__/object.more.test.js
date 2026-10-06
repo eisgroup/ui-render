@@ -1,28 +1,14 @@
 import {
-    hasObjectValue,
-    isEqualJSON,
-    isObject,
-    merge,
-    mergeReplaceArrays,
-    objChanges,
-    set,
-    update,
-    hasObjMatch,
-    hasObjKeys,
-    findObjByKeys,
-    findAllObjsByKeys,
-    toFlatObj,
-    fromFlatObj,
-    pop,
-    removeKey,
-    removeKeys,
-    removeEmptyValues,
-    removeNilValues,
-    removeDeletedItems,
-    sanitizeResponse,
-    sortObjKeys,
-    swapKeyWithValue,
-    toObjValuesTotal,
+  hasObjectValue,
+  isEqualJSON,
+  isObject,
+  merge,
+  mergeReplaceArrays,
+  objChanges,
+  set,
+  update,
+  removeNilValues,
+  sanitizeResponse,
 } from '../object'
 
 describe('hasObjectValue', () => {
@@ -121,144 +107,9 @@ describe('update', () => {
     })
 })
 
-describe('hasObjMatch', () => {
-    it('finds nested match', () => {
-        expect(hasObjMatch([[[1, -1], [2, -2]]], [1, -1])).toBe(true)
-    })
-    it('returns false when no match exists', () => {
-        expect(hasObjMatch({ a: { b: 1 } }, { b: 99 })).toBe(false)
-    })
-})
-
-describe('hasObjKeys', () => {
-    it('matches with deep comparison', () => {
-        expect(hasObjKeys({ a: 1 }, { a: 1 })).toBe(true)
-        expect(hasObjKeys({ a: 1 }, { a: 2 })).toBe(false)
-    })
-    it('matches paths with shallow comparison', () => {
-        expect(hasObjKeys({ x: { id: 7 } }, { 'x.id': 7 }, 'shallow')).toBe(true)
-    })
-    it('shallow returns false on object mismatch', () => {
-        expect(hasObjKeys({ a: { x: 1 } }, { a: { x: 2 } }, 'shallow')).toBe(false)
-    })
-    // The loose comparison used to be OR-ed onto the object branch, so a successful object match was then
-    // vetoed by comparing the two objects by reference — every shallow object match returned false.
-    it('shallow matches a nested object by value, not by reference', () => {
-        expect(hasObjKeys({ a: { x: 1 } }, { a: { x: 1 } }, 'shallow')).toBe(true)
-    })
-    it('shallow matches an object partially, ignoring extra keys on the target', () => {
-        expect(hasObjKeys({ a: { x: 1, y: 2 } }, { a: { x: 1 } }, 'shallow')).toBe(true)
-        expect(hasObjKeys({ a: { x: 1 } }, { a: { x: 1, y: 2 } }, 'shallow')).toBe(false)
-    })
-    it('shallow matches arrays by value', () => {
-        expect(hasObjKeys({ coords: [1, -1] }, { coords: [1, -1] }, 'shallow')).toBe(true)
-        expect(hasObjKeys({ coords: [1, -1] }, { coords: [2, -2] }, 'shallow')).toBe(false)
-    })
-    it('shallow keeps comparing primitives loosely', () => {
-        expect(hasObjKeys({ a: 1 }, { a: '1' }, 'shallow')).toBe(true)
-        expect(hasObjKeys({ a: 1 }, { a: 2 }, 'shallow')).toBe(false)
-    })
-    it('deep still requires strict equality, so an equal object does not match by value', () => {
-        expect(hasObjKeys({ a: { x: 1 } }, { a: { x: 1 } }, 'deep')).toBe(false)
-        expect(hasObjKeys({ a: 1 }, { a: '1' }, 'deep')).toBe(false)
-    })
-    it('include returns true when value is an object that matches', () => {
-        expect(hasObjKeys({ x: { id: 7 } }, { x: { id: 7 } }, 'include')).toBe(true)
-    })
-    it('include returns false when value is primitive and mismatches', () => {
-        expect(hasObjKeys({ a: 1 }, { a: 2 }, 'include')).toBe(false)
-    })
-    it('include traverses nested objects for matches', () => {
-        expect(hasObjKeys({ x: [{ a: 1 }, { a: 2 }] }, { x: { a: 1 } }, 'include')).toBe(true)
-    })
-})
-
-describe('findObjByKeys / findAllObjsByKeys', () => {
-    const obj = {
-        items: [
-            { id: 1, type: 'A' },
-            { id: 2, type: 'B' },
-            { id: 3, type: 'A' },
-        ],
-    }
-    it('finds first matching nested object', () => {
-        expect(findObjByKeys(obj, { type: 'A' })).toEqual({ id: 1, type: 'A' })
-    })
-    it('finds all matching nested objects', () => {
-        expect(findAllObjsByKeys(obj, { type: 'A' })).toEqual([
-            { id: 1, type: 'A' },
-            { id: 3, type: 'A' },
-        ])
-    })
-})
-
-describe('toFlatObj / fromFlatObj', () => {
-    it('flattens nested objects', () => {
-        expect(toFlatObj({ a: { b: { c: 1 } } })).toEqual({ 'a.b.c': 1 })
-    })
-    it('round-trips via unflatten', () => {
-        const original = { a: { b: { c: 1, d: [1, 2] } }, e: 'x' }
-        expect(fromFlatObj(toFlatObj(original))).toEqual(original)
-    })
-    it('respects custom delimiter', () => {
-        expect(toFlatObj({ a: { b: 1 } }, { delimiter: '/' })).toEqual({ 'a/b': 1 })
-    })
-})
-
-describe('pop', () => {
-    it('extracts and removes a value at a key path', () => {
-        const obj = { a: { b: 1 } }
-        expect(pop(obj, 'a.b')).toBe(1)
-        expect(obj).toEqual({ a: {} })
-    })
-    it('returns the fallback when value is missing', () => {
-        expect(pop({}, 'x.y', 'fb')).toBe('fb')
-    })
-})
-
-describe('removeKey', () => {
-    it('returns new object without the key', () => {
-        const obj = { a: 1, b: 2 }
-        expect(removeKey(obj, 'a')).toEqual({ b: 2 })
-        expect(obj).toEqual({ a: 1, b: 2 })
-    })
-})
-
-describe('removeKeys', () => {
-    it('removes top-level keys', () => {
-        expect(removeKeys({ a: 1, b: 2 }, ['a'])).toEqual({ b: 2 })
-    })
-    it('removes keys recursively when requested', () => {
-        const out = removeKeys({ a: 1, child: { a: 2, b: 3 } }, ['a'], { recursive: true })
-        expect(out).toEqual({ child: { b: 3 } })
-    })
-    it('clones when requested', () => {
-        const obj = { a: 1, b: 2 }
-        const out = removeKeys(obj, ['a'], { clone: true })
-        expect(out).toEqual({ b: 2 })
-        expect(obj).toEqual({ a: 1, b: 2 })
-    })
-})
-
-describe('removeEmptyValues', () => {
-    it('removes empty strings', () => {
-        expect(removeEmptyValues({ a: 'x', b: '' })).toEqual({ a: 'x' })
-    })
-    it('removes falsy from arrays', () => {
-        expect(removeEmptyValues([1, '', 2, ''])).toEqual([1, 2])
-    })
-})
-
 describe('removeNilValues', () => {
     it('removes null/undefined values', () => {
         expect(removeNilValues({ a: 1, b: null, c: undefined })).toEqual({ a: 1 })
-    })
-})
-
-describe('removeDeletedItems', () => {
-    it('removes items with truthy .delete from collection', () => {
-        const out = removeDeletedItems({ a: { id: 1 }, b: { id: 2, delete: true } })
-        expect(out).toEqual({ a: { id: 1 } })
     })
 })
 
@@ -274,23 +125,3 @@ describe('sanitizeResponse', () => {
     })
 })
 
-describe('sortObjKeys', () => {
-    it('sorts ascending by default', () => {
-        expect(Object.keys(sortObjKeys({ b: 1, a: 2, c: 3 }))).toEqual(['a', 'b', 'c'])
-    })
-    it('sorts descending when requested', () => {
-        expect(Object.keys(sortObjKeys({ b: 1, a: 2, c: 3 }, 'desc'))).toEqual(['c', 'b', 'a'])
-    })
-})
-
-describe('swapKeyWithValue', () => {
-    it('swaps keys with values', () => {
-        expect(swapKeyWithValue({ id: 1, name: 'Tom' })).toEqual({ 1: 'id', Tom: 'name' })
-    })
-})
-
-describe('toObjValuesTotal', () => {
-    it('sums numeric values', () => {
-        expect(toObjValuesTotal({ a: 1, b: 2, c: 3 })).toBe(6)
-    })
-})

@@ -375,7 +375,7 @@
   object sanitization, lodash-compatible collection/equality behavior, mapper relative context,
   immutable table extras, and asynchronous plain-text API failures. Follow-up contracts cover
   the InputDate/rc-picker boundary, controlled ProgressSteps updates, ScrollView behavior,
-  debounce/throttle timing windows, and browser/backend storage routing. The current contracts
+  debounce timing windows, and browser/backend storage routing. The current contracts
   cover Counter lifecycle and timing, hidden and sticky Input variants, ToggleField mappings,
   cyclic/repeated JsonView values, and Render setup/error defaults. The latest batch covers
   Pagination normalization/accessibility, Checkbox mappings and readonly behavior, ProgressBar
@@ -383,8 +383,8 @@
   dropdown language fallbacks, currency/fraction modes, and null Select labels. The next batch
   covers timeout/interval cleanup, duration and Moment-format parity, numeric boundary behavior,
   invalid Select indices, and raw/structured form-data isolation. The migration-safety pass now
-  also covers browser/backend environment bootstrapping, string edge contracts, ID collision
-  history, lazy ExpandList content, page-level Tabs transitions, recursive Render failures,
+  also covers browser/backend environment bootstrapping, string edge contracts, lazy ExpandList
+  content, page-level Tabs transitions, recursive Render failures,
   mapper defensive factories, Final Form subscription lifecycles, and popup action arguments.
 - Added a smoke contract covering every registered demo example and enforceable coverage
   thresholds for the renderer's critical files.
@@ -434,6 +434,17 @@
 - Dependabot proposes updates every week, of the development dependencies and of the GitHub Actions
   CI runs: a week's minor and patch updates in one pull request, each major in its own. Major
   versions of React and ESLint are held back, with the reason beside each in `.github/dependabot.yml`.
+- The code that neither the library nor the demo uses is gone: 212 exports, 202 of them in the
+  internal utilities, and three files, two unused and one empty. What the two builds use was
+  measured with webpack, and each module walked from there, until a pass found nothing more. The
+  tests of the deleted helpers went with them, and six demo example files that no page showed. The
+  bundle is 1.6 KB smaller, from module-level statements that kept dead helpers' data in it; what
+  it renders is unchanged.
+- The browser checks drive the views a user acts on that only jsdom covered: the date input's
+  calendar, the popup, the slider, a toggle, a checkbox, the dropdown by pointer, table sorting and
+  pages, and progress steps, 16 tests against the production demo build. `e2e/view-coverage.js`
+  names, for each of the 37 views, the tests that drive it or why none needs to, and a check keeps
+  it complete.
 
 #### Fixes
 

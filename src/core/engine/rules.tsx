@@ -38,7 +38,7 @@ import { createPopupContent } from './components/PopupContent'
 import type { FormApi } from 'final-form'
 import type { UploadArgs } from './upload'
 import type { Translate } from '../utils/_envs'
-import { dataKindPathFor, getDataKindPathFromRelative, pushDataKindRow, removeDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow } from './dataKindPush'
+import { dataKindPathFor, getDataKindPathFromRelative, pushDataKindRow, removeDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays } from './dataKindPush'
 
 // Non-narrowing, on purpose: a meta node checked with it stays open JSON, instead of becoming the
 // `Record<string, unknown>` the util's type guard narrows it to.
@@ -52,8 +52,6 @@ const isObject: (value: unknown) => boolean = isPlainObject
  */
 const isDeclaredOptionList = (options: unknown): options is Array<{ value?: unknown }> =>
     Array.isArray(options) && options.length > 0 && options.every(isObject)
-
-export { getDataKindPathFromRelative, pushDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, dataKindRowHasContent, validateNotWithinRangeDraftRow }
 
 FIELD.ACTION = {
     ADD_DATA: 'addData',

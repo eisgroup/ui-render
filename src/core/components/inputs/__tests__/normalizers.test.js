@@ -1,10 +1,8 @@
 import {
-    integer,
-    double5,
-    emptyStringToNull,
-    uppercase,
-    number,
-    phone,
+  integer,
+  double5,
+  uppercase,
+  phone,
 } from '../normalizers'
 
 describe('integer', () => {
@@ -36,43 +34,9 @@ describe('double5', () => {
     })
 })
 
-describe('emptyStringToNull', () => {
-    it('converts empty string to null', () => {
-        expect(emptyStringToNull('')).toBeNull()
-    })
-    it('leaves other values unchanged', () => {
-        expect(emptyStringToNull('x')).toBe('x')
-        expect(emptyStringToNull(0)).toBe(0)
-        expect(emptyStringToNull(null)).toBeNull()
-    })
-})
-
 describe('uppercase', () => {
     it('uppercases strings', () => {
         expect(uppercase('abc')).toBe('ABC')
-    })
-})
-
-describe('number normalizer factory', () => {
-    it('clamps to max', () => {
-        const fn = number({ max: 10 })
-        expect(fn(15)).toBe(10)
-    })
-    it('clamps to min', () => {
-        const fn = number({ min: 0 })
-        expect(fn(-5)).toBe(0)
-    })
-    it('rounds to decimals when value is truthy', () => {
-        const fn = number({ decimals: 2 })
-        expect(fn(1.2345)).toBe(1.23)
-    })
-    it('leaves zero unchanged when decimals is set (falsy guard)', () => {
-        const fn = number({ decimals: 2 })
-        expect(fn(0)).toBe(0)
-    })
-    it('returns the value as-is when within range and no decimals', () => {
-        const fn = number({ min: 0, max: 10 })
-        expect(fn(5)).toBe(5)
     })
 })
 

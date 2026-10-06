@@ -3,17 +3,13 @@ import {
 	get,
 	isEmpty,
 	isEqual,
-	isObjectLike,
 	isPlainObject,
-	matches,
 	merge as _merge,
 	mergeWith as _mergeWith,
-	property,
 	setIn as _setIn,
 	setWith,
 	unset,
 } from './lodash-lite'
-import { isCollection } from './array'
 
 /**
  * OBJECT FUNCTIONS ============================================================
@@ -33,10 +29,6 @@ import { isCollection } from './array'
 /** Anything walked with a computed key once the value is treated as object-like. */
 type Dict = Record<PropertyKey, unknown>
 
-/** The comparison modes {@link hasObjKeys} understands: 'deep', 'shallow' or 'include'. Kept a
- *  plain `string` because an unrecognised mode is not an error at runtime — it matches everything. */
-type MatchType = string
-
 /**
  * `setWith`'s customizer, as forwarded by {@link set}: it returns the container to create for a
  * missing path segment.
@@ -44,20 +36,6 @@ type MatchType = string
  *    annotates its own customizer, e.g. `set(obj, path, value, (v: Row) => …)`.
  */
 type SetWithCustomizer = (nsValue: any, key: PropertyKey, nsObject: any) => unknown
-
-/** Options accepted by {@link toFlatObj}, a subset of the `flat` package's API. */
-type FlattenOpts = {
-	delimiter?: string,
-	maxDepth?: number,
-	safe?: boolean,
-}
-
-/** Options accepted by {@link fromFlatObj}, a subset of the `flat` package's API. */
-type UnflattenOpts = {
-	delimiter?: string,
-	overwrite?: boolean,
-	object?: boolean,
-}
 
 /**
  * Check if value provided is an Object with at least one attribute
@@ -222,345 +200,6 @@ export function update<T> (state: T, payload?: unknown, shouldCloneDeep = false,
 }
 
 /**
- * Check Recursively for Matching Object within Nested Object or Collection.
- *
- * @example:
- *   hasObjMatch([[[1, -1], [2, -2]]], [1, -1]);
- *   >>> true
- *
- * @param {*} obj - the collection to search for matching object
- * @param {*} searchObj - the matching object to find
- * @returns {boolean} - true if a match found.
- * @Note: the bare `return` on a non-own property yields `undefined`, not `false` — hence the
- *    `| undefined` in the return type. Callers only ever test it for truthiness.
- */
-export function hasObjMatch(obj: unknown, searchObj: unknown): boolean | undefined {
-	for (const key in obj as Dict) {
-		if (!{}.hasOwnProperty.call(obj, key)) return
-		const value = (obj as Dict)[key]
-
-		if (matches(searchObj)(value)) {
-			return true
-		} else if (isObjectLike(value)) {
-			const nestedMatch = hasObjMatch(value, searchObj)
-			if (nestedMatch) return true
-		}
-	}
-
-	return false
-}
-
-/**
- * Check if an Object has Provided Key Paths and Values.
- *
- * @example:
- *  const obj = {
- *    properties: {
- *      id: 7
- *    },
- *    type: 'DRAFT',
- *    coords: [[[1, -1], [2, -2]]]
- *  }
- *  hasObjKeys(obj, { 'properties.id': 7, 'coords': [1, -1] }, 'include');
- *  >>> true
- *
- * @param {*} obj - the object to check
- * @param {object} keys - key paths and values to match, e.g. { 'properties.id': 7, type: 'DRAFT' }
- * @param {String} match - one of comparison types ['deep', 'shallow', 'include'], default is `deep`.
- *  `deep` requires strict equality, so an equal-by-value object does not match; `shallow` matches
- *  object-like values partially by value and everything else loosely; `include` recurses to find a match.
- * @returns {boolean} - true if a match found.
- */
-export function hasObjKeys(obj: unknown, keys: Dict = {}, match: MatchType = 'deep'): boolean | undefined {
-	for (const key in keys) {
-		const value = keys[key]
-		const searchValue = get(obj, key)
-
-		// Deep comparison
-		if (match === 'deep') {
-			if (searchValue !== value) return false
-		}
-
-		// Shallow comparison
-		else if (match === 'shallow') {
-			// Object-like values match by value (partially — extra keys on the target are ignored), everything
-			// else compares loosely. The two must not be OR-ed: doing so let the reference comparison veto an
-			// object match the first clause had already accepted, so no shallow object match ever succeeded.
-			if (isObjectLike(searchValue)) {
-				if (!matches(value)(searchValue)) return false
-			} else {
-				// eslint-disable-next-line eqeqeq -- primitives compare loosely on purpose (1 matches '1')
-				if (searchValue != value) return false
-			}
-		}
-
-		// Include comparison
-		else if (match === 'include') {
-			if (searchValue !== value && !isObjectLike(searchValue)) {
-				return false
-			}
-
-			if (!matches(value)(searchValue)) {
-				if (isObjectLike(searchValue)) return hasObjMatch(searchValue, value)
-
-				return false
-			}
-		}
-	}
-
-	return true
-}
-
-/**
- * Get Reference to Object with Provided Key Paths and Values within Nested Object or Collection.
- *
- * @example:
- *  const obj = {
- *    id: 7,
- *    items: [
- *      {
- *        type: 'polygon',
- *        geoJSON: {
- *          properties: {
- *            id: 7
- *          },
- *          type: 'DRAFT',
- *          coords: [[[1, -1], [2, -2]]]
- *        }
- *      }
- *    ]
- *  }
- *  findObjByKeys(obj, { 'properties.id': 7, 'coords': [1, -1] }, 'include');
- *  >>> Object: {
- *    properties: {
- *      id: 7
- *    },
- *    type: 'DRAFT',
- *    coords: [[[1, -1], [2, -2]]]
- *  }
- *
- * @param {*} obj - the collection to search for matching object
- * @param {Object} keys - object with key paths and values to match, e.g. { 'properties.id': 7, type: 'DRAFT' }
- * @param {String} match - one of comparison types ['deep', 'shallow', 'include']
- * @returns {Object} - the matching object.
- */
-export function findObjByKeys(obj: unknown, keys: Dict = {}, match: MatchType = 'deep'): object | undefined {
-	for (const key in obj as Dict) {
-		if (!{}.hasOwnProperty.call(obj, key)) return
-		const value = (obj as Dict)[key]
-
-		if (!isObjectLike(value)) continue
-
-		if (hasObjKeys(value, keys, match)) return value
-
-		const foundObj = findObjByKeys(value, keys, match)
-		if (foundObj) return foundObj
-	}
-}
-
-/**
- * Find all the objects which matches the the keys in the object.
- * @see findObjByKeys on usage details.
- * @param obj
- * @param keys
- * @param match
- * @returns {Array}
- */
-export function findAllObjsByKeys(obj: unknown, keys: Dict = {}, match: MatchType = 'deep'): object[] {
-	const result: object[] = []
-	_findAllObjsByKeys(result, obj, keys, match)
-	return result
-}
-
-/**
- * Find all the objects with matching keys-values pairs in the Object or Collection.
- * @see findObjByKeys (which only returns a single matched object) on usage details.
- * The only usage difference from findObjByKeys is that the found objects are not in the return value.
- * This method populates the argument array 'foundObjs' with the found objects. This method has no return value.
- *
- * @param {Array} result - this is the return array. Pass in an empty array and it will be populated with the found objects
- * @param {Object} obj - Object or Collection to search from
- * @param {Object} keys - object with key paths and values to match, e.g. { 'properties.id': 7, type: 'DRAFT' }
- * @param {String} match - one of comparison types ['deep', 'shallow', 'include']
- */
-function _findAllObjsByKeys(result: object[], obj: unknown, keys: Dict = {}, match: MatchType = 'deep'): void {
-	for (const key in obj as Dict) {
-		if (!{}.hasOwnProperty.call(obj, key)) return
-		const value = (obj as Dict)[key]
-
-		if (!isObjectLike(value)) continue
-
-		if (hasObjKeys(value, keys, match)) result.push(value)
-
-		_findAllObjsByKeys(result, value, keys, match)
-	}
-}
-
-/**
- * Flatten/Unflatten nested object keys (dot-separated). Subset of the `flat` package API.
- */
-function flattenObject (target: unknown, opts?: FlattenOpts): Dict {
-	opts = opts || {}
-	const delimiter = opts.delimiter || '.'
-	const maxDepth = opts.maxDepth
-	const output: Dict = {}
-	function step (object: Dict, prev?: string, currentDepth?: number) {
-		currentDepth = currentDepth || 1
-		Object.keys(object).forEach(function (key) {
-			const value = object[key]
-			const isarray = opts!.safe && Array.isArray(value)
-			const type = Object.prototype.toString.call(value)
-			const isbuffer = typeof Buffer !== 'undefined' && Buffer.isBuffer && Buffer.isBuffer(value)
-			const isobject = (
-				type === '[object Object]' ||
-				type === '[object Array]'
-			)
-			const newKey = prev
-				? prev + delimiter + key
-				: key
-			if (!isarray && !isbuffer && isobject && Object.keys(value as Dict).length &&
-				(!opts!.maxDepth || currentDepth! < maxDepth!)) {
-				return step(value as Dict, newKey, currentDepth! + 1)
-			}
-			output[newKey] = value
-		})
-	}
-	step(target as Dict)
-	return output
-}
-
-function unflattenObject (target: unknown, opts?: UnflattenOpts): unknown {
-	opts = opts || {}
-	const delimiter = opts.delimiter || '.'
-	const overwrite = opts.overwrite || false
-	const result: Dict = {}
-	const isbuffer = typeof Buffer !== 'undefined' && Buffer.isBuffer && Buffer.isBuffer(target)
-	if (isbuffer || Object.prototype.toString.call(target) !== '[object Object]') {
-		return target
-	}
-	// `key` is `undefined` once the path is exhausted; `Number(undefined)` is NaN, so the first
-	// clause short-circuits before `.indexOf` is reached — as it always has.
-	function getkey (key: string | undefined): string | number | undefined {
-		const parsedKey = Number(key)
-		return (
-			isNaN(parsedKey) ||
-			key!.indexOf('.') !== -1 ||
-			opts!.object
-		) ? key
-			: parsedKey
-	}
-	const sortedKeys = Object.keys(target as Dict).sort(function (keyA, keyB) {
-		return keyA.length - keyB.length
-	})
-	sortedKeys.forEach(function (key) {
-		const split = key.split(delimiter)
-		let key1 = getkey(split.shift())
-		let key2 = getkey(split[0])
-		let recipient = result
-		while (key2 !== undefined) {
-			if (key1 === '__proto__') {
-				return
-			}
-			const type = Object.prototype.toString.call(recipient[key1!])
-			const isobject = (
-				type === '[object Object]' ||
-				type === '[object Array]'
-			)
-			if (!overwrite && !isobject && typeof recipient[key1!] !== 'undefined') {
-				return
-			}
-			if ((overwrite && !isobject) || (!overwrite && recipient[key1!] == null)) {
-				recipient[key1!] = (
-					typeof key2 === 'number' &&
-					!opts!.object ? [] : {}
-				)
-			}
-			recipient = recipient[key1!] as Dict
-			if (split.length > 0) {
-				key1 = getkey(split.shift())
-				key2 = getkey(split[0])
-			}
-		}
-		recipient[key1!] = unflattenObject((target as Dict)[key], opts)
-	})
-	return result
-}
-
-export const toFlatObj = flattenObject
-export const fromFlatObj = unflattenObject
-
-/**
- * Extract the value safely from an object via the keyPath and returns the value.
- * Removes that value's key from the passed object.
- *
- * @uses lodash
- * @see https://lodash.com/docs/4.17.1#get
- * @param {Object} obj - the object to get from and mutate
- * @param {string|Array} keyPath - the path to the desired value
- * @param {*} [fallback] - optional fallback value to return
- * @return {*}
- */
-export function pop(obj: unknown, keyPath: unknown, fallback?: unknown): unknown {
-	const missing = {}
-	const value = get(obj, keyPath, missing)
-	if (value === missing) return fallback
-	unset(obj, keyPath)
-	return value
-}
-
-/**
- * Delete Object property without mutating it, returning new Object without the deleted property
- *
- * @param {Object} obj - the Object to remove property from
- * @param {string} key - Object property to delete
- * @return {Object} - without the deleted key property
- */
-export function removeKey (obj: Dict, key: string): Dict {
-	const {[key]: _, ...rest} = obj
-	return rest
-}
-
-/**
- * Recursively remove given list of keys from object or collection
- * @param {Object|Array} obj - or collection to remove keys from
- * @param {String[]} keys - list of keys to remove
- * @param {Boolean} [clone] - whether to return new object, defaults to mutating existing
- * @param {Boolean} [recursive] - whether to parse given obj recursively
- */
-export function removeKeys<T> (obj: T, keys: readonly string[], {clone = false, recursive = false}: {clone?: boolean, recursive?: boolean} = {}): T {
-	const data = (clone ? cloneDeep(obj) : obj) as Dict
-	for (const key in data) {
-		if (keys.indexOf(key) >= 0) {
-			delete data[key]
-		} else if (recursive && isCollection(data[key])) {
-			data[key] = removeKeys(data[key], keys, {recursive})
-		}
-	}
-	return data as T
-}
-
-/**
- * Remove Empty String value keys from given Collection by mutation
- * (For Array, Falsey values will be removed)
- *
- * @param {Object|Array} collection - to remove empty values
- * @param {Boolean} [recursive] - whether to remove empty values recursively
- * @return {Object|Array} - without empty strings
- */
-export function removeEmptyValues<T> (collection: T, {recursive = true}: {recursive?: boolean} = {}): T {
-	const data = collection as Dict
-	for (const key in data) {
-		if (data[key] === '') {
-			delete data[key]
-		} else if (recursive && typeof (data[key] || '') === 'object') {
-			data[key] = removeEmptyValues(data[key], { recursive })
-		}
-	}
-
-	return (data.constructor === Array ? (data as unknown as unknown[]).filter(v => v) : data) as T
-}
-
-/**
  * Remove Null/Undefined value keys from given Collection by mutation
  * (For Array, Falsey values will be removed)
  *
@@ -575,29 +214,6 @@ export function removeNilValues<T> (collection: T, {recursive = true}: {recursiv
 			delete data[key]
 		} else if (recursive && typeof data[key] === 'object') {
 			data[key] = removeNilValues(data[key], {recursive})
-		}
-	}
-
-	return (data.constructor === Array ? (data as unknown as unknown[]).filter(v => v) : data) as T
-}
-
-/**
- * Remove items with truthy 'delete' properties from given Collection by mutation
- * (For Array, Falsey values will be removed)
- *
- * @param {Object|Array} collection - to remove deleted items from
- * @return {Object|Array} - without items with .delete keys
- */
-export function removeDeletedItems<T>(collection: T): T {
-	const data = collection as Dict
-	for (const key in data) {
-		// Null is of type 'object' according to stupid JS specs
-		if (typeof (data[key] || '') !== 'object') continue
-
-		if ((data[key] as Dict).delete) {
-			delete data[key]
-		} else {
-			data[key] = removeDeletedItems(data[key])
 		}
 	}
 
@@ -630,64 +246,6 @@ export function sanitizeResponse<T> (collection: T, {tags = ['__typename'], clon
 	return (result.constructor === Array ? (result as unknown as unknown[]).filter(v => v != null) : result) as T
 }
 
-/**
- * Sort Object Keys by given order, returning new Object with Keys sorted
- *
- * @param {Object} obj - to sort key attributes for
- * @param {String} order - enum, one of ['asc', 'desc']
- * @return {Object} - sorted by key attributes
- */
-export function sortObjKeys(obj: Dict, order: string = 'asc'): Dict {
-	const result: Dict = {}
-	Object.keys(obj)
-		.sort(order === 'desc' ? sortObjKeys.descending : undefined)
-		.forEach(key => {
-			result[key] = obj[key]
-		})
-	return result
-}
-
-sortObjKeys.descending = (a: string, b: string): number => {
-	if (a < b) return 1
-	if (a > b) return -1
-	return 0
-}
-
-/**
- * Swap Object's Keys with its Values
- *
- * @example:
- *    swapKeyWithValue({id: 1, name: Tom})
- *    >>> {1: 'id', 'Tom': name}
- *
- * @param {Object} obj - to swap keys with values
- * @returns {Object} - with key and values swapped
- */
-export function swapKeyWithValue(obj: Dict): Dict {
-	const result: Dict = {}
-	for (const key in obj) {
-		// the value becomes a key: at runtime JS coerces whatever it is to a property key
-		result[obj[key] as PropertyKey] = key
-	}
-	return result
-}
-
-/**
- * Compute the Total Number from Object Values
- * @example:
- *    toObjValuesTotal({'a': 1, 'b': 2})
- *    >>> 3
- *
- * @param {Object} obj - with nested values to calculate total for
- * @returns {number} total - value of object values
- */
-export function toObjValuesTotal(obj: Dict): number {
-	let sum = 0
-	for (const key in obj) {
-		sum += obj[key] as number
-	}
-	return sum
-}
 
 
 export {
@@ -733,21 +291,6 @@ export {
 	 * @return {boolean} - Returns true if value is empty, else false
 	 */
 		isEmpty,
-
-	/**
-	 * Creates a function that returns the value at path of a given object
-	 *
-	 * @example
-	 *  [{ name: 'Neo', ... }, { name: 'Morpheus', ... }].map(property('name'))
-	 *  >>> ['Neo', 'Morpheus']
-	 *
-	 * @uses lodash
-	 * @see {@link https://lodash.com/docs/4.17.4#property} for further information
-	 *
-	 * @param {Array|string} path - The path of the property to get
-	 * @returns {Function} - Returns the new accessor function
-	 */
-		property,
 
 	/**
 	 * Removes the Property at Path of Object by Mutation

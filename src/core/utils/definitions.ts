@@ -8,18 +8,6 @@ import { Active } from './_envs'
  * validates its input: these helpers walk plain objects and hand back what they found.
  */
 
-/** A single definition: its `_` value plus localised labels keyed by language code */
-export interface DefinitionEntry {
-  /** canonical value of the definition - a code, a number, or a list of codes */
-  _?: unknown
-
-  /** localised label under a language code (`en`, `ru`, ...), or any other metadata */
-  [key: string]: unknown
-}
-
-/** Definitions as declared by the platform: keyed by variable name, or as a plain list */
-export type DefinitionSource = Record<string, DefinitionEntry> | readonly DefinitionEntry[]
-
 /** A group of definitions assigned to one `definitionSetup` prop (e.g. `FIELD.TYPE`) */
 export type Definition = Record<string, unknown>
 
@@ -95,32 +83,6 @@ export function definitionSetup<P extends string> (...props: P[]): Record<P, Def
     })
   })
   return DEFINITION
-}
-
-/**
- * Map Object Definition by its Underscore Value
- *
- * @example:
- *  definitionByValue(LANGUAGE)
- *  >>> {
- *        'en': {
- *          _: 'en',
- *          'en': 'English'
- *          ...
- *        },
- *        ...
- *      }
- *
- * @param DEFINITION - key/value pairs of variable name with its underscore value
- * @return definition - grouped by its underscore value
- */
-export function definitionByValue (DEFINITION: DefinitionSource): Record<string, DefinitionEntry> {
-  const result: Record<string, DefinitionEntry> = {}
-  for (const index of Object.keys(DEFINITION)) {
-    const def = (DEFINITION as Record<string, DefinitionEntry>)[index]
-    setOwn(result, def._, def)
-  }
-  return result
 }
 
 /**

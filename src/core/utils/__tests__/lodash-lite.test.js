@@ -1,29 +1,17 @@
 import {
-    get,
-    setWith,
-    setIn,
-    unset,
-    cloneDeep,
-    isEqual,
-    isEmpty,
-    isObjectLike,
-    isPlainObject,
-    matches,
-    property,
-    merge,
-    mergeWith,
-    some,
-    flatten,
-    min,
-    max,
-    difference,
-    intersection,
-    union,
-    unionBy,
-    unionWith,
-    uniqWith,
-    isNumber,
-    capitalize,
+  get,
+  setWith,
+  setIn,
+  unset,
+  cloneDeep,
+  isEqual,
+  isEmpty,
+  isObjectLike,
+  isPlainObject,
+  merge,
+  mergeWith,
+  flatten,
+  capitalize,
 } from '../lodash-lite'
 
 describe('get with various paths', () => {
@@ -155,59 +143,9 @@ describe('isEmpty', () => {
     })
 })
 
-describe('matches / property / some', () => {
-    it('matches checks shallow match', () => {
-        expect(matches({ a: 1 })({ a: 1, b: 2 })).toBe(true)
-        expect(matches({ a: 1 })({ a: 2 })).toBe(false)
-    })
-    it('property creates accessor', () => {
-        expect(property('a.b')({ a: { b: 5 } })).toBe(5)
-    })
-    it('some accepts a predicate function', () => {
-        expect(some([1, 2, 3], (v) => v === 2)).toBe(true)
-    })
-    it('some accepts an object pattern', () => {
-        expect(some([{ id: 1 }, { id: 2 }], { id: 2 })).toBe(true)
-    })
-})
-
-describe('flatten / min / max', () => {
+describe('flatten', () => {
     it('flattens one level', () => {
         expect(flatten([1, [2, 3], [[4]]])).toEqual([1, 2, 3, [4]])
-    })
-    it('min and max work', () => {
-        expect(min([3, 1, 2])).toBe(1)
-        expect(max([3, 1, 2])).toBe(3)
-    })
-    it('min/max return undefined for empty or non-array', () => {
-        expect(min([])).toBeUndefined()
-        expect(max([])).toBeUndefined()
-        expect(min(null)).toBeUndefined()
-    })
-})
-
-describe('set operations', () => {
-    it('difference removes values', () => {
-        expect(difference([1, 2, 3], [2])).toEqual([1, 3])
-    })
-    it('intersection of multiple arrays', () => {
-        expect(intersection([1, 2, 3], [2, 3, 4], [3, 5])).toEqual([3])
-    })
-    it('union deduplicates', () => {
-        expect(union([1, 2], [2, 3])).toEqual([1, 2, 3])
-    })
-    it('unionBy with iteratee string', () => {
-        expect(unionBy([{ x: 1 }], [{ x: 1 }, { x: 2 }], 'x')).toEqual([{ x: 1 }, { x: 2 }])
-    })
-    it('unionWith with comparator', () => {
-        const eq = (a, b) => a.id === b.id
-        expect(unionWith([{ id: 1 }], [{ id: 1 }, { id: 2 }], eq)).toEqual([
-            { id: 1 },
-            { id: 2 },
-        ])
-    })
-    it('uniqWith with custom comparator', () => {
-        expect(uniqWith([1.1, 1.2, 2.3], (a, b) => Math.floor(a) === Math.floor(b))).toEqual([1.1, 2.3])
     })
 })
 
@@ -226,7 +164,7 @@ describe('merge / mergeWith', () => {
     })
 })
 
-describe('isObjectLike / isPlainObject / isNumber', () => {
+describe('isObjectLike / isPlainObject', () => {
     it('isObjectLike works', () => {
         expect(isObjectLike({})).toBe(true)
         expect(isObjectLike([])).toBe(true)
@@ -239,12 +177,6 @@ describe('isObjectLike / isPlainObject / isNumber', () => {
         expect(isPlainObject([])).toBe(false)
         class Foo {}
         expect(isPlainObject(new Foo())).toBe(false)
-    })
-    it('isNumber works', () => {
-        expect(isNumber(1)).toBe(true)
-        // eslint-disable-next-line no-new-wrappers
-        expect(isNumber(new Number(1))).toBe(true)
-        expect(isNumber('1')).toBe(false)
     })
 })
 
@@ -340,28 +272,6 @@ describe('setWith branches', () => {
         setWith(obj, 'a.b', 'v', () => null)
         // Customizer returned null → falls back to default object creation
         expect(obj.a).toEqual({ b: 'v' })
-    })
-})
-
-describe('isMatch via matches() branches', () => {
-    it('identical primitives match', () => {
-        expect(matches(42)(42)).toBe(true)
-    })
-    it('primitive source against object returns false', () => {
-        expect(matches(42)({ a: 1 })).toBe(false)
-    })
-    it('nested object mismatch returns false', () => {
-        expect(matches({ a: { b: 1 } })({ a: { b: 2 } })).toBe(false)
-    })
-})
-
-describe('some with non-array, non-null collection', () => {
-    it('iterates object values', () => {
-        expect(some({ a: 1, b: 2, c: 3 }, (v) => v === 2)).toBe(true)
-        expect(some({ a: 1, b: 2 }, (v) => v === 9)).toBe(false)
-    })
-    it('returns false for null collection', () => {
-        expect(some(null, () => true)).toBe(false)
     })
 })
 
