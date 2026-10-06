@@ -167,6 +167,10 @@
   a field shows and writes the root's value at its name, and `getFormData` returns it there, also from a
   `useForm` form. The reference said `name` selects the block's values, which holds for what its views
   display. Nothing changes at runtime, since those names are the keys a host receives.
+- **The configuration reference says which Selects `getFormData` reorders.** Only one whose `name` and
+  options array are both at the top level of the data, found through `items` or `renderItem.items` from
+  the root; a Select in a `Tabs` entry, or with a dotted `name`, is left as it is, and so is its options
+  array. Nothing changes at runtime, for the same reason: a reorder would move keys a host receives.
 
 #### Build
 

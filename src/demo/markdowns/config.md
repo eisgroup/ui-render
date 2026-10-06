@@ -457,7 +457,7 @@ See the [Select: Cascading](examples#selectCascading) example for a working demo
 Shorthand for `{ "text": "categoryName", "value": "{index}" }` on a node with a `name` and no `onChange` of its own
 (with one, each option's `categoryName` is both its text and its value).
 Selected value in form data: `"0"`, `"1"`, etc.
-In the data `getFormData` hands the host, `changeOptionOrderForSelectFields` moves the selected item to the front of the options array and **removes** the select field from the output data, when that array is at the top level of the data. The values `onSubmit` receives are not reordered.
+In the data `getFormData` hands the host, `changeOptionOrderForSelectFields` moves the selected item to the front of the options array and **removes** the select field from the output data, when the Select's `name` and that array are both at the top level of the data, and the Select sits in `items` or `renderItem.items` all the way from the root. Any other Select, such as one in a `Tabs` entry or with a dotted `name`, is left as it is, and so is its options array. The values `onSubmit` receives are not reordered.
 
 ```json
 "mapOptions": { "text": "categoryName", "value": "{index}" }
