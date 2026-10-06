@@ -442,6 +442,11 @@
 - Dependabot proposes updates every week, of the development dependencies and of the GitHub Actions
   CI runs: a week's minor and patch updates in one pull request, each major in its own. Major
   versions of React and ESLint are held back, with the reason beside each in `.github/dependabot.yml`.
+  The majors of packages that can only move together arrive as one pull request per family: the form
+  stack (`final-form` 5 is what `react-final-form` 7 and `final-form-arrays` 4 need) and Babel.
+- jsdom's selector engine, nwsapi, is on 2.2.28, which matches `:focus-within` as browsers do; 2.2.23
+  answered it false even with focus inside. The dropdown's CSS contract now counts the four
+  `:focus-within` rules Chromium applies to the open, focused dropdown. Nothing it renders changed.
 - The code that neither the library nor the demo uses is gone: 212 exports, 202 of them in the
   internal utilities, and three files, two unused and one empty. What the two builds use was
   measured with webpack, and each module walked from there, until a pass found nothing more. The
