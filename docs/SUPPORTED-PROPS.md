@@ -60,7 +60,7 @@ fails if the dependency comes back. What it can no longer do is tell you the sca
 still works, so the contract test proves the four patterns against a synthetic source.
 
 An `eslint` `no-restricted-imports` entry (in `eslint.config.js`) fails `npm run lint:js` on a
-static `import` or `export … from` of the package from anywhere outside `src/core/components`,
+static `import` or `export … from` of the package from anywhere in `src`, `src/core/components` included,
 including deep imports such as `semantic-ui-react/dist/...`. A static import is *all* it sees:
 it cannot see `require()`, `jest.mock()`, or a dynamic `import('semantic-ui-react')` — measured
 on ESLint 9.39, the rule does not visit `ImportExpression`. It does cover TypeScript: `lint:js`
@@ -285,8 +285,8 @@ directions by `scripts/__tests__/wrapper-prop-reference.contract.test.js`: add a
 that uses a new attribute, and the test names it.
 
 Read it as an inventory, not a forwarding claim — most of these are consumed by
-`mapper.tsx` / `TableView.tsx` and never reach semantic-ui-react. Cross-reference the
-per-wrapper tables above for the fate of each.
+`mapper.tsx` / `TableView.tsx` and never reached the component behind them. Cross-reference
+the per-wrapper tables above for the fate of each.
 
 | View | Attributes in the tracked corpus | Found only in consumer metas |
 | --- | --- | --- |
@@ -297,9 +297,9 @@ per-wrapper tables above for the fate of each.
 | `Tooltip` | `children`, `label`, `view` | — |
 
 The last column is a step-0 audit finding, not a CI-checked fact: consumer metas are
-untracked working files (UPGRADE-PLAN §0.8) and CI never sees them. It is recorded because
-two of those props reach semantic-ui-react and are styled — a checklist derived from the
-demo corpus alone would be wrong.
+untracked working files (UPGRADE-PLAN §0.8) and CI never sees them. It was recorded because
+two of those props reached semantic-ui-react and were styled while it was the implementation —
+a checklist derived from the demo corpus alone would have been wrong.
 
 ## Obligations per step
 

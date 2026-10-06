@@ -150,8 +150,8 @@ enumerate it.
 - Jest + @testing-library/react for tests; Playwright (`playwright.config.js`, `e2e/*.pw.js`) for the browser leg, a gating CI job
 - stylelint for LESS linting (config: `.stylelintrc.json`)
 - Dependabot (`.github/dependabot.yml`) proposes updates weekly: for the devDependencies, a week's minor and patch updates in
-  one PR and each major in its own, with the React and ESLint majors ignored and the reason beside each; for the GitHub
-  Actions, one grouped PR
+  one PR and each major in its own, except the form stack's and Babel's, which can only move together and arrive as one PR
+  per family; the React and ESLint majors are ignored, with the reason beside each; for the GitHub Actions, one grouped PR
 
 ## Gotchas
 
