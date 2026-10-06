@@ -147,4 +147,30 @@ describe('the keyboard, by the WAI-ARIA Tabs pattern', () => {
         expect(tabs()[1]).toHaveAttribute('aria-selected', 'true')
         expect(reports).toEqual([2, 1])
     })
+
+    it('does nothing for Enter on the selected tab, or for an arrow that lands on it', () => {
+        const reports = []
+        const { container } = render(wrap(<Tabs items={[items[0]]} onChange={index => reports.push(index)}/>))
+        const [only] = tabsOf(container)
+
+        fireEvent.keyDown(only, { key: 'Enter' })
+        fireEvent.keyDown(only, { key: 'ArrowRight' })
+        act(() => { jest.advanceTimersByTime(50) })
+
+        expect(only).toHaveAttribute('aria-selected', 'true')
+        expect(document.activeElement).toBe(only)
+        expect(reports).toEqual([])
+    })
+
+    it.each([
+        ['a number', 7, '7'],
+        ['an object with number text', { text: 8 }, '8'],
+        ['an object with an icon only', { icon: 'star' }, null],
+        ['a JSX element', <b>Bold</b>, null],
+    ])('names its panel by a title that is %s, when it is text', (_name, tab, label) => {
+        const { container } = render(wrap(<Tabs items={[{ tab, content: 'Content' }]}/>))
+        const panel = container.querySelector('[role="tabpanel"]')
+        if (label === null) expect(panel).not.toHaveAttribute('aria-label')
+        else expect(panel).toHaveAttribute('aria-label', label)
+    })
 })

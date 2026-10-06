@@ -479,6 +479,18 @@ describe('TableView state, caches and renderers', () => {
       expect(bodyRowTexts(container)).toEqual(['A', 'B'])
     })
 
+    it('leaves the order alone for any other key', () => {
+      const {container} = render(withForm(
+        <TableView items={[{name: 'B'}, {name: 'A'}]} headers={[{id: 'name'}]} sorts={[{id: 'name'}]} {...defaults}/>
+      ))
+      const header = container.querySelector('th')
+
+      fireEvent.keyDown(header.querySelector('[role="button"]'), {key: 'a'})
+
+      expect(header).toHaveAttribute('aria-sort', 'none')
+      expect(bodyRowTexts(container)).toEqual(['B', 'A'])
+    })
+
     it('gives a column without a sort neither', () => {
       const {container} = render(withForm(<TableView items={[{name: 'A'}]} headers={[{id: 'name'}]} {...defaults}/>))
       const header = container.querySelector('th')

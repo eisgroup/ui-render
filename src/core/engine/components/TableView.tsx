@@ -325,7 +325,8 @@ function TableView (props: TableViewProps) {
     const value = data != null ? data : (cell || label)
     // A sortable column, by the WAI-ARIA sortable table since 2026-10-06: the header says its order in
     // `aria-sort`, and its control is a button in the tab order that Enter and Space press as a click does.
-    const order = hasSort ? (sorts.find(s => s.id === id) || {}).order : undefined
+    // Not undefined: `hasSort` found it.
+    const order = hasSort ? sorts.find(s => s.id === id)!.order : undefined
     const ariaSort = hasSort ? (order! < 0 ? 'descending' : order! > 0 ? 'ascending' : 'none') : undefined
     return (
       <Table.HeaderCell key={id || i} colSpan={colSpan} className={cn('left', classNameHeader)} style={styleHeader}
