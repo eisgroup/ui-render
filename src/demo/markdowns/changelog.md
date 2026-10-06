@@ -162,6 +162,11 @@
   published props, and the list of what went and why should be reachable from an installed copy
   rather than only from a URL. The manifest also gained `repository` and `bugs`, so npm links to
   the source and to somewhere you can tell us the removals hurt.
+- **The `Data` view's reference says where its fields' values live.** Outside a table row a `Data`
+  node's fields keep their own names, from the root of the form's values, whatever its `name` selects:
+  a field shows and writes the root's value at its name, and `getFormData` returns it there, also from a
+  `useForm` form. The reference said `name` selects the block's values, which holds for what its views
+  display. Nothing changes at runtime, since those names are the keys a host receives.
 
 #### Build
 

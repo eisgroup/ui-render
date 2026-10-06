@@ -89,9 +89,9 @@ const VIEW_CURATION = {
         notes: 'A change of `start`, `end`, `duration`, `delay` or `interval` runs the animation again.',
     },
     DATA: {
-        summary: 'Nested render instance: `meta` carries the nested declaration, `data` or `name` selects its values, and `kind` groups sibling instances into one array for validation.',
+        summary: 'Nested render instance: `meta` carries the nested declaration, `data` or `name` selects the values its views display, and `kind` groups sibling instances into one array for validation.',
         resolvesTo: 'Data',
-        notes: 'Its fields belong to the parent\'s form, unless `useForm` gives it a form of its own; a `renderExtraItem` declaration sets `useForm`. With `localDraft` and a `TableCells` declaration it renders a draft row that keeps its values in local state until the row is added. Any falsy local value falls back to the root `data`, so the nested block still has an object to bind against.',
+        notes: 'Its fields belong to the parent\'s form, unless `useForm` gives it a form of its own; a `renderExtraItem` declaration sets `useForm`. Outside a table row its fields keep their own names, from the root of the form\'s values, whatever `name` selects: a field shows and writes the root\'s value at its name, and `getFormData` returns it there. A `useForm` form starts from the selected values, and `getFormData` still returns its fields at the root, under their names. With `localDraft` and a `TableCells` declaration it renders a draft row that keeps its values in local state until the row is added. Any falsy local value falls back to the root `data`, so the nested block still has an object to bind against.',
     },
     DROPDOWN: {
         summary: 'Option list that deliberately does not write a form value; its `onChange` is proxied so the handler receives the selected value alone.',

@@ -44,6 +44,33 @@ describe('UI Render consumer-level regression guards', () => {
         expect(inputNames(container)).toEqual(['topLevel', 'inner'])
     })
 
+    it('keeps the fields of a named Data block under their own names, the keys its payload carries', () => {
+        // `name` selects what the block's views display, and its fields keep their own names from the
+        // root of the form's values: this one shows and writes `field`, not `nested.field`, while the
+        // Text beside it shows the nested value. That reads as a defect, and was reported as one on
+        // 2026-10-06; it stays, because those names are the keys a host receives, as the guard above
+        // pins for a block whose bound value is null.
+        const meta = {
+            view: 'Col',
+            items: [{
+                view: 'Data', kind: 'sect', name: 'nested',
+                meta: {view: 'Col', items: [{view: 'Text', name: 'field', className: 'shown'}, {view: 'Input', name: 'field'}]},
+            }],
+        }
+        const data = {field: 'ROOT', nested: {field: 'Inner'}}
+        let getFormData
+        const {container} = render(<UIRender meta={meta} data={data} initialValues={data} getFormData={f => { getFormData = f }}/>)
+
+        expect(inputNames(container)).toEqual(['field'])
+        expect(container.querySelector('input')).toHaveValue('ROOT')
+        expect(container.querySelector('.shown')).toHaveTextContent('Inner')
+        const input = container.querySelector('input')
+        fireEvent.focus(input)
+        fireEvent.change(input, {target: {value: 'typed'}})
+        fireEvent.blur(input)
+        expect(getFormData()).toEqual({field: 'typed', nested: {field: 'Inner'}})
+    })
+
     it('keeps a root-level popup template off the table row path', () => {
         const meta = {
             view: 'Col',
