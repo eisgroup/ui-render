@@ -509,6 +509,12 @@
   name resolved to nothing since: a field with `format`, `normalize` or `parse` set to `'hh:mm'` was
   left as typed, and still is. The schema, the published types and the engine's own list no longer
   name it; the schema and the types still accept any string, so a meta that uses it stays valid.
+- **A handler at the root of a `render*` view definition gets its row.** In
+  `renderCell: {view: 'Button', onClick: {name: 'popupOpen', args: ['edit.{index}', …]}}` the `{index}`
+  stayed as written: the root's handlers were bound once, outside any row, while those of the nodes
+  nested in it got the row's index and value. They get the row too now, when the caller passes one (a
+  table cell does). A root-level popup template opened this way with no `relativePath` now prints the
+  engine's warning that its fields bind at the root, as it always did when the button was nested.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the

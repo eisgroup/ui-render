@@ -168,7 +168,11 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
             // @Note: `relativePath` is deliberately NOT forwarded here. It reaches `getFunctionFromObject`,
             // which puts it into the `popupOpen` context, where `rules.tsx` gives it the highest priority when
             // resolving popup field names — rebinding a root-level popup template onto the table's path.
-            metaToFunctions(definition, {...funcConfig, data, relativeIndex, _data, rowValue: _data, instance})
+            // A `render*` view definition's own handlers are resolved where it renders, below, with the row's
+            // index: bound here, once and outside any row, an `{index}` in their arguments stayed as written.
+            if (!(attribute.indexOf('render') === 0 && definition.view)) {
+                metaToFunctions(definition, {...funcConfig, data, relativeIndex, _data, rowValue: _data, instance})
+            }
             if (definition.name) {
                 definition.name = interpolateString(definition.name, instance, {suppressError: true})
             }
@@ -190,6 +194,8 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
             // nested-definition `options._data`) reads that same binding. Renderers therefore observe, and can
             // clobber, each other's scratch value. Behaviour is intact today only because each renderer assigns
             // before it reads. Scoping this per renderer is engine-decomposition work (§9.3), not a lint fix.
+            // What the definition's own handlers were resolved against before they were resolved per call.
+            const contextData = _data
             // eslint-disable-next-line no-loop-func
             if (isObject(definition)) meta[attribute] = (value: any, index: any, props: Meta, self: any) => {
                 if (attribute === 'renderExtraItem') {
@@ -204,7 +210,16 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
 
                 // Render is a field definition
                 if (definition.view) {
-                    const {name, filterItems, ...configs} = definition
+                    const {name, filterItems, ...declared} = definition
+                    // The definition's own handlers, for this call: with the row's index and value when the
+                    // caller passes an index (a table row), and with the context around it otherwise, as before.
+                    const configs = cloneDeep(declared)
+                    metaToFunctions(configs, {
+                        ...funcConfig, data, instance,
+                        relativeIndex: index != null ? index : relativeIndex,
+                        _data: index != null ? value : contextData,
+                        rowValue: index != null ? value : contextData,
+                    })
                     // TableView calls renderExtraItem(allItems) with no row index — `index` is undefined.
                     // Inputs must bind to the next array slot (allItems.length): e.g. lineItems[2].field, not lineItems.field.
                     let rowIndex = index
