@@ -339,4 +339,18 @@ describe('UIRender public form contracts', () => {
         await waitFor(() => expect(submitted).toHaveLength(1))
         expect(submitted[0]).toEqual(expect.objectContaining({ note: 'short enough' }))
     })
+
+    it('renders an empty field with `format: \'uppercase\'`, and shows what was typed in capitals', async () => {
+        // final-form formats an empty field's `undefined`, and `uppercase` called `toUpperCase` on it:
+        // the field's render threw, so an empty field with this format never rendered.
+        const meta = formMeta({ view: 'Input', name: 'code', label: 'Code', format: 'uppercase' })
+        render(withProviders(<UIRender form meta={meta} data={{}} initialValues={{}} onSubmit={() => {}} />))
+
+        const input = screen.getByLabelText('Code')
+        expect(input).toHaveValue('')
+        fireEvent.focus(input)
+        fireEvent.change(input, { target: { value: 'ab-1' } })
+        fireEvent.blur(input)
+        await waitFor(() => expect(screen.getByLabelText('Code')).toHaveValue('AB-1'))
+    })
 })
