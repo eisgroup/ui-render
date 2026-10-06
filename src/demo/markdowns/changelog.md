@@ -347,7 +347,7 @@
   once in the root `static/` folder — the payload to copy into a host's web root — and
   `dist/static/all.css` and `font.css` became one-line `@import` re-exports of it. Both import paths keep working; `semantic.css` remains an
   empty stub in both places.
-- The tarball dropped from 579 files / 11.6 MB unpacked to **25 files / 3.35 MB (0.87 MB packed)**. Source maps continue
+- The tarball dropped from 579 files / 11.6 MB unpacked to **25 files / 3.34 MB (0.87 MB packed)**. Source maps continue
   to ship for host debugging.
 - **The package no longer ships `static/images/flags/`.** These were 266 country-flag SVGs, 41% of
   the unpacked package, and nothing in the library used them: their one reader was a dropdown
