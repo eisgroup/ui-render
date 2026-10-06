@@ -464,6 +464,9 @@
 - **An empty field with `format: 'uppercase'` renders.** final-form formats an empty field's
   `undefined`, and the `uppercase` normalizer called `toUpperCase` on it: the field's render threw, and
   the renderer showed its failure in the field's place. A value that is not a string is left as it is.
+- **`onError` hears from the documents a `Data` node nests.** The engine creates such a document and
+  gave it no `onError`, so a node that failed to render inside one was reported on the console only,
+  against what the prop promises. A nested document now reports to the closest `onError` up its parents.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the

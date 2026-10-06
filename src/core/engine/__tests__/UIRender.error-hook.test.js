@@ -80,4 +80,29 @@ describe('UIRender onError prop', () => {
         expect(screen.getByText('still here')).toBeInTheDocument()
         expect(screen.getByText(/render error at "items\[1\]"/)).toBeInTheDocument()
     })
+
+    it('reports a failing node inside a document a `Data` node nests, however deep', () => {
+        // The engine creates a nested document, and gave it no `onError`: the hook was read off the
+        // failing node's own document only, so these three failures reached the console and not the host.
+        const failing = { view: 'Table', name: 'orders', headers: 'not-an-array' }
+        const nested = {
+            view: 'Col',
+            items: [
+                { view: 'Text', name: 'label' },
+                { view: 'Data', kind: 'Shared', meta: failing },
+                { view: 'Data', kind: 'Own', useForm: true, meta: failing },
+                { view: 'Data', kind: 'Outer', meta: { view: 'Data', kind: 'Inner', meta: failing } },
+            ],
+        }
+        const reports = []
+
+        mount({ meta: nested, onError: report => reports.push(report) })
+
+        expect(reports.map(report => report.path)).toEqual(['items[1]', 'items[2]', 'items[3]'])
+        reports.forEach(report => {
+            expect(report.error).toBeInstanceOf(TypeError)
+            expect(report.message).toContain('view "Table"')
+        })
+        expect(screen.getByText('still here')).toBeInTheDocument()
+    })
 })
