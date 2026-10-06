@@ -20,7 +20,7 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
 ## Transform Patterns
 
 1. **Recursive Field definition**
-  - A Field can be any component, identified by `view` attribute, such as: Row, Button, Table, Dropdown, Piechart...
+  - A Field can be any component, identified by `view` attribute, such as: Row, Button, Table, Dropdown, PieChart...
   - Objects with `view` attribute can have other Fields nested inside `items` attribute.
 
 2. **Dynamic State**
@@ -33,7 +33,8 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
 
 3. **Curly Brace Transform**
   - The curly brace surrounding a key path will replace it with value found in `data.json` or in `state`
-    Example: `"name": "group.{state.group}.title"` -> becomes `"name": "group.undefined.title"`
+    Example: `"name": "group.{state.group}.title"` -> stays `"name": "group.{state.group}.title"` while `state.group`
+    is not set, a path that finds nothing
   - Fallback value can be defined after a comma, to avoid `undefined` value on initialization
     Example: `"name": "group.{state.group,0}.title"` -> falls back to `"name": "group.0.title"`
 
@@ -44,21 +45,27 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
   - See point 7 for the explanation of how `relativeData` works
 
 5. **Data Mapping (by key paths)**
-  - Use this to link attributes within `data.json` or `state` to attributes required by the component
+  - Use this to link the attributes of each item in a list to attributes required by the component
   - You can define data mappers as object or string:
-    a) `Object` example: `"mapOptions": {"component.attribute": "data.or.state.key.path"}`
+    a) `Object` example: `"mapOptions": {"component.attribute": "key.path.within.item"}`
     b) `String` example: `"mapOptions": "title"` -> use `title` attribute as options value
+    (a `Select` or `Dropdown` with a `name` and no `onChange` of its own shows it as the text and stores the index,
+    see below)
   - See the [example](#component-attributes) of `mapItems` and `mapOptions`
 
 6. **Custom Rendering (by matching values)**
   - See the [example](#component-attributes) of `renderCell: { values: {...} }` in Table view
   - Default function can be defined when no value matches
-    Example: `"renderCell": { "default": "Currency" }`
+    Example: `"renderCell": { "values": {...}, "default": "Currency" }` (without `values`, nothing renders)
 
 7. **Relative Data**
   - When you specify the `name` attribute of a Field, it retrieves values from local `data.json` object by default
   - Local Data is passed down (inherited) from parent/grandparent/etc. fields.
-  - Use `{"relativeData": false}` to make `name` attribute retrieve values from global (root `data.json`)
+  - Use `{"relativeData": false}` with a Value Transform (point 4), a `render*` definition or a `showIf` to retrieve
+    values from global (root `data.json`)
+  - On a Field itself, `{"relativeData": false}` only stops the Field (a `Table` excepted) retrieving its local data
+    by `name`: it keeps the local data it inherited (the root `data.json` when there is none), and its children
+    inherit `relativeData: false` unless they declare their own
   - Example:
     ```js
     const localData = {
@@ -80,8 +87,7 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
             },
             {
               view: "Child",
-              name: "id", // => this will resolve to "root.id"
-              relativeData: false,
+              label: { name: "id", relativeData: false }, // => this will resolve to "root.id"
             }
           ]
         }
@@ -240,15 +246,13 @@ of the `UIRender` component, not attributes of a `meta.json` node.
 
 | Prop | Default | Effect |
 |---|---|---|
-| `dateFormat` | `MM-DD-YYYY` | `moment` format tokens for every date the renderer **displays** (an ISO-8601 value inside a `Text` node, a `render*: "Date"` value) and **edits** (what the date picker shows, and the format it parses typed input with first) |
+| `dateFormat` | `MM-DD-YYYY` | `moment` format tokens for every date the renderer **displays** (an ISO-8601 value inside a `Text` node, a `render*: "Date"` value) and **edits** (what the date picker shows, and the format it parses typed input with first). A date field still stores `YYYY-MM-DD`, and reads a stored value in this format, `YYYY-MM-DD` or ISO 8601 first, then leniently |
 | `currency` | `USD` | published as a CSS class on the renderer's shell — `.app.EUR` — for currency-specific styling |
 | `language` | `en` | published as a CSS class on the renderer's shell — `.app.lang--fr` |
 
 They reach every component through `ConfigContext`, so a value inside a nested `Table` cell
 or a `Popup` is formatted the same way as a top-level field. Each key is merged
-independently: passing only `dateFormat` leaves the inherited `currency` and `language`
-alone, so an application can configure some values once around the renderer (through
-`AppProvider`) and others per renderer.
+independently: passing only `dateFormat` leaves `currency` and `language` at their defaults.
 
 > `currency` is **not** `meta.currencyCode`. `currencyCode` is a meta attribute and selects
 > the currency *symbol* the value renderers print; `currency` is a prop and only labels the
@@ -301,6 +305,7 @@ cannot replace the failure it was called to report.
 {
   currencyCode: 'USD', // default currency code for displaying currency symbol
                        // Supported codes: 'USD', 'EUR', 'GBP'
+                       // Read by a { name: 'Currency' } renderer; the string 'Currency' always prints $
 }
 ```
 
@@ -317,10 +322,11 @@ Available in all UI components:
   style: Object,         // CSS style to apply
   className: 'string',   // CSS class name to apply
   debug: Boolean,        // raise the errors a missing or wrongly typed data list otherwise silences
-  showIf: "path.to.data.that.exists",  // render only if path resolves to truthy value
+  tooltip: String || Object, // tooltip shown on hover or focus: its text, or tooltip props such as {title, position}
+  showIf: "path.to.data.that.exists",  // render only if path resolves to truthy value (an empty list or object is not)
   showIf: {              // object notation
-    name: "path.to.data.that.exists",
-    relativeData: Boolean,
+    name: "path.to.data.that.exists", // read from the root data and the form's values (in a table row: from the row)
+    relativeData: Boolean, // false reads `name` from the root in a table row too
     equal: Any,          // value to match against
   },
 }
@@ -332,23 +338,26 @@ Available in all UI components:
 {
   name: 'adminCosts.adminCategory', // (required) path to field value within data.json
   label: 'Input label',
-  placeholder: 'Appears inside empty input when focused',
-  type: 'number',       // 'checkbox', 'email', 'number', 'select', 'slider', 'text', 'textarea', 'toggle', etc.
+  placeholder: 'Appears inside empty input (with float, only while focused)',
+  type: 'number',       // 'checkbox', 'date', 'email', 'file', 'number', 'select', 'slider', 'text', 'textarea', 'toggle', etc.
   icon: 'dollar',       // icon css class name
   lefty: Boolean,        // show icon on the left (default: right)
   float: Boolean,        // label floats above input when focused
-  disabled: Boolean,
-  readonly: Boolean,     // makes all nested fields disabled with readonly CSS class
+  disabled: Boolean,     // `disabled: true` in data.json disables every field
+  readonly: Boolean,     // read-only, with readonly CSS class, and not rendered while it has no value
+                         // (`readonly: true` in data.json makes every field read-only)
   removable: Boolean,    // show cross icon that sets input value to null
-  format: String,        // name of the format function
-  normalize: String,     // name of the normalizer function
-  parse: String,         // name of the parser function
-  validate: String,      // name of the validation function
+  format: String,        // name of the format function (one of the normalizers)
+  normalize: String,     // name of the normalizer function: 'currency', 'date', 'double5', 'integer', 'percent',
+                         // 'phone' or 'uppercase'
+  parse: String,         // name of the parser function ('percent' divides by 100), else of a normalizer
+  validate: String,      // name of the validation function: 'email', 'maxLength' (100 characters), 'password',
+                         // 'required' or 'url'
   value: undefined,      // controlled input value
-  defaultValue: undefined, // used on init if value not set
+  defaultValue: undefined, // shown in an empty, unedited field that has a `format`; never stored
   onChange: String,       // callback function name for input value changes
-  min: Number,
-  max: Number,
+  min: Number,           // with type 'number', min and max install a range validator,
+  max: Number,           // and a value outside them is clamped on blur
   info: 'Content rendered when input is in focus',
   error: 'Content rendered when input is invalid',
   autoSubmit: Boolean,   // submit form on changes
@@ -356,7 +365,7 @@ Available in all UI components:
     delay: Number,       // delay in ms, default 200
   },
   outputFormat: {        // for Inputs with type 'number'
-    decimals: Number,    // fractional digits to show
+    decimals: Number,    // most fractional digits: more are rounded off on blur, and 0 blocks the decimal point
     percentage: Boolean, // add percent sign
     separateThousands: Boolean, // separate thousands (not compatible with percentage)
   },
@@ -366,12 +375,14 @@ Available in all UI components:
 ### Dropdown / Select Attributes
 
 `Select` is used for changing Input values, `Dropdown` for changing UI state only.
-Both support `{state.xxx}` interpolation — when a value is selected, it updates `state` automatically,
-so dependent fields using `{state.fieldName,fallback}` in their paths will re-render with new data.
+Both support `{state.xxx}` interpolation — when a value is selected, a node with a `name` and no `onChange`
+of its own updates `state` automatically (under its `name`), so dependent fields using
+`{state.fieldName,fallback}` in their paths will re-render with new data.
 
 ```js
 {
   compact: Boolean,
+  upward: Boolean,       // open the list upward (unset: only when it does not fit below and more room is above)
   options: [{ text: 'Label', value: 'internal value' }], // used as declared, see below
   mapOptions: Object,    // data mapper (ex: {value: "{index}", text: "title"})
   // Note: mapOptions.value = "{index}" stores selected value as String index.
@@ -393,6 +404,13 @@ A `value` bound to `state`, as above, shows the selection only while `state` hol
 an option's index: the engine clears a binding that resolves to a string it cannot find in the data.
 So bind `value` to `state` with index values (`mapOptions.value = "{index}"`). With a declared list,
 leave `value` unbound, and the control keeps its own selection.
+
+From the keyboard, Enter, Space, ArrowDown or ArrowUp opens the list. ArrowDown, ArrowUp, Home, End, PageUp
+and PageDown move the highlight, typing letters moves it to an option that starts with them, Enter or Space
+chooses the highlighted option, and Escape closes the list without changing the value.
+
+`search`, `multiple`, `allowAdditions` and `clearable` are not supported: each warns once in development
+and is ignored.
 
 #### Select with Dynamic State (Cascading Selects)
 
@@ -434,9 +452,10 @@ See the [Select: Cascading](examples#selectCascading) example for a working demo
 ```json
 "mapOptions": "categoryName"
 ```
-Shorthand for `{ "text": "categoryName", "value": "{index}" }`.
+Shorthand for `{ "text": "categoryName", "value": "{index}" }` on a node with a `name` and no `onChange` of its own
+(with one, each option's `categoryName` is both its text and its value).
 Selected value in form data: `"0"`, `"1"`, etc.
-On submit, `changeOptionOrderForSelectFields` moves the selected item to the front of the options array and **removes** the select field from the output data.
+In the data `getFormData` hands the host, `changeOptionOrderForSelectFields` moves the selected item to the front of the options array and **removes** the select field from the output data, when that array is at the top level of the data. The values `onSubmit` receives are not reordered.
 
 ```json
 "mapOptions": { "text": "categoryName", "value": "{index}" }
@@ -455,7 +474,7 @@ The select field **stays** in the output data with the real value. Options array
 
 | Scenario | mapOptions | Stored value | Kept in output |
 |---|---|---|---|
-| UI state only (drive other fields via `{state.xxx}`) | `"fieldName"` or `{ text, value: "{index}" }` | Index (`"0"`) | No (removed on submit) |
+| UI state only (drive other fields via `{state.xxx}`) | `"fieldName"` or `{ text, value: "{index}" }` | Index (`"0"`) | No (removed from `getFormData`, see above) |
 | Persistent selection (value matters for backend) | `{ text: "label", value: "id" }` | Real value (`"HIGH"`) | Yes |
 
 **Example: stable-value Select**
@@ -479,7 +498,7 @@ meta.json (index-based — default):
   "mapOptions": "periodBasisType"
 }
 ```
-→ Stores `"0"` or `"1"`. Removed from output on submit.
+→ Stores `"0"` or `"1"`. Removed from the `getFormData` output.
 
 meta.json (stable-value):
 ```json
@@ -505,7 +524,7 @@ for a range slider.
   name: 'path.in.data',     // bound value (number or [from, to])
   min: Number,              // lower bound (default 0)
   max: Number,              // upper bound (default 100)
-  step: Number | null,      // movement increment; pass null to snap to mark points
+  step: Number | null,      // movement increment; null or left out, with marks, snaps to the mark points
   marks: {                  // explicit marks: { value: { style?, label? } }
     [Number]: { style: Object, label: String | Number },
   },
@@ -514,11 +533,11 @@ for a range slider.
     isCurrency: Boolean,
     currency: String,       // default '$'
     isPercent: Boolean,
-    isTime: Boolean,        // formats milliseconds (`< 1000` → ms; otherwise human-readable)
+    isTime: Boolean,        // formats milliseconds (ms when the range ends at 1000 or less; otherwise human-readable)
     precision: Number,
     formatLabel: Function,  // (value) => string, overrides everything above
   },
-  rangeOptions: [Number, ...], // explicit list of mark values (no auto-step computation)
+  rangeOptions: [Number, ...], // same as `range`, which wins when both are given
   vertical: Boolean,        // render vertically
   disabled: Boolean,
   readonly: Boolean,
@@ -533,14 +552,14 @@ for a range slider.
 
 - Single mode is inferred when `value` is a number; range mode when it's an array of two numbers.
 - In range mode, handles can swap by dragging past each other (the array is normalised on commit).
-- Keyboard: `←/↓` and `→/↑` step by `step`; `Home`/`End` jump to `min`/`max`. With `step: null`
-  arrows snap to the next/previous mark value.
-- **Discrete mode** (when `step: null` *and* marks/`range` are provided): marks are distributed
+- Keyboard: `←/↓` and `→/↑` step by `step` (1 when it is not set); `Home`/`End` jump to `min`/`max`.
+  With marks and `step` null or left out, arrows snap to the next/previous mark value.
+- **Discrete mode** (when `step` is null or left out *and* marks/`range` are provided): marks are distributed
   evenly along the track and the handle moves between equal visual segments. Numeric values are
   preserved on the API (so e.g. `[10, 50, 100, 500, 1000, 5000]` stays as those values), but
   visually they spread uniformly instead of clumping near the low end of a linear scale.
 - `range: [10, 100, 500]` is a shortcut that becomes `min: 10`, `max: 500`, plus auto marks at
-  the listed values (and intermediate computed steps when length is 2 or starts with 0).
+  the listed values (and intermediate computed steps when it has two values, or three starting with 0).
 - See the example "Slider (single, range, marks, percent, disabled)" for runnable variants.
 
 ### Table Attributes
@@ -552,7 +571,7 @@ for a range slider.
   vertical: Boolean,     // render rows as columns (not compatible with renderItem)
   headers: [
     {
-      id: String,        // required cell id
+      id: String,        // cell id: the key of the row value (a header without it renders empty cells)
       label: String || Number || { name: String },
       renderCell: String || Object,
     },
@@ -578,7 +597,8 @@ for a range slider.
       'cellId4': { view: 'Input', name: 'path.to.cell.value' },
     },
   ],
-  renderItem: Object,    // nested field definition rendered after each Table item
+  renderItem: Object,    // nested field definition rendered below a Table item while it is expanded
+                         // (the first column becomes its toggle, unless that header has a renderCell)
   filterItems: [         // for nested tables within tables
     { 'state': 'state' },
   ],
@@ -590,8 +610,8 @@ for a range slider.
   itemClassNames: [      // conditional class names for table items
     { id: String, values: { 'value to match': 'className' } },
   ],
-  sorts: [               // sorting icon in table headers
-    { id: String, order: 0, sortKey: 'item.attribute' },
+  sorts: [               // sorting icon in table headers; a click, Enter or Space cycles descending, ascending, none
+    { id: String, order: 0, sortKey: 'item.attribute' }, // order: -1 descending, 1 ascending, 0 none
   ],
   colGroup: [            // column styles (colgroup HTML element)
     { style: Object, isFixed: Boolean },
@@ -608,6 +628,7 @@ for a range slider.
 - The control renders centered under the table with prev/next arrows, page numbers and ellipsis
   for skipped middle pages. Clicking a page scrolls the table back to its top.
 - Pagination state is internal to the table; switching pages does not modify the bound `data.json`.
+- When the rows shrink below the page that is open, the table shows the last page.
 - See the example "Table with Pagination" for a runnable config.
 
 ### Pie Chart Attributes
@@ -641,7 +662,7 @@ pointers, sorting and gradient fills.
 ```js
 {
   label: String | Number,  // slice label (also used as legend text and slice name)
-  value: Number,           // slice numeric value
+  value: Number,           // slice numeric value (a negative or non-numeric value counts as 0)
   id: String,              // optional, used as slice name when present (must be unique per chart)
 }
 ```
@@ -665,27 +686,27 @@ Single- or multi-file upload with click + drag&drop. Use through `Input` with `t
 {
   view: 'Input',
   type: 'file',          // route to Upload field
-  name: 'path.in.data',  // bound key in data.json (receives the File or File[])
-  fileType: String,      // optional preset key resolved against UPLOAD.BY_ROUTE for default formats/maxSize
+  name: 'path.in.data',  // bound key in data.json (receives the picked files, as a File[])
+  fileType: String,      // optional preset, 'json', 'image' or 'video', for default formats and a 16 MB maxSize
   formats: [String],     // accepted extensions, e.g. ['csv'] or ['png', 'jpg', 'webp']
   maxSize: Number,       // max file size in bytes (rejected with a popup if exceeded)
   multiple: Boolean,     // allow selecting multiple files (default: true)
   label: String,         // singular noun in the dropzone hint (pluralised when multiple)
-  labelOnHover: String,  // overrides the hover hint text (otherwise "Upload <label> file")
+  labelOnHover: String,  // overrides the hover hint text (otherwise "Upload <label> File")
   title: String,         // native tooltip on the dropzone
-  showTypes: Boolean,    // show the formats hint on hover (default: true)
+  showTypes: Boolean,    // show the formats hint on hover and keyboard focus (default: true)
   hasHeader: Boolean,    // render an `<h2>Upload <label></h2>` above the dropzone
   round: Boolean,        // adds the `round` CSS class to the wrapper
   classWrap: String,     // CSS class on the outer wrapper (e.g. 'left' to align left)
   className: String,     // CSS class on the dropzone itself (e.g. 'button' for button style)
-  styles: String,        // shorthand for additional CSS classes
-  readonly: Boolean,     // disable interaction without greying out
+  styles: String,        // alias of className, which it replaces when both are given
+  readonly: Boolean,     // disable interaction without greying out (not rendered while it holds no file)
   disabled: Boolean,     // disable interaction (greyed out)
   loading: Boolean,      // show spinner overlay while uploading
   autoSubmit: Boolean,   // submit the form automatically when a file is picked
   items: [Field],        // custom dropzone content (icon + text instead of the default hint)
   onChange: Function,    // (acceptedFiles, name) => void; receives an array of File objects
-  onFocus: Function,     // fires when drag enters the zone or the file dialog opens
+  onFocus: Function,     // fires when a drag enters the zone
   onBlur: Function,      // fires on drag leave or when the file dialog is cancelled
 }
 ```
@@ -695,26 +716,30 @@ Single- or multi-file upload with click + drag&drop. Use through `Input` with `t
 - Files larger than `maxSize` are rejected and a popup appears with the file name and the
   allowed size.
 - If the user picks a file outside the allowed `formats`, the file dialog filters it out client-
-  side; a manual drop of an unsupported format triggers a "FILE_UPLOAD_FAILED" popup listing
+  side; a manual drop of an unsupported format triggers a "File Upload Failed!" popup listing
   the allowed extensions.
 - With neither `formats` nor a `fileType` that names a known preset, any file is accepted and the
   hover hint names no formats.
-- `multiple: false` makes the field accept exactly one file; `multiple: true` (default) accepts
-  many — the `onChange` callback always receives an array.
+- `multiple: false` lets the file dialog pick one file (a drop still passes every accepted file);
+  `multiple: true` (default) accepts many — the `onChange` callback always receives an array.
 
 **Notes**
 
 - The dropzone toggles an `active` CSS class while a file is being dragged over it.
-- Pressing **Enter** while focused on the dropzone opens the file dialog; cancelling it via
-  the OS picker calls `onBlur` (uses the native `cancel` event with a focus-return fallback).
+- The dropzone is a button in the tab order: **Enter** or **Space** opens the file dialog, as a click
+  does. A disabled or read-only zone leaves the tab order and says so with `aria-disabled`.
+- Cancelling the OS picker calls `onBlur` (through the file input's native `cancel` event).
 - See the examples "Upload" and "Upload: variants" for runnable configs.
 
 ### AutoSubmit Attributes
 
 ```js
 {
+  view: 'AutoSubmit',    // renders no markup of its own; calls `onChange` when the form's values change
+  onChange: 'submit',    // (required) action called with the values
   delay: Number,         // delay in ms, default 200
-  partial: true,         // submit only changed values
+  partial: true,         // hand `onChange` only the changed values (the `submit` action still submits them all)
+  showLoader: Boolean,   // overlay a "Syncing..." spinner while `onChange` runs
 }
 ```
 
@@ -739,6 +764,7 @@ The Popup component allows you to display modal dialogs with form fields. When u
 {
   view: 'Popup',
   id: 'popupId',
+  title: 'Popup Title', // shown above the items
   items: [
     {
       view: 'Input',
@@ -808,7 +834,7 @@ When opening a popup from a table row (using `renderItem`), the popup fields wil
 
 - Use `{index}` in the popup ID when opening from table rows
 - Input fields inside popups automatically get the correct path prefix
-- Popup fields receive the current row's data (`_data`) automatically
+- Popup fields receive the current row's data (`_data`) automatically when the `Popup` is declared inside the row
 - Popups are centered on screen
 - The automatic path prefix comes from **where the `Popup` is declared**. A `Popup` declared *inside*
   the row (`renderItem` / `renderItemCells`) is scoped automatically. A `Popup` declared *outside* the
@@ -822,3 +848,8 @@ When opening a popup from a table row (using `renderItem`), the popup fields wil
 ## ShowIf Logic
 
 ![showIf-logic](static/images/showIf.png)
+
+> Four rows of the table are not what the renderer does: a `showIf` object with a `name` reads that path
+> from the root data with the form's current values (inside a table row, from that row, unless `relativeData`
+> is `false`), not from the node's local data. With the data above, `{name: "zzz"}` and
+> `{relativeData: true, name: "zzz"}`, with or without `equal: "value"`, are **hidden**.
