@@ -836,6 +836,10 @@ When opening a popup from a table row (using `renderItem`), the popup fields wil
 - Input fields inside popups automatically get the correct path prefix
 - Popup fields receive the current row's data (`_data`) automatically when the `Popup` is declared inside the row
 - Popups are centered on screen
+- A popup is a modal dialog to a keyboard and a screen reader: opening it moves focus to its first control
+  (its Ok button when the content has none), Tab and Shift+Tab stay inside it, Escape closes it as the
+  backdrop and Ok do (an open list or calendar inside closes first), and closing it gives focus back to the
+  control that opened it. A `title` names the dialog.
 - The automatic path prefix comes from **where the `Popup` is declared**. A `Popup` declared *inside*
   the row (`renderItem` / `renderItemCells`) is scoped automatically. A `Popup` declared *outside* the
   table must be told its scope explicitly, or its inputs stay root-scoped and the edit lands in a
