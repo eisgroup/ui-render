@@ -520,15 +520,17 @@ const DATE_INPUT = {
  */
 const POPUP = {
     /**
-     * [R->I] DEFECTS, all four. Nothing carries `role="dialog"` or `aria-modal`, so a screen reader
-     * is not told a dialog opened. Focus stays where it was, on the trigger behind the backdrop. Tab
-     * walks on through the page under the backdrop, and Escape does nothing: the backdrop and the Ok
-     * button are the only ways out. A fix (the WAI-ARIA dialog pattern) flips each value.
+     * [I] since 2026-10-06, when the four defects pinned here were fixed by the WAI-ARIA modal dialog
+     * pattern. Then nothing carried `role="dialog"` or `aria-modal`, so a screen reader was not told a
+     * dialog opened; focus stayed on the trigger behind the backdrop; Tab walked on through the page
+     * under it; and Escape did nothing, the backdrop and the Ok button being the only ways out. Now
+     * the box is a modal dialog, opening it moves focus to its first control, Tab and Shift+Tab stay
+     * inside it, Escape closes it, and closing it gives focus back to the trigger.
      */
-    DIALOG_ROLE_COUNT: 0,
-    FOCUS_MOVES_IN: false,
-    TAB_STAYS_IN: false,
-    ESCAPE_CLOSES: false,
+    DIALOG_ROLE_COUNT: 1,
+    FOCUS_MOVES_IN: true,
+    TAB_STAYS_IN: true,
+    ESCAPE_CLOSES: true,
 }
 
 /** The first slider of the `slider` example: `volume`, 0 to 100, step 1, starting at 35. */

@@ -123,6 +123,14 @@
   a disabled or read-only zone says so with `aria-disabled`, and the hint naming the accepted
   formats appears on keyboard focus as it does on hover. **This changes the markup**: the zone
   gains `role="button"`.
+- **The popup is a dialog.** It had no role, opening it left focus on the control behind the
+  backdrop, Tab walked the page under it, and only the pointer could close it. Now the box is a
+  modal `dialog` (`aria-modal`), named by its title when it has one. Opening it moves focus to its
+  first control, which is the Ok button when the content has none; Tab and Shift+Tab stay inside
+  it; Escape closes it, as the backdrop and Ok still do; and closing it gives focus back to the
+  control that opened it. An Escape that a control inside uses is left to it: an open list or an
+  open calendar closes first. **This changes the markup**: the box gains `role`, `aria-modal` and
+  `aria-labelledby`, its title an `id`, and the popup two focus guards around the box.
 - The text, number and date inputs no longer emit an `aria-describedby` pointing at an element
   that does not exist. The attribute was unconditional while the element carrying the target id
   renders only when there is an error or info message, so every reference in a form without

@@ -11,9 +11,9 @@
  * where a thing lands, what paints on top of what, what a real pointer hits, what the cascade
  * draws on focus.
  *
- * The values live in e2e/reference.js and carry its tags. Two tests are `[R->I]`, defects this
- * file found and pinned at their measured values so the suite is green today and a fix flips them:
- * what the popup offers a keyboard and a screen reader, and a checkbox id two instances share.
+ * The values live in e2e/reference.js and carry its tags. This file found two defects and pinned
+ * them `[R->I]`: what the popup offered a keyboard and a screen reader, flipped to `[I]` by its fix
+ * on 2026-10-06, and a checkbox id two instances share.
  */
 const { test, expect, rectOf, isWithin, topmostAt, activeElement } = require('./fixtures')
 const { DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, PROGRESS_STEPS } = require('./reference')
@@ -136,22 +136,29 @@ test.describe('popup: the modal a `popupOpen` action opens', () => {
         await expect(popup(page)).toHaveCount(0)
     })
 
-    test('[R->I] the keyboard: nothing names it a dialog, focus stays behind it, and Escape does not close it', async ({ page }) => {
+    test('[I] the keyboard: a dialog that takes focus and keeps it, Escape closes it, and focus goes back to the trigger', async ({ page }) => {
         await openExample(page, 'popupContent')
         await trigger(page).focus()
         await page.keyboard.press('Enter')
         await expect(popup(page)).toBeVisible()
 
-        const focusInside = () => page.evaluate(() => Boolean(document.activeElement && document.activeElement.closest('.app__popup')))
+        const focusInside = () => page.evaluate(() => Boolean(document.activeElement && document.activeElement.closest('.app__popup [role="dialog"]')))
         await expect(page.getByRole('dialog')).toHaveCount(POPUP.DIALOG_ROLE_COUNT)
+        await expect(page.getByRole('dialog')).toHaveAttribute('aria-modal', 'true')
         expect(await focusInside(), 'opening moves focus into it').toBe(POPUP.FOCUS_MOVES_IN)
-        expect(await activeElement(page), 'focus stays on the trigger').toMatchObject({ tag: 'button', text: 'Open Popup 1' })
 
-        await page.keyboard.press('Tab')
-        expect(await focusInside(), 'Tab stays inside it').toBe(POPUP.TAB_STAYS_IN)
+        // Round the dialog and past its ends, both ways: every stop is inside it.
+        const controls = await page.getByRole('dialog').locator('input, button, [tabindex="0"]').count()
+        for (const key of ['Tab', 'Shift+Tab']) {
+            for (let press = 0; press < controls + 2; press += 1) {
+                await page.keyboard.press(key)
+                expect(await focusInside(), `${key} #${press + 1} stays inside it`).toBe(POPUP.TAB_STAYS_IN)
+            }
+        }
 
         await page.keyboard.press('Escape')
         await expect(popup(page)).toHaveCount(POPUP.ESCAPE_CLOSES ? 0 : 1)
+        expect(await activeElement(page), 'closing gives focus back to the trigger').toMatchObject({ tag: 'button', text: 'Open Popup 1' })
     })
 })
 

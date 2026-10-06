@@ -84,7 +84,7 @@ const VIEW_COVERAGE = {
         browser: [
             t(IV, '[I] the backdrop covers the viewport, and the box paints above it'),
             t(IV, '[I] a click on the backdrop closes it, and so does Ok'),
-            t(IV, '[R->I] the keyboard: nothing names it a dialog, focus stays behind it, and Escape does not close it'),
+            t(IV, '[I] the keyboard: a dialog that takes focus and keeps it, Escape closes it, and focus goes back to the trigger'),
         ],
     },
     ProgressSteps: {
