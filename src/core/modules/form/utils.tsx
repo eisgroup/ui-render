@@ -378,8 +378,11 @@ export type WithFormOptions = Partial<FormProps<Values>> & {
   processErrors?: (form: FormApi, meta: any) => void
 }
 
-/** What the document is handed as `instance`: the form, and its submit handler, as the form renders. */
-type FormHandle = { form?: FormApi, handleSubmit?: FormRenderProps<Values>['handleSubmit'] }
+/** What a form without a host `onSubmit` submits to: nothing. */
+const submitNowhere = () => undefined
+
+/** What the document is handed as `instance`: the form and its submit handler, as the form renders, and its document tree. */
+type FormHandle = { form?: FormApi, handleSubmit?: FormRenderProps<Values>['handleSubmit'], tree?: object }
 
 export function withForm (options: WithFormOptions = {subscription: {pristine: true, valid: true}}) {
   // The engine's error processing arrives as a CALLBACK rather than an import (§9.3 step 2). It reads
@@ -440,7 +443,9 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
      * instance's methods (see `renderForm`).
      */
     function WithForm (props: { initialValues?: Values, onSubmit?: FormProps<Values>['onSubmit'], [key: string]: unknown }) {
-      const {initialValues, onSubmit = console.warn, ...restProps} = props
+      // A host that passes no `onSubmit` has nothing to submit to. The default was `console.warn` until
+      // 2026-10-06, which printed every value of the form to the console of a production page.
+      const {initialValues, onSubmit = submitNowhere, ...restProps} = props
       const self = useRef<{
         handle: FormHandle
         form?: FormApi
@@ -448,10 +453,15 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
         subscribedForm?: FormApi | null
         unsubscribe?: (() => void) | null
         stored?: object
+        tree?: object
       } | null>(null)
       if (self.current === null) self.current = {handle: {form: undefined, handleSubmit: undefined}}
       const own = self.current
       const {handle} = own
+      // The document tree this form registers under: a nested document's parent says which, and a root
+      // starts its own. A cast, not a guard: `parent` is the parent document's engine instance.
+      if (!own.tree) own.tree = ((restProps.parent as { formTree?: object } | undefined) || {}).formTree || {}
+      handle.tree = own.tree
 
       // The initial values the form works from: the first ones, then any that differ BY VALUE. A new
       // object with the same entries changes nothing; otherwise a host computing its values afresh
@@ -515,7 +525,8 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
         formsStorage.set(own.stored, {
           meta: props.meta,
           // Not undefined: the form rendered, and handed it over, before any effect runs.
-          form: handle.form!
+          form: handle.form!,
+          tree: own.tree!, // not undefined: the first render set it
         });
         return () => {
           if (own.unsubscribe) own.unsubscribe()
@@ -538,7 +549,8 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
           handle.form.reset(adopted)
           formsStorage.set(own.stored, {
             meta: props.meta,
-            form: handle.form
+            form: handle.form,
+            tree: own.tree!, // not undefined: the first render set it
           });
         }
         setApplied(adopted)

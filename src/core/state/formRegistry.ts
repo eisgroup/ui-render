@@ -2,19 +2,18 @@
  * THE MUTABLE REGISTRIES THE ENGINE AND THE FORM MODULE BOTH WRITE TO.
  * =============================================================================================
  *
- * These three lived one on each side of the `engine` ↔ `modules/form` boundary, and each side
- * reached across for the other's — the import cycle §2.6-4 catalogued and §9.3 step 2 dissolves.
- * They are module-level and shared by every `UIRender` on the page, which is a defect in its own
- * right: §9.3 step 3 moves them to per-instance context. This module exists to make that step a
- * change in ONE place rather than an archaeology exercise, so nothing else belongs in it.
+ * These lived one on each side of the `engine` ↔ `modules/form` boundary, and each side reached
+ * across for the other's — the import cycle §2.6-4 catalogued and §9.3 step 2 dissolved. Sharing them
+ * between every `UIRender` on the page was a defect of its own, fixed one registry at a time: the
+ * errors and the touched fields are per form since §9.3 step 3, and the forms are read per document
+ * tree since 2026-10-06 (`formsOf`). Nothing else belongs in this module.
  *
  * It sits below `components` and `modules` and above `utils`: both layers may import it, it may
  * import nothing but `utils`, and the ESLint layer rules in `package.json` enforce that.
  *
- * Everything here is keyed by the final-form `form` object: the key BOTH sides of the boundary
- * already hold, so neither the engine nor the form module needs a reference to the other. The maps
- * are weak, so an unmounted form's entries are collected with it and nothing has to be reset
- * between tests.
+ * The errors, the touched fields and the baselines are keyed by the final-form `form` object, the key
+ * BOTH sides of the boundary already hold, in weak maps, so an unmounted form's entries are collected
+ * with it. `formsStorage` is a plain map, and each form deletes its own entry when it unmounts.
  */
 
 import type { FormApi } from 'final-form'
@@ -24,14 +23,32 @@ export type RegisteredForm = {
 	/** The document's meta: a nested document's says where its rows sit */
 	meta: unknown,
 	form: FormApi,
+	/**
+	 * The document tree the form belongs to: one `UIRender` and every document nested in it share it,
+	 * and another `UIRender` on the page has its own. Its root's form layer makes it.
+	 */
+	tree: object,
 }
 
 /**
- * Every active form on the page, so any one of them can read the others' data.
- * Keyed by object identity: a fresh `{...initialValues}` copy per mount, which is also why an
- * entry has to be deleted before its key is replaced.
+ * Every active form on the page. Keyed by object identity: a fresh `{...initialValues}` copy per
+ * mount, which is also why an entry has to be deleted before its key is replaced.
  */
 export const formsStorage = new Map<object, RegisteredForm>()
+
+/**
+ * The forms of one document tree, which is what a document reads its data from: its own form and its
+ * nested documents'. It read every form on the page until 2026-10-06, so a second `UIRender` on the
+ * same page found its fields in the first one's `getFormData`, and the first one's in its own.
+ */
+export function formsOf (tree: object | undefined): Map<object, RegisteredForm> {
+	const forms = new Map<object, RegisteredForm>()
+	if (tree === undefined) return forms
+	formsStorage.forEach((entry, key) => {
+		if (entry.tree === tree) forms.set(key, entry)
+	})
+	return forms
+}
 
 /**
  * Validation errors by field name, PER FORM.

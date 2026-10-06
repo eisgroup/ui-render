@@ -159,7 +159,7 @@ see below for what it does with it). The schema is strict only where the rendere
 | `items` | array | the renderer maps over it; anything else throws mid-render |
 | `headers`, `extraHeaders`, `extraItems` | array | same, inside `Table` |
 | `name` | string | it is interpolated as a template; a truthy non-string throws |
-| `metaVersion` | `"MAJOR"` or `"MAJOR.MINOR"` string | see below |
+| `metaVersion` | `"MAJOR"` or `"MAJOR.MINOR"` string | the one exception: the engine ignores the value, see below |
 
 A `null` attribute is always safe: the renderer deletes null attributes and drops null array
 entries before rendering.
@@ -181,13 +181,13 @@ a stack trace:
 [ui-render] meta warning at "headers[2].renderCell": unknown render method "double5" …
 ```
 
-- **error** — the renderer will fail on that node (the four shapes in the table above).
+- **error** — the renderer will fail on that node (the first three shapes in the table above).
 - **warning** — the node renders, but degraded: an unknown or non-string `view` becomes the
   "field does not exist" placeholder; an unknown `render*` name falls back to plain text (a real
   and easy mistake: the value renderers are `Currency`, `Percent`, `Double5`, `Float`, `String`,
   `Date`, `Title+Input`, while the lower-case `double5`, `integer`, `percent`… names belong to
   `format` / `normalize` / `parse`); a `showIf` that is neither a key path string nor an object is
-  ignored, so the node always renders.
+  ignored, so the node always renders; a malformed `metaVersion` is reported, and changes nothing.
 
 Handler names (`onClick`, `onChange`, `onDone`) are deliberately **not** checked: they resolve
 against built-in actions, the host's `methods` prop and renderer instance methods, so an

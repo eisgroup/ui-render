@@ -424,6 +424,25 @@
 
 #### Fixes
 
+- **Two `UIRender`s on one page keep their form data apart.** Every document read the forms of
+  every document on the page: what `getFormData` hands the host, what `showIf` tests, what an
+  upload sends, and the rows a submit and a cross-row validation read. With two independent
+  documents on a page, each found the other's fields in its own data. A document now reads its
+  own form and those of the documents nested in it.
+- **A form whose host passes no `onSubmit` no longer prints its values.** The fallback was
+  `console.warn`, so a submit wrote every value of the form to the browser console of a
+  production page. It does nothing now.
+- **The `localDraft` row of a `Data` block is translated, and renders the fields of every column
+  layout.** It used the translator from before any document set its own, so its labels,
+  placeholders, errors and Add button were never translated; it uses its document's now. It looked
+  for fields inside `VerticalLayout` and `Col3`, which is not a view name, so the fields of a `Col`
+  or a `Column` were left out of the row.
+- **A malformed `metaVersion` is reported as a warning.** `validateMeta` reported it as an
+  `error`, the severity it keeps for shapes the renderer fails on, although the renderer ignores
+  the value.
+- **`padding-top-largest`, `padding-bottom-larger`, `padding-left-larger` and `no-margin-h`
+  exist.** The styles guide lists them with their families, and the stylesheet lacked them, so a
+  meta that used them got no spacing.
 - **A `Select` or `Dropdown` with its options written in the meta renders.** Declared as the
   configuration docs show, `options: [{ text, value }]` with a `name` and no `onChange`, it failed
   to render: each option was mapped to itself as its text. Such a list is now used as declared, as

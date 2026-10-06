@@ -4,6 +4,7 @@ import Input from '../../components/Input'
 import InputDate from '../../components/InputDate'
 import Table from '../../components/Table'
 import { Active } from '../../utils'
+import { FIELD } from '../../modules/variables'
 import type { Translate } from '../../utils/_envs'
 import { email, isRequired, maxLength, password, url } from '../../components/inputs/validationRules'
 import { integer } from '../../components/inputs/normalizers'
@@ -41,13 +42,20 @@ type DraftState = { draft: Record<string, unknown>, fieldErrors: Record<string, 
 type ChangeEventLike = { target?: { value?: unknown } }
 
 /**
- * Collect Input definitions from TableCells meta (including nested VerticalLayout).
+ * Whether a view is a column layout a draft row descends into: `Col` and its aliases. It tested for
+ * `'Col3'` until 2026-10-06, the constant's KEY rather than a view name, so `Col` and `Column` were
+ * skipped. Read when called, not captured at load (CLAUDE.md, the import-cycle gotcha).
+ */
+const isColumn = (view: unknown) => view === FIELD.TYPE.COL || view === FIELD.TYPE.COL2 || view === FIELD.TYPE.COL3
+
+/**
+ * Collect Input definitions from TableCells meta (including nested column layouts).
  */
 function collectInputs (items: DraftItem[] | undefined, out: DraftItem[] = []): DraftItem[] {
   if (!items) return out
   for (const item of items) {
     if (item.view === 'Input' && item.name) out.push(item)
-    if ((item.view === 'VerticalLayout' || item.view === 'Col3') && item.items) {
+    if (isColumn(item.view) && item.items) {
       collectInputs(item.items, out)
     }
   }
@@ -96,7 +104,11 @@ const EMPTY_DRAFT: DraftState = { draft: {}, fieldErrors: {} }
  * Table "add row" draft: values live only in React state until the user commits (Add).
  * No react-final-form Field registration — avoids leaking draft into parent `values`.
  */
-function LocalDraftTableRow ({ meta, kind, parentInstance, translate = DEFAULT_TRANSLATE }: LocalDraftTableRowProps) {
+function LocalDraftTableRow ({ meta, kind, parentInstance, translate: translateProp }: LocalDraftTableRowProps) {
+  // The document's own translator, when it is not handed one. `Data` hands none, and the module default
+  // is the translator from before any document set its own, so labels, placeholders, errors and the Add
+  // button were never translated until 2026-10-06.
+  const translate = translateProp || (parentInstance && parentInstance.translate as Translate | undefined) || DEFAULT_TRANSLATE
   const [state, setState] = useState<DraftState>(EMPTY_DRAFT)
   // `this.setState` merged into the state it was given; this keeps that shape, and the updater form.
   const update = (partial: Partial<DraftState> | ((s: DraftState) => Partial<DraftState>)) =>
@@ -201,7 +213,7 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate = DEFAULT_T
     if (item.view === 'Input' && item.name) {
       return renderInputCell(item, i)
     }
-    if (item.view === 'VerticalLayout' || item.view === 'Col3') {
+    if (isColumn(item.view)) {
       return (item.items || []).flatMap((sub, j) => renderBranch(sub, `${i}-${j}`))
     }
     if (item.view === 'Button') {

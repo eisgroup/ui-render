@@ -24,7 +24,7 @@ import { applyPeriods } from './applyPeriods'
 import { parsePopupAlertArgs, parsePopupArgs } from './popupArgs'
 import { findPopupTemplate } from './popupTemplate'
 import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
-import { errorsFor, formsStorage, touchedFor } from '../state/formRegistry'
+import { errorsFor, formsOf, formsStorage, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
 import { getFormsData, getLiveMergedDataKindArray, getRawFormsData } from './formData'
 import { errorsProcessing, mapErrorObjectToUIFormat } from './errorMapping'
@@ -351,17 +351,27 @@ export class UIRender extends DocumentInstance {
         }
     }
 
+    /**
+     * The document tree this document belongs to: its form layer's, or its parent's when it has no form
+     * of its own. Every document of one `UIRender` shares it, and it is what keeps another `UIRender`
+     * on the page out of this one's data (`state/formRegistry`, `formsOf`).
+     */
+    get formTree (): object | undefined {
+        const {instance, parent} = this.props
+        return (instance && instance.tree) || (parent && parent.formTree)
+    }
+
     getAllFormsData = () => {
         // TODO: investigate realisation with this.data
         // this.data contains related data but there no all changes
         // Strip the renderExtraItem draft slot (empty `{}` at array.length) from `dataKind.*` arrays
         // before returning — same compaction used after REMOVE_DATA.
-        return compactDataKindArrays(getFormsData(formsStorage))
+        return compactDataKindArrays(getFormsData(formsOf(this.formTree)))
     }
 
     // Raw form values without Select array reordering — for showIf lookups
     getRawFormsData = () => {
-        return getRawFormsData(formsStorage)
+        return getRawFormsData(formsOf(this.formTree))
     }
 
     getCalledMethod = () => {
@@ -1021,11 +1031,11 @@ function Decorator (Class: any) {
             }
             const pathToDataKindArray = base ? `${base}.dataKind.${kind}` : `dataKind.${kind}`
 
-            const live = getLiveMergedDataKindArray(pathToDataKindArray, formsStorage)
+            const live = getLiveMergedDataKindArray(pathToDataKindArray, formsOf(this.formTree))
             if (live.length > 0) {
                 return live
             }
-            const dataJson = getFormsData(formsStorage)
+            const dataJson = getFormsData(formsOf(this.formTree))
             return get(dataJson, pathToDataKindArray, []) as any[] // a cast, not a guard: the rows, or `[]`
         }
     }

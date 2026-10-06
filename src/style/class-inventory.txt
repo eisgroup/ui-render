@@ -504,6 +504,7 @@ no-header
 no-interaction
 no-margin
 no-margin-bottom
+no-margin-h
 no-margin-left
 no-margin-right
 no-margin-top
@@ -536,6 +537,7 @@ p
 padding
 padding-bottom
 padding-bottom-large
+padding-bottom-larger
 padding-bottom-largest
 padding-bottom-small
 padding-bottom-smaller
@@ -552,6 +554,7 @@ padding-larger
 padding-largest
 padding-left
 padding-left-large
+padding-left-larger
 padding-left-largest
 padding-left-small
 padding-left-smaller
@@ -569,6 +572,7 @@ padding-smallest
 padding-top
 padding-top-large
 padding-top-larger
+padding-top-largest
 padding-top-small
 padding-top-smaller
 padding-top-smallest

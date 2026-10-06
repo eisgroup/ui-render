@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://eisgroup.github.io/ui-render/meta.schema.json",
   "title": "eis-ui-render meta.json",
-  "description": "UI declaration consumed by the eis-ui-render UIRender component. A meta.json file is a single root Field node; every node may nest further nodes under `items`. The schema is deliberately open: nodes accept properties beyond the ones listed here, because component props are forwarded to the underlying React component. Constraints are only declared where the engine genuinely requires them — every one of them corresponds to a verified runtime failure, and the shipped test suite validates all bundled examples against this file.",
+  "description": "UI declaration consumed by the eis-ui-render UIRender component. A meta.json file is a single root Field node; every node may nest further nodes under `items`. The schema is deliberately open: nodes accept properties beyond the ones listed here, because component props are forwarded to the underlying React component. Constraints are only declared where the engine genuinely requires them — every one of them corresponds to a verified runtime failure but the format of `metaVersion`, which the engine ignores, and the shipped test suite validates all bundled examples against this file.",
   "$ref": "#/$defs/node",
   "properties": {
     "$schema": {

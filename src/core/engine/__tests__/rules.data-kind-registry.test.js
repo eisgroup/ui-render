@@ -9,8 +9,11 @@ import { Active } from '../../utils'
 const EngineLayer = Object.getPrototypeOf(Active.UIRender.InstanceClass)
 
 describe('the nested-Data registry', () => {
-    /** A bare object on the engine layer's prototype: the registry touches nothing else. */
-    const newParent = () => Object.create(EngineLayer.prototype)
+    /**
+     * A bare object on the engine layer's prototype, with empty props: the registry touches nothing else.
+     * `getDataKind` reads its document tree through `props` (`formTree`), and there is none here.
+     */
+    const newParent = () => Object.assign(Object.create(EngineLayer.prototype), { props: {} })
 
     function makeInstance (meta = {}, dataKindPath) {
         const inst = { props: { meta } }

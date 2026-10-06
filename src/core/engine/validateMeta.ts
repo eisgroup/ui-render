@@ -244,8 +244,11 @@ function checkMetaVersion (value: unknown, isRoot: boolean, report: Report): voi
             'metaVersion is a root-level declaration — on a nested node it is ignored')
         return
     }
+    // A warning, not an error: the engine strips `metaVersion` before rendering, so a malformed one makes
+    // nothing fail, and every `error` here is a measured failure (see the header). It was an error until
+    // 2026-10-06.
     if (typeof value !== 'string' || !META_VERSION_PATTERN.test(value)) {
-        report('metaVersion', META_SEVERITY.ERROR, META_PROBLEM.META_VERSION_INVALID,
+        report('metaVersion', META_SEVERITY.WARNING, META_PROBLEM.META_VERSION_INVALID,
             `metaVersion must be a "MAJOR" or "MAJOR.MINOR" string, got ${JSON.stringify(value)}`)
         return
     }
