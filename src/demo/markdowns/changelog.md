@@ -108,6 +108,17 @@
 
 #### Accessibility
 
+- **Tabs, an Expand's title and a sortable column's header work from the keyboard.** They had
+  no role and no tab stop, so a keyboard could not reach them and a screen reader did not say
+  what they were.
+  - Tabs follow WAI-ARIA's Tabs pattern: the bar is a `tablist`, each title a `tab` that says
+    whether it is selected, and the content a `tabpanel`. The arrow keys, Home and End move
+    between tabs and select them.
+  - An Expand's title is a button that says whether it is expanded; Enter and Space toggle it.
+  - A sortable column's header is a button that Enter and Space press, and the header cell says
+    its order in `aria-sort`.
+  - **This changes the markup**: these elements gain `role`, `tabindex` and `aria-*` attributes.
+    A click focuses them now, and the focus ring shows for the keyboard only.
 - The text, number and date inputs no longer emit an `aria-describedby` pointing at an element
   that does not exist. The attribute was unconditional while the element carrying the target id
   renders only when there is an error or info message, so every reference in a form without

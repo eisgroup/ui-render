@@ -460,6 +460,34 @@ describe('TableView state, caches and renderers', () => {
     })
   })
 
+  describe('a sortable column, by the WAI-ARIA sortable table', () => {
+    it('makes its header a button in the tab order, and says its order on the header cell', () => {
+      const {container} = render(withForm(
+        <TableView items={[{name: 'B'}, {name: 'A'}]} headers={[{id: 'name'}]} sorts={[{id: 'name'}]} {...defaults}/>
+      ))
+      const header = container.querySelector('th')
+      const button = header.querySelector('[role="button"]')
+      expect(button).toHaveAttribute('tabindex', '0')
+      expect(header).toHaveAttribute('aria-sort', 'none')
+
+      fireEvent.keyDown(button, {key: 'Enter'})
+      expect(header).toHaveAttribute('aria-sort', 'descending')
+      expect(bodyRowTexts(container)).toEqual(['B', 'A'])
+
+      fireEvent.keyDown(button, {key: ' '})
+      expect(header).toHaveAttribute('aria-sort', 'ascending')
+      expect(bodyRowTexts(container)).toEqual(['A', 'B'])
+    })
+
+    it('gives a column without a sort neither', () => {
+      const {container} = render(withForm(<TableView items={[{name: 'A'}]} headers={[{id: 'name'}]} {...defaults}/>))
+      const header = container.querySelector('th')
+
+      expect(header).not.toHaveAttribute('aria-sort')
+      expect(header.querySelector('[role="button"]')).toBeNull()
+    })
+  })
+
   it('renders under StrictMode without a warning', () => {
     // The class drew React's StrictMode warning about `UNSAFE_componentWillReceiveProps`.
     const errors = jest.spyOn(console, 'error').mockImplementation(() => {})

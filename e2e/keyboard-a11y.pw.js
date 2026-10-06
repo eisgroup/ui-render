@@ -243,3 +243,44 @@ test.describe('dropdown: the step 3 starting state', () => {
         await expect(control).not.toHaveAttribute('aria-activedescendant', /./)
     })
 })
+
+test.describe('tabs and disclosures: the keyboard', () => {
+    // Added 2026-10-06, when tabs took the WAI-ARIA Tabs pattern and an Expand's title became the
+    // button of the disclosure pattern. Until then neither had a role, a tab stop or a key.
+    test('[I] a tab bar is a tablist; an arrow moves focus to the next tab, selects it, and the focus ring paints', async ({ page }) => {
+        await page.goto('/examples#tabs')
+        await page.locator('#tabs.expanded').waitFor()
+        const tabs = page.locator('#tabs [role="tablist"] [role="tab"]')
+        await expect(tabs).toHaveCount(2)
+        await expect(tabs.nth(0)).toHaveAttribute('aria-selected', 'true')
+
+        await tabs.nth(0).focus()
+        await page.keyboard.press('ArrowRight')
+
+        expect(await activeElement(page)).toMatchObject({ role: 'tab' })
+        await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true')
+        await expect(tabs.nth(1)).toHaveAttribute('tabindex', '0')
+        // The global `:focus` rule draws the ring as a box-shadow (`_mixins.less`, `.outline()`).
+        const ring = locator => locator.evaluate(element => getComputedStyle(element).boxShadow)
+        expect(await ring(tabs.nth(1))).not.toBe('none')
+
+        // A click focuses a tab too, and draws no ring: it is kept for the keyboard (`:focus-visible`).
+        await tabs.nth(0).click()
+        await expect(tabs.nth(0)).toHaveAttribute('aria-selected', 'true')
+        expect(await activeElement(page)).toMatchObject({ role: 'tab' })
+        expect(await ring(tabs.nth(0))).toBe('none')
+    })
+
+    test('[I] an Expand title is a button in the tab order that Enter toggles', async ({ page }) => {
+        await page.goto('/examples#expandList')
+        await page.locator('#expandList.expanded').waitFor()
+        const title = page.locator('#expandList [role="button"][aria-expanded]').first()
+        await expect(title).toHaveAttribute('tabindex', '0')
+        const before = await title.getAttribute('aria-expanded')
+
+        await title.focus()
+        await page.keyboard.press('Enter')
+
+        await expect(title).toHaveAttribute('aria-expanded', before === 'true' ? 'false' : 'true')
+    })
+})

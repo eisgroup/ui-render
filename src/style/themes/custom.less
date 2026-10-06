@@ -46,9 +46,16 @@ label {
 
     line-height: size(18);
   }
+}
 
-  &:focus {
-    &:extend(.no-outline);
+// Tabs, an Expand's title and a sortable column's header take focus since 2026-10-06, by the WAI-ARIA
+// Tabs, disclosure and sortable-table patterns. A click focuses them too now, so the ring the global
+// `:focus` rule draws (`themes/_app.less`) is kept for the keyboard only, as `.tabs__item` kept none at all.
+.tabs__item,
+.app__expand > [role="button"],
+th > [role="button"] {
+  &:focus:not(:focus-visible) {
+    .no-outline();
   }
 }
 

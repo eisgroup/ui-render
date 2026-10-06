@@ -323,11 +323,23 @@ function TableView (props: TableViewProps) {
     const hasSort = sorts && !!sorts.find(s => s.id === id)
     const render = isFunction(cell) ? cell : renderHeaderContent
     const value = data != null ? data : (cell || label)
+    // A sortable column, by the WAI-ARIA sortable table since 2026-10-06: the header says its order in
+    // `aria-sort`, and its control is a button in the tab order that Enter and Space press as a click does.
+    const order = hasSort ? (sorts.find(s => s.id === id) || {}).order : undefined
+    const ariaSort = hasSort ? (order! < 0 ? 'descending' : order! > 0 ? 'ascending' : 'none') : undefined
     return (
-      <Table.HeaderCell key={id || i} colSpan={colSpan} className={cn('left', classNameHeader)} style={styleHeader}>
+      <Table.HeaderCell key={id || i} colSpan={colSpan} className={cn('left', classNameHeader)} style={styleHeader}
+                        aria-sort={ariaSort}>
         <Row className={cn('middle', className, {sort: hasSort})} style={style}
              // Not undefined: a header with a sort has an id.
-             onClick={hasSort ? (() => self.handleSort(id!)) : undefined}>
+             onClick={hasSort ? (() => self.handleSort(id!)) : undefined}
+             role={hasSort ? 'button' : undefined}
+             tabIndex={hasSort ? 0 : undefined}
+             onKeyDown={hasSort ? ((event: React.KeyboardEvent<HTMLElement>) => {
+               if (event.key !== 'Enter' && event.key !== ' ') return
+               event.preventDefault()
+               self.handleSort(id!)
+             }) : undefined}>
           {render
             ? render(value, id, {className, style}, self)
             // A cast, not a guard: `cell` is no function here, or it would be the renderer.

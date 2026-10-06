@@ -883,6 +883,10 @@
   padding-right: 1rem;
   line-height: 1.125rem;
 }
+.ui-render .tabs__item:focus:not(:focus-visible), .ui-render .app__expand > [role="button"]:focus:not(:focus-visible), .ui-render th > [role="button"]:focus:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
 .ui-render table thead {
   color: #666666;
 }
@@ -4876,7 +4880,7 @@
 .ui-render .inverted .outline, .ui-render .inverted input.checkbox.toggle:hover + label, .ui-render .inverted input.checkbox.toggle:focus + label, .ui-render .inverted input.checkbox.toggle:active + label, .ui-render .inverted input.checkbox.toggle:hover + label .checkbox__button, .ui-render .inverted input.checkbox.toggle:focus + label .checkbox__button, .ui-render .inverted input.checkbox.toggle:active + label .checkbox__button, .ui-render .inverted .interaction:hover, .ui-render .inverted .interaction:focus, .ui-render .inverted .button:hover, .ui-render .inverted .button:focus, .ui-render .inverted .input-tag:hover, .ui-render .inverted .input-tag:focus, .ui-render .inverted .app__tag:hover, .ui-render .inverted .app__tag:focus {
   box-shadow: inset 0 0 0 1px #4e92df;
 }
-.ui-render .no-outline, .ui-render .tabs__item:focus, .ui-render .app__form__group, .ui-render .ui.selection.dropdown > i.icon.delete, .ui-render .ui.selection.dropdown > i.icon.dropdown, .ui-render .ui.selection.dropdown > i.icon.search, .ui-render .ui.selection.dropdown > i[class^="icon-"], .ui-render .ui.selection.dropdown > i[class*=" icon-"], .ui-render div.input.icon .text.icon, .ui-render div.select.icon .text.icon, .ui-render div.input.icon i[class^="icon-"], .ui-render div.select.icon i[class^="icon-"], .ui-render div.input.icon i[class*=" icon-"], .ui-render div.select.icon i[class*=" icon-"], .ui-render .app__menu__items .app__menu__item, .ui-render .app__menu__button, .ui-render .app__progress--steps .button, .ui-render th > .app__expand > *:focus, .ui-render td > .app__expand > *:focus, .ui-render .no-interaction:hover, .ui-render .no-interaction:focus, .ui-render .app__progress--steps .input-tag, .ui-render .app__header__items .app__menu__item, .ui-render .app__sidebar__items .app__menu__item, .ui-render .app__progress--steps .app__tag {
+.ui-render .no-outline, .ui-render .app__form__group, .ui-render .ui.selection.dropdown > i.icon.delete, .ui-render .ui.selection.dropdown > i.icon.dropdown, .ui-render .ui.selection.dropdown > i.icon.search, .ui-render .ui.selection.dropdown > i[class^="icon-"], .ui-render .ui.selection.dropdown > i[class*=" icon-"], .ui-render div.input.icon .text.icon, .ui-render div.select.icon .text.icon, .ui-render div.input.icon i[class^="icon-"], .ui-render div.select.icon i[class^="icon-"], .ui-render div.input.icon i[class*=" icon-"], .ui-render div.select.icon i[class*=" icon-"], .ui-render .app__menu__items .app__menu__item, .ui-render .app__menu__button, .ui-render .app__progress--steps .button, .ui-render th > .app__expand > *:focus, .ui-render td > .app__expand > *:focus, .ui-render .no-interaction:hover, .ui-render .no-interaction:focus, .ui-render .app__progress--steps .input-tag, .ui-render .app__header__items .app__menu__item, .ui-render .app__sidebar__items .app__menu__item, .ui-render .app__progress--steps .app__tag {
   outline: none !important;
   box-shadow: none !important;
 }

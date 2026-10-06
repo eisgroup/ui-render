@@ -77,3 +77,26 @@ describe('ExpandList', () => {
         expect(container.textContent).toContain('Beta')
     })
 })
+
+describe('the keyboard, by the WAI-ARIA disclosure pattern', () => {
+    it('makes the title a button in the tab order that says whether it is expanded', () => {
+        const { container } = render(wrap(<Expand title="Section">content</Expand>))
+        const button = container.querySelector('[role="button"]')
+
+        expect(button).toHaveTextContent('Section')
+        expect(button).toHaveAttribute('tabindex', '0')
+        expect(button).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('toggles on Enter and on Space, as a click does, and leaves other keys alone', () => {
+        const { container } = render(wrap(<Expand title="Section">content</Expand>))
+        const button = container.querySelector('[role="button"]')
+
+        fireEvent.keyDown(button, { key: 'Enter' })
+        expect(button).toHaveAttribute('aria-expanded', 'true')
+        fireEvent.keyDown(button, { key: 'a' })
+        expect(button).toHaveAttribute('aria-expanded', 'true')
+        fireEvent.keyDown(button, { key: ' ' })
+        expect(button).toHaveAttribute('aria-expanded', 'false')
+    })
+})

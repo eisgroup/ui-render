@@ -125,7 +125,7 @@ Those four were the *published* ones — they had curated entries on this page w
 | --- | --- | --- | --- |
 | `Table` | `className` | `...omitProps(rest, ENGINE_PROPS, FIELD_ONLY_PROPS)` | `core/engine/components/TableView.tsx` |
 | `Table.Header` | `className` | — | `core/engine/components/TableView.tsx` |
-| `Table.HeaderCell` | `className`, `colSpan`, `key`, `style` | — | `core/engine/components/TableView.tsx` |
+| `Table.HeaderCell` | `aria-sort`, `className`, `colSpan`, `key`, `style` | — | `core/engine/components/TableView.tsx` |
 | `Table.Row` | `className`, `key` | — | `core/engine/components/TableView.tsx` |
 | `Table.Cell` | `className`, `colSpan`, `key`, `style` | `...rest` | `core/engine/components/LocalDraftTableRow.tsx`, `core/engine/components/TableView.tsx`, `core/engine/mapper.tsx` |
 | `Table.Body` | — | — | `core/engine/components/TableView.tsx` |

@@ -107,13 +107,13 @@ const CENSUS_ROLES = [
  * adopted the combobox pattern, the deliberate, reviewable change of this literal that
  * this note foresaw.)
  *
- * Examples with an EMPTY entry are a finding, not an oversight: `expandList`,
- * `tabs`, `tabsButtoned`, `upload` and `uploadVariants` render no interactive role
- * at all, so their controls are invisible to assistive technology and unreachable
- * by keyboard. That is why layer (2) cannot express a keyboard contract for tabs
- * or upload — there is nothing role-shaped to drive — and why §9.5's mandatory
- * Playwright/a11y suite, not this file, is the gate for them. `showIf` and
- * `summaryBox` are legitimately text-only.
+ * Examples with an EMPTY entry are a finding, not an oversight. `expandList`, `tabs` and
+ * `tabsButtoned` had one until 2026-10-06, when tabs took the WAI-ARIA Tabs pattern and an
+ * Expand's title, like a sortable column's header, became a button: they gained `tab`,
+ * `tablist` and `button`, and so did every example that renders tabs, an Expand or a sort.
+ * `upload` and `uploadVariants` still render no interactive role, so their controls are
+ * invisible to assistive technology, and layer (2) has nothing role-shaped to drive there.
+ * `showIf` and `summaryBox` are legitimately text-only.
  */
 const ROLE_CENSUS = {
     dropdown: { listbox: 1, option: 2, combobox: 1 },
@@ -129,14 +129,14 @@ const ROLE_CENSUS = {
     inputIntegerMin0: { textbox: 2 },
     inputToggle: { checkbox: 2 },
     decimal: { table: 1, rowgroup: 2, row: 3, columnheader: 1, cell: 2 },
-    layout: { listbox: 1, option: 2, combobox: 1 },
+    layout: { listbox: 1, option: 2, combobox: 1, tab: 2, tablist: 1 },
     list: { textbox: 2 },
-    expandList: {},
-    tabList: { textbox: 1 },
-    tabs: {},
-    tabsButtoned: {},
-    tableNested: { table: 1, rowgroup: 2, row: 3, columnheader: 6, cell: 12, checkbox: 1 },
-    tableVertical: { table: 1, rowgroup: 2, row: 6, columnheader: 6, cell: 12, checkbox: 1 },
+    expandList: { button: 2 },
+    tabList: { textbox: 1, tab: 2, tablist: 1 },
+    tabs: { tab: 2, tablist: 1 },
+    tabsButtoned: { tab: 2, tablist: 1 },
+    tableNested: { table: 1, rowgroup: 2, row: 3, columnheader: 6, cell: 12, checkbox: 1, button: 2 },
+    tableVertical: { table: 1, rowgroup: 2, row: 6, columnheader: 6, cell: 12, checkbox: 1, button: 2 },
     tableExtraItems: { table: 1, rowgroup: 2, row: 2, columnheader: 3, cell: 3, textbox: 1 },
     tableMatrix: { table: 1, rowgroup: 2, row: 5, columnheader: 12, cell: 14 },
     tableMatrixRequired: { table: 1, rowgroup: 2, row: 4, columnheader: 10, cell: 14 },
@@ -144,16 +144,16 @@ const ROLE_CENSUS = {
     nestedDataKind: { table: 4, rowgroup: 8, row: 20, columnheader: 18, cell: 58, button: 13, textbox: 38, spinbutton: 6 },
     tablePagination: { table: 1, rowgroup: 2, row: 6, columnheader: 5, cell: 25, button: 7, navigation: 1 },
     pieChart: { img: 2 },
-    popupContent: { table: 1, rowgroup: 2, row: 3, columnheader: 6, cell: 12, button: 1, checkbox: 1 },
-    ratingDetails: { table: 1, rowgroup: 2, row: 6, columnheader: 3, cell: 15, listbox: 1, option: 2, combobox: 1 },
-    rowListRelativeData: { table: 1, rowgroup: 2, row: 5, columnheader: 5, cell: 10, listbox: 1, option: 2, combobox: 1 },
+    popupContent: { table: 1, rowgroup: 2, row: 3, columnheader: 6, cell: 12, button: 3, checkbox: 1 },
+    ratingDetails: { table: 1, rowgroup: 2, row: 6, columnheader: 3, cell: 15, listbox: 1, option: 2, combobox: 1, tab: 3, tablist: 1 },
+    rowListRelativeData: { table: 1, rowgroup: 2, row: 5, columnheader: 5, cell: 10, listbox: 1, option: 2, combobox: 1, tab: 2, tablist: 1 },
     showIf: {},
     summaryBox: {},
     upload: {},
     uploadVariants: {},
     slider: { slider: 6 },
     invalidArray: { table: 2, rowgroup: 4, row: 2, columnheader: 9, listbox: 1, img: 1, combobox: 1 },
-    all: { table: 3, rowgroup: 6, row: 10, columnheader: 18, cell: 31, button: 4, checkbox: 1, listbox: 3, option: 4, img: 2, combobox: 3 },
+    all: { table: 3, rowgroup: 6, row: 10, columnheader: 18, cell: 31, button: 8, checkbox: 1, listbox: 3, option: 4, img: 2, combobox: 3, tab: 3, tablist: 1 },
 }
 
 /**
@@ -196,10 +196,15 @@ const FORM_BINDINGS = {
 // 81 -> 79 with the combobox pattern: a dropdown that declares a `label` is now named by it
 // (`aria-label` on the combobox), and two in the corpus do. The total stays 117: the combobox took
 // the listbox's place as the control, and the listbox it drives is its popup, not a control.
-const NAMELESS_CONTROLS = { total: 117, nameless: 79 }
+// 117 -> 145 and 79 -> 81 on 2026-10-06, when tabs, Expand titles and sortable headers became
+// controls and the ledger began counting `tab`: 12 new buttons and 16 tabs, all named but two. The
+// two are the `layout` example's tabs, which have no title in a bar its meta hides with
+// `classNameTabs: 'hide'`. jsdom applies no CSS; in a browser that bar is not displayed, so they are
+// neither seen nor announced.
+const NAMELESS_CONTROLS = { total: 145, nameless: 81 }
 
 /** Roles that count as an interactive control for the ledger above. */
-const CONTROL_ROLES = ['textbox', 'spinbutton', 'checkbox', 'combobox', 'listbox', 'slider', 'button']
+const CONTROL_ROLES = ['textbox', 'spinbutton', 'checkbox', 'combobox', 'listbox', 'slider', 'button', 'tab']
 
 /**
  * A listbox a combobox drives is that control's popup, not a control of its own: focus never lands on
