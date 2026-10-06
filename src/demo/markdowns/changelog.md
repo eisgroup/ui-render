@@ -519,6 +519,10 @@
   style up by its row there: every cell of the first row took the second column's style, and no cell of
   the first column was pinned. Cells are looked up by column now, and the header of a pinned column is
   pinned with it. The vertical layout, where the lookup was right, renders as before.
+- **An input's `info` text is classed `info`.** The text, input, number, date and dropdown fields
+  classed it `into`, which no rule selects, while its `error` sibling is classed `error`. **This changes
+  how it looks**: it was the body text colour (`#444`), and is the info colour now (`#1570b4`), as an
+  error is the error colour.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the
