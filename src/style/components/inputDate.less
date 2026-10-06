@@ -362,6 +362,9 @@
 
 .ui-render-picker-dropdown {
     position: absolute;
+    // Above the popup (`Modal.tsx`, 1000). rc-picker mounts the calendar in `<body>`, outside the popup:
+    // with `auto` it was above one only while the shell's `fade-in` made `.app` a stacking context.
+    z-index: 1050;
     box-shadow: 0 0 1px grey;
     pointer-events: none;
 }

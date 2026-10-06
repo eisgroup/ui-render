@@ -73,6 +73,7 @@ const VIEW_COVERAGE = {
             t(IV, '[I] with no room below the input it opens above, still inside the viewport'),
             t(IV, '[I] a click on a day writes it in the display format and closes the calendar'),
             t(IV, '[I] a click outside closes the calendar and leaves the value alone'),
+            t(IV, '[I] a date field inside it opens its calendar above it, where a click picks a day'),
         ],
         gap: 'text and number inputs: native controls with nothing positioned or layered; typing, formatting and validation are state, and jsdom covers them',
     },
@@ -85,6 +86,7 @@ const VIEW_COVERAGE = {
             t(IV, '[I] the backdrop covers the viewport, and the box paints above it'),
             t(IV, '[I] a click on the backdrop closes it, and so does Ok'),
             t(IV, '[I] the keyboard: a dialog that takes focus and keeps it, Escape closes it, and focus goes back to the trigger'),
+            t(IV, '[I] a date field inside it opens its calendar above it, where a click picks a day'),
         ],
     },
     ProgressSteps: {

@@ -13,7 +13,8 @@
  *
  * The values live in e2e/reference.js and carry its tags. This file found two defects and pinned
  * them `[R->I]`: what the popup offered a keyboard and a screen reader, and a checkbox id two
- * instances shared. Both were fixed on 2026-10-06, and their tests flipped to `[I]`.
+ * instances shared. Both were fixed on 2026-10-06, and their tests flipped to `[I]`. A third, a
+ * calendar above the popup only by the grace of the shell's animation, was fixed the same day.
  */
 const { test, expect, rectOf, isWithin, topmostAt, activeElement } = require('./fixtures')
 const { DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, PROGRESS_STEPS } = require('./reference')
@@ -159,6 +160,26 @@ test.describe('popup: the modal a `popupOpen` action opens', () => {
         await page.keyboard.press('Escape')
         await expect(popup(page)).toHaveCount(POPUP.ESCAPE_CLOSES ? 0 : 1)
         expect(await activeElement(page), 'closing gives focus back to the trigger').toMatchObject({ tag: 'button', text: 'Open Popup 1' })
+    })
+
+    test('[I] a date field inside it opens its calendar above it, where a click picks a day', async ({ page }) => {
+        await open(page)
+        const field = popup(page).locator(`input[name="${POPUP.DATE_FIELD}"]`)
+        const calendar = page.locator('.ui-render-picker-dropdown:not(.ui-render-picker-dropdown-hidden)')
+        await field.click()
+        await expect(calendar).toBeVisible()
+
+        const panel = calendar.locator('.ui-render-picker-panel')
+        expect(await hitsOwnCentre(page, panel, '.ui-render-picker-panel'), 'the calendar paints above the dialog').toBe(POPUP.CALENDAR_ABOVE)
+        // And on its own z-index, not on the shell's: while `.app`'s fade-in is in effect the shell is a
+        // stacking context, which the popup's z-index cannot reach out of.
+        await page.evaluate(() => { for (const shell of document.querySelectorAll('.app')) shell.style.animation = 'none' })
+        expect(await hitsOwnCentre(page, panel, '.ui-render-picker-panel'), 'also with no stacking context around the popup').toBe(POPUP.CALENDAR_ABOVE)
+
+        await calendar.locator('td.ui-render-picker-cell-in-view').first().click()
+        await expect(calendar).toBeHidden()
+        await expect(field).not.toHaveValue('')
+        await expect(popup(page), 'the click stayed with the calendar').toBeVisible()
     })
 })
 

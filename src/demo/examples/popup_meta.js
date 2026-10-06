@@ -21,7 +21,9 @@ const popupMeta = {
       view: 'Popup',
       id: 'popup1', // is used to open popup remotely
       items: [
-        cloneDeep(content)
+        cloneDeep(content),
+        // its calendar opens in `<body>`, and must paint above the popup
+        { view: 'Input', type: 'date', name: 'popupDate', label: 'Date' },
       ]
     },
     cloneDeep(content), // for testing changes made inside Popup -> should sync

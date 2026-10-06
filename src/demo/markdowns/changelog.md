@@ -471,6 +471,11 @@
   `<form onSubmit {...form}>`. The document a host mounts has had no `<form>` around it since 2025-03, so
   Enter in a field submits nothing, and that stays. Only a document with no content still had an empty
   `<form>`, and it has none now either. A document a `Data` node nests renders inside its own, as before.
+- **A calendar opened inside the popup is above it by its own `z-index`.** rc-picker mounts the
+  calendar in `<body>`, outside the popup, and gave it none: it was above the popup's 1000 only while the
+  shell's `fade-in` animation, which runs `forwards`, made the shell a stacking context. Without that
+  (measured in Chromium, with the animation removed) a click on a day landed on the dialog. The calendar
+  has `z-index: 1050` now, and the `popupContent` example's popup holds a date field.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the
