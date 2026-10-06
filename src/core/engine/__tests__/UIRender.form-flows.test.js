@@ -359,6 +359,39 @@ describe('UIRender public form contracts', () => {
         expect(container.querySelector('form')).toBeNull()
     })
 
+    it('runs a meta `onFocus` and `onBlur` after the field\'s own handling, which they used to replace', async () => {
+        // Neither was resolved to an action. The string form reached the input as a string, which threw
+        // `onFocus is not a function`; the object form resolved as a value and replaced the field's own
+        // handler, so a blur no longer marked the field touched and its error never showed.
+        const marks = []
+        const submitted = []
+        const meta = formMeta(
+            { view: 'Input', name: 'note', label: 'Note', validate: 'required', onFocus: { name: 'mark', args: ['note'] }, onBlur: 'submit' },
+            { view: 'Input', type: 'date', name: 'day', label: 'Day', onFocus: { name: 'mark', args: ['day focus'] }, onBlur: { name: 'mark', args: ['day'] } },
+        )
+        const values = { note: '', day: '2022-01-01' }
+        render(withProviders(<UIRender form meta={meta} data={values} initialValues={values}
+            methods={{ mark: (...args) => { marks.push(args[args.length - 1]) } }} onSubmit={(data) => { submitted.push(data) }} />))
+
+        const note = screen.getByLabelText('Note')
+        fireEvent.focus(note)
+        fireEvent.blur(note)
+        await waitFor(() => expect(screen.getByText('Required')).toBeInTheDocument())
+        expect(marks).toEqual(['note'])
+        expect(submitted).toHaveLength(0)
+
+        fireEvent.focus(note)
+        fireEvent.change(note, { target: { value: 'done' } })
+        fireEvent.blur(note)
+        await waitFor(() => expect(submitted).toHaveLength(1))
+        expect(submitted[0]).toEqual(expect.objectContaining({ note: 'done' }))
+
+        const day = document.querySelector('input[name="day"]')
+        fireEvent.focus(day)
+        fireEvent.blur(day)
+        expect(marks).toEqual(['note', 'note', 'day focus', 'day'])
+    })
+
     it('renders an empty field with `format: \'uppercase\'`, and shows what was typed in capitals', async () => {
         // final-form formats an empty field's `undefined`, and `uppercase` called `toUpperCase` on it:
         // the field's render threw, so an empty field with this format never rendered.

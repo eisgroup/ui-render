@@ -97,7 +97,7 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
 
 8. **Function definitions**
   - A Function gives you a way to format data for display in the UI (ex. `Currency`, `Float`, `Percent`...)
-  - A Function can be defined using `['onClick', 'onChange', 'onDone']` attributes, or starting with the word `render`
+  - A Function can be defined using `['onClick', 'onChange', 'onDone', 'onFocus', 'onBlur']` attributes, or starting with the word `render`
     Example: `renderLabel`, `renderCell`...
   - Function can be defined as `String`, with arguments separated by comma/s
     Example: `"setState,group"` -> use `setState` function with `group` as argument
@@ -195,9 +195,9 @@ a stack trace:
   `format` / `normalize` / `parse`); a `showIf` that is neither a key path string nor an object is
   ignored, so the node always renders; a malformed `metaVersion` is reported, and changes nothing.
 
-Handler names (`onClick`, `onChange`, `onDone`) are deliberately **not** checked: they resolve
-against built-in actions, the host's `methods` prop and renderer instance methods, so an
-unknown-name warning could not tell a typo from a valid host method.
+Handler names (`onClick`, `onChange`, `onDone`, `onFocus`, `onBlur`) are deliberately **not**
+checked: they resolve against built-in actions, the host's `methods` prop and renderer instance
+methods, so an unknown-name warning could not tell a typo from a valid host method.
 
 Pass a function instead of `true` to handle the findings yourself:
 `validateMeta={problems => myLogger(problems)}`. Each entry is
@@ -356,6 +356,8 @@ Available in all UI components:
   value: undefined,      // controlled input value
   defaultValue: undefined, // shown in an empty, unedited field that has a `format`; never stored
   onChange: String,       // callback function name for input value changes
+  onFocus: String,        // action called when the field takes focus, after the field's own handling
+  onBlur: String,         // action called when the field loses focus, after the field's own handling
   min: Number,           // with type 'number', min and max install a range validator,
   max: Number,           // and a value outside them is clamped on blur
   info: 'Content rendered when input is in focus',

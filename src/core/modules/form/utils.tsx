@@ -152,6 +152,10 @@ export type AsFieldProps = {
   /** Help text or component to show on invalid input */
   error?: React.ReactNode
   onChange?: (value: unknown, ...args: unknown[]) => void
+  /** Called after the field's own focus handling, with what the input passed it; never in its place */
+  onFocus?: unknown
+  /** Called after the field's own blur handling, with what the input passed it; never in its place */
+  onBlur?: unknown
   format?: ValueTransform
   normalize?: ValueTransform
   parse?: ValueTransform
@@ -251,7 +255,7 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
     Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}: FieldRenderProps<unknown>) => {
       const {
         onChange, error: err, defaultValue, normalize, format, parse, validate,
-        instance, onRemoveChange, ...props
+        instance, onRemoveChange, onFocus, onBlur, ...props
       }: AsFieldProps = this.props
 
       if (!this.hasFocus) { // use cached `value` while editing to prevent format/parse bugs and rerender
@@ -304,14 +308,22 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
       )
     }
 
+    // The field's own handling first, then the one a meta or a host gave it. Until 2026-10-06 that one
+    // replaced these two: the field never learnt it had focus, and a blur no longer marked it touched.
     handleFocus = (...args: Parameters<FieldInput['onFocus']>) => {
       this.hasFocus = true
-      return this.input.onFocus(...args)
+      const focused = this.input.onFocus(...args)
+      const {onFocus} = this.props
+      if (typeof onFocus === 'function') onFocus(...args)
+      return focused
     }
 
-    handleBlur = () => {
+    handleBlur = (...args: unknown[]) => {
       this.hasFocus = false
-      return this.input.onBlur()
+      const blurred = this.input.onBlur()
+      const {onBlur} = this.props
+      if (typeof onBlur === 'function') onBlur(...args)
+      return blurred
     }
 
     handleChange = (value: unknown, ...args: unknown[]) => {

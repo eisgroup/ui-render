@@ -50,7 +50,9 @@ export type TransformConfig = {
     [key: string]: unknown
 }
 
-const FUNCTION_NAMES = ['onClick', 'onChange', 'onDone']
+// `onFocus` and `onBlur` since 2026-10-06: before, a meta's reached the component as a string or as the
+// value its object form resolved to, and replaced the field's own handler (the field hosts in `modules/form`).
+const FUNCTION_NAMES = ['onClick', 'onChange', 'onDone', 'onFocus', 'onBlur']
 
 /** Declarations that describe the meta document rather than a component. See metaToProps. */
 const CONTRACT_ATTRIBUTES = ['$schema', 'metaVersion']

@@ -26,6 +26,10 @@ export type DateFieldProps = {
     /** Help text or component to show on invalid input */
     error?: React.ReactNode
     onChange?: (value: unknown, ...args: unknown[]) => void
+    /** Called after the field's own focus handling, with what the input passed it; never in its place */
+    onFocus?: unknown
+    /** Called after the field's own blur handling, with what the input passed it; never in its place */
+    onBlur?: unknown
     format?: ValueTransform
     normalize?: ValueTransform
     parse?: ValueTransform
@@ -76,7 +80,7 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
         Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}: FieldRenderProps<unknown>) => {
             const {
                 onChange, error: err, defaultValue, normalize, format, parse, validate,
-                instance, onRemoveChange, ...props
+                instance, onRemoveChange, onFocus, onBlur, ...props
             } = this.props
 
             if (!this.hasFocus) { // use cached `value` while editing to prevent format/parse bugs and rerender
@@ -113,14 +117,21 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
             )
         }
 
+        // The field's own handling first, then the one a meta or a host gave it, as in `asField`.
         handleFocus = (...args: Parameters<FieldInput['onFocus']>) => {
             this.hasFocus = true
-            return this.input.onFocus(...args)
+            const focused = this.input.onFocus(...args)
+            const {onFocus} = this.props
+            if (typeof onFocus === 'function') onFocus(...args)
+            return focused
         }
 
         handleBlur = (...args: Parameters<FieldInput['onBlur']>) => {
             this.hasFocus = false
-            return this.input.onBlur(...args)
+            const blurred = this.input.onBlur(...args)
+            const {onBlur} = this.props
+            if (typeof onBlur === 'function') onBlur(...args)
+            return blurred
         }
 
 

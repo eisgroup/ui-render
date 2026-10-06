@@ -481,6 +481,12 @@
   shell's `fade-in` animation, which runs `forwards`, made the shell a stacking context. Without that
   (measured in Chromium, with the animation removed) a click on a day landed on the dialog. The calendar
   has `z-index: 1050` now, and the `popupContent` example's popup holds a date field.
+- **A meta `onFocus` or `onBlur` is an action, and no longer breaks the field it is on.** Neither was
+  resolved: the string form reached the input as a string, and a focus threw `onFocus is not a
+  function`; the object form replaced the field's own handler, so a blur no longer marked the field
+  touched and its validation error never showed. Both resolve as `onClick` does now, by name or as
+  `{name, args}`, and a field calls them after its own handling, with what the input passed it. The
+  schema and the published types declare them.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the

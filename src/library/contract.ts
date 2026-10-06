@@ -174,6 +174,10 @@ export interface MetaNode {
     onClick?: MetaFunctionRef
     onChange?: MetaFunctionRef
     onDone?: MetaFunctionRef
+    /** On a field, called after the field's own focus handling, never in its place. */
+    onFocus?: MetaFunctionRef
+    /** On a field, called after the field's own blur handling, never in its place. */
+    onBlur?: MetaFunctionRef
     type?: MetaInputType
     format?: MetaNormalizerName
     normalize?: MetaNormalizerName
