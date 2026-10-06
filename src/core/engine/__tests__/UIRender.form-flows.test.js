@@ -392,6 +392,26 @@ describe('UIRender public form contracts', () => {
         expect(marks).toEqual(['note', 'note', 'day focus', 'day'])
     })
 
+    it('shows `defaultValue` in a field the data leaves unset, with no `format` too, and never stores it', () => {
+        // final-form formats an unset value as '' unless the field has a `format`, and only `undefined`
+        // counted as unset, so a `defaultValue` showed only in a field with a `format`.
+        let getFormData
+        const meta = formMeta(
+            { view: 'Input', name: 'code', label: 'Code', defaultValue: 'N/A' },
+            { view: 'Input', name: 'given', label: 'Given', defaultValue: 'N/A' },
+            { view: 'Input', type: 'date', name: 'day', label: 'Day', defaultValue: '2022-01-01' },
+        )
+        const values = { given: '' }
+        render(withProviders(
+            <UIRender form meta={meta} data={values} initialValues={values} getFormData={f => { getFormData = f }} onSubmit={() => {}} />
+        ))
+
+        expect(screen.getByLabelText('Code')).toHaveValue('N/A')
+        expect(screen.getByLabelText('Given')).toHaveValue('')
+        expect(document.querySelector('input[name="day"]')).toHaveValue('01-01-2022')
+        expect(getFormData()).toEqual({ given: '' })
+    })
+
     it('renders an empty field with `format: \'uppercase\'`, and shows what was typed in capitals', async () => {
         // final-form formats an empty field's `undefined`, and `uppercase` called `toUpperCase` on it:
         // the field's render threw, so an empty field with this format never rendered.

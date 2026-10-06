@@ -4,7 +4,7 @@ import React, { useRef } from 'react'
 import { isRequired } from '../../components/inputs/validationRules'
 import { touchedFor } from '../../state/formRegistry'
 import { Active } from '../../utils'
-import { namedField } from './utils'
+import { isUnset, namedField } from './utils'
 
 /** What final-form hands the input: its `input` props, without `value`, which the field caches. */
 type FieldInput = Omit<FieldRenderProps<unknown>['input'], 'value'>
@@ -77,7 +77,7 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
 
         // do not use ...props from input, because it is shared by <Active.Field> instances
         // @Note: react-final-form fires `format()` when `input.value` getter is called
-        Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}: FieldRenderProps<unknown>) => {
+        Input = ({input: {value, ...input}, meta: {touched, error, pristine, initial} = {}}: FieldRenderProps<unknown>) => {
             const {
                 onChange, error: err, defaultValue, normalize, format, parse, validate,
                 instance, onRemoveChange, onFocus, onBlur, ...props
@@ -85,7 +85,7 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
 
             if (!this.hasFocus) { // use cached `value` while editing to prevent format/parse bugs and rerender
                 // @Note: defaultValue is only used for UI, internal value is still undefined
-                this.value = value === void 0
+                this.value = isUnset(value, initial)
                     ? (pristine && defaultValue != null ? (format ? format(defaultValue) : defaultValue) : value)
                     : value
 

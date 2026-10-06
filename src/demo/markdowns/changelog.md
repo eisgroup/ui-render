@@ -497,6 +497,10 @@
   integer part, which only `truncated` is meant to do: 18.75 % printed `18%`, where `decimals: 0` printed
   `19%`. **This changes rendered output** wherever such a value's fraction is a half or more; in the
   bundled examples, two cells of `ratingDetails` (18 → 19) and two of `rowListRelativeData` (2 → 3).
+- **`defaultValue` shows in a field with no `format` as well.** final-form formats an unset value as
+  `''` unless the field has a `format`, and only `undefined` counted as unset, so the default showed
+  only in a field with a `format`. It shows in any unedited field the data leaves unset now, and is
+  still never stored. A `''` the data gives is a value: the default stays out of that field.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the

@@ -354,7 +354,7 @@ Available in all UI components:
   validate: String,      // name of the validation function: 'email', 'maxLength' (100 characters), 'password',
                          // 'required' or 'url'
   value: undefined,      // controlled input value
-  defaultValue: undefined, // shown in an empty, unedited field that has a `format`; never stored
+  defaultValue: undefined, // shown in an unedited field the data leaves unset; never stored
   onChange: String,       // callback function name for input value changes
   onFocus: String,        // action called when the field takes focus, after the field's own handling
   onBlur: String,         // action called when the field loses focus, after the field's own handling

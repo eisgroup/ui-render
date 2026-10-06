@@ -169,6 +169,14 @@ export type AsFieldProps = {
 }
 
 /**
+ * Whether a field holds no value of its own, which is when its `defaultValue` shows. final-form formats
+ * an unset value as `''` unless the field has a `format`, so `''` counts when the field started unset;
+ * until 2026-10-06 only `undefined` did, and a `defaultValue` showed only in a field with a `format`.
+ * A `''` the data gives is a value, and keeps the default out.
+ */
+export const isUnset = (value: unknown, initial: unknown) => value === void 0 || (value === '' && initial === void 0)
+
+/**
  * @param InputComponent - `any` props: the field spreads final-form's input and its own props onto it,
  *    which only the input's own type describes.
  */
@@ -252,7 +260,7 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
 
     // do not use ...props from input, because it is shared by <Active.Field> instances
     // @Note: react-final-form fires `format()` when `input.value` getter is called
-    Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}: FieldRenderProps<unknown>) => {
+    Input = ({input: {value, ...input}, meta: {touched, error, pristine, initial} = {}}: FieldRenderProps<unknown>) => {
       const {
         onChange, error: err, defaultValue, normalize, format, parse, validate,
         instance, onRemoveChange, onFocus, onBlur, ...props
@@ -260,7 +268,7 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
 
       if (!this.hasFocus) { // use cached `value` while editing to prevent format/parse bugs and rerender
         // @Note: defaultValue is only used for UI, internal value is still undefined
-        this.value = value === void 0
+        this.value = isUnset(value, initial)
           ? (pristine && defaultValue != null ? (format ? format(defaultValue) : defaultValue) : value)
           : value
 
