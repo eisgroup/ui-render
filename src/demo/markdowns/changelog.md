@@ -523,6 +523,9 @@
   classed it `into`, which no rule selects, while its `error` sibling is classed `error`. **This changes
   how it looks**: it was the body text colour (`#444`), and is the info colour now (`#1570b4`), as an
   error is the error colour.
+- **`readonly` on a layout node stays off its element.** A field reads `readonly` as a prop; a container
+  spread it onto its `<div>` as it was, and React warned of an invalid DOM property in development. The
+  DOM boundary strips it from containers now, with `name` and `label`; a field still gets it.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the

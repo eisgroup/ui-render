@@ -121,6 +121,13 @@ describe('DOM boundary per component', () => {
      * form control would break every form in the library, and silently: the markup
      * still renders. This is the line the two lists exist to draw.
      */
+    it('keeps a layout node\'s `readonly` off its element, where React called it an invalid DOM property', () => {
+        // A field reads `readonly` as a prop; a container spread it onto a <div> as it was.
+        const { container } = render(<View readonly><Row readonly /></View>)
+
+        expect(container.querySelector('[readonly]')).toBeNull()
+    })
+
     it('keeps `name` on a form control while removing it from a container', () => {
         const { container } = render(
             <div>

@@ -122,9 +122,12 @@ export const ENGINE_PROPS = [
  * Real, required attributes on a form control — and meaningless (or actively wrong) on a
  * generic container. Read the two-lists note above before touching this: `name` is the
  * form field registration path, and removing it from the control family breaks every form.
+ * `readonly` is the meta's attribute, which a field reads as a prop (the element's is
+ * `readOnly`): on a layout node it reached a `<div>`, and React warned about an invalid DOM
+ * property, until 2026-10-06.
  * @type {Array<String>}
  */
-export const FIELD_ONLY_PROPS = ['name', 'label']
+export const FIELD_ONLY_PROPS = ['name', 'label', 'readonly']
 
 /**
  * Shallow copy of `props` without the keys in the given lists.

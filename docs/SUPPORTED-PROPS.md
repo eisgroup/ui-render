@@ -104,7 +104,7 @@ CSS contract: `src/style/components/table.less` hangs EVERY cell's padding off `
 | --- | --- |
 | `className` | Passed through verbatim, or the attribute is omitted entirely when it is absent or empty. Semantic ran its own `cx()` and printed `class=""` regardless: 317 empty class attributes in the 38-example baseline were its, on `tbody` (24), `tr` (94) and `td` (199), and they are gone. |
 
-**Stripped at the DOM boundary.** `src/core/components/Table.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts` in all 7 components, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `meta`, `@class`, `name`, `label`.
+**Stripped at the DOM boundary.** `src/core/components/Table.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts` in all 7 components, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `meta`, `@class`, `name`, `label`, `readonly`.
 
 **Passthrough.** `style`, `colSpan`, `scope`, `id`, `data-*` and every event handler still reach the element untouched — they always did, because Semantic did not handle them either, so they ride the rest spread exactly as before. There is no `forwardRef`: nothing in `src` passes a ref to a table element, so the parameter would have had no caller.
 
@@ -163,7 +163,7 @@ CSS contract: The bubble is now mounted INSIDE `.ui-render`, which is what makes
 | `onOpen` | Called when the bubble opens, controlled or not. |
 | `onClose` | Called when it closes, controlled or not. |
 
-**Stripped at the DOM boundary.** `src/core/components/Tooltip.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `meta`, `@class`, `name`, `label`.
+**Stripped at the DOM boundary.** `src/core/components/Tooltip.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `meta`, `@class`, `name`, `label`, `readonly`.
 
 **Passthrough.** `style`, `data-*`, `aria-*` and every event handler still reach the bubble untouched through `omitProps(…, ENGINE_PROPS, FIELD_ONLY_PROPS)` — the same DOM boundary every other component uses, which is new here: SUIR's `Popup` applied no such filter, so `§9.7-F1` step 2 also closed the engine-prop leak on this path. There is no `forwardRef`: nothing in `src` passes a ref to a tooltip, and the host `<span>` holds the only ref the component itself needs.
 
@@ -239,7 +239,7 @@ CSS contract: Semantic's `modules/dropdown` CSS, vendored at step 4 as `src/styl
 | `translate` <br>*(has a default)* | The i18n function. Engine-owned, applied to option text, `label` and `placeholder`. CONSUMED, not stripped — destructured out at the top of the wrapper. It is also in ENGINE_PROPS, which is what catches it at other boundaries. |
 | `value` <br>*(bound as `valueFromParent`)* | Selected value. Held in wrapper state, synced from the prop, and array values are joined before being forwarded — so what the control sees is not always what the caller passed. |
 
-**Stripped at the DOM boundary.** `src/core/components/Dropdown.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `meta`, `@class`, `name`, `label`.
+**Stripped at the DOM boundary.** `src/core/components/Dropdown.tsx` applies `ENGINE_PROPS`, `FIELD_ONLY_PROPS` from `src/core/components/domProps.ts`, so these never become attributes: `view`, `index`, `data`, `_data`, `symbol`, `_comment`, `expanded`, `translate`, `onDataChanged`, `currencyCode`, `meta`, `@class`, `name`, `label`, `readonly`.
 
 **Passthrough.** `id`, `style`, `data-*` and every event handler still reach the dropdown element untouched, including the `onFocus`/`onBlur` the react-final-form adapter supplies — as real DOM handlers rather than as Semantic props, and they fire for the combobox inside it, because React's focus events bubble. `aria-*` reaches the combobox, the element that takes focus. `ENGINE_PROPS` and `FIELD_ONLY_PROPS` are stripped twice on the way: once by the wrapper, once by `Listbox` at the element itself.
 
