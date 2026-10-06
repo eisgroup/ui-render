@@ -17,9 +17,7 @@
  * skipped the first run through a mount flag), the form wrapper lost its subscription until the
  * next render, and the form layer stayed marked as unmounting.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 

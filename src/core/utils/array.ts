@@ -142,7 +142,7 @@ export function isInCollection (collection: unknown, element: CollectionMatch): 
  * @return {Array}
  */
 export function toList<T> (value: T | T[], clean?: unknown): T[]
-export function toList (value: unknown, clean?: unknown): unknown[] { // eslint-disable-line no-shadow
+export function toList (value: unknown, clean?: unknown): unknown[] {
   if (!isList(value)) value = [value]
   return clean ? (value as unknown[]).filter(v => v) : (value as unknown[])
 }

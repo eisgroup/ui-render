@@ -102,15 +102,11 @@ describe('a failure', () => {
 
         let originalResponse
         beforeAll(() => {
-            // eslint-disable-next-line no-undef
             originalResponse = global.Response
-            // eslint-disable-next-line no-undef
             global.Response = TestResponse
         })
         afterAll(() => {
-            // eslint-disable-next-line no-undef
             if (originalResponse === undefined) delete global.Response
-            // eslint-disable-next-line no-undef
             else global.Response = originalResponse
         })
 

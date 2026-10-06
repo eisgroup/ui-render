@@ -1,7 +1,5 @@
 // rules.tsx registers `fetch` in the action map while building meta.
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 

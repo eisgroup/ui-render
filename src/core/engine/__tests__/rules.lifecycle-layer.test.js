@@ -24,9 +24,7 @@
  * `Active.UIRender` to avoid a circular import — so the chain is the declared class, this layer,
  * then the form layer.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import '../../modules/form/utils' // eslint-disable-line import/first

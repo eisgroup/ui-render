@@ -9,7 +9,7 @@
  * tree since 2026-10-06 (`formsOf`). Nothing else belongs in this module.
  *
  * It sits below `components` and `modules` and above `utils`: both layers may import it, it may
- * import nothing but `utils`, and the ESLint layer rules in `package.json` enforce that.
+ * import nothing but `utils`, and the ESLint layer rules in `eslint.config.js` enforce that.
  *
  * The errors, the touched fields and the baselines are keyed by the final-form `form` object, the key
  * BOTH sides of the boundary already hold, in weak maps, so an unmounted form's entries are collected

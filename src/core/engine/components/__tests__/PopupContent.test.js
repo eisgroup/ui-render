@@ -6,9 +6,7 @@
  * A file of its own on purpose: React logs that warning once per component stack, for the life of
  * the module, so a test after another one that rendered a popup would pass on the old code too.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

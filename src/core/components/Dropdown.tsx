@@ -241,7 +241,7 @@ export function Dropdown ({
   if (options == null) options = []
 
   // Sanitize. Any other typeof — boolean, function — passes through unchanged; the bare
-  // `no default` comment below is the escape hatch eslint-config-react-app's `default-case` wants.
+  // `no default` comment below is `default-case`'s escape hatch, though the rule is off for TypeScript (eslint.config.js).
   // Casts: the first option's type is taken as every option's, as it was.
   switch (typeof options[0]) {
     case 'string':

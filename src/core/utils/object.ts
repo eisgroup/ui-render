@@ -279,7 +279,7 @@ export function hasObjKeys(obj: unknown, keys: Dict = {}, match: MatchType = 'de
 		// Deep comparison
 		if (match === 'deep') {
 			if (searchValue !== value) return false
-		} // eslint-disable-line
+		}
 
 		// Shallow comparison
 		else if (match === 'shallow') {
@@ -292,7 +292,7 @@ export function hasObjKeys(obj: unknown, keys: Dict = {}, match: MatchType = 'de
 				// eslint-disable-next-line eqeqeq -- primitives compare loosely on purpose (1 matches '1')
 				if (searchValue != value) return false
 			}
-		} // eslint-disable-line
+		}
 
 		// Include comparison
 		else if (match === 'include') {
@@ -516,7 +516,7 @@ export function pop(obj: unknown, keyPath: unknown, fallback?: unknown): unknown
  * @return {Object} - without the deleted key property
  */
 export function removeKey (obj: Dict, key: string): Dict {
-	const {[key]: _, ...rest} = obj // eslint-disable-line
+	const {[key]: _, ...rest} = obj
 	return rest
 }
 

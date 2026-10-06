@@ -15,9 +15,7 @@
  * new `{...form, reset}` on every render, and the document's `form` is the latest one. They all
  * share the underlying form's methods, so these tests tell "the same form" by `getState`.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

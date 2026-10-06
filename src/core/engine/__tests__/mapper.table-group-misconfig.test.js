@@ -6,9 +6,7 @@
  * does not exist, so each threw a TypeError and the node's error boundary rendered THAT. Found by the
  * TypeScript checker. The checks throw their own message now, and the boundary renders it.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

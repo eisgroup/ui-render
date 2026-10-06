@@ -15,9 +15,7 @@
  * Until §9.3 step 6 both happened in `UNSAFE_componentWillMount`. They are pinned here by
  * behaviour, so they hold for whatever sets them up.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

@@ -19,9 +19,7 @@
  * Rendered through the published entry, so the popup itself renders, portal and all.
  */
 // The engine hands the `fetch` action the global one whenever it builds a meta.
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first
@@ -58,8 +56,8 @@ function clickReporting (element) {
 
 describe('the meta\'s `popup` action', () => {
     let originalFetch
-    beforeEach(() => { originalFetch = global.fetch }) // eslint-disable-line no-undef
-    afterEach(() => { global.fetch = originalFetch }) // eslint-disable-line no-undef
+    beforeEach(() => { originalFetch = global.fetch })
+    afterEach(() => { global.fetch = originalFetch })
 
     it('opens the popup from the "Button with Icon" example, which configures nothing to show', () => {
         mount(buttonIconMeta)
@@ -83,7 +81,7 @@ describe('the meta\'s `popup` action', () => {
 
     it('shows a chain\'s result as the content, under the text the chain configures', async () => {
         // The shape `src/demo/markdowns/config.md` documents: `fetch`, then `popup` on its result.
-        global.fetch = () => Promise.resolve({ city: 'Oslo' }) // eslint-disable-line no-undef
+        global.fetch = () => Promise.resolve({ city: 'Oslo' })
         mount({
             view: 'Button',
             children: 'Look up',

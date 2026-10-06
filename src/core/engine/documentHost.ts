@@ -199,9 +199,11 @@ export function hostDocument<P extends object> (InstanceClass: HostedClass<P>): 
         const mounting = host.committedProps === undefined
 
         useBeforePaintEffect(() => {
-            if (instance.componentDidMount) instance.componentDidMount()
+            // The document's for its lifetime: made once, in the ref, by the first render.
+            const mounted = self.current!.instance
+            if (mounted.componentDidMount) mounted.componentDidMount()
             return () => {
-                if (instance.componentWillUnmount) instance.componentWillUnmount()
+                if (mounted.componentWillUnmount) mounted.componentWillUnmount()
             }
         }, [])
         useBeforePaintEffect(() => {

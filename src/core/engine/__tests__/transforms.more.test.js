@@ -103,7 +103,6 @@ describe('metaToProps - {name} value transform', () => {
 describe('metaToProps - render string mapping', () => {
     it('maps a render* string attribute to a function via Render.Method', () => {
         // Stub Render.Method to return an identity function
-        // eslint-disable-next-line global-require
         const RenderMod = require('../Render').default
         RenderMod.Method = jest.fn(() => (v) => v)
 

@@ -283,18 +283,21 @@ describe('generated supported-prop reference', () => {
     })
 
     it('keeps the eslint erosion guard configured', () => {
-        // The guard is a package.json override, so nothing else would notice it being dropped
-        // until a stray import shipped. §9.7-F1 step 0's second deliverable, pinned.
-        const { eslintConfig } = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'))
-        const override = (eslintConfig.overrides || []).find(entry => (
+        // The guard is an entry of `eslint.config.js` (a `package.json` override until the move to
+        // ESLint 9, 2026-10-06), so nothing else would notice it being dropped until a stray import
+        // shipped. §9.7-F1 step 0's second deliverable, pinned.
+        const config = require(path.join(ROOT, 'eslint.config.js'))
+        const override = config.find(entry => (
             entry.rules && entry.rules['no-restricted-imports']
         ))
         expect(override).toBeDefined()
+        expect(override.files).toEqual(expect.arrayContaining(['src/**/*.js', 'src/**/*.jsx', 'src/**/*.ts', 'src/**/*.tsx']))
         // It used to carry `excludedFiles: ['src/core/components/**']` — the one place allowed to
-        // import the package. §9.7-F1 step 3½ deleted the package, so there is no exemption left
-        // to grant and the guard covers ALL of `src`: an import anywhere would fail to resolve
-        // anyway, and this is what says so with a message instead of a module-not-found.
-        expect(override.excludedFiles).toBeUndefined()
+        // import the package; `ignores` is that key in a flat config. §9.7-F1 step 3½ deleted the
+        // package, so there is no exemption left to grant and the guard covers ALL of `src`: an
+        // import anywhere would fail to resolve anyway, and this is what says so with a message
+        // instead of a module-not-found.
+        expect(override.ignores).toBeUndefined()
         const [severity, options] = override.rules['no-restricted-imports']
         expect(severity).toBe('error')
         expect(options.paths.map(entry => entry.name)).toContain('semantic-ui-react')

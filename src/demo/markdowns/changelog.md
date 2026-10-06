@@ -408,9 +408,8 @@
   eighteen were genuine cleanups, four are suppressions carrying a comment that states why the rule
   does not apply, and three turned out to be the defects listed under Fixes.
 - Removed 14 devDependencies with no references in code, configs, scripts or CI, cutting the
-  installed development tree by 14 packages. Two more went later, `react-router` and
-  `eslint-plugin-react-hooks`, which `react-router-dom` and `eslint-config-react-app` install anyway.
-  This does not affect the published package.
+  installed development tree by 14 packages. One more went later, `react-router`, which
+  `react-router-dom` installs anyway. This does not affect the published package.
 - Build configuration: the demo build no longer duplicates the shared Babel presets. Every
   pipeline — library, demo and tests — now reads them from one `babel.config.js`, with only the
   development-time refresh transform declared by the demo. Emitted bundles are unchanged.
@@ -427,6 +426,11 @@
   expects a warning now says so and asserts it.
 - TypeScript checks JSX the way Babel compiles it, through `react/jsx-runtime`, so a file no longer
   needs `React` in scope for its JSX. The published declarations are unchanged.
+- Linting is on ESLint 9, configured in `eslint.config.js`. `eslint-config-react-app` never supported
+  it, so its rules are carried over as they were, and `react-hooks/exhaustive-deps` also checks the
+  effects of the code's own layout-effect hooks now. 81 `eslint-disable` comments that suppressed
+  nothing are gone. The development tree lost 158 packages to the move and gained 142, and
+  `npm audit` reports 35 findings in it, from 43.
 
 #### Fixes
 

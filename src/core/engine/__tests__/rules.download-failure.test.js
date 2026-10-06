@@ -8,9 +8,7 @@
  * an object React cannot render, so the whole UI was replaced by "Objects are not valid as a React
  * child". Found in the running demo; this renders the real popup.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

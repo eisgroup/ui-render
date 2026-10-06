@@ -17,9 +17,7 @@
  *   behaviour deliberately — now records the right one. That flip is the whole point of pinning a
  *   defect rather than describing it in a comment.
  */
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first

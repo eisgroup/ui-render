@@ -1,7 +1,5 @@
 // fetch is referenced while rules.tsx initializes FIELD.FUNC.
-// eslint-disable-next-line no-undef
 if (typeof global.fetch === 'undefined') {
-    // eslint-disable-next-line no-undef
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 
