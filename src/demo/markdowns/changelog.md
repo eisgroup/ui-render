@@ -467,6 +467,10 @@
 - **`onError` hears from the documents a `Data` node nests.** The engine creates such a document and
   gave it no `onError`, so a node that failed to render inside one was reported on the console only,
   against what the prop promises. A nested document now reports to the closest `onError` up its parents.
+- **The `form` prop is described as what it does.** Its type said the document renders inside
+  `<form onSubmit {...form}>`. The document a host mounts has had no `<form>` around it since 2025-03, so
+  Enter in a field submits nothing, and that stays. Only a document with no content still had an empty
+  `<form>`, and it has none now either. A document a `Data` node nests renders inside its own, as before.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the

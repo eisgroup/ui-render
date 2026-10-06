@@ -420,8 +420,10 @@ export class UIRender extends DocumentInstance {
             </Container>
             : <Container {...props}>
                 {childBefore}
-                {(form && !embedded) ? (content ||
-                    <form onSubmit={this.handleSubmit} {...form}>{content}</form>) : content}
+                {/* No `<form>` around the document a host mounts, whatever `form` is. There has been
+                    none since ae72179b (2025-03), whose `content || <form …>` left one only around a
+                    document with no content, and a host relies on Enter in a field submitting nothing. */}
+                {content}
                 {childAfter}
                 <Modal />
             </Container>

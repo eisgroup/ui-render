@@ -340,6 +340,25 @@ describe('UIRender public form contracts', () => {
         expect(submitted[0]).toEqual(expect.objectContaining({ note: 'short enough' }))
     })
 
+    it('renders no <form> around the document a host mounts, whatever `form` is; a nested document has one', () => {
+        // The contract promised `<form onSubmit {...form}>`, which this document has not had since
+        // ae72179b (2025-03): `content || <form …>` left a form only around a document with no content.
+        // The contract now says what it does, and so does the render: no form, also with no content.
+        const meta = formMeta(
+            { view: 'Input', name: 'first', label: 'First' },
+            { view: 'Data', kind: 'Nested', meta: { view: 'Input', name: 'second', label: 'Second' } },
+        )
+        const { container, rerender } = render(withProviders(
+            <UIRender form={{ id: 'host-form' }} meta={meta} data={{}} initialValues={{}} onSubmit={() => {}} />
+        ))
+        expect(container.querySelector('#host-form')).toBeNull()
+        expect(screen.getByLabelText('First').closest('form')).toBeNull()
+        expect(screen.getByLabelText('Second').closest('form')).toHaveAttribute('kind', 'Nested')
+
+        rerender(withProviders(<UIRender form={{ id: 'host-form' }} meta={meta} data={null} onSubmit={() => {}} />))
+        expect(container.querySelector('form')).toBeNull()
+    })
+
     it('renders an empty field with `format: \'uppercase\'`, and shows what was typed in capitals', async () => {
         // final-form formats an empty field's `undefined`, and `uppercase` called `toUpperCase` on it:
         // the field's render threw, so an empty field with this format never rendered.

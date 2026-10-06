@@ -211,7 +211,11 @@ export interface UIRenderProps<Data = unknown> {
     initialValues?: Data
     childBefore?: React.ReactNode
     childAfter?: React.ReactNode
-    /** If given, the document renders inside `<form onSubmit {...form}>`. */
+    /**
+     * Renders no element in the document a host mounts, which has no `<form>` around it, so Enter in
+     * a field submits nothing. A document a `Data` node nests renders inside `<form onSubmit {...form}>`,
+     * unless it is `embedded`.
+     */
     form?: boolean | UIRenderFormOptions
     /** Whether to disable rendering of the wrapper scroll view and the html form. */
     embedded?: boolean
