@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { Fragment, memo } from 'react'
 import Render from '../index'
 
 // `Render` is read where it is called, inside the component, and never captured in a module-level
@@ -89,13 +89,20 @@ export function createPopupContent () {
         // This ensures they are available in Render.props and passed down correctly
         // Set relativeData to false to prevent Render.tsx from automatically extracting data by name
         // This ensures _data remains the single row element throughout the render tree
-        // Add key prop to avoid React warning about missing keys
-        return mappedItems.map((item, idx) => Render({
-            ...item,
-            relativePath,
-            relativeIndex,
-            relativeData: false, // Prevent automatic data extraction by name in Render.tsx
-            key: item.id || item.name || `popup-item-${idx}`
-        }))
+        //
+        // Keyed by position, as `items.map(Render)` keys every other list of nodes. The key used to ride
+        // in the props handed to `Render`, which sets the element's key from its own index argument,
+        // undefined here: so every template popup logged React's missing-key warning, until 2026-10-06. Not `Render(props, idx)`: the index is also the node's meta path, and
+        // a popup's items are not at `items[idx]` of the document this renders in.
+        return mappedItems.map((item, idx) => (
+            <Fragment key={idx}>
+                {Render({
+                    ...item,
+                    relativePath,
+                    relativeIndex,
+                    relativeData: false, // Prevent automatic data extraction by name in Render.tsx
+                })}
+            </Fragment>
+        ))
     })
 }

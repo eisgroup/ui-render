@@ -231,13 +231,20 @@ describe('mapper RenderComponent', () => {
     })
 
     it('renders TABLE_CELLS as fragment of Table.Cells', () => {
-        const { container } = r({
-            view: FIELD.TYPE.TABLE_CELLS,
-            items: [
-                { view: FIELD.TYPE.TEXT, children: 'cell-1' },
-                { view: FIELD.TYPE.TEXT, children: 'cell-2' },
-            ],
-        })
+        // Inside a row, where cells belong, so React has no nesting to warn about.
+        const { container } = render(wrap(
+            <table><tbody><tr>
+                {Render({
+                    instance: defaultInstance,
+                    view: FIELD.TYPE.TABLE_CELLS,
+                    items: [
+                        { view: FIELD.TYPE.TEXT, children: 'cell-1' },
+                        { view: FIELD.TYPE.TEXT, children: 'cell-2' },
+                    ],
+                    data: {},
+                })}
+            </tr></tbody></table>
+        ))
         expect(container.querySelectorAll('td').length).toBe(2)
         expect(container.textContent).toContain('cell-1')
     })

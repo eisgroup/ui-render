@@ -8,6 +8,10 @@ module.exports = {
         '<rootDir>/node_modules/(?!(react-markdown|remark-gfm|remark-toc|unified|remark-parse|bail|trough|vfile|unist-util-stringify-position|mdast-util-from-markdown|mdast-util-to-string|micromark|decode-named-character-reference|character-entities|mdast-util-to-hast|trim-lines|property-information|hast-util-whitespace|space-separated-tokens|comma-separated-tokens|devlop|ccount|escape-string-regexp|markdown-table|zwitch|longest-streak|hast-util-to-text)/)',
     ],
     setupFiles: ['<rootDir>/src/style/__tests__/setup.js'],
+    // A test that prints to console.error or console.warn fails: that is how React reports what is
+    // wrong with a render, and a passing test's output is read by nobody. The file says how a test
+    // that expects a line asserts it. Inherited by every leg that spreads this config.
+    setupFilesAfterEnv: ['<rootDir>/scripts/jest-console-guard.js'],
     modulePathIgnorePatterns: ['<rootDir>/\\.[^/]+/worktrees/'],
     // `<rootDir>/e2e/` is the Playwright leg (playwright.config.js). Jest's `roots` is the repo
     // root and its default testMatch claims `**/__tests__/**`, `**/*.spec.js` and `**/*.test.js`,

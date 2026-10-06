@@ -164,14 +164,20 @@ describe('a document instance hosted by a function component', () => {
         expect(reported).toEqual([])
         // How often StrictMode repeats render-phase work depends on the React version. React 19
         // reuses a function component's hooks for the second render of a mount, so the host is
-        // constructed once where the class is constructed twice (measured in the React 19 advisory
-        // job). Up to 18 that second render starts from fresh hooks, and the counts are the class's.
+        // constructed once where the class is constructed twice, and the second render finds the
+        // props it derived from already seen (measured on the React 19 leg). Up to 18 that second
+        // render starts from fresh hooks, and the counts are the class's.
+        const receives = log => log.filter(line => line.startsWith('receive '))
+        expect(count(hostLog, 'render')).toBe(count(classLog, 'render'))
         if (Number(React.version.split('.')[0]) <= 18) {
             expect(count(hostLog, 'constructor')).toBe(count(classLog, 'constructor'))
-            expect(count(hostLog, 'render')).toBe(count(classLog, 'render'))
             // Every derivation the class made, the host made twice, and alike.
-            const receives = log => log.filter(line => line.startsWith('receive '))
             expect(receives(hostLog)).toEqual(receives(classLog).flatMap(line => [line, line]))
+        } else {
+            // Until 2026-10-06 nothing was asserted here, so these counts went unchecked on 19.
+            expect(count(hostLog, 'constructor')).toBe(count(classLog, 'constructor') / 2)
+            // Every derivation the class made, the host made once, and alike.
+            expect(receives(hostLog)).toEqual(receives(classLog))
         }
     })
 

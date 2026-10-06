@@ -185,12 +185,16 @@ describe('InputDate rc-picker and form contracts', () => {
         ['slash separated', '2026/01/02', '2026-01-02'],
         ['long month name', 'Jan 2, 2026', '2026-01-02'],
     ])('falls back to a lenient parse for a %s value', (_name, value, expected) => {
+        // The lenient parse is moment's own, and moment prints a deprecation warning for a string it
+        // reads that way, once per process. Expected here, so it is kept off the console.
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
         render(withConfig(
             <InputDate name="effectiveDate" value={value} />,
             { dateFormat: 'YYYY-MM-DD' }
         ))
 
         expect(pickerProps().value.format('YYYY-MM-DD')).toBe(expected)
+        warn.mockRestore()
     })
 
     it('still prefers the configured format over a lenient reading', () => {

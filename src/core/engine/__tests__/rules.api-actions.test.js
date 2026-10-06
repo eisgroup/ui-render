@@ -6,7 +6,7 @@ if (typeof global.fetch === 'undefined') {
 }
 
 import React from 'react' // eslint-disable-line import/first
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
 // Load form registration before rules.tsx follows the mapper/renders cycle.
 import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
@@ -200,7 +200,11 @@ describe('UIRender additional action and error contracts', () => {
         ))
 
         const readFormData = getFormData.mock.calls[0][0]
-        fireEvent.click(screen.getByRole('button', { name: 'Apply periods' }))
+        // Inside act: the host's promise settles into the document's update.
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Apply periods' }))
+            await new Promise(resolve => setTimeout(resolve, 0))
+        })
 
         await waitFor(() => expect(screen.getByText('After apply')).toBeInTheDocument())
         expect(updateExperienceData).toHaveBeenCalledWith(initialValues)

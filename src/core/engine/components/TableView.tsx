@@ -352,7 +352,7 @@ function TableView (props: TableViewProps) {
   }
 
   // Render Row Cells (in default layout)
-  const renderItemData = (item: TableItem, index: number, {id, renderCell, classNameCellWrap = '', classNameCell: className, styleCell: style}: TableHeader) => {
+  const renderItemData = (item: TableItem, index: number, {id, renderCell, classNameCellWrap = '', classNameCell: className, styleCell: style}: TableHeader, column?: number) => {
     // Conditional rendering logic based on given cell data
     const { additionalCellsStyles } = props
     // Headers without an `id` are section dividers — they render as empty body cells.
@@ -379,7 +379,9 @@ function TableView (props: TableViewProps) {
       // in-house `Table.Cell` omits an empty className itself, so the 199 inert `class=""` the
       // `-last` fix traded for are gone too. `getStickyCellClassName` still returns '' here --
       // suppressing the attribute is the cell's job, at the DOM edge, in one place.
-      <Table.Cell key={props.vertical ? index : id} className={cellClassName} style={cellStyle}>
+      // A section divider has no `id` to key its cell by, so it is keyed by its column: a table with one
+      // logged React's missing-key warning, until 2026-10-06.
+      <Table.Cell key={props.vertical ? index : (id != null ? id : `#${column}`)} className={cellClassName} style={cellStyle}>
         {isReactNode
           ? (typeof content === 'object'
             ? content
@@ -413,7 +415,7 @@ function TableView (props: TableViewProps) {
       <Fragment key={index}>
         {/* Casts, not guards: a string by now, and `headers` is set whenever rows render (see below). */}
         <Table.Row className={className as string | undefined}>
-          {renderItemCells ? renderItemCells(item, index) : headers!.map(header => renderItemData(item, index, header))}
+          {renderItemCells ? renderItemCells(item, index) : headers!.map((header, column) => renderItemData(item, index, header, column))}
         </Table.Row>
         {renderItem && expandedByRow(index) &&
           <Table.Row>

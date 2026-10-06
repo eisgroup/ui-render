@@ -99,10 +99,12 @@ jobs:
         run: npm run test:pack:consumer
 
       # The step above only ever sees the React the lockfile installs, so the declared 16.14, 17 and 19 ends of
-      # peerDependencies had no runtime coverage at all. This re-runs the same smoke against React installed
-      # into a throwaway directory — the repository's own node_modules is never touched. It checks the
-      # published artifact, which is what a peer range is a claim about; it is not a substitute for running
-      # the suite on those versions (see docs/UPGRADE-PLAN.md §8, "CI coverage of the declared peer range").
+      # peerDependencies had no runtime coverage at all. This re-runs the same smoke against each of them: the
+      # Reacts the per-React legs below run on, from their fixtures under scripts/fixtures/, which `npm ci`
+      # installed from the lockfile. So it needs no registry, and smokes the patch the legs test (it installed
+      # them from the registry into a throwaway directory until 2026-10-06). It checks the published artifact,
+      # which is what a peer range is a claim about; it is not a substitute for running the suite on those
+      # versions (see docs/UPGRADE-PLAN.md §8, "CI coverage of the declared peer range").
       - name: Smoke the packed tarball across the declared peer range
         run: npm run test:pack:peers
 

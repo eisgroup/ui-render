@@ -50,7 +50,9 @@ export function Text ({
     const { dateFormat } = useContext(ConfigContext) as DateConfig
 
     let component: React.ReactNode = children
-    if (React.isValidElement<{ translate?: Translate }>(children)) {
+    // A component child is handed the translator; a DOM element is not, because there `translate` is
+    // an HTML attribute, and React warned on a function in it (until 2026-10-06).
+    if (React.isValidElement<{ translate?: Translate }>(children) && typeof children.type !== 'string') {
         component = React.cloneElement(children, { translate })
     } else if (typeof children === 'object') {
         component = children

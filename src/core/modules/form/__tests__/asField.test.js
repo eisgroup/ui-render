@@ -6,9 +6,11 @@ import { asField } from '../utils'
 
 // Simple controlled input that uses props.value + props.onChange,
 // like a normal Semantic input would.
-const TestInput = ({ value, onChange, name, error, ...rest }) => (
+// `readonly` is the fields' prop; on an <input> it is `readOnly`, as the real inputs pass it.
+const TestInput = ({ value, onChange, name, error, readonly, ...rest }) => (
     <div>
         <input
+            readOnly={readonly}
             data-testid="ti"
             value={value || ''}
             onChange={(e) => onChange(e.target.value, name, e)}

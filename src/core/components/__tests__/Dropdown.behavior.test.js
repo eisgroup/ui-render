@@ -125,6 +125,8 @@ describe('Dropdown parent value and option contracts', () => {
     it('does not invent a selection for a `multiple` dropdown mounted with an empty array', () => {
         const calls = []
         const onChange = (...args) => calls.push(args)
+        // `multiple` is dropped, and says so once in development; `Dropdown.test.js` tests that warning.
+        jest.spyOn(console, 'warn').mockImplementation(() => {})
 
         render(withConfig(
             <Dropdown multiple options={[{ text: 'A', value: 'a' }, { text: 'B', value: 'b' }]}
@@ -134,6 +136,7 @@ describe('Dropdown parent value and option contracts', () => {
         // `String([])` is `''`, which is in no option list, so the reset guard used to fire and
         // report a selection of the first option before the user had touched anything.
         expect(calls).toEqual([])
+        console.warn.mockRestore()
     })
 
     /**
@@ -243,7 +246,7 @@ describe('Dropdown parent value and option contracts', () => {
         expect(listboxProps).not.toHaveProperty('name')
         expect(listboxProps).not.toHaveProperty('label')
 
-        listboxProps.onChange({}, { value: 'b' })
+        act(() => { listboxProps.onChange({}, { value: 'b' }) })
         expect(onChange).toHaveBeenCalledWith('b', 'category', {})
     })
 
@@ -358,6 +361,8 @@ describe('Dropdown additions contracts', () => {
      * `Listbox` implements it as the `upward` class token.
      */
     it('no longer forwards the addition props, and still forwards `upward`', () => {
+        // Each dropped prop says so once in development; `Dropdown.test.js` tests that warning.
+        jest.spyOn(console, 'warn').mockImplementation(() => {})
         renderDropdown({
             options: objectOptions,
             allowAdditions: true,
@@ -371,5 +376,6 @@ describe('Dropdown additions contracts', () => {
         expect(Object.keys(handed)).not.toContain('allowAdditions')
         expect(Object.keys(handed)).not.toContain('additionLabel')
         expect(Object.keys(handed)).not.toContain('additionPosition')
+        console.warn.mockRestore()
     })
 })

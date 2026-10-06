@@ -14,7 +14,7 @@ if (typeof global.fetch === 'undefined') {
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first
-import { fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
 import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
 import { AppProvider } from '../../providers' // eslint-disable-line import/first
@@ -48,7 +48,11 @@ describe('a download the host rejects', () => {
             </AppProvider>
         )
 
-        fireEvent.click(screen.getByRole('button', { name: 'Download report' }))
+        // Inside act: the host's rejection settles into the popup's update.
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Download report' }))
+            await new Promise(resolve => setTimeout(resolve, 0))
+        })
 
         await waitFor(() => expect(popupRoot).toHaveTextContent('Failed to fetch'))
         expect(popupRoot).toHaveTextContent('Download Failed!')

@@ -252,12 +252,18 @@ describe('TableView', () => {
     })
 
     it('renders nothing for items that do not have id field in header', () => {
-        // Section divider: header with no id renders empty cell
+        // Section divider: header with no id renders empty cell. Its cells are keyed by their column:
+        // they had no key until 2026-10-06, and React warned. React warns once per component stack,
+        // so this must stay the first test of the file to render a divider.
+        const errors = []
+        jest.spyOn(console, 'error').mockImplementation((...args) => { errors.push(String(args[0])) })
         const headers = [{ label: 'Group' }, { id: 'name' }]
         const { container } = render(
             wrap(<TableView items={items} headers={headers} {...defaults} />)
         )
         expect(container.querySelector('table')).toBeInTheDocument()
+        expect(errors.filter(message => message.includes('unique "key"'))).toEqual([])
+        console.error.mockRestore()
     })
 
     it('uses translate function for header label', () => {

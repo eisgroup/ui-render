@@ -60,11 +60,25 @@ describe('Text', () => {
     })
 
     it('renders a child React element via cloneElement', () => {
+        // A DOM element is not handed `translate`: it is an HTML attribute there, and React warned on
+        // the function until 2026-10-06. React warns once per prop name, so this stays the file's first.
+        const errors = []
+        jest.spyOn(console, 'error').mockImplementation((...args) => { errors.push(String(args[0])) })
         const { container } = renderWithConfig(
             <Text>
                 <span data-testid="child">child</span>
             </Text>
         )
         expect(container.querySelector('[data-testid="child"]')).toHaveTextContent('child')
+        expect(errors).toEqual([])
+        console.error.mockRestore()
+    })
+
+    it('hands its translator to a component child', () => {
+        const received = []
+        const Child = ({ translate }) => { received.push(translate); return <i>child</i> }
+        const translate = value => `t:${value}`
+        renderWithConfig(<Text translate={translate}><Child/></Text>)
+        expect(received[0]).toBe(translate)
     })
 })

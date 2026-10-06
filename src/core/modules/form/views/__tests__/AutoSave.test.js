@@ -57,7 +57,8 @@ describe('AutoSave', () => {
         act(() => {
             jest.advanceTimersByTime(100)
         })
-        await Promise.resolve()
+        // Inside act: the save's promise settles into a state update.
+        await act(async () => { await Promise.resolve() })
         expect(onChange).toHaveBeenCalled()
         expect(onChange.mock.calls[0][0]).toEqual({ a: 2 })
     })
@@ -77,7 +78,7 @@ describe('AutoSave', () => {
         act(() => {
             jest.advanceTimersByTime(100)
         })
-        await Promise.resolve()
+        await act(async () => { await Promise.resolve() })
         expect(onChange.mock.calls[0][0]).toEqual({ b: 5 })
     })
 

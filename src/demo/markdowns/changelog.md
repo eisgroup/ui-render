@@ -403,18 +403,32 @@
   eighteen were genuine cleanups, four are suppressions carrying a comment that states why the rule
   does not apply, and three turned out to be the defects listed under Fixes.
 - Removed 14 devDependencies with no references in code, configs, scripts or CI, cutting the
-  installed development tree by 14 packages. This does not affect the published package.
+  installed development tree by 14 packages. Two more went later, `react-router` and
+  `eslint-plugin-react-hooks`, which `react-router-dom` and `eslint-config-react-app` install anyway.
+  This does not affect the published package.
 - Build configuration: the demo build no longer duplicates the shared Babel presets. Every
   pipeline — library, demo and tests — now reads them from one `babel.config.js`, with only the
   development-time refresh transform declared by the demo. Emitted bundles are unchanged.
 - The declared peer range is now tested, not just asserted. The full suite runs on React 16.14, 17
   and 19 in gating checks of their own alongside the React 18 one, and the packed artifact is
-  server-rendered against each of them. The React 19 check began as a non-gating one, so that
+  server-rendered against each of them, from the same installs those checks use, with no registry
+  access. The React 19 check began as a non-gating one, so that
   upstream drift showed up early. Assertions that had been pinned to React version internals — a
   function component's second argument, and component names appended to development warnings — now
   assert behaviour instead, so the same suite passes on React 16.14, 17, 18.3 and 19.
+- A test that prints to `console.error` or `console.warn` fails, on every React the suite runs on.
+  That is where React reports a list without keys or an update outside `act`, and before this 12
+  test files printed such lines on React 18 and 16 on React 16.14 and 17, unread. A test that
+  expects a warning now says so and asserts it.
+- TypeScript checks JSX the way Babel compiles it, through `react/jsx-runtime`, so a file no longer
+  needs `React` in scope for its JSX. The published declarations are unchanged.
 
 #### Fixes
+
+- **A template popup, a table with a section divider, and a `Text` around a DOM element no longer
+  log React warnings in development.** The popup's items and the divider's cells had no `key`, and
+  `Text` handed its translator to an element such as a `<span>`, where `translate` is an HTML
+  attribute. Found when the test suite started failing on console output.
 
 - **Two `UIRender`s on one page keep their form data apart.** Every document read the forms of
   every document on the page: what `getFormData` hands the host, what `showIf` tests, what an
