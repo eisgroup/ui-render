@@ -467,6 +467,11 @@
   popup checked the box behind the popup. The first box in the document keeps the id it always had;
   another takes the next free one, `checkbox-Expand-All-2`, once it is in the document. An `id` the
   meta gives is used as given.
+- **An `Image` given only a `name` loads from the host's `/static/images/`.** Every release from
+  0.32.4 resolved it to `undefined/static/images/<name>`, a page-relative URL that 404s in every host:
+  the library build fixes its environment when it is built, so no homepage reaches it, and the
+  homepage prefix was applied anyway. The prefix applies only when a homepage is set, which in the
+  published build it never is. A host that serves the images elsewhere sets `path` or `src`.
 - **A date the field reads leniently no longer prints Moment's deprecation warning.** A stored date
   in a shape the configured format does not cover, such as `2026-1-2`, still renders, read the way
   Moment read it; the first one printed Moment's deprecation warning to the host's console. The
