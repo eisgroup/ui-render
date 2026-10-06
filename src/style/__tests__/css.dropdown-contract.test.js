@@ -13,7 +13,7 @@
  * five nodes, nobody reads such a list, and it says nothing about which parts matter. Instead, per
  * node, WHAT EACH CLASS TOKEN IS WORTH: the token is removed from the rendered node and the scoped
  * rules that stop matching are counted. A token worth zero is inert and the replacement may drop
- * it; a token worth thirteen is load-bearing and dropping it unstyles the control. That is the
+ * it; a token worth fifteen is load-bearing and dropping it unstyles the control. That is the
  * question a rewrite actually asks, and the numbers below are measured, not chosen.
  *
  * The counts are of `.ui-render`-scoped rules WITH declarations. They include the project's own
@@ -48,7 +48,7 @@ const ENTRY = path.join(STYLE_DIR, 'index.less');
  *              it to true is load-bearing rather than cosmetic. `active`/`visible` are the open
  *              state and only exist while open.
  *   text       the placeholder box. `divider` is Semantic's name for "nothing selected yet".
- *   icon       `icon` and `dropdown` are each worth all thirteen: the rules name `i.icon.dropdown`
+ *   icon       `icon` and `dropdown` are each worth all fourteen: the rules name `i.icon.dropdown`
  *              and `.dropdown.icon`, so BOTH tokens must be on the same element.
  *   menu       `menu` carries most of it; `transition` is the project's own animation layer and
  *              `visible` the open state. `DropdownMenu.js` hard-codes `'menu transition'`.
@@ -76,14 +76,22 @@ const ENTRY = path.join(STYLE_DIR, 'index.less');
  * measured in Chromium: every state of the dropdown computes the same border, shadow, background
  * and radius as before, because `dropdown.overrides` and `input.less` repeat each focus style for
  * `:focus-within`.
+ *
+ * `control` 15 → 17, `icon` 15 → 16 AND `menu` 16 → 17, EACH OF THEIR CLASS TOKENS BY AS MUCH, with
+ * nwsapi 2.2.28, jsdom's selector engine (2026-10-06). Up to 2.2.23 it answered `:focus-within` false
+ * even with focus inside the element, so the four rules those focus repeats add were not counted:
+ * `.ui.selection.dropdown:focus-within` twice on the control, its `i.icon.dropdown` and its `.menu`.
+ * Chromium always matched them, since a click focuses the combobox inside the open dropdown. A styling
+ * count by the rule above (`total` and `worth` moved together), and nothing about how the dropdown
+ * looks changed: the count caught up with the browser.
  */
 const TOKEN_CONTRACT = {
-    control: { classes: 'ui selection dropdown active visible', total: 15,
-        worth: { ui: 13, dropdown: 13, selection: 12, active: 4, visible: 1 } },
+    control: { classes: 'ui selection dropdown active visible', total: 17,
+        worth: { ui: 15, dropdown: 15, selection: 14, active: 4, visible: 1 } },
     text: { classes: 'text divider', total: 10, worth: { text: 7, divider: 2 } },
-    icon: { classes: 'icon dropdown', total: 15, worth: { icon: 13, dropdown: 13 } },
-    menu: { classes: 'menu transition visible', total: 16,
-        worth: { menu: 11, transition: 4, visible: 3 } },
+    icon: { classes: 'icon dropdown', total: 16, worth: { icon: 14, dropdown: 14 } },
+    menu: { classes: 'menu transition visible', total: 17,
+        worth: { menu: 12, transition: 4, visible: 3 } },
     option: { classes: 'item selected active', total: 9,
         worth: { item: 6, active: 2, selected: 1 } },
 };

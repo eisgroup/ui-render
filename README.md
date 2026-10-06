@@ -9,10 +9,10 @@ https://eisgroup.github.io/ui-render/
 
 [`docs/SUPPORTED-VIEWS.md`](docs/SUPPORTED-VIEWS.md) lists every name a `meta.json` may use — the
 `view` of a node, the value of a `render*` attribute, and the action names accepted by `onClick`,
-`onChange` and `onDone` — including the views that are declared as constants but that no resolver
-case handles. The page is generated from the `FIELD` constants plus the resolver source, so run
-`npm run docs:views` after adding or removing either; a contract test fails while the page and the
-source disagree.
+`onChange` and `onDone` — and puts any view that is declared as a constant but that no resolver case
+handles in a table of its own. The page is generated from the `FIELD` constants plus the resolver
+source, so run `npm run docs:views` after adding or removing either; a contract test fails while the
+page and the source disagree.
 
 ## Supported props on `Table`, `Tooltip` and `Select` / `Dropdown`
 
@@ -29,7 +29,9 @@ example corpus.
 
 `eis-ui-render` declares the following **peer dependencies**. The host application must install
 them explicitly — they are not bundled. React must remain a single shared instance, while Moment
-must be supplied by the host because the library build externalizes it.
+must be supplied by the host because the library build externalizes it. The bundle also imports
+`react/jsx-runtime`, which every React in the range ships, from the host's React: a build that
+aliases `react` to one copy must alias `react/jsx-runtime` the same way.
 
 | Package | Required version | Why it must be a peer |
 |---|---|---|
@@ -70,8 +72,8 @@ React's real global name, so it has never worked.
 ## Styles and assets (consumer)
 
 The library entry deliberately does not inject CSS, so the host loads the stylesheet itself. Both
-paths below work and resolve to the same rules — `dist/static/*.css` are one-line `@import`
-re-exports, so the bytes ship only once:
+paths below work and resolve to the same rules — `dist/static/all.css` and `font.css` are one-line
+`@import` re-exports, so the bytes ship only once (`semantic.css` is an empty stub in both folders):
 
 ```js
 import 'eis-ui-render/static/all.css'   // or 'eis-ui-render/dist/static/all.css'
@@ -86,14 +88,14 @@ cp -R node_modules/eis-ui-render/static ./public/
 ```
 
 An `Image` given only a `name` loads it from `/static/images/<name>`, relative to the host's web
-root. The package ships no images, so those files are the host's own. Earlier releases also
-carried `static/images/flags/`, 266 country-flag SVGs that nothing in the library used; a host that
-links them now ships its own copy.
+root, with the name lower-cased and each whitespace character replaced by `-`. The package ships no
+images, so those files are the host's own. Earlier releases also carried `static/images/flags/`, 266
+country-flag SVGs that nothing in the library used; a host that links them now ships its own copy.
 
-A host that serves `static/` under a sub-path or a CDN sets `path` (or `src`) on the `Image` in its
-meta; the library build fixes its environment at build time, so no host environment variable reaches
-it. Releases 0.32.4 to 0.34.3 resolved a name-only `Image` to a page-relative
-`undefined/static/images/<name>` instead, which 404s.
+A host that serves `static/` under a sub-path or a CDN sets `path` (the images folder, ending in `/`,
+which the name is appended to) or `src` on the `Image` in its meta; the library build fixes its
+environment at build time, so no host environment variable reaches it. Releases 0.32.4 to 0.34.3
+resolved a name-only `Image` to a page-relative `undefined/static/images/<name>` instead, which 404s.
 
 ## The meta.json contract (consumer)
 
@@ -130,9 +132,12 @@ React component, so nodes accept properties the schema does not list, and `view`
 action and normalizer names suggest the built-in vocabulary without rejecting an unlisted string —
 the renderer accepts those too. What the schema does constrain is the handful of shapes the engine
 genuinely requires (`items`/`headers`/`extraItems`/`extraHeaders` must be arrays, `name` must be a
-string), each of which is otherwise a render-time crash.
+string), each of which is otherwise a render-time crash, plus the type of a few attributes the engine
+reads, such as `relativeData` and `showIf`, and the format of `metaVersion`.
 
-`$schema` is stripped before rendering, so adding it changes no output.
+`$schema` is stripped before rendering, so adding it changes no output. So is a `_comment` attribute
+on any node, a note for the next author; the schema does not declare it, so an editor will not
+suggest it.
 
 ### Dev-mode validation
 
@@ -154,7 +159,8 @@ node rather than leaving a stack trace inside a minified bundle:
 `error` means the engine will fail on that node; `warning` means it will render, but silently
 degraded — an unknown `view` becomes a "field does not exist" placeholder, an unknown
 `render*` method falls back to plain text. Pass a function instead of `true` to collect the
-problems yourself (`validateMeta={problems => …}`); the reporter never throws into the host
+problems yourself (`validateMeta={problems => …}`), and keep it a stable reference: the check runs
+again whenever `meta` or this prop changes identity. The reporter never throws into the host
 application, whatever it finds.
 
 ### Contract version
@@ -169,7 +175,7 @@ record which contract it was authored against. The current contract version is *
   ones. Declaring a version equal to or below what the library implements is always compatible.
 - The engine **ignores the value** and strips the field before rendering: declaring it never
   changes output. Dev-mode validation is the only thing that reads it, and only to report a
-  malformed value, a version newer than the installed library implements, or a `metaVersion`
+  malformed value, a major version newer than the installed library implements, or a `metaVersion`
   placed on a nested node, where it means nothing.
 
 There is no negotiation beyond that, deliberately: the field exists so a future contract change
@@ -196,9 +202,9 @@ exactly like a top-level field:
 | `language` | `en` | published as a CSS class on the renderer's shell (`.app.lang--fr`) |
 
 Each is merged, not replaced: passing only `dateFormat` leaves `currency` and `language` at
-their inherited values. `currency` is **not** `meta.currencyCode` — that one selects the
-currency symbol the value renderers print, and is declared in meta rather than passed as a
-prop.
+their defaults. `currency` is **not** `meta.currencyCode` — that one selects the currency symbol
+a value renderer declared as an object prints (`{"name": "Currency"}`; the string form `"Currency"`
+always prints `$`), and is declared in meta rather than passed as a prop.
 
 > These props used to be accepted and then silently ignored — every date rendered as
 > `MM-DD-YYYY` whatever was passed. If your application has been passing `dateFormat` and
@@ -267,7 +273,11 @@ terminal and over the page; lint does not run here, so run `npm run lint:js` for
 Runs the browser leg of the contract suite (Playwright, Chromium) over a production build of the
 demo. It records what the tooltip actually does in a real browser — where the bubble lands relative
 to its trigger, whether it flips at a viewport edge, whether it is clipped, whether our CSS paints
-it — which is the class of fact the jsdom suites cannot express at all.
+it — which is the class of fact the jsdom suites cannot express at all. It also drives the keyboard
+through the tooltip, the dropdown, the tabs, an Expand title and the upload drop zone, and the views
+a user acts on: the date input's calendar, the popup, the slider, a toggle, a checkbox, the dropdown
+by pointer, table sorting and pages, and progress steps. `e2e/view-coverage.js` names, for each
+`view`, the tests that drive it or why none needs to, and a contract test keeps that map complete.
 
 Run `npm run test:e2e:install` once per machine first: it downloads Chromium into the Playwright
 cache (~570 MB on disk). That download is deliberately **not** wired into `npm install`, so a plain
@@ -288,13 +298,17 @@ before changing an assertion.
 - Bump the package version with `npm version patch` (or `minor`, `major`, or an explicit version).
   This also synchronizes every tracked `data-version` attribute.
 - Inspect the package contents with `npm pack --dry-run`.
-  The `prepack` lifecycle verifies version synchronization and builds the library automatically.
+  The `prepack` lifecycle verifies version synchronization, checks that the generated
+  `docs/SUPPORTED-VIEWS.md` and `docs/SUPPORTED-PROPS.md` are current, and builds the library
+  automatically.
 - The build writes what the bundle carries from other packages into `dist/`: the licence file of
   each one in `THIRD-PARTY-LICENSES.txt`, and a CycloneDX SBOM in `sbom.cdx.json`. A bundled package
   with no licence file fails the build.
 - Verify the artifact with `npm run test:pack`. It enforces the packaging budgets and then packs,
   extracts and server-renders the tarball in a throwaway consumer that has only the three peer
-  dependencies available. CI runs both gates on every pull request.
+  dependencies available. CI runs both gates on every pull request. After a build,
+  `npm run test:pack:peers` repeats that server render against React 16.14, 17 and 19, and CI runs
+  it too.
 - Login to npm with `npm login` if needed.
 - Publish the verified version with `npm publish`. The same `prepack` checks and build run again
   immediately before npm creates the published package.

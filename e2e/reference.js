@@ -520,15 +520,17 @@ const DATE_INPUT = {
  */
 const POPUP = {
     /**
-     * [R->I] DEFECTS, all four. Nothing carries `role="dialog"` or `aria-modal`, so a screen reader
-     * is not told a dialog opened. Focus stays where it was, on the trigger behind the backdrop. Tab
-     * walks on through the page under the backdrop, and Escape does nothing: the backdrop and the Ok
-     * button are the only ways out. A fix (the WAI-ARIA dialog pattern) flips each value.
+     * [I] since 2026-10-06, when the four defects pinned here were fixed by the WAI-ARIA modal dialog
+     * pattern. Then nothing carried `role="dialog"` or `aria-modal`, so a screen reader was not told a
+     * dialog opened; focus stayed on the trigger behind the backdrop; Tab walked on through the page
+     * under it; and Escape did nothing, the backdrop and the Ok button being the only ways out. Now
+     * the box is a modal dialog, opening it moves focus to its first control, Tab and Shift+Tab stay
+     * inside it, Escape closes it, and closing it gives focus back to the trigger.
      */
-    DIALOG_ROLE_COUNT: 0,
-    FOCUS_MOVES_IN: false,
-    TAB_STAYS_IN: false,
-    ESCAPE_CLOSES: false,
+    DIALOG_ROLE_COUNT: 1,
+    FOCUS_MOVES_IN: true,
+    TAB_STAYS_IN: true,
+    ESCAPE_CLOSES: true,
 }
 
 /** The first slider of the `slider` example: `volume`, 0 to 100, step 1, starting at 35. */
@@ -559,15 +561,25 @@ const CHECKBOX = {
     /** [I] What it opens and closes in `tableNested`: the two top rows. */
     ROW_TITLES: ['Gold', 'Silver'],
     /**
-     * [R->I] DEFECT. With no `id`, `Checkbox` derives one from its label (`checkbox-` + the label,
-     * spaces as dashes). `popupContent` renders the same table twice, once in the popup and once
-     * behind it, so the document holds two inputs with that id, and a `<label for>` resolves to the
-     * first: a click on the label inside the popup checks the box behind it, whose rows open, and
-     * leaves its own box and rows as they were. A unique id per instance flips this.
+     * [I] since 2026-10-06; until then a DEFECT pinned here. With no `id`, `Checkbox` derives one from
+     * its label (`checkbox-` + the label, spaces as dashes). `popupContent` renders the same table
+     * twice, once in the popup and once behind it, so the document held two inputs with that id, and
+     * a `<label for>` resolves to the first: a click on the label inside the popup checked the box
+     * behind it, whose rows opened, and left its own box and rows as they were. Now the first box in
+     * the document keeps the derived id, as every box did, and the popup's, mounted beside it, takes
+     * the next free one.
      */
     DERIVED_ID: 'checkbox-Expand-All',
-    INSTANCES_SHARING_THE_ID: 2,
-    AFTER_CLICK_IN_POPUP: [{ inPopup: false, checked: true }, { inPopup: true, checked: false }],
+    IN_POPUP_DOCUMENT: {
+        before: [
+            { id: 'checkbox-Expand-All', inPopup: false, checked: false },
+            { id: 'checkbox-Expand-All-2', inPopup: true, checked: false },
+        ],
+        afterClickInPopup: [
+            { id: 'checkbox-Expand-All', inPopup: false, checked: false },
+            { id: 'checkbox-Expand-All-2', inPopup: true, checked: true },
+        ],
+    },
 }
 
 /** `view: 'Dropdown'` driven by the pointer, in the `dropdown` example. */

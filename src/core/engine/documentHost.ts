@@ -29,7 +29,7 @@
  * `componentDidUpdate`.
  *
  * `documentHost.test.js` runs one script through a React class and through the host and pins that
- * both do the same thing, on React 16, 17 and 18, and under StrictMode. One difference is
+ * both do the same thing, on React 16, 17, 18 and 19, and under StrictMode. One difference is
  * deliberate: an update that changes nothing renders again, where React skipped the render and
  * still called back after the commit. The engine makes no such update.
  */

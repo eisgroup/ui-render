@@ -20,29 +20,29 @@ Below you can find the list of commonly used CSS styles.
 
 ## Distribution
 - **reverse** - revert the rending order of child items from the order they are defined in the component (RTL support)
-- **rtl** - RTL (Right to Left) text direction (for languages, such as Japanese)
+- **rtl** - RTL (Right to Left) text direction (for languages, such as Arabic or Hebrew)
 - **wrap** - required for horizontal layout to be responsive (arranges child items to new lines on narrow/mobile screens)
 
 ## Effects
 - **inverted** - inverts text/border color
-- **primary** - 
-- **secondary** -
-- **error** -  
-- **info** - 
-- **success** - 
-- **warning** - 
-- **grey** - 
+- **primary** - text in the theme's primary color, or a button with it as background (blue at the moment of writing)
+- **secondary** - text in the theme's secondary color, or a button with it as background (teal at the moment of writing)
+- **error** - text in the theme's error color, or a button with it as background (red at the moment of writing)
+- **info** - text in the theme's info color, or a button with it as background (blue at the moment of writing)
+- **success** - text in the theme's success color, or a button with it as background (green at the moment of writing)
+- **warning** - text in the theme's warning color, or a button with it as background (orange at the moment of writing)
+- **grey** - grey text, or a button with a grey background
 - 
 - **bg-grey** - grey background color
 - **bg-grey-light/lighter/lightest** - grey background color with adjusted tone (i.e. "bg-grey-lightest" = lightest)
-- **bg-black** - black background color
+- **bg-black** - off-black (dark grey) background color
 - **bg-white** - white background color
 - **bg-error** - background using the theme's error color (red at the moment of writing)
-- **bg-info** - background using the theme's info color (teal at the moment of writing)
+- **bg-info** - background using the theme's info color (blue at the moment of writing)
 - **bg-success** - background using the theme's success color (green at the moment of writing)
 - **bg-warning** - background using the theme's warning color (orange at the moment of writing)
 - **bg-error-light** - background using the theme's error light color (light red at the moment of writing)
-- **bg-info-light** - background using the theme's info light color (light teal at the moment of writing)
+- **bg-info-light** - background using the theme's info light color (light blue at the moment of writing)
 - **bg-success-light** - background using the theme's success light color (light green at the moment of writing)
 - **bg-warning-light** - background using the theme's warning light color (light orange at the moment of writing)
 - **bg-primary** - background using the theme's primary color (blue at the moment of writing)

@@ -547,12 +547,12 @@ export default function Tooltip ({
             {isOpen && (
                 <TooltipBubble
                     // DOM boundary (see ./domProps): the rest bag reaches a generic `<span>`, so both
-                    // lists apply. `Tooltip.tsx` filters again on its own spread; applying it here as
+                    // lists apply. `TooltipBubble.tsx` filters again on its own spread; applying it here as
                     // well is what makes this component's boundary derivable from its own source.
                     {...omitProps(supported, ENGINE_PROPS, FIELD_ONLY_PROPS)}
                     {...placementOf(position)}
                     show
-                    // On the BUBBLE, never as a default inside `Tooltip.tsx`: that file is shared with
+                    // On the BUBBLE, never as a default inside `TooltipBubble.tsx`: that file is shared with
                     // `Slider`'s five always-mounted bubbles, `Upload` and the validation tooltip, and
                     // a default `role` there would put five `tooltip` roles into the corpus census.
                     role="tooltip"

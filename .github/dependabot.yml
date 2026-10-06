@@ -5,7 +5,8 @@
 # gates any PR, on every React of the peer range.
 #
 # A week's minor and patch updates arrive as one PR; each major is a PR of its own, because it is a
-# migration to review, not a bump.
+# migration to review, not a bump, except where packages can only move together: those majors arrive
+# as one PR per family.
 version: 2
 updates:
   - package-ecosystem: npm
@@ -16,6 +17,17 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+      # The form stack takes its majors together: react-final-form 7 and final-form-arrays 4 each peer on
+      # final-form 5, so either one alone cannot install (`npm ci` failed with ERESOLVE on #164 and #166).
+      # docs/UPGRADE-PLAN.md §9.7-F4 bumps the four in one PR, after a changelog audit.
+      form-stack:
+        patterns: [final-form, final-form-arrays, react-final-form, react-final-form-arrays]
+        update-types: [major]
+      # Babel's presets peer on the @babel/core of their own major, so @babel/core 8 alone cannot install
+      # beside presets on 7 (#167).
+      babel:
+        patterns: ['@babel/*']
+        update-types: [major]
     ignore:
       # Development and the default suite run on React 18.3 by decision. 16.14, 17 and 19 have fixture legs of
       # their own (scripts/fixtures/, pinned in scripts/fixtures/react-legacy/floors.js), which this does not

@@ -160,7 +160,7 @@ export default function Table ({
 }: TableProps) {
     // DOM boundary: this spread lands on a <table>, where `name` is not a valid attribute.
     // `TableView` filters too, and deliberately keeps doing so — its own test pins the root's
-    // attribute set — but a second caller (`ErrorTable`) does not, so the filter belongs here.
+    // attribute set — but a caller that does not filter would leak it, so the filter belongs here.
     return <table
         // `ui` and `table` are NOT decoration: `.ui.table` is what gives every cell its padding.
         className={classNames('ui', { inverted, striped }, 'table', className)}

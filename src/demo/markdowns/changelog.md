@@ -123,6 +123,14 @@
   a disabled or read-only zone says so with `aria-disabled`, and the hint naming the accepted
   formats appears on keyboard focus as it does on hover. **This changes the markup**: the zone
   gains `role="button"`.
+- **The popup is a dialog.** It had no role, opening it left focus on the control behind the
+  backdrop, Tab walked the page under it, and only the pointer could close it. Now the box is a
+  modal `dialog` (`aria-modal`), named by its title when it has one. Opening it moves focus to its
+  first control, which is the Ok button when the content has none; Tab and Shift+Tab stay inside
+  it; Escape closes it, as the backdrop and Ok still do; and closing it gives focus back to the
+  control that opened it. An Escape that a control inside uses is left to it: an open list or an
+  open calendar closes first. **This changes the markup**: the box gains `role`, `aria-modal` and
+  `aria-labelledby`, its title an `id`, and the popup two focus guards around the box.
 - The text, number and date inputs no longer emit an `aria-describedby` pointing at an element
   that does not exist. The attribute was unconditional while the element carrying the target id
   renders only when there is an error or info message, so every reference in a form without
@@ -434,6 +442,11 @@
 - Dependabot proposes updates every week, of the development dependencies and of the GitHub Actions
   CI runs: a week's minor and patch updates in one pull request, each major in its own. Major
   versions of React and ESLint are held back, with the reason beside each in `.github/dependabot.yml`.
+  The majors of packages that can only move together arrive as one pull request per family: the form
+  stack (`final-form` 5 is what `react-final-form` 7 and `final-form-arrays` 4 need) and Babel.
+- jsdom's selector engine, nwsapi, is on 2.2.28, which matches `:focus-within` as browsers do; 2.2.23
+  answered it false even with focus inside. The dropdown's CSS contract now counts the four
+  `:focus-within` rules Chromium applies to the open, focused dropdown. Nothing it renders changed.
 - The code that neither the library nor the demo uses is gone: 212 exports, 202 of them in the
   internal utilities, and three files, two unused and one empty. What the two builds use was
   measured with webpack, and each module walked from there, until a pass found nothing more. The
@@ -448,6 +461,17 @@
 
 #### Fixes
 
+- **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
+  with no `id` takes one from its label, so two with one label in a document had the same id, and a
+  `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the
+  popup checked the box behind the popup. The first box in the document keeps the id it always had;
+  another takes the next free one, `checkbox-Expand-All-2`, once it is in the document. An `id` the
+  meta gives is used as given.
+- **An `Image` given only a `name` loads from the host's `/static/images/`.** Every release from
+  0.32.4 resolved it to `undefined/static/images/<name>`, a page-relative URL that 404s in every host:
+  the library build fixes its environment when it is built, so no homepage reaches it, and the
+  homepage prefix was applied anyway. The prefix applies only when a homepage is set, which in the
+  published build it never is. A host that serves the images elsewhere sets `path` or `src`.
 - **A date the field reads leniently no longer prints Moment's deprecation warning.** A stored date
   in a shape the configured format does not cover, such as `2026-1-2`, still renders, read the way
   Moment read it; the first one printed Moment's deprecation warning to the host's console. The

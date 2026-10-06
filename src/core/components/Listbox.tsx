@@ -53,10 +53,10 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
  * `dropdown.overrides` and `input.less` repeat each of its focus styles for `:focus-within`.
  *
  * THE CLASS STRING IS A CONTRACT, NOT DECORATION. `css.dropdown-contract.test.js` measures what
- * each token is worth in scoped CSS rules: `ui` and `dropdown` are worth all 13 rules that reach
- * the control and `selection` 12; the icon needs BOTH `icon` and `dropdown` on the same element;
- * `menu` carries 11 of the menu's 14 and `transition` 4; `item` 6 of an option's 7. Change any of
- * them and that many rules stop applying — which is why they are emitted here even though the
+ * each token is worth in scoped CSS rules, and pins the numbers: `ui`, `dropdown` and `selection`
+ * carry nearly every rule that reaches the control; the icon needs BOTH `icon` and `dropdown` on the
+ * same element; `menu` carries most of the menu's rules and `item` most of an option's. Change any
+ * of them and that many rules stop applying — which is why they are emitted here even though the
  * names are Semantic's.
  */
 
@@ -372,7 +372,7 @@ export default function Listbox ({
             {...dropdownProps}
         >
             {/* `divider` is Semantic's name for "this is the selection display", and it is worth
-                two of this node's six rules. It is the combobox too: see the file header. */}
+                two of this node's ten rules. It is the combobox too: see the file header. */}
             <div
                 ref={control}
                 role="combobox"

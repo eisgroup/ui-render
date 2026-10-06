@@ -48,7 +48,7 @@
           }
         },
         "relativeData": {
-          "description": "false makes `name` resolve against the root data.json instead of the inherited local data. Inherited by descendants; a descendant may opt back in with true.",
+          "description": "false stops this node resolving its local data by `name` (a Table still does), so it keeps the data it inherited. In a value transform, a render* definition or a showIf, false reads `name` from the root data.json. Inherited by descendants; a descendant may opt back in with true.",
           "type": [
             "boolean",
             "null"

@@ -41,7 +41,7 @@ export type UploadProps = {
     onClose?: (event: unknown) => void
     /** Callback on cancelled upload or drag leave */
     onBlur?: (...args: unknown[]) => void
-    /** Callback on choosing a file or drag enter */
+    /** Callback when a drag enters the zone */
     onFocus?: (...args: unknown[]) => void
     loading?: boolean
     /** Whether to disable upload */
