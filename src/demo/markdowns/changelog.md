@@ -531,6 +531,9 @@
   document built its actions, so where there is none, in jsdom or an older server, the render threw a
   `ReferenceError` before anything showed. The global is read when the action runs now, which also lets
   it call a polyfill installed after the document was built.
+- **The "Upload: variants" example shows its read-only case.** A read-only upload renders only while
+  it holds a file, and the example's data gave it none, so the case showed a title and nothing under it.
+  Its data gives it one now, and a line under the title says why it is there.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the

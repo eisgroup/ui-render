@@ -149,7 +149,7 @@ const ROLE_CENSUS = {
     showIf: {},
     summaryBox: {},
     upload: { button: 1 },
-    uploadVariants: { button: 3 },
+    uploadVariants: { button: 4 },
     slider: { slider: 6 },
     invalidArray: { table: 2, rowgroup: 4, row: 2, columnheader: 9, listbox: 1, img: 1, combobox: 1 },
     all: { table: 3, rowgroup: 6, row: 10, columnheader: 18, cell: 31, button: 8, checkbox: 1, listbox: 3, option: 4, img: 2, combobox: 3, tab: 3, tablist: 1 },
@@ -202,7 +202,9 @@ const FORM_BINDINGS = {
 // neither seen nor announced.
 // 145 -> 149 the same day, when the four drop zones of the upload examples became buttons, each named
 // by the text it shows.
-const NAMELESS_CONTROLS = { total: 149, nameless: 81 }
+// 149 -> 150, still the same day: `uploadVariants` gives its read-only zone a file, so it shows, named
+// like the others. Without one, a read-only upload renders nothing, and that case showed nothing.
+const NAMELESS_CONTROLS = { total: 150, nameless: 81 }
 
 /** Roles that count as an interactive control for the ledger above. */
 const CONTROL_ROLES = ['textbox', 'spinbutton', 'checkbox', 'combobox', 'listbox', 'slider', 'button', 'tab']
