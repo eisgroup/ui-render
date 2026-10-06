@@ -86,9 +86,16 @@ describe('Modal: the dialog a keyboard and a screen reader meet', () => {
         expect(document.getElementById(dialog().getAttribute('aria-labelledby'))).toHaveTextContent('Report')
     })
 
-    it('carries no name it does not have', () => {
-        render(wrap(<Modal />, open({ title: '' })))
+    it('is named by its message when it has no title, and by "Popup" when it has neither', () => {
+        // A dialog must have a name, and one with no title had none: it is never named by the empty title.
+        const { unmount } = render(wrap(<Modal />, open({ title: '' })))
+        expect(document.getElementById(dialog().getAttribute('aria-labelledby'))).toHaveTextContent('Saved.')
+        expect(document.getElementById(dialog().getAttribute('aria-labelledby'))).toHaveClass('p')
+        unmount()
+
+        render(wrap(<Modal />, open({ title: '', content: <input aria-label="first" /> })))
         expect(dialog()).not.toHaveAttribute('aria-labelledby')
+        expect(dialog()).toHaveAttribute('aria-label', 'Popup')
     })
 
     it('moves focus to its first control, which is Ok when the content has none', () => {

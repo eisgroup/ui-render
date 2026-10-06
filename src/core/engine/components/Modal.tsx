@@ -20,6 +20,9 @@ localiseTranslation({
     ERROR_excMark: {
         [l.ENGLISH]: 'Error!',
     },
+    POPUP: {
+        [l.ENGLISH]: 'Popup',
+    },
 })
 
 /** What sequential focus navigation may stop at; `focus()` itself rules out the rest (hidden, inert). */
@@ -45,8 +48,8 @@ const focusFirstOf = (candidates: HTMLElement[]): boolean => candidates.some((el
  */
 const GUARD_STYLE: React.CSSProperties = { position: 'fixed', top: 1, left: 1, width: 1, height: 0, padding: 0, overflow: 'hidden' }
 
-/** Ids for the dialog's title: a document has one popup, a page may hold several documents. */
-let titles = 0
+/** Ids for the dialog's title and message: a document has one popup, a page may hold several documents. */
+let popups = 0
 
 /**
  * The document's modal. It shows what a `popupOpen` action opened: the content a `view: 'Popup'`
@@ -54,9 +57,10 @@ let titles = 0
  * classes keep that name.
  *
  * A dialog by the WAI-ARIA modal dialog pattern since 2026-10-06. The box is `role="dialog"` with
- * `aria-modal`, named by its title. Opening it moves focus to its first control, which is its Ok
- * button when the content has none; Tab and Shift+Tab stay inside it; Escape closes it, as the
- * backdrop and Ok do; and closing it gives focus back to what had it, the control that opened it.
+ * `aria-modal`, named by its title, or by its message or "Popup" when it has none. Opening it moves
+ * focus to its first control, which is its Ok button when the content has none; Tab and Shift+Tab
+ * stay inside it; Escape closes it, as the backdrop and Ok do; and closing it gives focus back to
+ * what had it, the control that opened it.
  * Before, focus stayed on that control behind the backdrop, Tab walked the page under it, and only
  * the pointer could close it (`e2e/interactive-views.pw.js` measured each).
  */
@@ -65,7 +69,15 @@ const Modal = () => {
     const { isOpen, title, content, togglePopupState } = popup
     const activeClass = isOpen ? ' active' : ''
     const box = useRef<HTMLDivElement>(null)
-    const [titleId] = useState(() => `app__popup__title-${++titles}`)
+    const [{ titleId, messageId }] = useState(() => {
+        popups += 1
+        return { titleId: `app__popup__title-${popups}`, messageId: `app__popup__message-${popups}` }
+    })
+    // A dialog must have a name: its title; else the message it shows, when that is text; else a word for
+    // itself. Until 2026-10-06 a popup with no title had none.
+    const name = title
+        ? { 'aria-labelledby': titleId }
+        : (typeof content === 'string' && content ? { 'aria-labelledby': messageId } : { 'aria-label': _.POPUP })
 
     useEffect(() => {
         if (!isOpen) return undefined
@@ -121,7 +133,7 @@ const Modal = () => {
                     ref={box}
                     role="dialog"
                     aria-modal="true"
-                    aria-labelledby={title ? titleId : undefined}
+                    {...name}
                     className={'flex--col app__popup__box zoomin'}
                     onKeyDown={onKeyDown}
                     style={{
@@ -140,7 +152,7 @@ const Modal = () => {
                                     <Text id={titleId} className="app__popup__box__header__title">{title}</Text>
                                 </View>
                                 <View className="app__popup__box__body">
-                                    {typeof content === 'string' ? <Text
+                                    {typeof content === 'string' ? <Text id={messageId}
                                         className="p center">{content}</Text> : content}
                                 </View>
                                 <View className="app__popup__box__footer center">

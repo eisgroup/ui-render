@@ -146,6 +146,7 @@ test.describe('popup: the modal a `popupOpen` action opens', () => {
         const focusInside = () => page.evaluate(() => Boolean(document.activeElement && document.activeElement.closest('.app__popup [role="dialog"]')))
         await expect(page.getByRole('dialog')).toHaveCount(POPUP.DIALOG_ROLE_COUNT)
         await expect(page.getByRole('dialog')).toHaveAttribute('aria-modal', 'true')
+        await expect(page.getByRole('dialog')).toHaveAccessibleName(POPUP.ACCESSIBLE_NAME)
         expect(await focusInside(), 'opening moves focus into it').toBe(POPUP.FOCUS_MOVES_IN)
 
         // Round the dialog and past its ends, both ways: every stop is inside it.

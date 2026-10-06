@@ -528,6 +528,11 @@ const POPUP = {
      * inside it, Escape closes it, and closing it gives focus back to the trigger.
      */
     DIALOG_ROLE_COUNT: 1,
+    /**
+     * [I] since 2026-10-06. The example's popup has no title, and its dialog had no accessible name, which
+     * a dialog must have. Untitled, it is named by its message when that is text, and by "Popup" otherwise.
+     */
+    ACCESSIBLE_NAME: 'Popup',
     FOCUS_MOVES_IN: true,
     TAB_STAYS_IN: true,
     ESCAPE_CLOSES: true,
