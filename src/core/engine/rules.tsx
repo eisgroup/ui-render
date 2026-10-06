@@ -866,7 +866,9 @@ function Decorator (Class: any) {
 
             FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
             FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
-            FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
+            // The global is read when the action runs. Read here, until 2026-10-06, a document built
+            // where there is no `fetch` threw a ReferenceError before it rendered anything.
+            FIELD.FUNC[FIELD.ACTION.FETCH] = (...args: Parameters<typeof fetch>) => fetch(...args)
             // Bound to this document, and given the title and content that `popupArgs.ts` reads from
             // the caller's arguments and the meta's. It used to be `popupAlert` itself, unbound, so
             // from 2025-04-17, when the alert moved onto the context, every call threw on

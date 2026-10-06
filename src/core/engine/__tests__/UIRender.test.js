@@ -1,4 +1,4 @@
-// fetch is referenced in rules.tsx (FIELD.FUNC[FETCH] = fetch); stub it for jsdom before any import.
+// The `fetch` action calls the global when it runs, which the registry test below does; jsdom has none.
 if (typeof global.fetch === 'undefined') {
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
@@ -40,7 +40,17 @@ describe('UIRender (smoke)', () => {
         // decomposition could drop without any `this` breaking to show for it.
         render(wrap(<UIRender meta={{ view: 'Text', children: 'X' }} data={{}} />))
 
-        expect(FIELD.FUNC[FIELD.ACTION.FETCH]).toBe(global.fetch)
+        // It calls the global `fetch` when it runs, and is no longer the global itself: read while the
+        // actions were built, a document threw where there was none (rules.fetch-action.test.js).
+        const stub = global.fetch
+        const fetched = []
+        global.fetch = (...args) => { fetched.push(args); return stub(...args) }
+        try {
+            FIELD.FUNC[FIELD.ACTION.FETCH]('/data.json', { method: 'GET' })
+        } finally {
+            global.fetch = stub
+        }
+        expect(fetched).toEqual([['/data.json', { method: 'GET' }]])
         for (const action of [FIELD.ACTION.RESET, FIELD.ACTION.SET_STATE, FIELD.ACTION.SUBMIT, FIELD.ACTION.POPUP]) {
             expect(typeof FIELD.FUNC[action]).toBe('function')
         }

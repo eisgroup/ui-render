@@ -527,6 +527,10 @@
 - **`readonly` on a layout node stays off its element.** A field reads `readonly` as a prop; a container
   spread it onto its `<div>` as it was, and React warned of an invalid DOM property in development. The
   DOM boundary strips it from containers now, with `name` and `label`; a field still gets it.
+- **A document renders where there is no global `fetch`.** The `fetch` action read the global while a
+  document built its actions, so where there is none, in jsdom or an older server, the render threw a
+  `ReferenceError` before anything showed. The global is read when the action runs now, which also lets
+  it call a polyfill installed after the document was built.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the
