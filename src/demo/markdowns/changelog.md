@@ -431,9 +431,16 @@
   effects of the code's own layout-effect hooks now. 81 `eslint-disable` comments that suppressed
   nothing are gone. The development tree lost 158 packages to the move and gained 142, and
   `npm audit` reports 35 findings in it, from 43.
+- Dependabot proposes updates every week, of the development dependencies and of the GitHub Actions
+  CI runs: a week's minor and patch updates in one pull request, each major in its own. Major
+  versions of React and ESLint are held back, with the reason beside each in `.github/dependabot.yml`.
 
 #### Fixes
 
+- **A date the field reads leniently no longer prints Moment's deprecation warning.** A stored date
+  in a shape the configured format does not cover, such as `2026-1-2`, still renders, read the way
+  Moment read it; the first one printed Moment's deprecation warning to the host's console. The
+  same steps run one by one now, without it.
 - **A template popup, a table with a section divider, and a `Text` around a DOM element no longer
   log React warnings in development.** The popup's items and the divider's cells had no `key`, and
   `Text` handed its translator to an element such as a `<span>`, where `translate` is an HTML
