@@ -487,6 +487,12 @@
   touched and its validation error never showed. Both resolve as `onClick` does now, by name or as
   `{name, args}`, and a field calls them after its own handling, with what the input passed it. The
   schema and the published types declare them.
+- **Every form of the `Currency` renderer prints the document's currency.** Only `{"name": "Currency"}`
+  at the top of a `render*` attribute read the meta's `currencyCode`: the string form `"Currency"`, and
+  both forms inside a `values` map, printed `$` whatever it was. A code other than `USD`, `EUR` and
+  `GBP` printed no symbol at all, and prints itself now (`JPY` before the amount). A `symbol` the object
+  form gives is printed rather than replaced. **This changes rendered output** for a document whose
+  `currencyCode` is not `USD` and that uses those forms: `$` becomes its currency's symbol.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the

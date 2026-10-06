@@ -238,7 +238,7 @@ const VIEW_CURATION = {
 const RENDERER_CURATION = {
     CURRENCY: {
         summary: 'Number prefixed with a currency symbol, where `decimals` defaults to 2 and `symbol` to `$`.',
-        notes: 'A non-numeric value renders nothing. Written as an object, `{"name": "Currency"}`, it takes the symbol from a `currencyCode` of its own, or else the root meta\'s, and ignores a `symbol`: `$` for `USD`, the default, `€` for `EUR`, `£` for `GBP`, and none for any other code.',
+        notes: 'A non-numeric value renders nothing. In every form, the name or `{"name": "Currency"}`, at the top of a `render*` attribute or inside its `values`, it takes the symbol from the root meta\'s `currencyCode`, or from one an object form gives: `$` for `USD`, the default, `€` for `EUR`, `£` for `GBP`, and the code itself for any other. A `symbol` the object form gives wins over both.',
     },
     DATE: {
         summary: 'Value formatted as a date.',

@@ -304,8 +304,8 @@ cannot replace the failure it was called to report.
 ```js
 {
   currencyCode: 'USD', // default currency code for displaying currency symbol
-                       // Supported codes: 'USD', 'EUR', 'GBP'
-                       // Read by a { name: 'Currency' } renderer; the string 'Currency' always prints $
+                       // 'USD', 'EUR' and 'GBP' print $, € and £; any other code prints itself
+                       // Read by every 'Currency' renderer; a { name: 'Currency', symbol } prints its own
 }
 ```
 
