@@ -19,6 +19,49 @@ describe('Dropzone', () => {
         expect(getByText('drag files here')).toBeInTheDocument()
     })
 
+    it('opens the dialog for Enter and Space on the zone, and leaves other keys and inner controls alone', () => {
+        const { container, getByText } = render(<Dropzone><button>inner</button></Dropzone>)
+        const zone = container.firstChild
+        const clickSpy = jest.spyOn(container.querySelector('input'), 'click').mockImplementation(() => {})
+
+        fireEvent.keyDown(zone, { key: 'Enter' })
+        fireEvent.keyDown(zone, { key: ' ' })
+        fireEvent.keyDown(zone, { key: 'Escape' })
+        fireEvent.keyDown(getByText('inner'), { key: 'Enter' })
+
+        expect(clickSpy).toHaveBeenCalledTimes(2)
+        clickSpy.mockRestore()
+    })
+
+    it('runs a caller\'s onKeyDown first, and does nothing for a key it prevented', () => {
+        const seen = []
+        const onKeyDown = event => { seen.push(event.key); if (event.key === ' ') event.preventDefault() }
+        const { container } = render(<Dropzone onKeyDown={onKeyDown}>x</Dropzone>)
+        const clickSpy = jest.spyOn(container.querySelector('input'), 'click').mockImplementation(() => {})
+
+        fireEvent.keyDown(container.firstChild, { key: ' ' })
+        fireEvent.keyDown(container.firstChild, { key: 'Enter' })
+
+        expect(seen).toEqual([' ', 'Enter'])
+        expect(clickSpy).toHaveBeenCalledTimes(1)
+        clickSpy.mockRestore()
+    })
+
+    it('is a button in the tab order, and a disabled one says so and leaves it', () => {
+        const { container, rerender } = render(<Dropzone>x</Dropzone>)
+        expect(container.firstChild).toHaveAttribute('role', 'button')
+        expect(container.firstChild).toHaveAttribute('tabindex', '0')
+        expect(container.firstChild).not.toHaveAttribute('aria-disabled')
+
+        rerender(<Dropzone disabled>x</Dropzone>)
+        const clickSpy = jest.spyOn(container.querySelector('input'), 'click').mockImplementation(() => {})
+        fireEvent.keyDown(container.firstChild, { key: 'Enter' })
+        expect(container.firstChild).toHaveAttribute('tabindex', '-1')
+        expect(container.firstChild).toHaveAttribute('aria-disabled', 'true')
+        expect(clickSpy).not.toHaveBeenCalled()
+        clickSpy.mockRestore()
+    })
+
     it('forwards open() to click the hidden input', () => {
         const ref = createRef()
         const { container } = render(<Dropzone ref={ref}>x</Dropzone>)

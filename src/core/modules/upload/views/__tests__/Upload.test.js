@@ -104,12 +104,13 @@ describe('Upload', () => {
         expect(getByText('custom')).toBeInTheDocument()
     })
 
-    it('handleKeyPress opens dropzone on Enter', () => {
+    it('opens the dropzone on Enter', () => {
+        // On keydown, as the zone's button pattern has it (Dropzone); a `keypress` handler did until 2026-10-06.
         const wrapper = render(wrap(<Upload fileType="image" name="img" />))
         const div = wrapper.container.querySelector('.upload__dropzone')
         const input = wrapper.container.querySelector('input[type="file"]')
         const spy = jest.spyOn(input, 'click')
-        fireEvent.keyPress(div, { key: 'Enter', code: 'Enter', charCode: 13 })
+        fireEvent.keyDown(div, { key: 'Enter', code: 'Enter' })
         expect(spy).toHaveBeenCalled()
         spy.mockRestore()
     })

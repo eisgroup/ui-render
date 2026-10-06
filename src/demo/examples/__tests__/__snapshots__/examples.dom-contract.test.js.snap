@@ -5895,7 +5895,7 @@ exports[`demo example full-DOM contract upload renders a stable, non-empty DOM m
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
     <div class="flex--col app__upload left">
-      <div class="upload__dropzone input--wrapper button margin-largest" tabindex="0" title="Upload CSV File">
+      <div class="upload__dropzone input--wrapper button margin-largest" role="button" tabindex="0" title="Upload CSV File">
         <input accept=".csv" style="display: none;" tabindex="-1" type="file" />
         <i aria-hidden="true" class="icon-file-upload margin-right-smaller">
         </i>
@@ -5919,7 +5919,7 @@ exports[`demo example full-DOM contract uploadVariants renders a stable, non-emp
         "Click or drop a file. Format hint shows on hover."
       </span>
       <div class="flex--col app__upload">
-        <div class="upload__dropzone input--wrapper" tabindex="0" title="Upload CSV file">
+        <div class="upload__dropzone input--wrapper" role="button" tabindex="0" title="Upload CSV file">
           <input accept=".csv" style="display: none;" tabindex="-1" type="file" />
           <i aria-hidden="true" class="icon-image text largest no-margin">
           </i>
@@ -5949,7 +5949,7 @@ exports[`demo example full-DOM contract uploadVariants renders a stable, non-emp
         "Supports several formats and accepts up to 5 MB per file."
       </span>
       <div class="flex--col app__upload">
-        <div class="upload__dropzone input--wrapper" tabindex="0" title="Upload documents">
+        <div class="upload__dropzone input--wrapper" role="button" tabindex="0" title="Upload documents">
           <input accept=".pdf, .doc, .docx, .txt" multiple="" style="display: none;" tabindex="-1" type="file" />
           <i aria-hidden="true" class="icon-image text largest no-margin">
           </i>
@@ -5976,7 +5976,7 @@ exports[`demo example full-DOM contract uploadVariants renders a stable, non-emp
         "Image upload (button style, no hover hint)"
       </span>
       <div class="flex--col app__upload left">
-        <div class="upload__dropzone input--wrapper button margin-bottom" tabindex="0" title="Upload an image">
+        <div class="upload__dropzone input--wrapper button margin-bottom" role="button" tabindex="0" title="Upload an image">
           <input accept=".png, .jpg, .jpeg, .webp" style="display: none;" tabindex="-1" type="file" />
           <i aria-hidden="true" class="icon-image margin-right-smaller">
           </i>

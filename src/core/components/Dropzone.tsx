@@ -31,6 +31,8 @@ export type DropzoneProps = {
   className?: string
   /** Rendered inside the zone */
   children?: React.ReactNode
+  /** Called before the zone's own key handling; a key it prevents is left alone */
+  onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void
   [key: string]: unknown
 }
 
@@ -39,6 +41,12 @@ export type DropzoneProps = {
  * of `react-dropzone` we use: a wrapping element that opens a hidden file input
  * on click, accepts drag&drop, and preserves the imperative API used by Upload:
  * `open()` plus the underlying `fileInputEl`.
+ *
+ * THE KEYBOARD, since 2026-10-06: the zone is a button by the WAI-ARIA button pattern, in the tab
+ * order unless disabled, and Enter and Space open the dialog as a click does. It was a focusable `div`
+ * with no role, so a screen reader did not say what it was, and only Enter opened it, through a
+ * deprecated `keypress` handler `Upload` added. A key pressed in a control inside the zone is that
+ * control's. A disabled zone says so, `aria-disabled`, and leaves the tab order.
  *
  * Typed by a cast at the end: `forwardRef`'s own type runs the props through `Omit<…, 'ref'>`, which
  * erases every named prop of a type with an index signature. This is the same component with them kept.
@@ -54,6 +62,7 @@ const Dropzone = forwardRef(function Dropzone ({
   inputProps = {},
   className,
   children,
+  onKeyDown,
   ...props
 }: DropzoneProps, ref: React.ForwardedRef<DropzoneHandle>) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -82,6 +91,15 @@ const Dropzone = forwardRef(function Dropzone ({
     if (disabled) return
     // Avoid recursive click when the synthetic click bubbles from the hidden input itself.
     if (e.target === inputRef.current) return
+    inputRef.current && inputRef.current.click()
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (onKeyDown) onKeyDown(e)
+    if (disabled || e.defaultPrevented || e.target !== e.currentTarget) return
+    if (e.key !== 'Enter' && e.key !== ' ') return
+    // Space would scroll the page as well.
+    e.preventDefault()
     inputRef.current && inputRef.current.click()
   }
 
@@ -131,8 +149,12 @@ const Dropzone = forwardRef(function Dropzone ({
 
   return (
     <div
+      role='button'
+      tabIndex={disabled ? -1 : 0}
+      aria-disabled={disabled || undefined}
       className={className}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}

@@ -118,6 +118,11 @@
     its order in `aria-sort`.
   - **This changes the markup**: these elements gain `role`, `tabindex` and `aria-*` attributes.
     A click focuses them now, and the focus ring shows for the keyboard only.
+- **The upload drop zone is a button.** It took keyboard focus with no role, and only Enter opened
+  the file dialog. Now it is a `button`, named by the text it shows: Enter and Space open the dialog,
+  a disabled or read-only zone says so with `aria-disabled`, and the hint naming the accepted
+  formats appears on keyboard focus as it does on hover. **This changes the markup**: the zone
+  gains `role="button"`.
 - The text, number and date inputs no longer emit an `aria-describedby` pointing at an element
   that does not exist. The attribute was unconditional while the element carrying the target id
   renders only when there is an error or info message, so every reference in a form without

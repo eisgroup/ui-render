@@ -60,6 +60,7 @@ describe('Upload interaction contracts', () => {
         const input = container.querySelector('input[type="file"]')
 
         expect(zone).toHaveAttribute('tabindex', '-1')
+        expect(zone).toHaveAttribute('aria-disabled', 'true')
         expect(zone).toHaveClass(mode)
         expect(input).toBeDisabled()
 
@@ -80,8 +81,24 @@ describe('Upload interaction contracts', () => {
         expect(input).toHaveAttribute('accept', '.json')
         expect(screen.getAllByText('json', { exact: false })).not.toHaveLength(0)
 
-        fireEvent.keyPress(zone, { key: 'Space', code: 'Space', charCode: 32 })
+        fireEvent.keyDown(zone, { key: 'a' })
         expect(click).not.toHaveBeenCalled()
+    })
+
+    it('is a button in the tab order that Enter and Space open, as a click does', () => {
+        // Only Enter opened it until 2026-10-06, through a `keypress` handler, and nothing said what it was.
+        const { container } = renderUpload()
+        const zone = container.querySelector('.upload__dropzone')
+        const click = jest.spyOn(container.querySelector('input[type="file"]'), 'click').mockImplementation(() => {})
+
+        expect(zone).toHaveAttribute('role', 'button')
+        expect(zone).toHaveAttribute('tabindex', '0')
+        expect(zone).not.toHaveAttribute('aria-disabled')
+        expect(screen.getByRole('button', { name: /select or drop/i })).toBe(zone)
+
+        fireEvent.keyDown(zone, { key: 'Enter' })
+        fireEvent.keyDown(zone, { key: ' ' })
+        expect(click).toHaveBeenCalledTimes(2)
     })
 
     it('renders a custom hover instruction without replacing the format list', () => {

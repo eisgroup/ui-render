@@ -167,10 +167,6 @@ function Upload (props: UploadProps) {
         }
     }
 
-    const handleKeyPress = (event: React.KeyboardEvent) => {
-        if (event.key === 'Enter') (dropzone.current as DropzoneHandle).open()
-    }
-
     const label = props.label || fileType || _.FILE
     return (
         <View className={classNames('app__upload', classWrap, { round })}>
@@ -188,16 +184,16 @@ function Upload (props: UploadProps) {
                 //   <input type='file'> (that one takes `inputProps`), so it only landed on the
                 //   wrapping <div> as an invalid attribute. The field name is reported to the
                 //   host through onChange(files, name, dropzone) above.
+                // The zone is the button the keyboard reaches, and opens the dialog itself (Dropzone):
+                //   this passed a `keypress` handler for Enter until 2026-10-06.
                 title={translate(title)}
                 inputProps={{ tabIndex: -1 }}
-                tabIndex={disabled || readonly ? -1 : 0}
                 className={classNames('upload__dropzone', className, { active, round, disabled, readonly })}
                 ref={dropzone}
                 onDragEnter={onDragEnter}
                 onDragLeave={onDragLeave}
                 onDrop={handleUpload}
                 onFileDialogCancel={onBlur}
-                onKeyPress={handleKeyPress}
                 accept={formats}
                 multiple={multiple}
                 disabled={disabled || readonly}
