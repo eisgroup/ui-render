@@ -515,6 +515,10 @@
   nested in it got the row's index and value. They get the row too now, when the caller passes one (a
   table cell does). A root-level popup template opened this way with no `relativePath` now prints the
   engine's warning that its fields bind at the root, as it always did when the button was nested.
+- **`colGroup`'s pinned columns pin columns in the default layout.** A body cell looked its pinned
+  style up by its row there: every cell of the first row took the second column's style, and no cell of
+  the first column was pinned. Cells are looked up by column now, and the header of a pinned column is
+  pinned with it. The vertical layout, where the lookup was right, renders as before.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the

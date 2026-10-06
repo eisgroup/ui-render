@@ -616,8 +616,8 @@ for a range slider.
     { id: String, order: 0, sortKey: 'item.attribute' }, // order: -1 descending, 1 ascending, 0 none
   ],
   colGroup: [            // column styles (colgroup HTML element)
-    { style: Object, isFixed: Boolean },
-  ],
+    { style: Object, isFixed: Boolean }, // isFixed pins the column, header included, while the table scrolls
+  ],                                     // sideways; its left offset adds up the style.minWidth of those before it
   usePagination: false,  // enable pagination (renders nav below the table when totalPages > 1)
   rowsPerPage: 20,       // rows per page (default 20)
 }

@@ -367,8 +367,12 @@ function TableView (props: TableViewProps) {
     if (content instanceof Date) {
       content = getDateStringFromDateObject(content)
     }
-    const cellStyle = additionalCellsStyles[index+1] || {}
-    const cellClassName = getStickyCellClassName(cellStyle, classNameCellWrap, additionalCellsStyles[index+2] || {})
+    // The cell's column: given in the default layout; in the vertical one the header takes the first column
+    // and item `index` the one after it. The default layout read the row there until 2026-10-06, so a
+    // pinned column's style landed on a row: every cell of the first row took the second column's.
+    const position = column != null ? column : index + 1
+    const cellStyle = additionalCellsStyles[position] || {}
+    const cellClassName = getStickyCellClassName(cellStyle, classNameCellWrap, additionalCellsStyles[position + 1] || {})
     const isReactNode = content == null
       || typeof content !== 'object'
       || Array.isArray(content)
@@ -427,6 +431,19 @@ function TableView (props: TableViewProps) {
         }
       </Fragment>
     )
+  }
+
+  // A pinned column's header, in the default layout, is pinned with it (the vertical layout pins its header
+  // column below). Its own `styleHeader` is kept, but for what pins it.
+  const pinnedHeader = (header: TableHeader, column: number): TableHeader => {
+    const { additionalCellsStyles } = props
+    const style = additionalCellsStyles[column]
+    if (!style || style.position !== 'sticky') return header
+    return {
+      ...header,
+      styleHeader: {...header.styleHeader, ...style},
+      classNameHeader: getStickyCellClassName(style, header.classNameHeader, additionalCellsStyles[column + 1] || {}),
+    }
   }
 
   // Render Rows (in Vertical layout)
@@ -501,7 +518,7 @@ function TableView (props: TableViewProps) {
                 <Table.Row key={i}>{row.map(renderHeader)}</Table.Row>
             ))}
             {/* Vertical layout does not have horizontal headers */}
-            {!vertical && <Table.Row>{headers.map(renderHeader)}</Table.Row>}
+            {!vertical && <Table.Row>{headers.map((header, column) => renderHeader(pinnedHeader(header, column), column))}</Table.Row>}
           </Table.Header>
           <Table.Body>
             {props.name ? (
