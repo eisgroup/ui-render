@@ -178,9 +178,10 @@ function notWithinRangeValidator (value: unknown, { dataKind, args: argsIn }: { 
 
 FIELD.VALIDATION[FIELD.CROSS_VALIDATE.NOT_WITHIN_RANGE] = notWithinRangeValidator
 
+// `'hh:mm'` went on 2026-10-06: its normalizer was deleted in e6d8b514 (2022-12), and the name, still
+// published in the schema and the types, has resolved to nothing since.
 FIELD.NORMALIZE = {
     DATE: 'date',
-    HOUR_MINUTE: 'hh:mm',
     DOUBLE5: 'double5',
     INTEGER: 'integer',
     PHONE: 'phone',

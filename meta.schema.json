@@ -403,7 +403,6 @@
             "currency",
             "date",
             "double5",
-            "hh:mm",
             "integer",
             "percent",
             "phone",

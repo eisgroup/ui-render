@@ -501,6 +501,10 @@
   `''` unless the field has a `format`, and only `undefined` counted as unset, so the default showed
   only in a field with a `format`. It shows in any unedited field the data leaves unset now, and is
   still never stored. A `''` the data gives is a value: the default stays out of that field.
+- **`'hh:mm'` is no longer suggested as a normalizer name.** Its normalizer was deleted in 2022 and the
+  name resolved to nothing since: a field with `format`, `normalize` or `parse` set to `'hh:mm'` was
+  left as typed, and still is. The schema, the published types and the engine's own list no longer
+  name it; the schema and the types still accept any string, so a meta that uses it stays valid.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the

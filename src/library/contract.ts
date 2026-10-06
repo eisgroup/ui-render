@@ -127,7 +127,7 @@ export type MetaActionName =
     (string & {})
 
 export type MetaNormalizerName =
-    'currency' | 'date' | 'double5' | 'hh:mm' | 'integer' | 'percent' | 'phone' | 'uppercase' |
+    'currency' | 'date' | 'double5' | 'integer' | 'percent' | 'phone' | 'uppercase' |
     (string & {})
 
 export type MetaInputType =
