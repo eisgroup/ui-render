@@ -1,36 +1,12 @@
 import {
-    isNumber,
-    isNumeric,
-    startEndFromNumberRanges,
-    formatNumber,
-    shortNumber,
-    formatSI,
-    toOrdinal,
-    rad,
-    round,
-    roundUp,
-    roundDown,
-    roundTo,
-    roundDownTo,
-    roundUpTo,
-    decimalPlaces,
-    greatestCommonDivisor,
-    randomNumberInRange,
-    toPercentage,
-    toPercent,
+  isNumeric,
+  formatNumber,
+  shortNumber,
+  formatSI,
+  toOrdinal,
+  round,
+  toPercent,
 } from '../number'
-
-describe('isNumber', () => {
-    it('returns true for numbers', () => {
-        expect(isNumber(3)).toBe(true)
-        expect(isNumber(0)).toBe(true)
-        expect(isNumber(Infinity)).toBe(true)
-        expect(isNumber(NaN)).toBe(true)
-    })
-    it('returns false for strings', () => {
-        expect(isNumber('3')).toBe(false)
-    })
-})
 
 describe('isNumeric', () => {
     it('returns true for numbers and numeric strings', () => {
@@ -43,20 +19,6 @@ describe('isNumeric', () => {
         expect(isNumeric('a')).toBe(false)
         expect(isNumeric('')).toBe(false)
         expect(isNumeric(NaN)).toBe(false)
-    })
-})
-
-describe('startEndFromNumberRanges', () => {
-    it('returns start and end from typical ranges', () => {
-        expect(startEndFromNumberRanges([{ from: 1, to: 5 }])).toEqual({ start: 1, end: 5 })
-    })
-    it('finds first non-null from and last non-null to', () => {
-        expect(
-            startEndFromNumberRanges([{ from: null, to: 2 }, { from: 3, to: null }, { from: 5, to: 9 }])
-        ).toEqual({ start: 3, end: 9 })
-    })
-    it('returns undefined end when end <= start', () => {
-        expect(startEndFromNumberRanges([{ from: 10, to: 5 }])).toEqual({ start: 10, end: undefined })
     })
 })
 
@@ -137,83 +99,10 @@ describe('toOrdinal', () => {
     })
 })
 
-describe('rad', () => {
-    it('converts degree to radians', () => {
-        expect(rad(180)).toBeCloseTo(Math.PI)
-        expect(rad(90)).toBeCloseTo(Math.PI / 2)
-    })
-})
-
-describe('round / roundUp / roundDown', () => {
+describe('round', () => {
     it('rounds to given precision', () => {
         expect(round(123.4567, 3)).toBe(123.457)
         expect(round(123.4567)).toBe(123)
-    })
-    it('rounds up', () => {
-        expect(roundUp(123.4561, 3)).toBe(123.457)
-    })
-    it('rounds down', () => {
-        expect(roundDown(123.4569, 3)).toBe(123.456)
-    })
-})
-
-describe('roundTo / roundUpTo / roundDownTo', () => {
-    it('rounds to the closest multiple', () => {
-        expect(roundTo(123.4567, 10)).toBe(120)
-        expect(roundUpTo(123.4567, 10)).toBe(130)
-        expect(roundDownTo(123.4567, 10)).toBe(120)
-    })
-    it('avoids floating-point artifacts', () => {
-        expect(roundTo(1.2, 0.1)).toBe(1.2)
-    })
-})
-
-describe('decimalPlaces', () => {
-    it('counts decimal digits', () => {
-        expect(decimalPlaces(1.234)).toBe(3)
-        expect(decimalPlaces(10)).toBe(0)
-        expect(decimalPlaces('0.1')).toBe(1)
-    })
-    it('adjusts for scientific notation', () => {
-        expect(decimalPlaces(1e-5)).toBe(5)
-    })
-})
-
-describe('greatestCommonDivisor', () => {
-    it('finds gcd', () => {
-        expect(greatestCommonDivisor(12, 8)).toBe(4)
-        expect(greatestCommonDivisor(54, 24)).toBe(6)
-    })
-    it('handles zero', () => {
-        expect(greatestCommonDivisor(7, 0)).toBe(7)
-    })
-})
-
-describe('randomNumberInRange', () => {
-    it('returns a value within the inclusive range', () => {
-        for (let i = 0; i < 25; i++) {
-            const v = randomNumberInRange(1, 5)
-            expect(v).toBeGreaterThanOrEqual(1)
-            expect(v).toBeLessThanOrEqual(5)
-            expect(Number.isInteger(v)).toBe(true)
-        }
-    })
-})
-
-describe('toPercentage', () => {
-    it('returns the percentage change', () => {
-        expect(toPercentage(150, 100)).toBe(50)
-        expect(toPercentage(50, 100)).toBe(-50)
-    })
-    it('returns 0 when both are zero', () => {
-        expect(toPercentage(0, 0)).toBe(0)
-    })
-    it('returns Infinity when base is zero and new is positive', () => {
-        expect(toPercentage(5, 0)).toBe(Infinity)
-        expect(toPercentage(-5, 0)).toBe(-Infinity)
-    })
-    it('returns NaN for non-numeric input', () => {
-        expect(Number.isNaN(toPercentage('x', 1))).toBe(true)
     })
 })
 

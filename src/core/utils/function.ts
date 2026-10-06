@@ -1,4 +1,3 @@
-import { throttle as _throttle } from './lodash-lite'
 import { __DEV__ } from './_envs'
 import { isInListAny } from './array'
 import { TIME_DURATION_INSTANT } from './constants'
@@ -9,7 +8,7 @@ import { TIME_DURATION_INSTANT } from './constants'
  */
 
 /**
- * Any callable, used ONLY as the constraint of the `debounce`/`throttle` generics.
+ * Any callable, used ONLY as the constraint of the `debounce` generic.
  *
  * `never[]` is what makes it accept every concrete function type a caller already has, without
  * this module dictating what that function may take; `Parameters<F>`/`ReturnType<F>` then recover
@@ -23,9 +22,6 @@ export type Debounced<F extends AnyFn> =
 
 /** The option bag `debounce` reads — only `leading`, exactly as at runtime. */
 type DebounceOptions = { leading?: boolean }
-
-/** The option bag `throttle` forwards verbatim to the lodash-lite implementation. */
-type ThrottleOptions = { leading?: boolean, trailing?: boolean }
 
 /**
  * Checks if passed argument is of type function.
@@ -44,16 +40,6 @@ export function isFunction (func: unknown): func is Function {
 
 isFunction.Generator = (function * () {}).constructor
 isFunction.Async = (async () => {}).constructor
-
-/**
- * Check if given function is Asynchronous
- *
- * @param {Function} func - to check
- * @returns {Boolean} true - if it is
- */
-export function isAsync (func: unknown): boolean {
-	return (func as { constructor: { name: string } }).constructor.name === 'AsyncFunction'
-}
 
 /**
  * Check for a Valid Enumerable Value and Throw Error If It's Not
@@ -120,23 +106,4 @@ export function debounce<F extends AnyFn> (
 	}
 
 	return debounced
-}
-
-/**
- * LODASH CLONES ---------------------------------------------------------------
- * -----------------------------------------------------------------------------
- */
-
-/**
- * A wrapper around the lodash's throttle function.
- * @see {@link https://lodash.com/docs/4.17.2#throttle) for further information.
- * @param {Function} func - to call
- * @param {Number} [wait] - milliseconds to delay
- * @param {Object} [options]
- * @returns {function(...[*]=)} - throttled
- */
-export function throttle<F extends AnyFn> (
-	func: F, wait: number = TIME_DURATION_INSTANT, options: ThrottleOptions = {},
-): (this: unknown, ...args: Parameters<F>) => ReturnType<F> | undefined {
-	return _throttle(func, wait, options)
 }

@@ -1,49 +1,13 @@
 import {
-    decimalPlaces,
-    formatNumber,
-    formatSI,
-    greatestCommonDivisor,
-    round,
-    roundDown,
-    roundDownTo,
-    roundTo,
-    roundUp,
-    roundUpTo,
-    shortNumber,
-    startEndFromNumberRanges,
-    toOrdinal,
-    toPercent,
-    toPercentage,
+  formatNumber,
+  formatSI,
+  round,
+  shortNumber,
+  toOrdinal,
+  toPercent,
 } from '../number'
 
 describe('number utility edge contracts', () => {
-    describe('startEndFromNumberRanges', () => {
-        it('returns an empty result when no ranges are available', () => {
-            const emptyResult = { start: undefined, end: undefined }
-
-            expect(startEndFromNumberRanges()).toEqual(emptyResult)
-            expect(startEndFromNumberRanges(null)).toEqual(emptyResult)
-            expect(startEndFromNumberRanges([])).toEqual(emptyResult)
-            expect(startEndFromNumberRanges([{}])).toEqual(emptyResult)
-        })
-
-        it('keeps zero as a valid boundary', () => {
-            expect(startEndFromNumberRanges([{ from: null, to: 0 }, { from: 0, to: 5 }])).toEqual({
-                start: 0,
-                end: 5,
-            })
-            expect(startEndFromNumberRanges([{ to: 4 }, { from: 0 }])).toEqual({ start: 0, end: 4 })
-        })
-
-        it('discards equal and reversed final boundaries', () => {
-            expect(startEndFromNumberRanges([{ from: 0, to: 0 }])).toEqual({ start: 0, end: undefined })
-            expect(startEndFromNumberRanges([{ from: 10, to: 20 }, { from: 20, to: 5 }])).toEqual({
-                start: 10,
-                end: undefined,
-            })
-        })
-    })
-
     describe('formatNumber', () => {
         it('supports independent grouping sizes and delimiters', () => {
             expect(formatNumber(12345678.9, {
@@ -116,56 +80,14 @@ describe('number utility edge contracts', () => {
     describe('rounding defaults', () => {
         it('rounds decimal values to whole numbers when precision is omitted', () => {
             expect(round(1.6)).toBe(2)
-            expect(roundUp(1.01)).toBe(2)
-            expect(roundDown(1.99)).toBe(1)
         })
 
-        it('uses one as the default multiple', () => {
-            expect(roundTo(12.6)).toBe(13)
-            expect(roundUpTo(12.01)).toBe(13)
-            expect(roundDownTo(12.99)).toBe(12)
-        })
-
-        it('supports negative precision and exact decimal multiples', () => {
+        it('supports negative precision', () => {
             expect(round(149, -2)).toBe(100)
-            expect(roundUp(101, -2)).toBe(200)
-            expect(roundDown(199, -2)).toBe(100)
-            expect(roundUpTo(1.2, 0.1)).toBe(1.2)
-            expect(roundDownTo(1.2, 0.1)).toBe(1.2)
         })
     })
 
-    describe('decimal, divisor, and percent edge inputs', () => {
-        it('counts normalized decimals and scientific notation', () => {
-            expect(decimalPlaces(-1.23)).toBe(2)
-            expect(decimalPlaces('1.2300')).toBe(2)
-            expect(decimalPlaces(1.2e-7)).toBe(8)
-            expect(decimalPlaces(1.2e3)).toBe(0)
-            expect(decimalPlaces(NaN)).toBe(0)
-            expect(decimalPlaces(Infinity)).toBe(0)
-            expect(decimalPlaces(null)).toBe(0)
-        })
-
-        it('returns a positive divisor for negative and numeric-string inputs', () => {
-            expect(greatestCommonDivisor(-54, 24)).toBe(6)
-            expect(greatestCommonDivisor(24, -54)).toBe(6)
-            expect(greatestCommonDivisor('54', '24')).toBe(6)
-            expect(greatestCommonDivisor('7', '0')).toBe(7)
-            expect(greatestCommonDivisor(0, 7)).toBe(7)
-        })
-
-        it('uses the established infinity sentinel when a divisor is undefined', () => {
-            expect(greatestCommonDivisor(0, 0)).toBe(Infinity)
-            expect(greatestCommonDivisor('invalid', 2)).toBe(Infinity)
-        })
-
-        it('handles numeric-string zero consistently in percentage changes', () => {
-            expect(toPercentage('150', '100')).toBe(50)
-            expect(toPercentage('0', '0')).toBe(0)
-            expect(toPercentage('5', '0')).toBe(Infinity)
-            expect(toPercentage('-5', '0')).toBe(-Infinity)
-        })
-
+    describe('percent edge inputs', () => {
         it('formats signed numeric strings and rejects non-finite percentages', () => {
             expect(toPercent('0.125')).toBe('13%')
             expect(toPercent('0.125', 1)).toBe('12.5%')

@@ -6,41 +6,19 @@
 // values this module inspects, element generics only where the runtime genuinely passes a value
 // through, and no tightening of what any function accepts.
 //
-// Every `any` here is deliberate and confined to three places, none of which is a value this module
-// hands back to a caller:
-//   1. parameters of USER callbacks (iteratee, comparator, customizer) — a contravariant `unknown`
-//      there would reject every caller that annotates its own callback, e.g. `(a: Row, b: Row) => …`;
-//   2. the two relational comparisons in `min`/`max`, which are JS's own ordering over values the
-//      type system cannot order;
-//   3. `throttle`'s saved `arguments`, which is replayed verbatim through `Function.apply`.
+// Every `any` here is deliberate and confined to the parameters of USER callbacks (the `setWith` and
+// `mergeWith` customizers), none of which is a value this module hands back to a caller: a
+// contravariant `unknown` there would reject every caller that annotates its own callback, e.g.
+// `(nsValue: Row) => …`.
 
 /** Anything this module walks with a computed key once it knows the value is object-like. */
 type Dict = Record<PropertyKey, unknown>
-
-/** The resolved form of an iteratee shorthand. Callback parameters are `any` — see the note above. */
-type IterateeFn = (value: any, index?: any, collection?: any) => unknown
-
-/**
- * The shorthands `toIteratee` understands: a function, a `[path, value]` pair, a source object to
- * match, or any other value — which is treated as a property path, exactly as at runtime. The
- * constituents are spelled out rather than collapsed to `unknown` so that a callback argument still
- * gets its parameters contextually typed.
- */
-type Iteratee = IterateeFn | PropertyKey | boolean | bigint | readonly unknown[] | object | null | undefined
-
-/** Custom equality callback, as taken by `uniqWith`/`unionWith`. Truthy means "same value". */
-type Comparator = (a: any, b: any) => unknown
 
 /** `setWith`'s customizer: returns the container to create for a missing path segment. */
 type SetWithCustomizer = (nsValue: any, key: PropertyKey, nsObject: any) => unknown
 
 /** `mergeWith`'s customizer: a non-`undefined` return wins over the default merge. */
 type MergeCustomizer = (dstValue: any, srcValue: any, key: string, dst: any, src: any) => unknown
-
-/** A function whose signature this module does not constrain (`throttle`'s subject). */
-type AnyFunction = (...args: any) => any
-
-type ThrottleOptions = { leading?: boolean, trailing?: boolean }
 
 function isObjectLike(value: unknown): value is object {
 	return value != null && typeof value === 'object'
@@ -116,17 +94,6 @@ function get(object: unknown, path: unknown, defaultValue?: unknown): unknown {
 		cur = (cur as Dict)[key]
 	}
 	return cur === undefined ? defaultValue : cur
-}
-
-function hasPath(object: unknown, path: unknown): boolean {
-	const parts = toPath(path)
-	if (parts.length === 0) return false
-	let cur: unknown = object
-	for (const key of parts) {
-		if (cur == null || !(key in Object(cur))) return false
-		cur = (cur as Dict)[key]
-	}
-	return true
 }
 
 function setWith<T>(object: T, path: unknown, value: unknown, customizer?: SetWithCustomizer): T {
@@ -319,193 +286,12 @@ function isEqual(a: unknown, b: unknown, seen: Map<unknown, unknown> = new Map()
 	return false
 }
 
-function property(path: unknown): (obj: unknown) => unknown {
-	return (obj) => get(obj, path)
-}
-
-function matches(source: unknown): (object: unknown) => boolean {
-	const snapshot = cloneDeep(source)
-	return (object) => isMatch(object, snapshot)
-}
-
-function matchesProperty(path: unknown, sourceValue: unknown): (object: unknown) => boolean {
-	const snapshot = cloneDeep(sourceValue)
-	return (object) => {
-		const value = get(object, path)
-		if (value === undefined && snapshot === undefined && !hasPath(object, path)) return false
-		return isObjectLike(snapshot) ? isMatch(value, snapshot) : isEqual(value, snapshot)
-	}
-}
-
-function toIteratee(value: unknown): IterateeFn {
-	if (typeof value === 'function') return value as IterateeFn
-	if (value == null) return (item: unknown) => item
-	if (Array.isArray(value)) return matchesProperty(value[0], value[1])
-	if (isObjectLike(value)) return matches(value)
-	return property(value)
-}
-
-function isMatch(object: unknown, source: unknown): boolean {
-	if (sameValueZero(object, source)) return true
-	if (Array.isArray(source)) {
-		if (!Array.isArray(object) || source.length > object.length) return false
-		const used = new Set()
-		for (const sourceValue of source) {
-			let match = -1
-			for (let i = 0; i < object.length; i++) {
-				if (!used.has(i) && isMatch(object[i], sourceValue)) {
-					match = i
-					break
-				}
-			}
-			if (match === -1) return false
-			used.add(match)
-		}
-		return true
-	}
-	if (!isObject(source) || !isObject(object)) return false
-	if (!isPlainObject(source)) return isEqual(object, source)
-	for (const key of enumerableKeys(source)) {
-		if (!(key in Object(object))) return false
-		const sv = source[key]
-		const ov = (object as Dict)[key]
-		if (isObjectLike(sv)) {
-			if (!isMatch(ov, sv)) return false
-		} else if (!sameValueZero(ov, sv)) {
-			return false
-		}
-	}
-	return true
-}
-
-function some(collection: unknown, predicate?: Iteratee): boolean {
-	if (collection == null) return false
-	const pred = toIteratee(predicate)
-	if (Array.isArray(collection)) {
-		for (let i = 0; i < collection.length; i++) {
-			if (pred(collection[i], i, collection)) return true
-		}
-		return false
-	}
-	const dict = collection as Dict
-	for (const key in dict) {
-		if (Object.prototype.hasOwnProperty.call(dict, key) && pred(dict[key], key, dict)) return true
-	}
-	return false
-}
-
 function flatten<T>(array: ReadonlyArray<T | readonly T[]> | null | undefined): T[] {
 	if (!Array.isArray(array)) return []
 	const out: T[] = []
 	for (const item of array) {
 		if (Array.isArray(item)) out.push(...item)
 		else out.push(item)
-	}
-	return out
-}
-
-function min<T>(array: readonly T[] | null | undefined): T | undefined {
-	if (!Array.isArray(array) || array.length === 0) return undefined
-	let m: T | undefined
-	for (const value of array) {
-		if (value == null || Number.isNaN(value) || typeof value === 'symbol') continue
-		// `<` is JS's own relational comparison over values the type system cannot order
-		// (numbers, strings and dates all reach this line); the casts express that, and change
-		// nothing at runtime.
-		if (m === undefined || (value as any) < (m as any)) m = value
-	}
-	return m
-}
-
-function max<T>(array: readonly T[] | null | undefined): T | undefined {
-	if (!Array.isArray(array) || array.length === 0) return undefined
-	let m: T | undefined
-	for (const value of array) {
-		if (value == null || Number.isNaN(value) || typeof value === 'symbol') continue
-		// See the note in `min` about the relational-operator casts.
-		if (m === undefined || (value as any) > (m as any)) m = value
-	}
-	return m
-}
-
-function difference<T>(array: readonly T[] | null | undefined, values?: unknown): T[] {
-	if (!Array.isArray(array)) return []
-	const remove = new Set(Array.isArray(values) ? values : [])
-	const out: T[] = []
-	for (const value of array) if (!remove.has(value)) out.push(value)
-	return out
-}
-
-function intersection<T>(...arrays: Array<readonly T[] | null | undefined>): T[] {
-	if (arrays.length === 0 || arrays.some((array) => !Array.isArray(array))) return []
-	const [first, ...rest] = arrays as Array<readonly T[]>
-	const restSets = rest.map((a) => new Set(a))
-	const out: T[] = []
-	const seen = new Set()
-	for (const value of first) {
-		if (!seen.has(value) && restSets.every((set) => set.has(value))) {
-			seen.add(value)
-			out.push(value)
-		}
-	}
-	return out
-}
-
-function union<T>(...arrays: Array<readonly T[] | null | undefined>): T[] {
-	const out: T[] = []
-	const seen = new Set()
-	for (const arr of arrays) {
-		if (!Array.isArray(arr)) continue
-		for (const v of arr) {
-			if (!seen.has(v)) {
-				seen.add(v)
-				out.push(v)
-			}
-		}
-	}
-	return out
-}
-
-function uniqWith<T>(array: readonly T[] | null | undefined, comparator?: Comparator): T[] {
-	if (!Array.isArray(array)) return []
-	if (typeof comparator !== 'function') return union(array)
-	const out: T[] = []
-	for (const v of array) {
-		if (!out.some((o) => comparator(o, v))) out.push(v)
-	}
-	return out
-}
-
-function unionWith(...args: unknown[]): unknown[] {
-	const lastArg = args[args.length - 1]
-	const comparator = typeof lastArg === 'function' ? lastArg as Comparator : null
-	const arrays = comparator ? args.slice(0, -1) : args
-	if (!comparator) return union(...arrays as Array<unknown[]>)
-	const out: unknown[] = []
-	for (const arr of arrays) {
-		if (!Array.isArray(arr)) continue
-		for (const v of arr) {
-			if (!out.some((o) => comparator(o, v))) out.push(v)
-		}
-	}
-	return out
-}
-
-function unionBy(...args: unknown[]): unknown[] {
-	const lastArg = args[args.length - 1]
-	const iteratee = Array.isArray(lastArg) ? undefined : args.pop()
-	const it = toIteratee(iteratee)
-	const out: unknown[] = []
-	const seen = new Set()
-	for (const arr of args) {
-		if (!Array.isArray(arr)) continue
-		for (const v of arr) {
-			const key = it(v)
-			if (!seen.has(key)) {
-				seen.add(key)
-				out.push(v)
-			}
-		}
 	}
 	return out
 }
@@ -557,52 +343,6 @@ function _mergeInto(dst: Dict, src: unknown, customizer: MergeCustomizer | null)
 	}
 }
 
-function throttle(func: AnyFunction, wait: number, options: ThrottleOptions = {}): AnyFunction {
-	let lastCallTime = 0
-	let timeoutId: ReturnType<typeof setTimeout> | null = null
-	// `arguments` of the last throttled call, kept verbatim for `func.apply`.
-	let lastArgs: any
-	let lastThis: unknown
-	const leading = options.leading !== false
-	const trailing = options.trailing !== false
-
-	function invoke(time: number) {
-		lastCallTime = time
-		const args = lastArgs
-		const self = lastThis
-		lastArgs = lastThis = null
-		return func.apply(self, args)
-	}
-
-	function startTimer(remaining: number) {
-		timeoutId = setTimeout(() => {
-			timeoutId = null
-			if (trailing && lastArgs) invoke(Date.now())
-		}, remaining)
-	}
-
-	return function throttled(this: unknown) {
-		const now = Date.now()
-		if (!lastCallTime && leading === false) lastCallTime = now
-		const remaining = wait - (now - lastCallTime)
-		lastArgs = arguments
-		lastThis = this
-
-		if (remaining <= 0 || remaining > wait) {
-			if (timeoutId) {
-				clearTimeout(timeoutId)
-				timeoutId = null
-			}
-			return invoke(now)
-		}
-		if (!timeoutId && trailing) startTimer(remaining)
-	}
-}
-
-function isNumber(value: unknown): boolean {
-	return typeof value === 'number' || value instanceof Number
-}
-
 function capitalize(string: unknown): string {
 	const str = String(string == null ? '' : string)
 	if (!str) return ''
@@ -620,25 +360,10 @@ export {
 	isEmpty,
 	isObjectLike,
 	isPlainObject,
-	matches,
-	property,
 	merge,
 	mergeWith,
 	// collections
-	some,
 	flatten,
-	min,
-	max,
-	difference,
-	intersection,
-	union,
-	unionBy,
-	unionWith,
-	uniqWith,
-	// functions
-	throttle,
-	// number
-	isNumber,
 	// string
 	capitalize,
 }

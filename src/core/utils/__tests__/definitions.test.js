@@ -1,6 +1,5 @@
 import {
-    definitionSetup,
-    definitionByValue,
+  definitionSetup,
 } from '../definitions'
 
 describe('definitionSetup', () => {
@@ -34,10 +33,3 @@ describe('definitionSetup', () => {
     })
 })
 
-describe('definitionByValue', () => {
-    it('keys the object by underscore value', () => {
-        expect(definitionByValue({ ENGLISH: { _: 'en', en: 'English' } })).toEqual({
-            en: { _: 'en', en: 'English' },
-        })
-    })
-})

@@ -259,10 +259,13 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
+        // Functions 77 → 75 when the unused `throttle` and `isAsync` went: of the eight left, the two
+        // never called are the `function * () {}` and `async () => {}` literals `isFunction` takes its
+        // constructors from. Every statement is still covered.
         './src/core/utils/function.ts': {
             statements: 100,
             branches: 96,
-            functions: 77,
+            functions: 75,
             lines: 100,
         },
         './src/core/components/Counter.tsx': {

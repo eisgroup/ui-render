@@ -1,6 +1,5 @@
 import { LANGUAGE } from '../constants'
 import {
-  definitionByValue,
   definitionSetup,
   localiseTranslation,
 } from '../definitions'
@@ -65,24 +64,6 @@ describe('definition utilities contracts', () => {
 
       expect(definitions.TYPE).toEqual({ OWN: 'own' })
       expect(Object.prototype.hasOwnProperty.call(definitions.TYPE, 'INHERITED')).toBe(false)
-    })
-  })
-
-  describe('definition projections', () => {
-    it('maps array definitions by value and preserves the last duplicate', () => {
-      const first = { _: 'same', en: 'First' }
-      const second = { _: 'same', en: 'Second' }
-
-      expect(definitionByValue([first, second])).toEqual({ same: second })
-    })
-
-    it('maps a reserved underscore value as data without mutating the prototype', () => {
-      const item = { _: '__proto__', en: 'Prototype' }
-      const result = definitionByValue({ ITEM: item })
-
-      expect(Object.getPrototypeOf(result)).toBe(Object.prototype)
-      expect(Object.prototype.hasOwnProperty.call(result, '__proto__')).toBe(true)
-      expect(result.__proto__).toBe(item)
     })
   })
 

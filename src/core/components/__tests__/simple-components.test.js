@@ -2,7 +2,7 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { View } from '../View'
-import { Row, RowRef } from '../Row'
+import { Row } from '../Row'
 import { Loading } from '../Loading'
 import { Spinner } from '../Spinner'
 import { Icon } from '../Icon'
@@ -36,18 +36,6 @@ describe('Row', () => {
     it('renders a <div> with flex--row class', () => {
         const { container } = render(<Row />)
         expect(container.querySelector('div')).toHaveClass('flex--row')
-    })
-    it('RowRef forwards ref', () => {
-        let captured = null
-        render(<RowRef ref={(el) => { captured = el }} />)
-        expect(captured).not.toBeNull()
-    })
-    it('RowRef attaches a callback ref only: an object ref is dropped', () => {
-        // What `RowCallbackRef` in Row.tsx states. `Row` cannot tell an object ref from the legacy
-        // context `React.memo` passes in the same position, so it attaches functions only.
-        const ref = React.createRef()
-        render(<RowRef ref={ref} />)
-        expect(ref.current).toBeNull()
     })
 })
 

@@ -1,10 +1,10 @@
 import {
     toOpenLConfig,
     initSelectStatesFromData,
-    getDataKindPathFromRelative,
     parseArrayPrefixAndRowIndexFromFieldName,
     formsStorage,
 } from '../rules'
+import { getDataKindPathFromRelative } from '../dataKindPush'
 import { getLiveMergedDataKindArray } from '../formData'
 import { Active } from '../../utils'
 
