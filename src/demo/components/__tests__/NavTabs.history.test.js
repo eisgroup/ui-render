@@ -81,9 +81,16 @@ const renderNavTabs = () => render(
     </ConfigContext.Provider>
 )
 
-/** jsdom traverses the history asynchronously, as a browser does, and fires `popstate`. */
+/**
+ * jsdom traverses the history asynchronously, as a browser does, and fires `popstate`. The act window
+ * stays open until it has, so the router's update lands inside it: React 16 and 17 warned otherwise.
+ */
 const traverse = async (direction, expectedPath) => {
-    await act(async () => { window.history[direction]() })
+    await act(async () => {
+        const traversed = new Promise(resolve => window.addEventListener('popstate', resolve, { once: true }))
+        window.history[direction]()
+        await traversed
+    })
     await waitFor(() => expect(window.location.pathname).toBe(expectedPath))
     await settle()
 }

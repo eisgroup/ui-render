@@ -59,7 +59,7 @@ type TabsState = { activeIndex: number, transition: boolean }
  * Tabs with overridable self-managed state and overflow scrollbars, with NO engine coupling.
  *
  * Renamed from `Tabs` on 2026-09-22 (§9.9-H6). There were two files called `Tabs.js` and no way to
- * tell from a grep which one ships: this one, and `pages/main/components/Tabs.js`. They are not
+ * tell from a grep which one ships: this one, and `pages/main/components/Tabs.js` (now `engine/components/Tabs.tsx`). They are not
  * interchangeable — the engine's copy is the older of the two and has kept evolving, adding
  * `normalizeTabIndex`, `renderTab`, `currencyCode` injection and a third argument to `setTab`, about
  * 99 lines of difference. It is the one `mapper.tsx` registers for `view: 'Tabs'`.

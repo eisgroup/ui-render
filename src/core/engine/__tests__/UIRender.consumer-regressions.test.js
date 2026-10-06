@@ -1,6 +1,7 @@
 import React from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import util from 'util'
 import UIRender from '../../../library'
 
 /**
@@ -174,5 +175,23 @@ describe('UI Render consumer-level regression guards', () => {
 
         expect(view.container.querySelector('.tabs__content')).toHaveTextContent('S3')
         jest.useRealTimers()
+    })
+
+    it('submits a form whose host passes no onSubmit without printing its values', async () => {
+        // The default was `console.warn` until 2026-10-06: every value of the form, on the console.
+        const printed = []
+        for (const level of ['log', 'info', 'warn', 'error']) {
+            jest.spyOn(console, level).mockImplementation((...args) => { printed.push(util.inspect(args, {depth: 3})) })
+        }
+        const meta = {view: 'Col', items: [
+            {view: 'Input', name: 'secret'},
+            {view: 'Button', children: 'Send', onClick: 'submit'},
+        ]}
+        const values = {secret: 'kept-off-the-console'}
+        const {getByText} = render(<UIRender form meta={meta} data={values} initialValues={values}/>)
+
+        await act(async () => { fireEvent.click(getByText('Send')) })
+
+        expect(printed.filter(line => line.includes('kept-off-the-console'))).toEqual([])
     })
 })

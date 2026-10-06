@@ -52,7 +52,7 @@ describe('form/inputs - asField wrappers', () => {
         expect(formApi.getState().values.x).toBe('abc')
     })
 
-    it('DropdownField renders a Semantic UI Dropdown', () => {
+    it('DropdownField renders the dropdown', () => {
         const options = [{ text: 'A', value: 'a' }, { text: 'B', value: 'b' }]
         const { container } = render(wrap(<DropdownField name="x" options={options} />, { x: 'a' }))
         expect(container.querySelector('.ui.dropdown')).toBeInTheDocument()

@@ -131,7 +131,8 @@ If no value is provided for label at all, use `{"renderLabel": "String"}`
 
 Do not simultaneously define `renderLabel` attribute as empty object or object with `null` values, because the rendering
 priority is this:
-`renderLabel` > `items` > `children` > `label`.
+`items` > `renderLabel` > `children` > `label`.
+With `items`, `renderLabel` is ignored; without them it formats `children`, or `label` when there are no `children`.
 You can, however, retrieve `children` or `label` value dynamically, then use `renderLabel` to format that value.
 Example:
 

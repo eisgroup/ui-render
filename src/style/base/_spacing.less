@@ -103,6 +103,10 @@
   padding-top: @padding-large;
 }
 
+.padding-top-largest {
+  padding-top: @padding-largest;
+}
+
 .padding-top-larger {
   padding-top: @padding-larger;
 }
@@ -143,12 +147,20 @@
   padding-bottom: @padding-large;
 }
 
+.padding-bottom-larger {
+  padding-bottom: @padding-larger;
+}
+
 .padding-bottom-largest {
   padding-bottom: @padding-largest;
 }
 
 .padding-left-largest {
   padding-left: @padding-largest;
+}
+
+.padding-left-larger {
+  padding-left: @padding-larger;
 }
 
 .padding-left-large {
@@ -431,6 +443,13 @@
 
 .no-margin {
   margin: 0 !important;
+}
+
+// The only members of their families styles.md listed and the stylesheet lacked, until 2026-10-06:
+// `.no-margin-h` here, and `.padding-top-largest`, `.padding-bottom-larger`, `.padding-left-larger` above.
+.no-margin-h {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 .no-margin-v {

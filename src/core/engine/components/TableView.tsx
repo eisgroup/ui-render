@@ -323,11 +323,24 @@ function TableView (props: TableViewProps) {
     const hasSort = sorts && !!sorts.find(s => s.id === id)
     const render = isFunction(cell) ? cell : renderHeaderContent
     const value = data != null ? data : (cell || label)
+    // A sortable column, by the WAI-ARIA sortable table since 2026-10-06: the header says its order in
+    // `aria-sort`, and its control is a button in the tab order that Enter and Space press as a click does.
+    // Not undefined: `hasSort` found it.
+    const order = hasSort ? sorts.find(s => s.id === id)!.order : undefined
+    const ariaSort = hasSort ? (order! < 0 ? 'descending' : order! > 0 ? 'ascending' : 'none') : undefined
     return (
-      <Table.HeaderCell key={id || i} colSpan={colSpan} className={cn('left', classNameHeader)} style={styleHeader}>
+      <Table.HeaderCell key={id || i} colSpan={colSpan} className={cn('left', classNameHeader)} style={styleHeader}
+                        aria-sort={ariaSort}>
         <Row className={cn('middle', className, {sort: hasSort})} style={style}
              // Not undefined: a header with a sort has an id.
-             onClick={hasSort ? (() => self.handleSort(id!)) : undefined}>
+             onClick={hasSort ? (() => self.handleSort(id!)) : undefined}
+             role={hasSort ? 'button' : undefined}
+             tabIndex={hasSort ? 0 : undefined}
+             onKeyDown={hasSort ? ((event: React.KeyboardEvent<HTMLElement>) => {
+               if (event.key !== 'Enter' && event.key !== ' ') return
+               event.preventDefault()
+               self.handleSort(id!)
+             }) : undefined}>
           {render
             ? render(value, id, {className, style}, self)
             // A cast, not a guard: `cell` is no function here, or it would be the renderer.
@@ -340,7 +353,7 @@ function TableView (props: TableViewProps) {
   }
 
   // Render Row Cells (in default layout)
-  const renderItemData = (item: TableItem, index: number, {id, renderCell, classNameCellWrap = '', classNameCell: className, styleCell: style}: TableHeader) => {
+  const renderItemData = (item: TableItem, index: number, {id, renderCell, classNameCellWrap = '', classNameCell: className, styleCell: style}: TableHeader, column?: number) => {
     // Conditional rendering logic based on given cell data
     const { additionalCellsStyles } = props
     // Headers without an `id` are section dividers — they render as empty body cells.
@@ -367,7 +380,9 @@ function TableView (props: TableViewProps) {
       // in-house `Table.Cell` omits an empty className itself, so the 199 inert `class=""` the
       // `-last` fix traded for are gone too. `getStickyCellClassName` still returns '' here --
       // suppressing the attribute is the cell's job, at the DOM edge, in one place.
-      <Table.Cell key={props.vertical ? index : id} className={cellClassName} style={cellStyle}>
+      // A section divider has no `id` to key its cell by, so it is keyed by its column: a table with one
+      // logged React's missing-key warning, until 2026-10-06.
+      <Table.Cell key={props.vertical ? index : (id != null ? id : `#${column}`)} className={cellClassName} style={cellStyle}>
         {isReactNode
           ? (typeof content === 'object'
             ? content
@@ -401,7 +416,7 @@ function TableView (props: TableViewProps) {
       <Fragment key={index}>
         {/* Casts, not guards: a string by now, and `headers` is set whenever rows render (see below). */}
         <Table.Row className={className as string | undefined}>
-          {renderItemCells ? renderItemCells(item, index) : headers!.map(header => renderItemData(item, index, header))}
+          {renderItemCells ? renderItemCells(item, index) : headers!.map((header, column) => renderItemData(item, index, header, column))}
         </Table.Row>
         {renderItem && expandedByRow(index) &&
           <Table.Row>

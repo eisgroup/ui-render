@@ -92,10 +92,11 @@ const ARRAY_ATTRIBUTES = ['items', 'headers', 'extraHeaders', 'extraItems']
 const isPlainObject = (value: unknown): value is MetaNode => !!value && typeof value === 'object' && !Array.isArray(value)
 
 /**
- * View names and render-method names are read at call time, never at module load:
- * `FIELD.TYPE` is populated in several passes (`variables/fields`, then
- * `modules/form/constants`, then `pages/main/rules`), so a set captured at import
- * time would be missing Input, Select, Data, Popup and the rest.
+ * View names and render-method names are read at call time, never at module load.
+ * `FIELD.TYPE` was populated in several passes (`variables/fields`, then
+ * `modules/form/constants`, then `engine/rules`) until §9.3 steps 2 and 3 moved it
+ * into `variables/fields`, and a set captured at import time missed Input, Select,
+ * Data, Popup and the rest.
  *
  * @returns {Array<String>} declared values of the given FIELD definition group
  */
@@ -244,8 +245,11 @@ function checkMetaVersion (value: unknown, isRoot: boolean, report: Report): voi
             'metaVersion is a root-level declaration — on a nested node it is ignored')
         return
     }
+    // A warning, not an error: the engine strips `metaVersion` before rendering, so a malformed one makes
+    // nothing fail, and every `error` here is a measured failure (see the header). It was an error until
+    // 2026-10-06.
     if (typeof value !== 'string' || !META_VERSION_PATTERN.test(value)) {
-        report('metaVersion', META_SEVERITY.ERROR, META_PROBLEM.META_VERSION_INVALID,
+        report('metaVersion', META_SEVERITY.WARNING, META_PROBLEM.META_VERSION_INVALID,
             `metaVersion must be a "MAJOR" or "MAJOR.MINOR" string, got ${JSON.stringify(value)}`)
         return
     }

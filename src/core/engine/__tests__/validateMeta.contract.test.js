@@ -176,7 +176,7 @@ describe('metaVersion declaration', () => {
         ['an empty string', ''],
     ])('rejects %s', (label, value) => {
         expect(codesOf({ metaVersion: value, view: 'Row' }))
-            .toEqual([`error:${META_PROBLEM.META_VERSION_INVALID}@metaVersion`])
+            .toEqual([`warning:${META_PROBLEM.META_VERSION_INVALID}@metaVersion`])
     })
 
     it('warns when the declared major is newer than this build implements', () => {
@@ -196,7 +196,7 @@ describe('metaVersion declaration', () => {
         // including its own metaVersion.
         expect(validateMeta({ view: 'Data', meta: { metaVersion: '1', view: 'Row' } })).toEqual([])
         expect(codesOf({ view: 'Data', meta: { metaVersion: 'draft', view: 'Row' } }))
-            .toEqual([`error:${META_PROBLEM.META_VERSION_INVALID}@meta.metaVersion`])
+            .toEqual([`warning:${META_PROBLEM.META_VERSION_INVALID}@meta.metaVersion`])
         expect(validateMeta({ view: 'Data', meta: 'not-a-document' })).toEqual([])
     })
 })

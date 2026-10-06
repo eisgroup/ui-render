@@ -22,7 +22,7 @@ if (typeof global.fetch === 'undefined') {
     global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
 }
 import React from 'react' // eslint-disable-line import/first
-import { render } from '@testing-library/react' // eslint-disable-line import/first
+import { fireEvent, render } from '@testing-library/react' // eslint-disable-line import/first
 import '@testing-library/jest-dom' // eslint-disable-line import/first
 import '../../modules/form/utils' // eslint-disable-line import/first
 import UIRender from '../rules' // eslint-disable-line import/first
@@ -83,5 +83,24 @@ describe('two instances on one page keep their own translator', () => {
         const view = render(wrap(<div data-testid="only"><UIRender meta={meta} data={{}}/></div>))
 
         expect(textOf(view, 'only')).toContain('hello')
+    })
+})
+
+describe('two instances on one page keep their own form data', () => {
+    // Every document read every form on the page until 2026-10-06, so each of two independent
+    // documents found the other's fields in its `getFormData`, and in its `showIf` and upload data.
+    // Measured on the previous code: the first read {"alpha":"A1","beta":"B2"}, and so did the second.
+    it('each reads its own fields, and none of the other one', () => {
+        const readers = {}
+        const document = (name, value) => (
+            <UIRender form meta={{ view: 'Input', name, label: name }} data={{ [name]: value }}
+                      initialValues={{ [name]: value }} getFormData={read => { readers[name] = read }}/>
+        )
+        const view = render(wrap(<div>{document('alpha', 'A1')}{document('beta', 'B1')}</div>))
+        const [, second] = view.container.querySelectorAll('input')
+        fireEvent.change(second, { target: { value: 'B2' } })
+
+        expect(readers.alpha()).toEqual({ alpha: 'A1' })
+        expect(readers.beta()).toEqual({ beta: 'B2' })
     })
 })

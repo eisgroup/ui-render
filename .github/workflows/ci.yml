@@ -60,16 +60,17 @@ jobs:
       - name: Check the generated view reference
         run: npm run docs:views:check
 
-      # docs/SUPPORTED-PROPS.md is generated from the semantic-ui-react wrapper source,
-      # domProps.ts and the Table call sites (UPGRADE-PLAN 9.7-F1 step 0). It is the parity
-      # checklist steps 1-3 are judged against, so it has to fail loudly rather than rot.
+      # docs/SUPPORTED-PROPS.md is generated from the source of the views UPGRADE-PLAN 9.7-F1
+      # brought in-house (Table, Tooltip, Dropdown), domProps.ts and the Table call sites. It was
+      # the parity checklist steps 1-3 were judged against, and it records what each of them reads,
+      # strips and dropped, so it has to fail loudly rather than rot.
       # scripts/__tests__/wrapper-prop-reference.contract.test.js covers it in all four legs
       # and additionally walks the tracked example corpus; this step names the failure.
       - name: Check the generated supported-prop reference
         run: npm run docs:props:check
 
-      # `src/style/__tests__/semantic-contributed-css.txt` pins every rule the remaining
-      # `semantic-ui-less` imports contribute -- the "pixel parity of extracted CSS" criterion
+      # `src/style/__tests__/semantic-contributed-css.txt` pins every rule the two vendored
+      # Semantic modules (`src/style/vendor/`) contribute -- the "pixel parity of extracted CSS" criterion
       # UPGRADE-PLAN sets for §9.7-F1 step 4, which had no mechanism until this fixture existed.
       # `css.semantic-parity.test.js` covers it in all four legs; this step names the failure and,
       # unlike the suite, tells you the regeneration command.
@@ -98,10 +99,12 @@ jobs:
         run: npm run test:pack:consumer
 
       # The step above only ever sees the React the lockfile installs, so the declared 16.14, 17 and 19 ends of
-      # peerDependencies had no runtime coverage at all. This re-runs the same smoke against React installed
-      # into a throwaway directory — the repository's own node_modules is never touched. It checks the
-      # published artifact, which is what a peer range is a claim about; it is not a substitute for running
-      # the suite on those versions (see docs/UPGRADE-PLAN.md §8, "CI coverage of the declared peer range").
+      # peerDependencies had no runtime coverage at all. This re-runs the same smoke against each of them: the
+      # Reacts the per-React legs below run on, from their fixtures under scripts/fixtures/, which `npm ci`
+      # installed from the lockfile. So it needs no registry, and smokes the patch the legs test (it installed
+      # them from the registry into a throwaway directory until 2026-10-06). It checks the published artifact,
+      # which is what a peer range is a claim about; it is not a substitute for running the suite on those
+      # versions (see docs/UPGRADE-PLAN.md §8, "CI coverage of the declared peer range").
       - name: Smoke the packed tarball across the declared peer range
         run: npm run test:pack:peers
 
@@ -119,7 +122,7 @@ jobs:
 
   # Gating. `peerDependencies` declares a 16.14 floor, but `npm ci` installs exactly one React, so the
   # `verify` job above only ever exercises 18; `test:pack:peers` proves the published artifact server-renders
-  # on 16 and 17, which is narrower than running the suite. This runs the whole suite on React 16.14.
+  # on 16.14, 17 and 19, which is narrower than running the suite. This runs the whole suite on React 16.14.
   #
   # No `--legacy-peer-deps` here, as in the other fixture legs (the React 19 one used to need it): React
   # 16.14 comes from an install-only fixture package (`scripts/fixtures/react16-floor`, linked as the
@@ -195,12 +198,13 @@ jobs:
 
   # Gating. The browser leg of the contract suite (docs/UPGRADE-PLAN.md §9.5, §9.7-F1 step 2): the
   # positional facts about the tooltip that no jsdom suite can express, because every
-  # `getBoundingClientRect()` there is 0x0. It records what semantic-ui-react's `Popup` actually does
-  # in real Chrome so the in-house replacement has a measured reference to be judged against.
+  # `getBoundingClientRect()` there is 0x0. It first recorded what semantic-ui-react's `Popup` did in
+  # real Chrome, the reference the in-house tooltip was judged against; it also drives the keyboard
+  # through the dropdown, the tabs and the Expand titles (e2e/keyboard-a11y.pw.js).
   #
-  # GATING FROM DAY ONE, not advisory, and the distinction matters here. The product is currently
-  # broken at these use sites — the bubble is unpositioned and popper throws on every open — so the
-  # obvious reading is "red for a real reason, keep it off the merge path". That would be the wrong
+  # GATING FROM DAY ONE, not advisory, and the distinction mattered. When this job was added the product
+  # was broken at these use sites — the bubble unpositioned, and popper throwing on every open — so the
+  # obvious reading was "red for a real reason, keep it off the merge path". That would have been the wrong
   # call: red-because-the-product-is-broken belongs in a PINNED CURRENT VALUE, exactly as
   # `FIXED_PROP_LEAKS`, `KNOWN_DOM_DEFECTS` and `NAMELESS_CONTROLS` already work in jest. Every such
   # fact is pinned in e2e/reference.js and tagged [R->I], so the suite is green today, gates today,
@@ -217,9 +221,10 @@ jobs:
   # was not re-measured; it never means "the numbers drifted".
   #
   # WHY IT SERVES A PRODUCTION BUILD. webpack-dev-server renders an unhandled runtime error as a
-  # full-viewport overlay iframe, and opening a tooltip currently throws — so on the dev server the
-  # overlay intercepts every subsequent interaction. Disabling that overlay would remove a real
-  # debugging affordance from humans to suit a test runner. `playwright.config.js` builds the demo
+  # full-viewport overlay iframe that intercepts every later interaction. Opening a tooltip threw when
+  # this job was added; nothing does now, but a page error should fail the test that counts it rather
+  # than cover the page. Disabling that overlay would remove a real debugging affordance from humans
+  # to suit a test runner. `playwright.config.js` builds the demo
   # root-relative (`PUBLIC_PATH=/`, `REACT_APP_BASE_NAME=/`, into `build-e2e/`) and serves it with
   # `serve --single`; both webpack overrides default to today's values, so `npm run build` and
   # `npm run deploy` are untouched.

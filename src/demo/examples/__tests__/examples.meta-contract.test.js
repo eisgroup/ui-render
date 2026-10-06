@@ -28,9 +28,10 @@
  *    below with their cause, following the KNOWN_DOM_DEFECTS convention: recorded
  *    rather than blessed, and a change in either direction fails.
  *
- * IMPORT ORDER MATTERS: `FIELD.TYPE` is assembled in three passes
- * (`variables/fields`, then `modules/form/constants`, then `pages/main/rules`),
+ * IMPORT ORDER MATTERS: `engine/rules` adds the engine's actions to `FIELD.ACTION`,
  * so the engine entry point must be loaded before the vocabularies are read.
+ * (`FIELD.TYPE` was assembled in three passes too, until §9.3 steps 2 and 3 moved
+ * every view into `variables/fields`.)
  * -----------------------------------------------------------------------------
  */
 import fs from 'fs'

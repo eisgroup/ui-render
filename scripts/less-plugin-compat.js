@@ -2,9 +2,9 @@
  * Lets `less-plugin-functions` 1.0.0 run on LESS 4.
  *
  * THE PROBLEM, and it is one line of theirs. That plugin is how `size()` and `px()` work: they are
- * mixins in `src/style/_mixins.less` (`.function { .size() … }`) called as functions, at 186 sites
- * across 30 files. To call a mixin it does this, under a comment of its own that reads "the most
- * ugly hack ever":
+ * mixins in `src/style/_mixins.less` (`.function { .size() … }`) called as functions, at 133 sites
+ * across 25 files (186 across 30 when this was written). To call a mixin it does this, under a
+ * comment of its own that reads "the most ugly hack ever":
  *
  *     DetachedSet.prototype.type = 'NotDetachedRuleset';
  *     …eval…
@@ -18,7 +18,7 @@
  * it. Reads still answer `DetachedRuleset`, which is what the rest of LESS expects.
  *
  * WHY NOT the alternatives, each measured or costed:
- *   - rewriting the 186 call sites to inline arithmetic: every one changes a computed value, and
+ *   - rewriting the call sites to inline arithmetic: every one changes a computed value, and
  *     the result is unreadable where the point of `size()` is readability;
  *   - forking or patching the plugin: a fork to maintain, or a `patch-package` step in the build;
  *   - staying on LESS 3: the pin was the thing being removed.

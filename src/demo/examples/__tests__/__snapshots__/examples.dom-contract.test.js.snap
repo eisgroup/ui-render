@@ -5,7 +5,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
   <div class="flex--col min-height fill">
     <div class="flex--col border-bottom">
       <div class="flex--col app__expand">
-        <span class="text pointer row fill-width middle padding-small bg-white">
+        <span aria-expanded="false" class="text pointer row fill-width middle padding-small bg-white" role="button" tabindex="0">
           <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
           </i>
           "Admin Expenses"
@@ -16,7 +16,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
         </div>
       </div>
       <div class="flex--col app__expand expanded">
-        <span class="text pointer row fill-width middle padding-small bg-white">
+        <span aria-expanded="true" class="text pointer row fill-width middle padding-small bg-white" role="button" tabindex="0">
           <i aria-hidden="true" class="icon-chevron-down spin-90-deg">
           </i>
           <div class="flex--row wrap middle fill-width">
@@ -136,18 +136,18 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
             <div class="overflow-scroll flex--col max-height tabs fade-in">
               <div class="flex--col min-height max-height">
                 <div class="overflow-scroll flex--row max-width tabs__items no-scrollbar">
-                  <div class="flex--row min-width">
-                    <div class="flex--col tabs__item active">
+                  <div class="flex--row min-width" role="tablist">
+                    <div aria-selected="true" class="flex--col tabs__item active" role="tab" tabindex="0">
                       <span class="text">
                         "Demographic"
                       </span>
                     </div>
-                    <div class="flex--col pointer tabs__item">
+                    <div aria-selected="false" class="flex--col pointer tabs__item" role="tab" tabindex="-1">
                       <span class="text">
                         "Factors"
                       </span>
                     </div>
-                    <div class="flex--col pointer tabs__item">
+                    <div aria-selected="false" class="flex--col pointer tabs__item" role="tab" tabindex="-1">
                       <span class="text">
                         "Redistribution Calculator"
                       </span>
@@ -155,7 +155,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                   </div>
                 </div>
                 <div class="overflow-scroll flex--col max-height fill tabs__content fade-in">
-                  <div class="flex--col min-height fill">
+                  <div aria-label="Demographic" class="flex--col min-height fill" role="tabpanel">
                     <div class="flex--col padding-v">
                       <span class="text h3">
                         "Summary"
@@ -438,7 +438,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                 <tr>
                                   <td>
                                     <div class="flex--col app__expand expanded">
-                                      <span class="text pointer row fill-width middle padding-small">
+                                      <span aria-expanded="true" class="text pointer row fill-width middle padding-small" role="button" tabindex="0">
                                         <i aria-hidden="true" class="icon-chevron-down spin-90-deg">
                                         </i>
                                         "NV"
@@ -638,7 +638,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                 <tr>
                                   <td>
                                     <div class="flex--col app__expand expanded">
-                                      <span class="text pointer row fill-width middle padding-small">
+                                      <span aria-expanded="true" class="text pointer row fill-width middle padding-small" role="button" tabindex="0">
                                         <i aria-hidden="true" class="icon-chevron-down spin-90-deg">
                                         </i>
                                         "WS"
@@ -1166,7 +1166,7 @@ exports[`demo example full-DOM contract expandList renders a stable, non-empty D
 "<div class="overflow-scroll flex--col max-height fill ui__render fade-in bg-neutral">
   <div class="flex--col min-height fill">
     <div class="flex--col app__expand">
-      <span class="text pointer row fill-width middle padding-small">
+      <span aria-expanded="false" class="text pointer row fill-width middle padding-small" role="button" tabindex="0">
         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
         </i>
         <span class="text">
@@ -1179,7 +1179,7 @@ exports[`demo example full-DOM contract expandList renders a stable, non-empty D
       </div>
     </div>
     <div class="flex--col app__expand">
-      <span class="text pointer row fill-width middle padding-small">
+      <span aria-expanded="false" class="text pointer row fill-width middle padding-small" role="button" tabindex="0">
         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
         </i>
         <span class="text">
@@ -1470,19 +1470,19 @@ exports[`demo example full-DOM contract layout renders a stable, non-empty DOM m
         <div class="overflow-scroll flex--col max-height tabs fade-in">
           <div class="flex--col min-height max-height">
             <div class="overflow-scroll flex--row max-width tabs__items no-scrollbar hide">
-              <div class="flex--row min-width">
-                <div class="flex--col tabs__item active">
+              <div class="flex--row min-width" role="tablist">
+                <div aria-selected="true" class="flex--col tabs__item active" role="tab" tabindex="0">
                   <span class="text">
                   </span>
                 </div>
-                <div class="flex--col pointer tabs__item">
+                <div aria-selected="false" class="flex--col pointer tabs__item" role="tab" tabindex="-1">
                   <span class="text">
                   </span>
                 </div>
               </div>
             </div>
             <div class="overflow-scroll flex--col max-height fill tabs__content fade-in">
-              <div class="flex--col min-height fill">
+              <div class="flex--col min-height fill" role="tabpanel">
                 <div class="flex--row bg-primary" style="display: block; width: 100px; height: 100px;">
                 </div>
               </div>
@@ -2725,7 +2725,7 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
                 <tr>
                   <td>
                     <div class="flex--col app__expand">
-                      <span class="text pointer row fill-width middle padding-small">
+                      <span aria-expanded="false" class="text pointer row fill-width middle padding-small" role="button" tabindex="0">
                         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                         </i>
                         "Gold"
@@ -2766,7 +2766,7 @@ exports[`demo example full-DOM contract popupContent renders a stable, non-empty
                 <tr>
                   <td>
                     <div class="flex--col app__expand">
-                      <span class="text pointer row fill-width middle padding-small">
+                      <span aria-expanded="false" class="text pointer row fill-width middle padding-small" role="button" tabindex="0">
                         <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                         </i>
                         "Silver"
@@ -2825,7 +2825,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
         <div class="overflow-scroll flex--col max-height tabs fade-in buttoned">
           <div class="flex--col min-height max-height">
             <div class="overflow-scroll flex--row max-width tabs__items no-scrollbar padding-largest bg-neutral radius-bottom" style="overflow: visible;">
-              <div class="flex--row min-width">
+              <div class="flex--row min-width" role="tablist">
                 <div class="flex--row padding-right-largest middle bg-neutral">
                   <span class="text">
                     "FILTER BY"
@@ -2850,17 +2850,17 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                     </div>
                   </div>
                 </div>
-                <div class="flex--col tabs__item active">
+                <div aria-selected="true" class="flex--col tabs__item active" role="tab" tabindex="0">
                   <span class="text">
                     "General Summary"
                   </span>
                 </div>
-                <div class="flex--col pointer tabs__item">
+                <div aria-selected="false" class="flex--col pointer tabs__item" role="tab" tabindex="-1">
                   <span class="text">
                     "Demographic"
                   </span>
                 </div>
-                <div class="flex--col pointer tabs__item">
+                <div aria-selected="false" class="flex--col pointer tabs__item" role="tab" tabindex="-1">
                   <span class="text">
                     "Factors"
                   </span>
@@ -2868,7 +2868,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
               </div>
             </div>
             <div class="overflow-scroll flex--col max-height fill tabs__content fade-in margin-v-small">
-              <div class="flex--col min-height fill">
+              <div aria-label="General Summary" class="flex--col min-height fill" role="tabpanel">
                 <div class="flex--col">
                   <div class="flex--row wrap justify margin-v">
                     <div class="flex--col padding-largest radius bg-neutral" style="min-width: 48%;">
@@ -3237,7 +3237,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
         <div class="overflow-scroll flex--col max-height tabs fade-in buttoned">
           <div class="flex--col min-height max-height">
             <div class="overflow-scroll flex--row max-width tabs__items no-scrollbar padding-largest bg-neutral radius-bottom" style="overflow: visible;">
-              <div class="flex--row min-width">
+              <div class="flex--row min-width" role="tablist">
                 <div class="flex--row padding-right-largest middle bg-neutral">
                   <span class="text">
                     "FILTER BY"
@@ -3262,12 +3262,12 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                     </div>
                   </div>
                 </div>
-                <div class="flex--col tabs__item active">
+                <div aria-selected="true" class="flex--col tabs__item active" role="tab" tabindex="0">
                   <span class="text">
                     "General Summary"
                   </span>
                 </div>
-                <div class="flex--col pointer tabs__item">
+                <div aria-selected="false" class="flex--col pointer tabs__item" role="tab" tabindex="-1">
                   <span class="text">
                     "Breakdown"
                   </span>
@@ -3275,7 +3275,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
               </div>
             </div>
             <div class="overflow-scroll flex--col max-height fill tabs__content fade-in margin-v-small">
-              <div class="flex--col min-height fill">
+              <div aria-label="General Summary" class="flex--col min-height fill" role="tabpanel">
                 <div class="flex--col">
                   <div class="flex--col">
                     <div class="flex--row wrap justify margin-v">
@@ -4567,13 +4567,13 @@ exports[`demo example full-DOM contract tabList renders a stable, non-empty DOM 
     <div class="overflow-scroll flex--col max-height tabs fade-in padding">
       <div class="flex--col min-height max-height">
         <div class="overflow-scroll flex--row max-width tabs__items no-scrollbar">
-          <div class="flex--row min-width">
-            <div class="flex--col tabs__item active">
+          <div class="flex--row min-width" role="tablist">
+            <div aria-selected="true" class="flex--col tabs__item active" role="tab" tabindex="0">
               <span class="text">
                 "Gold"
               </span>
             </div>
-            <div class="flex--col pointer tabs__item">
+            <div aria-selected="false" class="flex--col pointer tabs__item" role="tab" tabindex="-1">
               <span class="text">
                 "Silver"
               </span>
@@ -4581,7 +4581,7 @@ exports[`demo example full-DOM contract tabList renders a stable, non-empty DOM 
           </div>
         </div>
         <div class="overflow-scroll flex--col max-height fill tabs__content fade-in">
-          <div class="flex--col min-height fill">
+          <div class="flex--col min-height fill" role="tabpanel">
             <div class="flex--col">
               <div class="flex--col margin-bottom-small radius">
                 <span class="text h3 padding no-margin">
@@ -5317,7 +5317,7 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
               <tr>
                 <td>
                   <div class="flex--col app__expand">
-                    <span class="text pointer row fill-width middle padding-small">
+                    <span aria-expanded="false" class="text pointer row fill-width middle padding-small" role="button" tabindex="0">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
                       "Gold"
@@ -5358,7 +5358,7 @@ exports[`demo example full-DOM contract tableNested renders a stable, non-empty 
               <tr>
                 <td>
                   <div class="flex--col app__expand">
-                    <span class="text pointer row fill-width middle padding-small">
+                    <span aria-expanded="false" class="text pointer row fill-width middle padding-small" role="button" tabindex="0">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
                       "Silver"
@@ -5693,7 +5693,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                 </th>
                 <td>
                   <div class="flex--col app__expand">
-                    <span class="text pointer row fill-width middle padding-small">
+                    <span aria-expanded="false" class="text pointer row fill-width middle padding-small" role="button" tabindex="0">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
                       "Gold"
@@ -5702,7 +5702,7 @@ exports[`demo example full-DOM contract tableVertical renders a stable, non-empt
                 </td>
                 <td>
                   <div class="flex--col app__expand">
-                    <span class="text pointer row fill-width middle padding-small">
+                    <span aria-expanded="false" class="text pointer row fill-width middle padding-small" role="button" tabindex="0">
                       <i aria-hidden="true" class="icon-chevron-right spin-90-deg-">
                       </i>
                       "Silver"
@@ -5833,13 +5833,13 @@ exports[`demo example full-DOM contract tabs renders a stable, non-empty DOM mat
     <div class="overflow-scroll flex--col max-height tabs fade-in padding">
       <div class="flex--col min-height max-height">
         <div class="overflow-scroll flex--row max-width tabs__items no-scrollbar">
-          <div class="flex--row min-width">
-            <div class="flex--col tabs__item active">
+          <div class="flex--row min-width" role="tablist">
+            <div aria-selected="true" class="flex--col tabs__item active" role="tab" tabindex="0">
               <span class="text">
                 "Gold"
               </span>
             </div>
-            <div class="flex--col pointer tabs__item">
+            <div aria-selected="false" class="flex--col pointer tabs__item" role="tab" tabindex="-1">
               <span class="text">
                 "Silver"
               </span>
@@ -5847,7 +5847,7 @@ exports[`demo example full-DOM contract tabs renders a stable, non-empty DOM mat
           </div>
         </div>
         <div class="overflow-scroll flex--col max-height fill tabs__content fade-in">
-          <div class="flex--col min-height fill">
+          <div aria-label="Gold" class="flex--col min-height fill" role="tabpanel">
             <span class="text">
               "Non-contributory"
             </span>
@@ -5865,13 +5865,13 @@ exports[`demo example full-DOM contract tabsButtoned renders a stable, non-empty
     <div class="overflow-scroll flex--col max-height tabs fade-in padding buttoned">
       <div class="flex--col min-height max-height">
         <div class="overflow-scroll flex--row max-width tabs__items no-scrollbar">
-          <div class="flex--row min-width">
-            <div class="flex--col tabs__item active">
+          <div class="flex--row min-width" role="tablist">
+            <div aria-selected="true" class="flex--col tabs__item active" role="tab" tabindex="0">
               <span class="text">
                 "Gold"
               </span>
             </div>
-            <div class="flex--col pointer tabs__item">
+            <div aria-selected="false" class="flex--col pointer tabs__item" role="tab" tabindex="-1">
               <span class="text">
                 "Silver"
               </span>
@@ -5879,7 +5879,7 @@ exports[`demo example full-DOM contract tabsButtoned renders a stable, non-empty
           </div>
         </div>
         <div class="overflow-scroll flex--col max-height fill tabs__content fade-in">
-          <div class="flex--col min-height fill">
+          <div aria-label="Gold" class="flex--col min-height fill" role="tabpanel">
             <span class="text">
               "Non-contributory"
             </span>

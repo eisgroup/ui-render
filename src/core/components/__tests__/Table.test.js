@@ -34,6 +34,13 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS } from '../domProps'
 /** Renders `children` inside a real table, for the parts that need a legal parent. */
 const inTable = (children) => render(<table><tbody>{children}</tbody></table>)
 
+/** A part inside the parent HTML allows for it, so React has no nesting to warn about. */
+const placed = (element, node) => {
+    if (element === 'tr') return <table><tbody>{node}</tbody></table>
+    if (element === 'th' || element === 'td') return <table><tbody><tr>{node}</tr></tbody></table>
+    return <table>{node}</table>
+}
+
 /** Every prop the DOM boundary exists to stop, as one bag. */
 const noop = () => {}
 const ENGINE_BAG = {
@@ -110,7 +117,7 @@ describe('Table', () => {
 
         it.each(parts)('Table.%s renders a <%s> with no class attribute when none is given',
             (name, Part, element) => {
-                const { container } = render(<table><Part/></table>)
+                const { container } = render(placed(element, <Part/>))
                 const node = container.querySelector(element)
                 expect(node).toBeInTheDocument()
                 // Semantic rendered class="" here. An omitted attribute is the intended change.
@@ -118,12 +125,12 @@ describe('Table', () => {
             })
 
         it.each(parts)('Table.%s passes `className` through verbatim', (name, Part, element) => {
-            const { container } = render(<table><Part className="font-normal left"/></table>)
+            const { container } = render(placed(element, <Part className="font-normal left"/>))
             expect(container.querySelector(element).getAttribute('class')).toBe('font-normal left')
         })
 
         it.each(parts)('Table.%s strips the engine and field-only props', (name, Part, element) => {
-            const { container } = render(<table><Part {...ENGINE_BAG}/></table>)
+            const { container } = render(placed(element, <Part {...ENGINE_BAG}/>))
             expect(container.querySelector(element).getAttributeNames()).toEqual([])
         })
 
@@ -189,15 +196,16 @@ describe('Table', () => {
             // of them needs a second class on the same element. So the 15 cells that asked for it
             // rendered at the <td> default anyway, and reproducing the classes would have copied
             // dead markup. The prop is gone; both call sites (LocalDraftTableRow) went with it.
-            // React warns about the unknown prop, which is the intended signal for a removed one.
-            const consoleError = jest.spyOn(console, 'error').mockImplementation(noop)
+            // The cell strips it and says so once in development, which "Table drops the props it
+            // no longer supports" below tests.
+            const consoleWarn = jest.spyOn(console, 'warn').mockImplementation(noop)
             try {
                 const { container } = inTable(<tr><Table.Cell verticalAlign="top">x</Table.Cell></tr>)
                 const td = container.querySelector('td')
                 expect(td.className).toBe('')
                 expect(td.hasAttribute('class')).toBe(false)
             } finally {
-                consoleError.mockRestore()
+                consoleWarn.mockRestore()
             }
         })
     })

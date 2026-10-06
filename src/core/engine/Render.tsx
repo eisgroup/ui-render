@@ -7,7 +7,7 @@ import { childItemPath, formatMetaPath } from './metaPath'
  * notation. Ambient tree position is exactly what context is for, and using it
  * keeps the path out of props: every prop a node carries is spread onto the
  * resolved component and can end up as a DOM attribute (that is how
- * `currencyCode` leaks today), and a diagnostic aid must not add to that.
+ * `currencyCode` leaked, until §9.4 stripped it at the DOM boundary), and a diagnostic aid must not add to that.
  */
 const MetaPathContext = createContext('')
 
@@ -158,8 +158,8 @@ class RenderClass extends Component<RenderProps, { error: unknown, diagnostic: s
     }
 
     /**
-     * @Note: try block only catches error in this Render function,
-     * Errors in components will propagate up to componentDidCatch in parent class.
+     * @Note: this boundary catches what its descendants throw (`componentDidCatch` above); what
+     * this render throws itself goes to the closest `Render` above it.
      */
     render () {
         if (this.state.error) return this.state.diagnostic

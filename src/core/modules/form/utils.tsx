@@ -326,50 +326,6 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
   return Class
 }
 
-/**
- * React Component React Final Form Decorator with getters to detect form input changes
- * @note:
- *  - cannot wrap connected to redux component, @connect must be declared before
- *  - onSubmit can be passed to the decorated Class component
- * @example:
- *     *@withForm()
- *      class SigninForm extends PureComponent {}
- *      // later in the render()
- *      <SigninForm onSubmit={(formValues, form, callback: ?(errors?) => void) => ?Object | Promise<?Object> | void}/>
- *      // see https://final-form.org/docs/react-final-form/types/FormProps#onsubmit
- *
- * @usage:
- *  or apply <Input onChange={this.handleChangeInput.bind(this)}/> manually:
- *  - this.canSave - getter boolean: true if form has input changes, no validation error exists, and is not loading
- *  - this.changedValues - getter object: key value pairs of form input values that have changed since initial values
- *  - this.registeredValues - getter object: key value pairs of registered form input values
- *  - this.changedAndRegisteredValues - getter object: combination of above
- *  - this.formValues - getter object: key value pairs of all form input values
- *
- * @helpers:
- *  - this.handleChangeInput() - function: updates state.canSave (hooked to this.renderInput, must be defined as function)
- *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
- *  - this.props.onChangeState - function: callback when internal state changes, receives this class instance,
- *        or {} on unmount. This is useful for nested forms with remote submit button within parent container.
- *
- *  @example:
- *    @connect(mapStateToProps)
- *    @withForm({subscription: {pristine: true, valid: true}})
- *    export default class UserEdit extends Component {
- *      state = {
- *        company: {}
- *      }
- *      render = () => (
- *        <View>
- *          <Company onChangeState={(instance) => this.setState({company: instance})} />
- *          <Button disabled={!this.state.company.canSave}>Save<Button/>
- *        </View>
- *      )
- *    }
- *
- * @param {FormProps|Object} [options] - for <Form/> see: https://final-form.org/docs/react-final-form/types/FormProps
- * @returns {Function} decorator - HOC wrapper function for given React component
- */
 /** The `<Form>` options a document is wrapped with, and the two the wrapper reads itself. */
 export type WithFormOptions = Partial<FormProps<Values>> & {
   /** Turns the class with the form layer over it into the component the wrapper renders */
@@ -378,9 +334,32 @@ export type WithFormOptions = Partial<FormProps<Values>> & {
   processErrors?: (form: FormApi, meta: any) => void
 }
 
-/** What the document is handed as `instance`: the form, and its submit handler, as the form renders. */
-type FormHandle = { form?: FormApi, handleSubmit?: FormRenderProps<Values>['handleSubmit'] }
+/** What a form without a host `onSubmit` submits to: nothing. */
+const submitNowhere = () => undefined
 
+/** What the document is handed as `instance`: the form and its submit handler, as the form renders, and its document tree. */
+type FormHandle = { form?: FormApi, handleSubmit?: FormRenderProps<Values>['handleSubmit'], tree?: object }
+
+/**
+ * The react-final-form layer over a document class. `withForm(options)(Class)` returns a wrapper that
+ * renders `<Form>` and, inside it, `Class` with the form layer `withFormSetup` builds over it. The
+ * engine is its one caller (`engine/rules.tsx`), and hands in its document host as `host`.
+ *
+ * The wrapper reads `initialValues` and `onSubmit` (final-form's `FormProps`); a host that passes no
+ * `onSubmit` submits to nothing. The class reads the form through what the layer adds:
+ *  - this.canSave - getter boolean: true if form has input changes, no validation error exists, and is not loading
+ *  - this.changedValues - getter object: key value pairs of form input values that have changed since initial values
+ *  - this.registeredValues - getter object: key value pairs of registered form input values
+ *  - this.changedAndRegisteredValues - getter object: combination of above
+ *  - this.formValues - getter object: key value pairs of all form input values
+ *  - this.handleChangeInput() - function: updates state.canSave
+ *  - this.syncInputChanges() - function: can be called manually to update input changes state, and force re-rendering
+ *  - this.props.onChangeState - function: callback when internal state changes, receives this class instance,
+ *        or {} on unmount
+ *
+ * @param {FormProps|Object} [options] - for <Form/> see: https://final-form.org/docs/react-final-form/types/FormProps
+ * @returns {Function} decorator - HOC wrapper function for given React component
+ */
 export function withForm (options: WithFormOptions = {subscription: {pristine: true, valid: true}}) {
   // The engine's error processing arrives as a CALLBACK rather than an import (§9.3 step 2). It reads
   // a meta node and writes the shared error map, which is engine business; importing it from here was
@@ -440,7 +419,9 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
      * instance's methods (see `renderForm`).
      */
     function WithForm (props: { initialValues?: Values, onSubmit?: FormProps<Values>['onSubmit'], [key: string]: unknown }) {
-      const {initialValues, onSubmit = console.warn, ...restProps} = props
+      // A host that passes no `onSubmit` has nothing to submit to. The default was `console.warn` until
+      // 2026-10-06, which printed every value of the form to the console of a production page.
+      const {initialValues, onSubmit = submitNowhere, ...restProps} = props
       const self = useRef<{
         handle: FormHandle
         form?: FormApi
@@ -448,10 +429,15 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
         subscribedForm?: FormApi | null
         unsubscribe?: (() => void) | null
         stored?: object
+        tree?: object
       } | null>(null)
       if (self.current === null) self.current = {handle: {form: undefined, handleSubmit: undefined}}
       const own = self.current
       const {handle} = own
+      // The document tree this form registers under: a nested document's parent says which, and a root
+      // starts its own. A cast, not a guard: `parent` is the parent document's engine instance.
+      if (!own.tree) own.tree = ((restProps.parent as { formTree?: object } | undefined) || {}).formTree || {}
+      handle.tree = own.tree
 
       // The initial values the form works from: the first ones, then any that differ BY VALUE. A new
       // object with the same entries changes nothing; otherwise a host computing its values afresh
@@ -515,7 +501,8 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
         formsStorage.set(own.stored, {
           meta: props.meta,
           // Not undefined: the form rendered, and handed it over, before any effect runs.
-          form: handle.form!
+          form: handle.form!,
+          tree: own.tree!, // not undefined: the first render set it
         });
         return () => {
           if (own.unsubscribe) own.unsubscribe()
@@ -538,7 +525,8 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
           handle.form.reset(adopted)
           formsStorage.set(own.stored, {
             meta: props.meta,
-            form: handle.form
+            form: handle.form,
+            tree: own.tree!, // not undefined: the first render set it
           });
         }
         setApplied(adopted)

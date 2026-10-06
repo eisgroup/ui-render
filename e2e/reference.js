@@ -421,8 +421,12 @@ const DROPDOWN = {
      * combobox pattern: the `.menu` is the `listbox` now, which owns the options, and the `.text`
      * beside it is the `combobox` that takes focus. Beside rather than inside, measured in this
      * browser: with the dropdown itself as the combobox, the open list folded into its value.
+     *
+     * AND `button: 1` (2026-10-06). It is not the dropdown's: the Examples page wraps each example in
+     * an Expand, the census reads the whole `#dropdown` section, and an Expand's title became the
+     * button of the WAI-ARIA disclosure pattern that day.
      */
-    ROLES: { combobox: 1, listbox: 1, option: 2 },
+    ROLES: { combobox: 1, listbox: 1, option: 2, button: 1 },
     /**
      * [R] Whether the options are in the DOM while the list is CLOSED — and it depends on the entry
      * point, which an earlier version of this note did not say. It called the fact "the single most

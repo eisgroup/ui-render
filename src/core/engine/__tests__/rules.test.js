@@ -433,9 +433,11 @@ describe('initSelectStatesFromData', () => {
 })
 
 // The engine layer's own members since §9.3 step 5; until then they were the `withDataKind` mixin.
-// They touch nothing but the registry, so a bare object on the layer's prototype is instance enough.
+// They touch nothing but the registry and the document tree their forms are read from (`formTree`),
+// so a bare object on the layer's prototype, given a form layer with a tree, is instance enough.
 describe('the nested-Data registry', () => {
     let parent
+    const TREE = {}
 
     function makeChild (relativePath) {
         return { props: { meta: { relativePath } } }
@@ -444,6 +446,7 @@ describe('the nested-Data registry', () => {
     beforeEach(() => {
         formsStorage.clear()
         parent = Object.create(Object.getPrototypeOf(Active.UIRender.InstanceClass).prototype)
+        parent.props = { instance: { tree: TREE } }
     })
 
     describe('registerDataKind', () => {
@@ -541,6 +544,7 @@ describe('the nested-Data registry', () => {
                     }),
                 },
                 meta: {},
+                tree: TREE,
             })
 
             expect(parent.getDataKind('periods', 'quote')).toEqual([
@@ -565,11 +569,24 @@ describe('the nested-Data registry', () => {
                     }),
                 },
                 meta: {},
+                tree: TREE,
             })
 
             expect(parent.getDataKind('periods')).toEqual([
                 { endDate: '2024-01-31' },
             ])
+        })
+
+        it('reads no form of another document tree: a second UIRender on the page', () => {
+            formsStorage.set('another root', {
+                form: {
+                    getState: () => ({ values: { quote: { dataKind: { periods: [{ startDate: '2024-03-01' }] } } } }),
+                },
+                meta: {},
+                tree: {},
+            })
+
+            expect(parent.getDataKind('periods', 'quote')).toEqual([])
         })
 
         it('returns an empty list when no form contains the dataKind path', () => {
@@ -578,6 +595,7 @@ describe('the nested-Data registry', () => {
                     getState: () => ({ values: { unrelated: true } }),
                 },
                 meta: {},
+                tree: TREE,
             })
 
             expect(parent.getDataKind('periods', 'quote')).toEqual([])

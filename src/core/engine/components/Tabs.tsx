@@ -91,6 +91,28 @@ function renderTab (tab: TabTitle | undefined) {
 const split = (items: TabItem[]) => ({tabs: items.map(({tab}) => tab), contents: items.map(({content}) => content)})
 
 /**
+ * The tab a key moves to, by the WAI-ARIA Tabs pattern: the arrows of the bar's own direction step
+ * through the tabs and wrap around, and Home and End go to the first and the last. `null` for any other key.
+ */
+export function tabTarget (key: string, current: number, count: number, vertical?: boolean): number | null {
+  if (key === (vertical ? 'ArrowDown' : 'ArrowRight')) return (current + 1) % count
+  if (key === (vertical ? 'ArrowUp' : 'ArrowLeft')) return (current - 1 + count) % count
+  if (key === 'Home') return 0
+  if (key === 'End') return count - 1
+  return null
+}
+
+/** A tab's title as text, for naming its panel; `undefined` when the title is not plain text. */
+const titleText = (tab: TabTitle | undefined) => {
+  if (typeof tab === 'string' || typeof tab === 'number') return String(tab)
+  if (tab && typeof tab === 'object' && !React.isValidElement(tab)) {
+    const {text} = tab as TitleObject
+    if (typeof text === 'string' || typeof text === 'number') return String(text)
+  }
+  return undefined
+}
+
+/**
  * Tabs Component with overridable self-managed state and overflow scrollbars.
  *
  * A FUNCTION COMPONENT since §9.3 step 6, and the last of the `@withTimer` classes. Its
@@ -109,6 +131,12 @@ const split = (items: TabItem[]) => ({tabs: items.map(({tab}) => tab), contents:
  * One thing changed, and a test pins it. The lifecycle compared a controlled `activeIndex` with the
  * COMMITTED active tab, so a parent that followed a click by passing that tab back as its
  * `activeIndex` was told about the click twice. Compared with the current state, it is told once.
+ *
+ * THE KEYBOARD, since 2026-10-06, by the WAI-ARIA Tabs pattern. The bar is a `tablist`, each title a
+ * `tab` with `aria-selected`, and the content a `tabpanel`, named by its tab's title when that is text.
+ * Only the active tab is in the tab order; the arrows of the bar's direction, Home and End move focus
+ * to another tab and select it, after the same 50 ms transition a click has. There are no ids to tie a
+ * tab to its panel: a counter would make every snapshot depend on the order things mount in.
  *
  * Function slots, content and children receive what the class passed as `this`: one object for the
  * component's lifetime, kept current, with `props`, `state`, `tabs`, `contents` and `setTab`.
@@ -208,6 +236,21 @@ export default function Tabs (props: TabsProps) {
 
   const {activeIndex, transition} = state
   const content = contents[activeIndex]
+  const onTabKeyDown = (event: React.KeyboardEvent<HTMLElement>, index: number) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      if (index !== activeIndex) setTab(index)
+      return
+    }
+    const target = tabTarget(event.key, index, tabs.length, vertical)
+    if (target == null) return
+    event.preventDefault()
+    // Focus moves at once; the tab it lands on is selected after its transition, as a click selects it.
+    const list = event.currentTarget.closest('[role="tablist"]')
+    const tab = list && list.querySelectorAll<HTMLElement>('[role="tab"]')[target]
+    if (tab) tab.focus()
+    if (target !== activeIndex) setTab(target)
+  }
   return (
     // In Safari, the entire .tabs container scrolls, but in Chrome, only .tabs__content scrolls
     // the solution is to enforce `min-height: initial` for this wrapper in `classNameInner`
@@ -217,18 +260,21 @@ export default function Tabs (props: TabsProps) {
       {...rest}
     >
       <ScrollView row={!vertical} center={centerTabs}
-                  className={cn('tabs__items no-scrollbar', classNameTabs)} style={styleTabs}>
+                  className={cn('tabs__items no-scrollbar', classNameTabs)} style={styleTabs}
+                  role="tablist" aria-orientation={vertical ? 'vertical' : undefined}>
         {isFunction(childrenBeforeTabs) ? childrenBeforeTabs(handle.current) : childrenBeforeTabs}
         {tabs.map((tab, i, allTabs) => (
           <View key={i} className={cn('tabs__item', {active: activeIndex === i && allTabs.length > 1})}
-                onClick={activeIndex !== i ? (() => setTab(i)) : undefined}>
+                role="tab" aria-selected={activeIndex === i} tabIndex={activeIndex === i ? 0 : -1}
+                onClick={activeIndex !== i ? (() => setTab(i)) : undefined}
+                onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => onTabKeyDown(event, i)}>
             {renderTab(tab)}
           </View>
         ))}
         {isFunction(childrenAfterTabs) ? childrenAfterTabs(handle.current) : childrenAfterTabs}
       </ScrollView>
       <ScrollView fill className={cn('tabs__content', {'fade-in': !transition}, classNameContent)}
-                  style={styleContent}>
+                  style={styleContent} role="tabpanel" aria-label={titleText(tabs[activeIndex])}>
         {typeof content === 'object' ? content : (isFunction(content) ? content(handle.current) : <Text>{content}</Text>)}
       </ScrollView>
       {isFunction(children) ? children(handle.current) : children}

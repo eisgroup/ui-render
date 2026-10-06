@@ -3,13 +3,15 @@ import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { Form } from 'react-final-form'
 // Force `form/utils` to fully load before asInputDateField pulls `storedTouched` from it,
-// otherwise the renders.js → asField cycle blows up.
+// otherwise the renders.tsx → asField cycle blows up.
 import '../utils'
 import { asInputDateField } from '../asInputDateField'
 
-const TestDate = ({ value, onChange, name, error, ...rest }) => (
+// `readonly` is the fields' prop; on an <input> it is `readOnly`, as the real inputs pass it.
+const TestDate = ({ value, onChange, name, error, readonly, ...rest }) => (
     <div>
         <input
+            readOnly={readonly}
             data-testid="dt"
             value={value || ''}
             onChange={(e) => onChange(e.target.value, name, e)}

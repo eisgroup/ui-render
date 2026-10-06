@@ -2,12 +2,12 @@
 type JSONReplacer = (this: unknown, key: string, value: unknown) => unknown
 
 /**
- * Converts given value to a JSON string if necessary.
- * Circular references are replaced with the string "[Circular]".
+ * Converts an object or array to a JSON string; any other value is returned as it is.
+ * An object met a second time, circular or merely shared, is written as the string "[Circular]".
  *
  * @param {*} data - to convert
  * @param {*} args - additional options (replacer, space)
- * @return {string}
+ * @return {string|*} the JSON string, or `data` itself when it is not an object
  */
 export function toJSON (
   data: unknown,
@@ -22,7 +22,7 @@ export function toJSON (
  * Attempts to parse a JSON string.
  *
  * @param {string} data - the string to be parsed
- * @return {Object|Null} - a JavaScript object if parsed successfully, null if not
+ * @return {*} - the parsed value, or `data` itself when it is not valid JSON
  */
 export function fromJSON (data: unknown): any {
   try {

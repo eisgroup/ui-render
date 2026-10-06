@@ -1069,8 +1069,8 @@ function renderMarkdown (reference) {
         `fails \`npm run lint:js\` on a static \`import\` of the package from anywhere outside \`${PACK}\`,`,
         'including deep imports such as `semantic-ui-react/dist/...`. A static import is *all* it sees:',
         'it cannot see `require()`, `jest.mock()`, or a dynamic `import(\'semantic-ui-react\')` — ESLint 8',
-        'does not visit `ImportExpression`. Nor does `lint:js` visit `.ts`/`.tsx` today, since it runs with',
-        '`--ext .js,.jsx`; the override glob already covers them for when it does.',
+        'does not visit `ImportExpression`. It does cover TypeScript: `lint:js` runs with',
+        '`--ext .js,.jsx,.ts,.tsx`.',
         '',
         `The scan above closes every one of those gaps — dynamic imports, double-quoted specifiers and`,
         `TypeScript files included — which is why both halves run${guardBlind.length

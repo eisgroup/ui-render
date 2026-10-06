@@ -148,10 +148,20 @@ export function Expand (props: ExpandProps) {
     const Title = renderLabel ? renderLabel(title) : title
     label = (
       // The label toggles with no children too: the content can be rendered elsewhere, as
-      // TableView renders a row's.
+      // TableView renders a row's. It is the button of the WAI-ARIA disclosure pattern since
+      // 2026-10-06: in the tab order, and Enter and Space toggle it as a click does.
       <Text
         className={classNames('row fill-width middle padding-small', {justify}, classNameLabel)}
         onClick={handleToggleExpand}
+        role="button"
+        tabIndex={0}
+        // `expanded` starts `undefined` when the prop is unset, and a collapsed disclosure must say `false`.
+        aria-expanded={!!expanded}
+        onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return
+          event.preventDefault()
+          handleToggleExpand()
+        }}
       >
         {justify && Title}
         {iconOpened && iconClosed &&

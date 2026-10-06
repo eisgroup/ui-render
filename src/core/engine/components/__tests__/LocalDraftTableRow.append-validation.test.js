@@ -95,12 +95,12 @@ describe('LocalDraftTableRow edge contracts', () => {
         expect(input).toHaveValue('')
     })
 
-    it('parses integer input nested in Col3 and ignores unsupported sibling meta', () => {
+    it('parses integer input nested in a column layout and ignores unsupported sibling meta', () => {
         const meta = {
             view: 'TableCells',
             items: [
                 {
-                    view: 'Col3',
+                    view: 'Col',
                     items: [
                         { view: 'Input', name: 'quantity', type: 'number', format: 'integer' },
                         { view: 'Text', children: 'Ignored decoration' },
@@ -167,5 +167,27 @@ describe('LocalDraftTableRow edge contracts', () => {
 
         expect(container.querySelector('button')).not.toBeInTheDocument()
         expect(mockPush).not.toHaveBeenCalled()
+    })
+})
+
+describe('LocalDraftTableRow and its document', () => {
+    it('descends into every column layout alias, and not into the constant key `Col3`', () => {
+        const meta = {
+            view: 'TableCells',
+            items: ['Col', 'Column', 'VerticalLayout', 'Col3'].map(view => ({
+                view, items: [{ view: 'Input', name: `in${view}`, label: view }],
+            })),
+        }
+        renderDraft({ meta, kind: 'rows', parentInstance: {} })
+
+        expect(Array.from(document.querySelectorAll('input'), input => input.name))
+            .toEqual(['inCol', 'inColumn', 'inVerticalLayout'])
+    })
+
+    it('translates with its document translator when it is handed none', () => {
+        const translate = text => `T:${text}`
+        renderDraft({ meta: inputMeta({ view: 'Input', name: 'title', label: 'Title' }), kind: 'rows', parentInstance: { translate } })
+
+        expect(screen.getByRole('button')).toHaveTextContent('T:Add draft')
     })
 })

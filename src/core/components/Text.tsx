@@ -50,7 +50,9 @@ export function Text ({
     const { dateFormat } = useContext(ConfigContext) as DateConfig
 
     let component: React.ReactNode = children
-    if (React.isValidElement<{ translate?: Translate }>(children)) {
+    // A component child is handed the translator; a DOM element is not, because there `translate` is
+    // an HTML attribute, and React warned on a function in it (until 2026-10-06).
+    if (React.isValidElement<{ translate?: Translate }>(children) && typeof children.type !== 'string') {
         component = React.cloneElement(children, { translate })
     } else if (typeof children === 'object') {
         component = children
@@ -64,7 +66,7 @@ export function Text ({
         }
     }
     // DOM boundary: this spread lands on a <span>, and `Text` is where every value renderer
-    // ends up (renders.js renderFloat -> <Text {...options}>), so the whole render-method
+    // ends up (renders.tsx renderFloat -> <Text {...options}>), so the whole render-method
     // options bag arrives here. Nothing engine-internal and no field-only attribute belongs
     // on a span — add new engine props to ./domProps.ts, not as another `foo: _` above.
     const domProps = omitProps(props, ENGINE_PROPS, FIELD_ONLY_PROPS)

@@ -2,12 +2,11 @@
  * THE WRAPPER'S MASSAGING LAYER, asserted at the seam — AND THIS FILE IS NOT A GATE.
  * =============================================================================================
  *
- * It mocks `semantic-ui-react` to `() => null` and reads the props object the wrapper hands down.
+ * It mocks the inner `Listbox` to `() => null` and reads the props object the wrapper hands down.
  * Measured, on the unmodified repo: every test here passes against an inner control that RENDERS
- * NOTHING. That is not a flaw to fix by deleting the file — the option sanitiser, the
- * case-insensitive addition dedup, the value normalisation and the callback signatures are real
- * wrapper logic that §9.7-F1 step 3 KEEPS, and the props object is the cheapest honest place to
- * observe them. It is a flaw to MISTAKE for a gate.
+ * NOTHING. That is not a flaw to fix by deleting the file — the option sanitiser, the value
+ * normalisation and the callback signatures are real wrapper logic that §9.7-F1 step 3 KEPT, and
+ * the props object is the cheapest honest place to observe them. It is a flaw to MISTAKE for a gate.
  *
  * What gates the component is `Dropdown.gate.test.js`, which drives the real library through
  * roles, text and callbacks — and whose acceptance test is that all of it fails when the inner
@@ -39,7 +38,7 @@ const withConfig = ui => (
     <ConfigContext.Provider value={initialConfigState}>{ui}</ConfigContext.Provider>
 )
 
-const latestSemanticProps = () => {
+const latestListboxProps = () => {
     const calls = Listbox.mock.calls
     return calls[calls.length - 1][0]
 }
@@ -66,7 +65,7 @@ describe('Dropdown parent value and option contracts', () => {
             ))
         })
 
-        expect(latestSemanticProps().value).toBe(0)
+        expect(latestListboxProps().value).toBe(0)
     })
 
     it('uses option text as the cascading fallback when an option has no value', () => {
@@ -126,6 +125,8 @@ describe('Dropdown parent value and option contracts', () => {
     it('does not invent a selection for a `multiple` dropdown mounted with an empty array', () => {
         const calls = []
         const onChange = (...args) => calls.push(args)
+        // `multiple` is dropped, and says so once in development; `Dropdown.test.js` tests that warning.
+        jest.spyOn(console, 'warn').mockImplementation(() => {})
 
         render(withConfig(
             <Dropdown multiple options={[{ text: 'A', value: 'a' }, { text: 'B', value: 'b' }]}
@@ -135,6 +136,7 @@ describe('Dropdown parent value and option contracts', () => {
         // `String([])` is `''`, which is in no option list, so the reset guard used to fire and
         // report a selection of the first option before the user had touched anything.
         expect(calls).toEqual([])
+        console.warn.mockRestore()
     })
 
     /**
@@ -148,7 +150,7 @@ describe('Dropdown parent value and option contracts', () => {
     it('appends `optionsLabel` once, as a disabled last option', () => {
         renderDropdown({ options: objectOptions, optionsLabel: 'FOOTER' })
 
-        const options = latestSemanticProps().options
+        const options = latestListboxProps().options
         expect(options.filter(o => o.content === 'FOOTER')).toHaveLength(1)
         expect(options[options.length - 1]).toEqual(
             expect.objectContaining({ content: 'FOOTER', disabled: true })
@@ -165,7 +167,7 @@ describe('Dropdown parent value and option contracts', () => {
         // which is why the "only one element carries the id" half of this contract lives in
         // `Dropdown.test.js` against the real one. Here: the derived id, and the wiring.
         expect(container.querySelector('.field-help').id).toBe('region-help')
-        expect(latestSemanticProps()['aria-describedby']).toBe('region-help')
+        expect(latestListboxProps()['aria-describedby']).toBe('region-help')
     })
 
     it('adds no `aria-describedby` when there is no help text to point at', () => {
@@ -173,7 +175,7 @@ describe('Dropdown parent value and option contracts', () => {
             <Dropdown id="region" name="region" options={[{ text: 'A', value: 'a' }]} onChange={() => {}}/>
         ))
 
-        expect(latestSemanticProps()['aria-describedby']).toBeUndefined()
+        expect(latestListboxProps()['aria-describedby']).toBeUndefined()
     })
 
     // The sanitizer dispatches on `typeof options[0].value`, and `typeof null === 'object'` — so a null value
@@ -183,7 +185,7 @@ describe('Dropdown parent value and option contracts', () => {
     it('gives a null-valued option its text as the value, matching the cascading fallback', () => {
         renderDropdown({ options: [{ text: 'Fallback label', value: null }] })
 
-        expect(latestSemanticProps().options).toEqual([
+        expect(latestListboxProps().options).toEqual([
             expect.objectContaining({ text: 'Fallback label', value: 'Fallback label' }),
         ])
     })
@@ -191,7 +193,7 @@ describe('Dropdown parent value and option contracts', () => {
     it('treats an option with no value key the same way', () => {
         renderDropdown({ options: [{ text: 'No value here' }] })
 
-        expect(latestSemanticProps().options).toEqual([
+        expect(latestListboxProps().options).toEqual([
             expect.objectContaining({ text: 'No value here', value: 'No value here' }),
         ])
     })
@@ -201,16 +203,16 @@ describe('Dropdown parent value and option contracts', () => {
     it('keeps real values on later options when the first one has none', () => {
         renderDropdown({ options: [{ text: 'No value' }, { text: 'Has value', value: 'x' }] })
 
-        expect(latestSemanticProps().options).toEqual([
+        expect(latestListboxProps().options).toEqual([
             expect.objectContaining({ text: 'No value', value: 'No value' }),
             expect.objectContaining({ text: 'Has value', value: 'x' }),
         ])
     })
 
-    // The engine hands every view `currencyCode` and `onDataChanged`. Semantic's Dropdown spreads
-    // whatever it does not recognise onto its <div>, so these reached the DOM and React warned on the
-    // demo's Dropdown example. Assert at the leak boundary: what we hand to Semantic.
-    it('keeps engine-only props out of the props handed to Semantic', () => {
+    // The engine hands every view `currencyCode` and `onDataChanged`. Semantic's Dropdown spread
+    // whatever it did not recognise onto its <div>, as `Listbox` does, so these reached the DOM and
+    // React warned on the demo's Dropdown example. Assert at the leak boundary: what we hand to Listbox.
+    it('keeps engine-only props out of the props handed to Listbox', () => {
         renderDropdown({
             options: objectOptions,
             currencyCode: 'EUR',
@@ -221,37 +223,37 @@ describe('Dropdown parent value and option contracts', () => {
             _comment: 'a note to the next meta author',
         })
 
-        const semanticProps = latestSemanticProps()
-        expect(semanticProps).not.toHaveProperty('currencyCode')
-        expect(semanticProps).not.toHaveProperty('onDataChanged')
-        expect(semanticProps).not.toHaveProperty('view')
-        expect(semanticProps).not.toHaveProperty('index')
-        expect(semanticProps).not.toHaveProperty('symbol')
-        expect(semanticProps).not.toHaveProperty('_comment')
+        const listboxProps = latestListboxProps()
+        expect(listboxProps).not.toHaveProperty('currencyCode')
+        expect(listboxProps).not.toHaveProperty('onDataChanged')
+        expect(listboxProps).not.toHaveProperty('view')
+        expect(listboxProps).not.toHaveProperty('index')
+        expect(listboxProps).not.toHaveProperty('symbol')
+        expect(listboxProps).not.toHaveProperty('_comment')
         // The options still arrive, so nothing else was stripped by accident.
-        expect(semanticProps.options).toHaveLength(2)
+        expect(listboxProps.options).toHaveLength(2)
     })
 
-    // Semantic declares no `name` prop, so it spread ours onto its <div role="listbox"> — 17
+    // Semantic declared no `name` prop, and neither does `Listbox`, so ours was spread onto the <div role="listbox"> — 17
     // occurrences in the DOM baseline. It is still the value every Dropdown callback reports as its
-    // second argument (covered by the onChange/onSelect/onSearch tests in this file), so this must
-    // hold *without* the prop reaching Semantic. `label` is consumed by the wrapper's own <Text>.
-    it('keeps `name` and `label` out of the props handed to Semantic, and still reports the name', () => {
+    // second argument (covered by the onChange/onSelect tests in this file), so this must
+    // hold *without* the prop reaching Listbox. `label` is consumed by the wrapper's own <Text>.
+    it('keeps `name` and `label` out of the props handed to Listbox, and still reports the name', () => {
         const onChange = jest.fn()
         renderDropdown({ options: objectOptions, name: 'category', label: 'Category', onChange })
 
-        const semanticProps = latestSemanticProps()
-        expect(semanticProps).not.toHaveProperty('name')
-        expect(semanticProps).not.toHaveProperty('label')
+        const listboxProps = latestListboxProps()
+        expect(listboxProps).not.toHaveProperty('name')
+        expect(listboxProps).not.toHaveProperty('label')
 
-        semanticProps.onChange({}, { value: 'b' })
+        act(() => { listboxProps.onChange({}, { value: 'b' }) })
         expect(onChange).toHaveBeenCalledWith('b', 'category', {})
     })
 
     it('still stringifies a genuinely object-valued option', () => {
         renderDropdown({ options: [{ text: 'Colour', value: [1, -1] }] })
 
-        expect(latestSemanticProps().options).toEqual([
+        expect(latestListboxProps().options).toEqual([
             expect.objectContaining({ text: 'Colour', value: '1,-1' }),
         ])
     })
@@ -260,9 +262,9 @@ describe('Dropdown parent value and option contracts', () => {
         const onChange = jest.fn()
         renderDropdown({ options: [{ text: 'Fallback label', value: null }], onChange })
 
-        const { onChange: semanticOnChange, options } = latestSemanticProps()
+        const { onChange: listboxOnChange, options } = latestListboxProps()
         act(() => {
-            semanticOnChange({}, { value: options[0].value })
+            listboxOnChange({}, { value: options[0].value })
         })
 
         expect(onChange).toHaveBeenCalledWith('Fallback label', undefined, expect.anything())
@@ -278,14 +280,14 @@ describe('Dropdown parent value and option contracts', () => {
     it('lets a caller turn `selection` off, though nothing in the corpus does', () => {
         renderDropdown({ options: objectOptions, selection: false })
 
-        expect(latestSemanticProps()).toEqual(expect.objectContaining({ selection: false }))
+        expect(latestListboxProps()).toEqual(expect.objectContaining({ selection: false }))
     })
 
     it('leaves object options with numeric values intact', () => {
         const options = [{ text: 'Ten', value: 10 }]
         renderDropdown({ options })
 
-        expect(latestSemanticProps().options).toEqual(options)
+        expect(latestListboxProps().options).toEqual(options)
     })
 
     it('normalizes color-array values to the string values used by options', () => {
@@ -294,8 +296,8 @@ describe('Dropdown parent value and option contracts', () => {
             value: [255, 0, 0],
         })
 
-        expect(latestSemanticProps().options[0].value).toBe('255,0,0')
-        expect(latestSemanticProps().value).toBe('255,0,0')
+        expect(latestListboxProps().options[0].value).toBe('255,0,0')
+        expect(latestListboxProps().value).toBe('255,0,0')
     })
 
 })
@@ -311,7 +313,7 @@ describe('Dropdown interaction callback contracts', () => {
         renderDropdown({ options: [0, 1], name: 'rank', onChange })
 
         act(() => {
-            latestSemanticProps().onChange(event, { value: 0 })
+            latestListboxProps().onChange(event, { value: 0 })
         })
 
         expect(onChange).toHaveBeenCalledWith(0, 'rank', event)
@@ -330,10 +332,10 @@ describe('Dropdown interaction callback contracts', () => {
         })
 
         act(() => {
-            latestSemanticProps().onChange(changeEvent, { value: 'b' })
+            latestListboxProps().onChange(changeEvent, { value: 'b' })
         })
         act(() => {
-            latestSemanticProps().onClose(closeEvent)
+            latestListboxProps().onClose(closeEvent)
         })
 
         expect(onSelect).toHaveBeenCalledWith('b', 'option', closeEvent)
@@ -359,6 +361,8 @@ describe('Dropdown additions contracts', () => {
      * `Listbox` implements it as the `upward` class token.
      */
     it('no longer forwards the addition props, and still forwards `upward`', () => {
+        // Each dropped prop says so once in development; `Dropdown.test.js` tests that warning.
+        jest.spyOn(console, 'warn').mockImplementation(() => {})
         renderDropdown({
             options: objectOptions,
             allowAdditions: true,
@@ -367,10 +371,11 @@ describe('Dropdown additions contracts', () => {
             upward: true,
         })
 
-        const handed = latestSemanticProps()
+        const handed = latestListboxProps()
         expect(handed).toEqual(expect.objectContaining({ upward: true }))
         expect(Object.keys(handed)).not.toContain('allowAdditions')
         expect(Object.keys(handed)).not.toContain('additionLabel')
         expect(Object.keys(handed)).not.toContain('additionPosition')
+        console.warn.mockRestore()
     })
 })

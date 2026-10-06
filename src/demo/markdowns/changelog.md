@@ -58,8 +58,7 @@
 #### Table rendering
 
 - **Tables are now rendered by our own components instead of `semantic-ui-react`.** The
-  `semantic-ui-react` table code path is gone from the bundle (~4 KB), and the library is one
-  component closer to not depending on the package at all. The elements are the same
+  `semantic-ui-react` table code path is gone from the bundle (~4 KB). The elements are the same
   (`table`/`thead`/`tbody`/`tfoot`/`tr`/`th`/`td`), in the same nesting, and the class names on
   `<table>`, `<thead>` and `<th>` are byte-for-byte what they were — including the `ui table`
   prefix on the root, which every table style in the package hangs off. Across the 38 bundled
@@ -108,6 +107,17 @@
 
 #### Accessibility
 
+- **Tabs, an Expand's title and a sortable column's header work from the keyboard.** They had
+  no role and no tab stop, so a keyboard could not reach them and a screen reader did not say
+  what they were.
+  - Tabs follow WAI-ARIA's Tabs pattern: the bar is a `tablist`, each title a `tab` that says
+    whether it is selected, and the content a `tabpanel`. The arrow keys, Home and End move
+    between tabs and select them.
+  - An Expand's title is a button that says whether it is expanded; Enter and Space toggle it.
+  - A sortable column's header is a button that Enter and Space press, and the header cell says
+    its order in `aria-sort`.
+  - **This changes the markup**: these elements gain `role`, `tabindex` and `aria-*` attributes.
+    A click focuses them now, and the focus ring shows for the keyboard only.
 - The text, number and date inputs no longer emit an `aria-describedby` pointing at an element
   that does not exist. The attribute was unconditional while the element carrying the target id
   renders only when there is an error or info message, so every reference in a form without
@@ -126,6 +136,14 @@
 
 #### Documentation
 
+- **New page: the supported props of `Table`, `Tooltip` and `Select` / `Dropdown`** —
+  `docs/SUPPORTED-PROPS.md`, linked from the README. These are the three views whose
+  implementation came in-house, and this is the first time their prop surface has been written
+  down. Each prop is listed with what happens to it — consumed by our own component, stripped
+  before it reaches the DOM, or deliberately dropped — and whether any real meta uses it. Nothing
+  changes at runtime; the page is generated from the component source and checked in CI, so the
+  derived half — which prop reaches where — cannot drift away from the code. The explanatory prose
+  beside it is curated, not machine-checked, and the page says so itself.
 - **The prop reference now ships with the package.** `docs/SUPPORTED-PROPS.md` and
   `docs/SUPPORTED-VIEWS.md` are in the npm tarball, not just on the site. This release removes
   published props, and the list of what went and why should be reachable from an installed copy
@@ -244,19 +262,8 @@
   cannot land on the element as invalid HTML attributes. Everything the select documents keeps
   working, `compact` and `upward` included.
 
-#### Documentation
+#### Props removed from Select, Tooltip and Table
 
-- **New page: the supported props of `Table`, `Tooltip` and `Select` / `Dropdown`** —
-  `docs/SUPPORTED-PROPS.md` in the repository, linked from the README. Those three views are the
-  ones whose implementation is being brought in-house, and this is the first time their prop surface
-  has been written down. Each prop is listed with two things: what actually happens to it —
-  consumed by our own component, stripped before it reaches the DOM, forwarded to
-  `semantic-ui-react`, or (for a view already reimplemented) deliberately dropped — and whether any
-  real meta uses it. Nothing changes at runtime; the page is
-  generated from the component source and checked in CI, so the derived half — which prop reaches where —
-  cannot drift away from the code. The explanatory prose beside it is curated, not machine-checked, and
-  the page says so itself. `Table` is the first view to have gone in-house, so its section already
-  reads as a record of what it emits and what it dropped rather than as a checklist.
 - **The select is narrowing, and this is the breaking part.** An earlier entry listed
   `search`, `multiple`, `allowAdditions` and `clearable` as the props you could actually write on a
   select, said the decision to rebuild or drop them was open, and asked you to speak up if your
@@ -294,7 +301,7 @@
   **If you pass an object `tooltip` attribute, its accepted surface narrowed from 45 names to 13.**
   Those 45 were never a designed API — they were whatever `semantic-ui-react`'s `Popup` and `Portal`
   happened to accept, reachable because the attribute was spread straight through. The 13 that
-  remain are the ones with a defined meaning here; of the rest, the 18 that were both reachable and
+  remain are the ones with a defined meaning here; of the rest, the 19 that were both reachable and
   plausible warn once each in development rather than being ignored silently, and the remainder had
   no observable effect to lose.
 
@@ -319,9 +326,7 @@
   it. If your build aliases `react` to one particular copy, alias `react/jsx-runtime` the same way.
 - Development and the primary test suite now run on React 18.3.1, and the demo mounts through the
   React 18 root API, so it renders with automatic batching exactly as a host on 18 does.
-- The peer range stays additive: host applications may use React 16.14, 17 or 18. Hosts on 16 or 17
-  need change nothing.
-- `TooltipPop` and `Image` no longer use `defaultProps`, which React 18.3 warns about for function
+- The tooltip and `Image` no longer use `defaultProps`, which React 18.3 warns about for function
   components and React 19 removes. Their defaults are unchanged.
 - The Moment peer range now accepts all compatible 2.x releases from 2.29.4 onward.
 - Public TypeScript declarations now describe the shipped callable component: `data` and `meta`
@@ -333,25 +338,23 @@
 
 #### Packaging
 
-- Stylesheets, fonts and images are no longer duplicated in the published package. The real files
-  ship once in the root `static/` folder — the payload to copy into a host's web root, since image
-  paths resolve to `<homepage>/static/images/` — and `dist/static/all.css` and `font.css` became
-  one-line `@import` re-exports of it. Both import paths keep working; `semantic.css` remains an
+- Stylesheets and fonts are no longer duplicated in the published package. The real files ship
+  once in the root `static/` folder — the payload to copy into a host's web root — and
+  `dist/static/all.css` and `font.css` became one-line `@import` re-exports of it. Both import paths keep working; `semantic.css` remains an
   empty stub in both places.
-- The tarball dropped from 579 files / 11.6 MB unpacked to **299 files / 6.7 MB (2.5 MB packed)**, remeasured 2026-09-15 after the Semantic exit completed.
-  Source maps continue to ship for host debugging.
+- The tarball dropped from 579 files / 11.6 MB unpacked to **25 files / 3.35 MB (0.87 MB packed)**. Source maps continue
+  to ship for host debugging.
 - **The package no longer ships `static/images/flags/`.** These were 266 country-flag SVGs, 41% of
   the unpacked package, and nothing in the library used them: their one reader was a dropdown
   renderer that never reached the bundle, and it is deleted. A host that links
   `/static/images/flags/<code>.svg`, from its own markup or from a meta `Image`, ships its own copy
-  now. The tarball is **23 files / 3.3 MB unpacked (0.85 MB packed)**, from 289 / 5.6 MB / 1.4 MB.
-  The demo site stops serving them as well, so a link to the demo's copy stops resolving.
+  now. The demo site stops serving them as well, so a link to the demo's copy stops resolving.
 - **The package records the third-party code it bundles.** `dist/index.js` carries 16 packages,
   all MIT, that `package.json` cannot declare, because they are bundled rather than installed:
   `npm sbom` reports none of them. Only two of their licence notices survived minification. The
   build now writes the licence file of each one into `dist/THIRD-PARTY-LICENSES.txt`, and lists
   them, with the vendored CSS, in a CycloneDX SBOM, `dist/sbom.cdx.json`, for scanners that read
-  one. The tarball is 25 files, 3.33 MB unpacked (0.86 MB packed).
+  one.
 
 #### Tests and CI
 
@@ -390,7 +393,7 @@
   registered view is covered by neither. A browser pass found the `Upload` failure listed under
   Fixes.
 - Added GitHub Actions checks for JavaScript/CSS lint, coverage, library build, and demo build.
-- Added a public-declaration gate against locked React 16/17/18 types in interop and direct
+- Added a public-declaration gate against locked React 16/17/18/19 types in interop and direct
   CommonJS modes, including a check of the built package's callable runtime export.
 - Added packaging gates: budgets over the published manifest (file count, sizes, required paths,
   duplicate assets) and a packed-tarball smoke that extracts the artifact, resolves every
@@ -400,19 +403,52 @@
   eighteen were genuine cleanups, four are suppressions carrying a comment that states why the rule
   does not apply, and three turned out to be the defects listed under Fixes.
 - Removed 14 devDependencies with no references in code, configs, scripts or CI, cutting the
-  installed development tree by 14 packages. This does not affect the published package.
+  installed development tree by 14 packages. Two more went later, `react-router` and
+  `eslint-plugin-react-hooks`, which `react-router-dom` and `eslint-config-react-app` install anyway.
+  This does not affect the published package.
 - Build configuration: the demo build no longer duplicates the shared Babel presets. Every
   pipeline — library, demo and tests — now reads them from one `babel.config.js`, with only the
   development-time refresh transform declared by the demo. Emitted bundles are unchanged.
 - The declared peer range is now tested, not just asserted. The full suite runs on React 16.14, 17
   and 19 in gating checks of their own alongside the React 18 one, and the packed artifact is
-  server-rendered against each of them. The React 19 check began as a non-gating one, so that
+  server-rendered against each of them, from the same installs those checks use, with no registry
+  access. The React 19 check began as a non-gating one, so that
   upstream drift showed up early. Assertions that had been pinned to React version internals — a
   function component's second argument, and component names appended to development warnings — now
   assert behaviour instead, so the same suite passes on React 16.14, 17, 18.3 and 19.
+- A test that prints to `console.error` or `console.warn` fails, on every React the suite runs on.
+  That is where React reports a list without keys or an update outside `act`, and before this 12
+  test files printed such lines on React 18 and 16 on React 16.14 and 17, unread. A test that
+  expects a warning now says so and asserts it.
+- TypeScript checks JSX the way Babel compiles it, through `react/jsx-runtime`, so a file no longer
+  needs `React` in scope for its JSX. The published declarations are unchanged.
 
 #### Fixes
 
+- **A template popup, a table with a section divider, and a `Text` around a DOM element no longer
+  log React warnings in development.** The popup's items and the divider's cells had no `key`, and
+  `Text` handed its translator to an element such as a `<span>`, where `translate` is an HTML
+  attribute. Found when the test suite started failing on console output.
+
+- **Two `UIRender`s on one page keep their form data apart.** Every document read the forms of
+  every document on the page: what `getFormData` hands the host, what `showIf` tests, what an
+  upload sends, and the rows a submit and a cross-row validation read. With two independent
+  documents on a page, each found the other's fields in its own data. A document now reads its
+  own form and those of the documents nested in it.
+- **A form whose host passes no `onSubmit` no longer prints its values.** The fallback was
+  `console.warn`, so a submit wrote every value of the form to the browser console of a
+  production page. It does nothing now.
+- **The `localDraft` row of a `Data` block is translated, and renders the fields of every column
+  layout.** It used the translator from before any document set its own, so its labels,
+  placeholders, errors and Add button were never translated; it uses its document's now. It looked
+  for fields inside `VerticalLayout` and `Col3`, which is not a view name, so the fields of a `Col`
+  or a `Column` were left out of the row.
+- **A malformed `metaVersion` is reported as a warning.** `validateMeta` reported it as an
+  `error`, the severity it keeps for shapes the renderer fails on, although the renderer ignores
+  the value.
+- **`padding-top-largest`, `padding-bottom-larger`, `padding-left-larger` and `no-margin-h`
+  exist.** The styles guide lists them with their families, and the stylesheet lacked them, so a
+  meta that used them got no spacing.
 - **A `Select` or `Dropdown` with its options written in the meta renders.** Declared as the
   configuration docs show, `options: [{ text, value }]` with a `name` and no `onChange`, it failed
   to render: each option was mapped to itself as its text. Such a list is now used as declared, as
@@ -429,8 +465,7 @@
   renders and accepts any file, and its hover hint names no formats.
 - **A `float` Dropdown keeps its label above the selected value.** The wrapper never marked a
   dropdown with a value as completed, so the stylesheet's completed state did not apply: the
-  label of a `float` dropdown fell back over the selection it named, and a multiple selection kept
-  its border. An empty selection and a field with an error are still not completed.
+  label of a `float` dropdown fell back over the selection it named. An empty selection and a field with an error are still not completed.
 - **`validate: 'password'` no longer throws on a server without a strength checker.** In a
   browser, the check is skipped until zxcvbn loads. On the server it threw
   `TypeError: Active.passwordCheck is not a function` unless the host had assigned one; it is now
@@ -531,8 +566,7 @@
   template declared outside the table was rebound onto the table's path and discarded its edit.
 - Stopped both Tabs implementations from passing `onClick={false}` to the DOM.
 - Date fields now forward blur events to Final Form and correctly leave focused state.
-- Dropdown now preserves controlled numeric zeroes, keeps sanitized multi-select values in
-  state, normalizes color values from its live state, and retains the selected value for
+- Dropdown now preserves controlled numeric zeroes, normalizes color values from its live state, and retains the selected value for
   `onSelect` after rerendering.
 - InputNumber now applies percentage/thousands formatting and parsing, honors uncontrolled
   defaults, preserves uncontrolled edits, tolerates an omitted `onChange`, and safely renders

@@ -188,7 +188,7 @@ const renderExample = ({ data, meta }) => {
  * A NOTE ON WHAT THIS CORPUS CANNOT SEE, since it misled twice: the 38 examples are a
  * regression net, not an audit. They contain zero `sticky` classes, so neither the
  * `-last` bug nor its fix could be judged here — that is covered directly in
- * `pages/main/components/__tests__/TableView.test.js`. Seven leaking DOM boundaries
+ * `engine/components/__tests__/TableView.test.js`. Seven leaking DOM boundaries
  * were likewise invisible because no example passes an engine prop to a slider or an
  * icon; see the audit note in `components/domProps.ts`.
  */

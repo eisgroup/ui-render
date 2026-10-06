@@ -1,5 +1,5 @@
 // Force form module to fully resolve before importing renders, which transitively
-// imports form/utils → pages/main/rules → withForm and hits a circular dep.
+// imports form/utils → engine/rules → withForm and hits a circular dep.
 import '../../../modules/form/utils'
 import { renderField } from '../renders'
 import { FIELD } from '../../../modules/variables'
