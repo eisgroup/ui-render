@@ -174,6 +174,9 @@ const REACT_APP_RULES = {
     'jsx-a11y/scope': 'warn',
 
     'react-hooks/rules-of-hooks': 'error',
+    // eslint-plugin-react-hooks 7 adds the React Compiler's rules to its presets. This config names
+    // the plugin's rules one by one, so they stay off: measured on 2026-10-07, switched on they report
+    // 100 findings in 16 files, 83 of them `react-hooks/refs`. Adopting them is a decision of its own.
 }
 
 /** `eslint-config-react-app`'s TypeScript override: tsc covers some rules, typescript-eslint others. */
