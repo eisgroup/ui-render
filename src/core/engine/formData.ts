@@ -165,6 +165,7 @@ const mergeData = (formData: Values[]) => {
 }
 
 // Find Select fields and change options order in case select was changed
+/** Exported for its unit tests: no other module imports it. */
 export const changeOptionOrderForSelectFields = (data: Values, meta: MetaNode | undefined) => {
   // find data related to Select and change options order
   const recursiveDataParser = (data: unknown, optionName: string, selectValue: unknown) => {

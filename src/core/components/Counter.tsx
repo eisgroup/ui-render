@@ -75,6 +75,8 @@ const initialState = (animation: Animation): CounterFrame => {
  * on `end` exactly. A frame with no steps left changes nothing, and returns the same state object so
  * React skips the update, as the class's updater did by returning `null`.
  *
+ * Exported for its unit tests: no other module imports it.
+ *
  * @param {{value: Number, steps: Number}} state - the displayed value and the steps left
  * @param {Number} end - the value the animation finishes on
  * @returns {{value: Number, steps: Number}} the next state

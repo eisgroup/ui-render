@@ -94,7 +94,7 @@ const split = (items: TabItem[]) => ({tabs: items.map(({tab}) => tab), contents:
  * The tab a key moves to, by the WAI-ARIA Tabs pattern: the arrows of the bar's own direction step
  * through the tabs and wrap around, and Home and End go to the first and the last. `null` for any other key.
  */
-export function tabTarget (key: string, current: number, count: number, vertical?: boolean): number | null {
+function tabTarget (key: string, current: number, count: number, vertical?: boolean): number | null {
   if (key === (vertical ? 'ArrowDown' : 'ArrowRight')) return (current + 1) % count
   if (key === (vertical ? 'ArrowUp' : 'ArrowLeft')) return (current - 1 + count) % count
   if (key === 'Home') return 0

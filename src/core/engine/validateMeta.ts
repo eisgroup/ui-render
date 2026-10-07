@@ -42,12 +42,21 @@ import { joinPath } from './metaPath'
  * -----------------------------------------------------------------------------
  */
 
-/** Contract version this build implements. Meta files may declare `metaVersion` to pin it. */
+/**
+ * Contract version this build implements. Meta files may declare `metaVersion` to pin it.
+ *
+ * Exported for its unit tests: no other module imports it.
+ */
 export const CURRENT_META_VERSION = '1'
 
-/** `MAJOR` or `MAJOR.MINOR`. */
+/**
+ * `MAJOR` or `MAJOR.MINOR`.
+ *
+ * Exported for its unit tests: no other module imports it.
+ */
 export const META_VERSION_PATTERN = /^[0-9]+(\.[0-9]+)?$/
 
+/** Exported for its unit tests: no other module imports it. */
 export const META_PROBLEM = {
     ROOT_NOT_OBJECT: 'ROOT_NOT_OBJECT',
     NAME_NOT_STRING: 'NAME_NOT_STRING',
@@ -61,6 +70,7 @@ export const META_PROBLEM = {
     SHOW_IF_INVALID: 'SHOW_IF_INVALID',
 }
 
+/** Exported for its unit tests: no other module imports it. */
 export const META_SEVERITY = {
     ERROR: 'error',
     WARNING: 'warning',
@@ -102,15 +112,25 @@ const isPlainObject = (value: unknown): value is MetaNode => !!value && typeof v
  */
 const declaredValues = (group: Record<string, string>) => Object.keys(group).map(key => group[key])
 
-/** @returns {Array<String>} every `view` value the engine declares */
+/**
+ * Exported for its unit tests: no other module imports it.
+ *
+ * @returns {Array<String>} every `view` value the engine declares
+ */
 export const declaredViews = () => declaredValues(FIELD.TYPE)
 
-/** @returns {Array<String>} every built-in `render*` method name */
+/**
+ * Exported for its unit tests: no other module imports it.
+ *
+ * @returns {Array<String>} every built-in `render*` method name
+ */
 export const declaredRenderMethods = () => declaredValues(FIELD.RENDER)
 
 /**
  * Validate a `meta.json` declaration against the contract the engine actually
  * implements, without rendering it.
+ *
+ * Exported for its unit tests: no other module imports it.
  *
  * @param {*} meta - meta.json declaration (the value passed to `UIRender.meta`)
  * @returns {Array<{path: String, severity: String, code: String, message: String}>} problems -
@@ -260,6 +280,8 @@ function checkMetaVersion (value: unknown, isRoot: boolean, report: Report): voi
 }
 
 /**
+ * Exported for its unit tests: no other module imports it.
+ *
  * @param {Object} problem - as returned by validateMeta()
  * @returns {String} single line, path first, suitable for a console warning
  */

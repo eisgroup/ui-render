@@ -19,7 +19,7 @@ export type IconProps = {
 /**
  * Icon - Pure Component
  */
-export function Icon ({
+function Icon ({
   name,
   className,
   large,

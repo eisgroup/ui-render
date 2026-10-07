@@ -21,7 +21,7 @@ export type TooltipBubbleProps = {
  * focused, or at once with `show`. `Tooltip` places one by its trigger, and `Slider`, `Upload` and
  * `withFormSetup`'s validation text use it directly. It was named `Tooltip` until §9.9-H6.
  */
-export function TooltipBubble ({top, bottom, right, left, show, className, ...props}: TooltipBubbleProps) {
+function TooltipBubble ({top, bottom, right, left, show, className, ...props}: TooltipBubbleProps) {
   return <span
     // DOM boundary (see ./domProps): the spread lands on a generic <span>, so both lists apply.
     className={classNames('tooltip no-wrap', {top, bottom, right, left, show}, className)}

@@ -50,6 +50,9 @@ type DocumentInstance = any
 
 /**
  * Get Form's Field Values
+ *
+ * Exported for its unit tests: no other module imports it.
+ *
  * @param {Object} form - instance from react-final-form
  * @return {Object} formValues - key values of field names and values
  */
@@ -59,6 +62,8 @@ export function fieldValues (form: FormApi): Values {
 
 /**
  * Get Form's Registered Field Values
+ *
+ * Exported for its unit tests: no other module imports it.
  *
  * @param {FormApi} form - instance from react-final-form
  * @returns {Object|Undefined} values - nested mapping of field values by their name, or `false` if no field values found
@@ -80,6 +85,8 @@ export function registeredFieldValues (form: FormApi): Values | undefined {
 
 /**
  * Get Form's Registered Field Errors
+ *
+ * Exported for its unit tests: no other module imports it.
  *
  * @param {FormApi} form - instance from react-final-form
  * @returns {Object|Undefined} errors - key values of field names and error messages
@@ -106,7 +113,7 @@ export function registeredFieldErrors (form: FormApi): Record<string, unknown> |
 
 // Before the browser paints, as `componentDidMount` and `componentDidUpdate` ran. On the server it
 // is a plain effect: a layout effect there only warns, once per wrapper (see `InputNative`).
-export const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
+const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /**
  * A field host as the decorators return it: memoised, as the `PureComponent` it was skipped a render with
@@ -664,6 +671,8 @@ export type FormSetupHelpers = {
 }
 
 /**
+ * Exported for its unit tests: no other module imports it.
+ *
  * @param Class - `any`: the engine's class, whose members the layers add in their class bodies
  */
 export function withFormSetup (Class: any, {fieldValues, registeredFieldValues, registeredFieldErrors, processErrors}: FormSetupHelpers) {

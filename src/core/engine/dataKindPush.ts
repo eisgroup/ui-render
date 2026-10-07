@@ -48,6 +48,8 @@ export function rowObjectForDataKindAppend (registeredValues: unknown, relativeP
 /**
  * Whether a table row object should be kept: not all-null / not only `{}`.
  * Final-form often leaves `{ periodName: undefined, ... }`; DevTools shows that as `{}`.
+ *
+ * Exported for its unit tests: no other module imports it.
  */
 export function dataKindRowHasContent (row: unknown): boolean {
     if (row == null) return false

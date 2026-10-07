@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { AnimateHeight } from '../AnimateHeight'
+import AnimateHeight from '../AnimateHeight'
 
 describe('AnimateHeight', () => {
     it('renders children inside the grid wrapper', () => {

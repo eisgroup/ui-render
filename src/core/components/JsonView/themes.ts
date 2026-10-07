@@ -8,7 +8,7 @@ export type Base16Theme = {
   base0C: string, base0D: string, base0E: string, base0F: string,
 }
 
-export const nicinabox: Base16Theme = {
+const nicinabox: Base16Theme = {
   scheme: 'nicinabox',
   author: 'nicinabox (http://github.com/nicinabox)',
   base00: 'rgba(0, 0, 0, 0)', // modified to match site's background

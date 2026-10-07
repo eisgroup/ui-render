@@ -69,6 +69,8 @@ FIELD.CROSS_VALIDATE = {
 
 /**
  * Parse `dataKind.experiencePeriods[0].startDate`-style field names for stable row index (see notWithinRangeValidator).
+ *
+ * Exported for its unit tests: no other module imports it.
  */
 export function parseArrayPrefixAndRowIndexFromFieldName (fieldName: unknown): { arrayPrefix: string, rowIndex: number } | null {
     if (!fieldName || typeof fieldName !== 'string') return null
@@ -243,6 +245,7 @@ export interface UIRender {
     readonly handleSubmit: (event?: React.SyntheticEvent) => unknown
 }
 
+/** Exported for its unit tests: no other module imports it. */
 export class UIRender extends DocumentInstance {
     static contextType = AppContext
 
@@ -440,11 +443,14 @@ export default UIRenderWithUISetup
 
 /**
  * Transform *_meta.json API response into custom rules applied by the team
+ *
+ * Exported for its unit tests: no other module imports it.
  */
 export function transformConfig (meta: any) {
     return toOpenLConfig(sanitizeResponse(meta || {}, { tags: [] }))
 }
 
+/** Exported for its unit tests: no other module imports it. */
 export function toOpenLConfig (meta: any): any {
     if (isObject(meta)) {
         const { view } = meta
@@ -503,6 +509,8 @@ export function toOpenLConfig (meta: any): any {
  * Pre-initialize instance.state from initial data for Select/Dropdown fields.
  * Ensures {state.xxx} interpolation resolves correctly on the first render,
  * before any component mounts.
+ *
+ * Exported for its unit tests: no other module imports it.
  *
  * @param {Object} meta - transformed meta (after toOpenLConfig)
  * @param {Object} data - initial data.json

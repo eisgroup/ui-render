@@ -19,7 +19,7 @@ export type ListProps = {
 /**
  * Dynamic List of Views/Rows - Pure Component.
  */
-export function List ({renderItem, items, row, currencyCode, ...props}: ListProps) {
+function List ({renderItem, items, row, currencyCode, ...props}: ListProps) {
   const Container = row ? Row : View
 
   if (!items) {

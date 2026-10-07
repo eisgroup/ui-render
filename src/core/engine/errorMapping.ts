@@ -98,6 +98,7 @@ export const mapErrorObjectToUIFormat = (errors: Record<string, unknown>) => {
   return result;
 }
 
+/** Exported for its unit tests: no other module imports it. */
 export const convertFieldNameToTitleCaseText = (str: string) => {
   let fieldName = str;
   if (fieldName.includes('.')) {

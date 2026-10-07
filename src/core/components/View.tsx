@@ -33,7 +33,7 @@ export type ViewProps = {
  *  ever needs the underlying element, wrap with `React.forwardRef` and forward onto the div deliberately,
  *  with a test; do not reinstate a parameter the export cannot fill.
  */
-export function View ({
+function View ({
     className,
     fill,
     reverse,

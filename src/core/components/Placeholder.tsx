@@ -8,7 +8,7 @@ export type PlaceholderProps = { className?: string, children: React.ReactNode, 
 /**
  * Placeholder - Pure Component.
  */
-export function Placeholder ({className, ...props}: PlaceholderProps) {
+function Placeholder ({className, ...props}: PlaceholderProps) {
   return <View
     fill
     className={classNames('bg-texture-faded full-screen middle center fade-in-up padding-largest', className)}

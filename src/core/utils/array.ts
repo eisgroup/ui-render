@@ -138,6 +138,8 @@ export function last<T> (array: readonly T[]): T {
  * Sort List in Ascending Order
  * (Fastest)
  *
+ * Exported for its unit tests: no other module imports it.
+ *
  * @example:
  *    array.sort(sortAscending)
  *
@@ -156,6 +158,8 @@ export function sortAscending (a: unknown, b: unknown): number {
 /**
  * Sort List in Descending Order
  * (Fastest)
+ *
+ * Exported for its unit tests: no other module imports it.
  *
  * @example:
  *    array.sort(sortDescending)

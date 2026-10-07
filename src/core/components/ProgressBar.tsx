@@ -48,7 +48,7 @@ export type ProgressBarProps = {
  *
  * @returns {Object} - React Component
  */
-export function ProgressBar ({
+function ProgressBar ({
   value: valueProp,
   className,
   gradient = true,

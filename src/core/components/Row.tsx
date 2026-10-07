@@ -17,7 +17,7 @@ export type RowProps = ViewProps
  * It took a second argument, a callback ref, for `RowRef`, a `forwardRef` of it nothing used: both went on
  * 2026-10-06. Through the default export's `React.memo` that argument only ever held legacy context.
  */
-export function Row ({
+function Row ({
   className,
   fill,
   reverse,

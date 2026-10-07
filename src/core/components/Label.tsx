@@ -15,7 +15,7 @@ export type LabelProps = {
  * Label - Pure Component.
  * Abstraction layer for React Web
  */
-export function Label ({
+function Label ({
   children,
   translate,
   ...props
