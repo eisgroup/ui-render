@@ -43,7 +43,7 @@ Because `react`/`react-dom` are webpack **externals** and npm **peer dependencie
 
 | Area | Current | Verdict |
 |---|---|---|
-| Bundler | webpack 5 (declared `^5.99`; + dev-server 6, CLI 6; dev-server **re-measured 2026-10-06**, it read 5) | ✅ current |
+| Bundler | webpack 5 (declared `^5.99`; + dev-server 6, CLI ~~6~~ 7 since 2026-10-06; dev-server **re-measured 2026-10-06**, it read 5). **The loaders on their current majors since 2026-10-07:** css-loader 7, style-loader 4, less-loader 13. Less's own 12 warnings stay in the build log through `lessLogAsWarnOrErr: false` until they are fixed: eight deprecations Less 5 will enforce (six mixin calls without parentheses, two inline JavaScript expressions) and four `:extend`s of selectors that match nothing | ✅ current |
 | Transpiler | ~~Babel 7 (declared `^7.26`)~~ **Babel 8 (declared `^8.0`) since 2026-10-07**, `babel-loader` 10 | ✅ current |
 | Tests | Jest 30 + `jest-environment-jsdom` 30 | ✅ current, React-18-ready |
 | Node | engines `>=18` (relaxed 2026-08-18, see §10), `.nvmrc` = 24 | ✅ current |
