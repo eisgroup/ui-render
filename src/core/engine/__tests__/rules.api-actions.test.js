@@ -165,7 +165,7 @@ describe('UIRender additional action and error contracts', () => {
             effectiveAt: '2026-07-31T22:15:00.000Z',
             requestId: 'request-2',
         }
-        const updateExperienceData = jest.fn().mockResolvedValue(response)
+        const updateData = jest.fn().mockResolvedValue(response)
         const config = {
             ...initialConfigState,
             dateFormat: 'YYYY-MM-DD',
@@ -188,7 +188,7 @@ describe('UIRender additional action and error contracts', () => {
                 data={initialValues}
                 initialValues={initialValues}
                 getFormData={getFormData}
-                apiCalls={{ updateExperienceData }}
+                apiCalls={{ updateData }}
             />,
             config
         ))
@@ -201,12 +201,41 @@ describe('UIRender additional action and error contracts', () => {
         })
 
         await waitFor(() => expect(screen.getByText('After apply')).toBeInTheDocument())
-        expect(updateExperienceData).toHaveBeenCalledWith(initialValues)
+        expect(updateData).toHaveBeenCalledWith(initialValues)
         expect(screen.getByText('2026-07-31')).toBeInTheDocument()
         expect(readFormData()).toEqual({
             ...response,
             effectiveAt: '2026-07-31',
         })
+    })
+
+    it('still calls the host under the old name of `updateData`, and takes `updateData` when a host passes both', async () => {
+        // `updateData` is the call's name since 2026-10-07. The old name is deprecated in the types and
+        // keeps working, so no host has to change.
+        const meta = { view: 'Button', children: 'Apply', onClick: { name: 'onApplyPeriods' } }
+        const values = { status: 'Before' }
+        const called = []
+        const answering = name => data => {
+            called.push([name, data])
+            return Promise.resolve({ status: name })
+        }
+        const apply = () => act(async () => {
+            fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
+            await new Promise(resolve => setTimeout(resolve, 0))
+        })
+
+        const old = render(withProviders(
+            <UIRender form meta={meta} data={values} initialValues={values} apiCalls={{ updateExperienceData: answering('old') }} />
+        ))
+        await apply()
+        old.unmount()
+        render(withProviders(
+            <UIRender form meta={meta} data={values} initialValues={values}
+                apiCalls={{ updateData: answering('new'), updateExperienceData: answering('old') }} />
+        ))
+        await apply()
+
+        expect(called).toEqual([['old', values], ['new', values]])
     })
 
     it('extracts a backend message from a failed apply Response', async () => {
@@ -222,7 +251,7 @@ describe('UIRender additional action and error contracts', () => {
         const failure = new ResponseStub(JSON.stringify({
             message: 'message=Periods overlap errors=[]',
         }))
-        const updateExperienceData = jest.fn().mockRejectedValue(failure)
+        const updateData = jest.fn().mockRejectedValue(failure)
         const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
 
         render(withProviders(
@@ -235,7 +264,7 @@ describe('UIRender additional action and error contracts', () => {
                 }}
                 data={{ status: 'Before apply', requestId: 'request-3' }}
                 initialValues={{ status: 'Before apply', requestId: 'request-3' }}
-                apiCalls={{ updateExperienceData }}
+                apiCalls={{ updateData }}
             />
         ))
 

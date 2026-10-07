@@ -54,6 +54,9 @@
   An array field could be reported with the array of its items' errors as its `text`. That entry
   is left out now; each item's error is still reported, under the item's own field name. Every
   other report is unchanged: every validator a meta can name returns a string.
+- **`apiCalls.updateData` is the call an `onApplyPeriods` action makes.** It had a name taken from one
+  host's domain; that name keeps working, is marked deprecated in the published types, and loses to
+  `updateData` when a host passes both. No host has to change anything.
 
 #### Table rendering
 

@@ -285,8 +285,8 @@ const ACTION_CURATION = {
         notes: null,
     },
     ON_APPLY_PERIODS: {
-        summary: 'Sends all form data to the host `updateExperienceData` API call and restarts the form with the normalized response.',
-        notes: 'Does nothing when the host supplies no `updateExperienceData`. An empty response (`undefined`, `null`, `\'\'`, `0`) leaves the data as it was; failures open an error popup.',
+        summary: 'Sends all form data to the host `updateData` API call and restarts the form with the normalized response.',
+        notes: 'Does nothing when the host supplies no `updateData`, or the same call under its deprecated old name. An empty response (`undefined`, `null`, `\'\'`, `0`) leaves the data as it was; failures open an error popup.',
     },
     POPUP: {
         summary: 'Opens an alert popup with the given title and content.',

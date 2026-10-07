@@ -32,7 +32,7 @@ const noop = () => {}
 const identity = value => value
 
 const apiCalls = {
-    updateExperienceData: () => Promise.resolve({}),
+    updateData: () => Promise.resolve({}),
     downloadFile: () => Promise.resolve({}),
     uploadFile: () => Promise.resolve({}),
 }

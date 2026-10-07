@@ -20,7 +20,7 @@ const messageFromConsoleCall = args => args
 // React 19 leaves out.
 
 const apiCalls = {
-    updateExperienceData: jest.fn(() => Promise.resolve({})),
+    updateData: jest.fn(() => Promise.resolve({})),
     downloadFile: jest.fn(() => Promise.resolve({})),
     uploadFile: jest.fn(() => Promise.resolve({})),
 }

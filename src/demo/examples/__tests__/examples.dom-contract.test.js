@@ -96,7 +96,7 @@ import { snapshotExamples } from '../manifest'
 const noop = () => {}
 const translate = value => value
 const apiCalls = {
-    updateExperienceData: () => Promise.resolve({}),
+    updateData: () => Promise.resolve({}),
     downloadFile: () => Promise.resolve({}),
     uploadFile: () => Promise.resolve({}),
 }

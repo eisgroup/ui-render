@@ -842,8 +842,9 @@ function Decorator (Class: any) {
 
             // Send every form's values to the host and make its answer the data (see
             // `applyPeriods.ts`); a failure shows the host's message in a popup.
+            // `updateData` since 2026-10-07; a host may still pass the call under its old name.
             FIELD.FUNC[FIELD.ACTION.ON_APPLY_PERIODS] = () => applyPeriods({
-                updateExperienceData: this.getAPICalls().updateExperienceData,
+                updateData: this.getAPICalls().updateData || this.getAPICalls().updateExperienceData,
                 readFormsData: this.getAllFormsData,
                 onUpdated: normalizedResponse => this.setState({
                     data: {
