@@ -472,6 +472,12 @@
   pages, and progress steps, 16 tests against the production demo build. `e2e/view-coverage.js`
   names, for each of the 37 views, the tests that drive it or why none needs to, and a check keeps
   it complete.
+- Four tests guard what the form stack's next major would break. A value the user entered survives a
+  tab switch away and back, shows in a field bound to the same name that mounts later, and survives
+  its table's remount; and `AutoSave` saves the first change under StrictMode. They pass on the
+  installed `react-final-form` 6.5.9 and fail on 7.0.1, which sets a field that mounts with no state
+  in final-form back to its initial value (final-form/react-final-form#1095, whose fix is not
+  released). The upgrade waits for that fix.
 
 #### Fixes
 
