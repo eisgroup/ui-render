@@ -162,3 +162,36 @@ describe('AutoSave debounce lifetime (§9.3 step 4)', () => {
         expect(onChange).not.toHaveBeenCalled()
     })
 })
+
+describe('AutoSave under StrictMode', () => {
+    it('saves the first change', async () => {
+        // AutoSave takes its baseline from the first call FormSpy makes, through the debounce, and
+        // StrictMode runs every effect's cleanup once at mount, which cancels that call.
+        // react-final-form 6.5.9 makes the call during the render and again after the cleanup. 7.0.1
+        // makes it once, from an effect, before the cleanup (its #1076): the first change became the
+        // baseline, and was never saved. The form-stack upgrade waits on this (docs/UPGRADE-PLAN.md
+        // §9.7-F4), with the tests in `engine/__tests__/UIRender.remount.test.js`.
+        const onChange = jest.fn().mockResolvedValue()
+        let formApi
+        render(
+            <React.StrictMode>
+                {wrap(
+                    <Form
+                        onSubmit={() => {}}
+                        initialValues={{ title: 'Draft' }}
+                        render={({ form }) => {
+                            formApi = form
+                            return <AutoSave onChange={onChange} delay={0}/>
+                        }}
+                    />
+                )}
+            </React.StrictMode>
+        )
+        await act(async () => { jest.advanceTimersByTime(10) })
+        act(() => { formApi.change('title', 'Final') })
+        // Inside act: the save's promise settles into a state update.
+        await act(async () => { jest.advanceTimersByTime(10) })
+
+        expect(onChange.mock.calls).toEqual([[{ title: 'Final' }]])
+    })
+})
