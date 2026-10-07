@@ -27,7 +27,7 @@ export type ImageSource = { avatar?: string, src?: string, name?: string, path?:
 /**
  * Image - Pure Component.
  */
-export function Image ({
+function Image ({
   name,
   path,
   className,
@@ -49,6 +49,7 @@ export function Image ({
               alt={props.alt} decoding={decoding} loading={loading}/>
 }
 
+/** Exported for its unit tests: no other module imports it. */
 export function imageSrc ({avatar, src, name = '', path = FILE.PATH_IMAGES}: ImageSource) {
   return avatar || src || (path + name.replace(/\s/g, '-').toLowerCase())
 }

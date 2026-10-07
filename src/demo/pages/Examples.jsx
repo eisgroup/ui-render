@@ -83,7 +83,7 @@ export default function Examples () {
                       translate={(v) => v}
                       dateFormat={"MM-DD-YYYY"}
                       apiCalls={{
-                        updateExperienceData: updatePerformanceData,
+                        updateData: updatePerformanceData,
                         downloadFile: downloadHistoricalFileTemplate,
                         uploadFile: uploadHistoricalFile
                       }}

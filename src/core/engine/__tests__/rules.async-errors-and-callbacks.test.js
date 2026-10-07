@@ -2,7 +2,8 @@ import React from 'react'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 // Load form registration before rules.tsx follows the mapper/renders cycle.
-import UIRender, { formsStorage } from '../rules'
+import UIRender from '../rules'
+import { formsStorage } from '../../state/formRegistry'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 
 const appContext = {
@@ -42,7 +43,7 @@ describe('UIRender asynchronous failure and callback contracts', () => {
 
         global.Response = ResponseStub
         const failure = new ResponseStub('Service temporarily unavailable')
-        const updateExperienceData = jest.fn().mockRejectedValue(failure)
+        const updateData = jest.fn().mockRejectedValue(failure)
         const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
 
         render(withProviders(
@@ -55,7 +56,7 @@ describe('UIRender asynchronous failure and callback contracts', () => {
                 }}
                 data={{ requestId: 'request-plain-error' }}
                 initialValues={{ requestId: 'request-plain-error' }}
-                apiCalls={{ updateExperienceData }}
+                apiCalls={{ updateData }}
             />
         ))
 
@@ -79,7 +80,7 @@ describe('UIRender asynchronous failure and callback contracts', () => {
             status: 'Keep current status',
         }
         const getFormData = jest.fn()
-        const updateExperienceData = jest.fn().mockResolvedValue(null)
+        const updateData = jest.fn().mockResolvedValue(null)
 
         render(withProviders(
             <UIRender
@@ -98,14 +99,14 @@ describe('UIRender asynchronous failure and callback contracts', () => {
                 data={data}
                 initialValues={data}
                 getFormData={getFormData}
-                apiCalls={{ updateExperienceData }}
+                apiCalls={{ updateData }}
             />
         ))
 
         const readFormData = getFormData.mock.calls[0][0]
         fireEvent.click(screen.getByRole('button', { name: 'Apply empty response' }))
 
-        await waitFor(() => expect(updateExperienceData).toHaveBeenCalledWith(data))
+        await waitFor(() => expect(updateData).toHaveBeenCalledWith(data))
         expect(screen.getByText('Keep current status')).toBeInTheDocument()
         expect(readFormData()).toEqual(data)
         expect(appContext.setPopupState).not.toHaveBeenCalled()

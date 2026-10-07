@@ -1,7 +1,7 @@
 import { capitalize, get } from './lodash-lite'
 
-export const alphaNumIdPattern = /[^a-zA-Z0-9_-]/g
-export const fileNameWithoutExtPattern = /\.[^.$]+$/
+const alphaNumIdPattern = /[^a-zA-Z0-9_-]/g
+const fileNameWithoutExtPattern = /\.[^.$]+$/
 
 /**
  * Options accepted by {@link interpolateString}.
@@ -85,7 +85,7 @@ export function interpolateString (
 	})
 }
 
-export const interpolateStringPattern = /{([^{}]+)}/g
+const interpolateStringPattern = /{([^{}]+)}/g
 
 /**
  * Get File Name without Extension String

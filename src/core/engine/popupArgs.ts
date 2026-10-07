@@ -77,7 +77,7 @@ type CallerProbe = {
     stopPropagation?: unknown
 }
 
-export function isCallerArgument (value: unknown): boolean {
+function isCallerArgument (value: unknown): boolean {
     // A cast, not a guard: the argument is only probed for those marks.
     const arg = value as CallerProbe | null | undefined
     // React component classes are functions, so check them before the generic primitive branch.

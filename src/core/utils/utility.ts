@@ -36,6 +36,8 @@ export function isGoodPassword (value: string, strength: number = 2): boolean {
 /**
  * Check Password Strength
  *
+ * Exported for its unit tests: no other module imports it.
+ *
  * @See: https://github.com/dropbox/zxcvbn
  *
  * @param password - to check

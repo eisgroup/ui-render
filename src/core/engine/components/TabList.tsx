@@ -12,7 +12,7 @@ export type TabListProps = {
   [key: string]: unknown
 }
 
-export function TabList ({renderLabel, renderItem, items, ...props}: TabListProps) {
+function TabList ({renderLabel, renderItem, items, ...props}: TabListProps) {
   return <Tabs
     {...props}
     items={items.map((item, i) => ({tab: renderLabel(item, i), content: renderItem(item, i)}))}

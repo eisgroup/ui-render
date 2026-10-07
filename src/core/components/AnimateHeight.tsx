@@ -23,7 +23,7 @@ export type AnimateHeightProps = {
  *
  * @returns {Object} - React element
  */
-export function AnimateHeight ({
+function AnimateHeight ({
   expanded,
   duration = STYLE.ANIMATION_DURATION,
   className,

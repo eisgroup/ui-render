@@ -12,11 +12,11 @@ import { applyPeriods } from '../applyPeriods'
 
 const hostAnswering = answer => {
     const sent = []
-    const updateExperienceData = data => {
+    const updateData = data => {
         sent.push(data)
         return Promise.resolve(answer)
     }
-    return { updateExperienceData, sent }
+    return { updateData, sent }
 }
 
 const failNever = (message, error) => {
@@ -25,11 +25,11 @@ const failNever = (message, error) => {
 
 describe('a working call', () => {
     it('sends every form value and hands over the answer normalised', async () => {
-        const { updateExperienceData, sent } = hostAnswering({ status: 'After', effectiveAt: '2026-07-31T22:15:00.000Z' })
+        const { updateData, sent } = hostAnswering({ status: 'After', effectiveAt: '2026-07-31T22:15:00.000Z' })
         const applied = []
 
         await applyPeriods({
-            updateExperienceData,
+            updateData,
             readFormsData: () => ({ status: 'Before', requestId: 'r-2' }),
             onUpdated: data => applied.push(data),
             onFailure: failNever,
@@ -42,11 +42,11 @@ describe('a working call', () => {
     it.each([['undefined', undefined], ['null', null], ['an empty string', ''], ['zero', 0]])(
         'ignores an answer of %s and leaves the data alone',
         async (_label, answer) => {
-            const { updateExperienceData } = hostAnswering(answer)
+            const { updateData } = hostAnswering(answer)
             const applied = []
 
             await applyPeriods({
-                updateExperienceData,
+                updateData,
                 readFormsData: () => ({}),
                 onUpdated: data => applied.push(data),
                 onFailure: failNever,
@@ -59,11 +59,11 @@ describe('a working call', () => {
     )
 })
 
-it('returns false and reads nothing when the host provides no updateExperienceData', async () => {
+it('returns false and reads nothing when the host provides no updateData', async () => {
     let reads = 0
 
     await expect(applyPeriods({
-        updateExperienceData: undefined,
+        updateData: undefined,
         readFormsData: () => { reads++; return {} },
         onUpdated: () => {},
         onFailure: failNever,
@@ -77,7 +77,7 @@ describe('a failure', () => {
         const failures = []
 
         await applyPeriods({
-            updateExperienceData: () => Promise.reject(failure),
+            updateData: () => Promise.reject(failure),
             readFormsData: () => ({}),
             onUpdated: () => {},
             onFailure: (message, error) => failures.push([message, error]),
@@ -115,7 +115,7 @@ describe('a failure', () => {
             const failures = []
 
             await applyPeriods({
-                updateExperienceData: () => Promise.reject(failure),
+                updateData: () => Promise.reject(failure),
                 readFormsData: () => ({}),
                 onUpdated: () => {},
                 onFailure: (message, error) => failures.push([message, error]),
@@ -129,7 +129,7 @@ describe('a failure', () => {
             const failures = []
 
             await expect(applyPeriods({
-                updateExperienceData: () => Promise.reject(new TestResponse('', false)),
+                updateData: () => Promise.reject(new TestResponse('', false)),
                 readFormsData: () => ({}),
                 onUpdated: () => {},
                 onFailure: (message, error) => failures.push([message, error]),
@@ -140,11 +140,11 @@ describe('a failure', () => {
 
     it('includes an answer that cannot be applied', async () => {
         const failure = new Error('cannot apply')
-        const { updateExperienceData } = hostAnswering({ status: 'After' })
+        const { updateData } = hostAnswering({ status: 'After' })
         const failures = []
 
         await applyPeriods({
-            updateExperienceData,
+            updateData,
             readFormsData: () => ({}),
             onUpdated: () => { throw failure },
             onFailure: (message, error) => failures.push(error),

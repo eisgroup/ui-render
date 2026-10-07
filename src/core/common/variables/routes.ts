@@ -1,7 +1,3 @@
-import { __PROD__, HOMEPAGE } from '../../utils'
-
-export const ROUTE_BASE = __PROD__ ? `${HOMEPAGE || ''}/` : '/'
-
 export function goTo (uri: string, title: string = uri, page: string = uri) {
   if (typeof window === 'undefined') return
 // eslint-disable-next-line no-restricted-globals

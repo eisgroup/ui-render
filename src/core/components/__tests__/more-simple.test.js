@@ -1,11 +1,11 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { Image, imageSrc } from '../Image'
-import { Placeholder } from '../Placeholder'
+import Image, { imageSrc } from '../Image'
+import Placeholder from '../Placeholder'
 import { PlaceholderField } from '../PlaceholderField'
-import { Space } from '../Space'
-import { TooltipBubble } from '../TooltipBubble'
+import Space from '../Space'
+import TooltipBubble from '../TooltipBubble'
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
 
 const wrap = (ui) => (

@@ -97,11 +97,11 @@ function expectations (testCase) {
     }
     if (testCase.name === 'demo-production') {
         checks.push(is('NODE_ENV', 'production'), is('__PROD__', true), is('HOMEPAGE', '/ui-render'),
-            is('PATH_IMAGES', '/ui-render/static/images/'), is('ROUTE_BASE', '/ui-render/'))
+            is('PATH_IMAGES', '/ui-render/static/images/'))
     }
     if (testCase.name === 'demo-e2e') {
         checks.push(is('NODE_ENV', 'production'), is('__PROD__', true), is('HOMEPAGE', ''),
-            is('PATH_IMAGES', '/static/images/'), is('ROUTE_BASE', '/'))
+            is('PATH_IMAGES', '/static/images/'))
     }
     return checks
 }
@@ -239,7 +239,7 @@ async function main () {
             ]
             console.log(`\n=== ${testCase.name} -- ${testCase.script}`)
             console.log(`    loaded ${result.assets.join(', ')}; DefinePlugin "Conflicting values" warnings: ${result.conflictingDefines}`)
-            for (const key of ['NODE_ENV', '__PROD__', '__DEV__', '__TEST__', 'HOMEPAGE', 'PATH_IMAGES', 'ROUTE_BASE', 'ENV', 'bundleTypeofProcess']) {
+            for (const key of ['NODE_ENV', '__PROD__', '__DEV__', 'HOMEPAGE', 'PATH_IMAGES', 'ENV', 'bundleTypeofProcess']) {
                 console.log(`    ${key.padEnd(20)} ${JSON.stringify(result.probe[key])}`)
             }
             for (const [label, check] of checks) {

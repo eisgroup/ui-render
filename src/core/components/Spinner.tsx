@@ -16,7 +16,7 @@ export type SpinnerProps = {
 /**
  * Spinner - Pure Component
  */
-export function Spinner ({
+function Spinner ({
   size = 'base',  // Enum
   color = 'primary',  // Enum
   className,

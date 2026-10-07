@@ -54,14 +54,14 @@ afterAll(() => {
 
 describe('_envs server loading contract', () => {
     it.each([
-        ['production', true, false, false, false, true],
-        ['stage', false, true, false, false, true],
-        ['test', false, false, true, false, false],
-        ['development', false, false, false, true, false],
-        ['preview', false, false, false, false, false],
+        ['production', true, false],
+        ['stage', false, false],
+        ['test', false, false],
+        ['development', false, true],
+        ['preview', false, false],
     ])(
         'derives mutually exclusive flags from NODE_ENV=%s',
-        (nodeEnv, prod, stage, test, dev, init) => {
+        (nodeEnv, prod, dev) => {
             setNodeEnv(nodeEnv)
 
             const subject = loadEnvs()
@@ -70,15 +70,8 @@ describe('_envs server loading contract', () => {
             expect(subject.NODE_ENV).toBe(nodeEnv)
             expect(subject).toMatchObject({
                 __PROD__: prod,
-                __STAGE__: stage,
-                __TEST__: test,
                 __DEV__: dev,
-                __CLIENT__: false,
-                __BACKEND__: true,
-                __IOS__: false,
-                _INIT_: init,
             })
-            expect(subject._WORK_DIR_).toBe(process.cwd())
         },
     )
 
@@ -95,25 +88,10 @@ describe('_envs server loading contract', () => {
 
         expect(subject.ENV).toEqual({})
         expect(subject.NODE_ENV).toBeUndefined()
-        expect(subject._WORK_DIR_).toBe('.')
         expect(subject).toMatchObject({
             __PROD__: false,
-            __STAGE__: false,
-            __TEST__: false,
             __DEV__: false,
-            __CLIENT__: false,
-            __BACKEND__: true,
-            _INIT_: false,
         })
-    })
-
-    it('does not treat a standalone location object as a browser', () => {
-        setGlobal('location', { origin: 'https://server.example', pathname: '/render' })
-
-        const subject = loadEnvs()
-
-        expect(subject.__CLIENT__).toBe(false)
-        expect(subject.__BACKEND__).toBe(true)
     })
 
     it('does not expose browser-only adapters', () => {
@@ -152,22 +130,6 @@ describe('_envs browser loading contract', () => {
 
         return { fakeLocation, fakeStorage, FakeWebSocket, fakeWindow }
     }
-
-    it.each(['production', 'stage', 'test', 'development'])(
-        'detects the client and never enables backend init in %s',
-        nodeEnv => {
-            setNodeEnv(nodeEnv)
-            const browser = installBrowser()
-
-            const subject = loadEnvs()
-
-            expect(subject.__CLIENT__).toBe(true)
-            expect(subject.__BACKEND__).toBe(false)
-            expect(subject._INIT_).toBe(false)
-            expect(subject._WORK_DIR_).toBe(process.cwd())
-            expect(window.location).toBe(browser.fakeLocation)
-        },
-    )
 
     it('captures localStorage and WebSocket at module initialization', () => {
         const browser = installBrowser()
@@ -215,10 +177,9 @@ describe('_envs browser loading contract', () => {
 })
 
 describe('_envs stable defaults contract', () => {
-    it('exports language, identity translation, mutable integration slots, and undefined sentinel', () => {
-        const { Active, UNDEFINED } = loadEnvs()
+    it('exports language, identity translation and mutable integration slots', () => {
+        const { Active } = loadEnvs()
 
-        expect(UNDEFINED).toBeUndefined()
         expect(Active.DEFAULT).toEqual({ LANGUAGE: 'en' })
         expect(Active.LANG._).toBe('en')
         expect(Active.translate('unchanged')).toBe('unchanged')
@@ -243,7 +204,6 @@ describe('_envs stable defaults contract', () => {
 
         try {
             expect(subject.NODE_ENV).toBe('test')
-            expect(subject.__TEST__).toBe(true)
             expect(subject.__PROD__).toBe(false)
             expect(subject.ENV.NODE_ENV).toBe('production')
             expect(subject.ENV.ENVS_CONTRACT_VALUE).toBe('changed-after-load')

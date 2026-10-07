@@ -3,7 +3,8 @@ import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { ConfigContext, initialConfigState, AppContext, initialAppState } from '../../../core/contexts'
 import { Render } from '../../../core/engine'
-import UIRender, { formsStorage } from '../../../core/engine/rules'
+import UIRender from '../../../core/engine/rules'
+import { formsStorage } from '../../../core/state/formRegistry'
 import { EXAMPLES as examples } from '../../examples/manifest'
 import ExamplesPage from '../Examples'
 
@@ -19,7 +20,7 @@ const messageFromConsoleCall = args => args
 // React 19 leaves out.
 
 const apiCalls = {
-    updateExperienceData: jest.fn(() => Promise.resolve({})),
+    updateData: jest.fn(() => Promise.resolve({})),
     downloadFile: jest.fn(() => Promise.resolve({})),
     uploadFile: jest.fn(() => Promise.resolve({})),
 }

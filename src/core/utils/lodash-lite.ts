@@ -20,6 +20,7 @@ type SetWithCustomizer = (nsValue: any, key: PropertyKey, nsObject: any) => unkn
 /** `mergeWith`'s customizer: a non-`undefined` return wins over the default merge. */
 type MergeCustomizer = (dstValue: any, srcValue: any, key: string, dst: any, src: any) => unknown
 
+/** Exported for its unit tests: no other module imports it. */
 function isObjectLike(value: unknown): value is object {
 	return value != null && typeof value === 'object'
 }

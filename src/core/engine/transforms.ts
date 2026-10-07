@@ -89,6 +89,7 @@ export function mapProps (data: unknown, mapper: string | Record<string, string>
     return ((debug ? data : toList(data, true)) as unknown[]).map(mapData)
 }
 
+/** Exported for its unit tests: no other module imports it. */
 export function getCurrencySymbol(currencyCode: unknown) {
     if (!currencyCode) return null
     switch (currencyCode) {

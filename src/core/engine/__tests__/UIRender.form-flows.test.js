@@ -2,7 +2,8 @@ import React from 'react'
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 // Load the form module before rules.tsx enters the mapper -> renders.tsx cycle.
-import UIRender, { formsStorage } from '../rules'
+import UIRender from '../rules'
+import { formsStorage } from '../../state/formRegistry'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 
 const appContext = {

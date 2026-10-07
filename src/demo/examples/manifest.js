@@ -354,10 +354,7 @@ export const EXAMPLES = [
  *
  * @type {Object<String, String>} filename -> reason
  */
-export const UNREGISTERED_EXAMPLE_FILES = {
-  'webstudio_data.json': 'orphaned pair kept as an external-producer meta sample; no importer',
-  'webstudio_meta.json': 'orphaned pair kept as an external-producer meta sample; no importer',
-}
+export const UNREGISTERED_EXAMPLE_FILES = {}
 
 /** Files in this directory that are infrastructure rather than example payloads. */
 export const MANIFEST_INFRASTRUCTURE_FILES = [

@@ -8,7 +8,7 @@ export type SpaceProps = { small?: boolean, large?: boolean, className?: string,
 /**
  * Space - Pure Component
  */
-export function Space ({small, large, className, ...props}: SpaceProps) {
+function Space ({small, large, className, ...props}: SpaceProps) {
   return <View className={classNames('space' + (small ? '-small' : (large ? '-large' : '')), className)} {...props}/>
 }
 

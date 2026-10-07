@@ -15,7 +15,7 @@ export type ExpandListProps = {
 /**
  * Dynamic List of Expandable Rows - Pure Component.
  */
-export function ExpandList ({renderLabel, renderItem, items, ...props}: ExpandListProps) {
+function ExpandList ({renderLabel, renderItem, items, ...props}: ExpandListProps) {
   return (
     items.map((item, i) => (
       <Expand key={item.id || i} {...props} title={renderLabel(item, i)}>{() => renderItem(item, i)}</Expand>

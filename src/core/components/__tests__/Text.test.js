@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { Text } from '../Text'
+import Text from '../Text'
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
 
 function renderWithConfig (ui, configOverrides = {}) {

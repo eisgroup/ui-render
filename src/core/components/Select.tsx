@@ -42,7 +42,7 @@ type DomValue = React.SelectHTMLAttributes<HTMLSelectElement>['value']
  * @param {*} [props] - other attributes to pass to `<select>`
  * @returns {Object} - React select component
  */
-export function Select ({
+function Select ({
   name,
   label = name,
   id = 'select-' + name,

@@ -64,6 +64,15 @@ export interface UIRenderDownloadResponse {
 }
 
 export interface UIRenderApiCalls<Data = unknown> {
+    /**
+     * Called by the `onApplyPeriods` action with every form's current values; what it resolves with
+     * becomes the document's data, and an empty answer leaves the data as it was.
+     */
+    updateData?(data: Data): Promise<unknown>
+    /**
+     * @deprecated The old name of `updateData`, which keeps working; `updateData` wins when a host
+     * passes both.
+     */
     updateExperienceData?(data: Data): Promise<unknown>
     downloadFile?(fileName: string): Promise<UIRenderDownloadResponse>
     /**

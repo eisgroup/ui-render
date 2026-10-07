@@ -26,6 +26,7 @@ export const FILE = {
   },
 }
 
+/** Exported for its unit tests: no other module imports it. */
 export const IMAGE = {
   EXTENSIONS: [FILE.EXT.JPG, FILE.EXT.JPEG, FILE.EXT.PNG, FILE.EXT.SVG, FILE.EXT.GIF, FILE.EXT.WEBP],
 }

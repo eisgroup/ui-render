@@ -76,6 +76,8 @@ export type UploadProps = {
  * Exported for its own unit test: the two negative branches are unreachable through the component,
  * because React always supplies an event and every React in the supported range except 19 carries
  * `persist`. Testing it directly covers them without a fourth React in the matrix.
+ *
+ * Exported for its unit tests: no other module imports it.
  */
 export function persistEvent (event: unknown) {
     const pooled = event as { persist?: unknown } | null | undefined

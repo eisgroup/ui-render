@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { Select } from '../Select'
+import Select from '../Select'
 
 const defaultOptions = [
     { text: 'Option A', value: 'a' },

@@ -1,9 +1,7 @@
 // Force form module to load before rules.tsx reaches renders.tsx
 import '../../modules/form/utils'
-import {
-    parseArrayPrefixAndRowIndexFromFieldName,
-    formsStorage,
-} from '../rules'
+import { parseArrayPrefixAndRowIndexFromFieldName } from '../rules'
+import { formsStorage } from '../../state/formRegistry'
 // The error maps are not the engine's to re-export any more: they live in the layer both the
 // engine and the form module import (§9.3 step 2), and are per form since step 3.
 import { clearErrorsFor, errorsFor } from '../../state/formRegistry'

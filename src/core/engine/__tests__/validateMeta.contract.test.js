@@ -20,7 +20,8 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 import { FIELD } from '../../modules/variables/fields'
-import UIRender, { formsStorage } from '../rules'
+import UIRender from '../rules'
+import { formsStorage } from '../../state/formRegistry'
 import { Render } from '..'
 import {
     CURRENT_META_VERSION,

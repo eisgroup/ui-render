@@ -18,9 +18,13 @@ const data: QuoteData = { cost: 120 }
 const meta = { view: 'Text', children: 'Cost' }
 
 const apiCalls: UIRenderApiCalls<QuoteData> = {
-    updateExperienceData: async values => values,
+    updateData: async values => values,
     downloadFile: async () => ({ blob: async () => new Blob() }),
     uploadFile: async (serializedData, file) => ({ serializedData, file }),
+}
+// The old name of `updateData` still compiles: deprecated, not removed.
+const apiCallsUnderTheOldName: UIRenderApiCalls<QuoteData> = {
+    updateExperienceData: async values => values,
 }
 
 const translate: UIRenderTranslate = (value: string): string => value.toUpperCase()
@@ -56,4 +60,4 @@ const missingData = <UIRender meta={meta}/>
 // @ts-expect-error meta is required by the runtime contract
 const missingMeta = <UIRender data={data}/>
 
-void [minimal, validating, complete, inferred, missingData, missingMeta, NamedUIRender]
+void [minimal, validating, complete, inferred, missingData, missingMeta, NamedUIRender, apiCallsUnderTheOldName]

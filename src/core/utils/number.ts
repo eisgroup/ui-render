@@ -116,6 +116,9 @@ export function shortNumber (
 
 /**
  * Format Number with SI Prefix
+ *
+ * Exported for its unit tests: no other module imports it.
+ *
  * @link: https://github.com/ThomWright/format-si-prefix
  *
  * @param {Number} number - to format
@@ -174,6 +177,8 @@ formatSI.PREFIXES = {
 
 /**
  * Format Number to Ordinal Numeric String
+ *
+ * Exported for its unit tests: no other module imports it.
  *
  * @param {number|string} number - to format
  * @return {string} - ordered number (i.e. 1st, 2nd, 3rd, 4th...)

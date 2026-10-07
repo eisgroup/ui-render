@@ -121,7 +121,8 @@ type HostCalls = Required<UIRender.UIRenderApiCalls>
 
 const downloadIsAccepted: Assignable<HostCalls['downloadFile'], NonNullable<DownloadOptions['downloadFile']>> = true
 const uploadIsAccepted: Assignable<HostCalls['uploadFile'], NonNullable<UploadOptions['uploadFile']>> = true
-const updateIsAccepted: Assignable<HostCalls['updateExperienceData'], NonNullable<ApplyPeriodsOptions['updateExperienceData']>> = true
+const updateIsAccepted: Assignable<HostCalls['updateData'], NonNullable<ApplyPeriodsOptions['updateData']>> = true
+const deprecatedUpdateIsAccepted: Assignable<HostCalls['updateExperienceData'], NonNullable<ApplyPeriodsOptions['updateData']>> = true
 const errorReportIsPublished: Assignable<DeliveredRenderErrorReport, UIRender.UIRenderErrorReport> = true
 const metaProblemIsPublished: Assignable<MetaProblem, UIRender.UIRenderMetaProblem> = true
 const validationReportIsPublished: Assignable<ReturnType<typeof mapErrorObjectToUIFormat>, UIRender.UIRenderValidationErrors> = true
@@ -133,5 +134,5 @@ void undeclaredKeys; void hostSpecificView; void rootKeys; void nested
 void rendererByName; void rendererByObject; void rendererBad
 void viewIsNotJustString; void renderIsNotJustString; void actionIsNotJustString
 void normalizerIsNotJustString; void inputTypeIsNotJustString; void openView
-void downloadIsAccepted; void uploadIsAccepted; void updateIsAccepted
+void downloadIsAccepted; void uploadIsAccepted; void updateIsAccepted; void deprecatedUpdateIsAccepted
 void errorReportIsPublished; void metaProblemIsPublished; void validationReportIsPublished

@@ -1,7 +1,8 @@
 import React from 'react'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import UIRender, { formsStorage } from '../rules'
+import UIRender from '../rules'
+import { formsStorage } from '../../state/formRegistry'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 
 const appContext = {

@@ -2,7 +2,8 @@ import React from 'react'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 // Load form registration before rules.tsx follows the mapper/renders cycle.
-import UIRender, { formsStorage } from '../rules'
+import UIRender from '../rules'
+import { formsStorage } from '../../state/formRegistry'
 // The lifecycle layer, not the bare class: since §9.3 step 5 the engine installs it on a subclass
 // of its own instead of mutating the class it is handed, and `Active.UIRender` is the channel
 // `engine/Data.tsx` already reads it from to render nested documents.

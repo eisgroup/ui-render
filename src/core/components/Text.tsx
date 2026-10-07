@@ -36,7 +36,7 @@ type DateConfig = { dateFormat?: string }
  * Text View - Pure Component.
  * (to be used as replacement for `<span></span>` for cross platform integration)
  */
-export function Text ({
+function Text ({
     className,
     fill,
     reverse,

@@ -8,7 +8,7 @@ export const ADD = 'ADD'             		// For adding a resource
 
 /* Size */
 export const SIZE_KB = 1024
-export const SIZE_MB = SIZE_KB * 1024
+const SIZE_MB = SIZE_KB * 1024
 export const SIZE_MB_16 = SIZE_MB * 16
 
 /* Time */

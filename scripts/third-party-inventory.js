@@ -25,13 +25,17 @@ const fs = require('fs')
 const path = require('path')
 
 /**
- * The CSS vendored under `src/style/vendor/` and shipped in `static/all.css`. It comes from no
- * `node_modules` package, so the bundle cannot name it: `THIRD-PARTY-NOTICES.md` holds its licences, and
- * a contract test holds this list to that file.
+ * The third-party CSS shipped in `static/all.css`: vendored under `src/style/vendor/`, or adapted into our
+ * own sources, as `where` says. It comes from no `node_modules` package, so the bundle cannot name it:
+ * `THIRD-PARTY-NOTICES.md` holds its licences, and a contract test holds this list to that file.
  */
 const VENDORED_CSS = [
-    { name: 'normalize.css', version: '7.0.0', license: 'MIT' },
-    { name: 'semantic-ui-less', version: '2.5.0', license: 'MIT' },
+    { name: 'float-label-css', version: '1.0.2', license: 'MIT',
+        where: 'CSS adapted into src/style/components/input.less, shipped in static/all.css' },
+    { name: 'normalize.css', version: '7.0.0', license: 'MIT',
+        where: 'CSS vendored under src/style/vendor/, shipped in static/all.css' },
+    { name: 'semantic-ui-less', version: '2.5.0', license: 'MIT',
+        where: 'CSS vendored under src/style/vendor/, shipped in static/all.css' },
 ]
 
 const NODE_MODULES = `${path.sep}node_modules${path.sep}`
@@ -128,7 +132,7 @@ function sbomOf (root, packages, vendored = []) {
     const components = [
         ...packages.map(pkg => componentOf(pkg, 'Bundled into dist/index.js')),
         ...[...vendored].sort(byNameAndVersion)
-            .map(pkg => componentOf(pkg, 'CSS vendored under src/style/vendor/, shipped in static/all.css')),
+            .map(pkg => componentOf(pkg, pkg.where)),
     ]
     const rootComponent = componentOf(root)
     return {

@@ -84,7 +84,7 @@ function toggled (state: ExpandState, expand: boolean): ExpandState {
  *    and collapsing again within `duration` unmounted the content before the second animation was
  *    over.
  */
-export function Expand (props: ExpandProps) {
+function Expand (props: ExpandProps) {
   const {
     id,
     title,

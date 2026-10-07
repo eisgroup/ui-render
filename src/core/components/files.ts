@@ -5,7 +5,7 @@ import { ENV } from '../utils'
  * =============================================================================
  */
 
-export const CDN_URL = ENV.REACT_APP_CDN_URL || ''
+const CDN_URL = ENV.REACT_APP_CDN_URL || ''
 
 export const FILE = {
   PATH_IMAGES: `${CDN_URL}/static/images/`,
