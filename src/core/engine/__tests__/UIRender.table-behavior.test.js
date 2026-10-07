@@ -62,12 +62,10 @@ const currentPage = () => within(pager()).queryAllByRole('button')
 
 describe('Table behavioural contract', () => {
     let consoleError
-    const originalFetch = global.fetch
     const originalScrollIntoView = Element.prototype.scrollIntoView
 
     beforeEach(() => {
         consoleError = jest.spyOn(console, 'error').mockImplementation(noop)
-        global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
         // jsdom implements no scrollIntoView, and TableView.handlePaginationChange
         // calls it UNGUARDED before it sets the new page — so without this stub the
         // page change is lost rather than merely unscrolled. Stubbed here rather than
@@ -80,8 +78,6 @@ describe('Table behavioural contract', () => {
         clearEngineGlobals()
         consoleError.mockRestore()
         Element.prototype.scrollIntoView = originalScrollIntoView
-        if (originalFetch === undefined) delete global.fetch
-        else global.fetch = originalFetch
     })
 
     describe('headers and cells', () => {

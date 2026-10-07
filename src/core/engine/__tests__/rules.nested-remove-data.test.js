@@ -8,12 +8,9 @@
  * (`registerDataKind` computes it from the same `relativePath`), but it also showed that no test
  * checked WHICH row a nested remove took. This one does, on the corpus's own `nestedDataKind`.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import { fireEvent, waitFor } from '@testing-library/react' // eslint-disable-line import/first
-import { EXAMPLES } from '../../../demo/examples/manifest' // eslint-disable-line import/first
-import { mountExample } from '../../../demo/testing/mountExample' // eslint-disable-line import/first
+import { fireEvent, waitFor } from '@testing-library/react'
+import { EXAMPLES } from '../../../demo/examples/manifest'
+import { mountExample } from '../../../demo/testing/mountExample'
 
 const example = EXAMPLES.find(({ id }) => id === 'nestedDataKind')
 

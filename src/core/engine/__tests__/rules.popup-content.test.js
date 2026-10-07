@@ -8,14 +8,11 @@
  * renamed for row 1 but keeps its DOM value, so it shows row 0's edit. The form data stays right,
  * which is exactly why nothing else in the suite noticed.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { act, fireEvent, render } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
-import { AppProvider } from '../../providers' // eslint-disable-line import/first
+import React from 'react'
+import { act, fireEvent, render } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import UIRender, { formsStorage } from '../rules'
+import { AppProvider } from '../../providers'
 
 const meta = {
     view: 'Col',

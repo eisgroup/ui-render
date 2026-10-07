@@ -16,15 +16,12 @@
  * Measured on the code this replaced: mount gave "A:hello" + "B:hello", and the re-render turned the
  * first into "B:hello".
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { fireEvent, render } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import '../../modules/form/utils' // eslint-disable-line import/first
-import UIRender from '../rules' // eslint-disable-line import/first
-import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
+import React from 'react'
+import { fireEvent, render } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import '../../modules/form/utils'
+import UIRender from '../rules'
+import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 
 const wrap = ui => (
     <ConfigContext.Provider value={initialConfigState}>

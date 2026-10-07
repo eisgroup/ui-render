@@ -17,9 +17,6 @@
  * skipped the first run through a mount flag), the form wrapper lost its subscription until the
  * next render, and the form layer stayed marked as unmounting.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
 
 /** Live `form.subscribe` and `form.registerField` calls on every form, across all of them. */
 const live = { subscriptions: 0, fields: 0 }

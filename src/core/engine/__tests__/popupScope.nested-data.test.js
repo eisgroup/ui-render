@@ -15,14 +15,11 @@
  * popup declared on the ROOT document is invisible to the nested one, measured while building this:
  * the click resolves a scope, finds no template, and silently does nothing.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { act, fireEvent, render } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import UIRender from '../rules' // eslint-disable-line import/first
-import { AppProvider } from '../../providers' // eslint-disable-line import/first
+import React from 'react'
+import { act, fireEvent, render } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import UIRender from '../rules'
+import { AppProvider } from '../../providers'
 
 const inputNames = root => Array.from(root.querySelectorAll('input')).map(input => input.getAttribute('name'))
 

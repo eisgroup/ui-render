@@ -457,6 +457,10 @@
 - jsdom's selector engine, nwsapi, is on 2.2.28, which matches `:focus-within` as browsers do; 2.2.23
   answered it false even with focus inside. The dropdown's CSS contract now counts the four
   `:focus-within` rules Chromium applies to the open, focused dropdown. Nothing it renders changed.
+- The suites no longer install a stand-in `fetch` before they render a document. 41 did, because the
+  engine read the global while it built its actions; it reads it when the `fetch` action runs now. Four
+  still install one, for what they do with it: three run that action, and one renders the demo's tabs,
+  which load their pages with it.
 - The code that neither the library nor the demo uses is gone: 212 exports, 202 of them in the
   internal utilities, and three files, two unused and one empty. What the two builds use was
   measured with webpack, and each module walked from there, until a pass found nothing more. The

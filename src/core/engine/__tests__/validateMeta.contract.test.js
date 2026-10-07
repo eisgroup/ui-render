@@ -260,7 +260,6 @@ describe('reportMetaProblems flag', () => {
  * prove the corrected meta renders.
  */
 describe('every error-severity check predicts a real engine failure', () => {
-    const originalFetch = global.fetch
     let consoleError
 
     const clearGlobalRegistries = () => {
@@ -270,14 +269,11 @@ describe('every error-severity check predicts a real engine failure', () => {
     beforeEach(() => {
         clearGlobalRegistries()
         consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
-        global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
     })
 
     afterEach(() => {
         consoleError.mockRestore()
         clearGlobalRegistries()
-        if (originalFetch === undefined) delete global.fetch
-        else global.fetch = originalFetch
     })
 
     const data = { rows: [{ a: 1 }], label: 'ok' }

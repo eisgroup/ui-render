@@ -15,17 +15,14 @@
  * Until §9.3 step 6 both happened in `UNSAFE_componentWillMount`. They are pinned here by
  * behaviour, so they hold for whatever sets them up.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { act, fireEvent, render, screen } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import '../../modules/form/utils' // eslint-disable-line import/first
-import { FIELD } from '../../modules/variables' // eslint-disable-line import/first
-import { clearEngineGlobals, mountMeta } from '../../../demo/testing/mountExample' // eslint-disable-line import/first
-import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
-import UIRender from '../rules' // eslint-disable-line import/first
+import React from 'react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import '../../modules/form/utils'
+import { FIELD } from '../../modules/variables'
+import { clearEngineGlobals, mountMeta } from '../../../demo/testing/mountExample'
+import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
+import UIRender from '../rules'
 
 const noop = () => {}
 const identity = value => value

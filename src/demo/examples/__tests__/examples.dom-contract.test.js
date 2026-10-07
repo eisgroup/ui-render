@@ -249,7 +249,6 @@ const BOUND_NAME_ATTRIBUTES = { count: 57, tags: ['input', 'textarea', 'select',
 
 describe('demo example full-DOM contract', () => {
     let consoleError
-    const originalFetch = global.fetch
     // Filled by the test.each below and asserted by the defect ledger afterwards,
     // so the ledger costs no extra renders.
     const renderedDom = new Map()
@@ -259,13 +258,10 @@ describe('demo example full-DOM contract', () => {
         // Examples.registry-and-rendering.test.js; silence them here so a snapshot
         // failure is not buried in warning output.
         consoleError = jest.spyOn(console, 'error').mockImplementation(noop)
-        global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
     })
 
     afterEach(() => {
         consoleError.mockRestore()
-        if (originalFetch === undefined) delete global.fetch
-        else global.fetch = originalFetch
     })
 
     test.each(snapshotExamples().map(example => [example.id, example]))(

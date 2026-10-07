@@ -11,15 +11,12 @@
  * This holds the corpus at zero. React prints each kind of warning once per run, so a NEW one shows
  * up here even when another suite has already triggered it elsewhere.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import util from 'util' // eslint-disable-line import/first
-import React from 'react' // eslint-disable-line import/first
-import { act, cleanup, render } from '@testing-library/react' // eslint-disable-line import/first
-import PublishedUIRender from '../../../library/main' // eslint-disable-line import/first
-import { EXAMPLES } from '../manifest' // eslint-disable-line import/first
-import { clearEngineGlobals } from '../../testing/mountExample' // eslint-disable-line import/first
+import util from 'util'
+import React from 'react'
+import { act, cleanup, render } from '@testing-library/react'
+import PublishedUIRender from '../../../library/main'
+import { EXAMPLES } from '../manifest'
+import { clearEngineGlobals } from '../../testing/mountExample'
 
 describe('the example corpus', () => {
     it('renders every example under StrictMode without a console error or warning', async () => {

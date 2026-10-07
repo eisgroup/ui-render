@@ -6,16 +6,12 @@
  * removed them one slice at a time, and this pins that none is left, on a document with nested
  * documents, rendered through the published entry. It is the engine's half of §9.3 step 7.
  */
-// The engine hands the `fetch` action the global one whenever it builds a meta.
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { act, fireEvent, render, screen } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import PublishedUIRender from '../../../library/main' // eslint-disable-line import/first
-import { EXAMPLES } from '../../../demo/examples/manifest' // eslint-disable-line import/first
-import { clearEngineGlobals } from '../../../demo/testing/mountExample' // eslint-disable-line import/first
+import React from 'react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import PublishedUIRender from '../../../library/main'
+import { EXAMPLES } from '../../../demo/examples/manifest'
+import { clearEngineGlobals } from '../../../demo/testing/mountExample'
 
 it('reports no unsafe lifecycle for a document with nested documents, through an edit', async () => {
     const example = EXAMPLES.find(({ id }) => id === 'nestedDataKind')

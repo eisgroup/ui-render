@@ -12,14 +12,6 @@ import UIRender from '../../../library'
 const inputNames = root => Array.from(root.querySelectorAll('input')).map(i => i.getAttribute('name'))
 
 describe('UI Render consumer-level regression guards', () => {
-    beforeAll(() => {
-        global.fetch = () => Promise.resolve({json: () => Promise.resolve({})})
-    })
-
-    afterAll(() => {
-        delete global.fetch
-    })
-
     afterEach(() => {
         jest.restoreAllMocks()
     })
