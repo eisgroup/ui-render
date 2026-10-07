@@ -39,7 +39,9 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
   checking them, so this is the only thing that checks them. JavaScript is not part of the program
   (`allowJs: false`): the demo and the tests stay JavaScript and are not checked, and a `.ts` file that
   imports a `.js` module fails (TS7016). Every `.ts` file is strict. Config: `tsconfig.json`. `tsconfig.build.json` EXTENDS
-  it, for `gen-ts`'s declaration emit, so keep every checking rule in `tsconfig.json`.
+  it, for `gen-ts`'s declaration emit, so keep every checking rule in `tsconfig.json`. TypeScript 6: its `types` array
+  names the one @types package the source needs, and `src/library/less.d.ts` lets the stylesheet's side-effect import
+  resolve. TypeScript 7 is held back, and `.github/dependabot.yml` says why.
 - `npm run typecheck:contract` — The same check on `src/library/contract.agreement.ts` alone (`tsconfig.contract.json`), so a
   failure names the meta contract table
 - `npm run docs:views` / `npm run docs:props` — Regenerate `docs/SUPPORTED-VIEWS.md` / `docs/SUPPORTED-PROPS.md` from the
