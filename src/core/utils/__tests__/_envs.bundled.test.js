@@ -73,8 +73,8 @@ describe('_envs after a bundler has rewritten process.env', () => {
     })
 
     it.each([
-        ['production', { __PROD__: true, __DEV__: false, __STAGE__: false, __TEST__: false }],
-        ['development', { __PROD__: false, __DEV__: true, __STAGE__: false, __TEST__: false }],
+        ['production', { __PROD__: true, __DEV__: false }],
+        ['development', { __PROD__: false, __DEV__: true }],
     ])('a bundle built for NODE_ENV=%s reports that mode with no process global', (nodeEnv, flags) => {
         const { subject, typeofProcess } = evaluateInBrowserRealm(bundle(nodeEnv))
 
@@ -83,8 +83,6 @@ describe('_envs after a bundler has rewritten process.env', () => {
         expect(subject).toMatchObject(flags)
         // The rest of the module still takes its no-process fallbacks.
         expect(subject.ENV).toEqual({})
-        expect(subject._WORK_DIR_).toBe('.')
-        expect(subject.__CLIENT__).toBe(true)
         expect(subject.HOMEPAGE).toBeUndefined()
     })
 

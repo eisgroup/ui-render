@@ -77,15 +77,7 @@ export const NODE_ENV: string | undefined = nodeEnv // @Note: Next.js does not a
 /** Base path the app is served under, without a trailing slash (`''` at the root, undefined when unset) */
 export const HOMEPAGE: string | undefined = homepage
 export const __PROD__: boolean = NODE_ENV === 'production'
-export const __STAGE__: boolean = NODE_ENV === 'stage'
-export const __TEST__: boolean = NODE_ENV === 'test'
 export const __DEV__: boolean = NODE_ENV === 'development'
-export const __CLIENT__: boolean = typeof window !== 'undefined'
-export const __BACKEND__: boolean = !__CLIENT__
-export const __IOS__: boolean = false
-export const _INIT_: boolean = __BACKEND__ && (__PROD__ || __STAGE__)
-export const _WORK_DIR_: string = typeof process !== 'undefined' ? process.cwd() : '.' // relative to root `index.js`
-export const UNDEFINED: undefined = ((Undefined?: undefined) => Undefined)()
 
 /* Globally Accessible Objects */
 export const Active: ActiveEnv = {
