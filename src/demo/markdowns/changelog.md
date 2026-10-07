@@ -175,6 +175,9 @@
   options array are both at the top level of the data, found through `items` or `renderItem.items` from
   the root; a Select in a `Tabs` entry, or with a dotted `name`, is left as it is, and so is its options
   array. Nothing changes at runtime, for the same reason: a reorder would move keys a host receives.
+- The demo renders its documentation pages with react-markdown 10 and remark-gfm 4. Each page's text and
+  structure are the same as before. Its headings no longer carry a stray `level` attribute, a prop
+  react-markdown 8 handed the demo's heading component, which passed it on to the DOM.
 
 #### Build
 
@@ -463,6 +466,8 @@
   That is where React reports a list without keys or an update outside `act`, and before this 12
   test files printed such lines on React 18 and 16 on React 16.14 and 17, unread. A test that
   expects a warning now says so and asserts it.
+- The DOM matchers are on `@testing-library/jest-dom` 7. It needs Node 22 and `@testing-library/dom` as
+  a peer, which the project already had, and no test changed.
 - TypeScript checks JSX the way Babel compiles it, through `react/jsx-runtime`, so a file no longer
   needs `React` in scope for its JSX. The published declarations are unchanged.
 - Linting is on ESLint 9, configured in `eslint.config.js`. `eslint-config-react-app` never supported
