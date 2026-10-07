@@ -3,6 +3,9 @@
     "target": "ES2019",
     "module": "CommonJS",
     "moduleResolution": "Node",
+    // A host on settings TypeScript 6 deprecates, which the declarations must still compile for. 6 errors on
+    // them without this; 7 drops them, so this matrix will need a 6 compiler of its own then.
+    "ignoreDeprecations": "6.0",
     "lib": ["ES2019", "DOM"],
     "jsx": "react",
     "strict": true,

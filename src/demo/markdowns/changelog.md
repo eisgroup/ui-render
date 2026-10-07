@@ -190,6 +190,9 @@
   needs it. The bundle's newest syntax is still ES2022's class fields. The type declarations, the
   licences and the stylesheet are byte-for-byte the same. Building from source needs Node 24.11 or
   later, which Babel 8 requires.
+- **TypeScript 6 checks the source and writes the published declarations.** `dist/index.d.ts` and
+  `dist/contract.d.ts` are byte-for-byte what TypeScript 5.9 wrote. TypeScript 7, the native compiler,
+  is held back: it no longer offers the compiler API the declaration build uses.
 
 #### Dependencies
 

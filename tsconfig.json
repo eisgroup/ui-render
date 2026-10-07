@@ -13,6 +13,11 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    // The @types packages in the program. TypeScript 6 includes none it is not given here, where 5.9 took
+    // every package under node_modules/@types. The source needs Node's for one thing: it reads
+    // `process.env`, which a bundler replaces (src/core/utils/_envs.ts). @types/node is installed with
+    // jest's types.
+    "types": ["node"],
     // The automatic runtime, as Babel compiles JSX (`babel.config.js`): JSX is checked through
     // `react/jsx-runtime`, so a file needs no `React` in scope for it. This read "react" until
     // 2026-10-06, which checked JSX as `React.createElement` and rejected a file Babel builds

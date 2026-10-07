@@ -44,6 +44,12 @@ updates:
       # why it is on 9). Drop this when they declare 10.
       - dependency-name: eslint
         update-types: [version-update:semver-major]
+      # TypeScript 7, the native compiler, exports only its version from `require('typescript')`: the compiler
+      # API moved to `typescript/unstable/*`. scripts/gen-ts.js, which writes the package's declarations, its
+      # contract test and src/demo/testing/contractTypes.js use that API, and typescript-eslint supports
+      # TypeScript below 6.1. Drop this when they are ported and typescript-eslint declares 7.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /
