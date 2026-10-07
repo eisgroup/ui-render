@@ -24,7 +24,7 @@ import { applyPeriods } from './applyPeriods'
 import { parsePopupAlertArgs, parsePopupArgs } from './popupArgs'
 import { findPopupTemplate } from './popupTemplate'
 import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
-import { errorsFor, formsOf, formsStorage, touchedFor } from '../state/formRegistry'
+import { errorsFor, formsOf, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
 import { getFormsData, getLiveMergedDataKindArray, getRawFormsData } from './formData'
 import { errorsProcessing, mapErrorObjectToUIFormat } from './errorMapping'
@@ -212,14 +212,6 @@ FIELD.PARSER = {
         return v && round(v / 100, 5)
     },
 }
-
-// `formsStorage` and `errorsMap` used to be DECLARED here, which is what made `modules/form` reach
-// back into the engine for them (§2.6-4). They now live in `state/formRegistry`, a layer both sides
-// may import, and are re-exported from here so every existing import of them keeps working — the
-// move is meant to dissolve the cycle, not to churn twenty call sites. §9.3 step 3 makes them
-// per-instance, and that will be a change inside `formRegistry` rather than a search.
-export { formsStorage }
-
 
 /**
  * UI Render Instance Component

@@ -19,7 +19,8 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../core/contexts'
-import UIRender, { formsStorage } from '../../core/engine/rules'
+import UIRender from '../../core/engine/rules'
+import { formsStorage } from '../../core/state/formRegistry'
 import { AppProvider } from '../../core/providers/AppProvider'
 
 /**

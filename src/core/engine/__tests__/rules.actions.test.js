@@ -2,7 +2,8 @@ import React from 'react'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 // Load the form module before rules.tsx follows the mapper/renders circular dependency.
-import UIRender, { formsStorage } from '../rules'
+import UIRender from '../rules'
+import { formsStorage } from '../../state/formRegistry'
 import { AppContext } from '../../contexts'
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
 

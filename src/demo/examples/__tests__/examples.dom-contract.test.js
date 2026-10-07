@@ -86,7 +86,8 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import { ConfigContext, initialConfigState, AppContext, initialAppState } from '../../../core/contexts'
-import UIRender, { formsStorage } from '../../../core/engine/rules'
+import UIRender from '../../../core/engine/rules'
+import { formsStorage } from '../../../core/state/formRegistry'
 import { serializeDom } from '../../testing/serializeDom'
 import { snapshotExamples } from '../manifest'
 
