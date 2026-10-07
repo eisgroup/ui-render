@@ -53,16 +53,17 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
      * a `PureComponent`, is now a plain class the function component below hosts (`asField` says how).
      */
     class FieldInstance {
-        props: DateFieldProps
+        declare props: DateFieldProps
 
         constructor (props: DateFieldProps) {
             this.props = props
         }
 
-        _value: unknown
-        hasFocus?: boolean
-        input!: FieldInput
-        initValues: unknown
+        // Declared only, as every field without a value here: Babel emits no field for them.
+        declare _value: unknown
+        declare hasFocus?: boolean
+        declare input: FieldInput
+        declare initValues: unknown
 
         get value () {
             if (this._value !== void 0) {

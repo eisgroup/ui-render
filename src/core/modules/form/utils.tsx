@@ -198,7 +198,7 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
    * final-form from remounting the input on every change (the note above).
    */
   class FieldInstance {
-    props: AsFieldProps
+    declare props: AsFieldProps
 
     constructor (props: AsFieldProps) {
       this.props = props
@@ -210,10 +210,11 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
     // "Cannot update during an existing state transition" warning.
     selectPreviousValue: unknown = null
 
-    _value: unknown
-    hasFocus?: boolean
-    input!: FieldInput
-    initValues: unknown
+    // Declared only, as every field without a value here: Babel emits no field for them.
+    declare _value: unknown
+    declare hasFocus?: boolean
+    declare input: FieldInput
+    declare initValues: unknown
 
     get value () {
       if (this._value !== void 0) {

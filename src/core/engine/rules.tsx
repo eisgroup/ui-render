@@ -249,9 +249,10 @@ export interface UIRender {
 export class UIRender extends DocumentInstance {
     static contextType = AppContext
 
-    // Type-only: the constructor sets each when the host gives it one, and Babel emits no field.
-    errorHandler?: (errors: object) => void
-    translate?: Translate
+    // Declared only: the constructor sets each when the host gives it one, and `declare` keeps Babel
+    // from emitting a field for it. Without it Babel 8 emits one, set to undefined after `super`.
+    declare errorHandler?: (errors: object) => void
+    declare translate?: Translate
 
     constructor (props: UIRenderProps) {
         super(props)
