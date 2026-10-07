@@ -381,6 +381,10 @@
   build now writes the licence file of each one into `dist/THIRD-PARTY-LICENSES.txt`, and lists
   them, with the vendored CSS, in a CycloneDX SBOM, `dist/sbom.cdx.json`, for scanners that read
   one.
+- **The notices and the SBOM credit float-label-css.** The float-label rules of `input.less` adapt
+  its technique, under its MIT licence, and neither file recorded it. `THIRD-PARTY-NOTICES.md` carries
+  its licence now, and says why the icon font is not listed: its IcoMoon export records no icon library
+  and no licence for any glyph.
 
 #### Tests and CI
 

@@ -105,6 +105,7 @@ describe('scripts/third-party-inventory.js', () => {
                 'pkg:npm/%40scope/scoped-package@0.1.0',
                 'pkg:npm/nested-package@2.0.0',
                 'pkg:npm/used-package@1.2.3',
+                'pkg:npm/float-label-css@1.0.2',
                 'pkg:npm/normalize.css@7.0.0',
                 'pkg:npm/semantic-ui-less@2.5.0',
             ])
@@ -203,6 +204,11 @@ describe('scripts/third-party-inventory.js', () => {
         }
         expect(headings).toHaveLength(VENDORED_CSS.length)
         expect(sbomOf(ROOT, [], VENDORED_CSS).components.map(component => component.description))
-            .toEqual(VENDORED_CSS.map(() => 'CSS vendored under src/style/vendor/, shipped in static/all.css'))
+            .toEqual(VENDORED_CSS.map(pkg => pkg.where))
+        // Each says where the CSS lives, and that place exists.
+        for (const { where } of VENDORED_CSS) {
+            const place = where.match(/src\/style\/[\w./-]+/)[0]
+            expect(fs.existsSync(path.join(__dirname, '..', '..', place))).toBe(true)
+        }
     })
 })
