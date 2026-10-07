@@ -9,47 +9,41 @@
  * "MISSING_ENV_VAR", the `typeof process` guard then yields `{}`). Code that reads `ENV.NODE_ENV` gets a property
  * of that stub: undefined, so every mode flag is false in a browser.
  *
- * This suite applies that rewrite with a tiny babel visitor, evaluates the result in a realm with NO `process`,
- * and asserts the flags the bundler was told to produce. scripts/test-env-flags.js proves the same thing against
- * the real webpack configs; this is the fast unit-level half of it.
+ * This suite applies that rewrite with a tiny babel visitor (scripts/fixtures/bundler-define.mjs), evaluates the
+ * result in a realm with NO `process`, and asserts the flags the bundler was told to produce.
+ * scripts/test-env-flags.js proves the same thing against the real webpack configs; this is the fast unit-level
+ * half of it.
  */
 const fs = require('fs')
 const path = require('path')
 const vm = require('vm')
-const babel = require('@babel/core')
+const { execFileSync } = require('child_process')
 
+const ROOT = path.resolve(__dirname, '../../../..')
 const SOURCE = path.resolve(__dirname, '../_envs.ts')
+const DEFINE = path.join(ROOT, 'scripts/fixtures/bundler-define.mjs')
 
-/** A bundler's define step in miniature: each defined key becomes a literal, the rest of `process.env` a stub. */
-function mimicBundlerDefine (defines) {
-    return ({ types: t }) => ({
-        name: 'mimic-bundler-define',
-        visitor: {
-            // Traversal is top-down, so `process.env.X` is seen whole before its inner `process.env`.
-            MemberExpression (memberPath) {
-                const defined = Object.keys(defines).find(key => memberPath.matchesPattern(`process.env.${key}`))
-                if (defined) {
-                    memberPath.replaceWith(t.stringLiteral(defines[defined]))
-                } else if (memberPath.matchesPattern('process.env')) {
-                    memberPath.replaceWith(t.objectExpression([]))
-                }
-            },
-        },
-    })
-}
+/** Every set of defines the tests below compile `_envs.ts` with. */
+const VARIANTS = [
+    { NODE_ENV: 'production' },
+    { NODE_ENV: 'development' },
+    { NODE_ENV: 'production', REACT_APP_HOMEPAGE: '/ui-render' },
+    { NODE_ENV: 'production', REACT_APP_HOMEPAGE: '' },
+]
+
+let compiled
+
+// One Node process compiles them all, and outside jest: Babel 8 is ES modules only, which jest's module registry
+// cannot load (the script says more).
+beforeAll(() => {
+    const variants = Object.fromEntries(VARIANTS.map(defines => [JSON.stringify(defines), defines]))
+    compiled = JSON.parse(execFileSync(process.execPath, [DEFINE, SOURCE, JSON.stringify(variants)], { cwd: ROOT, encoding: 'utf8' }))
+})
 
 function bundle (nodeEnv, extraDefines = {}) {
-    const { code } = babel.transformSync(fs.readFileSync(SOURCE, 'utf8'), {
-        filename: SOURCE,
-        // babel.config.js still supplies the presets; these two only stop @babel/core querying a stale
-        // browserslist DB for top-level targets it does not use (the warning is noise inside a test body).
-        targets: { node: 'current' },
-        browserslistConfigFile: false,
-        // Comments dropped so the "no process.env left" check below reads code, not the prose explaining it.
-        comments: false,
-        plugins: [mimicBundlerDefine({ NODE_ENV: nodeEnv, ...extraDefines })],
-    })
-    return code
+    const key = JSON.stringify({ NODE_ENV: nodeEnv, ...extraDefines })
+    if (!(key in compiled)) throw new Error(`no variant compiled for ${key}: add it to VARIANTS`)
+    return compiled[key]
 }
 
 /** Evaluate the rewritten module the way a browser would run it: a `window`, and no `process` at all. */

@@ -184,6 +184,12 @@
   changes. This only matters if you build the demo or the stylesheet from source.
 - `package.json` pins npm 11.9.0, the npm that comes with Node 24.14.0, in `packageManager`. npm
   ignores the field. Corepack, once enabled for npm, runs that version.
+- **The compiler is Babel 8.** The library, the demo and the tests all compile with it. `dist/index.js`
+  is 6,556 bytes smaller, 970 bytes gzipped: Babel 8 leaves default, rest and destructured parameters
+  as written, where Babel 7 rewrote them for every browser in the targets, and fixes only a browser that
+  needs it. The bundle's newest syntax is still ES2022's class fields. The type declarations, the
+  licences and the stylesheet are byte-for-byte the same. Building from source needs Node 24.11 or
+  later, which Babel 8 requires.
 
 #### Dependencies
 
