@@ -89,9 +89,9 @@ const VIEW_CURATION = {
         notes: 'A change of `start`, `end`, `duration`, `delay` or `interval` runs the animation again.',
     },
     DATA: {
-        summary: 'Nested render instance: `meta` carries the nested declaration, `data` or `name` selects its values, and `kind` groups sibling instances into one array for validation.',
+        summary: 'Nested render instance: `meta` carries the nested declaration, `data` or `name` selects the values its views display, and `kind` groups sibling instances into one array for validation.',
         resolvesTo: 'Data',
-        notes: 'Its fields belong to the parent\'s form, unless `useForm` gives it a form of its own; a `renderExtraItem` declaration sets `useForm`. With `localDraft` and a `TableCells` declaration it renders a draft row that keeps its values in local state until the row is added. Any falsy local value falls back to the root `data`, so the nested block still has an object to bind against.',
+        notes: 'Its fields belong to the parent\'s form, unless `useForm` gives it a form of its own; a `renderExtraItem` declaration sets `useForm`. Outside a table row its fields keep their own names, from the root of the form\'s values, whatever `name` selects: a field shows and writes the root\'s value at its name, and `getFormData` returns it there. A `useForm` form starts from the selected values, and `getFormData` still returns its fields at the root, under their names. With `localDraft` and a `TableCells` declaration it renders a draft row that keeps its values in local state until the row is added. Any falsy local value falls back to the root `data`, so the nested block still has an object to bind against.',
     },
     DROPDOWN: {
         summary: 'Option list that deliberately does not write a form value; its `onChange` is proxied so the handler receives the selected value alone.',
@@ -238,7 +238,7 @@ const VIEW_CURATION = {
 const RENDERER_CURATION = {
     CURRENCY: {
         summary: 'Number prefixed with a currency symbol, where `decimals` defaults to 2 and `symbol` to `$`.',
-        notes: 'A non-numeric value renders nothing. Written as an object, `{"name": "Currency"}`, it takes the symbol from a `currencyCode` of its own, or else the root meta\'s, and ignores a `symbol`: `$` for `USD`, the default, `€` for `EUR`, `£` for `GBP`, and none for any other code.',
+        notes: 'A non-numeric value renders nothing. In every form, the name or `{"name": "Currency"}`, at the top of a `render*` attribute or inside its `values`, it takes the symbol from the root meta\'s `currencyCode`, or from one an object form gives: `$` for `USD`, the default, `€` for `EUR`, `£` for `GBP`, and the code itself for any other. A `symbol` the object form gives wins over both.',
     },
     DATE: {
         summary: 'Value formatted as a date.',
@@ -250,11 +250,11 @@ const RENDERER_CURATION = {
     },
     FLOAT: {
         summary: 'Number with `decimals` decimal places.',
-        notes: 'Without `decimals` it shows the integer part only, truncated rather than rounded. A non-numeric value renders nothing.',
+        notes: 'Without `decimals` it shows an integer, rounded. A non-numeric value renders nothing.',
     },
     PERCENT: {
         summary: 'Number multiplied by 100 and suffixed with a percent sign, with `decimals` decimal places.',
-        notes: 'Without `decimals` it shows the integer part only, truncated rather than rounded. A non-numeric value renders nothing.',
+        notes: 'Without `decimals` it shows an integer, rounded. A non-numeric value renders nothing.',
     },
     STRING: {
         summary: 'Value as plain text.',

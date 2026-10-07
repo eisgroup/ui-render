@@ -2928,7 +2928,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                           <span class="text h3">
                             <div class="flex--row">
                               <span class="text">
-                                "18"
+                                "19"
                               </span>
                               <span class="text margin-left-smallest">
                                 "%"
@@ -2998,7 +2998,7 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                           <span class="text h3">
                             <div class="flex--row">
                               <span class="text">
-                                "18"
+                                "19"
                               </span>
                               <span class="text margin-left-smallest">
                                 "%"
@@ -3336,7 +3336,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                             <span class="text h3">
                               <div class="flex--row">
                                 <span class="text">
-                                  "2"
+                                  "3"
                                 </span>
                                 <span class="text margin-left-smallest">
                                   "%"
@@ -3436,7 +3436,7 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                             <span class="text h3">
                               <div class="flex--row">
                                 <span class="text">
-                                  "2"
+                                  "3"
                                 </span>
                                 <span class="text margin-left-smallest">
                                   "%"
@@ -5988,6 +5988,33 @@ exports[`demo example full-DOM contract uploadVariants renders a stable, non-emp
       <span class="text h3 h4 margin-top-large margin-bottom-small">
         "Read-only"
       </span>
+      <span class="text margin-bottom">
+        "Shown only while it holds a file, which the data gives it. It takes no click, drop or key."
+      </span>
+      <div class="flex--col app__upload">
+        <div aria-disabled="true" class="upload__dropzone input--wrapper readonly" role="button" tabindex="-1" title="Upload disabled">
+          <input accept=".csv" disabled="" multiple="" style="display: none;" tabindex="-1" type="file" />
+          <i aria-hidden="true" class="icon-image text largest no-margin">
+          </i>
+          <span class="text p margin-top-smallest">
+            "Select or Drop"
+            <br />
+            "CSVs"
+          </span>
+          <div class="flex--col dropzone__hover position-fill align-center appear-on-hover">
+            <div class="flex--col padding text-outline">
+              <div class="flex--col dropzone__hover__bg position-fill bg-neutral radius-large">
+              </div>
+              <span class="text margin-bottom-smaller">
+                "Upload CSV File"
+              </span>
+              <span class="text bold p">
+                "csv"
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>"

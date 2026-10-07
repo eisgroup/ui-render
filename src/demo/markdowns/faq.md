@@ -20,8 +20,8 @@ page.
 
 Field attributes starting with the word `render...` are used as function or field definition for displaying certain
 parts of a UI component. For example, in `Table` view, there is `renderCell` attribute used for customizing how value in
-each cell should be displayed (e.x. `renderCell: "Currency"` will render float numbers as currency with dollar sign,
-with two decimal places).
+each cell should be displayed (e.x. `renderCell: "Currency"` will render float numbers as currency with the symbol of
+the meta's `currencyCode`, `$` by default, with two decimal places).
 
 ## What is `children`?
 
@@ -44,7 +44,7 @@ A meta may also write it as `styles`: the renderer turns a `styles` string into 
 
 ## What style is responsible for `$` or `%` display in table cells?
 
-`renderCell: "Currency"` -> outputs number as currency with $ sign.
+`renderCell: "Currency"` -> outputs number as currency with the `currencyCode` sign ($ by default).
 `renderCell: "Percent"` -> outputs number as percent with % sign.
 
 ## How to set custom CSS styles?

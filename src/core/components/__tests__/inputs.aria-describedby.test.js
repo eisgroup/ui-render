@@ -21,6 +21,7 @@ import '@testing-library/jest-dom'
 import Input from '../Input'
 import InputNumber from '../InputNumber'
 import InputDate from '../InputDate'
+import Dropdown from '../Dropdown'
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
 
 const wrap = ui => <ConfigContext.Provider value={initialConfigState}>{ui}</ConfigContext.Provider>
@@ -59,5 +60,19 @@ describe.each(cases)('%s aria-describedby', (name, element) => {
         expect(control).not.toBeNull()
         const help = container.querySelector(`#${CSS.escape(control.getAttribute('aria-describedby'))}`)
         expect(help).toHaveTextContent('Street and number')
+    })
+})
+
+// The help text an `info` gives was classed `into`, which no rule selects, since 2020: it showed in the body
+// text colour, where its `error` sibling, classed `error`, shows in the error colour.
+describe.each([
+    ...cases,
+    ['Dropdown', props => <Dropdown options={[{ text: 'One', value: 1 }]} {...props} />],
+])('%s info message', (name, element) => {
+    it('is classed `info`, as an error is classed `error`', () => {
+        const { container } = render(wrap(element({ info: 'Street and number' })))
+
+        expect(container.querySelector('.field-help .info')).toHaveTextContent('Street and number')
+        expect(container.querySelector('.into')).toBeNull()
     })
 })

@@ -178,9 +178,10 @@ function notWithinRangeValidator (value: unknown, { dataKind, args: argsIn }: { 
 
 FIELD.VALIDATION[FIELD.CROSS_VALIDATE.NOT_WITHIN_RANGE] = notWithinRangeValidator
 
+// `'hh:mm'` went on 2026-10-06: its normalizer was deleted in e6d8b514 (2022-12), and the name, still
+// published in the schema and the types, has resolved to nothing since.
 FIELD.NORMALIZE = {
     DATE: 'date',
-    HOUR_MINUTE: 'hh:mm',
     DOUBLE5: 'double5',
     INTEGER: 'integer',
     PHONE: 'phone',
@@ -420,8 +421,10 @@ export class UIRender extends DocumentInstance {
             </Container>
             : <Container {...props}>
                 {childBefore}
-                {(form && !embedded) ? (content ||
-                    <form onSubmit={this.handleSubmit} {...form}>{content}</form>) : content}
+                {/* No `<form>` around the document a host mounts, whatever `form` is. There has been
+                    none since ae72179b (2025-03), whose `content || <form …>` left one only around a
+                    document with no content, and a host relies on Enter in a field submitting nothing. */}
+                {content}
                 {childAfter}
                 <Modal />
             </Container>
@@ -863,7 +866,9 @@ function Decorator (Class: any) {
 
             FIELD.FUNC[FIELD.ACTION.RESET] = this.resetForm.bind(this)
             FIELD.FUNC[FIELD.ACTION.SET_STATE] = this.setStates.bind(this)
-            FIELD.FUNC[FIELD.ACTION.FETCH] = fetch
+            // The global is read when the action runs. Read here, until 2026-10-06, a document built
+            // where there is no `fetch` threw a ReferenceError before it rendered anything.
+            FIELD.FUNC[FIELD.ACTION.FETCH] = (...args: Parameters<typeof fetch>) => fetch(...args)
             // Bound to this document, and given the title and content that `popupArgs.ts` reads from
             // the caller's arguments and the meta's. It used to be `popupAlert` itself, unbound, so
             // from 2025-04-17, when the alert moved onto the context, every call threw on

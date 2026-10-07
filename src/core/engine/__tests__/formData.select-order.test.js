@@ -130,6 +130,20 @@ describe('Select data reordering integrity contracts', () => {
     })
   })
 
+  it('leaves a Select alone when its name, its options or the Select itself is not where the walk looks', () => {
+    // Reported as a defect on 2026-10-06: the cascading example's Select is never reordered. Kept, because
+    // reordering these would move keys in the payload a host receives today, as the docs now say.
+    const nestedName = {view: 'Select', name: 'filters.selection', mapOptions: 'code'}
+    const byName = {filters: {selection: '1'}, primary: [{code: 'A'}, {code: 'B'}]}
+    const nestedOptions = {selection: '1', catalog: {primary: [{code: 'A'}, {code: 'B'}]}}
+    const inTabs = {view: 'Tabs', items: [{tab: 'One', content: indexMeta('code')}]}
+    const topLevel = {selection: '1', primary: [{code: 'A'}, {code: 'B'}]}
+
+    expect(changeOptionOrderForSelectFields(JSON.parse(JSON.stringify(byName)), nestedName)).toEqual(byName)
+    expect(changeOptionOrderForSelectFields(JSON.parse(JSON.stringify(nestedOptions)), indexMeta('code'))).toEqual(nestedOptions)
+    expect(changeOptionOrderForSelectFields(JSON.parse(JSON.stringify(topLevel)), inTabs)).toEqual(topLevel)
+  })
+
   it('reorders every matching option list whose index is valid', () => {
     const data = {
       selection: '1',

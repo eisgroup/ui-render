@@ -127,7 +127,7 @@ export type MetaActionName =
     (string & {})
 
 export type MetaNormalizerName =
-    'currency' | 'date' | 'double5' | 'hh:mm' | 'integer' | 'percent' | 'phone' | 'uppercase' |
+    'currency' | 'date' | 'double5' | 'integer' | 'percent' | 'phone' | 'uppercase' |
     (string & {})
 
 export type MetaInputType =
@@ -174,6 +174,10 @@ export interface MetaNode {
     onClick?: MetaFunctionRef
     onChange?: MetaFunctionRef
     onDone?: MetaFunctionRef
+    /** On a field, called after the field's own focus handling, never in its place. */
+    onFocus?: MetaFunctionRef
+    /** On a field, called after the field's own blur handling, never in its place. */
+    onBlur?: MetaFunctionRef
     type?: MetaInputType
     format?: MetaNormalizerName
     normalize?: MetaNormalizerName
@@ -211,7 +215,11 @@ export interface UIRenderProps<Data = unknown> {
     initialValues?: Data
     childBefore?: React.ReactNode
     childAfter?: React.ReactNode
-    /** If given, the document renders inside `<form onSubmit {...form}>`. */
+    /**
+     * Renders no element in the document a host mounts, which has no `<form>` around it, so Enter in
+     * a field submits nothing. A document a `Data` node nests renders inside `<form onSubmit {...form}>`,
+     * unless it is `embedded`.
+     */
     form?: boolean | UIRenderFormOptions
     /** Whether to disable rendering of the wrapper scroll view and the html form. */
     embedded?: boolean

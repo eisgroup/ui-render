@@ -6,7 +6,8 @@ export const integer = (value: unknown) => {
   return Number.isNaN(n) ? value : n
 }
 export const double5 = (value: number | string) => value && round(value, 5) // a field's raw value, as `round` takes it
-export const uppercase = (value: string) => value.toUpperCase()
+// Not a string, such as the `undefined` final-form formats for an empty field: as it is
+export const uppercase = (value: unknown) => typeof value === 'string' ? value.toUpperCase() : value
 
 export function phone (value: string) {
   if (!value) return value

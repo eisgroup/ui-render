@@ -35,7 +35,7 @@ import { joinPath } from './metaPath'
  * silently degrades (a placeholder instead of a component, plain text instead of
  * a formatted value), which is exactly what is hard to notice without a path.
  *
- * Deliberately NOT checked: `onClick` / `onChange` / `onDone` names. They resolve
+ * Deliberately NOT checked: `onClick` / `onChange` / `onDone` / `onFocus` / `onBlur` names. They resolve
  * against built-in actions *plus* the host's `methods` prop *plus* renderer
  * instance methods, so an unknown-name warning could not tell a typo from a
  * perfectly good host method and would cry wolf on the bundled examples.

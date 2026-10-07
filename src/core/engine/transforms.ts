@@ -1,5 +1,6 @@
 import { interpolateString, isCollection, isFunction, isList, isString, removeNilValues, toList } from '../utils'
 import { cloneDeep, get, hasObjectValue as hasPlainObjectValue, isObject as isPlainObject } from '../utils/object'
+import { FIELD } from '../modules/variables'
 import Render from './Render'
 
 // Non-narrowing, on purpose: a meta node checked with these stays `Meta`, open JSON, instead of
@@ -50,7 +51,9 @@ export type TransformConfig = {
     [key: string]: unknown
 }
 
-const FUNCTION_NAMES = ['onClick', 'onChange', 'onDone']
+// `onFocus` and `onBlur` since 2026-10-06: before, a meta's reached the component as a string or as the
+// value its object form resolved to, and replaced the field's own handler (the field hosts in `modules/form`).
+const FUNCTION_NAMES = ['onClick', 'onChange', 'onDone', 'onFocus', 'onBlur']
 
 /** Declarations that describe the meta document rather than a component. See metaToProps. */
 const CONTRACT_ATTRIBUTES = ['$schema', 'metaVersion']
@@ -98,6 +101,20 @@ export function getCurrencySymbol(currencyCode: unknown) {
         default:
             return null
     }
+}
+
+/**
+ * The symbol a `Currency` renderer prints: a `symbol` its definition gives, or else the symbol of its
+ * `currencyCode`, or of the document's, which is the code itself when `getCurrencySymbol` knows none.
+ * Every form of the renderer reads it here. Until 2026-10-06 only `{name: 'Currency'}` at the top of a
+ * `render*` attribute took the document's currency, the string form and the forms inside `values`
+ * printed `$` whatever it was, a `symbol` of the definition's own was replaced, and an unknown code
+ * printed none.
+ */
+function currencySymbolFor (definition: Meta | undefined, instance: TransformConfig['instance']): unknown {
+    if (definition && definition.symbol != null) return definition.symbol
+    const currencyCode = (definition && definition.currencyCode) || (instance && instance.state && instance.state.currencyCode)
+    return getCurrencySymbol(currencyCode) || currencyCode || undefined
 }
 
 /**
@@ -151,7 +168,11 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
             // @Note: `relativePath` is deliberately NOT forwarded here. It reaches `getFunctionFromObject`,
             // which puts it into the `popupOpen` context, where `rules.tsx` gives it the highest priority when
             // resolving popup field names — rebinding a root-level popup template onto the table's path.
-            metaToFunctions(definition, {...funcConfig, data, relativeIndex, _data, rowValue: _data, instance})
+            // A `render*` view definition's own handlers are resolved where it renders, below, with the row's
+            // index: bound here, once and outside any row, an `{index}` in their arguments stayed as written.
+            if (!(attribute.indexOf('render') === 0 && definition.view)) {
+                metaToFunctions(definition, {...funcConfig, data, relativeIndex, _data, rowValue: _data, instance})
+            }
             if (definition.name) {
                 definition.name = interpolateString(definition.name, instance, {suppressError: true})
             }
@@ -161,7 +182,11 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
         if (attribute.indexOf('render') === 0) {
             if (typeof definition === 'string') {
                 // Not undefined: the mapper installs `Render.Method` when the engine loads.
-                meta[attribute] = Render.Method!(meta[attribute])
+                const method = Render.Method!(definition)
+                meta[attribute] = (definition === FIELD.RENDER.CURRENCY && method)
+                    ? (value: unknown, index: unknown, props?: Meta, ...rest: unknown[]) =>
+                        method(value, index, {symbol: currencySymbolFor(undefined, instance), ...props}, ...rest)
+                    : method
             }
             // Below transformation only happens during render
             // @Note: every renderer built in this loop closes over the ONE function-scoped `_data` binding and
@@ -169,6 +194,8 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
             // nested-definition `options._data`) reads that same binding. Renderers therefore observe, and can
             // clobber, each other's scratch value. Behaviour is intact today only because each renderer assigns
             // before it reads. Scoping this per renderer is engine-decomposition work (§9.3), not a lint fix.
+            // What the definition's own handlers were resolved against before they were resolved per call.
+            const contextData = _data
             // eslint-disable-next-line no-loop-func
             if (isObject(definition)) meta[attribute] = (value: any, index: any, props: Meta, self: any) => {
                 if (attribute === 'renderExtraItem') {
@@ -183,7 +210,16 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
 
                 // Render is a field definition
                 if (definition.view) {
-                    const {name, filterItems, ...configs} = definition
+                    const {name, filterItems, ...declared} = definition
+                    // The definition's own handlers, for this call: with the row's index and value when the
+                    // caller passes an index (a table row), and with the context around it otherwise, as before.
+                    const configs = cloneDeep(declared)
+                    metaToFunctions(configs, {
+                        ...funcConfig, data, instance,
+                        relativeIndex: index != null ? index : relativeIndex,
+                        _data: index != null ? value : contextData,
+                        rowValue: index != null ? value : contextData,
+                    })
                     // TableView calls renderExtraItem(allItems) with no row index — `index` is undefined.
                     // Inputs must bind to the next array slot (allItems.length): e.g. lineItems[2].field, not lineItems.field.
                     let rowIndex = index
@@ -249,9 +285,7 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
                 // Render is a function definition
                 else if (definition.name) {
                     const func = getFunctionFromObject(definition, {...funcConfig, data})
-                    const currencyCode = (definition.currencyCode) || (instance && instance.state && instance.state.currencyCode)
-                    const currencySymbol = getCurrencySymbol(currencyCode)
-                    return isFunction(func) ? func.apply(this, [value, index, {...props, ...definition, symbol: currencySymbol ,data, _data}])
+                    return isFunction(func) ? func.apply(this, [value, index, {...props, ...definition, symbol: currencySymbolFor(definition, instance), data, _data}])
                       : func
                 }
 
@@ -263,11 +297,11 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
                       ? (valueDefinition.view
                           ? Render({...props, ...valueDefinition, data, _data}, index)
                           : getFunctionFromObject(valueDefinition, {...funcConfig, data})
-                            .apply(this, [value, index, {...props, ...valueDefinition, data, _data}])
+                            .apply(this, [value, index, {...props, ...valueDefinition, symbol: currencySymbolFor(valueDefinition, instance), data, _data}])
                       )
                       // Not undefined: the mapper installs `Render.Method`, which resolves every
                       // built-in renderer name.
-                      : Render.Method!(valueDefinition)!.apply(this, [value, index, {...props, data, _data}])
+                      : Render.Method!(valueDefinition)!.apply(this, [value, index, {symbol: currencySymbolFor(undefined, instance), ...props, data, _data}])
                 }
             }
         }

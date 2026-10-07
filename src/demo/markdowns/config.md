@@ -97,7 +97,7 @@ In short, the UI Render is both declarative and dynamic in nature, with the poss
 
 8. **Function definitions**
   - A Function gives you a way to format data for display in the UI (ex. `Currency`, `Float`, `Percent`...)
-  - A Function can be defined using `['onClick', 'onChange', 'onDone']` attributes, or starting with the word `render`
+  - A Function can be defined using `['onClick', 'onChange', 'onDone', 'onFocus', 'onBlur']` attributes, or starting with the word `render`
     Example: `renderLabel`, `renderCell`...
   - Function can be defined as `String`, with arguments separated by comma/s
     Example: `"setState,group"` -> use `setState` function with `group` as argument
@@ -195,9 +195,9 @@ a stack trace:
   `format` / `normalize` / `parse`); a `showIf` that is neither a key path string nor an object is
   ignored, so the node always renders; a malformed `metaVersion` is reported, and changes nothing.
 
-Handler names (`onClick`, `onChange`, `onDone`) are deliberately **not** checked: they resolve
-against built-in actions, the host's `methods` prop and renderer instance methods, so an
-unknown-name warning could not tell a typo from a valid host method.
+Handler names (`onClick`, `onChange`, `onDone`, `onFocus`, `onBlur`) are deliberately **not**
+checked: they resolve against built-in actions, the host's `methods` prop and renderer instance
+methods, so an unknown-name warning could not tell a typo from a valid host method.
 
 Pass a function instead of `true` to handle the findings yourself:
 `validateMeta={problems => myLogger(problems)}`. Each entry is
@@ -304,8 +304,8 @@ cannot replace the failure it was called to report.
 ```js
 {
   currencyCode: 'USD', // default currency code for displaying currency symbol
-                       // Supported codes: 'USD', 'EUR', 'GBP'
-                       // Read by a { name: 'Currency' } renderer; the string 'Currency' always prints $
+                       // 'USD', 'EUR' and 'GBP' print $, € and £; any other code prints itself
+                       // Read by every 'Currency' renderer; a { name: 'Currency', symbol } prints its own
 }
 ```
 
@@ -354,8 +354,10 @@ Available in all UI components:
   validate: String,      // name of the validation function: 'email', 'maxLength' (100 characters), 'password',
                          // 'required' or 'url'
   value: undefined,      // controlled input value
-  defaultValue: undefined, // shown in an empty, unedited field that has a `format`; never stored
+  defaultValue: undefined, // shown in an unedited field the data leaves unset; never stored
   onChange: String,       // callback function name for input value changes
+  onFocus: String,        // action called when the field takes focus, after the field's own handling
+  onBlur: String,         // action called when the field loses focus, after the field's own handling
   min: Number,           // with type 'number', min and max install a range validator,
   max: Number,           // and a value outside them is clamped on blur
   info: 'Content rendered when input is in focus',
@@ -455,7 +457,7 @@ See the [Select: Cascading](examples#selectCascading) example for a working demo
 Shorthand for `{ "text": "categoryName", "value": "{index}" }` on a node with a `name` and no `onChange` of its own
 (with one, each option's `categoryName` is both its text and its value).
 Selected value in form data: `"0"`, `"1"`, etc.
-In the data `getFormData` hands the host, `changeOptionOrderForSelectFields` moves the selected item to the front of the options array and **removes** the select field from the output data, when that array is at the top level of the data. The values `onSubmit` receives are not reordered.
+In the data `getFormData` hands the host, `changeOptionOrderForSelectFields` moves the selected item to the front of the options array and **removes** the select field from the output data, when the Select's `name` and that array are both at the top level of the data, and the Select sits in `items` or `renderItem.items` all the way from the root. Any other Select, such as one in a `Tabs` entry or with a dotted `name`, is left as it is, and so is its options array. The values `onSubmit` receives are not reordered.
 
 ```json
 "mapOptions": { "text": "categoryName", "value": "{index}" }
@@ -614,8 +616,8 @@ for a range slider.
     { id: String, order: 0, sortKey: 'item.attribute' }, // order: -1 descending, 1 ascending, 0 none
   ],
   colGroup: [            // column styles (colgroup HTML element)
-    { style: Object, isFixed: Boolean },
-  ],
+    { style: Object, isFixed: Boolean }, // isFixed pins the column, header included, while the table scrolls
+  ],                                     // sideways; its left offset adds up the style.minWidth of those before it
   usePagination: false,  // enable pagination (renders nav below the table when totalPages > 1)
   rowsPerPage: 20,       // rows per page (default 20)
 }
@@ -839,7 +841,8 @@ When opening a popup from a table row (using `renderItem`), the popup fields wil
 - A popup is a modal dialog to a keyboard and a screen reader: opening it moves focus to its first control
   (its Ok button when the content has none), Tab and Shift+Tab stay inside it, Escape closes it as the
   backdrop and Ok do (an open list or calendar inside closes first), and closing it gives focus back to the
-  control that opened it. A `title` names the dialog.
+  control that opened it. A `title` names the dialog; without one, its message does when it is text, and
+  the word "Popup" otherwise.
 - The automatic path prefix comes from **where the `Popup` is declared**. A `Popup` declared *inside*
   the row (`renderItem` / `renderItemCells`) is scoped automatically. A `Popup` declared *outside* the
   table must be told its scope explicitly, or its inputs stay root-scoped and the edit lands in a

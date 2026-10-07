@@ -528,9 +528,24 @@ const POPUP = {
      * inside it, Escape closes it, and closing it gives focus back to the trigger.
      */
     DIALOG_ROLE_COUNT: 1,
+    /**
+     * [I] since 2026-10-06. The example's popup has no title, and its dialog had no accessible name, which
+     * a dialog must have. Untitled, it is named by its message when that is text, and by "Popup" otherwise.
+     */
+    ACCESSIBLE_NAME: 'Popup',
     FOCUS_MOVES_IN: true,
     TAB_STAYS_IN: true,
     ESCAPE_CLOSES: true,
+    /**
+     * [I] since 2026-10-06. The date field the example's popup holds opens its calendar above the
+     * dialog. rc-picker mounts the calendar in `<body>`, outside the popup, and with `z-index: auto` it
+     * was above the popup's 1000 only because the shell, `.app`, animates in with `forwards`: while
+     * that animation is in effect the shell is a stacking context, and the popup is inside it. With
+     * the animation removed, the centre of the calendar hit the dialog, so a day could not be clicked
+     * (measured on the code before, with this test). The calendar has a z-index of its own now.
+     */
+    DATE_FIELD: 'popupDate',
+    CALENDAR_ABOVE: true,
 }
 
 /** The first slider of the `slider` example: `volume`, 0 to 100, step 1, starting at 35. */

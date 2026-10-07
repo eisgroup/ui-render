@@ -44,6 +44,33 @@ describe('UI Render consumer-level regression guards', () => {
         expect(inputNames(container)).toEqual(['topLevel', 'inner'])
     })
 
+    it('keeps the fields of a named Data block under their own names, the keys its payload carries', () => {
+        // `name` selects what the block's views display, and its fields keep their own names from the
+        // root of the form's values: this one shows and writes `field`, not `nested.field`, while the
+        // Text beside it shows the nested value. That reads as a defect, and was reported as one on
+        // 2026-10-06; it stays, because those names are the keys a host receives, as the guard above
+        // pins for a block whose bound value is null.
+        const meta = {
+            view: 'Col',
+            items: [{
+                view: 'Data', kind: 'sect', name: 'nested',
+                meta: {view: 'Col', items: [{view: 'Text', name: 'field', className: 'shown'}, {view: 'Input', name: 'field'}]},
+            }],
+        }
+        const data = {field: 'ROOT', nested: {field: 'Inner'}}
+        let getFormData
+        const {container} = render(<UIRender meta={meta} data={data} initialValues={data} getFormData={f => { getFormData = f }}/>)
+
+        expect(inputNames(container)).toEqual(['field'])
+        expect(container.querySelector('input')).toHaveValue('ROOT')
+        expect(container.querySelector('.shown')).toHaveTextContent('Inner')
+        const input = container.querySelector('input')
+        fireEvent.focus(input)
+        fireEvent.change(input, {target: {value: 'typed'}})
+        fireEvent.blur(input)
+        expect(getFormData()).toEqual({field: 'typed', nested: {field: 'Inner'}})
+    })
+
     it('keeps a root-level popup template off the table row path', () => {
         const meta = {
             view: 'Col',
@@ -64,6 +91,7 @@ describe('UI Render consumer-level regression guards', () => {
                 },
             ],
         }
+        const consoleWarn = jest.spyOn(console, 'warn').mockImplementation(() => {})
         const {container} = render(
             <UIRender meta={meta} data={{rows: [{a: 'x', note: 'n0'}, {a: 'y', note: 'n1'}]}}/>
         )
@@ -78,6 +106,42 @@ describe('UI Render consumer-level regression guards', () => {
         const names = inputNames(document.body)
         expect(names).toContain('note')
         expect(names.some(name => name && name.startsWith('rows.note'))).toBe(false)
+        // The button's `{index}` is its row since 2026-10-06, as a nested button's always was, so the
+        // engine says what it says of any row popup with no path: its field binds at the root.
+        expect(consoleWarn).toHaveBeenCalledWith(expect.stringContaining('POPUP_OPEN: "edit.1"'))
+    })
+
+    it('gives a handler at the root of a `render*` definition its row, as one nested in it has', () => {
+        // The root's handlers were bound once, outside any row, so `{index}` stayed as written: this
+        // popup opened with no row, and its field bound to `rows.note` instead of `rows[1].note`.
+        const meta = {
+            view: 'Col',
+            items: [
+                {view: 'Popup', id: 'edit.{index}', title: 'Edit', items: [{view: 'Input', name: 'note'}]},
+                {
+                    view: 'Table', name: 'rows',
+                    headers: [
+                        {id: 'a', label: 'A'},
+                        {
+                            id: 'act', label: 'Act',
+                            renderCell: {
+                                view: 'Button', children: 'Open',
+                                onClick: {name: 'popupOpen', args: ['edit.{index}', {relativePath: 'rows'}]},
+                            },
+                        },
+                    ],
+                },
+            ],
+        }
+        const data = {rows: [{a: 'x', note: 'n0'}, {a: 'y', note: 'n1'}]}
+        const {container} = render(<UIRender meta={meta} data={data} initialValues={data}/>)
+
+        const openButtons = Array.from(container.querySelectorAll('button'))
+            .filter(button => button.textContent.includes('Open'))
+        act(() => { fireEvent.click(openButtons[1]) })
+
+        expect(inputNames(document.body)).toContain('rows[1].note')
+        expect(document.querySelector('input[name="rows[1].note"]')).toHaveValue('n1')
     })
 
     it('never scopes a popup to a path that only exists in the data', () => {

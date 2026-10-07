@@ -95,6 +95,14 @@
         "onDone": {
           "$ref": "#/$defs/functionRef"
         },
+        "onFocus": {
+          "description": "Called when the node takes focus. On a field, after the field's own handling, never in its place.",
+          "$ref": "#/$defs/functionRef"
+        },
+        "onBlur": {
+          "description": "Called when the node loses focus. On a field, after the field's own handling, never in its place.",
+          "$ref": "#/$defs/functionRef"
+        },
         "type": {
           "description": "Input variant. `select`, `slider`, `toggle` and `file` re-resolve an Input node to the matching field component; `number` and `date` select the numeric and date field. Any other value is passed through to the underlying input element.",
           "$ref": "#/$defs/inputType"
@@ -395,7 +403,6 @@
             "currency",
             "date",
             "double5",
-            "hh:mm",
             "integer",
             "percent",
             "phone",

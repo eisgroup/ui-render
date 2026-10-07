@@ -38,6 +38,12 @@ describe('uppercase', () => {
     it('uppercases strings', () => {
         expect(uppercase('abc')).toBe('ABC')
     })
+    it('returns anything else as it is, such as an empty field\'s undefined', () => {
+        expect(uppercase(undefined)).toBeUndefined()
+        expect(uppercase(null)).toBeNull()
+        expect(uppercase('')).toBe('')
+        expect(uppercase(7)).toBe(7)
+    })
 })
 
 describe('phone', () => {

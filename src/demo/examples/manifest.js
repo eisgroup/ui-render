@@ -320,7 +320,8 @@ export const EXAMPLES = [
   {
     title: 'Upload: variants (single, multiple, image, readonly)',
     id: 'uploadVariants',
-    data: {},
+    // A read-only upload shows only while it holds a file: without one, its case showed nothing.
+    data: {readonlyUpload: ['report.csv']},
     meta: uploadVariantsMeta,
   },
   {

@@ -152,6 +152,10 @@ export type AsFieldProps = {
   /** Help text or component to show on invalid input */
   error?: React.ReactNode
   onChange?: (value: unknown, ...args: unknown[]) => void
+  /** Called after the field's own focus handling, with what the input passed it; never in its place */
+  onFocus?: unknown
+  /** Called after the field's own blur handling, with what the input passed it; never in its place */
+  onBlur?: unknown
   format?: ValueTransform
   normalize?: ValueTransform
   parse?: ValueTransform
@@ -163,6 +167,14 @@ export type AsFieldProps = {
    */
   [key: string]: unknown
 }
+
+/**
+ * Whether a field holds no value of its own, which is when its `defaultValue` shows. final-form formats
+ * an unset value as `''` unless the field has a `format`, so `''` counts when the field started unset;
+ * until 2026-10-06 only `undefined` did, and a `defaultValue` showed only in a field with a `format`.
+ * A `''` the data gives is a value, and keeps the default out.
+ */
+export const isUnset = (value: unknown, initial: unknown) => value === void 0 || (value === '' && initial === void 0)
 
 /**
  * @param InputComponent - `any` props: the field spreads final-form's input and its own props onto it,
@@ -248,15 +260,15 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
 
     // do not use ...props from input, because it is shared by <Active.Field> instances
     // @Note: react-final-form fires `format()` when `input.value` getter is called
-    Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}: FieldRenderProps<unknown>) => {
+    Input = ({input: {value, ...input}, meta: {touched, error, pristine, initial} = {}}: FieldRenderProps<unknown>) => {
       const {
         onChange, error: err, defaultValue, normalize, format, parse, validate,
-        instance, onRemoveChange, ...props
+        instance, onRemoveChange, onFocus, onBlur, ...props
       }: AsFieldProps = this.props
 
       if (!this.hasFocus) { // use cached `value` while editing to prevent format/parse bugs and rerender
         // @Note: defaultValue is only used for UI, internal value is still undefined
-        this.value = value === void 0
+        this.value = isUnset(value, initial)
           ? (pristine && defaultValue != null ? (format ? format(defaultValue) : defaultValue) : value)
           : value
 
@@ -304,14 +316,22 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
       )
     }
 
+    // The field's own handling first, then the one a meta or a host gave it. Until 2026-10-06 that one
+    // replaced these two: the field never learnt it had focus, and a blur no longer marked it touched.
     handleFocus = (...args: Parameters<FieldInput['onFocus']>) => {
       this.hasFocus = true
-      return this.input.onFocus(...args)
+      const focused = this.input.onFocus(...args)
+      const {onFocus} = this.props
+      if (typeof onFocus === 'function') onFocus(...args)
+      return focused
     }
 
-    handleBlur = () => {
+    handleBlur = (...args: unknown[]) => {
       this.hasFocus = false
-      return this.input.onBlur()
+      const blurred = this.input.onBlur()
+      const {onBlur} = this.props
+      if (typeof onBlur === 'function') onBlur(...args)
+      return blurred
     }
 
     handleChange = (value: unknown, ...args: unknown[]) => {

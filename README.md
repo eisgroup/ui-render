@@ -203,8 +203,8 @@ exactly like a top-level field:
 
 Each is merged, not replaced: passing only `dateFormat` leaves `currency` and `language` at
 their defaults. `currency` is **not** `meta.currencyCode` — that one selects the currency symbol
-a value renderer declared as an object prints (`{"name": "Currency"}`; the string form `"Currency"`
-always prints `$`), and is declared in meta rather than passed as a prop.
+the `Currency` value renderer prints, in either form (`"Currency"` or `{"name": "Currency"}`), and is
+declared in meta rather than passed as a prop.
 
 > These props used to be accepted and then silently ignored — every date rendered as
 > `MM-DD-YYYY` whatever was passed. If your application has been passing `dateFormat` and

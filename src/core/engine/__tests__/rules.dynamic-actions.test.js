@@ -296,4 +296,32 @@ describe('UIRender dynamic action and data-integrity contracts', () => {
         await waitFor(() => expect(screen.getByText('€')).toBeInTheDocument())
         expect(screen.queryByText('$')).not.toBeInTheDocument()
     })
+
+    it('prints the document\'s currency in every form of `Currency`, an unknown code as itself, and a `symbol` of its own', () => {
+        // Only `{name: 'Currency'}` at the top of a `render*` attribute took the document's currency: the
+        // string form and both forms inside `values` printed `$` whatever `currencyCode` was, an unknown
+        // code printed no symbol at all, and a definition's own `symbol` was replaced by the code's.
+        const data = { amount: 12.5 }
+        const label = renderLabel => ({ view: 'Text', children: { name: 'amount' }, renderLabel })
+        const meta = currencyCode => ({
+            view: 'Col',
+            currencyCode,
+            items: [
+                label('Currency'),
+                label({ values: {}, default: 'Currency' }),
+                label({ values: {}, default: { name: 'Currency' } }),
+                label({ name: 'Currency', symbol: 'CHF' }),
+                label({ name: 'Currency' }),
+            ],
+        })
+        const symbols = container => Array.from(container.querySelectorAll('.margin-right-smallest')).map(node => node.textContent)
+        const mount = currencyCode => render(<AppProvider><UIRender meta={meta(currencyCode)} data={data} initialValues={data} /></AppProvider>)
+
+        const view = mount('EUR')
+        expect(symbols(view.container)).toEqual(['€', '€', '€', 'CHF', '€'])
+        view.rerender(<AppProvider><UIRender meta={meta('JPY')} data={data} initialValues={data} /></AppProvider>)
+        expect(symbols(view.container)).toEqual(['JPY', 'JPY', 'JPY', 'CHF', 'JPY'])
+        view.unmount()
+        expect(symbols(mount(undefined).container)).toEqual(['$', '$', '$', 'CHF', '$'])
+    })
 })

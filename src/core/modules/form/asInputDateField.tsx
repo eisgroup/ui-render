@@ -4,7 +4,7 @@ import React, { useRef } from 'react'
 import { isRequired } from '../../components/inputs/validationRules'
 import { touchedFor } from '../../state/formRegistry'
 import { Active } from '../../utils'
-import { namedField } from './utils'
+import { isUnset, namedField } from './utils'
 
 /** What final-form hands the input: its `input` props, without `value`, which the field caches. */
 type FieldInput = Omit<FieldRenderProps<unknown>['input'], 'value'>
@@ -26,6 +26,10 @@ export type DateFieldProps = {
     /** Help text or component to show on invalid input */
     error?: React.ReactNode
     onChange?: (value: unknown, ...args: unknown[]) => void
+    /** Called after the field's own focus handling, with what the input passed it; never in its place */
+    onFocus?: unknown
+    /** Called after the field's own blur handling, with what the input passed it; never in its place */
+    onBlur?: unknown
     format?: ValueTransform
     normalize?: ValueTransform
     parse?: ValueTransform
@@ -73,15 +77,15 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
 
         // do not use ...props from input, because it is shared by <Active.Field> instances
         // @Note: react-final-form fires `format()` when `input.value` getter is called
-        Input = ({input: {value, ...input}, meta: {touched, error, pristine} = {}}: FieldRenderProps<unknown>) => {
+        Input = ({input: {value, ...input}, meta: {touched, error, pristine, initial} = {}}: FieldRenderProps<unknown>) => {
             const {
                 onChange, error: err, defaultValue, normalize, format, parse, validate,
-                instance, onRemoveChange, ...props
+                instance, onRemoveChange, onFocus, onBlur, ...props
             } = this.props
 
             if (!this.hasFocus) { // use cached `value` while editing to prevent format/parse bugs and rerender
                 // @Note: defaultValue is only used for UI, internal value is still undefined
-                this.value = value === void 0
+                this.value = isUnset(value, initial)
                     ? (pristine && defaultValue != null ? (format ? format(defaultValue) : defaultValue) : value)
                     : value
 
@@ -113,14 +117,21 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
             )
         }
 
+        // The field's own handling first, then the one a meta or a host gave it, as in `asField`.
         handleFocus = (...args: Parameters<FieldInput['onFocus']>) => {
             this.hasFocus = true
-            return this.input.onFocus(...args)
+            const focused = this.input.onFocus(...args)
+            const {onFocus} = this.props
+            if (typeof onFocus === 'function') onFocus(...args)
+            return focused
         }
 
         handleBlur = (...args: Parameters<FieldInput['onBlur']>) => {
             this.hasFocus = false
-            return this.input.onBlur(...args)
+            const blurred = this.input.onBlur(...args)
+            const {onBlur} = this.props
+            if (typeof onBlur === 'function') onBlur(...args)
+            return blurred
         }
 
 

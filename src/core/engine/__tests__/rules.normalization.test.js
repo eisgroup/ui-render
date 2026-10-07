@@ -3,6 +3,13 @@ import '../rules'
 import { FIELD } from '../../modules/variables'
 
 describe('rules meta normalization contract', () => {
+    it('resolves every normalizer name it publishes to a function', () => {
+        // `format`, `normalize` and `parse` read FIELD.NORMALIZER by these names. `'hh:mm'` was published
+        // for four years after its normalizer was deleted, and named nothing: a field with it was left as typed.
+        const unresolved = Object.values(FIELD.NORMALIZE).filter(name => typeof FIELD.NORMALIZER[name] !== 'function')
+        expect(unresolved).toEqual([])
+    })
+
     it('normalizes date values to the public YYYY-MM-DD data format', () => {
         expect(FIELD.NORMALIZER.date('2024-02-03T12:00:00.000Z')).toBe('2024-02-03')
         expect(FIELD.NORMALIZER.date(null)).toBeUndefined()

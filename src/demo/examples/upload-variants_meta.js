@@ -73,6 +73,11 @@ const uploadVariantsMeta = {
       styles: 'h4 margin-top-large margin-bottom-small',
     },
     {
+      view: 'Text',
+      children: 'Shown only while it holds a file, which the data gives it. It takes no click, drop or key.',
+      styles: 'margin-bottom',
+    },
+    {
       view: 'Input',
       type: 'file',
       name: 'readonlyUpload',

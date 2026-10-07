@@ -125,12 +125,13 @@
   gains `role="button"`.
 - **The popup is a dialog.** It had no role, opening it left focus on the control behind the
   backdrop, Tab walked the page under it, and only the pointer could close it. Now the box is a
-  modal `dialog` (`aria-modal`), named by its title when it has one. Opening it moves focus to its
-  first control, which is the Ok button when the content has none; Tab and Shift+Tab stay inside
-  it; Escape closes it, as the backdrop and Ok still do; and closing it gives focus back to the
-  control that opened it. An Escape that a control inside uses is left to it: an open list or an
-  open calendar closes first. **This changes the markup**: the box gains `role`, `aria-modal` and
-  `aria-labelledby`, its title an `id`, and the popup two focus guards around the box.
+  modal `dialog` (`aria-modal`), named by its title, or without one by its message when that is text
+  and by "Popup" otherwise. Opening it moves focus to its first control, which is the Ok button when
+  the content has none; Tab and Shift+Tab stay inside it; Escape closes it, as the backdrop and Ok
+  still do; and closing it gives focus back to the control that opened it. An Escape that a control
+  inside uses is left to it: an open list or an open calendar closes first. **This changes the
+  markup**: the box gains `role`, `aria-modal` and `aria-labelledby` or `aria-label`, its title and a
+  text message an `id`, and the popup two focus guards around the box.
 - The text, number and date inputs no longer emit an `aria-describedby` pointing at an element
   that does not exist. The attribute was unconditional while the element carrying the target id
   renders only when there is an error or info message, so every reference in a form without
@@ -162,6 +163,15 @@
   published props, and the list of what went and why should be reachable from an installed copy
   rather than only from a URL. The manifest also gained `repository` and `bugs`, so npm links to
   the source and to somewhere you can tell us the removals hurt.
+- **The `Data` view's reference says where its fields' values live.** Outside a table row a `Data`
+  node's fields keep their own names, from the root of the form's values, whatever its `name` selects:
+  a field shows and writes the root's value at its name, and `getFormData` returns it there, also from a
+  `useForm` form. The reference said `name` selects the block's values, which holds for what its views
+  display. Nothing changes at runtime, since those names are the keys a host receives.
+- **The configuration reference says which Selects `getFormData` reorders.** Only one whose `name` and
+  options array are both at the top level of the data, found through `items` or `renderItem.items` from
+  the root; a Select in a `Tabs` entry, or with a dotted `name`, is left as it is, and so is its options
+  array. Nothing changes at runtime, for the same reason: a reorder would move keys a host receives.
 
 #### Build
 
@@ -461,6 +471,69 @@
 
 #### Fixes
 
+- **An empty field with `format: 'uppercase'` renders.** final-form formats an empty field's
+  `undefined`, and the `uppercase` normalizer called `toUpperCase` on it: the field's render threw, and
+  the renderer showed its failure in the field's place. A value that is not a string is left as it is.
+- **`onError` hears from the documents a `Data` node nests.** The engine creates such a document and
+  gave it no `onError`, so a node that failed to render inside one was reported on the console only,
+  against what the prop promises. A nested document now reports to the closest `onError` up its parents.
+- **The `form` prop is described as what it does.** Its type said the document renders inside
+  `<form onSubmit {...form}>`. The document a host mounts has had no `<form>` around it since 2025-03, so
+  Enter in a field submits nothing, and that stays. Only a document with no content still had an empty
+  `<form>`, and it has none now either. A document a `Data` node nests renders inside its own, as before.
+- **A calendar opened inside the popup is above it by its own `z-index`.** rc-picker mounts the
+  calendar in `<body>`, outside the popup, and gave it none: it was above the popup's 1000 only while the
+  shell's `fade-in` animation, which runs `forwards`, made the shell a stacking context. Without that
+  (measured in Chromium, with the animation removed) a click on a day landed on the dialog. The calendar
+  has `z-index: 1050` now, and the `popupContent` example's popup holds a date field.
+- **A meta `onFocus` or `onBlur` is an action, and no longer breaks the field it is on.** Neither was
+  resolved: the string form reached the input as a string, and a focus threw `onFocus is not a
+  function`; the object form replaced the field's own handler, so a blur no longer marked the field
+  touched and its validation error never showed. Both resolve as `onClick` does now, by name or as
+  `{name, args}`, and a field calls them after its own handling, with what the input passed it. The
+  schema and the published types declare them.
+- **Every form of the `Currency` renderer prints the document's currency.** Only `{"name": "Currency"}`
+  at the top of a `render*` attribute read the meta's `currencyCode`: the string form `"Currency"`, and
+  both forms inside a `values` map, printed `$` whatever it was. A code other than `USD`, `EUR` and
+  `GBP` printed no symbol at all, and prints itself now (`JPY` before the amount). A `symbol` the object
+  form gives is printed rather than replaced. **This changes rendered output** for a document whose
+  `currencyCode` is not `USD` and that uses those forms: `$` becomes its currency's symbol.
+- **`Float` and `Percent` without `decimals` round to an integer.** They trimmed the value to its
+  integer part, which only `truncated` is meant to do: 18.75 % printed `18%`, where `decimals: 0` printed
+  `19%`. **This changes rendered output** wherever such a value's fraction is a half or more; in the
+  bundled examples, two cells of `ratingDetails` (18 → 19) and two of `rowListRelativeData` (2 → 3).
+- **`defaultValue` shows in a field with no `format` as well.** final-form formats an unset value as
+  `''` unless the field has a `format`, and only `undefined` counted as unset, so the default showed
+  only in a field with a `format`. It shows in any unedited field the data leaves unset now, and is
+  still never stored. A `''` the data gives is a value: the default stays out of that field.
+- **`'hh:mm'` is no longer suggested as a normalizer name.** Its normalizer was deleted in 2022 and the
+  name resolved to nothing since: a field with `format`, `normalize` or `parse` set to `'hh:mm'` was
+  left as typed, and still is. The schema, the published types and the engine's own list no longer
+  name it; the schema and the types still accept any string, so a meta that uses it stays valid.
+- **A handler at the root of a `render*` view definition gets its row.** In
+  `renderCell: {view: 'Button', onClick: {name: 'popupOpen', args: ['edit.{index}', …]}}` the `{index}`
+  stayed as written: the root's handlers were bound once, outside any row, while those of the nodes
+  nested in it got the row's index and value. They get the row too now, when the caller passes one (a
+  table cell does). A root-level popup template opened this way with no `relativePath` now prints the
+  engine's warning that its fields bind at the root, as it always did when the button was nested.
+- **`colGroup`'s pinned columns pin columns in the default layout.** A body cell looked its pinned
+  style up by its row there: every cell of the first row took the second column's style, and no cell of
+  the first column was pinned. Cells are looked up by column now, and the header of a pinned column is
+  pinned with it. The vertical layout, where the lookup was right, renders as before.
+- **An input's `info` text is classed `info`.** The text, input, number, date and dropdown fields
+  classed it `into`, which no rule selects, while its `error` sibling is classed `error`. **This changes
+  how it looks**: it was the body text colour (`#444`), and is the info colour now (`#1570b4`), as an
+  error is the error colour.
+- **`readonly` on a layout node stays off its element.** A field reads `readonly` as a prop; a container
+  spread it onto its `<div>` as it was, and React warned of an invalid DOM property in development. The
+  DOM boundary strips it from containers now, with `name` and `label`; a field still gets it.
+- **A document renders where there is no global `fetch`.** The `fetch` action read the global while a
+  document built its actions, so where there is none, in jsdom or an older server, the render threw a
+  `ReferenceError` before anything showed. The global is read when the action runs now, which also lets
+  it call a polyfill installed after the document was built.
+- **The "Upload: variants" example shows its read-only case.** A read-only upload renders only while
+  it holds a file, and the example's data gave it none, so the case showed a title and nothing under it.
+  Its data gives it one now, and a line under the title says why it is there.
 - **A checkbox's label checks its own box when another box has the same label.** A `Checkbox`
   with no `id` takes one from its label, so two with one label in a document had the same id, and a
   `<label for>` finds the first element with it: in the `popupContent` example, Expand All in the

@@ -331,7 +331,7 @@ const InputNumber = ({
             {idHelp &&
                 <View id={idHelp} className="field-help">
                     {error && <Text className="error">{translate(error)}</Text>}
-                    {info && <Text className="into">{translate(info)}</Text>}
+                    {info && <Text className="info">{translate(info)}</Text>}
                 </View>
             }
             {children}

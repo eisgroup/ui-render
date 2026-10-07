@@ -20,7 +20,7 @@ export type RenderProps = {
     _data?: unknown
     debug?: unknown
     form?: unknown
-    instance?: { state: { currencyCode?: string }, props?: { onError?: unknown } }
+    instance?: { state: { currencyCode?: string }, props?: { onError?: unknown, parent?: unknown } }
     relativeData?: boolean
     relativeIndex?: number | null
     relativePath?: string | null
@@ -269,7 +269,7 @@ function reportRenderError (report: DeliveredRenderErrorReport): void {
     // Every rendered node carries the UIRender instance that owns it, which is how a
     // per-instance host hook is reachable from here without threading another prop
     // through the tree (and without a module global, which two UIRenders would share).
-    const hook = get(report.props, 'instance.props.onError')
+    const hook = hostOnError(report.props.instance)
     if (typeof hook === 'function') {
         try {
             hook(report)
@@ -279,6 +279,19 @@ function reportRenderError (report: DeliveredRenderErrorReport): void {
         }
     }
     Render.onError(report)
+}
+
+/**
+ * The host's `onError` for a node of `instance`: the document's own, or the closest one up its
+ * `parent` chain. A document a `Data` node nests is created by the engine, which gives it none, so
+ * until 2026-10-06 a failure inside one never reached the host.
+ */
+function hostOnError (instance: unknown): unknown {
+    for (let owner = instance; owner; owner = get(owner, 'props.parent')) {
+        const hook = get(owner, 'props.onError')
+        if (typeof hook === 'function') return hook
+    }
+    return undefined
 }
 
 Render.onError = (report: RenderErrorReport) => console.warn(`Unhandled ${Render.name} error:`, report)

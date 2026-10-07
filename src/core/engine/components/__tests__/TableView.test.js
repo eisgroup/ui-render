@@ -368,3 +368,41 @@ describe('TableView sticky cell class', () => {
         expect(build(STICKY, 'sticky', STATIC)).toBe('sticky-last')
     })
 })
+
+describe('TableView pinned columns', () => {
+    // What the mapper builds from `colGroup: [{isFixed, style: {minWidth: '50px'}}, {isFixed, …}, {…}]`.
+    const pinned = [
+        { left: '0px', position: 'sticky', zIndex: 1 },
+        { left: '50px', position: 'sticky', zIndex: 1 },
+    ]
+    const threeColumns = [
+        { id: 'name', label: 'Name' },
+        { id: 'amount', label: 'Amount' },
+        { id: 'id', label: 'Id' },
+    ]
+    const pinsOf = cells => Array.from(cells).map(cell => [cell.style.left || null, cell.className || null])
+
+    it('pins the first columns in the default layout, header included, rather than the first rows', () => {
+        // Each body cell looked its style up by its ROW: every cell of the first row took the second
+        // column's, and no cell of the first column was pinned at all.
+        const { container } = render(wrap(
+            <TableView items={items} headers={threeColumns} {...defaults} additionalCellsStyles={pinned} />
+        ))
+
+        const expected = [['0px', 'sticky'], ['50px', 'sticky-last'], [null, null]]
+        expect(pinsOf(container.querySelectorAll('tbody tr')[0].children)).toEqual(expected)
+        expect(pinsOf(container.querySelectorAll('tbody tr')[1].children)).toEqual(expected)
+        // A header cell always carries `left`.
+        expect(pinsOf(container.querySelectorAll('thead th')))
+            .toEqual([['0px', 'left sticky'], ['50px', 'left sticky-last'], [null, 'left']])
+    })
+
+    it('keeps pinning the header column and the first items in the vertical layout', () => {
+        const { container } = render(wrap(
+            <TableView vertical items={items} headers={threeColumns} {...defaults} additionalCellsStyles={pinned} />
+        ))
+
+        const row = container.querySelectorAll('tbody tr')[0]
+        expect(pinsOf(row.children).map(([left]) => left)).toEqual(['0px', '50px', null])
+    })
+})
