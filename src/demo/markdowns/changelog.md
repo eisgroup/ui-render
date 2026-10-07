@@ -473,7 +473,9 @@
   measured with webpack, and each module walked from there, until a pass found nothing more. The
   tests of the deleted helpers went with them, and six demo example files that no page showed. The
   bundle is 1.6 KB smaller, from module-level statements that kept dead helpers' data in it; what
-  it renders is unchanged.
+  it renders is unchanged. What that sweep left for the owners went later: eight environment flags
+  nothing read, the `webstudio` example pair, the engine's re-export of the form registry, and 26
+  exports nothing outside their module imports.
 - The browser checks drive the views a user acts on that only jsdom covered: the date input's
   calendar, the popup, the slider, a toggle, a checkbox, the dropdown by pointer, table sorting and
   pages, and progress steps, 16 tests against the production demo build. `e2e/view-coverage.js`
