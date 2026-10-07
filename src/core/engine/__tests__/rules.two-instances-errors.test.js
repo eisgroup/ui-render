@@ -17,15 +17,12 @@
  *   behaviour deliberately — now records the right one. That flip is the whole point of pinning a
  *   defect rather than describing it in a comment.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import UIRender from '../rules' // eslint-disable-line import/first
-import { formsStorage } from '../../state/formRegistry' // eslint-disable-line import/first
-import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
+import React from 'react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import UIRender from '../rules'
+import { formsStorage } from '../../state/formRegistry'
+import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 
 const appContext = { ...initialAppState, setPopupState: () => {} }
 const withProviders = ui => (

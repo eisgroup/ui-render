@@ -15,19 +15,16 @@
  * new `{...form, reset}` on every render, and the document's `form` is the latest one. They all
  * share the underlying form's methods, so these tests tell "the same form" by `getState`.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import '../utils' // eslint-disable-line import/first
-import Render from '../../../engine/Render' // eslint-disable-line import/first
-import UIRender from '../../../engine/rules' // eslint-disable-line import/first
-import { UIRender as DeclaredUIRender } from '../../../engine/rules' // eslint-disable-line import/first
-import { errorsFor, formsStorage, touchedFor } from '../../../state/formRegistry' // eslint-disable-line import/first
-import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../../contexts' // eslint-disable-line import/first
-import { clearEngineGlobals } from '../../../../demo/testing/mountExample' // eslint-disable-line import/first
+import React from 'react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import '../utils'
+import Render from '../../../engine/Render'
+import UIRender from '../../../engine/rules'
+import { UIRender as DeclaredUIRender } from '../../../engine/rules'
+import { errorsFor, formsStorage, touchedFor } from '../../../state/formRegistry'
+import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../../contexts'
+import { clearEngineGlobals } from '../../../../demo/testing/mountExample'
 
 /** Every document instance a node was handed, and how many times each document rendered. */
 let seen

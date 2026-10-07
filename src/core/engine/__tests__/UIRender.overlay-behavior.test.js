@@ -51,18 +51,14 @@ const tooltipMeta = (extra = {}) => ({
 
 describe('overlay behavioural contract', () => {
     let consoleError
-    const originalFetch = global.fetch
 
     beforeEach(() => {
         consoleError = jest.spyOn(console, 'error').mockImplementation(noop)
-        global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
     })
 
     afterEach(() => {
         clearEngineGlobals()
         consoleError.mockRestore()
-        if (originalFetch === undefined) delete global.fetch
-        else global.fetch = originalFetch
     })
 
     describe('Tooltip', () => {

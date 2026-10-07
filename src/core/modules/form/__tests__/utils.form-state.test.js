@@ -10,18 +10,14 @@
  * Until §9.3 step 6 part of this ran in `UNSAFE_componentWillReceiveProps`, before the render. It is
  * pinned here by what the host receives, not by when, so it holds for whatever the layer is.
  */
-// The engine hands the `fetch` action the global one whenever it builds a meta.
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import '../utils' // eslint-disable-line import/first
-import Render from '../../../engine/Render' // eslint-disable-line import/first
-import UIRender from '../../../engine/rules' // eslint-disable-line import/first
-import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../../contexts' // eslint-disable-line import/first
-import { clearEngineGlobals } from '../../../../demo/testing/mountExample' // eslint-disable-line import/first
+import React from 'react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import '../utils'
+import Render from '../../../engine/Render'
+import UIRender from '../../../engine/rules'
+import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../../contexts'
+import { clearEngineGlobals } from '../../../../demo/testing/mountExample'
 
 let seen
 let resolve

@@ -31,7 +31,6 @@ const meta = {
 
 describe('UIRender onError prop', () => {
     const originalOnError = Render.onError
-    const originalFetch = global.fetch
     let consoleError
 
     beforeEach(() => {
@@ -39,14 +38,11 @@ describe('UIRender onError prop', () => {
         // channel; that the sink itself reports is mapper.error-sink.test.js's job.
         Render.onError = () => {}
         consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
-        global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
     })
 
     afterEach(() => {
         Render.onError = originalOnError
         consoleError.mockRestore()
-        if (originalFetch === undefined) delete global.fetch
-        else global.fetch = originalFetch
     })
 
     const mount = props => render(

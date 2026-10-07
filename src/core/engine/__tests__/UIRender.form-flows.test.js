@@ -1,14 +1,9 @@
-// fetch is referenced while rules.tsx initializes FIELD.FUNC.
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-
-import React from 'react' // eslint-disable-line import/first
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
+import React from 'react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom'
 // Load the form module before rules.tsx enters the mapper -> renders.tsx cycle.
-import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
-import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
+import UIRender, { formsStorage } from '../rules'
+import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 
 const appContext = {
     ...initialAppState,

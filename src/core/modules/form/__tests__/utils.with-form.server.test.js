@@ -5,13 +5,9 @@
  * server never runs: React warns about a layout effect on every server render, and a host that
  * server-renders a document would get that warning for every form on the page.
  */
-// The engine hands the `fetch` action the global one whenever it builds a meta.
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { renderToString } from 'react-dom/server' // eslint-disable-line import/first
-import PublishedUIRender from '../../../../library/main' // eslint-disable-line import/first
+import React from 'react'
+import { renderToString } from 'react-dom/server'
+import PublishedUIRender from '../../../../library/main'
 
 it('renders a document on the server without a warning about its form wrapper', () => {
     const reported = []

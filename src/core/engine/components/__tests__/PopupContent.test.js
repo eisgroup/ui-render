@@ -6,15 +6,12 @@
  * A file of its own on purpose: React logs that warning once per component stack, for the life of
  * the module, so a test after another one that rendered a popup would pass on the old code too.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { render } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import '../../rules' // eslint-disable-line import/first -- sets up the renderer the items resolve through
-import { createPopupContent } from '../PopupContent' // eslint-disable-line import/first
-import { ConfigContext, initialConfigState } from '../../../contexts/ConfigContext' // eslint-disable-line import/first
+import React from 'react'
+import { render } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import '../../rules' // sets up the renderer the items resolve through
+import { createPopupContent } from '../PopupContent'
+import { ConfigContext, initialConfigState } from '../../../contexts/ConfigContext'
 
 it('renders its items keyed, so React does not warn about the list', () => {
     const errors = []

@@ -238,20 +238,16 @@ const boundNames = () => [...new Set(
 
 describe('demo example behavioural contract', () => {
     let consoleError
-    const originalFetch = global.fetch
 
     beforeEach(() => {
         // Warnings are asserted by Examples.registry-and-rendering.test.js; silencing
         // them here keeps a census diff readable.
         consoleError = jest.spyOn(console, 'error').mockImplementation(noop)
-        global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
     })
 
     afterEach(() => {
         clearEngineGlobals()
         consoleError.mockRestore()
-        if (originalFetch === undefined) delete global.fetch
-        else global.fetch = originalFetch
     })
 
     it('pins the census against exactly the manifest, with no stale or missing entry', () => {

@@ -12,19 +12,16 @@
  * The instances are collected from `Render.Component`, the engine's resolver hook, which every
  * node passes through with its `instance`.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import '../../modules/form/utils' // eslint-disable-line import/first
-import Render from '../Render' // eslint-disable-line import/first
-import { autoSubmitter } from '../autoSubmit' // eslint-disable-line import/first
-import { EXAMPLES } from '../../../demo/examples/manifest' // eslint-disable-line import/first
-import { clearEngineGlobals, mountExample, mountMeta } from '../../../demo/testing/mountExample' // eslint-disable-line import/first
-import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
-import UIRender from '../rules' // eslint-disable-line import/first
+import React from 'react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import '../../modules/form/utils'
+import Render from '../Render'
+import { autoSubmitter } from '../autoSubmit'
+import { EXAMPLES } from '../../../demo/examples/manifest'
+import { clearEngineGlobals, mountExample, mountMeta } from '../../../demo/testing/mountExample'
+import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
+import UIRender from '../rules'
 
 /** Every distinct instance a node was handed, in the order they were first seen. */
 let seen

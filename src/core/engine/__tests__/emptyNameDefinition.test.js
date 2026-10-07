@@ -20,10 +20,6 @@ const data = {
     },
 }
 
-// `rules.tsx` registers the global `fetch` as a field action while building its config,
-// and jsdom does not provide one.
-if (typeof global.fetch === 'undefined') global.fetch = () => Promise.resolve()
-
 describe('empty `name` in a value definition', () => {
     it('resolves to an empty value, not to the data object', () => {
         const meta = metaToProps(

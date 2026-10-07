@@ -6,13 +6,10 @@
  * does not exist, so each threw a TypeError and the node's error boundary rendered THAT. Found by the
  * TypeScript checker. The checks throw their own message now, and the boundary renders it.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { act, render } from '@testing-library/react' // eslint-disable-line import/first
-import PublishedUIRender from '../../../library/main' // eslint-disable-line import/first
-import { clearEngineGlobals } from '../../../demo/testing/mountExample' // eslint-disable-line import/first
+import React from 'react'
+import { act, render } from '@testing-library/react'
+import PublishedUIRender from '../../../library/main'
+import { clearEngineGlobals } from '../../../demo/testing/mountExample'
 
 const data = { rows: [{ band: 'a', level: 1, amount: 3 }] }
 

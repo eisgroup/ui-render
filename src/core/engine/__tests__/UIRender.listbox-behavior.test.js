@@ -90,18 +90,14 @@ const press = (control, key, keyCode) => fireEvent.keyDown(control, { key, keyCo
 
 describe('Select and Dropdown behavioural contract', () => {
     let consoleError
-    const originalFetch = global.fetch
 
     beforeEach(() => {
         consoleError = jest.spyOn(console, 'error').mockImplementation(noop)
-        global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
     })
 
     afterEach(() => {
         clearEngineGlobals()
         consoleError.mockRestore()
-        if (originalFetch === undefined) delete global.fetch
-        else global.fetch = originalFetch
     })
 
     describe('opening, reading and choosing an option', () => {

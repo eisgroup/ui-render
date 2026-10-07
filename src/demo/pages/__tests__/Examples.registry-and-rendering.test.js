@@ -26,7 +26,6 @@ const apiCalls = {
 
 const translate = value => value
 const originalRenderOnError = Render.onError
-const originalFetch = global.fetch
 
 const clearGlobalRegistries = () => {
     formsStorage.clear()
@@ -55,9 +54,6 @@ describe('registered demo examples contract', () => {
         caughtRenderErrors = []
         Render.onError = ({ error }) => caughtRenderErrors.push(error)
         consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
-        global.fetch = jest.fn(() => Promise.resolve({
-            json: () => Promise.resolve({}),
-        }))
     })
 
     afterEach(() => {
@@ -65,11 +61,6 @@ describe('registered demo examples contract', () => {
         consoleError.mockRestore()
         clearGlobalRegistries()
         jest.clearAllMocks()
-        if (originalFetch === undefined) {
-            delete global.fetch
-        } else {
-            global.fetch = originalFetch
-        }
     })
 
     it('keeps the documented example registry stable and unique', () => {

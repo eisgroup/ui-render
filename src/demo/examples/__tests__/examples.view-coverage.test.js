@@ -13,18 +13,15 @@
  * the list honest: it renders the examples, records the `view` of every node the mapper resolves, and fails
  * when a registered view is rendered by neither an example nor a declaration below.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import util from 'util' // eslint-disable-line import/first
-import React from 'react' // eslint-disable-line import/first
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import PublishedUIRender from '../../../library/main' // eslint-disable-line import/first
-import Render from '../../../core/engine/Render' // eslint-disable-line import/first
-import { FIELD } from '../../../core/modules/variables' // eslint-disable-line import/first
-import { EXAMPLES } from '../manifest' // eslint-disable-line import/first
-import { clearEngineGlobals, noop } from '../../testing/mountExample' // eslint-disable-line import/first
+import util from 'util'
+import React from 'react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import PublishedUIRender from '../../../library/main'
+import Render from '../../../core/engine/Render'
+import { FIELD } from '../../../core/modules/variables'
+import { EXAMPLES } from '../manifest'
+import { clearEngineGlobals, noop } from '../../testing/mountExample'
 
 /** Runs `fn` with the mapper's resolver recording the `view` of every node it resolves. */
 async function recordingViews (fn) {

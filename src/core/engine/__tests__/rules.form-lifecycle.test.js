@@ -1,18 +1,13 @@
-// rules.tsx registers fetch while building the action map.
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-
-import React from 'react' // eslint-disable-line import/first
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
+import React from 'react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom'
 // Load form registration before rules.tsx follows the mapper/renders cycle.
-import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
+import UIRender, { formsStorage } from '../rules'
 // The lifecycle layer, not the bare class: since §9.3 step 5 the engine installs it on a subclass
 // of its own instead of mutating the class it is handed, and `Active.UIRender` is the channel
 // `engine/Data.tsx` already reads it from to render nested documents.
-import { Active } from '../../utils' // eslint-disable-line import/first
-import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
+import { Active } from '../../utils'
+import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 
 const appContext = {
     ...initialAppState,

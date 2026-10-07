@@ -14,12 +14,9 @@
  * instead was tried while measuring this, and the add does not work there at all — which is not
  * the pattern the corpus uses, and not what this file claims anything about.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import { fireEvent, waitFor } from '@testing-library/react' // eslint-disable-line import/first
-import { EXAMPLES } from '../../../demo/examples/manifest' // eslint-disable-line import/first
-import { mountExample } from '../../../demo/testing/mountExample' // eslint-disable-line import/first
+import { fireEvent, waitFor } from '@testing-library/react'
+import { EXAMPLES } from '../../../demo/examples/manifest'
+import { mountExample } from '../../../demo/testing/mountExample'
 
 const example = EXAMPLES.find(({ id }) => id === 'nestedDataKind')
 

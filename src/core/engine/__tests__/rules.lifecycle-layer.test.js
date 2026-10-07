@@ -24,12 +24,9 @@
  * `Active.UIRender` to avoid a circular import — so the chain is the declared class, this layer,
  * then the form layer.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import '../../modules/form/utils' // eslint-disable-line import/first
-import UIRenderDefault, { UIRender } from '../rules' // eslint-disable-line import/first
-import { Active } from '../../utils' // eslint-disable-line import/first
+import '../../modules/form/utils'
+import UIRenderDefault, { UIRender } from '../rules'
+import { Active } from '../../utils'
 
 /** Everything `Decorator` installs, by the name it installs it under. */
 const INSTALLED_METHODS = [

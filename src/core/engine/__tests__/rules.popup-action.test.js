@@ -18,16 +18,12 @@
  *
  * Rendered through the published entry, so the popup itself renders, portal and all.
  */
-// The engine hands the `fetch` action the global one whenever it builds a meta.
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { act, fireEvent, render, screen } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import PublishedUIRender from '../../../library/main' // eslint-disable-line import/first
-import buttonIconMeta from '../../../demo/examples/button-icon_meta' // eslint-disable-line import/first
-import { clearEngineGlobals } from '../../../demo/testing/mountExample' // eslint-disable-line import/first
+import React from 'react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import PublishedUIRender from '../../../library/main'
+import buttonIconMeta from '../../../demo/examples/button-icon_meta'
+import { clearEngineGlobals } from '../../../demo/testing/mountExample'
 
 const noop = () => {}
 const popupBox = () => document.querySelector('.app__popup__box')
@@ -55,9 +51,13 @@ function clickReporting (element) {
 }
 
 describe('the meta\'s `popup` action', () => {
+    // One test installs a `fetch` for the action to call; jsdom has none.
     let originalFetch
     beforeEach(() => { originalFetch = global.fetch })
-    afterEach(() => { global.fetch = originalFetch })
+    afterEach(() => {
+        if (originalFetch === undefined) delete global.fetch
+        else global.fetch = originalFetch
+    })
 
     it('opens the popup from the "Button with Icon" example, which configures nothing to show', () => {
         mount(buttonIconMeta)

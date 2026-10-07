@@ -12,17 +12,14 @@
  * (`UIRender.smoke`, `rules.actions`). This file pins a state change the document makes itself, and
  * the renders that must NOT rebuild, which nothing else covers.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { act, fireEvent, render, screen } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import '../../modules/form/utils' // eslint-disable-line import/first
-import Render from '../Render' // eslint-disable-line import/first
-import { clearEngineGlobals } from '../../../demo/testing/mountExample' // eslint-disable-line import/first
-import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts' // eslint-disable-line import/first
-import UIRender from '../rules' // eslint-disable-line import/first
+import React from 'react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import '../../modules/form/utils'
+import Render from '../Render'
+import { clearEngineGlobals } from '../../../demo/testing/mountExample'
+import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
+import UIRender from '../rules'
 
 /** Every node's render: the props it was handed, and its document's state as it rendered. */
 let rendered

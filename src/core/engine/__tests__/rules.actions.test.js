@@ -1,15 +1,10 @@
-// rules.tsx registers `fetch` in the action map while building meta.
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-
-import React from 'react' // eslint-disable-line import/first
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
+import React from 'react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom'
 // Load the form module before rules.tsx follows the mapper/renders circular dependency.
-import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
-import { AppContext } from '../../contexts' // eslint-disable-line import/first
-import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext' // eslint-disable-line import/first
+import UIRender, { formsStorage } from '../rules'
+import { AppContext } from '../../contexts'
+import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
 
 const popup = {
     setPopupState: jest.fn(),

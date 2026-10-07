@@ -26,7 +26,6 @@ const clearGlobalRegistries = () => {
 
 describe('nested dataKind demo interaction contract', () => {
     const originalRenderOnError = Render.onError
-    const originalFetch = global.fetch
     let caughtRenderErrors
     let consoleError
 
@@ -34,9 +33,6 @@ describe('nested dataKind demo interaction contract', () => {
         clearGlobalRegistries()
         caughtRenderErrors = []
         Render.onError = ({ error }) => caughtRenderErrors.push(error)
-        global.fetch = jest.fn(() => Promise.resolve({
-            json: () => Promise.resolve({}),
-        }))
         consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
         appContext.setPopupState.mockClear()
         appContext.togglePopupState.mockClear()
@@ -46,11 +42,6 @@ describe('nested dataKind demo interaction contract', () => {
         Render.onError = originalRenderOnError
         consoleError.mockRestore()
         clearGlobalRegistries()
-        if (originalFetch === undefined) {
-            delete global.fetch
-        } else {
-            global.fetch = originalFetch
-        }
     })
 
     it('removes, reindexes, edits, and appends line items inside one parent phase', async () => {

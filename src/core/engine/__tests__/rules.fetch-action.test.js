@@ -1,7 +1,7 @@
 /**
  * The `fetch` action reads the global when it runs. It was read while a document built its actions,
  * so a document rendered where there is no `fetch` (jsdom, an older server) threw a ReferenceError
- * before it rendered anything, which is why so many suites here install a stand-in first.
+ * before it rendered anything, and 41 suites here installed a stand-in first, until 2026-10-07.
  */
 import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'

@@ -47,19 +47,6 @@ const renderEngine = (props, { config } = {}) => {
 }
 
 describe('UIRender public config channel', () => {
-    // The engine publishes `fetch` as a meta-callable action while it renders, so the
-    // global has to exist even though nothing here fetches anything.
-    const originalFetch = global.fetch
-
-    beforeEach(() => {
-        global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-    })
-
-    afterEach(() => {
-        if (originalFetch === undefined) delete global.fetch
-        else global.fetch = originalFetch
-    })
-
     it('formats values with the dateFormat it was given, not the context default', () => {
         renderEngine({ dateFormat: 'YYYY/MM/DD' }, { config: initialConfigState })
 

@@ -11,9 +11,6 @@ import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
  * Regression: nested `RowList` blocks rendered empty while a sibling `Table` bound to the
  * same path kept working, because only `view: 'Table'` was exempt from the inherited flag.
  */
-// `rules.tsx` registers the global `fetch` as a field action while building its config,
-// and jsdom does not provide one.
-if (typeof global.fetch === 'undefined') global.fetch = () => Promise.resolve()
 
 const data = {
     Groups: [

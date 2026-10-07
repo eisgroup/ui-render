@@ -8,14 +8,11 @@
  * an object React cannot render, so the whole UI was replaced by "Objects are not valid as a React
  * child". Found in the running demo; this renders the real popup.
  */
-if (typeof global.fetch === 'undefined') {
-    global.fetch = () => Promise.resolve({ json: () => Promise.resolve({}) })
-}
-import React from 'react' // eslint-disable-line import/first
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react' // eslint-disable-line import/first
-import '@testing-library/jest-dom' // eslint-disable-line import/first
-import UIRender, { formsStorage } from '../rules' // eslint-disable-line import/first
-import { AppProvider } from '../../providers' // eslint-disable-line import/first
+import React from 'react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import UIRender, { formsStorage } from '../rules'
+import { AppProvider } from '../../providers'
 
 describe('a download the host rejects', () => {
     let popupRoot
