@@ -27,6 +27,13 @@
         "number-max-precision": null,
         "no-empty-source": null,
         "media-feature-name-no-vendor-prefix": null,
-        "media-feature-range-notation": null
+        "media-feature-range-notation": null,
+        "declaration-property-value-no-unknown": null,
+        "at-rule-prelude-no-invalid": null,
+        "at-rule-descriptor-value-no-unknown": null,
+        "nesting-selector-no-missing-scoping-root": null,
+        "color-function-alias-notation": null,
+        "declaration-property-value-keyword-no-deprecated": null,
+        "property-no-deprecated": null
     }
 }

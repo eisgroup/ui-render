@@ -475,6 +475,13 @@
   effects of the code's own layout-effect hooks now. 81 `eslint-disable` comments that suppressed
   nothing are gone. The development tree lost 158 packages to the move and gained 142, and
   `npm audit` reports 35 findings in it, from 43.
+- The stylesheet lint is on stylelint 17, with `stylelint-config-standard` 40. Seven rules the new
+  config adds are off: four misread Less, one would rewrite colours Less computes, and two report
+  deprecated CSS the stylesheet still ships (`overflow-y: overlay`, `word-break: break-word` and
+  `clip`), which a change to the stylesheet itself has to replace. The compiled CSS is unchanged.
+- eslint-plugin-react-hooks is on 7. It adds the React Compiler's rules to its presets; this
+  configuration names the plugin's rules one by one, so those stay off. Switched on, they would report
+  100 findings in 16 files.
 - Dependabot proposes updates every week, of the development dependencies and of the GitHub Actions
   CI runs: a week's minor and patch updates in one pull request, each major in its own. Major
   versions of React and ESLint are held back, with the reason beside each in `.github/dependabot.yml`.
