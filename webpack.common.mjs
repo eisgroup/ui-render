@@ -47,7 +47,11 @@ export function sourceRules ({ styleLoader, cssUrl, babelPlugins = [] }, lessOpt
                 styleLoader,
                 { loader: 'css-loader', options: { url: cssUrl } },
                 'postcss-loader',
-                { loader: 'less-loader', options: { lessOptions: lessOptions({ relativeUrls: false }) } },
+                // `lessLogAsWarnOrErr: false` keeps what Less itself warns about in the build log, as
+                // less-loader 12 did; 13 made each a webpack warning. Our sources raise 12: eight
+                // deprecations Less 5 will enforce (six mixin calls without parentheses, two inline
+                // JavaScript expressions) and four `:extend`s of selectors that match nothing.
+                { loader: 'less-loader', options: { lessOptions: lessOptions({ relativeUrls: false }), lessLogAsWarnOrErr: false } },
             ],
         },
     ]

@@ -182,6 +182,11 @@
   build; with Semantic gone the pin was re-examined and lifted. The compiled stylesheet is
   byte-for-byte identical — same SHA-256 before and after — so nothing about how the library looks
   changes. This only matters if you build the demo or the stylesheet from source.
+- The webpack loaders are on their current majors: css-loader 7, style-loader 4 and less-loader 13, and
+  dotenv-webpack 9 for the demo. Every file of the package and of the demo build is byte-for-byte the
+  same. less-loader 13 would turn what Less warns about into webpack warnings; the build keeps those in
+  its log, as before. There are 12, eight of them deprecations Less 5 will enforce, and fixing them is a
+  change of its own.
 - `package.json` pins npm 11.9.0, the npm that comes with Node 24.14.0, in `packageManager`. npm
   ignores the field. Corepack, once enabled for npm, runs that version.
 - **The compiler is Babel 8.** The library, the demo and the tests all compile with it. `dist/index.js`
