@@ -552,6 +552,9 @@
   support, in a CI job that does not gate yet. Every test passed in both, with one exception: WebKit
   on macOS gives a button focus neither by a click nor by Tab, as Safari does, so the two tests that
   rely on it skip that check there.
+- The browser tests run on React 19 as well as 18: the demo is built on the React 19.3.0 the jest leg
+  uses, and CI runs the Chromium suite against it. A test checks which React each run renders with, so
+  a run that quietly fell back to 18 would fail rather than pass.
 
 #### Fixes
 

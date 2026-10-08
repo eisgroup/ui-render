@@ -284,12 +284,22 @@ jobs:
       - name: Run the browser contract suite
         run: npm run test:e2e
 
+      # The same suite on the demo built with React 19.3.0, the top of the peer range: the browser half of
+      # the `react-19` jest leg (playwright.react19.config.js). `e2e/react-version.pw.js` checks the React
+      # the page renders with, so a fixture alias that stopped applying cannot pass as 18. Runs even when
+      # the step above failed, so one red run reports both Reacts.
+      - name: Run the browser contract suite on React 19
+        if: success() || failure()
+        run: npm run test:e2e:react19
+
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report
-          path: playwright-report/
+          path: |
+            playwright-report/
+            playwright-report-react19/
           retention-days: 7
 
   # The same browser suite in Firefox and WebKit, the other two engines of the browsers the hosts support
