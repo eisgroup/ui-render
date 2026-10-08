@@ -176,4 +176,7 @@ Temporary Items
 /build-e2e-react19
 /test-results-react19
 /playwright-report-react19
+# ... and the packed tarball in a browser (playwright.packed.config.js)
+/test-results-packed
+/playwright-report-packed
 /playwright/.cache

@@ -292,6 +292,17 @@ jobs:
         if: success() || failure()
         run: npm run test:e2e:react19
 
+      # The published package in a browser (scripts/test-packed-browser.js): the packed tarball, bundled by a
+      # throwaway host with its own React, beside the published static/all.css. The steps above drive the demo,
+      # which mounts src/, and the verify job's packed smoke renders on the server. It needs a built dist/.
+      - name: Build the library
+        if: success() || failure()
+        run: npm run build-lib
+
+      - name: Smoke the packed tarball in a browser
+        if: success() || failure()
+        run: npm run test:pack:browser
+
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@v7
@@ -300,6 +311,7 @@ jobs:
           path: |
             playwright-report/
             playwright-report-react19/
+            playwright-report-packed/
           retention-days: 7
 
   # The same browser suite in Firefox and WebKit, the other two engines of the browsers the hosts support

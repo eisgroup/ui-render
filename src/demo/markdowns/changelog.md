@@ -555,9 +555,15 @@
 - The browser tests run on React 19 as well as 18: the demo is built on the React 19.3.0 the jest leg
   uses, and CI runs the Chromium suite against it. A test checks which React each run renders with, so
   a run that quietly fell back to 18 would fail rather than pass.
+- CI loads the published package in a browser: the packed tarball, bundled by a throwaway application
+  with its own React, beside the published stylesheet. A test checks that it renders and responds, and
+  that the stylesheet styles the widget and nothing of the page around it.
 
 #### Fixes
 
+- **A `Checkbox` with no `onChange` can be clicked.** The view is presentational and reads no form value, and
+  a meta may leave its `onChange` out; a click then threw a `TypeError`. It now reports nothing: an
+  uncontrolled box toggles, and one given a `value` keeps it. The packed package's browser test found it.
 - **An empty field with `format: 'uppercase'` renders.** final-form formats an empty field's
   `undefined`, and the `uppercase` normalizer called `toUpperCase` on it: the field's render threw, and
   the renderer showed its failure in the field's place. A value that is not a string is left as it is.
