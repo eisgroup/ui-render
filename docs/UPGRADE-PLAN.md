@@ -963,7 +963,7 @@ All decomposition outputs are authored in TypeScript from the start (`engine/*.t
 
   **What this leg still cannot see** — stated so the gate is not overclaimed, and carried forward as the remaining browser-level gap:
   - **Real assistive technology.** Playwright reads the accessibility *tree* Chromium exposes. `role="tooltip"`/`aria-describedby` presence is checkable; "a screen reader announces the text" is not. NVDA / JAWS / VoiceOver stay manual.
-  - **Cross-browser.** Chromium only, which is narrower than `browserslist` (current Chrome, Edge, Firefox and Safari, since 2026-10-08). WebKit and Firefox cost a measured 102 MiB and 108 MiB of download plus their own flake.
+  - **Cross-browser.** ~~Chromium only, which is narrower than `browserslist` (current Chrome, Edge, Firefox and Safari, since 2026-10-08). WebKit and Firefox cost a measured 102 MiB and 108 MiB of download plus their own flake.~~ **Firefox and WebKit run the same suite since 2026-10-08**, desktop and touch, in the advisory CI job `browser-engines` (`npm run test:e2e:engines`); Chromium alone gates. Measured locally: 122 tests in 2.7 minutes, with one skipped and one assertion not made in WebKit on macOS, which keeps Safari's convention that a button takes focus neither by a click nor by Tab (`buttonsTakeFocus` in `e2e/fixtures.js`). What the job reports in CI decides whether it gates.
   - **Real OS pointer and touch.** `mouse.*` is CDP-synthesised and `hasTouch` is emulation; hover-on-touch heuristics and iOS Safari double-tap semantics are unverified. This matters more since part 3, which relies on `event.pointerType` to keep a tap from opening the tooltip: the emulation reports `touch`, and a real device that reports something else would reopen the collision.
   - **Visual correctness.** No pixel baselines: `toHaveScreenshot()` needs a pinned rasterisation platform to not be a maintenance tax, and computed style + geometry gives the same protection with none of the platform pinning. Revisit only with the Playwright docker image.
   - **The published artifact.** The demo mounts `src/`, not `dist/`. Neither this leg nor `test:pack:consumer`/`test:pack:peers` (require/SSR-level) covers "the published UMD + published CSS in a real browser".
@@ -2128,6 +2128,7 @@ npm run test:react16        # gating leg `react-16-floor`: whole suite on the 16
 npm run test:react17        # gating leg `react-17`: whole suite on 17.0.2
 npm run test:react19        # gating leg `react-19`: whole suite on 19.3.0
 npm run test:e2e            # gating leg `browser`: the Playwright suite
+npm run test:e2e:engines    # advisory leg `browser-engines`: the same suite in Firefox and WebKit
 
 # Packaging gates (§0.7 — budgets, duplication, packed-tarball smoke; both need a built dist/)
 npm run test:pack           # build-lib + both gates

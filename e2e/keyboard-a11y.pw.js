@@ -27,11 +27,12 @@
  * not checkable here and never will be — NVDA / JAWS / VoiceOver stay manual. §9.5 carries that
  * limit explicitly so this leg is not overclaimed.
  */
-const { test, expect, BUBBLE, ANY_BUBBLE, activeElement, tabThrough, tooltipA11yWiring } = require('./fixtures')
+const { test, expect, BUBBLE, ANY_BUBBLE, activeElement, tabThrough, tooltipA11yWiring, buttonsTakeFocus } = require('./fixtures')
 const { KEYBOARD, DROPDOWN, TIMING } = require('./reference')
 
 test.describe('tooltip: keyboard', () => {
-    test('[I] the trigger is reachable by Tab, in DOM order between the two inputs', async ({ page }) => {
+    test('[I] the trigger is reachable by Tab, in DOM order between the two inputs', async ({ page, browserName }) => {
+        test.skip(!buttonsTakeFocus(browserName), 'Tab skips buttons in WebKit on macOS: see buttonsTakeFocus in e2e/fixtures.js')
         await page.goto('/harness/tooltip?section=keyboard')
         await page.locator('[data-harness-section="keyboard"]').waitFor()
         await page.locator('[data-harness="kbd-before"]').focus()

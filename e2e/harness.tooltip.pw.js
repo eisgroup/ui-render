@@ -22,7 +22,7 @@
  * Expected values live in e2e/reference.js with [R] / [I] / [R->I] tags. The harness page's own
  * header explains why each section is shaped the way it is.
  */
-const { test, expect, BUBBLE, ANY_BUBBLE, INLINE_BUBBLE, rectOf, adjacency, isWithin, paintOf, topmostAt, paintedTopmostAt } = require('./fixtures')
+const { test, expect, BUBBLE, ANY_BUBBLE, INLINE_BUBBLE, rectOf, adjacency, isWithin, paintOf, topmostAt, paintedTopmostAt, buttonsTakeFocus } = require('./fixtures')
 const { BUBBLE_CLASS, INLINE, TIMING, WIDGET } = require('./reference')
 
 const bubble = (page) => page.locator(BUBBLE).first()
@@ -307,7 +307,7 @@ test.describe('harness: the dismissal contract, on a trigger with no action of i
      * and a lingering pointer would open the bubble by HOVER 500 ms later — which is what made the
      * first attempt at this measurement inconclusive.
      */
-    test('[I] a click does not open it at all — the gesture belongs to the trigger', async ({ page }) => {
+    test('[I] a click does not open it at all — the gesture belongs to the trigger', async ({ page, browserName }) => {
         await section(page, 'plain')
         const trigger = page.locator('[data-harness-trigger="plain"]')
         const box = await trigger.boundingBox()
@@ -322,6 +322,8 @@ test.describe('harness: the dismissal contract, on a trigger with no action of i
         // one focus-open, without which dropping the click gesture changed nothing a user sees.
         await page.waitForTimeout(TIMING.OPEN_BY_MS * 2)
         await expect(anyBubble(page)).not.toBeVisible()
+        // Where a click gives a button no focus, there is no focus-open to suppress and nothing to assert.
+        if (!buttonsTakeFocus(browserName)) return
         expect(await trigger.evaluate((element) => element === document.activeElement),
             'the trigger still takes focus normally; only the tooltip ignores it').toBe(true)
     })
