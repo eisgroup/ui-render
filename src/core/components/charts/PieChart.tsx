@@ -110,7 +110,8 @@ export default React.memo(PieChart)
 function DonutChart ({ data, height, gradient, showPointers, unit }: { data: PieDatum[], height: number, gradient: boolean, showPointers?: boolean, unit?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
-  const [hovered, setHovered] = useState<{ slice: PieSlice, x: number, y: number } | null>(null)
+  // The hovered slice by name, with the pointer's offset; the slice itself is looked up below.
+  const [hovered, setHovered] = useState<{ name: string, x: number, y: number } | null>(null)
 
   useEffect(() => {
     const node = wrapRef.current
@@ -137,14 +138,11 @@ function DonutChart ({ data, height, gradient, showPointers, unit }: { data: Pie
 
   const slices = useMemo(() => computeSlices(data), [data])
 
-  useEffect(() => {
-    setHovered(current => {
-      if (!current) return current
-      const slice = slices.find(item => item.name === current.slice.name)
-      if (!slice) return null
-      return slice === current.slice ? current : {...current, slice}
-    })
-  }, [slices])
+  // Looked up in the current slices, so an open tooltip shows new data at once. An effect copied the new slice into
+  // state until 2026-10-08, which rendered the old one once more. A slice that went away closes the tooltip, as it
+  // did then: the hover is cleared, so a slice of the same name coming back does not reopen it.
+  const hoveredSlice = hovered && slices.find(item => item.name === hovered.name)
+  if (hovered && !hoveredSlice) setHovered(null)
 
   return (
     <div
@@ -166,8 +164,8 @@ function DonutChart ({ data, height, gradient, showPointers, unit }: { data: Pie
                 strokeWidth={0}
                 data-name={slice.name}
                 data-color={slice.color}
-                onMouseEnter={(e) => setHovered({ slice, x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY })}
-                onMouseMove={(e) => setHovered({ slice, x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY })}
+                onMouseEnter={(e) => setHovered({ name: slice.name, x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY })}
+                onMouseMove={(e) => setHovered({ name: slice.name, x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY })}
                 onMouseLeave={() => setHovered(null)}
               />
             )
@@ -192,7 +190,7 @@ function DonutChart ({ data, height, gradient, showPointers, unit }: { data: Pie
           })}
         </g>
       </svg>
-      {hovered && <PieTooltip x={hovered.x} y={hovered.y} slice={hovered.slice} unit={unit} />}
+      {hovered && hoveredSlice && <PieTooltip x={hovered.x} y={hovered.y} slice={hoveredSlice} unit={unit} />}
     </div>
   )
 }

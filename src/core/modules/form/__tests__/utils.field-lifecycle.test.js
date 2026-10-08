@@ -183,6 +183,8 @@ describe('asField lifecycle contracts', () => {
 
         let renders = 0
         const Dropdown = ({ value }) => {
+            // Counting this component's renders from outside it is what the test measures.
+            // eslint-disable-next-line react-hooks/globals
             renders += 1
             return <input data-testid="dd" value={value || ''} readOnly/>
         }

@@ -496,9 +496,12 @@
   config adds are off: four misread Less, and one would rewrite colours Less computes. The two that
   report deprecated CSS are on, since the stylesheet replaced what they found (see Styling). The lint
   change itself left the compiled CSS unchanged.
-- eslint-plugin-react-hooks is on 7. It adds the React Compiler's rules to its presets; this
-  configuration names the plugin's rules one by one, so those stay off. Switched on, they would report
-  100 findings in 16 files.
+- eslint-plugin-react-hooks is on 7, and the React Compiler's rules it adds are on, except
+  `react-hooks/refs`. What they found is fixed. `Dropdown` and `InputNumber` no longer copy a prop
+  into state through an effect, so a new list of options, or a new value from the form, no longer
+  renders the old one once more first. A pie chart's tooltip looks up its slice as it renders, and
+  `Dropdown` no longer writes to the props it was given. Two findings are suppressed, each with the
+  reason the rule is wrong there. `react-hooks/refs` stays off until its 83 findings are fixed.
 - Dependabot proposes updates every week, of the development dependencies and of the GitHub Actions
   CI runs: a week's minor and patch updates in one pull request, each major in its own. Major
   versions of React and ESLint are held back, with the reason beside each in `.github/dependabot.yml`.
