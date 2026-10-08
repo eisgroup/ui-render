@@ -117,3 +117,22 @@ describe('Checkbox: an id of its own', () => {
         expect(ids()).toEqual(['agree', 'agree'])
     })
 })
+
+// Found by the packed tarball's browser smoke (scripts/test-packed-browser.js): the meta it renders gives a
+// `Checkbox` no `onChange`, and a click threw a TypeError from the published bundle. Nothing jest-side ever
+// clicked one without a handler.
+describe('Checkbox without onChange', () => {
+    it('toggles when uncontrolled, and reports nothing', () => {
+        const { container } = render(<Checkbox label="Free" />)
+        const box = container.querySelector('input')
+        fireEvent.click(box)
+        expect(box).toBeChecked()
+    })
+
+    it('keeps the value it is given when controlled', () => {
+        const { container } = render(<Checkbox label="Held" value={true} />)
+        const box = container.querySelector('input')
+        fireEvent.click(box)
+        expect(box).toBeChecked()
+    })
+})

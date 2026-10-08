@@ -142,8 +142,9 @@ export function Checkbox ({
         className={classNames('checkbox', type)}
         id={id}
         // `undefined` where the JavaScript passed `null`: the DOM typings reject `null`, and React attaches no
-        // listener for either. The cast is not a guard: without `onChange` a change throws, as it did before.
-        onChange={readonly ? undefined : (event) => (onChange as CheckboxChangeHandler)(event.target.checked ? valueTrue : valueFalse, props.name, event)}
+        // listener for either. Without `onChange` a change reports nothing. It threw until 2026-10-08, when the
+        // packed tarball's browser smoke clicked a checkbox whose meta gave none.
+        onChange={readonly ? undefined : (event) => onChange && onChange(event.target.checked ? valueTrue : valueFalse, props.name, event)}
         // DOM boundary (see ./domProps): the spread lands on the <input type="checkbox">, so ENGINE_PROPS only -- the onChange
         // above reads `props.name`, and the control needs it on the DOM.
         {...omitProps(props, ENGINE_PROPS)}
