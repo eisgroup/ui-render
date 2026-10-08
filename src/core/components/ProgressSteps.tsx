@@ -1,5 +1,5 @@
 import classNames from '../utils/classNames'
-import React, { Fragment, useRef, useState } from 'react'
+import React, { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { get, isFunction } from '../utils'
 import Button from './Button'
 import Icon from './Icon'
@@ -9,6 +9,12 @@ import ScrollView from './ScrollView'
 import Text from './Text'
 import { useTimers } from './utils'
 import View from './View'
+
+/**
+ * `useLayoutEffect` in a browser, so what a click reads is current before anything can be clicked, and
+ * `useEffect` on the server, where nothing is clicked and React 16 and 17 warn about a layout effect.
+ */
+const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /** One step of `items`. */
 export type ProgressStep = {
@@ -104,10 +110,13 @@ export default function ProgressSteps (props: ProgressStepsProps) {
   }
 
   // What a click's timer reads when it fires: the latest props, as `this.props` was, and how many
-  // times a controlled `activeIndex` has taken precedence since.
-  // Read through non-null assertions below: every render assigns it before any handler of it runs.
+  // times a controlled `activeIndex` has taken precedence since. Assigned after each commit, before
+  // paint, rather than during the render, which must not write a ref; a click comes after both.
+  // Read through non-null assertions below: every commit assigns it before any handler of it runs.
   const latest = useRef<{ props: ProgressStepsProps, overrides: number } | null>(null)
-  latest.current = {props, overrides}
+  useBeforePaintEffect(() => {
+    latest.current = {props, overrides}
+  })
 
   const handleClickStep = (index: number) => {
     timers.clear()

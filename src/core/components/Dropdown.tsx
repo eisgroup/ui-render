@@ -173,12 +173,12 @@ export function Dropdown ({
   // an effect, which only made the previous list render once more after every change: nothing has written to them
   // since §9.7-F1 step 3 part 2 removed additions, and nothing downstream keys on the list's identity.
   let options = opts
-  const defaultValue = useRef(typeof valueFromParent !== 'undefined'
+  // Starts at the parent's value, or else at the first option's.
+  const [value, setValue] = useState(() => typeof valueFromParent !== 'undefined'
     ? valueFromParent
     // A cast, not a guard: a string or a number has no `value`, and reads `undefined`, as it did.
     : ((Array.isArray(opts) && opts[0] && (opts[0] as ListboxOption).value) || undefined)
   )
-  const [value, setValue] = useState(defaultValue.current)
   // What the effect below last took from the parent: `null` until it first runs.
   const synced = useRef<{ value: unknown } | null>(null)
   const tempValue = useRef<unknown>()
@@ -278,8 +278,12 @@ export function Dropdown ({
   // click callback for its icon. A cast, not a guard: `icon` is then the name of the icon to render.
   if (onClickIcon) listboxProps.icon = <Icon name={(listboxProps.icon as string | undefined) || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
 
+  // The two handlers are spread after the filtered bag, not written into it: they reach `tempValue`, a ref, and
+  // the bag passes through two functions during the render, which must not be handed one. `Listbox` takes both
+  // as its own props, so where they sit in the bag never mattered, and the strip lists name neither.
+  const handlers: Record<string, unknown> = {}
   if (onChange || onSelect) {
-    listboxProps.onChange = (event: React.SyntheticEvent, {value}: { value: unknown }) => {
+    handlers.onChange = (event: React.SyntheticEvent, {value}: { value: unknown }) => {
       // @Note: this used to map a case-mismatched value back onto an existing option's value, and
       //  §9.7-F1 step 3 part 2 removed that with the rest of the free-text machinery — NOT because
       //  it belonged to it, but because measuring showed the branch had become unreachable. It
@@ -293,7 +297,7 @@ export function Dropdown ({
     }
   }
 
-  if (onSelect) listboxProps.onClose = (event: ListboxCloseEvent) => onSelect(tempValue.current, props.name, event)
+  if (onSelect) handlers.onClose = (event: ListboxCloseEvent) => onSelect(tempValue.current, props.name, event)
 
 
   // Sanitize Value (for Colors)
@@ -336,11 +340,11 @@ export function Dropdown ({
         // DOM boundary: `Listbox` spreads whatever it does not destructure onto its dropdown
         // element (and `aria-*` onto the combobox inside it), as Semantic's Dropdown did (and neither declares a
         // `name`), so engine props and `name`/`label` would become attributes there. Filtered
-        // here, AFTER the listboxProps.onClose assignment above, and without touching the `props.name`
-        // that handler reports to the host. `Listbox` strips again at its own edge because that
-        // is where the element is; this strip is what keeps engine props from reaching it at all.
-        // See ./domProps.ts.
+        // here, without touching the `props.name` the handlers report to the host. `Listbox` strips
+        // again at its own edge because that is where the element is; this strip is what keeps
+        // engine props from reaching it at all. See ./domProps.ts.
         {...omitProps(supported, ENGINE_PROPS, FIELD_ONLY_PROPS)}
+        {...handlers}
       />
       {label && float && <Text className="input__label">{translate(label)}</Text>}
       {(error || info) &&

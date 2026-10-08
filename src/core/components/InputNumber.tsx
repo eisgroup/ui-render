@@ -1,5 +1,5 @@
 import classNames from '../utils/classNames'
-import React, { useState, useCallback, useMemo, useRef } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { capitalize, isString } from '../utils'
 import Button from './Button'
 import Icon from './Icon'
@@ -150,19 +150,26 @@ const InputNumber = ({
     const [active, setActive] = useState(false)
     const initialValue = valueFromParent !== undefined ? valueFromParent : defaultValue
     const [value, setValue] = useState(initialValue !== undefined ? initialValue.toString().replace(',', '.') : '')
-    const hasBeenControlled = useRef(valueFromParent !== undefined)
-    if (valueFromParent !== undefined) hasBeenControlled.current = true
+    // Whether the parent has ever given a value: from then on, its value is what shows outside an edit. A ref
+    // until 2026-10-08, set during the render; state now, set in the render that first sees a value, which is why
+    // `controlled` also counts the value of this render.
+    const [hasBeenControlled, setHasBeenControlled] = useState(valueFromParent !== undefined)
+    if (valueFromParent !== undefined && !hasBeenControlled) setHasBeenControlled(true)
+    const controlled = hasBeenControlled || valueFromParent !== undefined
 
+    // What this component adds for the input goes on a copy: the rest bag is the caller's props, which a render
+    // must not write to. Same keys, in the same order, as when they were written onto the bag itself.
+    const forwarded: typeof props = {...props}
     if (readonly) {
-        props.className = 'readonly'
-        props.readOnly = readonly
+        forwarded.className = 'readonly'
+        forwarded.readOnly = readonly
     } // React fix
     if (float) {
         if (!label && name) label = capitalize(name)
         if (!placeholder) placeholder = ' ' // required for Float label CSS to work
     }
     if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
-    if (!label && title) props.title = translate(title)
+    if (!label && title) forwarded.title = translate(title)
     // An `aria-describedby` naming an id no element carries is worse than none: it is an axe
     // `aria-valid-attr-value` violation, and a screen reader announces nothing for it. The help
     // element exists only while there is a message, so the reference is conditional on the same
@@ -188,7 +195,7 @@ const InputNumber = ({
     if (!Object.is(synced.valueFromParent, valueFromParent) || synced.active !== active) {
         setSynced({ valueFromParent, active })
         // Don't update from parent during active editing to preserve user input
-        if (!active && hasBeenControlled.current) {
+        if (!active && controlled) {
             const newValue = valueFromParent !== undefined ? valueFromParent.toString().replace(',', '.') : ''
             if (newValue !== value) setValue(newValue)
         }
@@ -323,7 +330,7 @@ const InputNumber = ({
                     }}
                     // DOM boundary (see ./domProps): the spread lands on the <input>, so ENGINE_PROPS only -- `name` is the field registration
     // path this control must carry, and the onChange above reads `props.name`.
-                    {...omitProps(props, ENGINE_PROPS)}
+                    {...omitProps(forwarded, ENGINE_PROPS)}
                     value={displayValue}
                 />
                 {icon && !lefty && (isString(icon)

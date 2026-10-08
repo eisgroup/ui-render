@@ -1,5 +1,5 @@
 import classNames from '../utils/classNames'
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import { capitalize, isString } from '../utils'
 import Button from './Button'
 import Icon from './Icon'
@@ -103,21 +103,25 @@ export function Input ({
   ...props
 }: InputProps) {
   const [active, setState] = useState(props.autoFocus)
-  const max = useRef(props.type === 'date' ? '9999-01-01' : null);
-  if (autofocus) props.autoFocus = autofocus // React fix
+  // Fixed when the input mounts, as the ref it was until 2026-10-08.
+  const [max] = useState(props.type === 'date' ? '9999-01-01' : null)
+  // What this component adds for `InputNative` goes on a copy: the rest bag is the caller's props, which a render
+  // must not write to. Same keys, in the same order, as when they were written onto the bag itself.
+  const forwarded: typeof props = {...props}
+  if (autofocus) forwarded.autoFocus = autofocus // React fix
   if (readonly) {
-    props.className = 'readonly'
-    props.readOnly = readonly
+    forwarded.className = 'readonly'
+    forwarded.readOnly = readonly
   } // React fix
   if (props.type === 'hidden') {
-    return <InputNative name={name} id={id} disabled={disabled} {...props} />
+    return <InputNative name={name} id={id} disabled={disabled} {...forwarded} />
   }
   if (float) {
     if (!label && name) label = capitalize(name)
     if (!placeholder) placeholder = ' ' // required for Float label CSS to work
   }
   if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
-  if (!label && title) props.title = translate(title)
+  if (!label && title) forwarded.title = translate(title)
   // An `aria-describedby` naming an id no element carries is worse than none: it is an axe
   // `aria-valid-attr-value` violation, and a screen reader announces nothing for it. The help
   // element exists only while there is a message, so the reference is conditional on the same
@@ -167,9 +171,9 @@ export function Input ({
             active && setState(false)
             onBlur && onBlur(...args)
           }}
-          max={max.current}
+          max={max}
           placeholder={translate(placeholder)}
-          {...props}
+          {...forwarded}
         />
         {icon && !lefty && (isString(icon)
             ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>

@@ -1,5 +1,5 @@
 import classNames from '../utils/classNames'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TIME_DURATION_INSTANT } from '../utils'
 import Text from './Text'
 import View from './View'
@@ -68,7 +68,7 @@ function ProgressBar ({
 
   // The fill-in belongs to the value the bar mounted with. When `value` changes the effect re-runs:
   // its cleanup cancels the pending fill-in and the new run schedules nothing.
-  const mountValue = useRef(valueProp).current
+  const [mountValue] = useState(valueProp)
   useEffect(() => {
     if (!Object.is(valueProp, mountValue) || !hasProgressValue(valueProp)) return
     const timer = setTimeout(() => setValue(valueProp), TIME_DURATION_INSTANT)

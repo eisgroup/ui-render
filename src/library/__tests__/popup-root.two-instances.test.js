@@ -30,7 +30,10 @@ import { AppContext } from '../../core/contexts'
 const OpenPopup = ({ label }) => {
     const { setPopupState } = React.useContext(AppContext)
     const open = React.useRef(setPopupState)
-    open.current = setPopupState
+    // Kept current by an effect declared before the one that calls it, since effects run in order.
+    React.useEffect(() => {
+        open.current = setPopupState
+    })
     React.useEffect(() => {
         open.current({ isOpen: true, title: label, content: label })
     }, [label])

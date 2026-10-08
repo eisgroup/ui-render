@@ -1,5 +1,5 @@
 import classNames from '../utils/classNames'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { isFunction } from '../utils'
 import AnimateHeight from './AnimateHeight'
 import Icon from './Icon'
@@ -116,16 +116,19 @@ function Expand (props: ExpandProps) {
   }
 
   // The effect below runs once per change, and reads what it reports, and the collapse's
-  // `duration`, from the latest render, as the class read `this.props`.
+  // `duration`, from the latest commit, as the class read `this.props`. Assigned by an effect
+  // declared before it, since effects run in order, rather than during the render.
   const latest = useRef<{ report: (expanded: boolean) => void, duration: number } | null>(null)
-  latest.current = {
-    report: expanded => onClick && onClick({expanded, index: props.index, key: id, value: String(title)}),
-    duration,
-  }
+  useEffect(() => {
+    latest.current = {
+      report: expanded => onClick && onClick({expanded, index: props.index, key: id, value: String(title)}),
+      duration,
+    }
+  })
   const {change} = state
   useEffect(() => {
     if (!change) return
-    // Assertions, not guards: every render assigns `latest` above, before any effect of it runs.
+    // Assertions, not guards: the effect above assigns `latest` after every commit, before this one runs.
     latest.current!.report(change.expanded)
     if (change.expanded) return
     const timer = setTimeout(() => setState(current => ({...current, changing: false})), latest.current!.duration)
@@ -136,12 +139,14 @@ function Expand (props: ExpandProps) {
     setState(current => toggled(current, !current.expanded))
   }, [])
 
-  const cache = useRef<{ children: ExpandProps['children'], content: React.ReactNode } | null>(null)
-  if (cache.current === null || cache.current.children !== children) cache.current = {children, content: null}
   const {expanded, changing} = state
   const hasContent = children != null
-  const content = hasContent && (expanded || changing) && (cache.current.content ||
-    (cache.current.content = isFunction(children) ? children(id) : children))
+  const shown = hasContent && (expanded || changing)
+  // Built once it is shown, and kept while it stays shown and `children` and `id` are the same, so a
+  // render function is not called on every render. Collapsed, the content is unmounted, so nothing is
+  // lost by building it again. A ref held it until 2026-10-08, keyed on `children` alone.
+  const built = useMemo(() => (shown ? (isFunction(children) ? children(id) : children) : null), [shown, children, id])
+  const content = shown && built
 
   let label: React.ReactNode = null
   if (title != null || renderLabel) {

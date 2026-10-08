@@ -5,6 +5,12 @@ import type { ClassValue } from '../utils/classNames'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 
 /**
+ * `useLayoutEffect` in a browser, so the dismiss callback is current before a key or a click can reach it, and
+ * `useEffect` on the server, where nothing dismisses and React 16 and 17 warn about a layout effect.
+ */
+const useBeforePaintEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect
+
+/**
  * The open rest bag. `Render.tsx` spreads a meta node's `tooltip` object straight into this
  * component, so ANY key can arrive — that is the documented passthrough (`style`, `data-*`,
  * `aria-*`, handlers) and the reason the dropped names below have to be stripped explicitly.
@@ -400,10 +406,13 @@ export default function Tooltip ({
      * only a browser can answer, pinned in `e2e/keyboard-a11y.pw.js`).
      *
      * The dismiss callback is reached through a ref so this effect depends on `isOpen` alone and
-     * does not re-subscribe on every render.
+     * does not re-subscribe on every render. The ref is written after each commit, not during the
+     * render, which must not write one.
      */
     const dismissRef = React.useRef<(() => void) | null>(null)
-    dismissRef.current = () => change(false)
+    useBeforePaintEffect(() => {
+        dismissRef.current = () => change(false)
+    })
     React.useEffect(() => {
         if (!isOpen) return undefined
         const dismiss = (event: Event): void => {
