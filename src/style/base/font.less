@@ -82,7 +82,9 @@
 }
 
 .break-word {
-  word-break: break-word;
+  // What the deprecated `word-break: break-word` meant, by the CSS Text spec
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 
 .no-wrap {

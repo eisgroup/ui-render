@@ -274,6 +274,13 @@
   **If your application was relying on it** — most likely on `body { margin: 0 }` or on the
   full-height `html, body { height: 100% }` chain — declare those yourself. They are one line each,
   and they were never ours to set. Our own demo page now does exactly that.
+- **Three deprecated CSS features are replaced** by the standard ones the target browsers already treat
+  them as. Scrolling containers lose `overflow-y: overlay`: the `overflow: auto` before it applies, and
+  Chrome has treated `overlay` as `auto` since version 114. `.break-word` sets `overflow-wrap: anywhere` with
+  `word-break: normal`, which is what the CSS Text spec says the deprecated `word-break: break-word`
+  means. `.sr-only` hides with `clip-path: inset(50%)` instead of `clip`. Measured in Chrome, the
+  computed scroll behaviour, the wrapping and the hidden label's 1×1 box are what they were.
+  `static/all.css` is 69 bytes smaller.
 
 #### Select and Dropdown
 
