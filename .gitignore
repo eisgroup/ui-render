@@ -172,4 +172,8 @@ Temporary Items
 /test-results
 /playwright-report
 /blob-report
+# ... and its run on React 19 (playwright.react19.config.js)
+/build-e2e-react19
+/test-results-react19
+/playwright-report-react19
 /playwright/.cache

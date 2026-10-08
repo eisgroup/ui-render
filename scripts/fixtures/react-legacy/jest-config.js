@@ -1,6 +1,7 @@
 const path = require('path')
 
 const base = require('../../../jest.config')
+const { fixturePackages } = require('./packages')
 
 /**
  * Jest config factory for the per-React legs -- `jest.react16.config.js` (16.14, the declared floor),
@@ -40,36 +41,6 @@ const ROOT = path.resolve(HARNESS_DIR, '..', '..', '..')
 // rather than interpolating whatever path.relative() produced.
 const HARNESS_RELATIVE = path.relative(ROOT, HARNESS_DIR).split(path.sep).join('/')
 
-function fixtureRoot (floor) {
-    try {
-        return path.dirname(require.resolve(`${floor.fixturePackage}/package.json`))
-    } catch (error) {
-        throw new Error(
-            `${floor.fixturePackage} is not installed. It is a devDependency linked to ${floor.fixtureDir}`
-            + ' -- run `npm ci` after pulling the legacy-React harness.',
-            { cause: error }
-        )
-    }
-}
-
-/**
- * Same guard as assertReactTypesMajor() in scripts/test-public-types.js: a pinned slot must stay pinned.
- * Resolving from the fixture directory makes Node search that fixture's node_modules first and only then
- * the ancestors, so the version assertion is what stops a fallback to the repository's own React 18 -- in
- * the parent process, before jest starts, rather than as a resolver stack in a worker.
- */
-function floorPackage (floor, name, expectedVersion, from) {
-    const manifestPath = require.resolve(`${name}/package.json`, { paths: [from] })
-    const { version } = require(manifestPath)
-    if (!version.startsWith(expectedVersion)) {
-        throw new Error(
-            `the ${floor.name} leg resolved ${name} ${version} from ${path.relative(ROOT, from)};`
-            + ` expected ${expectedVersion}. Run \`npm ci\` to restore the pinned fixture install.`
-        )
-    }
-    return path.dirname(manifestPath)
-}
-
 /**
  * The invariant that makes every other assertion here meaningful: from the harness directory, a bare
  * `require('react')` must reach the REPOSITORY's React 18, so that a mapping which stopped applying lands on
@@ -92,14 +63,8 @@ function assertHarnessNotShadowed () {
 function legacyReactJestConfig (floor) {
     assertHarnessNotShadowed()
 
-    const fixture = fixtureRoot(floor)
-    const react = floorPackage(floor, 'react', floor.react, fixture)
-    const reactDom = floorPackage(floor, 'react-dom', floor.react, fixture)
-    // react-dom 16 and 17 require both `scheduler` and `scheduler/tracing`, on different scheduler lines
-    // (0.19 and 0.20); scheduler 0.23 (react-dom 18's copy) dropped tracing, and react-dom 19 is on 0.28.
-    // Resolving this from react-dom's own directory rather than the repository root is what keeps the legs
-    // from sharing a scheduler.
-    const scheduler = floorPackage(floor, 'scheduler', floor.schedulerLine, reactDom)
+    // Checked against ./floors.js; the guards, and why scheduler comes from react-dom's directory, in ./packages.js.
+    const { react, reactDom, scheduler } = fixturePackages(floor)
 
     return {
         ...base,

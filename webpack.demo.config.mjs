@@ -7,10 +7,30 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import Dotenv from 'dotenv-webpack';
 import lessOptionsModule from './scripts/less-options.js';
+import floors from './scripts/fixtures/react-legacy/floors.js';
+import fixturePackagesModule from './scripts/fixtures/react-legacy/packages.js';
 import { sourceRules } from './webpack.common.mjs'
 const { lessOptions } = lessOptionsModule;
+const { fixturePackages } = fixturePackagesModule;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * `REACT_FIXTURE=react19` builds the demo on a per-React jest leg's fixture install (scripts/fixtures/react-legacy/
+ * floors.js) instead of the installed React 18: playwright.react19.config.js sets it for the browser leg on React 19.
+ * Unset, nothing changes. The fixture's versions are checked as the jest legs check them, so a broken install cannot
+ * fall back to 18 unnoticed, and only a fixture with `react-dom/client` will do: the demo mounts through `createRoot`.
+ */
+function reactAliases (name) {
+    if (!name) return {};
+    const floor = floors[name];
+    if (!floor) throw new Error(`REACT_FIXTURE=${name} names no fixture in scripts/fixtures/react-legacy/floors.js`);
+    if (floor.legacyRoot) {
+        throw new Error(`REACT_FIXTURE=${name}: ${floor.name} has no react-dom/client, and the demo mounts through createRoot`);
+    }
+    const { react, reactDom, scheduler } = fixturePackages(floor);
+    return { react, 'react-dom': reactDom, scheduler };
+}
 
 export default (env, argv) => {
     const isProduction = argv.mode === 'production';
@@ -71,6 +91,7 @@ export default (env, argv) => {
             extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
             alias: {
                 process: 'process/browser',
+                ...reactAliases(process.env.REACT_FIXTURE),
             },
         },
         plugins: [

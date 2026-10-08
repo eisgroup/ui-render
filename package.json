@@ -47,6 +47,7 @@
     "test:e2e:install": "playwright install chromium",
     "test:e2e:engines": "playwright test --project=firefox --project=firefox-touch --project=webkit --project=webkit-touch",
     "test:e2e:engines:install": "playwright install firefox webkit",
+    "test:e2e:react19": "playwright test --config playwright.react19.config.js",
     "test:types": "npm run build-lib && npm run test:types:consumer",
     "test:types:consumer": "node scripts/test-public-types.js",
     "test:pack": "npm run build-lib && npm run test:pack:budget && npm run test:pack:consumer",
