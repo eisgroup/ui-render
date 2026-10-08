@@ -2104,8 +2104,8 @@ rg -n '"prop-types":' package.json
 # and the command threw on it.
 node -e "const l=require('./package-lock.json');for(const k of ['node_modules/react-final-form','node_modules/rc-picker','node_modules/@testing-library/react'])console.log(k,JSON.stringify(l.packages[k].peerDependencies))"
 
-# Local CI contour: every npm script .github/workflows/ci.yml runs (re-checked 2026-10-06). The job
-# `verify` runs the first sixteen in this order; each leg below is a job of its own.
+# Local CI contour: every npm script .github/workflows/ci.yml runs (re-checked 2026-10-08). The job
+# `verify` runs the first seventeen in this order; each leg below is a job of its own.
 npm run lint:js
 npm run lint:css
 npm run typecheck
@@ -2113,6 +2113,7 @@ npm run typecheck:contract
 npm run docs:views:check
 npm run docs:props:check
 npm run css:fixture:check
+npm run build-css:check
 npm run test:coverage
 npm run build-lib
 npm run test:css:built
