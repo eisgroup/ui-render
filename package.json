@@ -12,7 +12,7 @@
   },
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "packageManager": "npm@11.9.0",
   "main": "dist/index.js",
