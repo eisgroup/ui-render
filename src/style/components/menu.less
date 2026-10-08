@@ -150,7 +150,6 @@
   &:extend(.circular);
   &:extend(.circular.red);
   &:extend(.circular.small);
-  &:extend(.pop-in-flash all);
   &:extend(.text-shadow all);
   &:extend(.base-font all);
 
@@ -224,7 +223,7 @@
       .square(@menu-size-sidebar);
 
       &.active {
-        .border-gradient-h;
+        .border-gradient-h();
 
         background-color: transparent;
       }

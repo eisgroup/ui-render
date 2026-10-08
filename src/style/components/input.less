@@ -127,7 +127,6 @@ input {
     &::before {
       @offset: @border-size + size(1); // offset for border and focus outline
       &:extend(.position-absolute);
-      &:extend(.object);
 
       top: @offset;
       left: @offset;
@@ -135,14 +134,6 @@ input {
       bottom: @offset;
       border-radius: inherit;
       background-color: inherit; // use color set by Input on change
-    }
-
-    &[value=""] {
-      &:extend(.swatch-null all);
-
-      &::before {
-        &:extend(.swatch-null all);
-      }
     }
   }
 

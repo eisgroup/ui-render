@@ -113,7 +113,10 @@
     .checkRem() when (isunit(@tempBaseOutput, 'rem')), (@passedRem) {
       //keeps passed in rem unit and value
       //or sets to a default rem unit but uses passed value for px value
-      @remBaseAdj: unit(`(('@{default-unit}' == 'rem' & @{passedRem} == true) ? 1 : @{pxToEm} )`);
+      // A rem value keeps its size when rem is the default unit; any other is scaled from px.
+      .remBaseAdj() when (@default-unit = rem) and (@passedRem) { @remBaseAdj: 1; }
+      .remBaseAdj() when (default()) { @remBaseAdj: @pxToEm; }
+      .remBaseAdj();
       @baseOutput: unit((@i * @remBaseAdj), rem);
 
       font-size: unit(@i, px) * (@emToPx * @remBaseAdj);
