@@ -292,6 +292,60 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  # The same browser suite in Firefox and WebKit, the other two engines of the browsers the hosts support
+  # (`browserslist` in package.json, since 2026-10-08). ADVISORY for now, as `react-19-advisory` once was:
+  # `continue-on-error` keeps a red run from blocking a merge until the owners have this job's record of
+  # time and flakes to decide on. Measured locally on 2026-10-08: 122 tests in 2.7 minutes, one skipped,
+  # because WebKit on macOS keeps Safari's convention for buttons (`buttonsTakeFocus` in e2e/fixtures.js).
+  # Its own cache key: the Chromium job's cache holds only Chromium.
+  browser-engines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    continue-on-error: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve the Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-engines-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Firefox, WebKit and their system dependencies
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps firefox webkit
+
+      - name: Install Firefox and WebKit system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps firefox webkit
+
+      - name: Run the browser suite in Firefox and WebKit
+        run: npm run test:e2e:engines
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-engines
+          path: playwright-report/
+          retention-days: 7
+
   # Gating since 2026-09-30, when React 19 joined `peerDependencies` (docs/UPGRADE-PLAN.md §8), and the top of
   # the peer matrix: 16.14 and 17 below the installed 18, 19 above it. Until then this was
   # `react-19-advisory`, a `continue-on-error` job that installed React 19 over the lock with

@@ -272,6 +272,17 @@ async function tooltipA11yWiring (page, trigger) {
     }
 }
 
+/**
+ * WHETHER THE ENGINE GIVES A `<button>` FOCUS, by a click and by Tab. Two `[I]` tests read it.
+ * Safari does not focus a clicked button, by design (MDN, `<button>`, "Clicking and focus"; WebKit bug
+ * 22261), and on macOS Tab skips buttons unless the user turns on keyboard navigation. Measured on
+ * 2026-10-08 with Playwright's WebKit 26.6 on macOS: Tab went from the input before the tooltip trigger
+ * straight to the input after it, and the clicked trigger was not `document.activeElement`. Neither is
+ * the product's to change, so those facts are asserted everywhere but WebKit on macOS. CI runs WebKit
+ * on Linux, and what it reports there decides whether the exception has to cover WebKit everywhere.
+ */
+const buttonsTakeFocus = (browserName) => !(browserName === 'webkit' && process.platform === 'darwin')
+
 module.exports = {
     test,
     expect,
@@ -289,4 +300,5 @@ module.exports = {
     activeElement,
     tabThrough,
     tooltipA11yWiring,
+    buttonsTakeFocus,
 }

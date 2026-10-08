@@ -110,6 +110,26 @@ module.exports = defineConfig({
             },
             testMatch: '**/*.touch.pw.js',
         },
+        {
+            name: 'firefox',
+            use: { ...devices['Desktop Firefox'], viewport: { width: 1280, height: 800 } },
+            testIgnore: '**/*.touch.pw.js',
+        },
+        {
+            name: 'webkit',
+            use: { ...devices['Desktop Safari'], viewport: { width: 1280, height: 800 } },
+            testIgnore: '**/*.touch.pw.js',
+        },
+        {
+            name: 'webkit-touch',
+            use: { ...devices['Desktop Safari'], viewport: { width: 1280, height: 800 }, hasTouch: true, isMobile: false },
+            testMatch: '**/*.touch.pw.js',
+        },
+        {
+            name: 'firefox-touch',
+            use: { ...devices['Desktop Firefox'], viewport: { width: 1280, height: 800 }, hasTouch: true, isMobile: false },
+            testMatch: '**/*.touch.pw.js',
+        },
     ],
     webServer: {
         command: `npx webpack --mode production --config webpack.demo.config.mjs`

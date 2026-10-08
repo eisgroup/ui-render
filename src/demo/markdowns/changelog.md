@@ -548,6 +548,10 @@
   Its first run found the copy a change behind: the three deprecated CSS features replaced under
   Styling had not reached it, and they do now. `npm run build-css:check` names a failure and the
   command that fixes it.
+- The browser tests run in Firefox and WebKit too, the engines of the other browsers the hosts
+  support, in a CI job that does not gate yet. Every test passed in both, with one exception: WebKit
+  on macOS gives a button focus neither by a click nor by Tab, as Safari does, so the two tests that
+  rely on it skip that check there.
 
 #### Fixes
 
