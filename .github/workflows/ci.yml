@@ -395,3 +395,35 @@ jobs:
 
       - name: Test on React 19.3.0
         run: npm run test:react19
+
+  # The published Node floor, `engines.node >= 22` since 2026-10-08: the packed tarball, server-rendered on
+  # Node 22, the oldest line still supported upstream. The repository itself builds on the `.nvmrc` Node
+  # (Babel 8 needs 24.11), so the job builds there and then runs the smoke on 22. Until this job, the floor
+  # was inferred from the bundle's syntax and from a one-off run.
+  node-22-floor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build library
+        run: npm run build-lib
+
+      - name: Set up Node.js 22, the published floor
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Smoke the packed tarball on Node 22
+        run: node --version && node scripts/test-packed-consumer.js

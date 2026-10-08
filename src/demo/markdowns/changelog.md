@@ -389,6 +389,10 @@
   lost a wrapper Babel added for an old Safari bug, and webpack's runtime calls `Object.hasOwn`. So a
   browser older than Chrome 93, Firefox 92 or Safari 15.4 cannot load it. The stylesheet is
   byte-identical.
+- **The package requires Node 22 or later**: `engines.node` was `>=18`. Node 18 and 20 are out of
+  support upstream, and 22 is the oldest line still maintained. On an older Node, npm warns when it
+  installs the package, and refuses where `engine-strict` is set. The bundle is unchanged, and CI now
+  server-renders the packed package on Node 22.
 - The bundle's JSX now compiles to React's automatic runtime, so the bundle imports
   `react/jsx-runtime` from your React next to `react` itself. Every React in the peer range ships
   it. If your build aliases `react` to one particular copy, alias `react/jsx-runtime` the same way.

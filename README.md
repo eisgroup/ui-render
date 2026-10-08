@@ -248,9 +248,9 @@ the render failure is still reported.
 
 ## Development Installation
 
-The published package declares `engines.node >= 18`: that is the floor for *consuming* it, and the shipped
-bundle needs nothing newer (its newest syntax is ES2022's class fields, which Node 18 runs, and the packed
-artifact is verified to server-render on Node 22 and 24). Building this repository is a different matter and
+The published package declares `engines.node >= 22`: that is the floor for *consuming* it. Node 22 is the oldest
+line still supported upstream, and CI server-renders the packed package on it. On an older Node, npm warns at
+install, and refuses to install where `engine-strict` is set. Building this repository is a different matter and
 uses the version in `.nvmrc`, which is what CI installs: Babel 8, which compiles it, needs Node 24.11 or later.
 
 1. Install [Node.js](https://nodejs.org/), if you haven't already — use the version in `.nvmrc` (v24).
