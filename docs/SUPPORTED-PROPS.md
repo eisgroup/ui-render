@@ -135,7 +135,7 @@ Those four were the *published* ones — they had curated entries on this page w
 
 ### `Tooltip` — in-house, no semantic-ui-react
 
-`src/core/components/Tooltip.tsx`, 567 lines. Replaced the wrapper in §9.7-F1 step 2 part 3.
+`src/core/components/Tooltip.tsx`, 576 lines. Replaced the wrapper in §9.7-F1 step 2 part 3.
 
 The hover tooltip, over the same inline `<span>` `components/TooltipBubble.tsx` has shipped for years (as `components/Tooltip.tsx` until §9.9-H6, when this component, `TooltipPop`, took that name). Reached two live ways: a `view: "Tooltip"` node (`mapper.tsx`, which maps `label` to `content`) and the `tooltip` attribute on ANY node (`Render.tsx`, which wraps the rendered node and spreads an object `tooltip` — still an unfiltered passthrough, but into 13 accepted names now instead of 45). This was a FIX, not a trade: measured in real Chrome on the production build, the SUIR bubble rendered at the document origin at every use site a meta can declare (~730 px from its trigger on `buttonIcon`, 2538-3006 px on `all`) and every open raised an uncaught `TypeError` from popper's flip modifier, because SUIR clones the trigger with a `ref` and nothing a meta can declare can hold one. There was no working positioning to lose.
 
@@ -203,7 +203,7 @@ THE ARITHMETIC, derived from the installed `semantic-ui-react` rather than estim
 
 ### `Dropdown` — in-house, no semantic-ui-react
 
-`src/core/components/Dropdown.tsx`, 366 lines. Replaced the wrapper in §9.7-F1 step 3 part 2.
+`src/core/components/Dropdown.tsx`, 370 lines. Replaced the wrapper in §9.7-F1 step 3 part 2.
 
 The wrapper already owned the external API: the `onChange(value, name, event)` signature, option sanitisation and the cascading reset are all wrapper code, and none of it moved (the case-insensitive dedup on addition went with `allowAdditions` at part 2). Only the `<DropDown/>` element at the bottom changed — it is now the in-house `Listbox`, under the same import alias. Two entry points, and they differ: `mapper.tsx` imports the memoised default export for `view: "Dropdown"`, while `modules/form/inputs/DropdownField.ts` imports the NAMED export for `view: "Select"` — which is the majority path.
 

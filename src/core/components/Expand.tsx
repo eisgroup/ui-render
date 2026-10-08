@@ -1,5 +1,5 @@
 import classNames from '../utils/classNames'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { isFunction } from '../utils'
 import AnimateHeight from './AnimateHeight'
 import Icon from './Icon'
@@ -142,11 +142,21 @@ function Expand (props: ExpandProps) {
   const {expanded, changing} = state
   const hasContent = children != null
   const shown = hasContent && (expanded || changing)
-  // Built once it is shown, and kept while it stays shown and `children` and `id` are the same, so a
-  // render function is not called on every render. Collapsed, the content is unmounted, so nothing is
-  // lost by building it again. A ref held it until 2026-10-08, keyed on `children` alone.
-  const built = useMemo(() => (shown ? (isFunction(children) ? children(id) : children) : null), [shown, children, id])
-  const content = shown && built
+  // A render function's content is built when it is first shown, and kept while `children` is the same,
+  // however often it is collapsed and shown again: the function is called once (`Expand.lifecycle.test.js`).
+  // A ref held it until 2026-10-08. It is state now, stored by the render that builds it, which then runs
+  // again with it. As the ref did, it keeps only content that is something, so a function that gave nothing
+  // is asked again on the next render, and nothing is stored on every render.
+  const [built, setBuilt] = useState<{ children: ExpandProps['children'], content: React.ReactNode } | null>(null)
+  let content: React.ReactNode = shown && built !== null && built.children === children && built.content
+  if (shown && !content) {
+    if (isFunction(children)) {
+      content = children(id)
+      if (content) setBuilt({children, content})
+    } else {
+      content = children
+    }
+  }
 
   let label: React.ReactNode = null
   if (title != null || renderLabel) {

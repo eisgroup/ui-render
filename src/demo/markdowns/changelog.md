@@ -504,12 +504,15 @@
   config adds are off: four misread Less, and one would rewrite colours Less computes. The two that
   report deprecated CSS are on, since the stylesheet replaced what they found (see Styling). The lint
   change itself left the compiled CSS unchanged.
-- eslint-plugin-react-hooks is on 7, and the React Compiler's rules it adds are on, except
-  `react-hooks/refs`. What they found is fixed. `Dropdown` and `InputNumber` no longer copy a prop
-  into state through an effect, so a new list of options, or a new value from the form, no longer
-  renders the old one once more first. A pie chart's tooltip looks up its slice as it renders, and
-  `Dropdown` no longer writes to the props it was given. Two findings are suppressed, each with the
-  reason the rule is wrong there. `react-hooks/refs` stays off until its 83 findings are fixed.
+- eslint-plugin-react-hooks is on 7, and the React Compiler's rules it adds are on. What they found
+  is fixed. `Dropdown` and `InputNumber` no longer copy a prop into state through an effect, so a new
+  list of options, or a new value from the form, no longer renders the old one once more first. A pie
+  chart's tooltip looks up its slice as it renders. `Dropdown`, `Input`, `InputNumber` and the native
+  input no longer write to the props they were given, and nine components no longer read or write a
+  ref during a render: what a handler needs from the latest props is stored after the commit, and a
+  value fixed at mount is state. Three findings are suppressed, each with the reason the rule is
+  wrong there. `react-hooks/refs` is off only in `TableView`, `Tabs` and `StandaloneTabs`, which hand
+  their renderers one object kept current during the render, as the class instance they replaced did.
 - Dependabot proposes updates every week, of the development dependencies and of the GitHub Actions
   CI runs: a week's minor and patch updates in one pull request, each major in its own. Major
   versions of React and ESLint are held back, with the reason beside each in `.github/dependabot.yml`.
