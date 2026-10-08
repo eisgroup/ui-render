@@ -72,9 +72,11 @@
     "css:fixture:check": "node scripts/generate-semantic-css-fixture.js --check"
   },
   "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not op_mini all"
+    "last 2 Chrome versions",
+    "last 2 Edge versions",
+    "last 2 Firefox versions",
+    "last 2 Safari major versions",
+    "last 2 iOS major versions"
   ],
   "peerDependencies": {
     "moment": "^2.29.4",

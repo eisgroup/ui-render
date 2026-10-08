@@ -69,6 +69,10 @@ declares no dependencies of its own, so the host project installs nothing beside
 `dist/index.js` into a page with a `<script>` tag is **not supported**: the UMD global lookup never matched
 React's real global name, so it has never worked.
 
+The bundle is built for current browsers: the last two versions of Chrome, Edge and Firefox, and the last
+two major versions of Safari, on macOS and on iOS (`browserslist` in `package.json`). That is what the host
+applications support, so an older browser is not a target.
+
 ## Styles and assets (consumer)
 
 The library entry deliberately does not inject CSS, so the host loads the stylesheet itself. Both
