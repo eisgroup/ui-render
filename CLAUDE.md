@@ -28,7 +28,9 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 - `npm run test:e2e` — The browser leg (Playwright, `playwright.config.js`): builds the demo for production into `build-e2e/`, serves it on port 3199 and runs `e2e/*.pw.js` in Chromium, desktop and touch. `npm run test:e2e:install` installs Chromium first. `e2e/view-coverage.js` names, for every `view`, the browser tests that drive it or why none needs to, and `scripts/__tests__/view-browser-coverage.contract.test.js` keeps it complete
 - `npm run test:types` — `build-lib`, then compiles consumer fixtures against `dist/*.d.ts` under `@types/react` 16, 17, 18 and 19, as an interop default import and as a CommonJS `import = require` (`scripts/test-public-types.js`)
 - `npm run test:pack` — `build-lib`, then the packaging budgets (`test:pack:budget`, `scripts/check-package-budget.js`) and a server-render smoke of the packed tarball (`test:pack:consumer`). `npm run test:pack:peers` repeats the smoke on React 16.14, 17.0.2 and 19.3.0, from the same fixtures as the jest legs
-- `npm run build-css` — Standalone CSS build (LESS → PostCSS prefixwrap → CSS)
+- `npm run build-css` — Standalone CSS build (LESS → PostCSS prefixwrap → CSS) to `public/static/ui-render.built.css`,
+  which is committed because the demo site carries it. Rerun it after a style change: `npm run build-css:check`, which
+  CI runs, fails while the committed copy differs from what it writes
 - `npm run test:env-flags` — Compiles the source with each real webpack config (library, demo dev/prod, the e2e shape) and checks the env flags and `FILE.PATH_IMAGES` each ships, in a realm with no `process`. jest cannot see these: it runs the source against Node's real `process.env`. `_envs.ts` reads `process.env.NODE_ENV`/`REACT_APP_HOMEPAGE` as literals on purpose — never reintroduce `ENV.NODE_ENV` or a `typeof process` guard in front of them
 - `npm run test:css:built` — `css.pipeline.parity.test.js` again, on the built `static/all.css` (run `build-lib`
   first), under `jest.built-css.config.js`, where a missing file fails instead of skipping. CI runs it after

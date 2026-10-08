@@ -77,6 +77,13 @@ jobs:
       - name: Check the pinned semantic CSS fixture
         run: npm run css:fixture:check
 
+      # `public/static/ui-render.built.css` is `npm run build-css`'s output, committed because the demo
+      # site carries it (webpack.demo.config.mjs copies public/static). Nothing rebuilt it when the
+      # styles changed, and it fell behind twice. `css.pipeline.parity.test.js` covers it in all four
+      # legs; this step names the failure and, unlike the suite, tells you the regeneration command.
+      - name: Check the committed standalone stylesheet
+        run: npm run build-css:check
+
       - name: Test with coverage thresholds
         run: npm run test:coverage
 

@@ -315,6 +315,12 @@ describe('CSS pipeline parity — final CSS, post-PostCSS (§9.5)', () => {
                 changed.forEach(selector => expect(H8_EXEMPT_SELECTORS).toContain(selector));
             });
         });
+
+        it('is what the committed public/static/ui-render.built.css holds (`npm run build-css` rewrites it)', () => {
+            // The demo site carries that file, and nothing else rebuilds it when the styles change.
+            // A boolean, because a mismatch would otherwise print two 400 KB strings.
+            expect(fs.readFileSync(standaloneBuild.OUT_FILE, 'utf8') === standaloneCss).toBe(true);
+        });
     });
 
     describe('prefixwrap configuration — no longer divergent (the other half of §9.9-H8)', () => {

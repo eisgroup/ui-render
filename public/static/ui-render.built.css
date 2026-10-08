@@ -414,13 +414,11 @@
 }
 .ui-render .flex--scroll {
   overflow: auto;
-  overflow-y: overlay;
   /* iOS smooth scrolling - but causes animation content to hide on iOS */
   -webkit-overflow-scrolling: touch;
 }
 .ui-render .flex--scroll:hover, .ui-render .flex--scroll:focus, .ui-render .flex--scroll:active {
   overflow: auto;
-  overflow-y: overlay;
 }
 .ui-render .fill, .ui-render .flex--fill, .ui-render .flex--scroll, .ui-render .app, .ui-render .app__chart__tooltip__spacer, .ui-render, .ui-render #ui-render, .ui-render .app .app__content, .ui-render .app__modal.active, .ui-render .app__modal__box__content, .ui-render .app__upload, .ui-render .upload__dropzone:not(.button), .ui-render .app__popup.active, .ui-render .app__popup__box__content {
   flex: 1;
@@ -546,13 +544,11 @@
 }
 .ui-render .overflow-scroll, .ui-render .virtual-list, .ui-render .app__modal__box, .ui-render .app__popup__box {
   overflow: auto;
-  overflow-y: overlay;
   /* iOS smooth scrolling - but causes animation content to hide on iOS */
   -webkit-overflow-scrolling: touch;
 }
 .ui-render .overflow-scroll:hover, .ui-render .overflow-scroll:focus, .ui-render .overflow-scroll:active, .ui-render .virtual-list:hover, .ui-render .virtual-list:focus, .ui-render .virtual-list:active, .ui-render .app__modal__box:hover, .ui-render .app__modal__box:focus, .ui-render .app__modal__box:active, .ui-render .app__popup__box:hover, .ui-render .app__popup__box:focus, .ui-render .app__popup__box:active {
   overflow: auto;
-  overflow-y: overlay;
 }
 .ui-render .overflow-auto {
   overflow: auto;
@@ -3857,7 +3853,8 @@
   vertical-align: text-bottom;
 }
 .ui-render .break-word {
-  word-break: break-word;
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 .ui-render .no-wrap, .ui-render .app__progress__bar__tooltip, .ui-render .app__top-stats__label, .ui-render .button .tooltip, .ui-render .input-tag .tooltip, .ui-render .app__tag .tooltip {
   white-space: nowrap;
@@ -4741,7 +4738,7 @@
   margin: -1px;
   padding: 0;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   border: 0;
 }
 .ui-render .appear-on-hover, .ui-render .input__delete, .ui-render .app__slider__remove {

@@ -58,6 +58,7 @@
     "test:react19": "jest --config jest.react19.config.js",
     "test:watch": "jest --watch",
     "build-css": "node scripts/build-css.js",
+    "build-css:check": "node scripts/build-css.js --check",
     "docs:views": "node scripts/generate-view-reference.js",
     "docs:views:check": "node scripts/generate-view-reference.js --check",
     "docs:props": "node scripts/generate-wrapper-prop-reference.js",

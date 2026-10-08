@@ -492,10 +492,10 @@
   effects of the code's own layout-effect hooks now. 81 `eslint-disable` comments that suppressed
   nothing are gone. The development tree lost 158 packages to the move and gained 142, and
   `npm audit` reports 35 findings in it, from 43.
-- The stylesheet lint is on stylelint 17, with `stylelint-config-standard` 40. Seven rules the new
-  config adds are off: four misread Less, one would rewrite colours Less computes, and two report
-  deprecated CSS the stylesheet still ships (`overflow-y: overlay`, `word-break: break-word` and
-  `clip`), which a change to the stylesheet itself has to replace. The compiled CSS is unchanged.
+- The stylesheet lint is on stylelint 17, with `stylelint-config-standard` 40. Five rules the new
+  config adds are off: four misread Less, and one would rewrite colours Less computes. The two that
+  report deprecated CSS are on, since the stylesheet replaced what they found (see Styling). The lint
+  change itself left the compiled CSS unchanged.
 - eslint-plugin-react-hooks is on 7. It adds the React Compiler's rules to its presets; this
   configuration names the plugin's rules one by one, so those stay off. Switched on, they would report
   100 findings in 16 files.
@@ -530,6 +530,11 @@
   installed `react-final-form` 6.5.9 and fail on 7.0.1, which sets a field that mounts with no state
   in final-form back to its initial value (final-form/react-final-form#1095, whose fix is not
   released). The upgrade waits for that fix.
+- CI checks that the standalone stylesheet the demo site carries, `public/static/ui-render.built.css`,
+  is what `npm run build-css` writes. It is committed, and nothing rebuilt it when the styles changed.
+  Its first run found the copy a change behind: the three deprecated CSS features replaced under
+  Styling had not reached it, and they do now. `npm run build-css:check` names a failure and the
+  command that fixes it.
 
 #### Fixes
 
