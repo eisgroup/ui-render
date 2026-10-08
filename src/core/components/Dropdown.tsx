@@ -223,8 +223,9 @@ export function Dropdown ({
     }
   }, [optionValuesKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // What this component adds for `Listbox` goes on a copy: the rest bag is the caller's props, which a render
-  // must not write to. Same keys, in the same order, as when the additions were written onto the bag itself.
+  // What this component adds for `Listbox` goes on a copy of the rest bag: the cascading-reset effect above reads
+  // `props`, and a value an effect has used may not change afterwards in the render. Same keys, in the same order,
+  // as when the additions were written onto the bag itself.
   const listboxProps: Record<string, unknown> = {...props}
   if (readonly) listboxProps.disabled = true // the inner control has no `readOnly`
   if (listboxProps.selection == null) listboxProps.selection = true

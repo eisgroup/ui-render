@@ -157,19 +157,16 @@ const InputNumber = ({
     if (valueFromParent !== undefined && !hasBeenControlled) setHasBeenControlled(true)
     const controlled = hasBeenControlled || valueFromParent !== undefined
 
-    // What this component adds for the input goes on a copy: the rest bag is the caller's props, which a render
-    // must not write to. Same keys, in the same order, as when they were written onto the bag itself.
-    const forwarded: typeof props = {...props}
     if (readonly) {
-        forwarded.className = 'readonly'
-        forwarded.readOnly = readonly
+        props.className = 'readonly'
+        props.readOnly = readonly
     } // React fix
     if (float) {
         if (!label && name) label = capitalize(name)
         if (!placeholder) placeholder = ' ' // required for Float label CSS to work
     }
     if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
-    if (!label && title) forwarded.title = translate(title)
+    if (!label && title) props.title = translate(title)
     // An `aria-describedby` naming an id no element carries is worse than none: it is an axe
     // `aria-valid-attr-value` violation, and a screen reader announces nothing for it. The help
     // element exists only while there is a message, so the reference is conditional on the same
@@ -330,7 +327,7 @@ const InputNumber = ({
                     }}
                     // DOM boundary (see ./domProps): the spread lands on the <input>, so ENGINE_PROPS only -- `name` is the field registration
     // path this control must carry, and the onChange above reads `props.name`.
-                    {...omitProps(forwarded, ENGINE_PROPS)}
+                    {...omitProps(props, ENGINE_PROPS)}
                     value={displayValue}
                 />
                 {icon && !lefty && (isString(icon)

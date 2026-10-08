@@ -184,9 +184,7 @@ function InputNative (props: InputNativeProps) {
   // react-final-form registration path and the second argument of every onChange below,
   // `label` is what Select renders as its accessible label — stripping FIELD_ONLY_PROPS
   // here would break every form silently. See ./domProps.ts.
-  // A copy: `omitProps` hands back the bag itself when it strips nothing, and what the switch below adds must not
-  // be written onto the caller's props. Same keys, in the same order.
-  let forwarded: ForwardedProps = {...omitProps(rest, ENGINE_PROPS)} as ForwardedProps
+  let forwarded: ForwardedProps = omitProps(rest, ENGINE_PROPS) as ForwardedProps
   if (disabledSpellCheck) forwarded = {...noSpellCheck, ...forwarded}
   if (resize) {
     // Must use onKeyUp because onKeyDown/onKeyPress does not register `Enter` or fire too many times

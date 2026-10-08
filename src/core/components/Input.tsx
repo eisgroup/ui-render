@@ -105,23 +105,20 @@ export function Input ({
   const [active, setState] = useState(props.autoFocus)
   // Fixed when the input mounts, as the ref it was until 2026-10-08.
   const [max] = useState(props.type === 'date' ? '9999-01-01' : null)
-  // What this component adds for `InputNative` goes on a copy: the rest bag is the caller's props, which a render
-  // must not write to. Same keys, in the same order, as when they were written onto the bag itself.
-  const forwarded: typeof props = {...props}
-  if (autofocus) forwarded.autoFocus = autofocus // React fix
+  if (autofocus) props.autoFocus = autofocus // React fix
   if (readonly) {
-    forwarded.className = 'readonly'
-    forwarded.readOnly = readonly
+    props.className = 'readonly'
+    props.readOnly = readonly
   } // React fix
   if (props.type === 'hidden') {
-    return <InputNative name={name} id={id} disabled={disabled} {...forwarded} />
+    return <InputNative name={name} id={id} disabled={disabled} {...props} />
   }
   if (float) {
     if (!label && name) label = capitalize(name)
     if (!placeholder) placeholder = ' ' // required for Float label CSS to work
   }
   if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
-  if (!label && title) forwarded.title = translate(title)
+  if (!label && title) props.title = translate(title)
   // An `aria-describedby` naming an id no element carries is worse than none: it is an axe
   // `aria-valid-attr-value` violation, and a screen reader announces nothing for it. The help
   // element exists only while there is a message, so the reference is conditional on the same
@@ -173,7 +170,7 @@ export function Input ({
           }}
           max={max}
           placeholder={translate(placeholder)}
-          {...forwarded}
+          {...props}
         />
         {icon && !lefty && (isString(icon)
             ? <Icon name={icon} onClick={onClickIcon} className={classNameIcon}/>
