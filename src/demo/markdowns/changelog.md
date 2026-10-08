@@ -381,6 +381,14 @@
   16.14, 17 and 18 need change nothing. The whole test suite runs on React 19.3 in its own gating
   check beside 16.14, 17 and 18, the packed package is server-rendered against each of them, and
   the TypeScript declarations are compiled against `@types/react` 16, 17, 18 and 19.
+- **The bundle is built for current browsers only**: the last two versions of Chrome, Edge and
+  Firefox, and the last two major versions of Safari, on macOS and on iOS. That is what the host
+  applications support. The targets were `>0.2%, not dead`, a share of global use that took in
+  Chrome 109, the last version for Windows 7 and 8.1, and Safari back to iOS 15.6. Only
+  `dist/index.js` and its map changed, and the bundle is 44 bytes smaller: two static class fields
+  lost a wrapper Babel added for an old Safari bug, and webpack's runtime calls `Object.hasOwn`. So a
+  browser older than Chrome 93, Firefox 92 or Safari 15.4 cannot load it. The stylesheet is
+  byte-identical.
 - The bundle's JSX now compiles to React's automatic runtime, so the bundle imports
   `react/jsx-runtime` from your React next to `react` itself. Every React in the peer range ships
   it. If your build aliases `react` to one particular copy, alias `react/jsx-runtime` the same way.
