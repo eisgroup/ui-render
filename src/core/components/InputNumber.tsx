@@ -1,5 +1,5 @@
 import classNames from '../utils/classNames'
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import React, { useState, useCallback, useMemo, useRef } from 'react'
 import { capitalize, isString } from '../utils'
 import Button from './Button'
 import Icon from './Icon'
@@ -179,16 +179,20 @@ const InputNumber = ({
         [done, error, hasValue]
     )
 
-    useEffect(() => {
+    // Re-syncs from the parent when its value changes or an edit ends, in the render that sees the change. An effect
+    // did this until 2026-10-08, after the commit, which rendered the stale value once more. `synced` is what the last
+    // sync saw, compared with `Object.is` as the effect compared its dependencies: a parent value of NaN must not
+    // count as a change on every render. A local edit changes neither, so it is never overwritten with the parent's
+    // stale value.
+    const [synced, setSynced] = useState({ valueFromParent, active })
+    if (!Object.is(synced.valueFromParent, valueFromParent) || synced.active !== active) {
+        setSynced({ valueFromParent, active })
         // Don't update from parent during active editing to preserve user input
         if (!active && hasBeenControlled.current) {
             const newValue = valueFromParent !== undefined ? valueFromParent.toString().replace(',', '.') : ''
             if (newValue !== value) setValue(newValue)
         }
-        // `value` is read only to skip a redundant setState. Listing it would re-run this sync on every local
-        // edit, overwriting what the user is typing with the parent's stale value.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [valueFromParent, active])
+    }
 
     const onChangeHandler = useCallback((
         value: string,

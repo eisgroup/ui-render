@@ -138,7 +138,7 @@ const InputDate = ({
     // `aria-valid-attr-value` violation, and a screen reader announces nothing for it. The help
     // element exists only while there is a message, so the reference is conditional on the same
     // value — one binding for both, so the two cannot disagree again.
-    const idHelp = useMemo(() => (error || info) ? id + '-help' : undefined, [id, error, info])
+    const idHelp = (error || info) ? id + '-help' : undefined
 
     // `unknown`: rc-picker's type also covers its multiple mode, and `toMoment` reads whatever arrives.
     const onDateChanged = (date: unknown) => {

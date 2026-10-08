@@ -2,7 +2,7 @@ import classNames from '../utils/classNames'
 import React, { useEffect, useRef, useState } from 'react'
 import DropDown from './Listbox'
 import type { ListboxCloseEvent, ListboxOption } from './Listbox'
-import { isEqual, l, localiseTranslation } from '../utils'
+import { l, localiseTranslation } from '../utils'
 import { _ } from '../utils/translations'
 import Icon from './Icon'
 import Text from './Text'
@@ -169,8 +169,10 @@ export function Dropdown ({
   value: valueFromParent,
   ...props
 }: DropdownProps) {
-  // The options, synced from the prop by value below. Additions wrote to them until §9.7-F1 step 3 part 2.
-  let [options, setOptions] = useState(opts)
+  // The options as the prop gives them, sanitised below. They were state until 2026-10-08, synced from the prop by
+  // an effect, which only made the previous list render once more after every change: nothing has written to them
+  // since §9.7-F1 step 3 part 2 removed additions, and nothing downstream keys on the list's identity.
+  let options = opts
   const defaultValue = useRef(typeof valueFromParent !== 'undefined'
     ? valueFromParent
     // A cast, not a guard: a string or a number has no `value`, and reads `undefined`, as it did.
@@ -180,13 +182,6 @@ export function Dropdown ({
   // What the effect below last took from the parent: `null` until it first runs.
   const synced = useRef<{ value: unknown } | null>(null)
   const tempValue = useRef<unknown>()
-
-  useEffect(() => {
-    !isEqual(options, opts) && setOptions(opts)
-    // `options` is read only as an equality guard against a redundant setState. Listing it as a dependency
-    // would re-run this sync after every options change, including the one it just performed.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [opts])
 
   // Sync internal value with parent prop.
   // Skip on initial mount when valueFromParent is undefined to preserve defaultValue (first option).
@@ -228,8 +223,11 @@ export function Dropdown ({
     }
   }, [optionValuesKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (readonly) props.disabled = true // the inner control has no `readOnly`
-  if (props.selection == null) props.selection = true
+  // What this component adds for `Listbox` goes on a copy: the rest bag is the caller's props, which a render
+  // must not write to. Same keys, in the same order, as when the additions were written onto the bag itself.
+  const listboxProps: Record<string, unknown> = {...props}
+  if (readonly) listboxProps.disabled = true // the inner control has no `readOnly`
+  if (listboxProps.selection == null) listboxProps.selection = true
 
   // @Note: the comment below used to claim `undefined` options "pass through unchanged". They did
   //  not — `options[0]` on an absent or null list THREW, measured:
@@ -278,10 +276,10 @@ export function Dropdown ({
 
   // With `onClickIcon`, the icon is rendered here as a node that takes the click: the control has no
   // click callback for its icon. A cast, not a guard: `icon` is then the name of the icon to render.
-  if (onClickIcon) props.icon = <Icon name={(props.icon as string | undefined) || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
+  if (onClickIcon) listboxProps.icon = <Icon name={(listboxProps.icon as string | undefined) || 'dropdown'} onClick={onClickIcon} className={classNameIcon}/>
 
   if (onChange || onSelect) {
-    props.onChange = (event: React.SyntheticEvent, {value}: { value: unknown }) => {
+    listboxProps.onChange = (event: React.SyntheticEvent, {value}: { value: unknown }) => {
       // @Note: this used to map a case-mismatched value back onto an existing option's value, and
       //  §9.7-F1 step 3 part 2 removed that with the rest of the free-text machinery — NOT because
       //  it belonged to it, but because measuring showed the branch had become unreachable. It
@@ -295,7 +293,7 @@ export function Dropdown ({
     }
   }
 
-  if (onSelect) props.onClose = (event: ListboxCloseEvent) => onSelect(tempValue.current, props.name, event)
+  if (onSelect) listboxProps.onClose = (event: ListboxCloseEvent) => onSelect(tempValue.current, props.name, event)
 
 
   // Sanitize Value (for Colors)
@@ -316,7 +314,7 @@ export function Dropdown ({
   // Hoisted rather than nested inside `omitProps(...)`: `scripts/generate-wrapper-prop-reference.js`
   // reads the strip lists out of the `omitProps` call to document the DOM boundary, and its parser
   // takes the argument text up to the first `)`.
-  const supported = dropUnsupported(props)
+  const supported = dropUnsupported(listboxProps)
 
   return (
     <View className={classNames('input--wrapper', {
@@ -338,7 +336,7 @@ export function Dropdown ({
         // DOM boundary: `Listbox` spreads whatever it does not destructure onto its dropdown
         // element (and `aria-*` onto the combobox inside it), as Semantic's Dropdown did (and neither declares a
         // `name`), so engine props and `name`/`label` would become attributes there. Filtered
-        // here, AFTER the props.onClose assignment above, and without touching the `props.name`
+        // here, AFTER the listboxProps.onClose assignment above, and without touching the `props.name`
         // that handler reports to the host. `Listbox` strips again at its own edge because that
         // is where the element is; this strip is what keeps engine props from reaching it at all.
         // See ./domProps.ts.

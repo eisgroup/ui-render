@@ -174,9 +174,32 @@ const REACT_APP_RULES = {
     'jsx-a11y/scope': 'warn',
 
     'react-hooks/rules-of-hooks': 'error',
-    // eslint-plugin-react-hooks 7 adds the React Compiler's rules to its presets. This config names
-    // the plugin's rules one by one, so they stay off: measured on 2026-10-07, switched on they report
-    // 100 findings in 16 files, 83 of them `react-hooks/refs`. Adopting them is a decision of its own.
+}
+
+/**
+ * The React Compiler's rules, which eslint-plugin-react-hooks 7 adds to its presets, at the presets' levels.
+ * On since 2026-10-08, the owners' call, after what they found was fixed: 18 findings in `Dropdown`,
+ * `InputNumber`, `PieChart`, `InputDate`, `src/library/main.tsx` and a test. Two are suppressed where the
+ * comment says why the rule is wrong there.
+ *
+ * `react-hooks/refs` stays off until its findings are fixed: 83 reads and writes of a ref during a render,
+ * 53 of them in `TableView` and `Tabs`.
+ */
+const REACT_COMPILER_RULES = {
+    'react-hooks/static-components': 'error',
+    'react-hooks/use-memo': 'error',
+    'react-hooks/void-use-memo': 'error',
+    'react-hooks/preserve-manual-memoization': 'error',
+    'react-hooks/incompatible-library': 'warn',
+    'react-hooks/immutability': 'error',
+    'react-hooks/globals': 'error',
+    'react-hooks/set-state-in-effect': 'error',
+    'react-hooks/error-boundaries': 'error',
+    'react-hooks/purity': 'error',
+    'react-hooks/set-state-in-render': 'error',
+    'react-hooks/unsupported-syntax': 'warn',
+    'react-hooks/config': 'error',
+    'react-hooks/gating': 'error',
 }
 
 /** `eslint-config-react-app`'s TypeScript override: tsc covers some rules, typescript-eslint others. */
@@ -231,7 +254,7 @@ module.exports = [
         },
         plugins: { import: importPlugin, 'jsx-a11y': jsxA11y, react, 'react-hooks': reactHooks },
         settings: { react: { version: 'detect' } },
-        rules: REACT_APP_RULES,
+        rules: { ...REACT_APP_RULES, ...REACT_COMPILER_RULES },
     },
     {
         files: ['src/**/*.{ts,tsx}'],

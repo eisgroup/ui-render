@@ -27,7 +27,9 @@ function Render<Data = unknown> (props: UIRenderProps<Data>): React.ReactElement
 
     // During render, deliberately: the failures worth naming (a non-array `items`, a non-string
     // `name`) throw inside UIRender's own render, so an effect would report after the crash it
-    // was meant to explain. Keyed on the meta identity so a re-render costs nothing.
+    // was meant to explain. Keyed on the meta identity so a re-render costs nothing. The React
+    // Compiler's `void-use-memo` takes an unused result for a mistake; here the call is the point.
+    // eslint-disable-next-line react-hooks/void-use-memo
     React.useMemo(() => reportMetaProblems(hostProps.meta, validateMeta), [hostProps.meta, validateMeta])
 
     return (
