@@ -179,13 +179,11 @@ const REACT_APP_RULES = {
 /**
  * The React Compiler's rules, which eslint-plugin-react-hooks 7 adds to its presets, at the presets' levels.
  * On since 2026-10-08, the owners' call, after what they found was fixed: 18 findings in `Dropdown`,
- * `InputNumber`, `PieChart`, `InputDate`, `src/library/main.tsx` and a test. Two are suppressed where the
- * comment says why the rule is wrong there.
- *
- * `react-hooks/refs` stays off until its findings are fixed: 83 reads and writes of a ref during a render,
- * 53 of them in `TableView` and `Tabs`.
+ * `InputNumber`, `PieChart`, `InputDate`, `src/library/main.tsx` and a test, then the 25 of `react-hooks/refs`
+ * outside `INSTANCE_OBJECT_FILES`. Three are suppressed where the comment says why the rule is wrong there.
  */
 const REACT_COMPILER_RULES = {
+    'react-hooks/refs': 'error',
     'react-hooks/static-components': 'error',
     'react-hooks/use-memo': 'error',
     'react-hooks/void-use-memo': 'error',
@@ -201,6 +199,18 @@ const REACT_COMPILER_RULES = {
     'react-hooks/config': 'error',
     'react-hooks/gating': 'error',
 }
+
+/**
+ * Where `react-hooks/refs` is off, by the owners' call of 2026-10-08. Each of these components keeps one object
+ * for its lifetime, written during the render and handed to its renderers as `this`, as the class instance it
+ * replaced was (§9.3 step 6): the engine reads `props` off it, and looks up handlers on it by the names a meta
+ * gives. The rule reports that design 58 times. Changing it would change what every renderer receives.
+ */
+const INSTANCE_OBJECT_FILES = [
+    'src/core/engine/components/TableView.tsx',
+    'src/core/engine/components/Tabs.tsx',
+    'src/core/components/StandaloneTabs.tsx',
+]
 
 /** `eslint-config-react-app`'s TypeScript override: tsc covers some rules, typescript-eslint others. */
 const REACT_APP_TYPESCRIPT_RULES = {
@@ -256,6 +266,7 @@ module.exports = [
         settings: { react: { version: 'detect' } },
         rules: { ...REACT_APP_RULES, ...REACT_COMPILER_RULES },
     },
+    { files: INSTANCE_OBJECT_FILES, rules: { 'react-hooks/refs': 'off' } },
     {
         files: ['src/**/*.{ts,tsx}'],
         languageOptions: {

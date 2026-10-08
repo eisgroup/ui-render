@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { FormSpy } from 'react-final-form'
 import type { FormState, FormSubscription } from 'final-form'
 import { Loading } from '../../../components/Loading'
@@ -14,6 +14,12 @@ localiseTranslation({
 // One object, as the class's `defaultProps` held one: FormSpy is handed the same subscription on
 // every render rather than a new default each time.
 const VALUES_ONLY: FormSubscription = {values: true}
+
+/**
+ * `useLayoutEffect` in a browser, so a save reads the props of the last commit before anything can change
+ * a value, and `useEffect` on the server, where nothing saves and React 16 and 17 warn about a layout effect.
+ */
+const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 type Values = Record<string, any>
 
@@ -59,9 +65,15 @@ function AutoSave ({
   const [submitting, setSubmitting] = useState(false)
   const baseline = useRef<Values | undefined>(undefined)
   const inFlight = useRef<unknown>(null)
+  // What a save reads when it comes due, assigned after each commit rather than during the render.
   const latest = useRef<Pick<AutoSaveProps, 'onChange' | 'partial'> | null>(null)
-  latest.current = {onChange, partial}
+  useBeforePaintEffect(() => {
+    latest.current = {onChange, partial}
+  })
 
+  // `react-hooks/refs` assumes a function handed a callback during the render may call it then. `debounce` only
+  // wraps it: the callback runs from a timer, after the render, which is where reading the refs is allowed.
+  // eslint-disable-next-line react-hooks/refs
   const handleChange = useMemo(() => debounce(async ({values}: FormState<Values>) => {
     if (baseline.current == null) {
       baseline.current = values

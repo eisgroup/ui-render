@@ -1,5 +1,5 @@
 import classNames from '../utils/classNames'
-import React, { useState, useCallback, useMemo, useRef } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { capitalize, isString } from '../utils'
 import Button from './Button'
 import Icon from './Icon'
@@ -150,8 +150,12 @@ const InputNumber = ({
     const [active, setActive] = useState(false)
     const initialValue = valueFromParent !== undefined ? valueFromParent : defaultValue
     const [value, setValue] = useState(initialValue !== undefined ? initialValue.toString().replace(',', '.') : '')
-    const hasBeenControlled = useRef(valueFromParent !== undefined)
-    if (valueFromParent !== undefined) hasBeenControlled.current = true
+    // Whether the parent has ever given a value: from then on, its value is what shows outside an edit. A ref
+    // until 2026-10-08, set during the render; state now, set in the render that first sees a value, which is why
+    // `controlled` also counts the value of this render.
+    const [hasBeenControlled, setHasBeenControlled] = useState(valueFromParent !== undefined)
+    if (valueFromParent !== undefined && !hasBeenControlled) setHasBeenControlled(true)
+    const controlled = hasBeenControlled || valueFromParent !== undefined
 
     if (readonly) {
         props.className = 'readonly'
@@ -188,7 +192,7 @@ const InputNumber = ({
     if (!Object.is(synced.valueFromParent, valueFromParent) || synced.active !== active) {
         setSynced({ valueFromParent, active })
         // Don't update from parent during active editing to preserve user input
-        if (!active && hasBeenControlled.current) {
+        if (!active && controlled) {
             const newValue = valueFromParent !== undefined ? valueFromParent.toString().replace(',', '.') : ''
             if (newValue !== value) setValue(newValue)
         }

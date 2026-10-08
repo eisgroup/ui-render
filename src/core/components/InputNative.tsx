@@ -103,16 +103,16 @@ function InputNative (props: InputNativeProps) {
     ...rest
   }: InputNativeProps = props
   const element = useRef<InputNativeElement | null>(null)
-  // What the handlers and ref callbacks read when they run: the latest props, as `this.props` was.
-  const latest = useRef(props)
-  latest.current = props
+  // A node the compact ref callback attached in this commit. The layout effect below resizes it and hands it to
+  // `onMount`, with this render's props. Until 2026-10-08 the callback did both itself, reading the props from a
+  // ref that every render wrote, and a render must not write a ref. A child's ref attaches before its parent's
+  // layout effects run, so the work happens in the same commit, before paint, as it did.
+  const attached = useRef<InputNativeElement | null>(null)
 
   const onMountResize = useCallback((node: InputNativeElement | null) => {
     if (!node) return
-    const {compact, onMount} = latest.current
     element.current = node
-    resizeToContent(node.value, node.style, compact)
-    onMount && onMount(node)
+    attached.current = node
   }, [])
 
   const onMountColor = useCallback((node: InputNativeElement | null) => {
@@ -123,6 +123,13 @@ function InputNative (props: InputNativeProps) {
 
   // The element the render below picks, which decides whether the color branch applies.
   const type = resize ? 'textarea' : rest.type
+  useBeforePaintEffect(() => {
+    const node = attached.current
+    if (!node) return
+    attached.current = null
+    resizeToContent(node.value, node.style, compact)
+    onMount && onMount(node)
+  })
   const previous = useRef<InputNativeProps | null>(null)
   useBeforePaintEffect(() => {
     const before = previous.current
@@ -140,29 +147,31 @@ function InputNative (props: InputNativeProps) {
     if (type === 'color' && props.value !== before.value) node.style.backgroundColor = props.value
   })
 
+  // The handlers are made by every render, so the props they read are those of the render whose element they
+  // are on: the last one committed. They read them from a ref the render wrote until 2026-10-08.
   const onChange = (event: React.ChangeEvent<InputNativeElement>) => {
     const {target: {value, style}} = event
-    const {onChange, compact, name} = latest.current
+    const {onChange, name} = props
     if (compact != null) resizeToContent(value, style, compact)
     onChange && onChange(value, name, event)
   }
 
   const onChangeCheckbox = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {target: {checked}} = event
-    const {onChange, name} = latest.current
+    const {onChange, name} = props
     onChange && onChange(checked, name, event)
   }
 
   // @see: https://stackoverflow.com/questions/11167281/webkit-css-to-control-the-box-around-the-color-in-an-inputtype-color
   const onChangeColor = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {target} = event
-    const {onChange, name} = latest.current
+    const {onChange, name} = props
     target.style.backgroundColor = target.value
     onChange && onChange(target.value, name, event)
   }
 
   const onKeyUp = (event: React.KeyboardEvent<InputNativeElement>) => {
-    const {onKeyUp} = latest.current
+    const {onKeyUp} = props
     const textHeightFunc = (event.key === 'Enter') ? toTextHeightFunc : toTextHeight // resize instantly for Enter
     // A cast, not a guard: React types `target` as any EventTarget, and a keyup's target is the
     // focused field itself, which has no children to be the target instead.
@@ -183,26 +192,28 @@ function InputNative (props: InputNativeProps) {
     forwarded.type = 'textarea' // only textarea can resize
     if (!forwarded.rows) forwarded.rows = 1
   }
-  if (compact != null) forwarded.ref = onMountResize
+  // The ref callbacks are spread after the bag rather than written into it: the switch reads the bag during the
+  // render, and a bag holding a ref callback may not be read then. Each element gets the ref it got before, a
+  // caller's included when neither callback replaces it.
+  const resizeRef: ForwardedProps = compact != null ? {ref: onMountResize} : {}
   switch (forwarded.type) {
     case 'select':
       // A cast: the engine `onChange` is still in the bag here, as `Select` wants it (see
       // `ForwardedProps`), and `options` rides in with the rest of the field's props.
-      return <Select {...(forwarded as unknown as SelectProps)} />
+      return <Select {...({...forwarded, ...resizeRef} as unknown as SelectProps)} />
     case 'checkbox':
       forwarded.onChange = onChangeCheckbox
       if (forwarded.checked == null && forwarded.value != null) forwarded.checked = forwarded.value
-      return <input {...forwarded} />
+      return <input {...forwarded} {...resizeRef} />
     case 'color':
       forwarded.onChange = onChangeColor // update color for uncontrolled input
-      forwarded.ref = onMountColor
-      return <input {...forwarded} />
+      return <input {...forwarded} ref={onMountColor} />
     case 'textarea':
       forwarded.onChange = onChange
-      return <textarea {...forwarded} />
+      return <textarea {...forwarded} {...resizeRef} />
     default:
       forwarded.onChange = onChange
-      return <input {...forwarded} />
+      return <input {...forwarded} {...resizeRef} />
   }
 }
 
