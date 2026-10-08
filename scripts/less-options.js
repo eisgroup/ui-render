@@ -12,12 +12,11 @@
  * number and the compile dies. `always` is LESS 3's behaviour, and it is what keeps the output
  * identical — verified byte for byte across the two majors before the bump.
  *
- * WHY `javascriptEnabled` IS STILL HERE, since §9.7-F1 step 4 established it is not Semantic's
- * requirement: `_variables.less:23` is ours — `@version: \`Math.random()\``, a cache-buster appended
- * to the font URLs in `_mixins.less`. It only ever reaches `static/font.css`, never `all.css`.
- * Removing it is a separate decision (it makes every build's font URLs differ, which is either the
- * point or a nuisance depending on how the fonts are served), so it is left alone here and the flag
- * stays. What is no longer true is the claim that the flag came from the Semantic toolchain.
+ * NO `javascriptEnabled`, as Less 5 will have it: inline JavaScript fails the compile. The sources had
+ * two backtick expressions until 2026-10-08, both ours rather than Semantic's: `_variables.less`'s
+ * `@version: \`Math.random()\``, a cache-buster for the font URLs `.font-face` writes, which no active
+ * call reached, and the rem factor of `_mixins.less`'s `.font-size`, now mixin guards. Every compiled
+ * output stayed byte-identical.
  */
 const LessPluginFunctions = require('less-plugin-functions');
 const { less4Compatibility } = require('./less-plugin-compat.js');
@@ -42,7 +41,7 @@ function plugins () {
 
 /** The options every LESS compile in this repository uses. Spread it, then add `filename`/`paths`. */
 function lessOptions (extra = {}) {
-    return { javascriptEnabled: true, math: 'always', plugins: plugins(), ...extra };
+    return { math: 'always', plugins: plugins(), ...extra };
 }
 
 module.exports = { lessOptions, plugins, less };

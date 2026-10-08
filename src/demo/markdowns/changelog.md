@@ -190,6 +190,12 @@
   same. less-loader 13 would turn what Less warns about into webpack warnings; the build keeps those in
   its log, as before. There are 12, eight of them deprecations Less 5 will enforce, and fixing them is a
   change of its own.
+- **The stylesheet's source is ready for Less 5.** What Less warned about is fixed: six mixin calls have
+  their parentheses, two inline JavaScript expressions are gone, and so are four `:extend`s that matched
+  nothing. Inline JavaScript is now off, so a new one fails the build, and anything Less warns about shows
+  as a webpack warning. Every compiled stylesheet is byte-for-byte the same: the package's
+  `static/all.css` and `font.css`, the demo's, and the standalone `ui-render.built.css` the demo site
+  carries. That last one is also rebuilt: its committed copy had missed the date picker's `z-index`.
 - `package.json` pins npm 11.9.0, the npm that comes with Node 24.14.0, in `packageManager`. npm
   ignores the field. Corepack, once enabled for npm, runs that version.
 - **The compiler is Babel 8.** The library, the demo and the tests all compile with it. `dist/index.js`

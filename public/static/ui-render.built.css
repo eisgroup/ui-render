@@ -2135,6 +2135,7 @@
 }
 .ui-render-picker-dropdown {
   position: absolute;
+  z-index: 1050;
   box-shadow: 0 0 1px grey;
   pointer-events: none;
 }
