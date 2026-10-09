@@ -39,28 +39,33 @@ module.exports = {
         // A compile-time test (`npm run typecheck`), never run: counted, it is 0% of nothing that ships.
         '!<rootDir>/src/library/contract.agreement.ts',
     ],
+    // WHAT `npm run test:coverage` MEASURED, ROUNDED DOWN TO A WHOLE PERCENT, every number below. `global` is
+    // the files with no entry of their own: jest leaves a file with one out of it. Raised to that on 2026-10-09
+    // from 89/79/85/90 globally and 89/76/98/91 for `rules.tsx`, which were far below what the suite covers;
+    // measured in the local time zone and in UTC, as CI runs, and the two agreed on every file. A change that
+    // covers less fails here: cover what it adds, or lower the number in the same commit and say why beside it.
     coverageThreshold: {
         global: {
-            statements: 89,
-            branches: 79,
-            functions: 85,
-            lines: 90,
+            statements: 98,
+            branches: 95,
+            functions: 97,
+            lines: 99,
         },
         './src/core/engine/rules.tsx': {
-            statements: 89,
-            branches: 76,
-            functions: 98,
-            lines: 91,
+            statements: 96,
+            branches: 87,
+            functions: 100,
+            lines: 98,
         },
         './src/core/engine/mapper.tsx': {
             statements: 98,
-            branches: 93,
+            branches: 94,
             functions: 100,
             lines: 99,
         },
         './src/core/modules/form/utils.tsx': {
             statements: 100,
-            branches: 93,
+            branches: 96,
             functions: 100,
             lines: 100,
         },
@@ -72,7 +77,7 @@ module.exports = {
         },
         './src/core/components/StandaloneTabs.tsx': {
             statements: 100,
-            branches: 94,
+            branches: 97,
             functions: 100,
             lines: 100,
         },
@@ -129,13 +134,13 @@ module.exports = {
         },
         './src/core/engine/components/TableView.tsx': {
             statements: 100,
-            branches: 97,
+            branches: 98,
             functions: 100,
             lines: 100,
         },
         './src/core/engine/components/Tabs.tsx': {
             statements: 100,
-            branches: 98,
+            branches: 99,
             functions: 100,
             lines: 100,
         },
@@ -171,7 +176,7 @@ module.exports = {
         },
         './src/core/modules/form/views/AutoSave.tsx': {
             statements: 100,
-            branches: 93,
+            branches: 95,
             functions: 100,
             lines: 100,
         },
@@ -201,19 +206,19 @@ module.exports = {
         },
         './src/core/modules/upload/views/Upload.tsx': {
             statements: 100,
-            branches: 97,
+            branches: 100,
             functions: 100,
             lines: 100,
         },
         './src/core/components/InputNative.tsx': {
-            statements: 98,
-            branches: 94,
+            statements: 100,
+            branches: 96,
             functions: 100,
             lines: 100,
         },
         './src/core/components/Expand.tsx': {
-            statements: 97,
-            branches: 95,
+            statements: 100,
+            branches: 98,
             functions: 100,
             lines: 100,
         },
@@ -231,7 +236,7 @@ module.exports = {
         },
         './src/core/engine/components/LocalDraftTableRow.tsx': {
             statements: 99,
-            branches: 93,
+            branches: 94,
             functions: 100,
             lines: 100,
         },
@@ -261,11 +266,12 @@ module.exports = {
         },
         // Functions 77 → 75 when the unused `throttle` and `isAsync` went: of the eight left, the two
         // never called are the `function * () {}` and `async () => {}` literals `isFunction` takes its
-        // constructors from. Every statement is still covered.
+        // constructors from. Every statement is still covered. 75 → 80 on 2026-10-09: `debounce`'s `flush`
+        // made ten functions, and the same two are the only ones never called.
         './src/core/utils/function.ts': {
             statements: 100,
-            branches: 96,
-            functions: 75,
+            branches: 100,
+            functions: 80,
             lines: 100,
         },
         './src/core/components/Counter.tsx': {
@@ -315,6 +321,45 @@ module.exports = {
             branches: 100,
             functions: 100,
             lines: 100,
+        },
+        // These six had no entry until 2026-10-09, and each is on every document's path: the host, what the
+        // engine reads out of its forms and maps from its errors and its data (§9.9-H6), the popup scope, and
+        // `lodash-lite.ts`, which reads and writes every value a meta names.
+        './src/core/engine/documentHost.ts': {
+            statements: 98,
+            branches: 87,
+            functions: 100,
+            lines: 98,
+        },
+        './src/core/engine/formData.ts': {
+            statements: 100,
+            branches: 98,
+            functions: 100,
+            lines: 100,
+        },
+        './src/core/engine/errorMapping.ts': {
+            statements: 100,
+            branches: 100,
+            functions: 100,
+            lines: 100,
+        },
+        './src/core/engine/dataMapping.ts': {
+            statements: 100,
+            branches: 100,
+            functions: 100,
+            lines: 100,
+        },
+        './src/core/engine/popupScope.ts': {
+            statements: 100,
+            branches: 88,
+            functions: 100,
+            lines: 100,
+        },
+        './src/core/utils/lodash-lite.ts': {
+            statements: 96,
+            branches: 93,
+            functions: 100,
+            lines: 99,
         },
     },
 }

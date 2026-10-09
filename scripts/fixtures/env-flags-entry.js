@@ -1,4 +1,3 @@
-/* global globalThis */
 // Entry for scripts/test-env-flags.js. It imports the SOURCE, not dist/, so each real webpack config compiles
 // it with its own DefinePlugin / ProvidePlugin / Dotenv, and it publishes what the COMPILED code computed.
 //

@@ -721,6 +721,17 @@ Nothing to do for these:
 - JavaScript lint now runs with `--max-warnings 0`. All 22 pre-existing warnings were triaged:
   eighteen were genuine cleanups, four are suppressions carrying a comment that states why the rule
   does not apply, and three turned out to be the defects listed under Fixes.
+- JavaScript lint covers the tooling as well: `scripts/`, the browser tests in `e2e/` and the config
+  files at the root, 63 files, under the library's rules without the React ones. Its first run found
+  16 problems. Eleven were fixed, seven of them unused names in the browser tests; four came from
+  rules and globals that did not fit that code; and one, a string of prose that quotes a template, is
+  suppressed with its reason. A focused test (`.only`, `fit`, `fdescribe`) fails lint now: it ran
+  alone, the rest of its file was skipped, and the run still passed.
+- The coverage thresholds are what the suite measures, rounded down to a whole percent: 98/95/97/99
+  globally (statements, branches, functions, lines) where they were 89/79/85/90, and 96/87/100/98 for
+  the engine's `rules.tsx` where they were 89/76/98/91. Six more files have thresholds of their own:
+  the document host, the modules that read the forms and map errors and data, the popup scope and
+  `lodash-lite`.
 - Removed 14 devDependencies with no references in code, configs, scripts or CI, cutting the
   installed development tree by 14 packages. One more went later, `react-router`, which
   `react-router-dom` installs anyway. This does not affect the published package.

@@ -22,10 +22,9 @@
  * Expected values live in e2e/reference.js with [R] / [I] / [R->I] tags. The harness page's own
  * header explains why each section is shaped the way it is.
  */
-const { test, expect, BUBBLE, ANY_BUBBLE, INLINE_BUBBLE, rectOf, adjacency, isWithin, paintOf, topmostAt, paintedTopmostAt, buttonsTakeFocus } = require('./fixtures')
+const { test, expect, ANY_BUBBLE, INLINE_BUBBLE, rectOf, adjacency, isWithin, paintOf, paintedTopmostAt, buttonsTakeFocus } = require('./fixtures')
 const { BUBBLE_CLASS, INLINE, TIMING, WIDGET } = require('./reference')
 
-const bubble = (page) => page.locator(BUBBLE).first()
 /**
  * `Tooltip`'s OWN bubble, which `anyBubble` cannot express: several harness sections render a
  * static `<Tooltip show>` as a control, and those are `span.tooltip` too — visible from page load,

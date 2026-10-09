@@ -32,7 +32,7 @@ function reactAliases (name) {
     return { react, 'react-dom': reactDom, scheduler };
 }
 
-export default (env, argv) => {
+const demoConfig = (env, argv) => {
     const isProduction = argv.mode === 'production';
     const envFile = isProduction ? '.env.production' : '.env.development';
 
@@ -125,3 +125,5 @@ export default (env, argv) => {
             : undefined,
     };
 };
+
+export default demoConfig;

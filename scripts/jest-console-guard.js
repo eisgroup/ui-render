@@ -27,7 +27,7 @@ const util = require('util')
 
 const GUARDED = ['error', 'warn']
 
-let printed = []
+const printed = []
 
 for (const level of GUARDED) {
     const print = console[level]
@@ -38,13 +38,12 @@ for (const level of GUARDED) {
 }
 
 beforeEach(() => {
-    printed = []
+    printed.length = 0
 })
 
 afterEach(() => {
     if (!printed.length) return
-    const lines = printed
-    printed = []
+    const lines = printed.splice(0)
     throw new Error(
         `This test printed ${lines.length} line(s) to the console. Fix what they report, or, if the test`
         + ' expects them, replace that console method with a mock and assert them'
