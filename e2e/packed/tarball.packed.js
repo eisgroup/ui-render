@@ -157,3 +157,41 @@ test('a document in a fixed-height container is as tall as its content, and its 
     // node is a wrapper too, so only a host's can show the library losing it.
     expect(await page.locator('#host > .ui-render').evaluate(element => getComputedStyle(element).position)).toBe('relative')
 })
+
+/**
+ * PORTALS AND TIMERS, on every React of the peer range (`npm run test:pack:browser:peers` runs this page on 16.14, 17
+ * and 19 too). React 16 and 17 delegate events to the document, 18 and 19 to the root, and the parts that leave the
+ * document's DOM are where that shows: the popup opens into the wrapper's popup root, the calendar of a date field
+ * inside it into `<body>`, and a tooltip opens from a timer on hover.
+ */
+test('the popup opens, its calendar picks a date, Escape closes it, and a tooltip opens on hover', async ({ page }) => {
+    const errors = []
+    page.on('pageerror', error => errors.push(`pageerror: ${error.message}`))
+    page.on('console', message => {
+        if (message.type() === 'error') errors.push(`console: ${message.text()}`)
+    })
+    await page.goto(PAGE)
+
+    const document = page.locator('#popup > .ui-render')
+    await document.getByRole('button', { name: 'Open the popup' }).click()
+    const dialog = page.getByRole('dialog')
+    await expect(dialog).toContainText('Inside the popup')
+
+    const when = dialog.locator('input[name="when"]')
+    await when.click()
+    const calendar = page.locator('.ui-render-picker-dropdown:not(.ui-render-picker-dropdown-hidden)')
+    await expect(calendar).toBeVisible()
+    await calendar.locator('.ui-render-picker-cell-in-view .ui-render-picker-cell-inner').first().click()
+    await expect(when).not.toHaveValue('')
+    await expect(calendar).toBeHidden()
+
+    // A pick leaves focus on `<body>`, the calendar being outside the dialog, and the dialog hears Escape from inside
+    // it. 0.34.3 did the same (measured), so the user's way back is the field.
+    await when.focus()
+    await page.keyboard.press('Escape')
+    await expect(dialog).toBeHidden()
+
+    await document.getByRole('button', { name: 'Has a tooltip' }).hover()
+    await expect(page.getByRole('tooltip')).toHaveText('The tooltip text')
+    expect(errors).toEqual([])
+})

@@ -651,6 +651,11 @@ Nothing to do for these:
 
 #### Tests and CI
 
+- **The published package is driven in a browser on every React of the peer range.** The packed tarball's
+  browser smoke ran on React 18 only; it now runs on 16.14, 17 and 19 as well, in Chromium, mounting through
+  `ReactDOM.render` on 16 and 17 as a 0.34.x host does. It also opens a popup, picks a date in the calendar
+  inside it, closes it with Escape and opens a tooltip on hover: the parts that leave the document's DOM or
+  run on a timer, where React 16 and 17 handle events differently from 18 and 19.
 - Added behavior contracts for submit, validation, dynamic `showIf`, data updates,
   upload/download, popup actions, API error handling, and nested `dataKind` add/remove flows.
 - Added focused contracts for form lifecycle synchronization, meta/action transformation,

@@ -303,6 +303,13 @@ jobs:
         if: success() || failure()
         run: npm run test:pack:browser
 
+      # The same page on every other React of the peer range, 16.14, 17 and 19, from the jest legs' fixtures. Every
+      # 0.34.x host runs 16.14, which no other step drives in a browser: the jest legs run jsdom and the demo mounts
+      # through createRoot. On 16 and 17 the page mounts through ReactDOM.render, as those hosts do.
+      - name: Smoke the packed tarball in a browser on React 16.14, 17 and 19
+        if: success() || failure()
+        run: npm run test:pack:browser:peers
+
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@v7
