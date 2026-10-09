@@ -38,14 +38,21 @@
           ]
         },
         "items": {
-          "description": "Nested child nodes. MUST be an array: the engine maps over it, so any other type throws during render.",
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "$ref": "#/$defs/nodeEntry"
-          }
+          "description": "Nested child nodes. MUST be an array, or a `{ name }` value transform that resolves to one: the engine maps over it, so any other type throws during render.",
+          "anyOf": [
+            {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "$ref": "#/$defs/nodeEntry"
+              }
+            },
+            {
+              "$ref": "#/$defs/valueRef"
+            }
+          ]
         },
         "relativeData": {
           "description": "false stops this node resolving its local data by `name` (a Table still does), so it keeps the data it inherited. In a value transform, a render* definition or a showIf, false reads `name` from the root data.json. Inherited by descendants; a descendant may opt back in with true.",
@@ -59,27 +66,48 @@
           "$ref": "#/$defs/showIf"
         },
         "headers": {
-          "description": "Table column definitions, each a node-shaped object (`id`, `label`, `renderCell`, ...). MUST be an array: the Table component maps over it.",
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "$ref": "#/$defs/nodeEntry"
-          }
+          "description": "Table column definitions, each a node-shaped object (`id`, `label`, `renderCell`, ...). MUST be an array, or a `{ name }` value transform that resolves to one: the Table component maps over it.",
+          "anyOf": [
+            {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "$ref": "#/$defs/nodeEntry"
+              }
+            },
+            {
+              "$ref": "#/$defs/valueRef"
+            }
+          ]
         },
         "extraHeaders": {
-          "description": "Additional Table column definitions appended after `headers`. MUST be an array.",
-          "type": [
-            "array",
-            "null"
+          "description": "Additional Table column definitions appended after `headers`. MUST be an array, or a `{ name }` value transform that resolves to one.",
+          "anyOf": [
+            {
+              "type": [
+                "array",
+                "null"
+              ]
+            },
+            {
+              "$ref": "#/$defs/valueRef"
+            }
           ]
         },
         "extraItems": {
-          "description": "Additional Table rows appended after the data rows. MUST be an array.",
-          "type": [
-            "array",
-            "null"
+          "description": "Additional Table rows appended after the data rows. MUST be an array, or a `{ name }` value transform that resolves to one.",
+          "anyOf": [
+            {
+              "type": [
+                "array",
+                "null"
+              ]
+            },
+            {
+              "$ref": "#/$defs/valueRef"
+            }
           ]
         },
         "meta": {
@@ -124,7 +152,10 @@
         },
         "verify": {
           "description": "Cross-field validation, composed ahead of `validate`. `validate` here is one {name, args} definition or a list of them; remaining properties are passed to each validator as options.",
-          "type": "object",
+          "type": [
+            "object",
+            "null"
+          ],
           "properties": {
             "validate": {
               "description": "One cross-field validator definition, or a list of them."
@@ -141,7 +172,10 @@
         },
         "filterItems": {
           "description": "Row filter definitions applied to the node's collection.",
-          "type": "array"
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "tooltip": {
           "description": "Wraps the rendered node in a tooltip. A string is the tooltip title; an object is passed to the tooltip component."
@@ -225,6 +259,9 @@
         },
         {
           "$ref": "#/$defs/node"
+        },
+        {
+          "type": "null"
         }
       ]
     },
@@ -254,6 +291,9 @@
               "$ref": "#/$defs/functionRef"
             }
           }
+        },
+        {
+          "type": "null"
         }
       ]
     },
@@ -264,6 +304,9 @@
         },
         {
           "type": "object"
+        },
+        {
+          "type": "null"
         }
       ]
     },
@@ -273,7 +316,14 @@
           "type": "string"
         },
         {
+          "type": "number"
+        },
+        {
           "$ref": "#/$defs/valueRef"
+        },
+        {
+          "type": "object",
+          "description": "An object whose truthy keys are used as class names."
         },
         {
           "type": "array"
@@ -285,7 +335,7 @@
       "description": "A class-name value. Passed to `classNames()`, which accepts a string or number, an array of those (recursively), an object whose truthy keys are used, or null."
     },
     "valueRef": {
-      "description": "Single-key value transform: replaced by the value found at `name` before rendering.",
+      "description": "Single-key value transform: replaced by the value found at `name` before rendering. Only `name`, with an optional `relativeData`: the engine transforms an object with no other key, and passes any other on as it is.",
       "type": "object",
       "required": [
         "name"
@@ -300,7 +350,8 @@
             "null"
           ]
         }
-      }
+      },
+      "additionalProperties": false
     },
     "view": {
       "description": "Component type. The listed values are the vocabulary the engine declares; an unlisted string is accepted by this schema but renders a \"field does not exist\" placeholder, so the dev-mode validator reports it.",
@@ -411,6 +462,9 @@
         },
         {
           "type": "string"
+        },
+        {
+          "type": "null"
         }
       ]
     },
@@ -430,6 +484,9 @@
         },
         {
           "type": "string"
+        },
+        {
+          "type": "null"
         }
       ]
     }

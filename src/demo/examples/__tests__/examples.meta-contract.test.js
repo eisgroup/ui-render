@@ -297,9 +297,29 @@ const AGREEMENT_TABLE = [
     // classNames() recurses over arrays and reads truthy object keys.
     { label: 'className: array', meta: { view: 'Text', className: ['a', 'b'] }, engineAccepts: true },
     { label: 'styles: array', meta: { view: 'Text', styles: ['a'] }, engineAccepts: true },
+    // The value transform: an array attribute given as `{ name }`, with an optional `relativeData`, is replaced
+    // by the array at that path before the engine maps over it. Measured 2026-10-09 on the published bundle;
+    // the schema, the validator and the types all rejected it until then.
+    { label: 'items: value transform', meta: { view: 'Col', items: { name: 'blocks' } }, engineAccepts: true },
+    { label: 'headers: value transform', meta: { view: 'Table', name: 'rows', headers: { name: 'cols' } }, engineAccepts: true },
+    { label: 'extraHeaders: value transform', meta: { view: 'Table', name: 'rows', extraHeaders: { name: 'groups' } }, engineAccepts: true },
+    { label: 'extraItems: value transform', meta: { view: 'Table', name: 'rows', extraItems: { name: 'totals', relativeData: false } }, engineAccepts: true },
+    // More nulls the engine deletes before rendering, which the schema rejected.
+    { label: 'onClick: null', meta: { view: 'Button', onClick: null }, engineAccepts: true },
+    { label: 'type and format: null', meta: { view: 'Input', name: 'a', type: null, format: null }, engineAccepts: true },
+    { label: 'verify and filterItems: null', meta: { view: 'Input', name: 'a', verify: null, filterItems: null }, engineAccepts: true },
+    { label: 'renderCell and mapOptions: null', meta: { view: 'Table', name: 'rows', renderCell: null, mapOptions: null }, engineAccepts: true },
+    // classNames() takes a number, and an object whose truthy keys are the class names.
+    { label: 'className: object', meta: { view: 'Text', className: { 'my-bold': true, 'my-off': false } }, engineAccepts: true },
+    { label: 'className: number', meta: { view: 'Text', className: 5 }, engineAccepts: true },
+    { label: 'styles: object', meta: { view: 'Text', styles: { 'my-bold': true } }, engineAccepts: true },
     // Genuine crashes -- the shapes the schema exists to catch.
     { label: 'items: string', meta: { view: 'Text', items: 'nope' }, engineAccepts: false },
     { label: 'headers: number', meta: { view: 'Table', name: 'rows', headers: 7 }, engineAccepts: false },
+    // Not a value transform: an object with another key is passed on, and the engine throws mapping it.
+    { label: 'items: node object', meta: { view: 'Col', items: { name: 'blocks', view: 'Text' } }, engineAccepts: false },
+    // An array handler reaches React as the listener, and a click throws.
+    { label: 'onClick: array', meta: { view: 'Button', onClick: ['submit'] }, engineAccepts: false },
 ]
 
 describe('published schema and dev validator agree', () => {

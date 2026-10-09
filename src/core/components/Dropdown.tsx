@@ -73,7 +73,7 @@ localiseTranslation({
  *
  * Same mechanism as `Tooltip`'s list, and for the same reason — see docs/SUPPORTED-PROPS.md.
  */
-const DROPPED_PROPS = [
+export const DROPPED_PROPS = [
     // §9.7-F1 step 3 part 2 removed these three features, on the evidence that nothing declares
     // them, and these are all the names that belonged to them.
     'search', 'searchInput', 'searchQuery', 'onSearch', 'onSearchChange', 'deburr',

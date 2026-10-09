@@ -38,12 +38,12 @@ item has the details.
 - **Check flows that drive a select from the keyboard.** The arrows move a highlight and no longer
   change the value or call `onChange`. Enter, Space or Tab chooses the highlighted option. Escape and
   a click elsewhere choose nothing, and focus no longer opens the list. (Select and Dropdown)
-- **Find removed props in your metas yourself.** On a select: `search`, `multiple`,
-  `allowAdditions`, `clearable` and their companions. On a tooltip: `on`, `hoverable`,
+- **Find the removed props your metas still carry with `validateMeta`.** On a select: `search`,
+  `multiple`, `allowAdditions`, `clearable` and their companions. On a tooltip: `on`, `hoverable`,
   `mouseEnterDelay` and 16 more. On a table: `as`, `celled`, `textAlign`, `verticalAlign` and
-  `fixedHeader`. The published bundle drops them without a warning, and `validateMeta` does not
-  report them. `docs/SUPPORTED-PROPS.md`, in the package, records each of them. (Props removed from
-  Select, Tooltip and Table; Table rendering)
+  `fixedHeader`. The published bundle drops them without a warning; turn on the `validateMeta` prop
+  and it warns about each one (`DROPPED_PROP`), with its JSON path. `docs/SUPPORTED-PROPS.md`, in the
+  package, records each of them. (Meta contract; Props removed from Select, Tooltip and Table)
 - **Do not rely on a click to open a tooltip.** It opens on hover, after 500 ms by default, and on
   keyboard focus. `on` is ignored, and a tap opens nothing. A node with a `tooltip` is now wrapped in
   a `span.tooltip-host` as wide as its content, so in a column it no longer stretches. (Props removed
@@ -104,6 +104,23 @@ Nothing to do for these:
   shapes the renderer genuinely needs: `items`, `headers`, `extraHeaders` and `extraItems` must be
   arrays and `name` must be a string. The suggested vocabularies are checked against the
   renderer's own definitions, so they cannot drift from it.
+- **`validateMeta` points a host upgrading from 0.34 at the props it lost.** A prop
+  `semantic-ui-react` read and the in-house select, table or tooltip does not is a `DROPPED_PROP`
+  warning, at its path (`items[2].search`, `items[0].tooltip.on`). The published bundle strips these
+  without a word, so this is the one place they show; the lists are the components' own.
+- **The schema, `validateMeta` and the types agree with the renderer on more shapes.** Measured on
+  the published bundle:
+  - `items`, `headers`, `extraHeaders` and `extraItems` given as a value transform, `{ name }` with
+    an optional `relativeData`, render the array at that path. All three rejected it, and
+    `validateMeta` called it an error. An object with any other key is still an error: the renderer
+    throws mapping it.
+  - `null` on a handler, `type`, `format`, `normalize`, `parse`, `verify`, `filterItems`, a
+    `render*` renderer or `mapOptions` is deleted before rendering; the schema rejected it.
+  - `className` and `styles` take a number, or an object whose truthy keys are the class names, as
+    `classNames()` does; the schema and the types rejected both.
+  - **An array handler is an error now**, `HANDLER_ARRAY`: `onClick: ['submit']` never became a
+    function, React reported the array as the listener, and a click threw. The published types
+    allowed one; they no longer do.
 - New opt-in `validateMeta` prop runs the same rules at runtime and reports the **JSON path** of
   the offending node — `items[3].items[0].name` — instead of leaving a stack trace inside a
   minified bundle. `error` findings are shapes the renderer fails on; `warning` findings are nodes

@@ -162,7 +162,9 @@ node rather than leaving a stack trace inside a minified bundle:
 
 `error` means the engine will fail on that node; `warning` means it will render, but silently
 degraded — an unknown `view` becomes a "field does not exist" placeholder, an unknown
-`render*` method falls back to plain text. Pass a function instead of `true` to collect the
+`render*` method falls back to plain text, and a prop the select, table or tooltip no longer reads
+(`DROPPED_PROP`, see `docs/SUPPORTED-PROPS.md`) is ignored. Upgrading from 0.34, turn it on once
+to find those. Pass a function instead of `true` to collect the
 problems yourself (`validateMeta={problems => …}`), and keep it a stable reference: the check runs
 again whenever `meta` or this prop changes identity. The reporter never throws into the host
 application, whatever it finds.

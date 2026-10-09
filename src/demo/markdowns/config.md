@@ -193,7 +193,12 @@ a stack trace:
   and easy mistake: the value renderers are `Currency`, `Percent`, `Double5`, `Float`, `String`,
   `Date`, `Title+Input`, while the lower-case `double5`, `integer`, `percent`… names belong to
   `format` / `normalize` / `parse`); a `showIf` that is neither a key path string nor an object is
-  ignored, so the node always renders; a malformed `metaVersion` is reported, and changes nothing.
+  ignored, so the node always renders; a malformed `metaVersion` is reported, and changes nothing;
+  a prop the select, table or tooltip no longer reads (`DROPPED_PROP`: `search` on a select, `celled`
+  on a table, `on` in a `tooltip` object, and the rest `docs/SUPPORTED-PROPS.md` lists) is ignored.
+- An array attribute given as a value transform, `{ name: 'path' }` with an optional
+  `relativeData`, is not an error: it resolves to the array at that path. An array handler,
+  `onClick: ['submit']`, is one (`HANDLER_ARRAY`): only a string or an object becomes a function.
 
 Handler names (`onClick`, `onChange`, `onDone`, `onFocus`, `onBlur`) are deliberately **not**
 checked: they resolve against built-in actions, the host's `methods` prop and renderer instance

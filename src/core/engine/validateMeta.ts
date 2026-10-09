@@ -1,3 +1,6 @@
+import { DROPPED_PROPS as DROPDOWN_DROPPED } from '../components/Dropdown'
+import { DROPPED_PROPS as TABLE_DROPPED } from '../components/Table'
+import { DROPPED_PROPS as TOOLTIP_DROPPED } from '../components/Tooltip'
 import { FIELD } from '../modules/variables/fields'
 import { joinPath } from './metaPath'
 
@@ -28,12 +31,23 @@ import { joinPath } from './metaPath'
  *   - `extraHeaders` not an array   -> TypeError: extraHeaders.map is not a function
  *   - truthy non-string `name`      -> TypeError: resolvedName.includes is not a function
  *   - root not a plain object       -> nothing renders at all
+ *   - an array handler (`onClick: ['submit']`) -> React: "Expected `onClick` listener to be a
+ *     function", and the click throws. Only a string or an object becomes a function.
+ * An array attribute given as a value transform, `{ name: 'path' }`, is NOT an error: the engine
+ * replaces it with the array at that path before mapping, and measured, `items`, `headers`,
+ * `extraHeaders` and `extraItems` so given render their data in 0.34.3 and now. It was reported
+ * as one until 2026-10-09.
  * A `null` value is never reported: `transformConfig` runs the meta through
  * `sanitizeResponse`, which deletes null and undefined attributes before anything
  * renders, so `items: null` is measurably as harmless as no `items` at all.
  * `warning` severity is the opposite case: the engine accepts the node and
  * silently degrades (a placeholder instead of a component, plain text instead of
  * a formatted value), which is exactly what is hard to notice without a path.
+ *
+ * MIGRATION WARNINGS. A prop `semantic-ui-react` read and the in-house select, table or tooltip does not is
+ * a `DROPPED_PROP` warning: the component strips it and the published bundle says nothing, so this is
+ * where a host upgrading from 0.34.x can find the ones its metas still carry. The lists are the
+ * components' own `DROPPED_PROPS`, so the two cannot drift.
  *
  * Deliberately NOT checked: `onClick` / `onChange` / `onDone` / `onFocus` / `onBlur` names. They resolve
  * against built-in actions *plus* the host's `methods` prop *plus* renderer
@@ -68,6 +82,8 @@ export const META_PROBLEM = {
     VIEW_NOT_STRING: 'VIEW_NOT_STRING',
     UNKNOWN_RENDER_METHOD: 'UNKNOWN_RENDER_METHOD',
     SHOW_IF_INVALID: 'SHOW_IF_INVALID',
+    HANDLER_ARRAY: 'HANDLER_ARRAY',
+    DROPPED_PROP: 'DROPPED_PROP',
 }
 
 /** Exported for its unit tests: no other module imports it. */
@@ -99,7 +115,27 @@ type WalkContext = { problems: MetaProblem[], views: string[], renderMethods: st
 /** Attributes the engine maps over, so a non-array value throws during render. */
 const ARRAY_ATTRIBUTES = ['items', 'headers', 'extraHeaders', 'extraItems']
 
+/** The handlers a meta names, which only a string or an object turns into a function. */
+const HANDLER_ATTRIBUTES = ['onClick', 'onChange', 'onDone', 'onFocus', 'onBlur']
+
 const isPlainObject = (value: unknown): value is MetaNode => !!value && typeof value === 'object' && !Array.isArray(value)
+
+/**
+ * `{ name: 'path' }`, with an optional `relativeData`: replaced by the value at `name` before rendering (the value
+ * transform). Exactly the engine's test (`transforms.ts`): an object with any other key is passed on as it is.
+ */
+const isValueTransform = (value: unknown) => isPlainObject(value) && typeof value.name === 'string' &&
+    Object.keys(value).every(key => key === 'name' || (key === 'relativeData' && value.relativeData != null))
+
+/** The component a node renders whose `DROPPED_PROPS` apply to the node's own keys, if any. */
+function droppedFor (node: MetaNode): { component: string, names: readonly string[] } | null {
+    if (node.view === FIELD.TYPE.SELECT || node.view === FIELD.TYPE.DROPDOWN ||
+        (node.view === FIELD.TYPE.INPUT && node.type === 'select')) {
+        return { component: 'the select', names: DROPDOWN_DROPPED }
+    }
+    if (node.view === FIELD.TYPE.TABLE) return { component: 'the table', names: TABLE_DROPPED }
+    return null
+}
 
 /**
  * View names and render-method names are read at call time, never at module load.
@@ -207,11 +243,37 @@ function walkNode (node: MetaNode, path: string, context: WalkContext, isRoot: b
 
     ARRAY_ATTRIBUTES.forEach(attribute => {
         if (Object.prototype.hasOwnProperty.call(node, attribute) &&
-            node[attribute] != null && !Array.isArray(node[attribute])) {
+            node[attribute] != null && !Array.isArray(node[attribute]) && !isValueTransform(node[attribute])) {
             report(attribute, META_SEVERITY.ERROR, META_PROBLEM.NOT_AN_ARRAY,
-                `${attribute} must be an array, got ${describe(node[attribute])} — the engine maps over it and throws on any other type`)
+                `${attribute} must be an array, or a { name } value transform, got ${describe(node[attribute])} — the engine maps over it and throws on any other type`)
         }
     })
+
+    HANDLER_ATTRIBUTES.forEach(attribute => {
+        if (Array.isArray(node[attribute])) {
+            report(attribute, META_SEVERITY.ERROR, META_PROBLEM.HANDLER_ARRAY,
+                `${attribute} must be an action name or an action object, got an array — it never becomes a function, and a click on it throws`)
+        }
+    })
+
+    const dropped = droppedFor(node)
+    if (dropped) {
+        dropped.names.forEach(name => {
+            if (Object.prototype.hasOwnProperty.call(node, name)) {
+                report(name, META_SEVERITY.WARNING, META_PROBLEM.DROPPED_PROP,
+                    `"${name}" is not read by ${dropped.component} any more — semantic-ui-react read it in 0.34.x; it is stripped and ignored (docs/SUPPORTED-PROPS.md)`)
+            }
+        })
+    }
+    if (isPlainObject(node.tooltip)) {
+        const tooltip = node.tooltip
+        TOOLTIP_DROPPED.forEach(name => {
+            if (Object.prototype.hasOwnProperty.call(tooltip, name)) {
+                report(`tooltip.${name}`, META_SEVERITY.WARNING, META_PROBLEM.DROPPED_PROP,
+                    `"${name}" is not read by the tooltip any more — semantic-ui-react read it in 0.34.x; it is stripped and ignored (docs/SUPPORTED-PROPS.md)`)
+            }
+        })
+    }
 
     if (node.showIf != null && typeof node.showIf !== 'string' && !isPlainObject(node.showIf)) {
         report('showIf', META_SEVERITY.WARNING, META_PROBLEM.SHOW_IF_INVALID,

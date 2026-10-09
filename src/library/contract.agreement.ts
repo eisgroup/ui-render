@@ -45,6 +45,21 @@ const showIfNull: Meta = { view: 'Text', showIf: null }
 /* classNames() recurses over arrays and reads truthy object keys. */
 const classNameArray: Meta = { view: 'Text', className: ['a', 'b'] }
 const stylesArray: Meta = { view: 'Text', styles: ['a'] }
+const classNameObject: Meta = { view: 'Text', className: { 'my-bold': true, 'my-off': false } }
+const classNameNumber: Meta = { view: 'Text', className: 5 }
+const stylesObject: Meta = { view: 'Text', styles: { 'my-bold': true } }
+
+/* The value transform on an array attribute, resolved before the engine maps over it. */
+const itemsValueTransform: Meta = { view: 'Col', items: { name: 'blocks' } }
+const headersValueTransform: Meta = { view: 'Table', name: 'rows', headers: { name: 'cols' } }
+const extraHeadersValueTransform: Meta = { view: 'Table', name: 'rows', extraHeaders: { name: 'groups' } }
+const extraItemsValueTransform: Meta = { view: 'Table', name: 'rows', extraItems: { name: 'totals', relativeData: false } }
+
+/* More nulls the engine deletes before rendering. */
+const onClickNull: Meta = { view: 'Button', onClick: null }
+const typeAndFormatNull: Meta = { view: 'Input', name: 'a', type: null, format: null }
+const verifyAndFilterItemsNull: Meta = { view: 'Input', name: 'a', verify: null, filterItems: null }
+const renderCellAndMapOptionsNull: Meta = { view: 'Table', name: 'rows', renderCell: null, mapOptions: null }
 
 /* ---------------------------------------------------------------------------------------------
  * Genuine crashes — the shapes the contract exists to catch.
@@ -54,6 +69,10 @@ const stylesArray: Meta = { view: 'Text', styles: ['a'] }
 const itemsString: Meta = { view: 'Text', items: 'nope' }
 // @ts-expect-error headers must be a list of nodes, not a number (the engine throws on this)
 const headersNumber: Meta = { view: 'Table', name: 'rows', headers: 7 }
+// @ts-expect-error not a value transform: an object with another key is passed on, and the engine throws mapping it
+const itemsNodeObject: Meta = { view: 'Col', items: { name: 'blocks', view: 'Text' } }
+// @ts-expect-error an array handler reaches React as the listener, and a click throws
+const onClickArray: Meta = { view: 'Button', onClick: ['submit'] }
 
 /* ---------------------------------------------------------------------------------------------
  * PERMISSIVENESS, pinned in the accepting direction. A contract stricter than the engine reddens an
@@ -130,6 +149,10 @@ const validationReportIsPublished: Assignable<ReturnType<typeof mapErrorObjectTo
 /* Reference every binding so `noUnusedLocals` stays available to whoever turns it on. */
 void itemsNull; void headersNull; void extraHeadersNull; void extraItemsNull; void nameNull
 void showIfNull; void classNameArray; void stylesArray; void itemsString; void headersNumber
+void classNameObject; void classNameNumber; void stylesObject
+void itemsValueTransform; void headersValueTransform; void extraHeadersValueTransform; void extraItemsValueTransform
+void onClickNull; void typeAndFormatNull; void verifyAndFilterItemsNull; void renderCellAndMapOptionsNull
+void itemsNodeObject; void onClickArray
 void undeclaredKeys; void hostSpecificView; void rootKeys; void nested
 void rendererByName; void rendererByObject; void rendererBad
 void viewIsNotJustString; void renderIsNotJustString; void actionIsNotJustString
