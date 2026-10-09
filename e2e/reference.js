@@ -482,11 +482,13 @@ const DROPDOWN = {
      */
     WIRED_ARIA: { always: ['aria-haspopup'], whileOpen: ['aria-controls', 'aria-activedescendant'] },
     /**
-     * [R] What is still absent here, and why it is not the control's to supply: the `dropdown`
-     * example's meta declares no `label`, so the control has no name to carry. A dropdown that
-     * declares one carries it as `aria-label`, on the combobox and its list (`Dropdown.gate.test.js`).
+     * [I] The name the control carries here. The `dropdown` example's meta declares no `label`, so the
+     * control is named after its `name`, as the native `Select` names its control, and the combobox and
+     * its list both carry it as `aria-label`. A declared `label` comes first, and a meta's own
+     * `aria-label` or `aria-labelledby` above both (`Dropdown.test.js`). Until 2026-10-09 this entry
+     * recorded both attributes as absent: a dropdown without a `label` had no name at all.
      */
-    UNNAMED_IN_THIS_EXAMPLE: ['aria-labelledby', 'aria-label'],
+    NAME_IN_THIS_EXAMPLE: 'Select category',
 }
 
 // ---------------------------------------------------------------------------------------------
