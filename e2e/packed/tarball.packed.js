@@ -40,7 +40,7 @@ test('the published bundle and stylesheet render, respond and stay inside their 
     })
     await page.goto(PAGE)
 
-    const widget = page.locator('.ui-render')
+    const widget = page.locator('#host > .ui-render')
     await expect(widget.getByText('packed tarball smoke')).toBeVisible()
     expect(await page.evaluate(() => window.__reactVersions), 'the host React rendered it').toEqual([EXPECT_REACT])
 
@@ -66,5 +66,61 @@ test('the published bundle and stylesheet render, respond and stay inside their 
     await expect(widget.getByRole('option')).not.toHaveCount(0)
 
     await expect(widget.getByText('first row')).toBeVisible()
+    expect(errors).toEqual([])
+})
+
+/**
+ * THE LONG SELECT, against what 0.34.3 did (scripts/fixtures/packed-meta.js, `listMeta`), in a container scaled
+ * to 0.8 (scripts/test-packed-browser.js), which is where a list that scrolls by viewport pixels goes wrong. It
+ * opens with its selection in view, keeps the keyboard cursor in view, chooses the highlighted option when Tab
+ * leaves it and closes, and its options are legible on its `inverted` background.
+ */
+test('the long select keeps its selection and cursor in view, Tab chooses and closes, and it is legible', async ({ page }) => {
+    const errors = []
+    page.on('pageerror', error => errors.push(`pageerror: ${error.message}`))
+    await page.goto(PAGE)
+
+    const document = page.locator('#list > .ui-render')
+    const control = document.getByRole('combobox')
+    const list = document.getByRole('listbox')
+    // Whether the element fills a whole row of the list's visible window, measured from both boxes.
+    const inView = option => option.evaluate(element => {
+        const menu = element.closest('[role="listbox"]').getBoundingClientRect()
+        const box = element.getBoundingClientRect()
+        return box.top >= menu.top - 1 && box.bottom <= menu.bottom + 1
+    })
+
+    await control.click()
+    await expect(control).toHaveAttribute('aria-expanded', 'true')
+    const selected = list.locator('[role="option"][aria-selected="true"]')
+    await expect(selected).toHaveText('Option 30')
+    expect(await inView(selected), 'the selection opens in view').toBe(true)
+
+    for (let i = 0; i < 6; i += 1) await control.press('ArrowDown')
+    const cursor = page.locator(`#${await control.getAttribute('aria-activedescendant')}`)
+    await expect(cursor).toHaveText('Option 36')
+    expect(await inView(cursor), 'the cursor stays in view').toBe(true)
+
+    // Legible: the option's label against the list's background, by the WCAG contrast ratio. An option that lost
+    // the theme's `.text` colour was near-black on the inverted dark grey, about 1.6:1.
+    const contrast = await cursor.locator('.text').evaluate(element => {
+        const channels = colour => colour.match(/[\d.]+/g).slice(0, 3).map(Number)
+        const luminance = colour => {
+            const [r, g, b] = channels(colour).map(value => {
+                const c = value / 255
+                return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+            })
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b
+        }
+        const text = luminance(getComputedStyle(element).color)
+        const background = luminance(getComputedStyle(element.closest('[role="listbox"]')).backgroundColor)
+        return (Math.max(text, background) + 0.05) / (Math.min(text, background) + 0.05)
+    })
+    expect(contrast, 'the option label is legible on the list').toBeGreaterThan(4.5)
+
+    await control.press('Tab')
+    await expect(document.locator('input[name="after"]')).toBeFocused()
+    await expect(control).toHaveAttribute('aria-expanded', 'false')
+    await expect(control).toHaveText('Option 36')
     expect(errors).toEqual([])
 })

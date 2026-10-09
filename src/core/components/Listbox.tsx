@@ -42,6 +42,17 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
  *   they are here — this is the half of the keyboard matrix that had to be BUILT rather than
  *   ported, and the half no previous test covered.
  *
+ * THREE BEHAVIOURS KEPT, which the first version of this control lost and the 2026-10-08 audit found
+ * in a browser, against the published 0.34.3:
+ *   - the list scrolls the selected option into view as it opens and keeps the cursor in view as it
+ *     moves (`semantic-ui-react`'s `scrollSelectedItemIntoView`);
+ *   - it closes when focus leaves it, and chooses the highlighted option on the way out, as Tab does in
+ *     the select-only combobox pattern (the library's `closeOnBlur` with `selectOnBlur`, both on by
+ *     default; it had chosen it already, because its arrows committed);
+ *   - an option's label sits in a `span.text`, which is what the theme colours:
+ *     `.ui.selection.dropdown .text` and its `.inverted` variant, both `!important`. Without the span an
+ *     option in an `inverted` container was near-black on dark grey.
+ *
  * THE COMBOBOX PATTERN, AND WHY IT IS THE `.text` THAT TAKES FOCUS. The control follows WAI-ARIA's
  * select-only combobox: the element that takes focus is a `combobox` (`aria-haspopup`, `aria-expanded`,
  * `aria-controls` and `aria-activedescendant` on it, the field's label as its name), and the options sit
@@ -90,6 +101,10 @@ export type ListboxProps = {
     onChange?: (event: React.SyntheticEvent, data: { value: unknown }) => void
     onClose?: (event: ListboxCloseEvent) => void
     onOpen?: () => void
+    /** The dropdown's own, from the rest bag: the form adapter's, which marks a field touched. Called first. */
+    onBlur?: (event: React.FocusEvent<HTMLDivElement>) => void
+    /** The dropdown's own, from the rest bag. Called first. */
+    onMouseDown?: (event: React.MouseEvent<HTMLDivElement>) => void
     [key: string]: unknown
 }
 
@@ -115,7 +130,10 @@ let sequence = 0
 // measured on the server, where no list opens.
 const useCommitEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect
 
-/** The index the cursor should land on for a key, or -1 when the key does not move it. */
+/**
+ * The index the cursor should land on for a key, or -1 when the key does not move it. From no cursor
+ * (`current` -1), a step down lands on the first option and a step up on the last.
+ */
 function cursorFor (key: string, current: number, options: ListboxOption[]): number {
     const step = CURSOR_KEYS[key]
     if (step === undefined) return -1
@@ -131,7 +149,9 @@ function cursorFor (key: string, current: number, options: ListboxOption[]): num
     // product already had. `UIRender.listbox-behavior` pinned wrapping as the contract, and the
     // swap's job is to keep it where there is no defect to fix.
     const count = options.length
-    let next = current
+    // Upward from no cursor starts past the end, so the first step up lands on the last option and not
+    // the one before it.
+    let next = current === -1 && (step as number) < 0 ? count : current
     // Casts, not guards: the two `null` steps are Home's and End's, which returned above.
     for (let moved = 0; moved < Math.abs(step as number); moved += 1) {
         let candidate = next
@@ -195,6 +215,8 @@ export default function Listbox ({
     onChange,
     onClose,
     onOpen,
+    onBlur,
+    onMouseDown,
     ...props
 }: ListboxProps) {
     const [open, setOpen] = React.useState(false)
@@ -220,6 +242,10 @@ export default function Listbox ({
 
     const selectedIndex = options.findIndex(option => String(option.value) === String(value))
     const selected = selectedIndex === -1 ? undefined : options[selectedIndex]
+    // The cursor as far as the CURRENT options go. They can shrink while the list is open (a cascading
+    // reset, new data), and a cursor past the end pointed `aria-activedescendant` at no element and made
+    // Enter do nothing. Read in place of `cursor` everywhere below; the arrows start again from it.
+    const active = cursor < options.length ? cursor : -1
 
     const close = (event?: ListboxCloseEvent) => {
         setOpen(false)
@@ -293,17 +319,17 @@ export default function Listbox ({
 
         if (key === 'Enter' || key === ' ') {
             event.preventDefault()
-            commit(event, cursor)
+            commit(event, active)
             return
         }
 
-        // `cursor`, not `cursor === -1 ? selectedIndex : cursor` as three earlier expressions here
+        // `active` (the cursor), not `cursor === -1 ? selectedIndex : cursor` as three earlier expressions here
         // read. The fallback could never fire: `openWith` seeds the cursor from the selection and
         // the open-on-arrow branch above computes it explicitly, so while the list is open the
         // cursor is `-1` only when `selectedIndex` is `-1` as well. The one path that does leave a
         // `-1` cursor open — every option disabled — behaved identically either way, because
         // `cursorFor` returns `-1` and `commit` rejects an unselectable option.
-        const next = cursorFor(key, cursor, options)
+        const next = cursorFor(key, active, options)
         if (next !== -1) {
             event.preventDefault()
             setCursor(next)
@@ -316,7 +342,7 @@ export default function Listbox ({
             const fresh = Date.now() - now.at > TYPEAHEAD_RESET_MS
             const prefix = (fresh ? '' : now.prefix) + key
             typed.current = { prefix, at: Date.now() }
-            const match = typeaheadFor(prefix, cursor, options)
+            const match = typeaheadFor(prefix, active, options)
             if (match !== -1) {
                 event.preventDefault()
                 setCursor(match)
@@ -341,6 +367,83 @@ export default function Listbox ({
         const above = dropdown.top
         setFlipped(menu.current.getBoundingClientRect().height > below && above > below)
     }, [open, upward])
+
+    /**
+     * KEEPING THE CURSOR IN VIEW. Opening puts the cursor on the selected option, so this scrolls the
+     * selection into view as the list opens, and then follows the cursor as the keys move it, by the
+     * least scroll that shows the whole option — what `semantic-ui-react` did. Only the list scrolls,
+     * never the page.
+     *
+     * Measured with boxes rather than `offsetTop`, which counts from the nearest positioned ancestor and
+     * so depends on the menu's `position` in the host's stylesheet. But boxes are in viewport pixels,
+     * which a scaled ancestor scales (CSS `zoom`, `transform: scale`, an animation), while `scrollTop`
+     * and `clientHeight` are the list's own pixels, which it does not. So the boxes are divided by the
+     * list's scale first: without that, a scaled list opened with its selection out of view and the
+     * arrows walked the cursor out of view, measured in Chromium, Firefox and WebKit.
+     */
+    useCommitEffect(() => {
+        if (!open || active === -1) return
+        // Casts, not guards: an open list is mounted with every option, and `active` is one of them.
+        const list = menu.current as HTMLDivElement
+        const option = list.children[active]
+        const frame = list.getBoundingClientRect()
+        const scale = list.offsetHeight ? frame.height / list.offsetHeight : 1
+        const box = option.getBoundingClientRect()
+        // The option's edges from the top of the list's visible window, in the list's own pixels.
+        const top = (box.top - frame.top) / scale - list.clientTop
+        const bottom = (box.bottom - frame.top) / scale - list.clientTop
+        if (top < 0) list.scrollTop += top
+        else if (bottom > list.clientHeight) list.scrollTop += bottom - list.clientHeight
+    }, [open, active])
+
+    /**
+     * CLOSING WHEN FOCUS LEAVES, as `semantic-ui-react` did by default: Tab, Shift+Tab or a script's
+     * `blur()` used to leave the list open, over the fields below it, and a second dropdown could open
+     * beside it. Focus staying inside the dropdown keeps it open, and so does the window losing focus,
+     * which leaves the control as the document's active element.
+     *
+     * The highlighted option is CHOSEN on the way out, when the keys moved the highlight off the value:
+     * Tab "sets the value to the focused option" in the select-only combobox pattern, and the library
+     * chose it on blur too (`selectOnBlur`). Escape is still the way to close without choosing. A press
+     * elsewhere is not a blur here: it closes the list first (the outside-press listener above), so it
+     * chooses nothing, as before.
+     *
+     * The dropdown's own `onBlur` runs first and always, as it did when it rode the rest bag: it is
+     * what marks a form field touched.
+     */
+    const onBlurWithin = (event: React.FocusEvent<HTMLDivElement>) => {
+        if (typeof onBlur === 'function') onBlur(event)
+        if (!open) return
+        // Casts, not guards: the handler runs on the mounted dropdown, and a focus event's related
+        // target is a node.
+        const dropdown = host.current as HTMLDivElement
+        if (dropdown.contains(event.relatedTarget as Node | null)) return
+        if (dropdown.contains(document.activeElement)) return
+        if (active !== -1 && active !== selectedIndex && isSelectable(options[active])) commit(event, active)
+        else close(event)
+    }
+
+    /**
+     * Focus inside the list, which a script or assistive technology can put there (it is focusable, out
+     * of the tab order), would be left on an element about to hide when the list closes, and drop to the
+     * page. It goes back to the control, before the browser paints the list hidden.
+     */
+    useCommitEffect(() => {
+        // Casts, not guards: both are mounted for the dropdown's lifetime.
+        if (!open && (menu.current as HTMLDivElement).contains(document.activeElement)) (control.current as HTMLDivElement).focus()
+    }, [open])
+
+    /**
+     * A press on the dropdown's icon or padding would take focus from the control before the click
+     * that toggles the list, and closing on blur would then close the list for the click to reopen.
+     * So the press keeps focus where it is; the click focuses the control. A press on the control, or
+     * on what it shows, is left alone, and options already do the same for themselves.
+     */
+    const onPress = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (typeof onMouseDown === 'function') onMouseDown(event)
+        // Casts, not guards: the control is mounted, and a mouse event's target is a node.
+        if (!(control.current as HTMLDivElement).contains(event.target as Node)) event.preventDefault()
+    }
 
     const showOptions = open || !lazyLoad
 
@@ -369,6 +472,8 @@ export default function Listbox ({
                 return open ? close() : openWith()
             }}
             onKeyDown={onKeyDown}
+            onBlur={onBlurWithin}
+            onMouseDown={onPress}
             {...dropdownProps}
         >
             {/* `divider` is Semantic's name for "this is the selection display", and it is worth
@@ -379,7 +484,7 @@ export default function Listbox ({
                 aria-haspopup="listbox"
                 aria-expanded={open ? 'true' : 'false'}
                 aria-controls={open ? idPrefix : undefined}
-                aria-activedescendant={open && cursor !== -1 ? `${idPrefix}-${cursor}` : undefined}
+                aria-activedescendant={open && active !== -1 ? `${idPrefix}-${active}` : undefined}
                 // A `role="combobox"` div cannot carry the native `disabled` attribute, so being
                 // unavailable has to be SAID: `aria-disabled` for assistive technology, `tabIndex={-1}`
                 // for the tab order, and the guards in `openWith`/`onKeyDown` for the behaviour. The
@@ -397,6 +502,11 @@ export default function Listbox ({
                 ref={menu}
                 id={open ? idPrefix : undefined}
                 role="listbox"
+                // Out of the tab order. Focus stays on the combobox and the cursor is addressed through
+                // `aria-activedescendant`, as the pattern has it. Without this, Chromium makes a list long
+                // enough to scroll a keyboard-focusable scroller of its own, measured: Tab from the open
+                // list landed on the list rather than the next field, and the list stayed open.
+                tabIndex={-1}
                 aria-label={ariaProps['aria-label'] as string | undefined}
                 aria-labelledby={ariaProps['aria-labelledby'] as string | undefined}
                 className={classNames('menu', 'transition', { visible: open })}
@@ -417,7 +527,7 @@ export default function Listbox ({
                         aria-selected={index === selectedIndex ? 'true' : 'false'}
                         aria-disabled={option.disabled ? 'true' : undefined}
                         className={classNames('item', {
-                            selected: index === cursor,
+                            selected: index === active,
                             active: index === selectedIndex,
                             disabled: option.disabled,
                         })}
@@ -427,7 +537,9 @@ export default function Listbox ({
                             commit(event, index)
                         }}
                     >
-                        {option.content != null ? option.content : option.text}
+                        {/* `text`, as `semantic-ui-react` rendered it: the theme colours the label through
+                            it (see the file header), and a host's stylesheet may select on it too. */}
+                        <span className="text">{option.content != null ? option.content : option.text}</span>
                     </div>
                 ))}
             </div>

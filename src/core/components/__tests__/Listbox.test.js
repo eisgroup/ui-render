@@ -714,3 +714,259 @@ describe('which way the list opens', () => {
         expect(upwardOf(up.control)).toBe(true)
     })
 })
+
+/**
+ * WHAT `semantic-ui-react` DID AND THE FIRST VERSION OF THIS CONTROL DID NOT. Found by the 2026-10-08 audit
+ * against the published 0.34.3, and confirmed there in Chromium: the list never scrolled (the selection of a
+ * 40-option list opened out of view, and the arrows walked the cursor out of it), it stayed open when focus
+ * left it, and an option's label lost the `span.text` the theme colours, so an `inverted` list was
+ * near-black on dark grey. The browser half is `e2e/packed/tarball.packed.js`; these pin the logic.
+ */
+describe('what the library did that the first version lost', () => {
+    const LONG = Array.from({ length: 40 }, (_, i) => ({ text: `Option ${i}`, value: `v${i}` }))
+    const ROW = 30
+    const LIST_TOP = 100
+    const LIST_HEIGHT = 150
+
+    // jsdom lays nothing out and ignores `scrollTop`. This gives the list a 150 px window at y = 100 and
+    // each option a 30 px row, placed by the list's own scroll offset. `scale` is what a scaled ancestor
+    // (CSS `zoom`, `transform: scale`) does: the boxes scale with it, and the list's own pixels do not.
+    let restore = []
+    const layOut = (scale = 1) => {
+        const scrolled = new WeakMap()
+        const isList = element => element.getAttribute('role') === 'listbox'
+        const own = {}
+        ;['scrollTop', 'clientHeight', 'offsetHeight'].forEach(name => {
+            own[name] = Object.getOwnPropertyDescriptor(Element.prototype, name)
+                || Object.getOwnPropertyDescriptor(HTMLElement.prototype, name)
+        })
+        Object.defineProperty(Element.prototype, 'scrollTop', {
+            configurable: true,
+            get () { return scrolled.get(this) || 0 },
+            set (value) { scrolled.set(this, Math.max(0, value)) },
+        })
+        Object.defineProperty(Element.prototype, 'clientHeight', {
+            configurable: true,
+            get () { return isList(this) ? LIST_HEIGHT : 0 },
+        })
+        Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+            configurable: true,
+            get () { return isList(this) ? LIST_HEIGHT : 0 },
+        })
+        const measure = jest.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function rect () {
+            if (isList(this)) return { top: LIST_TOP, bottom: LIST_TOP + LIST_HEIGHT * scale, height: LIST_HEIGHT * scale }
+            if (this.getAttribute('role') === 'option') {
+                const list = this.parentElement
+                const top = LIST_TOP + (ROW * Array.prototype.indexOf.call(list.children, this) - list.scrollTop) * scale
+                return { top, bottom: top + ROW * scale, height: ROW * scale }
+            }
+            return { top: 0, bottom: 0, height: 0 }
+        })
+        restore = [
+            () => Object.defineProperty(Element.prototype, 'scrollTop', own.scrollTop),
+            () => Object.defineProperty(Element.prototype, 'clientHeight', own.clientHeight),
+            () => Object.defineProperty(HTMLElement.prototype, 'offsetHeight', own.offsetHeight),
+            () => measure.mockRestore(),
+        ]
+    }
+    afterEach(() => {
+        restore.forEach(undo => undo())
+        restore = []
+    })
+
+    const listOf = control => control.parentElement.querySelector('[role="listbox"]')
+    const shown = control => {
+        const list = listOf(control)
+        const first = list.scrollTop / ROW
+        return [first, first + LIST_HEIGHT / ROW - 1]
+    }
+
+    it('scrolls the selected option into view as the list opens', () => {
+        layOut()
+        const { control } = drive({ options: LONG, value: 'v30' })
+
+        fireEvent.click(control)
+
+        // The least scroll that shows all of option 30: its bottom at the list's bottom edge.
+        expect(listOf(control).scrollTop).toBe(ROW * 31 - LIST_HEIGHT)
+        expect(shown(control)).toEqual([26, 30])
+    })
+
+    it('keeps the cursor in view as the keys move it, down and back up', () => {
+        layOut()
+        const { control, press, cursor } = drive({ options: LONG, value: 'v30' })
+        fireEvent.click(control)
+
+        for (let i = 0; i < 6; i += 1) press('ArrowDown')
+        expect(cursor()).toBe('Option 36')
+        expect(shown(control)).toEqual([32, 36])
+
+        press('Home')
+        expect(listOf(control).scrollTop).toBe(0)
+
+        press('End')
+        expect(shown(control)).toEqual([35, 39])
+
+        press('PageUp')
+        press('PageUp')
+        expect(cursor()).toBe('Option 29')
+        expect(shown(control)).toEqual([29, 33])
+    })
+
+    it('scrolls by the list\'s own pixels under a scaled ancestor, in or out', () => {
+        [0.8, 1.25].forEach(scale => {
+            layOut(scale)
+            const { control, press, unmount } = drive({ options: LONG, value: 'v30' })
+            fireEvent.click(control)
+            expect(shown(control)).toEqual([26, 30])
+
+            press('Home')
+            press('ArrowUp')
+            expect(shown(control)).toEqual([35, 39])
+
+            unmount()
+            restore.forEach(undo => undo())
+            restore = []
+        })
+    })
+
+    it('does not scroll an option that is already in view', () => {
+        layOut()
+        const { control, press } = drive({ options: LONG, value: 'v2' })
+        fireEvent.click(control)
+        expect(listOf(control).scrollTop).toBe(0)
+
+        press('ArrowDown')
+        press('ArrowDown')
+        expect(listOf(control).scrollTop).toBe(0)
+    })
+
+    it('chooses the highlighted option when focus leaves it, as Tab does in the combobox pattern', () => {
+        const elsewhere = document.createElement('input')
+        document.body.appendChild(elsewhere)
+        try {
+            const { control, press, changes, closes } = drive({ value: 'a' })
+            act(() => { control.focus() })
+            fireEvent.click(control)
+            press('ArrowDown')
+            press('ArrowDown')
+
+            act(() => { elsewhere.focus() })
+
+            expect(changes).toEqual(['c'])
+            expect(closes).toEqual(['closed'])
+            expect(control).toHaveAttribute('aria-expanded', 'false')
+        } finally {
+            elsewhere.remove()
+        }
+    })
+
+    it('closes when focus leaves it, and reports the close', () => {
+        const elsewhere = document.createElement('input')
+        document.body.appendChild(elsewhere)
+        try {
+            const { control, closes } = drive({ value: 'b' })
+            act(() => { control.focus() })
+            fireEvent.click(control)
+            expect(control).toHaveAttribute('aria-expanded', 'true')
+
+            act(() => { elsewhere.focus() })
+
+            expect(control).toHaveAttribute('aria-expanded', 'false')
+            expect(closes).toEqual(['closed'])
+        } finally {
+            elsewhere.remove()
+        }
+    })
+
+    it('stays open when focus moves to the list itself, which a script can do', () => {
+        const { control, closes } = drive()
+        act(() => { control.focus() })
+        fireEvent.click(control)
+
+        act(() => { listOf(control).focus() })
+
+        expect(control).toHaveAttribute('aria-expanded', 'true')
+        expect(closes).toEqual([])
+    })
+
+    it('stays open when the window loses focus, which leaves the control the active element', () => {
+        const { control, closes } = drive()
+        act(() => { control.focus() })
+        fireEvent.click(control)
+
+        fireEvent.blur(control, { relatedTarget: null })
+
+        expect(document.activeElement).toBe(control)
+        expect(control).toHaveAttribute('aria-expanded', 'true')
+        expect(closes).toEqual([])
+    })
+
+    it('calls the dropdown\'s own `onBlur` first, and still when the list is closed', () => {
+        const seen = []
+        const { control } = drive({ onBlur: () => seen.push('blur'), onClose: () => seen.push('closed') })
+        act(() => { control.focus() })
+        act(() => { control.blur() })
+        expect(seen).toEqual(['blur'])
+
+        act(() => { control.focus() })
+        fireEvent.click(control)
+        act(() => { control.blur() })
+        expect(seen).toEqual(['blur', 'blur', 'closed'])
+    })
+
+    it('keeps focus on the control through a press on the icon, so the click that follows toggles once', () => {
+        const pressed = []
+        const { control } = drive({ onMouseDown: () => pressed.push('down') })
+        const icon = control.parentElement.querySelector('i.icon.dropdown')
+
+        expect(fireEvent.mouseDown(icon)).toBe(false)
+        expect(fireEvent.mouseDown(control)).toBe(true)
+        expect(pressed).toEqual(['down', 'down'])
+    })
+
+    it('renders an option\'s label in a `span.text`, as the library did, `content` included', () => {
+        const { control } = drive({ options: [{ text: 'Alpha', value: 'a' }, { text: '', content: <b>Bold</b>, value: 'b' }] })
+        fireEvent.click(control)
+
+        const labels = Array.from(listOf(control).querySelectorAll('[role="option"] > span.text'))
+        expect(labels.map(label => label.textContent)).toEqual(['Alpha', 'Bold'])
+        expect(labels[1].querySelector('b')).not.toBeNull()
+    })
+
+    it('drops a cursor the options shrank past, and the arrows start again from the ends', () => {
+        const { control, press, rerender, cursor } = drive({ value: 'c' })
+        fireEvent.click(control)
+        expect(control.getAttribute('aria-activedescendant')).toMatch(/-2$/)
+
+        rerender(<Listbox options={OPTIONS.slice(0, 2)} value="c"/>)
+        expect(control).not.toHaveAttribute('aria-activedescendant')
+        press('ArrowDown')
+        expect(cursor()).toBe('Alpha')
+
+        rerender(<Listbox options={OPTIONS.slice(0, 1)} value="c"/>)
+        rerender(<Listbox options={OPTIONS.slice(0, 2)} value="c"/>)
+        press('ArrowUp')
+        expect(cursor()).toBe('Beta')
+    })
+
+    it('lands on the last option from no cursor upward, not on the one before it', () => {
+        const { press, cursor } = drive()
+
+        press('ArrowUp')
+
+        expect(cursor()).toBe('Gamma')
+    })
+
+    it('gives focus back to the control when the list closes with focus inside it', () => {
+        const { control } = drive()
+        act(() => { control.focus() })
+        fireEvent.click(control)
+        act(() => { listOf(control).focus() })
+
+        fireEvent.keyDown(listOf(control), { key: 'Escape' })
+
+        expect(control).toHaveAttribute('aria-expanded', 'false')
+        expect(control).toHaveFocus()
+    })
+})

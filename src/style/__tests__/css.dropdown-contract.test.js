@@ -84,6 +84,11 @@ const ENTRY = path.join(STYLE_DIR, 'index.less');
  * Chromium always matched them, since a click focuses the combobox inside the open dropdown. A styling
  * count by the rule above (`total` and `worth` moved together), and nothing about how the dropdown
  * looks changed: the count caught up with the browser.
+ *
+ * `menu` STAYS 17 although the list took `tabIndex={-1}` (2026-10-09), out of the tab order
+ * (`Listbox.tsx`: Chromium made a list long enough to scroll a focusable scroller, and Tab landed on
+ * it). `_app.less`'s `*[tabIndex="-1"]` would have matched it and taken the open menu's shadow with
+ * its `box-shadow: none !important`, so the rule now excludes `[role="listbox"]`.
  */
 const TOKEN_CONTRACT = {
     control: { classes: 'ui selection dropdown active visible', total: 17,
