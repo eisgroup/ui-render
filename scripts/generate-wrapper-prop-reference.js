@@ -936,12 +936,14 @@ function inHouseSection (component, { domProps, callSites }) {
               + ` open spreads (${codeList(spreadsInto)}), so an attribute nobody anticipated on a`
               + ' meta node still arrives here as a prop. That is why'
             : ' A caller can still pass one, so'}`
-        + ' the component strips them explicitly and warns once per prop in development. Stripping'
+        + ' the component strips them explicitly. It warns once per prop only when this repository'
+        + ' runs the source in development; the published bundle is built for production and strips'
+        + ' them without a word. Stripping'
         + ' matters because the value would otherwise reach a real element as an attribute — a'
         + ' string-valued one lands lowercase (`verticalAlign="top"` rendered `verticalalign="top"`)'
         + ' and a boolean draws React\'s "Received `true` for a non-boolean attribute" warning, both'
-        + ' of them junk the DOM contract\'s tripwires exist to keep out. Warning matters because a'
-        + ' meta still carrying one would otherwise never learn it stopped working, and React\'s own'
+        + ' of them junk the DOM contract\'s tripwires exist to keep out. A meta still carrying one'
+        + ' learns nothing from the published bundle, so check it against the table below. And React\'s own'
         + ' unknown-prop warning cannot be relied on: it is silent for a lowercase name.',
         '',
         row(['Prop', 'Why it is gone']),

@@ -2,6 +2,97 @@
 
 ### Unreleased
 
+#### Upgrading from 0.34
+
+What a host on 0.34.3 may need to check or change, most likely first. The section named after each
+item has the details.
+
+- **Declare what your page took from our stylesheet.** Among other rules, 0.34.x set
+  `body { margin: 0 }`, a full-height flex chain on `html` and `body`, `box-sizing: border-box` on
+  every element, and our font, text colour and white background on `body`. The stylesheet now
+  styles only `.ui-render` and the date picker's calendar. (Styling)
+- **Copy the root `static/` folder, not `dist/static/`.** `dist/static/all.css` and `font.css` are
+  one-line `@import` re-exports now, with no fonts beside them. They work through a bundler, but
+  copied on their own to a web root they style nothing. (Packaging)
+- **Theme the widget through `.ui-render`, in a rule after our stylesheet.** The wrapper sets its
+  own font, size, line height and colour now, so rules on `body` or on the mount node no longer reach
+  it. (Styling)
+- **Check a root font size your page sets before our stylesheet.** 0.34.x reset it with
+  `html { font-size: 100% }`. The widget is sized in `rem` and now follows it: with
+  `html { font-size: 62.5% }` its text is 8.75px, not 14px. (Styling)
+- **Declare the packages you import that came with us.** With 0.34.x, npm installed `final-form`,
+  `final-form-arrays`, `react-final-form`, `react-final-form-arrays`, `rc-picker`, `prop-types` and
+  `semantic-ui-react` beside it, and what they depend on, such as `lodash`, `classnames` and
+  `@babel/runtime`. `dependencies` is empty now, so an import of one that your `package.json` does
+  not declare can fail the build. (Dependencies)
+- **TypeScript: check your imports and props.** The declarations are `export =`. A default import
+  needs `esModuleInterop` or `allowSyntheticDefaultImports`, which TypeScript 6 turns on by default.
+  Without them, write `import UIRender = require('eis-ui-render')`. `import { UIRender }` no longer
+  compiles. `data` and `meta` are required, `id` is gone, a `methods` object typed
+  `Record<string, Function>` no longer fits, and `dist/UIRender.d.ts` is gone. (Compatibility)
+- **Update tests that find elements by their markup.** Tabs, an Expand's title, a sortable header,
+  the upload drop zone and the popup have roles now. A select is a `[role="combobox"]`, named by its
+  `label`, and `[role="listbox"]` is its option list. `name` is on form controls only, so a select,
+  the upload drop zone, a table and a layout element no longer carry it. An option's label is still
+  a `span.text`. (Accessibility, Fixes)
+- **Check flows that drive a select from the keyboard.** The arrows move a highlight and no longer
+  change the value or call `onChange`. Enter, Space or Tab chooses the highlighted option. Escape and
+  a click elsewhere choose nothing, and focus no longer opens the list. (Select and Dropdown)
+- **Find removed props in your metas yourself.** On a select: `search`, `multiple`,
+  `allowAdditions`, `clearable` and their companions. On a tooltip: `on`, `hoverable`,
+  `mouseEnterDelay` and 16 more. On a table: `as`, `celled`, `textAlign`, `verticalAlign` and
+  `fixedHeader`. The published bundle drops them without a warning, and `validateMeta` does not
+  report them. `docs/SUPPORTED-PROPS.md`, in the package, records each of them. (Props removed from
+  Select, Tooltip and Table; Table rendering)
+- **Do not rely on a click to open a tooltip.** It opens on hover, after 500 ms by default, and on
+  keyboard focus. `on` is ignored, and a tap opens nothing. A node with a `tooltip` is now wrapped in
+  a `span.tooltip-host` as wide as its content, so in a column it no longer stretches. (Props removed
+  from Select, Tooltip and Table)
+- **Expect some rendered values to change.** Dates follow the `dateFormat` you pass, where 0.34.x
+  ignored it and showed `MM-DD-YYYY`. `Float` and `Percent` without `decimals` now round where they
+  used to truncate: 18.75 % shows `19%`, not `18%`. The `"Currency"` string form prints the symbol of
+  the meta's `currencyCode` where it printed `$`. (Renderer configuration and error reporting, Fixes)
+- **Resolve `apiCalls.uploadFile` with the full data, or with nothing.** A non-empty answer now
+  replaces the document's data and restarts the form, so a receipt wipes unsaved edits. Every 0.34.x
+  release threw the answer away. (Fixes)
+- **Read `getFormData` when a document with `autoSubmit` leaves.** A change to an `autoSubmit` field
+  that is still waiting when the document unmounts (the delay is 200 ms by default) is dropped.
+  0.34.x submitted it after the delay. The `AutoSubmit` view saves such a change as it unmounts.
+  (Renderer configuration and error reporting)
+- **Check `{state.…}` templates fed by a select.** A `Select`'s `setState` action now writes the
+  path the meta names. 0.34.x wrote the field's name unless `mapOptions.value` named a key. So in
+  list rows or under a named container, the key moves from under their path to `state.<name>`, and
+  every row shares that one key. (Select and Dropdown)
+- **Check pages that mount more than one `UIRender`.** Each document now reads only its own forms,
+  reports its errors to its own `getValidationErrors` and opens its popups in its own wrapper. In
+  0.34.x each read every form on the page, all their errors went to one callback, and every popup
+  opened in the first wrapper. (Renderer configuration and error reporting, Fixes)
+- **Ship your own copies of the images you link.** The package ships no images now. 0.34.x carried
+  `static/images/`, flags included. (Packaging)
+- **Style the Semantic class names a meta sets.** A node a meta gives `ui label`, `ui menu` or
+  `ui popup`, or a `data-tooltip` attribute, is no longer styled. (Styling)
+- **Alias `react/jsx-runtime` wherever you alias `react`.** The bundle now imports it from your
+  React. (Compatibility)
+- **Check your browser support.** The bundle targets the last two versions of Chrome, Edge and
+  Firefox and the last two major versions of Safari, on macOS and iOS. A browser older than
+  Chrome 93, Firefox 92 or Safari 15.4 cannot load it. 0.34.x targeted `>0.2%, not dead`.
+  (Compatibility)
+
+Nothing to do for these:
+
+- React 16.14 and Moment 2.29 stay supported. The peer ranges only widened: `react` and `react-dom`
+  to `^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0` from `^16.14.0`, and `moment` to `^2.29.4` from
+  `~2.29.4`. (Compatibility)
+- `engines.node` is `>=22`, as in 0.34.x. (Compatibility)
+- `dist/index.js` still exports the component itself, with no `.default`, so a bundler's default
+  import works as before. (Compatibility)
+- No Semantic UI package is installed with this one or used to build it. The two Semantic CSS
+  modules still in use are vendored into the stylesheet. The components keep Semantic's class names,
+  such as `ui selection dropdown` and `ui table`, and the stylesheet still selects on them.
+  (Dependencies, Table rendering)
+- The package is 25 files and 3.5 MB unpacked, down from 576 files and 12.5 MB, and `dist/index.js`
+  is 311 KB, down from 420 KB. (Packaging)
+
 #### Meta contract
 
 - The `meta.json` contract now ships as a JSON Schema (draft 2020-12) at
@@ -58,7 +149,9 @@
   `useForm` block and a table's draft row (`renderExtraItem`) have forms of their own. 0.34.x
   reported their errors with the rest, and so does this release. An earlier step of it reported the
   document's own form alone, so a required field left empty in either showed its error on screen
-  and never reached the host. Another `UIRender` on the page still reports only to its own callback.
+  and never reached the host. Another `UIRender` on the page reports only to its own callback,
+  which 0.34.x did not do: there every document's errors went to the callback of the last one
+  constructed with one.
 - **The `AutoSubmit` view saves a change still waiting when it unmounts.** In 0.34.x the save
   ran once the delay ran out, after the view had gone. An earlier step of this release cancelled it
   at unmount, which lost the last edit of a user who left within the delay (200 ms by default). Now
@@ -237,6 +330,15 @@
 
 #### Dependencies
 
+- **`dependencies` is empty, so nothing is installed beside this package any more.** 0.34.x
+  declared seven: `final-form`, `final-form-arrays`, `react-final-form`,
+  `react-final-form-arrays`, `rc-picker`, `prop-types` and `semantic-ui-react`. npm installed them
+  into your `node_modules`, with what they depend on, `lodash`, `classnames` and `@babel/runtime`
+  among them, and the 0.34.3 README said you did not need to install the form packages. The bundle
+  carries what it uses of them, so the widget is unaffected, but your own code may import one
+  without declaring it. Such an import fails the build with a missing module after the upgrade,
+  unless another package still installs it: declare it in your `package.json`.
+  `npm explain <package>` shows whether one reaches you only through `eis-ui-render`.
 - **Semantic UI is gone entirely — and nothing about how anything looks has changed.** The last
   piece was the stylesheet: two Semantic CSS modules were still being compiled from
   `semantic-ui-less` at build time. Their output now lives in this repository, and the package is
@@ -274,16 +376,20 @@
 
 #### Styling
 
-- **The stylesheet is 67 KB smaller, and nothing about how anything looks has changed.** Three
+- **The stylesheet is 67 KB smaller, and nothing the components render by themselves looks
+  different.** Three
   Semantic UI CSS modules were being compiled into every build for components this library no
   longer renders: the popup (our tooltip is in-house as of this same unreleased set), the label (it styled
   multi-select chips, and multi-select is gone), and the menu (it was kept "for the Pagination
   component", which turned out to be untrue — pagination has always been styled by our own CSS).
 
-  `static/all.css` goes from 374,894 to 307,785 bytes. Checked from both directions before removing
-  anything: nothing in the library emits the class names those modules style, and none of the 566
-  removed rules can match markup we render. The paginated table, the dropdowns and the tooltip were
-  all verified in a browser afterwards.
+  Removing them took 67 KB off `static/all.css`, whose 0.34.3 copy is 407,313 bytes. Checked from
+  both directions before removing anything: no component of the library emits the class names those
+  modules style, and none of the 566 removed rules can match the markup the components emit. The
+  paginated table, the dropdowns and the tooltip were all verified in a browser afterwards. A meta
+  can still put those names on a node through `className`, and Semantic's CSS-only tooltip was a
+  `data-tooltip` attribute: a node a meta gives `ui label`, `ui menu` or `ui popup`, or
+  `data-tooltip`, is no longer styled (measured in Chromium against 0.34.3).
 
 
 - **The stylesheet no longer touches your page — only its own wrapper.** Loading
@@ -323,7 +429,7 @@
     `* { box-sizing: inherit }`, so your own elements were sized by their border box;
   - on `body`: `overflow-x: hidden`, a white background, our font (14px Roboto, `line-height: 1`),
     our text colour and font smoothing;
-  - on `html`: `line-height: 1.15` and `text-size-adjust: 100%`;
+  - on `html`: `line-height: 1.15` and `-webkit-text-size-adjust: 100%`, with its `-ms-` twin;
   - `-webkit-tap-highlight-color: transparent` on every element.
 
   The first four are the likely ones. Our own demo page declares `body { margin: 0 }` and a
@@ -337,18 +443,27 @@
   1×1 box are what they were. `static/all.css` is 69 bytes smaller.
 
   **Only desktop Chrome 109 renders differently.** It is the last version for Windows 7 and 8.1, and
-  still among the target browsers. It drew an overflowing container's scrollbar over the content. Now
-  the scrollbar takes its width from the content, as it already did in Chrome 114 and later, Firefox
-  and Safari, which treat `overlay` as `auto`.
+  no longer among the target browsers (see *Compatibility*). It drew an overflowing container's
+  scrollbar over the content. Now the scrollbar takes its width from the content, as it already did
+  in Chrome 114 and later, Firefox and Safari, which treat `overlay` as `auto`.
 
 #### Select and Dropdown
 
+- **A `setState` action on a `Select` writes the state path the meta names.** In 0.34.x it wrote the
+  field's own name instead, unless the Select's `mapOptions.value` named a key of the option, and in
+  a list row or under a named container that name includes their path. So
+  `onChange: 'setState,chosen'` on a Select named `pick` wrote `state.pick` and writes `state.chosen`
+  now, and a Select named `cat` in the rows of a list, with the default `setState,cat`, wrote
+  `state.rows[1].cat` and writes `state.cat` now, one key every row shares. A Select whose
+  `mapOptions.value` names a key, and the `Dropdown` view, wrote the named path already. If a
+  `{state.…}` template in your meta reads the old key, read the named one.
 - **A dropdown near the bottom of the window opens upward.** Without an `upward` prop, the list is
   measured as it opens, and goes up when it does not fit below and there is more room above. A
   given `upward` still decides.
 - **The select is ours now, and its keyboard behaviour changed on purpose.** `Select` and
   `Dropdown` no longer use `semantic-ui-react` — no file in the library does. What you see and the
-  props you write are the same; the keyboard is not, and the change is a fix rather than a
+  props you write are the same, apart from the option keys and props listed under *Props removed
+  from Select, Tooltip and Table*; the keyboard is not, and the change is a fix rather than a
   side effect:
 
   **Arrow keys no longer change your data.** They used to. Moving down a list committed each option
@@ -366,6 +481,9 @@
   `PageUp`/`PageDown` move a page, and typing letters jumps to the first option starting with them
   (within 700 ms; pressing the same letter repeatedly cycles through the options starting with it).
 
+  **Focus no longer opens the list.** In 0.34.3, tabbing to a select opened it. Now Enter, Space,
+  ArrowDown or ArrowUp opens it, or a click (measured in Chromium).
+
   **Kept as it was:**
   - the list opens scrolled to the selected option, and keeps the highlighted option in view as the
     keys move it, in a zoomed or scaled container too;
@@ -382,11 +500,12 @@
   to (`aria-activedescendant`), and a read-only select finally says it is unavailable
   (`aria-disabled`) instead of only looking it.
 
-  **One thing to know if you pass unusual props.** Props `semantic-ui-react` recognised and we do
-  not — `search`, `multiple`, `allowAdditions` and their companions, plus `clearable` — used to be
-  quietly absorbed by the library. They now warn once in development and are stripped, so they
-  cannot land on the element as invalid HTML attributes. Everything the select documents keeps
-  working, `compact` and `upward` included.
+  **One thing to know if you pass unusual props.** Props `semantic-ui-react` implemented and we do
+  not — `search`, `multiple`, `allowAdditions` and their companions, plus `clearable` — worked in
+  0.34.x. They are now stripped, so they cannot land on the element as invalid HTML attributes, and
+  nothing reports them: the warning that names one is compiled out of the published bundle, which is
+  built for production, and prints only when this repository runs its source in development.
+  Everything the select documents keeps working, `compact` and `upward` included.
 
 #### Props removed from Select, Tooltip and Table
 
@@ -406,13 +525,18 @@
   What is NOT affected, because it shares code with none of this: options as strings, numbers or
   objects; a colour option whose value is an array like `[r, g, b]`; `optionsLabel`; the cascading
   reset when a parent select changes the option list; `compact`, `upward`, `disabled`, `readonly`
-  and `placeholder`.
+  and `placeholder`. Two of these did change, for other reasons. An object option is read for its
+  `text`, `value`, `key`, `content` and `disabled` only: the `description`, `icon`, `image`, `label`
+  and `flag` that `semantic-ui-react` rendered show nothing now, and an option's `className`,
+  `title`, `style` and `data-*` no longer reach its element. And the cascading reset hands
+  `onChange` the option's own value and the field's name, so a numeric value stays a number where
+  0.34.x passed it as a string.
 
   **Correction to the sentence that stood here:** it said `clearable` "was never read by the wrapper
   at all, so it is unaffected by this change and remains as it was". The first half is true and the
   conclusion was wrong. It was never read here because `semantic-ui-react` implemented it, and the
-  select no longer uses `semantic-ui-react` — so `clearable` is gone too. Passing it now warns in
-  development and does nothing, like the six above.
+  select no longer uses `semantic-ui-react` — so `clearable` is gone too. Passing it now does
+  nothing, like the six above, and the published bundle does not say so.
 - **The tooltip is settled, and one thing you could write in a meta is gone.** `position` is kept.
   `on` is **dropped**: a tooltip no longer opens on click or on tap, only on hover and on keyboard
   focus. Every tooltipped node in the examples already has its own click action, so one gesture was
@@ -422,14 +546,19 @@
   nothing observable before (`basic` emitted a class no loaded rule selects; the bubble was never
   hoverable in practice). The tooltip also gained `role="tooltip"` and `aria-describedby`, and it
   is now positioned next to its trigger — it was rendering at the document origin and throwing on
-  every open. See `docs/SUPPORTED-PROPS.md` for the per-prop record.
+  every open. To position it, a node with a `tooltip` is now wrapped in a `span.tooltip-host` as wide
+  as its content. In a column, such as `Col`, a tooltipped button no longer stretches to the
+  column's width, and a centred text no longer sits in the middle (measured in Chromium against
+  0.34.3). A host that needs the old layout styles the wrapper itself; `classWrap` puts a class of
+  its choosing on it. See `docs/SUPPORTED-PROPS.md` for the per-prop record.
 
   **If you pass an object `tooltip` attribute, its accepted surface narrowed from 45 names to 13.**
   Those 45 were never a designed API — they were whatever `semantic-ui-react`'s `Popup` and `Portal`
   happened to accept, reachable because the attribute was spread straight through. The 13 that
   remain are the ones with a defined meaning here; of the rest, the 19 that were both reachable and
-  plausible warn once each in development rather than being ignored silently, and the remainder had
-  no observable effect to lose.
+  plausible are stripped by name, and the remainder had no observable effect to lose. The published
+  bundle reports neither: the warning the 19 carry is compiled out of it, so compare your `tooltip`
+  objects with `docs/SUPPORTED-PROPS.md`.
 
   **One accessibility trade, stated rather than buried:** the bubble is not hoverable, which is a
   known non-conformance with WCAG SC 1.4.13 ("Content on Hover or Focus"). The other two parts of
@@ -442,11 +571,11 @@
 
 #### Compatibility
 
-- **React 19 is supported.** The `react` and `react-dom` peer ranges now read
-  `^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0`. The range was added to, not replaced, so hosts on
-  16.14, 17 and 18 need change nothing. The whole test suite runs on React 19.3 in its own gating
-  check beside 16.14, 17 and 18, the packed package is server-rendered against each of them, and
-  the TypeScript declarations are compiled against `@types/react` 16, 17, 18 and 19.
+- **React 17, 18 and 19 are supported.** The `react` and `react-dom` peer ranges now read
+  `^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0`, where 0.34.x read `^16.14.0`. The range was added
+  to, not replaced, so a host on 16.14 has nothing to change. The whole test suite runs on React 19.3
+  in its own gating check beside 16.14, 17 and 18, the packed package is server-rendered against each
+  of them, and the TypeScript declarations are compiled against `@types/react` 16, 17, 18 and 19.
 - **The bundle is built for current browsers only**: the last two versions of Chrome, Edge and
   Firefox, and the last two major versions of Safari, on macOS and on iOS. That is what the host
   applications support. The targets were `>0.2%, not dead`, a share of global use that took in
@@ -455,10 +584,12 @@
   lost a wrapper Babel added for an old Safari bug, and webpack's runtime calls `Object.hasOwn`. So a
   browser older than Chrome 93, Firefox 92 or Safari 15.4 cannot load it. The stylesheet is
   byte-identical.
-- **The package requires Node 22 or later**: `engines.node` was `>=18`. Node 18 and 20 are out of
-  support upstream, and 22 is the oldest line still maintained. On an older Node, npm warns when it
-  installs the package, and refuses where `engine-strict` is set. The bundle is unchanged, and CI now
-  server-renders the packed package on Node 22.
+- **The package requires Node 22 or later, as 0.34.x did**: `engines.node` is `>=22`, the value
+  0.34.0 to 0.34.3 published, so nothing changes for a host. An earlier step of this release had
+  lowered it to `>=18`; that is undone. Node 18 and 20 are out of support upstream, and 22 is the
+  oldest line still maintained. On an older Node, npm warns when it installs the package, and refuses
+  where `engine-strict` is set. The bundle is unchanged, and CI now server-renders the packed package
+  on Node 22.
 - The bundle's JSX now compiles to React's automatic runtime, so the bundle imports
   `react/jsx-runtime` from your React next to `react` itself. Every React in the peer range ships
   it. If your build aliases `react` to one particular copy, alias `react/jsx-runtime` the same way.
@@ -470,7 +601,18 @@
 - Public TypeScript declarations now describe the shipped callable component: `data` and `meta`
   are required, runtime-supported props are optional, and the package supports an interop default
   import or a direct TypeScript `import = require` without promising nonexistent instance or named
-  value APIs.
+  value APIs. **Code typed against 0.34.x can stop compiling.** Measured with TypeScript 6.0 and
+  `@types/react` 16:
+  - `dist/index.d.ts` is `export =` now, `dist/UIRender.d.ts` is gone and `dist/contract.d.ts` is
+    new. A default import, `import UIRender from 'eis-ui-render'`, needs `esModuleInterop` or
+    `allowSyntheticDefaultImports`, which TypeScript 6 turns on by default. With both off it fails
+    with TS1259, and `import UIRender = require('eis-ui-render')` compiles instead. The named
+    import `{ UIRender }` no longer compiles; at run time it was `undefined` in 0.34.x too.
+  - A `<UIRender>` without `data` or `meta` fails, and so does one given `id`, which 0.34.x
+    declared and never read.
+  - `methods` values are typed `(...args: any[]) => unknown`, so a `Record<string, Function>` no
+    longer fits. `initialValues` takes the type of `data`, so one that does not fit `data` fails.
+    `UIRender` is a function, no longer a class type: its props are `UIRender.UIRenderProps`.
 - The public `translate` callback retains its string-to-string contract; optional and non-string
   renderer values now bypass it unchanged.
 
@@ -478,15 +620,24 @@
 
 - Stylesheets and fonts are no longer duplicated in the published package. The real files ship
   once in the root `static/` folder — the payload to copy into a host's web root — and
-  `dist/static/all.css` and `font.css` became one-line `@import` re-exports of it. Both import paths keep working; `semantic.css` remains an
-  empty stub in both places.
-- The tarball dropped from 579 files / 11.6 MB unpacked to **25 files / 3.34 MB (0.87 MB packed)**. Source maps continue
-  to ship for host debugging.
-- **The package no longer ships `static/images/flags/`.** These were 266 country-flag SVGs, 41% of
-  the unpacked package, and nothing in the library used them: their one reader was a dropdown
-  renderer that never reached the bundle, and it is deleted. A host that links
-  `/static/images/flags/<code>.svg`, from its own markup or from a meta `Image`, ships its own copy
-  now. The demo site stops serving them as well, so a link to the demo's copy stops resolving.
+  `dist/static/all.css` and `font.css` became one-line `@import '../../static/…'` re-exports of it,
+  with no fonts beside them. Both import paths keep working through a bundler; `semantic.css` remains
+  an empty stub in both places. Copied, `dist/static/` no longer works: served from a web root as
+  `/static/all.css`, the re-export imports itself and the widget is unstyled (measured in Chromium),
+  and read as text it holds a comment and the `@import`. 0.34.x's `dist/static/` was a full copy,
+  fonts and images included. Copy the root `static/` folder instead.
+- The tarball dropped from 576 files / 12.5 MB unpacked in 0.34.3 to **25 files / 3.5 MB (0.9 MB
+  packed)**. Source maps continue to ship for host debugging.
+- **The package ships no images any more.** 0.34.3 carried 266 country-flag SVGs in
+  `static/images/flags/` and ten more files in `static/images/`: `flags.png`, `diamonds.png`,
+  `diamonds-dimmed.png`, `diamonds-dimmed-flipped.png`, `home.jpg`, `logo.svg`, `showIf.png`,
+  `ui-architecture.png`, `ui-render-inspect.png` and `ui-render-version.png`, each again under
+  `dist/static/images/`. The two copies of the flag SVGs were 38% of the unpacked package. Nothing in
+  the library used any of them: the flag SVGs' one reader was a dropdown renderer that never reached
+  the bundle and is deleted now, and neither the 0.34.3 bundle nor its stylesheet names any of the
+  ten files. A host that links one of them, from its own markup or from a meta `Image`, ships its own
+  copy now. The demo site stops serving the flag SVGs as well, so a link to the demo's copy of one
+  stops resolving.
 - **The package records the third-party code it bundles.** `dist/index.js` carries 16 packages,
   all MIT, that `package.json` cannot declare, because they are bundled rather than installed:
   `npm sbom` reports none of them. Only two of their licence notices survived minification. The
@@ -721,7 +872,10 @@
   every document on the page: what `getFormData` hands the host, what `showIf` tests, what an
   upload sends, and the rows a submit and a cross-row validation read. With two independent
   documents on a page, each found the other's fields in its own data. A document now reads its
-  own form and those of the documents nested in it.
+  own form and those of the documents nested in it. Its validation errors go to its own
+  `getValidationErrors`, where 0.34.x sent every document's to the callback of the last one
+  constructed with one. And its popups open in its own wrapper: 0.34.x looked the popup root up by
+  id, so every document's popups opened in the first wrapper on the page.
 - **A form whose host passes no `onSubmit` no longer prints its values.** The fallback was
   `console.warn`, so a submit wrote every value of the form to the browser console of a
   production page. It does nothing now.
@@ -802,8 +956,10 @@
   occurrences in the bundled examples. The 57 that bind a real field are unchanged, and every
   form value still round-trips into the submit payload exactly as before. **If your application
   or your tests select these elements with a `[name="…"]` CSS selector, use a class, an id or a
-  role instead:** for form fields nothing changed, but for a table, a dropdown wrapper or a
-  layout element the attribute is gone.
+  role instead:** a form control such as an `input` keeps its `name`, but a table, a layout
+  element, the upload drop zone and a `Select` or `Dropdown` field have lost it: the select's
+  wrapper carried the field's only `name`. Find a select by `[role="combobox"]` and its label, and
+  give one with no `label` an `id` or a `className` in its meta.
 - Both of the above are enforced at one place — a named list of engine-internal props applied
   where a component hands props to a DOM element — so adding an internal prop to the engine no
   longer means auditing a dozen components, which is how this leak returned four times before.
@@ -845,8 +1001,13 @@
   rewritten to the string `"null"`, while the cascading reset used the option's text — so the two
   never agreed and the control showed nothing selected. Such an option now carries its text as its
   value, which is what the reset already assumed.
-- Restored the upload ref contract after the in-house Dropzone replacement so successful
-  uploads reinitialize the rendered data.
+- **An upload's answer becomes the document's data.** Every 0.34.x release threw it away: the
+  `upload` action cleared the file input through the drop zone's `fileInputEl`, which the in-house
+  drop zone of 0.34.x did not expose, so it failed with a `TypeError` in the console after
+  `apiCalls.uploadFile` resolved. Now a non-empty answer replaces the data and restarts the form
+  with it, so an answer that is not the full data, such as a receipt, wipes unsaved edits and every
+  key it lacks. Resolve `uploadFile` with the full data, or with nothing (`undefined`, `null`, `''`
+  or `0`) to leave the data as it was.
 - Corrected the nested `dataKind` demo table metadata so it renders valid table markup.
 - `popupOpen` actions receive the row index as context. `relativePath` is deliberately not
   forwarded: it outranks every other source when a popup resolves its field names, so a popup
