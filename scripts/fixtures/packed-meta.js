@@ -77,4 +77,26 @@ const tallMeta = {
     items: Array.from({ length: 12 }, (_, i) => ({ view: 'Input', name: `field${i}`, label: `Field ${i}` })),
 }
 
-module.exports = { deepMeta, deepData, listMeta, listData, tallMeta }
+/**
+ * The fourth document: what portals and timers do differently across Reacts, where React 16 and 17 delegate events
+ * to the document and 18 and 19 to the root. A popup, which opens into the wrapper's popup root; a date field inside
+ * it, whose calendar rc-picker portals into `<body>`, outside both; and a tooltip, which opens on hover after a delay.
+ */
+const popupMeta = {
+    view: 'Col',
+    items: [
+        { view: 'Button', children: 'Open the popup', onClick: { name: 'popupOpen', args: ['packedPopup'] } },
+        {
+            view: 'Popup',
+            id: 'packedPopup',
+            title: 'A packed popup',
+            items: [
+                { view: 'Text', children: 'Inside the popup' },
+                { view: 'Input', type: 'date', name: 'when', label: 'When' },
+            ],
+        },
+        { view: 'Button', children: 'Has a tooltip', tooltip: 'The tooltip text' },
+    ],
+}
+
+module.exports = { deepMeta, deepData, listMeta, listData, tallMeta, popupMeta }
