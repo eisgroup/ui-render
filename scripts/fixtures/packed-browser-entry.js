@@ -11,3 +11,5 @@ mount(React.createElement(UIRender, { meta: deepMeta, data: deepData }), documen
 mount(React.createElement(UIRender, { meta: listMeta, data: listData, initialValues: listData }), document.getElementById('list'))
 mount(React.createElement(UIRender, { meta: tallMeta, data: {} }), document.getElementById('tall'))
 mount(React.createElement(UIRender, { meta: popupMeta, data: {}, initialValues: {} }), document.getElementById('popup'))
+// #host's document again: every field id it derives from a name repeats, and must stay unique on the page.
+mount(React.createElement(UIRender, { meta: deepMeta, data: deepData }), document.getElementById('twin'))

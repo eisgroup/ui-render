@@ -1,5 +1,5 @@
 import classNames from '../utils/classNames'
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useRef } from 'react'
 import { capitalize, isString } from '../utils'
 import Button from './Button'
 import Icon from './Icon'
@@ -10,6 +10,7 @@ import View from './View'
 import { Active } from '../utils'
 import type { Translate } from '../utils/_envs'
 import { ENGINE_PROPS, omitProps } from './domProps'
+import { useOwnId } from './useOwnId'
 
 // Constants
 const THOUSANDS_SEPARATOR_REGEX = /\B(?=(\d{3})+(?!\d))/g
@@ -88,7 +89,7 @@ export interface InputNumberProps {
 
 const InputNumber = ({
     name,
-    id = name,
+    id: idGiven,
     icon,
     lefty,
     onClickIcon,
@@ -165,7 +166,13 @@ const InputNumber = ({
         if (!label && name) label = capitalize(name)
         if (!placeholder) placeholder = ' ' // required for Float label CSS to work
     }
-    if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
+    // The id as it always was: the one given, else the name, else one from the label.
+    let derivedId = idGiven === undefined ? name : idGiven
+    if (!derivedId && label) derivedId = 'input-' + label.replace(/ +?/g, '-')
+    // Unique on the page unless the meta gave it: see `useOwnId`.
+    const field = useRef<HTMLInputElement>(null)
+    const ownId = useOwnId(idGiven ? undefined : derivedId, field)
+    const id = idGiven || ownId
     if (!label && title) props.title = translate(title)
     // An `aria-describedby` naming an id no element carries is worse than none: it is an axe
     // `aria-valid-attr-value` violation, and a screen reader announces nothing for it. The help
@@ -283,6 +290,7 @@ const InputNumber = ({
                     </Text>
                 }
                 <input
+                    ref={field}
                     type="text"
                     name={name}
                     id={id}

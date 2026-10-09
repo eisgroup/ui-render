@@ -248,6 +248,30 @@ The library logs the report itself as well, so `onError` adds a channel rather t
 silencing the console. It never has to be defensive: a reporter that throws is caught, and
 the render failure is still reported.
 
+## Several documents on one page (consumer)
+
+Each `UIRender` on a page keeps what it owns to itself:
+
+- its form data, and the validation errors `getValidationErrors` reports, which reach the
+  document that owns the field;
+- its popup, which opens in its own shell, under its own `language` and `currency` classes;
+- its `translate`, when it was given one: what it translates, it translates with that function
+  and never with another document's, its popup's title, message and Ok included.
+
+Two things are shared with the rest of the page:
+
+- **A document without `translate` uses another's.** It translates with the function of the
+  last document constructed with one, as every document did in 0.34, or shows its text as
+  given when no document has one. Give each document its own `translate` when they differ.
+- **An id a field derives is unique on the page, not only in its document.** A field with no
+  `id` in meta takes its `name` for one, or one made from its `label`. When another element on
+  the page already has that id, from another document or from a name the same document repeats
+  (the nested rows of a `dataKind`), the field takes `<id>-2`, `<id>-3` and so on, and its label
+  and help text follow it. The field that had the id first keeps it, so a page with one
+  document that repeats no name renders the ids it always did. An `id` given in meta is kept
+  as given: give one wherever the host needs a fixed id. Each document's popup root follows
+  the same rule: `render-popup-root`, then `render-popup-root-2`.
+
 ## Development Installation
 
 The published package declares `engines.node >= 22`: that is the floor for *consuming* it. Node 22 is the oldest
