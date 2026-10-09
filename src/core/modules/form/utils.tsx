@@ -213,6 +213,9 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
     // Declared only, as every field without a value here: Babel emits no field for them.
     declare _value: unknown
     declare hasFocus?: boolean
+    // Whether the field is mounted: set by its mount effect, cleared by the cleanup. What lets a removed
+    // field's deferred clear (`unmount`) tell a removal from an unmount that is followed by a mount again.
+    attached = false
     declare input: FieldInput
     declare initValues: unknown
 
@@ -255,6 +258,14 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
         setTimeout(() => {
           // only call this if the form is not unmounted and initialValues remained (i.e. not between transitions)
           if (instance.isUnmounting) {
+            return
+          }
+          // Nor if the field is mounted again by then. React unmounts and mounts again without removing
+          // anything: StrictMode does it to every mount in development on React 18 and 19, and React 19's
+          // `<Activity>` to what it hides and shows again, in production too. The document's
+          // `isUnmounting` is back to false by then, so this cleared the value of a field still on screen
+          // (measured on React 18.3 and 19.3; 0.34.3 kept it).
+          if (this.attached) {
             return
           }
           const form = instance.form
@@ -381,7 +392,11 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
     field.props = props
     useBeforePaintEffect(() => {
       const mounted = own.current! // not null: the render set it
-      return () => mounted.unmount()
+      mounted.attached = true
+      return () => {
+        mounted.attached = false
+        mounted.unmount()
+      }
     }, [])
     const {name, disabled, normalize, format, parse = normalize, validate, options} = props
     // A cast, not a guard, read at render: final-form's `Field`, unless something replaced it.
@@ -576,6 +591,11 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
           own.unsubscribe = null
           own.subscribedForm = null
           formsStorage.delete(own.stored!) // not undefined: the mount above stored it
+          // A nested form taking its errors with it, which nothing else would report when it goes on a
+          // component's own state (a tab switched, a row collapsed): the host heard them, and keeps them
+          // until it hears otherwise. The owner reports the document tree's errors; see `reportErrors`.
+          const owner = props.parent as { reportErrors?: () => void } | undefined
+          if (owner && typeof owner.reportErrors === 'function') owner.reportErrors()
         }
       }, []) // eslint-disable-line react-hooks/exhaustive-deps -- the mount's values, as `componentDidMount` read them
 

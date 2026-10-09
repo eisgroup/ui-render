@@ -252,6 +252,8 @@ export class UIRender extends DocumentInstance {
     // Declared only: the constructor sets each when the host gives it one, and `declare` keeps Babel
     // from emitting a field for it. Without it Babel 8 emits one, set to undefined after `super`.
     declare errorHandler?: (errors: object) => void
+    // What `errorHandler` was last handed, by `reportErrors`.
+    declare reportedErrors?: Record<string, string>
     declare translate?: Translate
 
     constructor (props: UIRenderProps) {
@@ -260,8 +262,8 @@ export class UIRender extends DocumentInstance {
         // constructed owned it for everybody: measured on two documents, the first one's validation
         // error was delivered to the SECOND one's callback and the first one's callback was never
         // called at all. Nothing else read that global, so it is gone rather than shadowed.
-        // An instance reports only if it was given a callback; it does not inherit its owner's,
-        // because the error map is still shared and the owner already reports those errors itself.
+        // A nested instance is not given one. It reports through its owner (`reportErrors`), whose
+        // callback hears the errors of every form in the document tree, nested ones included.
         if (typeof props.getValidationErrors === 'function') {
             this.errorHandler = props.getValidationErrors
         }
@@ -288,7 +290,6 @@ export class UIRender extends DocumentInstance {
             meta: {
                 json: this.props.meta
             },
-            errors: {},
             key: new Date(),
             isPopupOpen: false,
             popupTitle: '',
@@ -333,16 +334,42 @@ export class UIRender extends DocumentInstance {
         if (this.props.meta) {
             errorsProcessing(this.form, this.props.meta)
         }
+        this.reportErrors()
+    }
 
-        // This instance's errors. Until §9.3 step 3 split the map, every instance compared against
-        // the same one, so a second document repeated the first one's errors to its own callback.
-        const ownErrors = this.form ? errorsFor(this.form) : {}
-        if (typeof this.errorHandler === 'function'
-            && !isEqual(ownErrors, this.state.errors)
-        ) {
-            const errors = cloneDeep(ownErrors)
+    /**
+     * Hands the host's `getValidationErrors` the errors of every form in this document tree: the root
+     * form and each nested document's own, a `useForm` block's and a table's draft row
+     * (`renderExtraItem`) among them. A document given no callback asks its owner to report, so a
+     * nested form's change reaches the host even when nothing above it re-rendered.
+     *
+     * The tree's, and only the tree's. Until §9.3 step 3 every form wrote into one map for the whole
+     * page, so a second document repeated the first one's errors to its own callback. The split then
+     * reported each document's own form alone, which dropped the nested forms that 0.34.x reported:
+     * measured, a required field left empty in a `useForm` block, or in a draft row, showed its error
+     * on screen and never reached the host. `formsOf(tree)` is the scope `getFormData` reads.
+     */
+    reportErrors (): void {
+        if (typeof this.errorHandler !== 'function') {
+            const { parent } = this.props
+            if (parent && typeof parent.reportErrors === 'function') parent.reportErrors()
+            return
+        }
+        // A document going away has nothing left to report; its nested forms leave after it.
+        if ((this as { isUnmounting?: boolean }).isUnmounting) return
+        const treeErrors: Record<string, string> = {}
+        formsOf(this.formTree).forEach(({ form }) => {
+            if (form !== this.form) Object.assign(treeErrors, errorsFor(form))
+        })
+        // Its own form's last, so that one of its fields wins a name a nested form shares.
+        if (this.form) Object.assign(treeErrors, errorsFor(this.form))
+        // Against what the host was last told, kept here as it is told. It was state, and a state update
+        // shows at the next render: every nested document that re-rendered in a commit reported before
+        // that, so one change reached the host once per nested document, table rows included.
+        if (!isEqual(treeErrors, this.reportedErrors || {})) {
+            const errors = cloneDeep(treeErrors)
+            this.reportedErrors = errors
             this.errorHandler(mapErrorObjectToUIFormat(errors))
-            this.setState({ errors })
         }
     }
 
@@ -940,7 +967,9 @@ function Decorator (Class: any) {
         componentWillUnmount (nextProps?: unknown, nextState?: unknown) {
             const { parent, form, index } = this.props
             if (parent && index != null) parent.unregisterDataKind(this, form.kind, index)
-            // A change typed just before unmount must not submit a form the user has left.
+            // A change typed just before unmount must not submit a form the user has left. Not flushed
+            // either, measured 2026-10-09: by the time this runs the document's forms have left the
+            // registry, so a submit made here sent every `dataKind` table empty, as 0.34.x's late one did.
             cancelAutoSubmit(this)
             if (super.componentWillUnmount) super.componentWillUnmount(...arguments)
         }

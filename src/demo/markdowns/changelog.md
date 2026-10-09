@@ -54,6 +54,33 @@
   An array field could be reported with the array of its items' errors as its `text`. That entry
   is left out now; each item's error is still reported, under the item's own field name. Every
   other report is unchanged: every validator a meta can name returns a string.
+- **`getValidationErrors` hears every form of the document again, nested ones included.** A
+  `useForm` block and a table's draft row (`renderExtraItem`) have forms of their own. 0.34.x
+  reported their errors with the rest, and so does this release. An earlier step of it reported the
+  document's own form alone, so a required field left empty in either showed its error on screen
+  and never reached the host. Another `UIRender` on the page still reports only to its own callback.
+- **The `AutoSubmit` view saves a change still waiting when it unmounts.** In 0.34.x the save
+  ran once the delay ran out, after the view had gone. An earlier step of this release cancelled it
+  at unmount, which lost the last edit of a user who left within the delay (200 ms by default). Now
+  it saves as the view goes, with the values the user left, and updates nothing afterwards.
+- **`autoSubmit` on a field drops a change still waiting when the document unmounts.** In 0.34.x it
+  was submitted after the delay, when the document had already gone, and with every `dataKind`
+  table in the submitted values emptied, because the nested rows had left with the document.
+  Submitting it at unmount sends the same emptied tables, so it is not submitted at all. If your
+  page must keep that edit, read `getFormData` when it leaves.
+- **`AutoSubmit` carries on after a save that fails, and saves one change at a time.** Both
+  defects were in 0.34.x too.
+  - Its `onChange` returning a promise that rejects used to stop it for good. Every later change
+    waited for the failed save and failed with it, nothing was saved again, and the loader stayed
+    on. Now the next change saves again, and with `partial` it resends what failed. The failure is
+    the host's to report, from its own save: it no longer escapes as an unhandled promise rejection.
+  - Two changes made while a slow save was running woke together when it finished and saved at
+    once, so the older one could reach the server last. They now save in turn.
+- **A field with `onRemoveChange` keeps its value when React mounts it again.** React can unmount
+  a field and mount it again without removing it. StrictMode does this in development on React 18
+  and 19, and React 19's `<Activity>` does it to what it hides and shows again, in production too.
+  The field's deferred clear then set it to `null` and reported that to `onChange`. It clears only
+  a field that is really gone now, as on 0.34.3.
 - **`apiCalls.updateData` is the call an `onApplyPeriods` action makes.** It had a name taken from one
   host's domain; that name keeps working, is marked deprecated in the published types, and loses to
   `updateData` when a host passes both. No host has to change anything.

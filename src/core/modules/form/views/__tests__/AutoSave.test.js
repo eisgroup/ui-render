@@ -110,25 +110,30 @@ describe('AutoSave', () => {
 })
 
 describe('AutoSave debounce lifetime (§9.3 step 4)', () => {
-    it('does not save after the component unmounts', async () => {
-        // THE HAZARD: AutoSave had no componentWillUnmount at all, so a change typed just before the
-        // component went away still fired its onChange afterwards — a write the user had navigated
-        // away from, plus a setState on an unmounted component.
+    it('saves a change still waiting when the component unmounts, once, and updates no state after', async () => {
+        // THE HAZARD, twice over. AutoSave had no componentWillUnmount at all, so a change typed just before
+        // the component went away fired its onChange after it had gone, with a setState on an unmounted
+        // component. §9.3 step 4 then CANCELLED it at unmount, which lost the change: the last edit before
+        // the user left. It is flushed now, as the component goes, and nothing updates state after that,
+        // which the console guard would report on React 16 and 17.
         const onChange = jest.fn().mockResolvedValue()
-        const { getForm, unmount } = renderFormWithAutoSave({ a: 1 }, { onChange, delay: 300 })
+        const { getForm, unmount } = renderFormWithAutoSave({ a: 1 }, { onChange, delay: 300, showLoader: true })
 
         act(() => { jest.advanceTimersByTime(500) })   // let it capture initial values
         act(() => { getForm().change('a', 2) })         // schedule a save
         unmount()                                       // ...and leave before it fires
-        act(() => { jest.advanceTimersByTime(1000) })
+        expect(onChange).toHaveBeenCalledTimes(1)
+        expect(onChange).toHaveBeenCalledWith({ a: 2 })
 
-        expect(onChange).not.toHaveBeenCalled()
+        await act(async () => { jest.advanceTimersByTime(1000) })
+        expect(onChange).toHaveBeenCalledTimes(1)
     })
 
-    it('does not fire the OLD debounce after `delay` changes', async () => {
+    it('saves what the OLD debounce was waiting for when `delay` changes, once', async () => {
         // The same leak in a second place: UNSAFE_componentWillReceiveProps REPLACED this.handleChange
         // when `delay` changed without cancelling the previous one, so a call scheduled under the old
-        // delay still landed.
+        // delay landed later, beside whatever the new one saved. §9.3 step 4 cancelled it instead, which
+        // dropped the change; it is flushed now, so it lands at once, and only once.
         const onChange = jest.fn().mockResolvedValue()
         let formApi
         const view = render(
@@ -157,9 +162,12 @@ describe('AutoSave debounce lifetime (§9.3 step 4)', () => {
                 />
             )
         )
-        act(() => { jest.advanceTimersByTime(1000) })    // past the OLD delay, short of the new one
-
-        expect(onChange).not.toHaveBeenCalled()
+        // The change waiting under the old delay is saved as that debounce is replaced, not dropped, and not
+        // saved again by the new one.
+        expect(onChange).toHaveBeenCalledTimes(1)
+        expect(onChange).toHaveBeenCalledWith({ a: 2 })
+        await act(async () => { jest.advanceTimersByTime(10000) })
+        expect(onChange).toHaveBeenCalledTimes(1)
     })
 })
 
