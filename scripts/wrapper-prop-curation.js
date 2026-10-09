@@ -222,8 +222,9 @@ const IN_HOUSE_CURATION = {
             + 'names for the machinery behind them, plus `clearable`. THE MECHANISM MATTERS AS MUCH AS '
             + 'THE LIST: Semantic DECLARED every one of these, so passing one used to be harmless, '
             + 'while `Listbox` spreads what it does not destructure onto its element — a dropped prop '
-            + 'would have become a DOM attribute. `Dropdown.tsx` strips them and warns once per name in '
-            + 'development instead, the same mechanism `Tooltip` uses. Six names, one decision. The evidence is that nothing declares them: not the '
+            + 'would have become a DOM attribute. `Dropdown.tsx` strips them instead, the same mechanism `Tooltip` uses, '
+            + 'and warns once per name only when this repository runs the source in development: the '
+            + 'published bundle is built for production and strips them without a word. Six names, one decision. The evidence is that nothing declares them: not the '
             + 'tracked examples, not the consumer-only record, and no answer to the changelog entry '
             + 'that asked. This is a BREAKING change for anyone who did and did not say so, which '
             + 'is why it is on this page rather than only in the swap PR. THE SEMVER CALL IS MADE: the '
@@ -513,7 +514,8 @@ const IN_HOUSE_CURATION = {
             + '(`closeOnPortalMouseLeave`, `closeOnTrigger*`, `openOnTrigger*`, `eventPool`, '
             + '`triggerRef`, …). Those 45 split exactly three ways: 9 are still accepted under the '
             + 'same name (`content`, `children`, `inverted`, `position`, `open`, `disabled`, '
-            + '`className`, `onOpen`, `onClose`); 19 are DROPPED and warn once each; and 17 are '
+            + '`className`, `onOpen`, `onClose`); 19 are DROPPED by name, with a warning that only a development run of '
+            + 'the source in this repository prints; and 17 are '
             + 'dropped SILENTLY. 9 + 19 + 17 = 45. Every one of the 19 warned names really was in '
             + 'that surface — checked, none is invented. The silent 17 are Semantic\'s own internals '
             + '(`context`, `onMount`/`onUnmount`, `openOnTrigger*`, `popperModifiers`, '
@@ -828,7 +830,7 @@ const STEP_OBLIGATIONS = [
             'The L was NOT in `search`/`multiple`/`allowAdditions`/`clearable` — nothing used them, and they were REMOVED rather than reimplemented. It was in the keyboard/a11y matrix, which had to be built rather than ported: `Home`/`End`, `PageUp`/`PageDown` and typeahead were measured ABSENT from the library, so there was nothing to preserve and everything to write.',
             'MET: `displayName = \'Dropdown\'` and the named-vs-default export split both survive — `modules/form/utils.tsx` still branches on `InputComponent.displayName`, and only the named export carries it.',
             'MET, and one addition: `role="listbox"`, `aria-expanded`, `aria-disabled` and `tabIndex=-1` when disabled are all emitted. `aria-disabled` was MISSING in the first draft and caught by the behavioural suite — a `role="listbox"` div cannot carry the native attribute, so being unavailable has to be said three ways. Added beyond the library: `aria-activedescendant`, which is how the keyboard cursor is announced now that moving no longer commits.',
-            'DECIDED: tier 2 was resolved as REMOVAL, on the evidence that nothing in either corpus or the consumer-only record declares any of them. Not silently — the removed names are stripped at the boundary and warn once each in development, and the `Dropped` table below is the record.',
+            'DECIDED: tier 2 was resolved as REMOVAL, on the evidence that nothing in either corpus or the consumer-only record declares any of them. The removed names are stripped at the boundary. They warn once each only when this repository runs the source in development; the published bundle strips them silently, so the `Dropped` table below is the record a host has.',
             'DELIVERED: both `classContract` and `behaviourContract` are measured and present above. The class contract is pinned token by token in `src/style/__tests__/css.dropdown-contract.test.js` (what each class is worth in scoped rules), and the behaviour contract is the WAI-ARIA listbox model — arrows move a cursor, Enter commits, Escape reports nothing. The same keys work in the select-only combobox pattern the control follows now.',
         ],
     },
