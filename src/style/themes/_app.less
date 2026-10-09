@@ -24,8 +24,11 @@
   }
 }
 
-// This may be replaced with specific class to improve performance
-*[tabIndex="-1"] {
+// This may be replaced with specific class to improve performance.
+// Not the select's list (`Listbox.tsx`). It is out of the tab order only so that Chromium does not make
+// a long list a focusable scroller of its own, and `.no-outline()`'s `box-shadow: none !important` would
+// take the shadow off the open menu. `:where`, so the exclusion adds no specificity to the rule.
+*[tabIndex="-1"]:not(:where([role="listbox"])) {
   .no-outline();
 }
 

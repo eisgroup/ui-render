@@ -300,7 +300,8 @@
   as you passed it, fired your `onChange`, and cascaded any dependent select — so arrowing past an
   option changed the form, and `Escape` only closed the list without putting the old value back.
   There was no keyboard way back to where you started. Now the arrows move a highlight, **Enter**
-  chooses, and **Escape** closes having changed nothing.
+  or **Tab** chooses it (Tab then moves on, as before), and **Escape** closes having changed
+  nothing, as does a click elsewhere.
 
   If your meta relies on the old behaviour — an `onChange` firing while a user scrolls a list, or a
   dependent select refreshing before anything is chosen — that is the one thing here that needs
@@ -309,6 +310,16 @@
   **New keys, none of which worked before:** `Home` and `End` jump to the first and last option,
   `PageUp`/`PageDown` move a page, and typing letters jumps to the first option starting with them
   (within 700 ms; pressing the same letter repeatedly cycles through the options starting with it).
+
+  **Kept as it was:**
+  - the list opens scrolled to the selected option, and keeps the highlighted option in view as the
+    keys move it, in a zoomed or scaled container too;
+  - it closes when focus leaves it;
+  - an option's label is still a `span.text`, which is what the theme colours, in an `inverted`
+    container too.
+
+  `Tab` from an open list now moves to the next field. In 0.34.3, from a list long enough to scroll,
+  it closed the list and left focus on no element (measured in Chromium).
 
   **Two accessibility fixes.** The select used to announce its current value through a
   `role="alert"` live region — an alert is for interruptions, and a screen-reader user heard one

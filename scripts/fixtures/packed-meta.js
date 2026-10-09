@@ -45,4 +45,26 @@ const deepData = {
     flag: true,
 }
 
-module.exports = { deepMeta, deepData }
+/**
+ * The second document the browser smoke mounts, beside the first: a long select in an `inverted` container,
+ * which is what the 2026-10-08 audit found the first in-house list getting wrong against 0.34.3. Its selection
+ * opened out of view, the arrows walked the cursor out of view, focus leaving did not close it, and its options
+ * were near-black on the inverted dark grey. A layout question, so only a browser can answer it.
+ */
+const listMeta = {
+    view: 'Col',
+    className: 'inverted',
+    items: [
+        {
+            view: 'Input',
+            type: 'select',
+            name: 'pick',
+            label: 'A long list',
+            options: Array.from({ length: 40 }, (_, i) => ({ text: `Option ${i}`, value: `v${i}` })),
+        },
+        { view: 'Input', name: 'after', label: 'After the list' },
+    ],
+}
+const listData = { pick: 'v30', after: '' }
+
+module.exports = { deepMeta, deepData, listMeta, listData }

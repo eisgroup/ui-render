@@ -27,6 +27,8 @@ const PAGE = `<!doctype html>
 <body>
 <p id="outside" class="padding">The host page, outside the widget.</p>
 <div id="host"></div>
+<!-- Scaled, as a host's zoomed panel or animated popup is: the list scrolls by its own pixels, not the page's. -->
+<div style="transform: scale(0.8); transform-origin: top left"><div id="list"></div></div>
 <script src="bundle.js"></script>
 </body>
 </html>

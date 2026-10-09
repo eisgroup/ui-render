@@ -30,12 +30,16 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox">
+                <div class="menu transition" role="listbox" tabindex="-1">
                   <div aria-selected="true" class="item active" role="option">
-                    "ASO"
+                    <span class="text">
+                      "ASO"
+                    </span>
                   </div>
                   <div aria-selected="false" class="item" role="option">
-                    "ASOALC"
+                    <span class="text">
+                      "ASOALC"
+                    </span>
                   </div>
                 </div>
               </div>
@@ -47,12 +51,16 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox">
+                <div class="menu transition" role="listbox" tabindex="-1">
                   <div aria-selected="true" class="item active" role="option">
-                    "ASO"
+                    <span class="text">
+                      "ASO"
+                    </span>
                   </div>
                   <div aria-selected="false" class="item" role="option">
-                    "ASOALC"
+                    <span class="text">
+                      "ASOALC"
+                    </span>
                   </div>
                 </div>
               </div>
@@ -64,7 +72,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox">
+                <div class="menu transition" role="listbox" tabindex="-1">
                 </div>
               </div>
             </div>
@@ -982,12 +990,16 @@ exports[`demo example full-DOM contract dropdown renders a stable, non-empty DOM
         </div>
         <i aria-hidden="true" class="icon dropdown">
         </i>
-        <div class="menu transition" role="listbox">
+        <div class="menu transition" role="listbox" tabindex="-1">
           <div aria-selected="true" class="item active" role="option">
-            "Gold"
+            <span class="text">
+              "Gold"
+            </span>
           </div>
           <div aria-selected="false" class="item" role="option">
-            "Silver"
+            <span class="text">
+              "Silver"
+            </span>
           </div>
         </div>
       </div>
@@ -1013,12 +1025,16 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox">
+                <div class="menu transition" role="listbox" tabindex="-1">
                   <div aria-selected="true" class="item active" role="option">
-                    "Plan 1"
+                    <span class="text">
+                      "Plan 1"
+                    </span>
                   </div>
                   <div aria-selected="false" class="item" role="option">
-                    "Plan 2"
+                    <span class="text">
+                      "Plan 2"
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1035,15 +1051,21 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox">
+                <div class="menu transition" role="listbox" tabindex="-1">
                   <div aria-selected="true" class="item active" role="option">
-                    "GroupA"
+                    <span class="text">
+                      "GroupA"
+                    </span>
                   </div>
                   <div aria-selected="false" class="item" role="option">
-                    "GroupB"
+                    <span class="text">
+                      "GroupB"
+                    </span>
                   </div>
                   <div aria-selected="false" class="item" role="option">
-                    "DepLife"
+                    <span class="text">
+                      "DepLife"
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1304,7 +1326,7 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
             </div>
             <i aria-hidden="true" class="icon dropdown">
             </i>
-            <div class="menu transition" role="listbox">
+            <div class="menu transition" role="listbox" tabindex="-1">
             </div>
           </div>
         </div>
@@ -1449,12 +1471,16 @@ exports[`demo example full-DOM contract layout renders a stable, non-empty DOM m
             </div>
             <i aria-hidden="true" class="icon dropdown">
             </i>
-            <div class="menu transition" role="listbox">
+            <div class="menu transition" role="listbox" tabindex="-1">
               <div aria-selected="true" class="item active" role="option">
-                "Layout Alpha"
+                <span class="text">
+                  "Layout Alpha"
+                </span>
               </div>
               <div aria-selected="false" class="item" role="option">
-                "Layout Beta"
+                <span class="text">
+                  "Layout Beta"
+                </span>
               </div>
             </div>
           </div>
@@ -2839,12 +2865,16 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                       </div>
                       <i aria-hidden="true" class="icon dropdown">
                       </i>
-                      <div class="menu transition" role="listbox">
+                      <div class="menu transition" role="listbox" tabindex="-1">
                         <div aria-selected="true" class="item active" role="option">
-                          "Gold"
+                          <span class="text">
+                            "Gold"
+                          </span>
                         </div>
                         <div aria-selected="false" class="item" role="option">
-                          "Silver"
+                          <span class="text">
+                            "Silver"
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -3251,12 +3281,16 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                       </div>
                       <i aria-hidden="true" class="icon dropdown">
                       </i>
-                      <div class="menu transition" role="listbox">
+                      <div class="menu transition" role="listbox" tabindex="-1">
                         <div aria-selected="true" class="item active" role="option">
-                          "Group 1"
+                          <span class="text">
+                            "Group 1"
+                          </span>
                         </div>
                         <div aria-selected="false" class="item" role="option">
-                          "Group 2"
+                          <span class="text">
+                            "Group 2"
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -3677,7 +3711,7 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox">
+                <div class="menu transition" role="listbox" tabindex="-1">
                 </div>
               </div>
             </div>
@@ -3693,7 +3727,7 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox">
+                <div class="menu transition" role="listbox" tabindex="-1">
                 </div>
               </div>
             </div>
@@ -3829,7 +3863,7 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
                   </div>
                   <i aria-hidden="true" class="icon dropdown">
                   </i>
-                  <div class="menu transition" role="listbox">
+                  <div class="menu transition" role="listbox" tabindex="-1">
                   </div>
                 </div>
               </div>
@@ -3847,7 +3881,7 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
                   </div>
                   <i aria-hidden="true" class="icon dropdown">
                   </i>
-                  <div class="menu transition" role="listbox">
+                  <div class="menu transition" role="listbox" tabindex="-1">
                   </div>
                 </div>
               </div>
@@ -4000,7 +4034,7 @@ exports[`demo example full-DOM contract selectIndexValue renders a stable, non-e
         </div>
         <i aria-hidden="true" class="icon dropdown">
         </i>
-        <div aria-label="Select option (index value)" class="menu transition" role="listbox">
+        <div aria-label="Select option (index value)" class="menu transition" role="listbox" tabindex="-1">
         </div>
       </div>
     </div>
@@ -4024,7 +4058,7 @@ exports[`demo example full-DOM contract selectReorder renders a stable, non-empt
               </div>
               <i aria-hidden="true" class="icon dropdown">
               </i>
-              <div class="menu transition" role="listbox">
+              <div class="menu transition" role="listbox" tabindex="-1">
               </div>
             </div>
           </div>
@@ -4172,7 +4206,7 @@ exports[`demo example full-DOM contract selectStableValue renders a stable, non-
         </div>
         <i aria-hidden="true" class="icon dropdown">
         </i>
-        <div aria-label="Select option (stable id value)" class="menu transition" role="listbox">
+        <div aria-label="Select option (stable id value)" class="menu transition" role="listbox" tabindex="-1">
         </div>
       </div>
     </div>
