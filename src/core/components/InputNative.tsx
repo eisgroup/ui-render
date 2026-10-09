@@ -61,6 +61,8 @@ export type InputNativeProps = {
   disabledSpellCheck?: boolean
   /* Callback(element) on mount */
   onMount?: (element: InputNativeElement) => void
+  /* Called with the rendered `<input>` or `<textarea>`, and with `null` when it goes: how `Input` finds its own field */
+  elementRef?: (element: InputNativeElement | null) => void
   /* Form field registration path, and the second argument of every onChange below */
   name?: string
   /* Checkbox state; falls back to `value` when not given */
@@ -99,6 +101,7 @@ function InputNative (props: InputNativeProps) {
     resize,
     compact,
     onMount,
+    elementRef,
     initialValues,
     ...rest
   }: InputNativeProps = props
@@ -110,16 +113,18 @@ function InputNative (props: InputNativeProps) {
   const attached = useRef<InputNativeElement | null>(null)
 
   const onMountResize = useCallback((node: InputNativeElement | null) => {
+    if (elementRef) elementRef(node)
     if (!node) return
     element.current = node
     attached.current = node
-  }, [])
+  }, [elementRef])
 
   const onMountColor = useCallback((node: InputNativeElement | null) => {
+    if (elementRef) elementRef(node)
     if (!node) return
     element.current = node
     node.style.backgroundColor = node.value
-  }, [])
+  }, [elementRef])
 
   // The element the render below picks, which decides whether the color branch applies.
   const type = resize ? 'textarea' : rest.type
@@ -194,8 +199,10 @@ function InputNative (props: InputNativeProps) {
   }
   // The ref callbacks are spread after the bag rather than written into it: the switch reads the bag during the
   // render, and a bag holding a ref callback may not be read then. Each element gets the ref it got before, a
-  // caller's included when neither callback replaces it.
+  // caller's included when neither callback nor `elementRef` replaces it.
   const resizeRef: ForwardedProps = compact != null ? {ref: onMountResize} : {}
+  // `elementRef` when no callback above takes the ref; a `<select>` is `Select`'s element, and is not handed out.
+  const elementRefs: ForwardedProps = compact == null && elementRef ? {ref: elementRef} : resizeRef
   switch (forwarded.type) {
     case 'select':
       // A cast: the engine `onChange` is still in the bag here, as `Select` wants it (see
@@ -204,16 +211,16 @@ function InputNative (props: InputNativeProps) {
     case 'checkbox':
       forwarded.onChange = onChangeCheckbox
       if (forwarded.checked == null && forwarded.value != null) forwarded.checked = forwarded.value
-      return <input {...forwarded} {...resizeRef} />
+      return <input {...forwarded} {...elementRefs} />
     case 'color':
       forwarded.onChange = onChangeColor // update color for uncontrolled input
       return <input {...forwarded} ref={onMountColor} />
     case 'textarea':
       forwarded.onChange = onChange
-      return <textarea {...forwarded} {...resizeRef} />
+      return <textarea {...forwarded} {...elementRefs} />
     default:
       forwarded.onChange = onChange
-      return <input {...forwarded} {...resizeRef} />
+      return <input {...forwarded} {...elementRefs} />
   }
 }
 

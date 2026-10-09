@@ -195,3 +195,26 @@ test('the popup opens, its calendar picks a date, Escape closes it, and a toolti
     await expect(page.getByRole('tooltip')).toHaveText('The tooltip text')
     expect(errors).toEqual([])
 })
+
+test('a second copy of a document keeps its own ids, and its labels name its own fields', async ({ page }) => {
+    await page.goto(PAGE)
+    const host = page.locator('#host > .ui-render')
+    const twin = page.locator('#twin > .ui-render')
+    await expect(twin.getByText('packed tarball smoke')).toBeVisible()
+
+    // Five documents, and every id appears once: the derived field ids and each document's popup root.
+    const repeated = await page.evaluate(() => {
+        const ids = Array.from(document.querySelectorAll('[id]'), element => element.id)
+        return ids.filter((id, index) => ids.indexOf(id) !== index)
+    })
+    expect(repeated).toEqual([])
+
+    // The browser's own label-to-field association, which a click follows: the twin's label is the twin's field's.
+    await twin.locator('label', { hasText: 'Amount' }).click()
+    await expect(twin.getByLabel('Amount')).toBeFocused()
+    await expect(host.getByLabel('Amount')).not.toBeFocused()
+
+    // `Checkbox` kept the id it derives from its label unique before the other fields did: its label names it too.
+    await expect(twin.getByRole('checkbox', { name: 'A flag' })).toHaveCount(1)
+    await expect(host.getByRole('checkbox', { name: 'A flag' })).toHaveCount(1)
+})

@@ -1,5 +1,5 @@
 import classNames from '../utils/classNames'
-import React, { useMemo, useContext } from 'react'
+import React, { useCallback, useContext, useMemo, useRef } from 'react'
 import Row from './Row'
 import Text from './Text'
 import View from './View'
@@ -11,9 +11,10 @@ import generateConfig from 'rc-picker/lib/generate/moment'
 import moment from 'moment'
 import { ConfigContext } from '../contexts'
 import { ENGINE_PROPS, omitProps } from './domProps'
-import type { PickerProps } from 'rc-picker'
+import type { PickerProps, PickerRef } from 'rc-picker'
 import type { Moment } from 'moment'
 import type { Translate } from '../utils/_envs'
+import { useOwnId } from './useOwnId'
 
 type DatePickerProps = PickerProps<Moment>
 
@@ -22,7 +23,7 @@ type DatePickerProps = PickerProps<Moment>
  * it renders carries the attribute, the open panel included (measured). Typed rather than removed, so
  * that converting this file changes nothing at runtime.
  */
-const Picker = PickerJs as React.ComponentType<DatePickerProps & { resize?: boolean }>
+const Picker = PickerJs as React.ComponentType<DatePickerProps & { resize?: boolean } & React.RefAttributes<PickerRef>>
 
 /** The named props are read here; the rest is passed to rc-picker through ./domProps. */
 export type InputDateProps = {
@@ -64,7 +65,7 @@ export type InputDateProps = {
 
 const InputDate = ({
     name,
-    id = name,
+    id: idGiven,
     icon,
     lefty,
     onClickIcon,
@@ -105,7 +106,15 @@ const InputDate = ({
         props.inputReadOnly = readonly
     }
 
-    if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
+    // The id as it always was: the one given, else the name, else one from the label.
+    let derivedId = idGiven === undefined ? name : idGiven
+    if (!derivedId && label) derivedId = 'input-' + label.replace(/ +?/g, '-')
+    // Unique on the page unless the meta gave it: see `useOwnId`. The `<input>` that carries it is rc-picker's,
+    // inside the element its ref hands out.
+    const field = useRef<Element | null>(null)
+    const onPicker = useCallback((picker: PickerRef | null) => { field.current = picker && picker.nativeElement }, [])
+    const ownId = useOwnId(idGiven ? undefined : derivedId, field)
+    const id = idGiven || ownId
     if (!label && title) props.title = translate(title)
 
     const toMoment = (date: unknown): Moment | null => {
@@ -160,6 +169,7 @@ const InputDate = ({
             </Row>
             <Row className={classNames('input', {icon, lefty, error, info, unit})}>
                 <Picker
+                    ref={onPicker}
                     name={name}
                     id={id}
                     prefixCls={'ui-render-picker'}

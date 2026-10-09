@@ -8,12 +8,14 @@ import enUs from 'rc-picker/lib/locale/en_US'
 import InputDate from '../InputDate'
 import { ConfigContext } from '../../contexts/ConfigContext'
 
+// rc-picker's `Picker` is a `forwardRef` component, and `InputDate` takes its ref: the stand-in is one too, or React
+// warns that a function component cannot be given a ref. Its render function is the mock the tests read.
 jest.mock('rc-picker', () => {
     const React = require('react')
 
     return {
         __esModule: true,
-        default: jest.fn(props => React.createElement('input', {
+        default: React.forwardRef(jest.fn(props => React.createElement('input', {
             'data-testid': 'date-picker',
             autoFocus: props.autoFocus,
             className: props.className,
@@ -24,7 +26,7 @@ jest.mock('rc-picker', () => {
             placeholder: props.placeholder,
             readOnly: props.inputReadOnly,
             title: props.title,
-        })),
+        }))),
     }
 })
 
@@ -32,11 +34,11 @@ const withConfig = (ui, config = {}) => (
     <ConfigContext.Provider value={config}>{ui}</ConfigContext.Provider>
 )
 
-const pickerProps = () => Picker.mock.calls[Picker.mock.calls.length - 1][0]
+const pickerProps = () => Picker.render.mock.calls[Picker.render.mock.calls.length - 1][0]
 
 describe('InputDate rc-picker and form contracts', () => {
     beforeEach(() => {
-        Picker.mockClear()
+        Picker.render.mockClear()
     })
 
     it('uses the stable rc-picker contract and is safe without a config provider', () => {

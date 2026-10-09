@@ -1,15 +1,17 @@
 import classNames from '../utils/classNames'
-import React, { useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { capitalize, isString } from '../utils'
 import Button from './Button'
 import Icon from './Icon'
 import InputNative from './InputNative'
+import type { InputNativeElement } from './InputNative'
 import Label from './Label'
 import Row from './Row'
 import Text from './Text'
 import View from './View'
 import { Active } from '../utils'
 import type { Translate } from '../utils/_envs'
+import { useOwnId } from './useOwnId'
 
 /** The props documented on `Input` below; the rest is passed to `InputNative`. */
 export type InputProps = {
@@ -75,7 +77,7 @@ export type InputProps = {
  */
 export function Input ({
   name,
-  id = name,
+  id: idGiven,
   icon,
   lefty,
   onClickIcon,
@@ -110,14 +112,21 @@ export function Input ({
     props.className = 'readonly'
     props.readOnly = readonly
   } // React fix
-  if (props.type === 'hidden') {
-    return <InputNative name={name} id={id} disabled={disabled} {...props} />
-  }
   if (float) {
     if (!label && name) label = capitalize(name)
     if (!placeholder) placeholder = ' ' // required for Float label CSS to work
   }
-  if (!id && label) id = 'input-' + label.replace(/ +?/g, '-')
+  // The id as it always was: the one given, else the name, else, unless the input is hidden, one from the label.
+  let derivedId = idGiven === undefined ? name : idGiven
+  if (props.type !== 'hidden' && !derivedId && label) derivedId = 'input-' + label.replace(/ +?/g, '-')
+  // Unique on the page unless the meta gave it: see `useOwnId`.
+  const field = useRef<InputNativeElement | null>(null)
+  const onField = useCallback((node: InputNativeElement | null) => { field.current = node }, [])
+  const ownId = useOwnId(idGiven ? undefined : derivedId, field)
+  const id = idGiven || ownId
+  if (props.type === 'hidden') {
+    return <InputNative name={name} id={id} disabled={disabled} elementRef={onField} {...props} />
+  }
   if (!label && title) props.title = translate(title)
   // An `aria-describedby` naming an id no element carries is worse than none: it is an axe
   // `aria-valid-attr-value` violation, and a screen reader announces nothing for it. The help
@@ -159,7 +168,7 @@ export function Input ({
         </Text>
         }
         <InputNative
-          name={name} id={id} disabled={disabled} resize={resize} aria-describedby={idHelp}
+          name={name} id={id} disabled={disabled} resize={resize} aria-describedby={idHelp} elementRef={onField}
           onFocus={(...args: unknown[]) => {
             !active && setState(true)
             onFocus && onFocus(...args)

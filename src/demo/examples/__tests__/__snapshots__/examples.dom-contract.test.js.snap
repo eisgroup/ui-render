@@ -2069,7 +2069,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="sku" name="sku" type="text" value="" />
+                                        <input id="sku-2" name="sku" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2078,7 +2078,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="description" name="description" type="text" value="" />
+                                        <input id="description-2" name="description" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2087,7 +2087,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="qty" name="qty" type="number" value="" />
+                                        <input id="qty-2" name="qty" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2096,7 +2096,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="unitPrice" name="unitPrice" type="number" value="" />
+                                        <input id="unitPrice-2" name="unitPrice" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2240,7 +2240,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="sku" name="sku" type="text" value="" />
+                                        <input id="sku-3" name="sku" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2249,7 +2249,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="description" name="description" type="text" value="" />
+                                        <input id="description-3" name="description" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2258,7 +2258,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="qty" name="qty" type="number" value="" />
+                                        <input id="qty-3" name="qty" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2267,7 +2267,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="unitPrice" name="unitPrice" type="number" value="" />
+                                        <input id="unitPrice-3" name="unitPrice" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
