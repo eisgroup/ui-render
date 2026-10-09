@@ -2141,8 +2141,9 @@ npm run test:pack:consumer  # pack, extract, resolve every CSS @import/url(), se
 npm pack --dry-run          # raw manifest, when a budget failure needs eyeballing
 
 # Security baselines (§2.6-13)
-npm audit --omit=dev   # must stay at 0
-npm audit              # 0 on 2026-09-30 (§10), 35 on 2026-10-06 after the ESLint 9 move ("Automated updates" above), not re-measured since; a new finding is new debt to triage
+npm audit --omit=dev   # 0 while `dependencies` is empty, which leaves it nothing to audit: see audit:bundled below
+npm audit              # the development tree: 0 on 2026-09-30 (§10), 35 on 2026-10-06 after the ESLint 9 move ("Automated updates" above), 36 on 2026-10-09; a new finding is new debt to triage
+npm run audit:bundled  # what a host receives: the packages dist/sbom.cdx.json lists (build-lib first); 0 of 19 on 2026-10-09, weekly in CI
 
 # Final-CSS scoping gate (§9.9-H8 — expect 0 unscoped globals after the fix)
 # Reads the root payload: dist/static/all.css is only an @import re-export since §0.7.

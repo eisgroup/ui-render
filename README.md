@@ -191,6 +191,29 @@ Note the unrelated legacy `version` attribute seen in older meta files: it is no
 version (existing files use it both as a producer version at the root and as a node label deeper
 in the tree), the engine discards it, and new files should use `metaVersion`.
 
+## Security model (consumer)
+
+**A meta is code, not content.** Load only metas you would trust as much as your own code: the
+renderer does what a meta tells it to.
+
+- **It sets attributes on the elements it renders, raw HTML included.** A `Text` node with
+  `dangerouslySetInnerHTML: {__html: "…"}` renders that HTML. The renderer checks no URL scheme
+  in an attribute a meta gives.
+- **It calls functions.** A meta calls the actions the renderer has built in, the `methods` you
+  pass and the `apiCalls` you hand it, whenever it declares. One built-in action is `fetch`:
+  `{name: "fetch", mapArgs: ["https://…", options]}` calls the page's `fetch` with that URL and
+  those options.
+- **Data is text, unless a meta makes it an attribute.** A value from `data` renders as text,
+  which React escapes. A meta that binds one to an attribute with `{name: "path"}` sets the value
+  there as it is.
+- **Upload checks run in the browser only.** `formats` and `maxSize` decide what the drop zone
+  accepts, and your `uploadFile` receives the files as the user chose them. Check their type and
+  size again on your server.
+- **Downloads come from your `downloadFile`.** The renderer requests no URL for one: it saves what
+  your function answers through a temporary `<a download>`.
+
+To report a vulnerability, see [SECURITY.md](SECURITY.md).
+
 ## Renderer configuration (consumer)
 
 Three props configure how values are formatted and how the shell is labelled. They are

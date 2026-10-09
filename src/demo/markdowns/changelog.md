@@ -712,6 +712,13 @@ Nothing to do for these:
   registered view is covered by neither. A browser pass found the `Upload` failure listed under
   Fixes.
 - Added GitHub Actions checks for JavaScript/CSS lint, coverage, library build, and demo build.
+- The packages the bundle carries are audited every week, `npm run audit:bundled` in a scheduled workflow.
+  `dependencies` is empty, so `npm audit --omit=dev` audits nothing, and a full `npm audit` reports the
+  development tree: 36 findings on 2026-10-09, none of them in the 19 packages `dist/sbom.cdx.json` lists.
+- CI cancels a run only when a newer push to the same pull request supersedes it. A push to master
+  cancelled the run of the master commit before it, so merges in quick succession left commits
+  without a finished run. Every action is pinned to a commit, with its release in a comment that
+  Dependabot updates.
 - Added a public-declaration gate against locked React 16/17/18/19 types in interop and direct
   CommonJS modes, including a check of the built package's callable runtime export.
 - Added packaging gates: budgets over the published manifest (file count, sizes, required paths,
