@@ -29,6 +29,7 @@ const PAGE = `<!doctype html>
 <div id="host"></div>
 <!-- Scaled, as a host's zoomed panel or animated popup is: the list scrolls by its own pixels, not the page's. -->
 <div style="transform: scale(0.8); transform-origin: top left"><div id="list"></div></div>
+<div id="tall" style="height: 200px; overflow: auto"></div>
 <script src="bundle.js"></script>
 </body>
 </html>

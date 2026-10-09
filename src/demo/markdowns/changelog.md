@@ -266,14 +266,42 @@
   colour and base font there, and `box-sizing: border-box` plus our line-height on your `<html>`.
   An application with its own layout could be visibly rearranged just by importing our CSS.
 
-  Everything those rules were for now applies to the `.ui-render` element itself, which is where it
-  belonged: the widget still lays itself out as a full-height flex column with our font and
-  background. Measured in Chrome before and after — inside the wrapper nothing changed, and outside
-  it nothing applies any more.
+  The typography those rules gave your page now applies to the `.ui-render` element instead: our
+  font, `line-height: 1`, our text colour and `box-sizing: border-box`. So does the date picker's
+  calendar, which renders outside the wrapper, in `<body>`. The page layout they imposed applies
+  nowhere: the wrapper is a transparent block as tall as its content, as it was in 0.34.x, in a
+  container of any height. A document inside another document inherits its type, as it did then.
+  Measured in Chromium against 0.34.3, on a page with no styles of its own:
+  - the font, line height, colour and box model are the same, inside the wrapper and in the
+    calendar;
+  - a container with a fixed height scrolls to the last field.
 
-  **If your application was relying on it** — most likely on `body { margin: 0 }` or on the
-  full-height `html, body { height: 100% }` chain — declare those yourself. They are one line each,
-  and they were never ours to set. Our own demo page now does exactly that.
+  No rule matches an element of your page outside the wrapper, apart from the calendar's own. The
+  32 `@keyframes` names are page-wide, as they always were.
+
+  **The widget no longer takes its type from your page.** In 0.34.x it inherited from the nearest
+  styled ancestor. A font, size or colour your page set on `body` after our stylesheet, or on the
+  mount node's ancestors, reached it. The wrapper now sets ours itself, so to theme the widget,
+  style `.ui-render`.
+
+  **If your page relied on what our stylesheet set on it**, declare it yourself. In 0.34.x, loading
+  `static/all.css` gave your page:
+  - `body { margin: 0 }`;
+  - the full-height chain: `html` at `height: 100%` and `body` at `min-height: 100%`, both flex
+    columns with `position: relative`;
+  - `html { font-size: 100% }`, which reset a root font size your page had set before our
+    stylesheet loaded. The widget is sized in `rem`, so it now follows your page's root font size:
+    with the common `html { font-size: 62.5% }`, its text is 8.75px rather than 14px;
+  - `box-sizing: border-box` on `html`, inherited by every element (not pseudo-elements) through
+    `* { box-sizing: inherit }`, so your own elements were sized by their border box;
+  - on `body`: `overflow-x: hidden`, a white background, our font (14px Roboto, `line-height: 1`),
+    our text colour and font smoothing;
+  - on `html`: `line-height: 1.15` and `text-size-adjust: 100%`;
+  - `-webkit-tap-highlight-color: transparent` on every element.
+
+  The first four are the likely ones. Our own demo page declares `body { margin: 0 }` and a
+  full-height chain of its own in `public/index.html`: `html, body { height: 100% }` and a
+  flex-column mount node.
 - **Three deprecated CSS features are replaced** by their standard equivalents. Scrolling containers
   lose `overflow-y: overlay`, so the `overflow: auto` before it applies. `.break-word` sets
   `overflow-wrap: anywhere` with `word-break: normal`, which is what the CSS Text spec says the

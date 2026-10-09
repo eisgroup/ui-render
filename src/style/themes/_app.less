@@ -33,27 +33,41 @@
 }
 
 
-html {
-  &:extend(.flex--col);
-
-  font-size: @size-scale; // !important - reset browser default size
-  height: 100%;
-  box-sizing: border-box;
-}
-
+// THE WRAPPER, NOT THE PAGE. prefixwrap maps `html` and `body` onto `.ui-render` itself
+// (scripts/prefixwrap-options.js, §9.9-H8), so the `body` rule below styles our own root box, every
+// document's. It keeps what the widget's content inherited from the page in 0.34.x: our font and line height,
+// our text colour, and `position: relative`, which `body` had. `box-sizing: border-box` for the
+// `* { box-sizing: inherit }` chain comes from the vendored reset's `html` rule, on the same element.
+//
+// It does NOT keep the page layout the `html` and `body` rules gave the page: a full-height flex column,
+// `overflow-x: hidden` and our background. On the wrapper those turned every document into a box as tall as
+// its container that clipped what did not fit — measured in Chromium against 0.34.3, where a mount node with
+// `height: 300px; overflow: auto` scrolled to its last field and here hid everything after the fourth. 0.34.x
+// never laid the wrapper out; it was a block, as tall as its content, and transparent. A page that wants the
+// full-height chain declares it for its own mount node, as our demo does in public/index.html.
+//
+// There is no `html` rule here any more. Its `box-sizing` is the vendored reset's, and its `font-size:
+// @size-scale`, which reset a host's root font size in 0.34.x, was dead on the wrapper: `.base-font` sets the
+// wrapper's size later in the cascade. So the widget's `rem` sizes follow the host page's root font size, as
+// the changelog tells hosts.
 body {
-  &:extend(.flex--fill);
   &:extend(.base-font);
 
-  min-height: 100%;
   position: relative;
-  overflow-x: hidden;
   color: @color-text;
-  background-color: @color-bg;
 
   /* Make text lighter on dark background */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+// A DOCUMENT INSIDE ANOTHER inherits its type, as every document did in 0.34.x, when the type sat on `body`.
+// Without this, an inner wrapper's own rules (above, and `reset.overrides`) overrode whatever an element between
+// the two had set: an `.inverted` region kept its dark surface and lost its light text, measured at a contrast
+// of 1.5:1 against 0.34.3's 14:1. prefixwrap makes this `.ui-render div.ui-render`: a wrapper inside a wrapper.
+div.ui-render {
+  font: inherit;
+  color: inherit;
 }
 
 h1, h2, h3, h4, h5, h6,

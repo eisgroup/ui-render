@@ -16,16 +16,26 @@
 
     The §9.9-H8 decision (2026-09-11) is that the published stylesheet must not touch a host page at
     all, only its own `.ui-render` wrapper — so `postcss.config.js` stopped exempting `html`, `body`
-    and `*` from prefixwrap. Everything those rules used to impose on a host now lands on the
-    wrapper instead, which is what they were always for.
+    and `*` from prefixwrap. The typography those rules gave a host's page lands on the wrapper; the
+    page layout they imposed lands nowhere, since 2026-10-09 (themes/_app.less).
 
     Two of them were also doing something for THIS page, and only this page: `body { margin: 0 }`
     and the full-height chain. A demo is a host like any other, so it declares them itself. Adding
     them back to `src/style/` would re-open the leak for every consumer.
+
+    The chain continues on this page's mount node, `#ui-render`: a full-height flex column that
+    scrolls nothing sideways, on our background. Until 2026-10-09 the library's own wrapper rules
+    gave it that, and gave it to EVERY document's `.ui-render` too, which made a document in a host's
+    fixed-height container as tall as the container and clipped the rest (themes/_app.less). So it
+    is this page's, like the rest of the chain.
   -->
   <style>
     html, body { height: 100%; }
     body { margin: 0; }
+    #ui-render {
+      display: flex; flex-direction: column; flex: 1; align-self: stretch;
+      height: 100%; min-height: 100%; overflow-x: hidden; background-color: #fff;
+    }
   </style>
 
   <title>UI-Render Demo</title>

@@ -361,12 +361,30 @@
 }
 
 .ui-render-picker-dropdown {
+    // THE CALENDAR'S TYPE, set here because it inherits none. rc-picker mounts the calendar in `<body>`, outside
+    // `.ui-render`, so the wrapper's typography (themes/_app.less) never reaches it. In 0.34.x it inherited ours
+    // from the page's `body` and `html`, which our stylesheet styled; since §9.9-H8 it inherited the host page's
+    // instead: 16px Times, line height `normal`, black, content-box, measured in Chromium, Firefox and WebKit.
+    // These are the declarations it inherited then. Global, like every `.ui-render-*` rule (prefixwrap-options.js).
+    &:extend(.base-font);
+
     position: absolute;
     // Above the popup (`Modal.tsx`, 1000). rc-picker mounts the calendar in `<body>`, outside the popup:
     // with `auto` it was above one only while the shell's `fade-in` made `.app` a stacking context.
     z-index: 1050;
     box-shadow: 0 0 1px grey;
     pointer-events: none;
+    color: @color-text;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+    // Elements, not pseudo-elements: 0.34.x's page-wide rules were `* { … }`.
+    * {
+        box-sizing: inherit;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
 }
 
 .ui-render-picker-dropdown-range {

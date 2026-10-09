@@ -10,7 +10,8 @@
  *
  * WHAT THE OPTIONS ACTUALLY DO, measured rather than assumed, because the naming misleads:
  * with the exemptions gone, `body { … }` becomes `.ui-render { … }` — the declarations land on our
- * own root box, which is what they were always for. Adding prefixwrap's `prefixRootTags: true`
+ * own root box. That is right for the typography and wrong for the page layout, which
+ * themes/_app.less stopped declaring there on 2026-10-09. Adding prefixwrap's `prefixRootTags: true`
  * instead produces `.ui-render .body { … }`, a CLASS selector matching nothing, which silently
  * drops those styles. Do not "fix" this by turning that option on.
  *

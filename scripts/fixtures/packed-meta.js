@@ -67,4 +67,14 @@ const listMeta = {
 }
 const listData = { pick: 'v30', after: '' }
 
-module.exports = { deepMeta, deepData, listMeta, listData }
+/**
+ * The third document, in a host container with a fixed height that scrolls: twelve fields, taller than it. In
+ * 0.34.x the document was as tall as its content and the container scrolled to the last field; the wrapper's
+ * page-layout rules made it as tall as the container instead, and clipped the rest (themes/_app.less).
+ */
+const tallMeta = {
+    view: 'Col',
+    items: Array.from({ length: 12 }, (_, i) => ({ view: 'Input', name: `field${i}`, label: `Field ${i}` })),
+}
+
+module.exports = { deepMeta, deepData, listMeta, listData, tallMeta }
