@@ -402,3 +402,23 @@ describe('Dropdown', () => {
         })
     })
 })
+
+describe('the combobox\'s accessible name (2026-10-09)', () => {
+    it('is the label when there is one, "Select <name>" when there is not, and a meta\'s own aria-label above both', () => {
+        const labelled = renderDropdown({ name: 'region', label: 'Region', options: objectOptions })
+        expect(labelled.getByRole('combobox')).toHaveAttribute('aria-label', 'Region')
+        labelled.unmount()
+
+        // Without a label, the field's name, as the native `Select` names its control. It had no name at all.
+        const unlabelled = renderDropdown({ name: 'region', options: objectOptions })
+        expect(unlabelled.getByRole('combobox')).toHaveAttribute('aria-label', 'Select region')
+        unlabelled.unmount()
+
+        const own = renderDropdown({ name: 'region', options: objectOptions, 'aria-label': 'Where' })
+        expect(own.getByRole('combobox')).toHaveAttribute('aria-label', 'Where')
+        own.unmount()
+
+        const anonymous = renderDropdown({ options: objectOptions })
+        expect(anonymous.getByRole('combobox')).not.toHaveAttribute('aria-label')
+    })
+})

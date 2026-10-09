@@ -166,6 +166,10 @@ function unset(object: unknown, path: unknown): boolean {
 	if (object == null) return false
 	const parts = toPath(path)
 	if (parts.length === 0) return false
+	// The keys `set` and `setWith` refuse (above), refused here too. Without this, `unset(o, '__proto__.toString')`
+	// read `o.__proto__`, which is `Object.prototype`, and deleted its member for the whole page. Upload passes a
+	// field's name here, so a meta's field name was enough (the 2026-10-08 audit).
+	if (parts.some(part => part === '__proto__' || part === 'constructor' || part === 'prototype')) return false
 	const last = parts[parts.length - 1]
 	const parent = parts.length === 1 ? object : get(object, parts.slice(0, -1))
 	if (parent == null) return false

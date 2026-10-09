@@ -247,6 +247,10 @@ Nothing to do for these:
 
 #### Accessibility
 
+- **A select with no `label` has an accessible name.** It is named "Select <name>", from its field's
+  `name`, as the native `Select` names its control. Without a label it had no name at all, which a
+  screen reader announced as an unnamed combobox: 15 in the demo examples. A meta's own
+  `aria-label` or `aria-labelledby` still wins.
 - **Tabs, an Expand's title and a sortable column's header work from the keyboard.** They had
   no role and no tab stop, so a keyboard could not reach them and a screen reader did not say
   what they were.
@@ -804,6 +808,10 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A field named through `__proto__`, `constructor` or `prototype` can no longer delete a member of
+  `Object.prototype`.** Removing a field's value walks its name as a path, and the walk refused those
+  keys when writing but not when deleting: an upload field named `__proto__.toString` deleted
+  `Object.prototype.toString` for the whole page. Deleting refuses them now too.
 - **A `Checkbox` with no `onChange` can be clicked.** The view is presentational and reads no form value, and
   a meta may leave its `onChange` out; a click then threw a `TypeError`. It now reports nothing: an
   uncontrolled box toggles, and one given a `value` keeps it. The packed package's browser test found it.

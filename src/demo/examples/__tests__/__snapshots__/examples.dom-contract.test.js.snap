@@ -25,12 +25,12 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
             </span>
             <div class="flex--col input--wrapper fill-width margin-h-smaller">
               <div class="ui selection dropdown">
-                <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+                <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select active.option" class="text divider" role="combobox" tabindex="0">
                   "ASO"
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox" tabindex="-1">
+                <div aria-label="Select active.option" class="menu transition" role="listbox" tabindex="-1">
                   <div aria-selected="true" class="item active" role="option">
                     <span class="text">
                       "ASO"
@@ -46,12 +46,12 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
             </div>
             <div class="flex--col input--wrapper done fill-width margin-h-smaller">
               <div class="ui selection dropdown">
-                <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+                <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select active.option" class="text divider" role="combobox" tabindex="0">
                   "ASO"
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox" tabindex="-1">
+                <div aria-label="Select active.option" class="menu transition" role="listbox" tabindex="-1">
                   <div aria-selected="true" class="item active" role="option">
                     <span class="text">
                       "ASO"
@@ -67,12 +67,12 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
             </div>
             <div class="flex--col input--wrapper fill-width margin-h-smaller">
               <div class="ui selection dropdown">
-                <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+                <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select url" class="text divider" role="combobox" tabindex="0">
                   "IP Address"
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox" tabindex="-1">
+                <div aria-label="Select url" class="menu transition" role="listbox" tabindex="-1">
                 </div>
               </div>
             </div>
@@ -985,12 +985,12 @@ exports[`demo example full-DOM contract dropdown renders a stable, non-empty DOM
   <div class="flex--col min-height fill">
     <div class="flex--col input--wrapper fill-width" style="min-height: 120px;">
       <div class="ui selection dropdown">
-        <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+        <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select category" class="text divider" role="combobox" tabindex="0">
           "Gold"
         </div>
         <i aria-hidden="true" class="icon dropdown">
         </i>
-        <div class="menu transition" role="listbox" tabindex="-1">
+        <div aria-label="Select category" class="menu transition" role="listbox" tabindex="-1">
           <div aria-selected="true" class="item active" role="option">
             <span class="text">
               "Gold"
@@ -1020,12 +1020,12 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
             </span>
             <div class="flex--col input--wrapper middle">
               <div class="ui compact selection dropdown">
-                <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+                <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select optionX" class="text divider" role="combobox" tabindex="0">
                   "Plan 1"
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox" tabindex="-1">
+                <div aria-label="Select optionX" class="menu transition" role="listbox" tabindex="-1">
                   <div aria-selected="true" class="item active" role="option">
                     <span class="text">
                       "Plan 1"
@@ -1046,12 +1046,12 @@ exports[`demo example full-DOM contract dropdownExperience renders a stable, non
             </span>
             <div class="flex--col input--wrapper middle">
               <div class="ui compact selection dropdown">
-                <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+                <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select categoryX" class="text divider" role="combobox" tabindex="0">
                   "GroupA"
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox" tabindex="-1">
+                <div aria-label="Select categoryX" class="menu transition" role="listbox" tabindex="-1">
                   <div aria-selected="true" class="item active" role="option">
                     <span class="text">
                       "GroupA"
@@ -1321,12 +1321,12 @@ exports[`demo example full-DOM contract invalidArray renders a stable, non-empty
         </span>
         <div class="flex--col input--wrapper fill-width">
           <div class="ui selection dropdown">
-            <div aria-expanded="false" aria-haspopup="listbox" class="text divider default" role="combobox" tabindex="0">
+            <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select option" class="text divider default" role="combobox" tabindex="0">
               "Select"
             </div>
             <i aria-hidden="true" class="icon dropdown">
             </i>
-            <div class="menu transition" role="listbox" tabindex="-1">
+            <div aria-label="Select option" class="menu transition" role="listbox" tabindex="-1">
             </div>
           </div>
         </div>
@@ -1466,12 +1466,12 @@ exports[`demo example full-DOM contract layout renders a stable, non-empty DOM m
       <div class="flex--col">
         <div class="flex--col input--wrapper fill-width">
           <div class="ui selection dropdown">
-            <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+            <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select layout" class="text divider" role="combobox" tabindex="0">
               "Layout Alpha"
             </div>
             <i aria-hidden="true" class="icon dropdown">
             </i>
-            <div class="menu transition" role="listbox" tabindex="-1">
+            <div aria-label="Select layout" class="menu transition" role="listbox" tabindex="-1">
               <div aria-selected="true" class="item active" role="option">
                 <span class="text">
                   "Layout Alpha"
@@ -2860,12 +2860,12 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                   </div>
                   <div class="flex--col input--wrapper">
                     <div class="ui compact selection dropdown">
-                      <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+                      <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select option" class="text divider" role="combobox" tabindex="0">
                         "Gold"
                       </div>
                       <i aria-hidden="true" class="icon dropdown">
                       </i>
-                      <div class="menu transition" role="listbox" tabindex="-1">
+                      <div aria-label="Select option" class="menu transition" role="listbox" tabindex="-1">
                         <div aria-selected="true" class="item active" role="option">
                           <span class="text">
                             "Gold"
@@ -3276,12 +3276,12 @@ exports[`demo example full-DOM contract rowListRelativeData renders a stable, no
                   </div>
                   <div class="flex--col input--wrapper">
                     <div class="ui compact selection dropdown">
-                      <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+                      <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select group" class="text divider" role="combobox" tabindex="0">
                         "Group 1"
                       </div>
                       <i aria-hidden="true" class="icon dropdown">
                       </i>
-                      <div class="menu transition" role="listbox" tabindex="-1">
+                      <div aria-label="Select group" class="menu transition" role="listbox" tabindex="-1">
                         <div aria-selected="true" class="item active" role="option">
                           <span class="text">
                             "Group 1"
@@ -3706,12 +3706,12 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
             </span>
             <div class="flex--col input--wrapper middle">
               <div class="ui compact selection dropdown">
-                <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+                <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select categoryX" class="text divider" role="combobox" tabindex="0">
                   "Category 1"
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox" tabindex="-1">
+                <div aria-label="Select categoryX" class="menu transition" role="listbox" tabindex="-1">
                 </div>
               </div>
             </div>
@@ -3722,12 +3722,12 @@ exports[`demo example full-DOM contract selectCascading renders a stable, non-em
             </span>
             <div class="flex--col input--wrapper middle">
               <div class="ui compact selection dropdown">
-                <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+                <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select productX" class="text divider" role="combobox" tabindex="0">
                   "Alpha"
                 </div>
                 <i aria-hidden="true" class="icon dropdown">
                 </i>
-                <div class="menu transition" role="listbox" tabindex="-1">
+                <div aria-label="Select productX" class="menu transition" role="listbox" tabindex="-1">
                 </div>
               </div>
             </div>
@@ -3858,12 +3858,12 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
             <div class="flex--col">
               <div class="flex--col input--wrapper done middle">
                 <div class="ui compact selection dropdown" id="Settings.Record.GroupSelection">
-                  <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+                  <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select Settings.Record.GroupSelection" class="text divider" role="combobox" tabindex="0">
                     "Group B"
                   </div>
                   <i aria-hidden="true" class="icon dropdown">
                   </i>
-                  <div class="menu transition" role="listbox" tabindex="-1">
+                  <div aria-label="Select Settings.Record.GroupSelection" class="menu transition" role="listbox" tabindex="-1">
                   </div>
                 </div>
               </div>
@@ -3876,12 +3876,12 @@ exports[`demo example full-DOM contract selectCascadingStable renders a stable, 
             <div class="flex--col">
               <div class="flex--col input--wrapper done middle">
                 <div class="ui compact selection dropdown" id="Settings.Record.GroupList.1.ItemSelection">
-                  <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+                  <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select Settings.Record.GroupList.1.ItemSelection" class="text divider" role="combobox" tabindex="0">
                     "Gamma"
                   </div>
                   <i aria-hidden="true" class="icon dropdown">
                   </i>
-                  <div class="menu transition" role="listbox" tabindex="-1">
+                  <div aria-label="Select Settings.Record.GroupList.1.ItemSelection" class="menu transition" role="listbox" tabindex="-1">
                   </div>
                 </div>
               </div>
@@ -4053,12 +4053,12 @@ exports[`demo example full-DOM contract selectReorder renders a stable, non-empt
           </span>
           <div class="flex--col input--wrapper done middle">
             <div class="ui compact selection dropdown">
-              <div aria-expanded="false" aria-haspopup="listbox" class="text divider" role="combobox" tabindex="0">
+              <div aria-expanded="false" aria-haspopup="listbox" aria-label="Select RegionSelection" class="text divider" role="combobox" tabindex="0">
                 "South"
               </div>
               <i aria-hidden="true" class="icon dropdown">
               </i>
-              <div class="menu transition" role="listbox" tabindex="-1">
+              <div aria-label="Select RegionSelection" class="menu transition" role="listbox" tabindex="-1">
               </div>
             </div>
           </div>

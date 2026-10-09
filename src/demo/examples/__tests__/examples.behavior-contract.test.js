@@ -204,7 +204,9 @@ const FORM_BINDINGS = {
 // by the text it shows.
 // 149 -> 150, still the same day: `uploadVariants` gives its read-only zone a file, so it shows, named
 // like the others. Without one, a read-only upload renders nothing, and that case showed nothing.
-const NAMELESS_CONTROLS = { total: 150, nameless: 81 }
+// 81 -> 66 on 2026-10-09: a select with no `label` is named "Select <name>", as the native `Select` names
+// its control. The 15 comboboxes the corpus renders without a label had no name at all.
+const NAMELESS_CONTROLS = { total: 150, nameless: 66 }
 
 /** Roles that count as an interactive control for the ledger above. */
 const CONTROL_ROLES = ['textbox', 'spinbutton', 'checkbox', 'combobox', 'listbox', 'slider', 'button', 'tab']

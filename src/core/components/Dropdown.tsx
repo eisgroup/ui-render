@@ -2,7 +2,7 @@ import classNames from '../utils/classNames'
 import React, { useEffect, useRef, useState } from 'react'
 import DropDown from './Listbox'
 import type { ListboxCloseEvent, ListboxOption } from './Listbox'
-import { l, localiseTranslation } from '../utils'
+import { interpolateString, l, localiseTranslation } from '../utils'
 import { _ } from '../utils/translations'
 import Icon from './Icon'
 import Text from './Text'
@@ -47,6 +47,10 @@ export type DropdownProps = {
 }
 
 localiseTranslation({
+  // The native `Select` registers the same key, with the same text, for the same purpose.
+  SELECT_option: {
+    [l.ENGLISH]: 'Select {option}',
+  },
   ADD_: {
     [l.ENGLISH]: 'Add ',
   },
@@ -327,8 +331,10 @@ export function Dropdown ({
     }, className)} style={style}>
       {label && !float && <Text className="input__label">{translate(label)}</Text>}
       <DropDown
-        // The control's name. A meta's own `aria-label` or `aria-labelledby` rides the spread below and wins.
-        aria-label={label ? translate(label) : undefined}
+        // The control's name: its label, or, with none, "Select <name>", as the native `Select` names its control.
+        // Without the fallback a select with no `label` had no accessible name at all (15 in the examples, the
+        // 2026-10-08 audit). A meta's own `aria-label` or `aria-labelledby` rides the spread below and wins.
+        aria-label={label ? translate(label) : (props.name ? interpolateString(_.SELECT_option, {option: String(props.name)}) : undefined)}
         aria-describedby={helpId}
         className={classNames({info, readonly})}
         // A cast, not a guard: the sanitiser made objects of strings and numbers, and anything

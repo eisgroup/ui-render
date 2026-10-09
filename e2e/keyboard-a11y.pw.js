@@ -187,7 +187,7 @@ test.describe('dropdown: the step 3 starting state', () => {
         await expect(control).toHaveAttribute('aria-expanded', DROPDOWN.ARIA_EXPANDED_OPEN)
     })
 
-    test('[I] the combobox wiring, and the name this example does not give it', async ({ page }) => {
+    test('[I] the combobox wiring, and the name it takes from `name`', async ({ page }) => {
         await openExample(page)
         const control = page.locator('#dropdown [role="combobox"]').first()
         const has = async attributes => {
@@ -211,7 +211,9 @@ test.describe('dropdown: the step 3 starting state', () => {
             return node.parentElement === list.parentElement && !node.contains(list)
         }, listId)).toBe(true)
 
-        expect(await has(DROPDOWN.UNNAMED_IN_THIS_EXAMPLE), 'the example declares no label').toEqual([])
+        // The example declares no `label`, so both are named after the field.
+        await expect(control).toHaveAccessibleName(DROPDOWN.NAME_IN_THIS_EXAMPLE)
+        await expect(page.locator(`#${listId}`)).toHaveAccessibleName(DROPDOWN.NAME_IN_THIS_EXAMPLE)
     })
 
     /**

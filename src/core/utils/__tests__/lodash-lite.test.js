@@ -59,6 +59,22 @@ describe('setWith', () => {
 })
 
 describe('unset', () => {
+    it('refuses a path through __proto__, constructor or prototype, as set does', () => {
+        // `unset({}, '__proto__.hasOwnProperty')` deleted Object.prototype.hasOwnProperty for the whole page.
+        const original = Object.getOwnPropertyDescriptor(Object.prototype, 'hasOwnProperty')
+        try {
+            expect(unset({}, '__proto__.hasOwnProperty')).toBe(false)
+            expect(unset({}, 'constructor.prototype.hasOwnProperty')).toBe(false)
+            expect(unset({ a: { prototype: { b: 1 } } }, 'a.prototype.b')).toBe(false)
+            expect(Object.getOwnPropertyDescriptor(Object.prototype, 'hasOwnProperty')).toEqual(original)
+        } finally {
+            // What a regression of this guard deletes, put back as it was. Assigned instead, it would come back
+            // enumerable, and every `for…in` in the rest of the file would see it and fail.
+            // eslint-disable-next-line no-extend-native -- restoring the built-in, not extending it
+            Object.defineProperty(Object.prototype, 'hasOwnProperty', original)
+        }
+    })
+
     it('removes a leaf at a deep path', () => {
         const obj = { a: { b: { c: 1, d: 2 } } }
         expect(unset(obj, 'a.b.c')).toBe(true)
