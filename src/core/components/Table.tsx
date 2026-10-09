@@ -77,7 +77,7 @@ import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
  * a consumer actually gets is `docs/SUPPORTED-PROPS.md` and the changelog entry; the warning is
  * for the people working in here.
  */
-const DROPPED_PROPS = ['as', 'href', 'celled', 'textAlign', 'verticalAlign', 'fixedHeader']
+export const DROPPED_PROPS = ['as', 'href', 'celled', 'textAlign', 'verticalAlign', 'fixedHeader']
 
 const warnedDropped = new Set()
 

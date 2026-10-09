@@ -143,22 +143,32 @@ export type MetaInputType =
     'date' | 'file' | 'number' | 'select' | 'slider' | 'text' | 'textarea' | 'toggle' |
     (string & {})
 
-/** `{ name: 'path.to.value' }` — the engine resolves it against `data` at render time. */
+/**
+ * `{ name: 'path.to.value' }`, the value transform: the engine resolves it against `data` at render time. Only
+ * `name` and an optional `relativeData` — an object with any other key is passed on as it is.
+ */
 export interface MetaValueRef {
     name: string
+    relativeData?: boolean | null
 }
 
-/** A string, or a reference the engine resolves from `data`. */
-export type MetaStringOrValueRef = string | MetaValueRef | null
+/**
+ * A class-name value: a string, a reference the engine resolves from `data`, a number, or an object whose truthy
+ * keys are the class names, as `classNames()` takes them.
+ */
+export type MetaStringOrValueRef = string | number | MetaValueRef | Record<string, unknown> | null
 
 /** `renderCell: 'Currency'` or `renderCell: { name: 'Currency', ... }`. */
 export type MetaRenderer = MetaRenderMethod | { name?: MetaRenderMethod, [key: string]: unknown } | null
 
-/** `onClick: 'submit'` or `onClick: { name: 'submit', ... }`. */
+/**
+ * `onClick: 'submit'` or `onClick: { name: 'submit', ... }`. Not an array: the engine turns only a string or an
+ * object into a function, and an array reached React as the listener, which a click then threw on (measured
+ * 2026-10-09). The type allowed one until then.
+ */
 export type MetaFunctionRef =
     | MetaActionName
     | { name?: MetaActionName, [key: string]: unknown }
-    | Array<MetaActionName | { name?: MetaActionName, [key: string]: unknown }>
     | null
 
 export type MetaMapper = Record<string, unknown> | Array<Record<string, unknown>> | null
@@ -173,10 +183,11 @@ export type MetaNodeEntry = MetaNode | null
 export interface MetaNode {
     view?: MetaView
     name?: string | null
-    items?: MetaNodeEntry[] | null
-    headers?: MetaNodeEntry[] | null
-    extraHeaders?: unknown[] | null
-    extraItems?: unknown[] | null
+    /** The child nodes, or a value transform that resolves to them. */
+    items?: MetaNodeEntry[] | MetaValueRef | null
+    headers?: MetaNodeEntry[] | MetaValueRef | null
+    extraHeaders?: unknown[] | MetaValueRef | null
+    extraItems?: unknown[] | MetaValueRef | null
     relativeData?: boolean | null
     showIf?: unknown
     meta?: Meta
@@ -187,15 +198,15 @@ export interface MetaNode {
     onFocus?: MetaFunctionRef
     /** On a field, called after the field's own blur handling, never in its place. */
     onBlur?: MetaFunctionRef
-    type?: MetaInputType
-    format?: MetaNormalizerName
-    normalize?: MetaNormalizerName
-    parse?: MetaNormalizerName
+    type?: MetaInputType | null
+    format?: MetaNormalizerName | null
+    normalize?: MetaNormalizerName | null
+    parse?: MetaNormalizerName | null
     validate?: unknown
-    verify?: Record<string, unknown>
+    verify?: Record<string, unknown> | null
     mapOptions?: MetaMapper
     mapItems?: MetaMapper
-    filterItems?: unknown[]
+    filterItems?: unknown[] | null
     tooltip?: unknown
     styles?: MetaStringOrValueRef | unknown[]
     className?: MetaStringOrValueRef | unknown[]

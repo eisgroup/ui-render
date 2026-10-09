@@ -167,7 +167,7 @@ type Placement = (typeof PLACEMENTS)[number]
  * a consumer actually gets is `docs/SUPPORTED-PROPS.md` and the changelog entry; the warning is
  * for the people working in here.
  */
-const DROPPED_PROPS = [
+export const DROPPED_PROPS = [
     'as', 'basic', 'closeOnDocumentClick', 'closeOnEscape', 'defaultOpen', 'flowing', 'header',
     'hideOnScroll', 'hoverable', 'mountNode', 'mouseEnterDelay', 'mouseLeaveDelay', 'offset', 'on',
     'pinned', 'popper', 'size', 'trigger', 'wide',

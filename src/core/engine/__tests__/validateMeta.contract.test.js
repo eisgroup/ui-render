@@ -422,3 +422,62 @@ describe('every error-severity check predicts a real engine failure', () => {
         })
     })
 })
+
+describe('what the walk learned on 2026-10-09', () => {
+    it('reads a value-transformed array attribute as the array it resolves to, and nothing else as one', () => {
+        // `{ name }`, with an optional `relativeData`, is replaced by the array at that path before the engine maps
+        // over it (examples.meta-contract.test.js renders it). An object with another key is passed on and throws.
+        expect(errorsOf({ view: 'Col', items: { name: 'blocks' } })).toEqual([])
+        expect(errorsOf({ view: 'Table', name: 'rows', headers: { name: 'cols', relativeData: false } })).toEqual([])
+        expect(codesOf({ view: 'Col', items: { name: 'blocks', view: 'Text' } }))
+            .toEqual(['error:NOT_AN_ARRAY@items'])
+    })
+
+    it('reports an array handler as an error, which a click on really does throw', () => {
+        expect(codesOf({ view: 'Button', onClick: ['submit'] })).toEqual(['error:HANDLER_ARRAY@onClick'])
+        expect(errorsOf({ view: 'Button', onClick: 'submit' })).toEqual([])
+        expect(errorsOf({ view: 'Button', onClick: { name: 'submit' } })).toEqual([])
+
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+        try {
+            const { getByRole } = render(
+                <ConfigContext.Provider value={initialConfigState}>
+                    <AppContext.Provider value={{ ...initialAppState, setPopupState: () => {}, togglePopupState: () => {} }}>
+                        <UIRender data={{}} meta={{ view: 'Button', children: 'Go', onClick: ['submit'] }} translate={value => value}/>
+                    </AppContext.Provider>
+                </ConfigContext.Provider>
+            )
+            const warned = consoleError.mock.calls.map(call => call.join(' ')).join(' | ')
+            expect(warned).toContain('listener to be a function')
+            let thrown = null
+            const onError = event => { thrown = event.error; event.preventDefault() }
+            window.addEventListener('error', onError)
+            try {
+                getByRole('button', { name: 'Go' }).click()
+            } catch (error) {
+                thrown = error
+            } finally {
+                window.removeEventListener('error', onError)
+            }
+            expect(String(thrown && thrown.message)).toContain('listener to be a function')
+        } finally {
+            consoleError.mockRestore()
+            formsStorage.clear()
+        }
+    })
+
+    it('warns about each prop the in-house select, table and tooltip no longer read, at its path', () => {
+        // The published bundle strips them without a word, so this is where a host finds the ones its metas carry.
+        expect(codesOf({ view: 'Input', type: 'select', name: 'a', search: true, compact: true }))
+            .toEqual(['warning:DROPPED_PROP@search'])
+        expect(codesOf({ view: 'Dropdown', name: 'a', multiple: true, clearable: true }))
+            .toEqual(['warning:DROPPED_PROP@multiple', 'warning:DROPPED_PROP@clearable'])
+        expect(codesOf({ view: 'Table', name: 'rows', celled: true, headers: [] }))
+            .toEqual(['warning:DROPPED_PROP@celled'])
+        expect(codesOf({ view: 'Text', tooltip: { content: 'x', on: 'click', hoverable: true } }))
+            .toEqual(['warning:DROPPED_PROP@tooltip.hoverable', 'warning:DROPPED_PROP@tooltip.on'])
+        // The same names on a view that never read them, and the supported ones, say nothing.
+        expect(validateMeta({ view: 'Text', search: true, celled: true, tooltip: 'plain text' })).toEqual([])
+        expect(validateMeta({ view: 'Select', name: 'a', compact: true, upward: true, disabled: true })).toEqual([])
+    })
+})
