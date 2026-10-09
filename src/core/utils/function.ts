@@ -16,9 +16,9 @@ import { TIME_DURATION_INSTANT } from './constants'
  */
 type AnyFn = (...args: never[]) => unknown
 
-/** What `debounce` returns: the wrapper, plus the `cancel` added at §9.3 step 4. */
+/** What `debounce` returns: the wrapper, plus the `cancel` added at §9.3 step 4 and the `flush` of 2026-10-09. */
 export type Debounced<F extends AnyFn> =
-	((this: unknown, ...args: Parameters<F>) => void) & { cancel: () => void }
+	((this: unknown, ...args: Parameters<F>) => void) & { cancel: () => void, flush: () => void }
 
 /** The option bag `debounce` reads — only `leading`, exactly as at runtime. */
 type DebounceOptions = { leading?: boolean }
@@ -70,16 +70,22 @@ export function debounce<F extends AnyFn> (
 ): Debounced<F> {
 	let timeout: ReturnType<typeof setTimeout> | null | undefined
 	let trailingCall = false
-	const debounced = function(this: unknown) {
-		const self = this
-		const args = arguments
+	// The latest call's `this` and arguments, which are what the trailing call runs with. Each call used to
+	// close over its own in a `later` of its own, and only the latest call's timer survived, so this is
+	// the same call; kept outside so that `flush` can make it.
+	let lastThis: unknown
+	let lastArgs: unknown[] = []
+	const invoke = () => (func as unknown as (this: unknown, ...a: unknown[]) => unknown).apply(lastThis, lastArgs)
 
-		function later () {
-			timeout = null
-			if (!leading || trailingCall) (func as unknown as (this: unknown, ...a: unknown[]) => unknown)
-				.apply(self, args as unknown as unknown[])
-			trailingCall = false
-		}
+	function later () {
+		timeout = null
+		if (!leading || trailingCall) invoke()
+		trailingCall = false
+	}
+
+	const debounced = function(this: unknown) {
+		lastThis = this
+		lastArgs = Array.prototype.slice.call(arguments)
 
 		const callNow = leading && !timeout
 		if (timeout) {
@@ -87,8 +93,7 @@ export function debounce<F extends AnyFn> (
 			if (leading) trailingCall = true
 		}
 		timeout = setTimeout(later, wait)
-		if (callNow) (func as unknown as (this: unknown, ...a: unknown[]) => unknown)
-			.apply(self, args as unknown as unknown[])
+		if (callNow) invoke()
 	} as Debounced<F>
 
 	/**
@@ -103,6 +108,17 @@ export function debounce<F extends AnyFn> (
 		if (timeout) clearTimeout(timeout)
 		timeout = null
 		trailingCall = false
+	}
+
+	/**
+	 * Make a pending trailing call now, rather than when its timer runs out, and leave nothing pending.
+	 * What `cancel` would drop, `flush` delivers: a component going away saves the change it was
+	 * waiting to save, instead of losing it (AutoSave, and `autoSubmit` in the engine).
+	 */
+	debounced.flush = function () {
+		if (!timeout) return
+		clearTimeout(timeout)
+		later()
 	}
 
 	return debounced

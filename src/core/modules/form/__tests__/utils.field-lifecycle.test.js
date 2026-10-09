@@ -172,6 +172,48 @@ describe('asField lifecycle contracts', () => {
         expect(onChange).not.toHaveBeenCalled()
     })
 
+    // React unmounts a mounted field and mounts it again WITHOUT removing it: StrictMode does it to every mount
+    // in development on React 18 and 19, and React 19's `<Activity>` to what it hides and shows again, in
+    // production too. The document's `isUnmounting` is back to false by the time the deferred clear runs, so
+    // the clear needs the field's own word on whether it is still there. Measured: React 18.3 and 19.3 under
+    // StrictMode cleared the field to null; 0.34.3 kept it. React 16 and 17 run StrictMode's effects once, so
+    // their legs pass this either way.
+    it('does not clear a field that is unmounted and mounted again rather than removed', () => {
+        const initialValues = { attachment: 'kept.csv' }
+        const owner = {
+            form: { change: jest.fn() },
+            isUnmounting: false,
+            props: { initialValues },
+        }
+        const onChange = jest.fn()
+        const RemovableField = asField(BareInput)
+        const view = render(
+            <React.StrictMode>
+                <Form
+                    onSubmit={() => {}}
+                    initialValues={initialValues}
+                    render={() => (
+                        <RemovableField
+                            name="attachment"
+                            instance={owner}
+                            onRemoveChange
+                            onChange={onChange}
+                        />
+                    )}
+                />
+            </React.StrictMode>
+        )
+        act(() => jest.runOnlyPendingTimers())
+
+        expect(owner.form.change).not.toHaveBeenCalled()
+        expect(onChange).not.toHaveBeenCalled()
+
+        // And removed for real, it is cleared as before.
+        view.unmount()
+        act(() => jest.runOnlyPendingTimers())
+        expect(owner.form.change).toHaveBeenCalledWith('attachment', null)
+    })
+
     it('renders a Dropdown field without scheduling an update from inside render', () => {
         // The previous-value bookkeeping below is write-only — nothing renders from it — so holding
         // it in React state bought nothing and cost a second render pass plus React's

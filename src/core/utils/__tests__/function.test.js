@@ -120,3 +120,55 @@ describe('debounce cancellation (§9.3 step 4)', () => {
         expect(seen).toEqual([1])
     })
 })
+
+describe('debounce flush (2026-10-09)', () => {
+    beforeEach(() => jest.useFakeTimers())
+    afterEach(() => jest.useRealTimers())
+
+    it('makes the pending trailing call now, with the latest arguments and `this`, and only once', () => {
+        const seen = []
+        const debounced = debounce(function (n) { seen.push([this && this.id, n]) }, 100)
+        const owner = { id: 'owner', debounced }
+
+        owner.debounced(1)
+        owner.debounced(2)
+        debounced.flush()
+        expect(seen).toEqual([['owner', 2]])
+
+        jest.advanceTimersByTime(500)
+        expect(seen).toEqual([['owner', 2]])
+    })
+
+    it('does nothing when nothing is pending, and leaves the function reusable', () => {
+        let calls = 0
+        const debounced = debounce(() => { calls++ }, 100)
+
+        debounced.flush()
+        expect(calls).toBe(0)
+
+        debounced()
+        jest.advanceTimersByTime(500)
+        debounced.flush()
+        expect(calls).toBe(1)
+
+        debounced()
+        debounced.flush()
+        expect(calls).toBe(2)
+    })
+
+    it('makes a leading debounce\'s trailing call, and not the leading one again', () => {
+        const seen = []
+        const debounced = debounce((n) => seen.push(n), 100, { leading: true })
+
+        debounced(1)
+        debounced.flush()
+        expect(seen).toEqual([1])
+
+        debounced(2)
+        debounced(3)
+        debounced.flush()
+        expect(seen).toEqual([1, 2, 3])
+        debounced.flush()
+        expect(seen).toEqual([1, 2, 3])
+    })
+})
