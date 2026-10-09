@@ -35,6 +35,18 @@ const tseslint = require('typescript-eslint')
 /** `no-unused-vars` as `eslint-config-react-app` set it, and ESLint 8's default for `catch`. */
 const UNUSED_VARS = ['warn', { args: 'none', ignoreRestSiblings: true, caughtErrors: 'none' }]
 const UNUSED_EXPRESSIONS = ['error', { allowShortCircuit: true, allowTernary: true, allowTaggedTemplates: true }]
+const RESTRICTED_PROPERTIES = [
+    {
+        object: 'require',
+        property: 'ensure',
+        message: 'Please use import() instead. More info: https://facebook.github.io/create-react-app/docs/code-splitting',
+    },
+    {
+        object: 'System',
+        property: 'import',
+        message: 'Please use import() instead. More info: https://facebook.github.io/create-react-app/docs/code-splitting',
+    },
+]
 
 /** `eslint-config-react-app`'s rules (`index.js`, `base.js`), apart from `flowtype/*`. */
 const REACT_APP_RULES = {
@@ -121,18 +133,7 @@ const REACT_APP_RULES = {
     'unicode-bom': ['warn', 'never'],
     'use-isnan': 'warn',
     'valid-typeof': 'warn',
-    'no-restricted-properties': ['error',
-        {
-            object: 'require',
-            property: 'ensure',
-            message: 'Please use import() instead. More info: https://facebook.github.io/create-react-app/docs/code-splitting',
-        },
-        {
-            object: 'System',
-            property: 'import',
-            message: 'Please use import() instead. More info: https://facebook.github.io/create-react-app/docs/code-splitting',
-        },
-    ],
+    'no-restricted-properties': ['error', ...RESTRICTED_PROPERTIES],
     'getter-return': 'warn',
 
     'import/first': 'error',
@@ -175,6 +176,26 @@ const REACT_APP_RULES = {
 
     'react-hooks/rules-of-hooks': 'error',
 }
+
+/**
+ * The same rules for the tooling: `scripts/`, the browser tests in `e2e/` and the config files at the root, linted
+ * since 2026-10-09. Left out are the React, JSX and hooks rules: no component is written there, and
+ * `react-hooks/rules-of-hooks` reads the `use` callback of a Playwright fixture as React's `use`. The first run found
+ * 16 problems in 63 files. Seven unused names in the browser tests and four more were fixed; three were `document`
+ * in an entry that runs in a page, which the globals below answer; one was that `use`; and one, a string of prose
+ * that quotes a template, is suppressed where it stands.
+ */
+const TOOLING_RULES = Object.fromEntries(
+    Object.entries(REACT_APP_RULES).filter(([rule]) => !/^(react|react-hooks|jsx-a11y)\//.test(rule))
+)
+
+/**
+ * A focused test (`it.only`, `describe.only`, `test.describe.only`, `fit`, `fdescribe`) runs alone: the rest of its
+ * file is skipped, and the run still passes. Jest has no `--forbid-only`, and Playwright's `forbidOnly` is set for CI
+ * alone, so lint is what keeps one out of a commit, as `eslint-plugin-jest`'s `no-focused-tests` would.
+ */
+const FOCUSED = 'A focused test skips the rest of its file and the run still passes: remove the `.only`, or the `f` of `fit`/`fdescribe`.'
+const TEST_FILES = ['src/**/__tests__/**', 'scripts/__tests__/**', 'e2e/**/*.pw.js', 'e2e/**/*.packed.js']
 
 /**
  * The React Compiler's rules, which eslint-plugin-react-hooks 7 adds to its presets, at the presets' levels.
@@ -295,4 +316,29 @@ module.exports = [
     guard(['src/core/state/**'], [SEMANTIC_DEEP, NO_DEMO, notAbove('state', 'components'), notAbove('state', 'modules'),
         notAbove('state', 'engine')]),
     guard(['src/**/__tests__/**'], [SEMANTIC_DEEP]),
+
+    {
+        files: ['scripts/**/*.{js,mjs}', 'e2e/**/*.js', '*.{js,mjs}'],
+        languageOptions: { ecmaVersion: 'latest', sourceType: 'commonjs', globals: globals.node },
+        plugins: { import: importPlugin },
+        rules: TOOLING_RULES,
+    },
+    // ES modules: the webpack configs, and the entry `scripts/test-env-flags.js` has each of them bundle.
+    { files: ['**/*.mjs', 'scripts/fixtures/env-flags-entry.js'], languageOptions: { sourceType: 'module' } },
+    // What runs in a page: the browser tests' callbacks, and the entries the packed-tarball host bundles.
+    { files: ['e2e/**', 'scripts/fixtures/packed-*.js'], languageOptions: { globals: { ...globals.node, ...globals.browser } } },
+    // What runs under jest: its own suites, the console guard and the setup files of the legacy React legs.
+    {
+        files: ['scripts/__tests__/**', 'scripts/jest-console-guard.js', 'scripts/fixtures/react-legacy/setup-*.js'],
+        languageOptions: { globals: { ...globals.node, ...globals.jest } },
+    },
+
+    {
+        files: TEST_FILES,
+        rules: {
+            'no-restricted-properties': ['error', ...RESTRICTED_PROPERTIES, { property: 'only', message: FOCUSED }],
+            'no-restricted-globals': ['error', ...confusingBrowserGlobals,
+                { name: 'fit', message: FOCUSED }, { name: 'fdescribe', message: FOCUSED }],
+        },
+    },
 ]

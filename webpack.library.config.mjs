@@ -27,7 +27,7 @@ function writeReExport (name) {
     );
 }
 
-export default {
+const libraryConfig = {
     mode: 'production',
     devtool: 'source-map',
     entry: './src/library/index.ts',
@@ -172,3 +172,5 @@ export default {
         }),
     ]
 };
+
+export default libraryConfig;

@@ -36,7 +36,7 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
   first), under `jest.built-css.config.js`, where a missing file fails instead of skipping. CI runs it after
   `build-lib`: its coverage run comes before the build, so the suite's checks of the published stylesheet skip there
 - `npm run lint:css` — Lint LESS files with stylelint
-- `npm run lint:js` — ESLint over `src`, with `--max-warnings 0` (see Tech Stack)
+- `npm run lint:js` — ESLint over `src`, `scripts`, `e2e` and the config files at the root, with `--max-warnings 0` (see Tech Stack). The tooling has the same rules as `src` without the React ones, since 2026-10-09. A focused test (`.only`, `fit`, `fdescribe`) fails it: jest has no `--forbid-only`, so nothing else would notice one
 - `npm run typecheck` — `tsc --noEmit` over `src` (§9.6-E0). Babel STRIPS TypeScript types without
   checking them, so this is the only thing that checks them. JavaScript is not part of the program
   (`allowJs: false`): the demo and the tests stay JavaScript and are not checked, and a `.ts` file that

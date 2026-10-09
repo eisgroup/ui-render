@@ -312,6 +312,7 @@ const IN_HOUSE_CURATION = {
                 + 'Unless given, it is true for a value and no error. Until 2026-10-01 the default read '
                 + '`props.value`, always `undefined` once `value` was destructured out, so a `float` label '
                 + 'sat over the selection it named (`Dropdown.done-state.test.js`).',
+            // eslint-disable-next-line no-template-curly-in-string -- prose, naming the template the wrapper builds the id with
             error: 'Message shown under the control, in a `${id}-help` block the control points at with '
                 + '`aria-describedby`. The wrapper renders the text itself and forwards only '
                 + '`error={!!error}` for the class.',

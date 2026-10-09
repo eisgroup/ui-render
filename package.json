@@ -70,7 +70,7 @@
     "prepack": "npm run sync-version -- --check && npm run docs:views:check && npm run docs:props:check && npm run build-lib",
     "sync-version": "node scripts/sync-version.js",
     "version": "node scripts/sync-version.js && git add src/library/AppWrapper.tsx public/index.html",
-    "lint:js": "eslint src --max-warnings 0",
+    "lint:js": "eslint src scripts e2e \"*.js\" \"*.mjs\" --max-warnings 0",
     "lint:css": "stylelint 'src/style/**/*.less'",
     "css:fixture": "node scripts/generate-semantic-css-fixture.js",
     "css:fixture:check": "node scripts/generate-semantic-css-fixture.js --check"

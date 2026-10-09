@@ -25,10 +25,9 @@
  * READ e2e/reference.js FIRST. Every expected value lives there with an [R] / [I] / [R->I] tag, and
  * the tags are what stop this file being a tripwire on the replacement.
  */
-const { test, expect, BUBBLE, ANY_BUBBLE, rectOf, adjacency, clipAncestorsOf, paintOf, isInsideWidget, tooltipA11yWiring } = require('./fixtures')
-const { BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, WIDGET } = require('./reference')
+const { test, expect, ANY_BUBBLE, rectOf, adjacency, clipAncestorsOf, paintOf, isInsideWidget } = require('./fixtures')
+const { BUBBLE_CLASS, CORPUS, TIMING, WIDGET } = require('./reference')
 
-const bubble = (page) => page.locator(BUBBLE).first()
 /** Either shape. `[I]` tests use this so the planned inline convergence can be judged. */
 const anyBubble = (page) => page.locator(ANY_BUBBLE).first()
 

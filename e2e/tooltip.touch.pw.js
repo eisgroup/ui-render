@@ -13,7 +13,7 @@
  * handlers both see a single tap.
  */
 const { test, expect, ANY_BUBBLE } = require('./fixtures')
-const { TOUCH, TIMING } = require('./reference')
+const { TIMING } = require('./reference')
 
 /**
  * INVERTED, and the consequence is stated rather than sold. Part 2 measured one tap firing both

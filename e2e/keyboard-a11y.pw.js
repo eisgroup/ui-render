@@ -27,7 +27,7 @@
  * not checkable here and never will be — NVDA / JAWS / VoiceOver stay manual. §9.5 carries that
  * limit explicitly so this leg is not overclaimed.
  */
-const { test, expect, BUBBLE, ANY_BUBBLE, activeElement, tabThrough, tooltipA11yWiring, buttonsTakeFocus } = require('./fixtures')
+const { test, expect, ANY_BUBBLE, activeElement, tabThrough, tooltipA11yWiring, buttonsTakeFocus } = require('./fixtures')
 const { KEYBOARD, DROPDOWN, TIMING } = require('./reference')
 
 test.describe('tooltip: keyboard', () => {
