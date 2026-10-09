@@ -4,3 +4,16 @@
 .ui.icon:not(i) {
   font-size: inherit; // override stupid Semantic UI reset.
 }
+
+/*
+  THE WRAPPER'S LINE HEIGHT IS THE BODY'S. prefixwrap maps `html` and `body` onto `.ui-render` itself
+  (themes/_app.less), so normalize's `html { line-height: 1.15 }` in the vendored reset above and our
+  base font's `line-height: 1` on `body` land on the SAME element, and the reset, compiled later, won:
+  every line that inherits the wrapper's line height (Text, Title, a Row's content) was 15% taller than
+  in 0.34.x, where the two were different elements and the content inherited the body's 1. Measured in
+  Chromium: 16.1px for 14px text, against 14px. This comes after the reset, so it wins the same way.
+  `.ui-render` is left as it is by prefixwrap.
+*/
+.ui-render {
+  line-height: 1;
+}

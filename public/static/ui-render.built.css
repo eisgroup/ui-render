@@ -324,7 +324,7 @@
   content: "\e7f3";
 }
 /* Base layout */
-.ui-render .flex--col, .ui-render .flex--fill, .ui-render .flex--scroll, .ui-render, .ui-render .app__menu__items .app__menu__item, .ui-render .app__menu__button .box, .ui-render, .ui-render #ui-render, .ui-render .app .app__content, .ui-render .app__header__items .app__menu__item, .ui-render .app__sidebar__items .app__menu__item, .ui-render .app__modal.active, .ui-render .app__modal__box__content, .ui-render .app__upload, .ui-render .upload__dropzone:not(.button), .ui-render .app__popup.active, .ui-render .app__popup__box__content {
+.ui-render .flex--col, .ui-render .flex--fill, .ui-render .flex--scroll, .ui-render .app__menu__items .app__menu__item, .ui-render .app__menu__button .box, .ui-render #ui-render, .ui-render .app .app__content, .ui-render .app__header__items .app__menu__item, .ui-render .app__sidebar__items .app__menu__item, .ui-render .app__modal.active, .ui-render .app__modal__box__content, .ui-render .app__upload, .ui-render .upload__dropzone:not(.button), .ui-render .app__popup.active, .ui-render .app__popup__box__content {
   display: flex;
   flex-direction: column;
   position: relative;
@@ -420,7 +420,7 @@
 .ui-render .flex--scroll:hover, .ui-render .flex--scroll:focus, .ui-render .flex--scroll:active {
   overflow: auto;
 }
-.ui-render .fill, .ui-render .flex--fill, .ui-render .flex--scroll, .ui-render .app, .ui-render .app__chart__tooltip__spacer, .ui-render, .ui-render #ui-render, .ui-render .app .app__content, .ui-render .app__modal.active, .ui-render .app__modal__box__content, .ui-render .app__upload, .ui-render .upload__dropzone:not(.button), .ui-render .app__popup.active, .ui-render .app__popup__box__content {
+.ui-render .fill, .ui-render .flex--fill, .ui-render .flex--scroll, .ui-render .app, .ui-render .app__chart__tooltip__spacer, .ui-render #ui-render, .ui-render .app .app__content, .ui-render .app__modal.active, .ui-render .app__modal__box__content, .ui-render .app__upload, .ui-render .upload__dropzone:not(.button), .ui-render .app__popup.active, .ui-render .app__popup__box__content {
   flex: 1;
   align-self: stretch;
 }
@@ -687,19 +687,15 @@
   box-shadow: none !important;
 }
 .ui-render {
-  font-size: 100%;
-  height: 100%;
-  box-sizing: border-box;
-}
-.ui-render {
-  min-height: 100%;
   position: relative;
-  overflow-x: hidden;
   color: #444444;
-  background-color: #ffffff;
   /* Make text lighter on dark background */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+.ui-render div.ui-render {
+  font: inherit;
+  color: inherit;
 }
 .ui-render h1, .ui-render h2, .ui-render h3, .ui-render h4, .ui-render h5, .ui-render h6, .ui-render .h1, .ui-render .h2, .ui-render .h3, .ui-render .h4, .ui-render .h5, .ui-render .h6, .ui-render .app__form__group__title, .ui-render .app__modal__box__header__title, .ui-render .app__popup__box__header__title {
   font-weight: 500;
@@ -887,7 +883,7 @@
   color: #666666;
 }
 @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
-  .ui-render .flex--col, .ui-render .flex--fill, .ui-render .flex--scroll, .ui-render, .ui-render .app__menu__items .app__menu__item, .ui-render .app__menu__button .box, .ui-render, .ui-render #ui-render, .ui-render .app .app__content, .ui-render .app__header__items .app__menu__item, .ui-render .app__sidebar__items .app__menu__item, .ui-render .app__modal.active, .ui-render .app__modal__box__content, .ui-render .app__upload, .ui-render .upload__dropzone:not(.button), .ui-render .app__popup.active, .ui-render .app__popup__box__content {
+  .ui-render .flex--col, .ui-render .flex--fill, .ui-render .flex--scroll, .ui-render .app__menu__items .app__menu__item, .ui-render .app__menu__button .box, .ui-render #ui-render, .ui-render .app .app__content, .ui-render .app__header__items .app__menu__item, .ui-render .app__sidebar__items .app__menu__item, .ui-render .app__modal.active, .ui-render .app__modal__box__content, .ui-render .app__upload, .ui-render .upload__dropzone:not(.button), .ui-render .app__popup.active, .ui-render .app__popup__box__content {
     display: block;
   }
 }
@@ -2134,6 +2130,15 @@
   z-index: 1050;
   box-shadow: 0 0 1px grey;
   pointer-events: none;
+  color: #444444;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+.ui-render-picker-dropdown * {
+  box-sizing: inherit;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 .ui-render-picker-dropdown-range {
   padding: 10px 0;
@@ -3770,7 +3775,7 @@
 .ui-render .no-margin-right {
   margin-right: 0 !important;
 }
-.ui-render .base-font, .ui-render, .ui-render .badge {
+.ui-render .base-font, .ui-render, .ui-render-picker-dropdown, .ui-render .badge {
   font-size: 0.875rem;
   font-style: normal;
   font-family: 'Roboto', 'Open Sans', 'Helvetica Neue', Arial, Helvetica, sans-serif;
@@ -6102,6 +6107,18 @@
 *******************************/
 .ui-render .ui.icon:not(i) {
   font-size: inherit;
+}
+/*
+  THE WRAPPER'S LINE HEIGHT IS THE BODY'S. prefixwrap maps `html` and `body` onto `.ui-render` itself
+  (themes/_app.less), so normalize's `html { line-height: 1.15 }` in the vendored reset above and our
+  base font's `line-height: 1` on `body` land on the SAME element, and the reset, compiled later, won:
+  every line that inherits the wrapper's line height (Text, Title, a Row's content) was 15% taller than
+  in 0.34.x, where the two were different elements and the content inherited the body's 1. Measured in
+  Chromium: 16.1px for 14px text, against 14px. This comes after the reset, so it wins the same way.
+  `.ui-render` is left as it is by prefixwrap.
+*/
+.ui-render {
+  line-height: 1;
 }
 /*
  * VENDORED from semantic-ui-less 2.5.0 — `definitions/modules/dropdown`, compiled output.

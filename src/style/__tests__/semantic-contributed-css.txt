@@ -1,5 +1,5 @@
 # GENERATED — run `npm run css:fixture` to regenerate. See scripts/generate-semantic-css-fixture.js.
-# 288 rules contributed by the vendored Semantic imports in override/_semantic.less.
+# 289 rules contributed by the vendored Semantic imports in override/_semantic.less.
 # Order is the cascade order and is part of the contract.
 
 *, *:before, *:after
@@ -171,6 +171,9 @@ template
 
 .ui.icon:not(i)
   font-size: inherit
+
+.ui-render
+  line-height: 1
 
 .ui.dropdown
   cursor: pointer

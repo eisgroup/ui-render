@@ -124,3 +124,36 @@ test('the long select keeps its selection and cursor in view, Tab chooses and cl
     await expect(control).toHaveText('Option 36')
     expect(errors).toEqual([])
 })
+
+/**
+ * THE WRAPPER IS NOT A PAGE (scripts/fixtures/packed-meta.js, `tallMeta`). A document in a host container with a
+ * fixed height is as tall as its content, and the container scrolls to its last field, as in 0.34.x; and text in
+ * the widget sits on `line-height: 1`, the base font's, as it did then.
+ */
+test('a document in a fixed-height container is as tall as its content, and its text sits on line-height 1', async ({ page }) => {
+    await page.goto(PAGE)
+
+    const container = page.locator('#tall')
+    const document = container.locator('> .ui-render')
+    await expect(document.locator('input[name="field11"]')).toHaveCount(1)
+    const sizes = await container.evaluate(element => {
+        element.scrollTop = element.scrollHeight
+        const box = element.getBoundingClientRect()
+        const last = element.querySelector('input[name="field11"]').getBoundingClientRect()
+        return {
+            container: element.clientHeight,
+            document: element.querySelector('.ui-render').getBoundingClientRect().height,
+            lastInView: last.top >= box.top - 1 && last.bottom <= box.bottom + 1,
+        }
+    })
+    expect(sizes.document, 'the document takes its content\'s height, not the container\'s').toBeGreaterThan(sizes.container)
+    expect(sizes.lastInView, 'the container scrolls to the last field').toBe(true)
+
+    const [lineHeight, fontSize] = await page.locator('#host > .ui-render').getByText('packed tarball smoke')
+        .evaluate(element => [getComputedStyle(element).lineHeight, getComputedStyle(element).fontSize])
+    expect(lineHeight).toBe(fontSize)
+
+    // The positioning context `body` gave the widget in 0.34.x, on the published wrapper itself. The demo's mount
+    // node is a wrapper too, so only a host's can show the library losing it.
+    expect(await page.locator('#host > .ui-render').evaluate(element => getComputedStyle(element).position)).toBe('relative')
+})

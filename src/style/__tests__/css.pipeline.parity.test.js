@@ -31,7 +31,8 @@
  *
  * WHERE THOSE DECLARATIONS WENT, measured rather than assumed, because the option that looks right is the
  * one that breaks: with the exemptions removed, `body { … }` becomes `.ui-render { … }` — the rules land on
- * our own root box, which is what they were always for. prefixwrap's `prefixRootTags: true` instead produces
+ * our own root box. The typography belongs there; the page layout did not, and themes/_app.less stopped
+ * declaring it on 2026-10-09. prefixwrap's `prefixRootTags: true` instead produces
  * `.ui-render .body { … }`, a CLASS selector matching nothing, silently dropping them. Do not turn it on.
  *
  * The suite now pins the ABSENCE, which is the durable property: nothing escapes, and the two pipelines
