@@ -191,6 +191,29 @@ Note the unrelated legacy `version` attribute seen in older meta files: it is no
 version (existing files use it both as a producer version at the root and as a node label deeper
 in the tree), the engine discards it, and new files should use `metaVersion`.
 
+## Security model (consumer)
+
+**A meta is code, not content.** Load only metas you would trust as much as your own code: the
+renderer does what a meta tells it to.
+
+- **It sets attributes on the elements it renders, raw HTML included.** A `Text` node with
+  `dangerouslySetInnerHTML: {__html: "…"}` renders that HTML. The renderer checks no URL scheme
+  in an attribute a meta gives.
+- **It calls functions.** A meta calls the actions the renderer has built in, the `methods` you
+  pass and the `apiCalls` you hand it, whenever it declares. One built-in action is `fetch`:
+  `{name: "fetch", mapArgs: ["https://…", options]}` calls the page's `fetch` with that URL and
+  those options.
+- **Data is text, unless a meta makes it an attribute.** A value from `data` renders as text,
+  which React escapes. A meta that binds one to an attribute with `{name: "path"}` sets the value
+  there as it is.
+- **Upload checks run in the browser only.** `formats` and `maxSize` decide what the drop zone
+  accepts, and your `uploadFile` receives the files as the user chose them. Check their type and
+  size again on your server.
+- **Downloads come from your `downloadFile`.** The renderer requests no URL for one: it saves what
+  your function answers through a temporary `<a download>`.
+
+To report a vulnerability, see [SECURITY.md](SECURITY.md).
+
 ## Renderer configuration (consumer)
 
 Three props configure how values are formatted and how the shell is labelled. They are
@@ -247,6 +270,30 @@ the most precise position available.
 The library logs the report itself as well, so `onError` adds a channel rather than
 silencing the console. It never has to be defensive: a reporter that throws is caught, and
 the render failure is still reported.
+
+## Several documents on one page (consumer)
+
+Each `UIRender` on a page keeps what it owns to itself:
+
+- its form data, and the validation errors `getValidationErrors` reports, which reach the
+  document that owns the field;
+- its popup, which opens in its own shell, under its own `language` and `currency` classes;
+- its `translate`, when it was given one: what it translates, it translates with that function
+  and never with another document's, its popup's title, message and Ok included.
+
+Two things are shared with the rest of the page:
+
+- **A document without `translate` uses another's.** It translates with the function of the
+  last document constructed with one, as every document did in 0.34, or shows its text as
+  given when no document has one. Give each document its own `translate` when they differ.
+- **An id a field derives is unique on the page, not only in its document.** A field with no
+  `id` in meta takes its `name` for one, or one made from its `label`. When another element on
+  the page already has that id, from another document or from a name the same document repeats
+  (the nested rows of a `dataKind`), the field takes `<id>-2`, `<id>-3` and so on, and its label
+  and help text follow it. The field that had the id first keeps it, so a page with one
+  document that repeats no name renders the ids it always did. An `id` given in meta is kept
+  as given: give one wherever the host needs a fixed id. Each document's popup root follows
+  the same rule: `render-popup-root`, then `render-popup-root-2`.
 
 ## Development Installation
 
