@@ -10,8 +10,9 @@
  *
  * Measured in jsdom on React 18, a 200-row table with a Select column and a text column, two runs each: the
  * Selects rendered 600 times at mount and 200 times for each later edit or blur of the text, an edit taking
- * 62 and 51 ms; now 400, and none, an edit taking 26 and 28 ms. A number here that falls is progress: lower
- * it. One that rises is a regression.
+ * 62 and 51 ms; then 400, and none, an edit taking 26 and 28 ms. 200 at mount since the meta is kept across
+ * a state it does not read (`engine/metaStateReads.ts`). A number here that falls is progress: lower it. One
+ * that rises is a regression.
  */
 import React from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
@@ -70,16 +71,18 @@ afterEach(() => {
 })
 
 describe('a 50-row table with a Select column', () => {
-    it('renders each Select twice at mount, and none for another column\'s later edits or blurs', () => {
+    it('renders each Select once at mount, and none for another column\'s edits or blurs', () => {
         const { form, container } = mount()
         const atMount = mockRenders.count
-        // The first edit changes the document's state, which builds its meta, and so its cells, anew.
-        rendersOf(() => { form.change('rows[1].note', 'first') })
+        // The first edit changes the document's state (its `canSave`), which nothing in the meta reads.
+        const onFirstEdit = rendersOf(() => { form.change('rows[1].note', 'first') })
         const onEdit = rendersOf(() => { form.change('rows[1].note', 'second') })
         const note = container.querySelector('input[name="rows[1].note"]')
         const onBlur = rendersOf(() => { fireEvent.focus(note); fireEvent.blur(note) })
-        // Before 2026-10-12: 3 at mount for each Select, and all 50 again for the edit and for the blur.
-        expect({ atMount, onEdit, onBlur }).toEqual({ atMount: ROWS * 2, onEdit: 0, onBlur: 0 })
+        // Before the table's cells were kept (2026-10-12): 3 at mount for each Select, and all 50 again for
+        // each edit and for the blur. Then 2 at mount and all 50 for the first edit, until the meta was kept
+        // across a state it does not read.
+        expect({ atMount, onFirstEdit, onEdit, onBlur }).toEqual({ atMount: ROWS, onFirstEdit: 0, onEdit: 0, onBlur: 0 })
     })
 
     it('keeps each row\'s handlers acting for that row, render after render', () => {

@@ -2,11 +2,12 @@
  * WHEN THE ENGINE REBUILDS A DOCUMENT'S META.
  * =============================================================================================
  *
- * The engine turns a document's meta into props once for each state it renders. `{state.x}`
- * templates in a node's `name` resolve then, and the handlers it composes from strings such as
- * `'setState,choice'` are built then. So it must rebuild on every new state, and only then: a
- * render that brings no new state, such as a keystroke or a parent's render, hands every node the
- * same handlers, which is what lets a memoised component skip its render.
+ * The engine turns a document's meta into props from the state it renders. `{state.x}` templates in
+ * a node's `name` resolve then, and the handlers it composes from strings such as `'setState,choice'`
+ * are built then. So it must rebuild when a new state changes what it read, and only then: a render
+ * that brings no new state, such as a keystroke or a parent's render, and since 2026-10-12 a new state
+ * that changes nothing it read, hands every node the same handlers, which is what lets a memoised
+ * component skip its render (`metaStateReads.ts`).
  *
  * Rebuilding on props-driven and upload-driven state is pinned where those flows are
  * (`UIRender.smoke`, `rules.actions`). This file pins a state change the document makes itself, and
@@ -108,12 +109,36 @@ describe('a document\'s meta', () => {
         expect(latest().state).toBe(typed.state)
         expect(latest().props.onClick).toBe(typed.props.onClick)
 
-        // A new state is a new meta, with new handlers.
-        act(() => { instanceOf().setState({ unrelated: true }) })
+        // Since 2026-10-12, neither does a new state that changes nothing the meta read: the pick this
+        // button makes, which no template reads, keeps every handler (`metaStateReads.ts`).
+        act(() => { instanceOf().setState({ choice: 'picked', unrelated: true }) })
 
         expect(latest().state).not.toBe(typed.state)
-        expect(latest().props.onClick).not.toBe(typed.props.onClick)
+        expect(latest().props.onClick).toBe(typed.props.onClick)
+    })
+
+    it('is rebuilt, with new handlers, by a new state that changes what it read', () => {
+        const meta = {
+            view: 'Col',
+            items: [
+                { view: 'Input', name: 'amounts.{state.pick,first}', label: 'Amount' },
+                { view: 'Button', label: 'Choose', onClick: 'setState,choice' },
+            ],
+        }
+        const data = { amounts: { first: 'one', second: 'two' } }
+        const renders = () => rendered.filter(({ props }) => props.label === 'Choose')
+        const latest = () => renders()[renders().length - 1]
+        mountDocument({ meta, data, initialValues: data })
+        const mounted = latest()
+
+        act(() => { instanceOf().setState({ unrelated: true }) })
+        const unread = latest()
+        act(() => { instanceOf().setState({ pick: 'second' }) })
+
+        expect(unread.props.onClick).toBe(mounted.props.onClick)
+        expect(latest().props.onClick).not.toBe(mounted.props.onClick)
         expect(typeof latest().props.onClick).toBe('function')
+        expect(screen.getByDisplayValue('two')).toBeInTheDocument()
     })
 
     it('needs no lifecycle for it: under StrictMode React reports no componentWillUpdate', () => {
