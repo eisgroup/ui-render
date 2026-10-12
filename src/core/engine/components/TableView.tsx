@@ -15,6 +15,7 @@ import type { TableColGroupProps } from './TableColGroup'
 import { FieldArray } from 'react-final-form-arrays'
 import Pagination from '../../components/Pagination'
 import type { Translate } from '../../utils/_envs'
+import { TableColumnsContext } from '../../contexts'
 
 /** A row in the default layout, a column in the vertical one: values by header id. */
 export type TableItem = Record<string, any>
@@ -29,7 +30,16 @@ export type TableSort = {
 }
 
 /** A header or cell renderer: the value, where it is, the cell's own props, and the table's handle. */
-export type TableRenderer = (value: unknown, position: unknown, props: Record<string, unknown>, handle: TableViewHandle) => React.ReactNode
+/** What a body cell's renderer is told about its column: the header's label, translated, when it is plain text. */
+export type TableColumn = { label?: string }
+
+
+/** A header's label, translated, when it is the plain text the header shows; nothing for a header that renders more. */
+const columnLabelOf = ({ label, children, renderHeader }: TableHeader, translate: Translate): string | undefined =>
+  typeof label === 'string' && label && !renderHeader && children == null ? String(translate(label)) : undefined
+export type TableRenderer = (
+  value: unknown, position: unknown, props: Record<string, unknown>, handle: TableViewHandle, column?: TableColumn,
+) => React.ReactNode
 
 /** A header: a column in the default layout, a row in the vertical one. */
 export type TableHeader = {
@@ -230,6 +240,12 @@ function TableView (props: TableViewProps) {
     // No items and nothing derived before means no inferrable headers.
     headers = derived.current ? derived.current.headers : undefined
   }
+  // The labels a body row's fields are named by (`TableColumnsContext`): one value while they read the same, kept as
+  // `derived` keeps the headers, so a render with equal labels does not re-render every cell that reads them.
+  const labels = !props.vertical && headers ? headers.map(header => columnLabelOf(header, props.translate)) : null
+  const columns = useRef<Array<string | undefined> | null>(labels)
+  if (!isEqual(columns.current, labels)) columns.current = labels
+  const columnLabels = columns.current
 
   // What the handlers read when they are called: the latest props and state, as `this` held them.
   // Read through non-null assertions: every render assigns it before any handler runs.
@@ -353,7 +369,8 @@ function TableView (props: TableViewProps) {
   }
 
   // Render Row Cells (in default layout)
-  const renderItemData = (item: TableItem, index: number, {id, renderCell, classNameCellWrap = '', classNameCell: className, styleCell: style}: TableHeader, column?: number) => {
+  const renderItemData = (item: TableItem, index: number, header: TableHeader, column?: number) => {
+    const {id, renderCell, classNameCellWrap = '', classNameCell: className, styleCell: style} = header
     // Conditional rendering logic based on given cell data
     const { additionalCellsStyles } = props
     // Headers without an `id` are section dividers — they render as empty body cells.
@@ -362,7 +379,10 @@ function TableView (props: TableViewProps) {
     const {render: r, data} = (cell || {}) as { render?: TableRenderer, data?: unknown }
     const render = isFunction(cell) ? cell : (r || renderCell)
     const value = data != null ? data : cell
-    let content = render ? render(value, index, {className, style, expanded: expandedByRow(index)}, self) : cell
+    // The column, for a field in the cell to be named by its header (`transforms.ts`).
+    const columnLabel = columnLabelOf(header, props.translate)
+    const columnOf: TableColumn | undefined = columnLabel ? { label: columnLabel } : undefined
+    let content = render ? render(value, index, {className, style, expanded: expandedByRow(index)}, self, columnOf) : cell
     if ((content == null || content === '') && props.showEmptyAs != null) content = props.showEmptyAs
     if (content instanceof Date) {
       content = getDateStringFromDateObject(content)
@@ -491,12 +511,12 @@ function TableView (props: TableViewProps) {
 
   // Extra "add row" must use the next index in the full data array (allRows.length), not the paginated slice length.
   const tableBody = (
-    <>
+    <TableColumnsContext.Provider value={columnLabels}>
       {vertical ? headers.map(renderItemsVertical) : rows.map(renderItem)}
       {renderExtraItem && (
         <Table.Row>{renderExtraItem(allRows, allRows.length)}</Table.Row>
       )}
-    </>
+    </TableColumnsContext.Provider>
   )
 
   return (

@@ -29,13 +29,13 @@ import { get, hasObjectValue, isObject } from '../utils/object'
 import { autoSubmitter } from './autoSubmit'
 import { shouldRender } from './showIf'
 import Render, { formatRenderError, mapProps } from './index'
-import { relativePathFrom } from './transforms'
+import { isUnnamedField, relativePathFrom } from './transforms'
 import { renderField } from './components/renders'
 import TableView from './components/TableView'
 import TabList from './components/TabList'
 import Tabs from './components/Tabs'
 import Data from './Data'
-import { AppContext } from '../contexts'
+import { AppContext, TableColumnsContext } from '../contexts'
 import type { RenderErrorReport } from './Render'
 
 /**
@@ -96,6 +96,8 @@ const RenderComponent = ({
     // Subscribed, as it always was, so a node renders again when the popup opens or closes. It read a
     // `popup` key off the context until the checker found the context has none: see `Table.group` below.
     useContext(AppContext)
+    // The column labels of the table body this node sits in, if any: see `TableColumnsContext`.
+    const columns = useContext(TableColumnsContext)
     // The instance's own translator, not the module global: `Active.translate` is owned by whichever
     // UIRender was constructed LAST, so reading it here made a re-rendering instance translate with a
     // sibling's function. The fallback covers nodes rendered without an instance (tests, and the
@@ -147,6 +149,11 @@ const RenderComponent = ({
             return <>{items.map((item: any, i: number) => {
                 const merged = {
                     ...item,
+                    // A field in the cell that names nothing is named by its column's header, when the row has a cell
+                    // per header: until 2026-10-09 it had no name, and most nameless controls in the examples were these.
+                    ...(columns && columns.length === items.length && columns[i] && isUnnamedField(item) && {
+                        'aria-label': columns[i],
+                    }),
                     ...(item.relativePath == null && relativePath != null && { relativePath }),
                     ...(item.relativeIndex == null && relativeIndex != null && { relativeIndex }),
                 }

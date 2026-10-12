@@ -206,7 +206,14 @@ const FORM_BINDINGS = {
 // like the others. Without one, a read-only upload renders nothing, and that case showed nothing.
 // 81 -> 66 on 2026-10-09: a select with no `label` is named "Select <name>", as the native `Select` names
 // its control. The 15 comboboxes the corpus renders without a label had no name at all.
-const NAMELESS_CONTROLS = { total: 150, nameless: 66 }
+// 66 -> 60 the same day: a slider's handles are named by the field's `label`, or its `name`, and a range's two say
+// which end each moves. The six handles of the `slider` example had no name.
+// 60 -> 14 the same day: a field in a table cell that names nothing is named by its column's header, through a
+// header's `renderCell`, a `TableCells` row or a draft row with a cell per header. 46 of the 60 were these, in
+// `nestedDataKind` and `tableForm`. What is left: 9 icon buttons in columns whose header has no label, the two hidden
+// tabs of `layout`, two buttons of `all`, and the field in `tableExtraItems`' `extraItems` row, whose cells the
+// mapper builds without their columns.
+const NAMELESS_CONTROLS = { total: 150, nameless: 14 }
 
 /** Roles that count as an interactive control for the ledger above. */
 const CONTROL_ROLES = ['textbox', 'spinbutton', 'checkbox', 'combobox', 'listbox', 'slider', 'button', 'tab']

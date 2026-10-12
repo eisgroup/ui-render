@@ -362,6 +362,13 @@ describe('Dropdown', () => {
                         allowAdditions: true,
                         clearable: true,
                         noResultsMessage: 'nothing',
+                        // Among the 34 added on 2026-10-09: until then each became an attribute of the dropdown.
+                        fluid: true,
+                        closeOnBlur: true,
+                        open: true,
+                        tabIndex: 0,
+                        text: 'Shown instead',
+                        as: 'span',
                     }).container
                 })
             })

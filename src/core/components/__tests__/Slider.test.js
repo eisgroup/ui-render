@@ -422,3 +422,31 @@ describe('Slider', () => {
         })
     })
 })
+
+describe('Slider handle names (2026-10-09)', () => {
+    const names = container => [...container.querySelectorAll('[role="slider"]')]
+        .map(handle => handle.getAttribute('aria-label'))
+
+    it('takes the field label, translated, and else its name', () => {
+        expect(names(renderSlider({ value: 5, label: 'Volume', translate: text => `T:${text}` }).container))
+            .toEqual(['T:Volume'])
+        expect(names(renderSlider({ value: 5, name: 'volume' }).container)).toEqual(['volume'])
+        expect(names(renderSlider({ value: 5 }).container)).toEqual([null])
+    })
+
+    it('says which end each handle of a range moves', () => {
+        expect(names(renderSlider({ value: [10, 40], name: 'priceRange' }).container))
+            .toEqual(['priceRange, minimum', 'priceRange, maximum'])
+    })
+
+    it('puts a meta\'s own aria-label or aria-labelledby on the handles, above the derived name', () => {
+        const own = renderSlider({ value: 5, name: 'volume', 'aria-label': 'Loudness' }).container
+        expect(names(own)).toEqual(['Loudness'])
+        expect(own.firstChild).not.toHaveAttribute('aria-label')
+
+        const by = renderSlider({ value: 5, name: 'volume', 'aria-labelledby': 'heading' }).container
+        const handle = by.querySelector('[role="slider"]')
+        expect(handle).toHaveAttribute('aria-labelledby', 'heading')
+        expect(handle).not.toHaveAttribute('aria-label')
+    })
+})

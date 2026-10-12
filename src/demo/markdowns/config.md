@@ -337,6 +337,20 @@ Available in all UI components:
 }
 ```
 
+### A control's accessible name
+
+A screen reader announces a control by its name. Each control takes the first of these it has:
+
+1. a meta's own `aria-label` or `aria-labelledby`;
+2. the field's `label`;
+3. what it is given without one:
+   - a select is named "Select <name>", after its field's `name`;
+   - a slider's handle is named after the field's `name`, and a range's two handles add ", minimum" and ", maximum";
+   - a field in a table cell is named by its column's header, when the header shows its `label` as plain text. In a
+     `TableCells` row, or the draft row of a `localDraft` `Data`, only when the row has a cell per header.
+
+A button is named by its content, so a button that shows only an icon needs an `aria-label`.
+
 ### Input Attributes
 
 ```js

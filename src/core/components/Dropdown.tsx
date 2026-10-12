@@ -90,6 +90,18 @@ export const DROPPED_PROPS = [
     // Never wrapper API, but reachable through the old rest spread and curated as tier 2 on
     // docs/SUPPORTED-PROPS.md: SUIR's clear-selection icon. Nothing in either corpus sets it.
     'clearable',
+    // The other 34 names semantic-ui-react's `Dropdown` declared that the listbox neither reads nor stripped, added on
+    // 2026-10-09: each reached the dropdown element as an attribute, a boolean one with React's "Received `true` for a
+    // non-boolean attribute" warning (the 2026-10-08 audit counted them). Neither corpus sets any of them.
+    // Its open, close and select machinery, which the WAI-ARIA select-only combobox pattern decides instead:
+    'closeOnBlur', 'closeOnChange', 'closeOnEscape', 'defaultOpen', 'open', 'openOnFocus', 'selectOnBlur',
+    'selectOnNavigation', 'wrapSelection', 'defaultUpward', 'direction', 'tabIndex',
+    // Its style variants, classes the listbox does not emit:
+    'basic', 'button', 'floating', 'fluid', 'inline', 'item', 'labeled', 'loading', 'pointing', 'scrolling', 'simple',
+    // What served `search` and `multiple`, gone with them:
+    'defaultSearchQuery', 'minCharacters', 'defaultSelectedLabel', 'selectedLabel', 'renderLabel', 'onLabelClick',
+    // Its element and content overrides:
+    'as', 'header', 'trigger', 'text', 'defaultValue',
 ]
 
 const warnedDropped = new Set<string>()
@@ -106,10 +118,8 @@ function dropUnsupported (props: Record<string, unknown>) {
             warnedDropped.add(key)
             console.warn(
                 `[ui-render] <Dropdown> ignores the \`${key}\` prop.`
-                + ' semantic-ui-react handled it; the in-house listbox does not, because nothing in'
-                + ' the product or in any audited meta used it and the machinery behind it'
-                + ' (filtering, diacritics-insensitive matching, a search input, multi-value'
-                + ' handling, free-text additions) is gone. See docs/SUPPORTED-PROPS.md.'
+                + ' semantic-ui-react handled it; the in-house listbox does not, and nothing in the'
+                + ' product or in any audited meta used it. docs/SUPPORTED-PROPS.md says what it did.'
             )
         }
     })

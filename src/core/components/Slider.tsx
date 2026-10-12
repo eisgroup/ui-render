@@ -1,6 +1,8 @@
 import classNames from '../utils/classNames'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { formatNumber, last, round, toPercent } from '../utils'
+import { Active, formatNumber, interpolateString, l, last, localiseTranslation, round, toPercent } from '../utils'
+import { _ } from '../utils/translations'
+import type { Translate } from '../utils/_envs'
 import { formatDuration } from '../utils/time'
 import TooltipBubble from './TooltipBubble'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
@@ -28,6 +30,16 @@ export type SliderRangeLabels = {
 /** Props for each handle's `TooltipBubble`; `render(value)`, if set, renders its content. */
 export type SliderTooltipProps = { render?: (value: number) => React.ReactNode, [key: string]: unknown }
 
+localiseTranslation({
+  // The two handles of a range, named by the field: the WAI-ARIA multi-thumb slider's "minimum" and "maximum".
+  SLIDER_minimum: {
+    [l.ENGLISH]: '{name}, minimum',
+  },
+  SLIDER_maximum: {
+    [l.ENGLISH]: '{name}, maximum',
+  },
+})
+
 /** The named props are read here; the rest is spread onto the slider's `<div>`. */
 export type SliderProps = {
   value?: SliderValue | null
@@ -47,6 +59,9 @@ export type SliderProps = {
   unit?: string
   render?: (value: SliderValue | null | undefined) => React.ReactNode
   name?: string
+  /** Names each handle, translated; without one, the handles take `name`. Not rendered */
+  label?: string
+  translate?: Translate
   [key: string]: unknown
 }
 
@@ -97,6 +112,10 @@ export function Slider ({
   value,
   onChange,
   name,
+  label,
+  translate = Active.translate,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledby,
   ...rest
 }: SliderProps) {
   const isRange = Array.isArray(value)
@@ -118,6 +137,18 @@ export function Slider ({
   const dragCleanupRef = useRef<(() => void) | null>(null)
   const [activeIdx, setActiveIdx] = useState(-1)
   const interactive = !disabled && !readonly
+  // Each handle's name. It had none until 2026-10-09, so a screen reader announced a nameless slider: the field's
+  // label, or else its name, as a `Dropdown` with no label is named after its name, and on a range the end each handle
+  // moves. A meta's own
+  // `aria-label` or `aria-labelledby` wins, and goes to the handles rather than the div around them.
+  const fieldName = label ? String(translate(label)) : name
+  const handleName = (index: number): string | undefined => {
+    if (ariaLabelledby) return undefined
+    if (ariaLabel) return String(ariaLabel)
+    if (!fieldName) return undefined
+    if (!isRange) return fieldName
+    return interpolateString(index === 0 ? _.SLIDER_minimum : _.SLIDER_maximum, { name: fieldName })
+  }
 
   useEffect(() => () => {
     if (dragCleanupRef.current) dragCleanupRef.current()
@@ -263,6 +294,8 @@ export function Slider ({
             aria-valuenow={h.value}
             aria-orientation={vertical ? 'vertical' : 'horizontal'}
             aria-disabled={disabled || undefined}
+            aria-label={handleName(i)}
+            aria-labelledby={ariaLabelledby ? String(ariaLabelledby) : undefined}
             className={classNames('app__slider__handle', { active: isActive })}
             style={offset(pct)}
             onPointerDown={(e) => startDrag(e, i)}

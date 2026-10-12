@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react'
+import React, { memo, useContext, useState } from 'react'
 import Button from '../../components/Button'
 import Input from '../../components/Input'
 import InputDate from '../../components/InputDate'
@@ -10,6 +10,7 @@ import { email, isRequired, maxLength, password, url } from '../../components/in
 import { integer } from '../../components/inputs/normalizers'
 import { pushDataKindRow, validateNotWithinRangeDraftRow } from '../dataKindPush'
 import type { DataKindParent } from '../dataKindPush'
+import { TableColumnsContext } from '../../contexts'
 
 type Validator = (value: unknown) => unknown
 
@@ -110,6 +111,8 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate: translateP
   // button were never translated until 2026-10-06.
   const translate = translateProp || (parentInstance && parentInstance.translate as Translate | undefined) || DEFAULT_TRANSLATE
   const [state, setState] = useState<DraftState>(EMPTY_DRAFT)
+  // The column labels of the table this row is the last of: see `TableColumnsContext`.
+  const columns = useContext(TableColumnsContext)
   // `this.setState` merged into the state it was given; this keeps that shape, and the updater form.
   const update = (partial: Partial<DraftState> | ((s: DraftState) => Partial<DraftState>)) =>
     setState((s) => ({ ...s, ...(typeof partial === 'function' ? partial(s) : partial) }))
@@ -184,7 +187,7 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate: translateP
    *  `style={{verticalAlign: 'top'}}`, which is what the metas that actually align already do —
    *  and expect a visual change, because that one works.
    */
-  const renderInputCell = (def: DraftItem, i: number | string) => {
+  const renderInputCell = (def: DraftItem, i: number | string, columnLabel?: string) => {
     const name = def.name as string
     const { draft, fieldErrors } = state
     const value = draft[name]
@@ -198,7 +201,11 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate: translateP
       onChange: handleChange(name),
       error,
       translate,
-      className
+      className,
+      // Named by its column's header when it names nothing, as a field in any other row is (`TableColumnsContext`).
+      ...(columnLabel && def.label == null && def['aria-label'] == null && def['aria-labelledby'] == null && {
+        'aria-label': columnLabel,
+      }),
     }
     return (
       <Table.Cell key={name || i} className={def.classNameCellWrap}>
@@ -209,38 +216,40 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate: translateP
     )
   }
 
-  const renderBranch = (item: DraftItem, i: number | string): React.ReactNode => {
-    if (item.view === 'Input' && item.name) {
-      return renderInputCell(item, i)
-    }
-    if (isColumn(item.view)) {
-      return (item.items || []).flatMap((sub, j) => renderBranch(sub, `${i}-${j}`))
-    }
+  /**
+   * The cells the row renders, in order, before any is: a field's position is what names it. An `Input` takes a
+   * cell, a column layout the cells of its items, and the Add button one; nothing else renders.
+   */
+  const cellsOf = (item: DraftItem, i: number | string): Array<{ item: DraftItem, key: number | string }> => {
+    if (item.view === 'Input' && item.name) return [{ item, key: i }]
+    if (isColumn(item.view)) return (item.items || []).flatMap((sub, j) => cellsOf(sub, `${i}-${j}`))
     if (item.view === 'Button') {
       const oc = item.onClick
       // `.name` is read off whatever `onClick` is, a function included: the engine resolves the action
       // to a function named after it.
       const isAdd = oc && (oc === 'addData' || (oc as { name?: unknown }).name === 'addData')
-      if (!isAdd) return null
-      const { onClick: _oc, children, ...btnRest } = item
-      return (
-        <Table.Cell key={`btn-${i}`}>
-          <Button {...btnRest} type="button" onClick={handleAdd} translate={translate}>
-            {children}
-          </Button>
-        </Table.Cell>
-      )
+      return isAdd ? [{ item, key: i }] : []
     }
-    return null
+    return []
+  }
+
+  const renderCell = (item: DraftItem, i: number | string, columnLabel?: string): React.ReactNode => {
+    if (item.view === 'Input') return renderInputCell(item, i, columnLabel)
+    const { onClick: _oc, children, ...btnRest } = item
+    return (
+      <Table.Cell key={`btn-${i}`}>
+        <Button {...btnRest} type="button" onClick={handleAdd} translate={translate}>
+          {children}
+        </Button>
+      </Table.Cell>
+    )
   }
 
   if (!meta || !meta.items) return null
-  const cells = meta.items.flatMap((item, i) => {
-    const node = renderBranch(item, i)
-    if (node == null) return []
-    return Array.isArray(node) ? node : [node]
-  })
-  return <>{cells}</>
+  const planned = meta.items.flatMap((item, i) => cellsOf(item, i))
+  // A field is named by the header above its cell only when the row has a cell per header.
+  const aligned = !!columns && columns.length === planned.length
+  return <>{planned.map(({ item, key }, position) => renderCell(item, key, aligned ? columns![position] : undefined))}</>
 }
 
 // `memo` skips a render with shallow-equal props, as `PureComponent` did.
