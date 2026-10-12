@@ -180,6 +180,58 @@ describe('mapper behavior contracts', () => {
         expect(instance.submit).toHaveBeenCalledTimes(1)
     })
 
+    describe('the handlers autoSubmit and removable add, kept per document', () => {
+        const clearing = (extra = {}) => ({ view: FIELD.TYPE.INPUT, name: 'comment', removable: true, autoSubmit: { delay: 0 }, ...extra })
+        /** The field's `onChange` and `onClickIcon`, one render of its document later. */
+        const handlersOf = props => {
+            const { unmount } = renderMapped(props)
+            const { onChange, onClickIcon } = lastFieldProps()
+            unmount()
+            return { onChange, onClickIcon }
+        }
+
+        it('are the same functions while everything they call stays the same', () => {
+            const base = { instance: baseInstance(), form: { change: () => {} }, onChange: () => {} }
+            const [first, second] = [handlersOf(clearing(base)), handlersOf(clearing(base))]
+            expect([second.onChange === first.onChange, second.onClickIcon === first.onClickIcon]).toEqual([true, true])
+        })
+
+        it('are made again when something they call changes, and only those that call it', () => {
+            // [onChange kept, onClickIcon kept] when one thing changes, each on a document of its own.
+            const keptAfter = change => {
+                const base = { instance: baseInstance(), form: { change: () => {} }, onChange: () => {} }
+                const kept = handlersOf(clearing(base))
+                const changed = handlersOf(clearing({ ...base, ...change }))
+                return [changed.onChange === kept.onChange, changed.onClickIcon === kept.onClickIcon]
+            }
+            expect({
+                onChange: keptAfter({ onChange: () => {} }),
+                onRemove: keptAfter({ onRemove: () => {} }),
+                onClickIcon: keptAfter({ onClickIcon: () => {} }),
+                form: keptAfter({ form: { change: () => {} } }),
+            }).toEqual({
+                onChange: [false, false],
+                onRemove: [true, false],
+                onClickIcon: [true, false],
+                form: [true, false],
+            })
+        })
+
+        it('are made anew on each render for a field without a name', () => {
+            const nameless = clearing({ instance: baseInstance(), name: undefined })
+            const [first, second] = [handlersOf(nameless), handlersOf(nameless)]
+            expect([second.onChange === first.onChange, second.onClickIcon === first.onClickIcon]).toEqual([false, false])
+        })
+
+        it('keeps a bounded number of handlers for one document', () => {
+            const instance = baseInstance()
+            const first = handlersOf(clearing({ instance, name: 'field 0' }))
+            // Two handlers a field, for more fields than one document keeps handlers for.
+            for (let i = 1; i < 600; i++) handlersOf(clearing({ instance, name: `field ${i}` }))
+            expect(handlersOf(clearing({ instance, name: 'field 0' })).onClickIcon).not.toBe(first.onClickIcon)
+        })
+    })
+
     it('adds number bounds without losing the existing validator or readonly state', () => {
         const validate = jest.fn(value => value === 5 ? 'Reserved value' : undefined)
         renderMapped({

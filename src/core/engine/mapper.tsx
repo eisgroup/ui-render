@@ -81,6 +81,44 @@ function boundsKey (min: unknown, max: unknown): string | undefined {
     return low === undefined || high === undefined ? undefined : JSON.stringify([low, high])
 }
 
+/** A field's event handler, as the mapper wraps it. */
+type FieldHandler = (...args: any[]) => unknown
+
+/**
+ * THE HANDLERS `autoSubmit` AND `removable` ADD TO A FIELD, kept per document while what they call
+ * stays the same (2026-10-12).
+ *
+ * Each wrapped the field's own handler in a new function on every render. The field host's memo saw a
+ * changed prop on every render of the document, so the field rendered again on each change to any
+ * other field, a blur included. A wrapper is now the same function for as long as everything it calls
+ * is the same: it is kept per document and field name, and made again only when one of those changes.
+ * A field without a name, whose slot could not be told from another's, still gets a new one each render.
+ */
+const keptHandlers = new WeakMap<object, Map<string, { calls: unknown[], handler: FieldHandler }>>()
+
+/** How many wrapped handlers one document keeps. A document that keeps adding fields starts over past it. */
+const KEPT_HANDLERS_LIMIT = 1024
+
+/** The slot a field's wrapped handler is kept in, or `undefined` for a field without a name. */
+const handlerSlot = (kind: string, name: unknown): string | undefined =>
+    typeof name === 'string' && name !== '' ? `${kind}:${name}` : undefined
+
+/** What `make` returns, or what it returned before for this slot while it would call the very same things. */
+function keptHandler (instance: unknown, slot: string | undefined, calls: unknown[], make: () => FieldHandler): FieldHandler {
+    if (instance === null || typeof instance !== 'object' || slot === undefined) return make()
+    let bySlot = keptHandlers.get(instance)
+    if (!bySlot) {
+        bySlot = new Map()
+        keptHandlers.set(instance, bySlot)
+    }
+    const kept = bySlot.get(slot)
+    if (kept && kept.calls.length === calls.length && kept.calls.every((call, i) => Object.is(call, calls[i]))) return kept.handler
+    const handler = make()
+    if (!kept && bySlot.size >= KEPT_HANDLERS_LIMIT) bySlot.clear()
+    bySlot.set(slot, { calls, handler })
+    return handler
+}
+
 /** `validate` with a number field's bounds checked first, the same function while all three stay the same. */
 function boundedValidator (instance: unknown, validate: FieldValidator | undefined, min: any, max: any): FieldValidator {
     const bounded: FieldValidator = (value: any) => {
@@ -632,24 +670,27 @@ const RenderComponent = ({
             if (autoSubmit) {
                 const { onChange } = input
                 const submit = autoSubmitter(instance, autoSubmit.delay >= 0 ? autoSubmit.delay : TIME_DURATION_INSTANT)
-                input.onChange = (value: unknown) => {
+                input.onChange = keptHandler(instance, handlerSlot('autoSubmit', input.name), [onChange, submit], () => (value: unknown) => {
                     onChange && onChange(value)
                     submit()
-                }
+                })
             }
 
             // Input clearing
             if (removable) {
-                const { onRemove, onClickIcon } = input
+                // The name and the `onChange` it calls are read here, not when the icon is clicked: nothing
+                // below changes either, so they are what this render's `input` holds when it is clicked.
+                const { onRemove, onClickIcon, onChange, name } = input
+                const submits = Boolean(autoSubmit)
                 input.icon = 'delete'
                 input.classNameIcon = 'button circle small transparent appear-on-hover'
-                input.onClickIcon = (...args: unknown[]) => {
+                input.onClickIcon = keptHandler(instance, handlerSlot('removable', name), [form, name, onRemove, submits, onChange, onClickIcon], () => (...args: unknown[]) => {
                     // todo: for some reason Dropdown/Select have `form` undefined
-                    form && form.change && form.change(input.name, null)
-                    onRemove && onRemove(input.name)
-                    autoSubmit && input.onChange(null)
+                    form && form.change && form.change(name, null)
+                    onRemove && onRemove(name)
+                    submits && onChange(null)
                     onClickIcon && onClickIcon(...args)
-                }
+                })
             }
 
             // Validate type="number" with min/max

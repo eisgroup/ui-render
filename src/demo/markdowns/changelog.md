@@ -866,6 +866,11 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A field with `autoSubmit` or `removable` no longer renders again whenever another field changes.**
+  Each wrapped the field's own handler in a new function on every render, so such a field rendered
+  again on every change in its document, a blur included, and three times at mount: 200 fields for one
+  edit of another column in a 200-row table. The same handlers give the same function now. The field
+  still submits on a change, and clears, as it did.
 - **A number field with `min` or `max` no longer renders again on each change of its document.** Its
   bounds wrapped the field's `validate` in a new function on every render, and a field takes it as a
   prop: every such field rendered again on each change, a blur included, which was 400 fields for one
