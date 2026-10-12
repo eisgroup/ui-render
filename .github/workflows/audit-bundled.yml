@@ -1,0 +1,37 @@
+name: Audit the bundled packages
+
+# What a host receives is the code webpack bundled, listed in dist/sbom.cdx.json; `dependencies` is empty, so
+# `npm audit --omit=dev` audits nothing. scripts/audit-bundled.js runs `npm audit` and fails on a finding in a
+# bundled package, at moderate or above. Weekly rather than on every PR: a new advisory must not turn an
+# unrelated change red.
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the library, which writes the SBOM
+        run: npm run build-lib
+
+      - name: Audit the bundled packages
+        run: npm run audit:bundled

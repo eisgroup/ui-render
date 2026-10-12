@@ -449,7 +449,7 @@ export class UIRender extends DocumentInstance {
                     document with no content, and a host relies on Enter in a field submitting nothing. */}
                 {content}
                 {childAfter}
-                <Modal />
+                <Modal translate={this.translate || Active.translate} />
             </Container>
 
         // The configuration props are published here, around the whole subtree, rather than

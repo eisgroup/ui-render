@@ -37,6 +37,8 @@ const PAGE = `<!doctype html>
 <div style="transform: scale(0.8); transform-origin: top left"><div id="list"></div></div>
 <div id="tall" style="height: 200px; overflow: auto"></div>
 <div id="popup"></div>
+<!-- #host's document a second time, as a host that shows one form twice: each keeps its own ids and labels. -->
+<div id="twin"></div>
 <script src="bundle.js"></script>
 </body>
 </html>

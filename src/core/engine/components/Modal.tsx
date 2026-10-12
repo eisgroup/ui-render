@@ -6,6 +6,7 @@ import View from '../../components/View'
 import { l, localiseTranslation } from '../../utils'
 import { _ } from '../../utils/translations'
 import { AppContext } from '../../contexts'
+import type { Translate } from '../../utils/_envs'
 
 localiseTranslation({
     CANCEL: {
@@ -63,8 +64,13 @@ let popups = 0
  * what had it, the control that opened it.
  * Before, focus stayed on that control behind the backdrop, Tab walked the page under it, and only
  * the pointer could close it (`e2e/interactive-views.pw.js` measured each).
+ *
+ * Its title, its message and its Ok are translated by `translate`, the document's own translator.
+ * Until 2026-10-09 they took the components' default, `Active.translate`, which is the translator
+ * of the document constructed LAST: on a page with two documents, the first one's popup showed
+ * the second one's language around its own content.
  */
-const Modal = () => {
+const Modal = ({ translate }: { translate?: Translate }) => {
     const popup = useContext(AppContext)
     const { isOpen, title, content, togglePopupState } = popup
     const activeClass = isOpen ? ' active' : ''
@@ -149,14 +155,14 @@ const Modal = () => {
                         {isOpen && (
                             <>
                                 <View className="app__popup__box__header">
-                                    <Text id={titleId} className="app__popup__box__header__title">{title}</Text>
+                                    <Text id={titleId} className="app__popup__box__header__title" translate={translate}>{title}</Text>
                                 </View>
                                 <View className="app__popup__box__body">
                                     {typeof content === 'string' ? <Text id={messageId}
-                                        className="p center">{content}</Text> : content}
+                                        className="p center" translate={translate}>{content}</Text> : content}
                                 </View>
                                 <View className="app__popup__box__footer center">
-                                    <Button onClick={togglePopupState} className="primary">{_.OK}</Button>
+                                    <Button onClick={togglePopupState} className="primary" translate={translate}>{_.OK}</Button>
                                 </View>
                             </>
                         )}
