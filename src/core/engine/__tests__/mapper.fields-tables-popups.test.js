@@ -113,6 +113,50 @@ describe('mapper behavior contracts', () => {
         expect(onChange).toHaveBeenNthCalledWith(2, 'unknown')
     })
 
+    describe('the options a mapOptions maps, kept', () => {
+        const records = [{ id: 'draft', label: 'Draft' }, { id: 'bound', label: 'Bound' }]
+        const select = (extra = {}) => ({ view: FIELD.TYPE.SELECT, name: 'status', options: records, mapOptions: { text: 'label', value: 'id' }, ...extra })
+        /** The field's props, one render of its document later. */
+        const fieldOf = props => {
+            const { unmount } = renderMapped(props)
+            const field = lastFieldProps()
+            unmount()
+            return field
+        }
+
+        it('are the same array while they are mapped from the same options by the same mapping', () => {
+            const props = select({ instance: baseInstance() })
+            const [first, second] = [fieldOf(props).options, fieldOf(props).options]
+            expect(second).toBe(first)
+            expect(first).toEqual([{ text: 'Draft', value: 'draft' }, { text: 'Bound', value: 'bound' }])
+        })
+
+        it('are mapped again from other options, by another mapping, or in debug mode', () => {
+            const props = select({ instance: baseInstance() })
+            const kept = fieldOf(props).options
+            const others = [
+                fieldOf({ ...props, options: records.map(record => ({ ...record })) }).options,
+                fieldOf({ ...props, mapOptions: { text: 'label', value: 'id' } }).options,
+                fieldOf({ ...props, debug: true }).options,
+            ]
+            expect(others.map(options => [options === kept, options])).toEqual(others.map(() => [false, kept]))
+        })
+
+        it('are an empty list, the same one, for a field with no options', () => {
+            const props = select({ instance: baseInstance(), options: undefined })
+            const [first, second] = [fieldOf(props).options, fieldOf(props).options]
+            expect([first, second === first]).toEqual([[], true])
+        })
+
+        it('keep the stable-value onChange that searches them, while it calls the same handler', () => {
+            const onChange = () => {}
+            const props = select({ instance: baseInstance(), onChange })
+            const [first, second] = [fieldOf(props).onChange, fieldOf(props).onChange]
+            const another = fieldOf({ ...props, onChange: () => {} }).onChange
+            expect([second === first, another === first]).toEqual([true, false])
+        })
+    })
+
     it('coordinates removable fields with form clearing and debounced auto-submit', () => {
         jest.useFakeTimers()
         const onChange = jest.fn()

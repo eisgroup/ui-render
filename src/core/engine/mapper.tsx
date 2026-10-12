@@ -119,6 +119,42 @@ function keptHandler (instance: unknown, slot: string | undefined, calls: unknow
     return handler
 }
 
+/**
+ * THE OPTIONS A `mapOptions` MAPS, kept while they are mapped from the same options by the same mapping
+ * (2026-10-12).
+ *
+ * The mapper mapped a field's `options` through its `mapOptions` on every render, so the field was
+ * handed a new array each time. A Select, which takes them as a prop, rendered again on every render of
+ * its document: on each change of any other field, a blur included. `toOpenLConfig` gives a named Select
+ * with no `onChange` of its own a `mapOptions` whenever its options are not a declared option list, so
+ * many Selects did. The mapped array is now kept while the options array and the
+ * `mapOptions` are the very ones it was mapped from. Both come from the document's meta, which is built
+ * again when the document's state changes (`meta` in `rules.tsx`), and a meta built again is mapped
+ * again. The array is shared between those renders: nothing that takes it changes it, and `Dropdown`
+ * keys its reset on the options' values, not on the array.
+ */
+const keptOptions = new WeakMap<object, Map<unknown, { debug: unknown, options: unknown[] }>>()
+
+/** What a field with `mapOptions` and no `options` is handed: an empty list maps to an empty list, whatever the mapping. */
+const NO_OPTIONS: unknown[] = []
+
+/** `mapProps(options, mapOptions)`, or the array it gave before for the very same options and mapping. */
+function keptMappedOptions (options: unknown, mapOptions: any, debug: unknown): unknown[] {
+    if (!options) return NO_OPTIONS
+    const source = options
+    if (typeof source !== 'object') return mapProps(source, mapOptions, { debug: debug as boolean })
+    let byMapping = keptOptions.get(source)
+    if (!byMapping) {
+        byMapping = new Map()
+        keptOptions.set(source, byMapping)
+    }
+    const kept = byMapping.get(mapOptions)
+    if (kept && kept.debug === debug) return kept.options
+    const mapped = mapProps(source, mapOptions, { debug: debug as boolean })
+    byMapping.set(mapOptions, { debug, options: mapped })
+    return mapped
+}
+
 /** `validate` with a number field's bounds checked first, the same function while all three stay the same. */
 function boundedValidator (instance: unknown, validate: FieldValidator | undefined, min: any, max: any): FieldValidator {
     const bounded: FieldValidator = (value: any) => {
@@ -611,7 +647,7 @@ const RenderComponent = ({
             if (items.length) props.children = items.map(Render)
             const { mapOptions, removable, autoSubmit, expanded: _1, ...input } = props
             const { readonly, disabled } = data || {}
-            if (mapOptions) input.options = mapProps(input.options || [], mapOptions, { debug })
+            if (mapOptions) input.options = keptMappedOptions(input.options, mapOptions, debug)
 
             // Resolve Input name dynamic path
             // relativePath should be used to form input name even when relativeData === false (e.g., in popups)
@@ -660,10 +696,11 @@ const RenderComponent = ({
             if (view === FIELD.TYPE.SELECT && isObject(mapOptions) && mapOptions.value && mapOptions.value !== '{index}' && input.onChange) {
                 const stableOnChange = input.onChange
                 const mappedOptions = input.options || []
-                input.onChange = (value: unknown) => {
+                // Kept like the handlers `autoSubmit` and `removable` add: the options it searches are the kept ones above.
+                input.onChange = keptHandler(instance, handlerSlot('selectIndex', input.name), [stableOnChange, mappedOptions], () => (value: unknown) => {
                     const idx = mappedOptions.findIndex((o: any) => String(o.value) === String(value))
                     return stableOnChange(idx >= 0 ? String(idx) : value)
-                }
+                })
             }
 
             // Auto submit on changes
