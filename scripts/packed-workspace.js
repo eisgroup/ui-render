@@ -34,22 +34,28 @@ function packageVersion (packageDir) {
     return JSON.parse(fs.readFileSync(path.join(packageDir, 'package.json'), 'utf8')).version
 }
 
+/** Packs this repository's built dist/ into `destination`, and returns the tarball's path. */
+function packDist (destination) {
+    // --ignore-scripts keeps prepack from rebuilding dist/ here.
+    const stdout = run('npm', [
+        'pack', '--json', '--ignore-scripts', '--pack-destination', destination,
+    ], { cwd: ROOT })
+    // npm prints the JSON array last; anything before it is notice noise.
+    const start = stdout.indexOf('[')
+    if (start === -1) throw new Error('npm pack produced no JSON payload')
+    return path.join(destination, JSON.parse(stdout.slice(start))[0].filename)
+}
+
 /**
  * Packs the built dist/ (the caller builds it, with `npm run build-lib`) and installs the tarball into a new
- * host. `reactDir` takes the externals from another install, for the peer-range matrix. Returns the host's
- * directories and the versions it linked; the caller removes `workspace` when it is done.
+ * host. `reactDir` takes the externals from another install, for the peer-range matrix. `tarball` installs a
+ * tarball packed elsewhere instead, such as another commit's, for a comparison (scripts/test-packed-perf.js).
+ * Returns the host's directories and the versions it linked; the caller removes `workspace` when it is done.
  */
-function createPackedConsumer ({ reactDir = null } = {}) {
+function createPackedConsumer ({ reactDir = null, tarball: given = null } = {}) {
     const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'eis-ui-render-packed-'))
     try {
-        // --ignore-scripts keeps prepack from rebuilding dist/ here.
-        const stdout = run('npm', [
-            'pack', '--json', '--ignore-scripts', '--pack-destination', workspace,
-        ], { cwd: ROOT })
-        // npm prints the JSON array last; anything before it is notice noise.
-        const start = stdout.indexOf('[')
-        if (start === -1) throw new Error('npm pack produced no JSON payload')
-        const tarball = path.join(workspace, JSON.parse(stdout.slice(start))[0].filename)
+        const tarball = given ? path.resolve(given) : packDist(workspace)
 
         const extracted = path.join(workspace, 'extracted')
         fs.mkdirSync(extracted)

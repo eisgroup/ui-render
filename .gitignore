@@ -179,4 +179,6 @@ Temporary Items
 # ... and the packed tarball in a browser (playwright.packed.config.js)
 /test-results-packed
 /playwright-report-packed
+# ... and what its documents cost there (playwright.perf.config.js, scripts/test-packed-perf.js)
+/test-results-perf
 /playwright/.cache

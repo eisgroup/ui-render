@@ -56,6 +56,7 @@
     "test:pack:consumer": "node scripts/test-packed-consumer.js",
     "test:pack:browser": "node scripts/test-packed-browser.js",
     "test:pack:browser:peers": "node scripts/test-packed-browser.js --peers",
+    "test:perf": "node scripts/test-packed-perf.js",
     "audit:bundled": "node scripts/audit-bundled.js",
     "test:pack:peers": "node scripts/test-packed-react-matrix.js",
     "test:env-flags": "node scripts/test-env-flags.js",
