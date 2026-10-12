@@ -64,9 +64,13 @@ item has the details.
   list rows or under a named container, the key moves from under their path to `state.<name>`, and
   every row shares that one key. (Select and Dropdown)
 - **Check pages that mount more than one `UIRender`.** Each document now reads only its own forms,
-  reports its errors to its own `getValidationErrors` and opens its popups in its own wrapper. In
-  0.34.x each read every form on the page, all their errors went to one callback, and every popup
-  opened in the first wrapper. (Renderer configuration and error reporting, Fixes)
+  reports its errors to its own `getValidationErrors` and opens its popups in its own wrapper, where
+  its own `translate` translates them. In 0.34.x each read every form on the page, all their errors
+  went to one callback, every popup opened in the first wrapper, and every document translated with
+  the `translate` of the last one constructed. An id a field takes from its `name` is unique on the
+  page now: where a name repeats, the first field keeps it and the others take `<name>-2`,
+  `<name>-3`. Give a field an `id` in meta where the page needs a fixed one. (Renderer configuration
+  and error reporting, Accessibility, Fixes)
 - **Ship your own copies of the images you link.** The package ships no images now. 0.34.x carried
   `static/images/`, flags included. (Packaging)
 - **Style the Semantic class names a meta sets.** A node a meta gives `ui label`, `ui menu` or
@@ -247,6 +251,15 @@ Nothing to do for these:
 
 #### Accessibility
 
+- **A label names its own field when the field's name repeats on the page.** `Input`, `InputNumber`
+  and `InputDate` took their id from their `name`, or from their `label`, the same for every field
+  with that name, and a `<label for>` finds the first element with its id. With two documents of
+  the same fields on a page, the second document's labels named the first document's fields:
+  clicking one changed the other document's data, and the second document's fields had no
+  accessible name. The nested rows of a `dataKind` repeated their ids the same way. Such an id is
+  unique on the page now, as a `Checkbox`'s already was: the field that has it first keeps it, and
+  another takes `<id>-2`, `<id>-3`. An `id` given in meta is kept as it is. Each document's popup
+  root follows the same rule, `render-popup-root-2` for the second.
 - **A select with no `label` has an accessible name.** It is named "Select <name>", from its field's
   `name`, as the native `Select` names its control. Without a label it had no name at all, which a
   screen reader announced as an unnamed combobox: 15 in the demo examples. A meta's own
@@ -819,6 +832,9 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A popup's title, message and Ok are translated by the document that opened it.** They took the
+  `translate` of the document constructed last: on a page with two documents, the first one's popup
+  showed the second one's translation around its own content.
 - **A field named through `__proto__`, `constructor` or `prototype` can no longer delete a member of
   `Object.prototype`.** Removing a field's value walks its name as a path, and the walk refused those
   keys when writing but not when deleting: an upload field named `__proto__.toString` deleted

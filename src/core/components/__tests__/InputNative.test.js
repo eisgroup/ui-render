@@ -114,3 +114,32 @@ describe('InputNative', () => {
         expect(input.getAttribute('autoCapitalize')).toBe('off')
     })
 })
+
+describe('InputNative elementRef (2026-10-09)', () => {
+    // A plain function, recording: what `Input` passes to find its own field for `useOwnId`.
+    const recorder = () => {
+        const calls = []
+        const elementRef = node => calls.push(node && node.tagName)
+        return { calls, elementRef }
+    }
+
+    it.each([
+        ['an input', {}, 'INPUT'],
+        ['a compact input', { compact: 1 }, 'INPUT'],
+        ['a color input', { type: 'color', value: '#ff0000', onChange () {} }, 'INPUT'],
+        ['a checkbox', { type: 'checkbox' }, 'INPUT'],
+        ['a textarea', { resize: true }, 'TEXTAREA'],
+    ])('hands out %s, and null when it goes', (_, props, tag) => {
+        const { calls, elementRef } = recorder()
+        const { unmount } = render(<InputNative name="x" elementRef={elementRef} {...props} />)
+        expect(calls).toEqual([tag])
+        unmount()
+        expect(calls).toEqual([tag, null])
+    })
+
+    it('does not hand out a select, which is the element of `Select`', () => {
+        const { calls, elementRef } = recorder()
+        render(<InputNative name="x" type="select" options={['a', 'b']} elementRef={elementRef} />)
+        expect(calls).toEqual([])
+    })
+})
