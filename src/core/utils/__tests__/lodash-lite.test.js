@@ -136,6 +136,11 @@ describe('isEqual', () => {
     it('returns false for different constructors', () => {
         expect(isEqual([], {})).toBe(false)
     })
+    it('tells two instances of a class apart, unless they are the same one', () => {
+        class Row {}
+        const row = new Row()
+        expect([isEqual(row, row), isEqual(new Row(), new Row())]).toEqual([true, false])
+    })
 })
 
 describe('isEmpty', () => {
