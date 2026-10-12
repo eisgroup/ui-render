@@ -86,6 +86,34 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
   `npm run docs:views`), a classification in `e2e/view-coverage.js`, and a render by an example or by a declaration in
   `src/demo/examples/__tests__/examples.view-coverage.test.js`: the generator and the two tests fail until it has them.
 
+### Render stability
+
+Every field's host is memoised, so a field renders again only when one of its props is a different value or object
+than at its last render. The engine builds those props on every render: in the mapper (`mapper.tsx`), and in the
+transforms (`transforms.ts`), which include a table's or a list's cell renderer. A function, an array or an object
+built there is a new one each time unless it is kept. A new one renders the field again, along with every field like
+it in the document. Until 2026-10-12, that is how a 200-row period table spent about a second on one edit.
+
+What the engine builds for a field's props is now kept while the things it is built from stay the same:
+
+- **`keptVerify`** (`transforms.ts`): the validator a `verify` composes, per document and rule set.
+- **`boundedValidator`** (`mapper.tsx`): a number field's `min` and `max`, around its own `validate`.
+- **`keptHandler`** (`mapper.tsx`): the wrappers that `autoSubmit`, `removable` and a stable-value Select's
+  `onChange` add, per document and field name, while everything they call stays the same.
+- **`keptMappedOptions`** (`mapper.tsx`): the options a `mapOptions` maps.
+- **`BuiltCell`** (`transforms.ts`): a table's or a list's cell, per renderer and row.
+- **`meta`** (`rules.tsx`, with `metaStateReads.ts`): the document's meta, while the new state holds what the build
+  read from the old one.
+- **`lastMerges` and `ValidatingForm`** (`formData.ts`): the rows `notWithinRange` merges. The form a field validates
+  in is read from the values final-form hands the validator, not from its `getState()`.
+
+A new wrapper, mapping or copy made for a field's prop must be kept the same way. The
+`src/library/__tests__/*-budget.test.js` contracts count the renders that a mount, an edit and a blur cost. A number
+that falls is progress; one that rises is a regression.
+
+To find what a cost comes from, count before naming the cause: wrap the suspected function or component with
+`jest.mock` and count calls per action. Comparing timings with and without a feature does not name a cause.
+
 ### Internal layering and imports
 
 All internal imports use **relative paths** — there are no `ui-*-pack` webpack aliases (the only resolve alias left is `process`; the three `theme.config` aliases went with `semantic-ui-less` at §9.7-F1 step 4). The historical "pack" names survive as directory layers:
