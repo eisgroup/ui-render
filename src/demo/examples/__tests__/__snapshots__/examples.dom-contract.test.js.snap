@@ -1640,7 +1640,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input id="dataKind.phases[0].title" name="dataKind.phases[0].title" type="text" value="Design" />
+                        <input aria-label="Phase" id="dataKind.phases[0].title" name="dataKind.phases[0].title" type="text" value="Design" />
                       </div>
                     </div>
                   </td>
@@ -1649,7 +1649,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input aria-invalid="false" id="dataKind.phases[0].budget" inputmode="decimal" name="dataKind.phases[0].budget" type="text" value="5000" />
+                        <input aria-invalid="false" aria-label="Budget" id="dataKind.phases[0].budget" inputmode="decimal" name="dataKind.phases[0].budget" type="text" value="5000" />
                       </div>
                     </div>
                   </td>
@@ -1714,7 +1714,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.0.dataKind.lineItems[0].sku" name="dataKind.phases.0.dataKind.lineItems[0].sku" type="text" value="DES-001" />
+                                        <input aria-label="SKU" id="dataKind.phases.0.dataKind.lineItems[0].sku" name="dataKind.phases.0.dataKind.lineItems[0].sku" type="text" value="DES-001" />
                                       </div>
                                     </div>
                                   </td>
@@ -1723,7 +1723,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.0.dataKind.lineItems[0].description" name="dataKind.phases.0.dataKind.lineItems[0].description" type="text" value="Wireframes" />
+                                        <input aria-label="Description" id="dataKind.phases.0.dataKind.lineItems[0].description" name="dataKind.phases.0.dataKind.lineItems[0].description" type="text" value="Wireframes" />
                                       </div>
                                     </div>
                                   </td>
@@ -1732,7 +1732,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.0.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[0].qty" type="text" value="10" />
+                                        <input aria-invalid="false" aria-label="Qty" id="dataKind.phases.0.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[0].qty" type="text" value="10" />
                                       </div>
                                     </div>
                                   </td>
@@ -1741,7 +1741,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.0.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[0].unitPrice" type="text" value="150" />
+                                        <input aria-invalid="false" aria-label="Unit Price" id="dataKind.phases.0.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[0].unitPrice" type="text" value="150" />
                                       </div>
                                     </div>
                                   </td>
@@ -1760,7 +1760,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.0.dataKind.lineItems[1].sku" name="dataKind.phases.0.dataKind.lineItems[1].sku" type="text" value="DES-002" />
+                                        <input aria-label="SKU" id="dataKind.phases.0.dataKind.lineItems[1].sku" name="dataKind.phases.0.dataKind.lineItems[1].sku" type="text" value="DES-002" />
                                       </div>
                                     </div>
                                   </td>
@@ -1769,7 +1769,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.0.dataKind.lineItems[1].description" name="dataKind.phases.0.dataKind.lineItems[1].description" type="text" value="Mockups" />
+                                        <input aria-label="Description" id="dataKind.phases.0.dataKind.lineItems[1].description" name="dataKind.phases.0.dataKind.lineItems[1].description" type="text" value="Mockups" />
                                       </div>
                                     </div>
                                   </td>
@@ -1778,7 +1778,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.0.dataKind.lineItems[1].qty" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[1].qty" type="text" value="5" />
+                                        <input aria-invalid="false" aria-label="Qty" id="dataKind.phases.0.dataKind.lineItems[1].qty" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[1].qty" type="text" value="5" />
                                       </div>
                                     </div>
                                   </td>
@@ -1787,7 +1787,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.0.dataKind.lineItems[1].unitPrice" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[1].unitPrice" type="text" value="200" />
+                                        <input aria-invalid="false" aria-label="Unit Price" id="dataKind.phases.0.dataKind.lineItems[1].unitPrice" inputmode="decimal" name="dataKind.phases.0.dataKind.lineItems[1].unitPrice" type="text" value="200" />
                                       </div>
                                     </div>
                                   </td>
@@ -1806,7 +1806,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="sku" name="sku" type="text" value="" />
+                                        <input aria-label="SKU" id="sku" name="sku" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -1815,7 +1815,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="description" name="description" type="text" value="" />
+                                        <input aria-label="Description" id="description" name="description" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -1824,7 +1824,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="qty" name="qty" type="number" value="" />
+                                        <input aria-label="Qty" id="qty" name="qty" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -1833,7 +1833,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="unitPrice" name="unitPrice" type="number" value="" />
+                                        <input aria-label="Unit Price" id="unitPrice" name="unitPrice" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -1857,7 +1857,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input id="dataKind.phases[1].title" name="dataKind.phases[1].title" type="text" value="Development" />
+                        <input aria-label="Phase" id="dataKind.phases[1].title" name="dataKind.phases[1].title" type="text" value="Development" />
                       </div>
                     </div>
                   </td>
@@ -1866,7 +1866,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input aria-invalid="false" id="dataKind.phases[1].budget" inputmode="decimal" name="dataKind.phases[1].budget" type="text" value="15000" />
+                        <input aria-invalid="false" aria-label="Budget" id="dataKind.phases[1].budget" inputmode="decimal" name="dataKind.phases[1].budget" type="text" value="15000" />
                       </div>
                     </div>
                   </td>
@@ -1931,7 +1931,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.1.dataKind.lineItems[0].sku" name="dataKind.phases.1.dataKind.lineItems[0].sku" type="text" value="DEV-001" />
+                                        <input aria-label="SKU" id="dataKind.phases.1.dataKind.lineItems[0].sku" name="dataKind.phases.1.dataKind.lineItems[0].sku" type="text" value="DEV-001" />
                                       </div>
                                     </div>
                                   </td>
@@ -1940,7 +1940,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.1.dataKind.lineItems[0].description" name="dataKind.phases.1.dataKind.lineItems[0].description" type="text" value="Frontend" />
+                                        <input aria-label="Description" id="dataKind.phases.1.dataKind.lineItems[0].description" name="dataKind.phases.1.dataKind.lineItems[0].description" type="text" value="Frontend" />
                                       </div>
                                     </div>
                                   </td>
@@ -1949,7 +1949,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[0].qty" type="text" value="40" />
+                                        <input aria-invalid="false" aria-label="Qty" id="dataKind.phases.1.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[0].qty" type="text" value="40" />
                                       </div>
                                     </div>
                                   </td>
@@ -1958,7 +1958,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[0].unitPrice" type="text" value="175" />
+                                        <input aria-invalid="false" aria-label="Unit Price" id="dataKind.phases.1.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[0].unitPrice" type="text" value="175" />
                                       </div>
                                     </div>
                                   </td>
@@ -1977,7 +1977,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.1.dataKind.lineItems[1].sku" name="dataKind.phases.1.dataKind.lineItems[1].sku" type="text" value="DEV-002" />
+                                        <input aria-label="SKU" id="dataKind.phases.1.dataKind.lineItems[1].sku" name="dataKind.phases.1.dataKind.lineItems[1].sku" type="text" value="DEV-002" />
                                       </div>
                                     </div>
                                   </td>
@@ -1986,7 +1986,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.1.dataKind.lineItems[1].description" name="dataKind.phases.1.dataKind.lineItems[1].description" type="text" value="Backend" />
+                                        <input aria-label="Description" id="dataKind.phases.1.dataKind.lineItems[1].description" name="dataKind.phases.1.dataKind.lineItems[1].description" type="text" value="Backend" />
                                       </div>
                                     </div>
                                   </td>
@@ -1995,7 +1995,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[1].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[1].qty" type="text" value="30" />
+                                        <input aria-invalid="false" aria-label="Qty" id="dataKind.phases.1.dataKind.lineItems[1].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[1].qty" type="text" value="30" />
                                       </div>
                                     </div>
                                   </td>
@@ -2004,7 +2004,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[1].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[1].unitPrice" type="text" value="200" />
+                                        <input aria-invalid="false" aria-label="Unit Price" id="dataKind.phases.1.dataKind.lineItems[1].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[1].unitPrice" type="text" value="200" />
                                       </div>
                                     </div>
                                   </td>
@@ -2023,7 +2023,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.1.dataKind.lineItems[2].sku" name="dataKind.phases.1.dataKind.lineItems[2].sku" type="text" value="DEV-003" />
+                                        <input aria-label="SKU" id="dataKind.phases.1.dataKind.lineItems[2].sku" name="dataKind.phases.1.dataKind.lineItems[2].sku" type="text" value="DEV-003" />
                                       </div>
                                     </div>
                                   </td>
@@ -2032,7 +2032,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.1.dataKind.lineItems[2].description" name="dataKind.phases.1.dataKind.lineItems[2].description" type="text" value="Database setup" />
+                                        <input aria-label="Description" id="dataKind.phases.1.dataKind.lineItems[2].description" name="dataKind.phases.1.dataKind.lineItems[2].description" type="text" value="Database setup" />
                                       </div>
                                     </div>
                                   </td>
@@ -2041,7 +2041,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[2].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[2].qty" type="text" value="15" />
+                                        <input aria-invalid="false" aria-label="Qty" id="dataKind.phases.1.dataKind.lineItems[2].qty" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[2].qty" type="text" value="15" />
                                       </div>
                                     </div>
                                   </td>
@@ -2050,7 +2050,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.1.dataKind.lineItems[2].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[2].unitPrice" type="text" value="190" />
+                                        <input aria-invalid="false" aria-label="Unit Price" id="dataKind.phases.1.dataKind.lineItems[2].unitPrice" inputmode="decimal" name="dataKind.phases.1.dataKind.lineItems[2].unitPrice" type="text" value="190" />
                                       </div>
                                     </div>
                                   </td>
@@ -2069,7 +2069,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="sku" name="sku" type="text" value="" />
+                                        <input aria-label="SKU" id="sku" name="sku" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2078,7 +2078,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="description" name="description" type="text" value="" />
+                                        <input aria-label="Description" id="description" name="description" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2087,7 +2087,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="qty" name="qty" type="number" value="" />
+                                        <input aria-label="Qty" id="qty" name="qty" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2096,7 +2096,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="unitPrice" name="unitPrice" type="number" value="" />
+                                        <input aria-label="Unit Price" id="unitPrice" name="unitPrice" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2120,7 +2120,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input id="dataKind.phases[2].title" name="dataKind.phases[2].title" type="text" value="Testing" />
+                        <input aria-label="Phase" id="dataKind.phases[2].title" name="dataKind.phases[2].title" type="text" value="Testing" />
                       </div>
                     </div>
                   </td>
@@ -2129,7 +2129,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                       <div class="flex--row middle">
                       </div>
                       <div class="flex--row input">
-                        <input aria-invalid="false" id="dataKind.phases[2].budget" inputmode="decimal" name="dataKind.phases[2].budget" type="text" value="3000" />
+                        <input aria-invalid="false" aria-label="Budget" id="dataKind.phases[2].budget" inputmode="decimal" name="dataKind.phases[2].budget" type="text" value="3000" />
                       </div>
                     </div>
                   </td>
@@ -2194,7 +2194,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.2.dataKind.lineItems[0].sku" name="dataKind.phases.2.dataKind.lineItems[0].sku" type="text" value="QA-001" />
+                                        <input aria-label="SKU" id="dataKind.phases.2.dataKind.lineItems[0].sku" name="dataKind.phases.2.dataKind.lineItems[0].sku" type="text" value="QA-001" />
                                       </div>
                                     </div>
                                   </td>
@@ -2203,7 +2203,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="dataKind.phases.2.dataKind.lineItems[0].description" name="dataKind.phases.2.dataKind.lineItems[0].description" type="text" value="Unit tests" />
+                                        <input aria-label="Description" id="dataKind.phases.2.dataKind.lineItems[0].description" name="dataKind.phases.2.dataKind.lineItems[0].description" type="text" value="Unit tests" />
                                       </div>
                                     </div>
                                   </td>
@@ -2212,7 +2212,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.2.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.2.dataKind.lineItems[0].qty" type="text" value="20" />
+                                        <input aria-invalid="false" aria-label="Qty" id="dataKind.phases.2.dataKind.lineItems[0].qty" inputmode="decimal" name="dataKind.phases.2.dataKind.lineItems[0].qty" type="text" value="20" />
                                       </div>
                                     </div>
                                   </td>
@@ -2221,7 +2221,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input aria-invalid="false" id="dataKind.phases.2.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.2.dataKind.lineItems[0].unitPrice" type="text" value="100" />
+                                        <input aria-invalid="false" aria-label="Unit Price" id="dataKind.phases.2.dataKind.lineItems[0].unitPrice" inputmode="decimal" name="dataKind.phases.2.dataKind.lineItems[0].unitPrice" type="text" value="100" />
                                       </div>
                                     </div>
                                   </td>
@@ -2240,7 +2240,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="sku" name="sku" type="text" value="" />
+                                        <input aria-label="SKU" id="sku" name="sku" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2249,7 +2249,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="description" name="description" type="text" value="" />
+                                        <input aria-label="Description" id="description" name="description" type="text" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2258,7 +2258,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="qty" name="qty" type="number" value="" />
+                                        <input aria-label="Qty" id="qty" name="qty" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -2267,7 +2267,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                       <div class="flex--row middle">
                                       </div>
                                       <div class="flex--row input">
-                                        <input id="unitPrice" name="unitPrice" type="number" value="" />
+                                        <input aria-label="Unit Price" id="unitPrice" name="unitPrice" type="number" value="" />
                                       </div>
                                     </div>
                                   </td>
@@ -4260,7 +4260,7 @@ exports[`demo example full-DOM contract slider renders a stable, non-empty DOM m
         </div>
         <div class="app__slider__track" style="left: 0%; width: 35%;">
         </div>
-        <div aria-orientation="horizontal" aria-valuemax="100" aria-valuemin="0" aria-valuenow="35" class="app__slider__handle" role="slider" style="left: 35%;" tabindex="0">
+        <div aria-label="volume" aria-orientation="horizontal" aria-valuemax="100" aria-valuemin="0" aria-valuenow="35" class="app__slider__handle" role="slider" style="left: 35%;" tabindex="0">
           <span class="tooltip no-wrap top show">
             "35%"
           </span>
@@ -4277,12 +4277,12 @@ exports[`demo example full-DOM contract slider renders a stable, non-empty DOM m
         </div>
         <div class="app__slider__track" style="left: 12%; width: 64%;">
         </div>
-        <div aria-orientation="horizontal" aria-valuemax="1000" aria-valuemin="0" aria-valuenow="120" class="app__slider__handle" role="slider" style="left: 12%;" tabindex="0">
+        <div aria-label="priceRange, minimum" aria-orientation="horizontal" aria-valuemax="1000" aria-valuemin="0" aria-valuenow="120" class="app__slider__handle" role="slider" style="left: 12%;" tabindex="0">
           <span class="tooltip no-wrap top show">
             "120$"
           </span>
         </div>
-        <div aria-orientation="horizontal" aria-valuemax="1000" aria-valuemin="0" aria-valuenow="760" class="app__slider__handle" role="slider" style="left: 76%;" tabindex="0">
+        <div aria-label="priceRange, maximum" aria-orientation="horizontal" aria-valuemax="1000" aria-valuemin="0" aria-valuenow="760" class="app__slider__handle" role="slider" style="left: 76%;" tabindex="0">
           <span class="tooltip no-wrap top show">
             "760$"
           </span>
@@ -4311,7 +4311,7 @@ exports[`demo example full-DOM contract slider renders a stable, non-empty DOM m
         </span>
         <span class="app__slider__dot" style="left: 100%;">
         </span>
-        <div aria-orientation="horizontal" aria-valuemax="5000" aria-valuemin="10" aria-valuenow="500" class="app__slider__handle" role="slider" style="left: 60%;" tabindex="0">
+        <div aria-label="budget" aria-orientation="horizontal" aria-valuemax="5000" aria-valuemin="10" aria-valuenow="500" class="app__slider__handle" role="slider" style="left: 60%;" tabindex="0">
           <span class="tooltip no-wrap top show">
             "500"
           </span>
@@ -4353,7 +4353,7 @@ exports[`demo example full-DOM contract slider renders a stable, non-empty DOM m
         </span>
         <span class="app__slider__dot" style="left: 100%;">
         </span>
-        <div aria-orientation="horizontal" aria-valuemax="100" aria-valuemin="0" aria-valuenow="50" class="app__slider__handle" role="slider" style="left: 50%;" tabindex="0">
+        <div aria-label="split" aria-orientation="horizontal" aria-valuemax="100" aria-valuemin="0" aria-valuenow="50" class="app__slider__handle" role="slider" style="left: 50%;" tabindex="0">
           <span class="tooltip no-wrap top show">
             "50%"
           </span>
@@ -4382,7 +4382,7 @@ exports[`demo example full-DOM contract slider renders a stable, non-empty DOM m
         </div>
         <div class="app__slider__track" style="left: 0%; width: 60%;">
         </div>
-        <div aria-disabled="true" aria-orientation="horizontal" aria-valuemax="100" aria-valuemin="0" aria-valuenow="60" class="app__slider__handle" role="slider" style="left: 60%;" tabindex="-1">
+        <div aria-disabled="true" aria-label="disabledSlider" aria-orientation="horizontal" aria-valuemax="100" aria-valuemin="0" aria-valuenow="60" class="app__slider__handle" role="slider" style="left: 60%;" tabindex="-1">
         </div>
       </div>
     </div>
@@ -4771,7 +4771,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                       <div class="flex--row input">
                         <div class="ui-render-picker ui-render-picker">
                           <div class="ui-render-picker-input">
-                            <input aria-invalid="false" autocomplete="off" id="dataKind.period[0].startDate" name="dataKind.period[0].startDate" size="12" value="01-01-2022" />
+                            <input aria-invalid="false" aria-label="Start Date" autocomplete="off" id="dataKind.period[0].startDate" name="dataKind.period[0].startDate" size="12" value="01-01-2022" />
                           </div>
                         </div>
                       </div>
@@ -4784,7 +4784,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                       <div class="flex--row input">
                         <div class="ui-render-picker ui-render-picker">
                           <div class="ui-render-picker-input">
-                            <input aria-invalid="false" autocomplete="off" id="dataKind.period[0].endDate" name="dataKind.period[0].endDate" size="12" value="03-31-2022" />
+                            <input aria-invalid="false" aria-label="End Date" autocomplete="off" id="dataKind.period[0].endDate" name="dataKind.period[0].endDate" size="12" value="03-31-2022" />
                           </div>
                         </div>
                       </div>
@@ -4806,7 +4806,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                       <div class="flex--row input">
                         <div class="ui-render-picker ui-render-picker">
                           <div class="ui-render-picker-input">
-                            <input aria-invalid="false" autocomplete="off" id="dataKind.period[1].startDate" name="dataKind.period[1].startDate" size="12" value="04-01-2022" />
+                            <input aria-invalid="false" aria-label="Start Date" autocomplete="off" id="dataKind.period[1].startDate" name="dataKind.period[1].startDate" size="12" value="04-01-2022" />
                           </div>
                         </div>
                       </div>
@@ -4819,7 +4819,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                       <div class="flex--row input">
                         <div class="ui-render-picker ui-render-picker">
                           <div class="ui-render-picker-input">
-                            <input aria-invalid="false" autocomplete="off" id="dataKind.period[1].endDate" name="dataKind.period[1].endDate" size="12" value="06-30-2022" />
+                            <input aria-invalid="false" aria-label="End Date" autocomplete="off" id="dataKind.period[1].endDate" name="dataKind.period[1].endDate" size="12" value="06-30-2022" />
                           </div>
                         </div>
                       </div>

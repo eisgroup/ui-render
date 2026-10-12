@@ -264,7 +264,9 @@ describe('TableView additional contracts', () => {
       expect.objectContaining({
         props: expect.objectContaining({headers: expect.any(Array)}),
         handleItemExpand: expect.any(Function),
-      })
+      }),
+      // The column, which names a field in the cell: none here, the header having no label.
+      undefined
     )
   })
 

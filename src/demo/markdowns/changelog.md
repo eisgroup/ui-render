@@ -247,6 +247,16 @@ Nothing to do for these:
 
 #### Accessibility
 
+- **A field in a table cell is named by its column's header.** A field in a cell rarely has a `label`,
+  since the header above it says what it is, and a screen reader does not take a name from the header:
+  such a field had no name at all, 46 of the 60 nameless controls in the demo examples. It takes the
+  header's label as its `aria-label` now, when the header shows that label as plain text, through a
+  header's `renderCell`, a `TableCells` row or the draft row of a `localDraft` `Data`. In the last two, only
+  when the row has a cell per header. A field with its own `label`, `aria-label` or `aria-labelledby`
+  keeps it, and a cell that is not a field takes nothing.
+- **A slider's handles have a name.** A handle is named by the field's `label`, or else its `name`, and
+  a range's two handles add ", minimum" and ", maximum". A meta's own `aria-label` or
+  `aria-labelledby` goes to the handles now, where it used to land on the element around them.
 - **A select with no `label` has an accessible name.** It is named "Select <name>", from its field's
   `name`, as the native `Select` names its control. Without a label it had no name at all, which a
   screen reader announced as an unnamed combobox: 15 in the demo examples. A meta's own
@@ -558,6 +568,17 @@ Nothing to do for these:
   conclusion was wrong. It was never read here because `semantic-ui-react` implemented it, and the
   select no longer uses `semantic-ui-react` — so `clearable` is gone too. Passing it now does
   nothing, like the six above, and the published bundle does not say so.
+- **34 more names a select used to accept are stripped now.** `semantic-ui-react` declared them, and
+  the in-house select reads none, so each reached the dropdown element as an attribute, a boolean one with
+  React's warning. They are its open, close and select machinery (`closeOnBlur`, `closeOnChange`,
+  `closeOnEscape`, `defaultOpen`, `open`, `openOnFocus`, `selectOnBlur`, `selectOnNavigation`,
+  `wrapSelection`, `defaultUpward`, `direction`, `tabIndex`), its style variants (`basic`, `button`,
+  `floating`, `fluid`, `inline`, `item`, `labeled`, `loading`, `pointing`, `scrolling`, `simple`), what
+  served `search` and `multiple` (`defaultSearchQuery`, `minCharacters`, `defaultSelectedLabel`,
+  `selectedLabel`, `renderLabel`, `onLabelClick`) and its element overrides (`as`, `header`, `trigger`,
+  `text`, `defaultValue`). Neither our examples nor our record of consumer metas uses one. `validateMeta`
+  reports each, and `docs/SUPPORTED-PROPS.md` says what each did. A form field's `defaultValue` still
+  works: the form reads it before the select does.
 - **The tooltip is settled, and one thing you could write in a meta is gone.** `position` is kept.
   `on` is **dropped**: a tooltip no longer opens on click or on tap, only on hover and on keyboard
   focus. Every tooltipped node in the examples already has its own click action, so one gesture was

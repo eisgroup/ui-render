@@ -80,6 +80,15 @@
  * `cssContract` is the constraint the implementation inherits from our OWN LESS: the emitted
  * classNames are load-bearing, so "in-house markup" was never free to be clean markup.
  */
+/**
+ * `Dropdown`'s dropped names added on 2026-10-09: the 34 that semantic-ui-react declared and the listbox neither read nor
+ * stripped, so each reached the dropdown element as an attribute. Grouped as `Dropdown.tsx` groups them.
+ */
+const SUIR_VARIANT = name => `A Semantic style variant, which Semantic added as the \`${name}\` class. The listbox does not `
+    + 'add it, so the variant has not applied since §9.7-F1 step 3 part 2; until 2026-10-09 the name reached the dropdown '
+    + 'element as an attribute.'
+const GONE_WITH = (what, feature) => `${what}, gone with \`${feature}\`.`
+
 const IN_HOUSE_CURATION = {
     Table: {
         shipped: '§9.7-F1 step 1',
@@ -215,6 +224,50 @@ const IN_HOUSE_CURATION = {
             autofocus: 'Went with `search` because it could not outlive it: the wrapper turned it '
                 + 'into `searchInput={{autoFocus: true}}`, which does nothing on a control with no '
                 + 'search input. Removing search left it dead rather than merely unused.',
+            closeOnBlur: 'Closed the list when the dropdown lost focus; on by default. The list always closes '
+                + 'when focus leaves it now, as the WAI-ARIA select-only combobox pattern this control follows asks.',
+            closeOnChange: 'Closed the list after a choice. A choice always closes it now.',
+            closeOnEscape: 'Closed the list on Escape. Escape always closes it now, and chooses nothing.',
+            defaultOpen: 'Rendered the list open at first. The list opens only when the user opens it.',
+            open: 'Controlled whether the list was open. The control keeps that state itself; a host cannot drive it.',
+            openOnFocus: 'Opened the list when the dropdown took focus; on by default. Focus does not open it now: a '
+                + 'click or the keyboard does.',
+            selectOnBlur: 'Chose the highlighted option when focus left; on by default. Focus leaving the open list '
+                + 'still chooses the option under the cursor, Tab included. Escape and a click elsewhere choose nothing.',
+            selectOnNavigation: 'Chose each option as the arrows reached it; on by default. The arrows move a cursor '
+                + 'now, and Enter, Space or Tab chooses the option under it.',
+            wrapSelection: 'Let the arrows wrap from the last option to the first; on by default. They always wrap.',
+            defaultUpward: 'Opened the list upward at first. `upward` still decides the direction; without it, the '
+                + 'list opens upward when it does not fit below and there is more room above.',
+            direction: 'Aligned Semantic\'s menu to the left or the right edge. The listbox has one alignment.',
+            tabIndex: 'Set the tab order of the dropdown, the element that took focus in Semantic. The control '
+                + 'inside the dropdown takes focus now, so a `tabIndex` on the dropdown would add a second tab stop.',
+            basic: SUIR_VARIANT('basic'),
+            button: SUIR_VARIANT('button'),
+            floating: SUIR_VARIANT('floating'),
+            fluid: SUIR_VARIANT('fluid'),
+            inline: SUIR_VARIANT('inline'),
+            item: SUIR_VARIANT('item'),
+            labeled: SUIR_VARIANT('labeled'),
+            loading: SUIR_VARIANT('loading'),
+            pointing: SUIR_VARIANT('pointing'),
+            scrolling: SUIR_VARIANT('scrolling'),
+            simple: SUIR_VARIANT('simple'),
+            defaultSearchQuery: GONE_WITH('The text the search filter started with', 'search'),
+            minCharacters: GONE_WITH('How many characters the search needed before it filtered', 'search'),
+            defaultSelectedLabel: GONE_WITH('Which of the chips a multiple selection shows was selected at first', 'multiple'),
+            selectedLabel: GONE_WITH('Which of the chips a multiple selection shows was selected', 'multiple'),
+            renderLabel: GONE_WITH('How each chip of a multiple selection rendered', 'multiple'),
+            onLabelClick: GONE_WITH('Called when a chip of a multiple selection was clicked', 'multiple'),
+            as: 'Rendered the dropdown as another element or component. The listbox renders its own markup.',
+            header: 'A header line at the top of the menu. The listbox shows options only.',
+            trigger: 'Replaced what the closed dropdown shows with another element. The control shows the chosen '
+                + 'option\'s text, or the `placeholder`.',
+            text: 'Overrode the text the closed dropdown shows. The control shows the chosen option\'s text, or the '
+                + '`placeholder`.',
+            defaultValue: 'The value an uncontrolled dropdown started with. The listbox shows `value`. A form field '
+                + 'still honours a meta `defaultValue`: the form reads it before the field renders, so it never '
+                + 'reaches this list.',
         },
         droppedNote: 'Six names by DECISION and eight more that could not outlive them, which is why '
             + 'this list is longer than the changelog\'s. The decision half is `search`, `multiple`, '
@@ -232,7 +285,13 @@ const IN_HOUSE_CURATION = {
             + 'major — dropping a published propType is breaking even when nothing observed uses it — '
             + 'and it is left standing rather than rewritten, because the evidence and the decision '
             + 'are different things and a reader is entitled to both. What does not change either '
-            + 'way is this table: it is where a consumer finds out a prop stopped working.',
+            + 'way is this table: it is where a consumer finds out a prop stopped working. THE OTHER 34, added on '
+            + '2026-10-09. semantic-ui-react\'s `Dropdown` declared 65 props. The listbox reads 16 of them, 12 are '
+            + 'among the 14 above (the other two, `onSearch` and `autofocus`, were the wrapper\'s own), `onClick` '
+            + 'and `onFocus` still reach the dropdown element and work there, and `children` is ignored. The '
+            + 'remaining 34 reached the element as attributes, a boolean one with React\'s warning, until the '
+            + '2026-10-08 audit counted them. They are dropped the same way now, each with what it did in the '
+            + 'table. Neither corpus sets any of them.',
         partProps: {},
         elements: {},
         classContract: 'THE WRAPPER emits `input--wrapper` plus `{float, done, labeled, fill-width, '

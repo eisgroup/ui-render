@@ -3,6 +3,15 @@ import { cloneDeep, get, hasObjectValue as hasPlainObjectValue, isObject as isPl
 import { FIELD } from '../modules/variables'
 import Render from './Render'
 
+/**
+ * Whether a cell's definition renders a form control that names nothing: no `label`, `aria-label` or `aria-labelledby`.
+ * A table gives such a field its column's header for a name.
+ */
+export const isUnnamedField = (definition: Meta): boolean => [
+    FIELD.TYPE.INPUT, FIELD.TYPE.SELECT, FIELD.TYPE.DROPDOWN, FIELD.TYPE.CHECKBOX, FIELD.TYPE.TOGGLE, FIELD.TYPE.SLIDER,
+].indexOf(definition.view) !== -1
+    && definition.label == null && definition['aria-label'] == null && definition['aria-labelledby'] == null
+
 // Non-narrowing, on purpose: a meta node checked with these stays `Meta`, open JSON, instead of
 // becoming the `Record<string, unknown>` the util's type guard narrows it to.
 const isObject: (value: unknown) => boolean = isPlainObject
@@ -198,7 +207,7 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
             // What the definition's own handlers were resolved against before they were resolved per call.
             const contextData = _data
             // eslint-disable-next-line no-loop-func
-            if (isObject(definition)) meta[attribute] = (value: any, index: any, props: Meta, self: any) => {
+            if (isObject(definition)) meta[attribute] = (value: any, index: any, props: Meta, self: any, column?: { label?: string }) => {
                 if (attribute === 'renderExtraItem') {
                     definition.useForm = true
                 }
@@ -253,6 +262,9 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
                         // Relative Path is required for nested Inputs
                         ...revPath,
                         ...props,
+                        // A field in a table cell, with no name of its own, is named by its column's header. Until
+                        // 2026-10-09 it had none, and most of the nameless controls the examples rendered were these.
+                        ...column && column.label && isUnnamedField(definition) && {'aria-label': column.label},
                         // Recursively map definitions within Render function
                         // Note: since definition is mutated on each transform,
                         // we have to use original config for rendering lists
