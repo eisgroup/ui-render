@@ -866,6 +866,11 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A number field with `min` or `max` no longer renders again on each change of its document.** Its
+  bounds wrapped the field's `validate` in a new function on every render, and a field takes it as a
+  prop: every such field rendered again on each change, a blur included, which was 400 fields for one
+  blur of a 200-row table of two bounded columns. The same bounds over the same rule give the same
+  function now. They check what they checked, in the same order, with the same messages.
 - **A table that checks its periods with `notWithinRange` no longer slows down with its rows.** Two
   things made each change cost in proportion to the rows. The validator a field's `verify` composes was a
   new function on each render, so every date field rendered again on each change, a blur included: 402
