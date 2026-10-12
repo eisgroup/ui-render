@@ -378,6 +378,64 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  # What the published package's documents cost in Chromium: the main thread's busy time for a mount and for each
+  # action of four documents a host could render, a 200-row period table among them (e2e/perf/scenarios.perf.js,
+  # `npm run test:perf`). ADVISORY: a runner's speed varies from run to run, so this reports and never blocks. Its
+  # ceilings sit about three times above what the code costs on a developer's machine, and at least 100 ms for an
+  # action: they flag a cascade the size of the one the period table had before #209, not a small one, which the
+  # jsdom render-count contracts guard. The medians are in the job's log and in the `perf-results` artifact.
+  # Chromium only, so it shares the Chromium job's cache key.
+  browser-perf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve the Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Chromium and its system dependencies
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Chromium system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Build the library
+        run: npm run build-lib
+
+      - name: Measure what its documents cost in a browser
+        run: npm run test:perf
+
+      - name: Upload the measurements
+        if: success() || failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: perf-results
+          path: test-results-perf/
+          retention-days: 14
+
   # Gating since 2026-09-30, when React 19 joined `peerDependencies` (docs/UPGRADE-PLAN.md §8), and the top of
   # the peer matrix: 16.14 and 17 below the installed 18, 19 above it. Until then this was
   # `react-19-advisory`, a `continue-on-error` job that installed React 19 over the lock with
