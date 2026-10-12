@@ -45,6 +45,50 @@ export const getFormsData = (forms: Forms) => {
 }
 
 /**
+ * The form a field validates in, as its validator knows it: final-form hands a field's validator the
+ * form's current values, the very object `form.getState().values` returns.
+ */
+export type ValidatingForm = {
+  /** The form: the field's document's `form` */
+  form: FormApi
+  /** The field's name, so the merge reads these values only for a form that registers it */
+  name: string
+  /** What final-form handed the validator */
+  values: Values
+}
+
+/**
+ * THE LAST MERGE OF EACH PATH, kept on the first array it merged (2026-10-12).
+ *
+ * `notWithinRange` merges the rows for every field it validates, and final-form validates every
+ * field on a change: one edit of a 200-row period table merged its rows 400 times. Each merge read
+ * every form's state, and `form.getState()` computes the state of each of the form's fields, about
+ * 1 ms for that table's 401: the edit spent some 400 ms reading. Now the form the field validates in
+ * is read from what final-form handed the validator (`ValidatingForm`), and a merge is kept while
+ * every form holds the very array it held. final-form makes a new array for each change and each
+ * array mutator, and the engine replaces a form's array whole when it writes one (`submit`): nothing
+ * changes one in place.
+ *
+ * The rows are shared between the calls that get them: read them, do not change them. Each call gets
+ * an array of its own.
+ */
+const lastMerges = new WeakMap<unknown[], Map<string, { arrays: unknown[][], rows: object[] }>>()
+
+/**
+ * Whether two form objects are one final-form instance. react-final-form hands a new `{...form, reset}`
+ * on each render, each sharing the instance's methods, so an instance is told apart by them, as the
+ * form layer's handle tells it (`renderForm` in `modules/form/utils.tsx`).
+ */
+function sameForm (a: FormApi, b: FormApi): boolean {
+  return a === b || a.getState === b.getState
+}
+
+/** Whether `form` registers the field `name`: by its published state, or, before that, its field list. */
+function registers (form: FormApi, name: string): boolean {
+  return form.getFieldState(name) !== undefined || form.getRegisteredFields().indexOf(name) !== -1
+}
+
+/**
  * Live {@code dataKind.*} array: merge each row from every form that holds {@code path} in
  * {@code form.getState().values}, shallow-merge row objects (later forms in {@code forms} order win).
  * Length is capped to the minimum array length among those forms so a stale longer copy on the
@@ -52,19 +96,28 @@ export const getFormsData = (forms: Forms) => {
  *
  * @param {string} path - e.g. {@code orders.dataKind.lines} or {@code dataKind.line}
  * @param {Map} forms - {@link formsStorage}
+ * @param {ValidatingForm} [validating] - the form a validator runs in, read from its values
  * @returns {Array<Object>}
  */
-export function getLiveMergedDataKindArray (path: string, forms: Forms): object[] {
+export function getLiveMergedDataKindArray (path: string, forms: Forms, validating?: ValidatingForm): object[] {
   const arrays: unknown[][] = []
   forms.forEach(({ form }) => {
     if (!form || typeof form.getState !== 'function') return
-    const arr = get(form.getState().values, path)
+    const values = validating && sameForm(form, validating.form) && registers(form, validating.name)
+      ? validating.values
+      : form.getState().values
+    const arr = get(values, path)
     if (Array.isArray(arr) && arr.length > 0) {
       arrays.push(arr)
     }
   })
   if (!arrays.length) {
     return []
+  }
+  const kept = lastMerges.get(arrays[0])
+  const last = kept && kept.get(path)
+  if (last && last.arrays.length === arrays.length && last.arrays.every((array, i) => array === arrays[i])) {
+    return last.rows.slice()
   }
   const cap = Math.min(...arrays.map(a => a.length))
   const out: object[] = []
@@ -78,7 +131,10 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms): object[
     }
     out.push(hasObjectValue(row) ? row : {})
   }
-  return out
+  const byPath = kept || new Map()
+  byPath.set(path, { arrays, rows: out })
+  if (!kept) lastMerges.set(arrays[0], byPath)
+  return out.slice()
 }
 
 /**

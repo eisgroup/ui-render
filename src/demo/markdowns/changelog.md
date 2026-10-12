@@ -866,6 +866,16 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A table that checks its periods with `notWithinRange` no longer slows down with its rows.** Two
+  things made each change cost in proportion to the rows. The validator a field's `verify` composes was a
+  new function on each render, so every date field rendered again on each change, a blur included: 402
+  fields for one blur of a 200-row table. And final-form validates every field on a change, and the rule
+  computed every form's whole state for each field it checked: 400 times for one edit of that table. The
+  same rules give the same validator now, so an edit or a blur renders the field it touched; the rule
+  reads the form being edited from the values final-form hands it, and keeps the rows it merged until a
+  form's rows change. In jsdom, an edit of that table took about 960 ms and takes about 115, and a blur
+  took about 510 ms and takes 80 to 145, where the table without the rule takes 70 to 85 for either.
+  The same rows overlap as before.
 - **A popup's title, message and Ok are translated by the document that opened it.** They took the
   `translate` of the document constructed last: on a page with two documents, the first one's popup
   showed the second one's translation around its own content.

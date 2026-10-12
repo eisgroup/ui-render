@@ -330,4 +330,80 @@ describe('metaToFunctions - validate / format / parse / normalize / verify', () 
         metaToProps(meta, withFuncs())
         expect(meta.validate('whatever')).toBeUndefined()
     })
+
+    describe('the validator a verify composes, kept per document', () => {
+        // One document rendered again: `metaToProps` resolves a fresh copy of its meta each render.
+        const document = (instance, fieldValidation = { myValid: customValidate }) => cfg({
+            instance,
+            funcConfig: { ...funcConfig, fieldValidation },
+        })
+        const period = (args = ['startDate', 'endDate']) => ({
+            view: 'Input',
+            name: 'x',
+            validate: 'myValid',
+            verify: { dataKind: 'period', validate: [{ name: 'myValid', args }] },
+        })
+
+        it('is one function while the verify and the field\'s own validate stay the same', () => {
+            const instance = {}
+            const first = period()
+            const second = period()
+            metaToProps(first, document(instance))
+            metaToProps(second, document(instance))
+            expect(second.validate).toBe(first.validate)
+        })
+
+        it('is another for other rules, another own validate, or another document', () => {
+            const instance = {}
+            const kept = period()
+            metaToProps(kept, document(instance))
+            const otherRules = period(['from', 'to'])
+            metaToProps(otherRules, document(instance))
+            const otherOwn = { ...period(), validate: 'other' }
+            metaToProps(otherOwn, document(instance, { myValid: customValidate, other: () => undefined }))
+            const otherDocument = period()
+            metaToProps(otherDocument, document({}))
+            expect([otherRules.validate, otherOwn.validate, otherDocument.validate].some(validate => validate === kept.validate)).toBe(false)
+        })
+
+        it('is composed anew on each render when the verify holds what JSON cannot tell apart', () => {
+            const instance = {}
+            const holding = extra => () => ({ ...period(), verify: { validate: [{ name: 'myValid' }], ...extra } })
+            const pairs = [holding({ when: () => true }), holding({ from: new Date(0) }), holding({ limit: NaN })]
+                .map(meta => [meta(), meta()])
+            pairs.flat().forEach(meta => metaToProps(meta, document(instance)))
+            expect(pairs.map(([a, b]) => a.validate === b.validate)).toEqual([false, false, false])
+        })
+
+        it('is composed anew on each render without a document, from that render\'s registry', () => {
+            const rule = () => ({ view: 'Input', name: 'x', verify: { validate: [{ name: 'myValid' }] } })
+            const first = rule()
+            const second = rule()
+            metaToProps(first, cfg({ instance: undefined, funcConfig: { ...funcConfig, fieldValidation: { myValid: () => 'first' } } }))
+            metaToProps(second, cfg({ instance: undefined, funcConfig: { ...funcConfig, fieldValidation: { myValid: () => 'second' } } }))
+            expect(second.validate).not.toBe(first.validate)
+            expect([first.validate('value', {}, {}), second.validate('value', {}, {})]).toEqual(['first', 'second'])
+        })
+
+        it('keeps a bounded number of rule sets for one document', () => {
+            const instance = {}
+            const first = period(['rule 0', 'end'])
+            metaToProps(first, document(instance))
+            for (let i = 1; i < 1000; i++) metaToProps(period([`rule ${i}`, 'end']), document(instance))
+            const again = period(['rule 0', 'end'])
+            metaToProps(again, document(instance))
+            expect(again.validate).not.toBe(first.validate)
+        })
+
+        it('looks a rule up in the registry of the document\'s latest render', () => {
+            const instance = {}
+            const rule = () => ({ view: 'Input', name: 'x', verify: { validate: [{ name: 'myValid' }] } })
+            const first = rule()
+            const second = rule()
+            metaToProps(first, document(instance, { myValid: () => 'first' }))
+            metaToProps(second, document(instance, { myValid: () => 'second' }))
+            expect(second.validate).toBe(first.validate)
+            expect(first.validate('value', {}, {})).toBe('second')
+        })
+    })
 })

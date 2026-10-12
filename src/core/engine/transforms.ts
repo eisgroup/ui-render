@@ -370,6 +370,55 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
 }
 
 /**
+ * THE VALIDATOR A `verify` COMPOSES, kept per document while its rules stay the same (2026-10-12).
+ *
+ * `metaToProps` runs on every render of a document, and a `verify` made a new validator each time. A
+ * field takes it as its `validate` prop, so the field host's memo saw a changed prop on every render
+ * of the document: every field with a `verify` rendered again on each change, a blur included. In a
+ * 200-row period table that was all 402 date fields for one blur. The same rules give the same
+ * function now: what the `verify` holds, and the field's own `validate`. A `verify` holding what JSON
+ * cannot tell apart, a function for one, still makes a new validator on each render.
+ *
+ * A rule is looked up by name when the validator runs, in the registry of the document's latest
+ * render, as the validator it replaces did: a field validates with the `validate` of its latest render.
+ */
+const keptVerify = new WeakMap<object, { registry: Record<string, Handler>, byRules: Map<string, { own: unknown, composed: Handler }> }>()
+
+/** How many rule sets one document keeps. A host that keeps changing a document's meta starts over past it. */
+const KEPT_VERIFY_LIMIT = 64
+
+/** A document's kept validators, with the registry of its current render. */
+function keptVerifyOf (instance: object, registry: Record<string, Handler>) {
+    let kept = keptVerify.get(instance)
+    if (!kept) {
+        kept = { registry, byRules: new Map() }
+        keptVerify.set(instance, kept)
+    }
+    kept.registry = registry
+    return kept
+}
+
+const NOT_JSON = {}
+
+/** A `verify` as a key, or `undefined` when it holds what JSON would not tell apart. */
+function verifyKey (verify: Meta): string | undefined {
+    try {
+        return JSON.stringify(verify, function (this: Record<string, unknown>, key: string, value: unknown) {
+            const held = this[key]
+            if (typeof held === 'function' || typeof held === 'symbol') throw NOT_JSON
+            if (typeof held === 'number' && !Number.isFinite(held)) throw NOT_JSON
+            if (held !== null && typeof held === 'object' && !Array.isArray(held)) {
+                const prototype = Object.getPrototypeOf(held)
+                if (prototype !== Object.prototype && prototype !== null) throw NOT_JSON
+            }
+            return value
+        })
+    } catch (error) {
+        return undefined
+    }
+}
+
+/**
  * Transform Function Definition strings to actual methods, if they exist, by mutation
  * @example:
  *    const definition = {onChange: 'functionName'}
@@ -398,13 +447,26 @@ function metaToFunctions(definition: Meta, config: FunctionConfig) {
         // in the future, verify can have multiple validator functions, so compose them
         const {validate, ...opt} = definition.verify
         const { instance } = config
-        // final-form passes (value, allValues, meta) to field validate — forward for cross-field rules (e.g. notWithinRange)
-        const validators = toList(validate).map(({name, ...args}: Meta) => (...validateArgs: unknown[]) => {
-            const fn = fieldValidation[name]
-            return fn ? fn(validateArgs[0], {...opt, ...args}, validateArgs[1], validateArgs[2], instance) : undefined
-        })
-        if (definition.validate) validators.unshift(definition.validate)
-        definition.validate = composeValidators(...validators)
+        const own = definition.validate
+        const rules = instance !== null && typeof instance === 'object' ? verifyKey(definition.verify) : undefined
+        const kept = rules === undefined ? undefined : keptVerifyOf(instance, fieldValidation)
+        const reused = kept && kept.byRules.get(rules as string)
+        if (reused && reused.own === own) {
+            definition.validate = reused.composed
+        } else {
+            const registry = () => kept ? kept.registry : fieldValidation
+            // final-form passes (value, allValues, meta) to field validate — forward for cross-field rules (e.g. notWithinRange)
+            const validators = toList(validate).map(({name, ...args}: Meta) => (...validateArgs: unknown[]) => {
+                const fn = registry()[name]
+                return fn ? fn(validateArgs[0], {...opt, ...args}, validateArgs[1], validateArgs[2], instance) : undefined
+            })
+            if (own) validators.unshift(own)
+            definition.validate = composeValidators(...validators)
+            if (kept) {
+                if (kept.byRules.size >= KEPT_VERIFY_LIMIT) kept.byRules.clear()
+                kept.byRules.set(rules as string, { own, composed: definition.validate })
+            }
+        }
         delete definition.verify
     }
     funcNames.forEach(name => {

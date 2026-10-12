@@ -27,6 +27,7 @@ import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
 import { errorsFor, formsOf, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
 import { getFormsData, getLiveMergedDataKindArray, getRawFormsData } from './formData'
+import type { ValidatingForm } from './formData'
 import { errorsProcessing, mapErrorObjectToUIFormat } from './errorMapping'
 import { getDateStringFromDateObject, normalizeIncomingData, replaceDeepCopy } from './dataMapping'
 import { isEqual } from '../utils/object'
@@ -137,7 +138,14 @@ function notWithinRangeValidator (value: unknown, { dataKind, args: argsIn }: { 
 
     const form = instance && instance.props && instance.props.form
     const validationScope = form && form.kind === dataKind ? instance.dataKindPath : undefined
-    const valuesBy = parentUi.getDataKind(dataKind, validationScope)
+    // The form this field validates in, and the values final-form handed this validator: the merge
+    // reads that form from them rather than computing its whole state again (`getLiveMergedDataKindArray`).
+    const validating: ValidatingForm | undefined = instance && instance.form && meta && meta.name && allValues
+        ? { form: instance.form, name: meta.name, values: allValues }
+        : undefined
+    const valuesBy = validating
+        ? parentUi.getDataKind(dataKind, validationScope, validating)
+        : parentUi.getDataKind(dataKind, validationScope)
     const ranges: Array<[unknown, unknown]> = []
     const thisIndex = form && form.kind === dataKind && rowIndexNum != null && !Number.isNaN(rowIndexNum)
         ? String(rowIndexNum)
@@ -1048,9 +1056,10 @@ function Decorator (Class: any) {
          * @param {String} [scope] - dataKindPath scope to limit lookup to a specific parent context
          *   (e.g., for cross-validation within a single parent row in 2-level nesting).
          *   When omitted, derives the path from the first registered scope (backward-compatible).
+         * @param {Object} [validating] - the form a validator runs in, with the values final-form handed it
          * @returns {Array} forms values array, or empty array
          */
-        getDataKind (kind: string, scope?: string): any[] {
+        getDataKind (kind: string, scope?: string, validating?: ValidatingForm): any[] {
             let base: string | undefined
             if (scope != null) {
                 base = scope
@@ -1065,7 +1074,7 @@ function Decorator (Class: any) {
             }
             const pathToDataKindArray = base ? `${base}.dataKind.${kind}` : `dataKind.${kind}`
 
-            const live = getLiveMergedDataKindArray(pathToDataKindArray, formsOf(this.formTree))
+            const live = getLiveMergedDataKindArray(pathToDataKindArray, formsOf(this.formTree), validating)
             if (live.length > 0) {
                 return live
             }

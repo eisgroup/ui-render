@@ -63,6 +63,69 @@ describe('getLiveMergedDataKindArray', () => {
         expect(out[0]).toEqual({})
         expect(out[1]).toEqual({ x: 1 })
     })
+
+    describe('the merge kept between calls, and the form a validator runs in', () => {
+        /** A form as the merge reads it, counting how often its whole state is computed. */
+        function countedForm (values, fields = []) {
+            const form = {
+                reads: 0,
+                values,
+                getState () {
+                    form.reads += 1
+                    return { values: form.values }
+                },
+                getFieldState: name => fields.indexOf(name) === -1 ? undefined : { name },
+                getRegisteredFields: () => fields.slice(),
+            }
+            return form
+        }
+
+        it('gives the same rows while every form holds the same array, in an array of each call\'s own', () => {
+            const forms = new Map([
+                ['a', { form: countedForm({ items: [{ a: 1 }, { a: 2 }] }), meta: {} }],
+                ['b', { form: countedForm({ items: [{ b: 1 }, { b: 2 }] }), meta: {} }],
+            ])
+            const first = getLiveMergedDataKindArray('items', forms)
+            const second = getLiveMergedDataKindArray('items', forms)
+            expect(second).toEqual([{ a: 1, b: 1 }, { a: 2, b: 2 }])
+            expect([second === first, second[0] === first[0]]).toEqual([false, true])
+        })
+
+        it('merges again once a form holds another array', () => {
+            const form = countedForm({ items: [{ a: 1 }] })
+            const forms = new Map([['a', { form, meta: {} }]])
+            const first = getLiveMergedDataKindArray('items', forms)
+            form.values = { items: [{ a: 2 }] }
+            const second = getLiveMergedDataKindArray('items', forms)
+            expect(second).toEqual([{ a: 2 }])
+            expect(second[0]).not.toBe(first[0])
+        })
+
+        it('reads the form a validator runs in from the values it was handed, and computes the others\' state', () => {
+            const edited = countedForm({ items: [{ a: 'before the change' }] }, ['items[0].a'])
+            const other = countedForm({ items: [{ b: 1 }] })
+            const forms = new Map([['edited', { form: edited, meta: {} }], ['other', { form: other, meta: {} }]])
+            const handed = { items: [{ a: 'after the change' }] }
+            expect(getLiveMergedDataKindArray('items', forms, { form: edited, name: 'items[0].a', values: handed }))
+                .toEqual([{ a: 'after the change', b: 1 }])
+            expect([edited.reads, other.reads]).toEqual([0, 1])
+        })
+
+        it('tells that form by its methods, as react-final-form hands a new object of it on each render', () => {
+            const edited = countedForm({ items: [{ a: 1 }] }, ['items[0].a'])
+            const forms = new Map([['edited', { form: edited, meta: {} }]])
+            getLiveMergedDataKindArray('items', forms, { form: { ...edited }, name: 'items[0].a', values: { items: [{ a: 2 }] } })
+            expect(edited.reads).toBe(0)
+        })
+
+        it('computes the state of a form that does not register the field', () => {
+            const form = countedForm({ items: [{ a: 'its own' }] })
+            const forms = new Map([['a', { form, meta: {} }]])
+            expect(getLiveMergedDataKindArray('items', forms, { form, name: 'items[0].a', values: { items: [{ a: 'handed' }] } }))
+                .toEqual([{ a: 'its own' }])
+            expect(form.reads).toBe(1)
+        })
+    })
 })
 
 describe('getFormsData', () => {
