@@ -316,6 +316,17 @@ describe('metaToProps action definition contracts', () => {
         }, 'toast')
     })
 
+    it('maps a handler\'s argument templates afresh on every call', () => {
+        const save = (...args) => args
+        const meta = { view: 'Button', onClick: { name: 'save', mapArgs: [{ code: '{1.code}' }, ['{0}']] } }
+        metaToProps(meta, withFieldFunctions({ save }))
+        // Mapped in place until 2026-10-12, so the second call found the first call's values in the templates.
+        expect([meta.onClick('a', { code: 'first' }), meta.onClick('b', { code: 'second' })]).toEqual([
+            [{ code: 'first' }, ['a']],
+            [{ code: 'second' }, ['b']],
+        ])
+    })
+
     it('awaits an asynchronous action before invoking onDone', async () => {
         const load = jest.fn(() => Promise.resolve('payload'))
         const finishedValues = []
@@ -367,5 +378,70 @@ describe('metaToProps action definition contracts', () => {
 
         expect(meta.onClick('event')).toBe('navigated')
         expect(navigate).toHaveBeenCalledWith('event', 'details', 'edit')
+    })
+})
+
+describe('the cells a render* field definition builds, kept per row', () => {
+    beforeEach(() => {
+        Render.mockReset()
+        Render.Method = jest.fn(() => null)
+    })
+
+    /** The cell the renderer handed `Render` on its last call. */
+    const lastCell = () => Render.mock.calls[Render.mock.calls.length - 1][0]
+    const table = (renderCell = { view: 'Input', name: 'note', options: [{ text: 'A', value: 'a' }] }) => {
+        const meta = { view: 'Table', renderCell }
+        metaToProps(meta, config())
+        return meta
+    }
+    /** Calls the cell renderer as a table does, with a new props object and a new column each time. */
+    const callCell = (meta, { value = 'a', index = 0, className = 'cell', self = { props: { name: 'rows' } }, label = 'Note' } = {}) => {
+        meta.renderCell(value, index, { className }, self, { label })
+        return lastCell()
+    }
+
+    it('is the same cell while the row is called with the same things', () => {
+        const meta = table()
+        const first = callCell(meta)
+        expect(callCell(meta)).toBe(first)
+    })
+
+    it('is built again for another value, index, props or column label', () => {
+        // Each change on a renderer of its own, so that one change does not replace another's cell.
+        const kept = change => {
+            const meta = table()
+            const first = callCell(meta)
+            return callCell(meta, change) === first
+        }
+        expect({
+            value: kept({ value: 'b' }),
+            index: kept({ index: 1 }),
+            props: kept({ className: 'other' }),
+            label: kept({ label: 'Other' }),
+        }).toEqual({ value: false, index: false, props: false, label: false })
+    })
+
+    it('tells the caller\'s props apart by their keys, and from none at all', () => {
+        const meta = table()
+        const cells = [undefined, { className: 'cell' }, { style: 'cell' }, undefined].map(props => {
+            meta.renderCell('a', 0, props, { props: { name: 'rows' } }, { label: 'Note' })
+            return lastCell()
+        })
+        expect(cells.map((cell, i) => i > 0 && cell === cells[i - 1])).toEqual([false, false, false, false])
+    })
+
+    it('keeps one cell for each row', () => {
+        const meta = table()
+        const [first, second] = [callCell(meta, { index: 0 }), callCell(meta, { index: 1 })]
+        expect([callCell(meta, { index: 0 }) === first, callCell(meta, { index: 1 }) === second]).toEqual([true, true])
+    })
+
+    it('is built again when the caller method standing in for a handler is another', () => {
+        const meta = table({ view: 'Button', onClick: 'showRow' })
+        const self = { props: { name: 'rows' }, showRow: () => {} }
+        const first = callCell(meta, { self })
+        self.showRow = () => {}
+        const second = callCell(meta, { self })
+        expect([second === first, second.onClick === self.showRow]).toEqual([false, true])
     })
 })
