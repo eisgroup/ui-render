@@ -866,6 +866,13 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A field in a table cell no longer renders again on every render of its table.** The table built each
+  row's cell anew on every render, so whatever a cell's field took as an object or a function was new each
+  time, such as a Select's options or a handler with arguments. In a 200-row table, each edit and each blur
+  of a text cell rendered all 200 Selects of another column. A row's cell is kept now while the row is
+  called with the same value, index and props.
+- **The objects and arrays in a handler's `mapArgs` are filled in afresh on every call.** They were filled
+  in place, so from its second call on, a handler received its first call's values instead of its own.
 - **A Select outside a table no longer renders again on each change of its document.** Its options were
   mapped through its `mapOptions` on every render, and many Selects have one, so it was handed a new list
   each time: in a form of 100 Selects, every edit and every blur of another field rendered all 100. The

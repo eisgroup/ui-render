@@ -77,6 +77,34 @@ const COMMENT_ATTRIBUTES = ['_comment']
 const NON_PROP_ATTRIBUTES = [...CONTRACT_ATTRIBUTES, ...COMMENT_ATTRIBUTES]
 
 /**
+ * A CELL A `render*` FIELD DEFINITION BUILT FOR ONE ROW, kept while the row is called with the same things
+ * (2026-10-12).
+ *
+ * A table calls its `renderCell` (a list its `renderItem`) for every row on every render, and each call built
+ * the cell anew: two `cloneDeep`s of the definition, its handlers, its props. Everything in a cell was a new
+ * object or function each time, so the cell's field rendered again on every render of the table whenever it
+ * took one as a prop, such as a Select's options or a handler with arguments. In a 200-row table, each edit of
+ * one row's text rendered all 200 Selects of another column.
+ *
+ * A row's cell is now built once and kept for as long as the row is called with the very same things: the
+ * same value, at the same index and path, with the same props from the caller, the same column label, and the
+ * same caller methods standing in for handler names. What the build reads besides those belongs to the meta,
+ * which is built anew with these renderers when the document's state changes. The element is still made anew
+ * from the kept cell on every call, so the cell still renders, and still reads at render what it reads there,
+ * such as a `showIf` or a field's value.
+ */
+type BuiltCell = { value: unknown, relativePath: unknown, label: unknown, props: Meta | undefined, callerHandlers: Meta, cell: Meta }
+
+/** Whether two flat objects hold the very same values under the same keys. */
+function sameValues (a: Meta | undefined, b: Meta | undefined): boolean {
+    if (a === b) return true
+    if (!a || !b) return false
+    const keys = Object.keys(a)
+    return keys.length === Object.keys(b).length
+        && keys.every(key => Object.prototype.hasOwnProperty.call(b, key) && Object.is(a[key], b[key]))
+}
+
+/**
  * Map Data by given Mapper definition
  *
  * @param {Array|*} data - to map
@@ -206,6 +234,8 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
             // before it reads. Scoping this per renderer is engine-decomposition work (§9.3), not a lint fix.
             // What the definition's own handlers were resolved against before they were resolved per call.
             const contextData = _data
+            // This renderer's cells, by row (see `BuiltCell`).
+            const builtCells = new Map<unknown, BuiltCell>()
             // eslint-disable-next-line no-loop-func
             if (isObject(definition)) meta[attribute] = (value: any, index: any, props: Meta, self: any, column?: { label?: string }) => {
                 if (attribute === 'renderExtraItem') {
@@ -221,15 +251,6 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
                 // Render is a field definition
                 if (definition.view) {
                     const {name, filterItems, ...declared} = definition
-                    // The definition's own handlers, for this call: with the row's index and value when the
-                    // caller passes an index (a table row), and with the context around it otherwise, as before.
-                    const configs = cloneDeep(declared)
-                    metaToFunctions(configs, {
-                        ...funcConfig, data, instance,
-                        relativeIndex: index != null ? index : relativeIndex,
-                        _data: index != null ? value : contextData,
-                        rowValue: index != null ? value : contextData,
-                    })
                     // TableView calls renderExtraItem(allItems) with no row index — `index` is undefined.
                     // Inputs must bind to the next array slot (allItems.length): e.g. lineItems[2].field, not lineItems.field.
                     let rowIndex = index
@@ -258,13 +279,45 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
                         revPath.relativePath = relativePathFrom(meta, relativePath, relativeIndex)
                     }
 
-                    return Render({
+                    // Inject functions by their name string
+                    // Pass index, value, and relativePath for args interpolation and context
+                    // relativePath is critical for popup fields to have correct field names matching table row
+                    const callerHandlers: Meta = removeNilValues(FUNCTION_NAMES.map(func => isString(definition[func]) && self &&
+                      !getFunctionFromString(definition[func], {
+                        ...funcConfig,
+                        fallback: null,
+                        relativeIndex: rowIndex,
+                        relativePath: revPath.relativePath,
+                        _data: value,
+                        rowValue: value
+                      }) &&
+                      {[func]: self[definition[func]]}
+                    )).reduce((obj: Meta, item: Meta) => ({...obj, ...item}), {})
+                    const label = column && column.label
+                    const kept = builtCells.get(rowIndex)
+                    if (
+                      kept && Object.is(kept.value, value) && kept.relativePath === revPath.relativePath && kept.label === label &&
+                      sameValues(kept.props, props) && sameValues(kept.callerHandlers, callerHandlers)
+                    ) {
+                        return Render(kept.cell, rowIndex)
+                    }
+
+                    // The definition's own handlers, for this call: with the row's index and value when the
+                    // caller passes an index (a table row), and with the context around it otherwise, as before.
+                    const configs = cloneDeep(declared)
+                    metaToFunctions(configs, {
+                        ...funcConfig, data, instance,
+                        relativeIndex: index != null ? index : relativeIndex,
+                        _data: index != null ? value : contextData,
+                        rowValue: index != null ? value : contextData,
+                    })
+                    const cell: Meta = {
                         // Relative Path is required for nested Inputs
                         ...revPath,
                         ...props,
                         // A field in a table cell, with no name of its own, is named by its column's header. Until
                         // 2026-10-09 it had none, and most of the nameless controls the examples rendered were these.
-                        ...column && column.label && isUnnamedField(definition) && {'aria-label': column.label},
+                        ...label && isUnnamedField(definition) && {'aria-label': label},
                         // Recursively map definitions within Render function
                         // Note: since definition is mutated on each transform,
                         // we have to use original config for rendering lists
@@ -276,23 +329,12 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
                         ...definition.useForm && {useForm: true},
                         // Filter for row data from parent table (in default layout)
                         ...filterItems && {filterItems, parentItem: value},
-                        // Inject functions by their name string
-                        // Pass index, value, and relativePath for args interpolation and context
-                        // relativePath is critical for popup fields to have correct field names matching table row
-                        ...removeNilValues(FUNCTION_NAMES.map(func => isString(definition[func]) && self &&
-                          !getFunctionFromString(definition[func], {
-                            ...funcConfig, 
-                            fallback: null, 
-                            relativeIndex: rowIndex, 
-                            relativePath: revPath.relativePath,
-                            _data: value,
-                            rowValue: value
-                          }) &&
-                          {[func]: self[definition[func]]}
-                        )).reduce((obj: Meta, item: Meta) => ({...obj, ...item}), {}),
+                        ...callerHandlers,
                         ...definition.view.indexOf('Data') === 0 && {index: rowIndex},
                         data, _data, form, instance,
-                    }, rowIndex)
+                    }
+                    builtCells.set(rowIndex, { value, relativePath: revPath.relativePath, label, props, callerHandlers, cell })
+                    return Render(cell, rowIndex)
                 }
 
                 // Render is a function definition
@@ -585,9 +627,14 @@ function mapFunctionArgs (template: any, {data, args}: { data?: unknown, args: u
         // Casts, not guards: `{0}` reads the first argument, and the data is the document's object.
         return interpolateString(interpolateString(template, args as unknown as Record<string, unknown>, {suppressError: true}), data as Record<string, unknown> | undefined, {suppressError: true})
     if (isCollection(template)) {
+        // A copy, not the template (2026-10-12): a handler maps its arguments on every call, and the
+        // template is the definition's own, kept as long as the handler is. Mapped in place, a second call
+        // found the first call's values where the placeholders had been.
+        const mapped: any = Array.isArray(template) ? [] : {}
         for (const key in template) {
-            template[key] = mapFunctionArgs(template[key], {data, args})
+            mapped[key] = mapFunctionArgs(template[key], {data, args})
         }
+        return mapped
     }
     return template
 }
