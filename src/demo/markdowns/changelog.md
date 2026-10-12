@@ -736,6 +736,12 @@ Nothing to do for these:
   mapper defensive factories, Final Form subscription lifecycles, and popup action arguments.
 - Added a smoke contract covering every registered demo example and enforceable coverage
   thresholds for the renderer's critical files.
+- Two contracts for what a host does around a document. A document updated or replaced inside
+  `startTransition`, as React Router 7 renders a navigation, ends with the same markup and the same
+  forms registered as without the transition, an urgent update arriving meanwhile and StrictMode
+  included (React 18 and 19). And a 50-row table of fields renders each field once at mount and only
+  the edited one on a keystroke, with the document's commits and `onDataChanged` calls pinned on
+  React 16.14, 17, 18 and 19.
 - CI now checks the stylesheet it ships. The checks that `static/all.css` lets nothing escape
   `.ui-render` ran only when a build happened to be present, and CI runs the suite before it builds,
   so they never ran there. A step after the library build runs them on the built file, and fails if
