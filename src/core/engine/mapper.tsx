@@ -50,6 +50,64 @@ type MetaAttributes = any
 /** What a value renderer is handed after the value and its index: the node's own options. */
 type RenderMethodOptions = Record<string, any>
 
+/** A field's validator, as a number field's bounds call it: with the value alone. */
+type FieldValidator = (value: any) => unknown
+
+/**
+ * THE VALIDATOR A NUMBER FIELD'S `min` AND `max` ADD, kept per document while they stay the same
+ * (2026-10-12).
+ *
+ * A number field with `min` or `max` had its `validate` wrapped in a new function on every render. A
+ * field takes it as a prop, so the field host's memo saw a changed prop on every render of the
+ * document: every such field rendered again on each change, a blur included, which was all 400 number
+ * fields of a 200-row table for one blur. The same bounds over the same own `validate` give the same
+ * function now, as a `verify`'s rules do (`keptVerify` in `transforms.ts`). A bound that is not a
+ * number, a string, a boolean or nothing still makes a new one on each render.
+ */
+const keptBounds = new WeakMap<object, Map<string, { withoutOwn?: FieldValidator, byOwn: WeakMap<object, FieldValidator> }>>()
+
+/** How many sets of bounds one document keeps. A host that keeps changing a document's meta starts over past it. */
+const KEPT_BOUNDS_LIMIT = 64
+
+/** A field's bounds as a key, or `undefined` when one of them is a value a key would not tell apart. */
+function boundsKey (min: unknown, max: unknown): string | undefined {
+    const part = (bound: unknown) => {
+        if (bound == null) return 'none'
+        if (typeof bound === 'number' || typeof bound === 'boolean' || typeof bound === 'string') return [typeof bound, String(bound)]
+        return undefined
+    }
+    const low = part(min)
+    const high = part(max)
+    return low === undefined || high === undefined ? undefined : JSON.stringify([low, high])
+}
+
+/** `validate` with a number field's bounds checked first, the same function while all three stay the same. */
+function boundedValidator (instance: unknown, validate: FieldValidator | undefined, min: any, max: any): FieldValidator {
+    const bounded: FieldValidator = (value: any) => {
+        if (min != null && value < min) return `Must be minimum ${min}`
+        if (max != null && value > max) return `Must be maximum ${max}`
+        return (validate && validate(value)) || OK
+    }
+    const key = instance !== null && typeof instance === 'object' ? boundsKey(min, max) : undefined
+    if (key === undefined || (validate != null && typeof validate !== 'function')) return bounded
+    let byBounds = keptBounds.get(instance as object)
+    if (!byBounds) {
+        byBounds = new Map()
+        keptBounds.set(instance as object, byBounds)
+    }
+    let kept = byBounds.get(key)
+    if (!kept) {
+        if (byBounds.size >= KEPT_BOUNDS_LIMIT) byBounds.clear()
+        kept = { byOwn: new WeakMap() }
+        byBounds.set(key, kept)
+    }
+    if (validate == null) return kept.withoutOwn || (kept.withoutOwn = bounded)
+    const reused = kept.byOwn.get(validate)
+    if (reused) return reused
+    kept.byOwn.set(validate, bounded)
+    return bounded
+}
+
 /**
  * UI RENDERER COMPONENTS SETUP ================================================
  * Map Component props and Methods for recursive rendering
@@ -597,11 +655,7 @@ const RenderComponent = ({
             // Validate type="number" with min/max
             if (input.type === 'number') {
                 const { validate, min, max } = input
-                if (min != null || max != null) input.validate = (value: any) => {
-                    if (min != null && value < min) return `Must be minimum ${min}`
-                    if (max != null && value > max) return `Must be maximum ${max}`
-                    return (validate && validate(value)) || OK
-                }
+                if (min != null || max != null) input.validate = boundedValidator(instance, validate, min, max)
             }
 
             return renderField({ view, ...input, instance, ...readonly && { readonly }, ...disabled && { disabled }, translate })

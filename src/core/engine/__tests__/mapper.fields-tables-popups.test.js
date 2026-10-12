@@ -201,6 +201,53 @@ describe('mapper behavior contracts', () => {
         expect(field.validate(6)).toBe(OK)
     })
 
+    describe('the validator a number field\'s bounds add, kept per document', () => {
+        const bounded = (extra = {}) => ({ view: FIELD.TYPE.INPUT, name: 'quantity', type: 'number', min: 1, max: 10, ...extra })
+        /** The `validate` the field is handed, one render of its document later. */
+        const validateOf = props => {
+            const { unmount } = renderMapped(props)
+            const { validate } = lastFieldProps()
+            unmount()
+            return validate
+        }
+
+        it('is one function while the bounds and the field\'s own validate stay the same', () => {
+            const instance = baseInstance()
+            const own = value => value === 5 ? 'Reserved value' : undefined
+            expect(validateOf(bounded({ instance, validate: own }))).toBe(validateOf(bounded({ instance, validate: own })))
+            expect(validateOf(bounded({ instance }))).toBe(validateOf(bounded({ instance })))
+        })
+
+        it('is another for other bounds, another own validate, or another document', () => {
+            const instance = baseInstance()
+            const kept = validateOf(bounded({ instance }))
+            const others = [
+                validateOf(bounded({ instance, max: 20 })),
+                validateOf(bounded({ instance, min: '1' })),
+                validateOf(bounded({ instance, validate: () => undefined })),
+                validateOf(bounded({ instance: baseInstance() })),
+            ]
+            expect(others.some(validate => validate === kept)).toBe(false)
+        })
+
+        it('is made anew on each render for a bound a key cannot tell apart, or an own validate that is not a function', () => {
+            const instance = baseInstance()
+            const objectBound = bounded({ instance, min: { valueOf: () => 1 } })
+            const ownNotAFunction = bounded({ instance, validate: { rule: 'reserved' } })
+            const [first, second] = [validateOf(objectBound), validateOf(objectBound)]
+            const [third, fourth] = [validateOf(ownNotAFunction), validateOf(ownNotAFunction)]
+            expect([first === second, third === fourth]).toEqual([false, false])
+        })
+
+        it('keeps a bounded number of bound sets for one document', () => {
+            const instance = baseInstance()
+            const first = validateOf(bounded({ instance, max: 0 }))
+            // More sets of bounds than one document keeps.
+            for (let max = 1; max < 200; max++) validateOf(bounded({ instance, max }))
+            expect(validateOf(bounded({ instance, max: 0 }))).not.toBe(first)
+        })
+    })
+
     it('builds grouped table headers and matrix rows', () => {
         renderMapped({
             view: FIELD.TYPE.TABLE,
