@@ -9,15 +9,15 @@
  * mapped from the same options by the same mapping (`keptMappedOptions` in `engine/mapper.tsx`), and so is
  * the handler a stable-value Select's `onChange` is wrapped in, which searches them.
  *
- * What still renders a Select again is its document's meta being built anew, when the document's state
- * changes (`meta` in `engine/rules.tsx`): here, once, for the first edit, as for a Select whose options are
- * not mapped. A Select in a table cell still renders with its table too: the cell's renderer builds the
- * cell's meta anew, options included, for every row on every render (`engine/transforms.ts`), which this
- * does not change.
+ * What still renders a Select again is its document's meta being built anew, when a new state changes
+ * what the meta read (`meta` in `engine/rules.tsx`, `engine/metaStateReads.ts`). Nothing here reads the
+ * state, so no edit does. A Select in a table cell renders with its table: its cell is kept per row
+ * (`BuiltCell` in `engine/transforms.ts`).
  *
  * Measured in jsdom on React 18 with a form of 100 such Selects, two runs: 300 renders at mount and 100 for
- * each later edit or blur of another field, an edit taking 16 and 22 ms; now 200, and none, an edit taking
- * 7 and 5 ms. A number here that falls is progress: lower it. One that rises is a regression.
+ * each later edit or blur of another field, an edit taking 16 and 22 ms; then 200, and none, an edit taking
+ * 7 and 5 ms. 100 at mount since the meta is kept across a state it does not read. A number here that falls
+ * is progress: lower it. One that rises is a regression.
  */
 import React from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
@@ -72,10 +72,10 @@ describe('Selects whose options are mapped', () => {
         const form = [...formsStorage.values()].map(entry => entry.form).find(candidate => 'other' in candidate.getState().values)
         const other = container.querySelector('input[name="other"]')
 
-        // The first edit changes the document's state, which builds its meta anew: every Select renders once.
+        // The first edit changes the document's state (its `canSave`), which nothing in the meta reads.
         act(() => { form.change('other', 'first') })
         settle()
-        rendersSince()
+        const onFirstEdit = rendersSince()
         act(() => { form.change('other', 'second') })
         settle()
         const onEdit = rendersSince()
@@ -83,8 +83,10 @@ describe('Selects whose options are mapped', () => {
         settle()
         const onBlur = rendersSince()
         const none = { byValue: 0, byIndex: 0, plain: 0 }
-        // Before 2026-10-12 the two mapped Selects read 3 at mount, and 1 for the edit and for the blur.
-        expect({ atMount, onEdit, onBlur }).toEqual({ atMount: { byValue: 2, byIndex: 2, plain: 2 }, onEdit: none, onBlur: none })
+        // Before their options were kept (2026-10-12) the two mapped Selects read 3 at mount, and 1 for each
+        // later edit and for the blur.
+        // Each read 2 at mount, and 1 for the first edit, until the meta was kept across a state it does not read.
+        expect({ atMount, onFirstEdit, onEdit, onBlur }).toEqual({ atMount: { byValue: 1, byIndex: 1, plain: 1 }, onFirstEdit: none, onEdit: none, onBlur: none })
     })
 
     it('are handed the options their mapping makes', () => {

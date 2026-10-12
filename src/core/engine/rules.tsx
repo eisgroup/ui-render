@@ -18,6 +18,7 @@ import './mapper' // Set up UI Renderer components and methods
 import { cancelAutoSubmit } from './autoSubmit'
 import { DocumentInstance, hostDocument } from './documentHost'
 import { statePathOf } from './statePath'
+import { readsUnchanged, stateReadsOf } from './metaStateReads'
 import { describeFailure, download } from './download'
 import { upload } from './upload'
 import { applyPeriods } from './applyPeriods'
@@ -672,22 +673,31 @@ function Decorator (Class: any) {
         }
 
         /**
-         * Built once for each state object, from that state. `{state.x}` names resolve and the
-         * handlers are composed when it is built, so a new state needs a new one. A render that
-         * brings no new state, such as a parent's render, reuses it: every node keeps its handlers,
-         * and a memoised component can skip its render. `rules.meta-cache.test.js` pins both. Until
-         * §9.3 step 6 an `UNSAFE_componentWillUpdate` dropped the cache whenever an update brought
-         * a new state; keying the cache on the state does the same without a lifecycle.
+         * Built from the state, and kept while the state holds what the build read from it.
+         * `{state.x}` names resolve and the handlers are composed when it is built, so a state that
+         * changes what it read needs a new one. A render that brings no new state, such as a parent's
+         * render, reuses it, and since 2026-10-12 so does a new state that changes only what it did not
+         * read (`metaStateReads.ts`), such as the `canSave` of a first edit or the pick of a Select
+         * nothing reads. Every node keeps its handlers, and a memoised component can skip its render.
+         * `rules.meta-cache.test.js` pins it. Until §9.3 step 6 an `UNSAFE_componentWillUpdate` dropped
+         * the cache whenever an update brought a new state; keying the cache on the state does the same
+         * without a lifecycle.
          */
         get meta () {
-            if (this._meta != null && this._metaState === this.state) return this._meta
             const state = this.state
+            if (this._meta != null && (this._metaState === state || (this._metaReads && readsUnchanged(this._metaReads, this._metaState, state)))) {
+                this._metaState = state
+                return this._meta
+            }
             const transformedMeta = transformConfig(cloneDeep(get(state, 'meta.json')))
+            // What it reads of the state, taken before the seeding below and the build change it.
+            const reads = stateReadsOf(transformedMeta)
             // Pre-initialize state from data for Select/Dropdown fields,
             // so {state.xxx} interpolation resolves correctly on the first render
             initSelectStatesFromData(transformedMeta, this.data, this)
             this._meta = metaToProps(transformedMeta, this.config)
             this._metaState = state
+            this._metaReads = reads
             return this._meta
         }
 

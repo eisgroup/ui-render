@@ -866,6 +866,13 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A pick in a Select, or a document's first edit, no longer renders every field again.** A document
+  built its whole meta anew for every new state, and two writes made that common: a named Select with no
+  `onChange` of its own writes its pick into the state, and the first edit writes `canSave` there. Every
+  Select, and every field that takes an object or a function, rendered again for each such pick and for the
+  first edit: all 101 Selects of a form, for one pick. The meta is kept now while the state holds what it
+  read: the `{state.x}` its names read, the data, the currency. A pick that a template reads still builds
+  it anew, and the fields that depend on it follow.
 - **A field in a table cell no longer renders again on every render of its table.** The table built each
   row's cell anew on every render, so whatever a cell's field took as an object or a function was new each
   time, such as a Select's options or a handler with arguments. In a 200-row table, each edit and each blur
