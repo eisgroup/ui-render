@@ -866,6 +866,12 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A Select outside a table no longer renders again on each change of its document.** Its options were
+  mapped through its `mapOptions` on every render, and many Selects have one, so it was handed a new list
+  each time: in a form of 100 Selects, every edit and every blur of another field rendered all 100. The
+  mapped list is kept now until the options or the mapping change, and so is the handler a stable-value
+  Select's `onChange` is wrapped in. A Select in a table cell still renders with its table, whose cells
+  are built anew on each render.
 - **A field with `autoSubmit` or `removable` no longer renders again whenever another field changes.**
   Each wrapped the field's own handler in a new function on every render, so such a field rendered
   again on every change in its document, a blur included, and three times at mount: 200 fields for one
