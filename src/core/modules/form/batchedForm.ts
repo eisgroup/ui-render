@@ -43,8 +43,9 @@ export function registrationsOf (form: unknown): Registrations | undefined {
  * one, the form's listeners are told when it was the last field of its name. While validation is paused, that is
  * held until it resumes, and done once for all the fields that went.
  *
- * A registration that asks to be silent itself, as react-final-form's probe in a field's first render does, is
- * left as it is. So is every registration made while validation runs.
+ * A registration that asks to be silent itself, as react-final-form's probe in a field's first render does, keeps
+ * its `silent`, and while validation runs, it registers without its validator (see below). Every other registration
+ * made while validation runs is left as it is.
  */
 export function createBatchedForm<FormValues = Record<string, any>> (config: Config<FormValues>): FormApi<FormValues> {
   const form = createForm<FormValues>(config)
@@ -75,7 +76,21 @@ export function createBatchedForm<FormValues = Record<string, any>> (config: Con
     setConfig(name, value)
   }
   form.registerField = (name, subscriber, subscription, fieldConfig) => {
-    if (!form.isValidationPaused() || fieldConfig?.silent) return registerField(name, subscriber, subscription, fieldConfig)
+    if (fieldConfig?.silent) {
+      // react-final-form's probe in a field's first render, registered and unregistered at once for the state the
+      // field first renders with. With a validator and validation running, final-form validated every field for
+      // it: a burst of n fields mounting beside m others ran about n·m validators before any bracket opened, since
+      // the probe runs in render. Without one, the field first renders with no error yet, as every field does on a
+      // document's first render, where react-final-form has validation paused. Its error comes when its node's
+      // bracket closes. That bracket matters: react-final-form takes the first notification after the field's
+      // registration from its effect as the state the probe gave it, so that registration must not validate.
+      // Inside a bracket it registers silently, and the error comes in a later notification. Without the
+      // brackets, a field the user touched came back from a tab switch without its error, as the tab-switch test
+      // of `UIRender.form-flows.test.js` shows.
+      if (form.isValidationPaused()) return registerField(name, subscriber, subscription, fieldConfig)
+      return registerField(name, subscriber, subscription, {...fieldConfig, getValidator: undefined})
+    }
+    if (!form.isValidationPaused()) return registerField(name, subscriber, subscription, fieldConfig)
     unheard = true
     const unregister = registerField(name, subscriber, subscription, {...fieldConfig, silent: true})
     return () => {

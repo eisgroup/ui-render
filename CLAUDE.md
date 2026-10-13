@@ -132,11 +132,19 @@ resumes. Two things pause it:
 - react-final-form, for the first render;
 - the brackets an engine node opens in a layout effect and closes in a passive effect, on mount and when its
   `showIf` flips (`registrationsOf`, used by `RenderComponent` in `mapper.tsx`). Fields register in passive effects,
-  in between.
+  in between. `Modal` brackets its popup's fields the same way as it opens and closes, since nothing mounts when a
+  popup closes.
 
 A field that goes while validation is paused tells nothing until it resumes. React 16 runs a removed component's
-effect cleanups before any layout effect, so there a field that goes is not bracketed. `form-mount-budget.test.js`
-and `later-mount-budget.test.js` count what the bursts cost.
+effect cleanups before any layout effect, so there a field that goes is not bracketed.
+
+react-final-form also probes each field in its first render, registering and unregistering it for its first
+state. While validation runs, the probe registers without its validator, as it would on a document's first render:
+with one, it validated every field in the form, once per new field. The field gets its error when its node's
+bracket closes. That depends on its first registration from an effect coming inside a bracket, since
+react-final-form takes the first notification after it as the probe's state.
+
+`form-mount-budget.test.js` and `later-mount-budget.test.js` count what the bursts cost.
 
 To find what a cost comes from, count before naming the cause: wrap the suspected function or component with
 `jest.mock` and count calls per action. Comparing timings with and without a feature does not name a cause.

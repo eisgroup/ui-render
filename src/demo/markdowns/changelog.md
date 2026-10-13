@@ -866,6 +866,12 @@ Nothing to do for these:
 
 #### Fixes
 
+- **Fields that mount or go later cost the form one pass in two more cases.** react-final-form's probe of a
+  field's first render validated every field in the form while validation ran, once for each new field: in
+  Chromium, showing a 200-row table beside 200 required fields took 153 ms, and takes 98. A popup's fields
+  went one by one when it closed, each validating every field left, since nothing mounts then whose node
+  brackets them: the dialog brackets them now, and closing a popup that holds such a table takes 27 ms
+  instead of 447. On React 16 a popup's fields still go one by one.
 - **A number shown with decimals is formatted by a formatter made once.** `renderFloat`, which the
   `Currency`, `Float`, `Double5` and `Percent` renderers and `Counter` show numbers through, formatted
   each fraction with `toLocaleString` and its options: a new `Intl.NumberFormat` for every value, 9.65 µs
