@@ -13,11 +13,11 @@
  * the ones after it. scripts/test-packed-perf.js runs it (`npm run test:perf`) and prints them; CI runs it in the
  * advisory `browser-perf` job, which reports and never blocks.
  *
- * Each ceiling below is two and a half to three times what GitHub's runner measured for the code it was set with, and
- * at least 100 ms for an action, so that a slower run passes and so does an action's own noise. The runner took about
- * three times as long as an Apple M4 to mount a document (2026-10-13), and the M4 measured one build about twice as
- * long one day as the next, so the ceilings follow the runner's numbers, which the `browser-perf` job prints. The tab
- * switch's were set from the M4's at that ratio, before the runner had measured them.
+ * Each ceiling below is about two to three times what GitHub's runner measured for the code it was set with, and at
+ * least 100 ms for an action, so that a slower run passes and so does an action's own noise. The runner took about
+ * three times as long as an Apple M4 to mount a document, and up to twice as long for an action (2026-10-13). The M4
+ * measured one build about twice as long one day as the next. So the ceilings follow the runner's numbers, which the
+ * `browser-perf` job prints, not a developer's machine.
  *
  * A ceiling flags a cascade the size of the one #209 to #213 removed from the period table, whose edit cost five
  * times what it costs now. It does not flag a smaller one: the jsdom contracts, which count renders and field states,
@@ -36,7 +36,7 @@ const CEILINGS = {
     selectTable: { mount: 820, edit: 100, blur: 100 },
     selectForm: { mount: 340, pick: 100, edit: 100 },
     numberTable: { mount: 780, edit: 100 },
-    tabs: { mount: 330, switch: 720, back: 360 },
+    tabs: { mount: 210, switch: 360, back: 100 },
 }
 
 const median = values => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)]
