@@ -16,8 +16,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  # A PR's newer push supersedes the run before it. A push to the branch keeps its run.
+  # A PR's newer push supersedes the run before it. A push to the branch keeps its run, so each push has a group of
+  # its own, named by its commit: a group holds one running run and one pending one, and GitHub cancels the pending
+  # run when another arrives, whatever `cancel-in-progress` says (master's CI lost a commit's run that way on
+  # 2026-10-12).
+  group: ci-${{ github.workflow }}-${{ github.event_name == 'push' && github.sha || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
