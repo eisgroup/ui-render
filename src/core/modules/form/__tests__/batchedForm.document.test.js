@@ -1,7 +1,8 @@
 /**
- * A document's fields register silently while its first render mounts (`createBatchedForm`, 2026-10-13). A field
- * that goes later must still tell the form's listeners what final-form tells them when a field that is not silent
- * goes: that its validator went with it, and with it the field's error.
+ * A document's fields register silently while its first render mounts, and so do the fields that mount later
+ * between the brackets of an engine node (`createBatchedForm`, `registrationsOf`, 2026-10-13). The form's listeners
+ * must still hear what final-form would have told them: that a field that came is not valid, and that one that
+ * went took its validator, and with it its error.
  *
  * A tab switch is the case where nothing else does. It changes no value, so the field going is the only thing that
  * happens to the form, and a field unregistered silently would leave the form's listeners with a form that is not
@@ -22,6 +23,50 @@ function formHolding (key) {
 }
 
 describe('a document whose fields registered silently as it mounted', () => {
+    it('tells the form\'s listeners it is not valid when a tab switch brings a required field that is empty', async () => {
+        const meta = {
+            view: 'Tabs',
+            items: [
+                { tab: 'A', content: { view: 'Text', children: 'Nothing here' } },
+                { tab: 'B', content: { view: 'Input', name: 'b', label: 'B field', validate: 'required' } },
+            ],
+        }
+        render(<UIRender meta={meta} data={{ b: '' }} initialValues={{ b: '' }} onSubmit={() => {}} />)
+        const { form, heard } = formHolding('b')
+        expect(heard).toEqual([true])
+
+        fireEvent.click(screen.getByRole('tab', { name: 'B' }))
+        await act(async () => { await new Promise(resolve => setTimeout(resolve, 100)) })
+
+        expect(screen.getByLabelText('B field')).toBeTruthy()
+        expect(form.getState().valid).toBe(false)
+        expect(heard[heard.length - 1]).toBe(false)
+    })
+
+    it('tells them so when a `showIf` shows a required field that is empty, and hides it again', () => {
+        const meta = {
+            view: 'Col',
+            items: [
+                { view: 'Input', name: 'show', label: 'Show' },
+                { view: 'Input', name: 'a', label: 'A field', validate: 'required', showIf: { name: 'show', equal: 'yes' } },
+            ],
+        }
+        render(<UIRender meta={meta} data={{ show: 'no', a: '' }} initialValues={{ show: 'no', a: '' }} onSubmit={() => {}} />)
+        const { form, heard } = formHolding('show')
+        expect(screen.queryByLabelText('A field')).toBeNull()
+        expect(heard).toEqual([true])
+
+        act(() => { form.change('show', 'yes') })
+        expect(screen.getByLabelText('A field')).toBeTruthy()
+        expect(form.getState().valid).toBe(false)
+        expect(heard[heard.length - 1]).toBe(false)
+
+        act(() => { form.change('show', 'no') })
+        expect(screen.queryByLabelText('A field')).toBeNull()
+        expect(form.getState().valid).toBe(true)
+        expect(heard[heard.length - 1]).toBe(true)
+    })
+
     it('tells the form\'s listeners it is valid when a tab switch takes its only invalid field away', async () => {
         const meta = {
             view: 'Tabs',

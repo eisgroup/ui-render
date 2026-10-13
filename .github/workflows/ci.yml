@@ -382,7 +382,7 @@ jobs:
           retention-days: 7
 
   # What the published package's documents cost in Chromium: the main thread's busy time for a mount and for each
-  # action of four documents a host could render, a 200-row period table among them (e2e/perf/scenarios.perf.js,
+  # action of five documents a host could render, a 200-row period table among them (e2e/perf/scenarios.perf.js,
   # `npm run test:perf`). ADVISORY: a runner's speed varies from run to run, so this reports and never blocks. Its
   # ceilings sit about three times above what the code costs on a developer's machine, and at least 100 ms for an
   # action: they flag a cascade the size of the one the period table had before #209, not a small one, which the
