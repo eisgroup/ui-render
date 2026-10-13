@@ -2289,7 +2289,8 @@ Postponed 2026-09-30 (§9.7-F4), and no longer a React 19 prerequisite. **Postpo
   - **Also to check on the bump, since 2026-10-13:** `createBatchedForm` (`modules/form/batchedForm.ts`) leans on final-form's
     registration. A `silent` registration publishes only its own field's state, its unregistering is silent too, and
     `pauseValidation()` holds back the form's listeners. final-form 5.0.1's source keeps all three, read that day; run
-    `batchedForm.test.js`, `batchedForm.document.test.js` and `form-mount-budget.test.js` on the bump. Checked the same
+    `batchedForm.test.js`, `batchedForm.document.test.js`, `form-mount-budget.test.js` and `later-mount-budget.test.js` on the
+    bump. Checked the same
     day: npm's `latest` for `react-final-form` is still 7.0.1, and #1096 is still open.
 
 ### TS migration (§9.6)

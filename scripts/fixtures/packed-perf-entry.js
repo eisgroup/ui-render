@@ -57,6 +57,28 @@ const SCENARIOS = {
         },
         data: { other: 'text', ...Object.fromEntries(range(100).map(i => [`choice${i}`, 'a'])) },
     }),
+    // Two tabs, the second a 200-row table of a required text column and a bounded number column, which mounts and
+    // unmounts with its tab.
+    tabs: () => ({
+        meta: {
+            view: 'Tabs',
+            items: [
+                { tab: 'Summary', content: { view: 'Text', children: 'Nothing to edit here' } },
+                {
+                    tab: 'Rows',
+                    content: {
+                        view: 'Table',
+                        name: 'rows',
+                        headers: [
+                            { id: 'note', label: 'Note', renderCell: { view: 'Input', name: 'note', validate: 'required' } },
+                            { id: 'qty', label: 'Qty', renderCell: { view: 'Input', type: 'number', name: 'qty', min: 0, max: 100000 } },
+                        ],
+                    },
+                },
+            ],
+        },
+        data: { rows: range(ROWS).map(i => ({ note: `note ${i}`, qty: i })) },
+    }),
     // A column of number fields with bounds, beside a text column.
     numberTable: () => ({
         meta: {
