@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import Expand from '../Expand'
@@ -9,6 +9,8 @@ const wrap = ui => (
 )
 
 const labelOf = container => container.querySelector('.app__expand > .text')
+
+const MAJOR = Number(React.version.split('.')[0])
 
 describe('Expand lifecycle contracts', () => {
     beforeEach(() => jest.useFakeTimers())
@@ -309,5 +311,37 @@ describe('Expand lifecycle contracts', () => {
             scheduled.mockRestore()
             cleared.mockRestore()
         }
+    })
+
+    it('brackets its content mounting, and its content going when the collapse is over', () => {
+        // The engine hands an Expand the brackets of its document's form (`useBracket`). The content goes from a
+        // timer, a `duration` after the collapse, when nothing else would bracket its fields going.
+        const log = []
+        let depth = 0
+        const bracket = {
+            begin: () => { depth += 1; log.push('begin') },
+            end: () => { depth -= 1; log.push('end') },
+        }
+        const Content = () => {
+            useEffect(() => {
+                log.push(`mounted at ${depth}`)
+                return () => { log.push(`gone at ${depth}`) }
+            }, [])
+            return <span>Content</span>
+        }
+        const { container } = render(wrap(<Expand title="Details" duration={100} bracket={bracket}><Content/></Expand>))
+        // The mount's own bracket, with nothing in it: the content is collapsed.
+        expect(log).toEqual(['begin', 'end'])
+
+        fireEvent.click(labelOf(container))
+        expect(log.slice(2)).toEqual(['begin', 'mounted at 1', 'end'])
+
+        fireEvent.click(labelOf(container))
+        expect(log.slice(5)).toEqual([])
+        act(() => jest.advanceTimersByTime(100))
+        expect(screen.queryByText('Content')).not.toBeInTheDocument()
+        // React 16 runs a removed component's effect cleanups during the commit, before any layout effect.
+        expect(log.slice(5)).toEqual(MAJOR > 16 ? ['begin', 'gone at 1', 'end'] : ['gone at 0', 'begin', 'end'])
+        expect(depth).toBe(0)
     })
 })

@@ -111,6 +111,56 @@ describe('a document whose fields registered silently as it mounted', () => {
         expect(heard[heard.length - 1]).toBe(true)
     })
 
+    it('tells them it is valid when an Expand that holds an empty required field collapses', async () => {
+        const meta = {
+            view: 'Col',
+            items: [
+                { view: 'Input', name: 'title', label: 'Title' },
+                { view: 'Expand', title: 'Details', items: [{ view: 'Input', name: 'detail', label: 'Detail', validate: 'required' }] },
+            ],
+        }
+        render(<UIRender meta={meta} data={{ title: 'x', detail: '' }} initialValues={{ title: 'x', detail: '' }} onSubmit={() => {}} />)
+        const { form, heard } = formHolding('title')
+        const title = screen.getByRole('button', { name: 'Details' })
+        expect(heard).toEqual([true])
+
+        await act(async () => { fireEvent.click(title) })
+        expect(screen.getByLabelText('Detail')).toBeTruthy()
+        expect(heard[heard.length - 1]).toBe(false)
+
+        await act(async () => { fireEvent.click(title) })
+        // The content goes when the collapse's animation ends, 500 ms after the click.
+        await act(async () => { await new Promise(resolve => setTimeout(resolve, 600)) })
+        expect(screen.queryByLabelText('Detail')).toBeNull()
+        expect(form.getState().valid).toBe(true)
+        expect(heard[heard.length - 1]).toBe(true)
+    })
+
+    it('tells them it is valid when a table\'s rows collapse, one of them with an empty required field', async () => {
+        const meta = {
+            view: 'Table',
+            name: 'rows',
+            headers: [
+                { id: 'note', label: 'Note' },
+                { id: '#', renderHeader: { view: 'Checkbox', label: 'Expand all', onChange: 'handleToggleExpandAll' } },
+            ],
+            renderItem: { view: 'Input', name: 'detail', label: 'Detail', validate: 'required' },
+        }
+        const data = () => ({ rows: [{ note: 'A', detail: 'a' }, { note: 'B', detail: '' }] })
+        render(<UIRender meta={meta} data={data()} initialValues={data()} onSubmit={() => {}} />)
+        const { form, heard } = formHolding('rows')
+        expect(heard).toEqual([true])
+
+        await act(async () => { fireEvent.click(screen.getByLabelText('Expand all')) })
+        expect(screen.getAllByLabelText('Detail')).toHaveLength(2)
+        expect(heard[heard.length - 1]).toBe(false)
+
+        await act(async () => { fireEvent.click(screen.getByLabelText('Expand all')) })
+        expect(screen.queryByLabelText('Detail')).toBeNull()
+        expect(form.getState().valid).toBe(true)
+        expect(heard[heard.length - 1]).toBe(true)
+    })
+
     it('keeps validating after a Suspense boundary hides the document and shows it again', async () => {
         // React 18 and 19 run the layout effects of what such a boundary shows again, and not its passive ones: a
         // node's bracket opened then, and nothing closed it (`useBracket`), so the form never validated again. React

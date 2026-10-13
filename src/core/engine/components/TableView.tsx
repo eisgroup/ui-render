@@ -6,6 +6,8 @@ import Row from '../../components/Row'
 import ScrollView from '../../components/ScrollView'
 import Table from '../../components/Table'
 import Text from '../../components/Text'
+import { useBracket } from '../../components/useBracket'
+import type { Bracket } from '../../components/useBracket'
 import View from '../../components/View'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from '../../components/domProps'
 import { by, get, hasListValue, isEqual, isEqualList, isFunction, toJSON } from '../../utils'
@@ -108,6 +110,11 @@ export type TableViewProps = {
   className?: string
   name?: string
   fieldArrayName?: string
+  /**
+   * Opened before rows that expand or collapse, or come or go with the items, mount or go, and closed after
+   * (`useBracket`): the engine hands it the brackets of the document's form
+   */
+  bracket?: Bracket
   [key: string]: unknown
 }
 
@@ -484,6 +491,12 @@ function TableView (props: TableViewProps) {
 
   Object.assign(self, {props, state, headers, itemsSorted, renderHeader, renderItem, renderItemsVertical, renderItemData})
 
+  // The fields of rows that collapse, and of rows that go with the items, go when nothing mounts or changes that would
+  // bracket their going: the table brackets them itself, and those of rows that expand or come. Rows are keyed by
+  // their index, so rows go only when there are fewer. A page's rows go when another page's mount, which bracket them.
+  useBracket(props.bracket, state.items)
+  useBracket(props.bracket, itemsSorted.length)
+
   if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
   const {
     fill, className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical, colGroup, usePagination,
@@ -494,7 +507,7 @@ function TableView (props: TableViewProps) {
     // carried over: a dead entry in the list whose whole job is keeping props off the DOM
     // reads as protection that is not there.
     itemsExpanded: _6, translate: _7, additionalCellsStyles: _8, rowsPerPage: _9,
-    fieldArrayName: _10,
+    fieldArrayName: _10, bracket: _11,
     ...rest
   } = props
   const {activePage, rowsPerPage} = state

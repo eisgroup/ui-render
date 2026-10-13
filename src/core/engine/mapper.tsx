@@ -321,11 +321,11 @@ const RenderComponent = ({
             }
             if (props.name != null && props.title == null) props.title = props.name
             if (items.length) props.children = () => items.map(Render)
-            return <Expand {...props}/>
+            return <Expand {...props} bracket={registrationsOf(form)}/>
         }
 
         case FIELD.TYPE.EXPAND_LIST: {
-            return <ExpandList items={_data} {...props}/>
+            return <ExpandList items={_data} {...props} bracket={registrationsOf(form)}/>
         }
 
         case FIELD.TYPE.BUTTON: {
@@ -527,6 +527,7 @@ const RenderComponent = ({
                 fieldArrayName={fieldArrayName}
                 {...table}
                 translate={translate}
+                bracket={registrationsOf(form)}
             />
         }
 
