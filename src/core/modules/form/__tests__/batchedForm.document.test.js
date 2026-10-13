@@ -88,6 +88,29 @@ describe('a document whose fields registered silently as it mounted', () => {
         expect(heard[heard.length - 1]).toBe(true)
     })
 
+    it('tells them it is valid when a popup that holds an empty required field closes', async () => {
+        const meta = {
+            view: 'Col',
+            items: [
+                { view: 'Input', name: 'title', label: 'Title' },
+                { view: 'Button', children: 'Open details', onClick: { name: 'popupOpen', args: ['details'] } },
+                { view: 'Popup', id: 'details', title: 'Details', items: [{ view: 'Input', name: 'detail', label: 'Detail', validate: 'required' }] },
+            ],
+        }
+        render(<UIRender meta={meta} data={{ title: 'x', detail: '' }} initialValues={{ title: 'x', detail: '' }} onSubmit={() => {}} />)
+        const { form, heard } = formHolding('title')
+        expect(heard).toEqual([true])
+
+        await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'Open details' })) })
+        expect(screen.getByLabelText('Detail')).toBeTruthy()
+        expect(heard[heard.length - 1]).toBe(false)
+
+        await act(async () => { fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' }) })
+        expect(screen.queryByRole('dialog')).toBeNull()
+        expect(form.getState().valid).toBe(true)
+        expect(heard[heard.length - 1]).toBe(true)
+    })
+
     it('tells them so when the row with the empty required field is removed', () => {
         jest.useFakeTimers()
         try {

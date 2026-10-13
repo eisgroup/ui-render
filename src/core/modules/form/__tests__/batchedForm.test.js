@@ -134,6 +134,25 @@ describe('createBatchedForm', () => {
         expect(values[values.length - 1]).toEqual({})
     })
 
+    it('registers a probe without its validator while validation runs, so that it validates nothing', () => {
+        const { form } = setUp({ a: '', b: '' })
+        const validated = { count: 0 }
+        const counted = () => value => {
+            validated.count += 1
+            return value ? undefined : 'Required'
+        }
+        form.registerField('a', () => undefined, { error: true }, { getValidator: counted })
+        validated.count = 0
+        const heard = []
+        // react-final-form's probe in a field's first render: registered silently, and unregistered at once.
+        form.registerField('b', state => { heard.push(state) }, { error: true, valid: true }, { silent: true, getValidator: counted })()
+        expect(validated.count).toBe(0)
+        expect(heard).toEqual([expect.objectContaining({ error: undefined, valid: true })])
+        // The field's own registration validates, and finds the error.
+        form.registerField('b', () => undefined, { error: true }, { getValidator: counted })
+        expect(form.getFieldState('b').error).toBe('Required')
+    })
+
     it('leaves a registration that asks to be silent as it is, and its unregistering', () => {
         const { form } = setUp({ a: 1 })
         const batches = { count: 0 }

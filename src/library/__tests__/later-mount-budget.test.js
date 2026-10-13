@@ -13,9 +13,13 @@
  *  - a tab switch to the table computed 21008 field states and ran 5252 validators, and one away from it 20200 and
  *    5050;
  *  - a `showIf` that showed it computed 21524 and ran 5252, and one that hid it 21322 and 5151.
- * Now a switch to it computes 12 states per field, its own two as it registers and the rest in the passes when the
- * bracket closes, and validates each field twice; a switch away has no field left to tell. Hiding it validates each
- * field once, from the `form.change` that hides it: a field changed with no `validateFields` validates them all.
+ * Now a switch to it computes 11 states per field, and validates each field once, when the bracket closes; a switch
+ * away has no field left to tell. Hiding it validates each field once, from the `form.change` that hides it: a field
+ * changed with no `validateFields` validates them all.
+ *
+ * Until 2026-10-14, react-final-form's probe in each field's first render validated every field registered then,
+ * before any bracket opened. Here that was each field once more. Beside 100 other required fields, it was 101 times
+ * each new field: showing the table there ran 10502 validators, 10201 of them from the probes.
  *
  * React 16 runs a removed component's effect cleanups during the commit, before any layout effect, so no bracket is
  * open when the table's fields go: there they still go one by one, and cost what they did. A number here that falls
@@ -87,7 +91,7 @@ describe('fields that mount after the first render: a 50-row table of two fields
         const fields = formHolding('rows').getRegisteredFields()
         const away = await costOf(() => fireEvent.click(screen.getByRole('tab', { name: 'A' })))
         expect(fields).toHaveLength(2 * ROWS + 1)
-        expect(to).toEqual({ computed: 12 * fields.length, validated: 2 * fields.length })
+        expect(to).toEqual({ computed: 11 * fields.length, validated: fields.length })
         expect(away).toEqual(REMOVALS_BRACKETED ? { computed: 0, validated: 0 } : { computed: 20200, validated: 5050 })
         expect(screen.queryByRole('textbox', { name: /Note/ })).toBeNull()
     })
@@ -100,8 +104,45 @@ describe('fields that mount after the first render: a 50-row table of two fields
         const fields = form.getRegisteredFields()
         const hidden = await costOf(() => form.change('show', 'no'))
         expect(fields).toHaveLength(2 * ROWS + 2)
-        expect(shown).toEqual({ computed: 1431, validated: 2 * (fields.length - 1) })
+        expect(shown).toEqual({ computed: 1330, validated: fields.length - 1 })
         expect(hidden).toEqual(REMOVALS_BRACKETED ? { computed: 822, validated: fields.length - 1 } : { computed: 21322, validated: 5151 })
         expect(form.getRegisteredFields()).toEqual(['show'])
+    })
+
+    it('costs a `showIf` that shows it beside 100 other required fields a pass over all of them, not one per new field', async () => {
+        const others = Array.from({ length: 100 }, (_, i) => ({ view: 'Input', name: `other${i}`, validate: 'required' }))
+        const meta = { view: 'Col', items: [{ view: 'Input', name: 'show', label: 'Show' }, ...others, { ...table, showIf: { name: 'show', equal: 'yes' } }] }
+        const values = { ...data(), ...Object.fromEntries(others.map(({ name }) => [name, 'x'])) }
+        render(<UIRender meta={meta} data={values} initialValues={values} onSubmit={() => {}} />)
+        const form = formHolding('show')
+        const shown = await costOf(() => form.change('show', 'yes'))
+        expect(form.getRegisteredFields()).toHaveLength(2 * ROWS + 102)
+        // One pass over the fields already there for the change, and one over them all when the bracket closes.
+        expect(shown).toEqual({ computed: 3230, validated: 301 })
+    })
+
+    it('costs a popup that opens it beside 100 other required fields, and closes again, a pass over them each', async () => {
+        // Nothing mounts when a popup closes, whose node would bracket its fields going: the dialog brackets them.
+        const others = Array.from({ length: 100 }, (_, i) => ({ view: 'Input', name: `other${i}`, validate: 'required' }))
+        const meta = {
+            view: 'Col',
+            items: [
+                { view: 'Button', children: 'Open details', onClick: { name: 'popupOpen', args: ['details'] } },
+                ...others,
+                { view: 'Popup', id: 'details', title: 'Details', items: [table] },
+            ],
+        }
+        const values = { ...data(), ...Object.fromEntries(others.map(({ name }) => [name, 'x'])) }
+        render(<UIRender meta={meta} data={values} initialValues={values} onSubmit={() => {}} />)
+        const form = formHolding('other0')
+        const opened = await costOf(() => fireEvent.click(screen.getByRole('button', { name: 'Open details' })))
+        expect(form.getRegisteredFields()).toHaveLength(2 * ROWS + 101)
+        const closed = await costOf(() => fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' }))
+        expect(screen.queryByRole('dialog')).toBeNull()
+        expect(form.getRegisteredFields()).toHaveLength(100)
+        expect(opened).toEqual({ computed: 2212, validated: 201 })
+        // Once its fields have gone, every field left is validated and told once. Before, each field that went
+        // validated and told every field left, 15150 validators in all, which React 16 still does.
+        expect(closed).toEqual(REMOVALS_BRACKETED ? { computed: 600, validated: 100 } : { computed: 60800, validated: 15150 })
     })
 })

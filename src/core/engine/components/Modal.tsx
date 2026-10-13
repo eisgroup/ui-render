@@ -1,5 +1,6 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { registrationsOf } from '../../modules/form/batchedForm'
 import Button from '../../components/Button'
 import Text from '../../components/Text'
 import View from '../../components/View'
@@ -7,6 +8,10 @@ import { l, localiseTranslation } from '../../utils'
 import { _ } from '../../utils/translations'
 import { AppContext } from '../../contexts'
 import type { Translate } from '../../utils/_envs'
+
+// A layout effect in a browser. On the server, where no effect runs, an effect: React 16 and 17 warn about a layout
+// effect there.
+const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 localiseTranslation({
     CANCEL: {
@@ -70,7 +75,7 @@ let popups = 0
  * of the document constructed LAST: on a page with two documents, the first one's popup showed
  * the second one's language around its own content.
  */
-const Modal = ({ translate }: { translate?: Translate }) => {
+const Modal = ({ translate, form }: { translate?: Translate, form?: unknown }) => {
     const popup = useContext(AppContext)
     const { isOpen, title, content, togglePopupState } = popup
     const activeClass = isOpen ? ' active' : ''
@@ -94,6 +99,12 @@ const Modal = ({ translate }: { translate?: Translate }) => {
             if (opener && opener !== document.body && opener.isConnected) opener.focus()
         }
     }, [isOpen])
+
+    // A popup's fields go when it closes, and nothing mounts then whose node would bracket their going: the
+    // dialog brackets what opening and closing it registers and unregisters, in `form`, the document's, which
+    // its content's fields register with (`registrationsOf`, `modules/form/batchedForm.ts`).
+    useBeforePaintEffect(() => { registrationsOf(form)?.begin() }, [form, isOpen])
+    useEffect(() => { registrationsOf(form)?.end() }, [form, isOpen])
 
     const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         // A control inside that used the key claims it: an open listbox closes on Escape and says so.
