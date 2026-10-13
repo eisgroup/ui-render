@@ -12,10 +12,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
   # A PR's newer push supersedes the run before it. A push to master does not: each squash-merged commit gets a
-  # finished run, which is what a bisect needs. Until 2026-10-09 master's runs cancelled each other as well, and four
-  # PRs merged within a minute left three master commits with no completed run.
+  # finished run, which is what a bisect needs, so each push to master has a group of its own, named by its commit.
+  # One group for the branch was not enough even with `cancel-in-progress` off. A group holds one running run and one
+  # pending one, and GitHub cancels the pending run when another arrives. On 2026-10-12 three PRs merged within two
+  # minutes, and the middle commit, 5cb6bf69 (#215), got no run. Until 2026-10-09 master's runs also cancelled the
+  # one in progress, and four PRs merged within a minute left three master commits with no completed run.
+  group: ci-${{ github.workflow }}-${{ github.event_name == 'push' && github.sha || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
