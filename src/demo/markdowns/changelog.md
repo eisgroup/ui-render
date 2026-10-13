@@ -866,6 +866,11 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A number shown with decimals is formatted by a formatter made once.** `renderFloat`, which the
+  `Currency`, `Float`, `Double5` and `Percent` renderers and `Counter` show numbers through, formatted
+  each fraction with `toLocaleString` and its options: a new `Intl.NumberFormat` for every value, 9.65 µs
+  a value in Node 24's V8. It keeps one formatter for each count of decimals now, at 0.24 µs a value, and
+  shows exactly what it showed.
 - **Fields that mount after the first render no longer tell each other of themselves one by one.** A tab
   switch, a `showIf` that flips, a popup that opens or a row that expands registered its fields one at a
   time, and each one published the state of every field before it and, with a validator, validated them
