@@ -9,7 +9,7 @@
  * valid. Removing a row is not such a case, and is checked too: the removal changes the form's values, and its
  * listeners hear the state that follows from that.
  */
-import React from 'react'
+import React, { Suspense } from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import UIRender from '../../../../library/main'
 import { formsStorage } from '../../../state/formRegistry'
@@ -109,6 +109,42 @@ describe('a document whose fields registered silently as it mounted', () => {
         expect(screen.queryByRole('dialog')).toBeNull()
         expect(form.getState().valid).toBe(true)
         expect(heard[heard.length - 1]).toBe(true)
+    })
+
+    it('keeps validating after a Suspense boundary hides the document and shows it again', async () => {
+        // React 18 and 19 run the layout effects of what such a boundary shows again, and not its passive ones: a
+        // node's bracket opened then, and nothing closed it (`useBracket`), so the form never validated again. React
+        // 16 and 17 run neither, and pass either way.
+        let pending = null
+        const Later = () => {
+            if (pending) throw pending.promise
+            return null
+        }
+        const meta = { view: 'Input', name: 'note', label: 'Note', validate: 'required' }
+        const page = () => (
+            <Suspense fallback={<p>Loading</p>}>
+                <UIRender meta={meta} data={{ note: 'x' }} initialValues={{ note: 'x' }} onSubmit={() => {}} />
+                <Later />
+            </Suspense>
+        )
+        const { rerender } = render(page())
+        const { form, heard } = formHolding('note')
+        let release
+        pending = { promise: new Promise(resolve => { release = resolve }) }
+        act(() => { rerender(page()) })
+        expect(screen.getByText('Loading')).toBeTruthy()
+
+        pending = null
+        await act(async () => {
+            release()
+            // React 16 and 17 retry the boundary from the scheduler, which act does not drive there.
+            await new Promise(resolve => setTimeout(resolve, 50))
+        })
+        expect(screen.queryByText('Loading')).toBeNull()
+
+        act(() => { form.change('note', '') })
+        expect(form.getState().valid).toBe(false)
+        expect(heard[heard.length - 1]).toBe(false)
     })
 
     it('tells them so when the row with the empty required field is removed', () => {

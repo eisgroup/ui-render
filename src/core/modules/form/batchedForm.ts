@@ -3,8 +3,9 @@ import type { Config, FormApi } from 'final-form'
 
 /**
  * Brackets around a burst of fields registering and unregistering, which an engine node opens in its layout effect
- * and closes in its passive effect (`RenderComponent` in `engine/mapper.tsx`), on mount and when its `showIf` flips.
- * Brackets nest. The outermost one pauses validation when nothing else has, and resumes it when it closes.
+ * and closes in its passive effect (`RenderComponent` in `engine/mapper.tsx`), on mount and when its `showIf` flips,
+ * through `useBracket` (`components/useBracket.ts`). Brackets nest. The outermost one pauses validation when nothing
+ * else has, and resumes it when it closes.
  */
 export type Registrations = { begin: () => void, end: () => void }
 
