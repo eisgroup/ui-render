@@ -7,17 +7,21 @@
  * thread's busy time, the DevTools protocol's `TaskDuration`, over the mount and over each action, an action being
  * what a user does and everything it sets off until the page is idle again (the 300 ms typing debounce included).
  * Each action runs five times, and the median is what counts. After its runs, an edit or a pick checks that its field
- * shows the last run's value, so that an action that stops changing anything fails instead of measuring nothing. Each
- * test writes its document's numbers to PERF_OUT before it checks them, so that a document over its ceilings still
- * reports, and so do the ones after it. scripts/test-packed-perf.js runs it (`npm run test:perf`) and prints them; CI
- * runs it in the advisory `browser-perf` job, which reports and never blocks.
+ * shows the last run's value, so that an action that stops changing anything fails instead of measuring nothing. A tab
+ * switch waits for the table's field to be there, and a switch back for it to be gone. Each test writes its
+ * document's numbers to PERF_OUT before it checks them, so that a document over its ceilings still reports, and so do
+ * the ones after it. scripts/test-packed-perf.js runs it (`npm run test:perf`) and prints them; CI runs it in the
+ * advisory `browser-perf` job, which reports and never blocks.
  *
- * Each ceiling below is about three times what the current code costs on an Apple M4, and at least 100 ms for an
- * action, so that a slower runner passes and so does an action's own noise. That flags a cascade the size of the one
- * #209 to #213 removed from the period table: an edit there cost 374 ms before them and 67 ms after, and a first blur
- * 187 ms and 41 ms. It does not flag a small one. Elsewhere in these documents the same changes moved an action's cost
- * by less than 15 ms, and the jsdom contracts, which count renders, guard those. Lower a ceiling when a number falls
- * for good.
+ * Each ceiling below is two and a half to three times what GitHub's runner measured for the code it was set with, and
+ * at least 100 ms for an action, so that a slower run passes and so does an action's own noise. The runner took about
+ * three times as long as an Apple M4 to mount a document (2026-10-13), and the M4 measured one build about twice as
+ * long one day as the next, so the ceilings follow the runner's numbers, which the `browser-perf` job prints. The tab
+ * switch's were set from the M4's at that ratio, before the runner had measured them.
+ *
+ * A ceiling flags a cascade the size of the one #209 to #213 removed from the period table, whose edit cost five
+ * times what it costs now. It does not flag a smaller one: the jsdom contracts, which count renders and field states,
+ * guard those. Lower a ceiling when a number falls for good.
  */
 const fs = require('fs')
 const { test, expect } = require('@playwright/test')
@@ -29,9 +33,10 @@ const results = {}
 /** Milliseconds of main-thread work, per action, that no current scenario should come near. */
 const CEILINGS = {
     periods: { mount: 2000, edit: 210, blur: 130 },
-    selectTable: { mount: 1400, edit: 100, blur: 100 },
+    selectTable: { mount: 820, edit: 100, blur: 100 },
     selectForm: { mount: 340, pick: 100, edit: 100 },
-    numberTable: { mount: 1100, edit: 100 },
+    numberTable: { mount: 780, edit: 100 },
+    tabs: { mount: 330, switch: 720, back: 360 },
 }
 
 const median = values => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)]
@@ -133,6 +138,32 @@ test('a form of 100 named Selects: a pick, and an edit of its text field', async
     await record('selectForm', 'edit', measure, i => other.fill(`edited ${i}`))
     await expect(other).toHaveValue(`edited ${REPEAT - 1}`)
     check('selectForm')
+})
+
+test('two tabs, the second a 200-row table: a switch to it, and back', async ({ page }) => {
+    const { mount, measure } = await open(page, 'tabs')
+    results.tabs = { mount: { median: mount, runs: [mount] } }
+    const rows = page.getByRole('tab', { name: 'Rows', exact: true })
+    const summary = page.getByRole('tab', { name: 'Summary', exact: true })
+    const cell = page.locator('input[name="rows[1].note"]')
+    // A switch waits for the table's field to be there, and a switch back for it to be gone.
+    const switches = []
+    const backs = []
+    for (let i = 0; i < REPEAT; i++) {
+        switches.push(await measure(async () => {
+            await rows.click()
+            await cell.waitFor()
+        }))
+        backs.push(await measure(async () => {
+            await summary.click()
+            await cell.waitFor({ state: 'detached' })
+        }))
+    }
+    results.tabs.switch = { median: median(switches), runs: switches }
+    results.tabs.back = { median: median(backs), runs: backs }
+    await rows.click()
+    await expect(cell).toHaveValue('note 1')
+    check('tabs')
 })
 
 test('a 200-row table of bounded number fields: an edit of a number', async ({ page }) => {

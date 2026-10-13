@@ -871,6 +871,14 @@ Nothing to do for these:
   each fraction with `toLocaleString` and its options: a new `Intl.NumberFormat` for every value, 9.65 µs
   a value in Node 24's V8. It keeps one formatter for each count of decimals now, at 0.24 µs a value, and
   shows exactly what it showed.
+- **Fields that mount after the first render no longer tell each other of themselves one by one.** A tab
+  switch, a `showIf` that flips, a popup that opens or a row that expands registered its fields one at a
+  time, and each one published the state of every field before it and, with a validator, validated them
+  all. Each field that went did the same. In Chromium, a switch to a tab holding a 200-row table of two
+  fields per row took 241 ms, and a switch away from it 232 ms. An engine node now brackets the fields
+  that mount with it, and those that go in the same commit, as a tab's old content does, or with its own
+  `showIf`, and the form tells every field once: 78 ms and 39 ms. Fields that go on their own, as a closed
+  popup's do, still go one by one, and so do all that go on React 16.
 - **A document's fields no longer tell each other of themselves one by one as it mounts.** While a
   document's first render registered its fields, each one published the state of every field registered
   before it, so the mount's cost grew with the square of its fields: about half of the mount of a 200-row

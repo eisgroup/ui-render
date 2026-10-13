@@ -30,9 +30,9 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 - `npm run test:pack` — `build-lib`, then the packaging budgets (`test:pack:budget`, `scripts/check-package-budget.js`) and a server-render smoke of the packed tarball (`test:pack:consumer`). `npm run test:pack:peers` repeats the smoke on React 16.14, 17.0.2 and 19.3.0, from the same fixtures as the jest legs. `npm run test:pack:browser` (after `build-lib`) loads the packed tarball in Chromium: a throwaway host (`scripts/packed-workspace.js`, shared with the server smoke) bundles it with its own React beside the published `static/all.css`, and `e2e/packed/tarball.packed.js` (`playwright.packed.config.js`) checks that it renders, responds and styles only its own wrapper; CI runs it in the `browser` job. `npm run test:pack:browser:peers` runs the same page on React 16.14, 17 and 19 from the jest legs' fixtures, mounting through `ReactDOM.render` on 16 and 17 as 0.34.x hosts do; CI runs it there too
 - `npm run test:perf` (after `build-lib`) — what the packed tarball's documents cost in Chromium.
   - **What it measures:** the main thread's busy time (the DevTools protocol's `TaskDuration`) for a mount, and the
-    median of five runs of each action (an edit, a blur, a pick), in four documents of
-    `scripts/fixtures/packed-perf-entry.js`. The documents include a 200-row period table and a 200-row table with a
-    Select column.
+    median of five runs of each action (an edit, a blur, a pick, a tab switch), in five documents of
+    `scripts/fixtures/packed-perf-entry.js`. The documents include a 200-row period table, a 200-row table with a
+    Select column, and two tabs whose second holds a 200-row table.
   - **Where it runs:** in the same throwaway host as `test:pack:browser`, under `playwright.perf.config.js`, with
     `e2e/perf/scenarios.perf.js`. It prints the medians and writes them to `test-results-perf/perf-results.json`.
   - **Comparing versions:** `--tarball=<file>` measures a tarball packed elsewhere, such as another commit's, so two
@@ -121,11 +121,22 @@ A new wrapper, mapping or copy made for a field's prop must be kept the same way
 `src/library/__tests__/*-budget.test.js` contracts count the renders that a mount, an edit and a blur cost. A number
 that falls is progress; one that rises is a regression.
 
-A mount has a cost besides renders: every field registers with final-form. The form a document renders comes from
-`createBatchedForm` (`modules/form/batchedForm.ts`), which `<Form>` is handed as `form`. While react-final-form holds
-validation back for the first render, a field registers silently, and every field hears once when validation resumes.
-Until 2026-10-13 each registration published the state of every field before it, so a document of n fields computed
-about n²/2 field states as it mounted. `form-mount-budget.test.js` counts them.
+A mount has a cost besides renders: every field registers with final-form. Until 2026-10-13, each registration
+published the state of every field before it and, once validation ran, validated them all, and each unregistration
+did the same. A burst of n fields cost about n²/2 of each, on the first render, a tab switch, a `showIf` that flips
+or a popup.
+
+The form a document renders now comes from `createBatchedForm` (`modules/form/batchedForm.ts`), which `<Form>` is
+handed as `form`. While validation is paused, a field registers silently, and every field hears once when validation
+resumes. Two things pause it:
+- react-final-form, for the first render;
+- the brackets an engine node opens in a layout effect and closes in a passive effect, on mount and when its
+  `showIf` flips (`registrationsOf`, used by `RenderComponent` in `mapper.tsx`). Fields register in passive effects,
+  in between.
+
+A field that goes while validation is paused tells nothing until it resumes. React 16 runs a removed component's
+effect cleanups before any layout effect, so there a field that goes is not bracketed. `form-mount-budget.test.js`
+and `later-mount-budget.test.js` count what the bursts cost.
 
 To find what a cost comes from, count before naming the cause: wrap the suspected function or component with
 `jest.mock` and count calls per action. Comparing timings with and without a feature does not name a cause.

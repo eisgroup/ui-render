@@ -1,4 +1,5 @@
-import React, { memo, useContext } from 'react'
+import React, { memo, useContext, useEffect, useLayoutEffect } from 'react'
+import { registrationsOf } from '../modules/form/batchedForm'
 import AutoSave from '../modules/form/views/AutoSave'
 import { FIELD } from '../modules/variables'
 import { cn } from '../components'
@@ -37,6 +38,10 @@ import Tabs from './components/Tabs'
 import Data from './Data'
 import { AppContext, TableColumnsContext } from '../contexts'
 import type { RenderErrorReport } from './Render'
+
+// A layout effect in a browser. On the server, where no effect runs, an effect: React 16 and 17 warn about a layout
+// effect there.
+const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 /**
  * A meta node's attributes, as the mapper receives them from `Render`. `any`, deliberately: they are
@@ -236,7 +241,15 @@ const RenderComponent = ({
     // components that read `Active.translate` as a prop default).
     const translate = (instance && instance.translate) || Active.translate
     /* General showIf logic — the whole decision lives in `showIf.ts`, testable on its own. */
-    if (!shouldRender({ showIf, data, _data, relativeData, relativePath, relativeIndex, instance })) return null
+    const shown = shouldRender({ showIf, data, _data, relativeData, relativePath, relativeIndex, instance })
+    // The fields that mount below this node, or that go when it hides, register and unregister as one burst, which
+    // the form tells every field of once (`registrationsOf`, `modules/form/batchedForm.ts`). Its layout effect runs
+    // before any field below registers, in the passive effects, and its passive effect after they all have. When a
+    // tab, a step or a page changes, the new content's nodes bracket the old content's fields going as well: those
+    // go in the same commit's passive effects, which come between.
+    useBeforePaintEffect(() => { registrationsOf(form)?.begin() }, [form, shown])
+    useEffect(() => { registrationsOf(form)?.end() }, [form, shown])
+    if (!shown) return null
 
     switch (view) {
         case FIELD.TYPE.DATA:
