@@ -10,6 +10,19 @@ const ROWS = 200
 const range = count => Array.from({ length: count }, (_, i) => i)
 const records = [{ id: 'a', name: 'A' }, { id: 'b', name: 'B' }, { id: 'c', name: 'C' }]
 const choices = [{ text: 'A', value: 'a' }, { text: 'B', value: 'b' }, { text: 'C', value: 'c' }]
+// A 200-row table of a required text column and a bounded number column, and its rows.
+const rowsTable = {
+    view: 'Table',
+    name: 'rows',
+    headers: [
+        { id: 'note', label: 'Note', renderCell: { view: 'Input', name: 'note', validate: 'required' } },
+        { id: 'qty', label: 'Qty', renderCell: { view: 'Input', type: 'number', name: 'qty', min: 0, max: 100000 } },
+    ],
+}
+const tableRows = () => ({ rows: range(ROWS).map(i => ({ note: `note ${i}`, qty: i })) })
+// 200 required fields beside it, which every field that comes or goes used to validate, each.
+const besideFields = range(ROWS).map(i => ({ view: 'Input', name: `field${i}`, label: `Field ${i}`, validate: 'required' }))
+const besideValues = () => Object.fromEntries(range(ROWS).map(i => [`field${i}`, `value ${i}`]))
 const periodField = name => ({
     view: 'Input',
     name,
@@ -57,27 +70,41 @@ const SCENARIOS = {
         },
         data: { other: 'text', ...Object.fromEntries(range(100).map(i => [`choice${i}`, 'a'])) },
     }),
-    // Two tabs, the second a 200-row table of a required text column and a bounded number column, which mounts and
-    // unmounts with its tab.
+    // Two tabs, the second the 200-row table, which mounts and unmounts with its tab.
     tabs: () => ({
         meta: {
             view: 'Tabs',
             items: [
                 { tab: 'Summary', content: { view: 'Text', children: 'Nothing to edit here' } },
-                {
-                    tab: 'Rows',
-                    content: {
-                        view: 'Table',
-                        name: 'rows',
-                        headers: [
-                            { id: 'note', label: 'Note', renderCell: { view: 'Input', name: 'note', validate: 'required' } },
-                            { id: 'qty', label: 'Qty', renderCell: { view: 'Input', type: 'number', name: 'qty', min: 0, max: 100000 } },
-                        ],
-                    },
-                },
+                { tab: 'Rows', content: rowsTable },
             ],
         },
-        data: { rows: range(ROWS).map(i => ({ note: `note ${i}`, qty: i })) },
+        data: tableRows(),
+    }),
+    // The 200-row table, which a `showIf` shows and hides, beside 200 required fields.
+    reveal: () => ({
+        meta: {
+            view: 'Col',
+            items: [{ view: 'Input', name: 'show', label: 'Show' }, ...besideFields, { ...rowsTable, showIf: { name: 'show', equal: 'yes' } }],
+        },
+        data: { show: 'no', ...besideValues(), ...tableRows() },
+    }),
+    // A popup that holds the 200-row table, beside 200 required fields.
+    popup: () => ({
+        meta: {
+            view: 'Col',
+            items: [
+                { view: 'Button', children: 'Open rows', onClick: { name: 'popupOpen', args: ['rows'] } },
+                ...besideFields,
+                { view: 'Popup', id: 'rows', title: 'Rows', items: [rowsTable] },
+            ],
+        },
+        data: { ...besideValues(), ...tableRows() },
+    }),
+    // An Expand that holds the 200-row table, beside 200 required fields. Its content goes when its animation ends.
+    expand: () => ({
+        meta: { view: 'Col', items: [...besideFields, { view: 'Expand', title: 'Rows', items: [rowsTable] }] },
+        data: { ...besideValues(), ...tableRows() },
     }),
     // A column of number fields with bounds, beside a text column.
     numberTable: () => ({

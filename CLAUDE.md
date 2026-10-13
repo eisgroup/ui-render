@@ -30,9 +30,10 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 - `npm run test:pack` — `build-lib`, then the packaging budgets (`test:pack:budget`, `scripts/check-package-budget.js`) and a server-render smoke of the packed tarball (`test:pack:consumer`). `npm run test:pack:peers` repeats the smoke on React 16.14, 17.0.2 and 19.3.0, from the same fixtures as the jest legs. `npm run test:pack:browser` (after `build-lib`) loads the packed tarball in Chromium: a throwaway host (`scripts/packed-workspace.js`, shared with the server smoke) bundles it with its own React beside the published `static/all.css`, and `e2e/packed/tarball.packed.js` (`playwright.packed.config.js`) checks that it renders, responds and styles only its own wrapper; CI runs it in the `browser` job. `npm run test:pack:browser:peers` runs the same page on React 16.14, 17 and 19 from the jest legs' fixtures, mounting through `ReactDOM.render` on 16 and 17 as 0.34.x hosts do; CI runs it there too
 - `npm run test:perf` (after `build-lib`) — what the packed tarball's documents cost in Chromium.
   - **What it measures:** the main thread's busy time (the DevTools protocol's `TaskDuration`) for a mount, and the
-    median of five runs of each action (an edit, a blur, a pick, a tab switch), in five documents of
-    `scripts/fixtures/packed-perf-entry.js`. The documents include a 200-row period table, a 200-row table with a
-    Select column, and two tabs whose second holds a 200-row table.
+    median of five runs of each action (an edit, a blur, a pick, a tab switch, a table shown and taken away), in eight
+    documents of `scripts/fixtures/packed-perf-entry.js`. The documents include a 200-row period table, a 200-row
+    table with a Select column, two tabs whose second holds a 200-row table, and that table beside 200 required
+    fields, shown by a `showIf`, in a popup, or in an Expand.
   - **Where it runs:** in the same throwaway host as `test:pack:browser`, under `playwright.perf.config.js`, with
     `e2e/perf/scenarios.perf.js`. It prints the medians and writes them to `test-results-perf/perf-results.json`.
   - **Comparing versions:** `--tarball=<file>` measures a tarball packed elsewhere, such as another commit's, so two
