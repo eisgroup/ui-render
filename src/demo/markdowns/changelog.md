@@ -866,6 +866,12 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A document's fields no longer tell each other of themselves one by one as it mounts.** While a
+  document's first render registered its fields, each one published the state of every field registered
+  before it, so the mount's cost grew with the square of its fields: about half of the mount of a 200-row
+  table of two fields per row, in Chromium. The fields register quietly now, and every field and the form
+  hear once, when the form starts validating. Such a table mounts in 88 ms instead of 179, and a 200-row
+  period table in 239 instead of 336. A field that goes later still tells the form's listeners, as it did.
 - **A pick in a Select, or a document's first edit, no longer renders every field again.** A document
   built its whole meta anew for every new state, and two writes made that common: a named Select with no
   `onChange` of its own writes its pick into the state, and the first edit writes `canSave` there. Every

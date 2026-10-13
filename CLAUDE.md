@@ -121,6 +121,12 @@ A new wrapper, mapping or copy made for a field's prop must be kept the same way
 `src/library/__tests__/*-budget.test.js` contracts count the renders that a mount, an edit and a blur cost. A number
 that falls is progress; one that rises is a regression.
 
+A mount has a cost besides renders: every field registers with final-form. The form a document renders comes from
+`createBatchedForm` (`modules/form/batchedForm.ts`), which `<Form>` is handed as `form`. While react-final-form holds
+validation back for the first render, a field registers silently, and every field hears once when validation resumes.
+Until 2026-10-13 each registration published the state of every field before it, so a document of n fields computed
+about n²/2 field states as it mounted. `form-mount-budget.test.js` counts them.
+
 To find what a cost comes from, count before naming the cause: wrap the suspected function or component with
 `jest.mock` and count calls per action. Comparing timings with and without a feature does not name a cause.
 

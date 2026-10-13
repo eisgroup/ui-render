@@ -13,6 +13,7 @@ import { hasObjectValue, objChanges, set } from '../../utils/object'
 import { _ } from '../../utils/translations'
 import { baselineOf, clearErrorsFor, clearTouchedFor, formsStorage, hasBaseline, setBaseline, touchedFor } from '../../state/formRegistry'
 import arrayMutators from 'final-form-arrays'
+import { createBatchedForm } from './batchedForm'
 
 // The header of `validationErrors`, registered beside its one reader, as the components register
 // theirs. It used to live in `form/translations.js`, which nothing imported, so the header read
@@ -530,10 +531,21 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
       // reset to them, below. Told any earlier, it would compare them with the old form state and
       // publish a `canSave` it takes back one render later.
       const [applied, setApplied] = useState(adopted)
+      // The final-form instance `<Form>` renders, made here so that the first render's fields hear of each other
+      // once rather than once per field (`createBatchedForm`). `<Form>` makes none of its own when handed one,
+      // so it is made from the options `<Form>` would have made it from; their later changes reach it as before.
+      const [instance] = useState(() => {
+        const {debug, destroyOnUnregister, keepDirtyOnReinitialize, validate, validateOnBlur} = formOptions
+        return createBatchedForm<Values>({
+          debug, destroyOnUnregister, initialValues: adopted, keepDirtyOnReinitialize, mutators: MUTATORS, onSubmit,
+          validate, validateOnBlur,
+        })
+      })
 
-      // One subscription at a time, to the form the wrapper keeps (`renderForm`).
+      // The subscription to the form the wrapper keeps (`renderForm`): made by its first render, and made again
+      // by the effect below when StrictMode's cleanup has ended it. The form is the same instance for the
+      // wrapper's lifetime (`instance`), so no subscription is ever made over another.
       const subscribeTo = (form: FormApi) => {
-        if (own.unsubscribe) own.unsubscribe()
         own.subscribedForm = form
         own.unsubscribe = form.subscribe(
           formSubscription(form),
@@ -554,10 +566,10 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
         // the object. Keyed per render, each render started them empty: a field's remembered touch, the
         // reason that registry exists, was gone by the next render, so a touched field remounted by a tab
         // switch lost its error. Every one of those objects shares the instance's methods, and the `reset`
-        // each adds resets that same instance. The instance is told apart by those methods, not kept as
-        // the first object seen: StrictMode's discarded first render builds an instance of its own, and
-        // the committed instance's object must replace it.
-        if (!own.form || own.form.getState !== rendered.getState) own.form = rendered
+        // each adds resets that same instance. The instance is the wrapper's own (`instance`), so the first
+        // object stays right. Until 2026-10-13 react-final-form made it, and StrictMode's discarded first
+        // render made one of its own, whose object the committed instance's had to replace.
+        if (!own.form) own.form = rendered
         const form = own.form
         handle.form = form
         handle.handleSubmit = handleSubmit
@@ -627,10 +639,8 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
       return <Form
         onSubmit={onSubmit}
         {...formOptions}
-        mutators={{
-          ...arrayMutators,
-          setFieldTouched
-        }}
+        form={instance}
+        mutators={MUTATORS}
         initialValues={adopted}
         render={renderForm}
       />
@@ -664,6 +674,10 @@ const setFieldTouched = (args: [string, boolean], state: MutableState<Values>) =
     field.touched = touched
   }
 }
+
+// One object, which the form is made with and `<Form>` is handed: react-final-form compares it by identity, and
+// sets a new one on the form on every render it differs.
+const MUTATORS = {...arrayMutators, setFieldTouched}
 
 /**
  * Mixin to add Class Attributes and Methods commonly used with forms

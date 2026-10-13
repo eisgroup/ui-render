@@ -2286,6 +2286,11 @@ Postponed 2026-09-30 (§9.7-F4), and no longer a React 19 prerequisite. **Postpo
   - **And:** one type error, at the `setFieldTouched` mutator of `form/utils.tsx`; `submit()` returns a promise where it returned `undefined`, which nothing reads; and the form stack's own production build grows by 6.8 KB minified, 2.2 KB gzipped.
 - ☑ **Guards, 2026-10-07.** Four tests pass on 6.5.9 and fail on 7.0.1: the three of `engine/__tests__/UIRender.remount.test.js` (a tab switch, a field that first mounts after an edit made elsewhere, a table's remount) and `AutoSave.test.js`'s StrictMode test, which passes on React 16 and 17, whose StrictMode runs each effect once. With them the suite fails 10 tests on 7.0.1 under React 18 and 19, and 8 under 16.14 and 17.
 - ☐ All four packages bumped in **one PR**, on React 18, form-flow + contract suites green. **Waits for a `react-final-form` release with #1096.** If it cannot wait, measured 2026-10-07: a placeholder registration for each field and for a table's FieldArray, held from before the paint until the field's own registration has run, whenever the value differs from the initial one. The audit's first version registered only when final-form held no state for the name, so it missed a field that mounts in the commit that unmounts the last field of its name, the second guard. With the placeholder, the suite on 7.0.1 under React 18 fails 6 tests, and none of them is a field losing its value: the three render and `translate` counts, `inputToggle`'s snapshot, and the two StrictMode saves, which need AutoSave to take its baseline on FormSpy's first call rather than through the debounce.
+  - **Also to check on the bump, since 2026-10-13:** `createBatchedForm` (`modules/form/batchedForm.ts`) leans on final-form's
+    registration. A `silent` registration publishes only its own field's state, its unregistering is silent too, and
+    `pauseValidation()` holds back the form's listeners. final-form 5.0.1's source keeps all three, read that day; run
+    `batchedForm.test.js`, `batchedForm.document.test.js` and `form-mount-budget.test.js` on the bump. Checked the same
+    day: npm's `latest` for `react-final-form` is still 7.0.1, and #1096 is still open.
 
 ### TS migration (§9.6)
 
