@@ -866,6 +866,14 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A date field mounts its calendar picker when it is needed.** A closed rc-picker cost about as much as the rest
+  of a 200-row period table. A date field now renders what rc-picker renders for a closed field, the same element
+  with the same attributes, until it comes within 200 px of the viewport, a pointer comes over it, or it takes the
+  focus. Then rc-picker takes its place, and a click or a key reaches it as before. In Chromium, the 200-row period
+  table mounts in 150 ms instead of 251. The pickers of the rows a user scrolls to mount as they come near, so a
+  scroll through the whole table does the work its mount no longer does, a few milliseconds a frame. Where there is
+  no IntersectionObserver, as in jsdom, the picker mounts before the first paint, so a host's tests see rc-picker as
+  before.
 - **Fields that go on their own cost the form one pass.** An Expand's content goes when its collapse's animation
   ends, and a table's rows go when they collapse or when a host's data has fewer of them. Nothing mounts then whose
   node would bracket the fields that go, so each one validated every field left, as a closed popup's did. `Expand`

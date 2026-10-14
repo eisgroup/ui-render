@@ -150,6 +150,15 @@ react-final-form takes the first notification after it as the probe's state.
 
 `form-mount-budget.test.js` and `later-mount-budget.test.js` count what the bursts cost.
 
+A date field mounts rc-picker only when it is needed (`InputDate.tsx`, 2026-10-14): a closed rc-picker cost about as
+much as the rest of a 200-row period table. Until the field comes within 200 px of the viewport, a pointer comes over
+it, or it takes the focus, it renders a stand-in: the element rc-picker renders for a closed field, read from the same
+props. `InputDate.stand-in.test.js` compares the two for a set of props, so an rc-picker update that changes its closed
+DOM fails there. Where there is no IntersectionObserver, which is jsdom and the server, the picker mounts before the
+first paint, so jsdom tests see rc-picker. `e2e/interactive-views.pw.js` drives the stand-in in Chromium with an
+observer that never reports. The work moves rather than goes: a scroll through all 200 rows of that table mounts the
+pickers of the rows it passes, measured at about 255 ms against 66 on an unminified build, a few milliseconds a frame.
+
 To find what a cost comes from, count before naming the cause: wrap the suspected function or component with
 `jest.mock` and count calls per action. Comparing timings with and without a feature does not name a cause.
 

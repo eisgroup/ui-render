@@ -74,6 +74,8 @@ const VIEW_COVERAGE = {
             t(IV, '[I] a click on a day writes it in the display format and closes the calendar'),
             t(IV, '[I] a click outside closes the calendar and leaves the value alone'),
             t(IV, '[I] a date field inside it opens its calendar above it, where a click picks a day'),
+            t(IV, '[I] a click opens the calendar, the field keeps the focus, and a day picked is written'),
+            t(IV, '[I] a focus hands the field the focus, and a date typed there is written'),
         ],
         gap: 'text and number inputs: native controls with nothing positioned or layered; typing, formatting and validation are state, and jsdom covers them',
     },

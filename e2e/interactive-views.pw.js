@@ -106,6 +106,42 @@ test.describe('date input: the calendar overlay', () => {
     })
 })
 
+test.describe('date input: a field whose picker has not mounted', () => {
+    // A date field renders a stand-in for rc-picker until it comes near the viewport (`InputDate.tsx`, 2026-10-14).
+    // With an observer that never reports, every field keeps its stand-in, so a press or a focus is the first thing it
+    // meets, and mounts the picker under the pointer or the keyboard.
+    test.beforeEach(async ({ page }) => {
+        await page.addInitScript(() => {
+            window.IntersectionObserver = class { observe () {} unobserve () {} disconnect () {} }
+        })
+    })
+    const field = page => page.locator('#tableForm input[name="dataKind.period[0].startDate"]')
+    const calendar = page => page.locator('.ui-render-picker-dropdown:not(.ui-render-picker-dropdown-hidden)')
+
+    test('[I] a click opens the calendar, the field keeps the focus, and a day picked is written', async ({ page, pageErrors }) => {
+        await openExample(page, 'tableForm')
+        await field(page).click()
+
+        await expect(calendar(page)).toBeVisible()
+        await expect(field(page)).toBeFocused()
+        await calendar(page).locator(`td[title="${DATE_INPUT.PICKED_DAY}"]`).click()
+        await expect(field(page)).toHaveValue(DATE_INPUT.PICKED_VALUE)
+        expect(pageErrors).toEqual([])
+    })
+
+    test('[I] a focus hands the field the focus, and a date typed there is written', async ({ page, pageErrors }) => {
+        await openExample(page, 'tableForm')
+        await field(page).focus()
+
+        await expect(field(page)).toBeFocused()
+        await page.keyboard.press('ControlOrMeta+A')
+        await page.keyboard.type(DATE_INPUT.TYPED_VALUE)
+        await page.keyboard.press('Tab')
+        await expect(field(page)).toHaveValue(DATE_INPUT.TYPED_VALUE)
+        expect(pageErrors).toEqual([])
+    })
+})
+
 test.describe('popup: the modal a `popupOpen` action opens', () => {
     const trigger = page => page.locator('#popupContent').getByRole('button', { name: 'Open Popup 1' })
     const popup = page => page.locator('.app__popup')
