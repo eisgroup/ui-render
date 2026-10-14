@@ -7,8 +7,9 @@
  * thread's busy time, the DevTools protocol's `TaskDuration`, over the mount and over each action, an action being
  * what a user does and everything it sets off until the page is idle again (the 300 ms typing debounce included).
  * Each action runs five times, and the median is what counts. After its runs, an edit or a pick checks that its field
- * shows the last run's value, so that an action that stops changing anything fails instead of measuring nothing. A tab
- * switch waits for the table's field to be there, and a switch back for it to be gone. Each test writes its
+ * shows the last run's value, so that an action that stops changing anything fails instead of measuring nothing. An
+ * action that brings a table, a tab switch or a `showIf`, a popup or an Expand, waits for the table's field to be there,
+ * and the one that takes it away for it to be gone: a collapse, when its animation ends. Each test writes its
  * document's numbers to PERF_OUT before it checks them, so that a document over its ceilings still reports, and so do
  * the ones after it. scripts/test-packed-perf.js runs it (`npm run test:perf`) and prints them; CI runs it in the
  * advisory `browser-perf` job, which reports and never blocks.
@@ -37,6 +38,9 @@ const CEILINGS = {
     selectForm: { mount: 340, pick: 100, edit: 100 },
     numberTable: { mount: 780, edit: 100 },
     tabs: { mount: 210, switch: 360, back: 100 },
+    reveal: { mount: 270, show: 270, hide: 100 },
+    popup: { mount: 260, open: 340, close: 110 },
+    expand: { mount: 280, expand: 600, collapse: 400 },
 }
 
 const median = values => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)]
@@ -71,6 +75,21 @@ async function record (scenario, name, measure, action) {
     const runs = []
     for (let i = 0; i < REPEAT; i++) runs.push(await measure(() => action(i)))
     results[scenario][name] = { median: median(runs), runs }
+}
+
+/**
+ * Runs `there` and then `back`, REPEAT times, and records the median of what each cost: an action that brings a
+ * table, and the one that takes it away again.
+ */
+async function alternate (scenario, [thereName, backName], measure, there, back) {
+    const theres = []
+    const backs = []
+    for (let i = 0; i < REPEAT; i++) {
+        theres.push(await measure(there))
+        backs.push(await measure(back))
+    }
+    results[scenario][thereName] = { median: median(theres), runs: theres }
+    results[scenario][backName] = { median: median(backs), runs: backs }
 }
 
 /**
@@ -147,23 +166,62 @@ test('two tabs, the second a 200-row table: a switch to it, and back', async ({ 
     const summary = page.getByRole('tab', { name: 'Summary', exact: true })
     const cell = page.locator('input[name="rows[1].note"]')
     // A switch waits for the table's field to be there, and a switch back for it to be gone.
-    const switches = []
-    const backs = []
-    for (let i = 0; i < REPEAT; i++) {
-        switches.push(await measure(async () => {
-            await rows.click()
-            await cell.waitFor()
-        }))
-        backs.push(await measure(async () => {
-            await summary.click()
-            await cell.waitFor({ state: 'detached' })
-        }))
-    }
-    results.tabs.switch = { median: median(switches), runs: switches }
-    results.tabs.back = { median: median(backs), runs: backs }
+    await alternate('tabs', ['switch', 'back'], measure, async () => {
+        await rows.click()
+        await cell.waitFor()
+    }, async () => {
+        await summary.click()
+        await cell.waitFor({ state: 'detached' })
+    })
     await rows.click()
     await expect(cell).toHaveValue('note 1')
     check('tabs')
+})
+
+test('a `showIf` that shows a 200-row table beside 200 required fields, and hides it', async ({ page }) => {
+    const { mount, measure } = await open(page, 'reveal')
+    results.reveal = { mount: { median: mount, runs: [mount] } }
+    const show = page.getByRole('textbox', { name: 'Show', exact: true })
+    const cell = page.locator('input[name="rows[1].note"]')
+    await alternate('reveal', ['show', 'hide'], measure, async () => {
+        await show.fill('yes')
+        await cell.waitFor()
+    }, async () => {
+        await show.fill('no')
+        await cell.waitFor({ state: 'detached' })
+    })
+    check('reveal')
+})
+
+test('a popup that holds a 200-row table beside 200 required fields: opening it, and closing it', async ({ page }) => {
+    const { mount, measure } = await open(page, 'popup')
+    results.popup = { mount: { median: mount, runs: [mount] } }
+    const opener = page.getByRole('button', { name: 'Open rows', exact: true })
+    const cell = page.locator('input[name="rows[1].note"]')
+    await alternate('popup', ['open', 'close'], measure, async () => {
+        await opener.click()
+        await cell.waitFor()
+    }, async () => {
+        await page.getByRole('dialog').press('Escape')
+        await cell.waitFor({ state: 'detached' })
+    })
+    check('popup')
+})
+
+test('an Expand that holds a 200-row table beside 200 required fields: expanding it, and collapsing it', async ({ page }) => {
+    const { mount, measure } = await open(page, 'expand')
+    results.expand = { mount: { median: mount, runs: [mount] } }
+    const title = page.getByRole('button', { name: 'Rows', exact: true })
+    const cell = page.locator('input[name="rows[1].note"]')
+    // A collapse waits for the content to go, when the animation ends.
+    await alternate('expand', ['expand', 'collapse'], measure, async () => {
+        await title.click()
+        await cell.waitFor()
+    }, async () => {
+        await title.click()
+        await cell.waitFor({ state: 'detached' })
+    })
+    check('expand')
 })
 
 test('a 200-row table of bounded number fields: an edit of a number', async ({ page }) => {
