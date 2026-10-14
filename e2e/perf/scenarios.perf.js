@@ -38,10 +38,9 @@ const CEILINGS = {
     selectForm: { mount: 340, pick: 100, edit: 100 },
     numberTable: { mount: 780, edit: 100 },
     tabs: { mount: 210, switch: 360, back: 100 },
-    // Estimated from an Apple M4's numbers at the ratios above, until the runner has measured them.
-    reveal: { mount: 460, show: 510, hide: 210 },
-    popup: { mount: 470, open: 530, close: 230 },
-    expand: { mount: 500, expand: 860, collapse: 620 },
+    reveal: { mount: 270, show: 270, hide: 100 },
+    popup: { mount: 260, open: 340, close: 110 },
+    expand: { mount: 280, expand: 600, collapse: 400 },
 }
 
 const median = values => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)]
