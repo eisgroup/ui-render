@@ -1,5 +1,6 @@
 import classNames from '../utils/classNames'
-import React, { useCallback, useContext, useMemo, useRef } from 'react'
+import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import Row from './Row'
 import Text from './Text'
 import View from './View'
@@ -24,6 +25,55 @@ type DatePickerProps = PickerProps<Moment>
  * that converting this file changes nothing at runtime.
  */
 const Picker = PickerJs as React.ComponentType<DatePickerProps & { resize?: boolean } & React.RefAttributes<PickerRef>>
+
+// A layout effect in a browser. On the server, where no effect runs, an effect: React 16 and 17 warn about a layout
+// effect there.
+const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
+
+/**
+ * How far outside the viewport a field mounts its picker, so that one scrolled to is ready when it is reached.
+ */
+const NEAR = '200px'
+
+/** The fields that wait to come near the viewport, and what each then does. One observer watches them all. */
+const waiting = new Map<Element, () => void>()
+let observer: IntersectionObserver | null = null
+
+/** Calls `near` once `element` comes within NEAR of the viewport, and returns what stops the wait. */
+function whenNear (element: Element, near: () => void): () => void {
+    if (!observer) {
+        observer = new IntersectionObserver(entries => {
+            for (const entry of entries) {
+                if (!entry.isIntersecting) continue
+                const call = waiting.get(entry.target)
+                waiting.delete(entry.target)
+                observer!.unobserve(entry.target)
+                if (call) call()
+            }
+        }, {rootMargin: NEAR})
+    }
+    waiting.set(element, near)
+    observer.observe(element)
+    return () => {
+        waiting.delete(element)
+        observer!.unobserve(element)
+    }
+}
+
+/** The props rc-picker copies onto its `<input>` as they are: `role`, `aria-*` and `data-*` (rc-util's `pickAttrs`). */
+function ariaAndData (props: Record<string, unknown>): Record<string, unknown> {
+    const picked: Record<string, unknown> = {}
+    for (const key in props) {
+        if (key === 'role' || key.startsWith('aria-') || key.startsWith('data-')) picked[key] = props[key]
+    }
+    return picked
+}
+
+/**
+ * What mounted a field's picker: coming near the viewport or under a pointer, or a focus or a press while it was not
+ * there yet.
+ */
+type PickerMount = 'near' | 'focus' | 'press'
 
 /** The named props are read here; the rest is passed to rc-picker through ./domProps. */
 export type InputDateProps = {
@@ -113,6 +163,20 @@ const InputDate = ({
     // inside the element its ref hands out.
     const field = useRef<Element | null>(null)
     const onPicker = useCallback((picker: PickerRef | null) => { field.current = picker && picker.nativeElement }, [])
+    const onStandIn = useCallback((element: HTMLDivElement | null) => { field.current = element }, [])
+    // rc-picker cost a closed field about as much as the rest of a 200-row period table did (2026-10-14): a field
+    // renders what rc-picker renders while closed, the stand-in below, until it comes near the viewport. Where there is
+    // no IntersectionObserver, which is the server and jsdom, the picker mounts before the first paint.
+    const [mounted, setMounted] = useState<PickerMount | null>(autofocus ? 'focus' : null)
+    useBeforePaintEffect(() => {
+        if (mounted) return undefined
+        if (typeof IntersectionObserver === 'undefined') {
+            setMounted('near')
+            return undefined
+        }
+        // An assertion, not a guard: the stand-in's ref is attached before its parent's layout effects run.
+        return whenNear(field.current!, () => setMounted(current => current || 'near'))
+    }, [mounted])
     const ownId = useOwnId(idGiven ? undefined : derivedId, field)
     const id = idGiven || ownId
     if (!label && title) props.title = translate(title)
@@ -157,6 +221,15 @@ const InputDate = ({
         onChange(changedDate ? changedDate.format('YYYY-MM-DD') : null)
     }
 
+    // DOM boundary (see ./domProps): what reaches rc-picker, which forwards unknown props to its own <input>, so this
+    // is a form-control boundary: ENGINE_PROPS only.
+    const passed = omitProps(props, ENGINE_PROPS) as Record<string, unknown>
+    // The props rc-picker is handed below, before its own, and so what the stand-in renders from.
+    const given: Record<string, unknown> = {
+        name, id, className: 'ui-render-picker', disabled, 'aria-describedby': idHelp, placeholder: translate(placeholder),
+        ...passed,
+    }
+
     return (
         <View
             className={classNames('input--wrapper', className, {
@@ -168,30 +241,70 @@ const InputDate = ({
                 {label && <Label htmlFor={id} title={translate(title)}>{translate(label)}</Label>}
             </Row>
             <Row className={classNames('input', {icon, lefty, error, info, unit})}>
-                <Picker
-                    ref={onPicker}
-                    name={name}
-                    id={id}
-                    prefixCls={'ui-render-picker'}
-                    className={'ui-render-picker'}
-                    disabled={disabled}
-                    resize={resize}
-                    aria-describedby={idHelp}
-                    placeholder={translate(placeholder)}
-                    generateConfig={generateConfig}
-                    // DOM boundary (see ./domProps): the spread reaches rc-picker, which forwards unknown props to its own <input>, so this is
-    // a form-control boundary: ENGINE_PROPS only.
-                    {...omitProps(props, ENGINE_PROPS)}
-                    value={value}
-                    allowClear={false}
-                    locale={enUs}
-                    picker='date'
-                    format={[dateFormat, 'YYYY-MM-DD']}
-                    onChange={onDateChanged}
-                    onCalendarChange={onSelect}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                />
+                {mounted ? (
+                    <Picker
+                        ref={onPicker}
+                        name={name}
+                        id={id}
+                        prefixCls={'ui-render-picker'}
+                        className={'ui-render-picker'}
+                        disabled={disabled}
+                        resize={resize}
+                        aria-describedby={idHelp}
+                        placeholder={translate(placeholder)}
+                        generateConfig={generateConfig}
+                        {...passed}
+                        // Mounted by a focus or a press on the stand-in: it takes the focus, and a press opens it.
+                        {...(mounted !== 'near' && {autoFocus: true})}
+                        {...(mounted === 'press' && {defaultOpen: true})}
+                        value={value}
+                        allowClear={false}
+                        locale={enUs}
+                        picker='date'
+                        format={[dateFormat, 'YYYY-MM-DD']}
+                        onChange={onDateChanged}
+                        onCalendarChange={onSelect}
+                        onFocus={onFocus}
+                        onBlur={onBlur}
+                    />
+                ) : (
+                    // The stand-in: what rc-picker renders for a closed field, attribute for attribute, read from the same
+                    // props (`InputDate.stand-in.test.js`). It has rc-picker's elements, and none of its behaviour.
+                    <div
+                        ref={onStandIn}
+                        className={classNames('ui-render-picker', {'ui-render-picker-disabled': given.disabled}, given.className as string)}
+                        onMouseEnter={given.onMouseEnter as React.MouseEventHandler<HTMLDivElement> | undefined}
+                        onMouseLeave={given.onMouseLeave as React.MouseEventHandler<HTMLDivElement> | undefined}
+                        // A pointer comes over a field before it presses it, a touch or a pen as it touches: the picker
+                        // mounts then, at once, so that the press is rc-picker's own. A press that came first (a pointer
+                        // that has not moved since the field rendered under it) mounts it open and focused instead.
+                        onPointerEnter={() => flushSync(() => setMounted(current => current || 'near'))}
+                        onPointerDown={() => setMounted(current => current || 'press')}
+                    >
+                        <div className="ui-render-picker-input">
+                            <input
+                                aria-invalid={false}
+                                autoComplete="off"
+                                {...ariaAndData(given)}
+                                readOnly={given.inputReadOnly as boolean | undefined}
+                                required={given.required as boolean | undefined}
+                                name={given.name as string | undefined}
+                                {...(given.autoComplete !== undefined && {autoComplete: given.autoComplete as string})}
+                                // rc-picker's width, in characters: the format's, and at least 10, and 2 more.
+                                size={Math.max(10, dateFormat.length) + 2}
+                                id={given.id as string | undefined}
+                                // rc-picker's own text: the first format, in its locale, whatever moment's global one is.
+                                value={value ? generateConfig.locale.format(enUs.locale, value, dateFormat) : ''}
+                                placeholder={given.placeholder as string | undefined}
+                                disabled={given.disabled as boolean | undefined}
+                                tabIndex={given.tabIndex as number | undefined}
+                                onFocus={() => setMounted('focus')}
+                                // Nothing types here: a focus mounts the picker first.
+                                onChange={() => undefined}
+                            />
+                        </div>
+                    </div>
+                )}
             </Row>
             {idHelp &&
                 <View id={idHelp} className='field-help'>

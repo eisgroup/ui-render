@@ -514,6 +514,8 @@ const DATE_INPUT = {
     INITIAL_VALUE: '01-01-2022',
     PICKED_DAY: '2022-01-15',
     PICKED_VALUE: '01-15-2022',
+    /** [I] A date typed in the display format, which the field keeps. */
+    TYPED_VALUE: '02-03-2022',
 }
 
 /**
