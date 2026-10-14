@@ -133,7 +133,9 @@ resumes. Two things pause it:
 - the brackets an engine node opens in a layout effect and closes in a passive effect, on mount and when its
   `showIf` flips (`registrationsOf`, used by `RenderComponent` in `mapper.tsx`). Fields register in passive effects,
   in between. `Modal` brackets its popup's fields the same way as it opens and closes, since nothing mounts when a
-  popup closes.
+  popup closes. Both open and close them through `useBracket` (`components/useBracket.ts`), which opens none when a
+  Suspense boundary shows a component again: React 18 and 19 run its layout effects then, and not its passive ones,
+  so nothing would close it, and the form would stay paused.
 
 A field that goes while validation is paused tells nothing until it resumes. React 16 runs a removed component's
 effect cleanups before any layout effect, so there a field that goes is not bracketed.
