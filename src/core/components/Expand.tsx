@@ -5,6 +5,8 @@ import AnimateHeight from './AnimateHeight'
 import Icon from './Icon'
 import { STYLE } from './styles'
 import Text from './Text'
+import { useBracket } from './useBracket'
+import type { Bracket } from './useBracket'
 import View from './View'
 
 /** What `onClick` is told on every change: the new state, and which `Expand` it was. */
@@ -39,6 +41,11 @@ export type ExpandProps = {
   renderLabel?: (title: React.ReactNode) => React.ReactNode
   /** Argument to pass to 'onClick' callback as `index` */
   index?: string | number
+  /**
+   * Opened before the content mounts or goes, and closed after (`useBracket`): the engine hands it the brackets of
+   * the document's form, so that the fields of the content register, or unregister, as one burst
+   */
+  bracket?: Bracket
   [key: string]: unknown
 }
 
@@ -100,6 +107,7 @@ function Expand (props: ExpandProps) {
     iconClosed = 'chevron-right',
     iconOpened = 'chevron-down',
     renderLabel,
+    bracket,
     ...rest
   } = props
   const [state, setState] = useState<ExpandState>(() => ({
@@ -142,6 +150,9 @@ function Expand (props: ExpandProps) {
   const {expanded, changing} = state
   const hasContent = children != null
   const shown = hasContent && (expanded || changing)
+  // The content goes a `duration` after a collapse, from the timer above, when nothing else mounts or changes that
+  // would bracket its fields going: so the Expand brackets them itself, and those that come when it expands.
+  useBracket(bracket, shown)
   // A render function's content is built when it is first shown, and kept while `children` is the same,
   // however often it is collapsed and shown again: the function is called once (`Expand.lifecycle.test.js`).
   // A ref held it until 2026-10-08. It is state now, stored by the render that builds it, which then runs

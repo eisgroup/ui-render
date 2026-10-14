@@ -866,6 +866,12 @@ Nothing to do for these:
 
 #### Fixes
 
+- **Fields that go on their own cost the form one pass.** An Expand's content goes when its collapse's animation
+  ends, and a table's rows go when they collapse or when a host's data has fewer of them. Nothing mounts then whose
+  node would bracket the fields that go, so each one validated every field left, as a closed popup's did. `Expand`
+  and the table bracket them now. In Chromium, collapsing an Expand that holds a 200-row table beside 200 required
+  fields takes 124 ms instead of 535: 8 to 11 ms of it is script, and the rest is the frames of the animation. On
+  React 16 these fields still go one by one.
 - **Fields that mount or go later cost the form one pass in two more cases.** react-final-form's probe of a
   field's first render validated every field in the form while validation ran, once for each new field: in
   Chromium, showing a 200-row table beside 200 required fields took 153 ms, and takes 98. A popup's fields
