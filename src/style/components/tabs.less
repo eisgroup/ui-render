@@ -13,6 +13,28 @@
   &:extend(.padding-top all);
 }
 
+// A field's message in the tab bar (`childrenBeforeTabs`, `childrenAfterTabs`) takes no room in the
+// bar's row. It did, so the row grew as a message came and went: the tabs, which the row stretches to
+// its height, grew and shrank with it, and a label centred beside the field moved. The row makes the
+// room below instead, while a message shows, so that the bar's `overflow: auto` does not clip it.
+.tabs__items {
+  .input--wrapper {
+    position: relative;
+  }
+
+  .field-help {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    line-height: 1; // what `@input-help-height` measures, whatever line height the host gives the widget
+    white-space: nowrap;
+  }
+
+  > :has(.field-help) {
+    padding-bottom: @input-help-height;
+  }
+}
+
 .tabs__item {
   &:extend(.padding-h);
   &:extend(.padding-v-small);

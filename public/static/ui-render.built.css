@@ -3010,6 +3010,19 @@
   content: "";
   pointer-events: none;
 }
+.ui-render .tabs__items .input--wrapper {
+  position: relative;
+}
+.ui-render .tabs__items .field-help {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ui-render .tabs__items > :has(.field-help) {
+  padding-bottom: 1.875rem;
+}
 .ui-render .tabs__item {
   line-height: 1.1875rem;
   border-bottom: 1px solid #d9d9d9;

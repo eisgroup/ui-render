@@ -20,6 +20,8 @@
 @input-option-swatch-size: @size-icon-large;
 // Floating Label Calculation
 @input-help-size-ratio: 1;
+@input-help-font-size: size(round(px(@input-font-size) * @input-help-size-ratio));
+@input-help-height: @input-help-font-size + 2 * @padding-smaller; // one line of `.input__field-help` at `line-height: 1`
 @input-label-size-default-ratio: 1; // shown as placeholder
 @input-label-size-ratio: 12/14; // minimized at the top
 @input-label-line-height: 1.3;
@@ -802,7 +804,7 @@ div.select {
 
 /* Input Helper Info */
 .input__field-help {
-  font-size: size(round(px(@input-font-size) * @input-help-size-ratio));
+  font-size: @input-help-font-size;
   padding: @padding-smaller @input-padding-h-value;
   opacity: 0;
 

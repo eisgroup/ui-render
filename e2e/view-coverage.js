@@ -76,8 +76,9 @@ const VIEW_COVERAGE = {
             t(IV, '[I] a date field inside it opens its calendar above it, where a click picks a day'),
             t(IV, '[I] a click opens the calendar, the field keeps the focus, and a day picked is written'),
             t(IV, '[I] a focus hands the field the focus, and a date typed there is written'),
+            t(IV, '[I] a field in the tab bar shows its message in full, and neither the tabs nor the label beside it move'),
         ],
-        gap: 'text and number inputs: native controls with nothing positioned or layered; typing, formatting and validation are state, and jsdom covers them',
+        gap: 'text and number inputs outside a tab bar: native controls with nothing positioned or layered; typing, formatting and validation are state, and jsdom covers them',
     },
     Label: { kind: 'passive', why: 'a `<label>`; activating its control is the browser\'s own behaviour' },
     List: { kind: 'passive', why: 'renders the node data through `renderItem`' },
@@ -127,7 +128,10 @@ const VIEW_COVERAGE = {
     },
     Tabs: {
         kind: 'interactive',
-        browser: [t(KB, '[I] a tab bar is a tablist; an arrow moves focus to the next tab, selects it, and the focus ring paints')],
+        browser: [
+            t(KB, '[I] a tab bar is a tablist; an arrow moves focus to the next tab, selects it, and the focus ring paints'),
+            t(IV, '[I] a field in the tab bar shows its message in full, and neither the tabs nor the label beside it move'),
+        ],
     },
     Text: { kind: 'passive', why: 'text' },
     Title: { kind: 'passive', why: 'a heading' },
