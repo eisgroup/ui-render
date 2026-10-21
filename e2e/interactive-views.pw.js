@@ -1,7 +1,7 @@
 /**
  * THE VIEWS A USER ACTS ON THAT NO OTHER SPEC DRIVES — date input, popup, slider, toggle, checkbox,
- * dropdown by pointer, table sorting and pages, progress steps. Added 2026-10-06 with the view map,
- * `e2e/view-coverage.js`.
+ * dropdown by pointer, table sorting and pages, progress steps, a field in a tab bar. Added 2026-10-06
+ * with the view map, `e2e/view-coverage.js`.
  * =============================================================================================
  *
  * Before this file the browser leg drove the tooltip, the dropdown's keyboard, tabs, one Expand
@@ -17,7 +17,7 @@
  * calendar above the popup only by the grace of the shell's animation, was fixed the same day.
  */
 const { test, expect, rectOf, isWithin, topmostAt, activeElement } = require('./fixtures')
-const { DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, PROGRESS_STEPS } = require('./reference')
+const { DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, PROGRESS_STEPS, TAB_BAR_FIELD } = require('./reference')
 
 const openExample = async (page, id) => {
     await page.goto(`/examples#${id}`)
@@ -408,5 +408,58 @@ test.describe('progress steps', () => {
         await expect(step(PROGRESS_STEPS.CLICKED)).toHaveClass(/\bactive\b/)
         await expect(steps.locator('.tabs__content')).toHaveText(PROGRESS_STEPS.CLICKED_CONTENT)
         await expect.poll(filled).toEqual(PROGRESS_STEPS.BARS_FILLED_AFTER_CLICK)
+    })
+})
+
+test.describe('tabs: a field in the tab bar', () => {
+    // No example puts a field in a tab bar, so the demo page renders one: it renders the data and meta files it is given.
+    const meta = barClasses => ({
+        view: 'Tabs',
+        buttoned: true,
+        classNameTabs: barClasses,
+        childrenBeforeTabs: {
+            view: 'HorizontalLayout',
+            styles: 'middle',
+            items: [
+                { view: 'Text', label: TAB_BAR_FIELD.LABEL },
+                { view: 'Space' },
+                { view: 'Input', name: 'value', label: TAB_BAR_FIELD.FIELD, validate: 'required' },
+            ],
+        },
+        items: [
+            { tab: 'Overview', content: { view: 'Text', label: 'Overview content' } },
+            { tab: TAB_BAR_FIELD.TAB, content: { view: 'Text', label: 'Details content' } },
+        ],
+    })
+    const upload = (page, kind, json) => page.locator(`.test-${kind} input[type="file"]`)
+        .setInputFiles({ name: `${kind}.json`, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(json)) })
+
+    test('[I] a field in the tab bar shows its message in full, and neither the tabs nor the label beside it move', async ({ page, pageErrors }) => {
+        for (const barClasses of TAB_BAR_FIELD.BAR_CLASSES) {
+            await page.goto('/demo')
+            await upload(page, 'data', {})
+            await upload(page, 'meta', meta(barClasses))
+            const bar = page.locator('.tabs.buttoned .tabs__items')
+            const field = bar.getByRole('textbox', { name: TAB_BAR_FIELD.FIELD })
+            const message = bar.locator('.field-help')
+            const placeOfNeighbours = async () => ({
+                label: await rectOf(bar.getByText(TAB_BAR_FIELD.LABEL, { exact: true })),
+                tab: await rectOf(bar.getByRole('tab', { name: TAB_BAR_FIELD.TAB })),
+            })
+
+            await field.fill('1')
+            await field.blur()
+            await expect(message).toHaveCount(0)
+            const withValue = await placeOfNeighbours()
+
+            await field.fill('')
+            await field.blur()
+            await expect(message).toHaveText(TAB_BAR_FIELD.MESSAGE)
+            const barCase = `bar classes "${barClasses}"`
+            expect(await placeOfNeighbours(), `${barCase}: the message moves nothing beside the field`).toEqual(withValue)
+            expect(isWithin(await rectOf(message), await rectOf(bar)), `${barCase}: the bar does not clip it`).toBe(true)
+            expect(await hitsOwnCentre(page, message, '.field-help'), `${barCase}: nothing paints over it`).toBe(true)
+        }
+        expect(pageErrors).toEqual([])
     })
 })

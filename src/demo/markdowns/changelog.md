@@ -866,6 +866,11 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A field's message in a tab bar no longer moves the tabs.** A field in `childrenBeforeTabs` or
+  `childrenAfterTabs` showed its validation message in the bar's row, so the row grew while the message showed:
+  the tabs, which the row stretches to its height, grew with it, and a label centred beside the field moved down
+  by half the message. The message now takes no room in the row, and the row makes room for it below while it
+  shows, so the tabs keep their size and the label its place. The bar still grows by the message, as it did.
 - **A date field mounts its calendar picker when it is needed.** A closed rc-picker cost about as much as the rest
   of a 200-row period table. A date field now renders what rc-picker renders for a closed field, the same element
   with the same attributes, until it comes within 200 px of the viewport, a pointer comes over it, or it takes the

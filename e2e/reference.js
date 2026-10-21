@@ -632,7 +632,24 @@ const PROGRESS_STEPS = {
     BARS_FILLED_AFTER_CLICK: [true, true, false],
 }
 
+/**
+ * A required field in a tab bar's `childrenBeforeTabs`, beside a label the bar centres, on the demo page.
+ * [I] since 2026-10-21. The field's message took room in the field, so the bar's row grew while it showed:
+ * the tabs, which the row stretches to its height, grew with it, and the label moved down by half the
+ * message. Now the message takes no room there, and the row makes room for it below while it shows. That
+ * room matters to a bar with no padding of its own, whose `overflow: auto` clipped a message that only
+ * overlapped it (measured with the room taken out).
+ */
+const TAB_BAR_FIELD = {
+    LABEL: 'FILTER BY',
+    FIELD: 'Value',
+    TAB: 'Details',
+    MESSAGE: 'Required',
+    /** The bar's own classes: padded, as the demo's tab bars are, and not padded at all. */
+    BAR_CLASSES: ['padding-largest', ''],
+}
+
 module.exports = {
     BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, INLINE, WIDGET, TOUCH, KEYBOARD, DROPDOWN,
-    DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, PROGRESS_STEPS,
+    DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, PROGRESS_STEPS, TAB_BAR_FIELD,
 }
