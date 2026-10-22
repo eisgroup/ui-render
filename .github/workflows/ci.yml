@@ -266,16 +266,22 @@ jobs:
       # `--only-shell` would cut that to ~196 MB, and is deliberately NOT used: a CI/local browser
       # split is exactly the kind of difference that makes a browser gate unreproducible, and the
       # full install is also what `--headed`/`--ui` debugging needs.
+      # The key also names the runner's OS release (`ubuntu26.04`): Playwright downloads a build of its
+      # browsers for each Ubuntu release, and WebKit's links against that release's ICU. On 2026-10-22
+      # `ubuntu-latest` became 26.04, a key without the release restored the WebKit built for 24.04, and
+      # it could not load `libicudata.so.74`: every WebKit test failed at launch.
       - name: Resolve the Playwright version
         id: playwright
-        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+          echo "os=$(. /etc/os-release && echo "$ID$VERSION_ID")" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.os }}-${{ steps.playwright.outputs.version }}
 
       # The cache restores browser BINARIES, never the apt packages they link against, so the
       # cache-hit path still needs `install-deps`.
@@ -353,14 +359,16 @@ jobs:
 
       - name: Resolve the Playwright version
         id: playwright
-        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+          echo "os=$(. /etc/os-release && echo "$ID$VERSION_ID")" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-engines-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          key: playwright-engines-${{ runner.os }}-${{ steps.playwright.outputs.os }}-${{ steps.playwright.outputs.version }}
 
       - name: Install Firefox, WebKit and their system dependencies
         if: steps.playwright-cache.outputs.cache-hit != 'true'
@@ -408,14 +416,16 @@ jobs:
 
       - name: Resolve the Playwright version
         id: playwright
-        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+          echo "os=$(. /etc/os-release && echo "$ID$VERSION_ID")" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.os }}-${{ steps.playwright.outputs.version }}
 
       - name: Install Chromium and its system dependencies
         if: steps.playwright-cache.outputs.cache-hit != 'true'

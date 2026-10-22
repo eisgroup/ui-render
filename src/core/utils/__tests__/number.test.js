@@ -6,6 +6,9 @@ import {
   toOrdinal,
   round,
   toPercent,
+  numberLocale,
+  numberSeparators,
+  withDecimalSeparator,
 } from '../number'
 
 describe('isNumeric', () => {
@@ -113,5 +116,54 @@ describe('toPercent', () => {
     })
     it('returns empty string for non-numeric input', () => {
         expect(toPercent('x')).toBe('')
+    })
+})
+
+describe('numberLocale', () => {
+    it('reads a language tag as Intl writes it', () => {
+        expect(numberLocale('de-DE')).toBe('de-DE')
+        expect(numberLocale('EN-us')).toBe('en-US')
+    })
+    it('reads a Java-style tag with an underscore as the same tag', () => {
+        expect(numberLocale('de_DE')).toBe('de-DE')
+    })
+    it('reads no tag, and a value that is no language tag, as none', () => {
+        expect(numberLocale(undefined)).toBeUndefined()
+        expect(numberLocale('')).toBeUndefined()
+        expect(numberLocale(42)).toBeUndefined()
+        expect(numberLocale('not a tag')).toBeUndefined()
+    })
+})
+
+describe('numberSeparators', () => {
+    it('reads the decimal and grouping separators a locale writes', () => {
+        expect(numberSeparators('de-DE')).toEqual({ decimal: ',', group: '.' })
+        expect(numberSeparators('en-US')).toEqual({ decimal: '.', group: ',' })
+        // A no-break space, U+00A0, groups the digits in Russian.
+        expect(numberSeparators('ru-RU')).toEqual({ decimal: ',', group: ' ' })
+    })
+    it('reads them once for each locale', () => {
+        expect(numberSeparators('de-DE')).toBe(numberSeparators('de-DE'))
+    })
+    it('reads no grouping for a locale that writes no group, and a point when it writes no decimal', () => {
+        // A locale no other test reads, so that the parts below are the ones read for it.
+        const parts = jest.spyOn(Intl.NumberFormat.prototype, 'formatToParts')
+            .mockReturnValueOnce([{ type: 'integer', value: '12345' }])
+        try {
+            expect(numberSeparators('fi-FI')).toEqual({ decimal: '.', group: '' })
+        } finally {
+            parts.mockRestore()
+        }
+    })
+})
+
+describe('withDecimalSeparator', () => {
+    it('writes a locale\'s decimal separator for the point, and leaves the rest as it is', () => {
+        expect(withDecimalSeparator('1234.5', 'de-DE')).toBe('1234,5')
+        expect(withDecimalSeparator('12.5%', 'ru-RU')).toBe('12,5%')
+        expect(withDecimalSeparator('1234', 'de-DE')).toBe('1234')
+    })
+    it('leaves the point without a locale', () => {
+        expect(withDecimalSeparator('1234.5')).toBe('1234.5')
     })
 })

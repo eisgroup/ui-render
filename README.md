@@ -216,12 +216,12 @@ To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
 ## Renderer configuration (consumer)
 
-Three props configure how values are formatted and how the shell is labelled. They are
+Four props configure how values are formatted and how the shell is labelled. They are
 published to every component the renderer draws, so a nested `Table` cell honours them
 exactly like a top-level field:
 
 ```jsx
-<UIRender data={data} meta={meta} dateFormat="DD/MM/YYYY" currency="EUR" language="fr" />
+<UIRender data={data} meta={meta} dateFormat="DD/MM/YYYY" currency="EUR" language="fr" locale="fr-FR" />
 ```
 
 | Prop | Default | Effect |
@@ -229,11 +229,23 @@ exactly like a top-level field:
 | `dateFormat` | `MM-DD-YYYY` | [`moment` format tokens](https://momentjs.com/docs/#/displaying/format/) for every date the renderer **displays** (an ISO value in a `Text` node, a `render*: "Date"` value) and **edits** (the date picker's display and parsing) |
 | `currency` | `USD` | published as a CSS class on the renderer's shell (`.app.EUR`), for currency-specific styling |
 | `language` | `en` | published as a CSS class on the renderer's shell (`.app.lang--fr`) |
+| `locale` | none: the browser's | the [language tag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument) numbers are **displayed** in: their decimal and grouping separators. A Java-style `de_DE` is read as `de-DE` |
 
-Each is merged, not replaced: passing only `dateFormat` leaves `currency` and `language` at
-their defaults. `currency` is **not** `meta.currencyCode` — that one selects the currency symbol
+Each is merged, not replaced: passing only `dateFormat` leaves the others at their defaults.
+`currency` is **not** `meta.currencyCode` — that one selects the currency symbol
 the `Currency` value renderer prints, in either form (`"Currency"` or `{"name": "Currency"}`), and is
 declared in meta rather than passed as a prop.
+
+`locale` is where a host passes its user's number format. With `locale="de-DE"`:
+
+- the `Currency`, `Float`, `Double5` and `Percent` renderers, a `Counter`, a pie chart's values and a
+  slider's labels write `1.234,5`;
+- a number shown as it is, by a `Text` node or in short form (a pie chart's total, an upload's size limit),
+  takes the decimal separator only: `1234,5`, `1,2k`.
+
+Number **inputs** take and show a point either way. Without `locale`, or with a value that is no language
+tag, numbers show as they did before the prop existed: the renderers in the browser's locale, every other
+number with a point.
 
 > These props used to be accepted and then silently ignored — every date rendered as
 > `MM-DD-YYYY` whatever was passed. If your application has been passing `dateFormat` and

@@ -44,6 +44,7 @@ const props: UIRenderProps<QuoteData> = {
     dateFormat: 'MM-DD-YYYY',
     currency: 'USD',
     language: 'en',
+    locale: 'de-DE',
     onError: (report: UIRenderErrorReport) => [report.path, report.message, report.errorInfo.componentStack],
     validateMeta: (problems: UIRenderMetaProblem[]) => problems.map(problem => problem.path),
     className: 'quote-render',

@@ -64,3 +64,30 @@ describe('renders numeric formatting contracts', () => {
     }
   })
 })
+
+describe('renderFloat in the locale a host configured', () => {
+  const inLocale = (locale, ui) => (
+    <ConfigContext.Provider value={{...initialConfigState, locale}}>{ui}</ConfigContext.Provider>
+  )
+
+  it('writes the locale\'s grouping and decimal separators, the fraction still faded', () => {
+    const { container } = render(inLocale('de-DE', renderFloat(1234567.5, 2)))
+
+    expect(container.firstChild).toHaveTextContent('1.234.567,50')
+    expect(container.querySelector('.fade--quarter')).toHaveTextContent(',50')
+  })
+
+  it('rounds, truncates and pads as without a locale', () => {
+    // Russian groups with a no-break space, U+00A0, which `toHaveTextContent` would read as a space.
+    expect(render(inLocale('ru-RU', renderFloat(1234.75))).container.firstChild.textContent).toBe('1 235')
+    expect(render(inLocale('de-DE', renderFloat(12.349, 2, {truncated: true}))).container.firstChild).toHaveTextContent('12,34')
+    expect(render(inLocale('de-DE', renderFloat(7, 3))).container.firstChild).toHaveTextContent('7,000')
+    expect(render(inLocale('de-DE', renderFloat(-1234.5, 1))).container.firstChild).toHaveTextContent('-1.234,5')
+  })
+
+  it('shows what it showed without one', () => {
+    const { container } = render(inLocale(undefined, renderFloat(1234567.5, 2)))
+
+    expect(container.firstChild).toHaveTextContent(new Intl.NumberFormat().format(1234567) + new Intl.NumberFormat(undefined, {minimumFractionDigits: 2}).format(0.5).slice(1))
+  })
+})

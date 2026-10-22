@@ -141,6 +141,14 @@ Nothing to do for these:
 
 #### Renderer configuration and error reporting
 
+- **New `locale` prop: the language tag the widget shows numbers in.** A host passes its user's
+  number format, `de-DE`, and the `Currency`, `Float`, `Double5` and `Percent` renderers, a
+  `Counter`, a pie chart's values and a slider's labels write their decimal and grouping separators:
+  `1.234,5`. A number shown as it is, by a `Text` node or in short form (a pie chart's total, an
+  upload's size limit), takes its decimal separator. Until now the renderers used the browser's
+  locale and nothing could change it, so a host whose users read a decimal comma could not show
+  one. A Java-style `de_DE` is read as `de-DE`, and a value that is no language tag as none.
+  Without the prop nothing changes. Number inputs take and show a point either way.
 - **The `dateFormat`, `currency` and `language` props now work.** They were accepted and then
   silently dropped: the renderer discarded `dateFormat` on its way down the tree, nothing fed
   the configuration context, and every component fell back to the built-in `MM-DD-YYYY`

@@ -153,6 +153,18 @@ describe('PieChart', () => {
             expect(screen.getByText('12')).toBeInTheDocument()
         })
 
+        it('writes legend values and the total in the configured locale', () => {
+            render(
+                <ConfigContext.Provider value={{ ...initialConfigState, locale: 'de-DE' }}>
+                    <PieChart items={[{ label: 'North', value: 1234.5 }, { label: 'South', value: 0.25 }]} legends />
+                </ConfigContext.Provider>
+            )
+            expect(screen.getByText('1.234,5')).toBeInTheDocument()
+            expect(screen.getByText('0,25')).toBeInTheDocument()
+            // 1234.75 in short form, `shortNumber`'s three digits.
+            expect(screen.getByText('1,23k')).toBeInTheDocument()
+        })
+
         it('wraps in Row layout when legends is object without bottom', () => {
             const { container } = renderPieChart({
                 items: sampleItems,

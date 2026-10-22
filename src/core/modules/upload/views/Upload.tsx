@@ -17,12 +17,13 @@ import {
     isFunction,
     pluralize,
     shortNumber,
-    SIZE_KB
+    SIZE_KB,
+    withDecimalSeparator,
 } from '../../../utils'
 import { _ } from '../translations'
 import { Active } from '../../../utils'
 import type { Translate } from '../../../utils/_envs'
-import { AppContext } from '../../../contexts'
+import { AppContext, useNumberLocale } from '../../../contexts'
 
 // Re-exported: `UploadProps.onChange` hands the handle to the host.
 export type { DropzoneHandle }
@@ -98,6 +99,7 @@ function Upload (props: UploadProps) {
         className, classWrap, hasHeader, round, showTypes = true, title, translate = DEFAULT_TRANSLATE,
     } = props
     const context = useContext(AppContext)
+    const locale = useNumberLocale()
     const [active, setActive] = useState(false)
     const dropzone = useRef<DropzoneHandle | null>(null)
 
@@ -150,7 +152,7 @@ function Upload (props: UploadProps) {
                         content: <Row className="center wrap">
                             <Text className="bold margin-h-smaller">{file.name}</Text>
                             <Text>{_.MUST_BE_UNDER}</Text>
-                            <Text className="bold margin-h-smaller">{shortNumber(maxSize as number, 3, SIZE_KB)}B</Text>
+                            <Text className="bold margin-h-smaller">{withDecimalSeparator(shortNumber(maxSize as number, 3, SIZE_KB), locale)}B</Text>
                         </Row>
                     })
                     return

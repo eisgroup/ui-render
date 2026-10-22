@@ -22,6 +22,16 @@ describe('Text', () => {
         expect(container.querySelector('span')).toHaveTextContent('42')
     })
 
+    it('writes a number with the configured locale\'s decimal separator, and groups no digits', () => {
+        const { container } = renderWithConfig(<Text>{1234.5}</Text>, { locale: 'de-DE' })
+        expect(container.querySelector('span')).toHaveTextContent(/^1234,5$/)
+    })
+
+    it('writes a number with a point without a locale', () => {
+        const { container } = renderWithConfig(<Text>{1234.5}</Text>)
+        expect(container.querySelector('span')).toHaveTextContent(/^1234\.5$/)
+    })
+
     it('renders booleans as Yes/No', () => {
         const { container, rerender } = renderWithConfig(<Text>{true}</Text>)
         expect(container.querySelector('span')).toHaveTextContent('Yes')

@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 
 /**
  * Default configuration, and the shape of the context: `AppProvider` seeds its state
@@ -15,6 +15,8 @@ export type ConfigState = {
     dateFormat: string
     currency: string
     language: string
+    /** The language tag numbers are shown in (`de-DE`). None by default: the renderers use the runtime's. */
+    locale?: string
     setConfig: (config: Partial<Omit<ConfigState, 'setConfig'>>) => void
 }
 
@@ -27,3 +29,9 @@ export const initialConfigState: ConfigState = {
 
 // No default value: outside a provider the context is `undefined`, which `ConfigOverride` falls back from.
 export const ConfigContext = createContext<ConfigState | undefined>(undefined);
+
+/** The `locale` a host configured for numbers, or `undefined` for the runtime's, outside a provider too. */
+export const useNumberLocale = (): string | undefined => {
+    const config = useContext(ConfigContext)
+    return config && config.locale
+}

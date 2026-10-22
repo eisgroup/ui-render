@@ -1,6 +1,7 @@
 import classNames from '../../utils/classNames'
 import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react'
-import { by, pluralize, shortNumber, toAlphaNumId, toList, toListValuesTotal, truncate } from '../../utils'
+import { useNumberLocale } from '../../contexts'
+import { by, pluralize, shortNumber, toAlphaNumId, toList, toListValuesTotal, truncate, withDecimalSeparator } from '../../utils'
 import { renderFloat } from '../renders'
 import Row from '../Row'
 import { STYLE } from '../styles'
@@ -284,9 +285,10 @@ function arcPath (cx: number, cy: number, innerR: number, outerR: number, startA
 // ---------------------------------------------------------------------------
 
 function PieTotal ({ items }: { items: PieDatum[] }) {
+  const locale = useNumberLocale()
   return (
     <>
-      <Text className='h2 no-margin padding-bottom-smaller'>{shortNumber(toListValuesTotal(items))}</Text>
+      <Text className='h2 no-margin padding-bottom-smaller'>{withDecimalSeparator(shortNumber(toListValuesTotal(items)), locale)}</Text>
       <Text>Total</Text>
     </>
   )
@@ -298,6 +300,8 @@ function PieReference ({ data, legends, height }: { data: PieDatum[], legends: P
   const { bottom, columns = 0, background = true } = (legends || {}) as PieChartLegendOptions
   const classes = classNames('app__pie-chart__ref__items padding-small', { background, wrap: columns > 0 })
   const offsetTop = bottom ? { marginTop: height * -0.1 } : undefined
+  const locale = useNumberLocale()
+  const renderReferenceItem = (item: PieDatum) => referenceItem(item, locale)
 
   if (columns > 0) {
     const itemsPerCol = Math.ceil(data.length / columns)
@@ -318,11 +322,11 @@ function PieReference ({ data, legends, height }: { data: PieDatum[], legends: P
   return <View className={classes} style={offsetTop}>{data.map(renderReferenceItem)}</View>
 }
 
-function renderReferenceItem ({ name, color, value }: PieDatum) {
+function referenceItem ({ name, color, value }: PieDatum, locale: string | undefined) {
   return (
     <Row key={name} className='app__pie-chart__ref__item justify'>
       <Text className='truncate padding-right'>{name}</Text>
-      <Text style={{ color }}>{value.toLocaleString()}</Text>
+      <Text style={{ color }}>{value.toLocaleString(locale)}</Text>
     </Row>
   )
 }

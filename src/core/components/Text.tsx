@@ -3,7 +3,7 @@ import React, { useContext } from 'react'
 import { Active } from '../utils'
 import type { Translate } from '../utils/_envs'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
-import { ISO_8601_COMPLETE_DATE } from '../utils'
+import { ISO_8601_COMPLETE_DATE, withDecimalSeparator } from '../utils'
 import { ConfigContext } from '../contexts'
 import moment from 'moment'
 
@@ -21,8 +21,8 @@ export type TextProps = {
     rtl?: boolean
     /**
      * A string is translated, and an ISO 8601 date string is first formatted with the configured
-     * `dateFormat`. A number renders as its string, a boolean as 'Yes'/'No', and an element is
-     * cloned with `translate`.
+     * `dateFormat`. A number renders as its string, with the configured `locale`'s decimal separator,
+     * a boolean as 'Yes'/'No', and an element is cloned with `translate`.
      */
     children?: React.ReactNode
     translate?: Translate
@@ -30,7 +30,7 @@ export type TextProps = {
 }
 
 /** The part of ConfigContext this component reads. */
-type DateConfig = { dateFormat?: string }
+type TextConfig = { dateFormat?: string, locale?: string }
 
 /**
  * Text View - Pure Component.
@@ -47,7 +47,7 @@ function Text ({
 }: TextProps) {
     // A cast, not a guard: `ConfigContext` has no default value, so outside a provider this destructure
     // throws, as it did in JavaScript. The library root (`AppProvider`) always renders one.
-    const { dateFormat } = useContext(ConfigContext) as DateConfig
+    const { dateFormat, locale } = useContext(ConfigContext) as TextConfig
 
     let component: React.ReactNode = children
     // A component child is handed the translator; a DOM element is not, because there `translate` is
@@ -57,7 +57,7 @@ function Text ({
     } else if (typeof children === 'object') {
         component = children
     } else if (typeof children === 'number') {
-        component = children.toString()
+        component = withDecimalSeparator(children.toString(), locale)
     } else if (typeof children === 'boolean') {
         component = children ? 'Yes' : 'No'
     } else if (typeof children === 'string') {
