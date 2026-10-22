@@ -264,6 +264,15 @@ export interface UIRenderProps<Data = unknown> {
     /** Language code published to the configuration; the shell renders it as a CSS class. */
     language?: string
     /**
+     * Language tag the widget shows numbers in, `de-DE`; `de_DE` is read the same. It sets the decimal and
+     * grouping separators of the `Currency`, `Float`, `Double5` and `Percent` renderers, a `Counter`, a pie
+     * chart's values and a slider's labels. It also sets the decimal separator of a number shown as plain
+     * text or in short form: a pie chart's total, an upload's size limit. Without it, or with a value that
+     * is no language tag, numbers show as before: the renderers in the runtime's locale, the rest with a
+     * point. Number inputs take and show a point either way.
+     */
+    locale?: string
+    /**
      * Called with a report whenever one node's subtree fails to render, instead of the
      * failure taking the document down. The library logs the same report itself, so this
      * is an additional channel — send it to your error reporting — not a way to silence

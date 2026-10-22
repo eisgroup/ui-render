@@ -93,6 +93,24 @@ describe('Upload', () => {
         expect(ctx.setPopupState.mock.calls[0][0].title).toBeTruthy()
     })
 
+    it('writes the size limit with the configured locale\'s decimal separator', () => {
+        const ctx = { setPopupState: jest.fn() }
+        const config = { ...initialConfigState, locale: 'de-DE' }
+        const { container } = render(
+            <ConfigContext.Provider value={config}>
+                <AppContext.Provider value={ctx}>
+                    <Upload fileType="image" name="img" maxSize={2560} onChange={() => {}} />
+                </AppContext.Provider>
+            </ConfigContext.Provider>
+        )
+        fireEvent.drop(container.querySelector('.upload__dropzone'), {
+            dataTransfer: { files: [makeFile('big.png', 'image/png', 3000)] },
+        })
+        const { content } = ctx.setPopupState.mock.calls[0][0]
+        const popup = render(<ConfigContext.Provider value={config}>{content}</ConfigContext.Provider>)
+        expect(popup.getByText('2,5kB')).toBeInTheDocument()
+    })
+
     it('renders children when provided', () => {
         const { getByText } = render(
             wrap(

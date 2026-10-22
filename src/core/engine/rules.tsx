@@ -420,7 +420,7 @@ export class UIRender extends DocumentInstance {
     render () {
         const {
             childBefore, childAfter, form, embedded, className, style, parent,
-            dateFormat, currency, language,
+            dateFormat, currency, language, locale,
         } = this.props
         const { key } = this.state
 
@@ -467,7 +467,7 @@ export class UIRender extends DocumentInstance {
         // engine (not only the library entry point) is what makes the props work for a host
         // that mounts this component directly — the demo does, and so do the harnesses.
         return (
-            <ConfigOverride dateFormat={dateFormat} currency={currency} language={language}>
+            <ConfigOverride dateFormat={dateFormat} currency={currency} language={language} locale={locale}>
                 {tree}
             </ConfigOverride>
         )

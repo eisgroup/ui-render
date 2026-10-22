@@ -45,6 +45,7 @@ function Render<Data = unknown> (props: UIRenderProps<Data>): React.ReactElement
                 dateFormat={hostProps.dateFormat}
                 currency={hostProps.currency}
                 language={hostProps.language}
+                locale={hostProps.locale}
             >
                 <AppWrapper>
                     <UIRender {...engineProps} />

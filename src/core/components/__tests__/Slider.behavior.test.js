@@ -1,6 +1,7 @@
 import React from 'react'
 import { fireEvent, render } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
 import { Slider } from '../Slider'
 
 const handleAt = (container, index = 0) => container.querySelectorAll('[role="slider"]')[index]
@@ -187,6 +188,35 @@ describe('Slider risk-oriented behavior', () => {
     )
 
     expect(getByText(expectedLabel)).toBeInTheDocument()
+  })
+
+  it.each([
+    {scenario: 'numbers', range: [1000, 2500.5], rangeLabels: {}, expectedLabels: ['1.000', '2.500,5']},
+    {scenario: 'currency', range: [1000, 3000], rangeLabels: {isCurrency: true}, expectedLabels: ['$ 1.000', '$ 3.000']},
+    {scenario: 'percentages', range: [0, 12.5, 100], rangeLabels: {isPercent: true, precision: 1}, expectedLabels: ['12,5%']},
+    {scenario: 'short durations', range: [0.5, 1], rangeLabels: {isTime: true}, expectedLabels: ['0,5 ms', '1 ms']},
+    {scenario: 'long durations', range: [1000, 1500.5, 2000], rangeLabels: {isTime: true}, expectedLabels: ['1 second, 500,5 milliseconds']},
+  ])('writes $scenario in generated range labels with the configured locale\'s separators', ({range, rangeLabels, expectedLabels}) => {
+    const {getByText} = render(
+      <ConfigContext.Provider value={{...initialConfigState, locale: 'de-DE'}}>
+        <Slider value={range[0]} range={range} rangeLabels={rangeLabels}/>
+      </ConfigContext.Provider>
+    )
+
+    expectedLabels.forEach(label => expect(getByText(label)).toBeInTheDocument())
+  })
+
+  it('writes a handle\'s value with the configured locale\'s decimal separator, and with a point without one', () => {
+    const inLocale = locale => (
+      <ConfigContext.Provider value={{...initialConfigState, locale}}>
+        <Slider value={12.5} step={0.5} tooltipProps={{}} unit='%'/>
+      </ConfigContext.Provider>
+    )
+    const {getByText, rerender} = render(inLocale('de-DE'))
+    expect(getByText('12,5%')).toBeInTheDocument()
+
+    rerender(inLocale(undefined))
+    expect(getByText('12.5%')).toBeInTheDocument()
   })
 
   it('detaches global drag listeners when unmounted before pointerup', () => {

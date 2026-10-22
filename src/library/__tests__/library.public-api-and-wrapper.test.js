@@ -26,7 +26,7 @@ jest.mock('../../core/engine/rules', () => {
         return ReactModule.createElement(
             'output',
             { 'data-testid': 'ui-render' },
-            `${props.contract}|${config.currency}|${config.language}|${app.isOpen}`
+            `${props.contract}|${config.currency}|${config.language}|${app.isOpen}|${config.locale}`
         )
     }
 })
@@ -73,6 +73,12 @@ describe('published library contract', () => {
 
         expect(screen.getByTestId('ui-render')).toHaveTextContent('meta-data|PLN|pl|false')
         expect(container.querySelector('.app')).toHaveClass('fade-in', 'lang--pl', 'PLN')
+    })
+
+    it('lifts the host\'s locale with the rest of its configuration, as a language tag', () => {
+        render(<LibraryRender contract="meta-data" locale="de_DE" />)
+
+        expect(screen.getByTestId('ui-render')).toHaveTextContent('meta-data|USD|en|false|de-DE')
     })
 
     it('lets AppWrapper react to host configuration values', () => {

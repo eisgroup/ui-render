@@ -243,10 +243,10 @@ in the tree — and the renderer discards it.
 Everything above configures the *document*. These configure the *renderer* — they are props
 of the `UIRender` component, not attributes of a `meta.json` node.
 
-### dateFormat, currency, language
+### dateFormat, currency, language, locale
 
 ```jsx
-<UIRender data={data} meta={meta} dateFormat="DD/MM/YYYY" currency="EUR" language="fr" />
+<UIRender data={data} meta={meta} dateFormat="DD/MM/YYYY" currency="EUR" language="fr" locale="fr-FR" />
 ```
 
 | Prop | Default | Effect |
@@ -254,10 +254,18 @@ of the `UIRender` component, not attributes of a `meta.json` node.
 | `dateFormat` | `MM-DD-YYYY` | `moment` format tokens for every date the renderer **displays** (an ISO-8601 value inside a `Text` node, a `render*: "Date"` value) and **edits** (what the date picker shows, and the format it parses typed input with first). A date field still stores `YYYY-MM-DD`, and reads a stored value in this format, `YYYY-MM-DD` or ISO 8601 first, then leniently |
 | `currency` | `USD` | published as a CSS class on the renderer's shell — `.app.EUR` — for currency-specific styling |
 | `language` | `en` | published as a CSS class on the renderer's shell — `.app.lang--fr` |
+| `locale` | none: the browser's | the language tag (`de-DE`) numbers are **displayed** in, below. A Java-style `de_DE` is read as `de-DE`, and a value that is no language tag as none |
 
 They reach every component through `ConfigContext`, so a value inside a nested `Table` cell
 or a `Popup` is formatted the same way as a top-level field. Each key is merged
-independently: passing only `dateFormat` leaves `currency` and `language` at their defaults.
+independently: passing only `dateFormat` leaves the others at their defaults.
+
+`locale` sets the decimal and grouping separators of the `Currency`, `Float`, `Double5` and
+`Percent` renderers, a `Counter`, a `PieChart`'s values and a `Slider`'s labels: with
+`locale="de-DE"`, `1.234,5`. A number shown as it is, by a `Text` node or in short form (a
+`PieChart`'s total, an `Upload`'s size limit), takes its decimal separator only: `1234,5`.
+Number inputs take and show a point either way. Without `locale`, numbers show as they did
+before it: the renderers in the browser's locale, every other number with a point.
 
 > `currency` is **not** `meta.currencyCode`. `currencyCode` is a meta attribute and selects
 > the currency *symbol* the value renderers print; `currency` is a prop and only labels the

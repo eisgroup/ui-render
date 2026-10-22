@@ -202,12 +202,16 @@ enumerate it.
 
 ### Context and providers
 
-- `ConfigContext` (`src/core/contexts/`) — Provides `dateFormat`, `currency`, `language` globally.
+- `ConfigContext` (`src/core/contexts/`) — Provides `dateFormat`, `currency`, `language` and `locale` globally.
+  `locale` has no default: what shows numbers reads it through `useNumberLocale`, and without one the
+  renderers use the runtime's locale and every other number keeps its point, as before the prop existed.
 - `AppContext` (`src/core/contexts/`) — The popup state (`setPopupState`), and the `popupRoot` node `AppWrapper` publishes for
   a document's popups to portal into.
 - `AppProvider` (`src/core/providers/`) — Wraps the library export with context providers.
-- `ConfigOverride` (`src/core/providers/`) — Publishes a host's `dateFormat`/`currency`/`language` props into `ConfigContext`,
-  each given key merged over the inherited value; `src/library/main.tsx` and the engine's render both use it.
+- `ConfigOverride` (`src/core/providers/`) — Publishes a host's `dateFormat`/`currency`/`language`/`locale` props into `ConfigContext`,
+  each given key merged over the inherited value; `src/library/main.tsx` and the engine's render both use it. A `locale`
+  goes through `numberLocale` (`utils/number.ts`) first, which reads `de_DE` as `de-DE` and drops a value that is no
+  language tag, because `Intl` throws on one.
 
 ## Tech Stack
 

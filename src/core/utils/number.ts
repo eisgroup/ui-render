@@ -241,3 +241,46 @@ export function toPercent (number: unknown, decimals = 0): string {
 	if (!isNumeric(number)) return ''
 	return (Number(number) * 100).toFixed(decimals).toLocaleString() + '%'
 }
+
+/**
+ * The locale a host gives for the numbers the widget shows (its `locale` prop), as `Intl` reads it, or
+ * `undefined` for none. A Java-style tag, `de_DE`, is read as `de-DE`. A value that is still no language
+ * tag counts as none: `Intl` throws on it, where the runtime's own locale serves.
+ */
+export function numberLocale (locale: unknown): string | undefined {
+	if (typeof locale !== 'string' || !locale) return undefined
+	for (const tag of [locale, locale.replace(/_/g, '-')]) {
+		try {
+			return Intl.getCanonicalLocales(tag)[0]
+		} catch {
+			// Not a language tag as it is spelt: the loop tries the next spelling.
+		}
+	}
+	return undefined
+}
+
+/** The separators a locale writes numbers with. `group` is empty for a locale that does not group digits. */
+export type NumberSeparators = { decimal: string, group: string }
+
+const separatorsOfLocale = new Map<string, NumberSeparators>()
+
+/**
+ * The separators `locale` writes numbers with, read once from `Intl.NumberFormat`. They are for the numbers
+ * the widget does not format with `Intl`: a slider's labels, a number in short form and a number a `Text`
+ * shows as it is.
+ */
+export function numberSeparators (locale: string): NumberSeparators {
+	let separators = separatorsOfLocale.get(locale)
+	if (!separators) {
+		const parts = new Intl.NumberFormat(locale).formatToParts(12345.6)
+		const partOf = (type: string) => (parts.find(part => part.type === type) || { value: '' }).value
+		separators = { decimal: partOf('decimal') || '.', group: partOf('group') }
+		separatorsOfLocale.set(locale, separators)
+	}
+	return separators
+}
+
+/** `text`, a number as JavaScript writes it, with `locale`'s decimal separator for its point. Without a locale, `text`. */
+export function withDecimalSeparator (text: string, locale?: string): string {
+	return locale ? text.replace('.', numberSeparators(locale).decimal) : text
+}

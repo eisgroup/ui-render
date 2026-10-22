@@ -1,6 +1,9 @@
 import classNames from '../utils/classNames'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Active, formatNumber, interpolateString, l, last, localiseTranslation, round, toPercent } from '../utils'
+import { useNumberLocale } from '../contexts'
+import {
+  Active, formatNumber, interpolateString, l, last, localiseTranslation, numberSeparators, round, toPercent, withDecimalSeparator,
+} from '../utils'
 import { _ } from '../utils/translations'
 import type { Translate } from '../utils/_envs'
 import { formatDuration } from '../utils/time'
@@ -119,11 +122,12 @@ export function Slider ({
   ...rest
 }: SliderProps) {
   const isRange = Array.isArray(value)
+  const locale = useNumberLocale()
 
   // Resolve range/marks/step from helper props if provided.
   // A cast, not a guard: the condition has just tested the same expression.
   const expanded = (range || rangeOptions)
-    ? sliderRangeMarks((range || rangeOptions) as number[], rangeLabels, stepProp)
+    ? sliderRangeMarks((range || rangeOptions) as number[], rangeLabels, stepProp, locale)
     : null
   const min = expanded ? expanded.min : minProp
   const max = expanded ? expanded.max : maxProp
@@ -310,7 +314,7 @@ export function Slider ({
                 right={vertical}
                 {...omitRender(tooltipProps)}
               >
-                {tooltipProps.render ? tooltipProps.render(h.value) : `${h.value}${unit || ''}`}
+                {tooltipProps.render ? tooltipProps.render(h.value) : `${withDecimalSeparator(String(h.value), locale)}${unit || ''}`}
               </TooltipBubble>
             )}
           </div>
@@ -381,30 +385,40 @@ function onHandleKey (event: React.KeyboardEvent, value: number, idx: number, { 
  * @param {Array} range - list of numbers
  * @param {Object} [options] - mark options
  * @param {Number|Null} [step] - slider movement interval
+ * @param {String} [locale] - the language tag the labels are written in; without one, with a point and commas
  * @return {Object}
  */
-function sliderRangeMarks (range: number[], options: SliderRangeLabels = {}, step: number | null = null) {
+function sliderRangeMarks (range: number[], options: SliderRangeLabels = {}, step: number | null = null, locale?: string) {
   const computeSteps = range.length === 2 || (range.length === 3 && range[0] === 0)
   const markOptions = computeSteps ? {...options, computeSteps: true} : options
   return {
     min: range[0],
     max: last(range),
-    marks: sliderIntervals(range, markOptions),
+    marks: sliderIntervals(range, markOptions, locale),
     step,
   }
 }
 
-function sliderIntervals (range: number[], { formatLabel, isTime, isCurrency, currency, isPercent, precision, computeSteps = false }: SliderRangeLabels = {}) {
+function sliderIntervals (range: number[], { formatLabel, isTime, isCurrency, currency, isPercent, precision, computeSteps = false }: SliderRangeLabels = {}, locale?: string) {
   const min = range[0] || range[1]
   const max = last(range)
   const steps = Math.floor(max / min)
   const intervalSteps: SliderMarks = {}
 
   if (!formatLabel) {
-    formatLabel = formatNumber
-    if (isTime) formatLabel = max <= 1000 ? (val) => val + ' ms' : (val) => formatDuration(val, { round: false })
-    if (isCurrency) formatLabel = (val) => ((currency || '$') + ' ' + formatNumber(val))
-    if (isPercent) formatLabel = (val) => toPercent(val / 100, precision)
+    // A locale's separators in `formatNumber`'s own format, which keeps every digit a value has.
+    const separators = locale ? numberSeparators(locale) : undefined
+    const numberLabel = separators
+      ? (val: number) => formatNumber(val, { sectionDelimiter: separators.group, decimalDelimiter: separators.decimal })
+      : formatNumber
+    formatLabel = numberLabel
+    if (isTime) {
+      formatLabel = max <= 1000
+        ? (val) => withDecimalSeparator(String(val), locale) + ' ms'
+        : (val) => formatDuration(val, { round: false, ...separators && { decimal: separators.decimal } })
+    }
+    if (isCurrency) formatLabel = (val) => ((currency || '$') + ' ' + numberLabel(val))
+    if (isPercent) formatLabel = (val) => withDecimalSeparator(toPercent(val / 100, precision), locale)
   }
 
   if (computeSteps) {

@@ -1,4 +1,4 @@
-export { ConfigContext, initialConfigState } from './ConfigContext'
+export { ConfigContext, initialConfigState, useNumberLocale } from './ConfigContext'
 export { AppContext, initialAppState } from './AppContext'
 export { TableColumnsContext } from './TableColumnsContext'
 export type { ConfigState } from './ConfigContext'
