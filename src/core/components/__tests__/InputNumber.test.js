@@ -128,7 +128,7 @@ describe('InputNumber', () => {
 
     describe('combined min: 0 + decimals: 0 (integer ≥ 0)', () => {
         it('rejects negative decimal -0.5', () => {
-            // The reproducer from GENESIS-330655.
+            // A reported case: an integer field with `min: 0` took -0.5.
             const { input, onChange } = renderInput({ min: 0, outputFormat: { decimals: 0 } })
             fireEvent.change(input, { target: { value: '-0.5' } })
             expect(input.value).toBe('')
