@@ -9,6 +9,7 @@ const data: QuoteData = { cost: 120 }
 const meta = { view: 'Text', children: 'Cost' }
 
 const translate: UIRender.UIRenderTranslate = (value: string): string => value.toUpperCase()
+const builtInTexts: Partial<Record<UIRender.UIRenderPhraseId, string>> = { TOTAL: 'Gesamt' }
 
 const props: UIRender.UIRenderProps<QuoteData> = {
     data,
@@ -24,4 +25,4 @@ const falseDefault = UIRender.default
 // @ts-expect-error the direct CommonJS export has no named UIRender value property
 const falseNamed = UIRender.UIRender
 
-void [component, inferred, falseDefault, falseNamed]
+void [component, inferred, falseDefault, falseNamed, builtInTexts]

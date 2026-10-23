@@ -146,6 +146,14 @@ describe('PieChart additional behavioral contracts', () => {
     expect(container.querySelector('.app__chart__tooltip').textContent).toContain('No tasks0 days')
   })
 
+  it('translates the name in its tooltip with the translator it is given', () => {
+    const translate = value => (value === 'One task' ? 'Una tarea' : value)
+    const {container} = renderPieChart({items: [{label: 'One task', value: 1}], translate})
+
+    dispatchMouseWithOffset(slicesOf(container)[0], 'mouseEnter', 12, 18)
+    expect(container.querySelector('.app__chart__tooltip .truncate')).toHaveTextContent(/^Una tarea$/)
+  })
+
   it('keeps an open tooltip synchronized with controlled data updates and removal', () => {
     const {container, rerender} = renderPieChart({
       items: [{label: 'Account', value: 1}],
