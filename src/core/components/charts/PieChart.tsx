@@ -37,10 +37,7 @@ export type PieChartProps = {
   legends?: PieChartLegends
   pointers?: boolean
   sort?: string | string[]
-  /**
-   * The document's translator, for the texts in the chart's centre, its legend and its tooltip. Taken
-   * out by name: it is an HTML attribute too, and the rest of the props reach the chart's element.
-   */
+  /** The document's translator, for the texts in the chart's centre, its legend and its tooltip. */
   translate?: Translate
   [key: string]: unknown
 }

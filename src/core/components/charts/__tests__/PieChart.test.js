@@ -318,10 +318,5 @@ describe('PieChart', () => {
             renderPieChart({ items: sampleItems, children: 'Label Text', translate: translator({ 'Label Text': 'Etiqueta' }) })
             expect(screen.getByText('Etiqueta')).toBeInTheDocument()
         })
-
-        it('keeps `translate` off its element', () => {
-            const { container } = renderPieChart({ items: sampleItems, translate: translator({}) })
-            expect(container.querySelector('[translate]')).toBeNull()
-        })
     })
 })

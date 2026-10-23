@@ -107,7 +107,7 @@ Nothing to do for these:
   modules still in use are vendored into the stylesheet. The components keep Semantic's class names,
   such as `ui selection dropdown` and `ui table`, and the stylesheet still selects on them.
   (Dependencies, Table rendering)
-- The package is 25 files and 3.5 MB unpacked, down from 576 files and 12.5 MB, and `dist/index.js`
+- The package is 26 files and 3.5 MB unpacked, down from 576 files and 12.5 MB, and `dist/index.js`
   is 311 KB, down from 420 KB. (Packaging)
 
 #### Meta contract
@@ -160,9 +160,10 @@ Nothing to do for these:
   asked for each under a key of its own, `ui-render:TOTAL`, `ui-render:YES` and `ui-render:NO`,
   which a host registers as a `ui-render` namespace in its i18n. Where the answer is the key itself,
   the key without `ui-render:`, or empty, the widget shows its English text, as before. Each key is
-  asked for once, and the answer is not translated again. `docs/BUILT-IN-PHRASES.md` lists the ids
-  with their English texts, and the types publish them as `UIRenderPhraseId`. The pie chart asked
-  `translate` for the English word `Total` until now, and no longer does.
+  asked for once, and the answer is not translated again. `docs/BUILT-IN-PHRASES.md`, in the
+  package, lists the ids with their English texts, and the types publish them as
+  `UIRenderPhraseId`. The pie chart asked `translate` for the English word `Total` until now, and no
+  longer does.
 - **New `locale` prop: the language tag the widget shows numbers in.** A host passes its user's
   number format, `de-DE`, and the `Currency`, `Float`, `Double5` and `Percent` renderers, a
   `Counter`, a pie chart's values and a slider's labels write their decimal and grouping separators:
@@ -711,7 +712,7 @@ Nothing to do for these:
   `/static/all.css`, the re-export imports itself and the widget is unstyled (measured in Chromium),
   and read as text it holds a comment and the `@import`. 0.34.x's `dist/static/` was a full copy,
   fonts and images included. Copy the root `static/` folder instead.
-- The tarball dropped from 576 files / 12.5 MB unpacked in 0.34.3 to **25 files / 3.5 MB (0.9 MB
+- The tarball dropped from 576 files / 12.5 MB unpacked in 0.34.3 to **26 files / 3.5 MB (0.9 MB
   packed)**. Source maps continue to ship for host debugging.
 - **The package ships no images any more.** 0.34.3 carried 266 country-flag SVGs in
   `static/images/flags/` and ten more files in `static/images/`: `flags.png`, `diamonds.png`,
