@@ -21,10 +21,14 @@ keep it in single braces where your translation needs the value.
 **This page is generated.** Run `npm run docs:phrases` after changing `BUILT_IN_PHRASES` in
 `src/core/utils/phrases.ts`. The package's types list the same ids as `UIRender.UIRenderPhraseId`.
 
-## Phrases (41)
+## Phrases (52)
 
 | Id | English text | Where it shows |
 | --- | --- | --- |
+| `CALENDAR_OK` | OK | The button under a date field's calendar that takes the date picked in it, where its meta gives `needConfirm` or `showTime` |
+| `CHOOSE_A_DECADE` | Choose a decade | The name a screen reader gives the decade over the years of a date field's calendar, a button that shows the decades |
+| `CHOOSE_A_MONTH` | Choose a month | The name a screen reader gives the month over the days of a date field's calendar, a button that shows the months |
+| `CHOOSE_A_YEAR` | Choose a year | The name a screen reader gives the year over the days or the months of a date field's calendar, a button that shows the years |
 | `DOWNLOAD_FAILED` | Download Failed! | The popup a failed download opens, under its title, which is why the download failed |
 | `END_DATE_CANNOT_BE_LESS_THAN_START_DATE` | End date cannot be less than start date | A period's end date, checked by `notWithinRange`, where it is before the start date |
 | `ERROR` | Error | The title of the popup a failed `onApplyPeriods` opens, and of a template popup with no `title` and no `items` |
@@ -35,12 +39,16 @@ keep it in single braces where your translation needs the value.
 | `INVALID_DATE` | Invalid date | A date field left with text that is no date in its format, which it keeps showing |
 | `INVALID_EMAIL_ADDRESS` | Invalid email address | A field with `validate: "email"` that holds no email address |
 | `INVALID_URL` | Invalid URL | A field with `validate: "url"` that holds no URL with a protocol |
+| `LAST_YEAR` | Last year (Control + left) | The name a screen reader gives the button that goes a year back in a date field's calendar: a decade back where the calendar shows years, a century where it shows decades |
 | `MAXIMUM_FILE_SIZE_EXCEEDED` | Maximum File Size Exceeded! | The title of the popup a dropped file larger than an upload's `maxSize` opens |
 | `MUST_BE_LESS_THAN_CHARACTERS` | Must be less than {count} characters | A field with `validate: "maxLength"` that holds more; `{count}` is the limit, 100 |
 | `MUST_BE_MAXIMUM` | Must be maximum {max} | A number field above its `max`; `{max}` is the `max` |
 | `MUST_BE_MINIMUM` | Must be minimum {min} | A number field below its `min`; `{min}` is the `min` |
+| `NEXT_MONTH` | Next month (PageDown) | The name a screen reader gives the button that goes a month forward in a date field's calendar |
 | `NEXT_PAGE` | Next page | The name a screen reader gives the button to a table's next page |
+| `NEXT_YEAR` | Next year (Control + right) | The name a screen reader gives the button that goes a year forward in a date field's calendar: a decade forward where the calendar shows years, a century where it shows decades |
 | `NO` | No | A value of `false`, shown as text |
+| `NOW` | Now | The link under a date field's calendar that picks the current date and time, where its meta gives `showTime` |
 | `OFF` | OFF | A toggle's off side, where it has no label |
 | `OK` | Ok | The button that closes a popup |
 | `ON` | ON | A toggle's on side, where it has no label |
@@ -50,6 +58,7 @@ keep it in single braces where your translation needs the value.
 | `PERIODS_CANNOT_OVERLAP` | Periods cannot overlap | A period's dates, checked by `notWithinRange`, where the period overlaps another row's |
 | `POPUP` | Popup | The name a screen reader gives a popup with no title and no message |
 | `POPUP_CONTENT_IS_EMPTY` | Popup content is empty | The popup a `popupOpen` opens for a template popup with no `items` |
+| `PREVIOUS_MONTH` | Previous month (PageUp) | The name a screen reader gives the button that goes a month back in a date field's calendar |
 | `PREVIOUS_PAGE` | Previous page | The name a screen reader gives the button to a table's previous page |
 | `REQUIRED` | Required | A required field left empty |
 | `SELECT` | Select | A select's placeholder, where its meta gives none |
@@ -61,8 +70,10 @@ keep it in single braces where your translation needs the value.
 | `START_DATE_CANNOT_BE_MORE_THAN_END_DATE` | Start date cannot be more than end date | A period's start date, checked by `notWithinRange`, where it is after the end date |
 | `SYNCING` | Syncing... | An `AutoSubmit` view's loader while it saves, where its meta gives no `loadContent` |
 | `TABLE_HAS_NO_DATA` | Table has no data! | A table with no `headers` and no rows to take them from |
+| `TODAY` | Today | The link under a date field's calendar that picks today |
 | `TOTAL` | Total | A pie chart's centre, under the total of its values |
 | `UPLOAD_FILE` | Upload {file} | An upload's header, and its hover text where it has no `label` or `fileType`; `{file}` is its `label` or `fileType`, or else `FILE` |
 | `UPLOAD_FILES_ONLY` | Upload {formats} files only | The popup a dropped file of a type an upload does not take opens; `{formats}` lists the types it takes |
 | `UPLOAD_LABEL_FILE` | Upload {label} File | An upload's hover text, where it has a `label` or `fileType` and no `labelOnHover`; `{label}` is that label |
+| `WEEK` | Week | The name a screen reader gives the column of week numbers in a date field's calendar, where its meta gives `showWeek` |
 | `YES` | Yes | A value of `true`, shown as text |

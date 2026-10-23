@@ -30,14 +30,16 @@ export type UIRenderTranslate = (value: string) => string
  * English text. `docs/BUILT-IN-PHRASES.md` lists each id with its English text.
  */
 export type UIRenderPhraseId =
-    'DOWNLOAD_FAILED' | 'END_DATE_CANNOT_BE_LESS_THAN_START_DATE' | 'ERROR' | 'FILE' | 'FILES' |
-    'FILE_MUST_BE_UNDER' | 'FILE_UPLOAD_FAILED' | 'INVALID_DATE' | 'INVALID_EMAIL_ADDRESS' | 'INVALID_URL' |
+    'CALENDAR_OK' | 'CHOOSE_A_DECADE' | 'CHOOSE_A_MONTH' | 'CHOOSE_A_YEAR' | 'DOWNLOAD_FAILED' |
+    'END_DATE_CANNOT_BE_LESS_THAN_START_DATE' | 'ERROR' | 'FILE' | 'FILES' | 'FILE_MUST_BE_UNDER' |
+    'FILE_UPLOAD_FAILED' | 'INVALID_DATE' | 'INVALID_EMAIL_ADDRESS' | 'INVALID_URL' | 'LAST_YEAR' |
     'MAXIMUM_FILE_SIZE_EXCEEDED' | 'MUST_BE_LESS_THAN_CHARACTERS' | 'MUST_BE_MAXIMUM' | 'MUST_BE_MINIMUM' |
-    'NEXT_PAGE' | 'NO' | 'OFF' | 'OK' | 'ON' | 'PAGE' | 'PAGINATION' | 'PASSWORD_IS_TOO_WEAK' |
-    'PERIODS_CANNOT_OVERLAP' | 'POPUP' | 'POPUP_CONTENT_IS_EMPTY' | 'PREVIOUS_PAGE' | 'REQUIRED' | 'SELECT' |
-    'SELECT_NAME' | 'SELECT_OR_DROP' | 'SLIDER_MAXIMUM' | 'SLIDER_MINIMUM' |
-    'START_AND_END_DATE_CANNOT_BE_THE_SAME' | 'START_DATE_CANNOT_BE_MORE_THAN_END_DATE' | 'SYNCING' |
-    'TABLE_HAS_NO_DATA' | 'TOTAL' | 'UPLOAD_FILE' | 'UPLOAD_FILES_ONLY' | 'UPLOAD_LABEL_FILE' | 'YES'
+    'NEXT_MONTH' | 'NEXT_PAGE' | 'NEXT_YEAR' | 'NO' | 'NOW' | 'OFF' | 'OK' | 'ON' | 'PAGE' | 'PAGINATION' |
+    'PASSWORD_IS_TOO_WEAK' | 'PERIODS_CANNOT_OVERLAP' | 'POPUP' | 'POPUP_CONTENT_IS_EMPTY' | 'PREVIOUS_MONTH' |
+    'PREVIOUS_PAGE' | 'REQUIRED' | 'SELECT' | 'SELECT_NAME' | 'SELECT_OR_DROP' | 'SLIDER_MAXIMUM' |
+    'SLIDER_MINIMUM' | 'START_AND_END_DATE_CANNOT_BE_THE_SAME' | 'START_DATE_CANNOT_BE_MORE_THAN_END_DATE' |
+    'SYNCING' | 'TABLE_HAS_NO_DATA' | 'TODAY' | 'TOTAL' | 'UPLOAD_FILE' | 'UPLOAD_FILES_ONLY' |
+    'UPLOAD_LABEL_FILE' | 'WEEK' | 'YES'
 
 /** One finding from the dev-mode meta contract check enabled by `validateMeta`. */
 export interface UIRenderMetaProblem {
@@ -298,7 +300,10 @@ export interface UIRenderProps<Data = unknown> {
      * symbol the value renderers use.
      */
     currency?: string
-    /** Language code published to the configuration; the shell renders it as a CSS class. */
+    /**
+     * Language code published to the configuration; the shell renders it as a CSS class. Where `locale` names no
+     * moment locale the host has loaded, it names the one a date field shows month and day names in.
+     */
     language?: string
     /**
      * Language tag the widget shows numbers in, `de-DE`; `de_DE` is read the same. It sets the decimal and
@@ -307,6 +312,11 @@ export interface UIRenderProps<Data = unknown> {
      * text or in short form: a pie chart's total, an upload's size limit. Without it, or with a value that
      * is no language tag, numbers show as before: the renderers in the runtime's locale, the rest with a
      * point. Number inputs take and show a point either way.
+     *
+     * It also names the moment locale a date field shows month and day names in, in its calendar and in a
+     * date whose format names the month, and starts its weeks by: `de` for `de-DE`. moment's locale data is
+     * the host's to load (`import 'moment/locale/de'`). Where the host has loaded none for `locale`, the one
+     * `language` names is used, and then English, not moment's global locale.
      */
     locale?: string
     /**

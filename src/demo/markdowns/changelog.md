@@ -93,6 +93,12 @@ item has the details.
   these words no longer reaches the widget. `docs/BUILT-IN-PHRASES.md`, in the package, lists the ids.
   A host with no translation for a key sees the English, as before. (Renderer configuration and error
   reporting)
+- **Expect date fields in the language your `locale` or `language` names.** Where moment has that
+  locale loaded, a date field's calendar names its months and days in it and starts its weeks as it
+  does, and a date whose `dateFormat` names the month is shown and read in it: a German field takes
+  `15 März 2024`, no longer `15 Mar 2024`. The calendar's own texts are built-in phrases, such as
+  `ui-render:TODAY`. A host that loads no moment locale sees no change. (Renderer configuration and
+  error reporting)
 - **Expect `getValidationErrors` in your language, and a required field known by the rule.** A message
   the widget writes itself reaches the callback as the field shows it, translated where the host has
   its key. A required field is still reported as `<Field Name> is Required` when the `required` rule
@@ -204,6 +210,18 @@ Nothing to do for these:
   formats, in bold, where the host's translation puts their placeholders. `getValidationErrors` is
   handed the messages as the fields show them, but a required field's, which still reads
   `<Field Name> is Required`.
+- **A date field's calendar speaks the host's language.** It was rc-picker's English whatever the
+  host set: its `Today`, the names a screen reader gives its buttons, such as
+  `Previous month (PageUp)` and `Choose a year`, and its month and day names, while a `Text`
+  showed a date in moment's global locale. Its texts are 11 more built-in phrases: `TODAY`,
+  `PREVIOUS_MONTH`, `NEXT_MONTH`, `LAST_YEAR`, `NEXT_YEAR`, `CHOOSE_A_MONTH`, `CHOOSE_A_YEAR` and
+  `CHOOSE_A_DECADE`, with `NOW`, `CALENDAR_OK` and `WEEK` for what rc-picker shows where a meta gives
+  the field `showTime`, `needConfirm` or `showWeek`. rc-picker's other English texts, such as `Clear`
+  and `Last decade`, it shows nowhere. The month and day names, and those of a date whose
+  `dateFormat` names the month, are moment's, in the locale the host's `locale` names, `de` for
+  `de-DE`, or else its `language`, and the weeks start as that locale starts them. What a user types
+  is read in that locale too. moment's locale data is the host's to load: where it has not loaded the
+  locale, the names stay English, and moment's global locale plays no part.
 - **New `locale` prop: the language tag the widget shows numbers in.** A host passes its user's
   number format, `de-DE`, and the `Currency`, `Float`, `Double5` and `Percent` renderers, a
   `Counter`, a pie chart's values and a slider's labels write their decimal and grouping separators:
@@ -957,6 +975,9 @@ Nothing to do for these:
   rendered, as it does when it is left, and rc-picker dropped the date it had not confirmed yet.
 - **Emptying a date field's text empties its date.** The date came back once the field was left. A required field
   now says `Required`.
+- **A date picked in the calendar is handed on in English digits.** Where moment's global locale writes other digits,
+  such as `ar`, a date picked in a date field's calendar was handed on as it wrote itself, `٢٠٢٤-٠٣-٢٠`, and that is
+  what the data held. It is `2024-03-20` now, whatever the locale, the field's own included.
 - **A background class in a header's `classNameHeader` colours the header cell.** `classNameHeader`
   puts its classes on the `th`, and the stylesheet gave every `th` the header colour with a rule that
   outweighed any background class, so the cell stayed grey. Only a class in the header's `className`
