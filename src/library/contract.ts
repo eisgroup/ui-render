@@ -66,7 +66,9 @@ export interface UIRenderDownloadResponse {
 export interface UIRenderApiCalls<Data = unknown> {
     /**
      * Called by the `onApplyPeriods` action with every form's current values; what it resolves with
-     * becomes the document's data, and an empty answer leaves the data as it was.
+     * becomes the document's data, and an empty answer leaves the data as it was. It is not called while
+     * a field the user can change shows its validation error, and the values hold no table's draft row
+     * (`renderExtraItem`) until the row is added.
      */
     updateData?(data: Data): Promise<unknown>
     /**
@@ -244,6 +246,10 @@ export interface UIRenderProps<Data = unknown> {
     /** Whether to disable rendering of the wrapper scroll view and the html form. */
     embedded?: boolean
     onSubmit?(values: Data, ...args: any[]): unknown
+    /**
+     * Called as the document mounts, with a reader of every form's current values. They hold no table's
+     * draft row (`renderExtraItem`): what a user types there is in them once the row is added.
+     */
     getFormData?(getData: () => Data): void
     onDataChanged?(): void
     getValidationErrors?(errors: UIRenderValidationErrors): void

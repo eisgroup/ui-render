@@ -3,6 +3,7 @@ import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { Form } from 'react-final-form'
 import { asField } from '../utils'
+import { fixableFieldsOf } from '../../../state/formRegistry'
 
 // Simple controlled input that uses props.value + props.onChange,
 // like a normal Semantic input would.
@@ -166,5 +167,33 @@ describe('asField', () => {
 
         expect(getByTestId('ti')).toHaveAttribute('placeholder', 'second')
         expect(getByTestId('ti').value).toBe('1.0')
+    })
+})
+
+// What an `onApplyPeriods` reads to wait for a field's shown error (`engine/errorMapping.ts`).
+describe('the count of fields whose error the user can fix', () => {
+    it('holds an editable field while it is mounted, and neither a disabled nor a readonly one', () => {
+        // The form the engine's document hands its fields: only its identity is read here.
+        const form = {}
+        const instance = { form, props: {} }
+        const field = props => <RFForm initialValues={{ x: 'kept' }}><Wrapped name="x" instance={instance} {...props}/></RFForm>
+        const { rerender, unmount } = render(field({}))
+        expect([...fixableFieldsOf(form)]).toEqual([['x', 1]])
+
+        rerender(field({ disabled: true }))
+        expect(fixableFieldsOf(form).has('x')).toBe(false)
+        rerender(field({ readonly: true }))
+        expect(fixableFieldsOf(form).has('x')).toBe(false)
+        rerender(field({}))
+        expect([...fixableFieldsOf(form)]).toEqual([['x', 1]])
+
+        unmount()
+        expect(fixableFieldsOf(form).size).toBe(0)
+    })
+
+    it('counts nothing for a field rendered without a document, which has no form to count in', () => {
+        const { getByTestId } = render(<RFForm initialValues={{ x: 'kept' }}><Wrapped name="x"/></RFForm>)
+
+        expect(getByTestId('ti')).toHaveValue('kept')
     })
 })

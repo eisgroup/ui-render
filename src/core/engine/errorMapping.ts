@@ -1,12 +1,14 @@
 /**
  * HOW THE ENGINE MAPS VALIDATION ERRORS: which of a form's errors are shown (a touched field's, or
- * one the form remembers as touched), and the shape `getValidationErrors` hands a host.
+ * one the form remembers as touched), the shape `getValidationErrors` hands a host, and whether a
+ * field shows one that holds an `onApplyPeriods` back.
  *
  * It was part of `engine/utils.ts` until §9.9-H6, which dissolved that file into `formData.ts`,
  * `errorMapping.ts` and `dataMapping.ts`.
  */
 import type { FormApi } from 'final-form'
-import { errorsFor, touchedFor } from '../state/formRegistry'
+import { errorsFor, fixableFieldsOf, touchedFor } from '../state/formRegistry'
+import type { RegisteredForm } from '../state/formRegistry'
 import type { MetaNode } from './formData'
 
 function getKeyAndPathFromMetaData(meta: MetaNode): { key?: string, path?: string } {
@@ -57,6 +59,31 @@ export function errorsProcessing(form: FormApi, meta: MetaNode) {
       delete errorsMap[name];
     }
   })
+}
+
+/**
+ * Whether a field of these forms shows its validation error, one the user can fix: what holds an
+ * `onApplyPeriods` back (2026-10-23). Until then it sent a table that showed errors, a required field
+ * the user had emptied included, as `""`.
+ *
+ * A field shows its error as it renders it (`errorText` in `modules/form/utils.tsx` and
+ * `asInputDateField.tsx`): once the field is touched, remembered as touched, or changed. An untouched,
+ * unchanged field's error shows nothing, and holds nothing back. The fields read are those whose error
+ * the user can fix (`fixableFieldsOf`): not a disabled or readonly field, and not one that shows no
+ * error of its own, such as a toggle, or a table's array of rows, whose error is its rows' errors.
+ *
+ * It reads the fields' state and changes none: the field it finds already shows its error, which is
+ * all the user is shown, and an untouched field is not marked touched.
+ */
+export function showsAnError (forms: ReadonlyMap<object, RegisteredForm>): boolean {
+  for (const { form } of forms.values()) {
+    const rememberedTouched = touchedFor(form)
+    for (const name of fixableFieldsOf(form).keys()) {
+      const state = form.getFieldState(name)
+      if (state && state.error && (state.touched || rememberedTouched[name] || !state.pristine)) return true
+    }
+  }
+  return false
 }
 
 /*

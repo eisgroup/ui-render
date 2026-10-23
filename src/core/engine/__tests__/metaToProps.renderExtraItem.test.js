@@ -104,4 +104,37 @@ describe('metaToProps renderExtraItem', () => {
 
         expect(Render.mock.calls[0][0].useForm).toBe(true)
     })
+
+    // Its form holds what the user types until Add, which is not the document's data (`dataFormsOf`).
+    it('marks the Data node of renderExtraItem as the table\'s draft row, and no other cell', () => {
+        const cells = { view: 'Data', kind: 'lines', meta: { view: 'TableCells', items: [] } }
+        const tableMeta = {
+            view: 'Table',
+            name: 'dataKind.lines',
+            headers: [{ id: 'p' }],
+            renderItemCells: { ...cells },
+            renderExtraItem: { ...cells },
+        }
+        const self = { props: { name: 'dataKind.lines' } }
+
+        metaToProps(tableMeta, baseConfig())
+        tableMeta.renderItemCells({ p: 1 }, 0, {}, self)
+        tableMeta.renderExtraItem([{ p: 1 }], 1, {}, self)
+
+        expect(Render.mock.calls.map(([props]) => props.draftRow)).toEqual([undefined, true])
+    })
+
+    it('marks no draft row on a renderExtraItem that is not a Data node, which has no form of its own', () => {
+        const tableMeta = {
+            view: 'Table',
+            name: 'dataKind.lines',
+            headers: [{ id: 'p' }],
+            renderExtraItem: { view: 'TableCells', items: [] },
+        }
+
+        metaToProps(tableMeta, baseConfig())
+        tableMeta.renderExtraItem([], 0, {}, { props: { name: 'dataKind.lines' } })
+
+        expect(Render.mock.calls[0][0]).not.toHaveProperty('draftRow')
+    })
 })

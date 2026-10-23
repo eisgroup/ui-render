@@ -14,6 +14,7 @@ import { _ } from '../../utils/translations'
 import { baselineOf, clearErrorsFor, clearTouchedFor, formsStorage, hasBaseline, setBaseline, touchedFor } from '../../state/formRegistry'
 import arrayMutators from 'final-form-arrays'
 import { createBatchedForm } from './batchedForm'
+import { useFixableField } from './useFixableField'
 
 // The header of `validationErrors`, registered beside its one reader, as the components register
 // theirs. It used to live in `form/translations.js`, which nothing imported, so the header read
@@ -399,6 +400,7 @@ export function asField (InputComponent: React.ComponentType<any>, {sanitize}: {
         mounted.unmount()
       }
     }, [])
+    useFixableField(props)
     const {name, disabled, normalize, format, parse = normalize, validate, options} = props
     // A cast, not a guard, read at render: final-form's `Field`, unless something replaced it.
     const ActiveField = Active.Field as typeof Field
@@ -597,6 +599,8 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
           // Not undefined: the form rendered, and handed it over, before any effect runs.
           form: handle.form!,
           tree: own.tree!, // not undefined: the first render set it
+          // What the engine says of the document: a table's draft row, whose values are not data yet.
+          draftRow: props.draftRow === true,
         });
         return () => {
           if (own.unsubscribe) own.unsubscribe()
@@ -626,6 +630,7 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
             meta: props.meta,
             form: handle.form,
             tree: own.tree!, // not undefined: the first render set it
+            draftRow: props.draftRow === true,
           });
         }
         setApplied(adopted)

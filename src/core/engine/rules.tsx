@@ -25,11 +25,11 @@ import { applyPeriods } from './applyPeriods'
 import { parsePopupAlertArgs, parsePopupArgs } from './popupArgs'
 import { findPopupTemplate } from './popupTemplate'
 import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
-import { errorsFor, formsOf, touchedFor } from '../state/formRegistry'
+import { dataFormsOf, errorsFor, formsOf, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
 import { getFormsData, getLiveMergedDataKindArray, getRawFormsData } from './formData'
 import type { ValidatingForm } from './formData'
-import { errorsProcessing, mapErrorObjectToUIFormat } from './errorMapping'
+import { errorsProcessing, mapErrorObjectToUIFormat, showsAnError } from './errorMapping'
 import { getDateStringFromDateObject, normalizeIncomingData, replaceDeepCopy } from './dataMapping'
 import { isEqual } from '../utils/object'
 import { double5, integer, phone, uppercase } from '../components/inputs/normalizers'
@@ -356,7 +356,8 @@ export class UIRender extends DocumentInstance {
      * page, so a second document repeated the first one's errors to its own callback. The split then
      * reported each document's own form alone, which dropped the nested forms that 0.34.x reported:
      * measured, a required field left empty in a `useForm` block, or in a draft row, showed its error
-     * on screen and never reached the host. `formsOf(tree)` is the scope `getFormData` reads.
+     * on screen and never reached the host. `formsOf(tree)` is the scope `getFormData` reads, but for
+     * the draft rows, whose values are not data until they are added (`dataFormsOf`).
      */
     reportErrors (): void {
         if (typeof this.errorHandler !== 'function') {
@@ -395,9 +396,10 @@ export class UIRender extends DocumentInstance {
     getAllFormsData = () => {
         // TODO: investigate realisation with this.data
         // this.data contains related data but there no all changes
-        // Strip the renderExtraItem draft slot (empty `{}` at array.length) from `dataKind.*` arrays
-        // before returning — same compaction used after REMOVE_DATA.
-        return compactDataKindArrays(getFormsData(formsOf(this.formTree)))
+        // Every form's values but a table's draft row's (`dataFormsOf`), whose values were sent as one
+        // more row until 2026-10-23. A row with no content goes from the `dataKind.*` arrays, as after
+        // REMOVE_DATA: a removal can leave a ghost row behind.
+        return compactDataKindArrays(getFormsData(dataFormsOf(this.formTree)))
     }
 
     // Raw form values without Select array reordering — for showIf lookups
@@ -887,10 +889,12 @@ function Decorator (Class: any) {
 
 
             // Send every form's values to the host and make its answer the data (see
-            // `applyPeriods.ts`); a failure shows the host's message in a popup.
+            // `applyPeriods.ts`); a failure shows the host's message in a popup. Nothing is sent while
+            // a field of the forms the values come from shows its error.
             // `updateData` since 2026-10-07; a host may still pass the call under its old name.
             FIELD.FUNC[FIELD.ACTION.ON_APPLY_PERIODS] = () => applyPeriods({
                 updateData: this.getAPICalls().updateData || this.getAPICalls().updateExperienceData,
+                showsAnError: () => showsAnError(dataFormsOf(this.formTree)),
                 readFormsData: this.getAllFormsData,
                 onUpdated: normalizedResponse => this.setState({
                     data: {
@@ -1084,11 +1088,15 @@ function Decorator (Class: any) {
             }
             const pathToDataKindArray = base ? `${base}.dataKind.${kind}` : `dataKind.${kind}`
 
-            const live = getLiveMergedDataKindArray(pathToDataKindArray, formsOf(this.formTree), validating)
+            // The forms without a table's draft row (`dataFormsOf`). With one, a submit sent what the user
+            // had typed in it as a row when the table had none; a draft's own `notWithinRange` check reads
+            // its values from what final-form hands it, and the rows of the other forms from here.
+            const forms = dataFormsOf(this.formTree)
+            const live = getLiveMergedDataKindArray(pathToDataKindArray, forms, validating)
             if (live.length > 0) {
                 return live
             }
-            const dataJson = getFormsData(formsOf(this.formTree))
+            const dataJson = getFormsData(forms)
             return get(dataJson, pathToDataKindArray, []) as any[] // a cast, not a guard: the rows, or `[]`
         }
     }

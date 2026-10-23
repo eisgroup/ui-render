@@ -59,6 +59,15 @@ item has the details.
   that is still waiting when the document unmounts (the delay is 200 ms by default) is dropped.
   0.34.x submitted it after the delay. The `AutoSubmit` view saves such a change as it unmounts.
   (Renderer configuration and error reporting)
+- **Expect a table's draft row in the data only once it is added.** What a user types in the row a
+  `renderExtraItem` declaration renders is no longer in `getFormData`, in what `onApplyPeriods`
+  sends or in an upload. 0.34.x put it there as one more row, malformed: the typed values nested in
+  a `dataKind` of their own. Nor is it in a submit, which in 0.34.x sent it as a row of a table that
+  had none. A host that dropped that row can stop. Add puts the values in the rows, as before. (Fixes)
+- **Expect `apiCalls.updateData` to wait for the user's errors.** `onApplyPeriods` does not call it
+  while a field the user can change shows its validation error, and shows nothing new: the field's
+  own message is what the user sees. 0.34.x sent the table anyway, with an emptied required field as
+  `""`. A disabled or readonly field does not hold it back. (Fixes)
 - **Check `{state.…}` templates fed by a select.** A `Select`'s `setState` action now writes the
   path the meta names. 0.34.x wrote the field's name unless `mapOptions.value` named a key. So in
   list rows or under a named container, the key moves from under their path to `state.<name>`, and
@@ -874,6 +883,25 @@ Nothing to do for these:
 
 #### Fixes
 
+- **`onApplyPeriods` sends nothing while a field shows its validation error.** It sent the table as it
+  was: a user emptied a required number field, the field showed `Required`, the host's
+  `getValidationErrors` heard it, and `apiCalls.updateData` received the row with `""` in it, where a
+  submit in the same state reached no `onSubmit`. Now nothing is sent while a field the user can
+  change shows its error, once it is touched or changed, and nothing new is shown: the field's own
+  message is what the user sees. An error the field does not show yet holds nothing back, and the
+  field is not marked touched. The action does not validate as a submit does. A column the host
+  computes in its answer, declared disabled and required, is empty in a row the user has just added,
+  and no submit gets past it; it does not hold this action back, before or after a failed submit has
+  shown its error. A readonly field does not either, nor does a table's draft row, which the action
+  does not send.
+- **What a user types in a table's draft row is not data until the row is added.** The draft row, the
+  one a `renderExtraItem` declaration renders, has a form of its own, and its values were merged into
+  the document's wrapped in their path a second time. Typing in it without pressing Add put one more
+  row into `getFormData`, `{ dataKind: { period: [null, null, { startDate }] } }` in the demo's
+  `tableForm`, and `onApplyPeriods` and an upload sent it. In a table with no rows, a submit sent what
+  was typed as a row. None of them sees it now, and Add puts it in the rows, as before. The host still
+  hears the draft row's validation errors, and its own checks still read the rows: a period that
+  overlaps one shows `Periods cannot overlap` there.
 - **A field's message in a tab bar no longer moves the tabs.** A field in `childrenBeforeTabs` or
   `childrenAfterTabs` showed its validation message in the bar's row, so the row grew while the message showed:
   the tabs, which the row stretches to its height, grew with it, and a label centred beside the field moved down
