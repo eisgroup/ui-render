@@ -1,7 +1,7 @@
 /**
  * THE VIEWS A USER ACTS ON THAT NO OTHER SPEC DRIVES — date input, popup, slider, toggle, checkbox,
- * dropdown by pointer, table sorting, pages, headers and highlighted rows, progress steps, a field in a
- * tab bar. Added 2026-10-06 with the view map, `e2e/view-coverage.js`.
+ * dropdown by pointer, table sorting, pages, headers, header colours and highlighted rows, progress steps,
+ * a field in a tab bar. Added 2026-10-06 with the view map, `e2e/view-coverage.js`.
  * =============================================================================================
  *
  * Before this file the browser leg drove the tooltip, the dropdown's keyboard, tabs, one Expand
@@ -19,6 +19,7 @@
 const { test, expect, rectOf, isWithin, topmostAt, activeElement } = require('./fixtures')
 const {
     DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, HIGHLIGHTED_ROWS, PROGRESS_STEPS, TAB_BAR_FIELD,
+    HEADER_BACKGROUND,
 } = require('./reference')
 const NESTED_DATA = require('../src/demo/examples/array-nested_data.json')
 
@@ -419,6 +420,66 @@ test.describe('table: headers', () => {
         expect(measured.onlyHiddenText).toBe(true)
         expect(measured.hiddenBox).toEqual(TABLE.HIDDEN_TEXT_BOX)
         expect(measured.height).toBe(measured.labelledHeight)
+    })
+})
+
+test.describe('table: a header\'s background', () => {
+    // No example has a header on two lines beside headers with a background class, so the demo page renders one,
+    // with a text the class paints beside it.
+    const { CLASS, SWATCH, LONG_LABEL, HEADER_COLOUR, TRANSPARENT } = HEADER_BACKGROUND
+    const meta = vertical => ({
+        view: 'Col',
+        items: [
+            { view: 'Text', styles: CLASS, label: SWATCH },
+            {
+                view: 'Table',
+                name: 'rows',
+                vertical,
+                headers: [
+                    { id: 'name', label: 'Name', classNameHeader: CLASS },
+                    { id: 'code', label: 'Code' },
+                    { id: 'amount', label: LONG_LABEL, classNameHeader: CLASS },
+                    { id: 'total', label: 'Total', classNameHeader: CLASS },
+                ],
+            },
+        ],
+    })
+    const data = { rows: [{ name: 'One', code: 'A1', amount: '10', total: '10' }, { name: 'Two', code: 'B2', amount: '20', total: '20' }] }
+
+    test('[I] a background class in `classNameHeader` paints the whole header cell, and a header without one keeps the header colour', async ({ page, pageErrors }) => {
+        await page.setViewportSize(HEADER_BACKGROUND.VIEWPORT)
+        for (const vertical of [false, true]) {
+            await page.goto('/demo')
+            await upload(page, 'data', data)
+            await upload(page, 'meta', meta(vertical))
+            const colour = await page.getByText(SWATCH, { exact: true }).evaluate(element => getComputedStyle(element).backgroundColor)
+            const headers = await page.locator('table th').evaluateAll((cells, name) => cells.map((cell) => {
+                const content = cell.firstElementChild
+                return {
+                    label: cell.textContent.trim(),
+                    coloured: cell.classList.contains(name),
+                    cell: getComputedStyle(cell).backgroundColor,
+                    content: getComputedStyle(content).backgroundColor,
+                    cellHeight: cell.getBoundingClientRect().height,
+                    contentHeight: content.getBoundingClientRect().height,
+                }
+            }), CLASS)
+            const layout = vertical ? 'vertical layout' : 'default layout'
+
+            expect(headers.map(header => header.coloured), `${layout}: the class is on the cells it is given to`).toEqual([true, false, true, true])
+            expect(colour, `${layout}: the class paints a colour of its own`).not.toBe(HEADER_COLOUR)
+            if (!vertical) {
+                const name = headers[0]
+                expect(name.contentHeight, `${layout}: a label on two lines makes the row taller than a label on one`)
+                    .toBeLessThan(name.cellHeight - 10)
+            }
+            for (const header of headers) {
+                const which = `${layout}, header "${header.label.slice(0, 20)}"`
+                expect(header.cell, `${which}: the cell`).toBe(header.coloured ? colour : HEADER_COLOUR)
+                expect(header.content, `${which}: the label's row paints nothing over it`).toBe(TRANSPARENT)
+            }
+        }
+        expect(pageErrors).toEqual([])
     })
 })
 
