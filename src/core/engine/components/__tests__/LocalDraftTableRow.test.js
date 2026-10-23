@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { act, render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { ConfigContext, initialConfigState } from '../../../contexts/ConfigContext'
 import LocalDraftTableRow from '../LocalDraftTableRow'
@@ -174,6 +174,53 @@ describe('LocalDraftTableRow', () => {
             parentInstance: { getDataKind: () => [] },
         })
         expect(container.querySelector('.ui-render-picker')).toBeInTheDocument()
+    })
+
+    describe('a date cell left with text that is no date', () => {
+        const meta = {
+            view: 'TableCells',
+            items: [
+                { view: 'Input', name: 'startDate', type: 'date', validate: 'required' },
+                { view: 'Input', name: 'endDate', type: 'date' },
+                { view: 'VerticalLayout', items: [{ view: 'Button', onClick: { name: 'addData' }, children: 'Add' }] },
+            ],
+        }
+        // As a user types, and as long as rc-picker takes to confirm a date once the field is left.
+        const typeAndLeave = async (name, text) => {
+            const input = document.querySelector(`input[name="${name}"]`)
+            act(() => input.focus())
+            fireEvent.change(input, { target: { value: text } })
+            act(() => input.blur())
+            await act(() => new Promise(resolve => setTimeout(resolve, 100)))
+        }
+        const shown = name => document.querySelector(`input[name="${name}"]`).closest('.input--wrapper').querySelector('.field-help')
+
+        it('holds Add back, and says Invalid date, in an optional cell too', async () => {
+            renderDraft({ meta, kind: 'experiencePeriods', parentInstance: { getDataKind: () => [] } })
+            await typeAndLeave('startDate', '03-01-2026')
+            await typeAndLeave('endDate', '02-30-2026')
+
+            fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
+
+            expect(mockPush).not.toHaveBeenCalled()
+            expect(document.querySelector('input[name="endDate"]')).toHaveValue('02-30-2026')
+            expect(shown('endDate')).toHaveTextContent('Invalid date')
+            expect(shown('startDate')).toBeNull()
+        })
+
+        it('adds the row once the text is corrected', async () => {
+            renderDraft({ meta, kind: 'experiencePeriods', parentInstance: { getDataKind: () => [] } })
+            await typeAndLeave('startDate', '03-01-2026')
+            await typeAndLeave('endDate', '02-30-2026')
+            fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
+
+            await typeAndLeave('endDate', '03-31-2026')
+            expect(shown('endDate')).toBeNull()
+            fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
+
+            expect(mockPush).toHaveBeenCalledTimes(1)
+            expect(mockPush.mock.calls[0][0].rowObject).toEqual({ startDate: '2026-03-01', endDate: '2026-03-31' })
+        })
     })
 
     it('returns null when meta has no items', () => {

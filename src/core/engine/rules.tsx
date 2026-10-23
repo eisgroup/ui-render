@@ -25,7 +25,7 @@ import { applyPeriods } from './applyPeriods'
 import { parsePopupAlertArgs, parsePopupArgs } from './popupArgs'
 import { findPopupTemplate } from './popupTemplate'
 import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
-import { dataFormsOf, errorsFor, formsOf, touchedFor } from '../state/formRegistry'
+import { countReset, dataFormsOf, errorsFor, formsOf, touchedFor } from '../state/formRegistry'
 import { _ } from './translations'
 import { getFormsData, getLiveMergedDataKindArray, getRawFormsData } from './formData'
 import type { ValidatingForm } from './formData'
@@ -967,6 +967,8 @@ function Decorator (Class: any) {
         }
 
         resetForm () {
+            // Counted first: a date field left with text that is no date drops it when this validates (`resetsOf`).
+            countReset(this.form)
             this.form.reset()
         }
 

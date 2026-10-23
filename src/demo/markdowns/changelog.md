@@ -883,6 +883,18 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A date field keeps text that is no date, and says `Invalid date`.** rc-picker reads what a user types strictly,
+  in the display format, and hands on only a date. A field left with `11-31-2021` or `02-29-2021` showed the date it
+  had again, or nothing: an empty required field was wiped and said `Required`, and a field with a date went back to
+  it and said nothing. Now the field keeps the text and shows `Invalid date`, required or not. Its value stays the
+  date it had, or none: that is what `getFormData` returns, and a submit, an `onApplyPeriods` and a table's Add send
+  nothing while the error shows. The host's `getValidationErrors` hears `Invalid date`. The error goes once the text
+  is a date, typed or picked in the calendar, and the `reset` action shows the value again in place of the text.
+- **A date typed and left by a click is kept.** Only Tab and Enter kept a typed date: leaving the field by a click
+  anywhere else put the date it had back. The field handed rc-picker a new moment of the same date whenever it
+  rendered, as it does when it is left, and rc-picker dropped the date it had not confirmed yet.
+- **Emptying a date field's text empties its date.** The date came back once the field was left. A required field
+  now says `Required`.
 - **`onApplyPeriods` sends nothing while a field shows its validation error.** It sent the table as it
   was: a user emptied a required number field, the field showed `Required`, the host's
   `getValidationErrors` heard it, and `apiCalls.updateData` received the row with `""` in it, where a

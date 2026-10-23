@@ -516,6 +516,18 @@ const DATE_INPUT = {
     PICKED_VALUE: '01-15-2022',
     /** [I] A date typed in the display format, which the field keeps. */
     TYPED_VALUE: '02-03-2022',
+    /**
+     * [I] since 2026-10-23. Text that is no date, in the display format: a field left with it keeps it and shows
+     * `INVALID_MESSAGE`, and Submit sends nothing. Until then an empty required field was wiped and said `Required`,
+     * and a field with a date showed that date again and said nothing.
+     */
+    INVALID_TEXTS: ['11-31-2021', '02-29-2021'],
+    INVALID_MESSAGE: 'Invalid date',
+    /** [I] since 2026-10-23. A date typed and left by a click elsewhere, which only Tab and Enter kept until then. */
+    CLICKED_AWAY_VALUE: '11-30-2021',
+    CLICKED_AWAY_STORED: '2021-11-30',
+    /** [I] since 2026-10-23. What a required field says once its text is emptied: leaving it showed the date again. */
+    EMPTIED_MESSAGE: 'Required',
 }
 
 /**

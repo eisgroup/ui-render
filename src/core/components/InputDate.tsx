@@ -60,6 +60,91 @@ function whenNear (element: Element, near: () => void): () => void {
     }
 }
 
+/**
+ * A date as a moment, or null when there is none: a moment, a Date, a timestamp, or a string in `dateFormat`,
+ * `YYYY-MM-DD` or ISO 8601.
+ */
+function toMoment (date: unknown, dateFormat: string): Moment | null {
+    if (date == null || date === '') return null
+
+    let parsed: Moment
+    if (moment.isMoment(date)) parsed = date
+    else if (typeof date !== 'string') parsed = moment(date as moment.MomentInput)
+    else {
+        // Strict pass first, so the configured format wins over Moment's guessing. Then fall
+        // back to a lenient read: a stored value in a shape we do not list (unpadded `2021-1-2`,
+        // `2021/01/02`, `Jan 2, 2021`) must still render. Showing it blank reads as "unset" to
+        // the user, who then overwrites a perfectly good date.
+        parsed = moment(date, [dateFormat, 'YYYY-MM-DD', moment.ISO_8601], true)
+        // The lenient read is `moment(date)`'s own, step by step: ISO 8601, RFC 2822, then the
+        // `Date` parse Moment falls back to. Called as `moment(date)`, that last step printed
+        // Moment's deprecation warning to the host's console, until 2026-10-06.
+        if (!parsed.isValid()) parsed = moment(date, moment.ISO_8601)
+        if (!parsed.isValid()) parsed = moment(date, moment.RFC_2822)
+        if (!parsed.isValid()) parsed = moment(new Date(date))
+    }
+
+    return parsed.isValid() ? parsed : null
+}
+
+/**
+ * Whether rc-picker reads `text` as a date, as it reads what a user types: strictly, in one of `formats`. Never the
+ * lenient read of `toMoment`, which takes `02-29-2021` for 2021-02-28 and `11-31-2021` for 2021-11-30.
+ */
+function readsAsDate (text: string, formats: readonly string[]): boolean {
+    return formats.some(format => generateConfig.locale.parse(enUs.locale, text, [format]) !== null)
+}
+
+/** What the input rc-picker renders tells `InputDate` (`TextInput`). */
+type InputReports = {
+    /** The text the input shows, whenever it changes */
+    shows: (text: string) => void
+    focuses: () => void
+    /** The text the input shows as it loses the focus */
+    leaves: (text: string) => void
+}
+
+const InputReported = React.createContext<InputReports | null>(null)
+
+/** What rc-picker hands its input, among the rest: the text it keeps, and its own focus handlers. */
+type TextInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+    value: string
+    onFocus: React.FocusEventHandler<HTMLInputElement>
+    onBlur: React.FocusEventHandler<HTMLInputElement>
+}
+
+/**
+ * The `<input>` rc-picker renders, handed to it as `components.input`: the element it renders itself, which tells
+ * `InputDate` the text it shows. rc-picker keeps that text in its own state, and changes it as the user types, as the
+ * value changes, and as a day in the calendar is hovered.
+ */
+const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(function TextInput ({onFocus, onBlur, ...props}, ref) {
+    // An assertion, not a guard: rc-picker renders this input only inside `InputDate`'s provider.
+    const reports = useContext(InputReported)!
+    const {value} = props
+    useEffect(() => {
+        reports.shows(value)
+    }, [reports, value])
+    return (
+        <input
+            ref={ref}
+            {...props}
+            onFocus={event => {
+                reports.focuses()
+                onFocus(event)
+            }}
+            onBlur={event => {
+                // rc-picker's first: through it, the field's own, which marks the field touched.
+                onBlur(event)
+                reports.leaves(event.currentTarget.value)
+            }}
+        />
+    )
+})
+
+/** One object: rc-picker reads it into a context of its own, by identity. */
+const COMPONENTS = {input: TextInput}
+
 /** The props rc-picker copies onto its `<input>` as they are: `role`, `aria-*` and `data-*` (rc-util's `pickAttrs`). */
 function ariaAndData (props: Record<string, unknown>): Record<string, unknown> {
     const picked: Record<string, unknown> = {}
@@ -100,6 +185,11 @@ export type InputDateProps = {
     translate?: Translate
     /** Called with the picked date as `YYYY-MM-DD`, or null when there is none */
     onChange?: (value: string | null) => void
+    /**
+     * Called with the text the field is left with when that text is no date in its formats, which the field keeps
+     * showing, and with null once it shows a date or nothing again. The date is the one it had before.
+     */
+    onInvalidText?: (text: string | null) => void
     onSelect?: DatePickerProps['onCalendarChange']
     /** A moment, a Date, a timestamp, or a string in the configured format, `YYYY-MM-DD` or ISO 8601 */
     value?: unknown
@@ -140,6 +230,7 @@ const InputDate = ({
     placeholder,
     translate = Active.translate,
     onChange,
+    onInvalidText,
     onSelect,
     value: valueFromParent,
     defaultValue,
@@ -181,31 +272,56 @@ const InputDate = ({
     const id = idGiven || ownId
     if (!label && title) props.title = translate(title)
 
-    const toMoment = (date: unknown): Moment | null => {
-        if (date == null || date === '') return null
-
-        let parsed: Moment
-        if (moment.isMoment(date)) parsed = date
-        else if (typeof date !== 'string') parsed = moment(date as moment.MomentInput)
-        else {
-            // Strict pass first, so the configured format wins over Moment's guessing. Then fall
-            // back to a lenient read: a stored value in a shape we do not list (unpadded `2021-1-2`,
-            // `2021/01/02`, `Jan 2, 2021`) must still render. Showing it blank reads as "unset" to
-            // the user, who then overwrites a perfectly good date.
-            parsed = moment(date, [dateFormat, 'YYYY-MM-DD', moment.ISO_8601], true)
-            // The lenient read is `moment(date)`'s own, step by step: ISO 8601, RFC 2822, then the
-            // `Date` parse Moment falls back to. Called as `moment(date)`, that last step printed
-            // Moment's deprecation warning to the host's console, until 2026-10-06.
-            if (!parsed.isValid()) parsed = moment(date, moment.ISO_8601)
-            if (!parsed.isValid()) parsed = moment(date, moment.RFC_2822)
-            if (!parsed.isValid()) parsed = moment(new Date(date))
-        }
-
-        return parsed.isValid() ? parsed : null
-    }
-
     const sourceValue = valueFromParent !== undefined ? valueFromParent : defaultValue
-    const value = toMoment(sourceValue)
+    // One moment per value. A new one on every render made rc-picker drop a date typed and not confirmed yet whenever
+    // the field rendered again, as it does when it is left: only Tab and Enter kept the date, and a click anywhere else
+    // put the old one back, until 2026-10-23.
+    const value = useMemo(() => toMoment(sourceValue, dateFormat), [sourceValue, dateFormat])
+    // What rc-picker reads typed text in, and shows a date in the first of.
+    const formats = useMemo(() => [dateFormat, 'YYYY-MM-DD'], [dateFormat])
+
+    // TEXT THAT IS NO DATE. rc-picker hands on only text it reads as a date in `formats`. Until 2026-10-23 a field left
+    // with `11-31-2021` or `02-29-2021` showed the date it had before again, or nothing, and a required one said
+    // `Required`. Now it keeps the text (`preserveInvalidOnBlur`), and its owner hears of it (`onInvalidText`) to show
+    // the error: the date is still the one it had.
+    // The text reported, while the field shows it.
+    const invalidText = useRef<string | null>(null)
+    // Left empty. rc-picker confirms the date it last read once the field is left, one it read before the text was
+    // emptied included: until the next focus, the field takes none.
+    const emptied = useRef(false)
+    // What the reports read of the latest render: they are made once.
+    const latest = useRef({value, formats, onChange, onInvalidText})
+    useBeforePaintEffect(() => {
+        latest.current = {value, formats, onChange, onInvalidText}
+    })
+    const reports = useMemo<InputReports>(() => {
+        const report = (text: string | null) => {
+            if (invalidText.current === text) return
+            invalidText.current = text
+            const {onInvalidText} = latest.current
+            if (onInvalidText) onInvalidText(text)
+        }
+        return {
+            shows: (text) => {
+                // A date now, or nothing: the user corrected the text, or rc-picker showed a value in its place.
+                if (invalidText.current !== null && (!text || readsAsDate(text, latest.current.formats))) report(null)
+            },
+            focuses: () => {
+                emptied.current = false
+            },
+            leaves: (text) => {
+                if (text) {
+                    report(readsAsDate(text, latest.current.formats) ? null : text)
+                    return
+                }
+                report(null)
+                // Emptied, and so the date is gone. rc-picker kept it, and showed it again, until 2026-10-23.
+                emptied.current = true
+                const {value, onChange} = latest.current
+                if (value && onChange) onChange(null)
+            },
+        }
+    }, [])
 
     // An `aria-describedby` naming an id no element carries is worse than none: it is an axe
     // `aria-valid-attr-value` violation, and a screen reader announces nothing for it. The help
@@ -215,9 +331,9 @@ const InputDate = ({
 
     // `unknown`: rc-picker's type also covers its multiple mode, and `toMoment` reads whatever arrives.
     const onDateChanged = (date: unknown) => {
-        if (!onChange) return
+        if (!onChange || emptied.current) return
 
-        const changedDate = toMoment(date)
+        const changedDate = toMoment(date, dateFormat)
         onChange(changedDate ? changedDate.format('YYYY-MM-DD') : null)
     }
 
@@ -242,31 +358,35 @@ const InputDate = ({
             </Row>
             <Row className={classNames('input', {icon, lefty, error, info, unit})}>
                 {mounted ? (
-                    <Picker
-                        ref={onPicker}
-                        name={name}
-                        id={id}
-                        prefixCls={'ui-render-picker'}
-                        className={'ui-render-picker'}
-                        disabled={disabled}
-                        resize={resize}
-                        aria-describedby={idHelp}
-                        placeholder={translate(placeholder)}
-                        generateConfig={generateConfig}
-                        {...passed}
-                        // Mounted by a focus or a press on the stand-in: it takes the focus, and a press opens it.
-                        {...(mounted !== 'near' && {autoFocus: true})}
-                        {...(mounted === 'press' && {defaultOpen: true})}
-                        value={value}
-                        allowClear={false}
-                        locale={enUs}
-                        picker='date'
-                        format={[dateFormat, 'YYYY-MM-DD']}
-                        onChange={onDateChanged}
-                        onCalendarChange={onSelect}
-                        onFocus={onFocus}
-                        onBlur={onBlur}
-                    />
+                    <InputReported.Provider value={reports}>
+                        <Picker
+                            ref={onPicker}
+                            name={name}
+                            id={id}
+                            prefixCls={'ui-render-picker'}
+                            className={'ui-render-picker'}
+                            disabled={disabled}
+                            resize={resize}
+                            aria-describedby={idHelp}
+                            placeholder={translate(placeholder)}
+                            generateConfig={generateConfig}
+                            {...passed}
+                            // Mounted by a focus or a press on the stand-in: it takes the focus, and a press opens it.
+                            {...(mounted !== 'near' && {autoFocus: true})}
+                            {...(mounted === 'press' && {defaultOpen: true})}
+                            value={value}
+                            allowClear={false}
+                            locale={enUs}
+                            picker='date'
+                            format={formats}
+                            preserveInvalidOnBlur
+                            components={COMPONENTS}
+                            onChange={onDateChanged}
+                            onCalendarChange={onSelect}
+                            onFocus={onFocus}
+                            onBlur={onBlur}
+                        />
+                    </InputReported.Provider>
                 ) : (
                     // The stand-in: what rc-picker renders for a closed field, attribute for attribute, read from the same
                     // props (`InputDate.stand-in.test.js`). It has rc-picker's elements, and none of its behaviour.

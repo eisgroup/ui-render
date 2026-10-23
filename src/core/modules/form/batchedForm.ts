@@ -20,6 +20,19 @@ export function registrationsOf (form: unknown): Registrations | undefined {
   return form ? (form as {[REGISTRATIONS]?: Registrations})[REGISTRATIONS] : undefined
 }
 
+const REVALIDATE = Symbol('revalidate')
+
+/**
+ * Validates every field of a form `createBatchedForm` made, or of a copy of one, and tells every field and the
+ * form's listeners, as `setConfig('validate', …)` does. For a field whose validator reads something besides the
+ * values, which changed while its value did not: a date field left with text that is no date (`asInputDateField`).
+ * While validation is paused, that waits until it resumes. Nothing for any other form.
+ */
+export function revalidate (form: unknown): void {
+  const run = form ? (form as {[REVALIDATE]?: () => void})[REVALIDATE] : undefined
+  if (run) run()
+}
+
 /**
  * The final-form instance a document's `<Form>` renders, whose fields hear of each other once per burst of
  * registrations rather than once per field (2026-10-13).
@@ -135,6 +148,6 @@ export function createBatchedForm<FormValues = Record<string, any>> (config: Con
       form.resumeValidation()
     },
   }
-  Object.assign(form, {[REGISTRATIONS]: registrations})
+  Object.assign(form, {[REGISTRATIONS]: registrations, [REVALIDATE]: () => setConfig('validate', validate)})
   return form
 }
