@@ -257,7 +257,7 @@ of the `UIRender` component, not attributes of a `meta.json` node.
 |---|---|---|
 | `dateFormat` | `MM-DD-YYYY` | `moment` format tokens for every date the renderer **displays** (an ISO-8601 value inside a `Text` node, a `render*: "Date"` value) and **edits** (what the date picker shows, and the format it parses typed input with first). A date field still stores `YYYY-MM-DD`, and reads a stored value in this format, `YYYY-MM-DD` or ISO 8601 first, then leniently |
 | `currency` | `USD` | published as a CSS class on the renderer's shell — `.app.EUR` — for currency-specific styling |
-| `language` | `en` | published as a CSS class on the renderer's shell — `.app.lang--fr` |
+| `language` | `en` | published as a CSS class on the renderer's shell — `.app.lang--fr`. A change renders again every text the document translated, in the language `translate` answers in now, without a remount: the form keeps its values and the errors it shows |
 | `locale` | none: the browser's | the language tag (`de-DE`) numbers are **displayed** in, below. A Java-style `de_DE` is read as `de-DE`, and a value that is no language tag as none |
 
 They reach every component through `ConfigContext`, so a value inside a nested `Table` cell

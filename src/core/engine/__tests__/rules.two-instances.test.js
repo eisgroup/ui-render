@@ -22,6 +22,7 @@ import '@testing-library/jest-dom'
 import '../../modules/form/utils'
 import UIRender from '../rules'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
+import { Active } from '../../utils'
 
 const wrap = ui => (
     <ConfigContext.Provider value={initialConfigState}>
@@ -72,12 +73,56 @@ describe('two instances on one page keep their own translator', () => {
         expect(textOf(view, 'second')).toBe('B:hello')
     })
 
+    it('after the first one is handed another translator', () => {
+        const view = render(twoInstances())
+
+        view.rerender(twoInstances({ translate: v => `C:${v}` }))
+
+        expect(textOf(view, 'first')).toBe('C:hello')
+        expect(textOf(view, 'second')).toBe('B:hello')
+    })
+
     it('an instance given no translator still renders its label', () => {
         // The fallback path: no `translate` prop, no parent to inherit from, so the module global is
         // what is left. It must not throw or blank the label.
         const view = render(wrap(<div data-testid="only"><UIRender meta={meta} data={{}}/></div>))
 
         expect(textOf(view, 'only')).toContain('hello')
+    })
+})
+
+describe('the module global, `Active.translate`', () => {
+    // Seven components take it as their default and `modules/upload` reads it, so it is still assigned: it is the
+    // translator of the document constructed last with a `translate`. Since 2026-10-23 a document makes a new
+    // translator when it is handed another `translate` or `language`, and the global follows the one it holds.
+    it('follows the new translator of the document it is', () => {
+        const view = render(wrap(<UIRender meta={meta} data={{}} translate={v => `A:${v}`}/>))
+        expect(Active.translate('x')).toBe('A:x')
+
+        view.rerender(wrap(<UIRender meta={meta} data={{}} translate={v => `C:${v}`}/>))
+
+        expect(Active.translate('x')).toBe('C:x')
+        // Strings only reach the host's function, as before.
+        expect(Active.translate(1)).toBe(1)
+    })
+
+    it('stays the document\'s constructed last when another one is handed a new translator', () => {
+        // The second document keeps its function, so the first is the only one with a new translator: a global
+        // that went to whichever document made one last would read `C:x`.
+        const second = v => `B:${v}`
+        const page = first => wrap(
+            <div>
+                <div data-testid="first"><UIRender meta={meta} data={{}} translate={first}/></div>
+                <div data-testid="second"><UIRender meta={meta} data={{}} translate={second}/></div>
+            </div>
+        )
+        const view = render(page(v => `A:${v}`))
+        expect(Active.translate('x')).toBe('B:x')
+
+        view.rerender(page(v => `C:${v}`))
+
+        expect(textOf(view, 'first')).toBe('C:hello')
+        expect(Active.translate('x')).toBe('B:x')
     })
 })
 

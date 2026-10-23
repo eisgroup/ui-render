@@ -174,6 +174,12 @@ translated already, so a `Text` that shows it gets `alreadyTranslated` as its tr
 `BUILT_IN_PHRASES`, in `UIRenderPhraseId` (`src/library/contract.ts`; `typecheck` fails while the two differ) and on
 the page (`npm run docs:phrases`). A published id is never renamed: a host's translation of it would be lost silently.
 
+A switch of language reaches every text through the translator's identity. The document makes a new one when the
+host hands another `translate` or `language` (`translate` in `rules.tsx`) and publishes it in `TranslateContext`;
+every node of the mapper and every `Text` reads it there, and hands it on as a prop. So a component that translates
+takes the translator as a prop or reads that context, and keeps no translated text past a render that hands it another
+one. `language-switch.test.js` pins what follows a switch, and `language-switch-budget.test.js` what it costs.
+
 A text made where no translator is known is a `PhraseMessage` (`phraseMessage(ID, variables?)`): a validator's
 message, which final-form keeps as the field's error, and a popup's title. A `Text` shows one in the language of its
 `translate`, as it shows a boolean, and `getValidationErrors` is handed its text. A required field is known by the id,

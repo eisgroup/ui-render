@@ -93,6 +93,25 @@ describe('the instance every node of a document is handed', () => {
         expect(instance.getRawFormsData()).toEqual(expect.objectContaining({ amount: 5 }))
     })
 
+    it('carries the same translator while its `translate` and `language` stay, and the same again for a pair it had', () => {
+        // A render React throws away, as it does a transition's that a keystroke interrupts, reads the translator with
+        // props the document never commits, and the keystroke's render reads it with the props it has: that one must
+        // be the translator its fields already hold, or every field renders again for the keystroke.
+        const t = value => `t:${value}`
+        const view = mountDocument({ meta: inputMeta, data: { amount: 5 }, initialValues: { amount: 5 }, translate: t, language: 'en' })
+        const instance = rootOf()
+        const english = instance.translate
+
+        view.rerender({ meta: inputMeta, data: { amount: 5 }, initialValues: { amount: 5 }, translate: t, language: 'en' })
+        expect(instance.translate).toBe(english)
+
+        view.rerender({ meta: inputMeta, data: { amount: 5 }, initialValues: { amount: 5 }, translate: t, language: 'de' })
+        expect(instance.translate).not.toBe(english)
+
+        view.rerender({ meta: inputMeta, data: { amount: 5 }, initialValues: { amount: 5 }, translate: t, language: 'en' })
+        expect(instance.translate).toBe(english)
+    })
+
     it('keeps its state a free-form bag: a setState action writes a path into it', () => {
         mountMeta(inputMeta, { amount: 5 })
 

@@ -98,6 +98,12 @@ item has the details.
   its key. A required field is still reported as `<Field Name> is Required` when the `required` rule
   failed. A message a meta's own validator function returns is reported as it is, so one that reads
   `Required` is no longer reworded. (Renderer configuration and error reporting)
+- **Pass your language as `language` to switch it, and keep `translate` the same function.** A
+  document now renders every text it translated again, without a remount, when `language` changes or
+  when `translate` is a new function. 0.34.x ignored a new `translate`, and a switch reached only some
+  texts. A `translate` written inline, new on each render of your page, now renders every text of the
+  document each time: wrap it in `useCallback`. After a switch, `getValidationErrors` is called again
+  when the errors read differently in the new language. (Renderer configuration and error reporting)
 - **Check uploads that take several files under a `label`.** The drop zone shows the label as the meta
   gives it, `document`, where it showed the English plural, `documents`, which made nonsense of a
   translated label. An upload with no label still says `Files`. (Fixes)
@@ -204,6 +210,18 @@ Nothing to do for these:
   formats, in bold, where the host's translation puts their placeholders. `getValidationErrors` is
   handed the messages as the fields show them, but a required field's, which still reads
   `<Field Name> is Required`.
+- **A host switches language without a remount: it passes `language`.** When the `language` prop
+  changes, the document renders again every text it translated, in the language `translate` answers
+  in now: the labels, titles, placeholders and options of the meta, the table headers, the values it
+  shows as text, a popup's title and content, and the built-in texts, the validation messages under
+  the fields included. The form keeps what the user typed, the fields they left and the errors they
+  see, and `getValidationErrors` is handed the errors again when they read differently in the new
+  language. A host whose `translate` stays one function, as i18next's own `t` does, passes its
+  current language. A new `translate` does the same, so a host that hands a new function for each
+  language need not pass `language`. Until now a document made its translator once: a new
+  `translate` was ignored, and a switch reached only the texts a `Text` shows, which rendered again
+  whenever the host did. A field's label, its placeholder and a select's options kept the old
+  language until a remount, which lost what the user had typed.
 - **New `locale` prop: the language tag the widget shows numbers in.** A host passes its user's
   number format, `de-DE`, and the `Currency`, `Float`, `Double5` and `Percent` renderers, a
   `Counter`, a pie chart's values and a slider's labels write their decimal and grouping separators:
@@ -1013,6 +1031,14 @@ Nothing to do for these:
   own document's `translate`.** The loader and the hover text took the `translate` of the document
   constructed last, and a validation message was translated a second time with it. On a page with two
   documents, the first one's showed the second one's translation.
+- **A value a renderer shows, a tab's title and a table cell translate with their own document's
+  `translate`.** Their `Text` is handed no translator, and took the `translate` of the document
+  constructed last: on a page with two documents, the first one's `Yes` read in the second one's
+  language once the page rendered again.
+- **A host's render that hands a document the same props renders none of it.** The widget's provider
+  made new context values on every render, so every `Text` and every node of the document rendered
+  again whenever the host did: the 52 texts of a 50-row table with a column of text, on every render
+  of the host. They render when what they show changes now.
 - **`onApplyPeriods` sends nothing while a field shows its validation error.** It sent the table as it
   was: a user emptied a required number field, the field showed `Required`, the host's
   `getValidationErrors` heard it, and `apiCalls.updateData` received the row with `""` in it, where a

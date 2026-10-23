@@ -232,7 +232,7 @@ exactly like a top-level field:
 |---|---|---|
 | `dateFormat` | `MM-DD-YYYY` | [`moment` format tokens](https://momentjs.com/docs/#/displaying/format/) for every date the renderer **displays** (an ISO value in a `Text` node, a `render*: "Date"` value) and **edits** (the date picker's display and parsing) |
 | `currency` | `USD` | published as a CSS class on the renderer's shell (`.app.EUR`), for currency-specific styling |
-| `language` | `en` | published as a CSS class on the renderer's shell (`.app.lang--fr`) |
+| `language` | `en` | published as a CSS class on the renderer's shell (`.app.lang--fr`). A change renders again every text the document translated, in the new language (see [Switching language](#switching-language-while-a-document-is-on-the-page)) |
 | `locale` | none: the browser's | the [language tag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument) numbers are **displayed** in: their decimal and grouping separators. A Java-style `de_DE` is read as `de-DE` |
 
 Each is merged, not replaced: passing only `dateFormat` leaves the others at their defaults.
@@ -292,9 +292,27 @@ The validation messages reach `getValidationErrors` as the field shows them, in 
 required field is the exception: it is reported as `<Field Name> is Required`, with the name taken from
 the field's `name`, as before.
 
-In this version a text is looked up when its component renders. When your i18n changes language
-while a document is on the page, a built-in text already shown changes when its component renders
-again, not at once.
+### Switching language while a document is on the page
+
+Pass your current language as `language`. When your `translate` stays the same function as the
+language changes, as i18next's own `t` does, `language` is what tells the document:
+
+```jsx
+// `t` is one function for the life of the page, and answers in the language your i18n is in now.
+<UIRender meta={meta} data={data} translate={t} language={currentLanguage} />
+```
+
+When `language` changes, the document renders again every text it translated, in the language
+`translate` answers in now: the labels, titles, placeholders and options of the meta, the table
+headers, the values it shows as text, a popup's title and content, and the built-in texts, the
+validation messages under the fields included. Nothing is mounted again: what the user typed, the
+fields they left and the errors they see stay as they are. `getValidationErrors` is handed the errors
+again when they read differently in the new language.
+
+A new `translate` does the same, so a host whose `translate` is a new function for each language,
+such as one from i18next's `getFixedT`, need not pass `language`. Keep `translate` the same function
+between renders otherwise: every new one renders every text of the document again. Wrap one you
+write inline in `useCallback`.
 
 ## Error reporting (consumer)
 

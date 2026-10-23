@@ -93,6 +93,43 @@ describe('AppProvider contracts', () => {
         expect(screen.getByTestId('popup')).toHaveTextContent('false|Updated|Saved')
     })
 
+    it('hands its readers the same values while its state stays the same', () => {
+        // New values on every render, until 2026-10-23, rendered every reader again whenever the host rendered.
+        const seen = []
+        const Reader = React.memo(function Reader () {
+            seen.push({ config: React.useContext(ConfigContext), app: React.useContext(AppContext) })
+            return null
+        })
+        const host = () => <AppProvider><Reader /></AppProvider>
+        const view = render(host())
+        view.rerender(host())
+        view.rerender(host())
+
+        expect(seen).toHaveLength(1)
+    })
+
+    it('hands new values, with the same calls, when its state changes', () => {
+        const seen = []
+        const Reader = () => {
+            seen.push({ config: React.useContext(ConfigContext), app: React.useContext(AppContext) })
+            return <ContextHarness />
+        }
+        render(<AppProvider><Reader /></AppProvider>)
+
+        fireEvent.click(screen.getByRole('button', { name: 'configure' }))
+        fireEvent.click(screen.getByRole('button', { name: 'open popup' }))
+
+        expect(seen).toHaveLength(3)
+        const [first, configured, opened] = seen
+        expect(configured.config).not.toBe(first.config)
+        expect(configured.app).toBe(first.app)
+        expect(opened.app).not.toBe(configured.app)
+        expect(opened.config).toBe(configured.config)
+        expect(opened.config.setConfig).toBe(first.config.setConfig)
+        expect(opened.app.setPopupState).toBe(first.app.setPopupState)
+        expect(opened.app.togglePopupState).toBe(first.app.togglePopupState)
+    })
+
     it('uses functional popup updates when multiple toggles are batched', () => {
         render(
             <AppProvider>

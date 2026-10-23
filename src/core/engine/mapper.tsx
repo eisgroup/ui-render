@@ -39,7 +39,7 @@ import TableView from './components/TableView'
 import TabList from './components/TabList'
 import Tabs from './components/Tabs'
 import Data from './Data'
-import { AppContext, TableColumnsContext } from '../contexts'
+import { AppContext, TableColumnsContext, TranslateContext } from '../contexts'
 import type { RenderErrorReport } from './Render'
 
 /**
@@ -239,11 +239,13 @@ const RenderComponent = ({
     useContext(AppContext)
     // The column labels of the table body this node sits in, if any: see `TableColumnsContext`.
     const columns = useContext(TableColumnsContext)
-    // The instance's own translator, not the module global: `Active.translate` is owned by whichever
+    // The document's own translator, not the module global: `Active.translate` is owned by whichever
     // UIRender was constructed LAST, so reading it here made a re-rendering instance translate with a
-    // sibling's function. The fallback covers nodes rendered without an instance (tests, and the
-    // components that read `Active.translate` as a prop default).
-    const translate = (instance && instance.translate) || Active.translate
+    // sibling's function. Read from the context its document publishes, so that a new one, for another
+    // `language` or `translate`, renders the node again, one in a popup's content too, which renders in an
+    // element the popup keeps (`TranslateContext`). The instance's covers a node rendered without a document
+    // around it (tests), and the module global one whose document has no translator.
+    const translate = useContext(TranslateContext) || (instance && instance.translate) || Active.translate
     /* General showIf logic — the whole decision lives in `showIf.ts`, testable on its own. */
     const shown = shouldRender({ showIf, data, _data, relativeData, relativePath, relativeIndex, instance })
     // The fields that mount below this node, or that go when it hides, register and unregister as one burst, which

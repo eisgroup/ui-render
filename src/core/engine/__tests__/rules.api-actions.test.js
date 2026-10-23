@@ -64,7 +64,9 @@ describe('UIRender additional action and error contracts', () => {
             title: 'network unavailable',
         }))
         expect(React.isValidElement(popupState.content)).toBe(true)
-        expect(popupState.content.props.data).toBe('Download Failed!')
+        // Put in words as the popup shows it, in its document's language (`PhraseContent`): this one's is English.
+        const { container } = render(popupState.content)
+        expect(container).toHaveTextContent('Download Failed!')
     })
 
     it('keeps current data and reports the original upload failure', async () => {
