@@ -80,6 +80,16 @@ const SCHEMA_ONLY_VOCABULARIES = [
     ['inputType', 'MetaInputType'],
 ]
 
+/**
+ * The published unions that are no meta vocabulary, so neither table above can hold them, each with the
+ * place that pins it instead. Listed so that the check below still accounts for every published union.
+ */
+const NON_META_UNIONS = [
+    // The ids of the built-in phrases, pinned to `BUILT_IN_PHRASES` by `scripts/__tests__/phrase-reference.contract.test.js`
+    // and, at compile time, by `src/library/contract.agreement.ts`.
+    'UIRenderPhraseId',
+]
+
 const sortedValues = (group) => Object.keys(group).map(key => group[key]).sort()
 const suggestedEnum = (name) => [...schema.$defs[name].anyOf[0].enum].sort()
 
@@ -190,11 +200,13 @@ describe('published meta.json schema', () => {
     })
 
     it('pins every published vocabulary union to one of the two tables above', () => {
-        // Without this, adding a sixth union to the type surface and forgetting to list it here
-        // would leave it unchecked while the suite stayed green.
+        // Without this, adding a union to the type surface and forgetting to list it here would
+        // leave it unchecked while the suite stayed green. A union that is no meta vocabulary is
+        // named in NON_META_UNIONS, with where it is checked.
         const checked = [
             ...VOCABULARIES.map(([, , , typeName]) => typeName),
             ...SCHEMA_ONLY_VOCABULARIES.map(([, typeName]) => typeName),
+            ...NON_META_UNIONS,
         ].sort()
 
         expect(Object.keys(publishedUnions).sort()).toEqual(checked)

@@ -106,3 +106,6 @@ Below you can find the list of commonly used CSS styles.
 - **highlight-1-last** highlight 1 last table row
 - **highlight-2-last** highlight 2 last table rows
 - **highlight-3-last** highlight 3 last table rows
+
+The highlighted rows are the table's own: the row an expanded row shows its content in is not one of them, and neither
+are the rows of a table nested inside.

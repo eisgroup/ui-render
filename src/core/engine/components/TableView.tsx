@@ -46,8 +46,11 @@ export type TableRenderer = (
 /** A header: a column in the default layout, a row in the vertical one. */
 export type TableHeader = {
   id?: string
-  /** Header title, falls back to `id` if not given, and `children` not defined */
-  label?: string
+  /**
+   * Header title. Without it, and without `children`, the header shows no text, and its `id` is hidden text that
+   * names it for screen readers; a blank label (`''`) names nothing
+   */
+  label?: string | number
   /** Custom header content to render, overrides `label`; or a function that renders it */
   children?: React.ReactNode | TableRenderer
   data?: unknown
@@ -75,7 +78,7 @@ export type TableHeader = {
 export type TableViewProps = {
   /** In the default layout, items are rows: objects keyed by the `id`s of `headers` */
   items: TableItem[]
-  /** In the default layout, headers are columns. Derived from `items`, if not defined */
+  /** In the default layout, headers are columns. Derived from `items`, if not defined, each showing its key */
   headers?: TableHeader[]
   /**
    * Additional header layers, rendered above `headers` in the order they are defined: the first
@@ -184,6 +187,27 @@ function sortRows (items: TableItem[], sorts: TableSort[] | undefined) {
 }
 
 /**
+ * What a header shows when nothing renders it: its `children`, else its `label`, translated once, by the document's
+ * own `translate`. Until 2026-10-23 `Text` translated a label a second time, and `children` and the `id` once, all
+ * with the translator of the last document constructed. A label `0` shows, as the contract takes a number.
+ *
+ * A header with neither shows no text. Until meta contract 2 it showed its `id`: a technical name on screen where the
+ * meta meant a blank. The `id` stays as hidden text, which names the column, and its sort button, for a screen reader,
+ * as the visible `id` did. A blank label (`''`) names nothing: action columns declare one. The hidden text comes
+ * first, so the empty text after it still holds a blank header row's height (`table.less`).
+ */
+function headerText (cell: React.ReactNode, label: TableHeader['label'], id: string | undefined, translate: Translate) {
+  const text = cell || label
+  if (text != null && text !== '') return <Text className="p" translate={translate}>{text}</Text>
+  return (
+    <>
+      {label == null && id != null && <span className="sr-only">{translate(id)}</span>}
+      <Text className="p"/>
+    </>
+  )
+}
+
+/**
  * Table with Dynamic Headers - Component
  * @Note: check <Table> component for props documentation
  *
@@ -233,7 +257,8 @@ function TableView (props: TableViewProps) {
   }
   const itemsSorted = sorted.current.rows
 
-  // Compute header based on items if not defined
+  // Compute header based on items if not defined. A derived header shows its key as its content: it has no label,
+  // and a header without one shows no text (`headerText`).
   const derived = useRef<{ keys: string[], headers: TableHeader[] } | null>(null)
   let headers = headersProp
   if (!headers) {
@@ -241,7 +266,7 @@ function TableView (props: TableViewProps) {
     if (item) {
       const keys = Object.keys(item)
       if (derived.current === null || !isEqual(keys, derived.current.keys)) {
-        derived.current = {keys, headers: keys.map(id => ({id}))}
+        derived.current = {keys, headers: keys.map(id => ({id, children: id}))}
       }
     }
     // No items and nothing derived before means no inferrable headers.
@@ -367,7 +392,7 @@ function TableView (props: TableViewProps) {
           {render
             ? render(value, id, {className, style}, self)
             // A cast, not a guard: `cell` is no function here, or it would be the renderer.
-            : (typeof cell === 'object' ? cell : <Text className="p">{(cell as React.ReactNode) || (label != null ? translate(label) : id)}</Text>)
+            : (typeof cell === 'object' ? cell : headerText(cell as React.ReactNode, label, id, translate))
           }
           {hasSort && renderSort(sorts.find(item => item.id === id) || {})}
         </Row>
@@ -449,8 +474,9 @@ function TableView (props: TableViewProps) {
         <Table.Row className={className as string | undefined}>
           {renderItemCells ? renderItemCells(item, index) : headers!.map((header, column) => renderItemData(item, index, header, column))}
         </Table.Row>
+        {/* Its class keeps it out of the rows a `highlight-N-last` table counts (table.less). */}
         {renderItem && expandedByRow(index) &&
-          <Table.Row>
+          <Table.Row className='app__table__expansion'>
             <Table.Cell colSpan={headers!.length}>
               {renderItem(item, index)}
             </Table.Cell>

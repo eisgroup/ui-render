@@ -48,6 +48,11 @@ item has the details.
   keyboard focus. `on` is ignored, and a tap opens nothing. A node with a `tooltip` is now wrapped in
   a `span.tooltip-host` as wide as its content, so in a column it no longer stretches. (Props removed
   from Select, Tooltip and Table)
+- **Give a table header a `label` where it should show text.** A header in `headers` or
+  `extraHeaders` without one shows no text now, and keeps its `id` as hidden text, which names the
+  column for a screen reader. 0.34.x showed the `id`, a technical name, where a meta meant a blank.
+  This is meta contract version 2. `label: ""` is still blank, and a table without `headers` still
+  shows the keys of its first row. (Meta contract, Accessibility, Fixes)
 - **Expect some rendered values to change.** Dates follow the `dateFormat` you pass, where 0.34.x
   ignored it and showed `MM-DD-YYYY`. `Float` and `Percent` without `decimals` now round where they
   used to truncate: 18.75 % shows `19%`, not `18%`. The `"Currency"` string form prints the symbol of
@@ -80,6 +85,10 @@ item has the details.
   page now: where a name repeats, the first field keeps it and the others take `<name>-2`,
   `<name>-3`. Give a field an `id` in meta where the page needs a fixed one. (Renderer configuration
   and error reporting, Accessibility, Fixes)
+- **Translate the pie chart's `Total` under `ui-render:TOTAL`.** `translate` is asked for that key
+  now, not for the English word, so a translation a host keyed on `Total` no longer reaches the
+  chart. A host with no translation for the key sees `Total`, as before. (Renderer configuration and
+  error reporting)
 - **Ship your own copies of the images you link.** The package ships no images now. 0.34.x carried
   `static/images/`, flags included. (Packaging)
 - **Style the Semantic class names a meta sets.** A node a meta gives `ui label`, `ui menu` or
@@ -103,7 +112,7 @@ Nothing to do for these:
   modules still in use are vendored into the stylesheet. The components keep Semantic's class names,
   such as `ui selection dropdown` and `ui table`, and the stylesheet still selects on them.
   (Dependencies, Table rendering)
-- The package is 25 files and 3.5 MB unpacked, down from 576 files and 12.5 MB, and `dist/index.js`
+- The package is 26 files and 3.5 MB unpacked, down from 576 files and 12.5 MB, and `dist/index.js`
   is 311 KB, down from 420 KB. (Packaging)
 
 #### Meta contract
@@ -142,14 +151,28 @@ Nothing to do for these:
   until enabled, reports to `console.warn`, accepts a function instead of `true` to collect the
   findings, and never throws into the host application.
 - New optional root-level `metaVersion` field (`"MAJOR"` or `"MAJOR.MINOR"`; current contract
-  version `1`) records which contract a file was authored against, so future contract changes can
-  be additive and announced. **Absence means "current"**, so no existing `meta.json` needs to
-  change. The renderer ignores the value and strips the field before rendering, exactly as it now
+  version `2`) records which contract a file was authored against, so future contract changes can
+  be additive and announced. **Absence means "current"**, so no existing `meta.json` has to
+  declare it. The renderer ignores the value and strips the field before rendering, exactly as it now
   strips `$schema`, so declaring either changes no output; only dev-mode validation reads it.
   This is unrelated to the legacy `version` attribute, which the renderer still discards.
+- **Contract version 2: a table header without a `label` shows no text.** Version 1 showed its `id`.
+  The `id` stays as hidden text, which names the column for screen readers. A meta that declares
+  `metaVersion: "1"` renders such a header blank too, and `validateMeta` accepts it without a
+  warning: a version at or below the one implemented is always compatible. (Fixes)
 
 #### Renderer configuration and error reporting
 
+- **A host translates the texts the widget writes itself, through `translate`.** A host translates
+  the labels of its meta, but the pie chart's `Total` and the `Yes` and `No` a `Text` shows for a
+  boolean were always English, so a translated page showed them in English. `translate` is now
+  asked for each under a key of its own, `ui-render:TOTAL`, `ui-render:YES` and `ui-render:NO`,
+  which a host registers as a `ui-render` namespace in its i18n. Where the answer is the key itself,
+  the key without `ui-render:`, or empty, the widget shows its English text, as before. Each key is
+  asked for once, and the answer is not translated again. `docs/BUILT-IN-PHRASES.md`, in the
+  package, lists the ids with their English texts, and the types publish them as
+  `UIRenderPhraseId`. The pie chart asked `translate` for the English word `Total` until now, and no
+  longer does.
 - **New `locale` prop: the language tag the widget shows numbers in.** A host passes its user's
   number format, `de-DE`, and the `Currency`, `Float`, `Double5` and `Percent` renderers, a
   `Counter`, a pie chart's values and a slider's labels write their decimal and grouping separators:
@@ -275,6 +298,12 @@ Nothing to do for these:
   header's `renderCell`, a `TableCells` row or the draft row of a `localDraft` `Data`. In the last two, only
   when the row has a cell per header. A field with its own `label`, `aria-label` or `aria-labelledby`
   keeps it, and a cell that is not a field takes nothing.
+- **A table header without a label is still named by its `id`, which it no longer shows.** The `id`
+  is hidden text in the header cell, so a screen reader hears the column's name as it did while the
+  `id` showed, and a sortable column's button is named by it too, which an `aria-label` on the cell
+  would not do. A field in that column takes no name from it, as before. `label: ""` names nothing:
+  a column of action buttons declares it. **This changes the markup**: such a header cell holds a
+  `span.sr-only` before its empty `span.text`.
 - **A slider's handles have a name.** A handle is named by the field's `label`, or else its `name`, and
   a range's two handles add ", minimum" and ", maximum". A meta's own `aria-label` or
   `aria-labelledby` goes to the handles now, where it used to land on the element around them.
@@ -698,7 +727,7 @@ Nothing to do for these:
   `/static/all.css`, the re-export imports itself and the widget is unstyled (measured in Chromium),
   and read as text it holds a comment and the `@import`. 0.34.x's `dist/static/` was a full copy,
   fonts and images included. Copy the root `static/` folder instead.
-- The tarball dropped from 576 files / 12.5 MB unpacked in 0.34.3 to **25 files / 3.5 MB (0.9 MB
+- The tarball dropped from 576 files / 12.5 MB unpacked in 0.34.3 to **26 files / 3.5 MB (0.9 MB
   packed)**. Source maps continue to ship for host debugging.
 - **The package ships no images any more.** 0.34.3 carried 266 country-flag SVGs in
   `static/images/flags/` and ten more files in `static/images/`: `flags.png`, `diamonds.png`,
@@ -895,6 +924,28 @@ Nothing to do for these:
   rendered, as it does when it is left, and rc-picker dropped the date it had not confirmed yet.
 - **Emptying a date field's text empties its date.** The date came back once the field was left. A required field
   now says `Required`.
+- **A table with `highlight-1-last`, `highlight-2-last` or `highlight-3-last` highlights its own last rows.** An
+  expanded row shows its content in a row of its own below it, and the rule counted that row as one of the last:
+  expanding one of them highlighted its content, all of it drawn bold, in place of a row of the table. The rule also
+  reached the rows of every table nested in a highlighted one, and highlighted the last of them. Now a table counts
+  only its own rows, and not the content rows, which carry the class `app__table__expansion`.
+- **A table header without a `label` no longer shows its `id`.** A meta that leaves the label out to
+  mean a blank header showed the column's technical name there instead, such as `Description`. Now
+  it shows no text, and the `id` stays as hidden text for screen readers (Accessibility). This is
+  meta contract version 2. A header with a label, `children` or `renderHeader` shows what it did, and
+  so do a table without `headers`, which shows the keys of its first row, and a matrix table's group
+  row. A matrix table's other columns are copies of its `headers` and follow them. A header row whose
+  headers are all blank keeps its height. The demo's `ratingDetails` example showed `""` in such a
+  header, a label of two quote characters, and declares none now.
+- **A table header is translated once, by its own document.** Its label was translated twice: by
+  the document's `translate`, then by the `translate` of the last document constructed on the page.
+  Its `children`, and the `id` it showed without a label, were translated once, by that last
+  document's. A translator that does not leave its own output as it is, such as one that marks a
+  missing key, showed the wrong text, and so did a page with two documents and two translators.
+- **A pie chart translates with its own document's `translate`.** Its centre, its legend and its
+  tooltip took the `translate` of the document constructed last: on a page with two documents, a
+  slice added to the first one's chart after the second one mounted had its name translated by the
+  second one's function.
 - **`onApplyPeriods` sends nothing while a field shows its validation error.** It sent the table as it
   was: a user emptied a required number field, the field showed `Required`, the host's
   `getValidationErrors` heard it, and `apiCalls.updateData` received the row with `""` in it, where a

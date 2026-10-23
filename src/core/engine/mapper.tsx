@@ -360,7 +360,7 @@ const RenderComponent = ({
             const { mapItems, ...prop } = props
             if (mapItems) _data = mapProps(_data, mapItems, { debug })
             if (items.length) prop.children = items.map(Render)
-            return <PieChart items={_data} {...prop}/>
+            return <PieChart items={_data} {...prop} translate={translate}/>
         }
 
         case FIELD.TYPE.PROGRESS_STEPS: {

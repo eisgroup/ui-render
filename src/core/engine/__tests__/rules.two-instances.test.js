@@ -17,7 +17,7 @@
  * first into "B:hello".
  */
 import React from 'react'
-import { fireEvent, render } from '@testing-library/react'
+import { fireEvent, render, within } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import '../../modules/form/utils'
 import UIRender from '../rules'
@@ -78,6 +78,71 @@ describe('two instances on one page keep their own translator', () => {
         const view = render(wrap(<div data-testid="only"><UIRender meta={meta} data={{}}/></div>))
 
         expect(textOf(view, 'only')).toContain('hello')
+    })
+})
+
+describe('two instances on one page translate their pie charts with their own translator', () => {
+    // The mapper gave a pie chart no translator until 2026-10-23, so its texts took the module global, the
+    // translator of the document constructed LAST. Measured on that code: a slice added to the first document's
+    // chart after the second one mounted had its name translated by the second one's function, and neither
+    // chart asked for `ui-render:TOTAL`.
+    const pieMeta = { view: 'PieChart', name: 'slices', legends: true }
+    const translator = translations => value => (value in translations ? translations[value] : value)
+    const first = translator({ 'ui-render:TOTAL': 'Summe', Alpha: 'Alfa', Beta: 'Beta (first)' })
+    const second = translator({ 'ui-render:TOTAL': 'Somme', Alpha: 'Alpha (second)', Beta: 'Bêta' })
+    const alpha = [{ label: 'Alpha', value: 1 }]
+
+    const twoCharts = firstSlices => wrap(
+        <div>
+            <div data-testid="first"><UIRender meta={pieMeta} data={{ slices: firstSlices }} translate={first}/></div>
+            <div data-testid="second"><UIRender meta={pieMeta} data={{ slices: alpha }} translate={second}/></div>
+        </div>
+    )
+
+    it('at mount, and after the first one renders a new slice', () => {
+        const view = render(twoCharts(alpha))
+
+        expect(textOf(view, 'first')).toContain('Summe')
+        expect(textOf(view, 'first')).toContain('Alfa')
+        expect(textOf(view, 'second')).toContain('Somme')
+        expect(textOf(view, 'second')).toContain('Alpha (second)')
+
+        view.rerender(twoCharts([...alpha, { label: 'Beta', value: 2 }]))
+
+        expect(textOf(view, 'first')).toContain('Summe')
+        expect(textOf(view, 'first')).toContain('Beta (first)')
+        expect(textOf(view, 'first')).not.toContain('Bêta')
+        expect(textOf(view, 'second')).toContain('Somme')
+    })
+})
+
+describe('two instances on one page translate their own table headers, once', () => {
+    // A header's label was translated by its document, then again by `Text` with the module global, and its
+    // `id` by the global alone. Measured on the previous code: the first document's headers read "A:A:Name" and
+    // "A:note" at mount, then "B:A:Name" and "B:note" once it rendered again.
+    const tableMeta = { view: 'Table', name: 'rows', headers: [{ id: 'name', label: 'Name' }, { id: 'note' }] }
+    const twoTables = extraOnFirst => wrap(
+        <div>
+            <div data-testid="first">
+                <UIRender meta={tableMeta} data={{ rows: [{ name: 'x' }] }} translate={v => `A:${v}`} {...extraOnFirst}/>
+            </div>
+            <div data-testid="second">
+                <UIRender meta={tableMeta} data={{ rows: [{ name: 'y' }] }} translate={v => `B:${v}`}/>
+            </div>
+        </div>
+    )
+    // The header without a label shows nothing, so its text is the hidden id.
+    const headersOf = (view, id) => within(view.getByTestId(id)).getAllByRole('columnheader').map(cell => cell.textContent)
+
+    it('at mount, and after the first one re-renders', () => {
+        const view = render(twoTables())
+        expect(headersOf(view, 'first')).toEqual(['A:Name', 'A:note'])
+        expect(headersOf(view, 'second')).toEqual(['B:Name', 'B:note'])
+
+        view.rerender(twoTables({ embedded: true }))
+
+        expect(headersOf(view, 'first')).toEqual(['A:Name', 'A:note'])
+        expect(headersOf(view, 'second')).toEqual(['B:Name', 'B:note'])
     })
 })
 

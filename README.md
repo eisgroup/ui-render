@@ -172,11 +172,15 @@ application, whatever it finds.
 ### Contract version
 
 `meta.json` may declare an optional root-level `metaVersion` (`"MAJOR"` or `"MAJOR.MINOR"`) to
-record which contract it was authored against. The current contract version is **`1`**.
+record which contract it was authored against. The current contract version is **`2`**.
+
+Version `2` changed one thing: a table header without a `label` shows no text, where `1` showed its
+`id`. The `id` stays as hidden text, which names the column for screen readers. A header that should
+show text needs a `label`.
 
 - **Absence means "current"** — the file targets whatever contract the installed
   `eis-ui-render` implements. That is the right choice when meta and library ship together, and
-  it is why every existing `meta.json` keeps working untouched.
+  it is why no existing `meta.json` has to declare one.
 - **MAJOR** changes only for a change that would break existing meta; **MINOR** for additive
   ones. Declaring a version equal to or below what the library implements is always compatible.
 - The engine **ignores the value** and strips the field before rendering: declaring it never
@@ -250,6 +254,38 @@ number with a point.
 > These props used to be accepted and then silently ignored — every date rendered as
 > `MM-DD-YYYY` whatever was passed. If your application has been passing `dateFormat` and
 > compensating for it elsewhere, it now takes effect.
+
+## Translating the built-in texts (consumer)
+
+Your `translate` prop is handed the labels, titles and options of a meta, and the values a document
+shows as text. A few texts are UI Render's own, such as the `Total` under a pie chart's total:
+`translate` is asked for each of them under a key of its own, `ui-render:<ID>`, so an i18next-based
+host translates them by registering a `ui-render` namespace:
+
+```js
+i18next.addResourceBundle('de', 'ui-render', {
+    TOTAL: 'Gesamt',
+    YES: 'Ja',
+    NO: 'Nein',
+})
+```
+
+[`docs/BUILT-IN-PHRASES.md`](docs/BUILT-IN-PHRASES.md) lists every id with its English text and
+where it shows, and the package's types list the ids as `UIRender.UIRenderPhraseId`.
+
+When a key is missing, UI Render shows its English text. It takes what `translate` answers as a
+translation only when that is a non-empty string other than the key itself (`ui-render:TOTAL`, which
+an i18next-based host answers for a key it does not have) or the key without its namespace (`TOTAL`,
+which plain i18next answers). So a host with no `ui-render` namespace, or with no `translate`, sees
+these texts in English. Each key is asked for once, and what comes back is shown as it is: neither
+the English text nor your translation goes to `translate` again.
+
+A text may have a placeholder, written `{name}`. UI Render fills it after your translation comes
+back, so keep it in single braces in your translation, or leave it out.
+
+In this version a text is looked up when its component renders. When your i18n changes language
+while a document is on the page, a built-in text already shown changes when its component renders
+again, not at once.
 
 ## Error reporting (consumer)
 

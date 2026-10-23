@@ -63,6 +63,9 @@ The modernization roadmap (React 17/18 upgrade, `semantic-ui-react` exit, projec
 - `npm run docs:views` / `npm run docs:props` — Regenerate `docs/SUPPORTED-VIEWS.md` / `docs/SUPPORTED-PROPS.md` from the
   source and the prose in `scripts/view-reference-curation.js` / `scripts/wrapper-prop-curation.js`. Never edit the pages
   by hand: the `:check` variants, which CI and `prepack` run, fail on a page that differs from the generator's output
+- `npm run docs:phrases` — Regenerate `docs/BUILT-IN-PHRASES.md`, the ids a host's `translate` is asked for, with their
+  English texts, from `BUILT_IN_PHRASES` in `src/core/utils/phrases.ts`. `docs:phrases:check` runs in CI and `prepack`,
+  as the two above do
 - `npm run css:fixture` — Regenerate `src/style/__tests__/semantic-contributed-css.txt`, the pinned CSS of the two vendored
   Semantic modules; `css:fixture:check` runs in CI
 - `npm run sync-version` — Writes `package.json`'s version into the `data-version` of `src/library/AppWrapper.tsx` and
@@ -161,6 +164,15 @@ pickers of the rows it passes, measured at about 255 ms against 66 on an unminif
 
 To find what a cost comes from, count before naming the cause: wrap the suspected function or component with
 `jest.mock` and count calls per action. Comparing timings with and without a feature does not name a cause.
+
+### Built-in phrases
+
+A text the widget writes itself, rather than one the meta gives it, is a built-in phrase (`src/core/utils/phrases.ts`).
+`phrase(translate, ID)` asks the DOCUMENT's translator for `ui-render:<ID>`, and falls back to the English text in
+`BUILT_IN_PHRASES` when the answer is the key, the key without its namespace, empty or not a string. Its result is
+translated already, so a `Text` that shows it gets `alreadyTranslated` as its translator. A new id goes in
+`BUILT_IN_PHRASES`, in `UIRenderPhraseId` (`src/library/contract.ts`; `typecheck` fails while the two differ) and on
+the page (`npm run docs:phrases`). A published id is never renamed: a host's translation of it would be lost silently.
 
 ### Internal layering and imports
 

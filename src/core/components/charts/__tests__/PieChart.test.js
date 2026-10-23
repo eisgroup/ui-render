@@ -275,4 +275,48 @@ describe('PieChart', () => {
             expect(legendTexts[2]).toHaveTextContent('C')
         })
     })
+
+    describe('translation', () => {
+        // A host translate that knows only `translations`, and answers any other string with itself, as an
+        // i18next-based one answers a key it does not have.
+        const translator = translations => value => (value in translations ? translations[value] : value)
+
+        it('shows the host\'s translation of ui-render:TOTAL under a total it leaves as it is', () => {
+            renderPieChart({ items: sampleItems, translate: translator({ 'ui-render:TOTAL': 'Gesamt' }) })
+            expect(screen.getByText('Gesamt')).toBeInTheDocument()
+            expect(screen.getByText('72')).toBeInTheDocument()
+            expect(screen.queryByText('Total')).not.toBeInTheDocument()
+        })
+
+        it('shows Total when the host has no translation for it', () => {
+            renderPieChart({ items: sampleItems, translate: translator({}) })
+            expect(screen.getByText('Total')).toBeInTheDocument()
+            expect(screen.getByText('72')).toBeInTheDocument()
+        })
+
+        it('asks for the label by its key, and for the total as itself, never as a key', () => {
+            const calls = []
+            const translate = value => {
+                calls.push(value)
+                return value === 'ui-render:TOTAL' ? 'Gesamt' : value
+            }
+            renderPieChart({ items: sampleItems, translate })
+            expect(calls.filter(value => value.startsWith('ui-render:'))).toEqual(['ui-render:TOTAL'])
+            // The resolved label is not translated again, and the English one is never asked for.
+            expect(calls).not.toContain('Gesamt')
+            expect(calls).not.toContain('Total')
+            expect(calls).toContain('72')
+        })
+
+        it('translates its legend\'s names with the translator it is given', () => {
+            renderPieChart({ items: sampleItems, legends: true, translate: translator({ Engineering: 'Ingeniería' }) })
+            expect(screen.getByText('Ingeniería')).toBeInTheDocument()
+            expect(screen.queryByText('Engineering')).not.toBeInTheDocument()
+        })
+
+        it('translates string children with the translator it is given', () => {
+            renderPieChart({ items: sampleItems, children: 'Label Text', translate: translator({ 'Label Text': 'Etiqueta' }) })
+            expect(screen.getByText('Etiqueta')).toBeInTheDocument()
+        })
+    })
 })

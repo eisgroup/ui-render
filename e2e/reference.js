@@ -633,6 +633,32 @@ const TABLE = {
     PAGE_COUNT: 5,
     PAGE_3_ROWS: ['11', '12', '13', '14', '15'],
     LAST_PAGE_ROWS: ['21', '22', '23'],
+    /**
+     * [I] since 2026-10-23. `ratingDetails` declares its `Description` column without a label. Its header shows
+     * no text: its only text is the `id`, in the 1 px box of `.sr-only`, which names the column for a screen
+     * reader. Its empty text still takes a line, as a labelled header's text does, so a row of such headers
+     * keeps a row's height: measured, 36 px, where without the rule that gives it the line it was 17.
+     */
+    UNLABELLED_HEADER: 'Description',
+    HIDDEN_TEXT_BOX: { width: 1, height: 1 },
+}
+
+/**
+ * A `highlight-N-last` table on the demo page, with the `tableNested` example's data and rows that expand into a
+ * nested table. Each case expands one row; what it highlights then is the case's `highlighted` rows.
+ * [I] since 2026-10-23. The rule counted the last rows of every body in the table, the nested tables' too, and
+ * counted the row an expanded row shows its content in. Expanding the last row moved the highlight from it to that
+ * row, which made all its content bold, and the last row of a table nested there was highlighted as well. Now a
+ * table counts only its own rows, and not that one: the second case is the content row between the two it counts.
+ */
+const HIGHLIGHTED_ROWS = {
+    /** The font weight of a highlighted row, and of one that is not. */
+    WEIGHT: { highlighted: '500', plain: '400' },
+    ROWS: ['Gold', 'Silver'],
+    CASES: [
+        { styles: 'highlight-1-last', expand: 'Silver', highlighted: ['Silver'] },
+        { styles: 'highlight-2-last', expand: 'Gold', highlighted: ['Gold', 'Silver'] },
+    ],
 }
 
 /** The `all` example's progress steps: four, the second current. */
@@ -663,5 +689,5 @@ const TAB_BAR_FIELD = {
 
 module.exports = {
     BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, INLINE, WIDGET, TOUCH, KEYBOARD, DROPDOWN,
-    DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, PROGRESS_STEPS, TAB_BAR_FIELD,
+    DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, HIGHLIGHTED_ROWS, PROGRESS_STEPS, TAB_BAR_FIELD,
 }

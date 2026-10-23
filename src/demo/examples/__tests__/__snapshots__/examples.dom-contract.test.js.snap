@@ -474,7 +474,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                     </div>
                                   </td>
                                 </tr>
-                                <tr>
+                                <tr class="app__table__expansion">
                                   <td colspan="4">
                                     <div>
                                       <div class="overflow-scroll flex--row max-width">
@@ -674,7 +674,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                     </div>
                                   </td>
                                 </tr>
-                                <tr>
+                                <tr class="app__table__expansion">
                                   <td colspan="4">
                                     <div>
                                       <div class="overflow-scroll flex--row max-width">
@@ -1662,7 +1662,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr>
+                <tr class="app__table__expansion">
                   <td colspan="3">
                     <div class="flex--col padding-small padding-top-none">
                       <div>
@@ -1879,7 +1879,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr>
+                <tr class="app__table__expansion">
                   <td colspan="3">
                     <div class="flex--col padding-small padding-top-none">
                       <div>
@@ -2142,7 +2142,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr>
+                <tr class="app__table__expansion">
                   <td colspan="3">
                     <div class="flex--col padding-small padding-top-none">
                       <div>
@@ -3054,8 +3054,10 @@ exports[`demo example full-DOM contract ratingDetails renders a stable, non-empt
                               <tr>
                                 <th class="left" style="width: 60%;">
                                   <div class="flex--row middle">
+                                    <span class="sr-only">
+                                      "Description"
+                                    </span>
                                     <span class="text p">
-                                      "\\"\\""
                                     </span>
                                   </div>
                                 </th>
@@ -5131,49 +5133,49 @@ exports[`demo example full-DOM contract tableMatrixRequired renders a stable, no
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
-                      "ageBand"
+                      "Age"
                     </span>
                   </div>
                 </th>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
-                      "undiffRate_employee"
+                      "Undiff"
                     </span>
                   </div>
                 </th>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
-                      "smokerRate_employee"
+                      "Smoker"
                     </span>
                   </div>
                 </th>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
-                      "nonSmokerRate_employee"
+                      "Non"
                     </span>
                   </div>
                 </th>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
-                      "undiffRate_employer"
+                      "Undiff"
                     </span>
                   </div>
                 </th>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
-                      "smokerRate_employer"
+                      "Smoker"
                     </span>
                   </div>
                 </th>
                 <th class="left">
                   <div class="flex--row middle">
                     <span class="text p">
-                      "nonSmokerRate_employer"
+                      "Non"
                     </span>
                   </div>
                 </th>

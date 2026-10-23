@@ -23,6 +23,14 @@ export type UIRenderValidationErrors = Record<string, UIRenderValidationError>
 export type UIRenderMethod = (...args: any[]) => unknown
 export type UIRenderTranslate = (value: string) => string
 
+/**
+ * The id of a text the widget writes itself, such as the `Total` under a pie chart's total. The host's
+ * `translate` is asked for each as `ui-render:<id>`. Where it answers with that key, with the key without
+ * `ui-render:`, or with an empty string, the widget shows its own English text. `docs/BUILT-IN-PHRASES.md`
+ * lists each id with its English text.
+ */
+export type UIRenderPhraseId = 'NO' | 'TOTAL' | 'YES'
+
 /** One finding from the dev-mode meta contract check enabled by `validateMeta`. */
 export interface UIRenderMetaProblem {
     /** JSON path of the offending node, relative to the meta root (`''` for the root itself). */
@@ -187,7 +195,12 @@ export interface MetaNode {
     name?: string | null
     /** The child nodes, or a value transform that resolves to them. */
     items?: MetaNodeEntry[] | MetaValueRef | null
+    /**
+     * A Table's columns. A header shows its `label`. Without one it shows no text, and its `id` is hidden text that
+     * names it for screen readers; `label: ""` names nothing.
+     */
     headers?: MetaNodeEntry[] | MetaValueRef | null
+    /** Rows of Table headers, above `headers` in the order given: each an array of headers like those of `headers`. */
     extraHeaders?: unknown[] | MetaValueRef | null
     extraItems?: unknown[] | MetaValueRef | null
     relativeData?: boolean | null
@@ -254,6 +267,11 @@ export interface UIRenderProps<Data = unknown> {
     onDataChanged?(): void
     getValidationErrors?(errors: UIRenderValidationErrors): void
     methods?: Record<string, UIRenderMethod>
+    /**
+     * Translates what the widget shows: the labels, titles and options of the meta, the values it shows as
+     * text, and the texts the widget writes itself, which it asks for as `ui-render:<id>` (`UIRenderPhraseId`).
+     * It is handed strings only, and returns one it has no translation for as it was given.
+     */
     translate?: UIRenderTranslate
     apiCalls?: UIRenderApiCalls<Data>
     /**
