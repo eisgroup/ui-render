@@ -189,7 +189,8 @@ describe('raw and structured forms data boundaries', () => {
         meta: {},
       }],
       ['nested-row', {
-        form: makeForm({value: 'nested'}),
+        // Its fields are named by its row's place, `root.rows[1].value`.
+        form: makeForm({root: {rows: [undefined, {value: 'nested'}]}}),
         meta: {relativePath: 'root.rows', relativeIndex: 1},
       }],
     ])

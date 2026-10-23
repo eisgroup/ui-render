@@ -912,6 +912,16 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A `showIf` in a table's add row reads that row's fields.** The row a `renderExtraItem` declaration
+  renders has a form of its own, whose fields are named by the row's place, such as
+  `dataKind.items[1].kind`. A `showIf` reads the document's forms merged, and the merge put that form's
+  values at the row a second time, so a field the row gated on another of its fields never showed. The
+  row is read where its fields put it now, and two other cases of that merge are fixed with it:
+  - A table row that a `useForm` declaration gives a form. An edit in it put a copy of the table inside
+    the row in `getFormData`, and a `showIf` in the row read the row as it was.
+  - The rows of a table whose rows hold another table, with an add row that has a form. In a document
+    with more than one top-level key, what a `showIf` reads held none of the outer rows, so a field
+    gated on one of them never showed.
 - **A table header without a `label` no longer shows its `id`.** A meta that leaves the label out to
   mean a blank header showed the column's technical name there instead, such as `Description`. Now
   it shows no text, and the `id` stays as hidden text for screen readers (Accessibility). This is

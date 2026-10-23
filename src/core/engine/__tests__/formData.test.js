@@ -101,6 +101,15 @@ describe('getLiveMergedDataKindArray', () => {
             expect(second[0]).not.toBe(first[0])
         })
 
+        it('merges again once a later form holds another array, though the first form holds the same', () => {
+            const first = countedForm({ items: [{ a: 1 }] })
+            const later = countedForm({ items: [{ b: 1 }] })
+            const forms = new Map([['first', { form: first, meta: {} }], ['later', { form: later, meta: {} }]])
+            getLiveMergedDataKindArray('items', forms)
+            later.values = { items: [{ b: 2 }] }
+            expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ a: 1, b: 2 }])
+        })
+
         it('reads the form a validator runs in from the values it was handed, and computes the others\' state', () => {
             const edited = countedForm({ items: [{ a: 'before the change' }] }, ['items[0].a'])
             const other = countedForm({ items: [{ b: 1 }] })
@@ -136,18 +145,6 @@ describe('getFormsData', () => {
         expect(getFormsData(forms)).toEqual({ a: 1, b: 2 })
     })
 
-    it('merges a sub-form at relativePath/relativeIndex into the master', () => {
-        const forms = new Map([
-            ['master', { form: makeForm({ items: [{}, {}] }), meta: {} }],
-            ['child', {
-                form: makeForm({ name: 'Alice' }),
-                meta: { relativePath: 'items', relativeIndex: 1 },
-            }],
-        ])
-        const out = getFormsData(forms)
-        expect(out.items[1]).toEqual({ name: 'Alice' })
-    })
-
     it('skips sub-forms missing relativeIndex', () => {
         const forms = new Map([
             ['master', { form: makeForm({ a: 1 }), meta: {} }],
@@ -174,16 +171,61 @@ describe('getRawFormsData', () => {
         expect(out.optionSelection).toBe('1')
     })
 
-    it('places sub-form values at the right index', () => {
+})
+
+describe.each([
+    ['getFormsData', getFormsData],
+    ['getRawFormsData', getRawFormsData],
+])('a table row\'s own form, in %s', (_, read) => {
+    // A form registered with its row's place as `relativePath` and `relativeIndex`: a table's add row, or a row
+    // a `useForm` declaration gives a form. Its fields are named by that place, `items[1].name`, so its values
+    // hold the row there, as the engine's do.
+    const rowForm = (values, relativePath, relativeIndex) => ({ form: makeForm(values), meta: { relativePath, relativeIndex } })
+
+    it('places the row its fields hold at that row, and only once', () => {
         const forms = new Map([
-            ['master', { form: makeForm({ rows: [{}, {}, {}] }), meta: {} }],
-            ['child', {
-                form: makeForm({ value: 42 }),
-                meta: { relativePath: 'rows', relativeIndex: 2 },
-            }],
+            ['master', { form: makeForm({ items: [{}, {}] }), meta: {} }],
+            ['row', rowForm({ items: [undefined, { name: 'Alice' }] }, 'items', 1)],
         ])
-        const out = getRawFormsData(forms)
-        expect(out.rows[2]).toEqual({ value: 42 })
+        expect(read(forms)).toEqual({ items: [{}, { name: 'Alice' }] })
+    })
+
+    it('takes nothing else of the form: what it started from, at the root of its values, is not read', () => {
+        const forms = new Map([
+            ['master', { form: makeForm({ items: [{ name: 'Alice' }] }), meta: {} }],
+            ['row', rowForm({ name: 'as it started', items: [{ name: 'Bob' }] }, 'items', 0)],
+        ])
+        expect(read(forms)).toEqual({ items: [{ name: 'Bob' }] })
+    })
+
+    it('takes nothing from a form that holds nothing at its row yet', () => {
+        const forms = new Map([
+            ['master', { form: makeForm({ items: [{ name: 'Alice' }] }), meta: {} }],
+            ['add row', rowForm({}, 'items', 1)],
+        ])
+        expect(read(forms)).toEqual({ items: [{ name: 'Alice' }] })
+    })
+
+    it('writes the row over the document\'s copy of it, though the row\'s form registered first', () => {
+        // Forms register as they mount, children first; a document with one key at its root has no master.
+        const forms = new Map([
+            ['row', rowForm({ items: [{ name: 'edited' }] }, 'items', 0)],
+            ['master', { form: makeForm({ items: [{ name: 'as loaded', age: 30 }] }), meta: {} }],
+        ])
+        expect(read(forms)).toEqual({ items: [{ name: 'edited', age: 30 }] })
+    })
+
+    it('puts the row of a table nested in a row into the document\'s own arrays', () => {
+        const forms = new Map([
+            ['nested row', rowForm({ phases: [{ lines: [undefined, { sku: 'B' }] }] }, 'phases.0.lines', 1)],
+            ['master', { form: makeForm({ title: 'T', phases: [{ lines: [{ sku: 'A' }] }, { lines: [] }] }), meta: {} }],
+        ])
+        expect(read(forms)).toEqual({ title: 'T', phases: [{ lines: [{ sku: 'A' }, { sku: 'B' }] }, { lines: [] }] })
+    })
+
+    it('places the row in a document of its own when no form holds the document from its root', () => {
+        const forms = new Map([['row', rowForm({ items: [undefined, { name: 'Alice' }] }, 'items', 1)]])
+        expect(read(forms)).toEqual({ items: [undefined, { name: 'Alice' }] })
     })
 })
 
