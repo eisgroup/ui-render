@@ -35,6 +35,7 @@ export const BUILT_IN_PHRASES = {
 
   // Validation messages, under a field
   END_DATE_CANNOT_BE_LESS_THAN_START_DATE: 'End date cannot be less than start date', // A period's end date, checked by `notWithinRange`, where it is before the start date
+  INVALID_DATE: 'Invalid date', // A date field left with text that is no date in its format, which it keeps showing
   INVALID_EMAIL_ADDRESS: 'Invalid email address', // A field with `validate: "email"` that holds no email address
   INVALID_URL: 'Invalid URL', // A field with `validate: "url"` that holds no URL with a protocol
   MUST_BE_LESS_THAN_CHARACTERS: 'Must be less than {count} characters', // A field with `validate: "maxLength"` that holds more; `{count}` is the limit, 100

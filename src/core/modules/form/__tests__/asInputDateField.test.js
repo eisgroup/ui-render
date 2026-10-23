@@ -8,8 +8,9 @@ import '../utils'
 import { asInputDateField } from '../asInputDateField'
 import { fixableFieldsOf } from '../../../state/formRegistry'
 
-// `readonly` is the fields' prop; on an <input> it is `readOnly`, as the real inputs pass it.
-const TestDate = ({ value, onChange, name, error, readonly, ...rest }) => (
+// `readonly` is the fields' prop; on an <input> it is `readOnly`, as the real inputs pass it. `onInvalidText` is
+// `InputDate`'s, which this input has no text of its own to report through.
+const TestDate = ({ value, onChange, name, error, readonly, onInvalidText, ...rest }) => (
     <div>
         <input
             readOnly={readonly}

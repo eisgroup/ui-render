@@ -151,6 +151,109 @@ test.describe('date input: a field whose picker has not mounted', () => {
     })
 })
 
+test.describe('date input: what a user types', () => {
+    // rc-picker reads typed text strictly, in the display format, and hands on only a date. Each test leaves the field
+    // by a click elsewhere, as a user does, which is not how Tab leaves it: Tab confirms the date before the field is
+    // left, and a click lets rc-picker confirm it a frame later, once the field has rendered again.
+    const filled = page => page.locator('#tableForm input[name="dataKind.period[0].startDate"]')
+    const empty = page => page.locator('#tableForm input[name="dataKind.period[2].startDate"]')
+    /** The example on a page loaded afresh: a `goto` that changes only the hash keeps the document as it was. */
+    const reopen = async (page) => {
+        await page.goto('about:blank')
+        await openExample(page, 'tableForm')
+    }
+    /** The message a field shows: what its input is described by, an element there only while it shows one. */
+    const messageOf = async (page, input) => {
+        const id = await input.getAttribute('aria-describedby')
+        return id ? page.locator(`[id="${id}"]`).textContent() : ''
+    }
+    const typeAndLeave = async (page, input, text) => {
+        await input.click()
+        await page.keyboard.press('ControlOrMeta+A')
+        if (text) await page.keyboard.type(text)
+        else await page.keyboard.press('Backspace')
+        await page.locator('#tableForm thead th').first().click()
+    }
+    /** The warnings the page logs, in order: the demo's `onSubmit` is `console.warn`, handed the values. */
+    const warnings = (page) => {
+        const logged = []
+        page.on('console', (message) => { if (message.type() === 'warning') logged.push(message) })
+        return logged
+    }
+    /** Clicks Submit, and returns the periods each submit handed the demo's `onSubmit`: none when nothing was sent. */
+    const submit = async (page, logged) => {
+        await page.locator('#tableForm').getByRole('button', { name: /^Submit/ }).click()
+        // A marker logged after the click: once it is in, so is any warning the submit logged before it.
+        await page.evaluate(() => console.warn('after submit'))
+        await expect.poll(() => logged.some(message => message.text() === 'after submit')).toBe(true)
+        const values = await Promise.all(logged.splice(0).map(message => message.args()[0].jsonValue().catch(() => null)))
+        return values.filter(value => value && value.dataKind).map(value => value.dataKind.period)
+    }
+
+    test('[I] an empty required field keeps text that is no date once it is left, and says so', async ({ page, pageErrors }) => {
+        for (const text of DATE_INPUT.INVALID_TEXTS) {
+            await reopen(page)
+
+            await typeAndLeave(page, empty(page), text)
+
+            await expect(empty(page)).toHaveValue(text)
+            await expect.poll(() => messageOf(page, empty(page)), text).toBe(DATE_INPUT.INVALID_MESSAGE)
+        }
+        expect(pageErrors).toEqual([])
+    })
+
+    test('[I] a field with a date keeps text that is no date once it is left, says so, and Submit sends nothing', async ({ page, pageErrors }) => {
+        const logged = warnings(page)
+        for (const text of DATE_INPUT.INVALID_TEXTS) {
+            await reopen(page)
+            await expect(filled(page)).toHaveValue(DATE_INPUT.INITIAL_VALUE)
+
+            await typeAndLeave(page, filled(page), text)
+
+            await expect(filled(page)).toHaveValue(text)
+            await expect.poll(() => messageOf(page, filled(page)), text).toBe(DATE_INPUT.INVALID_MESSAGE)
+            expect(await submit(page, logged), text).toEqual([])
+        }
+        expect(pageErrors).toEqual([])
+    })
+
+    test('[I] a date typed and left by a click elsewhere is kept, and Submit sends it', async ({ page, pageErrors }) => {
+        const logged = warnings(page)
+        await openExample(page, 'tableForm')
+
+        await typeAndLeave(page, filled(page), DATE_INPUT.CLICKED_AWAY_VALUE)
+
+        await expect(filled(page)).toHaveValue(DATE_INPUT.CLICKED_AWAY_VALUE)
+        const sent = await submit(page, logged)
+        expect(sent.map(periods => periods[0].startDate)).toEqual([DATE_INPUT.CLICKED_AWAY_STORED])
+        expect(pageErrors).toEqual([])
+    })
+
+    test('[I] text corrected to a date takes the error away, and Submit sends the date', async ({ page }) => {
+        const logged = warnings(page)
+        await openExample(page, 'tableForm')
+        await typeAndLeave(page, filled(page), DATE_INPUT.INVALID_TEXTS[0])
+        await expect.poll(() => messageOf(page, filled(page))).toBe(DATE_INPUT.INVALID_MESSAGE)
+
+        await typeAndLeave(page, filled(page), DATE_INPUT.CLICKED_AWAY_VALUE)
+
+        await expect.poll(() => messageOf(page, filled(page))).toBe('')
+        const sent = await submit(page, logged)
+        expect(sent.map(periods => periods[0].startDate)).toEqual([DATE_INPUT.CLICKED_AWAY_STORED])
+    })
+
+    test('[I] a required field whose text is emptied stays empty once it is left, and says so', async ({ page }) => {
+        const logged = warnings(page)
+        await openExample(page, 'tableForm')
+
+        await typeAndLeave(page, filled(page), '')
+
+        await expect(filled(page)).toHaveValue('')
+        await expect.poll(() => messageOf(page, filled(page))).toBe(DATE_INPUT.EMPTIED_MESSAGE)
+        expect(await submit(page, logged)).toEqual([])
+    })
+})
+
 test.describe('popup: the modal a `popupOpen` action opens', () => {
     const trigger = page => page.locator('#popupContent').getByRole('button', { name: 'Open Popup 1' })
     const popup = page => page.locator('.app__popup')

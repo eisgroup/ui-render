@@ -39,6 +39,7 @@ const builtInTexts: Record<UIRenderPhraseId, string> = {
     FILES: 'Dateien',
     FILE_MUST_BE_UNDER: '{file} muss kleiner als {size} sein',
     FILE_UPLOAD_FAILED: 'Hochladen fehlgeschlagen!',
+    INVALID_DATE: 'Ungültiges Datum',
     INVALID_EMAIL_ADDRESS: 'Ungültige E-Mail-Adresse',
     INVALID_URL: 'Ungültige URL',
     MAXIMUM_FILE_SIZE_EXCEEDED: 'Datei zu groß!',

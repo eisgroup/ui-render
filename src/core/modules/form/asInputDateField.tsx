@@ -2,10 +2,15 @@ import { Field } from 'react-final-form'
 import type { FieldRenderProps } from 'react-final-form'
 import React, { useRef } from 'react'
 import { isRequired } from '../../components/inputs/validationRules'
-import { touchedFor } from '../../state/formRegistry'
+import { resetsOf, touchedFor } from '../../state/formRegistry'
 import { Active } from '../../utils'
+import { phraseMessage } from '../../utils/phrases'
+import { revalidate } from './batchedForm'
 import { isUnset, namedField } from './utils'
 import { useFixableField } from './useFixableField'
+
+// One message, returned each time: final-form renders a field again for an error that is another object.
+const INVALID_DATE = phraseMessage('INVALID_DATE')
 
 /** What final-form hands the input: its `input` props, without `value`, which the field caches. */
 type FieldInput = Omit<FieldRenderProps<unknown>['input'], 'value'>
@@ -34,7 +39,8 @@ export type DateFieldProps = {
     format?: ValueTransform
     normalize?: ValueTransform
     parse?: ValueTransform
-    validate?: (value: unknown, allValues: object) => unknown
+    /** Handed the field's state too when it declares three parameters, or none, as final-form hands it */
+    validate?: (value: unknown, allValues: object, state?: unknown) => unknown
     options?: unknown
     /**
      * Everything else reaches the input: `label`, `id`, `type` (the HTML attribute), `placeholder`,
@@ -65,6 +71,25 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
         declare hasFocus?: boolean
         declare input: FieldInput
         declare initValues: unknown
+        /** The text the field was left with that is no date, which the input shows (`onInvalidText`), and when */
+        declare invalidText?: string | null
+        declare invalidSince?: number
+        /** The input's key: one more when the input must show the value again, in place of such text */
+        declare inputKey?: number
+
+        /** The form the field's document renders it in, which counts its resets; none outside a document. */
+        get form () {
+            const {instance} = this.props
+            return instance && instance.form
+        }
+
+        /**
+         * `INVALID_DATE` while the field shows text that is no date, unless the `reset` action has reset the form since:
+         * its value is the date it had, which says nothing of the text.
+         */
+        get invalid () {
+            return this.invalidText != null && this.invalidSince === resetsOf(this.form) ? INVALID_DATE : undefined
+        }
 
         get value () {
             if (this._value !== void 0) {
@@ -96,6 +121,12 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
             // Hide this field if it's readonly and has no value.
             if (this.props.readonly && isRequired(this.value != null ? this.value : this.props.value)) return null
 
+            if (this.invalidText != null && !this.invalid) {
+                // The form was reset since the field was left with text that is no date: a new input shows the value.
+                this.invalidText = null
+                this.inputKey = (this.inputKey || 0) + 1
+            }
+
             this.input = input
 
             if (instance) this.initValues = instance.props.initialValues
@@ -108,15 +139,39 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
 
             return (
                 <InputComponent
+                    key={this.inputKey}
                     {...input}
                     value={nextValue}
                     onFocus={this.handleFocus}
                     onBlur={this.handleBlur} // prevent value change, but need onBlur to set touched for validation
                     onChange={this.handleChange}
+                    onInvalidText={this.handleInvalidText}
                     error={errorText} // only show error after user interaction
                     {...props} // allow forceful value override
                 />
             )
+        }
+
+        // The field's validator, around its own: final-form hands a validator the field's state only when it declares
+        // three parameters, or none, and works that state out for it. So there are two, and the field takes the one
+        // its own validator asks for (below).
+        validateValues = (value: unknown, allValues: object) => {
+            const {validate} = this.props
+            return this.invalid || (validate ? validate(value, allValues) : undefined)
+        }
+
+        // An assertion, not a guard: a field takes this one only for a validator of its own.
+        validateWithState = (value: unknown, allValues: object, state: unknown) =>
+            this.invalid || this.props.validate!(value, allValues, state)
+
+        /**
+         * The text the field is left with when it is no date, or null once it shows a date or nothing. Its value is still
+         * the date it had, so final-form has nothing to validate it again for: the form is asked to.
+         */
+        handleInvalidText = (text: string | null) => {
+            this.invalidText = text
+            this.invalidSince = resetsOf(this.form)
+            revalidate(this.form)
         }
 
         // The field's own handling first, then the one a meta or a host gave it, as in `asField`.
@@ -158,9 +213,13 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
         field.props = props
         useFixableField(props)
         const {name, disabled, normalize, format, parse = normalize, validate, options} = props
+        // Whatever its own, since text that is no date is an error in an optional field too.
+        const validator = typeof validate === 'function' && (validate.length === 0 || validate.length === 3)
+            ? field.validateWithState
+            : field.validateValues
         // A cast, not a guard, read at render: final-form's `Field`, unless something replaced it.
         const ActiveField = Active.Field as typeof Field
-        return <ActiveField {...{name, disabled, normalize, format, parse, validate, options}}
+        return <ActiveField {...{name, disabled, normalize, format, parse, options}} validate={validator}
                              component={field.Input}/>
     }
 

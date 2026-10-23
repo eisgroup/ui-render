@@ -29,6 +29,7 @@ const GERMAN = {
     'ui-render:FILES': 'Dateien',
     'ui-render:FILE_MUST_BE_UNDER': '{file} muss kleiner als {size} sein',
     'ui-render:FILE_UPLOAD_FAILED': 'Hochladen fehlgeschlagen!',
+    'ui-render:INVALID_DATE': 'Ungültiges Datum',
     'ui-render:INVALID_EMAIL_ADDRESS': 'Ungültige E-Mail-Adresse',
     'ui-render:INVALID_URL': 'Ungültige URL',
     'ui-render:MAXIMUM_FILE_SIZE_EXCEEDED': 'Datei zu groß!',
@@ -70,6 +71,7 @@ const SEEN_IN_GERMAN = {
     mustBeUnder: (file, size) => [file, 'muss kleiner als', size, 'sein'],
     uploadFailed: 'Hochladen fehlgeschlagen!',
     filesOnly: formats => ['Nur', formats, '-Dateien hochladen'],
+    invalidDate: 'Ungültiges Datum',
     invalidEmail: 'Ungültige E-Mail-Adresse',
     invalidUrl: 'Ungültige URL',
     tooLong: 'Höchstens 100 Zeichen',
@@ -105,6 +107,7 @@ const SEEN_IN_ENGLISH = {
     mustBeUnder: (file, size) => [file, 'must be under', size],
     uploadFailed: 'File Upload Failed!',
     filesOnly: formats => ['Upload', formats, 'files only'],
+    invalidDate: 'Invalid date',
     invalidEmail: 'Invalid email address',
     invalidUrl: 'Invalid URL',
     tooLong: 'Must be less than 100 characters',
@@ -196,6 +199,14 @@ describe.each([
             })
             expect(shownFor('mail', 'nobody')).toHaveTextContent(new RegExp(`^${seen.invalidEmail}$`))
             expect(shownFor('site', 'nowhere')).toHaveTextContent(new RegExp(`^${seen.invalidUrl}$`))
+        })
+
+        it('a date field left with text that is no date', async () => {
+            mount({ view: 'Input', type: 'date', name: 'start', label: 'Start' })
+            const shown = shownFor('start', '02-30-2021')
+            // rc-picker closes a frame or two after the field is left: inside `act`, which React 16 and 17 ask for.
+            await act(() => new Promise(resolve => setTimeout(resolve, 100)))
+            expect(shown).toHaveTextContent(new RegExp(`^${seen.invalidDate}$`))
         })
 
         it('a field that holds more than 100 characters', () => {
