@@ -58,10 +58,11 @@ import { joinPath } from './metaPath'
 
 /**
  * Contract version this build implements. Meta files may declare `metaVersion` to pin it.
+ * 2 since 2026-10-23: a table header without a `label` shows no text, where 1 showed its `id`.
  *
  * Exported for its unit tests: no other module imports it.
  */
-export const CURRENT_META_VERSION = '1'
+export const CURRENT_META_VERSION = '2'
 
 /**
  * `MAJOR` or `MAJOR.MINOR`.

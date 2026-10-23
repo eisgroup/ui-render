@@ -250,7 +250,6 @@ export const meta = {
                         'headers': [
                           {
                             'id': 'Description',
-                            'label': '""',
                             'styleHeader': {
                               'width': '60%'
                             }
@@ -609,7 +608,6 @@ export const meta = {
                             'headers': [
                               {
                                 'id': 'Description',
-                                'label': '""',
                                 'styleHeader': {
                                   'width': '60%'
                                 }
@@ -771,7 +769,6 @@ export const meta = {
                             'headers': [
                               {
                                 'id': 'Description',
-                                'label': '""',
                                 'styleHeader': {
                                   'width': '60%'
                                 }

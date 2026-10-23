@@ -2994,7 +2994,7 @@
 .ui-render th, .ui-render td {
   padding: 0;
 }
-.ui-render th > *:only-child:empty::before, .ui-render td > *:only-child:empty::before, .ui-render th > *:only-child > *:only-child:empty::before, .ui-render td > *:only-child > *:only-child:empty::before {
+.ui-render th > *:only-child:empty::before, .ui-render td > *:only-child:empty::before, .ui-render th > *:only-child > *:only-child:empty::before, .ui-render td > *:only-child > *:only-child:empty::before, .ui-render th > *:only-child > .sr-only:first-child + *:last-child:empty::before, .ui-render td > *:only-child > .sr-only:first-child + *:last-child:empty::before {
   content: 'A';
   visibility: hidden;
 }

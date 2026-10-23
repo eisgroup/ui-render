@@ -187,7 +187,12 @@ export interface MetaNode {
     name?: string | null
     /** The child nodes, or a value transform that resolves to them. */
     items?: MetaNodeEntry[] | MetaValueRef | null
+    /**
+     * A Table's columns. A header shows its `label`. Without one it shows no text, and its `id` is hidden text that
+     * names it for screen readers; `label: ""` names nothing.
+     */
     headers?: MetaNodeEntry[] | MetaValueRef | null
+    /** Rows of Table headers, above `headers` in the order given: each an array of headers like those of `headers`. */
     extraHeaders?: unknown[] | MetaValueRef | null
     extraItems?: unknown[] | MetaValueRef | null
     relativeData?: boolean | null

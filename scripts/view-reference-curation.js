@@ -186,7 +186,7 @@ const VIEW_CURATION = {
     TABLE: {
         summary: 'Table with dynamic `headers`, optional sorting, pagination, column groups and a `renderCell` declaration per header.',
         resolvesTo: 'TableView',
-        notes: '`group` pivots rows into grouped columns, `extraItems` appends computed rows, `filterItems` keeps only rows matching the parent row, and the node `name` is expanded to the full dot-path its row inputs register under.',
+        notes: '`group` pivots rows into grouped columns, `extraItems` appends computed rows, `filterItems` keeps only rows matching the parent row, and the node `name` is expanded to the full dot-path its row inputs register under. A header in `headers` or `extraHeaders` shows its `label`; without one it shows no text, and its `id` is hidden text that names it for screen readers (meta contract 2: under 1 the `id` showed), while `label: ""` names nothing. A table without `headers` takes them from its first row\'s keys and shows those.',
     },
     TABLE_CELLS: {
         summary: 'Renders each entry of `items` inside its own table cell.',

@@ -1,7 +1,7 @@
 /**
  * THE VIEWS A USER ACTS ON THAT NO OTHER SPEC DRIVES — date input, popup, slider, toggle, checkbox,
- * dropdown by pointer, table sorting and pages, progress steps, a field in a tab bar. Added 2026-10-06
- * with the view map, `e2e/view-coverage.js`.
+ * dropdown by pointer, table sorting, pages and headers, progress steps, a field in a tab bar. Added
+ * 2026-10-06 with the view map, `e2e/view-coverage.js`.
  * =============================================================================================
  *
  * Before this file the browser leg drove the tooltip, the dropdown's keyboard, tabs, one Expand
@@ -389,6 +389,29 @@ test.describe('table: sorting and pages', () => {
         while (await next.isEnabled()) await next.click()
         await expect(pager.getByRole('button', { name: `Page ${TABLE.PAGE_COUNT}` })).toHaveAttribute('aria-current', 'page')
         expect(await firstCells()).toEqual(TABLE.LAST_PAGE_ROWS)
+    })
+})
+
+test.describe('table: headers', () => {
+    test('[I] a header without a label shows no text, and is as tall as a labelled one', async ({ page }) => {
+        await openExample(page, 'ratingDetails')
+        // Found by the name a screen reader hears: the header's `id`.
+        const header = page.locator('#ratingDetails').getByRole('columnheader', { name: TABLE.UNLABELLED_HEADER })
+        const measured = await header.evaluate((th) => {
+            const hidden = th.querySelector('.sr-only')
+            const { width, height } = hidden.getBoundingClientRect()
+            return {
+                onlyHiddenText: th.textContent === hidden.textContent,
+                hiddenBox: { width, height },
+                // What a header holds, beside the next one's in its row: a row is as tall as the tallest.
+                height: th.firstElementChild.getBoundingClientRect().height,
+                labelledHeight: th.nextElementSibling.firstElementChild.getBoundingClientRect().height,
+            }
+        })
+
+        expect(measured.onlyHiddenText).toBe(true)
+        expect(measured.hiddenBox).toEqual(TABLE.HIDDEN_TEXT_BOX)
+        expect(measured.height).toBe(measured.labelledHeight)
     })
 })
 

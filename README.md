@@ -172,11 +172,15 @@ application, whatever it finds.
 ### Contract version
 
 `meta.json` may declare an optional root-level `metaVersion` (`"MAJOR"` or `"MAJOR.MINOR"`) to
-record which contract it was authored against. The current contract version is **`1`**.
+record which contract it was authored against. The current contract version is **`2`**.
+
+Version `2` changed one thing: a table header without a `label` shows no text, where `1` showed its
+`id`. The `id` stays as hidden text, which names the column for screen readers. A header that should
+show text needs a `label`.
 
 - **Absence means "current"** — the file targets whatever contract the installed
   `eis-ui-render` implements. That is the right choice when meta and library ship together, and
-  it is why every existing `meta.json` keeps working untouched.
+  it is why no existing `meta.json` has to declare one.
 - **MAJOR** changes only for a change that would break existing meta; **MINOR** for additive
   ones. Declaring a version equal to or below what the library implements is always compatible.
 - The engine **ignores the value** and strips the field before rendering: declaring it never

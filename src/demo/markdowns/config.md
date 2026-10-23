@@ -211,19 +211,23 @@ Pass a function instead of `true` to handle the findings yourself:
 ### metaVersion
 
 A `meta.json` may declare an optional, root-level `metaVersion` recording which contract it was
-authored against. The current contract version is **`1`**.
+authored against. The current contract version is **`2`**.
 
 ```json
 {
-  "metaVersion": "1",
+  "metaVersion": "2",
   "view": "Col",
   "items": []
 }
 ```
 
+Version `2` changed one thing: a table header without a `label` shows no text, where `1` showed its
+`id`. The `id` stays as hidden text, which names the column for screen readers. A header that should
+show text needs a `label` (see [Table Attributes](#table-attributes)).
+
 - **Leaving it out means "current"** — the file targets whatever contract the installed
   library implements. That is the right default when the meta files and the library ship
-  together, and it is why every existing `meta.json` keeps working unchanged.
+  together, and it is why no existing `meta.json` has to declare one.
 - **MAJOR** increases only for a change that would break existing meta; **MINOR** for additive
   ones. Declaring a version at or below what the library implements is always compatible.
 - The renderer **ignores the value** and strips the field before rendering, so declaring it never
@@ -601,7 +605,7 @@ for a range slider.
   headers: [
     {
       id: String,        // cell id: the key of the row value (a header without it renders empty cells)
-      label: String || Number || { name: String },
+      label: String || Number || { name: String }, // the header's text: without it, none (see Header notes)
       renderCell: String || Object,
     },
     {
@@ -649,6 +653,15 @@ for a range slider.
   rowsPerPage: 20,       // rows per page (default 20)
 }
 ```
+
+**Header notes**
+
+- A header in `headers` or `extraHeaders` shows its `label`, or `children` when it declares them.
+- Without a label it shows no text. Its `id` stays as hidden text, which names the column, and its sort
+  button, for screen readers. Before contract version 2 the `id` showed on screen.
+- `label: ""` is blank for screen readers too, as for a column of action buttons.
+- `label: 0` shows `0`.
+- A table without `headers` takes them from the keys of its first row and shows the keys.
 
 **Pagination notes**
 
