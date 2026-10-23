@@ -151,6 +151,8 @@ function Upload (props: UploadProps) {
             : React.cloneElement(values[part.placeholder], { key: index }))
     )
 
+    // Its popups open with `isOpen`, which they lacked until 2026-10-23: the popup keeps its `isOpen` when it is not
+    // given (`AppProvider`), so a refused drop handed it a title and a message and it stayed closed.
     const handleUpload = (acceptedFiles: File[]) => {
         const { onChange, name } = props
         if (hasListValue(acceptedFiles)) {
@@ -158,6 +160,7 @@ function Upload (props: UploadProps) {
                 // A cast, not a guard: an absent `maxSize` compares false here, as it did in JavaScript.
                 if (file.size > (maxSize as number)) {
                     context.setPopupState({
+                        isOpen: true,
                         title: phraseMessage('MAXIMUM_FILE_SIZE_EXCEEDED'),
                         content: <Row className="center wrap">
                             {phraseTexts('FILE_MUST_BE_UNDER', {
@@ -172,6 +175,7 @@ function Upload (props: UploadProps) {
             isFunction(onChange) && onChange(acceptedFiles, name, dropzone.current)
         } else {
             context.setPopupState({
+                isOpen: true,
                 title: phraseMessage('FILE_UPLOAD_FAILED'),
                 content: <View className="center wrap">
                     {phraseTexts('UPLOAD_FILES_ONLY', { formats: <Text className="p bold">{formats}</Text> })}

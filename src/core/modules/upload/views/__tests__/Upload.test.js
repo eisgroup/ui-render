@@ -4,6 +4,7 @@ import '@testing-library/jest-dom'
 import Upload from '../Upload'
 import { AppContext } from '../../../../contexts'
 import { ConfigContext, initialConfigState } from '../../../../contexts/ConfigContext'
+import { phraseMessage } from '../../../../utils/phrases'
 
 const wrap = (ui, appCtx = { setPopupState: jest.fn() }) => (
     <ConfigContext.Provider value={initialConfigState}>
@@ -80,17 +81,24 @@ describe('Upload', () => {
         expect(nameArg).toBe('img')
     })
 
-    it('shows popup when file is too large', () => {
+    it('opens the popup, and calls no onChange, when a file is too large', () => {
         const ctx = { setPopupState: jest.fn() }
+        const calls = []
+        const onChange = function (...args) { calls.push(args) }
         const { container } = render(
-            wrap(<Upload fileType="image" name="img" maxSize={5} onChange={() => {}} />, ctx)
+            wrap(<Upload fileType="image" name="img" maxSize={5} onChange={onChange} />, ctx)
         )
         const big = makeFile('big.png', 'image/png', 100)
         fireEvent.drop(container.querySelector('.upload__dropzone'), {
             dataTransfer: { files: [big] },
         })
-        expect(ctx.setPopupState).toHaveBeenCalled()
-        expect(ctx.setPopupState.mock.calls[0][0].title).toBeTruthy()
+        expect(ctx.setPopupState).toHaveBeenCalledTimes(1)
+        // Opened: a popup handed no `isOpen` stays as it is, and this one stayed closed until 2026-10-23.
+        expect(ctx.setPopupState.mock.calls[0][0]).toMatchObject({
+            isOpen: true,
+            title: phraseMessage('MAXIMUM_FILE_SIZE_EXCEEDED'),
+        })
+        expect(calls).toHaveLength(0)
     })
 
     it('writes the size limit with the configured locale\'s decimal separator', () => {

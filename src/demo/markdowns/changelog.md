@@ -944,6 +944,12 @@ Nothing to do for these:
 
 #### Fixes
 
+- **An upload that refuses a file says why, in a popup.** It refuses a file larger than its `maxSize`, and a
+  drop with no file of a type its `formats` take. The popup that says so, `Maximum File Size Exceeded!` or
+  `File Upload Failed!`, never opened: the upload gave it its title and message and left it closed, and the
+  user was refused without a word. 0.34.x did the same. Now the popup opens, and a drop that holds one file
+  too large is still refused whole. An upload inside a popup showed the message before, in place of that
+  popup, and still does.
 - **A date field keeps text that is no date, and says `Invalid date`.** rc-picker reads what a user types strictly,
   in the display format, and hands on only a date. A field left with `11-31-2021` or `02-29-2021` showed the date it
   had again, or nothing: an empty required field was wiped and said `Required`, and a field with a date went back to
