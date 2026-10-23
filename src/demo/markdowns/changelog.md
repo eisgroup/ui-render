@@ -80,6 +80,10 @@ item has the details.
   page now: where a name repeats, the first field keeps it and the others take `<name>-2`,
   `<name>-3`. Give a field an `id` in meta where the page needs a fixed one. (Renderer configuration
   and error reporting, Accessibility, Fixes)
+- **Translate the pie chart's `Total` under `ui-render:TOTAL`.** `translate` is asked for that key
+  now, not for the English word, so a translation a host keyed on `Total` no longer reaches the
+  chart. A host with no translation for the key sees `Total`, as before. (Renderer configuration and
+  error reporting)
 - **Ship your own copies of the images you link.** The package ships no images now. 0.34.x carried
   `static/images/`, flags included. (Packaging)
 - **Style the Semantic class names a meta sets.** A node a meta gives `ui label`, `ui menu` or
@@ -150,6 +154,15 @@ Nothing to do for these:
 
 #### Renderer configuration and error reporting
 
+- **A host translates the texts the widget writes itself, through `translate`.** A host translates
+  the labels of its meta, but the pie chart's `Total` and the `Yes` and `No` a `Text` shows for a
+  boolean were always English, so a translated page showed them in English. `translate` is now
+  asked for each under a key of its own, `ui-render:TOTAL`, `ui-render:YES` and `ui-render:NO`,
+  which a host registers as a `ui-render` namespace in its i18n. Where the answer is the key itself,
+  the key without `ui-render:`, or empty, the widget shows its English text, as before. Each key is
+  asked for once, and the answer is not translated again. `docs/BUILT-IN-PHRASES.md` lists the ids
+  with their English texts, and the types publish them as `UIRenderPhraseId`. The pie chart asked
+  `translate` for the English word `Total` until now, and no longer does.
 - **New `locale` prop: the language tag the widget shows numbers in.** A host passes its user's
   number format, `de-DE`, and the `Currency`, `Float`, `Double5` and `Percent` renderers, a
   `Counter`, a pie chart's values and a slider's labels write their decimal and grouping separators:
@@ -883,6 +896,10 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A pie chart translates with its own document's `translate`.** Its centre, its legend and its
+  tooltip took the `translate` of the document constructed last: on a page with two documents, a
+  slice added to the first one's chart after the second one mounted had its name translated by the
+  second one's function.
 - **`onApplyPeriods` sends nothing while a field shows its validation error.** It sent the table as it
   was: a user emptied a required number field, the field showed `Required`, the host's
   `getValidationErrors` heard it, and `apiCalls.updateData` received the row with `""` in it, where a

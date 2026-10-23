@@ -75,6 +75,12 @@ jobs:
       - name: Check the generated supported-prop reference
         run: npm run docs:props:check
 
+      # docs/BUILT-IN-PHRASES.md is generated from BUILT_IN_PHRASES in src/core/utils/phrases.ts: the ids
+      # a host's translate is asked for, with their English texts. scripts/__tests__/phrase-reference.contract.test.js
+      # covers it in all four legs; this step names the failure.
+      - name: Check the generated built-in phrase reference
+        run: npm run docs:phrases:check
+
       # `src/style/__tests__/semantic-contributed-css.txt` pins every rule the two vendored
       # Semantic modules (`src/style/vendor/`) contribute -- the "pixel parity of extracted CSS" criterion
       # UPGRADE-PLAN sets for §9.7-F1 step 4, which had no mechanism until this fixture existed.
