@@ -3,6 +3,7 @@ import UIRender, {
     UIRenderApiCalls,
     UIRenderErrorReport,
     UIRenderMetaProblem,
+    UIRenderPhraseId,
     UIRenderProps,
     UIRenderTranslate,
     UIRenderValidationErrors,
@@ -28,6 +29,11 @@ const apiCallsUnderTheOldName: UIRenderApiCalls<QuoteData> = {
 }
 
 const translate: UIRenderTranslate = (value: string): string => value.toUpperCase()
+
+// What a host registers under the `ui-render` namespace: one text for each published id.
+const builtInTexts: Record<UIRenderPhraseId, string> = { NO: 'Nein', TOTAL: 'Gesamt', YES: 'Ja' }
+// @ts-expect-error an id the widget does not publish
+const unknownPhrase: UIRenderPhraseId = 'MAYBE'
 
 const props: UIRenderProps<QuoteData> = {
     data,
@@ -61,4 +67,4 @@ const missingData = <UIRender meta={meta}/>
 // @ts-expect-error meta is required by the runtime contract
 const missingMeta = <UIRender data={data}/>
 
-void [minimal, validating, complete, inferred, missingData, missingMeta, NamedUIRender, apiCallsUnderTheOldName]
+void [minimal, validating, complete, inferred, missingData, missingMeta, NamedUIRender, apiCallsUnderTheOldName, builtInTexts, unknownPhrase]

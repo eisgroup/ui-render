@@ -28,6 +28,7 @@ import type { DeliveredRenderErrorReport } from '../core/engine/Render'
 import type { mapErrorObjectToUIFormat } from '../core/engine/errorMapping'
 import type { UploadOptions } from '../core/engine/upload'
 import type { MetaProblem } from '../core/engine/validateMeta'
+import type { BuiltInPhraseId } from '../core/utils/phrases'
 
 type Meta = UIRender.Meta
 
@@ -145,6 +146,8 @@ const deprecatedUpdateIsAccepted: Assignable<HostCalls['updateExperienceData'], 
 const errorReportIsPublished: Assignable<DeliveredRenderErrorReport, UIRender.UIRenderErrorReport> = true
 const metaProblemIsPublished: Assignable<MetaProblem, UIRender.UIRenderMetaProblem> = true
 const validationReportIsPublished: Assignable<ReturnType<typeof mapErrorObjectToUIFormat>, UIRender.UIRenderValidationErrors> = true
+/* What the engine asks a host's `translate` for, `ui-render:<id>`: its ids are exactly the ones the contract publishes. */
+const phraseIdsArePublished: Eq<BuiltInPhraseId, UIRender.UIRenderPhraseId> = true
 
 /* Reference every binding so `noUnusedLocals` stays available to whoever turns it on. */
 void itemsNull; void headersNull; void extraHeadersNull; void extraItemsNull; void nameNull
@@ -158,4 +161,4 @@ void rendererByName; void rendererByObject; void rendererBad
 void viewIsNotJustString; void renderIsNotJustString; void actionIsNotJustString
 void normalizerIsNotJustString; void inputTypeIsNotJustString; void openView
 void downloadIsAccepted; void uploadIsAccepted; void updateIsAccepted; void deprecatedUpdateIsAccepted
-void errorReportIsPublished; void metaProblemIsPublished; void validationReportIsPublished
+void errorReportIsPublished; void metaProblemIsPublished; void validationReportIsPublished; void phraseIdsArePublished
