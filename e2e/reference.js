@@ -631,6 +631,24 @@ const TABLE = {
     HIDDEN_TEXT_BOX: { width: 1, height: 1 },
 }
 
+/**
+ * A `highlight-N-last` table on the demo page, with the `tableNested` example's data and rows that expand into a
+ * nested table. Each case expands one row; what it highlights then is the case's `highlighted` rows.
+ * [I] since 2026-10-23. The rule counted the last rows of every body in the table, the nested tables' too, and
+ * counted the row an expanded row shows its content in. Expanding the last row moved the highlight from it to that
+ * row, which made all its content bold, and the last row of a table nested there was highlighted as well. Now a
+ * table counts only its own rows, and not that one: the second case is the content row between the two it counts.
+ */
+const HIGHLIGHTED_ROWS = {
+    /** The font weight of a highlighted row, and of one that is not. */
+    WEIGHT: { highlighted: '500', plain: '400' },
+    ROWS: ['Gold', 'Silver'],
+    CASES: [
+        { styles: 'highlight-1-last', expand: 'Silver', highlighted: ['Silver'] },
+        { styles: 'highlight-2-last', expand: 'Gold', highlighted: ['Gold', 'Silver'] },
+    ],
+}
+
 /** The `all` example's progress steps: four, the second current. */
 const PROGRESS_STEPS = {
     /** [I] A click on the third step makes it current and shows its content after the 50 ms swap. */
@@ -657,7 +675,21 @@ const TAB_BAR_FIELD = {
     BAR_CLASSES: ['padding-largest', ''],
 }
 
+/**
+ * The bars of what scrolls inside the widget, which `scrollbar.less` styles through `::-webkit-scrollbar`, on the
+ * demo page: under a table wider than the page, and beside a block with a height of its own.
+ * [I] since 2026-10-23. They were 3 px thick, too thin to grab, and `!important`, so a host could change them
+ * only with an `!important` rule of its own.
+ */
+const SCROLLBAR = {
+    /** A vertical bar's width and a horizontal bar's height, in CSS pixels. */
+    THICKNESS_PX: 8,
+    /** What a host's rule after the stylesheet sets, with no `!important`, and what the bars then measure. */
+    HOST_THICKNESS_PX: 12,
+}
+
 module.exports = {
     BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, INLINE, WIDGET, TOUCH, KEYBOARD, DROPDOWN,
-    DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, PROGRESS_STEPS, TAB_BAR_FIELD,
+    DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, HIGHLIGHTED_ROWS, PROGRESS_STEPS, TAB_BAR_FIELD,
+    SCROLLBAR,
 }

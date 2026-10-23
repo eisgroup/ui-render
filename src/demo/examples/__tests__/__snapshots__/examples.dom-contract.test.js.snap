@@ -474,7 +474,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                     </div>
                                   </td>
                                 </tr>
-                                <tr>
+                                <tr class="app__table__expansion">
                                   <td colspan="4">
                                     <div>
                                       <div class="overflow-scroll flex--row max-width">
@@ -674,7 +674,7 @@ exports[`demo example full-DOM contract all renders a stable, non-empty DOM matc
                                     </div>
                                   </td>
                                 </tr>
-                                <tr>
+                                <tr class="app__table__expansion">
                                   <td colspan="4">
                                     <div>
                                       <div class="overflow-scroll flex--row max-width">
@@ -1662,7 +1662,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr>
+                <tr class="app__table__expansion">
                   <td colspan="3">
                     <div class="flex--col padding-small padding-top-none">
                       <div>
@@ -1879,7 +1879,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr>
+                <tr class="app__table__expansion">
                   <td colspan="3">
                     <div class="flex--col padding-small padding-top-none">
                       <div>
@@ -2142,7 +2142,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr>
+                <tr class="app__table__expansion">
                   <td colspan="3">
                     <div class="flex--col padding-small padding-top-none">
                       <div>

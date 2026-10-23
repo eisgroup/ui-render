@@ -922,6 +922,18 @@ Nothing to do for these:
   - The rows of a table whose rows hold another table, with an add row that has a form. In a document
     with more than one top-level key, what a `showIf` reads held none of the outer rows, so a field
     gated on one of them never showed.
+- **The scrollbars inside the widget are 8 px thick, and a host's rule can change them.** In Chrome, Edge and
+  Safari, whatever scrolls inside the widget, such as a table wider than its container, had bars 3 px thick, too
+  thin to grab. They are 8 px now, with the same rounded thumb, measured in Chromium 153 and WebKit 26.6. Their
+  rules were `!important`, so a host could restyle the bars only with an `!important` rule of its own; now a rule
+  after our stylesheet does it without one: `.ui-render ::-webkit-scrollbar { width: 12px; height: 12px; }`. A
+  styled bar is no overlay, on macOS either, and takes its room from the content it scrolls: 5 px more than it
+  did. Firefox does not read these rules and draws the system's bars, as before.
+- **A table with `highlight-1-last`, `highlight-2-last` or `highlight-3-last` highlights its own last rows.** An
+  expanded row shows its content in a row of its own below it, and the rule counted that row as one of the last:
+  expanding one of them highlighted its content, all of it drawn bold, in place of a row of the table. The rule also
+  reached the rows of every table nested in a highlighted one, and highlighted the last of them. Now a table counts
+  only its own rows, and not the content rows, which carry the class `app__table__expansion`.
 - **A table header without a `label` no longer shows its `id`.** A meta that leaves the label out to
   mean a blank header showed the column's technical name there instead, such as `Description`. Now
   it shows no text, and the `id` stays as hidden text for screen readers (Accessibility). This is
