@@ -912,6 +912,11 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A table with `highlight-1-last`, `highlight-2-last` or `highlight-3-last` highlights its own last rows.** An
+  expanded row shows its content in a row of its own below it, and the rule counted that row as one of the last:
+  expanding one of them highlighted its content, all of it drawn bold, in place of a row of the table. The rule also
+  reached the rows of every table nested in a highlighted one, and highlighted the last of them. Now a table counts
+  only its own rows, and not the content rows, which carry the class `app__table__expansion`.
 - **A table header without a `label` no longer shows its `id`.** A meta that leaves the label out to
   mean a blank header showed the column's technical name there instead, such as `Description`. Now
   it shows no text, and the `id` stays as hidden text for screen readers (Accessibility). This is
