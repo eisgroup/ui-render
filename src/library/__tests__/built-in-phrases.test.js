@@ -16,9 +16,6 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import '@testing-library/jest-dom'
 import UIRender from '../main'
 import { Active } from '../../core/utils'
-import Upload from '../../core/modules/upload/views/Upload'
-import Modal from '../../core/engine/components/Modal'
-import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../core/contexts'
 
 const GERMAN = {
     // The labels of the metas below.
@@ -340,31 +337,13 @@ describe.each([
         })
 
         /**
-         * The popup a drop of `file` asks for, shown by the document's popup with the upload's translator. The upload
-         * opens none in a document, as it never has: it hands the popup its title and content and leaves it closed.
+         * The popup a drop of `file` on an upload of `props` opens in the document. Until 2026-10-23 it opened none: the
+         * upload handed the popup its title and content and left it closed, so this showed them in a `Modal` of its own.
          */
         const popupFor = (props, file) => {
-            const states = []
-            const { container } = render(
-                <ConfigContext.Provider value={initialConfigState}>
-                    <AppContext.Provider value={{ ...initialAppState, setPopupState: state => states.push(state) }}>
-                        <Upload name="attachment" translate={translate} {...props}/>
-                    </AppContext.Provider>
-                </ConfigContext.Provider>
-            )
+            const { container } = mount({ view: 'Input', type: 'file', name: 'attachment', ...props })
             fireEvent.drop(dropzoneOf(container), { dataTransfer: { files: [file] } })
-            expect(states).toHaveLength(1)
-            // The popup's root is the container of what renders it, so the cleanup after each test removes both.
-            const popupRoot = document.body.appendChild(document.createElement('div'))
-            render(
-                <ConfigContext.Provider value={initialConfigState}>
-                    <AppContext.Provider value={{ ...initialAppState, ...states[0], isOpen: true, popupRoot }}>
-                        <Modal translate={translate}/>
-                    </AppContext.Provider>
-                </ConfigContext.Provider>,
-                { container: popupRoot },
-            )
-            return within(popupRoot).getByRole('dialog')
+            return screen.getByRole('dialog')
         }
 
         it('the popup a file larger than its `maxSize` asks for', () => {

@@ -676,6 +676,21 @@ const TAB_BAR_FIELD = {
 }
 
 /**
+ * A file larger than an upload takes, picked from the keyboard: the `uploadVariants` example's image upload, whose
+ * zone reads "Choose image", takes files up to 2 MB.
+ * [I] since 2026-10-23. The upload refused such a file without a word, as 0.34.x did: it handed the popup its title
+ * and message, and the popup stayed closed. Now the popup opens above the page and takes the focus, and closing it
+ * gives the focus back to the zone.
+ */
+const UPLOAD_REFUSAL = {
+    ZONE: 'Choose image',
+    FILE: { name: 'photo.png', mimeType: 'image/png', bytes: 2 * 1024 * 1024 + 1 },
+    TITLE: 'Maximum File Size Exceeded!',
+    /** The popup's message, a text each: the file's name and the limit are texts of their own. */
+    MESSAGE: ['photo.png', 'must be under', '2MB'],
+}
+
+/**
  * The bars of what scrolls inside the widget, which `scrollbar.less` styles through `::-webkit-scrollbar`, on the
  * demo page: under a table wider than the page, and beside a block with a height of its own.
  * [I] since 2026-10-23. They were 3 px thick, too thin to grab, and `!important`, so a host could change them
@@ -691,5 +706,5 @@ const SCROLLBAR = {
 module.exports = {
     BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, INLINE, WIDGET, TOUCH, KEYBOARD, DROPDOWN,
     DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, HIGHLIGHTED_ROWS, PROGRESS_STEPS, TAB_BAR_FIELD,
-    SCROLLBAR,
+    UPLOAD_REFUSAL, SCROLLBAR,
 }

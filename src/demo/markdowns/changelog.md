@@ -942,6 +942,12 @@ Nothing to do for these:
 
 #### Fixes
 
+- **An upload that refuses a file says why, in a popup.** It refuses a file larger than its `maxSize`, and a
+  drop with no file of a type its `formats` take. The popup that says so, `Maximum File Size Exceeded!` or
+  `File Upload Failed!`, never opened: the upload gave it its title and message and left it closed, and the
+  user was refused without a word. 0.34.x did the same. Now the popup opens, and a drop that holds one file
+  too large is still refused whole. An upload inside a popup showed the message before, in place of that
+  popup, and still does.
 - **A `showIf` in a table's add row reads that row's fields.** The row a `renderExtraItem` declaration
   renders has a form of its own, whose fields are named by the row's place, such as
   `dataKind.items[1].kind`. A `showIf` reads the document's forms merged, and the merge put that form's

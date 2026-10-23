@@ -151,7 +151,10 @@ const VIEW_COVERAGE = {
     },
     Upload: {
         kind: 'interactive',
-        browser: [t(KB, '[I] an upload drop zone is a button that Space opens, and keyboard focus shows the formats it takes')],
+        browser: [
+            t(KB, '[I] an upload drop zone is a button that Space opens, and keyboard focus shows the formats it takes'),
+            t(IV, '[I] a file larger than it takes opens a popup above the page that says so, and closing it gives the focus back'),
+        ],
     },
     VerticalLayout: { kind: 'alias', aliasOf: 'Col' },
     VerticalList: { kind: 'alias', aliasOf: 'List' },
