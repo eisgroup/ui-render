@@ -1,5 +1,8 @@
 import classNames from '../utils/classNames'
 import React from 'react'
+import { Active } from '../utils'
+import type { Translate } from '../utils/_envs'
+import { phrase } from '../utils/phrases'
 
 /** What `onPageChange` is told: the new 1-indexed page. */
 export type PageChange = { activePage: number }
@@ -16,6 +19,8 @@ export type PaginationProps = {
   /** Page links shown at the start and end, 1 by default */
   boundaryCount?: number
   className?: string
+  /** The translator of its names, the built-in phrases `PAGINATION`, `PREVIOUS_PAGE`, `PAGE` and `NEXT_PAGE` */
+  translate?: Translate
 }
 
 /** A page number, or where a run of them is left out. */
@@ -32,6 +37,7 @@ function Pagination ({
   siblingCount = 1,
   boundaryCount = 1,
   className,
+  translate = Active.translate,
 }: PaginationProps) {
   if (!Number.isSafeInteger(totalPages) || totalPages < 2) return null
   const page = normalizePage(activePage, totalPages)
@@ -44,11 +50,11 @@ function Pagination ({
   }
 
   return (
-    <nav className={classNames('app__pagination', className)} role='navigation' aria-label='Pagination'>
+    <nav className={classNames('app__pagination', className)} role='navigation' aria-label={phrase(translate, 'PAGINATION')}>
       <PageButton
         disabled={page <= 1}
         onClick={(e) => go(e, page - 1)}
-        ariaLabel='Previous page'
+        ariaLabel={phrase(translate, 'PREVIOUS_PAGE')}
       >
         ‹
       </PageButton>
@@ -61,7 +67,7 @@ function Pagination ({
             key={item}
             active={item === page}
             onClick={(e) => go(e, item)}
-            ariaLabel={`Page ${item}`}
+            ariaLabel={phrase(translate, 'PAGE', { page: item })}
           >
             {item}
           </PageButton>
@@ -70,7 +76,7 @@ function Pagination ({
       <PageButton
         disabled={page >= totalPages}
         onClick={(e) => go(e, page + 1)}
-        ariaLabel='Next page'
+        ariaLabel={phrase(translate, 'NEXT_PAGE')}
       >
         ›
       </PageButton>

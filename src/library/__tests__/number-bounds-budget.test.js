@@ -16,6 +16,7 @@ import React from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
 import UIRender from '../main'
 import { formsStorage } from '../../core/state/formRegistry'
+import { phraseMessage } from '../../core/utils/phrases'
 
 /** Every render of `InputNumber`, the element of each number field. Not memoised, as it is not. */
 const mockRenders = { count: 0 }
@@ -95,6 +96,22 @@ describe('a 50-row table of number fields with min and max', () => {
             errorFor(form, 'rows[2].price', -1),
             errorFor(form, 'rows[2].price', ''),
             errorFor(form, 'rows[2].price', 5),
-        ]).toEqual(['Must be maximum 1000', 'Must be minimum 0', null, 'Must be minimum 0', 'Required', null])
+        ]).toEqual([
+            phraseMessage('MUST_BE_MAXIMUM', { max: 1000 }),
+            phraseMessage('MUST_BE_MINIMUM', { min: 0 }),
+            null,
+            phraseMessage('MUST_BE_MINIMUM', { min: 0 }),
+            phraseMessage('REQUIRED'),
+            null,
+        ])
+    })
+
+    it('fails a bound with the message it failed it with before, so the field is not told of a new error', () => {
+        // final-form tells a field its error changed when the error is another object (`PhraseMessage`).
+        const { form } = mountTable()
+        const first = errorFor(form, 'rows[2].qty', 5000)
+        errorFor(form, 'rows[2].qty', 10)
+        expect(errorFor(form, 'rows[2].qty', 2000)).toBe(first)
+        expect(errorFor(form, 'rows[3].qty', 5000)).toBe(first)
     })
 })

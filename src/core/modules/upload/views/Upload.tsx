@@ -13,9 +13,7 @@ import View from '../../../components/View'
 import {
     get,
     hasListValue,
-    interpolateString as parseString,
     isFunction,
-    pluralize,
     shortNumber,
     SIZE_KB,
     withDecimalSeparator,
@@ -23,6 +21,8 @@ import {
 import { _ } from '../translations'
 import { Active } from '../../../utils'
 import type { Translate } from '../../../utils/_envs'
+import { alreadyTranslated, phrase, phraseMessage, phraseParts } from '../../../utils/phrases'
+import type { BuiltInPhraseId } from '../../../utils/phrases'
 import { AppContext, useNumberLocale } from '../../../contexts'
 
 // Re-exported: `UploadProps.onChange` hands the handle to the host.
@@ -51,15 +51,15 @@ export type UploadProps = {
     readonly?: boolean
     /** Whether to allow multiple file uploads, true by default */
     multiple?: boolean
-    /** Whether to show title above the upload */
+    /** Whether to show title above the upload: the built-in phrase `UPLOAD_FILE` */
     hasHeader?: boolean
     /** Whether to show file types tooltip, true by default */
     showTypes?: boolean
     /** Whether to add `round` css class */
     round?: boolean
-    /** Optional label to show in the title */
+    /** What it takes, as the title, the drop zone and the hover text name it; translated, and shown as it is given */
     label?: string
-    /** Optional label to show on Dropzone hover */
+    /** Optional label to show on Dropzone hover, translated; the built-in phrase `UPLOAD_LABEL_FILE` or `UPLOAD_FILE` without one */
     labelOnHover?: string
     children?: React.ReactNode
     translate?: Translate
@@ -141,6 +141,16 @@ function Upload (props: UploadProps) {
         setActiveThen(false, () => committedProps.current.onBlur && committedProps.current.onBlur(event, ...rest))
     }
 
+    /**
+     * The built-in phrase `id` as `Text`s, with an element of `values` in place of each of their placeholders: the
+     * host's translation decides where each value goes. The popup shows them as they are.
+     */
+    const phraseTexts = (id: BuiltInPhraseId, values: Record<string, React.ReactElement>) => (
+        phraseParts(translate, id, Object.keys(values)).map((part, index) => typeof part === 'string'
+            ? <Text key={index} translate={alreadyTranslated}>{part}</Text>
+            : React.cloneElement(values[part.placeholder], { key: index }))
+    )
+
     const handleUpload = (acceptedFiles: File[]) => {
         const { onChange, name } = props
         if (hasListValue(acceptedFiles)) {
@@ -148,11 +158,12 @@ function Upload (props: UploadProps) {
                 // A cast, not a guard: an absent `maxSize` compares false here, as it did in JavaScript.
                 if (file.size > (maxSize as number)) {
                     context.setPopupState({
-                        title: _.MAXIMUM_FILE_SIZE_EXCEEDED,
+                        title: phraseMessage('MAXIMUM_FILE_SIZE_EXCEEDED'),
                         content: <Row className="center wrap">
-                            <Text className="bold margin-h-smaller">{file.name}</Text>
-                            <Text>{_.MUST_BE_UNDER}</Text>
-                            <Text className="bold margin-h-smaller">{withDecimalSeparator(shortNumber(maxSize as number, 3, SIZE_KB), locale)}B</Text>
+                            {phraseTexts('FILE_MUST_BE_UNDER', {
+                                file: <Text className="bold margin-h-smaller">{file.name}</Text>,
+                                size: <Text className="bold margin-h-smaller">{withDecimalSeparator(shortNumber(maxSize as number, 3, SIZE_KB), locale)}B</Text>,
+                            })}
                         </Row>
                     })
                     return
@@ -161,17 +172,20 @@ function Upload (props: UploadProps) {
             isFunction(onChange) && onChange(acceptedFiles, name, dropzone.current)
         } else {
             context.setPopupState({
-                title: _.FILE_UPLOAD_FAILED,
+                title: phraseMessage('FILE_UPLOAD_FAILED'),
                 content: <View className="center wrap">
-                    <Text>{_.UPLOAD}</Text>
-                    <Text className="p bold">{formats}</Text>
-                    <Text>{_.FILES_ONLY}</Text>
+                    {phraseTexts('UPLOAD_FILES_ONLY', { formats: <Text className="p bold">{formats}</Text> })}
                 </View>
             })
         }
     }
 
-    const label = props.label || fileType || _.FILE
+    // What it takes, as the host names it: translated, and shown as it is given. Until 2026-10-23 the drop zone put
+    // it in the English plural where the upload takes several files, which made nonsense of a translated label.
+    const given = props.label || fileType
+    const named = given ? String(translate(given)) : undefined
+    // The built-in phrase for what it takes, where the host names nothing.
+    const fileWord = () => phrase(translate, 'FILE')
     return (
         <View className={classNames('app__upload', classWrap, { round })}>
             {onClose && (
@@ -180,7 +194,7 @@ function Upload (props: UploadProps) {
                     <TooltipBubble top>{_.CLOSE}</TooltipBubble>
                 </View>
             )}
-            {hasHeader && <h2>{parseString(_.UPLOAD_file, { file: label })}</h2>}
+            {hasHeader && <h2>{phrase(translate, 'UPLOAD_FILE', { file: named || fileWord() })}</h2>}
             <Dropzone
                 // @note: When tabbing to dropzone with keyboard, input[type="file"] also gets event -> causing open twice.
                 //      => input is hidden by dropzone because it has ugly "Choose File" button
@@ -205,8 +219,8 @@ function Upload (props: UploadProps) {
                 {children || <Fragment>
                     <Icon name="image" className="text largest no-margin"/>
                     <Text className="p margin-top-smallest">
-                        {_.SELECT_OR_DROP}<br/>
-                        {pluralize(label as string, multiple ? 2 : 1)}
+                        {phrase(translate, 'SELECT_OR_DROP')}<br/>
+                        {named || (multiple ? phrase(translate, 'FILES') : fileWord())}
                     </Text>
                 </Fragment>
                 }
@@ -214,8 +228,13 @@ function Upload (props: UploadProps) {
                     <View className="dropzone__hover position-fill align-center appear-on-hover">
                         <View className="padding text-outline">
                             <View className="dropzone__hover__bg position-fill bg-neutral radius-large"/>
-                            <Text className="margin-bottom-smaller">
-                                {labelOnHover || parseString(_.UPLOAD_file_FILE, { file: label })}
+                            {/* Until 2026-10-23 an upload the host named nothing read "Upload File File" here. */}
+                            <Text className="margin-bottom-smaller" translate={alreadyTranslated}>
+                                {labelOnHover
+                                    ? translate(labelOnHover)
+                                    : (named
+                                        ? phrase(translate, 'UPLOAD_LABEL_FILE', { label: named })
+                                        : phrase(translate, 'UPLOAD_FILE', { file: fileWord() }))}
                             </Text>
                             {/* Without `formats` or a known `fileType` any file is accepted: no types to list. */}
                             {formats && <Text className="bold p">{formats.replace(/\./g, '')}</Text>}

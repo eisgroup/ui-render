@@ -17,6 +17,7 @@ import '@testing-library/jest-dom'
 import UIRender from '../rules'
 import { formsStorage } from '../../state/formRegistry'
 import { cloneDeep } from '../../utils'
+import { phraseMessage } from '../../utils/phrases'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 
 const popup = { ...initialAppState, setPopupState: jest.fn() }
@@ -140,7 +141,7 @@ describe('an onApplyPeriods action', () => {
         expect(shown('dataKind.periods[0].weight')).toBe('')
         expect(shown('reference')).toBe('')
         const [root] = [...formsStorage.values()].filter(({ draftRow }) => !draftRow)
-        expect(root.form.getFieldState('reference')).toMatchObject({ error: 'Required', touched: false })
+        expect(root.form.getFieldState('reference')).toMatchObject({ error: phraseMessage('REQUIRED'), touched: false })
     })
 
     it('waits for the error of a block with a form of its own, whose values it sends as well', async () => {

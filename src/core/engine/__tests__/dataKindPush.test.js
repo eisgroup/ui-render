@@ -10,6 +10,7 @@ import {
     dataKindPathFor,
     removeDataKindRow,
 } from '../dataKindPush'
+import { phraseMessage } from '../../utils/phrases'
 
 describe('rowObjectForDataKindAppend', () => {
     it('extracts one row from nested registeredFieldValues tree', () => {
@@ -68,7 +69,10 @@ describe('validateNotWithinRangeDraftRow', () => {
             'startDate',
             'endDate'
         )
-        expect(err).toMatchObject({ startDate: expect.any(String), endDate: expect.any(String) })
+        expect(err).toEqual({
+            startDate: phraseMessage('START_AND_END_DATE_CANNOT_BE_THE_SAME'),
+            endDate: phraseMessage('START_AND_END_DATE_CANNOT_BE_THE_SAME'),
+        })
     })
 
     it('rejects start after end', () => {
@@ -78,8 +82,10 @@ describe('validateNotWithinRangeDraftRow', () => {
             'startDate',
             'endDate'
         )
-        expect(err.startDate).toBeTruthy()
-        expect(err.endDate).toBeTruthy()
+        expect(err).toEqual({
+            startDate: phraseMessage('START_DATE_CANNOT_BE_MORE_THAN_END_DATE'),
+            endDate: phraseMessage('END_DATE_CANNOT_BE_LESS_THAN_START_DATE'),
+        })
     })
 
     it('rejects overlap with an existing period', () => {
@@ -89,7 +95,7 @@ describe('validateNotWithinRangeDraftRow', () => {
             'startDate',
             'endDate'
         )
-        expect(err.startDate).toBe('Periods cannot overlap')
+        expect(err.startDate).toEqual(phraseMessage('PERIODS_CANNOT_OVERLAP'))
     })
 
     it('allows a non-overlapping period', () => {

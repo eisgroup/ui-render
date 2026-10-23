@@ -4,6 +4,7 @@ import '@testing-library/jest-dom'
 import Upload, { persistEvent } from '../Upload'
 import { AppContext } from '../../../../contexts'
 import { ConfigContext, initialConfigState } from '../../../../contexts/ConfigContext'
+import { phraseMessage } from '../../../../utils/phrases'
 
 const renderUpload = (props = {}, app = { setPopupState: jest.fn() }) => {
     const result = render(
@@ -28,7 +29,7 @@ describe('Upload interaction contracts', () => {
 
         expect(onChange).not.toHaveBeenCalled()
         expect(app.setPopupState).toHaveBeenCalledWith(expect.objectContaining({
-            title: expect.any(String),
+            title: phraseMessage('FILE_UPLOAD_FAILED'),
             content: expect.any(Object),
         }))
     })

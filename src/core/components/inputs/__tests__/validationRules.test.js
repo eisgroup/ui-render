@@ -6,6 +6,43 @@ import {
     maxLength,
     password,
 } from '../validationRules'
+import { phraseMessage } from '../../../utils/phrases'
+
+// Each rule fails with a built-in phrase, which a field shows in its document's language, and with the same one
+// each time: final-form tells a field its error changed when the error is another object.
+describe('the messages the rules fail with', () => {
+    it('are the built-in phrases of the rules', () => {
+        expect(isRequired('')).toEqual(phraseMessage('REQUIRED'))
+        expect(url('not a url')).toEqual(phraseMessage('INVALID_URL'))
+        expect(email('not-an-email')).toEqual(phraseMessage('INVALID_EMAIL_ADDRESS'))
+        expect(maxLength()('x'.repeat(101))).toEqual(phraseMessage('MUST_BE_LESS_THAN_CHARACTERS', { count: 100 }))
+        expect(maxLength(3)('abcd')).toEqual(phraseMessage('MUST_BE_LESS_THAN_CHARACTERS', { count: 3 }))
+    })
+
+    it('are the same object each time a rule fails', () => {
+        expect(isRequired(null)).toBe(isRequired(''))
+        expect(url('a')).toBe(url('b'))
+        expect(email('a')).toBe(email('b'))
+        const tooLong = maxLength(3)
+        expect(tooLong('abcd')).toBe(tooLong('abcde'))
+    })
+
+    it('fails a weak password with its phrase', () => {
+        const original = window.zxcvbn
+        window.zxcvbn = () => ({ score: 0 })
+        try {
+            expect(password('abc')).toEqual(phraseMessage('PASSWORD_IS_TOO_WEAK'))
+            expect(password('abc')).toBe(password('abd'))
+        } finally {
+            window.zxcvbn = original
+        }
+    })
+
+    it('leave `password.confirm`, which no meta can name, with its own English message', () => {
+        password('Strong#Pass123!')
+        expect(password.confirm('different')).toBe('Password mismatch')
+    })
+})
 
 describe('isRequired', () => {
     it('returns OK for non-empty values', () => {

@@ -61,6 +61,32 @@ describe('Checkbox', () => {
         expect(container.textContent).toContain('OFF')
     })
 
+    it('shows a toggle\'s sides with no label as the built-in phrases ON and OFF, in its translator\'s language', () => {
+        const translate = value => ({ 'ui-render:ON': 'AN', 'ui-render:OFF': 'AUS' }[value] || value)
+        const { container } = render(<Checkbox id="flag" type="toggle" translate={translate} onChange={() => {}} />)
+        expect(container.querySelector('.checkbox__true')).toHaveTextContent(/^AN$/)
+        expect(container.querySelector('.checkbox__false')).toHaveTextContent(/^AUS$/)
+    })
+
+    it('shows a side\'s own label, or the toggle\'s, translated, and asks for no phrase then', () => {
+        const asked = []
+        // A translator is handed what it shows, and returns what is no string as it was given (`Translate`).
+        const translate = value => {
+            asked.push(value)
+            return typeof value === 'string' ? value.toUpperCase() : value
+        }
+        const { container } = render(<Checkbox id="flag" type="toggle" label="Flag" labelTrue="Yes please" translate={translate} onChange={() => {}} />)
+        expect(container.querySelector('.checkbox__true')).toHaveTextContent(/^YES PLEASE$/)
+        expect(container.querySelector('.checkbox__false')).toHaveTextContent(/^FLAG$/)
+        expect(asked.filter(value => typeof value === 'string' && value.startsWith('ui-render:'))).toEqual([])
+    })
+
+    it('asks for no phrase when it is no toggle, since it shows no sides', () => {
+        const asked = []
+        render(<Checkbox id="agree" translate={value => { asked.push(value); return value }} onChange={() => {}} />)
+        expect(asked.filter(value => typeof value === 'string' && value.startsWith('ui-render:'))).toEqual([])
+    })
+
     it('derives id from label when not provided', () => {
         const { container } = render(<Checkbox label="Agree to terms" onChange={() => {}} />)
         const input = container.querySelector('input')

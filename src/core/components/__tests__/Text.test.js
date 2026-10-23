@@ -3,6 +3,7 @@ import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import Text from '../Text'
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
+import { phraseMessage } from '../../utils/phrases'
 
 function renderWithConfig (ui, configOverrides = {}) {
     const value = { ...initialConfigState, ...configOverrides }
@@ -78,6 +79,29 @@ describe('Text', () => {
         const { container } = renderWithConfig(<Text translate={translate}>{true}</Text>)
         expect(container.querySelector('span')).toHaveTextContent(/^Ja$/)
         expect(calls).toEqual(['ui-render:YES'])
+    })
+
+    it('shows a phrase message as the host\'s translation of its key, its placeholders filled after', () => {
+        const calls = []
+        const translate = value => {
+            calls.push(value)
+            return value === 'ui-render:MUST_BE_MINIMUM' ? 'Mindestens {min}' : value
+        }
+        const { container } = renderWithConfig(<Text translate={translate}>{phraseMessage('MUST_BE_MINIMUM', { min: 3 })}</Text>)
+
+        expect(container.querySelector('span')).toHaveTextContent(/^Mindestens 3$/)
+        // Asked once, by its key, and what came back is not translated again.
+        expect(calls).toEqual(['ui-render:MUST_BE_MINIMUM'])
+    })
+
+    it('shows a phrase message in English when the host has no translation for it', () => {
+        const { container } = renderWithConfig(<Text translate={value => value}>{phraseMessage('REQUIRED')}</Text>)
+        expect(container.querySelector('span')).toHaveTextContent(/^Required$/)
+    })
+
+    it('still shows any other object as it is, a DOM element among them', () => {
+        const { container } = renderWithConfig(<Text translate={value => `T:${value}`}><b>bold</b></Text>)
+        expect(container.querySelector('span')).toContainHTML('<b>bold</b>')
     })
 
     it('formats ISO date strings using context dateFormat', () => {

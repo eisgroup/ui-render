@@ -374,15 +374,16 @@ const IN_HOUSE_CURATION = {
                 + 'meta\'s own `aria-label` or `aria-labelledby` overrides. CONSUMED, not stripped: it is '
                 + 'destructured out at the top of the wrapper, so it can never be in the rest bag that '
                 + '`omitProps` filters.',
-            placeholder: 'Placeholder text, translated by the wrapper and then forwarded.',
+            placeholder: 'Placeholder text, translated by the wrapper and then forwarded. Without one, the '
+                + 'control shows the built-in phrase `SELECT` (`docs/BUILT-IN-PHRASES.md`).',
             done: 'Adds a `done` class to the wrapper, the completed state the stylesheet selects on. '
                 + 'Unless given, it is true for a value and no error. Until 2026-10-01 the default read '
                 + '`props.value`, always `undefined` once `value` was destructured out, so a `float` label '
                 + 'sat over the selection it named (`Dropdown.done-state.test.js`).',
             // eslint-disable-next-line no-template-curly-in-string -- prose, naming the template the wrapper builds the id with
             error: 'Message shown under the control, in a `${id}-help` block the control points at with '
-                + '`aria-describedby`. The wrapper renders the text itself and forwards only '
-                + '`error={!!error}` for the class.',
+                + '`aria-describedby`. The wrapper renders the text itself, a validator\'s built-in phrase '
+                + 'in the language of `translate`, and forwards only `error={!!error}` for the class.',
             info: 'Explanatory message under the control. Also adds an `info` class.',
             float: 'Renders the label after the control (float-label layout).',
             className: 'Composed by the wrapper onto its own `input--wrapper` element; only the derived '
@@ -401,9 +402,10 @@ const IN_HOUSE_CURATION = {
                 + 'ways on a div: `aria-disabled`, `tabIndex={-1}`, and the open guards.',
             onClickIcon: 'Replaces the icon with a clickable `<Icon>` node. `Listbox` renders a caller\'s `icon` node in '
                 + 'place of its own `<i class="icon dropdown">`.',
-            translate: 'The i18n function. Engine-owned, applied to option text, `label` and '
-                + '`placeholder`. CONSUMED, not stripped — destructured out at the top of the wrapper. '
-                + 'It is also in ENGINE_PROPS, which is what catches it at other boundaries.',
+            translate: 'The i18n function. Engine-owned, applied to option text, `label`, `placeholder` '
+                + 'and `error`, and asked for the built-in phrases `SELECT` and `SELECT_NAME`. CONSUMED, not '
+                + 'stripped — destructured out at the top of the wrapper. It is also in ENGINE_PROPS, which is '
+                + 'what catches it at other boundaries.',
             required: 'Adds the wrapper\'s `required` class. Newly DESTRUCTURED at step 3 part 2 rather '
                 + 'than read off the rest bag: Semantic consumed `required` as a handled prop, so once '
                 + 'the control became an open `<div role="listbox">` the same prop rendered as '

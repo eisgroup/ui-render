@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, act } from '@testing-library/react'
+import { cleanup, render, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { Form } from 'react-final-form'
 import AutoSave from '../AutoSave'
@@ -106,6 +106,40 @@ describe('AutoSave', () => {
     it('does not crash with showLoader=true and submitting=false', () => {
         const { container } = renderFormWithAutoSave({ a: 1 }, { showLoader: true })
         expect(container.firstChild).toBeInTheDocument()
+    })
+})
+
+describe('AutoSave loader', () => {
+    // The loader shows while a save runs, and this one never finishes.
+    const neverSaved = () => new Promise(() => {})
+    const loaderWhileSaving = async autoSaveProps => {
+        const { getForm, container } = renderFormWithAutoSave({ a: 1 }, { onChange: neverSaved, delay: 100, showLoader: true, ...autoSaveProps })
+        act(() => { jest.advanceTimersByTime(100) })
+        act(() => { getForm().change('a', 2) })
+        act(() => { jest.advanceTimersByTime(100) })
+        await act(async () => { await Promise.resolve() })
+        return container.querySelector('.app__loading')
+    }
+
+    it('says the built-in phrase SYNCING in the language of its translator', async () => {
+        const translate = value => (value === 'ui-render:SYNCING' ? 'Wird gespeichert…' : value)
+        expect(await loaderWhileSaving({ translate })).toHaveTextContent(/^Wird gespeichert…$/)
+    })
+
+    it('says "Syncing..." where the host has no translation, and with no translator', async () => {
+        expect(await loaderWhileSaving({ translate: value => value })).toHaveTextContent(/^Syncing\.\.\.$/)
+        cleanup()
+        expect(await loaderWhileSaving()).toHaveTextContent(/^Syncing\.\.\.$/)
+    })
+
+    it('says the `loadContent` a meta gives, translated, and asks for no phrase', async () => {
+        const calls = []
+        const translate = value => {
+            calls.push(value)
+            return value === 'Saving' ? 'Speichern' : value
+        }
+        expect(await loaderWhileSaving({ translate, loadContent: 'Saving' })).toHaveTextContent(/^Speichern$/)
+        expect(calls).not.toContain('ui-render:SYNCING')
     })
 })
 

@@ -11,6 +11,7 @@ import Text from './Text'
 import View from './View'
 import { Active } from '../utils'
 import type { Translate } from '../utils/_envs'
+import type { PhraseMessage } from '../utils/phrases'
 import { useOwnId } from './useOwnId'
 
 /** The props documented on `Input` below; the rest is passed to `InputNative`. */
@@ -32,7 +33,8 @@ export type InputProps = {
   readonly?: boolean
   autofocus?: boolean
   float?: boolean
-  error?: React.ReactNode
+  /** Shown under the field: a string, which `translate` translates, or a validator's built-in phrase (`PhraseMessage`) */
+  error?: React.ReactNode | PhraseMessage
   info?: React.ReactNode
   style?: React.CSSProperties
   onFocus?: (...args: unknown[]) => void
@@ -189,7 +191,7 @@ export function Input ({
       </Row>
       {idHelp &&
       <View id={idHelp} className='field-help'>
-        {error && <Text className='error'>{translate(error)}</Text>}
+        {error && <Text className='error' translate={translate}>{error}</Text>}
         {info && <Text className='info'>{translate(info)}</Text>}
       </View>
       }

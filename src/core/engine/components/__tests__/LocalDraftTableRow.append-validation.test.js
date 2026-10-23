@@ -3,8 +3,6 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { ConfigContext, initialConfigState } from '../../../contexts/ConfigContext'
 import LocalDraftTableRow from '../LocalDraftTableRow'
-// The input rules' messages, which a document loads with the engine and this row alone does not.
-import '../../translations'
 
 const mockPush = jest.fn()
 
@@ -189,5 +187,37 @@ describe('LocalDraftTableRow and its document', () => {
         renderDraft({ meta: inputMeta({ view: 'Input', name: 'title', label: 'Title' }), kind: 'rows', parentInstance: { translate } })
 
         expect(screen.getByRole('button')).toHaveTextContent('T:Add draft')
+    })
+
+    it('shows a rule\'s message in the language of its translator, the built-in phrase of the rule', () => {
+        const translate = text => ({
+            'ui-render:MUST_BE_LESS_THAN_CHARACTERS': 'Höchstens {count} Zeichen',
+            'ui-render:PERIODS_CANNOT_OVERLAP': 'Zeiträume dürfen sich nicht überschneiden',
+        }[text] || text)
+        renderDraft({
+            meta: {
+                view: 'TableCells',
+                relativePath: 'dataKind.rows',
+                items: [
+                    { view: 'Input', name: 'note', validate: 'maxLength' },
+                    { view: 'Input', name: 'from', verify: { dataKind: 'rows', validate: [{ name: 'notWithinRange', args: ['from', 'to'] }] } },
+                    { view: 'Input', name: 'to' },
+                    { view: 'Button', onClick: 'addData', children: 'Add draft' },
+                ],
+            },
+            kind: 'rows',
+            parentInstance: { translate, getDataKind: () => [{ from: '2025-01-01', to: '2025-12-31' }] },
+        })
+
+        fireEvent.change(document.querySelector('input[name="note"]'), { target: { value: 'x'.repeat(101) } })
+        fireEvent.click(screen.getByRole('button', { name: 'Add draft' }))
+        expect(screen.getByText('Höchstens 100 Zeichen')).toBeInTheDocument()
+
+        fireEvent.change(document.querySelector('input[name="note"]'), { target: { value: 'short' } })
+        fireEvent.change(document.querySelector('input[name="from"]'), { target: { value: '2025-06-01' } })
+        fireEvent.change(document.querySelector('input[name="to"]'), { target: { value: '2025-06-30' } })
+        fireEvent.click(screen.getByRole('button', { name: 'Add draft' }))
+        expect(screen.getAllByText('Zeiträume dürfen sich nicht überschneiden')).toHaveLength(2)
+        expect(mockPush).not.toHaveBeenCalled()
     })
 })
