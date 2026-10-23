@@ -1,5 +1,7 @@
 import { get } from '../utils'
 import { cloneDeep, set } from '../utils/object'
+import { phraseMessage } from '../utils/phrases'
+import type { PhraseMessage } from '../utils/phrases'
 
 /** A row, or a tree of rows, as final-form holds them. */
 type Values = Record<string, unknown>
@@ -71,6 +73,17 @@ export function dataKindRowHasContent (row: unknown): boolean {
 }
 
 /**
+ * What the period rules of {@code notWithinRange} say, here and in `rules.tsx`: each a built-in phrase, the
+ * same message each time (`PhraseMessage`).
+ */
+export const PERIOD_MESSAGES = {
+    sameDay: phraseMessage('START_AND_END_DATE_CANNOT_BE_THE_SAME'),
+    startAfterEnd: phraseMessage('START_DATE_CANNOT_BE_MORE_THAN_END_DATE'),
+    endBeforeStart: phraseMessage('END_DATE_CANNOT_BE_LESS_THAN_START_DATE'),
+    overlap: phraseMessage('PERIODS_CANNOT_OVERLAP'),
+}
+
+/**
  * Same rules as {@link FIELD.VALIDATION} {@code notWithinRange} for one row, when the row is only in
  * local draft (not yet in the form array). Used by {@link LocalDraftTableRow} on Add.
  * @param {Object} draft - parsed field values for the new row
@@ -79,19 +92,19 @@ export function dataKindRowHasContent (row: unknown): boolean {
  * @param {string} endKey
  * @returns {Object|null} map of field name → error message, or null if valid
  */
-export function validateNotWithinRangeDraftRow (draft: Values, peerRows: unknown, startKey: string, endKey: string): Record<string, string> | null {
+export function validateNotWithinRangeDraftRow (draft: Values, peerRows: unknown, startKey: string, endKey: string): Record<string, PhraseMessage> | null {
     const _a = draft[startKey]
     const _b = draft[endKey]
-    const err: Record<string, string> = {}
+    const err: Record<string, PhraseMessage> = {}
     if (_a !== undefined && _b !== undefined && _a !== '' && _b !== '') {
         if (_a === _b) {
-            err[startKey] = 'Start date and end date cannot be the same'
-            err[endKey] = 'Start date and end date cannot be the same'
+            err[startKey] = PERIOD_MESSAGES.sameDay
+            err[endKey] = PERIOD_MESSAGES.sameDay
             return err
         }
         if (String(_a) > String(_b)) {
-            err[startKey] = 'Start date cannot be more than end date'
-            err[endKey] = 'End date cannot be less than start date'
+            err[startKey] = PERIOD_MESSAGES.startAfterEnd
+            err[endKey] = PERIOD_MESSAGES.endBeforeStart
             return err
         }
     }
@@ -110,8 +123,8 @@ export function validateNotWithinRangeDraftRow (draft: Values, peerRows: unknown
         }
         // Inclusive interval overlap on YYYY-MM-DD strings
         if (!(peerEnd < String(_a) || String(_b) < peerStart)) {
-            err[startKey] = 'Periods cannot overlap'
-            err[endKey] = 'Periods cannot overlap'
+            err[startKey] = PERIOD_MESSAGES.overlap
+            err[endKey] = PERIOD_MESSAGES.overlap
             return err
         }
     }

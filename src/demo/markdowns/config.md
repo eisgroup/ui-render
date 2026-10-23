@@ -361,6 +361,9 @@ A screen reader announces a control by its name. Each control takes the first of
    - a field in a table cell is named by its column's header, when the header shows its `label` as plain text. In a
      `TableCells` row, or the draft row of a `localDraft` `Data`, only when the row has a cell per header.
 
+The select's and the range's words are built-in phrases, `SELECT_NAME`, `SLIDER_MINIMUM` and `SLIDER_MAXIMUM`, which a
+host translates under `ui-render:<ID>` (`docs/BUILT-IN-PHRASES.md`).
+
 A button is named by its content, so a button that shows only an icon needs an `aria-label`.
 
 ### Input Attributes
@@ -733,8 +736,8 @@ Single- or multi-file upload with click + drag&drop. Use through `Input` with `t
   formats: [String],     // accepted extensions, e.g. ['csv'] or ['png', 'jpg', 'webp']
   maxSize: Number,       // max file size in bytes (rejected with a popup if exceeded)
   multiple: Boolean,     // allow selecting multiple files (default: true)
-  label: String,         // singular noun in the dropzone hint (pluralised when multiple)
-  labelOnHover: String,  // overrides the hover hint text (otherwise "Upload <label> File")
+  label: String,         // what it takes, translated and shown as given: the dropzone hint, header and hover hint
+  labelOnHover: String,  // overrides the hover hint text (otherwise "Upload <label> File", or "Upload File")
   title: String,         // native tooltip on the dropzone
   showTypes: Boolean,    // show the formats hint on hover and keyboard focus (default: true)
   hasHeader: Boolean,    // render an `<h2>Upload <label></h2>` above the dropzone

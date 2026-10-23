@@ -6,6 +6,7 @@ import Table from '../../components/Table'
 import { Active } from '../../utils'
 import { FIELD } from '../../modules/variables'
 import type { Translate } from '../../utils/_envs'
+import type { PhraseMessage } from '../../utils/phrases'
 import { email, isRequired, maxLength, password, url } from '../../components/inputs/validationRules'
 import { integer } from '../../components/inputs/normalizers'
 import { pushDataKindRow, validateNotWithinRangeDraftRow } from '../dataKindPush'
@@ -207,8 +208,9 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate: translateP
     const name = def.name as string
     const { draft, fieldErrors } = state
     const value = draft[name]
-    // A cast: a validator returns its message, or `email`'s falsy value, and the state holds it untyped.
-    const error = fieldErrors[name] as React.ReactNode
+    // A cast: a validator returns its message, a built-in phrase but for a meta's own function, or `email`'s falsy
+    // value, and the state holds it untyped.
+    const error = fieldErrors[name] as React.ReactNode | PhraseMessage
     const { className, type, format: _f, validate: _v, ...rest } = def
     const common = {
       ...rest,

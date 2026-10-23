@@ -258,15 +258,18 @@ number with a point.
 ## Translating the built-in texts (consumer)
 
 Your `translate` prop is handed the labels, titles and options of a meta, and the values a document
-shows as text. A few texts are UI Render's own, such as the `Total` under a pie chart's total:
-`translate` is asked for each of them under a key of its own, `ui-render:<ID>`, so an i18next-based
-host translates them by registering a `ui-render` namespace:
+shows as text. Some texts are UI Render's own: a select's `Select`, a popup's `Ok`, the validation
+messages, the upload's and the table's texts, the names screen readers give the controls, and the
+`Total` under a pie chart's total. `translate` is asked for each of them under a key of its own,
+`ui-render:<ID>`, so an i18next-based host translates them by registering a `ui-render` namespace:
 
 ```js
 i18next.addResourceBundle('de', 'ui-render', {
+    OK: 'OK',
+    REQUIRED: 'Pflichtfeld',
+    MUST_BE_MINIMUM: 'Mindestens {min}',
+    SELECT: 'Bitte wählen',
     TOTAL: 'Gesamt',
-    YES: 'Ja',
-    NO: 'Nein',
 })
 ```
 
@@ -281,7 +284,13 @@ these texts in English. Each key is asked for once, and what comes back is shown
 the English text nor your translation goes to `translate` again.
 
 A text may have a placeholder, written `{name}`. UI Render fills it after your translation comes
-back, so keep it in single braces in your translation, or leave it out.
+back, so keep it in single braces in your translation, or leave it out. A few fill it with an element
+of their own, such as the file name in bold in `FILE_MUST_BE_UNDER`: your translation decides where it
+goes.
+
+The validation messages reach `getValidationErrors` as the field shows them, in your language. A
+required field is the exception: it is reported as `<Field Name> is Required`, with the name taken from
+the field's `name`, as before.
 
 In this version a text is looked up when its component renders. When your i18n changes language
 while a document is on the page, a built-in text already shown changes when its component renders

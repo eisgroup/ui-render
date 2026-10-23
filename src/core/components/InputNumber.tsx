@@ -9,6 +9,7 @@ import Text from './Text'
 import View from './View'
 import { Active } from '../utils'
 import type { Translate } from '../utils/_envs'
+import type { PhraseMessage } from '../utils/phrases'
 import { ENGINE_PROPS, omitProps } from './domProps'
 import { useOwnId } from './useOwnId'
 
@@ -66,8 +67,11 @@ export interface InputNumberProps {
     resize?: boolean
     readonly?: boolean
     float?: boolean
-    /** The message to show, or `false` while it is not to be shown yet: the form's field wrapper passes that */
-    error?: string | false
+    /**
+     * The message to show, or `false` while it is not to be shown yet: the form's field wrapper passes that. A string is
+     * translated by `translate`, and a validator's built-in phrase (`PhraseMessage`) is shown in its language.
+     */
+    error?: string | false | PhraseMessage
     info?: string
     style?: React.CSSProperties
     onFocus?: React.FocusEventHandler<HTMLInputElement>
@@ -346,7 +350,7 @@ const InputNumber = ({
             </Row>
             {idHelp &&
                 <View id={idHelp} className="field-help">
-                    {error && <Text className="error">{translate(error)}</Text>}
+                    {error && <Text className="error" translate={translate}>{error}</Text>}
                     {info && <Text className="info">{translate(info)}</Text>}
                 </View>
             }

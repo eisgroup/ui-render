@@ -1,13 +1,17 @@
 import React from 'react'
+import type { PhraseMessage } from '../utils/phrases'
 
-/** What a popup is opened with; `isOpen` left out keeps the popup as it is. */
-export type PopupState = { title?: React.ReactNode, content?: React.ReactNode, isOpen?: boolean }
+/**
+ * What a popup is opened with; `isOpen` left out keeps the popup as it is. A title the widget writes itself is a
+ * `PhraseMessage`, which the popup shows in its document's language.
+ */
+export type PopupState = { title?: React.ReactNode | PhraseMessage, content?: React.ReactNode, isOpen?: boolean }
 
 /** The popup a document shows, the calls that change it, and where it portals to. */
 export type AppState = {
     isOpen: boolean
     togglePopupState: () => void
-    title: React.ReactNode
+    title: React.ReactNode | PhraseMessage
     content: React.ReactNode
     setPopupState: (popup: PopupState) => void
     popupRoot: HTMLElement | null

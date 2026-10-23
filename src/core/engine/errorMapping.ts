@@ -8,6 +8,8 @@
  */
 import type { FormApi } from 'final-form'
 import { errorsFor, fixableFieldsOf, touchedFor } from '../state/formRegistry'
+import type { Translate } from '../utils/_envs'
+import { isPhraseMessage, phrase } from '../utils/phrases'
 import type { RegisteredForm } from '../state/formRegistry'
 import type { MetaNode } from './formData'
 
@@ -50,11 +52,11 @@ export function errorsProcessing(form: FormApi, meta: MetaNode) {
     const { name, error, touched } = form.getFieldState(field)!;
 
     if (error && (touched || rememberedTouched[name])) {
-      let errorText = error;
-      if (errorText === 'Required') {
-        errorText = convertFieldNameToTitleCaseText(name) + ' is Required'
-      }
-      errorsMap[name] = errorText;
+      // A required field's message is known by its id, in any language: it was the English `'Required'` until the
+      // validators' messages became built-in phrases (2026-10-23).
+      errorsMap[name] = isPhraseMessage(error) && error.phrase === 'REQUIRED'
+        ? convertFieldNameToTitleCaseText(name) + ' is Required'
+        : error
     } else {
       delete errorsMap[name];
     }
@@ -101,17 +103,20 @@ export function showsAnError (forms: ReadonlyMap<object, RegisteredForm>): boole
 /**
  * The report a host's `getValidationErrors` is handed: each field's error, as one message.
  *
- * Only a string is a message. The published contract promises one (`UIRenderValidationMessage.text`),
- * and every validator a meta can name returns one. The one other thing that can reach here is a
- * container field's error: final-form gives an array field the array of its items' errors, and each
- * of those items is reported under its own field name already. Such an entry is left out, rather than
- * handed on as an array that a host reading `text` as a string could not show.
+ * Only a string is a message. The published contract promises one (`UIRenderValidationMessage.text`).
+ * Every validator a meta can name returns a built-in phrase (`PhraseMessage`), which is handed on as its
+ * text in the language of `translate`, the reporting document's translator, as the field shows it. The
+ * one other thing that can reach here is a container field's error: final-form gives an array field the
+ * array of its items' errors, and each of those items is reported under its own field name already. Such
+ * an entry is left out, rather than handed on as an array that a host reading `text` as a string could
+ * not show.
  */
-export const mapErrorObjectToUIFormat = (errors: Record<string, unknown>) => {
+export const mapErrorObjectToUIFormat = (errors: Record<string, unknown>, translate: Translate) => {
   const result: Record<string, { messages: Array<{ text: string }> }> = {};
 
   Object.keys(errors).forEach(fieldName => {
-    const text = errors[fieldName]
+    const error = errors[fieldName]
+    const text = isPhraseMessage(error) ? phrase(translate, error.phrase, error.variables) : error
     if (typeof text !== 'string') return
     result[fieldName] = {
       messages: [

@@ -2,10 +2,10 @@ import classNames from '../utils/classNames'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useNumberLocale } from '../contexts'
 import {
-  Active, formatNumber, interpolateString, l, last, localiseTranslation, numberSeparators, round, toPercent, withDecimalSeparator,
+  Active, formatNumber, last, numberSeparators, round, toPercent, withDecimalSeparator,
 } from '../utils'
-import { _ } from '../utils/translations'
 import type { Translate } from '../utils/_envs'
+import { phrase } from '../utils/phrases'
 import { formatDuration } from '../utils/time'
 import TooltipBubble from './TooltipBubble'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
@@ -32,16 +32,6 @@ export type SliderRangeLabels = {
 
 /** Props for each handle's `TooltipBubble`; `render(value)`, if set, renders its content. */
 export type SliderTooltipProps = { render?: (value: number) => React.ReactNode, [key: string]: unknown }
-
-localiseTranslation({
-  // The two handles of a range, named by the field: the WAI-ARIA multi-thumb slider's "minimum" and "maximum".
-  SLIDER_minimum: {
-    [l.ENGLISH]: '{name}, minimum',
-  },
-  SLIDER_maximum: {
-    [l.ENGLISH]: '{name}, maximum',
-  },
-})
 
 /** The named props are read here; the rest is spread onto the slider's `<div>`. */
 export type SliderProps = {
@@ -151,7 +141,8 @@ export function Slider ({
     if (ariaLabel) return String(ariaLabel)
     if (!fieldName) return undefined
     if (!isRange) return fieldName
-    return interpolateString(index === 0 ? _.SLIDER_minimum : _.SLIDER_maximum, { name: fieldName })
+    // The two handles of a range, named by the field: the WAI-ARIA multi-thumb slider's "minimum" and "maximum".
+    return phrase(translate, index === 0 ? 'SLIDER_MINIMUM' : 'SLIDER_MAXIMUM', { name: fieldName })
   }
 
   useEffect(() => () => {

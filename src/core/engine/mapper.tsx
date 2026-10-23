@@ -28,6 +28,8 @@ import View from '../components/View'
 import { Active, isList, isNumeric, toFlatList, toJSON } from '../utils'
 import { TIME_DURATION_INSTANT } from '../utils/constants'
 import { get, hasObjectValue, isObject } from '../utils/object'
+import { phraseMessage } from '../utils/phrases'
+import type { PhraseMessage } from '../utils/phrases'
 import { autoSubmitter } from './autoSubmit'
 import { shouldRender } from './showIf'
 import Render, { formatRenderError, mapProps } from './index'
@@ -157,11 +159,16 @@ function keptMappedOptions (options: unknown, mapOptions: any, debug: unknown): 
     return mapped
 }
 
-/** `validate` with a number field's bounds checked first, the same function while all three stay the same. */
+/**
+ * `validate` with a number field's bounds checked first, the same function while all three stay the same. A
+ * bound's message is made the first time it fails and returned each time after that (`PhraseMessage`).
+ */
 function boundedValidator (instance: unknown, validate: FieldValidator | undefined, min: any, max: any): FieldValidator {
+    let belowMin: PhraseMessage | undefined
+    let aboveMax: PhraseMessage | undefined
     const bounded: FieldValidator = (value: any) => {
-        if (min != null && value < min) return `Must be minimum ${min}`
-        if (max != null && value > max) return `Must be maximum ${max}`
+        if (min != null && value < min) return belowMin || (belowMin = phraseMessage('MUST_BE_MINIMUM', { min }))
+        if (max != null && value > max) return aboveMax || (aboveMax = phraseMessage('MUST_BE_MAXIMUM', { max }))
         return (validate && validate(value)) || OK
     }
     const key = instance !== null && typeof instance === 'object' ? boundsKey(min, max) : undefined
@@ -307,7 +314,7 @@ const RenderComponent = ({
         }
 
         case FIELD.TYPE.AUTO_SUBMIT: {
-            return <AutoSave {...props}/>
+            return <AutoSave {...props} translate={translate}/>
         }
 
         case FIELD.TYPE.CHECKBOX: {

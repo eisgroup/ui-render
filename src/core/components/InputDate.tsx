@@ -15,6 +15,7 @@ import { ENGINE_PROPS, omitProps } from './domProps'
 import type { PickerProps, PickerRef } from 'rc-picker'
 import type { Moment } from 'moment'
 import type { Translate } from '../utils/_envs'
+import type { PhraseMessage } from '../utils/phrases'
 import { useOwnId } from './useOwnId'
 
 type DatePickerProps = PickerProps<Moment>
@@ -175,7 +176,8 @@ export type InputDateProps = {
     resize?: boolean
     readonly?: boolean
     autofocus?: boolean
-    error?: React.ReactNode
+    /** Shown under the field: a string, which `translate` translates, or a validator's built-in phrase (`PhraseMessage`) */
+    error?: React.ReactNode | PhraseMessage
     info?: React.ReactNode
     style?: React.CSSProperties
     onFocus?: DatePickerProps['onFocus']
@@ -428,7 +430,7 @@ const InputDate = ({
             </Row>
             {idHelp &&
                 <View id={idHelp} className='field-help'>
-                    {error && <Text className='error'>{translate(error)}</Text>}
+                    {error && <Text className='error' translate={translate}>{error}</Text>}
                     {info && <Text className='info'>{translate(info)}</Text>}
                 </View>
             }

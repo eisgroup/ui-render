@@ -174,6 +174,12 @@ translated already, so a `Text` that shows it gets `alreadyTranslated` as its tr
 `BUILT_IN_PHRASES`, in `UIRenderPhraseId` (`src/library/contract.ts`; `typecheck` fails while the two differ) and on
 the page (`npm run docs:phrases`). A published id is never renamed: a host's translation of it would be lost silently.
 
+A text made where no translator is known is a `PhraseMessage` (`phraseMessage(ID, variables?)`): a validator's
+message, which final-form keeps as the field's error, and a popup's title. A `Text` shows one in the language of its
+`translate`, as it shows a boolean, and `getValidationErrors` is handed its text. A required field is known by the id,
+`REQUIRED`, never by its English. final-form tells a field of a new error by identity, so a validator makes each
+message once and returns that one: a new object for the same message renders the field again.
+
 ### Internal layering and imports
 
 All internal imports use **relative paths** — there are no `ui-*-pack` webpack aliases (the only resolve alias left is `process`; the three `theme.config` aliases went with `semantic-ui-less` at §9.7-F1 step 4). The historical "pack" names survive as directory layers:

@@ -72,7 +72,8 @@ export function dataFormsOf (tree: object | undefined): Map<object, RegisteredFo
 }
 
 /**
- * Validation errors by field name, PER FORM.
+ * Validation errors by field name, PER FORM. A message is a string, or a built-in phrase (`PhraseMessage`,
+ * `utils/phrases.ts`), which the report to the host puts in its document's language.
  *
  * One shared map until §9.3 step 3 split it, and sharing it was visible to anyone mounting two
  * documents on one page: the second document's `componentDidUpdate` found the first one's errors
@@ -84,10 +85,10 @@ export function dataFormsOf (tree: object | undefined): Map<object, RegisteredFo
  * object. A WeakMap, so an unmounted form's errors are collected with it and nothing has to be
  * cleaned up between tests.
  */
-const errorsByForm = new WeakMap<object, Record<string, string>>()
+const errorsByForm = new WeakMap<object, Record<string, unknown>>()
 
 /** The error map belonging to one form, created on first use. */
-export function errorsFor (form: object): Record<string, string> {
+export function errorsFor (form: object): Record<string, unknown> {
 	let errors = errorsByForm.get(form)
 	if (!errors) {
 		errors = {}

@@ -5,6 +5,7 @@ import '@testing-library/jest-dom'
 import UIRender from '../rules'
 import { formsStorage } from '../../state/formRegistry'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
+import { phraseMessage } from '../../utils/phrases'
 
 const appContext = {
     ...initialAppState,
@@ -67,7 +68,7 @@ describe('UIRender asynchronous failure and callback contracts', () => {
         await waitFor(() => expect(appContext.setPopupState).toHaveBeenCalledTimes(1))
         expect(failure.text).toHaveBeenCalledTimes(1)
         const popupState = appContext.setPopupState.mock.calls[0][0]
-        expect(popupState.title).toBe('Error')
+        expect(popupState.title).toEqual(phraseMessage('ERROR'))
         expect(popupState.content.props.data).toEqual({
             message: 'Service temporarily unavailable',
         })
