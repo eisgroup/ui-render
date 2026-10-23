@@ -114,9 +114,11 @@ th, td {
     }
   }
 
-  // Make empty Cell take full height to show border correctly
+  // Make empty Cell take full height to show border correctly. A header without a label holds its `id`, which only a
+  // screen reader reads, and then its empty text (`TableView.tsx`)
   > *:only-child:empty,
-  > *:only-child > *:only-child:empty {
+  > *:only-child > *:only-child:empty,
+  > *:only-child > .sr-only:first-child + *:last-child:empty {
     &::before {
       content: 'A';
       visibility: hidden;

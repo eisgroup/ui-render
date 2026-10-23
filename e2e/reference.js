@@ -621,6 +621,14 @@ const TABLE = {
     PAGE_COUNT: 5,
     PAGE_3_ROWS: ['11', '12', '13', '14', '15'],
     LAST_PAGE_ROWS: ['21', '22', '23'],
+    /**
+     * [I] since 2026-10-23. `ratingDetails` declares its `Description` column without a label. Its header shows
+     * no text: its only text is the `id`, in the 1 px box of `.sr-only`, which names the column for a screen
+     * reader. Its empty text still takes a line, as a labelled header's text does, so a row of such headers
+     * keeps a row's height: measured, 36 px, where without the rule that gives it the line it was 17.
+     */
+    UNLABELLED_HEADER: 'Description',
+    HIDDEN_TEXT_BOX: { width: 1, height: 1 },
 }
 
 /**

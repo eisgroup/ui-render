@@ -128,6 +128,28 @@ describe('Table behavioural contract', () => {
             expect(body.map(row => row.length)).toEqual(body.map(() => leafColumns))
         })
 
+        // The group row is not declared in `headers`: it shows each group's id, or the label the meta maps it to,
+        // as it did before a header without a label stopped showing its `id` (meta contract 2).
+        it('heads a matrix table\'s groups with their ids where the meta maps them to no label', () => {
+            mountExample(example('tableMatrixRequired'))
+
+            expect(headerRows(screen.getByRole('table'))[0]).toEqual(['', 'employee', 'employer'])
+        })
+
+        it('heads a matrix table\'s groups with the labels the meta maps them to', () => {
+            mountExample(example('tableMatrix'))
+
+            expect(headerRows(screen.getByRole('table'))[1]).toEqual(['Tier', 'Employee/Spouse/Child', 'Employer'])
+        })
+
+        it('names a column by its id where its header has no label', () => {
+            // `rating_details.js` leaves the label out of its `Description` column, meaning a blank header.
+            mountExample(example('ratingDetails'))
+
+            expect(within(screen.getByRole('table')).getAllByRole('columnheader')[0])
+                .toHaveAccessibleName('Description')
+        })
+
         it('still announces its headers when the bound data holds no usable rows', () => {
             // `invalid-array_data.json` is the degradation case: the table must remain a
             // table with its headers rather than collapsing or disappearing.
