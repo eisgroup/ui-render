@@ -944,6 +944,19 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A date field keeps text that is no date, and says `Invalid date`.** rc-picker reads what a user types strictly,
+  in the display format, and hands on only a date. A field left with `11-31-2021` or `02-29-2021` showed the date it
+  had again, or nothing: an empty required field was wiped and said `Required`, and a field with a date went back to
+  it and said nothing. Now the field keeps the text and shows `Invalid date`, required or not, a built-in phrase a
+  host translates as `ui-render:INVALID_DATE`. Its value stays the date it had, or none: that is what `getFormData`
+  returns, and a submit, an `onApplyPeriods` and a table's Add send nothing while the error shows. The host's
+  `getValidationErrors` hears the message as the field shows it. The error goes once the text is a date, typed or
+  picked in the calendar, and the `reset` action shows the value again in place of the text.
+- **A date typed and left by a click is kept.** Only Tab and Enter kept a typed date: leaving the field by a click
+  anywhere else put the date it had back. The field handed rc-picker a new moment of the same date whenever it
+  rendered, as it does when it is left, and rc-picker dropped the date it had not confirmed yet.
+- **Emptying a date field's text empties its date.** The date came back once the field was left. A required field
+  now says `Required`.
 - **A background class in a header's `classNameHeader` colours the header cell.** `classNameHeader`
   puts its classes on the `th`, and the stylesheet gave every `th` the header colour with a rule that
   outweighed any background class, so the cell stayed grey. Only a class in the header's `className`

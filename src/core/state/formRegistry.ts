@@ -198,3 +198,23 @@ export function holdFixableField (form: object, name: string): () => void {
 		else held.delete(name)
 	}
 }
+
+/**
+ * How many times the `reset` action has reset a form, PER FORM. A date field left with text that is no date shows
+ * it, and its error, only until the form's next reset (`asInputDateField`): the form's values hold the date it had
+ * before, so a reset that finds the value unchanged says nothing to the field.
+ *
+ * Counted by the action alone, not by every `form.reset`: the form layer resets a form to new initial values too,
+ * when a host or a parent document hands them over, and a field whose value they left unchanged keeps its text.
+ */
+const resetsByForm = new WeakMap<object, number>()
+
+/** How many times the `reset` action has reset this form; 0 when there is no form. */
+export function resetsOf (form: object | undefined): number {
+	return form ? resetsByForm.get(form) || 0 : 0
+}
+
+/** Count one reset of `form` by the `reset` action, before it resets the form's values. */
+export function countReset (form: object): void {
+	resetsByForm.set(form, resetsOf(form) + 1)
+}

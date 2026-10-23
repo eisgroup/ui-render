@@ -6,6 +6,7 @@ import Table from '../../components/Table'
 import { Active } from '../../utils'
 import { FIELD } from '../../modules/variables'
 import type { Translate } from '../../utils/_envs'
+import { phraseMessage } from '../../utils/phrases'
 import type { PhraseMessage } from '../../utils/phrases'
 import { email, isRequired, maxLength, password, url } from '../../components/inputs/validationRules'
 import { integer } from '../../components/inputs/normalizers'
@@ -40,7 +41,15 @@ export type LocalDraftTableRowProps = {
   translate?: Translate
 }
 
-type DraftState = { draft: Record<string, unknown>, fieldErrors: Record<string, unknown> }
+type DraftState = {
+  draft: Record<string, unknown>
+  fieldErrors: Record<string, unknown>
+  /**
+   * By name, the text a date cell was left with that is no date (`InputDate`'s `onInvalidText`): its value is the date
+   * it had
+   */
+  invalidTexts: Record<string, string | null>
+}
 type ChangeEventLike = { target?: { value?: unknown } }
 
 /**
@@ -100,7 +109,10 @@ function parseRowValue (def: DraftItem, raw: unknown) {
 // document was built last.
 const DEFAULT_TRANSLATE = Active.translate
 
-const EMPTY_DRAFT: DraftState = { draft: {}, fieldErrors: {} }
+const EMPTY_DRAFT: DraftState = { draft: {}, fieldErrors: {}, invalidTexts: {} }
+
+// The message a date cell left with text that is no date shows on Add, as `asInputDateField` shows it.
+const INVALID_DATE = phraseMessage('INVALID_DATE')
 
 /**
  * Table "add row" draft: values live only in React state until the user commits (Add).
@@ -128,9 +140,17 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate: translateP
     }))
   }
 
+  // What the cell shows changed, as a change does: its error goes until the next Add.
+  const handleInvalidText = (name: string) => (text: string | null) => {
+    update((s) => ({
+      invalidTexts: { ...s.invalidTexts, [name]: text },
+      fieldErrors: { ...s.fieldErrors, [name]: undefined }
+    }))
+  }
+
   const handleAdd = () => {
     const inputs = collectInputs(meta!.items)
-    const { draft, fieldErrors: prevErr } = state
+    const { draft, fieldErrors: prevErr, invalidTexts } = state
     const fieldErrors = { ...prevErr }
     let hasErr = false
 
@@ -140,12 +160,11 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate: translateP
       const raw = draft[name]
       const validator = resolveValidator(def.validate)
       const parsed = parseRowValue(def, raw)
-      if (validator) {
-        const err = validator(parsed)
-        if (err) {
-          fieldErrors[name] = err
-          hasErr = true
-        }
+      // A date cell left with text that is no date is an error, required or not: it would add the date it had.
+      const err = invalidTexts[name] ? INVALID_DATE : validator && validator(parsed)
+      if (err) {
+        fieldErrors[name] = err
+        hasErr = true
       }
       row[name] = parsed
     }
@@ -176,7 +195,7 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate: translateP
       rowObject: row,
       fallbackDataKindPath: ''
     })
-    if (appended !== false) update({ draft: {}, fieldErrors: {} })
+    if (appended !== false) update(EMPTY_DRAFT)
   }
 
   /**
@@ -212,7 +231,7 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate: translateP
     return (
       <Table.Cell key={name || i} className={def.classNameCellWrap}>
         {type === 'date'
-          ? <InputDate {...common} />
+          ? <InputDate {...common} onInvalidText={handleInvalidText(name)} />
           : <Input {...common} type={type || 'text'} />}
       </Table.Cell>
     )

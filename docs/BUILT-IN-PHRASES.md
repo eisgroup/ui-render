@@ -21,7 +21,7 @@ keep it in single braces where your translation needs the value.
 **This page is generated.** Run `npm run docs:phrases` after changing `BUILT_IN_PHRASES` in
 `src/core/utils/phrases.ts`. The package's types list the same ids as `UIRender.UIRenderPhraseId`.
 
-## Phrases (40)
+## Phrases (41)
 
 | Id | English text | Where it shows |
 | --- | --- | --- |
@@ -32,6 +32,7 @@ keep it in single braces where your translation needs the value.
 | `FILES` | Files | What an upload takes, where its meta gives no `label` or `fileType`: in its drop zone, where it takes several files |
 | `FILE_MUST_BE_UNDER` | {file} must be under {size} | The popup a dropped file larger than an upload's `maxSize` opens; `{file}` is the file's name, `{size}` the limit |
 | `FILE_UPLOAD_FAILED` | File Upload Failed! | The title of the popup a dropped file of a type an upload does not take opens |
+| `INVALID_DATE` | Invalid date | A date field left with text that is no date in its format, which it keeps showing |
 | `INVALID_EMAIL_ADDRESS` | Invalid email address | A field with `validate: "email"` that holds no email address |
 | `INVALID_URL` | Invalid URL | A field with `validate: "url"` that holds no URL with a protocol |
 | `MAXIMUM_FILE_SIZE_EXCEEDED` | Maximum File Size Exceeded! | The title of the popup a dropped file larger than an upload's `maxSize` opens |
