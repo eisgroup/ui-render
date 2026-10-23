@@ -953,6 +953,16 @@ Nothing to do for these:
   header without one keeps the header colour. **A header whose `classNameHeader` already names a
   background class changes colour,** since 0.34.x ignored it. A header your own stylesheet colours can
   change too: a rule after ours now applies from the specificity of `.ui-render th`.
+- **A `showIf` in a table's add row reads that row's fields.** The row a `renderExtraItem` declaration
+  renders has a form of its own, whose fields are named by the row's place, such as
+  `dataKind.items[1].kind`. A `showIf` reads the document's forms merged, and the merge put that form's
+  values at the row a second time, so a field the row gated on another of its fields never showed. The
+  row is read where its fields put it now, and two other cases of that merge are fixed with it:
+  - A table row that a `useForm` declaration gives a form. An edit in it put a copy of the table inside
+    the row in `getFormData`, and a `showIf` in the row read the row as it was.
+  - The rows of a table whose rows hold another table, with an add row that has a form. In a document
+    with more than one top-level key, what a `showIf` reads held none of the outer rows, so a field
+    gated on one of them never showed.
 - **The scrollbars inside the widget are 8 px thick, and a host's rule can change them.** In Chrome, Edge and
   Safari, whatever scrolls inside the widget, such as a table wider than its container, had bars 3 px thick, too
   thin to grab. They are 8 px now, with the same rounded thumb, measured in Chromium 153 and WebKit 26.6. Their
