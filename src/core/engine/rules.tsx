@@ -26,7 +26,7 @@ import { parsePopupAlertArgs, parsePopupArgs } from './popupArgs'
 import { findPopupTemplate } from './popupTemplate'
 import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
 import { dataFormsOf, errorsFor, formsOf, touchedFor } from '../state/formRegistry'
-import { _ } from './translations'
+import { phrase, phraseMessage } from '../utils/phrases'
 import { getFormsData, getLiveMergedDataKindArray, getRawFormsData } from './formData'
 import type { ValidatingForm } from './formData'
 import { errorsProcessing, mapErrorObjectToUIFormat, showsAnError } from './errorMapping'
@@ -40,7 +40,7 @@ import { createPopupContent } from './components/PopupContent'
 import type { FormApi } from 'final-form'
 import type { UploadArgs } from './upload'
 import type { Translate } from '../utils/_envs'
-import { dataKindPathFor, getDataKindPathFromRelative, pushDataKindRow, removeDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays } from './dataKindPush'
+import { dataKindPathFor, getDataKindPathFromRelative, pushDataKindRow, removeDataKindRow, rowObjectForDataKindAppend, compactDataKindArrays, PERIOD_MESSAGES } from './dataKindPush'
 
 // Non-narrowing, on purpose: a meta node checked with it stays open JSON, instead of becoming the
 // `Record<string, unknown>` the util's type guard narrows it to.
@@ -126,11 +126,11 @@ function notWithinRangeValidator (value: unknown, { dataKind, args: argsIn }: { 
 
     if (_a !== undefined && _b !== undefined) {
         if (_a === _b) {
-            return `Start date and end date cannot be the same`
+            return PERIOD_MESSAGES.sameDay
         } else if (_a === value && String(_b) < String(_a)) {
-            return `Start date cannot be more than end date`
+            return PERIOD_MESSAGES.startAfterEnd
         } else if (_b === value && String(_b) < String(_a)) {
-            return `End date cannot be less than start date`
+            return PERIOD_MESSAGES.endBeforeStart
         }
     }
 
@@ -180,7 +180,7 @@ function notWithinRangeValidator (value: unknown, { dataKind, args: argsIn }: { 
             return !(curHi < pLo || pHi < curLo)
         })
         if (overlapsPeer) {
-            return `Periods cannot overlap`
+            return PERIOD_MESSAGES.overlap
         }
     }
 
@@ -262,7 +262,7 @@ export class UIRender extends DocumentInstance {
     // from emitting a field for it. Without it Babel 8 emits one, set to undefined after `super`.
     declare errorHandler?: (errors: object) => void
     // What `errorHandler` was last handed, by `reportErrors`.
-    declare reportedErrors?: Record<string, string>
+    declare reportedErrors?: Record<string, unknown>
     declare translate?: Translate
 
     constructor (props: UIRenderProps) {
@@ -367,7 +367,7 @@ export class UIRender extends DocumentInstance {
         }
         // A document going away has nothing left to report; its nested forms leave after it.
         if ((this as { isUnmounting?: boolean }).isUnmounting) return
-        const treeErrors: Record<string, string> = {}
+        const treeErrors: Record<string, unknown> = {}
         formsOf(this.formTree).forEach(({ form }) => {
             if (form !== this.form) Object.assign(treeErrors, errorsFor(form))
         })
@@ -379,7 +379,7 @@ export class UIRender extends DocumentInstance {
         if (!isEqual(treeErrors, this.reportedErrors || {})) {
             const errors = cloneDeep(treeErrors)
             this.reportedErrors = errors
-            this.errorHandler(mapErrorObjectToUIFormat(errors))
+            this.errorHandler(mapErrorObjectToUIFormat(errors, this.translate || Active.translate))
         }
     }
 
@@ -710,7 +710,7 @@ function Decorator (Class: any) {
             // call is read at click time, as it always was.
             FIELD.FUNC[FIELD.ACTION.DOWNLOAD] = (...args) => download(args, {
                 downloadFile: this.getAPICalls().downloadFile,
-                onFailure: err => this.popupAlert(describeFailure(err), _.DOWNLOAD_FAILED_),
+                onFailure: err => this.popupAlert(describeFailure(err), phrase(this.translate || Active.translate, 'DOWNLOAD_FAILED')),
             })
             // Send the forms' values and a file through the host's `uploadFile`, and make its answer
             // the data (see `upload.ts`). The remount key and the form restart wait for the new data
@@ -837,7 +837,10 @@ function Decorator (Class: any) {
                         // Check if items exist and are not empty
                         if (!items || !Array.isArray(items) || items.length === 0) {
                             console.error('Popup items are empty or invalid:', items)
-                            this.popupAlert(title || 'Error', 'Popup content is empty')
+                            this.popupAlert(
+                                title || phraseMessage('ERROR'),
+                                phrase(this.translate || Active.translate, 'POPUP_CONTENT_IS_EMPTY'),
+                            )
                             return
                         }
                         
@@ -906,7 +909,7 @@ function Decorator (Class: any) {
                 onFailure: (message, error) => {
                     this.context.setPopupState({
                         isOpen: true,
-                        title: 'Error',
+                        title: phraseMessage('ERROR'),
                         content: <Json data={{ message }}/>
                     })
                     console.error(error)

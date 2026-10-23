@@ -26,6 +26,7 @@ import UIRender from '../main'
 import { meta as periodMeta } from '../../demo/examples/data_component'
 import { cloneDeep } from '../../core/utils'
 import { formsStorage } from '../../core/state/formRegistry'
+import { phraseMessage } from '../../core/utils/phrases'
 
 /** Every render of `InputDate`, the element of each date field. Not memoised, as `InputDate` is not. */
 const mockRenders = { count: 0 }
@@ -63,7 +64,7 @@ jest.mock('final-form', () => {
 
 const ROWS = 50
 const data = { dataKind: { period: Array.from({ length: ROWS }, (_, i) => ({ startDate: `${2000 + i}-01-01`, endDate: `${2000 + i}-06-30` })) } }
-const OVERLAP = 'Periods cannot overlap'
+const OVERLAP = phraseMessage('PERIODS_CANNOT_OVERLAP')
 
 /** The example's meta without its `verify`: the same table, with no rule to cost anything. */
 function withoutRule (node) {

@@ -1,5 +1,10 @@
 import { errorsProcessing, mapErrorObjectToUIFormat, convertFieldNameToTitleCaseText, showsAnError } from '../errorMapping'
 import { errorsFor, holdFixableField, touchedFor } from '../../state/formRegistry'
+import { phraseMessage } from '../../utils/phrases'
+
+// A host with no translation for a key answers with the key, as an i18next-based host translate does.
+const english = value => value
+const hostTranslate = translations => value => (value in translations ? translations[value] : value)
 
 describe('errorsProcessing', () => {
     function makeFormWithErrors (fieldStates, registered = Object.keys(fieldStates)) {
@@ -45,7 +50,7 @@ describe('errorsProcessing', () => {
         const form = makeFormWithErrors({
             ownerName: {
                 name: 'ownerName',
-                error: 'Required',
+                error: phraseMessage('REQUIRED'),
                 touched: true,
             },
         })
@@ -53,6 +58,18 @@ describe('errorsProcessing', () => {
         errorsProcessing(form, {})
 
         expect(errorsFor(form).ownerName).toBe('Owner Name is Required')
+    })
+
+    // It compared the English text until 2026-10-23, which a translated message would no longer have matched.
+    it('knows a Required error by its id: a string that reads "Required" is a message like any other', () => {
+        const form = makeFormWithErrors({
+            ownerName: { name: 'ownerName', error: 'Required', touched: true },
+            nickname: { name: 'nickname', error: phraseMessage('MUST_BE_MINIMUM', { min: 2 }), touched: true },
+        })
+
+        errorsProcessing(form, {})
+
+        expect(errorsFor(form)).toEqual({ ownerName: 'Required', nickname: phraseMessage('MUST_BE_MINIMUM', { min: 2 }) })
     })
 
     it('records an error for a field remembered as touched', () => {
@@ -75,7 +92,7 @@ describe('errorsProcessing', () => {
     it('removes a stale error after the field becomes valid', () => {
         const fieldState = {
             name: 'rows[1].startDate',
-            error: 'Required',
+            error: phraseMessage('REQUIRED'),
             touched: true,
         }
         const form = makeFormWithErrors({
@@ -95,7 +112,7 @@ describe('errorsProcessing', () => {
 describe('mapErrorObjectToUIFormat', () => {
     it('converts flat errors to UI format', () => {
         const errors = { fieldA: 'Field A is required', fieldB: 'Invalid value' }
-        const result = mapErrorObjectToUIFormat(errors)
+        const result = mapErrorObjectToUIFormat(errors, english)
         expect(result).toEqual({
             fieldA: { messages: [{ text: 'Field A is required' }] },
             fieldB: { messages: [{ text: 'Invalid value' }] },
@@ -103,11 +120,11 @@ describe('mapErrorObjectToUIFormat', () => {
     })
 
     it('returns empty object for empty input', () => {
-        expect(mapErrorObjectToUIFormat({})).toEqual({})
+        expect(mapErrorObjectToUIFormat({}, english)).toEqual({})
     })
 
     it('handles single error', () => {
-        const result = mapErrorObjectToUIFormat({ email: 'Invalid email' })
+        const result = mapErrorObjectToUIFormat({ email: 'Invalid email' }, english)
         expect(result.email.messages).toHaveLength(1)
         expect(result.email.messages[0].text).toBe('Invalid email')
     })
@@ -119,7 +136,7 @@ describe('mapErrorObjectToUIFormat', () => {
             'items[0].name': 'Name is Required',
             'group': { child: 'Invalid value' },
             'count': 3,
-        })
+        }, english)
         expect(result).toEqual({ 'items[0].name': { messages: [{ text: 'Name is Required' }] } })
     })
 
@@ -127,8 +144,8 @@ describe('mapErrorObjectToUIFormat', () => {
     // from its items' errors. The item is reported under its own name, so nothing is lost.
     it('reports an array field through its items, not as the array of their errors', () => {
         const fieldStates = {
-            'items': { name: 'items', error: [{ name: 'Required' }], touched: true },
-            'items[0].name': { name: 'items[0].name', error: 'Required', touched: true },
+            'items': { name: 'items', error: [{ name: phraseMessage('REQUIRED') }], touched: true },
+            'items[0].name': { name: 'items[0].name', error: phraseMessage('REQUIRED'), touched: true },
         }
         const form = {
             getRegisteredFields: () => Object.keys(fieldStates),
@@ -137,8 +154,40 @@ describe('mapErrorObjectToUIFormat', () => {
         errorsProcessing(form, {})
 
         expect(Object.keys(errorsFor(form))).toEqual(['items', 'items[0].name'])
-        expect(mapErrorObjectToUIFormat(errorsFor(form))).toEqual({
+        expect(mapErrorObjectToUIFormat(errorsFor(form), english)).toEqual({
             'items[0].name': { messages: [{ text: 'Name is Required' }] },
+        })
+    })
+
+    it('hands on a built-in phrase as its text in the language of the translator, as the field shows it', () => {
+        const errors = {
+            email: phraseMessage('INVALID_EMAIL_ADDRESS'),
+            age: phraseMessage('MUST_BE_MINIMUM', { min: 18 }),
+        }
+        const german = hostTranslate({
+            'ui-render:INVALID_EMAIL_ADDRESS': 'Ungültige E-Mail-Adresse',
+            'ui-render:MUST_BE_MINIMUM': 'Mindestens {min}',
+        })
+
+        expect(mapErrorObjectToUIFormat(errors, german)).toEqual({
+            email: { messages: [{ text: 'Ungültige E-Mail-Adresse' }] },
+            age: { messages: [{ text: 'Mindestens 18' }] },
+        })
+        // A host with no translation is handed the English text, as before.
+        expect(mapErrorObjectToUIFormat(errors, english)).toEqual({
+            email: { messages: [{ text: 'Invalid email address' }] },
+            age: { messages: [{ text: 'Must be minimum 18' }] },
+        })
+    })
+
+    it('hands on a required field\'s message as "<Field> is Required" whatever the translator', () => {
+        const fieldStates = { ownerName: { name: 'ownerName', error: phraseMessage('REQUIRED'), touched: true } }
+        const form = { getRegisteredFields: () => Object.keys(fieldStates), getFieldState: name => fieldStates[name] }
+        errorsProcessing(form, {})
+
+        const german = hostTranslate({ 'ui-render:REQUIRED': 'Pflichtfeld' })
+        expect(mapErrorObjectToUIFormat(errorsFor(form), german)).toEqual({
+            ownerName: { messages: [{ text: 'Owner Name is Required' }] },
         })
     })
 })

@@ -85,10 +85,22 @@ item has the details.
   page now: where a name repeats, the first field keeps it and the others take `<name>-2`,
   `<name>-3`. Give a field an `id` in meta where the page needs a fixed one. (Renderer configuration
   and error reporting, Accessibility, Fixes)
-- **Translate the pie chart's `Total` under `ui-render:TOTAL`.** `translate` is asked for that key
-  now, not for the English word, so a translation a host keyed on `Total` no longer reaches the
-  chart. A host with no translation for the key sees `Total`, as before. (Renderer configuration and
-  error reporting)
+- **Translate the widget's own texts under `ui-render:<ID>`.** `translate` is asked for these keys
+  now, not for the English words it was asked for: the pie chart's `Total`, a select's `Select`, a
+  toggle's `ON` and `OFF`, the popup's `Ok` and `Error`, the `AutoSubmit` loader's `Syncing...`, an
+  upload's hover text and the titles and texts of its popups, and the validation messages, such as
+  `Required`, `Invalid email address` and `Must be minimum 1`. A translation a host keyed on one of
+  these words no longer reaches the widget. `docs/BUILT-IN-PHRASES.md`, in the package, lists the ids.
+  A host with no translation for a key sees the English, as before. (Renderer configuration and error
+  reporting)
+- **Expect `getValidationErrors` in your language, and a required field known by the rule.** A message
+  the widget writes itself reaches the callback as the field shows it, translated where the host has
+  its key. A required field is still reported as `<Field Name> is Required` when the `required` rule
+  failed. A message a meta's own validator function returns is reported as it is, so one that reads
+  `Required` is no longer reworded. (Renderer configuration and error reporting)
+- **Check uploads that take several files under a `label`.** The drop zone shows the label as the meta
+  gives it, `document`, where it showed the English plural, `documents`, which made nonsense of a
+  translated label. An upload with no label still says `Files`. (Fixes)
 - **Ship your own copies of the images you link.** The package ships no images now. 0.34.x carried
   `static/images/`, flags included. (Packaging)
 - **Style the Semantic class names a meta sets.** A node a meta gives `ui label`, `ui menu` or
@@ -173,6 +185,23 @@ Nothing to do for these:
   package, lists the ids with their English texts, and the types publish them as
   `UIRenderPhraseId`. The pie chart asked `translate` for the English word `Total` until now, and no
   longer does.
+- **Every other text the widget writes itself is a built-in phrase too.** These were English whatever
+  the host's language:
+  - a select's `Select` placeholder, and the `Select <name>` a screen reader names one with no label by;
+  - a toggle's `ON` and `OFF`, and the names of a range slider's two handles;
+  - `Table has no data!`, and the names of a table's page navigation and of its buttons;
+  - the `AutoSubmit` loader's `Syncing...`;
+  - a popup's `Ok`, the `Popup` a screen reader names one with no title by, and the `Error`,
+    `Download Failed!` and `Popup content is empty` the engine shows in one;
+  - an upload's header, drop zone, hover text and popups;
+  - the validation messages, such as `Required`, `Invalid URL` and `Must be maximum 10`.
+
+  Each is asked for as `ui-render:<ID>`, 40 ids with `TOTAL`, `YES` and `NO`, and a host with no
+  translation for one sees the English, as before. A text that takes a value has a placeholder for it,
+  as in `Must be minimum {min}`. An upload's two popups put the file name, the size limit and the
+  formats, in bold, where the host's translation puts their placeholders. `getValidationErrors` is
+  handed the messages as the fields show them, but a required field's, which still reads
+  `<Field Name> is Required`.
 - **New `locale` prop: the language tag the widget shows numbers in.** A host passes its user's
   number format, `de-DE`, and the `Currency`, `Float`, `Double5` and `Percent` renderers, a
   `Counter`, a pie chart's values and a slider's labels write their decimal and grouping separators:
@@ -205,7 +234,8 @@ Nothing to do for these:
 - **`getValidationErrors` reports a string as each message's `text`, as its type always said.**
   An array field could be reported with the array of its items' errors as its `text`. That entry
   is left out now; each item's error is still reported, under the item's own field name. Every
-  other report is unchanged: every validator a meta can name returns a string.
+  other report is unchanged: every validator a meta can name returns a message the report hands on as
+  a string.
 - **`getValidationErrors` hears every form of the document again, nested ones included.** A
   `useForm` block and a table's draft row (`renderExtraItem`) have forms of their own. 0.34.x
   reported their errors with the rest, and so does this release. An earlier step of it reported the
@@ -929,6 +959,14 @@ Nothing to do for these:
   tooltip took the `translate` of the document constructed last: on a page with two documents, a
   slice added to the first one's chart after the second one mounted had its name translated by the
   second one's function.
+- **An upload with no `label` reads `Upload File` on hover.** It read `Upload File File`.
+- **An upload shows the `label` a meta gives it as it is given.** Where it took several files, its drop
+  zone put the label in the English plural, `documents` for `document`, and a translated label took the
+  English ending too.
+- **A field's validation message, an `AutoSubmit` loader and an upload's hover text translate with their
+  own document's `translate`.** The loader and the hover text took the `translate` of the document
+  constructed last, and a validation message was translated a second time with it. On a page with two
+  documents, the first one's showed the second one's translation.
 - **`onApplyPeriods` sends nothing while a field shows its validation error.** It sent the table as it
   was: a user emptied a required number field, the field showed `Required`, the host's
   `getValidationErrors` heard it, and `apiCalls.updateData` received the row with `""` in it, where a

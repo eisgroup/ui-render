@@ -2,14 +2,12 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { FormSpy } from 'react-final-form'
 import type { FormState, FormSubscription } from 'final-form'
 import { Loading } from '../../../components/Loading'
-import { debounce, l, localiseTranslation, objChanges, TIME_DURATION_INSTANT } from '../../../utils'
-import { _ } from '../../../utils/translations'
+import { debounce, objChanges, TIME_DURATION_INSTANT } from '../../../utils'
+import type { Translate } from '../../../utils/_envs'
+import { phraseMessage } from '../../../utils/phrases'
 
-localiseTranslation({
-  SYNCING___: {
-    [l.ENGLISH]: 'Syncing...',
-  },
-})
+// What the loader says while a save runs, where the meta gives no `loadContent`: in the language of `translate`.
+const SYNCING = phraseMessage('SYNCING')
 
 // One object, as the class's `defaultProps` held one: FormSpy is handed the same subscription on
 // every render rather than a new default each time.
@@ -42,8 +40,10 @@ export type AutoSaveProps = {
   subscription?: FormSubscription
   /** Milliseconds to delay form `onChange` */
   delay?: number
-  /** Loading message */
+  /** Loading message, translated by `translate`; the built-in phrase `SYNCING` without one */
   loadContent?: React.ReactNode
+  /** The document's translator, which the mapper passes */
+  translate?: Translate
 }
 
 /**
@@ -78,6 +78,7 @@ function AutoSave ({
   subscription = VALUES_ONLY,
   delay = TIME_DURATION_INSTANT,
   loadContent,
+  translate,
 }: AutoSaveProps) {
   const [submitting, setSubmitting] = useState(false)
   const baseline = useRef<Values | undefined>(undefined)
@@ -152,7 +153,7 @@ function AutoSave ({
   return <>
     {/* FormSpy onChange will be called once on component mount */}
     <FormSpy subscription={subscription} onChange={handleChange}/>
-    {showLoader && submitting ? <Loading loading>{loadContent || _.SYNCING___}</Loading> : null}
+    {showLoader && submitting ? <Loading loading translate={translate}>{loadContent || SYNCING}</Loading> : null}
   </>
 }
 

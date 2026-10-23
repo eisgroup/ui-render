@@ -61,18 +61,6 @@ localiseTranslation({
   COPIED: {
     [l.ENGLISH]: 'Copied',
   },
-  NO: {
-    [l.ENGLISH]: 'No',
-  },
-  YES: {
-    [l.ENGLISH]: 'Yes',
-  },
-  OK: {
-    [l.ENGLISH]: 'Ok',
-  },
-  ERROR: {
-    [l.ENGLISH]: 'Error',
-  },
   ERROR_MESSAGE: {
     [l.ENGLISH]: 'Error Message',
   },
@@ -123,9 +111,6 @@ localiseTranslation({
   },
   RETRY: {
     [l.ENGLISH]: 'Retry',
-  },
-  SELECT: {
-    [l.ENGLISH]: 'Select',
   },
   SEARCH: {
     [l.ENGLISH]: 'Search',
@@ -234,9 +219,6 @@ localiseTranslation({
   },
   SERVER_DISCONNECTED: {
     [l.ENGLISH]: 'Server Disconnected',
-  },
-  DOWNLOAD_FAILED_: {
-    [l.ENGLISH]: 'Download Failed!',
   },
   REQUEST_FAILED_FOR_url: {
     [l.ENGLISH]: 'Request failed for {url}',

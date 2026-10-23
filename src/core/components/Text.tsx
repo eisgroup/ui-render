@@ -2,7 +2,8 @@ import classNames from '../utils/classNames'
 import React, { useContext } from 'react'
 import { Active } from '../utils'
 import type { Translate } from '../utils/_envs'
-import { phrase } from '../utils/phrases'
+import { isPhraseMessage, phrase } from '../utils/phrases'
+import type { PhraseMessage } from '../utils/phrases'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 import { ISO_8601_COMPLETE_DATE, withDecimalSeparator } from '../utils'
 import { ConfigContext } from '../contexts'
@@ -24,9 +25,9 @@ export type TextProps = {
      * A string is translated, and an ISO 8601 date string is first formatted with the configured
      * `dateFormat`. A number renders as its string, with the configured `locale`'s decimal separator,
      * a boolean as the built-in phrase `YES` or `NO` in the language of `translate` (`utils/phrases.ts`),
-     * and an element is cloned with `translate`.
+     * a `PhraseMessage` as its phrase in that language, and an element is cloned with `translate`.
      */
-    children?: React.ReactNode
+    children?: React.ReactNode | PhraseMessage
     translate?: Translate
     [key: string]: unknown
 }
@@ -51,22 +52,25 @@ function Text ({
     // throws, as it did in JavaScript. The library root (`AppProvider`) always renders one.
     const { dateFormat, locale } = useContext(ConfigContext) as TextConfig
 
-    let component: React.ReactNode = children
+    let component: React.ReactNode
     // A component child is handed the translator; a DOM element is not, because there `translate` is
     // an HTML attribute, and React warned on a function in it (until 2026-10-06).
     if (React.isValidElement<{ translate?: Translate }>(children) && typeof children.type !== 'string') {
         component = React.cloneElement(children, { translate })
-    } else if (typeof children === 'object') {
-        component = children
+    } else if (isPhraseMessage(children)) {
+        // A validator's message or a popup's title, made where no translator is known: translated here, as a
+        // boolean is, and not again below.
+        component = phrase(translate, children.phrase, children.variables)
     } else if (typeof children === 'number') {
         component = withDecimalSeparator(children.toString(), locale)
     } else if (typeof children === 'boolean') {
         // Translated here, and not again below, which translates a string child only.
         component = phrase(translate, children ? 'YES' : 'NO')
-    } else if (typeof children === 'string') {
-        if (ISO_8601_COMPLETE_DATE.test(children)) {
-            component = moment(children).format(dateFormat)
-        }
+    } else if (typeof children === 'string' && ISO_8601_COMPLETE_DATE.test(children)) {
+        component = moment(children).format(dateFormat)
+    } else {
+        // Any other object, a DOM element among them, as it is, and any other string, which is translated below.
+        component = children
     }
     // DOM boundary: this spread lands on a <span>, and `Text` is where every value renderer
     // ends up (renders.tsx renderFloat -> <Text {...options}>), so the whole render-method

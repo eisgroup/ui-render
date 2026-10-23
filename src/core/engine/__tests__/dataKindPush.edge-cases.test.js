@@ -7,6 +7,7 @@ import {
     rowObjectForDataKindAppend,
     validateNotWithinRangeDraftRow,
 } from '../dataKindPush'
+import { phraseMessage } from '../../utils/phrases'
 
 const periodKeys = ['startDate', 'endDate']
 
@@ -119,8 +120,8 @@ describe('draft range validation edge contracts', () => {
         )
 
         expect(error).toEqual({
-            startDate: 'Periods cannot overlap',
-            endDate: 'Periods cannot overlap',
+            startDate: phraseMessage('PERIODS_CANNOT_OVERLAP'),
+            endDate: phraseMessage('PERIODS_CANNOT_OVERLAP'),
         })
     })
 })

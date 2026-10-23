@@ -31,7 +31,48 @@ const apiCallsUnderTheOldName: UIRenderApiCalls<QuoteData> = {
 const translate: UIRenderTranslate = (value: string): string => value.toUpperCase()
 
 // What a host registers under the `ui-render` namespace: one text for each published id.
-const builtInTexts: Record<UIRenderPhraseId, string> = { NO: 'Nein', TOTAL: 'Gesamt', YES: 'Ja' }
+const builtInTexts: Record<UIRenderPhraseId, string> = {
+    DOWNLOAD_FAILED: 'Herunterladen fehlgeschlagen!',
+    END_DATE_CANNOT_BE_LESS_THAN_START_DATE: 'Das Ende darf nicht vor dem Beginn liegen',
+    ERROR: 'Fehler',
+    FILE: 'Datei',
+    FILES: 'Dateien',
+    FILE_MUST_BE_UNDER: '{file} muss kleiner als {size} sein',
+    FILE_UPLOAD_FAILED: 'Hochladen fehlgeschlagen!',
+    INVALID_EMAIL_ADDRESS: 'Ungültige E-Mail-Adresse',
+    INVALID_URL: 'Ungültige URL',
+    MAXIMUM_FILE_SIZE_EXCEEDED: 'Datei zu groß!',
+    MUST_BE_LESS_THAN_CHARACTERS: 'Höchstens {count} Zeichen',
+    MUST_BE_MAXIMUM: 'Höchstens {max}',
+    MUST_BE_MINIMUM: 'Mindestens {min}',
+    NEXT_PAGE: 'Nächste Seite',
+    NO: 'Nein',
+    OFF: 'AUS',
+    OK: 'OK',
+    ON: 'AN',
+    PAGE: 'Seite {page}',
+    PAGINATION: 'Seitennavigation',
+    PASSWORD_IS_TOO_WEAK: 'Das Passwort ist zu schwach',
+    PERIODS_CANNOT_OVERLAP: 'Zeiträume dürfen sich nicht überschneiden',
+    POPUP: 'Dialog',
+    POPUP_CONTENT_IS_EMPTY: 'Der Dialog ist leer',
+    PREVIOUS_PAGE: 'Vorherige Seite',
+    REQUIRED: 'Pflichtfeld',
+    SELECT: 'Bitte wählen',
+    SELECT_NAME: '{name} wählen',
+    SELECT_OR_DROP: 'Auswählen oder ablegen',
+    SLIDER_MAXIMUM: '{name}, Maximum',
+    SLIDER_MINIMUM: '{name}, Minimum',
+    START_AND_END_DATE_CANNOT_BE_THE_SAME: 'Beginn und Ende dürfen nicht gleich sein',
+    START_DATE_CANNOT_BE_MORE_THAN_END_DATE: 'Der Beginn darf nicht nach dem Ende liegen',
+    SYNCING: 'Wird gespeichert…',
+    TABLE_HAS_NO_DATA: 'Die Tabelle hat keine Daten!',
+    TOTAL: 'Gesamt',
+    UPLOAD_FILE: '{file} hochladen',
+    UPLOAD_FILES_ONLY: 'Nur {formats}-Dateien hochladen',
+    UPLOAD_LABEL_FILE: '{label}-Datei hochladen',
+    YES: 'Ja',
+}
 // @ts-expect-error an id the widget does not publish
 const unknownPhrase: UIRenderPhraseId = 'MAYBE'
 

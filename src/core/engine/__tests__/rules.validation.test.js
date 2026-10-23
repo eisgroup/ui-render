@@ -1,6 +1,7 @@
 // Loading rules registers the public meta validator in FIELD.VALIDATION.
 import '../rules'
 import { FIELD } from '../../modules/variables'
+import { phraseMessage } from '../../utils/phrases'
 
 const validate = (...args) => FIELD.VALIDATION.notWithinRange(...args)
 
@@ -57,7 +58,7 @@ describe('notWithinRange meta validation', () => {
             values,
             { name: 'rows[0].startDate' },
             makeInstance()
-        )).toBe('Start date and end date cannot be the same')
+        )).toEqual(phraseMessage('START_AND_END_DATE_CANNOT_BE_THE_SAME'))
     })
 
     it('reports which boundary is out of order', () => {
@@ -75,7 +76,7 @@ describe('notWithinRange meta validation', () => {
             values,
             { name: 'rows[0].startDate' },
             instance
-        )).toBe('Start date cannot be more than end date')
+        )).toEqual(phraseMessage('START_DATE_CANNOT_BE_MORE_THAN_END_DATE'))
 
         expect(validate(
             '2024-01-10',
@@ -83,7 +84,7 @@ describe('notWithinRange meta validation', () => {
             values,
             { name: 'rows[0].endDate' },
             instance
-        )).toBe('End date cannot be less than start date')
+        )).toEqual(phraseMessage('END_DATE_CANNOT_BE_LESS_THAN_START_DATE'))
     })
 
     it('rejects a range overlapping another dataKind row', () => {
@@ -129,7 +130,7 @@ describe('notWithinRange meta validation', () => {
             values,
             { name: 'rows[1].startDate' },
             instance
-        )).toBe('Periods cannot overlap')
+        )).toEqual(phraseMessage('PERIODS_CANNOT_OVERLAP'))
         expect(instance.props.parent.getDataKind).toHaveBeenCalledWith('periods', '')
     })
 
@@ -154,7 +155,7 @@ describe('notWithinRange meta validation', () => {
             undefined,
             {},
             instance
-        )).toBe('Start date cannot be more than end date')
+        )).toEqual(phraseMessage('START_DATE_CANNOT_BE_MORE_THAN_END_DATE'))
         expect(instance.props.parent.getDataKind).not.toHaveBeenCalled()
     })
 
