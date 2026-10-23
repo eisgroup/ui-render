@@ -883,6 +883,13 @@ Nothing to do for these:
 
 #### Fixes
 
+- **The scrollbars inside the widget are 8 px thick, and a host's rule can change them.** In Chrome, Edge and
+  Safari, whatever scrolls inside the widget, such as a table wider than its container, had bars 3 px thick, too
+  thin to grab. They are 8 px now, with the same rounded thumb, measured in Chromium 153 and WebKit 26.6. Their
+  rules were `!important`, so a host could restyle the bars only with an `!important` rule of its own; now a rule
+  after our stylesheet does it without one: `.ui-render ::-webkit-scrollbar { width: 12px; height: 12px; }`. A
+  styled bar is no overlay, on macOS either, and takes its room from the content it scrolls: 5 px more than it
+  did. Firefox does not read these rules and draws the system's bars, as before.
 - **`onApplyPeriods` sends nothing while a field shows its validation error.** It sent the table as it
   was: a user emptied a required number field, the field showed `Required`, the host's
   `getValidationErrors` heard it, and `apiCalls.updateData` received the row with `""` in it, where a
