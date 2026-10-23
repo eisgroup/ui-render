@@ -43,6 +43,43 @@ describe('Text', () => {
         expect(container.querySelector('span')).toHaveTextContent('No')
     })
 
+    it('renders booleans as the host\'s translations of ui-render:YES and ui-render:NO', () => {
+        const translations = { 'ui-render:YES': 'Ja', 'ui-render:NO': 'Nein' }
+        const translate = value => translations[value] || value
+        const { container, rerender } = renderWithConfig(<Text translate={translate}>{true}</Text>)
+        expect(container.querySelector('span')).toHaveTextContent(/^Ja$/)
+        rerender(
+            <ConfigContext.Provider value={initialConfigState}>
+                <Text translate={translate}>{false}</Text>
+            </ConfigContext.Provider>
+        )
+        expect(container.querySelector('span')).toHaveTextContent(/^Nein$/)
+    })
+
+    it('renders booleans as Yes/No when the host has no translation for them', () => {
+        // An i18next-based host translate answers a key it does not have with the key itself.
+        const translate = value => value
+        const { container, rerender } = renderWithConfig(<Text translate={translate}>{true}</Text>)
+        expect(container.querySelector('span')).toHaveTextContent(/^Yes$/)
+        rerender(
+            <ConfigContext.Provider value={initialConfigState}>
+                <Text translate={translate}>{false}</Text>
+            </ConfigContext.Provider>
+        )
+        expect(container.querySelector('span')).toHaveTextContent(/^No$/)
+    })
+
+    it('asks its translator for a boolean once, by its key, and does not translate the answer again', () => {
+        const calls = []
+        const translate = value => {
+            calls.push(value)
+            return value === 'ui-render:YES' ? 'Ja' : value
+        }
+        const { container } = renderWithConfig(<Text translate={translate}>{true}</Text>)
+        expect(container.querySelector('span')).toHaveTextContent(/^Ja$/)
+        expect(calls).toEqual(['ui-render:YES'])
+    })
+
     it('formats ISO date strings using context dateFormat', () => {
         const { container } = renderWithConfig(<Text>2024-01-15</Text>)
         // Default in components is no ConfigContext provider → dateFormat will be undefined,

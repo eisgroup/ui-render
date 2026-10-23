@@ -81,6 +81,41 @@ describe('two instances on one page keep their own translator', () => {
     })
 })
 
+describe('two instances on one page translate their pie charts with their own translator', () => {
+    // The mapper gave a pie chart no translator until 2026-10-23, so its texts took the module global, the
+    // translator of the document constructed LAST. Measured on that code: a slice added to the first document's
+    // chart after the second one mounted had its name translated by the second one's function, and neither
+    // chart asked for `ui-render:TOTAL`.
+    const pieMeta = { view: 'PieChart', name: 'slices', legends: true }
+    const translator = translations => value => (value in translations ? translations[value] : value)
+    const first = translator({ 'ui-render:TOTAL': 'Summe', Alpha: 'Alfa', Beta: 'Beta (first)' })
+    const second = translator({ 'ui-render:TOTAL': 'Somme', Alpha: 'Alpha (second)', Beta: 'Bêta' })
+    const alpha = [{ label: 'Alpha', value: 1 }]
+
+    const twoCharts = firstSlices => wrap(
+        <div>
+            <div data-testid="first"><UIRender meta={pieMeta} data={{ slices: firstSlices }} translate={first}/></div>
+            <div data-testid="second"><UIRender meta={pieMeta} data={{ slices: alpha }} translate={second}/></div>
+        </div>
+    )
+
+    it('at mount, and after the first one renders a new slice', () => {
+        const view = render(twoCharts(alpha))
+
+        expect(textOf(view, 'first')).toContain('Summe')
+        expect(textOf(view, 'first')).toContain('Alfa')
+        expect(textOf(view, 'second')).toContain('Somme')
+        expect(textOf(view, 'second')).toContain('Alpha (second)')
+
+        view.rerender(twoCharts([...alpha, { label: 'Beta', value: 2 }]))
+
+        expect(textOf(view, 'first')).toContain('Summe')
+        expect(textOf(view, 'first')).toContain('Beta (first)')
+        expect(textOf(view, 'first')).not.toContain('Bêta')
+        expect(textOf(view, 'second')).toContain('Somme')
+    })
+})
+
 describe('two instances on one page keep their own form data', () => {
     // Every document read every form on the page until 2026-10-06, so each of two independent
     // documents found the other's fields in its `getFormData`, and in its `showIf` and upload data.

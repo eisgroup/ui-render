@@ -1,7 +1,9 @@
 import classNames from '../../utils/classNames'
 import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { useNumberLocale } from '../../contexts'
-import { by, pluralize, shortNumber, toAlphaNumId, toList, toListValuesTotal, truncate, withDecimalSeparator } from '../../utils'
+import { Active, by, pluralize, shortNumber, toAlphaNumId, toList, toListValuesTotal, truncate, withDecimalSeparator } from '../../utils'
+import type { Translate } from '../../utils/_envs'
+import { alreadyTranslated, phrase } from '../../utils/phrases'
 import { renderFloat } from '../renders'
 import Row from '../Row'
 import { STYLE } from '../styles'
@@ -35,6 +37,8 @@ export type PieChartProps = {
   legends?: PieChartLegends
   pointers?: boolean
   sort?: string | string[]
+  /** The document's translator, for the texts in the chart's centre, its legend and its tooltip. */
+  translate?: Translate
   [key: string]: unknown
 }
 
@@ -71,6 +75,7 @@ function PieChart ({
   legends,
   pointers,
   sort,
+  translate = Active.translate,
   ...props
 }: PieChartProps) {
   // A cast, not a guard: `'clean'` drops the `undefined` that an absent `sort` becomes.
@@ -89,15 +94,15 @@ function PieChart ({
   return (
     <Container {...legends && { className: classNames('app__pie-chart--ref middle center wrap', classNameWrap) }}>
       <View className={classNames('app__pie-chart min-width-290 center', className, { gradient })} {...props}>
-        <DonutChart data={data} height={height} gradient={gradient} showPointers={showPointers} unit={unit} />
+        <DonutChart data={data} height={height} gradient={gradient} showPointers={showPointers} unit={unit} translate={translate} />
         <View className='position-center center fade-in-slow'>
           {children != null
-            ? (typeof children === 'object' ? children : <Text className='center'>{children}</Text>)
-            : <PieTotal items={data} />
+            ? (typeof children === 'object' ? children : <Text className='center' translate={translate}>{children}</Text>)
+            : <PieTotal items={data} translate={translate} />
           }
         </View>
       </View>
-      {legends && <PieReference data={data} legends={legends} height={height} />}
+      {legends && <PieReference data={data} legends={legends} height={height} translate={translate} />}
     </Container>
   )
 }
@@ -108,7 +113,7 @@ export default React.memo(PieChart)
 // SVG DONUT
 // ---------------------------------------------------------------------------
 
-function DonutChart ({ data, height, gradient, showPointers, unit }: { data: PieDatum[], height: number, gradient: boolean, showPointers?: boolean, unit?: string }) {
+function DonutChart ({ data, height, gradient, showPointers, unit, translate }: { data: PieDatum[], height: number, gradient: boolean, showPointers?: boolean, unit?: string, translate: Translate }) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
   // The hovered slice by name, with the pointer's offset; the slice itself is looked up below.
@@ -191,12 +196,12 @@ function DonutChart ({ data, height, gradient, showPointers, unit }: { data: Pie
           })}
         </g>
       </svg>
-      {hovered && hoveredSlice && <PieTooltip x={hovered.x} y={hovered.y} slice={hoveredSlice} unit={unit} />}
+      {hovered && hoveredSlice && <PieTooltip x={hovered.x} y={hovered.y} slice={hoveredSlice} unit={unit} translate={translate} />}
     </div>
   )
 }
 
-function PieTooltip ({ x, y, slice, unit }: { x: number, y: number, slice: PieSlice, unit?: string }) {
+function PieTooltip ({ x, y, slice, unit, translate }: { x: number, y: number, slice: PieSlice, unit?: string, translate: Translate }) {
   const { name, value } = slice
   const decimals = Math.max(6 - (Math.round(value) || 0).toString().length, 0)
   return (
@@ -211,7 +216,7 @@ function PieTooltip ({ x, y, slice, unit }: { x: number, y: number, slice: PieSl
       }}
     >
       <View className='fill--width center'>
-        <Text className='truncate'>{name}</Text>
+        <Text className='truncate' translate={translate}>{name}</Text>
         <Text className='row'>
           {renderFloat(Number(value).toFixed(decimals))} {unit ? pluralize(unit, value) : ''}
         </Text>
@@ -284,24 +289,24 @@ function arcPath (cx: number, cy: number, innerR: number, outerR: number, startA
 // SUB-COMPONENTS
 // ---------------------------------------------------------------------------
 
-function PieTotal ({ items }: { items: PieDatum[] }) {
+function PieTotal ({ items, translate }: { items: PieDatum[], translate: Translate }) {
   const locale = useNumberLocale()
   return (
     <>
-      <Text className='h2 no-margin padding-bottom-smaller'>{withDecimalSeparator(shortNumber(toListValuesTotal(items)), locale)}</Text>
-      <Text>Total</Text>
+      <Text className='h2 no-margin padding-bottom-smaller' translate={translate}>{withDecimalSeparator(shortNumber(toListValuesTotal(items)), locale)}</Text>
+      <Text translate={alreadyTranslated}>{phrase(translate, 'TOTAL')}</Text>
     </>
   )
 }
 
-function PieReference ({ data, legends, height }: { data: PieDatum[], legends: PieChartLegends, height: number }) {
+function PieReference ({ data, legends, height, translate }: { data: PieDatum[], legends: PieChartLegends, height: number, translate: Translate }) {
   // A cast, not a guard: `true` has no options, and reads every one as `undefined`, as it did.
   // `columns = 0` gives the checker a number: an absent count compared `> 0` as false already.
   const { bottom, columns = 0, background = true } = (legends || {}) as PieChartLegendOptions
   const classes = classNames('app__pie-chart__ref__items padding-small', { background, wrap: columns > 0 })
   const offsetTop = bottom ? { marginTop: height * -0.1 } : undefined
   const locale = useNumberLocale()
-  const renderReferenceItem = (item: PieDatum) => referenceItem(item, locale)
+  const renderReferenceItem = (item: PieDatum) => referenceItem(item, locale, translate)
 
   if (columns > 0) {
     const itemsPerCol = Math.ceil(data.length / columns)
@@ -322,11 +327,11 @@ function PieReference ({ data, legends, height }: { data: PieDatum[], legends: P
   return <View className={classes} style={offsetTop}>{data.map(renderReferenceItem)}</View>
 }
 
-function referenceItem ({ name, color, value }: PieDatum, locale: string | undefined) {
+function referenceItem ({ name, color, value }: PieDatum, locale: string | undefined, translate: Translate) {
   return (
     <Row key={name} className='app__pie-chart__ref__item justify'>
-      <Text className='truncate padding-right'>{name}</Text>
-      <Text style={{ color }}>{value.toLocaleString(locale)}</Text>
+      <Text className='truncate padding-right' translate={translate}>{name}</Text>
+      <Text style={{ color }} translate={translate}>{value.toLocaleString(locale)}</Text>
     </Row>
   )
 }

@@ -58,12 +58,13 @@ describe('scripts/gen-ts.js', () => {
 
     // The published surface, counted. A new type is a change to the public API, and this is where
     // a review sees it; the generator itself would publish it without a word.
-    it('accepts the real contract, and publishes its 27 types', () => {
+    it('accepts the real contract, and publishes its 28 types', () => {
         const file = path.resolve(__dirname, '../../src/library/contract.ts')
         const names = contractExports(ts.createSourceFile(file, fs.readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true))
 
-        expect(names).toHaveLength(27)
-        expect(names).toEqual(expect.arrayContaining(['UIRenderProps', 'Meta', 'MetaNode', 'UIRenderErrorReport']))
+        // 27 at §9.6-E4; the 28th, `UIRenderPhraseId`, lists the ids of the built-in phrases (2026-10-23).
+        expect(names).toHaveLength(28)
+        expect(names).toEqual(expect.arrayContaining(['UIRenderProps', 'Meta', 'MetaNode', 'UIRenderErrorReport', 'UIRenderPhraseId']))
     })
 
     it.each([
