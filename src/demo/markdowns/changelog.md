@@ -80,6 +80,8 @@ item has the details.
   page now: where a name repeats, the first field keeps it and the others take `<name>-2`,
   `<name>-3`. Give a field an `id` in meta where the page needs a fixed one. (Renderer configuration
   and error reporting, Accessibility, Fixes)
+- **Check table headers whose `classNameHeader` names a background class.** The class now colours the
+  header cell, where 0.34.x ignored it and kept the cell grey. (Fixes)
 - **Ship your own copies of the images you link.** The package ships no images now. 0.34.x carried
   `static/images/`, flags included. (Packaging)
 - **Style the Semantic class names a meta sets.** A node a meta gives `ui label`, `ui menu` or
@@ -883,6 +885,15 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A background class in a header's `classNameHeader` colours the header cell.** `classNameHeader`
+  puts its classes on the `th`, and the stylesheet gave every `th` the header colour with a rule that
+  outweighed any background class, so the cell stayed grey. Only a class in the header's `className`
+  took effect, and it goes on the label inside the cell: beside a label on two lines, its colour was a
+  band with grey above and below it. The header colour is now as specific as `th` alone, so a
+  background class in `classNameHeader` paints the whole cell, however many lines a label takes, and a
+  header without one keeps the header colour. **A header whose `classNameHeader` already names a
+  background class changes colour,** since 0.34.x ignored it. A header your own stylesheet colours can
+  change too: a rule after ours now applies from the specificity of `.ui-render th`.
 - **`onApplyPeriods` sends nothing while a field shows its validation error.** It sent the table as it
   was: a user emptied a required number field, the field showed `Required`, the host's
   `getValidationErrors` heard it, and `apiCalls.updateData` received the row with `""` in it, where a

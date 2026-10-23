@@ -139,7 +139,15 @@ const IN_HOUSE_CURATION = {
             HeaderCell: 'Rendered as `th` wherever it sits. The `vertical` layout puts header cells inside '
                 + '`<tbody>`, which both `table.no-header.vertical > tbody > tr > th` and the role '
                 + 'census (`columnheader`) depend on. No `scope` is added: `scope="row"` would '
-                + 'reclassify those cells as `rowheader`.',
+                + 'reclassify those cells as `rowheader`. A meta header\'s `classNameHeader` and '
+                + '`styleHeader` go on this cell, and its `className` and `style` on the `Row` inside it, '
+                + 'which holds the label. So a header\'s background belongs in `classNameHeader`: `table.less` '
+                + 'gives the cell the header colour as specifically as `th` alone '
+                + '(`:where(table:not(.as-layout)) th`), and a background class there, such as '
+                + '`bg-primary-light2`, paints the whole cell. In `className` it paints the `Row` only, which '
+                + 'is as tall as its own label, so beside a label on two lines it is a band with the header '
+                + 'colour above and below it. Until 2026-10-23 the header colour outweighed every background '
+                + 'class, and `classNameHeader` could not set one.',
             Row: 'Takes the meta `itemClassNames` result, which is `undefined` for every row '
                 + 'in the tracked corpus.',
             Cell: 'The one boundary that matters: `mapper.tsx:154` spreads a `TableCells` '

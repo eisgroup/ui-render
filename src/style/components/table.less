@@ -85,20 +85,24 @@ table:not(.as-layout) {
         &:extend(.bg-primary-lightest all);
       }
     }
-
-    th {
-      background-color: @table-header-bg-color;
-    }
-  }
-
-  th {
-    background-color: @table-header-bg-color;
   }
 
   th, td {
     border-bottom: @table-border;
+  }
+
+  td {
     background-color: @color-table-body-bg;
   }
+}
+
+// A header cell takes the header colour unless a class on the cell sets its own background. `classNameHeader`
+// puts its classes on the `th`, so `bg-primary-light2` there paints the whole cell, however many lines its label
+// takes. `:where`, so that the rule is as specific as `th` alone. It was `table:not(.as-layout) tr th`, which
+// outweighed every background class until 2026-10-23: a meta could colour only the header's content (`className`),
+// and beside a label on two lines that colour was a band, with the header colour above and below it.
+:where(table:not(.as-layout)) th {
+  background-color: @table-header-bg-color;
 }
 
 // Minimise nested styling to allow easy config override

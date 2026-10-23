@@ -117,6 +117,7 @@ const VIEW_COVERAGE = {
         browser: [
             t(IV, '[I] a sortable header cycles descending, ascending, unsorted, and the rows follow'),
             t(IV, '[I] the pager marks the page it is on, and each page holds its own rows'),
+            t(IV, '[I] a background class in `classNameHeader` paints the whole header cell, and a header without one keeps the header colour'),
         ],
         gap: 'the inline draft row (`LocalDraftTableRow`): its fields are inputs, and adding the row is form state, which jsdom covers',
     },

@@ -51,13 +51,15 @@ export type TableHeader = {
   /** Custom header content to render, overrides `label`; or a function that renders it */
   children?: React.ReactNode | TableRenderer
   data?: unknown
-  /** CSS class name */
+  /** CSS class name of the header's content, the `Row` inside its `<th>`: a background here colours the content only */
   className?: string
-  /** CSS inline styles */
+  /** CSS inline styles of the header's content, the `Row` inside its `<th>` */
   style?: React.CSSProperties
   /** In `extraHeaders`: count of `headers` columns to span, default is 1 */
   colSpan?: number
+  /** CSS class name of the header's `<th>`: a background here colours the whole cell */
   classNameHeader?: string
+  /** CSS inline styles of the header's `<th>` */
   styleHeader?: React.CSSProperties
   renderHeader?: TableRenderer
   /** Cell render function for the items under the header */
