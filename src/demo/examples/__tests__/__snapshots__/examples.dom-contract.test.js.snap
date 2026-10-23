@@ -1800,7 +1800,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                     </div>
                                   </td>
                                 </tr>
-                                <tr>
+                                <tr class="app__table__add-row">
                                   <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
@@ -2063,7 +2063,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                     </div>
                                   </td>
                                 </tr>
-                                <tr>
+                                <tr class="app__table__add-row">
                                   <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
@@ -2234,7 +2234,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                                     </div>
                                   </td>
                                 </tr>
-                                <tr>
+                                <tr class="app__table__add-row">
                                   <td>
                                     <div class="flex--col input--wrapper">
                                       <div class="flex--row middle">
@@ -2285,7 +2285,7 @@ exports[`demo example full-DOM contract nestedDataKind renders a stable, non-emp
                     </div>
                   </td>
                 </tr>
-                <tr>
+                <tr class="app__table__add-row">
                   <td colspan="3">
                     <div class="flex--col padding-small">
                       <span class="text h5 margin-bottom-small">
@@ -4835,7 +4835,7 @@ exports[`demo example full-DOM contract tableForm renders a stable, non-empty DO
                     </div>
                   </td>
                 </tr>
-                <tr>
+                <tr class="app__table__add-row">
                   <td style="vertical-align: top;">
                     <div class="flex--col input--wrapper">
                       <div class="flex--row middle">

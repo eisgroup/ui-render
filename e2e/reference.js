@@ -659,6 +659,15 @@ const HIGHLIGHTED_ROWS = {
         { styles: 'highlight-1-last', expand: 'Silver', highlighted: ['Silver'] },
         { styles: 'highlight-2-last', expand: 'Gold', highlighted: ['Gold', 'Silver'] },
     ],
+    /**
+     * A table with two rows of data and the add row a `renderExtraItem` renders after them: the weight of each row,
+     * `row` or `add`. [I] since 2026-10-23. The add row was the last row the rule counted: with `highlight-1-last` it
+     * was drawn bold in place of the last row of data, and with `highlight-2-last` it took one of the two.
+     */
+    WITH_ADD_ROW: [
+        { styles: 'highlight-1-last', rows: [['row', '400'], ['row', '500'], ['add', '400']] },
+        { styles: 'highlight-2-last', rows: [['row', '500'], ['row', '500'], ['add', '400']] },
+    ],
 }
 
 /** The `all` example's progress steps: four, the second current. */
@@ -685,6 +694,21 @@ const TAB_BAR_FIELD = {
     MESSAGE: 'Required',
     /** The bar's own classes: padded, as the demo's tab bars are, and not padded at all. */
     BAR_CLASSES: ['padding-largest', ''],
+}
+
+/**
+ * A file larger than an upload takes, picked from the keyboard: the `uploadVariants` example's image upload, whose
+ * zone reads "Choose image", takes files up to 2 MB.
+ * [I] since 2026-10-23. The upload refused such a file without a word, as 0.34.x did: it handed the popup its title
+ * and message, and the popup stayed closed. Now the popup opens above the page and takes the focus, and closing it
+ * gives the focus back to the zone.
+ */
+const UPLOAD_REFUSAL = {
+    ZONE: 'Choose image',
+    FILE: { name: 'photo.png', mimeType: 'image/png', bytes: 2 * 1024 * 1024 + 1 },
+    TITLE: 'Maximum File Size Exceeded!',
+    /** The popup's message, a text each: the file's name and the limit are texts of their own. */
+    MESSAGE: ['photo.png', 'must be under', '2MB'],
 }
 
 /**
@@ -720,5 +744,5 @@ const HEADER_BACKGROUND = {
 module.exports = {
     BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, INLINE, WIDGET, TOUCH, KEYBOARD, DROPDOWN,
     DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, HIGHLIGHTED_ROWS, PROGRESS_STEPS, TAB_BAR_FIELD,
-    SCROLLBAR, HEADER_BACKGROUND,
+    UPLOAD_REFUSAL, SCROLLBAR, HEADER_BACKGROUND,
 }

@@ -28,7 +28,9 @@ describe('Upload interaction contracts', () => {
         })
 
         expect(onChange).not.toHaveBeenCalled()
+        // Opened: a popup handed no `isOpen` stays as it is, and this one stayed closed until 2026-10-23.
         expect(app.setPopupState).toHaveBeenCalledWith(expect.objectContaining({
+            isOpen: true,
             title: phraseMessage('FILE_UPLOAD_FAILED'),
             content: expect.any(Object),
         }))

@@ -232,8 +232,8 @@ exactly like a top-level field:
 |---|---|---|
 | `dateFormat` | `MM-DD-YYYY` | [`moment` format tokens](https://momentjs.com/docs/#/displaying/format/) for every date the renderer **displays** (an ISO value in a `Text` node, a `render*: "Date"` value) and **edits** (the date picker's display and parsing) |
 | `currency` | `USD` | published as a CSS class on the renderer's shell (`.app.EUR`), for currency-specific styling |
-| `language` | `en` | published as a CSS class on the renderer's shell (`.app.lang--fr`). A change renders again every text the document translated, in the new language (see [Switching language](#switching-language-while-a-document-is-on-the-page)) |
-| `locale` | none: the browser's | the [language tag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument) numbers are **displayed** in: their decimal and grouping separators. A Java-style `de_DE` is read as `de-DE` |
+| `language` | `en` | published as a CSS class on the renderer's shell (`.app.lang--fr`). Where `locale` names no moment locale you loaded, it names the one a date field's month and day names are in. A change renders again every text the document translated, in the new language (see [Switching language](#switching-language-while-a-document-is-on-the-page)) |
+| `locale` | none: the browser's | the [language tag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl#locales_argument) numbers are **displayed** in: their decimal and grouping separators. A Java-style `de_DE` is read as `de-DE`. It also names the moment locale a date field's month and day names are in (see [Translating the built-in texts](#translating-the-built-in-texts-consumer)) |
 
 Each is merged, not replaced: passing only `dateFormat` leaves the others at their defaults.
 `currency` is **not** `meta.currencyCode` — that one selects the currency symbol
@@ -259,9 +259,10 @@ number with a point.
 
 Your `translate` prop is handed the labels, titles and options of a meta, and the values a document
 shows as text. Some texts are UI Render's own: a select's `Select`, a popup's `Ok`, the validation
-messages, the upload's and the table's texts, the names screen readers give the controls, and the
-`Total` under a pie chart's total. `translate` is asked for each of them under a key of its own,
-`ui-render:<ID>`, so an i18next-based host translates them by registering a `ui-render` namespace:
+messages, the upload's and the table's texts, a date field's calendar, the names screen readers give
+the controls, and the `Total` under a pie chart's total. `translate` is asked for each of them under a
+key of its own, `ui-render:<ID>`, so an i18next-based host translates them by registering a
+`ui-render` namespace:
 
 ```js
 i18next.addResourceBundle('de', 'ui-render', {
@@ -292,6 +293,22 @@ The validation messages reach `getValidationErrors` as the field shows them, in 
 required field is the exception: it is reported as `<Field Name> is Required`, with the name taken from
 the field's `name`, as before.
 
+A date field's calendar asks for its texts the same way: `TODAY`, and the names a screen reader gives
+its buttons, such as `PREVIOUS_MONTH` and `CHOOSE_A_YEAR`. Its month and day names come from moment
+instead, and so do the month names of a date whose `dateFormat` names the month (`DD MMMM YYYY`). They
+are in the moment locale your `locale` prop names, `de` for `de-DE`, or else the one your `language`
+names, and the calendar's weeks start as that locale starts them. What a user types is read in that
+locale too: a German field takes `15 März 2024`, not `15 Mar 2024`. moment is your dependency, and its
+locale data is yours to load before the document renders:
+
+```js
+import 'moment/locale/de'
+```
+
+Without it, the names stay English. moment's global locale plays no part, so documents in two
+languages can share a page; a `Text` that shows a date still follows it. Loading a moment locale makes
+it moment's global locale too, so call `moment.locale()` afterwards if your page needs another.
+
 ### Switching language while a document is on the page
 
 Pass your current language as `language`. When your `translate` stays the same function as the
@@ -305,9 +322,10 @@ language changes, as i18next's own `t` does, `language` is what tells the docume
 When `language` changes, the document renders again every text it translated, in the language
 `translate` answers in now: the labels, titles, placeholders and options of the meta, the table
 headers, the values it shows as text, a popup's title and content, and the built-in texts, the
-validation messages under the fields included. Nothing is mounted again: what the user typed, the
-fields they left and the errors they see stay as they are. `getValidationErrors` is handed the errors
-again when they read differently in the new language.
+validation messages under the fields and a date field's calendar included. A date field's month and
+day names follow `language` too, where it is what names their moment locale. Nothing is mounted
+again: what the user typed, the fields they left and the errors they see stay as they are.
+`getValidationErrors` is handed the errors again when they read differently in the new language.
 
 A new `translate` does the same, so a host whose `translate` is a new function for each language,
 such as one from i18next's `getFixedT`, need not pass `language`. Keep `translate` the same function

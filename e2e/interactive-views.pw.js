@@ -1,7 +1,8 @@
 /**
  * THE VIEWS A USER ACTS ON THAT NO OTHER SPEC DRIVES — date input, popup, slider, toggle, checkbox,
  * dropdown by pointer, table sorting, pages, headers, header colours and highlighted rows, progress steps,
- * a field in a tab bar. Added 2026-10-06 with the view map, `e2e/view-coverage.js`.
+ * a field in a tab bar, the popup of an upload that refuses a file. Added 2026-10-06 with the view map,
+ * `e2e/view-coverage.js`.
  * =============================================================================================
  *
  * Before this file the browser leg drove the tooltip, the dropdown's keyboard, tabs, one Expand
@@ -19,7 +20,7 @@
 const { test, expect, rectOf, isWithin, topmostAt, activeElement } = require('./fixtures')
 const {
     DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, HIGHLIGHTED_ROWS, PROGRESS_STEPS, TAB_BAR_FIELD,
-    HEADER_BACKGROUND,
+    UPLOAD_REFUSAL, HEADER_BACKGROUND,
 } = require('./reference')
 const NESTED_DATA = require('../src/demo/examples/array-nested_data.json')
 
@@ -652,6 +653,36 @@ test.describe('table: the highlighted last rows', () => {
         }
         expect(pageErrors).toEqual([])
     })
+
+    test('[I] a table highlights its own last rows, and not the add row after them', async ({ page, pageErrors }) => {
+        // Two rows of data, and the add row a `renderExtraItem` renders after them, as the `tableForm` example has.
+        const data = { dataKind: { period: [{ label: 'First' }, { label: 'Second' }] } }
+        const cells = items => ({ view: 'TableCells', items })
+        const withAddRow = styles => ({
+            view: 'Table',
+            name: 'dataKind.period',
+            styles,
+            headers: [{ id: 'label', label: 'Label' }, { id: 'action', label: 'Action' }],
+            renderItemCells: { view: 'Data', kind: 'period', embedded: true, meta: cells([
+                { view: 'Input', name: 'label' }, { view: 'Text', label: 'Saved' },
+            ]) },
+            renderExtraItem: { view: 'Data', kind: 'period', initialValues: {}, embedded: true, meta: cells([
+                { view: 'Input', name: 'label' }, { view: 'Button', children: 'Add', onClick: 'addData' },
+            ]) },
+        })
+        const weights = table => table.evaluate(root => Array.from(root.querySelectorAll(':scope > tbody > tr'), row => [
+            row.classList.contains('app__table__add-row') ? 'add' : 'row',
+            [...new Set(Array.from(row.cells, cell => getComputedStyle(cell).fontWeight))].join(),
+        ]))
+
+        for (const { styles, rows } of HIGHLIGHTED_ROWS.WITH_ADD_ROW) {
+            await page.goto('/demo')
+            await upload(page, 'data', data)
+            await upload(page, 'meta', withAddRow(styles))
+            await expect.poll(() => weights(page.locator('.ui-render table').first()), styles).toEqual(rows)
+        }
+        expect(pageErrors).toEqual([])
+    })
 })
 
 test.describe('progress steps', () => {
@@ -720,6 +751,30 @@ test.describe('tabs: a field in the tab bar', () => {
             expect(isWithin(await rectOf(message), await rectOf(bar)), `${barCase}: the bar does not clip it`).toBe(true)
             expect(await hitsOwnCentre(page, message, '.field-help'), `${barCase}: nothing paints over it`).toBe(true)
         }
+        expect(pageErrors).toEqual([])
+    })
+})
+
+test.describe('upload: the popup of a file it refuses', () => {
+    const zone = page => page.locator('#uploadVariants').getByRole('button', { name: UPLOAD_REFUSAL.ZONE })
+
+    test('[I] a file larger than it takes opens a popup above the page that says so, and closing it gives the focus back', async ({ page, pageErrors }) => {
+        await openExample(page, 'uploadVariants')
+        await zone(page).focus()
+        const chooser = page.waitForEvent('filechooser')
+        await page.keyboard.press('Space')
+        const { name, mimeType, bytes } = UPLOAD_REFUSAL.FILE
+        await (await chooser).setFiles({ name, mimeType, buffer: Buffer.alloc(bytes) })
+
+        const dialog = page.getByRole('dialog', { name: UPLOAD_REFUSAL.TITLE })
+        await expect(dialog).toBeVisible()
+        expect(await dialog.locator('.app__popup__box__body .text').allTextContents()).toEqual(UPLOAD_REFUSAL.MESSAGE)
+        expect(await hitsOwnCentre(page, page.locator('.app__popup__box'), '.app__popup__box'), 'the box is on top of the page').toBe(true)
+        expect(await activeElement(page), 'it takes the focus').toMatchObject({ tag: 'button', text: 'Ok' })
+
+        await page.keyboard.press('Escape')
+        await expect(dialog).toHaveCount(0)
+        expect(await zone(page).evaluate(element => element === document.activeElement), 'closing gives it back to the zone').toBe(true)
         expect(pageErrors).toEqual([])
     })
 })

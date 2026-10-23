@@ -12,8 +12,13 @@
 import React from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import moment from 'moment'
+import 'moment/locale/de'
+import 'moment/locale/ar'
 import InputDate from '../InputDate'
 import { ConfigContext, initialConfigState } from '../../contexts/ConfigContext'
+
+// A locale moment loads becomes its global one, in a host as here.
+moment.locale('en')
 
 /** The one observer InputDate makes, and the elements it watches. */
 let watched = null
@@ -101,6 +106,38 @@ describe('a date field before its picker mounts', () => {
         } finally {
             moment.locale(previous)
         }
+    })
+
+    it.each([
+        ['a month name of the moment locale its `locale` names', { locale: 'de-DE', dateFormat: 'DD MMMM YYYY' }, '15 März 2024'],
+        ['a month name of the moment locale its `language` names', { language: 'de', dateFormat: 'DD MMM YYYY' }, '15 März 2024'],
+        ['the digits of the moment locale its `locale` names', { locale: 'ar-EG' }, '٠٣-١٥-٢٠٢٤'],
+    ])('renders what rc-picker renders for a closed field, with %s', (_, given, text) => {
+        const config = { ...initialConfigState, ...given }
+        withObserver()
+        const standIn = render(field({ value: '2024-03-15' }, config))
+        const before = markupOf(standIn.container)
+        standIn.unmount()
+
+        withoutObserver()
+        const picker = render(field({ value: '2024-03-15' }, config))
+        expect(markupOf(picker.container)).toBe(before)
+        expect(screen.getByDisplayValue(text)).toBeTruthy()
+    })
+
+    it('asks the translator for none of the calendar\'s texts until its picker mounts', () => {
+        withObserver()
+        const asked = []
+        const translate = value => {
+            asked.push(value)
+            return value
+        }
+        render(field({ value: '2024-03-15', translate }))
+        const phrases = () => asked.filter(value => typeof value === 'string' && value.startsWith('ui-render:'))
+        expect(phrases()).toEqual([])
+
+        watched.near()
+        expect(phrases()).toContain('ui-render:TODAY')
     })
 
     it('mounts the picker when the field comes near the viewport, and stops watching it', () => {

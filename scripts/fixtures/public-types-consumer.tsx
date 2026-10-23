@@ -32,6 +32,10 @@ const translate: UIRenderTranslate = (value: string): string => value.toUpperCas
 
 // What a host registers under the `ui-render` namespace: one text for each published id.
 const builtInTexts: Record<UIRenderPhraseId, string> = {
+    CALENDAR_OK: 'Übernehmen',
+    CHOOSE_A_DECADE: 'Jahrzehnt wählen',
+    CHOOSE_A_MONTH: 'Monat wählen',
+    CHOOSE_A_YEAR: 'Jahr wählen',
     DOWNLOAD_FAILED: 'Herunterladen fehlgeschlagen!',
     END_DATE_CANNOT_BE_LESS_THAN_START_DATE: 'Das Ende darf nicht vor dem Beginn liegen',
     ERROR: 'Fehler',
@@ -42,12 +46,16 @@ const builtInTexts: Record<UIRenderPhraseId, string> = {
     INVALID_DATE: 'Ungültiges Datum',
     INVALID_EMAIL_ADDRESS: 'Ungültige E-Mail-Adresse',
     INVALID_URL: 'Ungültige URL',
+    LAST_YEAR: 'Voriges Jahr (Strg + links)',
     MAXIMUM_FILE_SIZE_EXCEEDED: 'Datei zu groß!',
     MUST_BE_LESS_THAN_CHARACTERS: 'Höchstens {count} Zeichen',
     MUST_BE_MAXIMUM: 'Höchstens {max}',
     MUST_BE_MINIMUM: 'Mindestens {min}',
+    NEXT_MONTH: 'Nächster Monat (Bild ab)',
     NEXT_PAGE: 'Nächste Seite',
+    NEXT_YEAR: 'Nächstes Jahr (Strg + rechts)',
     NO: 'Nein',
+    NOW: 'Jetzt',
     OFF: 'AUS',
     OK: 'OK',
     ON: 'AN',
@@ -57,6 +65,7 @@ const builtInTexts: Record<UIRenderPhraseId, string> = {
     PERIODS_CANNOT_OVERLAP: 'Zeiträume dürfen sich nicht überschneiden',
     POPUP: 'Dialog',
     POPUP_CONTENT_IS_EMPTY: 'Der Dialog ist leer',
+    PREVIOUS_MONTH: 'Voriger Monat (Bild auf)',
     PREVIOUS_PAGE: 'Vorherige Seite',
     REQUIRED: 'Pflichtfeld',
     SELECT: 'Bitte wählen',
@@ -68,10 +77,12 @@ const builtInTexts: Record<UIRenderPhraseId, string> = {
     START_DATE_CANNOT_BE_MORE_THAN_END_DATE: 'Der Beginn darf nicht nach dem Ende liegen',
     SYNCING: 'Wird gespeichert…',
     TABLE_HAS_NO_DATA: 'Die Tabelle hat keine Daten!',
+    TODAY: 'Heute',
     TOTAL: 'Gesamt',
     UPLOAD_FILE: '{file} hochladen',
     UPLOAD_FILES_ONLY: 'Nur {formats}-Dateien hochladen',
     UPLOAD_LABEL_FILE: '{label}-Datei hochladen',
+    WEEK: 'Woche',
     YES: 'Ja',
 }
 // @ts-expect-error an id the widget does not publish
