@@ -552,11 +552,12 @@ function TableView (props: TableViewProps) {
   }
 
   // Extra "add row" must use the next index in the full data array (allRows.length), not the paginated slice length.
+  // Its class keeps it out of the rows a `highlight-N-last` table counts (table.less).
   const tableBody = (
     <TableColumnsContext.Provider value={columnLabels}>
       {vertical ? headers.map(renderItemsVertical) : rows.map(renderItem)}
       {renderExtraItem && (
-        <Table.Row>{renderExtraItem(allRows, allRows.length)}</Table.Row>
+        <Table.Row className='app__table__add-row'>{renderExtraItem(allRows, allRows.length)}</Table.Row>
       )}
     </TableColumnsContext.Provider>
   )

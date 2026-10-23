@@ -659,6 +659,15 @@ const HIGHLIGHTED_ROWS = {
         { styles: 'highlight-1-last', expand: 'Silver', highlighted: ['Silver'] },
         { styles: 'highlight-2-last', expand: 'Gold', highlighted: ['Gold', 'Silver'] },
     ],
+    /**
+     * A table with two rows of data and the add row a `renderExtraItem` renders after them: the weight of each row,
+     * `row` or `add`. [I] since 2026-10-23. The add row was the last row the rule counted: with `highlight-1-last` it
+     * was drawn bold in place of the last row of data, and with `highlight-2-last` it took one of the two.
+     */
+    WITH_ADD_ROW: [
+        { styles: 'highlight-1-last', rows: [['row', '400'], ['row', '500'], ['add', '400']] },
+        { styles: 'highlight-2-last', rows: [['row', '500'], ['row', '500'], ['add', '400']] },
+    ],
 }
 
 /** The `all` example's progress steps: four, the second current. */

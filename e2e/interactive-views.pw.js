@@ -652,6 +652,36 @@ test.describe('table: the highlighted last rows', () => {
         }
         expect(pageErrors).toEqual([])
     })
+
+    test('[I] a table highlights its own last rows, and not the add row after them', async ({ page, pageErrors }) => {
+        // Two rows of data, and the add row a `renderExtraItem` renders after them, as the `tableForm` example has.
+        const data = { dataKind: { period: [{ label: 'First' }, { label: 'Second' }] } }
+        const cells = items => ({ view: 'TableCells', items })
+        const withAddRow = styles => ({
+            view: 'Table',
+            name: 'dataKind.period',
+            styles,
+            headers: [{ id: 'label', label: 'Label' }, { id: 'action', label: 'Action' }],
+            renderItemCells: { view: 'Data', kind: 'period', embedded: true, meta: cells([
+                { view: 'Input', name: 'label' }, { view: 'Text', label: 'Saved' },
+            ]) },
+            renderExtraItem: { view: 'Data', kind: 'period', initialValues: {}, embedded: true, meta: cells([
+                { view: 'Input', name: 'label' }, { view: 'Button', children: 'Add', onClick: 'addData' },
+            ]) },
+        })
+        const weights = table => table.evaluate(root => Array.from(root.querySelectorAll(':scope > tbody > tr'), row => [
+            row.classList.contains('app__table__add-row') ? 'add' : 'row',
+            [...new Set(Array.from(row.cells, cell => getComputedStyle(cell).fontWeight))].join(),
+        ]))
+
+        for (const { styles, rows } of HIGHLIGHTED_ROWS.WITH_ADD_ROW) {
+            await page.goto('/demo')
+            await upload(page, 'data', data)
+            await upload(page, 'meta', withAddRow(styles))
+            await expect.poll(() => weights(page.locator('.ui-render table').first()), styles).toEqual(rows)
+        }
+        expect(pageErrors).toEqual([])
+    })
 })
 
 test.describe('progress steps', () => {
