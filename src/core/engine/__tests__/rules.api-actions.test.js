@@ -5,6 +5,7 @@ import '@testing-library/jest-dom'
 import UIRender from '../rules'
 import { formsStorage } from '../../state/formRegistry'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
+import { phraseMessage } from '../../utils/phrases'
 
 const popup = {
     ...initialAppState,
@@ -273,7 +274,7 @@ describe('UIRender additional action and error contracts', () => {
         await waitFor(() => expect(popup.setPopupState).toHaveBeenCalledTimes(1))
         expect(failure.text).toHaveBeenCalledTimes(1)
         const popupState = popup.setPopupState.mock.calls[0][0]
-        expect(popupState.title).toBe('Error')
+        expect(popupState.title).toEqual(phraseMessage('ERROR'))
         expect(React.isValidElement(popupState.content)).toBe(true)
         expect(popupState.content.props.data.message.trim()).toBe('Periods overlap')
         expect(consoleError).toHaveBeenCalledWith(failure)

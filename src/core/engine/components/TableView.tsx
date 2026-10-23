@@ -17,6 +17,7 @@ import type { TableColGroupProps } from './TableColGroup'
 import { FieldArray } from 'react-final-form-arrays'
 import Pagination from '../../components/Pagination'
 import type { Translate } from '../../utils/_envs'
+import { phrase } from '../../utils/phrases'
 import { TableColumnsContext } from '../../contexts'
 
 /** A row in the default layout, a column in the vertical one: values by header id. */
@@ -523,7 +524,7 @@ function TableView (props: TableViewProps) {
   useBracket(props.bracket, state.items)
   useBracket(props.bracket, itemsSorted.length)
 
-  if (!headers) return <Placeholder>{'Table has no data!'}</Placeholder>
+  if (!headers) return <Placeholder>{phrase(props.translate, 'TABLE_HAS_NO_DATA')}</Placeholder>
   const {
     fill, className, sorts, onSort, extraHeaders, renderExtraItem, showEmptyAs, vertical, colGroup, usePagination,
     items: _, headers: _2, renderItem: _3, renderItemCells: _4, itemClassNames: _5,
@@ -594,6 +595,7 @@ function TableView (props: TableViewProps) {
             activePage={page}
             totalPages={totalPages}
             onPageChange={self.handlePaginationChange}
+            translate={props.translate}
           />
         </ScrollView>
       )}

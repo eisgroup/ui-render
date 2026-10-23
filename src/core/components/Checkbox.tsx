@@ -5,6 +5,7 @@ import Row from './Row'
 import View from './View'
 import { Active } from '../utils'
 import type { Translate } from '../utils/_envs'
+import { phrase } from '../utils/phrases'
 import { ENGINE_PROPS, omitProps } from './domProps'
 import { useOwnId } from './useOwnId'
 
@@ -34,9 +35,9 @@ export type CheckboxProps = {
   title?: string
   /** Checked or unchecked state, when `value` is absent */
   defaultValue?: boolean
-  /** Text to show for checked state */
+  /** Text to show for checked state; without it and `label`, a toggle shows the built-in phrase `ON` */
   labelTrue?: React.ReactNode
-  /** Text to show for unchecked state */
+  /** Text to show for unchecked state; without it and `label`, a toggle shows the built-in phrase `OFF` */
   labelFalse?: React.ReactNode
   /** Value to assign to true case */
   valueTrue?: unknown
@@ -89,8 +90,9 @@ export function Checkbox ({
       if (onClick) onClick(event)
     }
   }
-  labelTrue = labelTrue || label || 'ON'
-  labelFalse = labelFalse || label || 'OFF'
+  // A toggle's side with no label of its own, on a toggle with none, is the built-in phrase in the language of
+  // `translate`.
+  const side = (own: React.ReactNode, id: 'ON' | 'OFF') => (own || label) ? translate(own || label) : phrase(translate, id)
   const input = useRef<HTMLInputElement>(null)
   const ownId = useOwnId(!id && label ? 'checkbox-' + label.replace(/ +?/g, '-') : undefined, input)
   if (!id) id = ownId
@@ -123,9 +125,9 @@ export function Checkbox ({
       >
         {type === 'toggle'
           ? <Fragment>
-            <View className="checkbox__true">{translate(labelTrue)}</View>
+            <View className="checkbox__true">{side(labelTrue, 'ON')}</View>
             <View className="checkbox__button"/>
-            <View className="checkbox__false">{translate(labelFalse)}</View>
+            <View className="checkbox__false">{side(labelFalse, 'OFF')}</View>
           </Fragment>
           : (translate(label) || id)
         }

@@ -5,8 +5,8 @@ import Button from '../../components/Button'
 import Text from '../../components/Text'
 import { useBracket } from '../../components/useBracket'
 import View from '../../components/View'
-import { l, localiseTranslation } from '../../utils'
-import { _ } from '../../utils/translations'
+import { Active, l, localiseTranslation } from '../../utils'
+import { alreadyTranslated, phrase } from '../../utils/phrases'
 import { AppContext } from '../../contexts'
 import type { Translate } from '../../utils/_envs'
 
@@ -22,9 +22,6 @@ localiseTranslation({
     },
     ERROR_excMark: {
         [l.ENGLISH]: 'Error!',
-    },
-    POPUP: {
-        [l.ENGLISH]: 'Popup',
     },
 })
 
@@ -67,12 +64,14 @@ let popups = 0
  * Before, focus stayed on that control behind the backdrop, Tab walked the page under it, and only
  * the pointer could close it (`e2e/interactive-views.pw.js` measured each).
  *
- * Its title, its message and its Ok are translated by `translate`, the document's own translator.
+ * Its title and its message are translated by `translate`, the document's own translator, and its Ok and its
+ * name are the built-in phrases `OK` and `POPUP` in that translator's language (`utils/phrases.ts`). A title
+ * the widget writes itself is a `PhraseMessage`, which the title's `Text` shows in that language too.
  * Until 2026-10-09 they took the components' default, `Active.translate`, which is the translator
  * of the document constructed LAST: on a page with two documents, the first one's popup showed
  * the second one's language around its own content.
  */
-const Modal = ({ translate, form }: { translate?: Translate, form?: unknown }) => {
+const Modal = ({ translate = Active.translate, form }: { translate?: Translate, form?: unknown }) => {
     const popup = useContext(AppContext)
     const { isOpen, title, content, togglePopupState } = popup
     const activeClass = isOpen ? ' active' : ''
@@ -81,12 +80,6 @@ const Modal = ({ translate, form }: { translate?: Translate, form?: unknown }) =
         popups += 1
         return { titleId: `app__popup__title-${popups}`, messageId: `app__popup__message-${popups}` }
     })
-    // A dialog must have a name: its title; else the message it shows, when that is text; else a word for
-    // itself. Until 2026-10-06 a popup with no title had none.
-    const name = title
-        ? { 'aria-labelledby': titleId }
-        : (typeof content === 'string' && content ? { 'aria-labelledby': messageId } : { 'aria-label': _.POPUP })
-
     useEffect(() => {
         if (!isOpen) return undefined
         const opener = document.activeElement as HTMLElement | null
@@ -113,6 +106,13 @@ const Modal = ({ translate, form }: { translate?: Translate, form?: unknown }) =
     }
 
     if (!isOpen) return null
+
+    // A dialog must have a name: its title; else the message it shows, when that is text; else a word for
+    // itself. Until 2026-10-06 a popup with no title had none. Worked out once it is open: a closed popup asks
+    // `translate` for nothing.
+    const name = title
+        ? { 'aria-labelledby': titleId }
+        : (typeof content === 'string' && content ? { 'aria-labelledby': messageId } : { 'aria-label': phrase(translate, 'POPUP') })
 
     return createPortal(
             <View
@@ -169,7 +169,9 @@ const Modal = ({ translate, form }: { translate?: Translate, form?: unknown }) =
                                         className="p center" translate={translate}>{content}</Text> : content}
                                 </View>
                                 <View className="app__popup__box__footer center">
-                                    <Button onClick={togglePopupState} className="primary" translate={translate}>{_.OK}</Button>
+                                    <Button onClick={togglePopupState} className="primary" translate={alreadyTranslated}>
+                                        {phrase(translate, 'OK')}
+                                    </Button>
                                 </View>
                             </>
                         )}

@@ -127,6 +127,7 @@ describe('a popup on a page with two documents', () => {
         const dialog = within(section).getByRole('dialog')
         expect(dialog.querySelector('.app__popup__box__header__title')).toHaveTextContent(`${id}:Heading`)
         expect(dialog.querySelector('.app__popup__box__body')).toHaveTextContent(`${id}:Body`)
-        expect(within(dialog).getByRole('button', { name: `${id}:Ok` })).toBeInTheDocument()
+        // Its Ok is the built-in phrase `OK`, which the document's translator is asked for by its key.
+        expect(within(dialog).getByRole('button', { name: `${id}:ui-render:OK` })).toBeInTheDocument()
     })
 })

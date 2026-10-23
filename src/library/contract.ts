@@ -24,12 +24,20 @@ export type UIRenderMethod = (...args: any[]) => unknown
 export type UIRenderTranslate = (value: string) => string
 
 /**
- * The id of a text the widget writes itself, such as the `Total` under a pie chart's total. The host's
- * `translate` is asked for each as `ui-render:<id>`. Where it answers with that key, with the key without
- * `ui-render:`, or with an empty string, the widget shows its own English text. `docs/BUILT-IN-PHRASES.md`
- * lists each id with its English text.
+ * The id of a text the widget writes itself, such as the `Total` under a pie chart's total, a select's
+ * `Select` or a field's `Required`. The host's `translate` is asked for each as `ui-render:<id>`. Where it
+ * answers with that key, with the key without `ui-render:`, or with an empty string, the widget shows its own
+ * English text. `docs/BUILT-IN-PHRASES.md` lists each id with its English text.
  */
-export type UIRenderPhraseId = 'NO' | 'TOTAL' | 'YES'
+export type UIRenderPhraseId =
+    'DOWNLOAD_FAILED' | 'END_DATE_CANNOT_BE_LESS_THAN_START_DATE' | 'ERROR' | 'FILE' | 'FILES' |
+    'FILE_MUST_BE_UNDER' | 'FILE_UPLOAD_FAILED' | 'INVALID_EMAIL_ADDRESS' | 'INVALID_URL' |
+    'MAXIMUM_FILE_SIZE_EXCEEDED' | 'MUST_BE_LESS_THAN_CHARACTERS' | 'MUST_BE_MAXIMUM' | 'MUST_BE_MINIMUM' |
+    'NEXT_PAGE' | 'NO' | 'OFF' | 'OK' | 'ON' | 'PAGE' | 'PAGINATION' | 'PASSWORD_IS_TOO_WEAK' |
+    'PERIODS_CANNOT_OVERLAP' | 'POPUP' | 'POPUP_CONTENT_IS_EMPTY' | 'PREVIOUS_PAGE' | 'REQUIRED' | 'SELECT' |
+    'SELECT_NAME' | 'SELECT_OR_DROP' | 'SLIDER_MAXIMUM' | 'SLIDER_MINIMUM' |
+    'START_AND_END_DATE_CANNOT_BE_THE_SAME' | 'START_DATE_CANNOT_BE_MORE_THAN_END_DATE' | 'SYNCING' |
+    'TABLE_HAS_NO_DATA' | 'TOTAL' | 'UPLOAD_FILE' | 'UPLOAD_FILES_ONLY' | 'UPLOAD_LABEL_FILE' | 'YES'
 
 /** One finding from the dev-mode meta contract check enabled by `validateMeta`. */
 export interface UIRenderMetaProblem {
@@ -265,6 +273,11 @@ export interface UIRenderProps<Data = unknown> {
      */
     getFormData?(getData: () => Data): void
     onDataChanged?(): void
+    /**
+     * Called with each field's validation error once the user has left the field. A message the widget writes
+     * itself is in the language of `translate`, as the field shows it. A required field's is the exception: it
+     * reads `<Field Name> is Required`, the name made from the field's `name`.
+     */
     getValidationErrors?(errors: UIRenderValidationErrors): void
     methods?: Record<string, UIRenderMethod>
     /**

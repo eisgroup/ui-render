@@ -5992,7 +5992,7 @@ exports[`demo example full-DOM contract uploadVariants renders a stable, non-emp
           <span class="text p margin-top-smallest">
             "Select or Drop"
             <br />
-            "documents"
+            "document"
           </span>
           <div class="flex--col dropzone__hover position-fill align-center appear-on-hover">
             <div class="flex--col padding text-outline">
@@ -6035,7 +6035,7 @@ exports[`demo example full-DOM contract uploadVariants renders a stable, non-emp
           <span class="text p margin-top-smallest">
             "Select or Drop"
             <br />
-            "CSVs"
+            "CSV"
           </span>
           <div class="flex--col dropzone__hover position-fill align-center appear-on-hover">
             <div class="flex--col padding text-outline">

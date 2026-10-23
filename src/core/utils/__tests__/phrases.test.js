@@ -1,5 +1,7 @@
 import { Active } from '../_envs'
-import { alreadyTranslated, BUILT_IN_PHRASES, phrase, PHRASE_NAMESPACE } from '../phrases'
+import {
+    alreadyTranslated, BUILT_IN_PHRASES, isPhraseMessage, phrase, PHRASE_NAMESPACE, phraseMessage, phraseParts,
+} from '../phrases'
 
 // A host translate that knows only `translations`, and answers any other string as an i18next-based one
 // does: with the key it was given, namespace included.
@@ -87,5 +89,70 @@ describe('alreadyTranslated', () => {
     it('returns what it is given, so a `Text` shows a resolved phrase as it is', () => {
         expect(alreadyTranslated('Gesamt')).toBe('Gesamt')
         expect(alreadyTranslated('ui-render:TOTAL')).toBe('ui-render:TOTAL')
+    })
+})
+
+describe('phraseMessage', () => {
+    it('names a built-in phrase and the variables its placeholders take', () => {
+        expect(phraseMessage('REQUIRED')).toEqual({ phrase: 'REQUIRED' })
+        expect(phraseMessage('MUST_BE_MINIMUM', { min: 0 })).toEqual({ phrase: 'MUST_BE_MINIMUM', variables: { min: 0 } })
+    })
+
+    it('cannot be changed, its variables included, since a validator hands the same one out each time', () => {
+        const variables = { min: 3 }
+        const message = phraseMessage('MUST_BE_MINIMUM', variables)
+        variables.min = 4
+
+        expect(message.variables).toEqual({ min: 3 })
+        expect(Object.isFrozen(message)).toBe(true)
+        expect(Object.isFrozen(message.variables)).toBe(true)
+    })
+})
+
+describe('isPhraseMessage', () => {
+    it('is true of a message, and of any object whose `phrase` is the id of a built-in phrase', () => {
+        expect(isPhraseMessage(phraseMessage('OK'))).toBe(true)
+        expect(isPhraseMessage({ phrase: 'TOTAL', variables: { count: 1 } })).toBe(true)
+    })
+
+    it('is false of anything else, a string with an id\'s text and an unknown id among them', () => {
+        [undefined, null, 'Required', 'REQUIRED', 'ui-render:REQUIRED', 3, true, [], {}, { phrase: 'NOT_AN_ID' },
+            { phrase: 'toString' }, { phrase: undefined }].forEach(value => {
+            expect(isPhraseMessage(value)).toBe(false)
+        })
+    })
+})
+
+describe('phraseParts', () => {
+    it('cuts the English text at the placeholders it is given, and trims what is between them', () => {
+        expect(phraseParts(value => value, 'FILE_MUST_BE_UNDER', ['file', 'size'])).toEqual([
+            { placeholder: 'file' }, 'must be under', { placeholder: 'size' },
+        ])
+        expect(phraseParts(value => value, 'UPLOAD_FILES_ONLY', ['formats'])).toEqual([
+            'Upload', { placeholder: 'formats' }, 'files only',
+        ])
+    })
+
+    it('cuts the host\'s translation where it puts the placeholders, in its own order', () => {
+        const translate = hostTranslate({ 'ui-render:FILE_MUST_BE_UNDER': 'Höchstens {size} für {file}' })
+
+        expect(phraseParts(translate, 'FILE_MUST_BE_UNDER', ['file', 'size'])).toEqual([
+            'Höchstens', { placeholder: 'size' }, 'für', { placeholder: 'file' },
+        ])
+    })
+
+    it('leaves any other placeholder in the text, and a placeholder the text repeats is cut each time', () => {
+        const translate = hostTranslate({ 'ui-render:UPLOAD_FILES_ONLY': '{formats} {sise}, {formats}' })
+
+        expect(phraseParts(translate, 'UPLOAD_FILES_ONLY', ['formats'])).toEqual([
+            { placeholder: 'formats' }, '{sise},', { placeholder: 'formats' },
+        ])
+    })
+
+    it('is the text alone where it has none of the placeholders, and asks for the phrase once', () => {
+        const { calls, translate } = recording(value => (value === 'ui-render:UPLOAD_FILES_ONLY' ? 'Nur Bilder' : value))
+
+        expect(phraseParts(translate, 'UPLOAD_FILES_ONLY', ['formats'])).toEqual(['Nur Bilder'])
+        expect(calls).toEqual(['ui-render:UPLOAD_FILES_ONLY'])
     })
 })

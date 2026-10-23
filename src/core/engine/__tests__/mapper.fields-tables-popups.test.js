@@ -5,6 +5,7 @@ import '../../modules/form/utils'
 import Render from '..'
 import { FIELD } from '../../modules/variables'
 import { OK } from '../../components/inputs/validationRules'
+import { phraseMessage } from '../../utils/phrases'
 import { AppContext, ConfigContext, initialAppState, initialConfigState } from '../../contexts'
 import { renderField } from '../components/renders'
 import TableView from '../components/TableView'
@@ -291,8 +292,8 @@ describe('mapper behavior contracts', () => {
         const field = lastFieldProps()
         expect(field.readonly).toBe(true)
         expect(field.disabled).toBe(true)
-        expect(field.validate(0)).toBe('Must be minimum 1')
-        expect(field.validate(11)).toBe('Must be maximum 10')
+        expect(field.validate(0)).toEqual(phraseMessage('MUST_BE_MINIMUM', { min: 1 }))
+        expect(field.validate(11)).toEqual(phraseMessage('MUST_BE_MAXIMUM', { max: 10 }))
         expect(field.validate(5)).toBe('Reserved value')
         expect(field.validate(6)).toBe(OK)
     })
