@@ -283,6 +283,14 @@ async function tooltipA11yWiring (page, trigger) {
  */
 const buttonsTakeFocus = (browserName) => !(browserName === 'webkit' && process.platform === 'darwin')
 
+/**
+ * WHETHER THE ENGINE DRAWS THE BARS `::-webkit-scrollbar` STYLES, as `scrollbar.less` styles the widget's. Measured
+ * on 2026-10-23 on macOS: in Chromium 153 and WebKit 26.6, a container's bars were as thick as the rule made them,
+ * 3, 8 or 12 px. Firefox 155 ignored the rule and drew the system's bars, which there are overlays and take no room.
+ * CI runs WebKit on Linux, and what it reports there decides whether WebKit belongs here everywhere.
+ */
+const drawsWebkitScrollbars = (browserName) => browserName !== 'firefox'
+
 module.exports = {
     test,
     expect,
@@ -301,4 +309,5 @@ module.exports = {
     tabThrough,
     tooltipA11yWiring,
     buttonsTakeFocus,
+    drawsWebkitScrollbars,
 }

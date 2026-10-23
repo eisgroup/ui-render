@@ -675,7 +675,21 @@ const TAB_BAR_FIELD = {
     BAR_CLASSES: ['padding-largest', ''],
 }
 
+/**
+ * The bars of what scrolls inside the widget, which `scrollbar.less` styles through `::-webkit-scrollbar`, on the
+ * demo page: under a table wider than the page, and beside a block with a height of its own.
+ * [I] since 2026-10-23. They were 3 px thick, too thin to grab, and `!important`, so a host could change them
+ * only with an `!important` rule of its own.
+ */
+const SCROLLBAR = {
+    /** A vertical bar's width and a horizontal bar's height, in CSS pixels. */
+    THICKNESS_PX: 8,
+    /** What a host's rule after the stylesheet sets, with no `!important`, and what the bars then measure. */
+    HOST_THICKNESS_PX: 12,
+}
+
 module.exports = {
     BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, INLINE, WIDGET, TOUCH, KEYBOARD, DROPDOWN,
     DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, HIGHLIGHTED_ROWS, PROGRESS_STEPS, TAB_BAR_FIELD,
+    SCROLLBAR,
 }
