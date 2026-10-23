@@ -6,13 +6,13 @@ import Table from '../../components/Table'
 import { Active } from '../../utils'
 import { FIELD } from '../../modules/variables'
 import type { Translate } from '../../utils/_envs'
+import { phraseMessage } from '../../utils/phrases'
 import type { PhraseMessage } from '../../utils/phrases'
 import { email, isRequired, maxLength, password, url } from '../../components/inputs/validationRules'
 import { integer } from '../../components/inputs/normalizers'
 import { pushDataKindRow, validateNotWithinRangeDraftRow } from '../dataKindPush'
 import type { DataKindParent } from '../dataKindPush'
 import { TableColumnsContext } from '../../contexts'
-import { _ } from '../translations'
 
 type Validator = (value: unknown) => unknown
 
@@ -111,6 +111,9 @@ const DEFAULT_TRANSLATE = Active.translate
 
 const EMPTY_DRAFT: DraftState = { draft: {}, fieldErrors: {}, invalidTexts: {} }
 
+// The message a date cell left with text that is no date shows on Add, as `asInputDateField` shows it.
+const INVALID_DATE = phraseMessage('INVALID_DATE')
+
 /**
  * Table "add row" draft: values live only in React state until the user commits (Add).
  * No react-final-form Field registration — avoids leaking draft into parent `values`.
@@ -158,7 +161,7 @@ function LocalDraftTableRow ({ meta, kind, parentInstance, translate: translateP
       const validator = resolveValidator(def.validate)
       const parsed = parseRowValue(def, raw)
       // A date cell left with text that is no date is an error, required or not: it would add the date it had.
-      const err = invalidTexts[name] ? _.INVALID_DATE : validator && validator(parsed)
+      const err = invalidTexts[name] ? INVALID_DATE : validator && validator(parsed)
       if (err) {
         fieldErrors[name] = err
         hasErr = true

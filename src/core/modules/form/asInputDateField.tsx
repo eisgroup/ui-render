@@ -4,10 +4,13 @@ import React, { useRef } from 'react'
 import { isRequired } from '../../components/inputs/validationRules'
 import { resetsOf, touchedFor } from '../../state/formRegistry'
 import { Active } from '../../utils'
-import { _ } from '../../utils/translations'
+import { phraseMessage } from '../../utils/phrases'
 import { revalidate } from './batchedForm'
 import { isUnset, namedField } from './utils'
 import { useFixableField } from './useFixableField'
+
+// One message, returned each time: final-form renders a field again for an error that is another object.
+const INVALID_DATE = phraseMessage('INVALID_DATE')
 
 /** What final-form hands the input: its `input` props, without `value`, which the field caches. */
 type FieldInput = Omit<FieldRenderProps<unknown>['input'], 'value'>
@@ -85,7 +88,7 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
          * its value is the date it had, which says nothing of the text.
          */
         get invalid () {
-            return this.invalidText != null && this.invalidSince === resetsOf(this.form) ? _.INVALID_DATE : undefined
+            return this.invalidText != null && this.invalidSince === resetsOf(this.form) ? INVALID_DATE : undefined
         }
 
         get value () {

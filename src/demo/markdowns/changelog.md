@@ -945,10 +945,11 @@ Nothing to do for these:
 - **A date field keeps text that is no date, and says `Invalid date`.** rc-picker reads what a user types strictly,
   in the display format, and hands on only a date. A field left with `11-31-2021` or `02-29-2021` showed the date it
   had again, or nothing: an empty required field was wiped and said `Required`, and a field with a date went back to
-  it and said nothing. Now the field keeps the text and shows `Invalid date`, required or not. Its value stays the
-  date it had, or none: that is what `getFormData` returns, and a submit, an `onApplyPeriods` and a table's Add send
-  nothing while the error shows. The host's `getValidationErrors` hears `Invalid date`. The error goes once the text
-  is a date, typed or picked in the calendar, and the `reset` action shows the value again in place of the text.
+  it and said nothing. Now the field keeps the text and shows `Invalid date`, required or not, a built-in phrase a
+  host translates as `ui-render:INVALID_DATE`. Its value stays the date it had, or none: that is what `getFormData`
+  returns, and a submit, an `onApplyPeriods` and a table's Add send nothing while the error shows. The host's
+  `getValidationErrors` hears the message as the field shows it. The error goes once the text is a date, typed or
+  picked in the calendar, and the `reset` action shows the value again in place of the text.
 - **A date typed and left by a click is kept.** Only Tab and Enter kept a typed date: leaving the field by a click
   anywhere else put the date it had back. The field handed rc-picker a new moment of the same date whenever it
   rendered, as it does when it is left, and rc-picker dropped the date it had not confirmed yet.
