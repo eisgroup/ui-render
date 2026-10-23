@@ -1,7 +1,7 @@
 /**
  * THE VIEWS A USER ACTS ON THAT NO OTHER SPEC DRIVES — date input, popup, slider, toggle, checkbox,
- * dropdown by pointer, table sorting and pages, progress steps, a field in a tab bar. Added 2026-10-06
- * with the view map, `e2e/view-coverage.js`.
+ * dropdown by pointer, table sorting, pages, headers and highlighted rows, progress steps, a field in a
+ * tab bar. Added 2026-10-06 with the view map, `e2e/view-coverage.js`.
  * =============================================================================================
  *
  * Before this file the browser leg drove the tooltip, the dropdown's keyboard, tabs, one Expand
@@ -17,12 +17,19 @@
  * calendar above the popup only by the grace of the shell's animation, was fixed the same day.
  */
 const { test, expect, rectOf, isWithin, topmostAt, activeElement } = require('./fixtures')
-const { DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, PROGRESS_STEPS, TAB_BAR_FIELD } = require('./reference')
+const {
+    DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, HIGHLIGHTED_ROWS, PROGRESS_STEPS, TAB_BAR_FIELD,
+} = require('./reference')
+const NESTED_DATA = require('../src/demo/examples/array-nested_data.json')
 
 const openExample = async (page, id) => {
     await page.goto(`/examples#${id}`)
     await page.locator(`#${id}.expanded`).waitFor()
 }
+
+/** The demo page renders the data and meta files it is given; this gives it one, as a user picking it would. */
+const upload = (page, kind, json) => page.locator(`.test-${kind} input[type="file"]`)
+    .setInputFiles({ name: `${kind}.json`, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(json)) })
 
 const centre = rect => ({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
 
@@ -392,6 +399,97 @@ test.describe('table: sorting and pages', () => {
     })
 })
 
+test.describe('table: headers', () => {
+    test('[I] a header without a label shows no text, and is as tall as a labelled one', async ({ page }) => {
+        await openExample(page, 'ratingDetails')
+        // Found by the name a screen reader hears: the header's `id`.
+        const header = page.locator('#ratingDetails').getByRole('columnheader', { name: TABLE.UNLABELLED_HEADER })
+        const measured = await header.evaluate((th) => {
+            const hidden = th.querySelector('.sr-only')
+            const { width, height } = hidden.getBoundingClientRect()
+            return {
+                onlyHiddenText: th.textContent === hidden.textContent,
+                hiddenBox: { width, height },
+                // What a header holds, beside the next one's in its row: a row is as tall as the tallest.
+                height: th.firstElementChild.getBoundingClientRect().height,
+                labelledHeight: th.nextElementSibling.firstElementChild.getBoundingClientRect().height,
+            }
+        })
+
+        expect(measured.onlyHiddenText).toBe(true)
+        expect(measured.hiddenBox).toEqual(TABLE.HIDDEN_TEXT_BOX)
+        expect(measured.height).toBe(measured.labelledHeight)
+    })
+})
+
+test.describe('table: the highlighted last rows', () => {
+    // No example highlights rows, so the demo page renders a table that does: its rows expand into a title and a
+    // table of their own.
+    const expandCell = { view: 'Expand', name: '{value}', index: '{index}', onClick: 'handleItemExpand' }
+    const meta = styles => ({
+        view: 'Table',
+        name: 'categories',
+        styles,
+        headers: [
+            { id: 'categoryID', label: 'Category', renderCell: expandCell },
+            { id: 'configuration.inputType', label: 'Type' },
+            { id: 'rate', label: 'Rate', renderCell: 'double5' },
+        ],
+        renderItem: {
+            view: 'Col',
+            relativeData: true,
+            items: [
+                { view: 'Title', label: 'Summary' },
+                {
+                    view: 'Table',
+                    name: 'classes',
+                    relativeData: true,
+                    headers: [
+                        { id: 'classID', label: 'Class', renderCell: expandCell },
+                        { id: 'numberOfLives', label: 'Count' },
+                        { id: 'totalVolume', label: 'Volume', renderCell: 'float' },
+                    ],
+                    renderItem: { view: 'Table', name: 'rateCards', relativeData: true },
+                },
+            ],
+        },
+    })
+    /**
+     * The weight each row draws its cells in. The table's own rows go by the title they show, or as `content` for
+     * the row an expanded row shows its content in; `nested` holds every row of the tables inside them.
+     */
+    const weights = table => table.evaluate((root) => {
+        const weightOf = row => [...new Set(Array.from(row.cells, cell => getComputedStyle(cell).fontWeight))].join()
+        return {
+            rows: Array.from(root.querySelectorAll(':scope > tbody > tr'), row => [
+                row.classList.contains('app__table__expansion') ? 'content' : row.cells[0].textContent.trim(),
+                weightOf(row),
+            ]),
+            nested: Array.from(root.querySelectorAll(':scope > tbody > tr table tbody > tr'), weightOf),
+        }
+    })
+
+    test('[I] a table highlights its own last rows, and neither the content of a row it expands nor a table in it', async ({ page, pageErrors }) => {
+        const { WEIGHT, ROWS } = HIGHLIGHTED_ROWS
+        for (const { styles, expand, highlighted } of HIGHLIGHTED_ROWS.CASES) {
+            await page.goto('/demo')
+            await upload(page, 'data', NESTED_DATA)
+            await upload(page, 'meta', meta(styles))
+            const table = page.locator('.ui-render table').first()
+            const row = title => [title, highlighted.includes(title) ? WEIGHT.highlighted : WEIGHT.plain]
+
+            await expect.poll(() => weights(table), `${styles}: before a row expands`).toEqual({ rows: ROWS.map(row), nested: [] })
+
+            await table.getByRole('button', { name: expand, exact: true }).click()
+            await expect.poll(() => weights(table), `${styles}: once ${expand} expands`).toEqual({
+                rows: ROWS.flatMap(title => (title === expand ? [row(title), ['content', WEIGHT.plain]] : [row(title)])),
+                nested: [WEIGHT.plain],
+            })
+        }
+        expect(pageErrors).toEqual([])
+    })
+})
+
 test.describe('progress steps', () => {
     test('[I] a click on a step makes it current, shows its content, and fills the bars up to it', async ({ page }) => {
         await openExample(page, 'all')
@@ -431,8 +529,6 @@ test.describe('tabs: a field in the tab bar', () => {
             { tab: TAB_BAR_FIELD.TAB, content: { view: 'Text', label: 'Details content' } },
         ],
     })
-    const upload = (page, kind, json) => page.locator(`.test-${kind} input[type="file"]`)
-        .setInputFiles({ name: `${kind}.json`, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(json)) })
 
     test('[I] a field in the tab bar shows its message in full, and neither the tabs nor the label beside it move', async ({ page, pageErrors }) => {
         for (const barClasses of TAB_BAR_FIELD.BAR_CLASSES) {

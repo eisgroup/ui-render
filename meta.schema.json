@@ -15,7 +15,7 @@
   },
   "$defs": {
     "metaVersion": {
-      "description": "OPTIONAL contract version this file was authored against, as `MAJOR` or `MAJOR.MINOR` (current: \"1\"). Root-level only. Absence means \"current\": the file targets whatever contract the installed eis-ui-render implements, which is the right choice when meta and library ship together. MAJOR changes only for a change that would break existing meta; MINOR for additive ones. The engine ignores the value and strips the field before rendering, so declaring it never changes output.",
+      "description": "OPTIONAL contract version this file was authored against, as `MAJOR` or `MAJOR.MINOR` (current: \"2\", in which a Table header without a `label` shows no text, where 1 showed its `id`). Root-level only. Absence means \"current\": the file targets whatever contract the installed eis-ui-render implements, which is the right choice when meta and library ship together. MAJOR changes only for a change that would break existing meta; MINOR for additive ones. The engine ignores the value and strips the field before rendering, so declaring it never changes output.",
       "type": "string",
       "pattern": "^[0-9]+(\\.[0-9]+)?$",
       "examples": [
@@ -66,7 +66,7 @@
           "$ref": "#/$defs/showIf"
         },
         "headers": {
-          "description": "Table column definitions, each a node-shaped object (`id`, `label`, `renderCell`, ...). MUST be an array, or a `{ name }` value transform that resolves to one: the Table component maps over it.",
+          "description": "Table column definitions, each a node-shaped object (`id`, `label`, `renderCell`, ...). A header shows its `label`. Without one it shows no text, and its `id` is hidden text that names it for screen readers; `label: \"\"` names nothing. MUST be an array, or a `{ name }` value transform that resolves to one: the Table component maps over it.",
           "anyOf": [
             {
               "type": [
@@ -83,7 +83,7 @@
           ]
         },
         "extraHeaders": {
-          "description": "Additional Table column definitions appended after `headers`. MUST be an array, or a `{ name }` value transform that resolves to one.",
+          "description": "Additional rows of Table headers, rendered above `headers` in the order given: each row an array of header definitions (`label`, `colSpan`, ...), which show their `label` as `headers` do. MUST be an array, or a `{ name }` value transform that resolves to one.",
           "anyOf": [
             {
               "type": [

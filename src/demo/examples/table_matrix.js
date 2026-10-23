@@ -93,19 +93,22 @@ export const meta = {
   },
 }
 
-// The minimum required config
+// The minimum required config, plus labels: a header without one shows no text
 export const metaRequired = {
   view: 'Table',
   name: 'matrixTable',
   headers: [
     {
       id: 'undiffRate',
+      label: 'Undiff',
     },
     {
       id: 'smokerRate',
+      label: 'Smoker',
     },
     {
       id: 'nonSmokerRate',
+      label: 'Non',
     },
   ],
   group: {
@@ -114,6 +117,7 @@ export const metaRequired = {
     },
     header: { // required, common header to group items by
       id: 'ageBand', // required
+      label: 'Age',
     },
   },
 }

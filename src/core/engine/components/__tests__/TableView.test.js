@@ -183,6 +183,21 @@ describe('TableView', () => {
         expect(container.querySelectorAll('[data-testid="expanded"]').length).toBe(2)
     })
 
+    // table.less leaves this class out when a `highlight-N-last` table counts its last rows: an expanded row's
+    // content follows it in a row of its own, which would otherwise take the highlight from it.
+    it('marks the row an expanded row shows its content in, and no other row', () => {
+        const renderItem = (item) => <span>{`exp:${item.name}`}</span>
+        const { container } = render(
+            wrap(<TableView items={items} headers={headers} renderItem={renderItem} itemsExpanded {...defaults} />)
+        )
+        expect(Array.from(container.querySelectorAll('tbody > tr'), row => [row.className, row.textContent])).toEqual([
+            ['', 'Alpha10'],
+            ['app__table__expansion', 'exp:Alpha'],
+            ['', 'Beta20'],
+            ['app__table__expansion', 'exp:Beta'],
+        ])
+    })
+
     it('uses renderItemCells when provided', () => {
         const renderItemCells = (item, i) => (
             <td key={i} data-testid={`custom-${i}`}>custom:{item.name}</td>

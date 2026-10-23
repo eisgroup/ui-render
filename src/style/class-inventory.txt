@@ -78,6 +78,7 @@ app__slider__values
 app__sort__icon
 app__spinner
 app__stats-change
+app__table__expansion
 app__table__filters
 app__table__options
 app__tag

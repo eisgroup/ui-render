@@ -180,6 +180,11 @@ describe('metaVersion declaration', () => {
             .toEqual([`warning:${META_PROBLEM.META_VERSION_INVALID}@metaVersion`])
     })
 
+    // A version at or below the one implemented is always compatible, and 2 is the first that has one below it.
+    it.each(['1', '1.4', CURRENT_META_VERSION, `${CURRENT_META_VERSION}.3`])('accepts %s without a word', (value) => {
+        expect(validateMeta({ metaVersion: value, view: 'Row' })).toEqual([])
+    })
+
     it('warns when the declared major is newer than this build implements', () => {
         const ahead = String(Number(CURRENT_META_VERSION) + 1)
         expect(codesOf({ metaVersion: ahead, view: 'Row' }))
