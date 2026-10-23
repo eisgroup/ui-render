@@ -198,6 +198,20 @@ describe('TableView', () => {
         ])
     })
 
+    // The same for the add row a `renderExtraItem` renders: the last row of the body, it would otherwise take the
+    // highlight from the last row of data.
+    it('marks the add row a renderExtraItem renders, and no other row', () => {
+        const renderExtraItem = (all, index) => <td>{`add:${index}`}</td>
+        const { container } = render(
+            wrap(<TableView items={items} headers={headers} renderExtraItem={renderExtraItem} {...defaults} />)
+        )
+        expect(Array.from(container.querySelectorAll('tbody > tr'), row => [row.className, row.textContent])).toEqual([
+            ['', 'Alpha10'],
+            ['', 'Beta20'],
+            ['app__table__add-row', 'add:2'],
+        ])
+    })
+
     it('uses renderItemCells when provided', () => {
         const renderItemCells = (item, i) => (
             <td key={i} data-testid={`custom-${i}`}>custom:{item.name}</td>

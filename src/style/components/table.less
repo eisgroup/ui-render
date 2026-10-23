@@ -67,11 +67,12 @@ table {
     }
   }
 
-  // The last rows of the table's own body: not those of a table nested in one of its rows, and not the row an
-  // expanded row shows its content in, which follows that row (`app__table__expansion`, TableView.tsx).
-  &.highlight-1-last > tbody > tr:nth-last-child(1 of :not(.app__table__expansion)),
-  &.highlight-2-last > tbody > tr:nth-last-child(-n+2 of :not(.app__table__expansion)),
-  &.highlight-3-last > tbody > tr:nth-last-child(-n+3 of :not(.app__table__expansion)) {
+  // The last rows of the table's own body: not those of a table nested in one of its rows, not the row an expanded
+  // row shows its content in, which follows that row (`app__table__expansion`), and not the add row a
+  // `renderExtraItem` puts after them all (`app__table__add-row`, both in TableView.tsx).
+  &.highlight-1-last > tbody > tr:nth-last-child(1 of :not(.app__table__expansion, .app__table__add-row)),
+  &.highlight-2-last > tbody > tr:nth-last-child(-n+2 of :not(.app__table__expansion, .app__table__add-row)),
+  &.highlight-3-last > tbody > tr:nth-last-child(-n+3 of :not(.app__table__expansion, .app__table__add-row)) {
     background-color: @color-table-lightest;
     font-weight: 500!important;
   }

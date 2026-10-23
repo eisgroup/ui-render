@@ -988,6 +988,10 @@ Nothing to do for these:
   expanding one of them highlighted its content, all of it drawn bold, in place of a row of the table. The rule also
   reached the rows of every table nested in a highlighted one, and highlighted the last of them. Now a table counts
   only its own rows, and not the content rows, which carry the class `app__table__expansion`.
+- **A table's add row no longer takes the `highlight-N-last` highlight.** The add row a `renderExtraItem` renders
+  comes after the table's rows, and the rule counted it as one of the last: with `highlight-1-last` the add row was
+  drawn bold and the last row of data was not, and with `highlight-2-last` it took one of the two. Now the add row
+  carries the class `app__table__add-row`, and the rule leaves it out, as it does an expanded row's content row.
 - **A table header without a `label` no longer shows its `id`.** A meta that leaves the label out to
   mean a blank header showed the column's technical name there instead, such as `Description`. Now
   it shows no text, and the `id` stays as hidden text for screen readers (Accessibility). This is
