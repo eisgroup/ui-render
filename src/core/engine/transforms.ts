@@ -331,6 +331,9 @@ export function metaToProps (this: unknown, meta: Meta, config: TransformConfig)
                         ...filterItems && {filterItems, parentItem: value},
                         ...callerHandlers,
                         ...definition.view.indexOf('Data') === 0 && {index: rowIndex},
+                        // A table's draft row: its form holds what the user types until Add, which is not the
+                        // document's data yet (`dataFormsOf`). A `Data` node only, the one view that reads it.
+                        ...attribute === 'renderExtraItem' && definition.view.indexOf('Data') === 0 && {draftRow: true},
                         data, _data, form, instance,
                     }
                     builtCells.set(rowIndex, { value, relativePath: revPath.relativePath, label, props, callerHandlers, cell })

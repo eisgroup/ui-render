@@ -113,6 +113,7 @@ describe('the form wrapper', () => {
         expect(key).toEqual(values)
         expect(key).not.toBe(values)
         expect(entry.meta).toBe(meta)
+        expect(entry.draftRow).toBe(false)
 
         view.unmount()
 
@@ -136,6 +137,19 @@ describe('the form wrapper', () => {
         const entries = storedFor(document)
         expect(entries.map(([key]) => key)).toEqual([next])
         expect(entries[0][1].meta).toBe(nextMeta)
+    })
+
+    // A table's draft row is the one document `Data` says this of: its values are not data yet (`dataFormsOf`).
+    it('records that its document is a table\'s draft row, in its entry and in the one it moves to', () => {
+        const first = { name: 'Ada', city: 'Paris' }
+        const view = mountHost({ data: first, initialValues: first, draftRow: true })
+        const [document] = documents()
+        expect(storedFor(document).map(([, entry]) => entry.draftRow)).toEqual([true])
+
+        const next = { name: 'Grace', city: 'Oslo' }
+        view.rerender({ data: next, initialValues: next, draftRow: true })
+
+        expect(storedFor(document).map(([key, entry]) => [key, entry.draftRow])).toEqual([[next, true]])
     })
 
     it('keeps the user\'s edits when the initial values change only by identity', () => {

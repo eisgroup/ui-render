@@ -40,6 +40,11 @@ export type DataProps = {
   relativeIndex?: number
   /** When true, a TableCells draft row keeps its values in local state until Add */
   localDraft?: boolean
+  /**
+   * Set by the engine, not the meta, on the row a table's `renderExtraItem` renders: the form of its own
+   * holds what the user types there, which is not the document's data until Add puts it in the rows
+   */
+  draftRow?: boolean
   className?: string
   style?: React.CSSProperties
   embedded?: boolean
@@ -73,7 +78,7 @@ const NO_META: DataMeta = {}
  */
 export default function Data ({
   kind, instance, index, relativeIndex, relativePath, data = NO_DATA, meta: metaIn = NO_META, initialValues = data,
-  className, style, embedded, useForm, localDraft,
+  className, style, embedded, useForm, localDraft, draftRow,
 }: DataProps) {
   // Use Active.UIRender to avoid circular import
   const UIRender = Active.UIRender as OpenComponent
@@ -118,6 +123,7 @@ export default function Data ({
       index={rowIndex}
       relativeIndex={relativeIndex}
       embedded={embedded}
+      draftRow={draftRow}
       {...{className, style}}
     />
   }

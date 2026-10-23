@@ -7,8 +7,8 @@ import { normalizeIncomingData } from './dataMapping'
  *
  * Lifted out of the `config` getter at §9.3 step 2. A file field writes `onChange: 'upload'`, and
  * `Upload` calls it with `(files, name, dropzone)` once the files pass its size check. The host's
- * `apiCalls.uploadFile` receives every form's current values as JSON, minus the file field, plus
- * the file; whatever it resolves with becomes the UI's data.
+ * `apiCalls.uploadFile` receives every form's current values as JSON, but a table's draft row's and
+ * minus the file field, plus the file; whatever it resolves with becomes the UI's data.
  *
  * AN EMPTY ANSWER IS IGNORED — `undefined`, `null`, `''`, `0` — and the data is left as it was, as
  * `onApplyPeriods` always did. Until this was fixed the answer replaced the data wholesale: with

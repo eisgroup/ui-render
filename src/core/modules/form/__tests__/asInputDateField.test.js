@@ -6,6 +6,7 @@ import { Form } from 'react-final-form'
 // otherwise the renders.tsx → asField cycle blows up.
 import '../utils'
 import { asInputDateField } from '../asInputDateField'
+import { fixableFieldsOf } from '../../../state/formRegistry'
 
 // `readonly` is the fields' prop; on an <input> it is `readOnly`, as the real inputs pass it.
 const TestDate = ({ value, onChange, name, error, readonly, ...rest }) => (
@@ -142,5 +143,27 @@ describe('asInputDateField', () => {
 
         expect(getByTestId('dt')).toHaveAttribute('placeholder', 'second')
         expect(getByTestId('dt').value).toBe('2024-0')
+    })
+})
+
+// What an `onApplyPeriods` reads to wait for a field's shown error (`engine/errorMapping.ts`).
+describe('the count of fields whose error the user can fix', () => {
+    it('holds an editable date field while it is mounted, and neither a disabled nor a readonly one', () => {
+        // The form the engine's document hands its fields: only its identity is read here.
+        const form = {}
+        const instance = { form, props: {} }
+        const field = props => <RFForm initialValues={{ d: '2024-01-15' }}><WrappedDate name="d" instance={instance} {...props}/></RFForm>
+        const { rerender, unmount } = render(field({}))
+        expect([...fixableFieldsOf(form)]).toEqual([['d', 1]])
+
+        rerender(field({ disabled: true }))
+        expect(fixableFieldsOf(form).has('d')).toBe(false)
+        rerender(field({ readonly: true }))
+        expect(fixableFieldsOf(form).has('d')).toBe(false)
+        rerender(field({}))
+        expect([...fixableFieldsOf(form)]).toEqual([['d', 1]])
+
+        unmount()
+        expect(fixableFieldsOf(form).size).toBe(0)
     })
 })

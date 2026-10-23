@@ -5,6 +5,7 @@ import { isRequired } from '../../components/inputs/validationRules'
 import { touchedFor } from '../../state/formRegistry'
 import { Active } from '../../utils'
 import { isUnset, namedField } from './utils'
+import { useFixableField } from './useFixableField'
 
 /** What final-form hands the input: its `input` props, without `value`, which the field caches. */
 type FieldInput = Omit<FieldRenderProps<unknown>['input'], 'value'>
@@ -155,6 +156,7 @@ export function asInputDateField (InputComponent: React.ComponentType<any>, {san
         if (own.current === null) own.current = new FieldInstance(props)
         const field = own.current
         field.props = props
+        useFixableField(props)
         const {name, disabled, normalize, format, parse = normalize, validate, options} = props
         // A cast, not a guard, read at render: final-form's `Field`, unless something replaced it.
         const ActiveField = Active.Field as typeof Field

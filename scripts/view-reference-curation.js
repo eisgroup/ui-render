@@ -91,7 +91,7 @@ const VIEW_CURATION = {
     DATA: {
         summary: 'Nested render instance: `meta` carries the nested declaration, `data` or `name` selects the values its views display, and `kind` groups sibling instances into one array for validation.',
         resolvesTo: 'Data',
-        notes: 'Its fields belong to the parent\'s form, unless `useForm` gives it a form of its own; a `renderExtraItem` declaration sets `useForm`. Outside a table row its fields keep their own names, from the root of the form\'s values, whatever `name` selects: a field shows and writes the root\'s value at its name, and `getFormData` returns it there. A `useForm` form starts from the selected values, and `getFormData` still returns its fields at the root, under their names. With `localDraft` and a `TableCells` declaration it renders a draft row that keeps its values in local state until the row is added. Any falsy local value falls back to the root `data`, so the nested block still has an object to bind against.',
+        notes: 'Its fields belong to the parent\'s form, unless `useForm` gives it a form of its own; a `renderExtraItem` declaration sets `useForm`, and what a user types in that draft row is not data until the row is added: `getFormData`, a submit, an upload and `onApplyPeriods` leave it out. Outside a table row its fields keep their own names, from the root of the form\'s values, whatever `name` selects: a field shows and writes the root\'s value at its name, and `getFormData` returns it there. A `useForm` form starts from the selected values, and `getFormData` still returns its fields at the root, under their names. With `localDraft` and a `TableCells` declaration it renders a draft row that keeps its values in local state until the row is added. Any falsy local value falls back to the root `data`, so the nested block still has an object to bind against.',
     },
     DROPDOWN: {
         summary: 'Option list that deliberately does not write a form value; its `onChange` is proxied so the handler receives the selected value alone.',
@@ -285,8 +285,8 @@ const ACTION_CURATION = {
         notes: null,
     },
     ON_APPLY_PERIODS: {
-        summary: 'Sends all form data to the host `updateData` API call and restarts the form with the normalized response.',
-        notes: 'Does nothing when the host supplies no `updateData`, or the same call under its deprecated old name. An empty response (`undefined`, `null`, `\'\'`, `0`) leaves the data as it was; failures open an error popup.',
+        summary: 'Sends the form data to the host `updateData` API call and restarts the form with the normalized response.',
+        notes: 'Sends nothing while a field the user can change shows its validation error, and shows nothing new: the field shows its own. A disabled or readonly field does not hold it back, nor does a table\'s draft row (`renderExtraItem`), which is not sent. Does nothing when the host supplies no `updateData`, or the same call under its deprecated old name. An empty response (`undefined`, `null`, `\'\'`, `0`) leaves the data as it was; failures open an error popup.',
     },
     POPUP: {
         summary: 'Opens an alert popup with the given title and content.',

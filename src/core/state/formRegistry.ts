@@ -11,9 +11,10 @@
  * It sits below `components` and `modules` and above `utils`: both layers may import it, it may
  * import nothing but `utils`, and the ESLint layer rules in `eslint.config.js` enforce that.
  *
- * The errors, the touched fields and the baselines are keyed by the final-form `form` object, the key
- * BOTH sides of the boundary already hold, in weak maps, so an unmounted form's entries are collected
- * with it. `formsStorage` is a plain map, and each form deletes its own entry when it unmounts.
+ * The errors, the touched fields, the baselines and the fields whose error the user can fix are keyed
+ * by the final-form `form` object, the key BOTH sides of the boundary already hold, in weak maps, so an
+ * unmounted form's entries are collected with it. `formsStorage` is a plain map, and each form deletes
+ * its own entry when it unmounts.
  */
 
 import type { FormApi } from 'final-form'
@@ -28,6 +29,11 @@ export type RegisteredForm = {
 	 * and another `UIRender` on the page has its own. Its root's form layer makes it.
 	 */
 	tree: object,
+	/**
+	 * Whether the form is a table's draft row, the row a `renderExtraItem` declaration renders: it holds
+	 * what the user types there, which is not the document's data until the row is added (`dataFormsOf`).
+	 */
+	draftRow: boolean,
 }
 
 /**
@@ -46,6 +52,21 @@ export function formsOf (tree: object | undefined): Map<object, RegisteredForm> 
 	if (tree === undefined) return forms
 	formsStorage.forEach((entry, key) => {
 		if (entry.tree === tree) forms.set(key, entry)
+	})
+	return forms
+}
+
+/**
+ * The forms whose values are a document tree's data: every form of `formsOf(tree)` but a table's draft
+ * row's. Until 2026-10-23 a draft row's values were data as soon as the user typed them: `getFormData`
+ * returned them, and an `onApplyPeriods` and an upload sent them, as one more row, malformed, and a submit
+ * sent them as a row of a table that had none. They are data once Add puts them in the table's rows. The
+ * errors a host hears are still every form's (`formsOf`).
+ */
+export function dataFormsOf (tree: object | undefined): Map<object, RegisteredForm> {
+	const forms = formsOf(tree)
+	forms.forEach((entry, key) => {
+		if (entry.draftRow) forms.delete(key)
 	})
 	return forms
 }
@@ -138,4 +159,41 @@ export function baselineOf (form: object): unknown {
 /** Record the `initialValues` this form is now working from. */
 export function setBaseline (form: object, initialValues: unknown): void {
 	baselineByForm.set(form, initialValues)
+}
+
+/**
+ * The fields whose validation error the user can fix, PER FORM: by name, how many such fields are mounted.
+ * `asField` and `asInputDateField` count each field they host while it is mounted, unless it is disabled or
+ * readonly. They are the two that show a field's error, and these are the fields whose shown error holds an
+ * `onApplyPeriods` back (`showsAnError`, `engine/errorMapping.ts`).
+ *
+ * A field the user cannot change holds nothing back: the error it shows is one only the host can clear. A
+ * table column the host computes from the other columns is declared disabled and required, and the host
+ * fills it in its answer to that action. A row added without it would show `Required` there once a submit
+ * had failed, and the action would have waited for it for good.
+ */
+const fixableByForm = new WeakMap<object, Map<string, number>>()
+
+/** The fields of one form whose error the user can fix, with how many of each are mounted. */
+export function fixableFieldsOf (form: object): ReadonlyMap<string, number> {
+	return fixableByForm.get(form) || new Map()
+}
+
+/**
+ * Count one mounted field of `form` whose error the user can fix. Returns what uncounts it, which the field
+ * calls once, when it goes or can no longer be changed.
+ */
+export function holdFixableField (form: object, name: string): () => void {
+	let fields = fixableByForm.get(form)
+	if (!fields) {
+		fields = new Map()
+		fixableByForm.set(form, fields)
+	}
+	const held = fields
+	held.set(name, (held.get(name) || 0) + 1)
+	return () => {
+		const count = held.get(name)! // not undefined: this hold counted it, and is released once
+		if (count > 1) held.set(name, count - 1)
+		else held.delete(name)
+	}
 }

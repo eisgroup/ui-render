@@ -6,7 +6,8 @@
  * rendered button. `rules.api-actions.test.js` and `rules.async-errors-and-callbacks.test.js` still
  * do that for the applied answer, the ignored empty one and the popup, and are what proves the
  * wiring. The body shapes a failure can have are `apiError.test.js`'s; this checks only that the
- * message it produces is the one handed on.
+ * message it produces is the one handed on. Which fields hold it back is `errorMapping.test.js`'s,
+ * and `rules.apply-periods.test.js` drives it through a document.
  */
 import { applyPeriods } from '../applyPeriods'
 
@@ -23,6 +24,8 @@ const failNever = (message, error) => {
     throw new Error(`onFailure was not expected, got: ${error}`)
 }
 
+const noErrorShown = () => false
+
 describe('a working call', () => {
     it('sends every form value and hands over the answer normalised', async () => {
         const { updateData, sent } = hostAnswering({ status: 'After', effectiveAt: '2026-07-31T22:15:00.000Z' })
@@ -30,6 +33,7 @@ describe('a working call', () => {
 
         await applyPeriods({
             updateData,
+            showsAnError: noErrorShown,
             readFormsData: () => ({ status: 'Before', requestId: 'r-2' }),
             onUpdated: data => applied.push(data),
             onFailure: failNever,
@@ -47,6 +51,7 @@ describe('a working call', () => {
 
             await applyPeriods({
                 updateData,
+                showsAnError: noErrorShown,
                 readFormsData: () => ({}),
                 onUpdated: data => applied.push(data),
                 onFailure: failNever,
@@ -61,14 +66,52 @@ describe('a working call', () => {
 
 it('returns false and reads nothing when the host provides no updateData', async () => {
     let reads = 0
+    let asked = 0
 
     await expect(applyPeriods({
         updateData: undefined,
+        showsAnError: () => { asked++; return false },
         readFormsData: () => { reads++; return {} },
         onUpdated: () => {},
         onFailure: failNever,
     })).resolves.toBe(false)
-    expect(reads).toBe(0)
+    expect({ reads, asked }).toEqual({ reads: 0, asked: 0 })
+})
+
+describe('a field that shows its error', () => {
+    it('holds the call back: nothing is read, sent or applied, and nothing fails', async () => {
+        const { updateData, sent } = hostAnswering({ status: 'After' })
+        let reads = 0
+        const applied = []
+
+        await expect(applyPeriods({
+            updateData,
+            showsAnError: () => true,
+            readFormsData: () => { reads++; return { status: 'Before' } },
+            onUpdated: data => applied.push(data),
+            onFailure: failNever,
+        })).resolves.toBe(false)
+
+        expect({ reads, sent, applied }).toEqual({ reads: 0, sent: [], applied: [] })
+    })
+
+    it('is asked at the click: the call goes once the error has gone', async () => {
+        const { updateData, sent } = hostAnswering(undefined)
+        let shown = true
+        const apply = () => applyPeriods({
+            updateData,
+            showsAnError: () => shown,
+            readFormsData: () => ({ weight: 2 }),
+            onUpdated: () => {},
+            onFailure: failNever,
+        })
+
+        await apply()
+        shown = false
+        await apply()
+
+        expect(sent).toEqual([{ weight: 2 }])
+    })
 })
 
 describe('a failure', () => {
@@ -78,6 +121,7 @@ describe('a failure', () => {
 
         await applyPeriods({
             updateData: () => Promise.reject(failure),
+            showsAnError: noErrorShown,
             readFormsData: () => ({}),
             onUpdated: () => {},
             onFailure: (message, error) => failures.push([message, error]),
@@ -116,6 +160,7 @@ describe('a failure', () => {
 
             await applyPeriods({
                 updateData: () => Promise.reject(failure),
+                showsAnError: noErrorShown,
                 readFormsData: () => ({}),
                 onUpdated: () => {},
                 onFailure: (message, error) => failures.push([message, error]),
@@ -130,6 +175,7 @@ describe('a failure', () => {
 
             await expect(applyPeriods({
                 updateData: () => Promise.reject(new TestResponse('', false)),
+                showsAnError: noErrorShown,
                 readFormsData: () => ({}),
                 onUpdated: () => {},
                 onFailure: (message, error) => failures.push([message, error]),
@@ -145,6 +191,7 @@ describe('a failure', () => {
 
         await applyPeriods({
             updateData,
+            showsAnError: noErrorShown,
             readFormsData: () => ({}),
             onUpdated: () => { throw failure },
             onFailure: (message, error) => failures.push(error),

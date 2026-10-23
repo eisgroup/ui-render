@@ -1,5 +1,5 @@
-import { errorsProcessing, mapErrorObjectToUIFormat, convertFieldNameToTitleCaseText } from '../errorMapping'
-import { errorsFor, touchedFor } from '../../state/formRegistry'
+import { errorsProcessing, mapErrorObjectToUIFormat, convertFieldNameToTitleCaseText, showsAnError } from '../errorMapping'
+import { errorsFor, holdFixableField, touchedFor } from '../../state/formRegistry'
 
 describe('errorsProcessing', () => {
     function makeFormWithErrors (fieldStates, registered = Object.keys(fieldStates)) {
@@ -140,6 +140,59 @@ describe('mapErrorObjectToUIFormat', () => {
         expect(mapErrorObjectToUIFormat(errorsFor(form))).toEqual({
             'items[0].name': { messages: [{ text: 'Name is Required' }] },
         })
+    })
+})
+
+describe('showsAnError', () => {
+    /** A form whose fields are in the given states, every one of them counted as one the user can fix. */
+    function formWith (fieldStates, fixable = Object.keys(fieldStates)) {
+        const form = { getFieldState: name => fieldStates[name] }
+        fixable.forEach(name => holdFixableField(form, name))
+        return form
+    }
+    const formsOf = (...forms) => new Map(forms.map(form => [{}, { form, meta: {}, tree: {}, draftRow: false }]))
+
+    const required = { error: 'Required', touched: false, pristine: true }
+
+    it('is false for no forms, and for a form whose fields are valid', () => {
+        expect(showsAnError(new Map())).toBe(false)
+        expect(showsAnError(formsOf(formWith({ weight: { touched: true, pristine: false } })))).toBe(false)
+    })
+
+    it('is false for an error the field does not show yet: untouched and unchanged', () => {
+        expect(showsAnError(formsOf(formWith({ weight: required })))).toBe(false)
+    })
+
+    it.each([
+        ['touched', { ...required, touched: true }, false],
+        ['changed', { ...required, pristine: false }, false],
+        ['remembered as touched', required, true],
+    ])('is true for an error the field shows once it is %s', (_label, state, remembered) => {
+        const form = formWith({ weight: state })
+        if (remembered) touchedFor(form).weight = true
+
+        expect(showsAnError(formsOf(formWith({}), form))).toBe(true)
+    })
+
+    it('reads only the fields whose error the user can fix', () => {
+        // `months` is disabled or readonly, or shows no error of its own: nothing counted it.
+        const form = formWith({ months: { ...required, touched: true } }, [])
+
+        expect(showsAnError(formsOf(form))).toBe(false)
+    })
+
+    it('skips a counted field the form no longer registers', () => {
+        expect(showsAnError(formsOf(formWith({}, ['gone'])))).toBe(false)
+    })
+
+    it('changes no field state: it only reads it', () => {
+        const state = { ...required, touched: true }
+        const form = formWith({ weight: state })
+
+        showsAnError(formsOf(form))
+
+        expect(state).toEqual({ error: 'Required', touched: true, pristine: true })
+        expect(touchedFor(form)).toEqual({})
     })
 })
 
