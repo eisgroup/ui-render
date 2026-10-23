@@ -883,6 +883,11 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A table with `highlight-1-last`, `highlight-2-last` or `highlight-3-last` highlights its own last rows.** An
+  expanded row shows its content in a row of its own below it, and the rule counted that row as one of the last:
+  expanding one of them highlighted its content, all of it drawn bold, in place of a row of the table. The rule also
+  reached the rows of every table nested in a highlighted one, and highlighted the last of them. Now a table counts
+  only its own rows, and not the content rows, which carry the class `app__table__expansion`.
 - **`onApplyPeriods` sends nothing while a field shows its validation error.** It sent the table as it
   was: a user emptied a required number field, the field showed `Required`, the host's
   `getValidationErrors` heard it, and `apiCalls.updateData` received the row with `""` in it, where a

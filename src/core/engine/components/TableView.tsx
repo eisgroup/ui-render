@@ -449,8 +449,9 @@ function TableView (props: TableViewProps) {
         <Table.Row className={className as string | undefined}>
           {renderItemCells ? renderItemCells(item, index) : headers!.map((header, column) => renderItemData(item, index, header, column))}
         </Table.Row>
+        {/* Its class keeps it out of the rows a `highlight-N-last` table counts (table.less). */}
         {renderItem && expandedByRow(index) &&
-          <Table.Row>
+          <Table.Row className='app__table__expansion'>
             <Table.Cell colSpan={headers!.length}>
               {renderItem(item, index)}
             </Table.Cell>
