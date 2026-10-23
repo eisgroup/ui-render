@@ -6,7 +6,7 @@
  * `errorMapping.ts` and `dataMapping.ts`.
  */
 import type { FormApi } from 'final-form'
-import { get, merge, isObject, hasObjectValue } from '../utils/object'
+import { get, merge, isObject, hasObjectValue, set } from '../utils/object'
 import type { RegisteredForm } from '../state/formRegistry'
 import { FIELD } from '../modules'
 import { cloneDeep } from '../utils'
@@ -30,18 +30,7 @@ type Values = Record<string, any>
 type Forms = ReadonlyMap<object, RegisteredForm>
 
 export const getFormsData = (forms: Forms) => {
-  const formDataArray: Values[] = [];
-
-  forms.forEach(value => {
-    const { form, meta } = value;
-    // A cast, not a guard: what a form registers as its meta is its document's meta.
-    const formData = getStructuredDataFromFormObject(form, meta as MetaNode | undefined);
-    if (formData) {
-      formDataArray.push(formData);
-    }
-  })
-
-  return mergeData([...formDataArray]);
+  return mergeForms(forms, changeOptionOrderForSelectFields);
 }
 
 /**
@@ -142,58 +131,61 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
  * Used for showIf lookups where array indices must match the original data order.
  */
 export const getRawFormsData = (forms: Forms) => {
-  const formDataArray: Values[] = [];
+  return mergeForms(forms, values => values);
+}
+
+/**
+ * THE FORMS' VALUES IN ONE DOCUMENT: the forms that hold it from its root, as `mergeData` merges them, then
+ * the row that each table row's own form holds, written over the document's copy of that row (2026-10-23).
+ *
+ * A table row with a form of its own registers the row's place as its meta's `relativePath` and
+ * `relativeIndex`. That is the add row a `renderExtraItem` declaration renders, or a row a `useForm`
+ * declaration gives a form. Its fields are named by that place (`dataKind.periods[1].startDate`), so its
+ * values hold the row there already. They were placed there a second time, at
+ * `dataKind.periods[1].dataKind.periods[1]`. Measured: a `showIf` in the add row never saw the row's own
+ * fields, and an edit in a `useForm` row put a copy of the table inside that row in `getFormData`.
+ *
+ * - Only the row is taken. The rest of such a form's values is what it started from, the row's data or
+ *   the declared `initialValues`, at the root of its values, where none of its fields reads.
+ * - The row goes into the document's own containers. In containers of its own, the row of a table nested
+ *   in a row (`dataKind.phases.0.dataKind.lineItems[2]`) made `phases` an object, which the merge put in
+ *   place of the document's array of phases.
+ * - The rows go last. Forms register as they mount, children first, and `mergeData` finds no master in a
+ *   document with one key at its root, so the document's copy of an edited row came last and won.
+ *
+ * @param {Map} forms - the forms to merge, `formsOf` or `dataFormsOf` a document tree
+ * @param {Function} fromRoot - what a form that holds the document from its root contributes of its values
+ * @returns {Object|undefined} the merged values, or `undefined` when no form contributes any
+ */
+function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | undefined) => Values) {
+  const documents: Values[] = [];
+  const rows: Array<{ place: string, row: unknown }> = [];
 
   forms.forEach(value => {
-    const { form, meta } = value;
-    // A cast, not a guard: as in `getFormsData`.
-    const { relativePath, relativeIndex } = (meta || {}) as MetaNode;
+    const { form } = value;
+    // A cast, not a guard: what a form registers as its meta is its document's meta.
+    const meta = value.meta as MetaNode | undefined;
+    const { relativePath, relativeIndex } = meta || {};
     if (relativePath && typeof relativeIndex === 'undefined') return;
 
     const formValues = cloneDeep(form.getState().values);
 
     if (!relativePath) {
-      formDataArray.push(formValues);
-    } else {
-      // Not undefined: a relative path without an index returned above.
-      formDataArray.push(createObjectStructure(formValues, relativePath, relativeIndex!));
+      documents.push(fromRoot(formValues, meta));
+      return;
     }
+    // Its fields are named `${place}.${name}` (`mapper.tsx`).
+    const place = `${relativePath}[${relativeIndex}]`;
+    const row = get(formValues, place);
+    if (row !== undefined) rows.push({ place, row });
   })
 
-  return mergeData([...formDataArray]);
-}
-
-const getStructuredDataFromFormObject = (form: FormApi, meta: MetaNode | undefined) => {
-  const { relativePath, relativeIndex } = meta || {};
-
-  if (relativePath && typeof relativeIndex === 'undefined') {
-    return;
-  }
-
-  const formValues = cloneDeep(form.getState().values);
-  const formState = changeOptionOrderForSelectFields(formValues, meta);
-
-  if (!relativePath) {
-    return formState;
-  }
-
-  // Not undefined: a relative path without an index returned above.
-  return createObjectStructure(formState, relativePath, relativeIndex!);
-}
-
-const createObjectStructure = (value: unknown, relativePath: string, relativeIndex: number): Values => {
-  return relativePath.split('.').reverse().reduce((acc: Values, item, index) => {
-    const result: Values = {};
-    if (index === 0) {
-      const tmpArray: unknown[] = [];
-      tmpArray[relativeIndex] = value;
-      result[item] = tmpArray;
-    } else {
-      result[item] = acc;
-    }
-
-    return result;
-  }, {})
+  const merged = mergeData(documents);
+  if (!rows.length) return merged;
+  // Written in place, which changes no form: each form's values were cloned before they were merged.
+  const result: Values = merged || {};
+  rows.forEach(({ place, row }) => set(result, place, merge(get(result, place), row)));
+  return result;
 }
 
 const mergeData = (formData: Values[]) => {
