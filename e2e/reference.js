@@ -703,8 +703,25 @@ const SCROLLBAR = {
     HOST_THICKNESS_PX: 12,
 }
 
+/**
+ * A table's header cells, on the demo page, at the window width of the measurement: four headers, the third with a
+ * label that takes two lines, and a background class in the `classNameHeader` of three of them. [I] since 2026-10-23.
+ * `classNameHeader` puts its classes on the `th`, and `table.less` gave the `th` the header colour as
+ * `table:not(.as-layout) tr th`, which outweighed the class: the cell kept the header colour.
+ */
+const HEADER_BACKGROUND = {
+    VIEWPORT: { width: 560, height: 800 },
+    CLASS: 'bg-primary-light2',
+    /** A text with the class beside the table, which the class paints: its colour is the one a header should take. */
+    SWATCH: 'Swatch',
+    LONG_LABEL: 'Annual amount of the requests processed in the period, in the currency of the request',
+    /** `@table-header-bg-color`, which a header without a background class keeps. */
+    HEADER_COLOUR: 'rgb(245, 245, 245)',
+    TRANSPARENT: 'rgba(0, 0, 0, 0)',
+}
+
 module.exports = {
     BUBBLE_CLASS, CORPUS, TIMING, DISMISSAL, INLINE, WIDGET, TOUCH, KEYBOARD, DROPDOWN,
     DATE_INPUT, POPUP, SLIDER, TOGGLE, CHECKBOX, POINTER_DROPDOWN, TABLE, HIGHLIGHTED_ROWS, PROGRESS_STEPS, TAB_BAR_FIELD,
-    UPLOAD_REFUSAL, SCROLLBAR,
+    UPLOAD_REFUSAL, SCROLLBAR, HEADER_BACKGROUND,
 }
