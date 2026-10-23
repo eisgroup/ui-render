@@ -2703,25 +2703,29 @@
  * because the desired effect is overlay scrollbar with content background showing through.
  * However, as soon as the scrollbar is styled, transparent track background shows the content of parent container,
  * and not the overflowing content itself, like the desired default behavior in Mac OS.
+ *
+ * The bars are 8px thick: at 3px they were too thin to grab. No rule here is `!important`, so a host's rule after
+ * this stylesheet restyles them without one, such as `.ui-render ::-webkit-scrollbar { width: 12px; height: 12px; }`.
+ * Firefox does not read these pseudo-elements, and draws the system's bars.
 */
 .ui-render ::-webkit-scrollbar {
-  width: 3px !important;
-  height: 3px !important;
+  width: 8px;
+  height: 8px;
 }
 /* this targets the default scrollbar (compulsory) */
 .ui-render ::-webkit-scrollbar-track {
-  background: transparent !important;
+  background: transparent;
 }
 /* the new scrollbar will have a flat appearance with the set background color */
 .ui-render ::-webkit-scrollbar-thumb {
-  background: rgba(68, 68, 68, 0.3) !important;
-  border-radius: 0.4375rem !important;
-  border: 1px solid rgba(68, 68, 68, 0.3) !important;
+  background: rgba(68, 68, 68, 0.3);
+  border-radius: 0.4375rem;
+  border: 1px solid rgba(68, 68, 68, 0.3);
 }
 /* this will style the thumb, ignoring the track */
 /* optionally, style the top + bottom buttons (left and right for horizontal bars) */
 .ui-render ::-webkit-scrollbar-corner {
-  background: transparent !important;
+  background: transparent;
 }
 /* if both the vertical + horizontal bars appear, the right bottom corner needs to be styled */
 .ui-render .no-scrollbar::-webkit-scrollbar {
@@ -2977,7 +2981,7 @@
 .ui-render table.no-header > thead {
   display: none;
 }
-.ui-render table.highlight-1-last tbody > tr:last-child, .ui-render table.highlight-2-last tbody > tr:nth-last-child(-n+2), .ui-render table.highlight-3-last tbody > tr:nth-last-child(-n+3) {
+.ui-render table.highlight-1-last > tbody > tr:nth-last-child(1 of :not(.app__table__expansion)), .ui-render table.highlight-2-last > tbody > tr:nth-last-child(-n + 2 of :not(.app__table__expansion)), .ui-render table.highlight-3-last > tbody > tr:nth-last-child(-n + 3 of :not(.app__table__expansion)) {
   background-color: rgba(0, 0, 0, 0.025);
   font-weight: 500!important;
 }
@@ -2993,7 +2997,7 @@
 .ui-render th, .ui-render td {
   padding: 0;
 }
-.ui-render th > *:only-child:empty::before, .ui-render td > *:only-child:empty::before, .ui-render th > *:only-child > *:only-child:empty::before, .ui-render td > *:only-child > *:only-child:empty::before {
+.ui-render th > *:only-child:empty::before, .ui-render td > *:only-child:empty::before, .ui-render th > *:only-child > *:only-child:empty::before, .ui-render td > *:only-child > *:only-child:empty::before, .ui-render th > *:only-child > .sr-only:first-child + *:last-child:empty::before, .ui-render td > *:only-child > .sr-only:first-child + *:last-child:empty::before {
   content: 'A';
   visibility: hidden;
 }

@@ -67,9 +67,11 @@ table {
     }
   }
 
-  &.highlight-1-last tbody > tr:last-child,
-  &.highlight-2-last tbody > tr:nth-last-child(-n+2),
-  &.highlight-3-last tbody > tr:nth-last-child(-n+3) {
+  // The last rows of the table's own body: not those of a table nested in one of its rows, and not the row an
+  // expanded row shows its content in, which follows that row (`app__table__expansion`, TableView.tsx).
+  &.highlight-1-last > tbody > tr:nth-last-child(1 of :not(.app__table__expansion)),
+  &.highlight-2-last > tbody > tr:nth-last-child(-n+2 of :not(.app__table__expansion)),
+  &.highlight-3-last > tbody > tr:nth-last-child(-n+3 of :not(.app__table__expansion)) {
     background-color: @color-table-lightest;
     font-weight: 500!important;
   }
@@ -116,9 +118,11 @@ th, td {
     }
   }
 
-  // Make empty Cell take full height to show border correctly
+  // Make empty Cell take full height to show border correctly. A header without a label holds its `id`, which only a
+  // screen reader reads, and then its empty text (`TableView.tsx`)
   > *:only-child:empty,
-  > *:only-child > *:only-child:empty {
+  > *:only-child > *:only-child:empty,
+  > *:only-child > .sr-only:first-child + *:last-child:empty {
     &::before {
       content: 'A';
       visibility: hidden;
