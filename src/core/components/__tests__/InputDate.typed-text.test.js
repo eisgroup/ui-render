@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import moment from 'moment'
+import 'moment/locale/de'
 import InputDate from '../InputDate'
 import { ConfigContext } from '../../contexts/ConfigContext'
 
@@ -10,15 +12,18 @@ import { ConfigContext } from '../../contexts/ConfigContext'
 
 const config = { dateFormat: 'MM-DD-YYYY' }
 
+// A locale moment loads becomes its global one, in a host as here.
+moment.locale('en')
+
 /**
  * The field as a document renders it: its value comes back through `onChange`, and it renders again when it is left,
  * as a field marked touched does.
  */
-function Field ({ initial = null, onChange, onInvalidText }) {
+function Field ({ initial = null, onChange, onInvalidText, configured = config }) {
     const [value, setValue] = useState(initial)
     const [, setLeft] = useState(0)
     return (
-        <ConfigContext.Provider value={config}>
+        <ConfigContext.Provider value={configured}>
             <InputDate
                 name="startDate"
                 value={value}
@@ -214,5 +219,54 @@ describe('InputDate: text a user types', () => {
         await frames()
 
         expect(input).toHaveValue('02-29-2021')
+    })
+})
+
+describe('InputDate: text a user types in a format that names the month', () => {
+    // rc-picker reads the month's name in its own moment locale, the one the host's `locale` names (2026-10-23).
+    const english = { dateFormat: 'DD MMM YYYY' }
+    const german = { dateFormat: 'DD MMM YYYY', locale: 'de-DE' }
+
+    /** What the field hands on and reports once `text` is typed in it and it is left, and the text it shows. */
+    async function typed (configured, text) {
+        const onChange = jest.fn()
+        const onInvalidText = jest.fn()
+        const { container } = render(<Field configured={configured} onChange={onChange} onInvalidText={onInvalidText}/>)
+        const input = container.querySelector('input[name="startDate"]')
+        typeAndLeave(input, text)
+        await frames()
+        return { changes: onChange.mock.calls, reports: onInvalidText.mock.calls, shown: input.value }
+    }
+
+    it.each([
+        ['an English name where the host names no locale, as before', english, '20 Mar 2024'],
+        ['a German name where the host names German', german, '20 März 2024'],
+    ])('takes %s', async (_, configured, text) => {
+        expect(await typed(configured, text)).toEqual({ changes: [['2024-03-20']], reports: [], shown: text })
+    })
+
+    it.each([
+        ['a German name where the host names no locale, as before', english, '20 März 2024'],
+        ['an English name where the host names German', german, '20 Mar 2024'],
+    ])('keeps and reports %s, which is no date in the field\'s locale', async (_, configured, text) => {
+        expect(await typed(configured, text)).toEqual({ changes: [], reports: [[text]], shown: text })
+    })
+
+    it('reports no text once it is corrected to a German name, and takes the date', async () => {
+        const onChange = jest.fn()
+        const onInvalidText = jest.fn()
+        const { container } = render(<Field configured={german} onChange={onChange} onInvalidText={onInvalidText}/>)
+        const input = container.querySelector('input[name="startDate"]')
+        typeAndLeave(input, '20 Mar 2024')
+        await frames()
+
+        act(() => input.focus())
+        fireEvent.change(input, { target: { value: '20 März 2024' } })
+        expect(onInvalidText.mock.calls).toEqual([['20 Mar 2024'], [null]])
+        act(() => input.blur())
+        await frames()
+
+        expect(onChange.mock.calls).toEqual([['2024-03-20']])
+        expect(input).toHaveValue('20 März 2024')
     })
 })

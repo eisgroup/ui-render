@@ -48,7 +48,8 @@ describe('InputDate rc-picker and form contracts', () => {
             allowClear: false,
             format: ['DD/MM/YYYY', 'YYYY-MM-DD'],
             generateConfig,
-            locale: enUs,
+            // rc-picker's English texts, and moment's English for the month and day names, which `en_US` is to moment.
+            locale: { ...enUs, locale: 'en' },
             name: 'effectiveDate',
             picker: 'date',
             prefixCls: 'ui-render-picker',
@@ -56,6 +57,20 @@ describe('InputDate rc-picker and form contracts', () => {
         }))
 
         expect(() => pickerProps().onChange(moment('2026-07-31'))).not.toThrow()
+    })
+
+    it('hands rc-picker one locale while its texts and its moment locale stay the same', () => {
+        // rc-picker keeps what it makes of its locale by identity: the text it shows a date as, its formats.
+        const field = config => withConfig(<InputDate name="effectiveDate" value="2026-07-31"/>, config)
+        const { rerender } = render(field({ dateFormat: 'DD.MM.YYYY' }))
+        rerender(field({ dateFormat: 'DD.MM.YYYY' }))
+        rerender(field({ dateFormat: 'DD.MM.YYYY', locale: 'de-DE' }))
+
+        const locales = Picker.render.mock.calls.map(([props]) => props.locale)
+        expect(locales).toHaveLength(3)
+        expect(locales[1]).toBe(locales[0])
+        expect(locales[2]).not.toBe(locales[0])
+        expect(locales[2]).toEqual({ ...enUs, locale: 'de' })
     })
 
     it('normalizes a selected date and exposes the configured display format', () => {

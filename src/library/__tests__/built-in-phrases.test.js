@@ -23,6 +23,10 @@ const GERMAN = {
     Report: 'Bericht',
     Title: 'Titel',
     // The built-in phrases.
+    'ui-render:CALENDAR_OK': 'Übernehmen',
+    'ui-render:CHOOSE_A_DECADE': 'Jahrzehnt wählen',
+    'ui-render:CHOOSE_A_MONTH': 'Monat wählen',
+    'ui-render:CHOOSE_A_YEAR': 'Jahr wählen',
     'ui-render:DOWNLOAD_FAILED': 'Herunterladen fehlgeschlagen!',
     'ui-render:ERROR': 'Fehler',
     'ui-render:FILE': 'Datei',
@@ -32,11 +36,15 @@ const GERMAN = {
     'ui-render:INVALID_DATE': 'Ungültiges Datum',
     'ui-render:INVALID_EMAIL_ADDRESS': 'Ungültige E-Mail-Adresse',
     'ui-render:INVALID_URL': 'Ungültige URL',
+    'ui-render:LAST_YEAR': 'Voriges Jahr (Strg + links)',
     'ui-render:MAXIMUM_FILE_SIZE_EXCEEDED': 'Datei zu groß!',
     'ui-render:MUST_BE_LESS_THAN_CHARACTERS': 'Höchstens {count} Zeichen',
     'ui-render:MUST_BE_MAXIMUM': 'Höchstens {max}',
     'ui-render:MUST_BE_MINIMUM': 'Mindestens {min}',
+    'ui-render:NEXT_MONTH': 'Nächster Monat (Bild ab)',
     'ui-render:NEXT_PAGE': 'Nächste Seite',
+    'ui-render:NEXT_YEAR': 'Nächstes Jahr (Strg + rechts)',
+    'ui-render:NOW': 'Jetzt',
     'ui-render:OFF': 'AUS',
     'ui-render:OK': 'Verstanden',
     'ui-render:ON': 'AN',
@@ -44,6 +52,7 @@ const GERMAN = {
     'ui-render:PAGINATION': 'Seitennavigation',
     'ui-render:POPUP': 'Dialog',
     'ui-render:POPUP_CONTENT_IS_EMPTY': 'Der Dialog ist leer',
+    'ui-render:PREVIOUS_MONTH': 'Voriger Monat (Bild auf)',
     'ui-render:PREVIOUS_PAGE': 'Vorherige Seite',
     'ui-render:REQUIRED': 'Pflichtfeld',
     'ui-render:SELECT': 'Bitte wählen',
@@ -52,9 +61,11 @@ const GERMAN = {
     'ui-render:SLIDER_MAXIMUM': '{name}, Maximum',
     'ui-render:SLIDER_MINIMUM': '{name}, Minimum',
     'ui-render:TABLE_HAS_NO_DATA': 'Die Tabelle hat keine Daten!',
+    'ui-render:TODAY': 'Heute',
     'ui-render:UPLOAD_FILE': '{file} hochladen',
     'ui-render:UPLOAD_FILES_ONLY': 'Nur {formats}-Dateien hochladen',
     'ui-render:UPLOAD_LABEL_FILE': '{label}-Datei hochladen',
+    'ui-render:WEEK': 'Woche',
 }
 const german = value => (value in GERMAN ? GERMAN[value] : value)
 // A host with no translation for a key answers with the key, as an i18next-based host translate does.
@@ -96,6 +107,17 @@ const SEEN_IN_GERMAN = {
     uploadFile: 'Datei hochladen',
     uploadReport: 'Bericht hochladen',
     uploadReportFile: 'Bericht-Datei hochladen',
+    calendarOk: 'Übernehmen',
+    chooseADecade: 'Jahrzehnt wählen',
+    chooseAMonth: 'Monat wählen',
+    chooseAYear: 'Jahr wählen',
+    lastYear: 'Voriges Jahr (Strg + links)',
+    nextMonth: 'Nächster Monat (Bild ab)',
+    nextYear: 'Nächstes Jahr (Strg + rechts)',
+    now: 'Jetzt',
+    previousMonth: 'Voriger Monat (Bild auf)',
+    today: 'Heute',
+    week: 'Woche',
 }
 const SEEN_IN_ENGLISH = {
     downloadFailed: 'Download Failed!',
@@ -132,6 +154,17 @@ const SEEN_IN_ENGLISH = {
     uploadFile: 'Upload File',
     uploadReport: 'Upload Report',
     uploadReportFile: 'Upload Report File',
+    calendarOk: 'OK',
+    chooseADecade: 'Choose a decade',
+    chooseAMonth: 'Choose a month',
+    chooseAYear: 'Choose a year',
+    lastYear: 'Last year (Control + left)',
+    nextMonth: 'Next month (PageDown)',
+    nextYear: 'Next year (Control + right)',
+    now: 'Now',
+    previousMonth: 'Previous month (PageUp)',
+    today: 'Today',
+    week: 'Week',
 }
 
 beforeEach(() => {
@@ -236,6 +269,65 @@ describe.each([
             expect(reports[reports.length - 1]).toEqual({
                 title: { messages: [{ text: 'Title is Required' }] },
                 mail: { messages: [{ text: seen.invalidEmail }] },
+            })
+        })
+    })
+
+    describe('in a date field\'s calendar', () => {
+        const field = { view: 'Input', type: 'date', name: 'start', label: 'Start' }
+
+        /**
+         * Opens the calendar of a document of the date field `meta` and hands it to `check`. rc-picker opens and closes
+         * it with timers, and React 16, 17 and 19 report each step that lands outside `act`: the timers are fake, every
+         * step runs inside one, and the document unmounts before the real timers come back.
+         */
+        const withCalendar = (meta, check) => {
+            jest.useFakeTimers()
+            try {
+                const view = mount(meta, { start: '2024-03-15' })
+                const input = view.container.querySelector('.ui-render-picker input')
+                act(() => {
+                    fireEvent.mouseDown(input)
+                    fireEvent.click(input)
+                })
+                act(() => { jest.runAllTimers() })
+                check(document.querySelector('.ui-render-picker-dropdown'))
+                view.unmount()
+                act(() => { jest.runAllTimers() })
+            } finally {
+                jest.useRealTimers()
+            }
+        }
+        const headerNamesOf = calendar => Array.from(
+            calendar.querySelectorAll('.ui-render-picker-header button'), button => button.getAttribute('aria-label'),
+        )
+
+        it('the names of the buttons over its days, and the link to today under them', () => {
+            withCalendar(field, calendar => {
+                expect(headerNamesOf(calendar)).toEqual([
+                    seen.lastYear, seen.previousMonth, seen.chooseAMonth, seen.chooseAYear, seen.nextMonth, seen.nextYear,
+                ])
+                expect(calendar.querySelector('.ui-render-picker-footer')).toHaveTextContent(new RegExp(`^${seen.today}$`))
+            })
+        })
+
+        it('the names of the buttons over its months and over its years', () => {
+            withCalendar(field, calendar => {
+                fireEvent.click(calendar.querySelector('.ui-render-picker-month-btn'))
+                expect(headerNamesOf(calendar)).toEqual([seen.lastYear, seen.chooseAYear, seen.nextYear])
+
+                fireEvent.click(calendar.querySelector('.ui-render-picker-year-btn'))
+                expect(headerNamesOf(calendar)).toEqual([seen.lastYear, seen.chooseADecade, seen.nextYear])
+            })
+        })
+
+        it('what it shows where its meta asks rc-picker for more: week numbers, a button that takes a date, a time', () => {
+            withCalendar({ ...field, showWeek: true, needConfirm: true }, calendar => {
+                expect(calendar.querySelector('.ui-render-picker-content thead th')).toHaveTextContent(new RegExp(`^${seen.week}$`))
+                expect(within(calendar).getByRole('button', { name: seen.calendarOk })).toBeInTheDocument()
+            })
+            withCalendar({ ...field, showTime: true }, calendar => {
+                expect(calendar.querySelector('.ui-render-picker-now-btn')).toHaveTextContent(new RegExp(`^${seen.now}$`))
             })
         })
     })

@@ -246,6 +246,12 @@ module.exports = {
             functions: 100,
             lines: 100,
         },
+        './src/core/components/calendarLocale.ts': {
+            statements: 100,
+            branches: 100,
+            functions: 100,
+            lines: 100,
+        },
         './src/core/components/ProgressSteps.tsx': {
             statements: 100,
             branches: 100,

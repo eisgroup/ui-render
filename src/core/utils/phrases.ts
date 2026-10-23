@@ -33,6 +33,19 @@ export const BUILT_IN_PHRASES = {
   SLIDER_MAXIMUM: '{name}, maximum', // The name a screen reader gives a range slider's upper handle; `{name}` is the slider's `label`, or else its `name`
   SLIDER_MINIMUM: '{name}, minimum', // The name a screen reader gives a range slider's lower handle; `{name}` is the slider's `label`, or else its `name`
 
+  // A date field's calendar
+  CALENDAR_OK: 'OK', // The button under a date field's calendar that takes the date picked in it, where its meta gives `needConfirm` or `showTime`
+  CHOOSE_A_DECADE: 'Choose a decade', // The name a screen reader gives the decade over the years of a date field's calendar, a button that shows the decades
+  CHOOSE_A_MONTH: 'Choose a month', // The name a screen reader gives the month over the days of a date field's calendar, a button that shows the months
+  CHOOSE_A_YEAR: 'Choose a year', // The name a screen reader gives the year over the days or the months of a date field's calendar, a button that shows the years
+  LAST_YEAR: 'Last year (Control + left)', // The name a screen reader gives the button that goes a year back in a date field's calendar: a decade back where the calendar shows years, a century where it shows decades
+  NEXT_MONTH: 'Next month (PageDown)', // The name a screen reader gives the button that goes a month forward in a date field's calendar
+  NEXT_YEAR: 'Next year (Control + right)', // The name a screen reader gives the button that goes a year forward in a date field's calendar: a decade forward where the calendar shows years, a century where it shows decades
+  NOW: 'Now', // The link under a date field's calendar that picks the current date and time, where its meta gives `showTime`
+  PREVIOUS_MONTH: 'Previous month (PageUp)', // The name a screen reader gives the button that goes a month back in a date field's calendar
+  TODAY: 'Today', // The link under a date field's calendar that picks today
+  WEEK: 'Week', // The name a screen reader gives the column of week numbers in a date field's calendar, where its meta gives `showWeek`
+
   // Validation messages, under a field
   END_DATE_CANNOT_BE_LESS_THAN_START_DATE: 'End date cannot be less than start date', // A period's end date, checked by `notWithinRange`, where it is before the start date
   INVALID_DATE: 'Invalid date', // A date field left with text that is no date in its format, which it keeps showing

@@ -7,7 +7,6 @@ import View from './View'
 import Label from './Label'
 import { Active } from '../utils'
 import PickerJs from 'rc-picker'
-import enUs from 'rc-picker/lib/locale/en_US'
 import generateConfig from 'rc-picker/lib/generate/moment'
 import moment from 'moment'
 import { ConfigContext } from '../contexts'
@@ -17,6 +16,7 @@ import type { Moment } from 'moment'
 import type { Translate } from '../utils/_envs'
 import type { PhraseMessage } from '../utils/phrases'
 import { useOwnId } from './useOwnId'
+import { dateLocaleOf, useCalendarLocale } from './calendarLocale'
 
 type DatePickerProps = PickerProps<Moment>
 
@@ -25,7 +25,28 @@ type DatePickerProps = PickerProps<Moment>
  * it renders carries the attribute, the open panel included (measured). Typed rather than removed, so
  * that converting this file changes nothing at runtime.
  */
-const Picker = PickerJs as React.ComponentType<DatePickerProps & { resize?: boolean } & React.RefAttributes<PickerRef>>
+const RcPicker = PickerJs as React.ComponentType<DatePickerProps & { resize?: boolean } & React.RefAttributes<PickerRef>>
+
+/**
+ * What `Picker` takes: rc-picker's props but its `locale`, which it makes of the last two, and the HTML `translate`
+ * attribute, whose name the document's translator takes.
+ */
+type CalendarPickerProps = Omit<DatePickerProps, 'locale' | 'translate'> & {
+    resize?: boolean
+    /** The document's translator, which the calendar's texts are asked of */
+    translate: Translate
+    /** The moment locale the field writes dates, month and day names in (`dateLocaleOf`) */
+    dateLocale: string
+}
+
+/**
+ * rc-picker, with its locale: its texts in the language of `translate`, its month and day names in `dateLocale`
+ * (`./calendarLocale`). A component of its own, so that a field asks for the texts only once its picker is mounted.
+ */
+const Picker = React.forwardRef<PickerRef, CalendarPickerProps>(function Picker ({translate, dateLocale, ...props}, ref) {
+    const locale = useCalendarLocale(translate, dateLocale)
+    return <RcPicker ref={ref} {...props} locale={locale}/>
+})
 
 // A layout effect in a browser. On the server, where no effect runs, an effect: React 16 and 17 warn about a layout
 // effect there.
@@ -89,11 +110,12 @@ function toMoment (date: unknown, dateFormat: string): Moment | null {
 }
 
 /**
- * Whether rc-picker reads `text` as a date, as it reads what a user types: strictly, in one of `formats`. Never the
- * lenient read of `toMoment`, which takes `02-29-2021` for 2021-02-28 and `11-31-2021` for 2021-11-30.
+ * Whether rc-picker reads `text` as a date, as it reads what a user types: strictly, in one of `formats`, and in the
+ * moment locale `dateLocale`, its own, which names the months. Never the lenient read of `toMoment`, which takes
+ * `02-29-2021` for 2021-02-28 and `11-31-2021` for 2021-11-30.
  */
-function readsAsDate (text: string, formats: readonly string[]): boolean {
-    return formats.some(format => generateConfig.locale.parse(enUs.locale, text, [format]) !== null)
+function readsAsDate (text: string, formats: readonly string[], dateLocale: string): boolean {
+    return formats.some(format => generateConfig.locale.parse(dateLocale, text, [format]) !== null)
 }
 
 /** What the input rc-picker renders tells `InputDate` (`TextInput`). */
@@ -241,6 +263,9 @@ const InputDate = ({
     const config = useContext(ConfigContext)
 
     const dateFormat = useMemo(() => (config && config.dateFormat) || 'DD/MM/YYYY', [config])
+    // The month and day names follow the host's `locale`, else its `language`, and not moment's global locale: until
+    // 2026-10-23 they were English whatever the host set.
+    const dateLocale = useMemo(() => dateLocaleOf(config && config.locale, config && config.language), [config])
 
     if (autofocus) props.autoFocus = autofocus // React fix
     if (readonly) {
@@ -292,9 +317,9 @@ const InputDate = ({
     // emptied included: until the next focus, the field takes none.
     const emptied = useRef(false)
     // What the reports read of the latest render: they are made once.
-    const latest = useRef({value, formats, onChange, onInvalidText})
+    const latest = useRef({value, formats, dateLocale, onChange, onInvalidText})
     useBeforePaintEffect(() => {
-        latest.current = {value, formats, onChange, onInvalidText}
+        latest.current = {value, formats, dateLocale, onChange, onInvalidText}
     })
     const reports = useMemo<InputReports>(() => {
         const report = (text: string | null) => {
@@ -306,14 +331,16 @@ const InputDate = ({
         return {
             shows: (text) => {
                 // A date now, or nothing: the user corrected the text, or rc-picker showed a value in its place.
-                if (invalidText.current !== null && (!text || readsAsDate(text, latest.current.formats))) report(null)
+                const {formats, dateLocale} = latest.current
+                if (invalidText.current !== null && (!text || readsAsDate(text, formats, dateLocale))) report(null)
             },
             focuses: () => {
                 emptied.current = false
             },
             leaves: (text) => {
                 if (text) {
-                    report(readsAsDate(text, latest.current.formats) ? null : text)
+                    const {formats, dateLocale} = latest.current
+                    report(readsAsDate(text, formats, dateLocale) ? null : text)
                     return
                 }
                 report(null)
@@ -336,7 +363,8 @@ const InputDate = ({
         if (!onChange || emptied.current) return
 
         const changedDate = toMoment(date, dateFormat)
-        onChange(changedDate ? changedDate.format('YYYY-MM-DD') : null)
+        // In English, for its digits: rc-picker's date is in the field's locale, and one such as `ar` writes others.
+        onChange(changedDate ? changedDate.clone().locale('en').format('YYYY-MM-DD') : null)
     }
 
     // DOM boundary (see ./domProps): what reaches rc-picker, which forwards unknown props to its own <input>, so this
@@ -376,9 +404,10 @@ const InputDate = ({
                             // Mounted by a focus or a press on the stand-in: it takes the focus, and a press opens it.
                             {...(mounted !== 'near' && {autoFocus: true})}
                             {...(mounted === 'press' && {defaultOpen: true})}
+                            translate={translate}
+                            dateLocale={dateLocale}
                             value={value}
                             allowClear={false}
-                            locale={enUs}
                             picker='date'
                             format={formats}
                             preserveInvalidOnBlur
@@ -416,7 +445,7 @@ const InputDate = ({
                                 size={Math.max(10, dateFormat.length) + 2}
                                 id={given.id as string | undefined}
                                 // rc-picker's own text: the first format, in its locale, whatever moment's global one is.
-                                value={value ? generateConfig.locale.format(enUs.locale, value, dateFormat) : ''}
+                                value={value ? generateConfig.locale.format(dateLocale, value, dateFormat) : ''}
                                 placeholder={given.placeholder as string | undefined}
                                 disabled={given.disabled as boolean | undefined}
                                 tabIndex={given.tabIndex as number | undefined}
