@@ -91,6 +91,28 @@ describe('what a document tree tells of its forms\' values', () => {
         expect(treeValuesTellsSince(tree, 5)).toBeUndefined()
     })
 
+    it('empties its log as the task ends, and still tells what each form held', () => {
+        jest.useFakeTimers()
+        try {
+            const tree = {}
+            const form = {}
+            const heard = []
+            listenToTreeValues(tree, tell => heard.push(tell))
+            tellTreeValues(tree, form, { inner: 'a' })
+            expect(treeValuesTellsSince(tree, 0)).toHaveLength(1)
+
+            jest.runOnlyPendingTimers()
+            expect(treeValuesTellsSince(tree, 0)).toBeUndefined()
+            expect(treeValuesTellsSince(tree, 1)).toEqual([])
+
+            tellTreeValues(tree, form, { inner: 'b' })
+            expect(heard[1].previous).toEqual({ inner: 'a' })
+            expect(treeValuesTellsSince(tree, 1)).toHaveLength(1)
+        } finally {
+            jest.useRealTimers()
+        }
+    })
+
     it('tells its own listeners only, and none that stopped, even while it tells', () => {
         const tree = {}
         const heard = []

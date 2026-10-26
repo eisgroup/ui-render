@@ -154,6 +154,27 @@ describe.each(HOSTS)('for %s', (_, renders) => {
     })
 })
 
+it('a node whose `useForm` block under it decides it the other way settles', () => {
+    // The block's values merge over the document's, `status` included: as the node shows, the block's form comes and
+    // hides it, and as it hides, the form goes and shows it. It stops, rather than render until React gives up.
+    const meta = {
+        view: 'Col',
+        items: [
+            { view: 'Input', name: 'status', label: 'Status' },
+            {
+                view: 'Col',
+                showIf: { name: 'status', equal: 'open', relativeData: false },
+                items: [{ view: 'Data', useForm: true, name: 'details', meta: { view: 'Col', items: [{ view: 'Input', name: 'note', label: 'Note' }] } }],
+            },
+        ],
+    }
+    const data = { status: 'draft', details: { status: 'archived', note: 'x' } }
+    mount(meta, data, 'once')
+
+    type('status', 'open')
+    expect(screen.getByLabelText('Status')).toHaveValue('open')
+})
+
 it('a node beside a block shows as the block adopts the value a host hands it', () => {
     // The block's form is reset to its new initial values while the document renders on, and the node decides with it.
     const meta = { view: 'Col', items: [{ ...block, name: 'sub' }, gated] }

@@ -87,8 +87,10 @@ export type TreeValuesListener = (tell: TreeValuesTell) => void
  *
  * A tell says what the form held before as well, so a listener needs no memory of the forms it has not heard yet. The
  * latest tells are kept, oldest first, for a node to catch up with those made between its render and its commit: a
- * node that mounts hears none of them, and one that renders again hears them with the decision of its last render. A
- * WeakMap, so a tree that has gone takes all of it with it.
+ * node that mounts hears none of them, and one that renders again hears them with the decision of its last render.
+ * They are kept until the task that made them ends, where a node renders and commits: one that commits in a later task
+ * finds them gone, and decides again. Kept for longer, they held a copy of a form's values for each of the latest
+ * thousand changes, in every document. A WeakMap, so a tree that has gone takes all of it with it.
  */
 type TreeValues = {
 	listeners: Set<TreeValuesListener>,
@@ -96,9 +98,11 @@ type TreeValues = {
 	live: Map<object, unknown>,
 	version: number,
 	log: TreeValuesTell[],
+	/** Whether the log is to be emptied as the task ends */
+	emptying: boolean,
 }
 
-/** How many tells a tree keeps: the registrations of a mount, and more. A node that rendered before more decides again. */
+/** How many tells a tree keeps in a task: the registrations of a mount, and more. A node that rendered before more decides again. */
 const LOG_LENGTH = 1024
 
 const treeValues = new WeakMap<object, TreeValues>()
@@ -106,7 +110,7 @@ const treeValues = new WeakMap<object, TreeValues>()
 function valuesOf (tree: object): TreeValues {
 	let entry = treeValues.get(tree)
 	if (!entry) {
-		entry = { listeners: new Set(), live: new Map(), version: 0, log: [] }
+		entry = { listeners: new Set(), live: new Map(), version: 0, log: [], emptying: false }
 		treeValues.set(tree, entry)
 	}
 	return entry
@@ -143,6 +147,14 @@ export function tellTreeValues (tree: object, form: object, values: unknown): vo
 	const tell = { version: entry.version, form, previous, values }
 	entry.log.push(tell)
 	if (entry.log.length > LOG_LENGTH) entry.log.shift()
+	if (!entry.emptying) {
+		entry.emptying = true
+		const emptied = entry
+		setTimeout(() => {
+			emptied.log = []
+			emptied.emptying = false
+		}, 0)
+	}
 	// A copy, and only who still listens: a listener that a render stops while the others hear is told nothing more.
 	const { listeners } = entry
 	Array.from(listeners).forEach(listener => { if (listeners.has(listener)) listener(tell) })

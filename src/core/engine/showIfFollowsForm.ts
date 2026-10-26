@@ -46,6 +46,18 @@ const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayo
 
 const valueAt = (values: unknown, path: string) => values === undefined ? undefined : get(values, path)
 
+/** A change of a form's values, as against a form that registers or goes. */
+const isValueChange = (tell: TreeValuesTell) => tell.previous !== undefined && tell.values !== undefined
+
+/**
+ * How many times a node renders again on forms that come and go, between two changes of its tree's values. A form that
+ * comes and goes with the node itself would flip it for ever: a `useForm` block under it whose values merge over the
+ * field its `showIf` reads, and decide it the other way, comes as the node shows and hides it, and goes as it hides and
+ * shows it. Measured, React gives up with "Maximum update depth exceeded". The node stops there, and stays as it is
+ * until a value of its tree changes. Each coming or going counts up to twice: as the node hears it, and as it commits.
+ */
+const COMINGS_AND_GOINGS = 4
+
 /**
  * Whether `tell`, from another form than `own`, can change a decision that read `value` at `path`: that form's value
  * there changed, to another than `value`. One that ends at `value` leaves the merge of the forms as it was, and so does
@@ -89,11 +101,18 @@ export function useShowIfFollowsForm (
     )
     const latest = useRef(following)
     const decided = useRef<ShowIfDecision>(rendered)
+    // Renders again on forms that came or went, since a value of the tree last changed (`COMINGS_AND_GOINGS`).
+    const flips = useRef(0)
     // Decides again, by the latest render's `decide`, and renders the node again where the answer is another.
-    const decideAgain = useCallback(() => {
+    const decideAgain = useCallback((byValues: boolean) => {
         const was = decided.current
-        decided.current = latest.current!.decide() // not undefined: only a node with a path listens
-        if (decided.current.shown !== was.shown) renderAgain()
+        const next = latest.current!.decide() // not undefined: only a node with a path listens
+        if (next.shown !== was.shown && !byValues) {
+            flips.current += 1
+            if (flips.current > COMINGS_AND_GOINGS) return
+        }
+        decided.current = next
+        if (next.shown !== was.shown) renderAgain()
     }, [])
     useBeforePaintEffect(() => {
         if (!following) return
@@ -101,8 +120,14 @@ export function useShowIfFollowsForm (
         decided.current = { shown: following.shown, value: following.value }
         if (!listened) return
         const tells = treeValuesTellsSince(listened, following.renderedAt)
-        if (tells && !tells.some(tell => moves(tell, form, following.path, following.value))) return
-        decideAgain()
+        if (!tells) {
+            // Gone from the log: they were made in an earlier task, and the node decides again.
+            decideAgain(true)
+            return
+        }
+        if (tells.some(isValueChange)) flips.current = 0
+        const moving = tells.filter(tell => moves(tell, form, following.path, following.value))
+        if (moving.length) decideAgain(moving.some(isValueChange))
     }, [following, listened, form, decideAgain])
     useBeforePaintEffect(() => {
         if (!subscribed) return undefined
@@ -114,13 +139,15 @@ export function useShowIfFollowsForm (
             const first = seen === undefined
             if (seen && seen.path === path && Object.is(seen.value, now)) return
             seen = { path, value: now }
-            if (!first && !Object.is(now, decided.current.value)) decideAgain()
+            if (!first && !Object.is(now, decided.current.value)) decideAgain(true)
         }, { values: true })
     }, [subscribed, decideAgain])
     useBeforePaintEffect(() => {
         if (!listened) return undefined
         return listenToTreeValues(listened, tell => {
-            if (moves(tell, form, latest.current!.path, decided.current.value)) decideAgain()
+            const byValues = isValueChange(tell)
+            if (byValues) flips.current = 0
+            if (moves(tell, form, latest.current!.path, decided.current.value)) decideAgain(byValues)
         })
     }, [listened, form, decideAgain])
 }
