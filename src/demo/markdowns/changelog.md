@@ -1,6 +1,13 @@
 ### Table of Contents
 
-### Unreleased
+### v0.35.0
+
+React 17, 18 and 19 join 16.14 in the peer range, and Semantic UI is gone: the select, the table and
+the tooltip are the widget's own components. The stylesheet styles only the widget's wrapper, nothing
+is installed beside the package, and its TypeScript declarations describe the component it ships.
+Every text the widget writes itself can be translated, and a host switches language without a
+remount. Start with *Upgrading from 0.34*: it lists what a host may need to check or change, most
+likely first.
 
 #### Upgrading from 0.34
 
