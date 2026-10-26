@@ -137,3 +137,66 @@ describe('a date picked in a date field', () => {
         }
     })
 })
+
+describe('a date field\'s calendar, when the host switches language', () => {
+    const TEXTS = { en: {}, de: { 'ui-render:TODAY': 'Heute', 'ui-render:PREVIOUS_MONTH': 'Voriger Monat' } }
+    /** A `t` fixed to one language, as i18next's `getFixedT` makes one. */
+    const fixedT = language => key => (key in TEXTS[language] ? TEXTS[language][key] : key)
+
+    /**
+     * Opens the calendar of the date field above, mounted with `before`, rerenders the document with `after`, and
+     * hands `check` the calendar as it was, and as it is after: the same element, open.
+     */
+    function switching (before, after, check) {
+        jest.useFakeTimers()
+        try {
+            const host = props => <UIRender meta={meta} data={data} initialValues={data} {...props}/>
+            const view = render(host(before))
+            const input = view.container.querySelector('.ui-render-picker input')
+            act(() => {
+                fireEvent.mouseDown(input)
+                fireEvent.click(input)
+            })
+            act(() => { jest.runAllTimers() })
+            const calendar = document.querySelector('.ui-render-picker-dropdown')
+            const shown = () => ({
+                today: calendar.querySelector('.ui-render-picker-footer').textContent,
+                previousMonth: calendar.querySelector('.ui-render-picker-header-prev-btn').getAttribute('aria-label'),
+                month: monthOf(calendar),
+                week: weekDaysOf(calendar),
+            })
+            const was = shown()
+            act(() => { view.rerender(host(after())) })
+            act(() => { jest.runAllTimers() })
+            expect(document.querySelector('.ui-render-picker-dropdown')).toBe(calendar)
+            check(was, shown())
+            view.unmount()
+            act(() => { jest.runAllTimers() })
+        } finally {
+            jest.useRealTimers()
+        }
+    }
+
+    const IN_ENGLISH = { today: 'Today', previousMonth: 'Previous month (PageUp)', month: 'Mar', week: ENGLISH_WEEK }
+
+    it('shows its texts, month and day names in the new language for a switch of `language`', () => {
+        // An i18next-based host keeps one `t` and changes what it answers, and passes its current language along.
+        const i18n = { language: 'en' }
+        const t = key => fixedT(i18n.language)(key)
+        switching({ translate: t, language: 'en' }, () => {
+            i18n.language = 'de'
+            return { translate: t, language: 'de' }
+        }, (was, is) => {
+            expect(was).toEqual(IN_ENGLISH)
+            expect(is).toEqual({ today: 'Heute', previousMonth: 'Voriger Monat', month: 'März', week: GERMAN_WEEK })
+        })
+    })
+
+    it('shows its texts in the language of a new `translate`, and its month and day names in that of `language`', () => {
+        // Until 2026-10-23 a new `translate` was ignored, and the calendar kept the first one's texts.
+        switching({ translate: fixedT('en') }, () => ({ translate: fixedT('de') }), (was, is) => {
+            expect(was).toEqual(IN_ENGLISH)
+            expect(is).toEqual({ ...IN_ENGLISH, today: 'Heute', previousMonth: 'Voriger Monat' })
+        })
+    })
+})
