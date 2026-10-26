@@ -145,8 +145,8 @@ Nothing to do for these:
   modules still in use are vendored into the stylesheet. The components keep Semantic's class names,
   such as `ui selection dropdown` and `ui table`, and the stylesheet still selects on them.
   (Dependencies, Table rendering)
-- The package is 26 files and 3.5 MB unpacked, down from 576 files and 12.5 MB, and `dist/index.js`
-  is 311 KB, down from 420 KB. (Packaging)
+- The package is 26 files and 3.7 MB unpacked, down from 576 files and 12.5 MB, and `dist/index.js`
+  is 332 KB, down from 420 KB. (Packaging)
 
 #### Meta contract
 
@@ -808,8 +808,8 @@ Nothing to do for these:
   `/static/all.css`, the re-export imports itself and the widget is unstyled (measured in Chromium),
   and read as text it holds a comment and the `@import`. 0.34.x's `dist/static/` was a full copy,
   fonts and images included. Copy the root `static/` folder instead.
-- The tarball dropped from 576 files / 12.5 MB unpacked in 0.34.3 to **26 files / 3.5 MB (0.9 MB
-  packed)**. Source maps continue to ship for host debugging.
+- The tarball dropped from 576 files / 12.5 MB unpacked (4.2 MB packed) in 0.34.3 to **26 files / 3.7 MB
+  (1.0 MB packed)**. Source maps continue to ship for host debugging.
 - **The package ships no images any more.** 0.34.3 carried 266 country-flag SVGs in
   `static/images/flags/` and ten more files in `static/images/`: `flags.png`, `diamonds.png`,
   `diamonds-dimmed.png`, `diamonds-dimmed-flipped.png`, `home.jpg`, `logo.svg`, `showIf.png`,
