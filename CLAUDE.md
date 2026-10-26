@@ -125,6 +125,12 @@ A new wrapper, mapping or copy made for a field's prop must be kept the same way
 `src/library/__tests__/*-budget.test.js` contracts count the renders that a mount, an edit and a blur cost. A number
 that falls is progress; one that rises is a regression.
 
+A node's `showIf` is decided when the node renders, and an object `showIf` with a `name` reads the form. So a node
+must render on a change of the form, or follow it: a `List`, an `ExpandList`, a `TabList` and a popup's content render
+their content only when their own props change, and provide `KeptContent` (`engine/showIfFollowsForm.ts`), under
+which such a node subscribes to its form and decides again when the value it reads changes. A new view that renders
+engine nodes behind a memo with props a change of the form leaves alone provides it too.
+
 A mount has a cost besides renders: every field registers with final-form. Until 2026-10-13, each registration
 published the state of every field before it and, once validation ran, validated them all, and each unregistration
 did the same. A burst of n fields cost about n²/2 of each, on the first render, a tab switch, a `showIf` that flips
@@ -173,6 +179,12 @@ A text the widget writes itself, rather than one the meta gives it, is a built-i
 translated already, so a `Text` that shows it gets `alreadyTranslated` as its translator. A new id goes in
 `BUILT_IN_PHRASES`, in `UIRenderPhraseId` (`src/library/contract.ts`; `typecheck` fails while the two differ) and on
 the page (`npm run docs:phrases`). A published id is never renamed: a host's translation of it would be lost silently.
+
+A switch of language reaches every text through the translator's identity. The document makes a new one when the
+host hands another `translate` or `language` (`translate` in `rules.tsx`) and publishes it in `TranslateContext`;
+every node of the mapper and every `Text` reads it there, and hands it on as a prop. So a component that translates
+takes the translator as a prop or reads that context, and keeps no translated text past a render that hands it another
+one. `language-switch.test.js` pins what follows a switch, and `language-switch-budget.test.js` what it costs.
 
 A text made where no translator is known is a `PhraseMessage` (`phraseMessage(ID, variables?)`): a validator's
 message, which final-form keeps as the field's error, and a popup's title. A `Text` shows one in the language of its

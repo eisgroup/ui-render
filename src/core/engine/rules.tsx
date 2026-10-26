@@ -1,4 +1,4 @@
-import React, { Fragment, isValidElement } from 'react'
+import React, { Fragment, isValidElement, useContext } from 'react'
 import '../modules/form/constants'
 import { withForm } from '../modules/form'
 import { FIELD } from '../modules/variables'
@@ -27,13 +27,14 @@ import { findPopupTemplate } from './popupTemplate'
 import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
 import { countReset, dataFormsOf, errorsFor, formsOf, touchedFor } from '../state/formRegistry'
 import { phrase, phraseMessage } from '../utils/phrases'
+import type { PhraseMessage } from '../utils/phrases'
 import { getFormsData, getLiveMergedDataKindArray, getRawFormsData } from './formData'
 import type { ValidatingForm } from './formData'
 import { errorsProcessing, mapErrorObjectToUIFormat, showsAnError } from './errorMapping'
 import { getDateStringFromDateObject, normalizeIncomingData, replaceDeepCopy } from './dataMapping'
 import { isEqual } from '../utils/object'
 import { double5, integer, phone, uppercase } from '../components/inputs/normalizers'
-import { AppContext } from '../contexts'
+import { AppContext, TranslateContext } from '../contexts'
 import { ConfigOverride } from '../providers'
 import Modal from './components/Modal'
 import { createPopupContent } from './components/PopupContent'
@@ -261,9 +262,15 @@ export class UIRender extends DocumentInstance {
     // Declared only: the constructor sets each when the host gives it one, and `declare` keeps Babel
     // from emitting a field for it. Without it Babel 8 emits one, set to undefined after `super`.
     declare errorHandler?: (errors: object) => void
-    // What `errorHandler` was last handed, by `reportErrors`.
+    // What `errorHandler` was last handed, by `reportErrors`: the errors as the forms hold them, the
+    // translator that put them in words, and the report it made of them.
     declare reportedErrors?: Record<string, unknown>
-    declare translate?: Translate
+    declare reportedWith?: Translate
+    declare lastReport?: Record<string, unknown>
+    // The translators `translate` made, by the `translate` prop and the `language` each was made for, and
+    // the one it returned last.
+    declare translators?: WeakMap<object, Map<unknown, Translate>>
+    declare lastTranslator?: Translate
 
     constructor (props: UIRenderProps) {
         super(props)
@@ -276,21 +283,13 @@ export class UIRender extends DocumentInstance {
         if (typeof props.getValidationErrors === 'function') {
             this.errorHandler = props.getValidationErrors
         }
-        // The instance's OWN translator, built once so its identity is stable across renders.
         // `Active.translate` is still assigned because seven components read it as a prop default and
         // `modules/upload` reads it directly, but it must not be what the engine renders with: it is
         // module-level, so the LAST instance constructed owns it, and a first instance that re-renders
         // afterwards translates with the second one's function for the rest of its life. Measured, not
-        // assumed — see `rules.two-instances.test.js`, which fails on the previous code.
-        if (typeof props.translate === 'function') {
-            const translate = props.translate
-            this.translate = (value: unknown) => typeof value === 'string' ? translate(value) : value
-            Active.translate = this.translate
-        } else if (props.parent && typeof props.parent.translate === 'function') {
-            // An embedded instance is not given the prop; it inherits the one its owner was built with
-            // rather than falling through to whatever the module global happens to hold.
-            this.translate = props.parent.translate
-        }
+        // assumed — see `rules.two-instances.test.js`, which fails on the previous code. The engine
+        // renders with the instance's own, `translate` below.
+        if (typeof props.translate === 'function') Active.translate = this.translate!
 
         this.state = {
             data: {
@@ -305,6 +304,53 @@ export class UIRender extends DocumentInstance {
             popupContent: '',
             currencyCode: (this.props.meta && this.props.meta.currencyCode) || 'USD',
         }
+    }
+
+    /**
+     * The instance's OWN translator: its `translate` prop, handed strings only, as the published contract
+     * promises (`UIRenderTranslate`). It is the same function from one render to the next, and a new one when
+     * the host hands another `translate` or another `language`. That is what renders again everything the
+     * document translated, in the language the host's `translate` answers in now: each component that takes
+     * the translator as a prop is handed a new one, past the memo of every field, and what reads
+     * `TranslateContext` hears of it, a popup's content among them. The form is left alone, so its values,
+     * touched fields and errors stay. An i18next-based host keeps one `t` and changes what it answers: the
+     * `language` it passes along is what tells the document.
+     *
+     * Until 2026-10-23 it was made once, in the constructor: a new `translate` was ignored, and a switch of
+     * language reached only what happened to render again.
+     *
+     * A nested instance is not given the prop. It renders with its owner's translator, as its owner has it
+     * now, rather than falling through to whatever the module global happens to hold.
+     *
+     * Each is kept for the `translate` and `language` it was made for, not only the last. A render React
+     * throws away, as it does a transition's that a keystroke interrupts, would otherwise leave the next
+     * render, with the props the document still has, a new translator: every field would render again for
+     * that keystroke.
+     */
+    get translate (): Translate | undefined {
+        const { translate, language, parent } = this.props
+        if (typeof translate !== 'function') {
+            return parent && typeof parent.translate === 'function' ? parent.translate : undefined
+        }
+        if (!this.translators) this.translators = new WeakMap()
+        let byLanguage = this.translators.get(translate)
+        if (!byLanguage) {
+            byLanguage = new Map()
+            this.translators.set(translate, byLanguage)
+        }
+        let translator = byLanguage.get(language)
+        if (!translator) {
+            translator = (value: unknown) => typeof value === 'string' ? translate(value) : value
+            byLanguage.set(language, translator)
+        }
+        // The module global stays with the document that holds it, the last one constructed with a
+        // `translate`, and follows that document's translator.
+        const last = this.lastTranslator
+        if (last !== translator) {
+            if (last && Active.translate === last) Active.translate = translator
+            this.lastTranslator = translator
+        }
+        return translator
     }
 
     // The document's one sync of `data` and `meta` from its props. Until §9.3 step 6 the engine
@@ -376,10 +422,18 @@ export class UIRender extends DocumentInstance {
         // Against what the host was last told, kept here as it is told. It was state, and a state update
         // shows at the next render: every nested document that re-rendered in a commit reported before
         // that, so one change reached the host once per nested document, table rows included.
-        if (!isEqual(treeErrors, this.reportedErrors || {})) {
-            const errors = cloneDeep(treeErrors)
-            this.reportedErrors = errors
-            this.errorHandler(mapErrorObjectToUIFormat(errors, this.translate || Active.translate))
+        // And in the words it was told them in: after a new translator (`translate`), the same errors are
+        // told again when they read differently in it, as the fields now show them.
+        const translate = this.translate || Active.translate
+        const changed = !isEqual(treeErrors, this.reportedErrors || {})
+        if (!changed && (translate === this.reportedWith || !this.reportedErrors)) return
+        const errors = changed ? cloneDeep(treeErrors) : this.reportedErrors!
+        const report = mapErrorObjectToUIFormat(errors, translate)
+        this.reportedErrors = errors
+        this.reportedWith = translate
+        if (changed || !isEqual(report, this.lastReport)) {
+            this.lastReport = report
+            this.errorHandler(report)
         }
     }
 
@@ -425,6 +479,8 @@ export class UIRender extends DocumentInstance {
             dateFormat, currency, language, locale,
         } = this.props
         const { key } = this.state
+        const ownTranslate = this.translate
+        const translate = ownTranslate || Active.translate
 
         const content = this.hasData && this.hasMeta &&
             <Render
@@ -436,7 +492,7 @@ export class UIRender extends DocumentInstance {
                 // Passing parent here made embedded Data / renderExtraItem fields call instance.form.change
                 // on the root form while Field names targeted nested paths — values leaked into the parent object.
                 instance={this}
-                translate={this.translate || Active.translate}
+                translate={translate}
                 onDataChanged={this.onDataChanged}
                 currencyCode={this.state.currencyCode}
             />
@@ -460,7 +516,7 @@ export class UIRender extends DocumentInstance {
                     document with no content, and a host relies on Enter in a field submitting nothing. */}
                 {content}
                 {childAfter}
-                <Modal translate={this.translate || Active.translate} form={this.form} />
+                <Modal translate={translate} form={this.form} />
             </Container>
 
         // The configuration props are published here, around the whole subtree, rather than
@@ -468,9 +524,12 @@ export class UIRender extends DocumentInstance {
         // every node would be spread onto components and leak into the DOM. Wrapping the
         // engine (not only the library entry point) is what makes the props work for a host
         // that mounts this component directly — the demo does, and so do the harnesses.
+        // The translator too, by the document a host mounts: every document it nests renders inside it, and
+        // so does its popup, whose content is the element it was opened with (`TranslateContext`). None for a
+        // document given no `translate`, whose components take the module global, as they did.
         return (
             <ConfigOverride dateFormat={dateFormat} currency={currency} language={language} locale={locale}>
-                {tree}
+                {parent ? tree : <TranslateContext.Provider value={ownTranslate}>{tree}</TranslateContext.Provider>}
             </ConfigOverride>
         )
     }
@@ -710,7 +769,7 @@ function Decorator (Class: any) {
             // call is read at click time, as it always was.
             FIELD.FUNC[FIELD.ACTION.DOWNLOAD] = (...args) => download(args, {
                 downloadFile: this.getAPICalls().downloadFile,
-                onFailure: err => this.popupAlert(describeFailure(err), phrase(this.translate || Active.translate, 'DOWNLOAD_FAILED')),
+                onFailure: err => this.popupAlert(describeFailure(err), <PhraseContent message={phraseMessage('DOWNLOAD_FAILED')}/>),
             })
             // Send the forms' values and a file through the host's `uploadFile`, and make its answer
             // the data (see `upload.ts`). The remount key and the form restart wait for the new data
@@ -839,7 +898,7 @@ function Decorator (Class: any) {
                             console.error('Popup items are empty or invalid:', items)
                             this.popupAlert(
                                 title || phraseMessage('ERROR'),
-                                phrase(this.translate || Active.translate, 'POPUP_CONTENT_IS_EMPTY'),
+                                <PhraseContent message={phraseMessage('POPUP_CONTENT_IS_EMPTY')}/>,
                             )
                             return
                         }
@@ -1143,3 +1202,14 @@ function Decorator (Class: any) {
 }
 
 const dataActionWarning = (e: unknown) => console.warn('Missing parent UI Render instance to modify form values!', e)
+
+/**
+ * A message the engine shows in a popup, a built-in phrase, shown as `popupAlert` shows a value. It is put in words as
+ * it renders, with the translator of the document it renders in (`TranslateContext`), so a switch of language while
+ * the popup is open shows it in the new language. Until 2026-10-23 it was put in words when the popup opened, and kept
+ * that language.
+ */
+function PhraseContent ({ message }: { message: PhraseMessage }) {
+    const translate = useContext(TranslateContext) || Active.translate
+    return <Json data={phrase(translate, message.phrase, message.variables)}/>
+}

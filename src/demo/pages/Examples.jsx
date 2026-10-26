@@ -35,6 +35,11 @@ function showValidationErrors (errors) {
   console.info('Validation errors', errors)
 }
 
+// One function for the page's life: a new `translate` renders every text of the document again.
+function translate (value) {
+  return value
+}
+
 export default function Examples () {
   const [activeIndex, setActiveIndex] = useState(null)
   // The document hands its form-data reader to the host through `getFormData`; the class kept it on `this`.
@@ -80,7 +85,7 @@ export default function Examples () {
                       onDataChanged={onSomeDataChanged}
                       onSubmit={console.warn}
                       getValidationErrors={showValidationErrors}
-                      translate={(v) => v}
+                      translate={translate}
                       dateFormat={"MM-DD-YYYY"}
                       apiCalls={{
                         updateData: updatePerformanceData,

@@ -41,7 +41,35 @@ export type ShouldRenderArgs = {
     instance?: { getRawFormsData?: () => unknown, [key: string]: unknown }
 }
 
-export function shouldRender ({ showIf, data, _data, relativeData, relativePath, relativeIndex, instance }: ShouldRenderArgs): boolean {
+/** An object `showIf`'s `name`, with its `{state.xxx}` templates interpolated. */
+function nameOf (showIf: ShowIfCondition, instance: ShouldRenderArgs['instance']): string | undefined {
+    const { name: rawName } = showIf
+    return rawName && rawName.includes('{')
+        ? interpolateString(rawName, instance, { suppressError: true })
+        : rawName
+}
+
+/**
+ * Where in the form's values the `showIf` of `args` reads: an object `showIf` with a `name` reads its document's
+ * forms there (`shouldRender`). `undefined` for any other, which reads no form.
+ */
+export function formPathOf ({ showIf, relativeData, relativePath, relativeIndex, instance }: ShouldRenderArgs): string | undefined {
+    if (!hasObjectValue(showIf)) return undefined
+    // A cast, not a guard: an object `showIf` is read as this shape, as it always was.
+    const condition = showIf as ShowIfCondition
+    const name = nameOf(condition, instance)
+    if (!name) return undefined
+    // Draft row / renderExtraItem sets relativePath + relativeIndex to the next array slot.
+    // showIf.name may still be a global path (e.g. `settings.allRowsComplete`).
+    // In that case prefixing with `[index].` is wrong — use showIf.relativeData === false or
+    // component relativeData === false to read `name` from form root.
+    return relativePath && typeof relativeIndex !== 'undefined' && condition.relativeData !== false && relativeData !== false
+        ? `${relativePath}[${relativeIndex}].${name}`
+        : name
+}
+
+export function shouldRender (args: ShouldRenderArgs): boolean {
+    const { showIf, data, _data, relativeData, instance } = args
     if (showIf == null) return true
 
     // UI Render should not 'Value Transform' `showIf` attribute
@@ -51,13 +79,11 @@ export function shouldRender ({ showIf, data, _data, relativeData, relativePath,
 
     if (hasObjectValue(showIf)) {
         // A cast, not a guard: an object `showIf` is read as this shape, as it always was.
-        const { name: rawName, relativeData: showIfRelativeData, equal } = showIf as ShowIfCondition
-        // Interpolate {state.xxx} templates in showIf.name
-        const name = rawName && rawName.includes('{')
-            ? interpolateString(rawName, instance, { suppressError: true })
-            : rawName
+        const { relativeData: showIfRelativeData, equal } = showIf as ShowIfCondition
+        const name = nameOf(showIf as ShowIfCondition, instance)
+        const path = formPathOf(args)
         let __data: unknown
-        if (name) {
+        if (path) {
             // Use raw form data (without Select array reordering) for showIf lookups.
             // getAllFormsData() applies changeOptionOrderForSelectFields which reorders arrays,
             // but {state.xxx} stores indices relative to the original array order.
@@ -70,18 +96,7 @@ export function shouldRender ({ showIf, data, _data, relativeData, relativePath,
             const formData = (rawForm != null && typeof rawForm === 'object')
                 ? mergeReplaceArrays(data, rawForm)
                 : data
-            // Draft row / renderExtraItem sets relativePath + relativeIndex to the next array slot.
-            // showIf.name may still be a global path (e.g. `settings.allRowsComplete`).
-            // In that case prefixing with `[index].` is wrong — use showIf.relativeData === false or
-            // component relativeData === false to read `name` from form root.
-            if (
-                relativePath && typeof relativeIndex !== 'undefined' &&
-                showIfRelativeData !== false && relativeData !== false
-            ) {
-                __data = get(formData, `${relativePath}[${relativeIndex}].${name}`, undefined)
-            } else {
-                __data = get(formData, name, undefined)
-            }
+            __data = get(formData, path, undefined)
         } else {
             // Get from initial data.
             // TODO: review this logic. It might be better to get from form instead of initial data

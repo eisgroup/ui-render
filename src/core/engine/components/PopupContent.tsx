@@ -1,5 +1,6 @@
 import { Fragment, memo } from 'react'
 import Render from '../index'
+import { KeptContent } from '../showIfFollowsForm'
 
 // `Render` is read where it is called, inside the component, and never captured in a module-level
 // constant: the engine's modules import each other in a cycle, and only a read at render is guaranteed
@@ -94,15 +95,21 @@ export function createPopupContent () {
         // in the props handed to `Render`, which sets the element's key from its own index argument,
         // undefined here: so every template popup logged React's missing-key warning, until 2026-10-06. Not `Render(props, idx)`: the index is also the node's meta path, and
         // a popup's items are not at `items[idx]` of the document this renders in.
-        return mappedItems.map((item, idx) => (
-            <Fragment key={idx}>
-                {Render({
-                    ...item,
-                    relativePath,
-                    relativeIndex,
-                    relativeData: false, // Prevent automatic data extraction by name in Render.tsx
-                })}
-            </Fragment>
-        ))
+        //
+        // The popup shows the element it was opened with: content its document's render does not reach (`KeptContent`).
+        return (
+            <KeptContent.Provider value={true}>
+                {mappedItems.map((item, idx) => (
+                    <Fragment key={idx}>
+                        {Render({
+                            ...item,
+                            relativePath,
+                            relativeIndex,
+                            relativeData: false, // Prevent automatic data extraction by name in Render.tsx
+                        })}
+                    </Fragment>
+                ))}
+            </KeptContent.Provider>
+        )
     })
 }

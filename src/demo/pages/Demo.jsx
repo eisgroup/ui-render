@@ -14,6 +14,9 @@ import { AppContext } from '../../core/contexts'
 
 const DEMO_JSON_STORAGE_KEY = 'DEMO_JSON'
 
+// One function for the page's life: a new `translate` renders every text of the document again.
+const translate = value => value
+
 const Demo = () => {
     const [data, setData] = React.useState(() => {
         const data = performStorage(GET, DEMO_JSON_STORAGE_KEY) || {}
@@ -107,7 +110,7 @@ const Demo = () => {
                 initialValues={data.json}
                 data={data.json}
                 meta={meta.json}
-                translate={(v) => v}
+                translate={translate}
                 onSubmit={console.warn}
                 getFormData={(f) => getFormData.current = f}
             />

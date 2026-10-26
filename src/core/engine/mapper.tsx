@@ -31,7 +31,8 @@ import { get, hasObjectValue, isObject } from '../utils/object'
 import { phraseMessage } from '../utils/phrases'
 import type { PhraseMessage } from '../utils/phrases'
 import { autoSubmitter } from './autoSubmit'
-import { shouldRender } from './showIf'
+import { formPathOf, shouldRender } from './showIf'
+import { KeptContent, useShowIfFollowsForm } from './showIfFollowsForm'
 import Render, { formatRenderError, mapProps } from './index'
 import { isUnnamedField, relativePathFrom } from './transforms'
 import { renderField } from './components/renders'
@@ -39,7 +40,7 @@ import TableView from './components/TableView'
 import TabList from './components/TabList'
 import Tabs from './components/Tabs'
 import Data from './Data'
-import { AppContext, TableColumnsContext } from '../contexts'
+import { AppContext, TableColumnsContext, TranslateContext } from '../contexts'
 import type { RenderErrorReport } from './Render'
 
 /**
@@ -239,13 +240,20 @@ const RenderComponent = ({
     useContext(AppContext)
     // The column labels of the table body this node sits in, if any: see `TableColumnsContext`.
     const columns = useContext(TableColumnsContext)
-    // The instance's own translator, not the module global: `Active.translate` is owned by whichever
+    // The document's own translator, not the module global: `Active.translate` is owned by whichever
     // UIRender was constructed LAST, so reading it here made a re-rendering instance translate with a
-    // sibling's function. The fallback covers nodes rendered without an instance (tests, and the
-    // components that read `Active.translate` as a prop default).
-    const translate = (instance && instance.translate) || Active.translate
+    // sibling's function. Read from the context its document publishes, so that a new one, for another
+    // `language` or `translate`, renders the node again, one in a popup's content too, which renders in an
+    // element the popup keeps (`TranslateContext`). The instance's covers a node rendered without a document
+    // around it (tests), and the module global one whose document has no translator.
+    const translate = useContext(TranslateContext) || (instance && instance.translate) || Active.translate
     /* General showIf logic — the whole decision lives in `showIf.ts`, testable on its own. */
-    const shown = shouldRender({ showIf, data, _data, relativeData, relativePath, relativeIndex, instance })
+    const showIfArgs = { showIf, data, _data, relativeData, relativePath, relativeIndex, instance }
+    const shown = shouldRender(showIfArgs)
+    // Where its document's render does not reach, in a list's items or a popup's content, a `showIf` that reads the
+    // form is decided again as the form changes (`showIfFollowsForm.ts`).
+    const kept = useContext(KeptContent)
+    useShowIfFollowsForm(form, kept ? formPathOf(showIfArgs) : undefined, shown, () => shouldRender(showIfArgs))
     // The fields that mount below this node, or that go when it hides, register and unregister as one burst, which
     // the form tells every field of once (`registrationsOf`, `modules/form/batchedForm.ts`). The bracket opens in a
     // layout effect, before any field below registers in the passive effects, and closes in a passive effect, after
@@ -278,15 +286,17 @@ const RenderComponent = ({
             return <Row {...props}>{items.map(Render)}</Row>
         }
 
+        // A list renders its items only when its own props change, which a change of the form does not do: they are
+        // content its document's render does not reach (`KeptContent`), as an `ExpandList`'s and a `TabList`'s are.
         case FIELD.TYPE.LIST:
         case FIELD.TYPE.COL_LIST:
         case FIELD.TYPE.COL_LIST3: {
-            return <List items={_data} {...props} currencyCode={currencyCode}/>
+            return <KeptContent.Provider value={true}><List items={_data} {...props} currencyCode={currencyCode}/></KeptContent.Provider>
         }
 
         case FIELD.TYPE.ROW_LIST:
         case FIELD.TYPE.ROW_LIST2: {
-            return <List items={_data} {...props} currencyCode={currencyCode} row/>
+            return <KeptContent.Provider value={true}><List items={_data} {...props} currencyCode={currencyCode} row/></KeptContent.Provider>
         }
 
         case FIELD.TYPE.TABLE_CELLS: {
@@ -332,7 +342,7 @@ const RenderComponent = ({
         }
 
         case FIELD.TYPE.EXPAND_LIST: {
-            return <ExpandList items={_data} {...props} bracket={registrationsOf(form)}/>
+            return <KeptContent.Provider value={true}><ExpandList items={_data} {...props} bracket={registrationsOf(form)}/></KeptContent.Provider>
         }
 
         case FIELD.TYPE.BUTTON: {
@@ -560,7 +570,7 @@ const RenderComponent = ({
 
             switch (view) {
                 case FIELD.TYPE.TAB_LIST:
-                    return <TabList items={_data} {...props}/>
+                    return <KeptContent.Provider value={true}><TabList items={_data} {...props}/></KeptContent.Provider>
 
                 case FIELD.TYPE.TABS:
                 default:
@@ -632,8 +642,9 @@ const RenderComponent = ({
              * When user clicks on a button that opens popup, the VirtualDOM is inserted to Popup component for rendering.
              * @withForm needs to wrap the entire content to provide Form field instance using existing form.
              */
+            // The popup shows the element it was opened with: content its document's render does not reach (`KeptContent`).
             const PopupContent = memo(function PopupContent () {
-                return items.map(Render)
+                return <KeptContent.Provider value={true}>{items.map(Render)}</KeptContent.Provider>
             })
 
             // Store popup with template ID if it contains variables

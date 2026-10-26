@@ -6,7 +6,7 @@ import { isPhraseMessage, phrase } from '../utils/phrases'
 import type { PhraseMessage } from '../utils/phrases'
 import { ENGINE_PROPS, FIELD_ONLY_PROPS, omitProps } from './domProps'
 import { ISO_8601_COMPLETE_DATE, withDecimalSeparator } from '../utils'
-import { ConfigContext } from '../contexts'
+import { ConfigContext, TranslateContext } from '../contexts'
 import moment from 'moment'
 
 /** The named props are read here; the rest is spread onto the `<span>` through ./domProps (see `ViewProps`). */
@@ -28,6 +28,7 @@ export type TextProps = {
      * a `PhraseMessage` as its phrase in that language, and an element is cloned with `translate`.
      */
     children?: React.ReactNode | PhraseMessage
+    /** What translates a string child: the translator of the document it renders in without one */
     translate?: Translate
     [key: string]: unknown
 }
@@ -45,12 +46,18 @@ function Text ({
     reverse,
     rtl,
     children,
-    translate = Active.translate,
+    translate: given,
     ...props
 }: TextProps) {
     // A cast, not a guard: `ConfigContext` has no default value, so outside a provider this destructure
     // throws, as it did in JavaScript. The library root (`AppProvider`) always renders one.
     const { dateFormat, locale } = useContext(ConfigContext) as TextConfig
+    // Handed none, as the value renderers and the tabs hand none, it takes its document's translator, read from
+    // the context, so it renders again when that changes (`TranslateContext`). Until 2026-10-23 it took the
+    // module global, the translator of the document constructed last: on a page with two documents, the second
+    // one's in the first. The global stays the default outside a document.
+    const documentTranslate = useContext(TranslateContext)
+    const translate = given || documentTranslate || Active.translate
 
     let component: React.ReactNode
     // A component child is handed the translator; a DOM element is not, because there `translate` is

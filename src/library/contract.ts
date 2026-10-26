@@ -277,15 +277,18 @@ export interface UIRenderProps<Data = unknown> {
     onDataChanged?(): void
     /**
      * Called with each field's validation error once the user has left the field. A message the widget writes
-     * itself is in the language of `translate`, as the field shows it. A required field's is the exception: it
-     * reads `<Field Name> is Required`, the name made from the field's `name`.
+     * itself is in the language of `translate`, as the field shows it, and is handed again after a switch of
+     * `language` or `translate`. A required field's is the exception: it reads `<Field Name> is Required`, the
+     * name made from the field's `name`, in any language.
      */
     getValidationErrors?(errors: UIRenderValidationErrors): void
     methods?: Record<string, UIRenderMethod>
     /**
      * Translates what the widget shows: the labels, titles and options of the meta, the values it shows as
      * text, and the texts the widget writes itself, which it asks for as `ui-render:<id>` (`UIRenderPhraseId`).
-     * It is handed strings only, and returns one it has no translation for as it was given.
+     * It is handed strings only, and returns one it has no translation for as it was given. A new function
+     * renders again every text the document translated, in its language, as a change of `language` does:
+     * keep it the same function between renders otherwise.
      */
     translate?: UIRenderTranslate
     apiCalls?: UIRenderApiCalls<Data>
@@ -302,7 +305,12 @@ export interface UIRenderProps<Data = unknown> {
     currency?: string
     /**
      * Language code published to the configuration; the shell renders it as a CSS class. Where `locale` names no
-     * moment locale the host has loaded, it names the one a date field shows month and day names in.
+     * moment locale the host has loaded, it names the one a date field shows month and day names in. When it
+     * changes, the document renders again every text it translated, in the language `translate` answers in now,
+     * without a remount: the form keeps what the user typed, the fields they left and the errors they see, and
+     * `getValidationErrors` is handed the errors again when they read differently. A host whose `translate`
+     * stays the same function when its language changes, as i18next's own `t` does, passes its current
+     * language here.
      */
     language?: string
     /**
