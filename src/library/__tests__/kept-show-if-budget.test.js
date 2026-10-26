@@ -24,9 +24,9 @@ jest.mock('../../core/engine/showIf', () => {
     const actual = jest.requireActual('../../core/engine/showIf')
     return {
         ...actual,
-        shouldRender: args => {
+        shouldRender: (args, found) => {
             if (args.showIf != null) mockCounts.decisions += 1
-            return actual.shouldRender(args)
+            return actual.shouldRender(args, found)
         },
     }
 })
@@ -134,5 +134,56 @@ describe('a 50-item list whose items read a field of a `useForm` block', () => {
         expect(keystroke('inner', 'yes')).toEqual({ decisions: ROWS, texts: 0 })
         expect(keystroke('inner', '')).toEqual({ decisions: ROWS * 2, texts: 0 })
         expect(shownItems(container)).toBe(0)
+    })
+
+    it('decides nothing more at mount where the block comes after the list, with the value the data gives it', () => {
+        // The items listen before the block's form and the document's register, and each tells the value they read.
+        const listFirst = { ...otherMeta, items: [otherMeta.items[0], otherMeta.items[2], otherMeta.items[1]] }
+        const listData = { ...otherData, inner: '' }
+        Object.assign(mockCounts, { decisions: 0, texts: 0 })
+        render(<UIRender meta={listFirst} data={listData} initialValues={listData}/>)
+        act(() => { jest.runOnlyPendingTimers() })
+        expect(mockCounts.decisions).toBe(ROWS * 2)
+
+        expect(keystroke('note', 'x')).toEqual({ decisions: 0, texts: 0 })
+    })
+})
+
+// A table whose rows each have a `useForm` form, the shape `rules.row-form-values.test.js` drives. A row's cell decides
+// once more as the document mounts than it renders, where it decided as often until 2026-10-26: its first render reads
+// the row's values, the document's form is not registered yet, and decides as if the field were empty. The document's
+// form tells its values as it registers, and the cell decides again, where it waited for the rows' next render before.
+// Each of these decisions merges every form of the tree, so the work grows with the square of the rows. Such a row's fields
+// start empty, and a submit after an edit in it loses the edit (`rules.row-form-values.test.js`): a defect of its own,
+// and no config uses one.
+describe('a 20-row table of `useForm` rows whose cell reads its row\'s field', () => {
+    const RowCount = 20
+    const rowsMeta = {
+        view: 'Table',
+        name: 'dataKind.items',
+        headers: [{ id: 'kind', label: 'Kind' }, { id: 'detail', label: 'Detail' }],
+        renderItemCells: {
+            view: 'Data', kind: 'items', embedded: true, useForm: true,
+            meta: {
+                view: 'TableCells',
+                items: [
+                    { view: 'Input', name: 'kind', type: 'text' },
+                    { view: 'Text', children: 'Detail', showIf: { name: 'kind', equal: 'other' } },
+                ],
+            },
+        },
+    }
+    const rowsData = { dataKind: { items: Array.from({ length: RowCount }, (_, i) => ({ kind: i % 2 ? 'other' : 'plain' })) } }
+
+    it('decides once more a row at mount than the row renders, and once for a keystroke in a row', () => {
+        // A row's cell renders three times as the document mounts on React 18.3, and twice on 16.14, 17 and 19, as it
+        // did before: measured, 60 and 40 decisions until 2026-10-26.
+        const mountRenders = React.version.startsWith('18.') ? 3 : 2
+        Object.assign(mockCounts, { decisions: 0, texts: 0 })
+        render(<UIRender meta={rowsMeta} data={rowsData} initialValues={rowsData}/>)
+        act(() => { jest.runOnlyPendingTimers() })
+        expect(mockCounts.decisions).toBe(RowCount * (mountRenders + 1))
+
+        expect(keystroke('dataKind.items[0].kind', 'other')).toEqual({ decisions: 1, texts: 1 })
     })
 })

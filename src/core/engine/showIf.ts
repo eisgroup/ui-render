@@ -68,7 +68,12 @@ export function formPathOf ({ showIf, relativeData, relativePath, relativeIndex,
         : name
 }
 
-export function shouldRender (args: ShouldRenderArgs): boolean {
+/**
+ * Whether the node renders. Where its `showIf` reads the form (`formPathOf`), `found` is handed the value it read there,
+ * merged from every form of the document and its data: what a node that follows the forms decides by
+ * (`showIfFollowsForm.ts`).
+ */
+export function shouldRender (args: ShouldRenderArgs, found?: { value?: unknown }): boolean {
     const { showIf, data, _data, relativeData, instance } = args
     if (showIf == null) return true
 
@@ -97,6 +102,7 @@ export function shouldRender (args: ShouldRenderArgs): boolean {
                 ? mergeReplaceArrays(data, rawForm)
                 : data
             __data = get(formData, path, undefined)
+            if (found) found.value = __data
         } else {
             // Get from initial data.
             // TODO: review this logic. It might be better to get from form instead of initial data

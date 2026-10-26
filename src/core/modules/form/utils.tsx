@@ -633,13 +633,15 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
         formsStorage.delete(own.stored!) // not undefined: the mount stored it before any update
         own.stored = {...adopted}
         if (handle.form) {
-          handle.form.reset(adopted)
+          // In the storage before the reset: the reset tells the tree the new values (`tellTreeValues` above), and
+          // what hears it decides with every form of the tree, this one included.
           formsStorage.set(own.stored, {
             meta: props.meta,
             form: handle.form,
             tree: own.tree!, // not undefined: the first render set it
             draftRow: props.draftRow === true,
           });
+          handle.form.reset(adopted)
         }
         setApplied(adopted)
       }, [adopted]) // eslint-disable-line react-hooks/exhaustive-deps -- the meta of the render that adopted them

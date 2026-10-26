@@ -11,6 +11,7 @@
  */
 import React from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import UIRender from '../main'
 
 const HOSTS = [
@@ -83,4 +84,86 @@ describe.each(HOSTS)('for %s', (_, renders) => {
         expect(screen.queryByLabelText('Inner')).toBeNull()
         expect(gatedShown()).toBe(false)
     })
+
+    it('a list\'s items that mount after the block\'s field is typed in hide as the block goes', () => {
+        // The items never heard the block change: they rendered with its value, and what it held is in the tell.
+        mount({
+            view: 'Col',
+            items: [
+                { view: 'Input', name: 'open', label: 'Open' },
+                { view: 'Input', name: 'reveal', label: 'Reveal' },
+                { ...block, showIf: { name: 'open', relativeData: false } },
+                { view: 'Col', showIf: { name: 'reveal', relativeData: false }, items: [{ view: 'List', name: 'rows', renderItem: gated }] },
+            ],
+        }, { open: 'yes', rows: [{ id: 0 }, { id: 1 }] }, renders)
+        type('inner', 'yes')
+        type('reveal', 'yes')
+        expect(screen.queryAllByText('Gated')).toHaveLength(2)
+
+        type('open', '')
+        expect(screen.queryAllByText('Gated')).toHaveLength(0)
+    })
+
+    it('a node and a list\'s items hide as a block that started with the value is cleared', () => {
+        // The block's form registers with its value before any of them listens.
+        const named = { ...block, name: 'sub' }
+        mount({ view: 'Col', items: [named, gated, { view: 'List', name: 'rows', renderItem: gated }] },
+            { sub: { inner: 'yes' }, rows: [{ id: 0 }] }, renders)
+        expect(screen.queryAllByText('Gated')).toHaveLength(2)
+
+        type('inner', '')
+        expect(screen.queryAllByText('Gated')).toHaveLength(0)
+    })
+
+    // A list's items in the next two: a node outside one is set right by its document's next render, and the items are
+    // not, so a decision they miss stays.
+    it('a list\'s items that mount as the block they read goes decide without the block', () => {
+        // They render while the block's form is still there, and the block goes in the same commit, before they listen.
+        mount({
+            view: 'Col',
+            items: [
+                { view: 'Input', name: 'mode', label: 'Mode' },
+                { ...block, showIf: { name: 'mode', equal: 'a', relativeData: false } },
+                { view: 'Col', showIf: { name: 'mode', equal: 'b', relativeData: false }, items: [{ view: 'List', name: 'rows', renderItem: gated }] },
+            ],
+        }, { mode: 'a', rows: [{ id: 0 }] }, renders)
+        type('inner', 'yes')
+        type('mode', 'b')
+        expect(screen.queryByLabelText('Inner')).toBeNull()
+        expect(screen.queryAllByText('Gated')).toHaveLength(0)
+    })
+
+    it('a list\'s items that mount with a block holding the value show', () => {
+        // The block's form registers after they rendered, and before they listen.
+        mount({
+            view: 'Col',
+            items: [
+                { view: 'Input', name: 'reveal', label: 'Reveal' },
+                {
+                    view: 'Col',
+                    showIf: { name: 'reveal', relativeData: false },
+                    items: [{ ...block, name: 'sub' }, { view: 'List', name: 'rows', renderItem: gated }],
+                },
+            ],
+        }, { sub: { inner: 'yes' }, rows: [{ id: 0 }] }, renders)
+        expect(gatedShown()).toBe(false)
+
+        type('reveal', 'yes')
+        expect(screen.getByLabelText('Inner')).toHaveValue('yes')
+        expect(screen.queryAllByText('Gated')).toHaveLength(1)
+    })
+})
+
+it('a node beside a block shows as the block adopts the value a host hands it', () => {
+    // The block's form is reset to its new initial values while the document renders on, and the node decides with it.
+    const meta = { view: 'Col', items: [{ ...block, name: 'sub' }, gated] }
+    const initialValues = { sub: { inner: '' } }
+    const { rerender } = render(<UIRender meta={meta} data={initialValues} initialValues={initialValues}/>)
+    act(() => { jest.runOnlyPendingTimers() })
+    expect(gatedShown()).toBe(false)
+
+    rerender(<UIRender meta={meta} data={{ sub: { inner: 'yes' } }} initialValues={initialValues}/>)
+    act(() => { jest.runOnlyPendingTimers() })
+    expect(screen.getByLabelText('Inner')).toHaveValue('yes')
+    expect(gatedShown()).toBe(true)
 })

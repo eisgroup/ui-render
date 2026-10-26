@@ -132,7 +132,9 @@ which such a node subscribes to its form and decides again when the value it rea
 engine nodes behind a memo with props a change of the form leaves alone provides it too. A document renders on its
 own form only, and a `useForm` block, a `useForm` row and a table's add row each have a form of their own: every node
 whose `showIf` reads the form hears the other forms of its document tree too, which the form layer tells
-(`tellTreeValues` in `state/formRegistry.ts`), and decides again in the same way (since 2026-10-26).
+(`tellTreeValues` in `state/formRegistry.ts`), and decides again in the same way (since 2026-10-26). A tell carries
+what the form held before, and the tree keeps its latest tells, so a node catches up as it commits with those made
+after it rendered.
 
 A mount has a cost besides renders: every field registers with final-form. Until 2026-10-13, each registration
 published the state of every field before it and, once validation ran, validated them all, and each unregistration
