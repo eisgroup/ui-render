@@ -11,7 +11,7 @@ import { Active, debounce, isEqualJSON, l, localiseTranslation, toJSON } from '.
 import type { Debounced } from '../../utils/function'
 import { hasObjectValue, objChanges, set } from '../../utils/object'
 import { _ } from '../../utils/translations'
-import { baselineOf, clearErrorsFor, clearTouchedFor, formsStorage, hasBaseline, setBaseline, touchedFor } from '../../state/formRegistry'
+import { baselineOf, clearErrorsFor, clearTouchedFor, formsStorage, hasBaseline, setBaseline, tellTreeValues, touchedFor } from '../../state/formRegistry'
 import arrayMutators from 'final-form-arrays'
 import { createBatchedForm } from './batchedForm'
 import { useFixableField } from './useFixableField'
@@ -602,11 +602,19 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
           // What the engine says of the document: a table's draft row, whose values are not data yet.
           draftRow: props.draftRow === true,
         });
+        // The tree's other documents hear this form's values, which their own render does not follow: a node there
+        // whose `showIf` reads one of its fields (`tellTreeValues`). final-form calls the subscriber at once, with the
+        // values the form registers with, and on every change of them after.
+        const told = handle.form!
+        const untell = told.subscribe(({values}) => tellTreeValues(own.tree!, told, values), {values: true})
         return () => {
           if (own.unsubscribe) own.unsubscribe()
           own.unsubscribe = null
           own.subscribedForm = null
+          untell()
           formsStorage.delete(own.stored!) // not undefined: the mount above stored it
+          // Once it is out of the storage, so that what hears it decides without its values.
+          tellTreeValues(own.tree!, told, undefined)
           // A nested form taking its errors with it, which nothing else would report when it goes on a
           // component's own state (a tab switched, a row collapsed): the host heard them, and keeps them
           // until it hears otherwise. The owner reports the document tree's errors; see `reportErrors`.

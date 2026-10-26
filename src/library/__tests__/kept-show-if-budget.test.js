@@ -102,3 +102,37 @@ describe('a 50-item list whose items read a field in their `showIf`', () => {
         expect(mockCounts.decisions).toBe(ROWS * 2)
     })
 })
+
+// A field of a `useForm` block, a form of its own, which the items hear of through their document tree (2026-10-26):
+// what it costs is what a field of their own form costs, above.
+describe('a 50-item list whose items read a field of a `useForm` block', () => {
+    const otherMeta = {
+        view: 'Col',
+        items: [
+            { view: 'Input', name: 'note', label: 'Note' },
+            { view: 'Data', useForm: true, meta: { view: 'Col', items: [{ view: 'Input', name: 'inner', label: 'Inner' }] } },
+            { view: 'List', name: 'rows', renderItem: { view: 'Text', children: 'Gated', showIf: { name: 'inner', relativeData: false } } },
+        ],
+    }
+    const otherData = { note: '', rows: data.rows }
+
+    it('decides nothing more at mount, and nothing for a keystroke in the document\'s own form', () => {
+        Object.assign(mockCounts, { decisions: 0, texts: 0 })
+        render(<UIRender meta={otherMeta} data={otherData} initialValues={otherData}/>)
+        act(() => { jest.runOnlyPendingTimers() })
+        expect(mockCounts.decisions).toBe(ROWS * 2)
+
+        expect(keystroke('note', 'x')).toEqual({ decisions: 0, texts: 0 })
+    })
+
+    it('decides each once for a keystroke in the block\'s field, and renders each it shows', () => {
+        const { container } = render(<UIRender meta={otherMeta} data={otherData} initialValues={otherData}/>)
+        act(() => { jest.runOnlyPendingTimers() })
+
+        expect(keystroke('inner', 'y')).toEqual({ decisions: ROWS * 2, texts: ROWS })
+        expect(shownItems(container)).toBe(ROWS)
+        expect(keystroke('inner', 'yes')).toEqual({ decisions: ROWS, texts: 0 })
+        expect(keystroke('inner', '')).toEqual({ decisions: ROWS * 2, texts: 0 })
+        expect(shownItems(container)).toBe(0)
+    })
+})

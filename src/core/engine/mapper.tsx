@@ -250,10 +250,12 @@ const RenderComponent = ({
     /* General showIf logic — the whole decision lives in `showIf.ts`, testable on its own. */
     const showIfArgs = { showIf, data, _data, relativeData, relativePath, relativeIndex, instance }
     const shown = shouldRender(showIfArgs)
-    // Where its document's render does not reach, in a list's items or a popup's content, a `showIf` that reads the
-    // form is decided again as the form changes (`showIfFollowsForm.ts`).
+    // Where its document's render does not reach, a `showIf` that reads the form is decided again as the form changes
+    // (`showIfFollowsForm.ts`): its own form in a list's items or a popup's content, and another form of its document
+    // tree, a `useForm` block's or a row's, anywhere.
     const kept = useContext(KeptContent)
-    useShowIfFollowsForm(form, kept ? formPathOf(showIfArgs) : undefined, shown, () => shouldRender(showIfArgs))
+    const tree = instance ? (instance as { formTree?: object }).formTree : undefined
+    useShowIfFollowsForm(form, tree, formPathOf(showIfArgs), kept, shown, () => shouldRender(showIfArgs))
     // The fields that mount below this node, or that go when it hides, register and unregister as one burst, which
     // the form tells every field of once (`registrationsOf`, `modules/form/batchedForm.ts`). The bracket opens in a
     // layout effect, before any field below registers in the passive effects, and closes in a passive effect, after

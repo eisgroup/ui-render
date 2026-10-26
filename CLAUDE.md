@@ -129,7 +129,10 @@ A node's `showIf` is decided when the node renders, and an object `showIf` with 
 must render on a change of the form, or follow it: a `List`, an `ExpandList`, a `TabList` and a popup's content render
 their content only when their own props change, and provide `KeptContent` (`engine/showIfFollowsForm.ts`), under
 which such a node subscribes to its form and decides again when the value it reads changes. A new view that renders
-engine nodes behind a memo with props a change of the form leaves alone provides it too.
+engine nodes behind a memo with props a change of the form leaves alone provides it too. A document renders on its
+own form only, and a `useForm` block, a `useForm` row and a table's add row each have a form of their own: every node
+whose `showIf` reads the form hears the other forms of its document tree too, which the form layer tells
+(`tellTreeValues` in `state/formRegistry.ts`), and decides again in the same way (since 2026-10-26).
 
 A mount has a cost besides renders: every field registers with final-form. Until 2026-10-13, each registration
 published the state of every field before it and, once validation ran, validated them all, and each unregistration

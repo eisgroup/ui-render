@@ -71,6 +71,37 @@ export function dataFormsOf (tree: object | undefined): Map<object, RegisteredFo
 	return forms
 }
 
+/** What a document tree tells of one of its forms: the form, and its values, `undefined` once it has gone. */
+export type TreeValuesListener = (form: object, values: unknown) => void
+
+/**
+ * Who hears the values of a document tree's forms, PER TREE. A node whose `showIf` reads a field of another form of
+ * its tree than its own, a `useForm` block's, hears that form's changes here (`engine/showIfFollowsForm.ts`): its own
+ * document renders only on changes of its own form. The form layer tells (`modules/form/utils.tsx`, `WithForm`), as a
+ * form registers, on every change of its values, and as it goes. A WeakMap, so a tree that has gone takes its
+ * listeners with it.
+ */
+const listenersByTree = new WeakMap<object, Set<TreeValuesListener>>()
+
+/** Hears every form of `tree`, from now on. Returns what stops it. */
+export function listenToTreeValues (tree: object, listener: TreeValuesListener): () => void {
+	let listeners = listenersByTree.get(tree)
+	if (!listeners) {
+		listeners = new Set()
+		listenersByTree.set(tree, listeners)
+	}
+	const own = listeners
+	own.add(listener)
+	return () => { own.delete(listener) }
+}
+
+/** Tells the listeners of `tree` that the values of its `form` are `values`, `undefined` once it has gone. */
+export function tellTreeValues (tree: object, form: object, values: unknown): void {
+	const listeners = listenersByTree.get(tree)
+	// A copy: a listener that a node's render stops while it hears would otherwise shift the iteration.
+	if (listeners) Array.from(listeners).forEach(listener => listener(form, values))
+}
+
 /**
  * Validation errors by field name, PER FORM. A message is a string, or a built-in phrase (`PhraseMessage`,
  * `utils/phrases.ts`), which the report to the host puts in its document's language.
