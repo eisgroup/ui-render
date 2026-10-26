@@ -980,6 +980,13 @@ Nothing to do for these:
 
 #### Fixes
 
+- **A `showIf` in a list's items or in a popup follows the field it reads.** A node in a `List`, an
+  `ExpandList`, a `TabList` or a popup decided its `showIf` when it rendered, and they render their
+  content only when their own props change: typing in the field the `showIf` reads left the node as it
+  was. A host that renders again on `onDataChanged` saw such a node show, and not hide again when the
+  field went back to what it started as. Such a node now follows the form its fields are in, and
+  renders again when the answer changes. A change of another field costs it a lookup, not a decision:
+  in a 50-item list, a keystroke elsewhere decides nothing and renders none of the items, as before.
 - **An upload that refuses a file says why, in a popup.** It refuses a file larger than its `maxSize`, and a
   drop with no file of a type its `formats` take. The popup that says so, `Maximum File Size Exceeded!` or
   `File Upload Failed!`, never opened: the upload gave it its title and message and left it closed, and the
