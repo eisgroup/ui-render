@@ -7,7 +7,10 @@
 @import "_variables";
 @import "_mixins";
 
-/* Google Fonts are loaded via <link> tag in index.html (CSS @import inside <style> is unreliable) */
+// Google Fonts are loaded via <link> tag in index.html (CSS @import inside <style> is unreliable).
+// A LESS comment, so it stays out of the CSS: postcss escapes the `<style` of a CSS comment, and
+// since 8.5.29 it then maps the rest of the file to one point, and the library build writes no
+// `all.css.map` (`npm run test:pack:budget` fails on that).
 
 /* Icons */
 @import "fonts/icons/style";

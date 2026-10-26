@@ -52,7 +52,6 @@
  */
 /* Scale according to screen size */
 /* Scale Padding according to text size */
-/* Google Fonts are loaded via <link> tag in index.html (CSS @import inside \3c style> is unreliable) */
 /* Icons */
 /* @font-face is in a separate font.css file */
 .ui-render [class^="icon-"], .ui-render [class*=" icon-"] {
