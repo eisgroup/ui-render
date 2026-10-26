@@ -998,7 +998,10 @@ Nothing to do for these:
   `showIf` read one of the block's fields did not render as it changed. 0.34.x showed and hid such a node only where
   the host rendered again on `onDataChanged`, and never for a host that renders once. Every host sees it follow the
   field now, and a node that read a field of a block that goes decides again without it. A keystroke in the block
-  costs a node that reads another field a lookup, not a decision.
+  costs a node that reads another field a lookup, not a decision. Such a node shows or hides at most eight times on
+  what one task of the page changes, which stops a block under it that decides it the other way from flipping it for
+  ever. A host's test that shows and hides one more often between two runs of its timers sees it stop at the eighth:
+  let the timers run between steps, as a browser does between a user's changes.
 - **A `showIf` in a list's items or in a popup follows the field it reads.** A node in a `List`, an
   `ExpandList`, a `TabList` or a popup decided its `showIf` when it rendered, and they render their
   content only when their own props change: typing in the field the `showIf` reads left the node as it
