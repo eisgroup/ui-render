@@ -1,6 +1,13 @@
 ### Table of Contents
 
-### Unreleased
+### v0.35.0
+
+React 17, 18 and 19 join 16.14 in the peer range, and Semantic UI is gone: the select, the table and
+the tooltip are the widget's own components. The stylesheet styles only the widget's wrapper, nothing
+is installed beside the package, and its TypeScript declarations describe the component it ships.
+Every text the widget writes itself can be translated, and a host switches language without a
+remount. Start with *Upgrading from 0.34*: it lists what a host may need to check or change, most
+likely first.
 
 #### Upgrading from 0.34
 
@@ -138,8 +145,8 @@ Nothing to do for these:
   modules still in use are vendored into the stylesheet. The components keep Semantic's class names,
   such as `ui selection dropdown` and `ui table`, and the stylesheet still selects on them.
   (Dependencies, Table rendering)
-- The package is 26 files and 3.5 MB unpacked, down from 576 files and 12.5 MB, and `dist/index.js`
-  is 311 KB, down from 420 KB. (Packaging)
+- The package is 26 files and 3.7 MB unpacked, down from 576 files and 12.5 MB, and `dist/index.js`
+  is 332 KB, down from 420 KB. (Packaging)
 
 #### Meta contract
 
@@ -186,6 +193,13 @@ Nothing to do for these:
   The `id` stays as hidden text, which names the column for screen readers. A meta that declares
   `metaVersion: "1"` renders such a header blank too, and `validateMeta` accepts it without a
   warning: a version at or below the one implemented is always compatible. (Fixes)
+- **Nine `view` names that never rendered are no longer offered:** `Date`, `Dates`, `Fields`,
+  `FieldsWithLevel`, `Group`, `Link`, `Place`, `UploadGrid` and `UploadGrids`. The engine has no
+  component for any of them, so a node with one rendered the "field does not exist" placeholder, and
+  still does. The schema and the published types listed them, so an editor suggested them. They no
+  longer do, and `validateMeta` warns about each as an unknown `view`. A meta that names one stays
+  valid, since both accept any string. `Date` as a `render*` value is another name, and works as
+  before.
 
 #### Renderer configuration and error reporting
 
@@ -537,7 +551,7 @@ Nothing to do for these:
 - **The stylesheet is 67 KB smaller, and nothing the components render by themselves looks
   different.** Three
   Semantic UI CSS modules were being compiled into every build for components this library no
-  longer renders: the popup (our tooltip is in-house as of this same unreleased set), the label (it styled
+  longer renders: the popup (our tooltip is in-house as of this same release), the label (it styled
   multi-select chips, and multi-select is gone), and the menu (it was kept "for the Pagination
   component", which turned out to be untrue — pagination has always been styled by our own CSS).
 
@@ -677,8 +691,7 @@ Nothing to do for these:
   **If your meta declares any of them, it will silently lose that behaviour**: the prop is simply
   not read any more. Nothing in our own examples declares them, and our record of props that only
   consumer metas use lists `disabled`, `upward` and `validate` for a select and nothing for a
-  dropdown — which is the evidence the decision rests on. If that record is wrong for you, say so
-  now rather than after the release.
+  dropdown — which is the evidence the decision rests on. If that record is wrong for you, tell us.
 
   What is NOT affected, because it shares code with none of this: options as strings, numbers or
   objects; a colour option whose value is an array like `[r, g, b]`; `optionsLabel`; the cascading
@@ -795,8 +808,8 @@ Nothing to do for these:
   `/static/all.css`, the re-export imports itself and the widget is unstyled (measured in Chromium),
   and read as text it holds a comment and the `@import`. 0.34.x's `dist/static/` was a full copy,
   fonts and images included. Copy the root `static/` folder instead.
-- The tarball dropped from 576 files / 12.5 MB unpacked in 0.34.3 to **26 files / 3.5 MB (0.9 MB
-  packed)**. Source maps continue to ship for host debugging.
+- The tarball dropped from 576 files / 12.5 MB unpacked (4.2 MB packed) in 0.34.3 to **26 files / 3.7 MB
+  (1.0 MB packed)**. Source maps continue to ship for host debugging.
 - **The package ships no images any more.** 0.34.3 carried 266 country-flag SVGs in
   `static/images/flags/` and ten more files in `static/images/`: `flags.png`, `diamonds.png`,
   `diamonds-dimmed.png`, `diamonds-dimmed-flipped.png`, `home.jpg`, `logo.svg`, `showIf.png`,
@@ -985,7 +998,10 @@ Nothing to do for these:
   `showIf` read one of the block's fields did not render as it changed. 0.34.x showed and hid such a node only where
   the host rendered again on `onDataChanged`, and never for a host that renders once. Every host sees it follow the
   field now, and a node that read a field of a block that goes decides again without it. A keystroke in the block
-  costs a node that reads another field a lookup, not a decision.
+  costs a node that reads another field a lookup, not a decision. Such a node shows or hides at most eight times on
+  what one task of the page changes, which stops a block under it that decides it the other way from flipping it for
+  ever. A host's test that shows and hides one more often between two runs of its timers sees it stop at the eighth:
+  let the timers run between steps, as a browser does between a user's changes.
 - **A `showIf` in a list's items or in a popup follows the field it reads.** A node in a `List`, an
   `ExpandList`, a `TabList` or a popup decided its `showIf` when it rendered, and they render their
   content only when their own props change: typing in the field the `showIf` reads left the node as it
@@ -1287,6 +1303,13 @@ Nothing to do for these:
   `getValidationErrors`, where 0.34.x sent every document's to the callback of the last one
   constructed with one. And its popups open in its own wrapper: 0.34.x looked the popup root up by
   id, so every document's popups opened in the first wrapper on the page.
+- **An edit in one document no longer swallows an edit in another.** What a document does once its
+  user stops typing, telling the host through `onDataChanged` and updating `canSave`, ran on one
+  timer for every document on the page. Edits in two documents within its 300 ms ran it once, for
+  the second: the first document neither told its host nor updated its `canSave`.
+- **A field with `autoSubmit` submits once for the changes made within its delay.** Each render
+  built the field a timer of its own, and a change renders, so two changes within the delay
+  submitted twice.
 - **A form whose host passes no `onSubmit` no longer prints its values.** The fallback was
   `console.warn`, so a submit wrote every value of the form to the browser console of a
   production page. It does nothing now.
@@ -1419,6 +1442,39 @@ Nothing to do for these:
   with it, so an answer that is not the full data, such as a receipt, wipes unsaved edits and every
   key it lacks. Resolve `uploadFile` with the full data, or with nothing (`undefined`, `null`, `''`
   or `0`) to leave the data as it was.
+- **An upload that takes several files hands the host every one.** `apiCalls.uploadFile` was handed
+  the first file picked, and no other. It is handed all of them now, as a third argument, and still
+  the first as its second, so a host written for two arguments sees no difference. The published
+  types declare the third.
+- **An upload leaves a nested file field out of the data it sends.** `uploadFile` is handed the
+  form's values without the file field, but only a top-level field was left out: one named
+  `attachment.file` was sent as well, as `[{}]`, which is what a `File` turns into as JSON.
+- **A download that fails says why, and the widget stays.** The popup it opens took what the
+  download failed with as its title, as it was. `fetch` fails with an `Error`, a host's call can fail
+  with a `Response`, and React renders neither, so the widget was replaced by the error `Objects are
+  not valid as a React child`. The title is the error's message now, or the answer's status, such as
+  `404 Not Found`, and the popup still reads `Download Failed!`.
+- **A `download` action saves the file under its second argument.** With
+  `{name: 'download', args: ['<file>', '<save as>']}`, the host's `downloadFile` is asked for the
+  first, and what it answers is saved under the second, when that is a non-empty string. The second
+  had been ignored since 2022, and the file was saved under the first.
+- **A download with no file name is named by the browser.** It was saved as `undefined`. The host's
+  `downloadFile` is still asked for `undefined`, as before.
+- **The error popup of `onApplyPeriods` shows the message of an answer that holds a `word:`.** Some
+  APIs answer with bare keys, `{message: "Row is locked"}`, so every `word:` was quoted before the
+  answer was read as JSON. That broke an answer that was JSON already wherever a value held one, such
+  as a URL, and the popup showed the raw answer instead of its message. The answer is read as it is
+  first now, and its keys are quoted only when that fails.
+- **A popup template's key matches the ids it names, and no others.** `popupOpen` found the template
+  of an id such as `edit.3` by reading each key as a regular expression, with `{index}` for a row's
+  index and nothing else escaped. A `.` matched any character, so `a.b.{index}` also took `aXb.3`,
+  and a key that is no valid expression, such as `list[.{index}`, threw, which broke the lookup of
+  every id in the document. The rest of the key matches as written now.
+- **The meta's `popup` action opens its popup.** It threw a `TypeError` on every call since 2025-04,
+  so a button with `onClick: 'popup,…'` opened nothing, and nor did a `fetch` chain that ends in one,
+  as the configuration docs show it. A first argument that is text is the title and the second the
+  content, so `'popup,Saved,All changes are stored'` reads as written. In a chain, what the step
+  before hands on is the content, and text after it the title. A button's click event is neither.
 - Corrected the nested `dataKind` demo table metadata so it renders valid table markup.
 - `popupOpen` actions receive the row index as context. `relativePath` is deliberately not
   forwarded: it outranks every other source when a popup resolves its field names, so a popup
