@@ -30,6 +30,11 @@
  * React 16 runs a removed component's effect cleanups during the commit, before any layout effect, so no bracket is
  * open when the table's fields go: there they still go one by one, and cost what they did. A number here that falls
  * is progress: lower it. One that rises is a regression.
+ *
+ * A `showIf` that reads the form merges the forms of its document, which computes the state of every field of each.
+ * Until 2026-10-26 it merged them for each of its decisions: showing the table computed 1330 states, 3230 beside 100
+ * other fields, and hiding it 822, 21322 on React 16. Now the decisions of a tree share a merge while the forms hold
+ * the same (`keptRawFormsData`).
  */
 import React from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
@@ -114,8 +119,8 @@ describe('fields that mount after the first render: a 50-row table of two fields
         const fields = form.getRegisteredFields()
         const hidden = await costOf(() => form.change('show', 'no'))
         expect(fields).toHaveLength(2 * ROWS + 2)
-        expect(shown).toEqual({ computed: 1330, validated: fields.length - 1 })
-        expect(hidden).toEqual(REMOVALS_BRACKETED ? { computed: 822, validated: fields.length - 1 } : { computed: 21322, validated: 5151 })
+        expect(shown).toEqual({ computed: 1126, validated: fields.length - 1 })
+        expect(hidden).toEqual(REMOVALS_BRACKETED ? { computed: 820, validated: fields.length - 1 } : { computed: 21320, validated: 5151 })
         expect(form.getRegisteredFields()).toEqual(['show'])
     })
 
@@ -128,7 +133,7 @@ describe('fields that mount after the first render: a 50-row table of two fields
         const shown = await costOf(() => form.change('show', 'yes'))
         expect(form.getRegisteredFields()).toHaveLength(2 * ROWS + 102)
         // One pass over the fields already there for the change, and one over them all when the bracket closes.
-        expect(shown).toEqual({ computed: 3230, validated: 301 })
+        expect(shown).toEqual({ computed: 2826, validated: 301 })
     })
 
     it('costs a popup that opens it beside 100 other required fields, and closes again, a pass over them each', async () => {

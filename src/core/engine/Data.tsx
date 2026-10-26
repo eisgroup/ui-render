@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useMemo } from 'react'
+import { setIn } from 'final-form'
 import { Active } from '../utils'
 import DocumentWithOwnForm from './rules'
+import { rowPlaceOf } from './formData'
 import LocalDraftTableRow from './components/LocalDraftTableRow'
 import type { LocalDraftTableRowProps } from './components/LocalDraftTableRow'
 
@@ -91,6 +93,13 @@ export default function Data ({
     ? {...metaIn, relativePath, relativeIndex}
     : metaIn
 
+  // A table row that `useForm` gives a form of its own names its fields by the row's place, `dataKind.items[1].kind`
+  // (`mapper.tsx`), so its form starts from the row's values there, placed as final-form places a field's value. Until
+  // 2026-10-26 it started from them at the root of its values, where none of its fields reads: every field of the row
+  // started empty. A table's add row (`draftRow`) starts from the `initialValues` its meta declares, as before.
+  const place = useForm && !draftRow ? rowPlaceOf(meta) : undefined
+  const formValues = useMemo(() => place ? setIn({}, place, initialValues) : initialValues, [place, initialValues])
+
   // TableCells only, or Data wrapping TableCells (e.g. renderExtraItem). Draft values stay in React state
   // until Add — no final-form fields at dataKind.*[nextIndex], so an empty `{}` is not materialized for the draft row.
   if (localDraft) {
@@ -117,7 +126,7 @@ export default function Data ({
     return <UIRenderWithUISetup
       data={data}
       meta={meta}
-      initialValues={initialValues}
+      initialValues={formValues}
       form={{kind}}
       parent={instance}
       index={rowIndex}

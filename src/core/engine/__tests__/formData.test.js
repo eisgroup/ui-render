@@ -3,6 +3,7 @@ import {
     getFormsData,
     getRawFormsData,
     getLiveMergedDataKindArray,
+    rowPlaceOf,
 } from '../formData'
 
 function makeForm(values) {
@@ -134,6 +135,97 @@ describe('getLiveMergedDataKindArray', () => {
                 .toEqual([{ a: 'its own' }])
             expect(form.reads).toBe(1)
         })
+
+        it('merges again once a row\'s own form holds another row, though every document holds the same array', () => {
+            const row = countedForm({ items: [{ a: 'typed' }] })
+            const forms = new Map([
+                ['row', { form: row, meta: { relativePath: 'items', relativeIndex: 0 } }],
+                ['master', { form: countedForm({ items: [{ a: 'as loaded' }] }), meta: {} }],
+            ])
+            getLiveMergedDataKindArray('items', forms)
+            row.values = { items: [{ a: 'typed again' }] }
+            expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ a: 'typed again' }])
+        })
+
+        it('reads the row of a row\'s own form from the values a validator in it was handed', () => {
+            const row = countedForm({ items: [undefined, { a: 'before the change' }] }, ['items[1].a'])
+            const forms = new Map([
+                ['master', { form: countedForm({ items: [{ a: 'first' }, { a: 'as loaded' }] }), meta: {} }],
+                ['row', { form: row, meta: { relativePath: 'items', relativeIndex: 1 } }],
+            ])
+            const handed = { items: [undefined, { a: 'after the change' }] }
+            expect(getLiveMergedDataKindArray('items', forms, { form: row, name: 'items[1].a', values: handed }))
+                .toEqual([{ a: 'first' }, { a: 'after the change' }])
+            expect(row.reads).toBe(0)
+        })
+    })
+
+    describe('a table row\'s own form', () => {
+        // A form registered with its row's place as `relativePath` and `relativeIndex`: a row a `useForm` declaration
+        // gives a form, which holds its row at that place and nothing else (`engine/Data.tsx`), as `mergeForms` reads it.
+        const rowForm = (values, relativePath, relativeIndex) => ({ form: makeForm(values), meta: { relativePath, relativeIndex } })
+
+        it('writes its row over the document\'s copy, and keeps the rows after it', () => {
+            // Forms register as they mount, children first. Until 2026-10-26 the document's copy won, and the row's form,
+            // which holds the array up to its own index, capped the rows there.
+            const forms = new Map([
+                ['row', rowForm({ items: [{ name: 'edited' }] }, 'items', 0)],
+                ['master', { form: makeForm({ items: [{ name: 'as loaded', age: 30 }, { name: 'Bob' }, { name: 'Carol' }] }), meta: {} }],
+            ])
+            expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ name: 'edited', age: 30 }, { name: 'Bob' }, { name: 'Carol' }])
+        })
+
+        it('leaves out a row past the document\'s rows, as one just removed there', () => {
+            const forms = new Map([
+                ['master', { form: makeForm({ items: [{ name: 'Alice' }] }), meta: {} }],
+                ['removed row', rowForm({ items: [undefined, { name: 'Bob' }] }, 'items', 1)],
+            ])
+            expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ name: 'Alice' }])
+        })
+
+        it('reads a row of a table nested in another\'s rows, its path in brackets or in dots', () => {
+            const forms = new Map([
+                ['master', { form: makeForm({ phases: [{ lines: [{ sku: 'A' }, { sku: 'B' }] }] }), meta: {} }],
+                ['row', rowForm({ phases: [{ lines: [undefined, { sku: 'edited' }] }] }, 'phases.0.lines', 1)],
+            ])
+            expect(getLiveMergedDataKindArray('phases[0].lines', forms)).toEqual([{ sku: 'A' }, { sku: 'edited' }])
+        })
+
+        it('puts the array of a table inside its row after the documents\' copies', () => {
+            const forms = new Map([
+                ['outer row', rowForm({ phases: [{ lines: [{ sku: 'edited' }] }] }, 'phases', 0)],
+                ['master', { form: makeForm({ phases: [{ lines: [{ sku: 'A', qty: 1 }, { sku: 'B' }] }] }), meta: {} }],
+            ])
+            expect(getLiveMergedDataKindArray('phases.0.lines', forms)).toEqual([{ sku: 'edited', qty: 1 }])
+        })
+
+        it('takes nothing from a row elsewhere, even what it holds at the root of its values', () => {
+            const forms = new Map([
+                ['master', { form: makeForm({ items: [{ name: 'Alice' }] }), meta: {} }],
+                ['other row', rowForm({ items: [{ name: 'stray' }], others: [{ name: 'edited' }] }, 'others', 0)],
+            ])
+            expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ name: 'Alice' }])
+        })
+
+        it('takes nothing from a row that holds no row there', () => {
+            const forms = new Map([
+                ['master', { form: makeForm({ items: [{ name: 'Alice' }] }), meta: {} }],
+                ['row', rowForm({ items: [null] }, 'items', 0)],
+            ])
+            expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ name: 'Alice' }])
+        })
+    })
+})
+
+describe('rowPlaceOf', () => {
+    it('places a row by its path and index, and nothing else', () => {
+        expect([
+            rowPlaceOf({ relativePath: 'dataKind.items', relativeIndex: 1 }),
+            rowPlaceOf({ relativePath: 'dataKind.items', relativeIndex: 0 }),
+            rowPlaceOf({ relativePath: 'dataKind.items' }),
+            rowPlaceOf({ relativeIndex: 1 }),
+            rowPlaceOf(undefined),
+        ]).toEqual(['dataKind.items[1]', 'dataKind.items[0]', undefined, undefined, undefined])
     })
 })
 

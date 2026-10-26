@@ -61,7 +61,7 @@ export type ValidatingForm = {
  * The rows are shared between the calls that get them: read them, do not change them. Each call gets
  * an array of its own.
  */
-const lastMerges = new WeakMap<unknown[], Map<string, { arrays: unknown[][], rows: object[] }>>()
+const lastMerges = new WeakMap<unknown[], Map<string, { arrays: unknown[][], own: Array<{ index: number, row: unknown }>, rows: object[] }>>()
 
 /**
  * Whether two form objects are one final-form instance. react-final-form hands a new `{...form, reset}`
@@ -78,10 +78,35 @@ function registers (form: FormApi, name: string): boolean {
 }
 
 /**
+ * The place of a table row with a form of its own, such as `dataKind.items[1]`, read from the meta its form registers:
+ * its `relativePath` and its `relativeIndex`. Its fields are named by it (`mapper.tsx`), and its form holds the row there
+ * (`engine/Data.tsx`). `undefined` for any other form.
+ */
+export function rowPlaceOf (meta: MetaNode | undefined): string | undefined {
+  const { relativePath, relativeIndex } = meta || {}
+  return relativePath && typeof relativeIndex !== 'undefined' ? `${relativePath}[${relativeIndex}]` : undefined
+}
+
+/** A path in dots: `dataKind.phases[0].dataKind.items` and `dataKind.phases.0.dataKind.items` name one place. */
+const dotted = (path: string) => path.replace(/\[(\d+)\]/g, '.$1')
+
+/** Whether `piece` is a row: an object, and not an array. */
+const isRow = (piece: unknown): piece is object => piece != null && typeof piece === 'object' && !Array.isArray(piece)
+
+/**
  * Live {@code dataKind.*} array: merge each row from every form that holds {@code path} in
  * {@code form.getState().values}, shallow-merge row objects (later forms in {@code forms} order win).
  * Length is capped to the minimum array length among those forms so a stale longer copy on the
  * master form does not leave ghost rows after FieldArray.remove (lodash merge keeps trailing indices).
+ *
+ * A table row with a form of its own holds its row only, at its place (`rowPlaceOf`), as `mergeForms` reads it
+ * (2026-10-26):
+ * - A row of this array is that row: written over the documents' copy of it, and no cap. A `useForm` row's form held
+ *   the array up to its own index once the row was edited, so the cap dropped the rows after it, and the document's
+ *   copy, merged after it, took its edit back. A submit sent what was left.
+ * - A row that this array is inside of, a table nested in such a row, holds the whole array, which goes after the
+ *   documents' copies.
+ * - A row elsewhere holds nothing of this array.
  *
  * @param {string} path - e.g. {@code orders.dataKind.lines} or {@code dataKind.line}
  * @param {Map} forms - {@link formsStorage}
@@ -89,23 +114,39 @@ function registers (form: FormApi, name: string): boolean {
  * @returns {Array<Object>}
  */
 export function getLiveMergedDataKindArray (path: string, forms: Forms, validating?: ValidatingForm): object[] {
-  const arrays: unknown[][] = []
-  forms.forEach(({ form }) => {
+  const documents: unknown[][] = []
+  const inRows: unknown[][] = []
+  // The row each row form of this array holds, by its index.
+  const rows: Array<{ index: number, row: unknown }> = []
+  const at = dotted(path)
+  forms.forEach(({ form, meta }) => {
     if (!form || typeof form.getState !== 'function') return
     const values = validating && sameForm(form, validating.form) && registers(form, validating.name)
       ? validating.values
       : form.getState().values
+    // A cast, not a guard: what a form registers as its meta is its document's meta.
+    const rowMeta = meta as MetaNode | undefined
+    const place = rowPlaceOf(rowMeta)
+    if (place && dotted(rowMeta!.relativePath!) === at) { // not undefined: `rowPlaceOf` read both
+      rows.push({ index: Number(rowMeta!.relativeIndex), row: get(values, place) })
+      return
+    }
+    if (place && !at.startsWith(`${dotted(place)}.`)) return
     const arr = get(values, path)
     if (Array.isArray(arr) && arr.length > 0) {
-      arrays.push(arr)
+      (place ? inRows : documents).push(arr)
     }
   })
+  const arrays = documents.concat(inRows)
   if (!arrays.length) {
     return []
   }
   const kept = lastMerges.get(arrays[0])
   const last = kept && kept.get(path)
-  if (last && last.arrays.length === arrays.length && last.arrays.every((array, i) => array === arrays[i])) {
+  if (
+    last && last.arrays.length === arrays.length && last.arrays.every((array, i) => array === arrays[i]) &&
+    last.own.length === rows.length && last.own.every(({ index, row }, i) => index === rows[i].index && row === rows[i].row)
+  ) {
     return last.rows.slice()
   }
   const cap = Math.min(...arrays.map(a => a.length))
@@ -114,14 +155,17 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
     let row: object = {}
     for (const arr of arrays) {
       const piece = arr[i]
-      if (piece != null && typeof piece === 'object' && !Array.isArray(piece)) {
+      if (isRow(piece)) {
         row = { ...row, ...piece }
       }
     }
     out.push(hasObjectValue(row) ? row : {})
   }
+  rows.forEach(({ index, row }) => {
+    if (index < cap && isRow(row)) out[index] = { ...out[index], ...row }
+  })
   const byPath = kept || new Map()
-  byPath.set(path, { arrays, rows: out })
+  byPath.set(path, { arrays, own: rows, rows: out })
   if (!kept) lastMerges.set(arrays[0], byPath)
   return out.slice()
 }
@@ -139,14 +183,15 @@ export const getRawFormsData = (forms: Forms) => {
  * the row that each table row's own form holds, written over the document's copy of that row (2026-10-23).
  *
  * A table row with a form of its own registers the row's place as its meta's `relativePath` and
- * `relativeIndex`. That is the add row a `renderExtraItem` declaration renders, or a row a `useForm`
- * declaration gives a form. Its fields are named by that place (`dataKind.periods[1].startDate`), so its
+ * `relativeIndex` (`rowPlaceOf`). That is the add row a `renderExtraItem` declaration renders, or a row a
+ * `useForm` declaration gives a form. Its fields are named by that place (`dataKind.periods[1].startDate`), so its
  * values hold the row there already. They were placed there a second time, at
  * `dataKind.periods[1].dataKind.periods[1]`. Measured: a `showIf` in the add row never saw the row's own
  * fields, and an edit in a `useForm` row put a copy of the table inside that row in `getFormData`.
  *
- * - Only the row is taken. The rest of such a form's values is what it started from, the row's data or
- *   the declared `initialValues`, at the root of its values, where none of its fields reads.
+ * - Only the row is taken, and only the row is copied. A `useForm` row's form starts from the row's values
+ *   there (`engine/Data.tsx`). An add row's starts from the `initialValues` its meta declares, at the root of
+ *   its values, where none of its fields reads.
  * - The row goes into the document's own containers. In containers of its own, the row of a table nested
  *   in a row (`dataKind.phases.0.dataKind.lineItems[2]`) made `phases` an object, which the merge put in
  *   place of the document's array of phases.
@@ -165,18 +210,15 @@ function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | u
     const { form } = value;
     // A cast, not a guard: what a form registers as its meta is its document's meta.
     const meta = value.meta as MetaNode | undefined;
-    const { relativePath, relativeIndex } = meta || {};
-    if (relativePath && typeof relativeIndex === 'undefined') return;
-
-    const formValues = cloneDeep(form.getState().values);
-
-    if (!relativePath) {
-      documents.push(fromRoot(formValues, meta));
+    const place = rowPlaceOf(meta);
+    if (!place) {
+      if (meta && meta.relativePath) return;
+      documents.push(fromRoot(cloneDeep(form.getState().values), meta));
       return;
     }
-    // Its fields are named `${place}.${name}` (`mapper.tsx`).
-    const place = `${relativePath}[${relativeIndex}]`;
-    const row = get(formValues, place);
+    // Its fields are named `${place}.${name}` (`mapper.tsx`). The row only: a `useForm` row's form holds the array up
+    // to its own index, which a copy of all of it would walk, one hole at a time.
+    const row = cloneDeep(get(form.getState().values, place));
     if (row !== undefined) rows.push({ place, row });
   })
 

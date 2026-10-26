@@ -1,5 +1,24 @@
 ### Table of Contents
 
+### Unreleased
+
+#### Fixes
+
+- **A table row that `useForm` gives a form of its own starts with its values, and a submit sends every row with
+  its edits.** Such a row's form started from the row's values at the root of its own values, while its fields read
+  them at the row's place, such as `dataKind.items[1].kind`: every field of the row started empty. A submit after an
+  edit in one row sent the rows only up to that one, and that one without the edit. A cross-row check
+  (`notWithinRange`) in such a row read neither end of a period the user had not typed there, so it missed an overlap
+  with another row. The form now starts from the row's values at its place, and what is read from the forms takes each
+  row from its own form, over the document's copy of it. Removing a row with `removeData` still loses what was typed
+  in the rows after it, which move up a row and start again from the document's copy.
+- **A `showIf` that reads the form merges the document's forms once, not once per node.** A node whose `showIf` reads
+  a field decides by every form of its document merged, and each node merged them as it decided, so a table whose
+  rows each hold such a node copied its forms once per row on every render of the rows. Measured on React 18.3 before
+  this change, a mount of 20 rows that `useForm` gives forms merged them 80 times, and a keystroke in a table of 20
+  rows that share the document's form merged them 20 times, each a copy of the whole table. The nodes of a document
+  now share one merge while its forms hold the same: a mount merges twice, and a keystroke once.
+
 ### v0.35.0
 
 React 17, 18 and 19 join 16.14 in the peer range, and Semantic UI is gone: the select, the table and

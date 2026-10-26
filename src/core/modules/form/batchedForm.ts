@@ -1,5 +1,6 @@
 import { createForm } from 'final-form'
 import type { Config, FormApi } from 'final-form'
+import { countFormsChange } from '../../state/formRegistry'
 
 /**
  * Brackets around a burst of fields registering and unregistering, which an engine node opens in its layout effect
@@ -61,10 +62,18 @@ export function revalidate (form: unknown): void {
  * A registration that asks to be silent itself, as react-final-form's probe in a field's first render does, keeps
  * its `silent`, and while validation runs, it registers without its validator (see below). Every other registration
  * made while validation runs is left as it is.
+ *
+ * NEW VALUES ARE COUNTED FIRST (2026-10-26). The first of the form's subscribers told of new values counts a change of
+ * what the page's forms hold before it hears of them (`countFormsChange`), whichever subscriber that is. What the engine
+ * merges from the forms is kept while the count stays the same (`engine/keptRawFormsData.ts`), and a node that follows
+ * the form decides as soon as it is told, by such a merge: it subscribes before the form layer does, as it mounts first.
  */
 export function createBatchedForm<FormValues = Record<string, any>> (config: Config<FormValues>): FormApi<FormValues> {
   const form = createForm<FormValues>(config)
-  const {registerField, resumeValidation, setConfig, submit} = form
+  const {registerField, resumeValidation, setConfig, submit, subscribe} = form
+  // The values the form's subscribers were last told of: those it starts with, which react-final-form's first render
+  // subscribes for and no merge holds yet, until a change.
+  let toldValues: unknown = form.getState().values
   // The form's own validator, which `setConfig('validate', …)` keeps and validates every field with.
   let validate = config.validate
   // A field registered silently since validation was paused, which the others have not heard of yet.
@@ -123,6 +132,13 @@ export function createBatchedForm<FormValues = Record<string, any>> (config: Con
     resumeValidation()
     settle()
   }
+  form.subscribe = (subscriber, subscription) => subscribe(state => {
+    if (subscription.values && state.values !== toldValues) {
+      toldValues = state.values
+      countFormsChange()
+    }
+    subscriber(state)
+  }, subscription)
   form.submit = () => {
     // A submit between a commit and its effects, inside a bracket, submits what has registered so far validated.
     if (pausedHere) {

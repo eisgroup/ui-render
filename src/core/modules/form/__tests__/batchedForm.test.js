@@ -9,6 +9,7 @@
  */
 import { createForm } from 'final-form'
 import { createBatchedForm, registrationsOf } from '../batchedForm'
+import { formsChangeCount } from '../../../state/formRegistry'
 
 const SUBSCRIPTION = { value: true, error: true, valid: true, pristine: true }
 
@@ -190,6 +191,37 @@ describe('createBatchedForm', () => {
         form.pauseValidation()
         form.resumeValidation()
         expect(batches.count).toBe(1)
+    })
+})
+
+describe('the values a batched form\'s subscribers are told of', () => {
+    // What the engine merges from the forms is kept while the count stays the same (`engine/keptRawFormsData.ts`): a
+    // subscriber that decides as it is told must find the count moved already, whichever subscriber is told first.
+    it('are counted once per change, before the first subscriber hears of them', () => {
+        const form = createBatchedForm({ onSubmit: () => undefined, initialValues: { a: 1 } })
+        const heard = []
+        const listen = who => form.subscribe(({ values }) => { heard.push([who, values.a, formsChangeCount()]) }, { values: true })
+        listen('first')
+        listen('second')
+        const before = formsChangeCount()
+        heard.length = 0
+
+        form.change('a', 2)
+
+        expect(heard).toEqual([['first', 2, before + 1], ['second', 2, before + 1]])
+    })
+
+    it('are not counted for a subscriber to something else, nor when the values stay', () => {
+        const form = createBatchedForm({ onSubmit: () => undefined, initialValues: { a: 1 } })
+        const succeeded = []
+        form.subscribe(() => undefined, { values: true })
+        form.subscribe(({ submitSucceeded }) => { succeeded.push(submitSucceeded) }, { submitSucceeded: true })
+        const before = formsChangeCount()
+
+        form.submit()
+
+        expect(succeeded).toEqual([false, true])
+        expect(formsChangeCount()).toBe(before)
     })
 })
 

@@ -136,6 +136,15 @@ whose `showIf` reads the form hears the other forms of its document tree too, wh
 what the form held before, and the tree keeps its latest tells, so a node catches up as it commits with those made
 after it rendered.
 
+Every such decision reads the merge of its tree's forms, which the tree's nodes share while what the page's forms hold
+stays the same (`keptRawFormsData`, since 2026-10-26): `formsStorage` counts each form that registers, goes or
+registers again, and a form a document renders counts its new values before the first of its subscribers hears of them
+(`createBatchedForm`). A tree's tells come too late for that: the form layer subscribes as the form commits, after the
+nodes under it. A change written into a form's values in place, which final-form tells nobody of, must be counted
+where it is made (`countFormsChange`), as the `submit` action's is. A `useForm` row's form holds its row at the row's
+place, as its fields read it (`engine/Data.tsx`), and every merge of the forms takes the row from there
+(`rowPlaceOf`, `engine/formData.ts`).
+
 A mount has a cost besides renders: every field registers with final-form. Until 2026-10-13, each registration
 published the state of every field before it and, once validation ran, validated them all, and each unregistration
 did the same. A burst of n fields cost about n²/2 of each, on the first render, a tab switch, a `showIf` that flips

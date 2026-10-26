@@ -4,12 +4,33 @@
  * exercised through the documents that use it.
  */
 import {
-    dataFormsOf, fixableFieldsOf, formsOf, formsStorage, holdFixableField, listenToTreeValues, tellTreeValues,
-    treeValuesTellsSince, treeValuesVersion,
+    countFormsChange, dataFormsOf, fixableFieldsOf, formsChangeCount, formsOf, formsStorage, holdFixableField,
+    listenToTreeValues, tellTreeValues, treeValuesTellsSince, treeValuesVersion,
 } from '../formRegistry'
 
 afterEach(() => {
     formsStorage.clear()
+})
+
+describe('what the page\'s forms hold, counted', () => {
+    it('counts a form registered, registered again, gone, the storage cleared, and new values', () => {
+        const key = {}
+        const counts = [formsChangeCount()]
+        formsStorage.set(key, { form: {}, meta: {}, tree: {}, draftRow: false })
+        counts.push(formsChangeCount())
+        formsStorage.set(key, { form: {}, meta: { relativeIndex: 1 }, tree: {}, draftRow: false })
+        counts.push(formsChangeCount())
+        formsStorage.delete(key)
+        counts.push(formsChangeCount())
+        formsStorage.clear()
+        counts.push(formsChangeCount())
+        countFormsChange()
+        counts.push(formsChangeCount())
+
+        expect(counts.map(count => count - counts[0])).toEqual([0, 1, 2, 3, 4, 5])
+        // Still a map of the forms.
+        expect(formsStorage).toBeInstanceOf(Map)
+    })
 })
 
 describe('dataFormsOf', () => {

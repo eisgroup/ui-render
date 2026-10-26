@@ -11,6 +11,10 @@
  *   once more as it renders, as every node decides its `showIf`;
  * - the mount decides nothing more than each item's render does.
  *
+ * The decisions of a document tree share one merge of its forms while they hold the same (`keptRawFormsData`,
+ * 2026-10-26): a keystroke merges once, and a mount twice, once before the forms register and once after. Each decision
+ * merged them until then, which made a mount and a keystroke cost the square of the items.
+ *
  * Measured on React 16.14, 17.0.2, 18.3.1 and 19.3.0, which agree. A number that falls is progress: lower
  * it here. One that rises is a regression.
  */
@@ -18,8 +22,18 @@ import React from 'react'
 import { act, fireEvent, render } from '@testing-library/react'
 import UIRender from '../main'
 
-/** Every decision of a `showIf` (`shouldRender` given one), and every render of a `Text`. */
-const mockCounts = { decisions: 0, texts: 0 }
+/** Every decision of a `showIf` (`shouldRender` given one), every render of a `Text`, and every merge of the forms. */
+const mockCounts = { decisions: 0, texts: 0, merges: 0 }
+jest.mock('../../core/engine/formData', () => {
+    const actual = jest.requireActual('../../core/engine/formData')
+    return {
+        ...actual,
+        getRawFormsData: forms => {
+            mockCounts.merges += 1
+            return actual.getRawFormsData(forms)
+        },
+    }
+})
 jest.mock('../../core/engine/showIf', () => {
     const actual = jest.requireActual('../../core/engine/showIf')
     return {
@@ -61,9 +75,12 @@ afterEach(() => {
     jest.useRealTimers()
 })
 
+/** Counts from zero. */
+const counting = () => Object.assign(mockCounts, { decisions: 0, texts: 0, merges: 0 })
+
 /** What typing `value` into the field `name` costs. */
 function keystroke (name, value) {
-    Object.assign(mockCounts, { decisions: 0, texts: 0 })
+    counting()
     act(() => { fireEvent.change(document.querySelector(`input[name="${name}"]`), { target: { value } }) })
     act(() => { jest.runOnlyPendingTimers() })
     return { ...mockCounts }
@@ -76,7 +93,7 @@ describe('a 50-item list whose items read a field in their `showIf`', () => {
         render(<UIRender meta={meta} data={data} initialValues={data}/>)
         act(() => { jest.runOnlyPendingTimers() })
 
-        expect(keystroke('note', 'x')).toEqual({ decisions: 0, texts: 0 })
+        expect(keystroke('note', 'x')).toEqual({ decisions: 0, texts: 0, merges: 0 })
     })
 
     it('decides each once for a keystroke in the field they read, and renders each it shows', () => {
@@ -84,22 +101,23 @@ describe('a 50-item list whose items read a field in their `showIf`', () => {
         act(() => { jest.runOnlyPendingTimers() })
 
         // Each decides, and renders, which decides it again.
-        expect(keystroke('flag', 'y')).toEqual({ decisions: ROWS * 2, texts: ROWS })
+        expect(keystroke('flag', 'y')).toEqual({ decisions: ROWS * 2, texts: ROWS, merges: 1 })
         expect(shownItems(container)).toBe(ROWS)
         // The same answer: each decides, and none renders.
-        expect(keystroke('flag', 'yes')).toEqual({ decisions: ROWS, texts: 0 })
-        expect(keystroke('flag', '')).toEqual({ decisions: ROWS * 2, texts: 0 })
+        expect(keystroke('flag', 'yes')).toEqual({ decisions: ROWS, texts: 0, merges: 1 })
+        expect(keystroke('flag', '')).toEqual({ decisions: ROWS * 2, texts: 0, merges: 1 })
         expect(shownItems(container)).toBe(0)
     })
 
     it('decides nothing more at mount than each item\'s render does', () => {
         // Each item renders twice as the document mounts, on every React version, and decides its `showIf` each time:
-        // 100 before the items followed the form, measured on the four.
-        Object.assign(mockCounts, { decisions: 0, texts: 0 })
+        // 100 before the items followed the form, measured on the four. Each decision merged the forms until 2026-10-26.
+        counting()
         render(<UIRender meta={meta} data={data} initialValues={data}/>)
         act(() => { jest.runOnlyPendingTimers() })
 
         expect(mockCounts.decisions).toBe(ROWS * 2)
+        expect(mockCounts.merges).toBe(2)
     })
 })
 
@@ -117,22 +135,23 @@ describe('a 50-item list whose items read a field of a `useForm` block', () => {
     const otherData = { note: '', rows: data.rows }
 
     it('decides nothing more at mount, and nothing for a keystroke in the document\'s own form', () => {
-        Object.assign(mockCounts, { decisions: 0, texts: 0 })
+        counting()
         render(<UIRender meta={otherMeta} data={otherData} initialValues={otherData}/>)
         act(() => { jest.runOnlyPendingTimers() })
         expect(mockCounts.decisions).toBe(ROWS * 2)
+        expect(mockCounts.merges).toBe(2)
 
-        expect(keystroke('note', 'x')).toEqual({ decisions: 0, texts: 0 })
+        expect(keystroke('note', 'x')).toEqual({ decisions: 0, texts: 0, merges: 0 })
     })
 
     it('decides each once for a keystroke in the block\'s field, and renders each it shows', () => {
         const { container } = render(<UIRender meta={otherMeta} data={otherData} initialValues={otherData}/>)
         act(() => { jest.runOnlyPendingTimers() })
 
-        expect(keystroke('inner', 'y')).toEqual({ decisions: ROWS * 2, texts: ROWS })
+        expect(keystroke('inner', 'y')).toEqual({ decisions: ROWS * 2, texts: ROWS, merges: 1 })
         expect(shownItems(container)).toBe(ROWS)
-        expect(keystroke('inner', 'yes')).toEqual({ decisions: ROWS, texts: 0 })
-        expect(keystroke('inner', '')).toEqual({ decisions: ROWS * 2, texts: 0 })
+        expect(keystroke('inner', 'yes')).toEqual({ decisions: ROWS, texts: 0, merges: 1 })
+        expect(keystroke('inner', '')).toEqual({ decisions: ROWS * 2, texts: 0, merges: 1 })
         expect(shownItems(container)).toBe(0)
     })
 
@@ -140,12 +159,13 @@ describe('a 50-item list whose items read a field of a `useForm` block', () => {
         // The items listen before the block's form and the document's register, and each tells the value they read.
         const listFirst = { ...otherMeta, items: [otherMeta.items[0], otherMeta.items[2], otherMeta.items[1]] }
         const listData = { ...otherData, inner: '' }
-        Object.assign(mockCounts, { decisions: 0, texts: 0 })
+        counting()
         render(<UIRender meta={listFirst} data={listData} initialValues={listData}/>)
         act(() => { jest.runOnlyPendingTimers() })
         expect(mockCounts.decisions).toBe(ROWS * 2)
+        expect(mockCounts.merges).toBe(2)
 
-        expect(keystroke('note', 'x')).toEqual({ decisions: 0, texts: 0 })
+        expect(keystroke('note', 'x')).toEqual({ decisions: 0, texts: 0, merges: 0 })
     })
 })
 
@@ -153,9 +173,8 @@ describe('a 50-item list whose items read a field of a `useForm` block', () => {
 // once more as the document mounts than it renders, where it decided as often until 2026-10-26: its first render reads
 // the row's values, the document's form is not registered yet, and decides as if the field were empty. The document's
 // form tells its values as it registers, and the cell decides again, where it waited for the rows' next render before.
-// Each of these decisions merges every form of the tree, so the work grows with the square of the rows. Such a row's fields
-// start empty, and a submit after an edit in it loses the edit (`rules.row-form-values.test.js`): a defect of its own,
-// and no config uses one.
+// Each of these decisions merged every form of the tree until 2026-10-26, so the work grew with the square of the rows:
+// measured on React 18.3, 80 merges of 21 forms.
 describe('a 20-row table of `useForm` rows whose cell reads its row\'s field', () => {
     const RowCount = 20
     const rowsMeta = {
@@ -179,11 +198,12 @@ describe('a 20-row table of `useForm` rows whose cell reads its row\'s field', (
         // A row's cell renders three times as the document mounts on React 18.3, and twice on 16.14, 17 and 19, as it
         // did before: measured, 60 and 40 decisions until 2026-10-26.
         const mountRenders = React.version.startsWith('18.') ? 3 : 2
-        Object.assign(mockCounts, { decisions: 0, texts: 0 })
+        counting()
         render(<UIRender meta={rowsMeta} data={rowsData} initialValues={rowsData}/>)
         act(() => { jest.runOnlyPendingTimers() })
         expect(mockCounts.decisions).toBe(RowCount * (mountRenders + 1))
+        expect(mockCounts.merges).toBe(2)
 
-        expect(keystroke('dataKind.items[0].kind', 'other')).toEqual({ decisions: 1, texts: 1 })
+        expect(keystroke('dataKind.items[0].kind', 'other')).toEqual({ decisions: 1, texts: 1, merges: 1 })
     })
 })

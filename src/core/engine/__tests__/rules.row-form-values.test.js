@@ -38,21 +38,31 @@ const cells = addRow => [
 
 const headers = [{ id: 'kind', label: 'Kind' }, { id: 'detail', label: 'Detail' }, { id: 'null', label: '' }]
 
-/** Mounts the meta on the data; the host records what `getFormData` reads. */
+/**
+ * Mounts the meta on the data; the host records what `getFormData` reads, and what a submit sends, and can hand the
+ * document other data.
+ */
 function mount (meta, data) {
-    const host = { reader: null }
-    const view = render(
+    const host = { reader: null, submitted: [] }
+    const document = values => (
         <ConfigContext.Provider value={initialConfigState}>
             <AppContext.Provider value={popup}>
-                <UIRender meta={meta} data={cloneDeep(data)} initialValues={cloneDeep(data)}
-                    getFormData={function (reader) { host.reader = reader }}/>
+                <UIRender meta={meta} data={cloneDeep(values)} initialValues={cloneDeep(values)}
+                    getFormData={function (reader) { host.reader = reader }}
+                    onSubmit={function (submitted) { host.submitted.push(cloneDeep(submitted)) }}/>
             </AppContext.Provider>
         </ConfigContext.Provider>
     )
-    return { ...view, host }
+    const view = render(document(data))
+    return { ...view, host, handOver: values => view.rerender(document(values)) }
 }
 
 const field = name => document.querySelector(`[name="${name}"]`)
+/** The message a field shows: what its input is described by, an element there only while it shows one. */
+const shown = name => {
+    const help = field(name).getAttribute('aria-describedby')
+    return help ? document.getElementById(help).textContent : ''
+}
 
 const type = (name, value) => {
     const input = field(name)
@@ -105,8 +115,6 @@ describe('a `showIf` in a table\'s add row', () => {
 })
 
 describe('a table row with a `useForm` form of its own', () => {
-    // Its fields start empty, as they did before this change, and that is not pinned here: its form starts
-    // from the row's values at the root of its own, where none of its fields reads.
     const meta = {
         view: 'Table',
         name: 'dataKind.items',
@@ -114,6 +122,68 @@ describe('a table row with a `useForm` form of its own', () => {
         renderItemCells: { view: 'Data', kind: 'items', embedded: true, useForm: true, meta: { view: 'TableCells', items: cells(false) } },
     }
     const data = { dataKind: { items: [{ kind: 'plain' }, { kind: 'other', detail: 'second' }] } }
+
+    // Until 2026-10-26 its form started from the row's values at the root of its own, where none of its fields reads:
+    // every field of the row started empty. And a submit sent the rows as the live merge had them
+    // (`getLiveMergedDataKindArray`), which let the document's copy of an edited row win, and kept no more rows than
+    // the shortest array of the forms held, which an edited row's form held up to its own index. Measured on the code
+    // before: the fields empty, and a submit after an edit of the first of three rows sent that row unedited, alone.
+    it('starts its fields from the row\'s values', () => {
+        mount(meta, data)
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('plain')
+        expect(field('dataKind.items[1].kind')).toHaveValue('other')
+        expect(field('dataKind.items[1].detail')).toHaveValue('second')
+    })
+
+    it('submits every row, the edited one with its edit', async () => {
+        const withSubmit = { view: 'Col', items: [meta, { view: 'Button', children: 'Submit', onClick: 'submit' }] }
+        const rows = [{ kind: 'plain' }, { kind: 'other', detail: 'second' }, { kind: 'plain' }]
+        const { host } = mount(withSubmit, { dataKind: { items: rows } })
+
+        type('dataKind.items[0].kind', 'other')
+        await click('Submit')
+
+        expect(host.submitted).toEqual([{ dataKind: { items: [{ kind: 'other' }, rows[1], rows[2]] } }])
+    })
+
+    it('shows the rows a host hands it next, and a `showIf` in them reads them', () => {
+        const { handOver } = mount(meta, data)
+
+        handOver({ dataKind: { items: [{ kind: 'other', detail: 'first' }, { kind: 'plain' }] } })
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('other')
+        expect(field('dataKind.items[0].detail')).toHaveValue('first')
+        expect(field('dataKind.items[1].kind')).toHaveValue('plain')
+        expect(field('dataKind.items[1].detail')).not.toBeInTheDocument()
+    })
+
+    it('finds an overlap between its period and another row\'s', async () => {
+        // A cross-row check reads the other rows from the forms (`getLiveMergedDataKindArray`), and this row's from
+        // the values its validator is handed. Before, its form held neither end of its period where the check reads it.
+        const verify = () => ({ dataKind: 'periods', validate: [{ name: 'notWithinRange', args: ['startDate', 'endDate'] }] })
+        const periods = {
+            view: 'Table',
+            name: 'dataKind.periods',
+            headers: [{ id: 'startDate', label: 'Start' }, { id: 'endDate', label: 'End' }],
+            renderItemCells: {
+                view: 'Data', kind: 'periods', embedded: true, useForm: true,
+                meta: {
+                    view: 'TableCells',
+                    items: [
+                        { view: 'Input', name: 'startDate', type: 'text', verify: verify() },
+                        { view: 'Input', name: 'endDate', type: 'text', verify: verify() },
+                    ],
+                },
+            },
+        }
+        mount(periods, { dataKind: { periods: [{ startDate: '2020-01-01', endDate: '2020-06-30' }, { startDate: '2021-01-01', endDate: '2021-06-30' }] } })
+
+        type('dataKind.periods[1].startDate', '2020-03-01')
+        await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)) })
+
+        expect(shown('dataKind.periods[1].startDate')).toBe('Periods cannot overlap')
+    })
 
     it('has its edit in getFormData at the row, with no copy of the table inside it', () => {
         const { host } = mount(meta, data)
