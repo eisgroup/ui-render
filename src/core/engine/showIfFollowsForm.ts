@@ -1,5 +1,5 @@
 import { createContext, useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef } from 'react'
-import { listenToTreeValues, treeValuesTellsSince, type TreeValuesTell } from '../state/formRegistry'
+import { listenToTreeValues, treeValuesTask, treeValuesTellsSince, type TreeValuesTell } from '../state/formRegistry'
 import { get } from '../utils/object'
 
 /**
@@ -46,17 +46,15 @@ const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayo
 
 const valueAt = (values: unknown, path: string) => values === undefined ? undefined : get(values, path)
 
-/** A change of a form's values, as against a form that registers or goes. */
-const isValueChange = (tell: TreeValuesTell) => tell.previous !== undefined && tell.values !== undefined
-
 /**
- * How many times a node renders again on forms that come and go, between two changes of its tree's values. A form that
- * comes and goes with the node itself would flip it for ever: a `useForm` block under it whose values merge over the
- * field its `showIf` reads, and decide it the other way, comes as the node shows and hides it, and goes as it hides and
- * shows it. Measured, React gives up with "Maximum update depth exceeded". The node stops there, and stays as it is
- * until a value of its tree changes. Each coming or going counts up to twice: as the node hears it, and as it commits.
+ * How many times a node renders again in one task on what its tree tells. A form that comes and goes with the node
+ * itself would flip it for ever: a `useForm` block under it whose values merge over the field its `showIf` reads, and
+ * decide it the other way, comes as the node shows and hides it, and goes as it hides and shows it, in one chain of
+ * renders, until React gives up with "Maximum update depth exceeded" (measured). A user's change settles in its own
+ * task, and so do a tab switch, a popup and a collapse, where forms come and go and no value changes: the node stops
+ * for the rest of the task, and its tree's next tell, in a task of its own, decides it as before.
  */
-const COMINGS_AND_GOINGS = 4
+const FLIPS_IN_A_TASK = 8
 
 /**
  * Whether `tell`, from another form than `own`, can change a decision that read `value` at `path`: that form's value
@@ -101,15 +99,18 @@ export function useShowIfFollowsForm (
     )
     const latest = useRef(following)
     const decided = useRef<ShowIfDecision>(rendered)
-    // Renders again on forms that came or went, since a value of the tree last changed (`COMINGS_AND_GOINGS`).
-    const flips = useRef(0)
+    // Its tree, and how many times it rendered again on what the tree told in the tree's task (`FLIPS_IN_A_TASK`).
+    const heard = useRef<object | undefined>(undefined)
+    const flips = useRef({ task: -1, count: 0 })
     // Decides again, by the latest render's `decide`, and renders the node again where the answer is another.
-    const decideAgain = useCallback((byValues: boolean) => {
+    const decideAgain = useCallback(() => {
         const was = decided.current
         const next = latest.current!.decide() // not undefined: only a node with a path listens
-        if (next.shown !== was.shown && !byValues) {
-            flips.current += 1
-            if (flips.current > COMINGS_AND_GOINGS) return
+        if (next.shown !== was.shown && heard.current) {
+            const task = treeValuesTask(heard.current)
+            if (flips.current.task !== task) flips.current = { task, count: 0 }
+            flips.current.count += 1
+            if (flips.current.count > FLIPS_IN_A_TASK) return
         }
         decided.current = next
         if (next.shown !== was.shown) renderAgain()
@@ -118,16 +119,11 @@ export function useShowIfFollowsForm (
         if (!following) return
         latest.current = following
         decided.current = { shown: following.shown, value: following.value }
+        heard.current = listened
         if (!listened) return
         const tells = treeValuesTellsSince(listened, following.renderedAt)
-        if (!tells) {
-            // Gone from the log: they were made in an earlier task, and the node decides again.
-            decideAgain(true)
-            return
-        }
-        if (tells.some(isValueChange)) flips.current = 0
-        const moving = tells.filter(tell => moves(tell, form, following.path, following.value))
-        if (moving.length) decideAgain(moving.some(isValueChange))
+        // Gone from the log, made in an earlier task: the node decides again.
+        if (!tells || tells.some(tell => moves(tell, form, following.path, following.value))) decideAgain()
     }, [following, listened, form, decideAgain])
     useBeforePaintEffect(() => {
         if (!subscribed) return undefined
@@ -139,15 +135,13 @@ export function useShowIfFollowsForm (
             const first = seen === undefined
             if (seen && seen.path === path && Object.is(seen.value, now)) return
             seen = { path, value: now }
-            if (!first && !Object.is(now, decided.current.value)) decideAgain(true)
+            if (!first && !Object.is(now, decided.current.value)) decideAgain()
         }, { values: true })
     }, [subscribed, decideAgain])
     useBeforePaintEffect(() => {
         if (!listened) return undefined
         return listenToTreeValues(listened, tell => {
-            const byValues = isValueChange(tell)
-            if (byValues) flips.current = 0
-            if (moves(tell, form, latest.current!.path, decided.current.value)) decideAgain(byValues)
+            if (moves(tell, form, latest.current!.path, decided.current.value)) decideAgain()
         })
     }, [listened, form, decideAgain])
 }

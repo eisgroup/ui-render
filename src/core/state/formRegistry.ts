@@ -100,6 +100,8 @@ type TreeValues = {
 	log: TreeValuesTell[],
 	/** Whether the log is to be emptied as the task ends */
 	emptying: boolean,
+	/** How many tasks that told have ended */
+	task: number,
 }
 
 /** How many tells a tree keeps in a task: the registrations of a mount, and more. A node that rendered before more decides again. */
@@ -110,7 +112,7 @@ const treeValues = new WeakMap<object, TreeValues>()
 function valuesOf (tree: object): TreeValues {
 	let entry = treeValues.get(tree)
 	if (!entry) {
-		entry = { listeners: new Set(), live: new Map(), version: 0, log: [], emptying: false }
+		entry = { listeners: new Set(), live: new Map(), version: 0, log: [], emptying: false, task: 0 }
 		treeValues.set(tree, entry)
 	}
 	return entry
@@ -120,6 +122,12 @@ function valuesOf (tree: object): TreeValues {
 export function treeValuesVersion (tree: object): number {
 	const entry = treeValues.get(tree)
 	return entry ? entry.version : 0
+}
+
+/** How many of the tasks in which `tree` told have ended: a node counts its renders per task by it. */
+export function treeValuesTask (tree: object): number {
+	const entry = treeValues.get(tree)
+	return entry ? entry.task : 0
 }
 
 /** The tells `tree` has made after `version`, oldest first, or `undefined` once it keeps no longer all of them. */
@@ -153,6 +161,7 @@ export function tellTreeValues (tree: object, form: object, values: unknown): vo
 		setTimeout(() => {
 			emptied.log = []
 			emptied.emptying = false
+			emptied.task += 1
 		}, 0)
 	}
 	// A copy, and only who still listens: a listener that a render stops while the others hear is told nothing more.

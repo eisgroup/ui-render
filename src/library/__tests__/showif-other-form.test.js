@@ -175,6 +175,58 @@ it('a node whose `useForm` block under it decides it the other way settles', () 
     expect(screen.getByLabelText('Status')).toHaveValue('open')
 })
 
+it('a node whose `useForm` block under it decides it the other way settles where the block changes a value as it comes', () => {
+    // A select whose value is none of its options picks the first as it mounts: a change of the tree's values in each
+    // turn of the flips.
+    const meta = {
+        view: 'Col',
+        items: [
+            { view: 'Input', name: 'status', label: 'Status' },
+            {
+                view: 'Col',
+                showIf: { name: 'status', equal: 'open', relativeData: false },
+                items: [{
+                    view: 'Data', useForm: true, name: 'details',
+                    meta: { view: 'Col', items: [{ view: 'Select', name: 'kind', label: 'Kind', options: ['a', 'b'] }] },
+                }],
+            },
+        ],
+    }
+    mount(meta, { status: 'draft', details: { status: 'archived', kind: 'none' } }, 'once')
+
+    type('status', 'open')
+    expect(screen.getByLabelText('Status')).toHaveValue('open')
+})
+
+it('a node follows a block in a tab through every switch of the tabs', () => {
+    // The block comes and goes with its tab, and no value of the document changes: each switch is a task of its own.
+    const meta = {
+        view: 'Col',
+        items: [
+            gated,
+            {
+                view: 'Tabs',
+                items: [
+                    { tab: 'A', content: { ...block, name: 'sub' } },
+                    { tab: 'B', content: { view: 'Text', children: 'Nothing here' } },
+                ],
+            },
+        ],
+    }
+    mount(meta, { sub: { inner: 'yes' } }, 'once')
+    expect(gatedShown()).toBe(true)
+    const pick = name => {
+        act(() => { fireEvent.click(screen.getByRole('tab', { name })) })
+        act(() => { jest.runOnlyPendingTimers() })
+    }
+    for (let round = 0; round < 8; round += 1) {
+        pick('B')
+        expect(gatedShown()).toBe(false)
+        pick('A')
+        expect(gatedShown()).toBe(true)
+    }
+})
+
 it('a node beside a block shows as the block adopts the value a host hands it', () => {
     // The block's form is reset to its new initial values while the document renders on, and the node decides with it.
     const meta = { view: 'Col', items: [{ ...block, name: 'sub' }, gated] }
