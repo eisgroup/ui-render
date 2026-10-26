@@ -470,3 +470,102 @@ describe('an empty row with a `useForm` form', () => {
         expect(field('dataKind.items[1].kind')).toHaveValue('')
     })
 })
+
+describe('an empty row with a `useForm` form, edited', () => {
+    const meta = {
+        view: 'Col',
+        items: [{
+            view: 'Table',
+            name: 'dataKind.items',
+            headers: [{ id: 'kind', label: 'Kind' }],
+            renderItemCells: {
+                view: 'Data', kind: 'items', embedded: true, useForm: true,
+                meta: {
+                    view: 'TableCells',
+                    items: [
+                        { view: 'Input', name: 'kind', type: 'text' },
+                        { view: 'Text', children: 'Typed here', showIf: { name: 'kind', equal: 'typed' } },
+                    ],
+                },
+            },
+        }, { view: 'Button', children: 'Submit', onClick: 'submit' }],
+    }
+
+    it.each([['a `null` row', null], ['a `{}` row', {}]])('has the edit of %s in getFormData, a `showIf` and a submit', async (_, row) => {
+        const { host } = mount(meta, { title: 'T', dataKind: { items: [{ kind: 'a' }, row] } })
+        const edited = { title: 'T', dataKind: { items: [{ kind: 'a' }, { kind: 'typed' }] } }
+
+        type('dataKind.items[1].kind', 'typed')
+
+        expect(host.reader()).toEqual(edited)
+        expect(screen.queryByText('Typed here')).toBeInTheDocument()
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+})
+
+// final-form drops a value set to `undefined`, which a field with `normalize: 'date'` sets for an empty date. Until
+// 2026-10-26 a `useForm` row's form gave nothing for a value it no longer held, so the document's copy showed the date
+// again: found in review, in `getFormData`, a submit and a `showIf`.
+describe('a value cleared in a `useForm` row', () => {
+    const withSubmit = cells => ({
+        view: 'Col',
+        items: [{
+            view: 'Table',
+            name: 'dataKind.items',
+            headers: cells.map(({ name }) => ({ id: name || 'null', label: name || '' })),
+            renderItemCells: { view: 'Data', kind: 'items', embedded: true, useForm: true, meta: { view: 'TableCells', items: cells } },
+        }, { view: 'Button', children: 'Submit', onClick: 'submit' }],
+    })
+
+    it('is gone from getFormData, a `showIf` and a submit, for a date field', async () => {
+        const meta = withSubmit([
+            { view: 'Input', name: 'kind', type: 'text' },
+            { view: 'Input', name: 'when', type: 'text', normalize: 'date' },
+            { view: 'Text', children: 'Has a date', showIf: { name: 'when' } },
+        ])
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a', when: '2020-01-01' }] } })
+        expect(screen.queryByText('Has a date')).toBeInTheDocument()
+
+        type('dataKind.items[0].when', '')
+
+        expect(host.reader()).toEqual({ dataKind: { items: [{ kind: 'a' }] } })
+        expect(screen.queryByText('Has a date')).not.toBeInTheDocument()
+        await click('Submit')
+        expect(host.submitted).toEqual([{ dataKind: { items: [{ kind: 'a' }] } }])
+    })
+
+    it('is empty, or off, where the field keeps a value for it', async () => {
+        const meta = withSubmit([
+            { view: 'Input', name: 'note', type: 'text' },
+            { view: 'Toggle', name: 'on', label: 'On' },
+        ])
+        const { host } = mount(meta, { dataKind: { items: [{ note: 'old', on: true }] } })
+
+        type('dataKind.items[0].note', '')
+        act(() => { fireEvent.click(field('dataKind.items[0].on') || screen.getByLabelText('On')) })
+
+        expect(host.reader()).toEqual({ dataKind: { items: [{ note: '', on: false }] } })
+        await click('Submit')
+        expect(host.submitted).toEqual([{ dataKind: { items: [{ note: '', on: false }] } }])
+    })
+})
+
+// A node rendered outside its document's render, such as a cell of a table's `extraItems`, has no document instance.
+// Until 2026-10-26 a `Data` view handed an object read that instance's data, and threw there: found in review.
+describe('a `useForm` block in a cell of a table\'s `extraItems`', () => {
+    it('renders its field', () => {
+        const meta = {
+            view: 'Table',
+            name: 'dataKind.items',
+            headers: [{ id: 'kind', label: 'Kind' }],
+            extraItems: [{
+                kind: { view: 'Data', kind: 'extra', useForm: true, meta: { view: 'Col', items: [{ view: 'Input', name: 'extraNote', type: 'text' }] } },
+            }],
+        }
+
+        mount(meta, { dataKind: { items: [{ kind: 'a' }] } })
+
+        expect(field('extraNote')).toBeInTheDocument()
+    })
+})

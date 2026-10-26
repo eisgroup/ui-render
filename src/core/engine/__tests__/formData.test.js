@@ -148,6 +148,18 @@ describe('getLiveMergedDataKindArray', () => {
             expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ a: 'typed again' }])
         })
 
+        it('merges again once a row\'s own form starts from another row, though it holds the same values', () => {
+            const values = { items: [{ a: 'typed' }] }
+            const row = { values, initialValues: { items: [{ a: 'typed' }] }, getState: () => ({ values, initialValues: row.initialValues }) }
+            const forms = new Map([
+                ['row', { form: row, meta: { relativePath: 'items', relativeIndex: 0 } }],
+                ['master', { form: countedForm({ items: [{ a: 'as loaded' }] }), meta: {} }],
+            ])
+            expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ a: 'as loaded' }])
+            row.initialValues = { items: [{ a: 'as loaded' }] }
+            expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ a: 'typed' }])
+        })
+
         it('reads the row of a row\'s own form from the values a validator in it was handed', () => {
             const row = countedForm({ items: [undefined, { a: 'before the change' }] }, ['items[1].a'])
             const forms = new Map([
@@ -180,6 +192,17 @@ describe('getLiveMergedDataKindArray', () => {
                 ['master', { form: makeForm({ items: [{ kind: 'a', note: 'new' }, { kind: 'b', note: 'new' }] }), meta: {} }],
             ])
             expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ kind: 'typed', note: 'new' }, { kind: 'b', note: 'new' }])
+        })
+
+        it('drops from the document\'s copy a value its row no longer holds, and cuts an array it made shorter', () => {
+            // A cleared field with `normalize: 'date'` sets `undefined`, which final-form drops. Until 2026-10-26 the
+            // document's copy kept the date.
+            const started = { items: [{ kind: 'a', when: '2020-01-01', lines: [{ sku: 'A' }, { sku: 'B' }] }] }
+            const forms = new Map([
+                ['row', rowForm({ items: [{ kind: 'a', lines: [{ sku: 'A' }] }] }, 'items', 0, started)],
+                ['master', { form: makeForm({ items: [{ kind: 'a', when: '2020-01-01', note: 'x', lines: [{ sku: 'A' }, { sku: 'B' }] }] }), meta: {} }],
+            ])
+            expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ kind: 'a', note: 'x', lines: [{ sku: 'A' }] }])
         })
 
         it('writes its row over the document\'s copy, and keeps the rows after it', () => {
@@ -217,6 +240,25 @@ describe('getLiveMergedDataKindArray', () => {
             expect(getLiveMergedDataKindArray('phases.0.lines', forms)).toEqual([{ sku: 'A', qty: 2 }, { sku: 'edited' }, { sku: 'C' }])
         })
 
+        it('cuts the rows of an array inside its row that it made shorter, and none it did not', () => {
+            const started = { phases: [{ lines: [{ sku: 'A' }, { sku: 'B' }, { sku: 'C' }] }] }
+            const shortened = rowForm({ phases: [{ lines: [{ sku: 'A' }, { sku: 'B' }] }] }, 'phases', 0, started)
+            const read = documentLines => getLiveMergedDataKindArray('phases.0.lines', new Map([
+                ['outer row', shortened],
+                ['master', { form: makeForm({ phases: [{ lines: documentLines }] }), meta: {} }],
+            ]))
+            expect([read([{ sku: 'A' }, { sku: 'B' }, { sku: 'C' }]), read([{ sku: 'A' }])])
+                .toEqual([[{ sku: 'A' }, { sku: 'B' }], [{ sku: 'A' }]])
+        })
+
+        it('takes nothing of an array inside its row that it had no start for', () => {
+            const forms = new Map([
+                ['outer row', rowForm({ phases: [{ lines: [{ sku: 'edited' }] }] }, 'phases', 0)],
+                ['master', { form: makeForm({ phases: [{ lines: [{ sku: 'A' }] }] }), meta: {} }],
+            ])
+            expect(getLiveMergedDataKindArray('phases.0.lines', forms)).toEqual([{ sku: 'A' }])
+        })
+
         it('leaves out what it changed of an array inside its row past the documents\' rows, and what is no row', () => {
             const started = { phases: [{ lines: [{ sku: 'A' }, 'B', { sku: 'C' }] }] }
             const forms = new Map([
@@ -245,31 +287,44 @@ describe('getLiveMergedDataKindArray', () => {
 })
 
 describe('changesOf', () => {
-    it('is what changed, where it is in objects and arrays', () => {
+    it('is each change at its path, in objects and arrays', () => {
         const initial = { kind: 'a', note: 'old', address: { city: 'X', zip: '1' }, lines: [{ sku: 'A' }, { sku: 'B' }] }
         const current = { kind: 'a', note: 'new', address: { city: 'X', zip: '2' }, lines: [{ sku: 'A' }, { sku: 'C' }] }
-        const changed = changesOf(initial, current)
 
-        expect(changed).toEqual({ note: 'new', address: { zip: '2' }, lines: [undefined, { sku: 'C' }] })
-        // A hole, which a merge skips: the first line stays whatever another form made of it.
-        expect(0 in changed.lines).toBe(false)
+        expect(changesOf(initial, current)).toEqual([
+            { path: ['note'], value: 'new' },
+            { path: ['address', 'zip'], value: '2' },
+            { path: ['lines', 1, 'sku'], value: 'C' },
+        ])
     })
 
-    it('is nothing for what stayed, and for what the current values no longer hold', () => {
+    it('is a value the current values no longer hold, and an array they made shorter', () => {
+        // final-form drops a value set to `undefined`, as a cleared field with `normalize: 'date'` sets it.
+        expect([
+            changesOf({ a: 1, when: '2020-01-01', none: undefined }, { a: 1 }),
+            changesOf({ when: '2020-01-01' }, { when: undefined }),
+            changesOf({ lines: [{ sku: 'A' }, { sku: 'B' }, { sku: 'C' }] }, { lines: [{ sku: 'A' }] }),
+        ]).toEqual([
+            [{ path: ['when'], removed: true }],
+            [{ path: ['when'], removed: true }],
+            [{ path: ['lines', 'length'], value: 1 }],
+        ])
+    })
+
+    it('is nothing for what stayed, nor for a row the current values do not hold at all', () => {
         const same = { a: { b: 1 } }
         expect([
             changesOf(same, same),
             changesOf({ a: 1, b: [1] }, { a: 1, b: [1] }),
-            changesOf({ a: 1, b: 2 }, { a: 1 }),
             changesOf({ a: 1 }, undefined),
-        ]).toEqual([undefined, undefined, undefined, undefined])
+        ]).toEqual([[], [], []])
     })
 
     it('compares other objects by value', () => {
         expect([
             changesOf({ at: new Date(0) }, { at: new Date(0) }),
             changesOf({ at: new Date(0) }, { at: new Date(1) }),
-        ]).toEqual([undefined, { at: new Date(1) }])
+        ]).toEqual([[], [{ path: ['at'], value: new Date(1) }]])
     })
 
     it('is the value that took the place of another kind of value, or of none', () => {
@@ -278,7 +333,12 @@ describe('changesOf', () => {
             changesOf(null, { a: 1 }),
             changesOf({ a: 1 }, null),
             changesOf({ a: [1] }, { a: 'x' }),
-        ]).toEqual([{ a: 1 }, { a: 1 }, null, { a: 'x' }])
+        ]).toEqual([
+            [{ path: [], value: { a: 1 } }],
+            [{ path: [], value: { a: 1 } }],
+            [{ path: [], value: null }],
+            [{ path: ['a'], value: 'x' }],
+        ])
     })
 })
 
@@ -350,6 +410,23 @@ describe.each([
             ['master', { form: makeForm({ title: 'T', items: [{ kind: 'a', note: 'new', lines: [{ sku: 'A', qty: 2 }] }] }), meta: {} }],
         ])
         expect(read(forms)).toEqual({ title: 'T', items: [{ kind: 'typed', note: 'new', lines: [{ sku: 'A', qty: 2 }] }] })
+    })
+
+    it('makes no row of a value the row\'s form no longer holds, where the document has no copy of the row', () => {
+        const forms = new Map([
+            ['row', rowForm({ items: [undefined, { kind: 'a' }] }, 'items', 1, { items: [undefined, { kind: 'a', when: '2020-01-01' }] })],
+            ['master', { form: makeForm({ title: 'T', items: [{ kind: 'b' }] }), meta: {} }],
+        ])
+        expect(read(forms)).toEqual({ title: 'T', items: [{ kind: 'b' }] })
+    })
+
+    it('drops from the document\'s copy a value the row\'s form no longer holds', () => {
+        const started = { items: [{ kind: 'a', when: '2020-01-01' }] }
+        const forms = new Map([
+            ['row', rowForm({ items: [{ kind: 'a' }] }, 'items', 0, started)],
+            ['master', { form: makeForm({ title: 'T', items: [{ kind: 'a', when: '2020-01-01' }] }), meta: {} }],
+        ])
+        expect(read(forms)).toEqual({ title: 'T', items: [{ kind: 'a' }] })
     })
 
     it('places the row its fields hold at that row, and only once', () => {

@@ -27,8 +27,11 @@ export type DataMeta = { view?: string, meta?: DataMeta, [key: string]: unknown 
 export type DataProps = {
   /** Data of the same `kind` are grouped into an array, and validated together as a group. */
   kind: string
-  /** The UI Render instance containing this Data component; a draft row reads its data kinds */
-  instance: NonNullable<LocalDraftTableRowProps['parentInstance']>
+  /**
+   * The UI Render instance containing this Data component; a draft row reads its data kinds. None for a node rendered
+   * outside a document's render: a table's `extraItems`, a tooltip's `children`, an input's `icon`, a `values` renderer.
+   */
+  instance?: LocalDraftTableRowProps['parentInstance']
   /** The index of this Data component in the array of rendered data, for removing itself */
   index?: number | string
   /** Data.json to use */
@@ -100,8 +103,8 @@ export default function Data ({
   // started empty. A table's add row (`draftRow`) starts from the `initialValues` its meta declares, as before, and so
   // does a row that holds no object: for a `null` row, `data` is the document's (`mapper.tsx`), which placed there put a
   // copy of the document inside the row.
-  const isRowValues = isObject(initialValues) && initialValues !== instance.data
-  const place = useForm && !draftRow && isRowValues ? rowPlaceOf(meta) : undefined
+  const rowPlace = useForm && !draftRow ? rowPlaceOf(meta) : undefined
+  const place = rowPlace && isObject(initialValues) && initialValues !== (instance && instance.data) ? rowPlace : undefined
   const formValues = useMemo(() => place ? setIn({}, place, initialValues) : initialValues, [place, initialValues])
 
   // TableCells only, or Data wrapping TableCells (e.g. renderExtraItem). Draft values stay in React state

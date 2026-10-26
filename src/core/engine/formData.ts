@@ -6,7 +6,7 @@
  * `errorMapping.ts` and `dataMapping.ts`.
  */
 import type { FormApi } from 'final-form'
-import { get, merge, isEqual, isObject, hasObjectValue, set } from '../utils/object'
+import { get, merge, isEqual, isObject, hasObjectValue, set, unset } from '../utils/object'
 import type { RegisteredForm } from '../state/formRegistry'
 import { FIELD } from '../modules'
 import { cloneDeep } from '../utils'
@@ -99,30 +99,67 @@ const dotted = (path: string) => path.replace(/\[(\d+)\]/g, '.$1')
 /** Whether `piece` is a row: an object, and not an array. */
 const isRow = (piece: unknown): piece is object => piece != null && typeof piece === 'object' && !Array.isArray(piece)
 
+/** A step of a path in values: a key of an object, or an index of an array. */
+type Step = string | number
+
 /**
- * What `current` changed of `initial`: the values that differ, where they are in objects and arrays (a changed element
- * of an array sits at its index, among holes), and nothing for a value `current` no longer holds; `undefined` when
- * nothing changed. A table row's own form starts from the row's values, so this is what the row's fields changed of it.
+ * Something a form changed of the values it started from, at `path`: the value there now, no value there any more
+ * (`removed`), or, at an array's `length`, an array made shorter.
  */
-export function changesOf (initial: unknown, current: unknown): unknown {
-  if (Object.is(initial, current) || current === undefined) return undefined
-  if (isObject(current) && isObject(initial)) {
-    let changed: Values | undefined
-    Object.keys(current).forEach(key => {
-      const value = changesOf(initial[key], current[key])
-      if (value !== undefined) (changed || (changed = {}))[key] = value
+export type Change = { path: Step[], value?: unknown, removed?: true }
+
+/**
+ * What `current` changed of `initial`, each change at its path, in objects and arrays; none for what stayed. A table
+ * row's own form starts from the row's values, so this is what the row's fields changed of it.
+ *
+ * A value `current` no longer holds is a change too (2026-10-26): final-form drops a value set to `undefined`, as a
+ * field with `normalize: 'date'` sets it when it is cleared, and the document's copy showed the value it had again.
+ */
+export function changesOf (initial: unknown, current: unknown, path: Step[] = [], changes: Change[] = []): Change[] {
+  if (Object.is(initial, current)) return changes
+  if (current === undefined) {
+    // A row its form does not hold at all is no change to the row: the form holds a row only at its place.
+    if (path.length) changes.push({ path, removed: true })
+  } else if (isObject(current) && isObject(initial)) {
+    Object.keys(current).forEach(key => changesOf(initial[key], current[key], [...path, key], changes))
+    Object.keys(initial).forEach(key => {
+      if (!(key in current) && initial[key] !== undefined) changes.push({ path: [...path, key], removed: true })
     })
-    return changed
+  } else if (Array.isArray(current) && Array.isArray(initial)) {
+    for (let index = 0; index < current.length; index++) changesOf(initial[index], current[index], [...path, index], changes)
+    if (current.length < initial.length) changes.push({ path: [...path, 'length'], value: current.length })
+  } else if (!isEqual(initial, current)) {
+    changes.push({ path, value: current })
   }
-  if (Array.isArray(current) && Array.isArray(initial)) {
-    let changed: unknown[] | undefined
-    current.forEach((item, index) => {
-      const value = changesOf(initial[index], item)
-      if (value !== undefined) (changed || (changed = []))[index] = value
-    })
-    return changed
-  }
-  return isEqual(initial, current) ? undefined : current
+  return changes
+}
+
+/**
+ * Writes `changes` into `target`, under `at`, where `target` is the caller's own copy: a value copied, a value no longer
+ * held deleted, and an array cut to its length. A whole row or array its form had no start for is merged over what is
+ * there, as every row form's values were before they had one.
+ */
+function applyChanges (target: object, at: Step[], changes: Change[]): void {
+  changes.forEach(({ path, value, removed }) => {
+    const to = [...at, ...path]
+    if (removed) {
+      unset(target, to)
+    } else if (path[path.length - 1] === 'length') {
+      const array = get(target, to.slice(0, -1))
+      if (Array.isArray(array) && array.length > Number(value)) array.length = Number(value)
+    } else {
+      const there = path.length ? undefined : get(target, to)
+      set(target, to, isObject(there) && isObject(value) ? merge(there, value) : cloneDeep(value))
+    }
+  })
+}
+
+/** Whether a change of the rows of an array, by their index, leaves them rows among the first `cap`: a row, not a value. */
+function keepsRows ({ path, value, removed }: Change, cap: number): boolean {
+  const [first] = path
+  if (first === 'length') return true
+  if (typeof first !== 'number' || first >= cap) return false
+  return path.length > 1 || (!removed && isRow(value))
 }
 
 /**
@@ -199,20 +236,21 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
     }
     out.push(hasObjectValue(row) ? row : {})
   }
-  owned.forEach(({ index, values, initial }) => {
-    const changed = changesOf(initial, values)
-    if (index !== undefined) {
-      if (index < cap && isRow(changed)) out[index] = merge(out[index], changed)
-    } else if (Array.isArray(changed)) {
-      changed.forEach((row, i) => {
-        if (i < cap && isRow(row)) out[i] = merge(out[i], row)
-      })
+  // Written over a copy: the rows hold the objects of the documents' values.
+  const changed = owned.map(({ index, values, initial }) => ({ index, changes: changesOf(initial, values) }))
+    .filter(({ changes }) => changes.length > 0)
+  const rows = { all: changed.length ? cloneDeep(out) : out }
+  changed.forEach(({ index, changes }) => {
+    if (index === undefined) {
+      applyChanges(rows, ['all'], changes.filter(change => keepsRows(change, cap)))
+    } else if (index < cap) {
+      applyChanges(rows, ['all', index], changes.filter(({ path, value, removed }) => path.length > 0 || (!removed && isRow(value))))
     }
   })
   const byPath = kept || new Map()
-  byPath.set(path, { arrays, owned, rows: out })
+  byPath.set(path, { arrays, owned, rows: rows.all })
   if (!kept) lastMerges.set(arrays[0], byPath)
-  return out.slice()
+  return rows.all.slice()
 }
 
 /**
@@ -251,7 +289,7 @@ export const getRawFormsData = (forms: Forms) => {
  */
 function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | undefined) => Values) {
   const documents: Values[] = [];
-  const rows: Array<{ place: string, row: unknown }> = [];
+  const rows: Array<{ place: string, changes: Change[] }> = [];
 
   forms.forEach(value => {
     const { form } = value;
@@ -263,18 +301,23 @@ function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | u
       documents.push(fromRoot(cloneDeep(form.getState().values), meta));
       return;
     }
-    // Its fields are named `${place}.${name}` (`mapper.tsx`). What it changed of the row only (`changesOf`), copied: a
-    // `useForm` row's form starts from the whole row, and an array up to its index, which a copy would walk hole by hole.
+    // Its fields are named `${place}.${name}` (`mapper.tsx`). What it changed of the row only (`changesOf`): a `useForm`
+    // row's form starts from the whole row, and an array up to its index, which a copy would walk hole by hole.
     const { values, initialValues } = form.getState();
-    const row = changesOf(get(initialValues, place), get(values, place));
-    if (row !== undefined) rows.push({ place, row: cloneDeep(row) });
+    const changes = changesOf(get(initialValues, place), get(values, place));
+    if (changes.length) rows.push({ place, changes });
   })
 
   const merged = mergeData(documents);
   if (!rows.length) return merged;
-  // Written in place, which changes no form: each form's values were cloned before they were merged.
+  // Written in place, which changes no form: each form's values were cloned before they were merged, and what a change
+  // writes is copied.
   const result: Values = merged || {};
-  rows.forEach(({ place, row }) => set(result, place, merge(get(result, place), row)));
+  rows.forEach(({ place, changes }) => {
+    const at = { row: get(result, place) };
+    applyChanges(at, ['row'], changes);
+    if (at.row !== undefined) set(result, place, at.row);
+  });
   return result;
 }
 
