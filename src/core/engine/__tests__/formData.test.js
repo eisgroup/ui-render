@@ -1,14 +1,15 @@
 import {
     changeOptionOrderForSelectFields,
+    changesOf,
     getFormsData,
     getRawFormsData,
     getLiveMergedDataKindArray,
     rowPlaceOf,
 } from '../formData'
 
-function makeForm(values) {
+function makeForm(values, initialValues) {
     return {
-        getState: () => ({ values }),
+        getState: () => ({ values, initialValues }),
     }
 }
 
@@ -156,14 +157,30 @@ describe('getLiveMergedDataKindArray', () => {
             const handed = { items: [undefined, { a: 'after the change' }] }
             expect(getLiveMergedDataKindArray('items', forms, { form: row, name: 'items[1].a', values: handed }))
                 .toEqual([{ a: 'first' }, { a: 'after the change' }])
-            expect(row.reads).toBe(0)
+            // Its state once, for what it started from: a row's form has a field or two.
+            expect(row.reads).toBe(1)
         })
     })
 
     describe('a table row\'s own form', () => {
         // A form registered with its row's place as `relativePath` and `relativeIndex`: a row a `useForm` declaration
         // gives a form, which holds its row at that place and nothing else (`engine/Data.tsx`), as `mergeForms` reads it.
-        const rowForm = (values, relativePath, relativeIndex) => ({ form: makeForm(values), meta: { relativePath, relativeIndex } })
+        // It gives what it changed of what it started from: with no initial values, all it holds.
+        const rowForm = (values, relativePath, relativeIndex, initialValues) => ({
+            form: makeForm(values, initialValues), meta: { relativePath, relativeIndex },
+        })
+
+        it('gives only what it changed of its row: the rest is the document\'s, which another form may have edited', () => {
+            // A field in the row's expanded content is the document form's. Until 2026-10-26 the row's form gave its
+            // whole row, and the row as it started came back over that field's edit.
+            const started = { items: [{ kind: 'a', note: 'old' }, { kind: 'b', note: 'old' }] }
+            const forms = new Map([
+                ['row', rowForm({ items: [{ kind: 'typed', note: 'old' }] }, 'items', 0, started)],
+                ['other row', rowForm(started, 'items', 1, started)],
+                ['master', { form: makeForm({ items: [{ kind: 'a', note: 'new' }, { kind: 'b', note: 'new' }] }), meta: {} }],
+            ])
+            expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ kind: 'typed', note: 'new' }, { kind: 'b', note: 'new' }])
+        })
 
         it('writes its row over the document\'s copy, and keeps the rows after it', () => {
             // Forms register as they mount, children first. Until 2026-10-26 the document's copy won, and the row's form,
@@ -191,12 +208,22 @@ describe('getLiveMergedDataKindArray', () => {
             expect(getLiveMergedDataKindArray('phases[0].lines', forms)).toEqual([{ sku: 'A' }, { sku: 'edited' }])
         })
 
-        it('puts the array of a table inside its row after the documents\' copies', () => {
+        it('gives what it changed of an array inside its row, row by row, over the documents\' copies, and caps nothing', () => {
+            const started = { phases: [{ lines: [{ sku: 'A', qty: 1 }, { sku: 'B' }] }] }
             const forms = new Map([
-                ['outer row', rowForm({ phases: [{ lines: [{ sku: 'edited' }] }] }, 'phases', 0)],
-                ['master', { form: makeForm({ phases: [{ lines: [{ sku: 'A', qty: 1 }, { sku: 'B' }] }] }), meta: {} }],
+                ['outer row', rowForm({ phases: [{ lines: [{ sku: 'A', qty: 1 }, { sku: 'edited' }] }] }, 'phases', 0, started)],
+                ['master', { form: makeForm({ phases: [{ lines: [{ sku: 'A', qty: 2 }, { sku: 'B' }, { sku: 'C' }] }] }), meta: {} }],
             ])
-            expect(getLiveMergedDataKindArray('phases.0.lines', forms)).toEqual([{ sku: 'edited', qty: 1 }])
+            expect(getLiveMergedDataKindArray('phases.0.lines', forms)).toEqual([{ sku: 'A', qty: 2 }, { sku: 'edited' }, { sku: 'C' }])
+        })
+
+        it('leaves out what it changed of an array inside its row past the documents\' rows, and what is no row', () => {
+            const started = { phases: [{ lines: [{ sku: 'A' }, 'B', { sku: 'C' }] }] }
+            const forms = new Map([
+                ['outer row', rowForm({ phases: [{ lines: [{ sku: 'A' }, 'edited', { sku: 'gone' }] }] }, 'phases', 0, started)],
+                ['master', { form: makeForm({ phases: [{ lines: [{ sku: 'A' }, { sku: 'B' }] }] }), meta: {} }],
+            ])
+            expect(getLiveMergedDataKindArray('phases.0.lines', forms)).toEqual([{ sku: 'A' }, { sku: 'B' }])
         })
 
         it('takes nothing from a row elsewhere, even what it holds at the root of its values', () => {
@@ -214,6 +241,44 @@ describe('getLiveMergedDataKindArray', () => {
             ])
             expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ name: 'Alice' }])
         })
+    })
+})
+
+describe('changesOf', () => {
+    it('is what changed, where it is in objects and arrays', () => {
+        const initial = { kind: 'a', note: 'old', address: { city: 'X', zip: '1' }, lines: [{ sku: 'A' }, { sku: 'B' }] }
+        const current = { kind: 'a', note: 'new', address: { city: 'X', zip: '2' }, lines: [{ sku: 'A' }, { sku: 'C' }] }
+        const changed = changesOf(initial, current)
+
+        expect(changed).toEqual({ note: 'new', address: { zip: '2' }, lines: [undefined, { sku: 'C' }] })
+        // A hole, which a merge skips: the first line stays whatever another form made of it.
+        expect(0 in changed.lines).toBe(false)
+    })
+
+    it('is nothing for what stayed, and for what the current values no longer hold', () => {
+        const same = { a: { b: 1 } }
+        expect([
+            changesOf(same, same),
+            changesOf({ a: 1, b: [1] }, { a: 1, b: [1] }),
+            changesOf({ a: 1, b: 2 }, { a: 1 }),
+            changesOf({ a: 1 }, undefined),
+        ]).toEqual([undefined, undefined, undefined, undefined])
+    })
+
+    it('compares other objects by value', () => {
+        expect([
+            changesOf({ at: new Date(0) }, { at: new Date(0) }),
+            changesOf({ at: new Date(0) }, { at: new Date(1) }),
+        ]).toEqual([undefined, { at: new Date(1) }])
+    })
+
+    it('is the value that took the place of another kind of value, or of none', () => {
+        expect([
+            changesOf(undefined, { a: 1 }),
+            changesOf(null, { a: 1 }),
+            changesOf({ a: 1 }, null),
+            changesOf({ a: [1] }, { a: 'x' }),
+        ]).toEqual([{ a: 1 }, { a: 1 }, null, { a: 'x' }])
     })
 })
 
@@ -272,7 +337,20 @@ describe.each([
     // A form registered with its row's place as `relativePath` and `relativeIndex`: a table's add row, or a row
     // a `useForm` declaration gives a form. Its fields are named by that place, `items[1].name`, so its values
     // hold the row there, as the engine's do.
-    const rowForm = (values, relativePath, relativeIndex) => ({ form: makeForm(values), meta: { relativePath, relativeIndex } })
+    const rowForm = (values, relativePath, relativeIndex, initialValues) => ({
+        form: makeForm(values, initialValues), meta: { relativePath, relativeIndex },
+    })
+
+    it('takes what the row\'s form changed of the row, over the document\'s copy another form edited', () => {
+        // A `useForm` row's form starts from the whole row (`engine/Data.tsx`). Until 2026-10-26 all of it was taken, and
+        // the note, which the document's form edited in the row's expanded content, came back as it started.
+        const started = { items: [{ kind: 'a', note: 'old', lines: [{ sku: 'A' }] }] }
+        const forms = new Map([
+            ['row', rowForm({ items: [{ kind: 'typed', note: 'old', lines: [{ sku: 'A' }] }] }, 'items', 0, started)],
+            ['master', { form: makeForm({ title: 'T', items: [{ kind: 'a', note: 'new', lines: [{ sku: 'A', qty: 2 }] }] }), meta: {} }],
+        ])
+        expect(read(forms)).toEqual({ title: 'T', items: [{ kind: 'typed', note: 'new', lines: [{ sku: 'A', qty: 2 }] }] })
+    })
 
     it('places the row its fields hold at that row, and only once', () => {
         const forms = new Map([

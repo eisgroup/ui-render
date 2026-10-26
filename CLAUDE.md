@@ -142,8 +142,9 @@ registers again, and a form a document renders counts its new values before the 
 (`createBatchedForm`). A tree's tells come too late for that: the form layer subscribes as the form commits, after the
 nodes under it. A change written into a form's values in place, which final-form tells nobody of, must be counted
 where it is made (`countFormsChange`), as the `submit` action's is. A `useForm` row's form holds its row at the row's
-place, as its fields read it (`engine/Data.tsx`), and every merge of the forms takes the row from there
-(`rowPlaceOf`, `engine/formData.ts`).
+place, as its fields read it (`engine/Data.tsx`), and every merge of the forms takes from it what it changed of the
+row (`rowPlaceOf`, `changesOf`, `engine/formData.ts`): the rest is the document's, which another form, such as the
+row's expanded content's, may have edited.
 
 A mount has a cost besides renders: every field registers with final-form. Until 2026-10-13, each registration
 published the state of every field before it and, once validation ran, validated them all, and each unregistration

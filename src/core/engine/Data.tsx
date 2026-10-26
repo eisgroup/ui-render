@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import { setIn } from 'final-form'
 import { Active } from '../utils'
+import { isObject } from '../utils/object'
 import DocumentWithOwnForm from './rules'
 import { rowPlaceOf } from './formData'
 import LocalDraftTableRow from './components/LocalDraftTableRow'
@@ -96,8 +97,11 @@ export default function Data ({
   // A table row that `useForm` gives a form of its own names its fields by the row's place, `dataKind.items[1].kind`
   // (`mapper.tsx`), so its form starts from the row's values there, placed as final-form places a field's value. Until
   // 2026-10-26 it started from them at the root of its values, where none of its fields reads: every field of the row
-  // started empty. A table's add row (`draftRow`) starts from the `initialValues` its meta declares, as before.
-  const place = useForm && !draftRow ? rowPlaceOf(meta) : undefined
+  // started empty. A table's add row (`draftRow`) starts from the `initialValues` its meta declares, as before, and so
+  // does a row that holds no object: for a `null` row, `data` is the document's (`mapper.tsx`), which placed there put a
+  // copy of the document inside the row.
+  const isRowValues = isObject(initialValues) && initialValues !== instance.data
+  const place = useForm && !draftRow && isRowValues ? rowPlaceOf(meta) : undefined
   const formValues = useMemo(() => place ? setIn({}, place, initialValues) : initialValues, [place, initialValues])
 
   // TableCells only, or Data wrapping TableCells (e.g. renderExtraItem). Draft values stay in React state

@@ -9,9 +9,11 @@
   them at the row's place, such as `dataKind.items[1].kind`: every field of the row started empty. A submit after an
   edit in one row sent the rows only up to that one, and that one without the edit. 0.34.x did both. A cross-row check
   (`notWithinRange`) in such a row read neither end of a period the user had not typed there, so it missed an overlap
-  with another row. The form now starts from the row's values at its place, and what is read from the forms takes each
-  row from its own form, over the document's copy of it. Removing a row with `removeData` still loses what was typed
-  in the rows after it, which move up a row and start again from the document's copy.
+  with another row. The form now starts from the row's values at its place, and what is read from the forms takes what
+  each row's own form changed of the row, over the document's copy of it: what the row's fields leave alone stays as
+  the document has it, so an edit made in the row's expanded content, or in a table there, is kept. Removing a row with
+  `removeData` still loses what was typed in the rows after it, which move up a row and start again from the
+  document's copy.
 - **A `showIf` that reads the form merges the document's forms once, not once per node.** A node whose `showIf` reads
   a field decides by every form of its document merged, and each node merged them as it decided, so a table whose
   rows each hold such a node copied its forms once per row on every render of the rows. Measured on React 18.3 before

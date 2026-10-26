@@ -275,3 +275,198 @@ describe('a table in the rows of another, whose add row has a form', () => {
         expect(field('dataKind.phases[0].budget')).toBeInTheDocument()
     })
 })
+
+// The rows' cells have a form of their own, which starts from the whole row (`engine/Data.tsx`), and what a row shows
+// below them, its expanded content, renders in the document, whose form holds its fields. Until 2026-10-26 a row's form
+// gave every merge all of its row, so the row as it started came back over an edit the expanded content made: found in
+// review, in what `getFormData` reads, what a submit sends, what a `showIf` reads and what a cross-row check compares.
+// 0.35.0 had none of it: there the row's form held only what was typed in it.
+describe('a `useForm` row whose expanded content has a field of the document\'s form', () => {
+    const table = {
+        view: 'Table',
+        name: 'dataKind.items',
+        headers: [{ id: 'kind', label: 'Kind' }],
+        itemsExpanded: true,
+        renderItemCells: {
+            view: 'Data', kind: 'items', embedded: true, useForm: true,
+            meta: { view: 'TableCells', items: [{ view: 'Input', name: 'kind', type: 'text' }] },
+        },
+        renderItem: {
+            view: 'Col',
+            items: [
+                { view: 'Input', name: 'note', type: 'text' },
+                { view: 'Text', children: 'The note is new', showIf: { name: 'note', equal: 'new' } },
+            ],
+        },
+    }
+    const meta = { view: 'Col', items: [table, { view: 'Button', children: 'Submit', onClick: 'submit' }] }
+    const data = { dataKind: { items: [{ kind: 'a', note: 'old' }] } }
+
+    it('has the content\'s edit in getFormData and in a submit', async () => {
+        const { host } = mount(meta, data)
+
+        type('dataKind.items[0].note', 'new')
+        expect(host.reader()).toEqual({ dataKind: { items: [{ kind: 'a', note: 'new' }] } })
+
+        await click('Submit')
+        expect(host.submitted).toEqual([{ dataKind: { items: [{ kind: 'a', note: 'new' }] } }])
+    })
+
+    it('shows a node whose `showIf` reads the content\'s edit', () => {
+        mount(meta, data)
+
+        type('dataKind.items[0].note', 'new')
+
+        expect(screen.queryByText('The note is new')).toBeInTheDocument()
+    })
+
+    it('has both edits, the row\'s and the content\'s, in a submit', async () => {
+        const { host } = mount(meta, data)
+
+        type('dataKind.items[0].kind', 'typed')
+        type('dataKind.items[0].note', 'new')
+        await click('Submit')
+
+        expect(host.submitted).toEqual([{ dataKind: { items: [{ kind: 'typed', note: 'new' }] } }])
+    })
+})
+
+describe('a table in the expanded rows of a table whose cells have `useForm` forms', () => {
+    const meta = {
+        view: 'Col',
+        items: [{
+            view: 'Table',
+            name: 'dataKind.phases',
+            headers: [{ id: 'title', label: 'Phase' }],
+            itemsExpanded: true,
+            renderItemCells: {
+                view: 'Data', kind: 'phases', embedded: true, useForm: true,
+                meta: { view: 'TableCells', items: [{ view: 'Input', name: 'title', type: 'text' }] },
+            },
+            renderItem: {
+                view: 'Col',
+                items: [{
+                    view: 'Table',
+                    name: 'dataKind.lineItems',
+                    headers: [{ id: 'sku', label: 'SKU' }, { id: 'note', label: 'Note' }],
+                    renderItemCells: {
+                        view: 'Data', kind: 'lineItems', embedded: true,
+                        meta: {
+                            view: 'TableCells',
+                            items: [
+                                { view: 'Input', name: 'sku', type: 'text' },
+                                { view: 'Input', name: 'note', type: 'text', showIf: { name: 'sku' } },
+                            ],
+                        },
+                    },
+                }],
+            },
+        }, { view: 'Button', children: 'Submit', onClick: 'submit' }],
+    }
+    const data = { dataKind: { phases: [{ title: 'Design', dataKind: { lineItems: [{ sku: '' }] } }] } }
+    const sku = 'dataKind.phases.0.dataKind.lineItems[0].sku'
+    const note = 'dataKind.phases.0.dataKind.lineItems[0].note'
+    const edited = { dataKind: { phases: [{ title: 'Design', dataKind: { lineItems: [{ sku: 'X-1' }] } }] } }
+
+    it('has an edit of its rows in getFormData and in a submit', async () => {
+        const { host } = mount(meta, data)
+
+        type(sku, 'X-1')
+        expect(host.reader()).toEqual(edited)
+
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+
+    it('shows the field a `showIf` in its row gates on that row\'s edit', () => {
+        mount(meta, data)
+        expect(field(note)).toBeNull()
+
+        type(sku, 'X-1')
+
+        expect(field(note)).not.toBeNull()
+    })
+})
+
+describe('a period table in the expanded rows of a table whose cells have `useForm` forms', () => {
+    const verify = () => ({ dataKind: 'periods', validate: [{ name: 'notWithinRange', args: ['startDate', 'endDate'] }] })
+    const meta = {
+        view: 'Table',
+        name: 'dataKind.phases',
+        headers: [{ id: 'title', label: 'Phase' }],
+        itemsExpanded: true,
+        renderItemCells: {
+            view: 'Data', kind: 'phases', embedded: true, useForm: true,
+            meta: { view: 'TableCells', items: [{ view: 'Input', name: 'title', type: 'text' }] },
+        },
+        renderItem: {
+            view: 'Col',
+            items: [{
+                view: 'Table',
+                name: 'dataKind.periods',
+                headers: [{ id: 'startDate', label: 'Start' }, { id: 'endDate', label: 'End' }],
+                renderItemCells: {
+                    view: 'Data', kind: 'periods', embedded: true,
+                    meta: {
+                        view: 'TableCells',
+                        items: [
+                            { view: 'Input', name: 'startDate', type: 'text', verify: verify() },
+                            { view: 'Input', name: 'endDate', type: 'text', verify: verify() },
+                        ],
+                    },
+                },
+            }],
+        },
+    }
+    const data = {
+        dataKind: {
+            phases: [{
+                title: 'Design',
+                dataKind: { periods: [{ startDate: '2020-01-01', endDate: '2020-06-30' }, { startDate: '2021-01-01', endDate: '2021-06-30' }] },
+            }],
+        },
+    }
+    const at = (row, name) => `dataKind.phases.0.dataKind.periods[${row}].${name}`
+
+    it('shows an overlap on both rows when an edit of one makes it overlap the other', async () => {
+        mount(meta, data)
+        fireEvent.focus(field(at(1, 'startDate')))
+        fireEvent.blur(field(at(1, 'startDate')))
+
+        type(at(0, 'endDate'), '2021-03-01')
+        await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)) })
+
+        expect(shown(at(0, 'endDate'))).toBe('Periods cannot overlap')
+        expect(shown(at(1, 'startDate'))).toBe('Periods cannot overlap')
+    })
+})
+
+// For a `null` row the `Data` view is handed the document's data (`mapper.tsx`). Until 2026-10-26 a `useForm` row's form
+// put that at the row: found in review, `getFormData` and a submit had a copy of the document as the row, and a field of
+// the row showed a value of the document's own of its name. 0.35.0 had none of it.
+describe('an empty row with a `useForm` form', () => {
+    const table = {
+        view: 'Table',
+        name: 'dataKind.items',
+        headers: [{ id: 'kind', label: 'Kind' }],
+        renderItemCells: {
+            view: 'Data', kind: 'items', embedded: true, useForm: true,
+            meta: { view: 'TableCells', items: [{ view: 'Input', name: 'kind', type: 'text' }] },
+        },
+    }
+    const meta = { view: 'Col', items: [table, { view: 'Button', children: 'Submit', onClick: 'submit' }] }
+
+    it('is no row in getFormData, and goes back to a submit as it came', async () => {
+        const { host } = mount(meta, { title: 'T', dataKind: { items: [{ kind: 'a' }, null] } })
+        expect(host.reader()).toEqual({ title: 'T', dataKind: { items: [{ kind: 'a' }] } })
+
+        await click('Submit')
+        expect(host.submitted).toEqual([{ title: 'T', dataKind: { items: [{ kind: 'a' }, null] } }])
+    })
+
+    it('shows nothing of the document in its fields', () => {
+        mount(meta, { kind: 'of the document', dataKind: { items: [{ kind: 'a' }, null] } })
+
+        expect(field('dataKind.items[1].kind')).toHaveValue('')
+    })
+})

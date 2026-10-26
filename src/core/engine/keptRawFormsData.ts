@@ -7,7 +7,7 @@
  * row merged as it rendered, and a mount renders the rows two or three times, so n rows cost about n² copies of a row.
  * Counted on React 18.3, a mount of 20, 40 and 80 rows with a `useForm` form each merged 1260, 4920 and 19440 forms, and
  * a keystroke in a table whose rows share the document's form copied the whole table once per row. Each such row's form
- * holds its row since 2026-10-26 (`engine/Data.tsx`), and every merge writes it over the document's copy.
+ * holds its row since 2026-10-26 (`engine/Data.tsx`), and every merge compares it with the row it started from.
  *
  * So a tree's merge is kept while what the page's forms hold stays the same (`formsChangeCount`): no form registers,
  * goes or registers again, and no form's values change. The count moves before anything else that subscribes to a form
