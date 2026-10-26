@@ -127,7 +127,7 @@ describe('a table row with a `useForm` form of its own', () => {
     // every field of the row started empty. And a submit sent the rows as the live merge had them
     // (`getLiveMergedDataKindArray`), which let the document's copy of an edited row win, and kept no more rows than
     // the shortest array of the forms held, which an edited row's form held up to its own index. Measured on the code
-    // before: the fields empty, and a submit after an edit of the first of three rows sent that row unedited, alone.
+    // before: the fields empty, and a submit after an edit of the second of three rows sent the first two, unedited.
     it('starts its fields from the row\'s values', () => {
         mount(meta, data)
 
@@ -141,10 +141,10 @@ describe('a table row with a `useForm` form of its own', () => {
         const rows = [{ kind: 'plain' }, { kind: 'other', detail: 'second' }, { kind: 'plain' }]
         const { host } = mount(withSubmit, { dataKind: { items: rows } })
 
-        type('dataKind.items[0].kind', 'other')
+        type('dataKind.items[1].detail', 'edited')
         await click('Submit')
 
-        expect(host.submitted).toEqual([{ dataKind: { items: [{ kind: 'other' }, rows[1], rows[2]] } }])
+        expect(host.submitted).toEqual([{ dataKind: { items: [rows[0], { kind: 'other', detail: 'edited' }, rows[2]] } }])
     })
 
     it('shows the rows a host hands it next, and a `showIf` in them reads them', () => {
