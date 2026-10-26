@@ -1,4 +1,5 @@
-import { createContext, useEffect, useLayoutEffect, useMemo, useReducer, useRef } from 'react'
+import { createContext, useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef } from 'react'
+import { listenToTreeValues, treeValuesTask, treeValuesTellsSince, type TreeValuesTell } from '../state/formRegistry'
 import { get } from '../utils/object'
 
 /**
@@ -17,11 +18,19 @@ import { get } from '../utils/object'
  * reads the form follows the form's values itself (`useShowIfFollowsForm`). A node outside them renders with its
  * document, as before, and costs nothing more.
  *
- * It follows the form the node's fields register with, its `form`. A `showIf` that reads another form of the document
- * tree, a nested document's with a form of its own, follows that form's changes where the document renders again with
- * them, as before.
+ * THE OTHER FORMS OF THE TREE (2026-10-26). A document renders on changes of its own form only, and a `Data` block
+ * with `useForm`, a table row with one, and a table's add row each have a form of their own. A node whose `showIf`
+ * reads a field of such a form, from outside it, rendered on none of its changes: one beside a `useForm` block that
+ * reads the block's field, and one in another block. Measured on the published 0.34.3, on React 16.14 and 18.3, it
+ * followed the field for a host that renders again on `onDataChanged`, through the context above, and never for a
+ * host that renders once. From 2026-10-23 it never followed it. So every node whose `showIf` reads the form follows
+ * the other forms of its document tree too, wherever it is: the form layer tells the tree each form's values
+ * (`tellTreeValues`, `state/formRegistry`), and a change of the value the `showIf` reads decides it again.
  */
 export const KeptContent = createContext(false)
+
+/** What a node decides its `showIf` by (`shouldRender`): whether it shows, and the value it read in the forms. */
+export type ShowIfDecision = { shown: boolean, value: unknown }
 
 /** What the hook needs of a final-form instance: its subscription to the values. */
 type ValuesSubscription = {
@@ -35,40 +44,104 @@ const isSubscribable = (form: unknown): form is ValuesSubscription =>
 // a layout effect there only warns.
 const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
+const valueAt = (values: unknown, path: string) => values === undefined ? undefined : get(values, path)
+
 /**
- * Renders the node again when its `showIf`, which reads `form`'s values at `path` (`formPathOf`), is decided another
- * way than `shown`, the way it rendered, after a change of those values. Only for a `path`: the node is in
- * `KeptContent`, and its `showIf` reads the form.
+ * How many times a node renders again in one task on what its tree tells. A form that comes and goes with the node
+ * itself would flip it for ever: a `useForm` block under it whose values merge over the field its `showIf` reads, and
+ * decide it the other way, comes as the node shows and hides it, and goes as it hides and shows it, in one chain of
+ * renders, until React gives up with "Maximum update depth exceeded" (measured). A user's change settles in its own
+ * task, and so do a tab switch, a popup and a collapse, where forms come and go and no value changes: the node stops
+ * for the rest of the task, and its tree's next tell, in a task of its own, decides it as before.
+ */
+const FLIPS_IN_A_TASK = 8
+
+/**
+ * Whether `tell`, from another form than `own`, can change a decision that read `value` at `path`: that form's value
+ * there changed, to another than `value`. One that ends at `value` leaves the merge of the forms as it was, and so does
+ * a change in a form that holds nothing there, which is most of them.
+ */
+const moves = (tell: TreeValuesTell, own: unknown, path: string, value: unknown) => {
+    if (tell.form === own) return false
+    const after = valueAt(tell.values, path)
+    return !Object.is(valueAt(tell.previous, path), after) && !Object.is(after, value)
+}
+
+/**
+ * Renders the node again when its `showIf`, which reads the form's values at `path` (`formPathOf`), is decided another
+ * way than it rendered, after a change of those values:
+ * - in `form`, the form its fields register with, where it is `kept`: its document renders on that form's changes,
+ *   but a node in `KeptContent` does not render with it;
+ * - in every other form of its document `tree`, wherever it is: its document renders on none of their changes.
  *
  * A decision merges every form of the document with its data, which is not cheap: in a document with a 200-row table,
- * close to half a millisecond. So a change that leaves the value at `path` as it was is not decided again, and costs a
- * lookup: one in another field, which is most of them. The first call, which final-form makes as the node subscribes,
- * notes the value the node rendered with.
+ * close to half a millisecond. So a change that leaves the value at `path` as it was, or that makes it the value the
+ * node decided by, is not decided again, and costs a lookup. The node decided by `rendered`, read as it rendered, and
+ * then by any decision it makes here. The tells its tree made after `renderedAt`, the count of tells as it rendered,
+ * reached the node with the decision of its last render, or, as it mounted, not at all: it catches up with them as it
+ * commits.
  *
- * The latest `shown`, `path` and `decide` are kept for the subscriber from the commit they come from, as a handler
- * reads the latest props. Every node calls this, and one that does not follow the form runs its effects once, as it
- * mounts, and none as it renders again.
+ * The latest `path` and `decide` are kept for the subscribers from the commit they come from, as a handler reads the
+ * latest props. Every node calls this, and one whose `showIf` reads no form runs its effects once, as it mounts, and
+ * none as it renders again.
  */
-export function useShowIfFollowsForm (form: unknown, path: string | undefined, shown: boolean, decide: () => boolean): void {
+export function useShowIfFollowsForm (
+    form: unknown, tree: object | undefined, kept: boolean, path: string | undefined,
+    rendered: ShowIfDecision, renderedAt: number, decide: () => ShowIfDecision,
+): void {
     const [, renderAgain] = useReducer((renders: number) => renders + 1, 0)
-    const subscribed = path !== undefined && isSubscribable(form) ? form : undefined
-    const following = useMemo(() => subscribed ? { path, shown, decide } : undefined, [subscribed, path, shown, decide])
+    const subscribed = kept && path !== undefined && isSubscribable(form) ? form : undefined
+    const listened = path !== undefined && tree !== undefined ? tree : undefined
+    const { shown, value } = rendered
+    const following = useMemo(
+        () => path !== undefined ? { path, shown, value, renderedAt, decide } : undefined,
+        [path, shown, value, renderedAt, decide],
+    )
     const latest = useRef(following)
+    const decided = useRef<ShowIfDecision>(rendered)
+    // Its tree, and how many times it rendered again on what the tree told in the tree's task (`FLIPS_IN_A_TASK`).
+    const heard = useRef<object | undefined>(undefined)
+    const flips = useRef({ task: -1, count: 0 })
+    // Decides again, by the latest render's `decide`, and renders the node again where the answer is another.
+    const decideAgain = useCallback(() => {
+        const was = decided.current
+        const next = latest.current!.decide() // not undefined: only a node with a path listens
+        if (next.shown !== was.shown && heard.current) {
+            const task = treeValuesTask(heard.current)
+            if (flips.current.task !== task) flips.current = { task, count: 0 }
+            flips.current.count += 1
+            if (flips.current.count > FLIPS_IN_A_TASK) return
+        }
+        decided.current = next
+        if (next.shown !== was.shown) renderAgain()
+    }, [])
     useBeforePaintEffect(() => {
-        if (following) latest.current = following
-    }, [following])
+        if (!following) return
+        latest.current = following
+        decided.current = { shown: following.shown, value: following.value }
+        heard.current = listened
+        if (!listened) return
+        const tells = treeValuesTellsSince(listened, following.renderedAt)
+        // Gone from the log, made in an earlier task: the node decides again.
+        if (!tells || tells.some(tell => moves(tell, form, following.path, following.value))) decideAgain()
+    }, [following, listened, form, decideAgain])
     useBeforePaintEffect(() => {
         if (!subscribed) return undefined
-        let seen: { value: unknown } | undefined
+        let seen: { path: string, value: unknown } | undefined
         return subscribed.subscribe(({ values }) => {
-            // Not undefined, and with a path: the effect above kept what the node follows with, in the commit this
-            // subscribes in. A node that stops following the form unsubscribes as it commits.
-            const { path, shown, decide } = latest.current!
-            const value = get(values, path as string)
-            if (seen && Object.is(seen.value, value)) return
+            const { path } = latest.current! // not undefined: the effect above kept it, in the commit this subscribes in
+            const now = valueAt(values, path)
+            // final-form's first call, as the node subscribes, notes the value the node rendered with.
             const first = seen === undefined
-            seen = { value }
-            if (!first && decide() !== shown) renderAgain()
+            if (seen && seen.path === path && Object.is(seen.value, now)) return
+            seen = { path, value: now }
+            if (!first && !Object.is(now, decided.current.value)) decideAgain()
         }, { values: true })
-    }, [subscribed])
+    }, [subscribed, decideAgain])
+    useBeforePaintEffect(() => {
+        if (!listened) return undefined
+        return listenToTreeValues(listened, tell => {
+            if (moves(tell, form, latest.current!.path, decided.current.value)) decideAgain()
+        })
+    }, [listened, form, decideAgain])
 }

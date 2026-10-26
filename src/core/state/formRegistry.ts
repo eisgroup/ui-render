@@ -72,6 +72,104 @@ export function dataFormsOf (tree: object | undefined): Map<object, RegisteredFo
 }
 
 /**
+ * What a document tree tells of one of its forms: its values before and after, `undefined` before a form registers
+ * and after it goes, and the count of the tree's tells it makes.
+ */
+export type TreeValuesTell = { readonly version: number, readonly form: object, readonly previous: unknown, readonly values: unknown }
+
+export type TreeValuesListener = (tell: TreeValuesTell) => void
+
+/**
+ * The values of a document tree's forms, PER TREE. A node whose `showIf` reads a field of another form of its tree
+ * than its own, a `useForm` block's, hears that form's changes here (`engine/showIfFollowsForm.ts`): its own document
+ * renders only on changes of its own form. The form layer tells (`modules/form/utils.tsx`, `WithForm`), as a form
+ * registers, on every change of its values, and as it goes.
+ *
+ * A tell says what the form held before as well, so a listener needs no memory of the forms it has not heard yet. The
+ * latest tells are kept, oldest first, for a node to catch up with those made between its render and its commit: a
+ * node that mounts hears none of them, and one that renders again hears them with the decision of its last render.
+ * They are kept until the task that made them ends, where a node renders and commits: one that commits in a later task
+ * finds them gone, and decides again. Kept for longer, they held a copy of a form's values for each of the latest
+ * thousand changes, in every document. A WeakMap, so a tree that has gone takes all of it with it.
+ */
+type TreeValues = {
+	listeners: Set<TreeValuesListener>,
+	/** The values each live form told last */
+	live: Map<object, unknown>,
+	version: number,
+	log: TreeValuesTell[],
+	/** Whether the log is to be emptied as the task ends */
+	emptying: boolean,
+	/** How many tasks that told have ended */
+	task: number,
+}
+
+/** How many tells a tree keeps in a task: the registrations of a mount, and more. A node that rendered before more decides again. */
+const LOG_LENGTH = 1024
+
+const treeValues = new WeakMap<object, TreeValues>()
+
+function valuesOf (tree: object): TreeValues {
+	let entry = treeValues.get(tree)
+	if (!entry) {
+		entry = { listeners: new Set(), live: new Map(), version: 0, log: [], emptying: false, task: 0 }
+		treeValues.set(tree, entry)
+	}
+	return entry
+}
+
+/** How many tells `tree` has made: a node reads it as it renders, and catches up with the tells after it. */
+export function treeValuesVersion (tree: object): number {
+	const entry = treeValues.get(tree)
+	return entry ? entry.version : 0
+}
+
+/** How many of the tasks in which `tree` told have ended: a node counts its renders per task by it. */
+export function treeValuesTask (tree: object): number {
+	const entry = treeValues.get(tree)
+	return entry ? entry.task : 0
+}
+
+/** The tells `tree` has made after `version`, oldest first, or `undefined` once it keeps no longer all of them. */
+export function treeValuesTellsSince (tree: object, version: number): readonly TreeValuesTell[] | undefined {
+	const entry = treeValues.get(tree)
+	const count = entry ? entry.version - version : 0
+	if (!entry || count <= 0) return []
+	return count > entry.log.length ? undefined : entry.log.slice(entry.log.length - count)
+}
+
+/** Hears every form of `tree`, from now on. Returns what stops it. */
+export function listenToTreeValues (tree: object, listener: TreeValuesListener): () => void {
+	const { listeners } = valuesOf(tree)
+	listeners.add(listener)
+	return () => { listeners.delete(listener) }
+}
+
+/** Tells the listeners of `tree` that the values of its `form` are `values`, `undefined` once it has gone. */
+export function tellTreeValues (tree: object, form: object, values: unknown): void {
+	const entry = valuesOf(tree)
+	const previous = entry.live.get(form)
+	if (values === undefined) entry.live.delete(form)
+	else entry.live.set(form, values)
+	entry.version += 1
+	const tell = { version: entry.version, form, previous, values }
+	entry.log.push(tell)
+	if (entry.log.length > LOG_LENGTH) entry.log.shift()
+	if (!entry.emptying) {
+		entry.emptying = true
+		const emptied = entry
+		setTimeout(() => {
+			emptied.log = []
+			emptied.emptying = false
+			emptied.task += 1
+		}, 0)
+	}
+	// A copy, and only who still listens: a listener that a render stops while the others hear is told nothing more.
+	const { listeners } = entry
+	Array.from(listeners).forEach(listener => { if (listeners.has(listener)) listener(tell) })
+}
+
+/**
  * Validation errors by field name, PER FORM. A message is a string, or a built-in phrase (`PhraseMessage`,
  * `utils/phrases.ts`), which the report to the host puts in its document's language.
  *

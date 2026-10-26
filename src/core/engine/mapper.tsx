@@ -33,6 +33,7 @@ import type { PhraseMessage } from '../utils/phrases'
 import { autoSubmitter } from './autoSubmit'
 import { formPathOf, shouldRender } from './showIf'
 import { KeptContent, useShowIfFollowsForm } from './showIfFollowsForm'
+import { treeValuesVersion } from '../state/formRegistry'
 import Render, { formatRenderError, mapProps } from './index'
 import { isUnnamedField, relativePathFrom } from './transforms'
 import { renderField } from './components/renders'
@@ -249,11 +250,19 @@ const RenderComponent = ({
     const translate = useContext(TranslateContext) || (instance && instance.translate) || Active.translate
     /* General showIf logic — the whole decision lives in `showIf.ts`, testable on its own. */
     const showIfArgs = { showIf, data, _data, relativeData, relativePath, relativeIndex, instance }
-    const shown = shouldRender(showIfArgs)
-    // Where its document's render does not reach, in a list's items or a popup's content, a `showIf` that reads the
-    // form is decided again as the form changes (`showIfFollowsForm.ts`).
+    // Where its document's render does not reach, a `showIf` that reads the form is decided again as the form changes
+    // (`showIfFollowsForm.ts`): its own form in a list's items or a popup's content, and another form of its document
+    // tree, a `useForm` block's or a row's, anywhere. It decides by the value it read, and catches up with what the
+    // tree told after it rendered.
     const kept = useContext(KeptContent)
-    useShowIfFollowsForm(form, kept ? formPathOf(showIfArgs) : undefined, shown, () => shouldRender(showIfArgs))
+    const tree = instance ? (instance as { formTree?: object }).formTree : undefined
+    const renderedAt = tree ? treeValuesVersion(tree) : 0
+    const found: { value?: unknown } = {}
+    const shown = shouldRender(showIfArgs, found)
+    useShowIfFollowsForm(form, tree, kept, formPathOf(showIfArgs), { shown, value: found.value }, renderedAt, () => {
+        const again: { value?: unknown } = {}
+        return { shown: shouldRender(showIfArgs, again), value: again.value }
+    })
     // The fields that mount below this node, or that go when it hides, register and unregister as one burst, which
     // the form tells every field of once (`registrationsOf`, `modules/form/batchedForm.ts`). The bracket opens in a
     // layout effect, before any field below registers in the passive effects, and closes in a passive effect, after
