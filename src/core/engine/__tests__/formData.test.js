@@ -4,6 +4,7 @@ import {
     getRawFormsData,
     getLiveMergedDataKindArray,
     holdsFields,
+    restartWrittenRows,
     rowPlaceOf,
 } from '../formData'
 
@@ -412,6 +413,76 @@ describe('holdsFields', () => {
             holdsFields(undefined, row, 'items[1]', ['items[1].kind']),
             holdsFields(undefined, row, 'items[1]', ['items[1].when']),
         ]).toEqual([false, true])
+    })
+})
+
+describe('restartWrittenRows', () => {
+    // What a submit does as it writes the merged rows into the document's form (`submit` in `rules.tsx`): what a row's
+    // own form changed is measured from what the document's form holds of it afterwards.
+    const rowAt = (values, initialValues, fields) => {
+        const form = { values, initialValues, getState: () => ({ values: form.values, initialValues: form.initialValues }), getRegisteredFields: () => fields }
+        return form
+    }
+    const formsOf = (row, document) => new Map([
+        ['row', { form: row, meta: { relativePath: 'items', relativeIndex: 0 } }],
+        ['document', { form: makeForm(document), meta: {} }],
+    ])
+
+    it('makes what the document\'s form holds of a row\'s changes its start: a change set back is one more', () => {
+        const row = rowAt({ items: [{ kind: 'b' }] }, { items: [{ kind: 'a' }] }, ['items[0].kind'])
+        const written = { items: [{ kind: 'b' }] }
+        restartWrittenRows(formsOf(row, written), written)
+
+        row.values = { items: [{ kind: 'a' }] }
+
+        expect(getRawFormsData(formsOf(row, written))).toEqual({ items: [{ kind: 'a' }] })
+        // What the merge holds there, the form would not write: its value is its start.
+        row.values = { items: [{ kind: 'b' }] }
+        expect(holdsFields({ items: [{ kind: 'held elsewhere' }] }, row, 'items[0]', ['items[0].kind'])).toBe(true)
+    })
+
+    it('keeps the start of a field whose value the document\'s form does not hold, as of a row a submit did not write', () => {
+        const row = rowAt({ items: [{ kind: 'b' }] }, { items: [{ kind: 'a' }] }, ['items[0].kind'])
+        const document = { items: [{ kind: 'c' }] }
+        restartWrittenRows(formsOf(row, document), document)
+
+        expect(getRawFormsData(formsOf(row, document))).toEqual({ items: [{ kind: 'b' }] })
+        row.values = { items: [{ kind: 'a' }] }
+        expect(getRawFormsData(formsOf(row, document))).toEqual({ items: [{ kind: 'c' }] })
+    })
+
+    it('makes a value taken away there a start with none', () => {
+        const row = rowAt({ items: [{ kind: 'a' }] }, { items: [{ kind: 'a', when: '2020-01-01' }] }, ['items[0].kind', 'items[0].when'])
+        restartWrittenRows(formsOf(row, { items: [{ kind: 'a' }] }), { items: [{ kind: 'a' }] })
+
+        // Another copy of the document, which holds the date: the form, with none, changed nothing of its start.
+        expect(getRawFormsData(formsOf(row, { items: [{ kind: 'a', when: '2020-01-01' }] }))).toEqual({ items: [{ kind: 'a', when: '2020-01-01' }] })
+    })
+
+    it('starts a form anew from the new initial values a reset gives it', () => {
+        const row = rowAt({ items: [{ kind: 'b' }] }, { items: [{ kind: 'a' }] }, ['items[0].kind'])
+        const written = { items: [{ kind: 'b' }] }
+        restartWrittenRows(formsOf(row, written), written)
+
+        // A host's new data: the form starts from them, whatever a submit wrote before.
+        row.initialValues = { items: [{ kind: 'c' }] }
+        const handedOver = { items: [{ kind: 'c' }] }
+
+        expect(getRawFormsData(formsOf(row, handedOver))).toEqual({ items: [{ kind: 'b' }] })
+    })
+
+    it('makes the live merge merge again, though every form holds the same values', () => {
+        const documentArray = [{ a: 'the document\'s' }]
+        const row = rowAt({ items: [{ a: 'typed' }] }, { items: [{ a: 'as loaded' }] }, ['items[0].a'])
+        const forms = new Map([
+            ['row', { form: row, meta: { relativePath: 'items', relativeIndex: 0 } }],
+            ['document', { form: makeForm({ items: documentArray }), meta: {} }],
+        ])
+        expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ a: 'typed' }])
+
+        restartWrittenRows(forms, { items: [{ a: 'typed' }] })
+
+        expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ a: 'the document\'s' }])
     })
 })
 

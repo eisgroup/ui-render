@@ -743,3 +743,91 @@ describe.each([['`useForm` rows', true], ['rows sharing the document\'s form', f
         expect(host.submitted).toEqual([edited])
     })
 })
+
+// A submit writes the merged rows into the document's form, in place, before final-form validates (`submit` in
+// `rules.tsx`): the document holds a row's edits from then on, whether the submit goes through or not. Measured from the
+// values it started with, a `useForm` row's edit set back after it was no change, and the document's copy, holding the
+// edit, came back in `getFormData`, a `showIf` and the next submit. Found in review, at 5ffe1898; 0.35.0 sent no edit of
+// such a row at all. A row's form now measures its changes from what a submit wrote (`restartWrittenRows`).
+describe.each([['`useForm` rows', true], ['rows sharing the document\'s form', false]])('an edit set back after a submit, in a table of %s', (_, useForm) => {
+    const tableOf = before => ({
+        view: 'Col',
+        items: [...before, {
+            view: 'Table',
+            name: 'dataKind.items',
+            headers: [{ id: 'kind', label: 'Kind' }],
+            renderItemCells: {
+                view: 'Data', kind: 'items', embedded: true, useForm,
+                meta: {
+                    view: 'TableCells',
+                    items: [{ view: 'Input', name: 'kind', type: 'text' }, { view: 'Text', children: 'The kind is b', showIf: { name: 'kind', equal: 'b' } }],
+                },
+            },
+        }, { view: 'Button', children: 'Submit', onClick: 'submit' }],
+    })
+
+    it('is what getFormData, a `showIf` and the next submit read', async () => {
+        const data = { dataKind: { items: [{ kind: 'a' }] } }
+        const { host } = mount(tableOf([]), data)
+
+        type('dataKind.items[0].kind', 'b')
+        await click('Submit')
+        type('dataKind.items[0].kind', 'a')
+
+        expect(host.submitted).toEqual([{ dataKind: { items: [{ kind: 'b' }] } }])
+        expect(host.reader()).toEqual(data)
+        expect(screen.queryByText('The kind is b')).not.toBeInTheDocument()
+        await click('Submit')
+        expect(host.submitted[1]).toEqual(data)
+    })
+
+    it('is what getFormData reads after a submit that validation stopped', async () => {
+        const title = { view: 'Input', name: 'title', type: 'text', validate: 'required', required: true }
+        const data = { title: '', dataKind: { items: [{ kind: 'a' }] } }
+        const { host } = mount(tableOf([title]), data)
+
+        type('dataKind.items[0].kind', 'b')
+        await click('Submit')
+        type('dataKind.items[0].kind', 'a')
+
+        expect(host.submitted).toEqual([])
+        expect(host.reader()).toEqual(data)
+    })
+})
+
+describe.each([['`useForm` rows', true], ['rows sharing the document\'s form', false]])('a `useForm` line\'s edit set back after a submit, in the expanded rows of a table of %s', (_, useForm) => {
+    const meta = {
+        view: 'Col',
+        items: [{
+            view: 'Table',
+            name: 'dataKind.phases',
+            headers: [{ id: 'title', label: 'Phase' }],
+            itemsExpanded: true,
+            renderItemCells: { view: 'Data', kind: 'phases', embedded: true, useForm, meta: { view: 'TableCells', items: [{ view: 'Input', name: 'title', type: 'text' }] } },
+            renderItem: {
+                view: 'Col',
+                items: [{
+                    view: 'Table',
+                    name: 'dataKind.lineItems',
+                    headers: [{ id: 'sku', label: 'SKU' }],
+                    renderItemCells: { view: 'Data', kind: 'lineItems', embedded: true, useForm: true, meta: { view: 'TableCells', items: [{ view: 'Input', name: 'sku', type: 'text' }] } },
+                }],
+            },
+        }, { view: 'Button', children: 'Submit', onClick: 'submit' }],
+    }
+    const data = { dataKind: { phases: [{ title: 'Design', dataKind: { lineItems: [{ sku: 'A' }] } }] } }
+    const sku = 'dataKind.phases.0.dataKind.lineItems[0].sku'
+
+    it('is what getFormData and the next submit read', async () => {
+        const { host } = mount(meta, data)
+
+        type(sku, 'X-1')
+        await click('Submit')
+        type(sku, 'A')
+
+        expect(host.submitted).toEqual([{ dataKind: { phases: [{ title: 'Design', dataKind: { lineItems: [{ sku: 'X-1' }] } }] } }])
+        expect(host.reader()).toEqual(data)
+        await click('Submit')
+        expect(host.submitted[1]).toEqual(data)
+    })
+})

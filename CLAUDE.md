@@ -143,11 +143,14 @@ registers again, and a form a document renders counts its new values before the 
 nodes under it. A change written into a form's values in place, which final-form tells nobody of, must be counted
 where it is made (`countFormsChange`), as the `submit` action's is. A `useForm` row's form holds its row at the row's
 place, as its fields read it (`engine/Data.tsx`), and every merge of the forms takes from it the values of the fields
-it changed, each against the value it started with, and nothing else, each read and written at the field's name
-(`rowPlaceOf`, `changedInside`, `writeField`, `engine/formData.ts`): the rest of the row, a field its cells only show
-included, is the document's, which another form, such as the row's expanded content's, may have edited. Its fields
-are every one it has registered, the ones a `showIf` hid included (`fieldNamesOf` in `createBatchedForm`). A name that
-comes is no change of what the forms hold: the kept merge is checked against the values of the names that came
+it changed and nothing else, each read and written at the field's name (`rowPlaceOf`, `changedInside`, `writeField`,
+`engine/formData.ts`). It changed a field whose value is not its start: its `initialValues`, moved, field by field, to
+the values a submit has written into the document's form (`restartWrittenRows`, which the `submit` action calls as it
+writes). The rest of the row, a field its cells only show included, is what the document's form holds: what another
+form, such as the row's expanded content's, has edited there, and what a submit has written of the row's form. A
+new write of a row's values into the document's form must move the start the same way. Its fields are every one it
+has registered, the ones a `showIf` hid included (`fieldNamesOf` in `createBatchedForm`). A name that comes is no
+change of what the forms hold: the kept merge is checked against the values of the names that came
 (`fieldNamesCount`, `holdsFields`), so a burst of registrations, a mount's among them, merges nothing more.
 
 A mount has a cost besides renders: every field registers with final-form. Until 2026-10-13, each registration

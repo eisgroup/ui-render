@@ -28,7 +28,7 @@ import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
 import { countFormsChange, countReset, dataFormsOf, errorsFor, formsOf, touchedFor } from '../state/formRegistry'
 import { phrase, phraseMessage } from '../utils/phrases'
 import type { PhraseMessage } from '../utils/phrases'
-import { getFormsData, getLiveMergedDataKindArray } from './formData'
+import { getFormsData, getLiveMergedDataKindArray, restartWrittenRows } from './formData'
 import { keptRawFormsData } from './keptRawFormsData'
 import type { ValidatingForm } from './formData'
 import { errorsProcessing, mapErrorObjectToUIFormat, showsAnError } from './errorMapping'
@@ -1070,9 +1070,14 @@ function Decorator (Class: any) {
             for (const kind in dataKind) {
                 dataKind[kind] = this.getDataKind(kind).map((v: unknown, index: number) => isEmpty(v) ? dataKind[kind][index] : v)
             }
-            // Written into the form's values in place, which final-form tells no subscriber of: counted, so that the
-            // merge a `showIf` reads is made again (`keptRawFormsData`).
-            if (dataKind) countFormsChange()
+            if (dataKind) {
+                // The document holds the rows' edits now, whether validation lets the submit through or not: a row's own
+                // form measures its next ones from them (`restartWrittenRows`), or one set back would give nothing.
+                restartWrittenRows(dataFormsOf(this.formTree), this.formValues)
+                // Written into the form's values in place, which final-form tells no subscriber of: counted, so that the
+                // merge a `showIf` reads is made again (`keptRawFormsData`).
+                countFormsChange()
+            }
             return this.form.submit(...args)
         }
 

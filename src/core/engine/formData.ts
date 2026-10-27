@@ -66,11 +66,11 @@ export type ValidatingForm = {
 const lastMerges = new WeakMap<unknown[], Map<string, { arrays: unknown[][], owned: Owned[], rows: object[] }>>()
 
 /**
- * A table row with a form of its own, as a merge of an array reads it: its place, its values and those it started with,
- * what each holds where the merge reads it (`held` and `started`: its row, or the array, when the array is inside its
- * row), which changes with any of its values there, and its fields.
+ * A table row with a form of its own, as a merge of an array reads it: its place, its values and those it started with
+ * (`startOf`), what each holds where the merge reads it (`held` and `started`: its row, or the array, when the array is
+ * inside its row), which changes with any of its values there, and its fields.
  */
-type Owned = { place: string, values: Values, initial: Values, held: unknown, started: unknown, fields: readonly string[] }
+type Owned = { place: string, values: Values, start: Values, held: unknown, started: unknown, fields: readonly string[] }
 
 /**
  * Whether two form objects are one final-form instance. react-final-form hands a new `{...form, reset}`
@@ -122,16 +122,62 @@ function namesInside (fields: readonly string[], place: string): string[] {
   return fields.map(dotted).filter(name => name.startsWith(inside))
 }
 
-/** Whether a form's value at `name` is the one it started with (`initial`, its `initialValues`): an object by its value. */
-const startedWith = (values: Values, initial: Values, name: string) => isEqual(getIn(values, name), getIn(initial, name))
+/** Whether a form's value at `name` is the one it started with (`start`, `startOf` it): an object by its value. */
+const startedWith = (values: Values, start: Values, name: string) => isEqual(getIn(values, name), getIn(start, name))
 
 /**
  * The names of `fields` inside `place` whose value a row's own form changed: what it holds there is not what it started
  * with (2026-10-27). A field it shows and leaves alone gives nothing: the value there is the document's, which another
  * form may have edited, such as a field of the same name in the row's expanded content.
  */
-function changedInside (fields: readonly string[], place: string, values: Values, initial: Values): string[] {
-  return namesInside(fields, place).filter(name => !startedWith(values, initial, name))
+function changedInside (fields: readonly string[], place: string, values: Values, start: Values): string[] {
+  return namesInside(fields, place).filter(name => !startedWith(values, start, name))
+}
+
+/**
+ * WHAT A TABLE ROW'S OWN FORM STARTED WITH, MOVED WHERE A SUBMIT WROTE ITS VALUES INTO THE DOCUMENT'S FORM (2026-10-27).
+ *
+ * A row's form gives the merges the fields it changed of its start, and the rest is the document's (`changedInside`). A
+ * submit writes the merged rows into the document's form, in place (`submit` in `rules.tsx`), so the document holds a
+ * row's edits from then on. Measured from its `initialValues`, an edit set back after a submit was no change, and gave
+ * nothing: the document's copy, holding the edit, came back in `getFormData`, a `showIf` and the next submit. So the
+ * values written become the start (`restartWrittenRows`), field by field, and an edit set back is a change of them.
+ *
+ * Kept here rather than in the form: re-initializing the form would make its fields pristine and untouched again. Kept
+ * for the `initialValues` the form had, so that new ones, a host's new data or the document's new rows, start it anew.
+ * Keyed by the form's `getState`, which every copy of the form react-final-form hands out shares (`sameForm`).
+ */
+const movedStarts = new WeakMap<object, { initial: unknown, start: Values }>()
+
+/** What a table row's own form started with, as the merges measure its changes (`movedStarts`): its `initialValues`, or more. */
+function startOf (form: FormApi, initialValues: Values | undefined): Values {
+  const moved = movedStarts.get(form.getState)
+  return moved && moved.initial === initialValues ? moved.start : initialValues || {}
+}
+
+/**
+ * Each table row's own form among `forms` takes, as the value it started with, the value of each field it changed that
+ * the document's `values` hold now: what a submit wrote there, a value taken away included (`movedStarts`). A field
+ * whose value the document's form does not hold, such as one of a row the submit did not write, keeps its start. The
+ * submit calls it as it writes, before final-form validates: one that validation stops has written all the same.
+ *
+ * @param {Map} forms - the forms of the document tree whose values were written, `dataFormsOf` it
+ * @param {Object} values - the document's values, written
+ */
+export function restartWrittenRows (forms: Forms, values: Values): void {
+  forms.forEach(({ form, meta }) => {
+    // A cast, not a guard: what a form registers as its meta is its document's meta.
+    const place = rowPlaceOf(meta as MetaNode | undefined)
+    if (!place || !form || typeof form.getState !== 'function') return
+    const state = form.getState()
+    const start = startOf(form, state.initialValues)
+    const written = changedInside(fieldsOf(form), place, state.values, start)
+      .filter(name => isEqual(getIn(values, name), getIn(state.values, name)))
+    if (!written.length) return
+    // A copy, field by field: the start was the form's own `initialValues`, which nothing may change.
+    const moved = written.reduce((next: unknown, name) => writeField(next, name, getIn(state.values, name)), start) as Values
+    movedStarts.set(form.getState, { initial: state.initialValues, start: moved })
+  })
 }
 
 /**
@@ -203,10 +249,10 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
     // A row's form has a field or two: its state, for what it started with, is cheap.
     const state = form.getState()
     const values = handed ? validating!.values : state.values
-    const initial = state.initialValues || {}
+    const start = startOf(form, state.initialValues)
     const where = inside ? place : path
     owned.push({
-      place, values, initial, held: getIn(values, where), started: getIn(initial, where), fields: fieldsOf(form),
+      place, values, start, held: getIn(values, where), started: getIn(start, where), fields: fieldsOf(form),
     })
   })
   if (!arrays.length) {
@@ -253,8 +299,8 @@ function mergeRows (at: string, arrays: unknown[][], owned: Owned[]): object[] {
   }
   // Each row is replaced, not changed: the rows hold the objects of the documents' values.
   const inside = `${at}.`
-  owned.slice().sort((a, b) => depthOf(a.place) - depthOf(b.place)).forEach(({ place, values, initial, fields }) => {
-    changedInside(fields, place, values, initial).forEach(name => {
+  owned.slice().sort((a, b) => depthOf(a.place) - depthOf(b.place)).forEach(({ place, values, start, fields }) => {
+    changedInside(fields, place, values, start).forEach(name => {
       const value = getIn(values, name)
       // A field that holds the array: its rows are the rows.
       if (name === at) {
@@ -293,8 +339,8 @@ export function holdsFields (merged: Values | undefined, form: FormApi, place: s
   const inside = namesInside(names, place)
   if (!inside.length) return true
   const { values, initialValues } = form.getState()
-  return inside.every(name =>
-    startedWith(values, initialValues || {}, name) || isEqual(getIn(values, name), getIn(merged || {}, name)))
+  const start = startOf(form, initialValues)
+  return inside.every(name => startedWith(values, start, name) || isEqual(getIn(values, name), getIn(merged || {}, name)))
 }
 
 /**
@@ -310,7 +356,9 @@ export function holdsFields (merged: Values | undefined, form: FormApi, place: s
  *
  * - Only the values of the fields the form changed are taken (2026-10-27): each name whose value is not the one the
  *   form started with (`changedInside`), read in its values and written at that name over the document's copy of the
- *   row (`writeField`), a value cleared there taken away. The rest of the row is the document's. A `useForm` row's form
+ *   row (`writeField`), a value cleared there taken away. Its start is its `initialValues`, moved to what a submit has
+ *   written of its values into the document's form (`restartWrittenRows`). The rest of the row is the document's,
+ *   which a submit has brought up to the row's form. A `useForm` row's form
  *   starts from the row's values there (`engine/Data.tsx`), and what it leaves alone, another form may have edited,
  *   such as a field in the row's expanded content, of the same name as one its cells show, too. Its fields are every
  *   one it has registered (`fieldNamesOf`), a field a `showIf` has hidden included: final-form keeps its value, as the
@@ -321,7 +369,9 @@ export function holdsFields (merged: Values | undefined, form: FormApi, place: s
  *   field named `length` was taken for an array's length, an object the row did not start with was written whole,
  *   over a field another form had added to it, and a cleared field took away the object it left empty in the row's
  *   form, with a field another form held in it. Then every field's value was taken, changed or not, and one the cells
- *   only showed wrote the row's value over an edit of the same name in the expanded content.
+ *   only showed wrote the row's value over an edit of the same name in the expanded content. Then a change was
+ *   measured from the `initialValues` alone, and an edit set back after a submit gave nothing: the document's copy,
+ *   which the submit had written, brought the edit back.
  * - The row goes into the document's own containers. In containers of its own, the row of a table nested
  *   in a row (`dataKind.phases.0.dataKind.lineItems[2]`) made `phases` an object, which the merge put in
  *   place of the document's array of phases.
@@ -350,7 +400,7 @@ function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | u
     // Its fields are named `${place}.${name}` (`mapper.tsx`). Only those: a `useForm` row's form starts from the whole
     // row, and an array up to its index, which a copy would walk hole by hole.
     const { values, initialValues } = form.getState();
-    const names = changedInside(fieldsOf(form), place, values, initialValues || {});
+    const names = changedInside(fieldsOf(form), place, values, startOf(form, initialValues));
     if (names.length) rows.push({ place, names, values });
   })
 
