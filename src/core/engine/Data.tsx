@@ -129,6 +129,10 @@ export default function Data ({
   // Prefer relativeIndex over index so row identity stays correct after FieldArray reindex (e.g. remove row).
   const rowIndex = relativeIndex != null ? relativeIndex : index
 
+  // A block whose `name` or `data` selects no values starts from the document's (`mapper.tsx`): its form holds the whole
+  // document, as the document's own form does, and the merges take from each the fields it changed (2026-10-27).
+  const wholeDocument = useForm === true && !rowPlace && !draftRow && initialValues === (instance && instance.data)
+
   if (useForm) {
     return <UIRenderWithUISetup
       data={data}
@@ -140,6 +144,7 @@ export default function Data ({
       relativeIndex={relativeIndex}
       embedded={embedded}
       draftRow={draftRow}
+      wholeDocument={wholeDocument}
       {...{className, style}}
     />
   }

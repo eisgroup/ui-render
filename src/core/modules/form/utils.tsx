@@ -601,6 +601,8 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
           tree: own.tree!, // not undefined: the first render set it
           // What the engine says of the document: a table's draft row, whose values are not data yet.
           draftRow: props.draftRow === true,
+          // A tree's root, which no parent hands its tree, and a block that starts from the whole document.
+          wholeDocument: !restProps.parent || props.wholeDocument === true,
         });
         // The tree's other documents hear this form's values, which their own render does not follow: a node there
         // whose `showIf` reads one of its fields (`tellTreeValues`). final-form calls the subscriber at once, with the
@@ -640,6 +642,7 @@ export function withForm (options: WithFormOptions = {subscription: {pristine: t
             form: handle.form,
             tree: own.tree!, // not undefined: the first render set it
             draftRow: props.draftRow === true,
+            wholeDocument: !restProps.parent || props.wholeDocument === true,
           });
           handle.form.reset(adopted)
         }

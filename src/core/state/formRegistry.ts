@@ -34,6 +34,13 @@ export type RegisteredForm = {
 	 * what the user types there, which is not the document's data until the row is added (`dataFormsOf`).
 	 */
 	draftRow: boolean,
+	/**
+	 * Whether the form holds the whole document from its root: a tree's root document's form, and a `useForm` block's
+	 * whose `name` or `data` selects no values, which starts from the document's (`engine/Data.tsx`). Where more than
+	 * one does, the merges take from each the fields it changed (`mergeDocuments` in `engine/formData.ts`). A block
+	 * that selects values of its own holds them from its root too, and is no such form.
+	 */
+	wholeDocument?: boolean,
 }
 
 /**

@@ -504,12 +504,40 @@ describe('restartWrittenRows', () => {
     })
 })
 
-describe('more than one form that holds the document from its root', () => {
-    // A document's own form holds it from its root, and so does a `useForm` block's that selects no values of its own
-    // (`engine/Data.tsx`): each holds a copy of what the other edits, as it started. Until 2026-10-27 the merge took the
-    // first to register as the master, the block's, children registering first, and the document's copy came over it.
-    const formOf = (values, fields = [], initialValues = {}, meta = {}) => ({ form: makeForm(values, fields, initialValues), meta })
+describe('more than one form that holds the whole document', () => {
+    // A document's own form holds the whole document, and so does a `useForm` block's that selects no values of its own
+    // (`engine/Data.tsx`, `wholeDocument`): each holds a copy of what the other edits, as it started. Until 2026-10-27 the
+    // merge took the first to register as the master, the block's, children registering first, and the document's copy
+    // came over it.
+    const formOf = (values, fields = [], initialValues = {}, meta = {}, wholeDocument = true) => ({
+        form: makeForm(values, fields, initialValues), meta, wholeDocument,
+    })
     const start = { title: 'T', items: [{ kind: 'a' }, { kind: 'x' }] }
+
+    it('leaves a field of the same name as it was, where a block that selects values of its own changed it', () => {
+        // Such a block holds its values from its root too, and `getFormData` returns them there: one name, one place.
+        const section = { title: 'S', note: 'n' }
+        const forms = new Map([
+            ['block', formOf({ title: 'S2', note: 'n' }, ['title', 'note'], section, {}, false)],
+            ['document', formOf({ title: 'T', section }, ['title'], { title: 'T', section })],
+        ])
+        expect(getRawFormsData(forms).title).toBe('T')
+    })
+
+    it('gives a Select\'s pick in a block, in a document of three keys, as that block alone does', () => {
+        // The document's meta does not reach the Select in the block: its copy holds the options in their order, and the
+        // value, as they started, and comes over the block's.
+        const meta = { view: 'Col', items: [{ view: 'Select', name: 'choice', mapOptions: 'code' }] }
+        const loaded = () => ({ title: 'T', choice: '0', options: [{ code: 'A' }, { code: 'B' }] })
+        const picked = () => ({ ...loaded(), choice: '1' })
+        const alone = getFormsData(new Map([['block', formOf(picked(), ['choice'], loaded(), meta)]]))
+        const forms = new Map([
+            ['block', formOf(picked(), ['choice'], loaded(), meta)],
+            ['document', formOf(loaded(), [], loaded())],
+        ])
+        expect(alone).toEqual({ title: 'T', options: [{ code: 'B' }, { code: 'A' }] })
+        expect(getFormsData(forms)).toEqual(alone)
+    })
 
     describe.each([
         ['getFormsData', getFormsData],
@@ -590,10 +618,10 @@ describe('more than one form that holds the document from its root', () => {
         })
 
         it('merges the rows of a nested document\'s form as before, and reads no field of it', () => {
-            // A form with a `relativePath` and no `relativeIndex` holds no document from its root.
+            // A form with a `relativePath` and no `relativeIndex` holds no whole document.
             const forms = new Map([
                 ['block', formOf({ items: [{ kind: 'b' }, { kind: 'x' }] }, ['items[0].kind'], start)],
-                ['nested', formOf({ items: [{ note: 'n' }, { note: 'm' }] }, ['items[0].note'], {}, { relativePath: 'items' })],
+                ['nested', formOf({ items: [{ note: 'n' }, { note: 'm' }] }, ['items[0].note'], {}, { relativePath: 'items' }, false)],
                 ['document', formOf(start, [], start)],
             ])
             expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ kind: 'b', note: 'n' }, { kind: 'x', note: 'm' }])
@@ -601,7 +629,7 @@ describe('more than one form that holds the document from its root', () => {
 
         it('reads the form a validator runs in from the values it was handed, every field it has there, and not its state', () => {
             const block = { reads: 0, getState () { block.reads += 1; return { values: start, initialValues: start } }, getFieldState: () => ({}), getRegisteredFields: () => ['items[0].kind'] }
-            const forms = new Map([['block', { form: block, meta: {} }], ['document', formOf(start, [], start)]])
+            const forms = new Map([['block', { form: block, meta: {}, wholeDocument: true }], ['document', formOf(start, [], start)]])
             const handed = { items: [{ kind: 'b' }, { kind: 'x' }] }
             expect(getLiveMergedDataKindArray('items', forms, { form: block, name: 'items[0].kind', values: handed }))
                 .toEqual([{ kind: 'b' }, { kind: 'x' }])
@@ -618,7 +646,7 @@ describe('more than one form that holds the document from its root', () => {
         it('is what the other form holds of the block\'s changes after a submit wrote them there: an edit set back is one more', () => {
             const block = blockAt({ items: [{ kind: 'b' }, { kind: 'x' }] }, ['items[0].kind'])
             // The document's form, which the document's submit wrote the block's row into.
-            const forms = new Map([['block', { form: block, meta: {} }], ['document', formOf({ items: [{ kind: 'b' }, { kind: 'x' }] })]])
+            const forms = new Map([['block', { form: block, meta: {}, wholeDocument: true }], ['document', formOf({ items: [{ kind: 'b' }, { kind: 'x' }] })]])
 
             restartWrittenRows(forms)
             block.values = { items: [{ kind: 'a' }, { kind: 'x' }] }
@@ -628,7 +656,7 @@ describe('more than one form that holds the document from its root', () => {
 
         it('does not move where the other form does not hold the block\'s changes, as after the block\'s own submit', () => {
             const block = blockAt({ items: [{ kind: 'b' }, { kind: 'x' }] }, ['items[0].kind'])
-            const forms = new Map([['block', { form: block, meta: {} }], ['document', formOf(start)]])
+            const forms = new Map([['block', { form: block, meta: {}, wholeDocument: true }], ['document', formOf(start)]])
 
             restartWrittenRows(forms)
 

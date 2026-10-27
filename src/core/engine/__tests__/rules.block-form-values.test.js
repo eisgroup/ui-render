@@ -15,7 +15,7 @@
  * sent, by design (`engine/Data.tsx`), and these tests leave that alone.
  */
 import React from 'react'
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { getIn } from 'final-form'
 import UIRender from '../rules'
@@ -218,5 +218,87 @@ describe('a table of `useForm` rows in a `useForm` block that holds the whole do
         expect(getIn(host.reader(), KIND)).toBe('a')
         await click('Submit')
         expect(getIn(host.submitted[host.submitted.length - 1], KIND)).toBe('a')
+    })
+})
+
+describe('a field of the same name in the document\'s form and in a form that does not hold the whole document', () => {
+    // A block that selects values of its own, and a `useForm` view in a table row's expanded content, hold their values
+    // from their root too, and `getFormData` returns them there: one name, one place. Such a form is merged as before.
+    const titles = () => Array.from(document.querySelectorAll('[name="title"]'))
+    const documentTitle = showsWhile('title', 'T')
+
+    it('keeps the document\'s value where a block that selects values of its own edits it', () => {
+        const meta = {
+            view: 'Col',
+            items: [
+                { view: 'Input', name: 'title', type: 'text' },
+                documentTitle,
+                block([{ view: 'Input', name: 'title', type: 'text' }, { view: 'Input', name: 'note', type: 'text' }], { name: 'section' }),
+            ],
+        }
+        const host = mount(meta, { title: 'T', section: { title: 'S', note: 'n' } })
+        expect(titles().map(input => input.value)).toEqual(['T', 'S'])
+        fireEvent.focus(titles()[1])
+        fireEvent.change(titles()[1], { target: { value: 'S2' } })
+        fireEvent.blur(titles()[1])
+        expect(host.reader().title).toBe('T')
+        expect(screen.queryByText('title is T')).toBeInTheDocument()
+    })
+
+    it('keeps the document\'s value where a `useForm` view in a row\'s expanded content edits it', () => {
+        const meta = {
+            view: 'Col',
+            items: [
+                { view: 'Input', name: 'title', type: 'text' },
+                documentTitle,
+                {
+                    view: 'Table',
+                    name: 'dataKind.phases',
+                    headers: [{ id: 'title', label: 'Phase' }],
+                    itemsExpanded: true,
+                    renderItemCells: {
+                        view: 'Data', kind: 'phases', embedded: true,
+                        meta: { view: 'TableCells', items: [{ view: 'Input', name: 'title', type: 'text' }] },
+                    },
+                    renderItem: {
+                        view: 'Data', kind: 'phases', useForm: true,
+                        meta: { view: 'Col', items: [{ view: 'Input', name: 'note', type: 'text' }, { view: 'Input', name: 'title', type: 'text' }] },
+                    },
+                },
+            ],
+        }
+        const host = mount(meta, { title: 'T', dataKind: { phases: [{ title: 'Design', note: 'x' }] } })
+        // The document's, and the expanded content's, which names its field from the row's values in its form.
+        expect(titles().map(input => input.value)).toEqual(['T', 'Design'])
+        fireEvent.focus(titles()[1])
+        fireEvent.change(titles()[1], { target: { value: 'Design 2' } })
+        fireEvent.blur(titles()[1])
+        expect(host.reader().title).toBe('T')
+        expect(screen.queryByText('title is T')).toBeInTheDocument()
+    })
+})
+
+describe('a Select whose value is an option\'s index, in a `useForm` block that holds the whole document', () => {
+    // Its value goes, and its options go first in the order the value picks (`changeOptionOrderForSelectFields`). The
+    // document's meta does not reach the Select in the block: its copy holds the options in their order, and came over.
+    const select = { view: 'Select', name: 'RegionSelection', options: { name: 'Regions' }, mapOptions: { text: 'RegionName', value: '{index}' } }
+    const regions = [{ RegionName: 'North' }, { RegionName: 'South' }, { RegionName: 'East' }, { RegionName: 'West' }]
+    const pick = index => {
+        const control = screen.getByRole('combobox')
+        fireEvent.click(control)
+        fireEvent.click(within(control.parentElement.querySelector('[role="listbox"]')).queryAllByRole('option')[index])
+    }
+    const read = host => {
+        const values = host.reader()
+        return { order: values.Regions.map(region => region.RegionName), selection: values.RegionSelection }
+    }
+
+    it.each([
+        ['two', { RegionSelection: '1', Regions: regions }],
+        ['three', { title: 'T', RegionSelection: '1', Regions: regions }],
+    ])('reads a pick as a document without the block does, with %s keys at the document\'s root', (_, values) => {
+        const host = mount({ view: 'Col', items: [block([select])] }, values)
+        pick(2)
+        expect(read(host)).toEqual({ order: ['East', 'North', 'South', 'West'], selection: undefined })
     })
 })
