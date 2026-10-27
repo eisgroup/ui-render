@@ -831,3 +831,62 @@ describe.each([['`useForm` rows', true], ['rows sharing the document\'s form', f
         expect(host.submitted[1]).toEqual(data)
     })
 })
+
+// A Save button in a `useForm` row's cells, or a field there with `autoSubmit`, submits the row's own document, which
+// writes the merged table into the row's form, not into the document's (`submit` in `rules.tsx`). From 2026-10-27, for
+// a day, the rows' forms took what that wrote as their start, and their edits dropped out of what the document reads:
+// found in review. A start moves only to what the forms holding the document from its root hold (`restartWrittenRows`).
+describe.each([['`useForm` rows', true], ['rows sharing the document\'s form', false]])('a submit made in the cells of a row, in a table of %s', (_, useForm) => {
+    const tableOf = cells => ({
+        view: 'Col',
+        items: [{
+            view: 'Table',
+            name: 'dataKind.items',
+            headers: [{ id: 'kind', label: 'Kind' }],
+            renderItemCells: { view: 'Data', kind: 'items', embedded: true, useForm, meta: { view: 'TableCells', items: cells } },
+        }, { view: 'Button', children: 'Submit', onClick: 'submit' }],
+    })
+    const withSave = tableOf([{ view: 'Input', name: 'kind', type: 'text' }, { view: 'Button', children: 'Save row', onClick: 'submit' }])
+    const data = { dataKind: { items: [{ kind: 'a' }, { kind: 'x' }] } }
+    const saveRow = index => act(async () => {
+        fireEvent.click(screen.getAllByRole('button', { name: 'Save row' })[index])
+        await new Promise(resolve => setTimeout(resolve, 0))
+    })
+
+    it('by a button keeps the edits of the rows in getFormData and in the document\'s submit', async () => {
+        const { host } = mount(withSave, data)
+        const edited = { dataKind: { items: [{ kind: 'b' }, { kind: 'y' }] } }
+
+        type('dataKind.items[0].kind', 'b')
+        type('dataKind.items[1].kind', 'y')
+        await saveRow(1)
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('b')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted[host.submitted.length - 1]).toEqual(edited)
+    })
+
+    it('by a button, then the edit set back, reads the value set back', async () => {
+        const { host } = mount(withSave, data)
+
+        type('dataKind.items[0].kind', 'b')
+        await saveRow(0)
+        type('dataKind.items[0].kind', 'a')
+
+        expect(host.reader()).toEqual(data)
+        await click('Submit')
+        expect(host.submitted[host.submitted.length - 1]).toEqual(data)
+    })
+
+    it('by a field with `autoSubmit` keeps the edits of the rows in getFormData', async () => {
+        const meta = tableOf([{ view: 'Input', name: 'kind', type: 'text' }, { view: 'Input', name: 'note', type: 'text', autoSubmit: { delay: 0 } }])
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a', note: '' }, { kind: 'x', note: '' }] } })
+
+        type('dataKind.items[0].kind', 'b')
+        type('dataKind.items[1].note', 'n')
+        await act(async () => { await new Promise(resolve => setTimeout(resolve, 50)) })
+
+        expect(host.reader()).toEqual({ dataKind: { items: [{ kind: 'b', note: '' }, { kind: 'x', note: 'n' }] } })
+    })
+})

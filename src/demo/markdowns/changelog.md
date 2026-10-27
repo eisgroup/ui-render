@@ -11,12 +11,12 @@
   (`notWithinRange`) in such a row read neither end of a period the user had not typed there, so it missed an overlap
   with another row. The form now starts from the row's values at its place, and what is read from the forms takes the
   value of each field such a row's form changed, at the field's name, a value cleared there included, over the
-  document's copy of the row, an edit set back after a submit included: the rest of the row stays as the document has
-  it, so an edit made in the row's expanded content, or in a table there, is kept, of a field the row's cells show as
-  well. A submit sends the edits of such a row in a table in another table's expanded content too, which 0.35.0 sent
-  as they were. An Add or a Remove still loses what was typed in the cells of a row whose data it changes, such as a
-  row whose expanded table gains or loses a line, or the rows after a removed one, which move up a row: they start
-  again from the document's copy.
+  document's copy of the row. A change is measured from what the document's form holds of the row, so an edit set
+  back after a submit is one too. The rest of the row stays as the document has it, so an edit made in the row's
+  expanded content, or in a table there, is kept, of a field the row's cells show as well. A submit sends the edits of
+  such a row in a table in another table's expanded content too, which 0.35.0 sent as they were. An Add or a Remove
+  still loses what was typed in the cells of a row whose data it changes, such as a row whose expanded table gains or
+  loses a line, or the rows after a removed one, which move up a row: they start again from the document's copy.
 - **A `showIf` that reads the form merges the document's forms once, not once per node.** A node whose `showIf` reads
   a field decides by every form of its document merged, and each node merged them as it decided, so a table whose
   rows each hold such a node copied its forms once per row on every render of the rows. Measured on React 18.3 before

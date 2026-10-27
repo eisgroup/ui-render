@@ -140,8 +140,10 @@ function changedInside (fields: readonly string[], place: string, values: Values
  * A row's form gives the merges the fields it changed of its start, and the rest is the document's (`changedInside`). A
  * submit writes the merged rows into the document's form, in place (`submit` in `rules.tsx`), so the document holds a
  * row's edits from then on. Measured from its `initialValues`, an edit set back after a submit was no change, and gave
- * nothing: the document's copy, holding the edit, came back in `getFormData`, a `showIf` and the next submit. So the
- * values written become the start (`restartWrittenRows`), field by field, and an edit set back is a change of them.
+ * nothing: the document's copy, holding the edit, came back in `getFormData`, a `showIf` and the next submit. So what
+ * the forms holding the document from its root hold of a row's changes becomes its start (`restartWrittenRows`), field
+ * by field, and an edit set back is a change of it. What another form holds is no start: a submit that a row's own
+ * document makes writes into the row's form, which the document's form does not read.
  *
  * Kept here rather than in the form: re-initializing the form would make its fields pristine and untouched again. Kept
  * for the `initialValues` the form had, so that new ones, a host's new data or the document's new rows, start it anew.
@@ -157,14 +159,16 @@ function startOf (form: FormApi, initialValues: Values | undefined): Values {
 
 /**
  * Each table row's own form among `forms` takes, as the value it started with, the value of each field it changed that
- * the document's `values` hold now: what a submit wrote there, a value taken away included (`movedStarts`). A field
- * whose value the document's form does not hold, such as one of a row the submit did not write, keeps its start. The
- * submit calls it as it writes, before final-form validates: one that validation stops has written all the same.
+ * the forms holding the document from its root hold now (`documentValuesOf`): what a submit wrote there, a value taken
+ * away included (`movedStarts`). A field whose value they do not hold keeps its start: one of a row the submit did not
+ * write, and every one where the submit wrote into another form than theirs, as a row's own form does when a button in
+ * the row's cells submits it, or a field there with `autoSubmit` (2026-10-27). The submit calls it as it writes, before
+ * final-form validates: one that validation stops has written all the same.
  *
- * @param {Map} forms - the forms of the document tree whose values were written, `dataFormsOf` it
- * @param {Object} values - the document's values, written
+ * @param {Map} forms - the forms of the document tree, `dataFormsOf` it
  */
-export function restartWrittenRows (forms: Forms, values: Values): void {
+export function restartWrittenRows (forms: Forms): void {
+  const values = documentValuesOf(forms) || {}
   forms.forEach(({ form, meta }) => {
     // A cast, not a guard: what a form registers as its meta is its document's meta.
     const place = rowPlaceOf(meta as MetaNode | undefined)
@@ -178,6 +182,21 @@ export function restartWrittenRows (forms: Forms, values: Values): void {
     const moved = written.reduce((next: unknown, name) => writeField(next, name, getIn(state.values, name)), start) as Values
     movedStarts.set(form.getState, { initial: state.initialValues, start: moved })
   })
+}
+
+/**
+ * What the forms among `forms` that hold the document from its root hold, merged as `mergeForms` merges them: a
+ * document's own form, and a block's with a form of its own, and no table row's. `undefined` where there is none.
+ */
+function documentValuesOf (forms: Forms): Values | undefined {
+  const documents: Values[] = []
+  forms.forEach(({ form, meta }) => {
+    // A cast, not a guard: what a form registers as its meta is its document's meta.
+    const node = meta as MetaNode | undefined
+    if (!form || typeof form.getState !== 'function' || rowPlaceOf(node) || (node && node.relativePath)) return
+    documents.push(cloneDeep(form.getState().values))
+  })
+  return mergeData(documents)
 }
 
 /**

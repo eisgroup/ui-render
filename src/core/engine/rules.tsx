@@ -1072,8 +1072,10 @@ function Decorator (Class: any) {
             }
             if (dataKind) {
                 // The document holds the rows' edits now, whether validation lets the submit through or not: a row's own
-                // form measures its next ones from them (`restartWrittenRows`), or one set back would give nothing.
-                restartWrittenRows(dataFormsOf(this.formTree), this.formValues)
+                // form measures its next ones from what the document's form holds of them (`restartWrittenRows`), or one
+                // set back would give nothing. A row's own document that submits writes into the row's form, which the
+                // document's form does not read: that moves no start.
+                restartWrittenRows(dataFormsOf(this.formTree))
                 // Written into the form's values in place, which final-form tells no subscriber of: counted, so that the
                 // merge a `showIf` reads is made again (`keptRawFormsData`).
                 countFormsChange()

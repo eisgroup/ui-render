@@ -423,6 +423,7 @@ describe('restartWrittenRows', () => {
         const form = { values, initialValues, getState: () => ({ values: form.values, initialValues: form.initialValues }), getRegisteredFields: () => fields }
         return form
     }
+    // The row, and the document's form, which holds the document from its root.
     const formsOf = (row, document) => new Map([
         ['row', { form: row, meta: { relativePath: 'items', relativeIndex: 0 } }],
         ['document', { form: makeForm(document), meta: {} }],
@@ -431,7 +432,7 @@ describe('restartWrittenRows', () => {
     it('makes what the document\'s form holds of a row\'s changes its start: a change set back is one more', () => {
         const row = rowAt({ items: [{ kind: 'b' }] }, { items: [{ kind: 'a' }] }, ['items[0].kind'])
         const written = { items: [{ kind: 'b' }] }
-        restartWrittenRows(formsOf(row, written), written)
+        restartWrittenRows(formsOf(row, written))
 
         row.values = { items: [{ kind: 'a' }] }
 
@@ -444,7 +445,7 @@ describe('restartWrittenRows', () => {
     it('keeps the start of a field whose value the document\'s form does not hold, as of a row a submit did not write', () => {
         const row = rowAt({ items: [{ kind: 'b' }] }, { items: [{ kind: 'a' }] }, ['items[0].kind'])
         const document = { items: [{ kind: 'c' }] }
-        restartWrittenRows(formsOf(row, document), document)
+        restartWrittenRows(formsOf(row, document))
 
         expect(getRawFormsData(formsOf(row, document))).toEqual({ items: [{ kind: 'b' }] })
         row.values = { items: [{ kind: 'a' }] }
@@ -453,7 +454,7 @@ describe('restartWrittenRows', () => {
 
     it('makes a value taken away there a start with none', () => {
         const row = rowAt({ items: [{ kind: 'a' }] }, { items: [{ kind: 'a', when: '2020-01-01' }] }, ['items[0].kind', 'items[0].when'])
-        restartWrittenRows(formsOf(row, { items: [{ kind: 'a' }] }), { items: [{ kind: 'a' }] })
+        restartWrittenRows(formsOf(row, { items: [{ kind: 'a' }] }))
 
         // Another copy of the document, which holds the date: the form, with none, changed nothing of its start.
         expect(getRawFormsData(formsOf(row, { items: [{ kind: 'a', when: '2020-01-01' }] }))).toEqual({ items: [{ kind: 'a', when: '2020-01-01' }] })
@@ -461,8 +462,7 @@ describe('restartWrittenRows', () => {
 
     it('starts a form anew from the new initial values a reset gives it', () => {
         const row = rowAt({ items: [{ kind: 'b' }] }, { items: [{ kind: 'a' }] }, ['items[0].kind'])
-        const written = { items: [{ kind: 'b' }] }
-        restartWrittenRows(formsOf(row, written), written)
+        restartWrittenRows(formsOf(row, { items: [{ kind: 'b' }] }))
 
         // A host's new data: the form starts from them, whatever a submit wrote before.
         row.initialValues = { items: [{ kind: 'c' }] }
@@ -471,16 +471,34 @@ describe('restartWrittenRows', () => {
         expect(getRawFormsData(formsOf(row, handedOver))).toEqual({ items: [{ kind: 'b' }] })
     })
 
+    it('moves no start where the forms that hold the document from its root do not hold the row\'s values', () => {
+        // A Save button in the row's cells submits the row's own document, which writes the merged table into the
+        // row's form. Until 2026-10-27 that moved the start of every edited row, and their edits dropped out.
+        const row = rowAt({ items: [{ kind: 'b' }, { kind: 'y' }] }, { items: [{ kind: 'a' }] }, ['items[0].kind'])
+        const forms = formsOf(row, { items: [{ kind: 'a' }, { kind: 'x' }] })
+
+        restartWrittenRows(forms)
+
+        expect(getRawFormsData(forms)).toEqual({ items: [{ kind: 'b' }, { kind: 'x' }] })
+    })
+
+    it('moves no start where no form holds the document from its root', () => {
+        const row = rowAt({ items: [{ kind: 'b' }] }, { items: [{ kind: 'a' }] }, ['items[0].kind'])
+
+        restartWrittenRows(new Map([['row', { form: row, meta: { relativePath: 'items', relativeIndex: 0 } }]]))
+
+        expect(getRawFormsData(formsOf(row, { items: [{ kind: 'b' }] }))).toEqual({ items: [{ kind: 'b' }] })
+        row.values = { items: [{ kind: 'a' }] }
+        expect(getRawFormsData(formsOf(row, { items: [{ kind: 'b' }] }))).toEqual({ items: [{ kind: 'b' }] })
+    })
+
     it('makes the live merge merge again, though every form holds the same values', () => {
-        const documentArray = [{ a: 'the document\'s' }]
         const row = rowAt({ items: [{ a: 'typed' }] }, { items: [{ a: 'as loaded' }] }, ['items[0].a'])
-        const forms = new Map([
-            ['row', { form: row, meta: { relativePath: 'items', relativeIndex: 0 } }],
-            ['document', { form: makeForm({ items: documentArray }), meta: {} }],
-        ])
+        const forms = formsOf(row, { items: [{ a: 'the document\'s' }] })
         expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ a: 'typed' }])
 
-        restartWrittenRows(forms, { items: [{ a: 'typed' }] })
+        // Another copy of the document's form, which a submit wrote the row's edit into.
+        restartWrittenRows(formsOf(row, { items: [{ a: 'typed' }] }))
 
         expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ a: 'the document\'s' }])
     })

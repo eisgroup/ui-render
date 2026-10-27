@@ -145,8 +145,9 @@ where it is made (`countFormsChange`), as the `submit` action's is. A `useForm` 
 place, as its fields read it (`engine/Data.tsx`), and every merge of the forms takes from it the values of the fields
 it changed and nothing else, each read and written at the field's name (`rowPlaceOf`, `changedInside`, `writeField`,
 `engine/formData.ts`). It changed a field whose value is not its start: its `initialValues`, moved, field by field, to
-the values a submit has written into the document's form (`restartWrittenRows`, which the `submit` action calls as it
-writes). The rest of the row, a field its cells only show included, is what the document's form holds: what another
+what the forms holding the document from its root hold of its values after a submit (`restartWrittenRows`, which the
+`submit` action calls as it writes; a submit a row's own document makes writes into the row's form, and moves no
+start). The rest of the row, a field its cells only show included, is what the document's form holds: what another
 form, such as the row's expanded content's, has edited there, and what a submit has written of the row's form. A
 new write of a row's values into the document's form must move the start the same way. Its fields are every one it
 has registered, the ones a `showIf` hid included (`fieldNamesOf` in `createBatchedForm`). A name that comes is no
