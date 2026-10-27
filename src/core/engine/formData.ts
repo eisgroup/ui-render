@@ -6,7 +6,7 @@
  * `errorMapping.ts` and `dataMapping.ts`.
  */
 import { getIn, setIn } from 'final-form'
-import type { FormApi } from 'final-form'
+import type { FormApi, FormState } from 'final-form'
 import { get, merge, isEqual, isObject, hasObjectValue, set } from '../utils/object'
 import type { RegisteredForm } from '../state/formRegistry'
 import { FIELD } from '../modules'
@@ -68,9 +68,11 @@ const lastMerges = new WeakMap<unknown[], Map<string, { arrays: unknown[][], own
 /**
  * A table row with a form of its own, as a merge of an array reads it: its place, its values and those it started with
  * (`startOf`), what each holds where the merge reads it (`held` and `started`: its row, or the array, when the array is
- * inside its row), which changes with any of its values there, and its fields.
+ * inside its row), which changes with any of its values there, and its fields. Or a form that holds the document from
+ * its root, where another does too, whose place is `''`, and which holds the array at its path; with no start when a
+ * validator runs in it, and then it gives every field it has there.
  */
-type Owned = { place: string, values: Values, start: Values, held: unknown, started: unknown, fields: readonly string[] }
+type Owned = { place: string, values: Values, start: Values | undefined, held: unknown, started: unknown, fields: readonly string[] }
 
 /**
  * Whether two form objects are one final-form instance. react-final-form hands a new `{...form, reset}`
@@ -96,6 +98,14 @@ export function rowPlaceOf (meta: MetaNode | undefined): string | undefined {
   return relativePath && typeof relativeIndex !== 'undefined' ? `${relativePath}[${relativeIndex}]` : undefined
 }
 
+/**
+ * Whether a form holds the document from its root, by the meta it registers: a document's own form, and a block's with a
+ * form of its own (`useForm`), and not a table row's (`rowPlaceOf`) or a nested document's, which a `relativePath` places.
+ */
+export function holdsTheDocument (meta: MetaNode | undefined): boolean {
+  return !rowPlaceOf(meta) && !(meta && meta.relativePath)
+}
+
 /** A path in dots: `dataKind.phases[0].dataKind.items` and `dataKind.phases.0.dataKind.items` name one place. */
 const dotted = (path: string) => path.replace(/\[(\d+)\]/g, '.$1')
 
@@ -116,8 +126,12 @@ function fieldsOf (form: FormApi): readonly string[] {
   return fieldNamesOf(form) || (typeof form.getRegisteredFields === 'function' ? form.getRegisteredFields() : [])
 }
 
-/** The names of `fields` inside `place`, in dots: those of a row's own form inside its row. */
+/**
+ * The names of `fields` inside `place`, in dots: those of a row's own form inside its row, or all of them for a form that
+ * holds the document from its root, whose place is `''`.
+ */
 function namesInside (fields: readonly string[], place: string): string[] {
+  if (!place) return fields.map(dotted)
   const inside = `${dotted(place)}.`
   return fields.map(dotted).filter(name => name.startsWith(inside))
 }
@@ -148,10 +162,13 @@ function changedInside (fields: readonly string[], place: string, values: Values
  * Kept here rather than in the form: re-initializing the form would make its fields pristine and untouched again. Kept
  * for the `initialValues` the form had, so that new ones, a host's new data or the document's new rows, start it anew.
  * Keyed by the form's `getState`, which every copy of the form react-final-form hands out shares (`sameForm`).
+ *
+ * A form that holds the document from its root, where another holds it too, gives the merges the fields it changed the
+ * same way (`mergeDocuments`), and its start moves the same way, to what the others hold of them (2026-10-27).
  */
 const movedStarts = new WeakMap<object, { initial: unknown, start: Values }>()
 
-/** What a table row's own form started with, as the merges measure its changes (`movedStarts`): its `initialValues`, or more. */
+/** What a form started with, as the merges measure its changes (`movedStarts`): its `initialValues`, or more. */
 function startOf (form: FormApi, initialValues: Values | undefined): Values {
   const moved = movedStarts.get(form.getState)
   return moved && moved.initial === initialValues ? moved.start : initialValues || {}
@@ -159,44 +176,99 @@ function startOf (form: FormApi, initialValues: Values | undefined): Values {
 
 /**
  * Each table row's own form among `forms` takes, as the value it started with, the value of each field it changed that
- * the forms holding the document from its root hold now (`documentValuesOf`): what a submit wrote there, a value taken
+ * the forms holding the document from its root hold now (`mergeDocuments`): what a submit wrote there, a value taken
  * away included (`movedStarts`). A field whose value they do not hold keeps its start: one of a row the submit did not
  * write, and every one where the submit wrote into another form than theirs, as a row's own form does when a button in
  * the row's cells submits it, or a field there with `autoSubmit` (2026-10-27). The submit calls it as it writes, before
  * final-form validates: one that validation stops has written all the same.
  *
+ * Where more than one form holds the document from its root, such as a `useForm` block's that holds the whole document
+ * beside the document's own (`mergeDocuments`), each of them takes so the value of each field it changed that the others
+ * hold now: the document's form, after a submit that wrote a table's rows of the block into it, holds the block's edits
+ * (2026-10-27). A block's own submit writes into the block's form, which moves none of its starts.
+ *
  * @param {Map} forms - the forms of the document tree, `dataFormsOf` it
  */
 export function restartWrittenRows (forms: Forms): void {
-  const values = documentValuesOf(forms) || {}
+  const documents = documentFormsOf(forms)
+  const values = mergeDocuments(documents, sameValues) || {}
   forms.forEach(({ form, meta }) => {
     // A cast, not a guard: what a form registers as its meta is its document's meta.
     const place = rowPlaceOf(meta as MetaNode | undefined)
     if (!place || !form || typeof form.getState !== 'function') return
     const state = form.getState()
-    const start = startOf(form, state.initialValues)
-    const written = changedInside(fieldsOf(form), place, state.values, start)
-      .filter(name => isEqual(getIn(values, name), getIn(state.values, name)))
-    if (!written.length) return
-    // A copy, field by field: the start was the form's own `initialValues`, which nothing may change.
-    const moved = written.reduce((next: unknown, name) => writeField(next, name, getIn(state.values, name)), start) as Values
-    movedStarts.set(form.getState, { initial: state.initialValues, start: moved })
+    restart(form, state.values, state.initialValues, place, values)
   })
+  if (documents.length < 2) return
+  // Each measured against the others before any start moves: a moved start changes what a form gives them.
+  const others = documents.map(document => mergeDocuments(documents.filter(other => other !== document), sameValues) || {})
+  documents.forEach(({ form, values: own, initialValues }, index) => restart(form, own, initialValues, '', others[index]))
 }
 
 /**
- * What the forms among `forms` that hold the document from its root hold, merged as `mergeForms` merges them: a
- * document's own form, and a block's with a form of its own, and no table row's. `undefined` where there is none.
+ * Moves the start of `form`, whose values and `initialValues` are given, to its value of each field inside `place` it
+ * changed that `held` holds too (`movedStarts`). A copy, field by field: the start was the form's own `initialValues`,
+ * which nothing may change.
  */
-function documentValuesOf (forms: Forms): Values | undefined {
-  const documents: Values[] = []
+function restart (form: FormApi, values: Values, initialValues: Values | undefined, place: string, held: Values): void {
+  const start = startOf(form, initialValues)
+  const written = changedInside(fieldsOf(form), place, values, start)
+    .filter(name => isEqual(getIn(held, name), getIn(values, name)))
+  if (!written.length) return
+  const moved = written.reduce((next: unknown, name) => writeField(next, name, getIn(values, name)), start) as Values
+  movedStarts.set(form.getState, { initial: initialValues, start: moved })
+}
+
+/** A form's values as they are: what a merge that reorders no Select's options gives of them. */
+const sameValues = (values: Values) => values
+
+/** A form that holds the document from its root (`holdsTheDocument`), as a merge reads it. */
+type DocumentForm = { form: FormApi, meta: MetaNode | undefined, values: Values, initialValues: Values | undefined }
+
+/** The forms among `forms` that hold the document from its root, in the order they registered. */
+function documentFormsOf (forms: Forms): DocumentForm[] {
+  const documents: DocumentForm[] = []
   forms.forEach(({ form, meta }) => {
     // A cast, not a guard: what a form registers as its meta is its document's meta.
     const node = meta as MetaNode | undefined
-    if (!form || typeof form.getState !== 'function' || rowPlaceOf(node) || (node && node.relativePath)) return
-    documents.push(cloneDeep(form.getState().values))
+    if (!form || typeof form.getState !== 'function' || !holdsTheDocument(node)) return
+    const { values, initialValues } = form.getState()
+    documents.push({ form, meta: node, values, initialValues })
   })
-  return mergeData(documents)
+  return documents
+}
+
+/**
+ * THE FORMS THAT HOLD THE DOCUMENT FROM ITS ROOT, MERGED, AND THE FIELDS EACH CHANGED OVER THE OTHERS' COPIES (2026-10-27).
+ *
+ * A document's own form holds it from its root, and so does a block's with a form of its own (`useForm`): from the
+ * values its `name` or `data` selects, and from the document's when they select none (`engine/Data.tsx`). `mergeData`
+ * merges them over the first that holds more than one key at its root, which a block's form that holds the whole
+ * document is, as children register first. The document's form came over it, holding every value as it started, and
+ * took back each edit made in the block: `getFormData` and a `showIf` read none of them, and a submit sent the rows of
+ * a table in the block as they started. A block mounted after an edit of the document's form, merged over it, took that
+ * edit back the same way. A master taken another way would only turn the loss round: each form holds a copy of what
+ * the other edits.
+ *
+ * So where more than one form holds the document, each writes over the merge the value of each field it changed, as a
+ * table row's own form does (`changedInside`): a field it registered whose value is not the one it started with
+ * (`startOf`), read in its copy, as `fromRoot` gave it, so that a Select's value that copy has given up for the order
+ * of its options goes. In the order `mergeData` merges them, so that two forms that changed one field come out as they
+ * did. A document with one such form merges as before.
+ *
+ * @param {Array} documents - the forms that hold the document from its root (`documentFormsOf`)
+ * @param {Function} fromRoot - what each contributes of its values
+ * @returns {Object|undefined} the merged values, or `undefined` when there is no form
+ */
+function mergeDocuments (documents: DocumentForm[], fromRoot: (values: Values, meta: MetaNode | undefined) => Values) {
+  const copies = documents.map(({ values, meta }) => fromRoot(cloneDeep(values), meta))
+  const merged = mergeData(copies)
+  if (documents.length < 2) return merged
+  return orderOfMerge(copies).reduce((result: unknown, index) => {
+    const { form, values, initialValues } = documents[index]
+    return changedInside(fieldsOf(form), '', values, startOf(form, initialValues))
+      .reduce((target: unknown, name) => writeField(target, name, getIn(copies[index], name)), result)
+  }, merged) as Values | undefined
 }
 
 /**
@@ -248,6 +320,7 @@ function writeField (target: unknown, at: string, value: unknown): unknown {
 export function getLiveMergedDataKindArray (path: string, forms: Forms, validating?: ValidatingForm): object[] {
   const arrays: unknown[][] = []
   const owned: Owned[] = []
+  const documents: Array<{ form: FormApi, values: Values, state: FormState<Values> | undefined }> = []
   const at = dotted(path)
   forms.forEach(({ form, meta }) => {
     if (!form || typeof form.getState !== 'function') return
@@ -256,10 +329,13 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
     const rowMeta = meta as MetaNode | undefined
     const place = rowPlaceOf(rowMeta)
     if (!place) {
-      const arr = get(handed ? validating!.values : form.getState().values, path) // not undefined: `handed` says so
+      const state = handed ? undefined : form.getState()
+      const values = state ? state.values : validating!.values // not undefined: `handed` says so
+      const arr = get(values, path)
       if (Array.isArray(arr) && arr.length > 0) {
         arrays.push(arr)
       }
+      if (holdsTheDocument(rowMeta)) documents.push({ form, values, state })
       return
     }
     // A row of this array, or a row inside one; else a row this array is inside of, or none of them.
@@ -276,6 +352,15 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
   })
   if (!arrays.length) {
     return []
+  }
+  // More than one form holds the document from its root: each writes the fields it changed, as `mergeDocuments` has
+  // them, before any row's own form. The form a validator runs in writes every field it has at the array, read in the
+  // values it was handed, the newest there are: its start would take its state, which those values spare it.
+  if (documents.length > 1) {
+    owned.unshift(...documents.map(({ form, values, state }) => {
+      const start = state ? startOf(form, state.initialValues) : undefined
+      return { place: '', values, start, held: getIn(values, at), started: start && getIn(start, at), fields: fieldsOf(form) }
+    }))
   }
   const kept = lastMerges.get(arrays[0])
   const last = kept && kept.get(path)
@@ -318,8 +403,13 @@ function mergeRows (at: string, arrays: unknown[][], owned: Owned[]): object[] {
   }
   // Each row is replaced, not changed: the rows hold the objects of the documents' values.
   const inside = `${at}.`
+  // A form that holds the document from its root, whose place `''` is the shallowest, goes first, and reads only its
+  // names at the array.
   owned.slice().sort((a, b) => depthOf(a.place) - depthOf(b.place)).forEach(({ place, values, start, fields }) => {
-    changedInside(fields, place, values, start).forEach(name => {
+    const names = place
+      ? changedInside(fields, place, values, start!) // not undefined: a row's own form has its start read
+      : namesInside(fields, '').filter(name => (name === at || name.startsWith(inside)) && !(start && startedWith(values, start, name)))
+    names.forEach(name => {
       const value = getIn(values, name)
       // A field that holds the array: its rows are the rows.
       if (name === at) {
@@ -352,7 +442,8 @@ export const getRawFormsData = (forms: Forms) => {
  * Whether `merged`, a merge `getRawFormsData` gave, holds at each of `names` inside `place` that the table row's own
  * `form` changed what the form holds there: a merge that read those names too would write over it what it holds
  * already, and come out the same. A name whose value the form did not change, it would not write. How a kept merge is
- * checked for the names that came to a row's form after it (`keptRawFormsData`).
+ * checked for the names that came to a row's form after it (`keptRawFormsData`), and, with `''` for a place, to a form
+ * that holds the document from its root, where another does too (`mergeDocuments`).
  */
 export function holdsFields (merged: Values | undefined, form: FormApi, place: string, names: readonly string[]): boolean {
   const inside = namesInside(names, place)
@@ -403,7 +494,6 @@ export function holdsFields (merged: Values | undefined, form: FormApi, place: s
  * @returns {Object|undefined} the merged values, or `undefined` when no form contributes any
  */
 function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | undefined) => Values) {
-  const documents: Values[] = [];
   const rows: Array<{ place: string, names: string[], values: Values }> = [];
 
   forms.forEach(value => {
@@ -411,11 +501,7 @@ function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | u
     // A cast, not a guard: what a form registers as its meta is its document's meta.
     const meta = value.meta as MetaNode | undefined;
     const place = rowPlaceOf(meta);
-    if (!place) {
-      if (meta && meta.relativePath) return;
-      documents.push(fromRoot(cloneDeep(form.getState().values), meta));
-      return;
-    }
+    if (!place) return;
     // Its fields are named `${place}.${name}` (`mapper.tsx`). Only those: a `useForm` row's form starts from the whole
     // row, and an array up to its index, which a copy would walk hole by hole.
     const { values, initialValues } = form.getState();
@@ -423,7 +509,8 @@ function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | u
     if (names.length) rows.push({ place, names, values });
   })
 
-  const merged = mergeData(documents);
+  // The forms that hold the document from its root, each with the fields it changed over the others' copies.
+  const merged = mergeDocuments(documentFormsOf(forms), fromRoot);
   if (!rows.length) return merged;
   // Each row is set in place, which changes no form: each form's values were cloned before they were merged, and
   // `writeField` copies what it writes into.
@@ -437,18 +524,25 @@ function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | u
   return result;
 }
 
+/**
+ * The index of the master among `formData`, the object the others are merged over (`mergeData`): the first that holds
+ * other than one key at its root, or -1.
+ */
+const masterOf = (formData: Values[]) => formData.findIndex(formValues => Object.keys(formValues).length !== 1)
+
+/** The order `mergeData` merges `formData` in, by index: the master first (`masterOf`), then the others as they come. */
+function orderOfMerge (formData: Values[]): number[] {
+  const master = masterOf(formData)
+  const others = formData.map((_, index) => index).filter(index => index !== master)
+  return master === -1 ? others : [master, ...others]
+}
+
 const mergeData = (formData: Values[]) => {
-  let masterDataIndex = -1;
   // Find Master object which contains all data structure
   // It should be one object in array
   // All other objects contain only one property at the first level of the structure
-  let result = formData.find((formValues, index) => {
-    if (Object.keys(formValues).length !== 1) {
-      masterDataIndex = index;
-      return true
-    }
-    return false;
-  })
+  const masterDataIndex = masterOf(formData);
+  let result = masterDataIndex === -1 ? undefined : formData[masterDataIndex];
 
   formData.forEach((formValues, index) => {
     if (index === masterDataIndex) {

@@ -164,6 +164,38 @@ describe('keptRawFormsData', () => {
         })
     })
 
+    describe('a field that comes to a form that holds the document from its root, beside another', () => {
+        // A `useForm` block's form that selects no values holds the whole document, as the document's own form does, and
+        // each gives a merge the fields it changed (`mergeDocuments`, 2026-10-27). A block registers first.
+
+        it('merges again where the form changed the field to another value than the merge holds', () => {
+            const tree = {}
+            const block = registerBatched(tree, { title: 'T', note: 'n' })
+            registerBatched(tree, { title: 'T', note: 'n' })
+            block.subscribe(() => undefined, { values: true })
+            block.change('title', 'U')
+            expect(keptRawFormsData(tree).title).toBe('T')
+            const merges = mockMerges.count
+
+            field(block, 'title')
+
+            expect(keptRawFormsData(tree).title).toBe('U')
+            expect(mockMerges.count).toBe(merges + 1)
+        })
+
+        it('keeps the merge where the field holds what the merge holds there', () => {
+            const tree = {}
+            const block = registerBatched(tree, { title: 'T', note: 'n' })
+            registerBatched(tree, { title: 'T', note: 'n' })
+            const first = keptRawFormsData(tree)
+
+            field(block, 'title')
+
+            expect(keptRawFormsData(tree)).toBe(first)
+            expect(mockMerges.count).toBe(1)
+        })
+    })
+
     it('keeps a merge per tree', () => {
         const one = {}
         const other = {}

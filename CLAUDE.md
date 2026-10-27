@@ -152,7 +152,11 @@ form, such as the row's expanded content's, has edited there, and what a submit 
 new write of a row's values into the document's form must move the start the same way. Its fields are every one it
 has registered, the ones a `showIf` hid included (`fieldNamesOf` in `createBatchedForm`). A name that comes is no
 change of what the forms hold: the kept merge is checked against the values of the names that came
-(`fieldNamesCount`, `holdsFields`), so a burst of registrations, a mount's among them, merges nothing more.
+(`fieldNamesCount`, `holdsFields`), so a burst of registrations, a mount's among them, merges nothing more. Where more
+than one form holds the document from its root, as a `useForm` block's that selects no values of its own does beside
+the document's form, each of them gives the merges the fields it changed in the same way, and its start moves in the
+same way, to what the others hold (`mergeDocuments`, since 2026-10-27): `mergeData` takes the first to register, a
+block's, as the master, and merged the document's copy, as it started, over the block's edits.
 
 A mount has a cost besides renders: every field registers with final-form. Until 2026-10-13, each registration
 published the state of every field before it and, once validation ran, validated them all, and each unregistration

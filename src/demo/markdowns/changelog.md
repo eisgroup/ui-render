@@ -17,6 +17,14 @@
   such a row in a table in another table's expanded content too, which 0.35.0 sent as they were. An Add or a Remove
   still loses what was typed in the cells of a row whose data it changes, such as a row whose expanded table gains or
   loses a line, or the rows after a removed one, which move up a row: they start again from the document's copy.
+- **An edit in a `useForm` block that holds the whole document is in what the document reads.** A `Data` view with
+  `useForm` whose `name` or `data` selects no values starts its form from the document's values, and the document's
+  own form holds them too. An edit made in such a block of a value the document had was missing from `getFormData`, a
+  `showIf` that read it did not follow it, and a submit sent the rows of a table in the block as they started; such a
+  block shown after an edit of the document's form took that edit back. 0.35.0 did all of it. What is read from the
+  forms now takes, from each form that holds the document from its root, the value of each field it changed, over the
+  others' copies, as it takes a `useForm` table row's. A submit of the document still sends its own form's values and
+  the tables' rows, and no other field of such a block.
 - **A `showIf` that reads the form merges the document's forms once, not once per node.** A node whose `showIf` reads
   a field decides by every form of its document merged, and each node merged them as it decided, so a table whose
   rows each hold such a node copied its forms once per row on every render of the rows. Measured on React 18.3 before
