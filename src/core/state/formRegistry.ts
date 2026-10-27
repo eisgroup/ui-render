@@ -37,10 +37,53 @@ export type RegisteredForm = {
 }
 
 /**
+ * How many times what the page's forms hold has changed: a form registered, went or registered again (`formsStorage`),
+ * or a form's values changed. The form a document renders counts its new values before the first of its subscribers
+ * hears of them (`createBatchedForm`, `modules/form/batchedForm.ts`), so the count moves before anything that follows
+ * the form decides. What the engine reads from a tree's forms is kept while the count stays the same
+ * (`engine/keptRawFormsData.ts`). A change made to a form's values in place, which final-form tells nobody of, is
+ * counted where it is made: the `submit` action's (`engine/rules.tsx`).
+ *
+ * The tree's tells (`tellTreeValues`) are no such signal: the form layer subscribes for them as the form commits, after
+ * the nodes under it have subscribed, which then decide before the tree is told.
+ */
+let formsChanges = 0
+
+/** How many times what the page's forms hold has changed. */
+export function formsChangeCount (): number {
+	return formsChanges
+}
+
+/** Counts a change of what the page's forms hold. */
+export function countFormsChange (): void {
+	formsChanges += 1
+}
+
+/**
  * Every active form on the page. Keyed by object identity: a fresh `{...initialValues}` copy per
  * mount, which is also why an entry has to be deleted before its key is replaced.
+ *
+ * Every entry set or deleted, and the storage cleared, counts as a change (`formsChangeCount`): a form registered again
+ * with new initial values brings the meta of the render that brought them, which no values tell.
  */
-export const formsStorage = new Map<object, RegisteredForm>()
+class FormsStorage extends Map<object, RegisteredForm> {
+	set (key: object, entry: RegisteredForm): this {
+		countFormsChange()
+		return super.set(key, entry)
+	}
+
+	delete (key: object): boolean {
+		countFormsChange()
+		return super.delete(key)
+	}
+
+	clear (): void {
+		countFormsChange()
+		super.clear()
+	}
+}
+
+export const formsStorage = new FormsStorage()
 
 /**
  * The forms of one document tree, which is what a document reads its data from: its own form and its

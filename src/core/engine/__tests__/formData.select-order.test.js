@@ -4,8 +4,9 @@ import {
   getRawFormsData,
 } from '../formData'
 
-const makeForm = values => ({
+const makeForm = (values, fields = []) => ({
   getState: () => ({values}),
+  getRegisteredFields: () => fields,
 })
 
 const indexMeta = (mapOptions = {text: 'code', value: '{index}'}) => ({
@@ -190,7 +191,7 @@ describe('raw and structured forms data boundaries', () => {
       }],
       ['nested-row', {
         // Its fields are named by its row's place, `root.rows[1].value`.
-        form: makeForm({root: {rows: [undefined, {value: 'nested'}]}}),
+        form: makeForm({root: {rows: [undefined, {value: 'nested'}]}}, ['root.rows[1].value']),
         meta: {relativePath: 'root.rows', relativeIndex: 1},
       }],
     ])

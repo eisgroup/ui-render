@@ -8,7 +8,8 @@
  * state changed.
  */
 import { createForm } from 'final-form'
-import { createBatchedForm, registrationsOf } from '../batchedForm'
+import { createBatchedForm, fieldNamesCount, fieldNamesOf, registrationsOf } from '../batchedForm'
+import { formsChangeCount } from '../../../state/formRegistry'
 
 const SUBSCRIPTION = { value: true, error: true, valid: true, pristine: true }
 
@@ -190,6 +191,95 @@ describe('createBatchedForm', () => {
         form.pauseValidation()
         form.resumeValidation()
         expect(batches.count).toBe(1)
+    })
+})
+
+describe('the values a batched form\'s subscribers are told of', () => {
+    // What the engine merges from the forms is kept while the count stays the same (`engine/keptRawFormsData.ts`): a
+    // subscriber that decides as it is told must find the count moved already, whichever subscriber is told first.
+    it('are counted once per change, before the first subscriber hears of them', () => {
+        const form = createBatchedForm({ onSubmit: () => undefined, initialValues: { a: 1 } })
+        const heard = []
+        const listen = who => form.subscribe(({ values }) => { heard.push([who, values.a, formsChangeCount()]) }, { values: true })
+        listen('first')
+        listen('second')
+        const before = formsChangeCount()
+        heard.length = 0
+
+        form.change('a', 2)
+
+        expect(heard).toEqual([['first', 2, before + 1], ['second', 2, before + 1]])
+    })
+
+    it('are not counted for a subscriber to something else, nor when the values stay', () => {
+        const form = createBatchedForm({ onSubmit: () => undefined, initialValues: { a: 1 } })
+        const succeeded = []
+        form.subscribe(() => undefined, { values: true })
+        form.subscribe(({ submitSucceeded }) => { succeeded.push(submitSucceeded) }, { submitSucceeded: true })
+        const before = formsChangeCount()
+
+        form.submit()
+
+        expect(succeeded).toEqual([false, true])
+        expect(formsChangeCount()).toBe(before)
+    })
+})
+
+describe('the names of a batched form\'s fields', () => {
+    // The engine takes from a table row's own form the values of its fields (`engine/formData.ts`), the ones a `showIf`
+    // has hidden included, as final-form keeps their values.
+    const listen = () => undefined
+
+    it('are every name a field registered with, in the order they came, the ones that went included', () => {
+        const form = createBatchedForm({ onSubmit: () => undefined })
+        const goes = form.registerField('items[0].detail', listen, { value: true })
+        form.registerField('items[0].kind', listen, { value: true })
+        goes()
+
+        expect(fieldNamesOf(form)).toEqual(['items[0].detail', 'items[0].kind'])
+        expect(form.getRegisteredFields()).toEqual(['items[0].kind'])
+    })
+
+    it('are a name for the field react-final-form registers from its effect, and none for its probe', () => {
+        const form = createBatchedForm({ onSubmit: () => undefined })
+        form.registerField('probed', listen, { value: true }, { silent: true })()
+        form.pauseValidation()
+        form.registerField('paused', listen, { value: true })
+
+        expect(fieldNamesOf(form)).toEqual(['paused'])
+    })
+
+    it('are the same list while no name comes, and a longer one that starts with it once one does', () => {
+        const form = createBatchedForm({ onSubmit: () => undefined })
+        form.registerField('a', listen, { value: true })
+        const first = fieldNamesOf(form)
+        const count = fieldNamesCount()
+
+        const goes = form.registerField('a', listen, { value: true })
+        goes()
+        expect([fieldNamesOf(form), fieldNamesCount()]).toEqual([first, count])
+        expect(fieldNamesOf(form)).toBe(first)
+
+        form.registerField('b', listen, { value: true })
+        expect([fieldNamesOf(form), fieldNamesCount()]).toEqual([['a', 'b'], count + 1])
+    })
+
+    it('are counted as no change of what the forms hold: a field registers with the value its form holds', () => {
+        const form = createBatchedForm({ onSubmit: () => undefined, initialValues: { a: 1 } })
+        const before = formsChangeCount()
+
+        form.registerField('a', listen, { value: true })
+
+        expect(formsChangeCount()).toBe(before)
+    })
+
+    it('are a batched form\'s, and its copies\'; none for any other form', () => {
+        const form = createBatchedForm({ onSubmit: () => undefined })
+        form.registerField('a', listen, { value: true })
+
+        expect(fieldNamesOf({ ...form, reset: () => undefined })).toBe(fieldNamesOf(form))
+        expect(fieldNamesOf(createForm({ onSubmit: () => undefined }))).toBeUndefined()
+        expect(fieldNamesOf(undefined)).toBeUndefined()
     })
 })
 

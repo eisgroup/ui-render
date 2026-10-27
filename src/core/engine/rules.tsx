@@ -25,10 +25,11 @@ import { applyPeriods } from './applyPeriods'
 import { parsePopupAlertArgs, parsePopupArgs } from './popupArgs'
 import { findPopupTemplate } from './popupTemplate'
 import { resolvePopupRowContext, resolvePopupScope } from './popupScope'
-import { countReset, dataFormsOf, errorsFor, formsOf, touchedFor } from '../state/formRegistry'
+import { countFormsChange, countReset, dataFormsOf, errorsFor, formsOf, touchedFor } from '../state/formRegistry'
 import { phrase, phraseMessage } from '../utils/phrases'
 import type { PhraseMessage } from '../utils/phrases'
-import { getFormsData, getLiveMergedDataKindArray, getRawFormsData } from './formData'
+import { getFormsData, getLiveMergedDataKindArray, restartWrittenRows } from './formData'
+import { keptRawFormsData } from './keptRawFormsData'
 import type { ValidatingForm } from './formData'
 import { errorsProcessing, mapErrorObjectToUIFormat, showsAnError } from './errorMapping'
 import { getDateStringFromDateObject, normalizeIncomingData, replaceDeepCopy } from './dataMapping'
@@ -456,9 +457,10 @@ export class UIRender extends DocumentInstance {
         return compactDataKindArrays(getFormsData(dataFormsOf(this.formTree)))
     }
 
-    // Raw form values without Select array reordering — for showIf lookups
+    // Raw form values without Select array reordering — for showIf lookups. One merge for every document of the tree
+    // while its forms hold the same (`keptRawFormsData`).
     getRawFormsData = () => {
-        return getRawFormsData(formsOf(this.formTree))
+        return keptRawFormsData(this.formTree)
     }
 
     getCalledMethod = () => {
@@ -1067,6 +1069,16 @@ function Decorator (Class: any) {
             const { dataKind } = this.formValues
             for (const kind in dataKind) {
                 dataKind[kind] = this.getDataKind(kind).map((v: unknown, index: number) => isEmpty(v) ? dataKind[kind][index] : v)
+            }
+            if (dataKind) {
+                // The document holds the rows' edits now, whether validation lets the submit through or not: a row's own
+                // form measures its next ones from what the document's form holds of them (`restartWrittenRows`), or one
+                // set back would give nothing. A row's own document that submits writes into the row's form, which the
+                // document's form does not read: that moves no start.
+                restartWrittenRows(dataFormsOf(this.formTree))
+                // Written into the form's values in place, which final-form tells no subscriber of: counted, so that the
+                // merge a `showIf` reads is made again (`keptRawFormsData`).
+                countFormsChange()
             }
             return this.form.submit(...args)
         }

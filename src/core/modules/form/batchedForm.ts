@@ -1,5 +1,6 @@
 import { createForm } from 'final-form'
 import type { Config, FormApi } from 'final-form'
+import { countFormsChange } from '../../state/formRegistry'
 
 /**
  * Brackets around a burst of fields registering and unregistering, which an engine node opens in its layout effect
@@ -33,6 +34,29 @@ export function revalidate (form: unknown): void {
   if (run) run()
 }
 
+const FIELDS = Symbol('fields')
+
+/** How many names the forms `createBatchedForm` made have registered, each the first time one of them registers it. */
+let namesRegistered = 0
+
+/**
+ * How many times a form `createBatchedForm` made has registered a name it had not registered before. The merge of the
+ * forms a `showIf` reads is kept while this stays the same, and checked when it moves (`engine/keptRawFormsData.ts`).
+ */
+export function fieldNamesCount (): number {
+  return namesRegistered
+}
+
+/**
+ * The name of every field a form `createBatchedForm` made, or a copy of one, has registered, the ones that have gone
+ * included, in the order they came: a list read before is the start of a later one. The same array while no name
+ * comes. Undefined for any other form.
+ */
+export function fieldNamesOf (form: unknown): readonly string[] | undefined {
+  const read = form ? (form as {[FIELDS]?: () => readonly string[]})[FIELDS] : undefined
+  return read ? read() : undefined
+}
+
 /**
  * The final-form instance a document's `<Form>` renders, whose fields hear of each other once per burst of
  * registrations rather than once per field (2026-10-13).
@@ -61,10 +85,26 @@ export function revalidate (form: unknown): void {
  * A registration that asks to be silent itself, as react-final-form's probe in a field's first render does, keeps
  * its `silent`, and while validation runs, it registers without its validator (see below). Every other registration
  * made while validation runs is left as it is.
+ *
+ * NEW VALUES ARE COUNTED FIRST (2026-10-26). The first of the form's subscribers told of new values counts a change of
+ * what the page's forms hold before it hears of them (`countFormsChange`), whichever subscriber that is. What the engine
+ * merges from the forms is kept while the count stays the same (`engine/keptRawFormsData.ts`), and a node that follows
+ * the form decides as soon as it is told, by such a merge: it subscribes before the form layer does, as it mounts first.
+ *
+ * ITS FIELDS ARE KEPT (2026-10-27). The engine takes from a table row's own form the values of the fields it changed,
+ * and nothing else (`engine/formData.ts`), so the form names every field it has registered (`fieldNamesOf`), the ones
+ * that have gone included: final-form keeps the value of a field that goes, as one a `showIf` hides, and the document's
+ * form keeps its copy. A name that comes is counted (`fieldNamesCount`), not as a change of what the forms hold: a field
+ * registers with the value its form holds, which is mostly the one the form started with, and gives a merge nothing
+ * then. A change counted for every burst of registrations would merge the forms once more for each, a mount among them.
+ * react-final-form's probe gives no name: the field registers again from its effect.
  */
 export function createBatchedForm<FormValues = Record<string, any>> (config: Config<FormValues>): FormApi<FormValues> {
   const form = createForm<FormValues>(config)
-  const {registerField, resumeValidation, setConfig, submit} = form
+  const {registerField, resumeValidation, setConfig, submit, subscribe} = form
+  // The values the form's subscribers were last told of: those it starts with, which react-final-form's first render
+  // subscribes for and no merge holds yet, until a change.
+  let toldValues: unknown = form.getState().values
   // The form's own validator, which `setConfig('validate', …)` keeps and validates every field with.
   let validate = config.validate
   // A field registered silently since validation was paused, which the others have not heard of yet.
@@ -75,6 +115,9 @@ export function createBatchedForm<FormValues = Record<string, any>> (config: Con
   // The brackets open, and whether the outermost one paused validation itself.
   let depth = 0
   let pausedHere = false
+  // Every name a field has registered with, and the list `fieldNamesOf` gives of them, made again once one comes.
+  const registered = new Set<string>()
+  let names: readonly string[] = []
 
   /** Tells every field and the form's listeners, once, what the fields that came and went left untold. */
   const settle = () => {
@@ -105,6 +148,11 @@ export function createBatchedForm<FormValues = Record<string, any>> (config: Con
       if (form.isValidationPaused()) return registerField(name, subscriber, subscription, fieldConfig)
       return registerField(name, subscriber, subscription, {...fieldConfig, getValidator: undefined})
     }
+    // A key of the form's values, as the checker types it: a field's name, which is a string.
+    if (!registered.has(String(name))) {
+      registered.add(String(name))
+      namesRegistered += 1
+    }
     if (!form.isValidationPaused()) return registerField(name, subscriber, subscription, fieldConfig)
     unheard = true
     const unregister = registerField(name, subscriber, subscription, {...fieldConfig, silent: true})
@@ -123,6 +171,13 @@ export function createBatchedForm<FormValues = Record<string, any>> (config: Con
     resumeValidation()
     settle()
   }
+  form.subscribe = (subscriber, subscription) => subscribe(state => {
+    if (subscription.values && state.values !== toldValues) {
+      toldValues = state.values
+      countFormsChange()
+    }
+    subscriber(state)
+  }, subscription)
   form.submit = () => {
     // A submit between a commit and its effects, inside a bracket, submits what has registered so far validated.
     if (pausedHere) {
@@ -148,6 +203,14 @@ export function createBatchedForm<FormValues = Record<string, any>> (config: Con
       form.resumeValidation()
     },
   }
-  Object.assign(form, {[REGISTRATIONS]: registrations, [REVALIDATE]: () => setConfig('validate', validate)})
+  Object.assign(form, {
+    [REGISTRATIONS]: registrations,
+    [REVALIDATE]: () => setConfig('validate', validate),
+    // The names only ever grow: a list of another length is out of date.
+    [FIELDS]: () => {
+      if (names.length !== registered.size) names = Array.from(registered)
+      return names
+    },
+  })
   return form
 }

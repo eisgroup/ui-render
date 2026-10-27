@@ -136,6 +136,24 @@ whose `showIf` reads the form hears the other forms of its document tree too, wh
 what the form held before, and the tree keeps its latest tells, so a node catches up as it commits with those made
 after it rendered.
 
+Every such decision reads the merge of its tree's forms, which the tree's nodes share while what the page's forms hold
+stays the same (`keptRawFormsData`, since 2026-10-26): `formsStorage` counts each form that registers, goes or
+registers again, and a form a document renders counts its new values before the first of its subscribers hears of them
+(`createBatchedForm`). A tree's tells come too late for that: the form layer subscribes as the form commits, after the
+nodes under it. A change written into a form's values in place, which final-form tells nobody of, must be counted
+where it is made (`countFormsChange`), as the `submit` action's is. A `useForm` row's form holds its row at the row's
+place, as its fields read it (`engine/Data.tsx`), and every merge of the forms takes from it the values of the fields
+it changed and nothing else, each read and written at the field's name (`rowPlaceOf`, `changedInside`, `writeField`,
+`engine/formData.ts`). It changed a field whose value is not its start: its `initialValues`, moved, field by field, to
+what the forms holding the document from its root hold of its values after a submit (`restartWrittenRows`, which the
+`submit` action calls as it writes; a submit a row's own document makes writes into the row's form, and moves no
+start). The rest of the row, a field its cells only show included, is what the document's form holds: what another
+form, such as the row's expanded content's, has edited there, and what a submit has written of the row's form. A
+new write of a row's values into the document's form must move the start the same way. Its fields are every one it
+has registered, the ones a `showIf` hid included (`fieldNamesOf` in `createBatchedForm`). A name that comes is no
+change of what the forms hold: the kept merge is checked against the values of the names that came
+(`fieldNamesCount`, `holdsFields`), so a burst of registrations, a mount's among them, merges nothing more.
+
 A mount has a cost besides renders: every field registers with final-form. Until 2026-10-13, each registration
 published the state of every field before it and, once validation ran, validated them all, and each unregistration
 did the same. A burst of n fields cost about n²/2 of each, on the first render, a tab switch, a `showIf` that flips
