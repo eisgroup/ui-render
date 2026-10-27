@@ -35,9 +35,9 @@ function register (tree, values, meta = {}, fields = []) {
 }
 
 /** A form `createBatchedForm` makes, registered in `tree`, and a field registered with it as a field's effect does. */
-function registerBatched (tree, values, meta = {}) {
+function registerBatched (tree, values, meta = {}, wholeDocument = false) {
     const form = createBatchedForm({ initialValues: values, onSubmit: () => undefined })
-    formsStorage.set({}, { form, meta, tree, draftRow: false })
+    formsStorage.set({}, { form, meta, tree, draftRow: false, wholeDocument })
     return form
 }
 const field = (form, name) => form.registerField(name, () => undefined, { value: true })
@@ -158,6 +158,40 @@ describe('keptRawFormsData', () => {
             const first = keptRawFormsData(tree)
 
             field(document, 'title')
+
+            expect(keptRawFormsData(tree)).toBe(first)
+            expect(mockMerges.count).toBe(1)
+        })
+    })
+
+    describe('a field that comes to a form that holds the whole document, beside another', () => {
+        // A `useForm` block's form that selects no values holds the whole document, as the document's own form does, and
+        // each gives a merge the fields it changed (`mergeDocuments`, 2026-10-27). A block registers first.
+
+        it('merges again where the form changed the field to another value than the merge holds', () => {
+            const tree = {}
+            const block = registerBatched(tree, { title: 'T', note: 'n' }, {}, true)
+            registerBatched(tree, { title: 'T', note: 'n' }, {}, true)
+            block.subscribe(() => undefined, { values: true })
+            block.change('title', 'U')
+            expect(keptRawFormsData(tree).title).toBe('T')
+            const merges = mockMerges.count
+
+            field(block, 'title')
+
+            expect(keptRawFormsData(tree).title).toBe('U')
+            expect(mockMerges.count).toBe(merges + 1)
+        })
+
+        it('keeps the merge where the field holds what the merge holds there', () => {
+            const tree = {}
+            const block = registerBatched(tree, { title: 'T', note: 'n' }, {}, true)
+            // A nested document's form, which a `relativePath` places: it holds no whole document.
+            registerBatched(tree, { note: 'n' }, { relativePath: 'section' })
+            registerBatched(tree, { title: 'T', note: 'n' }, {}, true)
+            const first = keptRawFormsData(tree)
+
+            field(block, 'title')
 
             expect(keptRawFormsData(tree)).toBe(first)
             expect(mockMerges.count).toBe(1)

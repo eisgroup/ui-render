@@ -21,6 +21,10 @@
  * Counted as a change, every burst of registrations would merge again, a mount among them: the mount's second merge
  * comes as its nodes commit, before their fields register.
  *
+ * Where more than one form holds the whole document (`wholeDocument`), such as a `useForm` block's that selects no values
+ * beside the document's own, each of them gives a merge the fields it changed the same way (`mergeDocuments`,
+ * 2026-10-27), and the names that come to them are checked the same way, with `''` for a place.
+ *
  * What is kept is what a merge would give. The values are shared between the calls that get them: read them, do not
  * change them.
  */
@@ -31,7 +35,10 @@ import { getRawFormsData, holdsFields, rowPlaceOf, type MetaNode } from './formD
 /** A form's values, or a merge of several. */
 type Values = Record<string, any>
 
-/** A table row with a form of its own, as a kept merge read it: where the row is, and the names its form had. */
+/**
+ * A table row with a form of its own, as a kept merge read it: where the row is, and the names its form had. Or a form
+ * that holds the whole document, where another does too, whose place is `''`.
+ */
 type KeptRow = { form: RegisteredForm['form'], place: string, names: readonly string[] }
 
 /** A tree's merge, with the counts it was made at and the rows it read. */
@@ -52,16 +59,22 @@ export function keptRawFormsData (tree: object | undefined): Values | undefined 
     return values
 }
 
-/** The table rows with a form of their own among `forms`, and the names each form has registered. */
+/**
+ * The table rows with a form of their own among `forms`, and the names each form has registered; and the forms that
+ * hold the document from its root, where there is more than one.
+ */
 function rowsOf (forms: Map<object, RegisteredForm>): KeptRow[] {
     const rows: KeptRow[] = []
-    forms.forEach(({ form, meta }) => {
+    const documents: KeptRow[] = []
+    forms.forEach(({ form, meta, wholeDocument }) => {
         // A cast, not a guard: what a form registers as its meta is its document's meta.
         const place = rowPlaceOf(meta as MetaNode | undefined)
-        const names = place ? fieldNamesOf(form) : undefined
-        if (place && names) rows.push({ form, place, names })
+        const names = fieldNamesOf(form)
+        if (!names) return
+        if (place) rows.push({ form, place, names })
+        else if (wholeDocument === true) documents.push({ form, place: '', names })
     })
-    return rows
+    return documents.length > 1 ? [...documents, ...rows] : rows
 }
 
 /**
