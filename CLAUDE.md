@@ -142,10 +142,11 @@ registers again, and a form a document renders counts its new values before the 
 (`createBatchedForm`). A tree's tells come too late for that: the form layer subscribes as the form commits, after the
 nodes under it. A change written into a form's values in place, which final-form tells nobody of, must be counted
 where it is made (`countFormsChange`), as the `submit` action's is. A `useForm` row's form holds its row at the row's
-place, as its fields read it (`engine/Data.tsx`), and every merge of the forms takes from it the values of its fields
-and nothing else, each read and written at the field's name (`rowPlaceOf`, `writeField`, `engine/formData.ts`): the
-rest is the document's, which another form, such as the row's expanded content's, may have edited. Its fields are
-every one it has registered, the ones a `showIf` hid included (`fieldNamesOf` in `createBatchedForm`). A name that
+place, as its fields read it (`engine/Data.tsx`), and every merge of the forms takes from it the values of the fields
+it changed, each against the value it started with, and nothing else, each read and written at the field's name
+(`rowPlaceOf`, `changedInside`, `writeField`, `engine/formData.ts`): the rest of the row, a field its cells only show
+included, is the document's, which another form, such as the row's expanded content's, may have edited. Its fields
+are every one it has registered, the ones a `showIf` hid included (`fieldNamesOf` in `createBatchedForm`). A name that
 comes is no change of what the forms hold: the kept merge is checked against the values of the names that came
 (`fieldNamesCount`, `holdsFields`), so a burst of registrations, a mount's among them, merges nothing more.
 

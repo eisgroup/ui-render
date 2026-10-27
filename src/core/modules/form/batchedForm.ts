@@ -91,13 +91,13 @@ export function fieldNamesOf (form: unknown): readonly string[] | undefined {
  * merges from the forms is kept while the count stays the same (`engine/keptRawFormsData.ts`), and a node that follows
  * the form decides as soon as it is told, by such a merge: it subscribes before the form layer does, as it mounts first.
  *
- * ITS FIELDS ARE KEPT (2026-10-27). The engine takes from a table row's own form the values of its fields, and nothing
- * else (`engine/formData.ts`), so the form names every field it has registered (`fieldNamesOf`), the ones that have gone
- * included: final-form keeps the value of a field that goes, as one a `showIf` hides, and the document's form keeps its
- * copy. A name that comes is counted (`fieldNamesCount`), not as a change of what the forms hold: a field registers with
- * the value its row's form holds, which the merge holds already, but where another form edited it, and a change counted
- * for every burst of registrations would merge the forms once more for each, a mount among them. react-final-form's
- * probe gives no name: the field registers again from its effect.
+ * ITS FIELDS ARE KEPT (2026-10-27). The engine takes from a table row's own form the values of the fields it changed,
+ * and nothing else (`engine/formData.ts`), so the form names every field it has registered (`fieldNamesOf`), the ones
+ * that have gone included: final-form keeps the value of a field that goes, as one a `showIf` hides, and the document's
+ * form keeps its copy. A name that comes is counted (`fieldNamesCount`), not as a change of what the forms hold: a field
+ * registers with the value its form holds, which is mostly the one the form started with, and gives a merge nothing
+ * then. A change counted for every burst of registrations would merge the forms once more for each, a mount among them.
+ * react-final-form's probe gives no name: the field registers again from its effect.
  */
 export function createBatchedForm<FormValues = Record<string, any>> (config: Config<FormValues>): FormApi<FormValues> {
   const form = createForm<FormValues>(config)

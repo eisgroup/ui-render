@@ -84,8 +84,18 @@ describe('keptRawFormsData', () => {
 
     describe('a field that comes to a table row\'s own form, with no new values', () => {
         // A merge reads a row's form by its fields' names (`fieldNamesOf`, 2026-10-27), and a field registers with no
-        // change of what the forms hold: one a `showIf` in the row's cells shows, say.
+        // change of what the forms hold: one a `showIf` in the row's cells shows, say. It writes its value only where
+        // the form changed it.
         const row = { relativePath: 'items', relativeIndex: 0 }
+        /** The row's form, which has changed its `detail` while no field of that name was there. */
+        const changedRowForm = tree => {
+            const rowForm = registerBatched(tree, { items: [{ kind: 'a', detail: 'as loaded' }] }, row)
+            // What the document's form does: a subscriber to the values, which counts their changes.
+            rowForm.subscribe(() => undefined, { values: true })
+            field(rowForm, 'items[0].kind')
+            rowForm.change('items[0].detail', 'typed in the row')
+            return rowForm
+        }
 
         it('keeps the merge where the field holds what the merge holds there, as it does when it comes', () => {
             const tree = {}
@@ -100,31 +110,46 @@ describe('keptRawFormsData', () => {
             expect(mockMerges.count).toBe(1)
         })
 
-        it('merges again where the field holds another value, which another form edited in the merge', () => {
+        it('keeps the merge where the field\'s form did not change it, whatever another form edited there', () => {
             const tree = {}
             registerBatched(tree, { title: 'T', items: [{ kind: 'a', detail: 'typed in the document' }] })
-            const rowForm = registerBatched(tree, { items: [{ kind: 'a', detail: 'the row\'s' }] }, row)
+            const rowForm = registerBatched(tree, { items: [{ kind: 'a', detail: 'as loaded' }] }, row)
             field(rowForm, 'items[0].kind')
-            expect(keptRawFormsData(tree).items[0].detail).toBe('typed in the document')
+            const first = keptRawFormsData(tree)
 
             field(rowForm, 'items[0].detail')
 
-            expect(keptRawFormsData(tree).items[0].detail).toBe('the row\'s')
-            expect(mockMerges.count).toBe(2)
+            expect(keptRawFormsData(tree)).toBe(first)
+            expect(first.items[0].detail).toBe('typed in the document')
+            expect(mockMerges.count).toBe(1)
+        })
+
+        it('merges again where its form changed the field to another value than the merge holds', () => {
+            const tree = {}
+            registerBatched(tree, { title: 'T', items: [{ kind: 'a', detail: 'typed in the document' }] })
+            const rowForm = changedRowForm(tree)
+            expect(keptRawFormsData(tree).items[0].detail).toBe('typed in the document')
+            const merges = mockMerges.count
+
+            field(rowForm, 'items[0].detail')
+
+            expect(keptRawFormsData(tree).items[0].detail).toBe('typed in the row')
+            expect(mockMerges.count).toBe(merges + 1)
         })
 
         it('merges again at once where the field comes inside a bracket, before validation resumes', () => {
             const tree = {}
             registerBatched(tree, { title: 'T', items: [{ kind: 'a', detail: 'typed in the document' }] })
-            const rowForm = registerBatched(tree, { items: [{ kind: 'a', detail: 'the row\'s' }] }, row)
+            const rowForm = changedRowForm(tree)
             keptRawFormsData(tree)
+            const merges = mockMerges.count
 
             registrationsOf(rowForm).begin()
             field(rowForm, 'items[0].detail')
 
-            expect(keptRawFormsData(tree).items[0].detail).toBe('the row\'s')
+            expect(keptRawFormsData(tree).items[0].detail).toBe('typed in the row')
             registrationsOf(rowForm).end()
-            expect(mockMerges.count).toBe(2)
+            expect(mockMerges.count).toBe(merges + 1)
         })
 
         it('keeps the merge where a field comes to a document\'s form, which is merged whole', () => {

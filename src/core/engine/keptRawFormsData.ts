@@ -7,8 +7,8 @@
  * row merged as it rendered, and a mount renders the rows two or three times, so n rows cost about n² copies of a row.
  * Counted on React 18.3, a mount of 20, 40 and 80 rows with a `useForm` form each merged 1260, 4920 and 19440 forms, and
  * a keystroke in a table whose rows share the document's form copied the whole table once per row. Each such row's form
- * holds its row since 2026-10-26 (`engine/Data.tsx`), and every merge writes the values of its fields over the
- * document's copy of the row.
+ * holds its row since 2026-10-26 (`engine/Data.tsx`), and every merge writes the values of the fields it changed over
+ * the document's copy of the row.
  *
  * So a tree's merge is kept while what the page's forms hold stays the same (`formsChangeCount`): no form registers,
  * goes or registers again, and no form's values change. The count moves before anything else that subscribes to a form
@@ -16,10 +16,10 @@
  *
  * A merge reads a row's form by its fields' names too, every one the form has registered (`fieldNamesOf`, 2026-10-27).
  * A name that comes is no change of what the forms hold (`fieldNamesCount`): the field registers with the value its
- * row's form holds, which the merge holds already, unless another form has edited it there. So where names came, the
- * merge is kept if it holds what each of them would write (`holdsFields`), and made again if not. Counted as a change,
- * every burst of registrations would merge again, a mount among them: the mount's second merge comes as its nodes
- * commit, before their fields register.
+ * row's form holds, which a merge writes only where the form changed it, mostly not before the field came. So where
+ * names came, the merge is kept if it holds what each of them would write (`holdsFields`), and made again if not.
+ * Counted as a change, every burst of registrations would merge again, a mount among them: the mount's second merge
+ * comes as its nodes commit, before their fields register.
  *
  * What is kept is what a merge would give. The values are shared between the calls that get them: read them, do not
  * change them.

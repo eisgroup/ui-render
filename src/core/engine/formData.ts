@@ -66,11 +66,11 @@ export type ValidatingForm = {
 const lastMerges = new WeakMap<unknown[], Map<string, { arrays: unknown[][], owned: Owned[], rows: object[] }>>()
 
 /**
- * A table row with a form of its own, as a merge of an array reads it: its place, its values, what they hold of the
- * array (`held`: its row of it, or the array, when the array is inside its row), which changes with any of them, and
- * its fields.
+ * A table row with a form of its own, as a merge of an array reads it: its place, its values and those it started with,
+ * what each holds where the merge reads it (`held` and `started`: its row, or the array, when the array is inside its
+ * row), which changes with any of its values there, and its fields.
  */
-type Owned = { place: string, values: Values, held: unknown, fields: readonly string[] }
+type Owned = { place: string, values: Values, initial: Values, held: unknown, started: unknown, fields: readonly string[] }
 
 /**
  * Whether two form objects are one final-form instance. react-final-form hands a new `{...form, reset}`
@@ -122,6 +122,18 @@ function namesInside (fields: readonly string[], place: string): string[] {
   return fields.map(dotted).filter(name => name.startsWith(inside))
 }
 
+/** Whether a form's value at `name` is the one it started with (`initial`, its `initialValues`): an object by its value. */
+const startedWith = (values: Values, initial: Values, name: string) => isEqual(getIn(values, name), getIn(initial, name))
+
+/**
+ * The names of `fields` inside `place` whose value a row's own form changed: what it holds there is not what it started
+ * with (2026-10-27). A field it shows and leaves alone gives nothing: the value there is the document's, which another
+ * form may have edited, such as a field of the same name in the row's expanded content.
+ */
+function changedInside (fields: readonly string[], place: string, values: Values, initial: Values): string[] {
+  return namesInside(fields, place).filter(name => !startedWith(values, initial, name))
+}
+
 /**
  * `target` with `value` written at `at`, a path inside it, as final-form writes a field's value into a form's values
  * (`setIn`): each object on the way copied, so the target is changed only where it is a copy of its own. `undefined`,
@@ -148,9 +160,11 @@ function writeField (target: unknown, at: string, value: unknown): unknown {
  * Length is capped to the minimum array length among those forms so a stale longer copy on the
  * master form does not leave ghost rows after FieldArray.remove (lodash merge keeps trailing indices).
  *
- * A table row with a form of its own (`rowPlaceOf`) gives the values of its fields, and nothing else, each written at
- * its name over the documents' rows and counted in no cap, as `mergeForms` takes them (2026-10-27):
- * - a field of a row of this array, in that row;
+ * A table row with a form of its own (`rowPlaceOf`) gives the values of the fields it changed, and nothing else, each
+ * written at its name over the documents' rows and counted in no cap, as `mergeForms` takes them (2026-10-27):
+ * - a field of a row of this array, or of a row inside one, such as a `useForm` line of a table in a row's expanded
+ *   content, in that row: a submit writes only the top arrays back (`submit` in `rules.tsx`), so a line's edit went
+ *   unsent until 2026-10-27;
  * - a field inside this array, where the array is inside its row, in that row of the array; and a field that holds
  *   the array, as a table's does (`FieldArray`), as the rows;
  * - a field elsewhere, nowhere.
@@ -183,11 +197,17 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
       }
       return
     }
-    const own = dotted(rowMeta!.relativePath!) === at // not undefined: `rowPlaceOf` read both
-    if (!own && !at.startsWith(`${dotted(place)}.`)) return
-    // A row's form has a field or two: its state is cheap.
-    const values = handed ? validating!.values : form.getState().values
-    owned.push({ place, values, held: getIn(values, own ? place : path), fields: fieldsOf(form) })
+    // A row of this array, or a row inside one; else a row this array is inside of, or none of them.
+    const inside = dotted(place).startsWith(`${at}.`)
+    if (!inside && !at.startsWith(`${dotted(place)}.`)) return
+    // A row's form has a field or two: its state, for what it started with, is cheap.
+    const state = form.getState()
+    const values = handed ? validating!.values : state.values
+    const initial = state.initialValues || {}
+    const where = inside ? place : path
+    owned.push({
+      place, values, initial, held: getIn(values, where), started: getIn(initial, where), fields: fieldsOf(form),
+    })
   })
   if (!arrays.length) {
     return []
@@ -197,7 +217,8 @@ export function getLiveMergedDataKindArray (path: string, forms: Forms, validati
   if (
     last && last.arrays.length === arrays.length && last.arrays.every((array, i) => array === arrays[i]) &&
     last.owned.length === owned.length &&
-    last.owned.every((was, i) => was.place === owned[i].place && was.held === owned[i].held && sameNames(was.fields, owned[i].fields))
+    last.owned.every((was, i) => was.place === owned[i].place && was.held === owned[i].held &&
+      was.started === owned[i].started && sameNames(was.fields, owned[i].fields))
   ) {
     return last.rows.slice()
   }
@@ -232,8 +253,8 @@ function mergeRows (at: string, arrays: unknown[][], owned: Owned[]): object[] {
   }
   // Each row is replaced, not changed: the rows hold the objects of the documents' values.
   const inside = `${at}.`
-  owned.slice().sort((a, b) => depthOf(a.place) - depthOf(b.place)).forEach(({ place, values, fields }) => {
-    namesInside(fields, place).forEach(name => {
+  owned.slice().sort((a, b) => depthOf(a.place) - depthOf(b.place)).forEach(({ place, values, initial, fields }) => {
+    changedInside(fields, place, values, initial).forEach(name => {
       const value = getIn(values, name)
       // A field that holds the array: its rows are the rows.
       if (name === at) {
@@ -263,15 +284,17 @@ export const getRawFormsData = (forms: Forms) => {
 }
 
 /**
- * Whether `merged`, a merge `getRawFormsData` gave, holds at each of `names` inside `place` what the table row's own
- * `form` holds there: a merge that read those names too would write over it what it holds already, and come out the
- * same. How a kept merge is checked for the names that came to a row's form after it (`keptRawFormsData`).
+ * Whether `merged`, a merge `getRawFormsData` gave, holds at each of `names` inside `place` that the table row's own
+ * `form` changed what the form holds there: a merge that read those names too would write over it what it holds
+ * already, and come out the same. A name whose value the form did not change, it would not write. How a kept merge is
+ * checked for the names that came to a row's form after it (`keptRawFormsData`).
  */
 export function holdsFields (merged: Values | undefined, form: FormApi, place: string, names: readonly string[]): boolean {
   const inside = namesInside(names, place)
   if (!inside.length) return true
-  const { values } = form.getState()
-  return inside.every(name => isEqual(getIn(values, name), getIn(merged || {}, name)))
+  const { values, initialValues } = form.getState()
+  return inside.every(name =>
+    startedWith(values, initialValues || {}, name) || isEqual(getIn(values, name), getIn(merged || {}, name)))
 }
 
 /**
@@ -285,18 +308,20 @@ export function holdsFields (merged: Values | undefined, form: FormApi, place: s
  * `dataKind.periods[1].dataKind.periods[1]`. Measured: a `showIf` in the add row never saw the row's own
  * fields, and an edit in a `useForm` row put a copy of the table inside that row in `getFormData`.
  *
- * - Only the values of the form's fields are taken (2026-10-27), each read in its values by the field's name and
- *   written at that name over the document's copy of the row (`writeField`), a value cleared there taken away; the
- *   rest of the row is the document's. A `useForm` row's form starts from the row's values there (`engine/Data.tsx`),
- *   and what its fields leave alone, another form may have edited, such as a field in the row's expanded content. Its
- *   fields are every one it has registered (`fieldNamesOf`), a field a `showIf` has hidden included: final-form keeps
- *   its value, as the document's form keeps a hidden field's. A field that holds an array, as a table's does
- *   (`FieldArray`), is written whole. An add row's form starts from the `initialValues` its meta declares, at the root
- *   of its values, where none of its fields reads, so all it holds at the row is what its user typed.
+ * - Only the values of the fields the form changed are taken (2026-10-27): each name whose value is not the one the
+ *   form started with (`changedInside`), read in its values and written at that name over the document's copy of the
+ *   row (`writeField`), a value cleared there taken away. The rest of the row is the document's. A `useForm` row's form
+ *   starts from the row's values there (`engine/Data.tsx`), and what it leaves alone, another form may have edited,
+ *   such as a field in the row's expanded content, of the same name as one its cells show, too. Its fields are every
+ *   one it has registered (`fieldNamesOf`), a field a `showIf` has hidden included: final-form keeps its value, as the
+ *   document's form keeps a hidden field's. A field that holds an array, as a table's does (`FieldArray`), is written
+ *   whole. An add row's form starts from the `initialValues` its meta declares, at the root of its values, where none
+ *   of its fields reads, so all it holds at the row is what its user typed.
  * - From 2026-10-26 what the form changed of the row it started from was taken instead, which review found wrong: a
  *   field named `length` was taken for an array's length, an object the row did not start with was written whole,
  *   over a field another form had added to it, and a cleared field took away the object it left empty in the row's
- *   form, with a field another form held in it.
+ *   form, with a field another form held in it. Then every field's value was taken, changed or not, and one the cells
+ *   only showed wrote the row's value over an edit of the same name in the expanded content.
  * - The row goes into the document's own containers. In containers of its own, the row of a table nested
  *   in a row (`dataKind.phases.0.dataKind.lineItems[2]`) made `phases` an object, which the merge put in
  *   place of the document's array of phases.
@@ -324,8 +349,9 @@ function mergeForms (forms: Forms, fromRoot: (values: Values, meta: MetaNode | u
     }
     // Its fields are named `${place}.${name}` (`mapper.tsx`). Only those: a `useForm` row's form starts from the whole
     // row, and an array up to its index, which a copy would walk hole by hole.
-    const names = namesInside(fieldsOf(form), place);
-    if (names.length) rows.push({ place, names, values: form.getState().values });
+    const { values, initialValues } = form.getState();
+    const names = changedInside(fieldsOf(form), place, values, initialValues || {});
+    if (names.length) rows.push({ place, names, values });
   })
 
   const merged = mergeData(documents);

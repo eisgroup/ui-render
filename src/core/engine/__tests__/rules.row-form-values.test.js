@@ -640,6 +640,46 @@ describe.each([['`useForm` rows', true], ['rows sharing the document\'s form', f
         expect(host.submitted).toEqual([edited])
     })
 
+    // Found in review, from 2026-10-27, for a day: the row's form wrote the value it started with over the edit, and a
+    // submit wrote that back into the document's form, so the expanded content's input lost it too. 0.35.0 had it right.
+    it.each([['an input', {}], ['a read-only input', { readonly: true }]])('keeps an edit the expanded content makes of a field the cells show in %s', async (__, shown) => {
+        const meta = tableOf(
+            [{ view: 'Input', name: 'kind', type: 'text' }, { view: 'Input', name: 'note', type: 'text', ...shown }],
+            [{ view: 'Input', name: 'note', type: 'text' }, { view: 'Text', children: 'The note is new', showIf: { name: 'note', equal: 'new' } }],
+        )
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'a', note: 'old' }] } })
+        const edited = { dataKind: { items: [{ kind: 'a', note: 'new' }] } }
+        const expandedNote = () => Array.from(document.querySelectorAll('[name="dataKind.items[0].note"]')).pop()
+
+        fireEvent.focus(expandedNote())
+        fireEvent.change(expandedNote(), { target: { value: 'new' } })
+        fireEvent.blur(expandedNote())
+
+        expect(host.reader()).toEqual(edited)
+        expect(screen.queryByText('The note is new')).toBeInTheDocument()
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+        expect(expandedNote()).toHaveValue('new')
+    })
+
+    it('keeps an edit the expanded content makes of a field the cells showed and then hid', async () => {
+        const meta = tableOf(
+            [{ view: 'Input', name: 'kind', type: 'text' }, { view: 'Input', name: 'detail', type: 'text', showIf: { name: 'kind', equal: 'other' } }],
+            [{ view: 'Input', name: 'detail', type: 'text' }],
+        )
+        const { host } = mount(meta, { dataKind: { items: [{ kind: 'plain', detail: 'as loaded' }] } })
+        const edited = { dataKind: { items: [{ kind: 'plain', detail: 'new' }] } }
+
+        type('dataKind.items[0].kind', 'other')
+        type('dataKind.items[0].kind', 'plain')
+        type('dataKind.items[0].detail', 'new')
+
+        expect(document.querySelectorAll('[name="dataKind.items[0].detail"]')).toHaveLength(1)
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+
     it('keeps the edit of a field that a `showIf` in the cells then hides, as final-form keeps its value', async () => {
         const meta = tableOf([
             { view: 'Input', name: 'kind', type: 'text' },
@@ -653,6 +693,52 @@ describe.each([['`useForm` rows', true], ['rows sharing the document\'s form', f
 
         expect(field('dataKind.items[0].detail')).not.toBeInTheDocument()
         expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+})
+
+// A submit writes only the top arrays of the document back, as the live merge gives them (`submit` in `rules.tsx`), and
+// until 2026-10-27 that merge left out a row with a form of its own inside another table's row: the edit of a `useForm`
+// line in a phase's expanded content reached `getFormData`, and not a submit. 0.35.0 did the same. Found in review.
+describe.each([['`useForm` rows', true], ['rows sharing the document\'s form', false]])('a table of `useForm` lines in the expanded rows of a table of %s', (_, useForm) => {
+    const meta = {
+        view: 'Col',
+        items: [{
+            view: 'Table',
+            name: 'dataKind.phases',
+            headers: [{ id: 'title', label: 'Phase' }],
+            itemsExpanded: true,
+            renderItemCells: { view: 'Data', kind: 'phases', embedded: true, useForm, meta: { view: 'TableCells', items: [{ view: 'Input', name: 'title', type: 'text' }] } },
+            renderItem: {
+                view: 'Col',
+                items: [{
+                    view: 'Table',
+                    name: 'dataKind.lineItems',
+                    headers: [{ id: 'sku', label: 'SKU' }, { id: 'note', label: 'Note' }],
+                    renderItemCells: {
+                        view: 'Data', kind: 'lineItems', embedded: true, useForm: true,
+                        meta: {
+                            view: 'TableCells',
+                            items: [{ view: 'Input', name: 'sku', type: 'text' }, { view: 'Input', name: 'note', type: 'text', showIf: { name: 'sku', equal: 'X-1' } }],
+                        },
+                    },
+                }],
+            },
+        }, { view: 'Button', children: 'Submit', onClick: 'submit' }],
+    }
+    const data = { dataKind: { phases: [{ title: 'Design', dataKind: { lineItems: [{ sku: 'A' }, { sku: 'B' }] } }] } }
+    const edited = { dataKind: { phases: [{ title: 'Design 2', dataKind: { lineItems: [{ sku: 'A' }, { sku: 'X-1' }] } }] } }
+
+    it('has the edits of a phase and of a line in getFormData, a `showIf` and a submit', async () => {
+        const { host } = mount(meta, data)
+        expect(field('dataKind.phases.0.dataKind.lineItems[1].sku')).toHaveValue('B')
+
+        type('dataKind.phases[0].title', 'Design 2')
+        type('dataKind.phases.0.dataKind.lineItems[1].sku', 'X-1')
+
+        expect(host.reader()).toEqual(edited)
+        expect(field('dataKind.phases.0.dataKind.lineItems[1].note')).toBeInTheDocument()
         await click('Submit')
         expect(host.submitted).toEqual([edited])
     })
