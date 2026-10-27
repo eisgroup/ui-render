@@ -129,9 +129,14 @@ export default function Data ({
   // Prefer relativeIndex over index so row identity stays correct after FieldArray reindex (e.g. remove row).
   const rowIndex = relativeIndex != null ? relativeIndex : index
 
-  // A block whose `name` or `data` selects no values starts from the document's (`mapper.tsx`): its form holds the whole
-  // document, as the document's own form does, and the merges take from each the fields it changed (2026-10-27).
-  const wholeDocument = useForm === true && !rowPlace && !draftRow && initialValues === (instance && instance.data)
+  // A view whose `name` or `data` selects no values starts from its document's (`mapper.tsx`). Where that document holds
+  // the whole document, a tree's root or such a view's document in one, so does this view's: a block's form then holds
+  // the whole document, as the document's own form does, and the merges take from each the fields it changed
+  // (`wholeDocument`, 2026-10-27). Inside a `Data` that selects a section or a row, it holds that section or row.
+  // A cast, not a guard: the instance is a document's engine instance, and its props are the document's.
+  const documentProps = instance && instance.props as { parent?: unknown, wholeDocument?: boolean } | undefined
+  const inWholeDocument = !!documentProps && (!documentProps.parent || documentProps.wholeDocument === true)
+  const wholeDocument = inWholeDocument && !draftRow && !rowPlaceOf(meta) && initialValues === (instance && instance.data)
 
   if (useForm) {
     return <UIRenderWithUISetup
@@ -158,6 +163,7 @@ export default function Data ({
     index={rowIndex}
     relativeIndex={relativeIndex}
     embedded={embedded}
+    wholeDocument={wholeDocument}
     {...{className, style}}
   />
 }

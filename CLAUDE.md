@@ -158,7 +158,9 @@ document's form (`wholeDocument`, which `engine/Data.tsx` hands the form layer, 
 them gives the merges the fields it changed in the same way, and its start moves in the same way, to what the others
 hold (`mergeDocuments`, since 2026-10-27): `mergeData` takes the first to register, a block's, as the master, and merged
 the document's copy, as it started, over the block's edits. A block that selects values of its own holds them from its
-root too, under names the document may have, and is merged as before.
+root too, under names the document may have, and is merged as before; so is one that selects none inside a `Data` view
+that selects a section or a row, which holds that section or row (`Data.tsx` hands `wholeDocument` down only from a
+document that holds the whole document).
 
 A mount has a cost besides renders: every field registers with final-form. Until 2026-10-13, each registration
 published the state of every field before it and, once validation ran, validated them all, and each unregistration

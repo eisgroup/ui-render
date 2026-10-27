@@ -302,3 +302,61 @@ describe('a Select whose value is an option\'s index, in a `useForm` block that 
         expect(read(host)).toEqual({ order: ['East', 'North', 'South', 'West'], selection: undefined })
     })
 })
+
+describe('a block that selects no values, inside a `Data` view without `useForm` that selects a section or a row', () => {
+    // The block starts from that document's values, a section or a row, not the whole document's: it is merged as before,
+    // and its `title` and the document's are one name, one place.
+    const titles = () => Array.from(document.querySelectorAll('[name="title"]'))
+    const inner = block([{ view: 'Input', name: 'title', type: 'text' }, { view: 'Input', name: 'note', type: 'text' }])
+    const editInner = value => {
+        const input = titles()[titles().length - 1]
+        fireEvent.focus(input)
+        fireEvent.change(input, { target: { value } })
+        fireEvent.blur(input)
+    }
+    let errors
+    beforeEach(() => {
+        errors = []
+        jest.spyOn(console, 'error').mockImplementation((...args) => { errors.push(String(args[0])) })
+    })
+    afterEach(() => {
+        // The block renders a <form> in the nested document's <form>, as it did before.
+        expect(errors.filter(message => !/validateDOMNesting|cannot be a descendant of|cannot contain a nested/.test(message))).toEqual([])
+        jest.restoreAllMocks()
+    })
+
+    it.each([
+        ['whose `name` selects a section', { name: 'section' }],
+        ['whose `data` is a section', { data: { title: 'S', note: 'n' } }],
+    ])('keeps the document\'s value in a `Data` %s', (_, selects) => {
+        const meta = { view: 'Col', items: [{ view: 'Input', name: 'title', type: 'text' }, showsWhile('title', 'T'), { view: 'Data', kind: 'section', ...selects, meta: { view: 'Col', items: [inner] } }] }
+        const host = mount(meta, { title: 'T', section: { title: 'S', note: 'n' } })
+        expect(titles().map(input => input.value)).toEqual(['T', 'S'])
+        editInner('S2')
+        expect(host.reader().title).toBe('T')
+        expect(screen.queryByText('title is T')).toBeInTheDocument()
+    })
+
+    it('keeps the document\'s value in a `Data` that is a table row\'s expanded content', () => {
+        const meta = {
+            view: 'Col',
+            items: [
+                { view: 'Input', name: 'title', type: 'text' },
+                showsWhile('title', 'T'),
+                {
+                    view: 'Table',
+                    name: 'dataKind.phases',
+                    headers: [{ id: 'title', label: 'Phase' }],
+                    itemsExpanded: true,
+                    renderItemCells: { view: 'Data', kind: 'phases', embedded: true, meta: { view: 'TableCells', items: [{ view: 'Input', name: 'title', type: 'text' }] } },
+                    renderItem: { view: 'Data', kind: 'phases', meta: { view: 'Col', items: [inner] } },
+                },
+            ],
+        }
+        const host = mount(meta, { title: 'T', dataKind: { phases: [{ title: 'Design', note: 'x' }] } })
+        expect(titles().map(input => input.value)).toEqual(['T', 'Design'])
+        editInner('Design 2')
+        expect(host.reader().title).toBe('T')
+        expect(screen.queryByText('title is T')).toBeInTheDocument()
+    })
+})

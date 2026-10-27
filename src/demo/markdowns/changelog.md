@@ -24,10 +24,11 @@
   in the block whose value is an option's index lost its pick. Such a block shown after an edit of the document's form
   took that edit back. 0.35.0 did all of it. What is read from the forms now takes, from the document's form and from
   each such block's, the value of each field it changed, over the others' copies, as it takes a `useForm` table row's.
-  A block that selects values of its own is read as before. A submit of the document still sends its own form's values
-  and the tables' rows, and no other field of such a block. Two cases stay as they were: an Add or a Remove in a table
-  in such a block does not reach a submit, nor a Remove `getFormData`; and such a block shown after a submit takes back
-  the edit of a `useForm` table row that the submit sent.
+  A block that selects values of its own, or that sits in a `Data` view that selects a section or a row, is read as
+  before. A submit of the document still sends its own form's values and the tables' rows, and no other field of such a
+  block. Three cases stay as they were: an Add or a Remove in a table in such a block does not reach a submit, nor a
+  Remove `getFormData`; such a block shown after a submit takes back the edit of a `useForm` table row that the submit
+  sent; and the pick of such a Select is lost where a table in another form edits its options.
 - **A `showIf` that reads the form merges the document's forms once, not once per node.** A node whose `showIf` reads
   a field decides by every form of its document merged, and each node merged them as it decided, so a table whose
   rows each hold such a node copied its forms once per row on every render of the rows. Measured on React 18.3 before

@@ -261,9 +261,10 @@ function documentFormsOf (forms: Forms): DocumentForm[] {
  * (`startOf`), read in its copy, as `fromRoot` gave it. And what `fromRoot` changed of its values: a Select's options,
  * which its form put in the order the Select's value picks, and that value, which it gave up for that order, where the
  * copy of another form, whose meta does not reach the Select, came over them. In the order `mergeData` merges them, so
- * that two forms that changed one field come out as they did. A block that selects values of its own, and a `useForm`
- * view in a table row's expanded content, hold those values from their root too, under names the document may have:
- * they are merged as before, by `mergeData` alone, and so is a document with one form that holds the whole of it.
+ * that two forms that changed one field come out as they did. A block that selects values of its own, a `useForm`
+ * view in a table row's expanded content, and a block in a `Data` view that selects a section or a row, hold those
+ * values from their root too, under names the document may have: they are merged as before, by `mergeData` alone, and
+ * so is a document with one form that holds the whole of it.
  *
  * @param {Array} documents - the forms merged from the root of the document (`documentFormsOf`)
  * @param {Function} fromRoot - what each contributes of its values
@@ -277,7 +278,9 @@ function mergeDocuments (documents: DocumentForm[], fromRoot: (values: Values, m
   return wholes.reduce((result: unknown, index) => {
     const { form, values, initialValues } = documents[index]
     const copy = copies[index]
-    const given = fromRoot === sameValues ? [] : Object.keys({ ...values, ...copy }).filter(key => !isEqual(copy[key], values[key]))
+    // What `fromRoot` can change: a key at the root it takes away, and an array there it orders anew.
+    const given = fromRoot === sameValues ? [] : Object.keys(values)
+      .filter(key => !(key in copy) || (Array.isArray(copy[key]) && !isEqual(copy[key], values[key])))
     return [...changedInside(fieldsOf(form), '', values, startOf(form, initialValues)), ...given]
       .reduce((target: unknown, name) => writeField(target, name, getIn(copy, name)), result)
   }, merged) as Values | undefined
