@@ -589,6 +589,16 @@ describe('more than one form that holds the document from its root', () => {
             expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ kind: 'a' }, { kind: 'x' }, { kind: 'new' }])
         })
 
+        it('merges the rows of a nested document\'s form as before, and reads no field of it', () => {
+            // A form with a `relativePath` and no `relativeIndex` holds no document from its root.
+            const forms = new Map([
+                ['block', formOf({ items: [{ kind: 'b' }, { kind: 'x' }] }, ['items[0].kind'], start)],
+                ['nested', formOf({ items: [{ note: 'n' }, { note: 'm' }] }, ['items[0].note'], {}, { relativePath: 'items' })],
+                ['document', formOf(start, [], start)],
+            ])
+            expect(getLiveMergedDataKindArray('items', forms)).toEqual([{ kind: 'b', note: 'n' }, { kind: 'x', note: 'm' }])
+        })
+
         it('reads the form a validator runs in from the values it was handed, every field it has there, and not its state', () => {
             const block = { reads: 0, getState () { block.reads += 1; return { values: start, initialValues: start } }, getFieldState: () => ({}), getRegisteredFields: () => ['items[0].kind'] }
             const forms = new Map([['block', { form: block, meta: {} }], ['document', formOf(start, [], start)]])

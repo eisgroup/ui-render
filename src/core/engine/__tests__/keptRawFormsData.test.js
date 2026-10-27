@@ -186,6 +186,8 @@ describe('keptRawFormsData', () => {
         it('keeps the merge where the field holds what the merge holds there', () => {
             const tree = {}
             const block = registerBatched(tree, { title: 'T', note: 'n' })
+            // A nested document's form, which a `relativePath` places: it holds no document from its root.
+            registerBatched(tree, { note: 'n' }, { relativePath: 'section' })
             registerBatched(tree, { title: 'T', note: 'n' })
             const first = keptRawFormsData(tree)
 

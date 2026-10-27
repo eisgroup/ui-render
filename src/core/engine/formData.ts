@@ -200,8 +200,9 @@ export function restartWrittenRows (forms: Forms): void {
     restart(form, state.values, state.initialValues, place, values)
   })
   if (documents.length < 2) return
-  // Each measured against the others before any start moves: a moved start changes what a form gives them.
-  const others = documents.map(document => mergeDocuments(documents.filter(other => other !== document), sameValues) || {})
+  // Each measured against the others before any start moves: a moved start changes what a form gives them. Not
+  // undefined: there is another form, and a merge of forms is an object.
+  const others = documents.map(document => mergeDocuments(documents.filter(other => other !== document), sameValues)!)
   documents.forEach(({ form, values: own, initialValues }, index) => restart(form, own, initialValues, '', others[index]))
 }
 
