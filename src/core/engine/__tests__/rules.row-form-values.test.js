@@ -1139,6 +1139,73 @@ describe.each(rowsOfBothKinds)('an Add in a table whose cells %s, one of them sh
     })
 })
 
+// A `useForm` block whose `name` or `data` selects no values holds the whole document, as the document's own form does
+// (`wholeDocument`), and the merges take from each the fields it changed (`mergeDocuments`). An Add and a Remove in a
+// table beside it write the rows' edits into the document's form all the same, and move the start of each row they keep
+// written to what that form held of it once written.
+describe.each(rowsOfBothKinds)('an Add and a Remove beside a `useForm` block that holds the whole document, in a table whose cells %s', (_, useForm) => {
+    const meta = {
+        view: 'Col',
+        items: [
+            { view: 'Data', kind: 'block', useForm: true, meta: { view: 'Col', items: [{ view: 'Input', name: 'title', type: 'text' }] } },
+            {
+                view: 'Table',
+                name: 'dataKind.items',
+                headers: [{ id: 'kind', label: 'Kind' }, { id: 'null', label: '' }],
+                renderItemCells: {
+                    view: 'Data', kind: 'items', embedded: true, ...useForm && { useForm: true },
+                    meta: {
+                        view: 'TableCells',
+                        items: [
+                            { view: 'Input', name: 'kind', type: 'text' },
+                            { view: 'Button', children: 'Remove', onClick: 'removeData' },
+                        ],
+                    },
+                },
+                renderExtraItem: {
+                    view: 'Data', kind: 'items', embedded: true, initialValues: {},
+                    meta: {
+                        view: 'TableCells',
+                        items: [
+                            { view: 'Input', name: 'kind', type: 'text', label: 'New kind' },
+                            { view: 'Button', children: 'Add', onClick: 'addData' },
+                        ],
+                    },
+                },
+            },
+            { view: 'Button', children: 'Submit', onClick: 'submit' },
+        ],
+    }
+
+    it('keeps what was typed in a row as a row is added and another removed', async () => {
+        const { host } = mount(meta, { title: 'T', dataKind: { items: [{ kind: 'a' }, { kind: 'b' }] } })
+        const edited = { title: 'T', dataKind: { items: [{ kind: 'b-edited' }, { kind: 'c' }] } }
+
+        type('dataKind.items[1].kind', 'b-edited')
+        type('dataKind.items[2].kind', 'c')
+        await click('Add')
+        await click('Remove', 0)
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('b-edited')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+
+    it('keeps an edit to the row it was made in, as a row that reads the same moves into its place', async () => {
+        const { host } = mount(meta, { title: 'T', dataKind: { items: [{ kind: 'x' }, { kind: 'a' }, { kind: 'a' }] } })
+        const edited = { title: 'T', dataKind: { items: [{ kind: 'a1' }, { kind: 'a' }] } }
+
+        type('dataKind.items[1].kind', 'a1')
+        await click('Remove', 0)
+
+        expect(field('dataKind.items[0].kind')).toHaveValue('a1')
+        expect(host.reader()).toEqual(edited)
+        await click('Submit')
+        expect(host.submitted).toEqual([edited])
+    })
+})
+
 // A row an Add or a Remove leaves where it was, and as it was, goes back into the data they rebuild as its form started
 // from it, so that its form keeps what it holds (`dataKindPush.ts`), as it did before the edits were written. Written
 // into that data with the other rows' edits, its edit started its form again from it. Measured while this was made: the
